@@ -5515,7 +5515,7 @@ msgid "Could not disconnect."
 msgstr "Trennen fehlgeschlagen."
 
 msgid "Could not download {names}."
-msgstr "{names} konnte nicht heruntergeladen werden."
+msgstr "Herunterladen fehlgeschlagen: {names}."
 
 msgid "Could not forget {domain}"
 msgstr "{domain} konnte nicht vergessen werden"

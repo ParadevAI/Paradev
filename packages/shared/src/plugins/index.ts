@@ -721,3 +721,20 @@ export function getPluginByName(name: string): PluginCatalogEntry | undefined {
 	const proxied = pluginProxyMcpServers(name);
 	return proxied ? { ...entry, mcpServers: proxied } : entry;
 }
+
+/**
+ * The desktop's old install record in local-db settings. Nothing reads it now
+ * except the one-time move into installed_plugins.json; the column stays so a
+ * build from before the move can still open the database.
+ */
+export interface InstalledPlugin {
+	name: string;
+	version: string;
+	installedAt: string;
+	/**
+	 * false = keep the install record but materialize nothing (Codex's
+	 * `enabled = false` semantics). Absent means enabled — records written
+	 * before this field existed stay active.
+	 */
+	enabled?: boolean;
+}

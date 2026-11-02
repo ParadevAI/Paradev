@@ -1,9 +1,9 @@
 import {
-	availablePlugins,
 	ensureDefaultMarketplace,
 	type InstallPluginResult,
 	installOrganizationPlugin,
 	installPlugin,
+	listAvailable,
 } from "@superset/agent-setup";
 import {
 	boolean,
@@ -43,7 +43,7 @@ async function organizationPlugin(
 		marketplace === ORGANIZATION ||
 		(marketplace !== undefined && isOrganizationMarketplace(marketplace));
 	if (marketplace && !named) return null;
-	if (!named && (await availablePlugins(name)).candidates.length) return null;
+	if (!named && listAvailable().some((a) => a.entry.name === name)) return null;
 
 	const plugins = await api.plugins.organization.list.query().catch((error) => {
 		if (named) throw error;

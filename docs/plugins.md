@@ -125,8 +125,10 @@ The code that changes it lives in `@superset/agent-setup` (`plugin-install.ts`, 
 `plugins` commands are thin wrappers over it, and the desktop calls it in-process from its tRPC
 routes and awaits it, so a failure reaches the Plugins page as an error. The desktop does not run
 the CLI for plugins and keeps no install list of its own; the list it once kept in `local.db` is
-moved into the file on upgrade, before the migration that drops it. Errors are `PluginError`; the
-CLI adds the command to run next. In one process, wrap every change in `serializePluginChange`:
+copied into the file once on upgrade; the column stays, unused, so an older build can still open
+the database. A refused change (not found, ambiguous, already or not installed) throws
+`PluginError`, and the CLI adds the command to run next; other failures (git, the filesystem, a
+timeout) are plain errors. In one process, wrap every change in `serializePluginChange`:
 each one reads the file and rewrites it, so two that overlap lose one's change. Authoring
 (`create`, `validate`, `publish`) stays in the CLI.
 

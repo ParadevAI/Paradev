@@ -1,3 +1,4 @@
+import type { InstalledPlugin } from "@superset/shared/plugins";
 import {
 	index,
 	integer,
@@ -265,6 +266,9 @@ export const settings = sqliteTable("settings", {
 	}),
 	disabledAgentHooks: text("disabled_agent_hooks", { mode: "json" }).$type<
 		string[]
+	>(),
+	installedPlugins: text("installed_plugins", { mode: "json" }).$type<
+		InstalledPlugin[]
 	>(),
 	disabledSkills: text("disabled_skills", { mode: "json" }).$type<string[]>(),
 });

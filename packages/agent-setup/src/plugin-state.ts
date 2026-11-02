@@ -67,16 +67,22 @@ export function writeKnownMarketplaces(
 	writeFileIfChanged(file, `${JSON.stringify(value, null, "\t")}\n`, 0o644);
 }
 
+/** Throws on a file with no plugins list: a rewrite would replace it with one entry. */
 export function readInstalledPlugins(): InstalledPluginEntry[] {
-	const raw = readJsonFile<{
-		version: number;
-		plugins: InstalledPluginEntry[];
-	}>(installedPluginsFilePath(), { version: 1, plugins: [] });
-	return raw.plugins ?? [];
+	const file = installedPluginsFilePath();
+	const raw = readJsonFile<unknown>(file, { version: 1, plugins: [] });
+	const plugins = (raw as { plugins?: unknown } | null)?.plugins;
+	if (!Array.isArray(plugins)) {
+		throw new PluginError(
+			`${file} has no plugins list, so it cannot be safely rewritten.`,
+		);
+	}
+	return plugins as InstalledPluginEntry[];
 }
 
 export function marketplaceManifest(name: string): Marketplace {
-	const known = readKnownMarketplaces()[name];
+	const registry = readKnownMarketplaces();
+	const known = Object.hasOwn(registry, name) ? registry[name] : undefined;
 	if (!known) {
 		throw new PluginError(`Marketplace "${name}" is not installed.`, {
 			code: "marketplace-not-installed",

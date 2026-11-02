@@ -15,7 +15,6 @@ import {
 	SUPERSET_SENSITIVE_FILE_MODE,
 } from "../app-environment";
 import { applyLegacyHomeMove } from "./legacy-home-paths";
-import { adoptLegacyInstalledPlugins } from "./legacy-installed-plugins";
 
 const DB_PATH = join(SUPERSET_HOME_DIR, "local.db");
 
@@ -96,15 +95,6 @@ console.log(`[local-db] Database initialized at: ${DB_PATH}`);
 console.log(`[local-db] Running migrations from: ${migrationsFolder}`);
 
 export const localDb = drizzle(sqlite, { schema });
-
-try {
-	const moved = adoptLegacyInstalledPlugins(sqlite);
-	if (moved.length) {
-		console.log(`[local-db] Moved plugins to installed_plugins.json: ${moved}`);
-	}
-} catch (error) {
-	console.error("[local-db] Could not move installed plugins:", error);
-}
 
 try {
 	runMigrations(localDb, migrationsFolder);

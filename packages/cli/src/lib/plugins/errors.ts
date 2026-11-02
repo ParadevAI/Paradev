@@ -9,6 +9,8 @@ function commandHint(error: PluginError): string | undefined {
 			return `Name one with --marketplace <name>, or ${error.plugin}@<marketplace>.`;
 		case "already-installed":
 			return `Run: superset plugins install ${error.plugin} --update`;
+		case "not-installed":
+			return `Run: superset plugins install ${error.plugin}`;
 		case "marketplace-not-installed":
 			return "Run: superset plugins marketplace add <owner/repo>";
 		default:

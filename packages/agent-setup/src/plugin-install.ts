@@ -274,7 +274,10 @@ export function listAvailable(): AvailablePlugin[] {
 }
 
 function sourceDir(marketplace: string, entry: MarketplaceEntry): string {
-	const known = readKnownMarketplaces()[marketplace];
+	const registry = readKnownMarketplaces();
+	const known = Object.hasOwn(registry, marketplace)
+		? registry[marketplace]
+		: undefined;
 	if (!known)
 		throw new PluginError(`Marketplace "${marketplace}" is not installed.`, {
 			code: "marketplace-not-installed",
@@ -599,7 +602,8 @@ export async function installPlugin(
 
 /**
  * Installs the default marketplace's plugins that the ledger records with no
- * tree, as adoptInstalledPlugins leaves them. Returns the names it could not.
+ * tree, as adoptInstalledPlugins leaves them. Returns each it could not, with
+ * the reason.
  */
 export async function restorePluginTrees(): Promise<string[]> {
 	const missing = readInstalledPlugins().filter(
@@ -611,8 +615,10 @@ export async function restorePluginTrees(): Promise<string[]> {
 	for (const plugin of missing) {
 		try {
 			await installPlugin(plugin.name, DEFAULT_MARKETPLACE, { update: true });
-		} catch {
-			failed.push(plugin.name);
+		} catch (error) {
+			failed.push(
+				`${plugin.name}: ${error instanceof Error ? error.message : String(error)}`,
+			);
 		}
 	}
 	return failed;
@@ -656,6 +662,9 @@ export async function recordPlugin(
 	return { ...plugin, skills: synced.skills, mcpError: synced.mcpError };
 }
 
+/** The plugin's record after the change, and the MCP config write error, if any. */
+export type ChangedPlugin = InstalledPluginEntry & { mcpError: string | null };
+
 /**
  * Flips a plugin's `enabled` flag on this machine.
  *
@@ -667,7 +676,7 @@ export async function setPluginEnabled(
 	name: string,
 	enabled: boolean,
 	marketplace?: string,
-): Promise<InstalledPluginEntry> {
+): Promise<ChangedPlugin> {
 	const plugins = readInstalledPlugins();
 	const match = findInstalled(plugins, name, marketplace);
 	if (!match) {
@@ -679,14 +688,14 @@ export async function setPluginEnabled(
 
 	const next = { ...match, enabled };
 	writeInstalledPlugins(plugins.map((p) => (p === match ? next : p)));
-	await syncPlugins();
-	return next;
+	const { mcpError } = await syncPlugins();
+	return { ...next, mcpError };
 }
 
 export async function removePlugin(
 	name: string,
 	marketplace?: string,
-): Promise<InstalledPluginEntry> {
+): Promise<ChangedPlugin> {
 	const plugins = readInstalledPlugins();
 	const match = findInstalled(plugins, name, marketplace);
 	if (!match) {
@@ -700,8 +709,8 @@ export async function removePlugin(
 	if (match.installPath && fs.existsSync(match.installPath)) {
 		fs.rmSync(match.installPath, { recursive: true });
 	}
-	await syncPlugins();
-	return match;
+	const { mcpError } = await syncPlugins();
+	return { ...match, mcpError };
 }
 
 export interface SkillEntry {

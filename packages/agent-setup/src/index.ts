@@ -125,6 +125,7 @@ export { PluginError, type PluginErrorCode } from "./plugin-error";
 export {
 	type AvailablePlugin,
 	availablePlugins,
+	type ChangedPlugin,
 	ensureDefaultMarketplace,
 	findAvailablePlugin,
 	type InstallMarketplaceResult,

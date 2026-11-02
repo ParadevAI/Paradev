@@ -33,6 +33,7 @@ import {
 } from "@superset/shared/plugins";
 import log from "electron-log/main";
 import { loadToken } from "lib/trpc/routers/auth/utils/auth-functions";
+import { adoptDesktopInstallList } from "main/lib/adopt-desktop-install-list";
 import { createCloudApiClient } from "main/lib/cloud-api-client";
 import { localDb } from "main/lib/local-db";
 import { runPluginChange } from "main/lib/run-plugin-change";
@@ -55,13 +56,22 @@ export function syncInstalledPluginMcpServers(): void {
 	if (error) log.warn("[plugins] plugin MCP servers were not synced:", error);
 }
 
-/** Installs the plugins adopted from the old desktop record, which have no tree yet. */
-export function restoreAdoptedPlugins(): Promise<void> {
-	return serializePluginChange(async () => {
-		const failed = await restorePluginTrees();
-		if (failed.length) {
-			log.warn(`[plugins] could not install ${failed.join(", ")}`);
+/** Moves the desktop's old local-db install list into installed_plugins.json, then installs their trees. */
+export async function adoptDesktopInstalls(): Promise<void> {
+	const list =
+		localDb
+			.select({ installedPlugins: settings.installedPlugins })
+			.from(settings)
+			.get()?.installedPlugins ?? [];
+	await serializePluginChange(async () => {
+		const moved = adoptDesktopInstallList(list);
+		if (moved.length) {
+			log.info(`[plugins] moved ${moved.join(", ")} to the ledger`);
+			syncInstalledPluginMcpServers();
 		}
+		const failed = await restorePluginTrees();
+		if (failed.length)
+			log.warn(`[plugins] could not install: ${failed.join("; ")}`);
 	});
 }
 
@@ -84,10 +94,11 @@ export async function installPlugin(
 /** Removing a plugin this machine does not have is a no-op. */
 export function uninstallPlugin(name: string): Promise<PluginChangeResult> {
 	return runPluginChange(async () => {
-		if (findInstalled(readInstalledPlugins(), name, DEFAULT_MARKETPLACE)) {
-			await removePlugin(name, DEFAULT_MARKETPLACE);
+		if (!findInstalled(readInstalledPlugins(), name, DEFAULT_MARKETPLACE)) {
+			return NO_CHANGE;
 		}
-		return NO_CHANGE;
+		const { mcpError } = await removePlugin(name, DEFAULT_MARKETPLACE);
+		return { mcpError };
 	});
 }
 
@@ -96,17 +107,22 @@ export function uninstallPlugin(name: string): Promise<PluginChangeResult> {
  * toggle rewrites it and re-syncs. Enabling a plugin this machine does not
  * have installs it; disabling one it does not have is a no-op.
  */
-export async function setPluginEnabled(
+export function setPluginEnabled(
 	name: string,
 	enabled: boolean,
 ): Promise<PluginChangeResult> {
-	if (!getPluginByName(name)) return NO_CHANGE;
 	return runPluginChange(async () => {
 		if (findInstalled(readInstalledPlugins(), name, DEFAULT_MARKETPLACE)) {
-			await setPluginEnabledOnMachine(name, enabled, DEFAULT_MARKETPLACE);
-			return NO_CHANGE;
+			const { mcpError } = await setPluginEnabledOnMachine(
+				name,
+				enabled,
+				DEFAULT_MARKETPLACE,
+			);
+			return { mcpError };
 		}
-		return enabled ? installDefaultPlugin(name) : NO_CHANGE;
+		return enabled && getPluginByName(name)
+			? installDefaultPlugin(name)
+			: NO_CHANGE;
 	});
 }
 
@@ -122,12 +138,12 @@ async function signedInApi(organizationId?: string | null) {
 	return createCloudApiClient(token, organizationId);
 }
 
-export async function installOrganizationPlugin(
+export function installOrganizationPlugin(
 	name: string,
 	marketplace: string,
 ): Promise<PluginChangeResult> {
-	const api = await signedInApi(organizationIdOfMarketplace(marketplace));
 	return runPluginChange(async () => {
+		const api = await signedInApi(organizationIdOfMarketplace(marketplace));
 		const { mcpError } = await installOrganizationPluginOnMachine(api, name);
 		return { mcpError };
 	});
@@ -150,10 +166,15 @@ export function setOrganizationPluginEnabled(
 	enabled: boolean,
 ): Promise<PluginChangeResult> {
 	return runPluginChange(async () => {
-		if (findInstalled(readInstalledPlugins(), name, marketplace)) {
-			await setPluginEnabledOnMachine(name, enabled, marketplace);
+		if (!findInstalled(readInstalledPlugins(), name, marketplace)) {
+			return NO_CHANGE;
 		}
-		return NO_CHANGE;
+		const { mcpError } = await setPluginEnabledOnMachine(
+			name,
+			enabled,
+			marketplace,
+		);
+		return { mcpError };
 	});
 }
 
@@ -185,11 +206,9 @@ export function finishPendingOrganizationForget(): Promise<void> {
  * Brings this machine's organization plugins in line with the account, then
  * re-provisions agents. Signed out, no organization's plugins stay.
  */
-export async function syncPlugins(
-	organizationId?: string | null,
-): Promise<void> {
-	const { token } = await loadToken();
-	await runPluginChange(async () => {
+export function syncPlugins(organizationId?: string | null): Promise<void> {
+	return runPluginChange(async () => {
+		const { token } = await loadToken();
 		if (!token) {
 			forgetOrganizationPluginsOnMachine();
 			await syncPluginsOnMachine();
