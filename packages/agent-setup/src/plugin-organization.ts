@@ -1,6 +1,4 @@
 import fs from "node:fs";
-import { writePluginTree } from "@superset/agent-setup";
-import { CLIError } from "@superset/cli-framework";
 import {
 	isOrganizationMarketplace,
 	manifestHasTools,
@@ -10,9 +8,42 @@ import {
 	pluginBundleHash,
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
-import type { ApiClient } from "../api-client";
-import { readInstalledPlugins, writeInstalledPlugins } from "./host";
-import { type InstallPluginResult, recordPlugin } from "./install";
+import { writeInstalledPlugins } from "./installed-plugins";
+import { writePluginTree } from "./plugin-cache";
+import { PluginError } from "./plugin-error";
+import { type InstallPluginResult, recordPlugin } from "./plugin-install";
+import { readInstalledPlugins } from "./plugin-state";
+
+/** The slice of the cloud API these calls use, so any tRPC client for it fits. */
+export interface OrganizationPluginApi {
+	plugins: {
+		list: {
+			query(input: { includeOrganization: boolean }): Promise<
+				{
+					name: string;
+					marketplace: string;
+					installed: boolean;
+					latestVersion: string | null;
+				}[]
+			>;
+		};
+		organization: {
+			bundle: {
+				query(input: { name: string }): Promise<{
+					bundle: string;
+					contentHash: string;
+					marketplace: string;
+					name: string;
+					version: string;
+				}>;
+			};
+		};
+	};
+	user: {
+		myOrganizations: { query(): Promise<{ id: string }[]> };
+		myOrganization: { query(): Promise<{ id: string } | null> };
+	};
+}
 
 function parseManifest(raw: Uint8Array | undefined): unknown {
 	try {
@@ -23,14 +54,14 @@ function parseManifest(raw: Uint8Array | undefined): unknown {
 }
 
 export async function installOrganizationPlugin(
-	api: ApiClient,
+	api: OrganizationPluginApi,
 	name: string,
 	options: { provision?: boolean } = {},
 ): Promise<InstallPluginResult> {
 	const download = await api.plugins.organization.bundle.query({ name });
 	const bundle = Buffer.from(download.bundle, "base64");
 	if (pluginBundleHash(bundle) !== download.contentHash) {
-		throw new CLIError(
+		throw new PluginError(
 			`The download of "${name}" does not match what your organization synced. Try again.`,
 		);
 	}
@@ -83,7 +114,7 @@ export function forgetOrganizationPlugins(
 /** In each organization besides the active one, drops the plugins the member may no longer use there. */
 async function dropRevokedElsewhere(
 	organizationIds: readonly string[],
-	apiFor: (organizationId: string) => ApiClient,
+	apiFor: (organizationId: string) => OrganizationPluginApi,
 ): Promise<string[]> {
 	const removed: string[] = [];
 	for (const organizationId of organizationIds) {
@@ -115,8 +146,8 @@ async function dropRevokedElsewhere(
  * left, are removed.
  */
 export async function reconcileOrganizationPlugins(
-	api: ApiClient,
-	apiFor: (organizationId: string) => ApiClient = () => api,
+	api: OrganizationPluginApi,
+	apiFor: (organizationId: string) => OrganizationPluginApi = () => api,
 ): Promise<{ installed: string[]; removed: string[]; failed: string[] }> {
 	const memberships = await api.user.myOrganizations.query();
 	const organization = await api.user.myOrganization.query();

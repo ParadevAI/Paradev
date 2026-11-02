@@ -2260,6 +2260,10 @@ msgstr "由智能体驱动的预览"
 msgid "Agents"
 msgstr "智能体"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "智能体无法访问 {0} 的工具"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "智能体无需中途干预即可完成常规工单。"
 
@@ -5509,6 +5513,9 @@ msgstr "无法停用插件"
 
 msgid "Could not disconnect."
 msgstr "无法断开连接。"
+
+msgid "Could not download {names}."
+msgstr "无法下载 {names}。"
 
 msgid "Could not forget {domain}"
 msgstr "无法忘记{domain}"
@@ -17488,6 +17495,9 @@ msgstr "登录一次，Paradev 会保持连接。"
 msgid "Sign in to {0}"
 msgstr "登录{0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "登录后才能更改组织的插件。"
+
 msgid "Sign in to continue"
 msgstr "登录以继续"
 
@@ -19124,6 +19134,9 @@ msgstr "Paradev主机服务意外停止（{cause}），且无法自动重启。"
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "路径必须位于仓库内"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "插件更改未在 {seconds} 秒内完成。"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"

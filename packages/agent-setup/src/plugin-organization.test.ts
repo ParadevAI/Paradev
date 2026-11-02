@@ -2,12 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { readInstalledPlugins, writeInstalledPlugins } from "./host";
-import { recordPlugin } from "./install";
+import { writeInstalledPlugins } from "./installed-plugins";
+import { recordPlugin } from "./plugin-install";
 import {
 	forgetOrganizationPlugins,
 	reconcileOrganizationPlugins,
-} from "./organization";
+} from "./plugin-organization";
+import { readInstalledPlugins } from "./plugin-state";
 
 const STAYED = "organization-11111111-0000-4000-8000-000000000000";
 const LEFT = "organization-22222222-0000-4000-8000-000000000000";

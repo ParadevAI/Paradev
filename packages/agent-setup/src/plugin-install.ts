@@ -3,36 +3,51 @@ import fs from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 import {
-	createManagedSkills,
-	resolveDisabledSkillIds,
-} from "@superset/agent-setup";
-import { CLIError } from "@superset/cli-framework";
-import {
-	assertSafeSegment,
 	DEFAULT_MARKETPLACE,
 	DEFAULT_MARKETPLACE_REF,
 	DEFAULT_MARKETPLACE_REPO,
+} from "@superset/shared/plugins";
+import { resolveDisabledSkillIds } from "./disabled-skills";
+import {
+	type InstalledPluginEntry,
+	writeInstalledPlugins,
+} from "./installed-plugins";
+import { createManagedSkills } from "./managed-skills";
+import { pluginCachePath } from "./plugin-cache";
+import { PluginError } from "./plugin-error";
+import {
+	assertSafeSegment,
+	MARKETPLACE_FILE,
+	type MarketplaceEntry,
+	releaseTag,
+} from "./plugin-marketplace";
+import { syncPluginMcpServers } from "./plugin-mcp-servers";
+import {
 	findInstalled,
-	type InstalledPlugin,
 	type KnownMarketplace,
 	type MarketplaceSource,
 	marketplaceManifest,
 	marketplacesDir,
-	pluginCachePath,
 	readInstalledPlugins,
 	readKnownMarketplaces,
 	skillsRoot,
-	writeInstalledPlugins,
 	writeKnownMarketplaces,
-} from "./host";
-import {
-	MARKETPLACE_FILE,
-	type MarketplaceEntry,
-	releaseTag,
-} from "./marketplace";
-import { syncPluginMcpServers } from "./mcp-servers";
+} from "./plugin-state";
 
-const git = promisify(execFile);
+const execFileAsync = promisify(execFile);
+const GIT_TIMEOUT_MS = 120_000;
+
+// Plugin changes run one at a time, so a fetch that never returns would hold
+// every later one.
+const git: typeof execFileAsync = ((
+	file: string,
+	args: string[],
+	options: object = {},
+) =>
+	execFileAsync(file, args, {
+		timeout: GIT_TIMEOUT_MS,
+		...options,
+	})) as typeof execFileAsync;
 
 // Cone mode always keeps top-level files, so the marketplace manifest comes
 // along without being named here.
@@ -86,7 +101,7 @@ export function parseMarketplaceSource(input: string): MarketplaceSource {
 	if (github?.[1]) {
 		return { kind: "github", repo: github[1], ...(ref ? { ref } : {}) };
 	}
-	throw new CLIError(
+	throw new PluginError(
 		`Could not read "${input}" as a marketplace. Use owner/repo, owner/repo@ref, a GitHub URL, or a local path.`,
 	);
 }
@@ -109,7 +124,7 @@ export async function installMarketplace(
 	if (source.kind === "path") {
 		location = source.path as string;
 		if (!fs.existsSync(path.join(location, MARKETPLACE_FILE))) {
-			throw new CLIError(`No ${MARKETPLACE_FILE} in ${location}.`);
+			throw new PluginError(`No ${MARKETPLACE_FILE} in ${location}.`);
 		}
 	} else {
 		const repo = source.repo as string;
@@ -138,7 +153,7 @@ export async function installMarketplace(
 			try {
 				// A marketplace is a couple of directories inside a repository that
 				// may be enormous — ours is 163 MB and 8,651 files — and this runs
-				// inside the desktop's 60s subprocess budget. Fetch no blobs and
+				// while the desktop waits on it. Fetch no blobs and
 				// check out only what a marketplace is made of.
 				await git("git", [
 					"clone",
@@ -160,14 +175,14 @@ export async function installMarketplace(
 				]);
 				await git("git", ["-C", location, "checkout"]);
 			} catch (error) {
-				throw new CLIError(
+				throw new PluginError(
 					`Could not clone ${repo}${ref ? `@${ref}` : ""}: ${error instanceof Error ? error.message : String(error)}`,
 				);
 			}
 		}
 
 		if (!fs.existsSync(path.join(location, MARKETPLACE_FILE))) {
-			throw new CLIError(
+			throw new PluginError(
 				`${repo} has no ${MARKETPLACE_FILE} at its root; it is not a marketplace.`,
 			);
 		}
@@ -184,7 +199,7 @@ export async function installMarketplace(
 	) as { name?: string; plugins?: MarketplaceEntry[] };
 
 	const name = options.name ?? manifest.name;
-	if (!name) throw new CLIError(`${MARKETPLACE_FILE} has no name.`);
+	if (!name) throw new PluginError(`${MARKETPLACE_FILE} has no name.`);
 
 	const known = readKnownMarketplaces();
 	known[name] = {
@@ -259,11 +274,16 @@ export function listAvailable(): AvailablePlugin[] {
 }
 
 function sourceDir(marketplace: string, entry: MarketplaceEntry): string {
-	const known = readKnownMarketplaces()[marketplace];
+	const registry = readKnownMarketplaces();
+	const known = Object.hasOwn(registry, marketplace)
+		? registry[marketplace]
+		: undefined;
 	if (!known)
-		throw new CLIError(`Marketplace "${marketplace}" is not installed.`);
+		throw new PluginError(`Marketplace "${marketplace}" is not installed.`, {
+			code: "marketplace-not-installed",
+		});
 	if (typeof entry.source !== "string") {
-		throw new CLIError(
+		throw new PluginError(
 			`Plugin "${entry.name}" uses a non-string source, which is not supported.`,
 		);
 	}
@@ -274,7 +294,7 @@ function sourceDir(marketplace: string, entry: MarketplaceEntry): string {
 	const realRoot = fs.existsSync(root) ? fs.realpathSync(root) : root;
 	const realDir = fs.existsSync(dir) ? fs.realpathSync(dir) : dir;
 	if (!contained(dir, root) || !contained(realDir, realRoot)) {
-		throw new CLIError(
+		throw new PluginError(
 			`Plugin "${entry.name}" resolves outside its marketplace.`,
 		);
 	}
@@ -330,7 +350,7 @@ async function extractTag(
 	const files = listed.stdout.split("\0").filter(Boolean);
 	if (!files.length) return false;
 	if (!files.some((file) => path.relative(prefix, file) === "plugin.json")) {
-		throw new CLIError(
+		throw new PluginError(
 			`Release ${tag} has no plugin.json at ${prefix}; the tag is not a usable release.`,
 		);
 	}
@@ -356,7 +376,9 @@ async function extractTag(
 /** A tree entry must stay inside the plugin directory it was listed under. */
 function assertSafeRelative(relative: string, file: string): void {
 	if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
-		throw new CLIError(`Refusing to extract "${file}": it escapes the plugin.`);
+		throw new PluginError(
+			`Refusing to extract "${file}": it escapes the plugin.`,
+		);
 	}
 }
 
@@ -369,7 +391,7 @@ function assertNotSymlink(target: string): void {
 		throw error;
 	}
 	if (stat.isSymbolicLink()) {
-		throw new CLIError(
+		throw new PluginError(
 			`Refusing to copy "${target}": a plugin cannot ship a symlink.`,
 		);
 	}
@@ -382,7 +404,7 @@ function copyTree(from: string, to: string): void {
 		const src = path.join(from, item.name);
 		const dest = path.join(to, item.name);
 		if (item.isSymbolicLink()) {
-			throw new CLIError(
+			throw new PluginError(
 				`Refusing to copy "${src}": a plugin cannot ship a symlink.`,
 			);
 		}
@@ -397,11 +419,100 @@ export interface InstallPluginResult {
 	version: string;
 	installPath: string;
 	skills: number;
+	/** Set when the plugin landed but no agent config could take its tools. */
+	mcpError: string | null;
 	tools?: boolean;
 }
 
+export type PluginRecord = Omit<InstallPluginResult, "skills" | "mcpError">;
+
 export interface InstallPluginOptions {
 	update?: boolean;
+}
+
+const REFRESH_INTERVAL_MS = 5 * 60_000;
+const lastRefreshed = new Map<string, number>();
+
+/**
+ * Fetches each GitHub marketplace again. A clone is made once and is otherwise
+ * never fetched, so a plugin added after it was made is missing from it.
+ * Returns one message per marketplace that could not be fetched.
+ */
+export async function refreshMarketplaces(
+	marketplace?: string,
+): Promise<string[]> {
+	const now = Date.now();
+	const due = Object.entries(readKnownMarketplaces()).filter(
+		([name, entry]) =>
+			(!marketplace || name === marketplace) &&
+			entry.source.kind === "github" &&
+			now - (lastRefreshed.get(name) ?? 0) >= REFRESH_INTERVAL_MS,
+	);
+	if (due.length) {
+		process.stderr.write(
+			`Updating ${due.map(([name]) => name).join(", ")} to look for new plugins…\n`,
+		);
+	}
+	const failures: string[] = [];
+	for (const [name, entry] of due) {
+		lastRefreshed.set(name, now);
+		try {
+			await installMarketplace(entry.source, { name });
+		} catch (error) {
+			failures.push(
+				`${name}: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
+	return failures;
+}
+
+/** The marketplace entries for `name`, refreshing the clones once if none has it. */
+export async function availablePlugins(
+	name: string,
+	marketplace?: string,
+	refresh: typeof refreshMarketplaces = refreshMarketplaces,
+): Promise<{ candidates: AvailablePlugin[]; failures: string[] }> {
+	const find = () =>
+		listAvailable().filter(
+			(a) =>
+				a.entry.name === name &&
+				(!marketplace || a.marketplace === marketplace),
+		);
+	const candidates = find();
+	if (candidates.length) return { candidates, failures: [] };
+	const failures = await refresh(marketplace);
+	return { candidates: find(), failures };
+}
+
+export async function findAvailablePlugin(
+	name: string,
+	marketplace?: string,
+	refresh: typeof refreshMarketplaces = refreshMarketplaces,
+): Promise<AvailablePlugin> {
+	const { candidates, failures } = await availablePlugins(
+		name,
+		marketplace,
+		refresh,
+	);
+
+	const [found, ...others] = candidates;
+	if (!found) {
+		throw new PluginError(`No plugin "${name}" in any installed marketplace.`, {
+			code: "not-found",
+			plugin: name,
+			suggestion: failures.length
+				? `Some marketplaces could not be updated: ${failures.join("; ")}`
+				: undefined,
+		});
+	}
+	if (others.length) {
+		throw new PluginError(
+			`"${name}" exists in ${candidates.map((c) => c.marketplace).join(", ")}.`,
+			{ code: "ambiguous", plugin: name },
+		);
+	}
+	return found;
 }
 
 export async function installPlugin(
@@ -409,30 +520,13 @@ export async function installPlugin(
 	marketplace?: string,
 	options: InstallPluginOptions = {},
 ): Promise<InstallPluginResult> {
-	const candidates = listAvailable().filter(
-		(a) =>
-			a.entry.name === name && (!marketplace || a.marketplace === marketplace),
-	);
-
-	if (candidates.length === 0) {
-		throw new CLIError(
-			`No plugin "${name}" in any installed marketplace. Run: superset plugins list --available`,
-		);
-	}
-	if (candidates.length > 1) {
-		throw new CLIError(
-			`"${name}" exists in ${candidates.map((c) => c.marketplace).join(", ")}. Disambiguate with ${name}@<marketplace>.`,
-		);
-	}
-
-	const found = candidates[0];
-	if (!found) throw new CLIError(`No plugin "${name}".`);
+	const found = await findAvailablePlugin(name, marketplace);
 	const { entry } = found;
 	const dir = sourceDir(found.marketplace, entry);
 
 	const manifestPath = path.join(dir, "plugin.json");
 	if (!fs.existsSync(manifestPath)) {
-		throw new CLIError(`Plugin "${name}" has no plugin.json.`);
+		throw new PluginError(`Plugin "${name}" has no plugin.json.`);
 	}
 
 	const existing = readInstalledPlugins().find(
@@ -440,11 +534,11 @@ export async function installPlugin(
 	);
 	if (existing && !options.update) {
 		const available = entry.version ?? "unknown";
-		throw new CLIError(
+		throw new PluginError(
 			existing.version === available
 				? `"${name}" is already installed at ${existing.version}.`
 				: `"${name}" is already installed at ${existing.version}; ${available} is available.`,
-			`Run: superset plugins install ${name} --update`,
+			{ code: "already-installed", plugin: name },
 		);
 	}
 	assertNotSymlink(manifestPath);
@@ -453,12 +547,12 @@ export async function installPlugin(
 		version?: string;
 	};
 	if (manifest.name !== name) {
-		throw new CLIError(
+		throw new PluginError(
 			`Marketplace "${found.marketplace}" lists "${name}", but its plugin.json declares "${manifest.name ?? "no name"}"; they must match.`,
 		);
 	}
 	if (entry.version && manifest.version && entry.version !== manifest.version) {
-		throw new CLIError(
+		throw new PluginError(
 			`Marketplace "${found.marketplace}" lists "${name}" at ${entry.version}, but its plugin.json declares ${manifest.version}; they must match.`,
 		);
 	}
@@ -498,35 +592,44 @@ export async function installPlugin(
 		}
 	}
 
-	const plugins = readInstalledPlugins().filter(
-		(p) => !(p.name === name && p.marketplace === found.marketplace),
-	);
-	plugins.push({
-		marketplace: found.marketplace,
+	return await recordPlugin({
 		name,
+		marketplace: found.marketplace,
 		version,
 		installPath: target,
-		installedAt: new Date().toISOString(),
-		enabled: true,
-	} satisfies InstalledPlugin);
-	writeInstalledPlugins(plugins);
+	});
+}
 
-	const skills = (await syncPlugins()).skills;
-	return {
-		name,
-		marketplace: found.marketplace,
-		version,
-		installPath: target,
-		skills,
-	};
+/**
+ * Installs the default marketplace's plugins that the ledger records with no
+ * tree, as adoptInstalledPlugins leaves them. Returns each it could not, with
+ * the reason.
+ */
+export async function restorePluginTrees(): Promise<string[]> {
+	const missing = readInstalledPlugins().filter(
+		(p) => p.marketplace === DEFAULT_MARKETPLACE && !p.installPath,
+	);
+	if (!missing.length) return [];
+	await ensureDefaultMarketplace();
+	const failed: string[] = [];
+	for (const plugin of missing) {
+		try {
+			await installPlugin(plugin.name, DEFAULT_MARKETPLACE, { update: true });
+		} catch (error) {
+			failed.push(
+				`${plugin.name}: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
+	return failed;
 }
 
 /** The ledger with this plugin recorded, keeping a member's choice to disable it. */
 export function ledgerWithPlugin(
-	ledger: readonly InstalledPlugin[],
-	plugin: Omit<InstallPluginResult, "skills">,
+	ledger: readonly InstalledPluginEntry[],
+	plugin: PluginRecord,
 	installedAt: string,
-): InstalledPlugin[] {
+): InstalledPluginEntry[] {
 	const existing = ledger.find(
 		(p) => p.name === plugin.name && p.marketplace === plugin.marketplace,
 	);
@@ -536,13 +639,13 @@ export function ledgerWithPlugin(
 			...plugin,
 			installedAt,
 			enabled: existing?.enabled ?? true,
-		} satisfies InstalledPlugin,
+		} satisfies InstalledPluginEntry,
 	];
 }
 
 /** Records the plugin and drops the tree of the version it replaces; `provision: false` leaves re-provisioning agents to the caller. */
 export async function recordPlugin(
-	plugin: Omit<InstallPluginResult, "skills">,
+	plugin: PluginRecord,
 	{ provision = true }: { provision?: boolean } = {},
 ): Promise<InstallPluginResult> {
 	const ledger = readInstalledPlugins();
@@ -554,11 +657,13 @@ export async function recordPlugin(
 		fs.rmSync(replaced.installPath, { recursive: true, force: true });
 	}
 
-	return {
-		...plugin,
-		skills: provision ? (await syncPlugins()).skills : 0,
-	};
+	if (!provision) return { ...plugin, skills: 0, mcpError: null };
+	const synced = await syncPlugins();
+	return { ...plugin, skills: synced.skills, mcpError: synced.mcpError };
 }
+
+/** The plugin's record after the change, and the MCP config write error, if any. */
+export type ChangedPlugin = InstalledPluginEntry & { mcpError: string | null };
 
 /**
  * Flips a plugin's `enabled` flag on this machine.
@@ -571,31 +676,41 @@ export async function setPluginEnabled(
 	name: string,
 	enabled: boolean,
 	marketplace?: string,
-): Promise<InstalledPlugin> {
+): Promise<ChangedPlugin> {
 	const plugins = readInstalledPlugins();
 	const match = findInstalled(plugins, name, marketplace);
-	if (!match) throw new CLIError(`"${name}" is not installed.`);
+	if (!match) {
+		throw new PluginError(`"${name}" is not installed.`, {
+			code: "not-installed",
+			plugin: name,
+		});
+	}
 
 	const next = { ...match, enabled };
 	writeInstalledPlugins(plugins.map((p) => (p === match ? next : p)));
-	await syncPlugins();
-	return next;
+	const { mcpError } = await syncPlugins();
+	return { ...next, mcpError };
 }
 
 export async function removePlugin(
 	name: string,
 	marketplace?: string,
-): Promise<InstalledPlugin> {
+): Promise<ChangedPlugin> {
 	const plugins = readInstalledPlugins();
 	const match = findInstalled(plugins, name, marketplace);
-	if (!match) throw new CLIError(`"${name}" is not installed.`);
+	if (!match) {
+		throw new PluginError(`"${name}" is not installed.`, {
+			code: "not-installed",
+			plugin: name,
+		});
+	}
 
 	writeInstalledPlugins(plugins.filter((p) => p !== match));
 	if (match.installPath && fs.existsSync(match.installPath)) {
 		fs.rmSync(match.installPath, { recursive: true });
 	}
-	await syncPlugins();
-	return match;
+	const { mcpError } = await syncPlugins();
+	return { ...match, mcpError };
 }
 
 export interface SkillEntry {

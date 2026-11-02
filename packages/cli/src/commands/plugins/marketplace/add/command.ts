@@ -1,9 +1,10 @@
-import { positional, string, table } from "@superset/cli-framework";
-import { command } from "../../../../lib/command";
 import {
 	installMarketplace,
 	parseMarketplaceSource,
-} from "../../../../lib/plugins/install";
+} from "@superset/agent-setup";
+import { positional, string, table } from "@superset/cli-framework";
+import { command } from "../../../../lib/command";
+import { withPluginHints } from "../../../../lib/plugins/errors";
 
 export default command({
 	sandbox: false,
@@ -24,10 +25,12 @@ export default command({
 			[22, 10, 56],
 		),
 	run: async ({ ctx, args, options }) => {
-		const source = parseMarketplaceSource(args.source as string);
-
-		const local = await installMarketplace(source, {
-			name: options.name as string | undefined,
+		const { source, local } = await withPluginHints(async () => {
+			const source = parseMarketplaceSource(args.source as string);
+			const local = await installMarketplace(source, {
+				name: options.name as string | undefined,
+			});
+			return { source, local };
 		});
 
 		await ctx.api.plugins.marketplaces.add.mutate(

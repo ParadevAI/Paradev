@@ -2260,6 +2260,10 @@ msgstr "Prévias controladas pelo agente"
 msgid "Agents"
 msgstr "Agentes"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Os agentes não conseguem acessar as ferramentas de {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Os agentes concluem tickets rotineiros sem intervenção no meio da tarefa."
 
@@ -5509,6 +5513,9 @@ msgstr "Não foi possível desativar o plugin"
 
 msgid "Could not disconnect."
 msgstr "Não foi possível desconectar."
+
+msgid "Could not download {names}."
+msgstr "Não foi possível baixar {names}."
 
 msgid "Could not forget {domain}"
 msgstr "Não foi possível esquecer {domain}"
@@ -17488,6 +17495,9 @@ msgstr "Entre uma vez. O Paradev mantém a conexão."
 msgid "Sign in to {0}"
 msgstr "Entre em {0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "Entre para alterar os plugins da sua organização."
+
 msgid "Sign in to continue"
 msgstr "Entre para continuar"
 
@@ -19124,6 +19134,9 @@ msgstr "O serviço do host do Paradev parou inesperadamente ({cause}) e não pô
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "O caminho precisa ficar dentro do repositório"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "A alteração do plugin não terminou em {seconds} segundos."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "O pool é renovado todo mês. O uso além dele é cobrado por GB-hora pela tarifa mostrada em cada plano."
