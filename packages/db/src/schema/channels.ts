@@ -25,7 +25,7 @@ import {
 	channelVisibilityValues,
 	dockBounceValues,
 } from "./enums";
-import { tasks } from "./schema";
+import { taskProjects, tasks } from "./schema";
 
 export const channelVisibility = pgEnum(
 	"channel_visibility",
@@ -72,6 +72,11 @@ export const channels = pgTable(
 		lastSeq: bigint("last_seq", { mode: "number" }).notNull().default(0),
 		lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
 		archivedAt: timestamp("archived_at", { withTimezone: true }),
+		/** The project whose tasks the channel shows; several channels can share one. */
+		taskProjectId: uuid("task_project_id").references(
+			(): AnyPgColumn => taskProjects.id,
+			{ onDelete: "set null" },
+		),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -81,6 +86,7 @@ export const channels = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(t) => [
+		index("channels_task_project_idx").on(t.taskProjectId),
 		uniqueIndex("channels_org_name_unique")
 			.on(t.organizationId, sql`lower(${t.name})`)
 			.where(sql`${t.archivedAt} IS NULL AND ${t.kind} = 'channel'`),

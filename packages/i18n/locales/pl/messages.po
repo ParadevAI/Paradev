@@ -19578,9 +19578,6 @@ msgstr "Tego subagenta nie można teraz przenieść w tło"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Ten subagent nie jest już śledzony przez hosta. Jego zapis pozostaje na dysku w katalogu sesji agenta."
 
-msgid "This task is in a channel you can't see"
-msgstr "To zadanie jest w kanale, którego nie widzisz"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Ten terminal nie ma jeszcze danych do przekazania."
 

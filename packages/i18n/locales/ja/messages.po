@@ -19578,9 +19578,6 @@ msgstr "このサブエージェントは今はバックグラウンドに移動
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "このサブエージェントはホストで追跡されなくなりました。トランスクリプトはエージェントのセッションディレクトリにディスク上で残ります。"
 
-msgid "This task is in a channel you can't see"
-msgstr "このタスクはあなたが見られないチャンネルにあります"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "このターミナルには引き継げる出力がまだありません。"
 

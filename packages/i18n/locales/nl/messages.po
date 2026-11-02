@@ -19578,9 +19578,6 @@ msgstr "Deze subagent kan nu niet naar de achtergrond"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Deze subagent wordt niet meer gevolgd door de host. Het transcript blijft op schijf in de sessiemap van de agent."
 
-msgid "This task is in a channel you can't see"
-msgstr "Deze taak staat in een kanaal dat je niet kunt zien"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Deze terminal heeft nog geen uitvoer om over te dragen."
 

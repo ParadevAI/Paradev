@@ -19578,9 +19578,6 @@ msgstr "此子智能体现在无法移到后台"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主机不再跟踪该子智能体。其记录仍保存在磁盘上的智能体会话目录中。"
 
-msgid "This task is in a channel you can't see"
-msgstr "此任务位于你看不到的频道中"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "该终端还没有可交接的输出。"
 

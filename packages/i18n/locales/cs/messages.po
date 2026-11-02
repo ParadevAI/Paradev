@@ -19578,9 +19578,6 @@ msgstr "Tento subagent se teď nedá přesunout na pozadí"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Tento subagent už není hostitelem sledován. Jeho přepis zůstává na disku v adresáři relace agenta."
 
-msgid "This task is in a channel you can't see"
-msgstr "Tento úkol je v kanálu, který nevidíte"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Tento terminál zatím nemá žádný výstup k předání."
 

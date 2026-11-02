@@ -19578,9 +19578,6 @@ msgstr "Ce sous-agent ne peut pas passer en arrière-plan pour le moment"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Cet sous-agent n'est plus suivi par l'hôte. Sa transcription reste sur le disque dans le répertoire de session de l'agent."
 
-msgid "This task is in a channel you can't see"
-msgstr "Cette tâche se trouve dans un canal que vous ne pouvez pas voir"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Ce terminal n'a encore aucune sortie à transmettre."
 

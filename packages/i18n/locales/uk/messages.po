@@ -19572,9 +19572,6 @@ msgstr "Цей субагент зараз не може перейти у фо�
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Хост більше не відстежує цього субагента. Його журнал розмови залишається на диску в папці сеансу агента."
 
-msgid "This task is in a channel you can't see"
-msgstr "Це завдання в каналі, який ви не бачите"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Цей термінал ще не має виводу, який можна передати."
 

@@ -19578,9 +19578,6 @@ msgstr "이 서브 에이전트는 지금 백그라운드로 옮길 수 없습�
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "이 서브 에이전트는 더 이상 호스트에서 추적되지 않습니다. 기록은 에이전트의 세션 디렉터리에 디스크로 남아 있습니다."
 
-msgid "This task is in a channel you can't see"
-msgstr "이 작업은 볼 수 없는 채널에 있습니다"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "이 터미널에는 아직 넘길 출력이 없습니다."
 

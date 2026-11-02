@@ -19578,9 +19578,6 @@ msgstr "Không thể chuyển agent con này sang chạy nền lúc này"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Máy chủ không còn theo dõi agent con này. Bản ghi vẫn nằm trên đĩa trong thư mục phiên của agent."
 
-msgid "This task is in a channel you can't see"
-msgstr "Nhiệm vụ này nằm trong một kênh bạn không xem được"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Terminal này chưa có kết quả nào để bàn giao."
 
