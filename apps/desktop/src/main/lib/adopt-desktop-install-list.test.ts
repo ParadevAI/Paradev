@@ -37,6 +37,20 @@ describe("adoptDesktopInstallList", () => {
 		expect(names()).toEqual([]);
 	});
 
+	test("copies what an older build added later, but not what was removed here", () => {
+		adoptDesktopInstallList(list, ledger);
+		fs.writeFileSync(ledger, JSON.stringify({ version: 1, plugins: [] }));
+
+		const addedByOlderBuild = [
+			...list,
+			{ name: "notion", version: "1.0.0", installedAt: "later" },
+		];
+		expect(adoptDesktopInstallList(addedByOlderBuild, ledger)).toEqual([
+			"notion",
+		]);
+		expect(names()).toEqual([["notion", true]]);
+	});
+
 	test("tries again on the next boot when the ledger cannot be read", () => {
 		fs.writeFileSync(ledger, "{not json");
 		expect(() => adoptDesktopInstallList(list, ledger)).toThrow();

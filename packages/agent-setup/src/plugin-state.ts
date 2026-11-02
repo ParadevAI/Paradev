@@ -77,6 +77,12 @@ export function readInstalledPlugins(): InstalledPluginEntry[] {
 			`${file} has no plugins list, so it cannot be safely rewritten.`,
 		);
 	}
+	const malformed = plugins.find((entry) => typeof entry?.name !== "string");
+	if (malformed !== undefined) {
+		throw new PluginError(
+			`${file} has an entry with no name (${JSON.stringify(malformed)}), so it cannot be safely rewritten.`,
+		);
+	}
 	return plugins as InstalledPluginEntry[];
 }
 

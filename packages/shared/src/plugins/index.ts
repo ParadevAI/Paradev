@@ -723,9 +723,10 @@ export function getPluginByName(name: string): PluginCatalogEntry | undefined {
 }
 
 /**
- * The desktop's old install record in local-db settings. Nothing reads it now
- * except the one-time move into installed_plugins.json; the column stays so a
- * build from before the move can still open the database.
+ * The desktop's old install record in local-db settings. Nothing writes it
+ * now. The desktop reads it at each boot only to copy entries it has not seen
+ * into installed_plugins.json; the column stays so a build from before the
+ * move can still open the database.
  */
 export interface InstalledPlugin {
 	name: string;

@@ -124,9 +124,9 @@ The code that changes it lives in `@superset/agent-setup` (`plugin-install.ts`, 
 `plugin-organization.ts`): installing, removing, enabling, syncing, marketplace clones. The CLI's
 `plugins` commands are thin wrappers over it, and the desktop calls it in-process from its tRPC
 routes and awaits it, so a failure reaches the Plugins page as an error. The desktop does not run
-the CLI for plugins and keeps no install list of its own; the list it once kept in `local.db` is
-copied into the file once on upgrade; the column stays, unused, so an older build can still open
-the database. A refused change (not found, ambiguous, already or not installed) throws
+the CLI for plugins and keeps no install list of its own. The list it once kept in `local.db` is
+copied into the file at boot, each entry once; the column stays, written by nothing new, so an
+older build can still open the database, and what such a build adds is copied on the next boot. A refused change (not found, ambiguous, already or not installed) throws
 `PluginError`, and the CLI adds the command to run next; other failures (git, the filesystem, a
 timeout) are plain errors. In one process, wrap every change in `serializePluginChange`:
 each one reads the file and rewrites it, so two that overlap lose one's change. Authoring

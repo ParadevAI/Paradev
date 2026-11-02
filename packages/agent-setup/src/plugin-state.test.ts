@@ -46,6 +46,13 @@ describe("plugin state readers", () => {
 		expect(() => readInstalledPlugins()).toThrow("has no plugins list");
 	});
 
+	test("a ledger with a malformed entry throws a PluginError, not a TypeError", () => {
+		for (const entry of [null, 3, { marketplace: "superset" }]) {
+			write("installed_plugins.json", JSON.stringify({ plugins: [entry] }));
+			expect(() => readInstalledPlugins()).toThrow(PluginError);
+		}
+	});
+
 	test("an inherited key is not an installed marketplace", () => {
 		write("known_marketplaces.json", "{}");
 		expect(() => marketplaceManifest("constructor")).toThrow(
