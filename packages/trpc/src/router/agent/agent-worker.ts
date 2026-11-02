@@ -123,9 +123,12 @@ export const agentWorkerRouter = {
 				),
 			)
 			.limit(1);
-		if (!turn) throw turnNotRunning();
+		if (!turn?.actingUserId) throw turnNotRunning();
 		return {
-			token: await signTurnToken(env.AGENT_TURN_SIGNING_SECRET, turn),
+			token: await signTurnToken(env.AGENT_TURN_SIGNING_SECRET, {
+				...turn,
+				actingUserId: turn.actingUserId,
+			}),
 			expiresInSeconds: TURN_TOKEN_TTL_SECONDS,
 		};
 	}),
@@ -166,10 +169,12 @@ export const agentWorkerRouter = {
 					),
 				)
 				.limit(1);
-			if (!turn) throw turnNotRunning();
+			const actingUserId = turn?.actingUserId;
+			if (!turn || !actingUserId) throw turnNotRunning();
 			const access = turn.cloudWorkspaceId
 				? await resolveTurnHost({
 						...turn,
+						actingUserId,
 						cloudWorkspaceId: turn.cloudWorkspaceId,
 					})
 				: null;
@@ -178,7 +183,7 @@ export const agentWorkerRouter = {
 				sessionId: turn.sessionId,
 				agentId: turn.agentId,
 				organizationId: turn.organizationId,
-				actingUserId: turn.actingUserId,
+				actingUserId,
 			};
 			return {
 				sessionStore: await sessionStoreFor(turn.sessionId),

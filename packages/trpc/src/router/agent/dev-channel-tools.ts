@@ -4,7 +4,8 @@ import {
 	agents,
 	channelMessages,
 	channels,
-	channelTasks,
+	taskProjects,
+	taskProjectTasks,
 	taskStatuses,
 	tasks,
 	users,
@@ -32,7 +33,7 @@ const channelRef = z.string().min(1).max(200);
 interface Turn {
 	agentId: string;
 	organizationId: string;
-	actingUserId?: string | null;
+	askerId: string;
 }
 
 /**
@@ -48,6 +49,7 @@ async function readableChannel(turn: Turn, ref: string) {
 			name: channels.name,
 			kind: channels.kind,
 			description: channels.description,
+			taskProjectId: channels.taskProjectId,
 		})
 		.from(channels)
 		.where(
@@ -68,11 +70,9 @@ async function readableChannel(turn: Turn, ref: string) {
 		sql`select authz.check_permission('agent', ${turn.agentId}, 'can_read', 'channel', ${channel.id}) as allowed`,
 	);
 	if (rows[0]?.allowed !== 1) throw channelNotReadable();
-	if (turn.actingUserId) {
-		await loadChannelAccess(turn.actingUserId, channel.id).catch(() => {
-			throw channelNotReadable();
-		});
-	}
+	await loadChannelAccess(turn.askerId, channel.id).catch(() => {
+		throw channelNotReadable();
+	});
 	return { channel, threadRootId: target?.threadRootId ?? null };
 }
 
@@ -99,7 +99,7 @@ export const devChannelTools = {
 		)
 		.query(async ({ ctx, input }) => {
 			const { channel, threadRootId } = await readableChannel(
-				ctx.agentTurn,
+				ctx.principal,
 				input.channel,
 			);
 			const rows = await db
@@ -146,7 +146,16 @@ export const devChannelTools = {
 	channelTasks: mainProcedure
 		.input(z.object({ channel: channelRef }))
 		.query(async ({ ctx, input }) => {
-			const { channel } = await readableChannel(ctx.agentTurn, input.channel);
+			const { channel } = await readableChannel(ctx.principal, input.channel);
+			const projectId = channel.taskProjectId;
+			if (!projectId) {
+				return { channel: `#${channel.name}`, project: null, tasks: [] };
+			}
+			const [project] = await db
+				.select({ name: taskProjects.name })
+				.from(taskProjects)
+				.where(eq(taskProjects.id, projectId))
+				.limit(1);
 			const rows = await db
 				.select({
 					taskId: tasks.id,
@@ -156,15 +165,22 @@ export const devChannelTools = {
 					assignee: users.name,
 					pullRequestUrl: tasks.prUrl,
 				})
-				.from(channelTasks)
-				.innerJoin(tasks, eq(tasks.id, channelTasks.taskId))
+				.from(taskProjectTasks)
+				.innerJoin(tasks, eq(tasks.id, taskProjectTasks.taskId))
 				.leftJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
 				.leftJoin(users, eq(users.id, tasks.assigneeId))
 				.where(
-					and(eq(channelTasks.channelId, channel.id), isNull(tasks.deletedAt)),
+					and(
+						eq(taskProjectTasks.projectId, projectId),
+						isNull(tasks.deletedAt),
+					),
 				)
-				.orderBy(desc(channelTasks.createdAt), asc(tasks.slug))
+				.orderBy(desc(taskProjectTasks.createdAt), asc(tasks.slug))
 				.limit(TASKS_LIMIT);
-			return { channel: `#${channel.name}`, tasks: rows };
+			return {
+				channel: `#${channel.name}`,
+				project: project?.name ?? null,
+				tasks: rows,
+			};
 		}),
 };

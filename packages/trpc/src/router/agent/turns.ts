@@ -30,8 +30,8 @@ export type TurnOutcome =
 interface Prompt {
 	agent: { id: string; organizationId: string };
 	sessionId: string;
-	/** Null for events no person sent, such as a task's report. */
-	actingUserId: string | null;
+	/** The person this work is for; a task's report carries who asked for the task. */
+	actingUserId: string;
 	promptId: string;
 	text: string;
 	reason: TurnReason;
@@ -132,7 +132,7 @@ async function deliver(sessionId: string, turn: TurnOutcome, prompt: Prompt) {
 			turnId: turn.turnId,
 			promptId,
 			text,
-			...(actingUserId ? { actingUserId } : {}),
+			actingUserId,
 		});
 		return;
 	}
@@ -591,11 +591,12 @@ export async function redeliverMessage({
 			and(eq(channelMessages.id, messageId), isNull(channelMessages.deletedAt)),
 		)
 		.limit(1);
-	if (!row) return false;
+	const authorId = row?.author ? row.message.authorId : null;
+	if (!row || !authorId) return false;
 	await submitPrompt({
 		agent,
 		sessionId: await ensureMainSession(agent),
-		actingUserId: row.author ? row.message.authorId : null,
+		actingUserId: authorId,
 		promptId,
 		text: await messageEvent({
 			channel: row.channel,

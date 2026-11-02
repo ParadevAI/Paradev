@@ -37,7 +37,7 @@ export const devRoutineTools = {
 		const rows = await db
 			.select()
 			.from(agentRoutines)
-			.where(eq(agentRoutines.agentId, ctx.agentTurn.agentId))
+			.where(eq(agentRoutines.agentId, ctx.principal.agentId))
 			.orderBy(desc(agentRoutines.createdAt));
 		return rows.map(routineView);
 	}),
@@ -50,14 +50,7 @@ export const devRoutineTools = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { agentId, organizationId, actingUserId } = ctx.agentTurn;
-			if (!actingUserId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message:
-						"Make routines while answering a person; this turn has none.",
-				});
-			}
+			const { agentId, organizationId, askerId } = ctx.principal;
 			if (!input.title || !input.prompt) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
@@ -77,7 +70,7 @@ export const devRoutineTools = {
 			if (
 				rows[0]?.allowed !== 1 ||
 				room?.organizationId !== organizationId ||
-				!(await personCanRead(actingUserId)(target.channelId))
+				!(await personCanRead(askerId)(target.channelId))
 			) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
@@ -100,12 +93,12 @@ export const devRoutineTools = {
 			await assertChannelTriggersReadable(
 				agentId,
 				triggers,
-				personCanRead(actingUserId),
+				personCanRead(askerId),
 			);
 			const routine = await insertRoutine({
 				organizationId,
 				agentId,
-				createdByUserId: actingUserId,
+				createdByUserId: askerId,
 				channelId: target.channelId,
 				threadRootId: target.threadRootId,
 				fields: {
@@ -121,7 +114,7 @@ export const devRoutineTools = {
 	updateRoutine: mainProcedure
 		.input(devRoutineChangesSchema.extend({ routineId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const { agentId, organizationId } = ctx.agentTurn;
+			const { agentId, organizationId } = ctx.principal;
 			const [routine] = await db
 				.select()
 				.from(agentRoutines)

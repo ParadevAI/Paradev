@@ -109,7 +109,7 @@ export const devToolsRouter = {
 			if (!target) throw channelNotFound();
 			const { channelId, threadRootId } = target;
 			const { rows } = await db.execute<{ allowed: number }>(
-				sql`select authz.check_permission('agent', ${ctx.agentTurn.agentId}, 'can_post', 'channel', ${channelId}) as allowed`,
+				sql`select authz.check_permission('agent', ${ctx.principal.agentId}, 'can_post', 'channel', ${channelId}) as allowed`,
 			);
 			if (rows[0]?.allowed !== 1) throw channelNotFound();
 			const [channel] = await db
@@ -117,17 +117,17 @@ export const devToolsRouter = {
 				.from(channels)
 				.where(eq(channels.id, channelId))
 				.limit(1);
-			if (channel?.organizationId !== ctx.agentTurn.organizationId) {
+			if (channel?.organizationId !== ctx.principal.organizationId) {
 				throw channelNotFound();
 			}
 			const [agent] = await db
 				.select({ name: agents.name })
 				.from(agents)
-				.where(eq(agents.id, ctx.agentTurn.agentId))
+				.where(eq(agents.id, ctx.principal.agentId))
 				.limit(1);
 			const message = await postAgentMessage({
 				channel,
-				agentId: ctx.agentTurn.agentId,
+				agentId: ctx.principal.agentId,
 				agentName: agent?.name ?? "",
 				body: input.body,
 				threadRootId,
@@ -153,7 +153,7 @@ export const devToolsRouter = {
 			.innerJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
 			.where(
 				and(
-					eq(agentSessions.agentId, ctx.agentTurn.agentId),
+					eq(agentSessions.agentId, ctx.principal.agentId),
 					isNull(tasks.deletedAt),
 				),
 			)
@@ -183,7 +183,7 @@ export const devToolsRouter = {
 	readTask: mainProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			const { task, sessions } = await devTask(ctx.agentTurn, input.taskId);
+			const { task, sessions } = await devTask(ctx.principal, input.taskId);
 			return { ...task, sessions };
 		}),
 
@@ -207,10 +207,10 @@ export const devToolsRouter = {
 		)
 		.mutation(async ({ ctx, input }) =>
 			startTask({
-				agentId: ctx.agentTurn.agentId,
-				organizationId: ctx.agentTurn.organizationId,
-				parentSessionId: ctx.agentTurn.sessionId,
-				requestedByUserId: ctx.agentTurn.actingUserId,
+				agentId: ctx.principal.agentId,
+				organizationId: ctx.principal.organizationId,
+				parentSessionId: ctx.principal.sessionId,
+				requestedByUserId: ctx.principal.askerId,
 				...input,
 			}),
 		),
@@ -224,7 +224,7 @@ export const devToolsRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { sessions } = await devTask(ctx.agentTurn, input.taskId);
+			const { sessions } = await devTask(ctx.principal, input.taskId);
 			const session = sessions.filter((row) => row.role === input.role).at(-1);
 			if (!session) throw taskNotFound();
 			if (session.status === "queued") {
@@ -237,7 +237,7 @@ export const devToolsRouter = {
 			const [agent] = await db
 				.select({ id: agents.id, organizationId: agents.organizationId })
 				.from(agents)
-				.where(eq(agents.id, ctx.agentTurn.agentId))
+				.where(eq(agents.id, ctx.principal.agentId))
 				.limit(1);
 			if (!agent) throw taskNotFound();
 			await db
@@ -247,8 +247,8 @@ export const devToolsRouter = {
 			const outcome = await submitPrompt({
 				agent,
 				sessionId: session.sessionId,
-				actingUserId: ctx.agentTurn.actingUserId,
-				promptId: `parent:${ctx.agentTurn.turnId}:${crypto.randomUUID()}`,
+				actingUserId: ctx.principal.askerId,
+				promptId: `parent:${ctx.principal.turnId}:${crypto.randomUUID()}`,
 				text: input.text,
 				reason: "task_update",
 			});
@@ -258,7 +258,7 @@ export const devToolsRouter = {
 	stopTask: mainProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const { sessions } = await devTask(ctx.agentTurn, input.taskId);
+			const { sessions } = await devTask(ctx.principal, input.taskId);
 			const active = sessions.filter(
 				(row) => row.status === "queued" || row.status === "running",
 			);
@@ -273,7 +273,7 @@ export const devToolsRouter = {
 					);
 				}
 			}
-			await fillSlots(ctx.agentTurn.agentId);
+			await fillSlots(ctx.principal.agentId);
 			return { stopped: active.length };
 		}),
 
@@ -283,8 +283,8 @@ export const devToolsRouter = {
 			const [memory] = await db
 				.insert(agentMemories)
 				.values({
-					organizationId: ctx.agentTurn.organizationId,
-					agentId: ctx.agentTurn.agentId,
+					organizationId: ctx.principal.organizationId,
+					agentId: ctx.principal.agentId,
 					content: input.content,
 				})
 				.returning({ id: agentMemories.id });
@@ -302,7 +302,7 @@ export const devToolsRouter = {
 				.from(agentMemories)
 				.where(
 					and(
-						eq(agentMemories.agentId, ctx.agentTurn.agentId),
+						eq(agentMemories.agentId, ctx.principal.agentId),
 						input.query
 							? ilike(agentMemories.content, `%${input.query}%`)
 							: undefined,
@@ -316,12 +316,12 @@ export const devToolsRouter = {
 		const [agent] = await db
 			.select({ defaultEnvironmentId: agents.defaultEnvironmentId })
 			.from(agents)
-			.where(eq(agents.id, ctx.agentTurn.agentId))
+			.where(eq(agents.id, ctx.principal.agentId))
 			.limit(1);
 		const rows = await db
 			.select({ id: environments.id, name: environments.name })
 			.from(environments)
-			.where(eq(environments.organizationId, ctx.agentTurn.organizationId))
+			.where(eq(environments.organizationId, ctx.principal.organizationId))
 			.limit(50);
 		return rows.map((row) => ({
 			...row,
