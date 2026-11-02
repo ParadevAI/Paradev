@@ -224,14 +224,24 @@ export function registerChatV3Routes(options: {
 								channel === "background",
 						);
 
-					const subscription = options.mount
-						.runtime()
-						.subscribe(
-							sessionId,
-							{ since, deltas, nestedSubagents },
-							createWsSink(socket),
+					// @hono/node-ws only logs a throw from onOpen and keeps the socket
+					// open, so the client would wait on an empty stream forever.
+					try {
+						const subscription = options.mount
+							.runtime()
+							.subscribe(
+								sessionId,
+								{ since, deltas, nestedSubagents },
+								createWsSink(socket),
+							);
+						unsubscribe = () => subscription.unsubscribe();
+					} catch (error) {
+						console.error(
+							`[chat-v3] could not open the stream for session ${sessionId}`,
+							error,
 						);
-					unsubscribe = () => subscription.unsubscribe();
+						socket.close();
+					}
 				},
 
 				onMessage: () => {
