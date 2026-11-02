@@ -25,7 +25,6 @@ import {
 	inArray,
 	isNull,
 	lt,
-	ne,
 	or,
 	sql,
 } from "drizzle-orm";
@@ -493,8 +492,8 @@ async function recentBefore(
 	channelId: string,
 	message: { id: string; threadRootId: string | null },
 ): Promise<{ from: string; body: string }[]> {
-	const sentAt = db
-		.select({ createdAt: channelMessages.createdAt })
+	const seq = db
+		.select({ seq: channelMessages.seq })
 		.from(channelMessages)
 		.where(eq(channelMessages.id, message.id));
 	const rows = await db
@@ -515,11 +514,10 @@ async function recentBefore(
 					: isNull(channelMessages.threadRootId),
 				isNull(channelMessages.deletedAt),
 				isNull(channelMessages.subtype),
-				ne(channelMessages.id, message.id),
-				lt(channelMessages.createdAt, sentAt),
+				lt(channelMessages.seq, seq),
 			),
 		)
-		.orderBy(desc(channelMessages.createdAt))
+		.orderBy(desc(channelMessages.seq))
 		.limit(RECENT_MESSAGES);
 	return rows.reverse().map((row) => ({
 		from: row.devName ?? row.userName ?? "someone",
