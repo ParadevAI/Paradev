@@ -186,6 +186,7 @@ export function eventText(event: {
 	where: string;
 	replyTo: string | null;
 	body: string;
+	threadRoot?: { from: string; body: string };
 	now?: Date;
 }) {
 	const attrs = [
@@ -194,8 +195,13 @@ export function eventText(event: {
 		...(event.replyTo ? [`reply_to="${attr(event.replyTo)}"`] : []),
 		`time="${(event.now ?? new Date()).toISOString()}"`,
 	];
-	return `<message ${attrs.join(" ")}>\n${escapeMessageTags(event.body)}\n</message>`;
+	const root = event.threadRoot
+		? `<thread_root from="${attr(event.threadRoot.from)}">\n${escapeMessageTags(event.threadRoot.body.slice(0, MAX_THREAD_ROOT_CHARS))}\n</thread_root>\n`
+		: "";
+	return `<message ${attrs.join(" ")}>\n${root}${escapeMessageTags(event.body)}\n</message>`;
 }
+
+const MAX_THREAD_ROOT_CHARS = 2_000;
 
 function attr(value: string) {
 	return value
@@ -205,7 +211,7 @@ function attr(value: string) {
 }
 
 function escapeMessageTags(body: string) {
-	return body.replace(/<(?=\s*\/?\s*message\b)/gi, "&lt;");
+	return body.replace(/<(?=\s*\/?\s*(?:message|thread_root)\b)/gi, "&lt;");
 }
 
 /** The one session every message to a Dev reaches; made on first use. */
@@ -343,7 +349,7 @@ export async function startTurnsForMessage(
 	}
 	await deliverToMains({
 		work: [...work.values()],
-		text: messageEvent({
+		text: await messageEvent({
 			channel,
 			roomName: room?.name,
 			authorName: author?.name,
@@ -399,7 +405,7 @@ async function routeUnmentioned({
 		}));
 	await deliverToMains({
 		work,
-		text: messageEvent({
+		text: await messageEvent({
 			channel: { id: channel.id, kind: "channel" },
 			roomName: channel.name,
 			authorName,
@@ -410,7 +416,7 @@ async function routeUnmentioned({
 	});
 }
 
-function messageEvent({
+async function messageEvent({
 	channel,
 	roomName,
 	authorName,
@@ -421,6 +427,9 @@ function messageEvent({
 	authorName: string | undefined;
 	message: { id: string; body: string; threadRootId: string | null };
 }) {
+	const threadRoot = message.threadRootId
+		? await threadRootOf(message.threadRootId)
+		: undefined;
 	const threadRootId =
 		channel.kind === "dm"
 			? message.threadRootId
@@ -433,7 +442,29 @@ function messageEvent({
 				: `#${roomName ?? "channel"}${message.threadRootId ? ", in a thread" : ""}`,
 		replyTo: replyTarget(channel.id, threadRootId),
 		body: message.body,
+		threadRoot,
 	});
+}
+
+async function threadRootOf(
+	rootId: string,
+): Promise<{ from: string; body: string } | undefined> {
+	const [root] = await db
+		.select({
+			body: channelMessages.body,
+			person: users.name,
+			dev: agents.name,
+		})
+		.from(channelMessages)
+		.leftJoin(users, eq(users.id, channelMessages.authorId))
+		.leftJoin(agents, eq(agents.id, channelMessages.authorId))
+		.where(
+			and(eq(channelMessages.id, rootId), isNull(channelMessages.deletedAt)),
+		)
+		.limit(1);
+	return root
+		? { from: root.person ?? root.dev ?? "someone", body: root.body }
+		: undefined;
 }
 
 /**
@@ -457,7 +488,7 @@ async function deliverToWatchers({
 	message: { id: string; body: string; threadRootId: string | null };
 	userId: string;
 }) {
-	const event = messageEvent({ channel, roomName, authorName, message });
+	const event = await messageEvent({ channel, roomName, authorName, message });
 	const replyTo = replyTarget(channel.id, message.threadRootId ?? message.id);
 	const now = new Date();
 	const results = await Promise.allSettled(
@@ -556,7 +587,7 @@ export async function redeliverMessage({
 		sessionId: await ensureMainSession(agent),
 		actingUserId: row.author ? row.message.authorId : null,
 		promptId,
-		text: messageEvent({
+		text: await messageEvent({
 			channel: row.channel,
 			roomName: row.channel.name,
 			authorName: row.author ?? undefined,
