@@ -21,7 +21,7 @@ export type SessionDurableEnvelope = Extract<
 export const sessionWorkspaceOptions = {
 	workspace: string().required().desc("Workspace ID"),
 	host: string().desc(
-		"Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)",
+		"Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)",
 	),
 	local: boolean().desc("The workspace is on this machine"),
 };
