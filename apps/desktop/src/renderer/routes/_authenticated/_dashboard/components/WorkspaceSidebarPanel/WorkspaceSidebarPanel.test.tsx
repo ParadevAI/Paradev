@@ -82,21 +82,21 @@ describe("WorkspaceSidebarPanel", () => {
 		expect(shownWidth()).toBe("52px");
 	});
 
-	test("a sidebar opened by hand in a narrow window leaves room for the right pane without rewriting the saved width", async () => {
+	test("a sidebar opened by hand in a narrow window leaves room for the center and right panes without rewriting the saved width", async () => {
 		useWorkspaceSidebarStore.setState({ width: 400, lastExpandedWidth: 400 });
 		await resizeWindow(1728);
 		const shownWidth = renderPanel();
-		await resizeWindow(560);
+		await resizeWindow(760);
 		expect(shownWidth()).toBe("52px");
 		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
-		expect(shownWidth()).toBe(`${560 - 262}px`);
+		expect(shownWidth()).toBe(`${760 - 260 - 262}px`);
 		expect(useWorkspaceSidebarStore.getState().width).toBe(400);
-		await resizeWindow(620);
-		expect(shownWidth()).toBe(`${620 - 262}px`);
+		await resizeWindow(640);
+		expect(shownWidth()).toBe("225px");
 		await resizeWindow(1728);
 		expect(shownWidth()).toBe("400px");
-		await resizeWindow(700);
-		expect(shownWidth()).toBe("400px");
+		await resizeWindow(900);
+		expect(shownWidth()).toBe(`${900 - 260 - 262}px`);
 	});
 
 	test("stops folding for the rest of the session once the user toggles it", async () => {
@@ -106,7 +106,7 @@ describe("WorkspaceSidebarPanel", () => {
 		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
 		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
 		await resizeWindow(700);
-		expect(shownWidth()).toBe("280px");
+		expect(shownWidth()).toBe("225px");
 	});
 
 	test("keeps the collapsed rail at any window width", async () => {

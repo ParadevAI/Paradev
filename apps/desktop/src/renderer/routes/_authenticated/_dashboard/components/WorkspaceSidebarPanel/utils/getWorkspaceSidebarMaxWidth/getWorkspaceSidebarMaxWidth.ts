@@ -3,13 +3,14 @@ import {
 	MAX_WORKSPACE_SIDEBAR_WIDTH,
 	MIN_WORKSPACE_SIDEBAR_WIDTH,
 } from "renderer/stores/workspace-sidebar-state";
+import { MIN_CENTER_WIDTH } from "../../constants";
 
 export function getWorkspaceSidebarMaxWidth(windowWidth: number): number {
 	return Math.max(
 		MIN_WORKSPACE_SIDEBAR_WIDTH,
 		Math.min(
 			MAX_WORKSPACE_SIDEBAR_WIDTH,
-			windowWidth - MIN_RIGHT_PANE_AREA_WIDTH,
+			windowWidth - MIN_CENTER_WIDTH - MIN_RIGHT_PANE_AREA_WIDTH,
 		),
 	);
 }
