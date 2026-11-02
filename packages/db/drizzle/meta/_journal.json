@@ -1289,6 +1289,13 @@
       "when": 1793572489433,
       "tag": "0183_channel_tasks_into_projects",
       "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1793572726455,
+      "tag": "0184_drop_channel_tasks",
+      "breakpoints": true
     }
   ]
 }

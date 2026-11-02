@@ -10,7 +10,7 @@ import {
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
 import { pickEntityColor } from "@superset/shared/entity-colors";
-import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "../../trpc";
@@ -24,7 +24,11 @@ import { recordTaskActivity } from "../task/activity";
 import { assertCanPost, loadChannelAccess } from "./access";
 import { channelMemberIds } from "./members";
 import { publishToUsers } from "./publish";
-import { channelIdSchema, channelTaskSchema } from "./schema";
+import {
+	channelIdSchema,
+	channelProjectSchema,
+	channelTaskSchema,
+} from "./schema";
 
 /** Tells the channel's members to reload its task list; others load it on open. */
 async function announceTasks(channelId: string) {
@@ -93,6 +97,59 @@ async function ensureChannelProject(channel: {
 }
 
 export const channelTaskRouter = {
+	/** The project whose tasks the channel shows; null when it has none. */
+	project: protectedProcedure
+		.input(channelIdSchema)
+		.query(async ({ ctx, input }) => {
+			const access = await loadChannelAccess(
+				ctx.session.user.id,
+				input.channelId,
+			);
+			const projectId = access.channel.taskProjectId;
+			if (!projectId) return null;
+			const [project] = await db
+				.select({
+					id: taskProjects.id,
+					name: taskProjects.name,
+					icon: taskProjects.icon,
+					color: taskProjects.color,
+				})
+				.from(taskProjects)
+				.where(eq(taskProjects.id, projectId))
+				.limit(1);
+			return project ?? null;
+		}),
+
+	/** Points the channel at a project of its organization, or at none. */
+	setProject: protectedProcedure
+		.input(channelProjectSchema)
+		.mutation(async ({ ctx, input }) => {
+			const access = await loadChannelAccess(
+				ctx.session.user.id,
+				input.channelId,
+			);
+			assertCanPost(access);
+			if (input.projectId) {
+				const [project] = await db
+					.select({ organizationId: taskProjects.organizationId })
+					.from(taskProjects)
+					.where(eq(taskProjects.id, input.projectId))
+					.limit(1);
+				if (project?.organizationId !== access.channel.organizationId) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Project not found",
+					});
+				}
+			}
+			await db
+				.update(channels)
+				.set({ taskProjectId: input.projectId })
+				.where(eq(channels.id, input.channelId));
+			await announceTasks(input.channelId);
+			return { projectId: input.projectId };
+		}),
+
 	/** A channel showing the task's project, when the reader can see one. */
 	forTask: protectedProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
