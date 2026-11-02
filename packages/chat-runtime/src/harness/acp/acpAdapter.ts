@@ -41,6 +41,7 @@ import {
 	airForkPointMeta,
 	airSubagentSpawnedSchema,
 	airSubagentStateSchema,
+	isCompactionCall,
 	isSubagentControlCall,
 	isTerminalAirState,
 } from "./air";
@@ -467,6 +468,10 @@ export class AcpAdapter implements HarnessAdapter {
 	private heldTurnId: string | null = null;
 	private readonly shellPids = new Map<string, number>();
 	private shellPoll: ReturnType<typeof setInterval> | null = null;
+	/** Claude aborts a running compaction when a steer arrives, so steers wait for these. */
+	private readonly compactions = new Set<string>();
+	private compactionsSettled: Promise<void> = Promise.resolve();
+	private settleCompactions: (() => void) | null = null;
 
 	constructor(private readonly options: AcpAdapterOptions) {
 		this.main = new SessionStream({
@@ -538,11 +543,14 @@ export class AcpAdapter implements HarnessAdapter {
 		const client = this.client;
 		const sessionId = this.sessionId;
 		if (!client || !sessionId || !this.canSteer()) return false;
+		const prompt = await this.toAcpPrompt(content);
+		while (this.compactions.size > 0) await this.compactionsSettled;
+		if (!this.canSteer()) return false;
 		const v2TurnId = this.v2TurnIsCurrent() ? this.v2Turn?.id : undefined;
 		if (v2TurnId) {
 			const response = await client.request("session/prompt", {
 				sessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (parsed?.messageId !== undefined && parsed.stopReason === undefined) {
@@ -553,7 +561,7 @@ export class AcpAdapter implements HarnessAdapter {
 		}
 		const response = await client.request(ACP_STEERING_METHOD, {
 			sessionId,
-			prompt: await this.toAcpPrompt(content),
+			prompt,
 			_meta: { steering: { idleBehavior: "promptRequired" } },
 		});
 		const outcome = acpSteeringResponseSchema.safeParse(response).data?.outcome;
@@ -883,6 +891,7 @@ export class AcpAdapter implements HarnessAdapter {
 		this.disposed = true;
 		this.stalePendingApprovals();
 		this.backgroundTasks.dispose();
+		this.endCompactions();
 		if (this.shellPoll) clearInterval(this.shellPoll);
 		await this.client?.close();
 		this.queue.close();
@@ -1104,7 +1113,7 @@ export class AcpAdapter implements HarnessAdapter {
 			status: "running",
 			startedAtMs: this.nextStartMs(),
 		});
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
 		if (this.heldTurnId !== turnId) return;
@@ -1119,6 +1128,7 @@ export class AcpAdapter implements HarnessAdapter {
 				sessionId: this.sessionId,
 				prompt: await this.toAcpPrompt(content),
 			});
+			this.endCompactions();
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (
 				v2 &&
@@ -1131,6 +1141,7 @@ export class AcpAdapter implements HarnessAdapter {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			this.finishTurn(turnId, parsed?.stopReason, parsed?.usage);
 		} catch (error) {
+			this.endCompactions();
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;
 			this.failRefusedTurn(turnId, this.turnError(error));
@@ -1167,7 +1178,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const id = this.mintId();
 		this.turnStderr = "";
 		this.emitTurn({ id, status: "running", startedAtMs: this.now() });
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 		this.v2Turn = { id, inserted: true };
 	}
 
@@ -1425,7 +1436,31 @@ export class AcpAdapter implements HarnessAdapter {
 		)
 			return;
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
-		if (item && !this.replaying) this.trackBackgroundShell(item);
+		if (!item || this.replaying) return;
+		this.trackBackgroundShell(item);
+		this.trackCompaction(raw, item);
+	}
+
+	private trackCompaction(raw: unknown, item: ToolCall): void {
+		if (!this.compactions.has(item.id) && !isCompactionCall(raw)) return;
+		if (item.status !== "running") {
+			this.compactions.delete(item.id);
+			if (this.compactions.size === 0) this.endCompactions();
+			return;
+		}
+		if (this.compactions.size === 0) {
+			this.compactionsSettled = new Promise((resolve) => {
+				this.settleCompactions = resolve;
+			});
+		}
+		this.compactions.add(item.id);
+	}
+
+	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
+	private endCompactions(): void {
+		this.compactions.clear();
+		this.settleCompactions?.();
+		this.settleCompactions = null;
 	}
 
 	private trackBackgroundShell(item: ToolCall): void {
@@ -1521,7 +1556,10 @@ export class AcpAdapter implements HarnessAdapter {
 		)
 			return;
 		const status = SESSION_STATUS_BY_ACP_STATE[parsed.data.state];
-		if (status) this.emitSession({ status });
+		if (!status) return;
+		this.emitSession({
+			status: this.pendingApprovals.size > 0 ? "awaiting_input" : status,
+		});
 	}
 
 	/**
@@ -2357,7 +2395,9 @@ export class AcpAdapter implements HarnessAdapter {
 
 	private statusAfterApprovals(): SessionState["status"] {
 		if (this.pendingApprovals.size > 0) return "awaiting_input";
-		return this.currentTurn?.status === "running" ? "running" : "idle";
+		return this.currentTurn?.status === "running" && !this.awaitingBackground
+			? "running"
+			: "idle";
 	}
 
 	private cancelApprovals(
@@ -2508,7 +2548,10 @@ export class AcpAdapter implements HarnessAdapter {
 			[...this.backgroundTaskTurns.values()].includes(this.currentTurn.id);
 		if (awaiting === this.awaitingBackground) return;
 		this.awaitingBackground = awaiting;
-		this.emitSession({ awaitingBackground: awaiting });
+		this.emitSession({
+			awaitingBackground: awaiting,
+			status: this.statusAfterApprovals(),
+		});
 	}
 
 	private emitItem(item: Item, turnId: string): void {

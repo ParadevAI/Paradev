@@ -111,6 +111,7 @@ export function TurnGroupSection({
 				<WorkingFor
 					completedAtMs={row.completedAtMs}
 					startedAtMs={row.startedAtMs}
+					waiting={row.waiting}
 				/>
 			);
 		case "item": {

@@ -83,6 +83,7 @@ export type ClaudeAdapterOptions = {
 
 type PendingApproval = {
 	toolUseId: string;
+	turnId: string;
 	input: Record<string, unknown>;
 	settle: (result: PermissionResult) => void;
 };
@@ -291,7 +292,10 @@ export class ClaudeAdapter implements HarnessAdapter {
 			});
 		}
 
-		this.emitApproval(approvalId, pending.toolUseId, "answered", decision);
+		this.emitApproval(approvalId, pending, "answered", decision);
+		if (this.approvals.size === 0 && this.translator?.currentTurnId) {
+			this.events.push({ kind: "session", session: { status: "running" } });
+		}
 		if (decision.type === "cancel") this.cancelTurn();
 	}
 
@@ -327,15 +331,33 @@ export class ClaudeAdapter implements HarnessAdapter {
 			for await (const message of stream) {
 				if (this.disposed) return;
 				this.reportSessionId(message);
-				for (const event of translator.translate(message)) {
-					this.events.push(event);
-				}
+				this.pushAll(translator.translate(message));
 			}
 		} catch (error) {
-			for (const event of translator.interrupt(String(error))) {
-				this.events.push(event);
+			this.pushAll(translator.interrupt(String(error)));
+		}
+		if (this.staleApprovals()) {
+			this.events.push({ kind: "session", session: { status: "idle" } });
+		}
+	}
+
+	private pushAll(events: AdapterEvent[]): void {
+		for (const event of events) {
+			this.events.push(event);
+			if (event.kind === "turn" && event.turn.status !== "running") {
+				this.staleApprovals();
 			}
 		}
+	}
+
+	private staleApprovals(): boolean {
+		const stale = [...this.approvals];
+		this.approvals.clear();
+		for (const [approvalId, pending] of stale) {
+			pending.settle({ behavior: "deny", message: "The turn ended." });
+			this.emitApproval(approvalId, pending, "stale");
+		}
+		return stale.length > 0;
 	}
 
 	private reportSessionId(message: unknown): void {
@@ -354,15 +376,21 @@ export class ClaudeAdapter implements HarnessAdapter {
 		toolUseId: string,
 	): Promise<PermissionResult> {
 		const approvalId = this.mintId();
+		const turnId = this.translator?.currentTurnId ?? "unattributed";
 		return new Promise<PermissionResult>((settle) => {
-			this.approvals.set(approvalId, { toolUseId, input, settle });
-			this.emitApproval(approvalId, toolUseId, "pending");
+			const pending = { toolUseId, turnId, input, settle };
+			this.approvals.set(approvalId, pending);
+			this.emitApproval(approvalId, pending, "pending");
+			this.events.push({
+				kind: "session",
+				session: { status: "awaiting_input" },
+			});
 		});
 	}
 
 	private emitApproval(
 		approvalId: string,
-		toolUseId: string,
+		{ toolUseId, turnId }: PendingApproval,
 		status: ApprovalRequest["status"],
 		decision?: Decision,
 	): void {
@@ -376,11 +404,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 			status,
 			...(decision ? { decision } : {}),
 		};
-		this.events.push({
-			kind: "item",
-			item,
-			turnId: this.translator?.currentTurnId ?? "unattributed",
-		});
+		this.events.push({ kind: "item", item, turnId });
 	}
 
 	private now(): number {
