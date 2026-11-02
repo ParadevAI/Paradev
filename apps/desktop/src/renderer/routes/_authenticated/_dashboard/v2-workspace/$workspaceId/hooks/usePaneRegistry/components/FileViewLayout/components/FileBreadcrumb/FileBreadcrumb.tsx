@@ -49,6 +49,7 @@ export function FileBreadcrumb({
 	const measureRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(segments.length);
 	const [maxWidth, setMaxWidth] = useState<number | null>(null);
+	const [showTrail, setShowTrail] = useState(true);
 	const [openCrumb, setOpenCrumb] = useState<number | null>(null);
 	const [trailPick, setTrailPick] = useState<number | null>(null);
 
@@ -95,10 +96,12 @@ export function FileBreadcrumb({
 					(collapsed ? (ellipsis ?? 0) + separator : 0);
 				if (width <= available) {
 					setVisibleCount(count);
+					setShowTrail(true);
 					return;
 				}
 			}
 			setVisibleCount(1);
+			setShowTrail(false);
 		};
 		fit();
 		const observer = new ResizeObserver(fit);
@@ -187,7 +190,7 @@ export function FileBreadcrumb({
 				style={maxWidth === null ? undefined : { maxWidth }}
 				title={filePath}
 			>
-				{hidden > 0 && (
+				{hidden > 0 && showTrail && (
 					<>
 						{crumb(
 							-1,
