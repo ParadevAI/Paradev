@@ -15,6 +15,7 @@ import { BreadcrumbTree } from "./components/BreadcrumbTree";
 import { HiddenTrail } from "./components/HiddenTrail";
 
 const MIN_GAP_TO_ACTIONS = 64;
+const EDGE_GAP = 8;
 const CRUMB_GAP = 4;
 
 interface FileBreadcrumbProps {
@@ -47,6 +48,7 @@ export function FileBreadcrumb({
 	const chipRef = useRef<HTMLDivElement>(null);
 	const measureRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(segments.length);
+	const [maxWidth, setMaxWidth] = useState<number | null>(null);
 	const [openCrumb, setOpenCrumb] = useState<number | null>(null);
 	const [trailPick, setTrailPick] = useState<number | null>(null);
 
@@ -68,13 +70,21 @@ export function FileBreadcrumb({
 				Number.parseFloat(style.paddingRight) +
 				Number.parseFloat(style.borderLeftWidth) +
 				Number.parseFloat(style.borderRightWidth);
-			const right = Math.min(
-				container.getBoundingClientRect().right - 8,
-				actions
-					? actions.getBoundingClientRect().left - MIN_GAP_TO_ACTIONS
-					: Number.POSITIVE_INFINITY,
+			const chipLeft = chip.getBoundingClientRect().left;
+			const containerRight = container.getBoundingClientRect().right;
+			const actionsLeft =
+				actions?.getBoundingClientRect().left ?? Number.POSITIVE_INFINITY;
+			setMaxWidth(
+				Math.max(
+					0,
+					Math.min(containerRight, actionsLeft) - EDGE_GAP - chipLeft,
+				),
 			);
-			const available = right - chip.getBoundingClientRect().left;
+			const right = Math.min(
+				containerRight - EDGE_GAP,
+				actionsLeft - MIN_GAP_TO_ACTIONS,
+			);
+			const available = right - chipLeft;
 			const separator = (chevron ?? 0) + CRUMB_GAP * 2;
 			for (let count = items.length; count >= 1; count--) {
 				const collapsed = count < items.length;
@@ -100,12 +110,12 @@ export function FileBreadcrumb({
 
 	const crumbLabel = (index: number, showDot: boolean): ReactNode =>
 		index === segments.length - 1 ? (
-			<span className="flex items-center gap-1.5 text-foreground">
+			<span className="flex min-w-0 items-center gap-1.5 text-foreground">
 				<FileIcon
 					fileName={segments[index] ?? ""}
 					className="size-3.5 shrink-0"
 				/>
-				{segments[index]}
+				<span className="truncate">{segments[index]}</span>
 				{showDot && (
 					<span className="size-2 shrink-0 rounded-full bg-muted-foreground" />
 				)}
@@ -174,6 +184,7 @@ export function FileBreadcrumb({
 			<div
 				ref={chipRef}
 				className="pointer-events-auto absolute top-2 left-2 z-10 flex h-7 max-w-[calc(100%-1rem)] items-center gap-1 overflow-hidden rounded-full border border-border/60 bg-background px-3 text-xs whitespace-nowrap text-muted-foreground shadow-sm"
+				style={maxWidth === null ? undefined : { maxWidth }}
 				title={filePath}
 			>
 				{hidden > 0 && (
