@@ -2,11 +2,11 @@ import { useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
-import { LuLoaderCircle } from "react-icons/lu";
 import {
 	BUILD_STATUS_LABELS,
 	type EnvironmentBuild,
 } from "renderer/routes/_authenticated/utils/environmentBuildMeta";
+import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 
 interface EnvironmentBuildStatusProps {
 	status: EnvironmentBuild["status"];
@@ -27,7 +27,7 @@ export function EnvironmentBuildStatus({
 			) : status === "failed" ? (
 				<HiXCircle className="size-4 shrink-0 text-destructive" />
 			) : (
-				<LuLoaderCircle className="size-4 shrink-0 animate-spin text-sky-500" />
+				<AsciiSpinner className="w-4 shrink-0 text-center text-sm leading-none" />
 			)}
 			{i18n._(BUILD_STATUS_LABELS[status])}
 		</span>
