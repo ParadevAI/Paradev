@@ -28,7 +28,7 @@ import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
 import {
 	jwtProcedure,
-	protectedProcedure,
+	personProcedure,
 	publicProcedure,
 	userError,
 } from "../../trpc";
@@ -88,7 +88,7 @@ function countEffects<T extends { automations: unknown[]; hosts: unknown[] }>(
 export const organizationRouter = {
 	members: organizationMembersRouter,
 
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		return db
 			.select({
 				id: organizations.id,
@@ -103,7 +103,7 @@ export const organizationRouter = {
 			.orderBy(organizations.name);
 	}),
 
-	listMembers: protectedProcedure
+	listMembers: personProcedure
 		.input(
 			z.object({ includeDeactivated: z.boolean().default(false) }).nullish(),
 		)
@@ -132,7 +132,7 @@ export const organizationRouter = {
 				.where(and(...conditions));
 		}),
 
-	listInvitations: protectedProcedure.query(async ({ ctx }) => {
+	listInvitations: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		return db
 			.select({
@@ -161,7 +161,7 @@ export const organizationRouter = {
 			.orderBy(desc(invitations.createdAt));
 	}),
 
-	listTeams: protectedProcedure.query(async ({ ctx }) => {
+	listTeams: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const [teamRows, teamMemberRows] = await Promise.all([
 			db
@@ -206,7 +206,7 @@ export const organizationRouter = {
 		}));
 	}),
 
-	getActive: protectedProcedure.query(async ({ ctx }) => {
+	getActive: personProcedure.query(async ({ ctx }) => {
 		const orgId = ctx.activeOrganizationId;
 		if (!orgId) return null;
 
@@ -263,7 +263,7 @@ export const organizationRouter = {
 			return org ?? null;
 		}),
 
-	getInvitation: protectedProcedure
+	getInvitation: personProcedure
 		.input(z.uuid())
 		.query(async ({ ctx, input }) => {
 			const invitation = await getInvitationById(input);
@@ -340,7 +340,7 @@ export const organizationRouter = {
 				},
 			};
 		}),
-	create: protectedProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -384,7 +384,7 @@ export const organizationRouter = {
 			return organization;
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -478,7 +478,7 @@ export const organizationRouter = {
 			return organization;
 		}),
 
-	uploadLogo: protectedProcedure
+	uploadLogo: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -551,7 +551,7 @@ export const organizationRouter = {
 			}
 		}),
 
-	addMember: protectedProcedure
+	addMember: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -571,7 +571,7 @@ export const organizationRouter = {
 			return member;
 		}),
 
-	removeMember: protectedProcedure
+	removeMember: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -657,7 +657,7 @@ export const organizationRouter = {
 	 * happens. Anyone may ask about themselves; asking about someone else is
 	 * an admin question.
 	 */
-	memberRemovalEffects: protectedProcedure
+	memberRemovalEffects: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -673,7 +673,7 @@ export const organizationRouter = {
 			return countEffects(await findMemberRemovalEffects(input));
 		}),
 
-	leave: protectedProcedure
+	leave: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -739,7 +739,7 @@ export const organizationRouter = {
 			};
 		}),
 
-	updateMemberRole: protectedProcedure
+	updateMemberRole: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),

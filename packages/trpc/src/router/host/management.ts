@@ -6,7 +6,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { nudge } from "../../lib/realtime";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import {
 	requireActiveOrgId,
 	requireActiveOrgMembership,
@@ -83,7 +83,7 @@ export const hostManagementRouter = {
 	 * the v2Host alias in root.ts; by then auto-update has moved the fleet
 	 * past 1.28.
 	 */
-	roster: protectedProcedure
+	roster: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }).optional())
 		.query(async ({ ctx, input }) => {
 			const organizationId = input?.organizationId ?? requireActiveOrgId(ctx);
@@ -113,7 +113,7 @@ export const hostManagementRouter = {
 				);
 		}),
 
-	listMembers: protectedProcedure.query(async ({ ctx }) => {
+	listMembers: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		return db
 			.select({
@@ -126,7 +126,7 @@ export const hostManagementRouter = {
 			.where(eq(v2UsersHosts.organizationId, organizationId));
 	}),
 
-	rename: protectedProcedure
+	rename: personProcedure
 		.input(
 			z.object({
 				hostId: z.string().min(1),
@@ -166,7 +166,7 @@ export const hostManagementRouter = {
 			return { success: true, txid };
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(z.object({ hostId: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = requireActiveOrgId(ctx);
@@ -260,7 +260,7 @@ export const hostManagementRouter = {
 			return { success: true, txid };
 		}),
 
-	addMember: protectedProcedure
+	addMember: personProcedure
 		.input(
 			z.object({
 				hostId: z.string().min(1),
@@ -306,7 +306,7 @@ export const hostManagementRouter = {
 			return { ...result.inserted, txid: result.txid };
 		}),
 
-	removeMember: protectedProcedure
+	removeMember: personProcedure
 		.input(
 			z.object({
 				hostId: z.string().min(1),
@@ -386,7 +386,7 @@ export const hostManagementRouter = {
 			return { success: true, txid };
 		}),
 
-	setMemberRole: protectedProcedure
+	setMemberRole: personProcedure
 		.input(
 			z.object({
 				hostId: z.string().min(1),

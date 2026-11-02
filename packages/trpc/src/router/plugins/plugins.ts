@@ -23,7 +23,7 @@ import {
 	ensureManagedInstalls,
 	memberRole,
 } from "../../lib/organization-plugins";
-import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import { createTRPCRouter, personProcedure } from "../../trpc";
 import {
 	requireActiveOrgId,
 	requireActiveOrgMembership,
@@ -109,7 +109,7 @@ function describe(
 }
 
 const marketplacesRouter = {
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		const rows = await db
 			.select()
 			.from(pluginMarketplaces)
@@ -142,7 +142,7 @@ const marketplacesRouter = {
 		];
 	}),
 
-	add: protectedProcedure
+	add: personProcedure
 		.input(
 			z.discriminatedUnion("sourceKind", [
 				z.object({
@@ -196,7 +196,7 @@ const marketplacesRouter = {
 			return { id: row?.id, name: input.name };
 		}),
 
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(z.object({ name: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			if (input.name === FIRST_PARTY) {
@@ -250,7 +250,7 @@ const marketplacesRouter = {
 } satisfies TRPCRouterRecord;
 
 const connectionsRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(z.object({ plugin: z.string().min(1).optional() }).optional())
 		.query(async ({ ctx, input }) => {
 			const install = input?.plugin
@@ -289,7 +289,7 @@ const connectionsRouter = {
 			}));
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ connectionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const [row] = await db
@@ -323,7 +323,7 @@ const loadSlackPreview = createSlackLinkPreviewLoader({
 
 export const pluginsRouter = createTRPCRouter({
 	/** A Slack message or profile link, read with the caller's own Slack. */
-	slackLinkPreview: protectedProcedure
+	slackLinkPreview: personProcedure
 		.input(z.object({ url: z.string().max(2048) }))
 		.query(async ({ ctx, input }) =>
 			loadSlackPreview({
@@ -333,7 +333,7 @@ export const pluginsRouter = createTRPCRouter({
 			}),
 		),
 
-	list: protectedProcedure
+	list: personProcedure
 		.input(
 			z
 				.object({
@@ -520,7 +520,7 @@ export const pluginsRouter = createTRPCRouter({
 			return [...installed, ...available, ...organizationAvailable];
 		}),
 
-	install: protectedProcedure
+	install: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -636,7 +636,7 @@ export const pluginsRouter = createTRPCRouter({
 			};
 		}),
 
-	setEnabled: protectedProcedure
+	setEnabled: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -666,7 +666,7 @@ export const pluginsRouter = createTRPCRouter({
 			};
 		}),
 
-	uninstall: protectedProcedure
+	uninstall: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),

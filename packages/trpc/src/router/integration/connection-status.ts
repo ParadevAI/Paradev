@@ -4,7 +4,7 @@ import { getConnector } from "@superset/shared/connectors";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { NEEDS_REAUTH } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgMembership } from "./utils";
 
 /**
@@ -38,7 +38,7 @@ export interface ProviderConnection {
 	accounts: ProviderAccount[];
 }
 
-export const connectionStatusProcedure = protectedProcedure
+export const connectionStatusProcedure = personProcedure
 	.input(z.object({ organizationId: z.uuid() }))
 	.query(
 		async ({ ctx, input }): Promise<Record<string, ProviderConnection>> => {

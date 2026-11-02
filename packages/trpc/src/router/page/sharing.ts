@@ -13,7 +13,7 @@ import {
 	sharingResourceSchema,
 	validateGrantees,
 } from "../../lib/sharing";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	assertPageReadable,
@@ -57,7 +57,7 @@ async function loadManagedPage(
 }
 
 export const pageSharingRouter = {
-	get: protectedProcedure
+	get: personProcedure
 		.input(sharingResourceSchema)
 		.query(async ({ ctx, input }) => {
 			const { page, userId, shareRole } = await loadSharedPage(ctx, input.id);
@@ -81,7 +81,7 @@ export const pageSharingRouter = {
 			};
 		}),
 
-	add: protectedProcedure
+	add: personProcedure
 		.input(addPageSharesSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page, userId } = await loadManagedPage(ctx, input.id);
@@ -99,7 +99,7 @@ export const pageSharingRouter = {
 			return { added };
 		}),
 
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(removeShareSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
@@ -111,7 +111,7 @@ export const pageSharingRouter = {
 			};
 		}),
 
-	setRole: protectedProcedure
+	setRole: personProcedure
 		.input(setShareRoleSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);

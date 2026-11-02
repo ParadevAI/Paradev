@@ -24,7 +24,7 @@ import type { z } from "zod";
 import { userError } from "../../i18n-error";
 import { anchorAttachments } from "../../lib/attachments";
 import { actorOf, type Principal } from "../../principal";
-import { actorProcedure, protectedProcedure } from "../../trpc";
+import { actorProcedure, personProcedure } from "../../trpc";
 import { jevChannelRouter } from "../agent/channel-routing";
 import { startTurnsForMessage } from "../agent/turns";
 import {
@@ -567,7 +567,7 @@ export const channelMessageRouter = {
 		.input(sendMessageSchema)
 		.mutation(({ ctx, input }) => sendChannelMessage(ctx, input)),
 
-	edit: protectedProcedure
+	edit: personProcedure
 		.input(editMessageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -612,7 +612,7 @@ export const channelMessageRouter = {
 			return edited;
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(messageIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -681,48 +681,46 @@ export const channelMessageRouter = {
 			return deleted;
 		}),
 
-	react: protectedProcedure
-		.input(reactSchema)
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
-			const { message, access } = await loadMessage(
-				ctx.principal,
-				input.messageId,
-			);
-			if (message.deletedAt) throw messageNotFound();
-			assertCanPost(access);
-			if (input.reacted) {
-				await db
-					.insert(channelMessageReactions)
-					.values({
-						messageId: message.id,
-						actorId: userId,
-						emoji: input.emoji,
-					})
-					.onConflictDoNothing();
-			} else {
-				await db
-					.delete(channelMessageReactions)
-					.where(
-						and(
-							eq(channelMessageReactions.messageId, message.id),
-							eq(channelMessageReactions.actorId, userId),
-							eq(channelMessageReactions.emoji, input.emoji),
-						),
-					);
-			}
-			const reacted = await enrichMessage(message);
-			const members = await recipients(access.channel.id);
-			publishToUsers(
-				members.map((m) => m.userId),
-				{
-					type: "channel.message",
-					channelId: access.channel.id,
-					message: toWire(reacted),
-				},
-			);
-			return reacted;
-		}),
+	react: personProcedure.input(reactSchema).mutation(async ({ ctx, input }) => {
+		const userId = ctx.session.user.id;
+		const { message, access } = await loadMessage(
+			ctx.principal,
+			input.messageId,
+		);
+		if (message.deletedAt) throw messageNotFound();
+		assertCanPost(access);
+		if (input.reacted) {
+			await db
+				.insert(channelMessageReactions)
+				.values({
+					messageId: message.id,
+					actorId: userId,
+					emoji: input.emoji,
+				})
+				.onConflictDoNothing();
+		} else {
+			await db
+				.delete(channelMessageReactions)
+				.where(
+					and(
+						eq(channelMessageReactions.messageId, message.id),
+						eq(channelMessageReactions.actorId, userId),
+						eq(channelMessageReactions.emoji, input.emoji),
+					),
+				);
+		}
+		const reacted = await enrichMessage(message);
+		const members = await recipients(access.channel.id);
+		publishToUsers(
+			members.map((m) => m.userId),
+			{
+				type: "channel.message",
+				channelId: access.channel.id,
+				message: toWire(reacted),
+			},
+		);
+		return reacted;
+	}),
 } satisfies TRPCRouterRecord;
 
 async function findByClientId(

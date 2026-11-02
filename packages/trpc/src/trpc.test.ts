@@ -19,7 +19,7 @@ const {
 	createTRPCContext,
 	createTRPCRouter,
 	jwtProcedure,
-	protectedProcedure,
+	personProcedure,
 } = await import("./trpc");
 
 const reached = jwtProcedure.mutation(() => "reached");
@@ -36,7 +36,7 @@ const router = createTRPCRouter({
 		restart: reached,
 	}),
 	user: createTRPCRouter({
-		myOrganization: protectedProcedure.query(
+		myOrganization: personProcedure.query(
 			({ ctx }) => ctx.activeOrganizationId,
 		),
 	}),
@@ -132,7 +132,7 @@ describe("the organization a cloud workspace acts in", () => {
 			() => callerFor({ organization: "other-org" }).cloudWorkspace.list(),
 		],
 		[
-			"protectedProcedure",
+			"personProcedure",
 			() => callerFor({ organization: "other-org" }).user.myOrganization(),
 		],
 	])("%s refuses a box another of its creator's organizations", async (_name, call) => {

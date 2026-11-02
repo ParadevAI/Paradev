@@ -1,10 +1,10 @@
 import type { PullRequestDiff } from "@superset/shared/pull-request-diff";
 import { z } from "zod";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { asViewerOrInstallation } from "./viewer-octokit";
 
 // Errors stay unmapped: released desktops read this procedure's failures as-is.
-export const getPullRequestDiff = protectedProcedure
+export const getPullRequestDiff = personProcedure
 	.input(
 		z.object({
 			organizationId: z.string().uuid(),
