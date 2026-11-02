@@ -13,7 +13,8 @@ import {
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, isNull, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { loadChannelAccess } from "../channel/access";
+import type { DevPrincipal } from "../../principal";
+import { loadChannelAccessFor } from "../channel/access";
 import { mainProcedure } from "./main-procedure";
 import { parseReplyTarget, replyTarget } from "./turns";
 
@@ -30,49 +31,33 @@ const channelNotReadable = () =>
 /** A channel name ("roster", "#roster") or a reply_to target. */
 const channelRef = z.string().min(1).max(200);
 
-interface Turn {
-	agentId: string;
-	organizationId: string;
-	askerId: string;
-}
-
 /**
- * The channel, and thread if the ref names one, that the Dev may read for
- * this turn: the Dev must be able to read it, and so must the person the
- * turn works for, so a Dev can't relay what its caller can't see.
+ * The channel, and thread if the ref names one, as the Dev may read it for
+ * the person it works for.
  */
-async function readableChannel(turn: Turn, ref: string) {
+async function readableChannel(principal: DevPrincipal, ref: string) {
 	const target = parseReplyTarget(ref);
-	const [channel] = await db
-		.select({
-			id: channels.id,
-			name: channels.name,
-			kind: channels.kind,
-			description: channels.description,
-			taskProjectId: channels.taskProjectId,
-		})
-		.from(channels)
-		.where(
-			and(
-				eq(channels.organizationId, turn.organizationId),
-				isNull(channels.archivedAt),
-				target
-					? eq(channels.id, target.channelId)
-					: and(
-							eq(channels.kind, "channel"),
-							sql`lower(${channels.name}) = ${ref.replace(/^#/, "").toLowerCase()}`,
-						),
-			),
-		)
-		.limit(1);
-	if (!channel) throw channelNotReadable();
-	const { rows } = await db.execute<{ allowed: number }>(
-		sql`select authz.check_permission('agent', ${turn.agentId}, 'can_read', 'channel', ${channel.id}) as allowed`,
+	const [named] = target
+		? [{ id: target.channelId }]
+		: await db
+				.select({ id: channels.id })
+				.from(channels)
+				.where(
+					and(
+						eq(channels.organizationId, principal.organizationId),
+						eq(channels.kind, "channel"),
+						isNull(channels.archivedAt),
+						sql`lower(${channels.name}) = ${ref.replace(/^#/, "").toLowerCase()}`,
+					),
+				)
+				.limit(1);
+	if (!named) throw channelNotReadable();
+	const { channel } = await loadChannelAccessFor(principal, named.id).catch(
+		() => {
+			throw channelNotReadable();
+		},
 	);
-	if (rows[0]?.allowed !== 1) throw channelNotReadable();
-	await loadChannelAccess(turn.askerId, channel.id).catch(() => {
-		throw channelNotReadable();
-	});
+	if (channel.archivedAt) throw channelNotReadable();
 	return { channel, threadRootId: target?.threadRootId ?? null };
 }
 

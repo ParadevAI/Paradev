@@ -26,7 +26,12 @@ import {
 	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
 } from "./lib/sandbox/api-credential";
-import type { DevPrincipal, PersonPrincipal } from "./principal";
+import {
+	actorOf,
+	type DevPrincipal,
+	type PersonPrincipal,
+	type Principal,
+} from "./principal";
 
 export type { I18nErrorCause, RequiredPlan } from "./i18n-error";
 export { isI18nErrorCause, planRequiredError, userError } from "./i18n-error";
@@ -206,59 +211,144 @@ export const sandboxProcedure = t.procedure.use(async ({ ctx, next }) => {
 	return next({ ctx: { ...ctx, sandboxWorkspace: workspace } });
 });
 
-export const protectedProcedure = t.procedure
+/**
+ * The signed-in person, with the organization they act in: the session's,
+ * or one they belong to named in the organization header.
+ */
+async function personFromSession(ctx: TRPCContext, path: string) {
+	const { session } = ctx;
+	if (!session) {
+		throw userError({
+			code: "UNAUTHORIZED",
+			message: "Not authenticated. Please sign in.",
+			i18nKey: "serverError.common.notAuthenticatedPleaseSignIn",
+		});
+	}
+	if (
+		session.user.deletionRequestedAt &&
+		!PENDING_DELETION_ALLOWED_PROCEDURES.has(path)
+	) {
+		throw userError({
+			code: "FORBIDDEN",
+			message: "Account is pending deletion.",
+			i18nKey: "serverError.common.accountIsPendingDeletion",
+		});
+	}
+	const sessionOrgId = session.session.activeOrganizationId ?? null;
+	const headerOrgId = ctx.headers.get(ORGANIZATION_HEADER)?.trim() || null;
+	assertInBoxOrganization(ctx.sandboxCaller, headerOrgId);
+
+	let activeOrganizationId = sessionOrgId;
+	if (headerOrgId && headerOrgId !== sessionOrgId) {
+		const membership = await db.query.members.findFirst({
+			where: and(
+				eq(members.userId, session.user.id),
+				eq(members.organizationId, headerOrgId),
+			),
+		});
+		if (!membership) {
+			throw notAMemberOfOrganization(headerOrgId, session.user.email);
+		}
+		activeOrganizationId = headerOrgId;
+	}
+	return {
+		session,
+		activeOrganizationId,
+		principal: personPrincipal(session.user.id, activeOrganizationId),
+	};
+}
+
+/**
+ * A Dev inside a running turn, from a turn token in its own header and
+ * signed with its own key, so it can never pass as a user's JWT. A settled
+ * turn, or an archived Dev, stops working at once rather than when the token
+ * expires. Null when the request carries no turn token.
+ */
+async function devFromTurnToken(
+	headers: Headers,
+): Promise<DevPrincipal | null> {
+	const token = headers.get(TURN_TOKEN_HEADER);
+	if (!token) return null;
+	const claims = await verifyTurnToken(env.AGENT_TURN_SIGNING_SECRET, token);
+	if (!claims) {
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "Bad turn token." });
+	}
+	const [turn] = await db
+		.select({
+			status: agentTurns.status,
+			archivedAt: agents.archivedAt,
+			ownerId: agents.createdByUserId,
+		})
+		.from(agentTurns)
+		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
+		.where(
+			and(
+				eq(agentTurns.id, claims.turnId),
+				eq(agentTurns.sessionId, claims.sessionId),
+				eq(agentTurns.agentId, claims.agentId),
+				eq(agentTurns.organizationId, claims.organizationId),
+			),
+		)
+		.limit(1);
+	if (!turn || turn.status !== "running" || turn.archivedAt) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+			message: "Turn is not running.",
+		});
+	}
+	return {
+		kind: "dev",
+		agentId: claims.agentId,
+		organizationId: claims.organizationId,
+		ownerId: turn.ownerId,
+		askerId: claims.actingUserId,
+		sessionId: claims.sessionId,
+		turnId: claims.turnId,
+	};
+}
+
+/**
+ * Anyone who may call: a Dev with a turn token, or a signed-in person.
+ * Procedures on it check access with `ctx.principal`, never the session.
+ */
+export const actorProcedure = t.procedure
 	.use(sandboxScope)
-	.use(clientTelemetry)
-	.use(async ({ ctx, next }) => {
-		if (!ctx.session) {
-			throw userError({
-				code: "UNAUTHORIZED",
-				message: "Not authenticated. Please sign in.",
-				i18nKey: "serverError.common.notAuthenticatedPleaseSignIn",
-			});
-		}
-
-		return next({ ctx: { ...ctx, session: ctx.session } });
-	})
 	.use(async ({ ctx, path, next }) => {
-		if (
-			ctx.session.user.deletionRequestedAt &&
-			!PENDING_DELETION_ALLOWED_PROCEDURES.has(path)
-		) {
-			throw userError({
-				code: "FORBIDDEN",
-				message: "Account is pending deletion.",
-				i18nKey: "serverError.common.accountIsPendingDeletion",
-			});
-		}
-		return next();
-	})
-	.use(async ({ ctx, next }) => {
-		const sessionOrgId = ctx.session.session.activeOrganizationId ?? null;
-		const headerOrgId = ctx.headers.get(ORGANIZATION_HEADER)?.trim() || null;
-		assertInBoxOrganization(ctx.sandboxCaller, headerOrgId);
-
-		let activeOrganizationId = sessionOrgId;
-		if (headerOrgId && headerOrgId !== sessionOrgId) {
-			const membership = await db.query.members.findFirst({
-				where: and(
-					eq(members.userId, ctx.session.user.id),
-					eq(members.organizationId, headerOrgId),
-				),
-			});
-			if (!membership) {
-				throw notAMemberOfOrganization(headerOrgId, ctx.session.user.email);
-			}
-			activeOrganizationId = headerOrgId;
-		}
-
-		const principal: PersonPrincipal = {
-			kind: "person",
-			userId: ctx.session.user.id,
-			organizationId: activeOrganizationId,
-		};
-		return next({ ctx: { ...ctx, activeOrganizationId, principal } });
+		const dev = await devFromTurnToken(ctx.headers);
+		const caller = dev
+			? {
+					session: null,
+					activeOrganizationId: dev.organizationId,
+					principal: dev as Principal,
+				}
+			: await personFromSession(ctx, path);
+		captureApiCall(ctx.client, actorOf(caller.principal), path);
+		return next({
+			ctx: { ...ctx, ...caller, principal: caller.principal as Principal },
+		});
 	});
+
+/** A signed-in person only. */
+export const protectedProcedure = actorProcedure.use(({ ctx, next }) => {
+	const { principal, session } = ctx;
+	if (principal.kind !== "person" || !session) {
+		throw userError({
+			code: "UNAUTHORIZED",
+			message: "Not authenticated. Please sign in.",
+			i18nKey: "serverError.common.notAuthenticatedPleaseSignIn",
+		});
+	}
+	return next({ ctx: { ...ctx, session, principal } });
+});
+
+/** A Dev inside a running turn only. */
+export const devProcedure = actorProcedure.use(({ ctx, next }) => {
+	const { principal } = ctx;
+	if (principal.kind !== "dev") {
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "No turn token." });
+	}
+	return next({ ctx: { ...ctx, principal } });
+});
 
 /**
  * Callers pass the organization in a header (the CLI sends
@@ -430,53 +520,4 @@ export const workerProcedure = t.procedure.use(async ({ ctx, next }) => {
 		throw new TRPCError({ code: "UNAUTHORIZED", message: "Unknown worker." });
 	}
 	return next();
-});
-
-/**
- * A Dev acting inside a running turn, never a person: authenticated by a
- * turn token in its own header and signed with its own key, so it can never
- * pass as a user's JWT. A settled turn, or an archived Dev, stops working at
- * once rather than when the token expires.
- */
-export const devProcedure = t.procedure.use(async ({ ctx, next }) => {
-	const token = ctx.headers.get(TURN_TOKEN_HEADER);
-	const claims = token
-		? await verifyTurnToken(env.AGENT_TURN_SIGNING_SECRET, token)
-		: null;
-	if (!claims) {
-		throw new TRPCError({ code: "UNAUTHORIZED", message: "No turn token." });
-	}
-	const [turn] = await db
-		.select({
-			status: agentTurns.status,
-			archivedAt: agents.archivedAt,
-			ownerId: agents.createdByUserId,
-		})
-		.from(agentTurns)
-		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
-		.where(
-			and(
-				eq(agentTurns.id, claims.turnId),
-				eq(agentTurns.sessionId, claims.sessionId),
-				eq(agentTurns.agentId, claims.agentId),
-				eq(agentTurns.organizationId, claims.organizationId),
-			),
-		)
-		.limit(1);
-	if (!turn || turn.status !== "running" || turn.archivedAt) {
-		throw new TRPCError({
-			code: "UNAUTHORIZED",
-			message: "Turn is not running.",
-		});
-	}
-	const principal: DevPrincipal = {
-		kind: "dev",
-		agentId: claims.agentId,
-		organizationId: claims.organizationId,
-		ownerId: turn.ownerId,
-		askerId: claims.actingUserId,
-		sessionId: claims.sessionId,
-		turnId: claims.turnId,
-	};
-	return next({ ctx: { principal } });
 });

@@ -13,7 +13,7 @@ import { pickEntityColor } from "@superset/shared/entity-colors";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure } from "../../trpc";
+import { actorProcedure, protectedProcedure } from "../../trpc";
 import {
 	assertTaskInOrganization,
 	taskColumns,
@@ -21,7 +21,11 @@ import {
 	toTaskChip,
 } from "../cloud-workspace/record";
 import { recordTaskActivity } from "../task/activity";
-import { assertCanPost, loadChannelAccess } from "./access";
+import {
+	assertCanPost,
+	loadChannelAccess,
+	loadChannelAccessFor,
+} from "./access";
 import { channelMemberIds } from "./members";
 import { publishToUsers } from "./publish";
 import {
@@ -231,38 +235,30 @@ export const channelTaskRouter = {
 		}),
 
 	/** The tasks in the channel's project, newest added first. */
-	list: protectedProcedure
-		.input(channelIdSchema)
-		.query(async ({ ctx, input }) => {
-			const access = await loadChannelAccess(
-				ctx.session.user.id,
-				input.channelId,
-			);
-			const projectId = access.channel.taskProjectId;
-			if (!projectId) return [];
-			const rows = await db
-				.select({
-					...taskColumns,
-					assigneeId: tasks.assigneeId,
-					assigneeName: users.name,
-					assigneeImage: users.image,
-				})
-				.from(taskProjectTasks)
-				.innerJoin(tasks, eq(tasks.id, taskProjectTasks.taskId))
-				.leftJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
-				.leftJoin(users, eq(users.id, tasks.assigneeId))
-				.where(
-					and(
-						eq(taskProjectTasks.projectId, projectId),
-						isNull(tasks.deletedAt),
-					),
-				)
-				.orderBy(desc(taskProjectTasks.createdAt));
-			return rows.map((row) => ({
-				...toTaskChip(row),
-				assignee: toAssignee(row),
-			}));
-		}),
+	list: actorProcedure.input(channelIdSchema).query(async ({ ctx, input }) => {
+		const access = await loadChannelAccessFor(ctx.principal, input.channelId);
+		const projectId = access.channel.taskProjectId;
+		if (!projectId) return [];
+		const rows = await db
+			.select({
+				...taskColumns,
+				assigneeId: tasks.assigneeId,
+				assigneeName: users.name,
+				assigneeImage: users.image,
+			})
+			.from(taskProjectTasks)
+			.innerJoin(tasks, eq(tasks.id, taskProjectTasks.taskId))
+			.leftJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
+			.leftJoin(users, eq(users.id, tasks.assigneeId))
+			.where(
+				and(eq(taskProjectTasks.projectId, projectId), isNull(tasks.deletedAt)),
+			)
+			.orderBy(desc(taskProjectTasks.createdAt));
+		return rows.map((row) => ({
+			...toTaskChip(row),
+			assignee: toAssignee(row),
+		}));
+	}),
 
 	/** Moves the task into the channel's project, making the project if needed. */
 	add: protectedProcedure
