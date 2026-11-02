@@ -242,10 +242,9 @@ export function PullRequestActions({
 		resetDraft();
 		selectProject(projectId);
 		updateDraft({
-			hostId,
 			promptDraft: linkedContextSeed([linkedPrChip(linkedPR)]),
 		});
-		openNewWorkspace(projectId);
+		openNewWorkspace(projectId, hostId);
 	};
 
 	const repairItems = data ? (

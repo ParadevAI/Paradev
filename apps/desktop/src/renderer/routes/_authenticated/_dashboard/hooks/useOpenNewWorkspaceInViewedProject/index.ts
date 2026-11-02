@@ -1,1 +1,4 @@
-export { useOpenNewWorkspaceInViewedProject } from "./useOpenNewWorkspaceInViewedProject";
+export {
+	resolveViewedWorkspaceHandoff,
+	useOpenNewWorkspaceInViewedProject,
+} from "./useOpenNewWorkspaceInViewedProject";
