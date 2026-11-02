@@ -17,6 +17,7 @@ import { z } from "zod";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { channelNotFound } from "../channel/access";
 import { postAgentMessage } from "../channel/channel-message";
+import { devChannelTools } from "./dev-channel-tools";
 import { devRoutineTools } from "./dev-routine-tools";
 import { mainProcedure } from "./main-procedure";
 import { fillSlots, startTask } from "./tasks";
@@ -329,4 +330,5 @@ export const devToolsRouter = {
 	}),
 
 	...devRoutineTools,
+	...devChannelTools,
 } satisfies TRPCRouterRecord;

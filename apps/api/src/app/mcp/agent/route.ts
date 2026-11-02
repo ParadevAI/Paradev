@@ -121,6 +121,28 @@ function devToolsServer(tools: DevTools): McpServer {
 		() => result(() => tools.listEnvironments()),
 	);
 	server.registerTool(
+		"read_channel",
+		{
+			description:
+				"Read a channel or thread you're in: who said what, oldest first. `channel` is a name (#roster) or a reply_to target (channel:<id> or channel:<id>/thread:<id>). Read before answering when the message refers to earlier talk. For more, pass the returned `before`. Top-level messages give each thread's target and reply count.",
+			inputSchema: {
+				channel: z.string(),
+				before: z.number().int().optional(),
+				limit: z.number().int().min(1).max(50).optional(),
+			},
+		},
+		(args) => result(() => tools.readChannel(args)),
+	);
+	server.registerTool(
+		"channel_tasks",
+		{
+			description:
+				"The Paradev tasks linked to a channel (its Tasks tab): slug, title, status, assignee and pull request. `channel` is a name or a reply_to target.",
+			inputSchema: { channel: z.string() },
+		},
+		(args) => result(() => tools.channelTasks(args)),
+	);
+	server.registerTool(
 		"routine_update",
 		{
 			description:

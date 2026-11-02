@@ -1,6 +1,7 @@
 import { startTurn, steerTurn } from "@superset/agent-harness/session";
 import { db, dbWs } from "@superset/db/client";
 import {
+	actors,
 	agentSessions,
 	agents,
 	agentTurns,
@@ -187,14 +188,22 @@ export function eventText(event: {
 	replyTo: string | null;
 	body: string;
 	now?: Date;
+	/** The channel's description, when it has one. */
+	about?: string | null;
+	/** For a reply in a thread: the message that started it. */
+	threadStart?: { from: string; body: string } | null;
 }) {
 	const attrs = [
 		`from="${attr(event.from)}"`,
 		`where="${attr(event.where)}"`,
+		...(event.about ? [`about="${attr(event.about)}"`] : []),
 		...(event.replyTo ? [`reply_to="${attr(event.replyTo)}"`] : []),
 		`time="${(event.now ?? new Date()).toISOString()}"`,
 	];
-	return `<message ${attrs.join(" ")}>\n${escapeMessageTags(event.body)}\n</message>`;
+	const start = event.threadStart
+		? `<thread_start from="${attr(event.threadStart.from)}">\n${escapeMessageTags(event.threadStart.body)}\n</thread_start>\n`
+		: "";
+	return `<message ${attrs.join(" ")}>\n${start}${escapeMessageTags(event.body)}\n</message>`;
 }
 
 function attr(value: string) {
@@ -205,7 +214,7 @@ function attr(value: string) {
 }
 
 function escapeMessageTags(body: string) {
-	return body.replace(/<(?=\s*\/?\s*message\b)/gi, "&lt;");
+	return body.replace(/<(?=\s*\/?\s*(message|thread_start)\b)/gi, "&lt;");
 }
 
 /** The one session every message to a Dev reaches; made on first use. */
@@ -306,7 +315,6 @@ export async function startTurnsForMessage(
 			watchers,
 			devs: members.map((row) => row.agent),
 			channel,
-			roomName: room?.name,
 			authorName: author?.name,
 			message,
 			userId,
@@ -343,9 +351,8 @@ export async function startTurnsForMessage(
 	}
 	await deliverToMains({
 		work: [...work.values()],
-		text: messageEvent({
+		text: await messageEvent({
 			channel,
-			roomName: room?.name,
 			authorName: author?.name,
 			message,
 		}),
@@ -399,9 +406,8 @@ async function routeUnmentioned({
 		}));
 	await deliverToMains({
 		work,
-		text: messageEvent({
+		text: await messageEvent({
 			channel: { id: channel.id, kind: "channel" },
-			roomName: channel.name,
 			authorName,
 			message,
 		}),
@@ -410,17 +416,23 @@ async function routeUnmentioned({
 	});
 }
 
-function messageEvent({
+const THREAD_START_CHARS = 2_000;
+
+/** A message for a Dev's main session, with where it was said and, in a thread, how the thread began. */
+async function messageEvent({
 	channel,
-	roomName,
 	authorName,
 	message,
 }: {
 	channel: { id: string; kind: "channel" | "dm" };
-	roomName: string | undefined;
 	authorName: string | undefined;
 	message: { id: string; body: string; threadRootId: string | null };
 }) {
+	const [room] = await db
+		.select({ name: channels.name, description: channels.description })
+		.from(channels)
+		.where(eq(channels.id, channel.id))
+		.limit(1);
 	const threadRootId =
 		channel.kind === "dm"
 			? message.threadRootId
@@ -430,10 +442,41 @@ function messageEvent({
 		where:
 			channel.kind === "dm"
 				? "your DM"
-				: `#${roomName ?? "channel"}${message.threadRootId ? ", in a thread" : ""}`,
+				: `#${room?.name ?? "channel"}${message.threadRootId ? ", in a thread" : ""}`,
+		about: channel.kind === "dm" ? null : room?.description,
 		replyTo: replyTarget(channel.id, threadRootId),
 		body: message.body,
+		threadStart: message.threadRootId
+			? await threadStartOf(message.threadRootId)
+			: null,
 	});
+}
+
+async function threadStartOf(
+	threadRootId: string,
+): Promise<{ from: string; body: string } | null> {
+	const [root] = await db
+		.select({
+			body: channelMessages.body,
+			userName: users.name,
+			devName: agents.name,
+		})
+		.from(channelMessages)
+		.leftJoin(actors, eq(actors.id, channelMessages.authorId))
+		.leftJoin(users, eq(users.id, actors.userId))
+		.leftJoin(agents, eq(agents.id, actors.agentId))
+		.where(
+			and(
+				eq(channelMessages.id, threadRootId),
+				isNull(channelMessages.deletedAt),
+			),
+		)
+		.limit(1);
+	if (!root) return null;
+	return {
+		from: root.devName ?? root.userName ?? "someone",
+		body: root.body.slice(0, THREAD_START_CHARS),
+	};
 }
 
 /**
@@ -444,7 +487,6 @@ async function deliverToWatchers({
 	watchers,
 	devs,
 	channel,
-	roomName,
 	authorName,
 	message,
 	userId,
@@ -452,12 +494,11 @@ async function deliverToWatchers({
 	watchers: Map<string, SelectAgentRoutine[]>;
 	devs: SelectAgent[];
 	channel: { id: string; kind: "channel" | "dm" };
-	roomName: string | undefined;
 	authorName: string | undefined;
 	message: { id: string; body: string; threadRootId: string | null };
 	userId: string;
 }) {
-	const event = messageEvent({ channel, roomName, authorName, message });
+	const event = await messageEvent({ channel, authorName, message });
 	const replyTo = replyTarget(channel.id, message.threadRootId ?? message.id);
 	const now = new Date();
 	const results = await Promise.allSettled(
@@ -556,9 +597,8 @@ export async function redeliverMessage({
 		sessionId: await ensureMainSession(agent),
 		actingUserId: row.author ? row.message.authorId : null,
 		promptId,
-		text: messageEvent({
+		text: await messageEvent({
 			channel: row.channel,
-			roomName: row.channel.name,
 			authorName: row.author ?? undefined,
 			message: row.message,
 		}),
