@@ -120,6 +120,10 @@
 			"types": "./src/router/cloud-workspace/reap.ts",
 			"default": "./src/router/cloud-workspace/reap.ts"
 		},
+		"./environment-build": {
+			"types": "./src/lib/sandbox/environment-build/index.ts",
+			"default": "./src/lib/sandbox/environment-build/index.ts"
+		},
 		"./automation-dispatch": {
 			"types": "./src/router/automation/dispatch.ts",
 			"default": "./src/router/automation/dispatch.ts"

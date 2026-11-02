@@ -8,7 +8,6 @@ import { useState } from "react";
 import {
 	HiOutlineArchiveBox,
 	HiOutlineCube,
-	HiOutlinePencil,
 	HiOutlinePlus,
 } from "react-icons/hi2";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -20,7 +19,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
-import { EnvironmentSecrets } from "./components/EnvironmentSecrets";
+import { EnvironmentBuildSummary } from "./components/EnvironmentBuildSummary";
 
 interface EnvironmentsSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -34,7 +33,6 @@ export function EnvironmentsSettings({
 	const utils = cloudTrpc.useUtils();
 	const navigate = useNavigate();
 	const [isCreating, setIsCreating] = useState(false);
-	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [archiving, setArchiving] = useState<{
 		id: string;
 		name: string;
@@ -69,19 +67,9 @@ export function EnvironmentsSettings({
 				utils.environment.list.invalidate(),
 				utils.billing.environmentUsage.invalidate(),
 			]);
-			setSelectedId(null);
 		},
 		onError: (error) => toast.error(errorMessage(error)),
 	});
-
-	if (selectedId) {
-		return (
-			<EnvironmentSecrets
-				environmentId={selectedId}
-				onBack={() => setSelectedId(null)}
-			/>
-		);
-	}
 
 	if (!showList && !showSecrets) return null;
 
@@ -155,7 +143,12 @@ export function EnvironmentsSettings({
 						>
 							<button
 								className="flex items-center gap-3 min-w-0 flex-1 text-left"
-								onClick={() => setSelectedId(environment.id)}
+								onClick={() =>
+									navigate({
+										to: "/environments/$environmentId",
+										params: { environmentId: environment.id },
+									})
+								}
 								type="button"
 							>
 								<HiOutlineCube className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -177,21 +170,11 @@ export function EnvironmentsSettings({
 									</div>
 								</div>
 							</button>
+							<EnvironmentBuildSummary
+								build={environment.latestBuild}
+								hasSnapshot={environment.sourceKind === "fork"}
+							/>
 							<div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-								<Button
-									aria-label={t({ message: "Edit environment" })}
-									className="h-8 w-8 text-muted-foreground"
-									onClick={() =>
-										navigate({
-											to: "/environments/$environmentId",
-											params: { environmentId: environment.id },
-										})
-									}
-									size="icon"
-									variant="ghost"
-								>
-									<HiOutlinePencil className="h-4 w-4" />
-								</Button>
 								<Button
 									aria-label={t({ message: "Archive environment" })}
 									className="h-8 w-8 text-muted-foreground hover:text-destructive"

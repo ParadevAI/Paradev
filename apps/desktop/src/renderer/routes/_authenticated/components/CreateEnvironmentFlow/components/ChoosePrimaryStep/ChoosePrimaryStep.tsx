@@ -16,6 +16,8 @@ interface ChoosePrimaryStepProps {
 	isStarting: boolean;
 	onBack: () => void;
 	onGetStarted: (primaryId: string) => void;
+	initialPrimaryId?: string | null;
+	editing?: boolean;
 }
 
 export function ChoosePrimaryStep({
@@ -23,8 +25,14 @@ export function ChoosePrimaryStep({
 	isStarting,
 	onBack,
 	onGetStarted,
+	initialPrimaryId,
+	editing = false,
 }: ChoosePrimaryStepProps) {
-	const [primaryId, setPrimaryId] = useState(repositories[0]?.id ?? "");
+	const [primaryId, setPrimaryId] = useState(
+		repositories.find((repository) => repository.id === initialPrimaryId)?.id ??
+			repositories[0]?.id ??
+			"",
+	);
 
 	return (
 		<>
@@ -73,7 +81,17 @@ export function ChoosePrimaryStep({
 					onClick={() => onGetStarted(primaryId)}
 					size="sm"
 				>
-					{isStarting ? <Trans>Starting…</Trans> : <Trans>Get started</Trans>}
+					{isStarting ? (
+						editing ? (
+							<Trans>Saving…</Trans>
+						) : (
+							<Trans>Starting…</Trans>
+						)
+					) : editing ? (
+						<Trans>Save and build</Trans>
+					) : (
+						<Trans>Get started</Trans>
+					)}
 				</Button>
 			</DialogFooter>
 		</>
