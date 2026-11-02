@@ -18,15 +18,21 @@ const {
 	createCallerFactory,
 	createTRPCContext,
 	createTRPCRouter,
-	jwtProcedure,
 	personProcedure,
 } = await import("./trpc");
+const { isMember } = await import("./lib/cloud-guards");
 
-const reached = jwtProcedure.mutation(() => "reached");
+const reached = personProcedure.mutation(() => "reached");
 
 const router = createTRPCRouter({
 	cloudWorkspace: createTRPCRouter({
-		list: jwtProcedure.query(({ ctx }) => ctx.organizationIds),
+		list: personProcedure.query(async ({ ctx }) => {
+			const visible: string[] = [];
+			for (const id of CREATOR_ORGS) {
+				if (await isMember(ctx, id)) visible.push(id);
+			}
+			return visible;
+		}),
 		delete: reached,
 		rename: reached,
 		setDescription: reached,
@@ -55,26 +61,17 @@ const session = {
 
 const callerFor = ({
 	sandboxCaller = BOX as typeof BOX | null,
-	bearer = false,
 	organization,
 }: {
 	sandboxCaller?: typeof BOX | null;
-	bearer?: boolean;
 	organization?: string;
 } = {}) => {
 	const headers = new Headers();
-	if (bearer) headers.set("authorization", "Bearer token");
 	if (organization) headers.set("x-superset-organization-id", organization);
 	return createCallerFactory(router)(
 		createTRPCContext({
 			session: session as never,
-			auth: {
-				api: {
-					verifyJWT: async () => ({
-						payload: { sub: "creator", organizationIds: CREATOR_ORGS },
-					}),
-				},
-			} as never,
+			auth: {} as never,
 			headers,
 			sandboxCaller,
 		}),
@@ -118,25 +115,16 @@ describe("what a cloud workspace may call", () => {
 });
 
 describe("the organization a cloud workspace acts in", () => {
-	test.each([
-		["its session", false],
-		["a bearer", true],
-	])("a box sees only its own organization through %s", async (_name, bearer) => {
-		const box = callerFor({ bearer });
-		expect(await box.cloudWorkspace.list()).toEqual(["box-org"]);
+	test("a box is a member of its own organization only", async () => {
+		expect(await callerFor().cloudWorkspace.list()).toEqual(["box-org"]);
 	});
 
-	test.each([
-		[
-			"jwtProcedure",
-			() => callerFor({ organization: "other-org" }).cloudWorkspace.list(),
-		],
-		[
-			"personProcedure",
-			() => callerFor({ organization: "other-org" }).user.myOrganization(),
-		],
-	])("%s refuses a box another of its creator's organizations", async (_name, call) => {
-		expect(await outcome(call)).toBe("FORBIDDEN");
+	test("a box may not name another of its creator's organizations", async () => {
+		expect(
+			await outcome(() =>
+				callerFor({ organization: "other-org" }).user.myOrganization(),
+			),
+		).toBe("FORBIDDEN");
 	});
 
 	test("a box may name its own organization", async () => {
