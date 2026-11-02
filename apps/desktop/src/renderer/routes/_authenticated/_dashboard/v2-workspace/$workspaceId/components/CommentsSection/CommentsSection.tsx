@@ -26,6 +26,7 @@ export type CommentsUnavailable = "needs-github" | "failed" | null;
 
 interface CommentsSectionProps {
 	pullRequest: PullRequestTarget | null;
+	provider: "github" | "gitlab";
 	/** Why the threads could not be read; null when they were. */
 	unavailable?: CommentsUnavailable;
 	comments: NormalizedComment[];
@@ -41,6 +42,7 @@ interface CommentsSectionProps {
 
 export function CommentsSection({
 	pullRequest,
+	provider,
 	unavailable = null,
 	comments,
 	isLoading,
@@ -265,6 +267,7 @@ export function CommentsSection({
 						conversationComments.map((comment) => (
 							<CommentRow
 								key={comment.id}
+								provider={provider}
 								comment={comment}
 								copiedActionKey={copiedActionKey}
 								onCopy={handleCopySingle}
@@ -346,6 +349,7 @@ export function CommentsSection({
 						openReviewComments.map((comment) => (
 							<CommentRow
 								key={comment.id}
+								provider={provider}
 								comment={comment}
 								copiedActionKey={copiedActionKey}
 								onCopy={handleCopySingle}
@@ -386,6 +390,7 @@ export function CommentsSection({
 						{resolvedComments.map((comment) => (
 							<CommentRow
 								key={comment.id}
+								provider={provider}
 								comment={comment}
 								copiedActionKey={copiedActionKey}
 								onCopy={handleCopySingle}
