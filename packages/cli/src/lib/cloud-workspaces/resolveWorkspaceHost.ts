@@ -2,10 +2,10 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { getHostId } from "@superset/shared/host-info";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import type { ApiClient } from "../api-client";
 import { resolveHostFilter } from "../host-target";
 
-const CLOUD_HOST = "cloud";
 const AVAILABILITY_TTL_MS = 60 * 60_000;
 const AVAILABILITY_TIMEOUT_MS = 2_000;
 
@@ -29,7 +29,7 @@ export async function resolveWorkspaceHost(
 		host: flags.host ?? undefined,
 		local: flags.local ?? undefined,
 	});
-	if (flags.host?.toLowerCase() === CLOUD_HOST) return undefined;
+	if (flags.host?.toLowerCase() === CLOUD_HOST_ID) return undefined;
 	if (explicit) return explicit;
 	return (await cloudWorkspacesAvailable(api, organizationId))
 		? undefined

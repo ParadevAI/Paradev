@@ -785,8 +785,8 @@ than silently falling through to the cloud.
 	humanColumns={["NAME", "BRANCH", "PROJECT", "TAGS", "ID"]}
 	quiet="workspace IDs"
 >
-List workspaces on a host. Defaults to this machine; pass `--host <id>` for
-another host. Workspaces are host-owned; there is no org-wide listing (the
+List workspaces: by default the cloud if your account has cloud workspaces, else this machine's. Pass `--local` or `--host <id>` for a
+host. Host workspaces are host-owned; there is no org-wide listing of them (the
 desktop app is the cross-host view). `projectName` falls back to the raw
 project id when the host doesn't know the project's name.
 </Command>
@@ -919,7 +919,7 @@ superset workspaces sleep ws_a
 		{ name: "id", description: "Workspace ID. Defaults to `$SUPERSET_WORKSPACE_ID` when run inside a workspace." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
 		{ flag: "--field <name>", description: "Print a single field's raw value (e.g. name, branch, worktreePath). Alias: -f." },
 	]}
 	output={`{
@@ -954,7 +954,7 @@ superset workspaces get --field branch   # inside a workspace
 		{ name: "id", required: true, description: "Workspace UUID." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
 		{ flag: "--name <name>", description: "New workspace name." },
 		{ flag: "--task-id <id>", description: "Link the workspace to a task by id." },
 		{ flag: "--clear-task", description: "Unlink the workspace from its current task. Mutually exclusive with --task-id." },
@@ -963,7 +963,7 @@ superset workspaces get --field branch   # inside a workspace
 	]}
 	output="Workspace"
 >
-Update a workspace on its host (default: this machine). `--tag` replaces the
+Update a workspace (default: the cloud if your account has cloud workspaces, else this machine). `--tag` replaces the
 whole tag set: tagging is how workspaces group into sidebar folders, so
 retagging moves the workspace between folders.
 
@@ -981,7 +981,7 @@ superset workspaces update ws_… --clear-task
 		{ name: "id", required: true, description: "Workspace ID." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
 		{ flag: "--print", description: "Print the deep link instead of opening the desktop app." },
 	]}
 	output={`{
@@ -2277,6 +2277,7 @@ Use [`automations logs`](#superset-automations-logs-id) for run history.
 		{ flag: "--workspace <workspaceId>", description: "Reuse an existing workspace (session workspaces are accepted)." },
 		{ flag: "--project <projectId>", description: "Project ID for new-workspace-per-run mode. Omit (with no --workspace) for session mode." },
 		{ flag: "--host <hostId>", description: "Host the automation dispatches to, or `cloud` for `--cloud` (default: this machine)." },
+		{ flag: "--cloud", description: "Run in the cloud: each run starts a cloud workspace from `--environment`, or reuses the one `--workspace` names." },
 		{ flag: "--agent <agent>", description: "Host agent presetId, instance UUID, or 'superset' for built-in chat. Default: claude." },
 		{ flag: "--continue-session", description: "Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace." },
 		{ flag: "--tag <tag>", description: "Workspace tag applied to each run's created workspace. Repeatable. Default: automation." },
@@ -2338,6 +2339,7 @@ superset automations trigger-options --group slack
 		{ flag: "--timezone <iana>", description: "New timezone." },
 		{ flag: "--dtstart <iso8601>", description: "New start time." },
 		{ flag: "--host <hostId>", description: "New target host, or `cloud` for `--cloud`." },
+		{ flag: "--cloud", description: "Move the automation to the cloud. Pass `--environment` or `--workspace` with it." },
 		{ flag: "--project <projectId>", description: "New v2 project ID." },
 		{ flag: "--workspace <workspaceId>", description: "New v2 workspace ID." },
 		{ flag: "--session", description: "Switch to session mode: clears the project and any workspace pin; each run creates a project-less session workspace. Mutually exclusive with --project/--workspace." },
