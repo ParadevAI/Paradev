@@ -10721,6 +10721,9 @@ msgstr "Linear beperkt het aantal verzoeken. Probeer het over een paar minuten o
 msgid "Linear issues"
 msgstr "Linear-issues"
 
+msgid "Linear project"
+msgstr "Linear-project"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -11913,9 +11916,6 @@ msgstr "Volgende afbeelding"
 
 msgid "Next match"
 msgstr "Volgende overeenkomst"
-
-msgid "Next release"
-msgstr "Volgende release"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -14553,9 +14553,6 @@ msgstr "Vorige overeenkomst"
 
 msgid "Previous prompts"
 msgstr "Eerdere prompts"
-
-msgid "Previous release"
-msgstr "Vorige release"
 
 msgid "Previous slide"
 msgstr "Vorige slide"

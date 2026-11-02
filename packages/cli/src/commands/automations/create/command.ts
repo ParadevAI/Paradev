@@ -9,6 +9,7 @@ import { resolveAutomationTarget } from "../resolveAutomationTarget";
 import {
 	refuseHostFlagsForCloud,
 	resolveCloudAutomationTarget,
+	splitCloudHost,
 } from "../resolveCloudAutomationTarget";
 import { resolveTriggers } from "../resolveTriggers";
 
@@ -53,7 +54,7 @@ export default command({
 			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace",
 		),
 		host: string().desc(
-			"Host the target project/workspace lives on (default: this machine)",
+			"Host the target project/workspace lives on, or `cloud` for --cloud (default: this machine)",
 		),
 		local: boolean().desc("Run the automation on this machine (the default)"),
 		agent: string()
@@ -90,12 +91,16 @@ export default command({
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
+		const hostFlag = splitCloudHost(options.host);
 		const cloud = Boolean(
-			options.cloud || options.environment || options.machineSize,
+			options.cloud ||
+				hostFlag.cloud ||
+				options.environment ||
+				options.machineSize,
 		);
 		if (cloud) {
 			refuseHostFlagsForCloud({
-				"--host": options.host,
+				"--host": hostFlag.host,
 				"--local": options.local,
 				"--project": options.project,
 				"--tag": options.tag?.length ? options.tag : undefined,
@@ -118,7 +123,7 @@ export default command({
 						userJwt: ctx.bearer,
 						api: ctx.api,
 						hostId: resolveHostFilter({
-							host: options.host ?? undefined,
+							host: hostFlag.host,
 							local: options.local ?? undefined,
 						}),
 						workspaceId: options.workspace ?? undefined,

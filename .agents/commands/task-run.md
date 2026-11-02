@@ -1,6 +1,6 @@
 ---
 description: Create a task, workspace, and start an AI agent session to work on it
-allowed-tools: mcp__superset__create_task, mcp__superset__list_members, mcp__superset__list_devices, mcp__superset__list_projects, mcp__superset__create_workspace, mcp__superset__start_agent_session, Bash(git config user.email)
+allowed-tools: mcp__superset__tasks_create, mcp__superset__organization_members_list, mcp__superset__hosts_list, mcp__superset__projects_list, mcp__superset__workspaces_create, Bash(git config user.email)
 ---
 
 Create a new task in Paradev, spin up a workspace, and start an AI agent session to work on it.
@@ -15,25 +15,26 @@ Parse `$ARGUMENTS` for:
 
 ### 0. Resolve current user and environment
 
-Run these in parallel:
-- Call `mcp__superset__list_members` and match against the git user email (`git config user.email`) to get the current user's member ID
-- Call `mcp__superset__list_devices` and select the device owned by the current user
-- Call `mcp__superset__list_projects` on the resolved device and select the project matching the current git repo
+Run these two in parallel:
+- Call `mcp__superset__organization_members_list` and match against the git user email (`git config user.email`) to get the current user's ID
+- Call `mcp__superset__hosts_list` and select the host this runs on (the user's machine)
+
+Then call `mcp__superset__projects_list` with that `hostId` and select the project matching the current git repo.
 
 ### 1. Create the task
 
 - Parse the arguments to extract the task description and optional priority
 - Generate a clear, concise task title from the description (imperative form, under 80 chars)
 - If the user provided more detail beyond a short title, include it as a markdown description on the task
-- Create the task using `mcp__superset__create_task` with:
+- Create the task using `mcp__superset__tasks_create` with:
   - `title`: The generated title
   - `description`: Expanded detail if provided, otherwise omit
   - `priority`: Parsed priority or `none`
-  - `assigneeId`: The resolved member ID from step 0
+  - `assigneeId`: The resolved user ID from step 0
 
-### 2. Create a workspace
+### 2. Create the workspace and start the agent
 
-- Use the device ID and project ID resolved in step 0
+- Use the host ID and project ID resolved in step 0
 - Generate a kebab-case workspace name from the task title (short, max 4-5 words)
 - Generate a branch name based on task type:
   - `fix/...` for bugs and defects
@@ -42,11 +43,7 @@ Run these in parallel:
   - `docs/...` for documentation-only changes
   - `refactor/...` for code refactors with no behavior change
   - Default to `feat/...` if the type is ambiguous
-- Create the workspace using `mcp__superset__create_workspace`
-
-### 3. Start AI agent session
-
-- Start an AI agent session using `mcp__superset__start_agent_session` with the created task ID and workspace ID
+- Create the workspace using `mcp__superset__workspaces_create` with `hostId`, `projectId`, `name`, `branch`, `taskId` (the created task), and `agents: [{ agent: "claude", prompt: <task title + description> }]`. It starts the agent once the workspace is ready.
 
 ## Output
 

@@ -10715,6 +10715,9 @@ msgstr "Linear обмежує кількість запитів. Спробуй�
 msgid "Linear issues"
 msgstr "Issues Linear"
 
+msgid "Linear project"
+msgstr "Проєкт Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -11907,9 +11910,6 @@ msgstr "Наступне зображення"
 
 msgid "Next match"
 msgstr "Наступний збіг"
-
-msgid "Next release"
-msgstr "Наступний реліз"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -14547,9 +14547,6 @@ msgstr "Попередній збіг"
 
 msgid "Previous prompts"
 msgstr "Попередні промпти"
-
-msgid "Previous release"
-msgstr "Попередній реліз"
 
 msgid "Previous slide"
 msgstr "Попередній слайд"

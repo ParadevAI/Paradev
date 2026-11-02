@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "notion",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Search, read, and write your Notion workspace: pages, databases, and comments.",
 	"author": {
 		"name": "Paradev",
