@@ -3,8 +3,8 @@ import { agentRoutines, channels } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import { devProcedure } from "../../trpc";
 import { loadChannelAccess } from "../channel/access";
-import { mainProcedure } from "./main-procedure";
 import {
 	assertChannelTriggersReadable,
 	assertRoutineValid,
@@ -33,7 +33,7 @@ const noSuchRoutine = () =>
 
 /** The routine_update tool: a Dev's own routines. It can pause one but not delete it. */
 export const devRoutineTools = {
-	listRoutines: mainProcedure.query(async ({ ctx }) => {
+	listRoutines: devProcedure.query(async ({ ctx }) => {
 		const rows = await db
 			.select()
 			.from(agentRoutines)
@@ -43,7 +43,7 @@ export const devRoutineTools = {
 	}),
 
 	/** Made for the person this turn works for; it answers at `replyTo`. */
-	createRoutine: mainProcedure
+	createRoutine: devProcedure
 		.input(
 			devRoutineChangesSchema.extend({
 				replyTo: z.string().regex(REPLY_TARGET),
@@ -111,7 +111,7 @@ export const devRoutineTools = {
 			return routineView(routine);
 		}),
 
-	updateRoutine: mainProcedure
+	updateRoutine: devProcedure
 		.input(devRoutineChangesSchema.extend({ routineId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const { agentId, organizationId } = ctx.principal;

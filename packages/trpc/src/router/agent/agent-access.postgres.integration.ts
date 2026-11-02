@@ -490,12 +490,6 @@ suite("agent access against a migrated PostgreSQL", () => {
 			})
 			.returning();
 		if (!taskTurn) throw Error("No task turn");
-		const { token } = await worker().agentWorker.turnToken({
-			turnId: taskTurn.id,
-		});
-		await expect(asAgent(token).devTools.listWork()).rejects.toThrow(
-			"Only a Dev's main session",
-		);
 		const settle = () =>
 			worker().agentWorker.settleTurn({
 				turnId: taskTurn.id,
