@@ -54,7 +54,11 @@ export function attachmentDisplayName(tag: AttachmentTag): string {
 	return tag.name || baseName(tag.path);
 }
 
-export function formatAttachmentTag({ path, type, name }: AttachmentTag): string {
+export function formatAttachmentTag({
+	path,
+	type,
+	name,
+}: AttachmentTag): string {
 	const attributes = [`path="${path}"`];
 	if (SAFE_TYPE.test(type)) attributes.push(`type="${type}"`);
 	const cleanName = name

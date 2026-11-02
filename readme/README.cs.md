@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Poté z terminálu daného pracovního prostoru spusťte vývojové nastavení:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

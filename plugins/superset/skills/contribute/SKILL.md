@@ -19,7 +19,7 @@ Take the user from "I want to fix/build X in Paradev" to a merge-ready PR that f
 
 1. `gh auth status`, then fork and clone: `gh repo fork paradevai/paradev --clone` (or add a fork remote to an existing clone)
 2. Best experience: add the clone as a project in the Paradev app and create a workspace per change, so contributions develop inside managed worktrees
-3. In the new workspace/worktree, run `./.superset/setup.local.sh` once (configures per-workspace ports, app identity, local services, and a seeded dev account; no external credentials needed), then `bun run dev`
+3. In the new workspace/worktree, run `./.paradev/setup.local.sh` once (configures per-workspace ports, app identity, local services, and a seeded dev account; no external credentials needed), then `bun run dev`
 4. Bun only, never npm/yarn/pnpm. Read the root `AGENTS.md` and follow it.
 
 ## 3. Make it merge-ready

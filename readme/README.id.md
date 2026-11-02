@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Lalu jalankan setup pengembangan dari terminal workspace tersebut:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

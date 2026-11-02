@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Затем запустите настройку окружения разработки из терминала этой рабочей области:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

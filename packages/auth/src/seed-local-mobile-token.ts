@@ -15,7 +15,7 @@ const PRODUCTION_API_URL = CANONICAL_URLS.API;
 
 /**
  * The local counterpart of seed-cloud-mobile-token.ts, run by
- * .superset/setup.sh (lib/setup/main.sh) right after step_seed_auth_token —
+ * .paradev/setup.sh (lib/setup/main.sh) right after step_seed_auth_token —
  * fully automated, so unlike that script it can't ask who you are. Instead
  * it reuses the same signal step_seed_auth_token already trusts: whatever
  * desktop sign-in already exists on this machine

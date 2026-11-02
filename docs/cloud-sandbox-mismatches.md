@@ -461,7 +461,7 @@ leaked: this repository's per-workspace Neon branches piled up until 383 were
 deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
 calls `sandbox.runArchiveHook` on the still-running box (direct with the host
 secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
-`.superset/config.toml` resolved for the cloud. A failing hook never blocks the
+`.paradev/config.toml` resolved for the cloud. A failing hook never blocks the
 stop, and an undo that lands during the hook re-runs setup (`runStartHook`
 with `force`) instead of stopping the box. A box whose host-service predates
 the procedure answers 404 and is stopped as before, so the fix reaches a box
@@ -761,7 +761,7 @@ Reproducing an app bug end to end from a cloud workspace means bringing up
 `apps/web` + `apps/api` inside the sandbox. Three of the documented ways to do
 that do not exist there (found driving GHSA-2cp5-f6gg-w5fp, 2026-09-24).
 
-**The app assumes:** `./.superset/setup.local.sh` can stand up Postgres,
+**The app assumes:** `./.paradev/setup.local.sh` can stand up Postgres,
 neon-proxy and Redis with `docker compose`, which is the whole point of the
 zero-credential local path in `DEVELOPMENT.md`.
 
@@ -806,7 +806,7 @@ from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1` and dies at
 
 **What we did:** started the desktop window with
 `unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID IS_SANDBOX`, after
-which plugin installs reached `superset-dev-data/plugins`. Nothing in
+which plugin installs reached `paradev-dev-data/plugins`. Nothing in
 `dev-stack.cloud.sh` does that yet. The box also has no object store for
 `R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses `minio/minio` and
 MinIO's binary download answers 410, so an in-memory S3 stand-in on that port

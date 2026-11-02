@@ -212,11 +212,8 @@ seed_missing_env_placeholders() {
   return 0
 }
 
-# The installed app's home: ~/.superset until the installed app has moved it.
+DEV_DATA_DIR="paradev-dev-data"
+
 prod_app_home() {
-  if [ -d "$HOME/.superset" ] && [ ! -L "$HOME/.superset" ]; then
-    echo "$HOME/.superset"
-  else
-    echo "$HOME/.paradev"
-  fi
+  echo "$HOME/.paradev"
 }

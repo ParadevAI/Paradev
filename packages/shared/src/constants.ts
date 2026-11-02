@@ -155,7 +155,7 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LAUNCH: "mobile-launch",
 	/**
-	 * Shows the `.superset/config.toml` editor in project settings in place of
+	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one
 	 * exists; this gates only where people are led to write one.
 	 */
