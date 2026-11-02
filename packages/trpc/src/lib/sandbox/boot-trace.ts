@@ -32,7 +32,7 @@ export function bootStampsFrom(body: unknown): BootStamp[] {
 }
 
 /** The box's clock and ours can disagree; a boot this far before `since` is still counted. */
-const CLOCK_SKEW_MS = 60_000;
+const CLOCK_SKEW_MS = 5_000;
 
 /**
  * Whether the answer's boot began at or after `since`. A host-service that
