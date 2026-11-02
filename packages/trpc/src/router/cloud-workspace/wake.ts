@@ -9,6 +9,7 @@ import { waitUntil } from "@vercel/functions";
 import { eq } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
+	bootBeganSince,
 	buildSandboxClaim,
 	describeSandbox,
 	recordBootSpans,
@@ -64,6 +65,7 @@ async function wake(
 		() => buildSandboxClaim({ row }),
 	);
 	let bootId: string | null = null;
+	const wakeStartedAt = Date.now();
 	const { hostTarget, booted, rebooted, answer } = await wakeSandbox({
 		providerSandboxId: row.providerSandboxId,
 		claim,
@@ -94,7 +96,7 @@ async function wake(
 			providerSandboxId: row.providerSandboxId,
 		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
 	}
-	if (rebooted) {
+	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
 		try {
 			recordBootSpans(answer);
 		} catch (error) {
