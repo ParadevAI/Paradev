@@ -436,6 +436,10 @@ export async function login(
 					},
 				);
 			} else {
+				// The paste flow was chosen, so nothing will ever hit the
+				// callback: release the port now instead of holding it through
+				// the prompt and until `finally` (#6347 review).
+				loopback?.server.close();
 				callbacks
 					.promptForPastedCode(pasteController.signal)
 					.then((pasted) => {

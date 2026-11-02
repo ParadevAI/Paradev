@@ -32,7 +32,10 @@ describe("login /authorize (single request)", () => {
 			// A loopback port is "bound" — but we never let the fake server
 			// actually receive a code; the test only asserts on the URL(s).
 			bindLoopbackServer: async () => ({
-				server: { close: () => {} } as never,
+				// `waitForCallback` subscribes with `server.on`, so the fake has
+				// to look like a server instead of throwing on the first call
+				// (#6347 review).
+				server: { close: () => {}, on: () => {} } as never,
 				port: 51789,
 			}),
 			shouldOpenBrowser: () => true,
