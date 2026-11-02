@@ -334,7 +334,7 @@ step_write_env() {
     # The dev app reads its display title live from the app home's host/*/host.db,
     # so a later workspace rename never needs this file rewritten.
     write_env_var "SUPERSET_WORKSPACE_NAME" "${WORKSPACE_NAME:-$(basename "$PWD")}"
-    write_env_var "SUPERSET_HOME_DIR" "$PWD/superset-dev-data"
+    write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
     echo ""
     echo "# Workspace Database (Neon Branch)"
     if [ -n "${BRANCH_ID:-}" ]; then
@@ -490,10 +490,10 @@ step_setup_local_mcp() {
 }
 
 step_seed_auth_token() {
-  echo "🔑 Seeding auth token into superset-dev-data/..."
+  echo "🔑 Seeding auth token into paradev-dev-data/..."
 
   local source_token="$(prod_app_home)/auth-token.enc"
-  local dev_data_dir="superset-dev-data"
+  local dev_data_dir="$DEV_DATA_DIR"
   local dest_token="$dev_data_dir/auth-token.enc"
 
   if [ ! -f "$source_token" ]; then
@@ -522,10 +522,10 @@ step_seed_auth_token() {
 }
 
 step_seed_host_dbs() {
-  echo "🛰️  Seeding host-service DBs into superset-dev-data/host/..."
+  echo "🛰️  Seeding host-service DBs into paradev-dev-data/host/..."
 
   local source_root="$(prod_app_home)/host"
-  local dev_data_dir="superset-dev-data"
+  local dev_data_dir="$DEV_DATA_DIR"
   local dest_root="$dev_data_dir/host"
   local force_overwrite="$FORCE_OVERWRITE_DATA"
 
@@ -612,10 +612,10 @@ step_seed_host_dbs() {
 }
 
 step_seed_local_db() {
-  echo "💾 Seeding local DB into superset-dev-data/..."
+  echo "💾 Seeding local DB into paradev-dev-data/..."
 
   local source_db="$(prod_app_home)/local.db"
-  local dev_data_dir="superset-dev-data"
+  local dev_data_dir="$DEV_DATA_DIR"
   local dest_db="$dev_data_dir/local.db"
   local force_overwrite="$FORCE_OVERWRITE_DATA"
 

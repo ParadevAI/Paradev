@@ -15,6 +15,7 @@ source "$SUPERSET_SCRIPT_DIR/lib/common.sh"
 source "$SUPERSET_SCRIPT_DIR/lib/setup/steps.sh" # reuse allocate_port_base + helpers
 
 cd "$ROOT_DIR" || exit 1
+move_legacy_dev_data
 
 # Must match SRH_TOKEN in docker-compose.yml.
 LOCAL_KV_TOKEN_VALUE="local_dev_token"
@@ -203,7 +204,7 @@ local_write_env() {
     echo ""
     echo "# ===== Local workspace overrides (setup.local.sh) ====="
     write_env_var "SUPERSET_WORKSPACE_NAME" "${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
-    write_env_var "SUPERSET_HOME_DIR" "$PWD/superset-dev-data"
+    write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
     write_env_var "SUPERSET_PORT_BASE" "$BASE"
     echo ""
     echo "# Per-workspace local DB stack (docker compose project $LOCAL_DB_PROJECT)"

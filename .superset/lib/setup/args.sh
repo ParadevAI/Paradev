@@ -8,7 +8,7 @@ setup_print_usage() {
 Usage: .superset/setup.sh [options]
 
 Options:
-  -f, --force              Reset superset-dev-data/ before seeding local DB
+  -f, --force              Reset paradev-dev-data/ before seeding local DB
   -m, --mcp              Add superset-local MCP entry to .mcp.json
   -h, --help               Show this help message
 EOT

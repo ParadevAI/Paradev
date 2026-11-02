@@ -7,7 +7,7 @@ teardown_print_usage() {
 Usage: .superset/teardown.sh [options]
 
 Options:
-  -f, --force              Remove superset-dev-data/ in current workspace
+  -f, --force              Remove paradev-dev-data/ in current workspace
   -h, --help               Show this help message
 EOT
 }

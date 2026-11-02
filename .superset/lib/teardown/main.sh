@@ -39,9 +39,9 @@ teardown_main() {
     step_failed "Deallocate port base"
   fi
 
-  # Step 6: Remove superset-dev-data (optional)
+  # Step 6: Remove paradev-dev-data (optional)
   if ! step_remove_dev_data; then
-    step_failed "Remove superset-dev-data"
+    step_failed "Remove paradev-dev-data"
   fi
 
   # Print summary and exit with appropriate code

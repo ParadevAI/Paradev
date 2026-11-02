@@ -1109,8 +1109,7 @@ exit 0
 			".gemini",
 			"settings.json",
 		);
-		const staleHookPath =
-			"/tmp/worktree/superset-dev-data/hooks/gemini-hook.sh";
+		const staleHookPath = "/tmp/worktree/paradev-dev-data/hooks/gemini-hook.sh";
 		const currentHookPath = "/tmp/.superset-new/hooks/gemini-hook.sh";
 
 		mkdirSync(path.dirname(geminiSettingsPath), { recursive: true });

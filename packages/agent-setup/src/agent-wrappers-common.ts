@@ -51,10 +51,10 @@ export function getManagedArtifactGuardHookCommand(): string {
 }
 
 // Dev setup (.superset/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
-// $PWD/superset-dev-data — without a leading dot — so we must recognize that
+// $PWD/paradev-dev-data — without a leading dot — so we must recognize that
 // variant to reap stale notify.sh paths from deleted worktrees.
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =
-	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|(?:paradev|superset)-dev-data)\//;
 
 import { writeFileIfChanged } from "./write-file-if-changed";
 

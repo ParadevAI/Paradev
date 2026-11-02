@@ -791,7 +791,7 @@ from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1` and dies at
 
 **What we did:** started the desktop window with
 `unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID IS_SANDBOX`, after
-which plugin installs reached `superset-dev-data/plugins`. Nothing in
+which plugin installs reached `paradev-dev-data/plugins`. Nothing in
 `dev-stack.cloud.sh` does that yet. The box also has no object store for
 `R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses `minio/minio` and
 MinIO's binary download answers 410, so an in-memory S3 stand-in on that port
