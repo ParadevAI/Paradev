@@ -85,9 +85,15 @@ export function BlogPostLayout({
 			)}
 
 			{relatedPosts.length > 0 && (
-				<section className="relative border-t border-border">
+				<aside
+					aria-labelledby="related-posts"
+					className="relative border-t border-border"
+				>
 					<div className="max-w-3xl mx-auto px-6 py-12">
-						<h2 className="text-xl font-medium text-foreground mb-6">
+						<h2
+							id="related-posts"
+							className="text-xl font-medium text-foreground mb-6"
+						>
 							<Trans>Related Posts</Trans>
 						</h2>
 						<div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
@@ -96,7 +102,7 @@ export function BlogPostLayout({
 							))}
 						</div>
 					</div>
-				</section>
+				</aside>
 			)}
 
 			<footer className="relative border-t border-border">

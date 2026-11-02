@@ -4,7 +4,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { useAwaitAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -25,7 +25,7 @@ export function useCreateAgentSession() {
 	const { machineId, activeHostUrl } = useLocalHostService();
 	const { agents } = useV2AgentChoices(activeHostUrl);
 	const { submit } = useWorkspaceCreates();
-	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	const busy = useRef(false);
 	const [isPending, setIsPending] = useState(false);
 
@@ -66,7 +66,7 @@ export function useCreateAgentSession() {
 			const openAsChat =
 				options.preferChat === true &&
 				Boolean(acpHarnessForPreset(presetOf(choice))) &&
-				(await awaitAcpChatEnabled());
+				(await resolveAcpChatEnabled());
 			const { workspaceId, completed } = submit({
 				hostId: machineId,
 				snapshot: {

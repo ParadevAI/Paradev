@@ -15,7 +15,7 @@ export default command({
 	aliases: ["delete"],
 	args: [positional("ids").required().variadic().desc("Workspace IDs")],
 	options: {
-		host: string().desc("Host the workspaces live on"),
+		host: string().desc("Host the workspaces live on, or `cloud`"),
 		local: boolean().desc("The workspaces are on this machine"),
 	},
 	run: async ({ ctx, args, options }) => {

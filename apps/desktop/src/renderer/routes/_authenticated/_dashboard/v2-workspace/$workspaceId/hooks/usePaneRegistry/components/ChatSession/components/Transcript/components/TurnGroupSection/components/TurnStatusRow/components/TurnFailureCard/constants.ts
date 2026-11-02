@@ -18,6 +18,7 @@ export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
 		message: "This conversation is too long for the model",
 	}),
 	refused: msg({ message: "The model declined to continue" }),
+	usage_limit: msg({ message: "Stopped by the usage limit" }),
 	session_lost: msg({ message: "The agent lost this conversation" }),
 	unknown: msg({ message: "Task interrupted" }),
 };
@@ -34,6 +35,7 @@ export const FAILURE_ACTIONS: Record<
 	model_unavailable: ["change_model", "continue"],
 	context_too_long: ["new_chat", "continue"],
 	refused: ["continue", "change_model"],
+	usage_limit: [],
 	session_lost: ["new_chat"],
 	unknown: ["continue", "change_model"],
 };

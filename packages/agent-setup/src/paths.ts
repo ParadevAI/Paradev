@@ -1,18 +1,43 @@
+import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+export const APP_HOME_DIR_NAME = ".paradev";
+
 /**
- * Canonical Superset home directory resolution, shared by every process that
- * provisions or consumes ~/.superset artifacts (Electron main, host-service,
- * CLI). Resolved lazily because the desktop rewrites SUPERSET_HOME_DIR into
- * process.env during boot (dev-workspace builds use ~/.superset-<workspace>),
- * and headless hosts may not have it set at all.
+ * The one home directory resolver for every process that provisions or
+ * consumes the app's per-machine files (Electron main, host-service, CLI,
+ * pty daemon). Resolved lazily because the desktop rewrites SUPERSET_HOME_DIR
+ * into process.env during boot, and headless hosts may not have it set at all.
  */
-export function resolveSupersetHomeDir(): string {
+export function resolveAppHomeDir(): string {
+	return process.env.SUPERSET_HOME_DIR?.trim() || defaultAppHomeDir();
+}
+
+export function defaultAppHomeDir(): string {
+	return path.join(resolveUserHomeDir(), APP_HOME_DIR_NAME);
+}
+
+/** Also true for the pre-rename `~/.superset`, which is a link to it once moved. */
+export function isDefaultAppHomeDir(dir: string | undefined): boolean {
+	if (!dir?.trim()) return true;
+	const resolved = path.resolve(dir);
+	const defaults = [
+		defaultAppHomeDir(),
+		path.join(resolveUserHomeDir(), ".superset"),
+	];
 	return (
-		process.env.SUPERSET_HOME_DIR?.trim() ||
-		path.join(resolveUserHomeDir(), ".superset")
+		defaults.includes(resolved) ||
+		defaults.map(realPath).includes(realPath(resolved))
 	);
+}
+
+function realPath(dir: string): string {
+	try {
+		return fs.realpathSync(dir);
+	} catch {
+		return dir;
+	}
 }
 
 /**
@@ -25,19 +50,19 @@ export function resolveUserHomeDir(): string {
 }
 
 export function getBinDir(): string {
-	return path.join(resolveSupersetHomeDir(), "bin");
+	return path.join(resolveAppHomeDir(), "bin");
 }
 
 export function getHooksDir(): string {
-	return path.join(resolveSupersetHomeDir(), "hooks");
+	return path.join(resolveAppHomeDir(), "hooks");
 }
 
 export function getZshDir(): string {
-	return path.join(resolveSupersetHomeDir(), "zsh");
+	return path.join(resolveAppHomeDir(), "zsh");
 }
 
 export function getBashDir(): string {
-	return path.join(resolveSupersetHomeDir(), "bash");
+	return path.join(resolveAppHomeDir(), "bash");
 }
 
 export function getOpenCodeConfigDir(): string {

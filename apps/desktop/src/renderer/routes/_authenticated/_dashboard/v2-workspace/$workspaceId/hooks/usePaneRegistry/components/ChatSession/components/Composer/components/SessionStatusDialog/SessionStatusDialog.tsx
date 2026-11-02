@@ -11,11 +11,11 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import type { SessionMode } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
+import { configOptionLabels } from "renderer/routes/_authenticated/components/AgentComposer/utils/configOptionLabels";
+import { KNOWN_MODES } from "renderer/routes/_authenticated/components/AgentComposer/utils/modeCopy";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useAccountUsage } from "../../../../../../hooks/useAccountUsage";
-import { configOptionLabels } from "../../utils/configOptionLabels";
-import { KNOWN_MODES } from "../../utils/modeCopy";
-import type { SessionMode } from "../ModePicker";
 import {
 	SessionStatusContent,
 	type WorkspaceKind,

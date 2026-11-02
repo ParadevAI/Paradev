@@ -1,29 +1,36 @@
-import type { UserContent } from "@superset/chat/protocol";
 import type { RendererContext } from "@superset/panes";
 import { useCallback, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
+import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
 import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
 import { openChatHistory } from "./utils/chatHistoryOpen";
+import {
+	pendingChatPrompts,
+	prependChatPrompts,
+} from "./utils/pendingChatPrompts";
 import { restartedChatPaneData } from "./utils/restartedChatPaneData";
 import { saveChatMode } from "./utils/savedChatMode";
 
 export function ChatPane({
 	ctx,
+	onOpenDiff,
 	onOpenFile,
 	onRevealPath,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
+	onOpenDiff: OpenReviewDiff;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
@@ -41,6 +48,11 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const openDiff = useCallback<OpenDiff>(
+		(filter, path) =>
+			onOpenDiff(path ?? "", false, undefined, undefined, undefined, filter),
+		[onOpenDiff],
+	);
 	const agentId = data.agent?.id;
 	const store = ctx.store;
 	const onNewChat = useCallback(
@@ -62,22 +74,7 @@ export function ChatPane({
 		},
 		[agentId, store],
 	);
-	const firstPrompt: UserContent[] =
-		data.pendingPrompt || data.pendingAttachments?.length
-			? [
-					...(data.pendingPrompt
-						? [{ type: "text" as const, text: data.pendingPrompt }]
-						: []),
-					...(data.pendingAttachments ?? []).map((attachment) => ({
-						type: "attachment" as const,
-						...attachment,
-					})),
-				]
-			: [];
-	const pendingPrompts = [
-		...(firstPrompt.length > 0 ? [firstPrompt] : []),
-		...(data.queuedPrompts ?? []),
-	];
+	const pendingPrompts = pendingChatPrompts(data);
 
 	const clearPendingPrompts = () => {
 		const {
@@ -86,6 +83,7 @@ export function ChatPane({
 			queuedPrompts: _queued,
 			...rest
 		} = latest.current;
+		latest.current = rest;
 		ctx.actions.updateData(rest);
 	};
 
@@ -121,12 +119,17 @@ export function ChatPane({
 				draftId={data.draftId}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={clearPendingPrompts}
-				onQueuePrompt={(content) =>
-					ctx.actions.updateData({
+				onQueuePrompt={(content) => {
+					latest.current = {
 						...latest.current,
 						queuedPrompts: [...(latest.current.queuedPrompts ?? []), content],
-					})
-				}
+					};
+					ctx.actions.updateData(latest.current);
+				}}
+				onRestoreQueuedPrompts={(prompts) => {
+					latest.current = prependChatPrompts(latest.current, prompts);
+					ctx.actions.updateData(latest.current);
+				}}
 				pendingPrompts={pendingPrompts}
 				launchPrompt={data.launchPrompt}
 				modelId={data.chatModelId}
@@ -221,6 +224,7 @@ export function ChatPane({
 						...(pendingPrompt ? { pendingPrompt } : {}),
 					})
 				}
+				onOpenDiff={openDiff}
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}
 				onOpenLink={openLink}

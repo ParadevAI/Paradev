@@ -14,7 +14,7 @@ keywords:
   - parallel coding agents
 ---
 
-Cline is a popular open-source autonomous coding agent that lives inside VS Code. It plans, edits files, runs terminal commands, and uses your own API keys, all within the editor. Paradev takes a different shape: it is an editor-independent, local-first workspace that runs many CLI agents in parallel across isolated Git worktrees, and treats your editor as a choice rather than the container.
+Cline is a popular open-source autonomous coding agent that lives inside VS Code. It plans, edits files, runs terminal commands, and uses your own API keys, all within the editor. Paradev takes a different shape: it is an editor-independent, local-first workspace that runs many CLI agents in parallel across separate Git worktrees, and treats your editor as a choice rather than the container.
 
 ---
 
@@ -25,7 +25,7 @@ Cline is a popular open-source autonomous coding agent that lives inside VS Code
 | **Category** | Agent orchestration workspace | In-editor autonomous agent |
 | **Home** | Standalone desktop app | VS Code (and forks) extension |
 | **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, Paradev Chat, any CLI agent | Model-agnostic: Anthropic, OpenRouter, Bedrock, and more via your keys |
-| **Parallelism** | Core feature: multiple agents across isolated Git worktrees | One agent per editor window/session |
+| **Parallelism** | Core feature: multiple agents across separate Git worktrees | One agent per editor window/session |
 | **Isolation** | Git worktrees for local branch-based workspaces | Works in your open workspace folder |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Free, open source; bring your own API keys |
 
@@ -33,7 +33,7 @@ Cline is a popular open-source autonomous coding agent that lives inside VS Code
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -55,7 +55,7 @@ Cline runs one agent session per editor window. Paradev organizes tasks in local
 
 ### Worktree Isolation
 
-Cline operates in your currently open workspace folder. Paradev gives new local branch-based workspaces separate Git worktrees for independent tasks. Shared services and merge conflicts still require coordination. Isolation is the core primitive Paradev is built around.
+Cline operates in your currently open workspace folder. Paradev gives new local branch-based workspaces separate Git worktrees for independent tasks. Shared services and merge conflicts still require coordination. A worktree per task is the core primitive Paradev is built around.
 
 ### Privacy
 
@@ -80,7 +80,7 @@ Cline is free and open source. You pay only for the model API you connect it to.
 - Value Plan/Act control and MCP support inside the editor
 
 **Choose Paradev if you:**
-- Want to run many agents in parallel across isolated Git worktrees
+- Want to run many agents in parallel across separate Git worktrees
 - Use JetBrains, Xcode, Neovim, or multiple editors, or want to stay editor-independent
 - Need a workspace with diff review, chat, browser preview, and port management around your agents
 - Want to mix agents (Claude Code, Codex, Aider, and more) rather than one in-editor agent

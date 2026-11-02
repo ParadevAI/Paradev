@@ -37,6 +37,7 @@ import {
 	sandboxExists,
 	stopAndSnapshot,
 } from "../../lib/sandbox";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { jwtProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
@@ -393,6 +394,7 @@ export const cloudWorkspaceRouter = {
 				taskIds: input.taskIds,
 				attachmentFileIds: input.attachmentFileIds,
 				machineSize: input.machineSize,
+				chat: !!input.agent && (await acpChatEnabled(ctx.userId)),
 				...(input.agent
 					? {
 							launch: {

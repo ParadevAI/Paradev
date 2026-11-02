@@ -27,6 +27,28 @@ describe("viewer GitHub on this machine", () => {
 		).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
 	});
 
+	test("a missing login is looked up once per window, not on every poll", async () => {
+		let lookups = 0;
+		let clock = 0;
+		const router = createViewerGithubRouter(
+			{
+				getToken: async () => {
+					lookups++;
+					return null;
+				},
+			},
+			() => ({}) as Octokit,
+			() => clock,
+		);
+		const call = router.createCaller({} as never);
+		for (let poll = 0; poll < 5; poll++) await call.status();
+		expect(lookups).toBe(1);
+
+		clock += 60_000;
+		await call.status();
+		expect(lookups).toBe(2);
+	});
+
 	test("acts with the local token and passes GitHub's refusal on as its code", async () => {
 		const { call, tokensUsed } = caller("local-token", {
 			request: (async () => {

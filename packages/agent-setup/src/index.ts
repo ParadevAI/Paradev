@@ -31,7 +31,7 @@ import {
  * process and the standalone (CLI-launched) host-service alike.
  *
  * Callers without their own settings store (headless hosts) omit
- * `disabledAgentIds`/`disabledSkillIds`; the shared ~/.superset mirror files
+ * `disabledAgentIds`/`disabledSkillIds`; the shared ~/.paradev mirror files
  * (agent-hooks.json, disabled-skills.json) and their SUPERSET_DISABLED_*
  * env overrides apply instead, so a machine running both the desktop and CLI
  * hosts converges on one disable set.
@@ -92,10 +92,12 @@ export {
 } from "./disabled-skills";
 export {
 	type EnabledPlugin,
+	findInstalledTree,
 	type InstalledPluginEntry,
 	installedPluginsFilePath,
 	readEnabledPlugins,
 	readInstalledPluginSources,
+	readInstalledVersions,
 	writeInstalledPlugins,
 } from "./installed-plugins";
 export {
@@ -108,12 +110,13 @@ export {
 	createManagedSkills,
 	type PluginSkillSource,
 } from "./managed-skills";
-export { getBinDir, resolveSupersetHomeDir } from "./paths";
+export { getBinDir, resolveAppHomeDir } from "./paths";
 export {
 	assertSafePluginSegment,
 	isSafePluginSegment,
 	pluginCacheDir,
 	pluginCachePath,
+	writePluginTree,
 } from "./plugin-cache";
 export { mcpHeadersHelperCommand } from "./plugin-connections";
 export {

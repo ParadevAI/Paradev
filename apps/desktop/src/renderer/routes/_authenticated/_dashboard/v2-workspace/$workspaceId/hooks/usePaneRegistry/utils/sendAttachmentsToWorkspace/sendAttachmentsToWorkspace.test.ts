@@ -45,7 +45,7 @@ function makeDeps(options: { putStatus?: number } = {}) {
 		async materialize(input) {
 			recorded.materialized.push(input);
 			return {
-				paths: input.fileIds.map((id) => `.superset/attachments/${id}.png`),
+				paths: input.fileIds.map((id) => `.paradev/attachments/${id}.png`),
 			};
 		},
 	};
@@ -78,8 +78,8 @@ describe("sendAttachmentsToWorkspace", () => {
 		]);
 		expect(recorded.attached).toEqual([]);
 		expect(paths).toEqual([
-			".superset/attachments/file-1.png",
-			".superset/attachments/file-2.png",
+			".paradev/attachments/file-1.png",
+			".paradev/attachments/file-2.png",
 		]);
 	});
 
@@ -201,7 +201,7 @@ describe("sendAttachmentsToWorkspace", () => {
 						written.push(items);
 						return {
 							ok: true,
-							paths: items.map((_, i) => `.superset/attachments/${i}`),
+							paths: items.map((_, i) => `.paradev/attachments/${i}`),
 						};
 					},
 				},
@@ -219,9 +219,9 @@ describe("sendAttachmentsToWorkspace", () => {
 			],
 		]);
 		expect(paths).toEqual([
-			".superset/attachments/0",
-			".superset/attachments/1",
-			".superset/attachments/2",
+			".paradev/attachments/0",
+			".paradev/attachments/1",
+			".paradev/attachments/2",
 		]);
 		expect(recorded.uploads).toEqual([]);
 		expect(recorded.materialized).toEqual([]);

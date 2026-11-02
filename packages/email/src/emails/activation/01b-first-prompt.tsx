@@ -1,4 +1,4 @@
-import { Heading, Section, Text } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import { EmailLayout, emailTheme } from "../../components";
 
 // Sent instead of 01-first-agent when the Resend automation has seen
@@ -20,11 +20,9 @@ export function ActivationNudge1Installed({
 			recipientEmail={userEmail}
 			unsubscribeUrl={unsubscribeUrl}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-3">
-				Your first agent is one prompt away
-			</Heading>
-			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
-				You&apos;ve got the app. The next step takes two minutes.
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
+				You&apos;ve got the app. Here&apos;s a first prompt that shows what it
+				can do.
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
@@ -36,14 +34,16 @@ export function ActivationNudge1Installed({
 					className="text-[13px] leading-6 text-foreground m-0"
 					style={{ fontFamily: emailTheme.fonts.mono }}
 				>
-					Find a small bug in this repo and fix it. Explain the bug and the fix
-					in your final message.
+					Find three small bugs or cleanups in this repo. Spin up an agent for
+					each one in its own workspace. When they&apos;re done, publish a page
+					that shows what each one changed.
 				</Text>
 			</Section>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-				The agent works in an isolated copy of your repo, so your checkout stays
-				untouched. If the result is garbage, delete the workspace.
+				You&apos;ll get three branches and a link to the page. Each agent works
+				in its own copy of your repo, so your checkout stays untouched. If a
+				result is garbage, delete that workspace.
 			</Text>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">

@@ -1,3 +1,7 @@
+import {
+	WORKSPACE_ATTACHMENTS_DIR,
+	WORKSPACE_ATTACHMENTS_GITIGNORE,
+} from "@superset/shared/workspace-attachments";
 import type { workspaceTrpc } from "@superset/workspace-client";
 import type { DesignModePayload } from "shared/browser-design-mode";
 import { formatDesignModeContextMarkdown } from "./designModePrompt";
@@ -22,7 +26,7 @@ export interface DesignModeAttachmentPaths {
 /**
  * Stage the design-mode selection for the agent: the full element context as
  * markdown, plus the element screenshot when one was captured. Files land in
- * `.superset/attachments/` (the same drop zone agent launches use) so the
+ * the workspace attachments dir (the same drop zone agent launches use) so the
  * one-line terminal prompt can reference them by repo-relative path.
  *
  * Goes through the host-service filesystem router — v2 workspace ids live in
@@ -49,12 +53,18 @@ export async function writeDesignModeAttachments({
 
 	const attachmentsDirectory = joinAbsolutePath(
 		workspace.worktreePath,
-		".superset/attachments",
+		WORKSPACE_ATTACHMENTS_DIR,
 	);
 	await client.filesystem.createDirectory.mutate({
 		workspaceId,
 		absolutePath: attachmentsDirectory,
 		recursive: true,
+	});
+	await client.filesystem.writeFile.mutate({
+		workspaceId,
+		absolutePath: joinAbsolutePath(attachmentsDirectory, ".gitignore"),
+		content: WORKSPACE_ATTACHMENTS_GITIGNORE,
+		options: { create: true, overwrite: false },
 	});
 
 	// Timestamp alone can collide across rapid sends; suffix for uniqueness.
@@ -81,11 +91,11 @@ export async function writeDesignModeAttachments({
 				data: dataUrl.slice("data:image/png;base64,".length),
 			},
 		});
-		screenshotPath = `.superset/attachments/${screenshotName}`;
+		screenshotPath = `${WORKSPACE_ATTACHMENTS_DIR}/${screenshotName}`;
 	}
 
 	return {
-		contextPath: `.superset/attachments/${contextName}`,
+		contextPath: `${WORKSPACE_ATTACHMENTS_DIR}/${contextName}`,
 		screenshotPath,
 	};
 }

@@ -20,7 +20,7 @@ export {
 
 import fs from "node:fs";
 import os from "node:os";
-import { resolveSupersetHomeDir } from "@superset/agent-setup";
+import { resolveAppHomeDir } from "@superset/agent-setup";
 import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
@@ -221,7 +221,7 @@ export function buildHostLaunchEnv(params: {
 	return buildV2TerminalEnv({
 		baseEnv,
 		shell: resolveLaunchShell(baseEnv),
-		supersetHomeDir: resolveSupersetHomeDir(),
+		supersetHomeDir: resolveAppHomeDir(),
 		organizationId: process.env.ORGANIZATION_ID || "",
 		themeType: params.themeType,
 		cwd: params.cwd,

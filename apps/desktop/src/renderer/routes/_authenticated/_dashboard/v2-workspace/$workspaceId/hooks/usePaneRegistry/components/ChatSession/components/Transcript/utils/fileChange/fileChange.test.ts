@@ -53,6 +53,14 @@ describe("fileChangeKind", () => {
 			),
 		).toBe("deleted");
 	});
+	test("a diff the agent marked as a deletion is one inside an edit call", () => {
+		expect(
+			fileChangeKind(
+				{ type: "diff", path: "a", oldText: "x", newText: "", deleted: true },
+				"edit",
+			),
+		).toBe("deleted");
+	});
 	test("an edit that empties a file is still an edit", () => {
 		expect(
 			fileChangeKind(

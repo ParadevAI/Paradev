@@ -1,6 +1,9 @@
 import { closeSync, mkdirSync, openSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { WORKSPACE_ATTACHMENTS_DIR } from "./workspace-attachments";
+import {
+	WORKSPACE_ATTACHMENTS_DIR,
+	WORKSPACE_ATTACHMENTS_GITIGNORE,
+} from "./workspace-attachments";
 
 /**
  * The worktree directory attachments are written into, created with a
@@ -13,7 +16,7 @@ export function ensureWorkspaceAttachmentsDir(worktreePath: string): string {
 	mkdirSync(dir, { recursive: true });
 	try {
 		closeSync(openSync(join(dir, ".gitignore"), "wx"));
-		writeFileSync(join(dir, ".gitignore"), "*\n");
+		writeFileSync(join(dir, ".gitignore"), WORKSPACE_ATTACHMENTS_GITIGNORE);
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
 	}

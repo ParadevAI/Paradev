@@ -53,7 +53,7 @@ These start as editors and add an autonomous agent. You still open files and typ
 
 ### 2. Agent workspaces
 
-These treat the agent as the primary unit. The product is built around launching many agents, isolating each task, and reviewing and merging what they produce. [Paradev](/compare/superset-vs-cursor), [Conductor](/compare/superset-vs-conductor), and [Orca](/compare/superset-vs-orca) fit here. You spend less time typing code and more time directing a fleet of agents.
+These treat the agent as the primary unit. The product is built around launching many agents, keeping each task separate, and reviewing and merging what they produce. [Paradev](/compare/superset-vs-cursor), [Conductor](/compare/superset-vs-conductor), and [Orca](/compare/superset-vs-orca) fit here. You spend less time typing code and more time directing a fleet of agents.
 
 Both are legitimately agentic. The difference is whether the editor or the agent is the center of the product.
 
@@ -63,9 +63,9 @@ The moment you run more than one agent on the same repository, a new problem app
 
 The clean solution is a **Git worktree per task**. A worktree gives each agent its own directory and branch that share the same repository history, so agents can work in parallel without stepping on each other. You review each worktree's diff independently and merge the ones you want.
 
-![The worktree-per-task pattern: one repository, an isolated worktree and branch per agent, independent diffs converging into review and merge](/images/guides/worktree-isolation.svg)
+![The worktree-per-task pattern: one repository, a separate worktree and branch per agent, independent diffs converging into review and merge](/images/guides/worktree-isolation.svg)
 
-This is why the strongest multi-agent IDEs are built around worktrees. It is also the dividing line in the category: some tools isolate parallel work in local worktrees ([Paradev](/compare/superset-vs-orca), Orca, Conductor, and Cursor 2.0), some push isolation to the cloud as a branch and a pull request (Copilot, Devin, JetBrains), and some edit the working copy with review gating (Zed and most in-editor agent modes).
+This is why the strongest multi-agent IDEs are built around worktrees. It is also the dividing line in the category: some tools separate parallel work into local worktrees ([Paradev](/compare/superset-vs-orca), Orca, Conductor, and Cursor 2.0), some push isolation to the cloud as a branch and a pull request (Copilot, Devin, JetBrains), and some edit the working copy with review gating (Zed and most in-editor agent modes).
 
 ## Where the Agents Actually Run
 
@@ -107,4 +107,4 @@ A multi-agent IDE runs several coding agents at once. Worktree-based workflows s
 
 ### Do I need an agentic IDE?
 
-If you only occasionally use AI to complete code, a standard editor is fine. If you delegate whole tasks to agents -- especially several at a time -- an agentic IDE built around worktree isolation and review helps keep task changes separate for review; shared services and integration conflicts still need attention.
+If you only occasionally use AI to complete code, a standard editor is fine. If you delegate whole tasks to agents -- especially several at a time -- an agentic IDE built around per-task worktrees and review helps keep task changes separate for review; shared services and integration conflicts still need attention.

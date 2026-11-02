@@ -120,6 +120,12 @@ const editorSyntaxSchema = z
 		tagName: z.string().optional(),
 		attributeName: z.string().optional(),
 		invalid: z.string().optional(),
+		operator: z.string().optional(),
+		punctuation: z.string().optional(),
+		property: z.string().optional(),
+		parameter: z.string().optional(),
+		heading: z.string().optional(),
+		link: z.string().optional(),
 	})
 	.passthrough();
 

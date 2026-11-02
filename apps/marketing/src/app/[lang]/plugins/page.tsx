@@ -4,7 +4,6 @@ import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
 import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
-import { CTASection } from "@/app/[lang]/components/CTASection";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
@@ -109,7 +108,6 @@ export default async function PluginsPage() {
 
 				<BuildOnce />
 			</main>
-			<CTASection />
 		</div>
 	);
 }

@@ -178,6 +178,12 @@ export function ChannelsRealtime() {
 					void utils.channelTask.list.invalidate({
 						channelId: event.channelId,
 					});
+					void utils.channelTask.project.invalidate({
+						channelId: event.channelId,
+					});
+					void utils.channelTask.linearProject.invalidate({
+						channelId: event.channelId,
+					});
 					void utils.channelTask.forTask.invalidate();
 					break;
 				case "channels.changed":
@@ -189,6 +195,7 @@ export function ChannelsRealtime() {
 					void utils.agent.list.invalidate();
 					void utils.agent.get.invalidate({ agentId: event.agentId });
 					void utils.agent.activity.invalidate({ agentId: event.agentId });
+					void utils.agentRoutine.list.invalidate({ agentId: event.agentId });
 					break;
 				case "channel.notify": {
 					if (event.organizationId !== organizationId) break;

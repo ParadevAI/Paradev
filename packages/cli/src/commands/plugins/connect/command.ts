@@ -53,7 +53,9 @@ export default command({
 			);
 		}
 
-		const catalog = await ctx.api.plugins.list.query();
+		const catalog = await ctx.api.plugins.list.query({
+			includeOrganization: true,
+		});
 		const slug =
 			catalog.find(
 				(entry) =>

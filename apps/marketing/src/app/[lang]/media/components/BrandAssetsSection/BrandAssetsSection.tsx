@@ -3,7 +3,11 @@ import { getAllPeople } from "@/lib/people";
 import { SectionHeading } from "../SectionHeading";
 import { AssetCard } from "./components/AssetCard";
 import { FounderCard } from "./components/FounderCard";
-import { LOGO_ASSETS, PRODUCT_IMAGE_ASSETS } from "./constants";
+import {
+	FOUNDER_PHOTO_ASSETS,
+	LOGO_ASSETS,
+	PRODUCT_IMAGE_ASSETS,
+} from "./constants";
 
 export function BrandAssetsSection() {
 	const founders = getAllPeople().filter(
@@ -41,6 +45,11 @@ export function BrandAssetsSection() {
 			<h3 className="mt-10 font-medium text-foreground">
 				<Trans>Founders</Trans>
 			</h3>
+			<ul className="mt-4 grid gap-4 sm:grid-cols-2">
+				{FOUNDER_PHOTO_ASSETS.map((asset) => (
+					<AssetCard key={asset.src} asset={asset} />
+				))}
+			</ul>
 			<ul className="mt-4 grid gap-4 sm:grid-cols-3">
 				{founders.map((person) => (
 					<FounderCard

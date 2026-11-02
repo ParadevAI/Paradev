@@ -1,19 +1,23 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
 	type AgentTaskRole,
 	agentSessions,
 	agents,
 	agentTurns,
+	cloudWorkspacePullRequests,
 	cloudWorkspaces,
 	environments,
+	githubPullRequests,
 	type SelectAgentSession,
+	tasks,
 } from "@superset/db/schema";
-import { and, asc, count, eq, isNull } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { startCloudWorkspace } from "../cloud-workspace/start";
+import { insertTask, moveTaskToStarted } from "../task/task";
 import { eventText, submitPrompt } from "./turns";
 
-/** Tasks a Dev runs at once; more wait in its queue. */
+/** Task sessions a Dev runs at once; more wait in its queue. */
 export const MAX_RUNNING_TASKS = 3;
 const LAUNCH_ATTEMPTS = 2;
 const LAUNCH_RETRY_MS = 2_000;
@@ -25,68 +29,117 @@ export interface StartTaskInput {
 	organizationId: string;
 	parentSessionId: string;
 	requestedByUserId: string | null;
-	title: string;
+	/** Work on this Paradev task; without it a new task is made from title and instructions. */
+	taskId?: string;
+	title?: string;
 	instructions: string;
 	role: AgentTaskRole;
 	environmentId?: string;
-	dedupeKey?: string;
-	reviewOfTaskId?: string;
 }
 
 export type StartTaskResult =
-	| { taskId: string; status: "running" | "queued" }
-	| { taskId: string; status: "failed"; error: string }
-	| { taskId: string; status: "duplicate"; title: string | null };
+	| { taskId: string; sessionId: string; status: "running" | "queued" }
+	| { taskId: string; sessionId: string; status: "failed"; error: string }
+	| { taskId: string; sessionId: string; status: "duplicate" };
 
 /**
- * A task the main session delegates. It runs on its own box, unless the Dev
- * already runs its limit, in which case it waits. A task for a dedupe key
- * that is already queued or running is refused with that task's id.
+ * Work the main session delegates: a Paradev task, and a task session that
+ * works on it on its own box. The session waits in a queue when the Dev
+ * already runs its limit. A task has at most one active writer.
  */
 export async function startTask(
 	input: StartTaskInput,
 ): Promise<StartTaskResult> {
 	const environmentId = await chooseEnvironment(input);
-	const brief = await taskBrief(input);
-	const [task] = await db
+	const taskId = input.taskId
+		? await ownedTask(input.organizationId, input.taskId)
+		: await newTask(input);
+	const [session] = await db
 		.insert(agentSessions)
 		.values({
 			organizationId: input.organizationId,
 			agentId: input.agentId,
 			kind: "task",
 			parentSessionId: input.parentSessionId,
-			title: input.title,
+			taskId,
 			role: input.role,
 			taskStatus: "queued",
-			dedupeKey: input.dedupeKey ?? null,
 			environmentId,
 			requestedByUserId: input.requestedByUserId,
-			instructions: brief,
+			instructions: input.instructions,
 		})
 		.onConflictDoNothing()
-		.returning();
-	if (!task) {
-		const [existing] = await db
-			.select({ id: agentSessions.id, title: agentSessions.title })
+		.returning({ id: agentSessions.id });
+	if (!session) {
+		const [writer] = await db
+			.select({ id: agentSessions.id })
 			.from(agentSessions)
-			.where(
-				and(
-					eq(agentSessions.agentId, input.agentId),
-					eq(agentSessions.dedupeKey, input.dedupeKey ?? ""),
-				),
-			)
-			.orderBy(asc(agentSessions.createdAt))
+			.where(activeWriterOf(taskId))
 			.limit(1);
-		if (!existing) throw new Error("task insert conflicted with no task");
-		return { taskId: existing.id, status: "duplicate", title: existing.title };
+		if (!writer) throw new Error("task session insert conflicted with none");
+		return { taskId, sessionId: writer.id, status: "duplicate" };
 	}
-	const { started, failed } = await fillSlots(input.agentId, task.id);
-	const error = failed.get(task.id);
-	if (error) return { taskId: task.id, status: "failed", error };
+	const { started, failed } = await fillSlots(input.agentId, session.id);
+	const error = failed.get(session.id);
+	if (error) return { taskId, sessionId: session.id, status: "failed", error };
 	return {
-		taskId: task.id,
-		status: started.includes(task.id) ? "running" : "queued",
+		taskId,
+		sessionId: session.id,
+		status: started.includes(session.id) ? "running" : "queued",
 	};
+}
+
+const activeWriterOf = (taskId: string) =>
+	and(
+		eq(agentSessions.taskId, taskId),
+		eq(agentSessions.role, "writer"),
+		inArray(agentSessions.taskStatus, ["queued", "running"]),
+	);
+
+async function ownedTask(organizationId: string, taskId: string) {
+	const [task] = await db
+		.select({ id: tasks.id })
+		.from(tasks)
+		.where(
+			and(
+				eq(tasks.id, taskId),
+				eq(tasks.organizationId, organizationId),
+				isNull(tasks.deletedAt),
+			),
+		)
+		.limit(1);
+	if (!task) {
+		throw userError({
+			code: "NOT_FOUND",
+			message: "No such task in this organization",
+			i18nKey: "serverError.agent.taskNotFound",
+		});
+	}
+	return task.id;
+}
+
+async function newTask(input: StartTaskInput): Promise<string> {
+	const [agent] = await db
+		.select({ createdByUserId: agents.createdByUserId })
+		.from(agents)
+		.where(eq(agents.id, input.agentId))
+		.limit(1);
+	const creatorId = input.requestedByUserId ?? agent?.createdByUserId;
+	if (!creatorId) throw new Error("no person to own the task");
+	const { task } = await insertTask({
+		organizationId: input.organizationId,
+		creatorId,
+		input: {
+			title:
+				input.title ??
+				input.instructions.split("\n")[0]?.slice(0, 120) ??
+				"Task",
+			description: input.instructions,
+			priority: "none",
+		},
+	});
+	if (!task) throw new Error("task insert returned no row");
+	return task.id;
 }
 
 async function chooseEnvironment(input: StartTaskInput): Promise<string> {
@@ -127,37 +180,67 @@ const environmentRequired = () =>
 		i18nKey: "serverError.agent.taskEnvironmentRequired",
 	});
 
-async function taskBrief(input: StartTaskInput): Promise<string> {
-	if (input.role !== "reviewer" || !input.reviewOfTaskId) {
-		return input.instructions;
+/** What a task session reads first: the task, and for a reviewer, the work to review. */
+async function brief(session: SelectAgentSession): Promise<string> {
+	const task = session.taskId ? await taskOf(session.taskId) : null;
+	const heading = task ? `Task ${task.slug}: ${task.title}` : "";
+	const asked = session.instructions ?? "";
+	if (session.role !== "reviewer" || !task) {
+		const description =
+			task?.description && task.description !== asked
+				? `The task's description:\n${task.description}`
+				: "";
+		return [heading, asked, description].filter(Boolean).join("\n\n");
 	}
-	const [writer] = await db
-		.select()
-		.from(agentSessions)
-		.where(
-			and(
-				eq(agentSessions.id, input.reviewOfTaskId),
-				eq(agentSessions.agentId, input.agentId),
-			),
-		)
-		.limit(1);
-	if (!writer) return input.instructions;
+	const writer = await latestSession(task.id, "writer");
 	return [
-		input.instructions,
-		`The work to review is task "${writer.title ?? writer.id}".`,
-		writer.pullRequestUrl
-			? `Its pull request: ${writer.pullRequestUrl}`
-			: "It has no pull request yet; review what its result describes.",
-		writer.result ? `What the writer reported:\n${writer.result}` : "",
+		heading,
+		asked,
+		task.prUrl
+			? `The pull request to review: ${task.prUrl}`
+			: "It has no pull request yet; review what the writer reported.",
+		writer?.reply ? `What the writer reported:\n${writer.reply}` : "",
 	]
 		.filter(Boolean)
 		.join("\n\n");
 }
 
+async function taskOf(taskId: string) {
+	const [task] = await db
+		.select({
+			id: tasks.id,
+			slug: tasks.slug,
+			title: tasks.title,
+			description: tasks.description,
+			prUrl: tasks.prUrl,
+		})
+		.from(tasks)
+		.where(eq(tasks.id, taskId))
+		.limit(1);
+	return task ?? null;
+}
+
+/** A task's newest session in a role, with the reply of its last turn. */
+export async function latestSession(taskId: string, role: AgentTaskRole) {
+	const [session] = await db
+		.select({
+			id: agentSessions.id,
+			status: agentSessions.taskStatus,
+			reply: sql<
+				string | null
+			>`(select t.reply from ${agentTurns} t where t.session_id = ${agentSessions.id} order by t.started_at desc limit 1)`,
+		})
+		.from(agentSessions)
+		.where(and(eq(agentSessions.taskId, taskId), eq(agentSessions.role, role)))
+		.orderBy(desc(agentSessions.createdAt))
+		.limit(1);
+	return session ?? null;
+}
+
 /**
- * Starts queued tasks, oldest first, until the Dev runs its limit. A task that
- * cannot start is reported to its main session, except `caller`, whose
- * failure the caller returns itself.
+ * Starts queued task sessions, oldest first, until the Dev runs its limit. A
+ * session that cannot start is reported to its main session, except
+ * `caller`, whose failure the caller returns itself.
  */
 export async function fillSlots(
 	agentId: string,
@@ -203,21 +286,21 @@ export async function fillSlots(
 			await launchWithRetry(next.id);
 			started.push(next.id);
 		} catch (error) {
-			const result = `Could not start: ${error instanceof Error ? error.message : String(error)}`;
+			const message = `Could not start: ${error instanceof Error ? error.message : String(error)}`;
 			await db
 				.update(agentSessions)
-				.set({ taskStatus: "failed", result })
+				.set({ taskStatus: "failed" })
 				.where(eq(agentSessions.id, next.id));
-			failed.set(next.id, result);
-			if (next.id !== caller) await reportToParent(next.id, null);
+			failed.set(next.id, message);
+			if (next.id !== caller) await reportToParent(next.id, null, message);
 		}
 	}
 }
 
-async function launchWithRetry(taskId: string) {
+async function launchWithRetry(sessionId: string) {
 	for (let attempt = 1; ; attempt++) {
 		try {
-			return await launchTask(await withUsableBox(taskId));
+			return await launchTask(await withUsableBox(sessionId));
 		} catch (error) {
 			if (attempt >= LAUNCH_ATTEMPTS) throw error;
 			await new Promise((resolve) => setTimeout(resolve, LAUNCH_RETRY_MS));
@@ -225,127 +308,232 @@ async function launchWithRetry(taskId: string) {
 	}
 }
 
-/** The task, without a box that failed or was deleted, so a retry makes a new one. */
-async function withUsableBox(taskId: string): Promise<SelectAgentSession> {
+/** The session, without a box that failed or was deleted, so a retry makes a new one. */
+async function withUsableBox(sessionId: string): Promise<SelectAgentSession> {
 	const [row] = await db
-		.select({ task: agentSessions, boxStatus: cloudWorkspaces.status })
+		.select({ session: agentSessions, boxStatus: cloudWorkspaces.status })
 		.from(agentSessions)
 		.leftJoin(
 			cloudWorkspaces,
 			eq(cloudWorkspaces.id, agentSessions.cloudWorkspaceId),
 		)
-		.where(eq(agentSessions.id, taskId))
+		.where(eq(agentSessions.id, sessionId))
 		.limit(1);
-	if (!row) throw new Error("task is gone");
+	if (!row) throw new Error("task session is gone");
 	if (
-		row.task.cloudWorkspaceId &&
+		row.session.cloudWorkspaceId &&
 		(row.boxStatus === "failed" || row.boxStatus === "deleted")
 	) {
 		const [cleared] = await db
 			.update(agentSessions)
 			.set({ cloudWorkspaceId: null })
-			.where(eq(agentSessions.id, taskId))
+			.where(eq(agentSessions.id, sessionId))
 			.returning();
 		if (cleared) return cleared;
 	}
-	return row.task;
+	return row.session;
 }
 
-async function launchTask(task: SelectAgentSession) {
+async function launchTask(session: SelectAgentSession) {
 	const [agent] = await db
 		.select()
 		.from(agents)
-		.where(and(eq(agents.id, task.agentId), isNull(agents.archivedAt)))
+		.where(and(eq(agents.id, session.agentId), isNull(agents.archivedAt)))
 		.limit(1);
 	if (!agent) throw new Error("Dev is gone");
-	const userId = task.requestedByUserId ?? agent.createdByUserId;
+	const task = session.taskId ? await taskOf(session.taskId) : null;
+	const userId = session.requestedByUserId ?? agent.createdByUserId;
 	if (!userId) throw new Error("no person to start a box for");
-	if (!task.environmentId) throw new Error("task has no environment");
-	if (!task.cloudWorkspaceId) {
+	if (!session.environmentId) throw new Error("task has no environment");
+	if (!session.cloudWorkspaceId) {
 		await startCloudWorkspace({
-			organizationId: task.organizationId,
+			organizationId: session.organizationId,
 			userId,
-			environmentId: task.environmentId,
-			name: `${agent.name}: ${task.title ?? "task"}`,
+			environmentId: session.environmentId,
+			name: `${agent.name}: ${task?.title ?? "task"}`,
+			...(task ? { taskIds: [task.id] } : {}),
 			beforeProvision: async (workspaceId) => {
 				await db
 					.update(agentSessions)
 					.set({ cloudWorkspaceId: workspaceId })
-					.where(eq(agentSessions.id, task.id));
+					.where(eq(agentSessions.id, session.id));
 			},
 		});
 	}
+	if (task && session.role === "writer") {
+		await dbWs.transaction((tx) =>
+			moveTaskToStarted(tx, {
+				taskId: task.id,
+				organizationId: session.organizationId,
+				actorUserId: userId,
+			}),
+		);
+	}
+	const [starts] = await db
+		.select({ n: count() })
+		.from(agentTurns)
+		.where(
+			and(
+				eq(agentTurns.sessionId, session.id),
+				eq(agentTurns.reason, "task_start"),
+			),
+		);
+	const start = starts?.n ?? 0;
 	await submitPrompt({
 		agent,
-		sessionId: task.id,
-		actingUserId: task.requestedByUserId,
-		promptId: `task-start:${task.id}`,
-		text: task.instructions ?? task.title ?? "Start the task.",
+		sessionId: session.id,
+		actingUserId: session.requestedByUserId,
+		promptId:
+			start === 0
+				? `task-start:${session.id}`
+				: `task-start:${session.id}:${start + 1}`,
+		text: (await brief(session)) || "Start the task.",
 		reason: "task_start",
 	});
 }
 
 /**
- * After a task's turn settles: record its status, result and pull request,
- * tell its main session, and start queued work in the slot it freed.
- * Repeat calls for the same turn tell the main session once.
+ * After a task session's turn settles: record its status and the task's pull
+ * request, tell its main session, and start queued work in the slot it
+ * freed. Repeat calls for the same turn tell the main session once.
  */
 export async function afterTaskTurn(turnId: string) {
 	const [row] = await db
-		.select({ turn: agentTurns, task: agentSessions })
+		.select({ turn: agentTurns, session: agentSessions })
 		.from(agentTurns)
 		.innerJoin(agentSessions, eq(agentSessions.id, agentTurns.sessionId))
 		.where(eq(agentTurns.id, turnId))
 		.limit(1);
-	if (!row || row.task.kind !== "task") return;
-	const { turn, task } = row;
+	if (!row || row.session.kind !== "task") return;
+	const { turn, session } = row;
+	if (await relaunchedOnNewBox(session, turn)) return;
 	const status =
 		turn.status === "completed"
 			? "done"
 			: turn.status === "interrupted"
 				? "stopped"
 				: "failed";
-	const pullRequestUrl =
-		turn.reply?.match(PULL_REQUEST_URL)?.[0] ?? task.pullRequestUrl;
-	if (task.taskStatus !== "stopped") {
+	if (session.taskStatus !== "stopped") {
 		await db
 			.update(agentSessions)
-			.set({
-				taskStatus: status,
-				result: turn.reply ?? turn.errorCode ?? task.result,
-				pullRequestUrl,
-			})
-			.where(eq(agentSessions.id, task.id));
+			.set({ taskStatus: status })
+			.where(eq(agentSessions.id, session.id));
 	}
-	await reportToParent(task.id, turn.id);
-	await fillSlots(task.agentId);
+	if (session.taskId && session.role === "writer") {
+		await recordPullRequest(session, turn.reply);
+	}
+	await reportToParent(session.id, turn.id, turn.reply ?? turn.errorCode);
+	await fillSlots(session.agentId);
 }
 
-async function reportToParent(taskId: string, turnId: string | null) {
-	const [task] = await db
-		.select()
-		.from(agentSessions)
-		.where(eq(agentSessions.id, taskId))
+/**
+ * A box that never came up fails the session's first turn. That says nothing
+ * about the work, so the session goes back in the queue for a new box, once,
+ * without telling the main session.
+ */
+async function relaunchedOnNewBox(
+	session: SelectAgentSession,
+	turn: typeof agentTurns.$inferSelect,
+): Promise<boolean> {
+	if (turn.status !== "failed" || turn.reason !== "task_start") return false;
+	if (!session.cloudWorkspaceId || session.taskStatus === "stopped")
+		return false;
+	const [box] = await db
+		.select({ status: cloudWorkspaces.status })
+		.from(cloudWorkspaces)
+		.where(eq(cloudWorkspaces.id, session.cloudWorkspaceId))
 		.limit(1);
-	if (!task?.parentSessionId) return;
+	if (box?.status !== "failed" && box?.status !== "deleted") return false;
+	const [starts] = await db
+		.select({ n: count() })
+		.from(agentTurns)
+		.where(
+			and(
+				eq(agentTurns.sessionId, session.id),
+				eq(agentTurns.reason, "task_start"),
+			),
+		);
+	if ((starts?.n ?? 0) >= LAUNCH_ATTEMPTS) return false;
+	await db
+		.update(agentSessions)
+		.set({ taskStatus: "queued", cloudWorkspaceId: null })
+		.where(eq(agentSessions.id, session.id));
+	await fillSlots(session.agentId);
+	return true;
+}
+
+/** The task's pull request: the one its box reported, else the one its writer named. */
+async function recordPullRequest(
+	session: SelectAgentSession,
+	reply: string | null,
+) {
+	if (!session.taskId) return;
+	const [onBox] = session.cloudWorkspaceId
+		? await db
+				.select({ url: githubPullRequests.url })
+				.from(cloudWorkspacePullRequests)
+				.innerJoin(
+					githubPullRequests,
+					and(
+						eq(
+							githubPullRequests.repositoryId,
+							cloudWorkspacePullRequests.repositoryId,
+						),
+						eq(
+							githubPullRequests.prNumber,
+							cloudWorkspacePullRequests.prNumber,
+						),
+					),
+				)
+				.where(
+					eq(
+						cloudWorkspacePullRequests.cloudWorkspaceId,
+						session.cloudWorkspaceId,
+					),
+				)
+				.orderBy(desc(cloudWorkspacePullRequests.linkedAt))
+				.limit(1)
+		: [];
+	const url = onBox?.url ?? reply?.match(PULL_REQUEST_URL)?.[0];
+	if (!url) return;
+	await db
+		.update(tasks)
+		.set({ prUrl: url })
+		.where(and(eq(tasks.id, session.taskId), isNull(tasks.prUrl)));
+}
+
+async function reportToParent(
+	sessionId: string,
+	turnId: string | null,
+	reported: string | null,
+) {
+	const [row] = await db
+		.select({ session: agentSessions, task: tasks })
+		.from(agentSessions)
+		.leftJoin(tasks, eq(tasks.id, agentSessions.taskId))
+		.where(eq(agentSessions.id, sessionId))
+		.limit(1);
+	const parentSessionId = row?.session.parentSessionId;
+	if (!row || !parentSessionId) return;
+	const { session, task } = row;
 	const [agent] = await db
 		.select({ id: agents.id, organizationId: agents.organizationId })
 		.from(agents)
-		.where(eq(agents.id, task.agentId))
+		.where(eq(agents.id, session.agentId))
 		.limit(1);
 	if (!agent) return;
 	const lines = [
-		`Task ${task.id} (${task.role ?? "writer"}): ${task.taskStatus}.`,
-		task.pullRequestUrl ? `Pull request: ${task.pullRequestUrl}` : "",
-		task.result ? `It reported:\n${task.result}` : "It reported nothing.",
+		`Task ${task?.slug ?? session.id} (${task?.id ?? "no task"}), ${session.role ?? "writer"} session ${session.id}: ${session.taskStatus}.`,
+		task?.prUrl ? `Pull request: ${task.prUrl}` : "",
+		reported ? `It reported:\n${reported}` : "It reported nothing.",
 	].filter(Boolean);
 	await submitPrompt({
 		agent,
-		sessionId: task.parentSessionId,
-		actingUserId: task.requestedByUserId,
-		promptId: `task-update:${turnId ?? task.id}`,
+		sessionId: parentSessionId,
+		actingUserId: session.requestedByUserId,
+		promptId: `task-update:${turnId ?? session.id}`,
 		text: eventText({
-			from: `your task: ${task.title ?? task.id}`,
+			from: `your task: ${task?.title ?? session.id}`,
 			where: "a task you started",
 			replyTo: null,
 			body: lines.join("\n"),

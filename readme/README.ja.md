@@ -287,13 +287,13 @@ Neonアカウントやサードパーティの認証情報は不要です。`set
 
 ## 設定
 
-ワークスペースのセットアップ、ティアダウン、実行スクリプトは `.superset/config.json` で設定します。[完全なドキュメント](https://docs.paradev.com/setup-teardown-scripts)を参照してください。
+ワークスペースのセットアップ、ティアダウン、実行スクリプトは `.paradev/config.json` で設定します。[完全なドキュメント](https://docs.paradev.com/setup-teardown-scripts)を参照してください。
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

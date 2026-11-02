@@ -11,6 +11,7 @@ import {
 	channelMessages,
 	channels,
 	members,
+	tasks,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
 import {
@@ -380,7 +381,7 @@ export const agentRouter = {
 					agentId: agents.id,
 					agentName: agents.name,
 					kind: agentSessions.kind,
-					title: agentSessions.title,
+					title: tasks.title,
 					taskStatus: agentSessions.taskStatus,
 					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
 					lastActivityAt: agentSessions.lastActivityAt,
@@ -388,6 +389,7 @@ export const agentRouter = {
 				})
 				.from(agentSessions)
 				.innerJoin(agents, eq(agents.id, agentSessions.agentId))
+				.leftJoin(tasks, eq(tasks.id, agentSessions.taskId))
 				.innerJoin(
 					members,
 					and(

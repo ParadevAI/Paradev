@@ -183,7 +183,7 @@ export const workspaceCleanupRouter = router({
 	 *                       default lists before any slow work, so the
 	 *                       delete feels instant in every client
 	 *   1.   Preflight    — dirty-worktree check (skip if force)
-	 *   2.   Teardown     — run .superset/teardown.sh (per teardownMode)
+	 *   2.   Teardown     — run the repo's teardown (per teardownMode)
 	 *   3.   Local cleanup — PTYs, worktree
 	 *   4.   Branch delete — optional local branch cleanup
 	 *   5.   Caches

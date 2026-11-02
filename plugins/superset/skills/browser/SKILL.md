@@ -70,6 +70,12 @@ reuses the active browser pane. Opening needs the workspace visible in the
 desktop app (the renderer creates the pane), so if it times out, ask the user to
 open the workspace.
 
+To put the page in the right sidebar beside the user's work instead, and when
+`superset panes --help` succeeds (older CLIs lack `panes`), run
+`superset panes open browser --workspace <id> --url <url>`
+(`superset:panes`), then find the pane with
+`superset browser list --workspace <id> --json`.
+
 ## Drive with the high-level verbs
 
 ```bash

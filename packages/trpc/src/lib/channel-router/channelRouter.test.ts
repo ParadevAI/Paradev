@@ -133,7 +133,7 @@ describe("routeChannelMessage", () => {
 			fetch: fakeFetch,
 			token: async () => "test-token",
 		});
-		expect(decision.devIds).toEqual(["ada-id"]);
+		expect(decision?.devIds).toEqual(["ada-id"]);
 		expect(calls[0]?.url).toBe(JEV_URL);
 		expect(new Headers(calls[0]?.init?.headers).get("authorization")).toBe(
 			"Bearer test-token",
@@ -143,7 +143,7 @@ describe("routeChannelMessage", () => {
 		);
 	});
 
-	test("fails closed on HTTP errors, thrown errors, token errors and timeouts", async () => {
+	test("gives no answer on HTTP errors, thrown errors, token errors and timeouts", async () => {
 		const token = async () => "test-token";
 		const failures: Parameters<typeof routeChannelMessage>[1][] = [
 			{
@@ -176,11 +176,36 @@ describe("routeChannelMessage", () => {
 			},
 		];
 		for (const deps of failures) {
-			expect(await routeChannelMessage(input, deps)).toEqual({
-				devIds: [],
-				scores: {},
-			});
+			expect(await routeChannelMessage(input, deps)).toBeNull();
 		}
+	});
+
+	test("retries a server error or a network error, but not a client error", async () => {
+		const token = async () => "test-token";
+		const answer = jevResponse({ respond: [0.95, 0.1] });
+		const replies = (...steps: (number | "throw")[]) => {
+			let calls = 0;
+			const fetch = (async () => {
+				const step = steps[calls++] ?? 200;
+				if (step === "throw") throw new Error("network");
+				return step === 200
+					? Response.json(answer)
+					: new Response("busy", { status: step });
+			}) as unknown as typeof globalThis.fetch;
+			return { fetch, calls: () => calls };
+		};
+
+		const flaky = replies(503, "throw");
+		expect(
+			(await routeChannelMessage(input, { fetch: flaky.fetch, token }))?.devIds,
+		).toEqual([ada.id]);
+		expect(flaky.calls()).toBe(3);
+
+		const denied = replies(401);
+		expect(
+			await routeChannelMessage(input, { fetch: denied.fetch, token }),
+		).toBeNull();
+		expect(denied.calls()).toBe(1);
 	});
 
 	test("skips the call when there are no Devs or the message is empty", async () => {

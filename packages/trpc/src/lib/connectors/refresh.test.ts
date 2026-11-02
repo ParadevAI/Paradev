@@ -2,6 +2,7 @@ import { afterAll, beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as crypto from "../../router/plugins/crypto";
+import * as discovery from "./discovery";
 
 // A refresh is a token-endpoint call plus what gets written back. A real
 // registry connector with a static client is used, so `resolveEndpoints` runs
@@ -14,14 +15,18 @@ let reads: Array<Record<string, unknown> | null> = [];
 let updates: Array<Record<string, unknown>> = [];
 let response: { status: number; ok: boolean; body: unknown } | null = null;
 let fetchError: Error | null = null;
+let tokenRequests: URLSearchParams[] = [];
+let oauthClients: Array<Record<string, unknown>> = [];
 
 let limits: number[] = [];
 
 // `refresh` re-reads one row by id; the lookups read two to detect a second.
+// The stored dynamic clients are read whole, ordered, with no limit.
 const selectChain = {
 	from: () => selectChain,
 	where: () => selectChain,
-	orderBy: () => selectChain,
+	orderBy: () =>
+		Object.assign(Promise.resolve(oauthClients), { limit: selectChain.limit }),
 	limit: (n: number) => {
 		limits.push(n);
 		if (rows.length) return Promise.resolve(rows.slice(0, n));
@@ -49,6 +54,21 @@ const updateChain = {
 };
 
 stub(db, { select: () => selectChain, update: () => updateChain });
+
+const ISSUER = "https://api.useautumn.com/api/auth";
+stub(discovery, {
+	discoverServer: () =>
+		Promise.resolve({
+			resource: "https://mcp.useautumn.com/mcp",
+			issuer: ISSUER,
+			metadata: {
+				issuer: ISSUER,
+				authorization_endpoint: `${ISSUER}/oauth2/authorize`,
+				token_endpoint: `${ISSUER}/oauth2/token`,
+				registration_endpoint: `${ISSUER}/oauth2/register`,
+			},
+		}),
+});
 
 stub(crypto, {
 	decryptSecret: (value: string) => Promise.resolve(value),
@@ -107,9 +127,12 @@ beforeEach(() => {
 	reads = [];
 	response = null;
 	fetchError = null;
+	tokenRequests = [];
+	oauthClients = [];
 	stored = connection();
-	globalThis.fetch = (async () => {
+	globalThis.fetch = (async (_input: string | URL, init?: RequestInit) => {
 		if (fetchError) throw fetchError;
+		tokenRequests.push(new URLSearchParams(String(init?.body)));
 		const current = response;
 		if (!current) throw new Error("no token-endpoint response configured");
 		return new Response(JSON.stringify(current.body), {
@@ -243,5 +266,55 @@ describe("one account, or an error", () => {
 		rows = [{ id: "conn-1" }];
 		await userConnection("org", "linear", "user");
 		expect(limits).toEqual([2]);
+	});
+});
+
+describe("a dynamic client's connection", () => {
+	const autumn = (overrides: Record<string, unknown> = {}) =>
+		connection({ connector: "autumn_mcp", ...overrides });
+	const oauthClient = (clientId: string, scopes: string[] | null) => ({
+		issuer: ISSUER,
+		clientId,
+		clientSecret: `${clientId}-secret`,
+		clientSecretExpiresAt: null,
+		tokenEndpointAuthMethod: "client_secret_post",
+		scopes,
+	});
+
+	beforeEach(() => {
+		response = {
+			ok: true,
+			status: 200,
+			body: { access_token: "new-access", expires_in: 3600 },
+		};
+		oauthClients = [
+			oauthClient("legacy-client", null),
+			oauthClient("scoped-client", ["offline_access", "rewards:read"]),
+		];
+	});
+
+	test("refreshes as the client its grant was issued to", async () => {
+		stored = autumn({ oauthClientId: "scoped-client" });
+
+		await ensureFreshConnection(autumn({ oauthClientId: "scoped-client" }));
+		expect(tokenRequests[0]?.get("client_id")).toBe("scoped-client");
+		expect(tokenRequests[0]?.get("client_secret")).toBe("scoped-client-secret");
+	});
+
+	test("from before client ids were recorded refreshes as the oldest client", async () => {
+		stored = autumn({ oauthClientId: null });
+
+		await ensureFreshConnection(autumn({ oauthClientId: null }));
+		expect(tokenRequests[0]?.get("client_id")).toBe("legacy-client");
+	});
+
+	test("whose client was forgotten needs reauthorization", async () => {
+		stored = autumn({ oauthClientId: "deleted-client" });
+
+		await expect(
+			ensureFreshConnection(autumn({ oauthClientId: "deleted-client" })),
+		).rejects.toBeInstanceOf(UnrefreshableConnectionError);
+		expect(tokenRequests).toHaveLength(0);
+		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
 	});
 });

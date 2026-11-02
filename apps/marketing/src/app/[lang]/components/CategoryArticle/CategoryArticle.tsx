@@ -95,7 +95,7 @@ export function CategoryArticle({ page }: CategoryArticleProps) {
 					</div>
 				</div>
 
-				<footer className="relative border-t border-border">
+				<aside className="relative border-t border-border">
 					<div className="max-w-3xl mx-auto px-6 relative">
 						<GridCross className="top-0 left-0" />
 						<GridCross className="top-0 right-0" />
@@ -111,7 +111,7 @@ export function CategoryArticle({ page }: CategoryArticleProps) {
 							<Trans>Get started</Trans>
 						</Link>
 					</div>
-				</footer>
+				</aside>
 			</article>
 		</main>
 	);

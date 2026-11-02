@@ -43,6 +43,7 @@ test("sending cancels the main agent's approvals and leaves subagents' alone", (
 
 	result.current([{ type: "text", text: "why are you stuck?" }], {
 		steer: false,
+		draft: { segments: [], attachments: [] },
 	});
 
 	expect(respondToApproval.mock.calls).toEqual([

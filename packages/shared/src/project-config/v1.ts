@@ -10,7 +10,7 @@ function stringArray(value: unknown): string[] | undefined {
 }
 
 /**
- * Translates a v1 `.superset/config.json` object into the v2 shape, keeping
+ * Translates a v1 `config.json` object into the v2 shape, keeping
  * what it did in the cloud, where v1 boot ran only `start`:
  * setup → [setup] (start → [setup.cloud]), teardown → [archive] (off in the
  * cloud), run → [terminals.dev] (default locally only),

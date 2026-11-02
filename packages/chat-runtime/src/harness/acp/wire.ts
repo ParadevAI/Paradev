@@ -85,6 +85,13 @@ export const acpUsageUpdateSchema = z.looseObject({
 	used: z.number().nonnegative().optional().catch(undefined),
 	size: z.number().positive().optional().catch(undefined),
 	cost: z.unknown().optional(),
+	_meta: z
+		.looseObject({
+			"_claude/rateLimit": z.unknown().optional(),
+			"_claude/model": z.unknown().optional(),
+		})
+		.nullish()
+		.catch(undefined),
 });
 export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
 
@@ -124,6 +131,10 @@ const acpToolCallContentSchema = z.looseObject({
 		.looseObject({ format: z.string().optional(), text: z.string() })
 		.nullable()
 		.optional(),
+	_meta: z
+		.looseObject({ kind: z.string().optional() })
+		.optional()
+		.catch(undefined),
 });
 export type AcpToolCallContent = z.infer<typeof acpToolCallContentSchema>;
 

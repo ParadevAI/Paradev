@@ -122,10 +122,10 @@ binary; write `superset` in code and docs here.
 Replace the capitalized placeholders before running these:
 
 ```bash
-superset ws create --local --project PROJECT_ID --branch BRANCH --agent claude --prompt "..."
-superset agents create --workspace WORKSPACE_ID --agent claude --prompt "..."
+superset ws create --local --project PROJECT_ID --name NAME --branch BRANCH --agent claude --prompt "..."
+superset agents create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
 superset ws list --local
-superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID
+superset terminals read --local --workspace WORKSPACE_ID --terminal TERMINAL_ID
 superset ws archive --local WORKSPACE_ID
 ```
 

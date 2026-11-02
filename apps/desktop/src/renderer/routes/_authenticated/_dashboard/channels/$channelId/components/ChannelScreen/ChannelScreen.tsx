@@ -251,6 +251,10 @@ export function ChannelScreen({
 		},
 		[channelId, lastReadSeq, applyChannelRead, markReadMutate],
 	);
+	const onReturnedToUnread = useCallback(
+		(readSeq: number) => setGhost(readSeq),
+		[],
+	);
 	const markAllRead = useCallback(() => {
 		setGhost(null);
 		setManualUnread(false);
@@ -391,6 +395,7 @@ export function ChannelScreen({
 								isMember && !manualUnread && panel.mode !== "expanded"
 							}
 							onSeen={onSeen}
+							onReturnedToUnread={onReturnedToUnread}
 							onMarkAllRead={markAllRead}
 							onMarkUnread={isMember ? onMarkUnread : undefined}
 							peopleById={peopleById}

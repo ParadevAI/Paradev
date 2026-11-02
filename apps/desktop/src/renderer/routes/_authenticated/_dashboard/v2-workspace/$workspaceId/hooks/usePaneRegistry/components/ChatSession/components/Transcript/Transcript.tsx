@@ -357,7 +357,7 @@ export function Transcript({
 					className={cn(
 						REMEMBER_SIZE_CLASSNAME,
 						!recent && OFFSCREEN_CLASSNAME,
-						"px-4 pb-1",
+						row.kind === "changed_files" ? "px-4" : "px-4 pb-1",
 						proseTopPadding(row, rows[index - 1]),
 					)}
 					commands={commands}

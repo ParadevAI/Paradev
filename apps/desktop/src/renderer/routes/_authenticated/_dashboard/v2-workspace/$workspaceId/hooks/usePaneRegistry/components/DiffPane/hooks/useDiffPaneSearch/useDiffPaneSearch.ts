@@ -31,7 +31,10 @@ let nextHighlightInstanceId = 0;
 
 interface UseDiffPaneSearchOptions {
 	containerRef: RefObject<HTMLDivElement | null>;
-	codeViewRef: RefObject<CodeViewHandle<DiffAnnotationMetadata> | null>;
+	codeViewRef: RefObject<CodeViewHandle<
+		DiffAnnotationMetadata,
+		undefined
+	> | null>;
 	items: CodeViewItem<DiffAnnotationMetadata>[];
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	collapsedSet: ReadonlySet<string>;
@@ -89,7 +92,7 @@ function isWithinSingleRow(range: Range): boolean {
 /** Locate the rendered row for a match, if the virtualizer currently has it
  *  mounted. Returns null while the row is scrolled out of the render window. */
 function findMatchRowElement(
-	codeViewHandle: CodeViewHandle<DiffAnnotationMetadata> | null,
+	codeViewHandle: CodeViewHandle<DiffAnnotationMetadata, undefined> | null,
 	match: DiffSearchMatch,
 ): HTMLElement | null {
 	const instance = codeViewHandle?.getInstance();

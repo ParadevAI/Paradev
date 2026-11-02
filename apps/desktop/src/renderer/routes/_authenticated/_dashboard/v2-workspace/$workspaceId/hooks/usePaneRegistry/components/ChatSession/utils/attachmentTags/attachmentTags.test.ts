@@ -1,10 +1,20 @@
 import { describe, expect, it } from "bun:test";
-import { appendPastedText } from "@superset/chat/core";
 import {
 	attachmentDisplayName,
 	formatAttachmentTag,
 	parseAttachmentTags,
 } from "./attachmentTags";
+
+function legacyPastedMessage(
+	prompt: string,
+	pastes: readonly string[],
+): string {
+	const blocks = pastes.map(
+		(paste) =>
+			`<pasted_text lines="${paste.split("\n").length}">\n${paste}\n</pasted_text>`,
+	);
+	return [prompt, ...blocks].filter(Boolean).join("\n\n");
+}
 
 describe("attachmentTags", () => {
 	it("round-trips tags appended to a message and strips them from the text", () => {
@@ -30,6 +40,17 @@ describe("attachmentTags", () => {
 		});
 	});
 
+	it("reads tags in the .paradev attachments folder and the pre-rename .superset one", () => {
+		const message = [
+			'<attachment path=".paradev/attachments/new.png" type="image/png" />',
+			'<attachment path=".superset/attachments/old.png" type="image/png" />',
+		].join("\n");
+
+		expect(parseAttachmentTags(message).attachments.map((a) => a.path)).toEqual(
+			[".paradev/attachments/new.png", ".superset/attachments/old.png"],
+		);
+	});
+
 	it("leaves tags that point outside the workspace attachments folder as plain text", () => {
 		const message = [
 			'<attachment path=".superset/attachments/../../../etc/passwd" type="image/png" />',
@@ -50,7 +71,7 @@ describe("attachmentTags", () => {
 			type: "image/png",
 		});
 		const paste = `log line\n${tag}`;
-		const message = appendPastedText(`look\n${tag}`, [paste]);
+		const message = legacyPastedMessage(`look\n${tag}`, [paste]);
 
 		expect(parseAttachmentTags(message)).toEqual({
 			text: "look",
@@ -64,12 +85,12 @@ describe("attachmentTags", () => {
 	it("keeps the attached name, escaped, and falls back to the file on disk without one", () => {
 		const message = [
 			formatAttachmentTag({
-				path: ".superset/attachments/Superset-arm64__21_.dmg",
+				path: ".paradev/attachments/Superset-arm64__21_.dmg",
 				type: "application/x-apple-diskimage",
 				name: 'Superset-arm64 (21) "final" <v2>.dmg',
 			}),
 			formatAttachmentTag({
-				path: ".superset/attachments/notes.txt",
+				path: ".paradev/attachments/notes.txt",
 				type: "text/plain",
 				name: "notes.txt",
 			}),

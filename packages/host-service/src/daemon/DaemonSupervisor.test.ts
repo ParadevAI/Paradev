@@ -1432,7 +1432,7 @@ describe("ptyDaemonSocketPath", () => {
 		expect(
 			ptyDaemonSocketPath(ORG, {
 				NODE_ENV: "production",
-				SUPERSET_HOME_DIR: path.join(os.homedir(), ".superset"),
+				SUPERSET_HOME_DIR: path.join(os.homedir(), ".paradev"),
 			}),
 		).toBe(legacyPath());
 	});
@@ -1478,7 +1478,7 @@ describe("ptyDaemonSocketPath", () => {
 		expect(() =>
 			ptyDaemonSocketPath(ORG, {
 				NODE_ENV: "test",
-				SUPERSET_HOME_DIR: path.join(os.homedir(), ".superset"),
+				SUPERSET_HOME_DIR: path.join(os.homedir(), ".paradev"),
 			}),
 		).toThrow(/isolated temp dir/);
 		expect(() =>
@@ -1521,7 +1521,7 @@ describe("ptyDaemonSocketPath", () => {
 		expect(
 			ptyDaemonSocketPath(ORG, {
 				NODE_ENV: "development",
-				SUPERSET_HOME_DIR: `${path.join(os.homedir(), ".superset")}/../.superset/`,
+				SUPERSET_HOME_DIR: `${path.join(os.homedir(), ".paradev")}/../.paradev/`,
 			}),
 		).toBe(legacyPath());
 	});

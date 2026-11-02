@@ -5,7 +5,11 @@ import {
 	releaseNotesResponseSchema,
 } from "@superset/shared/release-notes";
 import matter from "gray-matter";
-import { getChangelogEntries, getReleaseNotes } from "./changelog";
+import {
+	getChangelogEntries,
+	getReleaseNotes,
+	summarizeChangelogEntry,
+} from "./changelog";
 
 test("release highlights in changelog frontmatter are well-formed", () => {
 	for (const entry of getChangelogEntries()) {
@@ -56,4 +60,27 @@ test("release notes feed has absolute URLs and only versioned entries", () => {
 			highlights: [{ icon: "plug", title: "T", description: "D" }],
 		},
 	]);
+});
+
+test("changelog summary lists the named sections and skips catch-alls", () => {
+	expect(
+		summarizeChangelogEntry({
+			content: [
+				'## Pages Beside Your Code <PRBadge url="https://example.com/1" />',
+				"## Share `pages` With [Anyone](/pages)",
+				"## Improvements",
+			].join("\n\n"),
+		}),
+	).toBe("Pages Beside Your Code; Share pages With Anyone.");
+	expect(
+		summarizeChangelogEntry({ description: "Written by hand.", content: "" }),
+	).toBe("Written by hand.");
+});
+
+test("every changelog entry has a summary that fits a meta description", () => {
+	for (const entry of getChangelogEntries()) {
+		const summary = summarizeChangelogEntry(entry);
+		expect(summary?.length ?? 0).toBeGreaterThan(0);
+		expect(summary?.length ?? 0).toBeLessThanOrEqual(160);
+	}
 });

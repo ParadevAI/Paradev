@@ -85,7 +85,7 @@ test("a card from a host without description or image still shows the title", as
 	).toBeTruthy();
 });
 
-test("a pull request link gets the GitHub card, without the chip hint", async () => {
+test("a pull request link gets the GitHub card, with a link to open it", async () => {
 	const { asked, link } = renderLink(PR, PR, {
 		kind: "pr",
 		repo: "superset-sh/superset",
@@ -108,8 +108,8 @@ test("a pull request link gets the GitHub card, without the chip hint", async ()
 	await screen.findByText("feat(chat): load whole sessions");
 	expect(asked.map(({ path }) => path)).toEqual(["github.getWorkItem"]);
 	expect(
-		screen.queryByText("Click the chip to open the pull request"),
-	).toBeNull();
+		screen.getByText("Open on GitHub").closest("a")?.getAttribute("href"),
+	).toBe(PR);
 });
 
 test("a link with a service icon gets the website card too", async () => {

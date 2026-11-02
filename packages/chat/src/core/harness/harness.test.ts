@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	acpHarnessForPreset,
+	acpStartModes,
 	presetForAcpHarness,
 	presetForAnyHarness,
 } from "./harness";
@@ -38,5 +39,18 @@ describe("presetForAnyHarness", () => {
 		expect(presetForAnyHarness("claude-code")).toBe("claude");
 		expect(presetForAnyHarness("codex")).toBe("codex");
 		expect(presetForAnyHarness("unknown")).toBeUndefined();
+	});
+});
+
+describe("acpStartModes", () => {
+	test("a start mode's default is one of its modes, and agents without known modes offer none", () => {
+		for (const preset of ["claude", "codex", "pdev"]) {
+			const start = acpStartModes(preset);
+			expect(start?.modes.some((mode) => mode.id === start.defaultModeId)).toBe(
+				true,
+			);
+		}
+		expect(acpStartModes("opencode")).toBeUndefined();
+		expect(acpStartModes("omp")).toBeUndefined();
 	});
 });

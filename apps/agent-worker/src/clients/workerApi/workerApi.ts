@@ -34,6 +34,7 @@ export interface WorkerApiOptions extends TrpcCallOptions {
 
 interface TurnCredentialsResponse {
 	sessionStore: { baseUrl: string; writeTicket: string };
+	organizationId?: string;
 	host: (HostTarget & { workspaceId: string }) | null;
 	model: { headers: Record<string, string> } | null;
 	room: { channelId: string; threadRootId: string | null } | null;
@@ -77,9 +78,10 @@ export function workerApi(options: WorkerApiOptions): {
 				const headers =
 					options.local?.modelHeaders ??
 					granted.model?.headers ??
-					options.modelHeaders;
+					routerKeyHeaders(options.modelHeaders, granted.organizationId);
+				// A missing key is a deploy gap: retry, so the turn answers once it is set.
 				if (!headers)
-					throw ApplicationFailure.nonRetryable(
+					throw ApplicationFailure.retryable(
 						"Turn has no model credentials",
 						"NoModelCredentials",
 					);
@@ -139,4 +141,15 @@ export function workerApi(options: WorkerApiOptions): {
 			},
 		},
 	};
+}
+
+/** The router bills a key's turn to the organization the request names. */
+function routerKeyHeaders(
+	keyHeaders: Record<string, string> | undefined,
+	organizationId: string | undefined,
+): Record<string, string> | undefined {
+	if (!keyHeaders) return undefined;
+	return organizationId
+		? { ...keyHeaders, "x-superset-organization-id": organizationId }
+		: keyHeaders;
 }

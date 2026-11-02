@@ -57,6 +57,43 @@ describe("stepCounts", () => {
 			]).edits,
 		).toBe(4);
 	});
+	test("a shell command that only reads or searches is not a command", () => {
+		const shell = (command: string): ToolCall => ({
+			...call("execute"),
+			rawInput: { command },
+		});
+		expect(
+			stepCounts([
+				shell("cat README.md"),
+				shell("grep -rn todo src"),
+				shell("ls src"),
+				shell("echo x > out.txt"),
+				shell("bun test"),
+			]),
+		).toEqual({
+			commands: 1,
+			edits: 1,
+			reads: 1,
+			searches: 2,
+			fetches: 0,
+			tools: 0,
+		});
+	});
+	test("shell writes count each file once", () => {
+		const shell = (command: string, cwd?: string): ToolCall => ({
+			...call("execute"),
+			rawInput: cwd ? { command, cwd } : { command },
+		});
+		expect(
+			stepCounts([
+				shell("echo a > out.txt"),
+				shell("echo b >> out.txt"),
+				shell("echo c > other.txt"),
+				shell("echo d > notes.md", "/repo"),
+				shell("echo e >> /repo/notes.md"),
+			]).edits,
+		).toBe(3);
+	});
 	test("is all zeros for an empty run", () => {
 		expect(stepCounts([])).toEqual({
 			commands: 0,

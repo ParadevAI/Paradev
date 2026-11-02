@@ -74,6 +74,7 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"plugins.marketplaces.add",
 	"plugins.marketplaces.list",
 	"plugins.marketplaces.remove",
+	"plugins.organization.bundle",
 	"plugins.setEnabled",
 	"plugins.uninstall",
 	"support.submitFeedback",

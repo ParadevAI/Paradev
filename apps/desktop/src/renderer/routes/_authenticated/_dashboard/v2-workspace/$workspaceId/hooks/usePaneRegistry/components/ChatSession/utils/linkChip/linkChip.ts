@@ -106,3 +106,7 @@ export function linkOfChip(chip: ComposerChip): string | null {
 	const link = (chip.data as Partial<LinkChipData> | undefined)?.link;
 	return typeof link === "string" ? link : null;
 }
+
+export function chipLink(chip: ComposerChip): string | null {
+	return linkOfChip(chip) ?? (webUrl(chip.serialized) ? chip.serialized : null);
+}

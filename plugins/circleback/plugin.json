@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "circleback",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Meeting notes, action items, and transcripts from Circleback: search what was said and work what was captured.",
 	"author": {
 		"name": "Paradev",

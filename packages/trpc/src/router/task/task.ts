@@ -256,7 +256,26 @@ async function createTask(
 	importedFrom?: ImportSource,
 ) {
 	const organizationId = await requireActiveOrgMembership(ctx);
+	return insertTask({
+		organizationId,
+		creatorId: ctx.session.user.id,
+		input,
+		importedFrom,
+	});
+}
 
+/** Creates a task in an organization; the task routes and a Dev's `start_task` share it. */
+export async function insertTask({
+	organizationId,
+	creatorId,
+	input,
+	importedFrom,
+}: {
+	organizationId: string;
+	creatorId: string;
+	input: z.infer<typeof createTaskSchema>;
+	importedFrom?: ImportSource;
+}) {
 	const result = await dbWs.transaction(async (tx) => {
 		const statusId = input.statusId
 			? await getScopedStatusId(
@@ -295,7 +314,7 @@ async function createTask(
 				statusId,
 				priority: input.priority ?? "none",
 				organizationId,
-				creatorId: ctx.session.user.id,
+				creatorId,
 				assigneeId,
 				teamId,
 				estimate: input.estimate ?? null,
@@ -318,7 +337,7 @@ async function createTask(
 				...importedFrom,
 				taskId: task.id,
 				organizationId,
-				importedByUserId: ctx.session.user.id,
+				importedByUserId: creatorId,
 			});
 		}
 
@@ -487,6 +506,103 @@ async function buildTaskListFilters(
 		dueDateFrom: dueDateRange.from,
 		dueDateTo: dueDateRange.to,
 	});
+}
+
+/**
+ * Moves a task to the organization's first "started"-type status (e.g.
+ * "In Progress") when work begins on it — a workspace is created from it
+ * or an agent starts working. No-op unless the task is currently in a
+ * "backlog"/"unstarted" status, so it never regresses tasks that are
+ * already in progress or done. An unassigned task is assigned to the
+ * acting user; an existing assignee is never overwritten.
+ */
+export async function moveTaskToStarted(
+	tx: DbWsTransaction,
+	{
+		taskId,
+		organizationId,
+		actorUserId,
+	}: { taskId: string; organizationId: string; actorUserId: string },
+) {
+	const [current] = await tx
+		.select({
+			statusId: tasks.statusId,
+			statusType: taskStatuses.type,
+			statusProvider: taskStatuses.externalProvider,
+			assigneeId: tasks.assigneeId,
+		})
+		.from(tasks)
+		.innerJoin(taskStatuses, eq(tasks.statusId, taskStatuses.id))
+		.where(and(eq(tasks.id, taskId), isNull(tasks.deletedAt)))
+		.limit(1);
+
+	if (
+		!current ||
+		(current.statusType !== "backlog" && current.statusType !== "unstarted")
+	) {
+		return null;
+	}
+
+	// Stay within the status set the task already lives in (Linear
+	// statuses vs local defaults) so the transition is meaningful
+	// to the provider that owns the task's workflow.
+	const [startedStatus] = await tx
+		.select({ id: taskStatuses.id })
+		.from(taskStatuses)
+		.where(
+			and(
+				eq(taskStatuses.organizationId, organizationId),
+				eq(taskStatuses.type, "started"),
+				current.statusProvider
+					? eq(taskStatuses.externalProvider, current.statusProvider)
+					: isNull(taskStatuses.externalProvider),
+			),
+		)
+		.orderBy(asc(taskStatuses.position))
+		.limit(1);
+
+	if (!startedStatus) {
+		return null;
+	}
+
+	const unassigned = current.assigneeId === null;
+
+	// Compare-and-set on the observed status so a concurrent move to
+	// completed/canceled between the read and this write is never
+	// dragged back to started. No row updated = no-op.
+	const [task] = await tx
+		.update(tasks)
+		.set({
+			statusId: startedStatus.id,
+			...(unassigned ? { assigneeId: actorUserId } : {}),
+		})
+		.where(
+			and(
+				eq(tasks.id, taskId),
+				eq(tasks.statusId, current.statusId),
+				isNull(tasks.deletedAt),
+			),
+		)
+		.returning(taskColumns);
+
+	if (!task) {
+		return null;
+	}
+
+	await recordTaskActivity(
+		tx,
+		task.id,
+		{ kind: "user", userId: actorUserId },
+		diffTaskActivity(
+			{
+				...task,
+				statusId: current.statusId,
+				assigneeId: current.assigneeId,
+			},
+			task,
+		),
+	);
+	return task;
 }
 
 export const taskRouter = {
@@ -680,86 +796,12 @@ export const taskRouter = {
 					ctx.session.user.id,
 					input.id,
 				);
-
-				const [current] = await tx
-					.select({
-						statusId: tasks.statusId,
-						statusType: taskStatuses.type,
-						statusProvider: taskStatuses.externalProvider,
-						assigneeId: tasks.assigneeId,
-					})
-					.from(tasks)
-					.innerJoin(taskStatuses, eq(tasks.statusId, taskStatuses.id))
-					.where(and(eq(tasks.id, input.id), isNull(tasks.deletedAt)))
-					.limit(1);
-
-				if (
-					!current ||
-					(current.statusType !== "backlog" &&
-						current.statusType !== "unstarted")
-				) {
-					return { task: null, txid: null };
-				}
-
-				// Stay within the status set the task already lives in (Linear
-				// statuses vs local defaults) so the transition is meaningful
-				// to the provider that owns the task's workflow.
-				const [startedStatus] = await tx
-					.select({ id: taskStatuses.id })
-					.from(taskStatuses)
-					.where(
-						and(
-							eq(taskStatuses.organizationId, taskAccess.organizationId),
-							eq(taskStatuses.type, "started"),
-							current.statusProvider
-								? eq(taskStatuses.externalProvider, current.statusProvider)
-								: isNull(taskStatuses.externalProvider),
-						),
-					)
-					.orderBy(asc(taskStatuses.position))
-					.limit(1);
-
-				if (!startedStatus) {
-					return { task: null, txid: null };
-				}
-
-				const unassigned = current.assigneeId === null;
-
-				// Compare-and-set on the observed status so a concurrent move to
-				// completed/canceled between the read and this write is never
-				// dragged back to started. No row updated = no-op.
-				const [task] = await tx
-					.update(tasks)
-					.set({
-						statusId: startedStatus.id,
-						...(unassigned ? { assigneeId: ctx.session.user.id } : {}),
-					})
-					.where(
-						and(
-							eq(tasks.id, input.id),
-							eq(tasks.statusId, current.statusId),
-							isNull(tasks.deletedAt),
-						),
-					)
-					.returning(taskColumns);
-
-				if (!task) {
-					return { task: null, txid: null };
-				}
-
-				await recordTaskActivity(
-					tx,
-					task.id,
-					{ kind: "user", userId: ctx.session.user.id },
-					diffTaskActivity(
-						{
-							...task,
-							statusId: current.statusId,
-							assigneeId: current.assigneeId,
-						},
-						task,
-					),
-				);
+				const task = await moveTaskToStarted(tx, {
+					taskId: input.id,
+					organizationId: taskAccess.organizationId,
+					actorUserId: ctx.session.user.id,
+				});
+				if (!task) return { task: null, txid: null };
 
 				const txid = await getCurrentTxid(tx);
 

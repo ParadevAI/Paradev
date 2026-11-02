@@ -79,7 +79,11 @@ export function OrganizationJsonLd() {
 	return <JsonLdScript schema={schema} />;
 }
 
-export function SoftwareApplicationJsonLd() {
+export function SoftwareApplicationJsonLd({
+	dateModified,
+}: {
+	dateModified?: string;
+}) {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "SoftwareApplication",
@@ -99,6 +103,7 @@ export function SoftwareApplicationJsonLd() {
 		description: PRODUCT_SUMMARY,
 		disambiguatingDescription: PRODUCT_DISAMBIGUATION,
 		url: COMPANY.MARKETING_URL,
+		...(dateModified && { dateModified }),
 	};
 
 	return <JsonLdScript schema={schema} />;
@@ -197,6 +202,7 @@ export function ComparisonJsonLd({
 		publisher: {
 			"@type": "Organization",
 			name: BRAND.INTRO_NAME,
+			alternateName: BRAND.FORMER_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -259,7 +265,7 @@ export function ServiceJsonLd() {
 		name: `${BRAND.INTRO_NAME} agent orchestration`,
 		serviceType: "AI coding agent orchestration platform",
 		description:
-			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel with isolated Git worktrees, diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
+			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel, each in its own Git worktree and branch, with diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
 		provider: {
 			"@type": "Organization",
 			name: BRAND.INTRO_NAME,

@@ -666,40 +666,37 @@ export function WorkspaceActivityMenu({
 								<div>{pullRequests.map(pullRequestRow)}</div>
 							</MenuGroup>
 						)}
-						<MenuGroup
-							title={<Trans>Subagents</Trans>}
-							count={agentWork.subagents.length}
-						>
-							<div>
-								{agentWork.subagents.length + agentWork.finished.length > 0
-									? [
-											...agentRows(agentWork.subagents),
-											...agentWork.finished.map((entry) => (
-												<FinishedSubagentRow
-													key={entry.key}
-													entry={entry}
-													source={sourceOf(entry.terminalId)}
-													onOpen={(target) =>
-														agentActions.open(target, { subagent: true })
-													}
-												/>
-											)),
-										]
-									: emptyRow(<Trans>No subagents yet</Trans>)}
-							</div>
-						</MenuGroup>
-						<MenuGroup
-							title={<Trans>Background processes</Trans>}
-							count={processes.length + agentWork.shells.length}
-						>
-							<div>
-								{processes.length + agentWork.shells.length > 0
-									? [...agentRows(agentWork.shells), ...workRows(processes)]
-									: terminalSessionsQuery.isLoading
-										? emptyRow(<Trans>Loading…</Trans>)
-										: emptyRow(<Trans>Nothing running</Trans>)}
-							</div>
-						</MenuGroup>
+						{agentWork.subagents.length + agentWork.finished.length > 0 && (
+							<MenuGroup
+								title={<Trans>Subagents</Trans>}
+								count={agentWork.subagents.length}
+							>
+								<div>
+									{agentRows(agentWork.subagents)}
+									{agentWork.finished.map((entry) => (
+										<FinishedSubagentRow
+											key={entry.key}
+											entry={entry}
+											source={sourceOf(entry.terminalId)}
+											onOpen={(target) =>
+												agentActions.open(target, { subagent: true })
+											}
+										/>
+									))}
+								</div>
+							</MenuGroup>
+						)}
+						{processes.length + agentWork.shells.length > 0 && (
+							<MenuGroup
+								title={<Trans>Background processes</Trans>}
+								count={processes.length + agentWork.shells.length}
+							>
+								<div>
+									{agentRows(agentWork.shells)}
+									{workRows(processes)}
+								</div>
+							</MenuGroup>
+						)}
 						<MenuGroup
 							title={<Trans>Pages</Trans>}
 							addLabel={t({ message: "New page" })}

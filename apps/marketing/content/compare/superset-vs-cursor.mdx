@@ -1,86 +1,91 @@
 ---
-title: "Paradev vs Cursor (2026): Any-Agent Workspace vs Cursor's Agent Platform"
-description: "Compare Paradev and Cursor for parallel AI coding. A local-first workspace that runs any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, Projects, and iOS remote control."
+title: "Paradev vs Cursor (2026): Run Claude Code and Codex in Parallel, or Cursor's Own Agent"
+description: "Compare Paradev and Cursor for parallel AI coding. A desktop workspace that runs Claude Code, Codex, and any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, CLI, and Grok-centered plans after joining SpaceX."
 date: 2026-02-02
-lastUpdated: 2026-10-15
+lastUpdated: 2026-10-29
 type: "1v1"
 competitors:
   - cursor
 keywords:
   - superset vs cursor
+  - paradev vs cursor
   - cursor alternative
+  - cursor alternative for claude code
   - cursor agents window
+  - cursor background agents
   - cursor remote control
-  - cursor projects
   - parallel coding agents
-  - ai coding editor comparison
 ---
 
-Cursor started as an AI editor and is now a full agent platform: an Agents Window that runs agents locally, in the cloud, or over SSH, cloud agents on their own VMs, self-hosted machines, a coordinator agent in Projects, code hosting with Origin, and an iOS app that, since October 2026, can see and reply to the agents running on your computer. Paradev solves a narrower problem in a different way: it is a local-first workspace that runs any CLI agent, including Cursor's own, in parallel Git worktrees on your machines and subscriptions, independent of any editor.
+Choose Paradev (formerly Superset) if you want to run Claude Code, Codex, and other CLI agents in parallel, each in its own Git worktree, on the subscriptions you already pay for. Choose Cursor if you want one AI editor with its own agent at the center, plus managed cloud agents. Cursor runs Cursor's agent; Paradev runs any agent, including Cursor's. Since Cursor [joined SpaceX on August 14, 2026](https://cursor.com/blog/joining-spacex), its [plans](https://cursor.com/pricing) also center on Grok: Plus includes only Grok models, and third-party models start at Premium, billed at API list price.
 
-Facts were checked against Cursor's changelog, docs, and pricing page on October 13, 2026.
+**Our recommendation: choose Paradev if you use Claude Code or Codex and want several agents working in parallel with review and pull requests in one place.** Keep Cursor as your editor if you like it: Paradev opens any workspace in Cursor.
+
+[Download Paradev](/download) to run your current agent in a workspace, or see [Best Cursor Alternatives](/compare/cursor-alternative) for other options. Cursor facts were checked against its site, docs, changelog, and pricing page on October 29, 2026.
 
 ---
 
-## At a Glance
+## The Short Version
 
 | | **Paradev** | **Cursor** |
 |---|---|---|
-| **Category** | Agent workspace and orchestrator | AI editor and agent platform |
-| **Agents** | Any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, Droid, Muse Code, and more | Cursor's own agent, with models from several vendors |
-| **Parallel work** | Many agents, from different vendors, each in its own worktree; orchestrate skill turns Claude Code or Codex into a coordinator | Agents Window with worktrees; `/best-of-n` and `/multitask`; cloud agents; Projects coordinator (beta) |
-| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a cloud workspace | Your machine, Cursor's cloud VMs, SSH hosts, or self-hosted workers |
-| **Mobile** | iPhone and iPad app: terminals and diff review on your hosts and cloud workspaces | iOS app: cloud agent inbox and PR review; see and reply to local agents (since Oct 6, 2026) |
-| **Editor** | Works alongside any editor | Cursor's own editor at the center |
-| **Model costs** | Your own subscriptions and keys, never proxied | Cursor plans; third-party models billed at API list price |
+| **Category** | Desktop workspace for CLI coding agents | AI editor and agent platform |
+| **Agents** | Any CLI agent: Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and more | Cursor's own agent, with models from several vendors on paid plans |
+| **Parallel work** | Many agents, from different vendors, each in its own worktree and branch | Agents Window with worktrees for local agents; cloud agents on their own VMs |
+| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a cloud workspace | Your machine, remote SSH, Cursor's cloud VMs, or self-hosted machines |
+| **Mobile** | iPhone and iPad app: terminals and diff review on your hosts and cloud workspaces (Pro) | iOS app for cloud agents, and remote control of local agents since October 6, 2026; web app at cursor.com/agents |
+| **Editor** | Works beside any editor | Cursor's own editor at the center |
+| **Model costs** | Your own subscriptions and keys, never proxied | Plus: Grok models only. Premium and up: third-party models billed at API list price |
 | **Platforms** | macOS; experimental Linux AppImage; Windows unavailable | macOS, Windows, Linux, web, iOS |
 | **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Free; Plus $8, Premium $30, Super $100, Ultra $200 per month; Teams from $30 per user |
 
----
+## Why Look for a Cursor Alternative?
 
-## What Is Paradev?
+- **You want Claude Code or Codex in parallel.** Cursor's parallel features run Cursor's agent. Paradev runs Claude Code, Codex, and Cursor's agent side by side.
+- **You already pay for Claude or ChatGPT.** Paradev uses those plans directly. On Cursor, Claude and GPT models start at Premium and are billed at API list price.
+- **Your editor is not Cursor.** You use JetBrains, Xcode, Neovim, Zed, or VS Code and want agent orchestration that is not tied to one editor.
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor's agent, Antigravity CLI, GitHub Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, cloud workspaces run in the cloud without your own computer connected, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+## Paradev and Cursor, Side by Side
 
-## What Is Cursor?
+### Paradev
 
-Cursor is an AI editor that has grown into an agent platform. The Agents Window manages agents across many repositories, running locally, in the cloud, or over SSH, and gives local agents their own worktrees; in the editor, `/worktree`, `/best-of-n`, and `/multitask` cover parallel work. Cloud agents each get their own VM, start from prepared snapshots, and can subscribe to PRs, Slack, and schedules. Since September 2026, self-hosted machines let agents run on your own laptop, a VM, or worker pools on several cloud providers, and Projects, in beta, has a coordinator agent that plans work and hands it to many agents in parallel. Cursor also hosts code with Origin, reviews PRs with Bugbot, and since October 13 has an app marketplace. On October 6, 2026, Cursor added remote control for local agents: pair the iOS app with your desktop to see and reply to agents running on your computer, which must stay on. The CLI, `agent`, runs Cursor's agent in a terminal and lets other editors drive it over ACP. Cursor runs its own agent; its docs do not describe running Claude Code or Codex.
+Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent in its own Git worktree and branch with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with CI checks and line comments you can send to agents, a file editor, an in-app browser with Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, cloud workspaces run without your own computer connected, and scheduled automations, a CLI, and a TypeScript SDK cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Source-available under Elastic License 2.0 (ELv2).
+
+### Cursor
+
+Cursor describes itself as "your coding agent for building ambitious software." The Agents Window is a workspace for agents across repositories and environments: local, cloud, and remote SSH, with worktrees that give local agents their own Git checkouts. Cloud agents, formerly called Background Agents, run on isolated VMs, can be started from the editor, Slack, GitHub, Linear, or an API, and need the Premium plan or higher. The CLI, `agent`, runs Cursor's agent in a terminal and can hand a task to a cloud agent. Recent releases added remote control of local agents from the iOS app (October 6), cloud agent canvases (October 16), and an Agent SDK (October 20). Cursor joined SpaceX on August 14, 2026, and its plans now include Grok models, with third-party models from Premium up.
 
 ## Key Differences
 
 ### Any Agent vs Cursor's Agent
 
-Cursor's parallelism runs Cursor's agent, with your choice of model. Paradev runs agents from every vendor in real terminals, so Claude Code, Codex, and Cursor's own agent can work on the same repository side by side, and you can continue a session with a different agent. If you like Cursor's agent, you can run it in Paradev too.
+Cursor's parallelism runs Cursor's agent, with your choice of model. Paradev runs agents from every vendor in real terminals, so Claude Code, Codex, and Cursor's own agent can work on the same repository side by side, and you can hand a session to a different agent. If you like Cursor's agent, you can run it in Paradev too.
 
 ### Who Pays for the Models
 
-Paradev never proxies model calls: each agent runs on your own subscription or key. Cursor bundles usage into its plans, bills third-party models at API list price, and refreshes usage weekly.
+Paradev never proxies model calls: each agent runs on your own subscription or key. Cursor's Plus plan includes only Grok models. From Premium up, third-party models such as Claude and GPT are not part of the monthly price and are billed at API list price.
 
 ### Remote Agents and Mobile
 
-Both now let you check on agents running on your own machine from a phone. Cursor's iOS app pairs with one desktop and shows its local agents, alongside its cloud agents. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
+Both let you check on agents running on your own machine from a phone. Cursor's iOS app shows cloud agents and, since October 6, 2026, agents running on your computer, which must stay on. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
 
 ### Cloud Infrastructure
 
-Cursor offers managed cloud agents on their own VMs, started from prepared snapshots, and worker pools on several clouds. Paradev has cloud workspaces that run in the cloud and open from desktop, iPhone, and iPad, and it also runs agents on machines you own through Remote Access.
+Cursor offers managed cloud agents on isolated VMs, plus self-hosted machines for running tools on your own hardware. Paradev has cloud workspaces on the Team and Ultra plans (Beta), and runs agents on machines you own through Remote Access on Pro.
 
 ### Editor-Centered vs Editor-Independent
 
-Cursor's editor is the center of its product, and some CLI features work only in the editor. Paradev works alongside whichever editor you use, and many Paradev users run it next to Cursor.
-
----
+Cursor's editor is the center of its product. Paradev works beside whichever editor you use, including Cursor.
 
 ## Pricing
 
-Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing. Model costs are on your own agent subscriptions. Cursor's pricing page lists Free, Plus at $8 a month, Premium at $30, Super at $100, Ultra at $200, Teams from $30 per user, and Enterprise on custom terms. Cloud agents, automations, Origin, and Bugbot start at Premium, and third-party models are billed at API list price on every tier. Prices as of October 2026.
+Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly), and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing. Model costs stay on your own agent subscriptions. Cursor's pricing page lists Free, Plus at $8 a month (Grok models only), Premium at $30, Super at $100, Ultra at $200, Teams from $30 per user, and Enterprise on custom terms. Cloud agents, automations, code hosting, and Bugbot start at Premium, and third-party models are billed at API list price. Prices as of October 29, 2026.
 
----
-
-## Which Should You Choose?
+## How To Choose
 
 **Choose Paradev if you:**
 
-- Run CLI agents from several vendors and want them side by side
+- Run Claude Code, Codex, or other CLI agents and want them side by side
 - Want model costs on your own subscriptions, with no proxy
 - Want agents on machines you own, reachable from an iPhone or iPad app
 - Use JetBrains, Xcode, Neovim, Zed, or Cursor itself, and want orchestration that is not tied to one editor
@@ -88,28 +93,47 @@ Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro
 **Choose Cursor if you:**
 
 - Want one product for AI editing, local and cloud agents, and code review
-- Want cloud agents on prepared VM snapshots and worker pools across several clouds
-- Want a coordinator built into a Projects view that plans work for Cursor's own agents
-- Prefer Cursor's agent and editor as the center of your workflow
+- Want managed cloud agents on isolated VMs, started from Slack, GitHub, or Linear
+- Prefer Cursor's agent and editor at the center of your workflow
+- Are happy with Grok models, or with API list price for other models
 
 The two also work together: use Cursor as your editor, and Paradev to run Claude Code, Codex, and Cursor's agent in parallel worktrees around it.
 
----
+## Verdict
+
+Cursor is an excellent AI editor with a capable agent platform around it. It is built around Cursor's agent and, since the SpaceX deal, Grok-first plans. Paradev is the better fit if you want Claude Code, Codex, or any other CLI agent working in parallel on your own subscriptions, with review and pull requests in one workspace, and any editor beside it.
+
+## What To Try First
+
+- **Bring your agent:** launch Claude Code or Codex in a Paradev workspace with your existing plan.
+- **Add Cursor's agent:** run Cursor Agent in a second workspace on the same task and compare the diffs.
+- **Keep Cursor open:** open either workspace in Cursor when you want to edit by hand.
+- **Ship it:** commit, push, and open the PR from the Changes pane.
+
+[Download Paradev](/download), then follow the [parallel-task walkthrough](/blog/parallel-coding-agents-guide).
 
 ## Frequently Asked Questions
 
 ### Is Paradev a Cursor replacement?
 
-Not as an editor. Paradev does not offer Cursor-style inline completions. It is the workspace for running and reviewing many agents, and it opens any workspace in Cursor when you want to edit.
+Not as an editor. Paradev does not offer inline completions. It is the workspace for running and reviewing many agents, and it opens any workspace in Cursor when you want to edit.
 
 ### Does Cursor support parallel agents?
 
-Yes. The Agents Window runs agents locally, in the cloud, or over SSH, with worktrees for local agents, and Projects has a coordinator agent in beta. Cursor's parallelism runs its own agent; Paradev runs any CLI agent in worktrees on your machines.
+Yes. The Agents Window runs agents locally, in the cloud, or over SSH, with worktrees for local agents, and cloud agents run on their own VMs. Cursor's parallelism runs its own agent; Paradev runs any CLI agent in worktrees on your machines.
+
+### Can Cursor run Claude Code and Codex side by side?
+
+Cursor's docs describe running Cursor's agent, with Claude and GPT models available from Premium at API list price. They do not describe running the Claude Code or Codex CLIs. Paradev runs both side by side, each in its own worktree.
+
+### What happened to Cursor background agents?
+
+They are now called cloud agents. Cursor's docs say they run on isolated cloud VMs, work on their own branch, and need the Premium plan or higher.
 
 ### Can I control local Cursor agents from my phone?
 
-Yes, since October 6, 2026: pair Cursor's iOS app with your desktop to see and reply to its local agents. Paradev's iPhone and iPad app does the same for any agent running on any macOS or Linux host you add.
+Yes, since October 6, 2026: Cursor's iOS app can view and message agents running on your computer, which must stay on and online. Paradev's iPhone and iPad app does the same for any agent on any macOS or Linux host you add.
 
 ### Can I run Cursor's agent in Paradev?
 
-Yes. Cursor's agent is a built-in agent in Paradev, and runs in its own worktree next to Claude Code, Codex, and any other CLI agent.
+Yes. Cursor Agent is a built-in agent in Paradev and runs in its own worktree next to Claude Code, Codex, and any other CLI agent.

@@ -42,7 +42,7 @@ export function StagedChip({ pick, onRemove }: StagedChipProps) {
 			<button
 				type="button"
 				onClick={onRemove}
-				aria-label={t({ message: `Remove ${label}` })}
+				aria-label={t`Remove ${label}`}
 				className="grid size-4 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
 			>
 				<X className="size-3" />

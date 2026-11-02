@@ -34,8 +34,8 @@ export function ChoosePrimaryStep({
 				</DialogTitle>
 				<DialogDescription className="text-sm leading-snug">
 					<Trans>
-						Cloud workspaces open on it, and its .superset/config.json runs
-						setup. The others are checked out beside it.
+						Cloud workspaces open on it, and its Paradev config runs setup. The
+						others are checked out beside it.
 					</Trans>
 				</DialogDescription>
 			</DialogHeader>

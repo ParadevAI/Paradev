@@ -293,13 +293,13 @@ Zobacz [**DEVELOPMENT.md**](../DEVELOPMENT.md) — pełny przewodnik: co robi sk
 
 ## Konfiguracja
 
-Skonfiguruj skrypty setup, teardown i run obszaru roboczego w `.superset/config.json`. Zobacz [pełną dokumentację](https://docs.paradev.com/setup-teardown-scripts).
+Skonfiguruj skrypty setup, teardown i run obszaru roboczego w `.paradev/config.json`. Zobacz [pełną dokumentację](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

@@ -14,6 +14,7 @@ export const textElementSchema = z.looseObject({
 	}),
 	elementKind: z.enum(["file_mention", "slash_command", "other"]),
 	label: z.string().optional(),
+	data: z.unknown().optional(),
 });
 export type TextElement = z.infer<typeof textElementSchema>;
 
@@ -84,6 +85,8 @@ export const toolContentSchema = z.discriminatedUnion("type", [
 		path: z.string(),
 		oldText: z.string().nullable(),
 		newText: z.string(),
+		/** The agent removed the file; an empty `newText` alone can also be an emptied file. */
+		deleted: z.boolean().optional(),
 	}),
 	z.looseObject({
 		type: z.literal("terminal"),

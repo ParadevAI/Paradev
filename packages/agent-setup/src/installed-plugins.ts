@@ -1,27 +1,26 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { PluginSkillSource } from "./managed-skills";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export function installedPluginsFilePath(): string {
-	return path.join(
-		resolveSupersetHomeDir(),
-		"plugins",
-		"installed_plugins.json",
-	);
+	return path.join(resolveAppHomeDir(), "plugins", "installed_plugins.json");
 }
 
 interface InstalledPluginRecord {
 	name?: unknown;
 	marketplace?: unknown;
+	version?: unknown;
 	installPath?: unknown;
 	enabled?: unknown;
+	tools?: unknown;
 }
 
 export interface EnabledPlugin {
 	name: string;
 	marketplace: string;
+	tools?: boolean;
 }
 
 /**
@@ -60,6 +59,7 @@ export function readEnabledPlugins(
 			name: entry.name as string,
 			marketplace:
 				typeof entry.marketplace === "string" ? entry.marketplace : "",
+			...(typeof entry.tools === "boolean" ? { tools: entry.tools } : {}),
 		})) ?? null
 	);
 }
@@ -71,6 +71,44 @@ export interface InstalledPluginEntry {
 	installPath?: string;
 	installedAt: string;
 	enabled: boolean;
+	/** False for an organization plugin with only skills: no MCP entry is written for it. */
+	tools?: boolean;
+}
+
+/** The version of each plugin this machine holds, or null when the ledger cannot be read. */
+export function readInstalledVersions(
+	file: string = installedPluginsFilePath(),
+): { marketplace: string; name: string; version: string }[] | null {
+	const records = readLedgerRecords(file);
+	if (!records) return null;
+	return records.flatMap((entry) =>
+		typeof entry.marketplace === "string" &&
+		typeof entry.name === "string" &&
+		typeof entry.version === "string"
+			? [
+					{
+						marketplace: entry.marketplace,
+						name: entry.name,
+						version: entry.version,
+					},
+				]
+			: [],
+	);
+}
+
+export function findInstalledTree(
+	marketplace: string,
+	name: string,
+	file: string = installedPluginsFilePath(),
+): { version: string; installPath: string } | null {
+	const record = readLedgerRecords(file)?.find(
+		(entry) => entry.marketplace === marketplace && entry.name === name,
+	);
+	return typeof record?.version === "string" &&
+		typeof record.installPath === "string" &&
+		record.installPath
+		? { version: record.version, installPath: record.installPath }
+		: null;
 }
 
 export function writeInstalledPlugins(
