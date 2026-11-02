@@ -30,10 +30,13 @@ import slackIconUrl from "renderer/assets/icons/slack-icon.svg";
 import stripeIconUrl from "renderer/assets/icons/stripe-icon.svg";
 import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
 import { AutumnIcon } from "./components/AutumnIcon";
+import { FirecrawlIcon } from "./components/FirecrawlIcon";
+import { InngestIcon } from "./components/InngestIcon";
 import { PeecIcon } from "./components/PeecIcon";
 import { ResendIcon } from "./components/ResendIcon";
 import { SazabiIcon } from "./components/SazabiIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
+import { WisprIcon } from "./components/WisprIcon";
 
 /**
  * Per-plugin brand icons. Icons stay per-app rather than in the shared
@@ -62,7 +65,9 @@ const IMAGE_ICONS: Record<string, string> = {
 
 const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	autumn: { icon: AutumnIcon },
+	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
+	inngest: { icon: InngestIcon },
 	superhuman: { icon: SuperhumanIcon },
 	notion: { icon: SiNotion },
 	peec: { icon: PeecIcon },
@@ -78,6 +83,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	"google-docs": { icon: SiGoogledocs, color: "#4285F4" },
 	"google-sheets": { icon: SiGooglesheets, color: "#0F9D58" },
 	vercel: { icon: SiVercel },
+	wispr: { icon: WisprIcon },
 };
 
 /**

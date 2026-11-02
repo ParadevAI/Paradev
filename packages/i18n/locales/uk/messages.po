@@ -6471,6 +6471,9 @@ msgstr "Не працює"
 msgid "Debug"
 msgstr "Налагодження"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Налагодження невдалих запусків і повторний запуск функцій"
+
 msgid "Debug with production stack traces"
 msgstr "Налагодження за стек-трейсами з продакшену"
 
@@ -9876,6 +9879,9 @@ msgstr "Думки команди Paradev про паралельних коди
 
 msgid "Inspect branches and run SQL"
 msgstr "Переглядати гілки й виконувати SQL"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Перегляд таблиць і застосування міграцій"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15152,6 +15158,9 @@ msgstr "Зробити ребейз і злити"
 msgid "Rebase and merge"
 msgstr "Зробити ребейз і злити"
 
+msgid "Recall what was said in meetings"
+msgstr "Згадати, що говорили на зустрічах"
+
 msgid "Recent Activity"
 msgstr "Нещодавня активність"
 
@@ -16452,6 +16461,9 @@ msgstr "Область"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Підрахунок балів почнеться, коли набереться днів використання: {0}."
+
+msgid "Scrape and crawl websites"
+msgstr "Парсинг і обхід вебсайтів"
 
 msgid "Screenshot copied"
 msgstr "Знімок екрана скопійовано"

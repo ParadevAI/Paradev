@@ -6477,6 +6477,9 @@ msgstr "Đã dừng"
 msgid "Debug"
 msgstr "Debug"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Gỡ lỗi các lần chạy thất bại và chạy lại hàm"
+
 msgid "Debug with production stack traces"
 msgstr "Gỡ lỗi bằng stack trace từ production"
 
@@ -9882,6 +9885,9 @@ msgstr "Góc nhìn từ đội ngũ Paradev về coding agent chạy song song v
 
 msgid "Inspect branches and run SQL"
 msgstr "Xem branch và chạy SQL"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Kiểm tra bảng và áp dụng migration"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "Rebase & merge"
 msgid "Rebase and merge"
 msgstr "Rebase và merge"
 
+msgid "Recall what was said in meetings"
+msgstr "Xem lại những gì đã nói trong cuộc họp"
+
 msgid "Recent Activity"
 msgstr "Hoạt động gần đây"
 
@@ -16458,6 +16467,9 @@ msgstr "Phạm vi"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Việc tính điểm bắt đầu khi bảng xếp hạng có {0} ngày sử dụng."
+
+msgid "Scrape and crawl websites"
+msgstr "Thu thập và quét dữ liệu trang web"
 
 msgid "Screenshot copied"
 msgstr "Đã sao chép ảnh chụp màn hình"

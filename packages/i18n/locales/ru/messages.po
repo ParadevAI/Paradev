@@ -6477,6 +6477,9 @@ msgstr "Не работает"
 msgid "Debug"
 msgstr "Отладка"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Отладка сбойных запусков и повторный запуск функций"
+
 msgid "Debug with production stack traces"
 msgstr "Отладка по стек-трейсам из продакшена"
 
@@ -9882,6 +9885,9 @@ msgstr "Мысли команды Paradev о параллельных кодов
 
 msgid "Inspect branches and run SQL"
 msgstr "Просмотр веток и запуск SQL"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Просмотр таблиц и применение миграций"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "Перебазировать и объединить"
 msgid "Rebase and merge"
 msgstr "Перебазировать и объединить"
 
+msgid "Recall what was said in meetings"
+msgstr "Вспомнить, что говорили на встречах"
+
 msgid "Recent Activity"
 msgstr "Недавняя активность"
 
@@ -16458,6 +16467,9 @@ msgstr "Область"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Подсчёт очков начнётся, когда наберётся дней с активностью: {0}."
+
+msgid "Scrape and crawl websites"
+msgstr "Парсинг и обход веб-сайтов"
 
 msgid "Screenshot copied"
 msgstr "Снимок экрана скопирован"

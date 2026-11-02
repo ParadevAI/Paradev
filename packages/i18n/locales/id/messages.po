@@ -6477,6 +6477,9 @@ msgstr "Mati"
 msgid "Debug"
 msgstr "Debug"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Debug run yang gagal dan jalankan ulang fungsi"
+
 msgid "Debug with production stack traces"
 msgstr "Debug dengan stack trace produksi"
 
@@ -9882,6 +9885,9 @@ msgstr "Wawasan dari tim Paradev tentang agen coding paralel dan produktivitas d
 
 msgid "Inspect branches and run SQL"
 msgstr "Periksa branch dan jalankan SQL"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Periksa tabel dan terapkan migrasi"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "Rebase & Merge"
 msgid "Rebase and merge"
 msgstr "Rebase dan merge"
 
+msgid "Recall what was said in meetings"
+msgstr "Ingat kembali apa yang dibahas dalam rapat"
+
 msgid "Recent Activity"
 msgstr "Aktivitas Terbaru"
 
@@ -16458,6 +16467,9 @@ msgstr "Cakupan"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Penilaian dimulai setelah papan melihat {0} hari penggunaan."
+
+msgid "Scrape and crawl websites"
+msgstr "Scrape dan crawl situs web"
 
 msgid "Screenshot copied"
 msgstr "Tangkapan layar disalin"
