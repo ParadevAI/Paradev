@@ -4,6 +4,7 @@
 import { db } from "@superset/db/client";
 import { v2WorkspaceTypeValues } from "@superset/db/enums";
 import { type SelectV2Workspace, users } from "@superset/db/schema";
+import { isTestAccountEmail } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { Resend } from "resend";
@@ -23,7 +24,7 @@ async function exitActivationEmailCampaign(userId: string) {
 	});
 	const isRecentSignup =
 		user && Date.now() - user.createdAt.getTime() < ACTIVATION_EVENT_WINDOW_MS;
-	if (!isRecentSignup) return;
+	if (!isRecentSignup || isTestAccountEmail(user.email)) return;
 
 	const { error } = await resend.events.send({
 		event: "user.activated",
