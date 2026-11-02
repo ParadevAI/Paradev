@@ -938,4 +938,89 @@ suite("agent access against a migrated PostgreSQL", () => {
 			(await person(admin).agentRoutine.list({ agentId: agent.id }))[0]?.room,
 		).toMatchObject({ kind: "dm", channelId: dm.channelId });
 	});
+
+	test("a Dev reads a channel, a thread and the channel's tasks", async () => {
+		const { agent, token } = await agentWithChannel(admin);
+		const tools = asAgent(token).devTools;
+		const root = await person(admin).channelMessage.send({
+			channelId: privateChannel,
+			body: "who owns payroll?",
+			mentionedIds: [agent.id],
+			clientId: crypto.randomUUID(),
+		});
+		await person(admin).channelMessage.send({
+			channelId: privateChannel,
+			threadRootId: root.id,
+			body: "Avi, I think",
+			mentionedIds: [agent.id],
+			clientId: crypto.randomUUID(),
+		});
+		const page = await tools.readChannel({ channel: "#secret" });
+		expect(page.channel).toBe("#secret");
+		expect(
+			page.messages.find((m) => m.body === "who owns payroll?"),
+		).toMatchObject({
+			replies: 1,
+			thread: `channel:${privateChannel}/thread:${root.id}`,
+		});
+		const thread = await tools.readChannel({
+			channel: `channel:${privateChannel}/thread:${root.id}`,
+		});
+		expect(thread.messages.map((m) => m.body)).toEqual([
+			"who owns payroll?",
+			"Avi, I think",
+		]);
+	});
+
+	test("a Dev lists the tasks linked to a channel", async () => {
+		const { token } = await agentWithChannel(admin);
+		const { task } = await person(admin).task.create({ title: "Rotate keys" });
+		if (!task) throw Error("No task");
+		await person(admin).channelTask.add({
+			channelId: privateChannel,
+			taskId: task.id,
+		});
+		expect(
+			(
+				await asAgent(token).devTools.channelTasks({ channel: "secret" })
+			).tasks.map((t) => t.title),
+		).toContain("Rotate keys");
+	});
+
+	test("a Dev can't read a channel it or its person can't", async () => {
+		const { token } = await agentWithChannel(admin);
+		await expect(
+			asAgent(token).devTools.readChannel({ channel: "#other" }),
+		).rejects.toThrow("No channel by that name");
+		const outsiders = await agentWithChannel(outsider);
+		await expect(
+			asAgent(outsiders.token).devTools.channelTasks({ channel: "#secret" }),
+		).rejects.toThrow("No channel by that name");
+	});
+
+	test("a reply in a thread reaches the Dev with how the thread started", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await worker().agentWorker.settleTurn({
+			turnId: turn.id,
+			status: "completed",
+			steersConsumed: 0,
+		});
+		const root = await person(admin).channelMessage.send({
+			channelId: privateChannel,
+			body: "rotation for next week?",
+			mentionedIds: [agent.id],
+			clientId: crypto.randomUUID(),
+		});
+		await person(admin).channelMessage.send({
+			channelId: privateChannel,
+			threadRootId: root.id,
+			body: "and the week after",
+			mentionedIds: [agent.id],
+			clientId: crypto.randomUUID(),
+		});
+		const text = delivered.at(-1)?.text ?? "";
+		expect(text).toContain("<thread_start from=");
+		expect(text).toContain("rotation for next week?");
+		expect(text).toContain("and the week after");
+	});
 });
