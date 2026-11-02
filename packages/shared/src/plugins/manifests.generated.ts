@@ -893,6 +893,196 @@ export const FIRST_PARTY_MANIFESTS = {
 			}
 		]
 	} as const,
+	"inngest": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "inngest",
+		"version": "1.0.0",
+		"description": "Debug and operate Inngest: inspect runs and traces, send events, invoke and rerun functions, and query Insights.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"inngest",
+			"workflows",
+			"durable-execution",
+			"background-jobs",
+			"events"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Inngest",
+					"category": "Developer tools",
+					"icon": "inngest"
+				},
+				"connector": {
+					"slug": "inngest_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.inngest.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "debug-inngest-runs",
+				"description": "Find out why an Inngest function failed, stalled, or never ran — locate the run from the event or function, read its trace step by step, and fix or rerun only after the cause is known. Use when the user reports a failing or stuck Inngest function, a background job that did not happen, an event that triggered nothing, or asks to rerun, cancel, or replay runs."
+			}
+		]
+	} as const,
+	"supabase": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "supabase",
+		"version": "1.0.0",
+		"description": "Work with your Supabase projects: inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"supabase",
+			"postgres",
+			"database",
+			"sql",
+			"migrations",
+			"edge-functions"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Supabase",
+					"category": "Data & APIs",
+					"icon": "supabase"
+				},
+				"connector": {
+					"slug": "supabase_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.supabase.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "change-supabase-safely",
+				"description": "Inspect and change a Supabase project without surprises — pick the right project, read the schema before you write SQL, make schema changes as migrations, and check the advisors afterwards. Use when the user asks to query, change, or debug a Supabase database, add a table or column, write an RLS policy, read Supabase logs, or deploy an Edge Function."
+			}
+		]
+	} as const,
+	"firecrawl": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "firecrawl",
+		"version": "1.0.0",
+		"description": "Turn the web into agent-ready data with Firecrawl: search, scrape, map, and crawl sites, and parse documents.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"firecrawl",
+			"scraping",
+			"crawling",
+			"search",
+			"web-data"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Firecrawl",
+					"category": "Data & APIs",
+					"icon": "firecrawl"
+				},
+				"connector": {
+					"slug": "firecrawl_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "research-with-firecrawl",
+				"description": "Get web content into the conversation with the cheapest Firecrawl tool that does the job — scrape a known URL, search when there is no URL, map before you crawl, and hand multi-source questions to the agent. Use when the user asks to read, summarize, or extract data from web pages, research a topic across sites, collect a site's docs, or parse a PDF or document."
+			}
+		]
+	} as const,
+	"wispr": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "wispr",
+		"version": "1.0.0",
+		"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"wispr",
+			"wispr-flow",
+			"meetings",
+			"meeting-notes",
+			"transcripts",
+			"calendar"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Wispr Flow",
+					"category": "Productivity",
+					"icon": "wispr"
+				},
+				"connector": {
+					"slug": "wispr_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.wisprflow.ai/connect/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "find-in-wispr",
+				"description": "Answer \"what did we say or decide\" from Wispr Flow — narrow to the right meeting by date and people, read the notes before the transcript, and cite the meeting behind every claim. Use when the user asks what happened in a meeting, wants to prep for an upcoming one, or refers to a call, scratchpad note, or calendar event they captured with Wispr Flow."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

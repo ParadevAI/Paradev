@@ -522,6 +522,36 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "inngest",
+		version: "1.0.0",
+		description: "Debug runs and operate functions",
+		interface: { displayName: "Inngest", category: "Developer tools" },
+		mcpServers: {
+			inngest: { type: "http", url: "https://api.inngest.com/mcp" },
+		},
+	},
+	{
+		name: "firecrawl",
+		version: "1.0.0",
+		description: "Search, scrape, and crawl the web",
+		interface: { displayName: "Firecrawl", category: "Data & APIs" },
+		mcpServers: {
+			firecrawl: {
+				type: "http",
+				url: "https://mcp.firecrawl.dev/v2/mcp-oauth",
+			},
+		},
+	},
+	{
+		name: "wispr",
+		version: "1.0.0",
+		description: "Search your meeting notes and transcripts",
+		interface: { displayName: "Wispr Flow", category: "Productivity" },
+		mcpServers: {
+			wispr: { type: "http", url: "https://api.wisprflow.ai/connect/mcp" },
+		},
+	},
+	{
 		name: "superhuman",
 		version: "1.0.0",
 		description: "Search and manage your email",
