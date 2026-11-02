@@ -34,7 +34,7 @@ stub(posthog, {
 const { assertCloudAccess } = await import("./cloud-guards");
 
 const signedIn = (email: string, id = "user-1") => ({
-	userId: "user-1",
+	principal: { userId: "user-1" },
 	session: { user: { id, email } },
 });
 
@@ -103,7 +103,10 @@ describe("assertCloudAccess", () => {
 		flagResult = false;
 		storedEmail = null;
 		await expect(
-			assertCloudAccess({ userId: "user-1", session: null }, null),
+			assertCloudAccess(
+				{ principal: { userId: "user-1" }, session: null },
+				null,
+			),
 		).rejects.toThrow(/this account/);
 	});
 });

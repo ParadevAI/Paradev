@@ -232,7 +232,7 @@ async function assertOwnerMayUseCloud(
 		);
 	}
 	const { enabled } = await cloudAccess(
-		{ userId: automation.ownerUserId, session: null },
+		{ principal: { userId: automation.ownerUserId }, session: null },
 		automation.organizationId,
 	);
 	if (enabled === undefined) {

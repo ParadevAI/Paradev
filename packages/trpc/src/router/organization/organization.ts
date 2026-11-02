@@ -24,14 +24,10 @@ import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+import { isMember } from "../../lib/cloud-guards";
 import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
-import {
-	jwtProcedure,
-	personProcedure,
-	publicProcedure,
-	userError,
-} from "../../trpc";
+import { personProcedure, publicProcedure, userError } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { organizationMembersRouter } from "./members";
@@ -225,12 +221,12 @@ export const organizationRouter = {
 		return org ?? null;
 	}),
 
-	getActiveFromJwt: jwtProcedure.query(async ({ ctx }) => {
+	getActiveFromJwt: personProcedure.query(async ({ ctx }) => {
 		if (!ctx.activeOrganizationId) return null;
 
 		const membership = await db.query.members.findFirst({
 			where: and(
-				eq(members.userId, ctx.userId),
+				eq(members.userId, ctx.principal.userId),
 				eq(members.organizationId, ctx.activeOrganizationId),
 			),
 		});
@@ -243,14 +239,14 @@ export const organizationRouter = {
 		return org ?? null;
 	}),
 
-	getByIdFromJwt: jwtProcedure
+	getByIdFromJwt: personProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.id)) return null;
+			if (!(await isMember(ctx, input.id))) return null;
 
 			const membership = await db.query.members.findFirst({
 				where: and(
-					eq(members.userId, ctx.userId),
+					eq(members.userId, ctx.principal.userId),
 					eq(members.organizationId, input.id),
 				),
 			});
