@@ -175,6 +175,17 @@ describe("describeSchedule / fallback to Custom", () => {
 		);
 	});
 
+	it("returns Custom for a list of times or dates", () => {
+		for (const rrule of [
+			"FREQ=DAILY;BYHOUR=20,21,22,23,0,1,2;BYMINUTE=0",
+			"FREQ=DAILY;BYHOUR=9;BYMINUTE=0,30",
+			"FREQ=HOURLY;BYMINUTE=0,30",
+			"FREQ=MONTHLY;BYMONTHDAY=1,15;BYHOUR=9;BYMINUTE=0",
+		]) {
+			expect(describeSchedule(rrule, US)).toBe("Custom");
+		}
+	});
+
 	it("returns Custom for empty or malformed rules", () => {
 		expect(describeSchedule("", US)).toBe("Custom");
 		expect(describeSchedule("FREQ", US)).toBe("Custom");
@@ -239,6 +250,16 @@ describe("matchPreset", () => {
 
 	it("daily without BYHOUR → custom (our daily preset requires time)", () => {
 		expect(matchPreset("FREQ=DAILY")).toMatchObject({ kind: "custom" });
+	});
+
+	it("a list of hours or minutes → custom, so the picker cannot collapse it", () => {
+		for (const rrule of [
+			"FREQ=DAILY;BYHOUR=20,21,22,23,0,1,2;BYMINUTE=0",
+			"FREQ=WEEKLY;BYDAY=MO;BYHOUR=9;BYMINUTE=0,30",
+			"FREQ=HOURLY;BYMINUTE=0,30",
+		]) {
+			expect(matchPreset(rrule)).toEqual({ kind: "custom", rrule });
+		}
 	});
 
 	it("preserves the original rrule on custom fallback", () => {
