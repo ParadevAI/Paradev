@@ -6477,6 +6477,9 @@ msgstr "종료됨"
 msgid "Debug"
 msgstr "디버그"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "실패한 실행 디버그 및 함수 재실행"
+
 msgid "Debug with production stack traces"
 msgstr "프로덕션 스택 트레이스로 디버깅"
 
@@ -9882,6 +9885,9 @@ msgstr "병렬 코딩 에이전트와 개발자 생산성에 대한 Paradev 팀�
 
 msgid "Inspect branches and run SQL"
 msgstr "브랜치 확인 및 SQL 실행"
+
+msgid "Inspect tables and apply migrations"
+msgstr "테이블 확인 및 마이그레이션 적용"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "리베이스 후 머지"
 msgid "Rebase and merge"
 msgstr "리베이스 후 머지"
 
+msgid "Recall what was said in meetings"
+msgstr "회의에서 나온 이야기 다시 보기"
+
 msgid "Recent Activity"
 msgstr "최근 활동"
 
@@ -16458,6 +16467,9 @@ msgstr "범위"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "보드가 {0}일치 사용 기록을 확보하면 점수 산정이 시작됩니다."
+
+msgid "Scrape and crawl websites"
+msgstr "웹사이트 스크레이핑 및 크롤링"
 
 msgid "Screenshot copied"
 msgstr "스크린샷을 복사했습니다"

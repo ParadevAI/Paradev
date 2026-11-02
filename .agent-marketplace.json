@@ -206,6 +206,46 @@
 			"category": "development",
 			"source": "./plugins/sazabi",
 			"version": "1.0.0"
+		},
+		{
+			"name": "inngest",
+			"description": "Debug and operate Inngest: inspect runs and traces, send events, invoke and rerun functions, and query Insights.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "development",
+			"source": "./plugins/inngest",
+			"version": "1.0.0"
+		},
+		{
+			"name": "supabase",
+			"description": "Work with your Supabase projects: inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/supabase",
+			"version": "1.0.0"
+		},
+		{
+			"name": "firecrawl",
+			"description": "Turn the web into agent-ready data with Firecrawl: search, scrape, map, and crawl sites, and parse documents.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/firecrawl",
+			"version": "1.0.0"
+		},
+		{
+			"name": "wispr",
+			"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "productivity",
+			"source": "./plugins/wispr",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

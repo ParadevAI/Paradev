@@ -6477,6 +6477,9 @@ msgstr "Dead"
 msgid "Debug"
 msgstr "Debug"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Debug failed runs and rerun functions"
+
 msgid "Debug with production stack traces"
 msgstr "Debug with production stack traces"
 
@@ -9882,6 +9885,9 @@ msgstr "Insights from the Paradev team about parallel coding agents and develope
 
 msgid "Inspect branches and run SQL"
 msgstr "Inspect branches and run SQL"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Inspect tables and apply migrations"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "Rebase & Merge"
 msgid "Rebase and merge"
 msgstr "Rebase and merge"
 
+msgid "Recall what was said in meetings"
+msgstr "Recall what was said in meetings"
+
 msgid "Recent Activity"
 msgstr "Recent Activity"
 
@@ -16458,6 +16467,9 @@ msgstr "Scope"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Scoring starts once the board can see {0} days of usage."
+
+msgid "Scrape and crawl websites"
+msgstr "Scrape and crawl websites"
 
 msgid "Screenshot copied"
 msgstr "Screenshot copied"

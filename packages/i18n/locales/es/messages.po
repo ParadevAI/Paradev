@@ -6477,6 +6477,9 @@ msgstr "Muerta"
 msgid "Debug"
 msgstr "Depuración"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Depurar ejecuciones fallidas y volver a ejecutar funciones"
+
 msgid "Debug with production stack traces"
 msgstr "Depura con stack traces de producción"
 
@@ -9882,6 +9885,9 @@ msgstr "Análisis del equipo de Paradev sobre agentes de código en paralelo y p
 
 msgid "Inspect branches and run SQL"
 msgstr "Inspeccionar ramas y ejecutar SQL"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Inspeccionar tablas y aplicar migraciones"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "Rebase y fusionar"
 msgid "Rebase and merge"
 msgstr "Rebase y fusión"
 
+msgid "Recall what was said in meetings"
+msgstr "Recordar lo que se dijo en las reuniones"
+
 msgid "Recent Activity"
 msgstr "Actividad reciente"
 
@@ -16458,6 +16467,9 @@ msgstr "Alcance"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "La puntuación empieza cuando el tablero cuenta con {0} días de uso."
+
+msgid "Scrape and crawl websites"
+msgstr "Extraer y rastrear sitios web"
 
 msgid "Screenshot copied"
 msgstr "Captura de pantalla copiada"

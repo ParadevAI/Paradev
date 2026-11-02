@@ -1050,6 +1050,170 @@
 					}
 				}
 			]
+		},
+		"inngest_mcp": {
+			"displayName": "Inngest",
+			"icon": "inngest",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.inngest.com/mcp",
+					"scopes": [
+						"accounts:read:*",
+						"apps:read:*",
+						"apps:write:*",
+						"environments:read:*",
+						"environments:write:*",
+						"events:read:*",
+						"events:write:*",
+						"experiments:read:*",
+						"functions:read:*",
+						"functions:write:*",
+						"insights:read:*",
+						"runs:read:*",
+						"runs:write:*",
+						"sessions:read:*",
+						"webhooks:read:*",
+						"webhooks:write:*"
+					],
+					"identity": {
+						"url": "https://api.inngest.com/v2/account",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.data.id",
+							"label": "$.data.name"
+						},
+						"user": {
+							"id": "$.data.id",
+							"label": "$.data.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"supabase_mcp": {
+			"displayName": "Supabase",
+			"icon": "supabase",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.supabase.com/mcp",
+					"scopes": [
+						"organizations:read",
+						"projects:read",
+						"projects:write",
+						"database:read",
+						"database:write",
+						"analytics:read",
+						"secrets:read",
+						"edge_functions:read",
+						"edge_functions:write",
+						"environment:read",
+						"environment:write",
+						"storage:read",
+						"storage:write"
+					],
+					"identity": {
+						"url": "https://api.supabase.com/v1/organizations",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$[0].id",
+							"label": "$[0].name"
+						},
+						"user": {
+							"id": "$[0].id",
+							"label": "$[0].name"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"firecrawl_mcp": {
+			"displayName": "Firecrawl",
+			"icon": "firecrawl",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.firecrawl.dev/v2/mcp-oauth",
+					"scopes": ["firecrawl:global", "offline_access"],
+					"identity": {
+						"account": {
+							"id": "$.team_id"
+						},
+						"user": {
+							"id": "$.user_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"wispr_mcp": {
+			"displayName": "Wispr Flow",
+			"icon": "wispr",
+			"category": "Productivity",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.wisprflow.ai/connect/mcp",
+					"scopes": ["openid", "email", "profile", "offline_access"],
+					"identity": {
+						"url": "https://mcp-auth.wisprflow.com/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
 		}
 	}
 }

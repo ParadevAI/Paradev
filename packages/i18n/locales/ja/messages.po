@@ -6477,6 +6477,9 @@ msgstr "停止"
 msgid "Debug"
 msgstr "デバッグ"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "失敗した実行のデバッグと関数の再実行"
+
 msgid "Debug with production stack traces"
 msgstr "本番のスタックトレースでデバッグ"
 
@@ -9882,6 +9885,9 @@ msgstr "並列コーディングエージェントと開発者の生産性につ
 
 msgid "Inspect branches and run SQL"
 msgstr "ブランチの確認とSQLの実行"
+
+msgid "Inspect tables and apply migrations"
+msgstr "テーブルの確認とマイグレーションの適用"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "リベースしてマージ"
 msgid "Rebase and merge"
 msgstr "リベースしてマージ"
 
+msgid "Recall what was said in meetings"
+msgstr "会議での発言を振り返る"
+
 msgid "Recent Activity"
 msgstr "最近のアクティビティ"
 
@@ -16458,6 +16467,9 @@ msgstr "範囲"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "{0}日分の使用状況がそろうとスコアリングが始まります。"
+
+msgid "Scrape and crawl websites"
+msgstr "Webサイトのスクレイピングとクロール"
 
 msgid "Screenshot copied"
 msgstr "スクリーンショットをコピーしました"

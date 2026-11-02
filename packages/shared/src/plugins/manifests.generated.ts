@@ -893,6 +893,176 @@ export const FIRST_PARTY_MANIFESTS = {
 			}
 		]
 	} as const,
+	"inngest": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "inngest",
+		"version": "1.0.0",
+		"description": "Debug and operate Inngest: inspect runs and traces, send events, invoke and rerun functions, and query Insights.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"inngest",
+			"workflows",
+			"durable-execution",
+			"background-jobs",
+			"events"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Inngest",
+					"category": "Developer tools",
+					"icon": "inngest"
+				},
+				"connector": {
+					"slug": "inngest_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.inngest.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"supabase": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "supabase",
+		"version": "1.0.0",
+		"description": "Work with your Supabase projects: inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"supabase",
+			"postgres",
+			"database",
+			"sql",
+			"migrations",
+			"edge-functions"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Supabase",
+					"category": "Data & APIs",
+					"icon": "supabase"
+				},
+				"connector": {
+					"slug": "supabase_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.supabase.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"firecrawl": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "firecrawl",
+		"version": "1.0.0",
+		"description": "Turn the web into agent-ready data with Firecrawl: search, scrape, map, and crawl sites, and parse documents.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"firecrawl",
+			"scraping",
+			"crawling",
+			"search",
+			"web-data"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Firecrawl",
+					"category": "Data & APIs",
+					"icon": "firecrawl"
+				},
+				"connector": {
+					"slug": "firecrawl_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"wispr": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "wispr",
+		"version": "1.0.0",
+		"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"wispr",
+			"wispr-flow",
+			"meetings",
+			"meeting-notes",
+			"transcripts",
+			"calendar"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Wispr Flow",
+					"category": "Productivity",
+					"icon": "wispr"
+				},
+				"connector": {
+					"slug": "wispr_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.wisprflow.ai/connect/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

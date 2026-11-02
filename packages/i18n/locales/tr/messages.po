@@ -6477,6 +6477,9 @@ msgstr "Ölü"
 msgid "Debug"
 msgstr "Hata ayıklama"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Başarısız çalıştırmalarda hata ayıklayın ve fonksiyonları yeniden çalıştırın"
+
 msgid "Debug with production stack traces"
 msgstr "Üretim yığın izleriyle hata ayıklayın"
 
@@ -9882,6 +9885,9 @@ msgstr "Paradev ekibinden paralel kodlama ajanları ve geliştirici verimliliği
 
 msgid "Inspect branches and run SQL"
 msgstr "Branch'leri inceleyin ve SQL çalıştırın"
+
+msgid "Inspect tables and apply migrations"
+msgstr "Tabloları inceleyin ve migration'ları uygulayın"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -15158,6 +15164,9 @@ msgstr "Rebase ve birleştir"
 msgid "Rebase and merge"
 msgstr "Rebase ve birleştir"
 
+msgid "Recall what was said in meetings"
+msgstr "Toplantılarda söylenenleri hatırlayın"
+
 msgid "Recent Activity"
 msgstr "Son etkinlik"
 
@@ -16458,6 +16467,9 @@ msgstr "Kapsam"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Puanlama, tablo {0} günlük kullanım gördüğünde başlar."
+
+msgid "Scrape and crawl websites"
+msgstr "Web sitelerini kazıyın ve tarayın"
 
 msgid "Screenshot copied"
 msgstr "Ekran görüntüsü kopyalandı"
