@@ -54,7 +54,7 @@ export function getManagedArtifactGuardHookCommand(): string {
 // $PWD/superset-dev-data — without a leading dot — so we must recognize that
 // variant to reap stale notify.sh paths from deleted worktrees.
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =
-	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
 
 import { writeFileIfChanged } from "./write-file-if-changed";
 

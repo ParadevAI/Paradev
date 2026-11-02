@@ -1024,6 +1024,7 @@ exit 0
 		const cursorHooksPath = path.join(TEST_HOME_DIR, ".cursor", "hooks.json");
 		const staleHookPath =
 			"/tmp/worktree/superset-dev-data/hooks/cursor-hook.sh";
+		const paradevHookPath = "/Users/u/.paradev/hooks/cursor-hook.sh";
 		const currentHookPath = "/tmp/.superset-new/hooks/cursor-hook.sh";
 
 		mkdirSync(path.dirname(cursorHooksPath), { recursive: true });
@@ -1035,6 +1036,7 @@ exit 0
 					hooks: {
 						beforeSubmitPrompt: [
 							{ command: `${staleHookPath} Start` },
+							{ command: `${paradevHookPath} Start` },
 							{ command: "/usr/local/bin/custom-hook Start" },
 						],
 					},
@@ -1060,6 +1062,11 @@ exit 0
 		).toBe(true);
 		expect(
 			beforeSubmitPrompt.some((entry) => entry.command.includes(staleHookPath)),
+		).toBe(false);
+		expect(
+			beforeSubmitPrompt.some((entry) =>
+				entry.command.includes(paradevHookPath),
+			),
 		).toBe(false);
 		expect(
 			beforeSubmitPrompt.some(
