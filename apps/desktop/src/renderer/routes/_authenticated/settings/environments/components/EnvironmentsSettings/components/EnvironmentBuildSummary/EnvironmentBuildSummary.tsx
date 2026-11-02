@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
+import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { cn } from "@superset/ui/utils";
 import type { EnvironmentBuild } from "renderer/routes/_authenticated/utils/environmentBuildMeta";
-import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 
 interface EnvironmentBuildSummaryProps {
 	build: EnvironmentBuild | null | undefined;
@@ -22,15 +22,20 @@ export function EnvironmentBuildSummary({
 				: "bg-muted-foreground/40";
 	return (
 		<span className="flex w-44 shrink-0 items-center gap-2 text-xs text-muted-foreground">
-			{build?.status === "running" ? (
-				<AsciiSpinner className="w-1.5 text-xs leading-none" />
-			) : (
-				<span className={cn("size-1.5 shrink-0 rounded-full", dot)} />
-			)}
+			<span className="flex w-[11px] shrink-0 justify-center">
+				{build?.status === "running" ? (
+					<WaveSpinner className="text-foreground/80" />
+				) : (
+					<span className={cn("size-1.5 rounded-full", dot)} />
+				)}
+			</span>
 			{build?.status === "running" ? (
 				<Trans>Building</Trans>
 			) : build?.status === "failed" ? (
-				<Trans>Last build failed</Trans>
+				<Trans>
+					Build failed{" "}
+					{formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))}
+				</Trans>
 			) : build?.status === "succeeded" ? (
 				<Trans>
 					Built{" "}

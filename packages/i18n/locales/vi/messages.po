@@ -2361,9 +2361,6 @@ msgstr "Tất cả người phụ trách"
 msgid "All authors"
 msgstr "Tất cả tác giả"
 
-msgid "All builds"
-msgstr "Tất cả bản build"
-
 msgid "All changes saved"
 msgstr "Đã lưu mọi thay đổi"
 
@@ -3617,6 +3614,10 @@ msgstr "Bug"
 
 msgid "Bug reports"
 msgstr "Báo cáo lỗi"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "Build thất bại {0}"
 
 msgid "Build ID"
 msgstr "ID bản build"
@@ -10495,9 +10496,6 @@ msgstr "Tin nhắn agent gần nhất"
 msgid "Last attached"
 msgstr "Lần gắn cuối"
 
-msgid "Last build failed"
-msgstr "Bản build gần nhất thất bại"
-
 msgid "Last day of each month"
 msgstr "Ngày cuối mỗi tháng"
 
@@ -15728,9 +15726,6 @@ msgstr "Repository"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Các repository truy cập được qua bản cài đặt GitHub App."
-
-msgid "Repositories changed"
-msgstr "Đã thay đổi repository"
 
 msgid "Repositories refreshed"
 msgstr "Đã làm mới repository"

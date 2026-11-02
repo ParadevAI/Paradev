@@ -8,12 +8,12 @@ interface BuildIdCellProps {
 	buildId: string;
 }
 
-/** The id, with a copy button that shows while the row is hovered. */
+/** The id, with a copy button that shows while the cell is hovered. */
 export function BuildIdCell({ buildId }: BuildIdCellProps) {
 	const { t } = useLingui();
 	const { copyToClipboard, copied } = useCopyToClipboard(1500);
 	return (
-		<TableCell>
+		<TableCell className="group">
 			<div className="flex min-w-0 items-center gap-1">
 				<span className="truncate font-mono text-xs" title={buildId}>
 					{buildId}

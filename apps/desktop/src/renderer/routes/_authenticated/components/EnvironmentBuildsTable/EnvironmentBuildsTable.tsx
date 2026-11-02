@@ -54,7 +54,7 @@ export function EnvironmentBuildsTable({
 						</TableRow>
 					) : (
 						builds.map((build) => (
-							<TableRow className="group" key={build.id}>
+							<TableRow key={build.id}>
 								<BuildIdCell buildId={build.id} />
 								<TableCell>
 									{i18n._(BUILD_TRIGGER_LABELS[build.trigger])}

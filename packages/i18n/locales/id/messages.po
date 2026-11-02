@@ -2361,9 +2361,6 @@ msgstr "Semua penerima tugas"
 msgid "All authors"
 msgstr "Semua penulis"
 
-msgid "All builds"
-msgstr "Semua build"
-
 msgid "All changes saved"
 msgstr "Semua perubahan tersimpan"
 
@@ -3617,6 +3614,10 @@ msgstr "Bug"
 
 msgid "Bug reports"
 msgstr "Laporan bug"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "Build gagal {0}"
 
 msgid "Build ID"
 msgstr "ID build"
@@ -10495,9 +10496,6 @@ msgstr "Pesan agen terakhir"
 msgid "Last attached"
 msgstr "Terakhir terhubung"
 
-msgid "Last build failed"
-msgstr "Build terakhir gagal"
-
 msgid "Last day of each month"
 msgstr "Hari terakhir tiap bulan"
 
@@ -15728,9 +15726,6 @@ msgstr "Repositori"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Repositori yang bisa diakses lewat instalasi GitHub App."
-
-msgid "Repositories changed"
-msgstr "Repositori diubah"
 
 msgid "Repositories refreshed"
 msgstr "Repositori disegarkan"

@@ -2361,9 +2361,6 @@ msgstr "Tüm atananlar"
 msgid "All authors"
 msgstr "Tüm yazarlar"
 
-msgid "All builds"
-msgstr "Tüm derlemeler"
-
 msgid "All changes saved"
 msgstr "Tüm değişiklikler kaydedildi"
 
@@ -3617,6 +3614,10 @@ msgstr "Böcek"
 
 msgid "Bug reports"
 msgstr "Hata raporları"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "Derleme başarısız {0}"
 
 msgid "Build ID"
 msgstr "Derleme kimliği"
@@ -10495,9 +10496,6 @@ msgstr "Son ajan mesajı"
 msgid "Last attached"
 msgstr "Son bağlanma"
 
-msgid "Last build failed"
-msgstr "Son derleme başarısız oldu"
-
 msgid "Last day of each month"
 msgstr "Her ayın son günü"
 
@@ -15728,9 +15726,6 @@ msgstr "Depolar"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "GitHub App kurulumu üzerinden erişilebilen depolar."
-
-msgid "Repositories changed"
-msgstr "Depolar değişti"
 
 msgid "Repositories refreshed"
 msgstr "Depolar yenilendi"

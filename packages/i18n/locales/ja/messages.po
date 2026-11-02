@@ -2361,9 +2361,6 @@ msgstr "すべての担当者"
 msgid "All authors"
 msgstr "すべての作成者"
 
-msgid "All builds"
-msgstr "すべてのビルド"
-
 msgid "All changes saved"
 msgstr "すべての変更を保存しました"
 
@@ -3617,6 +3614,10 @@ msgstr "バグ"
 
 msgid "Bug reports"
 msgstr "バグ報告"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "ビルド失敗 {0}"
 
 msgid "Build ID"
 msgstr "ビルド ID"
@@ -10495,9 +10496,6 @@ msgstr "最後のエージェントメッセージ"
 msgid "Last attached"
 msgstr "最終接続"
 
-msgid "Last build failed"
-msgstr "前回のビルドが失敗しました"
-
 msgid "Last day of each month"
 msgstr "毎月末日"
 
@@ -15728,9 +15726,6 @@ msgstr "リポジトリ"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "GitHub Appのインストールからアクセスできるリポジトリです。"
-
-msgid "Repositories changed"
-msgstr "リポジトリを変更"
 
 msgid "Repositories refreshed"
 msgstr "リポジトリを更新しました"

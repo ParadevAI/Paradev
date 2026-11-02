@@ -2361,9 +2361,6 @@ msgstr "全部负责人"
 msgid "All authors"
 msgstr "所有作者"
 
-msgid "All builds"
-msgstr "所有构建"
-
 msgid "All changes saved"
 msgstr "所有更改已保存"
 
@@ -3617,6 +3614,10 @@ msgstr "虫子"
 
 msgid "Bug reports"
 msgstr "Bug 报告"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "构建失败 {0}"
 
 msgid "Build ID"
 msgstr "构建 ID"
@@ -10495,9 +10496,6 @@ msgstr "最近一条智能体消息"
 msgid "Last attached"
 msgstr "上次连接"
 
-msgid "Last build failed"
-msgstr "上次构建失败"
-
 msgid "Last day of each month"
 msgstr "每月最后一天"
 
@@ -15728,9 +15726,6 @@ msgstr "仓库"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "通过GitHub App安装可访问的仓库。"
-
-msgid "Repositories changed"
-msgstr "仓库已更改"
 
 msgid "Repositories refreshed"
 msgstr "仓库已刷新"

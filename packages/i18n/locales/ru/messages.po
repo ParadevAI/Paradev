@@ -2361,9 +2361,6 @@ msgstr "Все исполнители"
 msgid "All authors"
 msgstr "Все авторы"
 
-msgid "All builds"
-msgstr "Все сборки"
-
 msgid "All changes saved"
 msgstr "Все изменения сохранены"
 
@@ -3617,6 +3614,10 @@ msgstr "Жук"
 
 msgid "Bug reports"
 msgstr "Отчёты о багах"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "Сборка не удалась {0}"
 
 msgid "Build ID"
 msgstr "ID сборки"
@@ -10495,9 +10496,6 @@ msgstr "Последнее сообщение агента"
 msgid "Last attached"
 msgstr "Последнее подключение"
 
-msgid "Last build failed"
-msgstr "Последняя сборка не удалась"
-
 msgid "Last day of each month"
 msgstr "В последний день каждого месяца"
 
@@ -15728,9 +15726,6 @@ msgstr "Репозитории"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Репозитории, доступные через установку GitHub App."
-
-msgid "Repositories changed"
-msgstr "Репозитории изменены"
 
 msgid "Repositories refreshed"
 msgstr "Репозитории обновлены"

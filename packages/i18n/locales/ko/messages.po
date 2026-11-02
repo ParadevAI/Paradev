@@ -2361,9 +2361,6 @@ msgstr "모든 담당자"
 msgid "All authors"
 msgstr "모든 작성자"
 
-msgid "All builds"
-msgstr "모든 빌드"
-
 msgid "All changes saved"
 msgstr "모든 변경 사항 저장됨"
 
@@ -3617,6 +3614,10 @@ msgstr "버그"
 
 msgid "Bug reports"
 msgstr "버그 신고"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "빌드 실패 {0}"
 
 msgid "Build ID"
 msgstr "빌드 ID"
@@ -10495,9 +10496,6 @@ msgstr "마지막 에이전트 메시지"
 msgid "Last attached"
 msgstr "마지막 연결"
 
-msgid "Last build failed"
-msgstr "마지막 빌드 실패"
-
 msgid "Last day of each month"
 msgstr "매월 마지막 날"
 
@@ -15728,9 +15726,6 @@ msgstr "리포지토리"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "GitHub App 설치를 통해 접근할 수 있는 리포지토리입니다."
-
-msgid "Repositories changed"
-msgstr "리포지토리 변경됨"
 
 msgid "Repositories refreshed"
 msgstr "리포지토리를 새로 고쳤습니다"

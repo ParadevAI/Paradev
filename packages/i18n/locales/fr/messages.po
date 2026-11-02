@@ -2361,9 +2361,6 @@ msgstr "Tous les assignés"
 msgid "All authors"
 msgstr "Tous les auteurs"
 
-msgid "All builds"
-msgstr "Toutes les compilations"
-
 msgid "All changes saved"
 msgstr "Toutes les modifications sont enregistrées"
 
@@ -3617,6 +3614,10 @@ msgstr "Bug"
 
 msgid "Bug reports"
 msgstr "Signalements de bugs"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Build failed {0}"
+msgstr "Compilation échouée {0}"
 
 msgid "Build ID"
 msgstr "ID de compilation"
@@ -10495,9 +10496,6 @@ msgstr "Dernier message de l’agent"
 msgid "Last attached"
 msgstr "Dernier attachement"
 
-msgid "Last build failed"
-msgstr "La dernière compilation a échoué"
-
 msgid "Last day of each month"
 msgstr "Dernier jour de chaque mois"
 
@@ -15728,9 +15726,6 @@ msgstr "Dépôts"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Dépôts accessibles via l'installation de la GitHub App."
-
-msgid "Repositories changed"
-msgstr "Dépôts modifiés"
 
 msgid "Repositories refreshed"
 msgstr "Dépôts actualisés"
