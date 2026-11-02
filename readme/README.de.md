@@ -292,13 +292,13 @@ Siehe [**DEVELOPMENT.md**](../DEVELOPMENT.md) für die komplette Anleitung: was 
 
 ## Konfiguration
 
-Konfiguriere Setup-, Teardown- und Run-Skripte für Arbeitsbereiche in `.superset/config.json`. Siehe die [vollständige Dokumentation](https://docs.paradev.com/setup-teardown-scripts).
+Konfiguriere Setup-, Teardown- und Run-Skripte für Arbeitsbereiche in `.paradev/config.json`. Siehe die [vollständige Dokumentation](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

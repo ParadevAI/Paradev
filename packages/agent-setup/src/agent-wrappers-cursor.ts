@@ -13,7 +13,7 @@ import {
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
-import { getHooksDir, resolveUserHomeDir } from "./paths";
+import { APP_HOME_DIR_NAME, getHooksDir, resolveUserHomeDir } from "./paths";
 
 export const CURSOR_HOOK_SCRIPT_NAME = "cursor-hook.sh";
 
@@ -41,6 +41,7 @@ export function getCursorHookScriptContent(): string {
 	);
 	return template
 		.replace("{{MARKER}}", CURSOR_HOOK_MARKER)
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME)
 		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
 }
 

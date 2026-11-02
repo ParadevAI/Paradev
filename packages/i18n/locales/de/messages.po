@@ -4602,8 +4602,8 @@ msgstr "Cloud-Workspaces ignorieren diese Variable. Agenten melden sich stattdes
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloud-Workspaces brauchen den Team- oder Ultra-Plan. Upgraden Sie in Einstellungen, Abrechnung, um einen zu starten."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Cloud-Arbeitsbereiche öffnen sich darauf, und seine .superset/config.json führt die Einrichtung aus. Die anderen werden daneben ausgecheckt."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Cloud-Arbeitsbereiche öffnen sich darauf, und seine Paradev-Konfiguration führt die Einrichtung aus. Die anderen werden daneben ausgecheckt."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Cloud-Workspaces führen {agentLabel} damit nicht mehr aus."
@@ -10752,9 +10752,6 @@ msgstr "Diese Aufgabe verknüpfen"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} mit Arbeitsbereich verknüpft"
 
-msgid "Linked to {projectName}"
-msgstr "Verknüpft mit {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Noch keine Downloads"
 msgid "No emoji found"
 msgstr "Kein Emoji gefunden"
 
-msgid "No environments are linked to this project yet."
-msgstr "Mit diesem Projekt ist noch keine Umgebung verknüpft."
-
 msgid "No environments available"
 msgstr "Keine Umgebungen verfügbar"
 
 msgid "No environments found."
 msgstr "Keine Umgebungen gefunden."
+
+msgid "No environments linked to this project."
+msgstr "Mit diesem Projekt ist keine Umgebung verknüpft."
 
 msgid "No environments yet."
 msgstr "Noch keine Umgebungen. Erstelle eine, um daraus einen Cloud-Arbeitsbereich zu starten."
@@ -18906,8 +18903,8 @@ msgstr "Der Cloud-Arbeitsbereich hätte starten sollen, hat aber nicht rechtzeit
 msgid "The code expired. Start again."
 msgstr "Der Code ist abgelaufen. Starte erneut."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Die Befehle aus .superset/config.toml, mit denen Paradev die Arbeitsbereiche dieses Projekts einrichtet, startet und archiviert."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Die Befehle aus der config.toml des Repositorys, mit denen Paradev die Arbeitsbereiche dieses Projekts einrichtet, startet und archiviert."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Das Unternehmen hat eine Seed-Finanzierungsrunde über 11,5 Mio. US-Dollar abgeschlossen, angeführt von Union Square Ventures, mit Y Combinator und Paul Graham. TechCrunch zählte es zu den herausragenden Startups des YC Demo Day."
@@ -19580,9 +19577,6 @@ msgstr "Dieser Subagent kann gerade nicht in den Hintergrund verschoben werden"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Dieser Subagent wird vom Host nicht mehr verfolgt. Sein Protokoll bleibt auf der Festplatte im Sitzungsverzeichnis des Agenten."
-
-msgid "This task is in a channel you can't see"
-msgstr "Diese Aufgabe ist in einem Kanal, den du nicht sehen kannst"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Dieses Terminal hat noch keine Ausgabe zum Übergeben."

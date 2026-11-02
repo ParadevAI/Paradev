@@ -1,15 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { PluginSkillSource } from "./managed-skills";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export function installedPluginsFilePath(): string {
-	return path.join(
-		resolveSupersetHomeDir(),
-		"plugins",
-		"installed_plugins.json",
-	);
+	return path.join(resolveAppHomeDir(), "plugins", "installed_plugins.json");
 }
 
 interface InstalledPluginRecord {

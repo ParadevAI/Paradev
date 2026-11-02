@@ -211,3 +211,12 @@ seed_missing_env_placeholders() {
   success "Seeded ${#missing_lines[@]} placeholder(s) into $env_file: $missing_keys"
   return 0
 }
+
+# The installed app's home: ~/.superset until the installed app has moved it.
+prod_app_home() {
+  if [ -d "$HOME/.superset" ] && [ ! -L "$HOME/.superset" ]; then
+    echo "$HOME/.superset"
+  else
+    echo "$HOME/.paradev"
+  fi
+}

@@ -35,7 +35,7 @@ These flags are accepted by every command:
 ### scripts
 
 Reusable terminal launches. These are called terminal scripts in the app;
-setup, run, and teardown entries in `.superset/config.json` are project
+setup, run, and teardown entries in `.paradev/config.json` (or an existing `.superset/config.json`) are project
 lifecycle scripts. The legacy `presets` command name remains an alias.
 
 <Command
@@ -160,12 +160,12 @@ Authentication and session inspection.
 		},
 		{
 			flag: "--api-key <key>",
-			description: "Store a Paradev API key (`sk_live_…`) at `~/.superset/config.json` instead of running the OAuth flow.",
+			description: "Store a Paradev API key (`sk_live_…`) at `~/.paradev/config.json` instead of running the OAuth flow.",
 		},
 	]}
 >
 Authenticate via browser OAuth and store a session token at
-`~/.superset/config.json`.
+`~/.paradev/config.json`.
 
 Single-org accounts are selected automatically. With multiple orgs and a
 TTY, the CLI prompts; with multiple orgs and no TTY, you must pass
@@ -178,7 +178,7 @@ superset auth login --organization acme
 
 To sign in with an API key (useful for CI or any environment where the
 OAuth browser flow isn't an option), pass `--api-key`. The CLI validates
-the key, stores it at `~/.superset/config.json`, and clears any prior
+the key, stores it at `~/.paradev/config.json`, and clears any prior
 OAuth session.
 
 ```bash
@@ -494,7 +494,7 @@ active one.
 	]}
 	output={`{ id: string; name: string; slug: string }`}
 >
-Set the active organization in `~/.superset/config.json`.
+Set the active organization in `~/.paradev/config.json`.
 
 ```bash
 superset organization switch acme
@@ -831,7 +831,7 @@ supports local workspaces; older hosts reject it without creating a worktree.
 `--local` selects this machine and is independent of `--checkout local`.
 
 Pass `--session` explicitly to create a **session**: a project-less workspace backed
-by a managed folder under `~/.superset/sessions`, initialized as its own git
+by a managed folder under `~/.paradev/sessions`, initialized as its own git
 repo. Sessions have no branch semantics, so `--branch`, `--pr`, `--task`,
 `--base-branch`, `--checkout`, `--skip-branch-prefix`, and `--tag` are rejected, `--name` is
 optional, and the output has no `alreadyExists` field. Host workspace creation
@@ -1067,7 +1067,7 @@ List the repositories the organization's GitHub App can see. These are what `--r
 	options={[
 		{ flag: "--name <name>", description: "Environment name. Required." },
 		{ flag: "--repo <owner/name>", description: "Repository it checks out. Required; repeatable." },
-		{ flag: "--primary-repo <owner/name>", description: "Repository a workspace opens on and whose `.superset` config runs. Default: the first `--repo`." },
+		{ flag: "--primary-repo <owner/name>", description: "Repository a workspace opens on and whose Paradev config runs. Default: the first `--repo`." },
 		{ flag: "--scope <personal|organization>", description: "Who can use it. Default: `organization`." },
 		{ flag: "--region <region>", description: "Where its workspaces run, e.g. `iad1` or `fra1`. Default: the region nearest you." },
 	]}
@@ -2777,7 +2777,7 @@ superset schema | jq '.commands[] | select(.path == ["terminals"]) | .commands[]
 
 ### config
 
-Inspect the CLI's local config file: `config.json` under `~/.superset`, or
+Inspect the CLI's local config file: `config.json` under `~/.paradev`, or
 under `$SUPERSET_HOME_DIR` when that is set.
 
 <Command name="superset config check">

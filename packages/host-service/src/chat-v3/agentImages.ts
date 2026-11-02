@@ -20,6 +20,7 @@ import { MAX_CHAT_IMAGE_BYTES } from "@superset/shared/attachment-limits";
 import {
 	sanitizeAttachmentFileName,
 	WORKSPACE_ATTACHMENTS_DIR,
+	WORKSPACE_ATTACHMENTS_GITIGNORE,
 } from "@superset/shared/workspace-attachments";
 import mimeTypes from "mime-types";
 
@@ -38,12 +39,12 @@ function stemFor(name: string | undefined): string {
 	return sanitized ?? "image";
 }
 
-function attachmentsDir(cwd: string): string {
+export function attachmentsDir(cwd: string): string {
 	const dir = join(cwd, WORKSPACE_ATTACHMENTS_DIR);
 	mkdirSync(dir, { recursive: true });
 	try {
 		closeSync(openSync(join(dir, ".gitignore"), "wx"));
-		writeFileSync(join(dir, ".gitignore"), "*\n");
+		writeFileSync(join(dir, ".gitignore"), WORKSPACE_ATTACHMENTS_GITIGNORE);
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
 	}

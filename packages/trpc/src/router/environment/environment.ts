@@ -288,7 +288,7 @@ export const environmentRouter = {
 				organizationId: z.string().uuid(),
 				name: z.string().min(1).max(100),
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20),
-				/** The repository a workspace opens on; its `.superset` config runs. */
+				/** The repository a workspace opens on; its Paradev config runs. */
 				primaryRepositoryId: z.string().uuid(),
 				scope: z.enum(environmentScopeValues).default("organization"),
 				/** Where its boxes run; the region nearest the caller when omitted. */

@@ -7,6 +7,7 @@ import {
 	CommandItem,
 	CommandList,
 	CommandSeparator,
+	defaultFilter,
 } from "@superset/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { useState } from "react";
@@ -25,8 +26,10 @@ import {
 export interface EnvironmentOption {
 	id: string;
 	name: string;
-	scope?: "organization" | "personal";
 }
+
+const searchValue = (environment: EnvironmentOption) =>
+	`${environment.name} ${environment.id}`;
 
 interface EnvironmentPickerPillProps {
 	selectedEnvironment: EnvironmentOption | undefined;
@@ -51,7 +54,15 @@ export function EnvironmentPickerPill({
 }: EnvironmentPickerPillProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
+	const [search, setSearch] = useState("");
 	const needsSetup = !isLoading && linked.length === 0 && other.length === 0;
+	const showNoneLinked =
+		!!projectName &&
+		linked.length === 0 &&
+		other.some(
+			(environment) =>
+				!search || defaultFilter(searchValue(environment), search) > 0,
+		);
 	const pick = (environmentId: string) => {
 		onSelectEnvironment(environmentId);
 		setOpen(false);
@@ -59,16 +70,11 @@ export function EnvironmentPickerPill({
 	const renderItem = (environment: EnvironmentOption) => (
 		<CommandItem
 			key={environment.id}
-			value={`${environment.name} ${environment.id}`}
+			value={searchValue(environment)}
 			onSelect={() => pick(environment.id)}
 		>
 			<LuContainer className="size-4 text-muted-foreground" />
 			<span className="flex-1 truncate">{environment.name}</span>
-			{environment.scope === "personal" && (
-				<span className="text-[10px] text-muted-foreground">
-					<Trans>Only you</Trans>
-				</span>
-			)}
 			{environment.id === selectedEnvironment?.id && (
 				<HiCheck className="size-4 shrink-0" />
 			)}
@@ -76,7 +82,13 @@ export function EnvironmentPickerPill({
 	);
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover
+			open={open}
+			onOpenChange={(nextOpen) => {
+				setOpen(nextOpen);
+				if (!nextOpen) setSearch("");
+			}}
+		>
 			<PopoverTrigger asChild>
 				<FormPickerTrigger className="max-w-[160px]">
 					{needsSetup ? (
@@ -104,6 +116,8 @@ export function EnvironmentPickerPill({
 			>
 				<Command>
 					<CommandInput
+						value={search}
+						onValueChange={setSearch}
 						placeholder={t({
 							message: "Search environments...",
 						})}
@@ -112,21 +126,13 @@ export function EnvironmentPickerPill({
 						<CommandEmpty className="px-3 py-3 text-center text-xs text-muted-foreground">
 							<Trans>No environments found.</Trans>
 						</CommandEmpty>
-						{projectName && (
-							<CommandGroup
-								forceMount={linked.length === 0}
-								heading={t({ message: `Linked to ${projectName}` })}
-							>
-								{linked.length === 0 ? (
-									<p className="px-2 pt-0.5 pb-1.5 text-xs leading-snug text-muted-foreground">
-										<Trans>
-											No environments are linked to this project yet.
-										</Trans>
-									</p>
-								) : (
-									linked.map(renderItem)
-								)}
-							</CommandGroup>
+						{showNoneLinked && (
+							<p className="px-3 pt-2.5 pb-2 text-xs leading-snug text-muted-foreground">
+								<Trans>No environments linked to this project.</Trans>
+							</p>
+						)}
+						{linked.length > 0 && (
+							<CommandGroup>{linked.map(renderItem)}</CommandGroup>
 						)}
 						{other.length > 0 && (
 							<>

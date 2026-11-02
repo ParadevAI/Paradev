@@ -3,6 +3,7 @@ import {
 	attachmentNameWithSuffix,
 	sanitizeAttachmentFileName,
 	WORKSPACE_ATTACHMENTS_DIR,
+	WORKSPACE_ATTACHMENTS_GITIGNORE,
 } from "@superset/shared/workspace-attachments";
 import { fileToBase64 } from "renderer/lib/file-to-base64";
 
@@ -142,7 +143,7 @@ export async function uploadPastedFiles(options: {
 	const ignoreOutcome = await deps.writeFile({
 		workspaceId,
 		absolutePath: `${dirAbs}/.gitignore`,
-		content: "*\n",
+		content: WORKSPACE_ATTACHMENTS_GITIGNORE,
 		options: { create: true, overwrite: false },
 	});
 	if (ignoreOutcome.ok === false && ignoreOutcome.reason !== "exists") {

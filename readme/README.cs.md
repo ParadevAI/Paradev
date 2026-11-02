@@ -292,13 +292,13 @@ Kompletního průvodce najdete v [**DEVELOPMENT.md**](../DEVELOPMENT.md): co dě
 
 ## Konfigurace
 
-Nakonfigurujte skripty setup, teardown a run pracovního prostoru v `.superset/config.json`. Viz [úplná dokumentace](https://docs.paradev.com/setup-teardown-scripts).
+Nakonfigurujte skripty setup, teardown a run pracovního prostoru v `.paradev/config.json`. Viz [úplná dokumentace](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

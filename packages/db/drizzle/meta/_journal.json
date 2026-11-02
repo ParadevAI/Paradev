@@ -1275,6 +1275,27 @@
       "when": 1793484147154,
       "tag": "0181_automation_group",
       "breakpoints": true
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1793572485694,
+      "tag": "0182_channel_task_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 183,
+      "version": "7",
+      "when": 1793572489433,
+      "tag": "0183_channel_tasks_into_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1793572726455,
+      "tag": "0184_drop_channel_tasks",
+      "breakpoints": true
     }
   ]
 }

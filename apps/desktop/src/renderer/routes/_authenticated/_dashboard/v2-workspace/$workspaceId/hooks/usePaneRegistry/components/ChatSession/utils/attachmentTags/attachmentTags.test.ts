@@ -36,6 +36,17 @@ describe("attachmentTags", () => {
 		});
 	});
 
+	it("reads tags in the .paradev attachments folder and the pre-rename .superset one", () => {
+		const message = [
+			'<attachment path=".paradev/attachments/new.png" type="image/png" />',
+			'<attachment path=".superset/attachments/old.png" type="image/png" />',
+		].join("\n");
+
+		expect(parseAttachmentTags(message).attachments.map((a) => a.path)).toEqual(
+			[".paradev/attachments/new.png", ".superset/attachments/old.png"],
+		);
+	});
+
 	it("leaves tags that point outside the workspace attachments folder as plain text", () => {
 		const message = [
 			'<attachment path=".superset/attachments/../../../etc/passwd" type="image/png" />',

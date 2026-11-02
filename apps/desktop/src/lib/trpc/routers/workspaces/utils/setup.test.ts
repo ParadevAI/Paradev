@@ -1,20 +1,33 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PROJECTS_DIR_NAME, SUPERSET_DIR_NAME } from "shared/constants";
-import { loadSetupConfig, mergeConfigs } from "./setup";
+import { PROJECTS_DIR_NAME } from "shared/constants";
+import {
+	copySupersetConfigToWorktree,
+	loadSetupConfig,
+	mergeConfigs,
+} from "./setup";
 
 const TEST_DIR = join(tmpdir(), `superset-test-setup-${process.pid}`);
 const MAIN_REPO = join(TEST_DIR, "main-repo");
 const WORKTREE = join(TEST_DIR, "worktree");
 const PROJECT_ID = "test-project-id";
-const USER_CONFIG_DIR = join(
-	homedir(),
-	SUPERSET_DIR_NAME,
-	PROJECTS_DIR_NAME,
-	PROJECT_ID,
-);
+const TEST_APP_HOME = join(TEST_DIR, "app-home");
+const USER_CONFIG_DIR = join(TEST_APP_HOME, PROJECTS_DIR_NAME, PROJECT_ID);
+const ORIGINAL_SUPERSET_HOME_DIR = process.env.SUPERSET_HOME_DIR;
+
+beforeEach(() => {
+	process.env.SUPERSET_HOME_DIR = TEST_APP_HOME;
+});
+
+afterEach(() => {
+	if (ORIGINAL_SUPERSET_HOME_DIR === undefined) {
+		delete process.env.SUPERSET_HOME_DIR;
+	} else {
+		process.env.SUPERSET_HOME_DIR = ORIGINAL_SUPERSET_HOME_DIR;
+	}
+});
 
 describe("loadSetupConfig", () => {
 	beforeEach(() => {
@@ -701,5 +714,29 @@ describe("run config", () => {
 
 		const config = loadSetupConfig({ mainRepoPath: MAIN_REPO });
 		expect(config?.run).toEqual(["export DEBUG=1", "npm run dev"]);
+	});
+});
+
+describe("copySupersetConfigToWorktree", () => {
+	afterEach(() => {
+		rmSync(TEST_DIR, { recursive: true, force: true });
+	});
+
+	test("fills in config files a worktree's existing .paradev is missing", () => {
+		mkdirSync(join(MAIN_REPO, ".paradev", "attachments"), { recursive: true });
+		writeFileSync(join(MAIN_REPO, ".paradev", "config.json"), "{}");
+		writeFileSync(join(MAIN_REPO, ".paradev", "setup.sh"), "echo hi");
+		writeFileSync(join(MAIN_REPO, ".paradev", "task-x.md"), "task");
+		writeFileSync(join(MAIN_REPO, ".paradev", "attachments", "a.png"), "");
+		mkdirSync(join(WORKTREE, ".paradev"), { recursive: true });
+		writeFileSync(join(WORKTREE, ".paradev", "settings.json"), "mine");
+
+		copySupersetConfigToWorktree(MAIN_REPO, WORKTREE);
+
+		expect(existsSync(join(WORKTREE, ".paradev", "config.json"))).toBe(true);
+		expect(existsSync(join(WORKTREE, ".paradev", "setup.sh"))).toBe(true);
+		expect(existsSync(join(WORKTREE, ".paradev", "settings.json"))).toBe(true);
+		expect(existsSync(join(WORKTREE, ".paradev", "attachments"))).toBe(false);
+		expect(existsSync(join(WORKTREE, ".paradev", "task-x.md"))).toBe(false);
 	});
 });

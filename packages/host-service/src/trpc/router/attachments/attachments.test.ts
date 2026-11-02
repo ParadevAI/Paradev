@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import type { HostServiceContext } from "../../../types";
 import { attachmentsRouter } from "./attachments";
 import { MAX_INLINE_ATTACHMENT_BYTES } from "./constants";
@@ -229,13 +230,13 @@ describe("attachmentsRouter.delete", () => {
 });
 
 describe("getAttachmentsRoot", () => {
-	it("falls back to ~/.superset/host/standalone when HOST_MANIFEST_DIR is blank", () => {
+	it("falls back to the app home's host/standalone when HOST_MANIFEST_DIR is blank", () => {
 		const original = process.env.HOST_MANIFEST_DIR;
 		process.env.HOST_MANIFEST_DIR = "";
 		try {
 			const root = getAttachmentsRoot();
 			expect(root).toBe(
-				join(homedir(), ".superset", "host", "standalone", "attachments"),
+				join(resolveAppHomeDir(), "host", "standalone", "attachments"),
 			);
 		} finally {
 			if (original === undefined) delete process.env.HOST_MANIFEST_DIR;
@@ -249,7 +250,7 @@ describe("getAttachmentsRoot", () => {
 		try {
 			const root = getAttachmentsRoot();
 			expect(root).toBe(
-				join(homedir(), ".superset", "host", "standalone", "attachments"),
+				join(resolveAppHomeDir(), "host", "standalone", "attachments"),
 			);
 		} finally {
 			if (original === undefined) delete process.env.HOST_MANIFEST_DIR;

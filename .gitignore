@@ -55,11 +55,12 @@ mise.toml
 out
 next-env.d.ts
 
-# Superset (track scripts/config; ignore generated workspace artifacts)
+# Paradev (track scripts/config; ignore generated workspace artifacts)
 .superset/ports.json
 .superset/config.local.json
 .superset/config.local.toml
 .superset/attachments/
+.paradev/attachments/
 
 # tsbuildinfo
 *.tsbuildinfo

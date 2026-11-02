@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Make a repository Paradev (formerly Superset)-ready by writing .superset/config.toml (install, setup, terminals, archive, ports) so every new workspace, local or cloud, comes up configured, converting an old .superset/config.json, then verifying with a real workspace. Use when the user wants to set up a project or repo for Paradev, configure workspace setup scripts, convert config.json to config.toml, or fix a failing workspace setup ("new workspaces don't have node_modules", "my .env is missing in workspaces", "setup script isn't running").
+description: Make a repository Paradev (formerly Superset)-ready by writing .paradev/config.toml (install, setup, terminals, archive, ports) so every new workspace, local or cloud, comes up configured, converting an old config.json, then verifying with a real workspace. Use when the user wants to set up a project or repo for Paradev, configure workspace setup scripts, convert config.json to config.toml, or fix a failing workspace setup ("new workspaces don't have node_modules", "my .env is missing in workspaces", "setup script isn't running").
 argument-hint: optional notes about the project's setup needs
 allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
@@ -19,11 +19,13 @@ Work out what a fresh workspace needs, and ask about anything ambiguous:
 - Env files: `.env` is usually gitignored, so a new worktree needs it copied from the main checkout or generated from `.env.example`
 - Services (docker-compose, databases), the dev command and its ports
 - Monorepo layout (does a step need a `cwd`?)
-- What is already in `.superset/`: `config.toml`, or the old `config.json`, `config.local.json` and `ports.json`
+- Where the config lives. New repos use `.paradev/`. A repo set up before the rename has it in `.superset/`, which Paradev still reads: keep editing it there (a `.paradev/` folder holding only pdev's `settings.json`, `agents/` or `prompts/` does not count). Note what is already there: `config.toml`, or the old `config.json`, `config.local.json` and `ports.json`
 
-## 2. Write `.superset/config.toml`
+## 2. Write `config.toml`
 
-**If the repo still has `.superset/config.json`, convert it.** `config.json` is the old format: Paradev reads `config.toml` first and ignores `config.json` when both exist. Tell the user, translate it, and delete `config.json` and `ports.json` in the same change.
+In the folder from step 1 (`.paradev/` for a new repo; for a repo still on `.superset/`, read `.superset/` wherever the examples below say `.paradev/`). Moving an existing `.superset/` to `.paradev/` is optional; do it only if the user asks, in one commit: move its files into `.paradev/` (keep pdev's files already there; `git mv .superset .paradev` is only right when `.paradev/` doesn't exist), and change `./.superset/` paths in the config's commands and in scripts to `./.paradev/`.
+
+**If the repo still has `config.json`, convert it.** `config.json` is the old format: Paradev reads `config.toml` first and ignores `config.json` when both exist. Tell the user, translate it, and delete `config.json` and `ports.json` in the same change.
 
 | `config.json` | `config.toml` |
 |---|---|
@@ -31,7 +33,7 @@ Work out what a fresh workspace needs, and ask about anything ambiguous:
 | `teardown` | `[archive]` (outside cleanup only, see below) |
 | `run` | `[terminals.dev]` with `default = true` |
 | `cwd` | `cwd` on each table |
-| `.superset/<key>.sh` found by name | written out in `run` |
+| `<key>.sh` in the config folder, found by name | written out in `run` |
 | `config.local.json` with `before`/`after` | `config.local.toml` with full `run` lists |
 
 The format:
@@ -41,10 +43,10 @@ The format:
 run = ["bun install"]
 
 [setup]                       # get this workspace ready
-run = ["./.superset/setup.sh"]
+run = ["./.paradev/setup.sh"]
 
 [setup.cloud]                 # replaces keys of [setup] in the cloud
-run = ["./.superset/setup.cloud.sh"]
+run = ["./.paradev/setup.cloud.sh"]
 
 [terminals.dev]               # long-running
 run = "bun dev"
@@ -78,7 +80,7 @@ Rules:
 - Keep `setup` idempotent and fast; put workspace-independent installs in `[install]`.
 - `[archive]` is for outside resources (a database branch, `docker compose down`). Paradev already stops processes and deletes the worktree.
 - Copy secrets and `.env` from the main checkout (`$SUPERSET_ROOT_PATH`) at setup time; never commit them.
-- Personal tweaks go in `.superset/config.local.toml` in the main checkout. It is gitignored, applies to every worktree, is merged over the shared file, and the cloud never reads it.
+- Personal tweaks go in `config.local.toml`, next to `config.toml` in the main checkout. It is gitignored, applies to every worktree, is merged over the shared file, and the cloud never reads it.
 
 Show the user the proposed files and get explicit approval before writing.
 
