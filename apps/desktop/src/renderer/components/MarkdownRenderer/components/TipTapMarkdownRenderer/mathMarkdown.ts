@@ -147,6 +147,13 @@ function blockMathRule(
 				closingLine = line;
 				break;
 			}
+			if (text.includes("$$")) {
+				// A `$$` with text after it is not a closer, and scanning past it
+				// would pull that text into the math: `$$\nx\n$$ and text\n$$`
+				// used to render `and text` as LaTeX and drop it from the
+				// document (#7856 review). Stop here, like the first line does.
+				return false;
+			}
 			lines.push(text);
 		}
 		if (closingLine < 0) {

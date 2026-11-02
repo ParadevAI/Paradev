@@ -159,6 +159,20 @@ describe("math", () => {
 		);
 	});
 
+	it("does not swallow text that follows a rejected closing delimiter", () => {
+		// `$$ and text` is not a closer. Scanning past it to the next `$$` pulled
+		// `and text` into the LaTeX, so the preview showed it as math and the
+		// document lost it (#7856 review).
+		const markdown = "$$\nx\n$$ and text\n$$";
+		const editor = createEditor(markdown);
+		try {
+			expect(mathNodes(editor)).toEqual([]);
+			expect(editor.getText()).toContain("and text");
+		} finally {
+			editor.destroy();
+		}
+	});
+
 	it("leaves currency alone", () => {
 		const editor = createEditor("It costs $5 and $10 today.");
 		try {
