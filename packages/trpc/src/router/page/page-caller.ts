@@ -27,9 +27,7 @@ export async function pageCaller(ctx: {
 	const userId = onBehalfOf(principal);
 	await verifyOrgMembership(userId, organizationId);
 	const reader =
-		principal.kind === "person" || principal.askerId === principal.ownerId
-			? userId
-			: null;
+		principal.kind === "person" || principal.ownerAsks ? userId : null;
 	return { organizationId, userId, reader };
 }
 

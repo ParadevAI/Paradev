@@ -20,7 +20,7 @@ import {
 import { posthog } from "../../lib/analytics";
 import { workerProcedure } from "../../trpc";
 import { announceAgentChanged } from "./agents-changed";
-import { reconcileDevs } from "./reconcile";
+import { deliverWaiting, reconcileDevs } from "./reconcile";
 import { fireDueRoutines } from "./routines";
 import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
@@ -289,6 +289,9 @@ export const agentWorkerRouter = {
 			});
 			// A retried settle runs this again; the parent hears each turn once.
 			await afterTaskTurn(turnId);
+			await deliverWaiting(settled.agentId).catch((error) =>
+				console.error("[agent-worker] waiting messages not delivered", error),
+			);
 			return {
 				settled: true,
 				sessionStore: await sessionStoreFor(settled.sessionId),

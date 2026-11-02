@@ -6,6 +6,7 @@ import {
 	type SelectChannelMember,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
+import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import type { DevPrincipal, Principal } from "../../principal";
@@ -100,12 +101,14 @@ export async function loadChannelAccessFor(
 	}
 	const [dev, asker] = await Promise.all([
 		devChannelAccess(principal, channelId),
-		loadChannelAccess(principal.askerId, channelId).catch(() => null),
+		loadChannelAccess(principal.askerId, channelId).catch((error) => {
+			if (error instanceof TRPCError && error.code === "NOT_FOUND") return null;
+			throw error;
+		}),
 	]);
-	const readable =
-		principal.askerId === principal.ownerId
-			? Boolean(dev || asker)
-			: Boolean(dev && asker);
+	const readable = principal.ownerAsks
+		? Boolean(dev || asker)
+		: Boolean(dev && asker);
 	const channel = dev?.channel ?? asker?.channel;
 	if (!readable || channel?.organizationId !== principal.organizationId) {
 		throw channelNotFound();

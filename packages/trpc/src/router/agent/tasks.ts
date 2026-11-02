@@ -508,7 +508,13 @@ async function reportToParent(
 		.limit(1);
 	const parentSessionId = row?.session.parentSessionId;
 	const requestedByUserId = row?.session.requestedByUserId;
-	if (!row || !parentSessionId || !requestedByUserId) return;
+	if (!row || !parentSessionId) return;
+	if (!requestedByUserId) {
+		console.warn(
+			`[agent-tasks] report for session ${sessionId} dropped: the person who asked for the task is gone`,
+		);
+		return;
+	}
 	const { session, task } = row;
 	const [agent] = await db
 		.select({ id: agents.id, organizationId: agents.organizationId })

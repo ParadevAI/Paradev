@@ -126,10 +126,10 @@ function devToolsServer(caller: Caller): McpServer {
 		"read_channel",
 		{
 			description:
-				"Read a channel or thread you're in: who said what, oldest first. `channel` is a name (#roster) or a reply_to target (channel:<id> or channel:<id>/thread:<id>). Read before answering when the message refers to earlier talk. For more, pass the returned `before`. Top-level messages give each thread's target and reply count.",
+				"Read a channel or thread you can read for this turn: who said what, oldest first. `channel` is a name (#roster) or a reply_to target (channel:<id> or channel:<id>/thread:<id>). Read before answering when the message refers to earlier talk. For more, pass the returned `before`. Top-level messages give each thread's target and reply count.",
 			inputSchema: {
 				channel: z.string(),
-				before: z.number().int().optional(),
+				before: z.number().int().positive().optional(),
 				limit: z.number().int().min(1).max(50).optional(),
 			},
 		},

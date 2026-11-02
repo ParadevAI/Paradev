@@ -47,7 +47,7 @@ export async function reconcileDevs(
 		});
 	};
 
-	for (const message of await undeliveredMessages(organizationId)) {
+	for (const message of await undeliveredMessages({ organizationId })) {
 		await startTurnsForMessage(
 			{ id: message.channelId, kind: message.channelKind },
 			message,
@@ -75,7 +75,29 @@ export async function reconcileDevs(
 	return report;
 }
 
-async function undeliveredMessages(organizationId: string | undefined) {
+/** Messages to a Dev that waited for another person's turn, as soon as it settles. */
+export async function deliverWaiting(agentId: string) {
+	for (const message of await undeliveredMessages({
+		agentId,
+		waitedOnly: true,
+	})) {
+		await startTurnsForMessage(
+			{ id: message.channelId, kind: message.channelKind },
+			message,
+			message.authorId,
+		);
+	}
+}
+
+async function undeliveredMessages({
+	organizationId,
+	agentId,
+	waitedOnly = false,
+}: {
+	organizationId?: string;
+	agentId?: string;
+	waitedOnly?: boolean;
+}) {
 	const { rows } = await db.execute<{
 		id: string;
 		channelId: string;
@@ -93,10 +115,12 @@ async function undeliveredMessages(organizationId: string | undefined) {
 		join auth.users u on u.id = m.author_id
 		join channel_members cm on cm.channel_id = m.channel_id
 		join agents a on a.id = cm.actor_id and a.archived_at is null and a.paused_at is null
-		where m.created_at between now() - ${DELIVERY_WINDOW}::interval and now() - ${DELIVERY_GRACE}::interval
+		where m.created_at between now() - ${DELIVERY_WINDOW}::interval
+			and now() - ${waitedOnly ? "0 seconds" : DELIVERY_GRACE}::interval
 			and m.deleted_at is null and m.subtype is null
 			and (c.kind = 'dm' or a.id = any(m.mentioned_ids))
 			${organizationId ? sql`and c.organization_id = ${organizationId}` : sql``}
+			${agentId ? sql`and a.id = ${agentId}` : sql``}
 			and not exists (
 				select 1 from agent_turns t
 				where t.agent_id = a.id

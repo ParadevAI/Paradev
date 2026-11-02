@@ -38,6 +38,7 @@ type TurnReason = (typeof agentTurns.$inferInsert)["reason"];
 export type TurnOutcome =
 	| { turnId: string; outcome: "started" }
 	| { turnId: string; outcome: "joined"; steerSeq: number }
+	| { outcome: "waiting" }
 	| { turnId: string; outcome: "duplicate"; running: boolean };
 
 interface Prompt {
@@ -109,6 +110,11 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 			.onConflictDoNothing()
 			.returning({ id: agentTurns.id });
 		if (started) return { turnId: started.id, outcome: "started" };
+		// A message joins only a turn for the same person; another person's waits
+		// for its own turn, so a turn never answers two people with one's access.
+		const samePersonOnly = prompt.triggerMessageId
+			? eq(agentTurns.actingUserId, prompt.actingUserId)
+			: undefined;
 		const [joined] = await db
 			.update(agentTurns)
 			.set({
@@ -119,6 +125,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 					eq(agentTurns.sessionId, sessionId),
 					eq(agentTurns.status, "running"),
 					sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
+					samePersonOnly,
 				),
 			)
 			.returning({
@@ -127,6 +134,19 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 			});
 		if (joined) {
 			return { turnId: joined.id, outcome: "joined", steerSeq: joined.steers };
+		}
+		if (samePersonOnly) {
+			const [another] = await db
+				.select({ id: agentTurns.id })
+				.from(agentTurns)
+				.where(
+					and(
+						eq(agentTurns.sessionId, sessionId),
+						eq(agentTurns.status, "running"),
+					),
+				)
+				.limit(1);
+			if (another) return { outcome: "waiting" };
 		}
 	}
 	throw agentNotFound();
@@ -137,6 +157,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
  * may not have landed; the workflow drops prompt ids it has seen.
  */
 async function deliver(sessionId: string, turn: TurnOutcome, prompt: Prompt) {
+	if (turn.outcome === "waiting") return;
 	if (turn.outcome === "duplicate" && !turn.running) return;
 	const temporal = await agentTemporal();
 	const { promptId, text, actingUserId } = prompt;
@@ -374,6 +395,7 @@ export async function startTurnsForMessage(
 			return;
 		}
 	}
+	if (work.size === 0) return;
 	await deliverToMains({
 		work: [...work.values()],
 		text: await messageEvent({
@@ -680,7 +702,11 @@ export async function redeliverMessage({
 	reason: TurnReason;
 }): Promise<boolean> {
 	const [row] = await db
-		.select({ message: channelMessages, channel: channels, author: users.name })
+		.select({
+			message: channelMessages,
+			channel: channels,
+			author: { id: users.id, name: users.name, deletedAt: users.deletedAt },
+		})
 		.from(channelMessages)
 		.innerJoin(channels, eq(channels.id, channelMessages.channelId))
 		.leftJoin(users, eq(users.id, channelMessages.authorId))
@@ -688,7 +714,7 @@ export async function redeliverMessage({
 			and(eq(channelMessages.id, messageId), isNull(channelMessages.deletedAt)),
 		)
 		.limit(1);
-	const authorId = row?.author ? row.message.authorId : null;
+	const authorId = row?.author && !row.author.deletedAt ? row.author.id : null;
 	if (!row || !authorId) return false;
 	await submitPrompt({
 		agent,
@@ -697,7 +723,7 @@ export async function redeliverMessage({
 		promptId,
 		text: await messageEvent({
 			channel: row.channel,
-			authorName: row.author ?? undefined,
+			authorName: row.author?.name ?? undefined,
 			message: row.message,
 		}),
 		reason,
