@@ -9569,9 +9569,6 @@ msgstr "GitHub kullanıcı adı"
 msgid "GitHub username..."
 msgstr "GitHub kullanıcı adı..."
 
-msgid "GitHub username…"
-msgstr "GitHub kullanıcı adı…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Claude Code, Codex veya herhangi bir CLI ajanına kendi workspace'ini ve branch'ini verin, ardından her değişikliği tek bir yerde inceleyin."
 
@@ -13858,6 +13855,8 @@ msgstr "Eklentinizi Paradev deposuna ekleyen bir pull request açın. İnceleyip
 
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "İnceleme durumunu, kontrolleri ve yorumları görmek için bir pull request açın."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "İnceleme durumunu, kontrolleri ve yorumları görmek için bir çekme veya birleştirme isteği açın."
 
 msgid "Open actions menu"
 msgstr "Eylemler menüsünü aç"
@@ -13918,6 +13917,9 @@ msgstr "Claude Code, Codex, OpenCode ve Pi oturumlarını sohbet olarak aç"
 
 msgid "Open Command Palette"
 msgstr "Komut paletini aç"
+
+msgid "Open comment on {providerName}"
+msgstr "Yorumu {providerName}'da aç"
 
 msgid "Open comment on GitHub"
 msgstr "Yorumu GitHub'da aç"
@@ -14110,6 +14112,9 @@ msgstr "Menüyü aç"
 
 msgid "Open navigation"
 msgstr "Gezinmeyi aç"
+
+msgid "Open on {providerName}"
+msgstr "{providerName}'da aç"
 
 msgid "Open on GitHub"
 msgstr "GitHub'da aç"
@@ -22057,6 +22062,9 @@ msgstr "Daha fazla göster"
 
 msgid "View name"
 msgstr "Görünüm adı"
+
+msgid "View on {providerName}"
+msgstr "{providerName}'da görüntüle"
 
 msgid "View on GitHub"
 msgstr "GitHub'da görüntüle"

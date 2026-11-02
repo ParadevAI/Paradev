@@ -9569,9 +9569,6 @@ msgstr "GitHubのユーザー名"
 msgid "GitHub username..."
 msgstr "GitHubユーザー名..."
 
-msgid "GitHub username…"
-msgstr "GitHubユーザー名…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Claude Code、Codex、その他の CLI エージェントそれぞれに専用のワークスペースとブランチを用意し、すべての変更を一か所でレビューできます。"
 
@@ -13858,6 +13855,8 @@ msgstr "Paradevリポジトリにプラグインを追加するプルリクエ�
 
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "プルリクエストを開くと、レビュー状態、チェック、コメントを確認できます。"
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "プルリクエストまたはマージリクエストを開いて、レビュー状況、チェック、コメントを表示します。"
 
 msgid "Open actions menu"
 msgstr "アクションメニューを開く"
@@ -13918,6 +13917,9 @@ msgstr "Claude Code、Codex、OpenCode、Pi のセッションをチャットと
 
 msgid "Open Command Palette"
 msgstr "コマンドパレットを開く"
+
+msgid "Open comment on {providerName}"
+msgstr "{providerName}でコメントを開く"
 
 msgid "Open comment on GitHub"
 msgstr "GitHubでコメントを開く"
@@ -14110,6 +14112,9 @@ msgstr "メニューを開く"
 
 msgid "Open navigation"
 msgstr "ナビゲーションを開く"
+
+msgid "Open on {providerName}"
+msgstr "{providerName}で開く"
 
 msgid "Open on GitHub"
 msgstr "GitHubで開く"
@@ -22057,6 +22062,9 @@ msgstr "もっと見る"
 
 msgid "View name"
 msgstr "ビュー名"
+
+msgid "View on {providerName}"
+msgstr "{providerName}で表示"
 
 msgid "View on GitHub"
 msgstr "GitHubで表示"

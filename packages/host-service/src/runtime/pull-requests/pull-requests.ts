@@ -14,7 +14,12 @@ import {
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
 import { getLocalProject } from "../../projects/local-project-store";
+import { getSupportedRemotes } from "../../trpc/router/project/utils/git-remote";
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
+import {
+	execGlab as defaultExecGlab,
+	type ExecGlab,
+} from "../../trpc/router/workspace-creation/utils/exec-glab";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
 import {
@@ -44,6 +49,12 @@ import type {
 	GitHubPullRequestNode,
 	GitHubPullRequestReviewDecision,
 } from "./utils/github-query/types";
+import {
+	fetchOpenPullRequestsFromGlab,
+	fetchPullRequestByHeadFromGlab,
+	fetchPullRequestChecksFromGlab,
+	fetchPullRequestReviewDecisionFromGlab,
+} from "./utils/gitlab-query";
 import {
 	type ChecksStatus,
 	coerceChecksStatus,
@@ -97,7 +108,7 @@ function upstreamKey(
 	return `${owner.toLowerCase()}/${repo.toLowerCase()}#${branch}`;
 }
 
-type RepoProvider = "github";
+type RepoProvider = "github" | "gitlab";
 
 export interface PullRequestStateSnapshot {
 	url: string;
@@ -147,6 +158,7 @@ export interface WorkspacePullRequestHistory {
 export interface PullRequestRuntimeManagerOptions {
 	db: HostDb;
 	execGh: ExecGh;
+	execGlab?: ExecGlab;
 	git: GitFactory;
 	github: () => Promise<Octokit>;
 	gitWatcher: GitWatcher;
@@ -164,6 +176,7 @@ interface NormalizedRepoIdentity {
 	name: string;
 	url: string;
 	remoteName: string;
+	repoPath: string;
 	// Null when the repo can't be opened. Drives the default-branch link guard.
 	defaultBranch: string | null;
 }
@@ -286,6 +299,7 @@ export class PullRequestRuntimeManager {
 		worktreePath: string,
 	) => Promise<WorkspaceRefsSnapshot>;
 	private readonly worktreeExists: (worktreePath: string) => boolean;
+	private readonly execGlab: ExecGlab;
 	// Worktrees deleted out from under us (external `rm`, crashed teardown).
 	// While a workspace is listed here, sync attempts cost one existsSync and
 	// spawn no git; the probe timer re-enters the normal sync path when the
@@ -299,6 +313,7 @@ export class PullRequestRuntimeManager {
 		this.db = options.db;
 		this.conditionalGh = new ConditionalGh(options.execGh);
 		this.execGh = this.conditionalGh.exec;
+		this.execGlab = options.execGlab ?? defaultExecGlab;
 		this.git = options.git;
 		this.github = options.github;
 		this.gitWatcher = options.gitWatcher;
@@ -864,6 +879,7 @@ export class PullRequestRuntimeManager {
 			this.noteWorktreeMissing(workspace.id, workspace.worktreePath);
 			return null;
 		}
+		if (!workspace.projectId) return null;
 		this.noteWorktreePresent(workspace.id);
 		try {
 			const { branch, headSha, upstream } = await this.readWorkspaceRefs(
@@ -871,12 +887,43 @@ export class PullRequestRuntimeManager {
 			);
 			if (!branch) return null;
 
-			const upstreamOwner = upstream?.owner ?? null;
-			const upstreamRepo = upstream?.name ?? null;
-			const upstreamBranch = upstream?.branch ?? null;
-			const pullRequestId =
-				upstream ||
-				this.pullRequestHeadMatches(workspace.pullRequestId, headSha)
+			const project = this.db
+				.select({
+					repoProvider: projects.repoProvider,
+					repoUrl: projects.repoUrl,
+				})
+				.from(projects)
+				.where(eq(projects.id, workspace.projectId))
+				.get();
+			const upstreamProviderMismatch =
+				upstream?.provider !== undefined &&
+				project?.repoProvider !== null &&
+				project?.repoProvider !== undefined &&
+				upstream.provider !== project.repoProvider;
+			const projectHost =
+				project?.repoProvider === "gitlab" && project.repoUrl
+					? (() => {
+							try {
+								return new URL(project.repoUrl).hostname.toLowerCase();
+							} catch {
+								return null;
+							}
+						})()
+					: null;
+			const upstreamHostMismatch =
+				upstream?.provider === "gitlab" &&
+				projectHost !== null &&
+				upstream.host !== undefined &&
+				upstream.host !== projectHost;
+			const upstreamMismatch = upstreamProviderMismatch || upstreamHostMismatch;
+			const matchingUpstream = upstreamMismatch ? null : upstream;
+			const upstreamOwner = matchingUpstream?.owner ?? null;
+			const upstreamRepo = matchingUpstream?.name ?? null;
+			const upstreamBranch = matchingUpstream?.branch ?? null;
+			const pullRequestId = upstreamMismatch
+				? null
+				: matchingUpstream ||
+						this.pullRequestHeadMatches(workspace.pullRequestId, headSha)
 					? workspace.pullRequestId
 					: null;
 
@@ -1136,55 +1183,82 @@ export class PullRequestRuntimeManager {
 		const project = getLocalProject(this.db, projectId);
 		if (!project) return null;
 
-		let identity: Omit<NormalizedRepoIdentity, "defaultBranch">;
+		let identity: Omit<NormalizedRepoIdentity, "defaultBranch"> | null = null;
 		if (
-			project.repoProvider === "github" &&
+			(project.repoProvider === "github" ||
+				project.repoProvider === "gitlab") &&
 			project.repoOwner &&
 			project.repoName &&
 			project.repoUrl &&
 			project.remoteName
 		) {
 			identity = {
-				provider: "github",
+				provider: project.repoProvider,
 				owner: project.repoOwner,
 				name: project.repoName,
 				url: project.repoUrl,
 				remoteName: project.remoteName,
+				repoPath: project.repoPath,
 			};
-		} else {
-			const remoteName = "origin";
-			let remoteUrl: string;
-			// The construct sits inside the try: a repoPath that vanished from
-			// disk throws GitConstructError, which is "no repo" here, not a
-			// refresh failure to warn about every sweep.
-			try {
-				const git = await this.git(project.repoPath);
-				const value = await git.remote(["get-url", remoteName]);
-				if (typeof value !== "string") {
-					return null;
-				}
-				remoteUrl = value.trim();
-			} catch {
-				return null;
-			}
-
-			const parsedRemote = parseGitHubRemote(remoteUrl);
-			if (!parsedRemote) return null;
-
-			this.db
-				.update(projects)
-				.set({
-					repoProvider: parsedRemote.provider,
-					repoOwner: parsedRemote.owner,
-					repoName: parsedRemote.name,
-					repoUrl: parsedRemote.url,
-					remoteName,
-				})
-				.where(eq(projects.id, projectId))
-				.run();
-
-			identity = { ...parsedRemote, remoteName };
 		}
+
+		// Re-resolve the current remote so projects created before provider
+		// support was added, or projects whose metadata is stale, can recover.
+		// Keep valid stored metadata as a fallback when the repository is absent
+		// or the provider is temporarily unavailable.
+		try {
+			const git = await this.git(project.repoPath);
+			const remotes = await getSupportedRemotes(git, async (host) => {
+				try {
+					await this.execGlab(["auth", "status", "--hostname", host], {
+						cwd: project.repoPath,
+					});
+					return true;
+				} catch {
+					return false;
+				}
+			});
+			const configuredRemoteName =
+				project.remoteName && remotes.has(project.remoteName)
+					? project.remoteName
+					: null;
+			const remoteName =
+				(project.repoProvider === "gitlab"
+					? configuredRemoteName
+					: (configuredRemoteName ??
+						(remotes.has("origin")
+							? "origin"
+							: remotes.keys().next().value))) ?? null;
+			if (remoteName) {
+				const parsedRemote = remotes.get(remoteName);
+				if (parsedRemote) {
+					identity = {
+						...parsedRemote,
+						remoteName,
+						repoPath: project.repoPath,
+					};
+					this.db
+						.update(projects)
+						.set({
+							repoProvider: parsedRemote.provider,
+							repoOwner: parsedRemote.owner,
+							repoName: parsedRemote.name,
+							repoUrl: parsedRemote.url,
+							remoteName,
+						})
+						.where(eq(projects.id, projectId))
+						.run();
+				}
+			} else if (project.repoProvider === "gitlab") {
+				// Do not fall back to stale metadata when the GitLab remote is
+				// currently unauthenticated or unavailable.
+				identity = null;
+			}
+		} catch {
+			// Fall back to stored metadata below.
+		}
+
+		if (!identity) return null;
 
 		const defaultBranch = await this.resolveDefaultBranch(project.repoPath);
 		return { ...identity, defaultBranch };
@@ -1492,6 +1566,7 @@ export class PullRequestRuntimeManager {
 		// Branch stays case-sensitive so two case-variant branches can't share
 		// a cache entry and return each other's PR.
 		const cacheKey = [
+			repo.provider,
 			repo.owner.toLowerCase(),
 			repo.name.toLowerCase(),
 			head.owner.toLowerCase(),
@@ -1503,23 +1578,34 @@ export class PullRequestRuntimeManager {
 			cacheKey,
 			options,
 			() =>
-				this.fetchFromGitHub(
-					"PR head lookup",
-					{ owner: repo.owner, name: repo.name, head },
-					() =>
-						fetchPullRequestByHeadFromGh(
-							this.execGh,
-							{ owner: repo.owner, name: repo.name },
+				repo.provider === "gitlab"
+					? fetchPullRequestByHeadFromGlab(
+							this.execGlab,
+							{
+								owner: repo.owner,
+								name: repo.name,
+								host: new URL(repo.url).host,
+							},
 							head,
+							repo.repoPath,
+						)
+					: this.fetchFromGitHub(
+							"PR head lookup",
+							{ owner: repo.owner, name: repo.name, head },
+							() =>
+								fetchPullRequestByHeadFromGh(
+									this.execGh,
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
+							async () =>
+								fetchPullRequestByHead(
+									await this.github(),
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
+							{ probe: options.bypassCache === true },
 						),
-					async () =>
-						fetchPullRequestByHead(
-							await this.github(),
-							{ owner: repo.owner, name: repo.name },
-							head,
-						),
-					{ probe: options.bypassCache === true },
-				),
 		);
 	}
 
@@ -1542,6 +1628,24 @@ export class PullRequestRuntimeManager {
 			cacheKey,
 			{ ...options, fingerprint: node.headRefOid },
 			async () => {
+				if (repo.provider === "gitlab") {
+					const [reviewDecision, checks] = await Promise.all([
+						fetchPullRequestReviewDecisionFromGlab(
+							this.execGlab,
+							{ ...repo, host: new URL(repo.url).host },
+							node.number,
+							node.state,
+							repo.repoPath,
+						),
+						fetchPullRequestChecksFromGlab(
+							this.execGlab,
+							{ ...repo, host: new URL(repo.url).host },
+							node.headRefOid,
+							repo.repoPath,
+						),
+					]);
+					return { reviewDecision, checks, isInMergeQueue: null };
+				}
 				const [reviewDecision, checks] = await this.fetchFromGitHub(
 					"PR review/check lookup",
 					context,
@@ -1612,27 +1716,37 @@ export class PullRequestRuntimeManager {
 		repo: NormalizedRepoIdentity,
 		options: { bypassCache?: boolean } = {},
 	): Promise<GitHubPullRequestNode[]> {
-		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}`;
+		const cacheKey = `${repo.provider}/${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}`;
 		return this.cachedGitHubFetch(
 			this.openPullRequestsCache,
 			cacheKey,
 			options,
 			() =>
-				this.fetchFromGitHub(
-					"open-PR sweep",
-					{ owner: repo.owner, name: repo.name },
-					() =>
-						fetchOpenPullRequestsFromGh(this.execGh, {
-							owner: repo.owner,
-							name: repo.name,
-						}),
-					async () =>
-						fetchOpenPullRequests(await this.github(), {
-							owner: repo.owner,
-							name: repo.name,
-						}),
-					{ probe: options.bypassCache === true },
-				),
+				repo.provider === "gitlab"
+					? fetchOpenPullRequestsFromGlab(
+							this.execGlab,
+							{
+								owner: repo.owner,
+								name: repo.name,
+								host: new URL(repo.url).host,
+							},
+							repo.repoPath,
+						)
+					: this.fetchFromGitHub(
+							"open-PR sweep",
+							{ owner: repo.owner, name: repo.name },
+							() =>
+								fetchOpenPullRequestsFromGh(this.execGh, {
+									owner: repo.owner,
+									name: repo.name,
+								}),
+							async () =>
+								fetchOpenPullRequests(await this.github(), {
+									owner: repo.owner,
+									name: repo.name,
+								}),
+							{ probe: options.bypassCache === true },
+						),
 		);
 	}
 

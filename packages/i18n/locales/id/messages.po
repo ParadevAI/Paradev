@@ -9569,9 +9569,6 @@ msgstr "Username GitHub"
 msgid "GitHub username..."
 msgstr "Nama pengguna GitHub..."
 
-msgid "GitHub username…"
-msgstr "Username GitHub…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Beri Claude Code, Codex, atau agen CLI apa pun workspace dan branch sendiri, lalu tinjau setiap perubahan di satu tempat."
 
@@ -13858,6 +13855,8 @@ msgstr "Buka pull request yang menambahkannya ke repositori Paradev. Kami meninj
 
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Buka sebuah pull request untuk melihat status review, check, dan komentar."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "Buka pull request atau merge request untuk melihat status tinjauan, pemeriksaan, dan komentar."
 
 msgid "Open actions menu"
 msgstr "Buka menu aksi"
@@ -13918,6 +13917,9 @@ msgstr "Buka sesi Claude Code, Codex, OpenCode, dan Pi sebagai obrolan"
 
 msgid "Open Command Palette"
 msgstr "Buka Command Palette"
+
+msgid "Open comment on {providerName}"
+msgstr "Buka komentar di {providerName}"
 
 msgid "Open comment on GitHub"
 msgstr "Buka komentar di GitHub"
@@ -14110,6 +14112,9 @@ msgstr "Buka menu"
 
 msgid "Open navigation"
 msgstr "Buka navigasi"
+
+msgid "Open on {providerName}"
+msgstr "Buka di {providerName}"
 
 msgid "Open on GitHub"
 msgstr "Buka di GitHub"
@@ -22057,6 +22062,9 @@ msgstr "Lihat selengkapnya"
 
 msgid "View name"
 msgstr "Nama tampilan"
+
+msgid "View on {providerName}"
+msgstr "Lihat di {providerName}"
 
 msgid "View on GitHub"
 msgstr "Lihat di GitHub"

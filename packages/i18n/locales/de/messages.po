@@ -9569,9 +9569,6 @@ msgstr "GitHub-Benutzername"
 msgid "GitHub username..."
 msgstr "GitHub-Benutzername..."
 
-msgid "GitHub username…"
-msgstr "GitHub-Benutzername…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Gib Claude Code, Codex oder jedem CLI-Agenten einen eigenen Workspace und Branch und prüfe dann jede Änderung an einem Ort."
 
@@ -13858,6 +13855,8 @@ msgstr "Öffne einen Pull Request, der es zum Paradev-Repository hinzufügt. Wir
 
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Öffne einen Pull Request, um Review-Status, Prüfungen und Kommentare zu sehen."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "Öffne einen Pull Request oder Merge Request, um den Review-Status, Prüfungen und Kommentare zu sehen."
 
 msgid "Open actions menu"
 msgstr "Aktionsmenü öffnen"
@@ -13918,6 +13917,9 @@ msgstr "Claude-Code-, Codex-, OpenCode- und Pi-Sitzungen als Chats öffnen"
 
 msgid "Open Command Palette"
 msgstr "Befehlspalette öffnen"
+
+msgid "Open comment on {providerName}"
+msgstr "Kommentar auf {providerName} öffnen"
 
 msgid "Open comment on GitHub"
 msgstr "Kommentar auf GitHub öffnen"
@@ -14110,6 +14112,9 @@ msgstr "Menü öffnen"
 
 msgid "Open navigation"
 msgstr "Navigation öffnen"
+
+msgid "Open on {providerName}"
+msgstr "Auf {providerName} öffnen"
 
 msgid "Open on GitHub"
 msgstr "Auf GitHub öffnen"
@@ -22057,6 +22062,9 @@ msgstr "Mehr anzeigen"
 
 msgid "View name"
 msgstr "Name der Ansicht"
+
+msgid "View on {providerName}"
+msgstr "Auf {providerName} ansehen"
 
 msgid "View on GitHub"
 msgstr "Auf GitHub ansehen"

@@ -3,6 +3,7 @@ import {
 	normalizeProjectFilters,
 	serializeProjectFilters,
 } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
+import { normalizeAuthorFilters } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeAuthorFilter/normalizeAuthorFilter";
 import { normalizeGithubLogins } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeGithubLogins";
 import {
 	normalizePullRequestReviewFilter,
@@ -53,7 +54,7 @@ export function migratePullRequestsFilterState(
 		projectFilters: normalizeProjectFilters(
 			state.projectFilters ?? (legacyProject ? [legacyProject] : []),
 		),
-		authorFilter: normalizeGithubLogins(state.authorFilter),
+		authorFilter: normalizeAuthorFilters(state.authorFilter),
 		reviewerFilter: normalizeGithubLogins(state.reviewerFilter),
 		reviewFilter: normalizePullRequestReviewFilter(state.reviewFilter),
 		includeClosed: state.includeClosed === true,
@@ -82,7 +83,7 @@ export const usePullRequestsFilterStore = create<PullRequestsFilterState>()(
 						: { projectFilters: next };
 				}),
 			setAuthorFilter: (authorFilter) =>
-				set({ authorFilter: normalizeGithubLogins(authorFilter) }),
+				set({ authorFilter: normalizeAuthorFilters(authorFilter) }),
 			setReviewerFilter: (reviewerFilter) =>
 				set({ reviewerFilter: normalizeGithubLogins(reviewerFilter) }),
 			setReviewFilter: (reviewFilter) =>
