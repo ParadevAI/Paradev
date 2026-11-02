@@ -107,7 +107,7 @@ app" means the nudge landed. The notes below are the fallback behavior when
 no app acknowledged (app not running, or an older app version):
 
 - **Regular settings** (most of `settings set`): written to
-  `~/.paradev/local.db`. A running older app picks them up the next time
+  `local.db` in the target profile (`$SUPERSET_HOME_DIR`, else `~/.paradev`). A running older app picks them up the next time
   its window regains focus; no restart needed.
 - **Git settings** (`branchPrefixMode`, `branchPrefixCustom`,
   `worktreeBaseDir`): host-wide values written through the local host

@@ -41,7 +41,7 @@ Example questions:
 
     How should we handle errors?
     a) Return TRPCError at boundary
-    b) Use type-safe IPC error channel
+    b) Use type-safe tRPC error handling
     c) Other (specify)
 
 ## How to use ExecPlans
@@ -85,7 +85,7 @@ The agent executing your plan can list files, read files, search, run the projec
 - **Code Quality**: Biome at root level
 - **Database**: Drizzle ORM + Neon PostgreSQL
 - **UI**: React + TailwindCSS v4 + shadcn/ui (in `packages/ui`)
-- **Desktop**: Electron with type-safe IPC
+- **Desktop**: Electron with type-safe IPC over tRPC
 
 ### Common Commands
     # Development
@@ -161,7 +161,7 @@ For each milestone, include:
 
 **Example milestone structure:**
 
-    ### Milestone 1: IPC Channel Foundation
+    ### Milestone 1: tRPC Procedure Foundation
 
     This milestone establishes the tRPC procedure for workspace operations.
     At completion, the main process can receive workspace requests and return
@@ -287,7 +287,7 @@ Document parallel implementation strategies in the Plan of Work and include clea
     For this Paradev monorepo, always mention:
     - Which app(s) are affected (desktop, web, marketing, api, admin, docs)
     - Which packages are involved (db, ui, shared, trpc, queries, local-db)
-    - Any IPC channels if desktop work is involved
+    - Any tRPC procedures if desktop work is involved
 
     ## Plan of Work
 

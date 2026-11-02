@@ -225,7 +225,7 @@ export const FIRST_PARTY_MANIFESTS = {
 			},
 			{
 				"name": "find-in-sentry",
-				"description": "Answer \"what's breaking\" questions from Sentry — find the right org and project, search issues and events with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service."
+				"description": "Answer \"what's breaking\" questions from Sentry — find the right org and project, search issues and errors with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service."
 			}
 		]
 	} as const,

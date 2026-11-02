@@ -15,10 +15,11 @@ Parse `$ARGUMENTS` for:
 
 ### 0. Resolve current user and environment
 
-Run these in parallel:
+Run these two in parallel:
 - Call `mcp__superset__organization_members_list` and match against the git user email (`git config user.email`) to get the current user's ID
 - Call `mcp__superset__hosts_list` and select the host this runs on (the user's machine)
-- Call `mcp__superset__projects_list` with that `hostId` and select the project matching the current git repo
+
+Then call `mcp__superset__projects_list` with that `hostId` and select the project matching the current git repo.
 
 ### 1. Create the task
 

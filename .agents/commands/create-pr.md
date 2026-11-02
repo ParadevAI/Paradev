@@ -328,7 +328,7 @@ Use these as templates for the Manual QA Checklist section. Pick categories appr
 - [ ] App launches without errors
 - [ ] No console errors in DevTools (main + renderer)
 - [ ] Feature works after app restart
-- [ ] No Node.js imports in `src/renderer/`
+- [ ] No Node.js imports in `apps/desktop/src/renderer/`
 
 ### tRPC over Electron IPC
 - [ ] tRPC router changes validated from renderer call-sites
