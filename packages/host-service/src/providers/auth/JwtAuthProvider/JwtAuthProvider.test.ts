@@ -458,3 +458,37 @@ describe("JwtApiAuthProvider mint failures", () => {
 		).rejects.toThrow();
 	});
 });
+
+describe("JwtApiAuthProvider for one organization", () => {
+	function orgProvider(sessionToken: string) {
+		return new JwtApiAuthProvider({
+			getSessionToken: async () => sessionToken,
+			apiUrl: API_URL,
+			organizationId: ORGANIZATION_ID,
+		});
+	}
+
+	test("mints a token for the host's organization", async () => {
+		const fetchMock = mockFetch(async () =>
+			Response.json({ token: "org.jwt.token" }),
+		);
+		await expect(orgProvider("session-token").getJwt()).resolves.toBe(
+			"org.jwt.token",
+		);
+		expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+			`${API_URL}/api/auth/token?organizationId=${ORGANIZATION_ID}`,
+		);
+	});
+
+	test("exchanges an OAuth token, and keeps it when the API can't", async () => {
+		mockFetch(async () => Response.json({ token: "org.jwt.token" }));
+		await expect(orgProvider("oauth.access.token").getJwt()).resolves.toBe(
+			"org.jwt.token",
+		);
+
+		mockFetch(async () => new Response(null, { status: 401 }));
+		await expect(orgProvider("oauth.access.token").getJwt()).resolves.toBe(
+			"oauth.access.token",
+		);
+	});
+});

@@ -25,6 +25,8 @@ export interface JwtApiAuthProviderOptions {
 	getSessionToken: () => Promise<string>;
 	onInvalidateCache?: () => void;
 	apiUrl: string;
+	/** The organization this host acts in; its JWTs are minted for it alone. */
+	organizationId?: string;
 	mintTimeoutMs?: number;
 }
 
@@ -32,6 +34,7 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 	private readonly getSessionToken: () => Promise<string>;
 	private readonly onInvalidateCache?: () => void;
 	private readonly apiUrl: string;
+	private readonly organizationId: string | undefined;
 	private readonly mintTimeoutMs: number;
 	private cachedJwt: string | null = null;
 	private cachedJwtExpiresAt = 0;
@@ -50,6 +53,7 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 		this.getSessionToken = options.getSessionToken;
 		this.onInvalidateCache = options.onInvalidateCache;
 		this.apiUrl = options.apiUrl;
+		this.organizationId = options.organizationId;
 		this.mintTimeoutMs = options.mintTimeoutMs ?? MINT_TIMEOUT_MS;
 	}
 
@@ -74,16 +78,18 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 
 		const sessionToken = await this.getSessionToken();
 
-		// CLI OAuth code+PKCE login stores the OAuth access token directly,
-		// which is already a JWT signed by the same JWKS the relay verifies
-		// against and carries `organizationIds` via customAccessTokenClaims.
-		// Pass it through — no /api/auth/token exchange needed (and the
-		// better-auth jwt plugin endpoint doesn't accept OAuth tokens
-		// anyway, only sessions and api keys).
+		// A CLI OAuth login stores its access token, which lists every
+		// organization. It is exchanged for this host's organization.
 		if (looksLikeJwt(sessionToken)) {
-			return sessionToken;
+			if (!this.organizationId) return sessionToken;
+			// LEGACY(remove when list-only tokens are refused): an API older than
+			// organization tokens can't exchange an OAuth token, so it goes as is.
+			return this.mintShared(sessionToken).catch(() => sessionToken);
 		}
+		return this.mintShared(sessionToken);
+	}
 
+	private mintShared(sessionToken: string): Promise<string> {
 		const failure = this.mintFailure;
 		if (
 			failure?.sessionToken === sessionToken &&
@@ -106,7 +112,10 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 			// better-auth's apiKey plugin reads `sk_live_…` from x-api-key, not
 			// Authorization: Bearer; mirror what the CLI's tRPC client does in
 			// packages/cli/src/lib/api-client.ts.
-			const response = await fetch(`${this.apiUrl}/api/auth/token`, {
+			const query = this.organizationId
+				? `?organizationId=${encodeURIComponent(this.organizationId)}`
+				: "";
+			const response = await fetch(`${this.apiUrl}/api/auth/token${query}`, {
 				headers: sessionToken.startsWith("sk_live_")
 					? { "x-api-key": sessionToken }
 					: { Authorization: `Bearer ${sessionToken}` },

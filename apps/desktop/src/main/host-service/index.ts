@@ -106,6 +106,7 @@ async function main(): Promise<void> {
 			return token ?? env.AUTH_TOKEN;
 		},
 		apiUrl: env.SUPERSET_API_URL,
+		organizationId: env.ORGANIZATION_ID,
 	});
 
 	const { app, injectWebSocket, api, db, dispose, recordUnfinishedChats } =

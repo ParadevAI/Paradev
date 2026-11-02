@@ -1,5 +1,6 @@
 import { command } from "../../../lib/command";
 import { readConfig, writeConfig } from "../../../lib/config";
+import { forgetOrganizationTokens } from "../../../lib/organization-token";
 
 export default command({
 	sandbox: false,
@@ -10,6 +11,7 @@ export default command({
 		delete config.auth;
 		delete config.apiKey;
 		writeConfig(config);
+		forgetOrganizationTokens();
 		return { message: "Logged out." };
 	},
 });

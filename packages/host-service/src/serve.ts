@@ -87,6 +87,7 @@ async function main(): Promise<void> {
 			? () => configTokenSource.invalidateCache()
 			: undefined,
 		apiUrl: env.SUPERSET_API_URL,
+		organizationId: env.ORGANIZATION_ID,
 	});
 	const apiAuthProvider =
 		env.SUPERSET_HOST_RUN_MODE === "sandbox"
