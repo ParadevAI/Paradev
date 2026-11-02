@@ -88,6 +88,18 @@ function parseIntOrNull(value: string | undefined): number | null {
 	return Number.isFinite(n) ? n : null;
 }
 
+const SINGLE_VALUE_PARTS = [
+	"BYHOUR",
+	"BYMINUTE",
+	"BYSECOND",
+	"BYMONTH",
+	"BYMONTHDAY",
+] as const;
+
+function hasValueList(parts: RruleParts): boolean {
+	return SINGLE_VALUE_PARTS.some((key) => parts[key]?.includes(","));
+}
+
 function sortDays(days: string[]): string[] {
 	return [...days].sort(
 		(a, b) => DAY_ORDER.indexOf(a as never) - DAY_ORDER.indexOf(b as never),
@@ -141,7 +153,12 @@ export function matchPreset(rrule: string): PresetMatch {
 	const parts = parseRruleParts(rrule);
 	if (!parts) return { kind: "custom", rrule };
 
-	if (parts.BYSETPOS || parts.BYYEARDAY || parts.BYWEEKNO) {
+	if (
+		parts.BYSETPOS ||
+		parts.BYYEARDAY ||
+		parts.BYWEEKNO ||
+		hasValueList(parts)
+	) {
 		return { kind: "custom", rrule };
 	}
 	if (parts.COUNT || parts.UNTIL) return { kind: "custom", rrule };
@@ -227,7 +244,14 @@ export function describeSchedule(
 	const byMonthDay = parseIntOrNull(parts.BYMONTHDAY);
 
 	// Anything that references sub-patterns we don't generate → Custom.
-	if (parts.BYSETPOS || parts.BYYEARDAY || parts.BYWEEKNO) return custom();
+	if (
+		parts.BYSETPOS ||
+		parts.BYYEARDAY ||
+		parts.BYWEEKNO ||
+		hasValueList(parts)
+	) {
+		return custom();
+	}
 	if (parts.COUNT || parts.UNTIL) {
 		// Still describable, but prefer Custom so the bounded nature isn't hidden.
 		return custom();
