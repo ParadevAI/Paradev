@@ -4,9 +4,7 @@ import { verifyOrgMembership } from "../integration/utils";
 
 export interface PageCaller {
 	organizationId: string;
-	/** The person a new page is recorded as: the caller, or the person a Dev works for. */
 	userId: string;
-	/** Whose access reads and changes existing pages; null when the caller has none. */
 	reader: string | null;
 }
 
