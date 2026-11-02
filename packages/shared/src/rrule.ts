@@ -14,7 +14,7 @@
 
 import { TZDate } from "@date-fns/tz";
 import { msg } from "@lingui/core/macro";
-import { RRule } from "rrule";
+import { type Options, RRule } from "rrule";
 import { i18n } from "./i18n";
 
 const WEEKDAYS = ["MO", "TU", "WE", "TH", "FR"] as const;
@@ -537,6 +537,17 @@ function buildRuleString(
 	return `DTSTART:${formatRRuleLocalDtstart(dtstart, timezone)}\nRRULE:${rrule}`;
 }
 
+function sortTimeParts(options: Partial<Options>): Partial<Options> {
+	// rrule.js 2.8.1 walks BYHOUR/BYMINUTE/BYSECOND in written order for
+	// DAILY and longer rules, so `after()` misses times listed after a later one.
+	const sorted = { ...options };
+	for (const key of ["byhour", "byminute", "bysecond"] as const) {
+		const value = sorted[key];
+		if (Array.isArray(value)) sorted[key] = [...value].sort((a, b) => a - b);
+	}
+	return sorted;
+}
+
 /**
  * The next real-UTC occurrence strictly after `after`, or null when the
  * recurrence is exhausted (UNTIL/COUNT).
@@ -547,8 +558,12 @@ export function nextOccurrenceAfter(args: {
 	timezone: string;
 	after: Date;
 }): Date | null {
-	const rule = RRule.fromString(
-		buildRuleString(args.rrule, args.dtstart, args.timezone),
+	const rule = new RRule(
+		sortTimeParts(
+			RRule.parseString(
+				buildRuleString(args.rrule, args.dtstart, args.timezone),
+			),
+		),
 	);
 	const next = rule.after(utcToRruleDate(args.after, args.timezone), false);
 	return next ? rruleDateToUtc(next, args.timezone) : null;
