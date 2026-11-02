@@ -422,6 +422,8 @@ export async function wakeSandbox(args: {
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
 	booted: boolean;
+	/** The boot command ran: the session was stopped, or host-service in it had stopped answering. */
+	rebooted: boolean;
 	answer: HostAnswer;
 }> {
 	try {
@@ -492,7 +494,7 @@ export async function wakeSandbox(args: {
 					claim: args.claim,
 				}),
 		);
-		return { hostTarget, booted: !wasRunning, answer };
+		return { hostTarget, booted: !wasRunning, rebooted: !serving, answer };
 	} catch (error) {
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(args.providerSandboxId, error);

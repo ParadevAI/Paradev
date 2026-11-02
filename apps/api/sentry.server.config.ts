@@ -1,8 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
 
 import {
+	CLOUD_WORKSPACE_BOOTED_ATTRIBUTE,
 	CLOUD_WORKSPACE_PROVISION_TRANSACTION,
-	CLOUD_WORKSPACE_RESUMED_ATTRIBUTE,
 	CLOUD_WORKSPACE_START_TRANSACTION,
 	CLOUD_WORKSPACE_WAKE_TRANSACTION,
 } from "@superset/shared/constants";
@@ -25,10 +25,10 @@ Sentry.init({
 		name === CLOUD_WORKSPACE_WAKE_TRANSACTION
 			? 1
 			: 0,
-	// An open workspace's keepalive wakes a running box every ten minutes;
-	// only a wake that resumed a stopped one is worth its spans.
+	// An open workspace's keepalive wakes a serving box every ten minutes;
+	// only a wake that had to boot one is worth its spans.
 	beforeSendTransaction: (event) =>
-		event.contexts?.trace?.data?.[CLOUD_WORKSPACE_RESUMED_ATTRIBUTE] === false
+		event.contexts?.trace?.data?.[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE] === false
 			? null
 			: event,
 	sendDefaultPii: true,

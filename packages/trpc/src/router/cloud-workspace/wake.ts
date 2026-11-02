@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import {
-	CLOUD_WORKSPACE_RESUMED_ATTRIBUTE,
+	CLOUD_WORKSPACE_BOOTED_ATTRIBUTE,
 	CLOUD_WORKSPACE_WAKE_TRANSACTION,
 } from "@superset/shared/constants";
 import { waitUntil } from "@vercel/functions";
@@ -43,8 +43,11 @@ export async function wakeCloudWorkspace(
 				attributes: { "cloud_workspace.id": row.id },
 			},
 			async (span) => {
-				const { booted, ...woken } = await wake(row);
-				span.setAttribute(CLOUD_WORKSPACE_RESUMED_ATTRIBUTE, booted);
+				const { booted, rebooted, ...woken } = await wake(row);
+				span.setAttributes({
+					"cloud_workspace.resumed": booted,
+					[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE]: rebooted,
+				});
 				return woken;
 			},
 		);
@@ -55,22 +58,26 @@ export async function wakeCloudWorkspace(
 
 async function wake(
 	row: CloudWorkspaceRow,
-): Promise<WokenCloudWorkspace & { booted: boolean }> {
+): Promise<WokenCloudWorkspace & { booted: boolean; rebooted: boolean }> {
 	const { claim, agentCredentialDigest } = await Sentry.startSpan(
 		{ name: "claim", op: "sandbox" },
 		() => buildSandboxClaim({ row }),
 	);
 	let bootId: string | null = null;
-	const { hostTarget, booted, answer } = await wakeSandbox({
+	const { hostTarget, booted, rebooted, answer } = await wakeSandbox({
 		providerSandboxId: row.providerSandboxId,
 		claim,
 		beforeResume: async (box) => {
-			({ bootId } = await authorizeBoot({
-				organizationId: row.organizationId,
-				cloudWorkspaceId: row.id,
-				createdByUserId: row.createdByUserId,
-				...box,
-			}));
+			({ bootId } = await Sentry.startSpan(
+				{ name: "authorize boot", op: "billing" },
+				() =>
+					authorizeBoot({
+						organizationId: row.organizationId,
+						cloudWorkspaceId: row.id,
+						createdByUserId: row.createdByUserId,
+						...box,
+					}),
+			));
 		},
 	}).catch(async (error) => {
 		if (bootId) {
@@ -87,7 +94,7 @@ async function wake(
 			providerSandboxId: row.providerSandboxId,
 		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
 	}
-	if (booted) {
+	if (rebooted) {
 		try {
 			recordBootSpans(answer);
 		} catch (error) {
@@ -110,6 +117,7 @@ async function wake(
 	return {
 		hostTarget,
 		booted,
+		rebooted,
 		agentCredentialsChanged:
 			!booted &&
 			row.bootAgentCredentialDigest !== null &&
