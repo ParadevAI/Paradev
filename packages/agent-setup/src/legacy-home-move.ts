@@ -234,6 +234,8 @@ export async function repairGitWorktrees(
 ): Promise<void> {
 	const byRepo = new Map<string, string[]>();
 	for (const { repoPath, worktreePath } of worktrees) {
+		// git aborts the whole repair at a path whose parent folder is gone
+		if (!fs.existsSync(worktreePath)) continue;
 		byRepo.set(repoPath, [...(byRepo.get(repoPath) ?? []), worktreePath]);
 	}
 	for (const [repoPath, paths] of byRepo) {
