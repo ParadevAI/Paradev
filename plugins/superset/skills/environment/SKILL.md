@@ -76,7 +76,7 @@ Never pass a value with `--body`: it ends up in the process list and the shell h
 superset workspaces create --environment <environment-id> --name "Set up <name>"
 ```
 
-The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `ready`. Then work inside the box through terminals:
+The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `ready`; stop and report if it is `failed`. Then work inside the box through terminals:
 
 ```bash
 superset terminals create --workspace <workspace-id> --command "<cmd>"
@@ -109,10 +109,10 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 ## 6. Finish
 
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
-2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. Private is `personal`, the default.
+2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. To keep it private: `superset environments update <environment-id> --scope personal` (an environment you were given may already be shared).
 3. If the `config.toml` change is not in a pull request yet, offer to open one, and ask before pushing.
 4. Archive the setup box: `superset workspaces archive <workspace-id>`.
-5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready`, then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Give the user its link: the environment URL's origin with `/workspaces/<new-workspace-id>`, which opens it in the desktop app.
+5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready` (stop and report if it is `failed`), then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Give the user its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app.
 6. Summarize what is installed, what `config.toml` does, which variables are set, and which are missing and who has to provide them. Tell the user that more workspaces start from the new-workspace screen: pick Cloud, the project, and this environment.
 
 If you stop early, say where things stand and what the next session should do first; the environment and its latest checkpoint are all it needs to continue.

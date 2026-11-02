@@ -90,4 +90,4 @@ Commit the change on a branch. If there is no open pull request for it, offer to
 
 ## 4. Verify for real
 
-Create a throwaway workspace with `superset workspaces create --local --project <id> --name "setup-test"` and watch the "Workspace Setup" terminal output. Fix and repeat until it completes cleanly, then delete the test workspace. Setup is not done until a real workspace boots green.
+Create a throwaway workspace with `superset workspaces create --local --project <id> --name "setup-test" --branch setup-test --base-branch <the branch from step 3>` and watch the "Workspace Setup" terminal output. Fix and repeat until it completes cleanly, then delete the test workspace with `superset workspaces archive --local <id>` and its branch with `git branch -D setup-test`. Setup is not done until a real workspace boots green.

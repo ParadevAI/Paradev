@@ -913,6 +913,87 @@ superset workspaces sleep ws_a
 ```
 </Command>
 
+The commands below act on a cloud workspace through the API, so they work while
+its sandbox is asleep. Run inside a cloud workspace, `[id]` defaults to it.
+`restart` always takes an id: restarting the workspace you run in ends your own
+process.
+
+<Command
+	name="superset workspaces unarchive <id>"
+	args={[
+		{ name: "id", required: true, description: "Cloud workspace ID." },
+	]}
+	output={`{ id: string; unarchived: boolean }`}
+>
+Restore an archived cloud workspace. Alias: `restore`. Within 7 days of
+archiving it keeps its disk; after that it starts fresh from its environment.
+</Command>
+
+<Command
+	name="superset workspaces restart <id>"
+	args={[
+		{ name: "id", required: true, description: "Cloud workspace ID." },
+	]}
+	output={`{ id: string; restarted: boolean }`}
+>
+End every terminal and agent on a cloud workspace, so they start again with the
+current agent sign-ins.
+</Command>
+
+<Command
+	name="superset workspaces activity [id]"
+	args={[
+		{ name: "id", description: "Cloud workspace ID." },
+	]}
+>
+Show a cloud workspace's timeline, oldest first: renames, task links, labels,
+visibility, sharing, and pull requests. `--json` keeps every field.
+</Command>
+
+<Command
+	name="superset workspaces pull-requests [id]"
+	args={[
+		{ name: "id", description: "Cloud workspace ID." },
+	]}
+	options={[
+		{ flag: "--all", description: "Every cloud workspace you can see." },
+		{ flag: "--archived", description: "Archived cloud workspaces instead." },
+	]}
+>
+List a cloud workspace's pull requests: those linked to it, and those on its
+branch. Alias: `prs`. Outside a cloud workspace and without an id, it lists
+every cloud workspace's; `--archived` does too unless an id is given.
+</Command>
+
+<Command
+	name="superset workspaces share list [id]"
+	args={[
+		{ name: "id", description: "Cloud workspace ID." },
+	]}
+>
+Show a cloud workspace's owner, visibility, and who it is shared with.
+</Command>
+
+<Command
+	name="superset workspaces share add [id]"
+	args={[
+		{ name: "id", description: "Cloud workspace ID." },
+	]}
+	options={[
+		{ flag: "--user <email|id>", description: "Organization member. Repeatable." },
+		{ flag: "--team <id>", description: "Team. Repeatable." },
+	]}
+>
+Share a cloud workspace with members or teams; pass at least one `--user` or
+`--team`. `superset workspaces share remove` takes the same options and stops sharing. Only the workspace's creator
+can change who it is shared with.
+
+```bash
+superset workspaces share add ws_a --user ann@example.com
+superset workspaces share remove ws_a --user ann@example.com
+```
+</Command>
+
 <Command
 	name="superset workspaces get [id]"
 	args={[
@@ -960,6 +1041,9 @@ superset workspaces get --field branch   # inside a workspace
 		{ flag: "--clear-task", description: "Unlink the workspace from its current task. Mutually exclusive with --task-id." },
 		{ flag: "--tag <tag>", description: "Replace the workspace's tag set. Repeatable. Each tag groups the workspace into a sidebar folder of the same name." },
 		{ flag: "--clear-tags", description: "Remove every tag. Mutually exclusive with --tag." },
+		{ flag: "--visibility <just_me|org>", description: "Who sees a cloud workspace. Only its creator can change it." },
+		{ flag: "--add-label <name>", description: "Add a label to a cloud workspace, creating it when new. Repeatable." },
+		{ flag: "--remove-label <name>", description: "Remove a label from a cloud workspace. Repeatable." },
 	]}
 	output="Workspace"
 >
@@ -967,11 +1051,16 @@ Update a workspace (default: the cloud if your account has cloud workspaces, els
 whole tag set: tagging is how workspaces group into sidebar folders, so
 retagging moves the workspace between folders.
 
+On a cloud workspace every field is saved by the API, so it works while the
+sandbox is asleep. There, `--task-id` also takes a task slug and adds a link
+(a cloud workspace can link several tasks), and `--clear-task` removes them all.
+
 ```bash
 superset workspaces update ws_… --name "better-name"
 superset workspaces update ws_… --task-id tsk_…
 superset workspaces update ws_… --tag perf --tag infra
 superset workspaces update ws_… --clear-task
+superset workspaces update ws_… --add-label bug --visibility org
 ```
 </Command>
 
