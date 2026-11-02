@@ -68,7 +68,7 @@ const listColumns = {
 	).mapWith(Boolean),
 };
 
-/** People managing and talking to agents. Agents themselves use `agentApi`. */
+/** People managing and talking to agents. */
 export const agentRouter = {
 	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))

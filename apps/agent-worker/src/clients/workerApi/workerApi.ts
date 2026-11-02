@@ -102,13 +102,13 @@ export function workerApi(options: WorkerApiOptions): {
 				? {
 						post: (input) =>
 							trpcMutation<{ id: string }>(
-								`${options.apiUrl}/api/trpc/agentApi.postMessage`,
+								`${options.apiUrl}/api/trpc/channelMessage.send`,
 								{ [TURN_TOKEN_HEADER]: agentToken },
 								{
 									channelId: room.channelId,
 									body: input.body,
 									threadRootId: room.threadRootId,
-									idempotencyKey: input.idempotencyKey,
+									clientId: input.idempotencyKey,
 								},
 								options,
 							).then((message) => ({ messageId: message.id })),
