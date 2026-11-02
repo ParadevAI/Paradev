@@ -1,18 +1,39 @@
 import { mergeRegister } from "@lexical/utils";
 import {
 	$getSelection,
+	$isElementNode,
 	$isRangeSelection,
 	$isTextNode,
 	COMMAND_PRIORITY_LOW,
 	KEY_ARROW_LEFT_COMMAND,
 	KEY_ARROW_RIGHT_COMMAND,
 	type LexicalEditor,
+	type LexicalNode,
 } from "lexical";
 
-function $exitInlineCode(
-	event: KeyboardEvent | null,
-	edge: "start" | "end",
-): boolean {
+type Edge = "start" | "end";
+
+function $hasTextBeyond(node: LexicalNode, edge: Edge): boolean {
+	let current = node;
+	for (;;) {
+		const sibling =
+			edge === "end" ? current.getNextSibling() : current.getPreviousSibling();
+		if (sibling) {
+			if ($isTextNode(sibling)) return true;
+			if (!$isElementNode(sibling) || !sibling.isInline()) return false;
+			return $isTextNode(
+				edge === "end"
+					? sibling.getFirstDescendant()
+					: sibling.getLastDescendant(),
+			);
+		}
+		const parent = current.getParent();
+		if (!parent?.isInline()) return false;
+		current = parent;
+	}
+}
+
+function $exitInlineCode(event: KeyboardEvent | null, edge: Edge): boolean {
 	const selection = $getSelection();
 	if (
 		!$isRangeSelection(selection) ||
@@ -30,9 +51,7 @@ function $exitInlineCode(
 		edge === "end"
 			? selection.anchor.offset === node.getTextContentSize()
 			: selection.anchor.offset === 0;
-	const beyond =
-		edge === "end" ? node.getNextSibling() : node.getPreviousSibling();
-	if (!atEdge || $isTextNode(beyond)) return false;
+	if (!atEdge || $hasTextBeyond(node, edge)) return false;
 	event?.preventDefault();
 	selection.toggleFormat("code");
 	return true;

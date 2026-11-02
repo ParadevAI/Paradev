@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { $createLinkNode, LinkNode } from "@lexical/link";
 import {
 	$createParagraphNode,
 	$createTextNode,
@@ -10,6 +11,8 @@ import {
 	KEY_ARROW_LEFT_COMMAND,
 	KEY_ARROW_RIGHT_COMMAND,
 	type LexicalEditor,
+	type LexicalNode,
+	type TextNode,
 } from "lexical";
 import { registerInlineCodeExit } from "./inlineCodeExit";
 
@@ -21,9 +24,13 @@ afterAll(() => {
 
 type Run = [text: string, code: boolean];
 
-function setup(...runs: Run[]) {
+const plain = (text: string) => $createTextNode(text);
+const code = (text: string) => $createTextNode(text).toggleFormat("code");
+
+function setup(children: () => LexicalNode[]) {
 	const editor = createEditor({
 		namespace: "inline-code-exit-test",
+		nodes: [LinkNode],
 		onError: (error) => {
 			throw error;
 		},
@@ -37,21 +44,14 @@ function setup(...runs: Run[]) {
 		() => {
 			$getRoot()
 				.clear()
-				.append(
-					$createParagraphNode().append(
-						...runs.map(([text, code]) => {
-							const node = $createTextNode(text);
-							return code ? node.toggleFormat("code") : node;
-						}),
-					),
-				);
+				.append($createParagraphNode().append(...children()));
 		},
 		{ discrete: true },
 	);
 	return editor;
 }
 
-/** Puts the caret at an edge of run `index` the way a click would, presses the keys, then types. */
+/** Puts the caret at an edge of text node `index` the way a click would, presses the keys, then types. */
 function interact(
 	editor: LexicalEditor,
 	caret: { index: number; edge: "start" | "end" },
@@ -59,25 +59,33 @@ function interact(
 	text = "",
 ) {
 	const handled: boolean[] = [];
+	let caretAfterKeys: { node: string; offset: number; code: boolean } | null =
+		null;
 	editor.update(
 		() => {
-			const node = $getRoot().getAllTextNodes()[caret.index];
-			if (!node) throw new Error("no such run");
+			const node: TextNode | undefined =
+				$getRoot().getAllTextNodes()[caret.index];
+			if (!node) throw new Error("no such text node");
 			const offset = caret.edge === "start" ? 0 : node.getTextContentSize();
 			node.select(offset, offset).format = node.getFormat();
 			for (const init of keys) {
-				const event = new KeyboardEvent("keydown", init);
 				handled.push(
 					editor.dispatchCommand(
 						init.key === "ArrowLeft"
 							? KEY_ARROW_LEFT_COMMAND
 							: KEY_ARROW_RIGHT_COMMAND,
-						event,
+						new KeyboardEvent("keydown", init),
 					),
 				);
 			}
 			const selection = $getSelection();
-			if (text && $isRangeSelection(selection)) selection.insertText(text);
+			if (!$isRangeSelection(selection)) return;
+			caretAfterKeys = {
+				node: selection.anchor.getNode().getTextContent(),
+				offset: selection.anchor.offset,
+				code: selection.hasFormat("code"),
+			};
+			if (text) selection.insertText(text);
 		},
 		{ discrete: true },
 	);
@@ -86,12 +94,12 @@ function interact(
 			.getAllTextNodes()
 			.map((node): Run => [node.getTextContent(), node.hasFormat("code")]),
 	);
-	return { handled, runs };
+	return { handled, caret: caretAfterKeys, runs };
 }
 
 describe("registerInlineCodeExit", () => {
 	it("types plain text after code that ends the line once ArrowRight is pressed", () => {
-		const editor = setup(["run ", false], ["ls", true]);
+		const editor = setup(() => [plain("run "), code("ls")]);
 
 		expect(
 			interact(
@@ -102,6 +110,7 @@ describe("registerInlineCodeExit", () => {
 			),
 		).toEqual({
 			handled: [true],
+			caret: { node: "ls", offset: 2, code: false },
 			runs: [
 				["run ", false],
 				["ls", true],
@@ -111,7 +120,7 @@ describe("registerInlineCodeExit", () => {
 	});
 
 	it("types plain text before code that starts the line once ArrowLeft is pressed", () => {
-		const editor = setup(["ls", true], [" runs", false]);
+		const editor = setup(() => [code("ls"), plain(" runs")]);
 
 		expect(
 			interact(
@@ -122,6 +131,7 @@ describe("registerInlineCodeExit", () => {
 			),
 		).toEqual({
 			handled: [true],
+			caret: { node: "ls", offset: 0, code: false },
 			runs: [
 				["run ", false],
 				["ls", true],
@@ -131,7 +141,7 @@ describe("registerInlineCodeExit", () => {
 	});
 
 	it("lets the second ArrowRight move the caret as usual", () => {
-		const editor = setup(["ls", true]);
+		const editor = setup(() => [code("ls")]);
 
 		expect(
 			interact(editor, { index: 0, edge: "end" }, [
@@ -141,8 +151,22 @@ describe("registerInlineCodeExit", () => {
 		).toEqual([true, false]);
 	});
 
-	it("leaves the caret alone when plain text follows the code", () => {
-		const editor = setup(["ls", true], [" after", false]);
+	it("leaves the caret alone when text follows the code", () => {
+		const editor = setup(() => [code("ls"), plain(" after")]);
+
+		expect(
+			interact(editor, { index: 0, edge: "end" }, [{ key: "ArrowRight" }]),
+		).toMatchObject({
+			handled: [false],
+			caret: { node: "ls", offset: 2, code: true },
+		});
+	});
+
+	it("leaves the caret alone when text follows the link the code ends", () => {
+		const editor = setup(() => [
+			$createLinkNode("https://example.com").append(code("ls")),
+			plain(" after"),
+		]);
 
 		expect(
 			interact(editor, { index: 0, edge: "end" }, [{ key: "ArrowRight" }])
@@ -151,7 +175,7 @@ describe("registerInlineCodeExit", () => {
 	});
 
 	it("leaves Shift+ArrowRight selection alone", () => {
-		const editor = setup(["ls", true]);
+		const editor = setup(() => [code("ls")]);
 
 		expect(
 			interact(editor, { index: 0, edge: "end" }, [
