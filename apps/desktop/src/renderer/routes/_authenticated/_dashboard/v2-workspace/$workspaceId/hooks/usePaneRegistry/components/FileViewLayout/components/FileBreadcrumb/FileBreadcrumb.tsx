@@ -15,7 +15,7 @@ import { BreadcrumbTree } from "./components/BreadcrumbTree";
 import { HiddenTrail } from "./components/HiddenTrail";
 
 const MIN_GAP_TO_ACTIONS = 64;
-const EDGE_GAP = 8;
+const EDGE_GAP = 4;
 const CRUMB_GAP = 4;
 
 interface FileBreadcrumbProps {
