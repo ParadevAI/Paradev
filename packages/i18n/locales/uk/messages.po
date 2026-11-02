@@ -10715,6 +10715,9 @@ msgstr "Linear обмежує кількість запитів. Спробуй�
 msgid "Linear issues"
 msgstr "Issues Linear"
 
+msgid "Linear project"
+msgstr "Проєкт Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine

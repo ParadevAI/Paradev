@@ -10721,6 +10721,9 @@ msgstr "Linear ограничивает число запросов. Повто�
 msgid "Linear issues"
 msgstr "Задачи Linear"
 
+msgid "Linear project"
+msgstr "Проект Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
