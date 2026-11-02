@@ -67,11 +67,26 @@ msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Không thể hoàn tác
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" sẽ ngừng kích hoạt và lịch sử chạy sẽ bị xóa. Không thể hoàn tác."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit}"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit} vào workspace này. Nếu tệp nằm trên máy của workspace, hãy ghi đường dẫn của tệp thay vào đó."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" là một thư mục. Hãy đính kèm các tệp bên trong thay thế."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" vượt quá {limit}, mức tối đa mà một workspace ngoài cloud có thể nhận"
+
 msgid "\"{name}\" paused"
 msgstr "Đã tạm dừng \"{name}\""
 
 msgid "\"{name}\" resumed"
 msgstr "Đã tiếp tục \"{name}\""
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" đã bị di chuyển hoặc xóa. Hãy đính kèm lại."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" đã hoàn thành tác vụ"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {Đã dùng # nguồn} other {Đã dùng # nguồn}}
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {đã dùng # công cụ} other {đã dùng # công cụ}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} tệp vượt quá {limit} và không được thêm"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "Đã đính kèm {count} tệp — mỗi tin nhắn chứa tối đa {max} tệp"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star GitHub"
 
@@ -1542,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — quên trang này"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 tệp vượt quá {limit} và không được thêm"
 
 msgid "1 hr"
 msgstr "1 giờ"
@@ -13898,6 +13922,9 @@ msgstr "Hệ thống thiết kế Paradev"
 msgid "Paradev desktop app"
 msgstr "Ứng dụng Paradev cho máy tính"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev không có quyền đọc \"{name}\"."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise là Paradev dành cho đội nhóm. Hãy liên hệ để biết thêm về những gì được bao gồm và cách nó phù hợp với tổ chức của bạn."
 
@@ -19182,6 +19209,9 @@ msgstr "Cùng một ứng dụng chạy native trên iPad, ở cả chế độ 
 msgid "The scorecard"
 msgstr "Bảng điểm"
 
+msgid "The selected element's context is too large to send"
+msgstr "Ngữ cảnh của phần tử đã chọn quá lớn để gửi"
+
 msgid "The self-driving software factory"
 msgstr "Nhà máy phần mềm tự vận hành"
 
@@ -21352,9 +21382,6 @@ msgstr "Đã mở workspace, nhưng terminal không khởi động được."
 
 msgid "Workspace path is not available"
 msgstr "Không có đường dẫn workspace"
-
-msgid "Workspace path is not available yet"
-msgstr "Đường dẫn không gian làm việc chưa sẵn sàng"
 
 msgid "Workspace restored"
 msgstr "Đã khôi phục workspace"

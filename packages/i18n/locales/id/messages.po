@@ -67,11 +67,26 @@ msgstr "\"{0}\" akan di-merge ke {1} lewat {2}. Ini tidak bisa dibatalkan dari s
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tidak bisa dibatalkan."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" berukuran {size} — file di atas {limit} tidak dapat dilampirkan"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" berukuran {size} — file di atas {limit} tidak dapat dilampirkan ke workspace ini. Jika file ada di mesin workspace, sebutkan path-nya saja."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" adalah folder. Lampirkan file di dalamnya sebagai gantinya."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" melebihi {limit}, batas maksimum untuk workspace di luar cloud"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" dijeda"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" dilanjutkan"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" telah dipindahkan atau dihapus. Lampirkan lagi."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" telah menyelesaikan tugasnya"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {Memakai # sumber} other {Memakai # sumber}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {menggunakan # alat} other {menggunakan # alat}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} file melebihi {limit} dan tidak ditambahkan"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} file dilampirkan — satu pesan memuat paling banyak {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star GitHub"
 
@@ -1542,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — lupakan situs ini"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 file melebihi {limit} dan tidak ditambahkan"
 
 msgid "1 hr"
 msgstr "1 jam"
@@ -13898,6 +13922,9 @@ msgstr "Design System Paradev"
 msgid "Paradev desktop app"
 msgstr "Aplikasi desktop Paradev"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev tidak memiliki izin untuk membaca \"{name}\"."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise adalah Paradev untuk tim. Hubungi kami untuk tahu lebih banyak soal apa saja yang termasuk dan bagaimana cocoknya untuk organisasi Anda."
 
@@ -19182,6 +19209,9 @@ msgstr "Aplikasi yang sama berjalan native di iPad, dalam mode potret dan lanska
 msgid "The scorecard"
 msgstr "Kartu skor"
 
+msgid "The selected element's context is too large to send"
+msgstr "Konteks elemen yang dipilih terlalu besar untuk dikirim"
+
 msgid "The self-driving software factory"
 msgstr "Pabrik perangkat lunak yang menyetir sendiri"
 
@@ -21352,9 +21382,6 @@ msgstr "Workspace terbuka, tapi terminal gagal dijalankan."
 
 msgid "Workspace path is not available"
 msgstr "Path workspace tidak tersedia"
-
-msgid "Workspace path is not available yet"
-msgstr "Jalur ruang kerja belum tersedia"
 
 msgid "Workspace restored"
 msgstr "Workspace dipulihkan"

@@ -26,6 +26,8 @@ import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
+	ResolvedAttachment,
 } from "../types";
 import {
 	type RefusedWindow,
@@ -182,11 +184,7 @@ type V2Turn = {
 	idle?: AcpStateUpdate & { seq: number };
 };
 
-export type AcpAttachment = {
-	path: string;
-	mimeType: string;
-	data: string;
-};
+export type AcpAttachment = ResolvedAttachment;
 
 /** `path` is relative to the session cwd. */
 export type AcpStoredImage = { path: string };
@@ -234,7 +232,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
-	resolveAttachment?: (attachmentId: string) => Promise<AcpAttachment | null>;
+	resolveAttachment?: ResolveAttachment;
 	/** Without it, images the agent sends are dropped. */
 	storeImage?: (
 		image: AcpImageSource,
@@ -2271,7 +2269,7 @@ export class AcpAdapter implements HarnessAdapter {
 				continue;
 			}
 			const attachment = await this.options
-				.resolveAttachment?.(entry.attachmentId)
+				.resolveAttachment?.(entry)
 				.catch(() => null);
 			if (!attachment) {
 				dropped.push(entry.name);

@@ -1,4 +1,5 @@
 import semver from "semver";
+import { ATTACHMENT_PARTS_MIN_HOST_VERSION } from "./attachment-limits";
 
 /**
  * Minimum host-service version a v2 workspace UI can work with against a
@@ -105,4 +106,17 @@ export function hostNeedsUpdate(state: HostVersionState): boolean {
 /** Only versioned releases have a matching standalone CLI download. */
 export function isHostUpdateTarget(version: string): boolean {
 	return /^\d+\.\d+\.\d+$/.test(version) && semver.valid(version) !== null;
+}
+
+/**
+ * Whether a host's adapters read a chat attachment part. Below the floor a
+ * client puts path tags in the text instead.
+ */
+export function hostReadsAttachmentParts(
+	hostVersion: string | null | undefined,
+): boolean {
+	const version = semver.coerce(hostVersion ?? "");
+	return (
+		version !== null && semver.gte(version, ATTACHMENT_PARTS_MIN_HOST_VERSION)
+	);
 }

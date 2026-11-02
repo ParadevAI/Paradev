@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import {
-	parsePastedText,
+	attachmentDisplayName,
+	parseAttachmentTags,
 	readBookkeeping,
 	userMessageText,
 } from "@superset/chat/core";
@@ -41,10 +42,31 @@ export function UserMessageBubble({
 	const note = pending ? null : readBookkeeping(harness, raw);
 	if (note) return <SystemLine>{note.label}</SystemLine>;
 
-	const { text, pastes } = parsePastedText(raw);
-	const attachments = content.flatMap((part) =>
-		part.type === "attachment" ? [part] : [],
-	);
+	const {
+		text,
+		attachments: tags,
+		pastedTexts: pastes,
+	} = parseAttachmentTags(raw);
+	const attachments = [
+		...content.flatMap((part) =>
+			part.type === "attachment" && (part.fileId || part.attachmentId)
+				? [
+						{
+							key: part.fileId ?? part.attachmentId ?? part.name,
+							source: { fileId: part.fileId, attachmentId: part.attachmentId },
+							name: part.name,
+							mimeType: part.mimeType,
+						},
+					]
+				: [],
+		),
+		...tags.map((tag) => ({
+			key: tag.path,
+			source: {},
+			name: attachmentDisplayName(tag),
+			mimeType: "",
+		})),
+	];
 	const wide = attachments.length > 0 || pastes.length > 0;
 	const failed = pending?.failed === true;
 	return (
@@ -72,19 +94,19 @@ export function UserMessageBubble({
 							{attachments.map((attachment) =>
 								isViewableImage(attachment.mimeType) ? (
 									<AttachmentThumbnail
-										attachmentId={attachment.attachmentId}
 										hostUrl={hostUrl}
-										key={attachment.attachmentId}
+										key={attachment.key}
 										mediaType={attachment.mimeType}
 										name={attachment.name}
+										source={attachment.source}
 									/>
 								) : (
 									<AttachmentFileCard
-										attachmentId={attachment.attachmentId}
 										hostUrl={hostUrl}
-										key={attachment.attachmentId}
+										key={attachment.key}
 										mediaType={attachment.mimeType}
 										name={attachment.name}
+										source={attachment.source}
 									/>
 								),
 							)}

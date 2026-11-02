@@ -67,11 +67,26 @@ msgstr "“{0}”将通过{2}合并到{1}。在这里无法撤销。"
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "“{0}”将不再触发，其运行历史也会被移除。此操作无法撤销。"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "“{name}”大小为 {size} — 无法附加超过 {limit} 的文件"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "“{name}”大小为 {size} — 无法向此工作区附加超过 {limit} 的文件。如果该文件位于工作区所在的机器上，请改为提及其路径。"
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "“{name}”是一个文件夹。请改为附加其中的文件。"
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "“{name}”超过 {limit}，这是云端以外的工作区可接收的上限"
+
 msgid "\"{name}\" paused"
 msgstr "“{name}”已暂停"
 
 msgid "\"{name}\" resumed"
 msgstr "“{name}”已恢复"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "“{name}”已被移动或删除。请重新附加。"
 
 msgid "\"{title}\" has finished its task"
 msgstr "“{title}”已完成任务"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {使用了 # 个工具} other {使用了 # 个工具}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} 个文件超过 {limit}，未添加"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "已附加 {count} 个文件 — 一条消息最多可包含 {max} 个"
+
 msgid "{count} GitHub stars"
 msgstr "{count}个GitHub星标"
 
@@ -1542,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1个cookie——忘记此站点"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 个文件超过 {limit}，未添加"
 
 msgid "1 hr"
 msgstr "1 小时"
@@ -13898,6 +13922,9 @@ msgstr "Paradev设计系统"
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面应用"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev 没有读取“{name}”的权限。"
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise是面向团队的Paradev。联系我们，了解它包含什么，以及如何适配你的组织。"
 
@@ -19182,6 +19209,9 @@ msgstr "同一个应用在 iPad 上原生运行，支持竖屏和横屏。"
 msgid "The scorecard"
 msgstr "评分表"
 
+msgid "The selected element's context is too large to send"
+msgstr "所选元素的上下文太大，无法发送"
+
 msgid "The self-driving software factory"
 msgstr "自动驾驶的软件工厂"
 
@@ -21352,9 +21382,6 @@ msgstr "工作区已打开，但终端启动失败。"
 
 msgid "Workspace path is not available"
 msgstr "工作区路径不可用"
-
-msgid "Workspace path is not available yet"
-msgstr "工作区路径尚不可用"
 
 msgid "Workspace restored"
 msgstr "工作区已恢复"

@@ -20,8 +20,8 @@ import { MAX_CHAT_IMAGE_BYTES } from "@superset/shared/attachment-limits";
 import {
 	sanitizeAttachmentFileName,
 	WORKSPACE_ATTACHMENTS_DIR,
-	WORKSPACE_ATTACHMENTS_GITIGNORE,
 } from "@superset/shared/workspace-attachments";
+import { ensureWorkspaceAttachmentsDir } from "@superset/shared/workspace-attachments-dir";
 import mimeTypes from "mime-types";
 
 const NAME_HASH_CHARS = 12;
@@ -37,18 +37,6 @@ function stemFor(name: string | undefined): string {
 		? sanitizeAttachmentFileName(basename(name, extname(name)))
 		: null;
 	return sanitized ?? "image";
-}
-
-export function attachmentsDir(cwd: string): string {
-	const dir = join(cwd, WORKSPACE_ATTACHMENTS_DIR);
-	mkdirSync(dir, { recursive: true });
-	try {
-		closeSync(openSync(join(dir, ".gitignore"), "wx"));
-		writeFileSync(join(dir, ".gitignore"), WORKSPACE_ATTACHMENTS_GITIGNORE);
-	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-	}
-	return dir;
 }
 
 function isUsableFile(path: string, maxBytes: number): boolean {
@@ -101,7 +89,7 @@ function storeImage(
 		.digest("hex")
 		.slice(0, NAME_HASH_CHARS);
 	const fileName = `${stemFor(name)}-${hash}.${extensionFor(source.mimeType, name)}`;
-	const target = join(attachmentsDir(cwd), fileName);
+	const target = join(ensureWorkspaceAttachmentsDir(cwd), fileName);
 	if (!existsSync(target)) writeFileSync(target, bytes);
 	return { path: `${WORKSPACE_ATTACHMENTS_DIR}/${fileName}` };
 }
@@ -148,7 +136,7 @@ export function storeAgentImage(
 	}
 	const stored = storeImage(source, cwd, maxBytes);
 	if (stored && referencePath) {
-		attachmentsDir(cwd);
+		ensureWorkspaceAttachmentsDir(cwd);
 		mkdirSync(referenceDir, { recursive: true });
 		writeFileSync(referencePath, JSON.stringify(basename(stored.path)));
 	}

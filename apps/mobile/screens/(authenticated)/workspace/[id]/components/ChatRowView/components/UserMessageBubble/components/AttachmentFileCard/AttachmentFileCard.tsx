@@ -5,24 +5,27 @@ import { FileText } from "lucide-react-native";
 import { View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useAttachmentFile } from "../../hooks/useAttachmentFile";
+import {
+	type AttachmentSource,
+	useAttachmentFile,
+} from "../../hooks/useAttachmentFile";
 
 const GLYPH_SIZE = 36;
 
 export function AttachmentFileCard({
-	attachmentId,
+	source,
 	hostUrl,
 	name,
 	mediaType,
 }: {
-	attachmentId: string;
+	source: AttachmentSource;
 	hostUrl: string | undefined;
 	name: string;
 	mediaType: string;
 }) {
 	const { data: uri } = useAttachmentFile({
 		hostUrl,
-		attachmentId,
+		source,
 		name,
 		mediaType,
 	});

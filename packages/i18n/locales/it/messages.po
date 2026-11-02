@@ -67,11 +67,26 @@ msgstr "\"{0}\" verrà unita in {1} tramite {2}. L'operazione non può essere an
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" smetterà di scattare e la sua cronologia delle esecuzioni verrà rimossa. L'operazione non può essere annullata."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" pesa {size}: non è possibile allegare file più grandi di {limit}"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" pesa {size}: non è possibile allegare a questo workspace file più grandi di {limit}. Se il file si trova sulla macchina del workspace, indica invece il suo percorso."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" è una cartella. Allega invece i file al suo interno."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" supera {limit}, il massimo che un workspace fuori dal cloud può ricevere"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" messa in pausa"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" ripresa"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" è stato spostato o eliminato. Allegalo di nuovo."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" ha completato il suo task"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {Usata # fonte} other {Usate # fonti}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {usato # strumento} other {usati # strumenti}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} file superano {limit} e non sono stati aggiunti"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} file allegati: un messaggio ne può contenere al massimo {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star su GitHub"
 
@@ -1542,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — dimentica questo sito"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 file supera {limit} e non è stato aggiunto"
 
 msgid "1 hr"
 msgstr "1 h"
@@ -13898,6 +13922,9 @@ msgstr "Paradev Design System"
 msgid "Paradev desktop app"
 msgstr "App desktop di Paradev"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev non ha l'autorizzazione per leggere \"{name}\"."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise è Paradev per i team. Contattaci per sapere cosa include e come può funzionare per la tua organizzazione."
 
@@ -19182,6 +19209,9 @@ msgstr "La stessa app funziona in modo nativo su iPad, in verticale e in orizzon
 msgid "The scorecard"
 msgstr "La scheda di valutazione"
 
+msgid "The selected element's context is too large to send"
+msgstr "Il contesto dell’elemento selezionato è troppo grande per essere inviato"
+
 msgid "The self-driving software factory"
 msgstr "La fabbrica di software a guida autonoma"
 
@@ -21352,9 +21382,6 @@ msgstr "Workspace aperto, ma il terminale non è partito."
 
 msgid "Workspace path is not available"
 msgstr "Il percorso del workspace non è disponibile"
-
-msgid "Workspace path is not available yet"
-msgstr "Il percorso dello spazio di lavoro non è ancora disponibile"
 
 msgid "Workspace restored"
 msgstr "Workspace ripristinato"

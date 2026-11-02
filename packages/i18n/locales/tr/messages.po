@@ -67,11 +67,26 @@ msgstr "\"{0}\", {2} ile {1} dalına birleştirilecek. Buradan geri alınamaz."
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" artık tetiklenmeyecek ve çalıştırma geçmişi kaldırılacak. Bu geri alınamaz."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" {size} boyutunda — {limit} üzerindeki dosyalar eklenemez"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" {size} boyutunda — bu çalışma alanına {limit} üzerindeki dosyalar eklenemez. Dosya çalışma alanının makinesindeyse bunun yerine yolunu belirtin."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" bir klasör. Bunun yerine içindeki dosyaları ekle."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" {limit} sınırını aşıyor; bulut dışındaki bir çalışma alanı en fazla bu kadarını alabilir"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" duraklatıldı"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" sürdürüldü"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" taşındı veya silindi. Yeniden ekle."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" görevini tamamladı"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {# araç kullanıldı} other {# araç kullanıldı}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} dosya {limit} sınırını aştığı için eklenmedi"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} dosya eklendi — bir mesaj en fazla {max} dosya taşıyabilir"
+
 msgid "{count} GitHub stars"
 msgstr "{count} GitHub yıldızı"
 
@@ -1542,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 çerez — bu siteyi unut"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 dosya {limit} sınırını aştığı için eklenmedi"
 
 msgid "1 hr"
 msgstr "1 sa"
@@ -13898,6 +13922,9 @@ msgstr "Paradev Tasarım Sistemi"
 msgid "Paradev desktop app"
 msgstr "Paradev masaüstü uygulaması"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev'in \"{name}\" dosyasını okuma izni yok."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise, takımlar için Paradev'dir. Nelerin dahil olduğunu ve kuruluşunuzda nasıl işleyebileceğini öğrenmek için bize ulaşın."
 
@@ -19182,6 +19209,9 @@ msgstr "Aynı uygulama iPad'de yerel olarak, dikey ve yatay modda çalışır."
 msgid "The scorecard"
 msgstr "Puan tablosu"
 
+msgid "The selected element's context is too large to send"
+msgstr "Seçilen öğenin bağlamı gönderilemeyecek kadar büyük"
+
 msgid "The self-driving software factory"
 msgstr "Kendi kendini süren yazılım fabrikası"
 
@@ -21352,9 +21382,6 @@ msgstr "Çalışma alanı açıldı, ancak terminal başlatılamadı."
 
 msgid "Workspace path is not available"
 msgstr "Çalışma alanı yolu kullanılamıyor"
-
-msgid "Workspace path is not available yet"
-msgstr "Çalışma alanı yolu henüz kullanılamıyor"
 
 msgid "Workspace restored"
 msgstr "Çalışma alanı geri yüklendi"

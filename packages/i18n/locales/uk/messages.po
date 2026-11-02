@@ -61,11 +61,26 @@ msgstr "«{0}» буде злито в {1} через {2}. Звідси це н�
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "«{0}» більше не спрацьовуватиме, а історію її запусків буде видалено. Це не можна скасувати."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "«{name}» має розмір {size} — файли понад {limit} прикріпити не можна"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "«{name}» має розмір {size} — до цього робочого простору не можна прикріпити файли понад {limit}. Якщо файл є на машині робочого простору, вкажіть замість цього його шлях."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "«{name}» — це папка. Прикріпіть файли з неї."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "«{name}» більший за {limit} — це максимум для робочого простору поза хмарою"
+
 msgid "\"{name}\" paused"
 msgstr "«{name}» призупинено"
 
 msgid "\"{name}\" resumed"
 msgstr "«{name}» відновлено"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "«{name}» переміщено або видалено. Прикріпіть його знову."
 
 msgid "\"{title}\" has finished its task"
 msgstr "«{title}»: завдання виконано"
@@ -899,6 +914,12 @@ msgstr "{count, plural, one {Використано # джерело} few {Ви�
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {використано # інструмент} few {використано # інструменти} many {використано # інструментів} other {використано # інструмента}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "Файли понад {limit} не додано: {count}"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "Прикріплено файлів: {count} — в одному повідомленні не більше {max}"
+
 msgid "{count} GitHub stars"
 msgstr "Зірок на GitHub: {count}"
 
@@ -1536,6 +1557,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 файл cookie — забути цей сайт"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 файл більший за {limit} і не був доданий"
 
 msgid "1 hr"
 msgstr "1 год"
@@ -13892,6 +13916,9 @@ msgstr "Дизайн-система Paradev"
 msgid "Paradev desktop app"
 msgstr "Десктопний застосунок Paradev"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev не має дозволу на читання «{name}»."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise призначений для команд. Зв'яжіться з нами, щоб дізнатися більше про те, що входить у тариф і як він може працювати для вашої організації."
 
@@ -19176,6 +19203,9 @@ msgstr "Той самий застосунок працює нативно на 
 msgid "The scorecard"
 msgstr "Таблиця оцінок"
 
+msgid "The selected element's context is too large to send"
+msgstr "Контекст вибраного елемента завеликий для надсилання"
+
 msgid "The self-driving software factory"
 msgstr "Самокерована фабрика програмного забезпечення"
 
@@ -21346,9 +21376,6 @@ msgstr "Робочий простір відкрито, але термінал 
 
 msgid "Workspace path is not available"
 msgstr "Шлях до робочого простору недоступний"
-
-msgid "Workspace path is not available yet"
-msgstr "Шлях до робочого простору ще недоступний"
 
 msgid "Workspace restored"
 msgstr "Робочий простір відновлено"
