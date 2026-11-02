@@ -293,8 +293,9 @@ export class ClaudeAdapter implements HarnessAdapter {
 		}
 
 		this.emitApproval(approvalId, pending, "answered", decision);
-		if (this.approvals.size === 0 && this.translator?.currentTurnId) {
-			this.events.push({ kind: "session", session: { status: "running" } });
+		if (this.approvals.size === 0) {
+			const status = this.translator?.currentTurnId ? "running" : "idle";
+			this.events.push({ kind: "session", session: { status } });
 		}
 		if (decision.type === "cancel") this.cancelTurn();
 	}
@@ -334,7 +335,12 @@ export class ClaudeAdapter implements HarnessAdapter {
 				this.pushAll(translator.translate(message));
 			}
 		} catch (error) {
+			const waiting = this.approvals.size > 0;
 			this.pushAll(translator.interrupt(String(error)));
+			if (waiting) {
+				this.events.push({ kind: "session", session: { status: "idle" } });
+				return;
+			}
 		}
 		if (this.staleApprovals()) {
 			this.events.push({ kind: "session", session: { status: "idle" } });

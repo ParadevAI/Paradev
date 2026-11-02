@@ -2165,6 +2165,38 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("a steer waiting on a compaction is released when a v2 turn ends on idle", async () => {
+		const agent = new FakeAcpAgent();
+		agent.insertOnPrompt = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "compact-1",
+			title: "Compact conversation",
+			status: "in_progress",
+			_meta: { claudeCode: { toolName: "compact" } },
+		});
+		await flush();
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(steered).toBeUndefined();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "state_update",
+			state: "idle",
+			stopReason: "end_turn",
+		});
+		await flush();
+		expect(steered).toBe(false);
+		await adapter.dispose();
+	});
+
 	it("v2 idle cancelled interrupts the turn", async () => {
 		const agent = new FakeAcpAgent();
 		agent.insertOnPrompt = true;
@@ -3495,6 +3527,39 @@ describe("AcpAdapter on protocol v2", () => {
 			content: { type: "text", text: "The helper finished." },
 		});
 		await flush();
+		expect(sessionsOf(events).at(-1)?.status).toBe("running");
+		await adapter.dispose();
+	});
+
+	it("a running state update ends a background-only hold", async () => {
+		const agent = new FakeAcpAgent();
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "spawn a helper" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Helper",
+			task: "Help",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 10,
+			size: 100,
+			cost: { amount: 0.01, currency: "USD" },
+		});
+		await flush();
+		expect(sessionsOf(events).at(-1)?.awaitingBackground).toBe(true);
+
+		agent.notify("sess-1", { sessionUpdate: "state_update", state: "running" });
+		await flush();
+		const held = sessionsOf(events)
+			.filter((session) => session.awaitingBackground !== undefined)
+			.at(-1);
+		expect(held?.awaitingBackground).toBe(false);
 		expect(sessionsOf(events).at(-1)?.status).toBe("running");
 		await adapter.dispose();
 	});

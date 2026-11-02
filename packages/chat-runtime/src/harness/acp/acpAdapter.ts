@@ -1128,7 +1128,6 @@ export class AcpAdapter implements HarnessAdapter {
 				sessionId: this.sessionId,
 				prompt: await this.toAcpPrompt(content),
 			});
-			this.endCompactions();
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (
 				v2 &&
@@ -1199,6 +1198,7 @@ export class AcpAdapter implements HarnessAdapter {
 		stopReason: string | undefined,
 		usage?: AcpPromptUsage,
 	): void {
+		this.endCompactions();
 		this.main.flush();
 		this.emitTurn({
 			id: turnId,
@@ -1225,6 +1225,7 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	private failTurn(turnId: string, error: TurnError): void {
+		this.endCompactions();
 		this.customAnswer = null;
 		this.main.flush();
 		this.cancelPendingApprovals(turnId);
@@ -1555,6 +1556,10 @@ export class AcpAdapter implements HarnessAdapter {
 			this.options.clientApprovalModes
 		)
 			return;
+		if (parsed.data.state === "running" && this.cycleEnded) {
+			this.cycleEnded = false;
+			this.syncAwaitingBackground();
+		}
 		const status = SESSION_STATUS_BY_ACP_STATE[parsed.data.state];
 		if (!status) return;
 		this.emitSession({

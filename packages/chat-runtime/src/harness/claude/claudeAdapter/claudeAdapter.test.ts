@@ -11,6 +11,7 @@ type Harness = {
 	adapter: ClaudeAdapter;
 	iterator: AsyncIterator<AdapterEvent>;
 	emit: (message: unknown) => void;
+	crash: (error: Error) => void;
 	interrupts: number;
 	aborted: () => boolean;
 	options: () => ClaudeQueryOptions | null;
@@ -37,11 +38,13 @@ function createHarness(): Harness {
 	let notify: (() => void) | null = null;
 	let aborted = false;
 	let queryOptions: ClaudeQueryOptions | null = null;
+	let crashed: Error | null = null;
 	const state = { interrupts: 0 };
 
 	const stream: ClaudeSession = {
 		async *[Symbol.asyncIterator]() {
 			while (true) {
+				if (crashed) throw crashed;
 				const next = pending.shift();
 				if (next !== undefined) {
 					yield next;
@@ -73,6 +76,12 @@ function createHarness(): Harness {
 		iterator,
 		emit: (message: unknown) => {
 			pending.push(message);
+			const resume = notify;
+			notify = null;
+			resume?.();
+		},
+		crash: (error: Error) => {
+			crashed = error;
 			const resume = notify;
 			notify = null;
 			resume?.();
@@ -229,6 +238,48 @@ describe("ClaudeAdapter", () => {
 		const approvalId = approval?.kind === "item" ? approval.item.id : "";
 		harness.adapter.respondToApproval(approvalId, { type: "accept" });
 		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
+	});
+
+	test("a stream that fails while an approval waits leaves the session idle", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+		void harness.options()?.canUseTool?.(
+			"Bash",
+			{ command: "touch x" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+			},
+		);
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe(
+			"awaiting_input",
+		);
+
+		harness.crash(new Error("claude exited"));
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("idle");
+	});
+
+	test("an approval answered while no turn is open leaves the session idle", async () => {
+		const harness = createHarness();
+		await Promise.resolve();
+		void harness.options()?.canUseTool?.(
+			"Bash",
+			{ command: "touch x" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+			},
+		);
+		const raised = await untilStatus(harness.iterator);
+		expect(lastStatus(raised)).toBe("awaiting_input");
+		const approval = raised.find((event) => event.kind === "item");
+		const approvalId = approval?.kind === "item" ? approval.item.id : "";
+		harness.adapter.respondToApproval(approvalId, { type: "accept" });
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("idle");
 	});
 
 	test("dispose aborts the underlying session", async () => {

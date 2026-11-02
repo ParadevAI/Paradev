@@ -1,4 +1,5 @@
 import {
+	isPendingApproval,
 	type OutboxEntry,
 	type TurnGroup,
 	toolRunKey,
@@ -108,11 +109,7 @@ function repeatedTurnFailure(
 }
 
 function asksTheUser(entry: TurnGroup["entries"][number]): boolean {
-	return (
-		entry.kind === "item" &&
-		entry.item.kind === "approval_request" &&
-		(entry.item as ApprovalRequest).status === "pending"
-	);
+	return entry.kind === "item" && isPendingApproval(entry.item);
 }
 
 function withNoticeDetail(
