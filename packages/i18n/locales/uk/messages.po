@@ -5305,6 +5305,9 @@ msgstr "Копіювати назву гілки"
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Скопіюйте історію перегляду й дані входу з Chrome, Brave, Arc або іншого браузера на основі Chromium у Paradev."
 
+msgid "Copy build ID"
+msgstr "Скопіювати ID збірки"
+
 msgid "Copy code"
 msgstr "Копіювати код"
 

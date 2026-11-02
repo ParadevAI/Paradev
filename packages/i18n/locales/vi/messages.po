@@ -5311,6 +5311,9 @@ msgstr "Sao chép tên nhánh"
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ Chrome, Brave, Arc hoặc trình duyệt Chromium khác vào Paradev."
 
+msgid "Copy build ID"
+msgstr "Sao chép ID bản build"
+
 msgid "Copy code"
 msgstr "Sao chép mã"
 

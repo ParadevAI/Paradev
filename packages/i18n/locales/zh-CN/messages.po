@@ -5311,6 +5311,9 @@ msgstr "复制分支名"
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "将Chrome、Brave、Arc或其他Chromium浏览器的浏览历史和登录信息复制到Paradev。"
 
+msgid "Copy build ID"
+msgstr "复制构建 ID"
+
 msgid "Copy code"
 msgstr "复制代码"
 

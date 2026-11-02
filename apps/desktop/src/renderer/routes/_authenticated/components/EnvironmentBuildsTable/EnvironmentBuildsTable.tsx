@@ -11,9 +11,9 @@ import {
 import { EnvironmentBuildStatus } from "renderer/routes/_authenticated/components/EnvironmentBuildStatus";
 import {
 	BUILD_TRIGGER_LABELS,
-	buildDisplayId,
 	type EnvironmentBuild,
 } from "renderer/routes/_authenticated/utils/environmentBuildMeta";
+import { BuildIdCell } from "./components/BuildIdCell";
 
 interface EnvironmentBuildsTableProps {
 	builds: readonly EnvironmentBuild[];
@@ -54,13 +54,8 @@ export function EnvironmentBuildsTable({
 						</TableRow>
 					) : (
 						builds.map((build) => (
-							<TableRow key={build.id}>
-								<TableCell
-									className="truncate font-mono text-xs"
-									title={build.id}
-								>
-									{buildDisplayId(build)}
-								</TableCell>
+							<TableRow className="group" key={build.id}>
+								<BuildIdCell buildId={build.id} />
 								<TableCell>
 									{i18n._(BUILD_TRIGGER_LABELS[build.trigger])}
 								</TableCell>

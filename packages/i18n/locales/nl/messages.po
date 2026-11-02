@@ -5311,6 +5311,9 @@ msgstr "Branchnaam kopiëren"
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Kopieer browsegeschiedenis en logins uit Chrome, Brave, Arc of een andere Chromium-browser naar Paradev."
 
+msgid "Copy build ID"
+msgstr "Build-ID kopiëren"
+
 msgid "Copy code"
 msgstr "Code kopiëren"
 

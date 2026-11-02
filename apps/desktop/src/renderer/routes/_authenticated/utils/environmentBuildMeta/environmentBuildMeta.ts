@@ -23,14 +23,3 @@ export const BUILD_STATUS_LABELS: Record<
 	succeeded: msg({ message: "Success" }),
 	failed: msg({ message: "Failure" }),
 };
-
-/** "bld-20261029-4f2a9c1e-…": the day it started, then its id. */
-export function buildDisplayId(
-	build: Pick<EnvironmentBuild, "id" | "startedAt">,
-): string {
-	const day = new Date(build.startedAt)
-		.toISOString()
-		.slice(0, 10)
-		.replaceAll("-", "");
-	return `bld-${day}-${build.id}`;
-}

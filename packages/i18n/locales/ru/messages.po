@@ -5311,6 +5311,9 @@ msgstr "Скопировать имя ветки"
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Скопируйте историю просмотров и логины из Chrome, Brave, Arc или другого браузера на Chromium в Paradev."
 
+msgid "Copy build ID"
+msgstr "Скопировать ID сборки"
+
 msgid "Copy code"
 msgstr "Копировать код"
 

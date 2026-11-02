@@ -5311,6 +5311,9 @@ msgstr "Copiar el nombre de la rama"
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Copia a Paradev el historial de navegación y los inicios de sesión de Chrome, Brave, Arc u otro navegador basado en Chromium."
 
+msgid "Copy build ID"
+msgstr "Copiar ID de compilación"
+
 msgid "Copy code"
 msgstr "Copiar código"
 
