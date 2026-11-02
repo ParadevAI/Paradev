@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "84849717-abd3-4a8f-9470-79a572ef8cb2",
-  "prevId": "540614a0-7a75-4ee1-906b-e26b9886d7ff",
+  "id": "a03355e8-f6b7-4765-8e18-290a81e3a839",
+  "prevId": "dcec780e-d92e-4db2-8686-9d3276a7c6ca",
   "tables": {
     "browser_history": {
       "name": "browser_history",
@@ -495,7 +495,7 @@
           "name": "url",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "device_key": {
@@ -801,6 +801,13 @@
         },
         "terminal_cursor_blink": {
           "name": "terminal_cursor_blink",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "terminal_mac_option_is_meta": {
+          "name": "terminal_mac_option_is_meta",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

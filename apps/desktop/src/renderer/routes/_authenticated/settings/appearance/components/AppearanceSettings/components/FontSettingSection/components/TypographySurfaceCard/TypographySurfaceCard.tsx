@@ -25,6 +25,7 @@ import {
 	DEFAULT_TERMINAL_FONT_SIZE,
 	DEFAULT_TERMINAL_LIGATURES,
 	DEFAULT_TERMINAL_LINE_HEIGHT,
+	DEFAULT_TERMINAL_MAC_OPTION_IS_META,
 } from "renderer/lib/terminal/appearance";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import {
@@ -36,6 +37,12 @@ import type { FontInfo } from "../../hooks/useSystemFonts";
 import { toFontWeightOverride } from "../../utils/toFontWeightOverride";
 import { FontFamilyCombobox } from "../FontFamilyCombobox";
 import { FontPreview } from "../FontPreview";
+
+// Option is a macOS key. The row below persists a setting that no key press on
+// another platform can reach, so it only renders where the key exists.
+const IS_MAC =
+	typeof navigator !== "undefined" &&
+	navigator.platform.toLowerCase().includes("mac");
 
 export type FontSettingsUpdate =
 	inferRouterInputs<AppRouter>["settings"]["setFontSettings"];
@@ -95,6 +102,7 @@ const VARIANT_CONFIG = {
 			"terminalMinimumContrast",
 			"terminalCursorStyle",
 			"terminalCursorBlink",
+			"terminalMacOptionIsMeta",
 		] satisfies FontSettingKey[],
 	},
 } as const;
@@ -464,6 +472,36 @@ export function TypographySurfaceCard({
 								}
 							/>
 						</div>
+						{IS_MAC && (
+							<div className="flex items-center justify-between gap-3 min-h-14 sm:col-span-2">
+								<div>
+									<Label
+										htmlFor="terminal-mac-option-is-meta"
+										className="text-xs"
+									>
+										<Trans id="settings.appearance.typography.macOptionIsMeta">
+											Option as Meta (macOS)
+										</Trans>
+									</Label>
+									<p className="text-[11px] text-muted-foreground">
+										<Trans id="settings.appearance.typography.macOptionIsMetaHint">
+											Treat the Option key as Meta so Alt-based TUI shortcuts
+											reach the program.
+										</Trans>
+									</p>
+								</div>
+								<Switch
+									id="terminal-mac-option-is-meta"
+									checked={
+										settings.terminalMacOptionIsMeta ??
+										DEFAULT_TERMINAL_MAC_OPTION_IS_META
+									}
+									onCheckedChange={(checked) =>
+										mutateSetting("terminalMacOptionIsMeta", checked)
+									}
+								/>
+							</div>
+						)}
 					</>
 				)}
 			</div>
