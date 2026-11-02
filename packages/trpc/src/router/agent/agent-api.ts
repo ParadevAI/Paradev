@@ -69,7 +69,6 @@ export const agentApiRouter = {
 			return listTopLevelMessages(input);
 		}),
 
-	/** The worker's post of a turn's final answer, as the Dev. */
 	postMessage: devProcedure
 		.input(
 			z.object({
