@@ -17097,9 +17097,6 @@ msgstr "Отправка…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Отправит {0} символов контекста терминала (примерно {1} токенов) агенту {2}."
 
-msgid "Sensitive"
-msgstr "Секретная"
-
 msgid "Sent"
 msgstr "Отправлено"
 

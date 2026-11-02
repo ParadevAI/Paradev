@@ -17097,9 +17097,6 @@ msgstr "Wysyłanie…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Wyśle {0} znaków kontekstu terminala (około {1} tokenów) do {2}."
 
-msgid "Sensitive"
-msgstr "Poufna"
-
 msgid "Sent"
 msgstr "Wysłano"
 

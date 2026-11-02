@@ -1,7 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { LuCircleCheck, LuCircleX, LuLoaderCircle } from "react-icons/lu";
+import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
+import { LuLoaderCircle } from "react-icons/lu";
 import {
 	BUILD_STATUS_LABELS,
 	type EnvironmentBuild,
@@ -22,11 +23,11 @@ export function EnvironmentBuildStatus({
 	const label = (
 		<span className={cn("inline-flex items-center gap-2", className)}>
 			{status === "succeeded" ? (
-				<LuCircleCheck className="size-3.5 shrink-0 text-emerald-500" />
+				<HiCheckCircle className="size-4 shrink-0 text-emerald-500" />
 			) : status === "failed" ? (
-				<LuCircleX className="size-3.5 shrink-0 text-destructive" />
+				<HiXCircle className="size-4 shrink-0 text-destructive" />
 			) : (
-				<LuLoaderCircle className="size-3.5 shrink-0 animate-spin text-sky-500" />
+				<LuLoaderCircle className="size-4 shrink-0 animate-spin text-sky-500" />
 			)}
 			{i18n._(BUILD_STATUS_LABELS[status])}
 		</span>

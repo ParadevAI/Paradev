@@ -17097,9 +17097,6 @@ msgstr "正在发送…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "将向 {2} 发送 {0} 个字符的终端上下文（约 {1} 个 token）。"
 
-msgid "Sensitive"
-msgstr "敏感"
-
 msgid "Sent"
 msgstr "发送时间"
 

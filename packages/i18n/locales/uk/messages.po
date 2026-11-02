@@ -17091,9 +17091,6 @@ msgstr "Надсилання…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Надсилає агенту {2} контекст термінала: символів — {0}, токенів — приблизно {1}."
 
-msgid "Sensitive"
-msgstr "Секретна"
-
 msgid "Sent"
 msgstr "Надіслано"
 

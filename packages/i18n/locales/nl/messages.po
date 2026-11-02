@@ -17097,9 +17097,6 @@ msgstr "Versturen…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Stuurt {0} tekens terminalcontext (ongeveer {1} tokens) naar {2}."
 
-msgid "Sensitive"
-msgstr "Gevoelig"
-
 msgid "Sent"
 msgstr "Verstuurd"
 

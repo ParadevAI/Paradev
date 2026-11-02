@@ -1,5 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import { formatRelativeTime } from "@superset/i18n/format";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
@@ -7,6 +6,8 @@ import { useMemo, useState } from "react";
 import { LuArrowUpRight, LuPlus } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { AddSecretSheet } from "renderer/routes/_authenticated/components/AddSecretSheet";
+import { EditSecretDialog } from "renderer/routes/_authenticated/components/EditSecretDialog";
+import { SecretRow } from "renderer/routes/_authenticated/components/SecretRow";
 
 const PREVIEW_COUNT = 5;
 
@@ -21,9 +22,16 @@ export function EnvironmentVariablesPreview({
 	const navigate = useNavigate();
 	const utils = cloudTrpc.useUtils();
 	const [adding, setAdding] = useState(false);
-	const variables = cloudTrpc.environment.secrets.list.useQuery({
+	const [editing, setEditing] = useState<{
+		id: string;
+		key: string;
+		value: string;
+		sensitive: boolean;
+	} | null>(null);
+	const variables = cloudTrpc.environment.secrets.getDecrypted.useQuery({
 		environmentId,
 	});
+	const refresh = () => void utils.environment.secrets.invalidate();
 	const recent = useMemo(
 		() =>
 			[...(variables.data ?? [])]
@@ -85,40 +93,35 @@ export function EnvironmentVariablesPreview({
 					<Trans>No variables set yet.</Trans>
 				</p>
 			) : (
-				<div className="divide-y overflow-hidden rounded-md border">
+				<div className="rounded-md border">
 					{recent.map((variable) => (
-						<button
-							className="flex h-9 w-full items-center gap-3 px-3 text-left hover:bg-accent/40"
+						<SecretRow
+							environmentId={environmentId}
 							key={variable.id}
-							onClick={() =>
-								navigate({
-									to: "/environments/$environmentId/variables",
-									params: { environmentId },
-								})
-							}
-							type="button"
-						>
-							<span className="min-w-0 flex-1 truncate font-mono text-xs">
-								{variable.key}
-							</span>
-							{variable.sensitive && (
-								<span className="text-[11px] text-muted-foreground">
-									<Trans>Sensitive</Trans>
-								</span>
-							)}
-							<span className="text-[11px] text-muted-foreground">
-								{formatRelativeTime(new Date(variable.updatedAt))}
-							</span>
-						</button>
+							onDeleted={refresh}
+							onEdit={() => setEditing(variable)}
+							secret={variable}
+						/>
 					))}
 				</div>
 			)}
 			<AddSecretSheet
 				environmentId={environmentId}
 				onOpenChange={setAdding}
-				onSaved={() => void utils.environment.secrets.list.invalidate()}
+				onSaved={refresh}
 				open={adding}
 			/>
+			{editing && (
+				<EditSecretDialog
+					environmentId={environmentId}
+					onOpenChange={(open) => {
+						if (!open) setEditing(null);
+					}}
+					onSaved={refresh}
+					open
+					secret={editing}
+				/>
+			)}
 		</section>
 	);
 }

@@ -17097,9 +17097,6 @@ msgstr "Mengirim…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Mengirim {0} karakter konteks terminal (sekitar {1} token) ke {2}."
 
-msgid "Sensitive"
-msgstr "Sensitif"
-
 msgid "Sent"
 msgstr "Dikirim"
 

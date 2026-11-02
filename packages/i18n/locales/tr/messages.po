@@ -17097,9 +17097,6 @@ msgstr "Gönderiliyor…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "{2} ajanına {0} karakterlik terminal bağlamı (yaklaşık {1} token) gönderir."
 
-msgid "Sensitive"
-msgstr "Hassas"
-
 msgid "Sent"
 msgstr "Gönderildi"
 

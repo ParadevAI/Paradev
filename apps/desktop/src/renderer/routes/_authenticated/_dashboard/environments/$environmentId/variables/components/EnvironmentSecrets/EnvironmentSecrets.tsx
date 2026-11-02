@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 import { AddSecretSheet } from "renderer/routes/_authenticated/components/AddSecretSheet";
-import { EditSecretDialog } from "./components/EditSecretDialog";
+import { EditSecretDialog } from "renderer/routes/_authenticated/components/EditSecretDialog";
 import { EnvironmentVariablesList } from "./components/EnvironmentVariablesList";
 
 interface EnvironmentSecretsProps {

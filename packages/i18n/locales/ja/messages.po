@@ -17097,9 +17097,6 @@ msgstr "送信中…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "ターミナルのコンテキスト {0} 文字（約 {1} トークン）を {2} に送信します。"
 
-msgid "Sensitive"
-msgstr "機密"
-
 msgid "Sent"
 msgstr "送信日"
 

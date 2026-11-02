@@ -11,6 +11,7 @@ import {
 import { EnvironmentBuildStatus } from "renderer/routes/_authenticated/components/EnvironmentBuildStatus";
 import {
 	BUILD_TRIGGER_LABELS,
+	buildDisplayId,
 	type EnvironmentBuild,
 } from "renderer/routes/_authenticated/utils/environmentBuildMeta";
 
@@ -54,8 +55,11 @@ export function EnvironmentBuildsTable({
 					) : (
 						builds.map((build) => (
 							<TableRow key={build.id}>
-								<TableCell className="truncate font-mono text-xs">
-									{build.id.slice(0, 8)}
+								<TableCell
+									className="truncate font-mono text-xs"
+									title={build.id}
+								>
+									{buildDisplayId(build)}
 								</TableCell>
 								<TableCell>
 									{i18n._(BUILD_TRIGGER_LABELS[build.trigger])}

@@ -16,7 +16,7 @@ import {
 	HiOutlinePlus,
 } from "react-icons/hi2";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import { SecretRow } from "./components/SecretRow";
+import { SecretRow } from "renderer/routes/_authenticated/components/SecretRow";
 
 interface Secret {
 	id: string;

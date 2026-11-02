@@ -17097,9 +17097,6 @@ msgstr "보내는 중…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "터미널 컨텍스트 {0}자(약 {1} 토큰)를 {2}에 보냅니다."
 
-msgid "Sensitive"
-msgstr "민감"
-
 msgid "Sent"
 msgstr "보낸 날짜"
 

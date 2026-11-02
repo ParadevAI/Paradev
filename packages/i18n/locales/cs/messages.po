@@ -17097,9 +17097,6 @@ msgstr "Odesílám…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Odešle {0} znaků kontextu terminálu (přibližně {1} tokenů) agentovi {2}."
 
-msgid "Sensitive"
-msgstr "Citlivá"
-
 msgid "Sent"
 msgstr "Odesláno"
 

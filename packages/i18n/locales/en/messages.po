@@ -17097,9 +17097,6 @@ msgstr "Sending…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 
-msgid "Sensitive"
-msgstr "Sensitive"
-
 msgid "Sent"
 msgstr "Sent"
 
