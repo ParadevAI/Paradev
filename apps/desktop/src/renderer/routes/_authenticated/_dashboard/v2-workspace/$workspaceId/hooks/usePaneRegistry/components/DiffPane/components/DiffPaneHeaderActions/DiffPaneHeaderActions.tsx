@@ -87,6 +87,7 @@ export function DiffPaneHeaderActions({
 			<DiffPaneMoreMenu
 				areAllFilesCollapsed={areAllFilesCollapsed}
 				onToggleCollapseAll={onToggleCollapseAll}
+				commentNav={commentNav.total > 0 ? commentNav : undefined}
 			/>
 			{files && <DiffTreeToggleButton {...files} />}
 			<div

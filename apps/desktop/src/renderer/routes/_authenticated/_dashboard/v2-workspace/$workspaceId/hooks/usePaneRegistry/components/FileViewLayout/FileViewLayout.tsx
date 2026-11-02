@@ -195,6 +195,7 @@ export function FileViewLayout({
 			</ResizablePanelGroup>
 			{filePath && (
 				<FileBreadcrumb
+					key={filePath}
 					workspaceId={workspaceId}
 					filePath={filePath}
 					onOpenFile={(path) =>

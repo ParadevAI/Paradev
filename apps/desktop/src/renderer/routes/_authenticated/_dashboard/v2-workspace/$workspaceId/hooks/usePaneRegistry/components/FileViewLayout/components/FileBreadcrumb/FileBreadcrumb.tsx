@@ -1,4 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	Fragment,
@@ -102,6 +103,7 @@ export function FileBreadcrumb({
 			}
 			setVisibleCount(1);
 			setShowTrail(false);
+			setOpenCrumb((open) => (open === -1 ? null : open));
 		};
 		fit();
 		const observer = new ResizeObserver(fit);
@@ -143,7 +145,12 @@ export function FileBreadcrumb({
 		/>
 	);
 
-	const crumb = (key: number, label: ReactNode, content: ReactNode) => (
+	const crumb = (
+		key: number,
+		label: ReactNode,
+		content: ReactNode,
+		className = "min-w-0 truncate",
+	) => (
 		<Popover
 			open={openCrumb === key}
 			onOpenChange={(open) => {
@@ -154,7 +161,7 @@ export function FileBreadcrumb({
 			<PopoverTrigger asChild>
 				<button
 					type="button"
-					className="min-w-0 truncate rounded-sm px-0.5 hover:text-foreground"
+					className={cn(className, "rounded-sm px-0.5 hover:text-foreground")}
 				>
 					{label}
 				</button>
@@ -203,6 +210,7 @@ export function FileBreadcrumb({
 							) : (
 								treeFor(trailPick)
 							),
+							"shrink-0",
 						)}
 						{separator}
 					</>
