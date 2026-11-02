@@ -26,6 +26,7 @@ import {
 	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
 } from "./lib/sandbox/api-credential";
+import type { DevPrincipal, PersonPrincipal } from "./principal";
 
 export type { I18nErrorCause, RequiredPlan } from "./i18n-error";
 export { isI18nErrorCause, planRequiredError, userError } from "./i18n-error";
@@ -164,6 +165,11 @@ const clientTelemetry = t.middleware(async ({ ctx, path, next }) => {
 
 export const publicProcedure = t.procedure.use(clientTelemetry);
 
+const personPrincipal = (
+	userId: string,
+	organizationId: string | null,
+): PersonPrincipal => ({ kind: "person", userId, organizationId });
+
 /** The only procedures a pending-deletion account may call. */
 const PENDING_DELETION_ALLOWED_PROCEDURES = new Set([
 	"user.me",
@@ -246,7 +252,12 @@ export const protectedProcedure = t.procedure
 			activeOrganizationId = headerOrgId;
 		}
 
-		return next({ ctx: { ...ctx, activeOrganizationId } });
+		const principal: PersonPrincipal = {
+			kind: "person",
+			userId: ctx.session.user.id,
+			organizationId: activeOrganizationId,
+		};
+		return next({ ctx: { ...ctx, activeOrganizationId, principal } });
 	});
 
 /**
@@ -335,14 +346,16 @@ export const jwtProcedure = t.procedure
 								)
 							: [],
 					);
+					const activeOrganizationId = resolveActiveOrganizationId(
+						organizationIds,
+						headerOrgId,
+					);
 					return next({
 						ctx: {
 							userId: payload.sub,
 							organizationIds,
-							activeOrganizationId: resolveActiveOrganizationId(
-								organizationIds,
-								headerOrgId,
-							),
+							activeOrganizationId,
+							principal: personPrincipal(payload.sub, activeOrganizationId),
 						},
 					});
 				}
@@ -365,19 +378,21 @@ export const jwtProcedure = t.procedure
 				ctx.sandboxCaller,
 				memberRows.map((row) => row.organizationId),
 			);
+			const activeOrganizationId = headerOrgId
+				? resolveActiveOrganizationId(
+						organizationIds,
+						headerOrgId,
+						ctx.session.user.email,
+					)
+				: (ctx.session.session.activeOrganizationId ??
+					organizationIds[0] ??
+					null);
 			return next({
 				ctx: {
 					userId,
 					organizationIds,
-					activeOrganizationId: headerOrgId
-						? resolveActiveOrganizationId(
-								organizationIds,
-								headerOrgId,
-								ctx.session.user.email,
-							)
-						: (ctx.session.session.activeOrganizationId ??
-							organizationIds[0] ??
-							null),
+					activeOrganizationId,
+					principal: personPrincipal(userId, activeOrganizationId),
 				},
 			});
 		}
@@ -418,12 +433,12 @@ export const workerProcedure = t.procedure.use(async ({ ctx, next }) => {
 });
 
 /**
- * An agent acting inside a running turn, never a person: authenticated by a
+ * A Dev acting inside a running turn, never a person: authenticated by a
  * turn token in its own header and signed with its own key, so it can never
- * pass as a user's JWT. A settled turn, or an archived agent, stops working
- * at once rather than when the token expires.
+ * pass as a user's JWT. A settled turn, or an archived Dev, stops working at
+ * once rather than when the token expires.
  */
-export const agentProcedure = t.procedure.use(async ({ ctx, next }) => {
+export const devProcedure = t.procedure.use(async ({ ctx, next }) => {
 	const token = ctx.headers.get(TURN_TOKEN_HEADER);
 	const claims = token
 		? await verifyTurnToken(env.AGENT_TURN_SIGNING_SECRET, token)
@@ -432,7 +447,11 @@ export const agentProcedure = t.procedure.use(async ({ ctx, next }) => {
 		throw new TRPCError({ code: "UNAUTHORIZED", message: "No turn token." });
 	}
 	const [turn] = await db
-		.select({ status: agentTurns.status, archivedAt: agents.archivedAt })
+		.select({
+			status: agentTurns.status,
+			archivedAt: agents.archivedAt,
+			ownerId: agents.createdByUserId,
+		})
 		.from(agentTurns)
 		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
 		.where(
@@ -450,15 +469,14 @@ export const agentProcedure = t.procedure.use(async ({ ctx, next }) => {
 			message: "Turn is not running.",
 		});
 	}
-	return next({
-		ctx: {
-			agentTurn: {
-				agentId: claims.agentId,
-				organizationId: claims.organizationId,
-				sessionId: claims.sessionId,
-				turnId: claims.turnId,
-				actingUserId: claims.actingUserId,
-			},
-		},
-	});
+	const principal: DevPrincipal = {
+		kind: "dev",
+		agentId: claims.agentId,
+		organizationId: claims.organizationId,
+		ownerId: turn.ownerId,
+		askerId: claims.actingUserId,
+		sessionId: claims.sessionId,
+		turnId: claims.turnId,
+	};
+	return next({ ctx: { principal } });
 });
