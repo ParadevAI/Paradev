@@ -78,7 +78,7 @@ that must not change under them.
 - `mcp` — the vendor's own MCP server (`type: "streamable-http"`, `url`, optional `headers`), not a
   map: a plugin serves tools from exactly one place. Omit it for a Paradev-hosted plugin.
 
-The published JSON Schema at `https://superset.sh/schemas/plugin/1.0.0.json` is generated from
+The published JSON Schema at `https://paradev.com/schemas/plugin/1.0.0.json` is generated from
 `pluginManifestSchema` in `packages/shared/src/plugins/manifest-schema.ts`, and
 `superset plugins publish` validates against that same definition — so the schema we serve and the
 schema we enforce cannot drift.

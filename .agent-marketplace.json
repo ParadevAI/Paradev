@@ -1,5 +1,5 @@
 {
-	"$schema": "https://superset.sh/schemas/marketplace/1.0.0.json",
+	"$schema": "https://paradev.com/schemas/marketplace/1.0.0.json",
 	"name": "superset",
 	"description": "First-party Paradev plugins: skills and MCP tools for the agents you run.",
 	"owner": {
