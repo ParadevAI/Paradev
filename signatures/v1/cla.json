@@ -175,6 +175,14 @@
       "created_at": "2026-10-28T16:48:52Z",
       "repoId": 1080370450,
       "pullRequestNo": 8240
+    },
+    {
+      "name": "talarczykco",
+      "id": 1820718,
+      "comment_id": 6590115155,
+      "created_at": "2026-11-02T22:29:30Z",
+      "repoId": 1080370450,
+      "pullRequestNo": 7274
     }
   ]
 }
