@@ -67,13 +67,13 @@ function AddTabButton<_TData>({
 	const pendingActionRef = useRef<(() => void) | null>(null);
 	const button = (
 		<Button
-			className="ml-1.5 size-7 rounded-md border border-border/60 bg-muted/30 px-1 text-muted-foreground shadow-none hover:bg-accent/60 hover:text-foreground"
+			className="size-7 rounded-md text-muted-foreground shadow-none hover:bg-fill-hover hover:text-foreground"
 			size="icon"
 			type="button"
 			variant="ghost"
 			onClick={onAddTab}
 		>
-			<PlusIcon className="size-3.5" />
+			<PlusIcon className="size-4" strokeWidth={1.75} />
 		</Button>
 	);
 
@@ -255,7 +255,7 @@ export function TabBar<TData>({
 			<OverflowFadeContainer
 				observeChildren
 				onOverflowChange={handleOverflowChange}
-				className="hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden"
+				className="hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden pl-1.5"
 			>
 				<div
 					ref={tabsTrackRef}
@@ -263,7 +263,7 @@ export function TabBar<TData>({
 				>
 					{tabs.map((tab, i) => (
 						<div
-							className="h-full shrink-0 pt-1"
+							className="flex h-full shrink-0 items-center px-0.5"
 							key={tab.id}
 							style={{ width: TAB_WIDTH }}
 						>
@@ -297,7 +297,7 @@ export function TabBar<TData>({
 						/>
 					)}
 					{!hasHorizontalOverflow && (
-						<div className="flex h-full w-10 shrink-0 items-center justify-center pt-1">
+						<div className="flex h-full w-10 shrink-0 items-center justify-center">
 							<AddTabButton
 								renderAddTabMenu={renderAddTabMenu}
 								onAddTab={onAddTab}
@@ -310,7 +310,7 @@ export function TabBar<TData>({
 				</div>
 			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
-				<div className="no-drag flex h-full w-10 shrink-0 items-center justify-center pt-1">
+				<div className="no-drag flex h-full w-10 shrink-0 items-center justify-center">
 					<AddTabButton
 						renderAddTabMenu={renderAddTabMenu}
 						onAddTab={onAddTab}

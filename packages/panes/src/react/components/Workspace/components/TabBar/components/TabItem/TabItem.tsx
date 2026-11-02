@@ -126,10 +126,10 @@ export function TabItem<TData>({
 				<div
 					ref={setRef}
 					className={cn(
-						"group relative flex h-full w-full items-center rounded-t-md transition-colors",
+						"group relative flex h-7 w-full items-center rounded-lg transition-colors",
 						isActive
-							? "border border-border/70 border-b-transparent bg-background text-foreground"
-							: "border border-transparent border-b-border text-muted-foreground/70 hover:bg-muted/40 hover:text-muted-foreground",
+							? "bg-card text-foreground ring-1 ring-input"
+							: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}
@@ -161,7 +161,7 @@ export function TabItem<TData>({
 								<TooltipTrigger asChild>
 									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
 									<div
-										className="flex h-full min-w-0 flex-1 items-center gap-1.5 pl-3 pr-1 text-left text-xs transition-colors"
+										className="flex h-full min-w-0 flex-1 items-center gap-1.5 pl-2.5 pr-1 text-left text-xs transition-colors"
 										onAuxClick={(event) => {
 											if (event.button === 1) {
 												event.preventDefault();
@@ -180,7 +180,7 @@ export function TabItem<TData>({
 								</TooltipTrigger>
 								<TooltipContent side="bottom">{title}</TooltipContent>
 							</Tooltip>
-							<div className="relative flex h-full w-7 shrink-0 items-center justify-center">
+							<div className="relative mr-1 flex h-full w-4 shrink-0 items-center justify-center">
 								{accessory && (
 									<span className="pointer-events-none absolute inset-0 flex items-center justify-center leading-none opacity-100 transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
 										{accessory}
@@ -188,10 +188,7 @@ export function TabItem<TData>({
 								)}
 								<Button
 									aria-label={t({ message: "Close tab" })}
-									className={cn(
-										"pointer-events-none size-5 cursor-pointer text-current opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
-										isActive ? "hover:bg-muted" : "hover:bg-foreground/10",
-									)}
+									className="pointer-events-none size-4 cursor-pointer rounded text-muted-foreground opacity-0 transition-opacity hover:bg-fill-hover hover:text-foreground group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
 									onClick={(event) => {
 										event.stopPropagation();
 										onClose();
@@ -204,7 +201,7 @@ export function TabItem<TData>({
 									type="button"
 									variant="ghost"
 								>
-									<XIcon className="size-3.5" />
+									<XIcon className="size-3" />
 								</Button>
 							</div>
 						</>
