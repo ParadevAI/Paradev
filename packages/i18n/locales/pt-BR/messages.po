@@ -67,6 +67,12 @@ msgstr "\"{0}\" será mesclado em {1} via {2}. Não dá para desfazer daqui."
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" vai parar de disparar e seu histórico de execuções será removido. Não dá para desfazer."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" tem {size} — arquivos com mais de {limit} não podem ser anexados"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" tem {size} — arquivos com mais de {limit} não podem ser anexados a esta área de trabalho. Se o arquivo estiver na máquina da área de trabalho, mencione o caminho dele."
+
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" é uma pasta. Anexe os arquivos que estão nela."
 
@@ -914,6 +920,12 @@ msgstr "{count, plural, one {Usou # fonte} other {Usou # fontes}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {usou # ferramenta} other {usou # ferramentas}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} arquivos passam de {limit} e não foram adicionados"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} arquivos anexados — uma mensagem leva no máximo {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} estrelas no GitHub"
 
@@ -1551,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — esquecer este site"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 arquivo passa de {limit} e não foi adicionado"
 
 msgid "1 hr"
 msgstr "1 h"
@@ -19168,6 +19183,9 @@ msgstr "O mesmo app roda nativamente no iPad, na vertical e na horizontal."
 
 msgid "The scorecard"
 msgstr "O placar"
+
+msgid "The selected element's context is too large to send"
+msgstr "O contexto do elemento selecionado é grande demais para ser enviado"
 
 msgid "The self-driving software factory"
 msgstr "A fábrica de software autônoma"

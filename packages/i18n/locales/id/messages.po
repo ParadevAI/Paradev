@@ -67,6 +67,12 @@ msgstr "\"{0}\" akan di-merge ke {1} lewat {2}. Ini tidak bisa dibatalkan dari s
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tidak bisa dibatalkan."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" berukuran {size} — file di atas {limit} tidak dapat dilampirkan"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" berukuran {size} — file di atas {limit} tidak dapat dilampirkan ke workspace ini. Jika file ada di mesin workspace, sebutkan path-nya saja."
+
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" adalah folder. Lampirkan file di dalamnya sebagai gantinya."
 
@@ -914,6 +920,12 @@ msgstr "{count, plural, one {Memakai # sumber} other {Memakai # sumber}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {menggunakan # alat} other {menggunakan # alat}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} file melebihi {limit} dan tidak ditambahkan"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} file dilampirkan — satu pesan memuat paling banyak {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star GitHub"
 
@@ -1551,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — lupakan situs ini"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 file melebihi {limit} dan tidak ditambahkan"
 
 msgid "1 hr"
 msgstr "1 jam"
@@ -19168,6 +19183,9 @@ msgstr "Aplikasi yang sama berjalan native di iPad, dalam mode potret dan lanska
 
 msgid "The scorecard"
 msgstr "Kartu skor"
+
+msgid "The selected element's context is too large to send"
+msgstr "Konteks elemen yang dipilih terlalu besar untuk dikirim"
 
 msgid "The self-driving software factory"
 msgstr "Pabrik perangkat lunak yang menyetir sendiri"

@@ -67,6 +67,12 @@ msgstr "「{0}」は{2}で{1}にマージされます。ここからは元に戻
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "「{0}」は発火しなくなり、実行履歴も削除されます。この操作は元に戻せません。"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "「{name}」は {size} です — {limit} を超えるファイルは添付できません"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "「{name}」は {size} です — このワークスペースには {limit} を超えるファイルを添付できません。ファイルがワークスペースのマシン上にある場合は、代わりにそのパスを記載してください。"
+
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "「{name}」はフォルダです。代わりにフォルダ内のファイルを添付してください。"
 
@@ -914,6 +920,12 @@ msgstr "{count, plural, one {#件のソースを使用} other {#件のソース�
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {#件のツールを使用} other {#件のツールを使用}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} 件のファイルが {limit} を超えているため追加されませんでした"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} 件のファイルが添付されています — 1 つのメッセージに添付できるのは最大 {max} 件です"
+
 msgid "{count} GitHub stars"
 msgstr "GitHubスター{count}件"
 
@@ -1551,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1件のCookie — このサイトを削除"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 件のファイルが {limit} を超えているため追加されませんでした"
 
 msgid "1 hr"
 msgstr "1時間"
@@ -19168,6 +19183,9 @@ msgstr "同じアプリが iPad でネイティブに動作し、縦向きにも
 
 msgid "The scorecard"
 msgstr "スコアカード"
+
+msgid "The selected element's context is too large to send"
+msgstr "選択した要素のコンテキストが大きすぎるため送信できません"
 
 msgid "The self-driving software factory"
 msgstr "自動運転するソフトウェア工場"

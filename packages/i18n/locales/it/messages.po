@@ -67,6 +67,12 @@ msgstr "\"{0}\" verrà unita in {1} tramite {2}. L'operazione non può essere an
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" smetterà di scattare e la sua cronologia delle esecuzioni verrà rimossa. L'operazione non può essere annullata."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" pesa {size}: non è possibile allegare file più grandi di {limit}"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" pesa {size}: non è possibile allegare a questo workspace file più grandi di {limit}. Se il file si trova sulla macchina del workspace, indica invece il suo percorso."
+
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" è una cartella. Allega invece i file al suo interno."
 
@@ -914,6 +920,12 @@ msgstr "{count, plural, one {Usata # fonte} other {Usate # fonti}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {usato # strumento} other {usati # strumenti}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} file superano {limit} e non sono stati aggiunti"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} file allegati: un messaggio ne può contenere al massimo {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star su GitHub"
 
@@ -1551,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — dimentica questo sito"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 file supera {limit} e non è stato aggiunto"
 
 msgid "1 hr"
 msgstr "1 h"
@@ -19168,6 +19183,9 @@ msgstr "La stessa app funziona in modo nativo su iPad, in verticale e in orizzon
 
 msgid "The scorecard"
 msgstr "La scheda di valutazione"
+
+msgid "The selected element's context is too large to send"
+msgstr "Il contesto dell’elemento selezionato è troppo grande per essere inviato"
 
 msgid "The self-driving software factory"
 msgstr "La fabbrica di software a guida autonoma"

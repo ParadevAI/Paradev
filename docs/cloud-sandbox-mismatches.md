@@ -378,9 +378,12 @@ The bytes go where the workspace lives. A box gets them through storage:
 `attachment.createUpload`, a presigned PUT, `cloudWorkspace.attachFiles`,
 then `attachments.materializeIntoWorkspace` on the box. A relay-reached
 machine gets them as base64 `filesystem.writeFile`, capped at
-`MAX_INLINE_ATTACHMENT_BYTES`, so they never reach our servers. Chat
-attachments follow the same rule as parts: a `fileId` for a box, an
-`attachmentId` in the host's store otherwise.
+`MAX_INLINE_ATTACHMENT_BYTES`, so they never reach our servers. A workspace
+on the same machine as the desktop gets them from the desktop's main process
+(`attachments.writeIntoWorktree`), which copies a file from disk with no cap.
+Chat attachments follow the same rule as parts: a `fileId` for a box, an
+`attachmentId` in the host's store otherwise. A file on this machine too big
+for a part goes as a copied path instead.
 
 **The ingress drops an upload the host answers early.** tRPC's streamed batch
 (`httpBatchStreamLink`, `trpc-accept: application/jsonl`) returns its response

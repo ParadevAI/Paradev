@@ -29,10 +29,7 @@ describe("writeAttachmentsToWorktree", () => {
 				},
 			},
 		);
-		expect(written).toEqual([
-			`${DIR}/.gitignore`,
-			`${DIR}/shot_1.png`,
-		]);
+		expect(written).toEqual([`${DIR}/.gitignore`, `${DIR}/shot_1.png`]);
 		expect(paths).toEqual([`${WORKSPACE_ATTACHMENTS_DIR}/shot_1.png`]);
 	});
 });

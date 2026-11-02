@@ -67,6 +67,12 @@ msgstr "\"{0}\" will be merged into {1} via {2}. This can't be undone from here.
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" is {size} — files over {limit} can't be attached"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" is a folder. Attach the files inside it instead."
 
@@ -914,6 +920,12 @@ msgstr "{count, plural, one {Used # source} other {Used # sources}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {used # tool} other {used # tools}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} files are over {limit} and were not added"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} files attached — a message carries at most {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} GitHub stars"
 
@@ -1551,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — forget this site"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 file is over {limit} and was not added"
 
 msgid "1 hr"
 msgstr "1 hr"
@@ -19168,6 +19183,9 @@ msgstr "The same app runs natively on iPad, in portrait and landscape."
 
 msgid "The scorecard"
 msgstr "The scorecard"
+
+msgid "The selected element's context is too large to send"
+msgstr "The selected element's context is too large to send"
 
 msgid "The self-driving software factory"
 msgstr "The self-driving software factory"

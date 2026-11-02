@@ -130,6 +130,15 @@ export function useUploadAttachments(workspaceId: string) {
 				};
 			}
 		},
-		[host, queryClient, readsParts, route, sendPaths, t, workspaceId, worktreePath],
+		[
+			host,
+			queryClient,
+			readsParts,
+			route,
+			sendPaths,
+			t,
+			workspaceId,
+			worktreePath,
+		],
 	);
 }

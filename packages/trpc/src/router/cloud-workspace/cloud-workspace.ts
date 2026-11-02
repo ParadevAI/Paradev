@@ -8,6 +8,7 @@ import {
 	githubRepositories,
 	users,
 } from "@superset/db/schema";
+import { MAX_ATTACHMENTS } from "@superset/shared/attachment-limits";
 import { MACHINE_SIZES, machineSpec } from "@superset/shared/billing";
 import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
@@ -362,7 +363,10 @@ export const cloudWorkspaceRouter = {
 				 * bytes once it is up; the same cap `attachments.importFromCloud`
 				 * takes, since that is what runs in there.
 				 */
-				attachmentFileIds: z.array(z.string().uuid()).max(10).optional(),
+				attachmentFileIds: z
+					.array(z.string().uuid())
+					.max(MAX_ATTACHMENTS)
+					.optional(),
 				/** What the person typed, kept as the workspace's prompt; `prompt` may carry built context. */
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */

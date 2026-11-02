@@ -67,6 +67,12 @@ msgstr "„{0}” zostanie scalony do {1} przez {2}. Nie można tego stąd cofn�
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "„{0}” przestanie się uruchamiać, a jej historia uruchomień zostanie usunięta. Tej operacji nie można cofnąć."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "„{name}” ma {size} — nie można załączać plików większych niż {limit}"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "„{name}” ma {size} — do tego obszaru roboczego nie można załączać plików większych niż {limit}. Jeśli plik jest na maszynie obszaru roboczego, podaj zamiast tego jego ścieżkę."
+
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "„{name}” to folder. Zamiast tego załącz pliki z jego wnętrza."
 
@@ -914,6 +920,12 @@ msgstr "{count, plural, one {Użyto # źródła} few {Użyto # źródeł} many {
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {użyto # narzędzia} few {użyto # narzędzi} many {użyto # narzędzi} other {użyto # narzędzia}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "Pliki większe niż {limit} nie zostały dodane: {count}"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "Załączone pliki: {count} — wiadomość może zawierać najwyżej {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} gwiazdek GitHub"
 
@@ -1551,6 +1563,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — zapomnij tę witrynę"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 plik jest większy niż {limit} i nie został dodany"
 
 msgid "1 hr"
 msgstr "1 godz."
@@ -19168,6 +19183,9 @@ msgstr "Ta sama aplikacja działa natywnie na iPadzie, w pionie i w poziomie."
 
 msgid "The scorecard"
 msgstr "Karta wyników"
+
+msgid "The selected element's context is too large to send"
+msgstr "Kontekst wybranego elementu jest zbyt duży, aby go wysłać"
 
 msgid "The self-driving software factory"
 msgstr "Samojezdna fabryka oprogramowania"
