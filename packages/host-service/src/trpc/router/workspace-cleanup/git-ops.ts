@@ -62,8 +62,10 @@ export const cleanupGitOps = {
 		worktreePath: string;
 		gitEnv: GitTaskEnv;
 		force?: boolean;
-		/** Confirmed inside the managed worktrees root by the caller before it
-		 * is set — the worker will native-rm the directory first (see
+		/** The caller has proved the path sits inside the managed worktrees
+		 * root. The worker still only deletes natively when `force` is set and
+		 * git lists the path as a worktree of `repoPath`; otherwise it leaves
+		 * the directory alone and lets git have the only say (see
 		 * `gitWorktreeRemoveTask`). */
 		nativeRm?: boolean;
 	}): Promise<{

@@ -450,7 +450,13 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 					: ["worktree", "remove", target],
 			)
 			.catch((err: unknown) => {
-				removeError = (err instanceof Error ? err.message : String(err)).trim();
+				const gitError = (
+					err instanceof Error ? err.message : String(err)
+				).trim();
+				// Both failures are worth keeping: the native rm's EPERM/EBUSY
+				// names the files that were left behind, git's message says
+				// whether the registration went away (#6887 review).
+				removeError = removeError ? `${removeError}; ${gitError}` : gitError;
 				console.warn("[git/removeWorktree] git worktree remove failed", {
 					target,
 					error: removeError,
