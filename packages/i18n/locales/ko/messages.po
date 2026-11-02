@@ -11917,9 +11917,6 @@ msgstr "다음 이미지"
 msgid "Next match"
 msgstr "다음 일치 항목"
 
-msgid "Next release"
-msgstr "다음 릴리스"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "다음 실행 {0}"
@@ -14556,9 +14553,6 @@ msgstr "이전 일치 항목"
 
 msgid "Previous prompts"
 msgstr "이전 프롬프트"
-
-msgid "Previous release"
-msgstr "이전 릴리스"
 
 msgid "Previous slide"
 msgstr "이전 슬라이드"

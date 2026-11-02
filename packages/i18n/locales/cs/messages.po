@@ -11917,9 +11917,6 @@ msgstr "Další obrázek"
 msgid "Next match"
 msgstr "Další shoda"
 
-msgid "Next release"
-msgstr "Další vydání"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "Další běh {0}"
@@ -14556,9 +14553,6 @@ msgstr "Předchozí shoda"
 
 msgid "Previous prompts"
 msgstr "Předchozí prompty"
-
-msgid "Previous release"
-msgstr "Předchozí vydání"
 
 msgid "Previous slide"
 msgstr "Předchozí snímek"
