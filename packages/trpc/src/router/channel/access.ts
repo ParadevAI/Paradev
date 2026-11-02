@@ -113,7 +113,6 @@ export async function loadChannelAccessFor(
 	return { channel, membership: dev?.membership ?? null, orgRole: "member" };
 }
 
-/** The Dev's own access: a channel of its organization it is a member of. */
 async function devChannelAccess(dev: DevPrincipal, channelId: string) {
 	const [channel] = await db
 		.select()

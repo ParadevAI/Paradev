@@ -71,7 +71,6 @@ const messageColumns = {
 	devName: agents.name,
 };
 
-/** Reading a channel and its tasks, for a Dev that needs more than the message it was sent. */
 export const devChannelTools = {
 	readChannel: devProcedure
 		.input(

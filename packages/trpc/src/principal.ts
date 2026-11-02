@@ -1,4 +1,3 @@
-/** Who is calling: a person, or a Dev working for a person. */
 export type Principal = PersonPrincipal | DevPrincipal;
 
 export interface PersonPrincipal {
@@ -19,10 +18,8 @@ export interface DevPrincipal {
 	turnId: string;
 }
 
-/** Who did it. People and Devs share the actors id space. */
 export const actorOf = (principal: Principal) =>
 	principal.kind === "person" ? principal.userId : principal.agentId;
 
-/** Who it was for. */
 export const onBehalfOf = (principal: Principal) =>
 	principal.kind === "person" ? principal.userId : principal.askerId;
