@@ -15,6 +15,7 @@ import {
 	issueFilterFor,
 	linearStatusFilterValues,
 	listIssues,
+	listProjects,
 	updateIssue,
 } from "./api";
 import { callLinear } from "./refresh";
@@ -57,10 +58,17 @@ export const linearLiveRouter = {
 			withLinear(ctx.session.user.id, input.organizationId, getWorkspace),
 		),
 
+	projects: protectedProcedure
+		.input(organizationInput)
+		.query(({ ctx, input }) =>
+			withLinear(ctx.session.user.id, input.organizationId, listProjects),
+		),
+
 	issues: protectedProcedure
 		.input(
 			organizationInput.extend({
 				teamId: z.string().nullish(),
+				projectId: z.string().nullish(),
 				status: z.enum(linearStatusFilterValues).default("active"),
 				assignee: z.string().nullish(),
 				search: z.string().trim().max(200).nullish(),

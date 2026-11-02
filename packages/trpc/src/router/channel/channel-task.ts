@@ -26,6 +26,7 @@ import { channelMemberIds } from "./members";
 import { publishToUsers } from "./publish";
 import {
 	channelIdSchema,
+	channelLinearProjectSchema,
 	channelProjectSchema,
 	channelTaskSchema,
 } from "./schema";
@@ -120,6 +121,38 @@ export const channelTaskRouter = {
 			return project ?? null;
 		}),
 
+	/** The Linear project whose issues the channel shows; null when it has none. */
+	linearProject: protectedProcedure
+		.input(channelIdSchema)
+		.query(async ({ ctx, input }) => {
+			const access = await loadChannelAccess(
+				ctx.session.user.id,
+				input.channelId,
+			);
+			const linearProjectId = access.channel.linearProjectId;
+			return linearProjectId ? { linearProjectId } : null;
+		}),
+
+	/** Points the channel at a Linear project instead of one of ours, or at none. */
+	setLinearProject: protectedProcedure
+		.input(channelLinearProjectSchema)
+		.mutation(async ({ ctx, input }) => {
+			const access = await loadChannelAccess(
+				ctx.session.user.id,
+				input.channelId,
+			);
+			assertCanPost(access);
+			await db
+				.update(channels)
+				.set({
+					linearProjectId: input.linearProjectId,
+					...(input.linearProjectId ? { taskProjectId: null } : {}),
+				})
+				.where(eq(channels.id, input.channelId));
+			await announceTasks(input.channelId);
+			return { linearProjectId: input.linearProjectId };
+		}),
+
 	/** Points the channel at a project of its organization, or at none. */
 	setProject: protectedProcedure
 		.input(channelProjectSchema)
@@ -144,7 +177,10 @@ export const channelTaskRouter = {
 			}
 			await db
 				.update(channels)
-				.set({ taskProjectId: input.projectId })
+				.set({
+					taskProjectId: input.projectId,
+					...(input.projectId ? { linearProjectId: null } : {}),
+				})
 				.where(eq(channels.id, input.channelId));
 			await announceTasks(input.channelId);
 			return { projectId: input.projectId };

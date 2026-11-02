@@ -10721,6 +10721,9 @@ msgstr "Linear正在限制請求，請幾分鐘後再試。"
 msgid "Linear issues"
 msgstr "Linear議題"
 
+msgid "Linear project"
+msgstr "Linear 專案"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
