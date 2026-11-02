@@ -46,7 +46,7 @@ T3 Code moves fast: its latest stable release is version 0.0.45, and it ships se
 
 ### 1. Paradev
 
-Paradev is a local-first desktop workspace that runs any CLI agent in parallel Git worktrees: Claude Code, Codex, Cursor's agent, Grok Build, OpenCode, Antigravity CLI, Copilot CLI, Amp, Droid, Muse Code, and more, each on your own subscription or key, with no model proxy. Setup, teardown, and run scripts in `.superset/config.json` play the same role as `t3.json` scripts. The Changes pane commits, pushes, and opens PRs, the Pull Requests view shows CI checks and sends line comments back to agents, and the in-app browser has port detection. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and the [iPhone and iPad app](/mobile) shows terminals and diffs. Scheduled automations, a CLI, a TypeScript SDK, an MCP server, and a Slack bot cover unattended work, and the enterprise tier adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace that runs any CLI agent in parallel Git worktrees: Claude Code, Codex, Cursor's agent, Grok Build, OpenCode, Antigravity CLI, Copilot CLI, Amp, Droid, Muse Code, and more, each on your own subscription or key, with no model proxy. Setup, teardown, and run scripts in `.paradev/config.json` play the same role as `t3.json` scripts. The Changes pane commits, pushes, and opens PRs, the Pull Requests view shows CI checks and sends line comments back to agents, and the in-app browser has port detection. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and the [iPhone and iPad app](/mobile) shows terminals and diffs. Scheduled automations, a CLI, a TypeScript SDK, an MCP server, and a Slack bot cover unattended work, and the enterprise tier adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 **Best for:** developers and teams who want any agent, a full review loop, and a team plan.
 
@@ -100,7 +100,7 @@ For running any CLI agent in parallel worktrees, with pull requests, CI checks, 
 
 ### Can I bring my T3 Code scripts to Paradev?
 
-Yes. T3 Code's `t3.json` scripts map to Paradev's setup and run scripts in `.superset/config.json`. Scripts marked to run when a worktree is created become Paradev's setup script. See [Project Lifecycle Scripts](https://docs.paradev.com/setup-teardown-scripts).
+Yes. T3 Code's `t3.json` scripts map to Paradev's setup and run scripts in `.paradev/config.json`. Scripts marked to run when a worktree is created become Paradev's setup script. See [Project Lifecycle Scripts](https://docs.paradev.com/setup-teardown-scripts).
 
 ### Is T3 Code free?
 

@@ -4602,8 +4602,8 @@ msgstr "云工作区会忽略此变量。智能体改为在「设置 › 智能�
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "云工作区需要 Team 或 Ultra 方案。请在设置的账单中升级后启动。"
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "云工作区会在其上打开，并由它的 .superset/config.json 运行设置。其他仓库会检出在旁边。"
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "云工作区会在其上打开，并由它的 Paradev 配置运行设置。其他仓库会检出在旁边。"
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "云工作区将不再用它运行{agentLabel}。"
@@ -18903,8 +18903,8 @@ msgstr "云端工作区本应已启动，但没有及时响应。下次运行时
 msgid "The code expired. Start again."
 msgstr "代码已过期。请重新开始。"
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自 .superset/config.toml。"
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自仓库的 config.toml。"
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"

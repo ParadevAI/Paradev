@@ -1,4 +1,10 @@
 export {
+	LEGACY_PROJECT_CONFIG_DIR,
+	PROJECT_CONFIG_DIR,
+	PROJECT_CONFIG_FILE,
+	PROJECT_LOCAL_CONFIG_FILE,
+} from "./constants";
+export {
 	type ConfigError,
 	type ParseProjectConfigResult,
 	parseProjectConfig,
@@ -20,7 +26,3 @@ export {
 	projectConfigSchema,
 } from "./schema";
 export { fromV1Json, toTomlText } from "./v1";
-
-export const PROJECT_CONFIG_DIR = ".superset";
-export const PROJECT_CONFIG_FILE = "config.toml";
-export const PROJECT_LOCAL_CONFIG_FILE = "config.local.toml";

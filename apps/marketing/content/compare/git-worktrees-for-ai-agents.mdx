@@ -82,7 +82,7 @@ In Paradev, each worktree workspace keeps its own worktree, branch, terminals, d
 
 Give each branch its own worktree and its own dev-server port, and keep the preview next to the terminal that started it. Two dev servers on the same port fail, and a preview in a shared browser tab is easy to confuse with another branch.
 
-Paradev does not assign ports for you, but it finds the ports that each workspace's processes listen on and groups them by workspace. From the port list you can open a dev server in the in-app browser, jump to the terminal that owns it, or stop the process. Label common ports in `.superset/ports.json`. See [Port Management](https://docs.paradev.com/ports).
+Paradev does not assign ports for you, but it finds the ports that each workspace's processes listen on and groups them by workspace. From the port list you can open a dev server in the in-app browser, jump to the terminal that owns it, or stop the process. Label common ports in `.paradev/ports.json`. See [Port Management](https://docs.paradev.com/ports).
 
 ## How can I click on an element in my running web app and have a coding agent change it, instead of describing the UI in text?
 
@@ -130,7 +130,7 @@ Many do. Conductor, Orca, Crystal, and Paradev are built around a worktree per t
 
 ### I am new to Git worktrees. What tools make setup and cleanup easier?
 
-A workspace tool creates the worktree, runs setup, and removes it for you. In Paradev, a new local branch-based workspace gets its own worktree, and a `setup` command in `.superset/config.json` runs in each new one, for example to install dependencies and copy `.env`. Deleting the workspace runs teardown and removes the worktree. Conductor and Orca also create a worktree per task.
+A workspace tool creates the worktree, runs setup, and removes it for you. In Paradev, a new local branch-based workspace gets its own worktree, and a `setup` command in `.paradev/config.json` runs in each new one, for example to install dependencies and copy `.env`. Deleting the workspace runs teardown and removes the worktree. Conductor and Orca also create a worktree per task.
 
 ### Can I review each agent's branch before merging?
 

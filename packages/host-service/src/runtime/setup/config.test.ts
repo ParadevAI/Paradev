@@ -536,7 +536,14 @@ describe("shellSingleQuote", () => {
 });
 
 describe("getProjectConfigPath", () => {
-	it("appends .superset/config.json to the repoPath", () => {
-		expect(getProjectConfigPath("/tmp/x")).toBe("/tmp/x/.superset/config.json");
+	it("puts config.json in .paradev for a repo with no config", () => {
+		const repo = mkdtempSync(join(tmpdir(), "config-path-"));
+		try {
+			expect(getProjectConfigPath(repo)).toBe(
+				join(repo, ".paradev", "config.json"),
+			);
+		} finally {
+			rmSync(repo, { recursive: true, force: true });
+		}
 	});
 });

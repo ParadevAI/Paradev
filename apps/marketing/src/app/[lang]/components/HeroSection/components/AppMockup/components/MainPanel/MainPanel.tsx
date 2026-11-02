@@ -48,7 +48,7 @@ export function MainPanel({ activeDemo }: MainPanelProps) {
 								</div>
 								<div>Fable 5.1 with high effort · Claude Max</div>
 								<div className="truncate text-muted-foreground/65">
-									~/.superset/worktrees/superset/cloud-ws
+									~/.paradev/worktrees/paradev/cloud-ws
 								</div>
 							</div>
 						</div>

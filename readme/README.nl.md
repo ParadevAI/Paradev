@@ -292,13 +292,13 @@ Zie [**DEVELOPMENT.md**](../DEVELOPMENT.md) voor de volledige gids: wat het setu
 
 ## Configuratie
 
-Configureer setup-, teardown- en run-scripts voor werkruimtes in `.superset/config.json`. Zie de [volledige documentatie](https://docs.paradev.com/setup-teardown-scripts).
+Configureer setup-, teardown- en run-scripts voor werkruimtes in `.paradev/config.json`. Zie de [volledige documentatie](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

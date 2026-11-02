@@ -4602,8 +4602,8 @@ msgstr "クラウドワークスペースはこの変数を無視します。エ
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "クラウドワークスペースには Team または Ultra プランが必要です。起動するには設定の請求からアップグレードしてください。"
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "クラウドワークスペースはこのリポジトリで開き、その .superset/config.json がセットアップを実行します。ほかのリポジトリは横にチェックアウトされます。"
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "クラウドワークスペースはこのリポジトリで開き、その Paradev 設定がセットアップを実行します。ほかのリポジトリは横にチェックアウトされます。"
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "クラウドワークスペースはこれを使って{agentLabel}を実行しなくなります。"
@@ -18903,8 +18903,8 @@ msgstr "クラウドワークスペースは起動しているはずですが、
 msgid "The code expired. Start again."
 msgstr "コードの有効期限が切れました。やり直してください。"
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "このプロジェクトのワークスペースをセットアップ、実行、アーカイブするときに Paradev が実行するコマンド（.superset/config.toml）。"
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "このプロジェクトのワークスペースをセットアップ、実行、アーカイブするときに Paradev が実行するコマンド（リポジトリの config.toml）。"
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "同社は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は同社を YC Demo Day の注目スタートアップの 1 社に選びました。"

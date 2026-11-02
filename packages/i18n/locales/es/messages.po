@@ -4602,8 +4602,8 @@ msgstr "Los espacios de trabajo en la nube ignoran esta variable. Los agentes in
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Los espacios de trabajo en la nube necesitan el plan Team o Ultra. Mejora tu plan en Configuración, Facturación para iniciar uno."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Los espacios de trabajo en la nube se abren en él y su .superset/config.json ejecuta la configuración. Los demás se obtienen junto a él."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Los espacios de trabajo en la nube se abren en él y su configuración de Paradev ejecuta la preparación. Los demás se obtienen junto a él."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Los espacios de trabajo en la nube dejarán de ejecutar {agentLabel} con ella."
@@ -18903,8 +18903,8 @@ msgstr "El espacio de trabajo en la nube debería haberse iniciado, pero no resp
 msgid "The code expired. Start again."
 msgstr "El código caducó. Empieza de nuevo."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Los comandos que Paradev ejecuta para preparar, iniciar y archivar los espacios de trabajo de este proyecto, desde .superset/config.toml."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Los comandos que Paradev ejecuta para preparar, iniciar y archivar los espacios de trabajo de este proyecto, desde el config.toml del repositorio."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "La empresa levantó una ronda semilla de 11,5 millones de dólares liderada por Union Square Ventures, con Y Combinator y Paul Graham. TechCrunch la nombró una de las startups destacadas del YC Demo Day."

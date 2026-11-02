@@ -816,7 +816,7 @@ export const environments = pgTable(
 		/** The sandbox bundle every workspace of this environment boots on: the newest `sandbox_bundles` row at create, moved by every release. */
 		bundleSha: text("bundle_sha").notNull(),
 		/**
-		 * The repository a workspace opens on. Its `.superset` config is the one
+		 * The repository a workspace opens on. Its Paradev config is the one
 		 * the box runs. Null only after the repository is removed from GitHub.
 		 */
 		primaryRepositoryId: uuid("primary_repository_id").references(

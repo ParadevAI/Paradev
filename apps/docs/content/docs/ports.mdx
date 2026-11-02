@@ -19,7 +19,7 @@ Paradev does not assign per-workspace port ranges. It discovers listening ports 
 
 ## Port Labels
 
-Label detected ports by creating `.superset/ports.json` in your repository:
+Label detected ports by creating `ports.json` in your repository's config folder (`.paradev/`, or `.superset/` if your config is still there):
 
 ```json
 {
@@ -47,8 +47,8 @@ Label detected ports by creating `.superset/ports.json` in your repository:
 If `ports.json` is malformed, detected ports still appear without labels until you fix the file.
 
 **Tips:**
-- Commit `.superset/ports.json` to share port labels with your team
-- **Pro tip:** If you want deterministic per-workspace port ranges, implement it in project lifecycle setup/teardown scripts by reserving a range in a shared file (for example `~/.superset/port-allocations.json`) during setup and releasing it during teardown. See this repo's examples: [`.superset/setup.sh`](https://github.com/paradevai/paradev/blob/main/.superset/setup.sh) and [`.superset/teardown.sh`](https://github.com/paradevai/paradev/blob/main/.superset/teardown.sh).
+- Commit `.paradev/ports.json` to share port labels with your team
+- **Pro tip:** If you want deterministic per-workspace port ranges, implement it in project lifecycle setup/teardown scripts by reserving a range in a shared file (for example `~/.paradev/port-allocations.json`) during setup and releasing it during teardown. See this repo's examples: [`.superset/setup.sh`](https://github.com/paradevai/paradev/blob/main/.superset/setup.sh) and [`.superset/teardown.sh`](https://github.com/paradevai/paradev/blob/main/.superset/teardown.sh).
 
 ## Remote Access
 

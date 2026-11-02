@@ -12,13 +12,17 @@ repository or a per-machine override. They are different from
 [terminal scripts](/terminal-scripts), which are reusable launches saved in
 your Paradev settings and shown in the Scripts bar.
 
-Create `.superset/config.json` in your project:
+Create `.paradev/config.json` in your project:
+
+<Callout type="info">
+Repositories set up before Paradev's rename keep this config in `.superset/`. Paradev still reads it there and keeps editing it there; see the [FAQ](/faq) to move it.
+</Callout>
 
 ```json
 {
   "setup": ["bun install", "cp \"$SUPERSET_ROOT_PATH/.env\" .env"],
   "teardown": ["docker-compose down"],
-  "run": ["./.superset/run.sh"]
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -43,7 +47,7 @@ The `run` field defines commands that start your dev server or other long-runnin
 ```json
 {
   "setup": ["npm install"],
-  "run": ["./.superset/run.sh"]
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -73,9 +77,9 @@ The `run` field defines commands that start your dev server or other long-runnin
 **Full config:**
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -84,24 +88,24 @@ The `run` field defines commands that start your dev server or other long-runnin
 Override project scripts without modifying the repo by placing a `config.json` in your home directory, mirroring the repo's absolute path:
 
 ```
-~/.superset/projects/<repo-path>/config.json
+~/.paradev/projects/<repo-path>/config.json
 ```
 
-For a repo at `/Users/me/work/app`, that's `~/.superset/projects/Users/me/work/app/config.json`. The legacy location keyed by project ID (`~/.superset/projects/<project-id>/config.json`) still works as a fallback.
+For a repo at `/Users/me/work/app`, that's `~/.paradev/projects/Users/me/work/app/config.json`. The legacy location keyed by project ID (`~/.paradev/projects/<project-id>/config.json`) still works as a fallback.
 
 ### Priority Order
 
 For each key (`setup`, `teardown`, `run`), the highest-priority source that defines it wins:
 
-1. `~/.superset/projects/<repo-path>/config.json`: user override
-2. `<worktree>/.superset/config.json`: workspace-specific (setup and teardown only)
-3. `<repo>/.superset/config.json`: project default
+1. `~/.paradev/projects/<repo-path>/config.json`: user override
+2. `<worktree>/.paradev/config.json`: workspace-specific (setup and teardown only)
+3. `<repo>/.paradev/config.json`: project default
 
 Levels merge per key: a key one level doesn't define falls through to the next. `run` resolves at the project level, so it skips the worktree layer.
 
 ### Script Fallback
 
-If no commands are configured for a key, Paradev looks for a script instead: `.superset/<key>.sh` (`setup.sh`, `teardown.sh`, `run.sh`) in the worktree first, then the main repo. A gitignored script isn't checked out into new worktrees, so it typically exists only in the main repo.
+If no commands are configured for a key, Paradev looks for a script instead: `.paradev/<key>.sh` (`setup.sh`, `teardown.sh`, `run.sh`) in the worktree first, then the main repo. A gitignored script isn't checked out into new worktrees, so it typically exists only in the main repo.
 
 ### Working Directory
 
@@ -116,8 +120,8 @@ Set `cwd` to run commands somewhere other than the workspace root. Relative path
 **Custom setup script:**
 ```json
 {
-  "setup": ["~/.superset/projects/<repo-path>/setup.sh"],
-  "teardown": ["~/.superset/projects/<repo-path>/teardown.sh"]
+  "setup": ["~/.paradev/projects/<repo-path>/setup.sh"],
+  "teardown": ["~/.paradev/projects/<repo-path>/teardown.sh"]
 }
 ```
 
@@ -128,7 +132,7 @@ Set `cwd` to run commands somewhere other than the workspace root. Relative path
 
 ## Local Config
 
-Extend or override your team's committed scripts without modifying the repo. Create `.superset/config.local.json` alongside `config.json`. It's gitignored automatically.
+Extend or override your team's committed scripts without modifying the repo. Create `config.local.json` in the same folder as `config.json`. It's gitignored automatically.
 
 ### Prepend and/or append
 
@@ -138,10 +142,10 @@ Add steps before or after the team's scripts:
 {
   "setup": {
     "before": ["echo 'running pre-setup'"],
-    "after": ["./.superset/my-post-setup.sh"]
+    "after": ["./.paradev/my-post-setup.sh"]
   },
   "teardown": {
-    "after": ["./.superset/my-cleanup.sh"]
+    "after": ["./.paradev/my-cleanup.sh"]
   }
 }
 ```
@@ -154,7 +158,7 @@ Use a plain array to replace the team's scripts completely:
 
 ```json
 {
-  "setup": ["./.superset/my-custom-setup.sh"]
+  "setup": ["./.paradev/my-custom-setup.sh"]
 }
 ```
 
@@ -187,8 +191,8 @@ Deleting a workspace through the CLI, SDK, or MCP also runs teardown. Since ther
 ## Tips
 
 - Keep setup fast: it runs on every workspace creation
-- Commit `.superset/` to share with team
-- Use shell scripts for complex logic: `"setup": ["./.superset/setup.sh"]`
+- Commit `.paradev/` to share with team
+- Use shell scripts for complex logic: `"setup": ["./.paradev/setup.sh"]`
 - Use `config.local.json` to add personal steps without touching the team's config
-- Use user overrides (`~/.superset/projects/`) to replace scripts entirely per-project
+- Use user overrides (`~/.paradev/projects/`) to replace scripts entirely per-project
 - Use `run` for dev servers instead of putting them in `setup`: run scripts are restartable and don't block workspace creation

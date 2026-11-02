@@ -57,7 +57,13 @@ No. A worktree gives each task its own working files and branch. Agents still ru
 No. One branch = one workspace. Create a new branch if needed.
 
 **Where are workspaces stored on disk?**
-`~/.superset/worktrees/`, as ordinary git worktrees (sessions live at `~/.superset/sessions/`). Deleting a workspace removes its worktree; Paradev never deletes worktrees behind your back.
+`~/.paradev/worktrees/`, as ordinary git worktrees (sessions live at `~/.paradev/sessions/`). Deleting a workspace removes its worktree; Paradev never deletes worktrees behind your back.
+
+**Where did `~/.superset` go?**
+Paradev moves its folder from `~/.superset` to `~/.paradev` the first time an updated app, CLI or host starts. Your worktrees, sessions and settings move with it, and `~/.superset` becomes a link to `~/.paradev`, so old paths and older CLI builds keep working. Open terminals keep running through the move. If something blocks the move (for example a file with the same name already in `~/.paradev`), Paradev keeps using `~/.superset` for that run and tries again the next time it starts.
+
+**My repo has a `.superset/` folder. Do I need to change it?**
+No. Paradev still reads a repo's config from `.superset/` and keeps editing it there. New repos get `.paradev/`. To move an existing one, once everyone on the team runs a current Paradev, do it in one commit: move the files from `.superset/` into `.paradev/` (keep anything already in `.paradev/`, such as pdev's `settings.json`; `git mv .superset .paradev` is only right when `.paradev/` doesn't exist yet), and change any `./.superset/` paths in your config commands and scripts to `./.paradev/`.
 
 **I already have worktrees from another tool.**
 Use the **Import** tab in the New Workspace modal to bring existing worktrees in. See [Workspaces](/workspaces).
@@ -77,7 +83,7 @@ See [AI Agents](/agent-integration) for the full list. If an installed agent doe
 Under **Settings → Agents**, per agent. Preset-level tweaks don't override the agent's own launch settings.
 
 **Why did Paradev add hooks to my agent configs?**
-Paradev installs lifecycle hooks and command wrappers (in `~/.superset/bin`) so it can show agent status and send finished/waiting notifications. Removing them disables those features.
+Paradev installs lifecycle hooks and command wrappers (in `~/.paradev/bin`) so it can show agent status and send finished/waiting notifications. Removing them disables those features.
 
 **Do sessions survive restarts?**
 Yes. Terminals are backed by a background daemon, so running processes and scrollback survive app restarts and updates.

@@ -1,31 +1,47 @@
 import { cpSync, existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import {
+	resolveProjectConfigDir,
+	resolveProjectConfigDirName,
+} from "@superset/shared/project-config/dir";
 import {
 	CONFIG_FILE_NAME,
 	LOCAL_CONFIG_FILE_NAME,
-	PROJECT_SUPERSET_DIR_NAME,
 	PROJECTS_DIR_NAME,
 } from "shared/constants";
 import type { LocalSetupConfig, SetupConfig } from "shared/types";
 
 /**
- * Worktrees don't include gitignored files, so copy .superset from main repo
- * if it's missing — ensures setup scripts like "./.superset/setup.sh" work.
+ * Worktrees don't include gitignored files, so copy the config files the
+ * worktree is missing from the main repo — ensures setup scripts in it work.
+ * Files the app writes for agents (attachments, task prompts) stay behind.
  */
 export function copySupersetConfigToWorktree(
 	mainRepoPath: string,
 	worktreePath: string,
 ): void {
-	const mainSupersetDir = join(mainRepoPath, PROJECT_SUPERSET_DIR_NAME);
-	const worktreeSupersetDir = join(worktreePath, PROJECT_SUPERSET_DIR_NAME);
+	const configDirName = resolveProjectConfigDirName(mainRepoPath);
+	const mainSupersetDir = join(mainRepoPath, configDirName);
+	const worktreeSupersetDir = join(worktreePath, configDirName);
 
-	if (existsSync(mainSupersetDir) && !existsSync(worktreeSupersetDir)) {
+	if (existsSync(mainSupersetDir)) {
 		try {
-			cpSync(mainSupersetDir, worktreeSupersetDir, { recursive: true });
+			cpSync(mainSupersetDir, worktreeSupersetDir, {
+				recursive: true,
+				force: false,
+				filter: (source) => {
+					const name = relative(mainSupersetDir, source);
+					return (
+						name !== "attachments" &&
+						!name.startsWith(`attachments${sep}`) &&
+						!/^task-.*\.md$/.test(name)
+					);
+				},
+			});
 		} catch (error) {
 			console.error(
-				`Failed to copy ${PROJECT_SUPERSET_DIR_NAME} to worktree: ${error instanceof Error ? error.message : String(error)}`,
+				`Failed to copy ${configDirName} to worktree: ${error instanceof Error ? error.message : String(error)}`,
 			);
 		}
 	}
@@ -70,7 +86,7 @@ function readConfigFile(configPath: string): SetupConfig | null {
 
 function readConfigFromPath(basePath: string): SetupConfig | null {
 	return readConfigFile(
-		join(basePath, PROJECT_SUPERSET_DIR_NAME, CONFIG_FILE_NAME),
+		join(resolveProjectConfigDir(basePath), CONFIG_FILE_NAME),
 	);
 }
 
@@ -115,7 +131,7 @@ function readLocalConfigFile(filePath: string): LocalSetupConfig | null {
 
 function readLocalConfigFromPath(basePath: string): LocalSetupConfig | null {
 	return readLocalConfigFile(
-		join(basePath, PROJECT_SUPERSET_DIR_NAME, LOCAL_CONFIG_FILE_NAME),
+		join(resolveProjectConfigDir(basePath), LOCAL_CONFIG_FILE_NAME),
 	);
 }
 
@@ -167,15 +183,15 @@ export function mergeConfigs(
 /**
  * Resolves setup/teardown/run config with a three-tier priority:
  *   1. User override:  ~/.paradev/projects/<projectId>/config.json
- *   2. Worktree:       <worktreePath>/.superset/config.json
- *   3. Main repo:      <mainRepoPath>/.superset/config.json
+ *   2. Worktree:       <worktreePath>/<config dir>/config.json
+ *   3. Main repo:      <mainRepoPath>/<config dir>/config.json
  *
  * Higher-priority configs override only the keys they explicitly define.
  * Missing keys inherit from lower-priority sources, so stale copied worktree
  * configs do not mask newly added project-level commands like `run`.
  *
  * After resolving the base config, a local overlay is applied if
- * `.superset/config.local.json` exists in the workspace (worktree or main repo).
+ * `config.local.json` exists in the workspace (worktree or main repo).
  * The local config can prepend (before), append (after), or override each key.
  */
 export function loadSetupConfig({

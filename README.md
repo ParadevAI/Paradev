@@ -279,13 +279,13 @@ See [**DEVELOPMENT.md**](./DEVELOPMENT.md) for the full guide: what the setup sc
 
 ## Configuration
 
-Configure workspace setup, teardown, and run scripts in `.superset/config.json`. See [full documentation](https://docs.paradev.com/setup-teardown-scripts).
+Configure workspace setup, teardown, and run scripts in `.paradev/config.json`. See [full documentation](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

@@ -4602,8 +4602,8 @@ msgstr "Bulut çalışma alanları bu değişkeni yok sayar. Ajanlar bunun yerin
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Bulut çalışma alanları Team veya Ultra planı gerektirir. Başlatmak için Ayarlar, Faturalandırma bölümünden yükseltin."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Bulut çalışma alanları bunda açılır ve onun .superset/config.json dosyası kurulumu çalıştırır. Diğerleri yanına alınır."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Bulut çalışma alanları bunda açılır ve onun Paradev yapılandırması kurulumu çalıştırır. Diğerleri yanına alınır."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Bulut çalışma alanları {agentLabel} için bunu kullanmayı bırakacak."
@@ -18903,8 +18903,8 @@ msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zaman�
 msgid "The code expired. Start again."
 msgstr "Kodun süresi doldu. Yeniden başlayın."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Paradev'in bu projenin çalışma alanlarını hazırlamak, çalıştırmak ve arşivlemek için çalıştırdığı komutlar (.superset/config.toml)."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Paradev'in bu projenin çalışma alanlarını hazırlamak, çalıştırmak ve arşivlemek için çalıştırdığı komutlar (deponun config.toml dosyası)."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Şirket, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, şirketi YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."

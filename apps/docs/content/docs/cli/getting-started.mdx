@@ -24,14 +24,14 @@ and either name runs the same binary.
 ### Desktop app
 
 The desktop app includes the Paradev CLI. When the app launches, it writes
-app-managed shims at `~/.superset/bin/superset` and `~/.superset/bin/paradev`,
-and Paradev terminals prepend `~/.superset/bin` to `PATH` automatically.
+app-managed shims at `~/.paradev/bin/superset` and `~/.paradev/bin/paradev`,
+and Paradev terminals prepend `~/.paradev/bin` to `PATH` automatically.
 
 To use the bundled CLI from a normal shell, add the directory to your shell
 profile:
 
 ```bash
-export PATH="$HOME/.superset/bin:$PATH"
+export PATH="$HOME/.paradev/bin:$PATH"
 ```
 
 ### Standalone install
@@ -58,7 +58,7 @@ superset auth login
 
 The CLI starts a loopback callback server on `127.0.0.1:51789` (or `51790`
 through `51793` if earlier ports are busy), opens your browser to the
-consent page, and stores a session token at `~/.superset/config.json`.
+consent page, and stores a session token at `~/.paradev/config.json`.
 
 If you belong to multiple organizations, you'll be prompted to pick one. To
 skip the prompt and pick directly:
@@ -267,9 +267,9 @@ listing; the desktop app is the cross-host view.
 ## Where state lives
 
 ```text
-~/.superset/config.json                            # auth, active organization
-~/.superset/host/<organizationId>/manifest.json    # host server endpoint + token
-~/.superset/host/<organizationId>/host.db          # local host server DB
+~/.paradev/config.json                            # auth, active organization
+~/.paradev/host/<organizationId>/manifest.json    # host server endpoint + token
+~/.paradev/host/<organizationId>/host.db          # local host server DB
 ```
 
 `SUPERSET_HOME_DIR` relocates the whole tree, matching the desktop app.

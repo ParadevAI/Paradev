@@ -292,13 +292,13 @@ Veja [**DEVELOPMENT.md**](../DEVELOPMENT.md) para o guia completo: o que o scrip
 
 ## Configuração
 
-Configure os scripts de setup, teardown e run das áreas de trabalho em `.superset/config.json`. Veja a [documentação completa](https://docs.paradev.com/setup-teardown-scripts).
+Configure os scripts de setup, teardown e run das áreas de trabalho em `.paradev/config.json`. Veja a [documentação completa](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

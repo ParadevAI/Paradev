@@ -2,9 +2,32 @@ import type { AgentLaunchRequest } from "@superset/shared/agent-launch";
 import {
 	assignAttachmentFileName,
 	WORKSPACE_ATTACHMENTS_DIR,
+	WORKSPACE_ATTACHMENTS_GITIGNORE,
 } from "@superset/shared/workspace-attachments";
 import { launchCommandInPane } from "renderer/lib/terminal/launch-command";
 import type { AgentSessionLaunchContext, LaunchResultPayload } from "../types";
+
+/** Creates the attachments dir (recursive: a fresh worktree has none) and its `.gitignore`. */
+async function prepareAttachmentsDirectory(
+	workspaceId: string,
+	worktreePath: string,
+): Promise<string> {
+	const { electronTrpcClient } = await import("renderer/lib/trpc-client");
+	const directory = joinAbsolutePath(worktreePath, WORKSPACE_ATTACHMENTS_DIR);
+	await electronTrpcClient.filesystem.createDirectory.mutate({
+		workspaceId,
+		absolutePath: directory,
+		recursive: true,
+	});
+	await electronTrpcClient.filesystem.writeFile.mutate({
+		workspaceId,
+		absolutePath: joinAbsolutePath(directory, ".gitignore"),
+		content: WORKSPACE_ATTACHMENTS_GITIGNORE,
+		encoding: "utf-8",
+		options: { create: true, overwrite: false },
+	});
+	return directory;
+}
 
 type TerminalLaunchRequest = Extract<AgentLaunchRequest, { kind: "terminal" }>;
 
@@ -31,18 +54,13 @@ async function writeTaskPromptFile(
 		throw new Error(`Workspace path not found: ${workspaceId}`);
 	}
 
-	const supersetDirectory = joinAbsolutePath(
-		workspace.worktreePath,
-		".superset",
-	);
-	await electronTrpcClient.filesystem.createDirectory.mutate({
+	const attachmentsDirectory = await prepareAttachmentsDirectory(
 		workspaceId,
-		absolutePath: supersetDirectory,
-		recursive: true,
-	});
+		workspace.worktreePath,
+	);
 	await electronTrpcClient.filesystem.writeFile.mutate({
 		workspaceId,
-		absolutePath: joinAbsolutePath(supersetDirectory, baseName),
+		absolutePath: joinAbsolutePath(attachmentsDirectory, baseName),
 		content,
 		encoding: "utf-8",
 	});
@@ -112,17 +130,10 @@ async function writeAttachmentFiles(
 		throw new Error(`Workspace path not found: ${workspaceId}`);
 	}
 
-	// `.superset` doesn't exist in a fresh worktree, so this must be
-	// recursive — a plain mkdir ENOENTs and kills the whole agent launch.
-	const attachmentsDirectory = joinAbsolutePath(
-		workspace.worktreePath,
-		WORKSPACE_ATTACHMENTS_DIR,
-	);
-	await electronTrpcClient.filesystem.createDirectory.mutate({
+	const attachmentsDirectory = await prepareAttachmentsDirectory(
 		workspaceId,
-		absolutePath: attachmentsDirectory,
-		recursive: true,
-	});
+		workspace.worktreePath,
+	);
 
 	const usedFilenames = new Set<string>();
 	const writtenPaths: string[] = [];

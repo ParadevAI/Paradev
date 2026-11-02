@@ -4602,8 +4602,8 @@ msgstr "Gli spazi di lavoro cloud ignorano questa variabile. Gli agenti accedono
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "I workspace cloud richiedono il piano Team o Ultra. Passa a un piano superiore in Impostazioni, Fatturazione per avviarne uno."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "I workspace cloud si aprono su di esso e il suo .superset/config.json esegue la configurazione. Gli altri vengono recuperati accanto."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "I workspace cloud si aprono su di esso e la sua configurazione Paradev esegue la preparazione. Gli altri vengono recuperati accanto."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "I workspace cloud smetteranno di eseguire {agentLabel} con questa credenziale."
@@ -18903,8 +18903,8 @@ msgstr "Il workspace cloud avrebbe dovuto avviarsi, ma non ha risposto in tempo.
 msgid "The code expired. Start again."
 msgstr "Il codice è scaduto. Ricomincia."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "I comandi che Paradev esegue per preparare, avviare e archiviare i workspace di questo progetto, da .superset/config.toml."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "I comandi che Paradev esegue per preparare, avviare e archiviare i workspace di questo progetto, dal config.toml del repository."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "L’azienda ha raccolto un round seed da 11,5 milioni di dollari guidato da Union Square Ventures, con Y Combinator e Paul Graham. TechCrunch l’ha indicata tra le startup più promettenti del YC Demo Day."
