@@ -11,10 +11,23 @@ import {
 	channelThreadFollows,
 	type SelectAgent,
 	type SelectAgentRoutine,
+	taskProjects,
+	taskProjectTasks,
+	tasks,
 	users,
 } from "@superset/db/schema";
 import { waitUntil } from "@vercel/functions";
-import { and, arrayOverlaps, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import {
+	and,
+	arrayOverlaps,
+	desc,
+	eq,
+	inArray,
+	isNull,
+	lt,
+	or,
+	sql,
+} from "drizzle-orm";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { agentNotFound } from "./access";
 import { announceAgentChanged } from "./agents-changed";
@@ -189,19 +202,30 @@ export function eventText(event: {
 	body: string;
 	now?: Date;
 	about?: string | null;
+	project?: string | null;
 	threadStart?: { from: string; body: string } | null;
+	recent?: { from: string; body: string }[];
 }) {
 	const attrs = [
 		`from="${attr(event.from)}"`,
 		`where="${attr(event.where)}"`,
 		...(event.about ? [`about="${attr(event.about)}"`] : []),
+		...(event.project ? [`project="${attr(event.project)}"`] : []),
 		...(event.replyTo ? [`reply_to="${attr(event.replyTo)}"`] : []),
 		`time="${(event.now ?? new Date()).toISOString()}"`,
 	];
 	const start = event.threadStart
 		? `<thread_start from="${attr(event.threadStart.from)}">\n${escapeMessageTags(event.threadStart.body)}\n</thread_start>\n`
 		: "";
-	return `<message ${attrs.join(" ")}>\n${start}${escapeMessageTags(event.body)}\n</message>`;
+	const recent = event.recent?.length
+		? `<recent>\n${event.recent
+				.map(
+					(earlier) =>
+						`<said from="${attr(earlier.from)}">\n${escapeMessageTags(earlier.body)}\n</said>`,
+				)
+				.join("\n")}\n</recent>\n`
+		: "";
+	return `<message ${attrs.join(" ")}>\n${start}${recent}${escapeMessageTags(event.body)}\n</message>`;
 }
 
 function attr(value: string) {
@@ -212,7 +236,10 @@ function attr(value: string) {
 }
 
 function escapeMessageTags(body: string) {
-	return body.replace(/<(?=\s*\/?\s*(message|thread_start)\b)/gi, "&lt;");
+	return body.replace(
+		/<(?=\s*\/?\s*(message|thread_start|recent|said)\b)/gi,
+		"&lt;",
+	);
 }
 
 /** The one session every message to a Dev reaches; made on first use. */
@@ -426,7 +453,12 @@ async function messageEvent({
 	message: { id: string; body: string; threadRootId: string | null };
 }) {
 	const [room] = await db
-		.select({ name: channels.name, description: channels.description })
+		.select({
+			name: channels.name,
+			description: channels.description,
+			taskProjectId: channels.taskProjectId,
+			linearProjectId: channels.linearProjectId,
+		})
 		.from(channels)
 		.where(eq(channels.id, channel.id))
 		.limit(1);
@@ -441,12 +473,80 @@ async function messageEvent({
 				? "your DM"
 				: `#${room?.name ?? "channel"}${message.threadRootId ? ", in a thread" : ""}`,
 		about: channel.kind === "dm" ? null : room?.description,
+		project: channel.kind === "dm" || !room ? null : await projectLine(room),
 		replyTo: replyTarget(channel.id, threadRootId),
 		body: message.body,
 		threadStart: message.threadRootId
 			? await threadStartOf(message.threadRootId)
 			: null,
+		recent:
+			channel.kind === "dm" ? [] : await recentBefore(channel.id, message),
 	});
+}
+
+const RECENT_MESSAGES = 8;
+const RECENT_CHARS = 1_000;
+
+/** The channel's or thread's last messages before this one, oldest first. */
+async function recentBefore(
+	channelId: string,
+	message: { id: string; threadRootId: string | null },
+): Promise<{ from: string; body: string }[]> {
+	const seq = db
+		.select({ seq: channelMessages.seq })
+		.from(channelMessages)
+		.where(eq(channelMessages.id, message.id));
+	const rows = await db
+		.select({
+			body: channelMessages.body,
+			userName: users.name,
+			devName: agents.name,
+		})
+		.from(channelMessages)
+		.leftJoin(actors, eq(actors.id, channelMessages.authorId))
+		.leftJoin(users, eq(users.id, actors.userId))
+		.leftJoin(agents, eq(agents.id, actors.agentId))
+		.where(
+			and(
+				eq(channelMessages.channelId, channelId),
+				message.threadRootId
+					? eq(channelMessages.threadRootId, message.threadRootId)
+					: isNull(channelMessages.threadRootId),
+				isNull(channelMessages.deletedAt),
+				isNull(channelMessages.subtype),
+				lt(channelMessages.seq, seq),
+			),
+		)
+		.orderBy(desc(channelMessages.seq))
+		.limit(RECENT_MESSAGES);
+	return rows.reverse().map((row) => ({
+		from: row.devName ?? row.userName ?? "someone",
+		body: row.body.slice(0, RECENT_CHARS),
+	}));
+}
+
+/** What the channel's Tasks tab shows, so "here" has a meaning without a tool call. */
+async function projectLine(room: {
+	taskProjectId: string | null;
+	linearProjectId: string | null;
+}): Promise<string | null> {
+	if (room.linearProjectId)
+		return "a Linear project; read it with channel_tasks";
+	if (!room.taskProjectId) return null;
+	const [project] = await db
+		.select({
+			name: taskProjects.name,
+			tasks: sql<number>`count(${tasks.id})::int`,
+		})
+		.from(taskProjects)
+		.leftJoin(taskProjectTasks, eq(taskProjectTasks.projectId, taskProjects.id))
+		.leftJoin(
+			tasks,
+			and(eq(tasks.id, taskProjectTasks.taskId), isNull(tasks.deletedAt)),
+		)
+		.where(eq(taskProjects.id, room.taskProjectId))
+		.groupBy(taskProjects.name);
+	return project ? `${project.name}, ${project.tasks} tasks` : null;
 }
 
 async function threadStartOf(

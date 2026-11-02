@@ -137,7 +137,7 @@ function devToolsServer(tools: DevTools): McpServer {
 		"channel_tasks",
 		{
 			description:
-				"The Paradev tasks linked to a channel (its Tasks tab): slug, title, status, assignee and pull request. `channel` is a name or a reply_to target.",
+				"What a channel's Tasks tab shows: the tasks of its Paradev project (slug, title, status, assignee, pull request), or the issues of its Linear project (identifier, title, status, assignee, url). `channel` is a name or a reply_to target.",
 			inputSchema: { channel: z.string() },
 		},
 		(args) => result(() => tools.channelTasks(args)),
