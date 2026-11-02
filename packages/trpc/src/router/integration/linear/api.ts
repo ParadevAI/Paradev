@@ -98,8 +98,16 @@ export interface LinearWorkspace {
 	users: LinearUser[];
 }
 
+export interface LinearProject {
+	id: string;
+	name: string;
+	icon: string | null;
+	color: string;
+}
+
 export interface LinearIssueFilter {
 	team?: { id: { eq: string } };
+	project?: { id: { eq: string } };
 	state?: { type: { in: LinearStateType[] } };
 	assignee?: { null: true } | { id: { eq: string } } | { isMe: { eq: true } };
 }
@@ -333,6 +341,22 @@ export async function createIssue(
 	return toIssue(data.issueCreate.issue);
 }
 
+/** The workspace's projects that are not finished, by name. */
+export async function listProjects(
+	client: LinearClient,
+): Promise<LinearProject[]> {
+	const data = await request<{ projects: { nodes: LinearProject[] } }>(
+		client,
+		`query SupersetLinearProjects {
+			projects(first: 100, filter: { status: { type: { nin: ["completed", "canceled"] } } }) {
+				nodes { id name icon color }
+			}
+		}`,
+		{},
+	);
+	return [...data.projects.nodes].sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export async function getWorkspace(
 	client: LinearClient,
 ): Promise<LinearWorkspace> {
@@ -418,11 +442,13 @@ const STATE_TYPES_BY_FILTER: Record<
 
 export function issueFilterFor(input: {
 	teamId?: string | null;
+	projectId?: string | null;
 	status: LinearStatusFilter;
 	assignee?: string | null;
 }): LinearIssueFilter {
 	const filter: LinearIssueFilter = {};
 	if (input.teamId) filter.team = { id: { eq: input.teamId } };
+	if (input.projectId) filter.project = { id: { eq: input.projectId } };
 	if (input.status !== "all") {
 		filter.state = { type: { in: STATE_TYPES_BY_FILTER[input.status] } };
 	}

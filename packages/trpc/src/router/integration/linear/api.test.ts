@@ -49,6 +49,12 @@ describe("issueFilterFor", () => {
 		});
 	});
 
+	test("narrows to one project", () => {
+		expect(issueFilterFor({ status: "all", projectId: "p1" })).toEqual({
+			project: { id: { eq: "p1" } },
+		});
+	});
+
 	test("counts triage as backlog and leaves 'all' unfiltered", () => {
 		expect(issueFilterFor({ status: "backlog" }).state).toEqual({
 			type: { in: ["triage", "backlog"] },

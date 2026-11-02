@@ -10721,6 +10721,9 @@ msgstr "Linear limite les requêtes. Réessayez dans quelques minutes."
 msgid "Linear issues"
 msgstr "Issues Linear"
 
+msgid "Linear project"
+msgstr "Projet Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
