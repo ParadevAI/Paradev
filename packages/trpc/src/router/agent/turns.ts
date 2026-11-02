@@ -188,9 +188,7 @@ export function eventText(event: {
 	replyTo: string | null;
 	body: string;
 	now?: Date;
-	/** The channel's description, when it has one. */
 	about?: string | null;
-	/** For a reply in a thread: the message that started it. */
 	threadStart?: { from: string; body: string } | null;
 }) {
 	const attrs = [
@@ -418,7 +416,6 @@ async function routeUnmentioned({
 
 const THREAD_START_CHARS = 2_000;
 
-/** A message for a Dev's main session, with where it was said and, in a thread, how the thread began. */
 async function messageEvent({
 	channel,
 	authorName,
