@@ -173,6 +173,57 @@ describe("math", () => {
 		}
 	});
 
+	it("keeps a whitespace-padded span as text, inline and on one line", () => {
+		// KaTeX ignores a span whose content starts or ends with whitespace, and
+		// the display `trim()` used to erase that before the check, so `$$ x $$`
+		// rendered as math (#7856 review).
+		for (const markdown of ["$ x$", "$x $", "$$ x $$"]) {
+			const editor = createEditor(markdown);
+			try {
+				expect(mathNodes(editor)).toEqual([]);
+			} finally {
+				editor.destroy();
+			}
+			expect(roundTrip(markdown)).toBe(markdown);
+		}
+	});
+
+	it("keeps a price with cents or a thousands separator as text", () => {
+		// `$5` was already a price, but `5.00` and `1,000` read as math and the
+		// preview rendered them as LaTeX (#7856 review).
+		for (const markdown of ["$5.00$", "$1,000$"]) {
+			const editor = createEditor(markdown);
+			try {
+				expect(mathNodes(editor)).toEqual([]);
+			} finally {
+				editor.destroy();
+			}
+		}
+
+		// Three decimals are still pi-and-friends, not money.
+		const editor = createEditor("$3.141$");
+		try {
+			expect(mathNodes(editor)).toEqual([
+				{ type: "inlineMath", latex: "3.141" },
+			]);
+		} finally {
+			editor.destroy();
+		}
+	});
+
+	it("closes on a delimiter that follows an even run of backslashes", () => {
+		// `\\$` is a literal backslash then a real delimiter, so the span closes
+		// there instead of running to the end of the line (#7856 review).
+		const editor = createEditor("$a\\\\$ and more");
+		try {
+			expect(mathNodes(editor)).toEqual([
+				{ type: "inlineMath", latex: "a\\\\" },
+			]);
+		} finally {
+			editor.destroy();
+		}
+	});
+
 	it("leaves currency alone", () => {
 		const editor = createEditor("It costs $5 and $10 today.");
 		try {

@@ -54,17 +54,40 @@ interface MarkdownIt {
  * hands the rule `5-`, the first half of the range, so a numeric span ending in
  * a dash is not math either. Mirrored here so markdown-it gates on the same
  * reading of the delimiters.
+ *
+ * Prices with cents or thousands separators read the same way, and `$5.00$` /
+ * `$1,000$` used to render as math: a grouped number, or one with exactly two
+ * decimals, is money in prose. One decimal (`$3.1$`) and three (`$3.141$`) are
+ * left alone, so the pi-and-friends cases still work (#7856 review).
  */
+const GROUPED_NUMBER = /^\d{1,3}(?:,\d{3})+(?:\.\d+)?$/;
+const MONEY_WITH_CENTS = /^\d+\.\d{2}$/;
+
 function isMathContent(latex: string): boolean {
 	if (latex.length === 0 || /^\s/.test(latex) || /\s$/.test(latex)) {
 		return false;
 	}
-	return !/^\d+$/.test(latex) && !/^[\d.,]+[-–—]$/.test(latex);
+	return (
+		!/^\d+$/.test(latex) &&
+		!/^[\d.,]+[-–—]$/.test(latex) &&
+		!GROUPED_NUMBER.test(latex) &&
+		!MONEY_WITH_CENTS.test(latex)
+	);
 }
 
 function closingDelimiter(src: string, from: number): number {
 	for (let index = from; index < src.length; index++) {
-		if (src[index] === "$" && src[index - 1] !== "\\") {
+		if (src[index] !== "$") {
+			continue;
+		}
+		// An odd run of backslashes escapes the delimiter; an even one is a
+		// literal backslash followed by a real delimiter, so `\\$` closes
+		// (#7856 review).
+		let backslashes = 0;
+		for (let i = index - 1; i >= 0 && src[i] === "\\"; i--) {
+			backslashes++;
+		}
+		if (backslashes % 2 === 0) {
 			return index;
 		}
 	}
@@ -131,6 +154,14 @@ function blockMathRule(
 	let closingLine = startLine;
 	if (closingOnFirstLine >= 0) {
 		lines[0] = firstLine.slice(0, closingOnFirstLine);
+		// Same-line display math reads like the inline rule: `$$ x $$` keeps
+		// its spaces as text. `trim()` below used to erase them before the
+		// check, so this form rendered as math (#7856 review). A whitespace-edge
+		// rule on the multiline form would reject ordinary indentation.
+		const sameLine = lines[0] ?? "";
+		if (/^\s/.test(sameLine) || /\s$/.test(sameLine)) {
+			return false;
+		}
 	} else if (firstLine.includes("$$")) {
 		// The first line holds a `$$` with text after it, so this block has no
 		// closer of its own; a later line is not one, and reading it as the
