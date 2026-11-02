@@ -363,6 +363,72 @@ describe("recurrence timezone math", () => {
 		});
 	});
 
+	it("walks a BYHOUR list that wraps past midnight in time order", () => {
+		const runs = nextOccurrences({
+			rrule: "FREQ=DAILY;BYHOUR=20,21,22,23,0,1,2,3,4,5,6;BYMINUTE=0",
+			dtstart: new Date("2026-10-20T15:00:10.000Z"),
+			timezone: "America/New_York",
+			after: new Date("2026-10-29T23:30:00.000Z"),
+			count: 12,
+		});
+
+		expect(
+			runs.map((run) =>
+				formatDateTimeInTimezone(run, "America/New_York", { locale: "en-US" }),
+			),
+		).toEqual([
+			"Oct 29, 2026, 8:00 PM EDT",
+			"Oct 29, 2026, 9:00 PM EDT",
+			"Oct 29, 2026, 10:00 PM EDT",
+			"Oct 29, 2026, 11:00 PM EDT",
+			"Oct 30, 2026, 12:00 AM EDT",
+			"Oct 30, 2026, 1:00 AM EDT",
+			"Oct 30, 2026, 2:00 AM EDT",
+			"Oct 30, 2026, 3:00 AM EDT",
+			"Oct 30, 2026, 4:00 AM EDT",
+			"Oct 30, 2026, 5:00 AM EDT",
+			"Oct 30, 2026, 6:00 AM EDT",
+			"Oct 30, 2026, 8:00 PM EDT",
+		]);
+	});
+
+	it("walks an unsorted BYMINUTE list in time order", () => {
+		const runs = nextOccurrences({
+			rrule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=45,15",
+			dtstart: new Date("2026-01-01T00:00:00.000Z"),
+			timezone: "UTC",
+			after: new Date("2026-11-02T00:00:00.000Z"),
+			count: 3,
+		});
+
+		expect(runs.map((run) => run.toISOString())).toEqual([
+			"2026-11-02T09:15:00.000Z",
+			"2026-11-02T09:45:00.000Z",
+			"2026-11-03T09:15:00.000Z",
+		]);
+	});
+
+	it("keeps every overnight slot on the night daylight saving ends", () => {
+		const runs = nextOccurrences({
+			rrule: "FREQ=DAILY;BYHOUR=20,21,22,23,0,1,2,3,4,5,6;BYMINUTE=0",
+			dtstart: new Date("2026-10-20T15:00:00.000Z"),
+			timezone: "America/New_York",
+			after: new Date("2026-11-01T03:30:00.000Z"),
+			count: 8,
+		});
+
+		expect(runs.map((run) => run.toISOString())).toEqual([
+			"2026-11-01T04:00:00.000Z",
+			"2026-11-01T05:00:00.000Z",
+			"2026-11-01T07:00:00.000Z",
+			"2026-11-01T08:00:00.000Z",
+			"2026-11-01T09:00:00.000Z",
+			"2026-11-01T10:00:00.000Z",
+			"2026-11-01T11:00:00.000Z",
+			"2026-11-02T01:00:00.000Z",
+		]);
+	});
+
 	it("falls back to UTC formatting for invalid legacy timezone values", () => {
 		const formatted = formatDateTimeInTimezone(
 			new Date("2026-04-25T13:00:00.000Z"),
