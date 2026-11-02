@@ -56,7 +56,7 @@ export function EnvironmentBuilds({
 						{running ? (
 							<Trans>Building…</Trans>
 						) : (
-							<Trans>Trigger new build</Trans>
+							<Trans>Rebuild environment</Trans>
 						)}
 					</Button>
 				</div>

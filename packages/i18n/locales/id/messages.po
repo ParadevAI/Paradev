@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Perubahan"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Perubahan berlaku untuk workspace baru. Build baru dimulai otomatis."
-
 msgid "Changes open target"
 msgstr "Tempat membuka perubahan"
 
@@ -7738,9 +7735,6 @@ msgstr "Tiap hari kerja jam 9 pagi, baca issue GitHub baru, terapkan label, dan 
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Semua orang berdebat apakah ini bisa digeneralisasi. Perdebatan itu justru tanda bahwa levelnya sudah tercapai."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Semua orang di organisasi, atau hanya Anda."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Semua orang melihat versi baru begitu dipublikasikan"
@@ -15226,6 +15220,9 @@ msgstr "Rebase & Merge"
 msgid "Rebase and merge"
 msgstr "Rebase dan merge"
 
+msgid "Rebuild environment"
+msgstr "Build ulang environment"
+
 msgid "Recall what was said in meetings"
 msgstr "Ingat kembali apa yang dibahas dalam rapat"
 
@@ -17175,9 +17172,6 @@ msgstr "Setel warna grup"
 msgid "Set icon to {0}"
 msgstr "Setel ikon menjadi {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Diatur di setiap workspace yang dimulai dari environment ini, dan saat build."
-
 msgid "Set project…"
 msgstr "Tetapkan proyek…"
 
@@ -19111,9 +19105,6 @@ msgstr "Unggahan gambar kedaluwarsa — lampirkan lagi"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Deskripsi pekerjaannya bergeser. Engineer berhenti menjadi juru ketik berselera dan menjadi pengatur lalu lintas berselera: memecah pekerjaan, mengarahkannya ke armada agen, menengahi konflik antara agen yang sama-sama menyentuh modul yang sama."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "5 environment terakhir. Pulihkan salah satunya agar workspace baru kembali dimulai darinya."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Pembaruan, peningkatan, dan fitur baru terkini di Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "Mayoritas PR agen yang di-merge hanya perlu direview, tanpa suntingan ma
 
 msgid "The model declined to continue"
 msgstr "Model menolak untuk melanjutkan"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Yang terakhir diubah. Diatur di setiap workspace yang dimulai dari environment ini, dan saat build."
 
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
@@ -20084,9 +20072,6 @@ msgstr "Picu otomatisasi dari Gmail."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Picu otomatisasi dari pesan channel Teams."
-
-msgid "Trigger new build"
-msgstr "Mulai build baru"
 
 msgid "Trigger not found"
 msgstr "Pemicu tidak ditemukan"

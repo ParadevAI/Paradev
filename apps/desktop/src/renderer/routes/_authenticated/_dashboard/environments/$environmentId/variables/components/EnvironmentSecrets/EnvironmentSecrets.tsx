@@ -28,12 +28,6 @@ export function EnvironmentSecrets({ environmentId }: EnvironmentSecretsProps) {
 				<h2 className="text-xl font-semibold">
 					<Trans>Environment variables</Trans>
 				</h2>
-				<p className="mt-1 text-sm text-muted-foreground">
-					<Trans>
-						Set on every workspace started from this environment, and while it
-						builds.
-					</Trans>
-				</p>
 			</div>
 
 			<EnvironmentVariablesList

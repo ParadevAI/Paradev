@@ -46,17 +46,11 @@ export function EnvironmentVariablesPreview({
 
 	return (
 		<section className="space-y-3">
-			<div className="flex items-start justify-between gap-4">
+			<div className="flex items-center justify-between gap-4">
 				<div>
 					<h3 className="text-base font-semibold">
 						<Trans>Environment variables</Trans>
 					</h3>
-					<p className="mt-0.5 text-xs text-muted-foreground">
-						<Trans>
-							The most recently changed. Set on every workspace started from
-							this environment, and while it builds.
-						</Trans>
-					</p>
 				</div>
 				<div className="flex shrink-0 items-center gap-2">
 					{total > 0 && (

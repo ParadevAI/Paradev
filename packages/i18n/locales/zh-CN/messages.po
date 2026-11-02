@@ -4000,9 +4000,6 @@ msgstr "更新日志"
 msgid "Changes"
 msgstr "更改"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "更改将应用于新的工作区。新的构建会自动开始。"
-
 msgid "Changes open target"
 msgstr "更改视图打开位置"
 
@@ -7738,9 +7735,6 @@ msgstr "每个工作日上午9点，阅读新的GitHub议题，打上标签，�
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在争论这能否推广。这场争论本身就说明这一级别已经达到了。"
-
-msgid "Everyone in the organization, or only you."
-msgstr "组织中的所有人，或仅你自己。"
 
 msgid "Everyone sees new versions as they are published"
 msgstr "新版本一经发布，所有人都会看到"
@@ -15226,6 +15220,9 @@ msgstr "变基并合并"
 msgid "Rebase and merge"
 msgstr "变基并合并"
 
+msgid "Rebuild environment"
+msgstr "重新构建环境"
+
 msgid "Recall what was said in meetings"
 msgstr "回顾会议中说过的内容"
 
@@ -17175,9 +17172,6 @@ msgstr "设置分组颜色"
 msgid "Set icon to {0}"
 msgstr "将图标设为{0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "设置在从此环境启动的每个工作区中，以及构建期间。"
-
 msgid "Set project…"
 msgstr "设置项目…"
 
@@ -19111,9 +19105,6 @@ msgstr "图片上传已过期 — 请重新附加"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "岗位描述变了。工程师不再是有品味的打字员，而成了有品味的调度员：拆解工作、分派给智能体集群、在两个改了同一个模块的智能体之间做裁决。"
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "最近 5 个环境。恢复其中一个，新的工作区将再次从它启动。"
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Paradev 的最新更新、改进与新功能。"
 
@@ -19152,9 +19143,6 @@ msgstr "多数已合并的智能体PR只需审查，无需任何人工修改。"
 
 msgid "The model declined to continue"
 msgstr "模型拒绝继续"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "最近更改的变量。设置在从此环境启动的每个工作区中，以及构建期间。"
 
 msgid "The name of your organization or team"
 msgstr "你的组织或团队的名称"
@@ -20084,9 +20072,6 @@ msgstr "从 Gmail 触发自动化。"
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "用Teams频道消息触发自动化。"
-
-msgid "Trigger new build"
-msgstr "开始新的构建"
 
 msgid "Trigger not found"
 msgstr "未找到触发器"

@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Změny"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Změny platí pro nové pracovní prostory. Nové sestavení se spustí automaticky."
-
 msgid "Changes open target"
 msgstr "Cíl otevření změn"
 
@@ -7738,9 +7735,6 @@ msgstr "Každý všední den v 9:00 přečti nové GitHub issues, přiřaď št�
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Všichni se dohadují, jestli se to dá zobecnit. Právě ten spor je známkou toho, že úroveň byla dosažena."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Všichni v organizaci, nebo jen vy."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Všichni uvidí nové verze hned po zveřejnění"
@@ -15226,6 +15220,9 @@ msgstr "Rebase a sloučit"
 msgid "Rebase and merge"
 msgstr "Rebase a sloučit"
 
+msgid "Rebuild environment"
+msgstr "Znovu sestavit prostředí"
+
 msgid "Recall what was said in meetings"
 msgstr "Připomeňte si, co zaznělo na schůzkách"
 
@@ -17175,9 +17172,6 @@ msgstr "Nastavit barvu skupiny"
 msgid "Set icon to {0}"
 msgstr "Nastavit ikonu na {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Nastaveny v každém pracovním prostoru spuštěném z tohoto prostředí a během sestavení."
-
 msgid "Set project…"
 msgstr "Nastavit projekt…"
 
@@ -19111,9 +19105,6 @@ msgstr "Platnost nahrání obrázku vypršela — připojte ho znovu"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Popis práce se posouvá. Z inženýrů přestávají být písaři s vkusem a stávají se dispečery s vkusem: rozkládají práci, směrují ji flotilám a rozsuzují konflikty mezi agenty, kteří sáhli na stejný modul."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "Posledních 5 prostředí. Obnovte jedno, aby z něj nové pracovní prostory znovu startovaly."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Nejnovější aktualizace, vylepšení a nové funkce v Paradevu."
 
@@ -19152,9 +19143,6 @@ msgstr "Většina sloučených PR od agentů potřebuje jen revizi, bez jediné 
 
 msgid "The model declined to continue"
 msgstr "Model odmítl pokračovat"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Naposledy změněné. Nastaveny v každém pracovním prostoru spuštěném z tohoto prostředí a během sestavení."
 
 msgid "The name of your organization or team"
 msgstr "Název vaší organizace nebo týmu"
@@ -20084,9 +20072,6 @@ msgstr "Spouštějte automatizace z Gmailu."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Spouštějte automatizace ze zpráv v kanálech Teams."
-
-msgid "Trigger new build"
-msgstr "Spustit nové sestavení"
 
 msgid "Trigger not found"
 msgstr "Spouštěč nenalezen"

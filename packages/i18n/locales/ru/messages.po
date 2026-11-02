@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Изменения"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Изменения применяются к новым рабочим областям. Новая сборка запускается автоматически."
-
 msgid "Changes open target"
 msgstr "Куда открывать изменения"
 
@@ -7738,9 +7735,6 @@ msgstr "Каждый будний день в 9:00 читай новые зад�
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Все спорят, обобщается ли это. Сам спор — признак того, что уровень достигнут."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Все в организации или только вы."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Все видят новые версии по мере публикации"
@@ -15226,6 +15220,9 @@ msgstr "Перебазировать и объединить"
 msgid "Rebase and merge"
 msgstr "Перебазировать и объединить"
 
+msgid "Rebuild environment"
+msgstr "Пересобрать окружение"
+
 msgid "Recall what was said in meetings"
 msgstr "Вспомнить, что говорили на встречах"
 
@@ -17175,9 +17172,6 @@ msgstr "Задать цвет группы"
 msgid "Set icon to {0}"
 msgstr "Установить иконку {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Задаются в каждой рабочей области, запущенной из этого окружения, и во время сборки."
-
 msgid "Set project…"
 msgstr "Назначить проект…"
 
@@ -19111,9 +19105,6 @@ msgstr "Срок загрузки изображения истёк — прик
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Описание работы меняется. Инженеры перестают быть машинистками со вкусом и становятся диспетчерами со вкусом: декомпозируют работу, раздают её флотам, разрешают конфликты между агентами, которые оба тронули один модуль."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "Последние 5 окружений. Восстановите одно, чтобы новые рабочие области снова запускались из него."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Последние обновления, улучшения и новые возможности Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "Большинству объединённых агентских PR н
 
 msgid "The model declined to continue"
 msgstr "Модель отказалась продолжать"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Недавно изменённые. Задаются в каждой рабочей области, запущенной из этого окружения, и во время сборки."
 
 msgid "The name of your organization or team"
 msgstr "Название организации или команды"
@@ -20084,9 +20072,6 @@ msgstr "Запускайте автоматизации из Gmail."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Запускайте автоматизации по сообщениям в каналах Teams."
-
-msgid "Trigger new build"
-msgstr "Запустить новую сборку"
 
 msgid "Trigger not found"
 msgstr "Триггер не найден"

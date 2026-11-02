@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Wijzigingen"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Wijzigingen gelden voor nieuwe werkruimtes. Er start automatisch een nieuwe build."
-
 msgid "Changes open target"
 msgstr "Openingsdoel voor wijzigingen"
 
@@ -7738,9 +7735,6 @@ msgstr "Elke werkdag om 9 uur: lees nieuwe GitHub-issues, plaats labels en stel 
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Iedereen discussieert over de vraag of dit generaliseert. Die discussie is het teken dat het niveau is bereikt."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Iedereen in de organisatie, of alleen jij."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Iedereen ziet nieuwe versies zodra ze worden gepubliceerd"
@@ -15226,6 +15220,9 @@ msgstr "Rebasen en mergen"
 msgid "Rebase and merge"
 msgstr "Rebasen en mergen"
 
+msgid "Rebuild environment"
+msgstr "Omgeving opnieuw bouwen"
+
 msgid "Recall what was said in meetings"
 msgstr "Terugvinden wat er in vergaderingen is gezegd"
 
@@ -17175,9 +17172,6 @@ msgstr "Groepskleur instellen"
 msgid "Set icon to {0}"
 msgstr "Icoon instellen op {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Ingesteld in elke werkruimte die vanuit deze omgeving start, en tijdens het bouwen."
-
 msgid "Set project…"
 msgstr "Project instellen…"
 
@@ -19111,9 +19105,6 @@ msgstr "De upload van de afbeelding is verlopen — voeg deze opnieuw toe"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "De functieomschrijving verschuift. Engineers zijn geen typisten met smaak meer, maar dispatchers met smaak: werk opdelen, het naar vloten routeren, en conflicten beslechten tussen agents die dezelfde module aanraakten."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "De laatste 5 omgevingen. Herstel er een om nieuwe werkruimtes er weer vanaf te laten starten."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "De nieuwste updates, verbeteringen en functies in Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "De meeste gemergede agent-PR's hoeven alleen gereviewd te worden, zonder
 
 msgid "The model declined to continue"
 msgstr "Het model weigerde verder te gaan"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "De laatst gewijzigde. Ingesteld in elke werkruimte die vanuit deze omgeving start, en tijdens het bouwen."
 
 msgid "The name of your organization or team"
 msgstr "De naam van je organisatie of team"
@@ -20084,9 +20072,6 @@ msgstr "Automatiseringen starten vanuit Gmail."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Trigger automatiseringen vanuit berichten in Teams-kanalen."
-
-msgid "Trigger new build"
-msgstr "Nieuwe build starten"
 
 msgid "Trigger not found"
 msgstr "Trigger niet gevonden"

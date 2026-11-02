@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Zmiany"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Zmiany dotyczą nowych obszarów roboczych. Nowa kompilacja uruchomi się automatycznie."
-
 msgid "Changes open target"
 msgstr "Cel otwierania zmian"
 
@@ -7738,9 +7735,6 @@ msgstr "W każdy dzień roboczy o 9:00 przeczytaj nowe zgłoszenia GitHub, nadaj
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Wszyscy spierają się, czy to się uogólnia. Ten spór jest znakiem, że poziom został osiągnięty."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Wszyscy w organizacji albo tylko Ty."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Wszyscy widzą nowe wersje w miarę ich publikowania"
@@ -15226,6 +15220,9 @@ msgstr "Rebase i scal"
 msgid "Rebase and merge"
 msgstr "Rebase i scal"
 
+msgid "Rebuild environment"
+msgstr "Zbuduj środowisko ponownie"
+
 msgid "Recall what was said in meetings"
 msgstr "Przypomnij sobie, co padło na spotkaniach"
 
@@ -17175,9 +17172,6 @@ msgstr "Ustaw kolor grupy"
 msgid "Set icon to {0}"
 msgstr "Ustaw ikonę na {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Ustawiane w każdym obszarze roboczym uruchomionym z tego środowiska i podczas kompilacji."
-
 msgid "Set project…"
 msgstr "Ustaw projekt…"
 
@@ -19111,9 +19105,6 @@ msgstr "Przesyłanie obrazu wygasło — załącz go ponownie"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Zakres obowiązków się przesuwa. Inżynierowie przestają być maszynistkami z gustem, a stają się dyspozytorami z gustem: dzielą pracę, kierują ją do flot, rozstrzygają konflikty między agentami, którzy dotknęli tego samego modułu."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "Ostatnie 5 środowisk. Przywróć jedno, aby nowe obszary robocze znów z niego startowały."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Najnowsze aktualizacje, ulepszenia i nowe funkcje w Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "Większość scalonych PR-ów od agentów wymaga tylko przeglądu, bez �
 
 msgid "The model declined to continue"
 msgstr "Model odmówił kontynuowania"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Ostatnio zmienione. Ustawiane w każdym obszarze roboczym uruchomionym z tego środowiska i podczas kompilacji."
 
 msgid "The name of your organization or team"
 msgstr "Nazwa organizacji lub zespołu"
@@ -20084,9 +20072,6 @@ msgstr "Uruchamiaj automatyzacje z Gmaila."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Wyzwalaj automatyzacje z wiadomości na kanałach Teams."
-
-msgid "Trigger new build"
-msgstr "Uruchom nową kompilację"
 
 msgid "Trigger not found"
 msgstr "Nie znaleziono wyzwalacza"

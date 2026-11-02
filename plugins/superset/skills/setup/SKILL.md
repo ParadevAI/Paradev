@@ -84,7 +84,7 @@ Rules:
 
 In the cloud, `[install]` builds the environment's snapshot, which every new cloud workspace starts from:
 
-- A build runs when someone presses Trigger new build in Settings or runs `superset environments rebuild <env>`, when the environment's repositories change, and once a day on paid plans, so the snapshot follows the base branch. A failed build keeps the previous snapshot.
+- A build runs when someone presses Rebuild environment on the environment's page or runs `superset environments rebuild <env>`, when the environment's repositories change, and once a day on paid plans, so the snapshot follows the base branch. A failed build keeps the previous snapshot.
 - It runs from the primary repository's root (or its `cwd`), on the base branch at its latest commit, with the environment's variables and `SUPERSET_ENV=cloud`. There is no workspace: no `SUPERSET_WORKSPACE_NAME`, no database branch, no `.env`.
 - It must finish in 3 minutes and be idempotent: a build usually runs on top of the previous snapshot.
 - Put everything a box needs that does not depend on one workspace in `[install]` or `[install.cloud]`: dependencies, runtimes (`mise use -g node@22`), CLIs, browsers (`playwright install chromium`), generated code, a seeded local test database. `[setup.cloud]` is only for per-workspace state (a database branch, `.env`), because it runs on every boot and resume.

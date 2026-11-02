@@ -41,12 +41,6 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 				<h3 className="text-base font-semibold">
 					<Trans>Environment history</Trans>
 				</h3>
-				<p className="mt-0.5 text-xs text-muted-foreground">
-					<Trans>
-						The last 5 environments. Restore one to start new workspaces from it
-						again.
-					</Trans>
-				</p>
 			</div>
 			<div className="overflow-hidden rounded-md border">
 				<Table>

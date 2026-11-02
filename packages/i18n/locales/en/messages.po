@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Changes"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Changes apply to new workspaces. A new build starts automatically."
-
 msgid "Changes open target"
 msgstr "Changes open target"
 
@@ -7738,9 +7735,6 @@ msgstr "Every weekday at 9am, read new GitHub issues, apply labels, and draft a 
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Everyone in the organization, or only you."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Everyone sees new versions as they are published"
@@ -15226,6 +15220,9 @@ msgstr "Rebase & Merge"
 msgid "Rebase and merge"
 msgstr "Rebase and merge"
 
+msgid "Rebuild environment"
+msgstr "Rebuild environment"
+
 msgid "Recall what was said in meetings"
 msgstr "Recall what was said in meetings"
 
@@ -17175,9 +17172,6 @@ msgstr "Set group color"
 msgid "Set icon to {0}"
 msgstr "Set icon to {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Set on every workspace started from this environment, and while it builds."
-
 msgid "Set project…"
 msgstr "Set project…"
 
@@ -19111,9 +19105,6 @@ msgstr "The image upload expired — attach it again"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "The last 5 environments. Restore one to start new workspaces from it again."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "The latest updates, improvements, and new features in Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "The majority of merged agent PRs need review only, with zero human edits
 
 msgid "The model declined to continue"
 msgstr "The model declined to continue"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "The most recently changed. Set on every workspace started from this environment, and while it builds."
 
 msgid "The name of your organization or team"
 msgstr "The name of your organization or team"
@@ -20084,9 +20072,6 @@ msgstr "Trigger automations from Gmail."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Trigger automations from Teams channel messages."
-
-msgid "Trigger new build"
-msgstr "Trigger new build"
 
 msgid "Trigger not found"
 msgstr "Trigger not found"

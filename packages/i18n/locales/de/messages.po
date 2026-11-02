@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Änderungen"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Änderungen gelten für neue Arbeitsbereiche. Ein neuer Build startet automatisch."
-
 msgid "Changes open target"
 msgstr "Öffnungsziel für Änderungen"
 
@@ -7738,9 +7735,6 @@ msgstr "Jeden Werktag um 9 Uhr neue GitHub-Issues lesen, Labels vergeben und ein
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Alle streiten darüber, ob sich das verallgemeinern lässt. Genau dieser Streit ist das Zeichen, dass die Stufe erreicht wurde."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Alle in der Organisation oder nur du."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Alle sehen neue Versionen, sobald sie veröffentlicht werden"
@@ -15226,6 +15220,9 @@ msgstr "Rebase & zusammenführen"
 msgid "Rebase and merge"
 msgstr "Rebase und zusammenführen"
 
+msgid "Rebuild environment"
+msgstr "Umgebung neu bauen"
+
 msgid "Recall what was said in meetings"
 msgstr "Nachlesen, was in Meetings gesagt wurde"
 
@@ -17175,9 +17172,6 @@ msgstr "Gruppenfarbe festlegen"
 msgid "Set icon to {0}"
 msgstr "Icon auf {0} setzen"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Gesetzt in jedem Arbeitsbereich, der aus dieser Umgebung startet, und während sie gebaut wird."
-
 msgid "Set project…"
 msgstr "Projekt festlegen…"
 
@@ -19111,9 +19105,6 @@ msgstr "Der Bild-Upload ist abgelaufen — erneut anhängen"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Die Stellenbeschreibung verschiebt sich. Entwickler sind nicht länger Tipper mit Geschmack, sondern Disponenten mit Geschmack: Arbeit zerlegen, an Flotten verteilen, Konflikte zwischen Agenten schlichten, die beide dasselbe Modul angefasst haben."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "Die letzten 5 Umgebungen. Stelle eine wieder her, damit neue Arbeitsbereiche wieder von ihr starten."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Die neuesten Updates, Verbesserungen und Funktionen in Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "Die Mehrheit der gemergten Agenten-PRs braucht nur Review, ohne menschli
 
 msgid "The model declined to continue"
 msgstr "Das Modell hat abgelehnt weiterzumachen"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Zuletzt geändert. Gesetzt in jedem Arbeitsbereich, der aus dieser Umgebung startet, und während sie gebaut wird."
 
 msgid "The name of your organization or team"
 msgstr "Der Name deiner Organisation oder deines Teams"
@@ -20084,9 +20072,6 @@ msgstr "Automatisierungen aus Gmail auslösen."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Automatisierungen aus Nachrichten in Teams-Kanälen auslösen."
-
-msgid "Trigger new build"
-msgstr "Neuen Build starten"
 
 msgid "Trigger not found"
 msgstr "Trigger nicht gefunden"

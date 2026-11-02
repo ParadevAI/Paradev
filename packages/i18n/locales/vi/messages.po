@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Thay đổi"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Thay đổi áp dụng cho các workspace mới. Một bản build mới sẽ tự động bắt đầu."
-
 msgid "Changes open target"
 msgstr "Vị trí mở thay đổi"
 
@@ -7738,9 +7735,6 @@ msgstr "Mỗi ngày trong tuần lúc 9h sáng, đọc issue GitHub mới, gán 
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Ai cũng tranh cãi liệu điều này có khái quát được không. Chính cuộc tranh cãi đó là dấu hiệu mức này đã đạt được."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Mọi người trong tổ chức, hoặc chỉ bạn."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Mọi người thấy phiên bản mới ngay khi được xuất bản"
@@ -15226,6 +15220,9 @@ msgstr "Rebase & merge"
 msgid "Rebase and merge"
 msgstr "Rebase và merge"
 
+msgid "Rebuild environment"
+msgstr "Build lại environment"
+
 msgid "Recall what was said in meetings"
 msgstr "Xem lại những gì đã nói trong cuộc họp"
 
@@ -17175,9 +17172,6 @@ msgstr "Đặt màu nhóm"
 msgid "Set icon to {0}"
 msgstr "Đặt biểu tượng thành {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Được đặt trên mọi workspace khởi động từ environment này, và trong khi build."
-
 msgid "Set project…"
 msgstr "Đặt dự án…"
 
@@ -19111,9 +19105,6 @@ msgstr "Lượt tải lên hình ảnh đã hết hạn — hãy đính kèm l�
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Mô tả công việc thay đổi. Kỹ sư thôi làm thợ gõ phím có gu và trở thành người điều phối có gu: chia nhỏ công việc, phân về các đội agent, phân xử xung đột giữa những agent cùng chạm vào một module."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "5 environment gần nhất. Khôi phục một bản để các workspace mới lại khởi động từ nó."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Paradev."
 
@@ -19152,9 +19143,6 @@ msgstr "Phần lớn PR của agent được merge chỉ cần review, không c�
 
 msgid "The model declined to continue"
 msgstr "Mô hình đã từ chối tiếp tục"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Những biến thay đổi gần nhất. Được đặt trên mọi workspace khởi động từ environment này, và trong khi build."
 
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
@@ -20084,9 +20072,6 @@ msgstr "Kích hoạt tự động hóa từ Gmail."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Kích hoạt tự động hóa từ tin nhắn kênh Teams."
-
-msgid "Trigger new build"
-msgstr "Bắt đầu bản build mới"
 
 msgid "Trigger not found"
 msgstr "Không tìm thấy trigger"

@@ -143,9 +143,6 @@ export function EnvironmentEdit({
 						/>
 					</SettingsRow>
 					<SettingsRow
-						hint={t({
-							message: "Everyone in the organization, or only you.",
-						})}
 						htmlFor="environment-scope"
 						label={t({ message: "Visible to" })}
 					>
@@ -180,10 +177,6 @@ export function EnvironmentEdit({
 						<Trans>Edit</Trans>
 					</Button>
 				}
-				description={t({
-					message:
-						"Changes apply to new workspaces. A new build starts automatically.",
-				})}
 				title={t({ message: "Repositories" })}
 			>
 				<div className="divide-y rounded-md border">

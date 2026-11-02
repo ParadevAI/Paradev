@@ -3994,9 +3994,6 @@ msgstr "Журнал змін"
 msgid "Changes"
 msgstr "Зміни"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "Зміни застосовуються до нових робочих просторів. Нова збірка запускається автоматично."
-
 msgid "Changes open target"
 msgstr "Де відкривати зміни"
 
@@ -7732,9 +7729,6 @@ msgstr "Кожного буднього дня о 9:00 читай нові issue
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Усі сперечаються, чи це узагальнюється. Саме ця суперечка свідчить, що рівня досягнуто."
-
-msgid "Everyone in the organization, or only you."
-msgstr "Усі в організації або лише ви."
 
 msgid "Everyone sees new versions as they are published"
 msgstr "Усі бачать нові версії одразу після публікації"
@@ -15220,6 +15214,9 @@ msgstr "Зробити ребейз і злити"
 msgid "Rebase and merge"
 msgstr "Зробити ребейз і злити"
 
+msgid "Rebuild environment"
+msgstr "Перезібрати середовище"
+
 msgid "Recall what was said in meetings"
 msgstr "Згадати, що говорили на зустрічах"
 
@@ -17169,9 +17166,6 @@ msgstr "Задати колір групи"
 msgid "Set icon to {0}"
 msgstr "Установити значок: {0}"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "Задаються в кожному робочому просторі, запущеному з цього середовища, і під час збірки."
-
 msgid "Set project…"
 msgstr "Призначити проєкт…"
 
@@ -19105,9 +19099,6 @@ msgstr "Термін дії завантаженого зображення ми
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Суть професії змінюється. Інженери перестають бути друкарями зі смаком і стають диспетчерами зі смаком: розбивають роботу на частини, розподіляють її між флотами агентів, розв'язують конфлікти між агентами, які змінили той самий модуль."
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "Останні 5 середовищ. Відновіть одне, щоб нові робочі простори знову запускалися з нього."
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Останні оновлення, покращення й нові функції в Paradev."
 
@@ -19146,9 +19137,6 @@ msgstr "Більшість злитих PR від агентів потребу�
 
 msgid "The model declined to continue"
 msgstr "Модель відмовилася продовжувати"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "Нещодавно змінені. Задаються в кожному робочому просторі, запущеному з цього середовища, і під час збірки."
 
 msgid "The name of your organization or team"
 msgstr "Назва вашої організації чи команди"
@@ -20078,9 +20066,6 @@ msgstr "Запускайте автоматизації з Gmail."
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Запускайте автоматизації з повідомлень у каналах Teams."
-
-msgid "Trigger new build"
-msgstr "Запустити нову збірку"
 
 msgid "Trigger not found"
 msgstr "Тригер не знайдено"

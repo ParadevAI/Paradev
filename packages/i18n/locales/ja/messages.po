@@ -4000,9 +4000,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "変更"
 
-msgid "Changes apply to new workspaces. A new build starts automatically."
-msgstr "変更は新しいワークスペースに適用されます。新しいビルドが自動的に開始されます。"
-
 msgid "Changes open target"
 msgstr "変更ビューの開き先"
 
@@ -7738,9 +7735,6 @@ msgstr "平日午前9時に、新しいGitHub issueを読み、ラベルを付�
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "これが一般化するかどうかで議論が起きます。その議論こそ、このレベルに到達した証拠です。"
-
-msgid "Everyone in the organization, or only you."
-msgstr "組織の全員、または自分だけ。"
 
 msgid "Everyone sees new versions as they are published"
 msgstr "公開された新しいバージョンが全員に表示されます"
@@ -15226,6 +15220,9 @@ msgstr "リベースしてマージ"
 msgid "Rebase and merge"
 msgstr "リベースしてマージ"
 
+msgid "Rebuild environment"
+msgstr "環境を再ビルド"
+
 msgid "Recall what was said in meetings"
 msgstr "会議での発言を振り返る"
 
@@ -17175,9 +17172,6 @@ msgstr "グループの色を設定"
 msgid "Set icon to {0}"
 msgstr "アイコンを{0}に設定"
 
-msgid "Set on every workspace started from this environment, and while it builds."
-msgstr "この環境から起動するすべてのワークスペースと、ビルド中に設定されます。"
-
 msgid "Set project…"
 msgstr "プロジェクトを設定…"
 
@@ -19111,9 +19105,6 @@ msgstr "画像のアップロードの有効期限が切れました — もう�
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "職務の中身が変わります。エンジニアは審美眼のあるタイピストであることをやめ、審美眼のあるディスパッチャーになります。作業を分解し、フリートに割り振り、同じモジュールに触れたエージェント同士の衝突を裁く役です。"
 
-msgid "The last 5 environments. Restore one to start new workspaces from it again."
-msgstr "最新の 5 つの環境です。復元すると、新しいワークスペースが再びその環境から起動します。"
-
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Paradevの最新のアップデート、改善、新機能。"
 
@@ -19152,9 +19143,6 @@ msgstr "マージされたエージェントのPRの過半数が、レビュー�
 
 msgid "The model declined to continue"
 msgstr "モデルが続行を拒否しました"
-
-msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
-msgstr "最近変更されたもの。この環境から起動するすべてのワークスペースと、ビルド中に設定されます。"
 
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
@@ -20084,9 +20072,6 @@ msgstr "Gmail から自動化をトリガーします。"
 
 msgid "Trigger automations from Teams channel messages."
 msgstr "Teamsのチャンネルメッセージからオートメーションを起動します。"
-
-msgid "Trigger new build"
-msgstr "新しいビルドを開始"
 
 msgid "Trigger not found"
 msgstr "トリガーが見つかりません"
