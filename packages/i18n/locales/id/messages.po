@@ -4383,6 +4383,9 @@ msgstr "Klik di sini kalau tidak dialihkan"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik tombol “↑ update” untuk melihat konfirmasi sebelum pembaruan"
 
+msgid "Click to copy"
+msgstr "Klik untuk menyalin"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik untuk menyalin ID sesi (lanjutkan dengan `claude --resume <id>`)."
 
@@ -5311,9 +5314,6 @@ msgstr "Salin Nama Branch"
 
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Salin riwayat penjelajahan dan login dari Chrome, Brave, Arc, atau browser Chromium lain ke Paradev."
-
-msgid "Copy build ID"
-msgstr "Salin ID build"
 
 msgid "Copy code"
 msgstr "Salin kode"

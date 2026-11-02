@@ -1,37 +1,35 @@
-import { useLingui } from "@lingui/react/macro";
-import { Button } from "@superset/ui/button";
+import { Trans } from "@lingui/react/macro";
 import { TableCell } from "@superset/ui/table";
-import { HiCheck, HiOutlineClipboardDocument } from "react-icons/hi2";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { useState } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 
 interface BuildIdCellProps {
 	buildId: string;
 }
 
-/** The id, with a copy button that shows while the cell is hovered. */
+/** Click to copy, as a variable's value in the environment variables list. */
 export function BuildIdCell({ buildId }: BuildIdCellProps) {
-	const { t } = useLingui();
 	const { copyToClipboard, copied } = useCopyToClipboard(1500);
+	const [hovered, setHovered] = useState(false);
 	return (
-		<TableCell className="group">
-			<div className="flex min-w-0 items-center gap-1">
-				<span className="truncate font-mono text-xs" title={buildId}>
-					{buildId}
-				</span>
-				<Button
-					aria-label={t({ message: "Copy build ID" })}
-					className="size-6 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-					onClick={() => copyToClipboard(buildId)}
-					size="icon"
-					variant="ghost"
-				>
-					{copied ? (
-						<HiCheck className="size-3.5" />
-					) : (
-						<HiOutlineClipboardDocument className="size-3.5" />
-					)}
-				</Button>
-			</div>
+		<TableCell>
+			<Tooltip open={hovered}>
+				<TooltipTrigger asChild>
+					<button
+						className="max-w-full cursor-pointer truncate rounded px-1 py-0.5 text-left font-mono text-xs transition-colors hover:bg-accent"
+						onClick={() => copyToClipboard(buildId)}
+						onMouseEnter={() => setHovered(true)}
+						onMouseLeave={() => setHovered(false)}
+						type="button"
+					>
+						{buildId}
+					</button>
+				</TooltipTrigger>
+				<TooltipContent>
+					{copied ? <Trans>Copied!</Trans> : <Trans>Click to copy</Trans>}
+				</TooltipContent>
+			</Tooltip>
 		</TableCell>
 	);
 }

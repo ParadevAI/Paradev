@@ -4383,6 +4383,9 @@ msgstr "Klik hier als je niet wordt doorgestuurd"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik op ‘↑ update’ om de bevestiging vóór de update te bekijken"
 
+msgid "Click to copy"
+msgstr "Klik om te kopiëren"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik om de sessie-ID te kopiëren (hervatten met `claude --resume <id>`)."
 
@@ -5311,9 +5314,6 @@ msgstr "Branchnaam kopiëren"
 
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Kopieer browsegeschiedenis en logins uit Chrome, Brave, Arc of een andere Chromium-browser naar Paradev."
-
-msgid "Copy build ID"
-msgstr "Build-ID kopiëren"
 
 msgid "Copy code"
 msgstr "Code kopiëren"

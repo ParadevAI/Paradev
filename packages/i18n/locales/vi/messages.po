@@ -4383,6 +4383,9 @@ msgstr "Nhấp vào đây nếu không được chuyển hướng"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Nhấp vào nút “↑ update” để xem xác nhận trước khi cập nhật"
 
+msgid "Click to copy"
+msgstr "Nhấp để sao chép"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Nhấp để sao chép ID phiên (resume bằng `claude --resume <id>`)."
 
@@ -5311,9 +5314,6 @@ msgstr "Sao chép tên nhánh"
 
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ Chrome, Brave, Arc hoặc trình duyệt Chromium khác vào Paradev."
-
-msgid "Copy build ID"
-msgstr "Sao chép ID bản build"
 
 msgid "Copy code"
 msgstr "Sao chép mã"

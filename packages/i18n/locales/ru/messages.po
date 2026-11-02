@@ -4383,6 +4383,9 @@ msgstr "Нажмите здесь, если переход не произошё
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Нажмите «↑ update», чтобы увидеть подтверждение перед обновлением"
 
+msgid "Click to copy"
+msgstr "Нажмите, чтобы скопировать"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Нажмите, чтобы скопировать ID сессии (возобновление: `claude --resume <id>`)."
 
@@ -5311,9 +5314,6 @@ msgstr "Скопировать имя ветки"
 
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Скопируйте историю просмотров и логины из Chrome, Brave, Arc или другого браузера на Chromium в Paradev."
-
-msgid "Copy build ID"
-msgstr "Скопировать ID сборки"
 
 msgid "Copy code"
 msgstr "Копировать код"

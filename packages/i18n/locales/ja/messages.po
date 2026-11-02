@@ -4383,6 +4383,9 @@ msgstr "リダイレクトされない場合はこちらをクリック"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "「↑ update」ボタンをクリックすると更新前の確認が表示されます"
 
+msgid "Click to copy"
+msgstr "クリックしてコピー"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "クリックでセッションIDをコピーします(`claude --resume <id>`で再開)。"
 
@@ -5311,9 +5314,6 @@ msgstr "ブランチ名をコピー"
 
 msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
 msgstr "Chrome、Brave、Arc、その他ChromiumブラウザからブラウジングHistoryとログイン情報をParadevにコピーします。"
-
-msgid "Copy build ID"
-msgstr "ビルド ID をコピー"
 
 msgid "Copy code"
 msgstr "コードをコピー"
