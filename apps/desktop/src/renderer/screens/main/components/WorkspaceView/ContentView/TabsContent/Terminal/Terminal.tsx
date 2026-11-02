@@ -4,7 +4,10 @@ import type { Terminal as XTerm } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { sanitizeTerminalFontFamily } from "renderer/lib/terminal/appearance";
+import {
+	DEFAULT_TERMINAL_MAC_OPTION_IS_META,
+	sanitizeTerminalFontFamily,
+} from "renderer/lib/terminal/appearance";
 import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { useTerminalTheme } from "renderer/stores/theme";
@@ -413,8 +416,15 @@ export const Terminal = memo(function Terminal({
 		if (!fontSettings) return;
 		const family = sanitizeTerminalFontFamily(fontSettings.terminalFontFamily);
 		const size = fontSettings.terminalFontSize ?? DEFAULT_TERMINAL_FONT_SIZE;
-		v1TerminalCache.updateAppearance(paneId, family, size, ({ cols, rows }) =>
-			resizeRef.current({ paneId, cols, rows }),
+		const macOptionIsMeta =
+			fontSettings.terminalMacOptionIsMeta ??
+			DEFAULT_TERMINAL_MAC_OPTION_IS_META;
+		v1TerminalCache.updateAppearance(
+			paneId,
+			family,
+			size,
+			macOptionIsMeta,
+			({ cols, rows }) => resizeRef.current({ paneId, cols, rows }),
 		);
 	}, [paneId, fontSettings]);
 

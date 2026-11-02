@@ -208,20 +208,29 @@ export function detachFromContainer(paneId: string): void {
 // --- Appearance ---
 
 /**
- * Update font settings on a cached terminal. If the font changed and the
- * terminal is visible, re-fits (once the parser is idle) and reports any
- * dimension change through onResize so the caller can send a backend resize.
+ * Update appearance settings on a cached terminal. `macOptionIsMeta` is a plain
+ * xterm option, so it applies on its own and needs no refit: a toggle change
+ * with the font untouched still lands (#6426 review).
+ *
+ * If the font changed and the terminal is visible, re-fits (once the parser is
+ * idle) and reports any dimension change through onResize so the caller can
+ * send a backend resize.
  */
 export function updateAppearance(
 	paneId: string,
 	fontFamily: string,
 	fontSize: number,
+	macOptionIsMeta: boolean,
 	onResize?: (dims: { cols: number; rows: number }) => void,
 ): void {
 	const entry = cache.get(paneId);
 	if (!entry) return;
 
 	const { xterm } = entry;
+	if (xterm.options.macOptionIsMeta !== macOptionIsMeta) {
+		xterm.options.macOptionIsMeta = macOptionIsMeta;
+	}
+
 	const fontChanged =
 		xterm.options.fontFamily !== fontFamily ||
 		xterm.options.fontSize !== fontSize;
