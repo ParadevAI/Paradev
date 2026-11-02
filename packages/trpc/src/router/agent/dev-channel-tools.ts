@@ -13,8 +13,10 @@ import {
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, isNull, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import type { DevPrincipal } from "../../principal";
+import { type DevPrincipal, onBehalfOf } from "../../principal";
 import { loadChannelAccessFor } from "../channel/access";
+import { issueFilterFor, listIssues } from "../integration/linear/api";
+import { withLinear } from "../integration/linear/live";
 import { mainProcedure } from "./main-procedure";
 import { parseReplyTarget, replyTarget } from "./turns";
 
@@ -70,6 +72,37 @@ const messageColumns = {
 	userName: users.name,
 	devName: agents.name,
 };
+
+/** A Linear project's issues, read with the Linear login of the person the Dev works for. */
+async function linearProjectIssues(principal: DevPrincipal, projectId: string) {
+	try {
+		const page = await withLinear(
+			onBehalfOf(principal),
+			principal.organizationId,
+			(client) =>
+				listIssues(client, {
+					filter: issueFilterFor({ projectId, status: "all" }),
+				}),
+		);
+		return {
+			project: "Linear project",
+			tasks: page.issues.map((issue) => ({
+				identifier: issue.identifier,
+				title: issue.title,
+				status: issue.state.name,
+				assignee: issue.assignee?.displayName ?? null,
+				url: issue.url,
+			})),
+			more: page.nextCursor !== null,
+		};
+	} catch (error) {
+		return {
+			project: "Linear project",
+			tasks: [],
+			error: `Linear could not be read for the person you work for: ${error instanceof Error ? error.message : String(error)}`,
+		};
+	}
+}
 
 export const devChannelTools = {
 	readChannel: mainProcedure
@@ -131,6 +164,15 @@ export const devChannelTools = {
 		.input(z.object({ channel: channelRef }))
 		.query(async ({ ctx, input }) => {
 			const { channel } = await readableChannel(ctx.principal, input.channel);
+			if (channel.linearProjectId) {
+				return {
+					channel: `#${channel.name}`,
+					...(await linearProjectIssues(
+						ctx.principal,
+						channel.linearProjectId,
+					)),
+				};
+			}
 			const projectId = channel.taskProjectId;
 			if (!projectId) {
 				return { channel: `#${channel.name}`, project: null, tasks: [] };
