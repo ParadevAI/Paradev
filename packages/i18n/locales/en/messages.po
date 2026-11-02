@@ -11914,9 +11914,6 @@ msgstr "Next image"
 msgid "Next match"
 msgstr "Next match"
 
-msgid "Next release"
-msgstr "Next release"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "Next run {0}"
@@ -14553,9 +14550,6 @@ msgstr "Previous match"
 
 msgid "Previous prompts"
 msgstr "Previous prompts"
-
-msgid "Previous release"
-msgstr "Previous release"
 
 msgid "Previous slide"
 msgstr "Previous slide"

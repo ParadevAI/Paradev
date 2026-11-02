@@ -11914,9 +11914,6 @@ msgstr "Следующее изображение"
 msgid "Next match"
 msgstr "Следующее совпадение"
 
-msgid "Next release"
-msgstr "Следующий релиз"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "Следующий запуск {0}"
@@ -14553,9 +14550,6 @@ msgstr "Предыдущее совпадение"
 
 msgid "Previous prompts"
 msgstr "Предыдущие промпты"
-
-msgid "Previous release"
-msgstr "Предыдущий релиз"
 
 msgid "Previous slide"
 msgstr "Предыдущий слайд"
