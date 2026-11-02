@@ -51,6 +51,15 @@ describe("adoptDesktopInstallList", () => {
 		expect(names()).toEqual([["notion", true]]);
 	});
 
+	test("a damaged marker copies nothing rather than everything again", () => {
+		adoptDesktopInstallList(list, ledger);
+		fs.writeFileSync(ledger, JSON.stringify({ version: 1, plugins: [] }));
+		fs.writeFileSync(path.join(dir, ".desktop-list-adopted"), "{damaged");
+
+		expect(() => adoptDesktopInstallList(list, ledger)).toThrow();
+		expect(names()).toEqual([]);
+	});
+
 	test("tries again on the next boot when the ledger cannot be read", () => {
 		fs.writeFileSync(ledger, "{not json");
 		expect(() => adoptDesktopInstallList(list, ledger)).toThrow();

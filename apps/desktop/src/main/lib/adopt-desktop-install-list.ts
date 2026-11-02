@@ -6,13 +6,21 @@ import {
 } from "@superset/agent-setup";
 import type { InstalledPlugin } from "@superset/shared/plugins";
 
+/** A missing marker has seen nothing; a damaged one throws rather than copy everything again. */
 function readSeen(marker: string): Set<string> {
+	let raw: string;
 	try {
-		const names = JSON.parse(fs.readFileSync(marker, "utf-8"));
-		return new Set(Array.isArray(names) ? names : []);
-	} catch {
-		return new Set();
+		raw = fs.readFileSync(marker, "utf-8");
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException)?.code === "ENOENT") return new Set();
+		throw error;
 	}
+	const names: unknown = JSON.parse(raw);
+	if (!Array.isArray(names))
+		throw new Error(`${marker} is not a list of names`);
+	return new Set(
+		names.filter((name): name is string => typeof name === "string"),
+	);
 }
 
 /**

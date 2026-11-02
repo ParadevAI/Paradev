@@ -64,10 +64,14 @@ export async function adoptDesktopInstalls(): Promise<void> {
 			.from(settings)
 			.get()?.installedPlugins ?? [];
 	await serializePluginChange(async () => {
-		const moved = adoptDesktopInstallList(list);
-		if (moved.length) {
-			log.info(`[plugins] moved ${moved.join(", ")} to the ledger`);
-			syncInstalledPluginMcpServers();
+		try {
+			const moved = adoptDesktopInstallList(list);
+			if (moved.length) {
+				log.info(`[plugins] moved ${moved.join(", ")} to the ledger`);
+				syncInstalledPluginMcpServers();
+			}
+		} catch (error) {
+			log.warn("[plugins] could not move the old install list:", error);
 		}
 		const failed = await restorePluginTrees();
 		if (failed.length)

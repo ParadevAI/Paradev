@@ -382,32 +382,17 @@ async function reapStaleCommands(
 	}
 }
 
-const PROVISIONING_WAIT_MS = 120_000;
 let provisioning: Promise<void> = Promise.resolve();
-
-function settledOrTimedOut(previous: Promise<void>): Promise<void> {
-	return new Promise((resolve) => {
-		const timer = setTimeout(resolve, PROVISIONING_WAIT_MS);
-		timer.unref?.();
-		void previous.finally(() => {
-			clearTimeout(timer);
-			resolve();
-		});
-	});
-}
 
 /**
  * Runs one provisioning after another. Each reads installed_plugins.json when
  * it starts and reaps what is absent, so an overlapping older run could delete
  * the skills a newer one just wrote; boot starts one without waiting for it.
- * A run that never settles holds the next one only up to the wait limit.
  */
 export function createManagedSkills(
 	options: ManagedSkillsOptions = {},
 ): Promise<void> {
-	const next = settledOrTimedOut(provisioning).then(() =>
-		provisionManagedSkills(options),
-	);
+	const next = provisioning.then(() => provisionManagedSkills(options));
 	provisioning = next.catch(() => undefined);
 	return next;
 }
