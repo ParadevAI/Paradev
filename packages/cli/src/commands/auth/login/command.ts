@@ -186,7 +186,10 @@ export default command({
 			url: null,
 			status: "starting",
 			onSubmit: (code) => pasteResolve?.(code),
-			onCancel: () => pasteReject?.(new CLIError("Login cancelled")),
+			onCancel: () => {
+				cancelController.abort();
+				pasteReject?.(new CLIError("Login cancelled"));
+			},
 			onCopy: async () => false,
 		};
 
@@ -205,8 +208,18 @@ export default command({
 
 		let result: Awaited<ReturnType<typeof login>> | null = null;
 		let cancelled = false;
+		// Escape or Ctrl+C in the Ink UI has to end the whole login, not just
+		// the paste prompt: once the loopback flow stops starting a paste
+		// prompt, rejecting that promise leaves a browser login waiting with no
+		// way out (#6347 review).
+		const cancelController = new AbortController();
+		// Chained rather than `AbortSignal.any`, so the CLI keeps working on the
+		// Node versions it supports.
+		opts.signal?.addEventListener("abort", () => cancelController.abort(), {
+			once: true,
+		});
 		try {
-			result = await login(opts.signal, {
+			result = await login(cancelController.signal, {
 				onAuthorizationUrl: (url) => {
 					if (inkInstance) {
 						update({
