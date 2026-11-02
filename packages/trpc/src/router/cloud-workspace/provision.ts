@@ -165,7 +165,14 @@ async function provision(
 					claim,
 				}),
 		);
-		recordBootSpans(answer);
+		try {
+			recordBootSpans(answer);
+		} catch (error) {
+			console.error(
+				`[cloud-workspace] could not trace the boot of ${row.id}`,
+				error,
+			);
+		}
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);
