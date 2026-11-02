@@ -31,6 +31,19 @@ export function bootStampsFrom(body: unknown): BootStamp[] {
 	return parsed.success ? parsed.data.result.data.json.sandboxBoot.stamps : [];
 }
 
+/** The box's clock and ours can disagree; a boot this far before `since` is still counted. */
+const CLOCK_SKEW_MS = 5_000;
+
+/**
+ * Whether the answer's boot began at or after `since`. A host-service that
+ * outlived a boot command, which then started nothing, answers with an older
+ * boot's stamps.
+ */
+export function bootBeganSince(answer: HostAnswer, since: number): boolean {
+	const first = answer.stamps[0];
+	return first !== undefined && first.at >= since - CLOCK_SKEW_MS;
+}
+
 export interface BootSegment {
 	name: string;
 	start: number;
