@@ -278,9 +278,10 @@ function gitRecordsNameLegacyHome(
 		if (!adminDir) return false;
 		const resolvedAdminDir = path.resolve(worktreePath, adminDir);
 		if (namesLegacyHome(resolvedAdminDir)) return true;
-		return namesLegacyHome(
-			fs.readFileSync(path.join(resolvedAdminDir, "gitdir"), "utf8").trim(),
-		);
+		const backlink = fs
+			.readFileSync(path.join(resolvedAdminDir, "gitdir"), "utf8")
+			.trim();
+		return namesLegacyHome(path.resolve(resolvedAdminDir, backlink));
 	} catch {
 		return false;
 	}
