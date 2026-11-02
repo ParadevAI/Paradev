@@ -77,6 +77,8 @@ export const channels = pgTable(
 			(): AnyPgColumn => taskProjects.id,
 			{ onDelete: "set null" },
 		),
+		/** A Linear project whose issues the channel shows instead; Linear holds the issues. */
+		linearProjectId: text("linear_project_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
