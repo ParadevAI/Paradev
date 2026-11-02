@@ -134,43 +134,53 @@ test("nativeRm is skipped when the caller did not force removal", async () => {
 	expect(result.stillRegistered).toBe(true);
 });
 
-test("a failing native rm still lets git unregister, and reports why", async () => {
-	const { repo, worktree } = makeRepoWithHeavyWorktree();
-	// Make the recursive delete fail for real instead of mocking it: an
-	// unreadable directory stops `rm -r` with EACCES for a non-root user.
-	// (This is the deterministic-on-CI-non-root form; a root-run cannot be
-	// forced to fail by a permission bit, so everything below tolerates the
-	// case where the delete actually succeeded.)
-	const blocked = join(worktree, "node_modules", "pkg-a");
-	chmodSync(blocked, 0o000);
-	let rmFailed = false;
-	try {
-		const phases: string[] = [];
-		const result = await gitWorktreeRemoveTask.handler(
-			{
-				repoPath: repo,
-				worktreePath: worktree,
-				gitEnv: {} as GitTaskEnv,
-				nativeRm: true,
-			},
-			(phase) => phases.push(phase),
-		);
+// A permission bit cannot hold back a root-run process: the delete succeeds,
+// `removeError` stays falsy and the assertions below would pass without ever
+// exercising the failure they exist for. Skip there instead of passing
+// vacuously (#6887 review).
+const runningAsRoot =
+	typeof process.getuid === "function" && process.getuid() === 0;
 
-		// The point of the guard: the handler does not reject at the delete step.
-		// Before it, an EPERM/EBUSY escaped the task and the caller reported a
-		// removal failure for a worktree git could still have unregistered.
-		rmFailed = existsSync(blocked);
-		expect(phases).toContain("worktree-remove");
-		if (rmFailed) {
-			expect(result.removeError).toBeTruthy();
+test.skipIf(runningAsRoot)(
+	"a failing native rm still lets git unregister, and reports why",
+	async () => {
+		const { repo, worktree } = makeRepoWithHeavyWorktree();
+		// Make the recursive delete fail for real instead of mocking it: an
+		// unreadable directory stops `rm -r` with EACCES for a non-root user.
+		// (This is the deterministic-on-CI-non-root form; a root-run cannot be
+		// forced to fail by a permission bit, so everything below tolerates the
+		// case where the delete actually succeeded.)
+		const blocked = join(worktree, "node_modules", "pkg-a");
+		chmodSync(blocked, 0o000);
+		let rmFailed = false;
+		try {
+			const phases: string[] = [];
+			const result = await gitWorktreeRemoveTask.handler(
+				{
+					repoPath: repo,
+					worktreePath: worktree,
+					gitEnv: {} as GitTaskEnv,
+					nativeRm: true,
+				},
+				(phase) => phases.push(phase),
+			);
+
+			// The point of the guard: the handler does not reject at the delete step.
+			// Before it, an EPERM/EBUSY escaped the task and the caller reported a
+			// removal failure for a worktree git could still have unregistered.
+			rmFailed = existsSync(blocked);
+			expect(phases).toContain("worktree-remove");
+			if (rmFailed) {
+				expect(result.removeError).toBeTruthy();
+			}
+		} finally {
+			// Never throw a stray ENOENT when the tree actually got deleted
+			// (which is what happens when the test process runs as root and the
+			// chmod bit cannot hold it back).
+			if (existsSync(blocked)) chmodSync(blocked, 0o700);
 		}
-	} finally {
-		// Never throw a stray ENOENT when the tree actually got deleted
-		// (which is what happens when the test process runs as root and the
-		// chmod bit cannot hold it back).
-		if (existsSync(blocked)) chmodSync(blocked, 0o700);
-	}
-});
+	},
+);
 
 test("without nativeRm the task still unregisters via git (caller falls back)", async () => {
 	const { repo, worktree } = makeRepoWithHeavyWorktree();
@@ -205,4 +215,52 @@ test("nativeRm is a no-op for an already-missing path", async () => {
 	// `force: true` on a missing path is a no-op and git still registers the
 	// empty directory as removed.
 	expect(result.stillRegistered).toBe(false);
+});
+
+test("nativeRm leaves a directory git does not register on disk", async () => {
+	// The caller proves the path sits inside the managed worktrees root, and a
+	// stale row can name any in-root folder: another workspace's worktree, or a
+	// user directory. Deleting that before git has a say destroys work this
+	// workspace never owned (#6887 review), so the registry decides first.
+	const { repo } = makeRepoWithHeavyWorktree();
+	const stranger = mkdtempSync(join(tmpdir(), "rm-by-hand-stranger-"));
+	tempDirs.push(stranger);
+	writeFileSync(join(stranger, "keep.txt"), "not a worktree\n");
+
+	const phases: string[] = [];
+	const result = await gitWorktreeRemoveTask.handler(
+		{
+			repoPath: repo,
+			worktreePath: stranger,
+			gitEnv: {} as GitTaskEnv,
+			nativeRm: true,
+		},
+		(phase) => phases.push(phase),
+	);
+
+	expect(phases).not.toContain("delete-files");
+	expect(existsSync(join(stranger, "keep.txt"))).toBe(true);
+	// Both halves matter: `stillRegistered` is false because git never had it,
+	// and `wasRegistered` is what tells the caller not to delete it either.
+	expect(result.stillRegistered).toBe(false);
+	expect(result.wasRegistered).toBe(false);
+});
+
+test("a registered worktree reports that git had it before cleanup", async () => {
+	// The caller keeps its disk-recheck fallback only for a path git really
+	// registered, so the flag has to be true on the normal path.
+	const { repo, worktree } = makeRepoWithHeavyWorktree();
+
+	const result = await gitWorktreeRemoveTask.handler(
+		{
+			repoPath: repo,
+			worktreePath: worktree,
+			gitEnv: {} as GitTaskEnv,
+			nativeRm: true,
+		},
+		() => {},
+	);
+
+	expect(result.wasRegistered).toBe(true);
+	expect(existsSync(worktree)).toBe(false);
 });

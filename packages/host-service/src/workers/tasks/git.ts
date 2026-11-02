@@ -359,7 +359,7 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		 */
 		nativeRm?: boolean;
 	},
-	{ stillRegistered: boolean; removeError?: string }
+	{ stillRegistered: boolean; removeError?: string; wasRegistered: boolean }
 >({
 	type: "git/removeWorktree",
 	// This task outlives its caller's budget in the field (HOST-SERVICE-17,
@@ -394,7 +394,23 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// Why files can be left behind, whichever step failed. Declared before
 		// the native delete because that step can fail on its own.
 		let removeError: string | undefined;
-		if (nativeRm && force) {
+		// #6887 review: the native delete must never touch a directory git does
+		// not list as a worktree of this repo. The caller proves only that the
+		// stored path sits inside the managed root, so a stale row can point at
+		// any in-root folder — another workspace's worktree, a user directory —
+		// and deleting that before git has a say destroys work it never owned.
+		// The registry is asked first, on the same resolved `target` the delete
+		// and `worktree remove` then use: a symlink swapped in after the caller's
+		// containment check resolves outside the registration and is skipped.
+		reportPhase?.("worktree-list");
+		const registeredBefore = parseWorktreeList(
+			await git.raw(["worktree", "list", "--porcelain"]),
+		).some(
+			(w) =>
+				normalizeWorktreePath(w.path) === target &&
+				normalizeWorktreePath(w.path) !== normalizeWorktreePath(repoPath),
+		);
+		if (nativeRm && force && registeredBefore) {
 			// Only run the native delete when the caller asks for a forced
 			// removal: with `force: false` git's own `worktree remove` is
 			// supposed to refuse a dirty worktree, and deleting the tree here
@@ -449,6 +465,7 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 				(w) => normalizeWorktreePath(w.path) === target,
 			),
 			removeError,
+			wasRegistered: registeredBefore,
 		};
 	},
 });

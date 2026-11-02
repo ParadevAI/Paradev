@@ -66,7 +66,14 @@ export const cleanupGitOps = {
 		 * is set — the worker will native-rm the directory first (see
 		 * `gitWorktreeRemoveTask`). */
 		nativeRm?: boolean;
-	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
+	}): Promise<{
+		stillRegistered: boolean;
+		removeError?: string;
+		/** Whether git listed the path as a worktree of `repoPath` before the
+		 * worker touched it. False means the row pointed at a directory git
+		 * never owned, and the caller must not delete it. */
+		wasRegistered: boolean;
+	}> {
 		// Generous timeout: removal recursively deletes the worktree
 		// directory, which can take a while for large trees (node_modules
 		// etc.).

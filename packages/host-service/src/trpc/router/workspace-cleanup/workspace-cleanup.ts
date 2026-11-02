@@ -568,6 +568,7 @@ async function runDestroyPhases(
 			// orphaning disk past the archive commit point.
 			let stillRegistered = true;
 			let removeError: string | undefined;
+			let wasRegistered = false;
 			try {
 				// The fast native rm only runs when the caller can prove the
 				// path is inside this project's managed worktrees root — a
@@ -582,12 +583,13 @@ async function runDestroyPhases(
 					project,
 					worktreeBaseDir,
 				);
-				({ stillRegistered, removeError } = await cleanupGitOps.removeWorktree({
-					repoPath: project.repoPath,
-					worktreePath: local.worktreePath,
-					gitEnv: repoGitEnv,
-					nativeRm,
-				}));
+				({ stillRegistered, removeError, wasRegistered } =
+					await cleanupGitOps.removeWorktree({
+						repoPath: project.repoPath,
+						worktreePath: local.worktreePath,
+						gitEnv: repoGitEnv,
+						nativeRm,
+					}));
 			} catch (err) {
 				const message = err instanceof Error ? err.message : String(err);
 				throw new TRPCError({
@@ -617,7 +619,16 @@ async function runDestroyPhases(
 				// branches use.
 				const worktreeBaseDir =
 					project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
-				if (
+				if (!wasRegistered) {
+					// Git never listed this path as a worktree of this project, so
+					// the folder is not ours to delete whatever the row said: a
+					// stale or corrupt `worktreePath` can point at another
+					// workspace's tree or a user directory that happens to sit in
+					// the managed root (#6887 review).
+					warnings.push(
+						`Skipped folder removal at ${local.worktreePath}: git never had it registered as a worktree of ${project.repoPath}`,
+					);
+				} else if (
 					!isInsideProjectWorktreesRoot(
 						local.worktreePath,
 						project,
