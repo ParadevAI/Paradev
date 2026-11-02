@@ -120,6 +120,16 @@ writes the desired set and reaps whatever is absent, so a caller that hands in i
 instead of letting agent-setup read the file has just told it every other caller's plugins are gone.
 The desktop's next boot would undo a `plugins sync`, and vice versa.
 
+The code that changes it lives in `@superset/agent-setup` (`plugin-install.ts`, `plugin-state.ts`,
+`plugin-organization.ts`): installing, removing, enabling, syncing, marketplace clones. The CLI's
+`plugins` commands are thin wrappers over it, and the desktop calls it in-process from its tRPC
+routes and awaits it, so a failure reaches the Plugins page as an error. The desktop does not run
+the CLI for plugins and keeps no install list of its own; the list it once kept in `local.db` is
+moved into the file on upgrade, before the migration that drops it. Errors are `PluginError`; the
+CLI adds the command to run next. In one process, wrap every change in `serializePluginChange`:
+each one reads the file and rewrites it, so two that overlap lose one's change. Authoring
+(`create`, `validate`, `publish`) stays in the CLI.
+
 Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vibe, and Kimi read
 natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
 read the shared convention.

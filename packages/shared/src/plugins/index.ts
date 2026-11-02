@@ -721,20 +721,3 @@ export function getPluginByName(name: string): PluginCatalogEntry | undefined {
 	const proxied = pluginProxyMcpServers(name);
 	return proxied ? { ...entry, mcpServers: proxied } : entry;
 }
-
-/**
- * One install record, persisted as a JSON array on the local-db settings
- * singleton (mirrors `disabledAgentHooks`). Read by the main process at boot
- * to converge agent configs on the installed set.
- */
-export interface InstalledPlugin {
-	name: string;
-	version: string;
-	installedAt: string;
-	/**
-	 * false = keep the install record but materialize nothing (Codex's
-	 * `enabled = false` semantics). Absent means enabled — records written
-	 * before this field existed stay active.
-	 */
-	enabled?: boolean;
-}

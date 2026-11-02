@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { writeInstalledPlugins } from "./host";
-import { syncPluginMcpServers } from "./mcp-servers";
+import { writeInstalledPlugins } from "./installed-plugins";
+import { syncPluginMcpServers } from "./plugin-mcp-servers";
 
 const ORIGINAL_HOME_DIR = process.env.SUPERSET_HOME_DIR;
 const ORIGINAL_SANDBOX = process.env.SUPERSET_SANDBOX_WORKSPACE_ID;

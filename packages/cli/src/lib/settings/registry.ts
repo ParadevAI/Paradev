@@ -376,7 +376,6 @@ export const EXCLUDED_SETTINGS_COLUMNS: Record<string, string> = {
 	agentPresetPermissionsMigratedAt: "internal migration marker",
 	disabledAgentHooks: "agent-id list; use the app UI",
 	disabledSkills: "skill-name list; use the app's Plugins page",
-	installedPlugins: "structured install records; use the app's Plugins page",
 	terminalPersistence: "dead column; nothing reads it, retained for rollback",
 	deleteLocalBranch: "v2 reads renderer localStorage, unreachable externally",
 	exposeHostServiceViaRelay:

@@ -69,6 +69,7 @@ import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
 
 import {
 	finishPendingOrganizationForget,
+	restoreAdoptedPlugins,
 	syncInstalledPluginMcpServers,
 } from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
@@ -97,7 +98,7 @@ import {
 console.log("[main] Local database ready:", !!localDb);
 const IS_DEV = process.env.NODE_ENV === "development";
 
-void applyShellEnvToProcess().catch((error) => {
+const shellEnvApplied = applyShellEnvToProcess().catch((error) => {
 	console.error("[main] Failed to apply shell environment:", error);
 });
 
@@ -660,6 +661,12 @@ if (!gotTheLock) {
 		void finishPendingOrganizationForget().catch((error) =>
 			console.error("[main] Failed to remove organization plugins:", error),
 		);
+		// Installing clones the marketplace with git, which needs the shell PATH.
+		void shellEnvApplied
+			.then(restoreAdoptedPlugins)
+			.catch((error) =>
+				console.error("[main] Failed to install adopted plugins:", error),
+			);
 		try {
 			installBundledCliShim();
 		} catch (error) {

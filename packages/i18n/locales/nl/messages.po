@@ -2260,6 +2260,10 @@ msgstr "Previews aangestuurd door agents"
 msgid "Agents"
 msgstr "Agents"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agents kunnen de tools van {0} niet bereiken"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents voltooien routinetickets zonder tussentijds ingrijpen."
 
@@ -5509,6 +5513,9 @@ msgstr "Kan plugin niet uitschakelen"
 
 msgid "Could not disconnect."
 msgstr "Loskoppelen is mislukt."
+
+msgid "Could not download {names}."
+msgstr "Kan {names} niet downloaden."
 
 msgid "Could not forget {domain}"
 msgstr "Kan {domain} niet vergeten"
@@ -17488,6 +17495,9 @@ msgstr "Eén keer inloggen. Paradev houdt de verbinding."
 msgid "Sign in to {0}"
 msgstr "Log in bij {0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "Log in om de plugins van je organisatie te wijzigen."
+
 msgid "Sign in to continue"
 msgstr "Log in om verder te gaan"
 
@@ -19124,6 +19134,9 @@ msgstr "De Paradev-hostservice is onverwacht gestopt ({cause}) en kon niet autom
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "Het pad moet binnen de repository blijven"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "De pluginwijziging is niet binnen {seconds} seconden voltooid."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "De pool wordt elke maand vernieuwd. Gebruik daarboven wordt per GB-uur gefactureerd tegen het tarief bij elk abonnement."

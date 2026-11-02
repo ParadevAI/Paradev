@@ -2254,6 +2254,10 @@ msgstr "Попередній перегляд під керуванням аге
 msgid "Agents"
 msgstr "Агенти"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Агенти не мають доступу до інструментів {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Агенти виконують рутинні тікети без втручання під час роботи."
 
@@ -5503,6 +5507,9 @@ msgstr "Не вдалося вимкнути плагін"
 
 msgid "Could not disconnect."
 msgstr "Не вдалося від'єднати."
+
+msgid "Could not download {names}."
+msgstr "Не вдалося завантажити: {names}."
 
 msgid "Could not forget {domain}"
 msgstr "Не вдалося забути {domain}"
@@ -17482,6 +17489,9 @@ msgstr "Увійдіть один раз. Paradev збереже підключ�
 msgid "Sign in to {0}"
 msgstr "Увійдіть у {0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "Увійдіть, щоб змінити плагіни організації."
+
 msgid "Sign in to continue"
 msgstr "Увійдіть, щоб продовжити"
 
@@ -19118,6 +19128,9 @@ msgstr "Служба хоста Paradev неочікувано зупинила�
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "Шлях має бути всередині репозиторію"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Зміну плагіна не завершено за {seconds} с."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Пул оновлюється щомісяця. Використання понад нього оплачується за кожну ГБ-годину за ставкою, указаною в кожному тарифі."

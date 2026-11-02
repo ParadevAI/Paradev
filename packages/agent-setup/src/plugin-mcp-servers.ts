@@ -1,10 +1,10 @@
+import { desiredPluginMcpServers } from "@superset/shared/plugins";
+import { readEnabledPlugins } from "./installed-plugins";
 import {
-	mcpHeadersHelperCommand,
-	readEnabledPlugins,
 	type SyncManagedMcpServersOptions,
 	syncManagedMcpServers,
-} from "@superset/agent-setup";
-import { desiredPluginMcpServers } from "@superset/shared/plugins";
+} from "./managed-mcp-servers";
+import { mcpHeadersHelperCommand } from "./plugin-connections";
 
 export function syncPluginMcpServers(
 	options: SyncManagedMcpServersOptions = {},

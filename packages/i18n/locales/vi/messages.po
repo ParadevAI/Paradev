@@ -2260,6 +2260,10 @@ msgstr "Bản xem trước do agent điều khiển"
 msgid "Agents"
 msgstr "Agent"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agent không thể truy cập các công cụ của {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
@@ -5509,6 +5513,9 @@ msgstr "Không thể tắt plugin"
 
 msgid "Could not disconnect."
 msgstr "Không thể ngắt kết nối."
+
+msgid "Could not download {names}."
+msgstr "Không thể tải xuống {names}."
 
 msgid "Could not forget {domain}"
 msgstr "Không thể quên {domain}"
@@ -17488,6 +17495,9 @@ msgstr "Đăng nhập một lần. Paradev giữ kết nối."
 msgid "Sign in to {0}"
 msgstr "Đăng nhập vào {0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "Đăng nhập để thay đổi plugin của tổ chức."
+
 msgid "Sign in to continue"
 msgstr "Đăng nhập để tiếp tục"
 
@@ -19124,6 +19134,9 @@ msgstr "Dịch vụ host Paradev đã dừng bất ngờ ({cause}) và không t�
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "Đường dẫn phải nằm trong repository"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Thay đổi plugin chưa hoàn tất trong {seconds} giây."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Quỹ được làm mới mỗi tháng. Phần sử dụng vượt quỹ được tính theo GB-giờ với mức giá hiển thị ở từng gói."

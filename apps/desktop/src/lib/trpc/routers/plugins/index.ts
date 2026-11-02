@@ -5,7 +5,6 @@ import {
 	getBundledSkillIcons,
 	getBundledSkillPath,
 	getDisabledSkills,
-	getInstalledPlugins,
 	installOrganizationPlugin,
 	installPlugin,
 	organizationPluginVersions,
@@ -35,7 +34,7 @@ function isOrganizationPlugin(input: {
 }
 
 /**
- * Materialization only: skills, agent config, and the local install record are
+ * Materialization only: skills, agent config, and installed_plugins.json are
  * written here, never read back for display. Install state is the account's —
  * the UI reads plugins.list — so it is the same on every machine.
  */
@@ -92,39 +91,35 @@ export const createPluginsRouter = () => {
 
 		install: publicProcedure.input(pluginRef).mutation(async ({ input }) => {
 			if (isOrganizationPlugin(input)) {
-				await installOrganizationPlugin(input.name, input.marketplace);
-				return { installed: getInstalledPlugins() };
+				return installOrganizationPlugin(input.name, input.marketplace);
 			}
-			const installed = installPlugin(input.name);
-			if (installed === null) {
+			const result = await installPlugin(input.name);
+			if (result === null) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: `Unknown plugin: ${input.name}`,
 				});
 			}
-			return { installed };
+			return result;
 		}),
 
 		uninstall: publicProcedure.input(pluginRef).mutation(({ input }) => {
 			// The renderer removes the account install, then syncs this machine.
-			if (isOrganizationPlugin(input)) {
-				return { installed: getInstalledPlugins() };
-			}
-			return { installed: uninstallPlugin(input.name) };
+			if (isOrganizationPlugin(input)) return { mcpError: null };
+			return uninstallPlugin(input.name);
 		}),
 
 		setEnabled: publicProcedure
 			.input(pluginRef.extend({ enabled: z.boolean() }))
 			.mutation(({ input }) => {
 				if (isOrganizationPlugin(input)) {
-					setOrganizationPluginEnabled(
+					return setOrganizationPluginEnabled(
 						input.name,
 						input.marketplace,
 						input.enabled,
 					);
-					return { installed: getInstalledPlugins() };
 				}
-				return { installed: setPluginEnabled(input.name, input.enabled) };
+				return setPluginEnabled(input.name, input.enabled);
 			}),
 
 		organizationVersions: publicProcedure.query(() =>
