@@ -126,7 +126,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** The Linear project whose issues the channel shows; null when it has none. */
-	linearProject: protectedProcedure
+	linearProject: personProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -138,7 +138,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** Points the channel at a Linear project instead of one of ours, or at none. */
-	setLinearProject: protectedProcedure
+	setLinearProject: personProcedure
 		.input(channelLinearProjectSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
