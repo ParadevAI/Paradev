@@ -40,7 +40,7 @@ export function DiffPaneHeaderActions({
 				<DiffPanePRLink workspaceId={prLink.workspaceId} store={prLink.store} />
 			)}
 			{commentNav.total > 0 && (
-				<div className="flex shrink-0 items-center gap-0.5 rounded-md bg-muted/50 px-1">
+				<div className="hidden shrink-0 items-center gap-0.5 rounded-md bg-muted/50 px-1 @min-[520px]/pane-header:flex">
 					<LuMessageSquare
 						aria-hidden="true"
 						className="size-3 shrink-0 text-muted-foreground"
@@ -87,6 +87,7 @@ export function DiffPaneHeaderActions({
 			<DiffPaneMoreMenu
 				areAllFilesCollapsed={areAllFilesCollapsed}
 				onToggleCollapseAll={onToggleCollapseAll}
+				commentNav={commentNav.total > 0 ? commentNav : undefined}
 			/>
 			{files && <DiffTreeToggleButton {...files} />}
 			<div

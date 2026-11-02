@@ -67,7 +67,7 @@ export function useReleaseNotesCard(): SidebarCardEntry | null {
 		children: (
 			<ReleaseNotesDialog
 				open={isDialogOpen}
-				releases={releases}
+				release={release}
 				onClose={() => {
 					setDialogOpen(false);
 					dismiss();

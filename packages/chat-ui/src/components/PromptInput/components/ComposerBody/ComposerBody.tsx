@@ -4,7 +4,6 @@ import {
 	$insertDataTransferForRichText,
 	setLexicalClipboardDataTransfer,
 } from "@lexical/clipboard";
-import { $isCodeNode } from "@lexical/code";
 import { ListItemNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -106,6 +105,7 @@ import { $insertTranscript } from "../../utils/insertTranscript";
 import { $isInCode } from "../../utils/isInCode";
 import { rankCommands } from "../../utils/rankCommands";
 import { tablesToMarkdown } from "../../utils/tablesToMarkdown";
+import { registerTrailingParagraph } from "../../utils/trailingParagraph";
 import {
 	CommandTypeaheadOption,
 	MentionTypeaheadOption,
@@ -664,13 +664,6 @@ export function ComposerBody({
 					return true;
 				}
 				const steer = Boolean(event?.metaKey || event?.ctrlKey);
-				const selection = $getSelection();
-				if (
-					!steer &&
-					$isRangeSelection(selection) &&
-					$isCodeNode(selection.anchor.getNode().getTopLevelElement())
-				)
-					return false;
 				event?.preventDefault();
 				submitRef.current({ steer });
 				return true;
@@ -682,6 +675,7 @@ export function ComposerBody({
 			() => stateRef.current.history ?? [],
 		);
 		historyNavigationRef.current = historyNavigation;
+		const unregisterTrailingParagraph = registerTrailingParagraph(editor);
 		const unregisterEscape = editor.registerCommand<KeyboardEvent | null>(
 			KEY_ESCAPE_COMMAND,
 			(event) => {
@@ -876,6 +870,7 @@ export function ComposerBody({
 			unregisterText();
 			unregisterEnter();
 			historyNavigation.unregister();
+			unregisterTrailingParagraph();
 			unregisterEscape();
 			unregisterDrop();
 			unregisterPaste();

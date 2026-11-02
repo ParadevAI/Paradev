@@ -201,7 +201,7 @@ export function BrowserToolbar({
 				<button
 					type="button"
 					onClick={onReload}
-					className="rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+					className="hidden rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground @min-[300px]/browser-toolbar:block"
 				>
 					{isLoading ? (
 						<TbLoader2 className="size-3.5 animate-spin" />

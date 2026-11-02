@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "peec",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
 	"author": {
 		"name": "Paradev",
