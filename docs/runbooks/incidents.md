@@ -56,7 +56,7 @@ the components and ongoing incidents as JSON.
 When unsure, pick the higher level. It is easy to lower the level later.
 
 Local-only problems (one user's host-service, one machine's terminals) are support issues, not
-incidents. Send them through `superset doctor` and support.
+incidents. Send them through the `superset:doctor` skill and support.
 
 ## Who declares an incident
 

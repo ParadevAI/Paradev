@@ -9,7 +9,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"github": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "github",
-		"version": "1.0.3",
+		"version": "1.0.4",
 		"description": "Work with issues, pull requests, and CI across your repositories.",
 		"author": {
 			"name": "Paradev",
@@ -37,7 +37,10 @@ export const FIRST_PARTY_MANIFESTS = {
 				},
 				"mcp": {
 					"type": "streamable-http",
-					"url": "https://api.githubcopilot.com/mcp/"
+					"url": "https://api.githubcopilot.com/mcp/",
+					"headers": {
+						"X-MCP-Toolsets": "context,repos,issues,pull_requests,users,actions"
+					}
 				}
 			}
 		},
@@ -55,7 +58,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"linear": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "linear",
-		"version": "1.5.5",
+		"version": "1.5.6",
 		"description": "Plan and build products: create, search, and update Linear issues.",
 		"author": {
 			"name": "Paradev",
@@ -104,7 +107,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"notion": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "notion",
-		"version": "1.0.5",
+		"version": "1.0.6",
 		"description": "Search, read, and write your Notion workspace: pages, databases, and comments.",
 		"author": {
 			"name": "Paradev",
@@ -183,7 +186,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"sentry": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "sentry",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
 		"author": {
 			"name": "Paradev",
@@ -262,7 +265,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"granola": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "granola",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"description": "Recall what was said in your meetings: search, read, and query Granola notes and transcripts.",
 		"author": {
 			"name": "Paradev",
@@ -308,7 +311,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"circleback": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "circleback",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"description": "Meeting notes, action items, and transcripts from Circleback: search what was said and work what was captured.",
 		"author": {
 			"name": "Paradev",
@@ -428,7 +431,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"stripe": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "stripe",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"description": "Work with payments in Stripe: trace charges and subscriptions, read billing data, and search Stripe's docs.",
 		"author": {
 			"name": "Paradev",
@@ -478,7 +481,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"superhuman": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "superhuman",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"description": "Work your inbox from Superhuman: find and read threads, triage what needs you, draft replies in your voice, and schedule from your calendar.",
 		"author": {
 			"name": "Paradev",
@@ -770,7 +773,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"peec": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "peec",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
 		"author": {
 			"name": "Paradev",

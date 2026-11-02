@@ -27,7 +27,7 @@ Write one line each:
 - Who is affected: everyone, one region, one feature, one version, or one user.
 
 If only one user or one machine is affected, stop here. Tell the human that this is a support
-issue, and suggest `superset doctor`.
+issue, and suggest the `superset:doctor` skill (and `superset status` for host state).
 
 ## 2. Gather signals
 
