@@ -18,7 +18,7 @@ export default command({
 			message: [
 				`Owner:      ${sharing.owner?.email ?? sharing.owner?.name ?? "—"}`,
 				`Visibility: ${sharing.visibility}`,
-				`Shared with: ${sharing.grantees.length ? "" : "nobody"}`,
+				`Shared with: ${sharing.grantees.length ? "" : sharing.visibility === "org" ? "no one by name (the whole organization can see it)" : "nobody"}`,
 				...sharing.grantees.map((grantee) =>
 					grantee.kind === "user"
 						? `  user ${grantee.email} (${grantee.userId})`

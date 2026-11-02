@@ -13,7 +13,11 @@ interface ActivityEntry {
 	linkedTask: { slug: string } | null;
 	unlinkedTask: { slug: string } | null;
 	prUrl: string | null;
-	shareTarget: unknown;
+	shareTarget:
+		| { kind: "user"; person: { name: string } }
+		| { kind: "team"; name: string }
+		| { kind: "email"; email: string }
+		| null;
 }
 
 /** One line per timeline entry; the JSON output keeps every field. */
@@ -35,5 +39,14 @@ export function describeActivity(entry: ActivityEntry): string {
 	if (entry.linkedTask) return `linked task ${entry.linkedTask.slug}`;
 	if (entry.unlinkedTask) return `unlinked task ${entry.unlinkedTask.slug}`;
 	if (entry.prUrl) return `pull request ${entry.prUrl}`;
+	if (entry.shareTarget) {
+		const who =
+			entry.shareTarget.kind === "user"
+				? entry.shareTarget.person.name
+				: entry.shareTarget.kind === "team"
+					? `team ${entry.shareTarget.name}`
+					: entry.shareTarget.email;
+		return `${(entry.event ?? "shared").replaceAll("_", " ")} with ${who}`;
+	}
 	return (entry.event ?? "updated").replaceAll("_", " ");
 }

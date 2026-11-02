@@ -13,7 +13,7 @@ Teach the user the advanced Paradev features they aren't using yet, grounded in 
 
 ## 1. Audit (read-only)
 
-Run `bash scripts/audit.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh` in Claude Code). It runs `superset auth whoami`, `automations list`, `workspaces list` (cloud) and `workspaces list --local`, `agents list --local`, `hosts list`, `tasks list`, and `pages list` with `--json`, tolerating individual failures, and prints one JSON object.
+Run `bash scripts/audit.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh` in Claude Code). It runs `superset auth whoami`, `automations list`, `workspaces list` (the cloud for accounts with cloud workspaces, else this machine) and `workspaces list --local`, `agents list --local`, `hosts list`, `tasks list`, and `pages list` with `--json`, tolerating individual failures, and prints one JSON object.
 
 If the CLI is missing, offer to install it: `curl -fsSL https://paradev.com/cli/install.sh | sh`. If unauthenticated, `superset auth login`. If the audit is impossible, ask the user what their current workflow looks like and proceed from their answer.
 

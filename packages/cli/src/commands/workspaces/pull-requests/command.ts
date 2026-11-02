@@ -3,7 +3,7 @@ import { command } from "../../../lib/command";
 
 export default command({
 	description:
-		"List the pull requests of cloud workspaces: those linked to each one, and those on its branch. Inside a cloud workspace it defaults to that workspace; pass --all for every cloud workspace you can see",
+		"List the pull requests of cloud workspaces: those linked to each one, and those on its branch. Inside a cloud workspace it defaults to that workspace; pass --all for every cloud workspace you can see. Outside one it lists them all",
 	aliases: ["prs"],
 	args: [
 		positional("id").desc(
@@ -12,7 +12,9 @@ export default command({
 	],
 	options: {
 		all: boolean().desc("Every cloud workspace you can see"),
-		archived: boolean().desc("Archived cloud workspaces instead"),
+		archived: boolean().desc(
+			"Archived cloud workspaces instead; implies --all unless an id is given",
+		),
 	},
 	display: (data) =>
 		table(
@@ -23,7 +25,9 @@ export default command({
 	run: async ({ ctx, args, options }) => {
 		const id =
 			(args.id as string | undefined) ??
-			(options.all ? undefined : process.env.SUPERSET_SANDBOX_WORKSPACE_ID);
+			(options.all || options.archived
+				? undefined
+				: process.env.SUPERSET_SANDBOX_WORKSPACE_ID);
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");

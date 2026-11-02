@@ -22,6 +22,10 @@ describe("resolveGrantees", () => {
 			{ kind: "user", userId: "user-1" },
 			{ kind: "team", teamId },
 		]);
+		const userId = "00000000-0000-4000-8000-000000000002";
+		expect(await resolveGrantees(api, [userId], [])).toEqual([
+			{ kind: "user", userId },
+		]);
 		await expect(resolveGrantees(api, ["bob@example.com"], [])).rejects.toThrow(
 			"No member with email bob@example.com",
 		);

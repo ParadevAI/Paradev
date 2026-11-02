@@ -915,6 +915,8 @@ superset workspaces sleep ws_a
 
 The commands below act on a cloud workspace through the API, so they work while
 its sandbox is asleep. Run inside a cloud workspace, `[id]` defaults to it.
+`restart` always takes an id: restarting the workspace you run in ends your own
+process.
 
 <Command
 	name="superset workspaces unarchive <id>"
@@ -928,9 +930,9 @@ archiving it keeps its disk; after that it starts fresh from its environment.
 </Command>
 
 <Command
-	name="superset workspaces restart [id]"
+	name="superset workspaces restart <id>"
 	args={[
-		{ name: "id", description: "Cloud workspace ID." },
+		{ name: "id", required: true, description: "Cloud workspace ID." },
 	]}
 	output={`{ id: string; restarted: boolean }`}
 >
@@ -959,7 +961,8 @@ visibility, sharing, and pull requests. `--json` keeps every field.
 	]}
 >
 List a cloud workspace's pull requests: those linked to it, and those on its
-branch. Alias: `prs`.
+branch. Alias: `prs`. Outside a cloud workspace and without an id, it lists
+every cloud workspace's; `--archived` does too unless an id is given.
 </Command>
 
 <Command
@@ -981,8 +984,8 @@ Show a cloud workspace's owner, visibility, and who it is shared with.
 		{ flag: "--team <id>", description: "Team. Repeatable." },
 	]}
 >
-Share a cloud workspace with members or teams. `superset workspaces share
-remove` takes the same options and stops sharing. Only the workspace's creator
+Share a cloud workspace with members or teams; pass at least one `--user` or
+`--team`. `superset workspaces share remove` takes the same options and stops sharing. Only the workspace's creator
 can change who it is shared with.
 
 ```bash

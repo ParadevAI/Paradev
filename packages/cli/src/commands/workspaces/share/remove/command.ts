@@ -1,4 +1,5 @@
-import { positional, string } from "@superset/cli-framework";
+import { CLIError, positional, string } from "@superset/cli-framework";
+import { rawErrorMessage } from "@superset/i18n/errors";
 import { command } from "../../../../lib/command";
 import { cloudWorkspaceId } from "../../cloudWorkspaceId";
 import { resolveGrantees } from "../resolveGrantees";
@@ -24,15 +25,25 @@ export default command({
 		);
 		let removed = 0;
 		for (const grantee of grantees) {
-			const result = await ctx.api.cloudWorkspace.sharing.remove.mutate({
-				id,
-				grantee,
-			});
-			if (result.removed) removed++;
+			try {
+				const result = await ctx.api.cloudWorkspace.sharing.remove.mutate({
+					id,
+					grantee,
+				});
+				if (result.removed) removed++;
+			} catch (error) {
+				if (removed === 0) throw error;
+				throw new CLIError(
+					`Stopped sharing with ${removed}, then failed: ${rawErrorMessage(error)}`,
+					"Run superset workspaces share list to see who still has access",
+				);
+			}
 		}
 		return {
 			data: { id, removed },
-			message: `Stopped sharing cloud workspace ${id} with ${removed}`,
+			message: removed
+				? `Stopped sharing cloud workspace ${id} with ${removed}`
+				: `Cloud workspace ${id} was not shared with them`,
 		};
 	},
 });

@@ -76,7 +76,10 @@ type Ctx = Parameters<Parameters<typeof command>[0]["run"]>[0]["ctx"];
 /** A cloud workspace's details are the API's record; reading them never wakes its sandbox. */
 async function cloudDetail(ctx: Ctx, id: string) {
 	const row = await ctx.api.cloudWorkspace.get.query({ id }).catch((error) => {
-		if (error instanceof TRPCClientError && error.data?.code === "NOT_FOUND") {
+		if (
+			error instanceof TRPCClientError &&
+			(error.data?.code === "NOT_FOUND" || error.data?.code === "BAD_REQUEST")
+		) {
 			throw new CLIError(
 				`No cloud workspace ${id} in this organization`,
 				"Pass --local for a workspace on this machine, or --host <id> for another host",
