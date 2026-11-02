@@ -1221,6 +1221,66 @@ Set a variable on an environment. `secrets list` shows the names, never the valu
 
 ---
 
+### integrations
+
+The organization's integrations, shared by everyone in it. Cloud environments check out
+repositories through the organization's Paradev GitHub App.
+
+<Command
+	name="superset integrations github status"
+	options={[]}
+>
+Show where the GitHub App is installed and how many repositories it can see.
+</Command>
+
+<Command
+	name="superset integrations github connect"
+	options={[
+		{ flag: "--no-wait", description: "Print the install URL and exit without waiting." },
+	]}
+>
+Install the GitHub App in the browser, then wait until it is installed. Needs the Pro plan and a
+GitHub account that can install apps on the repositories' owner. `integrations github disconnect`
+removes it, and its repositories leave every environment; it asks first, or takes `--yes`.
+</Command>
+
+---
+
+### connections
+
+Your own accounts that the cloud workspaces you start sign in with.
+
+<Command
+	name="superset connections github connect"
+	options={[
+		{ flag: "--no-wait", description: "Print the authorize URL and exit without waiting." },
+	]}
+>
+Connect your GitHub account in the browser, so your cloud workspaces push and open pull requests
+as you instead of as the GitHub App. `connections github status` shows the account, and
+`connections github disconnect` removes it.
+</Command>
+
+<Command
+	name="superset connections agents set <agent>"
+	args={[
+		{ name: "agent", required: true, description: "`claude` or `codex`." },
+	]}
+	options={[
+		{ flag: "--kind <subscription|api_key>", description: "Required. `subscription`: the token from `claude setup-token`, or for Codex a ChatGPT sign-in. `api_key`: a provider or gateway key." },
+		{ flag: "--gateway", description: "The key is a Vercel AI Gateway key." },
+		{ flag: "--base-url <url>", description: "A compatible endpoint the key is for." },
+	]}
+>
+Sign an agent in for your cloud workspaces. A token or key is read from stdin or a prompt.
+`set codex --kind subscription` reads nothing: it starts a ChatGPT device-code sign-in and
+waits until you approve it in the browser.
+`connections agents list` shows which agents are signed in, and `connections agents remove
+<agent>` signs one out. For Claude, run `claude setup-token` and paste the token it prints.
+</Command>
+
+---
+
 ### agents
 
 Agents are terminal-agent rows configured on a host (the same rows shown in
