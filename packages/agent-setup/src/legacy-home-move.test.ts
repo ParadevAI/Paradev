@@ -237,10 +237,13 @@ describe("repairGitWorktrees", () => {
 		mkdirSync(path.dirname(after));
 		renameSync(before, after);
 
-		await repairGitWorktrees([
-			{ repoPath: repo, worktreePath: path.join(home, "deleted", "wt") },
-			{ repoPath: repo, worktreePath: after },
-		]);
+		await repairGitWorktrees(
+			[
+				{ repoPath: repo, worktreePath: path.join(home, "deleted", "wt") },
+				{ repoPath: repo, worktreePath: after },
+			],
+			path.join(home, "old"),
+		);
 
 		expect(git("worktree", "list", "--porcelain")).toContain(
 			`worktree ${after}`,

@@ -79,7 +79,7 @@ Verify `/api/auth/get-session` from inside the matched renderer before testing.
 Check which setup script provisioned the workspace before repairing auth:
 
 - `.paradev/setup.local.sh` creates a per-workspace local stack and runs the idempotent `bun run db:seed-dev`, but intentionally leaves sign-in as a separate step. If the account may be missing, rerun `bun run db:seed-dev` while the local DB stack is running.
-- `.paradev/setup.sh` seeds `paradev-dev-data/auth-token.enc` from `auth-token.enc` in the app home (`~/.superset` when it is a real directory, else `~/.paradev`; `prod_app_home` in `.paradev/lib/common.sh`) when available. Rerunning it without `--force` can fill a missing token. Do not use `--force` merely to repair auth: it resets `paradev-dev-data/` before reseeding.
+- `.paradev/setup.sh` seeds `paradev-dev-data/auth-token.enc` from `auth-token.enc` in the installed app's home, `~/.paradev` (`prod_app_home` in `.paradev/lib/common.sh`), when available. Rerunning it without `--force` can fill a missing token. Do not use `--force` merely to repair auth: it resets `paradev-dev-data/` before reseeding.
 
 The desktop hydrates a persisted token into an in-memory bearer-token closure. A raw `Runtime.evaluate` `fetch` cannot read that closure, and the local-dev sign-in button persists a bearer token but uses `credentials: "omit"`; neither guarantees the cookie required by a raw CDP probe. For a workspace created by `setup.local.sh`, repair the CDP session as follows:
 

@@ -474,7 +474,7 @@ step_setup_local_mcp() {
 
   # Add or update paradev-local entry
   local tmp_file="${mcp_file}.tmp.$$"
-  if ! jq --arg url "$local_url" '.mcpServers["paradev-local"] = {"type": "http", "url": $url}' "$mcp_file" > "$tmp_file"; then
+  if ! jq --arg url "$local_url" '.mcpServers["paradev-local"] = {"type": "http", "url": $url} | del(.mcpServers["superset-local"])' "$mcp_file" > "$tmp_file"; then
     error "Failed to set local MCP entry"
     rm -f "$tmp_file"
     return 1

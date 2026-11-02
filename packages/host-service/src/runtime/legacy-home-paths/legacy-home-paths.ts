@@ -34,7 +34,7 @@ export async function applyLegacyHomeMove(
 	const move = readLegacyHomeMove(appHomeDir);
 	if (!move) return;
 	try {
-		if (rewriteLegacyHomePaths(db.$client, PATH_COLUMNS, move) === 0) return;
+		rewriteLegacyHomePaths(db.$client, PATH_COLUMNS, move);
 		const moved = db
 			.select({
 				repoPath: projects.repoPath,
@@ -44,7 +44,7 @@ export async function applyLegacyHomeMove(
 			.innerJoin(projects, eq(workspaces.projectId, projects.id))
 			.all()
 			.filter(({ worktreePath }) => worktreePath.startsWith(`${move.to}/`));
-		await repairGitWorktrees(moved);
+		await repairGitWorktrees(moved, move.from);
 	} catch (error) {
 		console.error("[host-service] Could not rewrite moved paths:", error);
 	}

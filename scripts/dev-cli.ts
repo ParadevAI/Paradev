@@ -25,7 +25,7 @@ function repoRoot(): string {
 			encoding: "utf-8",
 		}).trim();
 	} catch {
-		// Fall back to walking up from this file to the first dir with a paradev-dev-data.
+		// Fall back to walking up from this file to the first dir with a package.json.
 		let dir = dirname(new URL(import.meta.url).pathname);
 		for (let i = 0; i < 8; i++) {
 			if (existsSync(join(dir, "package.json"))) return dir;
@@ -75,7 +75,8 @@ const host = findLiveHost(homeDir);
 if (!host) {
 	console.error(
 		`No live dev host found under ${homeDir}/host/*.\n` +
-			"Start the dev desktop app first (bun run dev:desktop) and open a workspace, then retry.",
+			"Start the dev desktop app first (bun run dev:desktop) and open a workspace, then retry.\n" +
+			"A worktree set up before paradev-dev-data needs ./.paradev/setup.sh re-run and the dev app restarted.",
 	);
 	process.exit(1);
 }

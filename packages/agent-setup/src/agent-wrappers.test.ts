@@ -1109,7 +1109,8 @@ exit 0
 			".gemini",
 			"settings.json",
 		);
-		const staleHookPath = "/tmp/worktree/paradev-dev-data/hooks/gemini-hook.sh";
+		const staleHookPath =
+			"/tmp/worktree/superset-dev-data/hooks/gemini-hook.sh";
 		const currentHookPath = "/tmp/.superset-new/hooks/gemini-hook.sh";
 
 		mkdirSync(path.dirname(geminiSettingsPath), { recursive: true });
@@ -1508,15 +1509,19 @@ describe("agent-wrappers claude settings.json", () => {
 				"/Users/me/.superset/hooks/muse/hooks.json",
 			),
 		).toBeNull();
-		// A previous Superset home (dev data, another install) is ours to replace.
-		expect(
-			getMuseSettingsJsonContent(
-				JSON.stringify({
-					managed_hooks_path: "/tmp/w/superset-dev-data/hooks/muse/hooks.json",
-				}),
-				"/Users/me/.superset/hooks/muse/hooks.json",
-			),
-		).not.toBeNull();
+		// A previous app home (dev data, another install) is ours to replace.
+		for (const previous of [
+			"/tmp/w/superset-dev-data/hooks/muse/hooks.json",
+			"/tmp/w/paradev-dev-data/hooks/muse/hooks.json",
+			"/Users/me/.paradev/hooks/muse/hooks.json",
+		]) {
+			expect(
+				getMuseSettingsJsonContent(
+					JSON.stringify({ managed_hooks_path: previous }),
+					"/tmp/w2/paradev-dev-data/hooks/muse/hooks.json",
+				),
+			).not.toBeNull();
+		}
 	});
 
 	it("removes only Paradev's pointer and env names from Muse settings.json", () => {
