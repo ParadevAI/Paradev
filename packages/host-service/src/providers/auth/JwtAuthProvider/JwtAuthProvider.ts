@@ -1,3 +1,4 @@
+import { ORGANIZATION_TOKEN_HEADER } from "@superset/shared/constants";
 import type { ApiAuthProvider } from "../types";
 
 const JWT_REFRESH_BUFFER_MS = 5 * 60 * 1000;
@@ -10,6 +11,7 @@ const MINT_RETRY_MAX_MS = 2 * 60 * 1000;
 // Callers share one in-flight mint, so a stalled request must not hold them all.
 const MINT_TIMEOUT_MS = 15_000;
 export const SESSION_REJECTED_ERROR_NAME = "SessionRejectedError";
+const LEGACY_API_ERROR_NAME = "OrganizationTokensUnsupportedError";
 
 function looksLikeJwt(token: string): boolean {
 	const parts = token.split(".");
@@ -84,12 +86,17 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 			if (!this.organizationId) return sessionToken;
 			// LEGACY(remove when list-only tokens are refused): an API older than
 			// organization tokens can't exchange an OAuth token, so it goes as is.
-			return this.mintShared(sessionToken).catch(() => sessionToken);
+			return this.mintShared(sessionToken).catch((error: unknown) => {
+				if (error instanceof Error && error.name === LEGACY_API_ERROR_NAME) {
+					return sessionToken;
+				}
+				throw error;
+			});
 		}
 		return this.mintShared(sessionToken);
 	}
 
-	private mintShared(sessionToken: string): Promise<string> {
+	private async mintShared(sessionToken: string): Promise<string> {
 		const failure = this.mintFailure;
 		if (
 			failure?.sessionToken === sessionToken &&
@@ -123,7 +130,14 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 			});
 			if (!response.ok) {
 				const error = new Error(`Failed to mint JWT: ${response.status}`);
-				if (response.status === 401) error.name = SESSION_REJECTED_ERROR_NAME;
+				if (
+					this.organizationId &&
+					!response.headers.has(ORGANIZATION_TOKEN_HEADER)
+				) {
+					error.name = LEGACY_API_ERROR_NAME;
+				} else if (response.status === 401) {
+					error.name = SESSION_REJECTED_ERROR_NAME;
+				}
 				throw error;
 			}
 			const data = (await response.json()) as { token: string };

@@ -337,6 +337,16 @@ async function devFromTurnToken(
 	};
 }
 
+/** The organization a call's input names, if any: `organizationId`, or `id` on organization routes. */
+function organizationNamedIn(path: string, input: unknown): string | null {
+	if (!input || typeof input !== "object") return null;
+	const fields = input as { organizationId?: unknown; id?: unknown };
+	const named = path.startsWith("organization.")
+		? (fields.organizationId ?? fields.id)
+		: fields.organizationId;
+	return typeof named === "string" ? named : null;
+}
+
 /**
  * Anyone who may call: a Dev with a turn token, or a signed-in person.
  * Procedures on it check access with `ctx.principal`, never the session.
@@ -344,7 +354,7 @@ async function devFromTurnToken(
 export const actorProcedure = t.procedure
 	.use(clientFloor)
 	.use(sandboxScope)
-	.use(async ({ ctx, path, next }) => {
+	.use(async ({ ctx, path, getRawInput, next }) => {
 		const dev = await devFromTurnToken(ctx.headers);
 		const caller = dev
 			? {
@@ -353,6 +363,16 @@ export const actorProcedure = t.procedure
 					principal: dev as Principal,
 				}
 			: await personFromSession(ctx, path);
+		const bound = boundOrganizationId(caller.session);
+		const named = bound
+			? organizationNamedIn(path, await getRawInput().catch(() => undefined))
+			: null;
+		if (bound && named && named !== bound) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: `This token is for organization ${bound}, not ${named}. Get a token for that organization.`,
+			});
+		}
 		captureApiCall(ctx.client, actorOf(caller.principal), path);
 		return next({
 			ctx: { ...ctx, ...caller, principal: caller.principal as Principal },

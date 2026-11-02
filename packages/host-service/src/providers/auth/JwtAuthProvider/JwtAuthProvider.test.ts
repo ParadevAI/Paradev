@@ -2,7 +2,10 @@ import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import {
+	ORGANIZATION_HEADER,
+	ORGANIZATION_TOKEN_HEADER,
+} from "@superset/shared/constants";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import SuperJSON from "superjson";
@@ -480,15 +483,28 @@ describe("JwtApiAuthProvider for one organization", () => {
 		);
 	});
 
-	test("exchanges an OAuth token, and keeps it when the API can't", async () => {
+	test("exchanges an OAuth token", async () => {
 		mockFetch(async () => Response.json({ token: "org.jwt.token" }));
 		await expect(orgProvider("oauth.access.token").getJwt()).resolves.toBe(
 			"org.jwt.token",
 		);
+	});
 
+	test("keeps the OAuth token only when the API can't mint organization tokens", async () => {
 		mockFetch(async () => new Response(null, { status: 401 }));
-		await expect(orgProvider("oauth.access.token").getJwt()).resolves.toBe(
-			"oauth.access.token",
+		const legacy = orgProvider("oauth.access.token");
+		await expect(legacy.getJwt()).resolves.toBe("oauth.access.token");
+		await expect(legacy.getJwt()).resolves.toBe("oauth.access.token");
+
+		mockFetch(
+			async () =>
+				new Response(null, {
+					status: 403,
+					headers: { [ORGANIZATION_TOKEN_HEADER]: "1" },
+				}),
+		);
+		await expect(orgProvider("oauth.access.token").getJwt()).rejects.toThrow(
+			"Failed to mint JWT: 403",
 		);
 	});
 });

@@ -17,7 +17,9 @@ export function cliUpdateFor(
 		recommended: RECOMMENDED_CLI_VERSION,
 	},
 ): CliUpdate {
-	if (!semver.valid(version)) return null;
+	if (!semver.valid(version) || semver.prerelease(version)?.[0] === "dev") {
+		return null;
+	}
 	if (floors.minimum && semver.lt(version, floors.minimum)) return "required";
 	if (floors.recommended && semver.lt(version, floors.recommended)) {
 		return "recommended";

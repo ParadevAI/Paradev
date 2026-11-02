@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import type { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { stub } from "../test/stub";
 import { posthog } from "./lib/analytics";
 
@@ -45,6 +46,9 @@ const router = createTRPCRouter({
 		myOrganization: personProcedure.query(
 			({ ctx }) => ctx.activeOrganizationId,
 		),
+		inOrganization: personProcedure
+			.input(z.object({ organizationId: z.string() }))
+			.query(({ input }) => input.organizationId),
 	}),
 });
 
@@ -195,6 +199,18 @@ describe("a token bound to one organization", () => {
 		const bearer = callerFor({ sandboxCaller: null, boundTo: "box-org" });
 		expect(await bearer.user.myOrganization()).toBe("box-org");
 		expect(await bearer.cloudWorkspace.list()).toEqual(["box-org"]);
+	});
+
+	test("can't name another organization in a call's input", async () => {
+		const bearer = callerFor({ sandboxCaller: null, boundTo: "box-org" });
+		expect(
+			await outcome(() =>
+				bearer.user.inOrganization({ organizationId: "other-org" }),
+			),
+		).toBe("FORBIDDEN");
+		expect(
+			await bearer.user.inOrganization({ organizationId: "box-org" }),
+		).toBe("box-org");
 	});
 
 	test("can't name another organization, even one its person belongs to", async () => {

@@ -1301,6 +1301,7 @@ export async function mintUserJwt(args: {
 				sub: args.userId,
 				organizationId: args.organizationId,
 				organizationIds: [args.organizationId],
+				organizationBound: true,
 				...(args.teamIds ? { teamIds: args.teamIds } : {}),
 				...(args.name !== undefined ? { name: args.name } : {}),
 				...(args.image !== undefined ? { image: args.image } : {}),
@@ -1314,15 +1315,12 @@ export async function mintUserJwt(args: {
 	return response.token;
 }
 
-/** Whether a token's claims bind it to exactly one organization. */
+/** The organization a token was minted for alone, by `mintUserJwt`; null for any other token. */
 export function boundOrganizationOf(
 	payload: Record<string, unknown>,
 ): string | null {
-	const { organizationId, organizationIds } = payload;
-	return typeof organizationId === "string" &&
-		Array.isArray(organizationIds) &&
-		organizationIds.length === 1 &&
-		organizationIds[0] === organizationId
-		? organizationId
+	return payload.organizationBound === true &&
+		typeof payload.organizationId === "string"
+		? payload.organizationId
 		: null;
 }

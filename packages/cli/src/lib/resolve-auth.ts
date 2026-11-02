@@ -13,7 +13,6 @@ import {
 	ServerUnreachableError,
 	SessionExpiredError,
 } from "./oauth-refresh";
-import { organizationBearer } from "./organization-token";
 
 export const NOT_LOGGED_IN = "Not logged in";
 
@@ -80,11 +79,7 @@ export async function resolveAuth(
 	const organizationId = resolveOrganizationId(config);
 	const resolvedConfig: SupersetConfig = { ...config, organizationId };
 
-	const apiBearer =
-		authSource === "oauth" && organizationId
-			? await organizationBearer(bearer, organizationId)
-			: bearer;
-	const api = createApiClient({ bearer: apiBearer, organizationId });
+	const api = createApiClient({ bearer, organizationId });
 	return { config: resolvedConfig, api, bearer, authSource };
 }
 

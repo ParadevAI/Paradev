@@ -11,6 +11,9 @@ export type AuthProvider = (typeof AUTH_PROVIDERS)[number];
 
 export const ORGANIZATION_HEADER = "x-superset-organization-id";
 
+/** On every reply from an API that mints organization tokens, refusals included. */
+export const ORGANIZATION_TOKEN_HEADER = "x-superset-organization-token";
+
 // Deep link protocol schemes (used for desktop OAuth callbacks)
 export const PROTOCOL_SCHEMES = {
 	DEV: "superset-dev",

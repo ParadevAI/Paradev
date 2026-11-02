@@ -15,6 +15,7 @@ describe("cliUpdateFor", () => {
 	test("current builds, unparseable versions and no floors pass", () => {
 		expect(cliUpdateFor("1.40.0", floors)).toBeNull();
 		expect(cliUpdateFor("dev", floors)).toBeNull();
+		expect(cliUpdateFor("0.0.0-dev", floors)).toBeNull();
 		expect(
 			cliUpdateFor("0.1.0", { minimum: null, recommended: null }),
 		).toBeNull();
