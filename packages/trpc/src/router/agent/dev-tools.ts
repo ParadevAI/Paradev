@@ -14,11 +14,11 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { agentTemporal } from "../../lib/agent-runtime";
+import { devProcedure } from "../../trpc";
 import { channelNotFound } from "../channel/access";
 import { sendChannelMessage } from "../channel/channel-message";
 import { devChannelTools } from "./dev-channel-tools";
 import { devRoutineTools } from "./dev-routine-tools";
-import { mainProcedure } from "./main-procedure";
 import { fillSlots, startTask } from "./tasks";
 import { parseReplyTarget, REPLY_TARGET, submitPrompt } from "./turns";
 
@@ -96,7 +96,7 @@ async function devTask(
  * turn may answer several people.
  */
 export const devToolsRouter = {
-	reply: mainProcedure
+	reply: devProcedure
 		.input(
 			z.object({
 				target: z.string().regex(REPLY_TARGET),
@@ -115,7 +115,7 @@ export const devToolsRouter = {
 			return { messageId: message.id };
 		}),
 
-	listWork: mainProcedure.query(async ({ ctx }) => {
+	listWork: devProcedure.query(async ({ ctx }) => {
 		const rows = await db
 			.select({
 				taskId: tasks.id,
@@ -160,14 +160,14 @@ export const devToolsRouter = {
 		return [...work.values()].slice(0, 30);
 	}),
 
-	readTask: mainProcedure
+	readTask: devProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const { task, sessions } = await devTask(ctx.principal, input.taskId);
 			return { ...task, sessions };
 		}),
 
-	startTask: mainProcedure
+	startTask: devProcedure
 		.input(
 			z
 				.object({
@@ -195,7 +195,7 @@ export const devToolsRouter = {
 			}),
 		),
 
-	messageTask: mainProcedure
+	messageTask: devProcedure
 		.input(
 			z.object({
 				taskId: z.string().uuid(),
@@ -235,7 +235,7 @@ export const devToolsRouter = {
 			return { delivered: outcome.outcome };
 		}),
 
-	stopTask: mainProcedure
+	stopTask: devProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const { sessions } = await devTask(ctx.principal, input.taskId);
@@ -257,7 +257,7 @@ export const devToolsRouter = {
 			return { stopped: active.length };
 		}),
 
-	remember: mainProcedure
+	remember: devProcedure
 		.input(z.object({ content: z.string().min(1).max(4_000) }))
 		.mutation(async ({ ctx, input }) => {
 			const [memory] = await db
@@ -271,7 +271,7 @@ export const devToolsRouter = {
 			return { id: memory?.id };
 		}),
 
-	recall: mainProcedure
+	recall: devProcedure
 		.input(z.object({ query: z.string().max(200).optional() }))
 		.query(async ({ ctx, input }) => {
 			return db
@@ -292,7 +292,7 @@ export const devToolsRouter = {
 				.limit(MAX_MEMORIES);
 		}),
 
-	listEnvironments: mainProcedure.query(async ({ ctx }) => {
+	listEnvironments: devProcedure.query(async ({ ctx }) => {
 		const [agent] = await db
 			.select({ defaultEnvironmentId: agents.defaultEnvironmentId })
 			.from(agents)

@@ -14,8 +14,8 @@ import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, isNull, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { DevPrincipal } from "../../principal";
+import { devProcedure } from "../../trpc";
 import { loadChannelAccessFor } from "../channel/access";
-import { mainProcedure } from "./main-procedure";
 import { parseReplyTarget, replyTarget } from "./turns";
 
 const BODY_CHARS = 4_000;
@@ -73,7 +73,7 @@ const messageColumns = {
 
 /** Reading a channel and its tasks, for a Dev that needs more than the message it was sent. */
 export const devChannelTools = {
-	readChannel: mainProcedure
+	readChannel: devProcedure
 		.input(
 			z.object({
 				channel: channelRef,
@@ -128,7 +128,7 @@ export const devChannelTools = {
 			};
 		}),
 
-	channelTasks: mainProcedure
+	channelTasks: devProcedure
 		.input(z.object({ channel: channelRef }))
 		.query(async ({ ctx, input }) => {
 			const { channel } = await readableChannel(ctx.principal, input.channel);
