@@ -2,6 +2,7 @@ import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
+import { updateCloudWorkspace } from "./updateCloudWorkspace";
 
 export default command({
 	description:
@@ -13,14 +14,31 @@ export default command({
 		),
 		local: boolean().desc("The workspace is on this machine"),
 		name: string().desc("Workspace name"),
-		taskId: string().desc("Link the workspace to a task by id"),
-		clearTask: boolean().desc("Unlink the workspace from its current task"),
+		taskId: string().desc(
+			"Link the workspace to a task by id. On a cloud workspace, also a task slug, added to its linked tasks",
+		),
+		clearTask: boolean().desc(
+			"Unlink the workspace from its task (on a cloud workspace, from every linked task)",
+		),
 		tag: string()
 			.variadic()
 			.desc(
 				"Replace the workspace's tag set. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
 			),
 		clearTags: boolean().desc("Remove every tag from the workspace"),
+		visibility: string()
+			.enum("just_me", "org")
+			.desc(
+				"Who sees a cloud workspace: `just_me` or `org`. Only its creator can change it",
+			),
+		addLabel: string()
+			.variadic()
+			.desc(
+				"Add a label to a cloud workspace by name, creating the label when it is new. Repeatable",
+			),
+		removeLabel: string()
+			.variadic()
+			.desc("Remove a label from a cloud workspace by name. Repeatable"),
 	},
 	run: async ({ ctx, args, options }) => {
 		const id = args.id as string;
@@ -55,14 +73,22 @@ export default command({
 				? options.tag
 				: undefined;
 
+		const cloudOnly = {
+			"--visibility": options.visibility,
+			"--add-label": options.addLabel?.length ? options.addLabel : undefined,
+			"--remove-label": options.removeLabel?.length
+				? options.removeLabel
+				: undefined,
+		};
 		if (
 			options.name === undefined &&
 			taskId === undefined &&
-			tags === undefined
+			tags === undefined &&
+			Object.values(cloudOnly).every((value) => value === undefined)
 		) {
 			throw new CLIError(
 				"No fields to update",
-				"Pass --name, --task-id, --clear-task, --tag, or --clear-tags",
+				"Pass --name, --task-id, --clear-task, --tag, --clear-tags, --visibility, --add-label, or --remove-label",
 			);
 		}
 
@@ -72,31 +98,23 @@ export default command({
 			organizationId,
 		);
 		if (!hostId) {
-			// A cloud workspace's name and tags live in the API; a task link is
-			// a host-side row it does not have.
-			if (taskId !== undefined) {
+			const data = await updateCloudWorkspace(ctx.api, id, {
+				name: options.name ?? undefined,
+				tags,
+				task: taskId,
+				visibility: options.visibility ?? undefined,
+				addLabels: options.addLabel ?? undefined,
+				removeLabels: options.removeLabel ?? undefined,
+			});
+			return { data, message: `Updated cloud workspace ${id}` };
+		}
+		for (const [flag, value] of Object.entries(cloudOnly)) {
+			if (value !== undefined) {
 				throw new CLIError(
-					options.clearTask
-						? "--clear-task does not apply to a cloud workspace"
-						: "--task-id does not apply to a cloud workspace",
-					"Task links belong to host workspaces; pass --local or --host <id>",
+					`${flag} applies to cloud workspaces only`,
+					"Drop --local and --host to target a cloud workspace",
 				);
 			}
-			const renamed =
-				options.name !== undefined
-					? await ctx.api.cloudWorkspace.rename.mutate({
-							id,
-							name: options.name,
-						})
-					: null;
-			const tagged =
-				tags !== undefined
-					? await ctx.api.cloudWorkspace.setTags.mutate({ id, tags })
-					: null;
-			return {
-				data: { ...renamed, ...tagged },
-				message: `Updated cloud workspace ${id}`,
-			};
 		}
 
 		const target = await resolveHostTarget({
