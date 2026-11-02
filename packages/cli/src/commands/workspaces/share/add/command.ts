@@ -30,7 +30,7 @@ export default command({
 			data: { id, added },
 			message: added.length
 				? `Shared cloud workspace ${id} with ${added.length} more`
-				: `Cloud workspace ${id} was already shared with them`,
+				: `No new shares on cloud workspace ${id}: each already has access (its owner always does)`,
 		};
 	},
 });
