@@ -3615,24 +3615,20 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Signalements de bugs"
 
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Build failed {0}"
-msgstr "Compilation échouée {0}"
-
 msgid "Build ID"
 msgstr "ID de compilation"
 
 msgid "Build in public"
 msgstr "Construire en public"
 
+msgid "Build started"
+msgstr "Compilation lancée"
+
 msgid "Build the future of Paradev in the cloud"
 msgstr "Construisez l’avenir de Paradev dans le cloud"
 
 msgid "Build your own"
 msgstr "Créez le vôtre"
-
-msgid "Building"
-msgstr "Compilation en cours"
 
 msgid "Building the last piece of software"
 msgstr "Construire le dernier logiciel"
@@ -3651,10 +3647,6 @@ msgstr "Compilations"
 
 msgid "Built"
 msgstr "Compilé"
-
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Built {0}"
-msgstr "Compilé {0}"
 
 msgid "Built in Paradev"
 msgstr "Construit dans Paradev"

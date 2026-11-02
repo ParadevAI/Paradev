@@ -3615,24 +3615,20 @@ msgstr "Brouk"
 msgid "Bug reports"
 msgstr "Hlášení chyb"
 
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Build failed {0}"
-msgstr "Sestavení selhalo {0}"
-
 msgid "Build ID"
 msgstr "ID sestavení"
 
 msgid "Build in public"
 msgstr "Vyvíjíme veřejně"
 
+msgid "Build started"
+msgstr "Sestavení spuštěno"
+
 msgid "Build the future of Paradev in the cloud"
 msgstr "Tvořte budoucnost Paradev v cloudu"
 
 msgid "Build your own"
 msgstr "Vytvořte vlastní"
-
-msgid "Building"
-msgstr "Sestavuje se"
 
 msgid "Building the last piece of software"
 msgstr "Stavíme poslední kus softwaru"
@@ -3651,10 +3647,6 @@ msgstr "Sestavení"
 
 msgid "Built"
 msgstr "Sestaveno"
-
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Built {0}"
-msgstr "Sestaveno {0}"
 
 msgid "Built in Paradev"
 msgstr "Vytvořeno v Paradev"

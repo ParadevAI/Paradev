@@ -3615,24 +3615,20 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Laporan bug"
 
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Build failed {0}"
-msgstr "Build gagal {0}"
-
 msgid "Build ID"
 msgstr "ID build"
 
 msgid "Build in public"
 msgstr "Membangun secara terbuka"
 
+msgid "Build started"
+msgstr "Build dimulai"
+
 msgid "Build the future of Paradev in the cloud"
 msgstr "Bangun masa depan Paradev di komputasi awan"
 
 msgid "Build your own"
 msgstr "Buat milik Anda sendiri"
-
-msgid "Building"
-msgstr "Sedang build"
 
 msgid "Building the last piece of software"
 msgstr "Membangun perangkat lunak yang terakhir"
@@ -3651,10 +3647,6 @@ msgstr "Build"
 
 msgid "Built"
 msgstr "Di-build"
-
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Built {0}"
-msgstr "Di-build {0}"
 
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"

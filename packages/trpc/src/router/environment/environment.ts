@@ -297,32 +297,6 @@ function toBuildView(
 	};
 }
 
-/** The newest build of each environment. */
-async function latestBuilds(
-	environmentRows: ReadonlyArray<{ id: string; sourceRef: string }>,
-) {
-	const ids = environmentRows.map((row) => row.id);
-	const rows = ids.length
-		? await db
-				.selectDistinctOn([environmentBuilds.environmentId])
-				.from(environmentBuilds)
-				.where(inArray(environmentBuilds.environmentId, ids))
-				.orderBy(
-					environmentBuilds.environmentId,
-					desc(environmentBuilds.startedAt),
-				)
-		: [];
-	const sourceRefs = new Map(
-		environmentRows.map((row) => [row.id, row.sourceRef]),
-	);
-	return new Map(
-		rows.map((build) => [
-			build.environmentId,
-			toBuildView(build, sourceRefs.get(build.environmentId) ?? ""),
-		]),
-	);
-}
-
 async function startRepositoriesBuild(args: {
 	environmentId: string;
 	userId: string;
@@ -393,16 +367,14 @@ export const environmentRouter = {
 				)
 				.orderBy(asc(environments.name));
 			const ids = rows.map((row) => row.id);
-			const [repos, projects, builds] = await Promise.all([
+			const [repos, projects] = await Promise.all([
 				repositoriesByEnvironment(rows),
 				projectIdsByEnvironment(ids),
-				latestBuilds(rows),
 			]);
 			return rows.map((row) => ({
 				...row,
 				repositories: repos.get(row.id) ?? [],
 				projectIds: projects.get(row.id) ?? [],
-				latestBuild: builds.get(row.id) ?? null,
 			}));
 		}),
 
@@ -411,16 +383,14 @@ export const environmentRouter = {
 		.query(async ({ ctx, input }) => {
 			const row = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, row.organizationId);
-			const [repos, projects, builds] = await Promise.all([
+			const [repos, projects] = await Promise.all([
 				repositoriesByEnvironment([row]),
 				projectIdsByEnvironment([row.id]),
-				latestBuilds([row]),
 			]);
 			return {
 				...row,
 				repositories: repos.get(row.id) ?? [],
 				projectIds: projects.get(row.id) ?? [],
-				latestBuild: builds.get(row.id) ?? null,
 			};
 		}),
 

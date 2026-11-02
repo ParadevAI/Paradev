@@ -3615,24 +3615,20 @@ msgstr "Böcek"
 msgid "Bug reports"
 msgstr "Hata raporları"
 
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Build failed {0}"
-msgstr "Derleme başarısız {0}"
-
 msgid "Build ID"
 msgstr "Derleme kimliği"
 
 msgid "Build in public"
 msgstr "Herkesin gözü önünde geliştiriyoruz"
 
+msgid "Build started"
+msgstr "Derleme başlatıldı"
+
 msgid "Build the future of Paradev in the cloud"
 msgstr "Paradev’in buluttaki geleceğini inşa edin"
 
 msgid "Build your own"
 msgstr "Kendinizinkini oluşturun"
-
-msgid "Building"
-msgstr "Derleniyor"
 
 msgid "Building the last piece of software"
 msgstr "Son yazılım parçasını inşa etmek"
@@ -3651,10 +3647,6 @@ msgstr "Derlemeler"
 
 msgid "Built"
 msgstr "Derlendi"
-
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Built {0}"
-msgstr "Derlendi {0}"
 
 msgid "Built in Paradev"
 msgstr "Paradev ile geliştirildi"

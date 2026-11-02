@@ -3615,24 +3615,20 @@ msgstr "虫子"
 msgid "Bug reports"
 msgstr "Bug 报告"
 
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Build failed {0}"
-msgstr "构建失败 {0}"
-
 msgid "Build ID"
 msgstr "构建 ID"
 
 msgid "Build in public"
 msgstr "公开构建"
 
+msgid "Build started"
+msgstr "构建已开始"
+
 msgid "Build the future of Paradev in the cloud"
 msgstr "共创 Paradev 的云端未来"
 
 msgid "Build your own"
 msgstr "自己动手构建"
-
-msgid "Building"
-msgstr "正在构建"
 
 msgid "Building the last piece of software"
 msgstr "打造最后一款软件"
@@ -3651,10 +3647,6 @@ msgstr "构建"
 
 msgid "Built"
 msgstr "构建时间"
-
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Built {0}"
-msgstr "已构建 {0}"
 
 msgid "Built in Paradev"
 msgstr "在 Paradev 中构建"

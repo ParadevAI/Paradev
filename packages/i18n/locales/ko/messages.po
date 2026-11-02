@@ -3615,24 +3615,20 @@ msgstr "버그"
 msgid "Bug reports"
 msgstr "버그 신고"
 
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Build failed {0}"
-msgstr "빌드 실패 {0}"
-
 msgid "Build ID"
 msgstr "빌드 ID"
 
 msgid "Build in public"
 msgstr "공개적으로 개발합니다"
 
+msgid "Build started"
+msgstr "빌드를 시작했습니다"
+
 msgid "Build the future of Paradev in the cloud"
 msgstr "클라우드에서 Paradev의 미래를 함께 만드세요"
 
 msgid "Build your own"
 msgstr "직접 만들기"
-
-msgid "Building"
-msgstr "빌드 중"
 
 msgid "Building the last piece of software"
 msgstr "마지막 소프트웨어를 만듭니다"
@@ -3651,10 +3647,6 @@ msgstr "빌드"
 
 msgid "Built"
 msgstr "빌드 시각"
-
-#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
-msgid "Built {0}"
-msgstr "빌드됨 {0}"
 
 msgid "Built in Paradev"
 msgstr "Paradev로 개발합니다"
