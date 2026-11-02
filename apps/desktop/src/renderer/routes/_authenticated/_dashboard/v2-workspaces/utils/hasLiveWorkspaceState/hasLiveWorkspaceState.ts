@@ -9,8 +9,8 @@ type LiveStateInputs = Pick<
 	"agentStatus" | "sandboxStatus" | "archivedAt" | "archiveReason" | "type"
 > & { pr: { state: V2WorkspacePrState } | null };
 
-/** True while something is happening or waiting; the row then shows the
- * status glyph in place of the age, as the cloud tab's trailing cell did. */
+/** True while something is happening or waiting; the list row then shows
+ * the status glyph before the name. */
 export function hasLiveWorkspaceState(workspace: LiveStateInputs): boolean {
 	if (workspace.archivedAt != null) return false;
 	return (
