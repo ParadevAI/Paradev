@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { auth, type Session } from "@superset/auth/server";
+import { auth, boundOrganizationOf, type Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
@@ -22,7 +22,7 @@ function looksLikeJwt(token: string): boolean {
 	return parts.length === 3 && parts.every(Boolean);
 }
 
-async function sessionFromOAuthBearer(
+export async function sessionFromOAuthBearer(
 	headers: Headers,
 ): Promise<Session | null> {
 	const authorization = headers.get("authorization");
@@ -62,6 +62,7 @@ async function sessionFromOAuthBearer(
 	const organizationIds = Array.isArray(payload.organizationIds)
 		? payload.organizationIds
 		: undefined;
+	const boundOrganizationId = boundOrganizationOf(payload);
 
 	const sessionId = typeof payload.sid === "string" ? payload.sid : userId;
 
@@ -72,6 +73,7 @@ async function sessionFromOAuthBearer(
 			userId,
 			activeOrganizationId,
 			organizationIds,
+			boundOrganizationId,
 			expiresAt: new Date(((payload.exp as number) ?? 0) * 1000),
 			token: token,
 			ipAddress: null,

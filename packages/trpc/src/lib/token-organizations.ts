@@ -1,6 +1,15 @@
+/** The one organization a bearer's token was minted for; null for other credentials. */
+export function boundOrganizationId(
+	session: { session: object } | null,
+): string | null {
+	const id = (session?.session as { boundOrganizationId?: unknown } | undefined)
+		?.boundOrganizationId;
+	return typeof id === "string" ? id : null;
+}
+
 /**
- * A bearer's organizations as its token listed them. Trusted to say yes, so a
- * removal can lag by the token's lifetime (an hour). Null for a cookie session.
+ * The organizations a session lists. Trusted to say yes, so a removal can lag
+ * by a bearer token's lifetime (an hour).
  */
 export function tokenOrganizationIds(
 	session: { session: object } | null,

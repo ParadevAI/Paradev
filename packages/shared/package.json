@@ -449,6 +449,10 @@
 			"types": "./src/install-update-lock.ts",
 			"default": "./src/install-update-lock.ts"
 		},
+		"./cli-version": {
+			"types": "./src/cli-version.ts",
+			"default": "./src/cli-version.ts"
+		},
 		"./host-version": {
 			"types": "./src/host-version.ts",
 			"default": "./src/host-version.ts"

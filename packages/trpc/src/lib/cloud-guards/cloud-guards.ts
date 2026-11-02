@@ -7,7 +7,10 @@ import { eq } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { posthog } from "../analytics";
 import type { SandboxCaller } from "../sandbox/api-credential";
-import { tokenOrganizationIds } from "../token-organizations";
+import {
+	boundOrganizationId,
+	tokenOrganizationIds,
+} from "../token-organizations";
 
 interface CloudAccessContext {
 	principal: { userId: string };
@@ -110,7 +113,11 @@ export async function isMember(
 	) {
 		return false;
 	}
+	const bound = boundOrganizationId(ctx.session);
+	if (bound) return organizationId === bound;
 	if (organizationId === ctx.activeOrganizationId) return true;
+	// LEGACY(remove when list-only tokens are refused): tokens that list every
+	// organization, from clients before organization-bound tokens.
 	if (tokenOrganizationIds(ctx.session)?.includes(organizationId)) return true;
 	return Boolean(
 		await findOrgMembership({ userId: ctx.principal.userId, organizationId }),
@@ -121,6 +128,8 @@ export async function isMember(
  * The organization a request acts in. A bearer that names none gets its
  * token's first, as the routes released clients call before naming one expect.
  */
+// LEGACY(remove when list-only tokens are refused): released CLIs call these
+// routes with a token that names no organization.
 export function organizationOrFirst(ctx: MemberContext): string | null {
 	return (
 		ctx.activeOrganizationId ?? tokenOrganizationIds(ctx.session)?.[0] ?? null

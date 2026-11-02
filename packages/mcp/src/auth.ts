@@ -255,7 +255,7 @@ export async function resolveMcpContext(
 	// membership list would let this MCP session reach hosts in other orgs.
 	const bearerToken = await mintUserJwt({
 		userId,
-		organizationIds: [organizationId],
+		organizationId: organizationId,
 		ttlSeconds: 300,
 	});
 

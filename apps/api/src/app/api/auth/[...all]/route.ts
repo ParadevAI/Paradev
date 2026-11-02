@@ -1,5 +1,6 @@
 import { auth } from "@superset/auth/server";
 import { toNextJsHandler } from "better-auth/next-js";
+import { organizationToken } from "@/lib/organization-token";
 
 const { GET: _GET, POST: _POST } = toNextJsHandler(auth);
 
@@ -15,6 +16,10 @@ function normalizeLocalhostUri(uri: string): string {
 
 const GET = async (req: Request) => {
 	const url = new URL(req.url);
+	const organizationId = url.searchParams.get("organizationId");
+	if (url.pathname.endsWith("/api/auth/token") && organizationId) {
+		return organizationToken(req, organizationId);
+	}
 	if (url.pathname.endsWith("/oauth2/authorize")) {
 		const redirectUri = url.searchParams.get("redirect_uri");
 		if (redirectUri) {

@@ -1,3 +1,4 @@
+import { CLI_UPDATE_HEADER } from "@superset/shared/cli-version";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
 import type { AppRouter } from "@superset/trpc";
 import type { TRPCClient } from "@trpc/client";
@@ -27,11 +28,23 @@ export class ApiHttpError extends Error {
 
 const MAX_ERROR_BODY_CHARS = 300;
 
+let updateNoticeShown = false;
+
+function noteUpdateNotice(response: Response) {
+	if (updateNoticeShown) return;
+	if (response.headers.get(CLI_UPDATE_HEADER) !== "recommended") return;
+	updateNoticeShown = true;
+	process.stderr.write(
+		"A newer Paradev CLI is available. Run `superset update`.\n",
+	);
+}
+
 export async function fetchRejectingNonJsonErrors(
 	input: string | URL | Request,
 	init?: RequestInit,
 ): Promise<Response> {
 	const response = await fetch(input, init);
+	noteUpdateNotice(response);
 	const contentType = response.headers.get("content-type") ?? "";
 	if (response.ok || contentType.includes("json")) return response;
 	const body = (await response.text())

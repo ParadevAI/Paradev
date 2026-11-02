@@ -221,7 +221,7 @@ export async function dispatchAutomation(
 	return dispatchRun(automation, cause, host.machineId, async (run, placed) => {
 		const jwt = await mintUserJwt({
 			userId: automation.ownerUserId,
-			organizationIds: [automation.organizationId],
+			organizationId: automation.organizationId,
 			scope: "automation-run",
 			runId: run.id,
 			ttlSeconds: 300,
@@ -441,7 +441,7 @@ async function pickOnlineHost(
 ): Promise<HostCandidate | null> {
 	const jwt = await mintUserJwt({
 		userId: automation.ownerUserId,
-		organizationIds: [automation.organizationId],
+		organizationId: automation.organizationId,
 		scope: "automation-presence",
 		ttlSeconds: 60,
 	});

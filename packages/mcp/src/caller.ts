@@ -38,6 +38,7 @@ export function createMcpCaller(ctx: McpContext): McpCaller {
 			userId: ctx.userId,
 			activeOrganizationId: ctx.organizationId,
 			organizationIds: ctx.organizationIds,
+			boundOrganizationId: ctx.organizationId,
 			expiresAt: new Date(Date.now() + 5 * 60_000),
 			token: ctx.bearerToken,
 			ipAddress: null,

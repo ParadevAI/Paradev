@@ -62,7 +62,7 @@ export async function createInMemoryMcpClient({
 	// host-call token must carry only the org this client is bound to.
 	const bearerToken = await mintUserJwt({
 		userId,
-		organizationIds: [organizationId],
+		organizationId: organizationId,
 		ttlSeconds: 300,
 	});
 

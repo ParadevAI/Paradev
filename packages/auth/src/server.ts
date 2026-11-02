@@ -1277,18 +1277,17 @@ export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
 
 /**
- * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT
- * plugin uses for session-derived tokens. Used by headless service code
- * (e.g. the automations dispatcher) that needs to act on behalf of a user
- * without holding their session cookie.
- *
- * The resulting token is accepted by anything that verifies via the public
- * JWKS endpoint (the relay and any other downstream service), because it is
- * signed with the same RS256 key pair.
+ * Mints a JWT for one organization, signed with the key the relay and
+ * realtime verify through the public JWKS. The API confines a bearer of it to
+ * that organization. `organizationIds` repeats it for relay and realtime
+ * builds that read only the list.
  */
 export async function mintUserJwt(args: {
 	userId: string;
-	organizationIds: string[];
+	organizationId: string;
+	name?: string | null;
+	image?: string | null;
+	teamIds?: string[];
 	scope?: string;
 	runId?: string;
 	/** Token lifetime in seconds. Default 300 (5 minutes). */
@@ -1300,7 +1299,11 @@ export async function mintUserJwt(args: {
 		body: {
 			payload: {
 				sub: args.userId,
-				organizationIds: args.organizationIds,
+				organizationId: args.organizationId,
+				organizationIds: [args.organizationId],
+				...(args.teamIds ? { teamIds: args.teamIds } : {}),
+				...(args.name !== undefined ? { name: args.name } : {}),
+				...(args.image !== undefined ? { image: args.image } : {}),
 				scope: args.scope,
 				runId: args.runId,
 				exp,
@@ -1309,4 +1312,17 @@ export async function mintUserJwt(args: {
 	});
 
 	return response.token;
+}
+
+/** Whether a token's claims bind it to exactly one organization. */
+export function boundOrganizationOf(
+	payload: Record<string, unknown>,
+): string | null {
+	const { organizationId, organizationIds } = payload;
+	return typeof organizationId === "string" &&
+		Array.isArray(organizationIds) &&
+		organizationIds.length === 1 &&
+		organizationIds[0] === organizationId
+		? organizationId
+		: null;
 }

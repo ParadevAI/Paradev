@@ -63,24 +63,35 @@ const callerFor = ({
 	sandboxCaller = BOX as typeof BOX | null,
 	organization,
 	tokenOrganizations,
+	boundTo,
 }: {
 	sandboxCaller?: typeof BOX | null;
 	organization?: string;
 	tokenOrganizations?: string[];
+	boundTo?: string;
 } = {}) => {
 	const headers = new Headers();
 	if (organization) headers.set("x-superset-organization-id", organization);
 	return createCallerFactory(router)(
 		createTRPCContext({
-			session: (tokenOrganizations
+			session: (boundTo
 				? {
 						...session,
 						session: {
-							activeOrganizationId: null,
-							organizationIds: tokenOrganizations,
+							activeOrganizationId: boundTo,
+							organizationIds: [boundTo],
+							boundOrganizationId: boundTo,
 						},
 					}
-				: session) as never,
+				: tokenOrganizations
+					? {
+							...session,
+							session: {
+								activeOrganizationId: null,
+								organizationIds: tokenOrganizations,
+							},
+						}
+					: session) as never,
 			auth: {} as never,
 			headers,
 			sandboxCaller,
@@ -176,6 +187,23 @@ describe("a bearer's token", () => {
 			tokenOrganizations: ["box-org"],
 		});
 		expect(await bearer.user.myOrganization()).toBe("other-org");
+	});
+});
+
+describe("a token bound to one organization", () => {
+	test("acts there", async () => {
+		const bearer = callerFor({ sandboxCaller: null, boundTo: "box-org" });
+		expect(await bearer.user.myOrganization()).toBe("box-org");
+		expect(await bearer.cloudWorkspace.list()).toEqual(["box-org"]);
+	});
+
+	test("can't name another organization, even one its person belongs to", async () => {
+		const bearer = callerFor({
+			sandboxCaller: null,
+			boundTo: "box-org",
+			organization: "other-org",
+		});
+		expect(await outcome(() => bearer.user.myOrganization())).toBe("FORBIDDEN");
 	});
 });
 

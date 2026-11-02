@@ -7,6 +7,7 @@ import {
 	cloudWorkspaces,
 	members,
 } from "@superset/db/schema";
+import { cliUpdateFor } from "@superset/shared/cli-version";
 import {
 	ORGANIZATION_HEADER,
 	STAFF_EMAIL_DOMAINS,
@@ -26,7 +27,10 @@ import {
 	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
 } from "./lib/sandbox/api-credential";
-import { tokenOrganizationIds } from "./lib/token-organizations";
+import {
+	boundOrganizationId,
+	tokenOrganizationIds,
+} from "./lib/token-organizations";
 import {
 	actorOf,
 	type DevPrincipal,
@@ -169,7 +173,22 @@ const clientTelemetry = t.middleware(async ({ ctx, path, next }) => {
 	return next();
 });
 
-export const publicProcedure = t.procedure.use(clientTelemetry);
+const clientFloor = t.middleware(({ ctx, next }) => {
+	if (
+		ctx.client?.product === "cli" &&
+		cliUpdateFor(ctx.client.version) === "required"
+	) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: `This CLI (${ctx.client.version}) is too old for this server. Run \`superset update\`.`,
+		});
+	}
+	return next();
+});
+
+export const publicProcedure = t.procedure
+	.use(clientFloor)
+	.use(clientTelemetry);
 
 const personPrincipal = (
 	userId: string,
@@ -235,8 +254,17 @@ async function personFromSession(ctx: TRPCContext, path: string) {
 	const headerOrgId = ctx.headers.get(ORGANIZATION_HEADER)?.trim() || null;
 	assertInBoxOrganization(ctx.sandboxCaller, headerOrgId);
 
-	let activeOrganizationId = sessionOrgId;
-	if (headerOrgId && headerOrgId !== sessionOrgId) {
+	const bound = boundOrganizationId(session);
+	if (bound && headerOrgId && headerOrgId !== bound) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: `This token is for organization ${bound}, not ${headerOrgId}. Get a token for that organization.`,
+		});
+	}
+	let activeOrganizationId = bound ?? sessionOrgId;
+	if (!bound && headerOrgId && headerOrgId !== sessionOrgId) {
+		// LEGACY(remove when list-only tokens are refused): the header picks among
+		// the organizations an older token lists.
 		const membership =
 			tokenOrganizationIds(session)?.includes(headerOrgId) ||
 			(await db.query.members.findFirst({
@@ -314,6 +342,7 @@ async function devFromTurnToken(
  * Procedures on it check access with `ctx.principal`, never the session.
  */
 export const actorProcedure = t.procedure
+	.use(clientFloor)
 	.use(sandboxScope)
 	.use(async ({ ctx, path, next }) => {
 		const dev = await devFromTurnToken(ctx.headers);

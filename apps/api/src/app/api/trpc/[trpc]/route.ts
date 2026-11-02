@@ -1,3 +1,4 @@
+import { CLI_UPDATE_HEADER, cliUpdateFor } from "@superset/shared/cli-version";
 import { appRouter } from "@superset/trpc";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { createContext } from "@/trpc/context";
@@ -17,7 +18,13 @@ const handler = (req: Request) =>
 		// other procedure varies by session. Cache only when *every* path in the
 		// batch is under leaderboard.public, or a session-varying response gets
 		// served from the CDN to the next caller.
-		responseMeta: ({ paths, type, errors }) => {
+		responseMeta: ({ ctx, paths, type, errors }) => {
+			if (
+				ctx?.client?.product === "cli" &&
+				cliUpdateFor(ctx.client.version) === "recommended"
+			) {
+				return { headers: { [CLI_UPDATE_HEADER]: "recommended" } };
+			}
 			if (type !== "query" || errors.length > 0 || !paths?.length) return {};
 			if (!paths.every((path) => path.startsWith("leaderboard.public."))) {
 				return {};
