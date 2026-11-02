@@ -20,6 +20,7 @@ interface ChangesScopeControlProps {
 	canRenameBranch: boolean;
 	onRenameBranch: (newName: string) => void;
 	baseClassName?: string;
+	commitLabelClassName?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export function ChangesScopeControl({
 	canRenameBranch,
 	onRenameBranch,
 	baseClassName,
+	commitLabelClassName,
 }: ChangesScopeControlProps) {
 	return (
 		<>
@@ -51,6 +53,7 @@ export function ChangesScopeControl({
 				currentBranchName={currentBranchName}
 				canRenameBranch={canRenameBranch}
 				onRenameBranch={onRenameBranch}
+				labelClassName={commitLabelClassName}
 			/>
 			{filter.kind === "all" && (
 				// Selector as a placeholder in the message: a bare "vs" cannot

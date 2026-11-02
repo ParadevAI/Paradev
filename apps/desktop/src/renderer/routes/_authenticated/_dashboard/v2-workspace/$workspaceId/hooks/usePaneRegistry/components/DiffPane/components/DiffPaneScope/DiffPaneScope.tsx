@@ -46,6 +46,7 @@ export function DiffPaneScope({
 					canRenameBranch={scope.canRenameBranch}
 					onRenameBranch={scope.renameBranch}
 					baseClassName="hidden @min-[420px]/pane-header:flex"
+					commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
 				/>
 			)}
 			{filter && (
