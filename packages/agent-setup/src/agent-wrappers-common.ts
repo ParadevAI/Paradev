@@ -50,7 +50,7 @@ export function getManagedArtifactGuardHookCommand(): string {
 	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" ] && "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" || true`;
 }
 
-// Dev setup (.superset/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
+// Dev setup (.paradev/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
 // $PWD/paradev-dev-data — without a leading dot — so we must recognize that
 // variant to reap stale notify.sh paths from deleted worktrees.
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =

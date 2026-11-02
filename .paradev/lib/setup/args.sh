@@ -5,11 +5,11 @@ SETUP_LOCAL_MCP=0
 
 setup_print_usage() {
   cat <<EOT
-Usage: .superset/setup.sh [options]
+Usage: .paradev/setup.sh [options]
 
 Options:
   -f, --force              Reset paradev-dev-data/ before seeding local DB
-  -m, --mcp              Add superset-local MCP entry to .mcp.json
+  -m, --mcp              Add paradev-local MCP entry to .mcp.json
   -h, --help               Show this help message
 EOT
 }

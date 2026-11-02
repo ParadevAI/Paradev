@@ -67,7 +67,7 @@ const REPO_URL = "https://github.com/paradevai/paradev.git";
 const REPO_PATH = SANDBOX_ROOT_CHECKOUT;
 const REPO_DIR = sandboxCheckoutDir(SANDBOX_PATHS.workspace, REPO_PATH);
 const REPO_FULL_NAME = "paradevai/paradev";
-/** The monorepo branch the golden is built from; its `.superset/config.json` supplies `start`. */
+/** The monorepo branch the golden is built from; its `.paradev/config.json` supplies `start`. */
 const BRANCH = process.env.SUPERSET_INTERNAL_BRANCH ?? "main";
 const REGION = DEFAULT_SANDBOX_REGION;
 
@@ -317,7 +317,7 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 	],
 	[
 		"the repository's cloud setup and dev stack",
-		"test -x /workspace/.superset/setup.cloud.sh && test -x /workspace/.superset/dev-stack.cloud.sh && echo ok",
+		"test -x /workspace/.paradev/setup.cloud.sh && test -x /workspace/.paradev/dev-stack.cloud.sh && echo ok",
 		/ok/,
 	],
 	["neonctl", "neonctl --version", /^\d+\.\d+/m],
@@ -486,7 +486,7 @@ const { releaseRepositoryWhere } = await import(
 const { recordReleasedBundle } = await import("./record-bundle");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
-// the box acts on the monorepo's own .superset/config.json.
+// the box acts on the monorepo's own .paradev/config.json.
 const monorepo = await db.query.githubRepositories.findFirst({
 	where: releaseRepositoryWhere(ORGANIZATION_ID as string, REPO_FULL_NAME),
 });

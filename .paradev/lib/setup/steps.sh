@@ -423,15 +423,15 @@ step_write_env() {
 
   success "Workspace .env written"
 
-  # Generate .superset/ports.json for static port name mapping in the desktop app
-  local superset_dir
-  superset_dir="${SUPERSET_SCRIPT_DIR:-$(dirname "$0")}"
+  # Generate .paradev/ports.json for static port name mapping in the desktop app
+  local paradev_dir
+  paradev_dir="${PARADEV_SCRIPT_DIR:-$(dirname "$0")}"
   assert_unique_ports "$WEB_PORT" "$API_PORT" "$MARKETING_PORT" "$ADMIN_PORT" \
     "$DOCS_PORT" "$DESKTOP_VITE_PORT" "$DESKTOP_NOTIFICATIONS_PORT" "$STREAMS_PORT" \
     "$STREAMS_INTERNAL_PORT" "$CODE_INSPECTOR_PORT" "$RELAY_PORT" "$USERCONTENT_DEV_PORT" \
     "$SANDBOX_GATE_DEV_PORT" "$REALTIME_PORT" || return 1
 
-  cat > "$superset_dir/ports.json" <<PORTSJSON
+  cat > "$paradev_dir/ports.json" <<PORTSJSON
 {
   "ports": [
     { "port": $WEB_PORT, "label": "Web" },
@@ -449,7 +449,7 @@ step_write_env() {
   ]
 }
 PORTSJSON
-  success "Port name mapping written to .superset/ports.json"
+  success "Port name mapping written to .paradev/ports.json"
 
   return 0
 }
@@ -472,9 +472,9 @@ step_setup_local_mcp() {
   local api_port="${API_PORT:-$((${SUPERSET_PORT_BASE:-3000} + 1))}"
   local local_url="http://localhost:${api_port}/api/v2/agent/mcp"
 
-  # Add or update superset-local entry
+  # Add or update paradev-local entry
   local tmp_file="${mcp_file}.tmp.$$"
-  if ! jq --arg url "$local_url" '.mcpServers["superset-local"] = {"type": "http", "url": $url}' "$mcp_file" > "$tmp_file"; then
+  if ! jq --arg url "$local_url" '.mcpServers["paradev-local"] = {"type": "http", "url": $url}' "$mcp_file" > "$tmp_file"; then
     error "Failed to set local MCP entry"
     rm -f "$tmp_file"
     return 1

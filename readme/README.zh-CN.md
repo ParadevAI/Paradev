@@ -273,7 +273,7 @@ git clone https://github.com/paradevai/paradev.git
 然后在该工作区的终端中运行开发环境设置:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

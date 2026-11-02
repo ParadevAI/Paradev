@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Sau đó chạy thiết lập phát triển từ terminal của workspace đó:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

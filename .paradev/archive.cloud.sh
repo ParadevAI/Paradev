@@ -4,12 +4,12 @@
 # and setup.cloud.sh creates the branch again on the next boot.
 set -uo pipefail
 
-SUPERSET_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARADEV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/common.sh"
+source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/teardown/steps.sh"
+source "$PARADEV_SCRIPT_DIR/lib/teardown/steps.sh"
 
 FAILED_STEPS=()
 SKIPPED_STEPS=()

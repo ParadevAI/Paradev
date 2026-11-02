@@ -13,7 +13,7 @@ setup_main() {
     return 1
   fi
 
-  echo "🚀 Setting up Superset workspace..."
+  echo "🚀 Setting up Paradev workspace..."
   echo ""
 
   # Step 1: Load environment

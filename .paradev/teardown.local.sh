@@ -5,11 +5,11 @@
 # down the docker stack.
 set -uo pipefail
 
-SUPERSET_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SUPERSET_SCRIPT_DIR/.." && pwd)"
+PARADEV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$PARADEV_SCRIPT_DIR/.." && pwd)"
 
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/common.sh"
+source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 
 cd "$ROOT_DIR" || exit 1
 

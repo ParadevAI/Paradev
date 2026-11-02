@@ -273,7 +273,7 @@ git clone https://github.com/paradevai/paradev.git
 그런 다음 해당 워크스페이스 터미널에서 개발 설정을 실행하세요:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

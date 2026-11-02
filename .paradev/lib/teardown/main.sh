@@ -13,7 +13,7 @@ teardown_main() {
     return 1
   fi
 
-  echo "🧹 Tearing down Superset workspace..."
+  echo "🧹 Tearing down Paradev workspace..."
   echo ""
 
   # Step 1: Load environment
