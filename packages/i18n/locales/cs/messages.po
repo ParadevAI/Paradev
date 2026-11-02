@@ -12520,6 +12520,9 @@ msgstr "Zapněte to v Paradev v Nastavení → Účet."
 msgid "Opt-out"
 msgstr "Odmítnout"
 
+msgid "Option as Meta (macOS)"
+msgstr "Option jako Meta (macOS)"
+
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Zkratky s Option mohou bránit psaní speciálních znaků"
 
@@ -18478,6 +18481,9 @@ msgstr "Přepisování…"
 
 msgid "Translated"
 msgstr "Přeloženo"
+
+msgid "Treat the Option key as Meta so Alt-based TUI shortcuts reach the program."
+msgstr "Považovat klávesu Option za Meta, aby se do programu dostaly zkratky TUI založené na Alt."
 
 msgid "Tree view"
 msgstr "Stromové zobrazení"

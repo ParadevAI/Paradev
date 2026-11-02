@@ -12520,6 +12520,9 @@ msgstr "Tham gia từ Paradev trong Cài đặt → Tài khoản."
 msgid "Opt-out"
 msgstr "Từ chối"
 
+msgid "Option as Meta (macOS)"
+msgstr "Dùng phím Option như Meta (macOS)"
+
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Phím tắt Option có thể cản trở việc gõ ký tự đặc biệt"
 
@@ -18478,6 +18481,9 @@ msgstr "Đang chuyển thành văn bản…"
 
 msgid "Translated"
 msgstr "Đã dịch"
+
+msgid "Treat the Option key as Meta so Alt-based TUI shortcuts reach the program."
+msgstr "Xử lý phím Option như Meta để các phím tắt TUI dùng Alt đến được chương trình."
 
 msgid "Tree view"
 msgstr "Xem dạng cây"

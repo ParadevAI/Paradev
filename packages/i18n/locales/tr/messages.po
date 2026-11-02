@@ -12520,6 +12520,9 @@ msgstr "Paradev'de Ayarlar → Hesap bölümünden katılın."
 msgid "Opt-out"
 msgstr "Vazgeç"
 
+msgid "Option as Meta (macOS)"
+msgstr "Option tuşunu Meta olarak kullan (macOS)"
+
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Option kısayolları özel karakter yazmayı engelleyebilir"
 
@@ -18478,6 +18481,9 @@ msgstr "Yazıya dökülüyor…"
 
 msgid "Translated"
 msgstr "Çevrildi"
+
+msgid "Treat the Option key as Meta so Alt-based TUI shortcuts reach the program."
+msgstr "Option tuşunu Meta olarak işle, böylece Alt tabanlı TUI kısayolları programa ulaşsın."
 
 msgid "Tree view"
 msgstr "Ağaç görünümü"

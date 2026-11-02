@@ -12520,6 +12520,9 @@ msgstr "Ikut serta dari Paradev di Pengaturan → Akun."
 msgid "Opt-out"
 msgstr "Tolak"
 
+msgid "Option as Meta (macOS)"
+msgstr "Option sebagai Meta (macOS)"
+
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Pintasan Option bisa menghalangi pengetikan karakter khusus"
 
@@ -18478,6 +18481,9 @@ msgstr "Mentranskripsi…"
 
 msgid "Translated"
 msgstr "Diterjemahkan"
+
+msgid "Treat the Option key as Meta so Alt-based TUI shortcuts reach the program."
+msgstr "Perlakukan tombol Option sebagai Meta agar pintasan TUI berbasis Alt sampai ke program."
 
 msgid "Tree view"
 msgstr "Tampilan pohon"

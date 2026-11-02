@@ -12520,6 +12520,9 @@ msgstr "Dołącz z Paradev w Ustawienia → Konto."
 msgid "Opt-out"
 msgstr "Rezygnuję"
 
+msgid "Option as Meta (macOS)"
+msgstr "Option jako Meta (macOS)"
+
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Skróty z Option mogą uniemożliwić wpisywanie znaków specjalnych"
 
@@ -18478,6 +18481,9 @@ msgstr "Transkrypcja…"
 
 msgid "Translated"
 msgstr "Przetłumaczone"
+
+msgid "Treat the Option key as Meta so Alt-based TUI shortcuts reach the program."
+msgstr "Traktuj klawisz Option jako Meta, aby skróty TUI oparte na Alt docierały do programu."
 
 msgid "Tree view"
 msgstr "Widok drzewa"

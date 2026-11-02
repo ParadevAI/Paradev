@@ -479,12 +479,10 @@ export function TypographySurfaceCard({
 										htmlFor="terminal-mac-option-is-meta"
 										className="text-xs"
 									>
-										<Trans id="settings.appearance.typography.macOptionIsMeta">
-											Option as Meta (macOS)
-										</Trans>
+										<Trans>Option as Meta (macOS)</Trans>
 									</Label>
 									<p className="text-[11px] text-muted-foreground">
-										<Trans id="settings.appearance.typography.macOptionIsMetaHint">
+										<Trans>
 											Treat the Option key as Meta so Alt-based TUI shortcuts
 											reach the program.
 										</Trans>

@@ -12520,6 +12520,9 @@ msgstr "在Paradev的“设置 → 账户”中选择加入。"
 msgid "Opt-out"
 msgstr "拒绝"
 
+msgid "Option as Meta (macOS)"
+msgstr "将 Option 键视为 Meta（macOS）"
+
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Option快捷键可能会影响特殊字符的输入"
 
@@ -18478,6 +18481,9 @@ msgstr "正在转写…"
 
 msgid "Translated"
 msgstr "已翻译"
+
+msgid "Treat the Option key as Meta so Alt-based TUI shortcuts reach the program."
+msgstr "将 Option 键视为 Meta，让基于 Alt 的 TUI 快捷键能被程序接收。"
 
 msgid "Tree view"
 msgstr "树状视图"
