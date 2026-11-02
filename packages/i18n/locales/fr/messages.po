@@ -10721,6 +10721,9 @@ msgstr "Linear limite les requêtes. Réessayez dans quelques minutes."
 msgid "Linear issues"
 msgstr "Issues Linear"
 
+msgid "Linear project"
+msgstr "Projet Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -11913,9 +11916,6 @@ msgstr "Image suivante"
 
 msgid "Next match"
 msgstr "Résultat suivant"
-
-msgid "Next release"
-msgstr "Version suivante"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -14553,9 +14553,6 @@ msgstr "Résultat précédent"
 
 msgid "Previous prompts"
 msgstr "Prompts précédents"
-
-msgid "Previous release"
-msgstr "Version précédente"
 
 msgid "Previous slide"
 msgstr "Diapositive précédente"

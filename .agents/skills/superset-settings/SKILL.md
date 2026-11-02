@@ -31,7 +31,7 @@ Prefer `--json` (auto-on in agent environments; parse it rather than
 matching the human sentences) and `superset settings list` to discover keys
 and allowed values instead of guessing. In Paradev terminals `superset` is
 already on PATH. `SUPERSET_HOME_DIR` overrides the target profile
-(`~/.superset` by default); useful for testing against a sandbox copy.
+(`~/.paradev` by default); useful for testing against a sandbox copy.
 
 ## Creating custom themes
 
@@ -107,7 +107,7 @@ app" means the nudge landed. The notes below are the fallback behavior when
 no app acknowledged (app not running, or an older app version):
 
 - **Regular settings** (most of `settings set`): written to
-  `~/.superset/local.db`. A running older app picks them up the next time
+  `local.db` in the target profile (`$SUPERSET_HOME_DIR`, else `~/.paradev`). A running older app picks them up the next time
   its window regains focus; no restart needed.
 - **Git settings** (`branchPrefixMode`, `branchPrefixCustom`,
   `worktreeBaseDir`): host-wide values written through the local host

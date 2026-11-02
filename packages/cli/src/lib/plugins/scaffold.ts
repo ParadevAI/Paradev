@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { CLIError } from "@superset/cli-framework";
+import { COMPANY } from "@superset/shared/constants";
 import {
 	type MarketplaceContext,
 	SUPERSET_EXTENSION,
@@ -131,7 +132,7 @@ export function scaffoldPlugin(
 	}
 
 	const manifest = {
-		$schema: "https://superset.sh/schemas/plugin/1.0.0.json",
+		$schema: `${COMPANY.MARKETING_URL}/schemas/plugin/1.0.0.json`,
 		name,
 		version: "0.1.0",
 		description,

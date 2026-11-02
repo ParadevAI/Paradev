@@ -73,10 +73,12 @@ Never pass a value with `--body`: it ends up in the process list and the shell h
 ## 4. Boot a box and get it running
 
 ```bash
-superset workspaces create --environment <environment-id> --name "Set up <name>"
+superset workspaces create --environment <environment-id> --name "Set up <name>" --machine-size large
 ```
 
-The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `ready`. Then work inside the box through terminals:
+Always pass `--machine-size large`. The default size runs out of memory on many production builds and makes every install and lint slow.
+
+The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `ready`; stop and report if it is `failed`. Then work inside the box through terminals:
 
 ```bash
 superset terminals create --workspace <workspace-id> --command "<cmd>"
@@ -109,10 +111,34 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 ## 6. Finish
 
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
-2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. Private is `personal`, the default.
+2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. To keep it private: `superset environments update <environment-id> --scope personal` (an environment you were given may already be shared).
 3. If the `config.toml` change is not in a pull request yet, offer to open one, and ask before pushing.
 4. Archive the setup box: `superset workspaces archive <workspace-id>`.
-5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready`, then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Give the user its link: the environment URL's origin with `/workspaces/<new-workspace-id>`, which opens it in the desktop app.
-6. Summarize what is installed, what `config.toml` does, which variables are set, and which are missing and who has to provide them. Tell the user that more workspaces start from the new-workspace screen: pick Cloud, the project, and this environment.
+5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready` (stop and report if it is `failed`), then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
+6. End with a final message in this structure, and nothing after it. Keep each section short. Write "none" for an empty section; do not drop it.
+
+```markdown
+## <environment name> is ready
+
+**Try it:** [<new workspace name>](<webUrl of the workspace from step 5>), started fresh from this environment.
+**Environment:** [<environment name>](<the environment link you were given>) · <private | shared with the organization>
+**Recommended box size:** `<small | medium | large | xlarge>`, because <why, from how the build, tests and services ran on the setup box>. Pick it in the new-workspace screen; it is not the default.
+
+### What a new workspace gets
+- Installed: <toolchains and dependencies>
+- On boot: <what `[setup]` runs> · terminals: <default terminals> · preview: <ports>
+
+### Variables
+- Set: <names only, never values>
+- Missing: <name> (read in <file>), to be provided by <who>
+
+### Still to do
+- <config.toml pull request link, or "merge it so new workspaces use it">
+- <anything that failed or that you skipped, and why>
+
+More workspaces: new-workspace screen → Cloud → <project> → <environment name>.
+```
+
+   If the fresh workspace from step 5 failed, write **Try it:** as the failure and its cause, not a link.
 
 If you stop early, say where things stand and what the next session should do first; the environment and its latest checkpoint are all it needs to continue.
