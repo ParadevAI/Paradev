@@ -10,6 +10,7 @@
  * ticket-checking gate in front of every port (`access.ts`).
  */
 
+import * as Sentry from "@sentry/core";
 import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
@@ -24,6 +25,7 @@ import {
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
+import { bootStampsFrom, type HostAnswer } from "./boot-trace";
 import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
@@ -179,11 +181,6 @@ async function runBoot(sandbox: Sandbox, hostSecret: string): Promise<void> {
 }
 
 /**
- * When the provider call that makes the sandbox started and returned, and
- * when boot was fired into it. Job-side clock; the boot runner's own phases
- * are stamped inside the sandbox and read off health.check.
- */
-/**
  * Creates the sandbox, writes its identity and starts boot. Returns once the
  * sandbox's address exists, not once anything listens on it; `settleSandbox`
  * is how a caller waits for that. Idempotent on the name: a re-delivered
@@ -216,23 +213,39 @@ export async function provisionSandbox(args: {
 	};
 	const sandbox =
 		(await getSandbox(args.name)) ??
-		(args.environment.sourceKind === "fork"
-			? // A fork copies the golden's region; a snapshot only exists where
-				// it was taken.
-				await Sandbox.fork({
-					...config,
-					sourceSandbox: args.environment.sourceRef,
-					resources: { vcpus: args.claim.vcpus },
-				})
-			: await Sandbox.create({
-					...config,
-					image: args.environment.sourceRef,
-					region: args.environment.region as SandboxRegion,
-					resources: { vcpus: args.claim.vcpus },
-				}));
-	await writeIdentity(sandbox, args.claim.identity);
-	await writeSignInFiles(sandbox, args.claim.files);
-	await runBoot(sandbox, args.claim.hostSecret);
+		(await Sentry.startSpan(
+			{
+				name:
+					args.environment.sourceKind === "fork" ? "fork" : "create from image",
+				op: "sandbox.provider",
+				attributes: {
+					"sandbox.name": args.name,
+					"sandbox.source": args.environment.sourceRef,
+					"sandbox.region": args.environment.region,
+					"sandbox.vcpus": args.claim.vcpus,
+				},
+			},
+			() =>
+				args.environment.sourceKind === "fork"
+					? // A fork copies the golden's region; a snapshot only exists where
+						// it was taken.
+						Sandbox.fork({
+							...config,
+							sourceSandbox: args.environment.sourceRef,
+							resources: { vcpus: args.claim.vcpus },
+						})
+					: Sandbox.create({
+							...config,
+							image: args.environment.sourceRef,
+							region: args.environment.region as SandboxRegion,
+							resources: { vcpus: args.claim.vcpus },
+						}),
+		));
+	await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
+		await writeIdentity(sandbox, args.claim.identity);
+		await writeSignInFiles(sandbox, args.claim.files);
+		await runBoot(sandbox, args.claim.hostSecret);
+	});
 	return {
 		providerSandboxId: args.name,
 		sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
@@ -253,15 +266,19 @@ export class SandboxNotReadyError extends Error {
 async function waitForHostService(
 	target: string,
 	providerSandboxId: string,
-): Promise<void> {
+): Promise<HostAnswer> {
 	const deadline = Date.now() + HOST_READY_TIMEOUT_MS;
 	while (Date.now() < deadline) {
-		const ok = await fetch(`${target}/trpc/health.check`, {
+		const body: unknown = await fetch(`${target}/trpc/health.check`, {
 			signal: AbortSignal.timeout(HOST_READY_POLL_MS * 6),
 		})
-			.then((response) => response.ok)
-			.catch(() => false);
-		if (ok) return;
+			.then((response) =>
+				response.ok ? response.json().catch(() => ({})) : null,
+			)
+			.catch(() => null);
+		if (body !== null) {
+			return { stamps: bootStampsFrom(body), answeredAt: Date.now() };
+		}
 		await new Promise((resolve) => setTimeout(resolve, HOST_READY_POLL_MS));
 	}
 	throw new SandboxNotReadyError(providerSandboxId);
@@ -276,13 +293,17 @@ export async function settleSandbox(args: {
 	providerSandboxId: string;
 	hostTarget: string;
 	claim: SandboxClaim;
-}): Promise<void> {
-	await waitForHostService(args.hostTarget, args.providerSandboxId);
+}): Promise<HostAnswer> {
+	const answer = await waitForHostService(
+		args.hostTarget,
+		args.providerSandboxId,
+	);
 	await pushManagedEnv(
 		args.hostTarget,
 		args.claim.hostSecret,
 		args.claim.managedEnv,
 	);
+	return answer;
 }
 
 /**
