@@ -2,6 +2,20 @@ import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
 import { eq, sql } from "drizzle-orm";
 
 const databaseUrl = process.env.AGENT_ACCESS_TEST_DATABASE_URL;
+
+async function eventually<T>(
+	read: () => Promise<T>,
+	done: (value: T) => boolean,
+	timeoutMs = 2_000,
+): Promise<T> {
+	const deadline = Date.now() + timeoutMs;
+	let value = await read();
+	while (!done(value) && Date.now() < deadline) {
+		await new Promise((resolve) => setTimeout(resolve, 25));
+		value = await read();
+	}
+	return value;
+}
 const suite = databaseUrl ? describe : describe.skip;
 
 suite("agent access against a migrated PostgreSQL", () => {
@@ -419,9 +433,10 @@ suite("agent access against a migrated PostgreSQL", () => {
 			threadRootId: root.id,
 			clientId: crypto.randomUUID(),
 		});
-		expect(await turns()).toEqual([
-			{ reason: "mention", steers: [reply.id], kind: "main" },
-		]);
+		// An unmentioned thread reply is routed after the send returns.
+		expect(
+			await eventually(turns, (rows) => rows[0]?.steers.length === 1),
+		).toEqual([{ reason: "mention", steers: [reply.id], kind: "main" }]);
 		const toAgent = delivered.filter(
 			(prompt) =>
 				prompt.text.includes("look at this") ||
@@ -1090,5 +1105,30 @@ suite("agent access against a migrated PostgreSQL", () => {
 		expect(text).toContain("<thread_start from=");
 		expect(text).toContain("rotation for next week?");
 		expect(text).toContain("and the week after");
+	});
+
+	test("a mention carries the messages just before it and the channel's project", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await worker().agentWorker.settleTurn({
+			turnId: turn.id,
+			status: "completed",
+			steersConsumed: 0,
+		});
+		const question = `what has been done here already? ${crypto.randomUUID()}`;
+		await person(admin).channelMessage.send({
+			channelId: privateChannel,
+			body: question,
+			clientId: crypto.randomUUID(),
+		});
+		await person(admin).channelMessage.send({
+			channelId: privateChannel,
+			body: "@Dev",
+			mentionedIds: [agent.id],
+			clientId: crypto.randomUUID(),
+		});
+		const text = delivered.at(-1)?.text ?? "";
+		expect(text).toMatch(/project="[^"]+, \d+ tasks"/);
+		expect(text).toContain("<recent>");
+		expect(text.indexOf(question)).toBeLessThan(text.indexOf("</recent>"));
 	});
 });
