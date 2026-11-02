@@ -40,7 +40,7 @@ export function ReleaseNotesDialog({
 				className={cn(
 					"max-h-[calc(100vh-4rem)] gap-0 overflow-hidden rounded-xl p-0",
 					release.image
-						? "sm:max-w-[760px] sm:grid-cols-[1fr_1.05fr]"
+						? "sm:min-h-[min(400px,calc(100vh-4rem))] sm:max-w-[760px] sm:grid-cols-[1fr_1.05fr]"
 						: "sm:max-w-[440px]",
 				)}
 			>
