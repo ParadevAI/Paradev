@@ -24,7 +24,7 @@ import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
-import { isMember } from "../../lib/cloud-guards";
+import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
 import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
 import { personProcedure, publicProcedure, userError } from "../../trpc";
@@ -222,18 +222,19 @@ export const organizationRouter = {
 	}),
 
 	getActiveFromJwt: personProcedure.query(async ({ ctx }) => {
-		if (!ctx.activeOrganizationId) return null;
+		const organizationId = organizationOrFirst(ctx);
+		if (!organizationId) return null;
 
 		const membership = await db.query.members.findFirst({
 			where: and(
 				eq(members.userId, ctx.principal.userId),
-				eq(members.organizationId, ctx.activeOrganizationId),
+				eq(members.organizationId, organizationId),
 			),
 		});
 		if (!membership) return null;
 
 		const org = await db.query.organizations.findFirst({
-			where: eq(organizations.id, ctx.activeOrganizationId),
+			where: eq(organizations.id, organizationId),
 			columns: { id: true, name: true, slug: true, taskTracker: true },
 		});
 		return org ?? null;

@@ -27,6 +27,7 @@ import {
 	assertCloudAccess,
 	assertMember,
 	type MemberContext,
+	organizationOrFirst,
 } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import {
@@ -200,7 +201,7 @@ export const cloudWorkspaceRouter = {
 	 */
 	available: personProcedure.query(async ({ ctx }) => {
 		try {
-			await assertCloudAccess(ctx, ctx.activeOrganizationId ?? null);
+			await assertCloudAccess(ctx, organizationOrFirst(ctx));
 			return { available: true };
 		} catch {
 			return { available: false };
