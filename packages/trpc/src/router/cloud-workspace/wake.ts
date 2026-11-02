@@ -1,11 +1,17 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import {
+	CLOUD_WORKSPACE_RESUMED_ATTRIBUTE,
+	CLOUD_WORKSPACE_WAKE_TRANSACTION,
+} from "@superset/shared/constants";
+import { waitUntil } from "@vercel/functions";
 import { eq } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
 	buildSandboxClaim,
 	describeSandbox,
+	recordBootSpans,
 	stopAndSnapshot,
 	wakeSandbox,
 } from "../../lib/sandbox";
@@ -28,9 +34,34 @@ export interface WokenCloudWorkspace {
 export async function wakeCloudWorkspace(
 	row: CloudWorkspaceRow,
 ): Promise<WokenCloudWorkspace> {
-	const { claim, agentCredentialDigest } = await buildSandboxClaim({ row });
+	try {
+		return await Sentry.startSpan(
+			{
+				name: CLOUD_WORKSPACE_WAKE_TRANSACTION,
+				op: "function",
+				forceTransaction: true,
+				attributes: { "cloud_workspace.id": row.id },
+			},
+			async (span) => {
+				const { booted, ...woken } = await wake(row);
+				span.setAttribute(CLOUD_WORKSPACE_RESUMED_ATTRIBUTE, booted);
+				return woken;
+			},
+		);
+	} finally {
+		waitUntil(Sentry.flush(2_000).catch(() => false));
+	}
+}
+
+async function wake(
+	row: CloudWorkspaceRow,
+): Promise<WokenCloudWorkspace & { booted: boolean }> {
+	const { claim, agentCredentialDigest } = await Sentry.startSpan(
+		{ name: "claim", op: "sandbox" },
+		() => buildSandboxClaim({ row }),
+	);
 	let bootId: string | null = null;
-	const { hostTarget, booted } = await wakeSandbox({
+	const { hostTarget, booted, answer } = await wakeSandbox({
 		providerSandboxId: row.providerSandboxId,
 		claim,
 		beforeResume: async (box) => {
@@ -56,6 +87,16 @@ export async function wakeCloudWorkspace(
 			providerSandboxId: row.providerSandboxId,
 		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
 	}
+	if (booted) {
+		try {
+			recordBootSpans(answer);
+		} catch (error) {
+			console.error(
+				`[cloud-workspace] could not trace the boot of ${row.id}`,
+				error,
+			);
+		}
+	}
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
 		...(booted ? { bootAgentCredentialDigest: agentCredentialDigest } : {}),
@@ -68,6 +109,7 @@ export async function wakeCloudWorkspace(
 	}
 	return {
 		hostTarget,
+		booted,
 		agentCredentialsChanged:
 			!booted &&
 			row.bootAgentCredentialDigest !== null &&

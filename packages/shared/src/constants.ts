@@ -305,6 +305,9 @@ export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 export const CLOUD_WORKSPACE_START_TRANSACTION = "cloud-workspace.start";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
+/** Every wake records one; only those that resumed a stopped box are sent (`CLOUD_WORKSPACE_RESUMED_ATTRIBUTE`). */
+export const CLOUD_WORKSPACE_WAKE_TRANSACTION = "cloud-workspace.wake";
+export const CLOUD_WORKSPACE_RESUMED_ATTRIBUTE = "cloud_workspace.resumed";
 
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
