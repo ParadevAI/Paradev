@@ -3648,6 +3648,9 @@ msgstr "建置中…"
 msgid "Builds"
 msgstr "建置"
 
+msgid "Built"
+msgstr "建置時間"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "已建置 {0}"
@@ -4872,9 +4875,6 @@ msgstr "設定檔內容"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json 必須是 JSON 物件"
-
-msgid "Configuration"
-msgstr "設定"
 
 msgid "Configure"
 msgstr "配置"
@@ -7739,6 +7739,9 @@ msgstr "每個工作日上午9點，閱讀新的GitHub議題，打上標籤，�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在爭論這能否推廣。這場爭論本身就說明這一級別已經達到了。"
 
+msgid "Everyone in the organization, or only you."
+msgstr "組織中的所有人，或僅你自己。"
+
 msgid "Everyone sees new versions as they are published"
 msgstr "新版本一經發布，所有人都會看到"
 
@@ -8915,11 +8918,6 @@ msgstr "基於"
 msgid "From"
 msgstr "從"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "來自 {0}@{1} 上的 .paradev/config.toml。請在那裡修改。"
-
 msgid "from {parentName}"
 msgstr "來自 {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "在你的客戶端裡安裝Paradev MCP"
 
 msgid "Install plugin"
 msgstr "安裝外掛"
-
-msgid "Install script"
-msgstr "安裝指令碼"
 
 msgid "Install the desktop app"
 msgstr "安裝桌面應用程式"
@@ -12740,9 +12735,6 @@ msgstr "未連線"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未連結 · 雲端工作區以組織的 GitHub App 身分推送"
-
-msgid "Not defined"
-msgstr "未定義"
 
 msgid "Not demoed here"
 msgstr "此處未做演示"
@@ -16395,9 +16387,6 @@ msgstr "在你的機器上執行本地命令"
 msgid "Runs appear here once an automation fires."
 msgstr "自動化觸發後，執行會顯示在這裡。"
 
-msgid "Runs every time a workspace starts"
-msgstr "每次工作區啟動時執行"
-
 msgid "Runs in"
 msgstr "執行位置"
 
@@ -16421,9 +16410,6 @@ msgstr "建立新工作區時執行。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "刪除工作區時執行。"
-
-msgid "Runs when the environment builds"
-msgstr "建置環境時執行"
 
 msgid "Same version as this app."
 msgstr "與此應用程式版本相同。"

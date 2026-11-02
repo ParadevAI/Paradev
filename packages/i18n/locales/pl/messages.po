@@ -3648,6 +3648,9 @@ msgstr "Trwa kompilacja…"
 msgid "Builds"
 msgstr "Kompilacje"
 
+msgid "Built"
+msgstr "Zbudowano"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Skompilowano {0}"
@@ -4872,9 +4875,6 @@ msgstr "Zawartość pliku konfiguracyjnego"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json musi być obiektem JSON"
-
-msgid "Configuration"
-msgstr "Konfiguracja"
 
 msgid "Configure"
 msgstr "Skonfiguruj"
@@ -7739,6 +7739,9 @@ msgstr "W każdy dzień roboczy o 9:00 przeczytaj nowe zgłoszenia GitHub, nadaj
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Wszyscy spierają się, czy to się uogólnia. Ten spór jest znakiem, że poziom został osiągnięty."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Wszyscy w organizacji albo tylko Ty."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Wszyscy widzą nowe wersje w miarę ich publikowania"
 
@@ -8915,11 +8918,6 @@ msgstr "z"
 msgid "From"
 msgstr "Z"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "Z .paradev/config.toml w {0}@{1}. Zmień je tam."
-
 msgid "from {parentName}"
 msgstr "od {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "Zainstaluj Paradev MCP w swoim kliencie"
 
 msgid "Install plugin"
 msgstr "Zainstaluj wtyczkę"
-
-msgid "Install script"
-msgstr "Skrypt instalacji"
 
 msgid "Install the desktop app"
 msgstr "Zainstaluj aplikację desktopową"
@@ -12740,9 +12735,6 @@ msgstr "Niepołączone"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Niepołączone · obszary robocze w chmurze pushują jako GitHub App twojej organizacji"
-
-msgid "Not defined"
-msgstr "Nie zdefiniowano"
 
 msgid "Not demoed here"
 msgstr "Nie pokazano tutaj"
@@ -16395,9 +16387,6 @@ msgstr "Uruchamia lokalne polecenie na Twojej maszynie"
 msgid "Runs appear here once an automation fires."
 msgstr "Uruchomienia pojawią się tutaj, gdy automatyzacja zostanie wyzwolona."
 
-msgid "Runs every time a workspace starts"
-msgstr "Uruchamia się przy każdym starcie obszaru roboczego"
-
 msgid "Runs in"
 msgstr "Działa w"
 
@@ -16421,9 +16410,6 @@ msgstr "Uruchamia się przy tworzeniu obszaru roboczego."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Uruchamia się przy usuwaniu obszaru roboczego."
-
-msgid "Runs when the environment builds"
-msgstr "Uruchamia się podczas budowania środowiska"
 
 msgid "Same version as this app."
 msgstr "Ta sama wersja co ta aplikacja."

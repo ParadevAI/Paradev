@@ -3648,6 +3648,9 @@ msgstr "ビルド中…"
 msgid "Builds"
 msgstr "ビルド"
 
+msgid "Built"
+msgstr "ビルド日時"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "ビルド済み {0}"
@@ -4872,9 +4875,6 @@ msgstr "設定ファイルの内容"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json は JSON オブジェクトである必要があります"
-
-msgid "Configuration"
-msgstr "設定"
 
 msgid "Configure"
 msgstr "設定"
@@ -7739,6 +7739,9 @@ msgstr "平日午前9時に、新しいGitHub issueを読み、ラベルを付�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "これが一般化するかどうかで議論が起きます。その議論こそ、このレベルに到達した証拠です。"
 
+msgid "Everyone in the organization, or only you."
+msgstr "組織の全員、または自分だけ。"
+
 msgid "Everyone sees new versions as they are published"
 msgstr "公開された新しいバージョンが全員に表示されます"
 
@@ -8915,11 +8918,6 @@ msgstr "元:"
 msgid "From"
 msgstr "移動元"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "{0}@{1} の .paradev/config.toml から読み込んでいます。変更はそちらで行ってください。"
-
 msgid "from {parentName}"
 msgstr "{parentName} から"
 
@@ -9977,9 +9975,6 @@ msgstr "クライアントにParadev MCPをインストール"
 
 msgid "Install plugin"
 msgstr "プラグインをインストール"
-
-msgid "Install script"
-msgstr "インストールスクリプト"
 
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
@@ -12740,9 +12735,6 @@ msgstr "未接続"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未接続 · クラウドワークスペースは組織の GitHub App としてプッシュします"
-
-msgid "Not defined"
-msgstr "未定義"
 
 msgid "Not demoed here"
 msgstr "ここではデモしていません"
@@ -16395,9 +16387,6 @@ msgstr "マシン上でローカルコマンドを実行します"
 msgid "Runs appear here once an automation fires."
 msgstr "オートメーションが起動すると、ここに実行が表示されます。"
 
-msgid "Runs every time a workspace starts"
-msgstr "ワークスペースが起動するたびに実行"
-
 msgid "Runs in"
 msgstr "実行場所"
 
@@ -16421,9 +16410,6 @@ msgstr "新しいワークスペースの作成時に実行します。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "ワークスペースの削除時に実行します。"
-
-msgid "Runs when the environment builds"
-msgstr "環境のビルド時に実行"
 
 msgid "Same version as this app."
 msgstr "このアプリと同じバージョンです。"

@@ -3648,6 +3648,9 @@ msgstr "Sedang build…"
 msgid "Builds"
 msgstr "Build"
 
+msgid "Built"
+msgstr "Di-build"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Di-build {0}"
@@ -4872,9 +4875,6 @@ msgstr "Isi file konfigurasi"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json harus berupa objek JSON"
-
-msgid "Configuration"
-msgstr "Konfigurasi"
 
 msgid "Configure"
 msgstr "Atur"
@@ -7739,6 +7739,9 @@ msgstr "Tiap hari kerja jam 9 pagi, baca issue GitHub baru, terapkan label, dan 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Semua orang berdebat apakah ini bisa digeneralisasi. Perdebatan itu justru tanda bahwa levelnya sudah tercapai."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Semua orang di organisasi, atau hanya Anda."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Semua orang melihat versi baru begitu dipublikasikan"
 
@@ -8915,11 +8918,6 @@ msgstr "dari"
 msgid "From"
 msgstr "Dari"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "Dari .paradev/config.toml di {0}@{1}. Ubah di sana."
-
 msgid "from {parentName}"
 msgstr "dari {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "Pasang Paradev MCP di klien Anda"
 
 msgid "Install plugin"
 msgstr "Instal plugin"
-
-msgid "Install script"
-msgstr "Skrip instalasi"
 
 msgid "Install the desktop app"
 msgstr "Pasang aplikasi desktop"
@@ -12740,9 +12735,6 @@ msgstr "Tidak Terhubung"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Belum terhubung · workspace cloud melakukan push sebagai GitHub App organisasi Anda"
-
-msgid "Not defined"
-msgstr "Tidak ditentukan"
 
 msgid "Not demoed here"
 msgstr "Tidak didemokan di sini"
@@ -16395,9 +16387,6 @@ msgstr "Menjalankan perintah lokal di mesin Anda"
 msgid "Runs appear here once an automation fires."
 msgstr "Run muncul di sini setelah otomatisasi terpicu."
 
-msgid "Runs every time a workspace starts"
-msgstr "Berjalan setiap kali workspace dimulai"
-
 msgid "Runs in"
 msgstr "Berjalan di"
 
@@ -16421,9 +16410,6 @@ msgstr "Dijalankan saat ruang kerja baru dibuat."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Dijalankan saat ruang kerja dihapus."
-
-msgid "Runs when the environment builds"
-msgstr "Berjalan saat environment di-build"
 
 msgid "Same version as this app."
 msgstr "Versi yang sama dengan aplikasi ini."

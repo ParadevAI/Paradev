@@ -3648,6 +3648,9 @@ msgstr "Đang build…"
 msgid "Builds"
 msgstr "Bản build"
 
+msgid "Built"
+msgstr "Đã build"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Đã build {0}"
@@ -4872,9 +4875,6 @@ msgstr "Nội dung tệp cấu hình"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json phải là một đối tượng JSON"
-
-msgid "Configuration"
-msgstr "Cấu hình"
 
 msgid "Configure"
 msgstr "Cấu hình"
@@ -7739,6 +7739,9 @@ msgstr "Mỗi ngày trong tuần lúc 9h sáng, đọc issue GitHub mới, gán 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Ai cũng tranh cãi liệu điều này có khái quát được không. Chính cuộc tranh cãi đó là dấu hiệu mức này đã đạt được."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Mọi người trong tổ chức, hoặc chỉ bạn."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Mọi người thấy phiên bản mới ngay khi được xuất bản"
 
@@ -8915,11 +8918,6 @@ msgstr "từ"
 msgid "From"
 msgstr "Từ"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "Từ .paradev/config.toml trên {0}@{1}. Hãy thay đổi ở đó."
-
 msgid "from {parentName}"
 msgstr "từ {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "Cài Paradev MCP vào client của bạn"
 
 msgid "Install plugin"
 msgstr "Cài đặt plugin"
-
-msgid "Install script"
-msgstr "Script cài đặt"
 
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
@@ -12740,9 +12735,6 @@ msgstr "Chưa kết nối"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Chưa kết nối · workspace cloud push dưới danh nghĩa GitHub App của tổ chức bạn"
-
-msgid "Not defined"
-msgstr "Chưa định nghĩa"
 
 msgid "Not demoed here"
 msgstr "Không demo ở đây"
@@ -16395,9 +16387,6 @@ msgstr "Chạy một lệnh cục bộ trên máy bạn"
 msgid "Runs appear here once an automation fires."
 msgstr "Các lần chạy sẽ xuất hiện ở đây khi một tự động hóa được kích hoạt."
 
-msgid "Runs every time a workspace starts"
-msgstr "Chạy mỗi khi một workspace khởi động"
-
 msgid "Runs in"
 msgstr "Chạy trong"
 
@@ -16421,9 +16410,6 @@ msgstr "Chạy khi tạo không gian làm việc mới."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Chạy khi xóa không gian làm việc."
-
-msgid "Runs when the environment builds"
-msgstr "Chạy khi environment được build"
 
 msgid "Same version as this app."
 msgstr "Cùng phiên bản với ứng dụng này."

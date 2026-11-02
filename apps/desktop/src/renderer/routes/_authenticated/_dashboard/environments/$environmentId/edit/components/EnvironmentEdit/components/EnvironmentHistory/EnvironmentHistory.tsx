@@ -4,7 +4,14 @@ import { formatDateTime } from "@superset/i18n/format";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
-import { Table, TableBody, TableCell, TableRow } from "@superset/ui/table";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@superset/ui/table";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 const HISTORY_SCAN = 50;
@@ -43,10 +50,24 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 			</div>
 			<div className="overflow-hidden rounded-md border">
 				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>
+								<Trans>Built</Trans>
+							</TableHead>
+							<TableHead>
+								<Trans>Commit</Trans>
+							</TableHead>
+							<TableHead className="w-28" />
+						</TableRow>
+					</TableHeader>
 					<TableBody>
 						{kept.length === 0 ? (
 							<TableRow>
-								<TableCell className="py-6 text-center text-sm text-muted-foreground">
+								<TableCell
+									className="py-6 text-center text-sm text-muted-foreground"
+									colSpan={3}
+								>
 									<Trans>No environments built yet</Trans>
 								</TableCell>
 							</TableRow>

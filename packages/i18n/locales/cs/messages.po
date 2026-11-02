@@ -3648,6 +3648,9 @@ msgstr "Sestavuje se…"
 msgid "Builds"
 msgstr "Sestavení"
 
+msgid "Built"
+msgstr "Sestaveno"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Sestaveno {0}"
@@ -4872,9 +4875,6 @@ msgstr "Obsah konfiguračního souboru"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json musí být objekt JSON"
-
-msgid "Configuration"
-msgstr "Konfigurace"
 
 msgid "Configure"
 msgstr "Nastavit"
@@ -7739,6 +7739,9 @@ msgstr "Každý všední den v 9:00 přečti nové GitHub issues, přiřaď št�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Všichni se dohadují, jestli se to dá zobecnit. Právě ten spor je známkou toho, že úroveň byla dosažena."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Všichni v organizaci, nebo jen vy."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Všichni uvidí nové verze hned po zveřejnění"
 
@@ -8915,11 +8918,6 @@ msgstr "z"
 msgid "From"
 msgstr "Z"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "Z .paradev/config.toml v {0}@{1}. Změňte je tam."
-
 msgid "from {parentName}"
 msgstr "od {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "Nainstalujte Paradev MCP do svého klienta"
 
 msgid "Install plugin"
 msgstr "Nainstalovat plugin"
-
-msgid "Install script"
-msgstr "Instalační skript"
 
 msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
@@ -12740,9 +12735,6 @@ msgstr "Nepřipojeno"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Nepřipojeno · cloudové pracovní prostory pushují jako GitHub App vaší organizace"
-
-msgid "Not defined"
-msgstr "Nedefinováno"
 
 msgid "Not demoed here"
 msgstr "Tady se neukazuje"
@@ -16395,9 +16387,6 @@ msgstr "Spouští lokální příkaz na vašem počítači"
 msgid "Runs appear here once an automation fires."
 msgstr "Běhy se zde objeví, jakmile se automatizace spustí."
 
-msgid "Runs every time a workspace starts"
-msgstr "Spouští se při každém startu pracovního prostoru"
-
 msgid "Runs in"
 msgstr "Běží v"
 
@@ -16421,9 +16410,6 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
-
-msgid "Runs when the environment builds"
-msgstr "Spouští se při sestavení prostředí"
 
 msgid "Same version as this app."
 msgstr "Stejná verze jako tato aplikace."

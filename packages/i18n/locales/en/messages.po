@@ -3648,6 +3648,9 @@ msgstr "Building…"
 msgid "Builds"
 msgstr "Builds"
 
+msgid "Built"
+msgstr "Built"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Built {0}"
@@ -4872,9 +4875,6 @@ msgstr "Config file contents"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json must be a JSON object"
-
-msgid "Configuration"
-msgstr "Configuration"
 
 msgid "Configure"
 msgstr "Configure"
@@ -7739,6 +7739,9 @@ msgstr "Every weekday at 9am, read new GitHub issues, apply labels, and draft a 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Everyone in the organization, or only you."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Everyone sees new versions as they are published"
 
@@ -8915,11 +8918,6 @@ msgstr "from"
 msgid "From"
 msgstr "From"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "From .paradev/config.toml on {0}@{1}. Change them there."
-
 msgid "from {parentName}"
 msgstr "from {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "Install Paradev MCP in your client"
 
 msgid "Install plugin"
 msgstr "Install plugin"
-
-msgid "Install script"
-msgstr "Install script"
 
 msgid "Install the desktop app"
 msgstr "Install the desktop app"
@@ -12740,9 +12735,6 @@ msgstr "Not Connected"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Not connected · cloud workspaces push as your organization's GitHub App"
-
-msgid "Not defined"
-msgstr "Not defined"
 
 msgid "Not demoed here"
 msgstr "Not demoed here"
@@ -16395,9 +16387,6 @@ msgstr "Runs a local command on your machine"
 msgid "Runs appear here once an automation fires."
 msgstr "Runs appear here once an automation fires."
 
-msgid "Runs every time a workspace starts"
-msgstr "Runs every time a workspace starts"
-
 msgid "Runs in"
 msgstr "Runs in"
 
@@ -16421,9 +16410,6 @@ msgstr "Runs when a new workspace is created."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Runs when a workspace is deleted."
-
-msgid "Runs when the environment builds"
-msgstr "Runs when the environment builds"
 
 msgid "Same version as this app."
 msgstr "Same version as this app."

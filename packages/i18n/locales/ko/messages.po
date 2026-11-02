@@ -3648,6 +3648,9 @@ msgstr "빌드 중…"
 msgid "Builds"
 msgstr "빌드"
 
+msgid "Built"
+msgstr "빌드 시각"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "빌드됨 {0}"
@@ -4872,9 +4875,6 @@ msgstr "설정 파일 내용"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json은 JSON 객체여야 합니다"
-
-msgid "Configuration"
-msgstr "구성"
 
 msgid "Configure"
 msgstr "구성"
@@ -7739,6 +7739,9 @@ msgstr "평일 오전 9시마다 새 GitHub 이슈를 읽고, 라벨을 적용�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "이것이 일반화될 수 있는지를 두고 모두가 논쟁합니다. 그 논쟁 자체가 해당 단계에 도달했다는 신호입니다."
 
+msgid "Everyone in the organization, or only you."
+msgstr "조직의 모든 사람 또는 나만."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "새 버전이 게시되는 대로 모두가 볼 수 있습니다"
 
@@ -8915,11 +8918,6 @@ msgstr "기준"
 msgid "From"
 msgstr "기존 위치"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "{0}@{1}의 .paradev/config.toml에서 가져옵니다. 변경은 그곳에서 하세요."
-
 msgid "from {parentName}"
 msgstr "{parentName}에서"
 
@@ -9977,9 +9975,6 @@ msgstr "클라이언트에 Paradev MCP 설치하기"
 
 msgid "Install plugin"
 msgstr "플러그인 설치"
-
-msgid "Install script"
-msgstr "설치 스크립트"
 
 msgid "Install the desktop app"
 msgstr "데스크톱 앱 설치"
@@ -12740,9 +12735,6 @@ msgstr "연결 안 됨"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "연결되지 않음 · 클라우드 워크스페이스가 조직의 GitHub App으로 푸시합니다"
-
-msgid "Not defined"
-msgstr "정의되지 않음"
 
 msgid "Not demoed here"
 msgstr "여기서는 시연하지 않음"
@@ -16395,9 +16387,6 @@ msgstr "내 컴퓨터에서 로컬 명령을 실행합니다"
 msgid "Runs appear here once an automation fires."
 msgstr "자동화가 실행되면 여기에 표시됩니다."
 
-msgid "Runs every time a workspace starts"
-msgstr "워크스페이스가 시작될 때마다 실행"
-
 msgid "Runs in"
 msgstr "실행 위치"
 
@@ -16421,9 +16410,6 @@ msgstr "새 작업 공간을 만들 때 실행됩니다."
 
 msgid "Runs when a workspace is deleted."
 msgstr "작업 공간을 삭제할 때 실행됩니다."
-
-msgid "Runs when the environment builds"
-msgstr "환경을 빌드할 때 실행"
 
 msgid "Same version as this app."
 msgstr "이 앱과 같은 버전입니다."

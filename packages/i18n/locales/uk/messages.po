@@ -3642,6 +3642,9 @@ msgstr "Триває збірка…"
 msgid "Builds"
 msgstr "Збірки"
 
+msgid "Built"
+msgstr "Зібрано"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Зібрано {0}"
@@ -4866,9 +4869,6 @@ msgstr "Вміст файлу конфігурації"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json має бути об'єктом JSON"
-
-msgid "Configuration"
-msgstr "Конфігурація"
 
 msgid "Configure"
 msgstr "Налаштувати"
@@ -7733,6 +7733,9 @@ msgstr "Кожного буднього дня о 9:00 читай нові issue
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Усі сперечаються, чи це узагальнюється. Саме ця суперечка свідчить, що рівня досягнуто."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Усі в організації або лише ви."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Усі бачать нові версії одразу після публікації"
 
@@ -8909,11 +8912,6 @@ msgstr "від"
 msgid "From"
 msgstr "Звідки"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "З .paradev/config.toml у {0}@{1}. Змінюйте їх там."
-
 msgid "from {parentName}"
 msgstr "від {parentName}"
 
@@ -9971,9 +9969,6 @@ msgstr "Встановіть Paradev MCP у свій клієнт"
 
 msgid "Install plugin"
 msgstr "Встановити плагін"
-
-msgid "Install script"
-msgstr "Скрипт встановлення"
 
 msgid "Install the desktop app"
 msgstr "Встановити десктопний застосунок"
@@ -12734,9 +12729,6 @@ msgstr "Не підключено"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Не підключено · хмарні робочі простори пушать від імені GitHub App вашої організації"
-
-msgid "Not defined"
-msgstr "Не задано"
 
 msgid "Not demoed here"
 msgstr "Тут не демонструється"
@@ -16389,9 +16381,6 @@ msgstr "Виконує локальну команду на вашому ком�
 msgid "Runs appear here once an automation fires."
 msgstr "Запуски з'являться тут, щойно спрацює автоматизація."
 
-msgid "Runs every time a workspace starts"
-msgstr "Виконується під час кожного запуску робочого простору"
-
 msgid "Runs in"
 msgstr "Запускається в"
 
@@ -16415,9 +16404,6 @@ msgstr "Виконується під час створення нового р�
 
 msgid "Runs when a workspace is deleted."
 msgstr "Виконується під час видалення робочого простору."
-
-msgid "Runs when the environment builds"
-msgstr "Виконується під час збірки середовища"
 
 msgid "Same version as this app."
 msgstr "Та сама версія, що й у цього застосунку."

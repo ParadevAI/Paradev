@@ -3648,6 +3648,9 @@ msgstr "Bezig met bouwen…"
 msgid "Builds"
 msgstr "Builds"
 
+msgid "Built"
+msgstr "Gebouwd"
+
 #. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
 msgid "Built {0}"
 msgstr "Gebouwd {0}"
@@ -4872,9 +4875,6 @@ msgstr "Inhoud van het configuratiebestand"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json moet een JSON-object zijn"
-
-msgid "Configuration"
-msgstr "Configuratie"
 
 msgid "Configure"
 msgstr "Configureren"
@@ -7739,6 +7739,9 @@ msgstr "Elke werkdag om 9 uur: lees nieuwe GitHub-issues, plaats labels en stel 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Iedereen discussieert over de vraag of dit generaliseert. Die discussie is het teken dat het niveau is bereikt."
 
+msgid "Everyone in the organization, or only you."
+msgstr "Iedereen in de organisatie, of alleen jij."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Iedereen ziet nieuwe versies zodra ze worden gepubliceerd"
 
@@ -8915,11 +8918,6 @@ msgstr "vanaf"
 msgid "From"
 msgstr "Van"
 
-#. placeholder {0}: source.repository
-#. placeholder {1}: source.branch
-msgid "From .paradev/config.toml on {0}@{1}. Change them there."
-msgstr "Uit .paradev/config.toml op {0}@{1}. Wijzig ze daar."
-
 msgid "from {parentName}"
 msgstr "van {parentName}"
 
@@ -9977,9 +9975,6 @@ msgstr "Paradev MCP installeren in je client"
 
 msgid "Install plugin"
 msgstr "Plugin installeren"
-
-msgid "Install script"
-msgstr "Installatiescript"
 
 msgid "Install the desktop app"
 msgstr "Installeer de desktop-app"
@@ -12740,9 +12735,6 @@ msgstr "Niet verbonden"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Niet gekoppeld · cloudwerkruimtes pushen als de GitHub App van je organisatie"
-
-msgid "Not defined"
-msgstr "Niet ingesteld"
 
 msgid "Not demoed here"
 msgstr "Hier niet gedemonstreerd"
@@ -16395,9 +16387,6 @@ msgstr "Voert een lokaal commando uit op je machine"
 msgid "Runs appear here once an automation fires."
 msgstr "Runs verschijnen hier zodra een automatisering wordt geactiveerd."
 
-msgid "Runs every time a workspace starts"
-msgstr "Draait bij elke start van een werkruimte"
-
 msgid "Runs in"
 msgstr "Draait in"
 
@@ -16421,9 +16410,6 @@ msgstr "Wordt uitgevoerd bij het aanmaken van een werkruimte."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Wordt uitgevoerd bij het verwijderen van een werkruimte."
-
-msgid "Runs when the environment builds"
-msgstr "Draait wanneer de omgeving wordt gebouwd"
 
 msgid "Same version as this app."
 msgstr "Dezelfde versie als deze app."

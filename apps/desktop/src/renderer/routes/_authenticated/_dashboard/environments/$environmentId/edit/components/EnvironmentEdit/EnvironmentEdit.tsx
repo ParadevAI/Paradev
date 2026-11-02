@@ -8,7 +8,6 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Input } from "@superset/ui/input";
-import { Label } from "@superset/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -25,8 +24,9 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "renderer/routes/_authenticated/components/ArchiveEnvironmentDialog";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentVariablesPreview } from "renderer/routes/_authenticated/components/EnvironmentVariablesPreview";
+import { SettingsRow } from "renderer/routes/_authenticated/settings/components/SettingsRow";
+import { SettingsSection } from "renderer/routes/_authenticated/settings/components/SettingsSection";
 import { EnvironmentHistory } from "./components/EnvironmentHistory";
-import { EnvironmentScripts } from "./components/EnvironmentScripts";
 
 type Scope = "organization" | "personal";
 
@@ -127,32 +127,33 @@ export function EnvironmentEdit({
 				</div>
 			</header>
 
-			<section className="space-y-3">
-				<h3 className="text-base font-semibold">
-					<Trans>Configuration</Trans>
-				</h3>
-				<div className="space-y-4 rounded-lg border bg-card/50 p-4">
-					<div className="space-y-1.5">
-						<Label htmlFor="environment-name">
-							<Trans>Name</Trans>
-						</Label>
+			<SettingsSection title={t({ message: "General" })}>
+				<div>
+					<SettingsRow
+						htmlFor="environment-name"
+						label={t({ message: "Name" })}
+					>
 						<Input
 							autoFocus={focusName}
+							className="w-64"
 							id="environment-name"
 							maxLength={100}
 							onChange={(event) => setName(event.target.value)}
 							value={name}
 						/>
-					</div>
-					<div className="space-y-1.5">
-						<Label htmlFor="environment-scope">
-							<Trans>Visible to</Trans>
-						</Label>
+					</SettingsRow>
+					<SettingsRow
+						hint={t({
+							message: "Everyone in the organization, or only you.",
+						})}
+						htmlFor="environment-scope"
+						label={t({ message: "Visible to" })}
+					>
 						<Select
 							onValueChange={(value) => setScope(value as Scope)}
 							value={scope}
 						>
-							<SelectTrigger className="w-56" id="environment-scope">
+							<SelectTrigger className="w-64" id="environment-scope">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -164,47 +165,46 @@ export function EnvironmentEdit({
 								</SelectItem>
 							</SelectContent>
 						</Select>
-					</div>
-					<EnvironmentScripts environmentId={row.id} />
+					</SettingsRow>
 				</div>
-			</section>
+			</SettingsSection>
 
-			<section className="space-y-3">
-				<div>
-					<h3 className="text-base font-semibold">
-						<Trans>Repositories</Trans>
-					</h3>
-					<p className="mt-0.5 text-xs text-muted-foreground">
-						<Trans>
-							Changes apply to new workspaces. A new build starts automatically.
-						</Trans>
-					</p>
-				</div>
-				<div className="flex flex-col items-start gap-2 rounded-lg border bg-card/50 p-4">
-					{row.repositories.map((repository, index) => (
-						<span
-							className="inline-flex items-center gap-2 text-sm"
-							key={repository.id}
-						>
-							<FaGithub className="size-3.5 text-muted-foreground" />
-							{repository.fullName}
-							{index === 0 && (
-								<span className="text-[11px] text-muted-foreground">
-									<Trans>primary</Trans>
-								</span>
-							)}
-						</span>
-					))}
+			<SettingsSection
+				action={
 					<Button
-						className="mt-1 h-8"
+						className="h-8"
 						onClick={() => setEditingRepositories(true)}
 						size="sm"
 						variant="outline"
 					>
 						<Trans>Edit</Trans>
 					</Button>
+				}
+				description={t({
+					message:
+						"Changes apply to new workspaces. A new build starts automatically.",
+				})}
+				title={t({ message: "Repositories" })}
+			>
+				<div className="divide-y rounded-md border">
+					{row.repositories.map((repository, index) => (
+						<div
+							className="flex h-10 items-center gap-2.5 px-3 text-sm"
+							key={repository.id}
+						>
+							<FaGithub className="size-4 text-muted-foreground" />
+							<span className="min-w-0 flex-1 truncate">
+								{repository.fullName}
+							</span>
+							{index === 0 && (
+								<span className="text-[11px] text-muted-foreground">
+									<Trans>primary</Trans>
+								</span>
+							)}
+						</div>
+					))}
 				</div>
-			</section>
+			</SettingsSection>
 
 			<EnvironmentVariablesPreview environmentId={row.id} />
 			<EnvironmentHistory environmentId={row.id} />
