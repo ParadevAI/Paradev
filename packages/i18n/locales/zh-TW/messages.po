@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. js-lingui-explicit-id
+msgid "greeting"
+msgstr ""
+
 msgid " and "
 msgstr "和"
 
@@ -4225,6 +4229,9 @@ msgstr "無法關閉會話"
 
 msgid "Could not close the session"
 msgstr "無法關閉會話"
+
+msgid "Could not complete authorization. Please close this window and restart authorization from the application."
+msgstr "無法完成授權。請關閉此視窗，並從應用程式重新開始授權。"
 
 msgid "Could not connect {plugin}. Try again."
 msgstr "無法連線 {plugin}。請重試。"

@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. js-lingui-explicit-id
+msgid "greeting"
+msgstr ""
+
 msgid " and "
 msgstr " và "
 
@@ -4225,6 +4229,9 @@ msgstr "Không thể đóng phiên"
 
 msgid "Could not close the session"
 msgstr "Không thể đóng phiên"
+
+msgid "Could not complete authorization. Please close this window and restart authorization from the application."
+msgstr "Không thể hoàn tất ủy quyền. Hãy đóng cửa sổ này và bắt đầu lại ủy quyền từ ứng dụng."
 
 msgid "Could not connect {plugin}. Try again."
 msgstr "Không thể kết nối {plugin}. Vui lòng thử lại."

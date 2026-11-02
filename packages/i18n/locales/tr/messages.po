@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. js-lingui-explicit-id
+msgid "greeting"
+msgstr ""
+
 msgid " and "
 msgstr " ve "
 
@@ -4225,6 +4229,9 @@ msgstr "Oturum kapatılamadı"
 
 msgid "Could not close the session"
 msgstr "Oturum kapatılamadı"
+
+msgid "Could not complete authorization. Please close this window and restart authorization from the application."
+msgstr "Yetkilendirme tamamlanamadı. Bu pencereyi kapatın ve yetkilendirmeyi uygulamadan yeniden başlatın."
 
 msgid "Could not connect {plugin}. Try again."
 msgstr "{plugin} bağlanamadı. Yeniden deneyin."

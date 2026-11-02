@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. js-lingui-explicit-id
+msgid "greeting"
+msgstr ""
+
 msgid " and "
 msgstr " e "
 
@@ -4225,6 +4229,9 @@ msgstr "Não foi possível fechar a sessão"
 
 msgid "Could not close the session"
 msgstr "Não foi possível fechar a sessão"
+
+msgid "Could not complete authorization. Please close this window and restart authorization from the application."
+msgstr "Não foi possível concluir a autorização. Feche esta janela e reinicie a autorização pelo aplicativo."
 
 msgid "Could not connect {plugin}. Try again."
 msgstr "Não foi possível conectar o {plugin}. Tente novamente."

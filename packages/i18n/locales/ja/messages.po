@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. js-lingui-explicit-id
+msgid "greeting"
+msgstr ""
+
 msgid " and "
 msgstr "と"
 
@@ -4225,6 +4229,9 @@ msgstr "セッションを終了できませんでした"
 
 msgid "Could not close the session"
 msgstr "セッションを閉じられませんでした"
+
+msgid "Could not complete authorization. Please close this window and restart authorization from the application."
+msgstr "認可を完了できませんでした。このウィンドウを閉じて、アプリケーションから認可をやり直してください。"
 
 msgid "Could not connect {plugin}. Try again."
 msgstr "{plugin} に接続できませんでした。もう一度お試しください。"

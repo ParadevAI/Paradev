@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. js-lingui-explicit-id
+msgid "greeting"
+msgstr ""
+
 msgid " and "
 msgstr " 및 "
 
@@ -4225,6 +4229,9 @@ msgstr "세션을 닫을 수 없습니다"
 
 msgid "Could not close the session"
 msgstr "세션을 닫지 못했습니다"
+
+msgid "Could not complete authorization. Please close this window and restart authorization from the application."
+msgstr "인증을 완료할 수 없습니다. 이 창을 닫고 애플리케이션에서 인증을 다시 시작하세요."
 
 msgid "Could not connect {plugin}. Try again."
 msgstr "{plugin}을(를) 연결하지 못했습니다. 다시 시도하세요."
