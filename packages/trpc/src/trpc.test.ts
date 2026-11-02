@@ -62,15 +62,25 @@ const session = {
 const callerFor = ({
 	sandboxCaller = BOX as typeof BOX | null,
 	organization,
+	tokenOrganizations,
 }: {
 	sandboxCaller?: typeof BOX | null;
 	organization?: string;
+	tokenOrganizations?: string[];
 } = {}) => {
 	const headers = new Headers();
 	if (organization) headers.set("x-superset-organization-id", organization);
 	return createCallerFactory(router)(
 		createTRPCContext({
-			session: session as never,
+			session: (tokenOrganizations
+				? {
+						...session,
+						session: {
+							activeOrganizationId: null,
+							organizationIds: tokenOrganizations,
+						},
+					}
+				: session) as never,
 			auth: {} as never,
 			headers,
 			sandboxCaller,
@@ -140,6 +150,32 @@ describe("the organization a cloud workspace acts in", () => {
 		});
 		expect(await client.cloudWorkspace.list()).toEqual(CREATOR_ORGS);
 		expect(await client.user.myOrganization()).toBe("other-org");
+	});
+});
+
+describe("a bearer's token", () => {
+	test("vouches for the organizations it lists without a lookup", async () => {
+		membership = undefined;
+		try {
+			const bearer = callerFor({
+				sandboxCaller: null,
+				organization: "other-org",
+				tokenOrganizations: ["other-org"],
+			});
+			expect(await bearer.user.myOrganization()).toBe("other-org");
+			expect(await bearer.cloudWorkspace.list()).toEqual(["other-org"]);
+		} finally {
+			membership = { id: "membership" };
+		}
+	});
+
+	test("an organization joined since the token was minted is looked up", async () => {
+		const bearer = callerFor({
+			sandboxCaller: null,
+			organization: "other-org",
+			tokenOrganizations: ["box-org"],
+		});
+		expect(await bearer.user.myOrganization()).toBe("other-org");
 	});
 });
 

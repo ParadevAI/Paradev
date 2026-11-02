@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { posthog } from "../analytics";
 import type { SandboxCaller } from "../sandbox/api-credential";
+import { tokenOrganizationIds } from "../token-organizations";
 
 interface CloudAccessContext {
 	principal: { userId: string };
@@ -88,10 +89,17 @@ async function currentEmail(ctx: CloudAccessContext): Promise<string | null> {
 
 export interface MemberContext {
 	principal: { userId: string };
+	session: { session: object } | null;
+	activeOrganizationId: string | null;
 	sandboxCaller: SandboxCaller | null;
 }
 
-/** Whether the caller belongs to the organization now; a box acts only in its own. */
+/**
+ * Whether the caller belongs to the organization. The organization this
+ * request already checked, or one a bearer's token lists, needs no query; an
+ * organization joined since the token was minted is looked up. A box acts
+ * only in its own.
+ */
 export async function isMember(
 	ctx: MemberContext,
 	organizationId: string,
@@ -102,6 +110,8 @@ export async function isMember(
 	) {
 		return false;
 	}
+	if (organizationId === ctx.activeOrganizationId) return true;
+	if (tokenOrganizationIds(ctx.session)?.includes(organizationId)) return true;
 	return Boolean(
 		await findOrgMembership({ userId: ctx.principal.userId, organizationId }),
 	);
