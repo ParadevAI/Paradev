@@ -9,7 +9,7 @@ export default command({
 	description:
 		"List workspaces: cloud workspaces by default if your account has them, else this machine's; --local or --host picks a host",
 	options: {
-		host: string().desc("List workspaces on this host (machineId)"),
+		host: string().desc("List workspaces on this host (machineId), or `cloud`"),
 		local: boolean().desc("List workspaces on this machine"),
 		project: string().desc("Filter by project name (case-insensitive) or id"),
 		search: string()
