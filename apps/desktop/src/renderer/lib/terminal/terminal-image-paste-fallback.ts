@@ -62,16 +62,36 @@ export function isImageFilePaste(event: ClipboardEvent): boolean {
 }
 
 /**
- * A path the way a shell needs it: bare when it holds nothing a shell would
- * split or interpret, single-quoted otherwise. A document called
+ * A path the way the shell reading it needs it: bare when it holds nothing a
+ * shell would split or interpret, quoted otherwise. A document called
  * `annual report.pdf` used to paste as TWO arguments — the space separated it —
  * so the command opened neither file (#7904 review). Quoting only when needed
  * leaves the common case (`notes.pdf` into a TUI prompt) byte-for-byte as it
  * was.
+ *
+ * The quotes follow the shell the PTY runs, not the one this code was written
+ * on. `FALLBACK_SHELL` is `cmd.exe` on Windows
+ * (`apps/desktop/src/main/lib/terminal/env.ts`), where a single quote is an
+ * ordinary character: a POSIX-quoted `'C:\Users\me\annual report.pdf'` reaches
+ * the command line with the quotes attached and the space still splitting it
+ * (#7904 review). Windows paths also carry backslashes, which no POSIX shell
+ * would take bare, so the "nothing to quote" set differs per platform.
  */
-function quotePath(path: string): string {
-	if (/^[A-Za-z0-9_@%+=:,./-]+$/.test(path)) return path;
+const POSIX_SAFE_PATH = /^[A-Za-z0-9_@%+=:,./-]+$/;
+const WINDOWS_SAFE_PATH = /^[A-Za-z0-9_@%+=:,./\\-]+$/;
+
+export function quotePathForPlatform(path: string, platform: string): string {
+	const isWindows = platform.toLowerCase().includes("win");
+	if ((isWindows ? WINDOWS_SAFE_PATH : POSIX_SAFE_PATH).test(path)) return path;
+	if (isWindows) return `"${path.replace(/"/g, '""')}"`;
 	return `'${path.replace(/'/g, `'\\''`)}'`;
+}
+
+export function quotePath(path: string): string {
+	return quotePathForPlatform(
+		path,
+		String(globalThis.navigator?.platform ?? ""),
+	);
 }
 
 function filePaths(files: File[]): string[] {
@@ -116,7 +136,7 @@ export function handleImagePasteFallback(
 		// A local non-image file wants its path as text. Pasting nothing here
 		// is what made the gesture look like it did something while the
 		// document never arrived.
-		const paths = filePaths(files).map(quotePath);
+		const paths = filePaths(files).map((path) => quotePath(path));
 		if (paths.length === 0) return;
 		event.preventDefault();
 		event.stopImmediatePropagation();

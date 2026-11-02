@@ -5,6 +5,8 @@ import {
 	installImagePasteFallback,
 	isImageFilePaste,
 	isNonTextPaste,
+	quotePath,
+	quotePathForPlatform,
 } from "./terminal-image-paste-fallback";
 
 interface FakeClipboardData {
@@ -450,5 +452,47 @@ describe("pasting a file that is not an image", () => {
 
 			expect(paste).toHaveBeenCalledWith(expected);
 		}
+	});
+});
+
+describe("quotePath", () => {
+	// The quoting has to match the shell that will read the line: POSIX single
+	// quotes locally on macOS and Linux, double quotes on Windows where
+	// `FALLBACK_SHELL` is `cmd.exe` and a single quote is just a character
+	// (#7904 review).
+	it("keeps a POSIX path bare when nothing would split it", () => {
+		expect(quotePathForPlatform("/Users/alice/notes.pdf", "MacIntel")).toBe(
+			"/Users/alice/notes.pdf",
+		);
+	});
+
+	it("single-quotes on POSIX and escapes an apostrophe the POSIX way", () => {
+		expect(
+			quotePathForPlatform("/Users/alice/it's mine.pdf", "Linux x86_64"),
+		).toBe("'/Users/alice/it'\\''s mine.pdf'");
+	});
+
+	it("keeps a Windows path with backslashes bare, because cmd.exe does not split on them", () => {
+		expect(quotePathForPlatform("C:\\Users\\alice\\notes.pdf", "Win32")).toBe(
+			"C:\\Users\\alice\\notes.pdf",
+		);
+	});
+
+	it("double-quotes a Windows path a shell would split", () => {
+		expect(
+			quotePathForPlatform("C:\\Users\\alice\\annual report.pdf", "Win32"),
+		).toBe('"C:\\Users\\alice\\annual report.pdf"');
+	});
+
+	it("doubles an embedded double quote on Windows", () => {
+		expect(quotePathForPlatform('C:\\Users\\alice\\a"b.pdf', "Win32")).toBe(
+			'"C:\\Users\\alice\\a""b.pdf"',
+		);
+	});
+
+	it("follows the renderer's own platform when no platform is given", () => {
+		// navigator.platform is "MacIntel" in this environment, so the default
+		// path takes the POSIX branch and a space still gets single quotes.
+		expect(quotePath("a b.pdf")).toBe("'a b.pdf'");
 	});
 });
