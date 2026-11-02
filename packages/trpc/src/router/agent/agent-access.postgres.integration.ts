@@ -179,11 +179,42 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).rejects.toThrow("Channel not found");
 	});
 
-	test("an agent can't read a channel it wasn't granted", async () => {
-		const { token } = await agentWithChannel(admin);
+	test("a Dev reads what its owner can when the owner asks, and only its own channels for anyone else", async () => {
+		const forOwner = await agentWithChannel(admin);
+		await asAgent(forOwner.token).agentApi.channelMessages({
+			channelId: otherChannel,
+		});
+		const forOutsider = await agentWithChannel(outsider);
 		await expect(
-			asAgent(token).agentApi.channelMessages({ channelId: otherChannel }),
+			asAgent(forOutsider.token).agentApi.channelMessages({
+				channelId: otherChannel,
+			}),
 		).rejects.toThrow("Channel not found");
+	});
+
+	test("a Dev calls channel routes with its turn token, and person-only routes refuse it", async () => {
+		const { agent, token } = await agentWithChannel(admin);
+		const sent = await asAgent(token).channelMessage.send({
+			channelId: privateChannel,
+			body: "posted through the person route",
+			clientId: crypto.randomUUID(),
+		});
+		expect(sent.authorId).toBe(agent.id);
+		const page = await asAgent(token).channelMessage.list({
+			channelId: privateChannel,
+			limit: 50,
+		});
+		expect(page.messages.map((message) => message.id)).toContain(sent.id);
+		await expect(
+			asAgent(token).channelMessage.send({
+				channelId: otherChannel,
+				body: "not a member here",
+				clientId: crypto.randomUUID(),
+			}),
+		).rejects.toThrow("Join the channel first");
+		await expect(
+			asAgent(token).channelTask.project({ channelId: privateChannel }),
+		).rejects.toThrow("Not authenticated");
 	});
 
 	test("a message mid-turn joins it, and the turn settles only after the worker read it", async () => {
@@ -419,7 +450,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).toBe(agent.id);
 		await expect(
 			tools.reply({ target: `channel:${otherChannel}`, body: "hi" }),
-		).rejects.toThrow("Channel not found");
+		).rejects.toThrow("Join the channel first");
 		await tools.remember({ content: "Satya prefers short replies" });
 		expect(
 			(await tools.recall({ query: "short" })).map((note) => note.content),
@@ -985,10 +1016,15 @@ suite("agent access against a migrated PostgreSQL", () => {
 				await asAgent(token).devTools.channelTasks({ channel: "secret" })
 			).tasks.map((t) => t.title),
 		).toContain("Rotate keys");
+		expect(
+			(
+				await asAgent(token).channelTask.list({ channelId: privateChannel })
+			).map((t) => t.title),
+		).toContain("Rotate keys");
 	});
 
 	test("a Dev can't read a channel it or its person can't", async () => {
-		const { token } = await agentWithChannel(admin);
+		const { token } = await agentWithChannel(outsider);
 		await expect(
 			asAgent(token).devTools.readChannel({ channel: "#other" }),
 		).rejects.toThrow("No channel by that name");

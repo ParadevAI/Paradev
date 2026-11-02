@@ -4,14 +4,10 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { devProcedure } from "../../trpc";
-import {
-	assertCanPost,
-	channelNotFound,
-	loadChannelAccess,
-} from "../channel/access";
+import { loadChannelAccess, loadChannelAccessFor } from "../channel/access";
 import {
 	listTopLevelMessages,
-	postAgentMessage,
+	sendChannelMessage,
 } from "../channel/channel-message";
 import { listMessagesSchema } from "../channel/schema";
 
@@ -69,64 +65,26 @@ export const agentApiRouter = {
 	channelMessages: devProcedure
 		.input(listMessagesSchema)
 		.query(async ({ ctx, input }) => {
-			const { rows } = await db.execute<{ allowed: number }>(
-				sql`select authz.check_permission('agent', ${ctx.principal.agentId}, 'can_read', 'channel', ${input.channelId}) as allowed`,
-			);
-			if (rows[0]?.allowed !== 1) throw channelNotFound();
-			const [channel] = await db
-				.select({ organizationId: channels.organizationId })
-				.from(channels)
-				.where(eq(channels.id, input.channelId))
-				.limit(1);
-			if (channel?.organizationId !== ctx.principal.organizationId) {
-				throw channelNotFound();
-			}
-			if (ctx.principal.askerId) {
-				await loadChannelAccess(ctx.principal.askerId, input.channelId);
-			}
+			await loadChannelAccessFor(ctx.principal, input.channelId);
 			return listTopLevelMessages(input);
 		}),
 
-	/** The Dev's post_message tool: a message in a room it may post in, as itself. */
+	/** The worker's post of a turn's final answer, as the Dev. */
 	postMessage: devProcedure
 		.input(
 			z.object({
 				channelId: z.string().uuid(),
 				body: z.string().max(40_000),
 				threadRootId: z.string().uuid().nullish(),
-				idempotencyKey: z.string().min(1).max(200).optional(),
+				idempotencyKey: z.string().min(1).max(64).optional(),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => {
-			const { rows } = await db.execute<{ allowed: number }>(
-				sql`select authz.check_permission('agent', ${ctx.principal.agentId}, 'can_post', 'channel', ${input.channelId}) as allowed`,
-			);
-			if (rows[0]?.allowed !== 1) throw channelNotFound();
-			const [channel] = await db
-				.select()
-				.from(channels)
-				.where(eq(channels.id, input.channelId))
-				.limit(1);
-			if (channel?.organizationId !== ctx.principal.organizationId) {
-				throw channelNotFound();
-			}
-			if (ctx.principal.askerId) {
-				assertCanPost(
-					await loadChannelAccess(ctx.principal.askerId, channel.id),
-				);
-			}
-			const [agent] = await db
-				.select({ name: agents.name })
-				.from(agents)
-				.where(eq(agents.id, ctx.principal.agentId))
-				.limit(1);
-			return postAgentMessage({
-				channel,
-				agentId: ctx.principal.agentId,
-				agentName: agent?.name ?? "",
+		.mutation(({ ctx, input }) =>
+			sendChannelMessage(ctx, {
+				channelId: input.channelId,
 				body: input.body,
-				threadRootId: input.threadRootId ?? null,
-				idempotencyKey: input.idempotencyKey,
-			});
-		}),
+				threadRootId: input.threadRootId,
+				clientId: input.idempotencyKey ?? crypto.randomUUID(),
+			}),
+		),
 } satisfies TRPCRouterRecord;

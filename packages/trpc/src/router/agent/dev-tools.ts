@@ -6,7 +6,6 @@ import {
 	agents,
 	agentTaskRoleEnum,
 	agentTurns,
-	channels,
 	environments,
 	taskStatuses,
 	tasks,
@@ -16,7 +15,7 @@ import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { channelNotFound } from "../channel/access";
-import { postAgentMessage } from "../channel/channel-message";
+import { sendChannelMessage } from "../channel/channel-message";
 import { devChannelTools } from "./dev-channel-tools";
 import { devRoutineTools } from "./dev-routine-tools";
 import { mainProcedure } from "./main-procedure";
@@ -107,30 +106,11 @@ export const devToolsRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const target = parseReplyTarget(input.target);
 			if (!target) throw channelNotFound();
-			const { channelId, threadRootId } = target;
-			const { rows } = await db.execute<{ allowed: number }>(
-				sql`select authz.check_permission('agent', ${ctx.principal.agentId}, 'can_post', 'channel', ${channelId}) as allowed`,
-			);
-			if (rows[0]?.allowed !== 1) throw channelNotFound();
-			const [channel] = await db
-				.select()
-				.from(channels)
-				.where(eq(channels.id, channelId))
-				.limit(1);
-			if (channel?.organizationId !== ctx.principal.organizationId) {
-				throw channelNotFound();
-			}
-			const [agent] = await db
-				.select({ name: agents.name })
-				.from(agents)
-				.where(eq(agents.id, ctx.principal.agentId))
-				.limit(1);
-			const message = await postAgentMessage({
-				channel,
-				agentId: ctx.principal.agentId,
-				agentName: agent?.name ?? "",
+			const message = await sendChannelMessage(ctx, {
+				channelId: target.channelId,
+				threadRootId: target.threadRootId,
 				body: input.body,
-				threadRootId,
+				clientId: crypto.randomUUID(),
 			});
 			return { messageId: message.id };
 		}),
