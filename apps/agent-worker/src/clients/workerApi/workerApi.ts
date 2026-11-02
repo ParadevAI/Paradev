@@ -15,13 +15,18 @@ const TURN_TOKEN_HEADER = "x-agent-turn-token";
 
 /** A reply longer than one channel message goes as several, in order. */
 export function messageParts(body: string): string[] {
+	const characters = Array.from(body.trim());
 	const parts: string[] = [];
 	for (
 		let start = 0;
-		start < body.length;
+		start < characters.length;
 		start += CHANNEL_MESSAGE_MAX_LENGTH
 	) {
-		parts.push(body.slice(start, start + CHANNEL_MESSAGE_MAX_LENGTH));
+		const part = characters
+			.slice(start, start + CHANNEL_MESSAGE_MAX_LENGTH)
+			.join("")
+			.trim();
+		if (part) parts.push(part);
 	}
 	return parts.length > 0 ? parts : [body];
 }

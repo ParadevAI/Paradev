@@ -12,4 +12,11 @@ describe("messageParts", () => {
 		]);
 		expect(parts.join("")).toBe(reply);
 	});
+
+	test("trailing whitespace past the limit doesn't become an empty message", () => {
+		const reply = `${"a".repeat(CHANNEL_MESSAGE_MAX_LENGTH)}   \n`;
+		expect(messageParts(reply)).toEqual([
+			"a".repeat(CHANNEL_MESSAGE_MAX_LENGTH),
+		]);
+	});
 });

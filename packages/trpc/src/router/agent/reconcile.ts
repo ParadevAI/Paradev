@@ -2,7 +2,7 @@ import { sessionWorkflowId, stateQuery } from "@superset/agent-harness/session";
 import { db } from "@superset/db/client";
 import { agents, agentTurns } from "@superset/db/schema";
 import type { Client } from "@temporalio/client";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { posthog } from "../../lib/analytics";
 import { afterTaskTurn } from "./tasks";
 import { redeliverMessage, startTurnsForMessage } from "./turns";
@@ -53,7 +53,9 @@ export async function reconcileDevs(
 			message,
 			message.authorId,
 		);
-		count("redelivered", { messageId: message.id });
+		if (await answered(message.id)) {
+			count("redelivered", { messageId: message.id });
+		}
 	}
 
 	for (const turn of await staleRunningTurns(organizationId)) {
@@ -73,6 +75,21 @@ export async function reconcileDevs(
 		}
 	}
 	return report;
+}
+
+/** Whether a turn now holds the message; one still waiting for another person's turn doesn't. */
+async function answered(messageId: string): Promise<boolean> {
+	const [turn] = await db
+		.select({ id: agentTurns.id })
+		.from(agentTurns)
+		.where(
+			or(
+				eq(agentTurns.promptId, messageId),
+				sql`${messageId} = any(${agentTurns.steerPromptIds})`,
+			),
+		)
+		.limit(1);
+	return Boolean(turn);
 }
 
 /** Messages to a Dev that waited for another person's turn, as soon as it settles. */

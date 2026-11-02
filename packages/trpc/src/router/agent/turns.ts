@@ -25,6 +25,7 @@ import {
 	inArray,
 	isNull,
 	lt,
+	ne,
 	or,
 	sql,
 } from "drizzle-orm";
@@ -125,6 +126,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 					eq(agentTurns.sessionId, sessionId),
 					eq(agentTurns.status, "running"),
 					sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
+					ne(agentTurns.promptId, promptId),
 					samePersonOnly,
 				),
 			)
