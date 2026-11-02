@@ -1003,6 +1003,44 @@ suite("agent access against a migrated PostgreSQL", () => {
 		]);
 	});
 
+	test("a Dev reads its owner's pages for its owner, and only makes new ones for anyone else", async () => {
+		const [page] = await db
+			.insert(schema.pages)
+			.values({
+				slug: `owner-page-${crypto.randomUUID().slice(0, 8)}`,
+				organizationId: orgId,
+				createdByUserId: admin,
+				title: "Owner's plan",
+				visibility: "just_me",
+			})
+			.returning();
+		if (!page) throw Error("No page");
+		const forOwner = await agentWithChannel(admin);
+		expect(
+			await asAgent(forOwner.token).page.versions({ id: page.id }),
+		).toEqual([]);
+		expect(
+			(await asAgent(forOwner.token).page.listPaginated({})).items.map(
+				(item) => item.id,
+			),
+		).toContain(page.id);
+
+		const forOutsider = await agentWithChannel(outsider);
+		await expect(
+			asAgent(forOutsider.token).page.versions({ id: page.id }),
+		).rejects.toThrow("Page not found");
+		expect(
+			(await asAgent(forOutsider.token).page.listPaginated({})).items,
+		).toEqual([]);
+		await expect(
+			asAgent(forOutsider.token).page.publish({
+				fileId: crypto.randomUUID(),
+				filename: "page.html",
+				pageId: page.id,
+			}),
+		).rejects.toThrow("Page not found");
+	});
+
 	test("a Dev lists the tasks linked to a channel", async () => {
 		const { token } = await agentWithChannel(admin);
 		const { task } = await person(admin).task.create({ title: "Rotate keys" });

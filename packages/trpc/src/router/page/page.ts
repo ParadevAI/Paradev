@@ -39,7 +39,12 @@ import { env } from "../../env";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { deletePageStorage } from "../../lib/page-store";
 import { deleteObjects, objectExists, presignedGetUrl } from "../../lib/r2";
-import { personProcedure, publicProcedure, userError } from "../../trpc";
+import {
+	actorProcedure,
+	personProcedure,
+	publicProcedure,
+	userError,
+} from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	assertPageReadable,
@@ -52,6 +57,7 @@ import {
 import { pageAssetRouter } from "./assets";
 import { withCommentSummaries } from "./comment-summary";
 import { decodePageCursor, encodePageCursor } from "./cursor";
+import { noPageAccess, pageCaller, pageReader } from "./page-caller";
 import { pageUrl } from "./page-url";
 import { pagePreview } from "./preview";
 import { publishPage } from "./publish";
@@ -490,14 +496,17 @@ export const pageRouter = {
 			});
 		}),
 
-	publish: personProcedure
+	publish: actorProcedure
 		.input(publishPageSchema)
 		.mutation(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
+			const caller = await pageCaller(ctx);
+			if (!caller.reader && (input.pageId || input.workspaceId)) {
+				throw noPageAccess();
+			}
 			return await publishPage({
 				input,
-				organizationId,
-				userId: ctx.session.user.id,
+				organizationId: caller.organizationId,
+				userId: caller.userId,
 			});
 		}),
 
@@ -525,12 +534,14 @@ export const pageRouter = {
 			return all;
 		}),
 
-	listPaginated: personProcedure
+	listPaginated: actorProcedure
 		.input(listPagesSchema)
 		.query(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
+			const caller = await pageCaller(ctx);
+			const userId = caller.reader;
+			if (!userId) return { items: [], nextCursor: null };
 			const batch = await listPageBatch({
-				organizationId: await requireActiveOrgMembership(ctx),
+				organizationId: caller.organizationId,
 				userId,
 				input,
 			});
@@ -642,13 +653,13 @@ export const pageRouter = {
 			};
 		}),
 
-	get: personProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
-		const organizationId = await requireActiveOrgMembership(ctx);
+	get: actorProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
+		const caller = await pageCaller(ctx);
 		const page = await loadPage({
 			id: input.id,
 			slug: input.slug,
-			organizationId,
-			userId: ctx.session.user.id,
+			organizationId: caller.organizationId,
+			userId: pageReader(caller),
 		});
 
 		const latestVersion = await latestVersionNumber(page.id);
@@ -1140,15 +1151,15 @@ export const pageRouter = {
 			return { id: page.id, deleted: true };
 		}),
 
-	versions: personProcedure
+	versions: actorProcedure
 		.input(pageRefSchema)
 		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
+			const caller = await pageCaller(ctx);
 			const page = await loadPage({
 				id: input.id,
 				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
+				organizationId: caller.organizationId,
+				userId: pageReader(caller),
 			});
 
 			const rows = await db
@@ -1179,13 +1190,13 @@ export const pageRouter = {
 			);
 		}),
 
-	pull: personProcedure.input(pullPageSchema).query(async ({ ctx, input }) => {
-		const organizationId = await requireActiveOrgMembership(ctx);
+	pull: actorProcedure.input(pullPageSchema).query(async ({ ctx, input }) => {
+		const caller = await pageCaller(ctx);
 		const page = await loadPage({
 			id: input.id,
 			slug: input.slug,
-			organizationId,
-			userId: ctx.session.user.id,
+			organizationId: caller.organizationId,
+			userId: pageReader(caller),
 		});
 
 		const latestVersion = await latestVersionNumber(page.id);
