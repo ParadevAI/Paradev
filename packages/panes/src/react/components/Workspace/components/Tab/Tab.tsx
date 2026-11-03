@@ -407,6 +407,7 @@ export function Tab<TData>({
 }: TabProps<TData>) {
 	const isCards = usePaneAppearance() === "cards";
 	const newPaneIds = useNewPaneIds(
+		tab.id,
 		tab.layout ? getPaneIdsInLayout(tab.layout) : [],
 	);
 	if (!tab.layout) {

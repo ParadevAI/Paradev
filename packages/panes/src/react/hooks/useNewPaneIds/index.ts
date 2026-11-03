@@ -1,1 +1,5 @@
-export { newPaneIds, useNewPaneIds } from "./useNewPaneIds";
+export {
+	newPaneIds,
+	newPaneIdsInTab,
+	useNewPaneIds,
+} from "./useNewPaneIds";

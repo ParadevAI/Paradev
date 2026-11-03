@@ -11,14 +11,32 @@ export function newPaneIds(
 	return added;
 }
 
+export interface SeenPanes {
+	tabId: string;
+	ids: ReadonlySet<string>;
+}
+
+/** `newPaneIds` for one tab: a different tab than `seen` was showing is a first look. */
+export function newPaneIdsInTab(
+	tabId: string,
+	paneIds: readonly string[],
+	seen: SeenPanes | null,
+): ReadonlySet<string> {
+	return newPaneIds(paneIds, seen?.tabId === tabId ? seen.ids : null);
+}
+
 /**
- * Which of `paneIds` joined since the last render. The first render reports
- * none, so a restored layout and a freshly opened tab appear at once; only a
- * pane added to a tab that is already on screen counts as new.
+ * Which of `paneIds` joined `tabId` since the last render of that same tab.
+ * The first look at a tab reports none, so a restored layout, a fresh tab
+ * and a switch to another tab all appear at once; only a pane added to the
+ * tab already on screen counts as new.
  */
-export function useNewPaneIds(paneIds: readonly string[]): ReadonlySet<string> {
-	const seenRef = useRef<Set<string> | null>(null);
-	const added = newPaneIds(paneIds, seenRef.current);
-	seenRef.current = new Set(paneIds);
+export function useNewPaneIds(
+	tabId: string,
+	paneIds: readonly string[],
+): ReadonlySet<string> {
+	const seenRef = useRef<SeenPanes | null>(null);
+	const added = newPaneIdsInTab(tabId, paneIds, seenRef.current);
+	seenRef.current = { tabId, ids: new Set(paneIds) };
 	return added;
 }

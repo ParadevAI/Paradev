@@ -3,7 +3,7 @@
 	--animate-spin-slow: spin-slow 3.6s linear infinite;
 	--animate-block-fade: block-fade 320ms ease-out both;
 	--animate-thinking-pulse: thinking-pulse 1.8s ease-in-out infinite;
-	--animate-pane-appear: pane-appear 520ms linear both;
+	--animate-pane-appear: pane-appear 440ms linear both;
 
 	@keyframes shimmer {
 		from {
@@ -36,44 +36,40 @@
 		}
 	}
 
-	/* A spring (stiffness 300, damping 22, mass 1) sampled every 40ms: one
-	   overshoot of about 4% at 180ms, settled by 520ms. Linear timing between
+	/* A spring (stiffness 300, damping 26, mass 1) sampled every 40ms: one
+	   overshoot of about 1.5% at 180ms, settled by 440ms. Linear timing between
 	   the samples keeps the curve a spring instead of an ease. */
 	@keyframes pane-appear {
 		0% {
 			opacity: 0;
-			transform: scale(0.92);
+			transform: scale(0.94);
 		}
-		8% {
-			opacity: 0.55;
-			transform: scale(0.955);
+		9% {
+			opacity: 0.6;
+			transform: scale(0.97);
 		}
-		15% {
-			opacity: 0.9;
-			transform: scale(0.995);
+		18% {
+			opacity: 0.95;
+			transform: scale(0.998);
 		}
-		23% {
+		27% {
 			opacity: 1;
-			transform: scale(1.022);
+			transform: scale(1.011);
 		}
-		35% {
-			transform: scale(1.038);
+		41% {
+			transform: scale(1.015);
 		}
-		46% {
-			transform: scale(1.024);
-		}
-		58% {
-			transform: scale(1.006);
+		55% {
+			transform: scale(1.008);
 		}
 		70% {
-			transform: scale(0.997);
+			transform: scale(1.002);
 		}
-		82% {
-			transform: scale(0.998);
+		85% {
+			transform: scale(0.999);
 		}
 		100% {
 			opacity: 1;
 			transform: scale(1);
 		}
-	}
 }
