@@ -1335,6 +1335,9 @@ msgstr "{teardownFailureCount, plural, one {Usuń mimo to} few {Usuń # mimo to}
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {scalono # PR agenta} few {scalono # PR agenta} many {scalono # PR agenta} other {scalono # PR agenta}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} tokenów · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} przerwane"
 
@@ -5207,6 +5210,9 @@ msgstr "Zawiera ten tekst..."
 msgid "Context"
 msgstr "Kontekst"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Kontekst {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Menu kontekstowe"
 
@@ -7708,6 +7714,9 @@ msgstr "esc aby zamknąć"
 msgid "esc to exit"
 msgstr "esc aby wyjść"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Szacunek według cennika API, a nie faktycznie wydane pieniądze"
+
 msgid "Event"
 msgstr "Zdarzenie"
 
@@ -9849,6 +9858,9 @@ msgstr "Ulepszona przeglądarka różnic"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "w {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Wejście {input} · Wyjście {output} · W pamięci podręcznej {cached}"
 
 msgid "in a new session"
 msgstr "w nowej sesji"
@@ -17214,6 +17226,9 @@ msgstr "Migawki sesji i cofanie"
 
 msgid "Session status"
 msgstr "Stan sesji"
+
+msgid "Session usage"
+msgstr "Użycie sesji"
 
 msgid "Sessions"
 msgstr "Sesje"

@@ -19,6 +19,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { env } from "renderer/env.renderer";
+import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
@@ -76,7 +77,9 @@ import {
 	type PullRequestEntry,
 	PullRequestRow,
 } from "./components/PullRequestRow";
+import { SessionUsageRow } from "./components/SessionUsageRow";
 import { ShipActionsMenu, type ShipView } from "./components/ShipActionsMenu";
+import { SubagentUsageLabel } from "./components/SubagentUsageLabel";
 import {
 	PANEL_EXIT_MS,
 	PANEL_MAX_HEIGHT_PX,
@@ -302,6 +305,15 @@ export function WorkspaceActivityMenu({
 		[detachedTerminals],
 	);
 	const agentWork = useAgentWork(workspaceId);
+	const agentBindings = useTerminalAgentBindings(workspaceId);
+	// Claude is the harness whose transcript records per-request usage.
+	const usageTerminalIds = useMemo(
+		() =>
+			[...agentBindings.values()]
+				.filter((binding) => binding.agentId === "claude" && !binding.endedAt)
+				.map((binding) => binding.terminalId),
+		[agentBindings],
+	);
 	const linkedPullRequests = useWorkspacePullRequests(workspaceId, {
 		enabled: open,
 	});
@@ -540,6 +552,26 @@ export function WorkspaceActivityMenu({
 		);
 	};
 
+	// Only terminal subagents have a transcript the host can price; chat
+	// sessions carry a sessionId and report usage through their own stream.
+	const subagentUsage = (
+		work: {
+			kind?: string;
+			sessionId?: string;
+			terminalId: string;
+			taskId: string;
+		},
+		live: boolean,
+	) =>
+		work.kind !== "shell" && !work.sessionId ? (
+			<SubagentUsageLabel
+				workspaceId={workspaceId}
+				terminalId={work.terminalId}
+				subagentId={work.taskId}
+				live={live}
+			/>
+		) : undefined;
+
 	const agentRows = (items: AgentWork[]) =>
 		items.map((work) => (
 			<AgentWorkRow
@@ -555,6 +587,7 @@ export function WorkspaceActivityMenu({
 				onMoveToBackground={(target) =>
 					runPending(target, agentActions.moveToBackground)
 				}
+				detail={subagentUsage(work, open)}
 			/>
 		));
 
@@ -681,6 +714,7 @@ export function WorkspaceActivityMenu({
 											onOpen={(target) =>
 												agentActions.open(target, { subagent: true })
 											}
+											detail={subagentUsage(entry, false)}
 										/>
 									))}
 								</div>
@@ -694,6 +728,25 @@ export function WorkspaceActivityMenu({
 								<div>
 									{agentRows(agentWork.shells)}
 									{workRows(processes)}
+								</div>
+							</MenuGroup>
+						)}
+						{usageTerminalIds.length > 0 && (
+							<MenuGroup title={<Trans>Session usage</Trans>}>
+								<div>
+									{usageTerminalIds.map((terminalId) => (
+										<SessionUsageRow
+											key={terminalId}
+											workspaceId={workspaceId}
+											terminalId={terminalId}
+											source={
+												usageTerminalIds.length > 1
+													? sourceOf(terminalId)
+													: undefined
+											}
+											live={open}
+										/>
+									))}
 								</div>
 							</MenuGroup>
 						)}

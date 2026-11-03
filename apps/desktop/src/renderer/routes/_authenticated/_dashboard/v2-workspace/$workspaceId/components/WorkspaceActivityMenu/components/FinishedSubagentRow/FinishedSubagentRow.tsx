@@ -1,15 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Bot } from "lucide-react";
+import type { ReactNode } from "react";
 import type { FinishedSubagent } from "../../stores/activityPanelStore";
 
 export function FinishedSubagentRow({
 	entry,
 	source,
 	onOpen,
+	detail,
 }: {
 	entry: FinishedSubagent;
 	source?: string;
 	onOpen: (entry: FinishedSubagent) => void;
+	/** Extra line under the name, such as the subagent's token usage. */
+	detail?: ReactNode;
 }) {
 	const { t } = useLingui();
 	return (
@@ -28,6 +32,7 @@ export function FinishedSubagentRow({
 						{source}
 					</span>
 				)}
+				{detail}
 			</span>
 			<span className="shrink-0 text-[11px] text-muted-foreground/70">
 				<Trans context="subagent status">Done</Trans>

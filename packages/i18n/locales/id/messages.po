@@ -1335,6 +1335,9 @@ msgstr "{teardownFailureCount, plural, one {Tetap hapus} other {Tetap hapus #}}"
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} token · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
 
@@ -5207,6 +5210,9 @@ msgstr "Mengandung teks ini..."
 msgid "Context"
 msgstr "Konteks"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Konteks {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Menu Konteks"
 
@@ -7708,6 +7714,9 @@ msgstr "esc untuk menutup"
 msgid "esc to exit"
 msgstr "esc untuk keluar"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Perkiraan dengan harga daftar API, bukan uang yang dibelanjakan"
+
 msgid "Event"
 msgstr "Peristiwa"
 
@@ -9849,6 +9858,9 @@ msgstr "Penampil diff yang lebih baik"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "di {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Masuk {input} · Keluar {output} · Cache {cached}"
 
 msgid "in a new session"
 msgstr "dalam sesi baru"
@@ -17214,6 +17226,9 @@ msgstr "Snapshot sesi & pengembalian"
 
 msgid "Session status"
 msgstr "Status sesi"
+
+msgid "Session usage"
+msgstr "Penggunaan sesi"
 
 msgid "Sessions"
 msgstr "Sesi"
