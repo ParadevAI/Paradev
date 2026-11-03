@@ -30,6 +30,9 @@ export const env = createEnv({
 		// API's per-IP anonymous limiter does not count every render as one
 		// visitor. Absent means those reads are anonymous, as they always were.
 		LEADERBOARD_INTERNAL_TOKEN: z.string().min(1).optional(),
+		// PostHog project secret key (feature_flag:read), for server-side flag
+		// evaluation in experiments. Unused while no experiment runs.
+		POSTHOG_PROJECT_SECRET_KEY: z.string().optional(),
 	},
 	client: {
 		NEXT_PUBLIC_API_URL: z.string().url(),
