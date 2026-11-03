@@ -110,11 +110,9 @@ export const chatHistoryRouter = {
 							)
 							.limit(1);
 						if (moving) throw stillMovingHere();
-						if (caller.sandbox && (await movedAwayFrom(tx, input))) {
-							throw movedAway();
-						}
 					}
-					if (!canAccess(caller, existing)) {
+					// Owner only: a box whose chat moved away must hear CONFLICT, not NOT_FOUND.
+					if (!canAccess({ ...caller, sandbox: null }, existing)) {
 						throw userError({
 							code: "NOT_FOUND",
 							message: "Chat session not found",
@@ -199,13 +197,13 @@ export const chatHistoryRouter = {
 						lastSeq: sameEpoch
 							? sql`greatest(coalesce(${chatSessions.lastSeq}, 0), ${folded.lastSeq})`
 							: folded.lastSeq,
-						...(freshState
-							? {
-									status: freshState.status,
-									...(freshState.title ? { title: freshState.title } : {}),
-								}
-							: {}),
-						lastActiveAt: new Date(),
+						...(freshState ? { status: freshState.status } : {}),
+						...(freshState?.title !== undefined
+							? { title: freshState.title }
+							: !sameEpoch
+								? { title: null }
+								: {}),
+						...(batchIsStale ? {} : { lastActiveAt: new Date() }),
 					})
 					.where(eq(chatSessions.id, input.sessionId));
 			});
@@ -317,24 +315,6 @@ export const chatHistoryRouter = {
 } satisfies TRPCRouterRecord;
 
 /** The box's workspace held the chat until a move took it elsewhere. */
-async function movedAwayFrom(
-	tx: Parameters<Parameters<typeof dbWs.transaction>[0]>[0],
-	input: { sessionId: string; workspaceId: string },
-): Promise<boolean> {
-	const [moved] = await tx
-		.select({ id: chatMoves.id })
-		.from(chatMoves)
-		.where(
-			and(
-				eq(chatMoves.sessionId, input.sessionId),
-				eq(chatMoves.fromWorkspaceId, input.workspaceId),
-				eq(chatMoves.status, "ready"),
-			),
-		)
-		.limit(1);
-	return moved !== undefined;
-}
-
 async function loadTranscript(transcriptId: string) {
 	const transcript = await db.query.chatTranscripts.findFirst({
 		where: eq(chatTranscripts.id, transcriptId),

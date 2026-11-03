@@ -3,13 +3,19 @@ import { MAX_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
 import { z } from "zod";
 
 export const MAX_PUSH_EVENTS = 500;
+export const MAX_PUSH_BYTES = 1024 * 1024;
 const MAX_EVENT_BYTES = 512 * 1024;
+const MAX_SEQ = 2_147_483_647;
+
+export function eventBytes(event: unknown): number {
+	return Buffer.byteLength(JSON.stringify(event));
+}
 
 const pushedEventSchema = z.object({
-	seq: z.number().int().positive(),
+	seq: z.number().int().positive().max(MAX_SEQ),
 	ts: z.number(),
 	event: durableEventSchema.refine(
-		(event) => Buffer.byteLength(JSON.stringify(event)) <= MAX_EVENT_BYTES,
+		(event) => eventBytes(event) <= MAX_EVENT_BYTES,
 		{ message: "A chat event is too large; cut its tool output first" },
 	),
 });
@@ -21,8 +27,20 @@ export const pushInputSchema = z.object({
 	harness: z.string().min(1).max(100),
 	harnessSessionId: z.string().min(1).max(200).optional(),
 	epoch: z.string().min(1).max(100),
-	events: z.array(pushedEventSchema).min(1).max(MAX_PUSH_EVENTS),
+	events: z
+		.array(pushedEventSchema)
+		.min(1)
+		.max(MAX_PUSH_EVENTS)
+		.refine(
+			(events) =>
+				events.reduce((total, { event }) => total + eventBytes(event), 0) <=
+				MAX_PUSH_BYTES,
+			{ message: "Too many chat event bytes in one push; send fewer events" },
+		),
 });
+
+/** Everything in a push but its events, checked before a host sends any. */
+export const pushSessionSchema = pushInputSchema.omit({ events: true });
 
 /** What an agent names its session files by; never a path. */
 const harnessSessionIdSchema = z

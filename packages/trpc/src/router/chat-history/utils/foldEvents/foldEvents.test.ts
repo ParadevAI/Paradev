@@ -30,6 +30,42 @@ describe("foldEvents", () => {
 		expect(folded.lastSeq).toBe(7);
 	});
 
+	test("keeps the newest version of each turn and its first seq", () => {
+		const turn = (status: string): DurableEvent =>
+			({
+				type: "turn",
+				turn: { id: "t1", status, startedAtMs: 5 },
+			}) as DurableEvent;
+		const folded = foldEvents([
+			{ seq: 9, ts: 0, event: turn("completed") },
+			{ seq: 2, ts: 0, event: turn("running") },
+		]);
+		expect(folded.turns).toHaveLength(1);
+		expect(folded.turns[0]).toMatchObject({
+			seq: 9,
+			firstSeq: 2,
+			status: "completed",
+			body: { status: "completed" },
+		});
+	});
+
+	test("a time out of the Date range is no date", () => {
+		const folded = foldEvents([
+			{
+				seq: 1,
+				ts: 0,
+				event: {
+					...tool("running"),
+					item: {
+						...(tool("running") as { item: object }).item,
+						startedAtMs: 1e20,
+					},
+				} as DurableEvent,
+			},
+		]);
+		expect(folded.items[0]?.startedAt).toBeNull();
+	});
+
 	test("drops availableCommands from the session state", () => {
 		const folded = foldEvents([
 			{

@@ -7,7 +7,7 @@ import {
 } from "./prepareEvent";
 
 describe("prepareEventForCloud", () => {
-	test("cuts long tool output and drops the session's command list", () => {
+	test("cuts long tool output and keeps only a session's short fields", () => {
 		const tool = prepareEventForCloud({
 			type: "item",
 			turnId: "t",
@@ -30,12 +30,21 @@ describe("prepareEventForCloud", () => {
 			session: {
 				status: "idle",
 				harness: "claude-acp",
+				title: "Fix the build",
 				availableCommands: [{ name: "init", description: "" }],
+				availableModels: Array.from({ length: 50_000 }, (_, index) => ({
+					id: `model-${index}`,
+					label: `Model ${index}`,
+				})),
 			},
 		} as DurableEvent);
 		expect(session).toEqual({
 			type: "session",
-			session: { status: "idle", harness: "claude-acp" },
+			session: {
+				status: "idle",
+				harness: "claude-acp",
+				title: "Fix the build",
+			},
 		} as DurableEvent);
 	});
 
@@ -79,6 +88,23 @@ describe("prepareEventForCloud", () => {
 		expect(eventBytes(cut)).toBeLessThanOrEqual(MAX_EVENT_BYTES);
 	});
 
+	test("cuts a message's other strings before its text", () => {
+		const text = "m".repeat(300_000);
+		const event = prepareEventForCloud({
+			type: "item",
+			turnId: "t",
+			item: {
+				id: "a",
+				kind: "agent_message",
+				text,
+				model: "x".repeat(200_000),
+				startedAtMs: 0,
+			},
+		} as DurableEvent);
+		expect(event.type === "item" && event.item.text).toBe(text);
+		expect(eventBytes(event)).toBeLessThanOrEqual(MAX_EVENT_BYTES);
+	});
+
 	test("cuts every long string tighter when their total is still too large", () => {
 		const event = prepareEventForCloud(
 			toolCall({
@@ -107,6 +133,24 @@ describe("prepareEventForCloud", () => {
 			content: [],
 			bodyOmitted: true,
 		});
+	});
+
+	test("keeps long ids whole", () => {
+		const id = "i".repeat(10_000);
+		const turnId = "t".repeat(10_000);
+		const long = toolCall({
+			content: Array.from({ length: 10 }, () => ({
+				type: "text",
+				text: "a".repeat(60_000),
+			})),
+		}) as Extract<DurableEvent, { type: "item" }>;
+		const prepared = prepareEventForCloud({
+			...long,
+			turnId,
+			item: { ...long.item, id },
+		} as DurableEvent);
+		expect(prepared.type === "item" && prepared.item.id).toBe(id);
+		expect(prepared.type === "item" && prepared.turnId).toBe(turnId);
 	});
 
 	test("does not cut a character in half", () => {

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -323,5 +323,31 @@ describe("ChatJournal onAppend", () => {
 			item: agentMessage("m", "hi"),
 		});
 		expect(seen.map((envelope) => envelope.cursor.seq)).toEqual([1]);
+	});
+
+	test("reports a listener's rejected promise with the event it failed on", async () => {
+		const logged = spyOn(console, "error").mockImplementation(() => {});
+		const runtime = createTestRuntime({
+			onAppend: async () => {
+				throw new Error("listener failed");
+			},
+		});
+		runtime.journal.open({ sessionId: "s", scopeId: "w", harness: "fake" });
+		runtime.journal.append("s", {
+			type: "item",
+			turnId: "t1",
+			item: agentMessage("m", "hi"),
+		});
+		await Promise.resolve();
+		await Promise.resolve();
+		try {
+			expect(logged).toHaveBeenCalledWith(
+				"[chat-journal] onAppend listener failed",
+				{ sessionId: "s", cursor: { epoch: expect.any(String), seq: 1 } },
+				expect.any(Error),
+			);
+		} finally {
+			logged.mockRestore();
+		}
 	});
 });
