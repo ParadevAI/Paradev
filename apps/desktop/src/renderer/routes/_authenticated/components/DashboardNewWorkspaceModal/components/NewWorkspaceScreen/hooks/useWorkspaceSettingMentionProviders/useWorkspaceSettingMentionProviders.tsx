@@ -109,6 +109,7 @@ export function useWorkspaceSettingMentionProviders({
 					...otherHosts.map((host) => ({
 						id: `host:${host.id}`,
 						label: host.name,
+						description: host.isOnline ? undefined : t({ message: "offline" }),
 						keywords: hostKeywords,
 						icon: <HiOutlineServer className="size-4" />,
 						select: () => onSelectHostId(host.id),
