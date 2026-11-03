@@ -285,7 +285,6 @@ function toBuildView(
 		kind: build.kind,
 		commitSha: build.commitSha,
 		error: stale ? "The build stopped unexpectedly" : build.error,
-		startedByUserId: build.startedByUserId,
 		startedAt: build.startedAt,
 		finishedAt: build.finishedAt,
 		active: build.goldenRef !== null && build.goldenRef === activeSourceRef,
@@ -299,7 +298,6 @@ function toBuildView(
 
 async function startRepositoriesBuild(args: {
 	environmentId: string;
-	userId: string;
 	repositoryIds?: readonly string[];
 	primaryRepositoryId?: string;
 }): Promise<string> {
@@ -307,7 +305,6 @@ async function startRepositoriesBuild(args: {
 		const build = await startEnvironmentBuild({
 			environmentId: args.environmentId,
 			trigger: "repositories",
-			startedByUserId: args.userId,
 			repositoryIds: args.repositoryIds,
 			primaryRepositoryId: args.primaryRepositoryId,
 		});
@@ -682,7 +679,6 @@ export const environmentRouter = {
 					await tx.insert(environmentBuilds).values({
 						environmentId,
 						organizationId: workspace.organizationId,
-						startedByUserId: ctx.userId,
 						status: "succeeded",
 						trigger: "promote",
 						kind: "incremental",
@@ -739,7 +735,6 @@ export const environmentRouter = {
 				const build = await startEnvironmentBuild({
 					environmentId: environment.id,
 					trigger: "manual",
-					startedByUserId: ctx.userId,
 				});
 				return toBuildView(build, environment.sourceRef);
 			} catch (error) {
@@ -888,7 +883,6 @@ export const environmentRouter = {
 				}
 				pendingBuildId = await startRepositoriesBuild({
 					environmentId: current.id,
-					userId: ctx.userId,
 					repositoryIds,
 					primaryRepositoryId,
 				});
@@ -929,7 +923,6 @@ export const environmentRouter = {
 			) {
 				pendingBuildId = await startRepositoriesBuild({
 					environmentId: current.id,
-					userId: ctx.userId,
 				});
 			}
 			if (Object.keys(patch).length === 0) {

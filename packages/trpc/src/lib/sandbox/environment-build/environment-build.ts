@@ -116,7 +116,7 @@ async function prepareBuild(
 		primary,
 		...repositories.filter((row) => row.id !== primary.id),
 	];
-	const baseBranch = build.baseBranch ?? primary.defaultBranch;
+	const baseBranch = primary.defaultBranch;
 	const token = await installationTokenFor(ordered);
 	const [hooks, environment, current] = await Promise.all([
 		readRepoHooks({ repo: primary, branch: baseBranch, token }),

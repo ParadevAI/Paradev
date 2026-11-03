@@ -970,13 +970,11 @@ export const environmentBuilds = pgTable(
 			.references(() => environments.id, { onDelete: "cascade" }),
 		// No foreign keys to the auth tables: creating one locks a hot parent.
 		organizationId: uuid("organization_id").notNull(),
-		startedByUserId: uuid("started_by_user_id"),
 		status: environmentBuildStatus().notNull().default("running"),
 		trigger: environmentBuildTrigger().notNull(),
 		kind: environmentBuildKind().notNull(),
 		repositoryIds: uuid("repository_ids").array().notNull(),
 		primaryRepositoryId: uuid("primary_repository_id"),
-		baseBranch: text("base_branch"),
 		commitSha: text("commit_sha"),
 		goldenRef: text("golden_ref"),
 		goldenDeletedAt: timestamp("golden_deleted_at", { withTimezone: true }),

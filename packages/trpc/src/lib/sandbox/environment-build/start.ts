@@ -87,7 +87,6 @@ function isUniqueViolation(error: unknown): boolean {
 export async function startEnvironmentBuild(args: {
 	environmentId: string;
 	trigger: Exclude<EnvironmentBuildTrigger, "promote">;
-	startedByUserId?: string | null;
 	repositoryIds?: readonly string[];
 	primaryRepositoryId?: string;
 }): Promise<SelectEnvironmentBuild> {
@@ -154,12 +153,10 @@ export async function startEnvironmentBuild(args: {
 			.values({
 				environmentId: environment.id,
 				organizationId: environment.organizationId,
-				startedByUserId: args.startedByUserId ?? null,
 				trigger: args.trigger,
 				kind,
 				repositoryIds: repositories.map((repository) => repository.id),
 				primaryRepositoryId: primary.id,
-				baseBranch: primary.defaultBranch,
 			})
 			.returning();
 	} catch (error) {

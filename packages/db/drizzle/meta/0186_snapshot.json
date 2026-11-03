@@ -1,5 +1,5 @@
 {
-  "id": "3225db0a-61e7-45d3-960a-8af1406b6afe",
+  "id": "ff1741a1-6bc1-4656-8c28-5b306b523e9c",
   "prevId": "71ff4395-bad5-443f-8970-205d5147e902",
   "version": "7",
   "dialect": "postgresql",
@@ -10692,12 +10692,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "started_by_user_id": {
-          "name": "started_by_user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "status": {
           "name": "status",
           "type": "environment_build_status",
@@ -10729,12 +10723,6 @@
         "primary_repository_id": {
           "name": "primary_repository_id",
           "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "base_branch": {
-          "name": "base_branch",
-          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
