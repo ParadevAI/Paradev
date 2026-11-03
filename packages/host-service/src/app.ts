@@ -18,6 +18,7 @@ import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createApiClient } from "./api";
+import { createChatSync } from "./chat-sync";
 import {
 	createChatAgentBridge,
 	createChatV3Mount,
@@ -332,12 +333,14 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
 	});
 
+	const chatSync = createChatSync({ runtime: () => chatV3.runtime(), api });
 	const runtime = {
 		agentJobs,
 		filesystem,
 		pullRequests: pullRequestRuntime,
 		pageWatch,
 		chat: () => chatV3.runtime(),
+		chatSync,
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
 	};
 
@@ -370,7 +373,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				workspaceId: scopeId,
 				occurredAt,
 			}),
+		onAppend: (envelope) => chatSync.noteAppend(envelope),
 	});
+	// A box keeps its chats in the cloud as they happen; a machine someone
+	// owns pushes a chat only when it moves.
+	const stopChatSync =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox" ? chatSync.start() : null;
 	try {
 		chatV3.resumeAfterUpdate();
 	} catch (error) {
@@ -588,6 +596,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		stopChatSync?.();
 		agentJobs.stopAll();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		if (attachmentSweepTimer) clearInterval(attachmentSweepTimer);

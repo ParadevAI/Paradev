@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { NodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
-import type { DeltaChannel } from "@superset/chat/protocol";
+import type { DeltaChannel, DurableEnvelope } from "@superset/chat/protocol";
 import { parseCursor } from "@superset/chat/protocol";
 import type {
 	ChatRuntime,
@@ -133,6 +133,7 @@ export function createChatV3Mount(options: {
 	dbPath: string;
 	agents?: ChatAgentBridge;
 	onSessionChanged?: (change: ChatSessionChange) => void;
+	onAppend?: (envelope: DurableEnvelope) => void;
 }): ChatV3Mount {
 	let built: ChatRuntime | null = null;
 	const markerPath = join(
@@ -156,6 +157,7 @@ export function createChatV3Mount(options: {
 			observer: options.agents,
 			checkpoints: createGitCheckpoints(),
 			onSessionChanged: options.onSessionChanged,
+			onAppend: options.onAppend,
 		});
 		return built;
 	};
