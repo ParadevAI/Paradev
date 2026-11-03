@@ -8,7 +8,7 @@ export function ContentCard({ children }: { children: ReactNode }) {
 	return (
 		<div
 			ref={setCard}
-			className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl bg-background"
+			className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl bg-sidebar"
 		>
 			<div className="relative flex min-h-0 min-w-0 flex-1">{children}</div>
 		</div>
