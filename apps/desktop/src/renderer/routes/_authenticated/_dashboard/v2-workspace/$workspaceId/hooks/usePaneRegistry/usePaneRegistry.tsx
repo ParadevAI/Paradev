@@ -74,7 +74,6 @@ import {
 	type SubagentPaneData,
 	type TerminalPaneData,
 } from "../../types";
-import { markCloudChatLaunchClosed } from "../../utils/closedChatSessions";
 import {
 	findTerminalPaneLocation,
 	focusOrAddTerminalPane,
@@ -902,10 +901,6 @@ export function usePaneRegistry({
 				},
 				getTitle: () => t({ message: "Chat" }),
 				insetsAside: true,
-				onAfterClose: (pane) => {
-					const data = pane.data as PendingCloudChatPaneData;
-					markCloudChatLaunchClosed(workspaceId, data.promptHash);
-				},
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<PendingCloudChatPane ctx={ctx} workspaceId={workspaceId} />
 				),

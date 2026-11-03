@@ -14,26 +14,3 @@ export function reopenChatSession(sessionId: string): void {
 export function isChatSessionClosed(sessionId: string): boolean {
 	return closed.has(sessionId);
 }
-
-export function markCloudChatLaunchClosed(
-	workspaceId: string,
-	promptHash: string,
-): void {
-	closed.add(`cloud-launch:${workspaceId}:${promptHash}`);
-}
-
-export function reopenCloudChatLaunch(
-	workspaceId: string,
-	promptHash: string,
-): void {
-	closed.delete(`cloud-launch:${workspaceId}:${promptHash}`);
-}
-
-export function closedCloudChatPromptHashes(workspaceId: string): Set<string> {
-	const prefix = `cloud-launch:${workspaceId}:`;
-	return new Set(
-		[...closed]
-			.filter((id) => id.startsWith(prefix))
-			.map((id) => id.slice(prefix.length)),
-	);
-}

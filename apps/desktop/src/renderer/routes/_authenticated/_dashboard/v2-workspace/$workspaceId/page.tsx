@@ -636,13 +636,7 @@ function V2WorkspaceContent() {
 
 	return (
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
-			<WorkspaceAgentEffects
-				workspaceId={workspaceId}
-				store={store}
-				rightStore={rightStore}
-				linkedStores={linkedPaneStores}
-				isLayoutReady={isLayoutReady && isRightLayoutReady}
-			/>
+			<WorkspaceAgentEffects store={store} rightStore={rightStore} />
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
 				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 					<WorkspaceSplitLayout
