@@ -55,6 +55,7 @@ import {
 	removeMastraManagedHooks,
 	removeMuseManagedHooks,
 	removeOmpExtension,
+	removeOpenCodeTuiPlugin,
 	removePiExtension,
 	removeVibeManagedHooks,
 } from "./agent-wrappers";
@@ -111,6 +112,7 @@ const AGENT_SETUP_DEFINITIONS: Record<
 			createOpenCodeTuiPlugin,
 			createOpenCodeWrapper,
 		],
+		teardown: [removeOpenCodeTuiPlugin],
 	},
 	omp: {
 		setup: [createOmpExtension],

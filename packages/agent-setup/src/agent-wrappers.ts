@@ -42,6 +42,7 @@ export {
 	OPENCODE_TUI_PLUGIN_MARKER,
 	removeClaudeManagedHooks,
 	removeCodexManagedHooks,
+	removeOpenCodeTuiPlugin,
 } from "./agent-wrappers-claude-codex-opencode";
 export {
 	buildWrapperScript,

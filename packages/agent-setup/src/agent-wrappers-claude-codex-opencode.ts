@@ -8,6 +8,7 @@ import {
 	getManagedNotifyHookCommand,
 	isManagedArtifactGuardCommand,
 	isManagedNotifyCommand,
+	removeOwnedFileIfMarked,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
 import { getArtifactGuardScriptPath } from "./artifact-guard-hook";
@@ -33,7 +34,8 @@ export const OPENCODE_PLUGIN_FILE = "superset-notify.js";
 const OPENCODE_PLUGIN_SIGNATURE = "// Superset opencode plugin";
 const OPENCODE_PLUGIN_VERSION = "v11";
 export const OPENCODE_PLUGIN_MARKER = `${OPENCODE_PLUGIN_SIGNATURE} ${OPENCODE_PLUGIN_VERSION}`;
-export const OPENCODE_TUI_PLUGIN_MARKER = "// Superset opencode tui plugin v1";
+const OPENCODE_TUI_PLUGIN_SIGNATURE = "// Superset opencode tui plugin";
+export const OPENCODE_TUI_PLUGIN_MARKER = `${OPENCODE_TUI_PLUGIN_SIGNATURE} v2`;
 
 /**
  * Returns the environment-scoped OpenCode plugin path under Superset home.
@@ -303,7 +305,7 @@ export function getOpenCodeTuiPluginContent(notifyPath: string): string {
 	);
 	return template
 		.replace("{{MARKER}}", OPENCODE_TUI_PLUGIN_MARKER)
-		.replace("{{NOTIFY_PATH}}", notifyPath);
+		.replace("{{NOTIFY_PATH}}", () => JSON.stringify(notifyPath));
 }
 
 /**
@@ -378,6 +380,14 @@ export function createOpenCodeTuiPlugin(): void {
 	);
 	console.log(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} OpenCode TUI plugin`,
+	);
+}
+
+export function removeOpenCodeTuiPlugin(): void {
+	removeOwnedFileIfMarked(
+		getOpenCodeTuiPluginPath(),
+		OPENCODE_TUI_PLUGIN_SIGNATURE,
+		"OpenCode TUI plugin",
 	);
 }
 
