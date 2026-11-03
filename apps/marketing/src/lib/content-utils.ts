@@ -27,6 +27,14 @@ export function slugify(text: string): string {
 		.replace(/(^-|-$)/g, "");
 }
 
+export function stripInlineMarkdown(text: string): string {
+	return text
+		.replace(/<[^>]*>/g, "")
+		.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+		.replace(/[`*_]/g, "")
+		.trim();
+}
+
 function toDateInput(dateValue: Date | string | number): string {
 	return new Date(dateValue).toISOString().split("T")[0] as string;
 }

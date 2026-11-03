@@ -93,14 +93,13 @@ export function createModeTracker(
 
 	const snapshot = (maxLines?: number): TerminalSnapshot => {
 		const buffer = term.buffer.active;
-		const total = buffer.length;
-		const start = maxLines && maxLines > 0 ? Math.max(0, total - maxLines) : 0;
+		const readLine = (y: number) =>
+			buffer.getLine(y)?.translateToString(true) ?? "";
+		let end = buffer.length;
+		while (end > 0 && readLine(end - 1) === "") end--;
+		const start = maxLines && maxLines > 0 ? Math.max(0, end - maxLines) : 0;
 		const lines: string[] = [];
-		for (let y = start; y < total; y++) {
-			lines.push(buffer.getLine(y)?.translateToString(true) ?? "");
-		}
-		// Trim trailing blank rows so the snapshot ends at real content.
-		while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+		for (let y = start; y < end; y++) lines.push(readLine(y));
 		return { cols: term.cols, rows: term.rows, text: lines.join("\n") };
 	};
 

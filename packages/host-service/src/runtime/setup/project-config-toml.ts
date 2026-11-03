@@ -4,7 +4,6 @@ import { BRAND } from "@superset/shared/brand";
 import {
 	type ConfigEnvironment,
 	type ConfigError,
-	PROJECT_CONFIG_DIR,
 	PROJECT_CONFIG_FILE,
 	PROJECT_LOCAL_CONFIG_FILE,
 	type ProjectConfig,
@@ -12,6 +11,7 @@ import {
 	type ResolvedProjectConfig,
 	resolveProjectConfig,
 } from "@superset/shared/project-config";
+import { resolveProjectConfigDir } from "@superset/shared/project-config/dir";
 
 export type TomlConfigLoad =
 	| { kind: "ok"; path: string; resolved: ResolvedProjectConfig }
@@ -27,11 +27,11 @@ export function configEnvironment(): ConfigEnvironment {
 }
 
 export function getTomlConfigPath(root: string): string {
-	return join(root, PROJECT_CONFIG_DIR, PROJECT_CONFIG_FILE);
+	return join(resolveProjectConfigDir(root), PROJECT_CONFIG_FILE);
 }
 
 export function getLocalTomlConfigPath(repoPath: string): string {
-	return join(repoPath, PROJECT_CONFIG_DIR, PROJECT_LOCAL_CONFIG_FILE);
+	return join(resolveProjectConfigDir(repoPath), PROJECT_LOCAL_CONFIG_FILE);
 }
 
 /** The shared file comes from the workspace's checkout, else the main checkout's. */
@@ -65,7 +65,7 @@ function readConfig(
 }
 
 /**
- * Load `.superset/config.toml` and the personal `config.local.toml` (main
+ * Load the repo's `config.toml` and the personal `config.local.toml` (main
  * checkout only: it is gitignored, so worktrees never have it). Returns null
  * when the project has no `config.toml`, so callers fall back to v1.
  */

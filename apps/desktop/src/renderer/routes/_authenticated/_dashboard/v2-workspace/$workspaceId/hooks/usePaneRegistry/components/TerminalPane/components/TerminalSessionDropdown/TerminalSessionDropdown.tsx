@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { formatCompactRelativeTime } from "@superset/i18n/format";
 import type { RendererContext } from "@superset/panes";
 import {
 	DropdownMenu,
@@ -25,7 +26,6 @@ import type {
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { TerminalPaneIcon } from "../TerminalPaneIcon";
 import { RenameSessionDialog } from "./components/RenameSessionDialog";
 import {
@@ -75,7 +75,7 @@ function formatCreatedAt(createdAt: number | undefined): string {
 			}),
 		);
 
-	return getRelativeTime(createdAt, { format: "compact" });
+	return formatCompactRelativeTime(createdAt);
 }
 
 function getTerminalPaneLocations(

@@ -59,6 +59,11 @@ export const CATALOG: {
 				description: msg({ message: "Work the action items from a call" }),
 			},
 			{
+				name: "wispr",
+				displayName: "Wispr Flow",
+				description: msg({ message: "Recall what was said in meetings" }),
+			},
+			{
 				name: "ynab",
 				displayName: "YNAB",
 				description: msg({ message: "Track budgets and spending" }),
@@ -111,6 +116,16 @@ export const CATALOG: {
 				displayName: "Resend",
 				description: msg({ message: "Send email and debug delivery" }),
 			},
+			{
+				name: "sazabi",
+				displayName: "Sazabi",
+				description: msg({ message: "Investigate production logs and issues" }),
+			},
+			{
+				name: "inngest",
+				displayName: "Inngest",
+				description: msg({ message: "Debug failed runs and rerun functions" }),
+			},
 		],
 	},
 	{
@@ -120,6 +135,11 @@ export const CATALOG: {
 				name: "neon",
 				displayName: "Neon",
 				description: msg({ message: "Inspect branches and run SQL" }),
+			},
+			{
+				name: "supabase",
+				displayName: "Supabase",
+				description: msg({ message: "Inspect tables and apply migrations" }),
 			},
 			{
 				name: "posthog",
@@ -140,6 +160,16 @@ export const CATALOG: {
 				name: "exa",
 				displayName: "Exa",
 				description: msg({ message: "Search the web" }),
+			},
+			{
+				name: "firecrawl",
+				displayName: "Firecrawl",
+				description: msg({ message: "Scrape and crawl websites" }),
+			},
+			{
+				name: "peec",
+				displayName: "Peec AI",
+				description: msg({ message: "Track your brand in AI search" }),
 			},
 		],
 	},

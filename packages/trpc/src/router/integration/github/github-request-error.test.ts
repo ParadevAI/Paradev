@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { githubRequestError, hiddenFromApp } from "./github-request-error";
+import { githubRequestError } from "./github-request-error";
 
 test("GitHub's status becomes the error code the desktop branches on", () => {
 	expect(
@@ -24,11 +24,4 @@ test("GitHub's status becomes the error code the desktop branches on", () => {
 	expect(githubRequestError(new Error("boom"), "x").code).toBe(
 		"INTERNAL_SERVER_ERROR",
 	);
-});
-
-test("a PR the App cannot see is the viewer's to try; their own refusal stands", () => {
-	expect(hiddenFromApp(false, { status: 404 })).toBe(true);
-	expect(hiddenFromApp(false, { errors: [{ type: "FORBIDDEN" }] })).toBe(true);
-	expect(hiddenFromApp(false, { status: 500 })).toBe(false);
-	expect(hiddenFromApp(true, { status: 404 })).toBe(false);
 });

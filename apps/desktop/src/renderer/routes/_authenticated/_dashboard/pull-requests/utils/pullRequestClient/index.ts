@@ -7,6 +7,7 @@ export {
 	type PullRequestMergeMethod,
 	type PullRequestTarget,
 	type PullRequestThreads,
+	pullRequestDiffQueryKey,
 	pullRequestThreadsQueryKey,
 	readPullRequestDetail,
 	readPullRequestDiff,

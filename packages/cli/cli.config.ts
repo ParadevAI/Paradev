@@ -42,6 +42,7 @@ export default defineConfig({
 				title: "Workspaces & agents",
 				commands: [
 					"workspaces",
+					"environments",
 					"sessions",
 					"agents",
 					"terminals",

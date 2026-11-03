@@ -15,6 +15,7 @@ import {
 	type PlanFamily,
 	seatPricePerMonth,
 } from "@superset/shared/billing";
+import { COMPANY } from "@superset/shared/constants";
 
 export interface FamilyPriceSet {
 	family: string;
@@ -174,6 +175,7 @@ export function faqValues(values: PlanPriceValues) {
 		planPrices: values.planPrices,
 		overagePrice: values.overagePrice,
 		packPrice: values.packPrice,
+		trustHost: new URL(COMPANY.TRUST_URL).host,
 	};
 }
 

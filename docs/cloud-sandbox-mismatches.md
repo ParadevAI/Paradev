@@ -283,9 +283,10 @@ access at all. Writes always act as the person looking: the desktop with the
 GitHub login on that person's own machine (the `viewerGithub` router in the
 main process), otherwise and on mobile through the API's
 `integration.github.*PullRequest*` procedures with their Superset connection
-(`githubUserTokenFor`). Reads take the same path, except that a person with
-neither may still read through the organization's GitHub App installation;
-anything the App cannot see asks them to connect GitHub.
+(`githubUserTokenFor`). Reads take the same path. A person with neither is
+asked to connect GitHub; the organization's App installation is not a
+fallback, because its rate limit is shared by everything the organization
+runs.
 
 ## Runtime environment
 
@@ -370,13 +371,36 @@ forwards Ctrl+V and lets the TUI (Claude Code, Codex) read the image from the
 OS clipboard — of the machine the PTY runs on. A sandbox (or any
 relay-reached host) never holds the user's local screenshot, so the paste
 silently did nothing or surfaced "Failed to paste image". Fixed renderer-side:
-for non-local hosts the desktop ships the clipboard bytes over
-`filesystem.writeFile` into the shared `.superset/attachments/` worktree dir
-(the same convention the agent-launch terminal adapter and the mobile
-composer use — mobile proved the pattern) and pastes the worktree-relative
-path instead (`setImagePasteOverride` in the terminal runtime registry).
-Chosen over a new host endpoint because deployed sandboxes never update
-their baked host-service.
+for non-local hosts the desktop writes the clipboard files into the worktree
+and pastes their worktree-relative paths instead (`setImagePasteOverride` in
+the terminal runtime registry, `useSendAttachments` in the pane registry).
+The bytes go where the workspace lives. A box gets them through storage:
+`attachment.createUpload`, a presigned PUT, `cloudWorkspace.attachFiles`,
+then `attachments.materializeIntoWorkspace` on the box. A relay-reached
+machine gets them as base64 `filesystem.writeFile`, capped at
+`MAX_INLINE_ATTACHMENT_BYTES`, so they never reach our servers. A workspace
+on the same machine as the desktop gets them from the desktop's main process
+(`attachments.writeIntoWorktree`), which copies a file from disk with no cap.
+Chat attachments follow the same rule as parts: a `fileId` for a box, an
+`attachmentId` in the host's store otherwise. A file on this machine too big
+for a part goes as a copied path instead.
+
+**The ingress drops an upload the host answers early.** tRPC's streamed batch
+(`httpBatchStreamLink`, `trpc-accept: application/jsonl`) returns its response
+head before it has read the request body. Behind a Vercel sandbox's ingress
+(`sb-*.vercel.run`, which the gate forwards to) that early response ends the
+exchange: the rest of the upload is dropped, the procedure never runs, and the
+client sees a stream that ends after the head line — "value$1 is not iterable"
+in tRPC's consumer. It is a race, not a size limit: a 500 KB body on a home
+uplink loses it about half the time, a 1 MB body on a datacenter link wins
+it. This is why shipping file bytes through `filesystem.writeFile` broke
+(SUPER-2658) and why attachments go through storage instead. host-service now
+buffers every `/trpc/*` body before handing it to tRPC, so no response starts
+before the request is complete. A box runs that host-service from its next
+boot (see "A box's host-service is as new as its last boot"); one that never
+sleeps keeps the race until it restarts. Reproducing with curl: pass
+`-H "Expect:"` — curl's automatic `Expect: 100-continue` on bodies ≥1 MB
+masks the bug, and browsers never send it.
 
 **A URL launcher succeeds and reaches nobody.** The image ships `xdg-utils`
 (`packages/sandbox/bundle/rootfs/usr/local/share/superset/desktop.Aptfile`)
@@ -424,6 +448,19 @@ missing. The CLI bundle has the same gap.
 
 ## Lifecycle
 
+**A box's host-service is as new as its last boot.** A sandbox bundle release
+repins every live environment (`environments.bundleSha`, set by
+`packages/sandbox/src/environments/release.ts`), and every wake builds the
+box's claim from its environment (`wakeCloudWorkspace` → `buildSandboxClaim`).
+When the box boots, `superset-boot` installs the pinned bundle if its hash
+differs from the one installed. So a cold wake, a restart or a new box runs
+the current host-service. A warm resume does not boot, and a box that never
+sleeps keeps the host-service it last booted with. Do not assume a box is
+frozen at the bundle it was provisioned with, and do not assume it is current
+either: gate a new host feature on the version the box reports
+(`health.check`), the same way as a remote host. The chat attachment parts
+floor (`ATTACHMENT_PARTS_MIN_HOST_VERSION`) works like this.
+
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
 session length. Vercel's server-side tag filter uses creation-order pagination
@@ -445,7 +482,7 @@ leaked: this repository's per-workspace Neon branches piled up until 383 were
 deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
 calls `sandbox.runArchiveHook` on the still-running box (direct with the host
 secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
-`.superset/config.toml` resolved for the cloud. A failing hook never blocks the
+`.paradev/config.toml` resolved for the cloud. A failing hook never blocks the
 stop, and an undo that lands during the hook re-runs setup (`runStartHook`
 with `force`) instead of stopping the box. A box whose host-service predates
 the procedure answers 404 and is stopped as before, so the fix reaches a box
@@ -745,7 +782,7 @@ Reproducing an app bug end to end from a cloud workspace means bringing up
 `apps/web` + `apps/api` inside the sandbox. Three of the documented ways to do
 that do not exist there (found driving GHSA-2cp5-f6gg-w5fp, 2026-09-24).
 
-**The app assumes:** `./.superset/setup.local.sh` can stand up Postgres,
+**The app assumes:** `./.paradev/setup.local.sh` can stand up Postgres,
 neon-proxy and Redis with `docker compose`, which is the whole point of the
 zero-credential local path in `DEVELOPMENT.md`.
 
@@ -771,6 +808,30 @@ a local stand-in — the usual way to drive an OAuth callback without a real
 provider secret — has to go through the resolver instead: a `--require`
 preload patching `dns.lookup` for Node, `--host-resolver-rules` for Chrome.
 Binding 443 and using sudo otherwise work.
+
+## The desktop dev build's bundled CLI thinks it is in a sandbox — open
+
+Found verifying organization plugins in the desktop dev build, 2026-10-22.
+
+**The app assumes:** the desktop runs its bundled `superset` CLI on a person's
+machine, so `plugins install`, `uninstall` and `sync` (all `sandbox: false`)
+are there to call.
+
+**A sandbox is:** a box whose environment carries
+`SUPERSET_SANDBOX_WORKSPACE_ID` and `IS_SANDBOX`, which the desktop dev build
+inherits from `dev-stack.cloud.sh` and passes to the CLI it spawns. The CLI
+then hides every machine-only command, and each plugin action logs
+`Unknown command: install` while the UI reports success. A desktop started
+from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1` and dies at
+`electron.app.commandLine` before a window opens.
+
+**What we did:** started the desktop window with
+`unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID IS_SANDBOX`, after
+which plugin installs reached `paradev-dev-data/plugins`. Nothing in
+`dev-stack.cloud.sh` does that yet. The box also has no object store for
+`R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses `minio/minio` and
+MinIO's binary download answers 410, so an in-memory S3 stand-in on that port
+was used for the test.
 
 ## Shared memory is 64 MB
 

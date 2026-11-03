@@ -5,15 +5,17 @@ import {
 	runningTurnId as findRunningTurnId,
 	latestSessionUsage,
 	launchConfigSelections,
+	type OutboxEntry,
+	presetForAnyHarness,
 	userMessageText,
 } from "@superset/chat/core";
 import type {
 	AvailableCommand,
-	BackgroundTask,
 	Decision,
 	SessionConfigOption,
 	SessionState,
 	UserContent,
+	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	useApprovals,
@@ -22,24 +24,32 @@ import {
 } from "@superset/chat/react";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { MessageScroller } from "@superset/chat-ui/MessageScroller";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { env } from "renderer/env.renderer";
+import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
+import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import type { RunInTerminal } from "../../../../hooks/useAgentCliUpdate";
 import {
 	ChatPaneActionsProvider,
+	type OpenDiff,
 	type OpenLink,
 	type OpenPage,
+	type TurnChangesSource,
 } from "../../providers/ChatPaneActionsProvider";
 import { TurnFailureActionsProvider } from "../../providers/TurnFailureActionsProvider";
 import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
 import { heldPromptQueue } from "../../utils/heldPromptQueue";
 import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
+import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
 import { railMessages } from "../../utils/railMessages";
 import {
@@ -51,6 +61,7 @@ import {
 } from "../Composer";
 import { ConnectionNotice } from "../ConnectionNotice";
 import { SessionHeader } from "../SessionHeader";
+import { SetupSessionHeader } from "../SetupSessionHeader";
 import { SubagentView } from "../SubagentView";
 import { Transcript, type TranscriptHandle } from "../Transcript";
 import { useChildrenByParent } from "../Transcript/hooks/useChildrenByParent";
@@ -61,6 +72,12 @@ import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
+import { LiveChangesPill } from "./components/LiveChangesPill";
+import {
+	type SwitchAccount,
+	type SwitchableAgent,
+	UsageLimitNotice,
+} from "./components/UsageLimitNotice";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
@@ -69,11 +86,12 @@ import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
+import { settledToolCalls } from "./utils/settledToolCalls";
+import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
-const NO_TASKS: BackgroundTask[] = [];
 
 const MODEL_OPTIONS_GRACE_MS = 1000;
 
@@ -97,12 +115,15 @@ export function SessionView({
 	preferredModelLabel,
 	onPendingPromptsSent,
 	onFork,
+	onSwitchAccount,
+	sessionAccount,
 	onEditMessage,
 	onRestartAndContinue,
 	onRunInTerminal,
 	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
+	openDiff,
 	openFile,
 	openPage,
 	openLink,
@@ -133,6 +154,8 @@ export function SessionView({
 	onSessionState?: (session: SessionState | null) => void;
 	/** The mode the user picked, so a resumed session can start in it again. */
 	onModeChange?: (modeId: string) => void;
+	onSwitchAccount?: SwitchAccount;
+	sessionAccount?: TerminalAgentBinding["account"];
 	/**
 	 * Absent when the agent cannot branch its own session. The transcript is
 	 * built here because only this view holds the timeline; a branch into
@@ -162,6 +185,7 @@ export function SessionView({
 		) => void;
 	};
 	openFile?: OpenFile;
+	openDiff?: OpenDiff;
 	openPage?: OpenPage;
 	openLink?: OpenLink;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
@@ -169,40 +193,57 @@ export function SessionView({
 	onNewChat?: () => void;
 }) {
 	const { t } = useLingui();
-	const session = useChatSession({ client, sendEnabled: held === undefined });
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
+	const session = useChatSession({
+		client,
+		sendEnabled: held === undefined,
+		snapshotWorktree,
+	});
 	const composerRef = useRef<ComposerHandle>(null);
 	const drawerRef = useRef<WorkDrawerHandle>(null);
 	const transcriptRef = useRef<TranscriptHandle>(null);
 	const paneRef = useRef<HTMLDivElement>(null);
 	const { outbox, discardPrompt } = session;
 	const openDraftKey = useRef(draftKey);
-	const restoreText = useCallback(
-		(text: string, originKey: string) => {
+	const restoreDraft = useCallback(
+		(draft: ComposerDraft, originKey: string) => {
 			if (originKey !== openDraftKey.current) {
-				prependToDraft(originKey, [text], originKey === draftKey);
+				prependToDraft(originKey, [draft], originKey === draftKey);
 				return;
 			}
-			composerRef.current?.appendText(text);
+			composerRef.current?.restoreDraft(draft);
 			composerRef.current?.focus();
 		},
 		[draftKey],
 	);
+	const sentDrafts = useRef(new Map<string, ComposerDraft>());
+	const draftOf = useCallback(
+		(entry: OutboxEntry): ComposerDraft =>
+			sentDrafts.current.get(entry.clientId) ?? {
+				segments: [{ type: "text", text: contentText(entry.content) }],
+				attachments: [],
+			},
+		[],
+	);
 	useEffect(() => {
-		const failed = outbox.filter(
-			(entry) =>
-				entry.state === "failed" &&
-				entry.content.every((part) => part.type === "text"),
-		);
+		const failed = outbox.filter((entry) => entry.state === "failed");
 		if (failed.length === 0) return;
 		for (const entry of failed) {
 			discardPrompt(entry.clientId);
-			restoreText(contentText(entry.content), draftKey);
+			restoreDraft(draftOf(entry), draftKey);
+			sentDrafts.current.delete(entry.clientId);
 		}
 		toast.error(
 			t({ message: "Couldn't send your message. It's back in the composer." }),
 		);
-	}, [outbox, discardPrompt, restoreText, draftKey, t]);
-	useRestoreUnsentPrompts(draftKey, outbox);
+	}, [outbox, discardPrompt, restoreDraft, draftOf, draftKey, t]);
+	useEffect(() => {
+		const live = new Set(outbox.map((entry) => entry.clientId));
+		for (const clientId of sentDrafts.current.keys()) {
+			if (!live.has(clientId)) sentDrafts.current.delete(clientId);
+		}
+	}, [outbox]);
+	useRestoreUnsentPrompts(draftKey, outbox, draftOf);
 	const timeline = useTimeline(session.snapshot, { nestChildItems: true });
 	const rail = useStableList(
 		useMemo(() => railMessages(timeline), [timeline]),
@@ -266,12 +307,50 @@ export function SessionView({
 		() => findRunningTurnId(session.snapshot.turns),
 		[session.snapshot.turns],
 	);
+	const liveRefreshKey = useMemo(
+		() =>
+			settledToolCalls(
+				timeline.find((group) => group.turnId === runningTurnId),
+			),
+		[timeline, runningTurnId],
+	);
+	const turnChanges = useMemo<TurnChangesSource>(
+		() => ({
+			sessionId: client.sessionId,
+			load: (turnId, live, anchorItemIds) =>
+				client.getTurnChanges({
+					workspaceId,
+					turnId,
+					live,
+					...(anchorItemIds?.length ? { anchorItemIds } : {}),
+				}),
+			undo: (turnId, paths, anchorItemIds) =>
+				client.undoTurnFiles({
+					workspaceId,
+					turnId,
+					paths,
+					...(anchorItemIds?.length ? { anchorItemIds } : {}),
+				}),
+		}),
+		[client, workspaceId],
+	);
 	const sessionUsage = useMemo(
 		() => latestSessionUsage(session.snapshot.turns),
 		[session.snapshot.turns],
 	);
 
 	const snapshotItems = session.snapshot.items;
+	const setupEnvironment = useMemo(() => {
+		for (const { item } of snapshotItems.values()) {
+			if (item.kind === "user_message") {
+				return setupEnvironmentId(
+					userMessageText(item as UserMessage),
+					env.NEXT_PUBLIC_WEB_URL,
+				);
+			}
+		}
+		return null;
+	}, [snapshotItems]);
 	const queuedPrompts = useStableList(
 		useMemo(
 			() => deriveQueuedPrompts({ items: snapshotItems }),
@@ -285,10 +364,6 @@ export function SessionView({
 	const clearRevealMessage = useCallback(() => setRevealMessageId(null), []);
 	const returnToComposer = useCallback(
 		(exit: DrawerExit) => composerRef.current?.returnFocus(exit === "history"),
-		[],
-	);
-	const appendToComposer = useCallback(
-		(text: string) => composerRef.current?.appendText(text),
 		[],
 	);
 	const enterDrawer = useCallback(
@@ -385,15 +460,27 @@ export function SessionView({
 	);
 	const holdPrompt = held?.onQueue;
 	const onAnswerFailed = useCallback(
-		(content: UserContent[]) => {
-			restoreText(contentText(content), draftKey);
+		(draft: ComposerDraft) => {
+			restoreDraft(draft, draftKey);
 			toast.error(
 				t({
 					message: "Couldn't send your message. It's back in the composer.",
 				}),
 			);
 		},
-		[restoreText, draftKey, t],
+		[restoreDraft, draftKey, t],
+	);
+	const sendKeepingDraft = useCallback(
+		(
+			content: UserContent[],
+			options: { expectedTurnId: string } | undefined,
+			draft: ComposerDraft,
+		) => {
+			const entry = sendPrompt(content, options);
+			sentDrafts.current.set(entry.clientId, draft);
+			return entry;
+		},
+		[sendPrompt],
 	);
 	const onSend = useMainSend({
 		approvals,
@@ -403,7 +490,7 @@ export function SessionView({
 		onUserPrompt,
 		respondToApproval,
 		runningTurnId,
-		sendPrompt,
+		sendPrompt: sendKeepingDraft,
 	});
 	const {
 		focusedId: focusedSubagentId,
@@ -421,8 +508,14 @@ export function SessionView({
 	}, [focusedSubagentId, focusComposer]);
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
-			restoreText(contentText(content), originKey),
-		[restoreText],
+			restoreDraft(
+				{
+					segments: [{ type: "text", text: contentText(content) }],
+					attachments: [],
+				},
+				originKey,
+			),
+		[restoreDraft],
 	);
 	const onStopTask = useCallback(
 		(taskId: string) =>
@@ -468,7 +561,6 @@ export function SessionView({
 			onBackgroundSubagent,
 		],
 	);
-	const backgroundTasks = sessionState?.backgroundTasks ?? NO_TASKS;
 	const awaitingBackground = sessionState?.awaitingBackground === true;
 	const onCancelTurn = useMemo(
 		() =>
@@ -481,20 +573,56 @@ export function SessionView({
 		() => ({
 			prompts: queuedPrompts,
 			paused: sessionState?.queuePaused === true,
+			pausedByLimit:
+				sessionState?.usageLimit !== undefined ||
+				sessionState?.queuePausedByLimit === true,
 			actionable: sessionState?.queueControls === true,
 			remove: session.removeQueuedPrompt,
 			resume: session.resumeQueue,
 			steer: session.steerQueuedPrompt,
+			update: session.updateQueuedPrompt,
 		}),
 		[
 			queuedPrompts,
 			sessionState?.queuePaused,
+			sessionState?.usageLimit,
+			sessionState?.queuePausedByLimit,
 			sessionState?.queueControls,
 			session.removeQueuedPrompt,
 			session.resumeQueue,
 			session.steerQueuedPrompt,
+			session.updateQueuedPrompt,
 		],
 	);
+
+	const limit = sessionState?.usageLimit;
+	const respondToUsageLimit = session.respondToUsageLimit;
+	const hostUrl = useWorkspaceHostUrl(workspaceId);
+	const usageLimit = useMemo(() => {
+		if (!limit) return undefined;
+		const preset = harness ? presetForAnyHarness(harness) : undefined;
+		const agent: SwitchableAgent | undefined =
+			preset === "claude" ? "claude" : preset === "codex" ? "codex" : undefined;
+		return {
+			limit,
+			respond: respondToUsageLimit,
+			modelLabel: limit.model
+				? modelDisplayName(limit.model, configOptions ?? [])
+				: undefined,
+			agent,
+			hostUrl,
+			sessionAccount,
+			onSwitchAccount,
+		};
+	}, [
+		limit,
+		respondToUsageLimit,
+		harness,
+		configOptions,
+		hostUrl,
+		onSwitchAccount,
+		sessionAccount,
+	]);
 
 	const heldQueued = held?.queued;
 	const heldLaunched = held?.launched;
@@ -538,6 +666,8 @@ export function SessionView({
 		<ChatPaneActionsProvider
 			editMessage={editMessage}
 			editableMessageIds={editableIds}
+			openDiff={openDiff}
+			turnChanges={turnChanges}
 			openFile={openFile}
 			openPage={openPage}
 			openLink={openLink}
@@ -557,6 +687,9 @@ export function SessionView({
 						left={headerLeft}
 						session={session.snapshot.session}
 					/>
+				)}
+				{setupEnvironment && (
+					<SetupSessionHeader environmentId={setupEnvironment} />
 				)}
 				<MessageScroller.Provider
 					autoScroll
@@ -616,18 +749,28 @@ export function SessionView({
 						</ConnectionNotice>
 					)
 				)}
+				{runningTurnId && !focusedSubagentId && (
+					<LiveChangesPill refreshKey={liveRefreshKey} turnId={runningTurnId} />
+				)}
 				<WorkDrawer
-					approvals={approvals}
-					onAppendToComposer={appendToComposer}
+					notice={
+						usageLimit &&
+						!held && (
+							<UsageLimitNotice
+								agent={usageLimit.agent}
+								hostUrl={usageLimit.hostUrl}
+								limit={usageLimit.limit}
+								modelLabel={usageLimit.modelLabel}
+								onRespond={usageLimit.respond}
+								onSwitchAccount={usageLimit.onSwitchAccount}
+								sessionAccount={usageLimit.sessionAccount}
+							/>
+						)
+					}
 					onExit={returnToComposer}
-					onMoveToBackground={onBackgroundSubagent}
-					onOpenSubagent={openSubagent}
-					onStop={onStopTask}
 					paneRef={paneRef}
 					queue={drawerQueue}
 					ref={drawerRef}
-					snapshot={session.snapshot}
-					tasks={backgroundTasks}
 				/>
 				<Composer
 					presetId={presetId}
@@ -650,7 +793,6 @@ export function SessionView({
 					onEnterDrawer={enterDrawer}
 					onSend={subagent.onSend}
 					target={subagent.target}
-					canQueue={composerQueue !== undefined}
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
@@ -662,6 +804,7 @@ export function SessionView({
 					onOpenFind={focusedSubagentId ? undefined : openFind}
 					onRestartAgent={onRestartAndContinue}
 					onRunInTerminal={onRunInTerminal}
+					usageLimited={!held && usageLimit !== undefined}
 					workspaceId={workspaceId}
 				/>
 			</ComposerDropZone>

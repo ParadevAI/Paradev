@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWorkspaceConnectionRefresh";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import {
 	attachCloudChatSession,
 	releasePendingCloudChat,
@@ -26,10 +25,11 @@ import {
 	reopenCloudChatLaunch,
 } from "../../utils/closedChatSessions";
 import { markChatSessionLive } from "../usePaneRegistry/components/ChatPane/components/AcpChatPane/hooks/useChatSessionLiveness";
-import { readComposerDraft } from "../usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft";
+import { hasComposerDraft } from "../usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft";
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { PENDING_CLOUD_CHAT_TIMEOUT_MS } from "./constants";
 import { initialCloudChatPromptHash } from "./utils/initialCloudChatPrompt";
+import { latestOpenChatSessions } from "./utils/latestOpenChatSessions";
 import { unresolvedPollDelay } from "./utils/unresolvedPollDelay";
 
 type PaneStore = StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -64,8 +64,7 @@ export function useAutoAdoptChatSessions({
 	isLayoutReady,
 	pendingTimeoutMs = PENDING_CLOUD_CHAT_TIMEOUT_MS,
 }: UseAutoAdoptChatSessionsArgs): void {
-	const chatAvailability = useAcpChatEnabled();
-	const enabled = chatAvailability === "enabled" && isLayoutReady;
+	const enabled = isLayoutReady;
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const queryClient = useQueryClient();
@@ -137,16 +136,6 @@ export function useAutoAdoptChatSessions({
 	const refresh = useWorkspaceConnectionRefresh(workspaceId, queryKey, enabled);
 	useWorkspaceEvent("chat:sessions-changed", workspaceId, refresh, enabled);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: tabs re-runs it when a waiting pane is restored
-	useEffect(() => {
-		if (chatAvailability !== "disabled" || !isLayoutReady) return;
-		for (const pending of pendingPanes([store, ...linkedStores])) {
-			pending.store
-				.getState()
-				.closePane({ tabId: pending.tabId, paneId: pending.paneId });
-		}
-	}, [chatAvailability, isLayoutReady, store, linkedStores, tabs]);
-
 	useEffect(() => {
 		const result = sessionsQuery.data;
 		if (!enabled || !result || sessionsQuery.isFetching) return;
@@ -195,7 +184,7 @@ export function useAutoAdoptChatSessions({
 				waitingSince.current.delete(pending.paneId);
 				const typed =
 					pending.data.queuedPrompts?.length ||
-					readComposerDraft(`chat-v3-draft:${pending.data.draftId}`);
+					hasComposerDraft(`chat-v3-draft:${pending.data.draftId}`);
 				if (typed) {
 					pending.store
 						.getState()
@@ -254,17 +243,15 @@ export function useAutoAdoptChatSessions({
 			}
 		}
 
-		const toAdopt = result.sessions
+		const toAdopt = latestOpenChatSessions(result.sessions, attached)
 			.filter(
 				(session) =>
-					session.live &&
 					!result.unresolved.includes(session.sessionId) &&
 					!isChatSessionClosed(session.sessionId) &&
-					!attached.has(session.sessionId) &&
-					!(session.terminalId && attached.has(session.terminalId)) &&
 					!(session.terminalId && isChatTerminalClosed(session.terminalId)) &&
 					!(
-						typeof result.promptHashes[session.sessionId] === "string" &&
+						(!session.live ||
+							typeof result.promptHashes[session.sessionId] === "string") &&
 						waitingAgents.has(presetForAcpHarness(session.harness) ?? "")
 					) &&
 					presetForAcpHarness(session.harness),

@@ -5,8 +5,8 @@
 #
 # Targets:
 #   - Dev neon branch via .env DATABASE_URL (must be a non-prod branch)
-#   - superset-dev-data/local.db          (v1 fixtures)
-#   - superset-dev-data/host/<orgId>/host.db  (host.db fixtures)
+#   - paradev-dev-data/local.db          (v1 fixtures)
+#   - paradev-dev-data/host/<orgId>/host.db  (host.db fixtures)
 #   - ~/code/<repo>                       (on-disk fixture repos)
 #
 # v1 local DB project rows that already exist (superset, cal.com, onbook,
@@ -19,7 +19,7 @@ set -euo pipefail
 SATYA_TEST_ORG=b2c3d4e5-f6a7-4890-9bcd-ef1234567891
 SUPERSET_ORG=a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
-DEV_DATA="$(pwd)/superset-dev-data"
+DEV_DATA="$(pwd)/paradev-dev-data"
 DEV_DATA_LOCAL_DB="$DEV_DATA/local.db"
 SATYA_TEST_HOST_DB="$DEV_DATA/host/$SATYA_TEST_ORG/host.db"
 SUPERSET_HOST_DB="$DEV_DATA/host/$SUPERSET_ORG/host.db"

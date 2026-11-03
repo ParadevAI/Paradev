@@ -122,15 +122,29 @@ binary; write `superset` in code and docs here.
 Replace the capitalized placeholders before running these:
 
 ```bash
-superset ws create --local --project PROJECT_ID --branch BRANCH --agent claude --prompt "..."
-superset agents create --workspace WORKSPACE_ID --agent claude --prompt "..."
+superset ws create --local --project PROJECT_ID --name NAME --branch BRANCH --agent claude --prompt "..."
+superset agents create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
 superset ws list --local
-superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID
+superset terminals read --local --workspace WORKSPACE_ID --terminal TERMINAL_ID
 superset ws archive --local WORKSPACE_ID
 ```
 
 In order: an isolated workspace with an agent already working in it, another agent in an existing
 workspace, what's running, what an agent is doing right now, and cleanup when you're done.
+
+Those agents run in terminals. A user who asks for a new *session* or a *chat* means a chat agent
+session, which is a different namespace: use `superset sessions`, not `agents create` or
+`terminals`. `terminals read` and `send` cannot control a chat session.
+
+```bash
+superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
+superset sessions list --local --workspace WORKSPACE_ID
+superset sessions read --local --workspace WORKSPACE_ID --session SESSION_ID
+superset sessions send --local --workspace WORKSPACE_ID --session SESSION_ID --prompt "..."
+superset sessions close --local --workspace WORKSPACE_ID --session SESSION_ID
+```
+
+`resume`, `open`, and `import`, and which agents chat supports: `docs/agent-tooling.md`.
 
 Spawning several related workspaces? Add `--tag SOME_TAG` (repeatable) to `ws create` — tagged
 workspaces group into a sidebar folder of that name automatically, so a batch files itself instead

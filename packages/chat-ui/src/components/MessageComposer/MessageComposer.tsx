@@ -14,8 +14,8 @@ import {
 	ChipRendererContext,
 	MentionChipNode,
 } from "../PromptInput/nodes/mentionChipNode";
+import { COMPOSER_THEME } from "../PromptInput/theme";
 import { MessageComposerBody } from "./components/MessageComposerBody";
-import { MESSAGE_COMPOSER_THEME } from "./theme";
 import type { MessageComposerProps } from "./types";
 import { MESSAGE_IMPORT } from "./utils/messageMarkdown";
 import "../PromptInput/prompt-input.css";
@@ -43,7 +43,7 @@ export function MessageComposer({
 			CodeNode,
 			LinkNode,
 		],
-		theme: MESSAGE_COMPOSER_THEME,
+		theme: COMPOSER_THEME,
 		editorState: initialMarkdown
 			? () =>
 					$convertFromMarkdownString(

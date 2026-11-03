@@ -1,4 +1,9 @@
-import { PANE_SPLIT_DIRECTIONS } from "@superset/shared/pane-layout-ops";
+import {
+	allLayoutTabs,
+	PANE_AREAS,
+	PANE_SPLIT_DIRECTIONS,
+	SIDEBAR_TOOLS,
+} from "@superset/shared/pane-layout-ops";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -10,12 +15,14 @@ import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { createCallerFactory, protectedProcedure, router } from "../../index";
 import { terminalRouter } from "../terminal";
 import { addPaneDetails } from "./add-pane-details";
+import { resolveOpenPath } from "./resolve-open-path";
 
 const createTerminalCaller = createCallerFactory(terminalRouter);
 
 type PaneLayoutOp = Parameters<PaneLayoutBridgeClient["apply"]>[0]["op"];
 
 const direction = z.enum(PANE_SPLIT_DIRECTIONS);
+const area = z.enum(PANE_AREAS);
 const paneInput = z.object({ workspaceId: z.string(), paneId: z.string() });
 
 async function applyOp(
@@ -94,12 +101,19 @@ export const panesRouter = router({
 		}),
 
 	newTab: protectedProcedure
-		.input(z.object({ workspaceId: z.string(), terminalId: z.string().min(1) }))
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				terminalId: z.string().min(1),
+				area: area.optional(),
+			}),
+		)
 		.mutation(({ ctx, input }) => {
 			requireWorkspaceTerminal(ctx, input.workspaceId, input.terminalId);
 			return applyOp(ctx, input.workspaceId, {
 				type: "newTab",
 				terminalId: input.terminalId,
+				area: input.area,
 			});
 		}),
 
@@ -132,7 +146,7 @@ export const panesRouter = router({
 		.input(paneInput.extend({ keepTerminal: z.boolean().default(false) }))
 		.mutation(async ({ ctx, input }) => {
 			const before = await applyOp(ctx, input.workspaceId, { type: "list" });
-			const terminalId = before.layout.tabs
+			const terminalId = allLayoutTabs(before.layout)
 				.flatMap((tab) => tab.panes)
 				.find((pane) => pane.id === input.paneId)?.terminalId;
 			const result = await applyOp(ctx, input.workspaceId, {
@@ -162,12 +176,15 @@ export const panesRouter = router({
 			}),
 		),
 
-	moveToNewTab: protectedProcedure.input(paneInput).mutation(({ ctx, input }) =>
-		applyOp(ctx, input.workspaceId, {
-			type: "moveToNewTab",
-			paneId: input.paneId,
-		}),
-	),
+	moveToNewTab: protectedProcedure
+		.input(paneInput.extend({ area: area.optional() }))
+		.mutation(({ ctx, input }) =>
+			applyOp(ctx, input.workspaceId, {
+				type: "moveToNewTab",
+				paneId: input.paneId,
+				area: input.area,
+			}),
+		),
 
 	swap: protectedProcedure
 		.input(paneInput.extend({ withPaneId: z.string() }))
@@ -176,6 +193,55 @@ export const panesRouter = router({
 				type: "swap",
 				paneId: input.paneId,
 				withPaneId: input.withPaneId,
+			}),
+		),
+
+	open: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				tool: z.enum(SIDEBAR_TOOLS),
+				url: z.string().min(1).optional(),
+				slug: z.string().min(1).optional(),
+				path: z.string().min(1).optional(),
+				line: z.number().int().positive().optional(),
+				background: z.boolean().optional(),
+			}),
+		)
+		.mutation(({ ctx, input }) => {
+			const { tool, path } = input;
+			const worktreePath = getLocalWorkspace(
+				ctx.db,
+				input.workspaceId,
+			)?.worktreePath;
+			const resolvedPath =
+				path && worktreePath && (tool === "file" || tool === "changes")
+					? resolveOpenPath(tool, path, worktreePath)
+					: path;
+			return applyOp(ctx, input.workspaceId, {
+				type: "open",
+				tool,
+				url: input.url,
+				slug: input.slug,
+				path: resolvedPath,
+				line: input.line,
+				background: input.background,
+			});
+		}),
+
+	sidebar: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				open: z.boolean(),
+				fullScreen: z.boolean().optional(),
+			}),
+		)
+		.mutation(({ ctx, input }) =>
+			applyOp(ctx, input.workspaceId, {
+				type: "sidebar",
+				open: input.open,
+				fullScreen: input.fullScreen,
 			}),
 		),
 });

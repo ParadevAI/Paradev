@@ -26,14 +26,10 @@
 		"test": "bun test --pass-with-no-tests"
 	},
 	"dependencies": {
-		"@earendil-works/pi-agent-core": "1.4.0",
-		"@earendil-works/pi-ai": "1.4.0",
-		"@earendil-works/pi-coding-agent": "1.4.0",
 		"@superset/chat": "workspace:*",
 		"@superset/chat-runtime": "workspace:*",
 		"@temporalio/client": "1.24.0",
-		"@temporalio/workflow": "1.24.0",
-		"diff": "8.0.3"
+		"@temporalio/workflow": "1.24.0"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",

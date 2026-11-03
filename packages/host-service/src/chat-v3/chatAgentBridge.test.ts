@@ -122,6 +122,40 @@ describe("createChatAgentBridge", () => {
 		bridge.stopped("chat-1");
 	});
 
+	it("updates the binding when only a subagent's status or controls change", () => {
+		const { bridge, terminalAgentStore, start, publish } = setup();
+		start("chat-1");
+		const publishTask = (fields: Record<string, unknown>) =>
+			publish("chat-1", {
+				type: "session",
+				session: {
+					status: "running",
+					harness: "claude-acp",
+					backgroundTasks: [
+						{
+							id: "subagent:c1",
+							kind: "subagent",
+							name: "Explore",
+							canStop: true,
+							startedAtMs: 0,
+							...fields,
+						},
+					],
+				},
+			});
+		publishTask({ subagentStatus: "running", canBackground: false });
+		publishTask({ subagentStatus: "running", canBackground: true });
+		expect(
+			terminalAgentStore.getChat(TERMINAL)?.backgroundTasks?.[0]?.canBackground,
+		).toBe(true);
+		publishTask({ subagentStatus: "idle", canBackground: true });
+		expect(
+			terminalAgentStore.getChat(TERMINAL)?.backgroundTasks?.[0]
+				?.subagentStatus,
+		).toBe("idle");
+		bridge.stopped("chat-1");
+	});
+
 	it("lists the chat's background tasks on its binding", () => {
 		const { bridge, terminalAgentStore, start, publish } = setup();
 		start("chat-1");

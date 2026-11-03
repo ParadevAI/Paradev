@@ -15,7 +15,7 @@ keywords:
   - claude code parallel
 ---
 
-Paradev and Sculptor are both desktop apps for running coding agents in parallel with isolated workspaces and built-in review. Sculptor, from the AI lab Imbue, centers on Claude Code and Imbue's own Pi harness, with an isolated environment per agent and a "Pairing Mode" that syncs an agent's work back into your local repo. Paradev supports CLI agents in local branch-based workspaces with separate Git worktrees, with an in-app browser, MCP, and remote and cloud workspaces around it.
+Paradev and Sculptor are both desktop apps for running coding agents in parallel in separate workspaces with built-in review. Sculptor, from the AI lab Imbue, centers on Claude Code and Imbue's own Pi harness, with an isolated environment per agent and a "Pairing Mode" that syncs an agent's work back into your local repo. Paradev supports CLI agents in local branch-based workspaces with separate Git worktrees, with an in-app browser, MCP, and remote and cloud workspaces around it.
 
 ---
 
@@ -23,7 +23,7 @@ Paradev and Sculptor are both desktop apps for running coding agents in parallel
 
 | | **Paradev** | **Sculptor** |
 |---|---|---|
-| **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, and browser | Runs coding agents in parallel isolated environments with pairing back to your repo |
+| **What it does** | Runs multiple agents in parallel in separate Git worktrees, with review and browser | Runs coding agents in parallel isolated environments with pairing back to your repo |
 | **Isolation** | Git worktrees for local branch-based workspaces | Isolated worktrees per workspace, plus optional containers |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, and more) | Claude Code and Imbue's Pi; can manage other terminal agents |
 | **Signature feature** | Broad agent-agnostic orchestration + remote/cloud hosts | Pairing Mode syncs an agent's work into your local repo/IDE |
@@ -35,7 +35,7 @@ Paradev and Sculptor are both desktop apps for running coding agents in parallel
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, and in cloud workspaces. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, and in cloud workspaces. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Sculptor?
 
@@ -49,7 +49,7 @@ Sculptor centers on Claude Code and Imbue's Pi harness, though it can manage oth
 
 ### Pairing vs Worktree-First Orchestration
 
-Sculptor's signature is Pairing Mode: an agent works in an isolated environment, and its changes sync back into your local checkout and IDE. Paradev keeps the worktree itself as the unit you work in, with in-app review and one-click handoff to your editor. Both isolate agents; they differ in how the isolated work rejoins your main checkout.
+Sculptor's signature is Pairing Mode: an agent works in an isolated environment, and its changes sync back into your local checkout and IDE. Paradev keeps the worktree itself as the unit you work in, with in-app review and one-click handoff to your editor. Both keep each agent's work separate; they differ in how that work rejoins your main checkout.
 
 ### Containers and Reach
 

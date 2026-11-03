@@ -1,1 +1,5 @@
-export { type MentionSection, useMentionSources } from "./useMentionSources";
+export {
+	type MentionSection,
+	matchesQuery,
+	useMentionSources,
+} from "./useMentionSources";

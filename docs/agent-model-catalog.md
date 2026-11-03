@@ -5,6 +5,13 @@ agent settings, workspace creation, and host-side CLI validation.
 `SUPERSET_CHAT_MODELS` in the same file supplies the cloud chat model list.
 Model names are provider identifiers and are not translated.
 
+## Codex refresh: October 30, 2026
+
+Live `codex app-server` → `model/list` (codex 0.162.1) lists GPT-6.1 Sol,
+GPT-6 Astra, GPT-6.1 Terra, GPT-6 Sol, GPT-6 Luna, and GPT-5.6 Sol, Terra, and
+Luna. Added GPT-6.1 Terra and removed the retired GPT-5.5. Every model takes
+`max`; all but the two Luna models take `ultra`.
+
 ## Verification: September 26, 2026
 
 | Agent | Result | Evidence |

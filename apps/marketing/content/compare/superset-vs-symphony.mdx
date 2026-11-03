@@ -23,7 +23,7 @@ Paradev and Symphony both scale coding agents past one-at-a-time, from opposite 
 
 | | **Paradev** | **Symphony** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Turns tracker tickets into isolated, autonomous Codex implementation runs |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | Turns tracker tickets into isolated, autonomous Codex implementation runs |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Headless orchestration daemon (spec + reference implementation) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Codex only (app-server protocol) |
 | **Control plane** | Workspace UI, CLI, MCP server, SDK | Your issue tracker (Linear, GitHub, Jira, Asana, GitLab) |
@@ -37,7 +37,7 @@ Paradev and Symphony both scale coding agents past one-at-a-time, from opposite 
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also reaches other machines you own through Remote Access, offers cloud workspaces that run in the cloud, and can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also reaches other machines you own through Remote Access, offers cloud workspaces that run in the cloud, and can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Symphony?
 

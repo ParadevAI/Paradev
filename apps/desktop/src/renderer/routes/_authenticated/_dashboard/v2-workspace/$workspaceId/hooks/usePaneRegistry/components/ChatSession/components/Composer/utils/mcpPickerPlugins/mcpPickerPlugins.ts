@@ -17,7 +17,13 @@ export function mcpPickerPlugins(
 ): McpPickerPlugin[] {
 	return catalog.flatMap((plugin) => {
 		const desired = desiredPluginMcpServers([
-			{ name: plugin.name, marketplace: plugin.marketplace },
+			{
+				name: plugin.name,
+				marketplace: plugin.marketplace,
+				tools:
+					plugin.connector !== null ||
+					Object.keys(plugin.mcpServers ?? {}).length > 0,
+			},
 		]);
 		const servers = Object.keys(desired);
 		if (!servers.length) return [];

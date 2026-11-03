@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { realpath } from "node:fs/promises";
+import { resolve, win32 } from "node:path";
 import {
 	deriveTimeline,
 	emptySnapshot,
@@ -19,9 +21,11 @@ import type {
 	DurableEvent,
 	GetItemsInput,
 	GetSessionInput,
+	GetTurnChangesInput,
 	PromptInput,
 	QueuedPromptInput,
 	RespondToApprovalInput,
+	RespondToUsageLimitInput,
 	ResumeQueueInput,
 	SetConfigOptionInput,
 	SetModeInput,
@@ -40,18 +44,30 @@ import {
 	getItemsInputSchema,
 	getOutlineInputSchema,
 	getSessionInputSchema,
+	getTurnChangesInputSchema,
 	listSessionsInputSchema,
 	promptInputSchema,
 	queuedPromptInputSchema,
 	respondToApprovalInputSchema,
+	respondToUsageLimitInputSchema,
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
+	type UndoTurnFilesInput,
+	type UpdateQueuedPromptInput,
+	undoTurnFilesInputSchema,
+	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import { z } from "zod";
+import type {
+	ChatCheckpoints,
+	TurnAnchors,
+	TurnChanges,
+	TurnUndoResult,
+} from "../../checkpoints";
 import type { ChatDb, ChatSessionRow } from "../../db";
 import type { ChatJournal } from "../../journal";
 import type { ChatSessionStore } from "../../projection";
@@ -216,7 +232,9 @@ export type ChatCommands = {
 	prompt(input: PromptInput): PromptResult;
 	removeQueuedPrompt(input: QueuedPromptInput): void;
 	steerQueuedPrompt(input: QueuedPromptInput): void;
+	updateQueuedPrompt(input: UpdateQueuedPromptInput): void;
 	resumeQueue(input: ResumeQueueInput): void;
+	respondToUsageLimit(input: RespondToUsageLimitInput): void;
 	cancelTurn(input: CancelTurnInput): void;
 	stopBackgroundTask(input: StopBackgroundTaskInput): Promise<boolean>;
 	steerSubagent(input: SteerSubagentInput): Promise<boolean>;
@@ -231,6 +249,12 @@ export type ChatCommands = {
 	): Promise<CreateSessionResult | null>;
 	rewindSession(input: RewindSessionCommandInput): Promise<CreateSessionResult>;
 	getSession(input: GetSessionInput): GetSessionResult;
+	getTurnChanges(
+		input: GetTurnChangesInput & { cwd: string },
+	): Promise<TurnChanges | null>;
+	undoTurnFiles(
+		input: UndoTurnFilesInput & { cwd: string },
+	): Promise<TurnUndoResult>;
 	getQueue(input: GetSessionInput): GetQueueResult;
 	listSessions(input: ListSessionsCommandInput): ChatSessionListEntry[];
 	discoverSessions(
@@ -256,6 +280,7 @@ export type CommandsOptions = {
 	db: ChatDb;
 	sessions: ChatSessionStore;
 	live: LiveSessionRegistry;
+	checkpoints?: ChatCheckpoints;
 	dedupe: { run<T>(commandId: string, execute: () => T): T };
 	mintSessionId?: () => string;
 	subagentItems?: SubagentItems;
@@ -264,6 +289,17 @@ export type CommandsOptions = {
 const MAX_CACHED_REPLAY_EVENTS = 20_000;
 
 export function createCommands(options: CommandsOptions): ChatCommands {
+	const turnAnchors = (
+		sessionId: string,
+		anchorItemIds: string[] | undefined,
+	): TurnAnchors => {
+		const harnessSessionId =
+			options.sessions.get(sessionId)?.harnessSessionId ?? undefined;
+		return harnessSessionId && anchorItemIds
+			? { harnessSessionId, anchorItemIds }
+			: {};
+	};
+
 	const mintSessionId = options.mintSessionId ?? randomUUID;
 	const subagentItems = options.subagentItems ?? new SubagentItems(options.db);
 
@@ -464,11 +500,10 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			return options.dedupe.run(`prompt:${parsed.commandId}`, () =>
 				options.live
 					.require(parsed.sessionId)
-					.prompt(
-						parsed.content,
-						parsed.clientId,
-						parsed.steer?.expectedTurnId,
-					),
+					.prompt(parsed.content, parsed.clientId, {
+						steerTurnId: parsed.steer?.expectedTurnId,
+						snapshotWorktree: parsed.snapshotWorktree === true,
+					}),
 			);
 		},
 
@@ -486,10 +521,30 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 		},
 
+		updateQueuedPrompt(input) {
+			const parsed: UpdateQueuedPromptInput =
+				updateQueuedPromptInputSchema.parse(input);
+			options.dedupe.run(`updateQueuedPrompt:${parsed.commandId}`, () => {
+				options.live
+					.require(parsed.sessionId)
+					.updateQueued(parsed.itemId, parsed.content);
+			});
+		},
+
 		resumeQueue(input) {
 			const parsed: ResumeQueueInput = resumeQueueInputSchema.parse(input);
 			options.dedupe.run(`resumeQueue:${parsed.commandId}`, () => {
 				options.live.require(parsed.sessionId).resumeQueue();
+			});
+		},
+
+		respondToUsageLimit(input) {
+			const parsed: RespondToUsageLimitInput =
+				respondToUsageLimitInputSchema.parse(input);
+			options.dedupe.run(`respondToUsageLimit:${parsed.commandId}`, () => {
+				options.live
+					.require(parsed.sessionId)
+					.respondToUsageLimit(parsed.action);
 			});
 		},
 
@@ -654,6 +709,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 								{ type: "text", text: parsed.prompt },
 							],
 							`rewind-${parsed.commandId}`,
+							{ snapshotWorktree: parsed.snapshotWorktree === true },
 						);
 					} catch (error) {
 						await this.closeSession({ sessionId: created.sessionId }).catch(
@@ -669,6 +725,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
 			const wasLive = options.live.get(parsed.sessionId) !== null;
+			options.sessions.markClosed(parsed.sessionId);
 			replays.delete(parsed.sessionId);
 			subagentItems.forget(parsed.sessionId);
 			try {
@@ -685,6 +742,44 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				subagentItems.forget(sessionId);
 				options.journal.announce(sessionId);
 			}
+		},
+
+		async getTurnChanges({ cwd, ...input }) {
+			const parsed = getTurnChangesInputSchema.parse(input);
+			if (!options.checkpoints) return null;
+			return options.checkpoints.changes({
+				cwd,
+				sessionId: parsed.sessionId,
+				turnId: parsed.turnId,
+				live: parsed.live === true,
+				...turnAnchors(parsed.sessionId, parsed.anchorItemIds),
+			});
+		},
+
+		undoTurnFiles({ cwd, ...input }) {
+			const parsed = undoTurnFilesInputSchema.parse(input);
+			return options.dedupe.run(`undoTurnFiles:${parsed.commandId}`, () => {
+				const checkpoints = options.checkpoints;
+				if (!checkpoints) {
+					return Promise.resolve<TurnUndoResult>({
+						status: "refused",
+						reason: "unsupported",
+					});
+				}
+				if (options.live.busyIn(cwd)) {
+					return Promise.resolve<TurnUndoResult>({
+						status: "refused",
+						reason: "busy",
+					});
+				}
+				return checkpoints.undo({
+					cwd,
+					sessionId: parsed.sessionId,
+					turnId: parsed.turnId,
+					paths: parsed.paths,
+					...turnAnchors(parsed.sessionId, parsed.anchorItemIds),
+				});
+			});
 		},
 
 		getSession(input) {
@@ -713,14 +808,23 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		listSessions,
 
-		discoverSessions(input) {
+		async discoverSessions(input) {
 			const parsed = discoverSessionsCommandSchema.parse(input);
-			return options.live.discoverSessions({
-				harness: parsed.harness,
-				scopeId: parsed.scopeId,
-				cwd: parsed.cwd,
-				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
-			});
+			const [page, cwds] = await Promise.all([
+				options.live.discoverSessions({
+					harness: parsed.harness,
+					scopeId: parsed.scopeId,
+					cwd: parsed.cwd,
+					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
+				}),
+				equivalentPaths(parsed.cwd),
+			]);
+			return {
+				...page,
+				sessions: page.sessions.filter((session) =>
+					cwds.has(pathKey(session.cwd)),
+				),
+			};
 		},
 
 		getItems(input) {
@@ -774,4 +878,19 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			};
 		},
 	};
+}
+
+async function equivalentPaths(path: string): Promise<Set<string>> {
+	const paths = new Set([pathKey(path)]);
+	const real = await realpath(path).catch(() => null);
+	if (real) paths.add(pathKey(real));
+	return paths;
+}
+
+export function pathKey(
+	path: string,
+	platform: NodeJS.Platform = process.platform,
+): string {
+	if (platform !== "win32") return resolve(path);
+	return win32.resolve(path).toLowerCase();
 }

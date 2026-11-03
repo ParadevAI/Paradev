@@ -3,6 +3,7 @@ import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
+import { workspaceLinks } from "../../../lib/open-url";
 import { uploadAttachments } from "../../../lib/upload-attachments";
 import { createCloudWorkspace } from "./createCloudWorkspace";
 
@@ -10,7 +11,7 @@ export default command({
 	description:
 		"Create a workspace: in the cloud by default if your account has cloud workspaces, else on this machine; --local or --host picks a host",
 	options: {
-		host: string().desc("Create on this host (machineId)"),
+		host: string().desc("Create on this host (machineId), or `cloud`"),
 		local: boolean().desc("Create on this machine"),
 		environment: string().desc(
 			"Environment ID a cloud workspace starts from (see: superset environments list); required when several have repositories",
@@ -31,14 +32,14 @@ export default command({
 			"Where the files live: `worktree` (default) checks out --branch in its own worktree; `local` uses the project's checkout as it is — no branch switch, files shared with the project's other local workspaces",
 		),
 		branch: string().desc(
-			"Git branch (required unless --pr, --task, or --checkout local is set)",
+			"Git branch the workspace works on, for a workspace on a host (required there unless --pr, --task, or --checkout local is set). A cloud workspace always gets a new branch of its own; use --base-branch",
 		),
 		pr: number().desc("PR number — checks out the verified PR head"),
 		task: string().desc(
 			"Task ID to link. When --branch is omitted, the task's provider branch name (e.g. Linear's) is used verbatim",
 		),
 		baseBranch: string().desc(
-			"Branch to fork from when `branch` does not exist (defaults to project default)",
+			"Branch to start from. On a host: used when --branch does not exist (defaults to the project default). In the cloud: the branch the workspace's new branch is cut from (defaults to the repository default)",
 		),
 		skipBranchPrefix: boolean().desc(
 			"Use --branch exactly as given instead of namespacing it under the project branch prefix",
@@ -236,9 +237,10 @@ export default command({
 				agents,
 				command: options.command ?? undefined,
 			});
+			const links = workspaceLinks(result.workspace.id);
 			return {
-				data: result,
-				message: `Created session "${result.workspace.name}" on host ${target.hostId}`,
+				data: { ...result, ...links },
+				message: `Created session "${result.workspace.name}" on host ${target.hostId}\n${links.webUrl}`,
 			};
 		}
 
@@ -263,11 +265,13 @@ export default command({
 			...(options.tag?.length ? { tags: options.tag } : {}),
 		});
 
+		const links = workspaceLinks(result.workspace.id);
+		const summary = result.alreadyExists
+			? `Reused existing workspace "${result.workspace.name}" on host ${target.hostId}`
+			: `Created workspace "${result.workspace.name}" on host ${target.hostId}`;
 		return {
-			data: result,
-			message: result.alreadyExists
-				? `Reused existing workspace "${result.workspace.name}" on host ${target.hostId}`
-				: `Created workspace "${result.workspace.name}" on host ${target.hostId}`,
+			data: { ...result, ...links },
+			message: `${summary}\n${links.webUrl}`,
 		};
 	},
 });

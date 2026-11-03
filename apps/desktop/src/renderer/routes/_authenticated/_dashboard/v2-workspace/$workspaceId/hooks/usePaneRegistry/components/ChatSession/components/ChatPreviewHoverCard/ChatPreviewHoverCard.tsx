@@ -67,6 +67,7 @@ export function ChatPreviewHoverCard({
 			<HoverCardTrigger
 				asChild
 				onClick={() => setOpen(false)}
+				onContextMenu={() => setOpen(false)}
 				onFocus={() => setWanted(true)}
 				onPointerEnter={(event) => {
 					if (event.pointerType !== "touch") setWanted(true);

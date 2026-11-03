@@ -2,12 +2,8 @@ import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure } from "../../../trpc";
-import { githubRequestError, hiddenFromApp } from "./github-request-error";
-import {
-	asViewer,
-	notConnectedError,
-	type ViewerPullRequest,
-} from "./viewer-octokit";
+import { githubRequestError } from "./github-request-error";
+import { asViewer } from "./viewer-octokit";
 
 const pullRequestInput = z.object({
 	organizationId: z.string().uuid(),
@@ -28,20 +24,6 @@ async function onGithub<T>(
 	}
 }
 
-async function readAs<T>(
-	pr: ViewerPullRequest,
-	fallback: string,
-	run: () => Promise<T>,
-): Promise<T> {
-	try {
-		return await run();
-	} catch (error) {
-		throw hiddenFromApp(pr.actsAsViewer, error)
-			? notConnectedError()
-			: githubRequestError(error, fallback);
-	}
-}
-
 /**
  * A pull request by its own identity, read and written as the person asking.
  * The work is `@superset/shared/pull-request-github`, which the desktop also
@@ -52,8 +34,8 @@ export const pullRequestProcedures = {
 	getPullRequestDetail: protectedProcedure
 		.input(pullRequestInput.extend({ activity: z.boolean().optional() }))
 		.query(async ({ ctx, input }): Promise<PullRequestDetailRead> => {
-			const pr = await asViewer(ctx.session.user.id, input, "read");
-			return readAs(pr, `Failed to read pull request #${pr.number}`, () =>
+			const pr = await asViewer(ctx.session.user.id, input);
+			return onGithub(`Failed to read pull request #${pr.number}`, () =>
 				pr.detail({ activity: input.activity }),
 			);
 		}),
@@ -61,9 +43,8 @@ export const pullRequestProcedures = {
 	getPullRequestThreads: protectedProcedure
 		.input(pullRequestInput)
 		.query(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "read");
+			const pr = await asViewer(ctx.session.user.id, input);
 			return pr.threads((error) => {
-				if (hiddenFromApp(pr.actsAsViewer, error)) throw notConnectedError();
 				console.warn(
 					`[github.getPullRequestThreads] ${input.repoFullName}#${input.number}:`,
 					error instanceof Error ? error.message : error,
@@ -75,8 +56,8 @@ export const pullRequestProcedures = {
 	getPullRequestDiffstat: protectedProcedure
 		.input(pullRequestInput)
 		.query(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "read");
-			return readAs(pr, `Failed to read pull request #${pr.number}`, () =>
+			const pr = await asViewer(ctx.session.user.id, input);
+			return onGithub(`Failed to read pull request #${pr.number}`, () =>
 				pr.diffstat(),
 			);
 		}),
@@ -84,7 +65,7 @@ export const pullRequestProcedures = {
 	addPullRequestComment: protectedProcedure
 		.input(pullRequestInput.extend({ body }))
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			return onGithub("GitHub refused the comment.", () =>
 				pr.comment(input.body),
 			);
@@ -95,7 +76,7 @@ export const pullRequestProcedures = {
 			pullRequestInput.extend({ commentId: z.number().int().positive(), body }),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			return onGithub("GitHub refused the reply.", () =>
 				pr.reply(input.commentId, input.body),
 			);
@@ -109,7 +90,7 @@ export const pullRequestProcedures = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			return onGithub("GitHub refused to update the thread.", () =>
 				pr.resolveThread(input.threadId, input.resolved),
 			);
@@ -123,7 +104,7 @@ export const pullRequestProcedures = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			return onGithub("GitHub refused the merge.", () =>
 				pr.merge({
 					mergeMethod: input.mergeMethod,
@@ -135,7 +116,7 @@ export const pullRequestProcedures = {
 	setPullRequestState: protectedProcedure
 		.input(pullRequestInput.extend({ state: z.enum(["open", "closed"]) }))
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			await onGithub(
 				`GitHub refused to ${input.state === "closed" ? "close" : "reopen"} the pull request.`,
 				() => pr.setState(input.state),
@@ -146,7 +127,7 @@ export const pullRequestProcedures = {
 	setPullRequestDraft: protectedProcedure
 		.input(pullRequestInput.extend({ draft: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			await onGithub(
 				input.draft
 					? "GitHub refused to convert the pull request to a draft."
@@ -159,7 +140,7 @@ export const pullRequestProcedures = {
 	updatePullRequestBranch: protectedProcedure
 		.input(pullRequestInput)
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			await onGithub("GitHub refused to update the branch.", () =>
 				pr.updateBranch(),
 			);
@@ -169,7 +150,7 @@ export const pullRequestProcedures = {
 	dequeuePullRequest: protectedProcedure
 		.input(pullRequestInput)
 		.mutation(async ({ ctx, input }) => {
-			const pr = await asViewer(ctx.session.user.id, input, "write");
+			const pr = await asViewer(ctx.session.user.id, input);
 			await onGithub(
 				"GitHub refused to remove the pull request from the queue.",
 				() => pr.dequeue(),

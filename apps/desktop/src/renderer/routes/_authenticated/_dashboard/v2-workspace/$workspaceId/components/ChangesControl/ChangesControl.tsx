@@ -18,7 +18,6 @@ interface ChangesControlProps {
 	onToggleChanges: () => void;
 	/** Open or focus the pane showing the linked PR's summary. */
 	onOpenPullRequest: OpenPullRequestPane;
-	paneAreaStyle?: boolean;
 }
 
 /**
@@ -28,8 +27,7 @@ interface ChangesControlProps {
  * or the ship action itself once the tree is clean; once a PR exists the
  * face is the PR badge alone. Either face toggles the Changes pane: it
  * closes the one in view and opens or focuses one otherwise, reading as
- * pressed while one shows. In the right pane area the Changes tab has its
- * own toggle, so the PR badge opens the pull request instead.
+ * pressed while one shows.
  *
  * Segments hide on their own: stats while status is unknown, the tree is
  * clean, or a PR owns the face; the right side while the flow state is
@@ -42,7 +40,6 @@ export const ChangesControl = memo(function ChangesControl({
 	isChangesOpen,
 	onToggleChanges,
 	onOpenPullRequest,
-	paneAreaStyle = false,
 }: ChangesControlProps) {
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
@@ -65,9 +62,7 @@ export const ChangesControl = memo(function ChangesControl({
 		((flowState.kind === "busy" || flowState.kind === "error") &&
 			flowState.pr != null);
 	const visibleStats =
-		!paneAreaStyle && !hasPr && stats != null && stats.fileCount > 0
-			? stats
-			: null;
+		!hasPr && stats != null && stats.fileCount > 0 ? stats : null;
 
 	return (
 		<div className="flex h-7 items-stretch divide-x divide-border/60 overflow-hidden rounded-md border border-border/60 bg-muted/30 empty:hidden">
@@ -88,24 +83,21 @@ export const ChangesControl = memo(function ChangesControl({
 				</button>
 			)}
 			{flowState.kind === "no-pr" ? (
-				!paneAreaStyle && (
-					<ShipControl
-						workspaceId={workspaceId}
-						sync={flowState.sync}
-						onRefresh={onRetry}
-						compact={visibleStats != null}
-					/>
-				)
+				<ShipControl
+					workspaceId={workspaceId}
+					sync={flowState.sync}
+					onRefresh={onRetry}
+					compact={visibleStats != null}
+				/>
 			) : (
 				<PRStatusGroup
 					state={flowState}
 					workspaceId={workspaceId}
 					onRefresh={onRetry}
-					isChangesOpen={!paneAreaStyle && isChangesOpen}
+					isChangesOpen={isChangesOpen}
 					toggleLabel={label}
-					onToggleChanges={paneAreaStyle ? undefined : onToggleChanges}
+					onToggleChanges={onToggleChanges}
 					onOpenPullRequest={onOpenPullRequest}
-					paneAreaStyle={paneAreaStyle}
 				/>
 			)}
 		</div>

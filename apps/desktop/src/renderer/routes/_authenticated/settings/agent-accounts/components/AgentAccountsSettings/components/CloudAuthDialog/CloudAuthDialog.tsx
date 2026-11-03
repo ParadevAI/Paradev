@@ -250,9 +250,7 @@ export function CloudAuthDialog({
 						<DialogHeader>
 							<DialogTitle>{label}</DialogTitle>
 							<DialogDescription>
-								<Trans>
-									How {label} signs in when Paradev runs it for you.
-								</Trans>
+								<Trans>How {label} authenticates in cloud workspaces.</Trans>
 							</DialogDescription>
 						</DialogHeader>
 
@@ -375,7 +373,8 @@ export function CloudAuthDialog({
 																	>
 																		<CopyStateIcon copied={copiedCommand} />
 																	</button>{" "}
-																	in a terminal and paste the token here.
+																	in a terminal and paste the token you get back
+																	here.
 																</Trans>
 															</p>
 															<div className="flex items-center gap-2">

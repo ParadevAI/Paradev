@@ -3,8 +3,6 @@ import type {
 	ContextMenuAnchorRect,
 	FileTreeDropResult,
 	FileTreeRenameEvent,
-	FileTreeRowDecoration,
-	FileTreeRowDecorationContext,
 	ContextMenuItem as PierreContextMenuItem,
 	ContextMenuOpenContext as PierreContextMenuOpenContext,
 } from "@pierre/trees";
@@ -58,12 +56,13 @@ import { buildPierreGitStatus } from "./utils/buildPierreGitStatus";
 import { stripTrailingSlash, toAbs } from "./utils/treePath";
 
 const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: FILE_EXPLORER_ROW_HEIGHT,
 	levelIndent: FILE_EXPLORER_INDENT,
 	withSearchChrome: true,
 });
 
 type GitStatusData = inferRouterOutputs<AppRouter>["git"]["getStatus"];
+
+const NARROW_HIDDEN = "hidden @min-[200px]/file-tree-header:inline-flex";
 
 interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
@@ -120,11 +119,6 @@ export function FilesTab({
 		onMove(_event: FileTreeDropResult) {},
 		onMoveError(_message: string) {},
 		onRenameError(_message: string) {},
-		renderRowDecoration(
-			_ctx: FileTreeRowDecorationContext,
-		): FileTreeRowDecoration | null {
-			return null;
-		},
 	});
 
 	const { model } = usePierreFileTree({
@@ -145,7 +139,6 @@ export function FilesTab({
 		itemHeight: FILE_EXPLORER_ROW_HEIGHT,
 		overscan: FILE_EXPLORER_OVERSCAN,
 		stickyFolders: true,
-		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
 	});
 
 	const bridge = useFilesTabBridge({ model, workspaceId, rootPath });
@@ -273,11 +266,6 @@ export function FilesTab({
 	handlersRef.current.onRenameError = (message) => handleRenameError(message);
 	handlersRef.current.onMove = (event) => void handleMove(event);
 	handlersRef.current.onMoveError = (message) => toast.error(message);
-	// No-op: Pierre's setGitStatus already renders its own per-row status
-	// indicator (and tints the row text), so a custom decoration here would
-	// duplicate it. Kept the wiring in place in case we want to layer
-	// something Pierre doesn't show (e.g. lock icons, debug markers).
-	handlersRef.current.renderRowDecoration = () => null;
 
 	// Hint tooltip uses ShadowClickHint to anchor a single shadcn Tooltip
 	// over the hovered row's bounding rect — Pierre owns the row DOM inside
@@ -385,21 +373,22 @@ export function FilesTab({
 					header={
 						<div
 							data-file-tree-header="true"
-							className="group flex h-10 items-center gap-1 bg-background px-2"
+							className="group @container/file-tree-header flex h-10 items-center gap-1 bg-background px-2"
 						>
 							{onSearch && (
 								<button
 									type="button"
 									onClick={onSearch}
+									aria-label={t({ message: "Search files" })}
 									className={cn(
-										"flex min-w-0 flex-1 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+										"flex min-w-0 items-center gap-1.5 @min-[150px]/file-tree-header:flex-1 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
 										variant === "fileView"
 											? "h-7 rounded-full border border-border/60 bg-background px-2.5 shadow-sm"
 											: "h-8 rounded-md px-1.5",
 									)}
 								>
 									<Search className="size-3.5 shrink-0" />
-									<span className="truncate">
+									<span className="hidden truncate @min-[150px]/file-tree-header:inline">
 										<Trans>Search files</Trans>
 									</span>
 								</button>
@@ -410,6 +399,7 @@ export function FilesTab({
 									label={t({
 										message: "New File",
 									})}
+									className={NARROW_HIDDEN}
 									onClick={() => void startCreating("file")}
 								/>
 								<FilesTabHeaderButton
@@ -417,6 +407,7 @@ export function FilesTab({
 									label={t({
 										message: "New Folder",
 									})}
+									className={NARROW_HIDDEN}
 									onClick={() => void startCreating("folder")}
 								/>
 								<FilesTabHeaderButton

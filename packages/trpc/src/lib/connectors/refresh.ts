@@ -8,7 +8,11 @@ import {
 	encryptSecret,
 } from "../../router/plugins/crypto";
 import { credentialFetch } from "../../router/plugins/manifest";
-import { forgetClient, redirectUriFor } from "./client-identity";
+import {
+	ForgottenClientError,
+	forgetClient,
+	redirectUriFor,
+} from "./client-identity";
 import { connectorMethod, requireConnector, resolveEndpoints } from "./index";
 
 const DEFAULT_EXPIRY_BUFFER_SECONDS = 60;
@@ -131,11 +135,18 @@ async function refresh(
 		connector,
 		current.authMethod as never as undefined,
 	);
+	// The refresh token is bound to the client it was issued to; any other one,
+	// even for the same server, gets invalid_client.
 	const endpoints = await resolveEndpoints(
 		current.connector,
 		method,
 		redirectUriFor(current.connector),
-	);
+		{ issuedTo: current.oauthClientId },
+	).catch(async (error: unknown) => {
+		if (!(error instanceof ForgottenClientError)) throw error;
+		await markNeedsReauth(current.id, current.accessToken);
+		throw new UnrefreshableConnectionError(current.connector);
+	});
 	const { clientId, clientSecret } = endpoints;
 
 	const body = new URLSearchParams({

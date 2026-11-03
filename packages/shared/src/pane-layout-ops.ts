@@ -4,8 +4,22 @@ import type { AgentRunState } from "./agent-status";
 export const PANE_SPLIT_DIRECTIONS = ["right", "left", "down", "up"] as const;
 export type PaneSplitDirection = (typeof PANE_SPLIT_DIRECTIONS)[number];
 
+/** `main` is the center of the workspace; `sidebar` is the right sidebar. */
+export const PANE_AREAS = ["main", "sidebar"] as const;
+export type PaneArea = (typeof PANE_AREAS)[number];
+
+export const SIDEBAR_TOOLS = [
+	"changes",
+	"file",
+	"files",
+	"pages",
+	"browser",
+] as const;
+export type SidebarTool = (typeof SIDEBAR_TOOLS)[number];
+
 const paneId = z.string().min(1);
 const direction = z.enum(PANE_SPLIT_DIRECTIONS);
+const area = z.enum(PANE_AREAS);
 
 export const paneLayoutOpSchema = z.discriminatedUnion("type", [
 	z.object({ type: z.literal("list") }),
@@ -33,9 +47,32 @@ export const paneLayoutOpSchema = z.discriminatedUnion("type", [
 		targetPaneId: paneId,
 		direction,
 	}),
-	z.object({ type: z.literal("moveToNewTab"), paneId }),
-	z.object({ type: z.literal("newTab"), terminalId: z.string().min(1) }),
+	z.object({
+		type: z.literal("moveToNewTab"),
+		paneId,
+		area: area.optional(),
+	}),
+	z.object({
+		type: z.literal("newTab"),
+		terminalId: z.string().min(1),
+		area: area.optional(),
+	}),
 	z.object({ type: z.literal("swap"), paneId, withPaneId: paneId }),
+	z.object({
+		type: z.literal("open"),
+		tool: z.enum(SIDEBAR_TOOLS),
+		url: z.string().min(1).optional(),
+		slug: z.string().min(1).optional(),
+		/** Absolute for `file`, relative to the worktree for `changes`. */
+		path: z.string().min(1).optional(),
+		line: z.number().int().positive().optional(),
+		background: z.boolean().optional(),
+	}),
+	z.object({
+		type: z.literal("sidebar"),
+		open: z.boolean(),
+		fullScreen: z.boolean().optional(),
+	}),
 ]);
 
 export type PaneLayoutOp = z.infer<typeof paneLayoutOpSchema>;
@@ -82,9 +119,23 @@ export interface PaneLayoutTab {
 	panes: PaneLayoutPane[];
 }
 
+export interface PaneLayoutSidebar {
+	open: boolean;
+	fullScreen: boolean;
+	activeTabId: string | null;
+	tabs: PaneLayoutTab[];
+}
+
+/** `activeTabId` and `tabs` describe the main area. */
 export interface PaneLayoutSnapshot {
 	activeTabId: string | null;
 	tabs: PaneLayoutTab[];
+	/** Absent from desktop apps older than the right sidebar ops. */
+	sidebar?: PaneLayoutSidebar;
+}
+
+export function allLayoutTabs(layout: PaneLayoutSnapshot): PaneLayoutTab[] {
+	return [...layout.tabs, ...(layout.sidebar?.tabs ?? [])];
 }
 
 export interface PaneLayoutOpResult {

@@ -8,6 +8,7 @@ import {
 	githubRepositories,
 	users,
 } from "@superset/db/schema";
+import { MAX_ATTACHMENTS } from "@superset/shared/attachment-limits";
 import { MACHINE_SIZES, machineSpec } from "@superset/shared/billing";
 import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
@@ -37,11 +38,10 @@ import {
 	sandboxExists,
 	stopAndSnapshot,
 } from "../../lib/sandbox";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { jwtProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
-import { ensureDefaultEnvironment } from "../environment/default-environment";
-import { regionForRequest } from "../environment/region-for-request";
 import {
 	canOpenWorkspace,
 	isListed,
@@ -53,7 +53,7 @@ import { recordCloudWorkspaceActivity } from "./activity";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
-import { queueReap } from "./reap";
+import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import { queueProvision, startCloudWorkspace } from "./start";
@@ -349,15 +349,7 @@ export const cloudWorkspaceRouter = {
 				/** Omitted = the repo's default branch, resolved here — a client
 				 * whose branch query hadn't answered must not guess "main". */
 				branch: z.string().min(1).max(300).optional(),
-				/** Required in practice; optional only while `repositoryId` is accepted. */
-				environmentId: z.string().uuid().optional(),
-				/**
-				 * @deprecated desktop 1.39.x sends this when no environment covers the
-				 * repository; the API then makes one. Newer clients send `environmentId`.
-				 * Remove with `ensureDefaultEnvironment` once MINIMUM_DESKTOP_VERSION
-				 * passes 1.39.x.
-				 */
-				repositoryId: z.string().uuid().optional(),
+				environmentId: z.string().uuid(),
 				/**
 				 * A built-in agent to launch on first boot with `prompt`. Absent
 				 * means the workspace comes up idle.
@@ -371,7 +363,10 @@ export const cloudWorkspaceRouter = {
 				 * bytes once it is up; the same cap `attachments.importFromCloud`
 				 * takes, since that is what runs in there.
 				 */
-				attachmentFileIds: z.array(z.string().uuid()).max(10).optional(),
+				attachmentFileIds: z
+					.array(z.string().uuid())
+					.max(MAX_ATTACHMENTS)
+					.optional(),
 				/** What the person typed, kept as the workspace's prompt; `prompt` may carry built context. */
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */
@@ -392,29 +387,10 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
-			const environmentId =
-				input.environmentId ??
-				(input.repositoryId
-					? (
-							await ensureDefaultEnvironment({
-								organizationId: input.organizationId,
-								repositoryId: input.repositoryId,
-								userId: ctx.userId,
-								region: regionForRequest(ctx.headers),
-							})
-						).id
-					: null);
-			if (!environmentId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "environmentId or repositoryId is required",
-				});
-			}
-
 			const row = await startCloudWorkspace({
 				organizationId: input.organizationId,
 				userId: ctx.userId,
-				environmentId,
+				environmentId: input.environmentId,
 				name: input.name,
 				prompt: input.prompt,
 				branch: input.branch,
@@ -422,6 +398,7 @@ export const cloudWorkspaceRouter = {
 				taskIds: input.taskIds,
 				attachmentFileIds: input.attachmentFileIds,
 				machineSize: input.machineSize,
+				chat: !!input.agent && (await acpChatEnabled(ctx.userId)),
 				...(input.agent
 					? {
 							launch: {
@@ -713,6 +690,7 @@ export const cloudWorkspaceRouter = {
 							),
 						);
 						await deleteSandbox(row.providerSandboxId);
+						await reapWorkspaceFiles(row.id);
 					});
 				}
 				await recordCloudWorkspaceActivity(

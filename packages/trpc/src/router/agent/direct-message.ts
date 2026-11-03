@@ -1,51 +1,42 @@
 import { dbWs } from "@superset/db/client";
 import {
-	agentSessions,
 	channelMembers,
 	channels,
 	type SelectAgent,
 } from "@superset/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
+import { ensureMainSession } from "./turns";
 
 /**
- * The DM between a person and a Dev: one agent session and one private
- * `dm` room, made together the first time and reused after.
+ * The private `dm` room between a person and a Dev, made the first time and
+ * reused after. Its messages reach the Dev's main session, whose id is
+ * returned with it.
  */
 export async function ensureDirectMessage(
 	agent: SelectAgent,
 	userId: string,
 ): Promise<{ sessionId: string; channelId: string }> {
-	return dbWs.transaction(async (tx) => {
-		await tx
-			.insert(agentSessions)
-			.values({
-				organizationId: agent.organizationId,
-				agentId: agent.id,
-				kind: "dm",
-				userId,
-			})
-			.onConflictDoNothing();
-		const [session] = await tx
-			.select({ id: agentSessions.id, channelId: agentSessions.channelId })
-			.from(agentSessions)
+	const name = `dm-${agent.id}-${userId}`;
+	const channelId = await dbWs.transaction(async (tx) => {
+		await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${name}))`);
+		const [existing] = await tx
+			.select({ id: channels.id })
+			.from(channels)
 			.where(
 				and(
-					eq(agentSessions.agentId, agent.id),
-					eq(agentSessions.kind, "dm"),
-					eq(agentSessions.userId, userId),
+					eq(channels.organizationId, agent.organizationId),
+					eq(channels.kind, "dm"),
+					eq(channels.name, name),
+					isNull(channels.archivedAt),
 				),
 			)
-			.for("update")
 			.limit(1);
-		if (!session) throw new Error("DM session missing after insert");
-		if (session.channelId) {
-			return { sessionId: session.id, channelId: session.channelId };
-		}
+		if (existing) return existing.id;
 		const [room] = await tx
 			.insert(channels)
 			.values({
 				organizationId: agent.organizationId,
-				name: `dm-${agent.id}-${userId}`,
+				name,
 				kind: "dm",
 				visibility: "private",
 				createdByUserId: userId,
@@ -56,10 +47,7 @@ export async function ensureDirectMessage(
 			{ channelId: room.id, actorId: userId, notify: "all" },
 			{ channelId: room.id, actorId: agent.id },
 		]);
-		await tx
-			.update(agentSessions)
-			.set({ channelId: room.id })
-			.where(eq(agentSessions.id, session.id));
-		return { sessionId: session.id, channelId: room.id };
+		return room.id;
 	});
+	return { sessionId: await ensureMainSession(agent), channelId };
 }

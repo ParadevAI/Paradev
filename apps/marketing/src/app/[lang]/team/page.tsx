@@ -10,7 +10,6 @@ import { initServerI18n } from "@/app/i18n-server";
 import { getAbout } from "@/lib/about";
 import { getAllPeople } from "@/lib/people";
 import { CompanyFacts } from "../components/CompanyFacts";
-import { CTASection } from "../components/CTASection";
 import { Investors } from "../components/Investors";
 import { PhotoFan } from "../components/PhotoFan";
 import { StoryPhoto } from "../components/StoryPhoto";
@@ -211,8 +210,6 @@ export default async function TeamPage() {
 					</div>
 				</section>
 			</div>
-
-			<CTASection showInstallCommand={false} />
 		</main>
 	);
 }

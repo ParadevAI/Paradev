@@ -10,6 +10,7 @@ import { useEffect, useMemo } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CheckResourcesHotkeyMount } from "renderer/commandPalette";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
+import { usePluginsSettingsVisible } from "renderer/hooks/usePluginsSettingsVisible";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
 import {
 	type SettingsSection,
@@ -51,6 +52,7 @@ const SECTION_ORDER: SettingsSection[] = [
 	"teams",
 	"project",
 	"integrations",
+	"plugins",
 	"billing",
 	"apikeys",
 	"security",
@@ -82,6 +84,7 @@ const SECTION_PATHS: Partial<Record<SettingsSection, string>> = {
 	browser: "/settings/browser",
 	experimental: "/settings/experimental",
 	integrations: "/settings/integrations",
+	plugins: "/settings/plugins",
 	billing: "/settings/billing",
 	apikeys: "/settings/api-keys",
 	security: "/settings/security",
@@ -117,7 +120,7 @@ function SettingsLayout() {
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH) === true;
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
-	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
+	const pluginsVisible = usePluginsSettingsVisible();
 	const searchQuery = useSettingsSearchQuery();
 	const setSearchQuery = useSetSettingsSearchQuery();
 	const originRoute = useSettingsOriginRoute();
@@ -138,7 +141,7 @@ function SettingsLayout() {
 						isV2CloudEnabled,
 						cloudWorkspacesEnabled,
 						mobileEnabled,
-						acpChatFlag,
+						pluginsVisible,
 					)
 				: {},
 		[
@@ -147,7 +150,7 @@ function SettingsLayout() {
 			isV2CloudEnabled,
 			cloudWorkspacesEnabled,
 			mobileEnabled,
-			acpChatFlag,
+			pluginsVisible,
 		],
 	);
 	const totalMatches = Object.values(matchCounts).reduce(

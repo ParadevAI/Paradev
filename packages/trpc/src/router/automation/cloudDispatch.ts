@@ -11,7 +11,6 @@ import {
 } from "@superset/shared/cloud-agent-launch";
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import { cloudAccess } from "../../lib/cloud-guards";
 import {
@@ -20,6 +19,7 @@ import {
 	SandboxUnavailableError,
 	sandboxHostSecretFor,
 } from "../../lib/sandbox";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { startCloudWorkspace } from "../cloud-workspace/start";
 import { transitionCloudWorkspace } from "../cloud-workspace/transition";
 import {
@@ -78,10 +78,8 @@ export async function runInCloud(
 	const launch = await withDeadline(prepareLaunch(args));
 	const { automation, prompt, placed, runId } = args;
 
+	const chat = await acpChatEnabled(automation.ownerUserId);
 	if (launch.kind === "pinned") {
-		const chat =
-			supportsCloudAgentChat(automation.agent) &&
-			(await acpChatEnabled(automation.ownerUserId));
 		const target = { baseUrl: launch.hostTarget, headers: launch.headers };
 		return launchAgentSession(
 			{
@@ -94,7 +92,7 @@ export async function runInCloud(
 				workspaceId: launch.row.id,
 				agent: automation.agent,
 				prompt,
-				chat,
+				chat: chat && supportsCloudAgentChat(automation.agent),
 				previous: launch.previous,
 			},
 		);
@@ -107,6 +105,7 @@ export async function runInCloud(
 		name: automation.name.slice(0, 200),
 		branch: launch.branch,
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
+		chat,
 		machineSize: (
 			await resolveMachineSize(
 				automation.organizationId,

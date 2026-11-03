@@ -34,6 +34,7 @@ import type {
 	DashboardSidebarWorkspacePullRequest,
 } from "../../../../types";
 import { DashboardSidebarWorkspaceQueuedBadge } from "../DashboardSidebarWorkspaceQueuedBadge";
+import { DashboardSidebarOpenCloudHostGlyph } from "./components/DashboardSidebarOpenCloudHostGlyph";
 import { DashboardSidebarPortsChip } from "./components/DashboardSidebarPortsChip";
 import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarRowEventBoundary";
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
@@ -388,21 +389,28 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								/>
 							)}
 							<div className="grid items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
+								{/* Not plain focus-within: a clicked row keeps focus, and the open cloud row's glyph must stay in view while it connects. */}
 								<span
 									className={cn(
 										"flex",
 										!isPending &&
 											!isSelected &&
-											"group-hover:invisible group-focus-within:invisible",
+											"group-hover:invisible group-[:focus-within:not(:focus:not(:focus-visible))]:invisible",
 									)}
 								>
-									<DashboardSidebarWorkspaceHostGlyph
-										hostType={hostType}
-										hostIsOnline={hostIsOnline}
-									/>
+									{isCloudWorkspace && isActive ? (
+										<DashboardSidebarOpenCloudHostGlyph
+											workspaceId={workspace.id}
+										/>
+									) : (
+										<DashboardSidebarWorkspaceHostGlyph
+											hostType={hostType}
+											hostIsOnline={hostIsOnline}
+										/>
+									)}
 								</span>
 								{!isPending && !isSelected && (
-									<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-focus-within:flex">
+									<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-[:focus-within:not(:focus:not(:focus-visible))]:flex">
 										{shortcutLabel && (
 											<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
 												{shortcutLabel}

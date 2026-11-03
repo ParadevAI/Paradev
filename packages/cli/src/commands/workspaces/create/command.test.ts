@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import type { MachineSize } from "@superset/shared/billing";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
 import createWorkspaceCommand from "./command";
 
 let localCreateError: Error | undefined;
@@ -15,16 +16,22 @@ withLocalHostService("org-1", {
 		createProcedure = "createLocal";
 		if (localCreateError) throw localCreateError;
 		createInput = input;
-		return { workspace: { name: "local" }, alreadyExists: false };
+		return {
+			workspace: { id: "ws-local", name: "local" },
+			alreadyExists: false,
+		};
 	},
 	"workspaces.createSession": (input) => {
 		sessionInput = input;
-		return { workspace: { name: "scratch" } };
+		return { workspace: { id: "ws-session", name: "scratch" } };
 	},
 	"workspaces.create": (input) => {
 		createProcedure = "create";
 		createInput = input;
-		return { workspace: { name: "agent-effort" }, alreadyExists: false };
+		return {
+			workspace: { id: "ws-1", name: "agent-effort" },
+			alreadyExists: false,
+		};
 	},
 });
 
@@ -107,6 +114,26 @@ describe("workspaces create", () => {
 		expect(sessionInput).toMatchObject({ name: "agent-effort" });
 		expect(createInput).toBeUndefined();
 	});
+
+	for (const [kind, overrides, id] of [
+		["worktree", {}, "ws-1"],
+		["local checkout", { checkout: "local", branch: undefined }, "ws-local"],
+		[
+			"session",
+			{ project: undefined, branch: undefined, session: true },
+			"ws-session",
+		],
+	] as const) {
+		test(`reports the new ${kind} workspace's desktop and web links`, async () => {
+			const links = workspaceLinks(id);
+			const result = (await invoke(overrides)) as {
+				data: Record<string, unknown>;
+				message: string;
+			};
+			expect(result.data).toMatchObject(links);
+			expect(result.message.split("\n").at(-1)).toBe(links.webUrl);
+		});
+	}
 
 	test("forwards model to the agent launched with the workspace", async () => {
 		await invoke({

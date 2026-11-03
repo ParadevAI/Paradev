@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Luego ejecuta la configuración de desarrollo desde el terminal de ese espacio de trabajo:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Consulta [**DEVELOPMENT.md**](../DEVELOPMENT.md) para la guía completa: qué ha
 
 ## Configuración
 
-Configura los scripts de setup, teardown y run de los espacios de trabajo en `.superset/config.json`. Consulta la [documentación completa](https://docs.paradev.com/setup-teardown-scripts).
+Configura los scripts de setup, teardown y run de los espacios de trabajo en `.paradev/config.json`. Consulta la [documentación completa](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

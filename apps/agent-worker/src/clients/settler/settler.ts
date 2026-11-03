@@ -25,6 +25,12 @@ export interface SessionStoreAccess {
  * joined after the last one. A turn already settled answers like a fresh settle.
  */
 export interface TurnSettler {
+	/** An attempt failed and will run again. */
+	noteRetry?(input: {
+		turnId: string;
+		attempt: number;
+		error: string;
+	}): Promise<void>;
 	settle(
 		input: SettleTurnInput,
 	): Promise<

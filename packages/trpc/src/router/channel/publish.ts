@@ -62,6 +62,8 @@ export function toWire(message: EnrichedMessage): ChannelMessageWire {
 		threadRootId: message.threadRootId,
 		authorId: message.authorId,
 		body: message.body,
+		subtype: message.subtype,
+		inviterId: message.inviterId,
 		mentionedIds: message.mentionedIds,
 		broadcast: message.broadcast,
 		clientId: message.clientId,

@@ -14,7 +14,8 @@ import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
-import { unreadState } from "../../utils/unreadState";
+import { useOrgDevs } from "../../hooks/useOrgDevs";
+import { countsAsUnread, unreadState } from "../../utils/unreadState";
 import { ChannelMessageRow, type ChannelPerson } from "../ChannelMessageRow";
 import { NewMessagesLine } from "../NewMessagesLine";
 import { ChannelIntro } from "./components/ChannelIntro";
@@ -47,6 +48,8 @@ interface ChannelTimelineProps {
 	canAutoMark: boolean;
 	/** The first unread message is on screen in a focused window. */
 	onSeen: (seq: number, saveGhost: boolean) => void;
+	/** The window got focus back with unread messages; the "New" line moves to them. */
+	onReturnedToUnread: (lastReadSeq: number) => void;
 	onMarkAllRead: () => void;
 	/** Nothing was unread on open, so later messages get no "New" line. */
 	onOpenedRead: () => void;
@@ -72,6 +75,7 @@ export function ChannelTimeline({
 	lastReadSeq,
 	canAutoMark,
 	onSeen,
+	onReturnedToUnread,
 	onMarkAllRead,
 	onOpenedRead,
 	onMarkUnread,
@@ -97,10 +101,13 @@ export function ChannelTimeline({
 				.flatMap((page) => page.messages),
 		[query.data],
 	);
-	const entries = useMemo(
-		() => groupMessages(messages, lineSeq ?? null, currentUserId),
-		[messages, lineSeq, currentUserId],
-	);
+	const devs = useOrgDevs();
+	const entries = useMemo(() => {
+		const devIds = new Set((devs ?? []).map((dev) => dev.id));
+		return groupMessages(messages, lineSeq ?? null, currentUserId, (id) =>
+			devIds.has(id),
+		);
+	}, [messages, lineSeq, currentUserId, devs]);
 	const unread = useMemo(
 		() =>
 			lastReadSeq === null
@@ -124,8 +131,20 @@ export function ChannelTimeline({
 	const firstId = messages[0]?.id;
 	const lastId = messages.at(-1)?.id;
 
-	const live = useRef({ unread, lastReadSeq, canAutoMark, onSeen });
-	live.current = { unread, lastReadSeq, canAutoMark, onSeen };
+	const live = useRef({
+		unread,
+		lastReadSeq,
+		canAutoMark,
+		onSeen,
+		onReturnedToUnread,
+	});
+	live.current = {
+		unread,
+		lastReadSeq,
+		canAutoMark,
+		onSeen,
+		onReturnedToUnread,
+	};
 
 	useEffect(() => {
 		if (lastReadSeq !== null) sentSeq.current = null;
@@ -140,9 +159,10 @@ export function ChannelTimeline({
 			LINE_OFFSET_PX;
 	};
 
-	const check = useCallback((saveGhost: boolean) => {
+	const check = useCallback((trigger: "update" | "view" | "focus") => {
 		const scroller = scrollerRef.current;
-		const { unread, lastReadSeq, canAutoMark, onSeen } = live.current;
+		const { unread, lastReadSeq, canAutoMark, onSeen, onReturnedToUnread } =
+			live.current;
 		if (
 			!scroller ||
 			!unread ||
@@ -151,6 +171,9 @@ export function ChannelTimeline({
 			scroller.clientWidth === 0
 		) {
 			return;
+		}
+		if (trigger === "focus" && canAutoMark && unread.firstUnread) {
+			onReturnedToUnread(lastReadSeq);
 		}
 		const first = unread.firstUnread
 			? scroller.querySelector(
@@ -175,7 +198,7 @@ export function ChannelTimeline({
 			return;
 		}
 		sentSeq.current = seq;
-		onSeen(seq, saveGhost && unread.firstUnread !== null);
+		onSeen(seq, trigger !== "update" && unread.firstUnread !== null);
 	}, []);
 
 	// Start where the reader left off: at the "New" line, loading older pages
@@ -199,7 +222,7 @@ export function ChannelTimeline({
 				(message) =>
 					message.seq > line &&
 					message.seq !== PENDING_SEQ &&
-					message.authorId !== currentUserId,
+					countsAsUnread(message, currentUserId),
 			);
 		const oldest = messages[0];
 		if (
@@ -255,12 +278,12 @@ export function ChannelTimeline({
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: re-checks when the newest message or read point changes
 	useEffect(() => {
-		const frame = requestAnimationFrame(() => check(false));
+		const frame = requestAnimationFrame(() => check("update"));
 		return () => cancelAnimationFrame(frame);
 	}, [lastId, lastReadSeq, canAutoMark, unread?.firstUnread?.id, check]);
 
 	useEffect(() => {
-		const onFocus = () => check(true);
+		const onFocus = () => check("focus");
 		window.addEventListener("focus", onFocus);
 		return () => {
 			window.removeEventListener("focus", onFocus);
@@ -374,7 +397,7 @@ export function ChannelTimeline({
 					scroller.getBoundingClientRect().top -
 					LINE_OFFSET_PX;
 			}
-			check(true);
+			check("view");
 			return;
 		}
 		if (!jump.target) {
@@ -428,7 +451,7 @@ export function ChannelTimeline({
 						el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_PX;
 					if (scrollTimer.current) clearTimeout(scrollTimer.current);
 					scrollTimer.current = setTimeout(
-						() => check(true),
+						() => check("view"),
 						SCROLL_SEEN_DEBOUNCE_MS,
 					);
 				}}
@@ -483,6 +506,7 @@ export function ChannelTimeline({
 									: null
 							}
 							compact={entry.compact}
+							rollup={entry.rollup}
 							now={now}
 							currentUserId={currentUserId}
 							canModerate={canModerate}

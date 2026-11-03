@@ -36,4 +36,5 @@ export interface AgentTab {
 
 export interface AppMockupProps {
 	activeDemo?: ActiveDemo;
+	edgeGlare?: boolean;
 }

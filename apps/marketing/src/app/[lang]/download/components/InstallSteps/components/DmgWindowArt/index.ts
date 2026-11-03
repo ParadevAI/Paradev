@@ -1,0 +1,1 @@
+export { DmgWindowArt } from "./DmgWindowArt";

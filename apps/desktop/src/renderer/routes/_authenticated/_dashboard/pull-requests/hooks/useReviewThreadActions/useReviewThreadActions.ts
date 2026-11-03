@@ -7,8 +7,16 @@ import {
 	setPullRequestThreadResolution,
 } from "../../utils/pullRequestClient";
 
+const viewerClient = {
+	replyToPullRequestThread,
+	setPullRequestThreadResolution,
+};
+
 /** Reply to and resolve review threads as the viewer; every surface reading the threads refetches after. */
-export function useReviewThreadActions(target: PullRequestTarget | null) {
+export function useReviewThreadActions(
+	target: PullRequestTarget | null,
+	client: typeof viewerClient = viewerClient,
+) {
 	const queryClient = useQueryClient();
 	return useMemo(() => {
 		const requireTarget = () => {
@@ -23,11 +31,14 @@ export function useReviewThreadActions(target: PullRequestTarget | null) {
 				: Promise.resolve();
 		return {
 			reply: async (commentId: number, body: string) => {
-				await replyToPullRequestThread(requireTarget(), { commentId, body });
+				await client.replyToPullRequestThread(requireTarget(), {
+					commentId,
+					body,
+				});
 				await refresh();
 			},
 			setResolved: async (threadId: string, resolved: boolean) => {
-				await setPullRequestThreadResolution(requireTarget(), {
+				await client.setPullRequestThreadResolution(requireTarget(), {
 					threadId,
 					resolved,
 				});
@@ -38,7 +49,7 @@ export function useReviewThreadActions(target: PullRequestTarget | null) {
 				const pullRequest = requireTarget();
 				const results = await Promise.allSettled(
 					threadIds.map((threadId) =>
-						setPullRequestThreadResolution(pullRequest, {
+						client.setPullRequestThreadResolution(pullRequest, {
 							threadId,
 							resolved: true,
 						}),
@@ -50,5 +61,5 @@ export function useReviewThreadActions(target: PullRequestTarget | null) {
 				return results;
 			},
 		};
-	}, [target, queryClient]);
+	}, [target, queryClient, client]);
 }

@@ -481,6 +481,8 @@ export const connections = pgTable(
 
 		issuer: text(),
 		resource: text(),
+		/** The dynamic client the grant was issued to; its refresh token is bound to it. */
+		oauthClientId: text("oauth_client_id"),
 
 		externalAccountId: text("external_account_id").notNull(),
 		externalAccountLabel: text("external_account_label"),
@@ -814,7 +816,7 @@ export const environments = pgTable(
 		/** The sandbox bundle every workspace of this environment boots on: the newest `sandbox_bundles` row at create, moved by every release. */
 		bundleSha: text("bundle_sha").notNull(),
 		/**
-		 * The repository a workspace opens on. Its `.superset` config is the one
+		 * The repository a workspace opens on. Its Paradev config is the one
 		 * the box runs. Null only after the repository is removed from GitHub.
 		 */
 		primaryRepositoryId: uuid("primary_repository_id").references(
@@ -875,6 +877,32 @@ export const environmentRepositories = pgTable(
 		index("environment_repositories_environment_id_idx").on(
 			table.environmentId,
 		),
+	],
+);
+
+/** Projects an environment is linked to; the new-workspace picker offers linked environments first. */
+export const environmentProjects = pgTable(
+	"environment_projects",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		/** A host project's key; projects live on hosts, so there is no row to reference. */
+		projectId: text("project_id").notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		unique("environment_projects_environment_id_project_id_unique").on(
+			table.environmentId,
+			table.projectId,
+		),
+		index("environment_projects_project_id_idx").on(table.projectId),
 	],
 );
 
@@ -1701,6 +1729,9 @@ export const automations = pgTable(
 		// ["automation"] so every automation groups its runs out of the box;
 		// clearing the set in the editor is the opt-out.
 		tags: jsonb().$type<string[]>().notNull().default(["automation"]),
+
+		// Groups the automation in the automations list. Null = ungrouped.
+		group: text("group_name"),
 
 		// Deliver each run's prompt into the agent session the previous run
 		// left behind, rather than starting another beside it. Needs a pinned

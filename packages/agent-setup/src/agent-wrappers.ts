@@ -1,4 +1,12 @@
 export {
+	AGY_HOOKS_NAME,
+	createAgyHooksJson,
+	createAgyWrapper,
+	getAgyHooksJsonContent,
+	getAgyHooksJsonPath,
+	removeAgyManagedHooks,
+} from "./agent-wrappers-agy";
+export {
 	AMP_PLUGIN_FILE,
 	AMP_PLUGIN_MARKER,
 	createAmpPlugin,

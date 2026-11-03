@@ -13,7 +13,10 @@ export type MentionSection = {
 	isLoading: boolean;
 };
 
-function matchesQuery(entry: ComposerMentionEntry, query: string): boolean {
+export function matchesQuery(
+	entry: ComposerMentionEntry,
+	query: string,
+): boolean {
 	if (!query) return true;
 	const lowered = query.toLowerCase();
 	if (entry.label.toLowerCase().includes(lowered)) return true;
@@ -59,8 +62,6 @@ export function useMentionSources(
 		return () => controller.abort();
 	}, [menuOpen, providers]);
 
-	// Search sources fire per keystroke and when the providers change; aborting
-	// the previous request replaces debouncing.
 	useEffect(() => {
 		if (!menuOpen) return;
 		const controller = new AbortController();

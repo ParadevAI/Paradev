@@ -9,6 +9,8 @@ interface DeadKey {
  * the writer.
  */
 export const DEAD_KEYS: DeadKey[] = [
+	// Device-local Chat setting; moved to the account (user_settings.experimental_chat)
+	{ key: "acp-chat", match: "exact" },
 	// The task page's inline agent picker; Start work opens New Workspace instead
 	{ key: "lastSelectedV2TaskAgent", match: "exact" },
 	{ key: "getting-started-v1", match: "exact" },
@@ -52,6 +54,9 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "v2-local-override-v2", match: "exact" },
 	// New-sidebar experiment toggle; the new sidebar is always on
 	{ key: "new-dashboard-sidebar", match: "exact" },
+	// File explorer and search dialog zustand stores had no consumers
+	{ key: "file-explorer-store", match: "exact" },
+	{ key: "search-dialog-store", match: "exact" },
 ];
 
 function matchesDeadKey(key: string): boolean {

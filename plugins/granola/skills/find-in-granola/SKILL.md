@@ -18,7 +18,8 @@ broad query. "The customer call last week" is a date range and an attendee,
 not a keyword. If the user names a folder or team space, `list_meeting_folders`
 first and list inside it. When results look empty, `get_account_info` tells you
 which email and workspace you are reading from — a personal account connected
-where the work one was meant is the usual cause, so say which one you searched.
+where the work one was meant is the usual cause (`switch_workspace` moves to
+another workspace the user belongs to), so say which one you searched.
 
 ## 2. Notes first, transcript only when the wording matters
 

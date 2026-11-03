@@ -3,7 +3,10 @@ import { stripLocation } from "../pathText";
 import { parseSupersetAppLink } from "../supersetAppLink";
 
 export type LinkUnfurl = {
-	icon: { kind: "plugin"; name: string } | { kind: "file"; fileName: string };
+	icon:
+		| { kind: "plugin"; name: string }
+		| { kind: "file"; fileName: string }
+		| { kind: "environment" };
 	label?: string;
 };
 
@@ -29,7 +32,12 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)granola\.(ai|so)$/, "granola"],
 	[/(^|\.)superhuman\.com$/, "superhuman"],
 	[/(^|\.)circleback\.ai$/, "circleback"],
+	[/(^|\.)peec\.ai$/, "peec"],
+	[/(^|\.)sazabi\.com$/, "sazabi"],
 	[/(^|\.)supabase\.(com|co)$/, "supabase"],
+	[/(^|\.)inngest\.com$/, "inngest"],
+	[/(^|\.)firecrawl\.dev$/, "firecrawl"],
+	[/(^|\.)wisprflow\.ai$/, "wispr"],
 ];
 
 const FILE_EXTENSION = /[^.]\.((?=\d*[a-z])[a-z0-9]{1,8})$/i;
@@ -65,6 +73,8 @@ const supersetApp: LinkUnfurler = ({ href }, webUrl) => {
 			return { icon, label: link.taskId };
 		case "plugin":
 			return { icon: { kind: "plugin", name: link.pluginName } };
+		case "environment":
+			return { icon: { kind: "environment" } };
 		default:
 			return { icon };
 	}

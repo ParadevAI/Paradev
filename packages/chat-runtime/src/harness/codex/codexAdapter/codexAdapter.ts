@@ -4,16 +4,20 @@ import type {
 	Decision,
 	Item,
 	SessionState,
+	TextElement,
 	ToolCall,
 	Turn,
 	UserContent,
 } from "@superset/chat/protocol";
 import { isKnownItem } from "@superset/chat/protocol";
+import { attachedFilesBlock } from "../../attachedFiles";
 import { EventQueue } from "../../eventQueue";
 import type {
 	AdapterEvent,
+	AttachmentPart,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
 } from "../../types";
 import { mapThreadItem } from "../mapThreadItem";
 import type {
@@ -109,6 +113,7 @@ export type CodexAdapterOptions = SpawnCodexOptions & {
 	launch?: () => Promise<Pick<SpawnCodexOptions, "command" | "args" | "env">>;
 	minVersion?: string;
 	clientVersion?: string;
+	resolveAttachment?: ResolveAttachment;
 	now?: () => number;
 	mintId?: () => string;
 	createTransport?(
@@ -126,6 +131,7 @@ export class CodexAdapter implements HarnessAdapter {
 	private pendingTurnStart = false;
 	private cancelRequested = false;
 	private readonly queuedInput: unknown[][] = [];
+	private resolvingPrompt: Promise<void> | null = null;
 	private client: CodexRpcClient | null = null;
 	private threadId: string | null = null;
 	private cwd = process.cwd();
@@ -153,7 +159,22 @@ export class CodexAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
-		const input = this.toCodexInput(content);
+		const hasAttachment = content.some((part) => part.type === "attachment");
+		if (!hasAttachment && !this.resolvingPrompt) {
+			this.deliver(this.toCodexInput(content));
+			return;
+		}
+		const input = this.toCodexInputWithAttachments(content);
+		const queued = (this.resolvingPrompt ?? Promise.resolve())
+			.then(() => input)
+			.then((resolved) => this.deliver(resolved));
+		this.resolvingPrompt = queued;
+		void queued.finally(() => {
+			if (this.resolvingPrompt === queued) this.resolvingPrompt = null;
+		});
+	}
+
+	private deliver(input: unknown[]): void {
 		if (!this.threadId || !this.client) {
 			this.queuedInput.push(input);
 			return;
@@ -659,29 +680,37 @@ export class CodexAdapter implements HarnessAdapter {
 	}
 
 	private toCodexInput(content: UserContent[]): unknown[] {
+		return content.flatMap((entry) =>
+			entry.type === "text" ? [codexTextInput(entry.text, entry.elements)] : [],
+		);
+	}
+
+	private async toCodexInputWithAttachments(
+		content: UserContent[],
+	): Promise<unknown[]> {
 		const input: unknown[] = [];
-		let skippedAttachment = false;
 		for (const entry of content) {
-			if (entry.type === "text") {
-				input.push({
-					type: "text",
-					text: entry.text,
-					text_elements: (entry.elements ?? []).map((element) => ({
-						byteRange: element.byteRange,
-						placeholder: null,
-					})),
-				});
-				continue;
-			}
-			skippedAttachment = true;
-		}
-		if (skippedAttachment) {
-			this.emitNotice(
-				"info",
-				"Attachments are not supported by the codex harness and were omitted",
+			input.push(
+				entry.type === "text"
+					? codexTextInput(entry.text, entry.elements)
+					: await this.attachmentInput(entry),
 			);
 		}
 		return input;
+	}
+
+	/** app-server's turn/start takes a `localImage` by path; anything else goes as a path in text. */
+	private async attachmentInput(entry: AttachmentPart): Promise<unknown> {
+		const file = await (
+			this.options.resolveAttachment?.(entry) ?? Promise.resolve(null)
+		).catch(() => null);
+		if (file?.mimeType.startsWith("image/"))
+			return { type: "localImage", path: file.path };
+		return codexTextInput(
+			file
+				? attachedFilesBlock([{ name: entry.name, path: file.path }])
+				: `[${entry.name}: could not be read]`,
+		);
 	}
 
 	private emitItem(item: Item, turnId: string): void {
@@ -726,4 +755,18 @@ export function createCodexAdapter(
 	options: CodexAdapterOptions = {},
 ): HarnessAdapter {
 	return new CodexAdapter(options);
+}
+
+function codexTextInput(
+	text: string,
+	elements: TextElement[] = [],
+): Record<string, unknown> {
+	return {
+		type: "text",
+		text,
+		text_elements: elements.map((element) => ({
+			byteRange: element.byteRange,
+			placeholder: null,
+		})),
+	};
 }

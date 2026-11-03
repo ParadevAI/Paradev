@@ -8,6 +8,7 @@ import type {
 } from "@pierre/trees";
 import {
 	FileTree as PierreFileTree,
+	useFileTreeSelector,
 	useFileTree as usePierreFileTree,
 } from "@pierre/trees/react";
 import { errorMessage } from "@superset/i18n/errors";
@@ -25,8 +26,8 @@ import { useFallthroughIcons } from "renderer/lib/fileIcons";
 import {
 	buildCollisionSafeTreePaths,
 	createPierreTreeStyle,
+	diffStatsDecoration,
 	FILE_STATUS_TO_PIERRE,
-	formatDiffStats,
 	PIERRE_TREE_UNSAFE_CSS,
 	type PierreGitStatusEntry,
 	stripTrailingSlash,
@@ -51,17 +52,13 @@ import {
 	HOVER_ACTIONS_ROW_CSS,
 	ShadowRowHoverActions,
 } from "./components/ShadowRowHoverActions";
-import { useMeasuredTreeHeight } from "./hooks/useMeasuredTreeHeight";
 import { buildTreeShape } from "./utils/buildTreeShape";
 
 const ITEM_HEIGHT = 24;
-// Pierre rows carry `margin-block: 1px`, so each row occupies ITEM_HEIGHT + 2px.
-const ROW_BOX = ITEM_HEIGHT + 2;
 // Small cushion so the last row never clips against the host's `overflow: hidden`.
 const HEIGHT_CUSHION = 8;
 
 const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: ITEM_HEIGHT,
 	levelIndent: 8,
 });
 
@@ -183,14 +180,12 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 
 	useFallthroughIcons(model);
 
-	// Size the host to Pierre's measured content height (it renders `height:
-	// 100%`, which collapses to 0 inside this section's auto-height container);
-	// fall back to a row-count estimate until that first measurement lands.
-	const contentHeight = useMeasuredTreeHeight(model);
+	// Pierre's host renders `height: 100%`, which collapses to 0 inside this
+	// section's auto-height container, so size it to the visible rows.
 	const treeHeight =
-		contentHeight != null
-			? contentHeight + HEIGHT_CUSHION
-			: (dirs.length + treePaths.length) * ROW_BOX + HEIGHT_CUSHION;
+		useFileTreeSelector(model, (tree) => tree.getVisibleCount()) *
+			model.getItemHeight() +
+		HEIGHT_CUSHION;
 
 	const setAllDirsExpanded = useCallback(
 		(expanded: boolean) => {
@@ -260,8 +255,8 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	};
 	// Pierre's row decoration accepts text or icon, not arbitrary JSX. The
 	// status indicator is already painted by `setGitStatus` (row tint + icon),
-	// so we contribute the `+N/−N` summary on files (uncolored — a library
-	// limitation) and the file count on directories.
+	// so we contribute the `+N/−N` summary on files and the file count on
+	// directories.
 	handlersRef.current.renderRowDecoration = (ctx) => {
 		if (ctx.item.kind === "directory") {
 			const count = dirFileCount.get(stripTrailingSlash(ctx.item.path));
@@ -269,8 +264,7 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 		}
 		const file = fileByTreePath.get(ctx.item.path);
 		if (!file) return null;
-		const text = formatDiffStats(file.additions, file.deletions);
-		return text ? { text } : null;
+		return diffStatsDecoration(file.additions, file.deletions);
 	};
 
 	const filePolicy = useChangesSidebarFilePolicy();

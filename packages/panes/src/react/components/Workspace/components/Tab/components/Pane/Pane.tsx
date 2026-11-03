@@ -14,6 +14,7 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
+import { usePaneAside } from "../../../../../../hooks/usePaneAside";
 import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
 	ContextMenuActionConfig,
@@ -298,6 +299,7 @@ export function Pane<TData>({
 	const icon = definition?.getIcon?.(context);
 	const titleContent = definition?.renderTitle?.(context);
 	const headerExtras = definition?.renderHeaderExtras?.(context);
+	const aside = usePaneAside(pane.id);
 	const toolbar = definition?.renderToolbar?.(context);
 
 	const isDropTarget = isOver && canDrop;
@@ -344,6 +346,8 @@ export function Pane<TData>({
 						onError={onPaneError}
 					>
 						<PaneContent
+							aside={aside}
+							insetsAside={definition?.insetsAside === true}
 							render={() =>
 								definition ? (
 									definition.renderPane(context)

@@ -39,6 +39,7 @@ export function PreviewHoverCard({
 			<HoverCardTrigger
 				asChild
 				onClick={() => onOpenChange(false)}
+				onContextMenu={() => onOpenChange(false)}
 				onFocus={onWanted}
 				onPointerEnter={(event) => {
 					if (event.pointerType !== "touch") onWanted?.();

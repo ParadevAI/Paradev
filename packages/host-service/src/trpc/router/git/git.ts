@@ -139,7 +139,8 @@ function runStatusSnapshot(
 		priority?: "foreground" | "background";
 	},
 ) {
-	const requestKey = JSON.stringify({ baseBranch: input.baseBranch ?? null });
+	const baseBranch = input.baseBranch || undefined;
+	const requestKey = JSON.stringify({ baseBranch: baseBranch ?? null });
 	return gitStatusRefreshLimiter.run({
 		workspaceId: input.workspaceId,
 		requestKey,
@@ -153,7 +154,7 @@ function runStatusSnapshot(
 				const snapshotStartedAt = Date.now();
 				const result = await workerPool.run(
 					gitStatusSnapshotTask,
-					{ worktreePath, baseBranch: input.baseBranch, gitEnv },
+					{ worktreePath, baseBranch, gitEnv },
 					{ timeoutMs: 15_000 },
 				);
 				if (result.baseRefFetchTarget) {
@@ -191,7 +192,7 @@ function runStatusSnapshot(
 
 			return gitStatusStore.read({
 				workspaceId: input.workspaceId,
-				baseBranch: input.baseBranch ?? null,
+				baseBranch: baseBranch ?? null,
 				computeFull,
 				computePartial: (paths) =>
 					workerPool.run(

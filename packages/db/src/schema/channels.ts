@@ -20,11 +20,12 @@ import {
 	channelBroadcastValues,
 	channelKindValues,
 	channelMemberRoleValues,
+	channelMessageSubtypeValues,
 	channelNotifyValues,
 	channelVisibilityValues,
 	dockBounceValues,
 } from "./enums";
-import { tasks } from "./schema";
+import { taskProjects } from "./schema";
 
 export const channelVisibility = pgEnum(
 	"channel_visibility",
@@ -41,6 +42,10 @@ export const channelBroadcast = pgEnum(
 );
 export const dockBounce = pgEnum("dock_bounce", dockBounceValues);
 export const channelKind = pgEnum("channel_kind", channelKindValues);
+export const channelMessageSubtype = pgEnum(
+	"channel_message_subtype",
+	channelMessageSubtypeValues,
+);
 
 /**
  * A conversation for a group of people and Devs in an organization, or a
@@ -67,6 +72,13 @@ export const channels = pgTable(
 		lastSeq: bigint("last_seq", { mode: "number" }).notNull().default(0),
 		lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
 		archivedAt: timestamp("archived_at", { withTimezone: true }),
+		/** The project whose tasks the channel shows; several channels can share one. */
+		taskProjectId: uuid("task_project_id").references(
+			(): AnyPgColumn => taskProjects.id,
+			{ onDelete: "set null" },
+		),
+		/** A Linear project whose issues the channel shows instead; Linear holds the issues. */
+		linearProjectId: text("linear_project_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -76,6 +88,7 @@ export const channels = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(t) => [
+		index("channels_task_project_idx").on(t.taskProjectId),
 		uniqueIndex("channels_org_name_unique")
 			.on(t.organizationId, sql`lower(${t.name})`)
 			.where(sql`${t.archivedAt} IS NULL AND ${t.kind} = 'channel'`),
@@ -120,7 +133,8 @@ export type SelectChannelMember = typeof channelMembers.$inferSelect;
  * A message in a channel. A reply carries `threadRootId`; the root keeps the
  * thread's reply count and last reply time so the timeline can draw the
  * replies line without counting. Deleting keeps the row (body cleared) so a
- * thread under a deleted message survives.
+ * thread under a deleted message survives. A `subtype` row records the
+ * author joining or leaving; `inviterId` is who added or removed them.
  */
 export const channelMessages = pgTable(
 	"channel_messages",
@@ -138,6 +152,10 @@ export const channelMessages = pgTable(
 			onDelete: "set null",
 		}),
 		body: text().notNull(),
+		subtype: channelMessageSubtype(),
+		inviterId: uuid("inviter_id").references(() => actors.id, {
+			onDelete: "set null",
+		}),
 		mentionedIds: uuid("mentioned_ids")
 			.array()
 			.notNull()
@@ -220,23 +238,6 @@ export const channelThreadFollows = pgTable(
 
 export type SelectChannelThreadFollow =
 	typeof channelThreadFollows.$inferSelect;
-
-/** A task's channel: at most one, so adding a task to a channel moves it from any other. */
-export const channelTasks = pgTable(
-	"channel_tasks",
-	{
-		taskId: uuid("task_id")
-			.primaryKey()
-			.references(() => tasks.id, { onDelete: "cascade" }),
-		channelId: uuid("channel_id")
-			.notNull()
-			.references(() => channels.id, { onDelete: "cascade" }),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.notNull()
-			.defaultNow(),
-	},
-	(t) => [index("channel_tasks_channel_id_idx").on(t.channelId)],
-);
 
 /**
  * A person's channel notification settings, the ones Slack keeps in

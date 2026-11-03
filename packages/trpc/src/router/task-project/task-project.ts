@@ -23,6 +23,7 @@ import {
 } from "../../lib/document-files";
 import { nudge } from "../../lib/realtime";
 import { jwtProcedure } from "../../trpc";
+import { announceProjectTasks } from "../channel/channel-task";
 import {
 	assertTaskInOrganization,
 	taskColumns,
@@ -213,6 +214,7 @@ export const taskProjectRouter = {
 				);
 			}
 			nudge(project.organizationId, "cloud_workspaces");
+			await announceProjectTasks([project.id, previous?.projectId]);
 			return { added: true };
 		}),
 
@@ -238,6 +240,7 @@ export const taskProjectRouter = {
 				);
 			}
 			nudge(project.organizationId, "cloud_workspaces");
+			await announceProjectTasks([project.id]);
 			return { removed: true };
 		}),
 

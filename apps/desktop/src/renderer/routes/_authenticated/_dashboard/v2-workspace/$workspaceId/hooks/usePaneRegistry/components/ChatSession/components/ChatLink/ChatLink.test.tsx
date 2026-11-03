@@ -1,5 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
 import type { AppRouter } from "@superset/host-service/trpc";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@superset/ui/context-menu";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
 import {
@@ -34,7 +40,16 @@ function renderLink(href: string, children: ReactNode, answer: unknown) {
 			queryClient={new QueryClient()}
 		>
 			<ChatPaneActionsProvider openLink={() => true} workspaceId="workspace-1">
-				<ChatLink href={href}>{children}</ChatLink>
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
+						<div>
+							<ChatLink href={href}>{children}</ChatLink>
+						</div>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem>Close Pane</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
@@ -70,7 +85,7 @@ test("a card from a host without description or image still shows the title", as
 	).toBeTruthy();
 });
 
-test("a pull request link gets the GitHub card, without the chip hint", async () => {
+test("a pull request link gets the GitHub card, with a link to open it", async () => {
 	const { asked, link } = renderLink(PR, PR, {
 		kind: "pr",
 		repo: "superset-sh/superset",
@@ -93,8 +108,8 @@ test("a pull request link gets the GitHub card, without the chip hint", async ()
 	await screen.findByText("feat(chat): load whole sessions");
 	expect(asked.map(({ path }) => path)).toEqual(["github.getWorkItem"]);
 	expect(
-		screen.queryByText("Click the chip to open the pull request"),
-	).toBeNull();
+		screen.getByText("Open on GitHub").closest("a")?.getAttribute("href"),
+	).toBe(PR);
 });
 
 test("a link with a service icon gets the website card too", async () => {
@@ -146,4 +161,24 @@ test("a square preview image is a thumbnail beside the text", async () => {
 	const title = await screen.findByText("Square page");
 	const card = title.closest("div.flex") as HTMLElement;
 	expect(card.querySelector("img.size-16")).toBeTruthy();
+});
+
+test("right-clicking a link opens its own menu, not the pane's, and copies it", async () => {
+	const writes: string[] = [];
+	const original = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+	Object.defineProperty(navigator, "clipboard", {
+		configurable: true,
+		value: { writeText: async (text: string) => void writes.push(text) },
+	});
+	try {
+		const { link } = renderLink(PR, PR, null);
+		fireEvent.contextMenu(link);
+		const copy = await screen.findByText("Copy Link");
+		expect(screen.queryByText("Close Pane")).toBeNull();
+		fireEvent.click(copy);
+		await waitFor(() => expect(writes).toEqual([PR]));
+	} finally {
+		if (original) Object.defineProperty(navigator, "clipboard", original);
+		else Reflect.deleteProperty(navigator, "clipboard");
+	}
 });

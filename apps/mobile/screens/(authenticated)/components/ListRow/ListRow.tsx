@@ -38,7 +38,7 @@ export function ListRow({
 			}
 		>
 			{icon ? <View className="w-7 items-center">{icon}</View> : null}
-			<View className="flex-shrink">
+			<View className="flex-1">
 				<Text
 					className="text-base"
 					style={{
@@ -57,7 +57,7 @@ export function ListRow({
 					</Text>
 				) : null}
 			</View>
-			<View className="flex-1 flex-row items-center justify-end gap-2">
+			<View className="max-w-[60%] flex-row items-center justify-end gap-2">
 				{trailing}
 			</View>
 		</Pressable>

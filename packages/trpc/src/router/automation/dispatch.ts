@@ -22,9 +22,9 @@ import {
 	slugifyForBranch,
 } from "@superset/shared/workspace-launch";
 import { and, eq, sql } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { runInCloud } from "./cloudDispatch";
 import { type HostCaller, launchAgentSession } from "./hostSession";
 import {
@@ -584,7 +584,7 @@ async function createWorkspaceOnHost(args: {
 	pullRequest: number | null;
 }): Promise<{ workspaceId: string }> {
 	// Session automation: no project, no branch. The host allocates a managed
-	// folder under ~/.superset/sessions and dedupes the name per run.
+	// folder under ~/.paradev/sessions and dedupes the name per run.
 	if (args.projectId === null) {
 		const result = await relayMutation<
 			{ name: string; tags?: string[] },
