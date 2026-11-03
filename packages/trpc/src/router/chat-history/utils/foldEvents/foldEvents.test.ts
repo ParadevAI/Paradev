@@ -45,6 +45,7 @@ describe("foldEvents", () => {
 			seq: 9,
 			firstSeq: 2,
 			status: "completed",
+			body: { status: "completed" },
 		});
 	});
 

@@ -6,7 +6,7 @@ export const MAX_PUSH_BYTES = 1024 * 1024;
 const MAX_EVENT_BYTES = 512 * 1024;
 const MAX_SEQ = 2_147_483_647;
 
-function eventBytes(event: unknown): number {
+export function eventBytes(event: unknown): number {
 	return Buffer.byteLength(JSON.stringify(event));
 }
 
