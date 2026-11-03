@@ -59,10 +59,10 @@ export const lightTheme: Theme = {
 	},
 
 	terminal: {
-		background: "#ffffff",
+		background: "#fafaf8",
 		foreground: "#000000",
 		cursor: "#000000",
-		cursorAccent: "#ffffff",
+		cursorAccent: "#fafaf8",
 		selectionBackground: "#add6ff",
 
 		// Standard ANSI colors (xterm defaults)
