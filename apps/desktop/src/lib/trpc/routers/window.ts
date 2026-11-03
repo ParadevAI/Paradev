@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { observable } from "@trpc/server/observable";
 import { dialog, Menu } from "electron";
 import { menuEmitter } from "main/lib/menu-events";
 import { getOrg, setOrg } from "main/lib/window-registry/window-registry";
@@ -42,6 +43,24 @@ export const createWindowRouter = () => {
 				window.setTitleBarOverlay(input);
 				return { success: true };
 			}),
+
+		/** Whether the calling window has OS focus: now, then on every change. */
+		onFocusChange: publicProcedure.subscription(({ ctx }) => {
+			return observable<boolean>((emit) => {
+				const window = ctx.senderWindow;
+				if (!window) return () => {};
+				const onFocus = () => emit.next(true);
+				const onBlur = () => emit.next(false);
+				emit.next(window.isFocused());
+				window.on("focus", onFocus);
+				window.on("blur", onBlur);
+				return () => {
+					if (window.isDestroyed()) return;
+					window.off("focus", onFocus);
+					window.off("blur", onBlur);
+				};
+			});
+		}),
 
 		isMaximized: publicProcedure.query(({ ctx }) => {
 			const window = ctx.senderWindow;

@@ -43,6 +43,7 @@ import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMo
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
+import { WindowFocusSync } from "./components/WindowFocusSync";
 import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
 
@@ -279,6 +280,7 @@ function DashboardLayout() {
 				{isParadevShell ? (
 					<>
 						<CommandPaletteHost />
+						<WindowFocusSync />
 						<TitleBarSlotsProvider>
 							<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
 								<TitleBar />
