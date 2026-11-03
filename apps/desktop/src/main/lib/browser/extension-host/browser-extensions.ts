@@ -59,6 +59,7 @@ interface Host {
 	session: Electron.Session;
 	actions: BrowserActionApi;
 	tabOf(paneId: string): Electron.WebContents | undefined;
+	onRemoved(extensionId: string): void;
 }
 
 interface PopupRef {
@@ -128,9 +129,15 @@ export function attachBrowserExtensions(options: {
 	session: Electron.Session;
 	extensions: ElectronChromeExtensions;
 	tabOf: (paneId: string) => Electron.WebContents | undefined;
+	onRemoved: (extensionId: string) => void;
 }): void {
 	const actions = browserActionApi(options.extensions);
-	host = { session: options.session, actions, tabOf: options.tabOf };
+	host = {
+		session: options.session,
+		actions,
+		tabOf: options.tabOf,
+		onRemoved: options.onRemoved,
+	};
 	actions.observers.add({
 		isDestroyed: () => false,
 		send: notifyBrowserExtensionsChanged,
@@ -306,6 +313,7 @@ export async function removeBrowserExtension(
 	await host.session.clearStorageData({
 		origin: `chrome-extension://${extensionId}`,
 	});
+	host.onRemoved(extensionId);
 	pins.setPinned(extensionId, false);
 	notifyBrowserExtensionsChanged();
 }

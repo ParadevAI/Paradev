@@ -725,6 +725,17 @@ boundary.
    `windows.getCurrent` and `windows.getLastFocused` answer the newest open
    window, and throw as in Chrome when none is open.
 
+9. Context menus: `create`, `update`, `remove` and `removeAll` emit
+   `context-menus-changed` with the extension's items, and
+   `restoreContextMenuItems` puts saved items back without an event. The app
+   keeps them across restarts, as Chrome does (`extension-lifecycle.ts`).
+   `contextMenus.update` is a real handler, with a rule, instead of a no-op.
+
+**What it changes** (`dist/chrome-extension-api.preload.js`): `chrome.storage`
+is no longer replaced. The package made `sync` and `managed` the same object
+as `local`; the app's `shimChromeStorage` gives each its own area instead.
+`contextMenus.update` calls the handler.
+
 Host patterns are matched by scheme, host and path, not by the package's
 `matchesPattern` glob, which lets `*://*.example.com/*` match any URL that
 contains `.example.com/`.
@@ -739,13 +750,17 @@ no permission, `tabs`, a host permission, `activeTab`, `cookies` with and
 without a host, `webNavigation`, `notifications` and `contextMenus`, and
 through `permissions.request`. Two tests list every handler the API classes
 register and every event name their code sends, and fail when one has no rule
-in `extensionApiRules`.
+in `extensionApiRules`. One drives `ContextMenusAPI` through each handler and
+`restoreContextMenuItems`, and one reads the preload for the two changes there.
 
 **Regenerating after a version bump:** `CI=1 bun patch electron-chrome-extensions`.
 In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
 `RoutingDelegate` and call it first in the three handlers; add the helpers and
 the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
-add the `canSeeTabUrl` line to the `TabsAPI.query` filter. In
+add the `canSeeTabUrl` line to the `TabsAPI.query` filter; add `update` and
+`emitChanged` to `ContextMenusAPI` and `restoreContextMenuItems` after
+`addWindow`. In the preload, delete the `storage` entry and the `noop` option of
+`contextMenus.update`. In
 `ExtensionRouter.onExtensionMessage`, look up `extensionApiRule(handlerName)`
 before the handler runs and pass the result through `apiRule.result`; in
 `sendEvent`, look up `extensionApiRule(eventName)` and check and filter per

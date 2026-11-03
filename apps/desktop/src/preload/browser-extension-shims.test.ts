@@ -1,6 +1,7 @@
 import { expect, type Mock, mock, test } from "bun:test";
 import { runInNewContext } from "node:vm";
 import { contextBridge } from "electron";
+import { shimChromeStorage } from "shared/browser-extension-storage-shim";
 
 interface MainWorld {
 	location: { protocol: string; hostname: string };
@@ -33,7 +34,7 @@ async function importInWorkerPreloadRealm(): Promise<Shim> {
 	}
 	const calls = (contextBridge.executeInMainWorld as Mock<() => void>).mock
 		.calls as unknown as [Shim][];
-	const shim = calls.at(-1)?.[0];
+	const shim = calls.findLast(([call]) => call.func !== shimChromeStorage)?.[0];
 	if (!shim) throw new Error("the preload never reached the main world");
 	return shim;
 }
@@ -42,10 +43,16 @@ async function importInWorkerPreloadRealm(): Promise<Shim> {
 function runInMainWorld(
 	{ func, args }: Shim,
 	url: string,
-	overrides: { isServiceWorker?: boolean; callOffscreen?: unknown } = {},
+	overrides: {
+		isServiceWorker?: boolean;
+		callOffscreen?: unknown;
+		chrome?: Record<string, unknown>;
+		takeInstalledDetails?: unknown;
+	} = {},
 ): MainWorld {
 	const { protocol, hostname } = new URL(url);
-	const [, callOffscreen, ...rest] = args;
+	const [, callOffscreen, toChrome, signInHost, toFirefox, takeInstalled] =
+		args;
 	const world = {
 		location: { protocol, hostname },
 		navigator: {
@@ -54,11 +61,14 @@ function runInMainWorld(
 			vendor: "Google Inc.",
 			userAgentData: { brands: [{ brand: "Chromium", version: "152" }] },
 		},
-		chrome: {},
+		chrome: overrides.chrome ?? {},
 		args: [
 			overrides.isServiceWorker ?? false,
 			overrides.callOffscreen ?? callOffscreen,
-			...rest,
+			toChrome,
+			signInHost,
+			toFirefox,
+			overrides.takeInstalledDetails ?? takeInstalled,
 		],
 	};
 	runInNewContext(`(${func.toString()})(...args)`, world);
@@ -118,4 +128,26 @@ test("Google's sign-in page sees Firefox, with no Chromium brands to cross-check
 	const website = runInMainWorld(shim, "https://example.com/").navigator;
 	expect(website.userAgent).toContain("Electron");
 	expect(website.userAgentData).toBeDefined();
+});
+
+test("an extension service worker gets runtime.onInstalled from the app, once, after its listeners are added", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const takeInstalledDetails = mock(async () => ({ reason: "install" }));
+	type Listener = (details: { reason: string }) => void;
+	const runtime = { onInstalled: { addListener: (_listener: Listener) => {} } };
+
+	const worker = runInMainWorld(
+		shim,
+		"chrome-extension://aapbdbdomjkkjkaonfhkkikfgjllcleb/main.js",
+		{ isServiceWorker: true, chrome: { runtime }, takeInstalledDetails },
+	);
+	const onInstalled = (worker.chrome.runtime as typeof runtime).onInstalled;
+	const reasons: string[] = [];
+	onInstalled.addListener(({ reason }) => reasons.push(`menu ${reason}`));
+	onInstalled.addListener(({ reason }) => reasons.push(`options ${reason}`));
+	await takeInstalledDetails.mock.results[0]?.value;
+	await Promise.resolve();
+
+	expect(takeInstalledDetails).toHaveBeenCalledTimes(1);
+	expect(reasons).toEqual(["menu install", "options install"]);
 });

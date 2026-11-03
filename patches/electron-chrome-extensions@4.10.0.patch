@@ -1,5 +1,36 @@
+diff --git a/dist/chrome-extension-api.preload.js b/dist/chrome-extension-api.preload.js
+index 67d3be4b5026069ec4ae73c1fc6e661f8a19098e..3e5a33bb8e5441f30785f690527f368754578bfc 100644
+--- a/dist/chrome-extension-api.preload.js
++++ b/dist/chrome-extension-api.preload.js
+@@ -298,7 +298,7 @@
+                 menuCreate(createProperties, callback);
+                 return createProperties.id;
+               },
+-              update: invokeExtension2("contextMenus.update", { noop: true }),
++              update: invokeExtension2("contextMenus.update"),
+               remove: invokeExtension2("contextMenus.remove"),
+               removeAll: invokeExtension2("contextMenus.removeAll"),
+               onClicked: new ExtensionEvent("contextMenus.onClicked")
+@@ -447,17 +447,6 @@
+             };
+           }
+         },
+-        storage: {
+-          factory: (base) => {
+-            const local = base && base.local;
+-            return {
+-              ...base,
+-              // TODO: provide a backend for browsers to opt-in to
+-              managed: local,
+-              sync: local
+-            };
+-          }
+-        },
+         tabs: {
+           factory: (base) => {
+             const api = {
 diff --git a/dist/cjs/index.js b/dist/cjs/index.js
-index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e6392c5ca64a 100644
+index a91ca8fd07194abb081e9bb35fad0060fefddf91..58e6e294168693811b7c4492b6dc06a3548bfd11 100644
 --- a/dist/cjs/index.js
 +++ b/dist/cjs/index.js
 @@ -66,7 +66,7 @@ var validateExtensionUrl = (url, extension) => {
@@ -11,7 +42,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      throw new Error("Invalid URL");
    }
    return url;
-@@ -121,6 +121,123 @@ var matchesTitlePattern = (pattern, title) => {
+@@ -121,6 +121,124 @@ var matchesTitlePattern = (pattern, title) => {
    const regexp = new RegExp(`^${pattern.split("*").map(escapePattern).join(".*")}$`);
    return title.match(regexp);
  };
@@ -125,6 +156,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
 +    "contextMenus.create",
 +    "contextMenus.remove",
 +    "contextMenus.removeAll",
++    "contextMenus.update",
 +    "contextMenus.onClicked"
 +  ], { permission: "contextMenus" }),
 +  ...rulesFor(["permissions.onAdded", "permissions.onRemoved"], {})
@@ -135,7 +167,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
  var getAllWindows = () => [...import_electron.BaseWindow.getAllWindows(), ...import_electron.BrowserWindow.getAllWindows()];
  
  // src/browser/popup.ts
-@@ -338,6 +455,7 @@ var BrowserActionAPI = class {
+@@ -338,6 +456,7 @@ var BrowserActionAPI = class {
        }
        const activeTab = this.ctx.store.getActiveTabFromWindow(window);
        if (!activeTab) return;
@@ -143,7 +175,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        const [width] = window.getSize();
        const anchorSize = 64;
        this.activateClick({
-@@ -402,8 +520,6 @@ var BrowserActionAPI = class {
+@@ -402,8 +521,6 @@ var BrowserActionAPI = class {
      );
      handle("browserAction.openPopup", this.openPopup);
      const preloadOpts = { allowRemote: true, extensionContext: false };
@@ -152,7 +184,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      handle(
        "browserAction.addObserver",
        (event) => {
-@@ -577,9 +693,12 @@ var BrowserActionAPI = class {
+@@ -577,9 +694,12 @@ var BrowserActionAPI = class {
        `activate [eventType: ${eventType}, extensionId: '${extensionId}', tabId: ${tabId}, senderId: ${sender?.id}]`
      );
      switch (eventType) {
@@ -166,7 +198,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        case "contextmenu":
          this.activateContextMenu(details);
          break;
-@@ -772,7 +891,8 @@ var _WindowsAPI = class _WindowsAPI {
+@@ -772,7 +892,8 @@ var _WindowsAPI = class _WindowsAPI {
    }
    getLastFocused(event) {
      const win = this.ctx.store.getLastFocusedWindow();
@@ -176,7 +208,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
    }
    getAll(event) {
      return Array.from(this.ctx.store.windows).map(this.getWindowDetails.bind(this));
-@@ -984,6 +1104,9 @@ var _TabsAPI = class _TabsAPI {
+@@ -984,6 +1105,9 @@ var _TabsAPI = class _TabsAPI {
    insertCSS(event, tabId, details) {
      const tab = this.ctx.store.getTabById(tabId);
      if (!tab) return;
@@ -186,7 +218,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      if (details.code) {
        tab.insertCSS(details.code);
      }
-@@ -992,6 +1115,7 @@ var _TabsAPI = class _TabsAPI {
+@@ -992,6 +1116,7 @@ var _TabsAPI = class _TabsAPI {
      const isSet = (value) => typeof value !== "undefined";
      const filteredTabs = Array.from(this.ctx.store.tabs).map(this.getTabDetails.bind(this)).filter((tab) => {
        if (!tab) return false;
@@ -194,7 +226,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        if (isSet(info.active) && info.active !== tab.active) return false;
        if (isSet(info.pinned) && info.pinned !== tab.pinned) return false;
        if (isSet(info.audible) && info.audible !== tab.audible) return false;
-@@ -1083,6 +1207,7 @@ var _TabsAPI = class _TabsAPI {
+@@ -1083,6 +1208,7 @@ var _TabsAPI = class _TabsAPI {
    onUpdated(tabId) {
      const tab = this.ctx.store.getTabById(tabId);
      if (!tab) return;
@@ -202,7 +234,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      let prevDetails;
      if (this.ctx.store.tabDetailsCache.has(tab.id)) {
        prevDetails = this.ctx.store.tabDetailsCache.get(tab.id);
-@@ -1118,6 +1243,7 @@ var _TabsAPI = class _TabsAPI {
+@@ -1118,6 +1244,7 @@ var _TabsAPI = class _TabsAPI {
      this.ctx.router.broadcastEvent("tabs.onUpdated", tab.id, changeInfo, details);
    }
    onRemoved(tabId) {
@@ -210,7 +242,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      const details = this.ctx.store.tabDetailsCache.has(tabId) ? this.ctx.store.tabDetailsCache.get(tabId) : null;
      this.ctx.store.tabDetailsCache.delete(tabId);
      const windowId = details ? details.windowId : WindowsAPI.WINDOW_ID_NONE;
-@@ -1359,7 +1485,11 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
+@@ -1359,7 +1486,11 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
      );
    }
    getLastFocusedWindow() {
@@ -223,7 +255,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
    }
    getCurrentWindow() {
      return this.getLastFocusedWindow();
-@@ -1383,6 +1513,9 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
+@@ -1383,6 +1514,9 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
    async removeWindow(window) {
      if (!this.windows.has(window)) return;
      this.windows.delete(window);
@@ -233,7 +265,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      if (typeof this.impl.removeWindow === "function") {
        await this.impl.removeWindow(window);
      } else {
-@@ -1470,7 +1603,7 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
+@@ -1470,7 +1604,7 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
    }
    async requestPermissions(extension, permissions) {
      if (typeof this.impl.requestPermissions !== "function") {
@@ -242,7 +274,52 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      }
      const result = await this.impl.requestPermissions(extension, permissions);
      return typeof result === "boolean" ? result : false;
-@@ -1723,6 +1856,7 @@ var ContextMenusAPI = class {
+@@ -1587,6 +1721,16 @@ var ContextMenusAPI = class {
+         return;
+       }
+       this.addContextItem(extension.id, createProperties);
++      this.emitChanged(extension.id);
++    };
++    this.update = ({ extension }, menuItemId, updateProperties) => {
++      const items = this.menus.get(extension.id);
++      const props = items?.get(menuItemId);
++      if (!props) {
++        throw new Error(`Cannot find menu item with id ${menuItemId}`);
++      }
++      items.set(menuItemId, { ...props, ...updateProperties, id: props.id });
++      this.emitChanged(extension.id);
+     };
+     this.remove = ({ extension }, menuItemId) => {
+       const items = this.menus.get(extension.id);
+@@ -1595,13 +1739,16 @@ var ContextMenusAPI = class {
+         if (items.size === 0) {
+           this.menus.delete(extension.id);
+         }
++        this.emitChanged(extension.id);
+       }
+     };
+     this.removeAll = ({ extension }) => {
+       this.menus.delete(extension.id);
++      this.emitChanged(extension.id);
+     };
+     const handle = this.ctx.router.apiHandler();
+     handle("contextMenus.create", this.create);
++    handle("contextMenus.update", this.update);
+     handle("contextMenus.remove", this.remove);
+     handle("contextMenus.removeAll", this.removeAll);
+     const sessionExtensions = ctx.session.extensions || ctx.session;
+@@ -1620,6 +1767,10 @@ var ContextMenusAPI = class {
+     }
+     contextItems.set(props.id, props);
+   }
++  emitChanged(extensionId) {
++    const items = this.menus.get(extensionId);
++    this.ctx.emit("context-menus-changed", extensionId, items ? [...items.values()] : []);
++  }
+   buildMenuItemsForParams(webContents2, params) {
+     if (webContents2.session !== this.ctx.session) return [];
+     let menuItemOptions = [];
+@@ -1723,6 +1874,7 @@ var ContextMenusAPI = class {
        // TODO
        srcUrl: params?.srcURL
      };
@@ -250,7 +327,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      this.ctx.router.sendEvent(extensionId, "contextMenus.onClicked", data, tab);
    }
  };
-@@ -1820,14 +1954,16 @@ async function getConfigSearchPaths(application) {
+@@ -1820,14 +1972,16 @@ async function getConfigSearchPaths(application) {
    }
    return searchPaths;
  }
@@ -268,7 +345,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
          d7("read config in %s", filePath, config);
          return config;
        } else {
-@@ -2266,11 +2402,26 @@ var getSessionFromEvent = (event) => {
+@@ -2266,11 +2420,26 @@ var getSessionFromEvent = (event) => {
  var d8 = (0, import_debug8.default)("electron-chrome-extensions:router");
  var DEFAULT_SESSION = "_self";
  var gRoutingDelegate;
@@ -295,7 +372,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        d8(`received '${handlerName}'`, args);
        const observer = this.sessionMap.get(getSessionFromEvent(event));
        return observer?.onExtensionMessage(event, extensionId, handlerName, ...args);
-@@ -2282,6 +2433,7 @@ var RoutingDelegate = class _RoutingDelegate {
+@@ -2282,6 +2451,7 @@ var RoutingDelegate = class _RoutingDelegate {
        return observer?.onExtensionMessage(event, void 0, handlerName, ...args);
      };
      this.onAddListener = (event, extensionId, eventName) => {
@@ -303,7 +380,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        const observer = this.sessionMap.get(getSessionFromEvent(event));
        const listener = event.type === "frame" ? {
          type: event.type,
-@@ -2294,6 +2446,7 @@ var RoutingDelegate = class _RoutingDelegate {
+@@ -2294,6 +2464,7 @@ var RoutingDelegate = class _RoutingDelegate {
        return observer?.addListener(listener, extensionId, eventName);
      };
      this.onRemoveListener = (event, extensionId, eventName) => {
@@ -311,7 +388,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        const observer = this.sessionMap.get(getSessionFromEvent(event));
        const listener = event.type === "frame" ? {
          type: event.type,
-@@ -2469,15 +2622,25 @@ var ExtensionRouter = class {
+@@ -2469,15 +2640,25 @@ var ExtensionRouter = class {
        throw new Error(`${handlerName} was sent from an unknown extension context`);
      }
      if (handler.permission) {
@@ -340,7 +417,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      d8(`${handlerName} result: %r`, result);
      return result;
    }
-@@ -2506,16 +2669,23 @@ var ExtensionRouter = class {
+@@ -2506,16 +2687,23 @@ var ExtensionRouter = class {
      if (!eventListeners || eventListeners.length === 0) {
        return;
      }
@@ -365,7 +442,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
          }).catch((error) => {
            d8("failed to send %s to %s", eventName, extensionId);
            console.error(error);
-@@ -2525,7 +2695,7 @@ var ExtensionRouter = class {
+@@ -2525,7 +2713,7 @@ var ExtensionRouter = class {
            console.error(`Unable to send '${eventName}' to extension host for ${extensionId}`);
            return;
          }
@@ -374,7 +451,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        }
        sentCount++;
      }
-@@ -2568,49 +2738,62 @@ function readLoadedExtensionManifest(ctx, extension) {
+@@ -2568,49 +2756,62 @@ function readLoadedExtensionManifest(ctx, extension) {
  }
  
  // src/browser/api/permissions.ts
@@ -468,7 +545,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
        return true;
      };
      const handle = this.ctx.router.apiHandler();
-@@ -2619,19 +2802,8 @@ var PermissionsAPI = class {
+@@ -2619,19 +2820,8 @@ var PermissionsAPI = class {
      handle("permissions.remove", this.remove);
      handle("permissions.request", this.request);
      const sessionExtensions = ctx.session.extensions || ctx.session;
@@ -489,7 +566,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
      });
    }
  };
-@@ -2764,6 +2936,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends import_no
+@@ -2764,6 +2954,14 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends import_no
      }
    }
    /** Add webContents to be tracked as a tab. */
@@ -497,11 +574,15 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e639
 +  addWindow(window) {
 +    this.ctx.store.addWindow(window);
 +  }
++  /** Bring back the menu items an extension made before the app restarted. */
++  restoreContextMenuItems(extensionId, items) {
++    for (const props of items) this.api.contextMenus.addContextItem(extensionId, props);
++  }
    addTab(tab, window) {
      this.checkWebContentsArgument(tab);
      this.ctx.store.addTab(tab, window);
 diff --git a/dist/esm/index.mjs b/dist/esm/index.mjs
-index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8aee009e2 100644
+index 43929222572e4d6875cc192aca0750da79d8ff14..d494a4898759050d18c4e857071544a1317b991f 100644
 --- a/dist/esm/index.mjs
 +++ b/dist/esm/index.mjs
 @@ -29,7 +29,7 @@ var validateExtensionUrl = (url, extension) => {
@@ -513,7 +594,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      throw new Error("Invalid URL");
    }
    return url;
-@@ -84,6 +84,123 @@ var matchesTitlePattern = (pattern, title) => {
+@@ -84,6 +84,124 @@ var matchesTitlePattern = (pattern, title) => {
    const regexp = new RegExp(`^${pattern.split("*").map(escapePattern).join(".*")}$`);
    return title.match(regexp);
  };
@@ -627,6 +708,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
 +    "contextMenus.create",
 +    "contextMenus.remove",
 +    "contextMenus.removeAll",
++    "contextMenus.update",
 +    "contextMenus.onClicked"
 +  ], { permission: "contextMenus" }),
 +  ...rulesFor(["permissions.onAdded", "permissions.onRemoved"], {})
@@ -637,7 +719,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
  var getAllWindows = () => [...BaseWindow.getAllWindows(), ...BrowserWindow.getAllWindows()];
  
  // src/browser/popup.ts
-@@ -301,6 +418,7 @@ var BrowserActionAPI = class {
+@@ -301,6 +419,7 @@ var BrowserActionAPI = class {
        }
        const activeTab = this.ctx.store.getActiveTabFromWindow(window);
        if (!activeTab) return;
@@ -645,7 +727,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        const [width] = window.getSize();
        const anchorSize = 64;
        this.activateClick({
-@@ -365,8 +483,6 @@ var BrowserActionAPI = class {
+@@ -365,8 +484,6 @@ var BrowserActionAPI = class {
      );
      handle("browserAction.openPopup", this.openPopup);
      const preloadOpts = { allowRemote: true, extensionContext: false };
@@ -654,7 +736,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      handle(
        "browserAction.addObserver",
        (event) => {
-@@ -540,9 +656,12 @@ var BrowserActionAPI = class {
+@@ -540,9 +657,12 @@ var BrowserActionAPI = class {
        `activate [eventType: ${eventType}, extensionId: '${extensionId}', tabId: ${tabId}, senderId: ${sender?.id}]`
      );
      switch (eventType) {
@@ -668,7 +750,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        case "contextmenu":
          this.activateContextMenu(details);
          break;
-@@ -735,7 +854,8 @@ var _WindowsAPI = class _WindowsAPI {
+@@ -735,7 +855,8 @@ var _WindowsAPI = class _WindowsAPI {
    }
    getLastFocused(event) {
      const win = this.ctx.store.getLastFocusedWindow();
@@ -678,7 +760,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
    }
    getAll(event) {
      return Array.from(this.ctx.store.windows).map(this.getWindowDetails.bind(this));
-@@ -947,6 +1067,9 @@ var _TabsAPI = class _TabsAPI {
+@@ -947,6 +1068,9 @@ var _TabsAPI = class _TabsAPI {
    insertCSS(event, tabId, details) {
      const tab = this.ctx.store.getTabById(tabId);
      if (!tab) return;
@@ -688,7 +770,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      if (details.code) {
        tab.insertCSS(details.code);
      }
-@@ -955,6 +1078,7 @@ var _TabsAPI = class _TabsAPI {
+@@ -955,6 +1079,7 @@ var _TabsAPI = class _TabsAPI {
      const isSet = (value) => typeof value !== "undefined";
      const filteredTabs = Array.from(this.ctx.store.tabs).map(this.getTabDetails.bind(this)).filter((tab) => {
        if (!tab) return false;
@@ -696,7 +778,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        if (isSet(info.active) && info.active !== tab.active) return false;
        if (isSet(info.pinned) && info.pinned !== tab.pinned) return false;
        if (isSet(info.audible) && info.audible !== tab.audible) return false;
-@@ -1046,6 +1170,7 @@ var _TabsAPI = class _TabsAPI {
+@@ -1046,6 +1171,7 @@ var _TabsAPI = class _TabsAPI {
    onUpdated(tabId) {
      const tab = this.ctx.store.getTabById(tabId);
      if (!tab) return;
@@ -704,7 +786,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      let prevDetails;
      if (this.ctx.store.tabDetailsCache.has(tab.id)) {
        prevDetails = this.ctx.store.tabDetailsCache.get(tab.id);
-@@ -1081,6 +1206,7 @@ var _TabsAPI = class _TabsAPI {
+@@ -1081,6 +1207,7 @@ var _TabsAPI = class _TabsAPI {
      this.ctx.router.broadcastEvent("tabs.onUpdated", tab.id, changeInfo, details);
    }
    onRemoved(tabId) {
@@ -712,7 +794,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      const details = this.ctx.store.tabDetailsCache.has(tabId) ? this.ctx.store.tabDetailsCache.get(tabId) : null;
      this.ctx.store.tabDetailsCache.delete(tabId);
      const windowId = details ? details.windowId : WindowsAPI.WINDOW_ID_NONE;
-@@ -1322,7 +1448,11 @@ var ExtensionStore = class extends EventEmitter2 {
+@@ -1322,7 +1449,11 @@ var ExtensionStore = class extends EventEmitter2 {
      );
    }
    getLastFocusedWindow() {
@@ -725,7 +807,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
    }
    getCurrentWindow() {
      return this.getLastFocusedWindow();
-@@ -1346,6 +1476,9 @@ var ExtensionStore = class extends EventEmitter2 {
+@@ -1346,6 +1477,9 @@ var ExtensionStore = class extends EventEmitter2 {
    async removeWindow(window) {
      if (!this.windows.has(window)) return;
      this.windows.delete(window);
@@ -735,7 +817,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      if (typeof this.impl.removeWindow === "function") {
        await this.impl.removeWindow(window);
      } else {
-@@ -1433,7 +1566,7 @@ var ExtensionStore = class extends EventEmitter2 {
+@@ -1433,7 +1567,7 @@ var ExtensionStore = class extends EventEmitter2 {
    }
    async requestPermissions(extension, permissions) {
      if (typeof this.impl.requestPermissions !== "function") {
@@ -744,7 +826,52 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      }
      const result = await this.impl.requestPermissions(extension, permissions);
      return typeof result === "boolean" ? result : false;
-@@ -1686,6 +1819,7 @@ var ContextMenusAPI = class {
+@@ -1550,6 +1684,16 @@ var ContextMenusAPI = class {
+         return;
+       }
+       this.addContextItem(extension.id, createProperties);
++      this.emitChanged(extension.id);
++    };
++    this.update = ({ extension }, menuItemId, updateProperties) => {
++      const items = this.menus.get(extension.id);
++      const props = items?.get(menuItemId);
++      if (!props) {
++        throw new Error(`Cannot find menu item with id ${menuItemId}`);
++      }
++      items.set(menuItemId, { ...props, ...updateProperties, id: props.id });
++      this.emitChanged(extension.id);
+     };
+     this.remove = ({ extension }, menuItemId) => {
+       const items = this.menus.get(extension.id);
+@@ -1558,13 +1702,16 @@ var ContextMenusAPI = class {
+         if (items.size === 0) {
+           this.menus.delete(extension.id);
+         }
++        this.emitChanged(extension.id);
+       }
+     };
+     this.removeAll = ({ extension }) => {
+       this.menus.delete(extension.id);
++      this.emitChanged(extension.id);
+     };
+     const handle = this.ctx.router.apiHandler();
+     handle("contextMenus.create", this.create);
++    handle("contextMenus.update", this.update);
+     handle("contextMenus.remove", this.remove);
+     handle("contextMenus.removeAll", this.removeAll);
+     const sessionExtensions = ctx.session.extensions || ctx.session;
+@@ -1583,6 +1730,10 @@ var ContextMenusAPI = class {
+     }
+     contextItems.set(props.id, props);
+   }
++  emitChanged(extensionId) {
++    const items = this.menus.get(extensionId);
++    this.ctx.emit("context-menus-changed", extensionId, items ? [...items.values()] : []);
++  }
+   buildMenuItemsForParams(webContents2, params) {
+     if (webContents2.session !== this.ctx.session) return [];
+     let menuItemOptions = [];
+@@ -1686,6 +1837,7 @@ var ContextMenusAPI = class {
        // TODO
        srcUrl: params?.srcURL
      };
@@ -752,7 +879,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      this.ctx.router.sendEvent(extensionId, "contextMenus.onClicked", data, tab);
    }
  };
-@@ -1783,14 +1917,16 @@ async function getConfigSearchPaths(application) {
+@@ -1783,14 +1935,16 @@ async function getConfigSearchPaths(application) {
    }
    return searchPaths;
  }
@@ -770,7 +897,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
          d7("read config in %s", filePath, config);
          return config;
        } else {
-@@ -2229,11 +2365,26 @@ var getSessionFromEvent = (event) => {
+@@ -2229,11 +2383,26 @@ var getSessionFromEvent = (event) => {
  var d8 = debug8("electron-chrome-extensions:router");
  var DEFAULT_SESSION = "_self";
  var gRoutingDelegate;
@@ -797,7 +924,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        d8(`received '${handlerName}'`, args);
        const observer = this.sessionMap.get(getSessionFromEvent(event));
        return observer?.onExtensionMessage(event, extensionId, handlerName, ...args);
-@@ -2245,6 +2396,7 @@ var RoutingDelegate = class _RoutingDelegate {
+@@ -2245,6 +2414,7 @@ var RoutingDelegate = class _RoutingDelegate {
        return observer?.onExtensionMessage(event, void 0, handlerName, ...args);
      };
      this.onAddListener = (event, extensionId, eventName) => {
@@ -805,7 +932,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        const observer = this.sessionMap.get(getSessionFromEvent(event));
        const listener = event.type === "frame" ? {
          type: event.type,
-@@ -2257,6 +2409,7 @@ var RoutingDelegate = class _RoutingDelegate {
+@@ -2257,6 +2427,7 @@ var RoutingDelegate = class _RoutingDelegate {
        return observer?.addListener(listener, extensionId, eventName);
      };
      this.onRemoveListener = (event, extensionId, eventName) => {
@@ -813,7 +940,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        const observer = this.sessionMap.get(getSessionFromEvent(event));
        const listener = event.type === "frame" ? {
          type: event.type,
-@@ -2432,15 +2585,25 @@ var ExtensionRouter = class {
+@@ -2432,15 +2603,25 @@ var ExtensionRouter = class {
        throw new Error(`${handlerName} was sent from an unknown extension context`);
      }
      if (handler.permission) {
@@ -842,7 +969,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      d8(`${handlerName} result: %r`, result);
      return result;
    }
-@@ -2469,16 +2632,23 @@ var ExtensionRouter = class {
+@@ -2469,16 +2650,23 @@ var ExtensionRouter = class {
      if (!eventListeners || eventListeners.length === 0) {
        return;
      }
@@ -867,7 +994,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
          }).catch((error) => {
            d8("failed to send %s to %s", eventName, extensionId);
            console.error(error);
-@@ -2488,7 +2658,7 @@ var ExtensionRouter = class {
+@@ -2488,7 +2676,7 @@ var ExtensionRouter = class {
            console.error(`Unable to send '${eventName}' to extension host for ${extensionId}`);
            return;
          }
@@ -876,7 +1003,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        }
        sentCount++;
      }
-@@ -2531,49 +2701,62 @@ function readLoadedExtensionManifest(ctx, extension) {
+@@ -2531,49 +2719,62 @@ function readLoadedExtensionManifest(ctx, extension) {
  }
  
  // src/browser/api/permissions.ts
@@ -970,7 +1097,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
        return true;
      };
      const handle = this.ctx.router.apiHandler();
-@@ -2582,19 +2765,8 @@ var PermissionsAPI = class {
+@@ -2582,19 +2783,8 @@ var PermissionsAPI = class {
      handle("permissions.remove", this.remove);
      handle("permissions.request", this.request);
      const sessionExtensions = ctx.session.extensions || ctx.session;
@@ -991,7 +1118,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
      });
    }
  };
-@@ -2727,6 +2899,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends EventEmit
+@@ -2727,6 +2917,14 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends EventEmit
      }
    }
    /** Add webContents to be tracked as a tab. */
@@ -999,19 +1126,25 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8
 +  addWindow(window) {
 +    this.ctx.store.addWindow(window);
 +  }
++  /** Bring back the menu items an extension made before the app restarted. */
++  restoreContextMenuItems(extensionId, items) {
++    for (const props of items) this.api.contextMenus.addContextItem(extensionId, props);
++  }
    addTab(tab, window) {
      this.checkWebContentsArgument(tab);
      this.ctx.store.addTab(tab, window);
 diff --git a/dist/types/browser/index.d.ts b/dist/types/browser/index.d.ts
-index b5295a5e9f69736026f89d621cd70ca0329b9e4a..bb4b5522178129608529ff8cbdc78f268c7db6c7 100644
+index b5295a5e9f69736026f89d621cd70ca0329b9e4a..55cb175fdc1c56ff964cbf768687c7f0da3e1e5e 100644
 --- a/dist/types/browser/index.d.ts
 +++ b/dist/types/browser/index.d.ts
-@@ -34,6 +34,8 @@ export declare class ElectronChromeExtensions extends EventEmitter {
+@@ -34,6 +34,10 @@ export declare class ElectronChromeExtensions extends EventEmitter {
      private prependPreload;
      private checkWebContentsArgument;
      /** Add webContents to be tracked as a tab. */
 +    /** Track a window before it has a tab, so extensions see a current window. */
 +    addWindow(window: Electron.BaseWindow): void;
++    /** Bring back the menu items an extension made before the app restarted. */
++    restoreContextMenuItems(extensionId: string, items: Record<string, unknown>[]): void;
      addTab(tab: Electron.WebContents, window: Electron.BaseWindow): void;
      /** Remove webContents from being tracked as a tab. */
      removeTab(tab: Electron.WebContents): void;
