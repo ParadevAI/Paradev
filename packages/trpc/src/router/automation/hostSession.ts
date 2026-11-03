@@ -32,6 +32,8 @@ export type LaunchAgentSessionArgs = {
 	chat: boolean;
 	/** See {@link PreviousRunSession}. Omit when nothing may be continued. */
 	previous?: PreviousRunSession;
+	/** Show a chat it starts in a background tab of the host's desktop app. */
+	openTab?: boolean;
 };
 
 /**
@@ -40,6 +42,24 @@ export type LaunchAgentSessionArgs = {
  * predates `sessions` gets the `agents.run` chat request it always got.
  */
 export async function launchAgentSession(
+	host: HostCaller,
+	args: LaunchAgentSessionArgs,
+): Promise<AgentRunResult> {
+	const result = await startAgentSession(host, args);
+	if (args.openTab && result.kind === "chat") {
+		// The run has started either way; a host with no desktop, or one too old
+		// for chat tabs, only leaves the chat without a tab.
+		await host
+			.mutation("panes.newTab", {
+				workspaceId: args.workspaceId,
+				sessionId: result.sessionId,
+			})
+			.catch(() => {});
+	}
+	return result;
+}
+
+async function startAgentSession(
 	host: HostCaller,
 	args: LaunchAgentSessionArgs,
 ): Promise<AgentRunResult> {

@@ -63,6 +63,8 @@ export async function resolveSessionWorkspace(
 	workspace: HostWorkspaceRow;
 	target: ResolvedHostTarget;
 	sessions: SessionsClient;
+	/** Shows a chat session in a background desktop tab; false when no desktop on that host can. */
+	openTab: (sessionId: string) => Promise<boolean>;
 }> {
 	const organizationId = ctx.config.organizationId;
 	if (!organizationId)
@@ -77,5 +79,20 @@ export async function resolveSessionWorkspace(
 		},
 		options.workspace,
 	);
-	return { workspace, target, sessions: sessionsClient(target.client) };
+	return {
+		workspace,
+		target,
+		sessions: sessionsClient(target.client),
+		openTab: async (sessionId) => {
+			try {
+				await target.client.panes.newTab.mutate({
+					workspaceId: options.workspace,
+					sessionId,
+				});
+				return true;
+			} catch {
+				return false;
+			}
+		},
+	};
 }
