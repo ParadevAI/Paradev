@@ -12,6 +12,7 @@ import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import type { BrowserExtension } from "main/lib/browser/extension-host/browser-extensions";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { ExtensionIcon } from "../ExtensionIcon";
 
 interface RemoveExtensionDialogProps {
 	/** Kept while the dialog closes, so its text does not blank mid-animation. */
@@ -41,8 +42,13 @@ export function RemoveExtensionDialog({
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<EnterEnabledAlertDialogContent className="max-w-[340px] gap-0 p-0">
 				<AlertDialogHeader className="px-4 pt-4 pb-2">
-					<AlertDialogTitle className="font-medium">
-						<Trans>Remove {name}?</Trans>
+					<AlertDialogTitle className="flex items-center gap-2 font-medium">
+						{extension && (
+							<ExtensionIcon extension={extension} className="size-5" />
+						)}
+						<span className="min-w-0">
+							<Trans>Remove {name}?</Trans>
+						</span>
 					</AlertDialogTitle>
 					<AlertDialogDescription>
 						<Trans>

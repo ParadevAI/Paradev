@@ -6,6 +6,7 @@ import {
 	removeBrowserExtension,
 	setBrowserExtensionPinned,
 } from "./browser-extensions";
+import { extensionIcon } from "./extension-icon";
 import { isUserExtension } from "./user-extensions";
 import {
 	browserExtensionsPath,
@@ -68,8 +69,11 @@ export const userExtensions: UserExtensions = {
 	},
 
 	async remove(extensionId, signal) {
-		const { name } = installed(extensionId);
-		if (!(await confirmRemoval(name, dialogWindow(), signal))) return false;
+		const extension = installed(extensionId);
+		const icon = extensionIcon(extension.path, extension.manifest);
+		if (!(await confirmRemoval(extension.name, dialogWindow(), signal, icon))) {
+			return false;
+		}
 		await removeBrowserExtension(extensionId);
 		return true;
 	},

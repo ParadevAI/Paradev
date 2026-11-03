@@ -12,6 +12,7 @@ import {
 } from "electron-chrome-web-store";
 import { confirm } from "./confirm-dialog";
 import { verifyCrx3 } from "./crx3";
+import { extensionIcon } from "./extension-icon";
 import { accessDetail, addedAccess, installWarnings } from "./install-warnings";
 
 // The package's own updater checks the moment it starts. An update then
@@ -37,10 +38,12 @@ export function confirmRemoval(
 	name: string,
 	window: Electron.BrowserWindow | undefined,
 	signal?: AbortSignal,
+	icon?: Electron.NativeImage,
 ): Promise<boolean> {
 	return confirm(
 		window,
 		{
+			icon,
 			buttons: [
 				i18n._(msg({ message: "Remove" })),
 				i18n._(msg({ message: "Cancel" })),
@@ -63,11 +66,13 @@ function confirmInstall(
 	manifest: chrome.runtime.Manifest,
 	window: Electron.BrowserWindow | undefined,
 	signal?: AbortSignal,
+	icon?: Electron.NativeImage,
 ): Promise<boolean> {
 	const warnings = installWarnings(manifest);
 	return confirm(
 		window,
 		{
+			icon,
 			buttons: [
 				i18n._(msg({ message: "Add extension" })),
 				i18n._(msg({ message: "Cancel" })),
@@ -86,8 +91,10 @@ function confirmUpdate(
 	name: string,
 	added: string[],
 	window: Electron.BrowserWindow | undefined,
+	icon?: Electron.NativeImage,
 ): Promise<boolean> {
 	return confirm(window, {
+		icon,
 		buttons: [
 			i18n._(msg({ message: "Update" })),
 			i18n._(msg({ message: "Keep current version" })),
@@ -133,7 +140,18 @@ export async function installBrowserWebStore(
 	};
 	// The page decides showConfirmDialog; removal deletes a vault's data, so always ask.
 	const onUninstall: OnUninstall = async (details) => {
-		if (!(await confirmRemoval(details.localizedName, details.browserWindow))) {
+		const installed = browserSession.extensions.getExtension(details.id);
+		const icon = installed
+			? extensionIcon(installed.path, installed.manifest)
+			: undefined;
+		if (
+			!(await confirmRemoval(
+				details.localizedName,
+				details.browserWindow,
+				undefined,
+				icon,
+			))
+		) {
 			return false;
 		}
 		await removeExtension(details.id);
@@ -150,10 +168,12 @@ export async function installBrowserWebStore(
 		if (added.length === 0) return true;
 		const update = `${id}@${manifest.version}`;
 		if (declinedUpdates.has(update)) return false;
+		const current = browserSession.extensions.getExtension(id);
 		const allowed = await confirmUpdate(
 			name,
 			added,
 			BrowserWindow.getFocusedWindow() ?? undefined,
+			current ? extensionIcon(current.path, current.manifest) : undefined,
 		);
 		if (!allowed) declinedUpdates.add(update);
 		return allowed;
@@ -168,6 +188,8 @@ export async function installBrowserWebStore(
 				details.localizedName,
 				details.manifest,
 				details.browserWindow,
+				undefined,
+				details.icon,
 			);
 			if (allowed) newInstalls.set(details.id, details.manifest);
 			return { action: allowed ? "allow" : "deny" };
@@ -235,7 +257,10 @@ export async function installWebStoreExtension(
 			await readFile(path.join(stagedPath, "manifest.json"), "utf8"),
 		);
 		const name = await localizedName(stagedPath, manifest);
-		if (!(await confirmInstall(name, manifest, window, signal))) return null;
+		const icon = extensionIcon(stagedPath, manifest);
+		if (!(await confirmInstall(name, manifest, window, signal, icon))) {
+			return null;
+		}
 		// The layout loadAllExtensions reads at start: <extensionsPath>/<id>/<version dir>.
 		const installPath = path.join(
 			extensionsPath,

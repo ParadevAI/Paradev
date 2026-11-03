@@ -6,7 +6,11 @@ test("an extension gets optional access only after the user allows it, and the q
 	const showMessageBox = dialog.showMessageBox as unknown as ReturnType<
 		typeof mock
 	>;
-	const extension = { name: "LastPass" } as Electron.Extension;
+	const extension = {
+		name: "LastPass",
+		path: "/extensions/lastpass",
+		manifest: {},
+	} as Electron.Extension;
 	const request = {
 		permissions: ["history"],
 		origins: ["https://bank.test/*"],
