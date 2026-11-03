@@ -56,7 +56,7 @@ export function WorkspaceMoreMenu({
 						<button
 							type="button"
 							aria-label={label}
-							className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground data-[state=open]:bg-accent/50 data-[state=open]:text-foreground"
+							className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground aria-expanded:bg-foreground/15 aria-expanded:text-foreground aria-expanded:hover:bg-foreground/20"
 						>
 							<Ellipsis className="size-4" strokeWidth={1.5} />
 						</button>
