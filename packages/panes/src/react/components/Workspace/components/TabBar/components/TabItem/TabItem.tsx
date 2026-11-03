@@ -172,10 +172,16 @@ export function TabItem<TData>({
 									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
 									<div
 										className={cn(
-											"flex h-full min-w-0 flex-1 items-center pr-1 text-left transition-colors",
+											"flex h-full min-w-0 flex-1 items-center text-left transition-[color,padding]",
 											isCards
-												? cn("gap-2", icon ? "pl-1.5" : "pl-3")
-												: "gap-1.5 pl-3 text-xs",
+												? cn(
+														"gap-2",
+														icon ? "pl-2.5" : "pl-3",
+														// The close button overlays the label's end on hover, so
+														// at rest the label keeps the room it would reserve.
+														"pr-2.5 group-hover:pr-7 group-focus-within:pr-7",
+													)
+												: "gap-1.5 pr-1 pl-3 text-xs",
 										)}
 										onAuxClick={(event) => {
 											if (event.button === 1) {
@@ -199,8 +205,8 @@ export function TabItem<TData>({
 							</Tooltip>
 							<div
 								className={cn(
-									"relative flex h-full shrink-0 items-center justify-center",
-									isCards ? "mr-2 w-4" : "w-7",
+									"flex h-full shrink-0 items-center justify-center",
+									isCards ? "absolute top-0 right-2 w-4" : "relative w-7",
 								)}
 							>
 								{accessory && (
