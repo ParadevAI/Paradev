@@ -245,7 +245,7 @@
 			},
 			"category": "data & apis",
 			"source": "./plugins/keenable",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "wispr",

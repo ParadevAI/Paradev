@@ -1023,7 +1023,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"keenable": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "keenable",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Search the web and fetch pages as clean markdown with Keenable, built for AI agents.",
 		"author": {
 			"name": "Paradev",
@@ -1044,6 +1044,14 @@ export const FIRST_PARTY_MANIFESTS = {
 				"interface": {
 					"displayName": "Keenable",
 					"category": "Data & APIs"
+				},
+				"connector": {
+					"slug": "keenable_mcp"
+				},
+				"bind": {
+					"headers": {
+						"X-API-Key": "${config.access_token}"
+					}
 				},
 				"mcp": {
 					"type": "streamable-http",
