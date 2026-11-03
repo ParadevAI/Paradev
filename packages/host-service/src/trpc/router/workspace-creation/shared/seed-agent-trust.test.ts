@@ -259,6 +259,23 @@ describe("resolveTrustTarget", () => {
 		expect(target(["--unset=CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
 		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe("/p/.claude.json");
 	});
+
+	test("reads env options from a raw command string", () => {
+		const target = (command: string) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "custom",
+				command,
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file;
+		const defaultFile = join(homedir(), ".claude.json");
+		expect(target("env -u CLAUDE_CONFIG_DIR claude --verbose")).toBe(
+			defaultFile,
+		);
+		expect(target("env --ignore-environment claude")).toBe(defaultFile);
+		expect(target("env -i CLAUDE_CONFIG_DIR=/p claude")).toBe(
+			"/p/.claude.json",
+		);
+	});
 });
 
 describe("seedAgyFolderTrust", () => {

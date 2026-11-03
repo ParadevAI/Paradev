@@ -236,12 +236,25 @@ export function AgentDetail({
 		if (isAgentCommandPatchChanged(config, { command, args, env })) {
 			updateMutation.mutate(
 				hasInlineEnv ? { command, args, env } : { command, args },
+				{
+					onSuccess: (updated) =>
+						setCommandText(
+							getAgentCommandText({
+								command: updated.command,
+								args: updated.args,
+							}),
+						),
+				},
 			);
 		}
 	};
 
-	const handleEnvCommit = (env: Record<string, string>) => {
-		if (!areEnvMapsEqual(env, config.env)) updateMutation.mutate({ env });
+	const handleEnvCommit = (
+		env: Record<string, string>,
+		onSaved: () => void,
+	) => {
+		if (areEnvMapsEqual(env, config.env)) onSaved();
+		else updateMutation.mutate({ env }, { onSuccess: onSaved });
 	};
 
 	const handlePromptArgsBlur = () => {

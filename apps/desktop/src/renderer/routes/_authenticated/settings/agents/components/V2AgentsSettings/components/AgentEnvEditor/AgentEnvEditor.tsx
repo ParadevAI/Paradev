@@ -46,10 +46,12 @@ function toEnv(rows: readonly EnvRow[]): Record<string, string> {
 	const accepted = acceptedRowIds(rows);
 	const entries = new Map<string, string>();
 	for (const row of rows) {
-		const entry = accepted.has(row.id)
-			? { key: row.key.trim(), value: row.value }
-			: row.saved;
-		if (entry && !entries.has(entry.key)) entries.set(entry.key, entry.value);
+		if (accepted.has(row.id)) entries.set(row.key.trim(), row.value);
+	}
+	for (const row of rows) {
+		if (!accepted.has(row.id) && row.saved && !entries.has(row.saved.key)) {
+			entries.set(row.saved.key, row.saved.value);
+		}
 	}
 	return Object.fromEntries(entries);
 }
@@ -57,7 +59,7 @@ function toEnv(rows: readonly EnvRow[]): Record<string, string> {
 interface AgentEnvEditorProps {
 	idPrefix: string;
 	env: Record<string, string>;
-	onCommit: (env: Record<string, string>) => void;
+	onCommit: (env: Record<string, string>, onSaved: () => void) => void;
 }
 
 export function AgentEnvEditor({
@@ -84,17 +86,18 @@ export function AgentEnvEditor({
 		const nextEnv = toEnv(next);
 		const nextAccepted = acceptedRowIds(next);
 		committedEnvs.current.add(envIdentity(nextEnv));
-		setRows((current) =>
-			current.map((row) => {
-				const sent = next.find((candidate) => candidate.id === row.id);
-				const unchanged =
-					sent && sent.key === row.key && sent.value === row.value;
-				return unchanged && nextAccepted.has(row.id)
-					? { ...row, saved: { key: row.key.trim(), value: row.value } }
-					: row;
-			}),
+		onCommit(nextEnv, () =>
+			setRows((current) =>
+				current.map((row) => {
+					const sent = next.find((candidate) => candidate.id === row.id);
+					const unchanged =
+						sent && sent.key === row.key && sent.value === row.value;
+					return unchanged && nextAccepted.has(row.id)
+						? { ...row, saved: { key: row.key.trim(), value: row.value } }
+						: row;
+				}),
+			),
 		);
-		onCommit(nextEnv);
 	};
 
 	const isInvalid = (row: EnvRow) =>
