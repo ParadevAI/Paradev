@@ -64,7 +64,8 @@ export const chatHistoryRouter = {
 						lastSeq: 0,
 					});
 				} else {
-					if (!canAccess(caller, existing)) {
+					// Owner only: a box whose chat moved away must hear CONFLICT, not NOT_FOUND.
+					if (!canAccess({ ...caller, sandbox: null }, existing)) {
 						throw userError({
 							code: "NOT_FOUND",
 							message: "Chat session not found",
@@ -155,7 +156,7 @@ export const chatHistoryRouter = {
 							: !sameEpoch
 								? { title: null }
 								: {}),
-						lastActiveAt: new Date(),
+						...(batchIsStale ? {} : { lastActiveAt: new Date() }),
 					})
 					.where(eq(chatSessions.id, input.sessionId));
 			});

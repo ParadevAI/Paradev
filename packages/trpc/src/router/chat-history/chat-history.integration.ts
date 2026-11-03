@@ -221,6 +221,25 @@ describe("chatHistory.push", () => {
 		).rejects.toThrow("moved to another workspace");
 	});
 
+	test("a box whose chat moved away hears that it moved", async () => {
+		const sessionId = newSession();
+		const box = callerFor(USER, CLOUD_WORKSPACE);
+		await push(sessionId, [{ seq: 1, event: agentMessage("a", "a") }], {
+			as: box,
+			workspaceId: CLOUD_WORKSPACE,
+		});
+		await db
+			.update(chatSessions)
+			.set({ v2WorkspaceId: WORKSPACE })
+			.where(eq(chatSessions.id, sessionId));
+		await expect(
+			push(sessionId, [{ seq: 2, event: agentMessage("b", "b") }], {
+				as: box,
+				workspaceId: CLOUD_WORKSPACE,
+			}),
+		).rejects.toThrow("moved to another workspace");
+	});
+
 	test("a late retry of an older batch keeps the newer title and status", async () => {
 		const sessionId = newSession();
 		await push(sessionId, [
