@@ -1,5 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
+	MAX_EXTENSION_MESSAGE_LENGTH,
+	NATIVE_MESSAGING_CHANNEL,
+	NATIVE_MESSAGING_EVENT_CHANNEL,
+	type NativeMessagingOp,
+	type NativePortEvent,
+} from "shared/browser-extension-native-messaging";
+import {
 	OFFSCREEN_CHANNEL,
 	type OffscreenMethod,
 } from "shared/browser-extension-offscreen";
@@ -18,6 +25,11 @@ contextBridge.executeInMainWorld({
 		toChromeUserAgent: (userAgent: string) => string,
 		googleSignInHost: string,
 		toFirefoxUserAgent: (userAgent: string) => string,
+		sendNative: (op: NativeMessagingOp, portId: number, arg?: unknown) => void,
+		listenNative: (
+			listener: (portId: number, event: NativePortEvent) => void,
+		) => void,
+		maxMessageLength: number,
 	) => {
 		// Session preloads run in website frames and workers too. The checks run
 		// here because a service worker's preload realm has no `location`.
@@ -71,6 +83,160 @@ contextBridge.executeInMainWorld({
 				hasDocument: () => callOffscreen("hasDocument"),
 			};
 		}
+
+		const runtime = chrome?.runtime as Record<string, unknown> | undefined;
+		let declaresNativeMessaging = false;
+		try {
+			const { permissions } = (
+				runtime?.getManifest as () => { permissions?: unknown }
+			)();
+			declaresNativeMessaging =
+				Array.isArray(permissions) && permissions.includes("nativeMessaging");
+		} catch {}
+		if (!runtime || !declaresNativeMessaging) return;
+
+		type Listener = (...args: unknown[]) => void;
+		const createEvent = () => {
+			const listeners = new Set<Listener>();
+			return {
+				event: {
+					addListener: (listener: Listener) => {
+						listeners.add(listener);
+					},
+					removeListener: (listener: Listener) => {
+						listeners.delete(listener);
+					},
+					hasListener: (listener: Listener) => listeners.has(listener),
+					hasListeners: () => listeners.size > 0,
+				},
+				dispatch: (...args: unknown[]) => {
+					for (const listener of [...listeners]) {
+						try {
+							listener(...args);
+						} catch (error) {
+							setTimeout(() => {
+								throw error;
+							});
+						}
+					}
+				},
+			};
+		};
+		type NativeEvent = ReturnType<typeof createEvent>["event"];
+		interface NativePort {
+			name: string;
+			onMessage: NativeEvent;
+			onDisconnect: NativeEvent;
+			postMessage(message: unknown): void;
+			disconnect(): void;
+		}
+		// Chrome sets runtime.lastError only while the callback runs.
+		// electron-chrome-extensions later swaps chrome.runtime for a copy, so
+		// it is looked up per call.
+		const withLastError = (message: string | undefined, run: () => void) => {
+			const current = global.chrome?.runtime as Record<string, unknown>;
+			if (message === undefined || !current) return run();
+			const previous = Object.getOwnPropertyDescriptor(current, "lastError");
+			try {
+				Object.defineProperty(current, "lastError", {
+					value: { message },
+					configurable: true,
+				});
+			} catch {
+				return run();
+			}
+			try {
+				run();
+			} finally {
+				if (previous) Object.defineProperty(current, "lastError", previous);
+				else delete current.lastError;
+			}
+		};
+
+		const handlers = new Map<number, (event: NativePortEvent) => void>();
+		const disconnectErrors = new WeakMap<NativePort, string | undefined>();
+		let nextPortId = 1;
+		let listening = false;
+		const connectNative = (application: unknown): NativePort => {
+			if (!listening) {
+				listening = true;
+				listenNative((portId, event) => handlers.get(portId)?.(event));
+			}
+			const portId = nextPortId++;
+			const onMessage = createEvent();
+			const onDisconnect = createEvent();
+			let connected = true;
+			const port: NativePort = {
+				name: "",
+				onMessage: onMessage.event,
+				onDisconnect: onDisconnect.event,
+				postMessage: (message) => {
+					if (!connected) {
+						throw new Error("Attempting to use a disconnected port object");
+					}
+					const json = JSON.stringify(message === undefined ? null : message);
+					if (json.length > maxMessageLength) {
+						throw new Error("Message length exceeded maximum allowed length.");
+					}
+					sendNative("post", portId, json);
+				},
+				disconnect: () => {
+					if (!connected) return;
+					connected = false;
+					handlers.delete(portId);
+					sendNative("disconnect", portId);
+				},
+			};
+			handlers.set(portId, (event) => {
+				if (event.type === "message") {
+					onMessage.dispatch(JSON.parse(event.json), port);
+					return;
+				}
+				connected = false;
+				handlers.delete(portId);
+				disconnectErrors.set(port, event.error);
+				withLastError(event.error, () => onDisconnect.dispatch(port));
+			});
+			sendNative("connect", portId, application);
+			return port;
+		};
+		// Chrome closes the port after the host's first reply.
+		const sendNativeMessage = (
+			application: unknown,
+			message: unknown,
+			callback?: (response?: unknown) => void,
+		) => {
+			const reply = new Promise((resolve, reject) => {
+				const port = connectNative(application);
+				port.onMessage.addListener((response) => {
+					port.disconnect();
+					resolve(response);
+				});
+				port.onDisconnect.addListener(() => {
+					reject(
+						new Error(disconnectErrors.get(port) ?? "Native host has exited."),
+					);
+				});
+				port.postMessage(message);
+			});
+			if (typeof callback !== "function") return reply;
+			reply.then(
+				(response) => callback(response),
+				(error: Error) => withLastError(error.message, () => callback()),
+			);
+		};
+		for (const [name, value] of [
+			["connectNative", connectNative],
+			["sendNativeMessage", sendNativeMessage],
+		] as const) {
+			// Enumerable, so electron-chrome-extensions' copy of runtime keeps it.
+			Object.defineProperty(runtime, name, {
+				value,
+				writable: true,
+				enumerable: true,
+				configurable: true,
+			});
+		}
 	},
 	args: [
 		process.type === "service-worker",
@@ -79,5 +245,13 @@ contextBridge.executeInMainWorld({
 		chromeUserAgent,
 		GOOGLE_SIGN_IN_HOST,
 		firefoxUserAgent,
+		(op: NativeMessagingOp, portId: number, arg?: unknown) =>
+			ipcRenderer.send(NATIVE_MESSAGING_CHANNEL, op, portId, arg),
+		(listener: (portId: number, event: NativePortEvent) => void) => {
+			ipcRenderer.on(NATIVE_MESSAGING_EVENT_CHANNEL, (_event, portId, event) =>
+				listener(portId, event),
+			);
+		},
+		MAX_EXTENSION_MESSAGE_LENGTH,
 	],
 });

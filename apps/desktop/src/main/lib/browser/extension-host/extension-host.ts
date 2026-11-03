@@ -12,6 +12,7 @@ import {
 	type ExtensionWindowOptions,
 	openExtensionWindow,
 } from "./extension-window";
+import { serveNativeMessaging } from "./native-messaging";
 import { serveOffscreenDocuments } from "./offscreen-documents";
 import { confirmPermissionRequest } from "./permission-request";
 import { waitForNewPane } from "./wait-for-new-pane";
@@ -97,6 +98,7 @@ function startExtensionHost(): void {
 	};
 
 	serveOffscreenDocuments(browserSession);
+	serveNativeMessaging(browserSession);
 
 	const extensions = new ElectronChromeExtensions({
 		session: browserSession,

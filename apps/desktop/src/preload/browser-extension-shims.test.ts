@@ -42,10 +42,25 @@ async function importInWorkerPreloadRealm(): Promise<Shim> {
 function runInMainWorld(
 	{ func, args }: Shim,
 	url: string,
-	overrides: { isServiceWorker?: boolean; callOffscreen?: unknown } = {},
+	overrides: {
+		isServiceWorker?: boolean;
+		callOffscreen?: unknown;
+		chrome?: Record<string, unknown>;
+		sendNative?: unknown;
+		listenNative?: unknown;
+	} = {},
 ): MainWorld {
 	const { protocol, hostname } = new URL(url);
-	const [, callOffscreen, ...rest] = args;
+	const [
+		,
+		callOffscreen,
+		toChromeUserAgent,
+		googleSignInHost,
+		toFirefoxUserAgent,
+		sendNative,
+		listenNative,
+		...rest
+	] = args;
 	const world = {
 		location: { protocol, hostname },
 		navigator: {
@@ -54,10 +69,15 @@ function runInMainWorld(
 			vendor: "Google Inc.",
 			userAgentData: { brands: [{ brand: "Chromium", version: "152" }] },
 		},
-		chrome: {},
+		chrome: overrides.chrome ?? {},
 		args: [
 			overrides.isServiceWorker ?? false,
 			overrides.callOffscreen ?? callOffscreen,
+			toChromeUserAgent,
+			googleSignInHost,
+			toFirefoxUserAgent,
+			overrides.sendNative ?? sendNative,
+			overrides.listenNative ?? listenNative,
 			...rest,
 		],
 	};
@@ -118,4 +138,118 @@ test("Google's sign-in page sees Firefox, with no Chromium brands to cross-check
 	const website = runInMainWorld(shim, "https://example.com/").navigator;
 	expect(website.userAgent).toContain("Electron");
 	expect(website.userAgentData).toBeDefined();
+});
+
+interface NativePort {
+	onMessage: { addListener(listener: (message: unknown) => void): void };
+	onDisconnect: { addListener(listener: () => void): void };
+	postMessage(message: unknown): void;
+	disconnect(): void;
+}
+interface NativeRuntime {
+	lastError?: { message: string };
+	connectNative?: (application: string) => NativePort;
+	sendNativeMessage?: (
+		application: string,
+		message: unknown,
+		callback?: (response?: unknown) => void,
+	) => Promise<unknown> | undefined;
+}
+
+function nativeWorld(
+	shim: Shim,
+	url: string,
+	permissions: string[] = ["nativeMessaging"],
+) {
+	const sent: unknown[][] = [];
+	let deliver: (portId: number, event: unknown) => void = () => {};
+	const runtime: NativeRuntime & Record<string, unknown> = {
+		getManifest: () => ({ permissions }),
+	};
+	runInMainWorld(shim, url, {
+		isServiceWorker: true,
+		chrome: { runtime },
+		sendNative: (...args: unknown[]) => sent.push(args),
+		listenNative: (listener: typeof deliver) => {
+			deliver = listener;
+		},
+	});
+	return {
+		runtime,
+		sent,
+		deliver: (portId: number, event: unknown) => deliver(portId, event),
+	};
+}
+
+test("only an extension that declares nativeMessaging gets connectNative", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const extension = nativeWorld(shim, "chrome-extension://abc/background.js");
+	expect(typeof extension.runtime.connectNative).toBe("function");
+	expect(typeof extension.runtime.sendNativeMessage).toBe("function");
+	// electron-chrome-extensions replaces runtime with a spread copy.
+	expect({ ...extension.runtime }.connectNative).toBe(
+		extension.runtime.connectNative,
+	);
+
+	for (const world of [
+		nativeWorld(shim, "chrome-extension://abc/background.js", ["storage"]),
+		nativeWorld(shim, "https://example.com/"),
+	]) {
+		expect(world.runtime.connectNative).toBeUndefined();
+		expect(world.runtime.sendNativeMessage).toBeUndefined();
+	}
+});
+
+test("a native port relays JSON and reports a host's exit through runtime.lastError", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime, sent, deliver } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+	);
+	const port = runtime.connectNative?.("com.example.host") as NativePort;
+	const received: unknown[] = [];
+	let disconnectError: string | undefined;
+	port.onMessage.addListener((message) => received.push(message));
+	port.onDisconnect.addListener(() => {
+		disconnectError = runtime.lastError?.message;
+	});
+	port.postMessage({ hello: "wörld" });
+	expect(sent).toEqual([
+		["connect", 1, "com.example.host"],
+		["post", 1, '{"hello":"wörld"}'],
+	]);
+
+	deliver(1, { type: "message", json: '{"ok":true}' });
+	deliver(1, { type: "disconnect", error: "Native host has exited." });
+	expect(received).toEqual([{ ok: true }]);
+	expect(disconnectError).toBe("Native host has exited.");
+	expect(runtime.lastError).toBeUndefined();
+	expect(() => port.postMessage({})).toThrow("disconnected port");
+});
+
+test("sendNativeMessage closes the port after the first reply and reports failures", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime, sent, deliver } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+	);
+	const reply = runtime.sendNativeMessage?.("com.example.host", { q: 1 });
+	deliver(1, { type: "message", json: '"first"' });
+	deliver(1, { type: "message", json: '"second"' });
+	expect(await reply).toBe("first");
+	expect(sent.at(-1)).toEqual(["disconnect", 1]);
+
+	let callbackError: string | undefined;
+	const done = new Promise<void>((resolve) => {
+		runtime.sendNativeMessage?.("com.example.missing", {}, () => {
+			callbackError = runtime.lastError?.message;
+			resolve();
+		});
+	});
+	deliver(2, {
+		type: "disconnect",
+		error: "Specified native messaging host not found.",
+	});
+	await done;
+	expect(callbackError).toBe("Specified native messaging host not found.");
 });

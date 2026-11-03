@@ -758,33 +758,20 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 		).toEqual([]);
 	});
 
-	test("a native app name cannot leave the native host folders", () => {
-		const start = source.indexOf("var isNativeHostName");
-		const lookup = source.indexOf(
-			"async function readNativeMessagingHostConfig",
-		);
-		expect(start).toBeGreaterThan(0);
-		const isNativeHostName = new Function(
-			`${source.slice(start, lookup)}; return isNativeHostName;`,
-		)() as (name: unknown) => boolean;
-		for (const name of ["com.1password.1password", "com.lastpass.nplastpass"])
-			expect(isNativeHostName(name)).toBe(true);
+	test("native messaging is left to the app's own host", () => {
 		for (const name of [
-			"../browser-extensions/x/1_0/native-host",
-			"com/evil",
-			"com..evil",
-			".com",
-			"Com.Evil",
-			"com\\evil",
-			42,
-		])
-			expect(isNativeHostName(name)).toBe(false);
-		expect(source.slice(lookup, lookup + 400)).toContain(
-			"if (!isNativeHostName(application)) return;",
+			"runtime.connectNative",
+			"runtime.disconnectNative",
+			"runtime.sendNativeMessage",
+		]) {
+			expect(source).not.toContain(`handle("${name}"`);
+		}
+		const preload = readFileSync(
+			join(dirname(cjsPath), "../chrome-extension-api.preload.js"),
+			"utf8",
 		);
-		expect(source).toContain(
-			"isValidConfig(config) && config.name === application",
-		);
+		expect(preload).not.toContain("connectNative: (application)");
+		expect(preload).not.toContain("sendNativeMessage:");
 	});
 
 	test("the current window moves to an open window when the focused one closes", async () => {
