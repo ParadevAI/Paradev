@@ -27,21 +27,19 @@ export function WorkspaceSwitcherButton() {
 					type="button"
 					aria-haspopup="dialog"
 					onClick={openWorkspaceList}
-					className="ml-0.5 flex h-7 min-w-0 max-w-60 items-center gap-1.5 rounded-lg px-1.5 font-semibold text-[13px] text-foreground transition-colors hover:bg-fill-hover"
+					className="no-drag flex h-7 min-w-0 max-w-60 items-center gap-1.5 rounded-md px-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
 				>
 					<Layers
-						className="size-3.5 shrink-0 text-muted-foreground"
+						className="size-4 shrink-0"
 						strokeWidth={HEADER_ICON_STROKE_WIDTH}
 					/>
-					<span className="flex min-w-0 items-center gap-[3px]">
-						<span className="truncate">
-							{getV2WorkspaceDisplayName(workspace)}
-						</span>
-						<ChevronDown
-							className="size-[13px] shrink-0 text-muted-foreground"
-							strokeWidth={HEADER_ICON_STROKE_WIDTH}
-						/>
+					<span className="truncate font-medium text-foreground">
+						{getV2WorkspaceDisplayName(workspace)}
 					</span>
+					<ChevronDown
+						className="size-3.5 shrink-0"
+						strokeWidth={HEADER_ICON_STROKE_WIDTH}
+					/>
 				</button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">
