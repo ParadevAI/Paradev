@@ -304,10 +304,15 @@ export async function removeBrowserExtension(
 		session: host.session,
 		extensionsPath: browserExtensionsPath(),
 	});
-	await host.session.clearStorageData({
-		origin: `chrome-extension://${extensionId}`,
-	});
-	await deleteExtensionRules(extensionId);
 	pins.setPinned(extensionId, false);
 	notifyBrowserExtensionsChanged();
+	const cleanup = await Promise.allSettled([
+		deleteExtensionRules(extensionId),
+		host.session.clearStorageData({
+			origin: `chrome-extension://${extensionId}`,
+		}),
+	]);
+	for (const result of cleanup) {
+		if (result.status === "rejected") throw result.reason;
+	}
 }
