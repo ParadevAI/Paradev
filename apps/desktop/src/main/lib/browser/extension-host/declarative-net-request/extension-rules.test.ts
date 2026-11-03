@@ -80,11 +80,12 @@ function setup(
 	const engine = new DnrEngine();
 	const publish = () =>
 		engine.setExtension({
-			extensionId: UBOL,
+			extensionId,
 			rulesets: rules.rulesets(),
 			hasHostAccess: () => true,
 			hostAccessForAllActions: false,
-			resolveExtensionPath: (path) => `chrome-extension://${UBOL}${path}`,
+			resolveExtensionPath: (path) =>
+				`chrome-extension://${extensionId}${path}`,
 		});
 	const outcome = (url: string) => {
 		publish();
@@ -354,4 +355,96 @@ test("a disposed extension stops saving once its last save lands", async () => {
 	expect(storage.saved?.dynamicRules).toEqual([block(1)]);
 	await rules.updateDynamicRules({ addRules: [block(2)] });
 	expect(saves).toBe(1);
+});
+
+test("concurrent updates from two extensions cannot both overdraw the pool", async () => {
+	const pool = new StaticRulePool();
+	const big = Array.from({ length: 181_000 }, (_, index) => block(index + 1));
+	const files = { ...FILES, "/rulesets/main/annoyances-cookies.json": big };
+	const holdSaves = (setupResult: ReturnType<typeof setup>) => {
+		const release: (() => void)[] = [];
+		setupResult.storage.save = () =>
+			new Promise<void>((resolve) => {
+				release.push(resolve);
+			});
+		return release;
+	};
+	const first = setup(null, "2026.1", { files, pool });
+	const second = setup(null, "2026.1", { files, pool, extensionId: "other" });
+	await first.rules.load();
+	await second.rules.load();
+	const releases = [holdSaves(first), holdSaves(second)];
+	let settled = 0;
+	const updates = [first, second].map((each) =>
+		each.rules
+			.updateEnabledRulesets({ enableRulesetIds: ["annoyances-cookies"] })
+			.then(
+				() => "ok",
+				(error: Error) => error.message,
+			)
+			.finally(() => {
+				settled++;
+			}),
+	);
+	// Both updates are either waiting on their save or already refused.
+	while (releases.flat().length + settled < 2) await Bun.sleep(5);
+	for (const release of releases) for (const resolve of release) resolve();
+	const results = await Promise.all(updates);
+	expect(results.filter((result) => result === "ok")).toHaveLength(1);
+	expect(results.join()).toContain("static rule count limit");
+});
+
+test("saved state over the limits is cut back on load", async () => {
+	const regexRules = (offset: number) =>
+		Array.from({ length: 600 }, (_, index) => ({
+			id: offset + index,
+			action: { type: "block" },
+			condition: { regexFilter: `^https://r${index}\\.example/` },
+		}));
+	const redirects = Array.from({ length: 5_001 }, (_, index) => ({
+		id: index + 1,
+		action: { type: "redirect", redirect: { url: "https://r.example/" } },
+		condition: { urlFilter: `||r${index}.example` },
+	})) as Rule[];
+	const { rules } = setup(
+		{
+			version: "2026.1",
+			enabledRulesetIds: ["ublock-filters", "easyprivacy"],
+			disabledRuleIds: {
+				easyprivacy: Array.from({ length: 5_001 }, (_, index) => index + 1),
+			},
+			dynamicRules: redirects,
+		},
+		"2026.1",
+		{
+			files: {
+				...FILES,
+				"/rulesets/main/ublock-filters.json": regexRules(1),
+				"/rulesets/main/easyprivacy.json": regexRules(1),
+			},
+		},
+	);
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	await rules.load();
+	warn.mockRestore();
+	expect(rules.getEnabledRulesets()).toEqual(["ublock-filters"]);
+	expect(rules.getDisabledRuleIds("easyprivacy")).toEqual([]);
+	expect(rules.getDynamicRules()).toHaveLength(5_000);
+});
+
+test("an extension unloaded before its load finishes takes nothing from the pool", async () => {
+	const pool = new StaticRulePool();
+	const big = Array.from({ length: 40_000 }, (_, index) => block(index + 1));
+	const { rules } = setup(
+		{ version: "2026.1", enabledRulesetIds: ["annoyances-cookies"] },
+		"2026.1",
+		{
+			files: { ...FILES, "/rulesets/main/annoyances-cookies.json": big },
+			pool,
+		},
+	);
+	const loading = rules.load();
+	void rules.dispose();
+	await loading;
+	expect(pool.capacity("other")).toBe(330_000);
 });

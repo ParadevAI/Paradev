@@ -4,7 +4,11 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { app, ipcMain } from "electron";
 import { DNR_CHANNEL } from "shared/browser-extension-dnr";
-import { deleteExtensionRules, enforceDeclarativeNetRequest } from "./dnr-host";
+import {
+	deleteExtensionRules,
+	drainBeforeDelete,
+	enforceDeclarativeNetRequest,
+} from "./dnr-host";
 import type { Rule } from "./types";
 
 type Listener = (details: object, callback: (response: object) => void) => void;
@@ -208,7 +212,7 @@ test("testMatchOutcome evaluates frame rules against topUrl", async () => {
 	).toEqual({ matchedRules: [{ ruleId: 1, rulesetId: "main" }] });
 });
 
-test("a rules save queued before uninstall does not recreate the file", async () => {
+test("an update that lands after uninstall does not recreate the file", async () => {
 	const { call, unload, rulesFile, id } = setup([]);
 	await call("getEnabledRulesets");
 	const update = call("updateDynamicRules", {
@@ -218,7 +222,27 @@ test("a rules save queued before uninstall does not recreate the file", async ()
 	});
 	unload();
 	await deleteExtensionRules(id);
-	await update.catch(() => {});
-	await Bun.sleep(20);
+	await update;
 	expect(existsSync(rulesFile)).toBe(false);
+});
+
+test("deleting rules waits for every unloaded instance's save", async () => {
+	const id = `dnrhostdrain${Date.now()}`;
+	let finishOlder = () => {};
+	drainBeforeDelete(
+		id,
+		new Promise<void>((resolve) => {
+			finishOlder = resolve;
+		}),
+	);
+	drainBeforeDelete(id, Promise.resolve());
+	let deleted = false;
+	const deleting = deleteExtensionRules(id).then(() => {
+		deleted = true;
+	});
+	await Bun.sleep(10);
+	expect(deleted).toBe(false);
+	finishOlder();
+	await deleting;
+	expect(deleted).toBe(true);
 });

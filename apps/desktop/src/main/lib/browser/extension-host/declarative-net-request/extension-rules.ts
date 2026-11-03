@@ -47,6 +47,10 @@ export class StaticRulePool {
 		this.used.set(extensionId, count);
 	}
 
+	get(extensionId: string): number {
+		return this.used.get(extensionId) ?? 0;
+	}
+
 	delete(extensionId: string): void {
 		this.used.delete(extensionId);
 	}
@@ -126,6 +130,28 @@ function updatedRules(
 	return next;
 }
 
+/** Saved dynamic rules, in order, up to the limits an update would enforce. */
+function savedDynamicRules(rules: Rule[]): Rule[] {
+	const ids = new Set<number>();
+	let unsafe = 0;
+	let regex = 0;
+	return rules.filter((rule) => {
+		if (ids.has(rule.id) || ids.size >= LIMITS.MAX_NUMBER_OF_DYNAMIC_RULES) {
+			return false;
+		}
+		if (isUnsafeRule(rule)) {
+			if (unsafe >= LIMITS.MAX_NUMBER_OF_UNSAFE_DYNAMIC_RULES) return false;
+			unsafe++;
+		}
+		if (isRegexRule(rule)) {
+			if (regex >= LIMITS.MAX_NUMBER_OF_REGEX_RULES) return false;
+			regex++;
+		}
+		ids.add(rule.id);
+		return true;
+	});
+}
+
 function savedDisabledRuleIds(raw: unknown): Record<string, number[]> {
 	if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return {};
 	const result: Record<string, number[]> = {};
@@ -134,7 +160,8 @@ function savedDisabledRuleIds(raw: unknown): Record<string, number[]> {
 			result[id] = ruleIds.filter((ruleId) => Number.isInteger(ruleId));
 		}
 	}
-	return result;
+	const total = Object.values(result).reduce((sum, ids) => sum + ids.length, 0);
+	return total > MAX_DISABLED_STATIC_RULES ? {} : result;
 }
 
 /**
@@ -177,14 +204,14 @@ export class ExtensionRules {
 			return null;
 		});
 		if (persisted) {
-			this.dynamicRules = validRules(persisted.dynamicRules);
+			this.dynamicRules = savedDynamicRules(validRules(persisted.dynamicRules));
 			const dropped =
 				(Array.isArray(persisted.dynamicRules)
 					? persisted.dynamicRules.length
 					: 0) - this.dynamicRules.length;
 			if (dropped > 0) {
 				console.warn(
-					`[dnr] ${this.extensionId}: skipped ${dropped} saved dynamic rules that are no longer valid`,
+					`[dnr] ${this.extensionId}: skipped ${dropped} saved dynamic rules that are invalid or over the limits`,
 				);
 			}
 			if (persisted.version === this.version) {
@@ -197,22 +224,45 @@ export class ExtensionRules {
 				this.disabledRuleIds = savedDisabledRuleIds(persisted.disabledRuleIds);
 			}
 		}
-		const failed = new Set<string>();
-		await Promise.all(
+		const loaded = await Promise.all(
 			this.enabled.map(async (id) => {
 				try {
-					this.indexes.set(id, await this.staticIndex(id));
+					return [id, await this.staticIndex(id)] as const;
 				} catch (error) {
-					failed.add(id);
 					console.warn(
 						`[dnr] ${this.extensionId} ruleset "${id}" did not load:`,
 						error,
 					);
+					return null;
 				}
 			}),
 		);
-		this.enabled = this.enabled.filter((id) => !failed.has(id));
-		this.pool.set(this.extensionId, this.staticRuleCount(this.enabled));
+		// The same limits updateEnabledRulesets enforces; rulesets past them stay off.
+		const enabled: string[] = [];
+		let ruleCount = 0;
+		let regexCount = 0;
+		for (const [id, index] of loaded.flatMap((entry) =>
+			entry ? [entry] : [],
+		)) {
+			const rules = this.staticRules.get(id) ?? [];
+			const regex = rules.filter(isRegexRule).length;
+			if (
+				enabled.length >= LIMITS.MAX_NUMBER_OF_ENABLED_STATIC_RULESETS ||
+				ruleCount + rules.length > this.pool.capacity(this.extensionId) ||
+				regexCount + regex > LIMITS.MAX_NUMBER_OF_REGEX_RULES
+			) {
+				console.warn(
+					`[dnr] ${this.extensionId} ruleset "${id}" is over the static rule limits; left disabled`,
+				);
+				continue;
+			}
+			enabled.push(id);
+			ruleCount += rules.length;
+			regexCount += regex;
+			this.indexes.set(id, index);
+		}
+		this.enabled = enabled;
+		this.claimStaticRules(ruleCount);
 		this.indexes.set(
 			DYNAMIC_RULESET_ID,
 			new RulesetIndex(DYNAMIC_RULESET_ID, this.dynamicRules, DYNAMIC_RANK),
@@ -293,7 +343,15 @@ export class ExtensionRules {
 					"The number of enabled regular expression rules exceeds the regex rule count limit.",
 				);
 			}
-			await this.persist({ enabledRulesetIds: next });
+			// Claim the pool before the save so a concurrent update elsewhere sees it.
+			const previous = this.pool.get(this.extensionId);
+			this.claimStaticRules(ruleCount);
+			try {
+				await this.persist({ enabledRulesetIds: next });
+			} catch (error) {
+				this.claimStaticRules(previous);
+				throw error;
+			}
 			for (const id of this.enabled) {
 				if (!next.includes(id)) {
 					this.indexes.delete(id);
@@ -302,7 +360,6 @@ export class ExtensionRules {
 			}
 			for (const [id, index] of added) this.indexes.set(id, index);
 			this.enabled = next;
-			this.pool.set(this.extensionId, ruleCount);
 		});
 	}
 
@@ -387,6 +444,10 @@ export class ExtensionRules {
 		if (!this.sources.some((source) => source.id === rulesetId)) {
 			throw new Error(`Invalid ruleset id: ${rulesetId}.`);
 		}
+	}
+
+	private claimStaticRules(count: number): void {
+		if (!this.disposed) this.pool.set(this.extensionId, count);
 	}
 
 	private staticRuleCount(ids: string[]): number {

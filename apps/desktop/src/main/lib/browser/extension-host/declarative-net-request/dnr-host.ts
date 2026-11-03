@@ -27,8 +27,29 @@ import type {
 const WEB_URLS = ["http://*/*", "https://*/*", "ws://*/*", "wss://*/*"];
 const MATCHED_RULES_LIMIT = 1_000;
 const MATCHED_RULES_TTL_MS = 5 * 60_000;
-// Rules of extensions being unloaded, until their last save lands.
-const draining = new Map<string, Promise<unknown>>();
+// Saves still in flight from unloaded instances, per extension ID.
+const draining = new Map<string, Set<Promise<unknown>>>();
+
+/** Holds back deleteExtensionRules for `extensionId` until `pending` settles. */
+export function drainBeforeDelete(
+	extensionId: string,
+	pending: Promise<unknown>,
+): void {
+	let set = draining.get(extensionId);
+	if (!set) {
+		set = new Set();
+		draining.set(extensionId, set);
+	}
+	const tracked = pending
+		.catch(() => undefined)
+		.finally(() => {
+			set.delete(tracked);
+			if (set.size === 0 && draining.get(extensionId) === set) {
+				draining.delete(extensionId);
+			}
+		});
+	set.add(tracked);
+}
 
 interface DnrManifest {
 	permissions?: string[];
@@ -92,7 +113,7 @@ function fileStorage(extensionId: string): RulesStorage {
 }
 
 export async function deleteExtensionRules(extensionId: string): Promise<void> {
-	await draining.get(extensionId);
+	await Promise.all(draining.get(extensionId) ?? []);
 	await rm(path.join(rulesDirectory(), `${extensionId}.json`), { force: true });
 }
 
@@ -320,12 +341,7 @@ export function enforceDeclarativeNetRequest(
 
 	const unload = (extensionId: string) => {
 		const entry = loaded.get(extensionId);
-		if (entry) {
-			const drained = entry.rules.dispose().finally(() => {
-				if (draining.get(extensionId) === drained) draining.delete(extensionId);
-			});
-			draining.set(extensionId, drained);
-		}
+		if (entry) drainBeforeDelete(extensionId, entry.rules.dispose());
 		loaded.delete(extensionId);
 		engine.removeExtension(extensionId);
 		syncHooks();
