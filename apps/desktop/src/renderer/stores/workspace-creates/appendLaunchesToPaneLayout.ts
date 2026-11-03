@@ -36,10 +36,11 @@ export function appendLaunchesToPaneLayout({
 	terminals,
 	agents,
 }: AppendArgs): WorkspaceState<PaneViewerData> {
-	const terminalLaunches: PaneLaunch[] = terminals.map((entry) => ({
-		sessionId: entry.terminalId,
-		label: entry.label,
-	}));
+	const terminalLabels = new Map(
+		terminals.map((entry) => [entry.terminalId, entry.label]),
+	);
+	// A wait-for-setup chained agent reuses the setup terminal, so its result
+	// carries the same session id — it gets one tab with the setup label.
 	const agentLaunches: PaneLaunch[] = agents
 		.filter(
 			(entry): entry is Extract<typeof entry, { ok: true }> =>
@@ -47,13 +48,18 @@ export function appendLaunchesToPaneLayout({
 		)
 		.map((entry) => ({
 			sessionId: entry.sessionId,
-			label: entry.label,
+			label: terminalLabels.has(entry.sessionId)
+				? terminalLabels.get(entry.sessionId)
+				: entry.label,
 		}));
-	// A wait-for-setup chained agent reuses the setup terminal, so its result
-	// carries the same session id as the setup terminal descriptor — dedupe to
-	// one tab (first entry wins, keeping the setup terminal's label).
 	const seen = new Set<string>();
-	const launches = [...terminalLaunches, ...agentLaunches].filter((launch) => {
+	const launches = [
+		...agentLaunches,
+		...terminals.map((entry) => ({
+			sessionId: entry.terminalId,
+			label: entry.label,
+		})),
+	].filter((launch) => {
 		if (seen.has(launch.sessionId)) return false;
 		seen.add(launch.sessionId);
 		return true;
@@ -67,9 +73,11 @@ export function appendLaunchesToPaneLayout({
 		initialState: existing ?? EMPTY_STATE,
 	});
 
-	for (const launch of launches) {
+	let firstTabId: string | null = null;
+	for (const [index, launch] of launches.entries()) {
 		store.getState().addTab({
 			titleOverride: launch.label,
+			focus: index === 0,
 			panes: [
 				{
 					kind: "terminal",
@@ -77,7 +85,9 @@ export function appendLaunchesToPaneLayout({
 				},
 			],
 		});
+		if (index === 0) firstTabId = store.getState().activeTabId;
 	}
+	if (firstTabId) store.getState().setActiveTab(firstTabId);
 
 	const next = store.getState();
 	return {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { appendLaunchesToPaneLayout } from "./appendLaunchesToPaneLayout";
 
 describe("appendLaunchesToPaneLayout", () => {
-	it("adds one tab per terminal and agent launch", () => {
+	it("puts an independent agent before the setup terminal and selects it", () => {
 		const state = appendLaunchesToPaneLayout({
 			existing: undefined,
 			terminals: [{ terminalId: "term-1", label: "Workspace Setup" }],
@@ -11,11 +11,11 @@ describe("appendLaunchesToPaneLayout", () => {
 			],
 		});
 
-		expect(state.tabs).toHaveLength(2);
 		expect(state.tabs.map((tab) => tab.titleOverride)).toEqual([
-			"Workspace Setup",
 			"Claude",
+			"Workspace Setup",
 		]);
+		expect(state.activeTabId).toBe(state.tabs[0].id);
 	});
 
 	it("dedupes a chained agent that reuses the setup terminal to one tab", () => {
