@@ -8,6 +8,9 @@ let transcriptText = "";
 let transcriptFails = false;
 let bindings: Array<Record<string, unknown>> = [];
 let splitInput: Record<string, unknown> | undefined;
+let splitError: Error | null = null;
+let killInput: Record<string, unknown> | undefined;
+const callerTerminalId = process.env.SUPERSET_TERMINAL_ID;
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -49,11 +52,16 @@ withLocalHostService("org-1", {
 	}),
 	"panes.split": (input) => {
 		splitInput = input;
+		if (splitError) throw splitError;
 		return {
 			paneId: "pane-new",
 			tabId: "tab-1",
 			layout: { activeTabId: null, tabs: [] },
 		};
+	},
+	"terminal.killSession": (input) => {
+		killInput = input;
+		return { success: true };
 	},
 	"agents.run": (input) => {
 		runInput = input;
@@ -89,7 +97,10 @@ afterEach(() => {
 	transcriptFails = false;
 	bindings = [];
 	splitInput = undefined;
-	delete process.env.SUPERSET_TERMINAL_ID;
+	splitError = null;
+	killInput = undefined;
+	if (callerTerminalId === undefined) delete process.env.SUPERSET_TERMINAL_ID;
+	else process.env.SUPERSET_TERMINAL_ID = callerTerminalId;
 });
 
 describe("agents create", () => {
@@ -257,6 +268,18 @@ describe("agents create", () => {
 			workspaceId: WORKSPACE_ID,
 			paneId: "pane-caller",
 			direction: "right",
+			terminalId: "terminal-1",
+		});
+	});
+
+	test("--split ends the agent when the desktop rejects the split", async () => {
+		process.env.SUPERSET_TERMINAL_ID = "terminal-caller";
+		splitError = new Error("pane is gone");
+		await expect(
+			invoke(undefined, { prompt: "Review this diff", split: "right" }),
+		).rejects.toThrow("pane is gone");
+		expect(killInput).toEqual({
+			workspaceId: WORKSPACE_ID,
 			terminalId: "terminal-1",
 		});
 	});

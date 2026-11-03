@@ -9,6 +9,7 @@ import {
 } from "../../../lib/pane-placement";
 import { buildHandoffPromptFromTerminal } from "../../../lib/terminal-handoff";
 import { uploadAttachments } from "../../../lib/upload-attachments";
+import { placeOrDispose } from "../../panes/shared";
 
 export default command({
 	description: "Create an agent session in an existing workspace",
@@ -136,17 +137,19 @@ export default command({
 		});
 
 		if (placement) {
-			await placeTerminal(
+			await placeOrDispose(
 				target.client,
 				options.workspace,
 				result.sessionId,
-				placement,
-			).catch((error) => {
-				throw new CLIError(
-					`${result.label} is running in terminal ${result.sessionId}, but it could not be placed beside ${placement.besidePaneId}: ${error instanceof Error ? error.message : String(error)}`,
-					"It shows in a new tab instead; move it with `superset panes move`",
-				);
-			});
+				true,
+				(terminalId) =>
+					placeTerminal(
+						target.client,
+						options.workspace,
+						terminalId,
+						placement,
+					),
+			);
 		}
 
 		return {

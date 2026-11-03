@@ -1,6 +1,10 @@
 import { string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
-import { closePanes } from "../../../lib/pane-placement";
+import {
+	closedPanesMessage,
+	closePanes,
+	paneCloseError,
+} from "../../../lib/pane-placement";
 import {
 	resolveSessionWorkspace,
 	sessionWorkspaceOptions,
@@ -16,7 +20,7 @@ export default command({
 		const { sessions, target } = await resolveSessionWorkspace(ctx, options);
 
 		// A chat pane restarts a stopped session it still shows, so it closes first.
-		const closedPaneIds = await closePanes(
+		const panes = await closePanes(
 			target.client,
 			options.workspace,
 			(pane) => pane.sessionId === options.session,
@@ -26,9 +30,19 @@ export default command({
 			sessionId: options.session,
 		});
 
+		if (panes.error)
+			throw paneCloseError(`session ${options.session}`, panes.error);
+
 		return {
-			data: { sessionId: options.session, closed: true, closedPaneIds },
-			message: `Closed session ${options.session}${closedPaneIds.length > 0 ? ` and its pane ${closedPaneIds.join(", ")}` : ""}`,
+			data: {
+				sessionId: options.session,
+				closed: true,
+				closedPaneIds: panes.closedPaneIds,
+			},
+			message: closedPanesMessage(
+				`session ${options.session}`,
+				panes.closedPaneIds,
+			),
 		};
 	},
 });

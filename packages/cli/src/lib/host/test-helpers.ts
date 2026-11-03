@@ -48,7 +48,9 @@ export function withLocalHostService(
 									message: error instanceof Error ? error.message : "failed",
 									code: -32603,
 									data: {
-										code: "INTERNAL_SERVER_ERROR",
+										code:
+											(error as { code?: unknown }).code ??
+											"INTERNAL_SERVER_ERROR",
 										httpStatus: 500,
 										path,
 									},

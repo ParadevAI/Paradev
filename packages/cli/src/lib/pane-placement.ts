@@ -88,24 +88,61 @@ export function placeTerminal(
 	});
 }
 
+export interface ClosedPanes {
+	closedPaneIds: string[];
+	error: string | null;
+}
+
 /**
- * Closes every pane that `match` picks and returns their IDs. Closing panes is
- * clean-up, so a host with no desktop app or no `panes` router closes nothing.
+ * Closes every pane that `match` picks. It never throws, so the caller still
+ * ends the terminal or session. A host with no desktop app closes nothing.
  */
 export async function closePanes(
 	client: HostServiceClient,
 	workspaceId: string,
 	match: PaneMatch,
-): Promise<string[]> {
-	const panes = await listPanes(client, workspaceId).catch(() => []);
-	const closed: string[] = [];
-	for (const pane of panes.filter(match)) {
-		await client.panes.close.mutate({
-			workspaceId,
-			paneId: pane.id,
-			keepTerminal: true,
-		});
-		closed.push(pane.id);
+): Promise<ClosedPanes> {
+	const closedPaneIds: string[] = [];
+	try {
+		const panes = await listPanes(client, workspaceId);
+		for (const pane of panes.filter(match)) {
+			await client.panes.close.mutate({
+				workspaceId,
+				paneId: pane.id,
+				keepTerminal: true,
+			});
+			closedPaneIds.push(pane.id);
+		}
+		return { closedPaneIds, error: null };
+	} catch (error) {
+		if (hasNoPanes(error)) return { closedPaneIds, error: null };
+		return {
+			closedPaneIds,
+			error: error instanceof Error ? error.message : String(error),
+		};
 	}
-	return closed;
+}
+
+export function isMissingPanesRouter(error: unknown): boolean {
+	return (
+		error instanceof Error &&
+		/No procedure found on path "?panes\./.test(error.message)
+	);
+}
+
+function hasNoPanes(error: unknown): boolean {
+	const code = (error as { data?: { code?: string } } | null)?.data?.code;
+	return code === "PRECONDITION_FAILED" || isMissingPanesRouter(error);
+}
+
+export function paneCloseError(what: string, error: string): CLIError {
+	return new CLIError(
+		`Closed ${what}, but not the panes that show it: ${error}`,
+		"Check with `superset panes list`, then close them with `superset panes close`",
+	);
+}
+
+export function closedPanesMessage(what: string, paneIds: string[]): string {
+	if (paneIds.length === 0) return `Closed ${what}`;
+	return `Closed ${what} and its ${paneIds.length === 1 ? "pane" : "panes"} ${paneIds.join(", ")}`;
 }

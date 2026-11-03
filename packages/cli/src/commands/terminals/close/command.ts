@@ -1,7 +1,11 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
-import { closePanes } from "../../../lib/pane-placement";
+import {
+	closedPanesMessage,
+	closePanes,
+	paneCloseError,
+} from "../../../lib/pane-placement";
 
 export default command({
 	description:
@@ -31,7 +35,7 @@ export default command({
 			options.workspace,
 		);
 
-		const closedPaneIds = await closePanes(
+		const panes = await closePanes(
 			target.client,
 			options.workspace,
 			(pane) => pane.terminalId === options.terminal,
@@ -41,9 +45,15 @@ export default command({
 			workspaceId: options.workspace,
 		});
 
+		if (panes.error)
+			throw paneCloseError(`terminal ${options.terminal}`, panes.error);
+
 		return {
-			data: { ...result, closedPaneIds },
-			message: `Closed terminal ${options.terminal}${closedPaneIds.length > 0 ? ` and its pane ${closedPaneIds.join(", ")}` : ""}`,
+			data: { ...result, closedPaneIds: panes.closedPaneIds },
+			message: closedPanesMessage(
+				`terminal ${options.terminal}`,
+				panes.closedPaneIds,
+			),
 		};
 	},
 });

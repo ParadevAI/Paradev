@@ -60,7 +60,11 @@ export default command({
 					),
 			);
 			return {
-				data: { terminalId: placed.terminalId, paneId: placed.paneId },
+				data: {
+					terminalId: placed.terminalId,
+					status: "active" as const,
+					paneId: placed.paneId,
+				},
 				message: `Created terminal ${placed.terminalId} in pane ${placed.paneId}, beside ${placement.besidePaneId}`,
 			};
 		}

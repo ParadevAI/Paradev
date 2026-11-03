@@ -57,5 +57,6 @@ describe("keepClosedPaneClosed", () => {
 		} as never);
 
 		expect(isChatSessionClosed("session-2")).toBe(false);
+		expect(isChatTerminalClosed("term-2")).toBe(false);
 	});
 });
