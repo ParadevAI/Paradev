@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -9,14 +9,18 @@ interface NewWorkspaceHandoff {
 	isV2CloudEnabled: boolean;
 	machineId: string | null | undefined;
 	navigate: ReturnType<typeof useNavigate>;
+	/** Navigating there again with nothing to hand off would drop its pins. */
+	isOnNewWorkspace?: boolean;
 }
 
 export function openNewWorkspace(
-	{ isV2CloudEnabled, navigate }: NewWorkspaceHandoff,
+	{ isV2CloudEnabled, navigate, isOnNewWorkspace }: NewWorkspaceHandoff,
 	projectId?: string | null,
 	requestedHostId?: string,
 	repository?: string | null,
 ) {
+	if (isV2CloudEnabled && isOnNewWorkspace && !projectId && !requestedHostId)
+		return;
 	if (!isV2CloudEnabled) {
 		useNewWorkspaceModalStore.getState().openModal(projectId ?? undefined);
 		return;
@@ -54,6 +58,7 @@ export function useOpenNewWorkspace() {
 	const navigate = useNavigate();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { machineId } = useLocalHostService();
+	const isOnNewWorkspace = !!useMatchRoute()({ to: "/new-workspace" });
 
 	return useCallback(
 		(
@@ -62,12 +67,12 @@ export function useOpenNewWorkspace() {
 			repository?: string | null,
 		) =>
 			openNewWorkspace(
-				{ isV2CloudEnabled, machineId, navigate },
+				{ isV2CloudEnabled, machineId, navigate, isOnNewWorkspace },
 				projectId,
 				requestedHostId,
 				repository,
 			),
-		[isV2CloudEnabled, machineId, navigate],
+		[isV2CloudEnabled, machineId, navigate, isOnNewWorkspace],
 	);
 }
 

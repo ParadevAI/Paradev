@@ -104,3 +104,17 @@ test("a handoff with a repository lets the pick follow it to another host", () =
 		selectedProjectRepository: "thinkfiveable/hours",
 	});
 });
+
+test("pressing New Workspace again on the screen keeps its pinned host", () => {
+	openNewWorkspace({ ...v2, isOnNewWorkspace: true });
+	expect(navigate).not.toHaveBeenCalled();
+});
+
+test("a new handoff on the screen still applies", () => {
+	openNewWorkspace({ ...v2, isOnNewWorkspace: true }, "project-a", "cloud");
+	expect(navigate).toHaveBeenCalledWith(
+		expect.objectContaining({
+			search: { projectId: "project-a", host: "cloud" },
+		}),
+	);
+});
