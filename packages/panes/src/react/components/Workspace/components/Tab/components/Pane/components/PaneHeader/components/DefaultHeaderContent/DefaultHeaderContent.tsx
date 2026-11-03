@@ -1,5 +1,6 @@
 import { cn } from "@superset/ui/utils";
 import type { ReactNode } from "react";
+import { usePaneAppearance } from "../../../../../../../../../../hooks/usePaneAppearance";
 
 interface DefaultHeaderContentProps {
 	title: ReactNode;
@@ -18,8 +19,14 @@ export function DefaultHeaderContent({
 	headerExtras,
 	actionsContent,
 }: DefaultHeaderContentProps) {
+	const isCards = usePaneAppearance() === "cards";
 	return (
-		<div className="flex h-full w-full min-w-0 items-center gap-2 px-3">
+		<div
+			className={cn(
+				"flex h-full w-full min-w-0 items-center gap-2",
+				isCards ? "px-2" : "px-3",
+			)}
+		>
 			{/* overflow-hidden: with flex-1's zero basis this area is the first
 			    to be squeezed, and a custom titleContent (e.g. the terminal
 			    session dropdown) has its own min-content width — without the

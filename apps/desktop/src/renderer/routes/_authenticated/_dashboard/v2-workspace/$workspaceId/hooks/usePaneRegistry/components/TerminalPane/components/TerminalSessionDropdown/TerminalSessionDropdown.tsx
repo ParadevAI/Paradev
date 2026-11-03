@@ -12,11 +12,13 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { Check, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -107,6 +109,7 @@ export function TerminalSessionDropdown({
 	onSessionRemoved,
 }: TerminalSessionDropdownProps) {
 	const { t } = useLingui();
+	const isParadevShell = useParadevShell();
 	const [isOpen, setIsOpen] = useState(false);
 	const collections = useCollections();
 	const { terminalId } = context.pane.data as TerminalPaneData;
@@ -369,7 +372,10 @@ export function TerminalSessionDropdown({
 							message: "Terminal sessions",
 						})}
 						title={triggerTitle}
-						className="flex min-w-0 max-w-96 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+						className={cn(
+							"flex min-w-0 max-w-96 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+							isParadevShell && "-ml-1.5",
+						)}
 						onClick={(event) => event.stopPropagation()}
 					>
 						<TerminalPaneIcon
