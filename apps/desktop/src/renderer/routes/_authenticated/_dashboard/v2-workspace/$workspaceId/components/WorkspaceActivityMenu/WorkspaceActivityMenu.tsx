@@ -54,17 +54,18 @@ import {
 	parseAttachedTerminalIdsKey,
 } from "../../utils/backgroundTerminals";
 import { changesPillStats } from "../../utils/changesPillStats";
+import type { AgentWork } from "../../utils/collectAgentWork";
 import { computeChecksRollup } from "../../utils/computeChecksStatus";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 import { getShipMenuActions } from "../../utils/getShipMenuActions";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
+import { AgentWorkRow } from "../AgentWorkRow";
 import { ChangesStats } from "../ChangesStats";
 import { CommitForm } from "../CommitForm";
 import { CreatePrForm } from "../CreatePrForm";
 import { NewPageComposer } from "../NewPageComposer";
 import { PRStatusIndicators } from "../PRStatusIndicators";
 import { ActivityMenuHeader } from "./components/ActivityMenuHeader";
-import { AgentWorkRow } from "./components/AgentWorkRow";
 import { AnimatedHeight } from "./components/AnimatedHeight";
 import { BackgroundWorkRow } from "./components/BackgroundWorkRow";
 import { ChangesMenuRow } from "./components/ChangesMenuRow";
@@ -89,7 +90,6 @@ import {
 	usePagesMenuSeenAt,
 	usePagesMenuSeenStore,
 } from "./stores/pagesMenuSeenStore";
-import type { AgentWork } from "./utils/collectAgentWork";
 import {
 	type BackgroundWork,
 	collectBackgroundWork,

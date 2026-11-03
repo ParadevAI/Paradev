@@ -75,7 +75,10 @@ import {
 	type MentionSection,
 	useMentionSources,
 } from "../../hooks/useMentionSources";
-import { useMentionTrigger } from "../../hooks/useMentionTrigger";
+import {
+	DEFAULT_TRIGGER,
+	useMentionTrigger,
+} from "../../hooks/useMentionTrigger";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import {
 	ChipRenderProvider,
@@ -455,7 +458,7 @@ export function ComposerBody({
 	const actionContextRef = useRef(actionContext);
 	actionContextRef.current = actionContext;
 
-	const { matchTrigger, activeProviders } = useMentionTrigger(
+	const { matchTrigger, activeProviders, activeTrigger } = useMentionTrigger(
 		mentionProviders ?? [],
 		mentionQuery,
 	);
@@ -476,19 +479,23 @@ export function ComposerBody({
 	);
 	const browseSections = useMemo<MentionSection[]>(
 		() => [
-			{
-				providerId: "add",
-				title: t({ message: "Add" }),
-				isLoading: false,
-				entries: [
-					{
-						id: "attach-files",
-						label: t({ message: "Attach files" }),
-						icon: <PaperclipIcon className="size-4" />,
-						select: (ctx) => ctx.attachFiles(),
-					},
-				],
-			},
+			...(activeTrigger === DEFAULT_TRIGGER
+				? [
+						{
+							providerId: "add",
+							title: t({ message: "Add" }),
+							isLoading: false,
+							entries: [
+								{
+									id: "attach-files",
+									label: t({ message: "Attach files" }),
+									icon: <PaperclipIcon className="size-4" />,
+									select: (ctx: ComposerActionContext) => ctx.attachFiles(),
+								},
+							],
+						},
+					]
+				: []),
 			...(links.rows.length > 0
 				? [
 						{
@@ -504,7 +511,7 @@ export function ComposerBody({
 					section.entries.length > 0 && !links.browsed.has(section.providerId),
 			),
 		],
-		[links, sections, t],
+		[activeTrigger, links, sections, t],
 	);
 	const browseEntries = useMemo(
 		() => browseSections.flatMap((section) => section.entries),
@@ -592,7 +599,7 @@ export function ComposerBody({
 						setTextContent(text: string): void;
 						select(anchor: number, focus: number): void;
 					};
-					const text = `@${completion}`;
+					const text = `${activeTrigger}${completion}`;
 					textNode.setTextContent(text);
 					textNode.select(text.length, text.length);
 				}

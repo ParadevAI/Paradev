@@ -1253,6 +1253,9 @@ msgstr "{productName}, Union Square Ventures liderliğinde, Y Combinator ve Paul
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}, Ekim 2026'ya kadar {formerName} adını taşıyordu."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · Projeyi, host'u ve daha fazlasını değiştirmek için #"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -3326,6 +3329,9 @@ msgstr "Destekçilerimiz"
 
 msgid "Background"
 msgstr "Arka plan"
+
+msgid "Background · {count}"
+msgstr "Arka planda · {count}"
 
 msgid "Background processes"
 msgstr "Arka plan işlemleri"
@@ -7633,6 +7639,9 @@ msgstr "URL girin..."
 msgid "Enterprise"
 msgstr "Kurumsal"
 
+msgid "environment"
+msgstr "Ortam"
+
 msgid "Environment"
 msgstr "Ortam"
 
@@ -9421,6 +9430,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Ana dizin"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11083,6 +11095,9 @@ msgstr "Düşük önem"
 
 msgid "Machine resources"
 msgstr "Makine kaynakları"
+
+msgid "Machine size"
+msgstr "Makine boyutu"
 
 msgid "Machine size: {label}"
 msgstr "Makine boyutu: {label}"
@@ -14702,6 +14717,9 @@ msgstr "İlerleme"
 msgid "Progress · Spinner"
 msgstr "İlerleme · Spinner"
 
+msgid "project"
+msgstr "Proje"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "proje"
@@ -17677,6 +17695,9 @@ msgstr "Altı fabrika otonomi düzeyi"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Altı fabrika otonomi düzeyi, aralarındaki eşikler ve 2026'nın bizi ne kadar ileri götüreceğine dair öngörümüz. Sonradan bizi notlandırabilesiniz diye şimdi yazıldı."
 
+msgid "size"
+msgstr "Boyut"
+
 msgid "Size"
 msgstr "Boyut"
 
@@ -18299,6 +18320,9 @@ msgstr "Alt ajan"
 
 msgid "Subagents"
 msgstr "Alt ajanlar"
+
+msgid "Subagents · {count}"
+msgstr "Alt ajanlar · {count}"
 
 msgid "Subject contains..."
 msgstr "Konu şunu içerir..."

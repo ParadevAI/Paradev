@@ -1253,6 +1253,9 @@ msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Squ
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} 在 2026 年 10 月之前名为 {formerName}。"
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · 输入 # 更改项目、主机等"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 
@@ -3326,6 +3329,9 @@ msgstr "投资方"
 
 msgid "Background"
 msgstr "背景"
+
+msgid "Background · {count}"
+msgstr "后台 · {count}"
 
 msgid "Background processes"
 msgstr "后台进程"
@@ -7633,6 +7639,9 @@ msgstr "输入URL..."
 msgid "Enterprise"
 msgstr "企业版"
 
+msgid "environment"
+msgstr "环境"
+
 msgid "Environment"
 msgstr "环境"
 
@@ -9421,6 +9430,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "主目录"
 
+msgid "host"
+msgstr "主机"
+
 msgid "Host"
 msgstr "主机"
 
@@ -11083,6 +11095,9 @@ msgstr "低严重性"
 
 msgid "Machine resources"
 msgstr "机器资源"
+
+msgid "Machine size"
+msgstr "机器规格"
 
 msgid "Machine size: {label}"
 msgstr "机器规格：{label}"
@@ -14702,6 +14717,9 @@ msgstr "进度"
 msgid "Progress · Spinner"
 msgstr "进度条 · 加载指示器"
 
+msgid "project"
+msgstr "项目"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "项目"
@@ -17677,6 +17695,9 @@ msgstr "工厂自主的六个等级"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "工厂自主的六个等级、等级之间的关卡，以及我们对2026年能走多远的预测。现在写下来，方便你以后给我们打分。"
 
+msgid "size"
+msgstr "规格"
+
 msgid "Size"
 msgstr "大小"
 
@@ -18299,6 +18320,9 @@ msgstr "子智能体"
 
 msgid "Subagents"
 msgstr "子智能体"
+
+msgid "Subagents · {count}"
+msgstr "子智能体 · {count}"
 
 msgid "Subject contains..."
 msgstr "主题包含..."

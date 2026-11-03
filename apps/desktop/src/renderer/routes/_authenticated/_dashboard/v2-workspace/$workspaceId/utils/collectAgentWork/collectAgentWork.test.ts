@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { BackgroundTask } from "@superset/chat/protocol";
-import { collectAgentWork } from "./collectAgentWork";
+import { collectAgentWork, collectSessionWork } from "./collectAgentWork";
 
 const task = (
 	id: string,
@@ -106,4 +106,15 @@ test("nested running subagents still count as running", () => {
 		"chat-a:outer",
 		"term-b:agent-1",
 	]);
+});
+
+test("a background process stays listed whatever subagent status it carries", () => {
+	const work = collectSessionWork(
+		[
+			task("idle-shell", { kind: "process", subagentStatus: "idle" }),
+			task("done", { subagentStatus: "idle" }),
+		],
+		{ terminalId: "chat", sessionId: "s" },
+	);
+	expect(work.map((item) => item.taskId)).toEqual(["idle-shell"]);
 });

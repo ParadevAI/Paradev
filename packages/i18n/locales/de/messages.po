@@ -1253,6 +1253,9 @@ msgstr "{productName} hat eine Seed-Finanzierungsrunde über 11,5 Mio. US-Dollar
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} hieß bis Oktober 2026 {formerName}."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # zum Ändern von Projekt, Host und mehr"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
@@ -3326,6 +3329,9 @@ msgstr "Unterstützt von"
 
 msgid "Background"
 msgstr "Hintergrund"
+
+msgid "Background · {count}"
+msgstr "Im Hintergrund · {count}"
 
 msgid "Background processes"
 msgstr "Hintergrundprozesse"
@@ -7633,6 +7639,9 @@ msgstr "URL eingeben..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Umgebung"
+
 msgid "Environment"
 msgstr "Umgebung"
 
@@ -9421,6 +9430,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Home"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11083,6 +11095,9 @@ msgstr "Niedriger Schweregrad"
 
 msgid "Machine resources"
 msgstr "Rechnerressourcen"
+
+msgid "Machine size"
+msgstr "Maschinengröße"
 
 msgid "Machine size: {label}"
 msgstr "Maschinengröße: {label}"
@@ -14702,6 +14717,9 @@ msgstr "Fortschritt"
 msgid "Progress · Spinner"
 msgstr "Fortschritt · Spinner"
 
+msgid "project"
+msgstr "Projekt"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "Projekt"
@@ -17677,6 +17695,9 @@ msgstr "Sechs Stufen der Fabrikautonomie"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Sechs Stufen der Fabrikautonomie, die Schwellen dazwischen und unsere Prognose, wie weit uns 2026 bringt. Jetzt aufgeschrieben, damit du uns später benoten kannst."
 
+msgid "size"
+msgstr "Größe"
+
 msgid "Size"
 msgstr "Größe"
 
@@ -18299,6 +18320,9 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagenten"
+
+msgid "Subagents · {count}"
+msgstr "Subagenten · {count}"
 
 msgid "Subject contains..."
 msgstr "Betreff enthält..."

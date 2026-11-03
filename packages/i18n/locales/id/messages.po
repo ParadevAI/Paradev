@@ -1253,6 +1253,9 @@ msgstr "{productName} meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipi
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} bernama {formerName} hingga Oktober 2026."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # untuk mengubah proyek, host, dan lainnya"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
@@ -3326,6 +3329,9 @@ msgstr "Didukung oleh"
 
 msgid "Background"
 msgstr "Latar belakang"
+
+msgid "Background · {count}"
+msgstr "Latar belakang · {count}"
 
 msgid "Background processes"
 msgstr "Proses latar belakang"
@@ -7633,6 +7639,9 @@ msgstr "Masukkan URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Lingkungan"
+
 msgid "Environment"
 msgstr "Lingkungan"
 
@@ -9421,6 +9430,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Home"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11083,6 +11095,9 @@ msgstr "Tingkat keparahan rendah"
 
 msgid "Machine resources"
 msgstr "Sumber daya mesin"
+
+msgid "Machine size"
+msgstr "Ukuran mesin"
 
 msgid "Machine size: {label}"
 msgstr "Ukuran mesin: {label}"
@@ -14702,6 +14717,9 @@ msgstr "Progres"
 msgid "Progress · Spinner"
 msgstr "Progres · Spinner"
 
+msgid "project"
+msgstr "Proyek"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "proyek"
@@ -17677,6 +17695,9 @@ msgstr "Enam level otonomi pabrik"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Enam level otonomi pabrik, gerbang di antaranya, dan prakiraan kami soal sejauh mana 2026 membawa kita. Ditulis sekarang supaya Anda bisa menilai kami nanti."
 
+msgid "size"
+msgstr "Ukuran"
+
 msgid "Size"
 msgstr "Ukuran"
 
@@ -18299,6 +18320,9 @@ msgstr "Subagen"
 
 msgid "Subagents"
 msgstr "Subagen"
+
+msgid "Subagents · {count}"
+msgstr "Subagen · {count}"
 
 msgid "Subject contains..."
 msgstr "Subjek mengandung..."

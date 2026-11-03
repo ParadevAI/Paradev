@@ -1253,6 +1253,9 @@ msgstr "{productName} pozyskał 11,5 mln USD w rundzie seed prowadzonej przez Un
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} nazywał się {formerName} do października 2026 roku."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · #, aby zmienić projekt, host i inne"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR-y} many {# PR-ów} other {# PR-a}}"
 
@@ -3326,6 +3329,9 @@ msgstr "Wspierają nas"
 
 msgid "Background"
 msgstr "Tło"
+
+msgid "Background · {count}"
+msgstr "W tle · {count}"
 
 msgid "Background processes"
 msgstr "Procesy w tle"
@@ -7633,6 +7639,9 @@ msgstr "Wpisz URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Środowisko"
+
 msgid "Environment"
 msgstr "Środowisko"
 
@@ -9421,6 +9430,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Dom"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11083,6 +11095,9 @@ msgstr "Niska waga"
 
 msgid "Machine resources"
 msgstr "Zasoby maszyny"
+
+msgid "Machine size"
+msgstr "Rozmiar maszyny"
 
 msgid "Machine size: {label}"
 msgstr "Rozmiar maszyny: {label}"
@@ -14702,6 +14717,9 @@ msgstr "Postęp"
 msgid "Progress · Spinner"
 msgstr "Progress · Spinner"
 
+msgid "project"
+msgstr "Projekt"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "projekt"
@@ -17677,6 +17695,9 @@ msgstr "Sześć poziomów autonomii fabryki"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Sześć poziomów autonomii fabryki, bramki między nimi i nasza prognoza, jak daleko zaprowadzi nas 2026. Spisane teraz, żeby można nas było później ocenić."
 
+msgid "size"
+msgstr "Rozmiar"
+
 msgid "Size"
 msgstr "Wielkość"
 
@@ -18299,6 +18320,9 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagenci"
+
+msgid "Subagents · {count}"
+msgstr "Subagenci · {count}"
 
 msgid "Subject contains..."
 msgstr "Temat zawiera..."

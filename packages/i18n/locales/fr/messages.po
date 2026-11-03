@@ -1253,6 +1253,9 @@ msgstr "{productName} a levé un tour de table d’amorçage de 11,5 millions de
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} s'appelait {formerName} jusqu'en octobre 2026."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # pour changer de projet, d’hôte et plus"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -3326,6 +3329,9 @@ msgstr "Ils nous soutiennent"
 
 msgid "Background"
 msgstr "Arrière-plan"
+
+msgid "Background · {count}"
+msgstr "En arrière-plan · {count}"
 
 msgid "Background processes"
 msgstr "Processus en arrière-plan"
@@ -7633,6 +7639,9 @@ msgstr "Saisissez une URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Environnement"
+
 msgid "Environment"
 msgstr "Environnement"
 
@@ -9421,6 +9430,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Accueil"
 
+msgid "host"
+msgstr "Hôte"
+
 msgid "Host"
 msgstr "Hôte"
 
@@ -11083,6 +11095,9 @@ msgstr "Gravité faible"
 
 msgid "Machine resources"
 msgstr "Ressources de la machine"
+
+msgid "Machine size"
+msgstr "Taille de la machine"
 
 msgid "Machine size: {label}"
 msgstr "Taille de la machine : {label}"
@@ -14702,6 +14717,9 @@ msgstr "Progression"
 msgid "Progress · Spinner"
 msgstr "Progression · Spinner"
 
+msgid "project"
+msgstr "Projet"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "projet"
@@ -17677,6 +17695,9 @@ msgstr "Six niveaux d'autonomie de l'usine"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Six niveaux d'autonomie de l'usine, les portes qui les séparent, et notre prévision de ce que 2026 nous permettra d'atteindre. Écrit dès maintenant pour que vous puissiez nous noter plus tard."
 
+msgid "size"
+msgstr "Taille"
+
 msgid "Size"
 msgstr "Taille"
 
@@ -18299,6 +18320,9 @@ msgstr "Sous-agent"
 
 msgid "Subagents"
 msgstr "Sous-agents"
+
+msgid "Subagents · {count}"
+msgstr "Sous-agents · {count}"
 
 msgid "Subject contains..."
 msgstr "L'objet contient..."

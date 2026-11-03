@@ -8,6 +8,7 @@ import {
 	getAgentModelSupport,
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
+import type { MachineSize } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { Button } from "@superset/ui/button";
@@ -94,6 +95,7 @@ import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useProjectPreselection } from "./hooks/useProjectPreselection";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
+import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
 import {
 	AGENT_DEFAULT_OPTION_ID,
 	LAUNCH_EFFORT_OPTION_ID,
@@ -308,11 +310,14 @@ export function NewWorkspaceScreen({
 			PROMPT_PLACEHOLDERS[
 				Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length)
 			];
-		return descriptor
+		const prompt = descriptor
 			? t(descriptor)
 			: t({
 					message: "What do you want to do?",
 				});
+		return t({
+			message: `${prompt} · # to change project, host, and more`,
+		});
 	}, [resetKey, placeholderRoll, t]);
 
 	const projectId = draft.selectedProjectId;
@@ -466,6 +471,81 @@ export function NewWorkspaceScreen({
 					: null,
 			[projectId, launchHostUrl],
 		),
+	);
+
+	const handleSelectHostId = useCallback(
+		(next: string | null) => {
+			setLastHostId(next);
+			updateDraft({ hostId: next });
+		},
+		[setLastHostId, updateDraft],
+	);
+	const handleSelectProject = useCallback(
+		(selectedProjectId: string | null) => {
+			const target = isCloudHost ? "cloud" : "device";
+			releasePreselection();
+			if (selectedProjectId === null) {
+				setLastProjectChoice(target, { kind: "none" });
+				selectSession();
+				return;
+			}
+			setLastProjectChoice(target, {
+				kind: "project",
+				projectId: selectedProjectId,
+			});
+			// A stand-in id means nothing to a device; keep the
+			// device's last project for next time.
+			if (projects.some((project) => project.id === selectedProjectId))
+				setLastProjectId(selectedProjectId);
+			selectProject(selectedProjectId);
+		},
+		[
+			isCloudHost,
+			releasePreselection,
+			setLastProjectChoice,
+			selectSession,
+			projects,
+			setLastProjectId,
+			selectProject,
+		],
+	);
+	const handleSelectEnvironment = useCallback(
+		(environmentId: string) =>
+			setCloudChoice(cloudChoiceKey, { environmentId }),
+		[setCloudChoice, cloudChoiceKey],
+	);
+	const handleSelectMachineSize = useCallback(
+		(machineSize: MachineSize) =>
+			setCloudChoice(cloudChoiceKey, { machineSize }),
+		[setCloudChoice, cloudChoiceKey],
+	);
+	const cloudSettings = useMemo(
+		() =>
+			isCloudHost
+				? {
+						environments: [...cloudSelection.linked, ...cloudSelection.other],
+						onSelectEnvironment: handleSelectEnvironment,
+						machineSizes: machineSizeOptions.options,
+						onSelectMachineSize: handleSelectMachineSize,
+					}
+				: null,
+		[
+			isCloudHost,
+			cloudSelection,
+			handleSelectEnvironment,
+			machineSizeOptions,
+			handleSelectMachineSize,
+		],
+	);
+	const settingProviders = useWorkspaceSettingMentionProviders({
+		projects: selectableProjects,
+		onSelectProject: handleSelectProject,
+		onSelectHostId: handleSelectHostId,
+		cloud: cloudSettings,
+	});
+	const mentionProviders = useMemo(
+		() => [...githubProviders, ...settingProviders],
+		[githubProviders, settingProviders],
 	);
 
 	// One signal drives both the prompt tier and the dismiss affordance: has
@@ -853,13 +933,7 @@ export function NewWorkspaceScreen({
 		/>
 	);
 	const devicePicker = (
-		<DevicePicker
-			hostId={draft.hostId}
-			onSelectHostId={(next) => {
-				setLastHostId(next);
-				updateDraft({ hostId: next });
-			}}
-		/>
+		<DevicePicker hostId={draft.hostId} onSelectHostId={handleSelectHostId} />
 	);
 	const contextPickers = (
 		<>
@@ -870,24 +944,7 @@ export function NewWorkspaceScreen({
 				githubRepositories={isCloudHost ? github.repositories : []}
 				githubConnection={isCloudHost ? github.connection : null}
 				isLoading={!areProjectsReady || (isCloudHost && github.isLoading)}
-				onSelectProject={(selectedProjectId) => {
-					const target = isCloudHost ? "cloud" : "device";
-					releasePreselection();
-					if (selectedProjectId === null) {
-						setLastProjectChoice(target, { kind: "none" });
-						selectSession();
-						return;
-					}
-					setLastProjectChoice(target, {
-						kind: "project",
-						projectId: selectedProjectId,
-					});
-					// A stand-in id means nothing to a device; keep the
-					// device's last project for next time.
-					if (projects.some((project) => project.id === selectedProjectId))
-						setLastProjectId(selectedProjectId);
-					selectProject(selectedProjectId);
-				}}
+				onSelectProject={handleSelectProject}
 			/>
 			{isCloudHost && (
 				<EnvironmentPickerPill
@@ -895,9 +952,7 @@ export function NewWorkspaceScreen({
 					linked={cloudSelection.linked}
 					other={cloudSelection.other}
 					projectName={draft.isSession ? undefined : selectedProject?.name}
-					onSelectEnvironment={(environmentId) =>
-						setCloudChoice(cloudChoiceKey, { environmentId })
-					}
+					onSelectEnvironment={handleSelectEnvironment}
 					onCreateEnvironment={() => setIsCreatingEnvironment(true)}
 					onManageEnvironments={() => {
 						closeModal();
@@ -909,9 +964,7 @@ export function NewWorkspaceScreen({
 			{isCloudHost && (
 				<MachineSizePickerPill
 					machineSize={cloudSelection.machineSize}
-					onSelectMachineSize={(machineSize) =>
-						setCloudChoice(cloudChoiceKey, { machineSize })
-					}
+					onSelectMachineSize={handleSelectMachineSize}
 				/>
 			)}
 			{activeOrganizationId && (
@@ -1064,7 +1117,7 @@ export function NewWorkspaceScreen({
 								handleSubmit();
 								return false;
 							}}
-							mentionProviders={githubProviders}
+							mentionProviders={mentionProviders}
 							pending={isCreating}
 							placeholder={t({ message: "Do anything in Paradev" })}
 						/>
@@ -1161,7 +1214,7 @@ export function NewWorkspaceScreen({
 							handleSubmit();
 							return false;
 						}}
-						mentionProviders={githubProviders}
+						mentionProviders={mentionProviders}
 						pending={isCreating}
 						placeholder={promptPlaceholder}
 						toolbar={modePicker}
