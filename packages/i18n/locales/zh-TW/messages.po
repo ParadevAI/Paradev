@@ -1847,6 +1847,9 @@ msgstr "你新增的人的存取權限"
 msgid "Access for this person"
 msgstr "此人的存取權限"
 
+msgid "Access the page debugger backend"
+msgstr "存取網頁偵錯工具後端"
+
 msgid "Access your email address"
 msgstr "存取你的電子郵件地址"
 
@@ -3453,6 +3456,9 @@ msgstr "簡介"
 msgid "Block"
 msgstr "方塊"
 
+msgid "Block content on any page"
+msgstr "封鎖任何網頁上的內容"
+
 msgid "blocked"
 msgstr "已阻止"
 
@@ -3919,6 +3925,9 @@ msgstr "用於代理程式輸出、評論和文件的標準markdown渲染層"
 
 msgid "Capabilities"
 msgstr "能力"
+
+msgid "Capture content of your screen"
+msgstr "擷取你畫面上的內容"
 
 msgid "Card"
 msgstr "卡片"
@@ -6918,6 +6927,9 @@ msgstr "詳情"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "此處無法顯示詳細資料，但連結仍可開啟。"
+
+msgid "Detect your physical location"
+msgstr "偵測你的實際位置"
 
 msgid "Dev"
 msgstr "開發"
@@ -11250,6 +11262,9 @@ msgstr "管理你的帳戶設定"
 msgid "Manage your apps, extensions, and themes"
 msgstr "管理你的應用程式、擴充功能和主題"
 
+msgid "Manage your downloads"
+msgstr "管理你的下載內容"
+
 msgid "Manage your organization's branding and members."
 msgstr "管理組織的品牌形象和成員。"
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "已讀取"
 
+msgid "Read a list of your most visited websites"
+msgstr "讀取你最常造訪的網站清單"
+
 msgid "Read and change all your data on all websites"
 msgstr "讀取及變更你在所有網站上的所有資料"
+
+msgid "Read and change your bookmarks"
+msgstr "讀取及變更你的書籤"
 
 msgid "Read and change your data on {count} websites"
 msgstr "讀取及變更你在 {count} 個網站上的資料"
@@ -16396,6 +16417,9 @@ msgstr "用 Paradev 平行執行程式設計代理"
 
 msgid "Run script"
 msgstr "執行指令碼"
+
+msgid "Run scripts you add on websites"
+msgstr "在網站上執行你新增的指令碼"
 
 msgid "Run setup script in each imported workspace"
 msgstr "在每個匯入的工作區中執行初始化指令碼"

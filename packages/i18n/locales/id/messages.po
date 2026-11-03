@@ -1847,6 +1847,9 @@ msgstr "Akses untuk orang yang Anda tambahkan"
 msgid "Access for this person"
 msgstr "Akses untuk orang ini"
 
+msgid "Access the page debugger backend"
+msgstr "Mengakses backend debugger halaman"
+
 msgid "Access your email address"
 msgstr "Mengakses alamat email Anda"
 
@@ -3453,6 +3456,9 @@ msgstr "Bio"
 msgid "Block"
 msgstr "Blok"
 
+msgid "Block content on any page"
+msgstr "Memblokir konten di halaman mana pun"
+
 msgid "blocked"
 msgstr "terblokir"
 
@@ -3919,6 +3925,9 @@ msgstr "Permukaan markdown kanonik untuk output agen, komentar, dan dokumentasi"
 
 msgid "Capabilities"
 msgstr "Kemampuan"
+
+msgid "Capture content of your screen"
+msgstr "Merekam konten layar Anda"
 
 msgid "Card"
 msgstr "Kartu"
@@ -6918,6 +6927,9 @@ msgstr "Detail"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Detail tidak tersedia di sini, tetapi tautan tetap bisa dibuka."
+
+msgid "Detect your physical location"
+msgstr "Mendeteksi lokasi fisik Anda"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11250,6 +11262,9 @@ msgstr "Kelola pengaturan akun Anda"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Mengelola aplikasi, ekstensi, dan tema"
 
+msgid "Manage your downloads"
+msgstr "Mengelola download Anda"
+
 msgid "Manage your organization's branding and members."
 msgstr "Kelola identitas dan anggota organisasi Anda."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Dibaca"
 
+msgid "Read a list of your most visited websites"
+msgstr "Membaca daftar situs web yang paling sering Anda kunjungi"
+
 msgid "Read and change all your data on all websites"
 msgstr "Membaca dan mengubah semua data Anda di semua situs"
+
+msgid "Read and change your bookmarks"
+msgstr "Membaca dan mengubah bookmark Anda"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Membaca dan mengubah data Anda di {count} situs"
@@ -16396,6 +16417,9 @@ msgstr "Jalankan agen coding paralel dengan Paradev"
 
 msgid "Run script"
 msgstr "Jalankan skrip"
+
+msgid "Run scripts you add on websites"
+msgstr "Menjalankan skrip yang Anda tambahkan di situs web"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Jalankan skrip setup di tiap workspace yang diimpor"

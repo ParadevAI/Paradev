@@ -17,7 +17,7 @@ test("an extension gets optional access only after the user allows it, and the q
 	const box = showMessageBox.mock.calls.at(-1)?.at(-1);
 	expect(box?.message).toBe("LastPass wants more access");
 	expect(box?.detail).toBe(
-		"It can:\nRead and change your data on bank.test\nRead your browsing history",
+		"It can:\n• Read and change your data on bank.test\n• Read your browsing history",
 	);
 
 	showMessageBox.mockImplementationOnce(() => Promise.resolve({ response: 0 }));

@@ -1847,6 +1847,9 @@ msgstr "추가할 사람의 접근 권한"
 msgid "Access for this person"
 msgstr "이 사람의 접근 권한"
 
+msgid "Access the page debugger backend"
+msgstr "페이지 디버거 백엔드에 액세스"
+
 msgid "Access your email address"
 msgstr "이메일 주소 접근"
 
@@ -3453,6 +3456,9 @@ msgstr "소개"
 msgid "Block"
 msgstr "블록"
 
+msgid "Block content on any page"
+msgstr "모든 페이지에서 콘텐츠 차단"
+
 msgid "blocked"
 msgstr "차단됨"
 
@@ -3919,6 +3925,9 @@ msgstr "에이전트 출력, 댓글, 문서를 위한 표준 마크다운 표면
 
 msgid "Capabilities"
 msgstr "기능"
+
+msgid "Capture content of your screen"
+msgstr "화면 콘텐츠 캡처"
 
 msgid "Card"
 msgstr "카드"
@@ -6918,6 +6927,9 @@ msgstr "세부 정보"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "여기서는 세부 정보를 볼 수 없지만 링크는 열립니다."
+
+msgid "Detect your physical location"
+msgstr "실제 위치 감지"
 
 msgid "Dev"
 msgstr "개발"
@@ -11250,6 +11262,9 @@ msgstr "계정 설정을 관리합니다"
 msgid "Manage your apps, extensions, and themes"
 msgstr "앱, 확장 프로그램, 테마 관리"
 
+msgid "Manage your downloads"
+msgstr "다운로드 관리"
+
 msgid "Manage your organization's branding and members."
 msgstr "조직의 브랜딩과 멤버를 관리합니다."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "읽음"
 
+msgid "Read a list of your most visited websites"
+msgstr "가장 많이 방문한 웹사이트 목록 읽기"
+
 msgid "Read and change all your data on all websites"
 msgstr "모든 웹사이트에서 내 데이터 읽기 및 변경"
+
+msgid "Read and change your bookmarks"
+msgstr "북마크 읽기 및 변경"
 
 msgid "Read and change your data on {count} websites"
 msgstr "웹사이트 {count}개에서 내 데이터 읽기 및 변경"
@@ -16396,6 +16417,9 @@ msgstr "Paradev로 병렬 코딩 에이전트 실행"
 
 msgid "Run script"
 msgstr "스크립트 실행"
+
+msgid "Run scripts you add on websites"
+msgstr "추가한 스크립트를 웹사이트에서 실행"
 
 msgid "Run setup script in each imported workspace"
 msgstr "가져온 각 워크스페이스에서 설정 스크립트 실행"

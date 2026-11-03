@@ -1847,6 +1847,9 @@ msgstr "Access for the people you add"
 msgid "Access for this person"
 msgstr "Access for this person"
 
+msgid "Access the page debugger backend"
+msgstr "Access the page debugger backend"
+
 msgid "Access your email address"
 msgstr "Access your email address"
 
@@ -3453,6 +3456,9 @@ msgstr "Bio"
 msgid "Block"
 msgstr "Block"
 
+msgid "Block content on any page"
+msgstr "Block content on any page"
+
 msgid "blocked"
 msgstr "blocked"
 
@@ -3919,6 +3925,9 @@ msgstr "Canonical markdown surface for agent output, comments, and docs"
 
 msgid "Capabilities"
 msgstr "Capabilities"
+
+msgid "Capture content of your screen"
+msgstr "Capture content of your screen"
 
 msgid "Card"
 msgstr "Card"
@@ -6918,6 +6927,9 @@ msgstr "Details"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details are not available here, but the link still opens."
+
+msgid "Detect your physical location"
+msgstr "Detect your physical location"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11250,6 +11262,9 @@ msgstr "Manage your account settings"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Manage your apps, extensions, and themes"
 
+msgid "Manage your downloads"
+msgstr "Manage your downloads"
+
 msgid "Manage your organization's branding and members."
 msgstr "Manage your organization's branding and members."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Read"
 
+msgid "Read a list of your most visited websites"
+msgstr "Read a list of your most visited websites"
+
 msgid "Read and change all your data on all websites"
 msgstr "Read and change all your data on all websites"
+
+msgid "Read and change your bookmarks"
+msgstr "Read and change your bookmarks"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Read and change your data on {count} websites"
@@ -16396,6 +16417,9 @@ msgstr "Run parallel coding agents with Paradev"
 
 msgid "Run script"
 msgstr "Run script"
+
+msgid "Run scripts you add on websites"
+msgstr "Run scripts you add on websites"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Run setup script in each imported workspace"

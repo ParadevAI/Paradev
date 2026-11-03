@@ -12,7 +12,7 @@ import {
 } from "electron-chrome-web-store";
 import { confirm } from "./confirm-dialog";
 import { verifyCrx3 } from "./crx3";
-import { addedAccess, installWarnings } from "./install-warnings";
+import { accessDetail, addedAccess, installWarnings } from "./install-warnings";
 
 // The package's own updater checks the moment it starts. An update then
 // deletes the old version's files while its service worker is still loading
@@ -74,7 +74,7 @@ function confirmInstall(
 			],
 			message: i18n._(msg({ message: `Add ${localizedName}?` })),
 			detail: warnings.length
-				? [i18n._(msg({ message: "It can:" })), ...warnings].join("\n")
+				? accessDetail(i18n._(msg({ message: "It can:" })), warnings)
 				: undefined,
 		},
 		signal,
@@ -93,8 +93,9 @@ function confirmUpdate(
 			i18n._(msg({ message: "Keep current version" })),
 		],
 		message: i18n._(msg({ message: `${name} wants more access` })),
-		detail: [i18n._(msg({ message: "The update can also:" })), ...added].join(
-			"\n",
+		detail: accessDetail(
+			i18n._(msg({ message: "The update can also:" })),
+			added,
 		),
 	});
 }
@@ -104,10 +105,8 @@ export async function installBrowserWebStore(
 	browserSession: Electron.Session,
 	{
 		removeExtension,
-		pinExtension,
 	}: {
 		removeExtension: (extensionId: string) => Promise<void>;
-		pinExtension: (extensionId: string) => void;
 	},
 ): Promise<void> {
 	enableCrxVerification();
@@ -115,7 +114,7 @@ export async function installBrowserWebStore(
 	// reach further before it moves into the folder the app loads at start.
 	const newInstalls = new Map<string, chrome.runtime.Manifest>();
 	browserSession.extensions.on("extension-loaded", (_event, extension) => {
-		if (newInstalls.delete(extension.id)) pinExtension(extension.id);
+		newInstalls.delete(extension.id);
 	});
 	const verifyInstall = async ({
 		id,

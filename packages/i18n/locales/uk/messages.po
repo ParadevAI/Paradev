@@ -1841,6 +1841,9 @@ msgstr "Доступ для людей, яких ви додаєте"
 msgid "Access for this person"
 msgstr "Доступ для цієї людини"
 
+msgid "Access the page debugger backend"
+msgstr "Отримувати доступ до серверної частини налагоджувача сторінки"
+
 msgid "Access your email address"
 msgstr "Доступ до вашої електронної адреси"
 
@@ -3447,6 +3450,9 @@ msgstr "Про себе"
 msgid "Block"
 msgstr "Блок"
 
+msgid "Block content on any page"
+msgstr "Блокувати вміст на будь-якій сторінці"
+
 msgid "blocked"
 msgstr "заблоковано"
 
@@ -3913,6 +3919,9 @@ msgstr "Стандартний шар markdown для виводу агенті�
 
 msgid "Capabilities"
 msgstr "Можливості"
+
+msgid "Capture content of your screen"
+msgstr "Записувати вміст екрана"
 
 msgid "Card"
 msgstr "Картка"
@@ -6912,6 +6921,9 @@ msgstr "Подробиці"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Подробиці тут недоступні, але посилання все одно відкривається."
+
+msgid "Detect your physical location"
+msgstr "Визначати ваше місцезнаходження"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11244,6 +11256,9 @@ msgstr "Керуйте налаштуваннями облікового зап�
 msgid "Manage your apps, extensions, and themes"
 msgstr "Керувати вашими застосунками, розширеннями й темами"
 
+msgid "Manage your downloads"
+msgstr "Керувати завантаженнями"
+
 msgid "Manage your organization's branding and members."
 msgstr "Керуйте брендингом та учасниками вашої організації."
 
@@ -15168,8 +15183,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Прочитано"
 
+msgid "Read a list of your most visited websites"
+msgstr "Читати список найвідвідуваніших сайтів"
+
 msgid "Read and change all your data on all websites"
 msgstr "Читати й змінювати всі ваші дані на всіх сайтах"
+
+msgid "Read and change your bookmarks"
+msgstr "Переглядати й змінювати закладки"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Читати й змінювати ваші дані на сайтах ({count})"
@@ -16390,6 +16411,9 @@ msgstr "Запускайте кодинг-агентів паралельно з
 
 msgid "Run script"
 msgstr "Запустити скрипт"
+
+msgid "Run scripts you add on websites"
+msgstr "Запускати на сайтах додані вами скрипти"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Запускати скрипт налаштування в кожному імпортованому робочому просторі"

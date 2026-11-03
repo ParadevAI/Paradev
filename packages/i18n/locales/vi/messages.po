@@ -1847,6 +1847,9 @@ msgstr "Quyền truy cập cho những người bạn thêm"
 msgid "Access for this person"
 msgstr "Quyền truy cập của người này"
 
+msgid "Access the page debugger backend"
+msgstr "Truy cập phần phụ trợ của trình gỡ lỗi trang"
+
 msgid "Access your email address"
 msgstr "Truy cập địa chỉ email của bạn"
 
@@ -3453,6 +3456,9 @@ msgstr "Giới thiệu"
 msgid "Block"
 msgstr "Khối"
 
+msgid "Block content on any page"
+msgstr "Chặn nội dung trên mọi trang"
+
 msgid "blocked"
 msgstr "bị chặn"
 
@@ -3919,6 +3925,9 @@ msgstr "Bề mặt markdown chuẩn cho kết quả agent, bình luận và tài
 
 msgid "Capabilities"
 msgstr "Khả năng"
+
+msgid "Capture content of your screen"
+msgstr "Chụp nội dung màn hình của bạn"
 
 msgid "Card"
 msgstr "Thẻ"
@@ -6918,6 +6927,9 @@ msgstr "Chi tiết"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Không có chi tiết ở đây, nhưng liên kết vẫn mở được."
+
+msgid "Detect your physical location"
+msgstr "Phát hiện vị trí thực của bạn"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11250,6 +11262,9 @@ msgstr "Quản lý cài đặt tài khoản của bạn"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Quản lý ứng dụng, tiện ích và giao diện"
 
+msgid "Manage your downloads"
+msgstr "Quản lý tệp tải xuống"
+
 msgid "Manage your organization's branding and members."
 msgstr "Quản lý nhận diện thương hiệu và thành viên của tổ chức."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Đã đọc"
 
+msgid "Read a list of your most visited websites"
+msgstr "Đọc danh sách trang web bạn truy cập nhiều nhất"
+
 msgid "Read and change all your data on all websites"
 msgstr "Đọc và thay đổi tất cả dữ liệu của bạn trên mọi trang web"
+
+msgid "Read and change your bookmarks"
+msgstr "Đọc và thay đổi dấu trang"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Đọc và thay đổi dữ liệu của bạn trên {count} trang web"
@@ -16396,6 +16417,9 @@ msgstr "Chạy song song các coding agent với Paradev"
 
 msgid "Run script"
 msgstr "Chạy script"
+
+msgid "Run scripts you add on websites"
+msgstr "Chạy các tập lệnh bạn thêm trên trang web"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Chạy script thiết lập trong mỗi workspace được nhập"

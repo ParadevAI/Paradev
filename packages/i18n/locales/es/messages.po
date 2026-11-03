@@ -1847,6 +1847,9 @@ msgstr "Acceso de las personas que añadas"
 msgid "Access for this person"
 msgstr "Acceso de esta persona"
 
+msgid "Access the page debugger backend"
+msgstr "Acceder al backend del depurador de la página"
+
 msgid "Access your email address"
 msgstr "Acceder a tu dirección de correo electrónico"
 
@@ -3453,6 +3456,9 @@ msgstr "Biografía"
 msgid "Block"
 msgstr "Bloque"
 
+msgid "Block content on any page"
+msgstr "Bloquear contenido en cualquier página"
+
 msgid "blocked"
 msgstr "bloqueada"
 
@@ -3919,6 +3925,9 @@ msgstr "Superficie canónica de markdown para la salida de agentes, los comentar
 
 msgid "Capabilities"
 msgstr "Capacidades"
+
+msgid "Capture content of your screen"
+msgstr "Capturar el contenido de tu pantalla"
 
 msgid "Card"
 msgstr "Tarjeta"
@@ -6918,6 +6927,9 @@ msgstr "Detalles"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Los detalles no están disponibles aquí, pero el enlace se abre igualmente."
+
+msgid "Detect your physical location"
+msgstr "Detectar tu ubicación física"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11250,6 +11262,9 @@ msgstr "Gestiona la configuración de tu cuenta"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Gestionar tus aplicaciones, extensiones y temas"
 
+msgid "Manage your downloads"
+msgstr "Gestionar tus descargas"
+
 msgid "Manage your organization's branding and members."
 msgstr "Gestiona la imagen de marca y los miembros de tu organización."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Leído"
 
+msgid "Read a list of your most visited websites"
+msgstr "Leer una lista de los sitios web que más visitas"
+
 msgid "Read and change all your data on all websites"
 msgstr "Leer y cambiar todos tus datos en todos los sitios web"
+
+msgid "Read and change your bookmarks"
+msgstr "Leer y cambiar tus marcadores"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Leer y cambiar tus datos en {count} sitios web"
@@ -16396,6 +16417,9 @@ msgstr "Ejecuta agentes de código en paralelo con Paradev"
 
 msgid "Run script"
 msgstr "Ejecutar el script"
+
+msgid "Run scripts you add on websites"
+msgstr "Ejecutar en sitios web las secuencias de comandos que añadas"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Ejecutar el script de setup en cada espacio de trabajo importado"

@@ -1847,6 +1847,9 @@ msgstr "Toegang voor de personen die je toevoegt"
 msgid "Access for this person"
 msgstr "Toegang voor deze persoon"
 
+msgid "Access the page debugger backend"
+msgstr "Toegang krijgen tot de debugger-backend van de pagina"
+
 msgid "Access your email address"
 msgstr "Je e-mailadres inzien"
 
@@ -3453,6 +3456,9 @@ msgstr "Bio"
 msgid "Block"
 msgstr "Blok"
 
+msgid "Block content on any page"
+msgstr "Content blokkeren op elke pagina"
+
 msgid "blocked"
 msgstr "geblokkeerd"
 
@@ -3919,6 +3925,9 @@ msgstr "Canoniek markdown-oppervlak voor agentuitvoer, opmerkingen en docs"
 
 msgid "Capabilities"
 msgstr "Mogelijkheden"
+
+msgid "Capture content of your screen"
+msgstr "Content van je scherm vastleggen"
 
 msgid "Card"
 msgstr "Kaart"
@@ -6918,6 +6927,9 @@ msgstr "Details"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details zijn hier niet beschikbaar, maar de link opent nog steeds."
+
+msgid "Detect your physical location"
+msgstr "Je fysieke locatie detecteren"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11250,6 +11262,9 @@ msgstr "Beheer je accountinstellingen"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Je apps, extensies en thema's beheren"
 
+msgid "Manage your downloads"
+msgstr "Je downloads beheren"
+
 msgid "Manage your organization's branding and members."
 msgstr "Beheer de branding en leden van je organisatie."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Gelezen"
 
+msgid "Read a list of your most visited websites"
+msgstr "Een lijst lezen van je meest bezochte websites"
+
 msgid "Read and change all your data on all websites"
 msgstr "Al je gegevens op alle websites lezen en wijzigen"
+
+msgid "Read and change your bookmarks"
+msgstr "Je bookmarks lezen en wijzigen"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Je gegevens op {count} websites lezen en wijzigen"
@@ -16396,6 +16417,9 @@ msgstr "Voer parallelle coding agents uit met Paradev"
 
 msgid "Run script"
 msgstr "Script uitvoeren"
+
+msgid "Run scripts you add on websites"
+msgstr "Scripts die je toevoegt uitvoeren op websites"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Setup-script uitvoeren in elke geïmporteerde werkruimte"

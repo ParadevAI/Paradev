@@ -64,7 +64,6 @@ export const userExtensions: UserExtensions = {
 			signal,
 		);
 		if (!extension) return { status: "declined" };
-		setBrowserExtensionPinned(extension.id, true);
 		return { status: "installed", extension: summary(extension) };
 	},
 

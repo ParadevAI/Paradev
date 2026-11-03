@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { BrowserWindow } from "electron";
 import { confirm } from "./confirm-dialog";
-import { addedAccess } from "./install-warnings";
+import { accessDetail, addedAccess } from "./install-warnings";
 
 /** Chrome asks before `permissions.request` grants optional access; this asks the same way. */
 export function confirmPermissionRequest(
@@ -20,6 +20,6 @@ export function confirmPermissionRequest(
 			i18n._(msg({ message: "Don't allow" })),
 		],
 		message: i18n._(msg({ message: `${name} wants more access` })),
-		detail: [i18n._(msg({ message: "It can:" })), ...added].join("\n"),
+		detail: accessDetail(i18n._(msg({ message: "It can:" })), added),
 	});
 }

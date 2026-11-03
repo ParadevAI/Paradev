@@ -1847,6 +1847,9 @@ msgstr "Přístup pro lidi, které přidáte"
 msgid "Access for this person"
 msgstr "Přístup této osoby"
 
+msgid "Access the page debugger backend"
+msgstr "Přistupovat k back-endu ladicího nástroje stránky"
+
 msgid "Access your email address"
 msgstr "číst vaši e-mailovou adresu"
 
@@ -3453,6 +3456,9 @@ msgstr "O mně"
 msgid "Block"
 msgstr "Blok"
 
+msgid "Block content on any page"
+msgstr "Blokovat obsah na libovolné stránce"
+
 msgid "blocked"
 msgstr "zablokováno"
 
@@ -3919,6 +3925,9 @@ msgstr "Kanonická markdown plocha pro výstup agenta, komentáře a dokumentaci
 
 msgid "Capabilities"
 msgstr "Možnosti"
+
+msgid "Capture content of your screen"
+msgstr "Zaznamenávat obsah obrazovky"
 
 msgid "Card"
 msgstr "Karta"
@@ -6918,6 +6927,9 @@ msgstr "Podrobnosti"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Podrobnosti zde nejsou k dispozici, ale odkaz se přesto otevře."
+
+msgid "Detect your physical location"
+msgstr "Zjišťovat vaši fyzickou polohu"
 
 msgid "Dev"
 msgstr "Vývoj"
@@ -11250,6 +11262,9 @@ msgstr "Spravujte nastavení svého účtu"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Spravovat aplikace, rozšíření a motivy"
 
+msgid "Manage your downloads"
+msgstr "Spravovat stahování"
+
 msgid "Manage your organization's branding and members."
 msgstr "Spravujte vzhled a členy své organizace."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Přečteno"
 
+msgid "Read a list of your most visited websites"
+msgstr "Číst seznam vašich nejnavštěvovanějších webů"
+
 msgid "Read and change all your data on all websites"
 msgstr "Číst a měnit všechna vaše data na všech webech"
+
+msgid "Read and change your bookmarks"
+msgstr "Číst a měnit vaše záložky"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Číst a měnit vaše data na {count} webech"
@@ -16396,6 +16417,9 @@ msgstr "Spouštějte paralelní coding agenty s Paradev"
 
 msgid "Run script"
 msgstr "Spustit skript"
+
+msgid "Run scripts you add on websites"
+msgstr "Spouštět na webech skripty, které přidáte"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Spustit setup skript v každém importovaném pracovním prostoru"

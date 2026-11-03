@@ -1847,6 +1847,9 @@ msgstr "Eklediğiniz kişiler için erişim"
 msgid "Access for this person"
 msgstr "Bu kişinin erişimi"
 
+msgid "Access the page debugger backend"
+msgstr "Sayfa hata ayıklayıcı arka ucuna erişme"
+
 msgid "Access your email address"
 msgstr "E-posta adresinize erişme"
 
@@ -3453,6 +3456,9 @@ msgstr "Hakkında"
 msgid "Block"
 msgstr "Blok"
 
+msgid "Block content on any page"
+msgstr "Herhangi bir sayfadaki içeriği engelleme"
+
 msgid "blocked"
 msgstr "engellendi"
 
@@ -3919,6 +3925,9 @@ msgstr "Ajan çıktısı, yorumlar ve belgeler için standart markdown yüzeyi"
 
 msgid "Capabilities"
 msgstr "Yetenekler"
+
+msgid "Capture content of your screen"
+msgstr "Ekranınızın içeriğini yakalama"
 
 msgid "Card"
 msgstr "Kart"
@@ -6918,6 +6927,9 @@ msgstr "Ayrıntılar"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Ayrıntılar burada görüntülenemiyor, ancak bağlantı yine de açılır."
+
+msgid "Detect your physical location"
+msgstr "Fiziksel konumunuzu algılama"
 
 msgid "Dev"
 msgstr "Geliştirme"
@@ -11250,6 +11262,9 @@ msgstr "Hesap ayarlarınızı yönetin"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Uygulamalarınızı, uzantılarınızı ve temalarınızı yönetme"
 
+msgid "Manage your downloads"
+msgstr "İndirmelerinizi yönetme"
+
 msgid "Manage your organization's branding and members."
 msgstr "Kuruluşunuzun marka görünümünü ve üyelerini yönetin."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Okundu"
 
+msgid "Read a list of your most visited websites"
+msgstr "En çok ziyaret ettiğiniz web sitelerinin listesini okuma"
+
 msgid "Read and change all your data on all websites"
 msgstr "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme"
+
+msgid "Read and change your bookmarks"
+msgstr "Yer işaretlerinizi okuma ve değiştirme"
 
 msgid "Read and change your data on {count} websites"
 msgstr "{count} web sitesindeki verilerinizi okuma ve değiştirme"
@@ -16396,6 +16417,9 @@ msgstr "Paradev ile paralel kodlama ajanları çalıştırın"
 
 msgid "Run script"
 msgstr "Betiği çalıştır"
+
+msgid "Run scripts you add on websites"
+msgstr "Eklediğiniz komut dosyalarını web sitelerinde çalıştırma"
 
 msgid "Run setup script in each imported workspace"
 msgstr "İçe aktarılan her çalışma alanında kurulum betiğini çalıştır"
