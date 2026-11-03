@@ -20,3 +20,8 @@ test("stays hidden for a short hold and shows once the hold outlasts the delay",
 	await act(() => new Promise((done) => setTimeout(done, 30)));
 	expect(result.current).toBe(false);
 });
+
+test("a zero delay shows the notice on the first render", () => {
+	const { result } = renderHook(() => useShowAfter(true, 0));
+	expect(result.current).toBe(true);
+});

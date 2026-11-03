@@ -18258,6 +18258,9 @@ msgstr "{what} içinde ajan başlatılıyor"
 msgid "Starting cloud workspace"
 msgstr "Bulut çalışma alanı başlatılıyor"
 
+msgid "Starting cloud workspace…"
+msgstr "Bulut çalışma alanı başlatılıyor…"
+
 msgid "Starting the agent…"
 msgstr "Aracı başlatılıyor…"
 

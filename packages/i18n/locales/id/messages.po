@@ -18258,6 +18258,9 @@ msgstr "Memulai agen di {what}"
 msgid "Starting cloud workspace"
 msgstr "Memulai workspace cloud"
 
+msgid "Starting cloud workspace…"
+msgstr "Memulai workspace cloud…"
+
 msgid "Starting the agent…"
 msgstr "Memulai agen…"
 

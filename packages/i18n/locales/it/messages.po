@@ -18258,6 +18258,9 @@ msgstr "Avvio di un agente in {what}"
 msgid "Starting cloud workspace"
 msgstr "Avvio del workspace cloud"
 
+msgid "Starting cloud workspace…"
+msgstr "Avvio del workspace cloud…"
+
 msgid "Starting the agent…"
 msgstr "Avvio dell'agente…"
 

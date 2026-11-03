@@ -18258,6 +18258,9 @@ msgstr "正在 {what} 中启动代理"
 msgid "Starting cloud workspace"
 msgstr "正在启动云端工作区"
 
+msgid "Starting cloud workspace…"
+msgstr "正在启动云端工作区…"
+
 msgid "Starting the agent…"
 msgstr "正在启动智能体…"
 

@@ -18258,6 +18258,9 @@ msgstr "{what} でエージェントを起動中"
 msgid "Starting cloud workspace"
 msgstr "クラウドワークスペースを開始中"
 
+msgid "Starting cloud workspace…"
+msgstr "クラウドワークスペースを開始中…"
+
 msgid "Starting the agent…"
 msgstr "エージェントを起動しています…"
 

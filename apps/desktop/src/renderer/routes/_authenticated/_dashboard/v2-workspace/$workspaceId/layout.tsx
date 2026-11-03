@@ -162,16 +162,16 @@ function V2WorkspaceLayout() {
 	// provisioning there is no box to open, and once it has failed there never
 	// will be; a ready one only waits for its address to be minted.
 	if (!workspace && cloudWorkspace) {
-		if (cloudWorkspace.status === "ready" && pendingCloudChat) {
+		if (cloudWorkspace.status !== "failed" && pendingCloudChat) {
 			return (
-				<StateScreenShell>
-					<PendingCloudChatPreview
-						label={
-							pendingCloudChat.titleOverride ?? pendingCloudChat.data.agentId
-						}
-						prompt={pendingCloudChat.data.launchPrompt}
-					/>
-				</StateScreenShell>
+				<PendingCloudChatPreview
+					agentId={pendingCloudChat.data.agentId}
+					label={
+						pendingCloudChat.titleOverride ?? pendingCloudChat.data.agentId
+					}
+					prompt={pendingCloudChat.data.launchPrompt}
+					stage={cloudWorkspace.status === "ready" ? "agent" : "workspace"}
+				/>
 			);
 		}
 		if (cloudWorkspace.status === "ready") {

@@ -689,11 +689,19 @@ export function AcpChatPane({
 		[editMessage],
 	);
 
+	const launched = useMemo(
+		() =>
+			launchPrompt
+				? [{ type: "text" as const, text: launchPrompt }]
+				: undefined,
+		[launchPrompt],
+	);
 	const draft = (notice: ReactNode) => (
 		<DraftChat
 			draftKey={draftKey}
 			getOpenFilePaths={getOpenFilePaths}
 			isActive={isActive}
+			launched={launched}
 			notice={notice}
 			onOpenHistory={onOpenHistory}
 			onQueue={onQueuePrompt}
@@ -737,7 +745,7 @@ export function AcpChatPane({
 			);
 		}
 		return draft(
-			agentSessionId ? (
+			agentSessionId && !launchPrompt ? (
 				<Trans>Attaching to the running session…</Trans>
 			) : (
 				<Trans>Starting the agent…</Trans>
@@ -754,12 +762,14 @@ export function AcpChatPane({
 			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
-							notice: <Trans>Resuming the conversation…</Trans>,
+							notice: launched ? (
+								<Trans>Starting the agent…</Trans>
+							) : (
+								<Trans>Resuming the conversation…</Trans>
+							),
 							queued: pendingPrompts,
 							onQueue: onQueuePrompt,
-							...(launchPrompt
-								? { launched: [{ type: "text" as const, text: launchPrompt }] }
-								: {}),
+							...(launched ? { launched } : {}),
 						},
 					}
 				: {})}

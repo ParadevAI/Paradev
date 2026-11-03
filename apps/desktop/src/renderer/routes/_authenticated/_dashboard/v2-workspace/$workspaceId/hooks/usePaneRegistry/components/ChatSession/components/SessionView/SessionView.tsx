@@ -59,6 +59,7 @@ import {
 	prependToDraft,
 } from "../Composer";
 import { ConnectionNotice } from "../ConnectionNotice";
+import { LaunchPromptView } from "../LaunchPromptView";
 import { SessionHeader } from "../SessionHeader";
 import { SetupSessionHeader } from "../SetupSessionHeader";
 import { SubagentView } from "../SubagentView";
@@ -631,20 +632,21 @@ export function SessionView({
 
 	const heldQueued = held?.queued;
 	const heldLaunched = held?.launched;
+	const launchPending = heldLaunched !== undefined && snapshotItems.size === 0;
 	const heldQueue = useMemo(
 		() =>
 			heldQueued
 				? heldPromptQueue(heldQueued, {
-						launched: heldLaunched,
+						launched: launchPending ? undefined : heldLaunched,
 						items: snapshotItems,
 					})
 				: undefined,
-		[heldQueued, heldLaunched, snapshotItems],
+		[heldQueued, heldLaunched, launchPending, snapshotItems],
 	);
 	const booting = sessionState?.status === "starting";
 	const heldNoticeShown = useShowAfter(
 		held !== undefined,
-		HELD_NOTICE_DELAY_MS,
+		heldLaunched ? 0 : HELD_NOTICE_DELAY_MS,
 	);
 	const openModelPicker = useCallback(
 		() => composerRef.current?.openModelPicker(),
@@ -715,6 +717,8 @@ export function SessionView({
 										itemId={focusedSubagentId}
 										queued={subagent.queued}
 									/>
+								) : launchPending && heldLaunched ? (
+									<LaunchPromptView prompt={heldLaunched} />
 								) : (
 									<TurnFailureActionsProvider value={failureActions}>
 										<Transcript

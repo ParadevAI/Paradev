@@ -10,5 +10,5 @@ export function useShowAfter(active: boolean, delayMs: number): boolean {
 		const timer = setTimeout(() => setShown(true), delayMs);
 		return () => clearTimeout(timer);
 	}, [active, delayMs]);
-	return active && shown;
+	return active && (shown || delayMs <= 0);
 }

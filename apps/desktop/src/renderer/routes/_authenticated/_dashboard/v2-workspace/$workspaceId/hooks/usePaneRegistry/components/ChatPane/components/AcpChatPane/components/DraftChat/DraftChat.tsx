@@ -7,6 +7,7 @@ import {
 	type ComposerHandle,
 } from "../../../../../ChatSession/components/Composer";
 import { ConnectionNotice } from "../../../../../ChatSession/components/ConnectionNotice";
+import { LaunchPromptView } from "../../../../../ChatSession/components/LaunchPromptView";
 import {
 	WorkDrawer,
 	type WorkDrawerHandle,
@@ -20,6 +21,7 @@ export function DraftChat({
 	draftKey,
 	getOpenFilePaths,
 	isActive,
+	launched,
 	notice,
 	onOpenHistory,
 	onQueue,
@@ -29,6 +31,7 @@ export function DraftChat({
 	draftKey: string;
 	getOpenFilePaths?: () => ReadonlySet<string>;
 	isActive: boolean;
+	launched?: UserContent[];
 	notice: ReactNode;
 	onOpenHistory?: () => void;
 	onQueue: (content: UserContent[]) => void;
@@ -50,7 +53,11 @@ export function DraftChat({
 			className="flex h-full min-h-0 w-full min-w-0 flex-col"
 			ref={paneRef}
 		>
-			<div className="min-h-0 flex-1" />
+			{launched ? (
+				<LaunchPromptView prompt={launched} />
+			) : (
+				<div className="min-h-0 flex-1" />
+			)}
 			<ConnectionNotice>{notice}</ConnectionNotice>
 			<WorkDrawer
 				onExit={(exit) => composerRef.current?.returnFocus(exit === "history")}

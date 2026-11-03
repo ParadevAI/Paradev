@@ -18258,6 +18258,9 @@ msgstr "Запуск агента в {what}"
 msgid "Starting cloud workspace"
 msgstr "Запуск облачной рабочей области"
 
+msgid "Starting cloud workspace…"
+msgstr "Запуск облачной рабочей области…"
+
 msgid "Starting the agent…"
 msgstr "Запуск агента…"
 
