@@ -9,8 +9,10 @@ interface SidebarSlideProps {
 	width: number;
 	onLayoutFrame?: () => void;
 	keepMounted?: boolean;
+	alwaysMounted?: boolean;
 	durationMs?: number;
-	children: (fill: boolean) => React.ReactNode;
+	edge?: "left" | "right";
+	children: (fill: boolean, hidden: boolean) => React.ReactNode;
 }
 
 export function SidebarSlide({
@@ -18,7 +20,9 @@ export function SidebarSlide({
 	width,
 	onLayoutFrame,
 	keepMounted = false,
+	alwaysMounted = false,
 	durationMs = 300,
+	edge = "right",
 	children,
 }: SidebarSlideProps) {
 	const [settled, setSettled] = useState<SidebarSlideMode>(mode);
@@ -65,8 +69,9 @@ export function SidebarSlide({
 		if (!move) onLayoutFrameRef.current?.();
 	}, [move]);
 
-	if (!hasOpened) return null;
-	if (!keepMounted && !move && settled === "closed") return null;
+	if (!alwaysMounted && !hasOpened) return null;
+	if (!alwaysMounted && !keepMounted && !move && settled === "closed")
+		return null;
 
 	// Settled open lays the panel out in flow so a drag-resize sizes everything
 	// from the panel itself. The element tree stays the same in every mode, so
@@ -105,7 +110,12 @@ export function SidebarSlide({
 					inert={hidden}
 					className={cn(
 						"flex",
-						inFlow ? "h-full" : "absolute inset-y-0 right-0",
+						inFlow
+							? "h-full"
+							: cn(
+									"absolute inset-y-0",
+									edge === "left" ? "left-0" : "right-0",
+								),
 						hidden && "invisible",
 					)}
 					style={{
@@ -114,7 +124,7 @@ export function SidebarSlide({
 					}}
 				>
 					<TabVisibilityContext.Provider value={!hidden}>
-						{children(fill)}
+						{children(fill, hidden)}
 					</TabVisibilityContext.Provider>
 				</div>
 			</div>

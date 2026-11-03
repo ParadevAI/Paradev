@@ -103,6 +103,33 @@ describe("SidebarSlide", () => {
 		expect(node?.dataset.visible).toBe("true");
 	});
 
+	test("an always-mounted panel renders before its first open, hidden and inert", () => {
+		const hiddenValues: boolean[] = [];
+		const { getByTestId } = render(
+			<SidebarSlide mode="closed" width={300} alwaysMounted durationMs={1}>
+				{(_fill, hidden) => {
+					hiddenValues.push(hidden);
+					return <Panel />;
+				}}
+			</SidebarSlide>,
+		);
+		expect(getByTestId("panel").parentElement?.hasAttribute("inert")).toBe(
+			true,
+		);
+		expect(hiddenValues.at(-1)).toBe(true);
+	});
+
+	test("a left-edge slide keeps its content pinned to the left while it moves", () => {
+		const ui = (mode: SidebarSlideMode) => (
+			<SidebarSlide mode={mode} width={300} edge="left" durationMs={1000}>
+				{() => <Panel />}
+			</SidebarSlide>
+		);
+		const { rerender, getByTestId } = render(ui("open"));
+		rerender(ui("closed"));
+		expect(getByTestId("panel").parentElement?.className).toContain("left-0");
+	});
+
 	test("settles on the last mode when toggled mid-move", async () => {
 		const slide = renderSlide("open", true);
 		slide.setMode("closed");

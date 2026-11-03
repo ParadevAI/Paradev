@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from "react";
+import { type ReactNode, useSyncExternalStore } from "react";
+import { SidebarSlide } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import {
 	COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
@@ -18,23 +19,30 @@ export function WorkspaceSidebarPanel({
 	className,
 	/** What the panel shows while collapsed: its own icon rail, or nothing beside a separate one. */
 	collapsedWidth = COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+	slides = false,
 	children,
 }: {
 	className?: string;
 	collapsedWidth?: number;
-	children: React.ReactNode;
+	slides?: boolean;
+	children: ReactNode | ((hidden: boolean) => ReactNode);
 }) {
 	const width = useWorkspaceSidebarStore((s) => s.width);
+	const lastExpandedWidth = useWorkspaceSidebarStore(
+		(s) => s.lastExpandedWidth,
+	);
 	const setWidth = useWorkspaceSidebarStore((s) => s.setWidth);
 	const maxWidth = useSyncExternalStore(subscribeToResize, getMaxWidth);
 	useAutoCollapseInNarrowWindow();
-	return (
+	const isCollapsed = width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH;
+	const expandedWidth = Math.min(
+		isCollapsed ? lastExpandedWidth : width,
+		maxWidth,
+	);
+
+	const renderPanel = (shownWidth: number, hidden: boolean) => (
 		<ResizablePanel
-			width={
-				width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
-					? collapsedWidth
-					: Math.min(width, maxWidth)
-			}
+			width={shownWidth}
 			onWidthChange={(next) => setWidth(Math.min(next, maxWidth))}
 			minWidth={collapsedWidth}
 			maxWidth={maxWidth}
@@ -43,7 +51,25 @@ export function WorkspaceSidebarPanel({
 			className={className}
 			onDoubleClickHandle={() => setWidth(DEFAULT_WORKSPACE_SIDEBAR_WIDTH)}
 		>
-			{children}
+			{typeof children === "function" ? children(hidden) : children}
 		</ResizablePanel>
+	);
+
+	if (!slides) {
+		return renderPanel(
+			isCollapsed ? collapsedWidth : expandedWidth,
+			isCollapsed,
+		);
+	}
+
+	return (
+		<SidebarSlide
+			mode={isCollapsed ? "closed" : "open"}
+			width={expandedWidth}
+			edge="left"
+			alwaysMounted
+		>
+			{(_fill, hidden) => renderPanel(expandedWidth, hidden)}
+		</SidebarSlide>
 	);
 }
