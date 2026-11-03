@@ -22,7 +22,7 @@ plugins/
 
 Each plugin's `source` in `.agent-marketplace.json` is a `./` folder in the repository. Paradev copies the whole folder, so skills can use `scripts/`, `assets/`, and other files next to them. Executable files stay executable.
 
-- A plugin can have at most 500 files, 2 MB compressed, and 16 MB uncompressed.
+- A plugin can have at most 500 files and about 12 MB of files in total, and must compress to 2 MB or less.
 - `.git`, `node_modules`, and `hooks/` are left out. Paradev does not run hooks.
 - A plugin cannot use the name of a plugin in the [Paradev marketplace](/plugins/available).
 - A plugin with MCP tools must name a connector that has its own tool server, or give an `mcp.url` that is a public `https` address.
@@ -67,7 +67,7 @@ Each plugin has a setting for each role: owner, admin, and member.
 
 | Setting | What it does |
 |:--------|:-------------|
-| **Unavailable** | The role cannot see or install the plugin. Existing installs are removed. |
+| **Unavailable** | The role cannot see or install the plugin, and its tools stop working at once. Existing installs are removed: each machine deletes its copy the next time it syncs plugins. |
 | **Available** | Members of the role can install it from **Plugins**. |
 | **Installed** | Everyone in the role gets it. They can disable it but not remove it. |
 

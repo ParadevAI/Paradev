@@ -3,7 +3,7 @@ title: Build a Plugin
 description: Write a plugin, test it on your machine, share it with your team, and submit it to the Paradev marketplace
 ---
 
-A plugin is a folder with a `plugin.json` manifest and, optionally, a `skills/` folder. It ships no code. Its tools come from an MCP server that already exists, and Paradev proxies each call to it. See [Overview](/plugins/overview) for what a plugin does once it is installed.
+A plugin is a folder with a `plugin.json` manifest and, optionally, a `skills/` folder. Its tools come from an MCP server that already exists, and Paradev proxies each call to it. The plugin does not include that server, but a skill can include `scripts/` files, which are installed on the user's machine. See [Overview](/plugins/overview) for what a plugin does once it is installed.
 
 ## Set Up a Marketplace
 
@@ -117,7 +117,7 @@ superset plugins marketplace add .
 superset plugins install acme --marketplace acme
 ```
 
-Start a new agent session and mention the plugin in a prompt. After you edit the plugin, run `superset plugins install acme --update` to copy the change to your machine.
+Start a new agent session and mention the plugin in a prompt. After you edit the plugin, run `superset plugins install acme --marketplace acme --update` to copy the change to your machine.
 
 <Callout type="warn">
 A plugin installed from your own marketplace gets its skills only, not its MCP tools. To test the tools, add the repository as an [organization plugin](/plugins/organization-plugins) source.
@@ -153,7 +153,7 @@ An owner or admin can sync your repository into a Paradev organization. Members 
 To make a plugin available to every Paradev user, open a pull request that adds it to the [Paradev repository](https://github.com/paradevai/paradev). The repository is itself a marketplace, so you build the plugin there with the same commands. Plugins in the Paradev marketplace are listed at [paradev.com/marketplace/plugins](https://paradev.com/marketplace/plugins) and in **Plugins** in the desktop app.
 
 1. Fork and clone the repository, then run `bun install`. See [CONTRIBUTING.md](https://github.com/paradevai/paradev/blob/main/CONTRIBUTING.md).
-2. From the repository root, run `superset plugins create <name>` and write the manifest and skills as described above.
+2. From the repository root, run `superset plugins create <name> --kind url --url <server-url>`, or `superset plugins create <name> --kind none --skills` for a skills-only plugin. Then write the manifest and skills as described above.
 3. If the MCP server needs a sign-in, add a connector to `packages/shared/src/connectors/connectors.json` and name it in `connector.slug`. A server that supports OAuth dynamic client registration needs only a connector with `"client": "dynamic"`; copy the `granola_mcp` entry. If the server needs a pre-registered OAuth app, say so in the pull request, and we register one.
 4. Add an entry for the plugin to `PLUGIN_CATALOG` in `packages/shared/src/plugins/index.ts`, with the same name and display name as `plugin.json`. A test fails until every published plugin has one.
 5. Run `superset plugins publish <name>`. This records the version in `.agent-marketplace.json` and regenerates `packages/shared/src/plugins/manifests.generated.ts`. Do not edit that file by hand.
@@ -183,7 +183,7 @@ git push
 
 ```bash
 superset plugins marketplace add acme/paradev-plugins
-superset plugins install acme --update
+superset plugins install acme --marketplace acme --update
 ```
 
-For a plugin in the Paradev repository, run `superset plugins publish <name> --bump patch` in your pull request. The new version ships when the pull request merges.
+For a plugin in the Paradev repository, run `superset plugins publish <name> --bump patch` in your pull request, and commit `packages/shared/src/plugins/manifests.generated.ts` with the plugin. CI fails if that file is out of date. The new version ships when the pull request merges.
