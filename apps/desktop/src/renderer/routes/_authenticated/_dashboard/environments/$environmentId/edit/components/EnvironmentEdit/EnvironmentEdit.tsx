@@ -116,7 +116,7 @@ export function EnvironmentEdit({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-48">
 							<DropdownMenuItem
-								className="text-destructive focus:text-destructive"
+								variant="destructive"
 								onSelect={() => setConfirmingArchive(true)}
 							>
 								<LuArchive className="size-3.5" />

@@ -5,6 +5,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Skeleton } from "@superset/ui/skeleton";
@@ -108,8 +109,9 @@ export function EnvironmentView({
 							<DropdownMenuItem onSelect={() => openEdit({ focus: "name" })}>
 								<Trans>Rename</Trans>
 							</DropdownMenuItem>
+							<DropdownMenuSeparator />
 							<DropdownMenuItem
-								className="text-destructive focus:text-destructive"
+								variant="destructive"
 								onSelect={() => setConfirmingArchive(true)}
 							>
 								<LuArchive className="size-3.5" />

@@ -5,6 +5,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Skeleton } from "@superset/ui/skeleton";
@@ -209,8 +210,9 @@ export function EnvironmentsSettings({
 									>
 										<Trans>Rebuild environment</Trans>
 									</DropdownMenuItem>
+									<DropdownMenuSeparator />
 									<DropdownMenuItem
-										className="text-destructive focus:text-destructive"
+										variant="destructive"
 										onSelect={() =>
 											setArchiving({
 												id: environment.id,
