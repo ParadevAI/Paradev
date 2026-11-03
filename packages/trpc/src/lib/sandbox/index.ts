@@ -26,6 +26,7 @@ export {
 	type RefreshSandboxCredentialsOutcome,
 	refreshSandboxCredentials,
 } from "./refresh-credentials";
+export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
 export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
