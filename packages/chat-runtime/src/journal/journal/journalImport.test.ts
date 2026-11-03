@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { ChatRuntime } from "../../index";
 import { readSince } from "../../replay";
 import { agentMessage, toolCall, turn } from "../../testing/fixtures";
@@ -45,6 +45,10 @@ describe("ChatJournal.importSession", () => {
 
 	beforeEach(() => {
 		runtime = createTestRuntime();
+	});
+
+	afterEach(async () => {
+		await runtime.dispose();
 	});
 
 	test("keeps the source's order and head seq under a new epoch, and the next append follows it", () => {
@@ -170,36 +174,38 @@ describe("commands.continueSession with a dead agent", () => {
 });
 
 describe("ChatJournal.importSession with replace", () => {
-	test("overwrites the journal a host already had, as when a chat moves back", () => {
+	test("overwrites the journal a host already had, as when a chat moves back", async () => {
 		const runtime = createTestRuntime();
-		runtime.journal.importSession(moved());
-		const before = runtime.journal.cursor(SESSION);
-		const back = moved(12);
-		expect(
-			runtime.journal.importSession({
-				...back,
-				events: [
-					...back.events,
-					{
-						seq: 11,
-						event: {
-							type: "item",
-							turnId: "t2",
-							item: agentMessage("from-cloud", "Done in the cloud"),
+		try {
+			runtime.journal.importSession(moved());
+			const before = runtime.journal.cursor(SESSION);
+			const back = moved(12);
+			expect(
+				runtime.journal.importSession({
+					...back,
+					events: [
+						...back.events,
+						{
+							seq: 11,
+							event: {
+								type: "item",
+								turnId: "t2",
+								item: agentMessage("from-cloud", "Done in the cloud"),
+							},
 						},
-					},
-				],
-				replace: true,
-			}),
-		).toBe(true);
-		const after = runtime.journal.cursor(SESSION);
-		expect(after.seq).toBe(12);
-		expect(after.epoch).not.toBe(before.epoch);
-		const outline = runtime.commands.getOutline({ sessionId: SESSION });
-		expect(outline.ok && outline.outline.items.map((s) => s.item.id)).toEqual([
-			"tool",
-			"reply",
-			"from-cloud",
-		]);
+					],
+					replace: true,
+				}),
+			).toBe(true);
+			const after = runtime.journal.cursor(SESSION);
+			expect(after.seq).toBe(12);
+			expect(after.epoch).not.toBe(before.epoch);
+			const outline = runtime.commands.getOutline({ sessionId: SESSION });
+			expect(outline.ok && outline.outline.items.map((s) => s.item.id)).toEqual(
+				["tool", "reply", "from-cloud"],
+			);
+		} finally {
+			await runtime.dispose();
+		}
 	});
 });

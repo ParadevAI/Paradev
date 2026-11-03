@@ -51,6 +51,43 @@ describe("gitPushSnapshotTask", () => {
 		).toEqual({ remote: "origin", pushUrls: [join(root, "push.git")] });
 	});
 
+	test("uses the first remote when there is no origin, with every push URL", async () => {
+		const git = simpleGit(repoPath);
+		await git.raw(["remote", "rename", "origin", "upstream"]);
+		await git.raw([
+			"remote",
+			"set-url",
+			"--add",
+			"--push",
+			"upstream",
+			"a.git",
+		]);
+		await git.raw([
+			"remote",
+			"set-url",
+			"--add",
+			"--push",
+			"upstream",
+			"b.git",
+		]);
+		expect(
+			await gitSnapshotRemoteTask.handler({
+				worktreePath: repoPath,
+				gitEnv: {},
+			}),
+		).toEqual({ remote: "upstream", pushUrls: ["a.git", "b.git"] });
+	});
+
+	test("finds no remote in a repository without one", async () => {
+		await simpleGit(repoPath).raw(["remote", "remove", "origin"]);
+		expect(
+			await gitSnapshotRemoteTask.handler({
+				worktreePath: repoPath,
+				gitEnv: {},
+			}),
+		).toBeNull();
+	});
+
 	test("pushes uncommitted and untracked work without changing the worktree", async () => {
 		const git = simpleGit(repoPath);
 		const head = (await git.revparse(["HEAD"])).trim();
@@ -110,8 +147,10 @@ describe("gitPushSnapshotTask", () => {
 			branch: "superset/teleport-anon",
 			gitEnv: NO_GLOBAL_CONFIG,
 		});
-		expect(await simpleGit(remotePath).show([`${commit}:tracked.txt`])).toBe(
-			"edited\n",
-		);
+		const remote = simpleGit(remotePath);
+		expect(await remote.show([`${commit}:tracked.txt`])).toBe("edited\n");
+		expect(
+			(await remote.raw(["log", "-1", "--format=%an <%ae>", commit])).trim(),
+		).toBe("Superset <teleport@superset.sh>");
 	});
 });

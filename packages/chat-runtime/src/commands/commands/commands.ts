@@ -522,7 +522,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				harnessSessionId: input.harnessSessionId,
 			});
 			// Removes the dead entry at once, so `create` can take its id.
-			if (live) void options.live.dispose(input.sessionId).catch(() => {});
+			if (live) {
+				void options.live
+					.dispose(input.sessionId)
+					.catch((error: unknown) =>
+						console.warn(
+							`[chat-runtime] could not dispose the dead agent of ${input.sessionId}`,
+							error,
+						),
+					);
+			}
 			options.live.create({
 				sessionId: input.sessionId,
 				scopeId: session.scopeId,

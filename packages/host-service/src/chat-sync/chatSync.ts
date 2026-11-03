@@ -191,8 +191,8 @@ export function createChatSync(args: {
 			}
 		}
 		for (const sessionId of [...dirty]) {
-			if (!started && !followed.has(sessionId)) continue;
 			dirty.delete(sessionId);
+			if (!started && !followed.has(sessionId)) continue;
 			if (moved.has(sessionId)) continue;
 			try {
 				await syncSession(sessionId);

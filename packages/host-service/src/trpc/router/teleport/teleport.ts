@@ -92,7 +92,6 @@ export const teleportRouter = router({
 	 * from all three.
 	 */
 	prepare: protectedProcedure
-		.meta({ timeoutMs: 180_000 })
 		.input(
 			z.object({
 				workspaceId: z.string(),
@@ -214,9 +213,7 @@ export const teleportRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const chat = requireChatRuntime(ctx);
 			requireChat(chat, input.workspaceId, input.chatSessionId);
-			if (chat.live.get(input.chatSessionId)) {
-				await chat.commands.closeSession({ sessionId: input.chatSessionId });
-			}
+			await chat.commands.closeSession({ sessionId: input.chatSessionId });
 			chat.journal.append(input.chatSessionId, {
 				type: "item",
 				turnId: `moved-${randomUUID()}`,
@@ -236,7 +233,6 @@ export const teleportRouter = router({
 
 	/** Makes a branch another host pushed available to create a worktree from. */
 	fetchBranch: machineOnlyProcedure
-		.meta({ timeoutMs: 120_000 })
 		.input(z.object({ projectId: z.string(), branch: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			const repoPath = requireProjectRepoPath(
@@ -267,7 +263,6 @@ export const teleportRouter = router({
 	 * everything the chat needs; `continueChat` then starts it.
 	 */
 	importChat: protectedProcedure
-		.meta({ timeoutMs: 180_000 })
 		.input(
 			z.object({
 				workspaceId: z.string(),

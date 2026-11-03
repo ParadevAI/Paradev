@@ -46,4 +46,27 @@ describe("gunzipBounded", () => {
 		execFileSync("tar", ["-cf", linked, "-C", stage, "."]);
 		await expect(assertPlainEntries(linked)).rejects.toThrow("will not unpack");
 	});
+
+	test("refuses entries named outside the stage", async () => {
+		const stage = join(root, "stage");
+		mkdirSync(join(stage, "session"), { recursive: true });
+		const file = join(stage, "session", "s.jsonl");
+		writeFileSync(file, "{}");
+
+		const parent = join(root, "parent.tar");
+		execFileSync("tar", [
+			"-cPf",
+			parent,
+			"-C",
+			join(stage, "session"),
+			"../session/s.jsonl",
+		]);
+		await expect(assertPlainEntries(parent)).rejects.toThrow("will not unpack");
+
+		const absolute = join(root, "absolute.tar");
+		execFileSync("tar", ["-cPf", absolute, file]);
+		await expect(assertPlainEntries(absolute)).rejects.toThrow(
+			"will not unpack",
+		);
+	});
 });

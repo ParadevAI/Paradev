@@ -1,3 +1,4 @@
+import { posix, win32 } from "node:path";
 import type { HarnessEnv } from "../../terminal-agents/harness-sessions/types";
 
 /** Where an agent's session files were recorded, packed with them. */
@@ -17,16 +18,21 @@ export function isPlainSessionId(id: unknown): id is string {
 	return typeof id === "string" && PLAIN_ID.test(id);
 }
 
+function isAbsolutePath(value: unknown): value is string {
+	return (
+		typeof value === "string" &&
+		(posix.isAbsolute(value) || win32.isAbsolute(value))
+	);
+}
+
 /** A manifest read from a bundle, or null when it is not one this host reads. */
 export function parseBundleManifest(value: unknown): BundleManifest | null {
 	if (typeof value !== "object" || value === null) return null;
 	const manifest = value as Record<string, unknown>;
 	if (manifest.version !== 1) return null;
 	if (!isPlainSessionId(manifest.harnessSessionId)) return null;
-	if (typeof manifest.sourceCwd !== "string" || !manifest.sourceCwd)
-		return null;
-	if (typeof manifest.sourceDir !== "string" || !manifest.sourceDir)
-		return null;
+	if (!isAbsolutePath(manifest.sourceCwd)) return null;
+	if (!isAbsolutePath(manifest.sourceDir)) return null;
 	return {
 		version: 1,
 		harnessSessionId: manifest.harnessSessionId,

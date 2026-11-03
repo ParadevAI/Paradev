@@ -10,7 +10,10 @@ type PushInput = {
 	events: { seq: number }[];
 };
 
-function setup(reject: (input: PushInput) => boolean = () => false) {
+function setup(
+	reject: (input: PushInput) => boolean = () => false,
+	code = "BAD_REQUEST",
+) {
 	const appended: DurableEnvelope[] = [];
 	const runtime = createTestRuntime({ onAppend: (e) => appended.push(e) });
 	const pushes: PushInput[] = [];
@@ -19,9 +22,7 @@ function setup(reject: (input: PushInput) => boolean = () => false) {
 			push: {
 				mutate: async (input: PushInput) => {
 					if (reject(input)) {
-						throw Object.assign(new Error("bad event"), {
-							data: { code: "BAD_REQUEST" },
-						});
+						throw Object.assign(new Error("rejected"), { data: { code } });
 					}
 					pushes.push(input);
 					return { ackedSeq: input.events.at(-1)?.seq ?? 0 };
@@ -103,7 +104,7 @@ describe("createChatSync", () => {
 		]);
 	});
 
-	test("a host that does not sync keeps pushing a chat it follows until the chat moves", async () => {
+	test("a host that does not sync keeps pushing a chat it follows", async () => {
 		const { sync, pushes, say, timers, appended } = setup();
 		say("before");
 		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
@@ -117,5 +118,30 @@ describe("createChatSync", () => {
 		expect(pushes.flatMap((push) => push.events.map((e) => e.seq))).toEqual([
 			1, 2,
 		]);
+	});
+
+	test("stops following a chat once the API says it moved", async () => {
+		let movedAway = false;
+		const { sync, pushes, say, timers, appended } = setup(
+			() => movedAway,
+			"CONFLICT",
+		);
+		sync.follow("s");
+		say("a");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		timers.shift()?.();
+		await Bun.sleep(0);
+		expect(pushes).toHaveLength(1);
+
+		movedAway = true;
+		say("b");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		timers.shift()?.();
+		await Bun.sleep(0);
+
+		say("c");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		expect(timers).toHaveLength(0);
+		expect(pushes).toHaveLength(1);
 	});
 });
