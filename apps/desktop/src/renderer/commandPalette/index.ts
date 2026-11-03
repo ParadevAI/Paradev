@@ -12,3 +12,4 @@ export type {
 	SectionId,
 } from "./core/types";
 export { openWorkspaceList } from "./modules/navigation/commands";
+export { openQuickOpen } from "./modules/workspace/commands";

@@ -49,6 +49,8 @@ export interface Command {
 	run?: (context: CommandContext) => void | Promise<void>;
 	children?: Command[] | ((context: CommandContext) => Command[]);
 	renderFrame?: () => React.ReactNode;
+	/** The input's placeholder while this frame is open; defaults to "Search in {title}…". */
+	framePlaceholder?: MessageDescriptor;
 }
 
 export interface CommandProvider {
