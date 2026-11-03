@@ -126,16 +126,19 @@ function confirmUpdate(
 
 /**
  * Install, load and update Web Store extensions; installs and updates both pass
- * `verifyCrx3`. Resolves to the extensions not loaded because their files changed.
+ * `verifyCrx3`. `onTurnedOff` gets the extensions not loaded because their
+ * files changed, before the store itself is set up.
  */
 export async function installBrowserWebStore(
 	browserSession: Electron.Session,
 	{
 		removeExtension,
+		onTurnedOff,
 	}: {
 		removeExtension: (extensionId: string) => Promise<void>;
+		onTurnedOff: (extensions: TurnedOffExtension[]) => void;
 	},
-): Promise<TurnedOffExtension[]> {
+): Promise<void> {
 	enableCrxVerification();
 	// The manifest the user approved, from the store page. The download must not
 	// reach further before it moves into the folder the app loads at start.
@@ -200,10 +203,12 @@ export async function installBrowserWebStore(
 	};
 	// Before the store API exists, so its install path cannot load a folder that is not yet checked.
 	await app.whenReady();
-	const turnedOff = await loadUserExtensions(
-		browserSession,
-		userExtensionPaths(),
-		localizedName,
+	onTurnedOff(
+		await loadUserExtensions(
+			browserSession,
+			userExtensionPaths(),
+			localizedName,
+		),
 	);
 	await installChromeWebStore({
 		session: browserSession,
@@ -235,7 +240,6 @@ export async function installBrowserWebStore(
 		checkForUpdates();
 		setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
 	}, FIRST_UPDATE_CHECK_DELAY_MS);
-	return turnedOff;
 }
 
 async function localizedName(

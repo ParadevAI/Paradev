@@ -40,11 +40,13 @@ export function readZipEntry(zip: Buffer, name: string): Buffer | null {
 			zip.readUInt16LE(localOffset + 26) +
 			zip.readUInt16LE(localOffset + 28);
 		const data = zip.subarray(dataStart, dataStart + compressedSize);
+		if (data.length !== compressedSize)
+			throw new Error(`Zip entry ${name} is truncated`);
 		const content =
 			method === COMPRESSION.stored
 				? Buffer.from(data)
 				: method === COMPRESSION.deflate
-					? inflateRawSync(data)
+					? inflateRawSync(data, { maxOutputLength: Math.max(size, 1) })
 					: null;
 		if (!content) throw new Error(`Zip entry ${name} uses method ${method}`);
 		if (content.length !== size)
@@ -57,7 +59,11 @@ export function readZipEntry(zip: Buffer, name: string): Buffer | null {
 function findEndRecord(zip: Buffer): number {
 	const lowest = Math.max(0, zip.length - END_RECORD_SIZE - MAX_COMMENT_SIZE);
 	for (let offset = zip.length - END_RECORD_SIZE; offset >= lowest; offset--) {
-		if (zip.readUInt32LE(offset) === END_OF_CENTRAL_DIRECTORY) return offset;
+		if (
+			zip.readUInt32LE(offset) === END_OF_CENTRAL_DIRECTORY &&
+			offset + END_RECORD_SIZE + zip.readUInt16LE(offset + 20) === zip.length
+		)
+			return offset;
 	}
 	throw new Error("Not a zip archive");
 }

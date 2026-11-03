@@ -120,18 +120,21 @@ export async function checkExtensionFiles(
 	const record = await readUsableRecord(file, options);
 	const { files, others } = await listFiles(dir);
 	if (!record) {
-		if (others[0]) throw new Error(`${others[0]} is not a plain file`);
-		const fileSha256: Record<string, string> = {};
+		if (others[0]) {
+			throw new ExtensionIntegrityError(`${others[0]} is not a plain file`);
+		}
+		const hashes: [string, string][] = [];
 		const extensionFiles = files.filter(
 			(relative) => relative !== STORAGE_SHIM_SCRIPT,
 		);
 		await forEachLimited(extensionFiles, PARALLEL_READS, async (relative) => {
-			fileSha256[relative] = sha256(await readOriginal(dir, relative)).toString(
-				"hex",
-			);
+			hashes.push([
+				relative,
+				sha256(await readOriginal(dir, relative)).toString("hex"),
+			]);
 		});
 		const manifest = await readFile(path.join(dir, MANIFEST));
-		await saveTrustedRecord(file, fileSha256, manifest);
+		await saveTrustedRecord(file, Object.fromEntries(hashes), manifest);
 		return "recorded";
 	}
 	if (others[0]) {
@@ -272,7 +275,8 @@ async function readUsableRecord(
 		if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
 		throw error;
 	}
-	const parsed = recordSchema.safeParse(parseJson(text));
+	const json = parseJson(text);
+	const parsed = recordSchema.safeParse(json);
 	if (!parsed.success) {
 		console.error(`[extension-host] Ignoring malformed record ${file}`);
 		return null;
@@ -281,10 +285,14 @@ async function readUsableRecord(
 		const manifest = parsed.data.manifest
 			? Buffer.from(parsed.data.manifest, "base64")
 			: null;
+		// zod drops a `__proto__` key, which is a valid file name.
+		const { fileSha256 } = json as { fileSha256: Record<string, unknown> };
 		const recorded = parsed.data.fileSha256[MANIFEST];
 		return {
 			kind: "trusted",
-			fileSha256: parsed.data.fileSha256,
+			fileSha256: Object.fromEntries(
+				Object.entries(fileSha256).map(([name, hash]) => [name, String(hash)]),
+			),
 			manifest:
 				manifest && sha256(manifest).toString("hex") === recorded
 					? manifest
@@ -343,7 +351,14 @@ async function verifySignedFiles(
 		throw new ExtensionIntegrityError(`${missing} is missing`);
 	}
 
-	const onDisk = await readFile(path.join(dir, MANIFEST));
+	const onDisk = await readFile(path.join(dir, MANIFEST)).catch(
+		(error: NodeJS.ErrnoException) => {
+			if (error.code === "ENOENT") {
+				throw new ExtensionIntegrityError(`${MANIFEST} is missing`);
+			}
+			throw error;
+		},
+	);
 	const manifest = parseJson(onDisk.toString("utf8")) as {
 		key?: unknown;
 	} | null;

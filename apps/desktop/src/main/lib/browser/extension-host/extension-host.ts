@@ -244,9 +244,8 @@ function startExtensionHost(): void {
 
 	void installBrowserWebStore(browserSession, {
 		removeExtension: removeBrowserExtension,
-	})
-		.then(setTurnedOffBrowserExtensions)
-		.catch((error: unknown) => {
-			console.error("[extension-host] Chrome Web Store setup failed:", error);
-		});
+		onTurnedOff: setTurnedOffBrowserExtensions,
+	}).catch((error: unknown) => {
+		console.error("[extension-host] Chrome Web Store setup failed:", error);
+	});
 }
