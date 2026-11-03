@@ -1048,7 +1048,7 @@ export function ComposerBody({
 		<div
 			className={cn(
 				inline
-					? "relative min-w-0 flex-1 py-[3px]"
+					? "relative min-w-24 flex-1 py-[3px]"
 					: "relative px-4 pt-3.5 pb-1",
 				inline && dictating && "hidden",
 			)}

@@ -4,7 +4,7 @@ import {
 	headerTabClassName,
 } from "@superset/ui/lib/header-controls";
 import { cn } from "@superset/ui/utils";
-import type { MouseEvent, ReactNode } from "react";
+import { type MouseEvent, type ReactNode, useEffect, useRef } from "react";
 import { LuX } from "react-icons/lu";
 
 interface ChatTabProps {
@@ -23,6 +23,11 @@ export function ChatTab({
 	onClose,
 }: ChatTabProps) {
 	const { t } = useLingui();
+	const ref = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (isActive)
+			ref.current?.scrollIntoView({ block: "nearest", inline: "nearest" });
+	}, [isActive]);
 	const closeOnMiddleClick = (event: MouseEvent<HTMLButtonElement>) => {
 		if (event.button !== 1) return;
 		event.preventDefault();
@@ -30,6 +35,7 @@ export function ChatTab({
 	};
 	return (
 		<div
+			ref={ref}
 			className={cn(
 				headerTabClassName(isActive),
 				"group w-[156px] shrink-0 pr-1",
@@ -37,8 +43,7 @@ export function ChatTab({
 		>
 			<button
 				type="button"
-				role="tab"
-				aria-selected={isActive}
+				aria-current={isActive ? "page" : undefined}
 				title={label}
 				onClick={onActivate}
 				onAuxClick={closeOnMiddleClick}

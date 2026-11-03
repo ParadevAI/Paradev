@@ -3581,7 +3581,7 @@ msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspac
 msgstr "Claude Code、Codex、OpenCode、またはあらゆるコーディングエージェントを1つのワークスペースに。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
 
 msgid "Bring in an agent"
-msgstr "エージェントを呼び込む"
+msgstr "エージェントを選択"
 
 msgid "Bring over your projects"
 msgstr "プロジェクトを引き継ぐ"

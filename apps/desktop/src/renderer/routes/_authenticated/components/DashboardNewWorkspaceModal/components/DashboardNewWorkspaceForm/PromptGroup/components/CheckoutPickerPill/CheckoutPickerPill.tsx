@@ -10,11 +10,11 @@ import { HiCheck } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
+import { PickerChevron } from "../../../components/PickerChevron";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../FormPickerTrigger";
-import { PickerChevron } from "../PickerChevron";
 
 interface CheckoutPickerPillProps {
 	checkout: WorkspaceCheckout;

@@ -27,6 +27,7 @@ import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { authClient } from "renderer/lib/auth-client";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
+import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
 import {
 	EMPTY_CLOUD_SIDEBAR,
 	useCloudSidebarStore,
@@ -200,11 +201,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	const v2RouteMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
 	const activeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
 	const isParadevShell = useParadevShell();
-	// In the redesigned shell Channels and Devs belong to the rail's Chat
-	// destination; elsewhere the list is workspaces only.
-	const isChatSection =
-		!!matchRoute({ to: "/channels", fuzzy: true }) ||
-		!!matchRoute({ to: "/devs", fuzzy: true });
+	const isChatSection = useIsChatSection();
 	const workspacesListCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.workspaces,
 	);
@@ -591,8 +588,6 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 								isChildDragDisabled={isChildDragDisabled}
 							>
 								{isParadevShell ? (
-									// Collapsed, the rail beside this panel is the whole sidebar;
-									// the hooks above keep workspace shortcuts and switching alive.
 									!isCollapsed && (
 										<div className="flex h-full flex-col">
 											{!isChatSection && <DashboardSidebarShellHeader />}

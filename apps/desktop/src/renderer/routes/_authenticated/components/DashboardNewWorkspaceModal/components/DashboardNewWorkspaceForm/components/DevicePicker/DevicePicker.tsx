@@ -26,7 +26,7 @@ import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../../PromptGroup/components/FormPickerTrigger";
-import { PickerChevron } from "../../PromptGroup/components/PickerChevron";
+import { PickerChevron } from "../PickerChevron";
 import { useWorkspaceHostOptions } from "./hooks/useWorkspaceHostOptions";
 
 function OnlineDot({ online }: { online: boolean }) {

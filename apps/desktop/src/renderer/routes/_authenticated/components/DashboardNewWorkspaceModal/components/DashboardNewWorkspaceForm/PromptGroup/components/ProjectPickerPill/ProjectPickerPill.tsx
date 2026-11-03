@@ -30,6 +30,7 @@ import {
 	useOpenEmptyProjectModal,
 	useOpenNewProjectModal,
 } from "renderer/stores/add-repository-modal";
+import { PickerChevron } from "../../../components/PickerChevron";
 import type {
 	GitHubConnectionAction,
 	GitHubRepositoryOption,
@@ -39,7 +40,6 @@ import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../FormPickerTrigger";
-import { PickerChevron } from "../PickerChevron";
 
 interface ProjectPickerPillProps {
 	selectedProject: ProjectOption | undefined;

@@ -1,5 +1,6 @@
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useIsInTitleBarShell } from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
+import { WINDOW_CONTROLS_INSET_WIDTH } from "./constants";
 
 /**
  * Keeps a header clear of the window-controls overlay that Electron draws on
@@ -21,8 +22,7 @@ export function WindowControlsInset({
 		<div
 			className="drag h-full shrink-0"
 			style={{
-				width:
-					"calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw))",
+				width: `calc${WINDOW_CONTROLS_INSET_WIDTH}`,
 			}}
 		/>
 	);

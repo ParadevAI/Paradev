@@ -111,14 +111,36 @@ export function useTitleBarSideSlot(
 	return slots ? slots.side : undefined;
 }
 
-/** `Workspace` props that move its tab bar into a title bar slot; none outside the shell. */
-export function titleBarTabBarProps(slot: HTMLElement | null | undefined): {
+/**
+ * `Workspace` props that move its tab bar into a title bar slot; none outside
+ * the shell. The moved bar keeps its `data-pane-area`, which close shortcuts
+ * use to find the active area, and an `inert` bar is hidden.
+ */
+export function titleBarTabBarProps(
+	slot: HTMLElement | null | undefined,
+	{
+		paneArea,
+		inert = false,
+	}: { paneArea: "center" | "right"; inert?: boolean },
+): {
 	tabBarClassName?: string;
 	renderTabBar?: (tabBar: ReactNode) => ReactNode;
 } {
 	if (slot === undefined) return {};
 	return {
 		tabBarClassName: "h-full flex-1 shrink shadow-none",
-		renderTabBar: (tabBar) => (slot ? createPortal(tabBar, slot) : null),
+		renderTabBar: (tabBar) =>
+			slot
+				? createPortal(
+						<div
+							data-pane-area={paneArea}
+							inert={inert}
+							className={inert ? "hidden" : "contents"}
+						>
+							{tabBar}
+						</div>,
+						slot,
+					)
+				: null,
 	};
 }

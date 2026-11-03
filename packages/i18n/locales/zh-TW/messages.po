@@ -3581,7 +3581,7 @@ msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspac
 msgstr "把 Claude Code、Codex、OpenCode 或任何程式碼代理帶進同一個工作區。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
 msgid "Bring in an agent"
-msgstr "加入代理程式"
+msgstr "選擇代理程式"
 
 msgid "Bring over your projects"
 msgstr "遷入專案"

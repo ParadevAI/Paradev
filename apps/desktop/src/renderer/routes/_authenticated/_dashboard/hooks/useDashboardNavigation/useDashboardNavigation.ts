@@ -1,11 +1,16 @@
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
 import {
 	pullRequestsSearchFromFilters,
 	usePullRequestsFilterStore,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsFilterStore";
-import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
+import {
+	organizationChatTabs,
+	useChatTabsStore,
+} from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import {
 	tasksSearchFromFilters,
 	useTasksFilterStore,
@@ -21,8 +26,8 @@ export function useDashboardNavigation() {
 	const matchRoute = useMatchRoute();
 	const { gateFeature, hasAccess } = usePaywall();
 	const cloudUtils = cloudTrpc.useUtils();
-	const tasksFilters = useTasksFilterStore();
-	const pullRequestsFilters = usePullRequestsFilterStore();
+	const organizationId = useActiveOrganizationId();
+	const isChatSection = useIsChatSection();
 
 	// Automations are Pro, but an org that already has some (a downgrade) can
 	// still reach the list to pause, edit, or delete them; the page gates the
@@ -51,11 +56,10 @@ export function useDashboardNavigation() {
 		isHomeOpen: !!matchRoute({ to: "/new-workspace" }),
 		openHome: () => navigate({ to: "/new-workspace" }),
 
-		isChannelsOpen:
-			!!matchRoute({ to: "/channels", fuzzy: true }) ||
-			!!matchRoute({ to: "/devs", fuzzy: true }),
+		isChannelsOpen: isChatSection,
 		openChannels: () => {
-			const { tabs, activeTabId } = useChatTabsStore.getState();
+			const { tabs: allTabs, activeTabId } = useChatTabsStore.getState();
+			const tabs = organizationChatTabs(allTabs, organizationId);
 			const active = tabs.find((tab) => tab.id === activeTabId) ?? tabs.at(-1);
 			return active
 				? navigate({ href: active.href })
@@ -67,10 +71,16 @@ export function useDashboardNavigation() {
 
 		isAutomationsOpen: !!matchRoute({ to: "/automations", fuzzy: true }),
 		openAutomations,
+		openFailedAutomations: () =>
+			navigate({
+				to: "/automations/runs",
+				search: { status: "failed", scope: "mine" },
+			}),
 
 		isTasksOpen: !!matchRoute({ to: "/tasks", fuzzy: true }),
 		openTasks: () =>
 			gateFeature(GATED_FEATURES.TASKS, () => {
+				const tasksFilters = useTasksFilterStore.getState();
 				navigate({
 					to: "/tasks",
 					search: tasksSearchFromFilters({
@@ -86,8 +96,9 @@ export function useDashboardNavigation() {
 			}),
 
 		isPullRequestsOpen: !!matchRoute({ to: "/pull-requests", fuzzy: true }),
-		openPullRequests: () =>
-			navigate({
+		openPullRequests: () => {
+			const pullRequestsFilters = usePullRequestsFilterStore.getState();
+			return navigate({
 				to: "/pull-requests",
 				search: pullRequestsSearchFromFilters({
 					search: pullRequestsFilters.search,
@@ -97,7 +108,8 @@ export function useDashboardNavigation() {
 					includeClosed: pullRequestsFilters.includeClosed,
 					mergedOnly: pullRequestsFilters.mergedOnly,
 				}),
-			}),
+			});
+		},
 
 		isPagesOpen: !!matchRoute({ to: "/pages", fuzzy: true }),
 		openPages: () => navigate({ to: "/pages" }),

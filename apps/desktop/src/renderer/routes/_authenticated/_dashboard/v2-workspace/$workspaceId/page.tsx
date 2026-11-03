@@ -693,7 +693,10 @@ function V2WorkspaceContent() {
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}
-									{...titleBarTabBarProps(titleBarMainSlot)}
+									{...titleBarTabBarProps(titleBarMainSlot, {
+										paneArea: "center",
+										inert: rightPaneMode === "expanded",
+									})}
 									appearance={isParadevShell ? "cards" : "default"}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}

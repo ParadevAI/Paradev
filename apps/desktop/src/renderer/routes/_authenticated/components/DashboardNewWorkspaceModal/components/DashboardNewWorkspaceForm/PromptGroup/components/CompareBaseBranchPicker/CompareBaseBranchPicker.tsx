@@ -15,12 +15,12 @@ import { LuFolderOpen } from "react-icons/lu";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { PLATFORM } from "renderer/hotkeys";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
+import { PickerChevron } from "../../../components/PickerChevron";
 import type { BranchFilter, BranchRow } from "../../../hooks/useBranchContext";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../FormPickerTrigger";
-import { PickerChevron } from "../PickerChevron";
 import { BranchLoadFailure } from "./components/BranchLoadFailure";
 import {
 	type OpenWorkspaceTarget,

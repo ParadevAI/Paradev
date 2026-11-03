@@ -283,7 +283,11 @@ function DashboardLayout() {
 									<NavigationRail />
 									<WorkspaceSidebarPanel
 										collapsedWidth={0}
-										className="border-r-0"
+										className={
+											isWorkspaceSidebarCollapsed
+												? "overflow-visible border-r-0"
+												: "border-r-0"
+										}
 									>
 										<DashboardSidebar
 											isCollapsed={isWorkspaceSidebarCollapsed}

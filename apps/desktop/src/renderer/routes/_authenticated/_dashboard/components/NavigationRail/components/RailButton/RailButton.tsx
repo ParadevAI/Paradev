@@ -8,7 +8,7 @@ export const RAIL_ICON_STROKE_WIDTH = 1.75;
 
 export function railButtonClass(isActive: boolean) {
 	return cn(
-		"relative flex size-9 items-center justify-center rounded-[10px] transition-colors",
+		"relative flex size-9 items-center justify-center rounded-[10px] outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring",
 		isActive
 			? "bg-fill-selected text-foreground"
 			: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",

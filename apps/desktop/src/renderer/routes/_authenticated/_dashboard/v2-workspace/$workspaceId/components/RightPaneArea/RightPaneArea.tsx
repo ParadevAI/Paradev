@@ -100,7 +100,7 @@ export function RightPaneArea({
 				<PullRequestCountsPrefetch key={pr.url} pullRequest={pr.ref} />
 			))}
 			<Workspace<PaneViewerData>
-				{...titleBarTabBarProps(titleBarSideSlot)}
+				{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
 				appearance={isParadevShell ? "cards" : "default"}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}

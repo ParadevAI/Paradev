@@ -188,7 +188,6 @@ export function OrganizationDropdown({
 							: "w-56"
 					}
 				>
-					{/* The rail has no Settings button of its own. */}
 					{variant === "rail" && (
 						<>
 							<DropdownMenuItem

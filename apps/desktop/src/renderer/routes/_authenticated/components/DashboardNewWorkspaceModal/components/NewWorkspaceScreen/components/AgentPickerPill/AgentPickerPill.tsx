@@ -8,6 +8,7 @@ import {
 import { cn } from "@superset/ui/utils";
 import { AtSign } from "lucide-react";
 import { LuCheck, LuChevronDown } from "react-icons/lu";
+import { AgentIcon } from "renderer/components/AgentIcon";
 import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import {
 	MENU_PANEL_CLASS,
@@ -15,7 +16,6 @@ import {
 	PILL_CHEVRON_CLASS,
 	PILL_TRIGGER_CLASS,
 } from "renderer/routes/_authenticated/components/AgentComposer/constants";
-import { AgentIcon } from "./components/AgentIcon";
 
 interface AgentPickerPillProps<TAgentId extends string> {
 	agents: readonly (AgentSelectAgent & { id: TAgentId })[];
@@ -36,13 +36,13 @@ export function AgentPickerPill<TAgentId extends string>({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<button
-					type="button"
-					aria-label={t({ message: "Agent" })}
-					className={cn(PILL_TRIGGER_CLASS, "group")}
-				>
+				<button type="button" className={cn(PILL_TRIGGER_CLASS, "group")}>
 					{selected ? (
-						<AgentIcon agent={selected} className="size-3.5" />
+						<AgentIcon
+							iconId={selected.iconId}
+							presetId={selected.presetId ?? selected.id}
+							className="size-3.5"
+						/>
 					) : (
 						<AtSign className="size-3.5 shrink-0" />
 					)}
@@ -63,7 +63,11 @@ export function AgentPickerPill<TAgentId extends string>({
 						className={MENU_ROW_CLASS}
 						onSelect={() => onSelect(agent.id)}
 					>
-						<AgentIcon agent={agent} className="size-4" />
+						<AgentIcon
+							iconId={agent.iconId}
+							presetId={agent.presetId ?? agent.id}
+							className="size-4"
+						/>
 						<span className="min-w-0 flex-1 truncate">{agent.label}</span>
 						{agent.id === selectedAgentId && (
 							<LuCheck className="size-3.5 shrink-0" />

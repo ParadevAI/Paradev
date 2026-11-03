@@ -13,10 +13,10 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { env } from "renderer/env.renderer";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
+import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { RailButton } from "./components/RailButton";
 import { RailMoreMenu } from "./components/RailMoreMenu";
-import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 
 export const NAVIGATION_RAIL_WIDTH = 52;
 
@@ -76,7 +76,11 @@ export function NavigationRail() {
 				}
 				icon={TimerReset}
 				isActive={navigation.isAutomationsOpen}
-				onClick={navigation.openAutomations}
+				onClick={
+					myFailedCount > 0
+						? navigation.openFailedAutomations
+						: navigation.openAutomations
+				}
 				badge={
 					myFailedCount > 0 ? (
 						<span

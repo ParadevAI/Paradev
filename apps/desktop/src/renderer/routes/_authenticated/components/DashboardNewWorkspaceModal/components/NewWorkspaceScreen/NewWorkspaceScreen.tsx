@@ -1061,7 +1061,14 @@ export function NewWorkspaceScreen({
 					{headerActions}
 				</div>
 				<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
-					<GitHubStarPill surface="new_workspace" className="mb-6" />
+					<h1 className="sr-only">
+						<Trans>What should we build next?</Trans>
+					</h1>
+					<GitHubStarPill
+						surface="new_workspace"
+						className="mb-6"
+						reserveSpace
+					/>
 					<div
 						className="relative flex w-full flex-col gap-2.5"
 						style={{

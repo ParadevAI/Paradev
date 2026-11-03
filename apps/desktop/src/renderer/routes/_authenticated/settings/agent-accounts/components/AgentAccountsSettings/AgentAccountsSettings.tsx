@@ -4,7 +4,7 @@ import { Button } from "@superset/ui/button";
 import { Check, Plus } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useState } from "react";
-import { AgentIcon } from "renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentIcon";
+import { AgentIcon } from "renderer/components/AgentIcon";
 import {
 	isConfigured,
 	useAgentCredential,
