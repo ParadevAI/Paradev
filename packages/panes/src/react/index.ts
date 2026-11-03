@@ -8,6 +8,7 @@ export { usePaneFocus } from "./hooks/usePaneFocus";
 export type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
+	PaneAppearance,
 	PaneContext,
 	PaneDefinition,
 	PaneRegistry,

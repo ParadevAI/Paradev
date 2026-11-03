@@ -3574,6 +3574,9 @@ msgstr "Підключайте будь-якого агента"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Зберіть Claude Code, Codex, OpenCode чи будь-якого кодинг-агента в одному робочому просторі. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
 
+msgid "Bring in an agent"
+msgstr "Підключіть агента"
+
 msgid "Bring over your projects"
 msgstr "Перенесіть свої проєкти"
 
@@ -7123,6 +7126,9 @@ msgstr "Показує мобільну бічну панель."
 
 msgid "Do anything"
 msgstr "Робіть що завгодно"
+
+msgid "Do anything in Paradev"
+msgstr "Робіть що завгодно в Paradev"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Чи потрібні мені власні підписки на кодинг-агентів?"

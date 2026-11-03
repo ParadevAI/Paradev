@@ -3580,6 +3580,9 @@ msgstr "Přiveďte jakéhokoli agenta"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Spojte Claude Code, Codex, OpenCode nebo jakéhokoli kódovacího agenta v jednom pracovním prostoru. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
 
+msgid "Bring in an agent"
+msgstr "Přizvat agenta"
+
 msgid "Bring over your projects"
 msgstr "Převeďte své projekty"
 
@@ -7129,6 +7132,9 @@ msgstr "Zobrazí mobilní postranní panel."
 
 msgid "Do anything"
 msgstr "Zadejte cokoli"
+
+msgid "Do anything in Paradev"
+msgstr "Zadejte cokoli v Paradev"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Potřebuji vlastní předplatné kódovacích agentů?"

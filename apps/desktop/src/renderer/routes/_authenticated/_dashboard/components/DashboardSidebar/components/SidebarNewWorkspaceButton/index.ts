@@ -1,0 +1,1 @@
+export { SidebarNewWorkspaceButton } from "./SidebarNewWorkspaceButton";

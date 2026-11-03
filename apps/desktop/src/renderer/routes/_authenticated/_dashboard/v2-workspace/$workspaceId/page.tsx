@@ -8,6 +8,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -16,6 +17,10 @@ import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/co
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
+import {
+	titleBarTabBarProps,
+	useTitleBarMainSlot,
+} from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
 import {
 	parseSubagentSearch,
 	readSubagentSearch,
@@ -197,6 +202,8 @@ function V2WorkspaceContent() {
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
 	const navigate = Route.useNavigate();
+	const titleBarMainSlot = useTitleBarMainSlot();
+	const isParadevShell = useParadevShell();
 	const consumeSearch = useCallback<ConsumeSearch>(
 		(keys) => {
 			void navigate({
@@ -686,6 +693,11 @@ function V2WorkspaceContent() {
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}
+									{...titleBarTabBarProps(titleBarMainSlot, {
+										paneArea: "center",
+										inert: rightPaneMode === "expanded",
+									})}
+									appearance={isParadevShell ? "cards" : "default"}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}

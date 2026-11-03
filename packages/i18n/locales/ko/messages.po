@@ -3580,6 +3580,9 @@ msgstr "어떤 에이전트든 데려오세요"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode 또는 어떤 코딩 에이전트든 하나의 워크스페이스로 가져오세요. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
 
+msgid "Bring in an agent"
+msgstr "에이전트 불러오기"
+
 msgid "Bring over your projects"
 msgstr "프로젝트 가져오기"
 
@@ -7129,6 +7132,9 @@ msgstr "모바일 사이드바를 표시합니다."
 
 msgid "Do anything"
 msgstr "무엇이든 해보세요"
+
+msgid "Do anything in Paradev"
+msgstr "Paradev에서 무엇이든 해보세요"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "코딩 에이전트 구독이 따로 필요한가요?"

@@ -3580,6 +3580,9 @@ msgstr "どのエージェントでも"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code、Codex、OpenCode、またはあらゆるコーディングエージェントを1つのワークスペースに。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
 
+msgid "Bring in an agent"
+msgstr "エージェントを選択"
+
 msgid "Bring over your projects"
 msgstr "プロジェクトを引き継ぐ"
 
@@ -7129,6 +7132,9 @@ msgstr "モバイルのサイドバーを表示します。"
 
 msgid "Do anything"
 msgstr "何でもどうぞ"
+
+msgid "Do anything in Paradev"
+msgstr "Paradev で何でもどうぞ"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "コーディングエージェントの契約は自分で用意する必要がありますか?"

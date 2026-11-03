@@ -3580,6 +3580,9 @@ msgstr "Bawa Agen Apa Pun"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Bawa Claude Code, Codex, OpenCode, atau agen coding apa pun ke dalam satu workspace. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
+msgid "Bring in an agent"
+msgstr "Libatkan agen"
+
 msgid "Bring over your projects"
 msgstr "Impor proyek Anda"
 
@@ -7129,6 +7132,9 @@ msgstr "Menampilkan sidebar mobile."
 
 msgid "Do anything"
 msgstr "Lakukan apa saja"
+
+msgid "Do anything in Paradev"
+msgstr "Lakukan apa saja di Paradev"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Apakah saya perlu langganan agen coding sendiri?"

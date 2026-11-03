@@ -90,6 +90,7 @@ export function SidebarSlide({
 
 	return (
 		<div
+			data-sidebar-slide=""
 			className="relative flex h-full shrink-0 ease-[ease] motion-reduce:transition-none"
 			style={{ width: inFlow ? undefined : panelWidth, ...transition }}
 		>

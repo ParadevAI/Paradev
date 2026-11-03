@@ -14,6 +14,7 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
+import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
 import { usePaneAside } from "../../../../../../hooks/usePaneAside";
 import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
@@ -94,6 +95,7 @@ export function Pane<TData>({
 	onPaneError,
 }: PaneComponentProps<TData>) {
 	const { t } = useLingui();
+	const isCards = usePaneAppearance() === "cards";
 	const definition = registry[pane.kind];
 
 	const tabs = store.getState().tabs;
@@ -314,11 +316,15 @@ export function Pane<TData>({
 					// width (panes resize independently of the viewport). Lives here,
 					// not on the header, so the containment's stacking context still
 					// holds both the header's absolute popovers and the pane's banners.
-					className={`@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
-						isActive && parentDirection !== null
-							? "border-primary/15"
-							: "border-transparent"
-					}`}
+					className={
+						isCards
+							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none`
+							: `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
+									isActive && parentDirection !== null
+										? "border-primary/15"
+										: "border-transparent"
+								}`
+					}
 					onPointerDownCapture={context.actions.focus}
 				>
 					{!definition?.hideHeader?.(context) && (
@@ -348,6 +354,7 @@ export function Pane<TData>({
 						<PaneContent
 							aside={aside}
 							insetsAside={definition?.insetsAside === true}
+							dimmed={isCards && !isActive && parentDirection !== null}
 							render={() =>
 								definition ? (
 									definition.renderPane(context)

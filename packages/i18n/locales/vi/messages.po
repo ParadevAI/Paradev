@@ -3580,6 +3580,9 @@ msgstr "Mang mọi agent về đây"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Đưa Claude Code, Codex, OpenCode hoặc bất kỳ agent lập trình nào vào một workspace. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
+msgid "Bring in an agent"
+msgstr "Chọn một agent"
+
 msgid "Bring over your projects"
 msgstr "Nhập các dự án của bạn"
 
@@ -7129,6 +7132,9 @@ msgstr "Hiển thị thanh bên trên di động."
 
 msgid "Do anything"
 msgstr "Làm bất cứ điều gì"
+
+msgid "Do anything in Paradev"
+msgstr "Làm bất cứ điều gì trong Paradev"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Tôi có cần gói đăng ký coding agent riêng không?"

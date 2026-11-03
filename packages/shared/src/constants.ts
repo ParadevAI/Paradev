@@ -162,6 +162,12 @@ export const FEATURE_FLAGS = {
 	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
 	/** In-app channels in the desktop sidebar. */
 	CHANNELS: "channels",
+	/**
+	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
+	 * card, pane cards and the inline home composer. Read once per launch, so
+	 * a change in PostHog applies on the next start.
+	 */
+	PARADEV_SHELL: "paradev-shell",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**

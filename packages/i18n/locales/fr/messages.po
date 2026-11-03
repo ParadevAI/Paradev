@@ -3580,6 +3580,9 @@ msgstr "Amenez n'importe quel agent"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Réunissez Claude Code, Codex, OpenCode ou n'importe quel agent de code dans un seul espace de travail. Lancez des tâches en parallèle sur des branches séparées et relisez tout au même endroit."
 
+msgid "Bring in an agent"
+msgstr "Faire intervenir un agent"
+
 msgid "Bring over your projects"
 msgstr "Importez vos projets"
 
@@ -7129,6 +7132,9 @@ msgstr "Affiche la barre latérale mobile."
 
 msgid "Do anything"
 msgstr "Demandez ce que vous voulez"
+
+msgid "Do anything in Paradev"
+msgstr "Demandez ce que vous voulez à Paradev"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Ai-je besoin de mes propres abonnements aux agents de code ?"

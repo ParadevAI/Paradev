@@ -31,6 +31,7 @@ import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferen
 import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
@@ -86,6 +87,7 @@ import {
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
 import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
+import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
@@ -131,6 +133,7 @@ export function NewWorkspaceScreen({
 	preSelectedHostId = null,
 }: NewWorkspaceScreenProps) {
 	const { t } = useLingui();
+	const isParadevShell = useParadevShell();
 	const navigate = useNavigate();
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
@@ -877,56 +880,288 @@ export function NewWorkspaceScreen({
 		return () => window.removeEventListener("keydown", handler);
 	}, [isOpen, handleSubmit]);
 
+	const headerActions = (
+		<>
+			{selectedProject && !needsSetup && (
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							aria-label={t({
+								message: "Update naming instructions",
+							})}
+							className="size-7 text-muted-foreground"
+							onClick={handleGoToNamingInstructions}
+						>
+							<Settings2Icon className="size-4" />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>
+						<Trans>Update naming instructions for {selectedProject.name}</Trans>
+					</TooltipContent>
+				</Tooltip>
+			)}
+			<PromptHistoryCommand
+				onSelect={applyPrompt}
+				tooltipLabel={t({
+					message: "Previous prompts",
+				})}
+			>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					aria-label={t({
+						message: "Previous prompts",
+					})}
+					className="size-7 text-muted-foreground"
+				>
+					<HistoryIcon className="size-4" />
+				</Button>
+			</PromptHistoryCommand>
+		</>
+	);
+	const samplePromptsList = (
+		<SamplePrompts
+			prompts={samplePrompts}
+			onSelect={applyPrompt}
+			onDismiss={handleDismissSamplePrompts}
+			canDismiss={hasRealWorkspace}
+			tier={samplePromptTier}
+		/>
+	);
+	const devicePicker = (
+		<DevicePicker hostId={draft.hostId} onSelectHostId={handleSelectHostId} />
+	);
+	const contextPickers = (
+		<>
+			<ProjectPickerPill
+				selectedProject={selectedProject}
+				projects={isCloudHost ? cloudHostProjects : projects}
+				isSessionSelected={draft.isSession}
+				githubRepositories={isCloudHost ? github.repositories : []}
+				githubConnection={isCloudHost ? github.connection : null}
+				isLoading={!areProjectsReady || (isCloudHost && github.isLoading)}
+				onSelectProject={handleSelectProject}
+			/>
+			{isCloudHost && (
+				<EnvironmentPickerPill
+					selectedEnvironment={resolvedEnvironment}
+					linked={cloudSelection.linked}
+					other={cloudSelection.other}
+					projectName={draft.isSession ? undefined : selectedProject?.name}
+					onSelectEnvironment={handleSelectEnvironment}
+					onCreateEnvironment={() => setIsCreatingEnvironment(true)}
+					onManageEnvironments={() => {
+						closeModal();
+						void navigate({ to: "/settings/environments" });
+					}}
+					isLoading={environmentsQuery.isLoading}
+				/>
+			)}
+			{isCloudHost && (
+				<MachineSizePickerPill
+					machineSize={cloudSelection.machineSize}
+					onSelectMachineSize={handleSelectMachineSize}
+				/>
+			)}
+			{activeOrganizationId && (
+				<CreateEnvironmentFlow
+					onOpenChange={setIsCreatingEnvironment}
+					onStarted={closeModal}
+					open={isCreatingEnvironment}
+					organizationId={activeOrganizationId}
+					projectId={draft.isSession ? null : projectId}
+				/>
+			)}
+			{linkedPR ? (
+				<>
+					<CheckoutPickerPill
+						checkout="worktree"
+						onSelectCheckout={() => {}}
+						disabled
+					/>
+					<span className="flex items-center gap-1 text-xs text-muted-foreground">
+						<LuGitPullRequest className="size-3 shrink-0" />
+						<Trans>based off PR #{linkedPR.prNumber}</Trans>
+					</span>
+				</>
+			) : draft.hostId === CLOUD_HOST_ID ? (
+				<CompareBaseBranchPicker {...pickerProps} />
+			) : draft.isSession ? null : (
+				<>
+					<CheckoutPickerPill
+						checkout={draft.checkout}
+						onSelectCheckout={(checkout) => {
+							setCheckoutDefault(checkout);
+							updateDraft({ checkout });
+						}}
+					/>
+					{draft.checkout === "worktree" && (
+						<CompareBaseBranchPicker
+							{...pickerProps}
+							onChangeProjectLocation={handleGoToSetup}
+						/>
+					)}
+				</>
+			)}
+		</>
+	);
+	const modePicker = pickerModes && (
+		<ModePicker
+			currentModeId={
+				selectedMode ?? startModes?.defaultModeId ?? AGENT_DEFAULT_OPTION_ID
+			}
+			hiddenModeIds={startModes ? undefined : NO_HIDDEN_MODES}
+			modes={pickerModes}
+			onSelect={(modeId) =>
+				setSelectedMode(
+					modeId === AGENT_DEFAULT_OPTION_ID ||
+						modeId === startModes?.defaultModeId
+						? null
+						: modeId,
+				)
+			}
+		/>
+	);
+	const setupButton = needsSetup && (
+		<Button
+			type="button"
+			variant="outline"
+			size="sm"
+			className="h-6 px-2 text-[11px] text-amber-500 hover:text-amber-500"
+			onClick={handleGoToSetup}
+		>
+			<Trans>Set up project…</Trans>
+		</Button>
+	);
+	const resizeHandles = (
+		<SymmetricResizeHandles
+			currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}
+			minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
+			maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
+			onWidthChange={setLiveComposerWidth}
+			onWidthCommit={(width) => {
+				setStoredComposerWidth(width);
+				setLiveComposerWidth(null);
+			}}
+			onReset={() => {
+				setStoredComposerWidth(null);
+				setLiveComposerWidth(null);
+			}}
+		/>
+	);
+
+	if (isParadevShell) {
+		return (
+			<ComposerDropZone className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background">
+				<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
+					{headerActions}
+				</div>
+				<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
+					<h1 className="sr-only">
+						<Trans>What should we build next?</Trans>
+					</h1>
+					<GitHubStarPill
+						surface="new_workspace"
+						className="mb-6"
+						reserveSpace
+					/>
+					<div
+						className="relative flex w-full flex-col gap-2.5"
+						style={{
+							maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
+						}}
+					>
+						<AnimatePresence initial={false}>
+							{isPromptEmpty &&
+								!samplePromptsPending &&
+								!samplePromptsDismissed && (
+									<motion.div
+										key="sample-prompts"
+										initial={{ opacity: 0, y: 12 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, transition: { duration: 0 } }}
+										transition={{
+											type: "tween",
+											duration: 0.15,
+											ease: "easeOut",
+										}}
+										// Out of flow, below the block: the composer is centred on
+										// the screen and must not move when the suggestions go.
+										className="absolute inset-x-0 top-full mt-3"
+									>
+										{samplePromptsList}
+									</motion.div>
+								)}
+						</AnimatePresence>
+						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
+							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+								{contextPickers}
+							</div>
+							{devicePicker}
+						</div>
+						<AgentComposer
+							layout="inline"
+							allowEmptySubmit
+							autoFocus
+							className="w-full"
+							draft={{
+								segments: draft.promptDraft,
+								attachments: draft.promptAttachments,
+							}}
+							disabled={needsSetup}
+							key={`${resetKey}-${promptSeed}`}
+							onDraftChange={({ segments, attachments }) =>
+								updateDraft({
+									promptDraft: segments,
+									promptAttachments: attachments,
+								})
+							}
+							onSubmit={() => {
+								handleSubmit();
+								return false;
+							}}
+							mentionProviders={mentionProviders}
+							pending={isCreating}
+							placeholder={t({ message: "Do anything in Paradev" })}
+						/>
+						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
+							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+								{modePicker}
+								<AgentPickerPill
+									agents={v2Agents}
+									selectedAgentId={selectedAgent}
+									onSelect={setSelectedAgent}
+								/>
+							</div>
+							<div className="flex shrink-0 items-center gap-1.5">
+								{setupButton}
+								{selectedAgent !== "none" && (
+									<ModelPicker
+										configOptions={launchOptions}
+										onOpenChange={setModelPickerOpen}
+										onSelect={selectLaunchOption}
+										open={modelPickerOpen}
+									/>
+								)}
+							</div>
+						</div>
+						{resizeHandles}
+					</div>
+				</div>
+			</ComposerDropZone>
+		);
+	}
+
 	// ── Render ───────────────────────────────────────────────────────
 	return (
 		<ComposerDropZone className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background">
 			<PageHeader
 				className="sticky top-0 z-10 w-full bg-background"
-				end={
-					<div className="flex items-center gap-0.5">
-						{selectedProject && !needsSetup && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Button
-										type="button"
-										variant="ghost"
-										size="icon"
-										aria-label={t({
-											message: "Update naming instructions",
-										})}
-										className="size-7 text-muted-foreground"
-										onClick={handleGoToNamingInstructions}
-									>
-										<Settings2Icon className="size-4" />
-									</Button>
-								</TooltipTrigger>
-								<TooltipContent>
-									<Trans>
-										Update naming instructions for {selectedProject.name}
-									</Trans>
-								</TooltipContent>
-							</Tooltip>
-						)}
-						<PromptHistoryCommand
-							onSelect={applyPrompt}
-							tooltipLabel={t({
-								message: "Previous prompts",
-							})}
-						>
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								aria-label={t({
-									message: "Previous prompts",
-								})}
-								className="size-7 text-muted-foreground"
-							>
-								<HistoryIcon className="size-4" />
-							</Button>
-						</PromptHistoryCommand>
-					</div>
-				}
+				end={<div className="flex items-center gap-0.5">{headerActions}</div>}
 			/>
 			<div className="flex flex-1 flex-col items-center justify-center gap-8">
 				<SupersetIcon className="h-10 w-auto text-muted-foreground/70" />
@@ -962,13 +1197,7 @@ export function NewWorkspaceScreen({
 									// sets overlap the heading instead.
 									className="mb-1"
 								>
-									<SamplePrompts
-										prompts={samplePrompts}
-										onSelect={applyPrompt}
-										onDismiss={handleDismissSamplePrompts}
-										canDismiss={hasRealWorkspace}
-										tier={samplePromptTier}
-									/>
+									{samplePromptsList}
 								</motion.div>
 							)}
 					</AnimatePresence>
@@ -995,27 +1224,7 @@ export function NewWorkspaceScreen({
 						mentionProviders={mentionProviders}
 						pending={isCreating}
 						placeholder={promptPlaceholder}
-						toolbar={
-							pickerModes && (
-								<ModePicker
-									currentModeId={
-										selectedMode ??
-										startModes?.defaultModeId ??
-										AGENT_DEFAULT_OPTION_ID
-									}
-									hiddenModeIds={startModes ? undefined : NO_HIDDEN_MODES}
-									modes={pickerModes}
-									onSelect={(modeId) =>
-										setSelectedMode(
-											modeId === AGENT_DEFAULT_OPTION_ID ||
-												modeId === startModes?.defaultModeId
-												? null
-												: modeId,
-										)
-									}
-								/>
-							)
-						}
+						toolbar={modePicker}
 						toolbarEnd={
 							agentSwitcher && (
 								<ModelPicker
@@ -1030,111 +1239,12 @@ export function NewWorkspaceScreen({
 					/>
 					<div className="mt-2 flex items-center justify-between gap-2">
 						<div className="flex min-w-0 flex-1 items-center gap-2">
-							<DevicePicker
-								hostId={draft.hostId}
-								onSelectHostId={handleSelectHostId}
-							/>
-							<ProjectPickerPill
-								selectedProject={selectedProject}
-								projects={isCloudHost ? cloudHostProjects : projects}
-								isSessionSelected={draft.isSession}
-								githubRepositories={isCloudHost ? github.repositories : []}
-								githubConnection={isCloudHost ? github.connection : null}
-								isLoading={
-									!areProjectsReady || (isCloudHost && github.isLoading)
-								}
-								onSelectProject={handleSelectProject}
-							/>
-							{isCloudHost && (
-								<EnvironmentPickerPill
-									selectedEnvironment={resolvedEnvironment}
-									linked={cloudSelection.linked}
-									other={cloudSelection.other}
-									projectName={
-										draft.isSession ? undefined : selectedProject?.name
-									}
-									onSelectEnvironment={handleSelectEnvironment}
-									onCreateEnvironment={() => setIsCreatingEnvironment(true)}
-									onManageEnvironments={() => {
-										closeModal();
-										void navigate({ to: "/settings/environments" });
-									}}
-									isLoading={environmentsQuery.isLoading}
-								/>
-							)}
-							{isCloudHost && (
-								<MachineSizePickerPill
-									machineSize={cloudSelection.machineSize}
-									onSelectMachineSize={handleSelectMachineSize}
-								/>
-							)}
-							{activeOrganizationId && (
-								<CreateEnvironmentFlow
-									onOpenChange={setIsCreatingEnvironment}
-									onStarted={closeModal}
-									open={isCreatingEnvironment}
-									organizationId={activeOrganizationId}
-									projectId={draft.isSession ? null : projectId}
-								/>
-							)}
-							{linkedPR ? (
-								<>
-									<CheckoutPickerPill
-										checkout="worktree"
-										onSelectCheckout={() => {}}
-										disabled
-									/>
-									<span className="flex items-center gap-1 text-xs text-muted-foreground">
-										<LuGitPullRequest className="size-3 shrink-0" />
-										<Trans>based off PR #{linkedPR.prNumber}</Trans>
-									</span>
-								</>
-							) : draft.hostId === CLOUD_HOST_ID ? (
-								<CompareBaseBranchPicker {...pickerProps} />
-							) : draft.isSession ? null : (
-								<>
-									<CheckoutPickerPill
-										checkout={draft.checkout}
-										onSelectCheckout={(checkout) => {
-											setCheckoutDefault(checkout);
-											updateDraft({ checkout });
-										}}
-									/>
-									{draft.checkout === "worktree" && (
-										<CompareBaseBranchPicker
-											{...pickerProps}
-											onChangeProjectLocation={handleGoToSetup}
-										/>
-									)}
-								</>
-							)}
+							{devicePicker}
+							{contextPickers}
 						</div>
-						{needsSetup && (
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								className="h-6 px-2 text-[11px] text-amber-500 hover:text-amber-500"
-								onClick={handleGoToSetup}
-							>
-								<Trans>Set up project…</Trans>
-							</Button>
-						)}
+						{setupButton}
 					</div>
-					<SymmetricResizeHandles
-						currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}
-						minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
-						maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
-						onWidthChange={setLiveComposerWidth}
-						onWidthCommit={(width) => {
-							setStoredComposerWidth(width);
-							setLiveComposerWidth(null);
-						}}
-						onReset={() => {
-							setStoredComposerWidth(null);
-							setLiveComposerWidth(null);
-						}}
-					/>
+					{resizeHandles}
 				</div>
 			</div>
 		</ComposerDropZone>

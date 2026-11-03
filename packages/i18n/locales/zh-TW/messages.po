@@ -3580,6 +3580,9 @@ msgstr "帶上任意代理程式"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "把 Claude Code、Codex、OpenCode 或任何程式碼代理帶進同一個工作區。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
+msgid "Bring in an agent"
+msgstr "選擇代理程式"
+
 msgid "Bring over your projects"
 msgstr "遷入專案"
 
@@ -7129,6 +7132,9 @@ msgstr "顯示行動版側邊欄。"
 
 msgid "Do anything"
 msgstr "做任何事"
+
+msgid "Do anything in Paradev"
+msgstr "在 Paradev 中做任何事"
 
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "我需要自備編碼代理程式的訂閱嗎？"
