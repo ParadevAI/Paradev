@@ -6016,6 +6016,9 @@ msgstr "Không thể lưu Dev"
 msgid "Couldn't save the routine"
 msgstr "Không thể lưu quy trình"
 
+msgid "Couldn't search your chats"
+msgstr "Không thể tìm kiếm các cuộc trò chuyện của bạn"
+
 msgid "Couldn't send comment"
 msgstr "Không thể gửi bình luận"
 

@@ -6016,6 +6016,9 @@ msgstr "Devを保存できませんでした"
 msgid "Couldn't save the routine"
 msgstr "ルーティンを保存できませんでした"
 
+msgid "Couldn't search your chats"
+msgstr "チャットを検索できませんでした"
+
 msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
 

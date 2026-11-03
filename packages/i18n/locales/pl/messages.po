@@ -6016,6 +6016,9 @@ msgstr "Nie udało się zapisać Deva"
 msgid "Couldn't save the routine"
 msgstr "Nie udało się zapisać rutyny"
 
+msgid "Couldn't search your chats"
+msgstr "Nie udało się przeszukać czatów"
+
 msgid "Couldn't send comment"
 msgstr "Nie udało się wysłać komentarza"
 

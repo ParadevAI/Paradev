@@ -6016,6 +6016,9 @@ msgstr "Не удалось сохранить Dev"
 msgid "Couldn't save the routine"
 msgstr "Не удалось сохранить рутину"
 
+msgid "Couldn't search your chats"
+msgstr "Не удалось выполнить поиск по чатам"
+
 msgid "Couldn't send comment"
 msgstr "Не удалось отправить комментарий"
 

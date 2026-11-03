@@ -6010,6 +6010,9 @@ msgstr "Не вдалося зберегти Dev"
 msgid "Couldn't save the routine"
 msgstr "Не вдалося зберегти рутину"
 
+msgid "Couldn't search your chats"
+msgstr "Не вдалося виконати пошук у чатах"
+
 msgid "Couldn't send comment"
 msgstr "Не вдалося надіслати коментар"
 

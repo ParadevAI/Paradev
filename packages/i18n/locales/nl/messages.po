@@ -6016,6 +6016,9 @@ msgstr "Kan de Dev niet opslaan"
 msgid "Couldn't save the routine"
 msgstr "Kan de routine niet opslaan"
 
+msgid "Couldn't search your chats"
+msgstr "Kon je chats niet doorzoeken"
+
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
 

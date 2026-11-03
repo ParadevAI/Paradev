@@ -6016,6 +6016,9 @@ msgstr "無法儲存 Dev"
 msgid "Couldn't save the routine"
 msgstr "無法儲存例行任務"
 
+msgid "Couldn't search your chats"
+msgstr "無法搜尋你的聊天"
+
 msgid "Couldn't send comment"
 msgstr "無法傳送評論"
 

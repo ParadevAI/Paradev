@@ -6016,6 +6016,9 @@ msgstr "Dev를 저장할 수 없습니다"
 msgid "Couldn't save the routine"
 msgstr "루틴을 저장할 수 없습니다"
 
+msgid "Couldn't search your chats"
+msgstr "채팅을 검색할 수 없습니다"
+
 msgid "Couldn't send comment"
 msgstr "코멘트를 보내지 못했습니다"
 
