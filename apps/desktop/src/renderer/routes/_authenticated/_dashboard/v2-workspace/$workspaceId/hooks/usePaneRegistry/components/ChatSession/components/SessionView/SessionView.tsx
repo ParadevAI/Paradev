@@ -71,7 +71,7 @@ import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
-import { LiveChangesPill } from "./components/LiveChangesPill";
+import { ComposerChips } from "./components/ComposerChips";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -746,8 +746,14 @@ export function SessionView({
 						</ConnectionNotice>
 					)
 				)}
-				{runningTurnId && !focusedSubagentId && (
-					<LiveChangesPill refreshKey={liveRefreshKey} turnId={runningTurnId} />
+				{!focusedSubagentId && (
+					<ComposerChips
+						backgroundTasks={sessionState?.backgroundTasks}
+						liveRefreshKey={liveRefreshKey}
+						onOpenSubagent={openSubagent}
+						onStopTask={onStopTask}
+						runningTurnId={runningTurnId}
+					/>
 				)}
 				<WorkDrawer
 					notice={

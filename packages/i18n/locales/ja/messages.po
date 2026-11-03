@@ -3299,6 +3299,9 @@ msgstr "支援者"
 msgid "Background"
 msgstr "背景"
 
+msgid "Background · {count}"
+msgstr "バックグラウンド · {count}"
+
 msgid "Background processes"
 msgstr "バックグラウンドプロセス"
 
@@ -18244,6 +18247,9 @@ msgstr "サブエージェント"
 
 msgid "Subagents"
 msgstr "サブエージェント"
+
+msgid "Subagents · {count}"
+msgstr "サブエージェント · {count}"
 
 msgid "Subject contains..."
 msgstr "件名に含む..."

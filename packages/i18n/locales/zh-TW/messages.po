@@ -3299,6 +3299,9 @@ msgstr "投資方"
 msgid "Background"
 msgstr "背景"
 
+msgid "Background · {count}"
+msgstr "背景執行 · {count}"
+
 msgid "Background processes"
 msgstr "背景處理程序"
 
@@ -18244,6 +18247,9 @@ msgstr "子代理程式"
 
 msgid "Subagents"
 msgstr "子代理程式"
+
+msgid "Subagents · {count}"
+msgstr "子代理程式 · {count}"
 
 msgid "Subject contains..."
 msgstr "主題包含..."

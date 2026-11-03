@@ -3299,6 +3299,9 @@ msgstr "Được hậu thuẫn bởi"
 msgid "Background"
 msgstr "Nền"
 
+msgid "Background · {count}"
+msgstr "Chạy nền · {count}"
+
 msgid "Background processes"
 msgstr "Tiến trình nền"
 
@@ -18244,6 +18247,9 @@ msgstr "Agent con"
 
 msgid "Subagents"
 msgstr "Agent con"
+
+msgid "Subagents · {count}"
+msgstr "Agent con · {count}"
 
 msgid "Subject contains..."
 msgstr "Tiêu đề chứa..."

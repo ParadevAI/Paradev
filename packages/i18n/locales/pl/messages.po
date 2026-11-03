@@ -3299,6 +3299,9 @@ msgstr "Wspierają nas"
 msgid "Background"
 msgstr "Tło"
 
+msgid "Background · {count}"
+msgstr "W tle · {count}"
+
 msgid "Background processes"
 msgstr "Procesy w tle"
 
@@ -18244,6 +18247,9 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagenci"
+
+msgid "Subagents · {count}"
+msgstr "Subagenci · {count}"
 
 msgid "Subject contains..."
 msgstr "Temat zawiera..."

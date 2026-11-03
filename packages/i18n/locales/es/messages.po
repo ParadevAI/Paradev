@@ -3299,6 +3299,9 @@ msgstr "Con el respaldo de"
 msgid "Background"
 msgstr "Fondo"
 
+msgid "Background · {count}"
+msgstr "En segundo plano · {count}"
+
 msgid "Background processes"
 msgstr "Procesos en segundo plano"
 
@@ -18244,6 +18247,9 @@ msgstr "Subagente"
 
 msgid "Subagents"
 msgstr "Subagentes"
+
+msgid "Subagents · {count}"
+msgstr "Subagentes · {count}"
 
 msgid "Subject contains..."
 msgstr "El asunto contiene..."
