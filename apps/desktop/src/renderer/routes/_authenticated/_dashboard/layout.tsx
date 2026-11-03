@@ -19,6 +19,7 @@ import { DashboardSidebarPortsProvider } from "renderer/routes/_authenticated/_d
 import { PortForwardsProvider } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { WorkspaceSidebarPanel } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
+import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
 import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
@@ -131,6 +132,7 @@ function DashboardLayout() {
 		[hostWorkspaces, currentV2WorkspaceId],
 	);
 	const { machineId: localMachineId } = useLocalHostService();
+	const openNewWorkspaceInViewedProject = useOpenNewWorkspaceInViewedProject();
 	useWorkspaceNamingFailedToast();
 	// Forwarding needs port data only for a workspace on another machine;
 	// a local selection must not switch on cross-host port polling.
@@ -156,10 +158,9 @@ function DashboardLayout() {
 	});
 	useHotkey("TOGGLE_WORKSPACE_SIDEBAR", toggleWorkspaceSidebarCollapsed);
 	useHotkey("NEW_WORKSPACE", () =>
-		openNewWorkspace(
-			currentWorkspace?.projectId ?? currentV2Workspace?.projectId ?? undefined,
-			currentV2Workspace?.hostId,
-		),
+		currentWorkspace?.projectId
+			? openNewWorkspace(currentWorkspace.projectId)
+			: openNewWorkspaceInViewedProject(),
 	);
 	useHotkey(
 		"QUICK_CREATE_WORKSPACE",
