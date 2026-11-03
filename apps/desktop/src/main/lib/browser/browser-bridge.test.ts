@@ -43,23 +43,30 @@ function fakePane(id: number, partition: string) {
 
 const INSTALLED_ID = "bcjindcccaagfpapjjmafapmmgkkhgoa";
 const extensionCalls: string[] = [];
-let userSays = false;
+let userSays: boolean | "never answers" = false;
+// Resolves as soon as the question closes: on the user's answer or the bridge's abort.
+const answer = (signal: AbortSignal) =>
+	userSays === "never answers"
+		? new Promise<boolean>((resolve) =>
+				signal.addEventListener("abort", () => resolve(false)),
+			)
+		: Promise.resolve(userSays);
 const extensions: UserExtensions = {
 	list: () => [
 		{ id: INSTALLED_ID, name: "JSON Formatter", version: "1", pinned: false },
 	],
-	install: async (id) => {
+	install: async (id, signal) => {
 		extensionCalls.push(`install ${id}`);
-		return userSays
+		return (await answer(signal))
 			? {
 					status: "installed",
 					extension: { id, name: "New", version: "1" },
 				}
 			: { status: "declined" };
 	},
-	remove: async (id) => {
+	remove: async (id, signal) => {
 		extensionCalls.push(`remove ${id}`);
-		return userSays;
+		return answer(signal);
 	},
 	setPinned: (id, pinned) => {
 		extensionCalls.push(`pin ${id} ${pinned}`);
@@ -83,7 +90,7 @@ beforeAll(async () => {
 	fakePane(902, AGENT_BROWSER_PARTITION);
 	browserManager.register("user-pane", 901, "ws-bridge");
 	browserManager.register("agent-pane", 902, "ws-bridge");
-	await startBrowserBridge({ homeDir: home, extensions });
+	await startBrowserBridge({ homeDir: home, extensions, answerDeadlineMs: 50 });
 });
 
 afterAll(async () => {
@@ -211,6 +218,7 @@ test("the CLI manages the user's extensions only with the user's yes, and never 
 			body: JSON.stringify(body),
 		});
 	const otherId = "a".repeat(32);
+	const missingId = "b".repeat(32);
 
 	userSays = false;
 	expect(
@@ -225,7 +233,7 @@ test("the CLI manages the user's extensions only with the user's yes, and never 
 	).toMatchObject({ status: "installed" });
 
 	expect(
-		(await post("/extensions/remove", { extensionId: otherId })).status,
+		(await post("/extensions/remove", { extensionId: missingId })).status,
 	).toBe(404);
 	expect(
 		(await post("/extensions/pin", { extensionId: "../../etc" })).status,
@@ -233,9 +241,20 @@ test("the CLI manages the user's extensions only with the user's yes, and never 
 	expect(
 		(await post("/extensions/activate", { extensionId: INSTALLED_ID })).status,
 	).toBe(404);
+	await post("/extensions/pin", { extensionId: INSTALLED_ID, pinned: true });
+	await post("/extensions/pin", { extensionId: INSTALLED_ID, pinned: false });
 	expect(extensionCalls).toEqual([
 		`install ${otherId}`,
 		`remove ${INSTALLED_ID}`,
 		`install ${otherId}`,
+		`pin ${INSTALLED_ID} true`,
+		`pin ${INSTALLED_ID} false`,
 	]);
+
+	userSays = "never answers";
+	const unanswered = await post("/extensions/install", {
+		extensionId: otherId,
+	});
+	expect(unanswered.status).toBe(408);
+	expect((await unanswered.json()).error).toContain("Nothing changed");
 });

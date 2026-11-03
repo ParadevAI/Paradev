@@ -9,6 +9,8 @@ interface ExtensionMenuRowProps {
 	onActivate: () => void;
 	onTogglePin: () => void;
 	onRemove: () => void;
+	/** True while the user is typing a name to jump to a row; Space is then part of the name. */
+	isSearching: (at: number) => boolean;
 }
 
 const ROW_ACTION =
@@ -23,6 +25,7 @@ export function ExtensionMenuRow({
 	onActivate,
 	onTogglePin,
 	onRemove,
+	isSearching,
 }: ExtensionMenuRowProps) {
 	const { t } = useLingui();
 	const { name, pinned } = extension;
@@ -30,7 +33,7 @@ export function ExtensionMenuRow({
 		<DropdownMenuItem
 			onSelect={onActivate}
 			onKeyDown={(event) => {
-				if (event.key === " ") {
+				if (event.key === " " && !isSearching(event.timeStamp)) {
 					event.preventDefault();
 					onTogglePin();
 				} else if (event.key === "Delete" || event.key === "Backspace") {

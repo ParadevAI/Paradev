@@ -292,7 +292,7 @@ export function setBrowserExtensionPinned(
 export async function removeBrowserExtension(
 	extensionId: string,
 ): Promise<void> {
-	if (!host) return;
+	if (!host) throw new Error("Browser extensions have not started yet");
 	const extension = host.session.extensions.getExtension(extensionId);
 	if (!extension || !isUserExtension(extension, browserExtensionsPath())) {
 		throw new Error(

@@ -48,25 +48,29 @@ export const userExtensions: UserExtensions = {
 			}));
 	},
 
-	async install(extensionId) {
+	async install(extensionId, signal) {
 		const existing = session
 			.fromPartition(BROWSER_PARTITION)
 			.extensions.getExtension(extensionId);
+		if (existing && !isUserExtension(existing, browserExtensionsPath())) {
+			throw new Error(`${existing.name} is built into the app`);
+		}
 		if (existing)
 			return { status: "already-installed", extension: summary(existing) };
 		const extension = await installWebStoreExtension(
 			session.fromPartition(BROWSER_PARTITION),
 			extensionId,
 			dialogWindow(),
+			signal,
 		);
 		if (!extension) return { status: "declined" };
 		setBrowserExtensionPinned(extension.id, true);
 		return { status: "installed", extension: summary(extension) };
 	},
 
-	async remove(extensionId) {
+	async remove(extensionId, signal) {
 		const { name } = installed(extensionId);
-		if (!(await confirmRemoval(name, dialogWindow()))) return false;
+		if (!(await confirmRemoval(name, dialogWindow(), signal))) return false;
 		await removeBrowserExtension(extensionId);
 		return true;
 	},

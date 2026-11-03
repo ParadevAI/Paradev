@@ -51,6 +51,10 @@ const LOGIN_IMPORT_REFUSED = "The user did not allow this login import.";
 const EXTENSION_ID = /^[a-p]{32}$/;
 const EXTENSION_INSTALL_REFUSED = "The user did not allow this extension.";
 const EXTENSION_REMOVE_REFUSED = "The user kept this extension.";
+const EXTENSION_UNANSWERED =
+	"Nobody answered the question in the app in time. Nothing changed.";
+// Under the relay's 65 s request limit, so a CLI that gives up never sees a later yes take effect.
+const ANSWER_DEADLINE_MS = 50_000;
 
 export interface UserExtensionSummary {
 	id: string;
@@ -71,9 +75,13 @@ export type UserExtensionInstall =
  */
 export interface UserExtensions {
 	list(): (UserExtensionSummary & { pinned: boolean })[];
-	install(extensionId: string): Promise<UserExtensionInstall>;
-	/** False when the user says no. */
-	remove(extensionId: string): Promise<boolean>;
+	/** The question closes, as a no, when `signal` aborts. */
+	install(
+		extensionId: string,
+		signal: AbortSignal,
+	): Promise<UserExtensionInstall>;
+	/** False when the user says no, or `signal` aborts first. */
+	remove(extensionId: string, signal: AbortSignal): Promise<boolean>;
 	setPinned(extensionId: string, pinned: boolean): void;
 }
 
@@ -175,9 +183,11 @@ function withPane(
 export async function startBrowserBridge({
 	homeDir,
 	extensions,
+	answerDeadlineMs = ANSWER_DEADLINE_MS,
 }: {
 	homeDir?: string;
 	extensions?: UserExtensions;
+	answerDeadlineMs?: number;
 } = {}): Promise<void> {
 	if (server) return;
 	const secret = randomBytes(32).toString("hex");
@@ -454,6 +464,7 @@ export async function startBrowserBridge({
 	});
 
 	const extensionRoute = (
+		{ requireInstalled }: { requireInstalled: boolean },
 		handler: (
 			extensions: UserExtensions,
 			extensionId: string,
@@ -474,7 +485,7 @@ export async function startBrowserBridge({
 				return;
 			}
 			if (
-				req.path !== "/extensions/install" &&
+				requireInstalled &&
 				!extensions.list().some((extension) => extension.id === extensionId)
 			) {
 				res
@@ -496,35 +507,61 @@ export async function startBrowserBridge({
 		res.json({ extensions: extensions.list() });
 	});
 
+	// The question closes when the caller hangs up or the deadline passes.
+	const answerSignal = (res: Response): AbortSignal => {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), answerDeadlineMs);
+		res.on("close", () => {
+			clearTimeout(timer);
+			controller.abort();
+		});
+		return controller.signal;
+	};
+	const refuse = (res: Response, signal: AbortSignal, refusal: string) => {
+		if (signal.aborted) res.status(408).json({ error: EXTENSION_UNANSWERED });
+		else res.status(403).json({ error: refusal });
+	};
+
 	app.post(
 		"/extensions/install",
-		extensionRoute(async (extensions, extensionId, _req, res) => {
-			const result = await extensions.install(extensionId);
-			if (result.status === "declined") {
-				res.status(403).json({ error: EXTENSION_INSTALL_REFUSED });
-				return;
-			}
-			res.json(result);
-		}),
+		extensionRoute(
+			{ requireInstalled: false },
+			async (extensions, extensionId, _req, res) => {
+				const signal = answerSignal(res);
+				const result = await extensions.install(extensionId, signal);
+				if (result.status === "declined") {
+					refuse(res, signal, EXTENSION_INSTALL_REFUSED);
+					return;
+				}
+				res.json(result);
+			},
+		),
 	);
 
 	app.post(
 		"/extensions/remove",
-		extensionRoute(async (extensions, extensionId, _req, res) => {
-			if (!(await extensions.remove(extensionId))) {
-				res.status(403).json({ error: EXTENSION_REMOVE_REFUSED });
-				return;
-			}
-			res.json({ ok: true });
-		}),
+		extensionRoute(
+			{ requireInstalled: true },
+			async (extensions, extensionId, _req, res) => {
+				const signal = answerSignal(res);
+				if (!(await extensions.remove(extensionId, signal))) {
+					refuse(res, signal, EXTENSION_REMOVE_REFUSED);
+					return;
+				}
+				res.json({ ok: true });
+			},
+		),
 	);
 
 	app.post(
 		"/extensions/pin",
-		extensionRoute(async (extensions, extensionId, req, res) => {
-			extensions.setPinned(extensionId, req.body?.pinned !== false);
-			res.json({ ok: true });
-		}),
+		extensionRoute(
+			{ requireInstalled: true },
+			async (extensions, extensionId, req, res) => {
+				extensions.setPinned(extensionId, req.body?.pinned !== false);
+				res.json({ ok: true });
+			},
+		),
 	);
 
 	const wss = new WebSocketServer({

@@ -1098,6 +1098,18 @@ class BrowserManager extends EventEmitter {
 		this.extensionMenuItems = items;
 	}
 
+	// An extension's broken menu must not take the page's own menu with it.
+	private safeExtensionMenuItems(
+		...args: Parameters<ExtensionMenuItems>
+	): Electron.MenuItem[] {
+		try {
+			return this.extensionMenuItems(...args);
+		} catch (error) {
+			console.error("[browser-manager] Extension menu items failed:", error);
+			return [];
+		}
+	}
+
 	private setupContextMenu(paneId: string, wc: Electron.WebContents): void {
 		const handler = (
 			_event: Electron.Event,
@@ -1184,7 +1196,7 @@ class BrowserManager extends EventEmitter {
 				menuItems.push({ type: "separator" });
 			}
 
-			const extensionItems = this.extensionMenuItems(wc, params);
+			const extensionItems = this.safeExtensionMenuItems(wc, params);
 			if (extensionItems.length > 0) {
 				menuItems.push(...extensionItems, { type: "separator" });
 			}

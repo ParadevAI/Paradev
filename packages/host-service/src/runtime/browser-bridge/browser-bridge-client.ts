@@ -15,6 +15,15 @@ export type {
 	ConsoleEntry,
 } from "./types";
 
+// A missing pane or a not-yet-open workspace is a caller-fixable precondition, not an internal fault.
+const BRIDGE_ERROR_CODES: Partial<Record<number, TRPCError["code"]>> = {
+	403: "FORBIDDEN",
+	404: "NOT_FOUND",
+	408: "TIMEOUT",
+	503: "PRECONDITION_FAILED",
+	504: "NOT_FOUND",
+};
+
 /**
  * Thin HTTP client for the desktop's browser bridge. The bridge is the only
  * thing that can touch a browser pane's guest webContents; this proxies the
@@ -37,12 +46,7 @@ export class BrowserBridgeClient {
 		);
 		if (!res.ok) {
 			throw new TRPCError({
-				// A missing pane / not-yet-open workspace is a caller-fixable
-				// precondition, not an internal fault.
-				code:
-					res.status === 404 || res.status === 504
-						? "NOT_FOUND"
-						: "BAD_REQUEST",
+				code: BRIDGE_ERROR_CODES[res.status] ?? "BAD_REQUEST",
 				message:
 					bridgeErrorDetail(res.body) ?? `Browser bridge error (${res.status})`,
 			});
