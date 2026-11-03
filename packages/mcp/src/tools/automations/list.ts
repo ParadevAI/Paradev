@@ -9,10 +9,13 @@ export function register(server: McpServer): void {
 		name: "automations_list",
 		annotations: { readOnlyHint: true },
 		description:
-			"List automations (agent runs on a schedule or on events) the calling user owns in the active organization. Returns a summary shape — call automations_get_prompt to fetch the prompt for one automation, or automations_get for the rest of its config. Pass `name` to filter rows by case-insensitive substring match on the automation name.",
+			"List automations (agent runs on a schedule or on events) the calling user owns in the active organization. Returns a summary shape — call automations_get_prompt to fetch the prompt for one automation, or automations_get for the rest of its config. Pass `name` to filter rows by case-insensitive substring match on the automation name. Archived automations are left out unless `archived` is true.",
 		inputSchema: {
 			name: optionalish(z.string().min(1)).describe(
 				"Filter rows by case-insensitive substring match on automation name.",
+			),
+			archived: optionalish(z.boolean()).describe(
+				"List archived automations instead of active ones.",
 			),
 		},
 		handler: async (input, ctx) => {

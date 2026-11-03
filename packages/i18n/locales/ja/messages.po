@@ -2937,6 +2937,9 @@ msgstr "環境をアーカイブ"
 msgid "Archive failed"
 msgstr "アーカイブに失敗しました"
 
+msgid "Archive this automation before you delete it."
+msgstr "削除する前に、このオートメーションをアーカイブしてください。"
+
 msgid "Archive workspace"
 msgstr "ワークスペースをアーカイブ"
 
@@ -13187,8 +13190,8 @@ msgstr "このオートメーションを実行できるのは所有者のみで
 msgid "Only the owner can view prompt history"
 msgstr "プロンプト履歴を表示できるのは所有者のみです"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "このオートメーションを削除できるのは所有者または組織のオーナーのみです"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "このオートメーションをアーカイブできるのは、所有者または組織のオーナーのみです"
 
 msgid "Only the people listed above can open it"
 msgstr "上記のメンバーだけが開けます"
@@ -19489,6 +19492,9 @@ msgstr "このオートメーションは {0} に属しています。開くに�
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "このオートメーションにはまだ指示がありません。実行する前に設定でプロンプトを記述してください。"
+
+msgid "This automation is archived. Restore it first."
+msgstr "このオートメーションはアーカイブ済みです。先に復元してください。"
 
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"

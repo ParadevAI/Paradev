@@ -2937,6 +2937,9 @@ msgstr "Archivia ambiente"
 msgid "Archive failed"
 msgstr "Archiviazione non riuscita"
 
+msgid "Archive this automation before you delete it."
+msgstr "Archivia questa automazione prima di eliminarla."
+
 msgid "Archive workspace"
 msgstr "Archivia il workspace"
 
@@ -13187,8 +13190,8 @@ msgstr "Solo il proprietario può eseguire questa automazione"
 msgid "Only the owner can view prompt history"
 msgstr "Solo il proprietario può vedere la cronologia dei prompt"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Solo il proprietario o un proprietario dell'organizzazione può eliminare questa automazione"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Solo il proprietario o un proprietario dell'organizzazione può archiviare questa automazione"
 
 msgid "Only the people listed above can open it"
 msgstr "Solo le persone elencate sopra possono aprirlo"
@@ -19489,6 +19492,9 @@ msgstr "Questa automazione appartiene a {0}. Passa a quell'organizzazione per ap
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Questa automazione non ha ancora istruzioni. Scrivi un prompt nelle sue impostazioni prima di eseguirla."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Questa automazione è archiviata. Ripristinala prima."
 
 msgid "This automation is in another organization"
 msgstr "Questa automazione si trova in un'altra organizzazione"

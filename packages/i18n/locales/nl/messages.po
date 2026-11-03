@@ -2937,6 +2937,9 @@ msgstr "Omgeving archiveren"
 msgid "Archive failed"
 msgstr "Archiveren mislukt"
 
+msgid "Archive this automation before you delete it."
+msgstr "Archiveer deze automatisering voordat je haar verwijdert."
+
 msgid "Archive workspace"
 msgstr "Werkruimte archiveren"
 
@@ -13187,8 +13190,8 @@ msgstr "Alleen de eigenaar kan deze automatisering uitvoeren"
 msgid "Only the owner can view prompt history"
 msgstr "Alleen de eigenaar kan de promptgeschiedenis bekijken"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Alleen de eigenaar of een organisatie-eigenaar kan deze automatisering verwijderen"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Alleen de eigenaar of een organisatie-eigenaar kan deze automatisering archiveren"
 
 msgid "Only the people listed above can open it"
 msgstr "Alleen de mensen hierboven kunnen het openen"
@@ -19489,6 +19492,9 @@ msgstr "Deze automatisering hoort bij {0}. Wissel naar die organisatie om hem te
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Deze automatisering heeft nog geen instructies. Schrijf een prompt in de instellingen voordat je hem uitvoert."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Deze automatisering is gearchiveerd. Herstel haar eerst."
 
 msgid "This automation is in another organization"
 msgstr "Deze automatisering staat in een andere organisatie"
