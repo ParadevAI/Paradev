@@ -7,6 +7,7 @@ import { mapEventType } from "../../../events";
 import { verifyAttributionToken } from "../../../terminal-agents/attribution-token";
 import { recordTerminalAgentTranscriptPath } from "../../../terminal-agents/persistence";
 import { isTrustedTranscriptPath } from "../../../terminal-agents/transcript-path";
+import type { TerminalAgentBinding } from "../../../terminal-agents/types";
 import { protectedProcedure, publicProcedure, router } from "../../index";
 import { captureSessionAccount } from "../usage/session-account/session-account";
 import { fanOutAgentLifecycle } from "./fan-out-agent-lifecycle";
@@ -70,6 +71,23 @@ function normalizeAgentIdentity(
 			? { definitionId: definitionId as AgentIdentity["definitionId"] }
 			: {}),
 	};
+}
+
+function matchesExternalWorker(
+	binding: TerminalAgentBinding | undefined,
+	agent: AgentIdentity | undefined,
+	eventType: string,
+): boolean {
+	// The first native hook establishes the worker identity. Observation
+	// shells and delayed wrappers must never replace it or change its status.
+	return Boolean(
+		agent?.agentId &&
+			(!binding ||
+				(binding.agentId === agent.agentId &&
+					(!binding.agentSessionId ||
+						binding.agentSessionId === agent.sessionId))) &&
+			(eventType !== "Detached" || binding?.agentSessionId),
+	);
 }
 
 export const notificationsRouter = router({
@@ -158,10 +176,7 @@ export const notificationsRouter = router({
 		const prior = ctx.terminalAgentStore.get(input.terminalId);
 		if (
 			terminalSession.agentLifecycleOwner === "external" &&
-			eventType === "Detached" &&
-			(!prior?.agentSessionId ||
-				agent?.sessionId !== prior.agentSessionId ||
-				agent.agentId !== prior.agentId)
+			!matchesExternalWorker(prior, agent, eventType)
 		) {
 			return { success: true, ignored: true as const };
 		}
@@ -183,12 +198,17 @@ export const notificationsRouter = router({
 				: undefined;
 		if (
 			terminalSession.agentLifecycleOwner === "external" &&
-			ctx.db.query.terminalSessions
+			(ctx.db.query.terminalSessions
 				.findFirst({
 					where: eq(terminalSessions.id, input.terminalId),
 					columns: { externalEndedAt: true },
 				})
-				.sync()?.externalEndedAt != null
+				.sync()?.externalEndedAt != null ||
+				!matchesExternalWorker(
+					ctx.terminalAgentStore.get(input.terminalId),
+					agent,
+					eventType,
+				))
 		)
 			return { success: true, ignored: true as const };
 		ctx.terminalAgentStore.recordEvent({

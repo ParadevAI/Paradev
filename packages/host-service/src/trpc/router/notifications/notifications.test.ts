@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, mock, spyOn } from "bun:test";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
 import type { AgentIdentity } from "@superset/shared/agent-identity";
@@ -23,6 +23,7 @@ import {
 	getLocalWorkspace,
 	insertLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
+import * as sessionAccount from "../usage/session-account/session-account";
 import { notificationsRouter } from "./notifications";
 
 interface BroadcastedAgentLifecycleEvent {
@@ -678,7 +679,22 @@ it("external worker termination needs its native identity, not the observation s
 		})
 		.where(eq(terminalSessions.id, "external"))
 		.run();
+	ctx.terminalAgentStore = new TerminalAgentStore(
+		new SqliteTerminalAgentBindingPersistence(db),
+	);
 	const caller = notificationsRouter.createCaller(ctx);
+	await caller.hook({
+		terminalId: "external",
+		eventType: "Attached",
+		agent: { agentId: "codex" },
+		launchId: "provisional-launch",
+	});
+	expect(
+		ctx.terminalAgentStore.get("external")?.agentSessionId,
+	).toBeUndefined();
+	expect(ctx.terminalAgentStore.get("external")?.launchId).toBe(
+		"provisional-launch",
+	);
 	await caller.hook({
 		terminalId: "external",
 		eventType: "Start",
@@ -691,31 +707,37 @@ it("external worker termination needs its native identity, not the observation s
 	expect(ctx.terminalAgentStore.get("external")?.definitionId).toBe(
 		"custom:actual-config",
 	);
-	for (const agent of [
-		undefined,
-		{ agentId: "codex", sessionId: "other-session" },
-	]) {
-		expect(
-			await caller.hook({
-				terminalId: "external",
-				eventType: "Detached",
-				agent,
-			}),
-		).toMatchObject({ ignored: true });
-		expect(ctx.terminalAgentStore.get("external")?.agentSessionId).toBe(
-			"native-worker",
-		);
+	for (const eventType of ["Attached", "Start", "Stop", "Detached"]) {
+		for (const agent of [
+			undefined,
+			{ agentId: "codex" },
+			{ agentId: "codex", sessionId: "late-wrapper-session" },
+			{ agentId: "claude", sessionId: "native-worker" },
+		]) {
+			expect(
+				await caller.hook({ terminalId: "external", eventType, agent }),
+			).toMatchObject({ ignored: true });
+			expect(ctx.terminalAgentStore.get("external")).toMatchObject({
+				agentId: "codex",
+				agentSessionId: "native-worker",
+				lastEventType: "Start",
+			});
+		}
 	}
+	expect(
+		new SqliteTerminalAgentBindingPersistence(db).load()[0]?.agentSessionId,
+	).toBe("native-worker");
 	await caller.hook({
 		terminalId: "external",
 		eventType: "Detached",
 		agent: { agentId: "codex", sessionId: "native-worker" },
 	});
 	expect(ctx.terminalAgentStore.get("external")).toBeUndefined();
-	db.update(terminalSessions)
-		.set({ externalEndedAt: 9 })
-		.where(eq(terminalSessions.id, "external"))
-		.run();
+	expect(
+		db.query.terminalSessions
+			.findFirst({ where: eq(terminalSessions.id, "external") })
+			.sync()?.externalEndedAt,
+	).toBeNumber();
 	expect(
 		await caller.hook({
 			terminalId: "external",
@@ -723,4 +745,69 @@ it("external worker termination needs its native identity, not the observation s
 			agent: { agentId: "codex", sessionId: "native-worker" },
 		}),
 	).toMatchObject({ ignored: true });
+});
+
+it.each([
+	undefined,
+	"late-wrapper-session",
+])("rechecks external native identity after account attribution with session %s", async (sessionId) => {
+	const { ctx, db } = createDbContext({
+		terminalId: "external",
+		workspaceId: "ws-external",
+	});
+	db.update(terminalSessions)
+		.set({ agentLifecycleOwner: "external" })
+		.where(eq(terminalSessions.id, "external"))
+		.run();
+	ctx.terminalAgentStore = new TerminalAgentStore(
+		new SqliteTerminalAgentBindingPersistence(db),
+	);
+	const entered = Promise.withResolvers<void>();
+	const captured =
+		Promise.withResolvers<
+			Awaited<ReturnType<typeof sessionAccount.captureSessionAccount>>
+		>();
+	const capture = spyOn(
+		sessionAccount,
+		"captureSessionAccount",
+	).mockImplementation(async () => {
+		entered.resolve();
+		return captured.promise;
+	});
+	try {
+		const caller = notificationsRouter.createCaller(ctx);
+		const lateWrapper = caller.hook({
+			terminalId: "external",
+			eventType: "Attached",
+			agent: { agentId: "codex", sessionId },
+			accountProfile: "",
+			attributionToken: issueAttributionToken("external"),
+		});
+		await entered.promise;
+		await caller.hook({
+			terminalId: "external",
+			eventType: "Start",
+			agent: { agentId: "codex", sessionId: "native-worker" },
+		});
+		captured.resolve({
+			agent: "codex",
+			selection: null,
+			credentialKind: "api_key",
+			identity: "wrong-wrapper-account",
+		});
+		expect(await lateWrapper).toMatchObject({ ignored: true });
+		expect(ctx.terminalAgentStore.get("external")).toMatchObject({
+			agentSessionId: "native-worker",
+			lastEventType: "Start",
+		});
+		expect(ctx.terminalAgentStore.get("external")?.account).toBeUndefined();
+		await caller.hook({
+			terminalId: "external",
+			eventType: "Detached",
+			agent: { agentId: "codex", sessionId: "native-worker" },
+		});
+		expect(ctx.terminalAgentStore.get("external")).toBeUndefined();
+	} finally {
+		capture.mockRestore();
+	}
 });
