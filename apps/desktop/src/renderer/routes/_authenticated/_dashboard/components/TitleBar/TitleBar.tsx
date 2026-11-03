@@ -1,8 +1,13 @@
 import { cn } from "@superset/ui/utils";
+import { useEffect } from "react";
 import { ZoomStable } from "renderer/components/ZoomStable";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useResolvedTheme } from "renderer/stores/theme";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
+import { TITLE_BAR_OVERLAY_HEIGHT } from "shared/constants";
+import { toHex } from "shared/themes/utils";
 import {
 	useTitleBarSideWidth,
 	useTitleBarSlots,
@@ -40,6 +45,22 @@ export function TitleBar() {
 	const isListPanelCollapsed = useWorkspaceSidebarStore((state) =>
 		state.isCollapsed(),
 	);
+	const theme = useResolvedTheme();
+
+	// The Windows/Linux window controls are painted by the window, so they take
+	// this row's colour and height only while the row is on screen.
+	useEffect(() => {
+		const setOverlay = (color: string, height: number) =>
+			electronTrpcClient.window.setTitleBarOverlay
+				.mutate({ color, symbolColor: toHex(theme.ui.foreground), height })
+				.catch((error: unknown) => {
+					console.warn("[TitleBar] window controls overlay not updated", error);
+				});
+		setOverlay(toHex(theme.ui.sidebar), ROW_HEIGHT);
+		return () => {
+			setOverlay(toHex(theme.ui.background), TITLE_BAR_OVERLAY_HEIGHT);
+		};
+	}, [theme]);
 	const slotStyle = isMac
 		? {
 				zoom: 1 / zoomFactor,

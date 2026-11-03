@@ -16,7 +16,11 @@ import { resolveDevWorkspaceName } from "main/lib/dev-workspace-name";
 import { getIconPath } from "main/lib/dock-icon";
 import { localDb } from "main/lib/local-db";
 import { isExpectedRendererExit } from "main/lib/renderer-exit";
-import { NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
+import {
+	NOTIFICATION_EVENTS,
+	PLATFORM,
+	TITLE_BAR_OVERLAY_HEIGHT,
+} from "shared/constants";
 import { env } from "shared/env.shared";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import { createIPCHandler } from "trpc-electron/main";
@@ -366,8 +370,16 @@ export async function restoreWindows(): Promise<void> {
 /** The overlay's colours follow the OS theme until the renderer's theme store sets its own. */
 export function titleBarOverlayColors(): Electron.TitleBarOverlay {
 	return nativeTheme.shouldUseDarkColors
-		? { color: "#252525", symbolColor: "#e5e5e5", height: 40 }
-		: { color: "#ffffff", symbolColor: "#1f1f1f", height: 40 };
+		? {
+				color: "#252525",
+				symbolColor: "#e5e5e5",
+				height: TITLE_BAR_OVERLAY_HEIGHT,
+			}
+		: {
+				color: "#ffffff",
+				symbolColor: "#1f1f1f",
+				height: TITLE_BAR_OVERLAY_HEIGHT,
+			};
 }
 
 export async function createPlatformWindow({
