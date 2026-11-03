@@ -36,6 +36,7 @@ import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-stat
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
 import { ChatTabs } from "./components/ChatTabs";
+import { ContentCard } from "./components/ContentCard";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
 import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
@@ -299,11 +300,7 @@ function DashboardLayout() {
 											isCollapsed={isWorkspaceSidebarCollapsed}
 										/>
 									</WorkspaceSidebarPanel>
-									<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
-										<div className="relative flex min-h-0 min-w-0 flex-1">
-											{content}
-										</div>
-									</div>
+									<ContentCard>{content}</ContentCard>
 								</div>
 							</div>
 						</TitleBarSlotsProvider>

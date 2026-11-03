@@ -124,7 +124,7 @@ export function RightPaneArea({
 				renderTabBarLeading={isFullScreen ? () => <WindowChrome /> : undefined}
 				onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
 				renderTabBarTrailing={() => (
-					<div className="flex items-center gap-1 pr-1">
+					<div className="flex items-center gap-1.5 pr-1">
 						<RightPaneHeaderButton
 							label={
 								isFullScreen

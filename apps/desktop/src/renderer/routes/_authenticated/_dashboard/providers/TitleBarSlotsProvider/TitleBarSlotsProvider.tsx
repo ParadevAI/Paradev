@@ -17,11 +17,13 @@ interface TitleBarSlots {
 	setSide: (element: HTMLElement | null) => void;
 	claimMain: () => () => void;
 	setSideWidth: (width: number | null) => void;
+	setMainStart: (left: number | null) => void;
 }
 
 const TitleBarSlotsContext = createContext<TitleBarSlots | null>(null);
 /** Changes every frame while the right pane slides, so only the title bar reads it. */
 const TitleBarSideWidthContext = createContext<number | null>(null);
+const TitleBarMainStartContext = createContext<number | null>(null);
 
 /** Lets a screen put its tab bars in the window's title bar instead of above its content. */
 export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
@@ -29,6 +31,7 @@ export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 	const [side, setSide] = useState<HTMLElement | null>(null);
 	const [mainClaims, setMainClaims] = useState(0);
 	const [sideWidth, setSideWidth] = useState<number | null>(null);
+	const [mainStart, setMainStart] = useState<number | null>(null);
 	const claimMain = useCallback(() => {
 		setMainClaims((count) => count + 1);
 		return () => setMainClaims((count) => count - 1);
@@ -42,13 +45,16 @@ export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 			setSide,
 			claimMain,
 			setSideWidth,
+			setMainStart,
 		}),
 		[main, side, mainClaims, claimMain],
 	);
 	return (
 		<TitleBarSlotsContext.Provider value={slots}>
 			<TitleBarSideWidthContext.Provider value={sideWidth}>
-				{children}
+				<TitleBarMainStartContext.Provider value={mainStart}>
+					{children}
+				</TitleBarMainStartContext.Provider>
 			</TitleBarSideWidthContext.Provider>
 		</TitleBarSlotsContext.Provider>
 	);
@@ -72,6 +78,29 @@ export function useIsInTitleBarShell(): boolean {
 /** From the right pane's left edge to the window's right edge, or null while the pane is closed. */
 export function useTitleBarSideWidth(): number | null {
 	return useContext(TitleBarSideWidthContext);
+}
+
+/** The content card's left edge, where the main tab bar starts; null until the card is measured. */
+export function useTitleBarMainStart(): number | null {
+	return useContext(TitleBarMainStartContext);
+}
+
+/** Measures `card`, the content card under the title bar, for {@link useTitleBarMainStart}. */
+export function useTitleBarMainCard(card: HTMLElement | null): void {
+	const setMainStart = useContext(TitleBarSlotsContext)?.setMainStart;
+	useEffect(() => {
+		if (!card || !setMainStart) return;
+		const measure = () => setMainStart(card.getBoundingClientRect().left);
+		measure();
+		const observer = new ResizeObserver(measure);
+		observer.observe(card);
+		window.addEventListener("resize", measure);
+		return () => {
+			observer.disconnect();
+			window.removeEventListener("resize", measure);
+			setMainStart(null);
+		};
+	}, [card, setMainStart]);
 }
 
 /**

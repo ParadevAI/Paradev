@@ -32,6 +32,7 @@ interface WorkspaceSplitLayoutProps {
 	onLayoutFrame?: () => void;
 	keepMounted: boolean;
 	durationMs?: number;
+	sidePanelClassName?: string;
 	side: ReactNode;
 	children: ReactNode;
 }
@@ -48,6 +49,7 @@ export function WorkspaceSplitLayout({
 	onLayoutFrame,
 	keepMounted,
 	durationMs,
+	sidePanelClassName,
 	side,
 	children,
 }: WorkspaceSplitLayoutProps) {
@@ -115,6 +117,7 @@ export function WorkspaceSplitLayout({
 						minWidth={minWidth}
 						maxWidth={clamped.maxWidth}
 						handleSide="left"
+						className={sidePanelClassName}
 						onDoubleClickHandle={() =>
 							onWidthChange(defaultWidth(containerWidth))
 						}

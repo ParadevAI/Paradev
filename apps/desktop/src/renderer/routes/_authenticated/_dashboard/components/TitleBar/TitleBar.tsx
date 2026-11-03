@@ -1,4 +1,5 @@
 import { cn } from "@superset/ui/utils";
+import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { ZoomStable } from "renderer/components/ZoomStable";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
@@ -9,6 +10,7 @@ import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-stat
 import { TITLE_BAR_OVERLAY_HEIGHT } from "shared/constants";
 import { toHex } from "shared/themes/utils";
 import {
+	useTitleBarMainStart,
 	useTitleBarSideWidth,
 	useTitleBarSlots,
 } from "../../providers/TitleBarSlotsProvider";
@@ -23,6 +25,7 @@ import {
 	WindowControlsInset,
 } from "../WindowControlsInset";
 import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
+import { WorkspaceSwitcherButton } from "./components/WorkspaceSwitcherButton";
 
 /** macOS draws the window buttons in the first 80 physical pixels, whatever the page zoom. */
 const TRAFFIC_LIGHTS_WIDTH = 80;
@@ -39,6 +42,10 @@ const ROW_HEIGHT = 44;
 export function TitleBar() {
 	const { setMain, setSide, mainClaims } = useTitleBarSlots();
 	const sideWidth = useTitleBarSideWidth();
+	const mainStart = useTitleBarMainStart();
+	const matchRoute = useMatchRoute();
+	const isOnWorkspace =
+		matchRoute({ to: "/v2-workspace/$workspaceId", fuzzy: true }) !== false;
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const zoomFactor = useZoomFactor();
@@ -79,33 +86,47 @@ export function TitleBar() {
 			className="flex h-11 shrink-0 items-stretch"
 			style={isMac ? { height: `${ROW_HEIGHT / zoomFactor}px` } : undefined}
 		>
-			{isMac ? (
-				<div
-					className="drag h-full shrink-0"
-					style={{ width: TRAFFIC_LIGHTS_WIDTH / zoomFactor }}
-				/>
-			) : (
-				<>
+			<div
+				className="flex shrink-0 items-stretch"
+				style={mainStart === null ? undefined : { minWidth: mainStart }}
+			>
+				{isMac ? (
 					<div
 						className="drag h-full shrink-0"
-						style={{ width: "env(titlebar-area-x, 0px)" }}
+						style={{ width: TRAFFIC_LIGHTS_WIDTH / zoomFactor }}
 					/>
-					<div
-						className="flex shrink-0 items-center justify-center"
-						style={{ width: NAVIGATION_RAIL_WIDTH }}
+				) : (
+					<>
+						<div
+							className="drag h-full shrink-0"
+							style={{ width: "env(titlebar-area-x, 0px)" }}
+						/>
+						<div
+							className="flex shrink-0 items-center justify-center"
+							style={{ width: NAVIGATION_RAIL_WIDTH }}
+						>
+							<AppMenuButton />
+						</div>
+					</>
+				)}
+				<div className="flex min-w-0 shrink-0 items-center">
+					<ZoomStable
+						enabled={isMac}
+						className="flex min-w-0 items-center gap-0.5"
 					>
-						<AppMenuButton />
-					</div>
-				</>
-			)}
-			<div className="flex shrink-0 items-center pr-1">
-				<ZoomStable enabled={isMac} className="flex items-center gap-0.5">
-					<NavigationControls />
-					<SidebarToggle />
-					{isListPanelCollapsed && <NewWorkspaceButton />}
-					<PortsDropdown align="start" />
-					<OfflineBadge />
-				</ZoomStable>
+						<NavigationControls />
+						<SidebarToggle />
+						{isListPanelCollapsed &&
+							(isOnWorkspace ? (
+								<WorkspaceSwitcherButton />
+							) : (
+								<NewWorkspaceButton />
+							))}
+						<PortsDropdown align="start" />
+						<OfflineBadge />
+					</ZoomStable>
+				</div>
+				<div className="drag h-full min-w-0 flex-1" />
 			</div>
 			<div
 				className={cn(
@@ -122,7 +143,7 @@ export function TitleBar() {
 			{mainClaims === 0 && <div className="drag h-full min-w-0 flex-1" />}
 			<div
 				className={cn(
-					"relative min-w-0 overflow-hidden border-l border-border",
+					"relative min-w-0 overflow-hidden",
 					sideWidth === null && "hidden",
 				)}
 				style={

@@ -662,6 +662,7 @@ function V2WorkspaceContent() {
 						onResizingChange={onSidebarResizeDragging}
 						onLayoutFrame={relayoutBrowserPanes}
 						keepMounted={isRightPaneAreaEnabled}
+						sidePanelClassName={isParadevShell ? "border-l-0" : undefined}
 						side={
 							isRightPaneAreaEnabled ? (
 								<>
@@ -747,7 +748,8 @@ function V2WorkspaceContent() {
 									renderTabBarTrailing={() => (
 										<div
 											className={cn(
-												"flex items-center gap-1",
+												"flex items-center",
+												isParadevShell ? "gap-1.5" : "gap-1",
 												isRightPaneAreaEnabled && "pr-1",
 											)}
 										>

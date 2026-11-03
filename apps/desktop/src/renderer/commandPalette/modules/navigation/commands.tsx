@@ -2,10 +2,30 @@ import { msg } from "@lingui/core/macro";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { BookOpenIcon, HistoryIcon, SettingsIcon } from "lucide-react";
 import { LuLayers } from "react-icons/lu";
+import { useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { RecentlyViewedFrame } from "../../ui/RecentlyViewed/RecentlyViewedFrame";
 import { WorkspaceListFrame } from "../../ui/WorkspaceList";
 import { settingsTabCommands } from "../settings/commands";
+
+const workspacesCommand: Command = {
+	id: "nav.workspaces",
+	title: msg({
+		message: "Workspaces",
+	}),
+	section: "navigation",
+	icon: LuLayers,
+	keywords: ["workspace", "project", "repo", "repository", "switch"],
+	renderFrame: () => <WorkspaceListFrame />,
+};
+
+/** Opens the command palette on its workspace list. */
+export function openWorkspaceList(): void {
+	const { setOpen, reset, pushFrame } = useFrameStackStore.getState();
+	reset();
+	setOpen(true);
+	pushFrame(workspacesCommand);
+}
 
 export const navigationProvider: CommandProvider = {
 	id: "navigation",
@@ -30,16 +50,7 @@ export const navigationProvider: CommandProvider = {
 				keywords: ["history", "recent", "back"],
 				renderFrame: () => <RecentlyViewedFrame />,
 			},
-			{
-				id: "nav.workspaces",
-				title: msg({
-					message: "Workspaces",
-				}),
-				section: "navigation",
-				icon: LuLayers,
-				keywords: ["workspace", "project", "repo", "repository", "switch"],
-				renderFrame: () => <WorkspaceListFrame />,
-			},
+			workspacesCommand,
 			{
 				id: "nav.docs",
 				title: msg({

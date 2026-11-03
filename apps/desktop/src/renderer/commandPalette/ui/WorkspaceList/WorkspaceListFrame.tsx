@@ -4,14 +4,17 @@ import {
 	CommandGroup,
 	CommandItem,
 	CommandList,
+	CommandShortcut,
 } from "@superset/ui/command";
 import { cn } from "@superset/ui/utils";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { CgLaptop } from "react-icons/cg";
-import { LuGitBranch, LuLaptop, LuMonitor } from "react-icons/lu";
+import { LuGitBranch, LuLaptop, LuMonitor, LuPlus } from "react-icons/lu";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
+import { useHotkeyDisplay } from "renderer/hotkeys/hooks/useHotkeyDisplay";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
 import {
 	navigateToV2Workspace,
 	navigateToWorkspace,
@@ -145,6 +148,12 @@ function V2WorkspaceList({ query }: { query: string }) {
 	const currentPath = useLocation({ select: (loc) => loc.pathname });
 	const navigate = useNavigate();
 	const setOpen = useFrameStackStore((s) => s.setOpen);
+	const openNewWorkspace = useOpenNewWorkspaceInViewedProject();
+	const newWorkspaceHotkey = useHotkeyDisplay("NEW_WORKSPACE");
+	const newWorkspaceLabel = t({ message: "New workspace" });
+	const showsNewWorkspace = newWorkspaceLabel
+		.toLowerCase()
+		.includes(query.toLowerCase());
 
 	const projectGroups = useMemo(() => {
 		const grouped = new Map<
@@ -184,6 +193,27 @@ function V2WorkspaceList({ query }: { query: string }) {
 			<CommandEmpty>
 				<Trans>No workspaces found.</Trans>
 			</CommandEmpty>
+			{showsNewWorkspace && (
+				<CommandGroup>
+					<CommandItem
+						value="workspace new"
+						onSelect={() => {
+							setOpen(false);
+							openNewWorkspace();
+						}}
+						className={ROW_CLASS}
+					>
+						<LuPlus className="shrink-0 text-muted-foreground" />
+						<span className="min-w-0 flex-1 truncate font-normal">
+							{newWorkspaceLabel}
+						</span>
+						{newWorkspaceHotkey.text &&
+							newWorkspaceHotkey.text !== "Unassigned" && (
+								<CommandShortcut>{newWorkspaceHotkey.text}</CommandShortcut>
+							)}
+					</CommandItem>
+				</CommandGroup>
+			)}
 			{projectGroups.map((group) => (
 				<CommandGroup key={group.projectId} heading={group.projectName}>
 					{group.workspaces.map((workspace) => {

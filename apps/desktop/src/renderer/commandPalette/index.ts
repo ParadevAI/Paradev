@@ -11,3 +11,4 @@ export type {
 	CommandSection,
 	SectionId,
 } from "./core/types";
+export { openWorkspaceList } from "./modules/navigation/commands";
