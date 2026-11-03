@@ -24,6 +24,14 @@ export type ChatSync = {
 	noteAppend(envelope: DurableEnvelope): void;
 	/** Keeps pushing every chat that changes, retrying with backoff. */
 	start(): () => void;
+	/**
+	 * Keeps pushing one chat while it moves away, on a host that does not
+	 * sync otherwise, so the move can see a turn taken after it began.
+	 * Stops once the chat has moved.
+	 */
+	follow(sessionId: string): void;
+	/** The chat is on this host again, as when it moves back. */
+	forget(sessionId: string): void;
 };
 
 type Schedule = (run: () => void, ms: number) => () => void;
@@ -74,6 +82,7 @@ export function createChatSync(args: {
 	const schedule = args.schedule ?? defaultSchedule;
 	const dirty = new Set<string>();
 	const moved = new Set<string>();
+	const followed = new Set<string>();
 	const inFlight = new Map<string, Promise<void>>();
 	let running = false;
 	let cancelTimer: (() => void) | null = null;
@@ -182,7 +191,7 @@ export function createChatSync(args: {
 			}
 		}
 		for (const sessionId of [...dirty]) {
-			if (!started) continue;
+			if (!started && !followed.has(sessionId)) continue;
 			dirty.delete(sessionId);
 			if (moved.has(sessionId)) continue;
 			try {
@@ -190,6 +199,7 @@ export function createChatSync(args: {
 			} catch (error) {
 				if (errorCode(error) === "CONFLICT") {
 					moved.add(sessionId);
+					followed.delete(sessionId);
 					continue;
 				}
 				dirty.add(sessionId);
@@ -211,14 +221,14 @@ export function createChatSync(args: {
 	};
 
 	const wake = (ms: number) => {
-		if (!started || cancelTimer) return;
+		if ((!started && followed.size === 0) || cancelTimer) return;
 		cancelTimer = schedule(() => void drain(), ms);
 	};
 
 	return {
 		syncSession,
 		noteAppend(envelope) {
-			if (!started) return;
+			if (!started && !followed.has(envelope.sessionId)) return;
 			dirty.add(envelope.sessionId);
 			const turnEnded =
 				envelope.event.type === "turn" &&
@@ -229,12 +239,21 @@ export function createChatSync(args: {
 			}
 			wake(turnEnded ? 0 : SETTLE_MS);
 		},
+		follow(sessionId) {
+			moved.delete(sessionId);
+			followed.add(sessionId);
+		},
+		forget(sessionId) {
+			moved.delete(sessionId);
+			followed.delete(sessionId);
+		},
 		start() {
 			started = true;
 			catchUp = true;
 			wake(0);
 			return () => {
 				started = false;
+				followed.clear();
 				cancelTimer?.();
 				cancelTimer = null;
 			};

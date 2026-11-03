@@ -102,4 +102,20 @@ describe("createChatSync", () => {
 			1, 3,
 		]);
 	});
+
+	test("a host that does not sync keeps pushing a chat it follows until the chat moves", async () => {
+		const { sync, pushes, say, timers, appended } = setup();
+		say("before");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		expect(timers).toHaveLength(0);
+
+		sync.follow("s");
+		say("during");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		await timers.shift()?.();
+		await Promise.resolve();
+		expect(pushes.flatMap((push) => push.events.map((e) => e.seq))).toEqual([
+			1, 2,
+		]);
+	});
 });
