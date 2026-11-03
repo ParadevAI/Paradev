@@ -23,7 +23,7 @@ index 67d3be4b5026069ec4ae73c1fc6e661f8a19098e..cd291ad98574406ae05cd94d986fff2a
            }
          },
 diff --git a/dist/cjs/index.js b/dist/cjs/index.js
-index a91ca8fd07194abb081e9bb35fad0060fefddf91..2f62da4f2bc684e62d2bb5d6a9d8f5713200e350 100644
+index a91ca8fd07194abb081e9bb35fad0060fefddf91..b9909b61622c40494eb52a9da3d889e3b4d5b514 100644
 --- a/dist/cjs/index.js
 +++ b/dist/cjs/index.js
 @@ -66,7 +66,7 @@ var validateExtensionUrl = (url, extension) => {
@@ -503,7 +503,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..2f62da4f2bc684e62d2bb5d6a9d8f571
        return true;
      };
      const handle = this.ctx.router.apiHandler();
-@@ -2619,19 +2799,8 @@ var PermissionsAPI = class {
+@@ -2619,19 +2799,11 @@ var PermissionsAPI = class {
      handle("permissions.remove", this.remove);
      handle("permissions.request", this.request);
      const sessionExtensions = ctx.session.extensions || ctx.session;
@@ -521,10 +521,13 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..2f62da4f2bc684e62d2bb5d6a9d8f571
 -      permissions: manifest.permissions || [],
 -      origins: manifest.host_permissions || []
 +      runtimeGrants.delete(extension.id);
++      for (const key of activeTabGrants.keys()) {
++        if (key.startsWith(`${extension.id}:`)) activeTabGrants.delete(key);
++      }
      });
    }
  };
-@@ -2764,6 +2933,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends import_no
+@@ -2764,6 +2936,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends import_no
      }
    }
    /** Add webContents to be tracked as a tab. */
@@ -536,7 +539,7 @@ index a91ca8fd07194abb081e9bb35fad0060fefddf91..2f62da4f2bc684e62d2bb5d6a9d8f571
      this.checkWebContentsArgument(tab);
      this.ctx.store.addTab(tab, window);
 diff --git a/dist/esm/index.mjs b/dist/esm/index.mjs
-index 43929222572e4d6875cc192aca0750da79d8ff14..f6a5b85c18dde6ecd408f1e9dfb0d8ebe9ebbba3 100644
+index 43929222572e4d6875cc192aca0750da79d8ff14..180fa94ce780e15ebf460fcf8f306df372645b8a 100644
 --- a/dist/esm/index.mjs
 +++ b/dist/esm/index.mjs
 @@ -29,7 +29,7 @@ var validateExtensionUrl = (url, extension) => {
@@ -1016,7 +1019,7 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..f6a5b85c18dde6ecd408f1e9dfb0d8eb
        return true;
      };
      const handle = this.ctx.router.apiHandler();
-@@ -2582,19 +2762,8 @@ var PermissionsAPI = class {
+@@ -2582,19 +2762,11 @@ var PermissionsAPI = class {
      handle("permissions.remove", this.remove);
      handle("permissions.request", this.request);
      const sessionExtensions = ctx.session.extensions || ctx.session;
@@ -1034,10 +1037,13 @@ index 43929222572e4d6875cc192aca0750da79d8ff14..f6a5b85c18dde6ecd408f1e9dfb0d8eb
 -      permissions: manifest.permissions || [],
 -      origins: manifest.host_permissions || []
 +      runtimeGrants.delete(extension.id);
++      for (const key of activeTabGrants.keys()) {
++        if (key.startsWith(`${extension.id}:`)) activeTabGrants.delete(key);
++      }
      });
    }
  };
-@@ -2727,6 +2896,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends EventEmit
+@@ -2727,6 +2899,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends EventEmit
      }
    }
    /** Add webContents to be tracked as a tab. */

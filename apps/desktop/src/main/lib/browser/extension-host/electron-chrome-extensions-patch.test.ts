@@ -253,11 +253,13 @@ function extensionHost({
 		}).map(([id, manifest]) => [id, { id, manifest }]),
 	);
 	const { jar, cookies, cookieChanged } = fakeCookies();
+	const extensionEvents = new EventEmitter();
 	const session = {
 		extensions: {
 			getExtension: (id: string) => extensions.get(id),
 			getAllExtensions: () => [...extensions.values()],
-			on: () => {},
+			on: (event: string, listener: (...args: unknown[]) => void) =>
+				extensionEvents.on(event, listener),
 		},
 		isPersistent: () => true,
 		cookies,
@@ -343,6 +345,12 @@ function extensionHost({
 		call,
 		sent,
 		cookieChanged,
+		unload: (extensionId: string) =>
+			extensionEvents.emit(
+				"extension-unloaded",
+				{},
+				extensions.get(extensionId),
+			),
 	};
 }
 
@@ -465,6 +473,16 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 		mail.url = "https://mail.example.com/inbox";
 		tabs.onUpdated(mail.id);
 		expect(await seesMail()).toBe(false);
+	});
+
+	test("an unloaded extension loses its activeTab grants, so a reinstall starts without them", async () => {
+		const { mail, tabs, call, unload } = extensionHost(api);
+		tabs.createTabDetails(mail);
+		api.grantActiveTab("activeTab", mail.id, mail.url);
+		unload("activeTab");
+		expect(
+			((await call("activeTab", "tabs.get", mail.id)) as TabDetails).url,
+		).toBeUndefined();
 	});
 
 	test("an extension styles only pages it may reach, and opens no file or data URL", async () => {
