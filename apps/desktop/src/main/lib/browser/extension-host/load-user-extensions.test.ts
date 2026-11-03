@@ -258,3 +258,14 @@ test("an unreadable or malformed turned-off extension is listed by its id", asyn
 		chmodSync(unreadable, 0o755);
 	}
 });
+
+test("a version folder that is a symlink is never loaded", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	rmSync(paths.manifestsPath, { recursive: true });
+	const elsewhere = join(paths.extensionsPath, "..", "elsewhere");
+	renameSync(installed, elsewhere);
+	symlinkSync(elsewhere, installed);
+
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [] });
+});

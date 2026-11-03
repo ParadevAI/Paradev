@@ -98,7 +98,14 @@ async function turnOff(paths: UserExtensionPaths, id: string): Promise<void> {
 	try {
 		await rename(path.join(paths.extensionsPath, id), target);
 	} catch (error) {
-		if (hadPrevious) await rename(previous, target).catch(() => {});
+		if (hadPrevious) {
+			await rename(previous, target).catch((restoreError: unknown) => {
+				console.error(
+					`[extension-host] Failed to restore ${id}:`,
+					restoreError,
+				);
+			});
+		}
 		throw error;
 	}
 	await rm(previous, { recursive: true, force: true });
@@ -184,8 +191,9 @@ async function latestVersion(
 	extensionDir: string,
 ): Promise<{ dir: string; version: string } | null> {
 	let latest: { name: string; version: string; parts: number[] } | null = null;
-	for (const name of await readdir(extensionDir)) {
-		const version = VERSION_DIR.exec(name)?.[1];
+	for (const entry of await readdir(extensionDir, { withFileTypes: true })) {
+		const { name } = entry;
+		const version = entry.isDirectory() ? VERSION_DIR.exec(name)?.[1] : null;
 		if (!version) continue;
 		const parts = version.split(".").map(Number);
 		if (!latest || compareVersions(parts, latest.parts) > 0) {
