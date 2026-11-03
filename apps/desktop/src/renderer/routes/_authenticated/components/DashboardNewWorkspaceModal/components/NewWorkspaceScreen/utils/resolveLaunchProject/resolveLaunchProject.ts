@@ -90,6 +90,6 @@ export function resolveLaunchProject({
 	) {
 		return project(lastChoice.projectId);
 	}
-	if (projects.length === 1) return project(projects[0].id);
+	if (isReady && projects.length === 1) return project(projects[0].id);
 	return { projectId: null, isSession: false, isPending: !isReady };
 }

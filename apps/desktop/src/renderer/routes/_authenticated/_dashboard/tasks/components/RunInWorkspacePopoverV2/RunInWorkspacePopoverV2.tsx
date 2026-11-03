@@ -588,6 +588,11 @@ export function RunInWorkspacePopoverV2({
 							other="Run # Workspaces"
 						/>
 					</Button>
+					{submitBlocker && (
+						<p className="px-1 pt-1.5 text-xs text-muted-foreground">
+							{submitBlocker}
+						</p>
+					)}
 				</div>
 			</PopoverContent>
 		</Popover>

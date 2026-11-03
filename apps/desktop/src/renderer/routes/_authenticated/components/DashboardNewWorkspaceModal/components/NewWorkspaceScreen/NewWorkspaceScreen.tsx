@@ -259,7 +259,11 @@ export function NewWorkspaceScreen({
 			: preSelectedProjectId
 				? `project:${preSelectedProjectId}`
 				: null;
-		if (!intent || intent === appliedIntentRef.current) return;
+		if (!intent) {
+			appliedIntentRef.current = null;
+			return;
+		}
+		if (intent === appliedIntentRef.current) return;
 		appliedIntentRef.current = intent;
 		if (preSelectedSession) selectSession();
 		else if (

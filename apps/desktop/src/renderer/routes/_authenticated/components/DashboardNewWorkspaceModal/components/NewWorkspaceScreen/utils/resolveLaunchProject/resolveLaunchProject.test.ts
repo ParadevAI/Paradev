@@ -143,6 +143,14 @@ test("selects the only project when nothing else decides", () => {
 	});
 });
 
+test("doesn't auto-select a lone project while other hosts are still loading", () => {
+	expect(resolve({ kind: "none" }, [cloudHours], { isReady: false })).toEqual({
+		projectId: null,
+		isSession: false,
+		isPending: true,
+	});
+});
+
 test("leaves the choice open rather than guessing among several", () => {
 	expect(resolve({ kind: "none" }, [cloudHours, cloudApi])).toEqual({
 		projectId: null,
