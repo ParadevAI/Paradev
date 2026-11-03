@@ -98,7 +98,12 @@ export async function placeOrDispose<T>(
 		if (owned) {
 			await client.terminal.killSession
 				.mutate({ workspaceId, terminalId })
-				.catch(() => {});
+				.catch((killError: unknown) => {
+					throw new CLIError(
+						`${error instanceof Error ? error.message : String(error)}; terminal ${terminalId} is still running: ${killError instanceof Error ? killError.message : String(killError)}`,
+						`Close it with \`superset terminals close --terminal ${terminalId}\``,
+					);
+				});
 		}
 		throw error;
 	}

@@ -104,8 +104,14 @@ export async function closePanes(
 	match: PaneMatch,
 ): Promise<ClosedPanes> {
 	const closedPaneIds: string[] = [];
+	let panes: PaneLayoutPane[];
 	try {
-		const panes = await listPanes(client, workspaceId);
+		panes = await listPanes(client, workspaceId);
+	} catch (error) {
+		if (hasNoPanes(error)) return { closedPaneIds, error: null };
+		return { closedPaneIds, error: errorMessage(error) };
+	}
+	try {
 		for (const pane of panes.filter(match)) {
 			await client.panes.close.mutate({
 				workspaceId,
@@ -116,12 +122,12 @@ export async function closePanes(
 		}
 		return { closedPaneIds, error: null };
 	} catch (error) {
-		if (hasNoPanes(error)) return { closedPaneIds, error: null };
-		return {
-			closedPaneIds,
-			error: error instanceof Error ? error.message : String(error),
-		};
+		return { closedPaneIds, error: errorMessage(error) };
 	}
+}
+
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
 }
 
 export function isMissingPanesRouter(error: unknown): boolean {
@@ -148,7 +154,7 @@ export function stopFailedError(
 	panes: ClosedPanes,
 	error: unknown,
 ): CLIError {
-	const reason = error instanceof Error ? error.message : String(error);
+	const reason = errorMessage(error);
 	const ids = panes.closedPaneIds;
 	const closed =
 		ids.length === 0
@@ -157,7 +163,8 @@ export function stopFailedError(
 	const open = panes.error ? ` Some panes did not close: ${panes.error}.` : "";
 	return new CLIError(
 		`Could not end ${what}: ${reason}.${closed}${open}`,
-		"Run the same command again to retry",
+		(error instanceof CLIError && error.suggestion) ||
+			"Run the same command again to retry",
 	);
 }
 

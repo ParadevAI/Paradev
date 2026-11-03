@@ -10,6 +10,7 @@ let bindings: Array<Record<string, unknown>> = [];
 let splitInput: Record<string, unknown> | undefined;
 let splitError: Error | null = null;
 let killInput: Record<string, unknown> | undefined;
+let killError: Error | null = null;
 const callerTerminalId = process.env.SUPERSET_TERMINAL_ID;
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001";
@@ -61,6 +62,7 @@ withLocalHostService("org-1", {
 	},
 	"terminal.killSession": (input) => {
 		killInput = input;
+		if (killError) throw killError;
 		return { success: true };
 	},
 	"agents.run": (input) => {
@@ -99,6 +101,7 @@ afterEach(() => {
 	splitInput = undefined;
 	splitError = null;
 	killInput = undefined;
+	killError = null;
 	if (callerTerminalId === undefined) delete process.env.SUPERSET_TERMINAL_ID;
 	else process.env.SUPERSET_TERMINAL_ID = callerTerminalId;
 });
@@ -282,6 +285,15 @@ describe("agents create", () => {
 			workspaceId: WORKSPACE_ID,
 			terminalId: "terminal-1",
 		});
+	});
+
+	test("--split names the agent's terminal when ending it fails too", async () => {
+		process.env.SUPERSET_TERMINAL_ID = "terminal-caller";
+		splitError = new Error("pane is gone");
+		killError = new Error("host busy");
+		await expect(
+			invoke(undefined, { prompt: "Review this diff", split: "right" }),
+		).rejects.toThrow(/terminal terminal-1 is still running/);
 	});
 
 	test("--split with an unknown --pane fails before launching the agent", async () => {

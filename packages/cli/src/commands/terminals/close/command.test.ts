@@ -102,6 +102,15 @@ describe("terminals close", () => {
 		expect(calls).toEqual(["close pane-child", "killSession"]);
 	});
 
+	test("a pane that the desktop refuses to close is a pane error", async () => {
+		closeError = Object.assign(new Error("No window is open"), {
+			code: "PRECONDITION_FAILED",
+		});
+		await expect(invoke("term-child")).rejects.toThrow(
+			/but not the panes that show it: No window is open/,
+		);
+	});
+
 	test("names the closed pane when ending the terminal fails", async () => {
 		killError = new Error("host busy");
 		await expect(invoke("term-child")).rejects.toThrow(
