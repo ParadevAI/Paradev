@@ -1,5 +1,6 @@
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
 import { getPluginIconUrl } from "renderer/components/PluginIcon";
+import { getFileIcon } from "renderer/lib/fileIcons";
 import { parseGithubWorkItemUrl } from "../githubWorkItem";
 import { unfurlLink } from "../linkUnfurl";
 import { parseSupersetAppLink } from "../supersetAppLink";
@@ -92,7 +93,9 @@ export function linkChip(
 			? getPluginIconUrl(unfurl.icon.name, options.isDark)
 			: unfurl?.icon.kind === "environment"
 				? ENVIRONMENT_ICON_URL
-				: undefined;
+				: unfurl?.icon.kind === "file"
+					? getFileIcon(unfurl.icon.fileName, false).src
+					: undefined;
 	return {
 		label: chat ?? readableLabel(url, text) ?? unfurl?.label ?? text,
 		serialized: text,

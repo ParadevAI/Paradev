@@ -11,12 +11,14 @@ import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../../../../../ChatSession/components/WorkDrawer";
+import { ChatPaneActionsProvider } from "../../../../../ChatSession/providers/ChatPaneActionsProvider";
 import { heldPromptQueue } from "../../../../../ChatSession/utils/heldPromptQueue";
 
 const NO_COMMANDS: never[] = [];
 
 export function DraftChat({
 	draftKey,
+	getOpenFilePaths,
 	isActive,
 	notice,
 	onOpenHistory,
@@ -25,6 +27,7 @@ export function DraftChat({
 	workspaceId,
 }: {
 	draftKey: string;
+	getOpenFilePaths?: () => ReadonlySet<string>;
 	isActive: boolean;
 	notice: ReactNode;
 	onOpenHistory?: () => void;
@@ -55,16 +58,21 @@ export function DraftChat({
 				queue={promptQueue}
 				ref={drawerRef}
 			/>
-			<Composer
-				availableCommands={NO_COMMANDS}
-				draftKey={draftKey}
-				inputRef={composerRef}
-				isActive={isActive}
-				onEnterDrawer={enterDrawer}
-				onOpenHistory={onOpenHistory}
-				onSend={(content) => onQueue(content)}
+			<ChatPaneActionsProvider
+				getOpenFilePaths={getOpenFilePaths}
 				workspaceId={workspaceId}
-			/>
+			>
+				<Composer
+					availableCommands={NO_COMMANDS}
+					draftKey={draftKey}
+					inputRef={composerRef}
+					isActive={isActive}
+					onEnterDrawer={enterDrawer}
+					onOpenHistory={onOpenHistory}
+					onSend={(content) => onQueue(content)}
+					workspaceId={workspaceId}
+				/>
+			</ChatPaneActionsProvider>
 		</ComposerDropZone>
 	);
 }

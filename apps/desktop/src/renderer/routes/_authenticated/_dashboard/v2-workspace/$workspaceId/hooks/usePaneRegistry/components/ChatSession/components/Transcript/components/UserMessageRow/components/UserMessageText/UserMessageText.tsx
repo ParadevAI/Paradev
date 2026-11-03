@@ -18,6 +18,7 @@ import {
 	CHAT_REMARK_PLUGINS,
 } from "../../../../../../constants";
 import { commandChip } from "../../../../../../utils/commandChip";
+import { fileMentionChip } from "../../../../../../utils/fileMentions";
 import { linkChip } from "../../../../../../utils/linkChip";
 import type { MessageSegment } from "../../../../../../utils/messageElements";
 import { ChatLink } from "../../../../../ChatLink";
@@ -47,6 +48,9 @@ function segmentChip(
 			...commandChip(name, commands?.get(name)?.description),
 			serialized: text,
 		};
+	}
+	if (element.elementKind === "file_mention") {
+		return fileMentionChip(text, element.label);
 	}
 	return {
 		label: element.label ?? text.split("/").pop() ?? text,

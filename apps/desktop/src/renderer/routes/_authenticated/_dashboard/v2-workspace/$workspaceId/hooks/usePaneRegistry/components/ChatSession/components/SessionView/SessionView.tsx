@@ -127,6 +127,7 @@ export function SessionView({
 	openFile,
 	openPage,
 	openLink,
+	getOpenFilePaths,
 	onOpenHistory,
 	terminalId,
 	onNewChat,
@@ -188,6 +189,7 @@ export function SessionView({
 	openDiff?: OpenDiff;
 	openPage?: OpenPage;
 	openLink?: OpenLink;
+	getOpenFilePaths?: () => ReadonlySet<string>;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	onNewChat?: () => void;
@@ -672,6 +674,7 @@ export function SessionView({
 			openFile={openFile}
 			openPage={openPage}
 			openLink={openLink}
+			getOpenFilePaths={getOpenFilePaths}
 			workspaceId={workspaceId}
 		>
 			<ComposerDropZone
