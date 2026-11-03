@@ -15,6 +15,7 @@ export {
 	findFirstPaneId,
 	findPanePath,
 	getActiveIdAfterRemoval,
+	getPaneIdsInLayout,
 	getPaneParentDirection,
 	getSpatialNeighborPaneId,
 	removePaneFromLayout,

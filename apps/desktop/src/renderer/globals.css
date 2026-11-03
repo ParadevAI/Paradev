@@ -80,6 +80,9 @@
 	--tab-hover: color-mix(in oklab, var(--foreground) 5%, transparent);
 	--tab-selected: color-mix(in oklab, var(--foreground) 15%, var(--sidebar));
 	--tab-selected-shadow: inset 0 0 0 0.8px rgb(255 255 255 / 0.1);
+	--tab-icon-card: color-mix(in oklab, var(--foreground) 12%, var(--sidebar));
+	--tab-icon-card-shadow:
+		inset 0 0.5px 0 rgb(255 255 255 / 0.14), 0 0 0 1px rgb(0 0 0 / 0.55);
 }
 
 /* Light theme fallback values - applied before hydration if user has light theme saved */
@@ -133,6 +136,10 @@
 	--tab-selected-shadow:
 		0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent),
 		0 1.5px 3.5px rgb(0 0 0 / 0.1);
+	--tab-icon-card: var(--card);
+	--tab-icon-card-shadow:
+		0 0 0 1px color-mix(in oklab, var(--foreground) 14%, transparent),
+		0 1px 1.5px rgb(0 0 0 / 0.08);
 }
 
 /* WindowFocusSync sets this while the OS window is not focused. */

@@ -172,8 +172,10 @@ export function TabItem<TData>({
 									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
 									<div
 										className={cn(
-											"flex h-full min-w-0 flex-1 items-center pr-1 pl-3 text-left transition-colors",
-											isCards ? "gap-2" : "gap-1.5 text-xs",
+											"flex h-full min-w-0 flex-1 items-center pr-1 text-left transition-colors",
+											isCards
+												? cn("gap-2", icon ? "pl-1.5" : "pl-3")
+												: "gap-1.5 pl-3 text-xs",
 										)}
 										onAuxClick={(event) => {
 											if (event.button === 1) {
@@ -183,7 +185,9 @@ export function TabItem<TData>({
 										}}
 										onDoubleClick={onRename ? startEditing : undefined}
 									>
-										{icon && <span className="shrink-0">{icon}</span>}
+										{icon && (
+											<span className="flex shrink-0 items-center">{icon}</span>
+										)}
 										<OverflowFadeText
 											className={cn("flex-1", isPreview && "italic")}
 										>

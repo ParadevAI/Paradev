@@ -1,0 +1,1 @@
+export { TabIconCard } from "./TabIconCard";

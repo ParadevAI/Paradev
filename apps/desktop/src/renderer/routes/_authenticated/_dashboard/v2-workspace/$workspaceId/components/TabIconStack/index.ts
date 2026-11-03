@@ -1,0 +1,1 @@
+export { TabIconStack } from "./TabIconStack";

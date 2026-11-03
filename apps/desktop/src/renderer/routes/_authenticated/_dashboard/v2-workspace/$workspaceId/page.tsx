@@ -42,6 +42,7 @@ import {
 	getRightPaneOptions,
 	type RightPaneKind,
 } from "./components/RightPaneNewTab";
+import { TabIconStack } from "./components/TabIconStack";
 import { V2NotificationStatusIndicator } from "./components/V2NotificationStatusIndicator";
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceOpenInButton } from "./components/V2WorkspaceOpenInButton";
@@ -703,7 +704,18 @@ function V2WorkspaceContent() {
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}
 									onPaneError={reportRendererError}
-									renderTabIcon={renderBrowserTabIcon}
+									renderTabIcon={
+										isParadevShell
+											? (tab) => (
+													<TabIconStack
+														tab={tab}
+														registry={paneRegistry}
+														store={store}
+														workspaceId={workspaceId}
+													/>
+												)
+											: renderBrowserTabIcon
+									}
 									renderTabAccessory={(tab) => (
 										<V2NotificationStatusIndicator
 											sources={getV2NotificationSourcesForTab(tab)}

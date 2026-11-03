@@ -31,6 +31,7 @@ import { useNewTabLists } from "../../hooks/useNewTabLists";
 import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/BrowserPane";
 import type { PaneViewerData } from "../../types";
 import { NEW_TAB_PANE } from "../RightPaneNewTab";
+import { TabIconStack } from "../TabIconStack";
 import { V2NotificationStatusIndicator } from "../V2NotificationStatusIndicator";
 import { PullRequestCountsPrefetch } from "./components/PullRequestCountsPrefetch";
 import {
@@ -107,7 +108,18 @@ export function RightPaneArea({
 				paneActions={rightPaneActions}
 				contextMenuActions={rightContextMenuActions}
 				onPaneError={reportRendererError}
-				renderTabIcon={renderBrowserTabIcon}
+				renderTabIcon={
+					isParadevShell
+						? (tab) => (
+								<TabIconStack
+									tab={tab}
+									registry={registry}
+									store={store}
+									workspaceId={workspace.id}
+								/>
+							)
+						: renderBrowserTabIcon
+				}
 				renameTabs={false}
 				isPreviewTab={isPreviewTab}
 				onTabClick={(tab) => {
