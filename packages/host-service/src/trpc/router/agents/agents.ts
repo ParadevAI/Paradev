@@ -512,10 +512,10 @@ export function bindResumedSession(
 async function runTerminalAgent(
 	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
 	input: AgentRunInput,
+	terminalId: string = crypto.randomUUID(),
 ): Promise<AgentRunResult> {
 	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
-	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
 		terminalId,
 		workspaceId: input.workspaceId,
@@ -744,13 +744,14 @@ function launchChatAgent(
 	ctx: Pick<HostServiceContext, "db" | "runtime">,
 	input: AgentRunInput,
 	cwd: string,
+	terminalId?: string,
 ): AgentRunResult | null {
 	const target = chatLaunchTarget(ctx.db, input);
 	if (!target) return null;
 	const chat = ctx.runtime.chat?.();
 	if (!chat?.live.supports(target.harness)) return null;
 
-	const created = createChatSession(chat, target, input, cwd);
+	const created = createChatSession(chat, target, input, cwd, terminalId);
 	const chatAgentId = presetForAcpHarness(target.harness);
 	return {
 		kind: "terminal",
@@ -801,9 +802,11 @@ async function continueTerminalAgent(
 	};
 }
 
+/** `launch.terminalId` is host-internal: the id a cloud launch was promised. */
 export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
+	launch: { terminalId?: string } = {},
 ): Promise<AgentRunResult> {
 	const workspace = ctx.db.query.workspaces
 		.findFirst({
@@ -842,8 +845,8 @@ export async function runAgentInWorkspace(
 		}
 	}
 	return (
-		launchChatAgent(ctx, input, workspace.worktreePath) ??
-		runTerminalAgent(ctx, input)
+		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
+		runTerminalAgent(ctx, input, launch.terminalId)
 	);
 }
 
