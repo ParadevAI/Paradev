@@ -1,5 +1,6 @@
 import type { StoredItem } from "@superset/chat/core";
 import type { UserContent, UserMessage } from "@superset/chat/protocol";
+import { hasUserMessage } from "../hasUserMessage";
 
 const NOTHING = async () => {};
 
@@ -11,8 +12,7 @@ export function heldPromptQueue(
 	},
 ) {
 	const launchedPending =
-		sent?.launched !== undefined &&
-		![...sent.items.values()].some(({ item }) => item.kind === "user_message");
+		sent?.launched !== undefined && !hasUserMessage(sent.items);
 	const prompts =
 		launchedPending && sent?.launched ? [sent.launched, ...queued] : queued;
 	if (prompts.length === 0) return undefined;
