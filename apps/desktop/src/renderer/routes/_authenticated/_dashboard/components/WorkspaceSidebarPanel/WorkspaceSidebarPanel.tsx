@@ -5,6 +5,7 @@ import {
 	DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 	useWorkspaceSidebarStore,
 } from "renderer/stores/workspace-sidebar-state";
+import { useAutoCollapseInNarrowWindow } from "./hooks/useAutoCollapseInNarrowWindow";
 import { getWorkspaceSidebarMaxWidth } from "./utils/getWorkspaceSidebarMaxWidth";
 
 const subscribeToResize = (onChange: () => void) => {
@@ -23,6 +24,7 @@ export function WorkspaceSidebarPanel({
 	const width = useWorkspaceSidebarStore((s) => s.width);
 	const setWidth = useWorkspaceSidebarStore((s) => s.setWidth);
 	const maxWidth = useSyncExternalStore(subscribeToResize, getMaxWidth);
+	useAutoCollapseInNarrowWindow();
 	return (
 		<ResizablePanel
 			width={

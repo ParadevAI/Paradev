@@ -44,7 +44,7 @@ When you install a plugin, Paradev adds its MCP server to each supported agent's
 
 | Agent | Config file | How Paradev writes it |
 |:------|:------------|:-----------------------|
-| Claude Code | `~/.claude.json` (user `mcpServers`) | Adds one entry per plugin and records it in `~/.superset/plugins/mcp-ledger.json` |
+| Claude Code | `~/.claude.json` (user `mcpServers`) | Adds one entry per plugin and records it in `~/.paradev/plugins/mcp-ledger.json` |
 | Codex | `~/.codex/config.toml` | Adds `[mcp_servers.<name>]` tables inside a `# >>> superset managed mcp servers >>>` block |
 
 - **Your entries win.** If you already configured a server for that agent with the same name as the plugin, Paradev leaves yours in place and does not add a copy. This is per agent: a server you added to Codex does not stop Paradev from adding it to Claude Code.

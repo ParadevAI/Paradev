@@ -24,6 +24,10 @@ import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 
 const AT_BOTTOM_THRESHOLD = 48;
+const MAINTAIN_SCROLL_AT_END = {
+	animated: false,
+	on: { dataChange: true, layout: true },
+};
 
 interface ConversationContextType {
 	isAtBottom: boolean;
@@ -60,11 +64,14 @@ export const Conversation = <ItemT,>({
 	contentContainerClassName,
 	contentContainerStyle,
 	onScroll,
+	onScrollBeginDrag,
+	onScrollEndDrag,
 	children,
 	...listProps
 }: ConversationProps<ItemT>) => {
 	const listRef = useRef<LegendListRef>(null);
 	const [isAtBottom, setIsAtBottom] = useState(true);
+	const [isDragging, setIsDragging] = useState(false);
 	const resolvedContentContainerStyle = useResolveClassNames(
 		contentContainerClassName ?? "",
 	);
@@ -79,6 +86,22 @@ export const Conversation = <ItemT,>({
 			onScroll?.(event);
 		},
 		[onScroll],
+	);
+
+	const handleScrollBeginDrag = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+			setIsDragging(true);
+			onScrollBeginDrag?.(event);
+		},
+		[onScrollBeginDrag],
+	);
+
+	const handleScrollEndDrag = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+			setIsDragging(false);
+			onScrollEndDrag?.(event);
+		},
+		[onScrollEndDrag],
 	);
 
 	const scrollToBottom = useCallback(() => {
@@ -105,11 +128,9 @@ export const Conversation = <ItemT,>({
 					// makes expanding a collapsible (tool card) yank the whole list up,
 					// so the chevron the user just tapped jumps away. Streaming still
 					// sticks to bottom via `dataChange` (every chunk replaces the data
-					// array) and `layout` covers keyboard/list resizes.
-					maintainScrollAtEnd={{
-						animated: false,
-						on: { dataChange: true, layout: true },
-					}}
+					// array) and `layout` covers keyboard/list resizes. Off while a
+					// finger drags, or each chunk pulls the reader back down.
+					maintainScrollAtEnd={isDragging ? false : MAINTAIN_SCROLL_AT_END}
 					maintainScrollAtEndThreshold={0.15}
 					recycleItems={false}
 					renderItem={renderItem}
@@ -120,6 +141,8 @@ export const Conversation = <ItemT,>({
 							: contentContainerStyle
 					}
 					onScroll={handleScroll}
+					onScrollBeginDrag={handleScrollBeginDrag}
+					onScrollEndDrag={handleScrollEndDrag}
 					ref={listRef}
 				/>
 				{children}

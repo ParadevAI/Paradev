@@ -1,7 +1,9 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { TRPCClientError } from "@trpc/client";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import { workspaceLinks } from "../../../lib/open-url";
 import {
 	listGroupSettings,
 	workspaceGroupNames,
@@ -14,7 +16,7 @@ export default command({
 	],
 	options: {
 		host: string().desc(
-			"Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)",
+			"Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)",
 		),
 		local: boolean().desc("The workspace is on this machine"),
 		field: string()
@@ -45,7 +47,7 @@ export default command({
 		);
 		const detail = hostId
 			? await hostDetail(ctx, organizationId, id, hostId)
-			: await cloudDetail(ctx, organizationId, id);
+			: await cloudDetail(ctx, id);
 
 		if (options.field) {
 			if (!Object.hasOwn(detail, options.field)) {
@@ -75,24 +77,37 @@ export default command({
 
 type Ctx = Parameters<Parameters<typeof command>[0]["run"]>[0]["ctx"];
 
-/** A cloud workspace's details are the API's row; reading them never wakes its sandbox. */
-async function cloudDetail(ctx: Ctx, organizationId: string, id: string) {
-	const rows = await ctx.api.cloudWorkspace.list.query({ organizationId });
-	const row = rows.find((candidate) => candidate.id === id);
-	if (!row) {
-		throw new CLIError(
-			`No cloud workspace ${id} in this organization`,
-			"Pass --local for a workspace on this machine, or --host <id> for another host",
-		);
-	}
+/** A cloud workspace's details are the API's record; reading them never wakes its sandbox. */
+async function cloudDetail(ctx: Ctx, id: string) {
+	const row = await ctx.api.cloudWorkspace.get.query({ id }).catch((error) => {
+		if (
+			error instanceof TRPCClientError &&
+			(error.data?.code === "NOT_FOUND" || error.data?.code === "BAD_REQUEST")
+		) {
+			throw new CLIError(
+				`No cloud workspace ${id} in this organization`,
+				"Pass --local for a workspace on this machine, or --host <id> for another host",
+			);
+		}
+		throw error;
+	});
+	const joined = (values: string[]) => values.join(", ") || null;
 	return {
 		id: row.id,
 		name: row.name,
 		branch: row.branch,
 		status: row.status,
-		environmentId: row.environmentId,
-		createdByUserId: row.createdByUserId,
+		visibility: row.visibility,
+		agentStatus: row.agentStatus,
+		description: row.description,
+		environmentId: row.environment?.id ?? null,
+		createdByUserId: row.createdBy?.userId ?? null,
 		createdAt: row.createdAt,
+		archivedAt: row.deletedAt,
+		repositories: joined(row.repositories.map((repo) => repo.fullName)),
+		tasks: joined(row.tasks.map((task) => task.slug)),
+		labels: joined(row.labels.map((label) => label.name)),
+		...workspaceLinks(row.id),
 	};
 }
 
@@ -139,5 +154,6 @@ async function hostDetail(
 		worktreePath: workspace.worktreePath,
 		worktreeExists: workspace.worktreeExists,
 		createdAt: workspace.createdAt,
+		...workspaceLinks(workspace.id),
 	};
 }

@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 
 export type PastedTextCardProps = {
 	text: string;
-	action: ReactNode;
+	action?: ReactNode;
 	onRemove?: () => void;
 	// What copying a selection across the card gives back.
 	sourceText?: string;
@@ -47,8 +47,12 @@ export function PastedTextCard({
 					{title}
 				</span>
 				<span className="flex items-center gap-1 whitespace-nowrap text-muted-foreground text-xs">
-					{action}
-					<span aria-hidden>·</span>
+					{action && (
+						<>
+							{action}
+							<span aria-hidden>·</span>
+						</>
+					)}
 					<span>
 						{t({
 							message: plural(lines, { one: "# line", other: "# lines" }),

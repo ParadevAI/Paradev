@@ -92,7 +92,7 @@ export function buildWhenToUseSection(): string[] {
 		"",
 		`Reach for ${BRAND.NAME} when you need to:`,
 		"",
-		"- Run several coding agents (Claude Code, Codex, OpenCode, or any CLI agent) at the same time on one repository without them stepping on each other. Each agent gets an isolated Git worktree and its own branch.",
+		"- Run several coding agents (Claude Code, Codex, OpenCode, or any CLI agent) at the same time on one repository without them editing the same working files. Each agent gets its own Git worktree and branch.",
 		`- Orchestrate agent work programmatically: create workspaces, launch agents with a prompt, open terminals, and track tasks from another agent or script via the ${BRAND.NAME} MCP server.`,
 		"- Run a prompt automatically (automations) on a cron-like schedule or when an event happens, such as a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook, in a fresh or existing workspace.",
 		"- Review diffs, manage ports, and monitor many concurrent agent sessions from one dashboard.",

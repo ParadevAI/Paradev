@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { automationGroupInputSchema } from "@superset/shared/automation-group";
 import {
 	describeEnvironments,
 	selectCloudEnvironment,
@@ -101,6 +102,11 @@ export function register(server: McpServer): void {
 				.optional()
 				.describe(
 					"Workspace tags applied to each run's created workspace; each tag files it into a sidebar folder of the same name. Defaults to ['automation'] so runs group out of the box.",
+				),
+			group: automationGroupInputSchema
+				.optional()
+				.describe(
+					"Group the automation is listed under in the automations table. Omit to leave it ungrouped. At most 64 characters; a name matching an existing group in any case joins that group.",
 				),
 		},
 		handler: async (input, ctx) => {

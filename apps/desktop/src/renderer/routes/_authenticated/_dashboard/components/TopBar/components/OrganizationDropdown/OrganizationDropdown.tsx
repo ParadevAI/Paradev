@@ -79,9 +79,10 @@ export function OrganizationDropdown({
 			message: "Organization",
 		});
 
-	const { plan: currentPlan } = useCurrentPlan();
+	const { plan: currentPlan, activePlan } = useCurrentPlan();
 	const isPaid = currentPlan !== "free";
-	const planLabel = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+	const planName = activePlan?.planTier ?? currentPlan;
+	const planLabel = planName.charAt(0).toUpperCase() + planName.slice(1);
 	const planBadge = isPaid ? (
 		<Badge
 			variant="default"

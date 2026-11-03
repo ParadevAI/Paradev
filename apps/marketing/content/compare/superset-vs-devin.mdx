@@ -25,7 +25,7 @@ Devin is a cloud-based AI software engineer that works autonomously in a remote 
 | **Category** | Agent orchestration workspace | Autonomous AI software engineer |
 | **Architecture** | Local-first: worktrees run on your machine or remote hosts you own; cloud workspaces run in the cloud | Fully remote: runs in cloud VMs |
 | **AI approach** | Agent-agnostic: orchestrates external agents plus Paradev Chat and MCP tools | Proprietary AI with browser, editor, and terminal in cloud |
-| **Parallelism** | Multiple agents across isolated local worktrees | Parallel cloud sessions |
+| **Parallelism** | Multiple agents across separate local worktrees | Parallel cloud sessions |
 | **Code privacy** | Local-first; outbound model traffic depends on your chosen agents/providers | Code runs on Cognition's cloud infrastructure |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free; Pro $20/mo, Max $200/mo, Teams $80 + $40/seat |
 | **License** | Source-available (ELv2) | Closed source |
@@ -34,7 +34,7 @@ Devin is a cloud-based AI software engineer that works autonomously in a remote 
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -60,7 +60,7 @@ Devin is a single proprietary agent: you use Cognition's AI or nothing. Paradev 
 
 ### Isolation Mechanism
 
-Paradev isolates agents using Git worktrees: lightweight, fast, and built into git itself. Devin isolates each session in a full cloud VM with its own OS, browser, and toolchain. VMs provide stronger isolation and fuller environment parity, but at much higher cost and latency.
+Paradev separates agents' working files using Git worktrees: lightweight, fast, and built into git itself. Worktrees do not sandbox processes or prevent merge conflicts. Devin isolates each session in a full cloud VM with its own OS, browser, and toolchain. VMs provide stronger isolation and fuller environment parity, but at much higher cost and latency.
 
 ### Pricing
 

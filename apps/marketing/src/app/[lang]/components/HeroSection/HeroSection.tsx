@@ -5,6 +5,7 @@ import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaApple, FaGithub } from "react-icons/fa";
+import { EdgeGlare } from "@/app/[lang]/components/EdgeGlare";
 import { track } from "@/lib/analytics";
 import { HEADLINE_VARIANTS, type HeadlineVariant } from "@/lib/hero-headline";
 import { DownloadButton } from "../DownloadButton";
@@ -71,7 +72,7 @@ export function HeroSection() {
 									? "/blog/superset-is-now-paradev"
 									: `/${i18n.locale}/blog/superset-is-now-paradev`
 							}
-							className="group mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
+							className="group relative mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
 							<span
 								aria-hidden="true"
@@ -88,6 +89,7 @@ export function HeroSection() {
 							>
 								→
 							</span>
+							<EdgeGlare className="-inset-px rounded-[inherit]" />
 						</Link>
 						<div className="space-y-4 sm:space-y-6">
 							<h1

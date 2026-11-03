@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import { INCLUDE_ORGANIZATION } from "renderer/hooks/usePluginCatalog";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { usePluginMutations } from "../usePluginMutations";
 
@@ -13,13 +14,14 @@ export function useInstallAfterConnect() {
 			if (inFlight.current.has(pluginName)) return;
 			inFlight.current.add(pluginName);
 			try {
-				const rows = await utils.plugins.list.fetch(undefined, {
+				const rows = await utils.plugins.list.fetch(INCLUDE_ORGANIZATION, {
 					staleTime: 0,
 				});
 				const row = rows.find((entry) => entry.name === pluginName);
 				const connected = Boolean(row?.connector && row.connections.length > 0);
 				const installed = Boolean(row?.installed && row.enabled);
-				if (connected && !installed) await install(pluginName);
+				if (connected && !installed)
+					await install(pluginName, row?.marketplace);
 			} finally {
 				inFlight.current.delete(pluginName);
 			}

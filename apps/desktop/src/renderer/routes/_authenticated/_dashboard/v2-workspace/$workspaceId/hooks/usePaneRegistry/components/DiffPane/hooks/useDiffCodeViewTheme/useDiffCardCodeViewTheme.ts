@@ -6,8 +6,7 @@ import { useDiffCodeViewTheme } from "./useDiffCodeViewTheme";
 /**
  * useDiffCodeViewTheme plus the per-file look shared by the PR Code tab and
  * the v2-workspace DiffPane: files edge to edge with a divider between them,
- * 32px headers, PullRequestRow's additions/deletions colors, and the app
- * background instead of the terminal theme's.
+ * 32px headers and PullRequestRow's additions/deletions colors.
  */
 export function useDiffCardCodeViewTheme() {
 	const { options, style } = useDiffCodeViewTheme();
@@ -17,8 +16,7 @@ export function useDiffCardCodeViewTheme() {
 	// list and in a card-styled diff. Branched in JS rather than a `.dark`
 	// selector in unsafeCSS — `.dark` lives on an ancestor outside Pierre's
 	// shadow root, which a shadow-scoped stylesheet's descendant combinator
-	// can't reach (see additionColor/deletionColor in useDiffCodeViewTheme
-	// for the same pattern).
+	// can't reach.
 	const activeTheme = useResolvedTheme();
 	const additionsColor =
 		activeTheme.type === "dark" ? "#34d399" : "var(--color-emerald-600)";
@@ -45,17 +43,5 @@ export function useDiffCardCodeViewTheme() {
 		[options, additionsColor, deletionsColor],
 	);
 
-	// useDiffCodeViewTheme sources its background from the *terminal* theme
-	// (terminalTheme?.background ?? var(--background)), but the diff draws
-	// its dividers against the app's own var(--background) — the
-	// two don't match (e.g. a flat white terminal background against the
-	// app's slightly-off-white #f9f9fa). Most visible on the CodeView root's
-	// own native scrollbar, which paints against whatever background that
-	// element has.
-	const cardStyle = useMemo(
-		() => ({ ...style, backgroundColor: "var(--background)" }),
-		[style],
-	);
-
-	return { options: cardOptions, style: cardStyle };
+	return { options: cardOptions, style };
 }

@@ -40,7 +40,7 @@ export function RightPaneNewTab({ onOpen }: RightPaneNewTabProps) {
 
 	return (
 		<div className="flex h-full w-full overflow-y-auto">
-			<div className="mx-auto w-full max-w-3xl space-y-4 p-4">
+			<div className="mx-auto w-full max-w-[640px] space-y-4 p-4">
 				<CloudSection title={<Trans>Tools</Trans>}>
 					<div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2 px-1">
 						{options.map((option) => (

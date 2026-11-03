@@ -4,9 +4,17 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./agent-routines": {
+			"types": "./src/agent-routines.ts",
+			"default": "./src/agent-routines.ts"
+		},
 		"./project-config": {
 			"types": "./src/project-config/index.ts",
 			"default": "./src/project-config/index.ts"
+		},
+		"./project-config/dir": {
+			"types": "./src/project-config/dir.ts",
+			"default": "./src/project-config/dir.ts"
 		},
 		"./oauth-refresh": {
 			"types": "./src/oauth-refresh.ts",
@@ -28,6 +36,10 @@
 		"./account-labels": {
 			"types": "./src/account-labels.ts",
 			"default": "./src/account-labels.ts"
+		},
+		"./html-preview": {
+			"types": "./src/html-preview.ts",
+			"default": "./src/html-preview.ts"
 		},
 		"./page-zoom": {
 			"types": "./src/page-zoom.ts",
@@ -197,6 +209,10 @@
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
 		},
+		"./pull-request-checks": {
+			"types": "./src/pull-request-checks/index.ts",
+			"default": "./src/pull-request-checks/index.ts"
+		},
 		"./pull-request-threads": {
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
@@ -361,6 +377,10 @@
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"
 		},
+		"./workspace-attachments-dir": {
+			"types": "./src/workspace-attachments-dir.ts",
+			"default": "./src/workspace-attachments-dir.ts"
+		},
 		"./agent-permissions-migration": {
 			"types": "./src/agent-permissions-migration.ts",
 			"default": "./src/agent-permissions-migration.ts"
@@ -465,6 +485,10 @@
 			"types": "./src/themes/types.ts",
 			"default": "./src/themes/types.ts"
 		},
+		"./plugins/bundle": {
+			"types": "./src/plugins/bundle.ts",
+			"default": "./src/plugins/bundle.ts"
+		},
 		"./plugins/manifest-schema": {
 			"types": "./src/plugins/manifest-schema.ts",
 			"default": "./src/plugins/manifest-schema.ts"
@@ -488,6 +512,10 @@
 		"./missing-procedure-error": {
 			"types": "./src/missing-procedure-error.ts",
 			"default": "./src/missing-procedure-error.ts"
+		},
+		"./automation-group": {
+			"types": "./src/automation-group.ts",
+			"default": "./src/automation-group.ts"
 		}
 	},
 	"scripts": {
@@ -502,7 +530,7 @@
 		"culori": "4.0.2",
 		"drizzle-orm": "0.45.2",
 		"friendly-words": "1.3.1",
-		"jose": "6.2.2",
+		"jose": "6.2.13",
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
 		"smol-toml": "1.9.1",

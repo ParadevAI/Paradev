@@ -160,6 +160,7 @@ let renders = 0;
 function Probe(props: {
 	client: SessionClient;
 	sendEnabled?: boolean;
+	snapshotWorktree?: boolean;
 	scheduler?: FrameScheduler;
 	pageSize?: number;
 	wait?: ReturnType<typeof createManualWait>["wait"];
@@ -168,6 +169,7 @@ function Probe(props: {
 	latest = useChatSession({
 		client: props.client,
 		sendEnabled: props.sendEnabled,
+		snapshotWorktree: props.snapshotWorktree,
 		deltas: [],
 		scheduler: props.scheduler,
 		pageSize: props.pageSize,
@@ -319,6 +321,32 @@ describe("useChatSession", () => {
 		view.rerender(<Probe client={client} wait={manual.wait} sendEnabled />);
 		await domWaitFor(() => expect(session().outbox).toHaveLength(0));
 		expect(host.prompts()).toBe(1);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("asks the host to snapshot the worktree for each prompt when told to", async () => {
+		const stack = await startStack();
+		const asked: (boolean | undefined)[] = [];
+		const transport = new Proxy(stack.transport, {
+			get: (target, key) =>
+				key === "prompt"
+					? (input: Parameters<ChatTransport["prompt"]>[0]) => {
+							asked.push(input.snapshotWorktree);
+							return target.prompt(input);
+						}
+					: Reflect.get(target, key),
+		});
+		const client = stack.makeClient({ transport });
+		const view = render(<Probe client={client} snapshotWorktree />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+
+		await domWaitFor(() => expect(asked).toEqual([true]));
 		view.unmount();
 		client.close();
 		await stack.runtime.dispose();

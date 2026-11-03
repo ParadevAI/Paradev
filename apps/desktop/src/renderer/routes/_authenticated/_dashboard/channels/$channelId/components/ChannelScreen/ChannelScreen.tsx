@@ -52,6 +52,8 @@ interface ChannelScreenProps {
 	intro?: ReactNode;
 	/** Replaces the tabbed panel with one view, and turns off threads. */
 	renderPanel?: (panel: { hide: () => void }) => ReactNode;
+	/** Shown instead of the timeline and composer, beside the same header and panel. */
+	body?: ReactNode;
 	composerPlaceholder?: string;
 }
 
@@ -63,6 +65,7 @@ export function ChannelScreen({
 	renderHeader,
 	intro,
 	renderPanel,
+	body,
 	composerPlaceholder,
 }: ChannelScreenProps) {
 	const { t } = useLingui();
@@ -248,6 +251,10 @@ export function ChannelScreen({
 		},
 		[channelId, lastReadSeq, applyChannelRead, markReadMutate],
 	);
+	const onReturnedToUnread = useCallback(
+		(readSeq: number) => setGhost(readSeq),
+		[],
+	);
 	const markAllRead = useCallback(() => {
 		setGhost(null);
 		setManualUnread(false);
@@ -365,7 +372,9 @@ export function ChannelScreen({
 						}
 					/>
 				)}
-				{tab === "messages" ? (
+				{body ? (
+					body
+				) : tab === "messages" ? (
 					<>
 						<ChannelTimeline
 							channelId={channelId}
@@ -386,6 +395,7 @@ export function ChannelScreen({
 								isMember && !manualUnread && panel.mode !== "expanded"
 							}
 							onSeen={onSeen}
+							onReturnedToUnread={onReturnedToUnread}
 							onMarkAllRead={markAllRead}
 							onMarkUnread={isMember ? onMarkUnread : undefined}
 							peopleById={peopleById}

@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "granola",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Recall what was said in your meetings: search, read, and query Granola notes and transcripts.",
 	"author": {
 		"name": "Paradev",

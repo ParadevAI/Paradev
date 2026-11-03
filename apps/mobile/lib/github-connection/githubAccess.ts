@@ -1,6 +1,6 @@
 import { TRPCClientError } from "@trpc/client";
 
-export type GithubAccessFailure = "not-connected" | "no-access";
+type GithubAccessFailure = "not-connected" | "no-access";
 
 /**
  * Why the API could not act on GitHub for this person, or null when the

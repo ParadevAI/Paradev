@@ -4,8 +4,8 @@ import {
 	memo,
 	useDeferredValue,
 } from "react";
-import { TabVisibilityContext } from "../../../../hooks/useIsTabVisible";
 import { Tab } from "../Tab";
+import { TabVisibilityScope } from "./components/TabVisibilityScope";
 
 // Unlike display:none, this keeps the hidden tab's layout, so its resize
 // observers see no 0-size and its scroll offsets survive.
@@ -30,9 +30,9 @@ function KeptTabView<TData>({ isVisible, ...tabProps }: KeptTabProps<TData>) {
 			inert={!isVisible}
 			aria-hidden={isVisible ? undefined : true}
 		>
-			<TabVisibilityContext.Provider value={isPaneVisible}>
+			<TabVisibilityScope visible={isPaneVisible}>
 				<MemoTab {...tabProps} />
-			</TabVisibilityContext.Provider>
+			</TabVisibilityScope>
 		</div>
 	);
 }

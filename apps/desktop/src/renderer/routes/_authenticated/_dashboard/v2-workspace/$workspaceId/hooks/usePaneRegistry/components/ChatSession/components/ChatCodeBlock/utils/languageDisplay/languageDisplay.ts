@@ -26,6 +26,7 @@ const LANGUAGES: Record<string, [label: string, extension: string]> = {
 	makefile: ["Makefile", "makefile"],
 	markdown: ["Markdown", "md"],
 	md: ["Markdown", "md"],
+	mermaid: ["Mermaid", "mmd"],
 	patch: ["Diff", "diff"],
 	php: ["PHP", "php"],
 	py: ["Python", "py"],

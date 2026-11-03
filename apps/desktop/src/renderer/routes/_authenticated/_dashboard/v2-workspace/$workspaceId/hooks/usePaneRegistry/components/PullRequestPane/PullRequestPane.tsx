@@ -15,6 +15,7 @@ import {
 	PullRequestDetailTabs,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
 import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
+import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
@@ -56,6 +57,10 @@ export function PullRequestPane({
 		}),
 		[organizationId, data.repoFullName, data.number],
 	);
+	const { refresh, isRefreshing } = useRefreshPullRequest({
+		target,
+		url: detail.data?.url,
+	});
 
 	// Pages and "open in diff" belong to the workspace, so they exist only
 	// when this workspace's linked PR is the one on screen.
@@ -129,6 +134,8 @@ export function PullRequestPane({
 						data={detail.data}
 						isLoading={detail.isLoading}
 						showStartWorkspace={false}
+						onRefresh={refresh}
+						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</div>

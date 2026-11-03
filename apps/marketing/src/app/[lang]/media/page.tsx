@@ -2,14 +2,13 @@ import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
+import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
-import { AboutSection } from "./components/AboutSection";
+import { AtAGlanceSection } from "./components/AtAGlanceSection";
 import { BrandAssetsSection } from "./components/BrandAssetsSection";
 import { LatestNewsSection } from "./components/LatestNewsSection";
-import { PressContactSection } from "./components/PressContactSection";
-import { PressCoverageSection } from "./components/PressCoverageSection";
 
 const productName = BRAND.NAME;
 const formerName = BRAND.FORMER_NAME;
@@ -62,13 +61,20 @@ export default async function MediaPage() {
 						</Trans>
 					)}
 				</p>
+				<p className="mt-4 text-muted-foreground">
+					<Trans>For press inquiries and interview requests, email us.</Trans>{" "}
+					<a
+						href={COMPANY.FOUNDERS_MAIL_TO}
+						className="font-medium text-foreground underline-offset-4 hover:underline"
+					>
+						{COMPANY.FOUNDERS_EMAIL}
+					</a>
+				</p>
 			</header>
 			<div className="mt-14 space-y-16 sm:mt-20 sm:space-y-20">
-				<AboutSection />
+				<AtAGlanceSection />
 				<LatestNewsSection lang={lang} />
-				<PressCoverageSection lang={lang} />
 				<BrandAssetsSection />
-				<PressContactSection />
 			</div>
 		</main>
 	);

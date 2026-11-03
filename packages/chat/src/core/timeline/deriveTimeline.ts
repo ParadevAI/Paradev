@@ -139,7 +139,7 @@ export function derivePendingApprovals(
 	return pending;
 }
 
-function isPendingApproval(item: Item): boolean {
+export function isPendingApproval(item: Item): boolean {
 	return (
 		item.kind === "approval_request" &&
 		(item as ApprovalRequest).status === "pending"

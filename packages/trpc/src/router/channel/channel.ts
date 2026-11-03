@@ -43,6 +43,10 @@ import {
 	orgMemberIds,
 	peopleAmong,
 } from "./members";
+import {
+	appendMembershipMessages,
+	publishMembershipMessages,
+} from "./membership-messages";
 import { publishToUsers } from "./publish";
 import { hasUnreadSql, mentionCountSql, publishReadState } from "./read-state";
 import {
@@ -270,7 +274,7 @@ export const channelRouter = {
 				input.memberIds.filter((id) => id !== userId),
 			);
 			try {
-				const channel = await dbWs.transaction(async (tx) => {
+				const { channel, joined } = await dbWs.transaction(async (tx) => {
 					const [row] = await tx
 						.insert(channels)
 						.values({
@@ -288,7 +292,15 @@ export const channelRouter = {
 							{ channelId: row.id, actorId: userId, role: "admin" as const },
 							...invited.all.map((actorId) => ({ channelId: row.id, actorId })),
 						]);
-					return row;
+					const joined = await appendMembershipMessages(tx, row.id, [
+						{ actorId: userId, subtype: "channel_join" },
+						...invited.all.map((actorId) => ({
+							actorId,
+							subtype: "channel_join" as const,
+							inviterId: userId,
+						})),
+					]);
+					return { channel: row, joined };
 				});
 				const listeners =
 					input.visibility === "public"
@@ -298,6 +310,7 @@ export const channelRouter = {
 					type: "channels.changed",
 					organizationId: input.organizationId,
 				});
+				await publishMembershipMessages(channel.id, joined);
 				return { id: channel.id, name: channel.name };
 			} catch (error) {
 				if (isUniqueViolation(error)) throw nameTaken();
@@ -367,15 +380,23 @@ export const channelRouter = {
 					i18nKey: "serverError.channel.cannotJoinPrivate",
 				});
 			}
-			await db
-				.insert(channelMembers)
-				.values({
-					channelId: access.channel.id,
-					actorId: userId,
-					lastReadSeq: access.channel.lastSeq,
-				})
-				.onConflictDoNothing();
+			const joined = await dbWs.transaction(async (tx) => {
+				const [member] = await tx
+					.insert(channelMembers)
+					.values({
+						channelId: access.channel.id,
+						actorId: userId,
+						lastReadSeq: access.channel.lastSeq,
+					})
+					.onConflictDoNothing()
+					.returning({ actorId: channelMembers.actorId });
+				if (!member) return [];
+				return appendMembershipMessages(tx, access.channel.id, [
+					{ actorId: userId, subtype: "channel_join" },
+				]);
+			});
 			await notifyMembers(access, [userId]);
+			await publishMembershipMessages(access.channel.id, joined);
 			return { id: access.channel.id };
 		}),
 
@@ -386,14 +407,21 @@ export const channelRouter = {
 			const access = await loadChannelAccess(userId, input.channelId);
 			if (!access.membership) return { id: access.channel.id };
 			await assertNotLastAdmin(access, userId);
-			await db
-				.delete(channelMembers)
-				.where(
-					and(
-						eq(channelMembers.channelId, access.channel.id),
-						eq(channelMembers.actorId, userId),
-					),
-				);
+			const left = await dbWs.transaction(async (tx) => {
+				const removed = await tx
+					.delete(channelMembers)
+					.where(
+						and(
+							eq(channelMembers.channelId, access.channel.id),
+							eq(channelMembers.actorId, userId),
+						),
+					)
+					.returning({ actorId: channelMembers.actorId });
+				if (removed.length === 0) return [];
+				return appendMembershipMessages(tx, access.channel.id, [
+					{ actorId: userId, subtype: "channel_leave" },
+				]);
+			});
 			const [remaining] = await db
 				.select({ value: count() })
 				.from(channelMembers)
@@ -415,6 +443,7 @@ export const channelRouter = {
 					.where(eq(channels.id, access.channel.id));
 			}
 			await notifyMembers(access, [userId]);
+			await publishMembershipMessages(access.channel.id, left, [userId]);
 			return { id: access.channel.id };
 		}),
 
@@ -437,17 +466,33 @@ export const channelRouter = {
 				access.channel.organizationId,
 				input.actorIds,
 			);
-			await db
-				.insert(channelMembers)
-				.values(
-					added.all.map((actorId) => ({
-						channelId: access.channel.id,
-						actorId,
-						lastReadSeq: access.channel.lastSeq,
-					})),
-				)
-				.onConflictDoNothing();
+			const joined = await dbWs.transaction(async (tx) => {
+				const inserted = await tx
+					.insert(channelMembers)
+					.values(
+						added.all.map((actorId) => ({
+							channelId: access.channel.id,
+							actorId,
+							lastReadSeq: access.channel.lastSeq,
+						})),
+					)
+					.onConflictDoNothing()
+					.returning({ actorId: channelMembers.actorId });
+				const isNew = new Set(inserted.map((row) => row.actorId));
+				return appendMembershipMessages(
+					tx,
+					access.channel.id,
+					added.all
+						.filter((actorId) => isNew.has(actorId))
+						.map((actorId) => ({
+							actorId,
+							subtype: "channel_join" as const,
+							inviterId: ctx.session.user.id,
+						})),
+				);
+			});
 			await notifyMembers(access, added.people);
+			await publishMembershipMessages(access.channel.id, joined);
 			return { added: added.all.length };
 		}),
 
@@ -461,15 +506,27 @@ export const channelRouter = {
 			assertCanManage(access);
 			assertNotArchived(access);
 			await assertNotLastAdmin(access, input.actorId);
-			await db
-				.delete(channelMembers)
-				.where(
-					and(
-						eq(channelMembers.channelId, access.channel.id),
-						eq(channelMembers.actorId, input.actorId),
-					),
-				);
+			const left = await dbWs.transaction(async (tx) => {
+				const removed = await tx
+					.delete(channelMembers)
+					.where(
+						and(
+							eq(channelMembers.channelId, access.channel.id),
+							eq(channelMembers.actorId, input.actorId),
+						),
+					)
+					.returning({ actorId: channelMembers.actorId });
+				if (removed.length === 0) return [];
+				return appendMembershipMessages(tx, access.channel.id, [
+					{
+						actorId: input.actorId,
+						subtype: "channel_leave",
+						inviterId: ctx.session.user.id,
+					},
+				]);
+			});
 			await notifyMembers(access, [input.actorId]);
+			await publishMembershipMessages(access.channel.id, left, [input.actorId]);
 			return { actorId: input.actorId };
 		}),
 

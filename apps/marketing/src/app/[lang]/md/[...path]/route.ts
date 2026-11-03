@@ -243,7 +243,7 @@ function enterprisePage(i18n: I18n): MarkdownPage {
 			"",
 			`- Contact sales: ${baseUrl}/enterprise`,
 			`- Security and compliance: ${COMPANY.TRUST_URL}`,
-			`- Email: sales${COMPANY.EMAIL_DOMAIN}`,
+			`- Email: ${COMPANY.SALES_EMAIL}`,
 		].join("\n"),
 	};
 }

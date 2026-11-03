@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_ATTACHMENTS } from "./attachment-limits";
 import { HOST_AGENT_PRESETS } from "./host-agent-presets";
 
 /**
@@ -41,7 +42,7 @@ export const cloudAgentLaunchSchema = z.object({
 	 * them to at create time, so the ids travel and the box pulls the bytes
 	 * itself once host-service is up.
 	 */
-	attachmentFileIds: z.array(z.string().uuid()).max(10).optional(),
+	attachmentFileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).optional(),
 	surface: z.enum(["terminal", "chat"]).optional(),
 	/**
 	 * Set only by cloud automation dispatch. A manual create must not name a
@@ -146,17 +147,3 @@ function splitAttachmentIds(value: string | undefined): string[] | undefined {
 		.filter(Boolean);
 	return ids.length > 0 ? ids : undefined;
 }
-
-/**
- * What the agent is asked to do when an environment is created with "Start
- * agent": onboard the checkout so a golden can be promoted from the result.
- * The person watches in the terminal and desktop and can take over.
- */
-export const ENVIRONMENT_ONBOARDING_PROMPT = [
-	"You are setting up this repository so a cloud workspace can start from it.",
-	"Work in the checkout you are in. Read its README, package manifests, lockfiles and any existing `.superset/config.json`.",
-	"Install what a developer needs to run the project (dependencies, toolchains, databases as services), then verify the project builds and its tests or dev server run.",
-	"Write `.superset/config.json` with `setup` (what you just did, as commands that can rerun on a fresh checkout), `start` (the services a workspace needs on every boot) and, if the project serves anything, `ports`.",
-	"If a step needs a secret you do not have, stop and list exactly which variables are required and where they are read; do not invent values.",
-	"When everything runs, summarize what you installed, what the hooks do, and what secrets the environment needs, then stop.",
-].join(" ");

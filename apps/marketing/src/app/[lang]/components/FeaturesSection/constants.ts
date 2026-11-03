@@ -51,14 +51,14 @@ export const FEATURES: Feature[] = [
 	{
 		id: "isolation",
 		tag: msg({
-			message: "Isolation",
+			message: "Worktrees",
 		}),
 		title: msg({
-			message: "Changes are isolated",
+			message: "Each task on its own branch",
 		}),
 		description: msg({
 			message:
-				"Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready.",
+				"Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready.",
 		}),
 	},
 	{

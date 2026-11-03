@@ -1,5 +1,8 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import { COMPANY } from "@superset/shared/constants";
+
+const trustHost = new URL(COMPANY.TRUST_URL).host;
 
 export interface EnterpriseFAQItem {
 	id: string;
@@ -44,8 +47,7 @@ export const ENTERPRISE_FAQ_ITEMS: EnterpriseFAQItem[] = [
 			message: "Is my data secure?",
 		}),
 		answer: msg({
-			message:
-				"Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh.",
+			message: `Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at ${trustHost}.`,
 		}),
 	},
 ];

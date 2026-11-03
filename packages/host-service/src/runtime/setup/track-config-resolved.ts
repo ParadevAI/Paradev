@@ -1,3 +1,4 @@
+import { resolveProjectConfigDirName } from "@superset/shared/project-config/dir";
 import type { ApiClient } from "../../types";
 import { describeProjectConfigSources } from "./config";
 
@@ -32,7 +33,7 @@ export function trackConfigResolved({
 		if (format === "none") return;
 		if (format === "json") {
 			console.info(
-				`[config] ${repoPath} uses .superset/config.json (${legacySources.join(", ")})`,
+				`[config] ${repoPath} uses ${resolveProjectConfigDirName(repoPath)}/config.json (${legacySources.join(", ")})`,
 			);
 		}
 		if (!api) return;

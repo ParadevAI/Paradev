@@ -63,6 +63,10 @@ export const COMPANY = {
 	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
+	SALES_EMAIL: `sales@${ROOT_DOMAIN}`,
+	/** The founders' inbox, used as the press contact. Fixed rather than built from ROOT_DOMAIN. */
+	FOUNDERS_EMAIL: "founders@paradev.com",
+	FOUNDERS_MAIL_TO: "mailto:founders@paradev.com",
 	REPORT_ISSUE_URL: `${SOCIAL.GITHUB.url}/issues/new`,
 	DISCORD_URL: SOCIAL.DISCORD.url,
 	APP_STORE_ID,
@@ -71,7 +75,7 @@ export const COMPANY = {
 	TRUST_URL: `https://trust.${ROOT_DOMAIN}`,
 	JOIN_US_URL: `${MARKETING_URL}/careers`,
 	/** The formal YC listing; product surfaces link here. `JOIN_US_URL` is our own marketing page. */
-	CAREERS_URL: "https://www.ycombinator.com/companies/superset/jobs",
+	CAREERS_URL: "https://www.ycombinator.com/companies/paradev/jobs",
 } as const;
 
 // Staff keep their @superset.sh accounts after the root domain changes.
@@ -90,7 +94,7 @@ export const OPEN_ROLES = [
 	{
 		title: "Founding Engineer",
 		location: "San Francisco, CA",
-		url: "https://www.ycombinator.com/companies/superset/jobs/Nd9luiP-founding-engineer",
+		url: "https://www.ycombinator.com/companies/paradev/jobs/Nd9luiP-founding-engineer",
 	},
 ] as const;
 
@@ -151,7 +155,7 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LAUNCH: "mobile-launch",
 	/**
-	 * Shows the `.superset/config.toml` editor in project settings in place of
+	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one
 	 * exists; this gates only where people are led to write one.
 	 */
@@ -194,7 +198,6 @@ export const FEATURE_FLAGS = {
 	 * Replaces the v2 workspace's right sidebar with a second pane area that
 	 * holds Files, Changes, Review, Browser and Chat panes.
 	 */
-	RIGHT_PANE_AREA: "right-pane-area",
 	/**
 	 * Who may use cloud sandboxes: shows the option in the create picker, and
 	 * gates the cloud procedures server-side (`assertCloudAccess`). The release
@@ -222,17 +225,22 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
-	 * Shows the ACP chat pane: a chat UI that attaches to a Claude/Codex
-	 * session in the workspace over the Agent Client Protocol. UI-only: the
-	 * flag decides who sees the pane, not what the host can do. Off, unloaded,
-	 * or offline all mean "no pane" — flips take effect live. Audience is a
-	 * release condition on the flag, so widening never needs a release.
+	 * Legacy gate for the ACP chat pane, replaced by the account's Chat
+	 * experimental setting (`user_settings.experimental_chat`). Read only by released
+	 * desktop and mobile builds; remove it once no live build reads it.
 	 */
 	ACP_CHAT: "acp-chat",
+	/**
+	 * Shows Fork into chat on agent terminal headers and Fork into CLI on chat
+	 * headers: a native fork of the session, opened in the other surface beside
+	 * it. Off, unloaded or offline hide them. Audience is a release condition on
+	 * the flag, in both the Production and Local Development projects.
+	 */
+	AGENT_SURFACE_FORK: "agent-surface-fork",
 	MOBILE_PANE: "mobile-pane",
 	/**
 	 * Shows the `pdev` agent: in the agent catalog, agent pickers
-	 * and, with ACP_CHAT, as a chat harness (`pdev acp`). Off, unloaded or
+	 * and, with the Chat setting on, as a chat harness (`pdev acp`). Off, unloaded or
 	 * offline all hide it. Hosts never seed it, so a user only gets it by
 	 * adding it while the flag is on.
 	 */
@@ -293,9 +301,13 @@ export const SANDBOX_WORKSPACE_PATH = "/workspace";
 
 export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 
-/** The one transaction the API traces: the cloud workspace provision job. */
+/** The transactions the API traces: a cloud workspace's start and the provision job it queues, one trace. */
+export const CLOUD_WORKSPACE_START_TRANSACTION = "cloud-workspace.start";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
+/** Every wake records one; only those that ran the boot command are sent (`CLOUD_WORKSPACE_BOOTED_ATTRIBUTE`). */
+export const CLOUD_WORKSPACE_WAKE_TRANSACTION = "cloud-workspace.wake";
+export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code

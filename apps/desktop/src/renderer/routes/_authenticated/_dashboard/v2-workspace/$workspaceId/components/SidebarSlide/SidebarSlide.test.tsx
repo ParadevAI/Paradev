@@ -7,6 +7,15 @@ import type { SidebarSlideMode } from "./SidebarSlide";
 
 const { act, cleanup, render } = await import("@testing-library/react");
 const { SidebarSlide } = await import("./SidebarSlide");
+const { useIsTabVisible } = await import("@superset/panes");
+
+function Panel() {
+	return (
+		<div data-testid="panel" data-visible={String(useIsTabVisible())}>
+			panel
+		</div>
+	);
+}
 
 afterEach(cleanup);
 
@@ -24,7 +33,7 @@ function renderSlide(mode: SidebarSlideMode, keepMounted = false) {
 		>
 			{(fill) => {
 				fills.push(fill);
-				return <div data-testid="panel">panel</div>;
+				return <Panel />;
 			}}
 		</SidebarSlide>
 	);
@@ -86,10 +95,12 @@ describe("SidebarSlide", () => {
 		expect(slide.panel()).toBe(node);
 		expect(content?.hasAttribute("inert")).toBe(true);
 		expect(content?.className).toContain("invisible");
+		expect(node?.dataset.visible).toBe("false");
 		slide.setMode("open");
 		await settle();
 		expect(slide.panel()).toBe(node);
 		expect(content?.hasAttribute("inert")).toBe(false);
+		expect(node?.dataset.visible).toBe("true");
 	});
 
 	test("settles on the last mode when toggled mid-move", async () => {

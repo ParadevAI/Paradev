@@ -18,6 +18,7 @@ import {
 	users,
 } from "@superset/db/schema";
 import { retiredTaskColumns } from "@superset/db/task-list-query";
+import { MAX_ATTACHMENTS } from "@superset/shared/attachment-limits";
 import { LABELS_MAX_PER_WORKSPACE } from "@superset/shared/labels";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
@@ -622,7 +623,7 @@ export const cloudWorkspaceRecordRouter = {
 		.input(
 			z.object({
 				id: z.string().uuid(),
-				fileIds: z.array(z.string().uuid()).min(1).max(10),
+				fileIds: z.array(z.string().uuid()).min(1).max(MAX_ATTACHMENTS),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {

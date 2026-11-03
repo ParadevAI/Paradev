@@ -45,3 +45,7 @@ export const startTurnUpdate = defineUpdate<StartTurnResult, [StartTurnInput]>(
 export const steerUpdate = defineUpdate<SteerResult, [SteerInput]>("steer");
 export const interruptSignal = defineSignal<[{ turnId?: string }]>("interrupt");
 export const stateQuery = defineQuery<SessionState>("state");
+/** Every steer the running turn has received, in order; empty for any other turn. */
+export const turnSteersQuery = defineQuery<SteerInput[], [string]>(
+	"turnSteers",
+);

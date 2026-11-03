@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 const databaseUrl = process.env.AGENT_ACCESS_TEST_DATABASE_URL;
 const suite = databaseUrl ? describe : describe.skip;
@@ -124,7 +124,12 @@ suite("agent access against a migrated PostgreSQL", () => {
 		const created = await db
 			.insert(schema.channels)
 			.values([
-				{ organizationId: orgId, name: "secret", visibility: "private" },
+				{
+					organizationId: orgId,
+					name: "secret",
+					visibility: "private",
+					lastSeq: 1,
+				},
 				{ organizationId: orgId, name: "other", visibility: "public" },
 			])
 			.returning({ id: schema.channels.id });
@@ -162,6 +167,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		expect(page.messages.map((message) => message.body)).toEqual([
 			"only for members",
+			"has joined the channel",
 		]);
 	});
 
@@ -232,9 +238,9 @@ suite("agent access against a migrated PostgreSQL", () => {
 			organizationId: orgId,
 			name: "Chatty",
 		});
-		const { channelId, sessionId } = await person(
-			admin,
-		).agent.openDirectMessage({ agentId: agent.id });
+		const { channelId } = await person(admin).agent.openDirectMessage({
+			agentId: agent.id,
+		});
 		expect(
 			(await person(admin).agent.openDirectMessage({ agentId: agent.id }))
 				.channelId,
@@ -246,6 +252,11 @@ suite("agent access against a migrated PostgreSQL", () => {
 			body: "hello",
 			clientId: crypto.randomUUID(),
 		});
+		const [dev] = await db
+			.select({ mainSessionId: schema.agents.mainSessionId })
+			.from(schema.agents)
+			.where(eq(schema.agents.id, agent.id));
+		const sessionId = dev?.mainSessionId ?? "";
 		const [turn] = await db
 			.select()
 			.from(schema.agentTurns)
@@ -255,11 +266,10 @@ suite("agent access against a migrated PostgreSQL", () => {
 			promptId: sent.id,
 			triggerMessageId: sent.id,
 		});
-		expect(delivered).toContainEqual({
-			kind: "start",
-			sessionId,
-			text: "hello",
-		});
+		const start = delivered.find((prompt) => prompt.sessionId === sessionId);
+		expect(start?.kind).toBe("start");
+		expect(start?.text).toContain(`reply_to="channel:${channelId}"`);
+		expect(start?.text).toContain("hello");
 		const credentials = await worker().agentWorker.turnCredentials({
 			turnId: turn?.id ?? "",
 		});
@@ -361,7 +371,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				.select({
 					reason: schema.agentTurns.reason,
 					steers: schema.agentTurns.steerPromptIds,
-					threadRootId: schema.agentSessions.threadRootId,
+					kind: schema.agentSessions.kind,
 				})
 				.from(schema.agentTurns)
 				.innerJoin(
@@ -370,7 +380,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				)
 				.where(eq(schema.agentTurns.agentId, agent.id));
 		expect(await turns()).toEqual([
-			{ reason: "mention", steers: [], threadRootId: root.id },
+			{ reason: "mention", steers: [], kind: "main" },
 		]);
 		const reply = await person(admin).channelMessage.send({
 			channelId,
@@ -379,16 +389,127 @@ suite("agent access against a migrated PostgreSQL", () => {
 			clientId: crypto.randomUUID(),
 		});
 		expect(await turns()).toEqual([
-			{ reason: "mention", steers: [reply.id], threadRootId: root.id },
+			{ reason: "mention", steers: [reply.id], kind: "main" },
 		]);
+		const toAgent = delivered.filter(
+			(prompt) =>
+				prompt.text.includes("look at this") ||
+				prompt.text.includes("and this"),
+		);
+		expect(toAgent.map((prompt) => prompt.kind)).toEqual(["start", "steer"]);
+		expect(toAgent[1]?.text).toContain(
+			`reply_to="channel:${channelId}/thread:${root.id}"`,
+		);
+	});
+
+	test("the main session replies where a message came from, and remembers", async () => {
+		const { agent, dm, token } = await agentWithChannel(admin);
+		const tools = asAgent(token).devTools;
+		const posted = await tools.reply({
+			target: `channel:${dm.channelId}`,
+			body: "on it",
+		});
+		const page = await person(admin).channelMessage.list({
+			channelId: dm.channelId,
+			limit: 50,
+		});
 		expect(
-			delivered.filter((prompt) =>
-				["@Mentioned @Outside look at this", "and this"].includes(prompt.text),
-			),
-		).toMatchObject([
-			{ kind: "start", text: "@Mentioned @Outside look at this" },
-			{ kind: "steer", text: "and this" },
+			page.messages.find((message) => message.id === posted.messageId)
+				?.authorId,
+		).toBe(agent.id);
+		await expect(
+			tools.reply({ target: `channel:${otherChannel}`, body: "hi" }),
+		).rejects.toThrow("Channel not found");
+		await tools.remember({ content: "Satya prefers short replies" });
+		expect(
+			(await tools.recall({ query: "short" })).map((note) => note.content),
+		).toEqual(["Satya prefers short replies"]);
+		expect(await tools.listWork()).toEqual([]);
+	});
+
+	test("a task session's finished turn records the task's pull request and tells its main session once", async () => {
+		const { agent, turn: mainTurn } = await agentWithChannel(admin);
+		const { task: work } = await person(admin).task.create({
+			title: "Fix the login 500",
+		});
+		if (!work) throw Error("No Paradev task");
+		const [task] = await db
+			.insert(schema.agentSessions)
+			.values({
+				organizationId: orgId,
+				agentId: agent.id,
+				kind: "task",
+				parentSessionId: mainTurn.sessionId,
+				taskId: work.id,
+				role: "writer",
+				taskStatus: "running",
+				requestedByUserId: admin,
+			})
+			.returning();
+		if (!task) throw Error("No task");
+		const [taskTurn] = await db
+			.insert(schema.agentTurns)
+			.values({
+				organizationId: orgId,
+				agentId: agent.id,
+				sessionId: task.id,
+				reason: "task_start",
+				actingUserId: admin,
+				promptId: `task-start:${task.id}`,
+			})
+			.returning();
+		if (!taskTurn) throw Error("No task turn");
+		const { token } = await worker().agentWorker.turnToken({
+			turnId: taskTurn.id,
+		});
+		await expect(asAgent(token).devTools.listWork()).rejects.toThrow(
+			"Only a Dev's main session",
+		);
+		const settle = () =>
+			worker().agentWorker.settleTurn({
+				turnId: taskTurn.id,
+				status: "completed",
+				steersConsumed: 0,
+				reply: "Fixed. https://github.com/acme/app/pull/7",
+			});
+		await settle();
+		await settle();
+		const [after] = await db
+			.select()
+			.from(schema.agentSessions)
+			.where(eq(schema.agentSessions.id, task.id));
+		expect(after?.taskStatus).toBe("done");
+		const [recorded] = await db
+			.select({ prUrl: schema.tasks.prUrl })
+			.from(schema.tasks)
+			.where(eq(schema.tasks.id, work.id));
+		expect(recorded?.prUrl).toBe("https://github.com/acme/app/pull/7");
+		const mainToken = (
+			await worker().agentWorker.turnToken({ turnId: mainTurn.id })
+		).token;
+		expect(await asAgent(mainToken).devTools.listWork()).toMatchObject([
+			{
+				taskId: work.id,
+				title: "Fix the login 500",
+				pullRequestUrl: "https://github.com/acme/app/pull/7",
+				sessions: [{ sessionId: task.id, role: "writer", status: "done" }],
+			},
 		]);
+		const [main] = await db
+			.select({ steers: schema.agentTurns.steerPromptIds })
+			.from(schema.agentTurns)
+			.where(eq(schema.agentTurns.id, mainTurn.id));
+		expect(
+			main?.steers.filter((id) => id === `task-update:${taskTurn.id}`),
+		).toHaveLength(1);
+		expect(
+			delivered.some(
+				(prompt) =>
+					prompt.sessionId === mainTurn.sessionId &&
+					prompt.text.includes("Fix the login 500") &&
+					prompt.text.includes("pull/7"),
+			),
+		).toBe(true);
 	});
 
 	test("archiving an agent revokes it at once", async () => {
@@ -423,6 +544,39 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).rejects.toThrow("Unknown worker.");
 	});
 
+	test("activity shows each person only their own DM and channels they can read", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const mine = await person(admin).agent.activity({ agentId: agent.id });
+		expect(mine.turns.map((turn) => turn.channelId)).toEqual([dm.channelId]);
+		const theirs = await person(outsider).agent.activity({ agentId: agent.id });
+		expect(theirs.turns).toEqual([]);
+	});
+
+	test("activity pages through turns that started at the same moment", async () => {
+		const { agent, dm, turn } = await agentWithChannel(admin);
+		const startedAt = new Date();
+		await db.insert(schema.agentTurns).values(
+			Array.from({ length: 51 }, () => ({
+				organizationId: orgId,
+				agentId: agent.id,
+				sessionId: dm.sessionId,
+				status: "completed" as const,
+				reason: "direct_message" as const,
+				actingUserId: admin,
+				triggerMessageId: turn.triggerMessageId,
+				startedAt,
+			})),
+		);
+		const first = await person(admin).agent.activity({ agentId: agent.id });
+		const second = await person(admin).agent.activity({
+			agentId: agent.id,
+			cursor: first.nextCursor,
+		});
+		const ids = [...first.turns, ...second.turns].map((turn) => turn.id);
+		expect(ids).toHaveLength(52);
+		expect(new Set(ids).size).toBe(52);
+	});
+
 	test("a paused agent starts no turns", async () => {
 		const agent = await person(admin).agent.create({
 			organizationId: orgId,
@@ -434,5 +588,354 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		await sendTo(admin, dm.channelId, "anyone there?");
 		expect(await turnsOf(agent.id)).toEqual([]);
+	});
+	/** A Temporal client whose session workflows all look like `description`. */
+	function fakeTemporal(description: { status: string; failedTasks?: number }) {
+		const terminated: string[] = [];
+		const client = {
+			workflow: {
+				getHandle: (workflowId: string) => ({
+					describe: async () => ({
+						status: { name: description.status },
+						raw: {
+							pendingWorkflowTask: description.failedTasks
+								? { attempt: description.failedTasks }
+								: null,
+						},
+					}),
+					query: async () => ({ turnId: null, pendingTurns: 0 }),
+					terminate: async () => {
+						terminated.push(workflowId);
+					},
+				}),
+			},
+		};
+		return { terminated, client: client as never };
+	}
+
+	const minutesAgo = (minutes: number) =>
+		new Date(Date.now() - minutes * 60_000);
+
+	test("the reconciler delivers a DM that never became a turn, once", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const [room] = await db
+			.update(schema.channels)
+			.set({ lastSeq: sql`${schema.channels.lastSeq} + 1` })
+			.where(eq(schema.channels.id, dm.channelId))
+			.returning({ seq: schema.channels.lastSeq });
+		const [dropped] = await db
+			.insert(schema.channelMessages)
+			.values({
+				channelId: dm.channelId,
+				seq: room?.seq ?? 0,
+				authorId: admin,
+				body: "did you get this?",
+				createdAt: minutesAgo(5),
+			})
+			.returning({ id: schema.channelMessages.id });
+		const { reconcileDevs } = await import("./reconcile");
+		const reached = async () =>
+			(await turnsOf(agent.id)).filter(
+				(turn) =>
+					turn.promptId === dropped?.id ||
+					turn.steerPromptIds.includes(dropped?.id ?? ""),
+			).length;
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client, {
+			organizationId: orgId,
+		});
+		expect(await reached()).toBe(1);
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client, {
+			organizationId: orgId,
+		});
+		expect(await reached()).toBe(1);
+	});
+
+	test("the reconciler settles a turn its workflow lost and sends its message again", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(10) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client, {
+			organizationId: orgId,
+		});
+		const turns = await turnsOf(agent.id);
+		expect(turns.find((row) => row.id === turn.id)).toMatchObject({
+			status: "failed",
+			errorCode: "lost",
+		});
+		expect(
+			turns.some((row) => row.promptId === `again:${turn.triggerMessageId}`),
+		).toBe(true);
+	});
+
+	test("the reconciler settles a lost turn older than an hour without sending it again", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(120) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client, {
+			organizationId: orgId,
+		});
+		const turns = await turnsOf(agent.id);
+		expect(turns).toHaveLength(1);
+		expect(turns[0]).toMatchObject({ status: "failed", errorCode: "lost" });
+	});
+
+	test("the reconciler terminates a session workflow whose workflow task keeps failing", async () => {
+		const { turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(10) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		const temporal = fakeTemporal({ status: "RUNNING", failedTasks: 5 });
+		await reconcileDevs(temporal.client, { organizationId: orgId });
+		expect(temporal.terminated).toContain(`session/${turn.sessionId}`);
+		const row = (await turnsOf(turn.agentId)).find(({ id }) => id === turn.id);
+		expect(row).toMatchObject({ status: "failed", errorCode: "lost" });
+	});
+
+	const settle = (turnId: string) =>
+		worker().agentWorker.settleTurn({
+			turnId,
+			status: "completed",
+			steersConsumed: 0,
+		});
+	const inHours = (hours: number) =>
+		new Date(Date.now() + hours * 3600_000).toISOString();
+	const routineTurnsOf = async (agentId: string) =>
+		(await turnsOf(agentId)).filter((turn) => turn.reason === "routine");
+	const makeDue = (routineId: string) =>
+		db
+			.update(schema.agentRoutines)
+			.set({ nextRunAt: minutesAgo(1) })
+			.where(eq(schema.agentRoutines.id, routineId));
+	const runDue = async () => {
+		const { fireDueRoutines } = await import("./routines");
+		return fireDueRoutines({ organizationId: orgId });
+	};
+
+	test("a routine runs in the Dev's main session, for the person who asked, answering where it was made", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Digest",
+			prompt: "Tell me what merged.",
+			schedule: { start: inHours(2), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		expect(routine.nextRunAt).not.toBeNull();
+		await settle(turn.id);
+		await makeDue(routine.id);
+		expect(await runDue()).toBe(1);
+		expect(await runDue()).toBe(0);
+		expect(await routineTurnsOf(agent.id)).toMatchObject([
+			{ routineId: routine.id, actingUserId: admin, sessionId: turn.sessionId },
+		]);
+		const text = delivered.at(-1)?.text ?? "";
+		expect(text).toContain("Tell me what merged.");
+		expect(text).toContain(`reply_to="channel:${dm.channelId}"`);
+		const [row] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.id, routine.id));
+		expect(row?.nextRunAt?.getTime()).toBeGreaterThan(Date.now());
+	});
+
+	test("a one-off routine switches itself off after it runs", async () => {
+		const { dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Reminder",
+			prompt: "Remind me to stretch.",
+			schedule: { start: inHours(1), repeat: null, timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		await makeDue(routine.id);
+		await runDue();
+		const [row] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.id, routine.id));
+		expect(row).toMatchObject({ enabled: false, nextRunAt: null });
+	});
+
+	test("a routine runs at most once an hour", async () => {
+		const { dm, token } = await agentWithChannel(admin);
+		await expect(
+			asAgent(token).devTools.createRoutine({
+				title: "Spam",
+				prompt: "Ping.",
+				schedule: {
+					start: inHours(1),
+					repeat: "FREQ=MINUTELY;INTERVAL=10",
+					timezone: "UTC",
+				},
+				replyTo: `channel:${dm.channelId}`,
+			}),
+		).rejects.toThrow("at most once an hour");
+	});
+
+	test("a Dev watching a channel gets each new message with its routine, once", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		await asAgent(token).devTools.createRoutine({
+			title: "Questions in #secret",
+			prompt: "Answer questions about who owns what.",
+			watchChannels: ["secret"],
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const question = await sendTo(admin, privateChannel, "who owns billing?");
+		const routineTurns = await routineTurnsOf(agent.id);
+		expect(routineTurns).toMatchObject([
+			{ promptId: question.id, triggerMessageId: question.id },
+		]);
+		const text = delivered.at(-1)?.text ?? "";
+		expect(text).toContain("who owns billing?");
+		expect(text).toContain("Answer questions about who owns what.");
+		expect(text).toContain(
+			`reply_to="channel:${privateChannel}/thread:${question.id}"`,
+		);
+		const [watched] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.agentId, agent.id));
+		expect(watched?.lastRunAt).not.toBeNull();
+	});
+
+	test("a Dev can't watch a channel the person it works for can't read", async () => {
+		const { dm, token } = await agentWithChannel(outsider);
+		await expect(
+			asAgent(token).devTools.createRoutine({
+				title: "Snoop",
+				prompt: "Watch.",
+				watchChannels: ["secret"],
+				replyTo: `channel:${dm.channelId}`,
+			}),
+		).rejects.toThrow("can't read it");
+	});
+
+	test("a matching provider event wakes the routines watching it", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		await asAgent(token).devTools.createRoutine({
+			title: "New PRs",
+			prompt: "Tell me about new PRs.",
+			watchEvents: [
+				{
+					kind: "github",
+					event: "pull_request.opened",
+					repositories: { mode: "list", ids: ["4242"] },
+				},
+			],
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const { notifyRoutinesOfEvent } = await import("./routines");
+		const event = (repositoryId: string) => ({
+			provider: "github" as const,
+			eventType: "pull_request.opened",
+			actorId: "1",
+			actorLogin: "octocat",
+			body: null,
+			repositoryId,
+			ref: "main",
+			actorIsExternal: false,
+			labels: [],
+			isFork: false,
+			subjectAuthorId: null,
+			subjectAuthorLogin: null,
+			assigneeId: null,
+			assigneeLogin: null,
+			names: ["pull_request.opened" as const],
+		});
+		for (const repositoryId of ["9999", "4242"]) {
+			await notifyRoutinesOfEvent({
+				eventId: crypto.randomUUID(),
+				event: {
+					organizationId: orgId,
+					eventType: "pull_request.opened",
+					title: `PR in ${repositoryId}`,
+					url: null,
+				},
+				dispatch: { event: event(repositoryId) },
+			});
+		}
+		expect(await routineTurnsOf(agent.id)).toHaveLength(1);
+		expect(delivered.at(-1)?.text).toContain("PR in 4242");
+	});
+
+	test("people see their own routines; only their creator or a manager changes them", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Mine",
+			prompt: "Do it.",
+			schedule: { start: inHours(3), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const listed = await person(admin).agentRoutine.list({ agentId: agent.id });
+		expect(listed.map((r) => r.id)).toEqual([routine.id]);
+		expect(
+			await person(outsider).agentRoutine.list({ agentId: agent.id }),
+		).toEqual([]);
+		await expect(
+			person(outsider).agentRoutine.update({
+				routineId: routine.id,
+				enabled: false,
+			}),
+		).rejects.toThrow("Routine not found");
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			enabled: false,
+		});
+		const [paused] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.id, routine.id));
+		expect(paused).toMatchObject({ enabled: false, nextRunAt: null });
+		await person(admin).agentRoutine.delete({ routineId: routine.id });
+		expect(
+			await person(admin).agentRoutine.list({ agentId: agent.id }),
+		).toEqual([]);
+	});
+
+	test("people move a routine to a channel the Dev posts in, or back to the DM", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Movable",
+			prompt: "Do it.",
+			schedule: { start: inHours(3), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const roomOf = async () =>
+			(
+				await db
+					.select({ channelId: schema.agentRoutines.channelId })
+					.from(schema.agentRoutines)
+					.where(eq(schema.agentRoutines.id, routine.id))
+			)[0]?.channelId;
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			room: { kind: "channel", channelId: privateChannel },
+		});
+		expect(await roomOf()).toBe(privateChannel);
+		await expect(
+			person(admin).agentRoutine.update({
+				routineId: routine.id,
+				room: { kind: "channel", channelId: otherChannel },
+			}),
+		).rejects.toThrow("can't post there");
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			room: { kind: "dm" },
+		});
+		expect(await roomOf()).toBe(dm.channelId);
+		expect(
+			(await person(admin).agentRoutine.list({ agentId: agent.id }))[0]?.room,
+		).toMatchObject({ kind: "dm", channelId: dm.channelId });
 	});
 });

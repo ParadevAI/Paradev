@@ -1,5 +1,5 @@
 import { COMPANY } from "@superset/shared/constants";
-import { getChangelogEntries } from "@/lib/changelog";
+import { getChangelogEntries, summarizeChangelogEntry } from "@/lib/changelog";
 
 export async function GET() {
 	const entries = getChangelogEntries();
@@ -28,7 +28,7 @@ export async function GET() {
     <item>
       <title>${escapeXml(entry.title)}</title>
       <link>${baseUrl}/changelog/${entry.slug}</link>
-      <description>${escapeXml(entry.description || "")}</description>
+      <description>${escapeXml(summarizeChangelogEntry(entry) ?? "")}</description>
       <pubDate>${new Date(entry.date).toUTCString()}</pubDate>
       <guid isPermaLink="true">${baseUrl}/changelog/${entry.slug}</guid>
     </item>`,

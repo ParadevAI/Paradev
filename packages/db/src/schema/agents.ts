@@ -1,7 +1,12 @@
+import type {
+	RoutineSchedule,
+	RoutineTrigger,
+} from "@superset/shared/agent-routines";
 import type { DevAvatar } from "@superset/shared/dev-avatar";
 import { sql } from "drizzle-orm";
 import {
 	bigint,
+	boolean,
 	index,
 	integer,
 	jsonb,
@@ -16,10 +21,12 @@ import { organizations, users } from "./auth";
 import { channelMessages, channels } from "./channels";
 import {
 	agentSessionKindValues,
+	agentTaskRoleValues,
+	agentTaskStatusValues,
 	agentTurnReasonValues,
 	agentTurnStatusValues,
 } from "./enums";
-import { cloudWorkspaces } from "./schema";
+import { cloudWorkspaces, environments, tasks } from "./schema";
 
 /**
  * A Dev: an agent that works in an organization under its own identity, as
@@ -40,6 +47,13 @@ export const agents = pgTable(
 			.notNull()
 			.default({ shape: "pebble", eyes: "dots", color: "#7aa7ff" }),
 		instructions: text(),
+		/** Set once, under a row lock, so a Dev never has two. */
+		mainSessionId: uuid("main_session_id"),
+		/** The repository its tasks get a box for when the request names none. */
+		defaultEnvironmentId: uuid("default_environment_id").references(
+			() => environments.id,
+			{ onDelete: "set null" },
+		),
 		pausedAt: timestamp("paused_at", { withTimezone: true }),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
@@ -71,11 +85,16 @@ export const agentTurnReason = pgEnum(
 	"agent_turn_reason",
 	agentTurnReasonValues,
 );
+export const agentTaskStatus = pgEnum(
+	"agent_task_status",
+	agentTaskStatusValues,
+);
+export const agentTaskRole = pgEnum("agent_task_role", agentTaskRoleValues);
 
 /**
- * One place a Dev works and keeps context: its DM with a person, or a thread
- * it was mentioned in. Turns happen inside it. Its run state lives in
- * Temporal and the session store.
+ * A Dev's `main` session, which every message to it reaches, or a `task` it
+ * delegated. Turns happen inside a session; its run state lives in Temporal
+ * and the session store. A task has its own box and reports to its parent.
  */
 export const agentSessions = pgTable(
 	"agent_sessions",
@@ -101,6 +120,21 @@ export const agentSessions = pgTable(
 			() => cloudWorkspaces.id,
 			{ onDelete: "set null" },
 		),
+		parentSessionId: uuid("parent_session_id"),
+		/** The work a task session is doing; its title, description, status and pull request live there. */
+		taskId: uuid("task_id").references(() => tasks.id, {
+			onDelete: "set null",
+		}),
+		role: agentTaskRole(),
+		taskStatus: agentTaskStatus("task_status"),
+		/** What the main session asked the task to do; sent when the task starts. */
+		instructions: text(),
+		environmentId: uuid("environment_id").references(() => environments.id, {
+			onDelete: "set null",
+		}),
+		requestedByUserId: uuid("requested_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -115,10 +149,71 @@ export const agentSessions = pgTable(
 		uniqueIndex("agent_sessions_thread_unique")
 			.on(t.agentId, t.threadRootId)
 			.where(sql`${t.kind} = 'thread'`),
+		index("agent_sessions_parent_idx").on(t.parentSessionId),
+		index("agent_sessions_task_idx").on(t.taskId),
+		uniqueIndex("agent_sessions_active_writer_per_task_unique")
+			.on(t.taskId)
+			.where(
+				sql`${t.taskId} is not null and ${t.role} = 'writer' and ${t.taskStatus} in ('queued', 'running')`,
+			),
 	],
 );
 
 export type SelectAgentSession = typeof agentSessions.$inferSelect;
+
+/**
+ * Something that wakes a Dev on its own: a schedule, or events it watches.
+ * A run is a turn in the Dev's main session, for the person who asked for
+ * it, answering where the routine was made; a channel message it watches is
+ * answered in that message's thread instead.
+ */
+export const agentRoutines = pgTable(
+	"agent_routines",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		agentId: uuid("agent_id")
+			.notNull()
+			.references(() => agents.id, { onDelete: "cascade" }),
+		createdByUserId: uuid("created_by_user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		channelId: uuid("channel_id")
+			.notNull()
+			.references(() => channels.id, { onDelete: "cascade" }),
+		threadRootId: uuid("thread_root_id").references(() => channelMessages.id, {
+			onDelete: "cascade",
+		}),
+		title: text().notNull(),
+		prompt: text().notNull(),
+		/** Null for a routine that only watches events. */
+		schedule: jsonb().$type<RoutineSchedule>(),
+		triggers: jsonb().$type<RoutineTrigger[]>().notNull().default([]),
+		enabled: boolean().notNull().default(true),
+		nextRunAt: timestamp("next_run_at", { withTimezone: true }),
+		lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(t) => [
+		index("agent_routines_agent_idx").on(t.agentId),
+		index("agent_routines_due_idx")
+			.on(t.nextRunAt)
+			.where(sql`${t.enabled} and ${t.nextRunAt} is not null`),
+		index("agent_routines_triggers_idx")
+			.on(t.organizationId)
+			.where(sql`${t.enabled} and jsonb_array_length(${t.triggers}) > 0`),
+	],
+);
+
+export type SelectAgentRoutine = typeof agentRoutines.$inferSelect;
 
 export interface AgentTurnToolCall {
 	name: string;
@@ -154,6 +249,9 @@ export const agentTurns = pgTable(
 			() => channelMessages.id,
 			{ onDelete: "set null" },
 		),
+		routineId: uuid("routine_id").references(() => agentRoutines.id, {
+			onDelete: "set null",
+		}),
 		startedAt: timestamp("started_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -168,6 +266,8 @@ export const agentTurns = pgTable(
 		outputTokens: integer("output_tokens"),
 		costMicrosUsd: bigint("cost_micros_usd", { mode: "number" }),
 		errorCode: text("error_code"),
+		attempts: integer().notNull().default(1),
+		lastAttemptError: text("last_attempt_error"),
 	},
 	(t) => [
 		index("agent_turns_session_idx").on(t.sessionId, t.startedAt),
@@ -182,3 +282,22 @@ export const agentTurns = pgTable(
 );
 
 export type SelectAgentTurn = typeof agentTurns.$inferSelect;
+
+/** Notes a Dev keeps across all its sessions. */
+export const agentMemories = pgTable(
+	"agent_memories",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		agentId: uuid("agent_id")
+			.notNull()
+			.references(() => agents.id, { onDelete: "cascade" }),
+		content: text().notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(t) => [index("agent_memories_agent_idx").on(t.agentId, t.createdAt)],
+);

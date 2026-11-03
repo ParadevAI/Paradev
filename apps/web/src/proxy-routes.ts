@@ -11,6 +11,7 @@ const otherPublicRoutes = [
 	"/automations",
 	"/workspaces",
 	"/plugins",
+	"/environments",
 	"/page",
 	"/robots.txt",
 	"/.well-known/apple-app-site-association",

@@ -273,7 +273,7 @@ git clone https://github.com/paradevai/paradev.git
 然后在该工作区的终端中运行开发环境设置:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -287,13 +287,13 @@ bun run dev
 
 ## 配置
 
-在 `.superset/config.json` 中配置工作区的设置、清理和运行脚本。参见[完整文档](https://docs.paradev.com/setup-teardown-scripts)。
+在 `.paradev/config.json` 中配置工作区的设置、清理和运行脚本。参见[完整文档](https://docs.paradev.com/setup-teardown-scripts)。
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

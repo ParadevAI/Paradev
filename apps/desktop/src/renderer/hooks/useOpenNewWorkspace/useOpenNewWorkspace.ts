@@ -1,4 +1,3 @@
-import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
@@ -14,7 +13,7 @@ interface NewWorkspaceHandoff {
 }
 
 export function openNewWorkspace(
-	{ isV2CloudEnabled, machineId, navigate }: NewWorkspaceHandoff,
+	{ isV2CloudEnabled, navigate }: NewWorkspaceHandoff,
 	projectId?: string | null,
 	requestedHostId?: string,
 ) {
@@ -23,8 +22,7 @@ export function openNewWorkspace(
 		return;
 	}
 	const hostId =
-		requestedHostId ??
-		(projectId ? resolveHandoffHostId(machineId) : undefined);
+		requestedHostId ?? (projectId ? resolveHandoffHostId() : undefined);
 	if (hostId) {
 		useNewWorkspaceDraftStore.getState().updateDraft({ hostId });
 	}
@@ -42,14 +40,13 @@ export function openNewWorkspace(
 
 export function openNewSession({
 	isV2CloudEnabled,
-	machineId,
 	navigate,
 }: NewWorkspaceHandoff) {
 	if (!isV2CloudEnabled) {
 		useNewWorkspaceModalStore.getState().openSessionModal();
 		return;
 	}
-	const hostId = resolveHandoffHostId(machineId);
+	const hostId = resolveHandoffHostId();
 	const draftStore = useNewWorkspaceDraftStore.getState();
 	if (hostId) draftStore.updateDraft({ hostId });
 	draftStore.selectSession();
@@ -80,14 +77,14 @@ export function useOpenNewWorkspace() {
 	);
 }
 
-// The cloud host has no project picker, so a project or session handoff must
-// leave it. A draft host goes in the URL so the page's restore can't replace it.
-function resolveHandoffHostId(machineId: string | null | undefined) {
-	const draftHostId = useNewWorkspaceDraftStore.getState().hostId;
-	const currentHostId =
-		draftHostId ?? useV2WorkspaceCreateDefaultsStore.getState().lastHostId;
-	if (currentHostId === CLOUD_HOST_ID) return machineId ?? undefined;
-	return draftHostId ?? undefined;
+// A project or session handoff keeps the host you were on; only the project
+// changes. The host goes in the URL so the page's restore can't replace it.
+function resolveHandoffHostId() {
+	return (
+		useNewWorkspaceDraftStore.getState().hostId ??
+		useV2WorkspaceCreateDefaultsStore.getState().lastHostId ??
+		undefined
+	);
 }
 
 export function openNewWorkspaceForLocalProject(

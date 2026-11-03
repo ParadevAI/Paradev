@@ -3,6 +3,7 @@ import { normalizeWorkspaceTag } from "@superset/shared/workspace-tags";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
+import { workspaceLinks } from "../../../lib/open-url";
 import {
 	isInGroup,
 	listGroupSettings,
@@ -13,7 +14,7 @@ export default command({
 	description:
 		"List workspaces: cloud workspaces by default if your account has them, else this machine's; --local or --host picks a host",
 	options: {
-		host: string().desc("List workspaces on this host (machineId)"),
+		host: string().desc("List workspaces on this host (machineId), or `cloud`"),
 		local: boolean().desc("List workspaces on this machine"),
 		project: string().desc("Filter by project name (case-insensitive) or id"),
 		search: string()
@@ -71,12 +72,17 @@ export default command({
 				organizationId,
 			});
 			const search = options.search?.toLowerCase();
-			return cloudWorkspaces.filter(
-				(workspace) =>
-					!search ||
-					workspace.name.toLowerCase().includes(search) ||
-					workspace.branch.toLowerCase().includes(search),
-			);
+			return cloudWorkspaces
+				.filter(
+					(workspace) =>
+						!search ||
+						workspace.name.toLowerCase().includes(search) ||
+						workspace.branch.toLowerCase().includes(search),
+				)
+				.map((workspace) => ({
+					...workspace,
+					...workspaceLinks(workspace.id),
+				}));
 		}
 
 		const target = await resolveHostTarget({
@@ -130,6 +136,7 @@ export default command({
 				projectName: workspace.projectName ?? workspace.projectId ?? "session",
 				tags: (workspace.tags ?? []).join(", "),
 				group: workspaceGroupNames(workspace, groupSettings).join(", "),
+				...workspaceLinks(workspace.id),
 			}));
 	},
 });

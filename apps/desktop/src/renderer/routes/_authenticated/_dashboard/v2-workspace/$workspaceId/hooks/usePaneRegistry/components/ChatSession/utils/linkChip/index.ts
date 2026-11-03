@@ -1,2 +1,2 @@
 export type { LinkChipData } from "./linkChip";
-export { linkChip, linkOfChip } from "./linkChip";
+export { chipLink, linkChip, linkOfChip } from "./linkChip";

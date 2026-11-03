@@ -20,7 +20,7 @@ export const SAMPLE_PROMPTS: Record<string, SamplePrompt> = {
 		label: msg({
 			message: "Set up this project for Paradev",
 		}),
-		prompt: `Set up this repository to work well with Paradev workspaces. Read ${CANONICAL_URLS.DOCS}/setup-teardown-scripts and create a .superset/config.json with: setup commands that install dependencies and copy untracked files (like .env) from "$SUPERSET_ROOT_PATH" into new workspaces, teardown commands that stop anything setup starts, and a run command that launches the dev server. If parallel workspaces would collide on dev-server ports, make the scripts pick a free port per workspace (see ${CANONICAL_URLS.DOCS}/ports). When you're done, summarize what you configured and how to use it.`,
+		prompt: `Set up this repository to work well with Paradev workspaces. Read ${CANONICAL_URLS.DOCS}/setup-teardown-scripts and create a .paradev/config.json (if .superset/ already has a config.json or config.toml and .paradev/ has neither, edit that config and keep its scripts in .superset/ instead) with: setup commands that install dependencies and copy untracked files (like .env) from "$SUPERSET_ROOT_PATH" into new workspaces, teardown commands that stop anything setup starts, and a run command that launches the dev server. If parallel workspaces would collide on dev-server ports, make the scripts pick a free port per workspace (see ${CANONICAL_URLS.DOCS}/ports). When you're done, summarize what you configured and how to use it.`,
 	},
 	"explain-repo": {
 		id: "explain-repo",
@@ -67,7 +67,7 @@ export const SAMPLE_PROMPTS: Record<string, SamplePrompt> = {
 		label: msg({
 			message: "Get more out of Paradev",
 		}),
-		prompt: `Read ${CANONICAL_URLS.DOCS} and figure out how I should be using Paradev for this specific repository. Cover how to run several workspaces in parallel without them colliding, what belongs in .superset/config.json, and which agent settings suit this codebase. Be concrete about this repo rather than generic, and end with the two or three changes worth making first.`,
+		prompt: `Read ${CANONICAL_URLS.DOCS} and figure out how I should be using Paradev for this specific repository. Cover how to run several workspaces in parallel without them colliding, what belongs in the repository's Paradev config (.paradev/, or .superset/ in older setups), and which agent settings suit this codebase. Be concrete about this repo rather than generic, and end with the two or three changes worth making first.`,
 	},
 };
 

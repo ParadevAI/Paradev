@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import {
 	boolean,
@@ -61,13 +60,6 @@ export default command({
 				const next = bumpVersion(plugin.manifest.version, bump as "patch");
 				plugin.manifest.version = next;
 				writeJson(path.join(plugin.dir, "plugin.json"), plugin.manifest);
-
-				const pkgPath = path.join(plugin.dir, "package.json");
-				if (fs.existsSync(pkgPath)) {
-					const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-					pkg.version = next;
-					writeJson(pkgPath, pkg);
-				}
 			}
 		}
 

@@ -2,5 +2,8 @@ export {
 	type ActivityDeps,
 	type AgentActivities,
 	createActivities,
-	type StreamFn,
+	type PdevLaunch,
+	type RoomPoster,
+	summarizeTurn,
+	type TurnPrompt,
 } from "./createActivities";

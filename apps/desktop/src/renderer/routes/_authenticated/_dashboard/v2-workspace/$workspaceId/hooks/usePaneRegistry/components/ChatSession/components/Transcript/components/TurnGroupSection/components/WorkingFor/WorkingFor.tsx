@@ -14,39 +14,44 @@ function elapsed(startedAtMs: number, completedAtMs: number | undefined) {
 /**
  * The turn's one live line, under the prompt: it sweeps while the agent works
  * and stays afterwards as "Worked for 8s", so a finished turn still says what
- * it cost. `onToggle` hangs the turn's work off it.
+ * it cost. It stops while the turn waits on the user. `onToggle` hangs the
+ * turn's work off it.
  */
 export function WorkingFor({
 	completedAtMs,
 	expanded,
 	onToggle,
 	startedAtMs,
+	waiting = false,
 }: {
 	startedAtMs: number;
 	completedAtMs?: number | undefined;
 	expanded?: boolean | undefined;
 	onToggle?: (() => void) | undefined;
+	waiting?: boolean | undefined;
 }) {
 	const { t } = useLingui();
 	const running = completedAtMs === undefined;
+	const ticking = running && !waiting;
 	const [seconds, setSeconds] = useState(() =>
 		elapsed(startedAtMs, completedAtMs),
 	);
 
 	useEffect(() => {
 		setSeconds(elapsed(startedAtMs, completedAtMs));
-		if (!running) return;
+		if (!ticking) return;
 		const timer = setInterval(
 			() => setSeconds(elapsed(startedAtMs, undefined)),
 			1000,
 		);
 		return () => clearInterval(timer);
-	}, [startedAtMs, completedAtMs, running]);
+	}, [startedAtMs, completedAtMs, ticking]);
 
 	if (!running && seconds === 0 && !onToggle) return null;
 
-	const label =
-		seconds < 60
+	const label = waiting
+		? t({ message: "Needs input" })
+		: seconds < 60
 			? running
 				? t`Working for ${seconds}s`
 				: t`Worked for ${seconds}s`
@@ -56,7 +61,7 @@ export function WorkingFor({
 
 	const content = (
 		<>
-			{running ? (
+			{ticking ? (
 				<Shimmer
 					className="min-w-0 truncate"
 					duration={CLOCK_SWEEP_SECONDS}

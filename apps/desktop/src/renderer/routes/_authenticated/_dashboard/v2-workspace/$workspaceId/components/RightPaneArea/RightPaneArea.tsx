@@ -19,7 +19,7 @@ import type { StoreApi } from "zustand/vanilla";
 import { useNewTabLists } from "../../hooks/useNewTabLists";
 import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/BrowserPane";
 import type { PaneViewerData } from "../../types";
-import { NEW_TAB_PANE, RightPaneNewTab } from "../RightPaneNewTab";
+import { NEW_TAB_PANE } from "../RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../V2NotificationStatusIndicator";
 import { PullRequestCountsPrefetch } from "./components/PullRequestCountsPrefetch";
 import {
@@ -28,6 +28,11 @@ import {
 } from "./utils/withNewTabSplits";
 
 const RIGHT_PANE_KEPT_TABS = 2;
+
+function isPreviewTab(tab: Tab<PaneViewerData>): boolean {
+	const panes = Object.values(tab.panes);
+	return panes.length === 1 && panes[0]?.kind === "file" && !panes[0].pinned;
+}
 
 interface RightPaneAreaProps {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -82,6 +87,14 @@ export function RightPaneArea({
 				contextMenuActions={rightContextMenuActions}
 				onPaneError={reportRendererError}
 				renderTabIcon={renderBrowserTabIcon}
+				renameTabs={false}
+				isPreviewTab={isPreviewTab}
+				onTabClick={(tab) => {
+					if (!isPreviewTab(tab)) return;
+					for (const pane of Object.values(tab.panes)) {
+						store.getState().setPanePinned({ paneId: pane.id, pinned: true });
+					}
+				}}
 				renderTabAccessory={(tab) => (
 					<V2NotificationStatusIndicator
 						sources={getV2NotificationSourcesForTab(tab)}
@@ -108,11 +121,6 @@ export function RightPaneArea({
 						</RightPaneHeaderButton>
 						{toolbar}
 					</div>
-				)}
-				renderEmptyState={() => (
-					<RightPaneNewTab
-						onOpen={(pane) => store.getState().addTab({ panes: [pane] })}
-					/>
 				)}
 				onBeforeCloseTab={onBeforeCloseTab}
 				onInteractionStateChange={onInteractionStateChange}

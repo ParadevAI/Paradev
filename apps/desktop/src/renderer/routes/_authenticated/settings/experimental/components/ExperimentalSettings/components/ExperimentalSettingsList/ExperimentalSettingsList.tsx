@@ -1,20 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
-import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import { useAcpChatStore } from "renderer/stores/acp-chat";
 import {
 	useInlineWorkspacePortsStore,
 	usePortsDisplayMode,
 } from "renderer/stores/inline-workspace-ports";
-import {
-	useRightPaneAreaEnabled,
-	useRightPaneAreaStore,
-} from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { useOpenV1ImportModal } from "renderer/stores/v1-import-modal";
 import {
@@ -26,6 +18,8 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
+import { AcpChatSetting } from "../AcpChatSetting";
+import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -51,21 +45,14 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const rightPaneAreaFlag =
-		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
-	const showRightPaneArea =
-		rightPaneAreaFlag &&
-		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_RIGHT_PANE_AREA, visibleItems);
-	const rightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
-	const setRightPaneAreaEnabled = useRightPaneAreaStore(
-		(state) => state.setEnabled,
+	const showAcpChat = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
+		visibleItems,
 	);
-	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
-	const showAcpChat =
-		acpChatFlag &&
-		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT, visibleItems);
-	const acpChatEnabled = useAcpChatEnabled() === "enabled";
-	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
+	const showChatTurnSnapshots = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
+		visibleItems,
+	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
 		visibleItems,
@@ -185,60 +172,8 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showRightPaneArea && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label htmlFor="right-pane-area" className="text-sm font-medium">
-								<HighlightText
-									text={t({
-										message: "Right pane area",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="right-pane-area"
-							checked={rightPaneAreaEnabled}
-							onCheckedChange={setRightPaneAreaEnabled}
-						/>
-					</div>
-				)}
-				{showAcpChat && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label htmlFor="acp-chat" className="text-sm font-medium">
-								<HighlightText
-									text={t({ message: "Chat" })}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Open Claude and Codex sessions in a chat pane instead of a terminal.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="acp-chat"
-							checked={acpChatEnabled}
-							onCheckedChange={setAcpChatEnabled}
-						/>
-					</div>
-				)}
+				{showAcpChat && <AcpChatSetting />}
+				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
 			</div>
 		</div>

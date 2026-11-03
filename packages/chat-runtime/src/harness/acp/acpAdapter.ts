@@ -14,6 +14,7 @@ import type {
 	ToolCall,
 	Turn,
 	TurnError,
+	UsageLimit,
 	UserContent,
 } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, isHiddenText } from "@superset/chat/protocol";
@@ -25,7 +26,14 @@ import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
+	ResolvedAttachment,
 } from "../types";
+import {
+	type RefusedWindow,
+	refusedWindow,
+	USAGE_LIMIT_TEXT,
+} from "../usageLimit";
 import {
 	AIR_ASYNC_TASK_STOP_METHOD,
 	AIR_CLIENT_META,
@@ -35,6 +43,7 @@ import {
 	airForkPointMeta,
 	airSubagentSpawnedSchema,
 	airSubagentStateSchema,
+	isCompactionCall,
 	isSubagentControlCall,
 	isTerminalAirState,
 } from "./air";
@@ -54,6 +63,7 @@ import {
 	spawnAcpTransport,
 } from "./rpcClient";
 import { messageIdOf, SessionStream } from "./sessionStream";
+import { startOptionId } from "./startOption";
 import type {
 	AcpConfigSelectOption,
 	AcpElicitationProperty,
@@ -174,11 +184,7 @@ type V2Turn = {
 	idle?: AcpStateUpdate & { seq: number };
 };
 
-export type AcpAttachment = {
-	path: string;
-	mimeType: string;
-	data: string;
-};
+export type AcpAttachment = ResolvedAttachment;
 
 /** `path` is relative to the session cwd. */
 export type AcpStoredImage = { path: string };
@@ -226,7 +232,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
-	resolveAttachment?: (attachmentId: string) => Promise<AcpAttachment | null>;
+	resolveAttachment?: ResolveAttachment;
 	/** Without it, images the agent sends are dropped. */
 	storeImage?: (
 		image: AcpImageSource,
@@ -420,6 +426,8 @@ export class AcpAdapter implements HarnessAdapter {
 	/** Shared by `start` and native discovery so a list never spawns a second agent. */
 	private connection: Promise<void> | null = null;
 	private sessionId: string | null = null;
+	private refused: RefusedWindow = null;
+	private lastModel: string | null = null;
 	private loadingSessionId: string | null = null;
 	private cwd = process.cwd();
 	private currentTurn: Turn | null = null;
@@ -458,6 +466,10 @@ export class AcpAdapter implements HarnessAdapter {
 	private heldTurnId: string | null = null;
 	private readonly shellPids = new Map<string, number>();
 	private shellPoll: ReturnType<typeof setInterval> | null = null;
+	/** Claude aborts a running compaction when a steer arrives, so steers wait for these. */
+	private readonly compactions = new Set<string>();
+	private compactionsSettled: Promise<void> = Promise.resolve();
+	private settleCompactions: (() => void) | null = null;
 
 	constructor(private readonly options: AcpAdapterOptions) {
 		this.main = new SessionStream({
@@ -529,11 +541,14 @@ export class AcpAdapter implements HarnessAdapter {
 		const client = this.client;
 		const sessionId = this.sessionId;
 		if (!client || !sessionId || !this.canSteer()) return false;
+		const prompt = await this.toAcpPrompt(content);
+		while (this.compactions.size > 0) await this.compactionsSettled;
+		if (!this.canSteer()) return false;
 		const v2TurnId = this.v2TurnIsCurrent() ? this.v2Turn?.id : undefined;
 		if (v2TurnId) {
 			const response = await client.request("session/prompt", {
 				sessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (parsed?.messageId !== undefined && parsed.stopReason === undefined) {
@@ -544,7 +559,7 @@ export class AcpAdapter implements HarnessAdapter {
 		}
 		const response = await client.request(ACP_STEERING_METHOD, {
 			sessionId,
-			prompt: await this.toAcpPrompt(content),
+			prompt,
 			_meta: { steering: { idleBehavior: "promptRequired" } },
 		});
 		const outcome = acpSteeringResponseSchema.safeParse(response).data?.outcome;
@@ -874,6 +889,7 @@ export class AcpAdapter implements HarnessAdapter {
 		this.disposed = true;
 		this.stalePendingApprovals();
 		this.backgroundTasks.dispose();
+		this.endCompactions();
 		if (this.shellPoll) clearInterval(this.shellPoll);
 		await this.client?.close();
 		this.queue.close();
@@ -1088,13 +1104,14 @@ export class AcpAdapter implements HarnessAdapter {
 
 	private async runTurn(content: UserContent[]): Promise<void> {
 		if (!this.client || !this.sessionId) return;
+		this.refused = null;
 		const turnId = this.mintId();
 		this.emitTurn({
 			id: turnId,
 			status: "running",
 			startedAtMs: this.nextStartMs(),
 		});
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
 		if (this.heldTurnId !== turnId) return;
@@ -1121,9 +1138,10 @@ export class AcpAdapter implements HarnessAdapter {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			this.finishTurn(turnId, parsed?.stopReason, parsed?.usage);
 		} catch (error) {
+			this.endCompactions();
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;
-			this.failTurn(turnId, this.turnError(error));
+			this.failRefusedTurn(turnId, this.turnError(error));
 		}
 	}
 
@@ -1157,14 +1175,14 @@ export class AcpAdapter implements HarnessAdapter {
 		const id = this.mintId();
 		this.turnStderr = "";
 		this.emitTurn({ id, status: "running", startedAtMs: this.now() });
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 		this.v2Turn = { id, inserted: true };
 	}
 
 	private endV2Turn(turnId: string, idle: AcpStateUpdate): void {
 		this.v2Turn = null;
 		if (idle.stopReason === "error")
-			this.failTurn(
+			this.failRefusedTurn(
 				turnId,
 				this.turnError(
 					idle.error?.message ?? "The agent stopped with an error.",
@@ -1178,6 +1196,7 @@ export class AcpAdapter implements HarnessAdapter {
 		stopReason: string | undefined,
 		usage?: AcpPromptUsage,
 	): void {
+		this.endCompactions();
 		this.main.flush();
 		this.emitTurn({
 			id: turnId,
@@ -1193,7 +1212,18 @@ export class AcpAdapter implements HarnessAdapter {
 		this.sendCustomAnswer();
 	}
 
+	/** A failed turn, reported as a usage limit when the agent refused for usage. */
+	private failRefusedTurn(turnId: string, failure: TurnError): void {
+		const limit = this.usageLimitFrom(failure.message);
+		if (limit) this.emitSession({ usageLimit: limit });
+		this.failTurn(
+			turnId,
+			limit ? { ...failure, kind: "usage_limit" } : failure,
+		);
+	}
+
 	private failTurn(turnId: string, error: TurnError): void {
+		this.endCompactions();
 		this.customAnswer = null;
 		this.main.flush();
 		this.cancelPendingApprovals(turnId);
@@ -1295,6 +1325,12 @@ export class AcpAdapter implements HarnessAdapter {
 
 		if (variant === "usage_update") {
 			const usage = acpUsageUpdateSchema.safeParse(outer.data.update);
+			if (usage.success && usage.data._meta?.["_claude/rateLimit"]) {
+				this.refused = refusedWindow(usage.data._meta["_claude/rateLimit"]);
+			}
+			if (typeof usage.data?._meta?.["_claude/model"] === "string") {
+				this.lastModel = usage.data._meta["_claude/model"];
+			}
 			if (usage.success && usage.data.cost !== undefined) this.main.flush();
 			if (
 				usage.success &&
@@ -1399,7 +1435,31 @@ export class AcpAdapter implements HarnessAdapter {
 		)
 			return;
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
-		if (item && !this.replaying) this.trackBackgroundShell(item);
+		if (!item || this.replaying) return;
+		this.trackBackgroundShell(item);
+		this.trackCompaction(raw, item);
+	}
+
+	private trackCompaction(raw: unknown, item: ToolCall): void {
+		if (!this.compactions.has(item.id) && !isCompactionCall(raw)) return;
+		if (item.status !== "running") {
+			this.compactions.delete(item.id);
+			if (this.compactions.size === 0) this.endCompactions();
+			return;
+		}
+		if (this.compactions.size === 0) {
+			this.compactionsSettled = new Promise((resolve) => {
+				this.settleCompactions = resolve;
+			});
+		}
+		this.compactions.add(item.id);
+	}
+
+	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
+	private endCompactions(): void {
+		this.compactions.clear();
+		this.settleCompactions?.();
+		this.settleCompactions = null;
 	}
 
 	private trackBackgroundShell(item: ToolCall): void {
@@ -1494,8 +1554,15 @@ export class AcpAdapter implements HarnessAdapter {
 			this.options.clientApprovalModes
 		)
 			return;
+		if (parsed.data.state === "running" && this.cycleEnded) {
+			this.cycleEnded = false;
+			this.syncAwaitingBackground();
+		}
 		const status = SESSION_STATUS_BY_ACP_STATE[parsed.data.state];
-		if (status) this.emitSession({ status });
+		if (!status) return;
+		this.emitSession({
+			status: this.pendingApprovals.size > 0 ? "awaiting_input" : status,
+		});
 	}
 
 	/**
@@ -1915,19 +1982,21 @@ export class AcpAdapter implements HarnessAdapter {
 		resumed: boolean,
 	): void {
 		const modeId = this.startModeId(startOptions, resumed);
-		for (const [category, value] of [
+		for (const [category, wanted] of [
 			["model", startOptions.modelId],
 			["mode", this.options.clientApprovalModes ? undefined : modeId],
 		] as const) {
 			const option = this.configOptions.find(
 				(entry) => entry.category === category,
 			);
-			if (
-				value &&
-				option &&
-				option.currentValue !== value &&
-				option.options.some((entry) => entry.id === value)
-			) {
+			if (!wanted || !option) continue;
+			const value =
+				category === "model"
+					? startOptionId(option.options, wanted)
+					: option.options.some((entry) => entry.id === wanted)
+						? wanted
+						: undefined;
+			if (value && option.currentValue !== value) {
 				this.setConfigOption(option.id, value);
 			}
 		}
@@ -2200,7 +2269,7 @@ export class AcpAdapter implements HarnessAdapter {
 				continue;
 			}
 			const attachment = await this.options
-				.resolveAttachment?.(entry.attachmentId)
+				.resolveAttachment?.(entry)
 				.catch(() => null);
 			if (!attachment) {
 				dropped.push(entry.name);
@@ -2329,7 +2398,9 @@ export class AcpAdapter implements HarnessAdapter {
 
 	private statusAfterApprovals(): SessionState["status"] {
 		if (this.pendingApprovals.size > 0) return "awaiting_input";
-		return this.currentTurn?.status === "running" ? "running" : "idle";
+		return this.currentTurn?.status === "running" && !this.awaitingBackground
+			? "running"
+			: "idle";
 	}
 
 	private cancelApprovals(
@@ -2480,7 +2551,10 @@ export class AcpAdapter implements HarnessAdapter {
 			[...this.backgroundTaskTurns.values()].includes(this.currentTurn.id);
 		if (awaiting === this.awaitingBackground) return;
 		this.awaitingBackground = awaiting;
-		this.emitSession({ awaitingBackground: awaiting });
+		this.emitSession({
+			awaitingBackground: awaiting,
+			status: this.statusAfterApprovals(),
+		});
 	}
 
 	private emitItem(item: Item, turnId: string): void {
@@ -2518,6 +2592,23 @@ export class AcpAdapter implements HarnessAdapter {
 			},
 			this.resolveTurnId(),
 		);
+	}
+
+	/**
+	 * The agent forwards Claude's `rate_limit_event` on its usage updates and
+	 * ends a refused turn with the CLI's own words. A refusal paid for by extra
+	 * usage reports nothing, and a turn that survives one is not a limit.
+	 */
+	private usageLimitFrom(message: string): UsageLimit | null {
+		const refused = this.refused;
+		this.refused = null;
+		if (!refused && !USAGE_LIMIT_TEXT.test(message)) return null;
+		return {
+			hitAtMs: this.now(),
+			...(refused?.resetsAtMs ? { resetsAtMs: refused.resetsAtMs } : {}),
+			...(refused?.window ? { window: refused.window } : {}),
+			...(this.lastModel ? { model: this.lastModel } : {}),
+		};
 	}
 
 	private emitSession(session: Partial<SessionState>): void {

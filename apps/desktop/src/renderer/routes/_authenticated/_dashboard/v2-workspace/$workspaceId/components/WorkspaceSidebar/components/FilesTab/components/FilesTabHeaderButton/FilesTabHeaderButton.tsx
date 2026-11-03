@@ -1,5 +1,6 @@
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { Loader2 } from "lucide-react";
 
 interface FilesTabHeaderButtonProps {
@@ -7,6 +8,7 @@ interface FilesTabHeaderButtonProps {
 	label: string;
 	loading?: boolean;
 	onClick: () => void;
+	className?: string;
 }
 
 /** Icon-only action button in the Files-tab "Explorer" header (New File/Folder, Refresh, Collapse All). */
@@ -15,6 +17,7 @@ export function FilesTabHeaderButton({
 	label,
 	loading,
 	onClick,
+	className,
 }: FilesTabHeaderButtonProps) {
 	return (
 		<Tooltip>
@@ -22,7 +25,10 @@ export function FilesTabHeaderButton({
 				<Button
 					variant="ghost"
 					size="icon"
-					className="size-7 text-muted-foreground hover:text-foreground"
+					className={cn(
+						"size-7 text-muted-foreground hover:text-foreground",
+						className,
+					)}
 					onClick={onClick}
 					aria-label={label}
 				>
