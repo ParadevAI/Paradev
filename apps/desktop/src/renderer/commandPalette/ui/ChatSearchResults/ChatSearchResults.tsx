@@ -8,6 +8,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useFrameStackStore } from "../../core/frames";
 
 const MIN_QUERY_CHARS = 2;
+const MAX_QUERY_CHARS = 200;
 const DEBOUNCE_MS = 250;
 
 /** Your chats stored in the cloud that match what is typed in the palette. */
@@ -15,12 +16,13 @@ export function ChatSearchResults({ query }: { query: string }) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const setOpen = useFrameStackStore((s) => s.setOpen);
-	const [debounced, setDebounced] = useState(query.trim());
+	const trimmed = query.trim().slice(0, MAX_QUERY_CHARS).trim();
+	const [debounced, setDebounced] = useState(trimmed);
 
 	useEffect(() => {
-		const timer = setTimeout(() => setDebounced(query.trim()), DEBOUNCE_MS);
+		const timer = setTimeout(() => setDebounced(trimmed), DEBOUNCE_MS);
 		return () => clearTimeout(timer);
-	}, [query]);
+	}, [trimmed]);
 
 	const search = cloudTrpc.chatHistory.search.useQuery(
 		{ query: debounced, limit: 8 },
@@ -31,7 +33,6 @@ export function ChatSearchResults({ query }: { query: string }) {
 			placeholderData: keepPreviousData,
 		},
 	);
-	const trimmed = query.trim();
 	if (trimmed.length < MIN_QUERY_CHARS) return null;
 	if (search.isError && trimmed === debounced) {
 		return (
