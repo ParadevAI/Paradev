@@ -6,7 +6,7 @@ import { and, count, eq, sql } from "drizzle-orm";
 import { presignedPutUrl } from "../../../lib/r2";
 import { actorProcedure, personProcedure, userError } from "../../../trpc";
 import { requireActiveOrgMembership } from "../../utils/active-org";
-import { assertPageWritable } from "../access";
+import { assertPageEditable } from "../access";
 import { pageCaller, pageReader } from "../page-caller";
 import { validateAssetPaths } from "../publish-rules";
 import {
@@ -164,7 +164,7 @@ async function loadWritablePage({
 			i18nKey: "serverError.page.pageNotFound",
 		});
 	}
-	assertPageWritable(page, userId);
+	await assertPageEditable(page, userId);
 	return page;
 }
 

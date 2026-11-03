@@ -3788,6 +3788,9 @@ msgstr "Kamera tidak tersedia"
 msgid "Can comment"
 msgstr "Dapat berkomentar"
 
+msgid "Can edit"
+msgstr "Dapat mengedit"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Bisakah saya membeli GB-jam cloud tambahan?"
 
@@ -14900,6 +14903,9 @@ msgstr "Terbitkan dari Paradev CLI atau lewat MCP."
 msgid "Publish from your own repo"
 msgstr "Terbitkan dari repo Anda sendiri"
 
+msgid "Publish new versions, rename and share"
+msgstr "Menerbitkan versi baru, mengganti nama, dan berbagi"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Dipublikasikan"
@@ -21657,6 +21663,9 @@ msgstr "Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari. Fold
 
 msgid "You can see how we work before you talk to us."
 msgstr "Anda bisa melihat cara kami bekerja sebelum berbicara dengan kami."
+
+msgid "You can view this page but not change it"
+msgstr "Anda dapat melihat halaman ini tetapi tidak dapat mengubahnya"
 
 msgid "You can view this page but not comment on it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"

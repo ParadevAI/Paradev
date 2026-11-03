@@ -3788,6 +3788,9 @@ msgstr "카메라를 사용할 수 없습니다"
 msgid "Can comment"
 msgstr "댓글 가능"
 
+msgid "Can edit"
+msgstr "편집 가능"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "클라우드 GB 시간을 더 구매할 수 있나요?"
 
@@ -14900,6 +14903,9 @@ msgstr "Paradev CLI나 MCP로 게시하세요."
 msgid "Publish from your own repo"
 msgstr "내 저장소에서 게시"
 
+msgid "Publish new versions, rename and share"
+msgstr "새 버전 게시, 이름 변경 및 공유"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "게시됨"
@@ -21657,6 +21663,9 @@ msgstr "30일 동안 설정 → 프로젝트에서 복원할 수 있습니다. �
 
 msgid "You can see how we work before you talk to us."
 msgstr "대화하기 전에 우리가 일하는 방식을 직접 볼 수 있습니다."
+
+msgid "You can view this page but not change it"
+msgstr "이 페이지를 볼 수는 있지만 변경할 수는 없습니다"
 
 msgid "You can view this page but not comment on it"
 msgstr "이 페이지를 볼 수는 있지만 댓글을 달 수는 없습니다"

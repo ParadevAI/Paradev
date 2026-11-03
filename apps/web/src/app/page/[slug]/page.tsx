@@ -190,6 +190,7 @@ export default async function PublishedPage({
 						sharedVersion: page.sharedVersion,
 						latestVersion: page.latestVersion,
 						servedVersion: page.servedVersion,
+						canEdit: access.canEdit,
 					}}
 					versions={versions}
 					currentUserId={session.user.id}

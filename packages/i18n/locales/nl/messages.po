@@ -3788,6 +3788,9 @@ msgstr "Camera is niet beschikbaar"
 msgid "Can comment"
 msgstr "Kan reageren"
 
+msgid "Can edit"
+msgstr "Kan bewerken"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Kan ik meer cloud-GB-uren kopen?"
 
@@ -14900,6 +14903,9 @@ msgstr "Publiceer vanuit de Paradev CLI of via MCP."
 msgid "Publish from your own repo"
 msgstr "Publiceer vanuit je eigen repo"
 
+msgid "Publish new versions, rename and share"
+msgstr "Nieuwe versies publiceren, hernoemen en delen"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Gepubliceerd"
@@ -21657,6 +21663,9 @@ msgstr "Je kunt het 30 dagen lang herstellen via Instellingen → Projecten. De 
 
 msgid "You can see how we work before you talk to us."
 msgstr "Je kunt zien hoe we werken voordat je met ons praat."
+
+msgid "You can view this page but not change it"
+msgstr "Je kunt deze pagina bekijken, maar niet wijzigen"
 
 msgid "You can view this page but not comment on it"
 msgstr "Je kunt deze pagina bekijken, maar er niet op reageren"

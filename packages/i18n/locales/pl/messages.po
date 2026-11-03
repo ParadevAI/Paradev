@@ -3788,6 +3788,9 @@ msgstr "Aparat jest niedostępny"
 msgid "Can comment"
 msgstr "Może komentować"
 
+msgid "Can edit"
+msgstr "Może edytować"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Czy mogę kupić więcej GB-godzin w chmurze?"
 
@@ -14900,6 +14903,9 @@ msgstr "Publikuj z Paradev CLI lub przez MCP."
 msgid "Publish from your own repo"
 msgstr "Publikuj z własnego repozytorium"
 
+msgid "Publish new versions, rename and share"
+msgstr "Publikowanie nowych wersji, zmiana nazwy i udostępnianie"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Opublikowano"
@@ -21657,6 +21663,9 @@ msgstr "Możesz go przywrócić w Ustawienia → Projekty przez 30 dni. Folder r
 
 msgid "You can see how we work before you talk to us."
 msgstr "Możesz zobaczyć, jak pracujemy, zanim z nami porozmawiasz."
+
+msgid "You can view this page but not change it"
+msgstr "Możesz wyświetlać tę stronę, ale nie możesz jej zmieniać"
 
 msgid "You can view this page but not comment on it"
 msgstr "Możesz wyświetlać tę stronę, ale nie możesz jej komentować"
