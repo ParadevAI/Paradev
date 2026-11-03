@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import type { DurableEnvelope } from "@superset/chat/protocol";
-import type { ChatRuntime } from "@superset/chat-runtime";
+import { type ChatRuntime, chatSyncState } from "@superset/chat-runtime";
 import { createTestRuntime } from "@superset/chat-runtime/testing";
 import type { ApiClient } from "../types";
 import { createChatSync } from "./chatSync";
@@ -141,12 +141,13 @@ describe("createChatSync", () => {
 	});
 
 	test("a chat the API cannot take as a whole is not marked pushed", async () => {
-		const { sync, pushes, say } = setup({
+		const { runtime, sync, pushes, say } = setup({
 			harnessSessionId: "h".repeat(500),
 		});
 		say("a");
 		await sync.syncSession(CHAT);
 		expect(pushes).toHaveLength(0);
+		expect(runtime.db.select().from(chatSyncState).all()).toEqual([]);
 	});
 
 	test("a busy chat takes turns with the others", async () => {

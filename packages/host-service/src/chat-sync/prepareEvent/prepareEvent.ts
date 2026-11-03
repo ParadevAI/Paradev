@@ -1,4 +1,7 @@
 import type { DurableEvent } from "@superset/chat/protocol";
+import { eventBytes } from "@superset/trpc/chat-history-schema";
+
+export { eventBytes };
 
 const MAX_STRING_CHARS = 64 * 1024;
 const TIGHT_STRING_CHARS = 4 * 1024;
@@ -46,8 +49,19 @@ function cutStrings(value: unknown, limit: number): unknown {
 	return value;
 }
 
-export function eventBytes(event: unknown): number {
-	return Buffer.byteLength(JSON.stringify(event));
+/** The ids the cloud keys rows by, which a cut must not shorten. */
+function keepIds(original: DurableEvent, cut: DurableEvent): DurableEvent {
+	if (original.type === "item" && cut.type === "item") {
+		return {
+			...cut,
+			turnId: original.turnId,
+			item: { ...cut.item, id: original.item.id },
+		};
+	}
+	if (original.type === "turn" && cut.type === "turn") {
+		return { ...cut, turn: { ...cut.turn, id: original.turn.id } };
+	}
+	return cut;
 }
 
 function cutEvent(
@@ -55,7 +69,7 @@ function cutEvent(
 	otherLimit: number,
 	messageLimit: number,
 ): DurableEvent {
-	const cut = cutStrings(event, otherLimit) as DurableEvent;
+	const cut = keepIds(event, cutStrings(event, otherLimit) as DurableEvent);
 	if (cut.type !== "item" || event.type !== "item") return cut;
 	if (!MESSAGE_KINDS.has(event.item.kind)) return cut;
 	const item: Record<string, unknown> = { ...cut.item };
@@ -106,5 +120,5 @@ export function prepareEventForCloud(event: DurableEvent): DurableEvent {
 		cut = cutEvent(prepared, otherLimit, messageLimit);
 		if (eventBytes(cut) <= MAX_EVENT_BYTES) return cut;
 	}
-	return omitBody(cut);
+	return keepIds(prepared, omitBody(cut));
 }
