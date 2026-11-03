@@ -6,6 +6,10 @@ import {
 	type DnrMethod,
 } from "shared/browser-extension-dnr";
 import {
+	INSTALLED_CHANNEL,
+	type InstalledDetails,
+} from "shared/browser-extension-installed";
+import {
 	MAX_EXTENSION_MESSAGE_LENGTH,
 	NATIVE_MESSAGING_CHANNEL,
 	NATIVE_MESSAGING_EVENT_CHANNEL,
@@ -16,6 +20,7 @@ import {
 	OFFSCREEN_CHANNEL,
 	type OffscreenMethod,
 } from "shared/browser-extension-offscreen";
+import { shimChromeStorage } from "shared/browser-extension-storage-shim";
 import {
 	chromeUserAgent,
 	firefoxUserAgent,
@@ -39,6 +44,7 @@ contextBridge.executeInMainWorld({
 		callDnr: (method: DnrMethod, args: unknown[]) => unknown,
 		dnrMethods: readonly DnrMethod[],
 		dnrConstants: Record<string, unknown>,
+		takeInstalledDetails: () => Promise<InstalledDetails | null>,
 	) => {
 		// Session preloads run in website frames and workers too. The checks run
 		// here because a service worker's preload realm has no `location`.
@@ -123,8 +129,40 @@ contextBridge.executeInMainWorld({
 				hasDocument: () => callOffscreen("hasDocument"),
 			};
 		}
-
+		// Electron never fires runtime.onInstalled; the app tracks installs and
+		// updates, and the worker asks once its first listener is added.
 		const runtime = chrome?.runtime as Record<string, unknown> | undefined;
+		if (isServiceWorker && runtime?.onInstalled) {
+			type InstalledListener = (details: InstalledDetails) => void;
+			const listeners = new Set<InstalledListener>();
+			let asked = false;
+			runtime.onInstalled = {
+				addListener(listener: InstalledListener) {
+					listeners.add(listener);
+					if (asked) return;
+					asked = true;
+					takeInstalledDetails().then(
+						(details) => {
+							if (!details) return;
+							for (const each of listeners) {
+								try {
+									each(details);
+								} catch (error) {
+									console.error(error);
+								}
+							}
+						},
+						() => {},
+					);
+				},
+				removeListener(listener: InstalledListener) {
+					listeners.delete(listener);
+				},
+				hasListener: (listener: InstalledListener) => listeners.has(listener),
+				hasListeners: () => listeners.size > 0,
+			};
+		}
+
 		let declaresNativeMessaging = false;
 		try {
 			const { permissions } = (
@@ -297,5 +335,8 @@ contextBridge.executeInMainWorld({
 			ipcRenderer.invoke(DNR_CHANNEL, method, args),
 		DNR_METHODS,
 		DNR_CONSTANTS,
+		() => ipcRenderer.invoke(INSTALLED_CHANNEL),
 	],
 });
+
+contextBridge.executeInMainWorld({ func: shimChromeStorage, args: [true] });
