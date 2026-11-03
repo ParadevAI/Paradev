@@ -1,4 +1,4 @@
-import { type ChildProcess, spawn } from "node:child_process";
+import { type ChildProcess, execFile, spawn } from "node:child_process";
 import path from "node:path";
 import { NATIVE_MESSAGING_ERRORS } from "shared/browser-extension-native-messaging";
 import { createNativeMessageReader, encodeNativeMessage } from "./framing";
@@ -21,7 +21,7 @@ export interface NativeHostLaunch {
 
 const KILL_GRACE_MS = 2000;
 // Two of Chrome's largest messages.
-const MAX_PENDING_BYTES = 128 * 1024 * 1024;
+export const MAX_PENDING_BYTES = 128 * 1024 * 1024;
 
 function spawnHost(
 	hostPath: string,
@@ -38,6 +38,26 @@ function spawnHost(
 		process.env.ComSpec ?? "cmd.exe",
 		["/d", "/s", "/c", `""${hostPath}" ${origin} --parent-window=0"`],
 		{ ...options, windowsVerbatimArguments: true, windowsHide: true },
+	);
+}
+
+/** On Windows the host runs under cmd.exe, so the whole tree is stopped. */
+export function terminateHost(
+	child: Pick<ChildProcess, "pid" | "kill">,
+	platform: NodeJS.Platform,
+	signal: NodeJS.Signals,
+): void {
+	if (platform !== "win32" || child.pid === undefined) {
+		child.kill(signal);
+		return;
+	}
+	execFile(
+		"taskkill",
+		["/pid", String(child.pid), "/T", "/F"],
+		{ windowsHide: true },
+		(error) => {
+			if (error) child.kill(signal);
+		},
 	);
 }
 
@@ -67,7 +87,8 @@ export function startNativeHost(
 	let child: ChildProcess;
 	try {
 		child = spawnHost(hostPath, origin, platform);
-	} catch {
+	} catch (error) {
+		console.warn(`[native-messaging] Cannot start ${hostPath}:`, error);
 		closed = true;
 		queueMicrotask(() =>
 			handlers.onClose(NATIVE_MESSAGING_ERRORS.failedToStart),
@@ -75,22 +96,36 @@ export function startNativeHost(
 		return { post: () => {}, close: () => {} };
 	}
 
-	const stop = () => {
-		child.stdin?.destroy();
-		child.stdout?.destroy();
-		if (child.exitCode !== null || child.signalCode !== null) return;
-		child.kill("SIGTERM");
+	const running = () => child.exitCode === null && child.signalCode === null;
+	let killing = false;
+	const kill = () => {
+		if (killing || !running()) return;
+		killing = true;
+		terminateHost(child, platform, "SIGTERM");
 		const timer = setTimeout(() => {
-			if (child.exitCode === null && child.signalCode === null) {
-				child.kill("SIGKILL");
-			}
+			if (running()) terminateHost(child, platform, "SIGKILL");
 		}, killGraceMs);
 		timer.unref?.();
 		child.once("exit", () => clearTimeout(timer));
 	};
+	const stop = () => {
+		child.stdin?.destroy();
+		child.stdout?.destroy();
+		kill();
+	};
 
-	child.on("error", () => finish(NATIVE_MESSAGING_ERRORS.failedToStart));
-	child.stdin?.on("error", () => {});
+	let closeError: string = NATIVE_MESSAGING_ERRORS.exited;
+	child.on("error", (error) => {
+		console.warn(`[native-messaging] Cannot start ${hostPath}:`, error);
+		finish(NATIVE_MESSAGING_ERRORS.failedToStart);
+	});
+	// Stops a host that closed its input; stdout still drains before `close`.
+	child.stdin?.on("error", (error) => {
+		if (closed) return;
+		console.warn("[native-messaging] Cannot write to the host:", error);
+		closeError = NATIVE_MESSAGING_ERRORS.io;
+		kill();
+	});
 	const read = createNativeMessageReader({
 		onMessage: (json) => {
 			if (!closed) handlers.onMessage(json);
@@ -102,18 +137,18 @@ export function startNativeHost(
 	});
 	child.stdout?.on("data", read);
 	// `close` follows the last stdout data, so every message is delivered first.
-	child.on("close", () => finish(NATIVE_MESSAGING_ERRORS.exited));
+	child.on("close", () => finish(closeError));
 
 	return {
 		post: (json) => {
 			if (closed) return;
+			const frame = encodeNativeMessage(json);
 			// A host that stops reading would otherwise buffer every frame in memory.
-			if (unsentBytes > maxPendingBytes) {
+			if (unsentBytes > 0 && unsentBytes + frame.length > maxPendingBytes) {
 				console.warn("[native-messaging] host stopped reading its input");
 				finish(NATIVE_MESSAGING_ERRORS.io);
 				return;
 			}
-			const frame = encodeNativeMessage(json);
 			unsentBytes += frame.length;
 			child.stdin?.write(frame, () => {
 				unsentBytes -= frame.length;

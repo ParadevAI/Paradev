@@ -1,20 +1,25 @@
-import { afterAll, expect, test } from "bun:test";
+import { afterAll, expect, spyOn, test } from "bun:test";
+import * as childProcess from "node:child_process";
+import { EventEmitter } from "node:events";
 import {
 	chmodSync,
 	mkdtempSync,
+	readFileSync,
 	realpathSync,
 	rmSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { PassThrough, Writable } from "node:stream";
 import {
 	NATIVE_MESSAGING_ERRORS,
 	type NativePortEvent,
 } from "shared/browser-extension-native-messaging";
-import { startNativeHost } from "./native-host-process";
+import { startNativeHost, terminateHost } from "./native-host-process";
 import {
 	createNativeMessagingPorts,
+	type NativeMessagingPortsDeps,
 	type PortOwner,
 } from "./native-messaging-ports";
 
@@ -79,20 +84,23 @@ function fakeOwner(extensionId = ONEPASSWORD, key = "worker:1") {
 	return { owner, events, next, alive: () => alive };
 }
 
-function ports(declares = true) {
+function ports(
+	allows = true,
+	findHost: NativeMessagingPortsDeps["findHost"] = async (name, extensionId) =>
+		name === "com.example.host" && extensionId === ONEPASSWORD
+			? {
+					ok: true,
+					host: {
+						name,
+						path: hostPath,
+						allowedOrigins: [`chrome-extension://${ONEPASSWORD}/`],
+					},
+				}
+			: { ok: false, error: NATIVE_MESSAGING_ERRORS.forbidden },
+) {
 	return createNativeMessagingPorts({
-		declaresNativeMessaging: () => declares,
-		findHost: async (name, extensionId) =>
-			name === "com.example.host" && extensionId === ONEPASSWORD
-				? {
-						ok: true,
-						host: {
-							name,
-							path: hostPath,
-							allowedOrigins: [`chrome-extension://${ONEPASSWORD}/`],
-						},
-					}
-				: { ok: false, error: NATIVE_MESSAGING_ERRORS.forbidden },
+		allowsNativeMessaging: () => allows,
+		findHost,
 		startHost: startNativeHost,
 	});
 }
@@ -181,12 +189,13 @@ test("unloading the extension stops its hosts without touching another context's
 	expect(await waitUntilStopped(pid)).toBe(true);
 });
 
-test("a host that stops reading closes the port instead of buffering without limit", async () => {
+test("a host that stops reading is stopped instead of buffering without limit", async () => {
 	const deafPath = path.join(dir, "deaf-host");
-	writeFileSync(deafPath, "#!/bin/sh\nexec sleep 30\n");
+	writeFileSync(deafPath, '#!/bin/sh\necho $$ > "$0.pid"\nexec sleep 30\n');
 	chmodSync(deafPath, 0o755);
+	let host: ReturnType<typeof startNativeHost> | undefined;
 	const closed = new Promise<string>((resolve) => {
-		const host = startNativeHost(
+		host = startNativeHost(
 			{
 				hostPath: deafPath,
 				origin: `chrome-extension://${ONEPASSWORD}/`,
@@ -194,9 +203,179 @@ test("a host that stops reading closes the port instead of buffering without lim
 			},
 			{ onMessage: () => {}, onClose: resolve },
 		);
-		const chunk = JSON.stringify("x".repeat(256 * 1024));
-		// More than a macOS pipe holds (up to 1 MiB).
-		for (let i = 0; i < 16; i++) host.post(chunk);
 	});
+	let pid = 0;
+	for (let i = 0; i < 200 && !pid; i++) {
+		try {
+			pid = Number(readFileSync(`${deafPath}.pid`, "utf8"));
+		} catch {}
+		if (!pid) await Bun.sleep(5);
+	}
+	expect(pid).toBeGreaterThan(0);
+	const chunk = JSON.stringify("x".repeat(256 * 1024));
+	// Outgrows the pipe (up to 1 MiB on macOS), so frames stay unsent.
+	for (let i = 0; i < 16; i++) host?.post(chunk);
 	expect(await closed).toBe(NATIVE_MESSAGING_ERRORS.io);
+	expect(await waitUntilStopped(pid)).toBe(true);
+});
+
+// A spawned host whose stdin takes every write but `write` decides the outcome.
+function fakeSpawn(write: (callback: (error?: Error) => void) => void) {
+	const signals: (NodeJS.Signals | number | undefined)[] = [];
+	const child = Object.assign(new EventEmitter(), {
+		pid: 99999,
+		exitCode: null as number | null,
+		signalCode: null as NodeJS.Signals | null,
+		stdin: new Writable({
+			write: (_chunk, _encoding, callback) => write(callback),
+		}),
+		stdout: new PassThrough(),
+		kill(signal?: NodeJS.Signals | number) {
+			signals.push(signal);
+			child.signalCode = "SIGTERM";
+			queueMicrotask(() => {
+				child.emit("exit", null, "SIGTERM");
+				child.emit("close", null, "SIGTERM");
+			});
+			return true;
+		},
+	});
+	const spawn = spyOn(childProcess, "spawn").mockImplementation(
+		(() => child) as unknown as typeof childProcess.spawn,
+	);
+	return { signals, restore: () => spawn.mockRestore() };
+}
+
+function startFakeHost(maxPendingBytes?: number) {
+	let result: string | undefined;
+	const host = startNativeHost(
+		{
+			hostPath: "/fake/host",
+			origin: `chrome-extension://${ONEPASSWORD}/`,
+			maxPendingBytes,
+		},
+		{
+			onMessage: () => {},
+			onClose: (error) => {
+				result = error;
+			},
+		},
+	);
+	return { host, result: () => result };
+}
+
+test("unsent input is capped counting the frame being added, but one large frame still goes out", () => {
+	const fake = fakeSpawn(() => {});
+	try {
+		const large = startFakeHost(1024);
+		large.host.post(JSON.stringify("x".repeat(4096)));
+		expect(large.result()).toBeUndefined();
+		large.host.close();
+
+		const small = startFakeHost(1024);
+		const chunk = JSON.stringify("x".repeat(600));
+		small.host.post(chunk);
+		expect(small.result()).toBeUndefined();
+		small.host.post(chunk);
+		expect(small.result()).toBe(NATIVE_MESSAGING_ERRORS.io);
+	} finally {
+		fake.restore();
+	}
+});
+
+test("a host that closes its input ends the port and is stopped", async () => {
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	const fake = fakeSpawn((callback) =>
+		callback(Object.assign(new Error("write EPIPE"), { code: "EPIPE" })),
+	);
+	try {
+		const { host, result } = startFakeHost();
+		host.post("{}");
+		for (let i = 0; i < 100 && result() === undefined; i++) await Bun.sleep(1);
+		expect(result()).toBe(NATIVE_MESSAGING_ERRORS.io);
+		expect(fake.signals).toEqual(["SIGTERM"]);
+	} finally {
+		fake.restore();
+		warn.mockRestore();
+	}
+});
+
+test("a host that cannot start says why", async () => {
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	try {
+		const closed = await new Promise<string>((resolve) =>
+			startNativeHost(
+				{
+					hostPath: path.join(dir, "missing-host"),
+					origin: `chrome-extension://${ONEPASSWORD}/`,
+				},
+				{ onMessage: () => {}, onClose: resolve },
+			),
+		);
+		expect(closed).toBe(NATIVE_MESSAGING_ERRORS.failedToStart);
+		expect(String(warn.mock.calls.flat())).toContain("ENOENT");
+	} finally {
+		warn.mockRestore();
+	}
+});
+
+test("on Windows the host's whole process tree is stopped, not just cmd.exe", () => {
+	const execFile = spyOn(childProcess, "execFile").mockImplementation(
+		(() => {}) as unknown as typeof childProcess.execFile,
+	);
+	try {
+		const kill = (() => true) as unknown as (
+			signal?: NodeJS.Signals,
+		) => boolean;
+		terminateHost({ pid: 4321, kill }, "win32", "SIGTERM");
+		expect(execFile.mock.calls[0]?.slice(0, 2)).toEqual([
+			"taskkill",
+			["/pid", "4321", "/T", "/F"],
+		]);
+	} finally {
+		execFile.mockRestore();
+	}
+});
+
+test("a failed host lookup disconnects the port with an error", async () => {
+	const error = spyOn(console, "error").mockImplementation(() => {});
+	try {
+		const native = ports(true, async () => {
+			throw new Error("lookup failed");
+		});
+		const { owner, events, alive } = fakeOwner();
+		await native.connect(owner, 3, "com.example.host");
+		expect(events).toEqual([
+			[3, { type: "disconnect", error: NATIVE_MESSAGING_ERRORS.failedToStart }],
+		]);
+		expect(alive()).toBe(0);
+		expect(native.openCount()).toBe(0);
+	} finally {
+		error.mockRestore();
+	}
+});
+
+test("messages are limited in UTF-8 bytes, and so is the queue while a host is looked up", async () => {
+	const pending = () => ports(true, () => new Promise(() => {}));
+	const wide = pending();
+	const first = fakeOwner();
+	void wide.connect(first.owner, 1, "com.example.host");
+	// 25M characters, but 75 MB of UTF-8.
+	wide.post(first.owner, 1, JSON.stringify("日".repeat(25 * 1024 * 1024)));
+	expect(first.events).toEqual([
+		[1, { type: "disconnect", error: NATIVE_MESSAGING_ERRORS.io }],
+	]);
+
+	const queue = pending();
+	const second = fakeOwner();
+	void queue.connect(second.owner, 1, "com.example.host");
+	const large = JSON.stringify("x".repeat(60 * 1024 * 1024));
+	queue.post(second.owner, 1, large);
+	queue.post(second.owner, 1, large);
+	expect(second.events).toEqual([]);
+	queue.post(second.owner, 1, large);
+	expect(second.events).toEqual([
+		[1, { type: "disconnect", error: NATIVE_MESSAGING_ERRORS.io }],
+	]);
+	expect(second.alive()).toBe(0);
 });
