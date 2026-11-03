@@ -692,6 +692,7 @@ export function AcpChatPane({
 	const draft = (notice: ReactNode) => (
 		<DraftChat
 			draftKey={draftKey}
+			getOpenFilePaths={getOpenFilePaths}
 			isActive={isActive}
 			notice={notice}
 			onOpenHistory={onOpenHistory}

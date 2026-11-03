@@ -16,4 +16,13 @@ describe("matchRecentFiles", () => {
 		).map((file) => file.relativePath);
 		expect(paths).toEqual(["docs/b.md", "src/B.ts"]);
 	});
+
+	test("finds a match older than the display limit", () => {
+		const files = Array.from({ length: 15 }, (_, i) => recent(`src/f${i}.ts`));
+		const paths = matchRecentFiles(files, "f14", new Set()).map(
+			(file) => file.relativePath,
+		);
+		expect(paths).toEqual(["src/f14.ts"]);
+		expect(matchRecentFiles(files, "", new Set())).toHaveLength(10);
+	});
 });

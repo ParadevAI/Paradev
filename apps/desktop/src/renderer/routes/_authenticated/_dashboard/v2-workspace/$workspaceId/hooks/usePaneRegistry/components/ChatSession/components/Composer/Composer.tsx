@@ -48,8 +48,8 @@ import {
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { useRecentlyViewedFiles } from "../../../../../useRecentlyViewedFiles";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
@@ -313,24 +313,26 @@ export const Composer = memo(function Composer({
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [isActive]);
-	const { recentFiles } = useRecentlyViewedFiles(workspaceId);
+	const collections = useCollections();
 	const { getOpenFilePaths } = useChatPaneActions();
-	// A new providers identity restarts the open menu's search and drops slow results.
-	const recentFilesRef = useRef(recentFiles);
-	recentFilesRef.current = recentFiles;
 	const searchFiles = useCallback(
 		async (query: string) => {
 			const { matches } = query.trim()
-				? await trpcUtils.filesystem.searchFiles.fetch({
-						workspaceId,
-						query,
-						includeHidden: false,
-						limit: FILE_SEARCH_LIMIT,
-					})
+				? await trpcUtils.filesystem.searchFiles
+						.fetch({
+							workspaceId,
+							query,
+							includeHidden: false,
+							limit: FILE_SEARCH_LIMIT,
+						})
+						.catch(() => ({ matches: [] }))
 				: { matches: [] };
+			// Read at call time: a subscription re-renders on every pane change
+			// and restarts the open menu's search.
 			return fileMentionMatches(
 				query,
-				recentFilesRef.current,
+				collections.v2WorkspaceLocalState.get(workspaceId)
+					?.recentlyViewedFiles ?? [],
 				getOpenFilePaths?.() ?? new Set(),
 				matches,
 			).map(
@@ -343,7 +345,7 @@ export const Composer = memo(function Composer({
 				}),
 			);
 		},
-		[trpcUtils, workspaceId, getOpenFilePaths],
+		[trpcUtils, workspaceId, collections, getOpenFilePaths],
 	);
 
 	const { transport } = useChatWiring();

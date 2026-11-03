@@ -1,7 +1,7 @@
 import { RECENT_DISPLAY_LIMIT } from "../../constants";
 import type { RecentFile } from "../../useRecentlyViewedFiles";
 
-/** Recent files as Quick Open lists them: open files first, then filtered by the query. */
+/** Recent files as Quick Open lists them: open files first, matching the query, capped. */
 export function matchRecentFiles(
 	recentFiles: readonly RecentFile[],
 	query: string,
@@ -15,6 +15,6 @@ export function matchRecentFiles(
 	);
 	const needle = query.trim().toLowerCase();
 	return [...open, ...rest]
-		.slice(0, RECENT_DISPLAY_LIMIT)
-		.filter((file) => file.relativePath.toLowerCase().includes(needle));
+		.filter((file) => file.relativePath.toLowerCase().includes(needle))
+		.slice(0, RECENT_DISPLAY_LIMIT);
 }
