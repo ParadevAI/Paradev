@@ -147,7 +147,14 @@ export function attachBrowserExtensions(options: {
 		send: notifyBrowserExtensionsChanged,
 	});
 	options.session.extensions.on("extension-loaded", (_event, extension) => {
-		if (turnedOff.has(extension.id)) void forgetTurnedOff(extension.id);
+		if (turnedOff.delete(extension.id)) {
+			deleteTurnedOffFiles(extension.id).catch((error: unknown) => {
+				console.error(
+					`[extension-host] Failed to delete ${extension.id}:`,
+					error,
+				);
+			});
+		}
 		notifyBrowserExtensionsChanged();
 	});
 	options.session.extensions.on(
@@ -235,14 +242,10 @@ export function setTurnedOffBrowserExtensions(
 	notifyBrowserExtensionsChanged();
 }
 
-async function forgetTurnedOff(extensionId: string): Promise<void> {
-	turnedOff.delete(extensionId);
-	notifyBrowserExtensionsChanged();
-	await rm(path.join(userExtensionPaths().turnedOffPath, extensionId), {
+function deleteTurnedOffFiles(extensionId: string): Promise<void> {
+	return rm(path.join(userExtensionPaths().turnedOffPath, extensionId), {
 		recursive: true,
 		force: true,
-	}).catch((error: unknown) => {
-		console.error(`[extension-host] Failed to delete ${extensionId}:`, error);
 	});
 }
 
@@ -349,10 +352,13 @@ export async function removeBrowserExtension(
 	if (!host) throw new Error("Browser extensions have not started yet");
 	const extension = host.session.extensions.getExtension(extensionId);
 	if (!extension && turnedOff.has(extensionId)) {
-		await forgetTurnedOff(extensionId);
+		await deleteTurnedOffFiles(extensionId);
+		turnedOff.delete(extensionId);
+		notifyBrowserExtensionsChanged();
 		await host.session.clearStorageData({
 			origin: `chrome-extension://${extensionId}`,
 		});
+		await deleteExtensionRules(extensionId);
 		pins.setPinned(extensionId, false);
 		return;
 	}

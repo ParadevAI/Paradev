@@ -85,14 +85,23 @@ export async function loadUserExtensions(
 
 async function turnOff(paths: UserExtensionPaths, id: string): Promise<void> {
 	await mkdir(paths.turnedOffPath, { recursive: true });
-	await rm(path.join(paths.turnedOffPath, id), {
-		recursive: true,
-		force: true,
-	});
-	await rename(
-		path.join(paths.extensionsPath, id),
-		path.join(paths.turnedOffPath, id),
+	const target = path.join(paths.turnedOffPath, id);
+	const previous = `${target}.previous`;
+	await rm(previous, { recursive: true, force: true });
+	const hadPrevious = await rename(target, previous).then(
+		() => true,
+		(error: NodeJS.ErrnoException) => {
+			if (error.code === "ENOENT") return false;
+			throw error;
+		},
 	);
+	try {
+		await rename(path.join(paths.extensionsPath, id), target);
+	} catch (error) {
+		if (hadPrevious) await rename(previous, target).catch(() => {});
+		throw error;
+	}
+	await rm(previous, { recursive: true, force: true });
 }
 
 async function listTurnedOffExtensions(
@@ -104,7 +113,13 @@ async function listTurnedOffExtensions(
 ): Promise<TurnedOffExtension[]> {
 	const turnedOff: TurnedOffExtension[] = [];
 	for (const id of await extensionIds(turnedOffPath)) {
-		const dir = (await latestVersion(path.join(turnedOffPath, id)))?.dir;
+		const dir = await latestVersion(path.join(turnedOffPath, id)).then(
+			(found) => found?.dir,
+			(error: unknown) => {
+				console.error(`[extension-host] Failed to read ${id}:`, error);
+				return undefined;
+			},
+		);
 		const manifest = dir ? await readManifest(dir) : null;
 		turnedOff.push({
 			id,
@@ -194,7 +209,13 @@ async function readManifest(
 	dir: string,
 ): Promise<chrome.runtime.Manifest | null> {
 	try {
-		return JSON.parse(await readFile(path.join(dir, "manifest.json"), "utf8"));
+		const manifest: unknown = JSON.parse(
+			await readFile(path.join(dir, "manifest.json"), "utf8"),
+		);
+		const { name, version } = (manifest ?? {}) as Record<string, unknown>;
+		return typeof name === "string" && typeof version === "string"
+			? (manifest as chrome.runtime.Manifest)
+			: null;
 	} catch {
 		return null;
 	}

@@ -1,11 +1,15 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import {
 	appendFileSync,
+	chmodSync,
+	cpSync,
 	existsSync,
+	mkdirSync,
 	mkdtempSync,
 	readFileSync,
 	renameSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { createServer } from "node:http";
@@ -119,7 +123,7 @@ test("signed hashes saved at install still check the extension after Electron de
 	expect(existsSync(join(paths.extensionsPath, JSON_FORMATTER_ID))).toBe(false);
 });
 
-test("a changed manifest or an added file turns a signed extension off", async () => {
+test("a changed, added, missing or symlinked file turns a signed extension off", async () => {
 	const tamper: Array<(installed: string) => void> = [
 		(installed) => {
 			const file = join(installed, "manifest.json");
@@ -128,6 +132,12 @@ test("a changed manifest or an added file turns a signed extension off", async (
 			writeFileSync(file, JSON.stringify(manifest, null, 2));
 		},
 		(installed) => writeFileSync(join(installed, "extra.js"), "alert(1)"),
+		(installed) => rmSync(join(installed, "options/options.js")),
+		(installed) => rmSync(join(installed, "manifest.json")),
+		(installed) => {
+			rmSync(join(installed, "content.js"));
+			symlinkSync("/etc/hosts", join(installed, "content.js"));
+		},
 	];
 	for (const change of tamper) {
 		const paths = freshPaths();
@@ -182,4 +192,69 @@ test("an update replaces a trusted record with the signed one", async () => {
 
 	expect(readRecord(paths)).toHaveProperty("verifiedContents");
 	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+});
+
+test("an install with no record turns off when it holds a symlink", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	rmSync(paths.manifestsPath, { recursive: true });
+	symlinkSync("/etc/hosts", join(installed, "linked.js"));
+
+	const { turnedOff, loaded } = await start(paths);
+
+	expect(loaded).toEqual([]);
+	expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
+});
+
+test("a file named __proto__ keeps its trusted hash", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	rmSync(paths.manifestsPath, { recursive: true });
+	writeFileSync(join(installed, "__proto__"), "data");
+
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+});
+
+test("an earlier turned-off copy stays when moving the new one out fails", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	const earlier = join(paths.turnedOffPath, JSON_FORMATTER_ID);
+	mkdirSync(paths.turnedOffPath, { recursive: true });
+	cpSync(join(paths.extensionsPath, JSON_FORMATTER_ID), earlier, {
+		recursive: true,
+	});
+	appendFileSync(join(installed, "content.js"), "\nalert(1);");
+	chmodSync(paths.extensionsPath, 0o555);
+	try {
+		const { turnedOff, loaded } = await start(paths);
+		expect(loaded).toEqual([]);
+		expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
+		expect(existsSync(join(earlier, `${VERSION}_0`, "manifest.json"))).toBe(
+			true,
+		);
+	} finally {
+		chmodSync(paths.extensionsPath, 0o755);
+	}
+});
+
+test("an unreadable or malformed turned-off extension is listed by its id", async () => {
+	const paths = freshPaths();
+	const malformedId = "a".repeat(32);
+	const unreadableId = "b".repeat(32);
+	const malformed = join(paths.turnedOffPath, malformedId, "1.0_0");
+	mkdirSync(malformed, { recursive: true });
+	writeFileSync(join(malformed, "manifest.json"), '"a string"');
+	const unreadable = join(paths.turnedOffPath, unreadableId);
+	mkdirSync(unreadable, { recursive: true });
+	chmodSync(unreadable, 0o000);
+	try {
+		const { turnedOff } = await start(paths);
+		expect(turnedOff.sort((a, b) => a.id.localeCompare(b.id))).toEqual([
+			{ id: malformedId, name: malformedId, version: "" },
+			{ id: unreadableId, name: unreadableId, version: "" },
+		]);
+	} finally {
+		chmodSync(unreadable, 0o755);
+	}
 });

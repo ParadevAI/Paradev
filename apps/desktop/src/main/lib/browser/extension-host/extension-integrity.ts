@@ -106,15 +106,18 @@ export async function checkExtensionFiles(
 	const record = await readUsableRecord(file, options);
 	const { files, others } = await listFiles(dir);
 	if (!record) {
-		if (others[0]) throw new Error(`${others[0]} is not a plain file`);
-		const fileSha256: Record<string, string> = {};
+		if (others[0]) {
+			throw new ExtensionIntegrityError(`${others[0]} is not a plain file`);
+		}
+		const hashes: [string, string][] = [];
 		await forEachLimited(files, PARALLEL_READS, async (relative) => {
-			fileSha256[relative] = sha256(
-				await readFile(path.join(dir, relative)),
-			).toString("hex");
+			hashes.push([
+				relative,
+				sha256(await readFile(path.join(dir, relative))).toString("hex"),
+			]);
 		});
 		await mkdir(path.dirname(file), { recursive: true });
-		const trusted: FilesRecord = { fileSha256 };
+		const trusted: FilesRecord = { fileSha256: Object.fromEntries(hashes) };
 		await writeFile(file, JSON.stringify(trusted));
 		return "recorded";
 	}
@@ -199,13 +202,21 @@ async function readUsableRecord(
 		if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
 		throw error;
 	}
-	const parsed = recordSchema.safeParse(parseJson(text));
+	const json = parseJson(text);
+	const parsed = recordSchema.safeParse(json);
 	if (!parsed.success) {
 		console.error(`[extension-host] Ignoring malformed record ${file}`);
 		return null;
 	}
 	if ("fileSha256" in parsed.data) {
-		return { kind: "trusted", fileSha256: parsed.data.fileSha256 };
+		// zod drops a `__proto__` key, which is a valid file name.
+		const { fileSha256 } = json as { fileSha256: Record<string, unknown> };
+		return {
+			kind: "trusted",
+			fileSha256: Object.fromEntries(
+				Object.entries(fileSha256).map(([name, hash]) => [name, String(hash)]),
+			),
+		};
 	}
 	const manifest = Buffer.from(parsed.data.manifest, "base64");
 	const signed = readSignedContents(parsed.data.verifiedContents);
@@ -259,7 +270,14 @@ async function verifySignedFiles(
 		throw new ExtensionIntegrityError(`${missing} is missing`);
 	}
 
-	const onDisk = await readFile(path.join(dir, MANIFEST));
+	const onDisk = await readFile(path.join(dir, MANIFEST)).catch(
+		(error: NodeJS.ErrnoException) => {
+			if (error.code === "ENOENT") {
+				throw new ExtensionIntegrityError(`${MANIFEST} is missing`);
+			}
+			throw error;
+		},
+	);
 	const manifest = parseJson(onDisk.toString("utf8")) as {
 		key?: unknown;
 	} | null;
