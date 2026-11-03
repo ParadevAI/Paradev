@@ -224,7 +224,8 @@ export class TerminalAgentStore extends EventEmitter {
 				: undefined;
 
 		const next: TerminalAgentBinding = {
-			...(this.persistence?.getLifecycleOwner?.(terminalId) === "external"
+			...((this.persistence?.getLifecycleOwner?.(terminalId) ??
+				prior?.agentLifecycleOwner) === "external"
 				? { agentLifecycleOwner: "external" as const }
 				: {}),
 			terminalId,

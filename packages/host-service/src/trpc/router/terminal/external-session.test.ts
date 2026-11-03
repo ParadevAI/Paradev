@@ -1,10 +1,12 @@
 import { Database } from "bun:sqlite";
-import { expect, it } from "bun:test";
+import { expect, it, spyOn } from "bun:test";
 import { resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
+import * as terminalRuntime from "../../../terminal/terminal";
+import { TerminalAgentStore } from "../../../terminal-agents";
 import type { HostServiceContext } from "../../../types";
 import { terminalRouter } from "./terminal";
 
@@ -68,4 +70,66 @@ it("cannot convert a normal terminal into an external observation", async () => 
 	expect(
 		ctx.db.select().from(schema.terminalSessions).get()?.agentLifecycleOwner,
 	).toBe("paradev");
+});
+
+it("reports failed observation cleanup and permits an idempotent retry", async () => {
+	const ctx = context();
+	ctx.terminalAgentStore = new TerminalAgentStore();
+	ctx.db
+		.insert(schema.terminalSessions)
+		.values({
+			id: "view",
+			originWorkspaceId: "ws",
+			agentLifecycleOwner: "external",
+		})
+		.run();
+	const dispose = spyOn(terminalRuntime, "disposeSessionAndWait")
+		.mockResolvedValueOnce({
+			terminalId: "view",
+			daemonCloseAttempted: true,
+			daemonCloseSucceeded: false,
+		})
+		.mockResolvedValueOnce({
+			terminalId: "view",
+			daemonCloseAttempted: true,
+			daemonCloseSucceeded: true,
+		});
+	try {
+		const caller = terminalRouter.createCaller(ctx);
+		await expect(
+			caller.endExternalSession({ workspaceId: "ws", terminalId: "view" }),
+		).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR" });
+		expect(
+			ctx.db.select().from(schema.terminalSessions).get()?.externalEndedAt,
+		).toBeNumber();
+		await expect(
+			caller.endExternalSession({ workspaceId: "ws", terminalId: "view" }),
+		).resolves.toMatchObject({ ended: true });
+		expect(dispose).toHaveBeenCalledTimes(2);
+	} finally {
+		dispose.mockRestore();
+	}
+});
+
+it("reports external ownership before a native binding exists and after observation disposal", async () => {
+	const ctx = context();
+	ctx.db
+		.insert(schema.terminalSessions)
+		.values({
+			id: "view",
+			originWorkspaceId: "ws",
+			agentLifecycleOwner: "external",
+			status: "disposed",
+		})
+		.run();
+	const caller = terminalRouter.createCaller(ctx);
+	await expect(
+		caller.getLifecycleOwner({ workspaceId: "ws", terminalId: "view" }),
+	).resolves.toEqual({ agentLifecycleOwner: "external" });
+	await expect(
+		caller.getLifecycleOwner({ workspaceId: "ws", terminalId: "new-shell" }),
+	).resolves.toEqual({ agentLifecycleOwner: "paradev" });
+	await expect(
+		caller.getLifecycleOwner({ workspaceId: "other", terminalId: "view" }),
+	).rejects.toMatchObject({ code: "FORBIDDEN" });
 });

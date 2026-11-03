@@ -127,6 +127,23 @@ const daemonRouter = router({
 });
 
 export const terminalRouter = router({
+	// Ownership exists before the first native hook and survives observation
+	// disposal, so panes must not infer it from the live agent binding list.
+	getLifecycleOwner: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
+		.query(({ ctx, input }) => {
+			const session = ctx.db.query.terminalSessions
+				.findFirst({ where: eq(terminalSessions.id, input.terminalId) })
+				.sync();
+			if (session && session.originWorkspaceId !== input.workspaceId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Terminal session does not belong to this workspace",
+				});
+			}
+			return { agentLifecycleOwner: session?.agentLifecycleOwner ?? "paradev" };
+		}),
+
 	createExternalSession: protectedProcedure
 		.input(
 			createSessionInputSchema
@@ -212,7 +229,14 @@ export const terminalRouter = router({
 				eventType: "Detached",
 				occurredAt: Date.now(),
 			});
-			await disposeSessionAndWait(input.terminalId, ctx.db);
+			const disposal = await disposeSessionAndWait(input.terminalId, ctx.db);
+			if (!disposal.daemonCloseSucceeded) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message:
+						"External worker binding ended, but observation cleanup failed. Retry endExternalSession to finish cleanup.",
+				});
+			}
 			return {
 				terminalId: input.terminalId,
 				agentLifecycleOwner: "external" as const,

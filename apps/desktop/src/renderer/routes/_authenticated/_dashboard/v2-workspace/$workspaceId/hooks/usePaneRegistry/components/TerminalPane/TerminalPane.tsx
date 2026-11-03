@@ -14,7 +14,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
-import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
+import { useTerminalReadOnly } from "renderer/hooks/host-service/useTerminalReadOnly";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { useHotkey } from "renderer/hotkeys";
 import {
@@ -109,8 +109,7 @@ export function TerminalPane({
 	const worktreePath = workspaceQuery.data?.worktreePath ?? undefined;
 	const paneData = ctx.pane.data as TerminalPaneData;
 	const { terminalId } = paneData;
-	const binding = useTerminalAgentBinding(workspaceId, terminalId);
-	const isExternal = binding?.agentLifecycleOwner === "external";
+	const isExternal = useTerminalReadOnly(workspaceId, terminalId);
 	const terminalInstanceId = ctx.pane.id;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	// Link actions are fired from event handlers (xterm clicks, context-menu
