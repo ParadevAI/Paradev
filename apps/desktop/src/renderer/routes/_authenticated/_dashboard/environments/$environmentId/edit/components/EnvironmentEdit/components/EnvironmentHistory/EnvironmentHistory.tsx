@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { formatDateTime } from "@superset/i18n/format";
-import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import {
@@ -82,9 +81,9 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 									</TableCell>
 									<TableCell className="text-right">
 										{build.active ? (
-											<Badge className="font-normal" variant="outline">
+											<span className="pr-3 text-sm text-muted-foreground">
 												<Trans>Current</Trans>
-											</Badge>
+											</span>
 										) : (
 											<Button
 												className="h-7"
