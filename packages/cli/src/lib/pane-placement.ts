@@ -111,19 +111,20 @@ export async function closePanes(
 		if (hasNoPanes(error)) return { closedPaneIds, error: null };
 		return { closedPaneIds, error: errorMessage(error) };
 	}
-	try {
-		for (const pane of panes.filter(match)) {
+	let firstError: string | null = null;
+	for (const pane of panes.filter(match)) {
+		try {
 			await client.panes.close.mutate({
 				workspaceId,
 				paneId: pane.id,
 				keepTerminal: true,
 			});
 			closedPaneIds.push(pane.id);
+		} catch (error) {
+			firstError ??= errorMessage(error);
 		}
-		return { closedPaneIds, error: null };
-	} catch (error) {
-		return { closedPaneIds, error: errorMessage(error) };
 	}
+	return { closedPaneIds, error: firstError };
 }
 
 function errorMessage(error: unknown): string {

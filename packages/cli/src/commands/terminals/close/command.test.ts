@@ -22,6 +22,8 @@ const layout = {
 			panes: [
 				pane("pane-agent", "term-agent"),
 				pane("pane-child", "term-child"),
+				pane("pane-twice-a", "term-twice"),
+				pane("pane-twice-b", "term-twice"),
 			],
 		},
 	],
@@ -29,6 +31,7 @@ const layout = {
 let listError: Error | null = null;
 let closeError: Error | null = null;
 let killError: Error | null = null;
+let failPane: string | null = null;
 let calls: string[] = [];
 
 const killSession = mock(async () => {
@@ -38,7 +41,7 @@ const killSession = mock(async () => {
 });
 const close = mock(async (input: { paneId: string }) => {
 	calls.push(`close ${input.paneId}`);
-	if (closeError) throw closeError;
+	if (closeError && (!failPane || input.paneId === failPane)) throw closeError;
 	return { paneId: null, tabId: null, layout };
 });
 
@@ -65,6 +68,7 @@ beforeEach(() => {
 	listError = null;
 	closeError = null;
 	killError = null;
+	failPane = null;
 	calls = [];
 	killSession.mockClear();
 	close.mockClear();
@@ -100,6 +104,17 @@ describe("terminals close", () => {
 			/Closed terminal term-child, but not the panes that show it: bridge disconnected/,
 		);
 		expect(calls).toEqual(["close pane-child", "killSession"]);
+	});
+
+	test("one pane that fails to close does not keep the others open", async () => {
+		closeError = new Error("bridge disconnected");
+		failPane = "pane-twice-a";
+		await expect(invoke("term-twice")).rejects.toThrow(/bridge disconnected/);
+		expect(calls).toEqual([
+			"close pane-twice-a",
+			"close pane-twice-b",
+			"killSession",
+		]);
 	});
 
 	test("a pane that the desktop refuses to close is a pane error", async () => {
