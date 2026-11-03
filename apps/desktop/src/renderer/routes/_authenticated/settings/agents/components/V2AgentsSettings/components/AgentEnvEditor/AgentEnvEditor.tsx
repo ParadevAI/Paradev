@@ -2,7 +2,15 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Plus, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+	type Dispatch,
+	type Ref,
+	type SetStateAction,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from "react";
 import { areEnvMapsEqual } from "renderer/lib/agent-launch-command";
 
 const ENV_KEY = /^[A-Za-z_][A-Za-z0-9_]*$/;
@@ -21,6 +29,12 @@ function toRows(env: Record<string, string>): EnvRow[] {
 		value,
 		saved: { key, value },
 	}));
+}
+
+function envIdentity(env: Record<string, string>): string {
+	return JSON.stringify(
+		Object.entries(env).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+	);
 }
 
 /** Rows that keep their saved name claim it before renamed or new rows. */
@@ -63,16 +77,64 @@ function markSaved(rows: EnvRow[], submitted: readonly EnvRow[]): EnvRow[] {
 	});
 }
 
+function withAssignments(
+	rows: readonly EnvRow[],
+	assignments: Record<string, string>,
+): EnvRow[] {
+	const remaining = new Map(Object.entries(assignments));
+	const updated = rows.map((row) => {
+		const key = row.key.trim();
+		if (!remaining.has(key)) return row;
+		const value = remaining.get(key) ?? "";
+		remaining.delete(key);
+		return { ...row, value };
+	});
+	const added = [...remaining].map(([key, value]) => ({
+		id: crypto.randomUUID(),
+		key,
+		value,
+		saved: null,
+	}));
+	return [...updated, ...added];
+}
+
+interface SaveState {
+	inFlight: boolean;
+	queued: boolean;
+	lastSent: Record<string, string>;
+	sentInBurst: Set<string>;
+	external: Record<string, string> | null;
+}
+
+function applyExternal(
+	state: SaveState,
+	setRows: Dispatch<SetStateAction<EnvRow[]>>,
+	external: Record<string, string>,
+) {
+	state.lastSent = external;
+	state.sentInBurst.clear();
+	setRows((current) =>
+		areEnvMapsEqual(toEnv(current), external) ? current : toRows(external),
+	);
+}
+
+export interface AgentEnvEditorHandle {
+	/** Sets variables, e.g. inline `VAR=value` prefixes from the command field. */
+	assign: (assignments: Record<string, string>) => void;
+}
+
 interface AgentEnvEditorProps {
 	idPrefix: string;
 	env: Record<string, string>;
 	onCommit: (env: Record<string, string>) => Promise<unknown>;
+	ref?: Ref<AgentEnvEditorHandle>;
 }
 
 export function AgentEnvEditor({
 	idPrefix,
 	env,
 	onCommit,
+	ref,
 }: AgentEnvEditorProps) {
 	const { t } = useLingui();
 	const variableNameLabel = t({ message: "Variable name" });
@@ -80,16 +142,23 @@ export function AgentEnvEditor({
 	const [rows, setRows] = useState(() => toRows(env));
 	const rowsRef = useRef(rows);
 	rowsRef.current = rows;
-	const saves = useRef({ inFlight: false, queued: false, lastSent: env });
+	const saves = useRef<SaveState>({
+		inFlight: false,
+		queued: false,
+		lastSent: env,
+		sentInBurst: new Set(),
+		external: null,
+	});
 	const accepted = acceptedRowIds(rows);
 
 	useEffect(() => {
 		const state = saves.current;
-		if (state.inFlight || areEnvMapsEqual(env, state.lastSent)) return;
-		state.lastSent = env;
-		setRows((current) =>
-			areEnvMapsEqual(toEnv(current), env) ? current : toRows(env),
-		);
+		const isOwnEcho =
+			areEnvMapsEqual(env, state.lastSent) ||
+			state.sentInBurst.has(envIdentity(env));
+		if (isOwnEcho) return;
+		if (state.inFlight) state.external = env;
+		else applyExternal(state, setRows, env);
 	}, [env]);
 
 	const send = (submitted: readonly EnvRow[]) => {
@@ -102,6 +171,7 @@ export function AgentEnvEditor({
 		const previous = state.lastSent;
 		state.inFlight = true;
 		state.lastSent = nextEnv;
+		state.sentInBurst.add(envIdentity(nextEnv));
 		onCommit(nextEnv)
 			.then(
 				() => setRows((current) => markSaved(current, submitted)),
@@ -111,17 +181,31 @@ export function AgentEnvEditor({
 			)
 			.finally(() => {
 				state.inFlight = false;
-				if (state.queued) {
-					state.queued = false;
-					send(rowsRef.current);
-				}
+				const { external, queued } = state;
+				state.external = null;
+				state.queued = false;
+				if (external) applyExternal(state, setRows, external);
+				else if (queued) send(rowsRef.current);
 			});
 	};
 
 	const commit = (next: readonly EnvRow[]) => {
-		if (saves.current.inFlight) saves.current.queued = true;
-		else send(next);
+		if (saves.current.inFlight) {
+			saves.current.queued = true;
+			return;
+		}
+		saves.current.sentInBurst.clear();
+		send(next);
 	};
+
+	useImperativeHandle(ref, () => ({
+		assign: (assignments) => {
+			const next = withAssignments(rowsRef.current, assignments);
+			rowsRef.current = next;
+			setRows(next);
+			commit(next);
+		},
+	}));
 
 	const isInvalid = (row: EnvRow) =>
 		!accepted.has(row.id) && (row.key.trim().length > 0 || row.saved !== null);

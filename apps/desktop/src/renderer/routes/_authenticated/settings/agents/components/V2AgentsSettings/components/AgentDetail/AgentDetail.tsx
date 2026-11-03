@@ -22,7 +22,7 @@ import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useMutation } from "@tanstack/react-query";
 import { Info, RotateCcw, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	getAgentCommandText,
 	isAgentCommandPatchChanged,
@@ -33,7 +33,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { AgentEnvEditor } from "../AgentEnvEditor";
+import { AgentEnvEditor, type AgentEnvEditorHandle } from "../AgentEnvEditor";
 import {
 	AgentDetailHeader,
 	AgentLaunchFields,
@@ -85,6 +85,7 @@ export function AgentDetail({
 				),
 		});
 
+	const envEditorRef = useRef<AgentEnvEditorHandle>(null);
 	const [label, setLabel] = useState(config.label);
 	const [commandText, setCommandText] = useState(
 		getAgentCommandText({ command: config.command, args: config.args }),
@@ -217,10 +218,11 @@ export function AgentDetail({
 	};
 
 	const handleCommandBlur = () => {
-		const parsed = parseAgentCommandText(commandText);
-		const hasInlineEnv = Object.keys(parsed.env).length > 0;
-		const env = hasInlineEnv ? { ...config.env, ...parsed.env } : config.env;
-		const { command, args } = parsed;
+		const {
+			command,
+			args,
+			env: inlineEnv,
+		} = parseAgentCommandText(commandText);
 		if (command.length === 0) {
 			toast.error(
 				t({
@@ -232,21 +234,14 @@ export function AgentDetail({
 			);
 			return;
 		}
-		if (isAgentCommandPatchChanged(config, { command, args, env })) {
-			updateMutation.mutate(
-				hasInlineEnv ? { command, args, env } : { command, args },
-				{
-					onSuccess: (updated) =>
-						setCommandText((current) =>
-							current === commandText
-								? getAgentCommandText({
-										command: updated.command,
-										args: updated.args,
-									})
-								: current,
-						),
-				},
-			);
+		if (Object.keys(inlineEnv).length > 0) {
+			envEditorRef.current?.assign(inlineEnv);
+			setCommandText(getAgentCommandText({ command, args }));
+		}
+		if (
+			isAgentCommandPatchChanged(config, { command, args, env: config.env })
+		) {
+			updateMutation.mutate({ command, args });
 		}
 	};
 
@@ -348,6 +343,7 @@ export function AgentDetail({
 					})}
 				>
 					<AgentEnvEditor
+						ref={envEditorRef}
 						idPrefix={config.id}
 						env={config.env}
 						onCommit={handleEnvCommit}
