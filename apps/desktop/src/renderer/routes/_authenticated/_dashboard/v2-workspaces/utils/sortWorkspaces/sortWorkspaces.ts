@@ -1,8 +1,13 @@
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import type { V2WorkspacesOrderBy } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
 
+type ActivityInputs = Pick<
+	AccessibleV2Workspace,
+	"lastAgentEventAt" | "createdAt"
+>;
+
 /** Best-known activity timestamp: last agent event, else creation. */
-export function workspaceActivityAt(workspace: AccessibleV2Workspace): number {
+export function workspaceActivityAt(workspace: ActivityInputs): number {
 	return Math.max(
 		workspace.lastAgentEventAt ?? 0,
 		workspace.createdAt.getTime(),
@@ -12,8 +17,8 @@ export function workspaceActivityAt(workspace: AccessibleV2Workspace): number {
 /** Newest activity first. Shared by the list sections and board columns so
  * both views order rows identically. */
 export function compareWorkspaces(
-	a: AccessibleV2Workspace,
-	b: AccessibleV2Workspace,
+	a: ActivityInputs,
+	b: ActivityInputs,
 ): number {
 	return workspaceActivityAt(b) - workspaceActivityAt(a);
 }

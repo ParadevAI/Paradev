@@ -12040,9 +12040,6 @@ msgstr "Geen actieve services"
 msgid "No active terminal sessions"
 msgstr "Geen actieve terminalsessies"
 
-msgid "No active workspaces"
-msgstr "Geen actieve werkruimtes"
-
 msgid "No agent"
 msgstr "Geen agent"
 
@@ -14305,9 +14302,6 @@ msgstr "Kies een thema of volg het uiterlijk van je systeem. Bekijk de <0>market
 msgid "Pick a workspace"
 msgstr "Kies een werkruimte"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Kies een werkruimte waarvan de agent op je invoer wacht, klaar is sinds je laatst keek of nog bezig is"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Kies een icoon en een kleur, of upload een eigen afbeelding. Standaard is de avatar van de gekoppelde GitHub-eigenaar."
 
@@ -15224,6 +15218,9 @@ msgstr "Rebasen en mergen"
 
 msgid "Recall what was said in meetings"
 msgstr "Terugvinden wat er in vergaderingen is gezegd"
+
+msgid "Recent"
+msgstr "Recent"
 
 msgid "Recent Activity"
 msgstr "Recente activiteit"
@@ -16403,6 +16400,9 @@ msgstr "Wordt uitgevoerd bij het aanmaken van een werkruimte."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Wordt uitgevoerd bij het verwijderen van een werkruimte."
+
+msgid "Same as Switch Workspace"
+msgstr "Hetzelfde als ‘Van werkruimte wisselen’"
 
 msgid "Same version as this app."
 msgstr "Dezelfde versie als deze app."
@@ -18527,6 +18527,9 @@ msgstr "Naar werkruimte 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Naar werkruimte 9"
+
+msgid "Switch to…"
+msgstr "Wisselen naar…"
 
 msgid "Switch workspace"
 msgstr "Van werkruimte wisselen"

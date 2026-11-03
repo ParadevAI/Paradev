@@ -12040,9 +12040,6 @@ msgstr "Žádné aktivní služby"
 msgid "No active terminal sessions"
 msgstr "Žádné aktivní relace terminálu"
 
-msgid "No active workspaces"
-msgstr "Žádné aktivní pracovní prostory"
-
 msgid "No agent"
 msgstr "Žádný agent"
 
@@ -14305,9 +14302,6 @@ msgstr "Vyberte motiv nebo se řiďte vzhledem systému. Prohlédněte si <0>mar
 msgid "Pick a workspace"
 msgstr "Vyberte pracovní prostor"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Vyberte pracovní prostor, jehož agent čeká na váš vstup, od vaší poslední návštěvy dokončil práci, nebo stále běží"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Vyberte ikonu a barvu nebo nahrajte vlastní obrázek. Ve výchozím stavu se použije avatar propojeného vlastníka na GitHubu."
 
@@ -15224,6 +15218,9 @@ msgstr "Rebase a sloučit"
 
 msgid "Recall what was said in meetings"
 msgstr "Připomeňte si, co zaznělo na schůzkách"
+
+msgid "Recent"
+msgstr "Nedávné"
 
 msgid "Recent Activity"
 msgstr "Nedávná aktivita"
@@ -16403,6 +16400,9 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
+
+msgid "Same as Switch Workspace"
+msgstr "Stejné jako „Přepnout pracovní prostor“"
 
 msgid "Same version as this app."
 msgstr "Stejná verze jako tato aplikace."
@@ -18527,6 +18527,9 @@ msgstr "Přepnout na pracovní prostor 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Přepnout na pracovní prostor 9"
+
+msgid "Switch to…"
+msgstr "Přepnout na…"
 
 msgid "Switch workspace"
 msgstr "Přepnout pracovní prostor"

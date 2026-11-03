@@ -12040,9 +12040,6 @@ msgstr "Etkin hizmet yok"
 msgid "No active terminal sessions"
 msgstr "Etkin terminal oturumu yok"
 
-msgid "No active workspaces"
-msgstr "Etkin çalışma alanı yok"
-
 msgid "No agent"
 msgstr "Ajan yok"
 
@@ -14305,9 +14302,6 @@ msgstr "Bir tema seçin veya sistem görünümünüzü izleyin. <0>Pazar yerine<
 msgid "Pick a workspace"
 msgstr "Bir çalışma alanı seçin"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Ajanı sizden yanıt bekleyen, son bakışınızdan beri işini bitiren veya hâlâ çalışan bir çalışma alanı seçin"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Bir simge ve renk seçin ya da özel bir görsel yükleyin. Varsayılan olarak bağlı GitHub sahibinin avatarı kullanılır."
 
@@ -15224,6 +15218,9 @@ msgstr "Rebase ve birleştir"
 
 msgid "Recall what was said in meetings"
 msgstr "Toplantılarda söylenenleri hatırlayın"
+
+msgid "Recent"
+msgstr "Son"
 
 msgid "Recent Activity"
 msgstr "Son etkinlik"
@@ -16403,6 +16400,9 @@ msgstr "Yeni bir çalışma alanı oluşturulduğunda çalışır."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Bir çalışma alanı silindiğinde çalışır."
+
+msgid "Same as Switch Workspace"
+msgstr "“Çalışma alanı değiştir” ile aynı"
 
 msgid "Same version as this app."
 msgstr "Bu uygulamayla aynı sürüm."
@@ -18527,6 +18527,9 @@ msgstr "8. çalışma alanına geç"
 
 msgid "Switch to Workspace 9"
 msgstr "9. çalışma alanına geç"
+
+msgid "Switch to…"
+msgstr "Şuraya geç…"
 
 msgid "Switch workspace"
 msgstr "Çalışma alanı değiştir"

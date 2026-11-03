@@ -12040,9 +12040,6 @@ msgstr "Keine aktiven Dienste"
 msgid "No active terminal sessions"
 msgstr "Keine aktiven Terminal-Sitzungen"
 
-msgid "No active workspaces"
-msgstr "Keine aktiven Arbeitsbereiche"
-
 msgid "No agent"
 msgstr "Kein Agent"
 
@@ -14305,9 +14302,6 @@ msgstr "Wähle ein Theme oder folge dem Erscheinungsbild deines Systems. Stöber
 msgid "Pick a workspace"
 msgstr "Arbeitsbereich auswählen"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Wähle einen Arbeitsbereich, dessen Agent auf deine Eingabe wartet, seit deinem letzten Blick fertig geworden ist oder noch läuft"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Wähle ein Icon und eine Farbe oder lade ein eigenes Bild hoch. Standard ist der Avatar des verknüpften GitHub-Eigentümers."
 
@@ -15224,6 +15218,9 @@ msgstr "Rebase und zusammenführen"
 
 msgid "Recall what was said in meetings"
 msgstr "Nachlesen, was in Meetings gesagt wurde"
+
+msgid "Recent"
+msgstr "Zuletzt"
 
 msgid "Recent Activity"
 msgstr "Letzte Aktivität"
@@ -16403,6 +16400,9 @@ msgstr "Wird beim Erstellen eines Arbeitsbereichs ausgeführt."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Wird beim Löschen eines Arbeitsbereichs ausgeführt."
+
+msgid "Same as Switch Workspace"
+msgstr "Wie „Arbeitsbereich wechseln“"
 
 msgid "Same version as this app."
 msgstr "Gleiche Version wie diese App."
@@ -18527,6 +18527,9 @@ msgstr "Zu Arbeitsbereich 8 wechseln"
 
 msgid "Switch to Workspace 9"
 msgstr "Zu Arbeitsbereich 9 wechseln"
+
+msgid "Switch to…"
+msgstr "Wechseln zu…"
 
 msgid "Switch workspace"
 msgstr "Arbeitsbereich wechseln"

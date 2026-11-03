@@ -12040,9 +12040,6 @@ msgstr "활성 서비스 없음"
 msgid "No active terminal sessions"
 msgstr "활성 터미널 세션 없음"
 
-msgid "No active workspaces"
-msgstr "활성 워크스페이스 없음"
-
 msgid "No agent"
 msgstr "에이전트 없음"
 
@@ -14305,9 +14302,6 @@ msgstr "테마를 고르거나 시스템 모양을 따르세요. <0>마켓플레
 msgid "Pick a workspace"
 msgstr "워크스페이스 선택"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "에이전트가 입력을 기다리고 있거나, 마지막으로 확인한 뒤 작업을 마쳤거나, 아직 실행 중인 워크스페이스를 선택합니다"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "아이콘과 색상을 고르거나 직접 만든 이미지를 업로드하세요. 기본값은 연결된 GitHub 소유자의 아바타입니다."
 
@@ -15224,6 +15218,9 @@ msgstr "리베이스 후 머지"
 
 msgid "Recall what was said in meetings"
 msgstr "회의에서 나온 이야기 다시 보기"
+
+msgid "Recent"
+msgstr "최근"
 
 msgid "Recent Activity"
 msgstr "최근 활동"
@@ -16403,6 +16400,9 @@ msgstr "새 작업 공간을 만들 때 실행됩니다."
 
 msgid "Runs when a workspace is deleted."
 msgstr "작업 공간을 삭제할 때 실행됩니다."
+
+msgid "Same as Switch Workspace"
+msgstr "‘워크스페이스 전환’과(와) 동일"
 
 msgid "Same version as this app."
 msgstr "이 앱과 같은 버전입니다."
@@ -18527,6 +18527,9 @@ msgstr "워크스페이스 8로 전환"
 
 msgid "Switch to Workspace 9"
 msgstr "워크스페이스 9로 전환"
+
+msgid "Switch to…"
+msgstr "전환 대상…"
 
 msgid "Switch workspace"
 msgstr "워크스페이스 전환"

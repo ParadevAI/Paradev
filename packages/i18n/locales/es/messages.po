@@ -12040,9 +12040,6 @@ msgstr "No hay servicios activos"
 msgid "No active terminal sessions"
 msgstr "No hay sesiones de terminal activas"
 
-msgid "No active workspaces"
-msgstr "No hay espacios de trabajo activos"
-
 msgid "No agent"
 msgstr "Sin agente"
 
@@ -14305,9 +14302,6 @@ msgstr "Elige un tema o sigue la apariencia del sistema. Explora el <0>marketpla
 msgid "Pick a workspace"
 msgstr "Elige un espacio de trabajo"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Elige un espacio de trabajo cuyo agente espera tu respuesta, terminó desde la última vez que lo miraste o sigue en ejecución"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Elige un icono y un color, o sube una imagen propia. Por defecto usa el avatar del propietario de GitHub enlazado."
 
@@ -15224,6 +15218,9 @@ msgstr "Rebase y fusión"
 
 msgid "Recall what was said in meetings"
 msgstr "Recordar lo que se dijo en las reuniones"
+
+msgid "Recent"
+msgstr "Recientes"
 
 msgid "Recent Activity"
 msgstr "Actividad reciente"
@@ -16403,6 +16400,9 @@ msgstr "Se ejecuta al crear un espacio de trabajo."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Se ejecuta al eliminar un espacio de trabajo."
+
+msgid "Same as Switch Workspace"
+msgstr "Igual que «Cambiar de espacio de trabajo»"
 
 msgid "Same version as this app."
 msgstr "Misma versión que esta app."
@@ -18527,6 +18527,9 @@ msgstr "Ir al espacio de trabajo 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Ir al espacio de trabajo 9"
+
+msgid "Switch to…"
+msgstr "Cambiar a…"
 
 msgid "Switch workspace"
 msgstr "Cambiar de espacio de trabajo"

@@ -12034,9 +12034,6 @@ msgstr "Немає активних служб"
 msgid "No active terminal sessions"
 msgstr "Немає активних сеансів термінала"
 
-msgid "No active workspaces"
-msgstr "Немає активних робочих просторів"
-
 msgid "No agent"
 msgstr "Без агента"
 
@@ -14299,9 +14296,6 @@ msgstr "Виберіть тему або використовуйте вигля
 msgid "Pick a workspace"
 msgstr "Виберіть робочий простір"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Виберіть робочий простір, агент якого чекає на ваше введення, завершив роботу після вашого останнього перегляду або ще працює"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Виберіть значок і колір або завантажте власне зображення. За замовчуванням використовується аватар пов'язаного власника GitHub."
 
@@ -15218,6 +15212,9 @@ msgstr "Зробити ребейз і злити"
 
 msgid "Recall what was said in meetings"
 msgstr "Згадати, що говорили на зустрічах"
+
+msgid "Recent"
+msgstr "Нещодавні"
 
 msgid "Recent Activity"
 msgstr "Нещодавня активність"
@@ -16397,6 +16394,9 @@ msgstr "Виконується під час створення нового р�
 
 msgid "Runs when a workspace is deleted."
 msgstr "Виконується під час видалення робочого простору."
+
+msgid "Same as Switch Workspace"
+msgstr "Те саме, що «Змінити робочий простір»"
 
 msgid "Same version as this app."
 msgstr "Та сама версія, що й у цього застосунку."
@@ -18521,6 +18521,9 @@ msgstr "Перейти до робочого простору 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Перейти до робочого простору 9"
+
+msgid "Switch to…"
+msgstr "Перейти до…"
 
 msgid "Switch workspace"
 msgstr "Змінити робочий простір"

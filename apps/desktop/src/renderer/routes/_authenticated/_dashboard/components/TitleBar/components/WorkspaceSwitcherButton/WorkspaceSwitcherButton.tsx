@@ -26,7 +26,7 @@ export function WorkspaceSwitcherButton() {
 				<button
 					type="button"
 					aria-haspopup="dialog"
-					onClick={openWorkspaceList}
+					onClick={() => openWorkspaceList({ via: "pill" })}
 					className="no-drag group/switcher mx-1.5 flex h-7 min-w-0 max-w-40 items-center gap-2 rounded-full bg-[var(--tab-selected)] pr-2 pl-2.5 font-medium text-[13px] text-foreground shadow-[var(--tab-selected-shadow)] transition-colors hover:bg-[var(--tab-switcher-hover)]"
 				>
 					<Layers

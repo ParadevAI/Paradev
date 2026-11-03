@@ -12040,9 +12040,6 @@ msgstr "没有活动的服务"
 msgid "No active terminal sessions"
 msgstr "没有活动的终端会话"
 
-msgid "No active workspaces"
-msgstr "没有活动的工作区"
-
 msgid "No agent"
 msgstr "无智能体"
 
@@ -14305,9 +14302,6 @@ msgstr "选择一个主题，或跟随系统外观。浏览<0>市场<1/></0>或<
 msgid "Pick a workspace"
 msgstr "选择一个工作区"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "选择一个工作区：其智能体正在等待你的输入、自你上次查看后已完成，或仍在运行"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "选择图标和颜色，或上传自定义图片。默认使用关联的GitHub所有者头像。"
 
@@ -15224,6 +15218,9 @@ msgstr "变基并合并"
 
 msgid "Recall what was said in meetings"
 msgstr "回顾会议中说过的内容"
+
+msgid "Recent"
+msgstr "最近"
 
 msgid "Recent Activity"
 msgstr "最近动态"
@@ -16403,6 +16400,9 @@ msgstr "创建新工作区时运行。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "删除工作区时运行。"
+
+msgid "Same as Switch Workspace"
+msgstr "与“切换工作区”相同"
 
 msgid "Same version as this app."
 msgstr "与此应用版本相同。"
@@ -18527,6 +18527,9 @@ msgstr "切换到工作区8"
 
 msgid "Switch to Workspace 9"
 msgstr "切换到工作区9"
+
+msgid "Switch to…"
+msgstr "切换到…"
 
 msgid "Switch workspace"
 msgstr "切换工作区"

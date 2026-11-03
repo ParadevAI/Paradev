@@ -12040,9 +12040,6 @@ msgstr "アクティブなサービスはありません"
 msgid "No active terminal sessions"
 msgstr "アクティブなターミナルセッションはありません"
 
-msgid "No active workspaces"
-msgstr "アクティブなワークスペースはありません"
-
 msgid "No agent"
 msgstr "エージェントなし"
 
@@ -14305,9 +14302,6 @@ msgstr "テーマを選ぶか、システムの外観に従います。<0>マー
 msgid "Pick a workspace"
 msgstr "ワークスペースを選択"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "エージェントがあなたの入力を待っている、前回確認してから完了した、またはまだ実行中のワークスペースを選択します"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "アイコンと色を選ぶか、独自の画像をアップロードします。既定ではリンクされたGitHubオーナーのアバターになります。"
 
@@ -15224,6 +15218,9 @@ msgstr "リベースしてマージ"
 
 msgid "Recall what was said in meetings"
 msgstr "会議での発言を振り返る"
+
+msgid "Recent"
+msgstr "最近"
 
 msgid "Recent Activity"
 msgstr "最近のアクティビティ"
@@ -16403,6 +16400,9 @@ msgstr "新しいワークスペースの作成時に実行します。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "ワークスペースの削除時に実行します。"
+
+msgid "Same as Switch Workspace"
+msgstr "「ワークスペースを切り替え」と同じ"
 
 msgid "Same version as this app."
 msgstr "このアプリと同じバージョンです。"
@@ -18527,6 +18527,9 @@ msgstr "ワークスペース8に切り替え"
 
 msgid "Switch to Workspace 9"
 msgstr "ワークスペース9に切り替え"
+
+msgid "Switch to…"
+msgstr "切り替え先…"
 
 msgid "Switch workspace"
 msgstr "ワークスペースを切り替え"
