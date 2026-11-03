@@ -53,8 +53,8 @@ export function useWorkspaceSettingMentionProviders({
 			source: { kind: "static", load: () => entries },
 		});
 
-		const projectKeyword = t({ message: "project" });
-		const hostKeyword = t({ message: "host" });
+		const projectKeywords = [t({ message: "project" }), "project"];
+		const hostKeywords = [t({ message: "host" }), "host"];
 		const providers = [
 			staticProvider(
 				{
@@ -66,7 +66,7 @@ export function useWorkspaceSettingMentionProviders({
 					...projects.map((project) => ({
 						id: `project:${project.id}`,
 						label: project.name,
-						keywords: [projectKeyword],
+						keywords: projectKeywords,
 						icon: (
 							<ProjectThumbnail
 								projectName={project.name}
@@ -78,7 +78,7 @@ export function useWorkspaceSettingMentionProviders({
 					{
 						id: "project:none",
 						label: t({ message: "No project" }),
-						keywords: [projectKeyword],
+						keywords: projectKeywords,
 						icon: <LuBox className="size-4" />,
 						select: () => onSelectProject(null),
 					},
@@ -91,7 +91,7 @@ export function useWorkspaceSettingMentionProviders({
 						id: "host:local",
 						label: t({ message: "Local Device" }),
 						description: currentDeviceName ?? undefined,
-						keywords: [hostKeyword],
+						keywords: hostKeywords,
 						icon: <HiOutlineComputerDesktop className="size-4" />,
 						select: () => onSelectHostId(machineId),
 					},
@@ -100,7 +100,7 @@ export function useWorkspaceSettingMentionProviders({
 								{
 									id: "host:cloud",
 									label: t({ message: "Cloud" }),
-									keywords: [hostKeyword],
+									keywords: hostKeywords,
 									icon: <CloudGlyph className="size-4" />,
 									select: () => onSelectHostId(CLOUD_HOST_ID),
 								},
@@ -109,7 +109,7 @@ export function useWorkspaceSettingMentionProviders({
 					...otherHosts.map((host) => ({
 						id: `host:${host.id}`,
 						label: host.name,
-						keywords: [hostKeyword],
+						keywords: hostKeywords,
 						icon: <HiOutlineServer className="size-4" />,
 						select: () => onSelectHostId(host.id),
 					})),
@@ -118,8 +118,8 @@ export function useWorkspaceSettingMentionProviders({
 		];
 		if (!cloud) return providers;
 
-		const environmentKeyword = t({ message: "environment" });
-		const sizeKeyword = t({ message: "size" });
+		const environmentKeywords = [t({ message: "environment" }), "environment"];
+		const sizeKeywords = [t({ message: "size" }), "size"];
 		return [
 			...providers,
 			staticProvider(
@@ -131,7 +131,7 @@ export function useWorkspaceSettingMentionProviders({
 				cloud.environments.map((environment) => ({
 					id: `environment:${environment.id}`,
 					label: environment.name,
-					keywords: [environmentKeyword],
+					keywords: environmentKeywords,
 					icon: <LuContainer className="size-4" />,
 					select: () => cloud.onSelectEnvironment(environment.id),
 				})),
@@ -146,7 +146,7 @@ export function useWorkspaceSettingMentionProviders({
 					id: `machine-size:${option.size}`,
 					label: option.name,
 					description: option.spec,
-					keywords: [sizeKeyword, option.size],
+					keywords: [...sizeKeywords, option.size],
 					icon: <LuCpu className="size-4" />,
 					select: () => cloud.onSelectMachineSize(option.size),
 				})),

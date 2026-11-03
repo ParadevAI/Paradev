@@ -17687,7 +17687,7 @@ msgid "Six levels of factory autonomy, the gates between them, and our forecast 
 msgstr "Sześć poziomów autonomii fabryki, bramki między nimi i nasza prognoza, jak daleko zaprowadzi nas 2026. Spisane teraz, żeby można nas było później ocenić."
 
 msgid "size"
-msgstr "Wielkość"
+msgstr "Rozmiar"
 
 msgid "Size"
 msgstr "Wielkość"

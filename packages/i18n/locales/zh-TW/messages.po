@@ -17687,7 +17687,7 @@ msgid "Six levels of factory autonomy, the gates between them, and our forecast 
 msgstr "工廠自主的六個等級、等級之間的關卡，以及我們對2026年能走多遠的預測。現在寫下來，方便你以後給我們打分。"
 
 msgid "size"
-msgstr "大小"
+msgstr "規格"
 
 msgid "Size"
 msgstr "大小"
