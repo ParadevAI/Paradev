@@ -49,6 +49,8 @@
 		"---Plugins---",
 		"plugins/overview",
 		"plugins/available",
+		"plugins/build-a-plugin",
+		"plugins/organization-plugins",
 		"---CLI---",
 		"cli/getting-started",
 		"cli/cli-reference",
