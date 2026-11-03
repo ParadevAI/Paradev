@@ -50,7 +50,7 @@ function runInMainWorld(
 		sendNative?: unknown;
 		listenNative?: unknown;
 		callDnr?: unknown;
-		takeInstalledDetails?: unknown;
+		installedEvent?: unknown;
 	} = {},
 ): MainWorld {
 	const { protocol, hostname } = new URL(url);
@@ -66,7 +66,7 @@ function runInMainWorld(
 		callDnr,
 		dnrMethods,
 		dnrConstants,
-		takeInstalledDetails,
+		installedEvent,
 	] = args;
 	const world = {
 		location: { protocol, hostname },
@@ -89,7 +89,7 @@ function runInMainWorld(
 			overrides.callDnr ?? callDnr,
 			dnrMethods,
 			dnrConstants,
-			overrides.takeInstalledDetails ?? takeInstalledDetails,
+			overrides.installedEvent ?? installedEvent,
 		],
 	};
 	runInNewContext(`(${func.toString()})(...args)`, world);
@@ -302,24 +302,34 @@ test("an extension's chrome.declarativeNetRequest calls main and keeps Chrome's 
 	).toBeUndefined();
 });
 
-test("an extension service worker gets runtime.onInstalled from the app, once, after its listeners are added", async () => {
+test("an extension service worker gets runtime.onInstalled once its listeners are added, and confirms only after they ran", async () => {
 	const shim = await importInWorkerPreloadRealm();
-	const takeInstalledDetails = mock(async () => ({ reason: "install" }));
+	const reasons: string[] = [];
+	const installedEvent = mock(async (method: string, _version?: string) => {
+		if (method === "pending") {
+			return { details: { reason: "install" }, version: "2.0.18" };
+		}
+		reasons.push("confirmed");
+		return null;
+	});
 	type Listener = (details: { reason: string }) => void;
 	const runtime = { onInstalled: { addListener: (_listener: Listener) => {} } };
 
 	const worker = runInMainWorld(
 		shim,
 		"chrome-extension://aapbdbdomjkkjkaonfhkkikfgjllcleb/main.js",
-		{ isServiceWorker: true, chrome: { runtime }, takeInstalledDetails },
+		{ isServiceWorker: true, chrome: { runtime }, installedEvent },
 	);
 	const onInstalled = (worker.chrome.runtime as typeof runtime).onInstalled;
-	const reasons: string[] = [];
 	onInstalled.addListener(({ reason }) => reasons.push(`menu ${reason}`));
-	onInstalled.addListener(({ reason }) => reasons.push(`options ${reason}`));
-	await takeInstalledDetails.mock.results[0]?.value;
-	await Promise.resolve();
+	onInstalled.addListener(() => {
+		throw new Error("options failed");
+	});
+	for (let tick = 0; tick < 5; tick++) await Promise.resolve();
 
-	expect(takeInstalledDetails).toHaveBeenCalledTimes(1);
-	expect(reasons).toEqual(["menu install", "options install"]);
+	expect(installedEvent.mock.calls).toEqual([
+		["pending"],
+		["delivered", "2.0.18"],
+	]);
+	expect(reasons).toEqual(["menu install", "confirmed"]);
 });

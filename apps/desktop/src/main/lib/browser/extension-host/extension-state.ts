@@ -1,5 +1,5 @@
 import { readFileSync, renameSync, writeFileSync } from "node:fs";
-import type { InstalledDetails } from "shared/browser-extension-installed";
+import type { PendingInstalled } from "shared/browser-extension-installed";
 
 export type MenuItemProps = Record<string, unknown>;
 
@@ -15,7 +15,9 @@ interface StateFile {
 }
 
 export interface ExtensionState {
-	takeInstalledDetails(extension: ExtensionRef): InstalledDetails | null;
+	/** What runtime.onInstalled still owes this version; nothing is recorded until it is delivered. */
+	pendingInstalled(extension: ExtensionRef): PendingInstalled | null;
+	markInstalledDelivered(extension: ExtensionRef, version: string): void;
 	restoreMenus(extension: ExtensionRef): MenuItemProps[] | null;
 	saveMenus(extension: ExtensionRef, items: MenuItemProps[]): void;
 	forget(extensionId: string): void;
@@ -62,14 +64,23 @@ export function createExtensionState(
 	}
 
 	return {
-		takeInstalledDetails({ id, version }) {
+		pendingInstalled({ id, version }) {
 			const seen = state.installed[id];
 			if (seen === version) return null;
+			if (seen === undefined)
+				return { details: { reason: "install" }, version };
+			if (seen === null) {
+				return { details: { reason: "chrome_update" }, version };
+			}
+			return {
+				details: { reason: "update", previousVersion: seen },
+				version,
+			};
+		},
+		markInstalledDelivered({ id, version }, delivered) {
+			if (delivered !== version || state.installed[id] === version) return;
 			state.installed[id] = version;
 			save();
-			if (seen === undefined) return { reason: "install" };
-			if (seen === null) return { reason: "chrome_update" };
-			return { reason: "update", previousVersion: seen };
 		},
 		restoreMenus({ id, version }) {
 			const saved = state.menus[id];
