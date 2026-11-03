@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { DurableEnvelope } from "@superset/chat/protocol";
 import { gt } from "drizzle-orm";
 import { CHAT_DB_FILENAME, chatJournal } from "../../db";
 import { type ChatRuntime, createChatRuntime } from "../../index";
@@ -302,5 +303,25 @@ describe("chat.db lifecycle", () => {
 		});
 		expect(existsSync(join(dataDir, CHAT_DB_FILENAME))).toBe(true);
 		await runtime.dispose();
+	});
+});
+
+describe("ChatJournal onAppend", () => {
+	test("reports each durable event once it is written", () => {
+		const seen: DurableEnvelope[] = [];
+		const runtime = createTestRuntime({
+			onAppend: (envelope) => seen.push(envelope),
+		});
+		runtime.journal.open({
+			sessionId: "s",
+			scopeId: "w",
+			harness: "fake",
+		});
+		runtime.journal.append("s", {
+			type: "item",
+			turnId: "t1",
+			item: agentMessage("m", "hi"),
+		});
+		expect(seen.map((envelope) => envelope.cursor.seq)).toEqual([1]);
 	});
 });

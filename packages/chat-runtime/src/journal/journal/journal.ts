@@ -33,6 +33,8 @@ export type ChatSessionChange = {
 
 export type ChatJournalOptions = {
 	onSessionChanged?: (change: ChatSessionChange) => void | Promise<void>;
+	/** Every durable event appended on this host, once it is written. Imported events are not reported. */
+	onAppend?: (envelope: DurableEnvelope) => void;
 };
 
 function reportListenerFailure(error: unknown): void {
@@ -120,13 +122,19 @@ export class ChatJournal {
 		cache.queuedItemIds = next.queuedItemIds;
 		if (listingChanged) this.notify(sessionId, cache.scopeId, ts);
 
-		return {
+		const envelope: DurableEnvelope = {
 			v: 1,
 			sessionId,
 			cursor: { epoch: cache.epoch, seq },
 			ts,
 			event: parsed,
 		};
+		try {
+			this.options.onAppend?.(envelope);
+		} catch (error) {
+			console.error("[chat-journal] onAppend listener failed", error);
+		}
+		return envelope;
 	}
 
 	cursor(sessionId: string): Cursor {

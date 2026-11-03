@@ -15,6 +15,13 @@
       "when": 1793301081019,
       "tag": "0001_session_closed_at",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793666840887,
+      "tag": "0002_chat_sync_state",
+      "breakpoints": true
     }
   ]
 }
