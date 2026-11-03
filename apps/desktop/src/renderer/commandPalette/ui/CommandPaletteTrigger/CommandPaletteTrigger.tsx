@@ -7,11 +7,14 @@ function holdsAnyModifier(e: KeyboardEvent): boolean {
 	return e.metaKey || e.ctrlKey || e.altKey;
 }
 
-/** First press opens the switcher; while it is open, each press selects the next row. */
+/**
+ * First press opens the switcher. While it is open, each press selects the
+ * next row and arms hold-to-switch, so a single tap only opens the list.
+ */
 function onSwitcherHotkey(e: KeyboardEvent): void {
 	const state = useFrameStackStore.getState();
 	if (state.open && state.root === "switcher" && state.frames.length === 0) {
-		state.stepSwitcher();
+		state.stepSwitcher(holdsAnyModifier(e));
 		return;
 	}
 	openWorkspaceList({ via: "hotkey", holdsModifier: holdsAnyModifier(e) });

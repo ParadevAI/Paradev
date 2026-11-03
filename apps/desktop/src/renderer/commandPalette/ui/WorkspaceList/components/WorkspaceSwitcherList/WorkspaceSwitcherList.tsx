@@ -33,8 +33,8 @@ export function WorkspaceSwitcherList({
 	cycle,
 }: WorkspaceSwitcherListProps) {
 	const { i18n } = useLingui();
-	const groups = useSwitcherGroups();
-	const trimmed = query.trim();
+	const { groups, query: parsed } = useSwitcherGroups(query);
+	const trimmed = parsed.text;
 
 	const results = useMemo(
 		() => (trimmed ? rankSwitcherRows(groups, trimmed) : null),

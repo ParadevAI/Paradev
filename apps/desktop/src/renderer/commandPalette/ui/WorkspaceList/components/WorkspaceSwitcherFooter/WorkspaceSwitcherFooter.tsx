@@ -24,6 +24,7 @@ export function WorkspaceSwitcherFooter({
 						: t({ message: "Delete" })
 				}
 			/>
+			<KeyHint keys={["#"]} label={t({ message: "All workspaces" })} />
 			{newWorkspace.keys[0] !== "Unassigned" ? (
 				<KeyHint
 					keys={newWorkspace.keys}

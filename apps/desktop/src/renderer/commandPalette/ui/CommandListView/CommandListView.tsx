@@ -34,42 +34,55 @@ interface Block {
 	node: ReactNode;
 }
 
+interface RootWorkspaceRows {
+	workspaceRows: SwitcherRow<AccessibleV2Workspace>[];
+	recentRows: SwitcherRow<AccessibleV2Workspace>[];
+	/** What the workspace rows were ranked and marked by. */
+	text: string;
+	/** The query started with "#": it is about workspaces, not commands. */
+	workspacesOnly: boolean;
+}
+
 function useRootWorkspaceRows(
 	enabled: boolean,
 	query: string,
-): {
-	workspaceRows: SwitcherRow<AccessibleV2Workspace>[];
-	recentRows: SwitcherRow<AccessibleV2Workspace>[];
-} {
-	const groups = useSwitcherGroups();
+): RootWorkspaceRows {
+	const { groups, query: parsed } = useSwitcherGroups(query);
 	const recentEntries = useRecentlyViewed(RECENT_PLACES * 3);
 	return useMemo(() => {
-		if (!enabled) return { workspaceRows: [], recentRows: [] };
-		if (query) {
+		const text = parsed.text;
+		const workspacesOnly = parsed.scope === "all";
+		if (!enabled) {
+			return { workspaceRows: [], recentRows: [], text, workspacesOnly };
+		}
+		if (text) {
 			return {
-				workspaceRows: rankSwitcherRows(groups, query).slice(
+				workspaceRows: rankSwitcherRows(groups, text).slice(
 					0,
 					MATCHED_WORKSPACES,
 				),
 				recentRows: [],
+				text,
+				workspacesOnly,
 			};
 		}
 		const rows = groups.flatMap((group) => group.rows);
 		const workspaceRows = rows
 			.filter((row) => !row.isCurrent)
-			.slice(0, TOP_WORKSPACES);
+			.slice(0, workspacesOnly ? MATCHED_WORKSPACES : TOP_WORKSPACES);
 		const shown = new Set(workspaceRows.map((row) => row.workspace.id));
 		const byId = new Map(rows.map((row) => [row.workspace.id, row]));
 		const recentRows: SwitcherRow<AccessibleV2Workspace>[] = [];
 		for (const entry of recentEntries) {
+			if (workspacesOnly) break;
 			if (entry.type !== "v2-workspace") continue;
 			const row = byId.get(entry.entityId);
 			if (!row || row.isCurrent || shown.has(row.workspace.id)) continue;
 			recentRows.push(row);
 			if (recentRows.length === RECENT_PLACES) break;
 		}
-		return { workspaceRows, recentRows };
-	}, [enabled, query, groups, recentEntries]);
+		return { workspaceRows, recentRows, text, workspacesOnly };
+	}, [enabled, parsed, groups, recentEntries]);
 }
 
 export function CommandListView({ query, onSelect }: CommandListViewProps) {
@@ -83,27 +96,23 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 		() => rankSections(sections, parsed.query),
 		[sections, parsed.query],
 	);
-	const { workspaceRows, recentRows } = useRootWorkspaceRows(
-		isV2CloudEnabled && !parsed.commandsOnly,
-		trimmed,
-	);
+	const { workspaceRows, recentRows, text, workspacesOnly } =
+		useRootWorkspaceRows(isV2CloudEnabled && !parsed.commandsOnly, trimmed);
+	const showsWorkspaces = isV2CloudEnabled && !parsed.commandsOnly;
 
 	// With a query, workspaces and command sections rank against each other
 	// on the same score; without one, workspaces and recent places lead.
 	const blocks: Block[] = [];
-	if (
-		workspaceRows.length > 0 ||
-		(!trimmed && isV2CloudEnabled && !parsed.commandsOnly)
-	) {
+	if (showsWorkspaces && (workspaceRows.length > 0 || !text)) {
 		const first = workspaceRows[0];
 		blocks.push({
 			key: "workspaces",
-			best: trimmed && first ? switcherRowScore(first, trimmed) : 1,
+			best: text && first ? switcherRowScore(first, text) : 1,
 			node: (
 				<RootWorkspacesSection
 					key="workspaces"
 					rows={workspaceRows}
-					query={trimmed}
+					query={text}
 				/>
 			),
 		});
@@ -115,24 +124,26 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 			node: <RootRecentSection key="recent" rows={recentRows} />,
 		});
 	}
-	for (const section of ranked) {
-		const first = section.commands[0];
-		blocks.push({
-			key: section.id,
-			best: trimmed && first ? scoreCommand(first, trimmed) : 0.5,
-			node: (
-				<CommandGroup key={section.id} heading={i18n._(section.label)}>
-					{section.commands.map((command) => (
-						<CommandItemRow
-							key={command.id}
-							command={command}
-							onSelect={onSelect}
-							query={trimmed}
-						/>
-					))}
-				</CommandGroup>
-			),
-		});
+	if (!(showsWorkspaces && workspacesOnly)) {
+		for (const section of ranked) {
+			const first = section.commands[0];
+			blocks.push({
+				key: section.id,
+				best: trimmed && first ? scoreCommand(first, trimmed) : 0.5,
+				node: (
+					<CommandGroup key={section.id} heading={i18n._(section.label)}>
+						{section.commands.map((command) => (
+							<CommandItemRow
+								key={command.id}
+								command={command}
+								onSelect={onSelect}
+								query={trimmed}
+							/>
+						))}
+					</CommandGroup>
+				),
+			});
+		}
 	}
 	blocks.sort((a, b) => b.best - a.best);
 
