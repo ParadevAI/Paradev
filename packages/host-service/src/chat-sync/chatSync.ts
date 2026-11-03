@@ -6,15 +6,19 @@ import {
 	chatSyncState,
 	readSessionRow,
 } from "@superset/chat-runtime";
+import {
+	MAX_PUSH_BYTES,
+	MAX_PUSH_EVENTS,
+	pushSessionSchema,
+} from "@superset/trpc/chat-history-schema";
 import { and, asc, eq, gt } from "drizzle-orm";
+import { z } from "zod";
 import type { ApiClient } from "../types";
 import { eventBytes, prepareEventForCloud } from "./prepareEvent";
 
 const SETTLE_MS = 1_000;
 const MIN_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 5 * 60 * 1000;
-const BATCH_EVENTS = 500;
-const BATCH_BYTES = 1024 * 1024;
 const REJECTED_CODES = new Set(["BAD_REQUEST", "PAYLOAD_TOO_LARGE"]);
 
 export type ChatSync = {
@@ -67,24 +71,40 @@ function errorCode(error: unknown): string | undefined {
 }
 
 export function createChatSync(args: {
-	runtime: () => ChatRuntime;
+	/** Null until this host has a chat database to read. */
+	runtime: () => ChatRuntime | null;
 	api: ApiClient;
 	schedule?: Schedule;
 }): ChatSync {
 	const schedule = args.schedule ?? defaultSchedule;
 	const dirty = new Set<string>();
 	const moved = new Set<string>();
-	const inFlight = new Map<string, Promise<void>>();
+	const inFlight = new Map<string, Promise<unknown>>();
 	let running = false;
 	let cancelTimer: (() => void) | null = null;
 	let retryMs = MIN_RETRY_MS;
 
-	const pushOnce = async (sessionId: string) => {
-		const { db } = args.runtime();
-		let batchEvents = BATCH_EVENTS;
+	/** Pushes the next batch of one chat. Resolves true when more may be left. */
+	const pushBatch = async (sessionId: string): Promise<boolean> => {
+		const db = args.runtime()?.db;
+		if (!db) return false;
+		let batchEvents = MAX_PUSH_EVENTS;
 		for (;;) {
 			const session = readSessionRow(db, sessionId);
-			if (!session) return;
+			if (!session) return false;
+			const request = pushSessionSchema.safeParse({
+				sessionId,
+				workspaceId: session.scopeId,
+				harness: session.harness,
+				harnessSessionId: session.harnessSessionId ?? undefined,
+				epoch: session.epoch,
+			});
+			if (!request.success) {
+				console.warn(
+					`[chat-sync] not syncing ${sessionId}: ${z.prettifyError(request.error)}`,
+				);
+				return false;
+			}
 			const pushed = readPushed(db, sessionId, session.epoch);
 			const rows = db
 				.select()
@@ -99,27 +119,24 @@ export function createChatSync(args: {
 				.orderBy(asc(chatJournal.seq))
 				.limit(batchEvents)
 				.all();
-			if (rows.length === 0) return;
+			if (rows.length === 0) return false;
 
 			const events = [];
 			let bytes = 0;
 			for (const row of rows) {
 				const event = prepareEventForCloud(JSON.parse(row.eventJson));
 				bytes += eventBytes(event);
-				if (events.length > 0 && bytes > BATCH_BYTES) break;
+				if (events.length > 0 && bytes > MAX_PUSH_BYTES) break;
 				events.push({ seq: row.seq, ts: row.ts, event });
 			}
 
 			try {
 				const { ackedSeq } = await args.api.chatHistory.push.mutate({
-					sessionId,
-					workspaceId: session.scopeId,
-					harness: session.harness,
-					harnessSessionId: session.harnessSessionId ?? undefined,
-					epoch: session.epoch,
+					...request.data,
 					events,
 				});
 				writePushed(db, sessionId, session.epoch, ackedSeq);
+				return true;
 			} catch (error) {
 				const code = errorCode(error);
 				if (!code || !REJECTED_CODES.has(code)) throw error;
@@ -136,72 +153,94 @@ export function createChatSync(args: {
 					error instanceof Error ? error.message : error,
 				);
 				writePushed(db, sessionId, session.epoch, skipped.seq);
-				batchEvents = BATCH_EVENTS;
+				return true;
 			}
 		}
 	};
 
-	const syncSession = (sessionId: string): Promise<void> => {
+	const exclusive = <T>(
+		sessionId: string,
+		run: () => Promise<T>,
+	): Promise<T> => {
 		const current = inFlight.get(sessionId);
 		if (current) {
-			return current.catch(() => {}).then(() => syncSession(sessionId));
+			return current.catch(() => {}).then(() => exclusive(sessionId, run));
 		}
-		const run = pushOnce(sessionId).finally(() => inFlight.delete(sessionId));
-		inFlight.set(sessionId, run);
-		return run;
+		const running = run().finally(() => inFlight.delete(sessionId));
+		inFlight.set(sessionId, running);
+		return running;
 	};
+
+	const syncSession = (sessionId: string): Promise<void> =>
+		exclusive(sessionId, async () => {
+			while (await pushBatch(sessionId)) {}
+		});
 
 	let started = false;
 	let catchUp = false;
 
-	/** Chats a previous run left unpushed; `pushOnce` skips the ones already pushed. */
+	/** Chats a previous run left unpushed; `pushBatch` skips the ones already pushed. */
 	const markAllDirty = () => {
-		const sessions = args
-			.runtime()
-			.db.selectDistinct({ sessionId: chatJournal.sessionId })
-			.from(chatJournal)
-			.all();
+		const db = args.runtime()?.db;
+		const sessions = db
+			? db
+					.selectDistinct({ sessionId: chatJournal.sessionId })
+					.from(chatJournal)
+					.all()
+			: [];
 		for (const { sessionId } of sessions) dirty.add(sessionId);
 		catchUp = false;
 	};
 
+	/** One batch per chat per round, so a busy chat does not hold up the others. */
 	const drain = async () => {
 		cancelTimer = null;
 		if (running) return;
 		running = true;
-		let failed = false;
+		let readFailed = false;
+		const failed = new Set<string>();
 		if (catchUp) {
 			try {
 				markAllDirty();
 			} catch (error) {
-				failed = true;
+				readFailed = true;
 				console.warn(
 					"[chat-sync] reading unpushed chats failed:",
 					error instanceof Error ? error.message : error,
 				);
 			}
 		}
-		for (const sessionId of [...dirty]) {
-			if (!started) continue;
-			dirty.delete(sessionId);
-			if (moved.has(sessionId)) continue;
-			try {
-				await syncSession(sessionId);
-			} catch (error) {
-				if (errorCode(error) === "CONFLICT") {
-					moved.add(sessionId);
-					continue;
+		let round = [...dirty];
+		while (started && round.length > 0) {
+			const next = new Set<string>();
+			for (const sessionId of round) {
+				if (!started) break;
+				dirty.delete(sessionId);
+				if (moved.has(sessionId)) continue;
+				try {
+					if (await exclusive(sessionId, () => pushBatch(sessionId))) {
+						next.add(sessionId);
+					}
+				} catch (error) {
+					if (errorCode(error) === "CONFLICT") {
+						moved.add(sessionId);
+						continue;
+					}
+					failed.add(sessionId);
+					console.warn(
+						"[chat-sync] push failed:",
+						error instanceof Error ? error.message : error,
+					);
 				}
-				dirty.add(sessionId);
-				failed = true;
-				console.warn(
-					"[chat-sync] push failed:",
-					error instanceof Error ? error.message : error,
-				);
 			}
+			for (const sessionId of dirty) {
+				if (!failed.has(sessionId)) next.add(sessionId);
+			}
+			round = [...next];
 		}
+		for (const sessionId of failed) dirty.add(sessionId);
 		running = false;
-		if (failed) {
+		if (readFailed || failed.size > 0) {
 			wake(retryMs);
 			retryMs = Math.min(retryMs * 2, MAX_RETRY_MS);
 		} else {

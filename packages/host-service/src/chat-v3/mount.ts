@@ -14,6 +14,7 @@ import type {
 	WsSinkSocket,
 } from "@superset/chat-runtime";
 import {
+	CHAT_DB_FILENAME,
 	CodexAdapter,
 	createChatRouter,
 	createChatRuntime,
@@ -117,6 +118,8 @@ function harnessRegistry(
 
 export type ChatV3Mount = {
 	runtime(): ChatRuntime;
+	/** The runtime, without creating chat.db on a host that has never had a chat. */
+	existingRuntime(): ChatRuntime | null;
 	closeScope(scopeId: string): Promise<void>;
 	recordUnfinished(): void;
 	resumeAfterUpdate(): void;
@@ -164,6 +167,11 @@ export function createChatV3Mount(options: {
 
 	return {
 		runtime,
+		existingRuntime: () =>
+			built ??
+			(existsSync(join(dirname(options.dbPath), CHAT_DB_FILENAME))
+				? runtime()
+				: null),
 		closeScope: async (scopeId) => {
 			await built?.commands.closeScope(scopeId);
 		},
