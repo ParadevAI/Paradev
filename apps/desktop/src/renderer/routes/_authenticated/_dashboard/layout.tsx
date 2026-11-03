@@ -1,3 +1,4 @@
+import { cn } from "@superset/ui/utils";
 import {
 	createFileRoute,
 	Outlet,
@@ -298,7 +299,13 @@ function DashboardLayout() {
 											isCollapsed={isWorkspaceSidebarCollapsed}
 										/>
 									</WorkspaceSidebarPanel>
-									<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+									<div
+										className={cn(
+											"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl",
+											!onV2WorkspaceRoute &&
+												"border border-border bg-background",
+										)}
+									>
 										<div className="relative flex min-h-0 min-w-0 flex-1">
 											{content}
 										</div>

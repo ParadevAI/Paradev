@@ -199,7 +199,8 @@ export function Workspace<TData>({
 			<PaneAsideRenderContext.Provider value={renderPaneAside}>
 				<div
 					className={cn(
-						"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden bg-background text-foreground",
+						"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground",
+						appearance !== "cards" && "bg-background",
 						className,
 					)}
 				>
