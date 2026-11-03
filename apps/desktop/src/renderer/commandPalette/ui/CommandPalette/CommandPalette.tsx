@@ -167,6 +167,13 @@ export function CommandPalette() {
 				? t({ message: "Switch to…" })
 				: t({ message: "Search workspaces, commands, files…" });
 
+	// Radix would focus the first tabbable, which is the back arrow once a
+	// frame is open; typing is what the palette is for.
+	const focusInput = useCallback((event: Event) => {
+		event.preventDefault();
+		inputRef.current?.focus();
+	}, []);
+
 	const backButton = (
 		<button
 			type="button"
@@ -182,6 +189,7 @@ export function CommandPalette() {
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent
 				showCloseButton={false}
+				onOpenAutoFocus={focusInput}
 				className="!max-w-[640px] sm:!max-w-[640px] translate-y-0 max-h-[80vh] overflow-hidden rounded-xl p-0"
 				style={{ top: "max(16px, calc(50% - 278px))" }}
 			>
