@@ -8,6 +8,7 @@ import {
 	HEADER_ICON_STROKE_WIDTH,
 } from "@superset/ui/lib/header-controls";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
+import { cn } from "@superset/ui/utils";
 import { PlusIcon } from "lucide-react";
 import {
 	type ComponentProps,
@@ -36,6 +37,8 @@ import {
 } from "./utils";
 
 interface TabBarProps<TData> {
+	/** Classes for the bar row, merged over its defaults. */
+	className?: string;
 	store: StoreApi<WorkspaceStore<TData>>;
 	tabs: Tab<TData>[];
 	registry: PaneRegistry<TData>;
@@ -107,6 +110,7 @@ function AddTabButton<_TData>({
 }
 
 export function TabBar<TData>({
+	className,
 	store,
 	tabs,
 	registry,
@@ -246,10 +250,13 @@ export function TabBar<TData>({
 			// children out with `no-drag` loses the carve-outs once they sit inside
 			// the masked/scrollable OverflowFadeContainer, which made the entire bar
 			// swallow clicks.
-			className="group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]"
+			className={cn(
+				"group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]",
+				className,
+			)}
 		>
 			{renderTabBarLeading && (
-				<div className="flex h-full shrink-0 items-stretch border-b border-border">
+				<div className="flex h-full shrink-0 items-stretch">
 					{renderTabBarLeading()}
 				</div>
 			)}
@@ -307,7 +314,7 @@ export function TabBar<TData>({
 					)}
 					{/* Empty space to the right of the tabs (collapses to 0 when the
 					    tabs overflow); the bar's only window-drag region. */}
-					<div className="drag h-full flex-1 border-b border-border" />
+					<div className="drag h-full flex-1" />
 				</div>
 			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
@@ -319,7 +326,7 @@ export function TabBar<TData>({
 				</div>
 			)}
 			{renderTabBarTrailing && (
-				<div className="no-drag flex h-full shrink-0 items-center px-1 border-b border-border">
+				<div className="no-drag flex h-full shrink-0 items-center px-1">
 					{renderTabBarTrailing()}
 				</div>
 			)}

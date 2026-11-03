@@ -147,6 +147,13 @@ export interface WorkspaceProps<TData> {
 	/** Rendered at the trailing (right) edge of the tab bar row. */
 	renderTabBarTrailing?: () => ReactNode;
 	renderBelowTabBar?: () => ReactNode;
+	/** Classes for the tab bar row, merged over its defaults. */
+	tabBarClassName?: string;
+	/**
+	 * Places the tab bar: gets the bar and returns what to render in its place,
+	 * such as a portal into a window title bar. Unset, the bar sits above the tabs.
+	 */
+	renderTabBar?: (tabBar: ReactNode) => ReactNode;
 	/**
 	 * Rendered over the right of the top-right pane's body, below its header.
 	 * It reserves its width by setting `--pane-aside-inset` on its parent.

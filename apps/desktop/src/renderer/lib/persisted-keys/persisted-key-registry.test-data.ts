@@ -90,7 +90,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/stores/workspace-sidebar-state.ts",
 		["workspace-sidebar-store"],
 	],
-	["src/renderer/stores/window-tabs.ts", ["window-tabs"]],
 	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore/cloudSidebarStore.ts",
 		["cloud-sidebar"],

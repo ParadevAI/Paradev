@@ -4347,9 +4347,6 @@ msgstr "{displayName}'i kapat"
 msgid "Close {label} tab"
 msgstr "{label} sekmesini kapat"
 
-msgid "Close {title}"
-msgstr "{title} sekmesini kapat"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0} kapatılsın mı?"
@@ -11695,12 +11692,6 @@ msgstr "Yeni terminal"
 
 msgid "New Terminal"
 msgstr "Yeni terminal"
-
-msgid "New thread"
-msgstr "Yeni konu"
-
-msgid "New thread ({newThreadShortcut})"
-msgstr "Yeni konu ({newThreadShortcut})"
 
 msgid "New window"
 msgstr "Yeni pencere"

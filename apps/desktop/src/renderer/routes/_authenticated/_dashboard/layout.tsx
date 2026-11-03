@@ -38,8 +38,9 @@ import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMount";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
+import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
-import { WindowTabBar } from "./components/WindowTabBar";
+import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
@@ -237,18 +238,23 @@ function DashboardLayout() {
 				<RemotePortForwarder />
 				<CommandPaletteHost />
 				{isV2CloudEnabled ? (
-					<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
-						<WindowTabBar />
-						<div className="flex min-h-0 flex-1">
-							<NavigationRail />
-							<WorkspaceSidebarPanel collapsedWidth={0} className="border-r-0">
-								{sidebar}
-							</WorkspaceSidebarPanel>
-							<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
-								{content}
+					<TitleBarSlotsProvider>
+						<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
+							<TitleBar />
+							<div className="flex min-h-0 flex-1">
+								<NavigationRail />
+								<WorkspaceSidebarPanel
+									collapsedWidth={0}
+									className="border-r-0"
+								>
+									{sidebar}
+								</WorkspaceSidebarPanel>
+								<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+									{content}
+								</div>
 							</div>
 						</div>
-					</div>
+					</TitleBarSlotsProvider>
 				) : (
 					<div className="flex h-full w-full flex-col overflow-hidden">
 						<TopBar />

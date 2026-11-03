@@ -8,10 +8,20 @@ import {
 	type WorkspaceInteractionState,
 	type WorkspaceStore,
 } from "@superset/panes";
-import { type ReactNode, useEffect, useMemo } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
+import {
+	titleBarTabBarProps,
+	useTitleBarSideSlot,
+} from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import type { StoreApi } from "zustand/vanilla";
@@ -73,13 +83,20 @@ export function RightPaneArea({
 		const active = store.getState().getActivePane();
 		if (active) store.getState().focusPane(active.pane.id);
 	}, [isFullScreen, store]);
+	// This element is `display: contents`, so the box to line the title bar up with is its parent.
+	const [paneBox, setPaneBox] = useState<HTMLElement | null>(null);
+	const measurePaneBox = useCallback((node: HTMLDivElement | null) => {
+		setPaneBox(node?.parentElement ?? null);
+	}, []);
+	const titleBarSideSlot = useTitleBarSideSlot(paneBox);
 
 	return (
-		<div className="contents" data-pane-area="right">
+		<div className="contents" data-pane-area="right" ref={measurePaneBox}>
 			{pullRequests.map((pr) => (
 				<PullRequestCountsPrefetch key={pr.url} pullRequest={pr.ref} />
 			))}
 			<Workspace<PaneViewerData>
+				{...titleBarTabBarProps(titleBarSideSlot)}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
 				paneActions={rightPaneActions}

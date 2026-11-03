@@ -4347,9 +4347,6 @@ msgstr "{displayName}を閉じる"
 msgid "Close {label} tab"
 msgstr "{label} タブを閉じる"
 
-msgid "Close {title}"
-msgstr "{title}を閉じる"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0}をクローズしますか?"
@@ -11695,12 +11692,6 @@ msgstr "新しいターミナル"
 
 msgid "New Terminal"
 msgstr "新規ターミナル"
-
-msgid "New thread"
-msgstr "新しいスレッド"
-
-msgid "New thread ({newThreadShortcut})"
-msgstr "新しいスレッド ({newThreadShortcut})"
 
 msgid "New window"
 msgstr "新規ウィンドウ"

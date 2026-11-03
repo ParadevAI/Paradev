@@ -4347,9 +4347,6 @@ msgstr "Cerrar {displayName}"
 msgid "Close {label} tab"
 msgstr "Cerrar la pestaña {label}"
 
-msgid "Close {title}"
-msgstr "Cerrar {title}"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "¿Cerrar #{0}?"
@@ -11695,12 +11692,6 @@ msgstr "Terminal nueva"
 
 msgid "New Terminal"
 msgstr "Nueva terminal"
-
-msgid "New thread"
-msgstr "Nuevo hilo"
-
-msgid "New thread ({newThreadShortcut})"
-msgstr "Nuevo hilo ({newThreadShortcut})"
 
 msgid "New window"
 msgstr "Nueva ventana"

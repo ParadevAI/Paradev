@@ -14,6 +14,10 @@ import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import {
+	titleBarTabBarProps,
+	useTitleBarMainSlot,
+} from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
+import {
 	parseSubagentSearch,
 	readSubagentSearch,
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
@@ -196,6 +200,7 @@ function V2WorkspaceContent() {
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
 	const navigate = Route.useNavigate();
+	const titleBarMainSlot = useTitleBarMainSlot();
 	const consumeSearch = useCallback<ConsumeSearch>(
 		(keys) => {
 			void navigate({
@@ -682,6 +687,7 @@ function V2WorkspaceContent() {
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}
+									{...titleBarTabBarProps(titleBarMainSlot)}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}

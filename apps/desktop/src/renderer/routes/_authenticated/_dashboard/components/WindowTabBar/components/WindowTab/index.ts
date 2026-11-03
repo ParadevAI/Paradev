@@ -1,1 +1,0 @@
-export { WindowTab } from "./WindowTab";

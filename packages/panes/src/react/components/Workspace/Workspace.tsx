@@ -31,6 +31,8 @@ export function Workspace<TData>({
 	renderTabBarLeading,
 	renderTabBarTrailing,
 	renderBelowTabBar,
+	tabBarClassName,
+	renderTabBar,
 	renderPaneAside,
 	onBeforeCloseTab,
 	onAfterCloseTab,
@@ -146,6 +148,50 @@ export function Workspace<TData>({
 		}
 	};
 
+	const tabBar = (
+		<TabBar
+			className={tabBarClassName}
+			store={store}
+			tabs={tabs}
+			registry={registry}
+			activeTabId={activeTabId}
+			onSelectTab={(tabId) => store.getState().setActiveTab(tabId)}
+			onCloseTab={closeTab}
+			onCloseOtherTabs={async (tabId) => {
+				for (const tab of tabs) {
+					if (tab.id !== tabId) await closeTab(tab.id);
+				}
+			}}
+			onCloseAllTabs={async () => {
+				for (const tab of tabs) {
+					await closeTab(tab.id);
+				}
+			}}
+			onRenameTab={
+				renameTabs
+					? (tabId, title) =>
+							store
+								.getState()
+								.setTabTitleOverride({ tabId, titleOverride: title })
+					: undefined
+			}
+			onTabClick={onTabClick}
+			isPreviewTab={isPreviewTab}
+			onReorderTab={(tabId, toIndex) =>
+				store.getState().reorderTab({ tabId, toIndex })
+			}
+			onMovePaneToNewTab={(paneId, toIndex) =>
+				store.getState().movePaneToNewTab({ paneId, toIndex })
+			}
+			renderTabIcon={renderTabIcon}
+			renderAddTabMenu={renderAddTabMenu}
+			onAddTab={onAddTab}
+			renderTabBarLeading={renderTabBarLeading}
+			renderTabBarTrailing={renderTabBarTrailing}
+			renderTabAccessory={renderTabAccessory}
+		/>
+	);
+
 	return (
 		<PaneAsideRenderContext.Provider value={renderPaneAside}>
 			<div
@@ -154,46 +200,7 @@ export function Workspace<TData>({
 					className,
 				)}
 			>
-				<TabBar
-					store={store}
-					tabs={tabs}
-					registry={registry}
-					activeTabId={activeTabId}
-					onSelectTab={(tabId) => store.getState().setActiveTab(tabId)}
-					onCloseTab={closeTab}
-					onCloseOtherTabs={async (tabId) => {
-						for (const tab of tabs) {
-							if (tab.id !== tabId) await closeTab(tab.id);
-						}
-					}}
-					onCloseAllTabs={async () => {
-						for (const tab of tabs) {
-							await closeTab(tab.id);
-						}
-					}}
-					onRenameTab={
-						renameTabs
-							? (tabId, title) =>
-									store
-										.getState()
-										.setTabTitleOverride({ tabId, titleOverride: title })
-							: undefined
-					}
-					onTabClick={onTabClick}
-					isPreviewTab={isPreviewTab}
-					onReorderTab={(tabId, toIndex) =>
-						store.getState().reorderTab({ tabId, toIndex })
-					}
-					onMovePaneToNewTab={(paneId, toIndex) =>
-						store.getState().movePaneToNewTab({ paneId, toIndex })
-					}
-					renderTabIcon={renderTabIcon}
-					renderAddTabMenu={renderAddTabMenu}
-					onAddTab={onAddTab}
-					renderTabBarLeading={renderTabBarLeading}
-					renderTabBarTrailing={renderTabBarTrailing}
-					renderTabAccessory={renderTabAccessory}
-				/>
+				{renderTabBar ? renderTabBar(tabBar) : tabBar}
 				{renderBelowTabBar?.()}
 				{keepAliveTabs > 0 ? (
 					<div className="relative min-h-0 min-w-0 flex-1">

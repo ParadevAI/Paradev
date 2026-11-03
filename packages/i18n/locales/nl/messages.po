@@ -4347,9 +4347,6 @@ msgstr "{displayName} sluiten"
 msgid "Close {label} tab"
 msgstr "Tabblad {label} sluiten"
 
-msgid "Close {title}"
-msgstr "{title} sluiten"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0} sluiten?"
@@ -11695,12 +11692,6 @@ msgstr "Nieuwe terminal"
 
 msgid "New Terminal"
 msgstr "Nieuwe terminal"
-
-msgid "New thread"
-msgstr "Nieuwe thread"
-
-msgid "New thread ({newThreadShortcut})"
-msgstr "Nieuwe thread ({newThreadShortcut})"
 
 msgid "New window"
 msgstr "Nieuw venster"

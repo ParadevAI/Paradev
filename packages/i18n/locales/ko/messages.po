@@ -4347,9 +4347,6 @@ msgstr "{displayName} 닫기"
 msgid "Close {label} tab"
 msgstr "{label} 탭 닫기"
 
-msgid "Close {title}"
-msgstr "{title} 닫기"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0}을(를) 닫을까요?"
@@ -11695,12 +11692,6 @@ msgstr "새 터미널"
 
 msgid "New Terminal"
 msgstr "새 터미널"
-
-msgid "New thread"
-msgstr "새 스레드"
-
-msgid "New thread ({newThreadShortcut})"
-msgstr "새 스레드 ({newThreadShortcut})"
 
 msgid "New window"
 msgstr "새 창"

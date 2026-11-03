@@ -4347,9 +4347,6 @@ msgstr "关闭{displayName}"
 msgid "Close {label} tab"
 msgstr "关闭 {label} 标签页"
 
-msgid "Close {title}"
-msgstr "关闭 {title}"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "关闭#{0}？"
@@ -11695,12 +11692,6 @@ msgstr "新建终端"
 
 msgid "New Terminal"
 msgstr "新建终端"
-
-msgid "New thread"
-msgstr "新话题"
-
-msgid "New thread ({newThreadShortcut})"
-msgstr "新话题 ({newThreadShortcut})"
 
 msgid "New window"
 msgstr "新建窗口"
