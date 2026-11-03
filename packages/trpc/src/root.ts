@@ -2,7 +2,6 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import { adminRouter } from "./router/admin";
 import {
-	agentApiRouter,
 	agentRouter,
 	agentRoutineRouter,
 	agentWorkerRouter,
@@ -52,7 +51,6 @@ import { createCallerFactory, createTRPCRouter } from "./trpc";
 export const appRouter = createTRPCRouter({
 	admin: adminRouter,
 	agent: agentRouter,
-	agentApi: agentApiRouter,
 	agentRoutine: agentRoutineRouter,
 	agentWorker: agentWorkerRouter,
 	devTools: devToolsRouter,
