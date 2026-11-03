@@ -41,11 +41,6 @@ msgstr "· aktualizováno {updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "Pohled „{0}“ a jeho filtry budou odstraněny. Pracovních prostorů se to nedotkne."
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "„{0}“ smazáno"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "„{0}“ bude na GitHubu označen jako uzavřený. Kdykoli ho odsud můžete znovu otevřít."
@@ -61,11 +56,6 @@ msgstr "„{0}“ bude sloučen do {1} pomocí {2}. Kontroly zatím neprošly �
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "„{0}“ bude sloučen do {1} pomocí {2}. Odsud to nelze vrátit zpět."
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "„{0}“ se přestane spouštět a její historie běhů bude odstraněna. Tuto akci nelze vrátit zpět."
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "„{name}“ má {size} — soubory nad {limit} nelze připojit"
@@ -127,10 +117,6 @@ msgstr "{0, plural, one {# agent} few {# agenti} many {# agenta} other {# agent�
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# automatizaci se nepodařilo spustit} few {# automatizace se nepodařilo spustit} many {# automatizace se nepodařilo spustit} other {# automatizací se nepodařilo spustit}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {# automatizace smazána} few {# automatizace smazány} many {# automatizace smazáno} other {# automatizací smazáno}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {# pracovní prostor} few {# pracovní prostory} many {#
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {# běžící agent stále používá předchozí účet — přepnutí platí jen pro nová spuštění.} few {# běžící agenti stále používají předchozí účet — přepnutí platí jen pro nová spuštění.} many {# běžícího agenta stále používá předchozí účet — přepnutí platí jen pro nová spuštění.} other {# běžících agentů stále používá předchozí účet — přepnutí platí jen pro nová spuštění.}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {# automatizace archivována} few {# automatizace archivovány} many {# automatizace archivováno} other {# automatizací archivováno}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, one {Položena # otázka} few {Položeny # otázky} many {Položeno # otázek} other {Položeno # otázek}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {Nepodařilo se smazat # pracovní prostor} few {Nepoda�
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Vytvářím # pracovní prostor...} few {Vytvářím # pracovní prostory...} many {Vytvářím # pracovního prostoru...} other {Vytvářím # pracovních prostorů...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {Smazat # automatizaci?} few {Smazat # automatizace?} many {Smazat # automatizace?} other {Smazat # automatizací?}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {Trvale smazat # automatizaci?} few {Trvale smazat # automatizace?} many {Trvale smazat # automatizace?} other {Trvale smazat # automatizací?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {Smazat # pracovní prostor?} few {Smazat # pracovní prostory?} many {Smazat # pracovního prostoru?} other {Smazat # pracovních prostorů?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {# automatizace smazána} few {# automatizace smazány} many {# automatizace smazáno} other {# automatizací smazáno}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, one {Pozastavena # automatizace.} few {Pozastaveny # automat
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, one {Pozastaví # automatizaci} few {Pozastaví # automatizace} many {Pozastaví # automatizace} other {Pozastaví # automatizací}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {# automatizace obnovena. Pozastavené zůstávají pozastavené.} few {# automatizace obnoveny. Pozastavené zůstávají pozastavené.} many {# automatizace obnoveno. Pozastavené zůstávají pozastavené.} other {# automatizací obnoveno. Pozastavené zůstávají pozastavené.}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {# automatizace obnovena} few {# automatizace obnoveny} many {# automatizace obnoveno} other {# automatizací obnoveno}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "Archivovat {name}?"
 msgid "Archive #{0}?"
 msgstr "Archivovat #{0}?"
 
+msgid "Archive automation"
+msgstr "Archivovat automatizaci"
+
 msgid "Archive channel"
 msgstr "Archivovat kanál"
 
@@ -2950,6 +2955,10 @@ msgstr "Archivované"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "Archivováno · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "„{0}“ archivováno"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6610,6 +6619,10 @@ msgstr "Delegovaný"
 msgid "Delete"
 msgstr "Smazat"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "Trvale smazat „{0}“?"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "Smazat „{0}“? Tím se z hosta odstraní jeho worktree."
@@ -6655,12 +6668,6 @@ msgstr "Přesto smazat"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "„Přesto smazat“ teardown skript úplně přeskočí."
-
-msgid "Delete automation"
-msgstr "Smazat automatizaci"
-
-msgid "Delete automation?"
-msgstr "Smazat automatizaci?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6774,6 +6781,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "Smazáno"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "„{0}“ smazáno"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "„{deletedName}“ smazán"
 
@@ -6834,9 +6845,6 @@ msgstr "Mažu {0} z {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Mažu {name}..."
-
-msgid "Deleting automation..."
-msgstr "Mažu automatizaci..."
 
 msgid "Deleting organization..."
 msgstr "Mažu organizaci..."
@@ -8006,6 +8014,9 @@ msgstr "Nepodařilo se přidat agenta"
 msgid "Failed to add member"
 msgstr "Nepodařilo se přidat člena"
 
+msgid "Failed to archive automation"
+msgstr "Automatizaci se nepodařilo archivovat"
+
 msgid "Failed to cancel invitation"
 msgstr "Nepodařilo se zrušit pozvánku"
 
@@ -8122,7 +8133,7 @@ msgid "Failed to delete account"
 msgstr "Nepodařilo se smazat účet"
 
 msgid "Failed to delete automation"
-msgstr "Nepodařilo se smazat automatizaci"
+msgstr "Automatizaci se nepodařilo smazat"
 
 msgid "Failed to delete host"
 msgstr "Hostitele se nepodařilo smazat"
@@ -8302,6 +8313,9 @@ msgstr "Nepodařilo se restartovat démona"
 
 msgid "Failed to restore"
 msgstr "Obnovení se nezdařilo"
+
+msgid "Failed to restore automation"
+msgstr "Automatizaci se nepodařilo obnovit"
 
 msgid "Failed to restore defaults"
 msgstr "Nepodařilo se obnovit výchozí nastavení"
@@ -12142,6 +12156,9 @@ msgstr "Zatím žádní agenti."
 
 msgid "No API keys yet."
 msgstr "Zatím žádné API klíče."
+
+msgid "No archived automations"
+msgstr "Žádné archivované automatizace"
 
 msgid "No archived workspaces"
 msgstr "Žádné archivované pracovní prostory"
@@ -16068,6 +16085,9 @@ msgstr "Obnovit"
 msgid "Restore {0} to defaults?"
 msgstr "Obnovit u {0} výchozí nastavení?"
 
+msgid "Restore automation"
+msgstr "Obnovit automatizaci"
+
 msgid "Restore default"
 msgstr "Obnovit výchozí"
 
@@ -16080,6 +16100,12 @@ msgstr "Obnovit tarif"
 msgid "restore the agent defaults"
 msgstr "obnovit výchozí nastavení agenta"
 
+msgid "Restore this automation to run it"
+msgstr "Chcete-li tuto automatizaci spustit, nejprve ji obnovte"
+
+msgid "Restore this automation to view prompt history"
+msgstr "Chcete-li zobrazit historii promptu, tuto automatizaci obnovte"
+
 msgid "Restore this version?"
 msgstr "Obnovit tuto verzi?"
 
@@ -16091,6 +16117,14 @@ msgstr "Obnovit pracovní prostor"
 
 msgid "Restored"
 msgstr "Obnoveno"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "„{0}“ obnoveno"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "„{0}“ obnoveno. Je pozastavená."
 
 msgid "Restored \"{projectName}\""
 msgstr "„{projectName}“ obnoven"
@@ -19071,6 +19105,9 @@ msgstr "Agent, který stránku sleduje, čte každý komentář. Aktualizuje str
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "Aplikace je ve verzi {appVersion}, ale připojená ke službě hostitele spuštěné něčím jiným, pravděpodobně starší CLI nebo jiným sestavením Paradev. Restart ji nahradí kopií této aplikace."
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "Automatizace a její historie spuštění budou odstraněny. Tuto akci nelze vrátit zpět."
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "Vlastník automatizace už v této organizaci nemůže používat cloudové pracovní prostory. Požádejte ho, aby si zkontroloval přístup, nebo automatizaci spusťte na zařízení."
 
@@ -19438,9 +19475,6 @@ msgstr "Tyto složky stále obsahují vaše soubory, ale do nového Paradevu se 
 msgid "These ports are still in use"
 msgstr "Tyto porty se stále používají"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "Přestanou se spouštět a jejich historie běhů bude odstraněna. Tuto akci nelze vrátit zpět."
-
 msgid "Thinking"
 msgstr "Uvažování"
 
@@ -19492,6 +19526,9 @@ msgstr "Tato automatizace patří organizaci {0}. Přepněte na tuto organizaci,
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Tato automatizace zatím nemá pokyny. Před spuštěním napište v jejím nastavení prompt."
+
+msgid "This automation is archived. It does not run."
+msgstr "Tato automatizace je archivovaná. Nespouští se."
 
 msgid "This automation is archived. Restore it first."
 msgstr "Tato automatizace je archivovaná. Nejprve ji obnovte."

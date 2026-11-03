@@ -52,6 +52,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
+	LuArchive,
 	LuArrowUpRight,
 	LuRotateCw,
 	LuSearch,
@@ -84,6 +85,7 @@ import { AutomationRow } from "./components/AutomationRow";
 import { AutomationStatCards } from "./components/AutomationStatCards";
 import { AutomationsEmptyState } from "./components/AutomationsEmptyState";
 import { HostOfflineRunDialog } from "./components/HostOfflineRunDialog";
+import { useArchiveAutomations } from "./hooks/useArchiveAutomations";
 import { useRowSelection } from "./hooks/useRowSelection";
 import { useSetAutomationGroup } from "./hooks/useSetAutomationGroup";
 import type { AutomationTemplate } from "./templates";
@@ -101,7 +103,7 @@ export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 	},
 );
 
-type Scope = "mine" | "team";
+type Scope = "mine" | "team" | "archived";
 
 type AutomationListItem = RouterOutputs["automation"]["list"][number];
 
@@ -136,9 +138,6 @@ function AutomationsPage() {
 	const [scope, setScope] = useState<Scope>("mine");
 	const [search, setSearch] = useState("");
 	const [cliHintDismissed, setCliHintDismissed] = useState(false);
-	const [pendingDelete, setPendingDelete] = useState<
-		AutomationListItem[] | null
-	>(null);
 	const [pendingGroupDelete, setPendingGroupDelete] = useState<{
 		group: string;
 		ids: string[];
@@ -151,6 +150,12 @@ function AutomationsPage() {
 		new Set(),
 	);
 	const { setGroup } = useSetAutomationGroup();
+	const {
+		archive: archiveAutomations,
+		restore: restoreAutomations,
+		confirmDelete: confirmDeleteAutomations,
+		isPending: archivePending,
+	} = useArchiveAutomations();
 
 	const toggleGroupCollapsed = (key: string) =>
 		setCollapsedGroups((prev) => {
@@ -288,40 +293,6 @@ function AutomationsPage() {
 		},
 	});
 
-	const deleteMutation = useMutation({
-		mutationFn: async (targets: AutomationListItem[]) => {
-			const results = await Promise.allSettled(
-				targets.map(({ id }) => apiTrpcClient.automation.delete.mutate({ id })),
-			);
-			const failed = results.find((result) => result.status === "rejected");
-			if (failed) throw failed.reason;
-		},
-		onSuccess: (_, targets) => {
-			setPendingDelete(null);
-			const [only] = targets;
-			toast.success(
-				targets.length === 1 && only
-					? t({ message: `"${only.name}" deleted` })
-					: t({
-							message: plural(targets.length, {
-								one: "# automation deleted",
-								other: "# automations deleted",
-							}),
-						}),
-			);
-		},
-		onSettled: () => void utils.automation.list.invalidate(),
-		onError: (error) =>
-			toast.error(
-				errorMessage(
-					error,
-					t({
-						message: "Failed to delete automation",
-					}),
-				),
-			),
-	});
-
 	const {
 		data: automations = [],
 		isPending: automationsPending,
@@ -331,6 +302,10 @@ function AutomationsPage() {
 	} = cloudTrpc.automation.list.useQuery(undefined, {
 		refetchInterval: 60_000,
 	});
+	const { data: archivedAutomations = [] } = cloudTrpc.automation.list.useQuery(
+		{ archived: true },
+		{ refetchInterval: 60_000, staleTime: 30_000 },
+	);
 
 	const { data: memberRows = [] } = cloudTrpc.organization.listMembers.useQuery(
 		undefined,
@@ -361,11 +336,12 @@ function AutomationsPage() {
 	const teamCount = automations.length - mineCount;
 
 	const tabVisible = useMemo(() => {
+		if (scope === "archived") return archivedAutomations;
 		if (!currentUserId) return automations;
 		return scope === "mine"
 			? automations.filter((a) => a.ownerUserId === currentUserId)
 			: automations.filter((a) => a.ownerUserId !== currentUserId);
-	}, [automations, scope, currentUserId]);
+	}, [automations, archivedAutomations, scope, currentUserId]);
 
 	const visible = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -416,7 +392,7 @@ function AutomationsPage() {
 		setScope(next);
 		clearSelection();
 		// The Owner column only exists on the team tab; drop the sort with it.
-		if (next !== "team" && sortField === "owner") setSortField(null);
+		if (next === "mine" && sortField === "owner") setSortField(null);
 	};
 
 	const sortedVisible = useMemo(() => {
@@ -481,8 +457,15 @@ function AutomationsPage() {
 		[tabVisible, sortedVisible],
 	);
 
-	// Only your own automations take actions, so only Mine selects.
-	const selectable = scope === "mine";
+	// Only your own automations take actions, so Mine selects. Archived rows
+	// you may restore or delete (yours, or any as an organization owner) select too.
+	const archivedTab = scope === "archived";
+	const selectable = scope === "mine" || archivedTab;
+	const canSelect = useCallback(
+		(automation: AutomationListItem) =>
+			!archivedTab || automation.ownerUserId === currentUserId || isOrgOwner,
+		[archivedTab, currentUserId, isOrgOwner],
+	);
 	const shownOrder = useMemo(() => {
 		if (!selectable) return [];
 		const rows = sections
@@ -490,8 +473,8 @@ function AutomationsPage() {
 					collapsedGroups.has(group ?? UNGROUPED_KEY) ? [] : items,
 				)
 			: sortedVisible;
-		return rows.map((row) => row.id);
-	}, [selectable, sections, sortedVisible, collapsedGroups]);
+		return rows.filter(canSelect).map((row) => row.id);
+	}, [selectable, sections, sortedVisible, collapsedGroups, canSelect]);
 	const {
 		selected,
 		toggle: toggleSelected,
@@ -499,15 +482,15 @@ function AutomationsPage() {
 		clear: clearSelection,
 	} = useRowSelection(shownOrder);
 	const selectedRows = useMemo(
-		() => automations.filter((a) => selected.has(a.id)),
-		[automations, selected],
+		() => tabVisible.filter((a) => selected.has(a.id)),
+		[tabVisible, selected],
 	);
 	const selectionActive = selected.size > 0;
 	// Rows sit under a group header, or make room for checkboxes.
 	const indentRows = sections !== null || selectionActive;
 
 	// Dragging rows between sections changes their group, as in Linear.
-	const canDrag = selectable && sections !== null;
+	const canDrag = scope === "mine" && sections !== null;
 	const sensors = useSensors(
 		useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
 	);
@@ -596,9 +579,6 @@ function AutomationsPage() {
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [selectable, selected, shownOrder, clearSelection, setSelectedMany]);
 
-	const pendingDeleteOnly =
-		pendingDelete?.length === 1 ? pendingDelete[0] : undefined;
-
 	const navigate = useNavigate();
 	const { createSession, isPending: creatingWithAgent } =
 		useCreateAgentSession();
@@ -633,28 +613,33 @@ function AutomationsPage() {
 		);
 	};
 
-	const scheduleWidth = scope === "team" ? "w-[16%]" : "w-[18%]";
+	const showOwnerColumn = scope !== "mine";
+	const scheduleWidth = showOwnerColumn ? "w-[16%]" : "w-[18%]";
 	const lastRunWidth = "w-[14%]";
-	const statusWidth = scope === "team" ? "w-[12%]" : "w-[13%]";
-	const columnCount = scope === "team" ? 6 : 5;
+	const statusWidth = showOwnerColumn ? "w-[12%]" : "w-[13%]";
+	const columnCount = showOwnerColumn ? 6 : 5;
 	const showAutomationLoading = automationsPending && tabVisible.length === 0;
 	// A failed read has no rows either, but it is not an empty org — it must not
 	// strip the page chrome or claim the org has no automations.
 	const showAutomationError = automationsFailed && automations.length === 0;
 	// True first run: nothing in the org — stats/tabs/search are noise.
 	const orgEmpty =
-		!automationsPending && !showAutomationError && automations.length === 0;
+		!automationsPending &&
+		!showAutomationError &&
+		automations.length === 0 &&
+		archivedAutomations.length === 0;
 	const tabEmpty =
 		!automationsPending && !showAutomationError && tabVisible.length === 0;
 	const showMineEmptyState = tabEmpty && scope === "mine";
 	const showTeamEmptyState = tabEmpty && scope === "team";
+	const showArchivedEmptyState = tabEmpty && scope === "archived";
 
 	const renderAutomationRow = (automation: AutomationListItem) => (
 		<AutomationRow
 			key={automation.id}
 			automation={automation}
 			owner={usersById.get(automation.ownerUserId)}
-			showOwner={scope === "team"}
+			showOwner={showOwnerColumn}
 			project={
 				automation.v2ProjectId === null
 					? undefined
@@ -664,7 +649,7 @@ function AutomationsPage() {
 			lastRun={lastRunById.get(automation.id) ?? null}
 			now={now}
 			isOwner={automation.ownerUserId === currentUserId}
-			canDelete={automation.ownerUserId === currentUserId || isOrgOwner}
+			canArchive={automation.ownerUserId === currentUserId || isOrgOwner}
 			isRetrying={retryingIds.has(automation.id)}
 			groups={groups}
 			indented={indentRows}
@@ -678,7 +663,7 @@ function AutomationsPage() {
 					: undefined
 			}
 			selection={
-				selectable
+				selectable && canSelect(automation)
 					? {
 							selected: selected.has(automation.id),
 							active: selectionActive,
@@ -708,7 +693,9 @@ function AutomationsPage() {
 				if (a.enabled) toggle();
 				else gateFeature(GATED_FEATURES.AUTOMATIONS, toggle);
 			}}
-			onDelete={(a) => setPendingDelete([a])}
+			onArchive={(a) => archiveAutomations([a])}
+			onRestore={(a) => restoreAutomations([a])}
+			onDelete={(a) => confirmDeleteAutomations([a])}
 		/>
 	);
 
@@ -798,6 +785,19 @@ function AutomationsPage() {
 											{teamCount}
 										</span>
 									</TabsTrigger>
+									{(archivedAutomations.length > 0 || scope === "archived") && (
+										<>
+											<div className="mx-1 h-4 w-px bg-border" />
+											<TabsTrigger
+												value="archived"
+												className="h-8 rounded-md px-3 data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground/60 data-[state=inactive]:hover:text-muted-foreground"
+											>
+												<span className="text-sm">
+													<Trans>Archived</Trans>
+												</span>
+											</TabsTrigger>
+										</>
+									)}
 								</TabsList>
 							</Tabs>
 							<div className="flex items-center gap-2">
@@ -906,6 +906,20 @@ function AutomationsPage() {
 									</EmptyDescription>
 								</EmptyHeader>
 							</Empty>
+						) : showArchivedEmptyState ? (
+							<Empty className="rounded-xl border border-border py-16">
+								<EmptyHeader>
+									<EmptyMedia
+										variant="icon"
+										className="size-14 [&_svg:not([class*='size-'])]:size-7"
+									>
+										<LuArchive />
+									</EmptyMedia>
+									<EmptyTitle>
+										<Trans>No archived automations</Trans>
+									</EmptyTitle>
+								</EmptyHeader>
+							</Empty>
 						) : (
 							// No overflow-hidden: it would break the sticky header, which
 							// sticks relative to the page scroll container.
@@ -958,7 +972,7 @@ function AutomationsPage() {
 														onSort={handleSort}
 													/>
 												</TableHead>
-												{scope === "team" && (
+												{showOwnerColumn && (
 													<TableHead
 														className={cn(DATA_TABLE_HEAD_CELL, "w-[14%]")}
 													>
@@ -1053,17 +1067,19 @@ function AutomationsPage() {
 																isCreating={creatingAutomation}
 																onSelectAll={
 																	selectable && !collapsed
-																		? () =>
+																		? () => {
+																				const ids = items
+																					.filter(canSelect)
+																					.map((a) => a.id);
 																				setSelectedMany(
-																					items.map((a) => a.id),
-																					!items.every((a) =>
-																						selected.has(a.id),
-																					),
-																				)
+																					ids,
+																					!ids.every((id) => selected.has(id)),
+																				);
+																			}
 																		: undefined
 																}
 																onDeleteGroup={
-																	selectable && group !== null
+																	scope === "mine" && group !== null
 																		? () =>
 																				setPendingGroupDelete({
 																					group,
@@ -1148,7 +1164,7 @@ function AutomationsPage() {
 						}
 						canPause={selectedRows.some((a) => a.enabled)}
 						canResume={selectedRows.some((a) => !a.enabled)}
-						busy={bulkEnabledMutation.isPending || deleteMutation.isPending}
+						busy={bulkEnabledMutation.isPending || archivePending}
 						onMove={(group) => setGroup({ ids: [...selected], group })}
 						onPause={() =>
 							bulkEnabledMutation.mutate({
@@ -1164,7 +1180,20 @@ function AutomationsPage() {
 								}),
 							)
 						}
-						onDelete={() => setPendingDelete(selectedRows)}
+						onArchive={() => {
+							archiveAutomations(selectedRows);
+							clearSelection();
+						}}
+						archived={archivedTab}
+						onRestore={() => {
+							restoreAutomations(selectedRows);
+							clearSelection();
+						}}
+						onDelete={() =>
+							confirmDeleteAutomations(selectedRows, {
+								onDeleted: clearSelection,
+							})
+						}
 						onClear={clearSelection}
 					/>
 				</div>
@@ -1214,55 +1243,6 @@ function AutomationsPage() {
 							}}
 						>
 							<Trans>Delete group</Trans>
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-
-			<AlertDialog
-				open={!!pendingDelete}
-				onOpenChange={(next) => {
-					if (!next) setPendingDelete(null);
-				}}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>
-							{pendingDelete && pendingDelete.length > 1 ? (
-								<Plural
-									value={pendingDelete.length}
-									one="Delete # automation?"
-									other="Delete # automations?"
-								/>
-							) : (
-								<Trans>Delete automation?</Trans>
-							)}
-						</AlertDialogTitle>
-						<AlertDialogDescription>
-							{pendingDeleteOnly ? (
-								<Trans>
-									"{pendingDeleteOnly.name}" will stop firing and its run
-									history will be removed. This can't be undone.
-								</Trans>
-							) : pendingDelete ? (
-								<Trans>
-									They will stop firing and their run history will be removed.
-									This can't be undone.
-								</Trans>
-							) : null}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>
-							<Trans>Cancel</Trans>
-						</AlertDialogCancel>
-						<AlertDialogAction
-							disabled={deleteMutation.isPending}
-							onClick={() => {
-								if (pendingDelete) deleteMutation.mutate(pendingDelete);
-							}}
-						>
-							<Trans>Delete</Trans>
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

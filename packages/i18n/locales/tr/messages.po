@@ -41,11 +41,6 @@ msgstr "· güncelleme {updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” ve filtreleri kaldırılır. Çalışma alanları etkilenmez."
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "\"{0}\" silindi"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "\"{0}\" GitHub'da kapalı olarak işaretlenecek. Buradan istediğiniz zaman yeniden açabilirsiniz."
@@ -61,11 +56,6 @@ msgstr "\"{0}\", {2} ile {1} dalına birleştirilecek. Kontroller henüz geçmed
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\", {2} ile {1} dalına birleştirilecek. Buradan geri alınamaz."
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "\"{0}\" artık tetiklenmeyecek ve çalıştırma geçmişi kaldırılacak. Bu geri alınamaz."
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "\"{name}\" {size} boyutunda — {limit} üzerindeki dosyalar eklenemez"
@@ -127,10 +117,6 @@ msgstr "{0, plural, one {# ajan} other {# ajan}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# otomasyon başlatılamadı} other {# otomasyon başlatılamadı}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {# otomasyon silindi} other {# otomasyon silindi}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {# çalışma alanı} other {# çalışma alanı}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {Çalışan bir ajan hâlâ önceki hesabı kullanıyor — geçiş yalnızca yeni başlatmalar için geçerli.} other {Çalışan # ajan hâlâ önceki hesabı kullanıyor — geçiş yalnızca yeni başlatmalar için geçerli.}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {# otomasyon arşivlendi} other {# otomasyon arşivlendi}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, one {# soru soruldu} other {# soru soruldu}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {# çalışma alanı silinemedi} other {# çalışma ala
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {# çalışma alanı oluşturuluyor...} other {# çalışma alanı oluşturuluyor...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {# otomasyon silinsin mi?} other {# otomasyon silinsin mi?}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {# otomasyon kalıcı olarak silinsin mi?} other {# otomasyon kalıcı olarak silinsin mi?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {# çalışma alanı silinsin mi?} other {# çalışma alanı silinsin mi?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {# otomasyon silindi} other {# otomasyon silindi}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, one {# otomasyon duraklatıldı.} other {# otomasyon durakla
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, one {# otomasyonu duraklatır} other {# otomasyonu duraklatır}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {# otomasyon geri yüklendi. Duraklatılmış olanlar duraklatılmış kalır.} other {# otomasyon geri yüklendi. Duraklatılmış olanlar duraklatılmış kalır.}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {# otomasyon geri yüklendi} other {# otomasyon geri yüklendi}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "{name} arşivlensin mi?"
 msgid "Archive #{0}?"
 msgstr "#{0} arşivlensin mi?"
 
+msgid "Archive automation"
+msgstr "Otomasyonu arşivle"
+
 msgid "Archive channel"
 msgstr "Kanalı arşivle"
 
@@ -2950,6 +2955,10 @@ msgstr "Arşivlenmiş"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "Arşivlendi · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "\"{0}\" arşivlendi"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6610,6 +6619,10 @@ msgstr "Devredilmiş"
 msgid "Delete"
 msgstr "Sil"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "\"{0}\" kalıcı olarak silinsin mi?"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "\"{0}\" silinsin mi? Bu, worktree'sini host'tan kaldırır."
@@ -6655,12 +6668,6 @@ msgstr "Yine de sil"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "Yine de sil, kapatma betiğini tamamen atlar."
-
-msgid "Delete automation"
-msgstr "Otomasyonu sil"
-
-msgid "Delete automation?"
-msgstr "Otomasyon silinsin mi?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6774,6 +6781,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "Silindi"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "\"{0}\" silindi"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "\"{deletedName}\" silindi"
 
@@ -6834,9 +6845,6 @@ msgstr "{1} öğeden {0} tanesi siliniyor…"
 
 msgid "Deleting {name}..."
 msgstr "{name} siliniyor..."
-
-msgid "Deleting automation..."
-msgstr "Otomasyon siliniyor..."
 
 msgid "Deleting organization..."
 msgstr "Kuruluş siliniyor..."
@@ -8006,6 +8014,9 @@ msgstr "Ajan eklenemedi"
 msgid "Failed to add member"
 msgstr "Üye eklenemedi"
 
+msgid "Failed to archive automation"
+msgstr "Otomasyon arşivlenemedi"
+
 msgid "Failed to cancel invitation"
 msgstr "Davet iptal edilemedi"
 
@@ -8302,6 +8313,9 @@ msgstr "Daemon yeniden başlatılamadı"
 
 msgid "Failed to restore"
 msgstr "Geri yüklenemedi"
+
+msgid "Failed to restore automation"
+msgstr "Otomasyon geri yüklenemedi"
 
 msgid "Failed to restore defaults"
 msgstr "Varsayılanlar geri yüklenemedi"
@@ -12142,6 +12156,9 @@ msgstr "Henüz ajan yok."
 
 msgid "No API keys yet."
 msgstr "Henüz API anahtarı yok."
+
+msgid "No archived automations"
+msgstr "Arşivlenmiş otomasyon yok"
 
 msgid "No archived workspaces"
 msgstr "Arşivlenmiş çalışma alanı yok"
@@ -16068,6 +16085,9 @@ msgstr "Geri yükle"
 msgid "Restore {0} to defaults?"
 msgstr "{0} varsayılanlara geri yüklensin mi?"
 
+msgid "Restore automation"
+msgstr "Otomasyonu geri yükle"
+
 msgid "Restore default"
 msgstr "Varsayılanı geri yükle"
 
@@ -16080,6 +16100,12 @@ msgstr "Planı geri yükle"
 msgid "restore the agent defaults"
 msgstr "ajan varsayılanlarını geri yükleme"
 
+msgid "Restore this automation to run it"
+msgstr "Çalıştırmak için bu otomasyonu geri yükleyin"
+
+msgid "Restore this automation to view prompt history"
+msgstr "Prompt geçmişini görmek için bu otomasyonu geri yükleyin"
+
 msgid "Restore this version?"
 msgstr "Bu sürüm geri yüklensin mi?"
 
@@ -16091,6 +16117,14 @@ msgstr "Çalışma alanını geri yükle"
 
 msgid "Restored"
 msgstr "Geri yüklendi"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "\"{0}\" geri yüklendi"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "\"{0}\" geri yüklendi. Duraklatılmış durumda."
 
 msgid "Restored \"{projectName}\""
 msgstr "\"{projectName}\" geri yüklendi"
@@ -19071,6 +19105,9 @@ msgstr "Sayfayı izleyen ajan her yorumu okur. Sayfayı günceller ve konuda yan
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "Uygulama {appVersion} sürümünde, ancak başka bir şeyin (muhtemelen eski bir CLI veya başka bir Paradev derlemesi) başlattığı bir ana makine hizmetine bağlı. Yeniden başlatmak onu bu uygulamanın kopyasıyla değiştirir."
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "Otomasyon ve çalıştırma geçmişi kaldırılır. Bu işlem geri alınamaz."
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "Otomasyonun sahibi artık bu kuruluşta bulut çalışma alanlarını kullanamıyor. Erişimini kontrol etmesini isteyin veya otomasyonu bir cihazda çalıştırın."
 
@@ -19438,9 +19475,6 @@ msgstr "Bu klasörlerde hâlâ dosyalarınız var, ancak yeni Paradev'e kendili�
 msgid "These ports are still in use"
 msgstr "Bu portlar hâlâ kullanımda"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "Artık çalışmayacaklar ve çalışma geçmişleri silinecek. Bu işlem geri alınamaz."
-
 msgid "Thinking"
 msgstr "Düşünme"
 
@@ -19492,6 +19526,9 @@ msgstr "Bu otomasyon {0} kuruluşuna ait. Açmak için o kuruluşa geçin."
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Bu otomasyonun henüz talimatı yok. Çalıştırmadan önce ayarlarında bir istem yazın."
+
+msgid "This automation is archived. It does not run."
+msgstr "Bu otomasyon arşivlendi. Çalışmaz."
 
 msgid "This automation is archived. Restore it first."
 msgstr "Bu otomasyon arşivlendi. Önce geri yükleyin."
