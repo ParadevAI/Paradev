@@ -38,7 +38,9 @@ export type FoldedBatch = {
 };
 
 function dateOf(ms: number | undefined): Date | null {
-	return typeof ms === "number" && Number.isFinite(ms) ? new Date(ms) : null;
+	if (typeof ms !== "number") return null;
+	const date = new Date(ms);
+	return Number.isNaN(date.getTime()) ? null : date;
 }
 
 /** Keeps the newest version of each item and turn, and where each first appeared. */

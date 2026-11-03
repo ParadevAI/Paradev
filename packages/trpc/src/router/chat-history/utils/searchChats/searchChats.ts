@@ -4,7 +4,6 @@ import { splitSearchQuery } from "../searchText";
 
 const BM25_INDEX = "chat_items_search_bm25";
 const BM25_CHECK_MS = 10 * 60 * 1000;
-const CANDIDATES = 500;
 
 let bm25: { available: boolean; checkedAt: number } | null = null;
 
@@ -38,7 +37,7 @@ type Row = Omit<ChatSearchResult, "lastActiveAt" | "score"> & {
 	score: number | string;
 };
 
-/** The best-matching item of each matching chat, best chats first. */
+/** The best-matching item of each matching chat. */
 function candidates(args: {
 	query: string;
 	userId: string;
@@ -50,17 +49,13 @@ function candidates(args: {
 		? sql`-(i.search <@> to_bm25query(to_tsvector('english', ${args.query}), ${BM25_INDEX}))`
 		: sql`ts_rank_cd(i.search, ${tsQuery})`;
 	return sql`
-		select * from (
-			select distinct on (i.session_id)
-				i.session_id, i.item_id, i.kind, i.search_text, ${score} as score
-			from chat_items i
-			where i.created_by = ${args.userId}
-				and i.organization_id = ${args.organizationId}
-				and i.search @@ ${tsQuery}
-			order by i.session_id, score desc
-		) best
-		order by score desc
-		limit ${CANDIDATES}`;
+		select distinct on (i.session_id)
+			i.session_id, i.item_id, i.kind, i.search_text, ${score} as score
+		from chat_items i
+		where i.created_by = ${args.userId}
+			and i.organization_id = ${args.organizationId}
+			and i.search @@ ${tsQuery}
+		order by i.session_id, score desc`;
 }
 
 /**
@@ -75,8 +70,7 @@ export async function searchChats(args: {
 }): Promise<ChatSearchResult[]> {
 	const query = splitSearchQuery(args.query);
 	if (!query) return [];
-	const useBm25 = await bm25Available();
-	const statement = sql`
+	const statement = (useBm25: boolean) => sql`
 		with hits as (${candidates({ ...args, query, useBm25 })}),
 		ranked as (
 			select h.*, s.title, s.harness, s.harness_session_id, s.v2_workspace_id,
@@ -97,14 +91,21 @@ export async function searchChats(args: {
 		order by score desc, last_active_at desc
 		limit ${args.limit}`;
 
-	const rows = useBm25
-		? await dbWs.transaction(async (tx) => {
+	let rows: Row[] | null = null;
+	if (await bm25Available()) {
+		try {
+			rows = await dbWs.transaction(async (tx) => {
 				await tx.execute(
 					sql`select set_config('lakebase_bm25.prefilter', 'on', true)`,
 				);
-				return (await tx.execute<Row>(statement)).rows;
-			})
-		: (await db.execute<Row>(statement)).rows;
+				return (await tx.execute<Row>(statement(true))).rows;
+			});
+		} catch (error) {
+			console.warn("[chat-search] BM25 search failed; using full-text", error);
+			bm25 = { available: false, checkedAt: Date.now() };
+		}
+	}
+	rows ??= (await db.execute<Row>(statement(false))).rows;
 
 	return rows.map((row) => ({
 		...row,

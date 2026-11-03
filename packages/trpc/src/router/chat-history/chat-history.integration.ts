@@ -167,7 +167,10 @@ describe("chatHistory.push", () => {
 
 	test("a new epoch starts the chat again", async () => {
 		const sessionId = newSession();
-		await push(sessionId, [{ seq: 1, event: agentMessage("old", "old") }]);
+		await push(sessionId, [
+			{ seq: 1, event: sessionEvent("idle", "Old title") },
+			{ seq: 2, event: agentMessage("old", "old") },
+		]);
 		await push(sessionId, [{ seq: 1, event: agentMessage("new", "new") }], {
 			epoch: "epoch-2",
 		});
@@ -178,6 +181,7 @@ describe("chatHistory.push", () => {
 			),
 		).toEqual(["new"]);
 		expect(stored.session.epoch).toBe("epoch-2");
+		expect(stored.session.title).toBeNull();
 	});
 
 	test("only the owner can write a chat", async () => {
@@ -236,9 +240,14 @@ describe("chatHistory.search", () => {
 		const first = newSession();
 		const copy = newSession();
 		const unrelated = newSession();
+		const someoneElses = newSession();
 		const text = "Fixed packages/chat-runtime/src/harness/acp/acpAdapter.ts";
 		await push(first, [{ seq: 1, event: agentMessage("x", text) }]);
 		await push(copy, [{ seq: 1, event: agentMessage("y", text) }]);
+		await push(someoneElses, [{ seq: 1, event: agentMessage("w", text) }], {
+			as: callerFor(OTHER_USER),
+			harnessSessionId: "harness-other",
+		});
 		await push(unrelated, [
 			{ seq: 1, event: agentMessage("z", "Nothing relevant here") },
 		]);
@@ -247,11 +256,11 @@ describe("chatHistory.search", () => {
 		const ids = results.map((row) => row.sessionId);
 		expect(ids.filter((id) => id === first || id === copy)).toHaveLength(1);
 		expect(ids).not.toContain(unrelated);
+		expect(ids).not.toContain(someoneElses);
 		expect(results[0]?.snippet).toContain("acpAdapter");
 
-		expect(await callerFor(OTHER_USER).search({ query: "acpAdapter" })).toEqual(
-			[],
-		);
+		const theirs = await callerFor(OTHER_USER).search({ query: "acpAdapter" });
+		expect(theirs.map((row) => row.sessionId)).toEqual([someoneElses]);
 	});
 
 	test("one long chat does not crowd out the others", async () => {

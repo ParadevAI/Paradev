@@ -60,5 +60,8 @@ export async function loadChatHistory(
 	]
 		.sort((a, b) => a.seq - b.seq)
 		.slice(0, page?.limit);
-	return { events, itemCount: items.length };
+	return {
+		events,
+		itemCount: events.filter(({ event }) => event.type === "item").length,
+	};
 }
