@@ -5695,6 +5695,9 @@ msgstr "Không thể ghi nhận workspace trên cloud"
 msgid "Could not record environment"
 msgstr "Không thể lưu environment"
 
+msgid "Could not reinstall {name}"
+msgstr "Không thể cài lại {name}"
+
 msgid "Could not remove {name}"
 msgstr "Không thể gỡ {name}"
 
@@ -15446,6 +15449,9 @@ msgstr "Region"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Paradev hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Paradev ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Paradev."
 
+msgid "Reinstall {name}"
+msgstr "Cài lại {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "đã tham gia lại {channel} theo lời mời của {inviter}, cùng với {others}."
 
@@ -20243,6 +20249,9 @@ msgstr "Biến hội thoại Slack thành tác vụ, chạy agent từ workspace
 
 msgid "turn the onboarding findings into a page"
 msgstr "biến kết quả nghiên cứu onboarding thành một trang"
+
+msgid "Turned off because its files changed"
+msgstr "Đã tắt vì các tệp của tiện ích đã thay đổi"
 
 msgid "Two Hands"
 msgstr "Hai tay"

@@ -5695,6 +5695,9 @@ msgstr "Kan cloudwerkruimte niet vastleggen"
 msgid "Could not record environment"
 msgstr "Omgeving kon niet worden opgeslagen"
 
+msgid "Could not reinstall {name}"
+msgstr "Kan {name} niet opnieuw installeren"
+
 msgid "Could not remove {name}"
 msgstr "Kan {name} niet verwijderen"
 
@@ -15446,6 +15449,9 @@ msgstr "Regio"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registreert lifecycle-hooks in de globale configuratie van deze agent zodat Paradev status kan tonen en meldingen kan sturen. Uitzetten verwijdert de items van Paradev overal — status en meldingen stoppen voor deze agent, ook binnen Paradev."
 
+msgid "Reinstall {name}"
+msgstr "{name} opnieuw installeren"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "is op uitnodiging van {inviter} samen met {others} opnieuw lid geworden van {channel}."
 
@@ -20243,6 +20249,9 @@ msgstr "Zet Slack-gesprekken om in taken, laat agents draaien vanuit je werkruim
 
 msgid "turn the onboarding findings into a page"
 msgstr "maak van de onboarding-bevindingen een pagina"
+
+msgid "Turned off because its files changed"
+msgstr "Uitgeschakeld omdat de bestanden zijn gewijzigd"
 
 msgid "Two Hands"
 msgstr "Twee handen"

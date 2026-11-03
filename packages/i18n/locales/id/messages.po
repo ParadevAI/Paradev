@@ -5695,6 +5695,9 @@ msgstr "Tidak bisa mencatat workspace cloud"
 msgid "Could not record environment"
 msgstr "Tidak dapat menyimpan environment"
 
+msgid "Could not reinstall {name}"
+msgstr "Tidak bisa memasang ulang {name}"
+
 msgid "Could not remove {name}"
 msgstr "Tidak bisa menghapus {name}"
 
@@ -15446,6 +15449,9 @@ msgstr "Region"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Mendaftarkan hook lifecycle di konfigurasi global agen ini agar Paradev bisa menampilkan status dan mengirim notifikasi. Mematikannya menghapus entri Paradev di mana-mana — status dan notifikasi berhenti untuk agen ini, termasuk di dalam Paradev."
 
+msgid "Reinstall {name}"
+msgstr "Pasang ulang {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "bergabung kembali dengan {channel} atas undangan {inviter}, bersama {others}."
 
@@ -20243,6 +20249,9 @@ msgstr "Ubah percakapan Slack menjadi tugas, jalankan agen dari workspace Anda, 
 
 msgid "turn the onboarding findings into a page"
 msgstr "ubah temuan onboarding menjadi halaman"
+
+msgid "Turned off because its files changed"
+msgstr "Dimatikan karena file-nya berubah"
 
 msgid "Two Hands"
 msgstr "Dua tangan"

@@ -5695,6 +5695,9 @@ msgstr "無法記錄雲端工作區"
 msgid "Could not record environment"
 msgstr "無法儲存環境"
 
+msgid "Could not reinstall {name}"
+msgstr "無法重新安裝 {name}"
+
 msgid "Could not remove {name}"
 msgstr "無法移除 {name}"
 
@@ -15446,6 +15449,9 @@ msgstr "區域"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "在該代理程式的全域性配置中註冊生命週期鉤子，以便Paradev顯示狀態併發送通知。關閉後會在所有位置移除Paradev的條目，該代理程式的狀態和通知都會停止，包括在Paradev內部。"
 
+msgid "Reinstall {name}"
+msgstr "重新安裝 {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "應 {inviter} 邀請，與 {others} 一起重新加入了 {channel}。"
 
@@ -20243,6 +20249,9 @@ msgstr "把Slack對話變成任務，從工作區執行代理程式，讓隊友�
 
 msgid "turn the onboarding findings into a page"
 msgstr "把新手引導的調查結果做成頁面"
+
+msgid "Turned off because its files changed"
+msgstr "已關閉，因為其檔案已變更"
 
 msgid "Two Hands"
 msgstr "雙手齊開"

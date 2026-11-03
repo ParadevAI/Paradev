@@ -5695,6 +5695,9 @@ msgstr "クラウドワークスペースを記録できませんでした"
 msgid "Could not record environment"
 msgstr "環境を保存できませんでした"
 
+msgid "Could not reinstall {name}"
+msgstr "{name} を再インストールできませんでした"
+
 msgid "Could not remove {name}"
 msgstr "{name} を削除できませんでした"
 
@@ -15446,6 +15449,9 @@ msgstr "リージョン"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "このエージェントのグローバル設定にライフサイクルフックを登録し、Paradevがステータス表示と通知を行えるようにします。オフにするとParadevのエントリがすべて削除され、Paradev内も含めてこのエージェントのステータスと通知が停止します。"
 
+msgid "Reinstall {name}"
+msgstr "{name} を再インストール"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "{inviter} の招待で {others} と一緒に {channel} に再参加しました。"
 
@@ -20243,6 +20249,9 @@ msgstr "Slackの会話をタスクに変え、ワークスペースからエー�
 
 msgid "turn the onboarding findings into a page"
 msgstr "オンボーディングの調査結果をページにして"
+
+msgid "Turned off because its files changed"
+msgstr "ファイルが変更されたためオフになっています"
 
 msgid "Two Hands"
 msgstr "両手"

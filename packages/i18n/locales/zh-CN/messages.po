@@ -5695,6 +5695,9 @@ msgstr "无法记录云端工作区"
 msgid "Could not record environment"
 msgstr "无法保存环境"
 
+msgid "Could not reinstall {name}"
+msgstr "无法重新安装 {name}"
+
 msgid "Could not remove {name}"
 msgstr "无法移除 {name}"
 
@@ -15446,6 +15449,9 @@ msgstr "区域"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "在该智能体的全局配置中注册生命周期钩子，以便Paradev显示状态并发送通知。关闭后会在所有位置移除Paradev的条目，该智能体的状态和通知都会停止，包括在Paradev内部。"
 
+msgid "Reinstall {name}"
+msgstr "重新安装 {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "应 {inviter} 邀请，与 {others} 一起重新加入了 {channel}。"
 
@@ -20243,6 +20249,9 @@ msgstr "把Slack对话变成任务，从工作区运行智能体，让队友在�
 
 msgid "turn the onboarding findings into a page"
 msgstr "把新手引导的调研结果做成页面"
+
+msgid "Turned off because its files changed"
+msgstr "已关闭，因为其文件已更改"
 
 msgid "Two Hands"
 msgstr "双手齐开"
