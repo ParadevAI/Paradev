@@ -80,6 +80,7 @@
 	--tab-hover: color-mix(in oklab, var(--foreground) 5%, transparent);
 	--tab-selected: color-mix(in oklab, var(--foreground) 15%, var(--sidebar));
 	--tab-selected-shadow: inset 0 0 0 0.8px rgb(255 255 255 / 0.1);
+	--tab-switcher-hover: color-mix(in oklab, var(--foreground) 20%, #1a1716);
 	--tab-icon-card: color-mix(in oklab, var(--foreground) 12%, var(--sidebar));
 	--tab-icon-card-shadow:
 		inset 0 0.5px 0 rgb(255 255 255 / 0.14), 0 0 0 1px rgb(0 0 0 / 0.55);
@@ -136,6 +137,7 @@
 	--tab-selected-shadow:
 		0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent),
 		0 1.5px 3.5px rgb(0 0 0 / 0.1);
+	--tab-switcher-hover: color-mix(in oklab, var(--foreground) 4%, var(--card));
 	--tab-icon-card: var(--card);
 	--tab-icon-card-shadow:
 		0 0 0 1px color-mix(in oklab, var(--foreground) 14%, transparent),
@@ -148,6 +150,7 @@
 	--tab-hover: transparent;
 	--tab-selected: color-mix(in oklab, var(--foreground) 7%, var(--sidebar));
 	--tab-selected-shadow: none;
+	--tab-switcher-hover: var(--tab-selected);
 }
 
 :root.light[data-window-focused="false"] {
