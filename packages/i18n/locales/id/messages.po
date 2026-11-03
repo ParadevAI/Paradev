@@ -19350,6 +19350,9 @@ msgstr "Beralih ke Workspace 9"
 msgid "Switch to…"
 msgstr "Beralih ke…"
 
+msgid "Switch workspace"
+msgstr "Ganti workspace"
+
 msgid "Switch Workspace"
 msgstr "Ganti workspace"
 

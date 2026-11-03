@@ -19350,6 +19350,9 @@ msgstr "Przełącz na obszar roboczy 9"
 msgid "Switch to…"
 msgstr "Przełącz na…"
 
+msgid "Switch workspace"
+msgstr "Przełącz obszar roboczy"
+
 msgid "Switch Workspace"
 msgstr "Przełącz obszar roboczy"
 

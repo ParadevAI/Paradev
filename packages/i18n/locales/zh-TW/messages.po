@@ -19350,6 +19350,9 @@ msgstr "切換到工作區9"
 msgid "Switch to…"
 msgstr "切換至…"
 
+msgid "Switch workspace"
+msgstr "切換工作區"
+
 msgid "Switch Workspace"
 msgstr "切換工作區"
 

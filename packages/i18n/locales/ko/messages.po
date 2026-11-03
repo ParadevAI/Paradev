@@ -19350,6 +19350,9 @@ msgstr "워크스페이스 9로 전환"
 msgid "Switch to…"
 msgstr "전환 대상…"
 
+msgid "Switch workspace"
+msgstr "워크스페이스 전환"
+
 msgid "Switch Workspace"
 msgstr "워크스페이스 전환"
 

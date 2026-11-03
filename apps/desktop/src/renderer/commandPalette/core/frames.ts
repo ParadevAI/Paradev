@@ -27,7 +27,7 @@ interface FrameStackState {
 	frames: Frame[];
 	/** Counts switcher-hotkey presses while the switcher is open; the list advances on each. */
 	switcherStep: number;
-	/** Opened with the modifier held, so releasing it switches to the selection. */
+	/** Armed once a further hotkey press steps while the modifier is held: releasing it then switches. */
 	switcherHold: boolean;
 	switcherSelection: SwitcherSelection | null;
 	setOpen: (open: boolean) => void;
@@ -35,7 +35,7 @@ interface FrameStackState {
 		via: SwitcherOpenedVia;
 		holdsModifier: boolean;
 	}) => void;
-	stepSwitcher: () => void;
+	stepSwitcher: (holdsModifier: boolean) => void;
 	releaseSwitcherHold: () => void;
 	setSwitcherSelection: (selection: SwitcherSelection | null) => void;
 	pushFrame: (command: Command) => void;
@@ -72,12 +72,15 @@ export const useFrameStackStore = create<FrameStackState>((set) => ({
 				root: "switcher",
 				frames: [],
 				switcherStep: 0,
-				switcherHold: holdsModifier,
+				switcherHold: false,
 				switcherSelection: null,
 			};
 		}),
-	stepSwitcher: () =>
-		set((state) => ({ switcherStep: state.switcherStep + 1 })),
+	stepSwitcher: (holdsModifier) =>
+		set((state) => ({
+			switcherStep: state.switcherStep + 1,
+			switcherHold: holdsModifier,
+		})),
 	releaseSwitcherHold: () => set({ switcherHold: false }),
 	setSwitcherSelection: (switcherSelection) =>
 		set((state) =>

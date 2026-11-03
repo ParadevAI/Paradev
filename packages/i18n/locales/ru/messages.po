@@ -19350,6 +19350,9 @@ msgstr "Перейти в рабочую область 9"
 msgid "Switch to…"
 msgstr "Перейти к…"
 
+msgid "Switch workspace"
+msgstr "Сменить рабочую область"
+
 msgid "Switch Workspace"
 msgstr "Сменить рабочую область"
 

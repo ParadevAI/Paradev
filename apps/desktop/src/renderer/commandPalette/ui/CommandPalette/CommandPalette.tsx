@@ -85,22 +85,24 @@ export function CommandPalette() {
 	);
 
 	const handleBack = useCallback(() => {
-		popFrame();
+		// The switcher root goes back to the commands root.
+		if (depth > 0) popFrame();
+		else setOpen(true);
 		setQuery("");
 		// Going back can unmount the focused element (the back button leaves
 		// with the last frame); return focus to the search input so keyboard
 		// navigation keeps working.
 		inputRef.current?.focus();
-	}, [popFrame]);
+	}, [depth, popFrame, setOpen]);
 
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
-			if (event.key === "Backspace" && !query && depth > 0) {
+			if (event.key === "Backspace" && !query && (depth > 0 || isSwitcher)) {
 				event.preventDefault();
 				handleBack();
 			}
 		},
-		[query, depth, handleBack],
+		[query, depth, isSwitcher, handleBack],
 	);
 
 	// cmdk's root Enter handler executes the highlighted list row no matter
@@ -214,7 +216,7 @@ export function CommandPalette() {
 						onValueChange={setQuery}
 						placeholder={placeholder}
 						onKeyDown={handleKeyDown}
-						leading={depth > 0 ? backButton : undefined}
+						leading={depth > 0 || isSwitcher ? backButton : undefined}
 					/>
 					<QueryContext.Provider value={query}>
 						{currentFrame ? (

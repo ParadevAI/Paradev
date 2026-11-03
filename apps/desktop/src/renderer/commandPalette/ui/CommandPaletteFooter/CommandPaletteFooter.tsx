@@ -12,7 +12,7 @@ export function CommandPaletteFooter() {
 			{switcher.keys[0] !== "Unassigned" ? (
 				<KeyHint
 					keys={switcher.keys}
-					label={t({ message: "All workspaces" })}
+					label={t({ message: "Switch workspace" })}
 				/>
 			) : null}
 			<KeyHint keys={[">"]} label={t({ message: "Commands only" })} />

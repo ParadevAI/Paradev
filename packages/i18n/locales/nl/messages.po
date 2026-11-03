@@ -19350,6 +19350,9 @@ msgstr "Naar werkruimte 9"
 msgid "Switch to…"
 msgstr "Wisselen naar…"
 
+msgid "Switch workspace"
+msgstr "Van werkruimte wisselen"
+
 msgid "Switch Workspace"
 msgstr "Van werkruimte wisselen"
 

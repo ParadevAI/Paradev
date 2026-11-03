@@ -19350,6 +19350,9 @@ msgstr "Přepnout na pracovní prostor 9"
 msgid "Switch to…"
 msgstr "Přepnout na…"
 
+msgid "Switch workspace"
+msgstr "Přepnout pracovní prostor"
+
 msgid "Switch Workspace"
 msgstr "Přepnout pracovní prostor"
 

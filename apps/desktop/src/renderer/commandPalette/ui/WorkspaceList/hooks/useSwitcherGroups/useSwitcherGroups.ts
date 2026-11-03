@@ -8,14 +8,37 @@ import {
 	bucketWorkspaces,
 	type SwitcherGroup,
 } from "../../utils/bucketWorkspaces";
+import {
+	parseSwitcherQuery,
+	type SwitcherQuery,
+} from "../../utils/parseSwitcherQuery";
+import { scopeWorkspaces } from "../../utils/scopeWorkspaces";
 
-/** Every reachable workspace in switcher order, with the viewed one marked current. */
-export function useSwitcherGroups(): SwitcherGroup<AccessibleV2Workspace>[] {
+export interface SwitcherGroups {
+	groups: SwitcherGroup<AccessibleV2Workspace>[];
+	query: SwitcherQuery;
+}
+
+/** The workspaces the query reaches, in switcher order, with the viewed one marked current. */
+export function useSwitcherGroups(rawQuery: string): SwitcherGroups {
 	const { all: workspaces } = useAccessibleV2Workspaces();
 	const currentPath = useLocation({ select: (loc) => loc.pathname });
 	const currentId = currentPath.match(/^\/v2-workspace\/([^/]+)/)?.[1] ?? null;
-	return useMemo(
-		() => bucketWorkspaces(workspaces, currentId),
-		[workspaces, currentId],
+	const query = useMemo(
+		() =>
+			parseSwitcherQuery(
+				rawQuery,
+				workspaces.map((workspace) => workspace.createdByName),
+			),
+		[rawQuery, workspaces],
 	);
+	const groups = useMemo(
+		() =>
+			bucketWorkspaces(
+				scopeWorkspaces(workspaces, query, currentId),
+				currentId,
+			),
+		[workspaces, query, currentId],
+	);
+	return { groups, query };
 }
