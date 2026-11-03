@@ -9,6 +9,7 @@ import {
 	notifyBrowserExtensionsChanged,
 	removeBrowserExtension,
 	setBrowserExtensionPinned,
+	setTurnedOffBrowserExtensions,
 } from "./browser-extensions";
 import { trackExtensionLifecycle } from "./extension-lifecycle";
 import { createExtensionState } from "./extension-state";
@@ -202,7 +203,9 @@ function startExtensionHost(): void {
 	void installBrowserWebStore(browserSession, {
 		removeExtension: removeBrowserExtension,
 		pinExtension: (extensionId) => setBrowserExtensionPinned(extensionId, true),
-	}).catch((error: unknown) => {
-		console.error("[extension-host] Chrome Web Store setup failed:", error);
-	});
+	})
+		.then(setTurnedOffBrowserExtensions)
+		.catch((error: unknown) => {
+			console.error("[extension-host] Chrome Web Store setup failed:", error);
+		});
 }

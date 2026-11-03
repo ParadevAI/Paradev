@@ -5686,6 +5686,9 @@ msgstr "Nepodařilo se zaznamenat cloudový pracovní prostor"
 msgid "Could not record environment"
 msgstr "Prostředí se nepodařilo uložit"
 
+msgid "Could not reinstall {name}"
+msgstr "{name} se nepodařilo znovu nainstalovat"
+
 msgid "Could not remove {name}"
 msgstr "{name} se nepodařilo odebrat"
 
@@ -15425,6 +15428,9 @@ msgstr "Region"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Zaregistruje lifecycle hooky do globální konfigurace tohoto agenta, aby Paradev mohl zobrazovat stav a posílat oznámení. Vypnutím se záznamy Paradev odeberou všude — stav a oznámení pro tohoto agenta přestanou fungovat, i uvnitř Paradev."
 
+msgid "Reinstall {name}"
+msgstr "Znovu nainstalovat {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "se znovu připojil(a) ke kanálu {channel} na pozvání uživatele {inviter}, stejně jako {others}."
 
@@ -20219,6 +20225,9 @@ msgstr "Proměňte konverzace ve Slacku v úkoly, spouštějte agenty ze svého 
 
 msgid "turn the onboarding findings into a page"
 msgstr "udělej z poznatků o onboardingu stránku"
+
+msgid "Turned off because its files changed"
+msgstr "Vypnuto, protože se změnily jeho soubory"
 
 msgid "Two Hands"
 msgstr "Obě ruce"

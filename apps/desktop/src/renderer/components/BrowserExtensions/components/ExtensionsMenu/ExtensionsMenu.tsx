@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { TbPlus, TbPuzzle } from "react-icons/tb";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { useActivateBrowserExtension } from "../../hooks/useActivateBrowserExtension";
+import { useReinstallBrowserExtension } from "../../hooks/useReinstallBrowserExtension";
 import { useSetBrowserExtensionPinned } from "../../hooks/useSetBrowserExtensionPinned";
 import { RemoveExtensionDialog } from "../RemoveExtensionDialog";
 import { ExtensionMenuRow } from "./components/ExtensionMenuRow";
@@ -34,6 +35,7 @@ export function ExtensionsMenu({
 	const { t } = useLingui();
 	const activate = useActivateBrowserExtension(paneId);
 	const setPinned = useSetBrowserExtensionPinned();
+	const reinstall = useReinstallBrowserExtension();
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const [removeTarget, setRemoveTarget] = useState<BrowserExtension | null>(
@@ -86,6 +88,10 @@ export function ExtensionsMenu({
 									onActivate={() => activate(extension, triggerRef.current)}
 									onTogglePin={() => setPinned(extension, !extension.pinned)}
 									onRemove={() => requestRemove(extension)}
+									onReinstall={() => {
+										setIsOpen(false);
+										reinstall(extension);
+									}}
 								/>
 							))}
 							<DropdownMenuSeparator />
