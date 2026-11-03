@@ -3330,6 +3330,9 @@ msgstr "Backed by"
 msgid "Background"
 msgstr "Background"
 
+msgid "Background · {count}"
+msgstr "Background · {count}"
+
 msgid "Background processes"
 msgstr "Background processes"
 
@@ -18311,6 +18314,9 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagents"
+
+msgid "Subagents · {count}"
+msgstr "Subagents · {count}"
 
 msgid "Subject contains..."
 msgstr "Subject contains..."

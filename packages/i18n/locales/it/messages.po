@@ -3330,6 +3330,9 @@ msgstr "Sostenuti da"
 msgid "Background"
 msgstr "Sfondo"
 
+msgid "Background · {count}"
+msgstr "In background · {count}"
+
 msgid "Background processes"
 msgstr "Processi in background"
 
@@ -18311,6 +18314,9 @@ msgstr "Sottoagente"
 
 msgid "Subagents"
 msgstr "Sottoagenti"
+
+msgid "Subagents · {count}"
+msgstr "Sottoagenti · {count}"
 
 msgid "Subject contains..."
 msgstr "L'oggetto contiene..."

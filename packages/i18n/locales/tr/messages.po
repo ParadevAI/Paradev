@@ -3330,6 +3330,9 @@ msgstr "Destekçilerimiz"
 msgid "Background"
 msgstr "Arka plan"
 
+msgid "Background · {count}"
+msgstr "Arka planda · {count}"
+
 msgid "Background processes"
 msgstr "Arka plan işlemleri"
 
@@ -18311,6 +18314,9 @@ msgstr "Alt ajan"
 
 msgid "Subagents"
 msgstr "Alt ajanlar"
+
+msgid "Subagents · {count}"
+msgstr "Alt ajanlar · {count}"
 
 msgid "Subject contains..."
 msgstr "Konu şunu içerir..."

@@ -3330,6 +3330,9 @@ msgstr "Didukung oleh"
 msgid "Background"
 msgstr "Latar belakang"
 
+msgid "Background · {count}"
+msgstr "Latar belakang · {count}"
+
 msgid "Background processes"
 msgstr "Proses latar belakang"
 
@@ -18311,6 +18314,9 @@ msgstr "Subagen"
 
 msgid "Subagents"
 msgstr "Subagen"
+
+msgid "Subagents · {count}"
+msgstr "Subagen · {count}"
 
 msgid "Subject contains..."
 msgstr "Subjek mengandung..."

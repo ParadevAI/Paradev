@@ -3324,6 +3324,9 @@ msgstr "Нас підтримують"
 msgid "Background"
 msgstr "Фон"
 
+msgid "Background · {count}"
+msgstr "У фоні · {count}"
+
 msgid "Background processes"
 msgstr "Фонові процеси"
 
@@ -18305,6 +18308,9 @@ msgstr "Субагент"
 
 msgid "Subagents"
 msgstr "Субагенти"
+
+msgid "Subagents · {count}"
+msgstr "Субагенти · {count}"
 
 msgid "Subject contains..."
 msgstr "Тема містить..."

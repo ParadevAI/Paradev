@@ -71,7 +71,7 @@ import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
-import { LiveChangesPill } from "./components/LiveChangesPill";
+import { ComposerChips } from "./components/ComposerChips";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -516,7 +516,7 @@ export function SessionView({
 	);
 	const onStopTask = useCallback(
 		(taskId: string) =>
-			void stopBackgroundTask(taskId)
+			stopBackgroundTask(taskId)
 				.then((stopped) => {
 					if (!stopped) throw new Error("the agent did not stop the task");
 				})
@@ -746,8 +746,17 @@ export function SessionView({
 						</ConnectionNotice>
 					)
 				)}
-				{runningTurnId && !focusedSubagentId && (
-					<LiveChangesPill refreshKey={liveRefreshKey} turnId={runningTurnId} />
+				{!focusedSubagentId && (
+					<ComposerChips
+						backgroundTasks={sessionState?.backgroundTasks}
+						liveRefreshKey={liveRefreshKey}
+						onMoveToBackground={onBackgroundSubagent}
+						onOpenSubagent={openSubagent}
+						onStopTask={onStopTask}
+						runningTurnId={runningTurnId}
+						sessionId={client.sessionId}
+						terminalId={terminalId}
+					/>
 				)}
 				<WorkDrawer
 					notice={

@@ -3330,6 +3330,9 @@ msgstr "Нас поддерживают"
 msgid "Background"
 msgstr "Фон"
 
+msgid "Background · {count}"
+msgstr "В фоне · {count}"
+
 msgid "Background processes"
 msgstr "Фоновые процессы"
 
@@ -18311,6 +18314,9 @@ msgstr "Субагент"
 
 msgid "Subagents"
 msgstr "Субагенты"
+
+msgid "Subagents · {count}"
+msgstr "Субагенты · {count}"
 
 msgid "Subject contains..."
 msgstr "Тема содержит..."

@@ -3330,6 +3330,9 @@ msgstr "투자자"
 msgid "Background"
 msgstr "배경"
 
+msgid "Background · {count}"
+msgstr "백그라운드 · {count}"
+
 msgid "Background processes"
 msgstr "백그라운드 프로세스"
 
@@ -18311,6 +18314,9 @@ msgstr "서브 에이전트"
 
 msgid "Subagents"
 msgstr "서브 에이전트"
+
+msgid "Subagents · {count}"
+msgstr "서브 에이전트 · {count}"
 
 msgid "Subject contains..."
 msgstr "제목에 포함..."

@@ -3330,6 +3330,9 @@ msgstr "Gesteund door"
 msgid "Background"
 msgstr "Achtergrond"
 
+msgid "Background · {count}"
+msgstr "Op de achtergrond · {count}"
+
 msgid "Background processes"
 msgstr "Achtergrondprocessen"
 
@@ -18311,6 +18314,9 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagents"
+
+msgid "Subagents · {count}"
+msgstr "Subagents · {count}"
 
 msgid "Subject contains..."
 msgstr "Onderwerp bevat..."
