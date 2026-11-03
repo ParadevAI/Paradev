@@ -271,6 +271,9 @@ export const settings = sqliteTable("settings", {
 		InstalledPlugin[]
 	>(),
 	disabledSkills: text("disabled_skills", { mode: "json" }).$type<string[]>(),
+	browserPinnedExtensions: text("browser_pinned_extensions", {
+		mode: "json",
+	}).$type<string[]>(),
 });
 
 export type InsertSettings = typeof settings.$inferInsert;

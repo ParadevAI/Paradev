@@ -10,10 +10,14 @@
 
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, Server } from "node:http";
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
 import { desktopNotificationSchema } from "@superset/shared/desktop-notification";
 import { paneLayoutRequestSchema } from "@superset/shared/pane-layout-ops";
+import { BrowserWindow, dialog, session } from "electron";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
+import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import { type WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
 import { showCliNotification } from "../notifications/show-cli-notification";
@@ -40,6 +44,44 @@ import {
 const OPEN_PANE_TIMEOUT_MS = 15_000;
 const MAX_CDP_MESSAGE_BYTES = 4 * 1024 * 1024;
 const CDP_PATH = /^\/panes\/([^/]+)\/cdp$/;
+const USER_PANE_ERROR =
+	"This pane is the user's own browser, with their logins and extensions. Agents can use only the panes they open.";
+
+const LOGIN_IMPORT_REFUSED = "The user did not allow this login import.";
+
+// Cookies are live sign-ins, so the user says yes to each copy into an agent's pane.
+async function confirmLoginImport(
+	browserName: string,
+	profileName: string,
+): Promise<boolean> {
+	const box: Electron.MessageBoxOptions = {
+		type: "question",
+		buttons: [
+			i18n._(msg({ message: "Allow" })),
+			i18n._(msg({ message: "Don't allow" })),
+		],
+		defaultId: 1,
+		cancelId: 1,
+		message: i18n._(
+			msg({ message: `Let an agent use your ${browserName} logins?` }),
+		),
+		detail: i18n._(
+			msg({
+				message: `It copies the cookies from your "${profileName}" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to.`,
+			}),
+		),
+	};
+	const window =
+		BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+	const { response } = window
+		? await dialog.showMessageBox(window, box)
+		: await dialog.showMessageBox(box);
+	return response === 0;
+}
+
+function isAgentPane(wc: Electron.WebContents): boolean {
+	return wc.session === session.fromPartition(AGENT_BROWSER_PARTITION);
+}
 
 let server: Server | null = null;
 
@@ -76,6 +118,11 @@ function requireScope(
 		res.status(400).json({ error: "workspaceId is required" });
 		return null;
 	}
+	const wc = browserManager.getWebContents(paneId, raw);
+	if (wc && !isAgentPane(wc)) {
+		res.status(403).json({ error: USER_PANE_ERROR });
+		return null;
+	}
 	return { paneId, workspaceId: raw };
 }
 
@@ -97,7 +144,11 @@ function withPane(
 	fn(wc, scope.paneId, scope.workspaceId);
 }
 
-export async function startBrowserBridge(): Promise<void> {
+export async function startBrowserBridge({
+	homeDir,
+}: {
+	homeDir?: string;
+} = {}): Promise<void> {
 	if (server) return;
 	const secret = randomBytes(32).toString("hex");
 	const app = express();
@@ -116,7 +167,11 @@ export async function startBrowserBridge(): Promise<void> {
 			typeof req.query.workspaceId === "string"
 				? req.query.workspaceId
 				: undefined;
-		res.json({ panes: browserManager.listPanes(workspaceId) });
+		const panes = browserManager.listPanes(workspaceId).filter((pane) => {
+			const wc = browserManager.getWebContents(pane.paneId);
+			return wc !== null && isAgentPane(wc);
+		});
+		res.json({ panes });
 	});
 
 	app.post("/open", (req, res) => {
@@ -184,6 +239,8 @@ export async function startBrowserBridge(): Promise<void> {
 				}) => {
 					if (event.workspaceId !== workspaceId) return;
 					if (known.has(event.paneId)) return;
+					const wc = browserManager.getWebContents(event.paneId);
+					if (!wc || !isAgentPane(wc)) return;
 					const info = browserManager
 						.listPanes(workspaceId)
 						.find((p) => p.paneId === event.paneId);
@@ -337,7 +394,7 @@ export async function startBrowserBridge(): Promise<void> {
 			res.status(400).json({ error: "sourceId is required" });
 			return;
 		}
-		const profile = resolveImportProfile(sourceId);
+		const profile = resolveImportProfile(sourceId, homeDir);
 		if (!profile) {
 			res.status(404).json({ error: "Unknown import source" });
 			return;
@@ -349,8 +406,20 @@ export async function startBrowserBridge(): Promise<void> {
 				.json({ error: `No live pane ${scope.paneId} in this workspace` });
 			return;
 		}
-		importCookiesIntoSession(wc.session, profile.profileDir, profile.browserKey)
-			.then((result) => res.json(result))
+		confirmLoginImport(profile.browserName, profile.profileName)
+			.then(async (allowed) => {
+				if (!allowed) {
+					res.status(403).json({ error: LOGIN_IMPORT_REFUSED });
+					return;
+				}
+				res.json(
+					await importCookiesIntoSession(
+						wc.session,
+						profile.profileDir,
+						profile.browserKey,
+					),
+				);
+			})
 			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 	});
 
@@ -388,14 +457,27 @@ export async function startBrowserBridge(): Promise<void> {
 	log.info(`[browser-bridge] listening on ${endpoint}`);
 }
 
+export async function stopBrowserBridge(): Promise<void> {
+	const running = server;
+	if (!running) return;
+	server = null;
+	running.closeAllConnections();
+	await new Promise<void>((resolve) => running.close(() => resolve()));
+}
+
 function handleCdpSocket(
 	paneId: string,
 	workspaceId: string,
 	ws: WebSocket,
 ): void {
-	let session: ReturnType<typeof browserManager.attachCdp>;
+	const wc = browserManager.getWebContents(paneId, workspaceId);
+	if (wc && !isAgentPane(wc)) {
+		ws.close(1008, "This pane is the user's own browser.");
+		return;
+	}
+	let cdp: ReturnType<typeof browserManager.attachCdp>;
 	try {
-		session = browserManager.attachCdp(
+		cdp = browserManager.attachCdp(
 			paneId,
 			workspaceId,
 			(payload) => {
@@ -413,13 +495,13 @@ function handleCdpSocket(
 		return;
 	}
 	ws.on("message", (data) => {
-		session.send(data.toString());
+		cdp.send(data.toString());
 	});
 	ws.on("close", () => {
-		session.detach();
+		cdp.detach();
 	});
 	ws.on("error", () => {
-		session.detach();
+		cdp.detach();
 	});
 }
 

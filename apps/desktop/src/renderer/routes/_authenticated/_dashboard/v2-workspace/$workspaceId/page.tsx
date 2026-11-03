@@ -126,6 +126,7 @@ interface WorkspaceSearch {
 	openUrl?: string;
 	openUrlTarget?: V2WorkspaceUrlOpenTarget;
 	openUrlRequestId?: string;
+	openUrlAgent?: true;
 }
 
 function parseOpenUrlTarget(
@@ -151,6 +152,7 @@ export const Route = createFileRoute(
 		openUrl: parseNonEmptyString(raw.openUrl),
 		openUrlTarget: parseOpenUrlTarget(raw.openUrlTarget),
 		openUrlRequestId: parseNonEmptyString(raw.openUrlRequestId),
+		openUrlAgent: raw.openUrlAgent === true ? true : undefined,
 	}),
 });
 
@@ -198,6 +200,7 @@ function V2WorkspaceContent() {
 		openUrl,
 		openUrlTarget,
 		openUrlRequestId,
+		openUrlAgent,
 	} = Route.useSearch();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
@@ -368,6 +371,7 @@ function V2WorkspaceContent() {
 		url: openUrl,
 		target: openUrlTarget,
 		requestId: openUrlRequestId,
+		agent: openUrlAgent,
 		consumeSearch,
 	});
 

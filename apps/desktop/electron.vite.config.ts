@@ -189,6 +189,9 @@ export default defineConfig({
 			rollupOptions: {
 				input: {
 					index: resolve("src/preload/index.ts"),
+					"browser-extension-shims": resolve(
+						"src/preload/browser-extension-shims.ts",
+					),
 				},
 			},
 		},

@@ -127,10 +127,21 @@ mock.module("electron", () => ({
 		),
 		showMessageBox: mock(() => Promise.resolve({ response: 0 })),
 	},
-	BrowserWindow: mock(() => ({
-		webContents: { send: mock() },
-		loadURL: mock(),
-		on: mock(),
+	BrowserWindow: Object.assign(
+		mock(() => ({
+			webContents: { send: mock() },
+			loadURL: mock(),
+			on: mock(),
+		})),
+		{ getFocusedWindow: mock(() => null), getAllWindows: mock(() => []) },
+	),
+	WebContentsView: mock(() => ({
+		webContents: {
+			send: mock(),
+			once: mock(),
+			loadURL: mock(() => Promise.resolve()),
+			close: mock(),
+		},
 	})),
 	ipcMain: {
 		handle: mock(),
@@ -169,6 +180,24 @@ mock.module("electron", () => ({
 		buildFromTemplate: mock(() => ({})),
 		setApplicationMenu: mock(),
 	},
+	session: {
+		defaultSession: {},
+		fromPartition: mock(() => ({})),
+	},
+	net: {},
+	nativeImage: {
+		createFromBuffer: mock(() => ({})),
+	},
+	powerMonitor: {
+		getSystemIdleState: mock(() => "active"),
+	},
+	contextBridge: {
+		executeInMainWorld: mock(),
+		exposeInMainWorld: mock(),
+	},
+	// Named so preloads can import it. Undefined, as in the main process, so
+	// electron-log does not start its renderer bridge.
+	ipcRenderer: undefined,
 }));
 
 // =============================================================================

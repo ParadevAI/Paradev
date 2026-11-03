@@ -17,6 +17,7 @@ import { getIconPath } from "main/lib/dock-icon";
 import { localDb } from "main/lib/local-db";
 import { isExpectedRendererExit } from "main/lib/renderer-exit";
 import {
+	APP_PARTITION,
 	NOTIFICATION_EVENTS,
 	PLATFORM,
 	TITLE_BAR_OVERLAY_HEIGHT,
@@ -446,7 +447,7 @@ export async function createPlatformWindow({
 			plugins: true,
 			// Isolate Electron session from system browser cookies
 			// This ensures desktop uses bearer token auth, not web cookies
-			partition: "persist:superset",
+			partition: APP_PARTITION,
 		},
 	});
 

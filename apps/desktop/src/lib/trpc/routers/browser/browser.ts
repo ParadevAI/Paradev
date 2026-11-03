@@ -4,13 +4,18 @@ import {
 	type BrowserOpenRequest,
 	browserManager,
 } from "main/lib/browser/browser-manager";
+import { clearPaneData } from "main/lib/browser/clear-pane-data";
 import { screenshotManager } from "main/lib/screenshot-manager";
+import { BROWSER_PARTITION, PANE_PARTITIONS } from "shared/constants";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+import { createBrowserExtensionsRouter } from "./extensions";
 
 export const createBrowserRouter = () => {
 	return router({
+		extensions: createBrowserExtensionsRouter(),
+
 		register: publicProcedure
 			.input(
 				z.object({
@@ -351,23 +356,8 @@ export const createBrowserRouter = () => {
 				}),
 			)
 			.mutation(async ({ input }) => {
-				const ses = session.fromPartition("persist:superset");
-				switch (input.type) {
-					case "cookies":
-						await ses.clearStorageData({ storages: ["cookies"] });
-						break;
-					case "cache":
-						await ses.clearCache();
-						break;
-					case "storage":
-						await ses.clearStorageData({
-							storages: ["localstorage", "indexdb"],
-						});
-						break;
-					case "all":
-						await ses.clearStorageData();
-						await ses.clearCache();
-						break;
+				for (const partition of PANE_PARTITIONS) {
+					await clearPaneData(session.fromPartition(partition), input.type);
 				}
 				return { success: true };
 			}),
@@ -393,7 +383,7 @@ export const createBrowserRouter = () => {
 		// (imported "logins" are cookies, not stored passwords).
 		getCookieDomains: publicProcedure.query(async () => {
 			const cookies = await session
-				.fromPartition("persist:superset")
+				.fromPartition(BROWSER_PARTITION)
 				.cookies.get({});
 			const domains = new Map<string, number>();
 			for (const cookie of cookies) {
@@ -409,7 +399,7 @@ export const createBrowserRouter = () => {
 		clearCookiesForDomain: publicProcedure
 			.input(z.object({ domain: z.string() }))
 			.mutation(async ({ input }) => {
-				const ses = session.fromPartition("persist:superset");
+				const ses = session.fromPartition(BROWSER_PARTITION);
 				const cookies = await ses.cookies.get({ domain: input.domain });
 				await Promise.all(
 					cookies.map((cookie) => {

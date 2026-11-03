@@ -116,6 +116,8 @@
 		"@xterm/addon-ligatures@0.11.0-beta.310": "patches/@xterm%2Faddon-ligatures@0.11.0-beta.310.patch",
 		"@xterm/addon-serialize@0.15.0-beta.310": "patches/@xterm%2Faddon-serialize@0.15.0-beta.310.patch",
 		"react-native@0.88.1": "patches/react-native@0.88.1.patch",
-		"@pierre/diffs@1.6.2": "patches/@pierre%2Fdiffs@1.6.2.patch"
+		"@pierre/diffs@1.6.2": "patches/@pierre%2Fdiffs@1.6.2.patch",
+		"electron-chrome-web-store@0.13.0": "patches/electron-chrome-web-store@0.13.0.patch",
+		"electron-chrome-extensions@4.10.0": "patches/electron-chrome-extensions@4.10.0.patch"
 	}
 }

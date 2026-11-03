@@ -399,7 +399,26 @@ function validateParcelWatcherPrepared(): void {
 	);
 }
 
+// Without these the browser pane still loads extensions, but with none of the
+// Chrome APIs they call, and only a console error says so.
+function validateBrowserExtensionPreloadsBuilt(): void {
+	for (const file of [
+		"main/chrome-extension-api.preload.js",
+		"main/chrome-web-store.preload.js",
+		"preload/browser-extension-shims.js",
+	]) {
+		assertExists(
+			join(projectRoot, "dist", file),
+			"Browser extension preload missing from the build. Run `bun run compile:app` first.",
+		);
+	}
+	console.log(
+		"[validate:native-runtime] OK: browser extension preloads present",
+	);
+}
+
 function main(): void {
+	validateBrowserExtensionPreloadsBuilt();
 	validateWorkspacePackagesBundled();
 	validateOnlyExpectedExternalRequires();
 	validateParcelWatcherNotBundled();
