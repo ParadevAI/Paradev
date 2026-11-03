@@ -66,11 +66,11 @@ export function ChatPane({
 					titleOverride: title,
 					data: { terminalId } satisfies TerminalPaneData,
 				});
-				return true;
+				return terminalId;
 			} catch (error) {
 				console.error("[chat] could not open a terminal", error);
 				toast.error(t({ message: "Couldn't open a terminal" }));
-				return false;
+				return null;
 			}
 		},
 		[launcher, split, t],
@@ -162,16 +162,19 @@ export function ChatPane({
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
-				onSessionInfo={({ harnessSessionId, title }) => {
+				onSessionInfo={({ harnessSessionId, title, modeId }) => {
 					const rebound = harnessSessionId !== undefined && data.agent;
 					const retitled = title !== undefined && title !== data.chatTitle;
-					if (!rebound && !retitled) return;
+					// A resume keeps the mode the chat was in, not the saved default.
+					const remoded = modeId !== undefined && modeId !== data.chatModeId;
+					if (!rebound && !retitled && !remoded) return;
 					ctx.actions.updateData({
 						...data,
 						...(rebound
 							? { agent: { ...rebound, sessionId: harnessSessionId } }
 							: {}),
 						...(retitled ? { chatTitle: title } : {}),
+						...(remoded ? { chatModeId: modeId } : {}),
 					});
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {

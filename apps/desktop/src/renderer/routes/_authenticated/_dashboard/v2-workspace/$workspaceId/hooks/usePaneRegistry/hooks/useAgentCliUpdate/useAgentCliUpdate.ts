@@ -5,7 +5,7 @@ import {
 } from "@superset/shared/agent-catalog";
 import { COMPANY } from "@superset/shared/constants";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	agentCliUpdateKey,
 	useAgentCliUpdateWatches,
@@ -14,15 +14,16 @@ import { hasUpdateLanded } from "./utils/hasUpdateLanded";
 
 const STATUS_STALE_MS = 60_000;
 const UPDATE_POLL_MS = 3_000;
+const COMMAND_POLL_MS = 1_000;
 const UPDATE_WATCH_MS = 5 * 60_000;
 
 export const AGENT_CLI_UPDATE_DOCS_URL = `${COMPANY.DOCS_URL}/chat#update-the-agent-cli`;
 
-/** Opens a terminal pane running `command`; false when none could open. */
+/** Opens a terminal pane running `command`: its id, or null when none opened. */
 export type RunInTerminal = (
 	command: string,
 	title: string,
-) => Promise<boolean>;
+) => Promise<string | null>;
 
 export type AgentCliUpdatePhase = "idle" | "updating" | "updated";
 
@@ -50,12 +51,14 @@ export function useAgentCliUpdate({
 	const key = agentCliUpdateKey(workspaceId, harness);
 	const watch = useAgentCliUpdateWatches((store) => store.watches[key] ?? null);
 	const startWatch = useAgentCliUpdateWatches((store) => store.start);
+	const patchWatch = useAgentCliUpdateWatches((store) => store.patch);
 	const clearWatch = useAgentCliUpdateWatches((store) => store.clear);
-	const { data } = workspaceTrpc.agentTooling.agentCliStatus.useQuery(
+	const { data, refetch } = workspaceTrpc.agentTooling.agentCliStatus.useQuery(
 		{ workspaceId, harness: harness ?? "" },
 		{
 			enabled: harness !== undefined,
 			staleTime: STATUS_STALE_MS,
+			refetchOnMount: "always",
 			retry: false,
 			refetchInterval: (query) =>
 				watch && !hasUpdateLanded(watch, query.state.data ?? null)
@@ -83,6 +86,36 @@ export function useAgentCliUpdate({
 	}, [watch, updated, clearWatch, key]);
 	const finish = useCallback(() => clearWatch(key), [clearWatch, key]);
 
+	// A command that ran and exited without changing the install failed or did
+	// nothing: give the Update action back instead of waiting out the watch.
+	const terminalId = watch?.terminalId;
+	const { data: commandState } =
+		workspaceTrpc.terminal.hasRunningProcess.useQuery(
+			{ terminalId: terminalId ?? "", workspaceId },
+			{
+				enabled: terminalId !== undefined && !updated,
+				refetchInterval: COMMAND_POLL_MS,
+				retry: false,
+			},
+		);
+	const checkingExit = useRef(false);
+	useEffect(() => {
+		if (!watch || updated || commandState === undefined) return;
+		if (commandState.running) {
+			if (!watch.ran) patchWatch(key, { ran: true });
+			return;
+		}
+		if (!watch.ran || checkingExit.current) return;
+		checkingExit.current = true;
+		void refetch()
+			.then(({ data: fresh }) => {
+				if (!hasUpdateLanded(watch, fresh ?? null)) clearWatch(key);
+			})
+			.finally(() => {
+				checkingExit.current = false;
+			});
+	}, [watch, updated, commandState, patchWatch, refetch, clearWatch, key]);
+
 	const command = status?.updateCommand ?? null;
 	const canUpdate = command !== null && onRunInTerminal !== undefined;
 	const binary = status?.binary;
@@ -104,7 +137,8 @@ export function useAgentCliUpdate({
 			command,
 			t({ message: `Update ${label}` }),
 		);
-		if (!opened) clearWatch(key);
+		if (opened) patchWatch(key, { terminalId: opened });
+		else clearWatch(key);
 	}, [
 		command,
 		onRunInTerminal,
@@ -113,6 +147,7 @@ export function useAgentCliUpdate({
 		sessionId,
 		t,
 		startWatch,
+		patchWatch,
 		clearWatch,
 		key,
 	]);
