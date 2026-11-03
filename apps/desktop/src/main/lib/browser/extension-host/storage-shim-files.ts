@@ -105,10 +105,13 @@ export async function addStorageShimFiles(
 	const shimmed = shimManifestText(manifest);
 	if (shimmed !== manifest) await writeFile(manifestPath, shimmed);
 
-	const files = await readdir(extensionPath, { recursive: true });
-	for (const file of files) {
-		if (!isExtensionPage(file)) continue;
-		const pagePath = path.join(extensionPath, file);
+	const entries = await readdir(extensionPath, {
+		recursive: true,
+		withFileTypes: true,
+	});
+	for (const entry of entries) {
+		if (!entry.isFile() || !isExtensionPage(entry.name)) continue;
+		const pagePath = path.join(entry.parentPath, entry.name);
 		const page = shimPage(await readFile(pagePath));
 		if (page) await writeFile(pagePath, page);
 	}

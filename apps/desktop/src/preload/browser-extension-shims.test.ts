@@ -332,6 +332,73 @@ test("an extension service worker gets runtime.onInstalled once its listeners ar
 	expect(reasons).toEqual(["menu install", "confirmed"]);
 });
 
+test("runtime.onInstalled asks again when the first ask failed or every listener left before it answered", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	type Listener = (details: { reason: string }) => void;
+	const settle = async () => {
+		for (let tick = 0; tick < 5; tick++) await Promise.resolve();
+	};
+	const workerWith = (firstAnswer: () => Promise<unknown>) => {
+		const answers = [
+			firstAnswer,
+			async () => ({ details: { reason: "update" }, version: "3.0" }),
+		];
+		const installedEvent = mock(async (method: string, _version?: string) =>
+			method === "pending" ? answers.shift()?.() : null,
+		);
+		const runtime = {
+			onInstalled: {
+				addListener: (_listener: Listener) => {},
+				removeListener: (_listener: Listener) => {},
+			},
+		};
+		const worker = runInMainWorld(
+			shim,
+			"chrome-extension://aapbdbdomjkkjkaonfhkkikfgjllcleb/main.js",
+			{ isServiceWorker: true, chrome: { runtime }, installedEvent },
+		);
+		return {
+			installedEvent,
+			onInstalled: (worker.chrome.runtime as typeof runtime).onInstalled,
+		};
+	};
+
+	const failed = workerWith(async () => {
+		throw new Error("worker not ready");
+	});
+	const reasons: string[] = [];
+	failed.onInstalled.addListener(({ reason }) => reasons.push(`a ${reason}`));
+	await settle();
+	failed.onInstalled.addListener(({ reason }) => reasons.push(`b ${reason}`));
+	await settle();
+	expect(failed.installedEvent.mock.calls).toEqual([
+		["pending"],
+		["pending"],
+		["delivered", "3.0"],
+	]);
+	expect(reasons).toEqual(["a update", "b update"]);
+
+	const left = workerWith(async () => ({
+		details: { reason: "update" },
+		version: "3.0",
+	}));
+	const leaving: Listener = () => reasons.push("left");
+	left.onInstalled.addListener(leaving);
+	left.onInstalled.removeListener(leaving);
+	await settle();
+	left.onInstalled.addListener(({ reason }) => {
+		reasons.push(`c ${reason}`);
+		left.onInstalled.addListener(() => reasons.push("added while running"));
+	});
+	await settle();
+	expect(left.installedEvent.mock.calls).toEqual([
+		["pending"],
+		["pending"],
+		["delivered", "3.0"],
+	]);
+	expect(reasons).toEqual(["a update", "b update", "c update"]);
+});
+
 test("a failed chrome.declarativeNetRequest call still runs its callback, with runtime.lastError", async () => {
 	const shim = await importInWorkerPreloadRealm();
 	const runtime: { lastError?: { message: string } } = {};

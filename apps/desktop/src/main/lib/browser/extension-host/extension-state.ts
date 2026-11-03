@@ -23,14 +23,58 @@ export interface ExtensionState {
 	forget(extensionId: string): void;
 }
 
-function readState(filePath: string): StateFile | null {
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+/** The saved state without malformed entries; "missing" when there is none or it is corrupt, which is moved aside. */
+function readState(filePath: string): StateFile | "missing" | "unreadable" {
+	let text: string;
 	try {
-		const parsed = JSON.parse(readFileSync(filePath, "utf8"));
-		if (parsed && typeof parsed === "object") {
-			return { installed: parsed.installed ?? {}, menus: parsed.menus ?? {} };
-		}
+		text = readFileSync(filePath, "utf8");
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return "missing";
+		console.error(
+			"[extension-host] Could not read extension state; it is left as is:",
+			error,
+		);
+		return "unreadable";
+	}
+	let parsed: unknown = null;
+	try {
+		parsed = JSON.parse(text);
 	} catch {}
-	return null;
+	if (!isRecord(parsed)) {
+		console.error(
+			`[extension-host] Extension state is corrupt; moved to ${filePath}.corrupt`,
+		);
+		try {
+			renameSync(filePath, `${filePath}.corrupt`);
+		} catch {}
+		return "missing";
+	}
+	const installed: StateFile["installed"] = {};
+	for (const [id, version] of Object.entries(
+		isRecord(parsed.installed) ? parsed.installed : {},
+	)) {
+		if (typeof version === "string" || version === null) {
+			installed[id] = version;
+		}
+	}
+	const menus: StateFile["menus"] = {};
+	for (const [id, saved] of Object.entries(
+		isRecord(parsed.menus) ? parsed.menus : {},
+	)) {
+		if (
+			isRecord(saved) &&
+			typeof saved.version === "string" &&
+			Array.isArray(saved.items) &&
+			saved.items.every(isRecord)
+		) {
+			menus[id] = { version: saved.version, items: saved.items };
+		}
+	}
+	return { installed, menus };
 }
 
 /**
@@ -42,8 +86,12 @@ export function createExtensionState(
 	filePath: string,
 	installedBefore: () => string[],
 ): ExtensionState {
-	let state: StateFile;
+	let state: StateFile = { installed: {}, menus: {} };
+	// Off when what was installed before is unknown: nothing is saved over the
+	// file, and no onInstalled fires with a reason that could be wrong.
+	let known = true;
 	const save = () => {
+		if (!known) return;
 		const temp = `${filePath}.tmp`;
 		try {
 			writeFileSync(temp, JSON.stringify(state));
@@ -53,18 +101,28 @@ export function createExtensionState(
 		}
 	};
 	const saved = readState(filePath);
-	if (saved) {
-		state = saved;
+	if (saved === "unreadable") {
+		known = false;
+	} else if (saved === "missing") {
+		try {
+			state.installed = Object.fromEntries(
+				installedBefore().map((id) => [id, null]),
+			);
+			save();
+		} catch (error) {
+			console.error(
+				"[extension-host] Could not list installed extensions:",
+				error,
+			);
+			known = false;
+		}
 	} else {
-		state = {
-			installed: Object.fromEntries(installedBefore().map((id) => [id, null])),
-			menus: {},
-		};
-		save();
+		state = saved;
 	}
 
 	return {
 		pendingInstalled({ id, version }) {
+			if (!known) return null;
 			const seen = state.installed[id];
 			if (seen === version) return null;
 			if (seen === undefined)

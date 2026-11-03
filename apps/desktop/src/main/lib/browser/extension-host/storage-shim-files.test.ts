@@ -36,6 +36,9 @@ test("content scripts and pages load the storage shim first, once, and main-worl
 		'<!DOCTYPE html>\n<html>\n  <head>\n    <script type="module" src="hud_page.js"></script>',
 	);
 
+	mkdirSync(join(extension, "views.html"));
+	writeFileSync(join(extension, "views.html", "popup.htm"), "<head></head>");
+
 	await addStorageShimFiles(extension);
 	await addStorageShimFiles(extension);
 
@@ -51,6 +54,9 @@ test("content scripts and pages load the storage shim first, once, and main-worl
 	]);
 	expect(readFileSync(join(extension, "pages", "hud_page.html"), "utf8")).toBe(
 		`<!DOCTYPE html>\n<html>\n  <head><script src="/${STORAGE_SHIM_SCRIPT}"></script>\n    <script type="module" src="hud_page.js"></script>`,
+	);
+	expect(readFileSync(join(extension, "views.html", "popup.htm"), "utf8")).toBe(
+		`<head><script src="/${STORAGE_SHIM_SCRIPT}"></script></head>`,
 	);
 	expect(
 		readFileSync(join(extension, STORAGE_SHIM_SCRIPT), "utf8"),

@@ -177,19 +177,30 @@ contextBridge.executeInMainWorld({
 					listeners.add(listener);
 					if (asked) return;
 					asked = true;
-					installedEvent("pending")
-						.then((pending) => {
-							if (!pending || listeners.size === 0) return;
-							for (const each of listeners) {
+					installedEvent("pending").then(
+						(pending) => {
+							if (!pending) return;
+							// Asked again by the next listener; nothing ran.
+							if (listeners.size === 0) {
+								asked = false;
+								return;
+							}
+							for (const each of [...listeners]) {
 								try {
 									each(pending.details);
 								} catch (error) {
 									console.error(error);
 								}
 							}
-							return installedEvent("delivered", pending.version);
-						})
-						.catch(() => {});
+							installedEvent("delivered", pending.version).catch(
+								(error: unknown) => console.error(error),
+							);
+						},
+						(error: unknown) => {
+							asked = false;
+							console.error(error);
+						},
+					);
 				},
 				removeListener(listener: InstalledListener) {
 					listeners.delete(listener);

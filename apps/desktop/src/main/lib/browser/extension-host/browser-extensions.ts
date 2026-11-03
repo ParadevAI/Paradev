@@ -357,35 +357,32 @@ export async function removeBrowserExtension(
 	extensionId: string,
 ): Promise<void> {
 	if (!host) throw new Error("Browser extensions have not started yet");
-	const extension = host.session.extensions.getExtension(extensionId);
+	const { session, onRemoved } = host;
+	const extension = session.extensions.getExtension(extensionId);
 	if (!extension && turnedOff.has(extensionId)) {
 		await deleteTurnedOffFiles(extensionId);
 		turnedOff.delete(extensionId);
-		await host.session.clearStorageData({
-			origin: `chrome-extension://${extensionId}`,
+	} else if (extension && isUserExtension(extension, browserExtensionsPath())) {
+		await uninstallExtension(extensionId, {
+			session,
+			extensionsPath: browserExtensionsPath(),
 		});
-		await deleteExtensionRules(extensionId);
-		host.onRemoved(extensionId);
-		pins.setPinned(extensionId, false);
-		notifyBrowserExtensionsChanged();
-		return;
-	}
-	if (!extension || !isUserExtension(extension, browserExtensionsPath())) {
+	} else {
 		throw new Error(
 			"Only extensions installed from the Web Store can be removed",
 		);
 	}
-	await uninstallExtension(extensionId, {
-		session: host.session,
-		extensionsPath: browserExtensionsPath(),
-	});
-	await host.session.clearStorageData({
-		origin: `chrome-extension://${extensionId}`,
-	});
-	await deleteExtensionRules(extensionId);
-	host.onRemoved(extensionId);
-	pins.setPinned(extensionId, false);
-	notifyBrowserExtensionsChanged();
+	// The extension is gone; what it kept is forgotten even if a step fails.
+	try {
+		await session.clearStorageData({
+			origin: `chrome-extension://${extensionId}`,
+		});
+		await deleteExtensionRules(extensionId);
+	} finally {
+		onRemoved(extensionId);
+		pins.setPinned(extensionId, false);
+		notifyBrowserExtensionsChanged();
+	}
 }
 
 /** Downloads a fresh copy of a turned-off extension; its local data is kept. */

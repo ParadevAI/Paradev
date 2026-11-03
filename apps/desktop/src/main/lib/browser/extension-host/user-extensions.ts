@@ -20,7 +20,8 @@ export function installedExtensionIds(installRoot: string): string[] {
 		return readdirSync(installRoot, { withFileTypes: true })
 			.filter((entry) => entry.isDirectory() && /^[a-p]{32}$/.test(entry.name))
 			.map((entry) => entry.name);
-	} catch {
-		return [];
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+		throw error;
 	}
 }

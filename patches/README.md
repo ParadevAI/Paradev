@@ -763,8 +763,10 @@ In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
 the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
 add the `canSeeTabUrl` line to the `TabsAPI.query` filter; add `update` and
 `emitChanged` to `ContextMenusAPI` and `restoreContextMenuItems` after
-`addWindow`. In the preload, delete the `storage` entry and the `noop` option of
-`contextMenus.update`. In
+`addWindow`; remove the `runtime.connectNative`, `runtime.disconnectNative`
+and `runtime.sendNativeMessage` handlers from `RuntimeAPI`. In the preload,
+delete the `storage` entry, the `connectNative` and `sendNativeMessage` entries,
+and the `noop` option of `contextMenus.update`. In
 `ExtensionRouter.onExtensionMessage`, look up `extensionApiRule(handlerName)`
 before the handler runs and pass the result through `apiRule.result`; in
 `sendEvent`, look up `extensionApiRule(eventName)` and check and filter per
