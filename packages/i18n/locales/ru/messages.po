@@ -3604,11 +3604,14 @@ msgstr "Просматривайте и устанавливайте навык�
 msgid "Browse for directory"
 msgstr "Выбрать папку"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Просматривайте плагины Paradev, общие темы и будущие конфигурации агентов."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Смотрите файлы тем Paradev, опубликованные сообществом, включая GitHub Dark Colorblind, Catppuccin, Ember и One Dark Pro."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Смотрите общедоступные темы и будущие конфигурации агентов для Paradev."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Просматривайте плагины, которые может использовать любой агент Paradev, и отправляйте свои."
 
 msgid "Browse the repo ↗"
 msgstr "Открыть репозиторий ↗"
@@ -3657,6 +3660,9 @@ msgstr "Строим последнюю программу"
 
 msgid "Building the last piece of software."
 msgstr "Строим последнюю программу."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Создали плагин? Отправьте его здесь."
 
 msgid "Built in Paradev"
 msgstr "Создано в Paradev"
@@ -9954,6 +9960,9 @@ msgstr "Установить и перезапустить"
 msgid "Install & Restart"
 msgstr "Установить и перезапустить"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Установите плагин в приложении Paradev, и его сможет использовать любой агент."
+
 msgid "Install failed"
 msgstr "Не удалось установить"
 
@@ -13200,6 +13209,9 @@ msgstr "Открыть многострочный редактор промпт�
 msgid "Open a new {label} chat?"
 msgstr "Открыть новый чат {label}?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Откройте пул-реквест, который добавляет плагин в репозиторий Paradev. Мы проверим его и добавим в маркетплейс."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Откройте пул-реквест, чтобы видеть статус ревью, проверки и комментарии."
 
@@ -14435,6 +14447,9 @@ msgstr "Маркетплейс плагинов"
 
 msgid "Plugins"
 msgstr "Плагины"
+
+msgid "Plugins, themes, and agents"
+msgstr "Плагины, темы и агенты"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Укажите на страницу. Ваш агент внесёт изменение."
@@ -17710,6 +17725,9 @@ msgstr "Навык"
 msgid "Skills"
 msgstr "Навыки"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Навыки и инструменты MCP для ваших агентов. Отправьте свой плагин."
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Навыки поставляются с плагином Paradev и автоматически поддерживаются в актуальном состоянии во всех ваших агентах. Нажмите на навык, чтобы посмотреть его."
 
@@ -18341,6 +18359,9 @@ msgstr "Отправить промпт"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "Ограничение частоты отправки промптов не настроено"
+
+msgid "Submit your plugin"
+msgstr "Отправить плагин"
 
 msgid "Submitting…"
 msgstr "Отправка…"
@@ -19313,9 +19334,6 @@ msgstr "Карточка предпросмотра темы"
 
 msgid "Themes"
 msgstr "Темы"
-
-msgid "Themes and agents"
-msgstr "Темы и агенты"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Эти команды выполняются автоматически при создании рабочей области. <0>Читать документацию<1/></0>"

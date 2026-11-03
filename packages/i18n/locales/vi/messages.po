@@ -3604,11 +3604,14 @@ msgstr "Duyệt và cài skill, server MCP và cấu hình agent do cộng đồ
 msgid "Browse for directory"
 msgstr "Duyệt thư mục"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Duyệt các plugin của Paradev, chủ đề được chia sẻ và cấu hình agent sắp ra mắt."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Duyệt các file theme Paradev do cộng đồng chia sẻ, gồm GitHub Dark Colorblind, Catppuccin, Ember và One Dark Pro."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Duyệt các theme được chia sẻ và những cấu hình agent sắp tới cho Paradev."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Duyệt các plugin mà mọi agent của Paradev đều dùng được và gửi plugin của riêng bạn."
 
 msgid "Browse the repo ↗"
 msgstr "Xem repo ↗"
@@ -3657,6 +3660,9 @@ msgstr "Xây phần mềm cuối cùng"
 
 msgid "Building the last piece of software."
 msgstr "Xây phần mềm cuối cùng."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Bạn đã tạo plugin? Gửi tại đây."
 
 msgid "Built in Paradev"
 msgstr "Được xây dựng trong Paradev"
@@ -9954,6 +9960,9 @@ msgstr "Cài đặt & khởi động lại"
 msgid "Install & Restart"
 msgstr "Cài đặt & khởi động lại"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Cài plugin trong ứng dụng Paradev và mọi agent đều dùng được."
+
 msgid "Install failed"
 msgstr "Cài đặt thất bại"
 
@@ -13200,6 +13209,9 @@ msgstr "Mở ô soạn prompt nhiều dòng cho terminal đang mở"
 msgid "Open a new {label} chat?"
 msgstr "Mở một chat {label} mới?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Mở một pull request thêm plugin vào repository của Paradev. Chúng tôi sẽ xem xét và thêm vào marketplace."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Hãy mở một pull request để xem trạng thái review, check và bình luận."
 
@@ -14435,6 +14447,9 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+msgid "Plugins, themes, and agents"
+msgstr "Plugin, chủ đề và agent"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Chỉ vào trang. Agent của bạn sẽ thực hiện thay đổi."
@@ -17710,6 +17725,9 @@ msgstr "Skill"
 msgid "Skills"
 msgstr "Skill"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Skill và công cụ MCP cho agent của bạn. Gửi plugin của riêng bạn."
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skill đi kèm plugin Paradev và được tự động cập nhật trong mọi agent bạn dùng. Nhấp vào một skill để xem trước."
 
@@ -18341,6 +18359,9 @@ msgstr "Gửi prompt"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "Chưa cấu hình giới hạn tần suất gửi prompt"
+
+msgid "Submit your plugin"
+msgstr "Gửi plugin của bạn"
 
 msgid "Submitting…"
 msgstr "Đang gửi…"
@@ -19313,9 +19334,6 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Chủ đề"
-
-msgid "Themes and agents"
-msgstr "Giao diện và agent"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Các lệnh này chạy tự động khi một workspace được tạo. <0>Đọc tài liệu<1/></0>"

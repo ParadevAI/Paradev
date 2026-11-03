@@ -3604,11 +3604,14 @@ msgstr "Sfoglia e installa skill, server MCP e configurazioni di agenti condivis
 msgid "Browse for directory"
 msgstr "Sfoglia le cartelle"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Esplora i plugin di Paradev, i temi condivisi e le future configurazioni degli agenti."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Sfoglia i file dei temi Paradev condivisi dalla community, tra cui GitHub Dark Colorblind, Catppuccin, Ember e One Dark Pro."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Sfoglia i temi condivisi e le future configurazioni degli agenti per Paradev."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Esplora i plugin che ogni agente Paradev può usare e invia il tuo."
 
 msgid "Browse the repo ↗"
 msgstr "Esplora il repository ↗"
@@ -3657,6 +3660,9 @@ msgstr "Costruiamo l'ultimo pezzo di software"
 
 msgid "Building the last piece of software."
 msgstr "Costruiamo l'ultimo pezzo di software."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Hai creato un plugin? Invialo qui."
 
 msgid "Built in Paradev"
 msgstr "Costruito in Paradev"
@@ -9954,6 +9960,9 @@ msgstr "Installa e riavvia"
 msgid "Install & Restart"
 msgstr "Installa e riavvia"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Installa un plugin nell'app Paradev e ogni agente potrà usarlo."
+
 msgid "Install failed"
 msgstr "Installazione non riuscita"
 
@@ -13200,6 +13209,9 @@ msgstr "Apri un compositore di prompt multiriga per il terminale attivo"
 msgid "Open a new {label} chat?"
 msgstr "Aprire una nuova chat {label}?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Apri una pull request che lo aggiunga al repository di Paradev. Lo esaminiamo e lo aggiungiamo al marketplace."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Apri una pull request per vedere lo stato della revisione, i controlli e i commenti."
 
@@ -14435,6 +14447,9 @@ msgstr "Marketplace dei plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+msgid "Plugins, themes, and agents"
+msgstr "Plugin, temi e agenti"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Indica la pagina. Il tuo agente fa la modifica."
@@ -17710,6 +17725,9 @@ msgstr "Skill"
 msgid "Skills"
 msgstr "Skill"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Skill e strumenti MCP per i tuoi agenti. Invia il tuo."
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Le skill sono incluse nel plugin Paradev e vengono mantenute aggiornate automaticamente in ogni agente che usi. Cliccane una per vederne l'anteprima."
 
@@ -18341,6 +18359,9 @@ msgstr "Invia il prompt"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "Il limite di frequenza per l'invio dei prompt non è configurato"
+
+msgid "Submit your plugin"
+msgstr "Invia il tuo plugin"
 
 msgid "Submitting…"
 msgstr "Invio…"
@@ -19313,9 +19334,6 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Temi"
-
-msgid "Themes and agents"
-msgstr "Temi e agenti"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Questi comandi vengono eseguiti automaticamente quando viene creato un workspace. <0>Leggi la documentazione<1/></0>"

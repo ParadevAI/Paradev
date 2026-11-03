@@ -3604,11 +3604,14 @@ msgstr "瀏覽並安裝社群共享的技能、MCP伺服器和代理程式配置
 msgid "Browse for directory"
 msgstr "瀏覽目錄"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "瀏覽 Paradev 外掛、共享主題和即將推出的代理程式設定。"
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "瀏覽社群分享的 Paradev 佈景主題檔案，包含 GitHub Dark Colorblind、Catppuccin、Ember 與 One Dark Pro。"
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "瀏覽 Paradev 的共享佈景主題與未來的代理設定。"
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "瀏覽每個 Paradev 代理程式都能使用的外掛，並提交你自己的外掛。"
 
 msgid "Browse the repo ↗"
 msgstr "瀏覽儲存庫 ↗"
@@ -3657,6 +3660,9 @@ msgstr "打造最後一款軟體"
 
 msgid "Building the last piece of software."
 msgstr "打造最後一款軟體。"
+
+msgid "Built a plugin? Submit it here."
+msgstr "做了外掛？在這裡提交。"
 
 msgid "Built in Paradev"
 msgstr "在 Paradev 中建構"
@@ -9954,6 +9960,9 @@ msgstr "安裝並重啟"
 msgid "Install & Restart"
 msgstr "安裝並重啟"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "在 Paradev 應用程式中安裝外掛，每個代理程式都能使用它。"
+
 msgid "Install failed"
 msgstr "安裝失敗"
 
@@ -13200,6 +13209,9 @@ msgstr "為目前終端開啟多行提示詞編輯器"
 msgid "Open a new {label} chat?"
 msgstr "要開啟新的 {label} 聊天嗎？"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "提交一個拉取請求，將它加入 Paradev 儲存庫。我們會審核並將它加入市場。"
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "建立拉取請求後即可檢視評審狀態、檢查和評論。"
 
@@ -14435,6 +14447,9 @@ msgstr "外掛市場"
 
 msgid "Plugins"
 msgstr "外掛"
+
+msgid "Plugins, themes, and agents"
+msgstr "外掛、主題和代理程式"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "指向頁面，代理程式來完成修改。"
@@ -17710,6 +17725,9 @@ msgstr "技能"
 msgid "Skills"
 msgstr "技能"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "為你的代理程式提供技能和 MCP 工具。提交你自己的外掛。"
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "技能隨Paradev外掛一起提供，並會在你使用的每個代理程式中自動保持最新。點選一個即可預覽。"
 
@@ -18341,6 +18359,9 @@ msgstr "提交提示詞"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "未配置提示詞提交速率限制"
+
+msgid "Submit your plugin"
+msgstr "提交你的外掛"
 
 msgid "Submitting…"
 msgstr "正在提交…"
@@ -19313,9 +19334,6 @@ msgstr "主題預覽卡片"
 
 msgid "Themes"
 msgstr "主題"
-
-msgid "Themes and agents"
-msgstr "主題與代理程式"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "建立工作區時會自動執行這些命令。<0>閱讀文件<1/></0>"

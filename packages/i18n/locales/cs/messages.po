@@ -3604,11 +3604,14 @@ msgstr "Procházejte a instalujte skills, MCP servery a konfigurace agentů sdí
 msgid "Browse for directory"
 msgstr "Procházet adresáře"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Procházejte pluginy Paradev, sdílené motivy a budoucí konfigurace agentů."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Procházejte soubory motivů pro Paradev sdílené komunitou, včetně GitHub Dark Colorblind, Catppuccin, Ember a One Dark Pro."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Procházejte sdílené motivy a budoucí konfigurace agentů pro Paradev."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Procházejte pluginy, které může používat každý agent Paradev, a odešlete vlastní."
 
 msgid "Browse the repo ↗"
 msgstr "Prohlédnout repozitář ↗"
@@ -3657,6 +3660,9 @@ msgstr "Stavíme poslední kus softwaru"
 
 msgid "Building the last piece of software."
 msgstr "Stavíme poslední kus softwaru."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Vytvořili jste plugin? Odešlete ho sem."
 
 msgid "Built in Paradev"
 msgstr "Vytvořeno v Paradev"
@@ -9954,6 +9960,9 @@ msgstr "Nainstalovat a restartovat"
 msgid "Install & Restart"
 msgstr "Nainstalovat a restartovat"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Nainstalujte plugin v aplikaci Paradev a může ho používat každý agent."
+
 msgid "Install failed"
 msgstr "Instalace selhala"
 
@@ -13200,6 +13209,9 @@ msgstr "Otevřít víceřádkový editor promptu pro aktivní terminál"
 msgid "Open a new {label} chat?"
 msgstr "Otevřít nový chat {label}?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Otevřete pull request, který ho přidá do repozitáře Paradev. Zkontrolujeme ho a přidáme do marketplace."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Otevřete pull request a uvidíte stav revize, kontroly a komentáře."
 
@@ -14435,6 +14447,9 @@ msgstr "Marketplace pluginů"
 
 msgid "Plugins"
 msgstr "Pluginy"
+
+msgid "Plugins, themes, and agents"
+msgstr "Pluginy, motivy a agenti"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Ukažte na stránku. Změnu provede váš agent."
@@ -17710,6 +17725,9 @@ msgstr "Skill"
 msgid "Skills"
 msgstr "Skills"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Skills a nástroje MCP pro vaše agenty. Odešlete vlastní."
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skills se dodávají s pluginem Paradev a v každém agentovi, kterého používáte, se udržují automaticky aktuální. Kliknutím si je zobrazíte."
 
@@ -18341,6 +18359,9 @@ msgstr "Odeslat prompt"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "Omezení počtu odeslaných promptů není nastavené"
+
+msgid "Submit your plugin"
+msgstr "Odeslat plugin"
 
 msgid "Submitting…"
 msgstr "Odesílám…"
@@ -19313,9 +19334,6 @@ msgstr "Karta náhledu motivu"
 
 msgid "Themes"
 msgstr "Motivy"
-
-msgid "Themes and agents"
-msgstr "Motivy a agenti"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Tyto příkazy se spustí automaticky při vytvoření pracovního prostoru. <0>Přečtěte si dokumentaci<1/></0>"

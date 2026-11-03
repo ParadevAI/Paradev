@@ -3604,11 +3604,14 @@ msgstr "커뮤니티가 공유한 스킬, MCP 서버, 에이전트 설정을 둘
 msgid "Browse for directory"
 msgstr "디렉터리 찾아보기"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Paradev 플러그인, 공유 테마, 향후 제공될 에이전트 설정을 둘러보세요."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "GitHub Dark Colorblind, Catppuccin, Ember, One Dark Pro 등 커뮤니티가 공유한 Paradev 테마 파일을 둘러보세요."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Paradev에 공유된 테마와 앞으로 추가될 에이전트 설정을 둘러보세요."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "모든 Paradev 에이전트가 사용할 수 있는 플러그인을 둘러보고 직접 만든 플러그인을 제출하세요."
 
 msgid "Browse the repo ↗"
 msgstr "리포지토리 둘러보기 ↗"
@@ -3657,6 +3660,9 @@ msgstr "마지막 소프트웨어를 만듭니다"
 
 msgid "Building the last piece of software."
 msgstr "마지막 소프트웨어를 만듭니다."
+
+msgid "Built a plugin? Submit it here."
+msgstr "플러그인을 만드셨나요? 여기에서 제출하세요."
 
 msgid "Built in Paradev"
 msgstr "Paradev로 개발합니다"
@@ -9954,6 +9960,9 @@ msgstr "설치 후 재시작"
 msgid "Install & Restart"
 msgstr "설치 후 재시작"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Paradev 앱에서 플러그인을 설치하면 모든 에이전트가 사용할 수 있습니다."
+
 msgid "Install failed"
 msgstr "설치 실패"
 
@@ -13200,6 +13209,9 @@ msgstr "활성 터미널의 여러 줄 프롬프트 작성기를 엽니다"
 msgid "Open a new {label} chat?"
 msgstr "새 {label} 채팅을 열까요?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Paradev 리포지토리에 플러그인을 추가하는 풀 리퀘스트를 열어 주세요. 검토 후 마켓플레이스에 추가합니다."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "리뷰 상태, 검사, 코멘트를 보려면 풀 리퀘스트를 여세요."
 
@@ -14435,6 +14447,9 @@ msgstr "플러그인 마켓플레이스"
 
 msgid "Plugins"
 msgstr "플러그인"
+
+msgid "Plugins, themes, and agents"
+msgstr "플러그인, 테마, 에이전트"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "페이지를 가리키면 에이전트가 변경합니다."
@@ -17710,6 +17725,9 @@ msgstr "스킬"
 msgid "Skills"
 msgstr "스킬"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "에이전트를 위한 스킬과 MCP 도구. 직접 만든 플러그인도 제출하세요."
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "스킬은 Paradev 플러그인에 포함되어 있으며 사용하는 모든 에이전트에서 자동으로 최신 상태로 유지됩니다. 미리 보려면 클릭하세요."
 
@@ -18341,6 +18359,9 @@ msgstr "프롬프트 제출"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "프롬프트 제출 요청 한도가 구성되지 않았습니다"
+
+msgid "Submit your plugin"
+msgstr "플러그인 제출"
 
 msgid "Submitting…"
 msgstr "제출하는 중…"
@@ -19313,9 +19334,6 @@ msgstr "테마 미리 보기 카드"
 
 msgid "Themes"
 msgstr "테마"
-
-msgid "Themes and agents"
-msgstr "테마와 에이전트"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "워크스페이스를 만들 때 이 명령이 자동으로 실행됩니다. <0>문서 보기<1/></0>"

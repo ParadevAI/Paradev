@@ -3604,11 +3604,14 @@ msgstr "Jelajahi dan pasang skill, server MCP, dan konfigurasi agen yang dibagik
 msgid "Browse for directory"
 msgstr "Telusuri direktori"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Jelajahi plugin Paradev, tema bersama, dan konfigurasi agen mendatang."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Jelajahi berkas tema Paradev yang dibagikan komunitas, termasuk GitHub Dark Colorblind, Catppuccin, Ember, dan One Dark Pro."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Jelajahi tema bersama dan konfigurasi agen mendatang untuk Paradev."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Jelajahi plugin yang bisa digunakan setiap agen Paradev, dan kirimkan plugin Anda sendiri."
 
 msgid "Browse the repo ↗"
 msgstr "Jelajahi repo ↗"
@@ -3657,6 +3660,9 @@ msgstr "Membangun perangkat lunak yang terakhir"
 
 msgid "Building the last piece of software."
 msgstr "Membangun perangkat lunak yang terakhir."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Sudah membuat plugin? Kirimkan di sini."
 
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"
@@ -9954,6 +9960,9 @@ msgstr "Instal & mulai ulang"
 msgid "Install & Restart"
 msgstr "Pasang & Mulai Ulang"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Instal plugin di aplikasi Paradev dan setiap agen bisa menggunakannya."
+
 msgid "Install failed"
 msgstr "Pemasangan gagal"
 
@@ -13200,6 +13209,9 @@ msgstr "Buka komposer prompt multibaris untuk terminal aktif"
 msgid "Open a new {label} chat?"
 msgstr "Buka chat {label} baru?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Buka pull request yang menambahkannya ke repositori Paradev. Kami meninjaunya lalu menambahkannya ke marketplace."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Buka sebuah pull request untuk melihat status review, check, dan komentar."
 
@@ -14435,6 +14447,9 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+msgid "Plugins, themes, and agents"
+msgstr "Plugin, tema, dan agen"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Tunjuk halamannya. Agen Anda yang membuat perubahan."
@@ -17710,6 +17725,9 @@ msgstr "Skill"
 msgid "Skills"
 msgstr "Skill"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Skill dan alat MCP untuk agen Anda. Kirimkan milik Anda sendiri."
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skill hadir bersama plugin Paradev dan selalu diperbarui otomatis di setiap agen yang Anda pakai. Klik salah satu untuk melihat pratinjaunya."
 
@@ -18341,6 +18359,9 @@ msgstr "Kirim prompt"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "Pembatasan laju pengiriman prompt belum dikonfigurasi"
+
+msgid "Submit your plugin"
+msgstr "Kirim plugin Anda"
 
 msgid "Submitting…"
 msgstr "Mengirim…"
@@ -19313,9 +19334,6 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Tema"
-
-msgid "Themes and agents"
-msgstr "Tema dan agen"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Perintah ini berjalan otomatis saat workspace dibuat. <0>Baca dokumentasi kami<1/></0>"
