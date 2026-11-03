@@ -36,7 +36,7 @@ export interface PageHeaderPage {
 	servedVersion: number | null;
 }
 
-export type PageShareRole = "view" | "comment";
+export type PageShareRole = "view" | "comment" | "edit";
 
 /** Who the page is shared with beyond its general access, and how to change that. */
 export interface PageHeaderSharing {
