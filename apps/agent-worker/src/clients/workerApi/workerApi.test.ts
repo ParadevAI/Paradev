@@ -4,7 +4,7 @@ import { messageParts } from "./workerApi";
 
 describe("messageParts", () => {
 	test("a reply longer than one channel message is split in order, losing nothing", () => {
-		const reply = "a".repeat(CHANNEL_MESSAGE_MAX_LENGTH) + "bc";
+		const reply = `${"a".repeat(CHANNEL_MESSAGE_MAX_LENGTH)}bc`;
 		const parts = messageParts(reply);
 		expect(parts.map((part) => part.length)).toEqual([
 			CHANNEL_MESSAGE_MAX_LENGTH,
