@@ -166,13 +166,9 @@ export function DashboardSidebarPinnedSection({
 						})}
 					</SortableContext>
 				)}
-				{!isSectionCollapsed && hasPinnedPages && (
-					<div className="flex flex-col gap-px px-2">
-						{renderPageRows(false)}
-					</div>
-				)}
-				{/* The drop zone renders regardless of collapse so the first pin can
-			    always land. */}
+				{/* Takes the departing last workspace row's place, above the pages, so
+				    the rows under the pointer hold still. Renders regardless of
+				    collapse so the first pin can always land. */}
 				{pinnedItems.length === 0 &&
 					isDraggingWorkspace &&
 					!isFloatingDropZone && (
@@ -183,6 +179,11 @@ export function DashboardSidebarPinnedSection({
 							})}
 						/>
 					)}
+				{!isSectionCollapsed && hasPinnedPages && (
+					<div className="flex flex-col gap-px px-2">
+						{renderPageRows(false)}
+					</div>
+				)}
 			</div>
 		</>
 	);

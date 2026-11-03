@@ -142,6 +142,9 @@ export function PagesList({
 				utils.page.listPaginated.setInfiniteData(listInput, context.previous);
 			}
 		},
+		onSuccess: (_data, { id }) => {
+			if (favoritePageIdSet.has(id)) onTogglePin(id);
+		},
 		onSettled: () => {
 			void utils.page.listPaginated.invalidate(listInput);
 			void utils.page.counts.invalidate();
