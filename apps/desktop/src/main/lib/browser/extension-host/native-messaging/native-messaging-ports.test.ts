@@ -23,7 +23,7 @@ const LASTPASS = "hdokiejnpimakedhajhdlcegeplioahd";
 const dir = mkdtempSync(path.join(tmpdir(), "native-host-"));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
-// Echoes each message with its argv and cwd; `{"exit":true}` exits, `{"hang":true}` ignores SIGTERM.
+// Echoes each message with its argv and cwd; `{"exit":true}` exits.
 const hostPath = path.join(dir, "host");
 writeFileSync(
 	hostPath,
@@ -179,4 +179,24 @@ test("unloading the extension stops its hosts without touching another context's
 	native.closeExtension(ONEPASSWORD);
 	expect(native.openCount()).toBe(0);
 	expect(await waitUntilStopped(pid)).toBe(true);
+});
+
+test("a host that stops reading closes the port instead of buffering without limit", async () => {
+	const deafPath = path.join(dir, "deaf-host");
+	writeFileSync(deafPath, "#!/bin/sh\nexec sleep 30\n");
+	chmodSync(deafPath, 0o755);
+	const closed = new Promise<string>((resolve) => {
+		const host = startNativeHost(
+			{
+				hostPath: deafPath,
+				origin: `chrome-extension://${ONEPASSWORD}/`,
+				maxPendingBytes: 1024,
+			},
+			{ onMessage: () => {}, onClose: resolve },
+		);
+		const chunk = JSON.stringify("x".repeat(256 * 1024));
+		// More than a macOS pipe holds (up to 1 MiB).
+		for (let i = 0; i < 16; i++) host.post(chunk);
+	});
+	expect(await closed).toBe(NATIVE_MESSAGING_ERRORS.io);
 });
