@@ -5,6 +5,7 @@ import {
 	pullRequestsSearchFromFilters,
 	usePullRequestsFilterStore,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsFilterStore";
+import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import {
 	tasksSearchFromFilters,
 	useTasksFilterStore,
@@ -53,7 +54,13 @@ export function useDashboardNavigation() {
 		isChannelsOpen:
 			!!matchRoute({ to: "/channels", fuzzy: true }) ||
 			!!matchRoute({ to: "/devs", fuzzy: true }),
-		openChannels: () => navigate({ to: "/channels/threads" }),
+		openChannels: () => {
+			const { tabs, activeTabId } = useChatTabsStore.getState();
+			const active = tabs.find((tab) => tab.id === activeTabId) ?? tabs.at(-1);
+			return active
+				? navigate({ href: active.href })
+				: navigate({ to: "/channels/threads" });
+		},
 
 		isWorkspacesOpen: !!matchRoute({ to: "/v2-workspaces" }),
 		openWorkspaces: () => navigate({ to: "/v2-workspaces" }),

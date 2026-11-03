@@ -33,6 +33,7 @@ import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
+import { ChatTabs } from "./components/ChatTabs";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
 import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
@@ -241,6 +242,7 @@ function DashboardLayout() {
 					<TitleBarSlotsProvider>
 						<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
 							<TitleBar />
+							<ChatTabs />
 							<div className="flex min-h-0 flex-1">
 								<NavigationRail />
 								<WorkspaceSidebarPanel
