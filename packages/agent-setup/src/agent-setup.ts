@@ -36,6 +36,7 @@ import {
 	createMuseWrapper,
 	createOmpExtension,
 	createOpenCodePlugin,
+	createOpenCodeTuiPlugin,
 	createOpenCodeWrapper,
 	createPiExtension,
 	createUfoWrapper,
@@ -105,7 +106,11 @@ const AGENT_SETUP_DEFINITIONS: Record<
 		teardown: [removeDroidManagedHooks],
 	},
 	opencode: {
-		setup: [createOpenCodePlugin, createOpenCodeWrapper],
+		setup: [
+			createOpenCodePlugin,
+			createOpenCodeTuiPlugin,
+			createOpenCodeWrapper,
+		],
 	},
 	omp: {
 		setup: [createOmpExtension],

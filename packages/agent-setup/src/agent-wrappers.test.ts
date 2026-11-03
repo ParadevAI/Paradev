@@ -97,6 +97,7 @@ const {
 	getGeminiSettingsJsonContent,
 	getMastraHooksJsonContent,
 	getOpenCodePluginContent,
+	getOpenCodeTuiPluginContent,
 	getOmpExtensionContent,
 	getOmpExtensionPath,
 	OMP_EXTENSION_MARKER,
@@ -420,6 +421,149 @@ describe("agent-wrappers opencode", () => {
 			},
 		});
 		expect(notify).not.toHaveBeenCalled();
+	});
+});
+
+describe("agent-wrappers opencode tui plugin", () => {
+	const originalTerminalId = process.env.SUPERSET_TERMINAL_ID;
+	const tuiRoot = path.join(TEST_ROOT, "opencode-tui");
+	const notifyLog = path.join(tuiRoot, "notify.log");
+	type Handler = (event: { data: Record<string, unknown> }) => void;
+	let handlers: Map<string, Handler>;
+	let pluginModule: Promise<{
+		default: { setup: (ctx: unknown) => unknown };
+	}>;
+
+	beforeAll(() => {
+		mkdirSync(tuiRoot, { recursive: true });
+		const notifyPath = path.join(tuiRoot, "notify.sh");
+		writeFileSync(
+			notifyPath,
+			`#!/bin/bash\necho "$SUPERSET_HOOK_HARNESS $1" >> "${notifyLog}"\n`,
+		);
+		chmodSync(notifyPath, 0o755);
+		const pluginPath = path.join(tuiRoot, "tui.mjs");
+		writeFileSync(pluginPath, getOpenCodeTuiPluginContent(notifyPath));
+		pluginModule = import(pathToFileURL(pluginPath).href);
+	});
+
+	beforeEach(() => {
+		rmSync(notifyLog, { force: true });
+		process.env.SUPERSET_TERMINAL_ID = "terminal-1";
+	});
+
+	afterEach(() => {
+		if (originalTerminalId === undefined) {
+			delete process.env.SUPERSET_TERMINAL_ID;
+		} else {
+			process.env.SUPERSET_TERMINAL_ID = originalTerminalId;
+		}
+	});
+
+	const sessions: Record<string, { parentID?: string }> = {
+		shown: {},
+		"shown-child": { parentID: "shown" },
+		"other-terminal": {},
+	};
+
+	const setupPlugin = async () => {
+		handlers = new Map();
+		const { default: plugin } = await pluginModule;
+		await plugin.setup({
+			data: {
+				on: (type: string, handler: Handler) => {
+					handlers.set(type, handler);
+					return () => handlers.delete(type);
+				},
+				session: {
+					get: (id: string) => sessions[id],
+					root: (id: string) => sessions[id]?.parentID ?? id,
+				},
+			},
+			ui: {
+				router: { current: () => ({ type: "session", sessionID: "shown" }) },
+			},
+		});
+	};
+
+	const emit = (type: string, data: Record<string, unknown>) =>
+		handlers.get(type)?.({ data });
+
+	const readNotifications = async (count: number) => {
+		for (let attempt = 0; attempt < 200; attempt++) {
+			const lines = existsSync(notifyLog)
+				? readFileSync(notifyLog, "utf-8").trim().split("\n")
+				: [];
+			if (lines.length >= count) {
+				return lines.map((line) => {
+					const separator = line.indexOf(" ");
+					return {
+						harness: line.slice(0, separator),
+						...JSON.parse(line.slice(separator + 1)),
+					};
+				});
+			}
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
+		throw new Error(`Expected ${count} notifications`);
+	};
+
+	it("reports only the shown root session's turns", async () => {
+		await setupPlugin();
+		emit("session.execution.started", { sessionID: "other-terminal" });
+		emit("session.execution.succeeded", { sessionID: "other-terminal" });
+		emit("session.execution.started", { sessionID: "shown" });
+		emit("session.execution.started", { sessionID: "shown-child" });
+		emit("session.execution.succeeded", { sessionID: "shown-child" });
+		emit("session.execution.succeeded", { sessionID: "shown" });
+		emit("session.execution.started", { sessionID: "shown" });
+		emit("session.execution.interrupted", { sessionID: "shown" });
+
+		expect(await readNotifications(4)).toEqual([
+			{ harness: "opencode", hook_event_name: "Start", session_id: "shown" },
+			{ harness: "opencode", hook_event_name: "Stop", session_id: "shown" },
+			{ harness: "opencode", hook_event_name: "Start", session_id: "shown" },
+			{ harness: "opencode", hook_event_name: "Stop", session_id: "shown" },
+		]);
+	});
+
+	it("reports a failed turn with its error message", async () => {
+		await setupPlugin();
+		emit("session.execution.started", { sessionID: "shown" });
+		emit("session.execution.failed", {
+			sessionID: "shown",
+			error: { message: "Provider unavailable" },
+		});
+
+		expect(await readNotifications(2)).toEqual([
+			{ harness: "opencode", hook_event_name: "Start", session_id: "shown" },
+			{
+				harness: "opencode",
+				hook_event_name: "Failed",
+				session_id: "shown",
+				message: "Provider unavailable",
+			},
+		]);
+	});
+
+	it("reports permission prompts for the shown root session only", async () => {
+		await setupPlugin();
+		emit("permission.asked", { sessionID: "other-terminal" });
+		emit("permission.asked", { sessionID: "shown" });
+
+		expect(await readNotifications(1)).toEqual([
+			{
+				harness: "opencode",
+				hook_event_name: "PermissionRequest",
+				session_id: "shown",
+			},
+		]);
+	});
+
+	it("does nothing outside a Superset terminal", async () => {
+		delete process.env.SUPERSET_TERMINAL_ID;
+		await setupPlugin();
+		expect(handlers.size).toBe(0);
 	});
 });
 
