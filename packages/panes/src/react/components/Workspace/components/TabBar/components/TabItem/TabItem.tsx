@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button } from "@superset/ui/button";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -8,6 +7,10 @@ import {
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
+import {
+	HEADER_TAB_CLOSE_CLASS,
+	headerTabClassName,
+} from "@superset/ui/lib/header-controls";
 import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -126,10 +129,8 @@ export function TabItem<TData>({
 				<div
 					ref={setRef}
 					className={cn(
-						"group relative flex h-7 w-full items-center rounded-lg transition-colors",
-						isActive
-							? "bg-card text-foreground ring-1 ring-input"
-							: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
+						headerTabClassName(isActive),
+						"group relative w-full",
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}
@@ -186,9 +187,12 @@ export function TabItem<TData>({
 										{accessory}
 									</span>
 								)}
-								<Button
+								<button
 									aria-label={t({ message: "Close tab" })}
-									className="pointer-events-none size-4 cursor-pointer rounded text-muted-foreground opacity-0 transition-opacity hover:bg-fill-hover hover:text-foreground group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
+									className={cn(
+										HEADER_TAB_CLOSE_CLASS,
+										"pointer-events-none cursor-pointer opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+									)}
 									onClick={(event) => {
 										event.stopPropagation();
 										onClose();
@@ -197,12 +201,10 @@ export function TabItem<TData>({
 										event.preventDefault();
 										event.stopPropagation();
 									}}
-									size="icon"
 									type="button"
-									variant="ghost"
 								>
 									<XIcon className="size-3" />
-								</Button>
+								</button>
 							</div>
 						</>
 					)}

@@ -1,4 +1,9 @@
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { LuPanelLeft, LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { useWorkspaceSidebarStore } from "renderer/stores";
@@ -10,15 +15,24 @@ export function SidebarToggle() {
 	const getToggleIcon = (isHovering: boolean) => {
 		if (collapsed) {
 			return isHovering ? (
-				<LuPanelLeftOpen className="size-4" strokeWidth={1.5} />
+				<LuPanelLeftOpen
+					className="size-4"
+					strokeWidth={HEADER_ICON_STROKE_WIDTH}
+				/>
 			) : (
-				<LuPanelLeft className="size-4" strokeWidth={1.5} />
+				<LuPanelLeft
+					className="size-4"
+					strokeWidth={HEADER_ICON_STROKE_WIDTH}
+				/>
 			);
 		}
 		return isHovering ? (
-			<LuPanelLeftClose className="size-4" strokeWidth={1.5} />
+			<LuPanelLeftClose
+				className="size-4"
+				strokeWidth={HEADER_ICON_STROKE_WIDTH}
+			/>
 		) : (
-			<LuPanelLeft className="size-4" strokeWidth={1.5} />
+			<LuPanelLeft className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
 		);
 	};
 
@@ -28,7 +42,7 @@ export function SidebarToggle() {
 				<button
 					type="button"
 					onClick={toggleCollapsed}
-					className="no-drag group flex items-center justify-center size-8 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors"
+					className={cn("no-drag group", HEADER_ICON_BUTTON_CLASS)}
 				>
 					<span className="group-hover:hidden">{getToggleIcon(false)}</span>
 					<span className="hidden group-hover:block">

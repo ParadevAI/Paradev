@@ -1,4 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
+import {
+	HEADER_ICON_STROKE_WIDTH,
+	HEADER_TAB_CLOSE_CLASS,
+	headerTabClassName,
+} from "@superset/ui/lib/header-controls";
 import { cn } from "@superset/ui/utils";
 import {
 	Bot,
@@ -62,10 +67,8 @@ export function WindowTab({
 	return (
 		<div
 			className={cn(
-				"group flex h-7 max-w-[180px] shrink-0 items-center rounded-lg pr-1 text-xs transition-colors",
-				isActive
-					? "bg-card text-foreground ring-1 ring-input"
-					: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
+				headerTabClassName(isActive),
+				"group max-w-[180px] shrink-0 pr-1",
 			)}
 		>
 			<button
@@ -73,9 +76,12 @@ export function WindowTab({
 				aria-current={isActive ? "page" : undefined}
 				onClick={onActivate}
 				onAuxClick={closeOnMiddleClick}
-				className="flex h-full min-w-0 items-center gap-1.5 rounded-lg pr-1 pl-2.5 outline-none focus-visible:ring-1 focus-visible:ring-ring"
+				className="flex h-full min-w-0 items-center gap-1.5 rounded-md pr-1 pl-2.5 outline-none focus-visible:ring-1 focus-visible:ring-ring"
 			>
-				<Icon className="size-3.5 shrink-0" strokeWidth={1.75} />
+				<Icon
+					className="size-3.5 shrink-0"
+					strokeWidth={HEADER_ICON_STROKE_WIDTH}
+				/>
 				<span className="truncate">{title}</span>
 			</button>
 			<button
@@ -83,7 +89,7 @@ export function WindowTab({
 				aria-label={t({ message: `Close ${title}` })}
 				onClick={onClose}
 				className={cn(
-					"flex size-4 shrink-0 items-center justify-center rounded text-muted-foreground transition-opacity hover:bg-fill-hover hover:text-foreground",
+					HEADER_TAB_CLOSE_CLASS,
 					isActive
 						? "opacity-100"
 						: "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",

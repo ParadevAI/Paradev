@@ -1,4 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useRouter } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
@@ -91,9 +95,9 @@ export function WindowTabBar() {
 							type="button"
 							aria-label={t({ message: "New thread" })}
 							onClick={() => openNewWorkspace()}
-							className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
+							className={HEADER_ICON_BUTTON_CLASS}
 						>
-							<Plus className="size-4" strokeWidth={1.75} />
+							<Plus className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">

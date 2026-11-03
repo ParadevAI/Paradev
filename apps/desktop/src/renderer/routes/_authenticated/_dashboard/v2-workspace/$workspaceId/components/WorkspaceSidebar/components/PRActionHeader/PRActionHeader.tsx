@@ -7,7 +7,7 @@ interface PRActionHeaderProps {
 
 export function PRActionHeader({ runButton }: PRActionHeaderProps) {
 	return (
-		<div className="@container/strip flex h-12 shrink-0 items-center gap-2 bg-muted/45 px-2 dark:bg-muted/35">
+		<div className="@container/strip flex h-12 shrink-0 items-center gap-2 px-2">
 			<div className="drag h-full min-w-0 flex-1" />
 			<div className="flex items-center gap-2">{runButton}</div>
 		</div>

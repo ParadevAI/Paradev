@@ -1,4 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import {
@@ -131,7 +135,7 @@ export function PanelTabStrip({
 	return (
 		// biome-ignore lint/a11y/noStaticElementInteractions: leaving the strip ends the close-width freeze
 		<div
-			className="flex h-12 shrink-0 items-stretch bg-muted/45 shadow-[inset_0_-1px_0_var(--border)] dark:bg-muted/35"
+			className="flex h-12 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]"
 			onMouseLeave={() => closing.release()}
 		>
 			{leading}
@@ -226,9 +230,15 @@ export function PanelTabStrip({
 							type="button"
 							aria-label={t({ message: "New tab" })}
 							onClick={onNewTab}
-							className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-fill-hover hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
+							className={cn(
+								HEADER_ICON_BUTTON_CLASS,
+								"outline-none focus-visible:ring-1 focus-visible:ring-ring",
+							)}
 						>
-							<LuPlus className="size-4" />
+							<LuPlus
+								className="size-4"
+								strokeWidth={HEADER_ICON_STROKE_WIDTH}
+							/>
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">

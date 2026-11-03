@@ -29,7 +29,6 @@ export function WorkspaceToolbar({
 				onForceStopRun={run.forceStopWorkspaceRun}
 			/>
 			<RightSidebarToggle
-				compact
 				isOpen={isRightPaneOpen}
 				onToggle={onToggleRightPane}
 			/>

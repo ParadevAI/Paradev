@@ -21,7 +21,7 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 	return (
 		<div className="flex h-full w-full min-w-0 flex-col border-l border-border bg-background">
 			<div className="flex h-12 shrink-0 items-center justify-end gap-1 border-b border-border pr-2">
-				<RightSidebarToggle isOpen onToggle={onHide} compact />
+				<RightSidebarToggle isOpen onToggle={onHide} />
 			</div>
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				<div className="flex flex-col gap-5 p-4">

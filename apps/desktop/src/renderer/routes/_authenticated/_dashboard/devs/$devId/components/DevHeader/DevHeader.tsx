@@ -126,11 +126,7 @@ export function DevHeader({
 						</DropdownMenuContent>
 					</DropdownMenu>
 					{!panel.isOpen && (
-						<RightSidebarToggle
-							isOpen={false}
-							onToggle={panel.toggle}
-							compact
-						/>
+						<RightSidebarToggle isOpen={false} onToggle={panel.toggle} />
 					)}
 				</div>
 			}

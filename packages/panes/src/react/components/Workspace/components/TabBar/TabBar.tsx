@@ -1,9 +1,12 @@
-import { Button } from "@superset/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { PlusIcon } from "lucide-react";
 import {
@@ -66,15 +69,13 @@ function AddTabButton<_TData>({
 }) {
 	const pendingActionRef = useRef<(() => void) | null>(null);
 	const button = (
-		<Button
-			className="size-7 rounded-md text-muted-foreground shadow-none hover:bg-fill-hover hover:text-foreground"
-			size="icon"
+		<button
+			className={HEADER_ICON_BUTTON_CLASS}
 			type="button"
-			variant="ghost"
 			onClick={onAddTab}
 		>
-			<PlusIcon className="size-4" strokeWidth={1.75} />
-		</Button>
+			<PlusIcon className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
+		</button>
 	);
 
 	if (renderAddTabMenu) {
@@ -245,7 +246,7 @@ export function TabBar<TData>({
 			// children out with `no-drag` loses the carve-outs once they sit inside
 			// the masked/scrollable OverflowFadeContainer, which made the entire bar
 			// swallow clicks.
-			className="group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch bg-muted/45 shadow-[inset_0_-1px_0_var(--border)] dark:bg-muted/35"
+			className="group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]"
 		>
 			{renderTabBarLeading && (
 				<div className="flex h-full shrink-0 items-stretch border-b border-border">

@@ -1,4 +1,9 @@
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { useLocation, useRouter } from "@tanstack/react-router";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { HotkeyLabel } from "renderer/hotkeys";
@@ -19,9 +24,12 @@ export function NavigationControls() {
 						type="button"
 						onClick={() => router.history.back()}
 						disabled={!canGoBack}
-						className="no-drag flex items-center justify-center size-7 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors disabled:opacity-30 disabled:pointer-events-none"
+						className={cn("no-drag", HEADER_ICON_BUTTON_CLASS)}
 					>
-						<LuArrowLeft className="size-4" strokeWidth={1.5} />
+						<LuArrowLeft
+							className="size-4"
+							strokeWidth={HEADER_ICON_STROKE_WIDTH}
+						/>
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
@@ -35,9 +43,12 @@ export function NavigationControls() {
 						type="button"
 						onClick={() => router.history.forward()}
 						disabled={!canGoForward}
-						className="no-drag flex items-center justify-center size-7 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors disabled:opacity-30 disabled:pointer-events-none"
+						className={cn("no-drag", HEADER_ICON_BUTTON_CLASS)}
 					>
-						<LuArrowRight className="size-4" strokeWidth={1.5} />
+						<LuArrowRight
+							className="size-4"
+							strokeWidth={HEADER_ICON_STROKE_WIDTH}
+						/>
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">

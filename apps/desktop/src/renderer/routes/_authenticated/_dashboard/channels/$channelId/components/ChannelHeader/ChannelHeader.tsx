@@ -148,11 +148,7 @@ export function ChannelHeader({
 						</DropdownMenuContent>
 					</DropdownMenu>
 					{!isPanelOpen && (
-						<RightSidebarToggle
-							isOpen={false}
-							onToggle={onTogglePanel}
-							compact
-						/>
+						<RightSidebarToggle isOpen={false} onToggle={onTogglePanel} />
 					)}
 				</div>
 			}

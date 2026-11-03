@@ -1,3 +1,7 @@
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import {
@@ -10,26 +14,33 @@ import { HotkeyLabel } from "renderer/hotkeys";
 interface RightSidebarToggleProps {
 	isOpen: boolean;
 	onToggle: () => void;
-	compact?: boolean;
 }
 
 export function RightSidebarToggle({
 	isOpen,
 	onToggle,
-	compact = false,
 }: RightSidebarToggleProps) {
 	const getToggleIcon = (isHovering: boolean) => {
 		if (!isOpen) {
 			return isHovering ? (
-				<LuPanelRightOpen className="size-4" strokeWidth={1.5} />
+				<LuPanelRightOpen
+					className="size-4"
+					strokeWidth={HEADER_ICON_STROKE_WIDTH}
+				/>
 			) : (
-				<LuPanelRight className="size-4" strokeWidth={1.5} />
+				<LuPanelRight
+					className="size-4"
+					strokeWidth={HEADER_ICON_STROKE_WIDTH}
+				/>
 			);
 		}
 		return isHovering ? (
-			<LuPanelRightClose className="size-4" strokeWidth={1.5} />
+			<LuPanelRightClose
+				className="size-4"
+				strokeWidth={HEADER_ICON_STROKE_WIDTH}
+			/>
 		) : (
-			<LuPanelRight className="size-4" strokeWidth={1.5} />
+			<LuPanelRight className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
 		);
 	};
 
@@ -39,10 +50,7 @@ export function RightSidebarToggle({
 				<button
 					type="button"
 					onClick={onToggle}
-					className={cn(
-						"no-drag group flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors",
-						compact ? "size-7" : "size-8",
-					)}
+					className={cn("no-drag group", HEADER_ICON_BUTTON_CLASS)}
 				>
 					<span className="group-hover:hidden">{getToggleIcon(false)}</span>
 					<span className="hidden group-hover:block">
