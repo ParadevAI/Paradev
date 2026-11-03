@@ -41,11 +41,6 @@ msgstr "· bijgewerkt {updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” en de bijbehorende filters worden verwijderd. De werkruimtes blijven ongewijzigd."
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "\"{0}\" verwijderd"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "\"{0}\" wordt op GitHub als gesloten gemarkeerd. Je kunt hem hier op elk moment heropenen."
@@ -61,11 +56,6 @@ msgstr "\"{0}\" wordt via {2} in {1} gemerged. De checks zijn nog niet geslaagd 
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" wordt via {2} in {1} gemerged. Dit kan hier niet ongedaan worden gemaakt."
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "\"{0}\" wordt niet meer geactiveerd en de geschiedenis van runs wordt verwijderd. Dit kan niet ongedaan worden gemaakt."
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "\"{name}\" is {size} — bestanden groter dan {limit} kunnen niet worden bijgevoegd"
@@ -127,10 +117,6 @@ msgstr "{0, plural, one {# agent} other {# agents}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# automatisering kon niet worden gestart} other {# automatiseringen konden niet worden gestart}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {# automatisering verwijderd} other {# automatiseringen verwijderd}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {# werkruimte} other {# werkruimtes}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {Eén draaiende agent gebruikt nog het vorige account — de wissel geldt alleen voor nieuwe starts.} other {# draaiende agents gebruiken nog het vorige account — de wissel geldt alleen voor nieuwe starts.}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {# automatisering gearchiveerd} other {# automatiseringen gearchiveerd}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, one {# vraag gesteld} other {# vragen gesteld}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {Kan # werkruimte niet verwijderen} other {Kan # werkrui
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {# werkruimte aanmaken...} other {# werkruimtes aanmaken...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {# automatisering verwijderen?} other {# automatiseringen verwijderen?}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {# automatisering definitief verwijderen?} other {# automatiseringen definitief verwijderen?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {# werkruimte verwijderen?} other {# werkruimtes verwijderen?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {# automatisering verwijderd} other {# automatiseringen verwijderd}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, one {# automatisering gepauzeerd.} other {# automatiseringen
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, one {Pauzeert # automatisering} other {Pauzeert # automatiseringen}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {# automatisering hersteld. Gepauzeerde blijven gepauzeerd.} other {# automatiseringen hersteld. Gepauzeerde blijven gepauzeerd.}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {# automatisering hersteld} other {# automatiseringen hersteld}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "{name} archiveren?"
 msgid "Archive #{0}?"
 msgstr "#{0} archiveren?"
 
+msgid "Archive automation"
+msgstr "Automatisering archiveren"
+
 msgid "Archive channel"
 msgstr "Kanaal archiveren"
 
@@ -2936,6 +2941,9 @@ msgstr "Omgeving archiveren"
 
 msgid "Archive failed"
 msgstr "Archiveren mislukt"
+
+msgid "Archive this automation before you delete it."
+msgstr "Archiveer deze automatisering voordat je haar verwijdert."
 
 msgid "Archive workspace"
 msgstr "Werkruimte archiveren"
@@ -2947,6 +2955,10 @@ msgstr "Gearchiveerd"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "Gearchiveerd · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "\"{0}\" gearchiveerd"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6610,6 +6622,10 @@ msgstr "Gedelegeerd"
 msgid "Delete"
 msgstr "Verwijderen"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "\"{0}\" definitief verwijderen?"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "\"{0}\" verwijderen? Hiermee wordt de worktree van de host verwijderd."
@@ -6655,12 +6671,6 @@ msgstr "Toch verwijderen"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "Met Toch verwijderen wordt het teardown-script volledig overgeslagen."
-
-msgid "Delete automation"
-msgstr "Automatisering verwijderen"
-
-msgid "Delete automation?"
-msgstr "Automatisering verwijderen?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6774,6 +6784,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "Verwijderd"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "\"{0}\" verwijderd"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "\"{deletedName}\" verwijderd"
 
@@ -6834,9 +6848,6 @@ msgstr "{0} van {1} verwijderen…"
 
 msgid "Deleting {name}..."
 msgstr "{name} verwijderen..."
-
-msgid "Deleting automation..."
-msgstr "Automatisering verwijderen..."
 
 msgid "Deleting organization..."
 msgstr "Organisatie verwijderen..."
@@ -8006,6 +8017,9 @@ msgstr "Toevoegen van agent mislukt"
 msgid "Failed to add member"
 msgstr "Toevoegen van lid mislukt"
 
+msgid "Failed to archive automation"
+msgstr "Automatisering archiveren mislukt"
+
 msgid "Failed to cancel invitation"
 msgstr "Annuleren van uitnodiging mislukt"
 
@@ -8122,7 +8136,7 @@ msgid "Failed to delete account"
 msgstr "Verwijderen van account mislukt"
 
 msgid "Failed to delete automation"
-msgstr "Verwijderen van automatisering mislukt"
+msgstr "Automatisering verwijderen mislukt"
 
 msgid "Failed to delete host"
 msgstr "Host verwijderen mislukt"
@@ -8302,6 +8316,9 @@ msgstr "Herstarten van daemon mislukt"
 
 msgid "Failed to restore"
 msgstr "Herstellen mislukt"
+
+msgid "Failed to restore automation"
+msgstr "Automatisering herstellen mislukt"
 
 msgid "Failed to restore defaults"
 msgstr "Herstellen van standaardwaarden mislukt"
@@ -12143,6 +12160,9 @@ msgstr "Nog geen agents."
 msgid "No API keys yet."
 msgstr "Nog geen API-sleutels."
 
+msgid "No archived automations"
+msgstr "Geen gearchiveerde automatiseringen"
+
 msgid "No archived workspaces"
 msgstr "Geen gearchiveerde werkruimtes"
 
@@ -13190,8 +13210,8 @@ msgstr "Alleen de eigenaar kan deze automatisering uitvoeren"
 msgid "Only the owner can view prompt history"
 msgstr "Alleen de eigenaar kan de promptgeschiedenis bekijken"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Alleen de eigenaar of een organisatie-eigenaar kan deze automatisering verwijderen"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Alleen de eigenaar of een organisatie-eigenaar kan deze automatisering archiveren"
 
 msgid "Only the people listed above can open it"
 msgstr "Alleen de mensen hierboven kunnen het openen"
@@ -16071,6 +16091,9 @@ msgstr "Herstellen"
 msgid "Restore {0} to defaults?"
 msgstr "{0} terugzetten naar standaardwaarden?"
 
+msgid "Restore automation"
+msgstr "Automatisering herstellen"
+
 msgid "Restore default"
 msgstr "Standaard herstellen"
 
@@ -16083,6 +16106,12 @@ msgstr "Plan herstellen"
 msgid "restore the agent defaults"
 msgstr "de standaardwaarden van de agent herstellen"
 
+msgid "Restore this automation to run it"
+msgstr "Herstel deze automatisering om haar uit te voeren"
+
+msgid "Restore this automation to view prompt history"
+msgstr "Herstel deze automatisering om de promptgeschiedenis te bekijken"
+
 msgid "Restore this version?"
 msgstr "Deze versie herstellen?"
 
@@ -16094,6 +16123,14 @@ msgstr "Werkruimte herstellen"
 
 msgid "Restored"
 msgstr "Hersteld"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "\"{0}\" hersteld"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "\"{0}\" hersteld. Ze is gepauzeerd."
 
 msgid "Restored \"{projectName}\""
 msgstr "\"{projectName}\" hersteld"
@@ -19074,6 +19111,9 @@ msgstr "De agent die de pagina volgt, leest elke opmerking. Hij werkt de pagina 
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "De app is op {appVersion}, maar gekoppeld aan een hostservice die door iets anders is gestart, waarschijnlijk een oudere CLI of een andere Paradev-build. Opnieuw starten vervangt die door de kopie van deze app."
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "De automatisering en haar uitvoergeschiedenis worden verwijderd. Dit kan niet ongedaan worden gemaakt."
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "De eigenaar van de automatisering kan in deze organisatie geen cloudwerkruimtes meer gebruiken. Vraag diegene de toegang te controleren, of voer de automatisering uit op een apparaat."
 
@@ -19441,9 +19481,6 @@ msgstr "Deze mappen bevatten nog je bestanden, maar zijn niet vanzelf naar het n
 msgid "These ports are still in use"
 msgstr "Deze poorten zijn nog in gebruik"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "Ze worden niet meer uitgevoerd en hun uitvoeringsgeschiedenis wordt verwijderd. Dit kan niet ongedaan worden gemaakt."
-
 msgid "Thinking"
 msgstr "Redenering"
 
@@ -19495,6 +19532,12 @@ msgstr "Deze automatisering hoort bij {0}. Wissel naar die organisatie om hem te
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Deze automatisering heeft nog geen instructies. Schrijf een prompt in de instellingen voordat je hem uitvoert."
+
+msgid "This automation is archived. It does not run."
+msgstr "Deze automatisering is gearchiveerd. Ze wordt niet uitgevoerd."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Deze automatisering is gearchiveerd. Herstel haar eerst."
 
 msgid "This automation is in another organization"
 msgstr "Deze automatisering staat in een andere organisatie"

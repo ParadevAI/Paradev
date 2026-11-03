@@ -19,11 +19,11 @@ Typical uses:
 - **PR reviews**: review a pull request as soon as you're requested as a reviewer
 - **Bug triage**: reproduce a new Sentry issue or a report posted in #bugs
 
-The list shows 7-day run health (successful, failed, and missed runs) and splits into **Mine** and **Team** tabs. Team automations are read-only; only the owner can edit, pause, run, group, or delete one.
+The list shows 7-day run health (successful, failed, and missed runs) and splits into **Mine** and **Team** tabs, plus an **Archived** tab once something is archived. Team automations are read-only; only the owner can edit, pause, run, group, or archive one.
 
 ## Requirements
 
-- **A Pro plan**: Automations are a [Pro feature](https://paradev.com/pricing). Creating, running, and resuming an automation needs a Pro or Enterprise subscription on the organization, from the app, the CLI, or the SDK alike. An organization that downgrades keeps its automations and can still edit, pause, or delete them, but they stop firing until it upgrades again.
+- **A Pro plan**: Automations are a [Pro feature](https://paradev.com/pricing). Creating, running, and resuming an automation needs a Pro or Enterprise subscription on the organization, from the app, the CLI, or the SDK alike. An organization that downgrades keeps its automations and can still edit, pause, or archive them, but they stop firing until it upgrades again.
 - **A project, or session mode**: automations usually run against a v2 project linked to a GitHub repo. Pick **No project** and each run creates a [session workspace](/workspaces#sessions) instead.
 - **A target device**: The run fires on the device you pick when creating the automation.
 - **A connected integration, for event triggers**: connect GitHub, Slack, Linear, Sentry, Notion, or Microsoft Teams from **Integrations** before you add one of its triggers. Microsoft Teams triggers need an Enterprise plan; every other trigger works on Pro.
@@ -118,13 +118,14 @@ The schedule advances to the next occurrence either way.
 
 When a run dispatches in "new workspace" mode, a fresh workspace is created from the project's repo for that run (or a fresh session workspace when the automation has no project). Open it from the run row to see the agent's work.
 
-## Pause, Run Now, Delete
+## Pause, Run Now, Archive
 
 From the automation's detail page (**Settings** tab):
 
 - **Pause**: flip the Active switch. Runs are kept, and each schedule row on a paused automation still shows when it *would* next run, so schedule edits are previewable.
 - **Run now**: dispatches immediately. The run appears under **Run History** within seconds.
-- **Delete**: in the ⋯ overflow menu; removes the automation and its run history.
+- **Archive**: in the ⋯ overflow menu. The automation stops firing and moves to the **Archived** tab; its run history is kept. Click **Undo** in the notification, or **Restore** on the Archived tab, to bring it back. A restored automation comes back paused, except through Undo, which also resumes it.
+- **Delete permanently**: only for an archived automation, from its ⋯ menu on the **Archived** tab or its detail page. This removes the automation and its run history and can't be undone.
 
 ## Groups
 
@@ -140,7 +141,7 @@ A group only organizes the list. It does not change where runs go: the workspace
 
 ## Select Several
 
-On the **Mine** tab, **⌘-click** a row (Ctrl-click on Windows and Linux) to start selecting. Every row then shows a checkbox, and a bar at the bottom of the list can **Move to group**, **Pause**, **Resume**, or **Delete** everything selected.
+On the **Mine** tab, **⌘-click** a row (Ctrl-click on Windows and Linux) to start selecting. Every row then shows a checkbox, and a bar at the bottom of the list can **Move to group**, **Pause**, **Resume**, or **Archive** everything selected. On the **Archived** tab, the same selection can **Restore** or **Delete permanently**.
 
 - **⌘-click** adds or removes one row. With a row focused, **X** does the same.
 - **Shift-click** selects every row between the last one you picked and this one.
@@ -192,5 +193,8 @@ superset automations get <id>
 superset automations run <id>
 superset automations pause <id>
 superset automations resume <id>
-superset automations delete <id>
+superset automations archive <id>     # stops it and hides it; runs stay
+superset automations list --archived
+superset automations unarchive <id>   # restores it, paused
+superset automations delete <id>      # permanently deletes an archived automation
 ```

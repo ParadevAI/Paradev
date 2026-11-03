@@ -41,11 +41,6 @@ msgstr "· 更新於{updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "將移除「{0}」及其篩選條件。工作區不受影響。"
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "「{0}」已刪除"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "「{0}」會在GitHub上被標記為關閉。你隨時可以在這裡重新開啟它。"
@@ -61,11 +56,6 @@ msgstr "「{0}」將通過{2}合併到{1}。檢查還沒通過，此操作會繞
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "「{0}」將通過{2}合併到{1}。在這裡無法復原。"
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "「{0}」將不再觸發，其執行歷史也會被移除。此操作無法復原。"
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "「{name}」大小為 {size} — 無法附加超過 {limit} 的檔案"
@@ -127,10 +117,6 @@ msgstr "{0, plural, other {# 個代理}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {無法啟動 # 個自動化} other {無法啟動 # 個自動化}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {已刪除 # 個自動化} other {已刪除 # 個自動化}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {#個工作區} other {#個工作區}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {#個執行中的代理程式仍在使用先前的帳戶。切換只對新啟動生效。} other {#個執行中的代理程式仍在使用先前的帳戶。切換只對新啟動生效。}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {已歸檔 # 個自動化} other {已歸檔 # 個自動化}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, other {提出了 # 個問題}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {無法刪除#個工作區} other {無法刪除#個工�
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {正在建立#個工作區...} other {正在建立#個工作區...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {刪除 # 個自動化？} other {刪除 # 個自動化？}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {永久刪除 # 個自動化？} other {永久刪除 # 個自動化？}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {刪除#個工作區？} other {刪除#個工作區？}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {已刪除 # 個自動化} other {已刪除 # 個自動化}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, other {已暫停 # 個自動化。}}"
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, other {暫停 # 個自動化}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {已恢復 # 個自動化。已暫停的仍保持暫停。} other {已恢復 # 個自動化。已暫停的仍保持暫停。}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {已恢復 # 個自動化} other {已恢復 # 個自動化}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "要封存 {name} 嗎？"
 msgid "Archive #{0}?"
 msgstr "封存 #{0}？"
 
+msgid "Archive automation"
+msgstr "歸檔自動化"
+
 msgid "Archive channel"
 msgstr "封存頻道"
 
@@ -2936,6 +2941,9 @@ msgstr "封存環境"
 
 msgid "Archive failed"
 msgstr "封存失敗"
+
+msgid "Archive this automation before you delete it."
+msgstr "請先歸檔此自動化，再刪除它。"
 
 msgid "Archive workspace"
 msgstr "封存工作區"
@@ -2947,6 +2955,10 @@ msgstr "已歸檔"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "已封存 · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "「{0}」已歸檔"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6610,6 +6622,10 @@ msgstr "委派"
 msgid "Delete"
 msgstr "刪除"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "永久刪除「{0}」？"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "刪除「{0}」？這會從主機上移除它的worktree。"
@@ -6655,12 +6671,6 @@ msgstr "仍然刪除"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "「仍然刪除」將完全跳過清理指令碼。"
-
-msgid "Delete automation"
-msgstr "刪除自動化"
-
-msgid "Delete automation?"
-msgstr "刪除自動化？"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6774,6 +6784,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "已刪除"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "「{0}」已刪除"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "已刪除「{deletedName}」"
 
@@ -6834,9 +6848,6 @@ msgstr "正在刪除第{0}個，共{1}個…"
 
 msgid "Deleting {name}..."
 msgstr "正在刪除{name}..."
-
-msgid "Deleting automation..."
-msgstr "正在刪除自動化..."
 
 msgid "Deleting organization..."
 msgstr "正在刪除組織..."
@@ -8006,6 +8017,9 @@ msgstr "新增代理程式失敗"
 msgid "Failed to add member"
 msgstr "新增成員失敗"
 
+msgid "Failed to archive automation"
+msgstr "無法歸檔自動化"
+
 msgid "Failed to cancel invitation"
 msgstr "取消邀請失敗"
 
@@ -8122,7 +8136,7 @@ msgid "Failed to delete account"
 msgstr "刪除帳戶失敗"
 
 msgid "Failed to delete automation"
-msgstr "刪除自動化失敗"
+msgstr "無法刪除自動化"
 
 msgid "Failed to delete host"
 msgstr "刪除主機失敗"
@@ -8302,6 +8316,9 @@ msgstr "重啟守護程式失敗"
 
 msgid "Failed to restore"
 msgstr "恢復失敗"
+
+msgid "Failed to restore automation"
+msgstr "無法恢復自動化"
 
 msgid "Failed to restore defaults"
 msgstr "恢復預設值失敗"
@@ -12143,6 +12160,9 @@ msgstr "暫無代理程式。"
 msgid "No API keys yet."
 msgstr "暫無API金鑰。"
 
+msgid "No archived automations"
+msgstr "沒有已歸檔的自動化"
+
 msgid "No archived workspaces"
 msgstr "沒有已封存的工作區"
 
@@ -13190,8 +13210,8 @@ msgstr "只有擁有者能執行這個自動化"
 msgid "Only the owner can view prompt history"
 msgstr "只有擁有者能檢視提示詞歷史"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "只有擁有者或組織擁有者能刪除這個自動化"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "只有擁有者或組織擁有者可以歸檔此自動化"
 
 msgid "Only the people listed above can open it"
 msgstr "只有上方列出的人可以開啟"
@@ -16071,6 +16091,9 @@ msgstr "恢復"
 msgid "Restore {0} to defaults?"
 msgstr "將{0}恢復為預設值？"
 
+msgid "Restore automation"
+msgstr "恢復自動化"
+
 msgid "Restore default"
 msgstr "恢復預設值"
 
@@ -16083,6 +16106,12 @@ msgstr "恢復方案"
 msgid "restore the agent defaults"
 msgstr "恢復代理程式預設設定"
 
+msgid "Restore this automation to run it"
+msgstr "恢復此自動化後才能執行"
+
+msgid "Restore this automation to view prompt history"
+msgstr "恢復此自動化後才能查看提示詞歷史"
+
 msgid "Restore this version?"
 msgstr "恢復這個版本？"
 
@@ -16094,6 +16123,14 @@ msgstr "恢復工作區"
 
 msgid "Restored"
 msgstr "已恢復"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "「{0}」已恢復"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "「{0}」已恢復，目前處於暫停狀態。"
 
 msgid "Restored \"{projectName}\""
 msgstr "已還原「{projectName}」"
@@ -19074,6 +19111,9 @@ msgstr "關注該頁面的代理程式會讀取每則留言，更新頁面並在
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "應用程式版本為 {appVersion}，但連接的是由其他程式（可能是舊版 CLI 或另一個 Paradev 版本）啟動的主機服務。重新啟動會將其替換為此應用程式自帶的副本。"
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "此自動化及其執行歷史將被刪除。此操作無法復原。"
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "此自動化的擁有者已無法在此組織中使用雲端工作區。請對方檢查存取權限，或在裝置上執行此自動化。"
 
@@ -19441,9 +19481,6 @@ msgstr "這些資料夾中仍有你的檔案，但沒有自動移轉到新版 Pa
 msgid "These ports are still in use"
 msgstr "這些埠仍在使用中"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "它們將不再執行，其執行紀錄也會被刪除。此操作無法復原。"
-
 msgid "Thinking"
 msgstr "思考"
 
@@ -19495,6 +19532,12 @@ msgstr "此自動化屬於 {0}。請切換到該組織後開啟。"
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "此自動化尚未有指示。請先在設定中撰寫提示，再執行。"
+
+msgid "This automation is archived. It does not run."
+msgstr "此自動化已歸檔，不會執行。"
+
+msgid "This automation is archived. Restore it first."
+msgstr "此自動化已歸檔。請先恢復。"
 
 msgid "This automation is in another organization"
 msgstr "此自動化位於其他組織"
