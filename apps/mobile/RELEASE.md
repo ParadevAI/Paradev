@@ -27,8 +27,36 @@ getting unstuck when App Review rejects or stalls it.
 
 ## Shipping a build
 
-Authenticate once per machine: `eas login` (or `EXPO_TOKEN` in CI, with
-`--non-interactive`). Submissions use the App Store Connect API key stored in
+Every native merge to `main` already uploads a build to TestFlight
+(`deploy.yml`). To send one to App Review, run **Release Mobile**
+(`.github/workflows/release-mobile.yml`) from the Actions tab: give it the
+"What's New" text and, optionally, a build number (default: the newest
+processed build). After a reviewer on the `mobile-release` environment
+approves the run, `scripts/submit-review.ts`:
+
+1. pushes the listing and App Review notes (`eas metadata:push`, with the
+   version set to the build's),
+2. creates or reuses that App Store version, sets "What's New" and attaches
+   the build,
+3. submits it for review, refusing if another submission is already waiting
+   or in review,
+4. opens the PR that bumps the patch version (see Versioning). That PR is
+   opened with `GITHUB_TOKEN`, so close and reopen it to run CI.
+
+Run it with `dry_run` first when anything about the release is unusual; it
+prints every App Store Connect call without making it. The same script runs
+from a laptop after `eas login`:
+`bun run scripts/submit-review.ts --whats-new "…" --dry-run`.
+
+The workflow needs `EXPO_TOKEN`, `APP_REVIEW_EMAIL` and `APP_REVIEW_PASSWORD`
+as secrets on the `mobile-release` environment (`APP_REVIEW_VIDEO_URL` is an
+optional variable). The App Store Connect API key is the one EAS Submit uses,
+read from EAS credentials, so it is not duplicated in GitHub.
+
+### By hand
+
+The fallback when the workflow is broken. Authenticate once per machine:
+`eas login` (or `EXPO_TOKEN` in CI, with `--non-interactive`). Submissions use the App Store Connect API key stored in
 EAS credentials, so no Apple password is needed locally. The demo-account
 credentials live in 1Password; copy them into `APP_REVIEW_EMAIL` and
 `APP_REVIEW_PASSWORD` in the main checkout's root `.env`, which
@@ -98,7 +126,7 @@ Channels: `preview` for internal builds, `production` for the store build.
 | Change | Lane |
 |---|---|
 | JS merged to main, under the `deploy.yml` trigger paths | `deploy.yml` publishes to `preview` and `production` |
-| Native merged to main | `deploy.yml` builds and uploads to App Store Connect; App Review stays manual |
+| Native merged to main | `deploy.yml` builds and uploads to App Store Connect; `release-mobile.yml` (manual, with approval) sends it to App Review |
 | JS on a pull request | `pr-preview.yml` publishes to a branch named after the git branch and comments a QR code, when a development build matches the fingerprint |
 | Native on a pull request | Add the `mobile-build` label; `build-pr.yml` builds a development client |
 
