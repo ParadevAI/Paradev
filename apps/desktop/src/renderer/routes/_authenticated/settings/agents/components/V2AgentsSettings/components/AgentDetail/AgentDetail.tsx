@@ -219,8 +219,9 @@ export function AgentDetail({
 
 	const handleCommandBlur = () => {
 		const parsed = parseAgentCommandText(commandText);
-		const patch = { ...parsed, env: { ...config.env, ...parsed.env } };
-		const { command } = patch;
+		const hasInlineEnv = Object.keys(parsed.env).length > 0;
+		const env = hasInlineEnv ? { ...config.env, ...parsed.env } : config.env;
+		const { command, args } = parsed;
 		if (command.length === 0) {
 			toast.error(
 				t({
@@ -232,8 +233,10 @@ export function AgentDetail({
 			);
 			return;
 		}
-		if (isAgentCommandPatchChanged(config, patch)) {
-			updateMutation.mutate(patch);
+		if (isAgentCommandPatchChanged(config, { command, args, env })) {
+			updateMutation.mutate(
+				hasInlineEnv ? { command, args, env } : { command, args },
+			);
 		}
 	};
 

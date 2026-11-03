@@ -13,7 +13,7 @@ import {
 	symlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
@@ -21,6 +21,7 @@ import type { HostDb } from "../../../../db";
 import * as schema from "../../../../db/schema";
 import {
 	resolveTrustFamily,
+	resolveTrustTarget,
 	seedAgentFolderTrust,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
@@ -221,6 +222,42 @@ describe("seedAgentFolderTrust", () => {
 		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
 			true,
 		);
+	});
+
+	test("reads a quoted CLAUDE_CONFIG_DIR from a raw command string", async () => {
+		const profile = join(dir, "profile with spaces");
+		const session = join(dir, "session");
+		mkdirSync(profile);
+		mkdirSync(session);
+		await seedAgentFolderTrust(createTestDb(), session, {
+			presetId: "custom",
+			command: `env CLAUDE_CONFIG_DIR='${profile}' claude --verbose && true`,
+			env: {},
+		});
+		const state = JSON.parse(
+			readFileSync(join(profile, ".claude.json"), "utf-8"),
+		);
+		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
+			true,
+		);
+	});
+});
+
+describe("resolveTrustTarget", () => {
+	test("env -i and -u drop the inherited CLAUDE_CONFIG_DIR", () => {
+		const target = (args: string[]) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "claude",
+				command: "env",
+				args: [...args, "claude"],
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file;
+		const defaultFile = join(homedir(), ".claude.json");
+		expect(target([])).toBe("/agent-profile/.claude.json");
+		expect(target(["-i"])).toBe(defaultFile);
+		expect(target(["-u", "CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
+		expect(target(["--unset=CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
+		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe("/p/.claude.json");
 	});
 });
 

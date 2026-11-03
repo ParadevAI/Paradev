@@ -30,6 +30,7 @@ import {
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
+import { parse } from "shell-quote";
 import type { HostDb } from "../../../../db";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
@@ -53,26 +54,60 @@ function programName(token: string): string {
 	return (token.split(/[\\/]/).pop() ?? "").toLowerCase().replace(/\.exe$/, "");
 }
 
+function commandTokens(config: LaunchCommand): string[] {
+	const command = config.command.trim();
+	const args = config.args ?? [];
+	if (!/\s/.test(command)) return [command, ...args];
+	const tokens: string[] = [];
+	for (const token of parse(command, (key) => `$${key}`)) {
+		if (typeof token === "string") tokens.push(token);
+		else if ("op" in token && token.op === "glob") tokens.push(token.pattern);
+		else break;
+	}
+	return [...tokens, ...args];
+}
+
 /**
- * Splits `[env] [VAR=value ...] <program>` into the program name and the
- * inline assignments, which override the process env at launch.
+ * Splits `[env [-i] [-u NAME] ...] [VAR=value ...] <program>` into the program
+ * name and how the wrapper changes the inherited env at launch.
  */
 function unwrapEnvCommand(config: LaunchCommand): {
 	executable: string;
 	env: Record<string, string>;
+	clearsInherited: boolean;
+	unset: string[];
 } {
-	const tokens = [
-		...config.command.trim().split(/\s+/),
-		...(config.args ?? []),
-	];
-	let index = programName(tokens[0] ?? "") === "env" ? 1 : 0;
+	const tokens = commandTokens(config);
+	let index = 0;
+	let clearsInherited = false;
+	const unset: string[] = [];
+	if (programName(tokens[0] ?? "") === "env") {
+		for (index = 1; index < tokens.length; index++) {
+			const token = tokens[index] ?? "";
+			if (token === "-i" || token === "-" || token === "--ignore-environment") {
+				clearsInherited = true;
+			} else if ((token === "-u" || token === "--unset") && tokens[index + 1]) {
+				unset.push(tokens[++index] ?? "");
+			} else if (token.startsWith("--unset=")) {
+				unset.push(token.slice("--unset=".length));
+			} else {
+				if (token === "--") index++;
+				break;
+			}
+		}
+	}
 	const env: Record<string, string> = {};
 	for (; index < tokens.length; index++) {
 		const match = ENV_ASSIGNMENT.exec(tokens[index] ?? "");
 		if (!match?.[1]) break;
 		env[match[1]] = match[2] ?? "";
 	}
-	return { executable: programName(tokens[index] ?? ""), env };
+	return {
+		executable: programName(tokens[index] ?? ""),
+		env,
+		clearsInherited,
+		unset,
+	};
 }
 
 /**
@@ -101,7 +136,7 @@ export function resolveTrustFamily(
  * `~/.claude.json` for the default home; Codex always uses
  * `$CODEX_HOME/config.toml`.
  */
-function resolveTrustTarget(
+export function resolveTrustTarget(
 	db: HostDb,
 	config: AgentLaunchConfig,
 ): TrustTarget | null {
@@ -113,11 +148,12 @@ function resolveTrustTarget(
 			file: join(homedir(), ".gemini", "antigravity-cli", "settings.json"),
 		};
 	}
-	const env = {
-		...resolveDefaultAccountEnv(db, family),
-		...config.env,
-		...unwrapEnvCommand(config).env,
-	};
+	const wrapper = unwrapEnvCommand(config);
+	const inherited: Record<string, string> = wrapper.clearsInherited
+		? {}
+		: { ...resolveDefaultAccountEnv(db, family), ...config.env };
+	for (const name of wrapper.unset) delete inherited[name];
+	const env = { ...inherited, ...wrapper.env };
 	if (family === "claude") {
 		const configDir = env.CLAUDE_CONFIG_DIR;
 		return {

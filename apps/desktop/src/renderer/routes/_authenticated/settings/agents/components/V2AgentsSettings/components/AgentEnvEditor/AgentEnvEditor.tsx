@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Plus, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { areEnvMapsEqual } from "renderer/lib/agent-launch-command";
 
 const ENV_KEY = /^[A-Za-z_][A-Za-z0-9_]*$/;
@@ -11,6 +11,7 @@ interface EnvRow {
 	id: string;
 	key: string;
 	value: string;
+	saved: { key: string; value: string } | null;
 }
 
 function toRows(env: Record<string, string>): EnvRow[] {
@@ -18,20 +19,39 @@ function toRows(env: Record<string, string>): EnvRow[] {
 		id: crypto.randomUUID(),
 		key,
 		value,
+		saved: { key, value },
 	}));
 }
 
-function isInvalidKey(key: string): boolean {
-	return key.trim().length > 0 && !ENV_KEY.test(key.trim());
+function envIdentity(env: Record<string, string>): string {
+	return JSON.stringify(
+		Object.entries(env).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+	);
 }
 
-function toEnv(rows: readonly EnvRow[]): Record<string, string> {
-	const env: Record<string, string> = {};
+function acceptedRowIds(rows: readonly EnvRow[]): Set<string> {
+	const seenKeys = new Set<string>();
+	const ids = new Set<string>();
 	for (const row of rows) {
 		const key = row.key.trim();
-		if (ENV_KEY.test(key)) env[key] = row.value;
+		if (!ENV_KEY.test(key) || seenKeys.has(key)) continue;
+		seenKeys.add(key);
+		ids.add(row.id);
 	}
-	return env;
+	return ids;
+}
+
+/** Rows whose name is not accepted keep their last saved entry. */
+function toEnv(rows: readonly EnvRow[]): Record<string, string> {
+	const accepted = acceptedRowIds(rows);
+	const entries = new Map<string, string>();
+	for (const row of rows) {
+		const entry = accepted.has(row.id)
+			? { key: row.key.trim(), value: row.value }
+			: row.saved;
+		if (entry && !entries.has(entry.key)) entries.set(entry.key, entry.value);
+	}
+	return Object.fromEntries(entries);
 }
 
 interface AgentEnvEditorProps {
@@ -49,17 +69,36 @@ export function AgentEnvEditor({
 	const variableNameLabel = t({ message: "Variable name" });
 	const variableValueLabel = t({ message: "Variable value" });
 	const [rows, setRows] = useState(() => toRows(env));
+	const committedEnvs = useRef(new Set<string>());
+	const accepted = acceptedRowIds(rows);
 
 	useEffect(() => {
+		if (committedEnvs.current.has(envIdentity(env))) return;
+		committedEnvs.current.clear();
 		setRows((current) =>
 			areEnvMapsEqual(toEnv(current), env) ? current : toRows(env),
 		);
 	}, [env]);
 
 	const commit = (next: readonly EnvRow[]) => {
-		if (next.some((row) => isInvalidKey(row.key))) return;
-		onCommit(toEnv(next));
+		const nextEnv = toEnv(next);
+		const nextAccepted = acceptedRowIds(next);
+		committedEnvs.current.add(envIdentity(nextEnv));
+		setRows((current) =>
+			current.map((row) => {
+				const sent = next.find((candidate) => candidate.id === row.id);
+				const unchanged =
+					sent && sent.key === row.key && sent.value === row.value;
+				return unchanged && nextAccepted.has(row.id)
+					? { ...row, saved: { key: row.key.trim(), value: row.value } }
+					: row;
+			}),
+		);
+		onCommit(nextEnv);
 	};
+
+	const isInvalid = (row: EnvRow) =>
+		!accepted.has(row.id) && (row.key.trim().length > 0 || row.saved !== null);
 
 	const updateRow = (id: string, patch: Partial<EnvRow>) =>
 		setRows((current) =>
@@ -75,7 +114,7 @@ export function AgentEnvEditor({
 	const addRow = () =>
 		setRows((current) => [
 			...current,
-			{ id: crypto.randomUUID(), key: "", value: "" },
+			{ id: crypto.randomUUID(), key: "", value: "", saved: null },
 		]);
 
 	return (
@@ -100,7 +139,7 @@ export function AgentEnvEditor({
 							onChange={(e) => updateRow(row.id, { key: e.target.value })}
 							onBlur={() => commit(rows)}
 							aria-label={variableNameLabel}
-							aria-invalid={isInvalidKey(row.key)}
+							aria-invalid={isInvalid(row)}
 							placeholder={variableNameLabel}
 							spellCheck={false}
 						/>
