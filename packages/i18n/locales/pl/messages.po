@@ -6155,6 +6155,9 @@ msgstr "Nie udało się zapisać rutyny"
 msgid "Couldn't save your choice. Try again."
 msgstr "Nie udało się zapisać wyboru. Spróbuj ponownie."
 
+msgid "Couldn't search your chats"
+msgstr "Nie udało się przeszukać czatów"
+
 msgid "Couldn't send comment"
 msgstr "Nie udało się wysłać komentarza"
 

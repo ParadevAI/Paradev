@@ -6149,6 +6149,9 @@ msgstr "Не вдалося зберегти рутину"
 msgid "Couldn't save your choice. Try again."
 msgstr "Не вдалося зберегти вибір. Спробуйте ще раз."
 
+msgid "Couldn't search your chats"
+msgstr "Не вдалося виконати пошук у чатах"
+
 msgid "Couldn't send comment"
 msgstr "Не вдалося надіслати коментар"
 

@@ -6155,6 +6155,9 @@ msgstr "Die Routine konnte nicht gespeichert werden"
 msgid "Couldn't save your choice. Try again."
 msgstr "Deine Auswahl konnte nicht gespeichert werden. Versuche es erneut."
 
+msgid "Couldn't search your chats"
+msgstr "Deine Chats konnten nicht durchsucht werden"
+
 msgid "Couldn't send comment"
 msgstr "Kommentar konnte nicht gesendet werden"
 

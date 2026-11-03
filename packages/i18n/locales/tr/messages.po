@@ -6155,6 +6155,9 @@ msgstr "Rutin kaydedilemedi"
 msgid "Couldn't save your choice. Try again."
 msgstr "Seçiminiz kaydedilemedi. Tekrar deneyin."
 
+msgid "Couldn't search your chats"
+msgstr "Sohbetleriniz aranamadı"
+
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
 

@@ -6155,6 +6155,9 @@ msgstr "Không thể lưu quy trình"
 msgid "Couldn't save your choice. Try again."
 msgstr "Không thể lưu lựa chọn của bạn. Hãy thử lại."
 
+msgid "Couldn't search your chats"
+msgstr "Không thể tìm kiếm các cuộc trò chuyện của bạn"
+
 msgid "Couldn't send comment"
 msgstr "Không thể gửi bình luận"
 

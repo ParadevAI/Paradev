@@ -6155,6 +6155,9 @@ msgstr "Tidak dapat menyimpan rutinitas"
 msgid "Couldn't save your choice. Try again."
 msgstr "Pilihan Anda tidak dapat disimpan. Coba lagi."
 
+msgid "Couldn't search your chats"
+msgstr "Tidak dapat mencari chat Anda"
+
 msgid "Couldn't send comment"
 msgstr "Tidak bisa mengirim komentar"
 

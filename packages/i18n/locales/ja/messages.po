@@ -6155,6 +6155,9 @@ msgstr "ルーティンを保存できませんでした"
 msgid "Couldn't save your choice. Try again."
 msgstr "選択を保存できませんでした。もう一度お試しください。"
 
+msgid "Couldn't search your chats"
+msgstr "チャットを検索できませんでした"
+
 msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
 
