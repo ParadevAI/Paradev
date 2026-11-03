@@ -2145,6 +2145,9 @@ msgstr "사이드바에 추가"
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
 
+msgid "Add variable"
+msgstr "변수 추가"
+
 msgid "Add what it does"
 msgstr "하는 일 추가"
 
@@ -15613,6 +15616,9 @@ msgstr "PR 링크를 제거할"
 msgid "Remove trigger"
 msgstr "트리거 제거"
 
+msgid "Remove variable"
+msgstr "변수 제거"
+
 msgid "Remove workspace"
 msgstr "워크스페이스 제거"
 
@@ -17278,6 +17284,9 @@ msgstr "이 프로젝트를 Paradev에 맞게 설정하기"
 
 msgid "Set up your organization to get started"
 msgstr "조직을 설정하고 시작하세요"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "이 에이전트를 실행할 때 설정됩니다. 예: 다른 Claude 로그인을 사용하려면 <0>CLAUDE_CONFIG_DIR</0>."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "설치된 플러그인을 다시 사용 가능으로 바꾸면 모두의 사본은 그대로 남고, 이후 각자 제거할 수 있습니다. 사용 불가로 바꾸면 제거됩니다."
@@ -20808,6 +20817,12 @@ msgstr "user@host, ssh://user@host:2222 또는 ssh 설정 별칭"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId가 워크스페이스의 프로젝트와 일치하지 않습니다"
+
+msgid "Variable name"
+msgstr "변수 이름"
+
+msgid "Variable value"
+msgstr "변수 값"
 
 msgid "Variables"
 msgstr "변수"

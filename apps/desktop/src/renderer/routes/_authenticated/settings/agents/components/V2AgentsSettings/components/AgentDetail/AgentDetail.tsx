@@ -24,6 +24,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Info, RotateCcw, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
+	areEnvMapsEqual,
 	getAgentCommandText,
 	isAgentCommandPatchChanged,
 	parseAgentCommandText,
@@ -33,6 +34,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { AgentEnvEditor } from "../AgentEnvEditor";
 import {
 	AgentDetailHeader,
 	AgentLaunchFields,
@@ -85,7 +87,9 @@ export function AgentDetail({
 		});
 
 	const [label, setLabel] = useState(config.label);
-	const [commandText, setCommandText] = useState(getAgentCommandText(config));
+	const [commandText, setCommandText] = useState(
+		getAgentCommandText({ command: config.command, args: config.args }),
+	);
 	const [promptArgsText, setPromptArgsText] = useState(
 		joinArgs(config.promptArgs),
 	);
@@ -102,11 +106,7 @@ export function AgentDetail({
 	useEffect(() => {
 		setLabel(config.label);
 		setCommandText(
-			getAgentCommandText({
-				command: config.command,
-				args: config.args,
-				env: config.env,
-			}),
+			getAgentCommandText({ command: config.command, args: config.args }),
 		);
 		setPromptArgsText(joinArgs(config.promptArgs));
 		setResumeArgsText(joinArgs(config.resumeArgs ?? []));
@@ -116,7 +116,6 @@ export function AgentDetail({
 		config.label,
 		config.command,
 		config.args,
-		config.env,
 		config.promptArgs,
 		config.resumeArgs,
 		config.forkArgs,
@@ -219,7 +218,8 @@ export function AgentDetail({
 	};
 
 	const handleCommandBlur = () => {
-		const patch = parseAgentCommandText(commandText);
+		const parsed = parseAgentCommandText(commandText);
+		const patch = { ...parsed, env: { ...config.env, ...parsed.env } };
 		const { command } = patch;
 		if (command.length === 0) {
 			toast.error(
@@ -227,12 +227,18 @@ export function AgentDetail({
 					message: "Command cannot be empty",
 				}),
 			);
-			setCommandText(getAgentCommandText(config));
+			setCommandText(
+				getAgentCommandText({ command: config.command, args: config.args }),
+			);
 			return;
 		}
 		if (isAgentCommandPatchChanged(config, patch)) {
 			updateMutation.mutate(patch);
 		}
+	};
+
+	const handleEnvCommit = (env: Record<string, string>) => {
+		if (!areEnvMapsEqual(env, config.env)) updateMutation.mutate({ env });
 	};
 
 	const handlePromptArgsBlur = () => {
@@ -323,6 +329,18 @@ export function AgentDetail({
 					promptTransport={promptTransport}
 					onPromptTransportChange={handleTransportChange}
 				/>
+
+				<Section
+					title={t({
+						message: "Environment Variables",
+					})}
+				>
+					<AgentEnvEditor
+						idPrefix={config.id}
+						env={config.env}
+						onCommit={handleEnvCommit}
+					/>
+				</Section>
 
 				{isHooksSetupTarget ? (
 					<div className="pt-2">

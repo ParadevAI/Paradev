@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
 	chmodSync,
@@ -6,19 +7,33 @@ import {
 	mkdtempSync,
 	readdirSync,
 	readFileSync,
+	realpathSync,
 	rmSync,
 	statSync,
 	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import type { HostDb } from "../../../../db";
+import * as schema from "../../../../db/schema";
 import {
 	resolveTrustFamily,
+	seedAgentFolderTrust,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
 	seedCodexFolderTrust,
 } from "./seed-agent-trust";
+
+function createTestDb(): HostDb {
+	const db = drizzle(new Database(":memory:"), { schema });
+	migrate(db, {
+		migrationsFolder: resolve(import.meta.dir, "../../../../../drizzle"),
+	});
+	return db as unknown as HostDb;
+}
 
 let dir: string;
 
@@ -59,6 +74,32 @@ describe("resolveTrustFamily", () => {
 				command: "C:\\tools\\codex.exe",
 			}),
 		).toBe("codex");
+	});
+
+	test("sees through env wrappers and inline assignments", () => {
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command:
+					"env CLAUDE_CONFIG_DIR=/p claude --dangerously-skip-permissions",
+			}),
+		).toBe("claude");
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command: "/usr/bin/env",
+				args: ["CODEX_HOME=/p", "A=1", "codex"],
+			}),
+		).toBe("codex");
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command: "CLAUDE_CONFIG_DIR=/p claude",
+			}),
+		).toBe("claude");
+		expect(
+			resolveTrustFamily({ presetId: "custom", command: "env my-agent" }),
+		).toBe(null);
 	});
 
 	test("returns null for providers without a known trust store", () => {
@@ -159,6 +200,27 @@ describe("seedClaudeFolderTrust", () => {
 			true,
 		);
 		expect(readdirSync(home)).toEqual([".claude.json"]);
+	});
+});
+
+describe("seedAgentFolderTrust", () => {
+	test("seeds the CLAUDE_CONFIG_DIR named by an env wrapper", async () => {
+		const profile = join(dir, "second-profile");
+		const session = join(dir, "session");
+		mkdirSync(profile);
+		mkdirSync(session);
+		await seedAgentFolderTrust(createTestDb(), session, {
+			presetId: "custom",
+			command: "env",
+			args: [`CLAUDE_CONFIG_DIR=${profile}`, "claude", "--verbose"],
+			env: { CLAUDE_CONFIG_DIR: join(dir, "overridden") },
+		});
+		const state = JSON.parse(
+			readFileSync(join(profile, ".claude.json"), "utf-8"),
+		);
+		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
+			true,
+		);
 	});
 });
 

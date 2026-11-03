@@ -2145,6 +2145,9 @@ msgstr "Add to sidebar"
 msgid "Add to workspace"
 msgstr "Add to workspace"
 
+msgid "Add variable"
+msgstr "Add variable"
+
 msgid "Add what it does"
 msgstr "Add what it does"
 
@@ -15613,6 +15616,9 @@ msgstr "remove the PR link"
 msgid "Remove trigger"
 msgstr "Remove trigger"
 
+msgid "Remove variable"
+msgstr "Remove variable"
+
 msgid "Remove workspace"
 msgstr "Remove workspace"
 
@@ -17278,6 +17284,9 @@ msgstr "Set up this project for Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Set up your organization to get started"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
@@ -20808,6 +20817,12 @@ msgstr "user@host, ssh://user@host:2222, or an ssh config alias"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId does not match the workspace's project"
+
+msgid "Variable name"
+msgstr "Variable name"
+
+msgid "Variable value"
+msgstr "Variable value"
 
 msgid "Variables"
 msgstr "Variables"
