@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { formatAge } from "@superset/i18n/format";
+import { formatAge, formatNumber } from "@superset/i18n/format";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
 import { Bot, SquareTerminal } from "lucide-react";
@@ -28,6 +28,10 @@ export function RunningTasksChip({
 	const now = useNow().getTime();
 	const count = work.length;
 	const Icon = kind === "subagent" ? Bot : SquareTerminal;
+	const label =
+		kind === "subagent"
+			? t({ message: `Subagents · ${count}` })
+			: t({ message: `Background · ${count}` });
 	const oldestStartedAtMs = Math.min(...work.map((item) => item.startedAtMs));
 	const stop = ({ taskId }: AgentWork) => {
 		setStopping((ids) => new Set(ids).add(taskId));
@@ -47,17 +51,21 @@ export function RunningTasksChip({
 	return (
 		<Popover onOpenChange={setOpen} open={open}>
 			<PopoverTrigger asChild>
-				<button className={COMPOSER_CHIP_CLASSNAME} type="button">
+				<button
+					aria-label={label}
+					className={COMPOSER_CHIP_CLASSNAME}
+					title={label}
+					type="button"
+				>
 					<Icon
 						className={cn(
 							"size-3 shrink-0 animate-pulse",
 							kind === "subagent" ? "text-sky-500" : "text-amber-500",
 						)}
 					/>
-					<span className="truncate">
-						{kind === "subagent"
-							? t({ message: `Subagents · ${count}` })
-							: t({ message: `Background · ${count}` })}
+					<span className="hidden truncate @[28rem]:inline">{label}</span>
+					<span className="tabular-nums @[28rem]:hidden">
+						{formatNumber(count)}
 					</span>
 					<span className="shrink-0 text-muted-foreground/60 tabular-nums">
 						{formatAge(oldestStartedAtMs, now)}

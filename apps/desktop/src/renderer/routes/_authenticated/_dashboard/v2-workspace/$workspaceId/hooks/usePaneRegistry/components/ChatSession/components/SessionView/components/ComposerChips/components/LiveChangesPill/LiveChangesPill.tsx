@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { formatNumber } from "@superset/i18n/format";
 import { FileDiff } from "lucide-react";
 import { DiffStatText } from "../../../../../../../../../../components/DiffStatText";
 import { useTurnChanges } from "../../../../../../hooks/useTurnChanges";
@@ -35,8 +36,13 @@ export function LiveChangesPill({
 		changes.files.map((file) => rootPlace(changes.root, file.path)),
 		{ fromHash: changes.before, toHash: changes.after },
 	);
+	const label = plural(changedCount, {
+		one: "Changes · # file",
+		other: "Changes · # files",
+	});
 	return (
 		<button
+			aria-label={label}
 			className={COMPOSER_CHIP_CLASSNAME}
 			disabled={!filter || !openDiff}
 			onClick={() => filter && openDiff?.(filter)}
@@ -44,11 +50,9 @@ export function LiveChangesPill({
 			type="button"
 		>
 			<FileDiff className="size-3 shrink-0" />
-			<span className="truncate">
-				{plural(changedCount, {
-					one: "Changes · # file",
-					other: "Changes · # files",
-				})}
+			<span className="hidden truncate @[28rem]:inline">{label}</span>
+			<span className="tabular-nums @[28rem]:hidden">
+				{formatNumber(changedCount)}
 			</span>
 			<span className="shrink-0 font-mono tabular-nums">
 				<DiffStatText

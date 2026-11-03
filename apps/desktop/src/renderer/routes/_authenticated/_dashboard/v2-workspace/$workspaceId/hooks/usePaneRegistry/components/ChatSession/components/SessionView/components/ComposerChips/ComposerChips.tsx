@@ -46,8 +46,8 @@ export function ComposerChips({
 					"pointer-events-none absolute inset-x-0 bottom-0",
 				)}
 			>
-				<div className={CHAT_COLUMN_CLASSNAME}>
-					<div className="pointer-events-auto mb-1.5 flex w-fit flex-wrap gap-1.5 empty:hidden">
+				<div className={cn(CHAT_COLUMN_CLASSNAME, "@container")}>
+					<div className="mb-1.5 flex max-w-full gap-1.5 empty:hidden [&>*]:pointer-events-auto">
 						{runningTurnId && (
 							<LiveChangesPill
 								refreshKey={liveRefreshKey}
