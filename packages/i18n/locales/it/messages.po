@@ -18525,6 +18525,9 @@ msgstr "Passa al workspace 8"
 msgid "Switch to Workspace 9"
 msgstr "Passa al workspace 9"
 
+msgid "Switch workspace"
+msgstr "Cambia workspace"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
