@@ -78,6 +78,7 @@ import {
 	UsageLimitNotice,
 } from "./components/UsageLimitNotice";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
+import { useLaunchPromptDelivered } from "./hooks/useLaunchPromptDelivered";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
@@ -350,16 +351,7 @@ export function SessionView({
 		}
 		return null;
 	}, [snapshotItems]);
-	const delivered = useMemo(
-		() =>
-			[...snapshotItems.values()].some(
-				({ item }) => item.kind === "user_message",
-			),
-		[snapshotItems],
-	);
-	useEffect(() => {
-		if (delivered) onLaunchPromptDelivered?.();
-	}, [delivered, onLaunchPromptDelivered]);
+	useLaunchPromptDelivered(snapshotItems, onLaunchPromptDelivered);
 	const queuedPrompts = useStableList(
 		useMemo(
 			() => deriveQueuedPrompts({ items: snapshotItems }),
