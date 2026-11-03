@@ -4755,6 +4755,9 @@ msgstr "命令..."
 msgid "Commands"
 msgstr "命令"
 
+msgid "Commands only"
+msgstr "仅命令"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "用于工作区初始化、清理和“运行”按钮的命令。"
 
@@ -12134,9 +12137,6 @@ msgstr "无颜色"
 msgid "No command configured."
 msgstr "未配置命令。"
 
-msgid "No commands found."
-msgstr "未找到命令。"
-
 msgid "No comment body"
 msgstr "没有评论正文"
 
@@ -16739,6 +16739,9 @@ msgstr "搜索触发器..."
 
 msgid "Search workspaces"
 msgstr "搜索工作区"
+
+msgid "Search workspaces, commands, files…"
+msgstr "搜索工作区、命令、文件…"
 
 msgid "Search workspaces..."
 msgstr "搜索工作区..."

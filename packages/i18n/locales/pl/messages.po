@@ -4755,6 +4755,9 @@ msgstr "Polecenie..."
 msgid "Commands"
 msgstr "Polecenia"
 
+msgid "Commands only"
+msgstr "Tylko polecenia"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Polecenia uruchamiane przy konfiguracji i sprzątaniu obszaru roboczego oraz przyciskiem Uruchom."
 
@@ -12134,9 +12137,6 @@ msgstr "Bez koloru"
 msgid "No command configured."
 msgstr "Nie skonfigurowano polecenia."
 
-msgid "No commands found."
-msgstr "Nie znaleziono poleceń."
-
 msgid "No comment body"
 msgstr "Brak treści komentarza"
 
@@ -16739,6 +16739,9 @@ msgstr "Szukaj wyzwalaczy..."
 
 msgid "Search workspaces"
 msgstr "Szukaj obszarów roboczych"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Szukaj obszarów roboczych, poleceń, plików…"
 
 msgid "Search workspaces..."
 msgstr "Szukaj obszarów roboczych..."

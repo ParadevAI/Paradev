@@ -4755,6 +4755,9 @@ msgstr "コマンド..."
 msgid "Commands"
 msgstr "コマンド"
 
+msgid "Commands only"
+msgstr "コマンドのみ"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "ワークスペースのセットアップ、ティアダウン、実行ボタンで実行されるコマンド。"
 
@@ -12134,9 +12137,6 @@ msgstr "色なし"
 msgid "No command configured."
 msgstr "コマンドが設定されていません。"
 
-msgid "No commands found."
-msgstr "コマンドが見つかりません。"
-
 msgid "No comment body"
 msgstr "コメント本文はありません"
 
@@ -16739,6 +16739,9 @@ msgstr "トリガーを検索..."
 
 msgid "Search workspaces"
 msgstr "ワークスペースを検索"
+
+msgid "Search workspaces, commands, files…"
+msgstr "ワークスペース、コマンド、ファイルを検索…"
 
 msgid "Search workspaces..."
 msgstr "ワークスペースを検索..."

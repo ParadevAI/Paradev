@@ -4755,6 +4755,9 @@ msgstr "Perintah..."
 msgid "Commands"
 msgstr "Perintah"
 
+msgid "Commands only"
+msgstr "Hanya perintah"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Perintah yang dijalankan untuk setup workspace, teardown, dan tombol Run."
 
@@ -12134,9 +12137,6 @@ msgstr "Tanpa warna"
 msgid "No command configured."
 msgstr "Tidak ada perintah yang dikonfigurasi."
 
-msgid "No commands found."
-msgstr "Tidak ada perintah ditemukan."
-
 msgid "No comment body"
 msgstr "Tidak ada isi komentar"
 
@@ -16739,6 +16739,9 @@ msgstr "Cari pemicu..."
 
 msgid "Search workspaces"
 msgstr "Cari workspace"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Cari workspace, perintah, file…"
 
 msgid "Search workspaces..."
 msgstr "Cari workspace..."

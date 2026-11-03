@@ -4755,6 +4755,9 @@ msgstr "Příkaz..."
 msgid "Commands"
 msgstr "Příkazy"
 
+msgid "Commands only"
+msgstr "Pouze příkazy"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Příkazy spouštěné při setupu a teardownu pracovního prostoru a tlačítkem Spustit."
 
@@ -12134,9 +12137,6 @@ msgstr "Bez barvy"
 msgid "No command configured."
 msgstr "Není nastavený žádný příkaz."
 
-msgid "No commands found."
-msgstr "Nenalezeny žádné příkazy."
-
 msgid "No comment body"
 msgstr "Bez textu komentáře"
 
@@ -16739,6 +16739,9 @@ msgstr "Hledat spouštěče..."
 
 msgid "Search workspaces"
 msgstr "Hledat pracovní prostory"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Hledat pracovní prostory, příkazy, soubory…"
 
 msgid "Search workspaces..."
 msgstr "Hledat pracovní prostory..."

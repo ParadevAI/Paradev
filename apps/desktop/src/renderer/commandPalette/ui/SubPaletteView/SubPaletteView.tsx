@@ -50,6 +50,7 @@ export function SubPaletteView({
 						key={command.id}
 						command={command}
 						onSelect={onSelect}
+						query={query}
 					/>
 				))}
 			</CommandGroup>

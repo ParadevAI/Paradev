@@ -24,6 +24,7 @@ import { executeCommand } from "../../core/execute";
 import { useFrameStackStore } from "../../core/frames";
 import type { Command as CommandType } from "../../core/types";
 import { CommandListView } from "../CommandListView/CommandListView";
+import { CommandPaletteFooter } from "../CommandPaletteFooter";
 import { SubPaletteView } from "../SubPaletteView/SubPaletteView";
 import { WorkspaceSwitcherView } from "../WorkspaceList/WorkspaceSwitcherView";
 
@@ -162,9 +163,7 @@ export function CommandPalette() {
 			})
 		: isSwitcher
 			? t({ message: "Switch to…" })
-			: t({
-					message: "Type a command or search…",
-				});
+			: t({ message: "Search workspaces, commands, files…" });
 
 	const backButton = (
 		<button
@@ -181,7 +180,7 @@ export function CommandPalette() {
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent
 				showCloseButton={false}
-				className="!max-w-[720px] sm:!max-w-[720px] translate-y-0 max-h-[80vh] overflow-hidden p-0"
+				className="!max-w-[640px] sm:!max-w-[640px] translate-y-0 max-h-[80vh] overflow-hidden rounded-xl p-0"
 				style={{ top: "max(16px, calc(50% - 278px))" }}
 			>
 				<DialogHeader className="sr-only">
@@ -197,7 +196,7 @@ export function CommandPalette() {
 					shouldFilter={false}
 					value={isSwitcher ? (switcherValue ?? "") : undefined}
 					onValueChange={isSwitcher ? setSwitcherValue : undefined}
-					className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:rounded-md [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-[7px] [&_[cmdk-list]]:max-h-[min(500px,calc(80vh-3rem))]"
+					className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-11 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-4 [&_[cmdk-input-wrapper]_svg]:w-4 [&_[cmdk-input]]:h-11 [&_[cmdk-item]]:rounded-md [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-[7px] [&_[cmdk-list]]:max-h-[min(500px,calc(80vh-3rem))]"
 				>
 					<CommandInput
 						ref={inputRef}
@@ -220,6 +219,7 @@ export function CommandPalette() {
 							<CommandListView query={query} onSelect={handleSelect} />
 						)}
 					</QueryContext.Provider>
+					{!currentFrame && !isSwitcher ? <CommandPaletteFooter /> : null}
 				</Command>
 			</DialogContent>
 		</Dialog>

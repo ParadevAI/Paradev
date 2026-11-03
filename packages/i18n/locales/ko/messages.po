@@ -4755,6 +4755,9 @@ msgstr "명령..."
 msgid "Commands"
 msgstr "명령"
 
+msgid "Commands only"
+msgstr "명령만"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "워크스페이스 설정, 정리, 실행 버튼에 사용되는 명령입니다."
 
@@ -12134,9 +12137,6 @@ msgstr "색상 없음"
 msgid "No command configured."
 msgstr "구성된 명령이 없습니다."
 
-msgid "No commands found."
-msgstr "명령을 찾을 수 없습니다."
-
 msgid "No comment body"
 msgstr "코멘트 본문 없음"
 
@@ -16739,6 +16739,9 @@ msgstr "트리거 검색..."
 
 msgid "Search workspaces"
 msgstr "워크스페이스 검색"
+
+msgid "Search workspaces, commands, files…"
+msgstr "워크스페이스, 명령, 파일 검색…"
 
 msgid "Search workspaces..."
 msgstr "워크스페이스 검색..."

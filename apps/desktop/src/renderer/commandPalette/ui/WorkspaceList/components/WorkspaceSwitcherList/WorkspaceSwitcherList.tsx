@@ -2,22 +2,16 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
-import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
-import { track } from "renderer/lib/analytics";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { useSwitcherGroups } from "../../hooks/useSwitcherGroups";
+import { useSwitchToWorkspace } from "../../hooks/useSwitchToWorkspace";
 import {
-	type AccessibleV2Workspace,
-	useAccessibleV2Workspaces,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
-import { useFrameStackStore } from "../../../../core/frames";
-import {
-	bucketWorkspaces,
 	rankSwitcherRows,
 	type SwitcherBucket,
 	type SwitcherRow,
 } from "../../utils/bucketWorkspaces";
-import { WorkspaceSwitcherRow } from "./components/WorkspaceSwitcherRow";
+import { WorkspaceSwitcherRow } from "../WorkspaceSwitcherRow";
 import { type SwitcherCycle, useSwitcherCycle } from "./hooks/useSwitcherCycle";
 
 const BUCKET_LABELS: Record<SwitcherBucket, MessageDescriptor> = {
@@ -39,17 +33,9 @@ export function WorkspaceSwitcherList({
 	cycle,
 }: WorkspaceSwitcherListProps) {
 	const { i18n } = useLingui();
-	const { all: workspaces } = useAccessibleV2Workspaces();
-	const currentPath = useLocation({ select: (loc) => loc.pathname });
-	const currentId = currentPath.match(/^\/v2-workspace\/([^/]+)/)?.[1] ?? null;
-	const navigate = useNavigate();
-	const setOpen = useFrameStackStore((s) => s.setOpen);
+	const groups = useSwitcherGroups();
 	const trimmed = query.trim();
 
-	const groups = useMemo(
-		() => bucketWorkspaces(workspaces, currentId),
-		[workspaces, currentId],
-	);
 	const results = useMemo(
 		() => (trimmed ? rankSwitcherRows(groups, trimmed) : null),
 		[groups, trimmed],
@@ -59,24 +45,14 @@ export function WorkspaceSwitcherList({
 		[results, groups],
 	);
 
+	const switchTo = useSwitchToWorkspace("switcher");
 	const select = useCallback(
 		(
 			row: SwitcherRow<AccessibleV2Workspace>,
 			index: number,
 			viaHold: boolean,
-		) => {
-			setOpen(false);
-			if (row.isCurrent) return;
-			track("workspace_switched", {
-				via: "switcher",
-				bucket: row.bucket,
-				index,
-				searched: trimmed.length > 0,
-				hold: viaHold,
-			});
-			void navigateToV2Workspace(row.workspace.id, navigate);
-		},
-		[setOpen, trimmed, navigate],
+		) => switchTo(row, index, { searched: trimmed.length > 0, hold: viaHold }),
+		[switchTo, trimmed],
 	);
 
 	useSwitcherCycle(cycle, ordered, trimmed, select);

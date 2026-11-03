@@ -11,7 +11,7 @@ import { hasLiveWorkspaceState } from "renderer/routes/_authenticated/_dashboard
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
-import { MatchedText } from "../../../../../MatchedText";
+import { MatchedText } from "../../../MatchedText";
 
 interface WorkspaceSwitcherRowProps {
 	workspace: AccessibleV2Workspace;

@@ -115,3 +115,11 @@ export function rankSwitcherRows<T extends BucketInputs>(
 		.sort((a, b) => b.score - a.score || a.order - b.order)
 		.map((entry) => entry.row);
 }
+
+/** The row's match score for the query, on the palette's own scale. */
+export function switcherRowScore<T extends BucketInputs>(
+	row: SwitcherRow<T>,
+	query: string,
+): number {
+	return scoreText(searchable(row.workspace), query);
+}

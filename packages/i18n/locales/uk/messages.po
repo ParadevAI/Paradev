@@ -4749,6 +4749,9 @@ msgstr "Команда..."
 msgid "Commands"
 msgstr "Команди"
 
+msgid "Commands only"
+msgstr "Лише команди"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Команди для налаштування та очищення робочого простору і для кнопки «Запустити»."
 
@@ -12128,9 +12131,6 @@ msgstr "Без кольору"
 msgid "No command configured."
 msgstr "Команду не налаштовано."
 
-msgid "No commands found."
-msgstr "Команд не знайдено."
-
 msgid "No comment body"
 msgstr "Коментар без тексту"
 
@@ -16733,6 +16733,9 @@ msgstr "Пошук тригерів..."
 
 msgid "Search workspaces"
 msgstr "Пошук робочих просторів"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Пошук робочих просторів, команд, файлів…"
 
 msgid "Search workspaces..."
 msgstr "Пошук робочих просторів..."

@@ -4755,6 +4755,9 @@ msgstr "Lệnh..."
 msgid "Commands"
 msgstr "Lệnh"
 
+msgid "Commands only"
+msgstr "Chỉ lệnh"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Các lệnh chạy khi thiết lập, dọn dẹp workspace và khi nhấn nút Chạy."
 
@@ -12134,9 +12137,6 @@ msgstr "Không màu"
 msgid "No command configured."
 msgstr "Chưa cấu hình lệnh."
 
-msgid "No commands found."
-msgstr "Không tìm thấy lệnh nào."
-
 msgid "No comment body"
 msgstr "Không có nội dung bình luận"
 
@@ -16739,6 +16739,9 @@ msgstr "Tìm trình kích hoạt..."
 
 msgid "Search workspaces"
 msgstr "Tìm workspace"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Tìm workspace, lệnh, tệp…"
 
 msgid "Search workspaces..."
 msgstr "Tìm workspace..."
