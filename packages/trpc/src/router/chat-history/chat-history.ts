@@ -149,12 +149,12 @@ export const chatHistoryRouter = {
 						lastSeq: sameEpoch
 							? sql`greatest(coalesce(${chatSessions.lastSeq}, 0), ${folded.lastSeq})`
 							: folded.lastSeq,
-						...(freshState
-							? {
-									status: freshState.status,
-									...(freshState.title ? { title: freshState.title } : {}),
-								}
-							: {}),
+						...(freshState ? { status: freshState.status } : {}),
+						...(freshState?.title !== undefined
+							? { title: freshState.title }
+							: !sameEpoch
+								? { title: null }
+								: {}),
 						lastActiveAt: new Date(),
 					})
 					.where(eq(chatSessions.id, input.sessionId));
