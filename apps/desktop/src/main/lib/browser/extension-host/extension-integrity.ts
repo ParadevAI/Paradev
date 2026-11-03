@@ -1,5 +1,5 @@
 import { createHash, createPublicKey, verify } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
@@ -27,13 +27,14 @@ const WEB_STORE_CONTENTS_KEY = createPublicKey({
 });
 
 const MANIFEST = "manifest.json";
+// Electron deletes this folder from the extension on every load.
 const METADATA_DIR = "_metadata";
 const VERIFIED_CONTENTS = `${METADATA_DIR}/verified_contents.json`;
 const SHA256_BYTES = 32;
 const PARALLEL_READS = 8;
 const VERSION = /^\d+(\.\d+){0,3}$/;
 
-/** The files on disk are not the ones the Web Store signed. */
+/** A file of the extension differs from its record. */
 export class ExtensionIntegrityError extends Error {}
 
 const verifiedContentsSchema = z.array(
@@ -70,10 +71,10 @@ const payloadSchema = z.object({
 });
 
 const recordSchema = z.union([
-	z.object({ manifest: z.string() }),
-	z.object({ manifestSha256: z.string() }),
+	z.object({ manifest: z.string(), verifiedContents: z.string() }),
+	z.object({ fileSha256: z.record(z.string(), z.string()) }),
 ]);
-type ManifestRecord = z.infer<typeof recordSchema>;
+type FilesRecord = z.infer<typeof recordSchema>;
 
 interface SignedContents {
 	id: string;
@@ -82,64 +83,57 @@ interface SignedContents {
 	rootHashes: Map<string, string[]>;
 }
 
+type UsableRecord =
+	| { kind: "signed"; signed: SignedContents; manifest: Buffer }
+	| { kind: "trusted"; fileSha256: Record<string, string> };
+
 /**
- * Checks an unpacked Web Store extension against the hashes the Web Store
- * signed, as Chrome's content verifier does, and throws
- * `ExtensionIntegrityError` when they differ. The package rewrites
- * manifest.json to add `key`, so it is checked against the original saved by
- * `saveSignedManifest` instead. With `trustUnsavedManifest`, a version that has
- * no saved original has its current manifest.json recorded as trusted.
+ * Checks an unpacked extension against its record and throws
+ * `ExtensionIntegrityError` on a difference. The signed record saved at
+ * install holds the Web Store's hashes; without a usable record, the current
+ * files are recorded as trusted and the result is "recorded". Other errors mean
+ * the files could not be checked.
  */
-export async function verifyExtensionFiles(
+export async function checkExtensionFiles(
 	dir: string,
-	options: {
-		extensionId: string;
-		manifestsPath: string;
-		trustUnsavedManifest: boolean;
-	},
-): Promise<{ version: string }> {
-	const signed = readSignedContents(
-		await readFile(path.join(dir, VERIFIED_CONTENTS), "utf8").catch(
-			(error: unknown) => {
-				throw isMissing(error)
-					? new ExtensionIntegrityError("it has no Web Store signed hashes")
-					: error;
-			},
-		),
+	options: { extensionId: string; version: string; manifestsPath: string },
+): Promise<"verified" | "recorded"> {
+	const file = recordPath(
+		options.manifestsPath,
+		options.extensionId,
+		options.version,
 	);
-	if (signed.id !== options.extensionId) {
-		throw new ExtensionIntegrityError(`its signed hashes are for ${signed.id}`);
+	const record = await readUsableRecord(file, options);
+	const { files, others } = await listFiles(dir);
+	if (!record) {
+		if (others[0]) throw new Error(`${others[0]} is not a plain file`);
+		const fileSha256: Record<string, string> = {};
+		await forEachLimited(files, PARALLEL_READS, async (relative) => {
+			fileSha256[relative] = sha256(
+				await readFile(path.join(dir, relative)),
+			).toString("hex");
+		});
+		await mkdir(path.dirname(file), { recursive: true });
+		const trusted: FilesRecord = { fileSha256 };
+		await writeFile(file, JSON.stringify(trusted));
+		return "recorded";
 	}
-	const files = (await listFiles(dir)).filter(
-		(file) => file !== MANIFEST && !file.startsWith(`${METADATA_DIR}/`),
-	);
-	const unchecked = new Set(signed.rootHashes.keys());
-	unchecked.delete(canonicalPath(MANIFEST));
-	await forEachLimited(files, PARALLEL_READS, async (file) => {
-		const key = canonicalPath(file);
-		const expected = signed.rootHashes.get(key);
-		if (!expected) {
-			throw new ExtensionIntegrityError(`${file} is not in its signed hashes`);
-		}
-		const actual = treeHashRoot(
-			await readFile(path.join(dir, file)),
-			signed.blockSize,
-		);
-		if (!expected.includes(actual)) {
-			throw new ExtensionIntegrityError(`${file} changed`);
-		}
-		unchecked.delete(key);
-	});
-	const missing = unchecked.values().next().value;
-	if (missing !== undefined) {
-		throw new ExtensionIntegrityError(`${missing} is missing`);
+	if (others[0]) {
+		throw new ExtensionIntegrityError(`${others[0]} is not a plain file`);
 	}
-	await verifyManifest(dir, signed, options);
-	return { version: signed.version };
+	if (record.kind === "signed") {
+		await verifySignedFiles(dir, files, record.signed, record.manifest);
+	} else {
+		await verifyTrustedFiles(dir, files, record.fileSha256);
+	}
+	return "verified";
 }
 
-/** Saves the CRX's own manifest.json, which the package rewrites when it unpacks. */
-export function saveSignedManifest(
+/**
+ * Saves the CRX's own manifest.json, which the package rewrites when it
+ * unpacks, and its signed hashes, which Electron deletes when it loads.
+ */
+export function saveSignedRecord(
 	crx: Buffer,
 	extensionId: string,
 	manifestsPath: string,
@@ -152,8 +146,16 @@ export function saveSignedManifest(
 		throw new Error("CRX manifest has no valid version");
 	}
 	const file = recordPath(manifestsPath, extensionId, version);
+	const verifiedContents = readZipEntry(archive, VERIFIED_CONTENTS);
+	if (!verifiedContents) {
+		rmSync(file, { force: true });
+		return;
+	}
 	mkdirSync(path.dirname(file), { recursive: true });
-	const record: ManifestRecord = { manifest: manifest.toString("base64") };
+	const record: FilesRecord = {
+		manifest: manifest.toString("base64"),
+		verifiedContents: verifiedContents.toString("utf8"),
+	};
 	writeFileSync(file, JSON.stringify(record));
 }
 
@@ -186,79 +188,123 @@ export function recordPath(
 	return path.join(manifestsPath, extensionId, `${version}.json`);
 }
 
-async function verifyManifest(
-	dir: string,
-	signed: SignedContents,
-	options: { manifestsPath: string; trustUnsavedManifest: boolean },
-): Promise<void> {
-	const onDisk = await readFile(path.join(dir, MANIFEST));
-	let manifest: { key?: unknown; version?: unknown };
+async function readUsableRecord(
+	file: string,
+	options: { extensionId: string; version: string },
+): Promise<UsableRecord | null> {
+	let text: string;
 	try {
-		manifest = JSON.parse(onDisk.toString("utf8"));
-	} catch {
-		throw new ExtensionIntegrityError(`${MANIFEST} is not valid JSON`);
+		text = await readFile(file, "utf8");
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+		throw error;
 	}
+	const parsed = recordSchema.safeParse(parseJson(text));
+	if (!parsed.success) {
+		console.error(`[extension-host] Ignoring malformed record ${file}`);
+		return null;
+	}
+	if ("fileSha256" in parsed.data) {
+		return { kind: "trusted", fileSha256: parsed.data.fileSha256 };
+	}
+	const manifest = Buffer.from(parsed.data.manifest, "base64");
+	const signed = readSignedContents(parsed.data.verifiedContents);
+	const problem = !signed
+		? "its Web Store signature does not verify"
+		: signed.id !== options.extensionId || signed.version !== options.version
+			? "it is for another extension or version"
+			: !signed.rootHashes
+						.get(canonicalPath(MANIFEST))
+						?.includes(treeHashRoot(manifest, signed.blockSize))
+				? "its manifest is not the signed one"
+				: null;
+	if (problem || !signed) {
+		console.error(`[extension-host] Ignoring record ${file}: ${problem}`);
+		return null;
+	}
+	return { kind: "signed", signed, manifest };
+}
+
+async function verifySignedFiles(
+	dir: string,
+	files: string[],
+	signed: SignedContents,
+	originalManifest: Buffer,
+): Promise<void> {
+	const unchecked = new Set(signed.rootHashes.keys());
+	unchecked.delete(canonicalPath(MANIFEST));
+	await forEachLimited(
+		files.filter((file) => file !== MANIFEST),
+		PARALLEL_READS,
+		async (file) => {
+			const key = canonicalPath(file);
+			const expected = signed.rootHashes.get(key);
+			if (!expected) {
+				throw new ExtensionIntegrityError(
+					`${file} is not in its signed hashes`,
+				);
+			}
+			const actual = treeHashRoot(
+				await readFile(path.join(dir, file)),
+				signed.blockSize,
+			);
+			if (!expected.includes(actual)) {
+				throw new ExtensionIntegrityError(`${file} changed`);
+			}
+			unchecked.delete(key);
+		},
+	);
+	const missing = unchecked.values().next().value;
+	if (missing !== undefined) {
+		throw new ExtensionIntegrityError(`${missing} is missing`);
+	}
+
+	const onDisk = await readFile(path.join(dir, MANIFEST));
+	const manifest = parseJson(onDisk.toString("utf8")) as {
+		key?: unknown;
+	} | null;
 	if (
-		typeof manifest.key !== "string" ||
+		typeof manifest?.key !== "string" ||
 		toExtensionId(
 			sha256(Buffer.from(manifest.key, "base64")).subarray(0, 16),
 		) !== signed.id
 	) {
 		throw new ExtensionIntegrityError(`${MANIFEST} has a different key`);
 	}
-	if (manifest.version !== signed.version) {
-		throw new ExtensionIntegrityError(`${MANIFEST} has a different version`);
+	// The package's own rewrite: the original, with `key` set.
+	const expected = JSON.parse(originalManifest.toString("utf8"));
+	expected.key = manifest.key;
+	if (!Buffer.from(JSON.stringify(expected, null, 2)).equals(onDisk)) {
+		throw new ExtensionIntegrityError(`${MANIFEST} changed`);
 	}
-
-	const file = recordPath(options.manifestsPath, signed.id, signed.version);
-	const record = await readRecord(file);
-	if (record && "manifest" in record) {
-		const original = Buffer.from(record.manifest, "base64");
-		const signedRoots = signed.rootHashes.get(canonicalPath(MANIFEST)) ?? [];
-		if (!signedRoots.includes(treeHashRoot(original, signed.blockSize))) {
-			throw new ExtensionIntegrityError(
-				`the saved ${MANIFEST} is not the signed one`,
-			);
-		}
-		// The package's own rewrite: the original, with `key` set.
-		const expected = JSON.parse(original.toString("utf8"));
-		expected.key = manifest.key;
-		if (!Buffer.from(JSON.stringify(expected, null, 2)).equals(onDisk)) {
-			throw new ExtensionIntegrityError(`${MANIFEST} changed`);
-		}
-		return;
-	}
-	const digest = sha256(onDisk).toString("hex");
-	if (record) {
-		if (record.manifestSha256 !== digest) {
-			throw new ExtensionIntegrityError(`${MANIFEST} changed`);
-		}
-		return;
-	}
-	if (!options.trustUnsavedManifest) {
-		throw new ExtensionIntegrityError(`${MANIFEST} has no saved copy`);
-	}
-	await mkdir(path.dirname(file), { recursive: true });
-	const trusted: ManifestRecord = { manifestSha256: digest };
-	await writeFile(file, JSON.stringify(trusted));
 }
 
-async function readRecord(file: string): Promise<ManifestRecord | null> {
-	let text: string;
-	try {
-		text = await readFile(file, "utf8");
-	} catch (error) {
-		if (isMissing(error)) return null;
-		throw error;
+async function verifyTrustedFiles(
+	dir: string,
+	files: string[],
+	fileSha256: Record<string, string>,
+): Promise<void> {
+	const unchecked = new Set(Object.keys(fileSha256));
+	await forEachLimited(files, PARALLEL_READS, async (file) => {
+		const expected = Object.hasOwn(fileSha256, file)
+			? fileSha256[file]
+			: undefined;
+		if (!expected) {
+			throw new ExtensionIntegrityError(`${file} was added`);
+		}
+		const actual = sha256(await readFile(path.join(dir, file))).toString("hex");
+		if (actual !== expected) {
+			throw new ExtensionIntegrityError(`${file} changed`);
+		}
+		unchecked.delete(file);
+	});
+	const missing = unchecked.values().next().value;
+	if (missing !== undefined) {
+		throw new ExtensionIntegrityError(`${missing} is missing`);
 	}
-	const record = recordSchema.safeParse(parseJson(text));
-	if (!record.success) {
-		throw new ExtensionIntegrityError("its saved manifest record is malformed");
-	}
-	return record.data;
 }
 
-function readSignedContents(json: string): SignedContents {
+function readSignedContents(json: string): SignedContents | null {
 	const parsed = verifiedContentsSchema.safeParse(parseJson(json));
 	const signedContent = parsed.success
 		? parsed.data.find((entry) => entry.description === "treehash per file")
@@ -267,19 +313,17 @@ function readSignedContents(json: string): SignedContents {
 	const webStore = signedContent?.signatures.find(
 		(signature) => signature.header?.kid === "webstore",
 	);
-	if (!signedContent || !webStore) {
-		throw new ExtensionIntegrityError("it has no Web Store signature");
-	}
-	const signatureValid = verify(
-		"sha256",
-		Buffer.from(`${webStore.protected}.${signedContent.payload}`),
-		WEB_STORE_CONTENTS_KEY,
-		Buffer.from(webStore.signature, "base64url"),
-	);
-	if (!signatureValid) {
-		throw new ExtensionIntegrityError(
-			"its Web Store signature does not verify",
-		);
+	if (
+		!signedContent ||
+		!webStore ||
+		!verify(
+			"sha256",
+			Buffer.from(`${webStore.protected}.${signedContent.payload}`),
+			WEB_STORE_CONTENTS_KEY,
+			Buffer.from(webStore.signature, "base64url"),
+		)
+	) {
+		return null;
 	}
 
 	const payload = payloadSchema.safeParse(
@@ -297,7 +341,7 @@ function readSignedContents(json: string): SignedContents {
 		blockSize < 2 * SHA256_BYTES ||
 		blockSize % SHA256_BYTES !== 0
 	) {
-		throw new ExtensionIntegrityError("its signed hashes are malformed");
+		return null;
 	}
 	const rootHashes = new Map<string, string[]>();
 	for (const file of treeHashes.files) {
@@ -329,19 +373,29 @@ function canonicalPath(relativePath: string): string {
 		: unix;
 }
 
-/** Relative paths of every file; a link or special file fails the check. */
-async function listFiles(root: string, relative = ""): Promise<string[]> {
+/** Relative paths of plain files outside `_metadata`, and of anything else such as links. */
+async function listFiles(
+	root: string,
+	relative = "",
+): Promise<{ files: string[]; others: string[] }> {
 	const entries = await readdir(path.join(root, relative), {
 		withFileTypes: true,
 	});
-	const files: string[] = [];
+	const found = { files: [] as string[], others: [] as string[] };
 	for (const entry of entries) {
 		const entryPath = relative ? `${relative}/${entry.name}` : entry.name;
-		if (entry.isDirectory()) files.push(...(await listFiles(root, entryPath)));
-		else if (entry.isFile()) files.push(entryPath);
-		else throw new ExtensionIntegrityError(`${entryPath} is not a plain file`);
+		if (entry.isDirectory()) {
+			if (entryPath === METADATA_DIR) continue;
+			const nested = await listFiles(root, entryPath);
+			found.files.push(...nested.files);
+			found.others.push(...nested.others);
+		} else if (entry.isFile()) {
+			found.files.push(entryPath);
+		} else {
+			found.others.push(entryPath);
+		}
 	}
-	return files;
+	return found;
 }
 
 async function forEachLimited<T>(
@@ -358,8 +412,4 @@ async function forEachLimited<T>(
 
 function sha256(data: Buffer): Buffer {
 	return createHash("sha256").update(data).digest();
-}
-
-function isMissing(error: unknown): boolean {
-	return (error as NodeJS.ErrnoException | null)?.code === "ENOENT";
 }

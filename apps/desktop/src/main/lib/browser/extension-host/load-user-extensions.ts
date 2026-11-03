@@ -1,16 +1,8 @@
-import { existsSync } from "node:fs";
-import {
-	mkdir,
-	readdir,
-	readFile,
-	rename,
-	rm,
-	writeFile,
-} from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm } from "node:fs/promises";
 import path from "node:path";
 import {
+	checkExtensionFiles,
 	ExtensionIntegrityError,
-	verifyExtensionFiles,
 } from "./extension-integrity";
 
 export interface TurnedOffExtension {
@@ -22,7 +14,7 @@ export interface TurnedOffExtension {
 export interface UserExtensionPaths {
 	/** `<id>/<version>_0` folders the app loads. */
 	extensionsPath: string;
-	/** Original manifests saved at install, `<id>/<version>.json`. */
+	/** Records of each version's files, `<id>/<version>.json`. */
 	manifestsPath: string;
 	/** Extensions whose files changed, moved out so nothing loads them. */
 	turnedOffPath: string;
@@ -30,12 +22,12 @@ export interface UserExtensionPaths {
 
 const EXTENSION_ID = /^[a-p]{32}$/;
 const VERSION_DIR = /^(\d+(?:\.\d+){0,3})_\d+$/;
-// Present once every install made before manifests were saved has been trusted once.
-const EXISTING_INSTALLS_TRUSTED = ".existing-installs-trusted";
 
 /**
- * Loads each installed extension once its files match what the Web Store
- * signed. One whose files changed is moved to `turnedOffPath` and returned.
+ * Loads each installed extension after checking its files against its record.
+ * Only a file that differs from the record keeps an extension from loading: it
+ * is moved to `turnedOffPath` and returned. An extension with no usable record,
+ * or one that cannot be read, loads.
  */
 export async function loadUserExtensions(
 	session: Pick<Electron.Session, "extensions" | "serviceWorkers">,
@@ -45,47 +37,49 @@ export async function loadUserExtensions(
 		manifest: chrome.runtime.Manifest,
 	) => Promise<string>,
 ): Promise<TurnedOffExtension[]> {
-	const trustUnsavedManifest = !existsSync(
-		path.join(paths.manifestsPath, EXISTING_INSTALLS_TRUSTED),
-	);
 	const loadedVersions = new Map<string, string>();
-	let everyInstallChecked = true;
 	const loadOne = async (id: string) => {
-		let dir: string | null = null;
+		let installed: { dir: string; version: string } | null;
 		try {
-			dir = await latestVersionDir(path.join(paths.extensionsPath, id));
-			if (!dir) return;
-			const { version } = await verifyExtensionFiles(dir, {
-				extensionId: id,
-				manifestsPath: paths.manifestsPath,
-				trustUnsavedManifest,
-			});
-			loadedVersions.set(id, version);
+			installed = await latestVersion(path.join(paths.extensionsPath, id));
 		} catch (error) {
-			if (!(error instanceof ExtensionIntegrityError)) {
-				everyInstallChecked = false;
-				console.error(`[extension-host] Failed to check ${id}:`, error);
-				return;
-			}
-			console.error(`[extension-host] ${id} is turned off: ${error.message}`);
-			await turnOff(paths, id).catch((moveError: unknown) => {
-				console.error(`[extension-host] Failed to move ${id}:`, moveError);
-			});
+			console.error(`[extension-host] Failed to read ${id}:`, error);
 			return;
 		}
-		await loadAndStart(session, dir).catch((error: unknown) => {
+		if (!installed) return;
+		try {
+			const result = await checkExtensionFiles(installed.dir, {
+				extensionId: id,
+				version: installed.version,
+				manifestsPath: paths.manifestsPath,
+			});
+			if (result === "recorded") {
+				console.log(
+					`[extension-host] ${id}@${installed.version} has no signed record; its files are trusted from now on`,
+				);
+			}
+		} catch (error) {
+			if (error instanceof ExtensionIntegrityError) {
+				console.error(`[extension-host] ${id} is turned off: ${error.message}`);
+				await turnOff(paths, id).catch((moveError: unknown) => {
+					console.error(`[extension-host] Failed to move ${id}:`, moveError);
+				});
+				return;
+			}
+			console.error(
+				`[extension-host] Could not check ${id}; loading it unchecked:`,
+				error,
+			);
+		}
+		loadedVersions.set(id, installed.version);
+		await loadAndStart(session, installed.dir).catch((error: unknown) => {
 			console.error(`[extension-host] Failed to load ${id}:`, error);
 		});
 	};
 	await Promise.all((await extensionIds(paths.extensionsPath)).map(loadOne));
-	await pruneManifests(paths, loadedVersions);
-	if (everyInstallChecked) {
-		await mkdir(paths.manifestsPath, { recursive: true });
-		await writeFile(
-			path.join(paths.manifestsPath, EXISTING_INSTALLS_TRUSTED),
-			"",
-		);
-	}
+	await pruneRecords(paths, loadedVersions).catch((error: unknown) => {
+		console.error("[extension-host] Failed to prune records:", error);
+	});
 	return listTurnedOffExtensions(paths.turnedOffPath, localizedName);
 }
 
@@ -110,7 +104,7 @@ async function listTurnedOffExtensions(
 ): Promise<TurnedOffExtension[]> {
 	const turnedOff: TurnedOffExtension[] = [];
 	for (const id of await extensionIds(turnedOffPath)) {
-		const dir = await latestVersionDir(path.join(turnedOffPath, id));
+		const dir = (await latestVersion(path.join(turnedOffPath, id)))?.dir;
 		const manifest = dir ? await readManifest(dir) : null;
 		turnedOff.push({
 			id,
@@ -138,8 +132,8 @@ async function loadAndStart(
 	}
 }
 
-/** Keeps the saved manifest only for the version each installed extension loads. */
-async function pruneManifests(
+/** Keeps the record only for the version each installed extension loads. */
+async function pruneRecords(
 	paths: UserExtensionPaths,
 	loadedVersions: Map<string, string>,
 ): Promise<void> {
@@ -171,17 +165,21 @@ async function extensionIds(root: string): Promise<string[]> {
 	}
 }
 
-async function latestVersionDir(extensionDir: string): Promise<string | null> {
-	let latest: { name: string; version: number[] } | null = null;
+async function latestVersion(
+	extensionDir: string,
+): Promise<{ dir: string; version: string } | null> {
+	let latest: { name: string; version: string; parts: number[] } | null = null;
 	for (const name of await readdir(extensionDir)) {
-		const match = VERSION_DIR.exec(name)?.[1];
-		if (!match) continue;
-		const version = match.split(".").map(Number);
-		if (!latest || compareVersions(version, latest.version) > 0) {
-			latest = { name, version };
+		const version = VERSION_DIR.exec(name)?.[1];
+		if (!version) continue;
+		const parts = version.split(".").map(Number);
+		if (!latest || compareVersions(parts, latest.parts) > 0) {
+			latest = { name, version, parts };
 		}
 	}
-	return latest ? path.join(extensionDir, latest.name) : null;
+	return latest
+		? { dir: path.join(extensionDir, latest.name), version: latest.version }
+		: null;
 }
 
 function compareVersions(a: number[], b: number[]): number {

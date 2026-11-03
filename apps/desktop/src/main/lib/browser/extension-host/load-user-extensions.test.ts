@@ -1,9 +1,10 @@
-import { afterEach, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import {
 	appendFileSync,
 	existsSync,
 	mkdtempSync,
 	readFileSync,
+	renameSync,
 	rmSync,
 	writeFileSync,
 } from "node:fs";
@@ -26,7 +27,15 @@ const webStoreCrx = readFileSync(
 );
 
 const tempDirs: string[] = [];
+const consoleError = console.error;
+const consoleLog = console.log;
+beforeEach(() => {
+	console.error = () => {};
+	console.log = () => {};
+});
 afterEach(() => {
+	console.error = consoleError;
+	console.log = consoleLog;
 	for (const dir of tempDirs.splice(0)) {
 		rmSync(dir, { recursive: true, force: true });
 	}
@@ -60,12 +69,12 @@ async function downloadFromWebStore(extensionsPath: string): Promise<string> {
 	}
 }
 
-function fakeSession() {
-	const loadExtension = mock(async (dir: string) => ({
-		id: JSON_FORMATTER_ID,
-		path: dir,
-		manifest: { manifest_version: 3 },
-	}));
+// Electron's loadExtension deletes the extension's _metadata folder.
+function electronLikeSession() {
+	const loadExtension = mock(async (dir: string) => {
+		rmSync(join(dir, "_metadata"), { recursive: true, force: true });
+		return { id: JSON_FORMATTER_ID, path: dir, manifest: {} };
+	});
 	const session = {
 		extensions: { loadExtension },
 		serviceWorkers: { startWorkerForScope: mock(async () => {}) },
@@ -76,42 +85,41 @@ function fakeSession() {
 const nameOf = async (_dir: string, manifest: chrome.runtime.Manifest) =>
 	manifest.name;
 
-test("an extension whose files match the Web Store's signed hashes loads", async () => {
-	const paths = freshPaths();
-	const installed = await downloadFromWebStore(paths.extensionsPath);
-	const { session, loadExtension } = fakeSession();
-
+async function start(paths: UserExtensionPaths) {
+	const { session, loadExtension } = electronLikeSession();
 	const turnedOff = await loadUserExtensions(session, paths, nameOf);
+	return { turnedOff, loaded: loadExtension.mock.calls.map(([dir]) => dir) };
+}
 
-	expect(turnedOff).toEqual([]);
-	expect(loadExtension.mock.calls).toEqual([[installed]]);
-});
+function readRecord(paths: UserExtensionPaths): Record<string, unknown> {
+	return JSON.parse(
+		readFileSync(
+			recordPath(paths.manifestsPath, JSON_FORMATTER_ID, VERSION),
+			"utf8",
+		),
+	);
+}
 
-test("an extension with a changed file is not loaded and is listed as turned off", async () => {
+test("signed hashes saved at install still check the extension after Electron deletes _metadata", async () => {
 	const paths = freshPaths();
 	const installed = await downloadFromWebStore(paths.extensionsPath);
-	appendFileSync(join(installed, "content.js"), "\nfetch('https://evil');");
-	const { session, loadExtension } = fakeSession();
-	const errors = mock(() => {});
-	const consoleError = console.error;
-	console.error = errors;
-	try {
-		const turnedOff = await loadUserExtensions(session, paths, nameOf);
 
-		expect(loadExtension).not.toHaveBeenCalled();
-		expect(turnedOff).toEqual([
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+	expect(existsSync(join(installed, "_metadata"))).toBe(false);
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+	expect(readRecord(paths)).toHaveProperty("verifiedContents");
+
+	appendFileSync(join(installed, "content.js"), "\nfetch('https://evil');");
+	expect(await start(paths)).toEqual({
+		turnedOff: [
 			{ id: JSON_FORMATTER_ID, name: "JSON Formatter", version: VERSION },
-		]);
-		expect(String(errors.mock.calls[0])).toContain("content.js changed");
-		expect(existsSync(join(paths.extensionsPath, JSON_FORMATTER_ID))).toBe(
-			false,
-		);
-	} finally {
-		console.error = consoleError;
-	}
+		],
+		loaded: [],
+	});
+	expect(existsSync(join(paths.extensionsPath, JSON_FORMATTER_ID))).toBe(false);
 });
 
-test("a changed manifest, an added file or a missing signature turns the extension off", async () => {
+test("a changed manifest or an added file turns a signed extension off", async () => {
 	const tamper: Array<(installed: string) => void> = [
 		(installed) => {
 			const file = join(installed, "manifest.json");
@@ -120,69 +128,58 @@ test("a changed manifest, an added file or a missing signature turns the extensi
 			writeFileSync(file, JSON.stringify(manifest, null, 2));
 		},
 		(installed) => writeFileSync(join(installed, "extra.js"), "alert(1)"),
-		(installed) => rmSync(join(installed, "_metadata/verified_contents.json")),
 	];
-	const consoleError = console.error;
-	console.error = () => {};
-	try {
-		for (const change of tamper) {
-			const paths = freshPaths();
-			change(await downloadFromWebStore(paths.extensionsPath));
-			const { session, loadExtension } = fakeSession();
+	for (const change of tamper) {
+		const paths = freshPaths();
+		change(await downloadFromWebStore(paths.extensionsPath));
 
-			const turnedOff = await loadUserExtensions(session, paths, nameOf);
+		const { turnedOff, loaded } = await start(paths);
 
-			expect(loadExtension).not.toHaveBeenCalled();
-			expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
-		}
-	} finally {
-		console.error = consoleError;
+		expect(loaded).toEqual([]);
+		expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
 	}
 });
 
-test("an install from before saved manifests is trusted once, then checked", async () => {
+test("an install from before records, without _metadata, loads and is checked from then on", async () => {
 	const paths = freshPaths();
 	const installed = await downloadFromWebStore(paths.extensionsPath);
-	rmSync(recordPath(paths.manifestsPath, JSON_FORMATTER_ID, VERSION));
+	rmSync(join(installed, "_metadata"), { recursive: true });
+	rmSync(paths.manifestsPath, { recursive: true });
 
-	const first = fakeSession();
-	expect(await loadUserExtensions(first.session, paths, nameOf)).toEqual([]);
-	expect(first.loadExtension).toHaveBeenCalledTimes(1);
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+	expect(readRecord(paths)).toHaveProperty("fileSha256");
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
 
-	appendFileSync(join(installed, "manifest.json"), " ");
-	const consoleError = console.error;
-	console.error = () => {};
-	try {
-		const second = fakeSession();
-		expect(
-			(await loadUserExtensions(second.session, paths, nameOf)).length,
-		).toBe(1);
-		expect(second.loadExtension).not.toHaveBeenCalled();
-	} finally {
-		console.error = consoleError;
-	}
+	appendFileSync(join(installed, "options/options.js"), "\nalert(1);");
+	const { turnedOff, loaded } = await start(paths);
+	expect(loaded).toEqual([]);
+	expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
 });
 
-test("an update saves the manifest of the version it unpacks", async () => {
+test("an unusable record never turns an extension off", async () => {
 	const paths = freshPaths();
-	await downloadFromWebStore(paths.extensionsPath);
-	const record = recordPath(paths.manifestsPath, JSON_FORMATTER_ID, VERSION);
-	writeFileSync(record, JSON.stringify({ manifestSha256: "stale" }));
-	const consoleError = console.error;
-	console.error = () => {};
-	try {
-		const stale = fakeSession();
-		await loadUserExtensions(stale.session, paths, nameOf);
-		expect(stale.loadExtension).not.toHaveBeenCalled();
-	} finally {
-		console.error = consoleError;
-	}
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	writeFileSync(
+		recordPath(paths.manifestsPath, JSON_FORMATTER_ID, VERSION),
+		"{not json",
+	);
 
-	rmSync(paths.turnedOffPath, { recursive: true, force: true });
-	const updated = await downloadFromWebStore(paths.extensionsPath);
-	const { session, loadExtension } = fakeSession();
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+	expect(existsSync(installed)).toBe(true);
+});
 
-	expect(await loadUserExtensions(session, paths, nameOf)).toEqual([]);
-	expect(loadExtension.mock.calls).toEqual([[updated]]);
-	expect(JSON.parse(readFileSync(record, "utf8"))).toHaveProperty("manifest");
+test("an update replaces a trusted record with the signed one", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	rmSync(paths.manifestsPath, { recursive: true });
+	await start(paths);
+	expect(readRecord(paths)).toHaveProperty("fileSha256");
+
+	// The package's update: unpack to staging, then replace the folder.
+	const staged = await downloadFromWebStore(`${paths.extensionsPath}.staging`);
+	rmSync(installed, { recursive: true });
+	renameSync(staged, installed);
+
+	expect(readRecord(paths)).toHaveProperty("verifiedContents");
+	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
 });

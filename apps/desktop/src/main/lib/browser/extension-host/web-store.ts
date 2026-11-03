@@ -12,7 +12,7 @@ import {
 } from "electron-chrome-web-store";
 import { confirm } from "./confirm-dialog";
 import { verifyCrx3 } from "./crx3";
-import { saveSignedManifest } from "./extension-integrity";
+import { saveSignedRecord } from "./extension-integrity";
 import { addedAccess, installWarnings } from "./install-warnings";
 import {
 	loadUserExtensions,
@@ -39,11 +39,11 @@ export function userExtensionPaths(): UserExtensionPaths {
 	};
 }
 
-/** Installs and updates unpack only a verified CRX, and save its manifest for `loadUserExtensions`. */
+/** Installs and updates unpack only a verified CRX, and save its signed record for `loadUserExtensions`. */
 export function enableCrxVerification(): void {
 	setCrxVerifier((crx) => {
 		const extensionId = verifyCrx3(crx);
-		saveSignedManifest(crx, extensionId, userExtensionPaths().manifestsPath);
+		saveSignedRecord(crx, extensionId, userExtensionPaths().manifestsPath);
 	});
 }
 
