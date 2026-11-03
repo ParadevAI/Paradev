@@ -34,7 +34,7 @@ afterEach(() => {
 	rmSync(rulesFile(), { force: true });
 });
 
-function attachTurnedOff() {
+function attachTurnedOff(onRemoved: (id: string) => void = () => {}) {
 	const session = {
 		extensions: {
 			on: () => {},
@@ -58,6 +58,7 @@ function attachTurnedOff() {
 		session: session as unknown as Electron.Session,
 		extensions,
 		tabOf: () => undefined,
+		onRemoved,
 	});
 	mkdirSync(path.join(turnedOffDir(), "1.0_0"), { recursive: true });
 	setTurnedOffBrowserExtensions([
@@ -88,4 +89,19 @@ test("removing a turned-off extension fails when its files cannot be deleted", a
 
 	expect(existsSync(turnedOffDir())).toBe(true);
 	expect(session.clearStorageData).not.toHaveBeenCalled();
+});
+
+test("a removed extension's saved state is forgotten even when clearing its data fails", async () => {
+	const onRemoved = mock((_id: string) => {});
+	const session = attachTurnedOff(onRemoved);
+	session.clearStorageData.mockImplementation(async () => {
+		throw new Error("storage busy");
+	});
+
+	await expect(removeBrowserExtension(EXTENSION_ID)).rejects.toThrow(
+		"storage busy",
+	);
+
+	expect(existsSync(turnedOffDir())).toBe(false);
+	expect(onRemoved).toHaveBeenCalledWith(EXTENSION_ID);
 });

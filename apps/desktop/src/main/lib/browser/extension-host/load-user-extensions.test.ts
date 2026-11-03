@@ -22,6 +22,11 @@ import {
 	loadUserExtensions,
 	type UserExtensionPaths,
 } from "./load-user-extensions";
+import {
+	STORAGE_SHIM_SCRIPT,
+	shimStorageOnLoad,
+	storageShimSource,
+} from "./storage-shim-files";
 import { enableCrxVerification, userExtensionPaths } from "./web-store";
 
 const JSON_FORMATTER_ID = "bcjindcccaagfpapjjmafapmmgkkhgoa";
@@ -89,10 +94,17 @@ function electronLikeSession() {
 const nameOf = async (_dir: string, manifest: chrome.runtime.Manifest) =>
 	manifest.name;
 
-async function start(paths: UserExtensionPaths) {
+async function start(paths: UserExtensionPaths, { shim = false } = {}) {
 	const { session, loadExtension } = electronLikeSession();
+	if (shim)
+		shimStorageOnLoad(session as Electron.Session, paths.extensionsPath);
 	const turnedOff = await loadUserExtensions(session, paths, nameOf);
 	return { turnedOff, loaded: loadExtension.mock.calls.map(([dir]) => dir) };
+}
+
+function contentScripts(installed: string): { js?: string[] }[] {
+	return JSON.parse(readFileSync(join(installed, "manifest.json"), "utf8"))
+		.content_scripts;
 }
 
 function readRecord(paths: UserExtensionPaths): Record<string, unknown> {
@@ -192,6 +204,93 @@ test("an update replaces a trusted record with the signed one", async () => {
 
 	expect(readRecord(paths)).toHaveProperty("verifiedContents");
 	expect(await start(paths)).toEqual({ turnedOff: [], loaded: [installed] });
+});
+
+test("the storage shim survives restarts as a known change, and any other change still turns the extension off", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	const options = join(installed, "options/options.html");
+
+	expect(await start(paths, { shim: true })).toEqual({
+		turnedOff: [],
+		loaded: [installed],
+	});
+	expect(contentScripts(installed).map(({ js }) => js)).toEqual([
+		[STORAGE_SHIM_SCRIPT, "content.js"],
+		["set-json-global.js"],
+	]);
+	expect(readFileSync(options, "utf8")).toContain(STORAGE_SHIM_SCRIPT);
+
+	writeFileSync(join(installed, STORAGE_SHIM_SCRIPT), "alert(1)");
+	expect(await start(paths, { shim: true })).toEqual({
+		turnedOff: [],
+		loaded: [installed],
+	});
+	expect(
+		readFileSync(join(installed, STORAGE_SHIM_SCRIPT)).equals(
+			storageShimSource(),
+		),
+	).toBe(true);
+
+	appendFileSync(join(installed, "content.js"), "\nfetch('https://evil');");
+	const { turnedOff, loaded } = await start(paths, { shim: true });
+	expect(loaded).toEqual([]);
+	expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
+});
+
+test("a shim tag moved within a page, or another script beside the shim, turns the extension off", async () => {
+	const tamper: Array<(installed: string) => void> = [
+		(installed) => {
+			const file = join(installed, "options/options.html");
+			const html = readFileSync(file, "utf8");
+			const tag = `<script src="/${STORAGE_SHIM_SCRIPT}"></script>`;
+			writeFileSync(file, `${html.replace(tag, "")}${tag}`);
+		},
+		(installed) => {
+			const file = join(installed, "manifest.json");
+			const manifest = JSON.parse(readFileSync(file, "utf8"));
+			manifest.content_scripts[0].js.push("lib/extra.js");
+			writeFileSync(file, JSON.stringify(manifest, null, 2));
+		},
+	];
+	for (const change of tamper) {
+		const paths = freshPaths();
+		const installed = await downloadFromWebStore(paths.extensionsPath);
+		await start(paths, { shim: true });
+		change(installed);
+
+		const { turnedOff, loaded } = await start(paths, { shim: true });
+
+		expect(loaded).toEqual([]);
+		expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
+	}
+});
+
+test("an install from before records and the shim loads, and its record learns the shimmed manifest", async () => {
+	const paths = freshPaths();
+	const installed = await downloadFromWebStore(paths.extensionsPath);
+	rmSync(join(installed, "_metadata"), { recursive: true });
+	rmSync(paths.manifestsPath, { recursive: true });
+	await start(paths);
+	// A record written before the shim existed has hashes only.
+	const file = recordPath(paths.manifestsPath, JSON_FORMATTER_ID, VERSION);
+	const { fileSha256 } = readRecord(paths);
+	writeFileSync(file, JSON.stringify({ fileSha256 }));
+
+	expect(await start(paths, { shim: true })).toEqual({
+		turnedOff: [],
+		loaded: [installed],
+	});
+	expect(contentScripts(installed)[0]?.js?.[0]).toBe(STORAGE_SHIM_SCRIPT);
+	expect(await start(paths, { shim: true })).toEqual({
+		turnedOff: [],
+		loaded: [installed],
+	});
+
+	appendFileSync(join(installed, "content.js"), "\nalert(1);");
+	const { turnedOff, loaded } = await start(paths, { shim: true });
+	expect(loaded).toEqual([]);
+	expect(turnedOff.map(({ id }) => id)).toEqual([JSON_FORMATTER_ID]);
 });
 
 test("an install with no record turns off when it holds a symlink", async () => {

@@ -5,6 +5,13 @@ import path from "node:path";
 import { z } from "zod";
 import { toExtensionId } from "./crx3";
 import { readZipEntry } from "./read-zip-entry";
+import {
+	isExtensionPage,
+	STORAGE_SHIM_SCRIPT,
+	shimManifestText,
+	storageShimSource,
+	unshimPage,
+} from "./storage-shim-files";
 
 // Chromium's kWebstoreSignaturesPublicKey (extensions/common/constants.cc): the
 // Web Store signs each CRX's _metadata/verified_contents.json with this RSA key.
@@ -72,7 +79,10 @@ const payloadSchema = z.object({
 
 const recordSchema = z.union([
 	z.object({ manifest: z.string(), verifiedContents: z.string() }),
-	z.object({ fileSha256: z.record(z.string(), z.string()) }),
+	z.object({
+		fileSha256: z.record(z.string(), z.string()),
+		manifest: z.string().optional(),
+	}),
 ]);
 type FilesRecord = z.infer<typeof recordSchema>;
 
@@ -85,7 +95,11 @@ interface SignedContents {
 
 type UsableRecord =
 	| { kind: "signed"; signed: SignedContents; manifest: Buffer }
-	| { kind: "trusted"; fileSha256: Record<string, string> };
+	| {
+			kind: "trusted";
+			fileSha256: Record<string, string>;
+			manifest: Buffer | null;
+	  };
 
 /**
  * Checks an unpacked extension against its record and throws
@@ -110,26 +124,85 @@ export async function checkExtensionFiles(
 			throw new ExtensionIntegrityError(`${others[0]} is not a plain file`);
 		}
 		const hashes: [string, string][] = [];
-		await forEachLimited(files, PARALLEL_READS, async (relative) => {
+		const extensionFiles = files.filter(
+			(relative) => relative !== STORAGE_SHIM_SCRIPT,
+		);
+		await forEachLimited(extensionFiles, PARALLEL_READS, async (relative) => {
 			hashes.push([
 				relative,
-				sha256(await readFile(path.join(dir, relative))).toString("hex"),
+				sha256(await readOriginal(dir, relative)).toString("hex"),
 			]);
 		});
-		await mkdir(path.dirname(file), { recursive: true });
-		const trusted: FilesRecord = { fileSha256: Object.fromEntries(hashes) };
-		await writeFile(file, JSON.stringify(trusted));
+		const manifest = await readFile(path.join(dir, MANIFEST));
+		await saveTrustedRecord(file, Object.fromEntries(hashes), manifest);
 		return "recorded";
 	}
 	if (others[0]) {
 		throw new ExtensionIntegrityError(`${others[0]} is not a plain file`);
 	}
+	await verifyStorageShim(dir, files);
+	const extensionFiles = files.filter(
+		(relative) => relative !== STORAGE_SHIM_SCRIPT,
+	);
 	if (record.kind === "signed") {
-		await verifySignedFiles(dir, files, record.signed, record.manifest);
+		await verifySignedFiles(
+			dir,
+			extensionFiles,
+			record.signed,
+			record.manifest,
+		);
 	} else {
-		await verifyTrustedFiles(dir, files, record.fileSha256);
+		await verifyTrustedFiles(dir, extensionFiles, record);
+		if (!record.manifest) {
+			// Records from before the storage shim keep only a hash; the
+			// manifest just matched it, so keep its text for the shimmed form.
+			await saveTrustedRecord(
+				file,
+				record.fileSha256,
+				await readFile(path.join(dir, MANIFEST)),
+			);
+		}
 	}
 	return "verified";
+}
+
+async function saveTrustedRecord(
+	file: string,
+	fileSha256: Record<string, string>,
+	manifest: Buffer,
+): Promise<void> {
+	await mkdir(path.dirname(file), { recursive: true });
+	const trusted: FilesRecord = {
+		fileSha256,
+		manifest: manifest.toString("base64"),
+	};
+	await writeFile(file, JSON.stringify(trusted));
+}
+
+/** The app's own shim file is exactly the app's current copy. */
+async function verifyStorageShim(dir: string, files: string[]): Promise<void> {
+	if (!files.includes(STORAGE_SHIM_SCRIPT)) return;
+	const shim = await readFile(path.join(dir, STORAGE_SHIM_SCRIPT));
+	if (!shim.equals(storageShimSource())) {
+		throw new ExtensionIntegrityError(`${STORAGE_SHIM_SCRIPT} changed`);
+	}
+}
+
+/** A file's bytes with the app's storage shim tag taken back out of a page. */
+async function readOriginal(dir: string, relative: string): Promise<Buffer> {
+	const content = await readFile(path.join(dir, relative));
+	return isExtensionPage(relative) ? unshimPage(content) : content;
+}
+
+/** The manifest is the original, or the original with the storage shim added. */
+function isManifestOrShimmed(onDisk: Buffer, original: Buffer): boolean {
+	if (onDisk.equals(original)) return true;
+	try {
+		const shimmed = shimManifestText(original.toString("utf8"));
+		return Buffer.from(shimmed).equals(onDisk);
+	} catch {
+		return false;
+	}
 }
 
 /**
@@ -213,13 +286,21 @@ async function readUsableRecord(
 		return null;
 	}
 	if ("fileSha256" in parsed.data) {
+		const manifest = parsed.data.manifest
+			? Buffer.from(parsed.data.manifest, "base64")
+			: null;
 		// zod drops a `__proto__` key, which is a valid file name.
 		const { fileSha256 } = json as { fileSha256: Record<string, unknown> };
+		const recorded = parsed.data.fileSha256[MANIFEST];
 		return {
 			kind: "trusted",
 			fileSha256: Object.fromEntries(
 				Object.entries(fileSha256).map(([name, hash]) => [name, String(hash)]),
 			),
+			manifest:
+				manifest && sha256(manifest).toString("hex") === recorded
+					? manifest
+					: null,
 		};
 	}
 	const manifest = Buffer.from(parsed.data.manifest, "base64");
@@ -260,7 +341,7 @@ async function verifySignedFiles(
 				);
 			}
 			const actual = treeHashRoot(
-				await readFile(path.join(dir, file)),
+				await readOriginal(dir, file),
 				signed.blockSize,
 			);
 			if (!expected.includes(actual)) {
@@ -296,7 +377,9 @@ async function verifySignedFiles(
 	// The package's own rewrite: the original, with `key` set.
 	const expected = JSON.parse(originalManifest.toString("utf8"));
 	expected.key = manifest.key;
-	if (!Buffer.from(JSON.stringify(expected, null, 2)).equals(onDisk)) {
+	if (
+		!isManifestOrShimmed(onDisk, Buffer.from(JSON.stringify(expected, null, 2)))
+	) {
 		throw new ExtensionIntegrityError(`${MANIFEST} changed`);
 	}
 }
@@ -304,7 +387,10 @@ async function verifySignedFiles(
 async function verifyTrustedFiles(
 	dir: string,
 	files: string[],
-	fileSha256: Record<string, string>,
+	{
+		fileSha256,
+		manifest,
+	}: { fileSha256: Record<string, string>; manifest: Buffer | null },
 ): Promise<void> {
 	const unchecked = new Set(Object.keys(fileSha256));
 	await forEachLimited(files, PARALLEL_READS, async (file) => {
@@ -314,8 +400,13 @@ async function verifyTrustedFiles(
 		if (!expected) {
 			throw new ExtensionIntegrityError(`${file} was added`);
 		}
-		const actual = sha256(await readFile(path.join(dir, file))).toString("hex");
-		if (actual !== expected) {
+		const content = await readOriginal(dir, file);
+		const matches =
+			sha256(content).toString("hex") === expected ||
+			(file === MANIFEST &&
+				!!manifest &&
+				isManifestOrShimmed(content, manifest));
+		if (!matches) {
 			throw new ExtensionIntegrityError(`${file} changed`);
 		}
 		unchecked.delete(file);

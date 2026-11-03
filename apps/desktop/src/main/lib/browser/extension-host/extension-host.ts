@@ -1,4 +1,5 @@
-import { BrowserWindow, session } from "electron";
+import path from "node:path";
+import { app, BrowserWindow, session } from "electron";
 import { ElectronChromeExtensions } from "electron-chrome-extensions";
 import { BROWSER_PARTITION } from "shared/constants";
 import { watchWindows } from "../../window-registry/window-registry";
@@ -10,6 +11,8 @@ import {
 	setTurnedOffBrowserExtensions,
 } from "./browser-extensions";
 import { enforceDeclarativeNetRequest } from "./declarative-net-request";
+import { trackExtensionLifecycle } from "./extension-lifecycle";
+import { createExtensionState } from "./extension-state";
 import {
 	type ExtensionWindowOptions,
 	openExtensionWindow,
@@ -17,8 +20,10 @@ import {
 import { serveNativeMessaging } from "./native-messaging";
 import { serveOffscreenDocuments } from "./offscreen-documents";
 import { confirmPermissionRequest } from "./permission-request";
+import { shimStorageOnLoad } from "./storage-shim-files";
+import { installedExtensionIds } from "./user-extensions";
 import { waitForNewPane } from "./wait-for-new-pane";
-import { installBrowserWebStore } from "./web-store";
+import { browserExtensionsPath, installBrowserWebStore } from "./web-store";
 
 type HostTab =
 	| { kind: "pane"; paneId: string }
@@ -171,6 +176,14 @@ function startExtensionHost(): void {
 		console.error("[extension-host] declarativeNetRequest unavailable:", error);
 	}
 
+	const installRoot = browserExtensionsPath();
+	const state = createExtensionState(
+		path.join(app.getPath("userData"), "browser-extension-state.json"),
+		() => installedExtensionIds(installRoot),
+	);
+	trackExtensionLifecycle({ session: browserSession, extensions, state });
+	shimStorageOnLoad(browserSession, installRoot);
+
 	watchWindows((window) => extensions.addWindow(window));
 	browserManager.setExtensionMenuItems((contents, params) =>
 		contents.session === browserSession
@@ -183,6 +196,7 @@ function startExtensionHost(): void {
 			session: browserSession,
 			extensions,
 			tabOf: (paneId) => paneTabs.get(paneId),
+			onRemoved: (extensionId) => state.forget(extensionId),
 		});
 	} catch (error) {
 		console.error("[extension-host] Toolbar actions unavailable:", error);
