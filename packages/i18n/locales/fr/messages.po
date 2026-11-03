@@ -4938,6 +4938,9 @@ msgstr "Commande..."
 msgid "Commands"
 msgstr "Commandes"
 
+msgid "Commands only"
+msgstr "Commandes seulement"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Commandes exécutées pour la configuration et le nettoyage de l'espace de travail, ainsi que pour le bouton Exécuter."
 
@@ -12660,9 +12663,6 @@ msgstr "Aucune couleur"
 msgid "No command configured."
 msgstr "Aucune commande configurée."
 
-msgid "No commands found."
-msgstr "Aucune commande trouvée."
-
 msgid "No comment body"
 msgstr "Aucun contenu de commentaire"
 
@@ -17474,6 +17474,9 @@ msgstr "Rechercher des déclencheurs..."
 
 msgid "Search workspaces"
 msgstr "Rechercher des espaces de travail"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Rechercher des espaces de travail, commandes, fichiers…"
 
 msgid "Search workspaces..."
 msgstr "Rechercher des espaces de travail..."

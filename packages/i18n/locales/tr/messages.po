@@ -4938,6 +4938,9 @@ msgstr "Komut..."
 msgid "Commands"
 msgstr "Komutlar"
 
+msgid "Commands only"
+msgstr "Yalnızca komutlar"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Çalışma alanı kurulumu, kapatması ve Çalıştır düğmesi için çalıştırılan komutlar."
 
@@ -12660,9 +12663,6 @@ msgstr "Renk yok"
 msgid "No command configured."
 msgstr "Yapılandırılmış komut yok."
 
-msgid "No commands found."
-msgstr "Komut bulunamadı."
-
 msgid "No comment body"
 msgstr "Yorum gövdesi yok"
 
@@ -17474,6 +17474,9 @@ msgstr "Tetikleyici ara..."
 
 msgid "Search workspaces"
 msgstr "Çalışma alanlarında ara"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Çalışma alanı, komut, dosya ara…"
 
 msgid "Search workspaces..."
 msgstr "Çalışma alanı ara..."

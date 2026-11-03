@@ -6,4 +6,5 @@ export {
 	type SwitcherBucket,
 	type SwitcherGroup,
 	type SwitcherRow,
+	switcherRowScore,
 } from "./bucketWorkspaces";

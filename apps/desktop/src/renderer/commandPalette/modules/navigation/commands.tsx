@@ -1,22 +1,10 @@
 import { msg } from "@lingui/core/macro";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { BookOpenIcon, HistoryIcon, Layers, SettingsIcon } from "lucide-react";
+import { BookOpenIcon, HistoryIcon, SettingsIcon } from "lucide-react";
 import { type SwitcherOpenedVia, useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { RecentlyViewedFrame } from "../../ui/RecentlyViewed/RecentlyViewedFrame";
-import { WorkspaceListFrame } from "../../ui/WorkspaceList";
 import { settingsTabCommands } from "../settings/commands";
-
-const workspacesCommand: Command = {
-	id: "nav.workspaces",
-	title: msg({
-		message: "Workspaces",
-	}),
-	section: "navigation",
-	icon: Layers,
-	keywords: ["workspace", "project", "repo", "repository", "switch"],
-	renderFrame: () => <WorkspaceListFrame />,
-};
 
 /**
  * Opens the workspace switcher. With the modifier still held, the switcher
@@ -54,7 +42,6 @@ export const navigationProvider: CommandProvider = {
 				keywords: ["history", "recent", "back"],
 				renderFrame: () => <RecentlyViewedFrame />,
 			},
-			workspacesCommand,
 			{
 				id: "nav.docs",
 				title: msg({

@@ -1,23 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
-import { Kbd, KbdGroup } from "@superset/ui/kbd";
-import type { ReactNode } from "react";
 import { PLATFORM, useHotkeyDisplay } from "renderer/hotkeys";
 import type { SwitcherSelection } from "../../../../core/frames";
-
-function Hint({ keys, label }: { keys: string[]; label: ReactNode }) {
-	return (
-		<span className="flex items-center gap-1.5">
-			<KbdGroup>
-				{keys.map((key) => (
-					<Kbd key={key} className="h-[18px] min-w-[18px] text-[11px]">
-						{key}
-					</Kbd>
-				))}
-			</KbdGroup>
-			{label}
-		</span>
-	);
-}
+import { KeyHint } from "../../../KeyHint";
 
 /** The keys that act on the selected row, so they can be learned without a tooltip. */
 export function WorkspaceSwitcherFooter({
@@ -31,8 +15,8 @@ export function WorkspaceSwitcherFooter({
 	const modifier = PLATFORM === "mac" ? "⌘" : "Ctrl";
 	return (
 		<div className="flex h-8 shrink-0 items-center gap-4 border-t px-3.5 text-[11px] text-muted-foreground">
-			<Hint keys={["↵"]} label={t({ message: "Open" })} />
-			<Hint
+			<KeyHint keys={["↵"]} label={t({ message: "Open" })} />
+			<KeyHint
 				keys={[modifier, "⌫"]}
 				label={
 					selection?.hostType === "cloud"
@@ -41,14 +25,14 @@ export function WorkspaceSwitcherFooter({
 				}
 			/>
 			{newWorkspace.keys[0] !== "Unassigned" ? (
-				<Hint
+				<KeyHint
 					keys={newWorkspace.keys}
 					label={t({ message: "New workspace" })}
 				/>
 			) : null}
 			{next.keys[0] !== "Unassigned" ? (
 				<span className="ml-auto">
-					<Hint keys={next.keys} label={t({ message: "Next" })} />
+					<KeyHint keys={next.keys} label={t({ message: "Next" })} />
 				</span>
 			) : null}
 		</div>

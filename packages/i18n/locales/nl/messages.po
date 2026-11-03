@@ -4938,6 +4938,9 @@ msgstr "Commando..."
 msgid "Commands"
 msgstr "Commando's"
 
+msgid "Commands only"
+msgstr "Alleen opdrachten"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Commando's voor setup en teardown van werkruimtes en voor de knop Uitvoeren."
 
@@ -12660,9 +12663,6 @@ msgstr "Geen kleur"
 msgid "No command configured."
 msgstr "Geen commando geconfigureerd."
 
-msgid "No commands found."
-msgstr "Geen opdrachten gevonden."
-
 msgid "No comment body"
 msgstr "Geen tekst in de opmerking"
 
@@ -17474,6 +17474,9 @@ msgstr "Triggers zoeken..."
 
 msgid "Search workspaces"
 msgstr "Werkruimtes zoeken"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Zoek werkruimtes, opdrachten, bestanden…"
 
 msgid "Search workspaces..."
 msgstr "Werkruimtes zoeken..."

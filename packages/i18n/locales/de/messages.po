@@ -4938,6 +4938,9 @@ msgstr "Befehl..."
 msgid "Commands"
 msgstr "Befehle"
 
+msgid "Commands only"
+msgstr "Nur Befehle"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Befehle für Arbeitsbereich-Setup, Teardown und die Schaltfläche „Ausführen“."
 
@@ -12660,9 +12663,6 @@ msgstr "Keine Farbe"
 msgid "No command configured."
 msgstr "Kein Befehl konfiguriert."
 
-msgid "No commands found."
-msgstr "Keine Befehle gefunden."
-
 msgid "No comment body"
 msgstr "Kein Kommentartext"
 
@@ -17474,6 +17474,9 @@ msgstr "Auslöser suchen..."
 
 msgid "Search workspaces"
 msgstr "Arbeitsbereiche durchsuchen"
+
+msgid "Search workspaces, commands, files…"
+msgstr "Arbeitsbereiche, Befehle, Dateien suchen…"
 
 msgid "Search workspaces..."
 msgstr "Arbeitsbereiche suchen..."
