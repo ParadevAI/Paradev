@@ -1,5 +1,10 @@
 import { db } from "@superset/db/client";
-import { chatMoves, cloudWorkspaces, v2UsersHosts } from "@superset/db/schema";
+import {
+	chatMoves,
+	cloudWorkspaces,
+	v2UsersHosts,
+	v2Workspaces,
+} from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { findMovableChat, lastTurnSeq } from "../findMovableChat";
@@ -8,8 +13,8 @@ type Owner = { organizationId: string; userId: string };
 
 /**
  * Records a `pending` move; nothing runs until it is queued. A workspace on a
- * computer is known only to that computer's host, so the caller names the
- * host of each side that is not a cloud workspace.
+ * computer may not be registered yet, so the caller names the host of each
+ * side that is not a cloud workspace.
  */
 export async function createChatMove(
 	args: Owner & {
@@ -20,7 +25,7 @@ export async function createChatMove(
 		/** A retry keeps its failed move's turn while it hands on the same bundle. */
 		retryOf?: { transcriptId: string; sourceTurnSeq: number | null };
 	},
-): Promise<{ id: string; toHostId: string | null }> {
+): Promise<{ id: string; toWorkspaceId: string; toHostId: string | null }> {
 	const { session, transcript } = await findMovableChat(args);
 	if (session.v2WorkspaceId === args.toWorkspaceId) {
 		throw new TRPCError({
@@ -40,6 +45,12 @@ export async function createChatMove(
 	const fromHostId = session.v2WorkspaceId
 		? await hostOf(args, session.v2WorkspaceId, args.fromHostId)
 		: null;
+	if (fromHostId === undefined) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Name the computer the chat moves from",
+		});
+	}
 
 	const [move] = await db
 		.insert(chatMoves)
@@ -48,7 +59,7 @@ export async function createChatMove(
 			organizationId: session.organizationId,
 			createdBy: args.userId,
 			fromWorkspaceId: session.v2WorkspaceId,
-			fromHostId: fromHostId ?? null,
+			fromHostId,
 			toWorkspaceId: args.toWorkspaceId,
 			toHostId,
 			sourceTurnSeq:
@@ -59,7 +70,11 @@ export async function createChatMove(
 			transcriptId: transcript.id,
 			harnessSessionId: transcript.harnessSessionId,
 		})
-		.returning({ id: chatMoves.id, toHostId: chatMoves.toHostId })
+		.returning({
+			id: chatMoves.id,
+			toWorkspaceId: chatMoves.toWorkspaceId,
+			toHostId: chatMoves.toHostId,
+		})
 		.catch((error: unknown) => {
 			if (isUniqueViolation(error)) {
 				throw new TRPCError({
@@ -74,10 +89,11 @@ export async function createChatMove(
 }
 
 /**
- * Null for a cloud workspace in the organization, the named host when the
- * caller may use it, and undefined when neither is known. A chat only moves
- * into a cloud workspace the caller started: the move runs an agent there
- * with that box's credentials.
+ * Null for a cloud workspace in the organization, the computer it is on
+ * (its registered host, else the named one) when the caller may use it, and
+ * undefined when neither is known. A chat only moves into a cloud workspace
+ * the caller started: the move runs an agent there with that box's
+ * credentials.
  */
 async function hostOf(
 	owner: Owner,
@@ -101,19 +117,33 @@ async function hostOf(
 		}
 		return null;
 	}
-	if (!hostId) return undefined;
+	const registered = await db.query.v2Workspaces.findFirst({
+		where: and(
+			eq(v2Workspaces.id, workspaceId),
+			eq(v2Workspaces.organizationId, owner.organizationId),
+		),
+		columns: { hostId: true },
+	});
+	if (registered && hostId && registered.hostId !== hostId) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "That workspace is not on that computer",
+		});
+	}
+	const resolved = registered?.hostId ?? hostId;
+	if (!resolved) return undefined;
 	const reachable = await db.query.v2UsersHosts.findFirst({
 		where: and(
 			eq(v2UsersHosts.organizationId, owner.organizationId),
 			eq(v2UsersHosts.userId, owner.userId),
-			eq(v2UsersHosts.hostId, hostId),
+			eq(v2UsersHosts.hostId, resolved),
 		),
 		columns: { hostId: true },
 	});
 	if (!reachable) {
 		throw new TRPCError({ code: "NOT_FOUND", message: "Host not found" });
 	}
-	return hostId;
+	return resolved;
 }
 
 function isUniqueViolation(error: unknown): boolean {

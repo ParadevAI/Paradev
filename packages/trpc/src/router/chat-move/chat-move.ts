@@ -4,6 +4,7 @@ import {
 	chatItems,
 	chatMoves,
 	chatSessions,
+	cloudWorkspaces,
 	type SelectChatMove,
 } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -98,9 +99,23 @@ function assertRunsOnComputer(move: SelectChatMove): void {
 	}
 }
 
-/** Queues a move into a cloud workspace; a move to a computer waits for `claim`. */
-async function startMove(move: { id: string; toHostId: string | null }) {
-	if (!move.toHostId) await queueChatMove(move.id);
+/**
+ * Queues a move into a cloud workspace that is up; one still provisioning
+ * stays pending until provisioning queues it. A move to a computer waits
+ * for `claim`.
+ */
+async function startMove(move: {
+	id: string;
+	toWorkspaceId: string;
+	toHostId: string | null;
+}) {
+	if (!move.toHostId) {
+		const destination = await db.query.cloudWorkspaces.findFirst({
+			where: eq(cloudWorkspaces.id, move.toWorkspaceId),
+			columns: { status: true },
+		});
+		if (destination?.status !== "provisioning") await queueChatMove(move.id);
+	}
 	return { moveId: move.id, runsOnThisComputer: move.toHostId !== null };
 }
 

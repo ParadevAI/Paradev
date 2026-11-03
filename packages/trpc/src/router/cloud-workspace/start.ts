@@ -296,7 +296,12 @@ export async function queueProvision(
 		await failChatMovesTo(
 			job.cloudWorkspaceId,
 			"The cloud workspace could not start",
-		).catch(() => {});
+		).catch((moveError) =>
+			console.error(
+				`[cloud-workspace] could not fail the chat moves into ${job.cloudWorkspaceId}`,
+				moveError,
+			),
+		);
 		console.error(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,

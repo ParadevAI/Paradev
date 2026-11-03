@@ -722,7 +722,13 @@ export const cloudWorkspaceRouter = {
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
-				await failChatMovesTo(row.id, "The cloud workspace was deleted");
+				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
+				);
 				// A row from a retired provider has no sandbox left to keep.
 				if (row.provider === "vercel") {
 					await queueReap(

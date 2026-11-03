@@ -4,10 +4,11 @@ import {
 	chatMoves,
 	chatSessions,
 	chatTranscripts,
+	chatTurns,
 	type SelectChatMove,
 } from "@superset/db/schema";
 import { fileOriginalKey } from "@superset/shared/usercontent";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, max } from "drizzle-orm";
 import { presignedGetUrl } from "../../../../lib/r2";
 import { loadChatHistory } from "../../../chat-history/utils/loadChatHistory";
 import { lastTurnSeq } from "../findMovableChat";
@@ -100,6 +101,12 @@ export async function claimMove(
 	return move ?? null;
 }
 
+function wentOnError(): ChatMoveError {
+	return new ChatMoveError(
+		"The chat went on in its old workspace after the move began. Move it again.",
+	);
+}
+
 /**
  * What the destination's `teleport.importChat` takes, without the events.
  * Refuses a chat that took a new turn after the move began: its agent's
@@ -119,9 +126,7 @@ async function prepareChatImport(move: SelectChatMove) {
 		move.sourceTurnSeq !== null &&
 		(await lastTurnSeq(session.id)) > move.sourceTurnSeq
 	) {
-		throw new ChatMoveError(
-			"The chat went on in its old workspace after the move began. Move it again.",
-		);
+		throw wentOnError();
 	}
 	const header: Omit<ChatImport, "events"> = {
 		workspaceId: move.toWorkspaceId,
@@ -171,7 +176,20 @@ export async function completeChatMove(
 		continueChat?: () => Promise<unknown>;
 	},
 ): Promise<void> {
-	await dbWs.transaction(async (tx) => {
+	const wentOn = await dbWs.transaction(async (tx) => {
+		// The lock orders this check with the source's history uploads, which lock the same row.
+		await tx
+			.select({ id: chatSessions.id })
+			.from(chatSessions)
+			.where(eq(chatSessions.id, move.sessionId))
+			.for("update");
+		if (move.sourceTurnSeq !== null) {
+			const [turn] = await tx
+				.select({ value: max(chatTurns.firstSeq) })
+				.from(chatTurns)
+				.where(eq(chatTurns.sessionId, move.sessionId));
+			if ((turn?.value ?? 0) > move.sourceTurnSeq) return true;
+		}
 		const [current] = await tx
 			.update(chatMoves)
 			.set({ status: "ready", finishedAt: new Date() })
@@ -187,7 +205,13 @@ export async function completeChatMove(
 			.update(chatSessions)
 			.set({ v2WorkspaceId: move.toWorkspaceId, lastActiveAt: new Date() })
 			.where(eq(chatSessions.id, move.sessionId));
+		return false;
 	});
+	if (wentOn) {
+		const error = wentOnError();
+		await failChatMove(move.id, error);
+		throw error;
+	}
 	await destination
 		.continueChat?.()
 		.catch((error: unknown) =>

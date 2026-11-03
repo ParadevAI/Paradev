@@ -220,7 +220,11 @@ async function provision(
 		});
 		nudge(row.organizationId, "cloud_workspaces");
 		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
-			() => {},
+			(moveError) =>
+				console.error(
+					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+					moveError,
+				),
 		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
