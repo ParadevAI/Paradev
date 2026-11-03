@@ -5686,6 +5686,9 @@ msgstr "Não foi possível registrar a área de trabalho na nuvem"
 msgid "Could not record environment"
 msgstr "Não foi possível salvar o ambiente"
 
+msgid "Could not reinstall {name}"
+msgstr "Não foi possível reinstalar {name}"
+
 msgid "Could not remove {name}"
 msgstr "Não foi possível remover {name}"
 
@@ -15425,6 +15428,9 @@ msgstr "Região"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registra hooks de ciclo de vida na configuração global deste agente para o Paradev mostrar o status e enviar notificações. Desligar isso remove as entradas do Paradev em todo lugar — status e notificações param para este agente, inclusive dentro do Paradev."
 
+msgid "Reinstall {name}"
+msgstr "Reinstalar {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "voltou a entrar em {channel} a convite de {inviter}, junto com {others}."
 
@@ -20219,6 +20225,9 @@ msgstr "Transforme conversas do Slack em tarefas, execute agentes a partir da su
 
 msgid "turn the onboarding findings into a page"
 msgstr "transforme as descobertas do onboarding em uma página"
+
+msgid "Turned off because its files changed"
+msgstr "Desativada porque os arquivos dela mudaram"
 
 msgid "Two Hands"
 msgstr "Duas mãos"
