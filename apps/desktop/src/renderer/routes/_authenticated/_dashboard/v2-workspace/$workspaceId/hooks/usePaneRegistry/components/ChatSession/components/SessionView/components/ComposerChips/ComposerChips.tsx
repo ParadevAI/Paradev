@@ -35,17 +35,21 @@ export function ComposerChips({
 							turnId={runningTurnId}
 						/>
 					)}
-					<RunningTasksChip
-						kind="subagent"
-						onOpen={onOpenSubagent}
-						onStop={onStopTask}
-						tasks={subagents}
-					/>
-					<RunningTasksChip
-						kind="process"
-						onStop={onStopTask}
-						tasks={processes}
-					/>
+					{subagents.length > 0 && (
+						<RunningTasksChip
+							kind="subagent"
+							onOpen={onOpenSubagent}
+							onStop={onStopTask}
+							tasks={subagents}
+						/>
+					)}
+					{processes.length > 0 && (
+						<RunningTasksChip
+							kind="process"
+							onStop={onStopTask}
+							tasks={processes}
+						/>
+					)}
 				</div>
 			</div>
 		</div>

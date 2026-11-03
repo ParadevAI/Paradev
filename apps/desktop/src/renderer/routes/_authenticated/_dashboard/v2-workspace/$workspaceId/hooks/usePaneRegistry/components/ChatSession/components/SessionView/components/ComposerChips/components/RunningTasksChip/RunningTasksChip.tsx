@@ -22,8 +22,7 @@ export function RunningTasksChip({
 }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
-	const now = useNow(1000, tasks.length > 0).getTime();
-	if (tasks.length === 0) return null;
+	const now = useNow().getTime();
 	const count = tasks.length;
 	const Icon = kind === "subagent" ? Bot : SquareTerminal;
 	const fallbackName =
