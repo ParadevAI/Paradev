@@ -106,8 +106,13 @@ function fileStorage(extensionId: string): RulesStorage {
 		save: async (rules) => {
 			await mkdir(rulesDirectory(), { recursive: true });
 			const temp = `${file}.${randomUUID()}.tmp`;
-			await writeFile(temp, JSON.stringify(rules));
-			await rename(temp, file);
+			try {
+				await writeFile(temp, JSON.stringify(rules));
+				await rename(temp, file);
+			} catch (error) {
+				await rm(temp, { force: true }).catch(() => {});
+				throw error;
+			}
 		},
 	};
 }

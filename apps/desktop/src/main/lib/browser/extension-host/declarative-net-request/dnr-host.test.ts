@@ -1,5 +1,11 @@
 import { afterEach, expect, type Mock, spyOn, test } from "bun:test";
-import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	readdirSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { app, ipcMain } from "electron";
@@ -245,4 +251,22 @@ test("deleting rules waits for every unloaded instance's save", async () => {
 	finishOlder();
 	await deleting;
 	expect(deleted).toBe(true);
+});
+
+test("a failed save leaves no temp file behind", async () => {
+	const { call, rulesFile, id } = setup([]);
+	await call("getEnabledRulesets");
+	mkdirSync(path.join(rulesFile, "blocker"), { recursive: true });
+	await expect(
+		call("updateDynamicRules", {
+			addRules: [
+				{ id: 1, action: { type: "block" }, condition: { urlFilter: "x" } },
+			],
+		}),
+	).rejects.toThrow();
+	expect(
+		readdirSync(path.dirname(rulesFile)).filter((name) =>
+			name.startsWith(`${id}.json.`),
+		),
+	).toEqual([]);
 });
