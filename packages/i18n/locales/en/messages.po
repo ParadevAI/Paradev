@@ -1664,6 +1664,9 @@ msgstr "A better in-app browser: preview your changes and click any element to s
 msgid "A better Paradev is ready"
 msgstr "A better Paradev is ready"
 
+msgid "A build of this environment is already running"
+msgstr "A build of this environment is already running"
+
 msgid "A CDP endpoint per pane"
 msgstr "A CDP endpoint per pane"
 
@@ -1911,6 +1914,9 @@ msgstr "active {lastActive}"
 msgid "Active agent sessions."
 msgstr "Active agent sessions."
 
+msgid "Active build status"
+msgstr "Active build status"
+
 msgid "active days"
 msgstr "active days"
 
@@ -2135,6 +2141,9 @@ msgstr "Add to sidebar"
 
 msgid "Add to workspace"
 msgstr "Add to workspace"
+
+msgid "Add variable"
+msgstr "Add variable"
 
 msgid "Add what it does"
 msgstr "Add what it does"
@@ -2404,6 +2413,9 @@ msgstr "All data will be permanently deleted for all {0} members — this cannot
 
 msgid "All downloads"
 msgstr "All downloads"
+
+msgid "All environment variables ({total})"
+msgstr "All environment variables ({total})"
 
 msgid "All features, side by side"
 msgstr "All features, side by side"
@@ -3372,9 +3384,6 @@ msgstr "Base directory for new worktrees on {selectedHostLabel}"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Base directory for new worktrees on {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Base image · no checkpoint yet"
-
 msgid "Base URL"
 msgstr "Base URL"
 
@@ -3643,8 +3652,14 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Bug reports"
 
+msgid "Build ID"
+msgstr "Build ID"
+
 msgid "Build in public"
 msgstr "Build in public"
+
+msgid "Build started"
+msgstr "Build started"
 
 msgid "Build the future of Paradev in the cloud"
 msgstr "Build the future of Paradev in the cloud"
@@ -3657,6 +3672,18 @@ msgstr "Building the last piece of software"
 
 msgid "Building the last piece of software."
 msgstr "Building the last piece of software."
+
+msgid "Building with the new repositories"
+msgstr "Building with the new repositories"
+
+msgid "Building…"
+msgstr "Building…"
+
+msgid "Builds"
+msgstr "Builds"
+
+msgid "Built"
+msgstr "Built"
 
 msgid "Built in Paradev"
 msgstr "Built in Paradev"
@@ -4156,10 +4183,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · before tooltip refactor"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint saved {0}"
-
 msgid "Checks"
 msgstr "Checks"
 
@@ -4388,6 +4411,9 @@ msgstr "Click here if not redirected"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Click the “↑ update” pill to see the pre-update confirm"
+
+msgid "Click to copy"
+msgstr "Click to copy"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Click to copy the session ID (resume with `claude --resume <id>`)."
@@ -6229,7 +6255,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Created"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7435,9 +7460,6 @@ msgstr "Edit description"
 msgid "Edit Description"
 msgstr "Edit Description"
 
-msgid "Edit environment"
-msgstr "Edit environment"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Edit files without asking; ask before commands"
 
@@ -7452,6 +7474,9 @@ msgstr "Edit on GitHub"
 
 msgid "Edit queued message"
 msgstr "Edit queued message"
+
+msgid "Edit repositories"
+msgstr "Edit repositories"
 
 msgid "Edit routine"
 msgstr "Edit routine"
@@ -7648,11 +7673,23 @@ msgstr "Environment"
 msgid "Environment archived"
 msgstr "Environment archived"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+
+msgid "Environment history"
+msgstr "Environment history"
+
 msgid "Environment not found"
 msgstr "Environment not found"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
+
+msgid "Environment updated"
+msgstr "Environment updated"
+
+msgid "Environment variables"
+msgstr "Environment variables"
 
 msgid "Environment Variables"
 msgstr "Environment Variables"
@@ -12086,6 +12123,12 @@ msgstr "No automations match"
 msgid "No branches found"
 msgstr "No branches found"
 
+msgid "No build yet"
+msgstr "No build yet"
+
+msgid "No builds yet"
+msgstr "No builds yet"
+
 msgid "No changed files."
 msgstr "No changed files."
 
@@ -12193,6 +12236,9 @@ msgstr "No emoji found"
 
 msgid "No environments available"
 msgstr "No environments available"
+
+msgid "No environments built yet"
+msgstr "No environments built yet"
 
 msgid "No environments found."
 msgstr "No environments found."
@@ -14326,6 +14372,9 @@ msgstr "Pick the project worktree folder on {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Pick the worktree folder on {hostName}."
 
@@ -15221,6 +15270,9 @@ msgstr "Rebase & Merge"
 
 msgid "Rebase and merge"
 msgstr "Rebase and merge"
+
+msgid "Rebuild environment"
+msgstr "Rebuild environment"
 
 msgid "Recall what was said in meetings"
 msgstr "Recall what was said in meetings"
@@ -16425,6 +16477,9 @@ msgstr "Save & create workspace"
 msgid "Save All"
 msgstr "Save All"
 
+msgid "Save and build"
+msgstr "Save and build"
+
 msgid "Save as environment"
 msgstr "Save as environment"
 
@@ -16473,6 +16528,9 @@ msgstr "Saved"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "Saved \"{0}\" as an environment"
+
+msgid "Saved from a workspace"
+msgstr "Saved from a workspace"
 
 msgid "Saved to Downloads"
 msgstr "Saved to Downloads"
@@ -17142,9 +17200,6 @@ msgstr "Sessions"
 msgid "Sessions · top {0} by cost"
 msgstr "Sessions · top {0} by cost"
 
-msgid "Set"
-msgstr "Set"
-
 msgid "Set a notification schedule"
 msgstr "Set a notification schedule"
 
@@ -17771,9 +17826,6 @@ msgstr "Smileys & People"
 
 msgid "Smoother onboarding"
 msgstr "Smoother onboarding"
-
-msgid "Snapshot"
-msgstr "Snapshot"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
@@ -19021,6 +19073,9 @@ msgstr "The dispatcher appears"
 msgid "The endpoint must use https."
 msgstr "The endpoint must use https."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "The environment changed while it was being restored. Try again."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 
@@ -19384,6 +19439,9 @@ msgstr "This automation has no instructions yet. Write a prompt in its settings 
 msgid "This automation is in another organization"
 msgstr "This automation is in another organization"
 
+msgid "This build has no snapshot to restore"
+msgstr "This build has no snapshot to restore"
+
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
 
@@ -19449,6 +19507,12 @@ msgstr "This directory does not exist. The terminal script will fall back to the
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+
+msgid "This environment has no repositories to build"
+msgstr "This environment has no repositories to build"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
@@ -20473,6 +20537,9 @@ msgstr "Update couldn't preserve sessions"
 
 msgid "Update daemon"
 msgstr "Update daemon"
+
+msgid "Update environment"
+msgstr "Update environment"
 
 msgid "Update Error"
 msgstr "Update Error"

@@ -1,16 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@superset/ui/dropdown-menu";
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-	HiOutlineArchiveBox,
-	HiOutlineCube,
-	HiOutlinePencil,
-	HiOutlinePlus,
-} from "react-icons/hi2";
+import { HiOutlineCube, HiOutlinePlus } from "react-icons/hi2";
+import { LuArchive, LuEllipsis } from "react-icons/lu";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "renderer/routes/_authenticated/components/ArchiveEnvironmentDialog";
@@ -20,7 +23,6 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
-import { EnvironmentSecrets } from "./components/EnvironmentSecrets";
 
 interface EnvironmentsSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -34,7 +36,6 @@ export function EnvironmentsSettings({
 	const utils = cloudTrpc.useUtils();
 	const navigate = useNavigate();
 	const [isCreating, setIsCreating] = useState(false);
-	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [archiving, setArchiving] = useState<{
 		id: string;
 		name: string;
@@ -63,25 +64,23 @@ export function EnvironmentsSettings({
 	const used = usage?.used ?? 0;
 	const limit = usage?.limit ?? 0;
 
+	const rebuild = cloudTrpc.environment.rebuild.useMutation({
+		onSuccess: () => {
+			toast.success(t({ message: "Build started" }));
+			return utils.environment.invalidate();
+		},
+		onError: (error) => toast.error(errorMessage(error)),
+	});
+
 	const archive = cloudTrpc.environment.archive.useMutation({
 		onSuccess: async () => {
 			await Promise.all([
 				utils.environment.list.invalidate(),
 				utils.billing.environmentUsage.invalidate(),
 			]);
-			setSelectedId(null);
 		},
 		onError: (error) => toast.error(errorMessage(error)),
 	});
-
-	if (selectedId) {
-		return (
-			<EnvironmentSecrets
-				environmentId={selectedId}
-				onBack={() => setSelectedId(null)}
-			/>
-		);
-	}
 
 	if (!showList && !showSecrets) return null;
 
@@ -155,7 +154,12 @@ export function EnvironmentsSettings({
 						>
 							<button
 								className="flex items-center gap-3 min-w-0 flex-1 text-left"
-								onClick={() => setSelectedId(environment.id)}
+								onClick={() =>
+									navigate({
+										to: "/environments/$environmentId",
+										params: { environmentId: environment.id },
+									})
+								}
 								type="button"
 							>
 								<HiOutlineCube className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -177,33 +181,50 @@ export function EnvironmentsSettings({
 									</div>
 								</div>
 							</button>
-							<div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-								<Button
-									aria-label={t({ message: "Edit environment" })}
-									className="h-8 w-8 text-muted-foreground"
-									onClick={() =>
-										navigate({
-											to: "/environments/$environmentId",
-											params: { environmentId: environment.id },
-										})
-									}
-									size="icon"
-									variant="ghost"
-								>
-									<HiOutlinePencil className="h-4 w-4" />
-								</Button>
-								<Button
-									aria-label={t({ message: "Archive environment" })}
-									className="h-8 w-8 text-muted-foreground hover:text-destructive"
-									onClick={() =>
-										setArchiving({ id: environment.id, name: environment.name })
-									}
-									size="icon"
-									variant="ghost"
-								>
-									<HiOutlineArchiveBox className="h-4 w-4" />
-								</Button>
-							</div>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										aria-label={t({ message: "More actions" })}
+										className="size-8 text-muted-foreground"
+										size="icon"
+										variant="ghost"
+									>
+										<LuEllipsis className="size-4" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-48">
+									<DropdownMenuItem
+										onSelect={() =>
+											navigate({
+												to: "/environments/$environmentId/edit",
+												params: { environmentId: environment.id },
+											})
+										}
+									>
+										<Trans>Edit</Trans>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onSelect={() =>
+											rebuild.mutate({ environmentId: environment.id })
+										}
+									>
+										<Trans>Rebuild environment</Trans>
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem
+										variant="destructive"
+										onSelect={() =>
+											setArchiving({
+												id: environment.id,
+												name: environment.name,
+											})
+										}
+									>
+										<LuArchive className="size-3.5" />
+										<Trans>Archive</Trans>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 					))}
 				</div>

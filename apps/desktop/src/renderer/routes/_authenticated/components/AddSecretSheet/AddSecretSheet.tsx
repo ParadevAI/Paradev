@@ -28,10 +28,7 @@ import {
 	HiPlus,
 } from "react-icons/hi2";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import {
-	parseEnvContent,
-	validateEnvContent,
-} from "../../../../../../utils/env-file";
+import { parseEnvContent, validateEnvContent } from "./utils/env-file";
 
 interface SecretEntry {
 	id: string;

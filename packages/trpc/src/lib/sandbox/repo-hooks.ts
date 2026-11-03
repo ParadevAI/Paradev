@@ -4,7 +4,8 @@
  * the pre-rename `.superset/`) on the branch
  * a workspace is created from. Ports are the one key the control plane must
  * know before the box exists (a sandbox publishes its ports at create); the
- * box reads its own setup and terminals.
+ * box reads its own setup and terminals. `[install]` runs only in an
+ * environment build, which the control plane drives.
  */
 import {
 	fromV1Json,
@@ -13,12 +14,14 @@ import {
 	PROJECT_CONFIG_DIR,
 	type ProjectConfig,
 	parseProjectConfig,
+	type ResolvedPhase,
 	resolveProjectConfig,
 } from "@superset/shared/project-config";
 import type { RepositoryRow } from "./repositories";
 
 export interface RepositoryHooks {
 	ports?: number[];
+	install?: ResolvedPhase;
 }
 
 const READ_TIMEOUT_MS = 5_000;
@@ -54,17 +57,23 @@ async function readRepoFile(
 	}
 }
 
-/** The ports with `preview = true`, as the cloud resolves them. */
+/** The ports with `preview = true` and the install phase, as the cloud resolves them. */
 function repoHooksFrom(config: ProjectConfig): RepositoryHooks {
-	const ports = resolveProjectConfig({
+	const resolved = resolveProjectConfig({
 		base: config,
 		local: null,
 		environment: "cloud",
-	})
-		.ports.filter((port) => port.preview)
+	});
+	const ports = resolved.ports
+		.filter((port) => port.preview)
 		.map((port) => port.default)
 		.slice(0, MAX_PREVIEW_PORTS);
-	return ports.length > 0 ? { ports } : {};
+	return {
+		...(ports.length > 0 ? { ports } : {}),
+		...(resolved.install.commands.length > 0
+			? { install: resolved.install }
+			: {}),
+	};
 }
 
 export function repoHooksFromToml(text: string): RepositoryHooks | null {

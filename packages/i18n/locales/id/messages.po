@@ -1664,6 +1664,9 @@ msgstr "Browser dalam aplikasi yang lebih baik: lihat pratinjau perubahan Anda d
 msgid "A better Paradev is ready"
 msgstr "Paradev yang lebih baik sudah siap"
 
+msgid "A build of this environment is already running"
+msgstr "Build environment ini sedang berjalan"
+
 msgid "A CDP endpoint per pane"
 msgstr "Satu endpoint CDP per panel"
 
@@ -1911,6 +1914,9 @@ msgstr "aktif {lastActive}"
 msgid "Active agent sessions."
 msgstr "Sesi agen yang aktif."
 
+msgid "Active build status"
+msgstr "Status build aktif"
+
 msgid "active days"
 msgstr "hari aktif"
 
@@ -2135,6 +2141,9 @@ msgstr "Tambahkan ke sidebar"
 
 msgid "Add to workspace"
 msgstr "Tambahkan ke workspace"
+
+msgid "Add variable"
+msgstr "Tambah variabel"
 
 msgid "Add what it does"
 msgstr "Tambahkan apa yang dilakukannya"
@@ -2404,6 +2413,9 @@ msgstr "Semua data akan dihapus permanen untuk seluruh {0} anggota — ini tidak
 
 msgid "All downloads"
 msgstr "Semua unduhan"
+
+msgid "All environment variables ({total})"
+msgstr "Semua variabel environment ({total})"
 
 msgid "All features, side by side"
 msgstr "Semua fitur, berdampingan"
@@ -3372,9 +3384,6 @@ msgstr "Direktori dasar untuk worktree baru di {selectedHostLabel}"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Direktori dasar untuk worktree baru di {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Image dasar · belum ada checkpoint"
-
 msgid "Base URL"
 msgstr "URL dasar"
 
@@ -3643,8 +3652,14 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Laporan bug"
 
+msgid "Build ID"
+msgstr "ID build"
+
 msgid "Build in public"
 msgstr "Membangun secara terbuka"
+
+msgid "Build started"
+msgstr "Build dimulai"
 
 msgid "Build the future of Paradev in the cloud"
 msgstr "Bangun masa depan Paradev di komputasi awan"
@@ -3657,6 +3672,18 @@ msgstr "Membangun perangkat lunak yang terakhir"
 
 msgid "Building the last piece of software."
 msgstr "Membangun perangkat lunak yang terakhir."
+
+msgid "Building with the new repositories"
+msgstr "Sedang build dengan repositori baru"
+
+msgid "Building…"
+msgstr "Sedang build…"
+
+msgid "Builds"
+msgstr "Build"
+
+msgid "Built"
+msgstr "Di-build"
 
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"
@@ -4156,10 +4183,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · sebelum refactor tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint tersimpan {0}"
-
 msgid "Checks"
 msgstr "Check"
 
@@ -4388,6 +4411,9 @@ msgstr "Klik di sini kalau tidak dialihkan"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik tombol “↑ update” untuk melihat konfirmasi sebelum pembaruan"
+
+msgid "Click to copy"
+msgstr "Klik untuk menyalin"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik untuk menyalin ID sesi (lanjutkan dengan `claude --resume <id>`)."
@@ -6229,7 +6255,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Dibuat"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7435,9 +7460,6 @@ msgstr "Edit deskripsi"
 msgid "Edit Description"
 msgstr "Edit Deskripsi"
 
-msgid "Edit environment"
-msgstr "Edit environment"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Edit file tanpa bertanya; tanya sebelum perintah"
 
@@ -7452,6 +7474,9 @@ msgstr "Edit di GitHub"
 
 msgid "Edit queued message"
 msgstr "Edit pesan dalam antrean"
+
+msgid "Edit repositories"
+msgstr "Edit repositori"
 
 msgid "Edit routine"
 msgstr "Edit rutinitas"
@@ -7648,11 +7673,23 @@ msgstr "Lingkungan"
 msgid "Environment archived"
 msgstr "Environment diarsipkan"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Build environment tersedia di paket Team dan Ultra. Tingkatkan paket di Pengaturan, Penagihan."
+
+msgid "Environment history"
+msgstr "Riwayat environment"
+
 msgid "Environment not found"
 msgstr "Environment tidak ditemukan"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Penyiapan environment, tes flaky, dan urusan kredensial — mode kegagalan membosankan yang mematikan run tanpa pengawasan pada 2025 — sebagian besar diselesaikan lewat rekayasa, bukan lewat model."
+
+msgid "Environment updated"
+msgstr "Environment diperbarui"
+
+msgid "Environment variables"
+msgstr "Variabel environment"
 
 msgid "Environment Variables"
 msgstr "Variabel Environment"
@@ -12086,6 +12123,12 @@ msgstr "Tidak ada otomatisasi yang cocok"
 msgid "No branches found"
 msgstr "Tidak ada branch ditemukan"
 
+msgid "No build yet"
+msgstr "Belum ada build"
+
+msgid "No builds yet"
+msgstr "Belum ada build"
+
 msgid "No changed files."
 msgstr "Tidak ada file yang berubah."
 
@@ -12193,6 +12236,9 @@ msgstr "Emoji tidak ditemukan"
 
 msgid "No environments available"
 msgstr "Tidak ada environment yang tersedia"
+
+msgid "No environments built yet"
+msgstr "Belum ada environment yang di-build"
 
 msgid "No environments found."
 msgstr "Environment tidak ditemukan."
@@ -14326,6 +14372,9 @@ msgstr "Pilih folder worktree proyek di {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Pilih repositori yang diambilnya. Agen di mesin ini mencari tahu apa yang perlu dipasang dan menjalankannya di cloud."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Pilih repositori yang di-checkout environment ini. Menyimpan akan memulai build baru; workspace tetap dimulai dari yang sekarang sampai build berhasil."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Pilih folder worktree di {hostName}."
 
@@ -15221,6 +15270,9 @@ msgstr "Rebase & Merge"
 
 msgid "Rebase and merge"
 msgstr "Rebase dan merge"
+
+msgid "Rebuild environment"
+msgstr "Build ulang environment"
 
 msgid "Recall what was said in meetings"
 msgstr "Ingat kembali apa yang dibahas dalam rapat"
@@ -16425,6 +16477,9 @@ msgstr "Simpan & buat workspace"
 msgid "Save All"
 msgstr "Simpan Semua"
 
+msgid "Save and build"
+msgstr "Simpan dan build"
+
 msgid "Save as environment"
 msgstr "Simpan sebagai environment"
 
@@ -16473,6 +16528,9 @@ msgstr "Tersimpan"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" disimpan sebagai environment"
+
+msgid "Saved from a workspace"
+msgstr "Disimpan dari workspace"
 
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
@@ -17142,9 +17200,6 @@ msgstr "Sesi"
 msgid "Sessions · top {0} by cost"
 msgstr "Sesi · {0} teratas menurut biaya"
 
-msgid "Set"
-msgstr "Diatur"
-
 msgid "Set a notification schedule"
 msgstr "Atur jadwal notifikasi"
 
@@ -17771,9 +17826,6 @@ msgstr "Smiley & Orang"
 
 msgid "Smoother onboarding"
 msgstr "Onboarding yang lebih mulus"
-
-msgid "Snapshot"
-msgstr "Snapshot"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Ambil snapshot worktree sebelum dan sesudah setiap giliran chat, agar kartunya mencantumkan setiap file yang berubah, termasuk edit lewat shell, dan dapat membatalkannya. Setiap prompt menunggu snapshot-nya lebih dulu."
@@ -19021,6 +19073,9 @@ msgstr "Munculnya sang pengatur"
 msgid "The endpoint must use https."
 msgstr "Endpoint harus menggunakan https."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Environment berubah saat sedang dipulihkan. Coba lagi."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Environment yang digunakan otomatisasi ini untuk memulai workspace cloud telah diarsipkan atau tidak memiliki repositori. Pilih environment lain di pengaturan otomatisasi."
 
@@ -19384,6 +19439,9 @@ msgstr "Otomatisasi ini belum memiliki instruksi. Tulis prompt di pengaturannya 
 msgid "This automation is in another organization"
 msgstr "Otomatisasi ini berada di organisasi lain"
 
+msgid "This build has no snapshot to restore"
+msgstr "Build ini tidak memiliki snapshot untuk dipulihkan"
+
 msgid "This cannot be undone."
 msgstr "Ini tidak bisa dibatalkan."
 
@@ -19449,6 +19507,12 @@ msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak mengonfirmasinya sebagai terverifikasi. Masuk dengan metode yang Anda gunakan sebelumnya."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Environment ini tidak memiliki [install] untuk di-build. Tambahkan di .paradev/config.toml pada branch dasarnya."
+
+msgid "This environment has no repositories to build"
+msgstr "Environment ini tidak memiliki repositori untuk di-build"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"
@@ -20473,6 +20537,9 @@ msgstr "Pembaruan tidak bisa mempertahankan sesi"
 
 msgid "Update daemon"
 msgstr "Perbarui daemon"
+
+msgid "Update environment"
+msgstr "Perbarui environment"
 
 msgid "Update Error"
 msgstr "Kesalahan Pembaruan"

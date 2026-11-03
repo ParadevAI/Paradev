@@ -1664,6 +1664,9 @@ msgstr "Лучший встроенный браузер: смотрите св�
 msgid "A better Paradev is ready"
 msgstr "Улучшенная версия Paradev готова"
 
+msgid "A build of this environment is already running"
+msgstr "Сборка этого окружения уже выполняется"
+
 msgid "A CDP endpoint per pane"
 msgstr "Свой CDP-эндпоинт для каждой панели"
 
@@ -1911,6 +1914,9 @@ msgstr "активность {lastActive}"
 msgid "Active agent sessions."
 msgstr "Активные сессии агентов."
 
+msgid "Active build status"
+msgstr "Статус активной сборки"
+
 msgid "active days"
 msgstr "активных дней"
 
@@ -2135,6 +2141,9 @@ msgstr "Добавить на боковую панель"
 
 msgid "Add to workspace"
 msgstr "Добавить в рабочую область"
+
+msgid "Add variable"
+msgstr "Добавить переменную"
 
 msgid "Add what it does"
 msgstr "Добавить, что он делает"
@@ -2404,6 +2413,9 @@ msgstr "Все данные будут безвозвратно удалены �
 
 msgid "All downloads"
 msgstr "Все загрузки"
+
+msgid "All environment variables ({total})"
+msgstr "Все переменные окружения ({total})"
 
 msgid "All features, side by side"
 msgstr "Все возможности рядом"
@@ -3372,9 +3384,6 @@ msgstr "Базовая папка для новых worktree на {selectedHostL
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Базовая папка для новых worktree на {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Базовый образ · контрольных точек пока нет"
-
 msgid "Base URL"
 msgstr "Базовый URL"
 
@@ -3643,8 +3652,14 @@ msgstr "Жук"
 msgid "Bug reports"
 msgstr "Отчёты о багах"
 
+msgid "Build ID"
+msgstr "ID сборки"
+
 msgid "Build in public"
 msgstr "Работаем открыто"
+
+msgid "Build started"
+msgstr "Сборка запущена"
 
 msgid "Build the future of Paradev in the cloud"
 msgstr "Создайте будущее Paradev в облаке"
@@ -3657,6 +3672,18 @@ msgstr "Строим последнюю программу"
 
 msgid "Building the last piece of software."
 msgstr "Строим последнюю программу."
+
+msgid "Building with the new repositories"
+msgstr "Идёт сборка с новыми репозиториями"
+
+msgid "Building…"
+msgstr "Идёт сборка…"
+
+msgid "Builds"
+msgstr "Сборки"
+
+msgid "Built"
+msgstr "Собрано"
 
 msgid "Built in Paradev"
 msgstr "Создано в Paradev"
@@ -4156,10 +4183,6 @@ msgstr "Контрольная точка"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольная точка · до рефакторинга tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Контрольная точка сохранена {0}"
-
 msgid "Checks"
 msgstr "Проверки"
 
@@ -4388,6 +4411,9 @@ msgstr "Нажмите здесь, если переход не произошё
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Нажмите «↑ update», чтобы увидеть подтверждение перед обновлением"
+
+msgid "Click to copy"
+msgstr "Нажмите, чтобы скопировать"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Нажмите, чтобы скопировать ID сессии (возобновление: `claude --resume <id>`)."
@@ -6229,7 +6255,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Создан"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7435,9 +7460,6 @@ msgstr "Изменить описание"
 msgid "Edit Description"
 msgstr "Изменить описание"
 
-msgid "Edit environment"
-msgstr "Изменить окружение"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Править файлы без вопросов; спрашивать перед командами"
 
@@ -7452,6 +7474,9 @@ msgstr "Изменить на GitHub"
 
 msgid "Edit queued message"
 msgstr "Изменить сообщение в очереди"
+
+msgid "Edit repositories"
+msgstr "Изменить репозитории"
 
 msgid "Edit routine"
 msgstr "Изменить рутину"
@@ -7648,11 +7673,23 @@ msgstr "Окружение"
 msgid "Environment archived"
 msgstr "Окружение архивировано"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Сборки окружений доступны в тарифах Team и Ultra. Перейдите на другой тариф в разделе Настройки, Оплата."
+
+msgid "Environment history"
+msgstr "История окружения"
+
 msgid "Environment not found"
 msgstr "Окружение не найдено"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Настройка окружения, нестабильные тесты и возня с учётными данными — скучные режимы отказа, которые убивали автономные прогоны в 2025-м, — по большей части решены инженерно, а не моделью."
+
+msgid "Environment updated"
+msgstr "Окружение обновлено"
+
+msgid "Environment variables"
+msgstr "Переменные окружения"
 
 msgid "Environment Variables"
 msgstr "Переменные окружения"
@@ -12086,6 +12123,12 @@ msgstr "Нет подходящих автоматизаций"
 msgid "No branches found"
 msgstr "Ветки не найдены"
 
+msgid "No build yet"
+msgstr "Сборки ещё нет"
+
+msgid "No builds yet"
+msgstr "Сборок ещё нет"
+
 msgid "No changed files."
 msgstr "Изменённых файлов нет."
 
@@ -12193,6 +12236,9 @@ msgstr "Эмодзи не найдены"
 
 msgid "No environments available"
 msgstr "Нет доступных окружений"
+
+msgid "No environments built yet"
+msgstr "Окружения ещё не собирались"
 
 msgid "No environments found."
 msgstr "Окружения не найдены."
@@ -14326,6 +14372,9 @@ msgstr "Выберите папку worktree проекта на {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Выберите репозитории, которые оно получает. Агент на этом компьютере разберётся, что установить, и запустит всё в облаке."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Выберите репозитории, которые загружает это окружение. Сохранение запускает новую сборку; рабочие области запускаются из текущей, пока новая не завершится успешно."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Выберите папку worktree на {hostName}."
 
@@ -15221,6 +15270,9 @@ msgstr "Перебазировать и объединить"
 
 msgid "Rebase and merge"
 msgstr "Перебазировать и объединить"
+
+msgid "Rebuild environment"
+msgstr "Пересобрать окружение"
 
 msgid "Recall what was said in meetings"
 msgstr "Вспомнить, что говорили на встречах"
@@ -16425,6 +16477,9 @@ msgstr "Сохранить и создать рабочую область"
 msgid "Save All"
 msgstr "Сохранить всё"
 
+msgid "Save and build"
+msgstr "Сохранить и собрать"
+
 msgid "Save as environment"
 msgstr "Сохранить как окружение"
 
@@ -16473,6 +16528,9 @@ msgstr "Сохранено"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "«{0}» сохранено как окружение"
+
+msgid "Saved from a workspace"
+msgstr "Сохранено из рабочей области"
 
 msgid "Saved to Downloads"
 msgstr "Сохранено в «Загрузки»"
@@ -17142,9 +17200,6 @@ msgstr "Сессии"
 msgid "Sessions · top {0} by cost"
 msgstr "Сессии · топ {0} по стоимости"
 
-msgid "Set"
-msgstr "Задана"
-
 msgid "Set a notification schedule"
 msgstr "Задать расписание уведомлений"
 
@@ -17771,9 +17826,6 @@ msgstr "Смайлики и люди"
 
 msgid "Smoother onboarding"
 msgstr "Более гладкий онбординг"
-
-msgid "Snapshot"
-msgstr "Снимок"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Делать снимок worktree до и после каждого хода чата, чтобы его карточка показывала каждый изменённый файл, включая правки из оболочки, и могла их отменить. Каждый промпт сначала ждёт свой снимок."
@@ -19021,6 +19073,9 @@ msgstr "Появляется диспетчер"
 msgid "The endpoint must use https."
 msgstr "Конечная точка должна использовать https."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Окружение изменилось во время восстановления. Попробуйте ещё раз."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Окружение, из которого эта автоматизация запускает облачные рабочие области, архивировано или не содержит репозиториев. Выберите другое окружение в настройках автоматизации."
 
@@ -19384,6 +19439,9 @@ msgstr "У этой автоматизации ещё нет инструкци�
 msgid "This automation is in another organization"
 msgstr "Эта автоматизация находится в другой организации"
 
+msgid "This build has no snapshot to restore"
+msgstr "У этой сборки нет снимка для восстановления"
+
 msgid "This cannot be undone."
 msgstr "Это нельзя отменить."
 
@@ -19449,6 +19507,12 @@ msgstr "Такой папки не существует. Скрипт терми
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Этот адрес электронной почты уже зарегистрирован с другим способом входа, и провайдер не подтвердил его как проверенный. Войдите тем способом, которым пользовались раньше."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "У этого окружения нет [install] для сборки. Добавьте его в .paradev/config.toml в базовой ветке."
+
+msgid "This environment has no repositories to build"
+msgstr "У этого окружения нет репозиториев для сборки"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "В этом окружении нет репозиториев. Создайте окружение с репозиториями в Настройках и запустите рабочую область из него"
@@ -20473,6 +20537,9 @@ msgstr "Обновление не смогло сохранить сессии"
 
 msgid "Update daemon"
 msgstr "Обновить демон"
+
+msgid "Update environment"
+msgstr "Обновить окружение"
 
 msgid "Update Error"
 msgstr "Ошибка обновления"

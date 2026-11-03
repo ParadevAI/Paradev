@@ -1664,6 +1664,9 @@ msgstr "アプリ内ブラウザを改良します。変更をプレビューし
 msgid "A better Paradev is ready"
 msgstr "新しいParadevの準備ができました"
 
+msgid "A build of this environment is already running"
+msgstr "この環境のビルドはすでに実行中です"
+
 msgid "A CDP endpoint per pane"
 msgstr "ペインごとに専用のCDPエンドポイント"
 
@@ -1911,6 +1914,9 @@ msgstr "{lastActive}にアクティブ"
 msgid "Active agent sessions."
 msgstr "実行中のエージェントセッション。"
 
+msgid "Active build status"
+msgstr "アクティブなビルドのステータス"
+
 msgid "active days"
 msgstr "アクティブ日数"
 
@@ -2135,6 +2141,9 @@ msgstr "サイドバーに追加"
 
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
+
+msgid "Add variable"
+msgstr "変数を追加"
 
 msgid "Add what it does"
 msgstr "役割を追加"
@@ -2404,6 +2413,9 @@ msgstr "{0}人のメンバー全員のデータが完全に削除されます �
 
 msgid "All downloads"
 msgstr "すべてのダウンロード"
+
+msgid "All environment variables ({total})"
+msgstr "すべての環境変数 ({total})"
 
 msgid "All features, side by side"
 msgstr "全機能を並べて比較"
@@ -3372,9 +3384,6 @@ msgstr "{selectedHostLabel}の新規ワークツリーのベースディレク�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}の新規ワークツリーのベースディレクトリ。"
 
-msgid "Base image · no checkpoint yet"
-msgstr "ベースイメージ · チェックポイントはまだありません"
-
 msgid "Base URL"
 msgstr "ベースURL"
 
@@ -3643,8 +3652,14 @@ msgstr "バグ"
 msgid "Bug reports"
 msgstr "バグ報告"
 
+msgid "Build ID"
+msgstr "ビルド ID"
+
 msgid "Build in public"
 msgstr "オープンに開発"
+
+msgid "Build started"
+msgstr "ビルドを開始しました"
 
 msgid "Build the future of Paradev in the cloud"
 msgstr "クラウドでParadevの未来を築く"
@@ -3657,6 +3672,18 @@ msgstr "最後のソフトウェアを作る"
 
 msgid "Building the last piece of software."
 msgstr "最後のソフトウェアを作る。"
+
+msgid "Building with the new repositories"
+msgstr "新しいリポジトリでビルド中"
+
+msgid "Building…"
+msgstr "ビルド中…"
+
+msgid "Builds"
+msgstr "ビルド"
+
+msgid "Built"
+msgstr "ビルド日時"
 
 msgid "Built in Paradev"
 msgstr "Paradevで開発"
@@ -4156,10 +4183,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "チェックポイント保存 {0}"
-
 msgid "Checks"
 msgstr "チェック"
 
@@ -4388,6 +4411,9 @@ msgstr "リダイレクトされない場合はこちらをクリック"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "「↑ update」ボタンをクリックすると更新前の確認が表示されます"
+
+msgid "Click to copy"
+msgstr "クリックしてコピー"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "クリックでセッションIDをコピーします(`claude --resume <id>`で再開)。"
@@ -6229,7 +6255,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "作成"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7435,9 +7460,6 @@ msgstr "説明を編集"
 msgid "Edit Description"
 msgstr "説明を編集"
 
-msgid "Edit environment"
-msgstr "環境を編集"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "ファイルは確認なしで編集し、コマンドは事前に確認"
 
@@ -7452,6 +7474,9 @@ msgstr "GitHubで編集"
 
 msgid "Edit queued message"
 msgstr "キューのメッセージを編集"
+
+msgid "Edit repositories"
+msgstr "リポジトリを編集"
 
 msgid "Edit routine"
 msgstr "ルーティンを編集"
@@ -7648,11 +7673,23 @@ msgstr "環境"
 msgid "Environment archived"
 msgstr "環境をアーカイブしました"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "環境のビルドは Team プランと Ultra プランで利用できます。設定の請求からアップグレードしてください。"
+
+msgid "Environment history"
+msgstr "環境の履歴"
+
 msgid "Environment not found"
 msgstr "環境が見つかりません"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境構築、不安定なテスト、認証情報の受け渡し。2025年に無人実行を潰していた退屈な失敗要因は、モデルの進歩ではなくエンジニアリングでほぼ取り除かれます。"
+
+msgid "Environment updated"
+msgstr "環境を更新しました"
+
+msgid "Environment variables"
+msgstr "環境変数"
 
 msgid "Environment Variables"
 msgstr "環境変数"
@@ -12086,6 +12123,12 @@ msgstr "一致するオートメーションがありません"
 msgid "No branches found"
 msgstr "ブランチが見つかりません"
 
+msgid "No build yet"
+msgstr "まだビルドがありません"
+
+msgid "No builds yet"
+msgstr "まだビルドがありません"
+
 msgid "No changed files."
 msgstr "変更されたファイルはありません。"
 
@@ -12193,6 +12236,9 @@ msgstr "絵文字が見つかりません"
 
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
+
+msgid "No environments built yet"
+msgstr "まだビルドされた環境がありません"
 
 msgid "No environments found."
 msgstr "環境が見つかりません。"
@@ -14326,6 +14372,9 @@ msgstr "{hostName}のプロジェクトのワークツリーフォルダを選�
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "チェックアウトするリポジトリを選んでください。このマシン上のエージェントが必要なものを判断し、クラウドで動く状態にします。"
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "この環境がチェックアウトするリポジトリを選択します。保存すると新しいビルドが始まり、成功するまでワークスペースは現在のものから起動します。"
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}のワークツリーフォルダを選択してください。"
 
@@ -15221,6 +15270,9 @@ msgstr "リベースしてマージ"
 
 msgid "Rebase and merge"
 msgstr "リベースしてマージ"
+
+msgid "Rebuild environment"
+msgstr "環境を再ビルド"
 
 msgid "Recall what was said in meetings"
 msgstr "会議での発言を振り返る"
@@ -16425,6 +16477,9 @@ msgstr "保存してワークスペースを作成"
 msgid "Save All"
 msgstr "すべて保存"
 
+msgid "Save and build"
+msgstr "保存してビルド"
+
 msgid "Save as environment"
 msgstr "環境として保存"
 
@@ -16473,6 +16528,9 @@ msgstr "保存済み"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "「{0}」を環境として保存しました"
+
+msgid "Saved from a workspace"
+msgstr "ワークスペースから保存"
 
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
@@ -17142,9 +17200,6 @@ msgstr "セッション"
 msgid "Sessions · top {0} by cost"
 msgstr "セッション · コスト上位{0}件"
 
-msgid "Set"
-msgstr "設定済み"
-
 msgid "Set a notification schedule"
 msgstr "通知スケジュールを設定"
 
@@ -17771,9 +17826,6 @@ msgstr "スマイリーと人"
 
 msgid "Smoother onboarding"
 msgstr "よりスムーズなオンボーディング"
-
-msgid "Snapshot"
-msgstr "スナップショット"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "チャットの各ターンの前後でワークツリーのスナップショットを作成し、カードに変更されたすべてのファイル（シェルによる編集を含む）を表示して元に戻せるようにします。各プロンプトは先にスナップショットの完了を待ちます。"
@@ -19021,6 +19073,9 @@ msgstr "ディスパッチャーの登場"
 msgid "The endpoint must use https."
 msgstr "エンドポイントは https を使用する必要があります。"
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "復元中に環境が変更されました。もう一度お試しください。"
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "このオートメーションがクラウドワークスペースを起動する環境が、アーカイブされたかリポジトリがありません。オートメーションの設定で別の環境を選択してください。"
 
@@ -19384,6 +19439,9 @@ msgstr "このオートメーションにはまだ指示がありません。実
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"
 
+msgid "This build has no snapshot to restore"
+msgstr "このビルドには復元できるスナップショットがありません"
+
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"
 
@@ -19449,6 +19507,12 @@ msgstr "このディレクトリは存在しません。ターミナルスクリ
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "このメールアドレスは別のサインイン方法で既に登録されており、プロバイダーが確認済みとして認証しませんでした。以前使用した方法でサインインしてください。"
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "この環境にはビルドする [install] がありません。ベースブランチの .paradev/config.toml に追加してください。"
+
+msgid "This environment has no repositories to build"
+msgstr "この環境にはビルドするリポジトリがありません"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "この環境にはリポジトリがありません。設定でリポジトリを含む環境を作成し、その環境からワークスペースを開始してください"
@@ -20473,6 +20537,9 @@ msgstr "更新でセッションを維持できませんでした"
 
 msgid "Update daemon"
 msgstr "デーモンを更新"
+
+msgid "Update environment"
+msgstr "環境を更新"
 
 msgid "Update Error"
 msgstr "アップデートエラー"
