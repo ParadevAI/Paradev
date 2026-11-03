@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import type { Client } from "@modelcontextprotocol/client";
 import { createInMemoryMcpClient } from "@superset/mcp/in-memory";
 import { env } from "@/env";
 import { posthog } from "@/lib/analytics";

@@ -4,9 +4,15 @@ import { members, users } from "@superset/db/schema";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
 import {
+	type DevPrincipal,
+	devFromTurnToken,
+	TURN_TOKEN_HEADER,
+} from "@superset/trpc";
+import {
 	resolveSandboxCaller,
 	type SandboxCaller,
 } from "@superset/trpc/lib/sandbox";
+import { TRPCError } from "@trpc/server";
 import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
 import {
@@ -14,7 +20,8 @@ import {
 	tokenOrganizationId,
 } from "./token-organization";
 
-export interface McpContext {
+export interface PersonMcpContext {
+	kind: "person";
 	userId: string;
 	email: string;
 	organizationId: string;
@@ -26,6 +33,19 @@ export interface McpContext {
 	relayUrl: string;
 	realtimeUrl: string;
 }
+
+export interface DevMcpContext {
+	kind: "dev";
+	principal: DevPrincipal;
+	turnToken: string;
+	source: "turn-token";
+	clientLabel: string;
+	requestId: string;
+}
+
+export type McpContext = PersonMcpContext | DevMcpContext;
+
+export type McpCallerKind = McpContext["kind"];
 
 const MCP_UNAUTHORIZED = Symbol("MCP_UNAUTHORIZED");
 export { MCP_UNAUTHORIZED };
@@ -190,9 +210,10 @@ async function sandboxContext(
 	caller: SandboxCaller,
 	relayUrl: string,
 	realtimeUrl: string,
-): Promise<McpContext> {
+): Promise<PersonMcpContext> {
 	const { email, organizationIds } = await loadUserAndOrgs(caller.userId);
 	return {
+		kind: "person",
 		userId: caller.userId,
 		email,
 		organizationId: caller.organizationId,
@@ -206,10 +227,10 @@ async function sandboxContext(
 	};
 }
 
-export async function resolveMcpContext(
+export async function resolvePersonMcpContext(
 	req: Request,
 	options: ResolveMcpContextOptions,
-): Promise<McpContext> {
+): Promise<PersonMcpContext> {
 	const { apiUrl, relayUrl, realtimeUrl } = options;
 
 	if (options.sandboxCredential) {
@@ -260,6 +281,7 @@ export async function resolveMcpContext(
 	});
 
 	return {
+		kind: "person",
 		userId,
 		email,
 		organizationId,
@@ -271,4 +293,40 @@ export async function resolveMcpContext(
 		relayUrl,
 		realtimeUrl,
 	};
+}
+
+async function resolveDevMcpContext(
+	req: Request,
+): Promise<DevMcpContext | null> {
+	const turnToken = req.headers.get(TURN_TOKEN_HEADER);
+	if (!turnToken) return null;
+	let principal: DevPrincipal | null;
+	try {
+		principal = await devFromTurnToken(req.headers);
+	} catch (error) {
+		if (error instanceof TRPCError && error.code === "UNAUTHORIZED") {
+			throw new McpUnauthorizedError(error.message);
+		}
+		throw error;
+	}
+	if (!principal) return null;
+	return {
+		kind: "dev",
+		principal,
+		turnToken,
+		source: "turn-token",
+		clientLabel: `dev:${principal.agentId}`,
+		requestId: crypto.randomUUID(),
+	};
+}
+
+/** A Dev inside a running turn, from its turn token, or else a person. */
+export async function resolveMcpContext(
+	req: Request,
+	options: ResolveMcpContextOptions,
+): Promise<McpContext> {
+	return (
+		(await resolveDevMcpContext(req)) ??
+		(await resolvePersonMcpContext(req, options))
+	);
 }

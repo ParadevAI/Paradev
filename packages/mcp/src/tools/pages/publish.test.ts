@@ -1,6 +1,4 @@
 import { expect, mock, test } from "bun:test";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { z } from "zod";
 
 type Input = {
 	html: string;
@@ -9,15 +7,6 @@ type Input = {
 	workspaceId?: string;
 	entryPath?: string;
 };
-let definition: {
-	inputSchema: z.ZodObject;
-	handler: (input: Input, ctx: object) => Promise<unknown>;
-};
-mock.module("../../define-tool", () => ({
-	defineTool: (_server: unknown, value: typeof definition) => {
-		definition = value;
-	},
-}));
 
 const PAGE_ID = "3f7a1c22-9c2e-4e3a-9a8b-1f0b6c2d4e55";
 let linked = false;
@@ -36,16 +25,20 @@ mock.module("../../caller", () => ({
 	}),
 }));
 
-const { register } = await import("./publish");
-register({} as McpServer);
+const { tool: definition } = await import("./publish");
+const schema = definition.inputSchema;
+if (!schema) throw new Error("pages_publish has no input schema");
 
 const call = async (input: Omit<Input, "html">) => {
 	linked = Boolean(input.workspaceId);
-	const parsed = definition.inputSchema.parse({
+	const parsed = schema.parse({
 		html: "<h1>hi</h1>",
 		...input,
-	}) as Input;
-	return (await definition.handler(parsed, {})) as Record<string, unknown>;
+	});
+	return (await definition.handler(parsed, {} as never)) as Record<
+		string,
+		unknown
+	>;
 };
 
 test("publishes with no workspace at all", async () => {
@@ -78,6 +71,6 @@ test("a publish by id says nothing — that caller already holds the id", async 
 
 test("still refuses half a workspace key", () => {
 	expect(() =>
-		definition.inputSchema.parse({ html: "<h1>hi</h1>", entryPath: "a.html" }),
+		schema.parse({ html: "<h1>hi</h1>", entryPath: "a.html" }),
 	).toThrow();
 });

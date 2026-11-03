@@ -1,17 +1,4 @@
 import { afterAll, expect, mock, test } from "bun:test";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { z } from "zod";
-
-type Definition = {
-	inputSchema: z.ZodTypeAny;
-	handler: (input: unknown, ctx: object) => Promise<unknown>;
-};
-const definitions = new Map<string, Definition>();
-mock.module("../../define-tool", () => ({
-	defineTool: (_server: unknown, value: Definition & { name: string }) => {
-		definitions.set(value.name, value);
-	},
-}));
 
 const PAGE_ID = "3f7a1c22-9c2e-4e3a-9a8b-1f0b6c2d4e55";
 mock.module("../../caller", () => ({
@@ -42,16 +29,25 @@ const realtime = Bun.serve({
 });
 afterAll(() => realtime.stop());
 
-const { register } = await import("./storage");
-register({} as McpServer);
+const storage = await import("./storage");
+const definitions = new Map(
+	[
+		storage.getStorageTool,
+		storage.setStorageTool,
+		storage.removeStorageTool,
+	].map((tool) => [tool.name, tool]),
+);
 
 const call = (name: string, input: Record<string, unknown>) => {
 	const definition = definitions.get(name);
 	if (!definition) throw new Error(`no tool ${name}`);
-	return definition.handler(definition.inputSchema.parse(input), {
-		realtimeUrl: `http://127.0.0.1:${realtime.port}`,
-		bearerToken: "user-jwt",
-	});
+	return definition.handler(
+		definition.inputSchema?.parse(input) as never,
+		{
+			realtimeUrl: `http://127.0.0.1:${realtime.port}`,
+			bearerToken: "user-jwt",
+		} as never,
+	);
 };
 
 test("reads one key from realtime with the user's token, by slug", async () => {

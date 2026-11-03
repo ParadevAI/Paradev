@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { TURN_TOKEN_HEADER } from "@superset/trpc";
 import { sandboxCredentialWorkspaceId } from "@superset/trpc/lib/sandbox";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -44,7 +45,9 @@ function limiterFor(prefix: string): Ratelimit {
 
 async function rateLimitKey(req: Request): Promise<string> {
 	const authorization = req.headers.get("authorization") ?? "";
-	const token = authorization.replace(/^Bearer\s+/i, "").trim();
+	const token =
+		authorization.replace(/^Bearer\s+/i, "").trim() ||
+		req.headers.get(TURN_TOKEN_HEADER)?.trim();
 	if (token) {
 		const digest = createHash("sha256").update(token).digest("hex");
 		return `token:${digest.slice(0, 32)}`;

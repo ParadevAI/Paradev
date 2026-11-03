@@ -1,28 +1,15 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { createMcpServer } from "@superset/mcp";
+import { listTools as listMcpTools } from "@superset/mcp/in-memory";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { getRequestOrigin } from "@/lib/oauth-metadata";
 
 async function listTools() {
-	const server = createMcpServer();
-	const [serverTransport, clientTransport] =
-		InMemoryTransport.createLinkedPair();
-	await server.connect(serverTransport);
-	const client = new Client({ name: "server-card", version: "1.0.0" });
-	try {
-		await client.connect(clientTransport);
-		const { tools } = await client.listTools();
-		return tools.map((tool) => ({
-			name: tool.name,
-			description: tool.description,
-			...(tool.annotations ? { annotations: tool.annotations } : {}),
-			inputSchema: tool.inputSchema,
-		}));
-	} finally {
-		await client.close();
-		await server.close();
-	}
+	const tools = await listMcpTools("person");
+	return tools.map((tool) => ({
+		name: tool.name,
+		description: tool.description,
+		...(tool.annotations ? { annotations: tool.annotations } : {}),
+		inputSchema: tool.inputSchema,
+	}));
 }
 
 export async function GET(request: Request): Promise<Response> {

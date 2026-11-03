@@ -263,7 +263,7 @@ async function personFromSession(ctx: TRPCContext, path: string) {
  * turn, or an archived Dev, stops working at once rather than when the token
  * expires. Null when the request carries no turn token.
  */
-async function devFromTurnToken(
+export async function devFromTurnToken(
 	headers: Headers,
 ): Promise<DevPrincipal | null> {
 	const token = headers.get(TURN_TOKEN_HEADER);

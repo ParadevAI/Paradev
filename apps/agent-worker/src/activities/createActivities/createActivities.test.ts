@@ -374,7 +374,7 @@ describe("runTurn", () => {
 				host: null,
 				dev: { name: "Ada", description: "backend", instructions: "Be brief." },
 				session: { kind: "main", role: null, title: null },
-				tools: { mcpUrl: "http://api/mcp/agent" },
+				tools: { mcpUrl: "http://api/mcp" },
 				agentToken: "turn-token",
 			},
 			model: "pdev/auto",
@@ -392,7 +392,7 @@ describe("runTurn", () => {
 		expect(start?.appendSystem).toContain("You are Ada");
 		expect(start?.appendSystem).toContain("Be brief.");
 		const mcp = JSON.parse(start?.mcp ?? "{}");
-		expect(mcp.mcpServers.dev.url).toBe("http://api/mcp/agent");
+		expect(mcp.mcpServers.dev.url).toBe("http://api/mcp");
 		expect(mcp.mcpServers.dev.headersHelper).toContain(
 			"dev-tools-headers.json",
 		);

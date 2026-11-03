@@ -1,10 +1,10 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
-import type { McpContext } from "./auth";
+import type { McpCallerKind, PersonMcpContext } from "./auth";
 import type { McpToolCallEmitter } from "./define-tool";
 import { createMcpServer } from "./server";
 
@@ -19,9 +19,7 @@ export interface InMemoryClientOptions {
 
 /**
  * Build an in-memory MCP client/server pair for server-side agent integrations
- * (the Slack agent, the automations dispatcher, etc.). Auth context is wired
- * directly through the SDK's documented `authInfo` option on each request —
- * no transport monkey-patching.
+ * (the Slack agent, the automations dispatcher, etc.), acting as `userId`.
  *
  * Callers MUST await the returned `cleanup()` to free the in-memory transport.
  * Use it inside a `try/finally` or with `await using` if your runtime supports it.
@@ -66,7 +64,8 @@ export async function createInMemoryMcpClient({
 		ttlSeconds: 300,
 	});
 
-	const mcpContext: McpContext = {
+	const context: PersonMcpContext = {
+		kind: "person",
 		userId,
 		email: user.email,
 		organizationId,
@@ -79,22 +78,27 @@ export async function createInMemoryMcpClient({
 		realtimeUrl,
 	};
 
-	const server = createMcpServer({ onToolCall });
+	return connect(createMcpServer({ kind: "person", context, onToolCall }));
+}
+
+/** What a caller of this kind sees in `tools/list`, for listings like the server card. */
+export async function listTools(kind: McpCallerKind) {
+	const { client, cleanup } = await connect(
+		createMcpServer({ kind, context: null }),
+	);
+	try {
+		return (await client.listTools()).tools;
+	} finally {
+		await cleanup();
+	}
+}
+
+async function connect(server: McpServer): Promise<{
+	client: Client;
+	cleanup: () => Promise<void>;
+}> {
 	const [serverTransport, clientTransport] =
 		InMemoryTransport.createLinkedPair();
-
-	const originalSend = clientTransport.send.bind(clientTransport);
-	clientTransport.send = (message, options) =>
-		originalSend(message, {
-			...options,
-			authInfo: {
-				token: "internal",
-				clientId: "mcp-internal",
-				scopes: ["mcp:full"],
-				extra: { mcpContext },
-			},
-		});
-
 	await server.connect(serverTransport);
 
 	const client = new Client({

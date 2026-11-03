@@ -203,7 +203,7 @@ export const agentWorkerRouter = {
 				session: { kind: turn.kind, role: turn.role, title: turn.title },
 				tools:
 					turn.kind === "main"
-						? { mcpUrl: `${env.NEXT_PUBLIC_API_URL}/mcp/agent` }
+						? { mcpUrl: `${env.NEXT_PUBLIC_API_URL}/mcp` }
 						: null,
 				agentToken: await signTurnToken(
 					env.AGENT_TURN_SIGNING_SECRET,

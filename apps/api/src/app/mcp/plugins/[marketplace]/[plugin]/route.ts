@@ -1,8 +1,8 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
 	isMcpUnauthorized,
-	type McpContext,
-	resolveMcpContext,
+	type PersonMcpContext,
+	resolvePersonMcpContext,
 } from "@superset/mcp";
 import {
 	AmbiguousConnectionError,
@@ -78,9 +78,9 @@ async function handle(
 		return withRateLimitHeaders(rateLimitedResponse(), rateLimitState);
 	}
 
-	let ctx: McpContext;
+	let ctx: PersonMcpContext;
 	try {
-		ctx = await resolveMcpContext(req, {
+		ctx = await resolvePersonMcpContext(req, {
 			apiUrl: env.NEXT_PUBLIC_API_URL,
 			relayUrl: env.RELAY_URL,
 			realtimeUrl: env.REALTIME_URL,
