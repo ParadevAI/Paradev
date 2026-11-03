@@ -3,6 +3,7 @@ import type { RouterOutputs } from "@superset/trpc";
 import { tabCapsuleClassName } from "@superset/ui/lib/header-controls";
 import { cn } from "@superset/ui/utils";
 import { useRouter } from "@tanstack/react-router";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { LuHash, LuLock, LuMessageSquareText } from "react-icons/lu";
 import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
@@ -36,6 +37,9 @@ export function ChatTabStrip({
 	const tabs = organizationChatTabs(allTabs, organizationId);
 	const activeTabId = useChatTabsStore((state) => state.activeTabId);
 	const closeTab = useChatTabsStore((state) => state.close);
+	const [hoveredTabId, setHoveredTabId] = useState<string | null>(null);
+	const isRaised = (tabId: string | undefined) =>
+		tabId === activeTabId || tabId === hoveredTabId;
 
 	const describe = (tab: ChatTabModel) => {
 		if (tab.kind === "threads") {
@@ -82,17 +86,21 @@ export function ChatTabStrip({
 					<div className="hide-scrollbar flex h-full min-w-0 flex-1 overflow-x-auto rounded-full">
 						{tabs.map((tab, index) => {
 							const { label, icon } = describe(tab);
-							const isActive = tab.id === activeTabId;
 							return (
 								<ChatTab
 									key={tab.id}
 									label={label}
 									icon={icon}
-									isActive={isActive}
+									isActive={tab.id === activeTabId}
 									showDivider={
 										index > 0 &&
-										!isActive &&
-										tabs[index - 1]?.id !== activeTabId
+										!isRaised(tab.id) &&
+										!isRaised(tabs[index - 1]?.id)
+									}
+									onHoverChange={(isHovered) =>
+										setHoveredTabId((current) =>
+											isHovered ? tab.id : current === tab.id ? null : current,
+										)
 									}
 									onActivate={() => go(tab.href)}
 									onClose={() => close(tab)}

@@ -32,9 +32,9 @@ export function capsuleTabClassName(isActive: boolean): string {
 	);
 }
 
-/** The line between two capsule tabs. It hides while either neighbour is hovered. */
+/** The line between two capsule tabs, drawn at the left edge of the later one. Leave it out next to the open or hovered tab. */
 export const TAB_DIVIDER_CLASS =
-	"pointer-events-none absolute top-2 bottom-2 -left-px w-px bg-foreground/10 [:hover+*>&]:opacity-0 [:hover>&]:opacity-0";
+	"pointer-events-none absolute top-2 bottom-2 -left-px w-px bg-foreground/10";
 
 /** The close button at the end of a header tab. */
 export const HEADER_TAB_CLOSE_CLASS =

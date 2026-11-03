@@ -188,6 +188,7 @@ export function TabBar<TData>({
 		return () => observer.disconnect();
 	}, [activeTabIndex, hasHorizontalOverflow]);
 
+	const [hoveredTabId, setHoveredTabId] = useState<string | null>(null);
 	const insertIndexRef = useRef<number | null>(null);
 	const [insertIndex, setInsertIndex] = useState<number | null>(null);
 
@@ -284,6 +285,9 @@ export function TabBar<TData>({
 		setHasHorizontalOverflow(state.hasOverflowX);
 	}, []);
 
+	const isRaised = (tab: Tab<TData> | undefined) =>
+		tab?.id === activeTabId || tab?.id === hoveredTabId;
+
 	const renderTabSlot = (tab: Tab<TData>, index: number) => (
 		<div
 			data-tab-slot=""
@@ -292,11 +296,19 @@ export function TabBar<TData>({
 			}
 			key={tab.id}
 			style={isCards ? undefined : { width: TAB_WIDTH }}
+			onPointerEnter={isCards ? () => setHoveredTabId(tab.id) : undefined}
+			onPointerLeave={
+				isCards
+					? () =>
+							setHoveredTabId((current) =>
+								current === tab.id ? null : current,
+							)
+					: undefined
+			}
 		>
-			{isCards &&
-				index > 0 &&
-				index !== activeTabIndex &&
-				index - 1 !== activeTabIndex && <span className={TAB_DIVIDER_CLASS} />}
+			{isCards && index > 0 && !isRaised(tab) && !isRaised(tabs[index - 1]) && (
+				<span className={TAB_DIVIDER_CLASS} />
+			)}
 			<TabItem
 				tab={tab}
 				tabs={tabs}

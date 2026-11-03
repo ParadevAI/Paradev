@@ -14,6 +14,7 @@ interface ChatTabProps {
 	icon: ReactNode;
 	isActive: boolean;
 	showDivider: boolean;
+	onHoverChange: (isHovered: boolean) => void;
 	onActivate: () => void;
 	onClose: () => void;
 }
@@ -23,6 +24,7 @@ export function ChatTab({
 	icon,
 	isActive,
 	showDivider,
+	onHoverChange,
 	onActivate,
 	onClose,
 }: ChatTabProps) {
@@ -38,7 +40,12 @@ export function ChatTab({
 		onClose();
 	};
 	return (
-		<div ref={ref} className={CAPSULE_TAB_SLOT_CLASS}>
+		<div
+			ref={ref}
+			className={CAPSULE_TAB_SLOT_CLASS}
+			onPointerEnter={() => onHoverChange(true)}
+			onPointerLeave={() => onHoverChange(false)}
+		>
 			{showDivider && <span className={TAB_DIVIDER_CLASS} />}
 			<div className={cn(capsuleTabClassName(isActive), "group pr-2")}>
 				<button
