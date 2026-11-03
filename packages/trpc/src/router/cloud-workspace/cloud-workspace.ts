@@ -47,6 +47,8 @@ import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { personProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
+import { createChatMove } from "../chat-move/utils/createChatMove";
+import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import {
 	canOpenWorkspace,
 	isListed,
@@ -382,11 +384,35 @@ export const cloudWorkspaceRouter = {
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
+				/**
+				 * A chat to move into the new workspace once its host answers, in
+				 * place of an agent. Its history and session bundle must be in
+				 * `chatHistory` first; `chatMove.latest` tracks the move.
+				 */
+				move: z
+					.object({
+						chatSessionId: z.string().uuid(),
+						/** The computer the chat leaves; omitted when it leaves a cloud workspace. */
+						fromHostId: z.string().min(1).max(200).optional(),
+					})
+					.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
+			if (input.move && input.agent) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "A workspace a chat moves into starts no agent of its own",
+				});
+			}
+			if (input.move && ctx.sandboxCaller) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "A cloud workspace cannot move chats",
+				});
+			}
 			if (input.agent && !isCloudAgentId(input.agent)) {
 				// Only the built-in presets exist inside a sandbox; the clients offer
 				// nothing else, so this is a developer error, not a user one.
@@ -417,6 +443,20 @@ export const cloudWorkspaceRouter = {
 								effort: input.effort,
 								mode: input.mode,
 								attachmentFileIds: input.attachmentFileIds,
+							},
+						}
+					: {}),
+				...(input.move
+					? {
+							beforeProvision: async (workspaceId: string) => {
+								const move = input.move as NonNullable<typeof input.move>;
+								await createChatMove({
+									chatSessionId: move.chatSessionId,
+									...(move.fromHostId ? { fromHostId: move.fromHostId } : {}),
+									toWorkspaceId: workspaceId,
+									organizationId: input.organizationId,
+									userId: ctx.principal.userId,
+								});
 							},
 						}
 					: {}),
@@ -682,6 +722,7 @@ export const cloudWorkspaceRouter = {
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
+				await failChatMovesTo(row.id, "The cloud workspace was deleted");
 				// A row from a retired provider has no sandbox left to keep.
 				if (row.provider === "vercel") {
 					await queueReap(
