@@ -18,7 +18,7 @@ export async function POST(request: Request): Promise<Response> {
 	const rejected = await verifyQstashRequest(
 		request,
 		body,
-		"/api/agent-credentials/jobs/renew-chatgpt",
+		"/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins",
 	);
 	if (rejected) return rejected;
 

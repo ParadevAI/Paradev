@@ -202,9 +202,9 @@ unsigned id token rebuilt from the claims, a last refresh far ahead so Codex
 never tries to renew) written with the identity on every create and wake; the
 firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
 including a forced rotation while it ran. An hourly QStash job
-(`/api/agent-credentials/jobs/renew-chatgpt`) renews every session near expiry,
-also with no box running, and re-applies the rules on the person's running
-boxes. Only a refusal that names a dead session (`refresh_token_expired`,
+(`/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins`) renews every session
+near expiry, also with no box running, and re-applies the rules on the
+person's running boxes. Only a refusal that names a dead session (`refresh_token_expired`,
 `_reused`, `_invalidated`, `invalid_grant`) removes the sign-in; any other
 failure keeps it and goes to Sentry. **Open:** Codex in the box cannot recover
 from a 401 by itself: it refreshes with the placeholder against
