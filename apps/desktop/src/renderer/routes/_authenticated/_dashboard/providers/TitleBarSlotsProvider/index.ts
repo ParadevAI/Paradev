@@ -3,5 +3,6 @@ export {
 	titleBarTabBarProps,
 	useTitleBarMainSlot,
 	useTitleBarSideSlot,
+	useTitleBarSideWidth,
 	useTitleBarSlots,
 } from "./TitleBarSlotsProvider";

@@ -83,10 +83,11 @@ export function RightPaneArea({
 		const active = store.getState().getActivePane();
 		if (active) store.getState().focusPane(active.pane.id);
 	}, [isFullScreen, store]);
-	// This element is `display: contents`, so the box to line the title bar up with is its parent.
+	// The slide's outer box is the one that shrinks to nothing when the pane
+	// closes; the pane inside keeps its width and only turns invisible.
 	const [paneBox, setPaneBox] = useState<HTMLElement | null>(null);
 	const measurePaneBox = useCallback((node: HTMLDivElement | null) => {
-		setPaneBox(node?.parentElement ?? null);
+		setPaneBox(node?.closest<HTMLElement>("[data-sidebar-slide]") ?? null);
 	}, []);
 	const titleBarSideSlot = useTitleBarSideSlot(paneBox);
 

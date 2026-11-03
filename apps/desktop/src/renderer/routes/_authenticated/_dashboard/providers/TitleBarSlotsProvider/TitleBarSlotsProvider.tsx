@@ -13,8 +13,6 @@ interface TitleBarSlots {
 	main: HTMLElement | null;
 	side: HTMLElement | null;
 	mainClaims: number;
-	/** From the right pane's left edge to the window's right edge, or null while it is closed. */
-	sideWidth: number | null;
 	setMain: (element: HTMLElement | null) => void;
 	setSide: (element: HTMLElement | null) => void;
 	claimMain: () => () => void;
@@ -22,6 +20,8 @@ interface TitleBarSlots {
 }
 
 const TitleBarSlotsContext = createContext<TitleBarSlots | null>(null);
+/** Changes every frame while the right pane slides, so only the title bar reads it. */
+const TitleBarSideWidthContext = createContext<number | null>(null);
 
 /** Lets a screen put its tab bars in the window's title bar instead of above its content. */
 export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
@@ -33,22 +33,23 @@ export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 		setMainClaims((count) => count + 1);
 		return () => setMainClaims((count) => count - 1);
 	}, []);
-	const value = useMemo(
+	const slots = useMemo(
 		() => ({
 			main,
 			side,
 			mainClaims,
-			sideWidth,
 			setMain,
 			setSide,
 			claimMain,
 			setSideWidth,
 		}),
-		[main, side, mainClaims, sideWidth, claimMain],
+		[main, side, mainClaims, claimMain],
 	);
 	return (
-		<TitleBarSlotsContext.Provider value={value}>
-			{children}
+		<TitleBarSlotsContext.Provider value={slots}>
+			<TitleBarSideWidthContext.Provider value={sideWidth}>
+				{children}
+			</TitleBarSideWidthContext.Provider>
 		</TitleBarSlotsContext.Provider>
 	);
 }
@@ -63,6 +64,11 @@ export function useTitleBarSlots(): TitleBarSlots {
 	return slots;
 }
 
+/** From the right pane's left edge to the window's right edge, or null while the pane is closed. */
+export function useTitleBarSideWidth(): number | null {
+	return useContext(TitleBarSideWidthContext);
+}
+
 /**
  * The title bar element a screen's main tab bar renders into: undefined outside
  * the shell, so the bar stays inline, and null until the title bar has mounted.
@@ -74,7 +80,7 @@ export function useTitleBarMainSlot(): HTMLElement | null | undefined {
 	return slots ? slots.main : undefined;
 }
 
-/** The title bar element above the right pane; `pane` is measured so the slot starts where the pane does. */
+/** The title bar element above the right pane; `pane` is measured so the slot spans exactly what the pane shows. */
 export function useTitleBarSideSlot(
 	pane: HTMLElement | null,
 ): HTMLElement | null | undefined {

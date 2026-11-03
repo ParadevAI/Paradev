@@ -1,7 +1,10 @@
 import { cn } from "@superset/ui/utils";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useTitleBarSlots } from "../../providers/TitleBarSlotsProvider";
+import {
+	useTitleBarSideWidth,
+	useTitleBarSlots,
+} from "../../providers/TitleBarSlotsProvider";
 import { AppMenuButton } from "../AppMenuButton";
 import { NavigationControls } from "../NavigationControls";
 import { NAVIGATION_RAIL_WIDTH } from "../NavigationRail";
@@ -18,7 +21,8 @@ const TRAFFIC_LIGHTS_WIDTH = 80;
  * tab bar, with the right pane's tab bar above the right pane.
  */
 export function TitleBar() {
-	const { setMain, setSide, mainClaims, sideWidth } = useTitleBarSlots();
+	const { setMain, setSide, mainClaims } = useTitleBarSlots();
+	const sideWidth = useTitleBarSideWidth();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const zoomFactor = useZoomFactor();
