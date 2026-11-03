@@ -17484,6 +17484,9 @@ msgstr "워크스페이스 검색…"
 msgid "Search your meeting notes"
 msgstr "회의 노트 검색"
 
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "워크스페이스를 검색해 열거나 새 워크스페이스를 시작합니다"
+
 msgid "Search..."
 msgstr "검색..."
 
@@ -19340,6 +19343,9 @@ msgstr "워크스페이스 8로 전환"
 
 msgid "Switch to Workspace 9"
 msgstr "워크스페이스 9로 전환"
+
+msgid "Switch Workspace"
+msgstr "워크스페이스 전환"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

@@ -17484,6 +17484,9 @@ msgstr "Поиск рабочих областей…"
 msgid "Search your meeting notes"
 msgstr "Поиск по заметкам со встреч"
 
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Найдите рабочую область и откройте её или создайте новую"
+
 msgid "Search..."
 msgstr "Поиск..."
 
@@ -19340,6 +19343,9 @@ msgstr "Перейти в рабочую область 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Перейти в рабочую область 9"
+
+msgid "Switch Workspace"
+msgstr "Сменить рабочую область"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

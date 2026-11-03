@@ -17484,6 +17484,9 @@ msgstr "Cari workspace…"
 msgid "Search your meeting notes"
 msgstr "Cari catatan rapat Anda"
 
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Cari workspace Anda dan buka salah satunya, atau mulai workspace baru"
+
 msgid "Search..."
 msgstr "Cari..."
 
@@ -19340,6 +19343,9 @@ msgstr "Beralih ke Workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Beralih ke Workspace 9"
+
+msgid "Switch Workspace"
+msgstr "Ganti workspace"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
