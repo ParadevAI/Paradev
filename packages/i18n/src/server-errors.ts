@@ -137,11 +137,23 @@ export const serverErrorMessages: Record<
 				message: `This automation belongs to ${params?.organizationName}. Switch to that organization to open it.`,
 			}),
 		),
-	"serverError.automation.onlyTheOwnerOrAnOrganizationOwner": () =>
+	"serverError.automation.archiveBeforeDelete": () =>
+		i18n._(
+			msg({
+				message: "Archive this automation before you delete it.",
+			}),
+		),
+	"serverError.automation.automationIsArchived": () =>
+		i18n._(
+			msg({
+				message: "This automation is archived. Restore it first.",
+			}),
+		),
+	"serverError.automation.onlyTheOwnerOrAnOrganizationOwnerCanArchive": () =>
 		i18n._(
 			msg({
 				message:
-					"Only the owner or an organization owner can delete this automation",
+					"Only the owner or an organization owner can archive this automation",
 			}),
 		),
 	"serverError.automation.automationsRequireThePro": () =>

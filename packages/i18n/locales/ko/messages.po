@@ -2937,6 +2937,9 @@ msgstr "환경 보관"
 msgid "Archive failed"
 msgstr "보관 실패"
 
+msgid "Archive this automation before you delete it."
+msgstr "삭제하기 전에 이 자동화를 보관하세요."
+
 msgid "Archive workspace"
 msgstr "워크스페이스 보관"
 
@@ -13187,8 +13190,8 @@ msgstr "소유자만 이 자동화를 실행할 수 있습니다"
 msgid "Only the owner can view prompt history"
 msgstr "소유자만 프롬프트 기록을 볼 수 있습니다"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "소유자 또는 조직 소유자만 이 자동화를 삭제할 수 있습니다"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "소유자 또는 조직 소유자만 이 자동화를 보관할 수 있습니다"
 
 msgid "Only the people listed above can open it"
 msgstr "위에 나열된 사람만 열 수 있습니다"
@@ -19489,6 +19492,9 @@ msgstr "이 자동화는 {0}에 속해 있습니다. 열려면 해당 조직으�
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "이 자동화에는 아직 지시문이 없습니다. 실행하기 전에 설정에서 프롬프트를 작성하세요."
+
+msgid "This automation is archived. Restore it first."
+msgstr "이 자동화는 보관되었습니다. 먼저 복원하세요."
 
 msgid "This automation is in another organization"
 msgstr "이 자동화는 다른 조직에 있습니다"

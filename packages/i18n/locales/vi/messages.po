@@ -2937,6 +2937,9 @@ msgstr "Lưu trữ environment"
 msgid "Archive failed"
 msgstr "Lưu trữ thất bại"
 
+msgid "Archive this automation before you delete it."
+msgstr "Hãy lưu trữ tự động hóa này trước khi xóa."
+
 msgid "Archive workspace"
 msgstr "Lưu trữ workspace"
 
@@ -13187,8 +13190,8 @@ msgstr "Chỉ chủ sở hữu mới chạy được tự động hóa này"
 msgid "Only the owner can view prompt history"
 msgstr "Chỉ chủ sở hữu mới xem được lịch sử prompt"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Chỉ chủ sở hữu hoặc chủ sở hữu tổ chức mới xóa được tự động hóa này"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Chỉ chủ sở hữu hoặc chủ sở hữu tổ chức mới có thể lưu trữ tự động hóa này"
 
 msgid "Only the people listed above can open it"
 msgstr "Chỉ những người có trong danh sách trên mới có thể mở"
@@ -19489,6 +19492,9 @@ msgstr "Tự động hóa này thuộc về {0}. Chuyển sang tổ chức đó 
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Tự động hóa này chưa có hướng dẫn. Hãy viết một prompt trong cài đặt trước khi chạy."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Tự động hóa này đã được lưu trữ. Hãy khôi phục nó trước."
 
 msgid "This automation is in another organization"
 msgstr "Tự động hóa này nằm trong một tổ chức khác"

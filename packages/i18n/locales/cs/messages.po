@@ -2937,6 +2937,9 @@ msgstr "Archivovat prostředí"
 msgid "Archive failed"
 msgstr "Archivace selhala"
 
+msgid "Archive this automation before you delete it."
+msgstr "Před smazáním tuto automatizaci archivujte."
+
 msgid "Archive workspace"
 msgstr "Archivovat pracovní prostor"
 
@@ -13187,8 +13190,8 @@ msgstr "Tuto automatizaci může spustit jen vlastník"
 msgid "Only the owner can view prompt history"
 msgstr "Historii promptů může zobrazit jen vlastník"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Tuto automatizaci může smazat jen vlastník nebo vlastník organizace"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Tuto automatizaci může archivovat jen vlastník nebo vlastník organizace"
 
 msgid "Only the people listed above can open it"
 msgstr "Otevřít ho mohou jen lidé uvedení výše"
@@ -19489,6 +19492,9 @@ msgstr "Tato automatizace patří organizaci {0}. Přepněte na tuto organizaci,
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Tato automatizace zatím nemá pokyny. Před spuštěním napište v jejím nastavení prompt."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Tato automatizace je archivovaná. Nejprve ji obnovte."
 
 msgid "This automation is in another organization"
 msgstr "Tato automatizace je v jiné organizaci"

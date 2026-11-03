@@ -8,13 +8,13 @@ export function register(server: McpServer): void {
 		name: "automations_delete",
 		annotations: { destructiveHint: true },
 		description:
-			"Delete an automation. Its schedules and event triggers stop immediately; past runs remain. Caller must be the owner.",
+			"Permanently delete an archived automation and its run history. This can't be undone. Archive it first with automations_archive. Caller must be the owner or an organization owner.",
 		inputSchema: {
 			id: z.string().uuid().describe("Automation UUID."),
 		},
 		handler: async (input, ctx) => {
 			const caller = createMcpCaller(ctx);
-			return caller.automation.delete({ id: input.id });
+			return caller.automation.deleteArchived({ id: input.id });
 		},
 	});
 }

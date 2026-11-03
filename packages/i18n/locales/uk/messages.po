@@ -2931,6 +2931,9 @@ msgstr "Архівувати середовище"
 msgid "Archive failed"
 msgstr "Не вдалося архівувати"
 
+msgid "Archive this automation before you delete it."
+msgstr "Архівуйте цю автоматизацію, перш ніж видалити її."
+
 msgid "Archive workspace"
 msgstr "Архівувати робочий простір"
 
@@ -13181,8 +13184,8 @@ msgstr "Лише власник може запускати цю автомат�
 msgid "Only the owner can view prompt history"
 msgstr "Лише власник може переглядати історію промптів"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Лише власник або власник організації може видалити цю автоматизацію"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Лише власник або власник організації може архівувати цю автоматизацію"
 
 msgid "Only the people listed above can open it"
 msgstr "Відкрити можуть лише люди, указані вище"
@@ -19483,6 +19486,9 @@ msgstr "Ця автоматизація належить організації 
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Ця автоматизація ще не має інструкцій. Напишіть промпт у її налаштуваннях, перш ніж запускати."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Цю автоматизацію архівовано. Спочатку відновіть її."
 
 msgid "This automation is in another organization"
 msgstr "Ця автоматизація в іншій організації"

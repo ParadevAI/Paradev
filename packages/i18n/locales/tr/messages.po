@@ -2937,6 +2937,9 @@ msgstr "Ortamı arşivle"
 msgid "Archive failed"
 msgstr "Arşivlenemedi"
 
+msgid "Archive this automation before you delete it."
+msgstr "Silmeden önce bu otomasyonu arşivleyin."
+
 msgid "Archive workspace"
 msgstr "Çalışma alanını arşivle"
 
@@ -13187,8 +13190,8 @@ msgstr "Bu otomasyonu yalnızca sahibi çalıştırabilir"
 msgid "Only the owner can view prompt history"
 msgstr "İstem geçmişini yalnızca sahibi görebilir"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Bu otomasyonu yalnızca sahibi veya bir kuruluş sahibi silebilir"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Bu otomasyonu yalnızca sahibi veya bir kuruluş sahibi arşivleyebilir"
 
 msgid "Only the people listed above can open it"
 msgstr "Yalnızca yukarıda listelenen kişiler açabilir"
@@ -19489,6 +19492,9 @@ msgstr "Bu otomasyon {0} kuruluşuna ait. Açmak için o kuruluşa geçin."
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Bu otomasyonun henüz talimatı yok. Çalıştırmadan önce ayarlarında bir istem yazın."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Bu otomasyon arşivlendi. Önce geri yükleyin."
 
 msgid "This automation is in another organization"
 msgstr "Bu otomasyon başka bir kuruluşta"
