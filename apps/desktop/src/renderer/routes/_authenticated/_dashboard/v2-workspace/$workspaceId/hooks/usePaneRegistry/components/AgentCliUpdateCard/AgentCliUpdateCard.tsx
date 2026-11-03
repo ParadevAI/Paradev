@@ -95,7 +95,8 @@ export function AgentCliUpdateCard({
 				aria-hidden
 				className={cn(
 					"h-lh w-4 shrink-0 text-popover-foreground/90",
-					state === "updating" && "animate-spin opacity-90",
+					state === "updating" &&
+						"animate-spin opacity-90 motion-reduce:animate-none",
 				)}
 			/>
 			<div className="flex min-w-0 flex-1 flex-col">

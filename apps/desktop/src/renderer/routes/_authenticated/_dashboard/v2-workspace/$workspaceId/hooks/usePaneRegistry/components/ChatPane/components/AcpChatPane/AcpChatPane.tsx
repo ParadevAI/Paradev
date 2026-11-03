@@ -597,7 +597,8 @@ export function AcpChatPane({
 	]);
 	// A retry cannot get past a CLI that is too old, and one mid-install can
 	// start the chat on whatever install the PATH falls through to. The
-	// recovery screen offers the update and resumes once it lands.
+	// recovery screen offers the update and resumes once it lands. A stopped
+	// chat holds until the CLI has been checked again.
 	const cliUpdatePending = useAgentCliUpdatePending(
 		workspaceId,
 		harness,
@@ -608,12 +609,13 @@ export function AcpChatPane({
 		harness,
 		sessionDead || sessionStopped,
 	);
+	const cliChecking = recoverable && cliTooOld === null;
 	const recovering =
 		switchingAccount ||
 		replacement !== null ||
 		(recoverable &&
 			!cliUpdatePending &&
-			!cliTooOld &&
+			cliTooOld === false &&
 			recoveries.current < MAX_RECOVERIES);
 	useEffect(() => {
 		if (!recovering || recoveryInFlight.current) return;
@@ -726,7 +728,8 @@ export function AcpChatPane({
 		harness &&
 		sessionId &&
 		(sessionDead || sessionStopped || lost) &&
-		!recovering
+		!recovering &&
+		!cliChecking
 	) {
 		return (
 			<AcpRecovery
@@ -780,7 +783,10 @@ export function AcpChatPane({
 			presetId={agent?.id}
 			client={client}
 			draftKey={draftKey}
-			{...(recovering || checking || transferredFrom === sessionId
+			{...(recovering ||
+			checking ||
+			cliChecking ||
+			transferredFrom === sessionId
 				? {
 						held: {
 							notice: <Trans>Resuming the conversation…</Trans>,

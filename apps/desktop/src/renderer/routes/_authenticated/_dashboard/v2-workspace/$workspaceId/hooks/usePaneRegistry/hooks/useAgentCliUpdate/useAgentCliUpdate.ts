@@ -5,7 +5,7 @@ import {
 } from "@superset/shared/agent-catalog";
 import { COMPANY } from "@superset/shared/constants";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	agentCliUpdateKey,
 	useAgentCliUpdateWatches,
@@ -92,12 +92,11 @@ export function useAgentCliUpdate({
 			? BUILTIN_AGENT_LABELS[binary]
 			: binary);
 	const installed = status?.installed ?? null;
-	const source = status?.source;
 	const update = useCallback(async () => {
-		if (!command || !onRunInTerminal || !label || !source) return;
+		if (!command || !onRunInTerminal || !label) return;
 		startWatch(key, {
 			from: installed,
-			source,
+			command,
 			sessionId,
 			until: Date.now() + UPDATE_WATCH_MS,
 		});
@@ -111,7 +110,6 @@ export function useAgentCliUpdate({
 		onRunInTerminal,
 		label,
 		installed,
-		source,
 		sessionId,
 		t,
 		startWatch,
@@ -119,30 +117,40 @@ export function useAgentCliUpdate({
 		key,
 	]);
 
-	return { status, label, phase, canUpdate, update, finish };
+	const startedHere = watch !== null && watch.sessionId === sessionId;
+
+	return { status, label, phase, startedHere, canUpdate, update, finish };
 }
 
 /**
- * True when the chat's CLI is older than chat needs. Checked again when the
- * chat stops, since the CLI may have changed since the last look.
+ * Whether the chat's CLI is older than chat needs. Once the chat stops it is
+ * checked again, since the CLI may have changed, and reads null until that
+ * check answers.
  */
 export function useAgentCliTooOld(
 	workspaceId: string,
 	harness: string | undefined,
 	stopped: boolean,
-): boolean {
-	const { data, refetch } = workspaceTrpc.agentTooling.agentCliStatus.useQuery(
-		{ workspaceId, harness: harness ?? "" },
-		{
-			enabled: harness !== undefined,
-			staleTime: STATUS_STALE_MS,
-			retry: false,
-		},
-	);
+): boolean | null {
+	const { data, refetch, dataUpdatedAt, errorUpdatedAt } =
+		workspaceTrpc.agentTooling.agentCliStatus.useQuery(
+			{ workspaceId, harness: harness ?? "" },
+			{
+				enabled: harness !== undefined,
+				staleTime: STATUS_STALE_MS,
+				retry: false,
+			},
+		);
+	const [stoppedAt, setStoppedAt] = useState<number | null>(null);
+	if (stopped !== (stoppedAt !== null)) {
+		setStoppedAt(stopped ? Date.now() : null);
+	}
 	useEffect(() => {
 		if (stopped && harness !== undefined) void refetch();
 	}, [stopped, harness, refetch]);
-	return data?.belowFloor === true;
+	if (data?.belowFloor === true) return true;
+	if (harness === undefined || stoppedAt === null) return false;
+	return Math.max(dataUpdatedAt, errorUpdatedAt) >= stoppedAt ? false : null;
 }
 
 /** True while an update this chat session started has not landed yet. */

@@ -42,23 +42,23 @@ export function AcpRecovery({
 	agentLabel?: string;
 	onRunInTerminal?: RunInTerminal;
 }) {
-	const { status, label, phase, canUpdate, update, finish } = useAgentCliUpdate(
-		{
+	const { status, label, phase, startedHere, canUpdate, update, finish } =
+		useAgentCliUpdate({
 			agentLabel,
 			workspaceId,
 			harness,
 			sessionId,
 			onRunInTerminal,
-		},
-	);
+		});
 	const tooOld = status?.belowFloor === true;
-	const retry = onResume ?? onStartNew;
+	const retry = onResume ?? (sessionId === null ? onStartNew : undefined);
 	const retried = useRef(false);
 	useEffect(() => {
+		if (phase !== "updated") retried.current = false;
 		if (phase !== "updated" || tooOld || retried.current) return;
 		retried.current = true;
 		finish();
-		retry();
+		retry?.();
 	}, [phase, tooOld, retry, finish]);
 
 	const installed = status?.installed;
@@ -81,7 +81,7 @@ export function AcpRecovery({
 				href: AGENT_CLI_UPDATE_DOCS_URL,
 			});
 		}
-		if (onResume) {
+		if (onResume && !updating) {
 			actions.push({
 				id: "resume",
 				label: <Trans>Resume</Trans>,
@@ -100,7 +100,9 @@ export function AcpRecovery({
 					className="w-full max-w-sm"
 					description={
 						updating ? (
-							<Trans>The chat resumes after the update.</Trans>
+							startedHere ? (
+								<Trans>The chat resumes after the update.</Trans>
+							) : undefined
 						) : (
 							<Trans>
 								Chat needs {minVersion} or newer. {installed} is installed.

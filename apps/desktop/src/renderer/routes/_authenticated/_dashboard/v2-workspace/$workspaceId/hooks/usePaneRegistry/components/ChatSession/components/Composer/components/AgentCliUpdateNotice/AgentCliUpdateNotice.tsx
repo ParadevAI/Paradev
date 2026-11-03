@@ -33,29 +33,44 @@ export function AgentCliUpdateNotice({
 	turnRunning: boolean;
 	workspaceId: string;
 }) {
-	const { status, label, phase, canUpdate, update, finish } = useAgentCliUpdate(
-		{
+	const { status, label, phase, startedHere, canUpdate, update, finish } =
+		useAgentCliUpdate({
 			agentLabel,
 			workspaceId,
 			harness: acpHarnessForPreset(presetId),
 			sessionId,
 			onRunInTerminal,
-		},
-	);
+		});
 	const dismissedAt = useAgentCliUpdateDismissals((store) => store.dismissedAt);
 	if (!status) return null;
 	const { binary, installed, latest } = status;
 	const cardClassName = cn("mb-2", className);
 
 	const dismiss = latest ? () => dismissAgentCliUpdate(binary, latest) : finish;
+	const dismissed =
+		latest !== null && isAgentCliUpdateDismissed(dismissedAt, binary, latest);
 	if (phase === "updating") {
+		if (dismissed) return null;
 		return (
 			<AgentCliUpdateCard
 				actions={[]}
 				className={cardClassName}
 				compact
-				description={<Trans>Follow along in the terminal below.</Trans>}
-				onDismiss={dismiss}
+				description={
+					startedHere ? (
+						<Trans>Follow along in the terminal below.</Trans>
+					) : undefined
+				}
+				onDismiss={
+					startedHere
+						? () => {
+								dismiss();
+								finish();
+							}
+						: latest
+							? dismiss
+							: undefined
+				}
 				state="updating"
 				testId="agent-cli-update-notice"
 				title={<Trans>Updating {label}…</Trans>}
@@ -73,10 +88,11 @@ export function AgentCliUpdateNotice({
 									id: "restart",
 									label: <Trans>Restart</Trans>,
 									onClick: () => {
-										finish();
 										void onRestartAgent(
 											turnRunning ? CONTINUE_PROMPT : undefined,
-										);
+										).then((restarted) => {
+											if (restarted) finish();
+										});
 									},
 								},
 							]
@@ -94,7 +110,7 @@ export function AgentCliUpdateNotice({
 	}
 
 	if (!status.behind || !latest) return null;
-	if (isAgentCliUpdateDismissed(dismissedAt, binary, latest)) return null;
+	if (dismissed) return null;
 	return (
 		<AgentCliUpdateCard
 			actions={[
