@@ -56,6 +56,33 @@ test("loads every page in order, including an empty final page", async () => {
 	).toEqual(["page=1", "page=2", "page=3"]);
 });
 
+test("a push between pages neither repeats nor drops a repository", async () => {
+	const repositories = Array.from({ length: 250 }, (_, index) => ({
+		full_name: `owner/repo-${String(index).padStart(3, "0")}`,
+		clone_url: `https://github.com/owner/repo-${index}.git`,
+		updated_at: `2026-01-01T00:00:${String(index % 60).padStart(2, "0")}Z`,
+	}));
+	let calls = 0;
+	const result = await listGitHubRepositories(async (args) => {
+		const page = Number(
+			args.find((arg) => arg.startsWith("page="))?.slice("page=".length),
+		);
+		if (++calls === 2) {
+			const pushed = repositories[150];
+			if (pushed) pushed.updated_at = "2026-02-01T00:00:00Z";
+		}
+		const ordered = args.includes("sort=updated")
+			? [...repositories].sort((a, b) =>
+					b.updated_at.localeCompare(a.updated_at),
+				)
+			: repositories;
+		return ordered.slice((page - 1) * 100, page * 100);
+	});
+	const names = result.map((repository) => repository.fullName);
+	expect(new Set(names).size).toBe(250);
+	expect(names[0]).toBe("owner/repo-150");
+});
+
 test("rejects invalid clone URLs on later pages instead of returning partial results", async () => {
 	let page = 0;
 	await expect(
@@ -150,7 +177,7 @@ test.skipIf(!Bun.which("gh"))(
 				const headers =
 					page < 20
 						? {
-								Link: `<${url.origin}/user/repos?${new URLSearchParams({ affiliation: "owner,collaborator,organization_member", sort: "updated", per_page: "100", page: String(page + 1) })}>; rel="next"`,
+								Link: `<${url.origin}/user/repos?${new URLSearchParams({ affiliation: "owner,collaborator,organization_member", sort: "full_name", per_page: "100", page: String(page + 1) })}>; rel="next"`,
 							}
 						: undefined;
 				return Response.json(entries, { headers });
@@ -189,7 +216,7 @@ test.skipIf(!Bun.which("gh"))(
 					"-f",
 					"affiliation=owner,collaborator,organization_member",
 					"-f",
-					"sort=updated",
+					"sort=full_name",
 					"-f",
 					"per_page=100",
 				]),
@@ -204,7 +231,7 @@ test.skipIf(!Bun.which("gh"))(
 				expect(request.pathname).toBe("/user/repos");
 				expect(Object.fromEntries(request.searchParams)).toEqual({
 					affiliation: "owner,collaborator,organization_member",
-					sort: "updated",
+					sort: "full_name",
 					per_page: "100",
 					page: String(index + 1),
 				});
