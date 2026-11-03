@@ -15,9 +15,13 @@ export interface NativeHostLaunch {
 	platform?: NodeJS.Platform;
 	/** How long a host may take to exit after SIGTERM before SIGKILL. */
 	killGraceMs?: number;
+	/** Bytes the host may leave unread before the port closes. */
+	maxPendingBytes?: number;
 }
 
 const KILL_GRACE_MS = 2000;
+// Two of Chrome's largest messages.
+const MAX_PENDING_BYTES = 128 * 1024 * 1024;
 
 function spawnHost(
 	hostPath: string,
@@ -44,6 +48,7 @@ export function startNativeHost(
 		origin,
 		platform = process.platform,
 		killGraceMs = KILL_GRACE_MS,
+		maxPendingBytes = MAX_PENDING_BYTES,
 	}: NativeHostLaunch,
 	handlers: {
 		onMessage: (json: string) => void;
@@ -51,6 +56,7 @@ export function startNativeHost(
 	},
 ): NativeHostProcess {
 	let closed = false;
+	let unsentBytes = 0;
 	const finish = (error: string) => {
 		if (closed) return;
 		closed = true;
@@ -101,7 +107,17 @@ export function startNativeHost(
 	return {
 		post: (json) => {
 			if (closed) return;
-			child.stdin?.write(encodeNativeMessage(json));
+			// A host that stops reading would otherwise buffer every frame in memory.
+			if (unsentBytes > maxPendingBytes) {
+				console.warn("[native-messaging] host stopped reading its input");
+				finish(NATIVE_MESSAGING_ERRORS.io);
+				return;
+			}
+			const frame = encodeNativeMessage(json);
+			unsentBytes += frame.length;
+			child.stdin?.write(frame, () => {
+				unsentBytes -= frame.length;
+			});
 		},
 		close: () => {
 			if (closed) return;
