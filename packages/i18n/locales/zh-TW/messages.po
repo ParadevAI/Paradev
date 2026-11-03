@@ -3788,6 +3788,9 @@ msgstr "相機不可用"
 msgid "Can comment"
 msgstr "可評論"
 
+msgid "Can edit"
+msgstr "可編輯"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "可以購買更多雲端 GB 小時嗎？"
 
@@ -14900,6 +14903,9 @@ msgstr "透過 Paradev CLI 或 MCP 發布。"
 msgid "Publish from your own repo"
 msgstr "從你自己的儲存庫發布"
 
+msgid "Publish new versions, rename and share"
+msgstr "發布新版本、重新命名和共用"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "已發佈"
@@ -21657,6 +21663,9 @@ msgstr "你可以在 30 天內從「設定 → 專案」還原。儲存庫資料
 
 msgid "You can see how we work before you talk to us."
 msgstr "在與我們交流之前，你就能看到我們是如何工作的。"
+
+msgid "You can view this page but not change it"
+msgstr "你可以檢視此頁面，但不能變更"
 
 msgid "You can view this page but not comment on it"
 msgstr "你可以檢視此頁面，但不能評論"

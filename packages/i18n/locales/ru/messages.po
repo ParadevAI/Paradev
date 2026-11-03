@@ -3788,6 +3788,9 @@ msgstr "Камера недоступна"
 msgid "Can comment"
 msgstr "Может комментировать"
 
+msgid "Can edit"
+msgstr "Может редактировать"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Можно ли купить больше облачных ГБ-часов?"
 
@@ -14900,6 +14903,9 @@ msgstr "Публикуйте через Paradev CLI или по MCP."
 msgid "Publish from your own repo"
 msgstr "Публикуйте из своего репозитория"
 
+msgid "Publish new versions, rename and share"
+msgstr "Публиковать новые версии, переименовывать и делиться"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Опубликован"
@@ -21657,6 +21663,9 @@ msgstr "Его можно восстановить в разделе «Наст�
 
 msgid "You can see how we work before you talk to us."
 msgstr "Вы можете увидеть, как мы работаем, ещё до разговора с нами."
+
+msgid "You can view this page but not change it"
+msgstr "Вы можете просматривать эту страницу, но не изменять её"
 
 msgid "You can view this page but not comment on it"
 msgstr "Вы можете просматривать эту страницу, но не комментировать её"

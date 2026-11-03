@@ -3788,6 +3788,9 @@ msgstr "Camera is not available"
 msgid "Can comment"
 msgstr "Can comment"
 
+msgid "Can edit"
+msgstr "Can edit"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Can I buy more cloud GB-hours?"
 
@@ -14900,6 +14903,9 @@ msgstr "Publish from the Paradev CLI or over MCP."
 msgid "Publish from your own repo"
 msgstr "Publish from your own repo"
 
+msgid "Publish new versions, rename and share"
+msgstr "Publish new versions, rename and share"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Published"
@@ -21657,6 +21663,9 @@ msgstr "You can restore it from Settings → Projects for 30 days. The repositor
 
 msgid "You can see how we work before you talk to us."
 msgstr "You can see how we work before you talk to us."
+
+msgid "You can view this page but not change it"
+msgstr "You can view this page but not change it"
 
 msgid "You can view this page but not comment on it"
 msgstr "You can view this page but not comment on it"

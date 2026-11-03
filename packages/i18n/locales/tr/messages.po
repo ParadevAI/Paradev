@@ -3788,6 +3788,9 @@ msgstr "Kamera kullanılamıyor"
 msgid "Can comment"
 msgstr "Yorum yapabilir"
 
+msgid "Can edit"
+msgstr "Düzenleyebilir"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Daha fazla bulut GB-saati satın alabilir miyim?"
 
@@ -14900,6 +14903,9 @@ msgstr "Paradev CLI'dan veya MCP üzerinden yayınlayın."
 msgid "Publish from your own repo"
 msgstr "Kendi deponuzdan yayımlayın"
 
+msgid "Publish new versions, rename and share"
+msgstr "Yeni sürümler yayımlayabilir, yeniden adlandırabilir ve paylaşabilir"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Yayınlandı"
@@ -21657,6 +21663,9 @@ msgstr "30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin
 
 msgid "You can see how we work before you talk to us."
 msgstr "Bizimle konuşmadan önce nasıl çalıştığımızı görebilirsiniz."
+
+msgid "You can view this page but not change it"
+msgstr "Bu sayfayı görüntüleyebilirsiniz ancak değiştiremezsiniz"
 
 msgid "You can view this page but not comment on it"
 msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"

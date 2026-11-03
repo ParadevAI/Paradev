@@ -3788,6 +3788,9 @@ msgstr "カメラを利用できません"
 msgid "Can comment"
 msgstr "コメント可"
 
+msgid "Can edit"
+msgstr "編集可"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "クラウド GB 時間を追加購入できますか?"
 
@@ -14900,6 +14903,9 @@ msgstr "Paradev CLI か MCP 経由で公開できます。"
 msgid "Publish from your own repo"
 msgstr "自分のリポジトリから公開"
 
+msgid "Publish new versions, rename and share"
+msgstr "新しいバージョンの公開、名前の変更、共有"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "公開"
@@ -21657,6 +21663,9 @@ msgstr "30 日間は「設定 → プロジェクト」から復元できます�
 
 msgid "You can see how we work before you talk to us."
 msgstr "話をする前に、私たちの働き方を見ることができます。"
+
+msgid "You can view this page but not change it"
+msgstr "このページは閲覧できますが、変更はできません"
 
 msgid "You can view this page but not comment on it"
 msgstr "このページは閲覧できますが、コメントはできません"

@@ -140,6 +140,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 					sharedVersion: resolved.sharedVersion,
 					latestVersion: resolved.latestVersion,
 					servedVersion: resolved.servedVersion,
+					canEdit: access.data?.canEdit,
 				}
 			: null;
 

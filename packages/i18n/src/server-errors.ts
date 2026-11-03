@@ -773,6 +773,12 @@ export const serverErrorMessages: Record<
 				message: "You don't have permission to remove this member",
 			}),
 		),
+	"serverError.page.cannotEdit": () =>
+		i18n._(
+			msg({
+				message: "You can view this page but not change it",
+			}),
+		),
 	"serverError.page.cannotComment": () =>
 		i18n._(
 			msg({

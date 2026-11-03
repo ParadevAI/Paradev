@@ -3788,6 +3788,9 @@ msgstr "相机不可用"
 msgid "Can comment"
 msgstr "可评论"
 
+msgid "Can edit"
+msgstr "可编辑"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "可以购买更多云端 GB 小时吗？"
 
@@ -14900,6 +14903,9 @@ msgstr "通过 Paradev CLI 或 MCP 发布。"
 msgid "Publish from your own repo"
 msgstr "从你自己的仓库发布"
 
+msgid "Publish new versions, rename and share"
+msgstr "发布新版本、重命名和共享"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "已发布"
@@ -21657,6 +21663,9 @@ msgstr "你可以在 30 天内从“设置 → 项目”恢复它。仓库文件
 
 msgid "You can see how we work before you talk to us."
 msgstr "在与我们交流之前，你就能看到我们是如何工作的。"
+
+msgid "You can view this page but not change it"
+msgstr "你可以查看此页面，但不能更改"
 
 msgid "You can view this page but not comment on it"
 msgstr "你可以查看此页面，但不能评论"

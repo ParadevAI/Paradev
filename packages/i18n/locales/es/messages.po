@@ -3788,6 +3788,9 @@ msgstr "La cámara no está disponible"
 msgid "Can comment"
 msgstr "Puede comentar"
 
+msgid "Can edit"
+msgstr "Puede editar"
+
 msgid "Can I buy more cloud GB-hours?"
 msgstr "¿Puedo comprar más GB-horas en la nube?"
 
@@ -14900,6 +14903,9 @@ msgstr "Publica desde la CLI de Paradev o por MCP."
 msgid "Publish from your own repo"
 msgstr "Publica desde tu propio repo"
 
+msgid "Publish new versions, rename and share"
+msgstr "Publicar nuevas versiones, cambiar el nombre y compartir"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Publicada"
@@ -21657,6 +21663,9 @@ msgstr "Puedes restaurarlo desde Configuración → Proyectos durante 30 días. 
 
 msgid "You can see how we work before you talk to us."
 msgstr "Puedes ver cómo trabajamos antes de hablar con nosotros."
+
+msgid "You can view this page but not change it"
+msgstr "Puedes ver esta página, pero no cambiarla"
 
 msgid "You can view this page but not comment on it"
 msgstr "Puedes ver esta página, pero no comentarla"

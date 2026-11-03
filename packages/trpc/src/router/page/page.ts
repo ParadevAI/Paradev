@@ -47,8 +47,9 @@ import {
 } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
+	assertPageEditable,
+	assertPageOwned,
 	assertPageReadable,
-	assertPageWritable,
 	loadPageShareRole,
 	pageAccess,
 	pageReadableBy,
@@ -655,12 +656,18 @@ export const pageRouter = {
 
 	get: actorProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
 		const caller = await pageCaller(ctx);
+		const reader = pageReader(caller);
 		const page = await loadPage({
 			id: input.id,
 			slug: input.slug,
 			organizationId: caller.organizationId,
-			userId: pageReader(caller),
+			userId: reader,
 		});
+		const { canEdit } = pageAccess(
+			page,
+			reader,
+			await loadPageShareRole(page, reader),
+		);
 
 		const latestVersion = await latestVersionNumber(page.id);
 		const served = servedVersion(page.sharedVersion, latestVersion);
@@ -688,6 +695,7 @@ export const pageRouter = {
 			servedVersion: served,
 			workspaceLinks,
 			watch: watchState(page, Date.now()),
+			canEdit,
 		};
 	}),
 
@@ -771,7 +779,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			const [updated] = await db
 				.update(pages)
@@ -805,7 +813,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			const [updated] = await db
 				.update(pages)
@@ -838,7 +846,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 			await db
 				.update(pages)
 				.set({ organizationRole: input.role })
@@ -861,7 +869,7 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return claimPageWatch(input);
 		}),
 	renewWatch: personProcedure
@@ -873,7 +881,7 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return renewPageWatch(input);
 		}),
 	releaseWatch: personProcedure
@@ -885,7 +893,7 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return releasePageWatch(input);
 		}),
 	reserveWatchDelivery: personProcedure
@@ -906,7 +914,7 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return reservePageWatchDelivery(input);
 		}),
 	finishWatchDelivery: personProcedure
@@ -925,7 +933,7 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return finishPageWatchDelivery(input);
 		}),
 
@@ -935,7 +943,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			await db
 				.update(pages)
@@ -954,7 +962,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			await db
 				.update(pages)
@@ -974,7 +982,7 @@ export const pageRouter = {
 		});
 
 		const userId = ctx.session.user.id;
-		const { canComment, canManage } = pageAccess(
+		const { canComment, canEdit, canManage } = pageAccess(
 			page,
 			userId,
 			await loadPageShareRole(page, userId),
@@ -982,6 +990,7 @@ export const pageRouter = {
 		return {
 			owner: await loadOwner(page.createdByUserId),
 			canComment,
+			canEdit,
 			canManage,
 		};
 	}),
@@ -992,7 +1001,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			if (input.version !== null) {
 				const [row] = await db
@@ -1045,7 +1054,7 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			assertPageOwned(page, userId);
 
 			if (input.onlyIfEmpty) {
 				const [discarded] = await db
