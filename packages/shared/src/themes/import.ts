@@ -3,6 +3,9 @@ import { builtInThemes, darkTheme, lightTheme } from "./built-in";
 import { getEditorTheme } from "./editor-theme";
 import { getDefaultTerminalColors, type Theme } from "./types";
 
+// Keep in sync with MAX_THEME_ID_LENGTH in host-service's terminal.ts.
+const MAX_THEME_ID_LENGTH = 200;
+
 const uiColorsSchema = z
 	.object({
 		background: z.string().optional(),
@@ -200,6 +203,13 @@ function parseThemeEntry(
 		return {
 			ok: false,
 			issue: `Theme ${index + 1}: Theme ID resolved to empty value`,
+		};
+	}
+
+	if (id.length > MAX_THEME_ID_LENGTH) {
+		return {
+			ok: false,
+			issue: `Theme ${index + 1}: Theme ID exceeds ${MAX_THEME_ID_LENGTH} characters`,
 		};
 	}
 

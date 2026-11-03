@@ -195,12 +195,14 @@ export function parseThemeType(
 	return value === "dark" || value === "light" ? value : undefined;
 }
 
+// Keep in sync with MAX_THEME_ID_LENGTH in shared's themes/import.ts.
 export const MAX_THEME_ID_LENGTH = 200;
 
 export function parseThemeId(
 	value: string | null | undefined,
 ): string | undefined {
-	if (!value || value.length > MAX_THEME_ID_LENGTH) return undefined;
+	if (typeof value !== "string" || !value || value.length > MAX_THEME_ID_LENGTH)
+		return undefined;
 	return value;
 }
 

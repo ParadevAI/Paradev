@@ -6,6 +6,7 @@ import type {
 	RendererContext,
 	WorkspaceStore,
 } from "@superset/panes";
+import { hostSupportsTerminalThemes } from "@superset/shared/host-version";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
@@ -37,6 +38,7 @@ import {
 	LuPower,
 } from "react-icons/lu";
 import { ThemeSwatch } from "renderer/components/ThemeSwatch";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
@@ -212,6 +214,13 @@ export function usePaneRegistry({
 		linkedStores,
 	});
 	const host = useWorkspaceHostTarget(workspaceId);
+	const remoteHostInfo = useHostServiceInfo(
+		host.status === "ready" && host.kind !== "local" ? host.url : null,
+	);
+	const supportsTerminalThemes =
+		host.status === "ready" &&
+		(host.kind === "local" ||
+			hostSupportsTerminalThemes(remoteHostInfo.data?.version));
 	const desktopUrl =
 		host.status === "ready" && host.kind === "sandbox" ? host.desktopUrl : null;
 	const collections = useCollections();
@@ -603,7 +612,7 @@ export function usePaneRegistry({
 						const currentThemeId =
 							findTerminalTheme(storedThemeId, customThemes)?.id ?? null;
 						const chooseTheme = (themeId: string | null) => {
-							if (themeId === storedThemeId) return;
+							if (currentSession && themeId === storedThemeId) return;
 							if (!currentSession || paneData.themeId !== undefined) {
 								ctx.actions.updateData({
 									...paneData,
@@ -670,6 +679,19 @@ export function usePaneRegistry({
 						}
 						return groups;
 					};
+					const terminalThemeActions: ContextMenuActionConfig<PaneViewerData>[] =
+						supportsTerminalThemes
+							? [
+									{ key: "sep-terminal-theme", type: "separator" },
+									{
+										key: "terminal-theme",
+										label: t({ message: "Theme" }),
+										icon: <LuPalette />,
+										children: themeActions,
+									},
+									{ key: "sep-terminal-defaults", type: "separator" },
+								]
+							: [];
 					const terminalActions: ContextMenuActionConfig<PaneViewerData>[] = [
 						{
 							key: "copy",
@@ -748,14 +770,7 @@ export function usePaneRegistry({
 								terminalRuntimeRegistry.scrollToBottom(terminalId, ctx.pane.id);
 							},
 						},
-						{ key: "sep-terminal-theme", type: "separator" },
-						{
-							key: "terminal-theme",
-							label: t({ message: "Theme" }),
-							icon: <LuPalette />,
-							children: themeActions,
-						},
-						{ key: "sep-terminal-defaults", type: "separator" },
+						...terminalThemeActions,
 					];
 
 					// Only present when the right-click landed on a link. "Open in"
@@ -1246,6 +1261,7 @@ export function usePaneRegistry({
 			createNewAgentSession,
 			focusAgentTerminal,
 			workspaceTrpcUtils,
+			supportsTerminalThemes,
 			t,
 			desktopUrl,
 			chatPaneIcon,

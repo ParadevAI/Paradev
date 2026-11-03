@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { type RendererContext, usePaneFocus } from "@superset/panes";
+import { hostSupportsTerminalThemes } from "@superset/shared/host-version";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
@@ -14,6 +15,8 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { useHotkey } from "renderer/hotkeys";
 import {
@@ -155,6 +158,14 @@ export function TerminalPane({
 		},
 	);
 	const pendingThemeId = paneData.themeId;
+	const host = useWorkspaceHostTarget(workspaceId);
+	const remoteHostInfo = useHostServiceInfo(
+		host.status === "ready" && host.kind !== "local" ? host.url : null,
+	);
+	const supportsTerminalThemes =
+		host.status === "ready" &&
+		(host.kind === "local" ||
+			hostSupportsTerminalThemes(remoteHostInfo.data?.version));
 	const effectiveThemeId =
 		pendingThemeId !== undefined ? pendingThemeId : (sessionThemeId ?? null);
 	const customThemes = useThemeStore((state) => state.customThemes);
@@ -205,7 +216,8 @@ export function TerminalPane({
 	const syncingThemeRef = useRef<string | null>(null);
 	const hasSession = sessionThemeId !== undefined;
 	useEffect(() => {
-		if (pendingThemeId === undefined || !hasSession) return;
+		if (pendingThemeId === undefined || !hasSession || !supportsTerminalThemes)
+			return;
 		const syncKey = `${terminalId}:${pendingThemeId}`;
 		if (syncingThemeRef.current === syncKey) return;
 		syncingThemeRef.current = syncKey;
@@ -227,11 +239,31 @@ export function TerminalPane({
 			})
 			.catch((error: unknown) => {
 				console.error("[terminal] Failed to save terminal theme", error);
+				toast.error(t({ message: "Failed to update terminal theme" }));
+				const { pane, actions } = paneRef.current;
+				const current = pane.data as TerminalPaneData;
+				if (
+					current.terminalId !== terminalId ||
+					current.themeId !== pendingThemeId
+				)
+					return;
+				actions.updateData({
+					...current,
+					themeId: undefined,
+				} as PaneViewerData);
 			})
 			.finally(() => {
 				syncingThemeRef.current = null;
 			});
-	}, [pendingThemeId, hasSession, terminalId, workspaceId, workspaceTrpcUtils]);
+	}, [
+		pendingThemeId,
+		hasSession,
+		supportsTerminalThemes,
+		terminalId,
+		workspaceId,
+		workspaceTrpcUtils,
+		t,
+	]);
 
 	// useCallback so useSyncExternalStore doesn't re-subscribe every render —
 	// otherwise every keystroke-triggered re-render unsubscribes and

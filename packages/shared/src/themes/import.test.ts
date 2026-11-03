@@ -146,4 +146,14 @@ describe("parseThemeConfigFile", () => {
 		if (result.ok) return;
 		expect(result.error).toContain("reserved");
 	});
+
+	it("rejects theme IDs that exceed the terminal limit", () => {
+		const result = parseThemeConfigFile(
+			JSON.stringify([{ id: "a".repeat(201) }]),
+		);
+
+		expect(result.ok).toBe(false);
+		if (result.ok) return;
+		expect(result.error).toBe("Theme 1: Theme ID exceeds 200 characters");
+	});
 });
