@@ -49,18 +49,23 @@ export function TitleBar() {
 
 	// The Windows/Linux window controls are painted by the window, so they take
 	// this row's colour and height only while the row is on screen.
+	const { background, foreground, sidebar, sidebarForeground } = theme.ui;
 	useEffect(() => {
-		const setOverlay = (color: string, height: number) =>
+		const setOverlay = (color: string, symbolColor: string, height: number) =>
 			electronTrpcClient.window.setTitleBarOverlay
-				.mutate({ color, symbolColor: toHex(theme.ui.foreground), height })
+				.mutate({
+					color: toHex(color),
+					symbolColor: toHex(symbolColor),
+					height,
+				})
 				.catch((error: unknown) => {
 					console.warn("[TitleBar] window controls overlay not updated", error);
 				});
-		setOverlay(toHex(theme.ui.sidebar), ROW_HEIGHT);
+		setOverlay(sidebar, sidebarForeground, ROW_HEIGHT);
 		return () => {
-			setOverlay(toHex(theme.ui.background), TITLE_BAR_OVERLAY_HEIGHT);
+			setOverlay(background, foreground, TITLE_BAR_OVERLAY_HEIGHT);
 		};
-	}, [theme]);
+	}, [background, foreground, sidebar, sidebarForeground]);
 	const slotStyle = isMac
 		? {
 				zoom: 1 / zoomFactor,

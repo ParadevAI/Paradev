@@ -15,7 +15,7 @@ const tab = (
 ): ChatTab => {
 	const route = describeChatTab(pathname);
 	if (!route) throw new Error(`not a chat path: ${pathname}`);
-	return createChatTab({ organizationId, route, pathname, href });
+	return createChatTab({ organizationId, route, href });
 };
 
 const threads = tab("org-a", "/channels/threads");
@@ -45,14 +45,25 @@ describe("chat tabs", () => {
 		expect(tab("org-b", "/channels/threads").id).toBe("org-b:threads");
 	});
 
-	test("a malformed escape in the path is not a tab", () => {
+	test("a malformed escape or an overlong id in the path is not a tab", () => {
 		expect(describeChatTab("/channels/%E0%A4%A")).toBeNull();
 		expect(describeChatTab("/devs/%")).toBeNull();
+		expect(describeChatTab(`/channels/${"c".repeat(129)}`)).toBeNull();
+		expect(describeChatTab(`/channels/${"c".repeat(128)}`)).not.toBeNull();
 	});
 
-	test("a very long href is stored as its pathname", () => {
-		const long = `/channels/c1?message=${"x".repeat(600)}`;
-		expect(tab("org-a", "/channels/c1", long).href).toBe("/channels/c1");
+	test("a very long href is stored as the tab's canonical path", () => {
+		const long = `/channels/c%201/extra?message=${"x".repeat(600)}`;
+		expect(tab("org-a", "/channels/c%201/extra", long).href).toBe(
+			"/channels/c%201",
+		);
+		expect(
+			tab(
+				"org-a",
+				"/channels/threads",
+				`/channels/threads?q=${"x".repeat(600)}`,
+			).href,
+		).toBe("/channels/threads");
 		expect(tab("org-a", "/channels/c1", "/channels/c1?thread=t1").href).toBe(
 			"/channels/c1?thread=t1",
 		);

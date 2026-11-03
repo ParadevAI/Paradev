@@ -101,8 +101,17 @@ describe("Tasks and pull requests navigation", () => {
 		const navigationSource = readComponent(
 			"../../../hooks/useDashboardNavigation/useDashboardNavigation.ts",
 		);
-		expect(navigationSource).toContain('to: "/tasks"');
-		expect(navigationSource).toContain('to: "/pull-requests"');
+		const handlerBlock = (start: string, end: string) =>
+			navigationSource.slice(
+				navigationSource.indexOf(start),
+				navigationSource.indexOf(end),
+			);
+		expect(handlerBlock("openTasks:", "isPullRequestsOpen:")).toContain(
+			'to: "/tasks"',
+		);
+		expect(handlerBlock("openPullRequests:", "isPagesOpen:")).toContain(
+			'to: "/pull-requests"',
+		);
 
 		const v2Sources = [
 			readComponent(

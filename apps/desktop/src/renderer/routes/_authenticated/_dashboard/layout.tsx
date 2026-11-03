@@ -19,6 +19,7 @@ import { DashboardSidebarPortsProvider } from "renderer/routes/_authenticated/_d
 import { PortForwardsProvider } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { WorkspaceSidebarPanel } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
+import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -82,6 +83,7 @@ function DashboardLayout() {
 		const stopAutomationFailuresSync = syncPersistedStoreAcrossWindows(
 			useAutomationFailuresStore,
 		);
+		const stopChatTabsSync = syncPersistedStoreAcrossWindows(useChatTabsStore);
 
 		return () => {
 			stopWorkspaceSidebarSync();
@@ -89,6 +91,7 @@ function DashboardLayout() {
 			stopAgentStateSync();
 			stopCloudSidebarSync();
 			stopAutomationFailuresSync();
+			stopChatTabsSync();
 		};
 	}, []);
 	// Get current workspace from route to pre-select project in new workspace modal
@@ -155,6 +158,7 @@ function DashboardLayout() {
 	useHotkey("NEW_WORKSPACE", () =>
 		openNewWorkspace(
 			currentWorkspace?.projectId ?? currentV2Workspace?.projectId ?? undefined,
+			currentV2Workspace?.hostId,
 		),
 	);
 	useHotkey(

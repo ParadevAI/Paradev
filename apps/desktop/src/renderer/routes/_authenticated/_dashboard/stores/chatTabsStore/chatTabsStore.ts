@@ -4,8 +4,10 @@ import { persist } from "zustand/middleware";
 export const CHAT_TABS_STORAGE_KEY = "chat-tabs";
 /** Opening a tab past this closes the oldest, so the strip stays bounded. */
 export const MAX_CHAT_TABS = 12;
-/** A longer href is stored as its pathname alone, so a long search string cannot grow the store. */
+/** A longer href is stored as the tab's canonical path, so a long URL cannot grow the store. */
 export const MAX_CHAT_TAB_HREF_LENGTH = 512;
+/** Channel and Dev ids are UUIDs; a longer path segment is not a tab. */
+const MAX_CHAT_TAB_ENTITY_ID_LENGTH = 128;
 
 export type ChatTabKind = "threads" | "channel" | "dev";
 
@@ -45,15 +47,19 @@ interface ChatTabsState {
 	prune: (input: PruneChatTabsInput) => void;
 }
 
+function canonicalChatTabPath(route: ChatTabRoute): string {
+	if (route.kind === "threads") return "/channels/threads";
+	const base = route.kind === "channel" ? "/channels" : "/devs";
+	return `${base}/${encodeURIComponent(route.entityId ?? "")}`;
+}
+
 export function createChatTab({
 	organizationId,
 	route,
-	pathname,
 	href,
 }: {
 	organizationId: string;
 	route: ChatTabRoute;
-	pathname: string;
 	href: string;
 }): ChatTab {
 	return {
@@ -63,7 +69,10 @@ export function createChatTab({
 				: `${organizationId}:${route.kind}:${route.entityId}`,
 		organizationId,
 		...route,
-		href: href.length > MAX_CHAT_TAB_HREF_LENGTH ? pathname : href,
+		href:
+			href.length > MAX_CHAT_TAB_HREF_LENGTH
+				? canonicalChatTabPath(route)
+				: href,
 	};
 }
 
@@ -148,9 +157,10 @@ export const useChatTabsStore = create<ChatTabsState>()(
 	),
 );
 
-function decodeSegment(segment: string): string | null {
+function decodeEntityId(segment: string): string | null {
 	try {
-		return decodeURIComponent(segment);
+		const entityId = decodeURIComponent(segment);
+		return entityId.length > MAX_CHAT_TAB_ENTITY_ID_LENGTH ? null : entityId;
 	} catch {
 		return null;
 	}
@@ -161,12 +171,12 @@ export function describeChatTab(pathname: string): ChatTabRoute | null {
 	if (pathname === "/channels/threads") return { kind: "threads" };
 	const channel = /^\/channels\/([^/]+)/.exec(pathname);
 	if (channel?.[1] && channel[1] !== "threads") {
-		const entityId = decodeSegment(channel[1]);
+		const entityId = decodeEntityId(channel[1]);
 		return entityId === null ? null : { kind: "channel", entityId };
 	}
 	const dev = /^\/devs\/([^/]+)/.exec(pathname);
 	if (dev?.[1]) {
-		const entityId = decodeSegment(dev[1]);
+		const entityId = decodeEntityId(dev[1]);
 		return entityId === null ? null : { kind: "dev", entityId };
 	}
 	return null;

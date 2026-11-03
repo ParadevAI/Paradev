@@ -31,7 +31,7 @@ export function ChatTabs() {
 	const routeTab = useMemo(() => {
 		const route = describeChatTab(pathname);
 		return route && organizationId
-			? createChatTab({ organizationId, route, pathname, href })
+			? createChatTab({ organizationId, route, href })
 			: null;
 	}, [organizationId, pathname, href]);
 
