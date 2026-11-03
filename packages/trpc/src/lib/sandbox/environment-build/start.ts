@@ -17,7 +17,7 @@ import {
 } from "../repositories";
 import { deleteSandbox } from "../vercel";
 import { buildBoxName, rebuildEnvironment } from "./environment-build";
-import { buildKind, checkoutLayoutMoves, STALE_BUILD_MS } from "./policy";
+import { checkoutLayoutMoves, STALE_BUILD_MS } from "./policy";
 
 export const BUILD_JOB_PATH = "/api/environments/build";
 
@@ -46,10 +46,8 @@ export async function organizationMayBuild(
 }
 
 /** A running build whose job died is failed here, and its box deleted. */
-export async function expireStaleBuilds(
-	environmentId: string,
-	now = Date.now(),
-): Promise<void> {
+export async function expireStaleBuilds(environmentId: string): Promise<void> {
+	const now = Date.now();
 	const expired = await db
 		.update(environmentBuilds)
 		.set({
@@ -144,7 +142,8 @@ export async function startEnvironmentBuild(args: {
 			next: repositories,
 			nextPrimaryId: primary.id,
 		});
-	const kind = moves ? "fresh" : buildKind(environment.sourceKind);
+	const kind =
+		moves || environment.sourceKind === "image" ? "fresh" : "incremental";
 
 	let build: SelectEnvironmentBuild | undefined;
 	try {

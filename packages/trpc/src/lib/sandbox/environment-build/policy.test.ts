@@ -1,36 +1,21 @@
 import { describe, expect, test } from "bun:test";
 import {
-	buildKind,
 	checkoutLayoutMoves,
 	checkoutScript,
 	dailyBuildsPaused,
-	failureTail,
 	goldensToDelete,
 	isStale,
 	removedCheckoutPaths,
 	STALE_BUILD_MS,
 } from "./policy";
 
-describe("buildKind", () => {
-	test("forks a golden, and builds from the image when there is none", () => {
-		expect(buildKind("fork")).toBe("incremental");
-		expect(buildKind("image")).toBe("fresh");
-	});
-});
-
 describe("isStale", () => {
-	const startedAt = new Date(0);
-
 	test("a running build past the limit is stale; a finished one never is", () => {
-		expect(isStale({ status: "running", startedAt }, STALE_BUILD_MS + 1)).toBe(
-			true,
-		);
-		expect(isStale({ status: "running", startedAt }, STALE_BUILD_MS)).toBe(
-			false,
-		);
-		expect(isStale({ status: "failed", startedAt }, STALE_BUILD_MS * 2)).toBe(
-			false,
-		);
+		const old = new Date(Date.now() - STALE_BUILD_MS - 1000);
+		const recent = new Date(Date.now() - 1000);
+		expect(isStale({ status: "running", startedAt: old })).toBe(true);
+		expect(isStale({ status: "running", startedAt: recent })).toBe(false);
+		expect(isStale({ status: "failed", startedAt: old })).toBe(false);
 	});
 });
 
@@ -118,15 +103,6 @@ describe("checkoutScript", () => {
 			checkouts: [{ url: "u", branch: "it's", path: "." }],
 		});
 		expect(script).toContain(`origin 'it'\\''s'`);
-	});
-});
-
-describe("failureTail", () => {
-	test("keeps the last forty lines", () => {
-		const output = Array.from({ length: 50 }, (_, i) => `line ${i}`).join("\n");
-		const tail = failureTail(`${output}\n`).split("\n");
-		expect(tail).toHaveLength(40);
-		expect(tail[0]).toBe("line 10");
 	});
 });
 

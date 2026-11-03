@@ -18,64 +18,44 @@ import {
 } from "../repositories";
 import {
 	type BuildBoxSource,
-	type BuildCommandResult,
 	createBuildBox,
 	deleteSandbox,
 	runBuildCommand,
 	snapshotBuildBox,
 } from "../vercel";
 import {
-	type BuildBudgets,
 	type BuildCheckout,
 	checkoutScript,
-	DEFAULT_BUILD_BUDGETS,
-	failureTail,
 	goldensToDelete,
-	installScript,
 	removedCheckoutPaths,
 } from "./policy";
-import { type BuildStore, buildStore } from "./store";
+import {
+	failBuild,
+	finishedBuilds,
+	loadBuild,
+	markGoldensDeleted,
+	recordBuildCommit,
+	succeedBuild,
+} from "./store";
 
 const BUILD_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const BOX_READY_MS = 45_000;
+const INSTALL_MS = 180_000;
+/** Inside the job's 300 s; the checkout and the snapshot get what is left. */
+const JOB_MS = 285_000;
+const FAILURE_TAIL_LINES = 40;
 
 export function buildBoxName(buildId: string): string {
 	return `envb-${buildId.replaceAll("-", "").slice(0, 24)}`;
 }
 
-export interface BuildInputs {
+interface BuildInputs {
 	install: ResolvedPhase | null;
 	installSource: string;
 	checkouts: BuildCheckout[];
 	removedPaths: string[];
 	networkPolicy: NetworkPolicy;
 	env: Record<string, string>;
-}
-
-export interface BuildBox {
-	create(args: {
-		name: string;
-		source: BuildBoxSource;
-		networkPolicy: NetworkPolicy;
-		organizationId: string;
-		sessionTimeoutMs: number;
-	}): Promise<void>;
-	run(args: {
-		name: string;
-		script: string;
-		env: Record<string, string>;
-		cwd?: string;
-		timeoutMs: number;
-	}): Promise<BuildCommandResult>;
-	snapshot(args: { name: string; timeoutMs: number }): Promise<void>;
-	remove(name: string): Promise<void>;
-}
-
-export interface BuildDeps {
-	store: BuildStore;
-	box: BuildBox;
-	prepare(build: SelectEnvironmentBuild): Promise<BuildInputs>;
-	budgets: BuildBudgets;
-	now(): number;
 }
 
 class BuildFailure extends Error {}
@@ -98,6 +78,10 @@ async function within<T>(
 
 function seconds(ms: number): number {
 	return Math.round(ms / 1000);
+}
+
+function failureTail(output: string): string {
+	return output.trimEnd().split("\n").slice(-FAILURE_TAIL_LINES).join("\n");
 }
 
 /** The primary repository first, each at the path a workspace has it. */
@@ -148,45 +132,30 @@ async function prepareBuild(
 	};
 }
 
-export const defaultBuildDeps: BuildDeps = {
-	store: buildStore,
-	box: {
-		create: createBuildBox,
-		run: runBuildCommand,
-		snapshot: snapshotBuildBox,
-		remove: deleteSandbox,
-	},
-	prepare: prepareBuild,
-	budgets: DEFAULT_BUILD_BUDGETS,
-	now: Date.now,
-};
-
 /**
  * Builds an environment's golden from `[install]` and makes it the one new
  * workspaces start from. A failure leaves the current golden in place.
  */
-export async function rebuildEnvironment(
-	args: { buildId: string },
-	deps: BuildDeps = defaultBuildDeps,
-): Promise<"succeeded" | "failed" | "skipped"> {
-	const loaded = await deps.store.load(args.buildId);
+export async function rebuildEnvironment(args: {
+	buildId: string;
+}): Promise<"succeeded" | "failed" | "skipped"> {
+	const loaded = await loadBuild(args.buildId);
 	if (!loaded || loaded.build.status !== "running") return "skipped";
 	const { build, environment } = loaded;
 	const name = buildBoxName(build.id);
-	const { budgets } = deps;
-	const deadline = deps.now() + budgets.jobMs;
+	const deadline = Date.now() + JOB_MS;
 	const remaining = (step: string) => {
-		const left = deadline - deps.now();
+		const left = deadline - Date.now();
 		if (left <= 0) {
 			throw new BuildFailure(
-				`The build ran out of time before ${step} (${seconds(budgets.jobMs)} seconds)`,
+				`The build ran out of time before ${step} (${seconds(JOB_MS)} seconds)`,
 			);
 		}
 		return left;
 	};
 	let boxCreated = false;
 	try {
-		const inputs = await deps.prepare(build);
+		const inputs = await prepareBuild(build);
 		if (!inputs.install) {
 			throw new BuildFailure(
 				`No [install] in .paradev/config.toml on ${inputs.installSource}`,
@@ -198,18 +167,18 @@ export async function rebuildEnvironment(
 				: { kind: "image", region: environment.region };
 		boxCreated = true;
 		await within(
-			deps.box.create({
+			createBuildBox({
 				name,
 				source,
 				networkPolicy: inputs.networkPolicy,
 				organizationId: build.organizationId,
-				sessionTimeoutMs: budgets.jobMs,
+				sessionTimeoutMs: JOB_MS,
 			}),
-			budgets.boxReadyMs,
-			`The box was not ready within ${seconds(budgets.boxReadyMs)} seconds`,
+			BOX_READY_MS,
+			`The box was not ready within ${seconds(BOX_READY_MS)} seconds`,
 		);
 
-		const checkout = await deps.box.run({
+		const checkout = await runBuildCommand({
 			name,
 			script: checkoutScript({
 				root: SANDBOX_PATHS.workspace,
@@ -226,17 +195,17 @@ export async function rebuildEnvironment(
 		}
 		const commitSha = checkout.output.trim().split("\n").at(-1) ?? "";
 		if (/^[0-9a-f]{40}$/.test(commitSha)) {
-			await deps.store.recordCommit(build.id, commitSha);
+			await recordBuildCommit(build.id, commitSha);
 		}
 
 		const primaryDir = sandboxCheckoutDir(
 			SANDBOX_PATHS.workspace,
 			inputs.checkouts[0]?.path ?? ".",
 		);
-		const installMs = Math.min(budgets.installMs, remaining("[install]"));
-		const install = await deps.box.run({
+		const installMs = Math.min(INSTALL_MS, remaining("[install]"));
+		const install = await runBuildCommand({
 			name,
-			script: installScript(inputs.install.commands),
+			script: ["set -euo pipefail", ...inputs.install.commands].join("\n"),
 			env: inputs.env,
 			cwd: inputs.install.cwd
 				? `${primaryDir}/${inputs.install.cwd}`
@@ -256,11 +225,11 @@ export async function rebuildEnvironment(
 
 		const snapshotMs = remaining("the snapshot");
 		await within(
-			deps.box.snapshot({ name, timeoutMs: snapshotMs }),
+			snapshotBuildBox({ name, timeoutMs: snapshotMs }),
 			snapshotMs,
 			"The snapshot did not finish before the build ran out of time",
 		);
-		const swapped = await deps.store.succeed({
+		const swapped = await succeedBuild({
 			build,
 			previousSourceRef: environment.sourceRef,
 			goldenRef: name,
@@ -270,10 +239,7 @@ export async function rebuildEnvironment(
 				"The environment changed during the build; its current snapshot was kept",
 			);
 		}
-		await pruneGoldens(
-			{ environmentId: build.environmentId, activeRef: name },
-			deps,
-		);
+		await pruneGoldens({ environmentId: build.environmentId, activeRef: name });
 		return "succeeded";
 	} catch (error) {
 		const expected =
@@ -282,35 +248,33 @@ export async function rebuildEnvironment(
 		if (!expected) {
 			console.error(`[environment-build] ${build.id} failed`, error);
 		}
-		await deps.store.fail(build.id, reason);
+		await failBuild(build.id, reason);
 		if (boxCreated) {
-			await deps.box
-				.remove(name)
-				.catch((cleanup: unknown) =>
-					console.error(
-						`[environment-build] could not delete build box ${name}`,
-						cleanup,
-					),
-				);
+			await deleteSandbox(name).catch((cleanup: unknown) =>
+				console.error(
+					`[environment-build] could not delete build box ${name}`,
+					cleanup,
+				),
+			);
 		}
 		return "failed";
 	}
 }
 
 /** Keeps the newest goldens; a golden that cannot be deleted now is tried again next time. */
-export async function pruneGoldens(
-	args: { environmentId: string; activeRef: string },
-	deps: Pick<BuildDeps, "store" | "box"> = defaultBuildDeps,
-): Promise<void> {
+export async function pruneGoldens(args: {
+	environmentId: string;
+	activeRef: string;
+}): Promise<void> {
 	const stale = goldensToDelete(
-		await deps.store.builds(args.environmentId),
+		await finishedBuilds(args.environmentId),
 		args.activeRef,
 	);
 	const deleted: string[] = [];
 	for (const build of stale) {
 		if (!build.goldenRef) continue;
 		try {
-			await deps.box.remove(build.goldenRef);
+			await deleteSandbox(build.goldenRef);
 			deleted.push(build.id);
 		} catch (error) {
 			console.error(
@@ -319,5 +283,5 @@ export async function pruneGoldens(
 			);
 		}
 	}
-	await deps.store.markGoldensDeleted(deleted);
+	await markGoldensDeleted(deleted);
 }

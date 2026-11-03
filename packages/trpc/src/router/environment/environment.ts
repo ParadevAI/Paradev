@@ -272,12 +272,8 @@ function buildRefusalError(error: BuildRefused) {
 }
 
 /** What a client sees of a build; a running build whose job died reads as failed. */
-function toBuildView(
-	build: SelectEnvironmentBuild,
-	activeSourceRef: string,
-	now = Date.now(),
-) {
-	const stale = isStale(build, now);
+function toBuildView(build: SelectEnvironmentBuild, activeSourceRef: string) {
+	const stale = isStale(build);
 	return {
 		id: build.id,
 		status: stale ? ("failed" as const) : build.status,

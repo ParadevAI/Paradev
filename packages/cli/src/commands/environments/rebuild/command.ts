@@ -1,6 +1,9 @@
 import { boolean, CLIError, positional } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
-import { resolveEnvironment, waitForBuild } from "../../../lib/environments";
+import { resolveEnvironment } from "../../../lib/environments";
+
+const POLL_MS = 5_000;
+const WAIT_MS = 10 * 60_000;
 
 export default command({
 	sandbox: false,
@@ -29,16 +32,19 @@ export default command({
 				message: `Build ${build.id} started. Follow it with: superset environments builds ${id}`,
 			};
 		}
-		const finished = await waitForBuild({
-			buildId: build.id,
-			fetchBuilds: async () =>
-				(
-					await ctx.api.environment.builds.query({
-						environmentId: id,
-						limit: 5,
-					})
-				).builds,
-		});
+		const deadline = Date.now() + WAIT_MS;
+		let finished: typeof build | undefined;
+		while (!finished && Date.now() < deadline) {
+			await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+			const { builds } = await ctx.api.environment.builds.query({
+				environmentId: id,
+				limit: 5,
+			});
+			finished = builds.find(
+				(candidate) =>
+					candidate.id === build.id && candidate.status !== "running",
+			);
+		}
 		if (!finished) {
 			throw new CLIError(
 				`Build ${build.id} is still running`,

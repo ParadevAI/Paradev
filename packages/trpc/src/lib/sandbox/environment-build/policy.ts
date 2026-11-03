@@ -1,35 +1,13 @@
-import type {
-	EnvironmentBuildKind,
-	EnvironmentBuildStatus,
-} from "@superset/db/schema";
+import type { EnvironmentBuildStatus } from "@superset/db/schema";
 import {
 	SANDBOX_ROOT_CHECKOUT,
 	sandboxCheckoutDir,
 	sandboxRepositoryPath,
 } from "@superset/shared/sandbox-contract";
 
-export const KEPT_GOLDENS = 5;
+const KEPT_GOLDENS = 5;
 export const STALE_BUILD_MS = 10 * 60 * 1000;
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
-const FAILURE_TAIL_LINES = 40;
-
-/** The job may run 300 s; checkout and snapshot get what is left before `jobMs`. */
-export interface BuildBudgets {
-	boxReadyMs: number;
-	installMs: number;
-	jobMs: number;
-}
-
-export const DEFAULT_BUILD_BUDGETS: BuildBudgets = {
-	boxReadyMs: 45_000,
-	installMs: 180_000,
-	jobMs: 285_000,
-};
-
-/** An environment without a golden can only be built from the image. */
-export function buildKind(sourceKind: "image" | "fork"): EnvironmentBuildKind {
-	return sourceKind === "image" ? "fresh" : "incremental";
-}
 
 type CheckoutRepository = { id: string; owner: string; name: string };
 
@@ -67,31 +45,33 @@ export function removedCheckoutPaths(args: {
 }
 
 /** A running build whose job died never finishes on its own. */
-export function isStale(
-	build: { status: EnvironmentBuildStatus; startedAt: Date },
-	now: number,
-): boolean {
+export function isStale(build: {
+	status: EnvironmentBuildStatus;
+	startedAt: Date;
+}): boolean {
 	return (
 		build.status === "running" &&
-		now - build.startedAt.getTime() > STALE_BUILD_MS
+		Date.now() - build.startedAt.getTime() > STALE_BUILD_MS
 	);
 }
 
-/** Kept goldens past the newest `keep`, never the active one. Builds newest first. */
+/** Kept goldens past the newest five, never the active one. Builds newest first. */
 export function goldensToDelete<
 	T extends {
 		status: EnvironmentBuildStatus;
 		goldenRef: string | null;
 		goldenDeletedAt: Date | null;
 	},
->(builds: readonly T[], activeRef: string, keep = KEPT_GOLDENS): T[] {
+>(builds: readonly T[], activeRef: string): T[] {
 	const kept = builds.filter(
 		(build) =>
 			build.status === "succeeded" &&
 			build.goldenRef !== null &&
 			build.goldenDeletedAt === null,
 	);
-	return kept.slice(keep).filter((build) => build.goldenRef !== activeRef);
+	return kept
+		.slice(KEPT_GOLDENS)
+		.filter((build) => build.goldenRef !== activeRef);
 }
 
 /** Finished builds, newest first. */
@@ -154,12 +134,4 @@ export function checkoutScript(args: {
 		);
 	}
 	return lines.join("\n");
-}
-
-export function installScript(commands: readonly string[]): string {
-	return ["set -euo pipefail", ...commands].join("\n");
-}
-
-export function failureTail(output: string): string {
-	return output.trimEnd().split("\n").slice(-FAILURE_TAIL_LINES).join("\n");
 }
