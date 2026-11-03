@@ -21,6 +21,12 @@ export const terminalSessions = sqliteTable(
 			{ onDelete: "set null" },
 		),
 		status: text().notNull().default("active"),
+		agentLifecycleOwner: text("agent_lifecycle_owner")
+			.$type<"paradev" | "external">()
+			.notNull()
+			.default("paradev"),
+		externalEndedAt: integer("external_ended_at"),
+		externalAgentConfigId: text("external_agent_config_id"),
 		/**
 		 * The name the user gave this session, or null for "no name" — which
 		 * is also what an empty or whitespace-only rename stores. Titles the
