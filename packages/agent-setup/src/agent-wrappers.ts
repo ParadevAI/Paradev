@@ -17,6 +17,7 @@ export {
 } from "./agent-wrappers-amp";
 export {
 	buildCodexWrapperExecLine,
+	buildOpenCodeWrapperExecLine,
 	CLAUDE_ARTIFACT_GUARD_EVENT,
 	CLAUDE_ARTIFACT_GUARD_MATCHER,
 	cleanupGlobalOpenCodePlugin,
@@ -31,9 +32,14 @@ export {
 	getClaudeManagedHookCommand,
 	getCodexGlobalHooksJsonContent,
 	getCodexGlobalHooksJsonPath,
+	getOpenCodeCliJsonContent,
+	getOpenCodeCliJsonPath,
+	getOpenCodeCliPluginContent,
 	getOpenCodeGlobalPluginPath,
 	getOpenCodePluginContent,
 	getOpenCodePluginPath,
+	OPENCODE_CLI_PLUGIN_FILE,
+	OPENCODE_CLI_PLUGIN_MARKER,
 	OPENCODE_PLUGIN_FILE,
 	OPENCODE_PLUGIN_MARKER,
 	removeClaudeManagedHooks,
