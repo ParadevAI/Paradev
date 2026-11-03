@@ -2,7 +2,7 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-Reference: This plan follows `AGENTS.md` (root), `packages/trpc/AGENTS.md`, `packages/trpc/src/lib/sandbox/AGENTS.md`, `apps/desktop/AGENTS.md`, `.agents/skills/trpc-compat/SKILL.md`, `.agents/skills/db-migrations/SKILL.md` and the ExecPlan template. The agreed product behaviour is in `plans/20261003-superset-config-v2-format.md` (the `[install]` and "Rebuild" sections); this plan repeats what it needs from it. Linear: SUPER-3017. UI mockup: `design/environment-builds/index.html`, published at https://app.superset.sh/page/environment-builds-super-3017-mockup-w2u7xq.
+Reference: This plan follows `AGENTS.md` (root), `packages/trpc/AGENTS.md`, `packages/trpc/src/lib/sandbox/AGENTS.md`, `apps/desktop/AGENTS.md`, `.agents/skills/trpc-compat/SKILL.md`, `.agents/skills/db-migrations/SKILL.md` and the ExecPlan template. The agreed product behaviour is in `plans/20261003-superset-config-v2-format.md` (the `[install]` and "Rebuild" sections); this plan repeats what it needs from it. Linear: SUPER-3017. UI mockup: https://app.superset.sh/page/environment-builds-super-3017-mockup-w2u7xq; the UI as built: https://app.superset.sh/page/environment-builds-the-ui-as-built-super-3017-db0dqq.
 
 
 ## Purpose / Big Picture
@@ -211,7 +211,7 @@ A redelivered job finds its build finished and returns. A function killed mid-bu
 
 ## Artifacts and Notes
 
-The mockup source is `design/environment-builds/index.html`; open it with `?state=running|paused|noinstall|image|menu`.
+The mockup is the published page linked at the top (`?state=running|paused|noinstall|image|menu`).
 
 
 ## Interfaces and Dependencies
