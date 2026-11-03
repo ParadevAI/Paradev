@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
 import { useMemo } from "react";
 import type {
@@ -28,7 +27,6 @@ export function PendingCloudChatPane({
 			draftKey={`chat-v3-draft:${data.draftId}`}
 			isActive={ctx.isActive}
 			launched={launched}
-			notice={<Trans>Starting the agent…</Trans>}
 			onQueue={(content) => {
 				const current = ctx.store
 					.getState()

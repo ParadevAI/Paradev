@@ -646,7 +646,7 @@ export function SessionView({
 	const booting = sessionState?.status === "starting";
 	const heldNoticeShown = useShowAfter(
 		held !== undefined,
-		heldLaunched ? 0 : HELD_NOTICE_DELAY_MS,
+		HELD_NOTICE_DELAY_MS,
 	);
 	const openModelPicker = useCallback(
 		() => composerRef.current?.openModelPicker(),
@@ -767,9 +767,8 @@ export function SessionView({
 					/>
 				)}
 				{held
-					? heldNoticeShown && (
-							<ConnectionNotice>{held.notice}</ConnectionNotice>
-						)
+					? heldNoticeShown &&
+						held.notice && <ConnectionNotice>{held.notice}</ConnectionNotice>
 					: booting && (
 							<ConnectionNotice>
 								<Trans>Starting the agent…</Trans>

@@ -32,7 +32,7 @@ export function DraftChat({
 	getOpenFilePaths?: () => ReadonlySet<string>;
 	isActive: boolean;
 	launched?: UserContent[];
-	notice: ReactNode;
+	notice?: ReactNode;
 	onOpenHistory?: () => void;
 	onQueue: (content: UserContent[]) => void;
 	queued: UserContent[][];
@@ -58,7 +58,7 @@ export function DraftChat({
 			) : (
 				<div className="min-h-0 flex-1" />
 			)}
-			<ConnectionNotice>{notice}</ConnectionNotice>
+			{notice && <ConnectionNotice>{notice}</ConnectionNotice>}
 			<WorkDrawer
 				onExit={(exit) => composerRef.current?.returnFocus(exit === "history")}
 				paneRef={paneRef}

@@ -18258,9 +18258,6 @@ msgstr "Đang khởi động tác nhân trong {what}"
 msgid "Starting cloud workspace"
 msgstr "Đang khởi động workspace trên cloud"
 
-msgid "Starting cloud workspace…"
-msgstr "Đang khởi động workspace trên cloud…"
-
 msgid "Starting the agent…"
 msgstr "Đang khởi động tác nhân…"
 

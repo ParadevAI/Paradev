@@ -18258,9 +18258,6 @@ msgstr "Spouští se agent v {what}"
 msgid "Starting cloud workspace"
 msgstr "Spouštím cloudový pracovní prostor"
 
-msgid "Starting cloud workspace…"
-msgstr "Spouštím cloudový pracovní prostor…"
-
 msgid "Starting the agent…"
 msgstr "Spouštění agenta…"
 

@@ -18258,9 +18258,6 @@ msgstr "正在 {what} 中啟動代理程式"
 msgid "Starting cloud workspace"
 msgstr "正在啟動雲端工作區"
 
-msgid "Starting cloud workspace…"
-msgstr "正在啟動雲端工作區…"
-
 msgid "Starting the agent…"
 msgstr "正在啟動代理…"
 

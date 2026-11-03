@@ -745,7 +745,7 @@ export function AcpChatPane({
 			);
 		}
 		return draft(
-			agentSessionId && !launchPrompt ? (
+			launchPrompt ? null : agentSessionId ? (
 				<Trans>Attaching to the running session…</Trans>
 			) : (
 				<Trans>Starting the agent…</Trans>
@@ -762,9 +762,7 @@ export function AcpChatPane({
 			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
-							notice: launched ? (
-								<Trans>Starting the agent…</Trans>
-							) : (
+							notice: launched ? null : (
 								<Trans>Resuming the conversation…</Trans>
 							),
 							queued: pendingPrompts,

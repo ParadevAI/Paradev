@@ -18258,9 +18258,6 @@ msgstr "Agent wird in {what} gestartet"
 msgid "Starting cloud workspace"
 msgstr "Cloud-Arbeitsbereich wird gestartet"
 
-msgid "Starting cloud workspace…"
-msgstr "Cloud-Arbeitsbereich wird gestartet…"
-
 msgid "Starting the agent…"
 msgstr "Agent wird gestartet…"
 
