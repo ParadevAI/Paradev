@@ -12563,9 +12563,6 @@ msgstr "Нет активных служб"
 msgid "No active terminal sessions"
 msgstr "Нет активных сессий терминала"
 
-msgid "No active workspaces"
-msgstr "Нет активных рабочих областей"
-
 msgid "No agent"
 msgstr "Без агента"
 
@@ -14911,9 +14908,6 @@ msgstr "Выберите тему или следуйте оформлению �
 msgid "Pick a workspace"
 msgstr "Выберите рабочую область"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Выберите рабочую область, где агент ждёт вашего ввода, завершил работу с момента вашего последнего просмотра или всё ещё выполняется"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Выберите иконку и цвет или загрузите своё изображение. По умолчанию используется аватар связанного владельца на GitHub."
 
@@ -15896,6 +15890,9 @@ msgstr "Перебазировать и объединить"
 
 msgid "Recall what was said in meetings"
 msgstr "Вспомнить, что говорили на встречах"
+
+msgid "Recent"
+msgstr "Недавние"
 
 msgid "Recent Activity"
 msgstr "Недавняя активность"
@@ -17126,6 +17123,9 @@ msgstr "Выполняется при создании рабочего прос
 
 msgid "Runs when a workspace is deleted."
 msgstr "Выполняется при удалении рабочего пространства."
+
+msgid "Same as Switch Workspace"
+msgstr "То же, что «Сменить рабочую область»"
 
 msgid "Same session"
 msgstr "Та же сессия"
@@ -19343,6 +19343,9 @@ msgstr "Перейти в рабочую область 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Перейти в рабочую область 9"
+
+msgid "Switch to…"
+msgstr "Перейти к…"
 
 msgid "Switch Workspace"
 msgstr "Сменить рабочую область"

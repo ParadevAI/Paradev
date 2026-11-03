@@ -11,6 +11,11 @@ const ALL_TOKENS = 40;
 
 type Searchable = Pick<Command, "title" | "keywords">;
 
+export interface SearchableText {
+	title: string;
+	keywords?: string[];
+}
+
 function normalize(text: string): string {
 	return text.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -28,11 +33,11 @@ function hasWordPrefix(wordList: string[], prefix: string): boolean {
  * tokens at word starts), never character subsequences: "po" must not hit
  * "Toggle theme" via "ap-p-earance col-o-r". Ties keep provider order.
  */
-export function scoreCommand(command: Searchable, rawQuery: string): number {
+export function scoreText(entry: SearchableText, rawQuery: string): number {
 	const query = normalize(rawQuery);
 	if (!query) return 1;
 
-	const title = normalize(i18n._(command.title));
+	const title = normalize(entry.title);
 	if (title === query) return TITLE_EXACT;
 	if (title.startsWith(query)) return TITLE_PREFIX;
 
@@ -49,7 +54,7 @@ export function scoreCommand(command: Searchable, rawQuery: string): number {
 
 	if (title.includes(query)) return TITLE_SUBSTRING;
 
-	const keywords = (command.keywords ?? []).map(normalize);
+	const keywords = (entry.keywords ?? []).map(normalize);
 	if (
 		keywords.some(
 			(keyword) =>
@@ -68,6 +73,13 @@ export function scoreCommand(command: Searchable, rawQuery: string): number {
 	}
 
 	return 0;
+}
+
+export function scoreCommand(command: Searchable, rawQuery: string): number {
+	return scoreText(
+		{ title: i18n._(command.title), keywords: command.keywords },
+		rawQuery,
+	);
 }
 
 interface Scored<T> {

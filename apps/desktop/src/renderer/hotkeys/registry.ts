@@ -238,8 +238,7 @@ export const HOTKEYS_REGISTRY = {
 		}),
 		category: "Workspace",
 		description: msg({
-			message:
-				"Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running",
+			message: "Same as Switch Workspace",
 		}),
 	},
 	CLOSE_WORKSPACE: {

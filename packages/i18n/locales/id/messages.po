@@ -12563,9 +12563,6 @@ msgstr "Tidak ada layanan aktif"
 msgid "No active terminal sessions"
 msgstr "Tidak ada sesi terminal aktif"
 
-msgid "No active workspaces"
-msgstr "Tidak ada workspace aktif"
-
 msgid "No agent"
 msgstr "Tanpa agen"
 
@@ -14911,9 +14908,6 @@ msgstr "Pilih tema atau ikuti tampilan sistem Anda. Jelajahi <0>marketplace<1/><
 msgid "Pick a workspace"
 msgstr "Pilih workspace"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Pilih workspace yang agennya menunggu input Anda, sudah selesai sejak terakhir Anda melihatnya, atau masih berjalan"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pilih ikon dan warna, atau unggah gambar kustom. Bawaannya memakai avatar pemilik GitHub yang ditautkan."
 
@@ -15896,6 +15890,9 @@ msgstr "Rebase dan merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Ingat kembali apa yang dibahas dalam rapat"
+
+msgid "Recent"
+msgstr "Terbaru"
 
 msgid "Recent Activity"
 msgstr "Aktivitas Terbaru"
@@ -17126,6 +17123,9 @@ msgstr "Dijalankan saat ruang kerja baru dibuat."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Dijalankan saat ruang kerja dihapus."
+
+msgid "Same as Switch Workspace"
+msgstr "Sama seperti “Ganti workspace”"
 
 msgid "Same session"
 msgstr "Sesi yang sama"
@@ -19343,6 +19343,9 @@ msgstr "Beralih ke Workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Beralih ke Workspace 9"
+
+msgid "Switch to…"
+msgstr "Beralih ke…"
 
 msgid "Switch Workspace"
 msgstr "Ganti workspace"

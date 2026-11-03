@@ -12563,9 +12563,6 @@ msgstr "Không có dịch vụ nào đang chạy"
 msgid "No active terminal sessions"
 msgstr "Không có phiên terminal nào đang chạy"
 
-msgid "No active workspaces"
-msgstr "Không có workspace đang hoạt động"
-
 msgid "No agent"
 msgstr "Không có agent"
 
@@ -14911,9 +14908,6 @@ msgstr "Chọn một theme hoặc theo giao diện hệ thống. Xem <0>marketpl
 msgid "Pick a workspace"
 msgstr "Chọn một workspace"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Chọn workspace có agent đang chờ bạn nhập, đã hoàn tất kể từ lần cuối bạn xem, hoặc vẫn đang chạy"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Chọn biểu tượng và màu, hoặc tải ảnh riêng lên. Mặc định dùng ảnh đại diện của chủ sở hữu GitHub đã liên kết."
 
@@ -15896,6 +15890,9 @@ msgstr "Rebase và merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Xem lại những gì đã nói trong cuộc họp"
+
+msgid "Recent"
+msgstr "Gần đây"
 
 msgid "Recent Activity"
 msgstr "Hoạt động gần đây"
@@ -17126,6 +17123,9 @@ msgstr "Chạy khi tạo không gian làm việc mới."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Chạy khi xóa không gian làm việc."
+
+msgid "Same as Switch Workspace"
+msgstr "Giống “Chuyển workspace”"
 
 msgid "Same session"
 msgstr "Cùng phiên"
@@ -19343,6 +19343,9 @@ msgstr "Chuyển tới workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Chuyển tới workspace 9"
+
+msgid "Switch to…"
+msgstr "Chuyển đến…"
 
 msgid "Switch Workspace"
 msgstr "Chuyển workspace"

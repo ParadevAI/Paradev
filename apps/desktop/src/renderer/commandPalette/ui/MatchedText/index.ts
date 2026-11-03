@@ -1,0 +1,1 @@
+export { MatchedText } from "./MatchedText";

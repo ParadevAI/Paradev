@@ -12563,9 +12563,6 @@ msgstr "No active services"
 msgid "No active terminal sessions"
 msgstr "No active terminal sessions"
 
-msgid "No active workspaces"
-msgstr "No active workspaces"
-
 msgid "No agent"
 msgstr "No agent"
 
@@ -14911,9 +14908,6 @@ msgstr "Pick a theme or follow your system appearance. Browse the <0>marketplace
 msgid "Pick a workspace"
 msgstr "Pick a workspace"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 
@@ -15896,6 +15890,9 @@ msgstr "Rebase and merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Recall what was said in meetings"
+
+msgid "Recent"
+msgstr "Recent"
 
 msgid "Recent Activity"
 msgstr "Recent Activity"
@@ -17126,6 +17123,9 @@ msgstr "Runs when a new workspace is created."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Runs when a workspace is deleted."
+
+msgid "Same as Switch Workspace"
+msgstr "Same as Switch Workspace"
 
 msgid "Same session"
 msgstr "Same session"
@@ -19343,6 +19343,9 @@ msgstr "Switch to Workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Switch to Workspace 9"
+
+msgid "Switch to…"
+msgstr "Switch to…"
 
 msgid "Switch Workspace"
 msgstr "Switch Workspace"

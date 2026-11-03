@@ -1,8 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { BookOpenIcon, HistoryIcon, SettingsIcon } from "lucide-react";
-import { LuLayers } from "react-icons/lu";
-import { useFrameStackStore } from "../../core/frames";
+import { BookOpenIcon, HistoryIcon, Layers, SettingsIcon } from "lucide-react";
+import { type SwitcherOpenedVia, useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { RecentlyViewedFrame } from "../../ui/RecentlyViewed/RecentlyViewedFrame";
 import { WorkspaceListFrame } from "../../ui/WorkspaceList";
@@ -14,17 +13,22 @@ const workspacesCommand: Command = {
 		message: "Workspaces",
 	}),
 	section: "navigation",
-	icon: LuLayers,
+	icon: Layers,
 	keywords: ["workspace", "project", "repo", "repository", "switch"],
 	renderFrame: () => <WorkspaceListFrame />,
 };
 
-/** Opens the command palette on its workspace list. */
-export function openWorkspaceList(): void {
-	const { setOpen, reset, pushFrame } = useFrameStackStore.getState();
-	reset();
-	setOpen(true);
-	pushFrame(workspacesCommand);
+/**
+ * Opens the workspace switcher. With the modifier still held, the switcher
+ * steps on each further press and switches when the modifier is released.
+ */
+export function openWorkspaceList(
+	options: { via?: SwitcherOpenedVia; holdsModifier?: boolean } = {},
+): void {
+	useFrameStackStore.getState().openSwitcher({
+		via: options.via ?? "command",
+		holdsModifier: options.holdsModifier ?? false,
+	});
 }
 
 export const navigationProvider: CommandProvider = {

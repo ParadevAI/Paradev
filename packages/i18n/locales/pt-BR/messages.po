@@ -12563,9 +12563,6 @@ msgstr "Nenhum serviço ativo"
 msgid "No active terminal sessions"
 msgstr "Nenhuma sessão de terminal ativa"
 
-msgid "No active workspaces"
-msgstr "Nenhuma área de trabalho ativa"
-
 msgid "No agent"
 msgstr "Nenhum agente"
 
@@ -14911,9 +14908,6 @@ msgstr "Escolha um tema ou siga a aparência do sistema. Veja o <0>marketplace<1
 msgid "Pick a workspace"
 msgstr "Escolha uma área de trabalho"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Escolha uma área de trabalho cujo agente está esperando sua resposta, terminou desde a última vez que você olhou ou ainda está em execução"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Escolha um ícone e uma cor, ou envie uma imagem. Por padrão, usa o avatar do dono do repositório no GitHub."
 
@@ -15896,6 +15890,9 @@ msgstr "Rebase e merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Relembrar o que foi dito nas reuniões"
+
+msgid "Recent"
+msgstr "Recentes"
 
 msgid "Recent Activity"
 msgstr "Atividade recente"
@@ -17126,6 +17123,9 @@ msgstr "Executado quando um espaço de trabalho é criado."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Executado quando um espaço de trabalho é excluído."
+
+msgid "Same as Switch Workspace"
+msgstr "Igual a “Trocar de área de trabalho”"
 
 msgid "Same session"
 msgstr "Mesma sessão"
@@ -19343,6 +19343,9 @@ msgstr "Ir para a área de trabalho 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Ir para a área de trabalho 9"
+
+msgid "Switch to…"
+msgstr "Alternar para…"
 
 msgid "Switch Workspace"
 msgstr "Trocar de área de trabalho"

@@ -12563,9 +12563,6 @@ msgstr "Brak aktywnych usług"
 msgid "No active terminal sessions"
 msgstr "Brak aktywnych sesji terminala"
 
-msgid "No active workspaces"
-msgstr "Brak aktywnych obszarów roboczych"
-
 msgid "No agent"
 msgstr "Brak agenta"
 
@@ -14911,9 +14908,6 @@ msgstr "Wybierz motyw lub podążaj za wyglądem systemu. Przejrzyj <0>marketpla
 msgid "Pick a workspace"
 msgstr "Wybierz obszar roboczy"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Wybierz obszar roboczy, którego agent czeka na Twoje dane, skończył pracę od Twojej ostatniej wizyty lub nadal działa"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Wybierz ikonę i kolor albo prześlij własny obraz. Domyślnie używany jest awatar powiązanego właściciela repozytorium GitHub."
 
@@ -15896,6 +15890,9 @@ msgstr "Rebase i scal"
 
 msgid "Recall what was said in meetings"
 msgstr "Przypomnij sobie, co padło na spotkaniach"
+
+msgid "Recent"
+msgstr "Ostatnie"
 
 msgid "Recent Activity"
 msgstr "Ostatnia aktywność"
@@ -17126,6 +17123,9 @@ msgstr "Uruchamia się przy tworzeniu obszaru roboczego."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Uruchamia się przy usuwaniu obszaru roboczego."
+
+msgid "Same as Switch Workspace"
+msgstr "To samo co „Przełącz obszar roboczy”"
 
 msgid "Same session"
 msgstr "Ta sama sesja"
@@ -19343,6 +19343,9 @@ msgstr "Przełącz na obszar roboczy 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Przełącz na obszar roboczy 9"
+
+msgid "Switch to…"
+msgstr "Przełącz na…"
 
 msgid "Switch Workspace"
 msgstr "Przełącz obszar roboczy"
