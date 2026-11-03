@@ -132,11 +132,11 @@ export function AgentEnvEditor({
 	useEffect(() => {
 		const state = saves.current;
 		if (state.inFlight || state.queued) return;
-		if (hasUnsavedEdits(rowsRef.current)) return;
+		if (hasUnsavedEdits(rows)) return;
 		if (areEnvMapsEqual(env, state.lastSent)) return;
 		state.lastSent = env;
 		setRows(toRows(env));
-	}, [env]);
+	}, [env, rows]);
 
 	const send = (submitted: readonly EnvRow[]) => {
 		const state = saves.current;
