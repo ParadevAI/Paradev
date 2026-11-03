@@ -25,6 +25,7 @@ import type {
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
+import { resolveChatAgentIds } from "./resolveChatAgentIds";
 import { useWorkspaceTransactionsStore } from "./workspaceTransactions";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
@@ -69,6 +70,7 @@ interface CreateOutcome {
 				sessionId: string;
 				label: string;
 				chatSessionId?: string;
+				chatAgentId?: string;
 		  }
 		| { ok: false; error: string }
 	>;
@@ -399,7 +401,12 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			);
 
 			const completed = createPromise
-				.then<SubmitOutcome>((result) => {
+				.then<SubmitOutcome>(async (result) => {
+					const agents = await resolveChatAgentIds(
+						getHostServiceClientByUrl(hostUrl),
+						result.workspace.id,
+						result.agents,
+					);
 					writeWorkspacePaneLayout(
 						collections,
 						{
@@ -407,7 +414,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 							projectId: result.workspace.projectId,
 						},
 						result.terminals,
-						result.agents,
+						agents,
 					);
 					if (result.workspace.id !== workspaceId) {
 						deleteWorkspaceLocalState(workspaceId);

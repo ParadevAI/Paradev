@@ -1,4 +1,4 @@
-import { acpStartModes } from "@superset/chat/core";
+import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
 import { attachedFilesBlock } from "@superset/chat-runtime";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
@@ -165,6 +165,8 @@ export type AgentRunResult = {
 	sessionId: string;
 	label: string;
 	chatSessionId?: string;
+	/** The chat pane's agent id, set when the launch opened a chat session. */
+	chatAgentId?: string;
 };
 
 /**
@@ -749,11 +751,13 @@ function launchChatAgent(
 	if (!chat?.live.supports(target.harness)) return null;
 
 	const created = createChatSession(chat, target, input, cwd);
+	const chatAgentId = presetForAcpHarness(target.harness);
 	return {
 		kind: "terminal",
 		sessionId: created.terminalId,
 		label: created.label,
 		chatSessionId: created.sessionId,
+		...(chatAgentId ? { chatAgentId } : {}),
 	};
 }
 
