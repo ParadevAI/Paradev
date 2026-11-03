@@ -9,8 +9,8 @@ import {
 } from "@superset/ui/context-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import {
+	capsuleTabClassName,
 	HEADER_TAB_CLOSE_CLASS,
-	headerTabClassName,
 } from "@superset/ui/lib/header-controls";
 import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
@@ -133,7 +133,7 @@ export function TabItem<TData>({
 					ref={setRef}
 					className={cn(
 						isCards
-							? cn(headerTabClassName(isActive), "group relative w-full")
+							? cn(capsuleTabClassName(isActive), "group relative")
 							: cn(
 									"group relative flex h-full w-full items-center rounded-t-md transition-colors",
 									isActive
@@ -172,8 +172,8 @@ export function TabItem<TData>({
 									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
 									<div
 										className={cn(
-											"flex h-full min-w-0 flex-1 items-center gap-1.5 pr-1 text-left text-xs transition-colors",
-											isCards ? "pl-2.5" : "pl-3",
+											"flex h-full min-w-0 flex-1 items-center pr-1 pl-3 text-left transition-colors",
+											isCards ? "gap-2" : "gap-1.5 text-xs",
 										)}
 										onAuxClick={(event) => {
 											if (event.button === 1) {
@@ -196,7 +196,7 @@ export function TabItem<TData>({
 							<div
 								className={cn(
 									"relative flex h-full shrink-0 items-center justify-center",
-									isCards ? "mr-1 w-4" : "w-7",
+									isCards ? "mr-2 w-4" : "w-7",
 								)}
 							>
 								{accessory && (
@@ -209,7 +209,7 @@ export function TabItem<TData>({
 										aria-label={t({ message: "Close tab" })}
 										className={cn(
 											HEADER_TAB_CLOSE_CLASS,
-											"pointer-events-none cursor-pointer opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+											"pointer-events-none cursor-pointer rounded-full opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
 										)}
 										onClick={(event) => {
 											event.stopPropagation();

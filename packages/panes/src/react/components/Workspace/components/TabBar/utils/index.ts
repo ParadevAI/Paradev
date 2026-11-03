@@ -3,4 +3,5 @@ export {
 	scrollLeftToRevealTab,
 	TAB_BAR_FADE_WIDTH,
 	TAB_WIDTH,
+	type TabSpan,
 } from "./utils";

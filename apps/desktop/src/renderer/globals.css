@@ -76,6 +76,10 @@
 	/* Sidebar row fills: low-opacity foreground washes so they track any theme */
 	--fill-hover: color-mix(in oklab, var(--foreground) 7%, transparent);
 	--fill-selected: color-mix(in oklab, var(--foreground) 10%, transparent);
+	--tab-capsule: color-mix(in oklab, var(--foreground) 7%, transparent);
+	--tab-hover: color-mix(in oklab, var(--foreground) 5%, transparent);
+	--tab-selected: color-mix(in oklab, var(--foreground) 15%, var(--sidebar));
+	--tab-selected-shadow: inset 0 0 0 0.8px rgb(255 255 255 / 0.1);
 }
 
 /* Light theme fallback values - applied before hydration if user has light theme saved */
@@ -125,6 +129,10 @@
 	--highlight-foreground: oklch(0.985 0 0);
 	--fill-hover: color-mix(in oklab, var(--foreground) 4%, transparent);
 	--fill-selected: color-mix(in oklab, var(--foreground) 6%, transparent);
+	--tab-selected: var(--card);
+	--tab-selected-shadow:
+		0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent),
+		0 1.5px 3.5px rgb(0 0 0 / 0.1);
 }
 
 @theme inline {
