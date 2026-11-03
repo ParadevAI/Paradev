@@ -8,7 +8,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Settings } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -19,6 +24,7 @@ import {
 } from "renderer/assets/app-icons/preset-icons";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 import { useBuiltinPresets } from "renderer/hooks/useBuiltinPresets";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import type { HotkeyId } from "renderer/hotkeys";
@@ -78,6 +84,7 @@ export function V2PresetsBar({
 	onToggleShowPresetsBar,
 }: V2PresetsBarProps) {
 	const navigate = useNavigate();
+	const isParadevShell = useParadevShell();
 	const isDark = useIsDarkTheme();
 	const collections = useCollections();
 	const { activeHostUrl } = useLocalHostService();
@@ -230,20 +237,34 @@ export function V2PresetsBar({
 
 	return (
 		<div
-			className="flex h-10 min-w-0 shrink-0 items-center gap-1.5 overflow-x-auto overflow-y-hidden bg-background px-2"
+			className={cn(
+				"flex min-w-0 shrink-0 overflow-x-auto overflow-y-hidden",
+				isParadevShell
+					? "h-[34px] items-end gap-0.5 px-1.5"
+					: "h-10 items-center gap-1.5 bg-background px-2",
+			)}
 			style={{ scrollbarWidth: "none" }}
 		>
 			<DropdownMenu>
 				<Tooltip delayDuration={1000} disableHoverableContent>
 					<TooltipTrigger asChild>
 						<DropdownMenuTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
-							>
-								<Settings className="size-3.5" />
-							</Button>
+							{isParadevShell ? (
+								<button type="button" className={HEADER_ICON_BUTTON_CLASS}>
+									<Settings
+										className="size-4"
+										strokeWidth={HEADER_ICON_STROKE_WIDTH}
+									/>
+								</button>
+							) : (
+								<Button
+									variant="ghost"
+									size="icon"
+									className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+								>
+									<Settings className="size-3.5" />
+								</Button>
+							)}
 						</DropdownMenuTrigger>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">

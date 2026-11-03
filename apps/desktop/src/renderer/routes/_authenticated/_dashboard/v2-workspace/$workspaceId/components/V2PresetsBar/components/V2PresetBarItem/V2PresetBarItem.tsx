@@ -11,10 +11,12 @@ import {
 import { useEffect, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { HiMiniCommandLine } from "react-icons/hi2";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import type { HotkeyId } from "renderer/hotkeys";
 import { HotkeyTooltip } from "renderer/hotkeys";
 import { resolveV2PresetIcon } from "renderer/lib/preset-icon";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { PRESET_ITEM_CLASS, PRESET_ITEM_SHELL_CLASS } from "../../constants";
 
 const V2_PRESET_BAR_ITEM_TYPE = "V2_PRESET_BAR_ITEM";
 
@@ -41,6 +43,7 @@ export function V2PresetBarItem({
 	onLocalReorder,
 	onPersistReorder,
 }: V2PresetBarItemProps) {
+	const isParadevShell = useParadevShell();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const icon = resolveV2PresetIcon(preset, agents, isDark);
 
@@ -90,7 +93,9 @@ export function V2PresetBarItem({
 						<Button
 							variant="ghost"
 							size="sm"
-							className="h-6 max-w-32 min-w-0 shrink-0 gap-2 rounded-md px-2 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+							className={
+								isParadevShell ? PRESET_ITEM_SHELL_CLASS : PRESET_ITEM_CLASS
+							}
 							onClick={() => onExecutePreset(preset)}
 						>
 							{icon ? (

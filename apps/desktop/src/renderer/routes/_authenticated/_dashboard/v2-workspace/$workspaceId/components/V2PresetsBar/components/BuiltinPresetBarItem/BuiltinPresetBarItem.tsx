@@ -10,7 +10,9 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { HiMiniCommandLine } from "react-icons/hi2";
 import { getPresetIcon } from "renderer/assets/app-icons/preset-icons";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { PRESET_ITEM_CLASS, PRESET_ITEM_SHELL_CLASS } from "../../constants";
 
 interface BuiltinPresetBarItemProps {
 	preset: V2TerminalPresetRow;
@@ -28,6 +30,7 @@ export function BuiltinPresetBarItem({
 	onExecutePreset,
 	onHide,
 }: BuiltinPresetBarItemProps) {
+	const isParadevShell = useParadevShell();
 	const icon = getPresetIcon("superset", isDark);
 
 	return (
@@ -39,7 +42,9 @@ export function BuiltinPresetBarItem({
 							<Button
 								variant="ghost"
 								size="sm"
-								className="h-6 max-w-32 min-w-0 shrink-0 gap-2 rounded-md px-2 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+								className={
+									isParadevShell ? PRESET_ITEM_SHELL_CLASS : PRESET_ITEM_CLASS
+								}
 								onClick={() => onExecutePreset(preset)}
 							>
 								{icon ? (
