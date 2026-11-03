@@ -4,6 +4,7 @@ import {
 	checkExtensionFiles,
 	ExtensionIntegrityError,
 } from "./extension-integrity";
+import { refreshStorageShimScript } from "./storage-shim-files";
 
 export interface TurnedOffExtension {
 	id: string;
@@ -47,6 +48,9 @@ export async function loadUserExtensions(
 			return;
 		}
 		if (!installed) return;
+		await refreshStorageShimScript(installed.dir).catch((error: unknown) => {
+			console.error(`[extension-host] Failed to refresh ${id}'s shim:`, error);
+		});
 		try {
 			const result = await checkExtensionFiles(installed.dir, {
 				extensionId: id,

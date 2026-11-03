@@ -19,6 +19,7 @@ interface NativeEvent {
 
 interface ChromeStorageGlobal {
 	chrome?: {
+		extension?: unknown;
 		runtime?: { lastError?: { message?: string } };
 		storage?: {
 			local?: NativeArea;
@@ -54,6 +55,10 @@ export function shimChromeStorage(extensionPagesOnly: boolean): void {
 		return;
 	}
 	const chrome = global.chrome;
+	// Electron's content scripts have no chrome.extension; Vimium reads this.
+	if (chrome && !chrome.extension) {
+		chrome.extension = { inIncognitoContext: false };
+	}
 	const storage = chrome?.storage;
 	const local = storage?.local;
 	const nativeOnChanged = storage?.onChanged;

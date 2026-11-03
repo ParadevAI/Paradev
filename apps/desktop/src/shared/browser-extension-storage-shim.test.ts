@@ -10,6 +10,7 @@ type Area = Record<string, (...args: unknown[]) => Promise<unknown>> & {
 	onChanged: { addListener(listener: (changes: Changes) => void): void };
 };
 interface ShimmedChrome {
+	extension?: { inIncognitoContext: boolean };
 	runtime: { lastError?: { message: string } };
 	storage: {
 		local: Area;
@@ -155,4 +156,9 @@ test("storage.sync keeps Chrome's quota and its callback form reports errors thr
 	expect(items).toEqual({ linkHintCharacters: "sadfjklewcmpgh" });
 	expect(await managed.get(null)).toEqual({});
 	await expect(managed.set({ a: 1 })).rejects.toThrow("read-only");
+});
+
+test("an extension context with no chrome.extension gets inIncognitoContext false, as a non-incognito Chrome", () => {
+	const { chrome } = extensionContext("chrome-extension://vimium/lib/utils.js");
+	expect(chrome.extension).toEqual({ inIncognitoContext: false });
 });
