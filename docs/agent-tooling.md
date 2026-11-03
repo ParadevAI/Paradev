@@ -151,6 +151,11 @@ returns the live chat session ID, which is a new one when the chat had stopped. 
 the session ID the prompt went to. `sessions list` lists Paradev-saved sessions for the workspace;
 native provider discovery remains available in the chat header's history menu.
 
+`sessions create`, `import` and `resume` also open the chat in a background tab of the host's
+desktop app when one is attached; a desktop never opens a chat by finding it. To show an existing
+session, run `superset panes new-tab --workspace WORKSPACE_ID --session CHAT_SESSION_ID`, with
+`--focus` to select it.
+
 Automations check the owner's `acp-chat` flag in the API, then the host's `sessions.capabilities`. Eligible runs use
 `sessions.create`; unsupported agents retain terminal launches. Hosts without the sessions router
 keep the previous `agents.run` chat request, but only an exact missing-procedure response triggers
