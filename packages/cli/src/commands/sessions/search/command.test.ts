@@ -56,10 +56,14 @@ describe("sessions search", () => {
 
 	test("shows control characters in chat text as escapes", () => {
 		const output = searchCommand.display?.([
-			{ sessionId: "s1", title: "a\u001b[2Jb", snippet: "c\u0007d" },
+			{
+				sessionId: "s1",
+				title: "a\u001b[2Jb\u009b2J",
+				snippet: "c\u0007d\u0085e",
+			},
 		] as never);
-		expect(output).toContain("a\\x1b[2Jb");
-		expect(output).toContain("c\\x07d");
-		expect(output).not.toContain("\u001b");
+		expect(output).toContain("a\\x1b[2Jb\\x9b2J");
+		expect(output).toContain("c\\x07d\\x85e");
+		expect(output).not.toMatch(/(?![\t\n])\p{Cc}/u);
 	});
 });
