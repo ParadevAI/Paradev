@@ -36,6 +36,7 @@ import {
 	createMuseWrapper,
 	createOmpExtension,
 	createOpenCodePlugin,
+	createOpenCodeTuiPlugin,
 	createOpenCodeWrapper,
 	createPiExtension,
 	createUfoWrapper,
@@ -54,6 +55,7 @@ import {
 	removeMastraManagedHooks,
 	removeMuseManagedHooks,
 	removeOmpExtension,
+	removeOpenCodeTuiPlugin,
 	removePiExtension,
 	removeVibeManagedHooks,
 } from "./agent-wrappers";
@@ -105,7 +107,12 @@ const AGENT_SETUP_DEFINITIONS: Record<
 		teardown: [removeDroidManagedHooks],
 	},
 	opencode: {
-		setup: [createOpenCodePlugin, createOpenCodeWrapper],
+		setup: [
+			createOpenCodePlugin,
+			createOpenCodeTuiPlugin,
+			createOpenCodeWrapper,
+		],
+		teardown: [removeOpenCodeTuiPlugin],
 	},
 	omp: {
 		setup: [createOmpExtension],
