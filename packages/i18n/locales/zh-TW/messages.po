@@ -1253,6 +1253,9 @@ msgstr "{productName} 完成了 1,150 萬美元的種子輪募資，由 Union Sq
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} 在 2026 年 10 月之前名為 {formerName}。"
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · 輸入 # 變更專案、主機等"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 個 PR}}"
 
@@ -7627,6 +7630,9 @@ msgstr "輸入URL..."
 msgid "Enterprise"
 msgstr "企業版"
 
+msgid "environment"
+msgstr "環境"
+
 msgid "Environment"
 msgstr "環境"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "主目錄"
 
+msgid "host"
+msgstr "主機"
+
 msgid "Host"
 msgstr "主機"
 
@@ -11077,6 +11086,9 @@ msgstr "低嚴重性"
 
 msgid "Machine resources"
 msgstr "機器資源"
+
+msgid "Machine size"
+msgstr "機器規格"
 
 msgid "Machine size: {label}"
 msgstr "機器規格：{label}"
@@ -14696,6 +14708,9 @@ msgstr "進度"
 msgid "Progress · Spinner"
 msgstr "進度條 · 載入指示器"
 
+msgid "project"
+msgstr "專案"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "專案"
@@ -17670,6 +17685,9 @@ msgstr "工廠自主的六個等級"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "工廠自主的六個等級、等級之間的關卡，以及我們對2026年能走多遠的預測。現在寫下來，方便你以後給我們打分。"
+
+msgid "size"
+msgstr "大小"
 
 msgid "Size"
 msgstr "大小"

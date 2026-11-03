@@ -1253,6 +1253,9 @@ msgstr "{productName} đã gọi được vòng hạt giống 11,5 triệu USD d
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} có tên là {formerName} cho đến tháng 10 năm 2026."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # để đổi dự án, host và hơn thế"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
@@ -7627,6 +7630,9 @@ msgstr "Nhập URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Môi trường"
+
 msgid "Environment"
 msgstr "Môi trường"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Home"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11077,6 +11086,9 @@ msgstr "Mức độ nghiêm trọng thấp"
 
 msgid "Machine resources"
 msgstr "Tài nguyên máy"
+
+msgid "Machine size"
+msgstr "Kích thước máy"
 
 msgid "Machine size: {label}"
 msgstr "Kích thước máy: {label}"
@@ -14696,6 +14708,9 @@ msgstr "Tiến độ"
 msgid "Progress · Spinner"
 msgstr "Progress · Spinner"
 
+msgid "project"
+msgstr "Dự án"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "dự án"
@@ -17670,6 +17685,9 @@ msgstr "Sáu mức tự chủ của nhà máy"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Sáu mức tự chủ của nhà máy, các cổng giữa chúng, và dự báo của chúng tôi về việc 2026 đưa ta đi được bao xa. Viết ra bây giờ để sau này bạn chấm điểm chúng tôi."
+
+msgid "size"
+msgstr "Kích thước"
 
 msgid "Size"
 msgstr "Kích thước"

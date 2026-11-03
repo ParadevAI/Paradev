@@ -1253,6 +1253,9 @@ msgstr "{productName} levantó una ronda semilla de 11,5 millones de dólares li
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se llamaba {formerName} hasta octubre de 2026."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # para cambiar proyecto, host y más"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -7627,6 +7630,9 @@ msgstr "Introducir URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Entorno"
+
 msgid "Environment"
 msgstr "Entorno"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Inicio"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11077,6 +11086,9 @@ msgstr "Gravedad baja"
 
 msgid "Machine resources"
 msgstr "Recursos de la máquina"
+
+msgid "Machine size"
+msgstr "Tamaño de la máquina"
 
 msgid "Machine size: {label}"
 msgstr "Tamaño de la máquina: {label}"
@@ -14696,6 +14708,9 @@ msgstr "Progreso"
 msgid "Progress · Spinner"
 msgstr "Progreso · Spinner"
 
+msgid "project"
+msgstr "Proyecto"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "proyecto"
@@ -17670,6 +17685,9 @@ msgstr "Seis niveles de autonomía de la fábrica"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Seis niveles de autonomía de la fábrica, las metas que los separan y nuestro pronóstico de hasta dónde llega 2026. Lo escribimos ahora para que puedas calificarnos después."
+
+msgid "size"
+msgstr "Tamaño"
 
 msgid "Size"
 msgstr "Tamaño"

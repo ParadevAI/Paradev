@@ -1253,6 +1253,9 @@ msgstr "{productName} raised an $11.5M seed round led by Union Square Ventures, 
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} was called {formerName} until October 2026."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # to change project, host, and more"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
@@ -7627,6 +7630,9 @@ msgstr "Enter URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "environment"
+
 msgid "Environment"
 msgstr "Environment"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Home"
 
+msgid "host"
+msgstr "host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11077,6 +11086,9 @@ msgstr "Low severity"
 
 msgid "Machine resources"
 msgstr "Machine resources"
+
+msgid "Machine size"
+msgstr "Machine size"
 
 msgid "Machine size: {label}"
 msgstr "Machine size: {label}"
@@ -14696,6 +14708,9 @@ msgstr "Progress"
 msgid "Progress · Spinner"
 msgstr "Progress · Spinner"
 
+msgid "project"
+msgstr "project"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "project"
@@ -17670,6 +17685,9 @@ msgstr "Six levels of factory autonomy"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
+
+msgid "size"
+msgstr "size"
 
 msgid "Size"
 msgstr "Size"
