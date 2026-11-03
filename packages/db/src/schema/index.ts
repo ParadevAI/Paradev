@@ -3,6 +3,7 @@ export * from "./agents";
 export * from "./auth";
 export * from "./authz";
 export * from "./channels";
+export * from "./chat";
 export * from "./enums";
 export * from "./github";
 export * from "./ingest";
