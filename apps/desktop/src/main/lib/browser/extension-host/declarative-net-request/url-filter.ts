@@ -1,7 +1,7 @@
 const SEPARATOR = "(?:[^A-Za-z0-9_\\-.%]|$)";
 // Past the scheme and any userinfo, at the host's start or after a dot in it.
 const DOMAIN_ANCHOR =
-	"^[a-z][a-z0-9+\\-.]*:\\/\\/(?:[^\\/?#@]*@|(?![^\\/?#]*@))(?:[^\\/?#@:]*\\.)?";
+	"^[a-z][a-z0-9+\\-.]*:\\/\\/(?:[^\\/?#]*@|(?![^\\/?#]*@))(?:[^\\/?#@:]*\\.)?";
 const TOKEN_CHAR = /[a-z0-9%]/;
 const TOKEN_RUN = /[a-z0-9%]+/g;
 const DOMAIN_CHAR = /[a-z0-9.-]/;

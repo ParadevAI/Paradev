@@ -21,3 +21,10 @@ test("a host, port or scheme the URL cannot take fails the redirect", () => {
 	expect(applyUrlTransform(url, { port: "70000" })).toBeNull();
 	expect(applyUrlTransform(url, { scheme: "chrome-extension" })).toBeNull();
 });
+
+test("a malformed host fails the redirect instead of throwing", () => {
+	const url = "https://a.example/x";
+	expect(applyUrlTransform(url, { host: "[::1]/evil" })).toBeNull();
+	expect(applyUrlTransform(url, { host: 5 as never })).toBeNull();
+	expect(applyUrlTransform(url, { host: "[::1]" })).toBe("https://[::1]/x");
+});

@@ -9,6 +9,16 @@ const FRAME_TYPES = new Set(["main_frame", "sub_frame"]);
 const HEADER_OPERATIONS = new Set(["append", "set", "remove"]);
 const DOMAIN_TYPES = new Set(["firstParty", "thirdParty"]);
 const TRANSFORM_SCHEMES = new Set(["http", "https", "ftp", "chrome-extension"]);
+const TRANSFORM_STRING_FIELDS = [
+	"scheme",
+	"host",
+	"port",
+	"path",
+	"query",
+	"fragment",
+	"username",
+	"password",
+] as const;
 const HEADER_NAME = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
 const BAD_HEADER_VALUE = /[\0\r\n]/;
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Chrome refuses non-ASCII filters.
@@ -57,7 +67,8 @@ export function regexFilterProblem(regex: unknown): "syntaxError" | null {
 		const char = regex[index];
 		if (char === "\\") {
 			const next = regex[index + 1] ?? "";
-			if (/[1-9k]/.test(next)) return "syntaxError";
+			// Backreferences, and \C, which RE2 reads as any byte and JS as "C".
+			if (/[1-9kC]/.test(next)) return "syntaxError";
 			index++;
 		} else if (inClass) {
 			if (char === "]") inClass = false;
@@ -68,6 +79,23 @@ export function regexFilterProblem(regex: unknown): "syntaxError" | null {
 		}
 	}
 	return null;
+}
+
+function isValidQueryTransform(value: unknown): boolean {
+	if (value === undefined) return true;
+	if (typeof value !== "object" || value === null) return false;
+	const { removeParams, addOrReplaceParams } = value as Record<string, unknown>;
+	const strings = (list: unknown) =>
+		Array.isArray(list) && list.every((item) => typeof item === "string");
+	return (
+		(removeParams === undefined || strings(removeParams)) &&
+		(addOrReplaceParams === undefined ||
+			(Array.isArray(addOrReplaceParams) &&
+				addOrReplaceParams.every(
+					(param) =>
+						typeof param?.key === "string" && typeof param.value === "string",
+				)))
+	);
 }
 
 function isValidRedirectUrl(raw: string): boolean {
@@ -121,6 +149,19 @@ export function validateRule(rule: Rule, options: ValidateOptions = {}): void {
 			fail(rule, 'does not provide a valid URL for "action.redirect.url".');
 		}
 		const transform = redirect.transform;
+		if (
+			transform !== undefined &&
+			(typeof transform !== "object" ||
+				transform === null ||
+				Array.isArray(transform) ||
+				TRANSFORM_STRING_FIELDS.some(
+					(key) =>
+						transform[key] !== undefined && typeof transform[key] !== "string",
+				) ||
+				!isValidQueryTransform(transform.queryTransform))
+		) {
+			fail(rule, 'has an invalid "action.redirect.transform".');
+		}
 		if (
 			transform?.scheme !== undefined &&
 			!TRANSFORM_SCHEMES.has(transform.scheme)

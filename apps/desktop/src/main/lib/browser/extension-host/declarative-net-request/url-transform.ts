@@ -48,17 +48,21 @@ export function applyUrlTransform(
 	raw: string,
 	transform: UrlTransform,
 ): string | null {
-	let url: URL;
+	// Runs in the request path, so a malformed transform must fail, never throw.
 	try {
-		url = new URL(raw);
+		return transformed(new URL(raw), transform);
 	} catch {
 		return null;
 	}
+}
+
+function transformed(url: URL, transform: UrlTransform): string | null {
 	if (transform.scheme) {
 		url.protocol = `${transform.scheme}:`;
 		if (url.protocol !== `${transform.scheme.toLowerCase()}:`) return null;
 	}
 	if (transform.host !== undefined) {
+		if (typeof transform.host !== "string") return null;
 		const before = url.hostname;
 		url.hostname = transform.host;
 		const ignored =
@@ -66,7 +70,8 @@ export function applyUrlTransform(
 			transform.host.toLowerCase() !== before.toLowerCase();
 		// The setter stops at a delimiter and keeps only the part before it.
 		const truncated =
-			!transform.host.startsWith("[") && /[/?#:@\\\s]/.test(transform.host);
+			!/^\[[0-9a-f:.]+\]$/i.test(transform.host) &&
+			/[/?#:@\\\s]/.test(transform.host);
 		if (ignored || truncated) return null;
 	}
 	if (transform.port !== undefined) {

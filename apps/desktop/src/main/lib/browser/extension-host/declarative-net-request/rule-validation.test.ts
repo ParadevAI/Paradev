@@ -72,6 +72,21 @@ describe("rejects", () => {
 			'"action.redirect.transform.scheme"',
 		],
 		[
+			"a transform that is not an object",
+			redirect({ transform: "bad" }),
+			'"action.redirect.transform"',
+		],
+		[
+			"a transform host that is not a string",
+			redirect({ transform: { host: 5 } }),
+			'"action.redirect.transform"',
+		],
+		[
+			"a malformed queryTransform",
+			redirect({ transform: { queryTransform: { removeParams: "utm" } } }),
+			'"action.redirect.transform"',
+		],
+		[
 			"a transform port that is not a port",
 			redirect({ transform: { port: "80abc" } }),
 			'"action.redirect.transform.port"',
@@ -211,6 +226,7 @@ test("regexFilterProblem accepts RE2's subset only", () => {
 		"(?<=a)b",
 		"(?<!a)b",
 		"(a)\\1",
+		"a\\Cb",
 		"(?<n>a)\\k<n>",
 		"exämple",
 	]) {

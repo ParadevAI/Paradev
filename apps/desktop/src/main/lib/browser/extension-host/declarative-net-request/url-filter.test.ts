@@ -10,3 +10,9 @@ test("a || anchor matches only in the host, never in userinfo", () => {
 	expect(filter.test("https://a.example.com@evil.com/")).toBe(false);
 	expect(filter.test("https://notexample.com/")).toBe(false);
 });
+
+test("a || anchor skips userinfo that holds more than one @", () => {
+	const filter = compileUrlFilter("||example.com^", false);
+	expect(filter.test("https://a@b@example.com/")).toBe(true);
+	expect(filter.test("https://example.com@b@evil.com/")).toBe(false);
+});
