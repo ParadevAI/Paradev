@@ -1,5 +1,8 @@
 import type { ElectronChromeExtensions } from "electron-chrome-extensions";
-import { INSTALLED_CHANNEL } from "shared/browser-extension-installed";
+import {
+	INSTALLED_CHANNEL,
+	type InstalledRequest,
+} from "shared/browser-extension-installed";
 import type { ExtensionState, MenuItemProps } from "./extension-state";
 
 /**
@@ -38,9 +41,15 @@ export function trackExtensionLifecycle({
 		}
 		served.add(worker);
 		const extensionId = new URL(worker.scope).host;
-		worker.ipc.handle(INSTALLED_CHANNEL, () => {
-			const extension = session.extensions.getExtension(extensionId);
-			return extension ? state.takeInstalledDetails(extension) : null;
-		});
+		worker.ipc.handle(
+			INSTALLED_CHANNEL,
+			(_event, ...[method, version]: InstalledRequest) => {
+				const extension = session.extensions.getExtension(extensionId);
+				if (!extension) return null;
+				if (method === "pending") return state.pendingInstalled(extension);
+				state.markInstalledDelivered(extension, version);
+				return null;
+			},
+		);
 	});
 }

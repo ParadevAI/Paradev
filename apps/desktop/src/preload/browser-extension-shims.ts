@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer } from "electron";
 import {
 	INSTALLED_CHANNEL,
 	type InstalledDetails,
+	type InstalledRequest,
+	type PendingInstalled,
 } from "shared/browser-extension-installed";
 import {
 	OFFSCREEN_CHANNEL,
@@ -23,7 +25,9 @@ contextBridge.executeInMainWorld({
 		toChromeUserAgent: (userAgent: string) => string,
 		googleSignInHost: string,
 		toFirefoxUserAgent: (userAgent: string) => string,
-		takeInstalledDetails: () => Promise<InstalledDetails | null>,
+		installedEvent: (
+			...request: InstalledRequest
+		) => Promise<PendingInstalled | null>,
 	) => {
 		// Session preloads run in website frames and workers too. The checks run
 		// here because a service worker's preload realm has no `location`.
@@ -78,7 +82,9 @@ contextBridge.executeInMainWorld({
 			};
 		}
 		// Electron never fires runtime.onInstalled; the app tracks installs and
-		// updates, and the worker asks once its first listener is added.
+		// updates, and the worker asks once its first listener is added. The app
+		// records the version only after the listeners ran, so a worker that
+		// stops first gets the event again.
 		const runtime = chrome?.runtime as Record<string, unknown> | undefined;
 		if (isServiceWorker && runtime?.onInstalled) {
 			type Listener = (details: InstalledDetails) => void;
@@ -89,19 +95,19 @@ contextBridge.executeInMainWorld({
 					listeners.add(listener);
 					if (asked) return;
 					asked = true;
-					takeInstalledDetails().then(
-						(details) => {
-							if (!details) return;
+					installedEvent("pending")
+						.then((pending) => {
+							if (!pending || listeners.size === 0) return;
 							for (const each of listeners) {
 								try {
-									each(details);
+									each(pending.details);
 								} catch (error) {
 									console.error(error);
 								}
 							}
-						},
-						() => {},
-					);
+							return installedEvent("delivered", pending.version);
+						})
+						.catch(() => {});
 				},
 				removeListener(listener: Listener) {
 					listeners.delete(listener);
@@ -118,7 +124,8 @@ contextBridge.executeInMainWorld({
 		chromeUserAgent,
 		GOOGLE_SIGN_IN_HOST,
 		firefoxUserAgent,
-		() => ipcRenderer.invoke(INSTALLED_CHANNEL),
+		(...request: InstalledRequest) =>
+			ipcRenderer.invoke(INSTALLED_CHANNEL, ...request),
 	],
 });
 

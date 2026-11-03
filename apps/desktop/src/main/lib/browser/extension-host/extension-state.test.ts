@@ -8,38 +8,39 @@ const scratch = mkdtempSync(join(tmpdir(), "extension-state-"));
 afterAll(() => rmSync(scratch, { recursive: true, force: true }));
 
 const TRANSLATE = "aapbdbdomjkkjkaonfhkkikfgjllcleb";
+
+// What a worker does: asks, runs its listeners, confirms.
+function deliverWith(state: ReturnType<typeof createExtensionState>) {
+	return (extension: { id: string; version: string }) => {
+		const pending = state.pendingInstalled(extension);
+		if (pending) state.markInstalledDelivered(extension, pending.version);
+		return pending?.details ?? null;
+	};
+}
 const VIMIUM = "dbepggeogbaibhgnhhndojpepiihcmeb";
 
 test("runtime.onInstalled fires once per install and update, and once for extensions the app had before", () => {
 	const file = join(scratch, "installed.json");
 	const state = createExtensionState(file, () => [TRANSLATE]);
+	const deliver = deliverWith(state);
 
-	expect(
-		state.takeInstalledDetails({ id: TRANSLATE, version: "2.0.18" }),
-	).toEqual({
+	expect(deliver({ id: TRANSLATE, version: "2.0.18" })).toEqual({
 		reason: "chrome_update",
 	});
-	expect(state.takeInstalledDetails({ id: VIMIUM, version: "2.4.2" })).toEqual({
+	expect(deliver({ id: VIMIUM, version: "2.4.2" })).toEqual({
 		reason: "install",
 	});
-	expect(
-		state.takeInstalledDetails({ id: VIMIUM, version: "2.4.2" }),
-	).toBeNull();
+	expect(deliver({ id: VIMIUM, version: "2.4.2" })).toBeNull();
 
 	const restarted = createExtensionState(file, () => []);
-	expect(
-		restarted.takeInstalledDetails({ id: TRANSLATE, version: "2.0.18" }),
-	).toBeNull();
-	expect(
-		restarted.takeInstalledDetails({ id: VIMIUM, version: "2.5.0" }),
-	).toEqual({
+	const deliverAfterRestart = deliverWith(restarted);
+	expect(deliverAfterRestart({ id: TRANSLATE, version: "2.0.18" })).toBeNull();
+	expect(deliverAfterRestart({ id: VIMIUM, version: "2.5.0" })).toEqual({
 		reason: "update",
 		previousVersion: "2.4.2",
 	});
 	restarted.forget(VIMIUM);
-	expect(
-		restarted.takeInstalledDetails({ id: VIMIUM, version: "2.5.0" }),
-	).toEqual({
+	expect(deliverAfterRestart({ id: VIMIUM, version: "2.5.0" })).toEqual({
 		reason: "install",
 	});
 });
