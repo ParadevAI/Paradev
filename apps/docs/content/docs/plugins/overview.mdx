@@ -10,7 +10,7 @@ A plugin connects your coding agents to another service, such as an issue tracke
 
 You install a plugin from the desktop app, and Paradev sets it up for the agents on that machine. When a plugin needs an account, you connect it in Paradev; the agent never sees your credentials.
 
-See [Available Plugins](/plugins/available) for guides to individual plugins.
+See [Available Plugins](/plugins/available) for guides to individual plugins, and [Build a Plugin](/plugins/build-a-plugin) to make and submit your own.
 
 ![The Plugins page in the desktop app, with plugins grouped by category](/images/plugins-catalog.png)
 
@@ -44,7 +44,7 @@ When you install a plugin, Paradev adds its MCP server to each supported agent's
 
 | Agent | Config file | How Paradev writes it |
 |:------|:------------|:-----------------------|
-| Claude Code | `~/.claude.json` (user `mcpServers`) | Adds one entry per plugin and records it in `~/.superset/plugins/mcp-ledger.json` |
+| Claude Code | `~/.claude.json` (user `mcpServers`) | Adds one entry per plugin and records it in `~/.paradev/plugins/mcp-ledger.json` |
 | Codex | `~/.codex/config.toml` | Adds `[mcp_servers.<name>]` tables inside a `# >>> superset managed mcp servers >>>` block |
 
 - **Your entries win.** If you already configured a server for that agent with the same name as the plugin, Paradev leaves yours in place and does not add a copy. This is per agent: a server you added to Codex does not stop Paradev from adding it to Claude Code.

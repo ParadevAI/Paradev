@@ -252,7 +252,7 @@ export const pageVisibilityValues = ["just_me", "org", "everyone"] as const;
 export const pageVisibilityEnum = z.enum(pageVisibilityValues);
 export type PageVisibility = z.infer<typeof pageVisibilityEnum>;
 
-export const pageShareRoleValues = ["view", "comment"] as const;
+export const pageShareRoleValues = ["view", "comment", "edit"] as const;
 export const pageShareRoleEnum = z.enum(pageShareRoleValues);
 export type PageShareRole = z.infer<typeof pageShareRoleEnum>;
 
@@ -329,6 +329,7 @@ export const agentTurnStatusValues = [
 	"completed",
 	"failed",
 	"interrupted",
+	"queued",
 ] as const;
 export const agentTurnStatusEnum = z.enum(agentTurnStatusValues);
 export type AgentTurnStatus = z.infer<typeof agentTurnStatusEnum>;

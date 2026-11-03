@@ -11,7 +11,7 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { jwtProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import {
 	accessTokenExpiresAt,
 	CHATGPT_DEVICE_URL,
@@ -60,7 +60,7 @@ function chatgptSignInError(error: unknown): never {
 
 export const agentCredentialRouter = {
 	/** What settings shows: which agents are signed in, never the credential. */
-	list: jwtProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		const rows = await db
 			.select({
 				agent: agentCredentials.agent,
@@ -72,12 +72,12 @@ export const agentCredentialRouter = {
 				updatedAt: agentCredentials.updatedAt,
 			})
 			.from(agentCredentials)
-			.where(eq(agentCredentials.userId, ctx.userId))
+			.where(eq(agentCredentials.userId, ctx.principal.userId))
 			.orderBy(asc(agentCredentials.agent));
 		return rows;
 	}),
 
-	set: jwtProcedure
+	set: personProcedure
 		.input(
 			z.object({
 				agent: agentId,
@@ -158,11 +158,11 @@ export const agentCredentialRouter = {
 			}
 
 			const encryptedValue = encryptAgentCredential(value, {
-				userId: ctx.userId,
+				userId: ctx.principal.userId,
 				agent: input.agent,
 			});
 			const row = {
-				userId: ctx.userId,
+				userId: ctx.principal.userId,
 				agent: input.agent,
 				kind: input.kind,
 				encryptedValue,
@@ -193,7 +193,7 @@ export const agentCredentialRouter = {
 	 * on OpenAI's page; the handle carries the pending code back to
 	 * `pollChatgptSignIn`, sealed to them so nobody else can finish it.
 	 */
-	startChatgptSignIn: jwtProcedure.mutation(async ({ ctx }) => {
+	startChatgptSignIn: personProcedure.mutation(async ({ ctx }) => {
 		const code = await requestDeviceCode().catch(chatgptSignInError);
 		return {
 			handle: encryptAgentCredential(
@@ -201,7 +201,7 @@ export const agentCredentialRouter = {
 					deviceAuthId: code.deviceAuthId,
 					userCode: code.userCode,
 				}),
-				{ userId: ctx.userId, agent: DEVICE_CODE_CONTEXT },
+				{ userId: ctx.principal.userId, agent: DEVICE_CODE_CONTEXT },
 			),
 			userCode: code.userCode,
 			verificationUrl: CHATGPT_DEVICE_URL,
@@ -210,7 +210,7 @@ export const agentCredentialRouter = {
 	}),
 
 	/** One check of a pending sign-in; stores the session once it is approved. */
-	pollChatgptSignIn: jwtProcedure
+	pollChatgptSignIn: personProcedure
 		.input(z.object({ handle: z.string().min(1).max(4096) }))
 		.mutation(async ({ ctx, input }) => {
 			let pending: z.infer<typeof deviceCodeHandleSchema>;
@@ -218,7 +218,7 @@ export const agentCredentialRouter = {
 				pending = deviceCodeHandleSchema.parse(
 					JSON.parse(
 						decryptAgentCredential(input.handle, {
-							userId: ctx.userId,
+							userId: ctx.principal.userId,
 							agent: DEVICE_CODE_CONTEXT,
 						}),
 					),
@@ -235,11 +235,11 @@ export const agentCredentialRouter = {
 
 			const accountLabel = chatgptIdentity(tokens.idToken).email;
 			const row = {
-				userId: ctx.userId,
+				userId: ctx.principal.userId,
 				agent: "codex",
 				kind: "subscription" as const,
 				encryptedValue: encryptAgentCredential(JSON.stringify(tokens), {
-					userId: ctx.userId,
+					userId: ctx.principal.userId,
 					agent: "codex",
 				}),
 				baseUrl: null,
@@ -264,14 +264,14 @@ export const agentCredentialRouter = {
 			return { status: "connected" as const, accountLabel };
 		}),
 
-	remove: jwtProcedure
+	remove: personProcedure
 		.input(z.object({ agent: agentId }))
 		.mutation(async ({ ctx, input }) => {
 			await dbWs
 				.delete(agentCredentials)
 				.where(
 					and(
-						eq(agentCredentials.userId, ctx.userId),
+						eq(agentCredentials.userId, ctx.principal.userId),
 						eq(agentCredentials.agent, input.agent),
 					),
 				);

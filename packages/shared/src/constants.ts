@@ -155,13 +155,19 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LAUNCH: "mobile-launch",
 	/**
-	 * Shows the `.superset/config.toml` editor in project settings in place of
+	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one
 	 * exists; this gates only where people are led to write one.
 	 */
 	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
 	/** In-app channels in the desktop sidebar. */
 	CHANNELS: "channels",
+	/**
+	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
+	 * card, pane cards and the inline home composer. Read once per launch, so
+	 * a change in PostHog applies on the next start.
+	 */
+	PARADEV_SHELL: "paradev-shell",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**
@@ -301,9 +307,13 @@ export const SANDBOX_WORKSPACE_PATH = "/workspace";
 
 export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 
-/** The one transaction the API traces: the cloud workspace provision job. */
+/** The transactions the API traces: a cloud workspace's start and the provision job it queues, one trace. */
+export const CLOUD_WORKSPACE_START_TRANSACTION = "cloud-workspace.start";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
+/** Every wake records one; only those that ran the boot command are sent (`CLOUD_WORKSPACE_BOOTED_ATTRIBUTE`). */
+export const CLOUD_WORKSPACE_WAKE_TRANSACTION = "cloud-workspace.wake";
+export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code

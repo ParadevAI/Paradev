@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
 import {
@@ -5,6 +6,8 @@ import {
 	describeCloudAgentLaunch,
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
+import { CLOUD_WORKSPACE_START_TRANSACTION } from "@superset/shared/constants";
+import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
@@ -90,7 +93,26 @@ export async function assertMachineSizeOffered(
  * mid-provision leaves a `provisioning` row we can reconcile, rather than
  * an orphaned sandbox nothing references.
  */
-export async function startCloudWorkspace(args: {
+export async function startCloudWorkspace(args: StartCloudWorkspaceInput) {
+	try {
+		return await Sentry.startSpan(
+			{
+				name: CLOUD_WORKSPACE_START_TRANSACTION,
+				op: "function",
+				forceTransaction: true,
+			},
+			async (span) => {
+				const row = await start(args);
+				span.setAttribute("cloud_workspace.id", row.id);
+				return row;
+			},
+		);
+	} finally {
+		waitUntil(Sentry.flush(2_000).catch(() => false));
+	}
+}
+
+export interface StartCloudWorkspaceInput {
 	organizationId: string;
 	userId: string;
 	environmentId: string;
@@ -108,7 +130,9 @@ export async function startCloudWorkspace(args: {
 	attachmentFileIds?: string[];
 	machineSize?: string;
 	beforeProvision?: (workspaceId: string) => Promise<void>;
-}) {
+}
+
+async function start(args: StartCloudWorkspaceInput) {
 	const openAsChat =
 		args.chat === true && supportsCloudAgentChat(args.launch?.agent);
 	const environment = await loadUsableEnvironment(args);

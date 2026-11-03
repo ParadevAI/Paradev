@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Ardından o çalışma alanı terminalinden geliştirme kurulumunu çalıştırın:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Tam kılavuz için [**DEVELOPMENT.md**](../DEVELOPMENT.md) dosyasına bakın: ku
 
 ## Yapılandırma
 
-Çalışma alanı kurulum, kaldırma ve çalıştırma betiklerini `.superset/config.json` dosyasında yapılandırın. [Tam belgelere](https://docs.paradev.com/setup-teardown-scripts) bakın.
+Çalışma alanı kurulum, kaldırma ve çalıştırma betiklerini `.paradev/config.json` dosyasında yapılandırın. [Tam belgelere](https://docs.paradev.com/setup-teardown-scripts) bakın.
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

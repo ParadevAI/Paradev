@@ -1,15 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { DEFAULT_MARKETPLACE } from "@superset/shared/plugins";
 import type { PluginSkillSource } from "./managed-skills";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export function installedPluginsFilePath(): string {
-	return path.join(
-		resolveSupersetHomeDir(),
-		"plugins",
-		"installed_plugins.json",
-	);
+	return path.join(resolveAppHomeDir(), "plugins", "installed_plugins.json");
 }
 
 interface InstalledPluginRecord {
@@ -125,6 +122,51 @@ export function writeInstalledPlugins(
 		`${JSON.stringify({ version: 1, plugins }, null, "\t")}\n`,
 		0o644,
 	);
+}
+
+/**
+ * Adds the records another store kept that this file lacks, without an
+ * installPath, so moving to this one record loses no install. Returns the
+ * names it added. Throws on an unreadable file rather than replace it.
+ */
+export function adoptInstalledPlugins(
+	records: readonly {
+		name: string;
+		version: string;
+		installedAt: string;
+		enabled?: boolean;
+		marketplace?: string;
+	}[],
+	file: string = installedPluginsFilePath(),
+): string[] {
+	let ledger: InstalledPluginEntry[] = [];
+	if (fs.existsSync(file)) {
+		const parsed = JSON.parse(fs.readFileSync(file, "utf-8")) as {
+			plugins?: unknown;
+		};
+		if (!Array.isArray(parsed?.plugins)) {
+			throw new Error(`${file} has no plugins list`);
+		}
+		ledger = parsed.plugins as InstalledPluginEntry[];
+	}
+	const added: InstalledPluginEntry[] = [];
+	for (const record of records) {
+		const marketplace = record.marketplace || DEFAULT_MARKETPLACE;
+		const held = [...ledger, ...added].some(
+			(entry) =>
+				entry.name === record.name && entry.marketplace === marketplace,
+		);
+		if (held) continue;
+		added.push({
+			marketplace,
+			name: record.name,
+			version: record.version,
+			installedAt: record.installedAt,
+			enabled: record.enabled !== false,
+		});
+	}
+	if (added.length) writeInstalledPlugins([...ledger, ...added], file);
+	return added.map((entry) => entry.name);
 }
 
 /**

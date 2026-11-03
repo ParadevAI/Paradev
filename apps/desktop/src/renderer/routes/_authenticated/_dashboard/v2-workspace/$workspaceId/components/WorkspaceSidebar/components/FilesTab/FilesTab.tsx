@@ -62,6 +62,8 @@ const TREE_STYLE = createPierreTreeStyle({
 
 type GitStatusData = inferRouterOutputs<AppRouter>["git"]["getStatus"];
 
+const NARROW_HIDDEN = "hidden @min-[200px]/file-tree-header:inline-flex";
+
 interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	variant?: "sidebar" | "fileView";
@@ -371,21 +373,22 @@ export function FilesTab({
 					header={
 						<div
 							data-file-tree-header="true"
-							className="group flex h-10 items-center gap-1 bg-background px-2"
+							className="group @container/file-tree-header flex h-10 items-center gap-1 bg-background px-2"
 						>
 							{onSearch && (
 								<button
 									type="button"
 									onClick={onSearch}
+									aria-label={t({ message: "Search files" })}
 									className={cn(
-										"flex min-w-0 flex-1 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+										"flex min-w-0 items-center gap-1.5 @min-[150px]/file-tree-header:flex-1 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
 										variant === "fileView"
 											? "h-7 rounded-full border border-border/60 bg-background px-2.5 shadow-sm"
 											: "h-8 rounded-md px-1.5",
 									)}
 								>
 									<Search className="size-3.5 shrink-0" />
-									<span className="truncate">
+									<span className="hidden truncate @min-[150px]/file-tree-header:inline">
 										<Trans>Search files</Trans>
 									</span>
 								</button>
@@ -396,6 +399,7 @@ export function FilesTab({
 									label={t({
 										message: "New File",
 									})}
+									className={NARROW_HIDDEN}
 									onClick={() => void startCreating("file")}
 								/>
 								<FilesTabHeaderButton
@@ -403,6 +407,7 @@ export function FilesTab({
 									label={t({
 										message: "New Folder",
 									})}
+									className={NARROW_HIDDEN}
 									onClick={() => void startCreating("folder")}
 								/>
 								<FilesTabHeaderButton

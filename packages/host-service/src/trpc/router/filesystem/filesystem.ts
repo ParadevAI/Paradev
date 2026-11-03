@@ -234,9 +234,21 @@ export const filesystemRouter = router({
 		.query(async ({ ctx, input, signal }) => {
 			const { workspaceId, ...serviceInput } = input;
 			const service = getFilesystemService(ctx, workspaceId);
-			return await withFsErrorTranslation(() =>
-				service.listDirectory(serviceInput, { signal }),
-			);
+			try {
+				return await withFsErrorTranslation(() =>
+					service.listDirectory(serviceInput, { signal }),
+				);
+			} catch (error) {
+				// The HTTP server aborts the request with a string reason when the
+				// client disconnects; throwIfAborted() rethrows that string as-is.
+				if (signal?.aborted && error === signal.reason) {
+					throw new TRPCError({
+						code: "CLIENT_CLOSED_REQUEST",
+						message: String(signal.reason),
+					});
+				}
+				throw error;
+			}
 		}),
 
 	readFile: queryProcedure

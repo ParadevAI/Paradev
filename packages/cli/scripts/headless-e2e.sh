@@ -5,10 +5,10 @@
 # machine that never ran the desktop app — and verifies the full agent-hook
 # chain the desktop otherwise provides:
 #
-#   1. First boot provisions ~/.superset (notify.sh, bin wrappers, zsh/bash
+#   1. First boot provisions ~/.paradev (notify.sh, bin wrappers, zsh/bash
 #      bootstrap) and every agent's managed hook config from the tarball's
 #      lib/agent-templates — with NO SUPERSET_HOME_DIR in the environment,
-#      so the ~/.superset fallback is what's under test.
+#      so the ~/.paradev fallback is what's under test.
 #   2. The provisioned notify.sh delivers a lifecycle event to
 #      notifications.hook and a row lands in terminal_agent_bindings.
 #      Unknown terminal ids are accepted (200) but recorded nowhere.
@@ -17,12 +17,12 @@
 #      while runtime-altering vars like NODE_ENV are never imported.
 #   4. A restart is idempotent: no file rewrites, no duplicated hook entries.
 #   5. Real zsh/bash login flows through the provisioned wrappers put
-#      ~/.superset/bin on PATH and register the shell-ready marker.
+#      ~/.paradev/bin on PATH and register the shell-ready marker.
 #   6. SUPERSET_DISABLED_AGENT_HOOKS and the shared agent-hooks.json mirror
 #      tear down (and re-enabling restores) per-agent hook configs.
 #   7. Two hosts provisioning concurrently leave valid, deduplicated configs.
 #
-# DESTRUCTIVE: wipes $HOME/.superset, ~/.claude, ~/.agents, ~/.codex,
+# DESTRUCTIVE: wipes $HOME/.paradev, $HOME/.superset, ~/.claude, ~/.agents, ~/.codex,
 # ~/.gemini and appends to the login-shell profile. Only runs when
 # SUPERSET_HEADLESS_E2E=1 — set by build-dist-linux-docker.sh (throwaway
 # container) and by the Linux jobs in .github/workflows/build-cli.yml
@@ -44,7 +44,7 @@ if [[ "$(uname -s)" != "Linux" ]]; then
 fi
 
 # ── Fixture: a fresh home with login-shell-only env additions ────────────
-rm -rf "$HOME/.superset" "$HOME/.claude" "$HOME/.agents" "$HOME/.codex" "$HOME/.gemini"
+rm -rf "$HOME/.paradev" "$HOME/.superset" "$HOME/.claude" "$HOME/.agents" "$HOME/.codex" "$HOME/.gemini"
 FAKE_TOOLS_DIR="${TMPDIR:-/tmp}/superset-e2e-fake-tools/bin"
 mkdir -p "$FAKE_TOOLS_DIR"
 # bash login shells read .bash_profile and ignore .profile when both exist.
@@ -137,12 +137,12 @@ done
 sleep 1  # managed-skills provisioning is async fire-and-forget
 
 echo "[e2e] === assert: provisioning artifacts ==="
-test -x "$HOME/.superset/hooks/notify.sh"
-grep -q "Superset agent notification hook" "$HOME/.superset/hooks/notify.sh"
-test -f "$HOME/.superset/zsh/.zshrc"
-grep -q "133;A" "$HOME/.superset/zsh/.zlogin"
-test -f "$HOME/.superset/bash/rcfile"
-WRAPPERS=$(ls "$HOME/.superset/bin" | wc -l)
+test -x "$HOME/.paradev/hooks/notify.sh"
+grep -q "Superset agent notification hook" "$HOME/.paradev/hooks/notify.sh"
+test -f "$HOME/.paradev/zsh/.zshrc"
+grep -q "133;A" "$HOME/.paradev/zsh/.zlogin"
+test -f "$HOME/.paradev/bash/rcfile"
+WRAPPERS=$(ls "$HOME/.paradev/bin" | wc -l)
 [[ "$WRAPPERS" -ge 12 ]] || { echo "[e2e] FAIL wrappers=$WRAPPERS"; exit 1; }
 
 echo "[e2e] === assert: managed hook configs ==="
@@ -168,14 +168,14 @@ grep -q "login-shell PATH entries into process env" "$HSDIR/host.log"
 
 echo "[e2e] === assert: real shell login flows through the wrappers ==="
 BASH_PROBE=$(env -i HOME="$HOME" TERM=dumb PATH=/usr/bin:/bin \
-  bash -c "source \"$HOME/.superset/bash/rcfile\"; echo \"PATH=\$PATH\"; declare -F __superset_prompt_mark")
-echo "$BASH_PROBE" | grep -q "$HOME/.superset/bin"
+  bash -c "source \"$HOME/.paradev/bash/rcfile\"; echo \"PATH=\$PATH\"; declare -F __superset_prompt_mark")
+echo "$BASH_PROBE" | grep -q "$HOME/.paradev/bin"
 echo "$BASH_PROBE" | grep -q "__superset_prompt_mark"
 if command -v zsh >/dev/null 2>&1; then
   ZSH_PROBE=$(env -i HOME="$HOME" TERM=dumb PATH=/usr/bin:/bin \
-    SUPERSET_ORIG_ZDOTDIR="$HOME" ZDOTDIR="$HOME/.superset/zsh" \
+    SUPERSET_ORIG_ZDOTDIR="$HOME" ZDOTDIR="$HOME/.paradev/zsh" \
     zsh -ilc 'print -r -- "PATH=$PATH"; whence -w __superset_prompt_mark' 2>/dev/null)
-  echo "$ZSH_PROBE" | grep -q "$HOME/.superset/bin"
+  echo "$ZSH_PROBE" | grep -q "$HOME/.paradev/bin"
   echo "$ZSH_PROBE" | grep -q "__superset_prompt_mark: function"
 else
   echo "[e2e] zsh not installed — skipping zsh wrapper-chain check"
@@ -198,7 +198,7 @@ fire_hook() {
         SUPERSET_AGENT_ID="claude" \
         SUPERSET_DEBUG_HOOKS=1 \
         SUPERSET_HOST_AGENT_HOOK_URL="http://127.0.0.1:$PORT/trpc/notifications.hook" \
-        bash "$HOME/.superset/hooks/notify.sh" 2>&1 || true
+        bash "$HOME/.paradev/hooks/notify.sh" 2>&1 || true
 }
 
 STATUS=$(fire_hook "e2e-unknown-terminal")
@@ -227,11 +227,11 @@ fi
 
 echo "[e2e] === assert: idempotent re-provisioning on restart ==="
 stop_host
-NOTIFY_MTIME1=$(stat -c %Y "$HOME/.superset/hooks/notify.sh")
+NOTIFY_MTIME1=$(stat -c %Y "$HOME/.paradev/hooks/notify.sh")
 PORT="$(new_port)"
 boot_host "$ORG" "$HSDIR/host.db" "$HSDIR/host2.log" "$PORT"
 await_healthy "$HSDIR/host2.log" "$PORT"
-NOTIFY_MTIME2=$(stat -c %Y "$HOME/.superset/hooks/notify.sh")
+NOTIFY_MTIME2=$(stat -c %Y "$HOME/.paradev/hooks/notify.sh")
 [[ "$NOTIFY_MTIME1" == "$NOTIFY_MTIME2" ]] || { echo "[e2e] FAIL notify.sh rewritten on unchanged content"; exit 1; }
 [[ "$(claude_stop_hook_count)" == "1" ]] || { echo "[e2e] FAIL duplicate hook entries after re-provision"; exit 1; }
 
@@ -254,7 +254,7 @@ test -f "$HOME/.gemini/settings.json"  # other agents untouched
 stop_host
 
 echo "[e2e] === assert: shared agent-hooks.json mirror is honored ==="
-printf '{\n\t"disabledAgentIds": ["claude"]\n}\n' > "$HOME/.superset/agent-hooks.json"
+printf '{\n\t"disabledAgentIds": ["claude"]\n}\n' > "$HOME/.paradev/agent-hooks.json"
 PORT="$(new_port)"
 boot_host "$ORG" "$HSDIR/host.db" "$HSDIR/host4.log" "$PORT"
 await_healthy "$HSDIR/host4.log" "$PORT"
@@ -263,7 +263,7 @@ sleep 1
 stop_host
 
 echo "[e2e] === assert: re-enabling restores the hooks ==="
-rm -f "$HOME/.superset/agent-hooks.json"
+rm -f "$HOME/.paradev/agent-hooks.json"
 PORT="$(new_port)"
 boot_host "$ORG" "$HSDIR/host.db" "$HSDIR/host5.log" "$PORT"
 await_healthy "$HSDIR/host5.log" "$PORT"

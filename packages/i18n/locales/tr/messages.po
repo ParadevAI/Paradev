@@ -67,11 +67,26 @@ msgstr "\"{0}\", {2} ile {1} dalına birleştirilecek. Buradan geri alınamaz."
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" artık tetiklenmeyecek ve çalıştırma geçmişi kaldırılacak. Bu geri alınamaz."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" {size} boyutunda — {limit} üzerindeki dosyalar eklenemez"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" {size} boyutunda — bu çalışma alanına {limit} üzerindeki dosyalar eklenemez. Dosya çalışma alanının makinesindeyse bunun yerine yolunu belirtin."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" bir klasör. Bunun yerine içindeki dosyaları ekle."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" {limit} sınırını aşıyor; bulut dışındaki bir çalışma alanı en fazla bu kadarını alabilir"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" duraklatıldı"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" sürdürüldü"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" taşındı veya silindi. Yeniden ekle."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" görevini tamamladı"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {# araç kullanıldı} other {# araç kullanıldı}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} dosya {limit} sınırını aştığı için eklenmedi"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} dosya eklendi — bir mesaj en fazla {max} dosya taşıyabilir"
+
 msgid "{count} GitHub stars"
 msgstr "{count} GitHub yıldızı"
 
@@ -1235,6 +1256,9 @@ msgstr "{productName}, Union Square Ventures liderliğinde, Y Combinator ve Paul
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}, Ekim 2026'ya kadar {formerName} adını taşıyordu."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · Projeyi, host'u ve daha fazlasını değiştirmek için #"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -1545,6 +1569,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 çerez — bu siteyi unut"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 dosya {limit} sınırını aştığı için eklenmedi"
 
 msgid "1 hr"
 msgstr "1 sa"
@@ -2268,6 +2295,10 @@ msgstr "Ajanın yönettiği önizlemeler"
 
 msgid "Agents"
 msgstr "Ajanlar"
+
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Ajanlar {0} araçlarına erişemiyor"
 
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
@@ -3308,6 +3339,9 @@ msgstr "Destekçilerimiz"
 msgid "Background"
 msgstr "Arka plan"
 
+msgid "Background · {count}"
+msgstr "Arka planda · {count}"
+
 msgid "Background processes"
 msgstr "Arka plan işlemleri"
 
@@ -3555,6 +3589,9 @@ msgstr "Hangi ajanı isterseniz getirin"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode veya herhangi bir kodlama ajanını tek bir çalışma alanında toplayın. Görevleri ayrı dallarda paralel çalıştırın ve her şeyi tek bir yerden inceleyin."
 
+msgid "Bring in an agent"
+msgstr "Bir ajan getir"
+
 msgid "Bring over your projects"
 msgstr "Projelerinizi aktarın"
 
@@ -3576,11 +3613,14 @@ msgstr "Toplulukça paylaşılan becerilere, MCP sunucularına ve ajan yapıland
 msgid "Browse for directory"
 msgstr "Dizine gözat"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Paradev eklentilerine, paylaşılan temalara ve gelecekteki ajan yapılandırmalarına göz atın."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "GitHub Dark Colorblind, Catppuccin, Ember ve One Dark Pro dahil olmak üzere toplulukça paylaşılan Paradev tema dosyalarına göz atın."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Paradev için paylaşılan temalara ve gelecekteki ajan yapılandırmalarına göz atın."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Her Paradev ajanının kullanabileceği eklentilere göz atın ve kendi eklentinizi gönderin."
 
 msgid "Browse the repo ↗"
 msgstr "Depoya göz atın ↗"
@@ -3629,6 +3669,9 @@ msgstr "Son yazılım parçasını inşa etmek"
 
 msgid "Building the last piece of software."
 msgstr "Son yazılım parçasını inşa ediyoruz."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Bir eklenti mi geliştirdiniz? Buradan gönderin."
 
 msgid "Built in Paradev"
 msgstr "Paradev ile geliştirildi"
@@ -3753,6 +3796,9 @@ msgstr "Kamera kullanılamıyor"
 
 msgid "Can comment"
 msgstr "Yorum yapabilir"
+
+msgid "Can edit"
+msgstr "Düzenleyebilir"
 
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Daha fazla bulut GB-saati satın alabilir miyim?"
@@ -4614,8 +4660,8 @@ msgstr "Bulut çalışma alanları bu değişkeni yok sayar. Ajanlar bunun yerin
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Bulut çalışma alanları Team veya Ultra planı gerektirir. Başlatmak için Ayarlar, Faturalandırma bölümünden yükseltin."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Bulut çalışma alanları bunda açılır ve onun .superset/config.json dosyası kurulumu çalıştırır. Diğerleri yanına alınır."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Bulut çalışma alanları bunda açılır ve onun Paradev yapılandırması kurulumu çalıştırır. Diğerleri yanına alınır."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Bulut çalışma alanları {agentLabel} için bunu kullanmayı bırakacak."
@@ -5524,6 +5570,9 @@ msgstr "Eklenti devre dışı bırakılamadı"
 
 msgid "Could not disconnect."
 msgstr "Bağlantı kesilemedi."
+
+msgid "Could not download {names}."
+msgstr "{names} indirilemedi."
 
 msgid "Could not forget {domain}"
 msgstr "{domain} unutulamadı"
@@ -6501,6 +6550,9 @@ msgstr "Ölü"
 msgid "Debug"
 msgstr "Hata ayıklama"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Başarısız çalıştırmalarda hata ayıklayın ve fonksiyonları yeniden çalıştırın"
+
 msgid "Debug with production stack traces"
 msgstr "Üretim yığın izleriyle hata ayıklayın"
 
@@ -7117,6 +7169,9 @@ msgstr "Mobil kenar çubuğunu gösterir."
 msgid "Do anything"
 msgstr "Ne isterseniz"
 
+msgid "Do anything in Paradev"
+msgstr "Paradev'de ne isterseniz"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Kendi kodlama ajanı aboneliklerime ihtiyacım var mı?"
 
@@ -7619,6 +7674,9 @@ msgstr "URL girin..."
 
 msgid "Enterprise"
 msgstr "Kurumsal"
+
+msgid "environment"
+msgstr "Ortam"
 
 msgid "Environment"
 msgstr "Ortam"
@@ -9414,6 +9472,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Ana dizin"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -9502,8 +9563,8 @@ msgstr "Çalıştırmalar arasındaki saat"
 msgid "Hover Card"
 msgstr "Üzerine gelme kartı"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Paradev sizin için çalıştırdığında {label} nasıl giriş yapar."
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "{label} bulut çalışma alanlarında nasıl kimlik doğrular."
 
 msgid "How 2026 plays out"
 msgstr "2026 nasıl geçecek"
@@ -9916,6 +9977,9 @@ msgstr "Paradev ekibinden paralel kodlama ajanları ve geliştirici verimliliği
 msgid "Inspect branches and run SQL"
 msgstr "Branch'leri inceleyin ve SQL çalıştırın"
 
+msgid "Inspect tables and apply migrations"
+msgstr "Tabloları inceleyin ve migration'ları uygulayın"
+
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
 msgstr "{0} inceleniyor"
@@ -9931,6 +9995,9 @@ msgstr "Kur ve yeniden başlat"
 
 msgid "Install & Restart"
 msgstr "Kur ve yeniden başlat"
+
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Paradev uygulamasında bir eklenti yükleyin, her ajan onu kullanabilsin."
 
 msgid "Install failed"
 msgstr "Kurulum başarısız"
@@ -10766,6 +10833,9 @@ msgstr "Linear istekleri sınırlıyor. Birkaç dakika sonra tekrar dene."
 msgid "Linear issues"
 msgstr "Linear issue'ları"
 
+msgid "Linear project"
+msgstr "Linear projesi"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10796,9 +10866,6 @@ msgstr "Bu görevi bağla"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} çalışma alanına bağlandı"
-
-msgid "Linked to {projectName}"
-msgstr "{projectName} ile bağlantılı"
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11085,6 +11152,9 @@ msgstr "Düşük önem"
 
 msgid "Machine resources"
 msgstr "Makine kaynakları"
+
+msgid "Machine size"
+msgstr "Makine boyutu"
 
 msgid "Machine size: {label}"
 msgstr "Makine boyutu: {label}"
@@ -11965,9 +12035,6 @@ msgstr "Sonraki görsel"
 msgid "Next match"
 msgstr "Sonraki eşleşme"
 
-msgid "Next release"
-msgstr "Sonraki sürüm"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "Sonraki çalıştırma {0}"
@@ -12184,14 +12251,14 @@ msgstr "Henüz indirme yok"
 msgid "No emoji found"
 msgstr "Emoji bulunamadı"
 
-msgid "No environments are linked to this project yet."
-msgstr "Bu projeye henüz bağlı bir ortam yok."
-
 msgid "No environments available"
 msgstr "Kullanılabilir ortam yok"
 
 msgid "No environments found."
 msgstr "Ortam bulunamadı."
+
+msgid "No environments linked to this project."
+msgstr "Bu projeye bağlı ortam yok."
 
 msgid "No environments yet."
 msgstr "Henüz ortam yok. Bir bulut çalışma alanını üzerinden başlatmak için bir ortam oluşturun."
@@ -13193,6 +13260,9 @@ msgstr "Etkin terminal için çok satırlı istem düzenleyicisini aç"
 msgid "Open a new {label} chat?"
 msgstr "Yeni bir {label} sohbeti açılsın mı?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Eklentinizi Paradev deposuna ekleyen bir pull request açın. İnceleyip pazar yerine ekleyelim."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "İnceleme durumunu, kontrolleri ve yorumları görmek için bir pull request açın."
 
@@ -13936,6 +14006,9 @@ msgstr "Paradev Tasarım Sistemi"
 msgid "Paradev desktop app"
 msgstr "Paradev masaüstü uygulaması"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev'in \"{name}\" dosyasını okuma izni yok."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise, takımlar için Paradev'dir. Nelerin dahil olduğunu ve kuruluşunuzda nasıl işleyebileceğini öğrenmek için bize ulaşın."
 
@@ -14035,8 +14108,8 @@ msgstr "Paradev Sayfalar demosu"
 msgid "Paradev Plugins"
 msgstr "Paradev Eklentileri"
 
-msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi trust.superset.sh adresinde inceleyin."
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
+msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
@@ -14429,6 +14502,9 @@ msgstr "Eklenti pazar yeri"
 msgid "Plugins"
 msgstr "Eklentiler"
 
+msgid "Plugins, themes, and agents"
+msgstr "Eklentiler, temalar ve ajanlar"
+
 msgid "Point at the page. Your agent makes the change."
 msgstr "Sayfayı işaret edin. Ajanınız değişikliği yapar."
 
@@ -14608,9 +14684,6 @@ msgstr "Önceki eşleşme"
 msgid "Previous prompts"
 msgstr "Önceki istemler"
 
-msgid "Previous release"
-msgstr "Önceki sürüm"
-
 msgid "Previous slide"
 msgstr "Önceki slayt"
 
@@ -14712,6 +14785,9 @@ msgstr "İlerleme"
 
 msgid "Progress · Spinner"
 msgstr "İlerleme · Spinner"
+
+msgid "project"
+msgstr "Proje"
 
 msgctxt "MCP server scope"
 msgid "project"
@@ -14877,6 +14953,9 @@ msgstr "Paradev CLI'dan veya MCP üzerinden yayınlayın."
 
 msgid "Publish from your own repo"
 msgstr "Kendi deponuzdan yayımlayın"
+
+msgid "Publish new versions, rename and share"
+msgstr "Yeni sürümler yayımlayabilir, yeniden adlandırabilir ve paylaşabilir"
 
 msgctxt "github release action"
 msgid "Published"
@@ -15229,6 +15308,9 @@ msgstr "Rebase ve birleştir"
 
 msgid "Rebase and merge"
 msgstr "Rebase ve birleştir"
+
+msgid "Recall what was said in meetings"
+msgstr "Toplantılarda söylenenleri hatırlayın"
 
 msgid "Recent Activity"
 msgstr "Son etkinlik"
@@ -16255,8 +16337,8 @@ msgstr "\"gh auth login\" çalıştırın veya GITHUB_TOKEN ayarlayın"
 msgid "Run {0} now"
 msgstr "{0} otomasyonunu şimdi çalıştır"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "Bir terminalde <0>{tokenCommand}</0><1><2/></1> çalıştırıp token'ı buraya yapıştırın."
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "Bir terminalde <0>{tokenCommand}</0><1><2/></1> çalıştırın ve aldığınız token'ı buraya yapıştırın."
 
 msgid "Run 01"
 msgstr "Run 01"
@@ -16533,6 +16615,9 @@ msgstr "Kapsam"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Puanlama, tablo {0} günlük kullanım gördüğünde başlar."
+
+msgid "Scrape and crawl websites"
+msgstr "Web sitelerini kazıyın ve tarayın"
 
 msgid "Screenshot copied"
 msgstr "Ekran görüntüsü kopyalandı"
@@ -17551,6 +17636,9 @@ msgstr "Bir kez oturum açın. Paradev bağlantıyı korur."
 msgid "Sign in to {0}"
 msgstr "{0} kuruluşunda oturum açın"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
+
 msgid "Sign in to continue"
 msgstr "Devam etmek için oturum açın"
 
@@ -17697,6 +17785,9 @@ msgstr "Altı fabrika otonomi düzeyi"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Altı fabrika otonomi düzeyi, aralarındaki eşikler ve 2026'nın bizi ne kadar ileri götüreceğine dair öngörümüz. Sonradan bizi notlandırabilesiniz diye şimdi yazıldı."
 
+msgid "size"
+msgstr "Boyut"
+
 msgid "Size"
 msgstr "Boyut"
 
@@ -17708,6 +17799,9 @@ msgstr "Beceri"
 
 msgid "Skills"
 msgstr "Beceriler"
+
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Ajanlarınız için beceriler ve MCP araçları. Kendi eklentinizi gönderin."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Beceriler Paradev eklentisiyle gelir ve kullandığınız her ajanda otomatik olarak güncel tutulur. Önizlemek için birine tıklayın."
@@ -18320,6 +18414,9 @@ msgstr "Alt ajan"
 msgid "Subagents"
 msgstr "Alt ajanlar"
 
+msgid "Subagents · {count}"
+msgstr "Alt ajanlar · {count}"
+
 msgid "Subject contains..."
 msgstr "Konu şunu içerir..."
 
@@ -18337,6 +18434,9 @@ msgstr "İstemi gönder"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "İstem gönderme hız sınırlaması yapılandırılmamış"
+
+msgid "Submit your plugin"
+msgstr "Eklentinizi gönderin"
 
 msgid "Submitting…"
 msgstr "Gönderiliyor…"
@@ -18975,8 +19075,8 @@ msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zaman�
 msgid "The code expired. Start again."
 msgstr "Kodun süresi doldu. Yeniden başlayın."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Paradev'in bu projenin çalışma alanlarını hazırlamak, çalıştırmak ve arşivlemek için çalıştırdığı komutlar (.superset/config.toml)."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Paradev'in bu projenin çalışma alanlarını hazırlamak, çalıştırmak ve arşivlemek için çalıştırdığı komutlar (deponun config.toml dosyası)."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Şirket, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, şirketi YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."
@@ -19191,6 +19291,9 @@ msgstr "Paradev host hizmeti beklenmedik şekilde durdu ({cause}) ve otomatik ol
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "Yol deponun içinde kalmalı"
 
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Eklenti değişikliği {seconds} saniye içinde tamamlanmadı."
+
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Havuz her ay sıfırlanır. Havuzu aşan kullanım her planda gösterilen GB-saat ücretiyle faturalandırılır."
 
@@ -19234,6 +19337,9 @@ msgstr "Aynı uygulama iPad'de yerel olarak, dikey ve yatay modda çalışır."
 
 msgid "The scorecard"
 msgstr "Puan tablosu"
+
+msgid "The selected element's context is too large to send"
+msgstr "Seçilen öğenin bağlamı gönderilemeyecek kadar büyük"
 
 msgid "The self-driving software factory"
 msgstr "Kendi kendini süren yazılım fabrikası"
@@ -19309,9 +19415,6 @@ msgstr "Tema önizleme kartı"
 
 msgid "Themes"
 msgstr "Temalar"
-
-msgid "Themes and agents"
-msgstr "Temalar ve ajanlar"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Bu komutlar bir çalışma alanı oluşturulduğunda otomatik olarak çalışır. <0>Belgelerimizi okuyun<1/></0>"
@@ -19655,9 +19758,6 @@ msgstr "Bu alt ajan şu anda arka plana taşınamıyor"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Bu alt ajan artık ana makine tarafından izlenmiyor. Dökümü, ajanın oturum dizininde diskte kalır."
-
-msgid "This task is in a channel you can't see"
-msgstr "Bu görev göremediğiniz bir kanalda"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Bu terminalde henüz devredilecek çıktı yok."
@@ -21415,9 +21515,6 @@ msgstr "Çalışma alanı açıldı, ancak terminal başlatılamadı."
 msgid "Workspace path is not available"
 msgstr "Çalışma alanı yolu kullanılamıyor"
 
-msgid "Workspace path is not available yet"
-msgstr "Çalışma alanı yolu henüz kullanılamıyor"
-
 msgid "Workspace restored"
 msgstr "Çalışma alanı geri yüklendi"
 
@@ -21565,8 +21662,8 @@ msgstr "Evet. Ücretsiz plan; 1 kullanıcı, yerel çalışma alanları, masaüs
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Evet. Bulut çalışma alanı olan planlarda sahipler, Ayarlar, Faturalandırma bölümünden GB-saat başına {packPrice} fiyatla istedikleri kadar ek GB-saat satın alabilir. Satın alınan GB-saatler aylık havuzdan sonra kullanılır ve süresi dolmaz; otomatik yükleme azaldıklarında daha fazlasını satın alabilir."
 
-msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Evet. Paradev, güvenlik kontrollerinin zaman içindeki işleyişini kapsayan SOC 2 Type II denetimini bağımsız bir denetçiyle tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi trust.superset.sh adresinde inceleyin."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+msgstr "Evet. Paradev, güvenlik kontrollerinin zaman içindeki işleyişini kapsayan SOC 2 Type II denetimini bağımsız bir denetçiyle tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Evet. Paradev, ajanlarınızın çalıştığı çalışma alanıdır, bir model sağlayıcısı değil. Claude Code, Codex, OpenCode veya herhangi bir CLI ajanını getirin ve her planda mevcut hesaplarınızı ya da API anahtarlarınızı kullanın."
@@ -21644,6 +21741,9 @@ msgstr "30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin
 
 msgid "You can see how we work before you talk to us."
 msgstr "Bizimle konuşmadan önce nasıl çalıştığımızı görebilirsiniz."
+
+msgid "You can view this page but not change it"
+msgstr "Bu sayfayı görüntüleyebilirsiniz ancak değiştiremezsiniz"
 
 msgid "You can view this page but not comment on it"
 msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"
@@ -21833,6 +21933,9 @@ msgstr "Planınız bulut ortamlarını içermiyor. Oluşturmak için Ayarlar, Fa
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Planınız {startDate} tarihinde {planName} olarak değişir. Bugün ücret alınmaz."
+
+msgid "Your prompt"
+msgstr "İsteminiz"
 
 msgid "Your rank"
 msgstr "Sıralamanız"

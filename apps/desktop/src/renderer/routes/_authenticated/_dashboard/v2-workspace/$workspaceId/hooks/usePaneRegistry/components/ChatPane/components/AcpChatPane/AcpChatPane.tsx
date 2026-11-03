@@ -69,6 +69,7 @@ export function AcpChatPane({
 	isActive,
 	onSessionInfo,
 	onPendingPromptsSent,
+	onLaunchPromptDelivered,
 	onQueuePrompt,
 	onOpenDiff,
 	onRestoreQueuedPrompts,
@@ -103,6 +104,7 @@ export function AcpChatPane({
 	/** A cloud launch's first prompt, which the agent got before this pane. */
 	launchPrompt?: string;
 	onPendingPromptsSent: () => void;
+	onLaunchPromptDelivered?: () => void;
 	onQueuePrompt: (content: UserContent[]) => void;
 	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
@@ -760,6 +762,9 @@ export function AcpChatPane({
 				: {})}
 			key={sessionId}
 			onPendingPromptsSent={onPendingPromptsSent}
+			onLaunchPromptDelivered={
+				launchPrompt ? onLaunchPromptDelivered : undefined
+			}
 			agentLabel={agentLabel}
 			agentSwitch={agentSwitch}
 			onModeChange={onModeChange}

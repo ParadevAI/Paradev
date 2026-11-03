@@ -425,6 +425,27 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a queued prompt does not hide that the agent awaits input", async () => {
+		const { runtime, sessionId } = startSession({
+			start: [{ kind: "session", session: { status: "idle" } }],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "session", session: { status: "awaiting_input" } },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+				],
+			],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		expect(second.queued).toBe(true);
+
+		await waitForApproval(runtime, sessionId);
+		expect(runtime.sessions.get(sessionId)?.status).toBe("awaiting_input");
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
+		await runtime.dispose();
+	});
+
 	test("cancelTurn interrupts the turn, cancels tools and stales approvals", async () => {
 		const { runtime, sessionId } = startSession({
 			turns: [

@@ -95,6 +95,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["cloud-sidebar"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/stores/chatTabsStore/chatTabsStore.ts",
+		["chat-tabs"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/listDisplayStore/listDisplayStore.ts",
 		["list-display"],
 	],

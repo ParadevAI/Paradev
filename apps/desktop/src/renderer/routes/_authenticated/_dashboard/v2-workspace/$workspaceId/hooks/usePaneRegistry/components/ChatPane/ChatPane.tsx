@@ -87,6 +87,12 @@ export function ChatPane({
 		ctx.actions.updateData(rest);
 	};
 
+	const clearLaunchPrompt = useCallback(() => {
+		const { launchPrompt: _delivered, ...rest } = latest.current;
+		latest.current = rest;
+		ctx.actions.updateData(rest);
+	}, [ctx.actions]);
+
 	if (data.agentSession) {
 		return (
 			<>
@@ -119,6 +125,7 @@ export function ChatPane({
 				draftId={data.draftId}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={clearPendingPrompts}
+				onLaunchPromptDelivered={clearLaunchPrompt}
 				onQueuePrompt={(content) => {
 					latest.current = {
 						...latest.current,
@@ -136,16 +143,18 @@ export function ChatPane({
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
 				onSessionInfo={({ harnessSessionId, title }) => {
-					const rebound = harnessSessionId !== undefined && data.agent;
-					const retitled = title !== undefined && title !== data.chatTitle;
+					const current = latest.current;
+					const rebound = harnessSessionId !== undefined && current.agent;
+					const retitled = title !== undefined && title !== current.chatTitle;
 					if (!rebound && !retitled) return;
-					ctx.actions.updateData({
-						...data,
+					latest.current = {
+						...current,
 						...(rebound
 							? { agent: { ...rebound, sessionId: harnessSessionId } }
 							: {}),
 						...(retitled ? { chatTitle: title } : {}),
-					});
+					};
+					ctx.actions.updateData(latest.current);
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
 					ctx.actions.setTitle(label);
@@ -215,7 +224,8 @@ export function ChatPane({
 				}}
 				onModeChange={(chatModeId) => {
 					if (data.agent) saveChatMode(data.agent.id, chatModeId);
-					ctx.actions.updateData({ ...data, chatModeId });
+					latest.current = { ...latest.current, chatModeId };
+					ctx.actions.updateData(latest.current);
 				}}
 				onSessionCreated={(sessionId, pendingPrompt) =>
 					ctx.actions.updateData({

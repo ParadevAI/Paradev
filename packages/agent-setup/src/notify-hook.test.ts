@@ -4,6 +4,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { getTemplatePath } from "./config";
 import { NOTIFY_SCRIPT_MARKER } from "./notify-hook";
+import { APP_HOME_DIR_NAME } from "./paths";
+
+const HOME_DIR_FALLBACK = `\${SUPERSET_HOME_DIR:-$HOME/${APP_HOME_DIR_NAME}}`;
 
 function readNotifyHookTemplate(): string {
 	return readFileSync(getTemplatePath("notify-hook.template.sh"), "utf-8");
@@ -18,7 +21,8 @@ const emptyHome = mkdtempSync(path.join(tmpdir(), "notify-hook-empty-home-"));
 function renderNotifyHookScript(): string {
 	return readNotifyHookTemplate()
 		.replaceAll("{{MARKER}}", NOTIFY_SCRIPT_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", "48763");
+		.replaceAll("{{DEFAULT_PORT}}", "48763")
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 const ambientEnvWithoutSuperset = Object.fromEntries(
@@ -359,9 +363,9 @@ describe("getNotifyScriptContent", () => {
 	});
 
 	it("resolves the endpoint at call time from org manifests, not only the frozen env URL", () => {
-		const script = readNotifyHookTemplate();
+		const script = renderNotifyHookScript();
 
-		expect(script).toContain("SUPERSET_HOME_DIR:-$HOME/.superset");
+		expect(script).toContain(HOME_DIR_FALLBACK);
 		expect(script).toContain("/host/*/manifest.json; do");
 		expect(script).toContain(
 			'HOOK_CANDIDATE_URLS="$SUPERSET_HOST_AGENT_HOOK_URL"',
@@ -469,13 +473,16 @@ describe("per-agent hook scripts dispatch to v2", () => {
 		["gemini-hook.template.sh", "AGENT_ID"],
 	] as const) {
 		it(`${template} posts v2 first and falls back to v1`, () => {
-			const script = readFileSync(getTemplatePath(template), "utf-8");
+			const script = readFileSync(
+				getTemplatePath(template),
+				"utf-8",
+			).replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 			expect(script).toContain(
 				'[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0',
 			);
 			expect(script).toContain(buildExpectedV2Payload(agentIdVar));
 			expect(script).toContain('curl -sX POST "$HOOK_URL"');
-			expect(script).toContain("SUPERSET_HOME_DIR:-$HOME/.superset");
+			expect(script).toContain(HOME_DIR_FALLBACK);
 			expect(script).toContain("/host/*/manifest.json; do");
 			expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
 			expect(script).toContain("/hook/complete");
@@ -720,7 +727,8 @@ describe("cursor-hook.template.sh identity", () => {
 	function renderCursorHook(): string {
 		return readFileSync(getTemplatePath("cursor-hook.template.sh"), "utf-8")
 			.replaceAll("{{MARKER}}", "# test hook")
-			.replaceAll("{{DEFAULT_PORT}}", "48763");
+			.replaceAll("{{DEFAULT_PORT}}", "48763")
+			.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 	}
 
 	async function runCursorHook(

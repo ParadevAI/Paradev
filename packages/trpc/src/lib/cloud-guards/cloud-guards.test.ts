@@ -31,10 +31,12 @@ stub(posthog, {
 	},
 });
 
-const { assertCloudAccess } = await import("./cloud-guards");
+const { assertCloudAccess, organizationOrFirst } = await import(
+	"./cloud-guards"
+);
 
 const signedIn = (email: string, id = "user-1") => ({
-	userId: "user-1",
+	principal: { userId: "user-1" },
 	session: { user: { id, email } },
 });
 
@@ -103,7 +105,32 @@ describe("assertCloudAccess", () => {
 		flagResult = false;
 		storedEmail = null;
 		await expect(
-			assertCloudAccess({ userId: "user-1", session: null }, null),
+			assertCloudAccess(
+				{ principal: { userId: "user-1" }, session: null },
+				null,
+			),
 		).rejects.toThrow(/this account/);
+	});
+});
+
+describe("organizationOrFirst", () => {
+	const caller = (
+		activeOrganizationId: string | null,
+		organizationIds?: string[],
+	) => ({
+		principal: { userId: "user-1" },
+		session: organizationIds ? { session: { organizationIds } } : null,
+		activeOrganizationId,
+		sandboxCaller: null,
+	});
+
+	test("a bearer that names no organization gets its token's first", () => {
+		expect(organizationOrFirst(caller(null, ["org-a", "org-b"]))).toBe("org-a");
+	});
+
+	test("the organization a request names wins", () => {
+		expect(organizationOrFirst(caller("org-b", ["org-a", "org-b"]))).toBe(
+			"org-b",
+		);
 	});
 });

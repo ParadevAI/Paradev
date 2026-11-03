@@ -80,6 +80,11 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.8,
 		},
 		{
+			url: `${baseUrl}/marketplace/plugins`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
 			url: `${baseUrl}/marketplace/themes`,
 			changeFrequency: "weekly",
 			priority: 0.8,

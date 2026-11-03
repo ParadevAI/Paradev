@@ -66,7 +66,7 @@ export function validateDirectoryPath(path: string, label: string): void {
  * Ensure the parent directory we're about to create a project under exists,
  * creating it (and any missing ancestors) when it doesn't. Unlike
  * `validateDirectoryPath`, a missing parent is a recoverable condition: the
- * default project location (e.g. `~/.superset/projects`) won't exist on a
+ * default project location (e.g. `~/.paradev/projects`) won't exist on a
  * fresh machine, and the user shouldn't have to pre-create it before their
  * first clone. Still rejects when the path exists but is a file.
  */

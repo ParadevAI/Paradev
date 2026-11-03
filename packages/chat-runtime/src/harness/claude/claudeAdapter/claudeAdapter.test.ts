@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import type { AdapterEvent } from "../../types";
+import type { SDKUserMessage } from "@anthropic-ai/claude-agent-sdk";
+import { attachedFilesBlock } from "../../attachedFiles";
+import type { AdapterEvent, ResolveAttachment } from "../../types";
 import {
 	ClaudeAdapter,
 	type ClaudeQuery,
+	type ClaudeQueryOptions,
 	type ClaudeSession,
 } from "./claudeAdapter";
 
@@ -10,8 +13,10 @@ type Harness = {
 	adapter: ClaudeAdapter;
 	iterator: AsyncIterator<AdapterEvent>;
 	emit: (message: unknown) => void;
+	crash: (error: Error) => void;
 	interrupts: number;
 	aborted: () => boolean;
+	options: () => ClaudeQueryOptions | null;
 };
 
 function messageStart(id: string): unknown {
@@ -34,11 +39,14 @@ function createHarness(): Harness {
 	const pending: unknown[] = [];
 	let notify: (() => void) | null = null;
 	let aborted = false;
+	let queryOptions: ClaudeQueryOptions | null = null;
+	let crashed: Error | null = null;
 	const state = { interrupts: 0 };
 
 	const stream: ClaudeSession = {
 		async *[Symbol.asyncIterator]() {
 			while (true) {
+				if (crashed) throw crashed;
 				const next = pending.shift();
 				if (next !== undefined) {
 					yield next;
@@ -55,6 +63,7 @@ function createHarness(): Harness {
 	};
 
 	const query: ClaudeQuery = ({ options }) => {
+		queryOptions = options;
 		options.abortController?.signal.addEventListener("abort", () => {
 			aborted = true;
 		});
@@ -73,11 +82,36 @@ function createHarness(): Harness {
 			notify = null;
 			resume?.();
 		},
+		crash: (error: Error) => {
+			crashed = error;
+			const resume = notify;
+			notify = null;
+			resume?.();
+		},
 		get interrupts() {
 			return state.interrupts;
 		},
 		aborted: () => aborted,
+		options: () => queryOptions,
 	};
+}
+
+async function untilStatus(
+	iterator: AsyncIterator<AdapterEvent>,
+): Promise<AdapterEvent[]> {
+	const seen: AdapterEvent[] = [];
+	for (let index = 0; index < 20; index += 1) {
+		const next = await iterator.next();
+		if (next.done) throw new Error("stream ended");
+		seen.push(next.value);
+		if (next.value.kind === "session" && next.value.session.status) return seen;
+	}
+	throw new Error("no session status");
+}
+
+function lastStatus(events: AdapterEvent[]): string | undefined {
+	const last = events.at(-1);
+	return last?.kind === "session" ? last.session.status : undefined;
 }
 
 async function nextTurn(
@@ -144,6 +178,110 @@ describe("ClaudeAdapter", () => {
 		await collect();
 
 		expect(reported).toEqual(["session-1"]);
+	});
+
+	test("an open approval reports the session awaiting input until answered", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		const canUseTool = harness.options()?.canUseTool;
+		void canUseTool?.(
+			"Bash",
+			{ command: "ls" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+			},
+		);
+		const raised = await untilStatus(harness.iterator);
+		expect(lastStatus(raised)).toBe("awaiting_input");
+
+		const approval = raised.find((event) => event.kind === "item");
+		const approvalId = approval?.kind === "item" ? approval.item.id : "";
+		harness.adapter.respondToApproval(approvalId, { type: "accept" });
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
+	});
+
+	test("an approval its turn left open does not hold the next turn awaiting input", async () => {
+		const harness = createHarness();
+		const ask = (toolUseID: string) =>
+			void harness.options()?.canUseTool?.(
+				"Bash",
+				{ command: "ls" },
+				{
+					signal: new AbortController().signal,
+					toolUseID,
+					requestId: toolUseID,
+				},
+			);
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+		ask("tool-1");
+		await untilStatus(harness.iterator);
+		harness.adapter.cancelTurn();
+		harness.emit(result());
+		const ended = await untilStatus(harness.iterator);
+		expect(
+			ended.some(
+				(event) => event.kind === "item" && event.item.status === "stale",
+			),
+		).toBe(true);
+
+		harness.adapter.prompt([{ type: "text", text: "second" }]);
+		harness.emit(messageStart("msg_2"));
+		await nextTurn(harness.iterator);
+		ask("tool-2");
+		const raised = await untilStatus(harness.iterator);
+		const approval = raised.find((event) => event.kind === "item");
+		const approvalId = approval?.kind === "item" ? approval.item.id : "";
+		harness.adapter.respondToApproval(approvalId, { type: "accept" });
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
+	});
+
+	test("a stream that fails while an approval waits leaves the session idle", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+		void harness.options()?.canUseTool?.(
+			"Bash",
+			{ command: "touch x" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+			},
+		);
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe(
+			"awaiting_input",
+		);
+
+		harness.crash(new Error("claude exited"));
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("idle");
+	});
+
+	test("an approval answered while no turn is open leaves the session idle", async () => {
+		const harness = createHarness();
+		await Promise.resolve();
+		void harness.options()?.canUseTool?.(
+			"Bash",
+			{ command: "touch x" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+			},
+		);
+		const raised = await untilStatus(harness.iterator);
+		expect(lastStatus(raised)).toBe("awaiting_input");
+		const approval = raised.find((event) => event.kind === "item");
+		const approvalId = approval?.kind === "item" ? approval.item.id : "";
+		harness.adapter.respondToApproval(approvalId, { type: "accept" });
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("idle");
 	});
 
 	test("dispose aborts the underlying session", async () => {
@@ -266,5 +404,131 @@ describe("ClaudeAdapter permission modes", () => {
 			session: { modeId: "bypassPermissions" },
 		});
 		expect(reverted.value).toMatchObject({ session: { modeId: "default" } });
+	});
+});
+
+describe("ClaudeAdapter attachments", () => {
+	function capturePrompts(resolveAttachment: ResolveAttachment) {
+		const sent: SDKUserMessage[] = [];
+		const stream: ClaudeSession = {
+			async *[Symbol.asyncIterator]() {
+				await new Promise(() => {});
+			},
+		};
+		const adapter = new ClaudeAdapter({
+			resolveAttachment,
+			query: ({ prompt }) => {
+				void (async () => {
+					for await (const message of prompt as AsyncIterable<SDKUserMessage>)
+						sent.push(message);
+				})();
+				return stream;
+			},
+		});
+		adapter.start({ cwd: "/workspace" });
+		return { adapter, sent };
+	}
+
+	const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+	const part = (name: string, mimeType: string) => ({
+		type: "attachment" as const,
+		attachmentId: name,
+		name,
+		mimeType,
+	});
+
+	test("sends an image as an image block", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/a/a.png",
+			mimeType: "image/png",
+			data: "cG5n",
+		}));
+		adapter.prompt([
+			{ type: "text", text: "what is this" },
+			part("shot.png", "image/png"),
+		]);
+		await flush();
+		expect(sent.map((message) => message.message.content)).toEqual([
+			[
+				{ type: "text", text: "what is this" },
+				{
+					type: "image",
+					source: { type: "base64", media_type: "image/png", data: "cG5n" },
+				},
+			],
+		]);
+	});
+
+	test("hands a non-image over as its name and path", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/b/b.pdf",
+			mimeType: "application/pdf",
+			data: "cGRm",
+		}));
+		adapter.prompt([part("spec.pdf", "application/pdf")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{
+				type: "text",
+				text: attachedFilesBlock([
+					{ name: "spec.pdf", path: "/store/b/b.pdf" },
+				]),
+			},
+		]);
+	});
+
+	test("drops an empty text part, which the API refuses as a block", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/a/a.png",
+			mimeType: "image/png",
+			data: "cG5n",
+		}));
+		adapter.prompt([{ type: "text", text: "" }, part("shot.png", "image/png")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{
+				type: "image",
+				source: { type: "base64", media_type: "image/png", data: "cG5n" },
+			},
+		]);
+	});
+
+	test("tells the agent which file it could not read", async () => {
+		const { adapter, sent } = capturePrompts(async () => null);
+		adapter.prompt([part("gone.png", "image/png")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{ type: "text", text: "[gone.png: could not be read]" },
+		]);
+	});
+
+	test("a prompt sent while an attachment resolves still goes second", async () => {
+		let release: () => void = () => {};
+		const { adapter, sent } = capturePrompts(
+			() =>
+				new Promise((resolve) => {
+					release = () =>
+						resolve({
+							path: "/store/c/c.png",
+							mimeType: "image/png",
+							data: "",
+						});
+				}),
+		);
+		adapter.prompt([part("first.png", "image/png")]);
+		adapter.prompt([{ type: "text", text: "second" }]);
+		await flush();
+		expect(sent).toEqual([]);
+		release();
+		await flush();
+		expect(sent.map((message) => message.message.content)).toEqual([
+			[
+				{
+					type: "image",
+					source: { type: "base64", media_type: "image/png", data: "" },
+				},
+			],
+			[{ type: "text", text: "second" }],
+		]);
 	});
 });

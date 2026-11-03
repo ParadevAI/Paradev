@@ -10,6 +10,7 @@ import { Redirect } from "renderer/components/Redirect";
 import { useWorkspaceNamingFailedToast } from "renderer/hooks/host-service/useWorkspaceNamingFailedToast";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useQuickCreateWorkspace } from "renderer/hooks/useQuickCreateWorkspace";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -18,6 +19,8 @@ import { DashboardSidebarPortsProvider } from "renderer/routes/_authenticated/_d
 import { PortForwardsProvider } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { WorkspaceSidebarPanel } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
+import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
+import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -33,12 +36,16 @@ import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
+import { ChatTabs } from "./components/ChatTabs";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
+import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMount";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
+import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
 import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
+import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
@@ -57,6 +64,7 @@ function DashboardLayout() {
 
 	const openNewWorkspace = useOpenNewWorkspace();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const isParadevShell = useParadevShell() && isV2CloudEnabled;
 	const portsDisplayMode = usePortsDisplayMode();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const quickCreateWorkspace = useQuickCreateWorkspace();
@@ -76,6 +84,7 @@ function DashboardLayout() {
 		const stopAutomationFailuresSync = syncPersistedStoreAcrossWindows(
 			useAutomationFailuresStore,
 		);
+		const stopChatTabsSync = syncPersistedStoreAcrossWindows(useChatTabsStore);
 
 		return () => {
 			stopWorkspaceSidebarSync();
@@ -83,6 +92,7 @@ function DashboardLayout() {
 			stopAgentStateSync();
 			stopCloudSidebarSync();
 			stopAutomationFailuresSync();
+			stopChatTabsSync();
 		};
 	}, []);
 	// Get current workspace from route to pre-select project in new workspace modal
@@ -122,6 +132,7 @@ function DashboardLayout() {
 		[hostWorkspaces, currentV2WorkspaceId],
 	);
 	const { machineId: localMachineId } = useLocalHostService();
+	const openNewWorkspaceInViewedProject = useOpenNewWorkspaceInViewedProject();
 	useWorkspaceNamingFailedToast();
 	// Forwarding needs port data only for a workspace on another machine;
 	// a local selection must not switch on cross-host port polling.
@@ -147,9 +158,9 @@ function DashboardLayout() {
 	});
 	useHotkey("TOGGLE_WORKSPACE_SIDEBAR", toggleWorkspaceSidebarCollapsed);
 	useHotkey("NEW_WORKSPACE", () =>
-		openNewWorkspace(
-			currentWorkspace?.projectId ?? currentV2Workspace?.projectId ?? undefined,
-		),
+		currentWorkspace?.projectId
+			? openNewWorkspace(currentWorkspace.projectId)
+			: openNewWorkspaceInViewedProject(),
 	);
 	useHotkey(
 		"QUICK_CREATE_WORKSPACE",
@@ -211,6 +222,41 @@ function DashboardLayout() {
 	const sidebarOutsideColumn =
 		!showsAppTopBar || (isV2CloudEnabled && !isWorkspaceSidebarCollapsed);
 
+	const content = versionMismatch ? (
+		// A v2 user on a stale v1 workspace route has nothing to go
+		// back to, so send them somewhere actionable instead of a
+		// dead-end "pick a workspace" screen. v1 users keep the
+		// static state — /new-workspace is a v2-only surface.
+		isV2CloudEnabled ? (
+			<Redirect to="/new-workspace" replace />
+		) : (
+			<CrossVersionMismatchState />
+		)
+	) : (
+		<ContentBoundary>
+			<Outlet />
+		</ContentBoundary>
+	);
+
+	const mounts = (
+		<>
+			<AddRepositoryModals />
+			<SaveAsEnvironmentMount />
+			<RestoreCloudWorkspaceMount />
+			{deleteTarget && (
+				<DeleteWorkspaceDialog
+					workspaceId={deleteTarget.workspaceId}
+					workspaceName={deleteTarget.workspaceName}
+					workspaceType={deleteTarget.workspaceType}
+					open={true}
+					onOpenChange={(open) => {
+						if (!open) setDeleteTarget(null);
+					}}
+				/>
+			)}
+		</>
+	);
+
 	return (
 		// The single ports-data provider for both layout modes. It lives up here
 		// (not in the sidebar) because in topbar mode the pill renders inside
@@ -231,47 +277,53 @@ function DashboardLayout() {
 		>
 			<PortForwardsProvider>
 				<RemotePortForwarder />
-				<div className="flex h-full w-full overflow-hidden">
-					<CommandPaletteHost />
-					{sidebarOutsideColumn && sidebarPanel}
-					<div className="flex flex-1 flex-col min-w-0 min-h-0">
-						{showsAppTopBar && <TopBar />}
-						<div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
-							{!sidebarOutsideColumn && sidebarPanel}
-							<div className="relative flex flex-1 min-h-0 min-w-0">
-								{versionMismatch ? (
-									// A v2 user on a stale v1 workspace route has nothing to go
-									// back to, so send them somewhere actionable instead of a
-									// dead-end "pick a workspace" screen. v1 users keep the
-									// static state — /new-workspace is a v2-only surface.
-									isV2CloudEnabled ? (
-										<Redirect to="/new-workspace" replace />
-									) : (
-										<CrossVersionMismatchState />
-									)
-								) : (
-									<ContentBoundary>
-										<Outlet />
-									</ContentBoundary>
-								)}
+				{isParadevShell ? (
+					<>
+						<CommandPaletteHost />
+						<TitleBarSlotsProvider>
+							<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
+								<TitleBar />
+								<ChatTabs />
+								<div className="flex min-h-0 flex-1">
+									<NavigationRail />
+									<WorkspaceSidebarPanel
+										collapsedWidth={0}
+										className={
+											isWorkspaceSidebarCollapsed
+												? "overflow-visible border-r-0"
+												: "border-r-0"
+										}
+									>
+										<DashboardSidebar
+											isCollapsed={isWorkspaceSidebarCollapsed}
+										/>
+									</WorkspaceSidebarPanel>
+									<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+										<div className="relative flex min-h-0 min-w-0 flex-1">
+											{content}
+										</div>
+									</div>
+								</div>
+							</div>
+						</TitleBarSlotsProvider>
+						{mounts}
+					</>
+				) : (
+					<div className="flex h-full w-full overflow-hidden">
+						<CommandPaletteHost />
+						{sidebarOutsideColumn && sidebarPanel}
+						<div className="flex flex-1 flex-col min-w-0 min-h-0">
+							{showsAppTopBar && <TopBar />}
+							<div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
+								{!sidebarOutsideColumn && sidebarPanel}
+								<div className="relative flex flex-1 min-h-0 min-w-0">
+									{content}
+								</div>
 							</div>
 						</div>
+						{mounts}
 					</div>
-					<AddRepositoryModals />
-					<SaveAsEnvironmentMount />
-					<RestoreCloudWorkspaceMount />
-					{deleteTarget && (
-						<DeleteWorkspaceDialog
-							workspaceId={deleteTarget.workspaceId}
-							workspaceName={deleteTarget.workspaceName}
-							workspaceType={deleteTarget.workspaceType}
-							open={true}
-							onOpenChange={(open) => {
-								if (!open) setDeleteTarget(null);
-							}}
-						/>
-					)}
-				</div>
+				)}
 			</PortForwardsProvider>
 		</DashboardSidebarPortsProvider>
 	);

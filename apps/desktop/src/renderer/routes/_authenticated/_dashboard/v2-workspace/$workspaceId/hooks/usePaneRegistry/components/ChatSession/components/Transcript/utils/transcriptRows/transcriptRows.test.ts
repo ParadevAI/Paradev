@@ -181,6 +181,35 @@ describe("transcriptRows", () => {
 		expect(rows[0]?.groupStart).toBe(true);
 	});
 
+	test("the clock of a turn held on a pending approval waits", () => {
+		const approval: ApprovalRequest = {
+			id: "ap1",
+			kind: "approval_request",
+			targetItemId: null,
+			title: "Allow this tool call?",
+			status: "pending",
+			startedAtMs: 3,
+		};
+		const held = (status: ApprovalRequest["status"]) =>
+			transcriptRows(
+				[
+					{
+						turnId: "t1",
+						turn: { id: "t1", status: "running", startedAtMs: 2 },
+						entries: [
+							{ kind: "item", item: prompt },
+							{ kind: "item", item: { ...approval, status } },
+						],
+					},
+				],
+				[],
+				new Set(),
+				find,
+			).find((row) => row.kind === "working");
+		expect(held("pending")).toMatchObject({ running: true, waiting: true });
+		expect(held("answered")).toMatchObject({ running: true, waiting: false });
+	});
+
 	test("a message sent mid-turn moves the clock under it", () => {
 		const steer = { ...prompt, id: "u2", clientId: "c2" };
 		const rows = transcriptRows(

@@ -1275,6 +1275,48 @@
       "when": 1793484147154,
       "tag": "0181_automation_group",
       "breakpoints": true
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1793572485694,
+      "tag": "0182_channel_task_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 183,
+      "version": "7",
+      "when": 1793572489433,
+      "tag": "0183_channel_tasks_into_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1793572726455,
+      "tag": "0184_drop_channel_tasks",
+      "breakpoints": true
+    },
+    {
+      "idx": 185,
+      "version": "7",
+      "when": 1793583125863,
+      "tag": "0185_channel_linear_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 186,
+      "version": "7",
+      "when": 1793679430808,
+      "tag": "0186_agent_turn_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 187,
+      "version": "7",
+      "when": 1793682579399,
+      "tag": "0187_page_share_role_edit",
+      "breakpoints": true
     }
   ]
 }

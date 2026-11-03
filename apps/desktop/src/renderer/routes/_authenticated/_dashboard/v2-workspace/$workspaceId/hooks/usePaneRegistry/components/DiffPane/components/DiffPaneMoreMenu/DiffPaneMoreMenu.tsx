@@ -16,12 +16,14 @@ import { useSettings } from "renderer/stores/settings";
 interface DiffPaneMoreMenuProps {
 	areAllFilesCollapsed: boolean;
 	onToggleCollapseAll: () => void;
+	commentNav?: { onPrev: () => void; onNext: () => void };
 }
 
 /** View options for the Changes pane, behind one button in its header. */
 export function DiffPaneMoreMenu({
 	areAllFilesCollapsed,
 	onToggleCollapseAll,
+	commentNav,
 }: DiffPaneMoreMenuProps) {
 	const { t } = useLingui();
 	const diffStyle = useSettings((s) => s.diffStyle);
@@ -71,6 +73,17 @@ export function DiffPaneMoreMenu({
 					<Trans>Show all lines</Trans>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuSeparator />
+				{commentNav && (
+					<>
+						<DropdownMenuItem onSelect={commentNav.onPrev}>
+							<Trans>Previous comment</Trans>
+						</DropdownMenuItem>
+						<DropdownMenuItem onSelect={commentNav.onNext}>
+							<Trans>Next comment</Trans>
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+					</>
+				)}
 				<DropdownMenuItem onSelect={onToggleCollapseAll}>
 					{areAllFilesCollapsed ? (
 						<Trans>Expand all files</Trans>

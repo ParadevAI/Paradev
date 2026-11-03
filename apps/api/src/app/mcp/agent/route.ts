@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createCaller } from "@superset/trpc";
@@ -7,7 +8,7 @@ import { createContext } from "@/trpc/context";
 
 const TURN_TOKEN_HEADER = "x-agent-turn-token";
 
-type DevTools = ReturnType<typeof createCaller>["devTools"];
+type Caller = ReturnType<typeof createCaller>;
 
 async function result(run: () => Promise<unknown>) {
 	try {
@@ -28,7 +29,8 @@ async function result(run: () => Promise<unknown>) {
 }
 
 /** The tools a Dev's main session uses, each acting under the caller's turn token. */
-function devToolsServer(tools: DevTools): McpServer {
+function devToolsServer(caller: Caller): McpServer {
+	const tools = caller.devTools;
 	const server = new McpServer({ name: "dev", version: "1.0.0" });
 	server.registerTool(
 		"reply",
@@ -119,6 +121,94 @@ function devToolsServer(tools: DevTools): McpServer {
 			inputSchema: {},
 		},
 		() => result(() => tools.listEnvironments()),
+	);
+	server.registerTool(
+		"read_channel",
+		{
+			description:
+				"Read a channel or thread you can read for this turn: who said what, oldest first. `channel` is a name (#roster) or a reply_to target (channel:<id> or channel:<id>/thread:<id>). Read before answering when the message refers to earlier talk. For more, pass the returned `before`. Top-level messages give each thread's target and reply count.",
+			inputSchema: {
+				channel: z.string(),
+				before: z.number().int().positive().optional(),
+				limit: z.number().int().min(1).max(50).optional(),
+			},
+		},
+		(args) => result(() => tools.readChannel(args)),
+	);
+	server.registerTool(
+		"channel_tasks",
+		{
+			description:
+				"What a channel's Tasks tab shows: the tasks of its Paradev project (slug, title, status, assignee, pull request), or the issues of its Linear project (identifier, title, status, assignee, url). `channel` is a name or a reply_to target.",
+			inputSchema: { channel: z.string() },
+		},
+		(args) => result(() => tools.channelTasks(args)),
+	);
+	server.registerTool(
+		"pages_publish",
+		{
+			description:
+				"Publish a self-contained HTML document as a Paradev page and return its URL. The page is recorded as the person you are working for. Pass pageId to add a version to one of your owner's pages; for anyone else you can only make new pages. Inline all CSS and JS: no network, no eval, no external scripts.",
+			inputSchema: {
+				html: z.string().min(1),
+				title: z.string().optional(),
+				description: z.string().optional(),
+				label: z.string().optional(),
+				pageId: z.string().optional(),
+				visibility: z.enum(["org", "just_me"]).optional(),
+			},
+		},
+		({ html, ...rest }) =>
+			result(async () => {
+				const bytes = Buffer.from(html, "utf8");
+				const staged = await caller.page.assets.upload({
+					kind: "document",
+					name: "page.html",
+					contentType: "text/html",
+					sizeBytes: bytes.length,
+					sha256: createHash("sha256").update(bytes).digest("hex"),
+				});
+				if (staged.upload) {
+					const response = await fetch(staged.upload.url, {
+						method: "PUT",
+						headers: staged.upload.headers,
+						body: bytes,
+					});
+					if (!response.ok) {
+						throw new Error(`Uploading the page failed (${response.status})`);
+					}
+				}
+				return caller.page.publish({
+					...rest,
+					fileId: staged.fileId,
+					filename: "page.html",
+				});
+			}),
+	);
+	server.registerTool(
+		"pages_list",
+		{
+			description:
+				"Your owner's pages, newest first; `search` matches title or slug. Empty when you work for someone else.",
+			inputSchema: { search: z.string().optional() },
+		},
+		(args) =>
+			result(() =>
+				caller.page.listPaginated(args.search ? { search: args.search } : {}),
+			),
+	);
+	server.registerTool(
+		"pages_pull",
+		{
+			description:
+				"One of your owner's pages: its details and a downloadUrl for the HTML of a version (the served one by default). Address it by id or slug.",
+			inputSchema: {
+				id: z.string().optional(),
+				slug: z.string().optional(),
+				version: z.number().int().optional(),
+			},
+		},
+		(args) => result(() => caller.page.pull(args)),
 	);
 	server.registerTool(
 		"routine_update",
@@ -223,7 +313,7 @@ async function handle(req: Request): Promise<Response> {
 		return Response.json({ error: "No turn token." }, { status: 401 });
 	}
 	const context = await createContext({ req, resHeaders: new Headers() });
-	const server = devToolsServer(createCaller(context).devTools);
+	const server = devToolsServer(createCaller(context));
 	const transport = new WebStandardStreamableHTTPServerTransport();
 	await server.connect(transport);
 	return transport.handleRequest(req);

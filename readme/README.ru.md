@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Затем запустите настройку окружения разработки из терминала этой рабочей области:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -293,13 +293,13 @@ worktree для разработки.
 
 ## Конфигурация
 
-Настройте скрипты setup, teardown и run для рабочих областей в `.superset/config.json`. См. [полную документацию](https://docs.paradev.com/setup-teardown-scripts).
+Настройте скрипты setup, teardown и run для рабочих областей в `.paradev/config.json`. См. [полную документацию](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

@@ -35,6 +35,7 @@ import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/co
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
 import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/components/LeaderboardAutoPublish";
 import { OrganizationPluginSync } from "renderer/routes/_authenticated/components/OrganizationPluginSync";
+import { ParadevShellSync } from "renderer/routes/_authenticated/components/ParadevShellSync";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
 import { PostHogPlanFlags } from "renderer/routes/_authenticated/components/PostHogPlanFlags";
 import { RealtimeNudges } from "renderer/routes/_authenticated/components/RealtimeNudges";
@@ -327,6 +328,7 @@ function AuthenticatedLayout() {
 			<CollectionsProvider>
 				<WindowTitle />
 				<PostHogPlanFlags />
+				<ParadevShellSync />
 				<GlobalBrowserLifecycle />
 				<GlobalPaneLayoutRequests />
 				<FileAutoSave />

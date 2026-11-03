@@ -1,157 +1,156 @@
-import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { promisify } from "node:util";
+import { msg } from "@lingui/core/macro";
 import {
 	createManagedSkills,
+	ensureDefaultMarketplace,
+	findInstalled,
+	forgetOrganizationPlugins as forgetOrganizationPluginsOnMachine,
 	installedPluginsFilePath,
-	mcpHeadersHelperCommand,
+	installOrganizationPlugin as installOrganizationPluginOnMachine,
+	installPlugin as installPluginOnMachine,
+	readInstalledPlugins,
 	readInstalledVersions,
+	reconcileOrganizationPlugins,
+	removePlugin,
 	resolveDisabledSkillIds,
-	syncManagedMcpServers,
+	restorePluginTrees,
+	serializePluginChange,
+	setPluginEnabled as setPluginEnabledOnMachine,
+	syncPluginMcpServers,
+	syncPlugins as syncPluginsOnMachine,
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { getBundledPluginDir } from "@superset/agent-setup/config";
+import { i18n } from "@superset/i18n";
 import { settings } from "@superset/local-db";
 import {
-	desiredPluginMcpServers,
+	DEFAULT_MARKETPLACE,
 	getPluginByName,
-	type InstalledPlugin,
 	isOrganizationMarketplace,
 	organizationIdOfMarketplace,
 	SUPERSET_MANAGED_SKILLS,
 } from "@superset/shared/plugins";
 import log from "electron-log/main";
 import { loadToken } from "lib/trpc/routers/auth/utils/auth-functions";
-import { env } from "main/env.main";
-import { resolveBundledCliPath } from "main/lib/bundled-cli";
+import { adoptDesktopInstallList } from "main/lib/adopt-desktop-install-list";
+import { createCloudApiClient } from "main/lib/cloud-api-client";
 import { localDb } from "main/lib/local-db";
-import { createSerialQueue } from "main/lib/serial-queue";
+import { runPluginChange } from "main/lib/run-plugin-change";
 
 /**
- * Installed-plugin state and its materialization into agent configs. State
- * lives on the local-db settings singleton (not renderer localStorage)
- * because the boot-time sync below runs in main before any renderer exists.
- * Sync is declarative: every call converges agent configs on the full
- * installed set, so installs and uninstalls both land on app restart even if
- * a mid-session sync was missed.
+ * Plugin changes on this machine, made in-process through @superset/agent-setup.
+ * installed_plugins.json is the only record of what is installed; the account
+ * side is the renderer's (cloudTrpc.plugins.*).
  */
 
-const execFileAsync = promisify(execFile);
-
-const pluginCliQueue = createSerialQueue();
-
-function queuePluginCli(
-	args: string[],
-	organizationId?: string | null,
-): Promise<void> {
-	return pluginCliQueue(() => runPluginCli(args, organizationId));
+export interface PluginChangeResult {
+	/** Set when the change landed but no agent config could take its tools. */
+	mcpError: string | null;
 }
 
-async function runPluginCli(
-	args: string[],
-	organizationId?: string | null,
-): Promise<void> {
-	const cli = resolveBundledCliPath();
-	if (!cli) {
-		log.warn("[plugins] no bundled CLI; skills were not provisioned");
-		return;
-	}
-
-	const { token } = await loadToken();
-	const { SUPERSET_ORGANIZATION_ID: _inherited, ...inherited } = process.env;
-	try {
-		await execFileAsync(cli, ["plugins", ...args, "--json"], {
-			timeout: 60_000,
-			// The CLI otherwise signs in as its own login and calls production.
-			env: {
-				...inherited,
-				SUPERSET_CLI_AUDIENCE: "internal",
-				SUPERSET_API_URL: env.NEXT_PUBLIC_API_URL,
-				...(token ? { SUPERSET_API_KEY: token } : {}),
-				...(organizationId ? { SUPERSET_ORGANIZATION_ID: organizationId } : {}),
-			},
-		});
-	} catch (error) {
-		log.warn(
-			`[plugins] ${args.join(" ")} failed; skills may be stale:`,
-			error instanceof Error ? error.message : error,
-		);
-		throw error;
-	}
-}
-
-export function getInstalledPlugins(): InstalledPlugin[] {
-	return localDb.select().from(settings).get()?.installedPlugins ?? [];
-}
-
-function saveInstalledPlugins(next: InstalledPlugin[]): void {
-	localDb
-		.insert(settings)
-		.values({ id: 1, installedPlugins: next })
-		.onConflictDoUpdate({
-			target: settings.id,
-			set: { installedPlugins: next },
-		})
-		.run();
-}
+const NO_CHANGE: PluginChangeResult = { mcpError: null };
 
 export function syncInstalledPluginMcpServers(): void {
-	if (env.NODE_ENV === "development") return;
-	syncManagedMcpServers(
-		desiredPluginMcpServers(getInstalledPlugins(), {
-			headersHelper: mcpHeadersHelperCommand(),
-		}),
-	);
+	const { error } = syncPluginMcpServers();
+	if (error) log.warn("[plugins] plugin MCP servers were not synced:", error);
 }
 
-/** Returns the updated install list; unknown plugin names return null. */
-export function installPlugin(name: string): InstalledPlugin[] | null {
-	const plugin = getPluginByName(name);
-	if (!plugin) return null;
-
-	const installed = getInstalledPlugins();
-	const existing = installed.find((entry) => entry.name === name);
-	const record: InstalledPlugin = {
-		name: plugin.name,
-		version: plugin.version,
-		installedAt: existing?.installedAt ?? new Date().toISOString(),
-		...(existing?.enabled === false ? { enabled: false } : {}),
-	};
-	const next = existing
-		? installed.map((entry) => (entry.name === name ? record : entry))
-		: [...installed, record];
-
-	saveInstalledPlugins(next);
-	void queuePluginCli(["install", name, "--update"]).catch(() => {});
-	return next;
+/** Moves the desktop's old local-db install list into installed_plugins.json, then installs their trees. */
+export async function adoptDesktopInstalls(): Promise<void> {
+	const list =
+		localDb
+			.select({ installedPlugins: settings.installedPlugins })
+			.from(settings)
+			.get()?.installedPlugins ?? [];
+	await serializePluginChange(async () => {
+		try {
+			const moved = adoptDesktopInstallList(list);
+			if (moved.length) {
+				log.info(`[plugins] moved ${moved.join(", ")} to the ledger`);
+				syncInstalledPluginMcpServers();
+			}
+		} catch (error) {
+			log.warn("[plugins] could not move the old install list:", error);
+		}
+		const failed = await restorePluginTrees();
+		if (failed.length)
+			log.warn(`[plugins] could not install: ${failed.join("; ")}`);
+	});
 }
 
-export function uninstallPlugin(name: string): InstalledPlugin[] {
-	const next = getInstalledPlugins().filter((entry) => entry.name !== name);
-	saveInstalledPlugins(next);
-	void queuePluginCli(["uninstall", name]).catch(() => {});
-	return next;
+async function installDefaultPlugin(name: string): Promise<PluginChangeResult> {
+	await ensureDefaultMarketplace();
+	const { mcpError } = await installPluginOnMachine(name, DEFAULT_MARKETPLACE, {
+		update: true,
+	});
+	return { mcpError };
 }
 
-/** The bundled CLI fetches an organization plugin's tree; skills are written here, where the templates live. */
-function queueOrganizationPluginCli(
-	args: string[],
-	organizationId: string | null,
-): Promise<void> {
-	return queuePluginCli(args, organizationId).finally(() =>
-		queueManagedSkillsSync(resolveDisabledSkillIds(getDisabledSkills())),
-	);
+/** Installs or updates; unknown plugin names return null. */
+export async function installPlugin(
+	name: string,
+): Promise<PluginChangeResult | null> {
+	if (!getPluginByName(name)) return null;
+	return runPluginChange(() => installDefaultPlugin(name));
+}
+
+/** Removing a plugin this machine does not have is a no-op. */
+export function uninstallPlugin(name: string): Promise<PluginChangeResult> {
+	return runPluginChange(async () => {
+		if (!findInstalled(readInstalledPlugins(), name, DEFAULT_MARKETPLACE)) {
+			return NO_CHANGE;
+		}
+		const { mcpError } = await removePlugin(name, DEFAULT_MARKETPLACE);
+		return { mcpError };
+	});
+}
+
+/**
+ * installed_plugins.json is the only `enabled` flag provisioning reads, so a
+ * toggle rewrites it and re-syncs. Enabling a plugin this machine does not
+ * have installs it; disabling one it does not have is a no-op.
+ */
+export function setPluginEnabled(
+	name: string,
+	enabled: boolean,
+): Promise<PluginChangeResult> {
+	return runPluginChange(async () => {
+		if (findInstalled(readInstalledPlugins(), name, DEFAULT_MARKETPLACE)) {
+			const { mcpError } = await setPluginEnabledOnMachine(
+				name,
+				enabled,
+				DEFAULT_MARKETPLACE,
+			);
+			return { mcpError };
+		}
+		return enabled && getPluginByName(name)
+			? installDefaultPlugin(name)
+			: NO_CHANGE;
+	});
+}
+
+async function signedInApi(organizationId?: string | null) {
+	const { token } = await loadToken();
+	if (!token) {
+		throw new Error(
+			i18n._(
+				msg({ message: "Sign in to change your organization's plugins." }),
+			),
+		);
+	}
+	return createCloudApiClient(token, organizationId);
 }
 
 export function installOrganizationPlugin(
 	name: string,
 	marketplace: string,
-): Promise<void> {
-	return queueOrganizationPluginCli(
-		["install", `${name}@organization`, "--update"],
-		organizationIdOfMarketplace(marketplace),
-	);
+): Promise<PluginChangeResult> {
+	return runPluginChange(async () => {
+		const api = await signedInApi(organizationIdOfMarketplace(marketplace));
+		const { mcpError } = await installOrganizationPluginOnMachine(api, name);
+		return { mcpError };
+	});
 }
 
 /** The version of each organization plugin on this machine, which only the ledger knows. */
@@ -169,11 +168,18 @@ export function setOrganizationPluginEnabled(
 	name: string,
 	marketplace: string,
 	enabled: boolean,
-): void {
-	void queueOrganizationPluginCli(
-		[enabled ? "enable" : "disable", name, "--marketplace", marketplace],
-		organizationIdOfMarketplace(marketplace),
-	).catch(() => {});
+): Promise<PluginChangeResult> {
+	return runPluginChange(async () => {
+		if (!findInstalled(readInstalledPlugins(), name, marketplace)) {
+			return NO_CHANGE;
+		}
+		const { mcpError } = await setPluginEnabledOnMachine(
+			name,
+			enabled,
+			marketplace,
+		);
+		return { mcpError };
+	});
 }
 
 const pendingForgetMarker = () =>
@@ -187,7 +193,10 @@ export async function forgetOrganizationPlugins(): Promise<void> {
 	const marker = pendingForgetMarker();
 	await fs.promises.mkdir(path.dirname(marker), { recursive: true });
 	await fs.promises.writeFile(marker, "");
-	await queueOrganizationPluginCli(["sync", "--forget-organizations"], null);
+	await runPluginChange(async () => {
+		forgetOrganizationPluginsOnMachine();
+		await syncPluginsOnMachine();
+	});
 	await fs.promises.rm(marker, { force: true });
 }
 
@@ -197,8 +206,28 @@ export function finishPendingOrganizationForget(): Promise<void> {
 		: Promise.resolve();
 }
 
+/**
+ * Brings this machine's organization plugins in line with the account, then
+ * re-provisions agents. Signed out, no organization's plugins stay.
+ */
 export function syncPlugins(organizationId?: string | null): Promise<void> {
-	return queueOrganizationPluginCli(["sync"], organizationId ?? null);
+	return runPluginChange(async () => {
+		const { token } = await loadToken();
+		if (!token) {
+			forgetOrganizationPluginsOnMachine();
+			await syncPluginsOnMachine();
+			return;
+		}
+		const { failed } = await reconcileOrganizationPlugins(
+			createCloudApiClient(token, organizationId),
+			(id) => createCloudApiClient(token, id),
+		);
+		await syncPluginsOnMachine();
+		if (failed.length) {
+			const names = failed.join(", ");
+			throw new Error(i18n._(msg({ message: `Could not download ${names}.` })));
+		}
+	});
 }
 
 /**
@@ -269,55 +298,16 @@ export function getBundledSkillIcons(): Record<string, string> {
 	return icons;
 }
 
-/**
- * Toggling re-syncs immediately: disable reaps, enable rewrites. A plugin
- * present only via the user's own config has no record yet — toggling adopts
- * it (creates the record) so the choice has somewhere to live.
- */
-export function setPluginEnabled(
-	name: string,
-	enabled: boolean,
-): InstalledPlugin[] {
-	const installed = getInstalledPlugins();
-	const hasRecord = installed.some((entry) => entry.name === name);
-	const plugin = getPluginByName(name);
-	const next = hasRecord
-		? installed.map((entry) =>
-				entry.name === name ? { ...entry, enabled } : entry,
-			)
-		: plugin
-			? [
-					...installed,
-					{
-						name: plugin.name,
-						version: plugin.version,
-						installedAt: new Date().toISOString(),
-						enabled,
-					},
-				]
-			: installed;
-	saveInstalledPlugins(next);
-	// installed_plugins.json is the only `enabled` flag provisioning reads, and
-	// local-db is not it: without this the skills stay materialized while the
-	// MCP servers are reaped, leaving the plugin half on.
-	void queuePluginCli([enabled ? "enable" : "disable", name]).catch(() => {});
-	return next;
-}
-
 export function getDisabledSkills(): string[] {
 	return localDb.select().from(settings).get()?.disabledSkills ?? [];
 }
 
-// Serializes the createManagedSkills resyncs triggered by setSkillEnabled and
-// writeBundledSkillContent so overlapping calls can't interleave:
-// createManagedSkills does multi-await fs work, and without this a second
-// call's resync could finish before the first's, leaving disk state
-// contradicting whichever write actually happened last.
-let managedSkillsSyncQueue: Promise<void> = Promise.resolve();
+// createManagedSkills does multi-await fs work, and so does every plugin
+// change; one queue keeps a resync from finishing out of order with either.
 function queueManagedSkillsSync(disabledSkills: readonly string[]): void {
-	managedSkillsSyncQueue = managedSkillsSyncQueue
-		.catch(() => {}) // a prior failure must not stall later syncs
-		.then(() => createManagedSkills({ disabledSkills }));
+	void serializePluginChange(() =>
+		createManagedSkills({ disabledSkills }),
+	).catch((error) => log.warn("[plugins] skill resync failed:", error));
 }
 
 /**

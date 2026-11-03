@@ -8,7 +8,7 @@ export const hostUpdateAuthorizationSchema = z.object({
 });
 
 export async function authorizeHostUpdate(
-	caller: { userId: string; organizationIds: string[] },
+	caller: { userId: string; isMember: boolean },
 	input: { organizationId: string; machineId: string; userId: string },
 	isOwner: (
 		organizationId: string,
@@ -17,7 +17,7 @@ export async function authorizeHostUpdate(
 	) => Promise<boolean>,
 ): Promise<{ allowed: boolean }> {
 	if (
-		!caller.organizationIds.includes(input.organizationId) ||
+		!caller.isMember ||
 		!(await isOwner(input.organizationId, input.machineId, caller.userId))
 	) {
 		throw new TRPCError({

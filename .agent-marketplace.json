@@ -1,5 +1,5 @@
 {
-	"$schema": "https://superset.sh/schemas/marketplace/1.0.0.json",
+	"$schema": "https://paradev.com/schemas/marketplace/1.0.0.json",
 	"name": "superset",
 	"description": "First-party Paradev plugins: skills and MCP tools for the agents you run.",
 	"owner": {
@@ -15,7 +15,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/github",
-			"version": "1.0.3"
+			"version": "1.0.4"
 		},
 		{
 			"name": "linear",
@@ -25,7 +25,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/linear",
-			"version": "1.5.5"
+			"version": "1.5.6"
 		},
 		{
 			"name": "notion",
@@ -35,7 +35,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/notion",
-			"version": "1.0.5"
+			"version": "1.0.6"
 		},
 		{
 			"name": "slack",
@@ -55,7 +55,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/sentry",
-			"version": "1.0.2"
+			"version": "1.0.3"
 		},
 		{
 			"name": "gmail",
@@ -75,7 +75,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/granola",
-			"version": "1.0.2"
+			"version": "1.0.3"
 		},
 		{
 			"name": "circleback",
@@ -85,7 +85,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/circleback",
-			"version": "1.0.2"
+			"version": "1.0.3"
 		},
 		{
 			"name": "ynab",
@@ -115,7 +115,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/stripe",
-			"version": "1.0.2"
+			"version": "1.0.3"
 		},
 		{
 			"name": "superhuman",
@@ -125,7 +125,7 @@
 			},
 			"category": "communication",
 			"source": "./plugins/superhuman",
-			"version": "1.0.2"
+			"version": "1.0.3"
 		},
 		{
 			"name": "neon",
@@ -195,7 +195,7 @@
 			},
 			"category": "data & apis",
 			"source": "./plugins/peec",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "sazabi",
@@ -205,6 +205,46 @@
 			},
 			"category": "development",
 			"source": "./plugins/sazabi",
+			"version": "1.0.0"
+		},
+		{
+			"name": "inngest",
+			"description": "Debug and operate Inngest: inspect runs and traces, send events, invoke and rerun functions, and query Insights.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "development",
+			"source": "./plugins/inngest",
+			"version": "1.0.0"
+		},
+		{
+			"name": "supabase",
+			"description": "Work with your Supabase projects: inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/supabase",
+			"version": "1.0.0"
+		},
+		{
+			"name": "firecrawl",
+			"description": "Turn the web into agent-ready data with Firecrawl: search, scrape, map, and crawl sites, and parse documents.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/firecrawl",
+			"version": "1.0.0"
+		},
+		{
+			"name": "wispr",
+			"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "productivity",
+			"source": "./plugins/wispr",
 			"version": "1.0.0"
 		}
 	],

@@ -15,14 +15,15 @@ import { TRPCError } from "@trpc/server";
 import { and, asc, count, desc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { anchorAttachments } from "../../lib/attachments";
-import { assertMember } from "../../lib/cloud-guards";
+import { assertMember, type MemberContext } from "../../lib/cloud-guards";
 import {
 	referencedFileIds,
 	toReadableDocument,
 	toStoredDocument,
 } from "../../lib/document-files";
 import { nudge } from "../../lib/realtime";
-import { jwtProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
+import { announceProjectTasks } from "../channel/channel-task";
 import {
 	assertTaskInOrganization,
 	taskColumns,
@@ -53,22 +54,22 @@ async function assertLeadIsMember(organizationId: string, userId: string) {
 	}
 }
 
-async function loadProject(ctx: { organizationIds: string[] }, id: string) {
+async function loadProject(ctx: MemberContext, id: string) {
 	const project = await db.query.taskProjects.findFirst({
 		where: eq(taskProjects.id, id),
 	});
 	if (!project) {
 		throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
 	}
-	assertMember(ctx.organizationIds, project.organizationId);
+	await assertMember(ctx, project.organizationId);
 	return project;
 }
 
 export const taskProjectRouter = {
-	list: jwtProcedure
+	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
 			const workspaceCounts = db
 				.select({
 					projectId: cloudWorkspaces.projectId,
@@ -129,7 +130,7 @@ export const taskProjectRouter = {
 		}),
 
 	/** One project with its tasks; its cloud workspaces come from the cloud workspace list. */
-	get: jwtProcedure
+	get: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const project = await loadProject(ctx, input.id);
@@ -183,7 +184,7 @@ export const taskProjectRouter = {
 		}),
 
 	/** A task belongs to one project; adding it here moves it from any other. */
-	addTask: jwtProcedure
+	addTask: personProcedure
 		.input(z.object({ id: z.string().uuid(), taskId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const project = await loadProject(ctx, input.id);
@@ -203,7 +204,7 @@ export const taskProjectRouter = {
 				await recordTaskActivity(
 					db,
 					input.taskId,
-					{ kind: "user", userId: ctx.userId },
+					{ kind: "user", userId: ctx.principal.userId },
 					[
 						{
 							fromProjectId: previous?.projectId ?? null,
@@ -213,10 +214,11 @@ export const taskProjectRouter = {
 				);
 			}
 			nudge(project.organizationId, "cloud_workspaces");
+			await announceProjectTasks([project.id, previous?.projectId]);
 			return { added: true };
 		}),
 
-	removeTask: jwtProcedure
+	removeTask: personProcedure
 		.input(z.object({ id: z.string().uuid(), taskId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const project = await loadProject(ctx, input.id);
@@ -233,15 +235,16 @@ export const taskProjectRouter = {
 				await recordTaskActivity(
 					db,
 					input.taskId,
-					{ kind: "user", userId: ctx.userId },
+					{ kind: "user", userId: ctx.principal.userId },
 					[{ fromProjectId: project.id, toProjectId: null }],
 				);
 			}
 			nudge(project.organizationId, "cloud_workspaces");
+			await announceProjectTasks([project.id]);
 			return { removed: true };
 		}),
 
-	create: jwtProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -261,10 +264,12 @@ export const taskProjectRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
 			const leadUserId =
-				input.leadUserId === undefined ? ctx.userId : input.leadUserId;
-			if (leadUserId && leadUserId !== ctx.userId) {
+				input.leadUserId === undefined
+					? ctx.principal.userId
+					: input.leadUserId;
+			if (leadUserId && leadUserId !== ctx.principal.userId) {
 				await assertLeadIsMember(input.organizationId, leadUserId);
 			}
 			const [project] = await db
@@ -290,7 +295,7 @@ export const taskProjectRouter = {
 			return project;
 		}),
 
-	update: jwtProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),

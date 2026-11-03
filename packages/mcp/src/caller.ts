@@ -9,11 +9,11 @@ export type McpCaller = ReturnType<typeof makeAppCaller>;
  * Build a tRPC server-side caller for the AppRouter scoped to an MCP context.
  *
  * Synthesizes the same shape `apps/api/src/trpc/context.ts` produces for HTTP
- * requests, so both `protectedProcedure` and `jwtProcedure` accept it:
- * - `session` carries `user.id` + `session.activeOrganizationId` for protected procs.
+ * requests, so `personProcedure` accepts it:
+ * - `session` carries `user.id` + `session.activeOrganizationId`.
  * - `headers` carries the minted JWT in `Authorization` + the active org id in
- *   the `x-superset-organization-id` header so jwt procs verify and org-scoped
- *   middleware reads the right org.
+ *   the `x-superset-organization-id` header, so org-scoped middleware reads the
+ *   right org.
  *
  * The minted JWT is reused across all calls in this request — the caller is
  * cheap to construct and tools call only one procedure each.

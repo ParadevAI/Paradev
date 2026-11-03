@@ -67,11 +67,26 @@ msgstr "“{0}”将通过{2}合并到{1}。在这里无法撤销。"
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "“{0}”将不再触发，其运行历史也会被移除。此操作无法撤销。"
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "“{name}”大小为 {size} — 无法附加超过 {limit} 的文件"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "“{name}”大小为 {size} — 无法向此工作区附加超过 {limit} 的文件。如果该文件位于工作区所在的机器上，请改为提及其路径。"
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "“{name}”是一个文件夹。请改为附加其中的文件。"
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "“{name}”超过 {limit}，这是云端以外的工作区可接收的上限"
+
 msgid "\"{name}\" paused"
 msgstr "“{name}”已暂停"
 
 msgid "\"{name}\" resumed"
 msgstr "“{name}”已恢复"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "“{name}”已被移动或删除。请重新附加。"
 
 msgid "\"{title}\" has finished its task"
 msgstr "“{title}”已完成任务"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {使用了 # 个工具} other {使用了 # 个工具}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} 个文件超过 {limit}，未添加"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "已附加 {count} 个文件 — 一条消息最多可包含 {max} 个"
+
 msgid "{count} GitHub stars"
 msgstr "{count}个GitHub星标"
 
@@ -1235,6 +1256,9 @@ msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Squ
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} 在 2026 年 10 月之前名为 {formerName}。"
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · 输入 # 更改项目、主机等"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 
@@ -1545,6 +1569,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1个cookie——忘记此站点"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 个文件超过 {limit}，未添加"
 
 msgid "1 hr"
 msgstr "1 小时"
@@ -2268,6 +2295,10 @@ msgstr "由智能体驱动的预览"
 
 msgid "Agents"
 msgstr "智能体"
+
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "智能体无法访问 {0} 的工具"
 
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "智能体无需中途干预即可完成常规工单。"
@@ -3308,6 +3339,9 @@ msgstr "投资方"
 msgid "Background"
 msgstr "背景"
 
+msgid "Background · {count}"
+msgstr "后台 · {count}"
+
 msgid "Background processes"
 msgstr "后台进程"
 
@@ -3555,6 +3589,9 @@ msgstr "带上任意智能体"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "把 Claude Code、Codex、OpenCode 或任何编码智能体带进同一个工作区。在不同分支上并行运行任务，并在一个地方审查所有内容。"
 
+msgid "Bring in an agent"
+msgstr "引入智能体"
+
 msgid "Bring over your projects"
 msgstr "迁入项目"
 
@@ -3576,11 +3613,14 @@ msgstr "浏览并安装社区共享的技能、MCP服务器和智能体配置。
 msgid "Browse for directory"
 msgstr "浏览目录"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "浏览 Paradev 插件、共享主题和即将推出的智能体配置。"
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "浏览社区共享的 Paradev 主题文件，包括 GitHub Dark Colorblind、Catppuccin、Ember 和 One Dark Pro。"
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "浏览 Paradev 的共享主题与未来的智能体配置。"
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "浏览每个 Paradev 智能体都能使用的插件，并提交你自己的插件。"
 
 msgid "Browse the repo ↗"
 msgstr "浏览仓库 ↗"
@@ -3629,6 +3669,9 @@ msgstr "打造最后一款软件"
 
 msgid "Building the last piece of software."
 msgstr "打造最后一款软件。"
+
+msgid "Built a plugin? Submit it here."
+msgstr "做了插件？在这里提交。"
 
 msgid "Built in Paradev"
 msgstr "在 Paradev 中构建"
@@ -3753,6 +3796,9 @@ msgstr "相机不可用"
 
 msgid "Can comment"
 msgstr "可评论"
+
+msgid "Can edit"
+msgstr "可编辑"
 
 msgid "Can I buy more cloud GB-hours?"
 msgstr "可以购买更多云端 GB 小时吗？"
@@ -4614,8 +4660,8 @@ msgstr "云工作区会忽略此变量。智能体改为在「设置 › 智能�
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "云工作区需要 Team 或 Ultra 方案。请在设置的账单中升级后启动。"
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "云工作区会在其上打开，并由它的 .superset/config.json 运行设置。其他仓库会检出在旁边。"
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "云工作区会在其上打开，并由它的 Paradev 配置运行设置。其他仓库会检出在旁边。"
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "云工作区将不再用它运行{agentLabel}。"
@@ -5524,6 +5570,9 @@ msgstr "无法停用插件"
 
 msgid "Could not disconnect."
 msgstr "无法断开连接。"
+
+msgid "Could not download {names}."
+msgstr "无法下载 {names}。"
 
 msgid "Could not forget {domain}"
 msgstr "无法忘记{domain}"
@@ -6501,6 +6550,9 @@ msgstr "已终止"
 msgid "Debug"
 msgstr "调试"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "调试失败的运行并重新运行函数"
+
 msgid "Debug with production stack traces"
 msgstr "用生产环境堆栈跟踪调试"
 
@@ -7117,6 +7169,9 @@ msgstr "显示移动端侧边栏。"
 msgid "Do anything"
 msgstr "做任何事"
 
+msgid "Do anything in Paradev"
+msgstr "在 Paradev 中做任何事"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "我需要自备编码智能体的订阅吗？"
 
@@ -7619,6 +7674,9 @@ msgstr "输入URL..."
 
 msgid "Enterprise"
 msgstr "企业版"
+
+msgid "environment"
+msgstr "环境"
 
 msgid "Environment"
 msgstr "环境"
@@ -9414,6 +9472,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "主目录"
 
+msgid "host"
+msgstr "主机"
+
 msgid "Host"
 msgstr "主机"
 
@@ -9502,8 +9563,8 @@ msgstr "运行间隔（小时）"
 msgid "Hover Card"
 msgstr "悬浮卡片"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Paradev 为你运行 {label} 时它如何登录。"
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "{label} 在云工作区中的身份验证方式。"
 
 msgid "How 2026 plays out"
 msgstr "2026年会怎么走"
@@ -9916,6 +9977,9 @@ msgstr "来自Paradev团队的洞见，关于并行编码智能体与开发者�
 msgid "Inspect branches and run SQL"
 msgstr "查看分支并运行 SQL"
 
+msgid "Inspect tables and apply migrations"
+msgstr "查看表并应用迁移"
+
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
 msgstr "正在检查{0}"
@@ -9931,6 +9995,9 @@ msgstr "安装并重启"
 
 msgid "Install & Restart"
 msgstr "安装并重启"
+
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "在 Paradev 应用中安装插件，每个智能体都能使用它。"
 
 msgid "Install failed"
 msgstr "安装失败"
@@ -10766,6 +10833,9 @@ msgstr "Linear正在限制请求，请几分钟后重试。"
 msgid "Linear issues"
 msgstr "Linear议题"
 
+msgid "Linear project"
+msgstr "Linear 项目"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10796,9 +10866,6 @@ msgstr "关联此任务"
 
 msgid "Linked {slug} to workspace"
 msgstr "已将{slug}关联到工作区"
-
-msgid "Linked to {projectName}"
-msgstr "已关联到 {projectName}"
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11085,6 +11152,9 @@ msgstr "低严重性"
 
 msgid "Machine resources"
 msgstr "机器资源"
+
+msgid "Machine size"
+msgstr "机器规格"
 
 msgid "Machine size: {label}"
 msgstr "机器规格：{label}"
@@ -11965,9 +12035,6 @@ msgstr "下一张图片"
 msgid "Next match"
 msgstr "下一个匹配"
 
-msgid "Next release"
-msgstr "下一个版本"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "下次运行{0}"
@@ -12184,14 +12251,14 @@ msgstr "暂无下载"
 msgid "No emoji found"
 msgstr "未找到表情"
 
-msgid "No environments are linked to this project yet."
-msgstr "尚无环境关联到此项目。"
-
 msgid "No environments available"
 msgstr "没有可用的环境"
 
 msgid "No environments found."
 msgstr "未找到环境。"
+
+msgid "No environments linked to this project."
+msgstr "没有环境关联到此项目。"
 
 msgid "No environments yet."
 msgstr "还没有环境。创建一个，以便基于它启动云端工作区。"
@@ -13193,6 +13260,9 @@ msgstr "为当前终端打开多行提示词编辑器"
 msgid "Open a new {label} chat?"
 msgstr "打开新的 {label} 聊天？"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "提交一个拉取请求，将它添加到 Paradev 仓库。我们会审核并将其添加到市场。"
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "创建拉取请求后即可查看评审状态、检查和评论。"
 
@@ -13936,6 +14006,9 @@ msgstr "Paradev设计系统"
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面应用"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev 没有读取“{name}”的权限。"
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise是面向团队的Paradev。联系我们，了解它包含什么，以及如何适配你的组织。"
 
@@ -14035,8 +14108,8 @@ msgstr "Paradev 页面演示"
 msgid "Paradev Plugins"
 msgstr "Paradev 插件"
 
-msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Paradev在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Paradev已通过独立审计机构的SOC 2 Type II审计。可在trust.superset.sh索取报告并查阅我们的安全文档。"
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
+msgstr "Paradev在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Paradev已通过独立审计机构的SOC 2 Type II审计。可在{trustHost}索取报告并查阅我们的安全文档。"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev起初是2025年11月的一个黑客松项目，一个用来管理worktree的简单桌面应用。"
@@ -14429,6 +14502,9 @@ msgstr "插件市场"
 msgid "Plugins"
 msgstr "插件"
 
+msgid "Plugins, themes, and agents"
+msgstr "插件、主题和智能体"
+
 msgid "Point at the page. Your agent makes the change."
 msgstr "指向页面，智能体来完成修改。"
 
@@ -14608,9 +14684,6 @@ msgstr "上一个匹配"
 msgid "Previous prompts"
 msgstr "历史提示词"
 
-msgid "Previous release"
-msgstr "上一个版本"
-
 msgid "Previous slide"
 msgstr "上一张"
 
@@ -14712,6 +14785,9 @@ msgstr "进度"
 
 msgid "Progress · Spinner"
 msgstr "进度条 · 加载指示器"
+
+msgid "project"
+msgstr "项目"
 
 msgctxt "MCP server scope"
 msgid "project"
@@ -14877,6 +14953,9 @@ msgstr "通过 Paradev CLI 或 MCP 发布。"
 
 msgid "Publish from your own repo"
 msgstr "从你自己的仓库发布"
+
+msgid "Publish new versions, rename and share"
+msgstr "发布新版本、重命名和共享"
 
 msgctxt "github release action"
 msgid "Published"
@@ -15229,6 +15308,9 @@ msgstr "变基并合并"
 
 msgid "Rebase and merge"
 msgstr "变基并合并"
+
+msgid "Recall what was said in meetings"
+msgstr "回顾会议中说过的内容"
 
 msgid "Recent Activity"
 msgstr "最近动态"
@@ -16255,8 +16337,8 @@ msgstr "运行 \"gh auth login\" 或设置 GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "立即运行{0}"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "在终端中运行<0>{tokenCommand}</0><1><2/></1>，然后把令牌粘贴到这里。"
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "在终端中运行<0>{tokenCommand}</0><1><2/></1>，然后把得到的令牌粘贴到这里。"
 
 msgid "Run 01"
 msgstr "Run 01"
@@ -16533,6 +16615,9 @@ msgstr "范围"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "当看板看到 {0} 天的使用数据后，才会开始计分。"
+
+msgid "Scrape and crawl websites"
+msgstr "抓取和爬取网站"
 
 msgid "Screenshot copied"
 msgstr "已复制截图"
@@ -17551,6 +17636,9 @@ msgstr "登录一次，Paradev 会保持连接。"
 msgid "Sign in to {0}"
 msgstr "登录{0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "登录后才能更改组织的插件。"
+
 msgid "Sign in to continue"
 msgstr "登录以继续"
 
@@ -17697,6 +17785,9 @@ msgstr "工厂自主的六个等级"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "工厂自主的六个等级、等级之间的关卡，以及我们对2026年能走多远的预测。现在写下来，方便你以后给我们打分。"
 
+msgid "size"
+msgstr "规格"
+
 msgid "Size"
 msgstr "大小"
 
@@ -17708,6 +17799,9 @@ msgstr "技能"
 
 msgid "Skills"
 msgstr "技能"
+
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "为你的智能体提供技能和 MCP 工具。提交你自己的插件。"
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "技能随Paradev插件一起提供，并会在你使用的每个智能体中自动保持最新。点击一个即可预览。"
@@ -18320,6 +18414,9 @@ msgstr "子智能体"
 msgid "Subagents"
 msgstr "子智能体"
 
+msgid "Subagents · {count}"
+msgstr "子智能体 · {count}"
+
 msgid "Subject contains..."
 msgstr "主题包含..."
 
@@ -18337,6 +18434,9 @@ msgstr "提交提示词"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "未配置提示词提交速率限制"
+
+msgid "Submit your plugin"
+msgstr "提交你的插件"
 
 msgid "Submitting…"
 msgstr "正在提交…"
@@ -18975,8 +19075,8 @@ msgstr "云端工作区本应已启动，但没有及时响应。下次运行时
 msgid "The code expired. Start again."
 msgstr "代码已过期。请重新开始。"
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自 .superset/config.toml。"
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自仓库的 config.toml。"
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
@@ -19191,6 +19291,9 @@ msgstr "Paradev主机服务意外停止（{cause}），且无法自动重启。"
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "路径必须位于仓库内"
 
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "插件更改未在 {seconds} 秒内完成。"
+
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"
 
@@ -19234,6 +19337,9 @@ msgstr "同一个应用在 iPad 上原生运行，支持竖屏和横屏。"
 
 msgid "The scorecard"
 msgstr "评分表"
+
+msgid "The selected element's context is too large to send"
+msgstr "所选元素的上下文太大，无法发送"
 
 msgid "The self-driving software factory"
 msgstr "自动驾驶的软件工厂"
@@ -19309,9 +19415,6 @@ msgstr "主题预览卡片"
 
 msgid "Themes"
 msgstr "主题"
-
-msgid "Themes and agents"
-msgstr "主题与智能体"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"
@@ -19655,9 +19758,6 @@ msgstr "此子智能体现在无法移到后台"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主机不再跟踪该子智能体。其记录仍保存在磁盘上的智能体会话目录中。"
-
-msgid "This task is in a channel you can't see"
-msgstr "此任务位于你看不到的频道中"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "该终端还没有可交接的输出。"
@@ -21415,9 +21515,6 @@ msgstr "工作区已打开，但终端启动失败。"
 msgid "Workspace path is not available"
 msgstr "工作区路径不可用"
 
-msgid "Workspace path is not available yet"
-msgstr "工作区路径尚不可用"
-
 msgid "Workspace restored"
 msgstr "工作区已恢复"
 
@@ -21565,8 +21662,8 @@ msgstr "有。免费版面向个人，包含1个用户、本地工作区、桌�
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "可以。在包含云工作区的方案中，所有者可以在设置的账单中按每 GB 小时 {packPrice} 的价格购买任意数量的额外 GB 小时。购买的 GB 小时在每月额度池之后使用，永不过期，余量不足时自动充值可以继续购买。"
 
-msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "是的。Paradev已通过独立审计机构的SOC 2 Type II审计，覆盖我们的安全控制在一段时间内的实际运行情况。可在trust.superset.sh索取报告并查阅我们的安全文档。"
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+msgstr "是的。Paradev已通过独立审计机构的SOC 2 Type II审计，覆盖我们的安全控制在一段时间内的实际运行情况。可在{trustHost}索取报告并查阅我们的安全文档。"
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "需要。Paradev是智能体运行的工作区，不是模型提供商。带上Claude Code、Codex、OpenCode或任意CLI智能体，在任何方案下都可以使用你已有的账号或API密钥。"
@@ -21644,6 +21741,9 @@ msgstr "你可以在 30 天内从“设置 → 项目”恢复它。仓库文件
 
 msgid "You can see how we work before you talk to us."
 msgstr "在与我们交流之前，你就能看到我们是如何工作的。"
+
+msgid "You can view this page but not change it"
+msgstr "你可以查看此页面，但不能更改"
 
 msgid "You can view this page but not comment on it"
 msgstr "你可以查看此页面，但不能评论"
@@ -21833,6 +21933,9 @@ msgstr "你的套餐不包含云端环境。请在设置的账单中升级后再
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "您的方案将于 {startDate} 切换到 {planName}。今天不扣费。"
+
+msgid "Your prompt"
+msgstr "你的提示词"
 
 msgid "Your rank"
 msgstr "你的排名"

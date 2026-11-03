@@ -16,7 +16,7 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { reapOrphanFiles } from "../../lib/files";
 import { presignedPutUrl } from "../../lib/r2";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import {
 	assertPageCommentable,
 	assertPageReadable,
@@ -125,7 +125,7 @@ async function loadThread({
 }
 
 export const pageCommentRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(listPageCommentsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -204,7 +204,7 @@ export const pageCommentRouter = {
 			);
 		}),
 
-	markRead: protectedProcedure
+	markRead: personProcedure
 		.input(markReadPageCommentsSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -233,7 +233,7 @@ export const pageCommentRouter = {
 	 * once per page. Visibility is the same rule `page.list` applies, enforced
 	 * in the join rather than by loading each page.
 	 */
-	listForOrganization: protectedProcedure
+	listForOrganization: personProcedure
 		.input(listOrganizationPageCommentsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -388,7 +388,7 @@ export const pageCommentRouter = {
 	 * happens. Gated on commenting because attaching is: a viewer who could
 	 * never post the comment shouldn't get the upload either.
 	 */
-	createImageUpload: protectedProcedure
+	createImageUpload: personProcedure
 		.input(createCommentImageUploadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -426,7 +426,7 @@ export const pageCommentRouter = {
 			return { fileId: row.id, upload };
 		}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createPageCommentThreadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -521,7 +521,7 @@ export const pageCommentRouter = {
 			});
 		}),
 
-	reply: protectedProcedure
+	reply: personProcedure
 		.input(replyPageCommentSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -582,7 +582,7 @@ export const pageCommentRouter = {
 			);
 		}),
 
-	edit: protectedProcedure
+	edit: personProcedure
 		.input(editPageCommentSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -629,7 +629,7 @@ export const pageCommentRouter = {
 			return { id: input.commentId };
 		}),
 
-	resolve: protectedProcedure
+	resolve: personProcedure
 		.input(resolvePageCommentThreadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -655,7 +655,7 @@ export const pageCommentRouter = {
 			return { id: input.threadId, resolved: input.resolved };
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(deletePageCommentThreadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);

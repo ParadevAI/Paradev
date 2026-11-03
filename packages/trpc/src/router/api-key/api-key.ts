@@ -4,13 +4,13 @@ import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 
 export const apiKeyRouter = {
 	// API keys mint a session as their creator, so they are personal
 	// credentials: list and revoke are scoped to the session user, never
 	// the organization.
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		return db
 			.select({
 				id: apikeys.id,
@@ -24,7 +24,7 @@ export const apiKeyRouter = {
 			.orderBy(desc(apikeys.createdAt));
 	}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(z.object({ name: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = ctx.activeOrganizationId;
@@ -49,7 +49,7 @@ export const apiKeyRouter = {
 			return { key: result.key };
 		}),
 
-	revoke: protectedProcedure
+	revoke: personProcedure
 		.input(z.object({ id: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const [deleted] = await db

@@ -48,7 +48,7 @@ function withoutAmbientKeys(
 
 /**
  * A chat agent is launched with the env a terminal would launch it with, so
- * the same CLI resolves the same tools and auth either way. `~/.superset/bin`
+ * the same CLI resolves the same tools and auth either way. `~/.paradev/bin`
  * leads PATH because a terminal picks that up from the shell bootstrap, which
  * a directly spawned agent never runs, and it is what puts the superset CLI
  * and the agent wrappers in reach.

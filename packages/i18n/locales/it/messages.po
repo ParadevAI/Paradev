@@ -67,11 +67,26 @@ msgstr "\"{0}\" verrà unita in {1} tramite {2}. L'operazione non può essere an
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" smetterà di scattare e la sua cronologia delle esecuzioni verrà rimossa. L'operazione non può essere annullata."
 
+msgid "\"{name}\" is {size} — files over {limit} can't be attached"
+msgstr "\"{name}\" pesa {size}: non è possibile allegare file più grandi di {limit}"
+
+msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" pesa {size}: non è possibile allegare a questo workspace file più grandi di {limit}. Se il file si trova sulla macchina del workspace, indica invece il suo percorso."
+
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" è una cartella. Allega invece i file al suo interno."
+
+msgid "\"{name}\" is over {limit}, the most a workspace outside the cloud can take"
+msgstr "\"{name}\" supera {limit}, il massimo che un workspace fuori dal cloud può ricevere"
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" messa in pausa"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" ripresa"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" è stato spostato o eliminato. Allegalo di nuovo."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" ha completato il suo task"
@@ -905,6 +920,12 @@ msgstr "{count, plural, one {Usata # fonte} other {Usate # fonti}}"
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {usato # strumento} other {usati # strumenti}}"
 
+msgid "{count} files are over {limit} and were not added"
+msgstr "{count} file superano {limit} e non sono stati aggiunti"
+
+msgid "{count} files attached — a message carries at most {max}"
+msgstr "{count} file allegati: un messaggio ne può contenere al massimo {max}"
+
 msgid "{count} GitHub stars"
 msgstr "{count} star su GitHub"
 
@@ -1235,6 +1256,9 @@ msgstr "{productName} ha raccolto un round seed da 11,5 milioni di dollari guida
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} si chiamava {formerName} fino a ottobre 2026."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # per cambiare progetto, host e altro"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -1545,6 +1569,9 @@ msgstr "1"
 
 msgid "1 cookie — forget this site"
 msgstr "1 cookie — dimentica questo sito"
+
+msgid "1 file is over {limit} and was not added"
+msgstr "1 file supera {limit} e non è stato aggiunto"
 
 msgid "1 hr"
 msgstr "1 h"
@@ -2268,6 +2295,10 @@ msgstr "Anteprime guidate dall'agente"
 
 msgid "Agents"
 msgstr "Agenti"
+
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Gli agenti non possono raggiungere gli strumenti di {0}"
 
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Gli agenti completano i ticket di routine senza interventi a metà task."
@@ -3308,6 +3339,9 @@ msgstr "Sostenuti da"
 msgid "Background"
 msgstr "Sfondo"
 
+msgid "Background · {count}"
+msgstr "In background · {count}"
+
 msgid "Background processes"
 msgstr "Processi in background"
 
@@ -3555,6 +3589,9 @@ msgstr "Porta qualsiasi agente"
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Porta Claude Code, Codex, OpenCode o qualsiasi agente di coding in un unico workspace. Esegui le attività in parallelo su branch separati e revisiona tutto in un unico posto."
 
+msgid "Bring in an agent"
+msgstr "Coinvolgi un agente"
+
 msgid "Bring over your projects"
 msgstr "Importa i tuoi progetti"
 
@@ -3576,11 +3613,14 @@ msgstr "Sfoglia e installa skill, server MCP e configurazioni di agenti condivis
 msgid "Browse for directory"
 msgstr "Sfoglia le cartelle"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Esplora i plugin di Paradev, i temi condivisi e le future configurazioni degli agenti."
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Sfoglia i file dei temi Paradev condivisi dalla community, tra cui GitHub Dark Colorblind, Catppuccin, Ember e One Dark Pro."
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Sfoglia i temi condivisi e le future configurazioni degli agenti per Paradev."
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "Esplora i plugin che ogni agente Paradev può usare e invia il tuo."
 
 msgid "Browse the repo ↗"
 msgstr "Esplora il repository ↗"
@@ -3629,6 +3669,9 @@ msgstr "Costruiamo l'ultimo pezzo di software"
 
 msgid "Building the last piece of software."
 msgstr "Costruiamo l'ultimo pezzo di software."
+
+msgid "Built a plugin? Submit it here."
+msgstr "Hai creato un plugin? Invialo qui."
 
 msgid "Built in Paradev"
 msgstr "Costruito in Paradev"
@@ -3753,6 +3796,9 @@ msgstr "La fotocamera non è disponibile"
 
 msgid "Can comment"
 msgstr "Può commentare"
+
+msgid "Can edit"
+msgstr "Può modificare"
 
 msgid "Can I buy more cloud GB-hours?"
 msgstr "Posso acquistare altre GB-ore cloud?"
@@ -4614,8 +4660,8 @@ msgstr "Gli spazi di lavoro cloud ignorano questa variabile. Gli agenti accedono
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "I workspace cloud richiedono il piano Team o Ultra. Passa a un piano superiore in Impostazioni, Fatturazione per avviarne uno."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "I workspace cloud si aprono su di esso e il suo .superset/config.json esegue la configurazione. Gli altri vengono recuperati accanto."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "I workspace cloud si aprono su di esso e la sua configurazione Paradev esegue la preparazione. Gli altri vengono recuperati accanto."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "I workspace cloud smetteranno di eseguire {agentLabel} con questa credenziale."
@@ -5524,6 +5570,9 @@ msgstr "Impossibile disattivare il plugin"
 
 msgid "Could not disconnect."
 msgstr "Impossibile disconnettere."
+
+msgid "Could not download {names}."
+msgstr "Impossibile scaricare {names}."
 
 msgid "Could not forget {domain}"
 msgstr "Impossibile dimenticare {domain}"
@@ -6501,6 +6550,9 @@ msgstr "Terminata"
 msgid "Debug"
 msgstr "Debug"
 
+msgid "Debug failed runs and rerun functions"
+msgstr "Esegui il debug delle esecuzioni non riuscite e riesegui le funzioni"
+
 msgid "Debug with production stack traces"
 msgstr "Esegui il debug con gli stack trace di produzione"
 
@@ -7117,6 +7169,9 @@ msgstr "Mostra la barra laterale mobile."
 msgid "Do anything"
 msgstr "Fai qualsiasi cosa"
 
+msgid "Do anything in Paradev"
+msgstr "Fai qualsiasi cosa in Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Mi servono abbonamenti miei agli agenti di programmazione?"
 
@@ -7619,6 +7674,9 @@ msgstr "Inserisci l'URL..."
 
 msgid "Enterprise"
 msgstr "Enterprise"
+
+msgid "environment"
+msgstr "Ambiente"
 
 msgid "Environment"
 msgstr "Ambiente"
@@ -9414,6 +9472,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Home"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -9502,8 +9563,8 @@ msgstr "Ore tra le esecuzioni"
 msgid "Hover Card"
 msgstr "Hover Card"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Come accede {label} quando Paradev lo esegue per te."
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "Come {label} si autentica negli spazi di lavoro cloud."
 
 msgid "How 2026 plays out"
 msgstr "Come andrà il 2026"
@@ -9916,6 +9977,9 @@ msgstr "Approfondimenti del team Paradev su agenti di programmazione in parallel
 msgid "Inspect branches and run SQL"
 msgstr "Ispeziona i branch ed esegui SQL"
 
+msgid "Inspect tables and apply migrations"
+msgstr "Ispeziona le tabelle e applica le migrazioni"
+
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
 msgstr "Ispezione di {0}"
@@ -9931,6 +9995,9 @@ msgstr "Installa e riavvia"
 
 msgid "Install & Restart"
 msgstr "Installa e riavvia"
+
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Installa un plugin nell'app Paradev e ogni agente potrà usarlo."
 
 msgid "Install failed"
 msgstr "Installazione non riuscita"
@@ -10766,6 +10833,9 @@ msgstr "Linear sta limitando le richieste. Riprova tra qualche minuto."
 msgid "Linear issues"
 msgstr "Issue Linear"
 
+msgid "Linear project"
+msgstr "Progetto Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10796,9 +10866,6 @@ msgstr "Collega questa attività"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} collegato al workspace"
-
-msgid "Linked to {projectName}"
-msgstr "Collegati a {projectName}"
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11085,6 +11152,9 @@ msgstr "Gravità bassa"
 
 msgid "Machine resources"
 msgstr "Risorse della macchina"
+
+msgid "Machine size"
+msgstr "Dimensione della macchina"
 
 msgid "Machine size: {label}"
 msgstr "Dimensione della macchina: {label}"
@@ -11965,9 +12035,6 @@ msgstr "Immagine successiva"
 msgid "Next match"
 msgstr "Corrispondenza successiva"
 
-msgid "Next release"
-msgstr "Release successiva"
-
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
 msgstr "Prossima esecuzione {0}"
@@ -12184,14 +12251,14 @@ msgstr "Ancora nessun download"
 msgid "No emoji found"
 msgstr "Nessuna emoji trovata"
 
-msgid "No environments are linked to this project yet."
-msgstr "Nessun ambiente è ancora collegato a questo progetto."
-
 msgid "No environments available"
 msgstr "Nessun ambiente disponibile"
 
 msgid "No environments found."
 msgstr "Nessun ambiente trovato."
+
+msgid "No environments linked to this project."
+msgstr "Nessun ambiente collegato a questo progetto."
 
 msgid "No environments yet."
 msgstr "Nessun ambiente. Creane uno per avviare da lì un workspace cloud."
@@ -13193,6 +13260,9 @@ msgstr "Apri un compositore di prompt multiriga per il terminale attivo"
 msgid "Open a new {label} chat?"
 msgstr "Aprire una nuova chat {label}?"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Apri una pull request che lo aggiunga al repository di Paradev. Lo esaminiamo e lo aggiungiamo al marketplace."
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Apri una pull request per vedere lo stato della revisione, i controlli e i commenti."
 
@@ -13936,6 +14006,9 @@ msgstr "Paradev Design System"
 msgid "Paradev desktop app"
 msgstr "App desktop di Paradev"
 
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev non ha l'autorizzazione per leggere \"{name}\"."
+
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise è Paradev per i team. Contattaci per sapere cosa include e come può funzionare per la tua organizzazione."
 
@@ -14035,8 +14108,8 @@ msgstr "Demo di Paradev Pagine"
 msgid "Paradev Plugins"
 msgstr "Paradev Plugin"
 
-msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Paradev gira localmente sulle macchine dei tuoi sviluppatori. Non conserviamo il tuo codice né le conversazioni con l'AI, e Paradev ha completato un audit SOC 2 Type II con un revisore indipendente. Richiedi il report e consulta la nostra documentazione sulla sicurezza su trust.superset.sh."
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
+msgstr "Paradev gira localmente sulle macchine dei tuoi sviluppatori. Non conserviamo il tuo codice né le conversazioni con l'AI, e Paradev ha completato un audit SOC 2 Type II con un revisore indipendente. Richiedi il report e consulta la nostra documentazione sulla sicurezza su {trustHost}."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev è nato come progetto di un hackathon nel novembre 2025. Era una semplice app desktop per gestire i worktree."
@@ -14429,6 +14502,9 @@ msgstr "Marketplace dei plugin"
 msgid "Plugins"
 msgstr "Plugin"
 
+msgid "Plugins, themes, and agents"
+msgstr "Plugin, temi e agenti"
+
 msgid "Point at the page. Your agent makes the change."
 msgstr "Indica la pagina. Il tuo agente fa la modifica."
 
@@ -14608,9 +14684,6 @@ msgstr "Corrispondenza precedente"
 msgid "Previous prompts"
 msgstr "Prompt precedenti"
 
-msgid "Previous release"
-msgstr "Release precedente"
-
 msgid "Previous slide"
 msgstr "Diapositiva precedente"
 
@@ -14712,6 +14785,9 @@ msgstr "Avanzamento"
 
 msgid "Progress · Spinner"
 msgstr "Progress · Spinner"
+
+msgid "project"
+msgstr "Progetto"
 
 msgctxt "MCP server scope"
 msgid "project"
@@ -14877,6 +14953,9 @@ msgstr "Pubblica dalla CLI di Paradev o tramite MCP."
 
 msgid "Publish from your own repo"
 msgstr "Pubblica dal tuo repo"
+
+msgid "Publish new versions, rename and share"
+msgstr "Pubblicare nuove versioni, rinominare e condividere"
 
 msgctxt "github release action"
 msgid "Published"
@@ -15229,6 +15308,9 @@ msgstr "Rebase e merge"
 
 msgid "Rebase and merge"
 msgstr "Rebase e merge"
+
+msgid "Recall what was said in meetings"
+msgstr "Ritrova ciò che è stato detto nelle riunioni"
 
 msgid "Recent Activity"
 msgstr "Attività recente"
@@ -16255,8 +16337,8 @@ msgstr "Esegui \"gh auth login\" o imposta GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "Esegui {0} ora"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "Esegui <0>{tokenCommand}</0><1><2/></1> in un terminale e incolla qui il token."
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "Esegui <0>{tokenCommand}</0><1><2/></1> in un terminale e incolla qui il token che ottieni."
 
 msgid "Run 01"
 msgstr "Run 01"
@@ -16533,6 +16615,9 @@ msgstr "Ambito"
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Il punteggio parte quando la classifica dispone di {0} giorni di utilizzo."
+
+msgid "Scrape and crawl websites"
+msgstr "Estrai e scansiona siti web"
 
 msgid "Screenshot copied"
 msgstr "Screenshot copiato"
@@ -17551,6 +17636,9 @@ msgstr "Accedi una volta. Paradev mantiene la connessione."
 msgid "Sign in to {0}"
 msgstr "Accedi a {0}"
 
+msgid "Sign in to change your organization's plugins."
+msgstr "Accedi per modificare i plugin della tua organizzazione."
+
 msgid "Sign in to continue"
 msgstr "Accedi per continuare"
 
@@ -17697,6 +17785,9 @@ msgstr "Sei livelli di autonomia della fabbrica"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Sei livelli di autonomia della fabbrica, i gate tra di essi e la nostra previsione su quanto lontano ci porterà il 2026. Messo per iscritto ora, così potrai valutarci dopo."
 
+msgid "size"
+msgstr "Dimensione"
+
 msgid "Size"
 msgstr "Dimensione"
 
@@ -17708,6 +17799,9 @@ msgstr "Skill"
 
 msgid "Skills"
 msgstr "Skill"
+
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "Skill e strumenti MCP per i tuoi agenti. Invia il tuo."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Le skill sono incluse nel plugin Paradev e vengono mantenute aggiornate automaticamente in ogni agente che usi. Cliccane una per vederne l'anteprima."
@@ -18320,6 +18414,9 @@ msgstr "Sottoagente"
 msgid "Subagents"
 msgstr "Sottoagenti"
 
+msgid "Subagents · {count}"
+msgstr "Sottoagenti · {count}"
+
 msgid "Subject contains..."
 msgstr "L'oggetto contiene..."
 
@@ -18337,6 +18434,9 @@ msgstr "Invia il prompt"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "Il limite di frequenza per l'invio dei prompt non è configurato"
+
+msgid "Submit your plugin"
+msgstr "Invia il tuo plugin"
 
 msgid "Submitting…"
 msgstr "Invio…"
@@ -18975,8 +19075,8 @@ msgstr "Il workspace cloud avrebbe dovuto avviarsi, ma non ha risposto in tempo.
 msgid "The code expired. Start again."
 msgstr "Il codice è scaduto. Ricomincia."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "I comandi che Paradev esegue per preparare, avviare e archiviare i workspace di questo progetto, da .superset/config.toml."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "I comandi che Paradev esegue per preparare, avviare e archiviare i workspace di questo progetto, dal config.toml del repository."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "L’azienda ha raccolto un round seed da 11,5 milioni di dollari guidato da Union Square Ventures, con Y Combinator e Paul Graham. TechCrunch l’ha indicata tra le startup più promettenti del YC Demo Day."
@@ -19191,6 +19291,9 @@ msgstr "Il servizio host di Paradev si è arrestato in modo imprevisto ({cause})
 msgid "serverError.plugins.pluginSourcePathOutside"
 msgstr "Il percorso deve restare all'interno del repository"
 
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "La modifica del plugin non è terminata entro {seconds} secondi."
+
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Il pool si azzera ogni mese. L'uso oltre il pool viene addebitato per GB-ora alla tariffa indicata per ogni piano."
 
@@ -19234,6 +19337,9 @@ msgstr "La stessa app funziona in modo nativo su iPad, in verticale e in orizzon
 
 msgid "The scorecard"
 msgstr "La scheda di valutazione"
+
+msgid "The selected element's context is too large to send"
+msgstr "Il contesto dell’elemento selezionato è troppo grande per essere inviato"
 
 msgid "The self-driving software factory"
 msgstr "La fabbrica di software a guida autonoma"
@@ -19309,9 +19415,6 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Temi"
-
-msgid "Themes and agents"
-msgstr "Temi e agenti"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Questi comandi vengono eseguiti automaticamente quando viene creato un workspace. <0>Leggi la documentazione<1/></0>"
@@ -19655,9 +19758,6 @@ msgstr "Questo sottoagente non può essere spostato in background ora"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Questo sottoagente non è più tracciato dall'host. La sua trascrizione resta su disco nella directory di sessione dell'agente."
-
-msgid "This task is in a channel you can't see"
-msgstr "Questa attività è in un canale che non puoi vedere"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Questo terminale non ha ancora output da passare."
@@ -21415,9 +21515,6 @@ msgstr "Workspace aperto, ma il terminale non è partito."
 msgid "Workspace path is not available"
 msgstr "Il percorso del workspace non è disponibile"
 
-msgid "Workspace path is not available yet"
-msgstr "Il percorso dello spazio di lavoro non è ancora disponibile"
-
 msgid "Workspace restored"
 msgstr "Workspace ripristinato"
 
@@ -21565,8 +21662,8 @@ msgstr "Sì. Il piano Free copre i singoli con 1 utente, workspace locali, l'app
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Sì. Nei piani con workspace cloud, gli owner possono acquistare qualsiasi quantità di GB-ore extra a {packPrice} per GB-ora in Impostazioni, Fatturazione. Le GB-ore acquistate sono usate dopo il pool mensile e non scadono mai, e la ricarica automatica può acquistarne altre quando stanno per finire."
 
-msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Sì. Paradev ha completato un audit SOC 2 Type II con un revisore indipendente, che copre i nostri controlli di sicurezza nel tempo. Richiedi il report e consulta la nostra documentazione sulla sicurezza su trust.superset.sh."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+msgstr "Sì. Paradev ha completato un audit SOC 2 Type II con un revisore indipendente, che copre i nostri controlli di sicurezza nel tempo. Richiedi il report e consulta la nostra documentazione sulla sicurezza su {trustHost}."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Sì. Paradev è il workspace in cui girano i tuoi agenti, non un fornitore di modelli. Porta Claude Code, Codex, OpenCode o qualsiasi agente da CLI e usa i tuoi account o le tue chiavi API esistenti con qualsiasi piano."
@@ -21644,6 +21741,9 @@ msgstr "Puoi ripristinarlo da Impostazioni → Progetti per 30 giorni. La cartel
 
 msgid "You can see how we work before you talk to us."
 msgstr "Puoi vedere come lavoriamo prima di parlare con noi."
+
+msgid "You can view this page but not change it"
+msgstr "Puoi visualizzare questa pagina ma non modificarla"
 
 msgid "You can view this page but not comment on it"
 msgstr "Puoi visualizzare questa pagina ma non commentarla"
@@ -21833,6 +21933,9 @@ msgstr "Il tuo piano non include ambienti cloud. Esegui l'upgrade in Impostazion
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Il tuo piano passa a {planName} il {startDate}. Oggi non viene addebitato nulla."
+
+msgid "Your prompt"
+msgstr "Il tuo prompt"
 
 msgid "Your rank"
 msgstr "La tua posizione"

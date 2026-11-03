@@ -44,7 +44,7 @@ git worktree add ../app-search -b feat/search
 
 New worktrees do not include ignored files such as `node_modules` or `.env`, so each one needs a setup step, for example installing dependencies and copying environment files from the main checkout.
 
-**In Paradev:** press **⌘N** to create a workspace. Each new local branch-based workspace gets its own worktree, branch, and persistent terminal. A `setup` command in `.superset/config.json` runs automatically in every new workspace; use `$SUPERSET_ROOT_PATH` to copy files from the main checkout:
+**In Paradev:** press **⌘N** to create a workspace. Each new local branch-based workspace gets its own worktree, branch, and persistent terminal. A `setup` command in `.paradev/config.json` runs automatically in every new workspace; use `$SUPERSET_ROOT_PATH` to copy files from the main checkout:
 
 ```json
 { "setup": ["bun install", "cp \"$SUPERSET_ROOT_PATH/.env\" .env"] }

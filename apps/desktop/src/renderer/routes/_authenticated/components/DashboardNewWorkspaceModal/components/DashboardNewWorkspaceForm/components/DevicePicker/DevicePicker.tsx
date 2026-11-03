@@ -13,19 +13,19 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useEffect } from "react";
 import {
 	HiCheck,
-	HiChevronUpDown,
 	HiOutlineComputerDesktop,
 	HiOutlineServer,
 } from "react-icons/hi2";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../../PromptGroup/components/FormPickerTrigger";
+import { PickerChevron } from "../PickerChevron";
 import { useWorkspaceHostOptions } from "./hooks/useWorkspaceHostOptions";
 
 function OnlineDot({ online }: { online: boolean }) {
@@ -65,16 +65,22 @@ interface DevicePickerProps {
 	 * the event that opens a DropdownMenu.
 	 */
 	disabled?: boolean;
+	/** False on surfaces that can only launch on a host. */
+	offersCloud?: boolean;
 }
 
-function getSelectedIcon(hostId: string | null, machineId: string | null) {
+function getSelectedIcon(
+	hostId: string | null,
+	machineId: string | null,
+	className: string,
+) {
 	if (hostId === CLOUD_HOST_ID) {
-		return <CloudGlyph className="size-4 shrink-0" />;
+		return <CloudGlyph className={className} />;
 	}
 	if (hostId === null || hostId === machineId) {
-		return <HiOutlineComputerDesktop className="size-4 shrink-0" />;
+		return <HiOutlineComputerDesktop className={className} />;
 	}
-	return <HiOutlineServer className="size-4 shrink-0" />;
+	return <HiOutlineServer className={className} />;
 }
 
 export function DevicePicker({
@@ -83,20 +89,14 @@ export function DevicePicker({
 	className,
 	showLocalOnlineState = false,
 	disabled,
+	offersCloud = true,
 }: DevicePickerProps) {
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
+	const isParadevShell = useParadevShell();
 	const { currentDeviceName, localHostIsOnline, otherHosts } =
 		useWorkspaceHostOptions();
-	// A remembered cloud target outlives the flag that offers it, and the menu
-	// then has no cloud entry to point at what the trigger claims is selected.
-	// Undefined means the flags haven't resolved, which is not a "no".
-	useEffect(() => {
-		if (hostId === CLOUD_HOST_ID && cloudEnabled === false) {
-			onSelectHostId(machineId);
-		}
-	}, [cloudEnabled, hostId, machineId, onSelectHostId]);
 	const isLocal = hostId === null || hostId === machineId;
 	const selectedLabel =
 		hostId === CLOUD_HOST_ID
@@ -133,10 +133,14 @@ export function DevicePicker({
 					})}
 					title={selectedLabel}
 				>
-					{getSelectedIcon(hostId, machineId)}
+					{getSelectedIcon(
+						hostId,
+						machineId,
+						isParadevShell ? "size-3.5 shrink-0" : "size-4 shrink-0",
+					)}
 					<span className="truncate">{selectedLabel}</span>
 					{selectedOnline !== null && <OnlineDot online={selectedOnline} />}
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<PickerChevron />
 				</FormPickerTrigger>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
@@ -151,13 +155,13 @@ export function DevicePicker({
 					{localOnline !== null && <OnlineDot online={localOnline} />}
 					{isLocal && <HiCheck className="size-4" />}
 				</DropdownMenuItem>
-				{cloudEnabled && (
+				{offersCloud && (cloudEnabled || isCloud) && (
 					<DropdownMenuItem onSelect={() => onSelectHostId(CLOUD_HOST_ID)}>
 						<CloudGlyph className="size-4" />
 						<span className="flex-1">
 							<Trans>Cloud</Trans>
 						</span>
-						{hostId === CLOUD_HOST_ID && <HiCheck className="size-4" />}
+						{isCloud && <HiCheck className="size-4" />}
 					</DropdownMenuItem>
 				)}
 				{otherHosts.length > 0 && (

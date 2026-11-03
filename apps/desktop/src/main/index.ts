@@ -73,6 +73,7 @@ import { menuEmitter } from "./lib/menu-events";
 import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
 
 import {
+	adoptDesktopInstalls,
 	finishPendingOrganizationForget,
 	syncInstalledPluginMcpServers,
 } from "./lib/plugin-installs";
@@ -683,6 +684,9 @@ if (!gotTheLock) {
 		}
 		void finishPendingOrganizationForget().catch((error) =>
 			console.error("[main] Failed to remove organization plugins:", error),
+		);
+		void adoptDesktopInstalls().catch((error) =>
+			console.error("[main] Failed to move the desktop's plugin list:", error),
 		);
 		try {
 			installBundledCliShim();

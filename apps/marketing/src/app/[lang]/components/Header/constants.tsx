@@ -70,7 +70,7 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 			{
 				href: "/marketplace",
 				label: <Trans>Marketplace</Trans>,
-				description: <Trans>Themes and agents</Trans>,
+				description: <Trans>Plugins, themes, and agents</Trans>,
 			},
 		],
 	},

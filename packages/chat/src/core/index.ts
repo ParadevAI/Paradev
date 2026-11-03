@@ -1,3 +1,4 @@
+export * from "./attachmentTags/attachmentTags";
 export * from "./bookkeeping/readBookkeeping";
 export * from "./coalesce";
 export * from "./config/launchConfigSelections";
