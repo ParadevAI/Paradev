@@ -18380,7 +18380,7 @@ msgid "Starting the simulator…"
 msgstr "Uruchamianie symulatora…"
 
 msgid "Starting the workspace"
-msgstr "Uruchamianie workspace’u"
+msgstr "Uruchamianie obszaru roboczego"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Uruchamianie. To powinno zająć tylko chwilę."
@@ -19603,7 +19603,7 @@ msgid "This channel is archived"
 msgstr "Ten kanał jest zarchiwizowany"
 
 msgid "This chat couldn't move here. It is still in the workspace it came from."
-msgstr "Nie udało się przenieść tego czatu tutaj. Nadal jest w workspace, z którego pochodzi."
+msgstr "Nie udało się przenieść tego czatu tutaj. Nadal jest w obszarze roboczym, z którego pochodzi."
 
 msgid "This chat has ended."
 msgstr "Ten czat się zakończył."

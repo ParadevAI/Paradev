@@ -97,6 +97,7 @@ export function useMoveChatToComputer(workspaceId: string) {
 			seedMovedChat({
 				collections,
 				workspaceId: created.workspaceId,
+				projectId: project.id,
 				chatSessionId,
 				harnessSessionId: prepared.harnessSessionId,
 				agentId: "claude",

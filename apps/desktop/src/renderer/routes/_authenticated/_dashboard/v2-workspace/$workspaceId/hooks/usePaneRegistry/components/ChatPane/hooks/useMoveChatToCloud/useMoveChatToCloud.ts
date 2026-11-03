@@ -79,6 +79,7 @@ export function useMoveChatToCloud(workspaceId: string) {
 			seedMovedChat({
 				collections,
 				workspaceId: created.id,
+				projectId: null,
 				chatSessionId,
 				harnessSessionId: prepared.harnessSessionId,
 				agentId: "claude",

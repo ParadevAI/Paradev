@@ -18380,7 +18380,7 @@ msgid "Starting the simulator…"
 msgstr "Simulator wordt gestart…"
 
 msgid "Starting the workspace"
-msgstr "Workspace starten"
+msgstr "Werkruimte starten"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Bezig met starten. Dit duurt maar even."
@@ -19603,7 +19603,7 @@ msgid "This channel is archived"
 msgstr "Dit kanaal is gearchiveerd"
 
 msgid "This chat couldn't move here. It is still in the workspace it came from."
-msgstr "Deze chat kon niet hierheen worden verplaatst. Hij staat nog in de workspace waar hij vandaan kwam."
+msgstr "Deze chat kon niet hierheen worden verplaatst. Hij staat nog in de werkruimte waar hij vandaan kwam."
 
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."

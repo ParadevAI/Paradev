@@ -43,8 +43,18 @@ export async function runMoveOnThisComputer({
 		};
 	} catch (error) {
 		await cloudTrpcClient.chatMove.fail
-			.mutate({ moveId, error: rawErrorMessage(error).slice(0, 2000) })
-			.catch(() => {});
+			.mutate({
+				moveId,
+				error:
+					rawErrorMessage(error).slice(0, 2000) ||
+					"The move to this computer failed",
+			})
+			.catch((failError: unknown) =>
+				console.warn(
+					`[chat-move] could not record that move ${moveId} failed`,
+					failError,
+				),
+			);
 		throw error;
 	}
 	// The chat already moved; one whose agent did not start resumes when opened.

@@ -1082,7 +1082,7 @@ msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
-msgstr "{messageCount, plural, other {会話をコピーしています（#件のメッセージ）}}"
+msgstr "{messageCount, plural, one {会話をコピーしています（#件のメッセージ）} other {会話をコピーしています（#件のメッセージ）}}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."

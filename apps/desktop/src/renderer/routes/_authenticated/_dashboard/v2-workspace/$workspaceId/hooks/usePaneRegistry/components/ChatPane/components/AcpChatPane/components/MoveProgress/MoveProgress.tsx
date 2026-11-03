@@ -5,7 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { Check, Circle, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { runMoveOnThisComputer } from "../../../../utils/runMoveOnThisComputer";
@@ -13,7 +13,8 @@ import { useMoveArrival } from "./hooks/useMoveArrival";
 
 const STEPS = ["pending", "copying", "restoring"] as const;
 const POLL_MS = 1_000;
-const ARRIVAL_GRACE_MS = 15_000;
+// Longer than the control plane waits for `teleport.continueChat`.
+const ARRIVAL_GRACE_MS = 35_000;
 
 /**
  * Where a chat moving into this workspace has got to, as the control plane
@@ -48,7 +49,9 @@ export function MoveProgress({
 	// Until this move is recorded, the newest one is an earlier move elsewhere.
 	const move = latest?.toWorkspaceId === workspaceId ? latest : null;
 	const messageCount = move?.messageCount ?? 0;
-	const ready = move?.status === "ready";
+	// A newer move out of this workspace means the chat arrived here and left again.
+	const movedOn = latest?.fromWorkspaceId === workspaceId;
+	const ready = move?.status === "ready" || movedOn;
 	useMoveArrival({
 		ready,
 		live: sessionLive,
@@ -61,7 +64,19 @@ export function MoveProgress({
 	const retry = cloudTrpc.chatMove.retry.useMutation({
 		onSuccess: ({ moveId, runsOnThisComputer }) => {
 			void utils.chatMove.latest.invalidate({ chatSessionId });
-			if (!runsOnThisComputer || !activeHostUrl) return;
+			if (!runsOnThisComputer) return;
+			if (!activeHostUrl) {
+				void cloudTrpcClient.chatMove.fail
+					.mutate({ moveId, error: "This computer's host is not running" })
+					.catch((error: unknown) =>
+						console.warn(
+							`[chat-move] could not record that move ${moveId} failed`,
+							error,
+						),
+					)
+					.finally(() => utils.chatMove.latest.invalidate({ chatSessionId }));
+				return;
+			}
 			void runMoveOnThisComputer({
 				moveId,
 				host: getHostServiceClientByUrl(activeHostUrl),
@@ -152,9 +167,13 @@ function stepIndex(move: { status: string } | null | undefined): number {
 }
 
 function isSettledHere(
-	move: { status: string; toWorkspaceId: string } | null | undefined,
+	move:
+		| { status: string; toWorkspaceId: string; fromWorkspaceId: string | null }
+		| null
+		| undefined,
 	workspaceId: string,
 ): boolean {
+	if (move?.fromWorkspaceId === workspaceId) return true;
 	return (
 		move?.toWorkspaceId === workspaceId &&
 		(move.status === "ready" || move.status === "failed")

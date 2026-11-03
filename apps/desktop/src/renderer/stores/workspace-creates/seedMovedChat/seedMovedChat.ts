@@ -14,6 +14,7 @@ import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 export function seedMovedChat({
 	collections,
 	workspaceId,
+	projectId,
 	chatSessionId,
 	harnessSessionId,
 	agentId,
@@ -21,6 +22,8 @@ export function seedMovedChat({
 }: {
 	collections: AppCollections;
 	workspaceId: string;
+	/** The sidebar project the workspace files under; null for a cloud workspace. */
+	projectId: string | null;
 	chatSessionId: string;
 	harnessSessionId: string;
 	agentId: string;
@@ -29,7 +32,7 @@ export function seedMovedChat({
 	if (!collections.v2WorkspaceLocalState.get(workspaceId)) {
 		writeWorkspacePaneLayout(
 			collections,
-			{ id: workspaceId, projectId: null },
+			{ id: workspaceId, projectId },
 			[],
 			[],
 		);

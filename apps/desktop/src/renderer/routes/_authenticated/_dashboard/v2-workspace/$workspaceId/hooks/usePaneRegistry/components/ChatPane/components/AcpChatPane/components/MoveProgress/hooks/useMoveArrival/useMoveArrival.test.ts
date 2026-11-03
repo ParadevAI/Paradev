@@ -30,6 +30,16 @@ test("a ready move arrives only once its session is live", async () => {
 	expect(calls.checks).toBeGreaterThan(0);
 
 	hook.rerender({ ready: true, live: true });
+	expect(calls.arrived).toBe(1);
+});
+
+test("a live session arrives when its move becomes ready, and only once", () => {
+	const { calls, hook } = render({ ready: false, live: true });
+	expect(calls.arrived).toBe(0);
+
+	hook.rerender({ ready: true, live: true });
+	expect(calls.arrived).toBe(1);
+	hook.rerender({ ready: true, live: false });
 	hook.rerender({ ready: true, live: true });
 	expect(calls.arrived).toBe(1);
 });
