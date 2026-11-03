@@ -1097,8 +1097,8 @@ export function NewWorkspaceScreen({
 									</motion.div>
 								)}
 						</AnimatePresence>
-						<div className="flex items-center justify-between gap-3 px-1">
-							<div className="flex min-w-0 flex-1 items-center gap-1.5">
+						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
+							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{contextPickers}
 							</div>
 							{devicePicker}
@@ -1128,8 +1128,8 @@ export function NewWorkspaceScreen({
 							pending={isCreating}
 							placeholder={t({ message: "Do anything in Paradev" })}
 						/>
-						<div className="flex items-center justify-between gap-3 px-1">
-							<div className="flex min-w-0 flex-1 items-center gap-1.5">
+						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
+							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{modePicker}
 								<AgentPickerPill
 									agents={v2Agents}

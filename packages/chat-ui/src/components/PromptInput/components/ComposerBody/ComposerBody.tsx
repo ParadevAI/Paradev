@@ -656,14 +656,14 @@ export function ComposerBody({
 	const submitRef = useRef(submit);
 	submitRef.current = submit;
 
-	const isFocusUnclaimed = () => {
+	const isFocusUnclaimed = useCallback(() => {
 		const active = document.activeElement;
 		return (
 			active == null ||
 			active === document.body ||
 			Boolean(rootRef.current?.contains(active))
 		);
-	};
+	}, []);
 
 	const dictationSession = useDictation({
 		transcribe: (audio, options) => dictation?.transcribe(audio, options) ?? "",
@@ -676,6 +676,16 @@ export function ComposerBody({
 			if (isFocusUnclaimed()) editor.focus();
 		},
 	});
+	// The inline layout hides the editor while dictating, so the focus above
+	// cannot land until the session is idle again.
+	const isDictationIdle = dictationSession.status === "idle";
+	const wasDictatingRef = useRef(false);
+	useEffect(() => {
+		const returnedToIdle = wasDictatingRef.current && isDictationIdle;
+		wasDictatingRef.current = !isDictationIdle;
+		if (returnedToIdle && layout === "inline" && isFocusUnclaimed())
+			editor.focus();
+	}, [isDictationIdle, layout, editor, isFocusUnclaimed]);
 
 	useEffect(() => {
 		const unregisterText = editor.registerTextContentListener((text) =>
