@@ -48,6 +48,7 @@ function runInMainWorld(
 		chrome?: Record<string, unknown>;
 		sendNative?: unknown;
 		listenNative?: unknown;
+		callDnr?: unknown;
 	} = {},
 ): MainWorld {
 	const { protocol, hostname } = new URL(url);
@@ -59,6 +60,8 @@ function runInMainWorld(
 		toFirefoxUserAgent,
 		sendNative,
 		listenNative,
+		maxMessageLength,
+		callDnr,
 		...rest
 	] = args;
 	const world = {
@@ -78,6 +81,8 @@ function runInMainWorld(
 			toFirefoxUserAgent,
 			overrides.sendNative ?? sendNative,
 			overrides.listenNative ?? listenNative,
+			maxMessageLength,
+			overrides.callDnr ?? callDnr,
 			...rest,
 		],
 	};
@@ -252,4 +257,61 @@ test("sendNativeMessage closes the port after the first reply and reports failur
 	});
 	await done;
 	expect(callbackError).toBe("Specified native messaging host not found.");
+});
+
+test("an extension's chrome.declarativeNetRequest calls main and keeps Chrome's constants", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const callDnr = mock(async () => ["ublock-filters"]);
+	const nativeDnr = {
+		MAX_NUMBER_OF_REGEX_RULES: 1000,
+		RuleActionType: { BLOCK: "block" },
+		getEnabledRulesets: () => Promise.resolve([]),
+	};
+
+	const worker = runInMainWorld(shim, "chrome-extension://abc/background.js", {
+		isServiceWorker: true,
+		callDnr,
+		chrome: { declarativeNetRequest: nativeDnr },
+	});
+	const dnr = worker.chrome.declarativeNetRequest as Record<string, unknown> & {
+		getEnabledRulesets: () => Promise<string[]>;
+		updateDynamicRules: (options: unknown, callback: () => void) => void;
+	};
+	expect(await dnr.getEnabledRulesets()).toEqual(["ublock-filters"]);
+	expect(dnr.RuleActionType).toEqual({ BLOCK: "block" });
+	expect(dnr.DYNAMIC_RULESET_ID).toBe("_dynamic");
+	await new Promise<void>((done) =>
+		dnr.updateDynamicRules({ removeRuleIds: [1] }, done),
+	);
+	expect(callDnr).toHaveBeenLastCalledWith("updateDynamicRules", [
+		{ removeRuleIds: [1] },
+	]);
+
+	expect(
+		runInMainWorld(shim, "chrome-extension://abc/background.js", {
+			isServiceWorker: true,
+		}).chrome.declarativeNetRequest,
+	).toBeUndefined();
+});
+
+test("a failed chrome.declarativeNetRequest call still runs its callback, with runtime.lastError", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const runtime: { lastError?: { message: string } } = {};
+	const worker = runInMainWorld(shim, "chrome-extension://abc/background.js", {
+		isServiceWorker: true,
+		callDnr: async () => {
+			throw new Error(
+				"Error invoking remote method 'browser-extension-declarative-net-request': Error: Rule with id 1 does not have a unique ID.",
+			);
+		},
+		chrome: { runtime, declarativeNetRequest: {} },
+	});
+	const dnr = worker.chrome.declarativeNetRequest as {
+		updateDynamicRules: (options: unknown, callback: () => void) => void;
+	};
+	const seen = await new Promise<string | undefined>((resolve) =>
+		dnr.updateDynamicRules({}, () => resolve(runtime.lastError?.message)),
+	);
+	expect(seen).toBe("Rule with id 1 does not have a unique ID.");
+	expect(runtime.lastError).toBeUndefined();
 });

@@ -3,6 +3,7 @@ import { type BrowserWindow, nativeImage } from "electron";
 import type { ElectronChromeExtensions } from "electron-chrome-extensions";
 import { uninstallExtension } from "electron-chrome-web-store";
 import { localDb } from "main/lib/local-db";
+import { deleteExtensionRules } from "./declarative-net-request";
 import { createExtensionPins } from "./extension-pins";
 import { isUserExtension } from "./user-extensions";
 import { browserExtensionsPath } from "./web-store";
@@ -306,6 +307,7 @@ export async function removeBrowserExtension(
 	await host.session.clearStorageData({
 		origin: `chrome-extension://${extensionId}`,
 	});
+	await deleteExtensionRules(extensionId);
 	pins.setPinned(extensionId, false);
 	notifyBrowserExtensionsChanged();
 }

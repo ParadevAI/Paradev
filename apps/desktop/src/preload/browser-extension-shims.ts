@@ -1,5 +1,11 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
+	DNR_CHANNEL,
+	DNR_CONSTANTS,
+	DNR_METHODS,
+	type DnrMethod,
+} from "shared/browser-extension-dnr";
+import {
 	MAX_EXTENSION_MESSAGE_LENGTH,
 	NATIVE_MESSAGING_CHANNEL,
 	NATIVE_MESSAGING_EVENT_CHANNEL,
@@ -30,6 +36,9 @@ contextBridge.executeInMainWorld({
 			listener: (portId: number, event: NativePortEvent) => void,
 		) => void,
 		maxMessageLength: number,
+		callDnr: (method: DnrMethod, args: unknown[]) => unknown,
+		dnrMethods: readonly DnrMethod[],
+		dnrConstants: Record<string, unknown>,
 	) => {
 		// Session preloads run in website frames and workers too. The checks run
 		// here because a service worker's preload realm has no `location`.
@@ -73,7 +82,68 @@ contextBridge.executeInMainWorld({
 				configurable: true,
 			});
 		}
-		// ponytail: promises only, no callback form; add it when an extension needs it.
+		// Chrome sets runtime.lastError only while the callback runs.
+		// electron-chrome-extensions later swaps chrome.runtime for a copy, so
+		// it is looked up per call.
+		const withLastError = (message: string | undefined, run: () => void) => {
+			const current = global.chrome?.runtime as Record<string, unknown>;
+			if (message === undefined || !current) return run();
+			const previous = Object.getOwnPropertyDescriptor(current, "lastError");
+			try {
+				Object.defineProperty(current, "lastError", {
+					value: { message },
+					configurable: true,
+				});
+			} catch {
+				return run();
+			}
+			try {
+				run();
+			} finally {
+				if (previous) Object.defineProperty(current, "lastError", previous);
+				else delete current.lastError;
+			}
+		};
+		// Electron exposes Chromium's chrome.declarativeNetRequest but never
+		// enforces its rules; main keeps the rules and enforces them instead.
+		const nativeDnr = chrome?.declarativeNetRequest as
+			| Record<string, unknown>
+			| undefined;
+		if (chrome && nativeDnr) {
+			const dnr: Record<string, unknown> = { ...dnrConstants };
+			for (const key of Object.keys(nativeDnr)) {
+				const value = nativeDnr[key];
+				if (typeof value !== "function") dnr[key] = value;
+			}
+			for (const method of dnrMethods) {
+				dnr[method] = (...args: unknown[]) => {
+					const callback =
+						typeof args.at(-1) === "function"
+							? (args.pop() as (result: unknown) => void)
+							: undefined;
+					const result = callDnr(method, args);
+					if (!callback) return result;
+					void Promise.resolve(result).then(callback, (error: unknown) =>
+						withLastError(
+							// ipcRenderer.invoke prefixes main's message; Chrome reports it bare.
+							String(
+								(error as { message?: unknown })?.message ?? error,
+							).replace(
+								/^Error invoking remote method '[^']*': (?:Error: )?/,
+								"",
+							),
+							() => callback(undefined),
+						),
+					);
+				};
+			}
+			Object.defineProperty(chrome, "declarativeNetRequest", {
+				value: dnr,
+				writable: true,
+				enumerable: true,
+				configurable: true,
+			});
+		}
 		if (isServiceWorker && chrome && !chrome.offscreen) {
 			chrome.offscreen = {
 				Reason: new Proxy({}, { get: (_target, reason) => reason }),
@@ -130,28 +200,6 @@ contextBridge.executeInMainWorld({
 			postMessage(message: unknown): void;
 			disconnect(): void;
 		}
-		// Chrome sets runtime.lastError only while the callback runs.
-		// electron-chrome-extensions later swaps chrome.runtime for a copy, so
-		// it is looked up per call.
-		const withLastError = (message: string | undefined, run: () => void) => {
-			const current = global.chrome?.runtime as Record<string, unknown>;
-			if (message === undefined || !current) return run();
-			const previous = Object.getOwnPropertyDescriptor(current, "lastError");
-			try {
-				Object.defineProperty(current, "lastError", {
-					value: { message },
-					configurable: true,
-				});
-			} catch {
-				return run();
-			}
-			try {
-				run();
-			} finally {
-				if (previous) Object.defineProperty(current, "lastError", previous);
-				else delete current.lastError;
-			}
-		};
 
 		const handlers = new Map<number, (event: NativePortEvent) => void>();
 		const disconnectErrors = new WeakMap<NativePort, string | undefined>();
@@ -253,5 +301,9 @@ contextBridge.executeInMainWorld({
 			);
 		},
 		MAX_EXTENSION_MESSAGE_LENGTH,
+		(method: DnrMethod, args: unknown[]) =>
+			ipcRenderer.invoke(DNR_CHANNEL, method, args),
+		DNR_METHODS,
+		DNR_CONSTANTS,
 	],
 });
