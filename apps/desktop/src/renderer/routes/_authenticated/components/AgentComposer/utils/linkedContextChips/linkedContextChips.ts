@@ -1,6 +1,7 @@
-import type {
-	ComposerChip,
-	ComposerDraftSegment,
+import {
+	type ComposerChip,
+	type ComposerDraftSegment,
+	draftChips,
 } from "@superset/chat-ui/PromptInput";
 import { GoIssueClosed, GoIssueOpened } from "react-icons/go";
 import { getPluginIconUrl } from "renderer/components/PluginIcon";
@@ -112,20 +113,13 @@ export function linkedContextOf(chips: readonly ComposerChip[]): LinkedContext {
 export function draftLinkedContext(
 	segments: readonly ComposerDraftSegment[],
 ): LinkedContext {
-	return linkedContextOf(
-		segments.flatMap((segment) =>
-			segment.type === "chip" ? [segment.chip] : [],
-		),
-	);
+	return linkedContextOf(draftChips(segments));
 }
 
 export function linkedContextSeed(
 	chips: readonly ComposerChip[],
 ): ComposerDraftSegment[] {
-	return chips.flatMap((chip) => [
-		{ type: "chip" as const, chip },
-		{ type: "text" as const, text: " " },
-	]);
+	return chips.map((chip) => ({ type: "chip" as const, chip }));
 }
 
 const LINEAR_ISSUE_URL = /linear\.app\/[^/]+\/issue\/([A-Z][A-Z0-9]*-\d+)/i;

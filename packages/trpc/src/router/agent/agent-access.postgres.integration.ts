@@ -698,4 +698,244 @@ suite("agent access against a migrated PostgreSQL", () => {
 		const row = (await turnsOf(turn.agentId)).find(({ id }) => id === turn.id);
 		expect(row).toMatchObject({ status: "failed", errorCode: "lost" });
 	});
+
+	const settle = (turnId: string) =>
+		worker().agentWorker.settleTurn({
+			turnId,
+			status: "completed",
+			steersConsumed: 0,
+		});
+	const inHours = (hours: number) =>
+		new Date(Date.now() + hours * 3600_000).toISOString();
+	const routineTurnsOf = async (agentId: string) =>
+		(await turnsOf(agentId)).filter((turn) => turn.reason === "routine");
+	const makeDue = (routineId: string) =>
+		db
+			.update(schema.agentRoutines)
+			.set({ nextRunAt: minutesAgo(1) })
+			.where(eq(schema.agentRoutines.id, routineId));
+	const runDue = async () => {
+		const { fireDueRoutines } = await import("./routines");
+		return fireDueRoutines({ organizationId: orgId });
+	};
+
+	test("a routine runs in the Dev's main session, for the person who asked, answering where it was made", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Digest",
+			prompt: "Tell me what merged.",
+			schedule: { start: inHours(2), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		expect(routine.nextRunAt).not.toBeNull();
+		await settle(turn.id);
+		await makeDue(routine.id);
+		expect(await runDue()).toBe(1);
+		expect(await runDue()).toBe(0);
+		expect(await routineTurnsOf(agent.id)).toMatchObject([
+			{ routineId: routine.id, actingUserId: admin, sessionId: turn.sessionId },
+		]);
+		const text = delivered.at(-1)?.text ?? "";
+		expect(text).toContain("Tell me what merged.");
+		expect(text).toContain(`reply_to="channel:${dm.channelId}"`);
+		const [row] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.id, routine.id));
+		expect(row?.nextRunAt?.getTime()).toBeGreaterThan(Date.now());
+	});
+
+	test("a one-off routine switches itself off after it runs", async () => {
+		const { dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Reminder",
+			prompt: "Remind me to stretch.",
+			schedule: { start: inHours(1), repeat: null, timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		await makeDue(routine.id);
+		await runDue();
+		const [row] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.id, routine.id));
+		expect(row).toMatchObject({ enabled: false, nextRunAt: null });
+	});
+
+	test("a routine runs at most once an hour", async () => {
+		const { dm, token } = await agentWithChannel(admin);
+		await expect(
+			asAgent(token).devTools.createRoutine({
+				title: "Spam",
+				prompt: "Ping.",
+				schedule: {
+					start: inHours(1),
+					repeat: "FREQ=MINUTELY;INTERVAL=10",
+					timezone: "UTC",
+				},
+				replyTo: `channel:${dm.channelId}`,
+			}),
+		).rejects.toThrow("at most once an hour");
+	});
+
+	test("a Dev watching a channel gets each new message with its routine, once", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		await asAgent(token).devTools.createRoutine({
+			title: "Questions in #secret",
+			prompt: "Answer questions about who owns what.",
+			watchChannels: ["secret"],
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const question = await sendTo(admin, privateChannel, "who owns billing?");
+		const routineTurns = await routineTurnsOf(agent.id);
+		expect(routineTurns).toMatchObject([
+			{ promptId: question.id, triggerMessageId: question.id },
+		]);
+		const text = delivered.at(-1)?.text ?? "";
+		expect(text).toContain("who owns billing?");
+		expect(text).toContain("Answer questions about who owns what.");
+		expect(text).toContain(
+			`reply_to="channel:${privateChannel}/thread:${question.id}"`,
+		);
+		const [watched] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.agentId, agent.id));
+		expect(watched?.lastRunAt).not.toBeNull();
+	});
+
+	test("a Dev can't watch a channel the person it works for can't read", async () => {
+		const { dm, token } = await agentWithChannel(outsider);
+		await expect(
+			asAgent(token).devTools.createRoutine({
+				title: "Snoop",
+				prompt: "Watch.",
+				watchChannels: ["secret"],
+				replyTo: `channel:${dm.channelId}`,
+			}),
+		).rejects.toThrow("can't read it");
+	});
+
+	test("a matching provider event wakes the routines watching it", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		await asAgent(token).devTools.createRoutine({
+			title: "New PRs",
+			prompt: "Tell me about new PRs.",
+			watchEvents: [
+				{
+					kind: "github",
+					event: "pull_request.opened",
+					repositories: { mode: "list", ids: ["4242"] },
+				},
+			],
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const { notifyRoutinesOfEvent } = await import("./routines");
+		const event = (repositoryId: string) => ({
+			provider: "github" as const,
+			eventType: "pull_request.opened",
+			actorId: "1",
+			actorLogin: "octocat",
+			body: null,
+			repositoryId,
+			ref: "main",
+			actorIsExternal: false,
+			labels: [],
+			isFork: false,
+			subjectAuthorId: null,
+			subjectAuthorLogin: null,
+			assigneeId: null,
+			assigneeLogin: null,
+			names: ["pull_request.opened" as const],
+		});
+		for (const repositoryId of ["9999", "4242"]) {
+			await notifyRoutinesOfEvent({
+				eventId: crypto.randomUUID(),
+				event: {
+					organizationId: orgId,
+					eventType: "pull_request.opened",
+					title: `PR in ${repositoryId}`,
+					url: null,
+				},
+				dispatch: { event: event(repositoryId) },
+			});
+		}
+		expect(await routineTurnsOf(agent.id)).toHaveLength(1);
+		expect(delivered.at(-1)?.text).toContain("PR in 4242");
+	});
+
+	test("people see their own routines; only their creator or a manager changes them", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Mine",
+			prompt: "Do it.",
+			schedule: { start: inHours(3), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const listed = await person(admin).agentRoutine.list({ agentId: agent.id });
+		expect(listed.map((r) => r.id)).toEqual([routine.id]);
+		expect(
+			await person(outsider).agentRoutine.list({ agentId: agent.id }),
+		).toEqual([]);
+		await expect(
+			person(outsider).agentRoutine.update({
+				routineId: routine.id,
+				enabled: false,
+			}),
+		).rejects.toThrow("Routine not found");
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			enabled: false,
+		});
+		const [paused] = await db
+			.select()
+			.from(schema.agentRoutines)
+			.where(eq(schema.agentRoutines.id, routine.id));
+		expect(paused).toMatchObject({ enabled: false, nextRunAt: null });
+		await person(admin).agentRoutine.delete({ routineId: routine.id });
+		expect(
+			await person(admin).agentRoutine.list({ agentId: agent.id }),
+		).toEqual([]);
+	});
+
+	test("people move a routine to a channel the Dev posts in, or back to the DM", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Movable",
+			prompt: "Do it.",
+			schedule: { start: inHours(3), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const roomOf = async () =>
+			(
+				await db
+					.select({ channelId: schema.agentRoutines.channelId })
+					.from(schema.agentRoutines)
+					.where(eq(schema.agentRoutines.id, routine.id))
+			)[0]?.channelId;
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			room: { kind: "channel", channelId: privateChannel },
+		});
+		expect(await roomOf()).toBe(privateChannel);
+		await expect(
+			person(admin).agentRoutine.update({
+				routineId: routine.id,
+				room: { kind: "channel", channelId: otherChannel },
+			}),
+		).rejects.toThrow("can't post there");
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			room: { kind: "dm" },
+		});
+		expect(await roomOf()).toBe(dm.channelId);
+		expect(
+			(await person(admin).agentRoutine.list({ agentId: agent.id }))[0]?.room,
+		).toMatchObject({ kind: "dm", channelId: dm.channelId });
+	});
 });

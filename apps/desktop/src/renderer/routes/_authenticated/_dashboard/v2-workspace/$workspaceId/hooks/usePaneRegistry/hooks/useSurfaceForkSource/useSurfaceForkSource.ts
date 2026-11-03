@@ -3,6 +3,7 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import type { ChatPaneData, TerminalPaneData } from "../../../../types";
 import type { SurfaceForkSource } from "../useSurfaceFork";
@@ -20,6 +21,7 @@ export function useSurfaceForkSource(
 ): { enabled: boolean; source: SurfaceForkSource | null } {
 	const enabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.AGENT_SURFACE_FORK) === true;
+	const acpChatEnabled = useAcpChatEnabled();
 	const binding = useTerminalAgentBinding(workspaceId, pane.data.terminalId);
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const { data: configs = [] } = useV2AgentConfigs(hostUrl);
@@ -43,6 +45,7 @@ export function useSurfaceForkSource(
 	}
 
 	if (
+		!acpChatEnabled ||
 		!binding?.agentSessionId ||
 		binding.endedAt ||
 		LOCKED_WHILE_CLI_RUNS.has(binding.agentId) ||

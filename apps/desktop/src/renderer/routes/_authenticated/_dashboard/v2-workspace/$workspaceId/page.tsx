@@ -46,6 +46,7 @@ import {
 	ActivityPanelAside,
 	WorkspaceActivityMenu,
 } from "./components/WorkspaceActivityMenu";
+import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
@@ -56,8 +57,6 @@ import {
 import { WorkspaceToolbar } from "./components/WorkspaceToolbar";
 import { useAgentSessionLauncher } from "./hooks/useAgentSessionLauncher";
 import { useAutoAdoptBackgroundSessions } from "./hooks/useAutoAdoptBackgroundSessions";
-import { useAutoAdoptChatSessions } from "./hooks/useAutoAdoptChatSessions";
-import { useClearActivePaneAttention } from "./hooks/useClearActivePaneAttention";
 import { useCloseRightPaneAreaWhenEmpty } from "./hooks/useCloseRightPaneAreaWhenEmpty";
 import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
@@ -67,7 +66,6 @@ import { useDefaultBrowserUrl } from "./hooks/useDefaultBrowserUrl";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
-import { useIsChatTabActive } from "./hooks/useIsChatTabActive";
 import { useOpenNewTabWhenRightPaneOpensEmpty } from "./hooks/useOpenNewTabWhenRightPaneOpensEmpty";
 import { usePaneAreaMoveActions } from "./hooks/usePaneAreaMoveActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
@@ -223,8 +221,6 @@ function V2WorkspaceContent() {
 	} = useV2UserPreferences();
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
 	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
-	useClearActivePaneAttention({ store });
-	const isChatTabActive = useIsChatTabActive(store);
 	const rightPaneAreaFlag = useRightPaneAreaEnabled();
 	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
 	const {
@@ -241,7 +237,6 @@ function V2WorkspaceContent() {
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_PANE) === true;
 	const { store: rightStore, isLayoutReady: isRightLayoutReady } =
 		useV2WorkspacePaneLayout({ slot: "rightPaneLayout" });
-	useClearActivePaneAttention({ store: rightStore });
 	useRestoreExpandedPaneArea({
 		workspaceId,
 		centerStore: store,
@@ -306,7 +301,7 @@ function V2WorkspaceContent() {
 	const addChatTab = useCallback(() => {
 		void openNewChat();
 	}, [openNewChat]);
-	const onAddChat = acpChat === "enabled" ? addChatTab : undefined;
+	const onAddChat = acpChat ? addChatTab : undefined;
 	const {
 		matchedPresets,
 		newTabPresets,
@@ -358,12 +353,6 @@ function V2WorkspaceContent() {
 		resolvePresetCommands,
 	});
 	useAutoAdoptBackgroundSessions({
-		store,
-		linkedStores: linkedPaneStores,
-		workspaceId,
-		isLayoutReady: isLayoutReady && isRightLayoutReady,
-	});
-	useAutoAdoptChatSessions({
 		store,
 		linkedStores: linkedPaneStores,
 		workspaceId,
@@ -573,7 +562,7 @@ function V2WorkspaceContent() {
 		isMobilePaneEnabled,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
-	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat !== "disabled" });
+	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat });
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();
 	});
@@ -633,6 +622,13 @@ function V2WorkspaceContent() {
 
 	return (
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
+			<WorkspaceAgentEffects
+				workspaceId={workspaceId}
+				store={store}
+				rightStore={rightStore}
+				linkedStores={linkedPaneStores}
+				isLayoutReady={isLayoutReady && isRightLayoutReady}
+			/>
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
 				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 					<WorkspaceSplitLayout
@@ -699,7 +695,7 @@ function V2WorkspaceContent() {
 										/>
 									)}
 									renderBelowTabBar={() =>
-										showPresetsBar && !isChatTabActive ? (
+										showPresetsBar ? (
 											<V2PresetsBar
 												matchedPresets={matchedPresets}
 												executePreset={executePreset}

@@ -1,16 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
-import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import { useAcpChatStore } from "renderer/stores/acp-chat";
-import {
-	useChatTurnSnapshotsEnabled,
-	useChatTurnSnapshotsStore,
-} from "renderer/stores/chat-turn-snapshots";
 import {
 	useInlineWorkspacePortsStore,
 	usePortsDisplayMode,
@@ -26,6 +18,8 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
+import { AcpChatSetting } from "../AcpChatSetting";
+import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -51,21 +45,13 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
-	const showAcpChat =
-		acpChatFlag &&
-		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT, visibleItems);
-	const acpChatEnabled = useAcpChatEnabled() === "enabled";
-	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
-	const showChatTurnSnapshots =
-		acpChatFlag &&
-		isItemVisible(
-			SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
-			visibleItems,
-		);
-	const chatTurnSnapshotsEnabled = useChatTurnSnapshotsEnabled();
-	const setChatTurnSnapshotsEnabled = useChatTurnSnapshotsStore(
-		(state) => state.setEnabled,
+	const showAcpChat = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
+		visibleItems,
+	);
+	const showChatTurnSnapshots = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
+		visibleItems,
 	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
@@ -186,61 +172,8 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showAcpChat && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label htmlFor="acp-chat" className="text-sm font-medium">
-								<HighlightText
-									text={t({ message: "Chat" })}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Open Claude and Codex sessions in a chat pane instead of a terminal.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="acp-chat"
-							checked={acpChatEnabled}
-							onCheckedChange={setAcpChatEnabled}
-						/>
-					</div>
-				)}
-				{showChatTurnSnapshots && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label
-								htmlFor="chat-turn-snapshots"
-								className="text-sm font-medium"
-							>
-								<HighlightText
-									text={t({ message: "Track file changes per turn" })}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="chat-turn-snapshots"
-							checked={chatTurnSnapshotsEnabled}
-							onCheckedChange={setChatTurnSnapshotsEnabled}
-						/>
-					</div>
-				)}
+				{showAcpChat && <AcpChatSetting />}
+				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
 			</div>
 		</div>

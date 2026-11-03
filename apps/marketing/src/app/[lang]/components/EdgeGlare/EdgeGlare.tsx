@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useRef } from "react";
-import { usePointerVars } from "./hooks/usePointerVars";
+import { usePointerVars } from "@/app/[lang]/hooks/usePointerVars";
 
 type Edges = "ring" | "horizontal";
 

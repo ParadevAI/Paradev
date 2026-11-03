@@ -1,8 +1,9 @@
-import { MAX_CHAT_IMAGE_BYTES } from "@superset/shared/attachment-limits";
+import {
+	MAX_CHAT_IMAGE_BYTES,
+	MAX_THUMBNAIL_BYTES,
+} from "@superset/shared/attachment-limits";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
-
-export const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024;
 
 const READ_OPTIONS = {
 	staleTime: Number.POSITIVE_INFINITY,
@@ -20,6 +21,8 @@ export type ChatImageSource =
  * capped; `full` follows it with the larger read for a file over the cap, so
  * a thumbnail and the overlay showing the same file share one cached read.
  */
+export { MAX_THUMBNAIL_BYTES };
+
 export function useChatImageSource(
 	image: { path: string; mimeType: string } | null,
 	{ full }: { full: boolean },

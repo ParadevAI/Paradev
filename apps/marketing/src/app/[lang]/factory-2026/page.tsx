@@ -238,7 +238,7 @@ export default async function Factory2026Page() {
 					<p className="text-muted-foreground mt-3 max-w-lg mx-auto leading-relaxed">
 						<Trans>
 							Paradev is the workbench for the F3 to F4 transition: parallel
-							agents in isolated workspaces, fleets you can actually supervise,
+							agents on separate branches, fleets you can actually supervise,
 							and a review surface for code you did not write.
 						</Trans>
 					</p>

@@ -88,7 +88,7 @@ export const sandboxIdentitySchema = z.object({
 	 * The repositories this workspace checks out, as JSON
 	 * (`sandboxRepositoriesSchema`): each at `<workspace>/<path>` on its
 	 * branch. The first is the primary: the one the workspace opens on and
-	 * whose `.superset` config the box runs.
+	 * whose Paradev config the box runs.
 	 */
 	SUPERSET_SANDBOX_REPOSITORIES: z.string().min(2),
 	SUPERSET_SANDBOX_PLUGINS: z.string().min(2).optional(),

@@ -511,13 +511,21 @@ export const Composer = memo(function Composer({
 			steer: boolean,
 			draft: ComposerDraft,
 		) => {
-			const tags = await uploadAttachments(files);
-			if (!tags) {
+			const upload = await uploadAttachments(files);
+			if (!upload.ok) {
+				const keep = new Set(upload.keep);
+				const restored: ComposerDraft = {
+					...draft,
+					attachments: draft.attachments.filter((attachment) =>
+						keep.has(attachment.file),
+					),
+				};
 				const input = promptInputRef.current;
-				if (input) input.restoreDraft(draft);
-				else prependToDraft(draftKey, [draft]);
+				if (input) input.restoreDraft(restored);
+				else prependToDraft(draftKey, [restored]);
 				return;
 			}
+			const { tags, parts } = upload;
 			const message = text.trim();
 			const elements = elementsForChips(message, mentions);
 			const mcpContext = mcpContextLine(
@@ -528,18 +536,24 @@ export const Composer = memo(function Composer({
 				env.NEXT_PUBLIC_WEB_URL,
 				otherHostOf,
 			);
+			const body = [message, ...tags].filter(Boolean).join("\n");
 			onSend(
 				[
-					{
-						type: "text",
-						text: [message, ...tags].filter(Boolean).join("\n"),
-						...(elements.length > 0 ? { elements } : {}),
-					},
+					...(body || parts.length === 0
+						? [
+								{
+									type: "text" as const,
+									text: body,
+									...(elements.length > 0 ? { elements } : {}),
+								},
+							]
+						: []),
 					...[mcpContext, chatContext].flatMap((context) =>
 						context
 							? [{ type: "text" as const, text: context, hidden: true }]
 							: [],
 					),
+					...parts,
 				],
 				{ steer, draft },
 			);

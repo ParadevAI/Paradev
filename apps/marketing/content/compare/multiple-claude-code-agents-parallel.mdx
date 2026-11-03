@@ -1,6 +1,6 @@
 ---
 title: "How to Run Multiple Claude Code Agents in Parallel"
-description: "Learn the safest way to run multiple Claude Code sessions at once. Compare terminal tabs, tmux, manual Git worktrees, and Paradev's orchestration workflow."
+description: "Learn how to run multiple Claude Code sessions at once in separate worktrees. Compare terminal tabs, tmux, manual Git worktrees, and Paradev's orchestration workflow."
 date: 2026-03-20
 lastUpdated: 2026-10-14
 type: "tutorial"
@@ -62,19 +62,19 @@ This separates working files, but does not sandbox the agent or prevent merge co
 
 This is the same worktree-based approach, but automated.
 
-Paradev creates an isolated worktree per task, launches Claude Code inside it, keeps the sessions organized, and gives you one place to review the resulting diffs. Claude Code still does the coding. Paradev handles the orchestration.
+Paradev creates a separate worktree and branch per task, launches Claude Code inside it, keeps the sessions organized, and gives you one place to review the resulting diffs. Claude Code still does the coding. Paradev handles the orchestration.
 
-That is the key distinction: Claude Code is the agent; Paradev is the workflow layer that lets you run many Claude Code sessions safely.
+That is the key distinction: Claude Code is the agent; Paradev is the workflow layer that lets you run and review many Claude Code sessions in parallel.
 
 Claude Code's own features keep working inside it. Paradev launches the real `claude` CLI in a real terminal with your own login, so `/remote-control`, `/schedule`, `/loop`, subagents, and `--resume` behave as they do in any terminal.
 
 ## Quick Comparison
 
-| Approach | Parallel? | Isolated by default? | Review workflow | Ongoing overhead |
+| Approach | Parallel? | Own worktree by default? | Review workflow | Ongoing overhead |
 |---|---|---|---|---|
 | Terminal tabs | Yes | No | Manual | Low setup, high risk |
-| tmux | Yes | No | Manual | Good for power users, still no isolation |
-| Manual Git worktrees + Claude Code | Yes | Yes | Git-native, but manual | Safe, but repetitive |
+| tmux | Yes | No | Manual | Good for power users, still one checkout |
+| Manual Git worktrees + Claude Code | Yes | Yes | Git-native, but manual | Works, but repetitive |
 | `claude --worktree` | Yes | Yes | Git-native, but manual | Low for Claude Code alone |
 | Paradev + Claude Code | Yes | Yes | Built-in diff review per task | Lowest overhead once installed |
 
@@ -124,7 +124,7 @@ The right loop is:
 3. merge the good ones
 4. spawn follow-up tasks from the remaining gaps
 
-This is why worktrees matter so much: every agent output stays isolated until you decide what lands.
+This is why worktrees matter so much: every agent's output stays on its own branch until you decide what lands.
 
 ## Verify the setup before adding more agents
 
@@ -179,7 +179,7 @@ The real choice is:
 
 - Claude Code alone, with `claude --worktree` per session and your own way of tracking them
 - Claude Code plus manual worktrees, with more setup overhead
-- Claude Code plus Paradev, with the same isolation model, all of Claude Code's own commands, and one place to track and review every session
+- Claude Code plus Paradev, with the same worktree model, all of Claude Code's own commands, and one place to track and review every session
 
 For most teams and solo developers, worktree-based orchestration is the difference between "parallel in theory" and "parallel every day."
 
@@ -191,7 +191,7 @@ Yes. `claude --worktree` starts each session in its own worktree, and subagents 
 
 ### Do I need Git worktrees to parallelize Claude Code?
 
-If you care about safety, yes. Separate worktrees keep each session on its own branch and working directory, which prevents overlapping changes from colliding in one checkout.
+If the sessions edit files, yes. Separate worktrees keep each session on its own branch and working directory, which prevents overlapping changes from colliding in one checkout.
 
 ### Is tmux enough?
 

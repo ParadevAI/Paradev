@@ -144,15 +144,10 @@ describe("buildAgentModelArgs", () => {
 		expect(models.find((model) => model.id === "opus")?.label).toBe("Opus");
 	});
 
-	it("dates codex's retiring models in the picker, not just in a comment", () => {
-		const models = getAgentModelSupport("codex")?.models ?? [];
-		const groupOf = (id: string) =>
-			models.find((model) => model.id === id)?.group;
-		expect(groupOf("gpt-5.6-sol")).toBe("Current");
-		expect(groupOf("gpt-5.5")).toBe("Retiring 2026-10-14");
-		// Retired 2026-08-31 and gone from the live catalog since.
-		expect(groupOf("gpt-5.4")).toBeUndefined();
-		expect(groupOf("gpt-5.3-codex")).toBeUndefined();
+	it("drops codex models that left the live catalog", () => {
+		for (const model of ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex"]) {
+			expect(buildAgentModelArgs("codex", model)).toEqual([]);
+		}
 	});
 
 	it("passes a pinned legacy claude model through to the CLI flag", () => {
@@ -214,18 +209,15 @@ describe("buildAgentModelArgs", () => {
 		}
 	});
 
-	it("offers the GPT-6 models in codex's current section", () => {
-		const models = getAgentModelSupport("codex")?.models ?? [];
+	it("offers every GPT-6 Codex model", () => {
 		for (const model of [
 			"gpt-6.1-sol",
 			"gpt-6-astra",
+			"gpt-6.1-terra",
 			"gpt-6-sol",
 			"gpt-6-luna",
 		]) {
 			expect(buildAgentModelArgs("codex", model)).toEqual(["--model", model]);
-			expect(models.find((option) => option.id === model)?.group).toBe(
-				"Current",
-			);
 		}
 	});
 
@@ -427,7 +419,7 @@ describe("buildAgentEffortArgs", () => {
 			"-c",
 			"model_reasoning_effort=ultra",
 		]);
-		expect(buildAgentEffortArgs("codex", "ultra", "gpt-5.5")).toEqual([]);
+		expect(buildAgentEffortArgs("codex", "ultra", "gpt-6-luna")).toEqual([]);
 	});
 });
 
@@ -485,12 +477,9 @@ describe("getAgentEfforts", () => {
 			"xhigh",
 			"max",
 		]);
-		expect(getAgentEfforts("codex", "gpt-5.5").map((e) => e.id)).toEqual([
-			"low",
-			"medium",
-			"high",
-			"xhigh",
-		]);
+		expect(
+			getAgentEfforts("codex", "gpt-6.1-terra").map((e) => e.id),
+		).toContain("ultra");
 	});
 
 	it("keeps the full list when the model is unset or uncurated", () => {

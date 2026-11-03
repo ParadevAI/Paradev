@@ -10,6 +10,7 @@ interface Env {
 	TEMPORAL_ADDRESS: string;
 	TEMPORAL_NAMESPACE?: string;
 	TEMPORAL_API_KEY: string;
+	AGENT_ROUTER_API_KEY?: string;
 }
 
 const INSTANCES = ["agent-worker-0"];
@@ -32,6 +33,7 @@ export class AgentWorker extends Container<Env> {
 			TEMPORAL_ADDRESS: env.TEMPORAL_ADDRESS,
 			TEMPORAL_NAMESPACE: env.TEMPORAL_NAMESPACE,
 			TEMPORAL_API_KEY: env.TEMPORAL_API_KEY,
+			AGENT_ROUTER_API_KEY: env.AGENT_ROUTER_API_KEY,
 		};
 		this.envVars = Object.fromEntries(
 			Object.entries(vars).filter((entry): entry is [string, string] =>

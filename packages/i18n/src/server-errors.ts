@@ -303,8 +303,6 @@ export const serverErrorMessages: Record<
 				message: "Only channel admins can do that",
 			}),
 		),
-	"serverError.channel.taskInHiddenChannel": () =>
-		i18n._(msg({ message: "This task is in a channel you can't see" })),
 	"serverError.channel.archived": () =>
 		i18n._(
 			msg({
@@ -877,6 +875,42 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Workspace not found",
+			}),
+		),
+	"serverError.routine.roomNotAllowed": () =>
+		i18n._(
+			msg({
+				message: "The Dev can't post there.",
+			}),
+		),
+	"serverError.routine.notFound": () =>
+		i18n._(
+			msg({
+				message: "Routine not found",
+			}),
+		),
+	"serverError.routine.nothingToDo": () =>
+		i18n._(
+			msg({
+				message: "A routine needs a schedule or something to watch.",
+			}),
+		),
+	"serverError.routine.invalidSchedule": () =>
+		i18n._(
+			msg({
+				message: "This schedule isn't valid.",
+			}),
+		),
+	"serverError.routine.tooFrequent": () =>
+		i18n._(
+			msg({
+				message: "A routine can run at most once an hour.",
+			}),
+		),
+	"serverError.routine.inThePast": () =>
+		i18n._(
+			msg({
+				message: "This schedule has no runs left.",
 			}),
 		),
 	"serverError.pageComment.commentNotFound": () =>

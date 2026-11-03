@@ -4,7 +4,9 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import {
@@ -105,6 +107,12 @@ export function DashboardSidebarSelectionProvider({
 		});
 	}, [availableWorkspaceIds]);
 
+	// Read at click time: a dependency here would give every row a new
+	// callback, and so a re-render, on each workspace switch.
+	const activeWorkspaceIdRef = useRef(activeWorkspaceId);
+	useLayoutEffect(() => {
+		activeWorkspaceIdRef.current = activeWorkspaceId;
+	}, [activeWorkspaceId]);
 	const selectWorkspaceFromEvent = useCallback(
 		(
 			event: WorkspaceSelectionEvent,
@@ -122,12 +130,12 @@ export function DashboardSidebarSelectionProvider({
 				applyWorkspaceSelection(current, {
 					...options,
 					mode,
-					activeWorkspaceId,
+					activeWorkspaceId: activeWorkspaceIdRef.current,
 				}),
 			);
 			return true;
 		},
-		[activeWorkspaceId],
+		[],
 	);
 
 	const removeSelectedWorkspaces = useCallback((workspaceIds: string[]) => {

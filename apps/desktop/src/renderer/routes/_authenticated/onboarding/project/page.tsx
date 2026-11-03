@@ -82,7 +82,7 @@ function OnboardingProjectPage() {
 	const { waitForHostReady } = useLocalHostService();
 	const openNewWorkspace = useOpenNewWorkspaceForLocalProject();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const cloneTargetDir = homeDir ? `${homeDir}/.superset/projects` : null;
+	const cloneTargetDir = homeDir ? `${homeDir}/.paradev/projects` : null;
 	const [url, setUrl] = useState("");
 	const [busy, setBusy] = useState(false);
 	const [cloneError, setCloneError] = useState<CloneError | null>(null);

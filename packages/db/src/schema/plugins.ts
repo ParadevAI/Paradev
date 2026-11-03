@@ -214,6 +214,8 @@ export const pluginOauthClients = pgTable(
 		registrationClientUri: text("registration_client_uri"),
 
 		tokenEndpointAuthMethod: text("token_endpoint_auth_method"),
+		/** The scopes this client was registered for; null on a row from before they were recorded. */
+		scopes: text().array(),
 
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -222,9 +224,10 @@ export const pluginOauthClients = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		uniqueIndex("plugin_oauth_clients_issuer_redirect_unique").on(
+		uniqueIndex("plugin_oauth_clients_issuer_redirect_client_unique").on(
 			table.issuer,
 			table.redirectUri,
+			table.clientId,
 		),
 	],
 );

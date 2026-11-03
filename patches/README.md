@@ -480,6 +480,42 @@ bun test apps/desktop/src/pierre-trees-lookup-patch.test.ts
 test once @pierre/trees ships a release whose segment walk stops at a file
 node.
 
+## @pierre/diffs (`@pierre%2Fdiffs@<version>.patch`)
+
+**Why:** GH #9136 stress testing. The Changes pane showed `VirtualizedFile.render:
+rendered a different file than its prepared layout` in place of every visible
+diff whenever its patch request failed (reproduced with 3,000 untracked files:
+7 errors per load, every load). `VirtualizedFile.finalizeRender` compares the
+rendered file with the prepared one by object identity. The renderer can hand
+back the result it cached for an earlier, equal file object, so an equal file
+throws. `VirtualizedFileDiff.finalizeRender` already compares by target
+(`areDiffTargetsEqual`). 1.6.2 is the latest release.
+
+**What it changes** (`dist/components/VirtualizedFile.js`): one line in
+`finalizeRender` — compare with `areFileTargetsEqual` (cache key, or name,
+contents and language), which the same file already uses everywhere else.
+
+**Guard test:** `apps/desktop/src/pierre-diffs-finalize-render-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch @pierre/diffs@<new-version>
+# in node_modules/@pierre/diffs/dist/components/VirtualizedFile.js, in
+# finalizeRender, replace `this.getRenderedFile() !== this.pendingRender?.file`
+# with `!areFileTargetsEqual(this.getRenderedFile(), this.pendingRender?.file)`
+bun patch --commit 'node_modules/@pierre/diffs'
+bun test apps/desktop/src/pierre-diffs-finalize-render-patch.test.ts
+```
+
+`bun patch --commit` can also record deletions of the bundled
+`dist/node_modules/.pnpm/@types_*` files. Keep only the `VirtualizedFile.js`
+hunk.
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test once @pierre/diffs ships a release whose `VirtualizedFile.finalizeRender`
+compares by target.
+
 ## expo-observe (`expo-observe@<version>.patch`)
 
 **Why:** its podspec asks for `swift_version = '6.0'`, and the package keeps

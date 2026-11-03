@@ -52,14 +52,8 @@ export function hasDraft(draftKey: string): boolean {
 }
 
 export function joinDrafts(drafts: readonly ComposerDraft[]): ComposerDraft {
-	const segments: ComposerDraftSegment[] = [];
-	for (const draft of drafts) {
-		if (draft.segments.length === 0) continue;
-		if (segments.length > 0) segments.push({ type: "text", text: "\n\n" });
-		segments.push(...draft.segments);
-	}
 	return {
-		segments,
+		segments: drafts.flatMap((draft) => draft.segments),
 		attachments: drafts.flatMap((draft) => draft.attachments),
 		...(drafts.some((draft) => draft.usedDictation)
 			? { usedDictation: true }

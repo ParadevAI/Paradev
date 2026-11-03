@@ -1,3 +1,4 @@
+import { TabVisibilityContext } from "@superset/panes";
 import { cn } from "@superset/ui/utils";
 import { useEffect, useRef, useState } from "react";
 
@@ -112,7 +113,9 @@ export function SidebarSlide({
 						contain: move ? "strict" : undefined,
 					}}
 				>
-					{children(fill)}
+					<TabVisibilityContext.Provider value={!hidden}>
+						{children(fill)}
+					</TabVisibilityContext.Provider>
 				</div>
 			</div>
 		</div>

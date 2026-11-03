@@ -15,7 +15,7 @@ keywords:
   - multi agent workspace
 ---
 
-Paradev and Augment Intent are both workspaces for running multiple coding agents against real repositories, and both isolate parallel work in Git worktrees. The philosophical split is who decomposes the work: Intent puts a coordinator agent in charge of drafting a spec and fanning out tasks to implementor agents, with you approving at checkpoints, while Paradev keeps decomposition with the developer and makes dispatch, monitoring, and review as fast as possible.
+Paradev and Augment Intent are both workspaces for running multiple coding agents against real repositories, and both separate parallel work into Git worktrees. The philosophical split is who decomposes the work: Intent puts a coordinator agent in charge of drafting a spec and fanning out tasks to implementor agents, with you approving at checkpoints, while Paradev keeps decomposition with the developer and makes dispatch, monitoring, and review as fast as possible.
 
 ---
 
@@ -23,7 +23,7 @@ Paradev and Augment Intent are both workspaces for running multiple coding agent
 
 | | **Paradev** | **Augment Intent** |
 |---|---|---|
-| **What it does** | Runs multiple agents in parallel with Git worktree isolation, you direct the work | Coordinator agent drafts a spec, decomposes tasks, runs implementor agents in waves, verifier checks results |
+| **What it does** | Runs multiple agents in parallel in separate Git worktrees, you direct the work | Coordinator agent drafts a spec, decomposes tasks, runs implementor agents in waves, verifier checks results |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Gemini, Copilot, more) | Auggie (native) plus CLI agents and custom agents per workspace |
 | **Workflow** | You scope tasks, dispatch agents, review diffs per task | Three human checkpoints: spec review, task decomposition, diff review; PR generated in-app |
 | **Automations** | Scheduled recurring agent runs built in | Not documented |
@@ -35,7 +35,7 @@ Paradev and Augment Intent are both workspaces for running multiple coding agent
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ![Claude streaming a billing migration in one Paradev workspace while other agents run in parallel workspaces](/images/readme/agents-working.gif)
 
@@ -81,7 +81,7 @@ Paradev has a free tier and paid seats; it never proxies model calls, so your ag
 
 **Choose Paradev if you:**
 
-- Prefer to scope tasks yourself and want dispatch, isolation, and review to be instant
+- Prefer to scope tasks yourself and want dispatch, worktree setup, and review to be instant
 - Run a mixed or fast-changing agent fleet beyond Claude Code, Codex, and OpenCode
 - Want scheduled automations and programmatic orchestration over MCP
 - Need Linux, Intel Mac support, or handoff to your own editor
@@ -101,7 +101,7 @@ Paradev has a free tier and paid seats; it never proxies model calls, so your ag
 
 ### Do Paradev and Augment Intent both use Git worktrees?
 
-Yes. Intent backs each workspace with an isolated worktree and a dedicated branch, and each implementor commits to its own branch during parallel waves. Paradev creates a worktree for each new local branch-based workspace. The isolation mechanism is the same; the orchestration philosophy differs.
+Yes. Intent backs each workspace with an isolated worktree and a dedicated branch, and each implementor commits to its own branch during parallel waves. Paradev creates a worktree for each new local branch-based workspace. The worktree mechanism is the same; the orchestration philosophy differs.
 
 ### Can Augment Intent use any coding agent?
 

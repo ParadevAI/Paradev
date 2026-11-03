@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "linear",
-	"version": "1.5.5",
+	"version": "1.5.6",
 	"description": "Plan and build products: create, search, and update Linear issues.",
 	"author": {
 		"name": "Paradev",

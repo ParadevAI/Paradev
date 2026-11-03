@@ -1,13 +1,12 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
-import { AtSign, BotOff } from "lucide-react";
+import { AtSign } from "lucide-react";
 import { LuCheck, LuChevronDown } from "react-icons/lu";
 import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import {
@@ -21,10 +20,10 @@ import { AgentIcon } from "./components/AgentIcon";
 interface AgentPickerPillProps<TAgentId extends string> {
 	agents: readonly (AgentSelectAgent & { id: TAgentId })[];
 	selectedAgentId: TAgentId | "none";
-	onSelect: (agentId: TAgentId | "none") => void;
+	onSelect: (agentId: TAgentId) => void;
 }
 
-/** Which agent the new thread starts with, or none for a bare workspace. */
+/** Which agent the new thread starts with. */
 export function AgentPickerPill<TAgentId extends string>({
 	agents,
 	selectedAgentId,
@@ -71,19 +70,6 @@ export function AgentPickerPill<TAgentId extends string>({
 						)}
 					</DropdownMenuItem>
 				))}
-				<DropdownMenuSeparator />
-				<DropdownMenuItem
-					className={MENU_ROW_CLASS}
-					onSelect={() => onSelect("none")}
-				>
-					<BotOff className="size-4 shrink-0" />
-					<span className="min-w-0 flex-1 truncate">
-						<Trans>No agent</Trans>
-					</span>
-					{selectedAgentId === "none" && (
-						<LuCheck className="size-3.5 shrink-0" />
-					)}
-				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

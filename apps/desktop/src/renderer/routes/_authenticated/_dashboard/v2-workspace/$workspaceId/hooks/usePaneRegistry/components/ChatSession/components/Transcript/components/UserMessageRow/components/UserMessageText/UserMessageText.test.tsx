@@ -125,8 +125,10 @@ test("every link is drawn as the composer's chip, and nothing is fetched until h
 			shown?.querySelector(".prompt-input-chip img")?.getAttribute("src"),
 		).toBe(drawn.iconUrl ?? null);
 	}
-	expect(view.container.textContent).toBe(
-		`Look at superset-sh/superset#8329 and Roadmap\nthen ${LATER}.`,
+	const paragraph = view.container.querySelector("p");
+	expect(paragraph?.innerHTML.split("<br>")).toHaveLength(2);
+	expect(paragraph?.textContent).toBe(
+		`Look at superset-sh/superset#8329 and Roadmapthen ${LATER}.`,
 	);
 
 	await hover("Roadmap");
@@ -249,4 +251,60 @@ test("a pull request picked in the composer is drawn as the composer drew it", (
 	const plain = view.getByTestId("older").querySelector(".prompt-input-chip");
 	expect(plain?.textContent).toBe(chip.label);
 	expect(plain?.querySelector("img")).toBeNull();
+});
+
+function renderSegments(
+	segments: Parameters<typeof UserMessageText>[0]["segments"],
+) {
+	const link: TRPCLink<AppRouter> = () => () => observable(() => {});
+	return render(
+		<workspaceTrpc.Provider
+			client={workspaceTrpc.createClient({ links: [link] })}
+			queryClient={new QueryClient()}
+		>
+			<ChatPaneActionsProvider openLink={() => true} workspaceId="workspace-1">
+				<UserMessageText segments={segments} />
+			</ChatPaneActionsProvider>
+		</workspaceTrpc.Provider>,
+	);
+}
+
+test("a sent list and formatting render as markdown, not as typed markers", () => {
+	const view = renderSegments([{ text: "Plan:\n- one\n- **two**" }]);
+	const items = view.container.querySelectorAll("ul > li");
+	expect(Array.from(items, (item) => item.textContent)).toEqual(["one", "two"]);
+	expect(
+		view.container.querySelector('li [data-streamdown="strong"]')?.textContent,
+	).toBe("two");
+	expect(view.container.textContent).not.toContain("**");
+});
+
+test("a chip inside a bullet is still drawn as its chip", () => {
+	const chip = linkedPrChip({
+		prNumber: 8329,
+		title: "Load whole sessions",
+		url: PR,
+		state: "merged",
+	});
+	const text = `- review ${PR}\n- then ship`;
+	const view = renderSegments(
+		splitByElements(text, elementsForChips(text, [chip])),
+	);
+	const first = view.container.querySelector("ul > li");
+	expect(first?.querySelector(".prompt-input-chip")?.textContent).toBe(
+		chip.label,
+	);
+	expect(view.container.textContent).not.toContain("#superset-message-chip");
+});
+
+test("typed text that only looks like markdown stays as typed", () => {
+	const typed = "call __init__ with *args, **kwargs";
+	const view = renderSegments([
+		{ text: `${typed}\nedit ~/src/a_b.py and ~/src/c.py` },
+	]);
+	const paragraph = view.container.querySelector("p");
+	expect(paragraph?.textContent).toBe(
+		`${typed}edit ~/src/a_b.py and ~/src/c.py`,
+	);
+	expect(view.container.querySelector("[data-streamdown], em, del")).toBeNull();
 });

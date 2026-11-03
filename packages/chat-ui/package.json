@@ -13,6 +13,7 @@
 		"test": "bun test --pass-with-no-tests"
 	},
 	"dependencies": {
+		"@lexical/clipboard": "0.41.0",
 		"@lexical/code": "0.41.0",
 		"@lexical/link": "0.41.0",
 		"@lexical/list": "0.41.0",

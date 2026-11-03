@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Sau đó chạy thiết lập phát triển từ terminal của workspace đó:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Xem [**DEVELOPMENT.md**](../DEVELOPMENT.md) để có hướng dẫn đầy đ�
 
 ## Cấu hình
 
-Cấu hình các script setup, teardown và run của workspace trong `.superset/config.json`. Xem [tài liệu đầy đủ](https://docs.paradev.com/setup-teardown-scripts).
+Cấu hình các script setup, teardown và run của workspace trong `.paradev/config.json`. Xem [tài liệu đầy đủ](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

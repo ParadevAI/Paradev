@@ -4,6 +4,7 @@ import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { DevDescription } from "./components/DevDescription";
 import { DevInstructions } from "./components/DevInstructions";
+import { DevRoutines } from "./components/DevRoutines";
 import { DevStatus } from "./components/DevStatus";
 import { DevTalkToIt } from "./components/DevTalkToIt";
 import { PanelSection } from "./components/PanelSection";
@@ -52,6 +53,7 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 					<PanelSection title={<Trans>Talk to it</Trans>}>
 						<DevTalkToIt dev={dev} />
 					</PanelSection>
+					<DevRoutines devId={dev.id} />
 					{dev.canManage && (
 						<PanelSection title={<Trans>Instructions</Trans>}>
 							<DevInstructions dev={dev} />

@@ -39,7 +39,7 @@ log "shell tooling installed"
 apt_install --no-install-recommends clang-16
 log "clang-16 installed"
 # neonctl: a workspace branches the database for itself on its first start,
-# the same way .superset/setup.sh does on a laptop.
+# the same way .paradev/setup.sh does on a laptop.
 sudo npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }
 
 # vercel, wrangler, eas: day-to-day deploy/build CLIs (Vercel projects,
@@ -57,7 +57,7 @@ apt_install stripe
 log "stripe $(stripe --version 2>/dev/null) installed"
 
 # The dev stack and the workspace's database are the repository's own
-# .superset/setup.cloud.sh and .superset/dev-stack.cloud.sh, run by the start
+# .paradev/setup.cloud.sh and .paradev/dev-stack.cloud.sh, run by the start
 # hook. This environment only adds what is not in the repository: the shell
 # tooling above, and neonctl, which setup.cloud.sh calls.
 

@@ -48,7 +48,6 @@ test("a confirmed cloud chat has a waiting pane before any host session exists",
 			collections: state.collections,
 			workspaceId: "new-cloud",
 			launch,
-			chatEnabled: true,
 		});
 	seed();
 	seed();
@@ -64,20 +63,18 @@ test("a confirmed cloud chat has a waiting pane before any host session exists",
 	expect(pending?.data).not.toHaveProperty("pendingPrompt");
 });
 
-test("older APIs, terminal launches, and disabled chat do not seed a waiting chat", () => {
+test("older APIs and terminal launches do not seed a waiting chat", () => {
 	const state = collections();
-	for (const [id, descriptor, chatEnabled] of [
-		["old-api", undefined, true],
-		["no-agent", null, true],
-		["terminal", { ...launch, surface: "terminal" }, true],
-		["empty-prompt", { ...launch, promptHash: null }, true],
-		["disabled", launch, false],
+	for (const [id, descriptor] of [
+		["old-api", undefined],
+		["no-agent", null],
+		["terminal", { ...launch, surface: "terminal" }],
+		["empty-prompt", { ...launch, promptHash: null }],
 	] as const) {
 		seedPendingCloudChat({
 			collections: state.collections,
 			workspaceId: id,
 			launch: descriptor,
-			chatEnabled,
 		});
 	}
 	expect(state.rows.size).toBe(0);
@@ -99,7 +96,6 @@ test("an existing nonempty pane layout is never replaced", () => {
 		collections: state.collections,
 		workspaceId: "existing-cloud",
 		launch,
-		chatEnabled: true,
 	});
 	expect(state.rows.get("existing-cloud")?.paneLayout).toEqual(original);
 });
@@ -110,7 +106,6 @@ test("attaching preserves the pane, tab, draft, queued messages and model withou
 		collections: state.collections,
 		workspaceId: "handoff",
 		launch,
-		chatEnabled: true,
 		modelId: "chosen-model",
 		modeId: "plan",
 	});
@@ -154,7 +149,6 @@ test("releasing a waiting chat keeps the pane and what was typed but starts its 
 		collections: state.collections,
 		workspaceId: "release",
 		launch,
-		chatEnabled: true,
 		modelId: "chosen-model",
 	});
 	const layout = state.rows.get("release")?.paneLayout;
@@ -184,7 +178,6 @@ test("the typed prompt goes to the chat that got it, not to a fresh one", () => 
 		workspaceId: "typed",
 		launch,
 		prompt: "fix the login bug",
-		chatEnabled: true,
 	});
 	const layout = state.rows.get("typed")?.paneLayout;
 	const pending = layout && pendingCloudChatPane(layout);

@@ -5,7 +5,7 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 import {
 	type TableCopyFormat,
 	tableClipboardText,
-} from "../../utils/tableClipboard";
+} from "../../../../../../utils/tableClipboard";
 
 const COPIED_MS = 1500;
 

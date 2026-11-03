@@ -52,7 +52,7 @@ Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-3241699
   `select id, session_id, attempts, last_attempt_error, status from agent_turns where attempts > 1 and started_at > now() - interval '1 day' order by attempts desc limit 50`
 - Turns the reconciler found lost: `error_code = 'lost'` in the first query.
 - Writer tasks that finished without a pull request:
-  `select id, title, result from agent_sessions where kind = 'task' and role = 'writer' and task_status = 'done' and pull_request_url is null and last_activity_at > now() - interval '1 day'`
+  `select s.id, t.id as task_id, t.title from agent_sessions s join tasks t on t.id = s.task_id where s.kind = 'task' and s.role = 'writer' and s.task_status = 'done' and t.pr_url is null and s.last_activity_at > now() - interval '1 day'`
 - Loops, meaning turns with many tool calls:
   `select id, session_id, jsonb_array_length(tool_calls) as calls, reply from agent_turns where started_at > now() - interval '1 day' and jsonb_array_length(coalesce(tool_calls, '[]')) > 20`
 - Slow main-session answers:
@@ -116,9 +116,9 @@ One rough edge per run. Add any new rough edges you notice to the list.
 ## Finish
 
 - Update the notebook, then write your final message: mode, what you found, what you filed (with
-  links), and anything that blocked you.
-- Last command: `superset workspaces archive "$SUPERSET_SANDBOX_WORKSPACE_ID"` when everything
-  worked, or `superset workspaces sleep` when a step failed, so the evidence stays.
+  links), and anything that blocked you. When a step failed, put the command, its output, and the
+  ids involved in the notebook and the final message; the workspace does not outlive the run.
+- Last command, every run: `superset workspaces archive "$SUPERSET_SANDBOX_WORKSPACE_ID"`.
 
 ## Rules
 

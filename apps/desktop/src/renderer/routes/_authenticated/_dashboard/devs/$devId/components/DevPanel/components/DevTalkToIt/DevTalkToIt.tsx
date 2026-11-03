@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import type { RouterOutputs } from "@superset/trpc";
 import { useNavigate } from "@tanstack/react-router";
 import { LuCornerDownRight, LuHash } from "react-icons/lu";
-import { PanelRow } from "./components/PanelRow";
+import { PanelRow } from "../PanelRow";
 
 type Dev = RouterOutputs["agent"]["get"];
 

@@ -5,7 +5,7 @@ import { callPanes, workspaceOptions } from "../shared";
 
 export default command({
 	description:
-		"List the tabs of a workspace and the split tree of panes in each tab",
+		"List the tabs of a workspace, in the main area and the right sidebar, and the split tree of panes in each tab",
 	options: workspaceOptions,
 	run: async ({ ctx, options }) => {
 		const client = await resolveHostClient(ctx, options);

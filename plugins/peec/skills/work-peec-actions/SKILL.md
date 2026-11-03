@@ -13,7 +13,7 @@ that matter. Keep both clean.
 
 ## 1. Read the queue in the order Peec ranks it
 
-Run `list_projects`, then `list_actions` with `statuses: ["PENDING", "ACCEPTED"]`
+Run `list_projects`, then `list_actions` with `statuses: ["PENDING", "PLANNED", "ACCEPTED"]`
 (ordered by `impact`). Group them as Peec does:
 
 1. **Site fixes** (`SEO_ISSUE`, `ROBOTS_TXT`): these block everything else.
@@ -43,7 +43,8 @@ email, post, or pitch yourself: an action records the work, it does not do it.
 ## 4. Log shipped work on the day it shipped
 
 For work Peec did not suggest (a page launch, a rename, a crawler fix), use
-`create_actions` with `status: "COMPLETED"`, `completed_at` set to the real
+`create_actions` with a `kind` (`TECHNICAL`, `CONTENT_CREATION`,
+`CONTENT_OPTIMIZATION`, `MENTION`, `PRODUCT_PAGE`, `OTHER`), `status: "COMPLETED"`, `completed_at` set to the real
 ship date, the `page_url` it changed, and the `prompt_ids` it was meant to
 move. For a Peec action that was done earlier, use `update_actions_status` with
 `completed_at`. The Impact view then marks that day on the chart.

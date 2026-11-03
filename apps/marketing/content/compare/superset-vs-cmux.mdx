@@ -24,7 +24,7 @@ Paradev and cmux both help you run many AI coding agents at once, but they sit i
 | | **Paradev** | **cmux** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Native terminal for AI agents |
-| **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, and browser | Runs agent sessions in vertical tabs and split panes with notifications and an embedded browser |
+| **What it does** | Runs multiple agents in parallel in separate Git worktrees, with review and browser | Runs agent sessions in vertical tabs and split panes with notifications and an embedded browser |
 | **Isolation** | Git worktrees for local branch-based workspaces | None built in -- isolation is left to the agent or to you |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, and more) | Any terminal agent (Claude Code, Codex, OpenCode, Gemini, Aider, Goose, and more) |
 | **Review tooling** | Built-in diff/file editor; commit, push, and open PRs; PR pane with checks and review threads | Terminal-native; review happens in the agent or your editor |
@@ -35,7 +35,7 @@ Paradev and cmux both help you run many AI coding agents at once, but they sit i
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is cmux?
 
@@ -45,7 +45,7 @@ cmux is a native macOS terminal built specifically for running AI coding agents.
 
 ## Key Differences
 
-### Organizing Sessions vs Isolating Work
+### Organizing Sessions vs Separating Work
 
 This is the core distinction. cmux is a terminal: it makes your agent sessions easy to see, split, and switch between, but it does not isolate what each agent changes. If two agents work on the same repository, they share one working directory unless you set up isolation yourself. Paradev creates a Git worktree and branch for each new local branch-based workspace. cmux answers "how do I see all my agents?"; Paradev answers "how do I run agents on the same repo in separate working directories?"
 
@@ -73,7 +73,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 **Choose Paradev if you:**
 
-- Want automatic Git worktree isolation so agents can share one repo safely
+- Want a Git worktree per task so agents on one repo do not edit the same working files
 - Want built-in diff review and merge inside the same app
 - Need remote, cloud, CLI, or MCP surfaces
 - Work on more than just macOS, or plan to
@@ -101,8 +101,8 @@ Yes. The cmux agent terminal is macOS only today. Paradev supports macOS and exp
 
 ### Can I use cmux and Paradev together?
 
-Yes. They solve different problems. You can keep cmux as your native agent terminal and use Paradev when multiple agents need isolated worktrees on the same repository, with review and orchestration in one place.
+Yes. They solve different problems. You can keep cmux as your native agent terminal and use Paradev when multiple agents need separate worktrees on the same repository, with review and orchestration in one place.
 
 ### What is the best terminal for AI coding agents?
 
-If you want a polished native terminal for agent sessions on macOS, cmux is a strong choice. If your bottleneck is coordinating several agents on one repository, the deciding factor becomes worktree isolation and review, which is what Paradev is built around. See our roundup of the [best terminal for AI coding agents](/compare/best-terminal-for-ai-coding).
+If you want a polished native terminal for agent sessions on macOS, cmux is a strong choice. If your bottleneck is coordinating several agents on one repository, the deciding factor becomes a worktree per task and review, which is what Paradev is built around. See our roundup of the [best terminal for AI coding agents](/compare/best-terminal-for-ai-coding).

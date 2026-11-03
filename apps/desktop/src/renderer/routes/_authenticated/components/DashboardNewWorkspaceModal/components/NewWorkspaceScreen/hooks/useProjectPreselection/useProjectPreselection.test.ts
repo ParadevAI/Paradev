@@ -24,7 +24,7 @@ test("holds the intended project while its list refreshes, then permits manual s
 	const { result, rerender } = renderHook(
 		({ projects, requested }) => {
 			const draft = useNewWorkspaceDraftStore();
-			const pending = useProjectPreselection({
+			const { isPending: pending } = useProjectPreselection({
 				isOpen: true,
 				areProjectsReady: true,
 				projects,
@@ -94,7 +94,7 @@ test("direct URL preselection blocks a remembered project until the requested pr
 				selectProject,
 				selectSession: mock(),
 				updateDraft,
-			}),
+			}).isPending,
 		{ initialProps: { projects: [{ id: "old-project" }] } },
 	);
 	expect(result.current).toBe(true);
@@ -103,6 +103,28 @@ test("direct URL preselection blocks a remembered project until the requested pr
 	rerender({ projects: [{ id: "old-project" }, { id: "new-project" }] });
 	expect(selectProject).toHaveBeenCalledWith("new-project");
 	expect(result.current).toBe(false);
+});
+
+test("a manual pick ends the wait for a requested project that never arrives", () => {
+	const { result } = renderHook(() =>
+		useProjectPreselection({
+			isOpen: true,
+			areProjectsReady: true,
+			projects: [{ id: "paradev" }],
+			preSelectedProjectId: "missing-project",
+			preSelectedSession: false,
+			selectedProjectId: "paradev",
+			isSession: false,
+			target: "device",
+			lastChoice: { kind: "project", projectId: "paradev" },
+			selectProject: mock(),
+			selectSession: mock(),
+			updateDraft: mock(),
+		}),
+	);
+	expect(result.current.isPending).toBe(true);
+	act(() => result.current.releasePreselection());
+	expect(result.current.isPending).toBe(false);
 });
 
 test("restores a remembered No project choice", () => {

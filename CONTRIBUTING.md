@@ -15,7 +15,7 @@ git worktree. Add your clone to the installed Paradev app, create a workspace
 for your change, then run the following commands in that workspace:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

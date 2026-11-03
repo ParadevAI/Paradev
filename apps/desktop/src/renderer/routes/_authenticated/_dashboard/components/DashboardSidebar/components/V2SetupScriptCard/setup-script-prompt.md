@@ -2,7 +2,7 @@ Set up [Paradev workspace setup & teardown scripts]({{DOCS_URL}}/setup-teardown-
 
 ## Goal
 
-Create `.superset/config.json` in the repository root with `setup` and `teardown` commands tailored to this project — plus a `run` command if it has a dev server. First inspect the codebase to figure out the right commands: detect the package manager, how dependencies are installed, how the dev server starts, and any services (databases, Docker, etc.) that need to start and stop. Then write commands that match what you find.
+Create `.paradev/config.json` in the repository root (if `.superset/` already has a `config.json` or `config.toml` and `.paradev/` has neither, edit that config instead, and use `.superset/` wherever the examples below say `.paradev/`) with `setup` and `teardown` commands tailored to this project — plus a `run` command if it has a dev server. First inspect the codebase to figure out the right commands: detect the package manager, how dependencies are installed, how the dev server starts, and any services (databases, Docker, etc.) that need to start and stop. Then write commands that match what you find.
 
 ## What each field does
 
@@ -18,7 +18,7 @@ Setup and teardown commands run sequentially in the workspace directory.
 {
   "setup": ["bun install", "cp \"$SUPERSET_ROOT_PATH/.env\" .env"],
   "teardown": ["docker-compose down"],
-  "run": ["./.superset/run.sh"]
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -48,7 +48,7 @@ Setup and teardown commands run sequentially in the workspace directory.
 ## Tips
 
 - Keep setup fast — it runs on every workspace creation.
-- For anything non-trivial, put the logic in a shell script and call it: `"setup": ["./.superset/setup.sh"]` (create the script too).
-- Commit `.superset/` so your team shares the same setup.
+- For anything non-trivial, put the logic in a shell script and call it: `"setup": ["./.paradev/setup.sh"]` (create the script too).
+- Commit the config folder so your team shares the same setup.
 
 When you're done, briefly summarize what you configured and why.

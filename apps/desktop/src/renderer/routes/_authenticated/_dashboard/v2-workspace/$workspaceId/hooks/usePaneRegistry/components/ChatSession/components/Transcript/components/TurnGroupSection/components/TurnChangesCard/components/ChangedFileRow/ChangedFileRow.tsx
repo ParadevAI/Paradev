@@ -19,7 +19,8 @@ import { TruncateStart } from "../../../../../TruncateStart";
 /**
  * One file of a turn's changes: the name stays whole while its folder gives
  * way, the stats line up with the rows around it, the row opens the file's
- * diff and the arrow opens the file itself.
+ * diff (or the file, when there is no diff to show) and the arrow opens the
+ * file itself.
  */
 export function ChangedFileRow({
 	kind,
@@ -40,14 +41,16 @@ export function ChangedFileRow({
 	const { t } = useLingui();
 	const shownPath = place.relativePath ?? place.absolutePath;
 	const columnStyle = { width: statWidth } as CSSProperties;
+	const open = kind === "deleted" ? undefined : onOpen;
+	const onRowClick = onReview ?? open;
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
 				<div className="group/file flex min-w-0 items-center gap-1 pr-1.5 transition-colors hover:bg-foreground/[0.04]">
 					<button
 						className="flex min-w-0 flex-1 items-center gap-2 py-1 pl-3 text-left focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-[-2px] disabled:cursor-default"
-						disabled={!onReview}
-						onClick={onReview}
+						disabled={!onRowClick}
+						onClick={onRowClick}
 						title={shownPath}
 						type="button"
 					>
@@ -74,23 +77,23 @@ export function ChangedFileRow({
 									: t({ message: "deleted", context: "changed file badge" })}
 							</span>
 						)}
+						<span
+							className="ml-auto flex shrink-0 font-mono text-xs tabular-nums"
+							data-find-skip
+						>
+							<span className="text-right text-green-400" style={columnStyle}>
+								{stats && stats.additions > 0 && `+${stats.additions}`}
+							</span>
+							<span className="text-right text-red-400" style={columnStyle}>
+								{stats && stats.deletions > 0 && `−${stats.deletions}`}
+							</span>
+						</span>
 					</button>
-					<span
-						className="flex shrink-0 font-mono text-xs tabular-nums"
-						data-find-skip
-					>
-						<span className="text-right text-green-400" style={columnStyle}>
-							{stats && stats.additions > 0 && `+${stats.additions}`}
-						</span>
-						<span className="text-right text-red-400" style={columnStyle}>
-							{stats && stats.deletions > 0 && `−${stats.deletions}`}
-						</span>
-					</span>
 					<button
 						aria-label={t({ message: "Open file" })}
 						className="shrink-0 rounded p-1 text-muted-foreground/60 transition-colors hover:bg-foreground/[0.06] hover:text-foreground disabled:invisible"
-						disabled={!onOpen || kind === "deleted"}
-						onClick={onOpen}
+						disabled={!open}
+						onClick={open}
 						title={t({ message: "Open file" })}
 						type="button"
 					>
@@ -99,10 +102,7 @@ export function ChangedFileRow({
 				</div>
 			</ContextMenuTrigger>
 			<ContextMenuContent>
-				<ContextMenuItem
-					disabled={!onOpen || kind === "deleted"}
-					onSelect={onOpen}
-				>
+				<ContextMenuItem disabled={!open} onSelect={open}>
 					<FileText />
 					<Trans>Open</Trans>
 				</ContextMenuItem>

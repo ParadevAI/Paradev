@@ -2,7 +2,7 @@ import { describe, expect, it, jest } from "bun:test";
 import { spawn } from "node:child_process";
 import type { Item } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, wrapHiddenText } from "@superset/chat/protocol";
-import type { AdapterEvent } from "../types";
+import type { AdapterEvent, ResolveAttachment } from "../types";
 import {
 	AcpAdapter,
 	type AcpAdapterOptions,
@@ -954,6 +954,71 @@ describe("AcpAdapter", () => {
 		expect(turns.at(-1)?.status).toBe("completed");
 		expect(sessionsOf(events).at(-1)?.status).toBe("idle");
 
+		await adapter.dispose();
+	});
+
+	it("holds a steer until a running compaction settles", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		const compaction = {
+			toolCallId: "compact-1",
+			_meta: { jetbrains: { air: { contextCompaction: { version: 1 } } } },
+		};
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			title: "Compact conversation",
+			kind: "think",
+			status: "in_progress",
+			...compaction,
+		});
+		await flush();
+
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(agent.sent.map((f) => f.method)).not.toContain("_session/steering");
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call_update",
+			status: "completed",
+			...compaction,
+		});
+		await flush();
+		expect(steered).toBe(true);
+		expect(agent.sent.at(-1)).toMatchObject({ method: "_session/steering" });
+		await adapter.dispose();
+	});
+
+	it("does not steer into a turn that ended during its compaction", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "compact-1",
+			title: "Compact conversation",
+			status: "in_progress",
+			_meta: { claudeCode: { toolName: "compact" } },
+		});
+		await flush();
+
+		const steered = adapter.steer([{ type: "text", text: "and this" }]);
+		agent.releasePrompts("end_turn");
+		expect(await steered).toBe(false);
+		expect(agent.sent.map((f) => f.method)).not.toContain("_session/steering");
 		await adapter.dispose();
 	});
 
@@ -2046,6 +2111,26 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("a running state_update keeps an open approval awaiting input", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "go" }]);
+		await flush();
+
+		agent.requestPermission("sess-1", "tc-1");
+		agent.notify("sess-1", { sessionUpdate: "state_update", state: "running" });
+		await flush();
+		expect(sessionsOf(events).at(-1)?.status).toBe("awaiting_input");
+
+		adapter.respondToApproval("approval:tc-1", { type: "accept" });
+		await flush();
+		expect(sessionsOf(events).at(-1)?.status).toBe("running");
+
+		await adapter.dispose();
+	});
+
 	it("v2 insertion response keeps the turn open until idle", async () => {
 		const agent = new FakeAcpAgent();
 		agent.insertOnPrompt = true;
@@ -2077,6 +2162,38 @@ describe("AcpAdapter on protocol v2", () => {
 		expect(lastTurn()?.status).toBe("completed");
 		expect(sessionsOf(events).at(-1)?.status).toBe("idle");
 
+		await adapter.dispose();
+	});
+
+	it("a steer waiting on a compaction is released when a v2 turn ends on idle", async () => {
+		const agent = new FakeAcpAgent();
+		agent.insertOnPrompt = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "compact-1",
+			title: "Compact conversation",
+			status: "in_progress",
+			_meta: { claudeCode: { toolName: "compact" } },
+		});
+		await flush();
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(steered).toBeUndefined();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "state_update",
+			state: "idle",
+			stopReason: "end_turn",
+		});
+		await flush();
+		expect(steered).toBe(false);
 		await adapter.dispose();
 	});
 
@@ -3379,6 +3496,71 @@ describe("AcpAdapter on protocol v2", () => {
 		await flush();
 		expect(awaiting()).toEqual([true, false]);
 
+		await adapter.dispose();
+	});
+
+	it("reports the session idle while the turn is held only for background work", async () => {
+		const agent = new FakeAcpAgent();
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "spawn a helper" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Helper",
+			task: "Help",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 10,
+			size: 100,
+			cost: { amount: 0.01, currency: "USD" },
+		});
+		await flush();
+		expect(sessionsOf(events).at(-1)?.status).toBe("idle");
+
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			content: { type: "text", text: "The helper finished." },
+		});
+		await flush();
+		expect(sessionsOf(events).at(-1)?.status).toBe("running");
+		await adapter.dispose();
+	});
+
+	it("a running state update ends a background-only hold", async () => {
+		const agent = new FakeAcpAgent();
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "spawn a helper" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Helper",
+			task: "Help",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 10,
+			size: 100,
+			cost: { amount: 0.01, currency: "USD" },
+		});
+		await flush();
+		expect(sessionsOf(events).at(-1)?.awaitingBackground).toBe(true);
+
+		agent.notify("sess-1", { sessionUpdate: "state_update", state: "running" });
+		await flush();
+		const held = sessionsOf(events)
+			.filter((session) => session.awaitingBackground !== undefined)
+			.at(-1);
+		expect(held?.awaitingBackground).toBe(false);
+		expect(sessionsOf(events).at(-1)?.status).toBe("running");
 		await adapter.dispose();
 	});
 
@@ -5614,11 +5796,7 @@ describe("AcpAdapter config options", () => {
 describe("AcpAdapter attachments", () => {
 	const startWith = (
 		agent: FakeAcpAgent,
-		resolveAttachment: (id: string) => Promise<{
-			path: string;
-			mimeType: string;
-			data: string;
-		} | null>,
+		resolveAttachment: ResolveAttachment,
 	) => {
 		const adapter = new AcpAdapter({
 			command: "fake",
@@ -5711,6 +5889,25 @@ describe("AcpAdapter attachments", () => {
 				/missing\.png/.test(String(e.item.text)),
 		);
 		expect(told).toBe(true);
+	});
+
+	it("hands the resolver the whole part, so a cloud part resolves by its fileId", async () => {
+		const agent = new FakeAcpAgent();
+		const asked: unknown[] = [];
+		const { adapter } = startWith(agent, async (part) => {
+			asked.push(part);
+			return null;
+		});
+		await flush();
+		const part = {
+			type: "attachment" as const,
+			fileId: "8c1f6f8e-3a2b-4c5d-9e0f-112233445566",
+			name: "shot.png",
+			mimeType: "image/png",
+		};
+		adapter.prompt([part]);
+		await flush();
+		expect(asked).toEqual([part]);
 	});
 });
 

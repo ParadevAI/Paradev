@@ -6,7 +6,7 @@ import {
 	type BoardColumnKey,
 	deriveBoardColumn,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/deriveBoardColumn";
-import { compareWorkspaces } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
+import { compareWorkspacesBy } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
 import { V2WorkspacesBoardColumn } from "./components/V2WorkspacesBoardColumn";
 import { getVisibleBoardColumns } from "./utils/getVisibleBoardColumns";
 
@@ -22,6 +22,7 @@ export function V2WorkspacesBoard({
 	const showArchived = useV2WorkspacesFilterStore(
 		(state) => state.showArchived,
 	);
+	const orderBy = useV2WorkspacesFilterStore((state) => state.orderBy);
 
 	const byColumn = useMemo(() => {
 		const map = new Map<BoardColumnKey, AccessibleV2Workspace[]>(
@@ -31,11 +32,12 @@ export function V2WorkspacesBoard({
 			if (workspace.archivedAt != null && !showArchived) continue;
 			map.get(deriveBoardColumn(workspace))?.push(workspace);
 		}
+		const compare = compareWorkspacesBy(orderBy);
 		for (const column of map.values()) {
-			column.sort(compareWorkspaces);
+			column.sort(compare);
 		}
 		return map;
-	}, [workspaces, showArchived]);
+	}, [workspaces, showArchived, orderBy]);
 
 	const isEmpty = workspaces.length === 0;
 	if (isEmpty && !isReady) {

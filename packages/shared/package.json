@@ -4,9 +4,17 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./agent-routines": {
+			"types": "./src/agent-routines.ts",
+			"default": "./src/agent-routines.ts"
+		},
 		"./project-config": {
 			"types": "./src/project-config/index.ts",
 			"default": "./src/project-config/index.ts"
+		},
+		"./project-config/dir": {
+			"types": "./src/project-config/dir.ts",
+			"default": "./src/project-config/dir.ts"
 		},
 		"./oauth-refresh": {
 			"types": "./src/oauth-refresh.ts",
@@ -201,6 +209,10 @@
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
 		},
+		"./pull-request-checks": {
+			"types": "./src/pull-request-checks/index.ts",
+			"default": "./src/pull-request-checks/index.ts"
+		},
 		"./pull-request-threads": {
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
@@ -365,6 +377,10 @@
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"
 		},
+		"./workspace-attachments-dir": {
+			"types": "./src/workspace-attachments-dir.ts",
+			"default": "./src/workspace-attachments-dir.ts"
+		},
 		"./agent-permissions-migration": {
 			"types": "./src/agent-permissions-migration.ts",
 			"default": "./src/agent-permissions-migration.ts"
@@ -496,6 +512,10 @@
 		"./missing-procedure-error": {
 			"types": "./src/missing-procedure-error.ts",
 			"default": "./src/missing-procedure-error.ts"
+		},
+		"./automation-group": {
+			"types": "./src/automation-group.ts",
+			"default": "./src/automation-group.ts"
 		}
 	},
 	"scripts": {
