@@ -129,10 +129,18 @@ export class ChatJournal {
 			ts,
 			event: parsed,
 		};
+		const reportAppendFailure = (error: unknown) =>
+			console.error(
+				"[chat-journal] onAppend listener failed",
+				{ sessionId, cursor: envelope.cursor },
+				error,
+			);
 		try {
-			this.options.onAppend?.(envelope);
+			void Promise.resolve(this.options.onAppend?.(envelope)).catch(
+				reportAppendFailure,
+			);
 		} catch (error) {
-			console.error("[chat-journal] onAppend listener failed", error);
+			reportAppendFailure(error);
 		}
 		return envelope;
 	}
