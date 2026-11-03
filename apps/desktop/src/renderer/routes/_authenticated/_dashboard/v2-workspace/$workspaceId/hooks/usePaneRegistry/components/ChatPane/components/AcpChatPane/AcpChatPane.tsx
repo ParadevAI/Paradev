@@ -76,6 +76,7 @@ export function AcpChatPane({
 	onOpenFile,
 	onOpenPage,
 	onOpenLink,
+	getOpenFilePaths,
 	onOpenHistory,
 	onNewChat,
 	onModeChange,
@@ -114,6 +115,7 @@ export function AcpChatPane({
 	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
 	onOpenLink?: OpenLink;
+	getOpenFilePaths?: () => ReadonlySet<string>;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
@@ -781,6 +783,7 @@ export function AcpChatPane({
 			openFile={onOpenFile}
 			openPage={onOpenPage}
 			openLink={onOpenLink}
+			getOpenFilePaths={getOpenFilePaths}
 			onOpenHistory={onOpenHistory}
 			onNewChat={newChat}
 			onSessionState={(state) => {

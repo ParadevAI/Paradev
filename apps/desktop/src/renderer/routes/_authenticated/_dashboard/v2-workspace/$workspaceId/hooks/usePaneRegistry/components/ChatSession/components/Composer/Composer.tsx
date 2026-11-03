@@ -33,9 +33,10 @@ import {
 	useState,
 } from "react";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
+import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
 import { useHotkey } from "renderer/hotkeys";
-import { FileIcon, getFileIcon } from "renderer/lib/fileIcons";
+import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
 	type AgentSwitcher,
@@ -48,16 +49,20 @@ import {
 import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useRecentlyViewedFiles } from "../../../../../useRecentlyViewedFiles";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
+import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import type { ChatForkTarget } from "../../types";
 import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
 import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
+import { fileMentionChip, fileMentionMatches } from "../../utils/fileMentions";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
 	prependToDraft,
@@ -308,33 +313,37 @@ export const Composer = memo(function Composer({
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [isActive]);
+	const { recentFiles } = useRecentlyViewedFiles(workspaceId);
+	const { getOpenFilePaths } = useChatPaneActions();
+	// A new providers identity restarts the open menu's search and drops slow results.
+	const recentFilesRef = useRef(recentFiles);
+	recentFilesRef.current = recentFiles;
 	const searchFiles = useCallback(
 		async (query: string) => {
-			if (!query) return [];
-			const { matches } = await trpcUtils.filesystem.searchFiles.fetch({
-				workspaceId,
+			const { matches } = query.trim()
+				? await trpcUtils.filesystem.searchFiles.fetch({
+						workspaceId,
+						query,
+						includeHidden: false,
+						limit: FILE_SEARCH_LIMIT,
+					})
+				: { matches: [] };
+			return fileMentionMatches(
 				query,
-				includeHidden: false,
-				limit: 20,
-			});
-			return matches.map(
-				(match): ComposerMentionEntry => ({
-					id: match.absolutePath,
-					label: match.name,
-					description: match.relativePath,
-					icon: <FileIcon className="size-4" fileName={match.name} />,
-					// The agent reads the path itself, so a mention is the path.
-					select: (ctx) =>
-						ctx.insertChip({
-							label: match.name,
-							serialized: match.relativePath,
-							iconUrl: getFileIcon(match.name, false).src,
-							data: { elementKind: "file_mention" },
-						}),
+				recentFilesRef.current,
+				getOpenFilePaths?.() ?? new Set(),
+				matches,
+			).map(
+				(file): ComposerMentionEntry => ({
+					id: file.absolutePath,
+					label: file.name,
+					description: file.relativePath,
+					icon: <FileIcon className="size-4" fileName={file.name} />,
+					select: (ctx) => ctx.insertChip(fileMentionChip(file.relativePath)),
 				}),
 			);
 		},
-		[trpcUtils, workspaceId],
+		[trpcUtils, workspaceId, getOpenFilePaths],
 	);
 
 	const { transport } = useChatWiring();
@@ -371,6 +380,7 @@ export const Composer = memo(function Composer({
 						id: session.sessionId,
 						label: title,
 						description: formatRelativeTime(new Date(session.updatedAt)),
+						icon: <PluginIcon className="size-4" pluginName="superset" />,
 						select: (ctx) =>
 							ctx.insertChip(
 								chatReferenceChip(

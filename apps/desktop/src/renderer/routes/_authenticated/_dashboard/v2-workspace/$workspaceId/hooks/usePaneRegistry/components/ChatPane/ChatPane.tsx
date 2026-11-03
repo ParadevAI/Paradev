@@ -2,11 +2,13 @@ import type { RendererContext } from "@superset/panes";
 import { useCallback, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
@@ -44,6 +46,12 @@ export function ChatPane({
 		onRevealPath,
 		showHint,
 	});
+	const rightPane = useRightPaneLinkTarget();
+	const fileViewerStore = rightPane?.store ?? ctx.store;
+	const getOpenFilePaths = useCallback(
+		() => new Set(openFilePathsIn(fileViewerStore.getState())),
+		[fileViewerStore],
+	);
 	const latest = useRef(data);
 	latest.current = data;
 	const paneId = ctx.pane.id;
@@ -106,6 +114,7 @@ export function ChatPane({
 					onOpenFile={onOpenFile}
 					onOpenPage={openPage}
 					onOpenLink={openLink}
+					getOpenFilePaths={getOpenFilePaths}
 					onOpenHistory={onOpenHistory}
 				/>
 				<LinkHoverHint
@@ -238,6 +247,7 @@ export function ChatPane({
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}
 				onOpenLink={openLink}
+				getOpenFilePaths={getOpenFilePaths}
 				onOpenHistory={onOpenHistory}
 				onNewChat={agentId ? onNewChat : undefined}
 				sessionId={data.sessionId}

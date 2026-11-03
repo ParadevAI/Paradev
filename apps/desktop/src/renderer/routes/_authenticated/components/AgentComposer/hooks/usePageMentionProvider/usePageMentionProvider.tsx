@@ -4,6 +4,8 @@ import type {
 	ComposerMentionProvider,
 } from "@superset/chat-ui/PromptInput";
 import { useCallback, useMemo } from "react";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
+import { getPluginIconUrl, PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
@@ -11,6 +13,7 @@ import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/
 export function usePageMentionProvider(): ComposerMentionProvider {
 	const { t } = useLingui();
 	const cloudUtils = cloudTrpc.useUtils();
+	const isDark = useIsDarkTheme();
 	const searchPages = useCallback(
 		async (query: string) => {
 			const { items } = await cloudUtils.page.listPaginated.fetch(
@@ -25,12 +28,17 @@ export function usePageMentionProvider(): ComposerMentionProvider {
 					id: page.id,
 					label: page.title,
 					description: page.slug,
+					icon: <PluginIcon className="size-4" pluginName="superset" />,
 					select: (ctx) =>
-						ctx.insertChip({ label: page.title, serialized: url }),
+						ctx.insertChip({
+							label: page.title,
+							serialized: url,
+							iconUrl: getPluginIconUrl("superset", isDark),
+						}),
 				};
 			});
 		},
-		[cloudUtils],
+		[cloudUtils, isDark],
 	);
 	return useMemo(
 		() => ({
