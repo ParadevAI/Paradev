@@ -5,16 +5,16 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 import { CgLaptop } from "react-icons/cg";
 import { HiCheck } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
-import { PILL_CHEVRON_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "../FormPickerTrigger";
+import { PickerChevron } from "../PickerChevron";
 
 interface CheckoutPickerPillProps {
 	checkout: WorkspaceCheckout;
@@ -34,6 +34,7 @@ export function CheckoutPickerPill({
 	disabled = false,
 }: CheckoutPickerPillProps) {
 	const { t } = useLingui();
+	const isParadevShell = useParadevShell();
 	const label =
 		checkout === "local" ? t({ message: "Local" }) : t({ message: "Worktree" });
 	const Icon = checkout === "local" ? CgLaptop : LuGitFork;
@@ -50,9 +51,11 @@ export function CheckoutPickerPill({
 					}
 					disabled={disabled}
 				>
-					<Icon className="size-3.5 shrink-0" />
+					<Icon
+						className={isParadevShell ? "size-3.5 shrink-0" : "size-3 shrink-0"}
+					/>
 					<span className="truncate">{label}</span>
-					<ChevronDown className={PILL_CHEVRON_CLASS} />
+					<PickerChevron />
 				</FormPickerTrigger>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent

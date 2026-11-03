@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} za użytkownika/mies. przy rozliczeniu miesięcznym lub {
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} za użytkownika/mies. Aplikacja mobilna, automatyzacje, priorytetowe wsparcie."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
+
 msgid "{name} accounts"
 msgstr "Konta {name}"
 
@@ -2096,6 +2099,9 @@ msgstr "Dodaj NIP"
 
 msgid "Add team member..."
 msgstr "Dodaj członka zespołu..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Dodaj testy do najbardziej ryzykownego nieprzetestowanego kodu…"
 
 msgid "Add tests where they're missing"
 msgstr "Dodaj testy tam, gdzie ich brakuje"
@@ -3222,6 +3228,9 @@ msgstr "Automatyzacje i wyzwalacze zdarzeń"
 msgid "Automations require the Pro plan."
 msgstr "Automatyzacje wymagają planu Pro."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Automatyzacje, nieudane: {myFailedCount}"
+
 msgid "Autonomous"
 msgstr "Autonomiczny"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode i inne."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude działa teraz w obszarze roboczym component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Uporządkuj nieaktualne TODO…"
 
 msgid "Clear"
 msgstr "Przezroczysty"
@@ -7833,6 +7845,9 @@ msgstr "Eksperymentalne"
 msgid "Expired"
 msgstr "Wygasł"
 
+msgid "Explain how this repository works…"
+msgstr "Wyjaśnij, jak działa to repozytorium…"
+
 msgid "Explain to me how this repository works"
 msgstr "Wyjaśnij mi, jak działa to repozytorium"
 
@@ -8556,6 +8571,9 @@ msgstr "Znajdź"
 
 msgid "Find a person…"
 msgstr "Znajdź osobę…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Znajdź mały błąd i napraw go…"
 
 msgid "Find a team…"
 msgstr "Znajdź zespół…"
@@ -11896,6 +11914,9 @@ msgstr "Nowy obszar roboczy"
 
 msgid "New Workspace"
 msgstr "Nowy obszar roboczy"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Nowy obszar roboczy ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nowy obszar roboczy w {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK i publiczne API"
 msgid "Search"
 msgstr "Szukaj"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Szukaj ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Szukaj wśród {0} witryn…"
@@ -17168,6 +17192,9 @@ msgstr "Konfigurowanie w tle..."
 
 msgid "Settings"
 msgstr "Ustawienia"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Ustawienia ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Ustawienia → Dostęp zdalny → „Zezwól na zdalny dostęp do tego urządzenia przez przekaźnik”."
@@ -19961,6 +19988,9 @@ msgstr "Śledź zadania synchronizowane z Linear i zarządzaj nimi. Panuj nad pr
 msgid "Track budgets and spending"
 msgstr "Śledź budżety i wydatki"
 
+msgid "Track down that flaky test…"
+msgstr "Wytrop ten niestabilny test…"
+
 msgid "Track file changes per turn"
 msgstr "Śledź zmiany plików w każdej turze"
 
@@ -20486,6 +20516,9 @@ msgstr "Aktualizowanie…"
 
 msgid "Upgrade"
 msgstr "Podnieś plan"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Zaktualizuj zależność i napraw to, co się zepsuje…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Co ma działać automatycznie?"
 msgid "What should the page show?"
 msgstr "Co ma pokazywać strona?"
 
+msgid "What should we build next?"
+msgstr "Co budujemy dalej?"
+
 msgid "What teams automate"
 msgstr "Co automatyzują zespoły"
 
@@ -21442,6 +21478,9 @@ msgstr "Napisz odpowiedź"
 
 msgid "Write a reply…"
 msgstr "Napisz odpowiedź…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Napisz dokumentację części, o którą wszyscy pytają…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Napisz raz. Działa w każdym agencie."

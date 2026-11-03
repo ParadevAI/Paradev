@@ -1,3 +1,4 @@
+import { Button } from "@superset/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -26,6 +27,7 @@ import {
 	transferTabToIndex,
 } from "../../../../../core/transfer";
 import type { Tab } from "../../../../../types";
+import { usePaneAppearance } from "../../../../hooks/usePaneAppearance";
 import type { AddTabMenuActions, PaneRegistry } from "../../../../types";
 import { PANE_DRAG_TYPE } from "../Tab/components/Pane/components/PaneHeader";
 import { TAB_DRAG_TYPE, TabItem } from "./components/TabItem";
@@ -71,7 +73,8 @@ function AddTabButton<_TData>({
 	onAddTab?: () => void;
 }) {
 	const pendingActionRef = useRef<(() => void) | null>(null);
-	const button = (
+	const isCards = usePaneAppearance() === "cards";
+	const button = isCards ? (
 		<button
 			className={HEADER_ICON_BUTTON_CLASS}
 			type="button"
@@ -79,6 +82,16 @@ function AddTabButton<_TData>({
 		>
 			<PlusIcon className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
 		</button>
+	) : (
+		<Button
+			className="ml-1.5 size-7 rounded-md border border-border/60 bg-muted/30 px-1 text-muted-foreground shadow-none hover:bg-accent/60 hover:text-foreground"
+			size="icon"
+			type="button"
+			variant="ghost"
+			onClick={onAddTab}
+		>
+			<PlusIcon className="size-3.5" />
+		</Button>
 	);
 
 	if (renderAddTabMenu) {
@@ -131,6 +144,7 @@ export function TabBar<TData>({
 	renderTabBarTrailing,
 	renderTabAccessory,
 }: TabBarProps<TData>) {
+	const isCards = usePaneAppearance() === "cards";
 	const tabsTrackRef = useRef<HTMLDivElement>(null);
 	const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
 	const activeTabIndex = tabs.findIndex((tab) => tab.id === activeTabId);
@@ -262,19 +276,29 @@ export function TabBar<TData>({
 			// the masked/scrollable OverflowFadeContainer, which made the entire bar
 			// swallow clicks.
 			className={cn(
-				"group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]",
+				isCards
+					? "group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]"
+					: "group/root-tabs flex h-12 min-w-0 shrink-0 items-stretch bg-muted/45 shadow-[inset_0_-1px_0_var(--border)] dark:bg-muted/35",
 				className,
 			)}
 		>
 			{renderTabBarLeading && (
-				<div className="flex h-full shrink-0 items-stretch">
+				<div
+					className={cn(
+						"flex h-full shrink-0 items-stretch",
+						!isCards && "border-b border-border",
+					)}
+				>
 					{renderTabBarLeading()}
 				</div>
 			)}
 			<OverflowFadeContainer
 				observeChildren
 				onOverflowChange={handleOverflowChange}
-				className="hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden pl-1.5"
+				className={cn(
+					"hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden",
+					isCards && "pl-1.5",
+				)}
 			>
 				<div
 					ref={tabsTrackRef}
@@ -282,7 +306,11 @@ export function TabBar<TData>({
 				>
 					{tabs.map((tab, i) => (
 						<div
-							className="flex h-full shrink-0 items-center px-0.5"
+							className={
+								isCards
+									? "flex h-full shrink-0 items-center px-0.5"
+									: "h-full shrink-0 pt-1"
+							}
 							key={tab.id}
 							style={{ width: TAB_WIDTH }}
 						>
@@ -316,7 +344,12 @@ export function TabBar<TData>({
 						/>
 					)}
 					{!hasHorizontalOverflow && (
-						<div className="flex h-full w-10 shrink-0 items-center justify-center">
+						<div
+							className={cn(
+								"flex h-full w-10 shrink-0 items-center justify-center",
+								!isCards && "pt-1",
+							)}
+						>
 							<AddTabButton
 								renderAddTabMenu={renderAddTabMenu}
 								onAddTab={onAddTab}
@@ -325,11 +358,21 @@ export function TabBar<TData>({
 					)}
 					{/* Empty space to the right of the tabs (collapses to 0 when the
 					    tabs overflow); the bar's only window-drag region. */}
-					<div className="drag h-full flex-1" />
+					<div
+						className={cn(
+							"drag h-full flex-1",
+							!isCards && "border-b border-border",
+						)}
+					/>
 				</div>
 			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
-				<div className="no-drag flex h-full w-10 shrink-0 items-center justify-center">
+				<div
+					className={cn(
+						"no-drag flex h-full w-10 shrink-0 items-center justify-center",
+						!isCards && "pt-1",
+					)}
+				>
 					<AddTabButton
 						renderAddTabMenu={renderAddTabMenu}
 						onAddTab={onAddTab}
@@ -337,7 +380,12 @@ export function TabBar<TData>({
 				</div>
 			)}
 			{renderTabBarTrailing && (
-				<div className="no-drag flex h-full shrink-0 items-center px-1">
+				<div
+					className={cn(
+						"no-drag flex h-full shrink-0 items-center px-1",
+						!isCards && "border-b border-border",
+					)}
+				>
 					{renderTabBarTrailing()}
 				</div>
 			)}

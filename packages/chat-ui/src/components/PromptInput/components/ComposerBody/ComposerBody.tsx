@@ -1311,7 +1311,7 @@ export function ComposerBody({
 					className={
 						!canSend || disabled || pending
 							? buttons.inactiveSend
-							: isEmpty && attachments.length === 0
+							: inline && isEmpty && attachments.length === 0
 								? buttons.filled
 								: cn(
 										buttons.base,

@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} mỗi người dùng/tháng khi thanh toán theo tháng, 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} mỗi người dùng/tháng. Di động, tự động hóa, hỗ trợ ưu tiên."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
+
 msgid "{name} accounts"
 msgstr "Tài khoản {name}"
 
@@ -2096,6 +2099,9 @@ msgstr "Thêm mã số thuế"
 
 msgid "Add team member..."
 msgstr "Thêm thành viên nhóm..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Thêm test cho phần code rủi ro nhất chưa được test…"
 
 msgid "Add tests where they're missing"
 msgstr "Thêm test ở những chỗ còn thiếu"
@@ -3222,6 +3228,9 @@ msgstr "Tự động hóa & trigger sự kiện"
 msgid "Automations require the Pro plan."
 msgstr "Tự động hóa yêu cầu gói Pro."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Tự động hóa, {myFailedCount} đang lỗi"
+
 msgid "Autonomous"
 msgstr "Tự chủ"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode và nhiều nữa."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude hiện đang chạy trong workspace component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Dọn các TODO cũ…"
 
 msgid "Clear"
 msgstr "Trong suốt"
@@ -7833,6 +7845,9 @@ msgstr "Thử nghiệm"
 msgid "Expired"
 msgstr "Đã hết hạn"
 
+msgid "Explain how this repository works…"
+msgstr "Giải thích repository này hoạt động thế nào…"
+
 msgid "Explain to me how this repository works"
 msgstr "Giải thích cho tôi repository này hoạt động thế nào"
 
@@ -8556,6 +8571,9 @@ msgstr "Tìm"
 
 msgid "Find a person…"
 msgstr "Tìm người…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Tìm một lỗi nhỏ và sửa nó…"
 
 msgid "Find a team…"
 msgstr "Tìm nhóm…"
@@ -11896,6 +11914,9 @@ msgstr "Workspace mới"
 
 msgid "New Workspace"
 msgstr "Workspace mới"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Workspace mới ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Workspace mới trong {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK & API công khai"
 msgid "Search"
 msgstr "Tìm kiếm"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Tìm kiếm ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Tìm trong {0} trang…"
@@ -17168,6 +17192,9 @@ msgstr "Đang thiết lập ở nền..."
 
 msgid "Settings"
 msgstr "Cài đặt"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Cài đặt ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Cài đặt → Truy cập từ xa → “Cho phép truy cập từ xa vào thiết bị này qua relay”."
@@ -19961,6 +19988,9 @@ msgstr "Theo dõi và quản lý tác vụ được đồng bộ từ Linear. N�
 msgid "Track budgets and spending"
 msgstr "Theo dõi ngân sách và chi tiêu"
 
+msgid "Track down that flaky test…"
+msgstr "Truy ra bài test chập chờn đó…"
+
 msgid "Track file changes per turn"
 msgstr "Theo dõi thay đổi tệp theo từng lượt"
 
@@ -20486,6 +20516,9 @@ msgstr "Đang cập nhật…"
 
 msgid "Upgrade"
 msgstr "Nâng cấp"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Nâng cấp một dependency và sửa những gì hỏng…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Việc gì nên chạy tự động?"
 msgid "What should the page show?"
 msgstr "Trang nên hiển thị gì?"
 
+msgid "What should we build next?"
+msgstr "Chúng ta xây dựng gì tiếp theo?"
+
 msgid "What teams automate"
 msgstr "Các nhóm tự động hóa những gì"
 
@@ -21442,6 +21478,9 @@ msgstr "Viết câu trả lời"
 
 msgid "Write a reply…"
 msgstr "Viết trả lời…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Viết tài liệu cho phần ai cũng hỏi…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Viết một lần. Chạy trong mọi agent."

@@ -60,6 +60,7 @@ export function ChannelHeader({
 	return (
 		<PageHeader
 			className="border-b border-border"
+			reservesWindowControls={!isPanelOpen}
 			start={
 				<div className="flex min-w-0 items-center gap-3">
 					<Tooltip delayDuration={500}>
@@ -148,7 +149,11 @@ export function ChannelHeader({
 						</DropdownMenuContent>
 					</DropdownMenu>
 					{!isPanelOpen && (
-						<RightSidebarToggle isOpen={false} onToggle={onTogglePanel} />
+						<RightSidebarToggle
+							isOpen={false}
+							onToggle={onTogglePanel}
+							compact
+						/>
 					)}
 				</div>
 			}

@@ -5,34 +5,28 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { LuPanelLeft, LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { useWorkspaceSidebarStore } from "renderer/stores";
 
 export function SidebarToggle() {
 	const { isCollapsed, toggleCollapsed } = useWorkspaceSidebarStore();
 	const collapsed = isCollapsed();
+	const isParadevShell = useParadevShell();
+	const strokeWidth = isParadevShell ? HEADER_ICON_STROKE_WIDTH : 1.5;
 
 	const getToggleIcon = (isHovering: boolean) => {
 		if (collapsed) {
 			return isHovering ? (
-				<LuPanelLeftOpen
-					className="size-4"
-					strokeWidth={HEADER_ICON_STROKE_WIDTH}
-				/>
+				<LuPanelLeftOpen className="size-4" strokeWidth={strokeWidth} />
 			) : (
-				<LuPanelLeft
-					className="size-4"
-					strokeWidth={HEADER_ICON_STROKE_WIDTH}
-				/>
+				<LuPanelLeft className="size-4" strokeWidth={strokeWidth} />
 			);
 		}
 		return isHovering ? (
-			<LuPanelLeftClose
-				className="size-4"
-				strokeWidth={HEADER_ICON_STROKE_WIDTH}
-			/>
+			<LuPanelLeftClose className="size-4" strokeWidth={strokeWidth} />
 		) : (
-			<LuPanelLeft className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
+			<LuPanelLeft className="size-4" strokeWidth={strokeWidth} />
 		);
 	};
 
@@ -42,7 +36,11 @@ export function SidebarToggle() {
 				<button
 					type="button"
 					onClick={toggleCollapsed}
-					className={cn("no-drag group", HEADER_ICON_BUTTON_CLASS)}
+					className={
+						isParadevShell
+							? cn("no-drag group", HEADER_ICON_BUTTON_CLASS)
+							: "no-drag group flex items-center justify-center size-8 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors"
+					}
 				>
 					<span className="group-hover:hidden">{getToggleIcon(false)}</span>
 					<span className="hidden group-hover:block">

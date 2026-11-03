@@ -1098,6 +1098,9 @@ msgstr "月払いで1ユーザーあたり月額 {monthlyPrice}、または年�
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オートメーション、優先サポート。"
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
+
 msgid "{name} accounts"
 msgstr "{name} のアカウント"
 
@@ -2096,6 +2099,9 @@ msgstr "税IDを追加"
 
 msgid "Add team member..."
 msgstr "チームメンバーを追加..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "テストのない危険なコードにテストを追加…"
 
 msgid "Add tests where they're missing"
 msgstr "テストが不足している箇所に追加"
@@ -3222,6 +3228,9 @@ msgstr "オートメーションとイベントトリガー"
 msgid "Automations require the Pro plan."
 msgstr "オートメーションにはProプランが必要です。"
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "オートメーション、{myFailedCount}件が失敗中"
+
 msgid "Autonomous"
 msgstr "自律"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code、Codex、Cursor、OpenCodeなど。"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "ワークスペースcomponent-showcaseでClaudeが実行中です。"
+
+msgid "Clean up stale TODOs…"
+msgstr "古いTODOを整理…"
 
 msgid "Clear"
 msgstr "クリア"
@@ -7833,6 +7845,9 @@ msgstr "実験的機能"
 msgid "Expired"
 msgstr "期限切れ"
 
+msgid "Explain how this repository works…"
+msgstr "このリポジトリの仕組みを説明…"
+
 msgid "Explain to me how this repository works"
 msgstr "このリポジトリの仕組みを教えて"
 
@@ -8556,6 +8571,9 @@ msgstr "検索"
 
 msgid "Find a person…"
 msgstr "メンバーを検索…"
+
+msgid "Find a small bug and fix it…"
+msgstr "小さなバグを見つけて修正…"
 
 msgid "Find a team…"
 msgstr "チームを検索…"
@@ -11896,6 +11914,9 @@ msgstr "新規ワークスペース"
 
 msgid "New Workspace"
 msgstr "新規ワークスペース"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "新規ワークスペース({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "{name} に新規ワークスペース"
@@ -16526,6 +16547,9 @@ msgstr "SDKと公開API"
 msgid "Search"
 msgstr "検索"
 
+msgid "Search ({searchShortcutText})"
+msgstr "検索 ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "{0}件のサイトを検索…"
@@ -17168,6 +17192,9 @@ msgstr "バックグラウンドでセットアップ中..."
 
 msgid "Settings"
 msgstr "設定"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "設定 ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "設定 → リモートアクセス →「リレー経由でこのデバイスへのリモートアクセスを許可」。"
@@ -19961,6 +19988,9 @@ msgstr "Linearから同期したタスクを追跡・管理できます。Parade
 msgid "Track budgets and spending"
 msgstr "予算と支出を管理"
 
+msgid "Track down that flaky test…"
+msgstr "不安定なテストの原因を突き止める…"
+
 msgid "Track file changes per turn"
 msgstr "ターンごとにファイルの変更を記録"
 
@@ -20486,6 +20516,9 @@ msgstr "更新中…"
 
 msgid "Upgrade"
 msgstr "アップグレード"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "依存関係を更新して壊れた箇所を直す…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "何を自動で実行しますか？"
 msgid "What should the page show?"
 msgstr "ページに何を表示しますか?"
 
+msgid "What should we build next?"
+msgstr "次は何を作りますか?"
+
 msgid "What teams automate"
 msgstr "チームが自動化していること"
 
@@ -21442,6 +21478,9 @@ msgstr "返信を書く"
 
 msgid "Write a reply…"
 msgstr "返信を入力…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "よく質問される部分のドキュメントを書く…"
 
 msgid "Write once. Runs in every agent."
 msgstr "一度書けば、すべてのエージェントで動きます。"

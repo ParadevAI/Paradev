@@ -1,6 +1,7 @@
 export {
 	TitleBarSlotsProvider,
 	titleBarTabBarProps,
+	useIsInTitleBarShell,
 	useTitleBarMainSlot,
 	useTitleBarSideSlot,
 	useTitleBarSideWidth,

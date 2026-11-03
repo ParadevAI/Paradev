@@ -14,6 +14,8 @@ import {
 } from "react-icons/lu";
 import { useHotkey } from "renderer/hotkeys";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
+import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
+import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
 import type { ChannelMessage } from "renderer/routes/_authenticated/utils/channelMessageCache";
 import {
 	type ChannelPanelTab,
@@ -133,6 +135,7 @@ export function ChannelPanel({
 				onCloseOthers={(key) => closeOthers(channelId, key)}
 				onCloseToRight={(key) => closeToRight(channelId, key)}
 				onNewTab={() => openNewTab(channelId)}
+				leading={isFullScreen ? <WindowChrome /> : undefined}
 				renderPreview={(key) => {
 					const tab = byKey.get(key);
 					if (tab?.kind === "thread") {
@@ -176,6 +179,7 @@ export function ChannelPanel({
 						>
 							<LuPanelRightClose className="size-4" strokeWidth={1.5} />
 						</RightPaneHeaderButton>
+						<WindowControlsInset />
 					</div>
 				}
 			/>

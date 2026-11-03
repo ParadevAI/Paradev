@@ -126,7 +126,11 @@ export interface AddTabMenuActions {
 	runAfterClose: (action: () => void) => void;
 }
 
+/** `cards` draws each pane as its own rounded card with gaps between them, and the tabs as pills. */
+export type PaneAppearance = "default" | "cards";
+
 export interface WorkspaceProps<TData> {
+	appearance?: PaneAppearance;
 	store: StoreApi<WorkspaceStore<TData>>;
 	registry: PaneRegistry<TData>;
 	className?: string;

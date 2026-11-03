@@ -10,6 +10,7 @@ import { Redirect } from "renderer/components/Redirect";
 import { useWorkspaceNamingFailedToast } from "renderer/hooks/host-service/useWorkspaceNamingFailedToast";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useQuickCreateWorkspace } from "renderer/hooks/useQuickCreateWorkspace";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -41,6 +42,7 @@ import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMo
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
+import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
@@ -60,6 +62,7 @@ function DashboardLayout() {
 
 	const openNewWorkspace = useOpenNewWorkspace();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const isParadevShell = useParadevShell() && isV2CloudEnabled;
 	const portsDisplayMode = usePortsDisplayMode();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const quickCreateWorkspace = useQuickCreateWorkspace();
@@ -105,6 +108,7 @@ function DashboardLayout() {
 	const onV1WorkspaceRoute = currentWorkspaceMatch !== false;
 	const onV2WorkspaceRoute = v2WorkspaceMatch !== false;
 	useHistoryNavigationShortcuts();
+	const showsAppTopBar = useShowsAppTopBar();
 	const versionMismatch =
 		(isV2CloudEnabled && onV1WorkspaceRoute) ||
 		(!isV2CloudEnabled && onV2WorkspaceRoute);
@@ -187,34 +191,65 @@ function DashboardLayout() {
 		},
 	);
 
-	const sidebar = isV2CloudEnabled ? (
-		<DashboardSidebar isCollapsed={isWorkspaceSidebarCollapsed} />
-	) : (
-		<WorkspaceSidebar
-			isCollapsed={isWorkspaceSidebarCollapsed}
-			activeProjectId={currentWorkspace?.projectId ?? null}
-			activeProjectName={currentWorkspace?.project?.name ?? null}
-		/>
+	// The collapsed rail's top strip continues the page's header row, so the
+	// panel must not draw its own full-height border: the sidebar's inner
+	// border, which stops below the strip, is the only divider.
+	const railContinuesHeaderRow = !showsAppTopBar && isWorkspaceSidebarCollapsed;
+
+	const sidebarPanel = (
+		<WorkspaceSidebarPanel
+			className={railContinuesHeaderRow ? "border-r-0" : undefined}
+		>
+			{isV2CloudEnabled ? (
+				<DashboardSidebar isCollapsed={isWorkspaceSidebarCollapsed} />
+			) : (
+				<WorkspaceSidebar
+					isCollapsed={isWorkspaceSidebarCollapsed}
+					activeProjectId={currentWorkspace?.projectId ?? null}
+					activeProjectName={currentWorkspace?.project?.name ?? null}
+				/>
+			)}
+		</WorkspaceSidebarPanel>
 	);
 
-	const content = (
-		<div className="relative flex min-h-0 min-w-0 flex-1">
-			{versionMismatch ? (
-				// A v2 user on a stale v1 workspace route has nothing to go
-				// back to, so send them somewhere actionable instead of a
-				// dead-end "pick a workspace" screen. v1 users keep the
-				// static state — /new-workspace is a v2-only surface.
-				isV2CloudEnabled ? (
-					<Redirect to="/new-workspace" replace />
-				) : (
-					<CrossVersionMismatchState />
-				)
-			) : (
-				<ContentBoundary>
-					<Outlet />
-				</ContentBoundary>
+	// v2 screens draw their own headers, so the sidebar always runs full
+	// height beside them; only v1 screens keep the TopBar above both.
+	const sidebarOutsideColumn =
+		!showsAppTopBar || (isV2CloudEnabled && !isWorkspaceSidebarCollapsed);
+
+	const content = versionMismatch ? (
+		// A v2 user on a stale v1 workspace route has nothing to go
+		// back to, so send them somewhere actionable instead of a
+		// dead-end "pick a workspace" screen. v1 users keep the
+		// static state — /new-workspace is a v2-only surface.
+		isV2CloudEnabled ? (
+			<Redirect to="/new-workspace" replace />
+		) : (
+			<CrossVersionMismatchState />
+		)
+	) : (
+		<ContentBoundary>
+			<Outlet />
+		</ContentBoundary>
+	);
+
+	const mounts = (
+		<>
+			<AddRepositoryModals />
+			<SaveAsEnvironmentMount />
+			<RestoreCloudWorkspaceMount />
+			{deleteTarget && (
+				<DeleteWorkspaceDialog
+					workspaceId={deleteTarget.workspaceId}
+					workspaceName={deleteTarget.workspaceName}
+					workspaceType={deleteTarget.workspaceType}
+					open={true}
+					onOpenChange={(open) => {
+						if (!open) setDeleteTarget(null);
+					}}
+				/>
 			)}
-		</div>
+		</>
 	);
 
 	return (
@@ -237,48 +272,48 @@ function DashboardLayout() {
 		>
 			<PortForwardsProvider>
 				<RemotePortForwarder />
-				<CommandPaletteHost />
-				{isV2CloudEnabled ? (
-					<TitleBarSlotsProvider>
-						<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
-							<TitleBar />
-							<ChatTabs />
-							<div className="flex min-h-0 flex-1">
-								<NavigationRail />
-								<WorkspaceSidebarPanel
-									collapsedWidth={0}
-									className="border-r-0"
-								>
-									{sidebar}
-								</WorkspaceSidebarPanel>
-								<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+				{isParadevShell ? (
+					<>
+						<CommandPaletteHost />
+						<TitleBarSlotsProvider>
+							<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
+								<TitleBar />
+								<ChatTabs />
+								<div className="flex min-h-0 flex-1">
+									<NavigationRail />
+									<WorkspaceSidebarPanel
+										collapsedWidth={0}
+										className="border-r-0"
+									>
+										<DashboardSidebar
+											isCollapsed={isWorkspaceSidebarCollapsed}
+										/>
+									</WorkspaceSidebarPanel>
+									<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+										<div className="relative flex min-h-0 min-w-0 flex-1">
+											{content}
+										</div>
+									</div>
+								</div>
+							</div>
+						</TitleBarSlotsProvider>
+						{mounts}
+					</>
+				) : (
+					<div className="flex h-full w-full overflow-hidden">
+						<CommandPaletteHost />
+						{sidebarOutsideColumn && sidebarPanel}
+						<div className="flex flex-1 flex-col min-w-0 min-h-0">
+							{showsAppTopBar && <TopBar />}
+							<div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
+								{!sidebarOutsideColumn && sidebarPanel}
+								<div className="relative flex flex-1 min-h-0 min-w-0">
 									{content}
 								</div>
 							</div>
 						</div>
-					</TitleBarSlotsProvider>
-				) : (
-					<div className="flex h-full w-full flex-col overflow-hidden">
-						<TopBar />
-						<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-							<WorkspaceSidebarPanel>{sidebar}</WorkspaceSidebarPanel>
-							{content}
-						</div>
+						{mounts}
 					</div>
-				)}
-				<AddRepositoryModals />
-				<SaveAsEnvironmentMount />
-				<RestoreCloudWorkspaceMount />
-				{deleteTarget && (
-					<DeleteWorkspaceDialog
-						workspaceId={deleteTarget.workspaceId}
-						workspaceName={deleteTarget.workspaceName}
-						workspaceType={deleteTarget.workspaceType}
-						open={true}
-						onOpenChange={(open) => {
-							if (!open) setDeleteTarget(null);
-						}}
-					/>
 				)}
 			</PortForwardsProvider>
 		</DashboardSidebarPortsProvider>

@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} per pengguna/bulan ditagih bulanan, atau {yearlyPrice} di
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan prioritas."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
+
 msgid "{name} accounts"
 msgstr "Akun {name}"
 
@@ -2096,6 +2099,9 @@ msgstr "Tambah NPWP/tax ID"
 
 msgid "Add team member..."
 msgstr "Tambah anggota tim..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Tambahkan tes untuk kode paling berisiko yang belum diuji…"
 
 msgid "Add tests where they're missing"
 msgstr "Tambahkan tes yang belum ada"
@@ -3222,6 +3228,9 @@ msgstr "Otomatisasi & pemicu event"
 msgid "Automations require the Pro plan."
 msgstr "Otomatisasi memerlukan paket Pro."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Otomatisasi, {myFailedCount} gagal"
+
 msgid "Autonomous"
 msgstr "Otonom"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode, dan lainnya."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude kini berjalan di workspace component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Bereskan TODO yang basi…"
 
 msgid "Clear"
 msgstr "Bening"
@@ -7833,6 +7845,9 @@ msgstr "Eksperimental"
 msgid "Expired"
 msgstr "Kedaluwarsa"
 
+msgid "Explain how this repository works…"
+msgstr "Jelaskan cara kerja repositori ini…"
+
 msgid "Explain to me how this repository works"
 msgstr "Jelaskan cara kerja repositori ini"
 
@@ -8556,6 +8571,9 @@ msgstr "Cari"
 
 msgid "Find a person…"
 msgstr "Cari orang…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Cari bug kecil dan perbaiki…"
 
 msgid "Find a team…"
 msgstr "Cari tim…"
@@ -11896,6 +11914,9 @@ msgstr "Workspace baru"
 
 msgid "New Workspace"
 msgstr "Workspace Baru"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Workspace Baru ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Workspace baru di {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK & API publik"
 msgid "Search"
 msgstr "Cari"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Cari ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Cari {0} situs…"
@@ -17168,6 +17192,9 @@ msgstr "Menyiapkan di latar belakang..."
 
 msgid "Settings"
 msgstr "Pengaturan"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Pengaturan ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Pengaturan → Akses Jarak Jauh → “Izinkan akses jarak jauh ke perangkat ini melalui relay”."
@@ -19961,6 +19988,9 @@ msgstr "Lacak dan kelola tugas yang disinkronkan dari Linear. Kuasai pekerjaan A
 msgid "Track budgets and spending"
 msgstr "Pantau anggaran dan pengeluaran"
 
+msgid "Track down that flaky test…"
+msgstr "Lacak tes flaky itu…"
+
 msgid "Track file changes per turn"
 msgstr "Lacak perubahan file per giliran"
 
@@ -20486,6 +20516,9 @@ msgstr "Memperbarui…"
 
 msgid "Upgrade"
 msgstr "Upgrade"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Apa yang perlu berjalan otomatis?"
 msgid "What should the page show?"
 msgstr "Apa yang harus ditampilkan halaman ini?"
 
+msgid "What should we build next?"
+msgstr "Apa yang harus kita bangun berikutnya?"
+
 msgid "What teams automate"
 msgstr "Apa yang diotomatisasi tim"
 
@@ -21442,6 +21478,9 @@ msgstr "Tulis balasan"
 
 msgid "Write a reply…"
 msgstr "Tulis balasan…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Tulis dokumentasi untuk bagian yang selalu ditanyakan…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Tulis sekali. Berjalan di setiap agen."

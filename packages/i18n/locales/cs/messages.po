@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} za uživatele/měs. při měsíční fakturaci, nebo {yea
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prioritní podpora."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
+
 msgid "{name} accounts"
 msgstr "Účty {name}"
 
@@ -2096,6 +2099,9 @@ msgstr "Přidat DIČ"
 
 msgid "Add team member..."
 msgstr "Přidat člena týmu..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Doplň testy pro nejrizikovější netestovaný kód…"
 
 msgid "Add tests where they're missing"
 msgstr "Doplnit testy tam, kde chybí"
@@ -3222,6 +3228,9 @@ msgstr "Automatizace a spouštěče událostí"
 msgid "Automations require the Pro plan."
 msgstr "Automatizace vyžadují tarif Pro."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Automatizace, neúspěšné: {myFailedCount}"
+
 msgid "Autonomous"
 msgstr "Autonomní"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode a další."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude teď běží v pracovním prostoru component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Ukliď zastaralé TODO…"
 
 msgid "Clear"
 msgstr "Čirý"
@@ -7833,6 +7845,9 @@ msgstr "Experimentální"
 msgid "Expired"
 msgstr "Vypršelo"
 
+msgid "Explain how this repository works…"
+msgstr "Vysvětli, jak tento repozitář funguje…"
+
 msgid "Explain to me how this repository works"
 msgstr "Vysvětlit mi, jak tento repozitář funguje"
 
@@ -8556,6 +8571,9 @@ msgstr "Najít"
 
 msgid "Find a person…"
 msgstr "Najít osobu…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Najdi malou chybu a oprav ji…"
 
 msgid "Find a team…"
 msgstr "Najít tým…"
@@ -11896,6 +11914,9 @@ msgstr "Nový pracovní prostor"
 
 msgid "New Workspace"
 msgstr "Nový pracovní prostor"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Nový pracovní prostor ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nový pracovní prostor v {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK a veřejné API"
 msgid "Search"
 msgstr "Hledat"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Hledat ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Hledat mezi {0} weby…"
@@ -17168,6 +17192,9 @@ msgstr "Nastavuji na pozadí..."
 
 msgid "Settings"
 msgstr "Nastavení"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Nastavení ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Nastavení → Vzdálený přístup → „Povolit vzdálený přístup k tomuto zařízení přes relay“."
@@ -19961,6 +19988,9 @@ msgstr "Sledujte a spravujte úkoly synchronizované z Linearu. Mějte práci po
 msgid "Track budgets and spending"
 msgstr "Sledování rozpočtů a výdajů"
 
+msgid "Track down that flaky test…"
+msgstr "Vypátrej ten nestabilní test…"
+
 msgid "Track file changes per turn"
 msgstr "Sledovat změny souborů po každém tahu"
 
@@ -20486,6 +20516,9 @@ msgstr "Aktualizuji…"
 
 msgid "Upgrade"
 msgstr "Přejít výš"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Aktualizuj závislost a oprav, co se rozbije…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Co by mělo běžet automaticky?"
 msgid "What should the page show?"
 msgstr "Co má stránka zobrazovat?"
 
+msgid "What should we build next?"
+msgstr "Co postavíme dál?"
+
 msgid "What teams automate"
 msgstr "Co týmy automatizují"
 
@@ -21442,6 +21478,9 @@ msgstr "Napište odpověď"
 
 msgid "Write a reply…"
 msgstr "Napište odpověď…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Napiš dokumentaci k části, na kterou se všichni ptají…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Napište jednou. Běží v každém agentovi."

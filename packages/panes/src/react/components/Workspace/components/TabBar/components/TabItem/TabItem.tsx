@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Button } from "@superset/ui/button";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -18,6 +19,7 @@ import { PencilIcon, XIcon } from "lucide-react";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { Tab } from "../../../../../../../types";
+import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
 import type { PaneRegistry } from "../../../../../../types";
 import { useTabTitle } from "../../../../utils/useTabTitle";
 import { PANE_DRAG_TYPE } from "../../../Tab/components/Pane/components/PaneHeader";
@@ -61,6 +63,7 @@ export function TabItem<TData>({
 	accessory,
 }: TabItemProps<TData>) {
 	const { t } = useLingui();
+	const isCards = usePaneAppearance() === "cards";
 	const [isEditing, setIsEditing] = useState(false);
 	const [editValue, setEditValue] = useState("");
 	const title = useTabTitle(tab, tabs, registry);
@@ -129,8 +132,14 @@ export function TabItem<TData>({
 				<div
 					ref={setRef}
 					className={cn(
-						headerTabClassName(isActive),
-						"group relative w-full",
+						isCards
+							? cn(headerTabClassName(isActive), "group relative w-full")
+							: cn(
+									"group relative flex h-full w-full items-center rounded-t-md transition-colors",
+									isActive
+										? "border border-border/70 border-b-transparent bg-background text-foreground"
+										: "border border-transparent border-b-border text-muted-foreground/70 hover:bg-muted/40 hover:text-muted-foreground",
+								),
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}
@@ -162,7 +171,10 @@ export function TabItem<TData>({
 								<TooltipTrigger asChild>
 									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
 									<div
-										className="flex h-full min-w-0 flex-1 items-center gap-1.5 pl-2.5 pr-1 text-left text-xs transition-colors"
+										className={cn(
+											"flex h-full min-w-0 flex-1 items-center gap-1.5 pr-1 text-left text-xs transition-colors",
+											isCards ? "pl-2.5" : "pl-3",
+										)}
 										onAuxClick={(event) => {
 											if (event.button === 1) {
 												event.preventDefault();
@@ -181,30 +193,58 @@ export function TabItem<TData>({
 								</TooltipTrigger>
 								<TooltipContent side="bottom">{title}</TooltipContent>
 							</Tooltip>
-							<div className="relative mr-1 flex h-full w-4 shrink-0 items-center justify-center">
+							<div
+								className={cn(
+									"relative flex h-full shrink-0 items-center justify-center",
+									isCards ? "mr-1 w-4" : "w-7",
+								)}
+							>
 								{accessory && (
 									<span className="pointer-events-none absolute inset-0 flex items-center justify-center leading-none opacity-100 transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
 										{accessory}
 									</span>
 								)}
-								<button
-									aria-label={t({ message: "Close tab" })}
-									className={cn(
-										HEADER_TAB_CLOSE_CLASS,
-										"pointer-events-none cursor-pointer opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
-									)}
-									onClick={(event) => {
-										event.stopPropagation();
-										onClose();
-									}}
-									onMouseDown={(event) => {
-										event.preventDefault();
-										event.stopPropagation();
-									}}
-									type="button"
-								>
-									<XIcon className="size-3" />
-								</button>
+								{isCards ? (
+									<button
+										aria-label={t({ message: "Close tab" })}
+										className={cn(
+											HEADER_TAB_CLOSE_CLASS,
+											"pointer-events-none cursor-pointer opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+										)}
+										onClick={(event) => {
+											event.stopPropagation();
+											onClose();
+										}}
+										onMouseDown={(event) => {
+											event.preventDefault();
+											event.stopPropagation();
+										}}
+										type="button"
+									>
+										<XIcon className="size-3" />
+									</button>
+								) : (
+									<Button
+										aria-label={t({ message: "Close tab" })}
+										className={cn(
+											"pointer-events-none size-5 cursor-pointer text-current opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+											isActive ? "hover:bg-muted" : "hover:bg-foreground/10",
+										)}
+										onClick={(event) => {
+											event.stopPropagation();
+											onClose();
+										}}
+										onMouseDown={(event) => {
+											event.preventDefault();
+											event.stopPropagation();
+										}}
+										size="icon"
+										type="button"
+										variant="ghost"
+									>
+										<XIcon className="size-3.5" />
+									</Button>
+								)}
 							</div>
 						</>
 					)}

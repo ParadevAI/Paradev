@@ -8,11 +8,15 @@ import { useCallback, useMemo, useRef } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
+import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
+import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
 import {
 	titleBarTabBarProps,
 	useTitleBarMainSlot,
@@ -199,6 +203,7 @@ function V2WorkspaceContent() {
 	const workspaceId = workspace.id;
 	const navigate = Route.useNavigate();
 	const titleBarMainSlot = useTitleBarMainSlot();
+	const isParadevShell = useParadevShell();
 	const consumeSearch = useCallback<ConsumeSearch>(
 		(keys) => {
 			void navigate({
@@ -567,6 +572,10 @@ function V2WorkspaceContent() {
 		void workspaceRun.toggleWorkspaceRun();
 	});
 
+	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
+	// Default to Mac while loading so window controls don't flash in.
+	const isMac = platform === undefined || platform === "darwin";
+
 	const workspaceRunButton = (
 		<V2WorkspaceRunButton
 			projectId={workspace.projectId}
@@ -584,6 +593,7 @@ function V2WorkspaceContent() {
 			run={workspaceRun}
 			isRightPaneOpen={isRightPaneOpen}
 			onToggleRightPane={toggleRightSidebar}
+			showWindowControls={!isMac}
 		/>
 	);
 
@@ -684,6 +694,7 @@ function V2WorkspaceContent() {
 								<Workspace<PaneViewerData>
 									key={workspaceId}
 									{...titleBarTabBarProps(titleBarMainSlot)}
+									appearance={isParadevShell ? "cards" : "default"}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}
@@ -729,6 +740,7 @@ function V2WorkspaceContent() {
 									renderPaneAside={() => (
 										<ActivityPanelAside workspaceId={workspaceId} />
 									)}
+									renderTabBarLeading={() => <WindowChrome />}
 									renderTabBarTrailing={() => (
 										<div
 											className={cn(
@@ -759,6 +771,7 @@ function V2WorkspaceContent() {
 														isOpen={sidebarOpen}
 														onToggle={toggleRightSidebar}
 													/>
+													{!isMac && !sidebarOpen && <WindowControlsInset />}
 												</>
 											)}
 										</div>

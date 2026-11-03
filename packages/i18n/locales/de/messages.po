@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} pro Nutzer/Monat bei monatlicher Abrechnung oder {yearlyP
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} pro Nutzer/Monat. Mobile, Automatisierungen, bevorzugter Support."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "Bei {myFailedCount} deiner Automatisierungen ist der letzte Lauf fehlgeschlagen"
+
 msgid "{name} accounts"
 msgstr "{name}-Konten"
 
@@ -2096,6 +2099,9 @@ msgstr "Steuernummer hinzufügen"
 
 msgid "Add team member..."
 msgstr "Teammitglied hinzufügen..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Tests für den riskantesten ungetesteten Code schreiben…"
 
 msgid "Add tests where they're missing"
 msgstr "Tests ergänzen, wo sie fehlen"
@@ -3222,6 +3228,9 @@ msgstr "Automatisierungen & Ereignis-Trigger"
 msgid "Automations require the Pro plan."
 msgstr "Automatisierungen erfordern den Pro-Plan."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Automatisierungen, {myFailedCount} fehlgeschlagen"
+
 msgid "Autonomous"
 msgstr "Autonom"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode und mehr."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude läuft jetzt im Arbeitsbereich component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Veraltete TODOs aufräumen…"
 
 msgid "Clear"
 msgstr "Klar"
@@ -7833,6 +7845,9 @@ msgstr "Experimentell"
 msgid "Expired"
 msgstr "Abgelaufen"
 
+msgid "Explain how this repository works…"
+msgstr "Erklären, wie dieses Repository funktioniert…"
+
 msgid "Explain to me how this repository works"
 msgstr "Erklär mir, wie dieses Repository funktioniert"
 
@@ -8556,6 +8571,9 @@ msgstr "Suchen"
 
 msgid "Find a person…"
 msgstr "Person suchen…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Einen kleinen Bug finden und beheben…"
 
 msgid "Find a team…"
 msgstr "Team suchen…"
@@ -11896,6 +11914,9 @@ msgstr "Neuer Arbeitsbereich"
 
 msgid "New Workspace"
 msgstr "Neuer Arbeitsbereich"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Neuer Arbeitsbereich ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Neuer Arbeitsbereich in {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK & öffentliche API"
 msgid "Search"
 msgstr "Suchen"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Suchen ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "{0} Websites durchsuchen…"
@@ -17168,6 +17192,9 @@ msgstr "Einrichtung läuft im Hintergrund..."
 
 msgid "Settings"
 msgstr "Einstellungen"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Einstellungen ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Einstellungen → Fernzugriff → „Fernzugriff auf dieses Gerät über den Relay erlauben“."
@@ -19961,6 +19988,9 @@ msgstr "Verfolge und verwalte Aufgaben, die aus Linear synchronisiert werden. Be
 msgid "Track budgets and spending"
 msgstr "Budgets und Ausgaben verfolgen"
 
+msgid "Track down that flaky test…"
+msgstr "Diesem flaky Test auf den Grund gehen…"
+
 msgid "Track file changes per turn"
 msgstr "Dateiänderungen pro Durchlauf verfolgen"
 
@@ -20486,6 +20516,9 @@ msgstr "Wird aktualisiert…"
 
 msgid "Upgrade"
 msgstr "Upgrade"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Eine Abhängigkeit aktualisieren und beheben, was bricht…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Was soll automatisch laufen?"
 msgid "What should the page show?"
 msgstr "Was soll die Seite zeigen?"
 
+msgid "What should we build next?"
+msgstr "Was bauen wir als Nächstes?"
+
 msgid "What teams automate"
 msgstr "Was Teams automatisieren"
 
@@ -21442,6 +21478,9 @@ msgstr "Antwort schreiben"
 
 msgid "Write a reply…"
 msgstr "Antwort schreiben…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Doku für den Teil schreiben, nach dem alle fragen…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Einmal schreiben. Läuft in jedem Agenten."

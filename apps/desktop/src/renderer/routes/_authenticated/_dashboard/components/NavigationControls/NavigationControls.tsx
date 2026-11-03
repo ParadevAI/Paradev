@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useLocation, useRouter } from "@tanstack/react-router";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { HotkeyLabel } from "renderer/hotkeys";
 // Temporarily hidden: import { HistoryDropdown } from "./components/HistoryDropdown";
 
@@ -15,6 +16,11 @@ export function NavigationControls() {
 
 	const canGoBack = router.history.canGoBack();
 	const canGoForward = location.state.__TSR_index < router.history.length - 1;
+	const isParadevShell = useParadevShell();
+	const buttonClassName = isParadevShell
+		? cn("no-drag", HEADER_ICON_BUTTON_CLASS)
+		: "no-drag flex items-center justify-center size-7 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors disabled:opacity-30 disabled:pointer-events-none";
+	const strokeWidth = isParadevShell ? HEADER_ICON_STROKE_WIDTH : 1.5;
 
 	return (
 		<div className="flex items-center">
@@ -24,12 +30,9 @@ export function NavigationControls() {
 						type="button"
 						onClick={() => router.history.back()}
 						disabled={!canGoBack}
-						className={cn("no-drag", HEADER_ICON_BUTTON_CLASS)}
+						className={buttonClassName}
 					>
-						<LuArrowLeft
-							className="size-4"
-							strokeWidth={HEADER_ICON_STROKE_WIDTH}
-						/>
+						<LuArrowLeft className="size-4" strokeWidth={strokeWidth} />
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
@@ -43,12 +46,9 @@ export function NavigationControls() {
 						type="button"
 						onClick={() => router.history.forward()}
 						disabled={!canGoForward}
-						className={cn("no-drag", HEADER_ICON_BUTTON_CLASS)}
+						className={buttonClassName}
 					>
-						<LuArrowRight
-							className="size-4"
-							strokeWidth={HEADER_ICON_STROKE_WIDTH}
-						/>
+						<LuArrowRight className="size-4" strokeWidth={strokeWidth} />
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">

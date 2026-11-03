@@ -30,6 +30,7 @@ export {
 export type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
+	PaneAppearance,
 	PaneContext,
 	PaneDefinition,
 	PaneRegistry,

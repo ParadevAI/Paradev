@@ -64,6 +64,11 @@ export function useTitleBarSlots(): TitleBarSlots {
 	return slots;
 }
 
+/** True inside the redesigned shell, whose title bar keeps the window controls clear for everything below it. */
+export function useIsInTitleBarShell(): boolean {
+	return useContext(TitleBarSlotsContext) !== null;
+}
+
 /** From the right pane's left edge to the window's right edge, or null while the pane is closed. */
 export function useTitleBarSideWidth(): number | null {
 	return useContext(TitleBarSideWidthContext);

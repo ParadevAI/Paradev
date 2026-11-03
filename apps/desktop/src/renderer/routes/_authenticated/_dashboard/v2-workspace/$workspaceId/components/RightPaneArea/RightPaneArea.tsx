@@ -16,8 +16,10 @@ import {
 	useState,
 } from "react";
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
+import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import {
 	titleBarTabBarProps,
 	useTitleBarSideSlot,
@@ -90,6 +92,7 @@ export function RightPaneArea({
 		setPaneBox(node?.closest<HTMLElement>("[data-sidebar-slide]") ?? null);
 	}, []);
 	const titleBarSideSlot = useTitleBarSideSlot(paneBox);
+	const isParadevShell = useParadevShell();
 
 	return (
 		<div className="contents" data-pane-area="right" ref={measurePaneBox}>
@@ -98,6 +101,7 @@ export function RightPaneArea({
 			))}
 			<Workspace<PaneViewerData>
 				{...titleBarTabBarProps(titleBarSideSlot)}
+				appearance={isParadevShell ? "cards" : "default"}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
 				paneActions={rightPaneActions}
@@ -117,6 +121,7 @@ export function RightPaneArea({
 						sources={getV2NotificationSourcesForTab(tab)}
 					/>
 				)}
+				renderTabBarLeading={isFullScreen ? () => <WindowChrome /> : undefined}
 				onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
 				renderTabBarTrailing={() => (
 					<div className="flex items-center gap-1 pr-1">

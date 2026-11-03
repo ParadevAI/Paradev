@@ -1098,6 +1098,9 @@ msgstr "按月计费每用户每月 {monthlyPrice}，或按年计费 {yearlyPric
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。"
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "你有{myFailedCount}个自动化上次运行失败"
+
 msgid "{name} accounts"
 msgstr "{name} 账号"
 
@@ -2096,6 +2099,9 @@ msgstr "添加税号"
 
 msgid "Add team member..."
 msgstr "添加团队成员..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "给风险最高又没测试的代码补上测试…"
 
 msgid "Add tests where they're missing"
 msgstr "给缺测试的地方补测试"
@@ -3222,6 +3228,9 @@ msgstr "自动化与事件触发"
 msgid "Automations require the Pro plan."
 msgstr "自动化需要Pro套餐。"
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "自动化，{myFailedCount}个失败"
+
 msgid "Autonomous"
 msgstr "自主"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code、Codex、Cursor、OpenCode等。"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude已在工作区component-showcase中运行。"
+
+msgid "Clean up stale TODOs…"
+msgstr "清理过期的TODO…"
 
 msgid "Clear"
 msgstr "透明"
@@ -7833,6 +7845,9 @@ msgstr "实验功能"
 msgid "Expired"
 msgstr "已过期"
 
+msgid "Explain how this repository works…"
+msgstr "讲讲这个仓库是怎么运作的…"
+
 msgid "Explain to me how this repository works"
 msgstr "讲讲这个仓库是怎么运作的"
 
@@ -8556,6 +8571,9 @@ msgstr "查找"
 
 msgid "Find a person…"
 msgstr "查找成员…"
+
+msgid "Find a small bug and fix it…"
+msgstr "找一个小bug并修好它…"
 
 msgid "Find a team…"
 msgstr "查找团队…"
@@ -11896,6 +11914,9 @@ msgstr "新建工作区"
 
 msgid "New Workspace"
 msgstr "新建工作区"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "新建工作区（{shortcutText}）"
 
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作区"
@@ -16526,6 +16547,9 @@ msgstr "SDK与公开API"
 msgid "Search"
 msgstr "搜索"
 
+msgid "Search ({searchShortcutText})"
+msgstr "搜索（{searchShortcutText}）"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "搜索{0}个站点…"
@@ -17168,6 +17192,9 @@ msgstr "正在后台配置..."
 
 msgid "Settings"
 msgstr "设置"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "设置（{settingsHotkey}）"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "设置 → 远程访问 → “允许通过中继远程访问本设备”。"
@@ -19961,6 +19988,9 @@ msgstr "跟踪和管理从Linear同步的任务。不用离开Paradev就能掌�
 msgid "Track budgets and spending"
 msgstr "跟踪预算和支出"
 
+msgid "Track down that flaky test…"
+msgstr "揪出那个不稳定的测试…"
+
 msgid "Track file changes per turn"
 msgstr "按轮跟踪文件更改"
 
@@ -20486,6 +20516,9 @@ msgstr "正在更新…"
 
 msgid "Upgrade"
 msgstr "升级"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "升级一个依赖，并修好被它弄坏的地方…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "哪些事应该自动运行？"
 msgid "What should the page show?"
 msgstr "页面应展示什么?"
 
+msgid "What should we build next?"
+msgstr "接下来做点什么？"
+
 msgid "What teams automate"
 msgstr "团队都在自动化什么"
 
@@ -21442,6 +21478,9 @@ msgstr "写回复"
 
 msgid "Write a reply…"
 msgstr "写一条回复…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "给大家最常问的那部分写文档…"
 
 msgid "Write once. Runs in every agent."
 msgstr "编写一次，在每个智能体中运行。"

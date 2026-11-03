@@ -1098,6 +1098,9 @@ msgstr "Aylık faturalandırmada kullanıcı başına aylık {monthlyPrice} veya
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, öncelikli destek."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
+
 msgid "{name} accounts"
 msgstr "{name} hesapları"
 
@@ -2096,6 +2099,9 @@ msgstr "Vergi kimliği ekle"
 
 msgid "Add team member..."
 msgstr "Takım üyesi ekle..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Test edilmemiş en riskli kod için test ekle…"
 
 msgid "Add tests where they're missing"
 msgstr "Eksik olan yerlere test ekle"
@@ -3222,6 +3228,9 @@ msgstr "Otomasyonlar ve olay tetikleyicileri"
 msgid "Automations require the Pro plan."
 msgstr "Otomasyonlar Pro planı gerektirir."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Otomasyonlar, {myFailedCount} başarısız"
+
 msgid "Autonomous"
 msgstr "Otonom"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode ve daha fazlası."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude artık component-showcase çalışma alanında çalışıyor."
+
+msgid "Clean up stale TODOs…"
+msgstr "Eskimiş TODO'ları temizle…"
 
 msgid "Clear"
 msgstr "Şeffaf"
@@ -7833,6 +7845,9 @@ msgstr "Deneysel"
 msgid "Expired"
 msgstr "Süresi doldu"
 
+msgid "Explain how this repository works…"
+msgstr "Bu deponun nasıl çalıştığını açıkla…"
+
 msgid "Explain to me how this repository works"
 msgstr "Bu deponun nasıl çalıştığını anlat"
 
@@ -8556,6 +8571,9 @@ msgstr "Bul"
 
 msgid "Find a person…"
 msgstr "Kişi bul…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Küçük bir hata bul ve düzelt…"
 
 msgid "Find a team…"
 msgstr "Takım bul…"
@@ -11896,6 +11914,9 @@ msgstr "Yeni çalışma alanı"
 
 msgid "New Workspace"
 msgstr "Yeni çalışma alanı"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Yeni çalışma alanı ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "{name} içinde yeni çalışma alanı"
@@ -16526,6 +16547,9 @@ msgstr "SDK ve herkese açık API"
 msgid "Search"
 msgstr "Ara"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Ara ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "{0} sitede ara…"
@@ -17168,6 +17192,9 @@ msgstr "Arka planda kuruluyor..."
 
 msgid "Settings"
 msgstr "Ayarlar"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Ayarlar ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Ayarlar → Uzaktan erişim → “Bu cihaza röle üzerinden uzaktan erişime izin ver”."
@@ -19961,6 +19988,9 @@ msgstr "Linear'dan eşitlenen görevleri izleyin ve yönetin. Paradev'den çıkm
 msgid "Track budgets and spending"
 msgstr "Bütçeleri ve harcamaları takip edin"
 
+msgid "Track down that flaky test…"
+msgstr "Şu kararsız testin izini sür…"
+
 msgid "Track file changes per turn"
 msgstr "Dosya değişikliklerini tur başına izle"
 
@@ -20486,6 +20516,9 @@ msgstr "Güncelleniyor…"
 
 msgid "Upgrade"
 msgstr "Yükselt"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Bir bağımlılığı yükselt ve bozulanları düzelt…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Ne otomatik çalışmalı?"
 msgid "What should the page show?"
 msgstr "Sayfa ne göstermeli?"
 
+msgid "What should we build next?"
+msgstr "Sırada ne geliştirelim?"
+
 msgid "What teams automate"
 msgstr "Ekipler neleri otomatikleştiriyor"
 
@@ -21442,6 +21478,9 @@ msgstr "Bir yanıt yazın"
 
 msgid "Write a reply…"
 msgstr "Bir yanıt yazın…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Herkesin sorduğu bölüm için belge yaz…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Bir kez yazın. Her ajanda çalışır."

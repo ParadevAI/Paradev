@@ -70,7 +70,7 @@ export function TitleBar() {
 				)}
 				style={sideWidth === null ? undefined : { flex: `0 1 ${sideWidth}px` }}
 			/>
-			<WindowControlsInset />
+			<WindowControlsInset inTitleBar />
 		</div>
 	);
 }

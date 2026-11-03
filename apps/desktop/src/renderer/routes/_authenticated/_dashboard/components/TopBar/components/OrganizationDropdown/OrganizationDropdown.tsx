@@ -188,18 +188,25 @@ export function OrganizationDropdown({
 							: "w-56"
 					}
 				>
-					<DropdownMenuItem
-						onSelect={() => navigate({ to: "/settings/account" })}
-					>
-						<HiOutlineCog6Tooth className="h-4 w-4" />
-						<span>
-							<Trans>Settings</Trans>
-						</span>
-						{settingsShortcut !== "Unassigned" && (
-							<DropdownMenuShortcut>{settingsShortcut}</DropdownMenuShortcut>
-						)}
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
+					{/* The rail has no Settings button of its own. */}
+					{variant === "rail" && (
+						<>
+							<DropdownMenuItem
+								onSelect={() => navigate({ to: "/settings/account" })}
+							>
+								<HiOutlineCog6Tooth className="h-4 w-4" />
+								<span>
+									<Trans>Settings</Trans>
+								</span>
+								{settingsShortcut !== "Unassigned" && (
+									<DropdownMenuShortcut>
+										{settingsShortcut}
+									</DropdownMenuShortcut>
+								)}
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+						</>
+					)}
 
 					{/* Organization */}
 					<DropdownMenuItem

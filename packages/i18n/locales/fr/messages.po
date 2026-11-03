@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} par utilisateur/mois en facturation mensuelle, ou {yearly
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} par utilisateur/mois. Mobile, automatisations, support prioritaire."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "Vos automatisations en échec lors de leur dernière exécution : {myFailedCount}"
+
 msgid "{name} accounts"
 msgstr "Comptes {name}"
 
@@ -2096,6 +2099,9 @@ msgstr "Ajouter un identifiant fiscal"
 
 msgid "Add team member..."
 msgstr "Ajouter un membre d'équipe..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Ajoute des tests pour le code non testé le plus risqué…"
 
 msgid "Add tests where they're missing"
 msgstr "Ajouter des tests là où il en manque"
@@ -3222,6 +3228,9 @@ msgstr "Automatisations et déclencheurs d'événements"
 msgid "Automations require the Pro plan."
 msgstr "Les automatisations nécessitent le forfait Pro."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Automatisations, {myFailedCount} en échec"
+
 msgid "Autonomous"
 msgstr "Autonome"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode, et plus encore."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude s'exécute désormais dans l'espace de travail component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Nettoie les TODO obsolètes…"
 
 msgid "Clear"
 msgstr "Transparent"
@@ -7833,6 +7845,9 @@ msgstr "Expérimental"
 msgid "Expired"
 msgstr "Expiré"
 
+msgid "Explain how this repository works…"
+msgstr "Explique le fonctionnement de ce dépôt…"
+
 msgid "Explain to me how this repository works"
 msgstr "M'expliquer le fonctionnement de ce dépôt"
 
@@ -8556,6 +8571,9 @@ msgstr "Rechercher"
 
 msgid "Find a person…"
 msgstr "Rechercher une personne…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Trouve un petit bug et corrige-le…"
 
 msgid "Find a team…"
 msgstr "Rechercher une équipe…"
@@ -11896,6 +11914,9 @@ msgstr "Nouvel espace de travail"
 
 msgid "New Workspace"
 msgstr "Nouvel espace de travail"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Nouvel espace de travail ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nouvel espace de travail dans {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK et API publique"
 msgid "Search"
 msgstr "Rechercher"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Rechercher ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Rechercher parmi {0} sites…"
@@ -17168,6 +17192,9 @@ msgstr "Configuration en arrière-plan..."
 
 msgid "Settings"
 msgstr "Paramètres"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Paramètres ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Paramètres → Accès distant → « Autoriser l'accès distant à cet appareil via le relais »."
@@ -19961,6 +19988,9 @@ msgstr "Suivez et gérez les tâches synchronisées depuis Linear. Gardez le con
 msgid "Track budgets and spending"
 msgstr "Suivre les budgets et les dépenses"
 
+msgid "Track down that flaky test…"
+msgstr "Traque ce test instable…"
+
 msgid "Track file changes per turn"
 msgstr "Suivre les modifications de fichiers à chaque tour"
 
@@ -20486,6 +20516,9 @@ msgstr "Mise à jour…"
 
 msgid "Upgrade"
 msgstr "Passer à ce forfait"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Mets à jour une dépendance et corrige ce qui casse…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Qu'est-ce qui doit s'exécuter automatiquement ?"
 msgid "What should the page show?"
 msgstr "Que doit montrer la page ?"
 
+msgid "What should we build next?"
+msgstr "Que construisons-nous ensuite ?"
+
 msgid "What teams automate"
 msgstr "Ce que les équipes automatisent"
 
@@ -21442,6 +21478,9 @@ msgstr "Écrire une réponse"
 
 msgid "Write a reply…"
 msgstr "Écrire une réponse…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Rédige la documentation de la partie sur laquelle tout le monde pose des questions…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Écrivez une fois. Fonctionne dans chaque agent."

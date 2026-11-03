@@ -1098,6 +1098,9 @@ msgstr "{monthlyPrice} per gebruiker/maand bij maandelijkse facturering, of {yea
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per gebruiker/maand. Mobiel, automatiseringen, prioriteitsondersteuning."
 
+msgid "{myFailedCount} of your automations failed their last run"
+msgstr "Bij {myFailedCount} van je automatiseringen is de laatste run mislukt"
+
 msgid "{name} accounts"
 msgstr "{name}-accounts"
 
@@ -2096,6 +2099,9 @@ msgstr "Btw-nummer toevoegen"
 
 msgid "Add team member..."
 msgstr "Teamlid toevoegen..."
+
+msgid "Add tests for the riskiest untested code…"
+msgstr "Voeg tests toe voor de riskantste ongeteste code…"
 
 msgid "Add tests where they're missing"
 msgstr "Tests toevoegen waar ze ontbreken"
@@ -3222,6 +3228,9 @@ msgstr "Automatiseringen en event-triggers"
 msgid "Automations require the Pro plan."
 msgstr "Automatiseringen vereisen het Pro-abonnement."
 
+msgid "Automations, {myFailedCount} failing"
+msgstr "Automatiseringen, {myFailedCount} mislukt"
+
 msgid "Autonomous"
 msgstr "Autonoom"
 
@@ -4249,6 +4258,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode en meer."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude draait nu in werkruimte component-showcase."
+
+msgid "Clean up stale TODOs…"
+msgstr "Ruim verouderde TODO's op…"
 
 msgid "Clear"
 msgstr "Helder"
@@ -7833,6 +7845,9 @@ msgstr "Experimenteel"
 msgid "Expired"
 msgstr "Verlopen"
 
+msgid "Explain how this repository works…"
+msgstr "Leg uit hoe deze repository werkt…"
+
 msgid "Explain to me how this repository works"
 msgstr "Leg me uit hoe deze repository werkt"
 
@@ -8556,6 +8571,9 @@ msgstr "Zoeken"
 
 msgid "Find a person…"
 msgstr "Persoon zoeken…"
+
+msgid "Find a small bug and fix it…"
+msgstr "Vind een kleine bug en fix die…"
 
 msgid "Find a team…"
 msgstr "Team zoeken…"
@@ -11896,6 +11914,9 @@ msgstr "Nieuwe werkruimte"
 
 msgid "New Workspace"
 msgstr "Nieuwe werkruimte"
+
+msgid "New Workspace ({shortcutText})"
+msgstr "Nieuwe werkruimte ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nieuwe werkruimte in {name}"
@@ -16526,6 +16547,9 @@ msgstr "SDK en publieke API"
 msgid "Search"
 msgstr "Zoeken"
 
+msgid "Search ({searchShortcutText})"
+msgstr "Zoeken ({searchShortcutText})"
+
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "{0} sites doorzoeken…"
@@ -17168,6 +17192,9 @@ msgstr "Bezig met instellen op de achtergrond..."
 
 msgid "Settings"
 msgstr "Instellingen"
+
+msgid "Settings ({settingsHotkey})"
+msgstr "Instellingen ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Instellingen → Externe toegang → “Externe toegang tot dit apparaat via de relay toestaan”."
@@ -19961,6 +19988,9 @@ msgstr "Volg en beheer taken die vanuit Linear zijn gesynchroniseerd. Houd overz
 msgid "Track budgets and spending"
 msgstr "Houd budgetten en uitgaven bij"
 
+msgid "Track down that flaky test…"
+msgstr "Spoor die flaky test op…"
+
 msgid "Track file changes per turn"
 msgstr "Bestandswijzigingen per beurt bijhouden"
 
@@ -20486,6 +20516,9 @@ msgstr "Bijwerken…"
 
 msgid "Upgrade"
 msgstr "Upgraden"
+
+msgid "Upgrade a dependency and fix what breaks…"
+msgstr "Werk een dependency bij en fix wat er stukgaat…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21103,6 +21136,9 @@ msgstr "Wat moet automatisch draaien?"
 msgid "What should the page show?"
 msgstr "Wat moet de pagina laten zien?"
 
+msgid "What should we build next?"
+msgstr "Wat gaan we hierna bouwen?"
+
 msgid "What teams automate"
 msgstr "Wat teams automatiseren"
 
@@ -21442,6 +21478,9 @@ msgstr "Schrijf een antwoord"
 
 msgid "Write a reply…"
 msgstr "Schrijf een antwoord…"
+
+msgid "Write docs for the part everyone asks about…"
+msgstr "Schrijf docs voor het onderdeel waar iedereen naar vraagt…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Eén keer schrijven. Draait in elke agent."
