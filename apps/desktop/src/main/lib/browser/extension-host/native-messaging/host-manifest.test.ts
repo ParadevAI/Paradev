@@ -1,4 +1,5 @@
 import { afterAll, expect, spyOn, test } from "bun:test";
+import * as childProcess from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -201,6 +202,41 @@ test("a manifest that exists but cannot be read stops the lookup", async () => {
 		).toEqual({ ok: false, error: NATIVE_MESSAGING_ERRORS.notFound });
 		expect(warn).toHaveBeenCalled();
 	} finally {
+		warn.mockRestore();
+	}
+});
+
+test("a registry query that fails for a reason other than a missing key is logged", async () => {
+	let failure: NodeJS.ErrnoException | number = 1;
+	const execFile = spyOn(childProcess, "execFile").mockImplementation(((
+		_file: string,
+		_args: string[],
+		callback: (error: unknown, stdout: string) => void,
+	) => {
+		const error =
+			typeof failure === "number"
+				? Object.assign(new Error("Command failed"), { code: failure })
+				: failure;
+		callback(error, "");
+	}) as unknown as typeof childProcess.execFile);
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	const lookup = () =>
+		findNativeHost("com.example.host", ONEPASSWORD, {
+			platform: "win32",
+			home: root,
+			appHostsDir: path.join(root, "no-app-hosts"),
+		});
+	try {
+		expect(await lookup()).toEqual({
+			ok: false,
+			error: NATIVE_MESSAGING_ERRORS.notFound,
+		});
+		expect(warn).not.toHaveBeenCalled();
+		failure = Object.assign(new Error("spawn reg ENOENT"), { code: "ENOENT" });
+		await lookup();
+		expect(warn).toHaveBeenCalledTimes(8);
+	} finally {
+		execFile.mockRestore();
 		warn.mockRestore();
 	}
 });

@@ -116,7 +116,7 @@ export function startNativeHost(
 
 	let closeError: string = NATIVE_MESSAGING_ERRORS.exited;
 	child.on("error", (error) => {
-		console.warn(`[native-messaging] Cannot start ${hostPath}:`, error);
+		console.warn(`[native-messaging] Host process error ${hostPath}:`, error);
 		finish(NATIVE_MESSAGING_ERRORS.failedToStart);
 	});
 	// Stops a host that closed its input; stdout still drains before `close`.

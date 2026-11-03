@@ -312,6 +312,18 @@ test("a native message is limited in UTF-8 bytes, as Chrome measures it", async 
 	expect(sent).toEqual([["connect", 1, "com.example.host"]]);
 });
 
+test("a native message that cannot be serialized throws instead of reaching the host", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime, sent } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+	);
+	const port = runtime.connectNative?.("com.example.host") as NativePort;
+	expect(() => port.postMessage(() => {})).toThrow("Could not serialize");
+	expect(() => port.postMessage(Symbol("x"))).toThrow("Could not serialize");
+	expect(sent).toEqual([["connect", 1, "com.example.host"]]);
+});
+
 test("sendNativeMessage disconnects the port it opened when the message cannot be sent", async () => {
 	const shim = await importInWorkerPreloadRealm();
 	const { runtime, sent } = nativeWorld(

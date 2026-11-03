@@ -233,6 +233,9 @@ contextBridge.executeInMainWorld({
 						throw new Error("Attempting to use a disconnected port object");
 					}
 					const json = JSON.stringify(message === undefined ? null : message);
+					if (json === undefined) {
+						throw new Error("Could not serialize message.");
+					}
 					if (new TextEncoder().encode(json).length > maxMessageLength) {
 						throw new Error("Message length exceeded maximum allowed length.");
 					}

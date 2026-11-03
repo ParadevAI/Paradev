@@ -94,9 +94,14 @@ function queryRegistryDefault([key, view]: [string, string]): Promise<
 	string | null
 > {
 	return new Promise((resolve) => {
-		execFile("reg", ["query", key, "/ve", view], (error, stdout) =>
-			resolve(error ? null : parseRegistryDefault(stdout)),
-		);
+		execFile("reg", ["query", key, "/ve", view], (error, stdout) => {
+			if (!error) return resolve(parseRegistryDefault(stdout));
+			// reg exits with 1 when the key or value does not exist.
+			if (error.code !== 1) {
+				console.warn(`[native-messaging] Cannot query ${key} ${view}:`, error);
+			}
+			resolve(null);
+		});
 	});
 }
 
