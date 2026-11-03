@@ -19,6 +19,9 @@ interface MarkdownItState {
 	src: string;
 	pos: number;
 	push: (type: string, tag: string, nesting: number) => MarkdownItToken;
+	tokens: MarkdownItToken[];
+	md: MarkdownIt;
+	env: unknown;
 	bMarks: number[];
 	eMarks: number[];
 	tShift: number[];
@@ -42,6 +45,12 @@ interface MarkdownIt {
 		ruler: {
 			before: (beforeName: string, name: string, rule: unknown) => void;
 		};
+		parse: (
+			src: string,
+			md: MarkdownIt,
+			env: unknown,
+			outTokens: MarkdownItToken[],
+		) => void;
 	};
 	renderer: {
 		rules: Record<string, (tokens: MarkdownItToken[], idx: number) => string>;
@@ -121,13 +130,17 @@ function inlineMathRule(state: MarkdownItState, silent: boolean): boolean {
 
 	const latex = src.slice(state.pos + 1, end);
 	if (!isMathContent(latex)) {
-		// The span is text (`$5.00$`, `$ x$`). Consume it whole instead of
-		// leaving the delimiters for a later rule: otherwise the closing `$`
-		// can open a new span, and `$5.00$+$x$` renders `$+$` as math and
-		// leaves `x$` literal (#7856 review).
+		// The span is text (`$5.00$`, `$ x$`). Consume it instead of leaving
+		// the delimiters for a later rule: otherwise the closing `$` can open
+		// a new span, and `$5.00$+$x$` renders `$+$` as math and leaves `x$`
+		// literal. The delimiters become text, but the span still goes through
+		// inline parsing, so `$ *x*$` keeps its emphasis (#7856 review).
 		if (!silent) {
-			const token = state.push("text", "", 0);
-			token.content = src.slice(state.pos, end + 1);
+			const opening = state.push("text", "", 0);
+			opening.content = "$";
+			state.md.inline.parse(latex, state.md, state.env, state.tokens);
+			const closing = state.push("text", "", 0);
+			closing.content = "$";
 		}
 		state.pos = end + 1;
 		return true;

@@ -235,6 +235,20 @@ describe("math", () => {
 		}
 	});
 
+	it("still parses the prose inside a rejected span", () => {
+		// A rejected span is text, but its contents are still markdown: the
+		// whole-span text token used to leave `$ *x*$` with the asterisks on
+		// screen (#7856 review).
+		const editor = createEditor("$ *x*$");
+		try {
+			expect(mathNodes(editor)).toEqual([]);
+			expect(editor.state.doc.textContent).toBe("$ x$");
+		} finally {
+			editor.destroy();
+		}
+		expect(roundTrip("$ *x*$")).toBe("$ *x*$");
+	});
+
 	it("leaves currency alone", () => {
 		const editor = createEditor("It costs $5 and $10 today.");
 		try {
