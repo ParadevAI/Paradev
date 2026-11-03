@@ -3601,11 +3601,14 @@ msgstr "浏览并安装社区共享的技能、MCP服务器和智能体配置。
 msgid "Browse for directory"
 msgstr "浏览目录"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "浏览 Paradev 插件、共享主题和即将推出的智能体配置。"
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "浏览社区共享的 Paradev 主题文件，包括 GitHub Dark Colorblind、Catppuccin、Ember 和 One Dark Pro。"
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "浏览 Paradev 的共享主题与未来的智能体配置。"
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "浏览每个 Paradev 智能体都能使用的插件，并提交你自己的插件。"
 
 msgid "Browse the repo ↗"
 msgstr "浏览仓库 ↗"
@@ -3654,6 +3657,9 @@ msgstr "打造最后一款软件"
 
 msgid "Building the last piece of software."
 msgstr "打造最后一款软件。"
+
+msgid "Built a plugin? Submit it here."
+msgstr "做了插件？在这里提交。"
 
 msgid "Built in Paradev"
 msgstr "在 Paradev 中构建"
@@ -9948,6 +9954,9 @@ msgstr "安装并重启"
 msgid "Install & Restart"
 msgstr "安装并重启"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "在 Paradev 应用中安装插件，每个智能体都能使用它。"
+
 msgid "Install failed"
 msgstr "安装失败"
 
@@ -13194,6 +13203,9 @@ msgstr "为当前终端打开多行提示词编辑器"
 msgid "Open a new {label} chat?"
 msgstr "打开新的 {label} 聊天？"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "提交一个拉取请求，将它添加到 Paradev 仓库。我们会审核并将其添加到市场。"
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "创建拉取请求后即可查看评审状态、检查和评论。"
 
@@ -14429,6 +14441,9 @@ msgstr "插件市场"
 
 msgid "Plugins"
 msgstr "插件"
+
+msgid "Plugins, themes, and agents"
+msgstr "插件、主题和智能体"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "指向页面，智能体来完成修改。"
@@ -17704,6 +17719,9 @@ msgstr "技能"
 msgid "Skills"
 msgstr "技能"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "为你的智能体提供技能和 MCP 工具。提交你自己的插件。"
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "技能随Paradev插件一起提供，并会在你使用的每个智能体中自动保持最新。点击一个即可预览。"
 
@@ -18335,6 +18353,9 @@ msgstr "提交提示词"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "未配置提示词提交速率限制"
+
+msgid "Submit your plugin"
+msgstr "提交你的插件"
 
 msgid "Submitting…"
 msgstr "正在提交…"
@@ -19307,9 +19328,6 @@ msgstr "主题预览卡片"
 
 msgid "Themes"
 msgstr "主题"
-
-msgid "Themes and agents"
-msgstr "主题与智能体"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"

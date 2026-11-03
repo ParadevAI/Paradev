@@ -3601,11 +3601,14 @@ msgstr "コミュニティが共有したスキル、MCPサーバー、エージ
 msgid "Browse for directory"
 msgstr "ディレクトリを参照"
 
+msgid "Browse Paradev plugins, shared themes, and future agent configs."
+msgstr "Paradevのプラグイン、共有テーマ、今後のエージェント設定を閲覧できます。"
+
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "GitHub Dark Colorblind、Catppuccin、Ember、One Dark Proなど、コミュニティが共有するParadevのテーマファイルを閲覧できます。"
 
-msgid "Browse shared themes and future agent configs for Paradev."
-msgstr "Paradev向けに共有されたテーマと今後のエージェント設定を閲覧できます。"
+msgid "Browse the plugins every Paradev agent can use, and submit your own."
+msgstr "すべてのParadevエージェントが使えるプラグインを閲覧し、自分のプラグインを送信できます。"
 
 msgid "Browse the repo ↗"
 msgstr "リポジトリを見る ↗"
@@ -3654,6 +3657,9 @@ msgstr "最後のソフトウェアを作る"
 
 msgid "Building the last piece of software."
 msgstr "最後のソフトウェアを作る。"
+
+msgid "Built a plugin? Submit it here."
+msgstr "プラグインを作りましたか？ここから送信してください。"
 
 msgid "Built in Paradev"
 msgstr "Paradevで開発"
@@ -9948,6 +9954,9 @@ msgstr "インストールして再起動"
 msgid "Install & Restart"
 msgstr "インストールして再起動"
 
+msgid "Install a plugin in the Paradev app and every agent can use it."
+msgstr "Paradevアプリでプラグインをインストールすると、すべてのエージェントが使えます。"
+
 msgid "Install failed"
 msgstr "インストールに失敗しました"
 
@@ -13194,6 +13203,9 @@ msgstr "アクティブなターミナル用の複数行プロンプト入力を
 msgid "Open a new {label} chat?"
 msgstr "新しい {label} チャットを開きますか？"
 
+msgid "Open a pull request that adds it to the Paradev repository. We review it and add it to the marketplace."
+msgstr "Paradevリポジトリにプラグインを追加するプルリクエストを開いてください。レビューしてマーケットプレイスに追加します。"
+
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "プルリクエストを開くと、レビュー状態、チェック、コメントを確認できます。"
 
@@ -14429,6 +14441,9 @@ msgstr "プラグインマーケットプレイス"
 
 msgid "Plugins"
 msgstr "プラグイン"
+
+msgid "Plugins, themes, and agents"
+msgstr "プラグイン、テーマ、エージェント"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "ページを指すだけで、エージェントが変更します。"
@@ -17704,6 +17719,9 @@ msgstr "スキル"
 msgid "Skills"
 msgstr "スキル"
 
+msgid "Skills and MCP tools for your agents. Submit your own."
+msgstr "エージェント向けのスキルとMCPツール。自分のプラグインも送信できます。"
+
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "スキルはParadevプラグインに同梱され、使用するすべてのエージェントで自動的に最新の状態に保たれます。クリックしてプレビューできます。"
 
@@ -18335,6 +18353,9 @@ msgstr "プロンプトを投稿"
 
 msgid "Submit prompt rate limiting is not configured"
 msgstr "プロンプト送信のレート制限が設定されていません"
+
+msgid "Submit your plugin"
+msgstr "プラグインを送信"
 
 msgid "Submitting…"
 msgstr "送信中…"
@@ -19307,9 +19328,6 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "テーマ"
-
-msgid "Themes and agents"
-msgstr "テーマとエージェント"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "これらのコマンドはワークスペース作成時に自動的に実行されます。<0>ドキュメントを読む<1/></0>"
