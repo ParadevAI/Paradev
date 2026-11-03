@@ -1081,6 +1081,9 @@ msgstr "{localHostName} (perangkat ini)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, other {Menyalin percakapan (# pesan)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} dari {0} sasaran menopang untuk {nextLabel} — {laggingLabels} paling tertinggal."
@@ -1953,6 +1956,9 @@ msgstr "Tambahkan {0} ke workspace"
 
 msgid "Add {localizedName}?"
 msgstr "Tambahkan {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Tambahkan {repositoryName} sebagai proyek di komputer ini terlebih dahulu"
 
 msgid "Add a comment…"
 msgstr "Tambahkan komentar…"
@@ -5499,6 +5505,9 @@ msgstr "Salin riwayat penjelajahan dan login Anda dari browser lain ke Paradev. 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Salin kunci Anda sekarang — Anda tidak akan bisa melihatnya lagi."
 
+msgid "Copying the conversation"
+msgstr "Menyalin percakapan"
+
 msgid "Copyright or trademark"
 msgstr "Hak cipta atau merek dagang"
 
@@ -5935,6 +5944,12 @@ msgstr "Tidak bisa merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Tidak dapat memindahkan chat ini ke cloud"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Tidak dapat memindahkan chat ini ke komputer ini"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
 
@@ -6078,6 +6093,9 @@ msgstr "Tidak dapat menghentikan obrolan"
 
 msgid "Couldn't take a screenshot"
 msgstr "Gagal mengambil tangkapan layar"
+
+msgid "Couldn't try the move again"
+msgstr "Tidak dapat mencoba memindahkan lagi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Perubahan file tidak bisa dibatalkan."
@@ -6348,6 +6366,9 @@ msgstr "Membuat tugas"
 
 msgid "Creating a workspace"
 msgstr "Membuat workspace"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Membuat workspace di komputer ini…"
 
 msgid "Creating PR..."
 msgstr "Membuat PR…"
@@ -11738,8 +11759,17 @@ msgstr "Pindahkan {count} ke Grup"
 msgid "Move {name} to background"
 msgstr "Pindahkan {name} ke latar belakang"
 
+msgid "Move this chat to the cloud?"
+msgstr "Pindahkan chat ini ke cloud?"
+
+msgid "Move this chat to this computer?"
+msgstr "Pindahkan chat ini ke komputer ini?"
+
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
+
+msgid "Move to cloud"
+msgstr "Pindahkan ke cloud"
 
 msgid "Move to group"
 msgstr "Pindahkan ke grup"
@@ -11753,8 +11783,17 @@ msgstr "Pindahkan ke kanan"
 msgid "Move to Tab"
 msgstr "Pindahkan ke Tab"
 
+msgid "Move to this computer"
+msgstr "Pindahkan ke komputer ini"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" dipindahkan ke {group}"
+
+msgid "Moving this chat here"
+msgstr "Memindahkan chat ini ke sini"
+
+msgid "Moving..."
+msgstr "Memindahkan..."
 
 msgid "Multi-select"
 msgstr "Pilih banyak"
@@ -16138,6 +16177,9 @@ msgstr "\"{workspaceName}\" dipulihkan"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Memulihkan \"{workspaceName}\"…"
 
+msgid "Restoring Claude's session"
+msgstr "Memulihkan sesi Claude"
+
 msgid "Restoring your session"
 msgstr "Memulihkan sesi Anda"
 
@@ -16623,6 +16665,12 @@ msgstr "Disimpan ke Downloads"
 
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Menyimpan pekerjaan workspace cloud dan percakapan ini…"
+
+msgid "Saving your work and this conversation…"
+msgstr "Menyimpan pekerjaan Anda dan percakapan ini…"
 
 msgid "Saving..."
 msgstr "Menyimpan..."
@@ -18325,8 +18373,14 @@ msgstr "Memulai workspace cloud"
 msgid "Starting the agent…"
 msgstr "Memulai agen…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Memulai workspace cloud…"
+
 msgid "Starting the simulator…"
 msgstr "Memulai simulator…"
+
+msgid "Starting the workspace"
+msgstr "Memulai workspace"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Sedang memulai. Ini hanya perlu sebentar."
@@ -19129,6 +19183,9 @@ msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siap
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Pekerjaan workspace cloud, termasuk perubahan yang belum di-commit, didorong ke branch baru. Workspace di komputer ini dimulai dari branch tersebut, dan percakapan ini berlanjut di sana. Jika agen sedang bekerja, agen dihentikan terlebih dahulu."
+
 msgid "The code expired. Start again."
 msgstr "Kode kedaluwarsa. Mulai lagi."
 
@@ -19545,6 +19602,9 @@ msgstr "Ini tidak bisa dibatalkan."
 msgid "This channel is archived"
 msgstr "Kanal ini diarsipkan"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Chat ini tidak dapat dipindahkan ke sini. Chat masih berada di workspace asalnya."
+
 msgid "This chat has ended."
 msgstr "Chat ini telah berakhir."
 
@@ -19578,6 +19638,9 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
 
+msgid "This computer's host is not running"
+msgstr "Host komputer ini tidak berjalan"
+
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
 
@@ -19607,6 +19670,9 @@ msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak m
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Lingkungan ini membuka {environmentRepository}, bukan {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repositori environment ini sudah tetap; promosikan workspace lagi untuk mengubahnya"
@@ -20659,6 +20725,9 @@ msgstr "Pembaruan Diperlukan"
 
 msgid "update the branch prefix"
 msgstr "memperbarui prefix branch"
+
+msgid "Update the host service on this device and try again."
+msgstr "Perbarui layanan host di perangkat ini, lalu coba lagi."
 
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
@@ -21920,6 +21989,9 @@ msgstr "Perubahan Anda akan hilang kalau tidak disimpan."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kode Anda tetap lokal secara bawaan, dengan kendali eksplisit atas layanan yang terhubung."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Pekerjaan Anda saat ini, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan percakapan ini berlanjut di sana. Jika agen sedang bekerja, agen dihentikan terlebih dahulu."
 
 msgid "Your download starts automatically."
 msgstr "Unduhan Anda dimulai secara otomatis."

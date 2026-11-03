@@ -1081,6 +1081,9 @@ msgstr "{localHostName} (toto zařízení)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Kopírování konverzace (# zpráva)} few {Kopírování konverzace (# zprávy)} many {Kopírování konverzace (# zprávy)} other {Kopírování konverzace (# zpráv)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "Na {nextLabel} táhne {met} z {0} cílů — nejvíc zaostává {laggingLabels}."
@@ -1953,6 +1956,9 @@ msgstr "Přidat {0} do pracovního prostoru"
 
 msgid "Add {localizedName}?"
 msgstr "Přidat {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto počítači"
 
 msgid "Add a comment…"
 msgstr "Přidat komentář…"
@@ -5499,6 +5505,9 @@ msgstr "Zkopírujte historii prohlížení a přihlášení z jiného prohlíže
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Zkopírujte si klíč teď — už ho znovu neuvidíte."
 
+msgid "Copying the conversation"
+msgstr "Kopírování konverzace"
+
 msgid "Copyright or trademark"
 msgstr "Autorská práva nebo ochranná známka"
 
@@ -5935,6 +5944,12 @@ msgstr "Pull request se nepodařilo sloučit"
 msgid "Couldn't move the subagent to the background"
 msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Tento chat se nepodařilo přesunout do cloudu"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Tento chat se nepodařilo přesunout na tento počítač"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
 
@@ -6078,6 +6093,9 @@ msgstr "Chat se nepodařilo zastavit"
 
 msgid "Couldn't take a screenshot"
 msgstr "Snímek obrazovky se nepodařilo pořídit"
+
+msgid "Couldn't try the move again"
+msgstr "Přesun se nepodařilo zkusit znovu"
 
 msgid "Couldn't undo the file changes."
 msgstr "Změny souborů se nepodařilo vrátit."
@@ -6348,6 +6366,9 @@ msgstr "Vytváří se úkol"
 
 msgid "Creating a workspace"
 msgstr "Vytváří se pracovní prostor"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Vytváří se pracovní prostor na tomto počítači…"
 
 msgid "Creating PR..."
 msgstr "Vytváření PR…"
@@ -11738,8 +11759,17 @@ msgstr "Přesunout {count} do skupiny"
 msgid "Move {name} to background"
 msgstr "Přesunout {name} na pozadí"
 
+msgid "Move this chat to the cloud?"
+msgstr "Přesunout tento chat do cloudu?"
+
+msgid "Move this chat to this computer?"
+msgstr "Přesunout tento chat na tento počítač?"
+
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
+
+msgid "Move to cloud"
+msgstr "Přesunout do cloudu"
 
 msgid "Move to group"
 msgstr "Přesunout do skupiny"
@@ -11753,8 +11783,17 @@ msgstr "Přesunout doprava"
 msgid "Move to Tab"
 msgstr "Přesunout na kartu"
 
+msgid "Move to this computer"
+msgstr "Přesunout na tento počítač"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "„{name}“ přesunuto do skupiny {group}"
+
+msgid "Moving this chat here"
+msgstr "Tento chat se přesouvá sem"
+
+msgid "Moving..."
+msgstr "Přesouvání..."
 
 msgid "Multi-select"
 msgstr "Výběr více možností"
@@ -16138,6 +16177,9 @@ msgstr "„{workspaceName}“ obnoven"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Obnovuji „{workspaceName}“…"
 
+msgid "Restoring Claude's session"
+msgstr "Obnovování relace Claude"
+
 msgid "Restoring your session"
 msgstr "Obnovuji vaši relaci"
 
@@ -16623,6 +16665,12 @@ msgstr "Uloženo do Stažených souborů"
 
 msgid "Saving as an environment..."
 msgstr "Ukládání jako prostředí..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Ukládá se práce cloudového pracovního prostoru a tato konverzace…"
+
+msgid "Saving your work and this conversation…"
+msgstr "Ukládá se vaše práce a tato konverzace…"
 
 msgid "Saving..."
 msgstr "Ukládání…"
@@ -18325,8 +18373,14 @@ msgstr "Spouštím cloudový pracovní prostor"
 msgid "Starting the agent…"
 msgstr "Spouštění agenta…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Spouští se cloudový pracovní prostor…"
+
 msgid "Starting the simulator…"
 msgstr "Spouštění simulátoru…"
+
+msgid "Starting the workspace"
+msgstr "Spouštění pracovního prostoru"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Spouští se. Mělo by to trvat jen chvilku."
@@ -19129,6 +19183,9 @@ msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, z
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Další běh to zkusí znovu."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Práce cloudového pracovního prostoru, včetně nepotvrzených změn, se odešle do nové větve. Z této větve se spustí pracovní prostor na tomto počítači a tato konverzace tam bude pokračovat. Pokud agent pracuje, nejprve se zastaví."
+
 msgid "The code expired. Start again."
 msgstr "Platnost kódu vypršela. Začněte znovu."
 
@@ -19545,6 +19602,9 @@ msgstr "Nelze vrátit zpět."
 msgid "This channel is archived"
 msgstr "Tento kanál je archivovaný"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Tento chat se sem nepodařilo přesunout. Zůstává v pracovním prostoru, ze kterého přišel."
+
 msgid "This chat has ended."
 msgstr "Tento chat skončil."
 
@@ -19578,6 +19638,9 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
+msgid "This computer's host is not running"
+msgstr "Hostitel tohoto počítače neběží"
+
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -19607,6 +19670,9 @@ msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a po
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Toto prostředí otevírá {environmentRepository}, ne {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozitáře tohoto prostředí jsou pevně dané; pro jejich změnu znovu povyšte pracovní prostor"
@@ -20659,6 +20725,9 @@ msgstr "Vyžadována aktualizace"
 
 msgid "update the branch prefix"
 msgstr "aktualizovat prefix větve"
+
+msgid "Update the host service on this device and try again."
+msgstr "Aktualizujte službu hostitele na tomto zařízení a zkuste to znovu."
 
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
@@ -21920,6 +21989,9 @@ msgstr "Pokud změny neuložíte, budou ztraceny."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Váš kód zůstává ve výchozím stavu lokálně a připojené služby máte výslovně pod kontrolou."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Vaše aktuální práce, včetně nepotvrzených změn, se odešle do nové větve ve vzdáleném repozitáři. Z této větve se v prostředí, které vyberete, spustí cloudový pracovní prostor a tato konverzace tam bude pokračovat. Pokud agent pracuje, nejprve se zastaví."
 
 msgid "Your download starts automatically."
 msgstr "Stahování začne automaticky."

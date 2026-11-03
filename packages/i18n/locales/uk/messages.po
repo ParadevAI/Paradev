@@ -1075,6 +1075,9 @@ msgstr "{localHostName} (цей пристрій)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Копіювання розмови (# повідомлення)} few {Копіювання розмови (# повідомлення)} many {Копіювання розмови (# повідомлень)} other {Копіювання розмови (# повідомлення)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "Для {nextLabel} виконано {met} з {0} цілей — найбільше відстають {laggingLabels}."
@@ -1947,6 +1950,9 @@ msgstr "Додати {0} до робочого простору"
 
 msgid "Add {localizedName}?"
 msgstr "Додати {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Спочатку додайте {repositoryName} як проєкт на цьому комп'ютері"
 
 msgid "Add a comment…"
 msgstr "Додайте коментар…"
@@ -5493,6 +5499,9 @@ msgstr "Скопіюйте історію перегляду й дані вхо�
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Скопіюйте ключ зараз — потім ви не зможете його побачити."
 
+msgid "Copying the conversation"
+msgstr "Копіювання розмови"
+
 msgid "Copyright or trademark"
 msgstr "Авторське право або торговельна марка"
 
@@ -5929,6 +5938,12 @@ msgstr "Не вдалося злити пул-реквест"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не вдалося перевести субагента у фоновий режим"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Не вдалося перемістити цей чат у хмару"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Не вдалося перемістити цей чат на цей комп'ютер"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
 
@@ -6072,6 +6087,9 @@ msgstr "Не вдалося зупинити чат"
 
 msgid "Couldn't take a screenshot"
 msgstr "Не вдалося зробити знімок екрана"
+
+msgid "Couldn't try the move again"
+msgstr "Не вдалося повторити перенесення"
 
 msgid "Couldn't undo the file changes."
 msgstr "Не вдалося скасувати зміни у файлах."
@@ -6342,6 +6360,9 @@ msgstr "Створення завдання"
 
 msgid "Creating a workspace"
 msgstr "Створення робочого простору"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Створення робочого простору на цьому комп'ютері…"
 
 msgid "Creating PR..."
 msgstr "Створення PR..."
@@ -11732,8 +11753,17 @@ msgstr "Перемістити {count} до групи"
 msgid "Move {name} to background"
 msgstr "Перевести {name} у фоновий режим"
 
+msgid "Move this chat to the cloud?"
+msgstr "Перемістити цей чат у хмару?"
+
+msgid "Move this chat to this computer?"
+msgstr "Перемістити цей чат на цей комп'ютер?"
+
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
+
+msgid "Move to cloud"
+msgstr "Перемістити в хмару"
 
 msgid "Move to group"
 msgstr "Перемістити до групи"
@@ -11747,8 +11777,17 @@ msgstr "Перемістити праворуч"
 msgid "Move to Tab"
 msgstr "Перемістити у вкладку"
 
+msgid "Move to this computer"
+msgstr "Перемістити на цей комп'ютер"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "«{name}» переміщено до {group}"
+
+msgid "Moving this chat here"
+msgstr "Перенесення цього чату сюди"
+
+msgid "Moving..."
+msgstr "Переміщення..."
 
 msgid "Multi-select"
 msgstr "Множинний вибір"
@@ -16132,6 +16171,9 @@ msgstr "Відновлено «{workspaceName}»"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Відновлення «{workspaceName}»…"
 
+msgid "Restoring Claude's session"
+msgstr "Відновлення сеансу Claude"
+
 msgid "Restoring your session"
 msgstr "Відновлення вашого сеансу"
 
@@ -16617,6 +16659,12 @@ msgstr "Збережено в «Завантаження»"
 
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Збереження роботи хмарного робочого простору та цієї розмови…"
+
+msgid "Saving your work and this conversation…"
+msgstr "Збереження вашої роботи та цієї розмови…"
 
 msgid "Saving..."
 msgstr "Збереження..."
@@ -18319,8 +18367,14 @@ msgstr "Запуск хмарного робочого простору"
 msgid "Starting the agent…"
 msgstr "Запускаємо агента…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Запуск хмарного робочого простору…"
+
 msgid "Starting the simulator…"
 msgstr "Запускаємо симулятор…"
+
+msgid "Starting the workspace"
+msgstr "Запуск робочого простору"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Запуск. Це займе лише мить."
@@ -19123,6 +19177,9 @@ msgstr "Чат залишиться без змін. Файли, які будь
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Хмарний робочий простір мав запуститися, але не відповів вчасно. Наступний запуск спробує знову."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Робота хмарного робочого простору, включно з незакомітованими змінами, надсилається до нової гілки. Робочий простір на цьому комп'ютері запускається з цієї гілки, і ця розмова продовжується там. Якщо агент працює, спочатку він зупиниться."
+
 msgid "The code expired. Start again."
 msgstr "Термін дії коду минув. Почніть знову."
 
@@ -19539,6 +19596,9 @@ msgstr "Цю дію неможливо скасувати."
 msgid "This channel is archived"
 msgstr "Цей канал архівовано"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Не вдалося перенести цей чат сюди. Він і далі в робочому просторі, звідки прийшов."
+
 msgid "This chat has ended."
 msgstr "Цей чат завершено."
 
@@ -19572,6 +19632,9 @@ msgstr "Цей хмарний робочий простір не може зап
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Цей хмарний робочий простір прокидається; після простою це може тривати до 30 секунд."
 
+msgid "This computer's host is not running"
+msgstr "Хост цього комп'ютера не запущено"
+
 msgid "This conversation is too long for the model"
 msgstr "Ця розмова задовга для моделі"
 
@@ -19601,6 +19664,9 @@ msgstr "Цю електронну адресу вже зареєстровано
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "У цьому середовищі немає репозиторіїв. Створіть середовище з репозиторіями в налаштуваннях, а потім запустіть робочий простір із нього"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Це середовище відкриває {environmentRepository}, а не {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозиторії цього середовища фіксовані; щоб змінити їх, ще раз створіть середовище з робочого простору"
@@ -20653,6 +20719,9 @@ msgstr "Потрібне оновлення"
 
 msgid "update the branch prefix"
 msgstr "оновити префікс гілки"
+
+msgid "Update the host service on this device and try again."
+msgstr "Оновіть хост-службу на цьому пристрої та спробуйте ще раз."
 
 msgid "Update this host to message subagents"
 msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам"
@@ -21914,6 +21983,9 @@ msgstr "Якщо не зберегти зміни, їх буде втрачен�
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "За замовчуванням ваш код залишається локально, а підключеними сервісами ви керуєте явно."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Ваша поточна робота, включно з незакомітованими змінами, надсилається до нової гілки у віддаленому репозиторії. Хмарний робочий простір запускається з цієї гілки у вибраному вами середовищі, і ця розмова продовжується там. Якщо агент працює, спочатку він зупиниться."
 
 msgid "Your download starts automatically."
 msgstr "Завантаження почнеться автоматично."

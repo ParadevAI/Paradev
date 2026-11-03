@@ -1081,6 +1081,9 @@ msgstr "{localHostName} (dit apparaat)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Gesprek kopiëren (# bericht)} other {Gesprek kopiëren (# berichten)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} van {0} doelen dragen bij voor {nextLabel} — {laggingLabels} lopen het verst achter."
@@ -1953,6 +1956,9 @@ msgstr "{0} toevoegen aan werkruimte"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} toevoegen?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Voeg {repositoryName} eerst toe als project op deze computer"
 
 msgid "Add a comment…"
 msgstr "Voeg een reactie toe…"
@@ -5499,6 +5505,9 @@ msgstr "Kopieer je browsegeschiedenis en logins uit een andere browser naar Para
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Kopieer je sleutel nu — je kunt hem later niet meer zien."
 
+msgid "Copying the conversation"
+msgstr "Gesprek kopiëren"
+
 msgid "Copyright or trademark"
 msgstr "Auteursrecht of handelsmerk"
 
@@ -5935,6 +5944,12 @@ msgstr "Kan pull request niet mergen"
 msgid "Couldn't move the subagent to the background"
 msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Kon deze chat niet naar de cloud verplaatsen"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Kan deze chat niet naar deze computer verplaatsen"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
 
@@ -6078,6 +6093,9 @@ msgstr "Kon de chat niet stoppen"
 
 msgid "Couldn't take a screenshot"
 msgstr "Screenshot maken mislukt"
+
+msgid "Couldn't try the move again"
+msgstr "De verplaatsing kon niet opnieuw worden geprobeerd"
 
 msgid "Couldn't undo the file changes."
 msgstr "De bestandswijzigingen konden niet ongedaan worden gemaakt."
@@ -6348,6 +6366,9 @@ msgstr "Taak wordt aangemaakt"
 
 msgid "Creating a workspace"
 msgstr "Werkruimte wordt aangemaakt"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Werkruimte op deze computer wordt gemaakt…"
 
 msgid "Creating PR..."
 msgstr "PR wordt aangemaakt…"
@@ -11738,8 +11759,17 @@ msgstr "{count} naar groep verplaatsen"
 msgid "Move {name} to background"
 msgstr "{name} naar de achtergrond verplaatsen"
 
+msgid "Move this chat to the cloud?"
+msgstr "Deze chat naar de cloud verplaatsen?"
+
+msgid "Move this chat to this computer?"
+msgstr "Deze chat naar deze computer verplaatsen?"
+
 msgid "Move to background"
 msgstr "Naar de achtergrond"
+
+msgid "Move to cloud"
+msgstr "Naar cloud verplaatsen"
 
 msgid "Move to group"
 msgstr "Naar groep verplaatsen"
@@ -11753,8 +11783,17 @@ msgstr "Naar rechts verplaatsen"
 msgid "Move to Tab"
 msgstr "Verplaatsen naar tabblad"
 
+msgid "Move to this computer"
+msgstr "Naar deze computer verplaatsen"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" verplaatst naar {group}"
+
+msgid "Moving this chat here"
+msgstr "Deze chat wordt hierheen verplaatst"
+
+msgid "Moving..."
+msgstr "Verplaatsen..."
 
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
@@ -16138,6 +16177,9 @@ msgstr "\"{workspaceName}\" hersteld"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" wordt hersteld…"
 
+msgid "Restoring Claude's session"
+msgstr "Sessie van Claude herstellen"
+
 msgid "Restoring your session"
 msgstr "Je sessie wordt hersteld"
 
@@ -16623,6 +16665,12 @@ msgstr "Opgeslagen in Downloads"
 
 msgid "Saving as an environment..."
 msgstr "Opslaan als omgeving..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Werk van de cloudwerkruimte en dit gesprek worden opgeslagen…"
+
+msgid "Saving your work and this conversation…"
+msgstr "Je werk en dit gesprek worden opgeslagen…"
 
 msgid "Saving..."
 msgstr "Opslaan..."
@@ -18325,8 +18373,14 @@ msgstr "Cloudwerkruimte starten"
 msgid "Starting the agent…"
 msgstr "Agent starten…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Cloudwerkruimte wordt gestart…"
+
 msgid "Starting the simulator…"
 msgstr "Simulator wordt gestart…"
+
+msgid "Starting the workspace"
+msgstr "Workspace starten"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Bezig met starten. Dit duurt maar even."
@@ -19129,6 +19183,9 @@ msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "De cloudwerkruimte had gestart moeten zijn, maar reageerde niet op tijd. De volgende run probeert het opnieuw."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Het werk van de cloudwerkruimte, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op deze computer start vanaf die branch, en dit gesprek gaat daar verder. Als de agent bezig is, stopt die eerst."
+
 msgid "The code expired. Start again."
 msgstr "De code is verlopen. Begin opnieuw."
 
@@ -19545,6 +19602,9 @@ msgstr "Dit kan niet ongedaan worden gemaakt."
 msgid "This channel is archived"
 msgstr "Dit kanaal is gearchiveerd"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Deze chat kon niet hierheen worden verplaatst. Hij staat nog in de workspace waar hij vandaan kwam."
+
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."
 
@@ -19578,6 +19638,9 @@ msgstr "Deze cloudwerkruimte kan niet starten"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 seconden duren."
 
+msgid "This computer's host is not running"
+msgstr "De host van deze computer draait niet"
+
 msgid "This conversation is too long for the model"
 msgstr "Dit gesprek is te lang voor het model"
 
@@ -19607,6 +19670,9 @@ msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de pr
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Deze omgeving opent {environmentRepository}, niet {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "De repositories van deze omgeving liggen vast; promoveer opnieuw een werkruimte om ze te wijzigen"
@@ -20659,6 +20725,9 @@ msgstr "Update vereist"
 
 msgid "update the branch prefix"
 msgstr "de branchprefix bijwerken"
+
+msgid "Update the host service on this device and try again."
+msgstr "Werk de hostservice op dit apparaat bij en probeer het opnieuw."
 
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
@@ -21920,6 +21989,9 @@ msgstr "Je wijzigingen gaan verloren als je ze niet opslaat."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Je code blijft standaard lokaal, met expliciete controle over gekoppelde diensten."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Je huidige werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch op de remote gepusht. Een cloudwerkruimte start vanaf die branch in de omgeving die je kiest, en dit gesprek gaat daar verder. Als de agent bezig is, stopt die eerst."
 
 msgid "Your download starts automatically."
 msgstr "Je download start automatisch."

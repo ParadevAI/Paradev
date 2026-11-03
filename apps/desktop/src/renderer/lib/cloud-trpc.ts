@@ -43,6 +43,7 @@ export const CLOUD_TRPC_ROUTER_ROOTS = [
 	"channelThread",
 	"chat",
 	"chatHistory",
+	"chatMove",
 	"environment",
 	"githubUser",
 	"host",

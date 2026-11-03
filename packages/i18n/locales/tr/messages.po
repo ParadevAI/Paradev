@@ -1081,6 +1081,9 @@ msgstr "{localHostName} (bu cihaz)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Konuşma kopyalanıyor (# mesaj)} other {Konuşma kopyalanıyor (# mesaj)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{0} hedeften {met} tanesi {nextLabel} için üzerine düşeni yapıyor — en geride {laggingLabels} var."
@@ -1953,6 +1956,9 @@ msgstr "{0} öğesini çalışma alanına ekle"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} eklensin mi?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Önce {repositoryName} deposunu bu bilgisayarda proje olarak ekleyin"
 
 msgid "Add a comment…"
 msgstr "Yorum ekle…"
@@ -5499,6 +5505,9 @@ msgstr "Tarama geçmişinizi ve oturum bilgilerinizi başka bir tarayıcıdan Pa
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Anahtarınızı şimdi kopyalayın — bir daha göremezsiniz."
 
+msgid "Copying the conversation"
+msgstr "Konuşma kopyalanıyor"
+
 msgid "Copyright or trademark"
 msgstr "Telif hakkı veya ticari marka"
 
@@ -5935,6 +5944,12 @@ msgstr "Pull request birleştirilemedi"
 msgid "Couldn't move the subagent to the background"
 msgstr "Alt ajan arka plana taşınamadı"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Bu sohbet buluta taşınamadı"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Bu sohbet bu bilgisayara taşınamadı"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
 
@@ -6078,6 +6093,9 @@ msgstr "Sohbet durdurulamadı"
 
 msgid "Couldn't take a screenshot"
 msgstr "Ekran görüntüsü alınamadı"
+
+msgid "Couldn't try the move again"
+msgstr "Taşıma yeniden denenemedi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Dosya değişiklikleri geri alınamadı."
@@ -6348,6 +6366,9 @@ msgstr "Görev oluşturuluyor"
 
 msgid "Creating a workspace"
 msgstr "Çalışma alanı oluşturuluyor"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Bu bilgisayarda çalışma alanı oluşturuluyor…"
 
 msgid "Creating PR..."
 msgstr "PR oluşturuluyor…"
@@ -11738,8 +11759,17 @@ msgstr "{count} öğeyi gruba taşı"
 msgid "Move {name} to background"
 msgstr "{name} öğesini arka plana taşı"
 
+msgid "Move this chat to the cloud?"
+msgstr "Bu sohbet buluta taşınsın mı?"
+
+msgid "Move this chat to this computer?"
+msgstr "Bu sohbet bu bilgisayara taşınsın mı?"
+
 msgid "Move to background"
 msgstr "Arka plana taşı"
+
+msgid "Move to cloud"
+msgstr "Buluta taşı"
 
 msgid "Move to group"
 msgstr "Gruba taşı"
@@ -11753,8 +11783,17 @@ msgstr "Sağ tarafa taşı"
 msgid "Move to Tab"
 msgstr "Sekmeye taşı"
 
+msgid "Move to this computer"
+msgstr "Bu bilgisayara taşı"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\", {group} grubuna taşındı"
+
+msgid "Moving this chat here"
+msgstr "Bu sohbet buraya taşınıyor"
+
+msgid "Moving..."
+msgstr "Taşınıyor..."
 
 msgid "Multi-select"
 msgstr "Çoklu seçim"
@@ -16138,6 +16177,9 @@ msgstr "\"{workspaceName}\" geri yüklendi"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" geri yükleniyor…"
 
+msgid "Restoring Claude's session"
+msgstr "Claude oturumu geri yükleniyor"
+
 msgid "Restoring your session"
 msgstr "Oturumunuz geri yükleniyor"
 
@@ -16623,6 +16665,12 @@ msgstr "İndirilenler klasörüne kaydedildi"
 
 msgid "Saving as an environment..."
 msgstr "Ortam olarak kaydediliyor..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Bulut çalışma alanının işi ve bu konuşma kaydediliyor…"
+
+msgid "Saving your work and this conversation…"
+msgstr "İşiniz ve bu konuşma kaydediliyor…"
 
 msgid "Saving..."
 msgstr "Kaydediliyor..."
@@ -18325,8 +18373,14 @@ msgstr "Bulut çalışma alanı başlatılıyor"
 msgid "Starting the agent…"
 msgstr "Aracı başlatılıyor…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Bulut çalışma alanı başlatılıyor…"
+
 msgid "Starting the simulator…"
 msgstr "Simülatör başlatılıyor…"
+
+msgid "Starting the workspace"
+msgstr "Çalışma alanı başlatılıyor"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Başlatılıyor. Yalnızca kısa bir süre alacaktır."
@@ -19129,6 +19183,9 @@ msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından d�
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Commit edilmemiş değişiklikler dahil bulut çalışma alanının işi yeni bir dala gönderilir. Bu bilgisayardaki bir çalışma alanı bu daldan başlar ve bu konuşma orada devam eder. Ajan çalışıyorsa önce durur."
+
 msgid "The code expired. Start again."
 msgstr "Kodun süresi doldu. Yeniden başlayın."
 
@@ -19545,6 +19602,9 @@ msgstr "Bu geri alınamaz."
 msgid "This channel is archived"
 msgstr "Bu kanal arşivlendi"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Bu sohbet buraya taşınamadı. Geldiği çalışma alanında duruyor."
+
 msgid "This chat has ended."
 msgstr "Bu sohbet sona erdi."
 
@@ -19578,6 +19638,9 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
 
+msgid "This computer's host is not running"
+msgstr "Bu bilgisayarın host hizmeti çalışmıyor"
+
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
 
@@ -19607,6 +19670,9 @@ msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağla
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Bu ortam {chatRepository} değil, {environmentRepository} açar"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Bu ortamın depoları sabittir; değiştirmek için bir çalışma alanını yeniden yükseltin"
@@ -20659,6 +20725,9 @@ msgstr "Güncelleme gerekli"
 
 msgid "update the branch prefix"
 msgstr "dal ön ekini güncelleme"
+
+msgid "Update the host service on this device and try again."
+msgstr "Bu cihazdaki host hizmetini güncelleyip yeniden deneyin."
 
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
@@ -21920,6 +21989,9 @@ msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Commit edilmemiş değişiklikler dahil mevcut çalışmanız uzak depoda yeni bir dala gönderilir. Seçtiğiniz ortamda bu daldan bir bulut çalışma alanı başlar ve bu konuşma orada devam eder. Ajan çalışıyorsa önce durur."
 
 msgid "Your download starts automatically."
 msgstr "İndirmen otomatik olarak başlar."

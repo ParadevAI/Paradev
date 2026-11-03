@@ -1081,6 +1081,9 @@ msgstr "{localHostName} (это устройство)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Копирование разговора (# сообщение)} few {Копирование разговора (# сообщения)} many {Копирование разговора (# сообщений)} other {Копирование разговора (# сообщения)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "На {nextLabel} работают {met} из {0} целей — дальше всего отстают {laggingLabels}."
@@ -1953,6 +1956,9 @@ msgstr "Добавить {0} в рабочую область"
 
 msgid "Add {localizedName}?"
 msgstr "Добавить {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Сначала добавьте {repositoryName} как проект на этом компьютере"
 
 msgid "Add a comment…"
 msgstr "Добавьте комментарий…"
@@ -5499,6 +5505,9 @@ msgstr "Скопируйте историю просмотров и логины
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Скопируйте ключ сейчас — увидеть его снова не получится."
 
+msgid "Copying the conversation"
+msgstr "Копирование разговора"
+
 msgid "Copyright or trademark"
 msgstr "Авторские права или товарный знак"
 
@@ -5935,6 +5944,12 @@ msgstr "Не удалось объединить пул-реквест"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не удалось перевести субагента в фон"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Не удалось перенести этот чат в облако"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Не удалось перенести этот чат на этот компьютер"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
 
@@ -6078,6 +6093,9 @@ msgstr "Не удалось остановить чат"
 
 msgid "Couldn't take a screenshot"
 msgstr "Не удалось сделать снимок экрана"
+
+msgid "Couldn't try the move again"
+msgstr "Не удалось повторить перенос"
 
 msgid "Couldn't undo the file changes."
 msgstr "Не удалось отменить изменения файлов."
@@ -6348,6 +6366,9 @@ msgstr "Создание задачи"
 
 msgid "Creating a workspace"
 msgstr "Создание рабочего пространства"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Создание рабочей области на этом компьютере…"
 
 msgid "Creating PR..."
 msgstr "Создание PR…"
@@ -11738,8 +11759,17 @@ msgstr "Переместить {count} в группу"
 msgid "Move {name} to background"
 msgstr "Перевести {name} в фон"
 
+msgid "Move this chat to the cloud?"
+msgstr "Перенести этот чат в облако?"
+
+msgid "Move this chat to this computer?"
+msgstr "Перенести этот чат на этот компьютер?"
+
 msgid "Move to background"
 msgstr "Перевести в фон"
+
+msgid "Move to cloud"
+msgstr "Перенести в облако"
 
 msgid "Move to group"
 msgstr "Переместить в группу"
@@ -11753,8 +11783,17 @@ msgstr "Переместить вправо"
 msgid "Move to Tab"
 msgstr "Переместить во вкладку"
 
+msgid "Move to this computer"
+msgstr "Перенести на этот компьютер"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "«{name}» перемещена в {group}"
+
+msgid "Moving this chat here"
+msgstr "Перенос этого чата сюда"
+
+msgid "Moving..."
+msgstr "Перенос..."
 
 msgid "Multi-select"
 msgstr "Множественный выбор"
@@ -16138,6 +16177,9 @@ msgstr "Восстановлено: «{workspaceName}»"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Восстановление «{workspaceName}»…"
 
+msgid "Restoring Claude's session"
+msgstr "Восстановление сеанса Claude"
+
 msgid "Restoring your session"
 msgstr "Восстановление сессии"
 
@@ -16623,6 +16665,12 @@ msgstr "Сохранено в «Загрузки»"
 
 msgid "Saving as an environment..."
 msgstr "Сохранение как среда..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Сохранение работы облачной рабочей области и этого разговора…"
+
+msgid "Saving your work and this conversation…"
+msgstr "Сохранение вашей работы и этого разговора…"
 
 msgid "Saving..."
 msgstr "Сохранение..."
@@ -18325,8 +18373,14 @@ msgstr "Запуск облачной рабочей области"
 msgid "Starting the agent…"
 msgstr "Запуск агента…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Запуск облачной рабочей области…"
+
 msgid "Starting the simulator…"
 msgstr "Запуск симулятора…"
+
+msgid "Starting the workspace"
+msgstr "Запуск рабочей области"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Запускается. Это займёт всего несколько мгновений."
@@ -19129,6 +19183,9 @@ msgstr "Чат остаётся как есть. Файлы, которые кт
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Облачная рабочая область должна была запуститься, но не ответила вовремя. Следующий запуск попробует снова."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Работа облачной рабочей области, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на этом компьютере запускается из этой ветки, и этот разговор продолжается там. Если агент работает, сначала он остановится."
+
 msgid "The code expired. Start again."
 msgstr "Срок действия кода истёк. Начните заново."
 
@@ -19545,6 +19602,9 @@ msgstr "Это нельзя отменить."
 msgid "This channel is archived"
 msgstr "Этот канал архивирован"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Не удалось перенести этот чат сюда. Он по-прежнему в рабочей области, откуда пришёл."
+
 msgid "This chat has ended."
 msgstr "Этот чат завершён."
 
@@ -19578,6 +19638,9 @@ msgstr "Не удаётся запустить эту облачную рабо�
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Облачное рабочее пространство запускается. После простоя это может занять до 30 секунд."
 
+msgid "This computer's host is not running"
+msgstr "Хост этого компьютера не запущен"
+
 msgid "This conversation is too long for the model"
 msgstr "Этот разговор слишком длинный для модели"
 
@@ -19607,6 +19670,9 @@ msgstr "Этот адрес электронной почты уже зарег�
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "В этом окружении нет репозиториев. Создайте окружение с репозиториями в Настройках и запустите рабочую область из него"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Это окружение открывает {environmentRepository}, а не {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозитории этого окружения зафиксированы; чтобы изменить их, снова повысьте рабочую область"
@@ -20659,6 +20725,9 @@ msgstr "Требуется обновление"
 
 msgid "update the branch prefix"
 msgstr "обновить префикс ветки"
+
+msgid "Update the host service on this device and try again."
+msgstr "Обновите службу хоста на этом устройстве и повторите попытку."
 
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
@@ -21920,6 +21989,9 @@ msgstr "Изменения будут потеряны, если их не со�
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Ваш код по умолчанию остаётся локальным, с явным контролем над подключёнными сервисами."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Ваша текущая работа, включая незакоммиченные изменения, отправляется в новую ветку на удалённом репозитории. Облачная рабочая область запускается из этой ветки в выбранном вами окружении, и этот разговор продолжается там. Если агент работает, сначала он остановится."
 
 msgid "Your download starts automatically."
 msgstr "Загрузка начнётся автоматически."
