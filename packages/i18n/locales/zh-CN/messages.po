@@ -1847,6 +1847,9 @@ msgstr "你添加的人的访问权限"
 msgid "Access for this person"
 msgstr "此人的访问权限"
 
+msgid "Access the page debugger backend"
+msgstr "访问网页调试程序后端"
+
 msgid "Access your email address"
 msgstr "访问你的邮箱地址"
 
@@ -3453,6 +3456,9 @@ msgstr "简介"
 msgid "Block"
 msgstr "方块"
 
+msgid "Block content on any page"
+msgstr "屏蔽任何网页上的内容"
+
 msgid "blocked"
 msgstr "已阻止"
 
@@ -3919,6 +3925,9 @@ msgstr "用于智能体输出、评论和文档的标准markdown渲染层"
 
 msgid "Capabilities"
 msgstr "能力"
+
+msgid "Capture content of your screen"
+msgstr "截取您屏幕上的内容"
 
 msgid "Card"
 msgstr "卡片"
@@ -6918,6 +6927,9 @@ msgstr "详情"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "此处无法显示详情，但链接仍可打开。"
+
+msgid "Detect your physical location"
+msgstr "检测您的实际位置"
 
 msgid "Dev"
 msgstr "开发"
@@ -11250,6 +11262,9 @@ msgstr "管理你的账户设置"
 msgid "Manage your apps, extensions, and themes"
 msgstr "管理您的应用、扩展程序和主题背景"
 
+msgid "Manage your downloads"
+msgstr "管理您的下载内容"
+
 msgid "Manage your organization's branding and members."
 msgstr "管理组织的品牌形象和成员。"
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "已读取"
 
+msgid "Read a list of your most visited websites"
+msgstr "读取您最常访问的网站列表"
+
 msgid "Read and change all your data on all websites"
 msgstr "读取和更改您在所有网站上的所有数据"
+
+msgid "Read and change your bookmarks"
+msgstr "读取和更改您的书签"
 
 msgid "Read and change your data on {count} websites"
 msgstr "读取和更改您在 {count} 个网站上的数据"
@@ -16396,6 +16417,9 @@ msgstr "用 Paradev 并行运行编程智能体"
 
 msgid "Run script"
 msgstr "运行脚本"
+
+msgid "Run scripts you add on websites"
+msgstr "在网站上运行您添加的脚本"
 
 msgid "Run setup script in each imported workspace"
 msgstr "在每个导入的工作区中运行初始化脚本"

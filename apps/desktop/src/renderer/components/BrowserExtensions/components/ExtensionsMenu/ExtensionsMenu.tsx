@@ -15,13 +15,27 @@ import { useActivateBrowserExtension } from "../../hooks/useActivateBrowserExten
 import { useSetBrowserExtensionPinned } from "../../hooks/useSetBrowserExtensionPinned";
 import { RemoveExtensionDialog } from "../RemoveExtensionDialog";
 import { ExtensionMenuRow } from "./components/ExtensionMenuRow";
-import { CHROME_WEB_STORE_URL, MENU_CLOSE_ANIMATION_MS } from "./constants";
+import {
+	CHROME_WEB_STORE_URL,
+	MENU_CLOSE_ANIMATION_MS,
+	TYPEAHEAD_RESET_MS,
+} from "./constants";
 
 interface ExtensionsMenuProps {
 	paneId: string;
 	extensions: BrowserExtension[];
 	onOpenUrl: (url: string) => void;
 	triggerClassName: string;
+}
+
+function isTypeaheadKey(event: React.KeyboardEvent): boolean {
+	return (
+		event.key.length === 1 &&
+		event.key !== " " &&
+		!event.metaKey &&
+		!event.ctrlKey &&
+		!event.altKey
+	);
 }
 
 /** The toolbar's puzzle button, as in Chrome: every extension, to open, pin or remove. */
@@ -36,6 +50,7 @@ export function ExtensionsMenu({
 	const setPinned = useSetBrowserExtensionPinned();
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const [isOpen, setIsOpen] = useState(false);
+	const lastTypedAt = useRef(Number.NEGATIVE_INFINITY);
 	const [removeTarget, setRemoveTarget] = useState<BrowserExtension | null>(
 		null,
 	);
@@ -76,7 +91,13 @@ export function ExtensionsMenu({
 						<Trans>Extensions</Trans>
 					</TooltipContent>
 				</Tooltip>
-				<DropdownMenuContent align="end" className="w-64">
+				<DropdownMenuContent
+					align="end"
+					className="w-64"
+					onKeyDownCapture={(event) => {
+						if (isTypeaheadKey(event)) lastTypedAt.current = event.timeStamp;
+					}}
+				>
 					{extensions.length > 0 && (
 						<>
 							{extensions.map((extension) => (
@@ -86,6 +107,9 @@ export function ExtensionsMenu({
 									onActivate={() => activate(extension, triggerRef.current)}
 									onTogglePin={() => setPinned(extension, !extension.pinned)}
 									onRemove={() => requestRemove(extension)}
+									isSearching={(at) =>
+										at - lastTypedAt.current < TYPEAHEAD_RESET_MS
+									}
 								/>
 							))}
 							<DropdownMenuSeparator />

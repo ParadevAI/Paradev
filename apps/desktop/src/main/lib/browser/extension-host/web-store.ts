@@ -12,7 +12,8 @@ import {
 } from "electron-chrome-web-store";
 import { confirm } from "./confirm-dialog";
 import { verifyCrx3 } from "./crx3";
-import { addedAccess, installWarnings } from "./install-warnings";
+import { extensionIcon } from "./extension-icon";
+import { accessDetail, addedAccess, installWarnings } from "./install-warnings";
 
 // The package's own updater checks the moment it starts. An update then
 // deletes the old version's files while its service worker is still loading
@@ -36,20 +37,27 @@ type OnUninstall = NonNullable<WebStoreOptions["onUninstall"]>;
 export function confirmRemoval(
 	name: string,
 	window: Electron.BrowserWindow | undefined,
+	signal?: AbortSignal,
+	icon?: Electron.NativeImage,
 ): Promise<boolean> {
-	return confirm(window, {
-		buttons: [
-			i18n._(msg({ message: "Remove" })),
-			i18n._(msg({ message: "Cancel" })),
-		],
-		message: i18n._(msg({ message: `Remove ${name}?` })),
-		detail: i18n._(
-			msg({
-				message:
-					"The extension and its local data are deleted from this browser.",
-			}),
-		),
-	});
+	return confirm(
+		window,
+		{
+			icon,
+			buttons: [
+				i18n._(msg({ message: "Remove" })),
+				i18n._(msg({ message: "Cancel" })),
+			],
+			message: i18n._(msg({ message: `Remove ${name}?` })),
+			detail: i18n._(
+				msg({
+					message:
+						"The extension and its local data are deleted from this browser.",
+				}),
+			),
+		},
+		signal,
+	);
 }
 
 // The package installs on one click; Chrome asks first and lists what the extension can reach.
@@ -57,18 +65,25 @@ function confirmInstall(
 	localizedName: string,
 	manifest: chrome.runtime.Manifest,
 	window: Electron.BrowserWindow | undefined,
+	signal?: AbortSignal,
+	icon?: Electron.NativeImage,
 ): Promise<boolean> {
 	const warnings = installWarnings(manifest);
-	return confirm(window, {
-		buttons: [
-			i18n._(msg({ message: "Add extension" })),
-			i18n._(msg({ message: "Cancel" })),
-		],
-		message: i18n._(msg({ message: `Add ${localizedName}?` })),
-		detail: warnings.length
-			? [i18n._(msg({ message: "It can:" })), ...warnings].join("\n")
-			: undefined,
-	});
+	return confirm(
+		window,
+		{
+			icon,
+			buttons: [
+				i18n._(msg({ message: "Add extension" })),
+				i18n._(msg({ message: "Cancel" })),
+			],
+			message: i18n._(msg({ message: `Add ${localizedName}?` })),
+			detail: warnings.length
+				? accessDetail(i18n._(msg({ message: "It can:" })), warnings)
+				: undefined,
+		},
+		signal,
+	);
 }
 
 // Chrome disables an update that reaches further until the user agrees; this keeps the old version instead.
@@ -76,15 +91,18 @@ function confirmUpdate(
 	name: string,
 	added: string[],
 	window: Electron.BrowserWindow | undefined,
+	icon?: Electron.NativeImage,
 ): Promise<boolean> {
 	return confirm(window, {
+		icon,
 		buttons: [
 			i18n._(msg({ message: "Update" })),
 			i18n._(msg({ message: "Keep current version" })),
 		],
 		message: i18n._(msg({ message: `${name} wants more access` })),
-		detail: [i18n._(msg({ message: "The update can also:" })), ...added].join(
-			"\n",
+		detail: accessDetail(
+			i18n._(msg({ message: "The update can also:" })),
+			added,
 		),
 	});
 }
@@ -94,10 +112,8 @@ export async function installBrowserWebStore(
 	browserSession: Electron.Session,
 	{
 		removeExtension,
-		pinExtension,
 	}: {
 		removeExtension: (extensionId: string) => Promise<void>;
-		pinExtension: (extensionId: string) => void;
 	},
 ): Promise<void> {
 	enableCrxVerification();
@@ -105,7 +121,7 @@ export async function installBrowserWebStore(
 	// reach further before it moves into the folder the app loads at start.
 	const newInstalls = new Map<string, chrome.runtime.Manifest>();
 	browserSession.extensions.on("extension-loaded", (_event, extension) => {
-		if (newInstalls.delete(extension.id)) pinExtension(extension.id);
+		newInstalls.delete(extension.id);
 	});
 	const verifyInstall = async ({
 		id,
@@ -124,7 +140,18 @@ export async function installBrowserWebStore(
 	};
 	// The page decides showConfirmDialog; removal deletes a vault's data, so always ask.
 	const onUninstall: OnUninstall = async (details) => {
-		if (!(await confirmRemoval(details.localizedName, details.browserWindow))) {
+		const installed = browserSession.extensions.getExtension(details.id);
+		const icon = installed
+			? extensionIcon(installed.path, installed.manifest)
+			: undefined;
+		if (
+			!(await confirmRemoval(
+				details.localizedName,
+				details.browserWindow,
+				undefined,
+				icon,
+			))
+		) {
 			return false;
 		}
 		await removeExtension(details.id);
@@ -141,10 +168,12 @@ export async function installBrowserWebStore(
 		if (added.length === 0) return true;
 		const update = `${id}@${manifest.version}`;
 		if (declinedUpdates.has(update)) return false;
+		const current = browserSession.extensions.getExtension(id);
 		const allowed = await confirmUpdate(
 			name,
 			added,
 			BrowserWindow.getFocusedWindow() ?? undefined,
+			current ? extensionIcon(current.path, current.manifest) : undefined,
 		);
 		if (!allowed) declinedUpdates.add(update);
 		return allowed;
@@ -159,6 +188,8 @@ export async function installBrowserWebStore(
 				details.localizedName,
 				details.manifest,
 				details.browserWindow,
+				undefined,
+				details.icon,
 			);
 			if (allowed) newInstalls.set(details.id, details.manifest);
 			return { action: allowed ? "allow" : "deny" };
@@ -205,12 +236,14 @@ async function localizedName(
 
 /**
  * Install by Web Store ID, asking first with the warnings of the CRX that was
- * downloaded and verified. Resolves to null when the user says no.
+ * downloaded and verified. Resolves to null when the user says no, or when
+ * `signal` aborts before they answer.
  */
 export async function installWebStoreExtension(
 	browserSession: Electron.Session,
 	extensionId: string,
 	window: Electron.BrowserWindow | undefined,
+	signal?: AbortSignal,
 ): Promise<Electron.Extension | null> {
 	const loaded = browserSession.extensions.getExtension(extensionId);
 	if (loaded) return loaded;
@@ -224,7 +257,10 @@ export async function installWebStoreExtension(
 			await readFile(path.join(stagedPath, "manifest.json"), "utf8"),
 		);
 		const name = await localizedName(stagedPath, manifest);
-		if (!(await confirmInstall(name, manifest, window))) return null;
+		const icon = extensionIcon(stagedPath, manifest);
+		if (!(await confirmInstall(name, manifest, window, signal, icon))) {
+			return null;
+		}
 		// The layout loadAllExtensions reads at start: <extensionsPath>/<id>/<version dir>.
 		const installPath = path.join(
 			extensionsPath,

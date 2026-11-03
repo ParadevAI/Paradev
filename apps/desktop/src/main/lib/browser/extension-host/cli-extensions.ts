@@ -6,6 +6,7 @@ import {
 	removeBrowserExtension,
 	setBrowserExtensionPinned,
 } from "./browser-extensions";
+import { extensionIcon } from "./extension-icon";
 import { isUserExtension } from "./user-extensions";
 import {
 	browserExtensionsPath,
@@ -48,25 +49,31 @@ export const userExtensions: UserExtensions = {
 			}));
 	},
 
-	async install(extensionId) {
+	async install(extensionId, signal) {
 		const existing = session
 			.fromPartition(BROWSER_PARTITION)
 			.extensions.getExtension(extensionId);
+		if (existing && !isUserExtension(existing, browserExtensionsPath())) {
+			throw new Error(`${existing.name} is built into the app`);
+		}
 		if (existing)
 			return { status: "already-installed", extension: summary(existing) };
 		const extension = await installWebStoreExtension(
 			session.fromPartition(BROWSER_PARTITION),
 			extensionId,
 			dialogWindow(),
+			signal,
 		);
 		if (!extension) return { status: "declined" };
-		setBrowserExtensionPinned(extension.id, true);
 		return { status: "installed", extension: summary(extension) };
 	},
 
-	async remove(extensionId) {
-		const { name } = installed(extensionId);
-		if (!(await confirmRemoval(name, dialogWindow()))) return false;
+	async remove(extensionId, signal) {
+		const extension = installed(extensionId);
+		const icon = extensionIcon(extension.path, extension.manifest);
+		if (!(await confirmRemoval(extension.name, dialogWindow(), signal, icon))) {
+			return false;
+		}
 		await removeBrowserExtension(extensionId);
 		return true;
 	},

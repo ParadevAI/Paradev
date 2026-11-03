@@ -1847,6 +1847,9 @@ msgstr "追加するユーザーのアクセス"
 msgid "Access for this person"
 msgstr "この人のアクセス"
 
+msgid "Access the page debugger backend"
+msgstr "ページのデバッガ バックエンドにアクセスする"
+
 msgid "Access your email address"
 msgstr "メールアドレスへのアクセス"
 
@@ -3453,6 +3456,9 @@ msgstr "自己紹介"
 msgid "Block"
 msgstr "ブロック"
 
+msgid "Block content on any page"
+msgstr "すべてのページでコンテンツをブロックする"
+
 msgid "blocked"
 msgstr "ブロック"
 
@@ -3919,6 +3925,9 @@ msgstr "エージェント出力・コメント・ドキュメント向けの標
 
 msgid "Capabilities"
 msgstr "できること"
+
+msgid "Capture content of your screen"
+msgstr "画面のコンテンツをキャプチャする"
 
 msgid "Card"
 msgstr "カード"
@@ -6918,6 +6927,9 @@ msgstr "詳細"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "ここでは詳細を表示できませんが、リンクは開けます。"
+
+msgid "Detect your physical location"
+msgstr "現在地を検出する"
 
 msgid "Dev"
 msgstr "開発"
@@ -11250,6 +11262,9 @@ msgstr "アカウント設定を管理"
 msgid "Manage your apps, extensions, and themes"
 msgstr "アプリ、拡張機能、テーマの管理"
 
+msgid "Manage your downloads"
+msgstr "ダウンロードを管理する"
+
 msgid "Manage your organization's branding and members."
 msgstr "組織のブランディングとメンバーを管理します。"
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "読み取り済み"
 
+msgid "Read a list of your most visited websites"
+msgstr "よくアクセスするウェブサイトのリストを読み取る"
+
 msgid "Read and change all your data on all websites"
 msgstr "すべてのウェブサイト上にある自分のすべてのデータの読み取りと変更"
+
+msgid "Read and change your bookmarks"
+msgstr "ブックマークの読み取りと変更"
 
 msgid "Read and change your data on {count} websites"
 msgstr "{count} 件のウェブサイト上にある自分のデータの読み取りと変更"
@@ -16396,6 +16417,9 @@ msgstr "Paradev で並列コーディングエージェントを実行"
 
 msgid "Run script"
 msgstr "スクリプトを実行"
+
+msgid "Run scripts you add on websites"
+msgstr "追加したスクリプトをウェブサイトで実行する"
 
 msgid "Run setup script in each imported workspace"
 msgstr "インポートした各ワークスペースでセットアップスクリプトを実行"

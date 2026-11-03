@@ -1847,6 +1847,9 @@ msgstr "Dostęp dla dodawanych osób"
 msgid "Access for this person"
 msgstr "Dostęp tej osoby"
 
+msgid "Access the page debugger backend"
+msgstr "Uzyskiwać dostęp do backendu debugera strony"
+
 msgid "Access your email address"
 msgstr "Uzyskać dostęp do Twojego adresu e-mail"
 
@@ -3453,6 +3456,9 @@ msgstr "O sobie"
 msgid "Block"
 msgstr "Blok"
 
+msgid "Block content on any page"
+msgstr "Blokować treści na dowolnej stronie"
+
 msgid "blocked"
 msgstr "zablokowane"
 
@@ -3919,6 +3925,9 @@ msgstr "Kanoniczna powierzchnia markdown dla wyjścia agenta, komentarzy i dokum
 
 msgid "Capabilities"
 msgstr "Możliwości"
+
+msgid "Capture content of your screen"
+msgstr "Przechwytywać zawartość ekranu"
 
 msgid "Card"
 msgstr "Karta"
@@ -6918,6 +6927,9 @@ msgstr "Szczegóły"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Szczegóły nie są tu dostępne, ale link nadal się otwiera."
+
+msgid "Detect your physical location"
+msgstr "Wykrywać Twoją fizyczną lokalizację"
 
 msgid "Dev"
 msgstr "Dev"
@@ -11250,6 +11262,9 @@ msgstr "Zarządzaj ustawieniami konta"
 msgid "Manage your apps, extensions, and themes"
 msgstr "Zarządzać aplikacjami, rozszerzeniami i motywami"
 
+msgid "Manage your downloads"
+msgstr "Zarządzać pobranymi plikami"
+
 msgid "Manage your organization's branding and members."
 msgstr "Zarządzaj wizerunkiem i członkami organizacji."
 
@@ -15174,8 +15189,14 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Odczytano"
 
+msgid "Read a list of your most visited websites"
+msgstr "Odczytywać listę najczęściej odwiedzanych stron"
+
 msgid "Read and change all your data on all websites"
 msgstr "Odczytywać i zmieniać wszystkie Twoje dane na wszystkich stronach"
+
+msgid "Read and change your bookmarks"
+msgstr "Odczytywać i zmieniać zakładki"
 
 msgid "Read and change your data on {count} websites"
 msgstr "Odczytywać i zmieniać Twoje dane na {count} stronach"
@@ -16396,6 +16417,9 @@ msgstr "Uruchamiaj równoległe agenty kodujące z Paradev"
 
 msgid "Run script"
 msgstr "Uruchom skrypt"
+
+msgid "Run scripts you add on websites"
+msgstr "Uruchamiać na stronach dodane przez Ciebie skrypty"
 
 msgid "Run setup script in each imported workspace"
 msgstr "Uruchom skrypt konfiguracyjny w każdym zaimportowanym obszarze roboczym"

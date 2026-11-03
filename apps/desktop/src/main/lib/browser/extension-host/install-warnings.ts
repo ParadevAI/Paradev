@@ -33,6 +33,17 @@ const PERMISSION_WARNINGS: [permissions: string[], line: MessageDescriptor][] =
 			msg({ message: "Manage your apps, extensions, and themes" }),
 		],
 		[["notifications"], msg({ message: "Display notifications" })],
+		[["declarativeNetRequest"], msg({ message: "Block content on any page" })],
+		[["userScripts"], msg({ message: "Run scripts you add on websites" })],
+		[["debugger"], msg({ message: "Access the page debugger backend" })],
+		[["downloads"], msg({ message: "Manage your downloads" })],
+		[["bookmarks"], msg({ message: "Read and change your bookmarks" })],
+		[["geolocation"], msg({ message: "Detect your physical location" })],
+		[
+			["topSites"],
+			msg({ message: "Read a list of your most visited websites" }),
+		],
+		[["desktopCapture"], msg({ message: "Capture content of your screen" })],
 	];
 
 const WARNED_PERMISSIONS = new Set(
@@ -74,6 +85,11 @@ function access(manifest: InstallManifest) {
 		...(permissions.has("<all_urls>") ? ["<all_urls>"] : []),
 	]);
 	return { permissions, hosts };
+}
+
+/** A dialog's detail text: the lead line, then one bullet per line of access. */
+export function accessDetail(lead: string, lines: string[]): string {
+	return [lead, ...lines.map((line) => `• ${line}`)].join("\n");
 }
 
 /** What the install question lists for an extension, as Chrome words it. */

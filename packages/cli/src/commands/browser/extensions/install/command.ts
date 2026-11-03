@@ -26,7 +26,7 @@ export default command({
 			message:
 				result.status === "already-installed"
 					? `${name} ${version} is already installed.`
-					: `Installed ${name} ${version} and pinned it to the toolbar.`,
+					: `Installed ${name} ${version}. Pin it to the toolbar from the Extensions menu.`,
 		};
 	},
 });
