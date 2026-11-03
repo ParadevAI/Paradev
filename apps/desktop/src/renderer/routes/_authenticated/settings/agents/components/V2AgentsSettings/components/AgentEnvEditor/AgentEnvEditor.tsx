@@ -23,21 +23,18 @@ function toRows(env: Record<string, string>): EnvRow[] {
 	}));
 }
 
-function envIdentity(env: Record<string, string>): string {
-	return JSON.stringify(
-		Object.entries(env).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
-	);
-}
-
+/** Rows that keep their saved name claim it before renamed or new rows. */
 function acceptedRowIds(rows: readonly EnvRow[]): Set<string> {
-	const seenKeys = new Set<string>();
+	const takenKeys = new Set<string>();
 	const ids = new Set<string>();
-	for (const row of rows) {
+	const accept = (row: EnvRow) => {
 		const key = row.key.trim();
-		if (!ENV_KEY.test(key) || seenKeys.has(key)) continue;
-		seenKeys.add(key);
+		if (ids.has(row.id) || !ENV_KEY.test(key) || takenKeys.has(key)) return;
+		takenKeys.add(key);
 		ids.add(row.id);
-	}
+	};
+	for (const row of rows) if (row.saved?.key === row.key.trim()) accept(row);
+	for (const row of rows) accept(row);
 	return ids;
 }
 
@@ -56,10 +53,20 @@ function toEnv(rows: readonly EnvRow[]): Record<string, string> {
 	return Object.fromEntries(entries);
 }
 
+function markSaved(rows: EnvRow[], submitted: readonly EnvRow[]): EnvRow[] {
+	const accepted = acceptedRowIds(submitted);
+	return rows.map((row) => {
+		const sent = submitted.find((candidate) => candidate.id === row.id);
+		return sent && accepted.has(row.id)
+			? { ...row, saved: { key: sent.key.trim(), value: sent.value } }
+			: row;
+	});
+}
+
 interface AgentEnvEditorProps {
 	idPrefix: string;
 	env: Record<string, string>;
-	onCommit: (env: Record<string, string>, onSaved: () => void) => void;
+	onCommit: (env: Record<string, string>) => Promise<unknown>;
 }
 
 export function AgentEnvEditor({
@@ -71,33 +78,49 @@ export function AgentEnvEditor({
 	const variableNameLabel = t({ message: "Variable name" });
 	const variableValueLabel = t({ message: "Variable value" });
 	const [rows, setRows] = useState(() => toRows(env));
-	const committedEnvs = useRef(new Set<string>());
+	const rowsRef = useRef(rows);
+	rowsRef.current = rows;
+	const saves = useRef({ inFlight: false, queued: false, lastSent: env });
 	const accepted = acceptedRowIds(rows);
 
 	useEffect(() => {
-		if (committedEnvs.current.has(envIdentity(env))) return;
-		committedEnvs.current.clear();
+		const state = saves.current;
+		if (state.inFlight || areEnvMapsEqual(env, state.lastSent)) return;
+		state.lastSent = env;
 		setRows((current) =>
 			areEnvMapsEqual(toEnv(current), env) ? current : toRows(env),
 		);
 	}, [env]);
 
+	const send = (submitted: readonly EnvRow[]) => {
+		const state = saves.current;
+		const nextEnv = toEnv(submitted);
+		if (areEnvMapsEqual(nextEnv, state.lastSent)) {
+			setRows((current) => markSaved(current, submitted));
+			return;
+		}
+		const previous = state.lastSent;
+		state.inFlight = true;
+		state.lastSent = nextEnv;
+		onCommit(nextEnv)
+			.then(
+				() => setRows((current) => markSaved(current, submitted)),
+				() => {
+					state.lastSent = previous;
+				},
+			)
+			.finally(() => {
+				state.inFlight = false;
+				if (state.queued) {
+					state.queued = false;
+					send(rowsRef.current);
+				}
+			});
+	};
+
 	const commit = (next: readonly EnvRow[]) => {
-		const nextEnv = toEnv(next);
-		const nextAccepted = acceptedRowIds(next);
-		committedEnvs.current.add(envIdentity(nextEnv));
-		onCommit(nextEnv, () =>
-			setRows((current) =>
-				current.map((row) => {
-					const sent = next.find((candidate) => candidate.id === row.id);
-					const unchanged =
-						sent && sent.key === row.key && sent.value === row.value;
-					return unchanged && nextAccepted.has(row.id)
-						? { ...row, saved: { key: row.key.trim(), value: row.value } }
-						: row;
-				}),
-			),
-		);
+		if (saves.current.inFlight) saves.current.queued = true;
+		else send(next);
 	};
 
 	const isInvalid = (row: EnvRow) =>
@@ -110,6 +133,7 @@ export function AgentEnvEditor({
 
 	const removeRow = (id: string) => {
 		const next = rows.filter((row) => row.id !== id);
+		rowsRef.current = next;
 		setRows(next);
 		commit(next);
 	};

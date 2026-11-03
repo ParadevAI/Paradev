@@ -257,6 +257,7 @@ describe("resolveTrustTarget", () => {
 		expect(target(["-i"])).toBe(defaultFile);
 		expect(target(["-u", "CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
 		expect(target(["--unset=CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
+		expect(target(["-uCLAUDE_CONFIG_DIR"])).toBe(defaultFile);
 		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe("/p/.claude.json");
 	});
 
@@ -272,6 +273,7 @@ describe("resolveTrustTarget", () => {
 			defaultFile,
 		);
 		expect(target("env --ignore-environment claude")).toBe(defaultFile);
+		expect(target("env -uCLAUDE_CONFIG_DIR claude")).toBe(defaultFile);
 		expect(target("env -i CLAUDE_CONFIG_DIR=/p claude")).toBe(
 			"/p/.claude.json",
 		);

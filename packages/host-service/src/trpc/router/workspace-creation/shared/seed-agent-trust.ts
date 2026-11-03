@@ -90,6 +90,8 @@ function unwrapEnvCommand(config: LaunchCommand): {
 				unset.push(tokens[++index] ?? "");
 			} else if (token.startsWith("--unset=")) {
 				unset.push(token.slice("--unset=".length));
+			} else if (/^-u./.test(token)) {
+				unset.push(token.slice(2));
 			} else {
 				if (token === "--") index++;
 				break;

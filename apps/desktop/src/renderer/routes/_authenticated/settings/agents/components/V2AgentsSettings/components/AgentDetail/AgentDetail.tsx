@@ -24,7 +24,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Info, RotateCcw, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
-	areEnvMapsEqual,
 	getAgentCommandText,
 	isAgentCommandPatchChanged,
 	parseAgentCommandText,
@@ -238,24 +237,21 @@ export function AgentDetail({
 				hasInlineEnv ? { command, args, env } : { command, args },
 				{
 					onSuccess: (updated) =>
-						setCommandText(
-							getAgentCommandText({
-								command: updated.command,
-								args: updated.args,
-							}),
+						setCommandText((current) =>
+							current === commandText
+								? getAgentCommandText({
+										command: updated.command,
+										args: updated.args,
+									})
+								: current,
 						),
 				},
 			);
 		}
 	};
 
-	const handleEnvCommit = (
-		env: Record<string, string>,
-		onSaved: () => void,
-	) => {
-		if (areEnvMapsEqual(env, config.env)) onSaved();
-		else updateMutation.mutate({ env }, { onSuccess: onSaved });
-	};
+	const handleEnvCommit = (env: Record<string, string>) =>
+		updateMutation.mutateAsync({ env });
 
 	const handlePromptArgsBlur = () => {
 		const args = parseArgs(promptArgsText);
