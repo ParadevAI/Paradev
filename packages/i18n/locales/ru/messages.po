@@ -1253,6 +1253,9 @@ msgstr "{productName} привлёк 11,5 млн долларов в посев�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "До октября 2026 года {productName} назывался {formerName}."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # — сменить проект, хост и другое"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
@@ -7627,6 +7630,9 @@ msgstr "Введите URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Окружение"
+
 msgid "Environment"
 msgstr "Окружение"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Домашняя"
 
+msgid "host"
+msgstr "Хост"
+
 msgid "Host"
 msgstr "Хост"
 
@@ -11077,6 +11086,9 @@ msgstr "Низкая серьёзность"
 
 msgid "Machine resources"
 msgstr "Ресурсы машины"
+
+msgid "Machine size"
+msgstr "Размер машины"
 
 msgid "Machine size: {label}"
 msgstr "Размер машины: {label}"
@@ -14696,6 +14708,9 @@ msgstr "Прогресс"
 msgid "Progress · Spinner"
 msgstr "Прогресс · спиннер"
 
+msgid "project"
+msgstr "Проект"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "проект"
@@ -17670,6 +17685,9 @@ msgstr "Шесть уровней автономности фабрики"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Шесть уровней автономности фабрики, шлюзы между ними и наш прогноз, как далеко нас заведёт 2026 год. Записано сейчас, чтобы потом вы могли выставить нам оценку."
+
+msgid "size"
+msgstr "Размер"
 
 msgid "Size"
 msgstr "Размер"

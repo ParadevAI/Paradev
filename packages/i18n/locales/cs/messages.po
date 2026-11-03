@@ -1253,6 +1253,9 @@ msgstr "{productName} získal 11,5 milionu dolarů v seed kole, které vedl fond
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se až do října 2026 jmenoval {formerName}."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · # pro změnu projektu, hostu a dalších"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
@@ -7627,6 +7630,9 @@ msgstr "Zadejte URL..."
 msgid "Enterprise"
 msgstr "Enterprise"
 
+msgid "environment"
+msgstr "Prostředí"
+
 msgid "Environment"
 msgstr "Prostředí"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "Domů"
 
+msgid "host"
+msgstr "Host"
+
 msgid "Host"
 msgstr "Host"
 
@@ -11077,6 +11086,9 @@ msgstr "Nízká závažnost"
 
 msgid "Machine resources"
 msgstr "Prostředky počítače"
+
+msgid "Machine size"
+msgstr "Velikost stroje"
 
 msgid "Machine size: {label}"
 msgstr "Velikost stroje: {label}"
@@ -14696,6 +14708,9 @@ msgstr "Průběh"
 msgid "Progress · Spinner"
 msgstr "Průběh · Spinner"
 
+msgid "project"
+msgstr "Projekt"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "projekt"
@@ -17670,6 +17685,9 @@ msgstr "Šest úrovní autonomie továrny"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Šest úrovní autonomie továrny, brány mezi nimi a naše předpověď, kam nás dostane rok 2026. Sepsáno teď, abyste nás mohli později oznámkovat."
+
+msgid "size"
+msgstr "Velikost"
 
 msgid "Size"
 msgstr "Velikost"

@@ -1253,6 +1253,9 @@ msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}의 이름은 2026년 10월까지 {formerName}였습니다."
 
+msgid "{prompt} · # to change project, host, and more"
+msgstr "{prompt} · #으로 프로젝트, 호스트 등 변경"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 
@@ -7627,6 +7630,9 @@ msgstr "URL 입력..."
 msgid "Enterprise"
 msgstr "엔터프라이즈"
 
+msgid "environment"
+msgstr "환경"
+
 msgid "Environment"
 msgstr "환경"
 
@@ -9415,6 +9421,9 @@ msgctxt "directory"
 msgid "Home"
 msgstr "홈"
 
+msgid "host"
+msgstr "호스트"
+
 msgid "Host"
 msgstr "호스트"
 
@@ -11077,6 +11086,9 @@ msgstr "심각도 낮음"
 
 msgid "Machine resources"
 msgstr "머신 리소스"
+
+msgid "Machine size"
+msgstr "머신 크기"
 
 msgid "Machine size: {label}"
 msgstr "머신 크기: {label}"
@@ -14696,6 +14708,9 @@ msgstr "진행 상황"
 msgid "Progress · Spinner"
 msgstr "진행 표시줄 · 스피너"
 
+msgid "project"
+msgstr "프로젝트"
+
 msgctxt "MCP server scope"
 msgid "project"
 msgstr "프로젝트"
@@ -17670,6 +17685,9 @@ msgstr "공장 자율성의 여섯 단계"
 
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "공장 자율성의 여섯 단계, 그 사이의 관문, 그리고 2026년에 어디까지 갈지에 대한 전망입니다. 나중에 채점할 수 있도록 지금 적어 둡니다."
+
+msgid "size"
+msgstr "크기"
 
 msgid "Size"
 msgstr "크기"
