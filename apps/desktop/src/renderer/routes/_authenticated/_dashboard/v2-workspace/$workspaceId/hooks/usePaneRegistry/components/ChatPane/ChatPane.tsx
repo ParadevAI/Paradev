@@ -87,6 +87,12 @@ export function ChatPane({
 		ctx.actions.updateData(rest);
 	};
 
+	const clearLaunchPrompt = useCallback(() => {
+		const { launchPrompt: _delivered, ...rest } = latest.current;
+		latest.current = rest;
+		ctx.actions.updateData(rest);
+	}, [ctx.actions]);
+
 	if (data.agentSession) {
 		return (
 			<>
@@ -119,6 +125,7 @@ export function ChatPane({
 				draftId={data.draftId}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={clearPendingPrompts}
+				onLaunchPromptDelivered={clearLaunchPrompt}
 				onQueuePrompt={(content) => {
 					latest.current = {
 						...latest.current,

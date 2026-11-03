@@ -113,6 +113,7 @@ export function SessionView({
 	pendingPrompts,
 	preferredModelLabel,
 	onPendingPromptsSent,
+	onLaunchPromptDelivered,
 	onFork,
 	onSwitchAccount,
 	sessionAccount,
@@ -149,6 +150,7 @@ export function SessionView({
 	/** Selected by name once the agent lists its models, before the first prompt goes out. */
 	preferredModelLabel?: string;
 	onPendingPromptsSent: () => void;
+	onLaunchPromptDelivered?: () => void;
 	onSessionState?: (session: SessionState | null) => void;
 	/** The mode the user picked, so a resumed session can start in it again. */
 	onModeChange?: (modeId: string) => void;
@@ -348,6 +350,16 @@ export function SessionView({
 		}
 		return null;
 	}, [snapshotItems]);
+	const delivered = useMemo(
+		() =>
+			[...snapshotItems.values()].some(
+				({ item }) => item.kind === "user_message",
+			),
+		[snapshotItems],
+	);
+	useEffect(() => {
+		if (delivered) onLaunchPromptDelivered?.();
+	}, [delivered, onLaunchPromptDelivered]);
 	const queuedPrompts = useStableList(
 		useMemo(
 			() => deriveQueuedPrompts({ items: snapshotItems }),
