@@ -71,10 +71,16 @@ export function WorkspaceSwitcherRow({
 				<Lead workspace={workspace} isCurrent={isCurrent} />
 			</span>
 			<span className="flex min-w-0 flex-1 items-center gap-2">
-				<span className={cn("truncate", isUnread && "font-semibold")}>
+				<span
+					className={cn(
+						"min-w-0 flex-[1_1_auto] truncate",
+						isUnread && "font-semibold",
+					)}
+				>
 					<MatchedText text={workspace.name} query={query} />
 				</span>
-				<span className="flex min-w-0 flex-1 items-center gap-1.5 text-[11.5px] text-muted-foreground">
+				{/* Clips rather than overlapping the right cluster when the name takes the room. */}
+				<span className="flex max-w-[55%] min-w-0 flex-[0_1_auto] items-center gap-1.5 overflow-hidden text-[11.5px] text-muted-foreground">
 					<V2WorkspaceProjectIcon
 						projectName={projectName}
 						iconUrl={workspace.projectIconUrl}

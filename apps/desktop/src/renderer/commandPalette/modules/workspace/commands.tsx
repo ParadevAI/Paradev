@@ -7,12 +7,34 @@ import {
 	Trash2Icon,
 	ZapIcon,
 } from "lucide-react";
-import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useQuickCreateWorkspaceIntent } from "renderer/stores/quick-create-workspace-intent";
 import { useRemoveFromSidebarIntent } from "renderer/stores/remove-workspace-from-sidebar-intent";
+import { useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { LinkTaskFrame } from "../../ui/LinkTask/LinkTaskFrame";
+import { QuickOpenFrame } from "../../ui/QuickOpen";
+
+const quickOpenCommand: Command = {
+	id: "files.quickOpen",
+	title: msg({
+		message: "Search files",
+	}),
+	section: "workspace",
+	icon: FileIcon,
+	keywords: ["file picker", "quick open"],
+	hotkeyId: "QUICK_OPEN",
+	renderFrame: () => <QuickOpenFrame />,
+	framePlaceholder: msg({ message: "Search files..." }),
+};
+
+/** Opens the palette on its files frame, for the open workspace. */
+export function openQuickOpen(): void {
+	const { setOpen, reset, pushFrame } = useFrameStackStore.getState();
+	setOpen(true);
+	reset();
+	pushFrame(quickOpenCommand);
+}
 
 export const workspaceProvider: CommandProvider = {
 	id: "workspace",
@@ -49,20 +71,7 @@ export const workspaceProvider: CommandProvider = {
 				run: (ctx) => ctx.openNewWorkspace(workspace.projectId),
 			},
 			quickCreate,
-			{
-				id: "files.quickOpen",
-				title: msg({
-					message: "Search files",
-				}),
-				section: "workspace",
-				icon: FileIcon,
-				keywords: ["file picker", "quick open"],
-				hotkeyId: "QUICK_OPEN",
-				run: () =>
-					useQuickOpenStore.getState().openFor({
-						workspaceId: workspace.id,
-					}),
-			},
+			quickOpenCommand,
 			{
 				id: "workspace.linkTask",
 				title: msg({

@@ -157,13 +157,15 @@ export function CommandPalette() {
 	}, [root]);
 
 	const frameTitle = currentFrame ? i18n._(currentFrame.command.title) : null;
-	const placeholder = frameTitle
-		? t({
-				message: `Search in ${frameTitle}…`,
-			})
-		: isSwitcher
-			? t({ message: "Switch to…" })
-			: t({ message: "Search workspaces, commands, files…" });
+	const placeholder = currentFrame?.command.framePlaceholder
+		? i18n._(currentFrame.command.framePlaceholder)
+		: frameTitle
+			? t({
+					message: `Search in ${frameTitle}…`,
+				})
+			: isSwitcher
+				? t({ message: "Switch to…" })
+				: t({ message: "Search workspaces, commands, files…" });
 
 	const backButton = (
 		<button
