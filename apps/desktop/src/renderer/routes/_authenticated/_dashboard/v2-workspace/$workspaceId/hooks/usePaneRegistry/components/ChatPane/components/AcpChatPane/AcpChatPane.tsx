@@ -21,6 +21,11 @@ import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnres
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
+import {
+	type RunInTerminal,
+	useAgentCliTooOld,
+	useAgentCliUpdatePending,
+} from "../../../../hooks/useAgentCliUpdate";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -83,6 +88,7 @@ export function AcpChatPane({
 	onOpenAgentChat,
 	onOpenForkedChat,
 	onRewound,
+	onRunInTerminal,
 	pendingPrompts,
 	launchPrompt,
 	sessionId,
@@ -107,7 +113,11 @@ export function AcpChatPane({
 	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
-	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
+	onSessionInfo: (info: {
+		harnessSessionId?: string;
+		title?: string;
+		modeId?: string;
+	}) => void;
 	onOpenFile?: OpenFile;
 	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
@@ -120,6 +130,8 @@ export function AcpChatPane({
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
 	onRewound?: (prompt: string) => void;
+	/** Absent where the chat has no workspace to open a terminal in. */
+	onRunInTerminal?: RunInTerminal;
 	modelId?: string;
 	modelLabel?: string;
 	modeId?: string;
@@ -512,9 +524,9 @@ export function AcpChatPane({
 		if (continuedInTerminal) continueAfterRestart.current = null;
 	}, [continuedInTerminal]);
 	const restartAndContinue = useCallback(
-		async (prompt: string) => {
+		async (prompt?: string) => {
 			if (!sessionId) return false;
-			continueAfterRestart.current = prompt;
+			continueAfterRestart.current = prompt ?? null;
 			try {
 				await wiring.transport.closeSession({ sessionId });
 				return true;
@@ -587,10 +599,28 @@ export function AcpChatPane({
 		releaseReplacement,
 		t,
 	]);
+	// A retry cannot get past a CLI that is too old, and one mid-install can
+	// start the chat on whatever install the PATH falls through to. The
+	// recovery screen offers the update and resumes once it lands. A stopped
+	// chat holds until the CLI has been checked again.
+	const cliUpdatePending = useAgentCliUpdatePending(
+		workspaceId,
+		harness,
+		sessionId,
+	);
+	const cliTooOld = useAgentCliTooOld(
+		workspaceId,
+		harness,
+		sessionDead || sessionStopped,
+	);
+	const cliChecking = recoverable && cliTooOld === null;
 	const recovering =
 		switchingAccount ||
 		replacement !== null ||
-		(recoverable && recoveries.current < MAX_RECOVERIES);
+		(recoverable &&
+			!cliUpdatePending &&
+			cliTooOld === false &&
+			recoveries.current < MAX_RECOVERIES);
 	useEffect(() => {
 		if (!recovering || recoveryInFlight.current) return;
 		const delayMs =
@@ -702,14 +732,20 @@ export function AcpChatPane({
 		harness &&
 		sessionId &&
 		(sessionDead || sessionStopped || lost) &&
-		!recovering
+		!recovering &&
+		!cliChecking
 	) {
 		return (
 			<AcpRecovery
+				agentLabel={presetLabel}
 				detail={failure ?? stored?.lastError ?? undefined}
+				harness={harness}
+				onRunInTerminal={onRunInTerminal}
 				onStartNew={startFresh}
 				{...(continuedInTerminal ? {} : { onResume: retryRecovery })}
 				reason={continuedInTerminal ? "in-terminal" : "stopped"}
+				sessionId={sessionId}
+				workspaceId={workspaceId}
 			/>
 		);
 	}
@@ -718,9 +754,14 @@ export function AcpChatPane({
 		if (failure && harness) {
 			return (
 				<AcpRecovery
+					agentLabel={presetLabel}
 					detail={failure}
+					harness={harness}
+					onRunInTerminal={onRunInTerminal}
 					onStartNew={startFresh}
 					reason="no-transcript"
+					sessionId={sessionId}
+					workspaceId={workspaceId}
 				/>
 			);
 		}
@@ -746,7 +787,10 @@ export function AcpChatPane({
 			presetId={agent?.id}
 			client={client}
 			draftKey={draftKey}
-			{...(recovering || checking || transferredFrom === sessionId
+			{...(recovering ||
+			checking ||
+			cliChecking ||
+			transferredFrom === sessionId
 				? {
 						held: {
 							notice: <Trans>Resuming the conversation…</Trans>,
@@ -768,6 +812,7 @@ export function AcpChatPane({
 			onFork={fork}
 			onEditMessage={onRewound ? onEditMessage : undefined}
 			onRestartAndContinue={harness ? restartAndContinue : undefined}
+			onRunInTerminal={onRunInTerminal}
 			onStartNewChat={harness ? startNewChat : undefined}
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
 			onSwitchAccount={switchAccount}
@@ -789,6 +834,7 @@ export function AcpChatPane({
 						? { harnessSessionId: bound }
 						: {}),
 					...(state?.title ? { title: state.title } : {}),
+					...(state?.modeId ? { modeId: state.modeId } : {}),
 				});
 			}}
 			pendingPrompts={pendingPrompts}

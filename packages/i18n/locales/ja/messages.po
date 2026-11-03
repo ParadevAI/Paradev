@@ -1062,6 +1062,15 @@ msgstr "{kindLabel}テーマ"
 msgid "{label} access to {pluginName}"
 msgstr "{label} の {pluginName} へのアクセス"
 
+msgid "{label} needs an update"
+msgstr "{label} の更新が必要です"
+
+msgid "{label} update available"
+msgstr "{label} のアップデートがあります"
+
+msgid "{label} updated"
+msgstr "{label} を更新しました"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "チャット起動"
 msgid "Chat mode"
 msgstr "チャットモード"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "チャットには {minVersion} 以降が必要です。インストールされているのは {installed} です。"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -5883,6 +5895,9 @@ msgstr "サブエージェントをバックグラウンドに移動できませ
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
+
+msgid "Couldn't open a terminal"
+msgstr "ターミナルを開けませんでした"
 
 msgid "Couldn't open the screenshot"
 msgstr "スクリーンショットを開けませんでした"
@@ -8722,6 +8737,9 @@ msgstr "フォルダ表示"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "新しいワークツリーにチェックアウトするフォルダを、リポジトリルートからの相対パスで1行に1つずつ。ルートのファイルは常に含まれます。空欄ですべてをチェックアウトします。"
 
+msgid "Follow along in the terminal below."
+msgstr "進行状況は下のターミナルで確認できます。"
+
 msgid "FOLLOW ON X"
 msgstr "Xでフォロー"
 
@@ -9583,6 +9601,9 @@ msgstr "Paradevに{name}をインストールする方法"
 
 msgid "How to install Paradev"
 msgstr "Paradev のインストール方法"
+
+msgid "How to update"
+msgstr "更新方法"
 
 msgid "How we build it, in long form."
 msgstr "どう作っているかを詳しく。"
@@ -15921,6 +15942,9 @@ msgstr "ターミナルデーモンを再起動しますか?"
 msgid "Restart terminals"
 msgstr "ターミナルを再起動"
 
+msgid "Restart the chat to use {installed}."
+msgstr "{installed} を使用するにはチャットを再起動してください。"
+
 msgid "Restart workspace"
 msgstr "ワークスペースを再起動"
 
@@ -18964,6 +18988,9 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "変更はすぐに適用されます。期間の残りについて差額のみをお支払いいただきます。"
 
+msgid "The chat resumes after the update."
+msgstr "アップデート後にチャットが再開されます。"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "チャットはそのまま残ります。このターンの後に誰かが編集したファイルはそのままにし、一覧に表示します。"
 
@@ -20453,6 +20480,9 @@ msgstr "更新"
 msgid "Update {appName} on this machine to attach files"
 msgstr "ファイルを添付するには、このマシンで{appName}を更新してください"
 
+msgid "Update {label}"
+msgstr "{label} を更新"
+
 msgid "Update available"
 msgstr "アップデートあり"
 
@@ -20524,6 +20554,9 @@ msgstr "{0}からたった今更新しました。"
 
 msgid "Updates"
 msgstr "アップデート"
+
+msgid "Updating {label}…"
+msgstr "{label} を更新しています…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

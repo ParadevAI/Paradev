@@ -1,5 +1,15 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
+import { useEffect, useRef } from "react";
+import {
+	AGENT_CLI_UPDATE_DOCS_URL,
+	type RunInTerminal,
+	useAgentCliUpdate,
+} from "../../../../../../hooks/useAgentCliUpdate";
+import {
+	AgentCliUpdateCard,
+	type AgentCliUpdateCardAction,
+} from "../../../../../AgentCliUpdateCard";
 
 /**
  * Shown when the chat cannot be used: the agent session had no transcript to
@@ -11,16 +21,107 @@ import { Button } from "@superset/ui/button";
  * offer: no transcript to load, or no agent session left to load it from.
  */
 export function AcpRecovery({
+	agentLabel,
 	detail,
+	harness,
 	onResume,
+	onRunInTerminal,
 	onStartNew,
 	reason,
+	sessionId,
+	workspaceId,
 }: {
 	reason: "no-transcript" | "stopped" | "in-terminal";
 	detail?: string | undefined;
 	onResume?: () => void;
 	onStartNew: () => void;
+	workspaceId: string;
+	/** Null when the chat failed before it had a session. */
+	sessionId: string | null;
+	harness?: string;
+	agentLabel?: string;
+	onRunInTerminal?: RunInTerminal;
 }) {
+	const { status, label, phase, startedHere, canUpdate, update, finish } =
+		useAgentCliUpdate({
+			agentLabel,
+			workspaceId,
+			harness,
+			sessionId,
+			onRunInTerminal,
+		});
+	const tooOld = status?.belowFloor === true;
+	const retry = onResume ?? (sessionId === null ? onStartNew : undefined);
+	const retried = useRef(false);
+	useEffect(() => {
+		if (phase !== "updated") retried.current = false;
+		if (phase !== "updated" || tooOld || retried.current) return;
+		retried.current = true;
+		finish();
+		retry?.();
+	}, [phase, tooOld, retry, finish]);
+
+	const installed = status?.installed;
+	const minVersion = status?.minVersion;
+	const updating = phase === "updating";
+	if (tooOld || updating) {
+		const actions: AgentCliUpdateCardAction[] = [];
+		if (!updating && canUpdate) {
+			actions.push({
+				id: "update",
+				label: <Trans>Update {label}</Trans>,
+				title: status?.updateCommand ?? undefined,
+				onClick: () => void update(),
+			});
+		}
+		if (!updating && !canUpdate) {
+			actions.push({
+				id: "docs",
+				label: <Trans>How to update</Trans>,
+				href: AGENT_CLI_UPDATE_DOCS_URL,
+			});
+		}
+		if (onResume && !updating) {
+			actions.push({
+				id: "resume",
+				label: <Trans>Resume</Trans>,
+				onClick: onResume,
+			});
+		}
+		actions.push({
+			id: "new",
+			label: <Trans>Start a new chat</Trans>,
+			onClick: onStartNew,
+		});
+		return (
+			<div className="flex h-full w-full items-center justify-center p-8">
+				<AgentCliUpdateCard
+					actions={actions}
+					className="w-full max-w-sm"
+					description={
+						updating ? (
+							startedHere ? (
+								<Trans>The chat resumes after the update.</Trans>
+							) : undefined
+						) : (
+							<Trans>
+								Chat needs {minVersion} or newer. {installed} is installed.
+							</Trans>
+						)
+					}
+					state={updating ? "updating" : "required"}
+					testId="agent-cli-update-recovery"
+					title={
+						updating ? (
+							<Trans>Updating {label}…</Trans>
+						) : (
+							<Trans>{label} needs an update</Trans>
+						)
+					}
+				/>
+			</div>
+		);
+	}
 	return (
 		// w-full because the pane lays its children out in a row: without it this
 		// sizes to its content and hugs the left edge.

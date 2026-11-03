@@ -1062,6 +1062,15 @@ msgstr "{kindLabel} тема"
 msgid "{label} access to {pluginName}"
 msgstr "Доступ роли {label} к {pluginName}"
 
+msgid "{label} needs an update"
+msgstr "{label} нужно обновить"
+
+msgid "{label} update available"
+msgstr "Доступно обновление {label}"
+
+msgid "{label} updated"
+msgstr "{label} обновлён"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "Запуск в чате"
 msgid "Chat mode"
 msgstr "Режим чата"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Для чата нужна версия {minVersion} или новее. Установлена {installed}."
+
 msgid "Chat session not found"
 msgstr "Сессия чата не найдена"
 
@@ -5883,6 +5895,9 @@ msgstr "Не удалось перевести субагента в фон"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
+
+msgid "Couldn't open a terminal"
+msgstr "Не удалось открыть терминал"
 
 msgid "Couldn't open the screenshot"
 msgstr "Не удалось открыть снимок экрана"
@@ -8722,6 +8737,9 @@ msgstr "Вид папок"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Папки для выгрузки в новые worktree, по одной в строке, относительно корня репозитория. Файлы в корне включаются всегда. Пусто — выгружается всё."
 
+msgid "Follow along in the terminal below."
+msgstr "Следите за ходом в терминале ниже."
+
 msgid "FOLLOW ON X"
 msgstr "ПОДПИСАТЬСЯ В X"
 
@@ -9583,6 +9601,9 @@ msgstr "Как установить {name} в Paradev"
 
 msgid "How to install Paradev"
 msgstr "Как установить Paradev"
+
+msgid "How to update"
+msgstr "Как обновить"
 
 msgid "How we build it, in long form."
 msgstr "Как мы это строим, подробно."
@@ -15921,6 +15942,9 @@ msgstr "Перезапустить демон терминала?"
 msgid "Restart terminals"
 msgstr "Перезапустить терминалы"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Перезапустите чат, чтобы использовать версию {installed}."
+
 msgid "Restart workspace"
 msgstr "Перезапустить рабочую область"
 
@@ -18964,6 +18988,9 @@ msgstr "Теперь кнопка выделяется. Я проверил эт
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Изменение вступает в силу сразу. Вы платите только разницу за остаток периода."
 
+msgid "The chat resumes after the update."
+msgstr "Чат продолжится после обновления."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Чат остаётся как есть. Файлы, которые кто-либо изменил после этого хода, не трогаются и перечисляются."
 
@@ -20453,6 +20480,9 @@ msgstr "Обновить"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Обновите {appName} на этой машине, чтобы прикреплять файлы"
 
+msgid "Update {label}"
+msgstr "Обновить {label}"
+
 msgid "Update available"
 msgstr "Доступно обновление"
 
@@ -20524,6 +20554,9 @@ msgstr "Только что обновлено с {0}."
 
 msgid "Updates"
 msgstr "Обновления"
+
+msgid "Updating {label}…"
+msgstr "Обновление {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

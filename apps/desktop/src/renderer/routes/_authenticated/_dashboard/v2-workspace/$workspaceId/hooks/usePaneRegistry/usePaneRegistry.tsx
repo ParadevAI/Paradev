@@ -963,6 +963,7 @@ export function usePaneRegistry({
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<ChatPane
 						ctx={ctx}
+						launcher={launcher}
 						onOpenDiff={onOpenDiff}
 						onOpenFile={onOpenFile}
 						onRevealPath={onRevealPath}

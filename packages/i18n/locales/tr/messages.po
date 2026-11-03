@@ -1062,6 +1062,15 @@ msgstr "{kindLabel} tema"
 msgid "{label} access to {pluginName}"
 msgstr "{label} rolünün {pluginName} erişimi"
 
+msgid "{label} needs an update"
+msgstr "{label} güncellenmeli"
+
+msgid "{label} update available"
+msgstr "{label} güncellemesi var"
+
+msgid "{label} updated"
+msgstr "{label} güncellendi"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "Sohbet başlatma"
 msgid "Chat mode"
 msgstr "Sohbet modu"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Sohbet için {minVersion} veya daha yeni bir sürüm gerekiyor. Yüklü sürüm {installed}."
+
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
 
@@ -5883,6 +5895,9 @@ msgstr "Alt ajan arka plana taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
+
+msgid "Couldn't open a terminal"
+msgstr "Terminal açılamadı"
 
 msgid "Couldn't open the screenshot"
 msgstr "Ekran görüntüsü açılamadı"
@@ -8722,6 +8737,9 @@ msgstr "Klasör görünümü"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Yeni worktree'lere checkout edilecek klasörler; her satıra bir tane, depo köküne göre. Kökteki dosyalar her zaman dahildir. Boş bırakılırsa her şey checkout edilir."
 
+msgid "Follow along in the terminal below."
+msgstr "İlerlemeyi aşağıdaki terminalden izleyin."
+
 msgid "FOLLOW ON X"
 msgstr "X'TE TAKİP EDİN"
 
@@ -9583,6 +9601,9 @@ msgstr "{name} teması Paradev'e nasıl kurulur"
 
 msgid "How to install Paradev"
 msgstr "Paradev nasıl yüklenir"
+
+msgid "How to update"
+msgstr "Nasıl güncellenir"
 
 msgid "How we build it, in long form."
 msgstr "Nasıl geliştirdiğimiz, ayrıntılı olarak."
@@ -15921,6 +15942,9 @@ msgstr "Terminal daemon'u yeniden başlatılsın mı?"
 msgid "Restart terminals"
 msgstr "Terminalleri yeniden başlat"
 
+msgid "Restart the chat to use {installed}."
+msgstr "{installed} sürümünü kullanmak için sohbeti yeniden başlatın."
+
 msgid "Restart workspace"
 msgstr "Çalışma alanını yeniden başlat"
 
@@ -18964,6 +18988,9 @@ msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı ödersiniz."
 
+msgid "The chat resumes after the update."
+msgstr "Sohbet, güncellemeden sonra devam edecek."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
 
@@ -20453,6 +20480,9 @@ msgstr "Güncelle"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Dosya eklemek için bu makinede {appName}'i güncelleyin"
 
+msgid "Update {label}"
+msgstr "Güncelle: {label}"
+
 msgid "Update available"
 msgstr "Güncelleme mevcut"
 
@@ -20524,6 +20554,9 @@ msgstr "Az önce {0} sürümünden güncellendi."
 
 msgid "Updates"
 msgstr "Güncellemeler"
+
+msgid "Updating {label}…"
+msgstr "{label} güncelleniyor…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

@@ -1062,6 +1062,15 @@ msgstr "Chủ đề {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Quyền {label} với {pluginName}"
 
+msgid "{label} needs an update"
+msgstr "{label} cần được cập nhật"
+
+msgid "{label} update available"
+msgstr "Có bản cập nhật {label}"
+
+msgid "{label} updated"
+msgstr "Đã cập nhật {label}"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "Khởi chạy chat"
 msgid "Chat mode"
 msgstr "Chế độ chat"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Trò chuyện cần phiên bản {minVersion} trở lên. Phiên bản đã cài là {installed}."
+
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
 
@@ -5883,6 +5895,9 @@ msgstr "Không thể chuyển agent con sang chạy nền"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
+
+msgid "Couldn't open a terminal"
+msgstr "Không thể mở terminal"
 
 msgid "Couldn't open the screenshot"
 msgstr "Không thể mở ảnh chụp màn hình"
@@ -8722,6 +8737,9 @@ msgstr "Xem theo thư mục"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Các thư mục sẽ được checkout vào worktree mới, mỗi dòng một thư mục, tính từ gốc repo. Tệp ở gốc luôn được đưa vào. Để trống sẽ checkout tất cả."
 
+msgid "Follow along in the terminal below."
+msgstr "Theo dõi tiến trình trong terminal bên dưới."
+
 msgid "FOLLOW ON X"
 msgstr "THEO DÕI TRÊN X"
 
@@ -9583,6 +9601,9 @@ msgstr "Cách cài {name} trong Paradev"
 
 msgid "How to install Paradev"
 msgstr "Cách cài đặt Paradev"
+
+msgid "How to update"
+msgstr "Cách cập nhật"
 
 msgid "How we build it, in long form."
 msgstr "Cách chúng tôi xây dựng, chi tiết."
@@ -15921,6 +15942,9 @@ msgstr "Khởi động lại daemon terminal?"
 msgid "Restart terminals"
 msgstr "Khởi động lại terminal"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Khởi động lại cuộc trò chuyện để dùng phiên bản {installed}."
+
 msgid "Restart workspace"
 msgstr "Khởi động lại workspace"
 
@@ -18964,6 +18988,9 @@ msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạ
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Thay đổi có hiệu lực ngay. Bạn chỉ trả phần chênh lệch cho thời gian còn lại của kỳ này."
 
+msgid "The chat resumes after the update."
+msgstr "Cuộc trò chuyện sẽ tiếp tục sau khi cập nhật."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat vẫn giữ nguyên. Các tệp đã được bất kỳ ai sửa kể từ lượt này sẽ được giữ nguyên và liệt kê."
 
@@ -20453,6 +20480,9 @@ msgstr "Cập nhật"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Hãy cập nhật {appName} trên máy này để đính kèm tệp"
 
+msgid "Update {label}"
+msgstr "Cập nhật {label}"
+
 msgid "Update available"
 msgstr "Có bản cập nhật"
 
@@ -20524,6 +20554,9 @@ msgstr "Vừa cập nhật từ {0}."
 
 msgid "Updates"
 msgstr "Cập nhật"
+
+msgid "Updating {label}…"
+msgstr "Đang cập nhật {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

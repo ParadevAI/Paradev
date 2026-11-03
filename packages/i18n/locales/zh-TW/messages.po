@@ -1062,6 +1062,15 @@ msgstr "{kindLabel}主題"
 msgid "{label} access to {pluginName}"
 msgstr "{label} 對 {pluginName} 的存取權限"
 
+msgid "{label} needs an update"
+msgstr "{label} 需要更新"
+
+msgid "{label} update available"
+msgstr "{label} 有可用更新"
+
+msgid "{label} updated"
+msgstr "{label} 已更新"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "聊天啟動"
 msgid "Chat mode"
 msgstr "聊天模式"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "聊天需要 {minVersion} 或更新版本。目前安裝的是 {installed}。"
+
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
 
@@ -5883,6 +5895,9 @@ msgstr "無法將子代理程式移到背景"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
+
+msgid "Couldn't open a terminal"
+msgstr "無法開啟終端機"
 
 msgid "Couldn't open the screenshot"
 msgstr "無法開啟螢幕擷取畫面"
@@ -8722,6 +8737,9 @@ msgstr "資料夾檢視"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "要檢出到新worktree的資料夾，每行一個，相對於儲存庫根目錄。根目錄下的檔案始終包含在內。留空則檢出全部。"
 
+msgid "Follow along in the terminal below."
+msgstr "可在下方終端機中查看進度。"
+
 msgid "FOLLOW ON X"
 msgstr "在X上關注"
 
@@ -9583,6 +9601,9 @@ msgstr "如何在Paradev中安裝{name}"
 
 msgid "How to install Paradev"
 msgstr "如何安裝 Paradev"
+
+msgid "How to update"
+msgstr "如何更新"
 
 msgid "How we build it, in long form."
 msgstr "我們如何打造它，深入介紹。"
@@ -15921,6 +15942,9 @@ msgstr "重啟終端守護程式？"
 msgid "Restart terminals"
 msgstr "重啟終端"
 
+msgid "Restart the chat to use {installed}."
+msgstr "重啟聊天即可使用 {installed}。"
+
 msgid "Restart workspace"
 msgstr "重新啟動工作區"
 
@@ -18964,6 +18988,9 @@ msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "變更立即生效。您只需支付本期剩餘時間的差額。"
 
+msgid "The chat resumes after the update."
+msgstr "更新完成後，聊天會自動繼續。"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保持不動並列出。"
 
@@ -20453,6 +20480,9 @@ msgstr "更新"
 msgid "Update {appName} on this machine to attach files"
 msgstr "請在這臺機器上更新{appName}以附加檔案"
 
+msgid "Update {label}"
+msgstr "更新 {label}"
+
 msgid "Update available"
 msgstr "有可用更新"
 
@@ -20524,6 +20554,9 @@ msgstr "剛剛從 {0} 更新。"
 
 msgid "Updates"
 msgstr "更新"
+
+msgid "Updating {label}…"
+msgstr "正在更新 {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

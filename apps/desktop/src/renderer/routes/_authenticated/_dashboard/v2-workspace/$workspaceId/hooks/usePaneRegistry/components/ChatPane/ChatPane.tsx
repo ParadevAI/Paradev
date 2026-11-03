@@ -1,4 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
+import { toast } from "@superset/ui/sonner";
 import { useCallback, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
@@ -6,7 +8,10 @@ import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
+	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import type { TerminalLauncher } from "../../../useV2TerminalLauncher";
+import type { RunInTerminal } from "../../hooks/useAgentCliUpdate";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
@@ -23,17 +28,20 @@ import { saveChatMode } from "./utils/savedChatMode";
 
 export function ChatPane({
 	ctx,
+	launcher,
 	onOpenDiff,
 	onOpenFile,
 	onRevealPath,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
+	launcher: TerminalLauncher;
 	workspaceId: string;
 	onOpenDiff: OpenReviewDiff;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
+	const { t } = useLingui();
 	const data = ctx.pane.data as ChatPaneData;
 	const openPage = useOpenChatPage(ctx.store);
 	const { hint, showHint } = useLinkClickHint();
@@ -48,6 +56,25 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const split = ctx.actions.split;
+	const runInTerminal = useCallback<RunInTerminal>(
+		async (command, title) => {
+			try {
+				const terminalId = await launcher.create({ command });
+				split("down", {
+					kind: "terminal",
+					titleOverride: title,
+					data: { terminalId } satisfies TerminalPaneData,
+				});
+				return terminalId;
+			} catch (error) {
+				console.error("[chat] could not open a terminal", error);
+				toast.error(t({ message: "Couldn't open a terminal" }));
+				return null;
+			}
+		},
+		[launcher, split, t],
+	);
 	const openDiff = useCallback<OpenDiff>(
 		(filter, path) =>
 			onOpenDiff(path ?? "", false, undefined, undefined, undefined, filter),
@@ -135,16 +162,19 @@ export function ChatPane({
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
-				onSessionInfo={({ harnessSessionId, title }) => {
+				onSessionInfo={({ harnessSessionId, title, modeId }) => {
 					const rebound = harnessSessionId !== undefined && data.agent;
 					const retitled = title !== undefined && title !== data.chatTitle;
-					if (!rebound && !retitled) return;
+					// A resume keeps the mode the chat was in, not the saved default.
+					const remoded = modeId !== undefined && modeId !== data.chatModeId;
+					if (!rebound && !retitled && !remoded) return;
 					ctx.actions.updateData({
 						...data,
 						...(rebound
 							? { agent: { ...rebound, sessionId: harnessSessionId } }
 							: {}),
 						...(retitled ? { chatTitle: title } : {}),
+						...(remoded ? { chatModeId: modeId } : {}),
 					});
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
@@ -200,6 +230,7 @@ export function ChatPane({
 						],
 					});
 				}}
+				onRunInTerminal={runInTerminal}
 				onRewound={(prompt) => {
 					const { agent, chatModelId, chatModelLabel, chatModeId } =
 						latest.current;

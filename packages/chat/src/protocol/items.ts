@@ -271,6 +271,8 @@ export const noticeSchema = z.looseObject({
 	kind: z.literal("notice"),
 	noticeKind: z.enum(["compaction", "config_change", "error", "info"]),
 	text: z.string().optional(),
+	/** The `code` of the error an error notice reports, when it had one. */
+	code: z.string().optional(),
 });
 export type Notice = z.infer<typeof noticeSchema>;
 

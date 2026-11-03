@@ -335,6 +335,14 @@ confirmations no one is there to answer. The bundle carries
 Note that a headless `-p` run writes none of those keys, so a smoke test passes
 while the interactive TUI still blocks.
 
+**A person can't update an agent CLI in a sandbox.** The image provides the CLIs
+and every boot links them again, so an update run inside the box is undone at
+the next restart. The chat's update check reports the source as managed in
+sandbox mode: no notice, no version lookup, and the version-floor error gives no
+install command (`resolveAgentCliUpdate` in `chat-v3/agentCliUpdate.ts`). A CLI
+below the chat's floor there (SUPER-2716) needs a new image, not an action in the
+app.
+
 **Claude refuses its own launch flags under root. Fixed by the v2 layout:
 everything a person touches runs as `ubuntu`.** The builtin agent runs
 `claude --dangerously-skip-permissions`, and a sandbox used to run as root, so

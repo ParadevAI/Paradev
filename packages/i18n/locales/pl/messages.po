@@ -1062,6 +1062,15 @@ msgstr "Motyw {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Dostęp roli {label} do {pluginName}"
 
+msgid "{label} needs an update"
+msgstr "{label} wymaga aktualizacji"
+
+msgid "{label} update available"
+msgstr "Dostępna aktualizacja {label}"
+
+msgid "{label} updated"
+msgstr "Zaktualizowano {label}"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "Uruchomienie czatu"
 msgid "Chat mode"
 msgstr "Tryb czatu"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Czat wymaga wersji {minVersion} lub nowszej. Zainstalowana jest {installed}."
+
 msgid "Chat session not found"
 msgstr "Nie znaleziono sesji czatu"
 
@@ -5883,6 +5895,9 @@ msgstr "Nie udało się przenieść subagenta w tło"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nie udało się automatycznie nazwać „{name}”"
+
+msgid "Couldn't open a terminal"
+msgstr "Nie udało się otworzyć terminala"
 
 msgid "Couldn't open the screenshot"
 msgstr "Nie udało się otworzyć zrzutu ekranu"
@@ -8722,6 +8737,9 @@ msgstr "Widok folderów"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Foldery pobierane do nowych worktree, po jednym w wierszu, względem katalogu głównego repozytorium. Pliki w katalogu głównym są zawsze dołączane. Puste pole pobiera wszystko."
 
+msgid "Follow along in the terminal below."
+msgstr "Postęp możesz śledzić w terminalu poniżej."
+
 msgid "FOLLOW ON X"
 msgstr "OBSERWUJ NA X"
 
@@ -9583,6 +9601,9 @@ msgstr "Jak zainstalować {name} w Paradev"
 
 msgid "How to install Paradev"
 msgstr "Jak zainstalować Paradev"
+
+msgid "How to update"
+msgstr "Jak zaktualizować"
 
 msgid "How we build it, in long form."
 msgstr "Jak to budujemy, szczegółowo."
@@ -15921,6 +15942,9 @@ msgstr "Zrestartować demona terminala?"
 msgid "Restart terminals"
 msgstr "Zrestartuj terminale"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Uruchom ponownie czat, aby używać wersji {installed}."
+
 msgid "Restart workspace"
 msgstr "Uruchom ponownie obszar roboczy"
 
@@ -18964,6 +18988,9 @@ msgstr "Przycisk teraz się wyróżnia. Sprawdziłem to w Twoim panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Zmiana działa od razu. Płacisz tylko różnicę za resztę okresu."
 
+msgid "The chat resumes after the update."
+msgstr "Czat zostanie wznowiony po aktualizacji."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Czat zostaje bez zmian. Pliki edytowane od tej tury przez kogokolwiek pozostają nietknięte i są wymienione."
 
@@ -20453,6 +20480,9 @@ msgstr "Aktualizuj"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Zaktualizuj {appName} na tej maszynie, aby dołączać pliki"
 
+msgid "Update {label}"
+msgstr "Aktualizuj {label}"
+
 msgid "Update available"
 msgstr "Dostępna aktualizacja"
 
@@ -20524,6 +20554,9 @@ msgstr "Przed chwilą zaktualizowano z {0}."
 
 msgid "Updates"
 msgstr "Aktualizacje"
+
+msgid "Updating {label}…"
+msgstr "Aktualizowanie {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

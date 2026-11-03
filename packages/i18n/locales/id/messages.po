@@ -1062,6 +1062,15 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Akses {label} ke {pluginName}"
 
+msgid "{label} needs an update"
+msgstr "{label} perlu diperbarui"
+
+msgid "{label} update available"
+msgstr "Pembaruan {label} tersedia"
+
+msgid "{label} updated"
+msgstr "{label} sudah diperbarui"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "Peluncuran Chat"
 msgid "Chat mode"
 msgstr "Mode chat"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Chat memerlukan versi {minVersion} atau yang lebih baru. Yang terpasang {installed}."
+
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
 
@@ -5883,6 +5895,9 @@ msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
+
+msgid "Couldn't open a terminal"
+msgstr "Tidak dapat membuka terminal"
 
 msgid "Couldn't open the screenshot"
 msgstr "Tidak dapat membuka tangkapan layar"
@@ -8722,6 +8737,9 @@ msgstr "Tampilan folder"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Folder yang di-checkout ke worktree baru, satu per baris, relatif terhadap root repo. File di root selalu disertakan. Kosong berarti checkout semuanya."
 
+msgid "Follow along in the terminal below."
+msgstr "Pantau prosesnya di terminal di bawah."
+
 msgid "FOLLOW ON X"
 msgstr "IKUTI DI X"
 
@@ -9583,6 +9601,9 @@ msgstr "Cara memasang {name} di Paradev"
 
 msgid "How to install Paradev"
 msgstr "Cara memasang Paradev"
+
+msgid "How to update"
+msgstr "Cara memperbarui"
 
 msgid "How we build it, in long form."
 msgstr "Cara kami membangunnya, secara mendalam."
@@ -15921,6 +15942,9 @@ msgstr "Mulai ulang daemon terminal?"
 msgid "Restart terminals"
 msgstr "Mulai ulang terminal"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Mulai ulang chat untuk menggunakan versi {installed}."
+
 msgid "Restart workspace"
 msgstr "Mulai ulang workspace"
 
@@ -18964,6 +18988,9 @@ msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa periode ini."
 
+msgid "The chat resumes after the update."
+msgstr "Chat akan dilanjutkan setelah pembaruan."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siapa pun, dibiarkan dan dicantumkan."
 
@@ -20453,6 +20480,9 @@ msgstr "Perbarui"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Perbarui {appName} di mesin ini untuk melampirkan file"
 
+msgid "Update {label}"
+msgstr "Perbarui {label}"
+
 msgid "Update available"
 msgstr "Pembaruan tersedia"
 
@@ -20524,6 +20554,9 @@ msgstr "Baru saja diperbarui dari {0}."
 
 msgid "Updates"
 msgstr "Pembaruan"
+
+msgid "Updating {label}…"
+msgstr "Memperbarui {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

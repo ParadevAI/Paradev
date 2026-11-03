@@ -6292,6 +6292,49 @@ describe("AcpAdapter when the agent fails", () => {
 		await adapter.dispose();
 	});
 
+	it("reports the version of the CLI it started", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ launch: async () => ({ command: "fake-agent", cliVersion: "1.2.3" }) },
+		);
+		await flush();
+
+		expect(
+			events.some(
+				(event) =>
+					event.kind === "session" && event.session.cliVersion === "1.2.3",
+			),
+		).toBe(true);
+
+		await adapter.dispose();
+	});
+
+	it("keeps the code of the error that stopped the agent starting", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{
+				launch: async () => {
+					throw Object.assign(new Error("too old"), { code: "outdated" });
+				},
+			},
+		);
+		await flush();
+
+		expect(
+			itemsOf(events).find(
+				(item) => item.kind === "notice" && item.noticeKind === "error",
+			),
+		).toMatchObject({ text: "too old", code: "outdated" });
+
+		await adapter.dispose();
+	});
+
 	it("names a failed prompt, with what the agent printed during the turn and how to sign in", async () => {
 		const agent = new FakeAcpAgent();
 		agent.holdPrompts = true;

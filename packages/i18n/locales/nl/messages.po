@@ -1062,6 +1062,15 @@ msgstr "{kindLabel} thema"
 msgid "{label} access to {pluginName}"
 msgstr "{label}-toegang tot {pluginName}"
 
+msgid "{label} needs an update"
+msgstr "{label} moet worden bijgewerkt"
+
+msgid "{label} update available"
+msgstr "Update voor {label} beschikbaar"
+
+msgid "{label} updated"
+msgstr "{label} bijgewerkt"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4060,6 +4069,9 @@ msgstr "Start via chat"
 msgid "Chat mode"
 msgstr "Chatmodus"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "De chat heeft {minVersion} of nieuwer nodig. {installed} is geïnstalleerd."
+
 msgid "Chat session not found"
 msgstr "Chatsessie niet gevonden"
 
@@ -5883,6 +5895,9 @@ msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
+
+msgid "Couldn't open a terminal"
+msgstr "Kan geen terminal openen"
 
 msgid "Couldn't open the screenshot"
 msgstr "Kan de screenshot niet openen"
@@ -8722,6 +8737,9 @@ msgstr "Mapweergave"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Mappen die in nieuwe worktrees worden uitgecheckt, één per regel, relatief aan de repo-root. Bestanden in de root worden altijd meegenomen. Leeg checkt alles uit."
 
+msgid "Follow along in the terminal below."
+msgstr "Volg de voortgang in de terminal hieronder."
+
 msgid "FOLLOW ON X"
 msgstr "VOLG ONS OP X"
 
@@ -9583,6 +9601,9 @@ msgstr "{name} installeren in Paradev"
 
 msgid "How to install Paradev"
 msgstr "Paradev installeren"
+
+msgid "How to update"
+msgstr "Zo werk je bij"
 
 msgid "How we build it, in long form."
 msgstr "Hoe we het bouwen, uitgebreid uitgelegd."
@@ -15921,6 +15942,9 @@ msgstr "Terminal-daemon herstarten?"
 msgid "Restart terminals"
 msgstr "Terminals herstarten"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Start de chat opnieuw om {installed} te gebruiken."
+
 msgid "Restart workspace"
 msgstr "Werkruimte herstarten"
 
@@ -18964,6 +18988,9 @@ msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van deze periode."
 
+msgid "The chat resumes after the update."
+msgstr "De chat gaat verder na de update."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan ook zijn bewerkt, blijven ongemoeid en worden vermeld."
 
@@ -20453,6 +20480,9 @@ msgstr "Bijwerken"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Werk {appName} op deze machine bij om bestanden toe te voegen"
 
+msgid "Update {label}"
+msgstr "{label} bijwerken"
+
 msgid "Update available"
 msgstr "Update beschikbaar"
 
@@ -20524,6 +20554,9 @@ msgstr "Zojuist bijgewerkt vanaf {0}."
 
 msgid "Updates"
 msgstr "Updates"
+
+msgid "Updating {label}…"
+msgstr "{label} bijwerken…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
