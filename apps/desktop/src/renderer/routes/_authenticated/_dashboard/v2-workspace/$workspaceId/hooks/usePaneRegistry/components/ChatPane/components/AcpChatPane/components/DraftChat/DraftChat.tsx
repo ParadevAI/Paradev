@@ -74,6 +74,7 @@ export function DraftChat({
 					draftKey={draftKey}
 					inputRef={composerRef}
 					isActive={isActive}
+					launching={launched !== undefined}
 					onEnterDrawer={enterDrawer}
 					onOpenHistory={onOpenHistory}
 					onSend={(content) => onQueue(content)}

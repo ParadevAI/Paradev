@@ -126,6 +126,8 @@ export type ComposerProps = {
 	onEnterDrawer?: (options: { actionableOnly: boolean }) => boolean;
 	sessionUsage?: SessionUsage | null;
 	turnRunning?: boolean;
+	/** A launch prompt is on its way: Stop shows, disabled until there is a turn to stop. */
+	launching?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
 	/** A usage limit holds the chat; its notice sits above the composer. */
@@ -188,6 +190,7 @@ export const Composer = memo(function Composer({
 	sessionUsage,
 	target,
 	turnRunning = false,
+	launching = false,
 	terminalId,
 	usageLimited = false,
 	workspaceId,
@@ -637,7 +640,7 @@ export const Composer = memo(function Composer({
 						: (placeholder ??
 							t({ message: "Ask the agent, @mention files, run /commands" }))
 				}
-				status={stop ? "streaming" : "ready"}
+				status={stop || launching ? "streaming" : "ready"}
 				stopOnEscape={!escapeGoesBack}
 				toolbar={
 					target ? (

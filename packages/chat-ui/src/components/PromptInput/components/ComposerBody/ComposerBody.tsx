@@ -1305,8 +1305,10 @@ export function ComposerBody({
 					aria-label={t({
 						message: "Stop response",
 					})}
+					disabled={!onStop}
+					title={onStop ? undefined : t({ message: "Starting the agent…" })}
 					onClick={onStop}
-					className={buttons.filled}
+					className={onStop ? buttons.filled : buttons.inactiveSend}
 				>
 					<SquareIcon className="size-3 fill-current" />
 				</button>

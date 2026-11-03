@@ -818,6 +818,7 @@ export function SessionView({
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
+					launching={launchPending}
 					terminalId={terminalId}
 					agentLabel={agentLabel}
 					onNewChat={onNewChat}
