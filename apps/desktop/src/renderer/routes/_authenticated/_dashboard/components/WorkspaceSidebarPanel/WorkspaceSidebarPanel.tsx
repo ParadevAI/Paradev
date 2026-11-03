@@ -5,6 +5,7 @@ import {
 	DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 	useWorkspaceSidebarStore,
 } from "renderer/stores/workspace-sidebar-state";
+import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "./constants";
 import { useAutoCollapseInNarrowWindow } from "./hooks/useAutoCollapseInNarrowWindow";
 import { getWorkspaceSidebarMaxWidth } from "./utils/getWorkspaceSidebarMaxWidth";
 
@@ -29,21 +30,23 @@ export function WorkspaceSidebarPanel({
 	const maxWidth = useSyncExternalStore(subscribeToResize, getMaxWidth);
 	useAutoCollapseInNarrowWindow();
 	return (
-		<ResizablePanel
-			width={
-				width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
-					? collapsedWidth
-					: Math.min(width, maxWidth)
-			}
-			onWidthChange={(next) => setWidth(Math.min(next, maxWidth))}
-			minWidth={collapsedWidth}
-			maxWidth={maxWidth}
-			handleSide="right"
-			clampWidth={false}
-			className={className}
-			onDoubleClickHandle={() => setWidth(DEFAULT_WORKSPACE_SIDEBAR_WIDTH)}
-		>
-			{children}
-		</ResizablePanel>
+		<div {...{ [WORKSPACE_SIDEBAR_ATTRIBUTE]: "" }} className="contents">
+			<ResizablePanel
+				width={
+					width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
+						? collapsedWidth
+						: Math.min(width, maxWidth)
+				}
+				onWidthChange={(next) => setWidth(Math.min(next, maxWidth))}
+				minWidth={collapsedWidth}
+				maxWidth={maxWidth}
+				handleSide="right"
+				clampWidth={false}
+				className={className}
+				onDoubleClickHandle={() => setWidth(DEFAULT_WORKSPACE_SIDEBAR_WIDTH)}
+			>
+				{children}
+			</ResizablePanel>
+		</div>
 	);
 }

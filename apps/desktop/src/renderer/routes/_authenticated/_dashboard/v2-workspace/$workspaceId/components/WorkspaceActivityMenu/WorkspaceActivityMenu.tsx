@@ -33,6 +33,7 @@ import {
 } from "renderer/lib/github/openPullRequestLink";
 import { clearTerminalBackgroundMarker } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hooks/usePageFavorites";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
@@ -141,7 +142,6 @@ export function WorkspaceActivityMenu({
 			: null;
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
-	const [popoverOpen, setPopoverOpen] = useState(false);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const anchorNode = useActivityPanelStore(
 		(state) => state.anchorNodes[workspaceId],
@@ -156,6 +156,12 @@ export function WorkspaceActivityMenu({
 		(state) => state.hidden[workspaceId] === true,
 	);
 	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const popoverOpen = useActivityPanelStore(
+		(state) => state.floatingOpen[workspaceId] === true,
+	);
+	const setFloatingOpen = useActivityPanelStore(
+		(state) => state.setFloatingOpen,
+	);
 	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
 	const open = docked || floating;
@@ -441,11 +447,11 @@ export function WorkspaceActivityMenu({
 	}, [open, workspaceId, newestPublishedAt, markSeen]);
 
 	useEffect(() => {
-		if (fits) setPopoverOpen(false);
-	}, [fits]);
+		if (fits) setFloatingOpen(workspaceId, false);
+	}, [fits, workspaceId, setFloatingOpen]);
 
 	const setFloating = (next: boolean) => {
-		setPopoverOpen(next);
+		setFloatingOpen(workspaceId, next);
 		if (next) {
 			void utils.page.listPaginated.invalidate(workspaceListInput);
 			return;
@@ -825,7 +831,11 @@ export function WorkspaceActivityMenu({
 					if (shipView || composing) event.preventDefault();
 				}}
 				onInteractOutside={(event) => {
-					if (triggerRef.current?.contains(event.target as Node))
+					const target = event.target as Element;
+					if (
+						triggerRef.current?.contains(target) ||
+						target.closest?.(`[${WORKSPACE_SIDEBAR_ATTRIBUTE}]`)
+					)
 						event.preventDefault();
 				}}
 			>
