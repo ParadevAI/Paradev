@@ -38,6 +38,7 @@ export function useTerminalInterruptClear({
 	const queryClient = useQueryClient();
 
 	const recordInterrupt = useEffectEvent(() => {
+		if (binding?.agentLifecycleOwner === "external") return;
 		const agentActive =
 			binding?.lastEventType === "Start" ||
 			binding?.lastEventType === "PermissionRequest";

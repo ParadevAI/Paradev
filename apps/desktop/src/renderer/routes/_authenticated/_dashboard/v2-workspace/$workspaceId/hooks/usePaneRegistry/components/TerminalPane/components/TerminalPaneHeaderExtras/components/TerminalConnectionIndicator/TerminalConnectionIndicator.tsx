@@ -26,6 +26,7 @@ interface TerminalConnectionIndicatorProps {
 	terminalId: string;
 	terminalInstanceId: string;
 	onNewShell: () => Promise<void>;
+	readOnly?: boolean;
 }
 
 /** How often to re-ask the host whether the daemon is answering. */
@@ -74,6 +75,7 @@ export function TerminalConnectionIndicator({
 	terminalId,
 	terminalInstanceId,
 	onNewShell,
+	readOnly = false,
 }: TerminalConnectionIndicatorProps) {
 	const { t } = useLingui();
 	const subscribe = useCallback(
@@ -118,7 +120,7 @@ export function TerminalConnectionIndicator({
 	);
 	const [creatingShell, setCreatingShell] = useState(false);
 	const newShell = async () => {
-		if (creatingShell) return;
+		if (creatingShell || readOnly) return;
 		setCreatingShell(true);
 		try {
 			await onNewShell();
@@ -195,7 +197,9 @@ export function TerminalConnectionIndicator({
 	const gaveUp =
 		diagnosis !== null && connectionState === "closed" && terminated;
 	const mode = sessionEnded
-		? "ended"
+		? readOnly
+			? "disconnected"
+			: "ended"
 		: daemonUnreachable
 			? "unresponsive"
 			: gaveUp
@@ -262,7 +266,7 @@ export function TerminalConnectionIndicator({
 					</div>
 
 					<div className="flex gap-2">
-						{sessionEnded && (
+						{sessionEnded && !readOnly && (
 							<Button
 								className="flex-1 gap-2"
 								disabled={creatingShell}
@@ -272,7 +276,7 @@ export function TerminalConnectionIndicator({
 								<Trans>New shell</Trans>
 							</Button>
 						)}
-						{!connectionHealthy && !sessionEnded && (
+						{!connectionHealthy && (!sessionEnded || readOnly) && (
 							<Button
 								className="flex-1 gap-2"
 								disabled={reconnecting}
@@ -296,7 +300,7 @@ export function TerminalConnectionIndicator({
 								)}
 							</Button>
 						)}
-						{daemonUnreachable && (
+						{daemonUnreachable && !readOnly && (
 							<Button
 								variant="outline"
 								className="flex-1 hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
@@ -363,7 +367,7 @@ export function TerminalConnectionIndicator({
 				)}
 			</PopoverContent>
 			<AlertDialog
-				open={confirmRestartOpen}
+				open={confirmRestartOpen && !readOnly}
 				onOpenChange={setConfirmRestartOpen}
 			>
 				<AlertDialogContent>

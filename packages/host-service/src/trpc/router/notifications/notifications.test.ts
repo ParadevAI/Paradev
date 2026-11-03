@@ -665,3 +665,62 @@ describe("login attribution authentication", () => {
 		expect(terminalAgentStore.get("terminal-1")?.account).toBeUndefined();
 	});
 });
+
+it("external worker termination needs its native identity, not the observation shell", async () => {
+	const { ctx, db } = createDbContext({
+		terminalId: "external",
+		workspaceId: "ws-external",
+	});
+	db.update(terminalSessions)
+		.set({
+			agentLifecycleOwner: "external",
+			externalAgentConfigId: "custom:actual-config",
+		})
+		.where(eq(terminalSessions.id, "external"))
+		.run();
+	const caller = notificationsRouter.createCaller(ctx);
+	await caller.hook({
+		terminalId: "external",
+		eventType: "Start",
+		agent: {
+			agentId: "codex",
+			sessionId: "native-worker",
+			definitionId: "inherited-scheduler",
+		},
+	});
+	expect(ctx.terminalAgentStore.get("external")?.definitionId).toBe(
+		"custom:actual-config",
+	);
+	for (const agent of [
+		undefined,
+		{ agentId: "codex", sessionId: "other-session" },
+	]) {
+		expect(
+			await caller.hook({
+				terminalId: "external",
+				eventType: "Detached",
+				agent,
+			}),
+		).toMatchObject({ ignored: true });
+		expect(ctx.terminalAgentStore.get("external")?.agentSessionId).toBe(
+			"native-worker",
+		);
+	}
+	await caller.hook({
+		terminalId: "external",
+		eventType: "Detached",
+		agent: { agentId: "codex", sessionId: "native-worker" },
+	});
+	expect(ctx.terminalAgentStore.get("external")).toBeUndefined();
+	db.update(terminalSessions)
+		.set({ externalEndedAt: 9 })
+		.where(eq(terminalSessions.id, "external"))
+		.run();
+	expect(
+		await caller.hook({
+			terminalId: "external",
+			eventType: "Start",
+			agent: { agentId: "codex", sessionId: "native-worker" },
+		}),
+	).toMatchObject({ ignored: true });
+});

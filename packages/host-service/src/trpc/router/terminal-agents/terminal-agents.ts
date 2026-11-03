@@ -219,7 +219,12 @@ export function listAccountRestartCandidates(
 ): Array<{ binding: TerminalAgentBinding; agentLabel: string }> {
 	const out: Array<{ binding: TerminalAgentBinding; agentLabel: string }> = [];
 	for (const binding of store.list()) {
-		if (!binding.agentSessionId || binding.chatSessionId) continue;
+		if (
+			!binding.agentSessionId ||
+			binding.chatSessionId ||
+			binding.agentLifecycleOwner === "external"
+		)
+			continue;
 		const config = resolveHostAgentConfig(
 			db,
 			binding.definitionId ?? binding.agentId,

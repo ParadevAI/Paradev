@@ -29,9 +29,14 @@ import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
-import { workspaces } from "../../../db/schema";
+import {
+	terminalAgentBindings,
+	terminalSessions,
+	workspaces,
+} from "../../../db/schema";
 import {
 	createTerminalSessionInternal,
+	isExternalTerminal,
 	sendAgentMessage,
 } from "../../../terminal/terminal";
 import type {
@@ -797,10 +802,45 @@ async function continueTerminalAgent(
 	};
 }
 
+export function assertParadevLifecycleOwner(
+	db: HostDb,
+	input: AgentRunInput,
+): void {
+	const nativeSessionId = input.resumeSessionId ?? input.forkSessionId;
+	const externalSession =
+		nativeSessionId &&
+		db
+			.select({ id: terminalSessions.id })
+			.from(terminalSessions)
+			.innerJoin(
+				terminalAgentBindings,
+				eq(terminalAgentBindings.terminalId, terminalSessions.id),
+			)
+			.where(
+				and(
+					eq(terminalSessions.agentLifecycleOwner, "external"),
+					eq(terminalAgentBindings.agentSessionId, nativeSessionId),
+				),
+			)
+			.get();
+	if (
+		(input.continueTerminalId &&
+			isExternalTerminal(db, input.continueTerminalId)) ||
+		externalSession
+	) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message:
+				"This worker is managed externally; use its lifecycle owner to continue or resume it.",
+		});
+	}
+}
+
 export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
 ): Promise<AgentRunResult> {
+	assertParadevLifecycleOwner(ctx.db, input);
 	const workspace = ctx.db.query.workspaces
 		.findFirst({
 			// A tombstoned (archived) row is gone for agent launches: without

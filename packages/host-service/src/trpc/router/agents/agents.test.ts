@@ -19,6 +19,7 @@ import {
 } from "../attachments/storage";
 import { setDefaultAccountSelection } from "../usage/default-account";
 import {
+	assertParadevLifecycleOwner,
 	bindResumedSession,
 	buildAgentCommandString,
 	buildTerminalAgentLaunch,
@@ -1323,5 +1324,52 @@ describe("attachments handed to an agent launch", () => {
 		expect(
 			readAttachmentMetadata(metadata.attachmentId)?.lastUsedAt,
 		).toBeGreaterThan(0);
+	});
+});
+
+describe("external lifecycle ownership", () => {
+	it("rejects continuation, resume and fork before any launch fallback", () => {
+		const db = createTestDb();
+		db.insert(schema.terminalSessions)
+			.values({
+				id: "external-view",
+				originWorkspaceId: "ws",
+				agentLifecycleOwner: "external",
+				status: "disposed",
+			})
+			.run();
+		db.insert(schema.terminalAgentBindings)
+			.values({
+				terminalId: "external-view",
+				workspaceId: "ws",
+				agentId: "codex",
+				agentSessionId: "native-external",
+				startedAt: 1,
+				lastEventAt: 2,
+				lastEventType: "Start",
+			})
+			.run();
+		for (const selection of [
+			{ continueTerminalId: "external-view" },
+			{ resumeSessionId: "native-external" },
+			{ forkSessionId: "native-external" },
+		]) {
+			expect(() =>
+				assertParadevLifecycleOwner(db, {
+					workspaceId: "ws",
+					agent: "codex",
+					prompt: "continue",
+					...selection,
+				}),
+			).toThrow("managed externally");
+		}
+		expect(() =>
+			assertParadevLifecycleOwner(db, {
+				workspaceId: "ws",
+				agent: "codex",
+				prompt: "continue",
+				resumeSessionId: "native-ceo",
+			}),
+		).not.toThrow();
 	});
 });

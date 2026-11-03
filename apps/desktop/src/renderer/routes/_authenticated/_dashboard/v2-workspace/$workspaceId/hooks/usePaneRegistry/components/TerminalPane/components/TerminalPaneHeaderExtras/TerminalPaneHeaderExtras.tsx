@@ -1,3 +1,4 @@
+import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import type { SubagentPaneData } from "../../../../../../types";
 import type {
 	SurfaceForkPlacement,
@@ -38,6 +39,7 @@ export function TerminalPaneHeaderExtras({
 	onOpenSubagent,
 	onNewShell,
 }: TerminalPaneHeaderExtrasProps) {
+	const binding = useTerminalAgentBinding(workspaceId, terminalId);
 	return (
 		<div className="flex items-center gap-1">
 			<AccountUsage
@@ -54,6 +56,7 @@ export function TerminalPaneHeaderExtras({
 				terminalId={terminalId}
 				terminalInstanceId={terminalInstanceId}
 				onNewShell={onNewShell}
+				readOnly={binding?.agentLifecycleOwner === "external"}
 			/>
 			<TerminalPageWatchChip
 				workspaceId={workspaceId}

@@ -136,7 +136,7 @@ export function TerminalSessionHandoffMenu({
 		if (defaultTargetConfigId) setTargetConfigId(defaultTargetConfigId);
 	}, [action, defaultTargetConfigId, targetConfigId]);
 
-	if (!binding) return null;
+	if (!binding || binding.agentLifecycleOwner === "external") return null;
 
 	const openAction = (nextAction: SessionAction) => {
 		setMenuOpen(false);

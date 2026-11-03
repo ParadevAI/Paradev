@@ -101,10 +101,18 @@ export const notificationsRouter = router({
 		const terminalSession = ctx.db.query.terminalSessions
 			.findFirst({
 				where: eq(terminalSessions.id, input.terminalId),
-				columns: { originWorkspaceId: true },
+				columns: {
+					originWorkspaceId: true,
+					externalEndedAt: true,
+					agentLifecycleOwner: true,
+					externalAgentConfigId: true,
+				},
 			})
 			.sync();
-		if (!terminalSession?.originWorkspaceId) {
+		if (
+			!terminalSession?.originWorkspaceId ||
+			terminalSession.externalEndedAt != null
+		) {
 			return { success: true, ignored: true as const };
 		}
 
@@ -148,6 +156,15 @@ export const notificationsRouter = router({
 		const preview = trimOrUndefined(input.preview);
 
 		const prior = ctx.terminalAgentStore.get(input.terminalId);
+		if (
+			terminalSession.agentLifecycleOwner === "external" &&
+			eventType === "Detached" &&
+			(!prior?.agentSessionId ||
+				agent?.sessionId !== prior.agentSessionId ||
+				agent.agentId !== prior.agentId)
+		) {
+			return { success: true, ignored: true as const };
+		}
 		const account =
 			verifyAttributionToken(input.terminalId, input.attributionToken) &&
 			eventType === "Attached" &&
@@ -164,6 +181,16 @@ export const notificationsRouter = router({
 						input.apiKey ?? false,
 					).catch(() => undefined)
 				: undefined;
+		if (
+			terminalSession.agentLifecycleOwner === "external" &&
+			ctx.db.query.terminalSessions
+				.findFirst({
+					where: eq(terminalSessions.id, input.terminalId),
+					columns: { externalEndedAt: true },
+				})
+				.sync()?.externalEndedAt != null
+		)
+			return { success: true, ignored: true as const };
 		ctx.terminalAgentStore.recordEvent({
 			account,
 			launchId: trimOrUndefined(input.launchId),
@@ -172,7 +199,16 @@ export const notificationsRouter = router({
 			eventType,
 			...(agent?.agentId ? { agentId: agent.agentId } : {}),
 			...(agent?.sessionId ? { agentSessionId: agent.sessionId } : {}),
-			...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
+			...(terminalSession.agentLifecycleOwner === "external"
+				? terminalSession.externalAgentConfigId
+					? {
+							definitionId:
+								terminalSession.externalAgentConfigId as AgentIdentity["definitionId"],
+						}
+					: {}
+				: agent?.definitionId
+					? { definitionId: agent.definitionId }
+					: {}),
 			occurredAt,
 		});
 		const transcriptPath = trimOrUndefined(input.transcriptPath);

@@ -22,7 +22,12 @@ import type {
 	TerminalAgentId,
 } from "./types";
 
+const externalOwner = sql<boolean>`EXISTS (SELECT 1 FROM terminal_sessions AS owner WHERE owner.id = ${terminalAgentBindings.terminalId} AND owner.agent_lifecycle_owner = 'external')`;
+const observationConnected = sql<boolean>`EXISTS (SELECT 1 FROM terminal_sessions AS observation WHERE observation.id = ${terminalAgentBindings.terminalId} AND observation.status = 'active' AND observation.dispose_requested_at IS NULL)`;
+
 const bindingColumns = {
+	externalOwner,
+	observationConnected,
 	terminalId: terminalAgentBindings.terminalId,
 	workspaceId: terminalAgentBindings.workspaceId,
 	agentId: terminalAgentBindings.agentId,
@@ -36,6 +41,8 @@ const bindingColumns = {
 };
 
 interface BindingRow {
+	externalOwner: boolean;
+	observationConnected: boolean;
 	terminalId: string;
 	workspaceId: string;
 	agentId: TerminalAgentId;
@@ -50,6 +57,12 @@ interface BindingRow {
 
 function rowToBinding(row: BindingRow): TerminalAgentBinding {
 	return {
+		...(row.externalOwner
+			? {
+					agentLifecycleOwner: "external" as const,
+					observationConnected: Boolean(row.observationConnected),
+				}
+			: {}),
 		terminalId: row.terminalId,
 		workspaceId: row.workspaceId,
 		agentId: row.agentId,
@@ -92,6 +105,25 @@ export function markTerminalAgentBindingEnded(
 	reason: TerminalAgentEndReason,
 	endedAt: number = Date.now(),
 ): { workspaceId: string } | undefined {
+	if (reason === "detached") {
+		db.update(terminalSessions)
+			.set({ externalEndedAt: endedAt })
+			.where(
+				and(
+					eq(terminalSessions.id, terminalId),
+					eq(terminalSessions.agentLifecycleOwner, "external"),
+				),
+			)
+			.run();
+	}
+	if (reason === "terminal-exited" || reason === "disposed") {
+		const owner = db
+			.select({ owner: terminalSessions.agentLifecycleOwner })
+			.from(terminalSessions)
+			.where(eq(terminalSessions.id, terminalId))
+			.get();
+		if (owner?.owner === "external") return undefined;
+	}
 	const row = db
 		.select({
 			workspaceId: terminalAgentBindings.workspaceId,
@@ -157,6 +189,7 @@ function resumeCandidatePredicate(workspaceId: string, terminalId: string) {
 		eq(terminalAgentBindings.workspaceId, workspaceId),
 		isNotNull(terminalAgentBindings.endedAt),
 		eq(terminalAgentBindings.endReason, "terminal-exited"),
+		sql`NOT ${externalOwner}`,
 		isNotNull(terminalAgentBindings.agentSessionId),
 	);
 }
@@ -174,6 +207,7 @@ export function listResumeCandidateBindings(
 			and(
 				isNotNull(terminalAgentBindings.endedAt),
 				eq(terminalAgentBindings.endReason, "terminal-exited"),
+				sql`NOT ${externalOwner}`,
 				isNotNull(terminalAgentBindings.agentSessionId),
 			),
 		)
@@ -396,9 +430,15 @@ export class SqliteTerminalAgentBindingPersistence
 			)
 			.where(
 				and(
-					ne(terminalSessions.status, "disposed"),
-					isNull(terminalSessions.disposeRequestedAt),
+					or(
+						externalOwner,
+						and(
+							ne(terminalSessions.status, "disposed"),
+							isNull(terminalSessions.disposeRequestedAt),
+						),
+					),
 					isNull(terminalAgentBindings.endedAt),
+					isNull(terminalSessions.externalEndedAt),
 				),
 			)
 			.all();
@@ -420,10 +460,10 @@ export class SqliteTerminalAgentBindingPersistence
 			.where(
 				and(
 					eq(terminalAgentBindings.workspaceId, workspaceId),
-					eq(terminalSessions.status, "active"),
-					isNull(terminalSessions.disposeRequestedAt),
+					or(externalOwner, observationConnected),
 					isNotNull(terminalSessions.originWorkspaceId),
 					isNull(terminalAgentBindings.endedAt),
+					isNull(terminalSessions.externalEndedAt),
 					...(filter?.agentId
 						? [eq(terminalAgentBindings.agentId, filter.agentId)]
 						: []),
@@ -447,10 +487,10 @@ export class SqliteTerminalAgentBindingPersistence
 			)
 			.where(
 				and(
-					eq(terminalSessions.status, "active"),
-					isNull(terminalSessions.disposeRequestedAt),
+					or(externalOwner, observationConnected),
 					isNotNull(terminalSessions.originWorkspaceId),
 					isNull(terminalAgentBindings.endedAt),
+					isNull(terminalSessions.externalEndedAt),
 				),
 			)
 			.all();
@@ -474,10 +514,10 @@ export class SqliteTerminalAgentBindingPersistence
 				and(
 					eq(terminalAgentBindings.workspaceId, workspaceId),
 					eq(terminalAgentBindings.agentId, agentId),
-					eq(terminalSessions.status, "active"),
-					isNull(terminalSessions.disposeRequestedAt),
+					or(externalOwner, observationConnected),
 					isNotNull(terminalSessions.originWorkspaceId),
 					isNull(terminalAgentBindings.endedAt),
+					isNull(terminalSessions.externalEndedAt),
 					...(definitionId
 						? [eq(terminalAgentBindings.definitionId, definitionId)]
 						: []),
@@ -537,7 +577,9 @@ export class SqliteTerminalAgentBindingPersistence
 			.where(
 				and(
 					inArray(terminalSessions.status, ["exited", "disposed"]),
+					sql`NOT ${externalOwner}`,
 					isNull(terminalAgentBindings.endedAt),
+					isNull(terminalSessions.externalEndedAt),
 				),
 			)
 			.all();
@@ -563,6 +605,26 @@ export class SqliteTerminalAgentBindingPersistence
 		return markTerminalAgentBindingEnded(this.db, terminalId, reason, endedAt);
 	}
 
+	isExternalEnded(terminalId: string): boolean {
+		return (
+			this.db
+				.select({ endedAt: terminalSessions.externalEndedAt })
+				.from(terminalSessions)
+				.where(eq(terminalSessions.id, terminalId))
+				.get()?.endedAt != null
+		);
+	}
+
+	getLifecycleOwner(terminalId: string): "paradev" | "external" {
+		return (
+			this.db
+				.select({ owner: terminalSessions.agentLifecycleOwner })
+				.from(terminalSessions)
+				.where(eq(terminalSessions.id, terminalId))
+				.get()?.owner ?? "paradev"
+		);
+	}
+
 	getEnded(
 		terminalId: string,
 	): { endedAt: number; agentSessionId?: string } | undefined {
@@ -582,6 +644,7 @@ export class SqliteTerminalAgentBindingPersistence
 	}
 
 	upsert(binding: TerminalAgentBinding): void {
+		if (this.isExternalEnded(binding.terminalId)) return;
 		// A fresh event for the terminal revives an ended row: a new agent
 		// session started there, so the old resume candidate is superseded.
 		this.db

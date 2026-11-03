@@ -21,13 +21,22 @@ import { fileURLToPath } from "node:url";
 import { Server } from "@superset/pty-daemon";
 import { createDb, type HostDb } from "../db/index.ts";
 import { projects, workspaces } from "../db/schema.ts";
+import {
+	SqliteTerminalAgentBindingPersistence,
+	TerminalAgentStore,
+} from "../terminal-agents/index.ts";
+import { terminalRouter } from "../trpc/router/terminal/terminal.ts";
+import type { HostServiceContext } from "../types.ts";
 import { disposeDaemonClient } from "./daemon-client-singleton.ts";
 import { initTerminalBaseEnv } from "./env.ts";
 import {
 	__resetSessionsForTesting,
+	createExternalTerminalSession,
 	createTerminalSessionInternal,
 	disposeSessionAndWait,
 	snapshotSession,
+	writeFramedInputToSession,
+	writeInputToSession,
 } from "./terminal.ts";
 import { __setAccountShellForTesting } from "./user-shell.ts";
 
@@ -240,3 +249,100 @@ async function waitFor(predicate: () => boolean, ms: number): Promise<void> {
 		await new Promise((r) => setTimeout(r, 25));
 	}
 }
+
+test("external observation reconnects without owning the worker or accepting input", async () => {
+	const terminalId = `external-${randomUUID().slice(0, 8)}`;
+	const outFile = path.join(TEST_HOME, terminalId);
+	const duplicateFile = `${outFile}-duplicate`;
+	const store = new TerminalAgentStore(
+		new SqliteTerminalAgentBindingPersistence(db),
+	);
+	const ctx = {
+		db,
+		isAuthenticated: true,
+		terminalAgentStore: store,
+	} as HostServiceContext;
+	const caller = terminalRouter.createCaller(ctx);
+	const input = {
+		terminalId,
+		workspaceId,
+		initialCommand: `printf first > '${outFile}'`,
+	};
+	const result = await caller.createExternalSession(input);
+	assert.deepEqual(result, {
+		terminalId,
+		agentLifecycleOwner: "external",
+		readOnly: true,
+		agentConfigId: null,
+	});
+	await waitFor(() => fs.existsSync(outFile), 3000);
+	store.recordEvent({
+		terminalId,
+		workspaceId,
+		eventType: "Start",
+		agentId: "codex",
+		agentSessionId: "real-native-worker-id",
+		occurredAt: Date.now(),
+	});
+	const first = await createExternalTerminalSession({ ...input, db });
+	assert.ok(!("error" in first));
+	if ("error" in first) return;
+	const repeat = await createExternalTerminalSession({
+		...input,
+		initialCommand: `touch '${duplicateFile}'`,
+		db,
+	});
+	assert.ok(!("error" in repeat));
+	if ("error" in repeat) return;
+	assert.equal(repeat.pty.pid, first.pty.pid);
+	const raw = writeInputToSession({
+		terminalId,
+		workspaceId,
+		data: `touch '${duplicateFile}'\r`,
+	});
+	assert.equal("error" in raw && raw.kind, "SESSION_READ_ONLY");
+	const sent = await writeFramedInputToSession({
+		terminalId,
+		workspaceId,
+		text: "echo prohibited",
+		submit: true,
+		db,
+	});
+	assert.equal("error" in sent && sent.kind, "SESSION_READ_ONLY");
+	const ordinary = await createTerminalSessionInternal({ ...input, db });
+	assert.equal("error" in ordinary && ordinary.kind, "SESSION_READ_ONLY");
+	await disposeSessionAndWait(terminalId, db);
+	assert.equal(
+		store
+			.listByWorkspace(workspaceId)
+			.find((row) => row.terminalId === terminalId)?.agentSessionId,
+		"real-native-worker-id",
+	);
+	const reconnect = await createExternalTerminalSession({
+		...input,
+		initialCommand: `printf second > '${outFile}'`,
+		db,
+	});
+	assert.ok(!("error" in reconnect));
+	if ("error" in reconnect) return;
+	assert.notEqual(reconnect.pty.pid, first.pty.pid);
+	await waitFor(() => fs.readFileSync(outFile, "utf8") === "second", 3000);
+	assert.equal(fs.existsSync(duplicateFile), false);
+	assert.equal(
+		store
+			.listByWorkspace(workspaceId)
+			.find((row) => row.terminalId === terminalId)?.lastEventType,
+		"Start",
+	);
+	await caller.endExternalSession({ terminalId, workspaceId });
+	assert.equal(
+		store
+			.listByWorkspace(workspaceId)
+			.some((row) => row.terminalId === terminalId),
+		false,
+	);
+	await assert.rejects(
+		() => caller.createExternalSession(input),
+		/external worker has ended/,
+	);
+});
