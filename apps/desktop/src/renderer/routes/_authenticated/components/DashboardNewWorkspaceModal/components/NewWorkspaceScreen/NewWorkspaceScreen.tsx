@@ -93,6 +93,7 @@ import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
+import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
@@ -169,6 +170,19 @@ export function NewWorkspaceScreen({
 		intentHostId: preSelectedHostId,
 		savedHostId: lastHostId,
 		machineId,
+	});
+	const clearHostIntent = useCallback(() => {
+		void navigate({
+			to: "/new-workspace",
+			search: (prev) => ({ ...prev, host: undefined }),
+			replace: true,
+		});
+	}, [navigate]);
+	useConsumeHostIntent({
+		isOpen,
+		intentHostId: preSelectedHostId,
+		saveHost: setLastHostId,
+		clearIntent: clearHostIntent,
 	});
 	const isCloudHost = hostId === CLOUD_HOST_ID;
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
@@ -478,17 +492,8 @@ export function NewWorkspaceScreen({
 	);
 
 	const handleSelectHostId = useCallback(
-		(next: string | null) => {
-			setLastHostId(next);
-			if (preSelectedHostId) {
-				void navigate({
-					to: "/new-workspace",
-					search: (prev) => ({ ...prev, host: undefined }),
-					replace: true,
-				});
-			}
-		},
-		[setLastHostId, preSelectedHostId, navigate],
+		(next: string | null) => setLastHostId(next),
+		[setLastHostId],
 	);
 	const handleSelectProject = useCallback(
 		(selectedProjectId: string | null) => {
