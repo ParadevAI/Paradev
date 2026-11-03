@@ -1,6 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import {
 	useTitleBarSideWidth,
 	useTitleBarSlots,
@@ -12,6 +13,7 @@ import { OfflineBadge } from "../OfflineBadge";
 import { PortsDropdown } from "../PortsDropdown";
 import { SidebarToggle } from "../SidebarToggle";
 import { WindowControlsInset } from "../WindowControlsInset";
+import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
 
 /** macOS draws the window buttons in the first 80 physical pixels, whatever the page zoom. */
 const TRAFFIC_LIGHTS_WIDTH = 80;
@@ -26,6 +28,9 @@ export function TitleBar() {
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const zoomFactor = useZoomFactor();
+	const isListPanelCollapsed = useWorkspaceSidebarStore((state) =>
+		state.isCollapsed(),
+	);
 
 	return (
 		<div className="flex h-11 shrink-0 items-stretch">
@@ -43,8 +48,9 @@ export function TitleBar() {
 				</div>
 			)}
 			<div className="flex shrink-0 items-center gap-0.5 pr-1">
-				<SidebarToggle />
 				<NavigationControls />
+				<SidebarToggle />
+				{isListPanelCollapsed && <NewWorkspaceButton />}
 				<PortsDropdown align="start" />
 				<OfflineBadge />
 			</div>

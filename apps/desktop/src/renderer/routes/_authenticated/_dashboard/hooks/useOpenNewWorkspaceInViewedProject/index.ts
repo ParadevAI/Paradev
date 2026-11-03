@@ -1,0 +1,1 @@
+export { useOpenNewWorkspaceInViewedProject } from "./useOpenNewWorkspaceInViewedProject";
