@@ -1324,6 +1324,13 @@
       "when": 1793684241648,
       "tag": "0188_automation_archived_at",
       "breakpoints": true
+    },
+    {
+      "idx": 189,
+      "version": "7",
+      "when": 1793743584177,
+      "tag": "0189_chat_storage",
+      "breakpoints": true
     }
   ]
 }
