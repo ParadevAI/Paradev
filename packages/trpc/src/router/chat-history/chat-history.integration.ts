@@ -525,9 +525,17 @@ describe("chat moves", () => {
 		const sessionId = await chatOnLaptop();
 		const target = {
 			chatSessionId: sessionId,
+			fromHostId: LAPTOP,
 			organizationId: ORG,
 			userId: USER,
 		};
+		await expect(
+			createChatMove({
+				...target,
+				fromHostId: undefined,
+				toWorkspaceId: MY_CLOUD,
+			}),
+		).rejects.toThrow("Name the computer the chat moves from");
 		await expect(
 			createChatMove({ ...target, toWorkspaceId: THEIR_CLOUD }),
 		).rejects.toThrow("cloud workspace you started");
@@ -565,6 +573,7 @@ describe("chat moves", () => {
 		const sessionId = await chatOnLaptop();
 		const move = await createChatMove({
 			chatSessionId: sessionId,
+			fromHostId: LAPTOP,
 			toWorkspaceId: MY_CLOUD,
 			organizationId: ORG,
 			userId: USER,
@@ -585,6 +594,7 @@ describe("chat moves", () => {
 			chatSessionId: sessionId,
 			toWorkspaceId: DESKTOP_WORKSPACE,
 			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
 		});
 		await mover.claim({ moveId: toDesktop.moveId });
 		await mover.fail({ moveId: toDesktop.moveId, error: "import failed" });
@@ -629,6 +639,7 @@ describe("chat moves", () => {
 			chatSessionId: sessionId,
 			toWorkspaceId: DESKTOP_WORKSPACE,
 			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
 		});
 		await mover.claim({ moveId: first.moveId });
 		await mover.fail({ moveId: first.moveId, error: "import failed" });
@@ -652,6 +663,7 @@ describe("chat moves", () => {
 		const sessionId = await chatOnLaptop();
 		const move = await createChatMove({
 			chatSessionId: sessionId,
+			fromHostId: LAPTOP,
 			toWorkspaceId: MY_CLOUD,
 			organizationId: ORG,
 			userId: USER,
@@ -674,6 +686,7 @@ describe("chat moves", () => {
 		const sessionId = await chatOnLaptop();
 		const move = await createChatMove({
 			chatSessionId: sessionId,
+			fromHostId: LAPTOP,
 			toWorkspaceId: MY_CLOUD,
 			organizationId: ORG,
 			userId: USER,
