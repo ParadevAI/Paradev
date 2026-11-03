@@ -228,6 +228,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	launch?: () => Promise<
 		Pick<SpawnAcpOptions, "command" | "args" | "env"> & {
 			loginCommand?: string;
+			cliVersion?: string;
 		}
 	>;
 	/** Selected for a new session that asks for no mode, when the agent offers it. */
@@ -912,6 +913,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const launch = await this.options.launch?.();
 		if (this.disposed) return;
 		this.loginCommand = launch?.loginCommand;
+		if (launch?.cliVersion) this.emitSession({ cliVersion: launch.cliVersion });
 		const client = new AcpRpcClient({
 			createTransport: (handlers) => {
 				const transport = (this.options.createTransport ?? spawnAcpTransport)(

@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { acpHarnessForPreset, CONTINUE_PROMPT } from "@superset/chat/core";
 import { cn } from "@superset/ui/utils";
 import { ArrowRight } from "lucide-react";
+import { coerce, gt } from "semver";
 import {
 	AGENT_CLI_UPDATE_DOCS_URL,
 	type RunInTerminal,
@@ -20,6 +21,7 @@ export function AgentCliUpdateNotice({
 	onRestartAgent,
 	onRunInTerminal,
 	presetId,
+	runningVersion,
 	sessionId,
 	turnRunning,
 	workspaceId,
@@ -29,6 +31,8 @@ export function AgentCliUpdateNotice({
 	onRestartAgent?: (prompt?: string) => Promise<boolean>;
 	onRunInTerminal?: RunInTerminal;
 	presetId?: string;
+	/** The CLI version this chat's agent process was started from. */
+	runningVersion?: string;
 	sessionId: string | null;
 	turnRunning: boolean;
 	workspaceId: string;
@@ -78,7 +82,12 @@ export function AgentCliUpdateNotice({
 		);
 	}
 	if (!installed) return null;
-	if (phase === "updated") {
+	const runningOlder =
+		phase === "idle" &&
+		runningVersion !== undefined &&
+		isNewer(installed, runningVersion) &&
+		!isAgentCliUpdateDismissed(dismissedAt, binary, installed);
+	if (phase === "updated" || runningOlder) {
 		return (
 			<AgentCliUpdateCard
 				actions={
@@ -101,7 +110,9 @@ export function AgentCliUpdateNotice({
 				className={cardClassName}
 				compact
 				description={<Trans>Restart the chat to use {installed}.</Trans>}
-				onDismiss={finish}
+				onDismiss={
+					runningOlder ? () => dismissAgentCliUpdate(binary, installed) : finish
+				}
 				state="updated"
 				testId="agent-cli-update-notice"
 				title={<Trans>{label} updated</Trans>}
@@ -147,4 +158,10 @@ export function AgentCliUpdateNotice({
 			title={<Trans>{label} update available</Trans>}
 		/>
 	);
+}
+
+function isNewer(version: string, than: string): boolean {
+	const a = coerce(version, { includePrerelease: true });
+	const b = coerce(than, { includePrerelease: true });
+	return a !== null && b !== null && gt(a, b);
 }

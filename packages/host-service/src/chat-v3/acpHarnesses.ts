@@ -78,7 +78,13 @@ export function acpHarnessFactory(
 				const loginCommand = agentLoginCommand(entry.binary, env);
 				const login = loginCommand ? { loginCommand } : {};
 				if (!adapterEntry) {
-					return { command: cli.command, args: entry.args, env, ...login };
+					return {
+						command: cli.command,
+						args: entry.args,
+						env,
+						cliVersion: cli.version,
+						...login,
+					};
 				}
 				if (!entry.executableEnv) {
 					throw new Error(
@@ -93,6 +99,7 @@ export function acpHarnessFactory(
 						ELECTRON_RUN_AS_NODE: "1",
 						[entry.executableEnv]: cli.command,
 					},
+					cliVersion: cli.version,
 					...login,
 				};
 			},

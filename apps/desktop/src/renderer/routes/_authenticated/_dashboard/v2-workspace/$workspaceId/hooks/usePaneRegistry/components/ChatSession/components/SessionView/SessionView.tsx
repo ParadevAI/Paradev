@@ -804,6 +804,9 @@ export function SessionView({
 					onOpenFind={focusedSubagentId ? undefined : openFind}
 					onRestartAgent={onRestartAndContinue}
 					onRunInTerminal={onRunInTerminal}
+					{...(sessionState?.cliVersion
+						? { cliVersion: sessionState.cliVersion }
+						: {})}
 					usageLimited={!held && usageLimit !== undefined}
 					workspaceId={workspaceId}
 				/>

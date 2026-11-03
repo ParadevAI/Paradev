@@ -127,6 +127,8 @@ export type ComposerProps = {
 	agentLabel?: string;
 	onRunInTerminal?: RunInTerminal;
 	onRestartAgent?: (prompt?: string) => Promise<boolean>;
+	/** The CLI version this chat's agent process was started from. */
+	cliVersion?: string;
 	/** A usage limit holds the chat; its notice sits above the composer. */
 	usageLimited?: boolean;
 };
@@ -185,6 +187,7 @@ export const Composer = memo(function Composer({
 	onOpenHistory,
 	onRestartAgent,
 	onRunInTerminal,
+	cliVersion,
 	placeholder,
 	sessionUsage,
 	target,
@@ -618,6 +621,7 @@ export const Composer = memo(function Composer({
 				onRestartAgent={onRestartAgent}
 				onRunInTerminal={onRunInTerminal}
 				presetId={presetId}
+				{...(cliVersion ? { runningVersion: cliVersion } : {})}
 				sessionId={sessionId ?? null}
 				turnRunning={turnRunning}
 				workspaceId={workspaceId}

@@ -21,6 +21,7 @@ const CACHE_TTL_MS = 60_000;
 export type AgentCli = {
 	command: string;
 	env: NodeJS.ProcessEnv;
+	version: string;
 };
 
 function isExecutableFile(path: string): boolean {
@@ -213,5 +214,5 @@ export async function resolveAgentCli(options: {
 			? new AgentCliOutdatedError(message)
 			: new Error(message);
 	}
-	return { command: probed.command, env };
+	return { command: probed.command, env, version: found };
 }
