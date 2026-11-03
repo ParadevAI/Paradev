@@ -7,12 +7,14 @@ import { cn } from "@superset/ui/utils";
 import { useEffect, useRef } from "react";
 import type { StoreApi } from "zustand/vanilla";
 import type { WorkspaceStore } from "../../../../../core/store";
+import { getPaneIdsInLayout } from "../../../../../core/store/utils";
 import type {
 	LayoutNode,
 	SplitPath,
 	Tab as TabType,
 } from "../../../../../types";
 import { useIsTabVisible } from "../../../../hooks/useIsTabVisible";
+import { useNewPaneIds } from "../../../../hooks/useNewPaneIds";
 import { usePaneAppearance } from "../../../../hooks/usePaneAppearance";
 import {
 	PaneAsideTargetContext,
@@ -47,6 +49,15 @@ interface TabProps<TData> {
 	onSplitResizeDragging?: (sourceId: string, isDragging: boolean) => void;
 }
 
+/**
+ * Keys a split's panels by what they hold, so a pane that a new split wraps
+ * keeps its element and its terminal instead of remounting beside the new one.
+ */
+function layoutNodeKey(node: LayoutNode): string {
+	if (node.type === "pane") return `pane:${node.paneId}`;
+	return `split:${layoutNodeKey(node.first)}+${layoutNodeKey(node.second)}`;
+}
+
 function SplitView<TData>({
 	store,
 	tab,
@@ -57,6 +68,7 @@ function SplitView<TData>({
 	contextMenuActions,
 	onPaneError,
 	onSplitResizeDragging,
+	newPaneIds,
 }: {
 	store: StoreApi<WorkspaceStore<TData>>;
 	tab: TabType<TData>;
@@ -67,6 +79,7 @@ function SplitView<TData>({
 	contextMenuActions?: TabProps<TData>["contextMenuActions"];
 	onPaneError?: TabProps<TData>["onPaneError"];
 	onSplitResizeDragging?: TabProps<TData>["onSplitResizeDragging"];
+	newPaneIds: ReadonlySet<string>;
 }) {
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const isCards = usePaneAppearance() === "cards";
@@ -118,10 +131,12 @@ function SplitView<TData>({
 			}}
 		>
 			<ResizablePanel
+				key={layoutNodeKey(node.first)}
+				order={1}
 				className={PANE_MIN_SIZE_CLASS_NAME}
 				defaultSize={firstSize}
 			>
-				<LayoutNodeView
+				<PanelContent
 					store={store}
 					tab={tab}
 					node={node.first}
@@ -131,6 +146,7 @@ function SplitView<TData>({
 					contextMenuActions={contextMenuActions}
 					onPaneError={onPaneError}
 					onSplitResizeDragging={onSplitResizeDragging}
+					newPaneIds={newPaneIds}
 					parentDirection={node.direction}
 				/>
 			</ResizablePanel>
@@ -215,10 +231,12 @@ function SplitView<TData>({
 				}
 			/>
 			<ResizablePanel
+				key={layoutNodeKey(node.second)}
+				order={2}
 				className={PANE_MIN_SIZE_CLASS_NAME}
 				defaultSize={secondSize}
 			>
-				<LayoutNodeView
+				<PanelContent
 					store={store}
 					tab={tab}
 					node={node.second}
@@ -228,10 +246,71 @@ function SplitView<TData>({
 					contextMenuActions={contextMenuActions}
 					onPaneError={onPaneError}
 					onSplitResizeDragging={onSplitResizeDragging}
+					newPaneIds={newPaneIds}
 					parentDirection={node.direction}
 				/>
 			</ResizablePanel>
 		</ResizablePanelGroup>
+	);
+}
+
+function PanelContent<TData>({
+	store,
+	tab,
+	node,
+	path,
+	registry,
+	paneActions,
+	contextMenuActions,
+	onPaneError,
+	onSplitResizeDragging,
+	parentDirection,
+	newPaneIds,
+}: {
+	store: StoreApi<WorkspaceStore<TData>>;
+	tab: TabType<TData>;
+	node: LayoutNode;
+	path: SplitPath;
+	registry: PaneRegistry<TData>;
+	paneActions?: TabProps<TData>["paneActions"];
+	contextMenuActions?: TabProps<TData>["contextMenuActions"];
+	onPaneError?: TabProps<TData>["onPaneError"];
+	onSplitResizeDragging?: TabProps<TData>["onSplitResizeDragging"];
+	parentDirection: "horizontal" | "vertical" | null;
+	newPaneIds: ReadonlySet<string>;
+}) {
+	const isTabVisible = useIsTabVisible();
+	if (node.type === "pane") {
+		const pane = tab.panes[node.paneId];
+		if (!pane) return null;
+		return (
+			<Pane
+				store={store}
+				tab={tab}
+				pane={pane}
+				isActive={isTabVisible && tab.activePaneId === pane.id}
+				registry={registry}
+				paneActions={paneActions}
+				contextMenuActions={contextMenuActions}
+				onPaneError={onPaneError}
+				parentDirection={parentDirection}
+				appears={newPaneIds.has(pane.id)}
+			/>
+		);
+	}
+	return (
+		<SplitView
+			store={store}
+			tab={tab}
+			node={node}
+			path={path}
+			registry={registry}
+			paneActions={paneActions}
+			contextMenuActions={contextMenuActions}
+			onPaneError={onPaneError}
+			onSplitResizeDragging={onSplitResizeDragging}
+			newPaneIds={newPaneIds}
+		/>
 	);
 }
 
@@ -246,6 +325,7 @@ function LayoutNodeView<TData>({
 	onPaneError,
 	onSplitResizeDragging,
 	parentDirection = null,
+	newPaneIds,
 }: {
 	store: StoreApi<WorkspaceStore<TData>>;
 	tab: TabType<TData>;
@@ -257,8 +337,8 @@ function LayoutNodeView<TData>({
 	onPaneError?: TabProps<TData>["onPaneError"];
 	onSplitResizeDragging?: TabProps<TData>["onSplitResizeDragging"];
 	parentDirection?: "horizontal" | "vertical" | null;
+	newPaneIds: ReadonlySet<string>;
 }) {
-	const isTabVisible = useIsTabVisible();
 	// A persisted layout can be malformed — a split node with a missing
 	// child, or a corrupt node shape from an older schema. Render nothing
 	// rather than crashing the whole renderer on `node.type` of undefined.
@@ -267,21 +347,36 @@ function LayoutNodeView<TData>({
 	}
 
 	if (node.type === "pane") {
-		const pane = tab.panes[node.paneId];
-		if (!pane) return null;
-
+		if (!tab.panes[node.paneId]) return null;
+		// The same group a split renders, with one panel: splitting this pane
+		// then adds a sibling panel instead of replacing the pane's element,
+		// so its terminal stays attached and only the new pane springs in.
 		return (
-			<Pane
-				store={store}
-				tab={tab}
-				pane={pane}
-				isActive={isTabVisible && tab.activePaneId === pane.id}
-				registry={registry}
-				paneActions={paneActions}
-				contextMenuActions={contextMenuActions}
-				onPaneError={onPaneError}
-				parentDirection={parentDirection}
-			/>
+			<ResizablePanelGroup
+				className="min-h-full min-w-full overflow-auto"
+				direction="horizontal"
+			>
+				<ResizablePanel
+					key={layoutNodeKey(node)}
+					order={1}
+					className={PANE_MIN_SIZE_CLASS_NAME}
+					defaultSize={100}
+				>
+					<PanelContent
+						store={store}
+						tab={tab}
+						node={node}
+						path={path}
+						registry={registry}
+						paneActions={paneActions}
+						contextMenuActions={contextMenuActions}
+						onPaneError={onPaneError}
+						onSplitResizeDragging={onSplitResizeDragging}
+						parentDirection={parentDirection}
+						newPaneIds={newPaneIds}
+					/>
+				</ResizablePanel>
+			</ResizablePanelGroup>
 		);
 	}
 
@@ -296,6 +391,7 @@ function LayoutNodeView<TData>({
 			contextMenuActions={contextMenuActions}
 			onPaneError={onPaneError}
 			onSplitResizeDragging={onSplitResizeDragging}
+			newPaneIds={newPaneIds}
 		/>
 	);
 }
@@ -310,6 +406,9 @@ export function Tab<TData>({
 	onSplitResizeDragging,
 }: TabProps<TData>) {
 	const isCards = usePaneAppearance() === "cards";
+	const newPaneIds = useNewPaneIds(
+		tab.layout ? getPaneIdsInLayout(tab.layout) : [],
+	);
 	if (!tab.layout) {
 		return (
 			<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -338,6 +437,7 @@ export function Tab<TData>({
 					contextMenuActions={contextMenuActions}
 					onPaneError={onPaneError}
 					onSplitResizeDragging={onSplitResizeDragging}
+					newPaneIds={newPaneIds}
 				/>
 			</div>
 		</PaneAsideTargetContext.Provider>

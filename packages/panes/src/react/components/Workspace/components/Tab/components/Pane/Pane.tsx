@@ -53,6 +53,8 @@ interface PaneComponentProps<TData> {
 		| ContextMenuActionConfig<TData>[]
 		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
 	onPaneError?: PaneErrorHandler;
+	/** The pane joined a tab already on screen, so it springs in. */
+	appears?: boolean;
 }
 
 function resolveActions<TData, TAction>(
@@ -93,8 +95,12 @@ export function Pane<TData>({
 	paneActions,
 	contextMenuActions,
 	onPaneError,
+	appears = false,
 }: PaneComponentProps<TData>) {
 	const { t } = useLingui();
+	// Read once: the Tab reports `appears` only on the render the pane joined,
+	// and the animation outlives that render.
+	const [springsIn] = useState(appears);
 	const isCards = usePaneAppearance() === "cards";
 	const definition = registry[pane.kind];
 
@@ -318,7 +324,7 @@ export function Pane<TData>({
 					// holds both the header's absolute popovers and the pane's banners.
 					className={
 						isCards
-							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none`
+							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none${springsIn ? " animate-pane-appear motion-reduce:animate-none" : ""}`
 							: `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
 									isActive && parentDirection !== null
 										? "border-primary/15"
