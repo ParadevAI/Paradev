@@ -3574,9 +3574,6 @@ msgstr "Leve o {companyName} para sua equipe. Entre em contato para saber mais s
 msgid "Bring a link to something you built recently."
 msgstr "Traga o link de algo que você construiu recentemente."
 
-msgid "Bring Any Agent"
-msgstr "Traga qualquer agente"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Traga Claude Code, Codex, OpenCode ou qualquer agente de código para um único workspace. Execute tarefas em paralelo em branches separadas e revise tudo em um só lugar."
 
@@ -13674,9 +13671,6 @@ msgstr "Laranja"
 msgid "Orchestrate Parallel Agents"
 msgstr "Orquestrar agentes em paralelo"
 
-msgid "Orchestrate Them All"
-msgstr "Orquestre todos eles"
-
 msgid "Orchestrated"
 msgstr "Orquestrado"
 
@@ -14098,10 +14092,6 @@ msgid "Parallel agent worktrees"
 msgstr "Worktrees de agentes em paralelo"
 
 msgid "Parallel agents"
-msgstr "Agentes em paralelo"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
 msgstr "Agentes em paralelo"
 
 msgid "Parallel agents guide"
@@ -19123,10 +19113,6 @@ msgstr "O host voltou ao build anterior."
 
 msgid "The human reads every line before it merges."
 msgstr "A pessoa lê cada linha antes do merge."
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "A IDE para"
 
 msgid "The image upload expired — attach it again"
 msgstr "O envio da imagem expirou — anexe-a novamente"

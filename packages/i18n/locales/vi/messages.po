@@ -3574,9 +3574,6 @@ msgstr "Đưa {companyName} đến với đội của bạn. Liên hệ với ch
 msgid "Bring a link to something you built recently."
 msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần đây."
 
-msgid "Bring Any Agent"
-msgstr "Mang mọi agent về đây"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Đưa Claude Code, Codex, OpenCode hoặc bất kỳ agent lập trình nào vào một workspace. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
@@ -13674,9 +13671,6 @@ msgstr "Cam"
 msgid "Orchestrate Parallel Agents"
 msgstr "Điều phối agent song song"
 
-msgid "Orchestrate Them All"
-msgstr "Điều phối tất cả"
-
 msgid "Orchestrated"
 msgstr "Điều phối"
 
@@ -14098,10 +14092,6 @@ msgid "Parallel agent worktrees"
 msgstr "Worktree agent chạy song song"
 
 msgid "Parallel agents"
-msgstr "Agent song song"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
 msgstr "Agent song song"
 
 msgid "Parallel agents guide"
@@ -19123,10 +19113,6 @@ msgstr "Máy chủ đã quay lại bản dựng trước."
 
 msgid "The human reads every line before it merges."
 msgstr "Con người đọc từng dòng trước khi merge."
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "IDE dành cho"
 
 msgid "The image upload expired — attach it again"
 msgstr "Lượt tải lên hình ảnh đã hết hạn — hãy đính kèm lại"

@@ -3574,9 +3574,6 @@ msgstr "{companyName}をチームに導入しましょう。エンタープラ�
 msgid "Bring a link to something you built recently."
 msgstr "最近作ったもののリンクをお持ちください。"
 
-msgid "Bring Any Agent"
-msgstr "どのエージェントでも"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code、Codex、OpenCode、またはあらゆるコーディングエージェントを1つのワークスペースに。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
 
@@ -13674,9 +13671,6 @@ msgstr "オレンジ"
 msgid "Orchestrate Parallel Agents"
 msgstr "並列エージェントを指揮"
 
-msgid "Orchestrate Them All"
-msgstr "すべてを指揮する"
-
 msgid "Orchestrated"
 msgstr "オーケストレーション"
 
@@ -14099,10 +14093,6 @@ msgstr "並列のエージェントワークツリー"
 
 msgid "Parallel agents"
 msgstr "並列エージェント"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
-msgstr "専用IDE"
 
 msgid "Parallel agents guide"
 msgstr "並列エージェントガイド"
@@ -19123,10 +19113,6 @@ msgstr "ホストは以前のビルドに戻りました。"
 
 msgid "The human reads every line before it merges."
 msgstr "人間がマージ前に全行を読む。"
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "並列エージェント"
 
 msgid "The image upload expired — attach it again"
 msgstr "画像のアップロードの有効期限が切れました — もう一度添付してください"

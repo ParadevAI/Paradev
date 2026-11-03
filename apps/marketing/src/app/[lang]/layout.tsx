@@ -16,10 +16,6 @@ import {
 } from "@/components/JsonLd";
 import { getChangelogEntries } from "@/lib/changelog";
 import { REDDIT_PIXEL_ID } from "@/lib/constants";
-import {
-	APPLY_HEADLINE_VARIANT_SCRIPT,
-	HEADLINE_VARIANT_STYLE,
-} from "@/lib/hero-headline";
 
 import { CTAButtons } from "./components/CTAButtons";
 import { Footer } from "./components/Footer";
@@ -147,14 +143,6 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
-				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: static script built from constants
-					dangerouslySetInnerHTML={{ __html: APPLY_HEADLINE_VARIANT_SCRIPT }}
-				/>
-				<style
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: static rules built from constants
-					dangerouslySetInnerHTML={{ __html: HEADLINE_VARIANT_STYLE }}
-				/>
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd
 					dateModified={getChangelogEntries()[0]?.date}
