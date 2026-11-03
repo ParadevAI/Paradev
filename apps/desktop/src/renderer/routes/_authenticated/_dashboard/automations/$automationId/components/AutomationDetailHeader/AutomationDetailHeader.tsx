@@ -7,7 +7,15 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { LuClock, LuEllipsis, LuLink, LuPlay, LuTrash2 } from "react-icons/lu";
+import {
+	LuArchive,
+	LuArchiveRestore,
+	LuClock,
+	LuEllipsis,
+	LuLink,
+	LuPlay,
+	LuTrash2,
+} from "react-icons/lu";
 import { AutomationGroupMenuItems } from "../../../components/AutomationGroupMenuItems";
 import { AutomationBreadcrumbBar } from "../AutomationBreadcrumbBar";
 
@@ -18,15 +26,18 @@ interface AutomationDetailHeaderProps {
 	groups: string[];
 	onMoveToGroup: (group: string | null) => void;
 	onCopyLink: () => void;
+	onArchive: () => void;
+	onRestore: () => void;
 	onDelete: () => void;
 	onRunNow: () => void;
 	onOpenHistory: () => void;
-	deleteDisabled?: boolean;
+	archiveDisabled?: boolean;
 	runNowDisabled?: boolean;
 	/** Disables the actions — they're all owner-gated server-side. */
 	readOnly?: boolean;
-	/** Owner or organization owner; delete is the one action that outlives read-only. */
-	canDelete?: boolean;
+	archived?: boolean;
+	/** Owner or organization owner; archiving is the one action that outlives read-only. */
+	canArchive?: boolean;
 }
 
 export function AutomationDetailHeader({
@@ -35,13 +46,16 @@ export function AutomationDetailHeader({
 	groups,
 	onMoveToGroup,
 	onCopyLink,
+	onArchive,
+	onRestore,
 	onDelete,
 	onRunNow,
 	onOpenHistory,
-	deleteDisabled,
+	archiveDisabled,
 	runNowDisabled,
 	readOnly,
-	canDelete = !readOnly,
+	archived = false,
+	canArchive = !readOnly,
 }: AutomationDetailHeaderProps) {
 	const { t } = useLingui();
 	return (
@@ -55,7 +69,7 @@ export function AutomationDetailHeader({
 							variant="ghost"
 							size="icon-sm"
 							onClick={onOpenHistory}
-							disabled={readOnly}
+							disabled={readOnly || archived}
 							aria-label={t({
 								message: "Prompt history",
 							})}
@@ -65,7 +79,9 @@ export function AutomationDetailHeader({
 					</span>
 				</TooltipTrigger>
 				<TooltipContent>
-					{readOnly ? (
+					{archived ? (
+						<Trans>Restore this automation to view prompt history</Trans>
+					) : readOnly ? (
 						<Trans>Only the owner can view prompt history</Trans>
 					) : (
 						<Trans>Prompt history</Trans>
@@ -89,7 +105,7 @@ export function AutomationDetailHeader({
 						<LuLink className="size-4" />
 						<Trans>Copy link</Trans>
 					</DropdownMenuItem>
-					{!readOnly && (
+					{!readOnly && !archived && (
 						<AutomationGroupMenuItems
 							kind="dropdown"
 							groups={groups}
@@ -97,14 +113,33 @@ export function AutomationDetailHeader({
 							onMove={onMoveToGroup}
 						/>
 					)}
-					<DropdownMenuItem
-						variant="destructive"
-						disabled={!canDelete || deleteDisabled}
-						onSelect={onDelete}
-					>
-						<LuTrash2 className="size-4" />
-						<Trans>Delete automation</Trans>
-					</DropdownMenuItem>
+					{archived ? (
+						<DropdownMenuItem
+							disabled={!canArchive || archiveDisabled}
+							onSelect={onRestore}
+						>
+							<LuArchiveRestore className="size-4" />
+							<Trans>Restore automation</Trans>
+						</DropdownMenuItem>
+					) : null}
+					{archived ? (
+						<DropdownMenuItem
+							variant="destructive"
+							disabled={!canArchive || archiveDisabled}
+							onSelect={onDelete}
+						>
+							<LuTrash2 className="size-4" />
+							<Trans>Delete permanently</Trans>
+						</DropdownMenuItem>
+					) : (
+						<DropdownMenuItem
+							disabled={!canArchive || archiveDisabled}
+							onSelect={onArchive}
+						>
+							<LuArchive className="size-4" />
+							<Trans>Archive automation</Trans>
+						</DropdownMenuItem>
+					)}
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<div className="mx-1 h-4 w-px bg-border" />
@@ -116,7 +151,7 @@ export function AutomationDetailHeader({
 							size="sm"
 							className="h-8 gap-1.5 px-3"
 							onClick={onRunNow}
-							disabled={readOnly || runNowDisabled}
+							disabled={readOnly || archived || runNowDisabled}
 						>
 							<LuPlay className="size-4" />
 							<span>
@@ -125,10 +160,16 @@ export function AutomationDetailHeader({
 						</Button>
 					</span>
 				</TooltipTrigger>
-				{readOnly && (
+				{archived ? (
 					<TooltipContent>
-						<Trans>Only the owner can run this automation</Trans>
+						<Trans>Restore this automation to run it</Trans>
 					</TooltipContent>
+				) : (
+					readOnly && (
+						<TooltipContent>
+							<Trans>Only the owner can run this automation</Trans>
+						</TooltipContent>
+					)
 				)}
 			</Tooltip>
 		</AutomationBreadcrumbBar>

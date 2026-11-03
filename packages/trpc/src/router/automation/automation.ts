@@ -43,6 +43,8 @@ import {
 	gte,
 	ilike,
 	inArray,
+	isNotNull,
+	isNull,
 	notInArray,
 	sql,
 } from "drizzle-orm";
@@ -62,6 +64,7 @@ import {
 } from "../utils/active-org";
 import { dispatchAutomation } from "./dispatch";
 import {
+	assertNotArchived,
 	automationBaseColumns,
 	automationNotFound,
 	getAutomationForUser,
@@ -69,7 +72,7 @@ import {
 	promptSourceFromSession,
 	recordPromptVersion,
 	refreshScheduleNextRuns,
-	requireAutomationDeleteAccess,
+	requireAutomationArchiveAccess,
 	resolveAutomationGroup,
 	scheduleSummariesFor,
 	summarizeSchedules,
@@ -167,6 +170,20 @@ async function verifyHostAccess(
 	}
 }
 
+async function archiveAutomation(
+	ctx: Parameters<typeof requireActiveOrgMembership>[0],
+	id: string,
+) {
+	const organizationId = await requireActiveOrgMembership(ctx);
+	await requireAutomationArchiveAccess(ctx.session.user.id, organizationId, id);
+
+	await db
+		.update(automations)
+		.set({ archivedAt: new Date(), enabled: false })
+		.where(and(eq(automations.id, id), isNull(automations.archivedAt)));
+	nudge(organizationId, "automation_runs");
+}
+
 /**
  * The one run query. Both run lists read through this: All runs org-wide, and
  * an automation's own history as the same list filtered to it. Two queries
@@ -215,7 +232,7 @@ function selectRuns(args: {
 				eq(automationRuns.organizationId, args.organizationId),
 				args.automationId
 					? eq(automationRuns.automationId, args.automationId)
-					: undefined,
+					: isNull(automations.archivedAt),
 				args.status === "failed"
 					? inArray(automationRuns.status, [...FAILED_RUN_STATUSES])
 					: args.status === "missed"
@@ -454,6 +471,10 @@ export const automationRouter = {
 						.min(1)
 						.optional()
 						.describe("Case-insensitive substring match on automation name."),
+					archived: z
+						.boolean()
+						.optional()
+						.describe("List archived automations instead of active ones."),
 				})
 				.optional(),
 		)
@@ -466,6 +487,9 @@ export const automationRouter = {
 				.where(
 					and(
 						eq(automations.organizationId, organizationId),
+						input?.archived
+							? isNotNull(automations.archivedAt)
+							: isNull(automations.archivedAt),
 						input?.name
 							? ilike(automations.name, `%${escapeLikePattern(input.name)}%`)
 							: undefined,
@@ -888,17 +912,65 @@ export const automationRouter = {
 			};
 		}),
 
+	/** @deprecated Archives; use `archive`. Released clients still call it. */
 	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
+			await archiveAutomation(ctx, input.id);
+			return { ok: true };
+		}),
+
+	/** Archive an automation: it stops firing and leaves the list. `unarchive` restores it, paused. */
+	archive: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await archiveAutomation(ctx, input.id);
+			return { ok: true };
+		}),
+
+	unarchive: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
-			await requireAutomationDeleteAccess(
+			await requireAutomationArchiveAccess(
 				ctx.session.user.id,
 				organizationId,
 				input.id,
 			);
 
-			await db.delete(automations).where(eq(automations.id, input.id));
+			await db
+				.update(automations)
+				.set({ archivedAt: null })
+				.where(eq(automations.id, input.id));
+			nudge(organizationId, "automation_runs");
+
+			return { ok: true };
+		}),
+
+	/** Permanently delete an archived automation and its run history. */
+	deleteArchived: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			await requireAutomationArchiveAccess(
+				ctx.session.user.id,
+				organizationId,
+				input.id,
+			);
+
+			const [deleted] = await db
+				.delete(automations)
+				.where(
+					and(eq(automations.id, input.id), isNotNull(automations.archivedAt)),
+				)
+				.returning({ id: automations.id });
+			if (!deleted) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message: "Archive this automation before you delete it.",
+					i18nKey: "serverError.automation.archiveBeforeDelete",
+				});
+			}
 			nudge(organizationId, "automation_runs");
 
 			return { ok: true };
@@ -917,6 +989,7 @@ export const automationRouter = {
 				input.id,
 			);
 
+			if (input.enabled) assertNotArchived(existing);
 			const resuming = input.enabled && !existing.enabled;
 
 			const updated = await dbWs.transaction(async (tx) => {
@@ -962,6 +1035,8 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+
+			assertNotArchived(automation);
 
 			// The dispatcher refuses this too, but through runNow it would surface
 			// as a 500 — an expected user state, not a server fault.
@@ -1270,10 +1345,12 @@ export const automationRouter = {
 				count: sql<number>`count(*)::int`,
 			})
 			.from(automationRuns)
+			.innerJoin(automations, eq(automations.id, automationRuns.automationId))
 			.where(
 				and(
 					eq(automationRuns.organizationId, organizationId),
 					gte(automationRuns.createdAt, since),
+					isNull(automations.archivedAt),
 				),
 			)
 			.groupBy(sql`1`, automationRuns.status);
