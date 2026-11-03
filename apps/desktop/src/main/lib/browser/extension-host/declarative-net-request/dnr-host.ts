@@ -56,9 +56,19 @@ function fileStorage(extensionId: string): RulesStorage {
 	const file = path.join(rulesDirectory(), `${extensionId}.json`);
 	return {
 		load: async () => {
+			let text: string;
 			try {
-				return JSON.parse(await readFile(file, "utf8")) as PersistedRules;
+				text = await readFile(file, "utf8");
+			} catch (error) {
+				if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+				throw error;
+			}
+			try {
+				return JSON.parse(text) as PersistedRules;
 			} catch {
+				// Corrupt for good: keep a copy and start over.
+				console.error(`[dnr] ${file} is not valid JSON; moved aside`);
+				await rename(file, `${file}.corrupt`).catch(() => {});
 				return null;
 			}
 		},

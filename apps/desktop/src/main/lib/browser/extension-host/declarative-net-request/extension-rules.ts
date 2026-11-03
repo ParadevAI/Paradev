@@ -81,6 +81,8 @@ export class ExtensionRules {
 	private readonly staticRules = new Map<string, Rule[]>();
 	private readonly indexes = new Map<string, RulesetIndex>();
 	private queue: Promise<unknown> = Promise.resolve();
+	// Set when the saved rules could not be read, so an update cannot overwrite them.
+	private savedRulesUnreadable = false;
 
 	constructor(
 		readonly extensionId: string,
@@ -95,7 +97,14 @@ export class ExtensionRules {
 	}
 
 	async load(): Promise<void> {
-		const persisted = await this.storage.load().catch(() => null);
+		const persisted = await this.storage.load().catch((error: unknown) => {
+			console.error(
+				`[dnr] ${this.extensionId} saved rules could not be read; changes stay unsaved this session:`,
+				error,
+			);
+			this.savedRulesUnreadable = true;
+			return null;
+		});
 		if (persisted) {
 			this.dynamicRules = validStaticRules(persisted.dynamicRules);
 			if (persisted.version === this.version) {
@@ -279,6 +288,7 @@ export class ExtensionRules {
 	}
 
 	private persist(): Promise<void> {
+		if (this.savedRulesUnreadable) return Promise.resolve();
 		return this.storage.save({
 			version: this.version,
 			enabledRulesetIds: this.enabled,

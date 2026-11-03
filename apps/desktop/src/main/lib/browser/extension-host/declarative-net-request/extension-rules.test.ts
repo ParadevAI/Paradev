@@ -171,3 +171,24 @@ test("dynamic rules persist and take effect; session rules do not persist", asyn
 	await restarted.rules.updateDynamicRules({ removeRuleIds: [7] });
 	expect(restarted.outcome("https://ads.example/a.js").kind).toBe("block");
 });
+
+test("saved rules that cannot be read are never overwritten", async () => {
+	const { rules, storage } = setup({ version: "2026.1", dynamicRules: [] });
+	storage.load = async () => {
+		throw new Error("EIO: i/o error");
+	};
+	const save = storage.save;
+	let saves = 0;
+	storage.save = async (next) => {
+		saves++;
+		await save(next);
+	};
+	await rules.load();
+	await rules.updateDynamicRules({
+		addRules: [
+			{ id: 9, action: { type: "block" }, condition: { urlFilter: "x" } },
+		],
+	});
+	expect(rules.getDynamicRules()).toHaveLength(1);
+	expect(saves).toBe(0);
+});
