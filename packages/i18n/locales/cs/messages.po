@@ -16749,6 +16749,9 @@ msgstr "Hledat pracovní prostory…"
 msgid "Search your meeting notes"
 msgstr "Prohledávání poznámek ze schůzek"
 
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Prohledejte své pracovní prostory a otevřete jeden, nebo založte nový"
+
 msgid "Search..."
 msgstr "Hledat..."
 
@@ -18526,6 +18529,9 @@ msgid "Switch to Workspace 9"
 msgstr "Přepnout na pracovní prostor 9"
 
 msgid "Switch workspace"
+msgstr "Přepnout pracovní prostor"
+
+msgid "Switch Workspace"
 msgstr "Přepnout pracovní prostor"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")

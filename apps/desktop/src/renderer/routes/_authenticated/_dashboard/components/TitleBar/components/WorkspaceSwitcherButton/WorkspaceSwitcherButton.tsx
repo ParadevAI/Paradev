@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useMatchRoute } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import { openWorkspaceList } from "renderer/commandPalette";
+import { HotkeyLabel } from "renderer/hotkeys";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 
@@ -38,7 +39,10 @@ export function WorkspaceSwitcherButton() {
 				</button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">
-				{t({ message: "Switch workspace" })}
+				<HotkeyLabel
+					label={t({ message: "Switch workspace" })}
+					id="OPEN_WORKSPACE_LIST"
+				/>
 			</TooltipContent>
 		</Tooltip>
 	);

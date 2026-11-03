@@ -16749,6 +16749,9 @@ msgstr "ワークスペースを検索…"
 msgid "Search your meeting notes"
 msgstr "会議メモを検索"
 
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "ワークスペースを検索して開くか、新しいワークスペースを作成します"
+
 msgid "Search..."
 msgstr "検索..."
 
@@ -18526,6 +18529,9 @@ msgid "Switch to Workspace 9"
 msgstr "ワークスペース9に切り替え"
 
 msgid "Switch workspace"
+msgstr "ワークスペースを切り替え"
+
+msgid "Switch Workspace"
 msgstr "ワークスペースを切り替え"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
