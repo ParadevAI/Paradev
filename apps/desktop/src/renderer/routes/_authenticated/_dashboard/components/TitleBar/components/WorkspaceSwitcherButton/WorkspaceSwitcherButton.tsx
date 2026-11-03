@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { HEADER_ICON_STROKE_WIDTH } from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useMatchRoute } from "@tanstack/react-router";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Layers } from "lucide-react";
 import { openWorkspaceList } from "renderer/commandPalette";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -27,15 +27,21 @@ export function WorkspaceSwitcherButton() {
 					type="button"
 					aria-haspopup="dialog"
 					onClick={openWorkspaceList}
-					className="ml-0.5 flex h-7 min-w-0 max-w-60 items-center gap-[3px] rounded-lg pr-1.5 pl-2 font-semibold text-[13px] text-foreground transition-colors hover:bg-fill-hover"
+					className="ml-0.5 flex h-7 min-w-0 max-w-60 items-center gap-1.5 rounded-lg px-1.5 font-semibold text-[13px] text-foreground transition-colors hover:bg-fill-hover"
 				>
-					<span className="truncate">
-						{getV2WorkspaceDisplayName(workspace)}
-					</span>
-					<ChevronDown
-						className="size-[13px] shrink-0 text-muted-foreground"
+					<Layers
+						className="size-3.5 shrink-0 text-muted-foreground"
 						strokeWidth={HEADER_ICON_STROKE_WIDTH}
 					/>
+					<span className="flex min-w-0 items-center gap-[3px]">
+						<span className="truncate">
+							{getV2WorkspaceDisplayName(workspace)}
+						</span>
+						<ChevronDown
+							className="size-[13px] shrink-0 text-muted-foreground"
+							strokeWidth={HEADER_ICON_STROKE_WIDTH}
+						/>
+					</span>
 				</button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">
