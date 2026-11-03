@@ -1746,6 +1746,7 @@ export const automations = pgTable(
 
 		// The schedule lives in the automation's `schedule` trigger.
 		enabled: boolean().notNull().default(true),
+		archivedAt: timestamp("archived_at", { withTimezone: true }),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
