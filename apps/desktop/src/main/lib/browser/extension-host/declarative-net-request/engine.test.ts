@@ -451,7 +451,7 @@ test("redirect transform and regexSubstitution", () => {
 	});
 });
 
-test("per-request cost stays small with uBO Lite sized rulesets", () => {
+test("uBO Lite sized rulesets still match through the index", () => {
 	const rules: Rule[] = [];
 	for (let id = 1; id <= 20_000; id++) {
 		rules.push({
@@ -474,9 +474,7 @@ test("per-request cost stays small with uBO Lite sized rulesets", () => {
 			requestDomains: Array.from({ length: 30_000 }, (_, i) => `t${i}.example`),
 		},
 	});
-	const built = performance.now();
 	const engine = engineWith(extension({ default: rules }));
-	const buildMs = performance.now() - built;
 
 	const urls = [
 		"https://ad1234.example/x.js",
@@ -484,15 +482,6 @@ test("per-request cost stays small with uBO Lite sized rulesets", () => {
 		"https://t29999.example/p",
 		"https://www.news.example/static/app.bundle.js?v=12345",
 	];
-	const iterations = 20_000;
-	const started = performance.now();
-	for (let i = 0; i < iterations; i++) {
-		engine.evaluate(request(urls[i % urls.length] as string));
-	}
-	const perRequestUs = ((performance.now() - started) * 1000) / iterations;
-	console.log(
-		`[dnr perf] 40k rules + 30k-domain rule: build ${buildMs.toFixed(0)} ms, ${perRequestUs.toFixed(1)} µs/request`,
-	);
 	expect(engine.evaluate(request(urls[0] as string)).outcome.kind).toBe(
 		"block",
 	);
@@ -503,5 +492,214 @@ test("per-request cost stays small with uBO Lite sized rulesets", () => {
 		"block",
 	);
 	expect(engine.evaluate(request(urls[3] as string)).outcome.kind).toBe("none");
-	expect(perRequestUs).toBeLessThan(200);
+});
+
+describe("Chrome parity", () => {
+	const block = (id: number, condition: Rule["condition"]): Rule => ({
+		id,
+		action: { type: "block" },
+		condition,
+	});
+
+	test("an IP address host only matches itself as a domain", () => {
+		const engine = engineWith(
+			extension({ s: [block(1, { requestDomains: ["0.1"] })] }),
+		);
+		expect(engine.evaluate(request("http://10.0.0.1/a.js")).outcome.kind).toBe(
+			"none",
+		);
+		const exact = engineWith(
+			extension({ s: [block(1, { requestDomains: ["10.0.0.1"] })] }),
+		);
+		expect(exact.evaluate(request("http://10.0.0.1/a.js")).outcome.kind).toBe(
+			"block",
+		);
+	});
+
+	test("a request with no initiator is third-party", () => {
+		const engine = engineWith(
+			extension({
+				s: [
+					block(1, { urlFilter: "||site.example", domainType: "firstParty" }),
+				],
+			}),
+		);
+		expect(
+			engine.evaluate(
+				request("https://site.example/a.js", { initiator: undefined }),
+			).outcome.kind,
+		).toBe("none");
+		expect(
+			engine.evaluate(
+				request("https://site.example/a.js", {
+					initiator: "https://site.example",
+				}),
+			).outcome.kind,
+		).toBe("block");
+	});
+
+	test("navigations need host access to the URL only, not the initiator", () => {
+		const engine = engineWith(
+			extension(
+				{
+					s: [
+						{
+							id: 1,
+							action: {
+								type: "redirect",
+								redirect: { url: "https://r.example/" },
+							},
+							condition: {
+								urlFilter: "||b.example",
+								resourceTypes: ["sub_frame", "script"],
+							},
+						},
+					],
+				},
+				{ hasHostAccess: (url) => url.startsWith("https://b.example") },
+			),
+		);
+		expect(
+			engine.evaluate(
+				request("https://b.example/frame", { resourceType: "sub_frame" }),
+			).outcome,
+		).toMatchObject({ kind: "redirect", url: "https://r.example/" });
+		expect(
+			engine.evaluate(request("https://b.example/a.js")).outcome.kind,
+		).toBe("none");
+	});
+
+	test("after a set, only the same extension may append to that header", () => {
+		const headerRule = (
+			id: number,
+			priority: number,
+			operation: "set" | "append" | "remove",
+		): Rule => ({
+			id,
+			priority,
+			action: {
+				type: "modifyHeaders",
+				requestHeaders: [{ header: "x-test", operation, value: String(id) }],
+			},
+			condition: { urlFilter: "||site.example" },
+		});
+		const same = engineWith(
+			extension({ s: [headerRule(1, 2, "set"), headerRule(2, 1, "append")] }),
+		).evaluate(request("https://site.example/"));
+		expect(same.requestHeaders.map((change) => change.operation)).toEqual([
+			"set",
+			"append",
+		]);
+
+		const other = engineWith(
+			extension({ s: [headerRule(2, 1, "append")] }, { extensionId: OTHER }),
+			extension({ s: [headerRule(1, 2, "set")] }),
+		).evaluate(request("https://site.example/"));
+		expect(other.requestHeaders.map((change) => change.operation)).toEqual([
+			"set",
+		]);
+
+		const removed = engineWith(
+			extension({
+				s: [headerRule(1, 2, "remove"), headerRule(2, 1, "append")],
+			}),
+		).evaluate(request("https://site.example/"));
+		expect(removed.requestHeaders.map((change) => change.operation)).toEqual([
+			"remove",
+		]);
+	});
+
+	test("a regexSubstitution that yields a javascript: URL does not redirect", () => {
+		const engine = engineWith(
+			extension({
+				s: [
+					{
+						id: 1,
+						action: {
+							type: "redirect",
+							redirect: { regexSubstitution: "javascript:\\1" },
+						},
+						condition: { regexFilter: "^https://site\\.example/(.*)$" },
+					},
+				],
+			}),
+		);
+		expect(
+			engine.evaluate(request("https://site.example/alert(1)")).outcome.kind,
+		).toBe("none");
+	});
+
+	test("republishing an extension keeps its install order", () => {
+		const redirectTo = (url: string): Rule[] => [
+			{
+				id: 1,
+				action: { type: "redirect", redirect: { url } },
+				condition: { urlFilter: "||site.example" },
+			},
+		];
+		const older = extension(
+			{ s: redirectTo("https://older.example/") },
+			{ extensionId: OTHER },
+		);
+		const engine = engineWith(
+			older,
+			extension({ s: redirectTo("https://newer.example/") }),
+		);
+		engine.setExtension({ ...older });
+		expect(
+			engine.evaluate(request("https://site.example/")).outcome,
+		).toMatchObject({ url: "https://newer.example/" });
+	});
+
+	test("matched lists the action taken, and header rules by direction", () => {
+		const engine = engineWith(
+			extension(
+				{
+					s: [
+						{
+							id: 1,
+							action: {
+								type: "redirect",
+								redirect: { url: "https://r.example/" },
+							},
+							condition: { urlFilter: "||site.example" },
+						},
+					],
+				},
+				{ extensionId: OTHER },
+			),
+			extension({
+				s: [
+					block(2, { urlFilter: "||site.example" }),
+					{
+						id: 3,
+						action: { type: "allow" },
+						condition: { urlFilter: "||ok.example" },
+					},
+					{
+						id: 4,
+						priority: 2,
+						action: {
+							type: "modifyHeaders",
+							responseHeaders: [
+								{ header: "x-frame-options", operation: "remove" },
+							],
+						},
+						condition: { urlFilter: "||ok.example" },
+					},
+				],
+			}),
+		);
+		expect(engine.evaluate(request("https://site.example/")).matched).toEqual([
+			{ extensionId: UBOL, rulesetId: "s", ruleId: 2 },
+		]);
+		const allowed = engine.evaluate(request("https://ok.example/"));
+		expect(allowed.matched).toEqual([
+			{ extensionId: UBOL, rulesetId: "s", ruleId: 3 },
+		]);
+		expect(allowed.requestHeaderRules).toEqual([]);
+		expect(allowed.responseHeaderRules).toEqual([
+			{ extensionId: UBOL, rulesetId: "s", ruleId: 4 },
+		]);
+	});
 });

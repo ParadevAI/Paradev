@@ -151,8 +151,11 @@ export interface DnrDecision {
 	outcome: DnrOutcome;
 	requestHeaders: HeaderChange[];
 	responseHeaders: HeaderChange[];
-	/** Every rule that acted, for getMatchedRules. */
+	/** The rules whose action was taken: the block or redirect, else every allow. */
 	matched: MatchedRule[];
+	/** modifyHeaders rules that changed a request or response header. */
+	requestHeaderRules: MatchedRule[];
+	responseHeaderRules: MatchedRule[];
 }
 
 export const DYNAMIC_RULESET_ID = "_dynamic";

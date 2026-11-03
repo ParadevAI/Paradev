@@ -54,9 +54,27 @@ export function applyUrlTransform(
 	} catch {
 		return null;
 	}
-	if (transform.scheme) url.protocol = `${transform.scheme}:`;
-	if (transform.host !== undefined) url.hostname = transform.host;
-	if (transform.port !== undefined) url.port = transform.port;
+	if (transform.scheme) {
+		url.protocol = `${transform.scheme}:`;
+		if (url.protocol !== `${transform.scheme.toLowerCase()}:`) return null;
+	}
+	if (transform.host !== undefined) {
+		const before = url.hostname;
+		url.hostname = transform.host;
+		const ignored =
+			url.hostname === before &&
+			transform.host.toLowerCase() !== before.toLowerCase();
+		// The setter stops at a delimiter and keeps only the part before it.
+		const truncated =
+			!transform.host.startsWith("[") && /[/?#:@\\\s]/.test(transform.host);
+		if (ignored || truncated) return null;
+	}
+	if (transform.port !== undefined) {
+		if (!/^\d{0,5}$/.test(transform.port) || Number(transform.port) > 65_535) {
+			return null;
+		}
+		url.port = transform.port;
+	}
 	if (transform.path !== undefined) url.pathname = transform.path || "/";
 	if (transform.query !== undefined) url.search = transform.query;
 	else if (transform.queryTransform) {
