@@ -15,6 +15,10 @@ import {
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
+import {
+	failChatMovesTo,
+	queueChatMovesTo,
+} from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { transitionCloudWorkspace } from "./transition";
@@ -141,6 +145,7 @@ async function provision(
 				columns: { status: true },
 			});
 			if (current?.status === "deleted") {
+				await failChatMovesTo(row.id, "The cloud workspace was deleted");
 				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId);
 			}
@@ -164,6 +169,12 @@ async function provision(
 					hostTarget: sandbox.hostTarget,
 					claim,
 				}),
+		);
+		await queueChatMovesTo(row.id).catch((error) =>
+			console.error(
+				`[cloud-workspace] could not start the chat moving into ${row.id}`,
+				error,
+			),
 		);
 		try {
 			recordBootSpans(answer);
@@ -208,6 +219,9 @@ async function provision(
 			set: keepForDiagnosis ? { providerSandboxId } : {},
 		});
 		nudge(row.organizationId, "cloud_workspaces");
+		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
+			() => {},
+		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
 	}

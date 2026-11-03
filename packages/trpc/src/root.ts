@@ -22,6 +22,7 @@ import {
 } from "./router/channel";
 import { chatRouter } from "./router/chat";
 import { chatHistoryRouter } from "./router/chat-history";
+import { chatMoveRouter } from "./router/chat-move";
 import { cloudWorkspaceRouter } from "./router/cloud-workspace";
 import { connectorsRouter } from "./router/connectors";
 import { environmentRouter } from "./router/environment";
@@ -62,6 +63,7 @@ export const appRouter = createTRPCRouter({
 	billing: billingRouter,
 	chat: chatRouter,
 	chatHistory: chatHistoryRouter,
+	chatMove: chatMoveRouter,
 	cloudWorkspace: cloudWorkspaceRouter,
 	environment: environmentRouter,
 	host: { ...hostRouter, ...hostManagementRouter },
