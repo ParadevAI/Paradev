@@ -11,11 +11,7 @@ import { z } from "zod";
 import { env } from "../../../env";
 import { installationOctokit } from "../../../lib/sandbox/clone-token";
 import { organizationSyncsNow } from "../../../lib/sync-policy/syncPolicy";
-import {
-	planRequiredError,
-	protectedProcedure,
-	userError,
-} from "../../../trpc";
+import { personProcedure, planRequiredError, userError } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
 import { findInstalledRepository } from "./find-installed-repository";
 import { getPullRequestDiff } from "./get-pull-request-diff";
@@ -34,7 +30,7 @@ const qstash = new Client({ token: env.QSTASH_TOKEN });
 export const githubRouter = {
 	...pullRequestProcedures,
 	getPullRequestDiff,
-	getInstallation: protectedProcedure
+	getInstallation: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -55,7 +51,7 @@ export const githubRouter = {
 			return installation ?? null;
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
@@ -72,7 +68,7 @@ export const githubRouter = {
 			return { success: true };
 		}),
 
-	triggerSync: protectedProcedure
+	triggerSync: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -126,14 +122,14 @@ export const githubRouter = {
 			return { success: true };
 		}),
 
-	listRepositories: protectedProcedure
+	listRepositories: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 			return listGithubRepositories(input.organizationId);
 		}),
 
-	listPullRequests: protectedProcedure
+	listPullRequests: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -197,7 +193,7 @@ export const githubRouter = {
 			});
 		}),
 
-	listOrganizationPullRequests: protectedProcedure
+	listOrganizationPullRequests: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -215,7 +211,7 @@ export const githubRouter = {
 	 * is not installed on has no entry; `hasInstallation` lets a client fall
 	 * back to a host it can reach.
 	 */
-	getByBranches: protectedProcedure
+	getByBranches: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -343,7 +339,7 @@ export const githubRouter = {
 	 *
 	 * @deprecated Use the API's `integration.github.getPullRequestDetail`, which acts as the viewer. Kept for released clients.
 	 */
-	getPullRequest: protectedProcedure
+	getPullRequest: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -395,7 +391,7 @@ export const githubRouter = {
 			};
 		}),
 
-	getStats: protectedProcedure
+	getStats: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

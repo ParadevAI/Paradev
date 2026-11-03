@@ -50,7 +50,7 @@ import { z } from "zod";
 import { env } from "../../env";
 import { assertCloudAccess } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
-import { planRequiredError, protectedProcedure, userError } from "../../trpc";
+import { personProcedure, planRequiredError, userError } from "../../trpc";
 import {
 	assertMachineSizeOffered,
 	loadUsableEnvironment,
@@ -298,7 +298,10 @@ async function resolveTarget(
 		await verifyHostAccess(userId, organizationId, hostId);
 	}
 	if (plan.cloud) {
-		await assertCloudAccess({ userId, session: ctx.session }, organizationId);
+		await assertCloudAccess(
+			{ principal: { userId }, session: ctx.session },
+			organizationId,
+		);
 		if (!isCloudAgentId(agent)) {
 			throw userError({
 				code: "BAD_REQUEST",
@@ -441,7 +444,7 @@ export const automationRouter = {
 	 * List automations scoped to the caller's active organization. The
 	 * `prompt` body is omitted — call `getPrompt` to fetch it for one row.
 	 */
-	list: protectedProcedure
+	list: personProcedure
 		.input(
 			z
 				.object({
@@ -492,7 +495,7 @@ export const automationRouter = {
 	 * large markdown) — call `getPrompt` to fetch it. Use `listRuns` for
 	 * run history.
 	 */
-	get: protectedProcedure
+	get: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -540,7 +543,7 @@ export const automationRouter = {
 			};
 		}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
@@ -657,7 +660,7 @@ export const automationRouter = {
 			return withSchedule(created, input.triggers ?? null, legacySchedule);
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -799,7 +802,7 @@ export const automationRouter = {
 			);
 		}),
 
-	getPrompt: protectedProcedure
+	getPrompt: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -819,7 +822,7 @@ export const automationRouter = {
 			return existing;
 		}),
 
-	setGroup: protectedProcedure
+	setGroup: personProcedure
 		.input(setAutomationGroupSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -834,7 +837,7 @@ export const automationRouter = {
 			return { id: input.id, group };
 		}),
 
-	setPrompt: protectedProcedure
+	setPrompt: personProcedure
 		.input(setAutomationPromptSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -885,7 +888,7 @@ export const automationRouter = {
 			};
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -901,7 +904,7 @@ export const automationRouter = {
 			return { ok: true };
 		}),
 
-	setEnabled: protectedProcedure
+	setEnabled: personProcedure
 		.input(z.object({ id: z.string().uuid(), enabled: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
 			// Pausing is always allowed; resuming is what needs the plan.
@@ -950,7 +953,7 @@ export const automationRouter = {
 			};
 		}),
 
-	runNow: protectedProcedure
+	runNow: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
@@ -1007,7 +1010,7 @@ export const automationRouter = {
 	 * Issues a new bearer token for a webhook trigger, replacing any previous
 	 * one. The token is returned once; only its hash is stored.
 	 */
-	rotateWebhookSecret: protectedProcedure
+	rotateWebhookSecret: personProcedure
 		.input(z.object({ triggerId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1058,7 +1061,7 @@ export const automationRouter = {
 	 * Stores a provider-issued signing secret on a trigger, verbatim — an HMAC
 	 * verifier needs the raw key. Bearer-token kinds use `rotateWebhookSecret`.
 	 */
-	setTriggerSecret: protectedProcedure
+	setTriggerSecret: personProcedure
 		.input(
 			z.object({
 				triggerId: z.string().uuid(),
@@ -1111,7 +1114,7 @@ export const automationRouter = {
 		}),
 
 	/** Run history for a given automation (paginated). */
-	listRuns: protectedProcedure
+	listRuns: personProcedure
 		.input(listRunsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1133,7 +1136,7 @@ export const automationRouter = {
 			return rows.map(({ cursorAt: _cursorAt, ...run }) => run);
 		}),
 
-	listOrgRuns: protectedProcedure
+	listOrgRuns: personProcedure
 		.input(listOrgRunsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1174,7 +1177,7 @@ export const automationRouter = {
 			};
 		}),
 
-	runPayload: protectedProcedure
+	runPayload: personProcedure
 		.input(runPayloadSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1206,7 +1209,7 @@ export const automationRouter = {
 	 * A cloud workspace reporting the session its first-boot launch started,
 	 * for the automation run that created it. Only the box itself may call it.
 	 */
-	reportCloudLaunch: protectedProcedure
+	reportCloudLaunch: personProcedure
 		.input(reportCloudLaunchSchema)
 		.mutation(async ({ ctx, input }) => {
 			if (!ctx.sandboxCaller) {
@@ -1223,7 +1226,7 @@ export const automationRouter = {
 		}),
 
 	/** Most recent run per automation across the caller's active organization. */
-	latestRuns: protectedProcedure.query(async ({ ctx }) => {
+	latestRuns: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 
 		return db
@@ -1249,7 +1252,7 @@ export const automationRouter = {
 	 * stat cards and 6-hour activity buckets for the run-history sparkline.
 	 * Aggregated in SQL — an org can have tens of thousands of runs a week.
 	 */
-	orgRunStats: protectedProcedure.query(async ({ ctx }) => {
+	orgRunStats: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const bucketSeconds = 6 * 60 * 60;
 		const bucketCount = 28;
@@ -1293,7 +1296,7 @@ export const automationRouter = {
 	}),
 
 	/** Validate an RRule body + preview its next occurrences. */
-	validateRrule: protectedProcedure
+	validateRrule: personProcedure
 		.input(parseRruleSchema)
 		.mutation(async ({ input }) => {
 			const dtstart = input.dtstart ?? new Date();

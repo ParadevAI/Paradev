@@ -1,7 +1,11 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaceShares, cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, exists, isNotNull, ne, or, sql } from "drizzle-orm";
-import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
+import {
+	assertCloudAccess,
+	assertMember,
+	type MemberContext,
+} from "../../lib/cloud-guards";
 import { grantsTo, isCloudWorkspaceSharedWith } from "../../lib/sharing";
 import { userError } from "../../trpc";
 
@@ -73,18 +77,15 @@ export const notFound = () =>
 	});
 
 export async function loadVisibleWorkspace(
-	ctx: Parameters<typeof assertCloudAccess>[0] & {
-		organizationIds: string[];
-		userId: string;
-	},
+	ctx: Parameters<typeof assertCloudAccess>[0] & MemberContext,
 	id: string,
 ) {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, id),
 	});
 	if (!row) throw notFound();
-	assertMember(ctx.organizationIds, row.organizationId);
+	await assertMember(ctx, row.organizationId);
 	await assertCloudAccess(ctx, row.organizationId);
-	if (!(await canOpenWorkspace(row, ctx.userId))) throw notFound();
+	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
 	return row;
 }

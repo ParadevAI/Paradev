@@ -1,3 +1,4 @@
+import { CHANNEL_MESSAGE_MAX_LENGTH } from "@superset/shared/channels";
 import { ApplicationFailure } from "@temporalio/common";
 import type { RoomPoster } from "../../activities/createActivities";
 import type { CredentialsProvider, TurnCredentials } from "../credentials";
@@ -11,6 +12,24 @@ import { TrpcCallError, type TrpcCallOptions, trpcMutation } from "../trpcCall";
 
 const WORKER_SECRET_HEADER = "x-agent-worker-secret";
 const TURN_TOKEN_HEADER = "x-agent-turn-token";
+
+/** A reply longer than one channel message goes as several, in order. */
+export function messageParts(body: string): string[] {
+	const characters = Array.from(body.trim());
+	const parts: string[] = [];
+	for (
+		let start = 0;
+		start < characters.length;
+		start += CHANNEL_MESSAGE_MAX_LENGTH
+	) {
+		const part = characters
+			.slice(start, start + CHANNEL_MESSAGE_MAX_LENGTH)
+			.join("")
+			.trim();
+		if (part) parts.push(part);
+	}
+	return parts.length > 0 ? parts : [body];
+}
 
 /** API answers that a retry cannot change. */
 const NON_RETRYABLE: Record<string, string> = {
@@ -100,18 +119,27 @@ export function workerApi(options: WorkerApiOptions): {
 		roomPoster: ({ room, agentToken }) =>
 			room && agentToken
 				? {
-						post: (input) =>
-							trpcMutation<{ id: string }>(
-								`${options.apiUrl}/api/trpc/agentApi.postMessage`,
-								{ [TURN_TOKEN_HEADER]: agentToken },
-								{
-									channelId: room.channelId,
-									body: input.body,
-									threadRootId: room.threadRootId,
-									idempotencyKey: input.idempotencyKey,
-								},
-								options,
-							).then((message) => ({ messageId: message.id })),
+						post: async (input) => {
+							let first: string | null = null;
+							for (const [index, body] of messageParts(input.body).entries()) {
+								const message = await trpcMutation<{ id: string }>(
+									`${options.apiUrl}/api/trpc/channelMessage.send`,
+									{ [TURN_TOKEN_HEADER]: agentToken },
+									{
+										channelId: room.channelId,
+										body,
+										threadRootId: room.threadRootId,
+										clientId:
+											index === 0
+												? input.idempotencyKey
+												: `${input.idempotencyKey}:${index}`,
+									},
+									options,
+								);
+								first ??= message.id;
+							}
+							return { messageId: first ?? "" };
+						},
 					}
 				: null,
 		reconcile: () => call("reconcile", undefined),

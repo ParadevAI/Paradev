@@ -59,6 +59,9 @@ async function sessionFromOAuthBearer(
 
 	const activeOrganizationId =
 		typeof payload.organizationId === "string" ? payload.organizationId : null;
+	const organizationIds = Array.isArray(payload.organizationIds)
+		? payload.organizationIds
+		: undefined;
 
 	const sessionId = typeof payload.sid === "string" ? payload.sid : userId;
 
@@ -68,6 +71,7 @@ async function sessionFromOAuthBearer(
 			id: sessionId,
 			userId,
 			activeOrganizationId,
+			organizationIds,
 			expiresAt: new Date(((payload.exp as number) ?? 0) * 1000),
 			token: token,
 			ipAddress: null,
