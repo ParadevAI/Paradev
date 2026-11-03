@@ -32,9 +32,9 @@ const AGENT_CLI_PACKAGES: Record<string, CliPackage> = {
 		formulae: [],
 		native: {
 			matches: ({ path, realPath }) =>
-				path.endsWith("/.local/bin/claude") ||
 				realPath.includes("/.local/share/claude/") ||
-				realPath.includes("/.claude/local/"),
+				realPath.includes("/.claude/local/") ||
+				(realPath === path && path.endsWith("/.local/bin/claude")),
 			args: ["update"],
 			// The native installer follows the stable or the latest channel, and
 			// `stable` is never ahead of either.
@@ -45,7 +45,15 @@ const AGENT_CLI_PACKAGES: Record<string, CliPackage> = {
 };
 
 export function hasAgentCliUpdates(binary: string): boolean {
-	return binary in AGENT_CLI_PACKAGES;
+	return Object.hasOwn(AGENT_CLI_PACKAGES, binary);
+}
+
+/** How to install a supported CLI that is not on the machine at all. */
+export function agentCliInstallHint(binary: string): string | undefined {
+	const pkg = hasAgentCliUpdates(binary)
+		? AGENT_CLI_PACKAGES[binary]
+		: undefined;
+	return pkg ? `npm i -g ${pkg.npm}@latest` : undefined;
 }
 
 const SHELL_SAFE = /^[\w@%+=:,./-]+$/;
@@ -79,7 +87,9 @@ export function resolveAgentCliUpdate(options: {
 	exists?: (path: string) => boolean;
 	writable?: (path: string) => boolean;
 }): AgentCliUpdate | null {
-	const pkg = AGENT_CLI_PACKAGES[options.binary];
+	const pkg = hasAgentCliUpdates(options.binary)
+		? AGENT_CLI_PACKAGES[options.binary]
+		: undefined;
 	if (!pkg) return null;
 	if (options.runMode === "sandbox") {
 		return { source: "managed", command: null, latest: null };
@@ -94,8 +104,8 @@ export function resolveAgentCliUpdate(options: {
 	const exists = options.exists ?? existsSync;
 	const writable = options.writable ?? isWritable;
 	const { path, realPath } = found;
-	const tool = (candidate: string, fallback: string) =>
-		exists(candidate) ? shellQuote(candidate) : fallback;
+	const tool = (candidate: string) =>
+		exists(candidate) ? shellQuote(candidate) : null;
 
 	if (pkg.native?.matches(found)) {
 		return {
@@ -112,12 +122,15 @@ export function resolveAgentCliUpdate(options: {
 		if (!(cask ? pkg.casks : pkg.formulae).includes(token)) {
 			return { source: "unknown", command: null, latest: npmLatest };
 		}
-		const brewBin = tool(`${prefix}/bin/brew`, "brew");
+		const brewBin = tool(`${prefix}/bin/brew`);
 		return {
 			source: "homebrew",
-			command: cask
-				? `${brewBin} upgrade --cask ${token}`
-				: `${brewBin} upgrade ${token}`,
+			command:
+				brewBin === null
+					? null
+					: cask
+						? `${brewBin} upgrade --cask ${token}`
+						: `${brewBin} upgrade ${token}`,
 			latest: {
 				kind: "homebrew",
 				name: token,
@@ -129,9 +142,10 @@ export function resolveAgentCliUpdate(options: {
 	const inPackage = `/node_modules/${escapeRegExp(pkg.npm)}[-/]`;
 	const bun = new RegExp(`^(.*)/install/global${inPackage}`).exec(realPath);
 	if (bun && path === `${bun[1]}/bin/${options.binary}`) {
+		const bunBin = tool(`${bun[1]}/bin/bun`);
 		return {
 			source: "bun",
-			command: `${tool(`${bun[1]}/bin/bun`, "bun")} add -g ${pkg.npm}@latest`,
+			command: bunBin === null ? null : `${bunBin} add -g ${pkg.npm}@latest`,
 			latest: npmLatest,
 		};
 	}

@@ -7,7 +7,11 @@ import { getBinDir } from "@superset/agent-setup";
 import { AGENT_CLI_OUTDATED } from "@superset/shared/agent-cli-status";
 import { coerce, gte } from "semver";
 import { UNGATED_VERSION } from "./acpCatalogue";
-import { type AgentCliBinary, resolveAgentCliUpdate } from "./agentCliUpdate";
+import {
+	type AgentCliBinary,
+	agentCliInstallHint,
+	resolveAgentCliUpdate,
+} from "./agentCliUpdate";
 
 const execFileAsync = promisify(execFile);
 
@@ -199,9 +203,15 @@ export async function resolveAgentCli(options: {
 			found: probed.found,
 			runMode: process.env.SUPERSET_HOST_RUN_MODE,
 		});
-		const upgrade = update ? (update.command ?? undefined) : options.upgrade;
+		const install =
+			!probed.found && update?.source === "unknown"
+				? agentCliInstallHint(options.binary)
+				: undefined;
+		const upgrade = update ? (update.command ?? install) : options.upgrade;
 		const message = agentCliUnsupported({ ...options, found, upgrade });
-		throw found ? new AgentCliOutdatedError(message) : new Error(message);
+		throw found && update
+			? new AgentCliOutdatedError(message)
+			: new Error(message);
 	}
 	return { command: probed.command, env };
 }

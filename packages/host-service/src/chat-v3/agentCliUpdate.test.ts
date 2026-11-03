@@ -5,12 +5,12 @@ function update(
 	binary: string,
 	path: string,
 	realPath: string,
-	options: { writable?: boolean } = {},
+	options: { writable?: boolean; exists?: boolean } = {},
 ) {
 	return resolveAgentCliUpdate({
 		binary,
 		found: { path, realPath },
-		exists: () => true,
+		exists: () => options.exists ?? true,
 		writable: () => options.writable ?? true,
 	});
 }
@@ -72,6 +72,36 @@ describe("resolveAgentCliUpdate", () => {
 			command: "/Users/a/.local/bin/claude update",
 			latest: { kind: "npm", name: "@anthropic-ai/claude-code", tag: "stable" },
 		});
+	});
+
+	it("goes by where ~/.local/bin/claude leads, not where it sits", () => {
+		expect(
+			update(
+				"claude",
+				"/Users/a/.local/bin/claude",
+				"/opt/homebrew/Caskroom/claude-code/2.1.312/claude",
+			)?.command,
+		).toBe("/opt/homebrew/bin/brew upgrade --cask claude-code");
+	});
+
+	it("offers no command when the install's own brew or bun is missing", () => {
+		const missing = { exists: false };
+		expect(
+			update(
+				"codex",
+				"/opt/homebrew/bin/codex",
+				"/opt/homebrew/Caskroom/codex/0.166.0/codex",
+				missing,
+			),
+		).toMatchObject({ source: "homebrew", command: null });
+		expect(
+			update(
+				"claude",
+				"/Users/a/.bun/bin/claude",
+				"/Users/a/.bun/install/global/node_modules/@anthropic-ai/claude-code/cli.js",
+				missing,
+			),
+		).toMatchObject({ source: "bun", command: null });
 	});
 
 	it("updates a bun global install with that bun", () => {

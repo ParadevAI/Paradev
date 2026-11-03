@@ -1,13 +1,13 @@
 import type { AgentCliStatus } from "@superset/shared/agent-cli-status";
-import { coerce, lt } from "semver";
+import { coerce, lt, valid } from "semver";
 import { ACP_HARNESSES, UNGATED_VERSION } from "./acpCatalogue";
 import { meetsFloor, probeAgentCli } from "./agentCli";
-import { resolveAgentCliUpdate } from "./agentCliUpdate";
+import { hasAgentCliUpdates, resolveAgentCliUpdate } from "./agentCliUpdate";
 import { type LatestCliVersion, latestCliVersion } from "./latestCliVersion";
 
 function isOlder(installed: string, latest: string): boolean {
-	const current = coerce(installed);
-	const newest = coerce(latest);
+	const current = valid(installed) ?? coerce(installed);
+	const newest = valid(latest) ?? coerce(latest);
 	return current !== null && newest !== null && lt(current, newest);
 }
 
@@ -21,7 +21,7 @@ export async function agentCliStatus(options: {
 	latest?: LatestCliVersion;
 }): Promise<AgentCliStatus | null> {
 	const entry = ACP_HARNESSES[options.harness];
-	if (!entry) return null;
+	if (!entry || !hasAgentCliUpdates(entry.binary)) return null;
 	const probed = await probeAgentCli(entry.binary, options.env);
 	const update = resolveAgentCliUpdate({
 		binary: entry.binary,

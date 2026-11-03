@@ -20,10 +20,10 @@ import {
 const BINARY = "superset-test-agent-cli";
 const dirs: string[] = [];
 
-function fakeCli(dir: string, version: string): string {
+function fakeCli(dir: string, version: string, binary = BINARY): string {
 	mkdirSync(dir, { recursive: true });
-	const path = join(dir, BINARY);
-	writeFileSync(`${path}.next`, `#!/bin/sh\necho "${BINARY} ${version}"\n`);
+	const path = join(dir, binary);
+	writeFileSync(`${path}.next`, `#!/bin/sh\necho "${binary} ${version}"\n`);
 	chmodSync(`${path}.next`, 0o755);
 	renameSync(`${path}.next`, path);
 	return path;
@@ -40,7 +40,9 @@ afterEach(() => {
 		rmSync(dir, { recursive: true, force: true });
 });
 
-describe("realAgentCli", () => {
+const POSIX_ONLY = process.platform === "win32";
+
+describe.skipIf(POSIX_ONLY)("realAgentCli", () => {
 	it("skips the app's own bin dirs, as the wrapper does", () => {
 		const home = tempHome();
 		fakeCli(join(home, ".paradev-dev", "bin"), "0.0.1");
@@ -59,7 +61,7 @@ describe("realAgentCli", () => {
 	});
 });
 
-describe("probeAgentCli", () => {
+describe.skipIf(POSIX_ONLY)("probeAgentCli", () => {
 	it("reads the new version as soon as an update replaces the binary", async () => {
 		const home = tempHome();
 		const env = { HOME: home, PATH: join(home, "bin") };
@@ -71,19 +73,32 @@ describe("probeAgentCli", () => {
 	});
 });
 
-describe("resolveAgentCli", () => {
-	it("marks a CLI that is too old, so chat can offer the update instead", async () => {
+describe.skipIf(POSIX_ONLY)("resolveAgentCli", () => {
+	it("marks a too-old CLI only when chat can offer its update", async () => {
 		const home = tempHome();
+		fakeCli(join(home, "bin"), "1.0.0", "codex");
 		fakeCli(join(home, "bin"), "1.0.0");
+		const env = { HOME: home, PATH: join(home, "bin") };
+		const tooOld = (binary: string) =>
+			resolveAgentCli({ binary, minVersion: "2.0.0", env: async () => env })
+				.then(() => null)
+				.catch((caught: unknown) => caught);
+
+		expect(await tooOld("codex")).toMatchObject({ code: AGENT_CLI_OUTDATED });
+		expect(await tooOld(BINARY)).not.toHaveProperty("code");
+	});
+
+	it("says how to install a supported CLI that is missing", async () => {
+		const home = tempHome();
 		const env = { HOME: home, PATH: join(home, "bin") };
 
 		const error = await resolveAgentCli({
-			binary: BINARY,
-			minVersion: "2.0.0",
+			binary: "codex",
+			minVersion: "0.160.0",
 			env: async () => env,
 		}).catch((caught: unknown) => caught);
 
-		expect(error).toMatchObject({ code: AGENT_CLI_OUTDATED });
+		expect(String(error)).toContain("npm i -g @openai/codex@latest");
 	});
 });
 

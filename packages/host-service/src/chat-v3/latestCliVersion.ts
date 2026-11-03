@@ -37,7 +37,13 @@ async function fetchLatest(
 		headers: { accept: "application/json" },
 		signal: AbortSignal.timeout(LOOKUP_TIMEOUT_MS),
 	});
-	if (!response.ok) return null;
+	if (!response.ok) {
+		console.warn(
+			`[chat-v3] newest-version lookup returned ${response.status}`,
+			lookupUrl(source),
+		);
+		return null;
+	}
 	const version = readVersion(source, await response.json());
 	return typeof version === "string" && VERSION.test(version) ? version : null;
 }
@@ -57,7 +63,10 @@ export function createLatestCliVersion(
 		if (hit && now() < hit.expiresAt) return hit.version;
 		const entry = {
 			expiresAt: now() + DAY_MS,
-			version: fetchLatest(fetchImpl, source).catch(() => null),
+			version: fetchLatest(fetchImpl, source).catch((error: unknown) => {
+				console.warn("[chat-v3] newest-version lookup failed", error);
+				return null;
+			}),
 		};
 		cache.set(key, entry);
 		void entry.version.then((version) => {
