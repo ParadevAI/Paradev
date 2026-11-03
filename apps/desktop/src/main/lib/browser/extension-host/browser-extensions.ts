@@ -360,7 +360,10 @@ export async function removeBrowserExtension(
 		await host.session.clearStorageData({
 			origin: `chrome-extension://${extensionId}`,
 		});
+		await deleteExtensionRules(extensionId);
+		host.onRemoved(extensionId);
 		pins.setPinned(extensionId, false);
+		notifyBrowserExtensionsChanged();
 		return;
 	}
 	if (!extension || !isUserExtension(extension, browserExtensionsPath())) {

@@ -720,8 +720,7 @@ boundary.
 8. `browserAction.getState` and `browserAction.activate` are no longer IPC
    handlers; the app calls them in the main process. `windows.create`,
    `tabs.create` and `tabs.update` refuse `file:` and `data:` URLs, as they
-   already refused `chrome:` and `javascript:`. A native messaging host name must be a dotted
-   name, and its manifest's `name` must match it. With no window focused,
+   already refused `chrome:` and `javascript:`. With no window focused,
    `windows.getCurrent` and `windows.getLastFocused` answer the newest open
    window, and throw as in Chrome when none is open.
 
@@ -730,11 +729,16 @@ boundary.
    `restoreContextMenuItems` puts saved items back without an event. The app
    keeps them across restarts, as Chrome does (`extension-lifecycle.ts`).
    `contextMenus.update` is a real handler, with a rule, instead of a no-op.
+10. Native messaging: the package's `runtime.connectNative` and
+   `runtime.sendNativeMessage` handlers are removed. They read one message per
+   chunk of host output, counted characters instead of bytes, and left hosts
+   running. The app's `extension-host/native-messaging/` is the only path.
 
 **What it changes** (`dist/chrome-extension-api.preload.js`): `chrome.storage`
 is no longer replaced. The package made `sync` and `managed` the same object
 as `local`; the app's `shimChromeStorage` gives each its own area instead.
-`contextMenus.update` calls the handler.
+`contextMenus.update` calls the handler. The `runtime.connectNative` and
+`runtime.sendNativeMessage` entries are removed; the app's shim adds its own.
 
 Host patterns are matched by scheme, host and path, not by the package's
 `matchesPattern` glob, which lets `*://*.example.com/*` match any URL that
