@@ -1020,6 +1020,39 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"keenable": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "keenable",
+		"version": "1.0.0",
+		"description": "Search the web and fetch pages as clean markdown with Keenable, built for AI agents.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"keenable",
+			"search",
+			"web-search",
+			"fetch",
+			"research"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Keenable",
+					"category": "Data & APIs"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.keenable.ai/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 	"wispr": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "wispr",
