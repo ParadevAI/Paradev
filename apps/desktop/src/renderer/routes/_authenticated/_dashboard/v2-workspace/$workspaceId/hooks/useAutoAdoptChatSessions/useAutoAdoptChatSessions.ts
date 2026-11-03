@@ -20,7 +20,6 @@ import {
 import {
 	closedCloudChatPromptHashes,
 	isChatSessionClosed,
-	isChatTerminalClosed,
 	markChatSessionClosed,
 	reopenCloudChatLaunch,
 } from "../../utils/closedChatSessions";
@@ -29,7 +28,6 @@ import { hasComposerDraft } from "../usePaneRegistry/components/ChatSession/comp
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { PENDING_CLOUD_CHAT_TIMEOUT_MS } from "./constants";
 import { initialCloudChatPromptHash } from "./utils/initialCloudChatPrompt";
-import { latestOpenChatSessions } from "./utils/latestOpenChatSessions";
 import { unresolvedPollDelay } from "./utils/unresolvedPollDelay";
 
 type PaneStore = StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -156,7 +154,6 @@ export function useAutoAdoptChatSessions({
 		const closedHashes = closedCloudChatPromptHashes(workspaceId);
 		const now = Date.now();
 		let nextDeadline: number | null = null;
-		const waitingAgents = new Set<string>();
 		for (const pending of pendingPanes(stores)) {
 			const forAgent = result.sessions.filter(
 				(candidate) =>
@@ -216,7 +213,6 @@ export function useAutoAdoptChatSessions({
 			}
 			if (!session) {
 				nextDeadline = Math.min(nextDeadline ?? deadline, deadline);
-				waitingAgents.add(pending.data.agentId);
 				continue;
 			}
 			waitingSince.current.delete(pending.paneId);
@@ -243,49 +239,6 @@ export function useAutoAdoptChatSessions({
 			}
 		}
 
-		const toAdopt = latestOpenChatSessions(result.sessions, attached)
-			.filter(
-				(session) =>
-					!result.unresolved.includes(session.sessionId) &&
-					!isChatSessionClosed(session.sessionId) &&
-					!(session.terminalId && isChatTerminalClosed(session.terminalId)) &&
-					!(
-						(!session.live ||
-							typeof result.promptHashes[session.sessionId] === "string") &&
-						waitingAgents.has(presetForAcpHarness(session.harness) ?? "")
-					) &&
-					presetForAcpHarness(session.harness),
-			)
-			.sort((a, b) => a.updatedAt - b.updatedAt);
-		if (toAdopt.length > 0) {
-			const state = store.getState();
-			const restoreActiveTabId =
-				state.tabs.length > 0 ? state.activeTabId : null;
-			for (const session of toAdopt) {
-				const presetId = presetForAcpHarness(session.harness);
-				if (!presetId) continue;
-				store.getState().addTab({
-					focus: false,
-					panes: [
-						{
-							kind: "chat-v3",
-							data: {
-								terminalId: session.terminalId ?? session.sessionId,
-								sessionId: session.sessionId,
-								agent: {
-									id: presetId,
-									...(session.harnessSessionId
-										? { sessionId: session.harnessSessionId }
-										: {}),
-								},
-								...(session.title ? { chatTitle: session.title } : {}),
-							} satisfies ChatPaneData,
-						},
-					],
-				});
-			}
-			if (restoreActiveTabId) store.getState().setActiveTab(restoreActiveTabId);
-		}
 		return () => clearTimeout(deadlineTimer);
 	}, [
 		queryClient,

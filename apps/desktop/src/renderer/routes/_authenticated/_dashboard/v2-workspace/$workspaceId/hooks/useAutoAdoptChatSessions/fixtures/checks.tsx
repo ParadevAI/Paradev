@@ -282,12 +282,12 @@ test("the host launch attaches once in place and does not resend the launch prom
 	expect(creates).toBe(0);
 });
 
-test("a collaborator's chat is adopted separately and never replaces the waiting launch", async () => {
+test("a collaborator's chat gets no tab and never replaces the waiting launch", async () => {
 	const pending = await waitingPane();
 	sessions = [session("collaborator")];
 	outlines.set("collaborator", [message("desktop-client", "initial prompt")]);
 	show(pending.store, "collaborative-workspace");
-	await waitFor(() => expect(pending.store.getState().tabs).toHaveLength(2));
+	await waitFor(() => expect(reads).toBeGreaterThanOrEqual(1));
 	expect(pending.store.getState().tabs[0]?.panes[pending.paneId]?.kind).toBe(
 		PENDING_CLOUD_CHAT_PANE_KIND,
 	);
@@ -299,7 +299,7 @@ test("a collaborator's chat is adopted separately and never replaces the waiting
 			pending.store.getState().tabs[0]?.panes[pending.paneId]?.data,
 		).toMatchObject({ sessionId: "own-launch" }),
 	);
-	expect(pending.store.getState().tabs).toHaveLength(2);
+	expect(pending.store.getState().tabs).toHaveLength(1);
 	expect(pending.store.getState().activeTabId).toBe(pending.tabId);
 	expect(creates).toBe(0);
 });
