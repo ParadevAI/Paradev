@@ -59,9 +59,9 @@ export function agentCliCommand(
 	return supersetWrapper(binary) ?? findOnPath(binary, env) ?? binary;
 }
 
-const SUPERSET_BIN_DIR = /^\.superset(?:-[^/]+)?\/bin$/;
+const APP_BIN_DIR = /^\.(?:paradev|superset)(?:-[^/]+)?\/bin$/;
 
-/** The binary a Superset wrapper runs: the first on PATH outside Superset's bin dirs. */
+/** The binary an agent wrapper runs: the first on PATH outside the app's bin dirs. */
 export function realAgentCli(
 	binary: string,
 	env: NodeJS.ProcessEnv,
@@ -70,7 +70,7 @@ export function realAgentCli(
 	for (const entry of (env.PATH ?? "").split(delimiter)) {
 		const dir = entry.replace(/\/+$/, "");
 		if (!dir || dir === getBinDir()) continue;
-		if (SUPERSET_BIN_DIR.test(relative(home, dir))) continue;
+		if (APP_BIN_DIR.test(relative(home, dir))) continue;
 		for (const name of candidateNames(binary)) {
 			const path = join(dir, name);
 			if (!isExecutableFile(path)) continue;

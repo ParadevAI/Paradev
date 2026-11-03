@@ -11,7 +11,7 @@ export type AgentCliUpdate = {
 	latest: LatestVersionSource | null;
 };
 
-/** The binary the Superset wrapper runs, and where that resolves to. */
+/** The binary the agent wrapper runs, and where that resolves to. */
 export type AgentCliBinary = { path: string; realPath: string };
 
 type CliPackage = {

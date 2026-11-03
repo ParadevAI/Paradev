@@ -41,13 +41,18 @@ afterEach(() => {
 });
 
 describe("realAgentCli", () => {
-	it("skips Superset's own bin dirs, as the wrapper does", () => {
+	it("skips the app's own bin dirs, as the wrapper does", () => {
 		const home = tempHome();
-		fakeCli(join(home, ".superset-dev", "bin"), "0.0.1");
+		fakeCli(join(home, ".paradev-dev", "bin"), "0.0.1");
+		fakeCli(join(home, ".superset", "bin"), "0.0.1");
 		const real = fakeCli(join(home, "real"), "1.0.0");
 		const env = {
 			HOME: home,
-			PATH: [join(home, ".superset-dev", "bin"), join(home, "real")].join(":"),
+			PATH: [
+				join(home, ".paradev-dev", "bin"),
+				join(home, ".superset", "bin"),
+				join(home, "real"),
+			].join(":"),
 		};
 
 		expect(realAgentCli(BINARY, env)?.path).toBe(real);
