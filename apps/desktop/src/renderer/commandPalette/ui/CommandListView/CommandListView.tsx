@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
 import { type ReactNode, useMemo } from "react";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import { useRecentlyViewed } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls/components/HistoryDropdown/hooks/useRecentlyViewed";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections, scoreCommand } from "../../core/rankCommands";
@@ -15,13 +14,11 @@ import {
 	type SwitcherRow,
 	switcherRowScore,
 } from "../WorkspaceList/utils/bucketWorkspaces";
-import { RootRecentSection } from "./components/RootRecentSection";
 import { RootWorkspacesSection } from "./components/RootWorkspacesSection";
 import { parseRootQuery } from "./utils/parseRootQuery";
 
 const TOP_WORKSPACES = 3;
 const MATCHED_WORKSPACES = 5;
-const RECENT_PLACES = 3;
 
 interface CommandListViewProps {
 	query: string;
@@ -36,7 +33,6 @@ interface Block {
 
 interface RootWorkspaceRows {
 	workspaceRows: SwitcherRow<AccessibleV2Workspace>[];
-	recentRows: SwitcherRow<AccessibleV2Workspace>[];
 	/** What the workspace rows were ranked and marked by. */
 	text: string;
 	/** The query started with "#": it is about workspaces, not commands. */
@@ -48,41 +44,26 @@ function useRootWorkspaceRows(
 	query: string,
 ): RootWorkspaceRows {
 	const { groups, query: parsed } = useSwitcherGroups(query);
-	const recentEntries = useRecentlyViewed(RECENT_PLACES * 3);
 	return useMemo(() => {
 		const text = parsed.text;
 		const workspacesOnly = parsed.scope === "all";
-		if (!enabled) {
-			return { workspaceRows: [], recentRows: [], text, workspacesOnly };
-		}
+		if (!enabled) return { workspaceRows: [], text, workspacesOnly };
 		if (text) {
 			return {
 				workspaceRows: rankSwitcherRows(groups, text).slice(
 					0,
 					MATCHED_WORKSPACES,
 				),
-				recentRows: [],
 				text,
 				workspacesOnly,
 			};
 		}
-		const rows = groups.flatMap((group) => group.rows);
-		const workspaceRows = rows
+		const workspaceRows = groups
+			.flatMap((group) => group.rows)
 			.filter((row) => !row.isCurrent)
 			.slice(0, workspacesOnly ? MATCHED_WORKSPACES : TOP_WORKSPACES);
-		const shown = new Set(workspaceRows.map((row) => row.workspace.id));
-		const byId = new Map(rows.map((row) => [row.workspace.id, row]));
-		const recentRows: SwitcherRow<AccessibleV2Workspace>[] = [];
-		for (const entry of recentEntries) {
-			if (workspacesOnly) break;
-			if (entry.type !== "v2-workspace") continue;
-			const row = byId.get(entry.entityId);
-			if (!row || row.isCurrent || shown.has(row.workspace.id)) continue;
-			recentRows.push(row);
-			if (recentRows.length === RECENT_PLACES) break;
-		}
-		return { workspaceRows, recentRows, text, workspacesOnly };
-	}, [enabled, parsed, groups, recentEntries]);
+		return { workspaceRows, text, workspacesOnly };
+	}, [enabled, parsed, groups]);
 }
 
 export function CommandListView({ query, onSelect }: CommandListViewProps) {
@@ -96,12 +77,14 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 		() => rankSections(sections, parsed.query),
 		[sections, parsed.query],
 	);
-	const { workspaceRows, recentRows, text, workspacesOnly } =
-		useRootWorkspaceRows(isV2CloudEnabled && !parsed.commandsOnly, trimmed);
+	const { workspaceRows, text, workspacesOnly } = useRootWorkspaceRows(
+		isV2CloudEnabled && !parsed.commandsOnly,
+		trimmed,
+	);
 	const showsWorkspaces = isV2CloudEnabled && !parsed.commandsOnly;
 
 	// With a query, workspaces and command sections rank against each other
-	// on the same score; without one, workspaces and recent places lead.
+	// on the same score; without one, workspaces lead.
 	const blocks: Block[] = [];
 	if (showsWorkspaces && (workspaceRows.length > 0 || !text)) {
 		const first = workspaceRows[0];
@@ -115,13 +98,6 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 					query={text}
 				/>
 			),
-		});
-	}
-	if (recentRows.length > 0) {
-		blocks.push({
-			key: "recent",
-			best: 1,
-			node: <RootRecentSection key="recent" rows={recentRows} />,
 		});
 	}
 	if (!(showsWorkspaces && workspacesOnly)) {

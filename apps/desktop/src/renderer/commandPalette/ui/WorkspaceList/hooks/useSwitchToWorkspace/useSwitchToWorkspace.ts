@@ -6,7 +6,7 @@ import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dash
 import { useFrameStackStore } from "../../../../core/frames";
 import type { SwitcherRow } from "../../utils/bucketWorkspaces";
 
-export type SwitchedVia = "switcher" | "palette" | "recent";
+export type SwitchedVia = "switcher" | "palette";
 
 export interface SwitchDetails {
 	searched: boolean;
