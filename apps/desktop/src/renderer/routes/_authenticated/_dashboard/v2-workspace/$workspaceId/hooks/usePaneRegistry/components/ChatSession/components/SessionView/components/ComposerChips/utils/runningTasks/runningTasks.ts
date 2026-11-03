@@ -6,7 +6,9 @@ export function runningTasks(tasks: readonly BackgroundTask[] | undefined): {
 } {
 	const running = (tasks ?? []).filter(
 		(task) =>
-			task.subagentStatus === undefined || task.subagentStatus === "running",
+			task.kind !== "subagent" ||
+			task.subagentStatus === undefined ||
+			task.subagentStatus === "running",
 	);
 	const subagentIds = new Set(
 		running.filter((task) => task.kind === "subagent").map((task) => task.id),

@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackgroundTask } from "@superset/chat/protocol";
 import { formatAge } from "@superset/i18n/format";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
+import { Spinner } from "@superset/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { Bot, Square, SquareTerminal } from "lucide-react";
@@ -18,10 +19,11 @@ export function RunningTasksChip({
 	kind: BackgroundTask["kind"];
 	tasks: readonly BackgroundTask[];
 	onOpen?: (taskId: string) => void;
-	onStop: (taskId: string) => void;
+	onStop: (taskId: string) => Promise<void>;
 }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
+	const [stopping, setStopping] = useState<ReadonlySet<string>>(new Set());
 	const now = useNow().getTime();
 	const count = tasks.length;
 	const Icon = kind === "subagent" ? Bot : SquareTerminal;
@@ -30,6 +32,16 @@ export function RunningTasksChip({
 			? t({ message: "Subagent" })
 			: t({ message: "Terminal" });
 	const oldestStartedAtMs = Math.min(...tasks.map((task) => task.startedAtMs));
+	const stop = (taskId: string) => {
+		setStopping((ids) => new Set(ids).add(taskId));
+		void onStop(taskId).finally(() =>
+			setStopping((ids) => {
+				const next = new Set(ids);
+				next.delete(taskId);
+				return next;
+			}),
+		);
+	};
 	return (
 		<Popover onOpenChange={setOpen} open={open}>
 			<PopoverTrigger asChild>
@@ -50,7 +62,12 @@ export function RunningTasksChip({
 					</span>
 				</button>
 			</PopoverTrigger>
-			<PopoverContent align="start" className="w-72 p-1" side="top">
+			<PopoverContent
+				align="start"
+				className="w-72 p-1"
+				onOpenAutoFocus={(event) => event.preventDefault()}
+				side="top"
+			>
 				{tasks.map((task) => {
 					const name = task.name || fallbackName;
 					return (
@@ -87,22 +104,31 @@ export function RunningTasksChip({
 									{formatAge(task.startedAtMs, now)}
 								</span>
 							</button>
-							{task.canStop && (
+							{task.canStop ? (
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<button
 											aria-label={t({ message: `Stop ${name}` })}
-											className="flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-background hover:text-foreground focus-visible:bg-background"
-											onClick={() => onStop(task.id)}
+											className="flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-background hover:text-foreground focus-visible:bg-background disabled:pointer-events-none"
+											disabled={stopping.has(task.id)}
+											onClick={() => stop(task.id)}
 											type="button"
 										>
-											<Square className="size-2.5 fill-current" />
+											{stopping.has(task.id) ? (
+												<Spinner className="size-3" />
+											) : (
+												<Square className="size-2.5 fill-current" />
+											)}
 										</button>
 									</TooltipTrigger>
 									<TooltipContent side="top">
 										<Trans>Stop</Trans>
 									</TooltipContent>
 								</Tooltip>
+							) : (
+								tasks.some((other) => other.canStop) && (
+									<span className="size-6 shrink-0" />
+								)
 							)}
 						</div>
 					);

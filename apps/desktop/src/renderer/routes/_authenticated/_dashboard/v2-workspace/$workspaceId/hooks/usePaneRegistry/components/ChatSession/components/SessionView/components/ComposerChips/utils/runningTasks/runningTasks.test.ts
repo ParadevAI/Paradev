@@ -21,9 +21,10 @@ describe("runningTasks", () => {
 			task("inner", { parentId: "outer" }),
 			task("done", { subagentStatus: "idle" }),
 			task("shell", { kind: "process", parentId: "outer" }),
+			task("idle-shell", { kind: "process", subagentStatus: "idle" }),
 		]);
 		expect(subagents.map((t) => t.id)).toEqual(["outer"]);
-		expect(processes.map((t) => t.id)).toEqual(["shell"]);
+		expect(processes.map((t) => t.id)).toEqual(["shell", "idle-shell"]);
 	});
 
 	test("keeps a subagent whose parent is not running", () => {

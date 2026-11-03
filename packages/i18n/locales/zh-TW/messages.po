@@ -3300,7 +3300,7 @@ msgid "Background"
 msgstr "背景"
 
 msgid "Background · {count}"
-msgstr "背景執行 · {count}"
+msgstr "背景 · {count}"
 
 msgid "Background processes"
 msgstr "背景處理程序"

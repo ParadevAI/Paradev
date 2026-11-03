@@ -516,7 +516,7 @@ export function SessionView({
 	);
 	const onStopTask = useCallback(
 		(taskId: string) =>
-			void stopBackgroundTask(taskId)
+			stopBackgroundTask(taskId)
 				.then((stopped) => {
 					if (!stopped) throw new Error("the agent did not stop the task");
 				})

@@ -19,7 +19,7 @@ export function ComposerChips({
 	liveRefreshKey: number;
 	runningTurnId: string | null;
 	onOpenSubagent: (itemId: string) => void;
-	onStopTask: (taskId: string) => void;
+	onStopTask: (taskId: string) => Promise<void>;
 }) {
 	const { subagents, processes } = useMemo(
 		() => runningTasks(backgroundTasks),

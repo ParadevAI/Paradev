@@ -19,21 +19,27 @@ const shell = (id: string): BackgroundTask => ({
 	startedAtMs: Date.now(),
 });
 
-const chips = (backgroundTasks: BackgroundTask[]) => (
+const chips = (
+	backgroundTasks: BackgroundTask[],
+	onStopTask: (taskId: string) => Promise<void> = async () => {},
+) => (
 	<ComposerChips
 		backgroundTasks={backgroundTasks}
 		liveRefreshKey={0}
 		onOpenSubagent={() => {}}
-		onStopTask={() => {}}
+		onStopTask={onStopTask}
 		runningTurnId={null}
 	/>
 );
 
-test("a list left open when its last task ended stays closed for the next task", () => {
-	const view = render(chips([shell("dev")]));
+const openList = () =>
 	act(() => {
 		fireEvent.click(screen.getByRole("button", { name: /Background/ }));
 	});
+
+test("a list left open when its last task ended stays closed for the next task", () => {
+	const view = render(chips([shell("dev")]));
+	openList();
 	expect(screen.queryByText("npm run dev")).not.toBeNull();
 
 	view.rerender(chips([]));
@@ -41,4 +47,31 @@ test("a list left open when its last task ended stays closed for the next task",
 
 	expect(screen.queryByRole("button", { name: /Background/ })).not.toBeNull();
 	expect(screen.queryByText("npm run build")).toBeNull();
+});
+
+test("opening the list does not focus a stop button", () => {
+	render(chips([shell("dev")]));
+	openList();
+	expect(document.activeElement?.getAttribute("aria-label")).not.toBe(
+		"Stop npm run dev",
+	);
+});
+
+test("a second click on stop while the first is pending sends no request", () => {
+	const stops: string[] = [];
+	render(
+		chips([shell("dev")], (taskId) => {
+			stops.push(taskId);
+			return new Promise(() => {});
+		}),
+	);
+	openList();
+	const stop = screen.getByRole("button", { name: "Stop npm run dev" });
+	act(() => {
+		fireEvent.click(stop);
+	});
+	act(() => {
+		fireEvent.click(stop);
+	});
+	expect(stops).toEqual(["dev"]);
 });
