@@ -26,9 +26,12 @@ const chips = (
 	<ComposerChips
 		backgroundTasks={backgroundTasks}
 		liveRefreshKey={0}
+		onMoveToBackground={() => {}}
 		onOpenSubagent={() => {}}
 		onStopTask={onStopTask}
 		runningTurnId={null}
+		sessionId="session"
+		terminalId="terminal"
 	/>
 );
 

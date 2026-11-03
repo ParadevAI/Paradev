@@ -1,38 +1,35 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import type { BackgroundTask } from "@superset/chat/protocol";
+import { useLingui } from "@lingui/react/macro";
 import { formatAge } from "@superset/i18n/format";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
-import { Spinner } from "@superset/ui/spinner";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { Bot, Square, SquareTerminal } from "lucide-react";
+import { Bot, SquareTerminal } from "lucide-react";
 import { useState } from "react";
 import { useNow } from "renderer/hooks/useNow";
+import { AgentWorkRow } from "../../../../../../../../../../components/AgentWorkRow";
+import type { AgentWork } from "../../../../../../../../../../utils/collectAgentWork";
 import { COMPOSER_CHIP_CLASSNAME } from "../../constants";
 
 export function RunningTasksChip({
 	kind,
-	tasks,
+	work,
 	onOpen,
 	onStop,
+	onMoveToBackground,
 }: {
-	kind: BackgroundTask["kind"];
-	tasks: readonly BackgroundTask[];
+	kind: AgentWork["kind"];
+	work: readonly AgentWork[];
 	onOpen?: (taskId: string) => void;
 	onStop: (taskId: string) => Promise<void>;
+	onMoveToBackground: (taskId: string) => void;
 }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const [stopping, setStopping] = useState<ReadonlySet<string>>(new Set());
 	const now = useNow().getTime();
-	const count = tasks.length;
+	const count = work.length;
 	const Icon = kind === "subagent" ? Bot : SquareTerminal;
-	const fallbackName =
-		kind === "subagent"
-			? t({ message: "Subagent" })
-			: t({ message: "Terminal" });
-	const oldestStartedAtMs = Math.min(...tasks.map((task) => task.startedAtMs));
-	const stop = (taskId: string) => {
+	const oldestStartedAtMs = Math.min(...work.map((item) => item.startedAtMs));
+	const stop = ({ taskId }: AgentWork) => {
 		setStopping((ids) => new Set(ids).add(taskId));
 		void onStop(taskId).finally(() =>
 			setStopping((ids) => {
@@ -41,6 +38,11 @@ export function RunningTasksChip({
 				return next;
 			}),
 		);
+	};
+	const openWork = ({ taskId }: AgentWork) => {
+		if (!onOpen) return;
+		setOpen(false);
+		onOpen(taskId);
 	};
 	return (
 		<Popover onOpenChange={setOpen} open={open}>
@@ -68,71 +70,17 @@ export function RunningTasksChip({
 				onOpenAutoFocus={(event) => event.preventDefault()}
 				side="top"
 			>
-				{tasks.map((task) => {
-					const name = task.name || fallbackName;
-					return (
-						<div
-							className="group flex min-h-7 items-center gap-1 rounded-sm py-0.5 pr-1 pl-2 text-xs transition-colors hover:bg-accent"
-							key={task.id}
-						>
-							<button
-								className="flex min-w-0 flex-1 items-center gap-2 rounded-sm text-left outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-default"
-								disabled={!onOpen}
-								onClick={() => {
-									setOpen(false);
-									onOpen?.(task.id);
-								}}
-								type="button"
-							>
-								<Icon className="size-3.5 shrink-0 text-muted-foreground" />
-								<span className="flex min-w-0 flex-1 flex-col">
-									<span
-										className={cn(
-											"min-w-0 truncate text-foreground",
-											kind === "process" && "font-mono",
-										)}
-									>
-										{name}
-									</span>
-									{task.detail && (
-										<span className="min-w-0 truncate text-[11px] text-muted-foreground/70">
-											{task.detail}
-										</span>
-									)}
-								</span>
-								<span className="shrink-0 text-[11px] text-muted-foreground/70 tabular-nums">
-									{formatAge(task.startedAtMs, now)}
-								</span>
-							</button>
-							{task.canStop ? (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<button
-											aria-label={t({ message: `Stop ${name}` })}
-											className="flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-background hover:text-foreground focus-visible:bg-background disabled:pointer-events-none"
-											disabled={stopping.has(task.id)}
-											onClick={() => stop(task.id)}
-											type="button"
-										>
-											{stopping.has(task.id) ? (
-												<Spinner className="size-3" />
-											) : (
-												<Square className="size-2.5 fill-current" />
-											)}
-										</button>
-									</TooltipTrigger>
-									<TooltipContent side="top">
-										<Trans>Stop</Trans>
-									</TooltipContent>
-								</Tooltip>
-							) : (
-								tasks.some((other) => other.canStop) && (
-									<span className="size-6 shrink-0" />
-								)
-							)}
-						</div>
-					);
-				})}
+				{work.map((item) => (
+					<AgentWorkRow
+						key={item.key}
+						now={now}
+						onMoveToBackground={({ taskId }) => onMoveToBackground(taskId)}
+						onOpen={openWork}
+						onStop={stop}
+						pending={stopping.has(item.taskId)}
+						work={item}
+					/>
+				))}
 			</PopoverContent>
 		</Popover>
 	);

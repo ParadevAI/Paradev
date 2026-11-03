@@ -750,9 +750,12 @@ export function SessionView({
 					<ComposerChips
 						backgroundTasks={sessionState?.backgroundTasks}
 						liveRefreshKey={liveRefreshKey}
+						onMoveToBackground={onBackgroundSubagent}
 						onOpenSubagent={openSubagent}
 						onStopTask={onStopTask}
 						runningTurnId={runningTurnId}
+						sessionId={client.sessionId}
+						terminalId={terminalId}
 					/>
 				)}
 				<WorkDrawer

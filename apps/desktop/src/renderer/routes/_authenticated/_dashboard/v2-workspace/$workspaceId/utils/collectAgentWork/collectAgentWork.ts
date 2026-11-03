@@ -27,8 +27,11 @@ export type AgentBinding = {
 const isRunning = (task: BackgroundTask) =>
 	task.subagentStatus === undefined || task.subagentStatus === "running";
 
-function chatWork(binding: AgentBinding, sessionId: string): AgentWork[] {
-	const tasks = (binding.backgroundTasks ?? []).filter(
+export function collectSessionWork(
+	backgroundTasks: readonly BackgroundTask[] | undefined,
+	owner: { terminalId: string; sessionId: string },
+): AgentWork[] {
+	const tasks = (backgroundTasks ?? []).filter(
 		(task) => task.kind !== "subagent" || isRunning(task),
 	);
 	const subagents = new Map(
@@ -54,14 +57,14 @@ function chatWork(binding: AgentBinding, sessionId: string): AgentWork[] {
 	return tasks
 		.filter((task) => topOf(task) === task)
 		.map((task) => ({
-			key: `${binding.terminalId}:${task.id}`,
+			key: `${owner.terminalId}:${task.id}`,
 			kind: task.kind === "subagent" ? "subagent" : "shell",
 			name: task.name,
 			...(task.detail ? { step: task.detail } : {}),
 			startedAtMs: task.startedAtMs,
-			terminalId: binding.terminalId,
+			terminalId: owner.terminalId,
 			taskId: task.id,
-			sessionId,
+			sessionId: owner.sessionId,
 			canStop: task.canStop,
 			canBackground: task.canBackground === true,
 			nested: nested.get(task.id) ?? 0,
@@ -103,7 +106,10 @@ export function collectAgentWork(bindings: Iterable<AgentBinding>): {
 	const work = live
 		.flatMap((binding) =>
 			binding.chatSessionId
-				? chatWork(binding, binding.chatSessionId)
+				? collectSessionWork(binding.backgroundTasks, {
+						terminalId: binding.terminalId,
+						sessionId: binding.chatSessionId,
+					})
 				: terminalWork(binding),
 		)
 		.sort((a, b) => a.startedAtMs - b.startedAtMs);

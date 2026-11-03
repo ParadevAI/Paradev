@@ -1,30 +1,42 @@
 import type { BackgroundTask } from "@superset/chat/protocol";
 import { useMemo } from "react";
+import { collectSessionWork } from "../../../../../../../../utils/collectAgentWork";
 import {
 	CHAT_COLUMN_CLASSNAME,
 	CHAT_GUTTER_CLASSNAME,
 } from "../../../../constants";
 import { LiveChangesPill } from "./components/LiveChangesPill";
 import { RunningTasksChip } from "./components/RunningTasksChip";
-import { runningTasks } from "./utils/runningTasks";
 
 export function ComposerChips({
 	backgroundTasks,
+	sessionId,
+	terminalId,
 	liveRefreshKey,
 	runningTurnId,
 	onOpenSubagent,
 	onStopTask,
+	onMoveToBackground,
 }: {
 	backgroundTasks: readonly BackgroundTask[] | undefined;
+	sessionId: string;
+	terminalId: string | undefined;
 	liveRefreshKey: number;
 	runningTurnId: string | null;
 	onOpenSubagent: (itemId: string) => void;
 	onStopTask: (taskId: string) => Promise<void>;
+	onMoveToBackground: (taskId: string) => void;
 }) {
-	const { subagents, processes } = useMemo(
-		() => runningTasks(backgroundTasks),
-		[backgroundTasks],
-	);
+	const { subagents, shells } = useMemo(() => {
+		const work = collectSessionWork(backgroundTasks, {
+			terminalId: terminalId ?? "",
+			sessionId,
+		});
+		return {
+			subagents: work.filter((item) => item.kind === "subagent"),
+			shells: work.filter((item) => item.kind === "shell"),
+		};
+	}, [backgroundTasks, sessionId, terminalId]);
 	return (
 		<div className={CHAT_GUTTER_CLASSNAME}>
 			<div className={CHAT_COLUMN_CLASSNAME}>
@@ -38,16 +50,18 @@ export function ComposerChips({
 					{subagents.length > 0 && (
 						<RunningTasksChip
 							kind="subagent"
+							onMoveToBackground={onMoveToBackground}
 							onOpen={onOpenSubagent}
 							onStop={onStopTask}
-							tasks={subagents}
+							work={subagents}
 						/>
 					)}
-					{processes.length > 0 && (
+					{shells.length > 0 && (
 						<RunningTasksChip
-							kind="process"
+							kind="shell"
+							onMoveToBackground={onMoveToBackground}
 							onStop={onStopTask}
-							tasks={processes}
+							work={shells}
 						/>
 					)}
 				</div>
