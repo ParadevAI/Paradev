@@ -3574,9 +3574,6 @@ msgstr "Подключите {companyName} для своей команды. С�
 msgid "Bring a link to something you built recently."
 msgstr "Принесите ссылку на то, что вы недавно создали."
 
-msgid "Bring Any Agent"
-msgstr "Приводите любого агента"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Соберите Claude Code, Codex, OpenCode или любого другого агента для кода в одном рабочем пространстве. Запускайте задачи параллельно в отдельных ветках и проверяйте всё в одном месте."
 
@@ -13674,9 +13671,6 @@ msgstr "Оранжевый"
 msgid "Orchestrate Parallel Agents"
 msgstr "Оркестрируйте параллельных агентов"
 
-msgid "Orchestrate Them All"
-msgstr "Оркестрируйте всех"
-
 msgid "Orchestrated"
 msgstr "С оркестрацией"
 
@@ -14099,10 +14093,6 @@ msgstr "Параллельные worktree агентов"
 
 msgid "Parallel agents"
 msgstr "Параллельные агенты"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
-msgstr "Параллельных агентов"
 
 msgid "Parallel agents guide"
 msgstr "Руководство по параллельным агентам"
@@ -19123,10 +19113,6 @@ msgstr "Хост вернулся к предыдущей сборке."
 
 msgid "The human reads every line before it merges."
 msgstr "Человек читает каждую строку перед слиянием."
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "IDE для"
 
 msgid "The image upload expired — attach it again"
 msgstr "Срок загрузки изображения истёк — прикрепите его снова"

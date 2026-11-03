@@ -3574,9 +3574,6 @@ msgstr "{companyName}을 팀에 도입하세요. 엔터프라이즈 플랜과 �
 msgid "Bring a link to something you built recently."
 msgstr "최근에 만든 결과물의 링크를 가져오세요."
 
-msgid "Bring Any Agent"
-msgstr "어떤 에이전트든 데려오세요"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode 또는 어떤 코딩 에이전트든 하나의 워크스페이스로 가져오세요. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
 
@@ -13674,9 +13671,6 @@ msgstr "주황"
 msgid "Orchestrate Parallel Agents"
 msgstr "병렬 에이전트 오케스트레이션"
 
-msgid "Orchestrate Them All"
-msgstr "모두 오케스트레이션하세요"
-
 msgid "Orchestrated"
 msgstr "오케스트레이션"
 
@@ -14099,10 +14093,6 @@ msgstr "병렬 에이전트 worktree"
 
 msgid "Parallel agents"
 msgstr "병렬 에이전트"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
-msgstr "IDE"
 
 msgid "Parallel agents guide"
 msgstr "병렬 에이전트 가이드"
@@ -19123,10 +19113,6 @@ msgstr "호스트가 이전 빌드로 돌아갔습니다."
 
 msgid "The human reads every line before it merges."
 msgstr "사람이 머지 전에 모든 줄을 읽습니다."
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "병렬 에이전트를 위한"
 
 msgid "The image upload expired — attach it again"
 msgstr "이미지 업로드가 만료되었습니다 — 다시 첨부하세요"

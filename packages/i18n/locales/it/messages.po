@@ -3574,9 +3574,6 @@ msgstr "Porta {companyName} nel tuo team. Contattaci per saperne di più sui pia
 msgid "Bring a link to something you built recently."
 msgstr "Porta il link a qualcosa che hai costruito di recente."
 
-msgid "Bring Any Agent"
-msgstr "Porta qualsiasi agente"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Porta Claude Code, Codex, OpenCode o qualsiasi agente di coding in un unico workspace. Esegui le attività in parallelo su branch separati e revisiona tutto in un unico posto."
 
@@ -13674,9 +13671,6 @@ msgstr "Arancione"
 msgid "Orchestrate Parallel Agents"
 msgstr "Orchestra agenti in parallelo"
 
-msgid "Orchestrate Them All"
-msgstr "Orchestrali tutti"
-
 msgid "Orchestrated"
 msgstr "Orchestrato"
 
@@ -14098,10 +14092,6 @@ msgid "Parallel agent worktrees"
 msgstr "Worktree di agenti in parallelo"
 
 msgid "Parallel agents"
-msgstr "Agenti in parallelo"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
 msgstr "Agenti in parallelo"
 
 msgid "Parallel agents guide"
@@ -19123,10 +19113,6 @@ msgstr "L'host è tornato alla build precedente."
 
 msgid "The human reads every line before it merges."
 msgstr "L'umano legge ogni riga prima del merge."
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "L'IDE per"
 
 msgid "The image upload expired — attach it again"
 msgstr "Il caricamento dell'immagine è scaduto — allegala di nuovo"

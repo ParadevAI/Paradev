@@ -3574,9 +3574,6 @@ msgstr "Přineste {companyName} svému týmu. Ozvěte se nám a zjistěte více 
 msgid "Bring a link to something you built recently."
 msgstr "Přineste odkaz na něco, co jste nedávno vytvořili."
 
-msgid "Bring Any Agent"
-msgstr "Přiveďte jakéhokoli agenta"
-
 msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Spojte Claude Code, Codex, OpenCode nebo jakéhokoli kódovacího agenta v jednom pracovním prostoru. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
 
@@ -13674,9 +13671,6 @@ msgstr "Oranžová"
 msgid "Orchestrate Parallel Agents"
 msgstr "Řiďte paralelní agenty"
 
-msgid "Orchestrate Them All"
-msgstr "Řiďte je všechny"
-
 msgid "Orchestrated"
 msgstr "Orchestrovaný"
 
@@ -14099,10 +14093,6 @@ msgstr "Paralelní worktree agentů"
 
 msgid "Parallel agents"
 msgstr "Paralelní agenti"
-
-#. Homepage headline, line 2 of 2, after “The IDE for”.
-msgid "Parallel Agents"
-msgstr "Paralelní agenty"
 
 msgid "Parallel agents guide"
 msgstr "Průvodce paralelními agenty"
@@ -19123,10 +19113,6 @@ msgstr "Hostitel se vrátil k předchozímu sestavení."
 
 msgid "The human reads every line before it merges."
 msgstr "Člověk přečte každý řádek, než se sloučí."
-
-#. Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.
-msgid "The IDE for"
-msgstr "IDE pro"
 
 msgid "The image upload expired — attach it again"
 msgstr "Platnost nahrání obrázku vypršela — připojte ho znovu"
