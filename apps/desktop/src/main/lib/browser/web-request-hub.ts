@@ -94,10 +94,13 @@ function compilePattern(pattern: string): UrlMatcher {
 
 const compiled = new Map<string, UrlMatcher>();
 
+const COMPILED_LIMIT = 1_000;
+
 function matcherFor(pattern: string): UrlMatcher {
 	let matcher = compiled.get(pattern);
 	if (!matcher) {
 		matcher = compilePattern(pattern);
+		if (compiled.size >= COMPILED_LIMIT) compiled.clear();
 		compiled.set(pattern, matcher);
 	}
 	return matcher;

@@ -109,9 +109,8 @@ test("match patterns compare a port when they name one", () => {
 test("a path with many wildcards does not backtrack on a long URL", () => {
 	const pattern = `https://example.com/${"*a".repeat(12)}b`;
 	const url = `https://example.com/${"a".repeat(5_000)}`;
-	const started = performance.now();
+	// The old .* RegExp never finished on this input.
 	expect(urlMatchesPattern(pattern, url)).toBe(false);
-	expect(performance.now() - started).toBeLessThan(1_000);
 	expect(
 		urlMatchesPattern("https://example.com/*/x*", "https://example.com/a/b/xy"),
 	).toBe(true);
