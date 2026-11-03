@@ -5707,6 +5707,9 @@ msgstr "Nie udało się zapisać obszaru roboczego w chmurze"
 msgid "Could not record environment"
 msgstr "Nie udało się zapisać środowiska"
 
+msgid "Could not reinstall {name}"
+msgstr "Nie udało się ponownie zainstalować {name}"
+
 msgid "Could not remove {name}"
 msgstr "Nie udało się usunąć {name}"
 
@@ -15466,6 +15469,9 @@ msgstr "Region"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Rejestruje hooki cyklu życia w globalnej konfiguracji tego agenta, aby Paradev mógł pokazywać status i wysyłać powiadomienia. Wyłączenie usuwa wpisy Paradev wszędzie — status i powiadomienia dla tego agenta przestają działać, także wewnątrz Paradev."
 
+msgid "Reinstall {name}"
+msgstr "Zainstaluj ponownie {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "ponownie dołączył(a) do {channel} na zaproszenie użytkownika {inviter}, podobnie jak {others}."
 
@@ -20286,6 +20292,9 @@ msgstr "Zamieniaj rozmowy na Slacku w zadania, uruchamiaj agentów ze swojego ob
 
 msgid "turn the onboarding findings into a page"
 msgstr "zrób stronę z wniosków o onboardingu"
+
+msgid "Turned off because its files changed"
+msgstr "Wyłączone, ponieważ zmieniły się jego pliki"
 
 msgid "Two Hands"
 msgstr "Dwie ręce"
