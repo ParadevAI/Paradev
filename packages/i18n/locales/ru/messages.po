@@ -16120,9 +16120,6 @@ msgstr "Продолжится после сброса"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Продолжение через {resumeSeconds} с"
 
-msgid "Resuming the conversation…"
-msgstr "Возобновляем разговор…"
-
 msgid "Retry"
 msgstr "Повторить"
 

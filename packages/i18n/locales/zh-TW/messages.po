@@ -16120,9 +16120,6 @@ msgstr "將在重設後繼續"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒後繼續"
 
-msgid "Resuming the conversation…"
-msgstr "正在繼續對話…"
-
 msgid "Retry"
 msgstr "重試"
 

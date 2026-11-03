@@ -16120,9 +16120,6 @@ msgstr "Sẽ tiếp tục khi đặt lại"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Tiếp tục sau {resumeSeconds} giây"
 
-msgid "Resuming the conversation…"
-msgstr "Đang tiếp tục cuộc trò chuyện…"
-
 msgid "Retry"
 msgstr "Thử lại"
 

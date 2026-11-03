@@ -16120,9 +16120,6 @@ msgstr "Reprise à la réinitialisation"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Reprise dans {resumeSeconds} s"
 
-msgid "Resuming the conversation…"
-msgstr "Reprise de la conversation…"
-
 msgid "Retry"
 msgstr "Réessayer"
 

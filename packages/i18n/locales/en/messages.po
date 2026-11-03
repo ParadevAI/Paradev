@@ -16120,9 +16120,6 @@ msgstr "Resuming at reset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Resuming in {resumeSeconds}s"
 
-msgid "Resuming the conversation…"
-msgstr "Resuming the conversation…"
-
 msgid "Retry"
 msgstr "Retry"
 

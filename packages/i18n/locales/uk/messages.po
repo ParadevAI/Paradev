@@ -16114,9 +16114,6 @@ msgstr "Відновлення після скидання ліміту"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Відновлення через {resumeSeconds} с"
 
-msgid "Resuming the conversation…"
-msgstr "Відновлюємо розмову…"
-
 msgid "Retry"
 msgstr "Повторити"
 

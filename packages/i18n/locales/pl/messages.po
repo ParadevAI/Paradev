@@ -16120,9 +16120,6 @@ msgstr "Wznowienie po resecie"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wznowienie za {resumeSeconds} s"
 
-msgid "Resuming the conversation…"
-msgstr "Wznawianie rozmowy…"
-
 msgid "Retry"
 msgstr "Ponów"
 

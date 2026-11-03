@@ -55,5 +55,6 @@ export function useChatSessionLiveness({
 
 	const checking =
 		sessionId !== null && (connection.state !== "open" || !query.isSuccess);
-	return { stored: checking ? undefined : query.data, checking };
+	const unreachable = checking && connection.state === "open" && query.isError;
+	return { stored: checking ? undefined : query.data, checking, unreachable };
 }

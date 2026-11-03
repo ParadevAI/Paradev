@@ -16120,9 +16120,6 @@ msgstr "Akan dilanjutkan saat direset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
 
-msgid "Resuming the conversation…"
-msgstr "Melanjutkan percakapan…"
-
 msgid "Retry"
 msgstr "Coba lagi"
 

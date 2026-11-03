@@ -16120,9 +16120,6 @@ msgstr "Pokračuje po obnovení"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Pokračování za {resumeSeconds} s"
 
-msgid "Resuming the conversation…"
-msgstr "Obnovuji konverzaci…"
-
 msgid "Retry"
 msgstr "Zkusit znovu"
 

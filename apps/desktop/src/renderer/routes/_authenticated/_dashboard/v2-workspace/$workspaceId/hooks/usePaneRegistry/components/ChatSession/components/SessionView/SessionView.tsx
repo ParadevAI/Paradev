@@ -84,7 +84,6 @@ import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
 import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
-import { useShowAfter } from "./hooks/useShowAfter";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
@@ -96,7 +95,6 @@ const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
 
 const MODEL_OPTIONS_GRACE_MS = 1000;
-const HELD_NOTICE_DELAY_MS = 1000;
 
 function contentText(content: UserContent[]): string {
 	return userMessageText({ content });
@@ -144,7 +142,8 @@ export function SessionView({
 	terminalId?: string;
 	headerLeft?: ReactNode;
 	held?: {
-		notice: ReactNode;
+		/** Shown only when holding has gone wrong; a normal hold is silent. */
+		notice?: ReactNode;
 		queued: UserContent[][];
 		onQueue: (content: UserContent[]) => void;
 		/** Already sent, so shown only until the transcript has a user message. */
@@ -644,10 +643,6 @@ export function SessionView({
 		[heldQueued, heldLaunched, launchPending, snapshotItems],
 	);
 	const booting = sessionState?.status === "starting";
-	const heldNoticeShown = useShowAfter(
-		held !== undefined,
-		HELD_NOTICE_DELAY_MS,
-	);
 	const openModelPicker = useCallback(
 		() => composerRef.current?.openModelPicker(),
 		[],
@@ -767,8 +762,7 @@ export function SessionView({
 					/>
 				)}
 				{held
-					? heldNoticeShown &&
-						held.notice && <ConnectionNotice>{held.notice}</ConnectionNotice>
+					? held.notice && <ConnectionNotice>{held.notice}</ConnectionNotice>
 					: booting && (
 							<ConnectionNotice>
 								<Trans>Starting the agent…</Trans>

@@ -151,7 +151,7 @@ export function AcpChatPane({
 			.catch(() => undefined);
 	});
 
-	const { stored, checking } = useChatSessionLiveness({
+	const { stored, checking, unreachable } = useChatSessionLiveness({
 		hostUrl,
 		sessionId,
 		transport: wiring.transport,
@@ -762,9 +762,9 @@ export function AcpChatPane({
 			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
-							notice: launched ? null : (
-								<Trans>Resuming the conversation…</Trans>
-							),
+							...(unreachable
+								? { notice: <Trans>Can't reach the host</Trans> }
+								: {}),
 							queued: pendingPrompts,
 							onQueue: onQueuePrompt,
 							...(launched ? { launched } : {}),

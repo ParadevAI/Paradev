@@ -16120,9 +16120,6 @@ msgstr "Retomando na redefinição"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Retomando em {resumeSeconds} s"
 
-msgid "Resuming the conversation…"
-msgstr "Retomando a conversa…"
-
 msgid "Retry"
 msgstr "Tentar de novo"
 
