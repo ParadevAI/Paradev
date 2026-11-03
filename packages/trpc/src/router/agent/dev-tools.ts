@@ -29,7 +29,7 @@ const taskNotFound = () =>
 
 const lastReply = sql<
 	string | null
->`(select t.reply from ${agentTurns} t where t.session_id = ${agentSessions.id} order by t.started_at desc limit 1)`;
+>`(select t.reply from ${agentTurns} t where t.session_id = ${agentSessions.id} and t.status <> 'queued' order by t.started_at desc limit 1)`;
 
 interface WorkItem {
 	taskId: string;

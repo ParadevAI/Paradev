@@ -4,7 +4,6 @@ import { db } from "@superset/db/client";
 import {
 	agents,
 	agentTurns,
-	channelMessages,
 	cloudWorkspaces,
 	members,
 } from "@superset/db/schema";
@@ -13,7 +12,7 @@ import {
 	STAFF_EMAIL_DOMAINS,
 } from "@superset/shared/constants";
 import { initTRPC, TRPCError } from "@trpc/server";
-import { and, count, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import superjson from "superjson";
 import { env } from "./env";
 import { formatError, userError } from "./i18n-error";
@@ -278,7 +277,6 @@ async function devFromTurnToken(
 			status: agentTurns.status,
 			archivedAt: agents.archivedAt,
 			ownerId: agents.createdByUserId,
-			steerPromptIds: agentTurns.steerPromptIds,
 		})
 		.from(agentTurns)
 		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
@@ -298,9 +296,7 @@ async function devFromTurnToken(
 		});
 	}
 	const ownerAsks =
-		turn.ownerId !== null &&
-		claims.actingUserId === turn.ownerId &&
-		(await steersAllFrom(turn.steerPromptIds, turn.ownerId));
+		turn.ownerId !== null && claims.actingUserId === turn.ownerId;
 	return {
 		kind: "dev",
 		agentId: claims.agentId,
@@ -311,25 +307,6 @@ async function devFromTurnToken(
 		sessionId: claims.sessionId,
 		turnId: claims.turnId,
 	};
-}
-
-const MESSAGE_ID =
-	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-
-/** Whether every prompt that joined the turn is a message from this person. */
-async function steersAllFrom(promptIds: string[], userId: string) {
-	if (promptIds.length === 0) return true;
-	if (!promptIds.every((id) => MESSAGE_ID.test(id))) return false;
-	const [row] = await db
-		.select({ n: count() })
-		.from(channelMessages)
-		.where(
-			and(
-				inArray(channelMessages.id, promptIds),
-				eq(channelMessages.authorId, userId),
-			),
-		);
-	return row?.n === promptIds.length;
 }
 
 /**

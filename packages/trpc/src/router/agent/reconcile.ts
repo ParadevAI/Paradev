@@ -2,10 +2,14 @@ import { sessionWorkflowId, stateQuery } from "@superset/agent-harness/session";
 import { db } from "@superset/db/client";
 import { agents, agentTurns } from "@superset/db/schema";
 import type { Client } from "@temporalio/client";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { posthog } from "../../lib/analytics";
 import { afterTaskTurn } from "./tasks";
-import { redeliverMessage, startTurnsForMessage } from "./turns";
+import {
+	redeliverMessage,
+	startNextQueued,
+	startTurnsForMessage,
+} from "./turns";
 
 /** A message younger than this may still be on its way; one older is given up on. */
 const DELIVERY_GRACE = "1 minute";
@@ -16,10 +20,11 @@ const TURN_GRACE = "2 minutes";
 const WEDGED_ATTEMPTS = 3;
 const BATCH = 50;
 
-export type ReconcileFix = "redelivered" | "terminated" | "lost";
+export type ReconcileFix = "redelivered" | "dequeued" | "terminated" | "lost";
 
 export interface ReconcileReport {
 	redelivered: number;
+	dequeued: number;
 	terminated: number;
 	lost: number;
 }
@@ -36,7 +41,12 @@ export async function reconcileDevs(
 	temporal: Client,
 	{ organizationId }: { organizationId?: string } = {},
 ): Promise<ReconcileReport> {
-	const report: ReconcileReport = { redelivered: 0, terminated: 0, lost: 0 };
+	const report: ReconcileReport = {
+		redelivered: 0,
+		dequeued: 0,
+		terminated: 0,
+		lost: 0,
+	};
 	const count = (fix: ReconcileFix, details: Record<string, unknown>) => {
 		report[fix] += 1;
 		console.info("[devs-reconcile]", fix, JSON.stringify(details));
@@ -53,8 +63,12 @@ export async function reconcileDevs(
 			message,
 			message.authorId,
 		);
-		if (await answered(message.id)) {
-			count("redelivered", { messageId: message.id });
+		count("redelivered", { messageId: message.id });
+	}
+
+	for (const sessionId of await strandedQueues(organizationId)) {
+		if (await startNextQueued(sessionId)) {
+			count("dequeued", { sessionId });
 		}
 	}
 
@@ -77,43 +91,10 @@ export async function reconcileDevs(
 	return report;
 }
 
-/** Whether a turn now holds the message; one still waiting for another person's turn doesn't. */
-async function answered(messageId: string): Promise<boolean> {
-	const [turn] = await db
-		.select({ id: agentTurns.id })
-		.from(agentTurns)
-		.where(
-			or(
-				eq(agentTurns.promptId, messageId),
-				sql`${messageId} = any(${agentTurns.steerPromptIds})`,
-			),
-		)
-		.limit(1);
-	return Boolean(turn);
-}
-
-/** Messages to a Dev that waited for another person's turn, as soon as it settles. */
-export async function deliverWaiting(agentId: string) {
-	for (const message of await undeliveredMessages({
-		agentId,
-		waitedOnly: true,
-	})) {
-		await startTurnsForMessage(
-			{ id: message.channelId, kind: message.channelKind },
-			message,
-			message.authorId,
-		);
-	}
-}
-
 async function undeliveredMessages({
 	organizationId,
-	agentId,
-	waitedOnly = false,
 }: {
 	organizationId?: string;
-	agentId?: string;
-	waitedOnly?: boolean;
 }) {
 	const { rows } = await db.execute<{
 		id: string;
@@ -132,12 +113,10 @@ async function undeliveredMessages({
 		join auth.users u on u.id = m.author_id
 		join channel_members cm on cm.channel_id = m.channel_id
 		join agents a on a.id = cm.actor_id and a.archived_at is null and a.paused_at is null
-		where m.created_at between now() - ${DELIVERY_WINDOW}::interval
-			and now() - ${waitedOnly ? "0 seconds" : DELIVERY_GRACE}::interval
+		where m.created_at between now() - ${DELIVERY_WINDOW}::interval and now() - ${DELIVERY_GRACE}::interval
 			and m.deleted_at is null and m.subtype is null
 			and (c.kind = 'dm' or a.id = any(m.mentioned_ids))
 			${organizationId ? sql`and c.organization_id = ${organizationId}` : sql``}
-			${agentId ? sql`and a.id = ${agentId}` : sql``}
 			and not exists (
 				select 1 from agent_turns t
 				where t.agent_id = a.id
@@ -146,6 +125,25 @@ async function undeliveredMessages({
 		order by m.created_at
 		limit ${BATCH}`);
 	return rows;
+}
+
+/** Sessions with a queued turn and none running, as when a settle never started the next one. */
+async function strandedQueues(organizationId: string | undefined) {
+	const rows = await db
+		.selectDistinct({ sessionId: agentTurns.sessionId })
+		.from(agentTurns)
+		.where(
+			and(
+				eq(agentTurns.status, "queued"),
+				organizationId
+					? eq(agentTurns.organizationId, organizationId)
+					: undefined,
+				sql`${agentTurns.startedAt} < now() - ${DELIVERY_GRACE}::interval`,
+				sql`not exists (select 1 from agent_turns r where r.session_id = ${agentTurns.sessionId} and r.status = 'running')`,
+			),
+		)
+		.limit(BATCH);
+	return rows.map((row) => row.sessionId);
 }
 
 function staleRunningTurns(organizationId: string | undefined) {

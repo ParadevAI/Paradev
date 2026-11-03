@@ -20,10 +20,11 @@ import {
 import { posthog } from "../../lib/analytics";
 import { workerProcedure } from "../../trpc";
 import { announceAgentChanged } from "./agents-changed";
-import { deliverWaiting, reconcileDevs } from "./reconcile";
+import { reconcileDevs } from "./reconcile";
 import { fireDueRoutines } from "./routines";
 import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
+import { startNextQueued } from "./turns";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
 const turnNotRunning = () =>
@@ -289,8 +290,8 @@ export const agentWorkerRouter = {
 			});
 			// A retried settle runs this again; the parent hears each turn once.
 			await afterTaskTurn(turnId);
-			await deliverWaiting(settled.agentId).catch((error) =>
-				console.error("[agent-worker] waiting messages not delivered", error),
+			await startNextQueued(settled.sessionId).catch((error) =>
+				console.error("[agent-worker] next queued turn didn't start", error),
 			);
 			return {
 				settled: true,

@@ -20,6 +20,7 @@ import { waitUntil } from "@vercel/functions";
 import {
 	and,
 	arrayOverlaps,
+	asc,
 	desc,
 	eq,
 	inArray,
@@ -30,6 +31,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import { agentTemporal } from "../../lib/agent-runtime";
+import { isUniqueViolation } from "../channel/members";
 import { agentNotFound } from "./access";
 import { announceAgentChanged } from "./agents-changed";
 import { channelRoutinesFor, markRun, routineText } from "./routines";
@@ -39,7 +41,7 @@ type TurnReason = (typeof agentTurns.$inferInsert)["reason"];
 export type TurnOutcome =
 	| { turnId: string; outcome: "started" }
 	| { turnId: string; outcome: "joined"; steerSeq: number }
-	| { outcome: "waiting" }
+	| { turnId: string; outcome: "queued" }
 	| { turnId: string; outcome: "duplicate"; running: boolean };
 
 interface Prompt {
@@ -56,9 +58,11 @@ interface Prompt {
 
 /**
  * Records a prompt as a turn and hands it to the session's workflow: it
- * starts a turn, or joins the running one as a steer. A prompt id already
- * seen records nothing new. A prompt the workflow never got is undone, so
- * the same prompt id can be sent again.
+ * starts a turn, joins the running one as a steer when it is for the same
+ * person, or queues behind it. A turn works for one person, so a Dev's
+ * access in it is that person's. A prompt id already seen records nothing
+ * new. A prompt the workflow never got is undone, so the same prompt id can
+ * be sent again.
  */
 export async function submitPrompt(prompt: Prompt): Promise<TurnOutcome> {
 	const turn = await recordTurn(prompt);
@@ -75,6 +79,18 @@ export async function submitPrompt(prompt: Prompt): Promise<TurnOutcome> {
 /** Retries when the running turn settles between the insert and the join. */
 async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 	const { agent, sessionId, promptId } = prompt;
+	const row = (status: "running" | "queued") => ({
+		organizationId: agent.organizationId,
+		agentId: agent.id,
+		sessionId,
+		status,
+		reason: prompt.reason,
+		actingUserId: prompt.actingUserId,
+		promptId,
+		prompt: prompt.text,
+		triggerMessageId: prompt.triggerMessageId ?? null,
+		routineId: prompt.routineId ?? null,
+	});
 	for (let attempt = 0; attempt < 3; attempt++) {
 		const [duplicate] = await db
 			.select({ id: agentTurns.id, status: agentTurns.status })
@@ -98,24 +114,10 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 		}
 		const [started] = await db
 			.insert(agentTurns)
-			.values({
-				organizationId: agent.organizationId,
-				agentId: agent.id,
-				sessionId,
-				reason: prompt.reason,
-				actingUserId: prompt.actingUserId,
-				promptId,
-				triggerMessageId: prompt.triggerMessageId ?? null,
-				routineId: prompt.routineId ?? null,
-			})
+			.values(row("running"))
 			.onConflictDoNothing()
 			.returning({ id: agentTurns.id });
 		if (started) return { turnId: started.id, outcome: "started" };
-		// A message joins only a turn for the same person; another person's waits
-		// for its own turn, so a turn never answers two people with one's access.
-		const samePersonOnly = prompt.triggerMessageId
-			? eq(agentTurns.actingUserId, prompt.actingUserId)
-			: undefined;
 		const [joined] = await db
 			.update(agentTurns)
 			.set({
@@ -125,9 +127,9 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 				and(
 					eq(agentTurns.sessionId, sessionId),
 					eq(agentTurns.status, "running"),
+					eq(agentTurns.actingUserId, prompt.actingUserId),
 					sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
 					ne(agentTurns.promptId, promptId),
-					samePersonOnly,
 				),
 			)
 			.returning({
@@ -137,19 +139,23 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 		if (joined) {
 			return { turnId: joined.id, outcome: "joined", steerSeq: joined.steers };
 		}
-		if (samePersonOnly) {
-			const [another] = await db
-				.select({ id: agentTurns.id })
-				.from(agentTurns)
-				.where(
-					and(
-						eq(agentTurns.sessionId, sessionId),
-						eq(agentTurns.status, "running"),
-					),
-				)
-				.limit(1);
-			if (another) return { outcome: "waiting" };
-		}
+		const [running] = await db
+			.select({ id: agentTurns.id })
+			.from(agentTurns)
+			.where(
+				and(
+					eq(agentTurns.sessionId, sessionId),
+					eq(agentTurns.status, "running"),
+				),
+			)
+			.limit(1);
+		if (!running) continue;
+		const [queued] = await db
+			.insert(agentTurns)
+			.values(row("queued"))
+			.onConflictDoNothing()
+			.returning({ id: agentTurns.id });
+		if (queued) return { turnId: queued.id, outcome: "queued" };
 	}
 	throw agentNotFound();
 }
@@ -159,7 +165,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
  * may not have landed; the workflow drops prompt ids it has seen.
  */
 async function deliver(sessionId: string, turn: TurnOutcome, prompt: Prompt) {
-	if (turn.outcome === "waiting") return;
+	if (turn.outcome === "queued") return;
 	if (turn.outcome === "duplicate" && !turn.running) return;
 	const temporal = await agentTemporal();
 	const { promptId, text, actingUserId } = prompt;
@@ -195,6 +201,51 @@ async function forgetUndelivered(turn: TurnOutcome, promptId: string) {
 			})
 			.where(eq(agentTurns.id, turn.turnId));
 	}
+}
+
+/**
+ * Starts the session's oldest queued turn once no turn runs. One that can't
+ * reach the workflow goes back in the queue for the reconciler.
+ */
+export async function startNextQueued(sessionId: string): Promise<boolean> {
+	const [next] = await db
+		.select({ id: agentTurns.id })
+		.from(agentTurns)
+		.where(
+			and(eq(agentTurns.sessionId, sessionId), eq(agentTurns.status, "queued")),
+		)
+		.orderBy(asc(agentTurns.startedAt))
+		.limit(1);
+	if (!next) return false;
+	const [turn] = await db
+		.update(agentTurns)
+		.set({ status: "running", startedAt: new Date() })
+		.where(and(eq(agentTurns.id, next.id), eq(agentTurns.status, "queued")))
+		.returning()
+		.catch((error: unknown) => {
+			if (isUniqueViolation(error)) return [];
+			throw error;
+		});
+	if (!turn?.promptId || !turn.actingUserId) return false;
+	try {
+		await startTurn(await agentTemporal(), sessionId, {
+			turnId: turn.id,
+			promptId: turn.promptId,
+			text: turn.prompt ?? "",
+			actingUserId: turn.actingUserId,
+		});
+	} catch (error) {
+		await db
+			.update(agentTurns)
+			.set({ status: "queued" })
+			.where(and(eq(agentTurns.id, turn.id), eq(agentTurns.status, "running")));
+		throw error;
+	}
+	announceAgentChanged({
+		id: turn.agentId,
+		organizationId: turn.organizationId,
+	});
+	return true;
 }
 
 export const REPLY_TARGET =

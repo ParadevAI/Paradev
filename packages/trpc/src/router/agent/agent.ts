@@ -29,6 +29,7 @@ import {
 	exists,
 	inArray,
 	isNull,
+	ne,
 	or,
 	sql,
 } from "drizzle-orm";
@@ -130,7 +131,12 @@ export const agentRouter = {
 					settledAt: agentTurns.settledAt,
 				})
 				.from(agentTurns)
-				.where(eq(agentTurns.agentId, agent.id))
+				.where(
+					and(
+						eq(agentTurns.agentId, agent.id),
+						ne(agentTurns.status, "queued"),
+					),
+				)
 				.orderBy(desc(agentTurns.startedAt))
 				.limit(10),
 		]);
@@ -188,6 +194,7 @@ export const agentRouter = {
 				.where(
 					and(
 						eq(agentTurns.agentId, agent.id),
+						ne(agentTurns.status, "queued"),
 						input.cursor
 							? sql`(${agentTurns.startedAt}, ${agentTurns.id}) < (select t.started_at, t.id from ${agentTurns} t where t.id = ${input.cursor})`
 							: undefined,
