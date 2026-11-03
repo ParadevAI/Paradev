@@ -132,9 +132,9 @@ function SplitView<TData>({
 				/>
 			</ResizablePanel>
 			<ResizableHandle
-				// The active pane draws a 2px border on either side of the 1px
-				// divider. Cover that full visual border with the sash hit area.
+				// The gap between two pane cards is the sash; its hit area spans the gap and both borders.
 				hitAreaSize="large"
+				className="w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
 				style={{ zIndex: RESIZE_HANDLE_BASE_Z_INDEX - path.length }}
 				onPointerDownCapture={(event) => {
 					if (event.button !== 0 || !event.isPrimary) return;
@@ -312,7 +312,7 @@ export function Tab<TData>({
 		// isolate contains the resize handles' z-indexes so they never paint
 		// above body-portalled overlays (dialogs, menus).
 		<PaneAsideTargetContext.Provider value={topRightPaneId(tab.layout)}>
-			<div className="isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto">
+			<div className="isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto p-1.5">
 				<LayoutNodeView
 					store={store}
 					tab={tab}
