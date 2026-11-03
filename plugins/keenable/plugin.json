@@ -20,7 +20,8 @@
 			"mcp": {
 				"type": "streamable-http",
 				"url": "https://api.keenable.ai/mcp"
-			}
+}
+
 		}
 	}
 }
