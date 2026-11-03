@@ -97,14 +97,18 @@ export function CommandPalette() {
 
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
+			if (query) return;
 			// Only a frame leaves on Backspace; the switcher keeps the back
 			// arrow, so clearing a query never bounces you out of it.
-			if (event.key === "Backspace" && !query && depth > 0) {
+			const leaves =
+				(event.key === "Backspace" && depth > 0) ||
+				(event.key === "ArrowLeft" && (depth > 0 || isSwitcher));
+			if (leaves) {
 				event.preventDefault();
 				handleBack();
 			}
 		},
-		[query, depth, handleBack],
+		[query, depth, isSwitcher, handleBack],
 	);
 
 	// cmdk's root Enter handler executes the highlighted list row no matter
