@@ -1,9 +1,19 @@
 import { TRPCError } from "@trpc/server";
 import type { BrowserBridgeConfig } from "../../types";
 import { bridgeErrorDetail, bridgeFetch } from "./bridge-fetch";
-import type { BrowserPane, ConsoleEntry } from "./types";
+import type {
+	BrowserExtension,
+	BrowserExtensionInstall,
+	BrowserPane,
+	ConsoleEntry,
+} from "./types";
 
-export type { BrowserPane, ConsoleEntry } from "./types";
+export type {
+	BrowserExtension,
+	BrowserExtensionInstall,
+	BrowserPane,
+	ConsoleEntry,
+} from "./types";
 
 /**
  * Thin HTTP client for the desktop's browser bridge. The bridge is the only
@@ -114,6 +124,36 @@ export class BrowserBridgeClient {
 		}>("POST", `/panes/${encodeURIComponent(paneId)}/import-cookies`, {
 			workspaceId,
 			sourceId,
+		});
+	}
+
+	listExtensions() {
+		return this.request<{ extensions: BrowserExtension[] }>(
+			"GET",
+			"/extensions",
+		);
+	}
+
+	installExtension(extensionId: string) {
+		return this.request<BrowserExtensionInstall>(
+			"POST",
+			"/extensions/install",
+			{
+				extensionId,
+			},
+		);
+	}
+
+	removeExtension(extensionId: string) {
+		return this.request<{ ok: true }>("POST", "/extensions/remove", {
+			extensionId,
+		});
+	}
+
+	setExtensionPinned(extensionId: string, pinned: boolean) {
+		return this.request<{ ok: true }>("POST", "/extensions/pin", {
+			extensionId,
+			pinned,
 		});
 	}
 }

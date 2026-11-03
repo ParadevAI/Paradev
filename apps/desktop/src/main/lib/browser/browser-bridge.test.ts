@@ -4,7 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { dialog, session, webContents } from "electron";
 import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
-import { startBrowserBridge, stopBrowserBridge } from "./browser-bridge";
+import {
+	startBrowserBridge,
+	stopBrowserBridge,
+	type UserExtensions,
+} from "./browser-bridge";
 import { getBrowserBridgeInfo } from "./browser-bridge-info";
 import { browserManager } from "./browser-manager";
 import { browserLocations } from "./chromium-profiles";
@@ -37,6 +41,31 @@ function fakePane(id: number, partition: string) {
 	});
 }
 
+const INSTALLED_ID = "bcjindcccaagfpapjjmafapmmgkkhgoa";
+const extensionCalls: string[] = [];
+let userSays = false;
+const extensions: UserExtensions = {
+	list: () => [
+		{ id: INSTALLED_ID, name: "JSON Formatter", version: "1", pinned: false },
+	],
+	install: async (id) => {
+		extensionCalls.push(`install ${id}`);
+		return userSays
+			? {
+					status: "installed",
+					extension: { id, name: "New", version: "1" },
+				}
+			: { status: "declined" };
+	},
+	remove: async (id) => {
+		extensionCalls.push(`remove ${id}`);
+		return userSays;
+	},
+	setPinned: (id, pinned) => {
+		extensionCalls.push(`pin ${id} ${pinned}`);
+	},
+};
+
 const home = mkdtempSync(join(tmpdir(), "bridge-home-"));
 const [chrome] = browserLocations(process.platform);
 if (!chrome) throw new Error("no Chromium location on this platform");
@@ -54,7 +83,7 @@ beforeAll(async () => {
 	fakePane(902, AGENT_BROWSER_PARTITION);
 	browserManager.register("user-pane", 901, "ws-bridge");
 	browserManager.register("agent-pane", 902, "ws-bridge");
-	await startBrowserBridge({ homeDir: home });
+	await startBrowserBridge({ homeDir: home, extensions });
 });
 
 afterAll(async () => {
@@ -167,4 +196,46 @@ test("an agent's open answers with its own pane, not a user pane that registers 
 		browserManager.unregister("late-user-pane");
 		browserManager.unregister("late-agent-pane");
 	}
+});
+
+test("the CLI manages the user's extensions only with the user's yes, and never opens one", async () => {
+	const bridge = getBrowserBridgeInfo();
+	if (!bridge) throw new Error("the bridge did not start");
+	const post = (path: string, body: object) =>
+		fetch(`${bridge.endpoint}${path}`, {
+			method: "POST",
+			headers: {
+				authorization: `Bearer ${bridge.secret}`,
+				"content-type": "application/json",
+			},
+			body: JSON.stringify(body),
+		});
+	const otherId = "a".repeat(32);
+
+	userSays = false;
+	expect(
+		(await post("/extensions/install", { extensionId: otherId })).status,
+	).toBe(403);
+	expect(
+		(await post("/extensions/remove", { extensionId: INSTALLED_ID })).status,
+	).toBe(403);
+	userSays = true;
+	expect(
+		await (await post("/extensions/install", { extensionId: otherId })).json(),
+	).toMatchObject({ status: "installed" });
+
+	expect(
+		(await post("/extensions/remove", { extensionId: otherId })).status,
+	).toBe(404);
+	expect(
+		(await post("/extensions/pin", { extensionId: "../../etc" })).status,
+	).toBe(400);
+	expect(
+		(await post("/extensions/activate", { extensionId: INSTALLED_ID })).status,
+	).toBe(404);
+	expect(extensionCalls).toEqual([
+		`install ${otherId}`,
+		`remove ${INSTALLED_ID}`,
+		`install ${otherId}`,
+	]);
 });

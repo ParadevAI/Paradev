@@ -14,3 +14,15 @@ export interface ConsoleEntry {
 	message: string;
 	timestamp: number;
 }
+
+export interface BrowserExtension {
+	id: string;
+	name: string;
+	version: string;
+	pinned: boolean;
+}
+
+export interface BrowserExtensionInstall {
+	status: "installed" | "already-installed";
+	extension: Omit<BrowserExtension, "pinned">;
+}

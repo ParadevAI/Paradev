@@ -1,9 +1,11 @@
+import { mkdir, readFile, rename, rm } from "node:fs/promises";
 import path from "node:path";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { app, BrowserWindow } from "electron";
 import {
 	type BeforeUpdate,
+	downloadExtension,
 	installChromeWebStore,
 	setCrxVerifier,
 	updateExtensions,
@@ -30,9 +32,8 @@ export function enableCrxVerification(): void {
 
 type WebStoreOptions = NonNullable<Parameters<typeof installChromeWebStore>[0]>;
 type OnUninstall = NonNullable<WebStoreOptions["onUninstall"]>;
-type BeforeInstall = NonNullable<WebStoreOptions["beforeInstall"]>;
 
-function confirmRemoval(
+export function confirmRemoval(
 	name: string,
 	window: Electron.BrowserWindow | undefined,
 ): Promise<boolean> {
@@ -52,13 +53,13 @@ function confirmRemoval(
 }
 
 // The package installs on one click; Chrome asks first and lists what the extension can reach.
-const confirmInstall: BeforeInstall = async ({
-	localizedName,
-	manifest,
-	browserWindow,
-}) => {
+function confirmInstall(
+	localizedName: string,
+	manifest: chrome.runtime.Manifest,
+	window: Electron.BrowserWindow | undefined,
+): Promise<boolean> {
 	const warnings = installWarnings(manifest);
-	const allowed = await confirm(browserWindow, {
+	return confirm(window, {
 		buttons: [
 			i18n._(msg({ message: "Add extension" })),
 			i18n._(msg({ message: "Cancel" })),
@@ -68,8 +69,7 @@ const confirmInstall: BeforeInstall = async ({
 			? [i18n._(msg({ message: "It can:" })), ...warnings].join("\n")
 			: undefined,
 	});
-	return { action: allowed ? "allow" : "deny" };
-};
+}
 
 // Chrome disables an update that reaches further until the user agrees; this keeps the old version instead.
 function confirmUpdate(
@@ -155,11 +155,13 @@ export async function installBrowserWebStore(
 		autoUpdate: false,
 		verifyInstall,
 		beforeInstall: async (details) => {
-			const decision = await confirmInstall(details);
-			if (decision.action === "allow") {
-				newInstalls.set(details.id, details.manifest);
-			}
-			return decision;
+			const allowed = await confirmInstall(
+				details.localizedName,
+				details.manifest,
+				details.browserWindow,
+			);
+			if (allowed) newInstalls.set(details.id, details.manifest);
+			return { action: allowed ? "allow" : "deny" };
 		},
 		onUninstall,
 	});
@@ -174,4 +176,66 @@ export async function installBrowserWebStore(
 		checkForUpdates();
 		setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
 	}, FIRST_UPDATE_CHECK_DELAY_MS);
+}
+
+async function localizedName(
+	dir: string,
+	manifest: chrome.runtime.Manifest,
+): Promise<string> {
+	const key = /^__MSG_(\w+)__$/.exec(manifest.name)?.[1]?.toLowerCase();
+	if (!key || !manifest.default_locale) return manifest.name;
+	try {
+		const file = path.join(
+			dir,
+			"_locales",
+			manifest.default_locale,
+			"messages.json",
+		);
+		const messages: Record<string, { message?: string }> = JSON.parse(
+			(await readFile(file, "utf8")).replace(/^\uFEFF/, ""),
+		);
+		const match = Object.entries(messages).find(
+			([name]) => name.toLowerCase() === key,
+		);
+		return match?.[1].message || manifest.name;
+	} catch {
+		return manifest.name;
+	}
+}
+
+/**
+ * Install by Web Store ID, asking first with the warnings of the CRX that was
+ * downloaded and verified. Resolves to null when the user says no.
+ */
+export async function installWebStoreExtension(
+	browserSession: Electron.Session,
+	extensionId: string,
+	window: Electron.BrowserWindow | undefined,
+): Promise<Electron.Extension | null> {
+	const loaded = browserSession.extensions.getExtension(extensionId);
+	if (loaded) return loaded;
+	const extensionsPath = browserExtensionsPath();
+	const stagedPath = await downloadExtension(
+		extensionId,
+		`${extensionsPath}.staging`,
+	);
+	try {
+		const manifest: chrome.runtime.Manifest = JSON.parse(
+			await readFile(path.join(stagedPath, "manifest.json"), "utf8"),
+		);
+		const name = await localizedName(stagedPath, manifest);
+		if (!(await confirmInstall(name, manifest, window))) return null;
+		// The layout loadAllExtensions reads at start: <extensionsPath>/<id>/<version dir>.
+		const installPath = path.join(
+			extensionsPath,
+			extensionId,
+			path.basename(stagedPath),
+		);
+		await rm(installPath, { recursive: true, force: true });
+		await mkdir(path.dirname(installPath), { recursive: true });
+		await rename(stagedPath, installPath);
+		return await browserSession.extensions.loadExtension(installPath);
+	} finally {
+		await rm(stagedPath, { recursive: true, force: true });
+	}
 }
