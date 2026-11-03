@@ -22,53 +22,119 @@ export interface WebRequestHooks {
 	onHeadersReceived?: HeadersReceived;
 }
 
-const PATTERN = /^(\*|[a-z][a-z0-9+.-]*):\/\/(\*|\*\.[^/*]+|[^/*]+)(\/.*)$/;
+const PATTERN =
+	/^(\*|[a-z][a-z0-9+.-]*):\/\/(\*|\*\.[^/*:]+|\[[^\]]+\]|[^/*:]+)(?::(\*|\d+))?(\/.*)$/;
 const ANY_SCHEME = new Set(["http:", "https:", "ws:", "wss:"]);
+const DEFAULT_PORTS: Record<string, string> = {
+	"http:": "80",
+	"https:": "443",
+	"ws:": "80",
+	"wss:": "443",
+};
 
-function globToRegExp(glob: string): RegExp {
-	const escaped = glob
-		.split("*")
-		.map((part) => part.replace(/[\\^$+?.()|[\]{}]/g, "\\$&"))
-		.join(".*");
-	return new RegExp(`^${escaped}$`);
+type UrlMatcher = (url: URL) => boolean;
+
+/** `*` matches any run of characters. Never backtracks past the last `*`, so it is O(glob × text) at worst. */
+export function globMatches(glob: string, text: string): boolean {
+	let g = 0;
+	let t = 0;
+	let star = -1;
+	let resume = 0;
+	while (t < text.length) {
+		if (g < glob.length && glob[g] === "*") {
+			star = g++;
+			resume = t;
+		} else if (g < glob.length && glob[g] === text[t]) {
+			g++;
+			t++;
+		} else if (star !== -1) {
+			g = star + 1;
+			t = ++resume;
+		} else {
+			return false;
+		}
+	}
+	while (g < glob.length && glob[g] === "*") g++;
+	return g === glob.length;
+}
+
+function compilePattern(pattern: string): UrlMatcher {
+	if (pattern === "<all_urls>") return () => true;
+	const parts = PATTERN.exec(pattern);
+	if (!parts) return () => false;
+	const [, scheme, host, port, path] = parts as unknown as [
+		string,
+		string,
+		string,
+		string | undefined,
+		string,
+	];
+	return (url) => {
+		if (
+			scheme === "*"
+				? !ANY_SCHEME.has(url.protocol)
+				: `${scheme}:` !== url.protocol
+		) {
+			return false;
+		}
+		const hostname = url.hostname;
+		const hostMatches =
+			host === "*" ||
+			host === hostname ||
+			(host.startsWith("*.") &&
+				(hostname === host.slice(2) || hostname.endsWith(host.slice(1))));
+		if (!hostMatches) return false;
+		if (port !== undefined && port !== "*") {
+			const urlPort = url.port || DEFAULT_PORTS[url.protocol] || "";
+			if (urlPort !== port) return false;
+		}
+		return globMatches(path, url.pathname + url.search);
+	};
+}
+
+const compiled = new Map<string, UrlMatcher>();
+
+function matcherFor(pattern: string): UrlMatcher {
+	let matcher = compiled.get(pattern);
+	if (!matcher) {
+		matcher = compilePattern(pattern);
+		compiled.set(pattern, matcher);
+	}
+	return matcher;
+}
+
+function parseUrl(raw: string): URL | null {
+	try {
+		return new URL(raw);
+	} catch {
+		return null;
+	}
 }
 
 /** Chrome's match pattern rules, which Electron's webRequest filters use. */
-export function urlMatchesPattern(pattern: string, raw: string): boolean {
+export function urlMatchesPattern(pattern: string, raw: string | URL): boolean {
 	if (pattern === "<all_urls>") return true;
-	const parts = PATTERN.exec(pattern);
-	if (!parts) return false;
-	let url: URL;
-	try {
-		url = new URL(raw);
-	} catch {
-		return false;
-	}
-	const [, scheme, host, path] = parts as unknown as [
-		string,
-		string,
-		string,
-		string,
-	];
-	if (
-		scheme === "*"
-			? !ANY_SCHEME.has(url.protocol)
-			: `${scheme}:` !== url.protocol
-	) {
-		return false;
-	}
-	const hostname = url.hostname;
-	const hostMatches =
-		host === "*" ||
-		host === hostname ||
-		(host.startsWith("*.") &&
-			(hostname === host.slice(2) || hostname.endsWith(host.slice(1))));
-	return hostMatches && globToRegExp(path).test(url.pathname + url.search);
+	const url = typeof raw === "string" ? parseUrl(raw) : raw;
+	return url !== null && matcherFor(pattern)(url);
 }
 
 interface Entry {
 	hooks: WebRequestHooks;
 	matches(url: string): boolean;
+}
+
+function urlsMatcher(patterns: string[]): (raw: string) => boolean {
+	const matchers = patterns.map(matcherFor);
+	let lastRaw: string | null = null;
+	let lastUrl: URL | null = null;
+	return (raw) => {
+		if (raw !== lastRaw) {
+			lastRaw = raw;
+			lastUrl = parseUrl(raw);
+		}
+		const url = lastUrl;
+		return url !== null && matchers.some((matcher) => matcher(url));
+	};
 }
 
 /**
@@ -84,8 +150,7 @@ export class WebRequestHub {
 	add(hooks: WebRequestHooks): () => void {
 		const entry: Entry = {
 			hooks,
-			matches: (url) =>
-				hooks.urls.some((pattern) => urlMatchesPattern(pattern, url)),
+			matches: urlsMatcher(hooks.urls),
 		};
 		this.entries.push(entry);
 		this.sync();
