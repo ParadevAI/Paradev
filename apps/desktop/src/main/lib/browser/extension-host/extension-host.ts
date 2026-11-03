@@ -9,6 +9,7 @@ import {
 	removeBrowserExtension,
 	setBrowserExtensionPinned,
 } from "./browser-extensions";
+import { enforceDeclarativeNetRequest } from "./declarative-net-request";
 import {
 	type ExtensionWindowOptions,
 	openExtensionWindow,
@@ -26,6 +27,38 @@ type TabEntry = [Electron.WebContents, BrowserWindow];
 
 function hostWindowOf(contents: Electron.WebContents): BrowserWindow | null {
 	return BrowserWindow.fromWebContents(contents.hostWebContents ?? contents);
+}
+
+// ponytail: runtime grants live in electron-chrome-extensions' private
+// permissions API; the manifest alone misses optional hosts granted later.
+function grantedAccess(
+	extensions: ElectronChromeExtensions,
+	extension: Electron.Extension,
+): string[] {
+	const permissions = (
+		extensions as unknown as {
+			api?: {
+				permissions?: {
+					getAll?: (event: { extension: Electron.Extension }) => {
+						permissions: string[];
+						origins: string[];
+					};
+				};
+			};
+		}
+	).api?.permissions;
+	if (typeof permissions?.getAll === "function") {
+		const granted = permissions.getAll({ extension });
+		return [...granted.permissions, ...granted.origins];
+	}
+	const manifest = extension.manifest as {
+		permissions?: string[];
+		host_permissions?: string[];
+	};
+	return [
+		...(manifest.permissions ?? []),
+		...(manifest.host_permissions ?? []),
+	];
 }
 
 /**
@@ -127,6 +160,14 @@ function startExtensionHost(): void {
 		},
 		requestPermissions: confirmPermissionRequest,
 	});
+
+	try {
+		enforceDeclarativeNetRequest(browserSession, {
+			grantedAccess: (extension) => grantedAccess(extensions, extension),
+		});
+	} catch (error) {
+		console.error("[extension-host] declarativeNetRequest unavailable:", error);
+	}
 
 	watchWindows((window) => extensions.addWindow(window));
 	browserManager.setExtensionMenuItems((contents, params) =>
