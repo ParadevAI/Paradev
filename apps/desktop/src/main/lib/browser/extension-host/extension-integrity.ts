@@ -1,5 +1,5 @@
 import { createHash, createPublicKey, verify } from "node:crypto";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
@@ -224,7 +224,11 @@ export function saveSignedRecord(
 	const file = recordPath(manifestsPath, extensionId, version);
 	const verifiedContents = readZipEntry(archive, VERIFIED_CONTENTS);
 	if (!verifiedContents) {
-		rmSync(file, { force: true });
+		try {
+			unlinkSync(file);
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+		}
 		return;
 	}
 	mkdirSync(path.dirname(file), { recursive: true });
