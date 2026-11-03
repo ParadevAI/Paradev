@@ -6,6 +6,7 @@ export const MAX_HOST_MESSAGE_BYTES = 1024 * 1024;
 const MAX_FRAME_BYTES = 0xffffffff;
 
 const littleEndian = endianness() === "LE";
+const utf8 = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
 /** A message to a host: its UTF-8 length in native byte order, then the JSON. */
 export function encodeNativeMessage(json: string): Buffer {
@@ -45,17 +46,17 @@ export function createNativeMessageReader(handlers: {
 				return;
 			}
 			if (pending.length < HEADER_BYTES + length) return;
-			const json = pending.toString(
-				"utf8",
-				HEADER_BYTES,
-				HEADER_BYTES + length,
-			);
+			const body = pending.subarray(HEADER_BYTES, HEADER_BYTES + length);
 			pending = pending.subarray(HEADER_BYTES + length);
+			let json: string;
 			try {
+				json = utf8.decode(body);
 				JSON.parse(json);
 			} catch {
 				failed = true;
-				handlers.onError("The native host sent a message that is not JSON.");
+				handlers.onError(
+					"The native host sent a message that is not UTF-8 JSON.",
+				);
 				return;
 			}
 			handlers.onMessage(json);

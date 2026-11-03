@@ -1,4 +1,4 @@
-import { afterAll, expect, test } from "bun:test";
+import { afterAll, expect, spyOn, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -8,6 +8,8 @@ import {
 	isValidNativeHostName,
 	nativeHostDirectories,
 	parseNativeHostManifest,
+	parseRegistryDefault,
+	windowsHostRegistryKeys,
 } from "./host-manifest";
 
 const ONEPASSWORD = "aeblfdkhhhdcdjpifhhbdiojplfjncoa";
@@ -134,4 +136,71 @@ test("a host is found only for an extension its manifest allows", async () => {
 	expect(
 		await findNativeHost("com.example.host", OTHER, locations),
 	).toMatchObject({ ok: true });
+});
+
+test("Windows looks in both registry views, 32-bit first, and expands REG_EXPAND_SZ paths", () => {
+	expect(windowsHostRegistryKeys("com.example.host").slice(0, 4)).toEqual([
+		[
+			"HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.example.host",
+			"/reg:32",
+		],
+		[
+			"HKCU\\Software\\Chromium\\NativeMessagingHosts\\com.example.host",
+			"/reg:32",
+		],
+		[
+			"HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.example.host",
+			"/reg:64",
+		],
+		[
+			"HKCU\\Software\\Chromium\\NativeMessagingHosts\\com.example.host",
+			"/reg:64",
+		],
+	]);
+	expect(windowsHostRegistryKeys("com.example.host")).toHaveLength(8);
+
+	const output = (type: string, value: string) =>
+		`\r\nHKEY_CURRENT_USER\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.example.host\r\n    (Default)    ${type}    ${value}\r\n\r\n`;
+	const env = { LOCALAPPDATA: "C:\\Users\\me\\AppData\\Local" };
+	expect(
+		parseRegistryDefault(
+			output("REG_EXPAND_SZ", "%LOCALAPPDATA%\\host.json"),
+			env,
+		),
+	).toBe("C:\\Users\\me\\AppData\\Local\\host.json");
+	expect(
+		parseRegistryDefault(output("REG_EXPAND_SZ", "%MISSING%\\host.json"), env),
+	).toBe("%MISSING%\\host.json");
+	expect(
+		parseRegistryDefault(output("REG_SZ", "%LOCALAPPDATA%\\host.json"), env),
+	).toBe("%LOCALAPPDATA%\\host.json");
+	expect(parseRegistryDefault("ERROR: not found", env)).toBeNull();
+});
+
+test("a manifest that exists but cannot be read stops the lookup", async () => {
+	const home = path.join(root, "unreadable-home");
+	const appHostsDir = path.join(root, "unreadable-app");
+	const chromeDir = path.join(
+		home,
+		"Library/Application Support/Google/Chrome/NativeMessagingHosts",
+	);
+	mkdirSync(chromeDir, { recursive: true });
+	writeFileSync(path.join(chromeDir, "com.example.host.json"), manifest());
+	// A directory where the higher-priority manifest goes fails with EISDIR.
+	mkdirSync(path.join(appHostsDir, "com.example.host.json"), {
+		recursive: true,
+	});
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	try {
+		expect(
+			await findNativeHost("com.example.host", ONEPASSWORD, {
+				platform: "darwin",
+				home,
+				appHostsDir,
+			}),
+		).toEqual({ ok: false, error: NATIVE_MESSAGING_ERRORS.notFound });
+		expect(warn).toHaveBeenCalled();
+	} finally {
+		warn.mockRestore();
+	}
 });
