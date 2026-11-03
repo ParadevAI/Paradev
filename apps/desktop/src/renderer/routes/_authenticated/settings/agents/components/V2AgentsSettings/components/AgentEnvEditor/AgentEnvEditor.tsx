@@ -3,9 +3,7 @@ import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Plus, X } from "lucide-react";
 import {
-	type Dispatch,
 	type Ref,
-	type SetStateAction,
 	useEffect,
 	useImperativeHandle,
 	useRef,
@@ -29,12 +27,6 @@ function toRows(env: Record<string, string>): EnvRow[] {
 		value,
 		saved: { key, value },
 	}));
-}
-
-function envIdentity(env: Record<string, string>): string {
-	return JSON.stringify(
-		Object.entries(env).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
-	);
 }
 
 /** Rows that keep their saved name claim it before renamed or new rows. */
@@ -82,9 +74,10 @@ function withAssignments(
 	assignments: Record<string, string>,
 ): EnvRow[] {
 	const remaining = new Map(Object.entries(assignments));
+	const accepted = acceptedRowIds(rows);
 	const updated = rows.map((row) => {
 		const key = row.key.trim();
-		if (!remaining.has(key)) return row;
+		if (!accepted.has(row.id) || !remaining.has(key)) return row;
 		const value = remaining.get(key) ?? "";
 		remaining.delete(key);
 		return { ...row, value };
@@ -98,23 +91,11 @@ function withAssignments(
 	return [...updated, ...added];
 }
 
-interface SaveState {
-	inFlight: boolean;
-	queued: boolean;
-	lastSent: Record<string, string>;
-	sentInBurst: Set<string>;
-	external: Record<string, string> | null;
-}
-
-function applyExternal(
-	state: SaveState,
-	setRows: Dispatch<SetStateAction<EnvRow[]>>,
-	external: Record<string, string>,
-) {
-	state.lastSent = external;
-	state.sentInBurst.clear();
-	setRows((current) =>
-		areEnvMapsEqual(toEnv(current), external) ? current : toRows(external),
+function hasUnsavedEdits(rows: readonly EnvRow[]): boolean {
+	return rows.some((row) =>
+		row.saved === null
+			? row.key.trim().length > 0 || row.value.length > 0
+			: row.key.trim() !== row.saved.key || row.value !== row.saved.value,
 	);
 }
 
@@ -142,23 +123,19 @@ export function AgentEnvEditor({
 	const [rows, setRows] = useState(() => toRows(env));
 	const rowsRef = useRef(rows);
 	rowsRef.current = rows;
-	const saves = useRef<SaveState>({
-		inFlight: false,
-		queued: false,
-		lastSent: env,
-		sentInBurst: new Set(),
-		external: null,
-	});
+	const saves = useRef({ inFlight: false, queued: false, lastSent: env });
 	const accepted = acceptedRowIds(rows);
 
+	// While a save is pending or rows hold unsaved edits, the rows are the
+	// source of truth: a full-config response from another save can carry an
+	// older env.
 	useEffect(() => {
 		const state = saves.current;
-		const isOwnEcho =
-			areEnvMapsEqual(env, state.lastSent) ||
-			state.sentInBurst.has(envIdentity(env));
-		if (isOwnEcho) return;
-		if (state.inFlight) state.external = env;
-		else applyExternal(state, setRows, env);
+		if (state.inFlight || state.queued) return;
+		if (hasUnsavedEdits(rowsRef.current)) return;
+		if (areEnvMapsEqual(env, state.lastSent)) return;
+		state.lastSent = env;
+		setRows(toRows(env));
 	}, [env]);
 
 	const send = (submitted: readonly EnvRow[]) => {
@@ -171,7 +148,6 @@ export function AgentEnvEditor({
 		const previous = state.lastSent;
 		state.inFlight = true;
 		state.lastSent = nextEnv;
-		state.sentInBurst.add(envIdentity(nextEnv));
 		onCommit(nextEnv)
 			.then(
 				() => setRows((current) => markSaved(current, submitted)),
@@ -181,21 +157,16 @@ export function AgentEnvEditor({
 			)
 			.finally(() => {
 				state.inFlight = false;
-				const { external, queued } = state;
-				state.external = null;
-				state.queued = false;
-				if (external) applyExternal(state, setRows, external);
-				else if (queued) send(rowsRef.current);
+				if (state.queued) {
+					state.queued = false;
+					send(rowsRef.current);
+				}
 			});
 	};
 
 	const commit = (next: readonly EnvRow[]) => {
-		if (saves.current.inFlight) {
-			saves.current.queued = true;
-			return;
-		}
-		saves.current.sentInBurst.clear();
-		send(next);
+		if (saves.current.inFlight) saves.current.queued = true;
+		else send(next);
 	};
 
 	useImperativeHandle(ref, () => ({

@@ -86,6 +86,7 @@ export function AgentDetail({
 		});
 
 	const envEditorRef = useRef<AgentEnvEditorHandle>(null);
+	const [envEditorKey, setEnvEditorKey] = useState(0);
 	const [label, setLabel] = useState(config.label);
 	const [commandText, setCommandText] = useState(
 		getAgentCommandText({ command: config.command, args: config.args }),
@@ -193,6 +194,7 @@ export function AgentDetail({
 		},
 		onSuccess: (updated) => {
 			onChanged(updated);
+			setEnvEditorKey((key) => key + 1);
 			const updatedLabel = updated.label;
 			toast.success(
 				t({
@@ -343,6 +345,7 @@ export function AgentDetail({
 					})}
 				>
 					<AgentEnvEditor
+						key={envEditorKey}
 						ref={envEditorRef}
 						idPrefix={config.id}
 						env={config.env}
