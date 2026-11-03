@@ -59,7 +59,7 @@ export function RunningTasksChip({
 							? t({ message: `Subagents · ${count}` })
 							: t({ message: `Background · ${count}` })}
 					</span>
-					<span className="shrink-0 font-mono tabular-nums">
+					<span className="shrink-0 text-muted-foreground/60 tabular-nums">
 						{formatAge(oldestStartedAtMs, now)}
 					</span>
 				</button>
