@@ -41,11 +41,6 @@ msgstr "· actualizada {updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "Se eliminarán «{0}» y sus filtros. Los espacios de trabajo no se ven afectados."
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "\"{0}\" eliminada"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "\"{0}\" se marcará como cerrada en GitHub. Puedes reabrirla desde aquí en cualquier momento."
@@ -61,11 +56,6 @@ msgstr "\"{0}\" se fusionará en {1} mediante {2}. Las comprobaciones aún no se
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" se fusionará en {1} mediante {2}. No se puede deshacer desde aquí."
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "\"{0}\" dejará de dispararse y se eliminará su historial de ejecuciones. Esto no se puede deshacer."
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "«{name}» ocupa {size}: no se pueden adjuntar archivos de más de {limit}"
@@ -127,10 +117,6 @@ msgstr "{0, plural, one {# agente} other {# agentes}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {No se pudo iniciar # automatización} other {No se pudieron iniciar # automatizaciones}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {# automatización eliminada} other {# automatizaciones eliminadas}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {# espacio de trabajo} other {# espacios de trabajo}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {Un agente en marcha sigue usando la cuenta anterior; el cambio solo se aplica a los nuevos lanzamientos.} other {# agentes en marcha siguen usando la cuenta anterior; el cambio solo se aplica a los nuevos lanzamientos.}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {# automatización archivada} other {# automatizaciones archivadas}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, one {Hizo # pregunta} other {Hizo # preguntas}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {No se pudo eliminar # espacio de trabajo} other {No se 
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Creando # espacio de trabajo...} other {Creando # espacios de trabajo...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {¿Eliminar # automatización?} other {¿Eliminar # automatizaciones?}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {¿Eliminar # automatización de forma permanente?} other {¿Eliminar # automatizaciones de forma permanente?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {¿Eliminar # espacio de trabajo?} other {¿Eliminar # espacios de trabajo?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {# automatización eliminada} other {# automatizaciones eliminadas}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, one {Se pausó # automatización.} other {Se pausaron # auto
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, one {Pausa # automatización} other {Pausa # automatizaciones}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {# automatización restaurada. Las pausadas siguen pausadas.} other {# automatizaciones restauradas. Las pausadas siguen pausadas.}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {# automatización restaurada} other {# automatizaciones restauradas}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "¿Archivar a {name}?"
 msgid "Archive #{0}?"
 msgstr "¿Archivar #{0}?"
 
+msgid "Archive automation"
+msgstr "Archivar automatización"
+
 msgid "Archive channel"
 msgstr "Archivar canal"
 
@@ -2936,6 +2941,9 @@ msgstr "Archivar entorno"
 
 msgid "Archive failed"
 msgstr "No se pudo archivar"
+
+msgid "Archive this automation before you delete it."
+msgstr "Archiva esta automatización antes de eliminarla."
 
 msgid "Archive workspace"
 msgstr "Archivar espacio de trabajo"
@@ -2947,6 +2955,10 @@ msgstr "Archivados"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "Archivado · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "\"{0}\" archivada"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6607,6 +6619,10 @@ msgstr "Delegado"
 msgid "Delete"
 msgstr "Eliminar"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "¿Eliminar \"{0}\" de forma permanente?"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "¿Eliminar \"{0}\"? Esto quita su worktree del host."
@@ -6652,12 +6668,6 @@ msgstr "Eliminar de todos modos"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "Eliminar de todos modos omitirá por completo el script de limpieza."
-
-msgid "Delete automation"
-msgstr "Eliminar la automatización"
-
-msgid "Delete automation?"
-msgstr "¿Eliminar la automatización?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6771,6 +6781,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "Eliminada"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "\"{0}\" eliminada"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "\"{deletedName}\" eliminado"
 
@@ -6831,9 +6845,6 @@ msgstr "Eliminando {0} de {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Eliminando {name}..."
-
-msgid "Deleting automation..."
-msgstr "Eliminando la automatización..."
 
 msgid "Deleting organization..."
 msgstr "Eliminando la organización..."
@@ -8003,6 +8014,9 @@ msgstr "No se pudo añadir el agente"
 msgid "Failed to add member"
 msgstr "No se pudo añadir el miembro"
 
+msgid "Failed to archive automation"
+msgstr "No se pudo archivar la automatización"
+
 msgid "Failed to cancel invitation"
 msgstr "No se pudo cancelar la invitación"
 
@@ -8299,6 +8313,9 @@ msgstr "No se pudo reiniciar el daemon"
 
 msgid "Failed to restore"
 msgstr "No se pudo restaurar"
+
+msgid "Failed to restore automation"
+msgstr "No se pudo restaurar la automatización"
 
 msgid "Failed to restore defaults"
 msgstr "No se pudieron restaurar los valores predeterminados"
@@ -12140,6 +12157,9 @@ msgstr "Aún no hay agentes."
 msgid "No API keys yet."
 msgstr "Aún no hay claves de API."
 
+msgid "No archived automations"
+msgstr "No hay automatizaciones archivadas"
+
 msgid "No archived workspaces"
 msgstr "No hay espacios de trabajo archivados"
 
@@ -13187,8 +13207,8 @@ msgstr "Solo el propietario puede ejecutar esta automatización"
 msgid "Only the owner can view prompt history"
 msgstr "Solo el propietario puede ver el historial de prompts"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Solo el propietario o un propietario de la organización puede eliminar esta automatización"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Solo el propietario o un propietario de la organización puede archivar esta automatización"
 
 msgid "Only the people listed above can open it"
 msgstr "Solo las personas indicadas arriba pueden abrirlo"
@@ -16065,6 +16085,9 @@ msgstr "Restaurar"
 msgid "Restore {0} to defaults?"
 msgstr "¿Restaurar {0} a los valores predeterminados?"
 
+msgid "Restore automation"
+msgstr "Restaurar automatización"
+
 msgid "Restore default"
 msgstr "Restaurar valores predeterminados"
 
@@ -16077,6 +16100,12 @@ msgstr "Restaurar el plan"
 msgid "restore the agent defaults"
 msgstr "restaurar los valores predeterminados del agente"
 
+msgid "Restore this automation to run it"
+msgstr "Restaura esta automatización para ejecutarla"
+
+msgid "Restore this automation to view prompt history"
+msgstr "Restaura esta automatización para ver el historial del prompt"
+
 msgid "Restore this version?"
 msgstr "¿Restaurar esta versión?"
 
@@ -16088,6 +16117,14 @@ msgstr "Restaurar espacio de trabajo"
 
 msgid "Restored"
 msgstr "Restaurada"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "\"{0}\" restaurada"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "\"{0}\" restaurada. Está en pausa."
 
 msgid "Restored \"{projectName}\""
 msgstr "Se restauró \"{projectName}\""
@@ -19068,6 +19105,9 @@ msgstr "El agente que sigue la página lee cada comentario. Actualiza la página
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "La app está en {appVersion} pero conectada a un servicio de host iniciado por otra cosa, probablemente una CLI antigua u otra compilación de Paradev. Reiniciar lo sustituye por la copia de esta app."
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "Se eliminan la automatización y su historial de ejecuciones. Esta acción no se puede deshacer."
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "El propietario de la automatización ya no puede usar espacios de trabajo en la nube en esta organización. Pídele que revise su acceso o ejecuta la automatización en un dispositivo."
 
@@ -19435,9 +19475,6 @@ msgstr "Estas carpetas aún tienen tus archivos, pero no se pasaron solas al nue
 msgid "These ports are still in use"
 msgstr "Estos puertos siguen en uso"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "Dejarán de ejecutarse y se eliminará su historial de ejecuciones. No se puede deshacer."
-
 msgid "Thinking"
 msgstr "Razonamiento"
 
@@ -19489,6 +19526,12 @@ msgstr "Esta automatización pertenece a {0}. Cambia a esa organización para ab
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Esta automatización todavía no tiene instrucciones. Escribe un prompt en sus ajustes antes de ejecutarla."
+
+msgid "This automation is archived. It does not run."
+msgstr "Esta automatización está archivada. No se ejecuta."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Esta automatización está archivada. Restáurala primero."
 
 msgid "This automation is in another organization"
 msgstr "Esta automatización está en otra organización"

@@ -7,7 +7,15 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useRef } from "react";
-import { LuFolderInput, LuPause, LuPlay, LuTrash2, LuX } from "react-icons/lu";
+import {
+	LuArchive,
+	LuArchiveRestore,
+	LuFolderInput,
+	LuPause,
+	LuPlay,
+	LuTrash2,
+	LuX,
+} from "react-icons/lu";
 import { AutomationGroupPicker } from "../AutomationGroupPicker";
 
 interface AutomationBulkBarProps {
@@ -22,6 +30,10 @@ interface AutomationBulkBarProps {
 	onMove: (group: string | null) => void;
 	onPause: () => void;
 	onResume: () => void;
+	onArchive: () => void;
+	/** The selection is archived: only Restore and Delete permanently apply. */
+	archived?: boolean;
+	onRestore: () => void;
 	onDelete: () => void;
 	onClear: () => void;
 }
@@ -37,6 +49,9 @@ export function AutomationBulkBar({
 	onMove,
 	onPause,
 	onResume,
+	onArchive,
+	archived = false,
+	onRestore,
 	onDelete,
 	onClear,
 }: AutomationBulkBarProps) {
@@ -70,76 +85,103 @@ export function AutomationBulkBar({
 				</TooltipContent>
 			</Tooltip>
 			<div className="mx-1 h-5 w-px bg-border" />
-			<DropdownMenu
-				onOpenChange={(open) => {
-					// After the menu mounts and Radix places its own focus.
-					if (open) {
-						requestAnimationFrame(() =>
-							requestAnimationFrame(() => inputRef.current?.focus()),
-						);
-					}
-				}}
-			>
-				<DropdownMenuTrigger asChild>
+			{archived ? (
+				<>
 					<Button
 						variant="ghost"
 						size="sm"
 						className="h-8 gap-1.5"
 						disabled={busy}
+						onClick={onRestore}
 					>
-						<LuFolderInput className="size-4" />
-						<Trans>Move to group</Trans>
+						<LuArchiveRestore className="size-4" />
+						<Trans>Restore</Trans>
 					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					side="top"
-					align="start"
-					sideOffset={8}
-					className="w-60 p-0"
-				>
-					<AutomationGroupPicker
-						kind="dropdown"
-						groups={groups}
-						currentGroup={currentGroup}
-						onMove={onMove}
-						inputRef={inputRef}
-					/>
-				</DropdownMenuContent>
-			</DropdownMenu>
-			{canPause && (
-				<Button
-					variant="ghost"
-					size="sm"
-					className="h-8 gap-1.5"
-					disabled={busy}
-					onClick={onPause}
-				>
-					<LuPause className="size-4" />
-					<Trans>Pause</Trans>
-				</Button>
+					<Button
+						variant="ghost"
+						size="sm"
+						className="h-8 gap-1.5 text-destructive hover:text-destructive"
+						disabled={busy}
+						onClick={onDelete}
+					>
+						<LuTrash2 className="size-4" />
+						<Trans>Delete permanently</Trans>
+					</Button>
+				</>
+			) : (
+				<>
+					<DropdownMenu
+						onOpenChange={(open) => {
+							// After the menu mounts and Radix places its own focus.
+							if (open) {
+								requestAnimationFrame(() =>
+									requestAnimationFrame(() => inputRef.current?.focus()),
+								);
+							}
+						}}
+					>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="h-8 gap-1.5"
+								disabled={busy}
+							>
+								<LuFolderInput className="size-4" />
+								<Trans>Move to group</Trans>
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							side="top"
+							align="start"
+							sideOffset={8}
+							className="w-60 p-0"
+						>
+							<AutomationGroupPicker
+								kind="dropdown"
+								groups={groups}
+								currentGroup={currentGroup}
+								onMove={onMove}
+								inputRef={inputRef}
+							/>
+						</DropdownMenuContent>
+					</DropdownMenu>
+					{canPause && (
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-8 gap-1.5"
+							disabled={busy}
+							onClick={onPause}
+						>
+							<LuPause className="size-4" />
+							<Trans>Pause</Trans>
+						</Button>
+					)}
+					{canResume && (
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-8 gap-1.5"
+							disabled={busy}
+							onClick={onResume}
+						>
+							<LuPlay className="size-4" />
+							<Trans>Resume</Trans>
+						</Button>
+					)}
+					<Button
+						variant="ghost"
+						size="sm"
+						className="h-8 gap-1.5"
+						disabled={busy}
+						onClick={onArchive}
+					>
+						<LuArchive className="size-4" />
+						<Trans>Archive</Trans>
+					</Button>
+				</>
 			)}
-			{canResume && (
-				<Button
-					variant="ghost"
-					size="sm"
-					className="h-8 gap-1.5"
-					disabled={busy}
-					onClick={onResume}
-				>
-					<LuPlay className="size-4" />
-					<Trans>Resume</Trans>
-				</Button>
-			)}
-			<Button
-				variant="ghost"
-				size="sm"
-				className="h-8 gap-1.5 text-destructive hover:text-destructive"
-				disabled={busy}
-				onClick={onDelete}
-			>
-				<LuTrash2 className="size-4" />
-				<Trans>Delete</Trans>
-			</Button>
 		</div>
 	);
 }

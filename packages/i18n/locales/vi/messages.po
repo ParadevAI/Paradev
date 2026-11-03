@@ -41,11 +41,6 @@ msgstr "· cập nhật {updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” và các bộ lọc của nó sẽ bị xóa. Workspace không bị ảnh hưởng."
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "Đã xóa \"{0}\""
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "\"{0}\" sẽ được đánh dấu là đã đóng trên GitHub. Bạn có thể mở lại từ đây bất cứ lúc nào."
@@ -61,11 +56,6 @@ msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Các check chưa qua �
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Không thể hoàn tác từ đây."
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "\"{0}\" sẽ ngừng kích hoạt và lịch sử chạy sẽ bị xóa. Không thể hoàn tác."
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit}"
@@ -127,10 +117,6 @@ msgstr "{0, plural, other {# agent}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {Không thể khởi chạy # tự động hóa} other {Không thể khởi chạy # tự động hóa}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {Đã xóa # tự động hóa} other {Đã xóa # tự động hóa}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {# workspace} other {# workspace}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {# agent đang chạy vẫn dùng tài khoản trước — việc chuyển chỉ áp dụng cho lần khởi chạy mới.} other {# agent đang chạy vẫn dùng tài khoản trước — việc chuyển chỉ áp dụng cho lần khởi chạy mới.}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {Đã lưu trữ # tự động hóa} other {Đã lưu trữ # tự động hóa}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, other {Đã hỏi # câu hỏi}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {Không thể xóa # workspace} other {Không thể xóa
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Đang tạo # workspace...} other {Đang tạo # workspace...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {Xóa # tự động hóa?} other {Xóa # tự động hóa?}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {Xóa vĩnh viễn # tự động hóa?} other {Xóa vĩnh viễn # tự động hóa?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {Xóa # workspace?} other {Xóa # workspace?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {Đã xóa # tự động hóa} other {Đã xóa # tự động hóa}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, other {Đã tạm dừng # tự động hóa.}}"
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, other {Tạm dừng # tự động hóa}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {Đã khôi phục # tự động hóa. Các tự động hóa đang tạm dừng vẫn tạm dừng.} other {Đã khôi phục # tự động hóa. Các tự động hóa đang tạm dừng vẫn tạm dừng.}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {Đã khôi phục # tự động hóa} other {Đã khôi phục # tự động hóa}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "Lưu trữ {name}?"
 msgid "Archive #{0}?"
 msgstr "Lưu trữ #{0}?"
 
+msgid "Archive automation"
+msgstr "Lưu trữ tự động hóa"
+
 msgid "Archive channel"
 msgstr "Lưu trữ kênh"
 
@@ -2936,6 +2941,9 @@ msgstr "Lưu trữ environment"
 
 msgid "Archive failed"
 msgstr "Lưu trữ thất bại"
+
+msgid "Archive this automation before you delete it."
+msgstr "Hãy lưu trữ tự động hóa này trước khi xóa."
 
 msgid "Archive workspace"
 msgstr "Lưu trữ workspace"
@@ -2947,6 +2955,10 @@ msgstr "Đã lưu trữ"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "Đã lưu trữ · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "Đã lưu trữ \"{0}\""
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6607,6 +6619,10 @@ msgstr "Ủy quyền"
 msgid "Delete"
 msgstr "Xóa"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "Xóa vĩnh viễn \"{0}\"?"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "Xóa \"{0}\"? Thao tác này gỡ worktree của nó khỏi host."
@@ -6652,12 +6668,6 @@ msgstr "Vẫn xóa"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "Vẫn xóa sẽ bỏ qua hoàn toàn script teardown."
-
-msgid "Delete automation"
-msgstr "Xóa tự động hóa"
-
-msgid "Delete automation?"
-msgstr "Xóa tự động hóa?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6771,6 +6781,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "Đã xóa"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "Đã xóa \"{0}\""
+
 msgid "Deleted \"{deletedName}\""
 msgstr "Đã xóa \"{deletedName}\""
 
@@ -6831,9 +6845,6 @@ msgstr "Đang xóa {0} trong {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Đang xóa {name}..."
-
-msgid "Deleting automation..."
-msgstr "Đang xóa tự động hóa..."
 
 msgid "Deleting organization..."
 msgstr "Đang xóa tổ chức..."
@@ -8003,6 +8014,9 @@ msgstr "Không thể thêm agent"
 msgid "Failed to add member"
 msgstr "Không thể thêm thành viên"
 
+msgid "Failed to archive automation"
+msgstr "Không thể lưu trữ tự động hóa"
+
 msgid "Failed to cancel invitation"
 msgstr "Không thể hủy lời mời"
 
@@ -8299,6 +8313,9 @@ msgstr "Không thể khởi động lại daemon"
 
 msgid "Failed to restore"
 msgstr "Không thể khôi phục"
+
+msgid "Failed to restore automation"
+msgstr "Không thể khôi phục tự động hóa"
 
 msgid "Failed to restore defaults"
 msgstr "Không thể khôi phục mặc định"
@@ -12140,6 +12157,9 @@ msgstr "Chưa có agent nào."
 msgid "No API keys yet."
 msgstr "Chưa có khóa API nào."
 
+msgid "No archived automations"
+msgstr "Không có tự động hóa nào đã lưu trữ"
+
 msgid "No archived workspaces"
 msgstr "Không có workspace nào đã lưu trữ"
 
@@ -13187,8 +13207,8 @@ msgstr "Chỉ chủ sở hữu mới chạy được tự động hóa này"
 msgid "Only the owner can view prompt history"
 msgstr "Chỉ chủ sở hữu mới xem được lịch sử prompt"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Chỉ chủ sở hữu hoặc chủ sở hữu tổ chức mới xóa được tự động hóa này"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Chỉ chủ sở hữu hoặc chủ sở hữu tổ chức mới có thể lưu trữ tự động hóa này"
 
 msgid "Only the people listed above can open it"
 msgstr "Chỉ những người có trong danh sách trên mới có thể mở"
@@ -16065,6 +16085,9 @@ msgstr "Khôi phục"
 msgid "Restore {0} to defaults?"
 msgstr "Khôi phục {0} về mặc định?"
 
+msgid "Restore automation"
+msgstr "Khôi phục tự động hóa"
+
 msgid "Restore default"
 msgstr "Khôi phục mặc định"
 
@@ -16077,6 +16100,12 @@ msgstr "Khôi phục gói"
 msgid "restore the agent defaults"
 msgstr "khôi phục mặc định của agent"
 
+msgid "Restore this automation to run it"
+msgstr "Khôi phục tự động hóa này để chạy nó"
+
+msgid "Restore this automation to view prompt history"
+msgstr "Khôi phục tự động hóa này để xem lịch sử prompt"
+
 msgid "Restore this version?"
 msgstr "Khôi phục phiên bản này?"
 
@@ -16088,6 +16117,14 @@ msgstr "Khôi phục workspace"
 
 msgid "Restored"
 msgstr "Đã khôi phục"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "Đã khôi phục \"{0}\""
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "Đã khôi phục \"{0}\". Tự động hóa đang tạm dừng."
 
 msgid "Restored \"{projectName}\""
 msgstr "Đã khôi phục \"{projectName}\""
@@ -19068,6 +19105,9 @@ msgstr "Agent theo dõi trang sẽ đọc từng bình luận. Agent cập nhậ
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "Ứng dụng đang ở {appVersion} nhưng kết nối với dịch vụ máy chủ do thứ khác khởi động, có thể là CLI cũ hoặc bản dựng Paradev khác. Khởi động lại sẽ thay thế nó bằng bản của ứng dụng này."
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "Tự động hóa và lịch sử chạy của nó sẽ bị xóa. Không thể hoàn tác thao tác này."
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "Chủ sở hữu của tự động hóa không còn dùng được workspace cloud trong tổ chức này. Hãy nhờ họ kiểm tra quyền truy cập, hoặc chạy tự động hóa trên một thiết bị."
 
@@ -19435,9 +19475,6 @@ msgstr "Các thư mục này vẫn còn tệp của bạn, nhưng chưa tự chu
 msgid "These ports are still in use"
 msgstr "Các cổng này vẫn đang được dùng"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "Chúng sẽ ngừng chạy và lịch sử chạy sẽ bị xóa. Không thể hoàn tác."
-
 msgid "Thinking"
 msgstr "Suy luận"
 
@@ -19489,6 +19526,12 @@ msgstr "Tự động hóa này thuộc về {0}. Chuyển sang tổ chức đó 
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Tự động hóa này chưa có hướng dẫn. Hãy viết một prompt trong cài đặt trước khi chạy."
+
+msgid "This automation is archived. It does not run."
+msgstr "Tự động hóa này đã được lưu trữ. Nó không chạy."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Tự động hóa này đã được lưu trữ. Hãy khôi phục nó trước."
 
 msgid "This automation is in another organization"
 msgstr "Tự động hóa này nằm trong một tổ chức khác"

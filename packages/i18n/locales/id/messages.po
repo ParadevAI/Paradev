@@ -41,11 +41,6 @@ msgstr "· diperbarui {updatedAgo}"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” beserta filternya akan dihapus. Workspace tidak terpengaruh."
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "\"{0}\" dihapus"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "\"{0}\" akan ditandai ditutup di GitHub. Anda bisa membukanya lagi dari sini kapan saja."
@@ -61,11 +56,6 @@ msgstr "\"{0}\" akan di-merge ke {1} lewat {2}. Check-nya belum lulus — ini me
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" akan di-merge ke {1} lewat {2}. Ini tidak bisa dibatalkan dari sini."
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tidak bisa dibatalkan."
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "\"{name}\" berukuran {size} — file di atas {limit} tidak dapat dilampirkan"
@@ -127,10 +117,6 @@ msgstr "{0, plural, other {# agen}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# otomatisasi tidak dapat dimulai} other {# otomatisasi tidak dapat dimulai}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {# otomatisasi dihapus} other {# otomatisasi dihapus}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {# workspace} other {# workspace}}"
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {# agen yang sedang berjalan masih memakai akun sebelumnya — pergantian hanya berlaku untuk peluncuran baru.} other {# agen yang sedang berjalan masih memakai akun sebelumnya — pergantian hanya berlaku untuk peluncuran baru.}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {# otomatisasi diarsipkan} other {# otomatisasi diarsipkan}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, other {Mengajukan # pertanyaan}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {Tidak bisa menghapus # workspace} other {Tidak bisa men
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Membuat # workspace...} other {Membuat # workspace...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {Hapus # otomatisasi?} other {Hapus # otomatisasi?}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {Hapus # otomatisasi secara permanen?} other {Hapus # otomatisasi secara permanen?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {Hapus # workspace?} other {Hapus # workspace?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {# otomatisasi dihapus} other {# otomatisasi dihapus}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, other {# otomatisasi dijeda.}}"
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, other {Menjeda # otomatisasi}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {# otomatisasi dipulihkan. Yang dijeda tetap dijeda.} other {# otomatisasi dipulihkan. Yang dijeda tetap dijeda.}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {# otomatisasi dipulihkan} other {# otomatisasi dipulihkan}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "Arsipkan {name}?"
 msgid "Archive #{0}?"
 msgstr "Arsipkan #{0}?"
 
+msgid "Archive automation"
+msgstr "Arsipkan otomatisasi"
+
 msgid "Archive channel"
 msgstr "Arsipkan kanal"
 
@@ -2936,6 +2941,9 @@ msgstr "Arsipkan environment"
 
 msgid "Archive failed"
 msgstr "Pengarsipan gagal"
+
+msgid "Archive this automation before you delete it."
+msgstr "Arsipkan otomatisasi ini sebelum menghapusnya."
 
 msgid "Archive workspace"
 msgstr "Arsipkan workspace"
@@ -2947,6 +2955,10 @@ msgstr "Diarsipkan"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "Diarsipkan · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "\"{0}\" diarsipkan"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6607,6 +6619,10 @@ msgstr "Didelegasikan"
 msgid "Delete"
 msgstr "Hapus"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "Hapus \"{0}\" secara permanen?"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "Hapus \"{0}\"? Ini menghapus worktree-nya dari host."
@@ -6652,12 +6668,6 @@ msgstr "Tetap hapus"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "Tetap hapus akan melewati skrip teardown sepenuhnya."
-
-msgid "Delete automation"
-msgstr "Hapus otomatisasi"
-
-msgid "Delete automation?"
-msgstr "Hapus otomatisasi?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6771,6 +6781,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "Dihapus"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "\"{0}\" dihapus"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "Menghapus \"{deletedName}\""
 
@@ -6831,9 +6845,6 @@ msgstr "Menghapus {0} dari {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Menghapus {name}..."
-
-msgid "Deleting automation..."
-msgstr "Menghapus otomatisasi..."
 
 msgid "Deleting organization..."
 msgstr "Menghapus organisasi..."
@@ -8003,6 +8014,9 @@ msgstr "Gagal menambah agen"
 msgid "Failed to add member"
 msgstr "Gagal menambah anggota"
 
+msgid "Failed to archive automation"
+msgstr "Gagal mengarsipkan otomatisasi"
+
 msgid "Failed to cancel invitation"
 msgstr "Gagal membatalkan undangan"
 
@@ -8299,6 +8313,9 @@ msgstr "Gagal memulai ulang daemon"
 
 msgid "Failed to restore"
 msgstr "Gagal memulihkan"
+
+msgid "Failed to restore automation"
+msgstr "Gagal memulihkan otomatisasi"
 
 msgid "Failed to restore defaults"
 msgstr "Gagal memulihkan setelan bawaan"
@@ -12140,6 +12157,9 @@ msgstr "Belum ada agen."
 msgid "No API keys yet."
 msgstr "Belum ada kunci API."
 
+msgid "No archived automations"
+msgstr "Tidak ada otomatisasi yang diarsipkan"
+
 msgid "No archived workspaces"
 msgstr "Tidak ada workspace yang diarsipkan"
 
@@ -13187,8 +13207,8 @@ msgstr "Hanya pemilik yang bisa menjalankan otomatisasi ini"
 msgid "Only the owner can view prompt history"
 msgstr "Hanya pemilik yang bisa melihat riwayat prompt"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "Hanya pemilik atau pemilik organisasi yang bisa menghapus otomatisasi ini"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "Hanya pemilik atau pemilik organisasi yang dapat mengarsipkan otomatisasi ini"
 
 msgid "Only the people listed above can open it"
 msgstr "Hanya orang yang tercantum di atas yang dapat membukanya"
@@ -16065,6 +16085,9 @@ msgstr "Pulihkan"
 msgid "Restore {0} to defaults?"
 msgstr "Pulihkan {0} ke setelan bawaan?"
 
+msgid "Restore automation"
+msgstr "Pulihkan otomatisasi"
+
 msgid "Restore default"
 msgstr "Pulihkan setelan bawaan"
 
@@ -16077,6 +16100,12 @@ msgstr "Pulihkan paket"
 msgid "restore the agent defaults"
 msgstr "memulihkan setelan bawaan agen"
 
+msgid "Restore this automation to run it"
+msgstr "Pulihkan otomatisasi ini untuk menjalankannya"
+
+msgid "Restore this automation to view prompt history"
+msgstr "Pulihkan otomatisasi ini untuk melihat riwayat prompt"
+
 msgid "Restore this version?"
 msgstr "Pulihkan versi ini?"
 
@@ -16088,6 +16117,14 @@ msgstr "Pulihkan workspace"
 
 msgid "Restored"
 msgstr "Dipulihkan"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "\"{0}\" dipulihkan"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "\"{0}\" dipulihkan. Otomatisasi ini dijeda."
 
 msgid "Restored \"{projectName}\""
 msgstr "\"{projectName}\" dipulihkan"
@@ -19068,6 +19105,9 @@ msgstr "Agen yang memantau halaman membaca setiap komentar. Agen memperbarui hal
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "Aplikasi berada di {appVersion} tetapi terhubung ke layanan host yang dimulai oleh hal lain, kemungkinan CLI lama atau build Paradev lain. Memulai ulang akan menggantinya dengan salinan dari aplikasi ini."
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "Otomatisasi dan riwayat jalannya dihapus. Tindakan ini tidak dapat dibatalkan."
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "Pemilik otomatisasi ini tidak bisa lagi menggunakan workspace cloud di organisasi ini. Minta mereka memeriksa aksesnya, atau jalankan otomatisasi di perangkat."
 
@@ -19435,9 +19475,6 @@ msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke 
 msgid "These ports are still in use"
 msgstr "Port ini masih dipakai"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "Otomatisasi ini tidak akan berjalan lagi dan riwayat jalannya akan dihapus. Tindakan ini tidak dapat dibatalkan."
-
 msgid "Thinking"
 msgstr "Pemikiran"
 
@@ -19489,6 +19526,12 @@ msgstr "Otomatisasi ini milik {0}. Ganti ke organisasi tersebut untuk membukanya
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "Otomatisasi ini belum memiliki instruksi. Tulis prompt di pengaturannya sebelum menjalankannya."
+
+msgid "This automation is archived. It does not run."
+msgstr "Otomatisasi ini diarsipkan. Otomatisasi ini tidak berjalan."
+
+msgid "This automation is archived. Restore it first."
+msgstr "Otomatisasi ini diarsipkan. Pulihkan terlebih dahulu."
 
 msgid "This automation is in another organization"
 msgstr "Otomatisasi ini berada di organisasi lain"

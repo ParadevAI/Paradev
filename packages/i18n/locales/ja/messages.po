@@ -41,11 +41,6 @@ msgstr "· {updatedAgo}に更新"
 msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "「{0}」とそのフィルターが削除されます。ワークスペースには影響しません。"
 
-#. placeholder {0}: automation.name
-#. placeholder {0}: only.name
-msgid "\"{0}\" deleted"
-msgstr "「{0}」を削除しました"
-
 #. placeholder {0}: data.title
 msgid "\"{0}\" will be marked closed on GitHub. You can reopen it from here at any time."
 msgstr "「{0}」はGitHub上でクローズ済みになります。ここからいつでも再オープンできます。"
@@ -61,11 +56,6 @@ msgstr "「{0}」は{2}で{1}にマージされます。チェックはまだ通
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "「{0}」は{2}で{1}にマージされます。ここからは元に戻せません。"
-
-#. placeholder {0}: automation.name
-#. placeholder {0}: pendingDeleteOnly.name
-msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-msgstr "「{0}」は発火しなくなり、実行履歴も削除されます。この操作は元に戻せません。"
 
 msgid "\"{name}\" is {size} — files over {limit} can't be attached"
 msgstr "「{name}」は {size} です — {limit} を超えるファイルは添付できません"
@@ -127,10 +117,6 @@ msgstr "{0, plural, other {エージェント # 件}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {#件のオートメーションを開始できませんでした} other {#件のオートメーションを開始できませんでした}}"
-
-#. placeholder {0}: targets.length
-msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
-msgstr "{0, plural, one {#件のオートメーションを削除しました} other {#件のオートメーションを削除しました}}"
 
 #. placeholder {0}: ids.length
 msgid "{0, plural, one {# automation paused} other {# automations paused}}"
@@ -298,6 +284,10 @@ msgstr "{0, plural, one {#件のワークスペース} other {#件のワーク�
 msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
 msgstr "{0, plural, one {実行中の#件のエージェントはまだ以前のアカウントを使用しています。切り替えが適用されるのは新規起動のみです。} other {実行中の#件のエージェントはまだ以前のアカウントを使用しています。切り替えが適用されるのは新規起動のみです。}}"
 
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
+msgstr "{0, plural, one {#件のオートメーションをアーカイブしました} other {#件のオートメーションをアーカイブしました}}"
+
 #. placeholder {0}: pages.length
 msgid "{0, plural, one {Asked # question} other {Asked # questions}}"
 msgstr "{0, plural, other {# 件の質問をしました}}"
@@ -316,13 +306,17 @@ msgstr "{0, plural, one {#件のワークスペースを削除できませんで
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {#件のワークスペースを作成中...} other {#件のワークスペースを作成中...}}"
 
-#. placeholder {0}: pendingDelete.length
-msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
-msgstr "{0, plural, one {#件のオートメーションを削除しますか？} other {#件のオートメーションを削除しますか？}}"
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Delete # automation permanently?} other {Delete # automations permanently?}}"
+msgstr "{0, plural, one {#件のオートメーションを完全に削除しますか？} other {#件のオートメーションを完全に削除しますか？}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {#件のワークスペースを削除しますか?} other {#件のワークスペースを削除しますか?}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Deleted # automation} other {Deleted # automations}}"
+msgstr "{0, plural, one {#件のオートメーションを削除しました} other {#件のオートメーションを削除しました}}"
 
 #. placeholder {0}: cleanup.hosts
 msgid "{0, plural, one {Deleted # host with no other owner, along with its workspaces.} other {Deleted # hosts with no other owner, along with their workspaces.}}"
@@ -367,6 +361,14 @@ msgstr "{0, plural, other {オートメーション # 件を一時停止しま�
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, other {オートメーション # 件を一時停止します}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
+msgstr "{0, plural, one {#件のオートメーションを復元しました。一時停止中のものは一時停止のままです。} other {#件のオートメーションを復元しました。一時停止中のものは一時停止のままです。}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {Restored # automation} other {Restored # automations}}"
+msgstr "{0, plural, one {#件のオートメーションを復元しました} other {#件のオートメーションを復元しました}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -2928,6 +2930,9 @@ msgstr "{name} をアーカイブしますか？"
 msgid "Archive #{0}?"
 msgstr "#{0} をアーカイブしますか？"
 
+msgid "Archive automation"
+msgstr "オートメーションをアーカイブ"
+
 msgid "Archive channel"
 msgstr "チャンネルをアーカイブ"
 
@@ -2936,6 +2941,9 @@ msgstr "環境をアーカイブ"
 
 msgid "Archive failed"
 msgstr "アーカイブに失敗しました"
+
+msgid "Archive this automation before you delete it."
+msgstr "削除する前に、このオートメーションをアーカイブしてください。"
 
 msgid "Archive workspace"
 msgstr "ワークスペースをアーカイブ"
@@ -2947,6 +2955,10 @@ msgstr "アーカイブ済み"
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
 msgstr "アーカイブ済み · {0}"
+
+#. placeholder {0}: only.name
+msgid "Archived \"{0}\""
+msgstr "「{0}」をアーカイブしました"
 
 #. placeholder {0}: formatCompactRelativeTime(workspace.deletedAt, now)
 msgid "Archived {0}"
@@ -6607,6 +6619,10 @@ msgstr "委任"
 msgid "Delete"
 msgstr "削除"
 
+#. placeholder {0}: only.name
+msgid "Delete \"{0}\" permanently?"
+msgstr "「{0}」を完全に削除しますか？"
+
 #. placeholder {0}: target.name
 msgid "Delete \"{0}\"? This removes its worktree from the host."
 msgstr "「{0}」を削除しますか?ホストからワークツリーが削除されます。"
@@ -6652,12 +6668,6 @@ msgstr "それでも削除"
 
 msgid "Delete anyway will skip the teardown script entirely."
 msgstr "「それでも削除」はティアダウンスクリプトを完全にスキップします。"
-
-msgid "Delete automation"
-msgstr "オートメーションを削除"
-
-msgid "Delete automation?"
-msgstr "オートメーションを削除しますか?"
 
 #. placeholder {0}: index + 1
 msgid "Delete command {0}"
@@ -6771,6 +6781,10 @@ msgctxt "github release action"
 msgid "Deleted"
 msgstr "削除"
 
+#. placeholder {0}: only.name
+msgid "Deleted \"{0}\""
+msgstr "「{0}」を削除しました"
+
 msgid "Deleted \"{deletedName}\""
 msgstr "「{deletedName}」を削除しました"
 
@@ -6831,9 +6845,6 @@ msgstr "{1}件中{0}件を削除中…"
 
 msgid "Deleting {name}..."
 msgstr "{name}を削除中..."
-
-msgid "Deleting automation..."
-msgstr "オートメーションを削除中..."
 
 msgid "Deleting organization..."
 msgstr "組織を削除中..."
@@ -8003,6 +8014,9 @@ msgstr "エージェントの追加に失敗しました"
 msgid "Failed to add member"
 msgstr "メンバーの追加に失敗しました"
 
+msgid "Failed to archive automation"
+msgstr "オートメーションをアーカイブできませんでした"
+
 msgid "Failed to cancel invitation"
 msgstr "招待のキャンセルに失敗しました"
 
@@ -8299,6 +8313,9 @@ msgstr "デーモンの再起動に失敗しました"
 
 msgid "Failed to restore"
 msgstr "復元できませんでした"
+
+msgid "Failed to restore automation"
+msgstr "オートメーションを復元できませんでした"
 
 msgid "Failed to restore defaults"
 msgstr "デフォルトの復元に失敗しました"
@@ -12140,6 +12157,9 @@ msgstr "エージェントはまだありません。"
 msgid "No API keys yet."
 msgstr "APIキーはまだありません。"
 
+msgid "No archived automations"
+msgstr "アーカイブ済みのオートメーションはありません"
+
 msgid "No archived workspaces"
 msgstr "アーカイブ済みのワークスペースはありません"
 
@@ -13187,8 +13207,8 @@ msgstr "このオートメーションを実行できるのは所有者のみで
 msgid "Only the owner can view prompt history"
 msgstr "プロンプト履歴を表示できるのは所有者のみです"
 
-msgid "Only the owner or an organization owner can delete this automation"
-msgstr "このオートメーションを削除できるのは所有者または組織のオーナーのみです"
+msgid "Only the owner or an organization owner can archive this automation"
+msgstr "このオートメーションをアーカイブできるのは、所有者または組織のオーナーのみです"
 
 msgid "Only the people listed above can open it"
 msgstr "上記のメンバーだけが開けます"
@@ -16065,6 +16085,9 @@ msgstr "復元"
 msgid "Restore {0} to defaults?"
 msgstr "{0}をデフォルトに戻しますか?"
 
+msgid "Restore automation"
+msgstr "オートメーションを復元"
+
 msgid "Restore default"
 msgstr "デフォルトを復元"
 
@@ -16077,6 +16100,12 @@ msgstr "プランを復元"
 msgid "restore the agent defaults"
 msgstr "エージェントの既定値を復元する"
 
+msgid "Restore this automation to run it"
+msgstr "実行するには、このオートメーションを復元してください"
+
+msgid "Restore this automation to view prompt history"
+msgstr "プロンプト履歴を表示するには、このオートメーションを復元してください"
+
 msgid "Restore this version?"
 msgstr "このバージョンを復元しますか?"
 
@@ -16088,6 +16117,14 @@ msgstr "ワークスペースを復元"
 
 msgid "Restored"
 msgstr "復元済み"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\""
+msgstr "「{0}」を復元しました"
+
+#. placeholder {0}: only.name
+msgid "Restored \"{0}\". It is paused."
+msgstr "「{0}」を復元しました。一時停止中です。"
 
 msgid "Restored \"{projectName}\""
 msgstr "「{projectName}」を復元しました"
@@ -19068,6 +19105,9 @@ msgstr "ページを見ているエージェントが各コメントを読み、
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "アプリは{appVersion}ですが、別のもの（古いCLIや別のParadevビルドの可能性）が起動したホストサービスに接続しています。再起動するとこのアプリのコピーに置き換わります。"
 
+msgid "The automation and its run history are removed. This can't be undone."
+msgstr "オートメーションとその実行履歴が削除されます。この操作は元に戻せません。"
+
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "このオートメーションの所有者は、この組織でクラウドワークスペースを使用できなくなりました。所有者にアクセス権の確認を依頼するか、デバイス上でオートメーションを実行してください。"
 
@@ -19435,9 +19475,6 @@ msgstr "これらのフォルダにはファイルが残っていますが、新
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
 
-msgid "They will stop firing and their run history will be removed. This can't be undone."
-msgstr "実行されなくなり、実行履歴も削除されます。この操作は取り消せません。"
-
 msgid "Thinking"
 msgstr "思考"
 
@@ -19489,6 +19526,12 @@ msgstr "このオートメーションは {0} に属しています。開くに�
 
 msgid "This automation has no instructions yet. Write a prompt in its settings before running it."
 msgstr "このオートメーションにはまだ指示がありません。実行する前に設定でプロンプトを記述してください。"
+
+msgid "This automation is archived. It does not run."
+msgstr "このオートメーションはアーカイブ済みです。実行されません。"
+
+msgid "This automation is archived. Restore it first."
+msgstr "このオートメーションはアーカイブ済みです。先に復元してください。"
 
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"

@@ -2553,15 +2553,48 @@ cat ./prompt.md | superset automations prompt set aut_… --from-file -
 </Command>
 
 <Command
+	name="superset automations archive <id>"
+	args={[
+		{ name: "id", required: true, description: "Automation ID." },
+	]}
+	output={`{ ok: true }`}
+>
+Archive an automation. It stops firing and leaves `automations list`; its run
+history stays.
+
+```bash
+superset automations archive aut_…
+```
+</Command>
+
+<Command
+	name="superset automations unarchive <id>"
+	args={[
+		{ name: "id", required: true, description: "Automation ID." },
+	]}
+	output={`{ ok: true }`}
+>
+Restore an archived automation. It comes back paused; run `automations resume`
+to start it. `restore` is an alias.
+
+```bash
+superset automations list --archived
+superset automations unarchive aut_…
+```
+</Command>
+
+<Command
 	name="superset automations delete <id>"
 	args={[
 		{ name: "id", required: true, description: "Automation ID." },
 	]}
 	output={`{ ok: true }`}
 >
-Delete an automation.
+Permanently delete an archived automation and its run history. This can't be
+undone. Archive the automation first; an active automation is refused.
 
 ```bash
+superset automations archive aut_…
 superset automations delete aut_…
 ```
 </Command>
