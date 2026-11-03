@@ -33,6 +33,7 @@ export type ChatRuntimeOptions = {
 	bootstrapLimit?: number;
 	dedupeCapacity?: number;
 	onSessionChanged?: ChatJournalOptions["onSessionChanged"];
+	onAppend?: ChatJournalOptions["onAppend"];
 	usageLimitGraceMs?: number;
 };
 
@@ -58,6 +59,7 @@ export function createChatRuntime(options: ChatRuntimeOptions): ChatRuntime {
 	});
 	const journal = new ChatJournal(db, {
 		onSessionChanged: options.onSessionChanged,
+		onAppend: options.onAppend,
 	});
 	const sessions = new ChatSessionStore(db);
 	const subagentItems = new SubagentItems(db);

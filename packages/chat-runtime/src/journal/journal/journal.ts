@@ -5,10 +5,11 @@ import type {
 	SessionStatus,
 } from "@superset/chat/protocol";
 import { durableEventSchema } from "@superset/chat/protocol";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { ChatDb } from "../../db";
 import { chatJournal } from "../../db";
 import {
+	insertSessionRow,
 	readSessionRow,
 	removeSessionRow,
 	setHarnessSessionId,
@@ -16,7 +17,7 @@ import {
 } from "../../projection";
 import { readSince } from "../../replay";
 import type { ChatSessionInit } from "../epoch";
-import { openEpoch } from "../epoch";
+import { mintEpoch, openEpoch } from "../epoch";
 
 export type OpenedSession = {
 	sessionId: string;
@@ -33,6 +34,16 @@ export type ChatSessionChange = {
 
 export type ChatJournalOptions = {
 	onSessionChanged?: (change: ChatSessionChange) => void | Promise<void>;
+	/** Every durable event appended on this host, once it is written. Imported events are not reported. */
+	onAppend?: (envelope: DurableEnvelope) => void;
+};
+
+/** A chat recorded elsewhere, with each event at the seq it first appeared at. */
+export type ImportedSession = {
+	session: ChatSessionInit & { lastSeq: number };
+	events: readonly { seq: number; event: DurableEvent }[];
+	/** Overwrites a journal this host already has, as when a chat moves back. */
+	replace?: boolean;
 };
 
 function reportListenerFailure(error: unknown): void {
@@ -120,13 +131,125 @@ export class ChatJournal {
 		cache.queuedItemIds = next.queuedItemIds;
 		if (listingChanged) this.notify(sessionId, cache.scopeId, ts);
 
-		return {
+		const envelope: DurableEnvelope = {
 			v: 1,
 			sessionId,
 			cursor: { epoch: cache.epoch, seq },
 			ts,
 			event: parsed,
 		};
+		try {
+			this.options.onAppend?.(envelope);
+		} catch (error) {
+			console.error("[chat-journal] onAppend listener failed", error);
+		}
+		return envelope;
+	}
+
+	/**
+	 * Writes a chat recorded on another host under a new epoch. Each event
+	 * sits at the seq it first appeared at with its latest body, which keeps
+	 * the order a chat shows but not the source's cursors, so a client that
+	 * read the chat before reads it again in full. The session state goes at
+	 * the source's last seq, so the next append continues after it. Returns
+	 * false, writing nothing, when the session already has a journal and
+	 * `replace` is not set.
+	 */
+	importSession({ session, events, replace }: ImportedSession): boolean {
+		const existing = readSessionRow(this.db, session.sessionId);
+		if (
+			!replace &&
+			existing &&
+			this.hasJournal(session.sessionId, existing.epoch)
+		) {
+			return false;
+		}
+
+		const epoch = mintEpoch();
+		const now = Date.now();
+		const status = session.status ?? "idle";
+		const sessionEvent = durableEventSchema.parse({
+			type: "session",
+			session: {
+				status,
+				harness: session.harness,
+				...(session.title ? { title: session.title } : {}),
+				...(session.harnessSessionId
+					? { harnessSessionId: session.harnessSessionId }
+					: {}),
+			},
+		});
+		const taken = new Set(events.map((row) => row.seq));
+		const rows = [
+			...events.map((row) => ({
+				seq: row.seq,
+				event: durableEventSchema.parse(row.event),
+			})),
+			...(session.lastSeq > 0 && !taken.has(session.lastSeq)
+				? [{ seq: session.lastSeq, event: sessionEvent }]
+				: []),
+		];
+		const queued = new Set<string>();
+		for (const { event } of rows) {
+			if (event.type !== "item" || event.item.kind !== "user_message") continue;
+			if ("queued" in event.item && event.item.queued === true) {
+				queued.add(event.item.id);
+			} else {
+				queued.delete(event.item.id);
+			}
+		}
+
+		this.db.transaction(() => {
+			if (existing) removeSessionRow(this.db, session.sessionId);
+			this.db
+				.delete(chatJournal)
+				.where(eq(chatJournal.sessionId, session.sessionId))
+				.run();
+			insertSessionRow(this.db, {
+				sessionId: session.sessionId,
+				scopeId: session.scopeId,
+				harness: session.harness,
+				harnessSessionId: session.harnessSessionId ?? null,
+				epoch,
+				status,
+				title: session.title ?? null,
+				queuedCount: queued.size,
+				updatedAt: now,
+				closedAt: null,
+			});
+			for (const row of rows) {
+				this.db
+					.insert(chatJournal)
+					.values({
+						sessionId: session.sessionId,
+						epoch,
+						seq: row.seq,
+						ts: now,
+						eventJson: JSON.stringify(row.event),
+					})
+					.run();
+			}
+		});
+
+		this.sessions.delete(session.sessionId);
+		this.notify(session.sessionId, session.scopeId, now);
+		return true;
+	}
+
+	private hasJournal(sessionId: string, epoch: string): boolean {
+		return (
+			this.db
+				.select({ seq: chatJournal.seq })
+				.from(chatJournal)
+				.where(
+					and(
+						eq(chatJournal.sessionId, sessionId),
+						eq(chatJournal.epoch, epoch),
+					),
+				)
+				.limit(1)
+				.get() !== undefined
+		);
 	}
 
 	cursor(sessionId: string): Cursor {

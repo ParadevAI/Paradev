@@ -40,5 +40,14 @@ export const chatSessionsLocal = sqliteTable(
 	(table) => [index("chat_sessions_local_scope_id_idx").on(table.scopeId)],
 );
 
+/** How far a session's journal has been pushed to the cloud, per epoch. */
+export const chatSyncState = sqliteTable("chat_sync_state", {
+	sessionId: text("session_id").primaryKey(),
+	epoch: text().notNull(),
+	pushedSeq: integer("pushed_seq").notNull().default(0),
+	updatedAt: integer("updated_at").notNull(),
+});
+
 export type JournalRow = typeof chatJournal.$inferSelect;
+export type SyncStateRow = typeof chatSyncState.$inferSelect;
 export type ChatSessionRow = typeof chatSessionsLocal.$inferSelect;
