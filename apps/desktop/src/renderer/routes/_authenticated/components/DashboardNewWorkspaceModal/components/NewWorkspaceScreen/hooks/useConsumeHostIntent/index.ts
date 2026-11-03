@@ -1,0 +1,1 @@
+export { useConsumeHostIntent } from "./useConsumeHostIntent";
