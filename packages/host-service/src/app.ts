@@ -337,7 +337,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
 	});
 
-	const chatSync = createChatSync({ runtime: () => chatV3.runtime(), api });
+	const chatSync = createChatSync({
+		runtime: () => chatV3.existingRuntime(),
+		api,
+	});
 	const runtime = {
 		agentJobs,
 		filesystem,
