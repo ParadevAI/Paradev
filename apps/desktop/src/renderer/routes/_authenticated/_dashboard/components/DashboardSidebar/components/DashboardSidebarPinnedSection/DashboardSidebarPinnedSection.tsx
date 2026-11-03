@@ -75,6 +75,11 @@ export function DashboardSidebarPinnedSection({
 			/>
 		));
 	const hasPinnedPages = pinnedPages.length > 0;
+	// Snapshotted like `emptyAtPickup`: pages that load or drop out mid-drag
+	// must not mount or unmount the section under the pointer.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: hasPinnedPages is read at that moment on purpose
+	const pagesAtPickup = useMemo(() => hasPinnedPages, [isDraggingWorkspace]);
+	const showsPinnedPages = isDraggingWorkspace ? pagesAtPickup : hasPinnedPages;
 
 	if (isCollapsed) {
 		if (pinnedWorkspaces.length === 0 && !hasPinnedPages) return null;
@@ -123,7 +128,7 @@ export function DashboardSidebarPinnedSection({
 	);
 	const isFloatingDropZone = pinnedItems.length === 0 && emptyAtPickup;
 
-	if (isFloatingDropZone && !hasPinnedPages) {
+	if (isFloatingDropZone && !showsPinnedPages) {
 		return floatingDropZone;
 	}
 
@@ -179,7 +184,7 @@ export function DashboardSidebarPinnedSection({
 							})}
 						/>
 					)}
-				{!isSectionCollapsed && hasPinnedPages && (
+				{!isSectionCollapsed && showsPinnedPages && (
 					<div className="flex flex-col gap-px px-2">
 						{renderPageRows(false)}
 					</div>
