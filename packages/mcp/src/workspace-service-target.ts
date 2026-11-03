@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { McpContext } from "./auth";
+import type { PersonMcpContext } from "./auth";
 import { createMcpCaller } from "./caller";
 import {
 	HostServiceUnreachableError,
@@ -24,7 +24,7 @@ export const workspaceLocationInput = {
  */
 export async function requireCloudUnlessHost(
 	input: { hostId?: string },
-	ctx: McpContext,
+	ctx: PersonMcpContext,
 ): Promise<void> {
 	if (input.hostId) return;
 	const { available } = await createMcpCaller(ctx).cloudWorkspace.available();
@@ -45,7 +45,7 @@ export async function requireCloudUnlessHost(
  */
 export async function workspaceServiceCall<TOutput>(
 	input: { hostId?: string; workspaceId: string },
-	ctx: McpContext,
+	ctx: PersonMcpContext,
 	procedure: string,
 	method: "query" | "mutation",
 	payload?: unknown,

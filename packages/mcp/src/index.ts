@@ -1,8 +1,14 @@
-export type { McpContext } from "./auth";
+export type {
+	DevMcpContext,
+	McpCallerKind,
+	McpContext,
+	PersonMcpContext,
+} from "./auth";
 export {
 	isMcpUnauthorized,
 	McpUnauthorizedError,
 	resolveMcpContext,
+	resolvePersonMcpContext,
 } from "./auth";
 export { createMcpCaller } from "./caller";
 export type { McpToolCallEmitter, McpToolCallEvent } from "./define-tool";

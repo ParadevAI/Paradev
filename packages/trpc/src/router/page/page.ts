@@ -504,6 +504,13 @@ export const pageRouter = {
 			if (!caller.reader && (input.pageId || input.workspaceId)) {
 				throw noPageAccess();
 			}
+			if (ctx.principal.kind === "dev" && input.visibility === "everyone") {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message:
+						"A Dev can't make a page public. Use visibility org or just_me.",
+				});
+			}
 			return await publishPage({
 				input,
 				organizationId: caller.organizationId,

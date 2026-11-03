@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import type { Client } from "@modelcontextprotocol/client";
 import type { WebClient } from "@slack/web-api";
 import { env } from "@/env";
 import { DEFAULT_SLACK_MODEL } from "../../../constants";
@@ -616,7 +616,7 @@ Context gathering:
 - Use slack_get_channel_history to read recent channel messages for additional context
 - Don't ask the user for context you can find yourself - be proactive`;
 
-type McpRequestOptions = NonNullable<Parameters<Client["callTool"]>[2]>;
+type McpRequestOptions = NonNullable<Parameters<Client["callTool"]>[1]>;
 
 async function fetchAgentContext({
 	mcpClient,
@@ -630,19 +630,13 @@ async function fetchAgentContext({
 	const [membersResult, statusesResult, hostsResult] = await Promise.all([
 		mcpClient.callTool(
 			{ name: "organization_members_list", arguments: {} },
-			undefined,
 			requestOptions(),
 		),
 		mcpClient.callTool(
 			{ name: "tasks_statuses_list", arguments: {} },
-			undefined,
 			requestOptions(),
 		),
-		mcpClient.callTool(
-			{ name: "hosts_list", arguments: {} },
-			undefined,
-			requestOptions(),
-		),
+		mcpClient.callTool({ name: "hosts_list", arguments: {} }, requestOptions()),
 	]);
 
 	const sections: string[] = [];
@@ -1038,7 +1032,6 @@ ${agentContext}`;
 						) {
 							result = await supersetMcp.callTool(
 								{ name: toolName, arguments: input },
-								undefined,
 								mcpRequestOptions(),
 							);
 						} else if (pluginSet && PLUGIN_SLACK_TOOLS[prefix]?.has(toolName)) {

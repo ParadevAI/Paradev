@@ -1,13 +1,32 @@
 import { auth, type Session } from "@superset/auth/server";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
-import { createCaller as makeAppCaller } from "@superset/trpc";
-import type { McpContext } from "./auth";
+import {
+	createCaller as makeAppCaller,
+	TURN_TOKEN_HEADER,
+} from "@superset/trpc";
+import type { DevMcpContext, McpContext, PersonMcpContext } from "./auth";
 
 export type McpCaller = ReturnType<typeof makeAppCaller>;
 
+/** A tRPC server-side caller acting as whoever called the MCP server. */
+export function createMcpCaller(ctx: McpContext): McpCaller {
+	return ctx.kind === "dev" ? devCaller(ctx) : personCaller(ctx);
+}
+
+/** The turn token goes on as-is; `actorProcedure` checks it on every call. */
+function devCaller(ctx: DevMcpContext): McpCaller {
+	return makeAppCaller({
+		session: null,
+		auth,
+		headers: new Headers({ [TURN_TOKEN_HEADER]: ctx.turnToken }),
+		client: null,
+		agentCaller: { transport: "mcp", label: ctx.clientLabel },
+		sandboxCaller: null,
+		sandboxWorkspaceId: null,
+	});
+}
+
 /**
- * Build a tRPC server-side caller for the AppRouter scoped to an MCP context.
- *
  * Synthesizes the same shape `apps/api/src/trpc/context.ts` produces for HTTP
  * requests, so `personProcedure` accepts it:
  * - `session` carries `user.id` + `session.activeOrganizationId`.
@@ -18,7 +37,7 @@ export type McpCaller = ReturnType<typeof makeAppCaller>;
  * The minted JWT is reused across all calls in this request — the caller is
  * cheap to construct and tools call only one procedure each.
  */
-export function createMcpCaller(ctx: McpContext): McpCaller {
+function personCaller(ctx: PersonMcpContext): McpCaller {
 	const headers = new Headers();
 	headers.set("authorization", `Bearer ${ctx.bearerToken}`);
 	headers.set(ORGANIZATION_HEADER, ctx.organizationId);

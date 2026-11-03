@@ -500,7 +500,7 @@ describe("agent loop", () => {
 		create.mockImplementationOnce(async () => toolResponse());
 		await runSlackAgent({ ...params, deadline: Date.now() + 30_000 });
 		const timeouts = callTool.mock.calls.map(
-			(call) => (call[2] as { timeout?: number } | undefined)?.timeout,
+			(call) => (call[1] as { timeout?: number } | undefined)?.timeout,
 		);
 		expect(timeouts.length).toBeGreaterThanOrEqual(4);
 		for (const timeout of timeouts) {
