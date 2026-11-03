@@ -1,11 +1,15 @@
 import { afterAll, afterEach, describe, expect, mock, test } from "bun:test";
-// Snapshot the real module BEFORE mock.module: bun module mocks are process-wide,
-// so a partial replacement breaks other test files that import e.g. execFileSync.
-import * as realChildProcess from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { ApiClient } from "../api-client";
+import { getSupersetConfigPath } from "../config";
+import { hostServiceLogPath } from "./manifest";
+import {
+	describeHostExit,
+	type SpawnHostOptions,
+	spawnHostService,
+} from "./spawn";
 
 const originalFetch = globalThis.fetch;
 const originalSupersetHomeDir = process.env.SUPERSET_HOME_DIR;
@@ -46,13 +50,9 @@ const spawnMock = mock(
 	},
 );
 
-mock.module("node:child_process", () => ({
-	...realChildProcess,
-	spawn: spawnMock,
-}));
-
-const { SUPERSET_CONFIG_PATH } = await import("../config");
-const { describeHostExit, spawnHostService } = await import("./spawn");
+function spawnHost(options: SpawnHostOptions) {
+	return spawnHostService(options, spawnMock as never);
+}
 
 function createApi(): ApiClient {
 	return {
@@ -90,7 +90,7 @@ describe("spawnHostService", () => {
 		process.env.SUPERSET_HOST_BIN = join(tempHome, "missing-host");
 		try {
 			await expect(
-				spawnHostService({
+				spawnHost({
 					organizationId: "00000000-0000-0000-0000-000000000001",
 					sessionToken: "session-token",
 					api: createApi(),
@@ -108,18 +108,43 @@ describe("spawnHostService", () => {
 		process.env.SUPERSET_CLI_CHANNEL = "desktop-bundled";
 		try {
 			await expect(
-				spawnHostService({
+				spawnHost({
 					organizationId: "00000000-0000-0000-0000-000000000001",
 					sessionToken: "session-token",
 					api: createApi(),
 					port: 54879,
 					daemon: true,
 				}),
-			).rejects.toThrow(/bundled with the Superset desktop app/);
+			).rejects.toThrow(/bundled with the Paradev desktop app/);
 		} finally {
 			process.env.SUPERSET_HOST_BIN = hostBin;
 			delete process.env.SUPERSET_CLI_CHANNEL;
 		}
+	});
+
+	test("stops the host when the manifest cannot be written", async () => {
+		const organizationId = "00000000-0000-0000-0000-000000000002";
+		const manifestDir = dirname(hostServiceLogPath(organizationId));
+		mkdirSync(dirname(manifestDir), { recursive: true });
+		writeFileSync(manifestDir, "");
+		globalThis.fetch = mock(
+			async () => new Response("ok", { status: 200 }),
+		) as unknown as typeof fetch;
+
+		await expect(
+			spawnHost({
+				organizationId,
+				sessionToken: "session-token",
+				api: createApi(),
+				port: 54879,
+				daemon: false,
+			}),
+		).rejects.toThrow();
+
+		const child = spawnMock.mock.results[0]?.value as {
+			kill: ReturnType<typeof mock>;
+		};
+		expect(child.kill).toHaveBeenCalledWith("SIGTERM");
 	});
 
 	test("passes SUPERSET_AUTH_CONFIG_PATH when provided", async () => {
@@ -127,18 +152,19 @@ describe("spawnHostService", () => {
 			async () => new Response("ok", { status: 200 }),
 		) as unknown as typeof fetch;
 
-		await spawnHostService({
+		await spawnHost({
 			organizationId: "00000000-0000-0000-0000-000000000001",
 			sessionToken: "session-token",
-			authConfigPath: SUPERSET_CONFIG_PATH,
+			authConfigPath: getSupersetConfigPath(),
 			api: createApi(),
 			port: 54879,
 			daemon: true,
 		});
 
+		expect(spawnCalls[0]?.options.env?.SUPERSET_HOST_AUTO_UPDATE).toBe("false");
 		expect(spawnMock).toHaveBeenCalledTimes(1);
 		expect(spawnCalls[0]?.options.env?.SUPERSET_AUTH_CONFIG_PATH).toBe(
-			SUPERSET_CONFIG_PATH,
+			getSupersetConfigPath(),
 		);
 		expect(spawnCalls[0]?.options.env?.AUTH_TOKEN).toBe("session-token");
 	});
@@ -148,7 +174,7 @@ describe("spawnHostService", () => {
 			async () => new Response("ok", { status: 200 }),
 		) as unknown as typeof fetch;
 
-		const { exited } = await spawnHostService({
+		const { exited } = await spawnHost({
 			organizationId: "00000000-0000-0000-0000-000000000001",
 			sessionToken: "session-token",
 			api: createApi(),
@@ -169,4 +195,19 @@ describe("spawnHostService", () => {
 		expect(describeHostExit(exit)).toBe("killed by SIGSEGV");
 		expect(describeHostExit({ code: 3, signal: null })).toBe("exit code 3");
 	});
+});
+
+test("passes the auto-update opt-in to the host", async () => {
+	globalThis.fetch = mock(
+		async () => new Response("ok"),
+	) as unknown as typeof fetch;
+	await spawnHost({
+		organizationId: "00000000-0000-0000-0000-000000000001",
+		sessionToken: "session-token",
+		api: createApi(),
+		port: 54879,
+		daemon: true,
+		autoUpdate: true,
+	});
+	expect(spawnCalls[0]?.options.env?.SUPERSET_HOST_AUTO_UPDATE).toBe("true");
 });

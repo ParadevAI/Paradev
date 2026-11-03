@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { SessionStatus } from "@superset/chat/protocol";
 import type { ChatDb } from "../../db";
 import {
 	insertSessionRow,
@@ -12,7 +13,7 @@ export type ChatSessionInit = {
 	scopeId: string;
 	harness: string;
 	harnessSessionId?: string | null;
-	status?: string;
+	status?: SessionStatus;
 	title?: string | null;
 };
 
@@ -40,6 +41,7 @@ export function openEpoch(db: ChatDb, init: ChatSessionInit): OpenedEpoch {
 			title: init.title ?? null,
 			queuedCount: 0,
 			updatedAt: Date.now(),
+			closedAt: null,
 		});
 		return { epoch, minted: true };
 	}

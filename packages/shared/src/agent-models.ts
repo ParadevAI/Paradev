@@ -82,6 +82,11 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 		provider: "Anthropic",
 	},
 	{ id: "anthropic/claude-fable-5", label: "Fable 5", provider: "Anthropic" },
+	{
+		id: "anthropic/claude-sonnet-5-5",
+		label: "Sonnet 5.5",
+		provider: "Anthropic",
+	},
 	{ id: "anthropic/claude-sonnet-5", label: "Sonnet 5", provider: "Anthropic" },
 	{
 		id: "anthropic/claude-sonnet-4-6",
@@ -93,6 +98,7 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 		label: "Haiku 4.5",
 		provider: "Anthropic",
 	},
+	{ id: "openai/gpt-6.1-sol", label: "GPT-6.1 Sol", provider: "OpenAI" },
 	{ id: "openai/gpt-6-astra", label: "GPT-6 Astra", provider: "OpenAI" },
 	{ id: "openai/gpt-6-sol", label: "GPT-6 Sol", provider: "OpenAI" },
 	{ id: "openai/gpt-6-luna", label: "GPT-6 Luna", provider: "OpenAI" },
@@ -111,8 +117,6 @@ const PINNED_GROUP = "Pinned releases";
 const CURSOR_ANTHROPIC_GROUP = "Anthropic";
 const CURSOR_OPENAI_GROUP = "OpenAI";
 const CURSOR_OTHER_GROUP = "Other";
-const CURRENT_GROUP = "Current";
-const CODEX_RETIRING_GROUP = "Retiring 2026-10-14";
 
 export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 	{
@@ -131,6 +135,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "claude-fable-5", label: "Fable 5", group: PINNED_GROUP },
 			{ id: "claude-opus-5-5", label: "Opus 5.5", group: PINNED_GROUP },
 			{ id: "claude-opus-5", label: "Opus 5", group: PINNED_GROUP },
+			{ id: "claude-sonnet-5-5", label: "Sonnet 5.5", group: PINNED_GROUP },
 			{ id: "claude-sonnet-5", label: "Sonnet 5", group: PINNED_GROUP },
 			{ id: "claude-opus-4-8", label: "Opus 4.8", group: PINNED_GROUP },
 			{ id: "claude-opus-4-7", label: "Opus 4.7", group: PINNED_GROUP },
@@ -144,17 +149,16 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		presetId: "codex",
 		modelFlag: "--model",
 		models: [
-			// Availability is account-dependent; ids are verified against Codex's
-			// live catalog (`codex app-server` → `model/list`).
-			{ id: "gpt-6-astra", label: "GPT-6 Astra", group: CURRENT_GROUP },
-			{ id: "gpt-6-sol", label: "GPT-6 Sol", group: CURRENT_GROUP },
-			{ id: "gpt-6-luna", label: "GPT-6 Luna", group: CURRENT_GROUP },
-			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol", group: CURRENT_GROUP },
-			{ id: "gpt-5.6-terra", label: "GPT-5.6 Terra", group: CURRENT_GROUP },
-			{ id: "gpt-5.6-luna", label: "GPT-5.6 Luna", group: CURRENT_GROUP },
-			// Superseded by the GPT-6 family; the header dates the retirement
-			// so it reaches the person picking rather than only this file.
-			{ id: "gpt-5.5", label: "GPT-5.5", group: CODEX_RETIRING_GROUP },
+			// Availability is account-dependent; ids and order follow Codex's
+			// live catalog (`codex app-server` → `model/list`, codex 0.162.1).
+			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol" },
+			{ id: "gpt-6-astra", label: "GPT-6 Astra" },
+			{ id: "gpt-6.1-terra", label: "GPT-6.1 Terra" },
+			{ id: "gpt-6-sol", label: "GPT-6 Sol" },
+			{ id: "gpt-6-luna", label: "GPT-6 Luna" },
+			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol" },
+			{ id: "gpt-5.6-terra", label: "GPT-5.6 Terra" },
+			{ id: "gpt-5.6-luna", label: "GPT-5.6 Luna" },
 		],
 	},
 	{
@@ -168,6 +172,22 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		],
 	},
 	{
+		presetId: "agy",
+		modelFlag: "--model",
+		models: [
+			// Family ids; `--effort` picks the level. The catalog is
+			// account-dependent and agy rejects ids the account lacks. Verified
+			// against `agy models` (agy 1.4.10, 2026-10-29) except Gemini 4 Argon,
+			// whose family and level ids ship in the binary but need a plan that
+			// includes it.
+			{ id: "gemini-4-argon", label: "Gemini 4 Argon" },
+			{ id: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+			{ id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+			{ id: "claude-opus-4-6-thinking", label: "Claude Opus 4.6" },
+			{ id: "gpt-oss-120b", label: "GPT-OSS 120B" },
+		],
+	},
+	{
 		presetId: "copilot",
 		modelFlag: "--model",
 		models: [
@@ -175,6 +195,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "claude-opus-5.5", label: "Claude Opus 5.5" },
 			{ id: "claude-opus-5", label: "Claude Opus 5" },
 			{ id: "claude-fable-5.1", label: "Claude Fable 5.1" },
+			{ id: "claude-sonnet-5.5", label: "Claude Sonnet 5.5" },
 			{ id: "claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "claude-sonnet-4.6", label: "Claude Sonnet 4.6" },
 			{ id: "claude-haiku-4.5", label: "Claude Haiku 4.5" },
@@ -267,6 +288,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "gpt-5.4-medium", label: "GPT-5.4", group: CURSOR_OPENAI_GROUP },
 			{ id: "gpt-5.3-codex", label: "Codex 5.3", group: CURSOR_OPENAI_GROUP },
 			{
+				id: "gemini-4-argon-high",
+				label: "Gemini 4 Argon",
+				group: CURSOR_OTHER_GROUP,
+			},
+			{
 				id: "gemini-3.8-flash-high",
 				label: "Gemini 3.8 Flash",
 				group: CURSOR_OTHER_GROUP,
@@ -297,6 +323,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// models.dev directly (2026-09-01), the gpt-6 family likewise
 			// (2026-09-23).
 			{ id: "anthropic/claude-opus-5-5", label: "Claude Opus 5.5" },
+			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
@@ -325,6 +352,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "@slow", label: "Configured slow model" },
 			{ id: "@plan", label: "Configured plan model" },
 			{ id: "anthropic/claude-opus-5-5", label: "Claude Opus 5.5" },
+			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
@@ -339,6 +367,17 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "openai-codex/gpt-5.6-sol", label: "GPT-5.6 Sol" },
 			{ id: "openai-codex/gpt-5.6-terra", label: "GPT-5.6 Terra" },
 			{ id: "openai-codex/gpt-5.6-luna", label: "GPT-5.6 Luna" },
+		],
+	},
+	{
+		presetId: "pdev",
+		modelFlag: "--model",
+		models: [
+			{ id: "pdev/auto", label: "Auto" },
+			{ id: "pdev/claude", label: "Claude" },
+			{ id: "pdev/fun", label: "Fun" },
+			{ id: "pdev/writing", label: "Writing" },
+			{ id: "pdev/free", label: "Free" },
 		],
 	},
 	{
@@ -369,9 +408,8 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 export interface AgentEffortOption extends AgentModelOption {
 	/**
 	 * Model ids that accept this effort, when only some do. Absent means every
-	 * model the agent offers takes it. Codex's two top levels arrived with
-	 * GPT-5.6 and the models below it reject them, so the picker only offers
-	 * them next to a model that has them.
+	 * model the agent offers takes it. Codex's `ultra` is missing on its Luna
+	 * models, so the picker only offers it next to a model that has it.
 	 */
 	models?: readonly string[];
 }
@@ -397,6 +435,11 @@ export interface AgentEffortSupport {
 	 * offer an effort at all.
 	 */
 	modelVariants?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+	/**
+	 * Offer effort only next to a curated model. The agent's own default model
+	 * is unknown here and may reject the flag (agy's Claude models do).
+	 */
+	requiresModel?: boolean;
 }
 
 export interface AgentModeOption extends AgentModelOption {
@@ -512,6 +555,11 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 		["low", "medium", "high", "xhigh"],
 		{ medium: "gpt-5.3-codex" },
 	),
+	"gemini-4-argon-high": cursorEffortVariants("gemini-4-argon", [
+		"low",
+		"medium",
+		"high",
+	]),
 	"gemini-3.8-flash-high": cursorEffortVariants("gemini-3.8-flash", [
 		"low",
 		"medium",
@@ -526,6 +574,8 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 	"kimi-k3-max": cursorEffortVariants("kimi-k3", ["low", "high", "max"]),
 	"glm-5.2-high": cursorEffortVariants("glm-5.2", ["high", "max"]),
 };
+
+const AGY_EFFORT_MODELS = ["gemini-4-argon", "gemini-3.8-flash"] as const;
 
 const PI_THINKING_LEVELS: AgentModelOption[] = [
 	{ id: "off", label: "Off" },
@@ -577,24 +627,19 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 			{ id: "medium", label: "Medium" },
 			{ id: "high", label: "High" },
 			{ id: "xhigh", label: "xHigh" },
-			// Per-model support comes from Codex's live model catalog. GPT-6
-			// Astra and Sol support `ultra`; GPT-6 Luna supports up to `max`.
-			{
-				id: "max",
-				label: "Max",
-				models: [
-					"gpt-6-astra",
-					"gpt-6-sol",
-					"gpt-6-luna",
-					"gpt-5.6-sol",
-					"gpt-5.6-terra",
-					"gpt-5.6-luna",
-				],
-			},
+			{ id: "max", label: "Max" },
+			// The Luna models stop at `max` (Codex's live model catalog).
 			{
 				id: "ultra",
 				label: "Ultra",
-				models: ["gpt-6-astra", "gpt-6-sol", "gpt-5.6-sol", "gpt-5.6-terra"],
+				models: [
+					"gpt-6.1-sol",
+					"gpt-6-astra",
+					"gpt-6.1-terra",
+					"gpt-6-sol",
+					"gpt-5.6-sol",
+					"gpt-5.6-terra",
+				],
 			},
 		],
 	},
@@ -618,6 +663,22 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 		presetId: "omp",
 		effortFlag: "--thinking",
 		efforts: [...PI_THINKING_LEVELS],
+	},
+	{
+		presetId: "pdev",
+		effortFlag: "--thinking",
+		efforts: [...PI_THINKING_LEVELS, { id: "max", label: "Max" }],
+	},
+	{
+		// Only Gemini models take `--effort`; agy rejects it on the others.
+		presetId: "agy",
+		effortFlag: "--effort",
+		requiresModel: true,
+		efforts: [
+			{ id: "low", label: "Low", models: AGY_EFFORT_MODELS },
+			{ id: "medium", label: "Medium", models: AGY_EFFORT_MODELS },
+			{ id: "high", label: "High", models: AGY_EFFORT_MODELS },
+		],
 	},
 	{
 		presetId: "copilot",
@@ -710,6 +771,7 @@ export function getAgentEfforts(
 	)
 		? model
 		: undefined;
+	if (support.requiresModel && !selected) return [];
 	if (support.modelVariants) {
 		const variants = selected ? support.modelVariants[selected] : undefined;
 		if (!variants) return [];

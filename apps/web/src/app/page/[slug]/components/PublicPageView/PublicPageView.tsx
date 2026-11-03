@@ -1,13 +1,20 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
+import { pagePresenceUrl } from "@superset/shared/page-presence";
 import { Button } from "@superset/ui/button";
-import { PageFrame } from "@superset/ui/page-comments";
+import { PageFrame, usePageToolsUnavailable } from "@superset/ui/page-comments";
+import { PagePresenceStack, useJoinPresence } from "@superset/ui/presence";
 import { Globe } from "lucide-react";
 import Link from "next/link";
+import { useMemo, useRef } from "react";
+import { env } from "@/env";
 import { OpenInSupersetButton } from "../OpenInSupersetButton";
+import { ReportPageDialog } from "./components/ReportPageDialog";
+import { guestId } from "./utils/guestId";
 
 interface PublicPageViewProps {
+	pageId: string;
 	title: string;
 	viewUrl: string;
 	slug: string;
@@ -15,12 +22,25 @@ interface PublicPageViewProps {
 }
 
 export function PublicPageView({
+	pageId,
 	title,
 	viewUrl,
 	slug,
 	signedIn,
 }: PublicPageViewProps) {
 	const { t } = useLingui();
+	const frameRef = useRef<HTMLIFrameElement>(null);
+	const frameOrigin = useMemo(() => new URL(viewUrl).origin, [viewUrl]);
+	usePageToolsUnavailable({ frameRef, frameOrigin, signedIn });
+	useJoinPresence({
+		roomId: pageId,
+		url: async () =>
+			pagePresenceUrl({
+				realtimeUrl: env.NEXT_PUBLIC_REALTIME_URL,
+				pageId,
+				guestId: guestId(),
+			}),
+	});
 
 	return (
 		<div className="flex h-dvh flex-col bg-background">
@@ -30,7 +50,9 @@ export function PublicPageView({
 					aria-label={t({ message: "Shared with everyone" })}
 				/>
 				<span className="min-w-0 truncate font-medium text-sm">{title}</span>
-				<div className="ml-auto shrink-0">
+				<div className="ml-auto flex shrink-0 items-center gap-1">
+					<PagePresenceStack pageId={pageId} viewerId={undefined} />
+					<ReportPageDialog slug={slug} signedIn={signedIn} />
 					{signedIn ? (
 						<OpenInSupersetButton slug={slug} />
 					) : (
@@ -49,8 +71,15 @@ export function PublicPageView({
 			</div>
 
 			<main className="min-h-0 flex-1">
-				<PageFrame src={viewUrl} title={title} />
+				<PageFrame ref={frameRef} src={viewUrl} title={title} />
 			</main>
+
+			<footer className="shrink-0 border-t px-3 py-1.5 text-center text-[11px] text-muted-foreground">
+				<Trans>
+					This page was published by a Paradev user. Its contents are
+					unverified.
+				</Trans>
+			</footer>
 		</div>
 	);
 }

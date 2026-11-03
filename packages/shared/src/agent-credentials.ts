@@ -1,11 +1,13 @@
 /**
  * The environment variables a signed-in agent reads inside a cloud workspace.
  *
- * A subscription is a long-lived token the agent's own CLI accepts directly
- * (`claude setup-token`), so it needs no refreshing on our side. An API key is
- * the provider key, optionally against a compatible endpoint. A gateway key is
- * an API key against the gateway's endpoint for that agent, sent the way the
- * gateway documents for it.
+ * A Claude subscription is a long-lived token Claude Code accepts directly
+ * (`claude setup-token`), so it needs no refreshing on our side. A Codex
+ * subscription is a ChatGPT sign-in: an OAuth session the API refreshes and
+ * hands over as a file, not a variable. An API key is the provider key,
+ * optionally against a compatible endpoint. A gateway key is an API key
+ * against the gateway's endpoint for that agent, sent the way the gateway
+ * documents for it.
  */
 export const AGENT_CREDENTIAL_ENV_NAMES = [
 	"ANTHROPIC_API_KEY",
@@ -28,6 +30,8 @@ export const CLOUD_WORKSPACE_IGNORED_ENV_NAMES = [
 	"ANTHROPIC_API_KEY",
 	"ANTHROPIC_AUTH_TOKEN",
 	"CLAUDE_CODE_OAUTH_TOKEN",
+	"CODEX_ACCESS_TOKEN",
+	"CODEX_API_KEY",
 	"OPENAI_API_KEY",
 ] as const;
 
@@ -36,6 +40,9 @@ export function isCloudWorkspaceIgnoredEnvName(name: string): boolean {
 		name,
 	);
 }
+
+/** The provider a Codex subscription row carries when it is a ChatGPT sign-in. */
+export const CHATGPT_PROVIDER = "chatgpt";
 
 const GATEWAY_BASE_URLS: Record<string, string> = {
 	claude: "https://ai-gateway.vercel.sh/claude-code",

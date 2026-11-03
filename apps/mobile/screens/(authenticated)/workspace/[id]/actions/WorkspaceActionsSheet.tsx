@@ -3,7 +3,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { formatDistanceToNow } from "date-fns";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { PencilIcon, PinIcon, ShareIcon } from "lucide-react-native";
-import type { ReactNode } from "react";
+import { type ReactNode, type RefObject, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useHostProjects } from "@/hooks/useHostProjects";
@@ -11,6 +12,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import { isSandboxHost } from "@/lib/sandbox-access";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
+import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
@@ -18,11 +20,13 @@ import { WorkspacePages } from "./components/WorkspacePages";
 import { WorkspacePullRequests } from "./components/WorkspacePullRequests";
 
 function CircleAction({
+	ref,
 	icon,
 	label,
 	active,
 	onPress,
 }: {
+	ref?: RefObject<ViewInstance | null>;
 	icon: ReactNode;
 	label: string;
 	active?: boolean;
@@ -30,6 +34,7 @@ function CircleAction({
 }) {
 	return (
 		<Pressable
+			ref={ref}
 			accessibilityLabel={label}
 			onPress={onPress}
 			className={
@@ -89,6 +94,7 @@ export function WorkspaceActionsSheet() {
 		id ? id in state.pinnedAt : false,
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
+	const shareRef = useRef<ViewInstance>(null);
 
 	const isCloud = host !== null && isSandboxHost(host.machineId);
 	const project = workspace?.projectId
@@ -141,9 +147,10 @@ export function WorkspaceActionsSheet() {
 						onPress={() => id && togglePin(id)}
 					/>
 					<CircleAction
+						ref={shareRef}
 						label={t({ message: "Share" })}
 						icon={<ShareIcon size={19} color={theme.foreground} />}
-						onPress={shareWorkspace}
+						onPress={() => shareWorkspace(anchorOf(shareRef))}
 					/>
 				</View>
 

@@ -5,7 +5,13 @@ import type { Cursor, Envelope } from "@superset/chat/protocol";
 import { isDeltaEnvelope, isDurableEnvelope } from "@superset/chat/protocol";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
-import { agentMessage, turn } from "../../testing/fixtures";
+import {
+	agentMessage,
+	approvalRequest,
+	toolCall,
+	turn,
+	userMessage,
+} from "../../testing/fixtures";
 import { createTestRuntime } from "../../testing/testRuntime";
 import {
 	createManualSchedule,
@@ -31,6 +37,119 @@ const STREAMING_TURN: FakeHarnessScript = {
 		],
 	],
 };
+
+const SUBAGENT_TURN: FakeHarnessScript = {
+	turns: [
+		[
+			{ kind: "turn", turn: turn("t1") },
+			{
+				kind: "item",
+				item: toolCall("subagent:c", { subagent: true, toolName: "subagent" }),
+				turnId: "t1",
+			},
+			{
+				kind: "item",
+				item: userMessage("sub:c:u", "task", {
+					parentItemId: "subagent:c",
+					from: "parent",
+				}),
+				turnId: "t1",
+			},
+			{
+				kind: "delta",
+				delta: {
+					type: "text",
+					itemId: "sub:c:a",
+					append: "child",
+					parentItemId: "subagent:c",
+				},
+			},
+			{
+				kind: "item",
+				item: {
+					...agentMessage("sub:c:a", "child"),
+					parentItemId: "subagent:c",
+				},
+				turnId: "t1",
+			},
+			{
+				kind: "item",
+				item: toolCall("subagent:d", {
+					subagent: true,
+					parentItemId: "subagent:c",
+				}),
+				turnId: "t1",
+			},
+			{
+				kind: "delta",
+				delta: { type: "background", itemId: "subagent:d", append: "ls" },
+			},
+			{
+				kind: "item",
+				item: toolCall("sub:d:t", { parentItemId: "subagent:d" }),
+				turnId: "t1",
+			},
+			{ kind: "item", item: toolCall("task-1"), turnId: "t1" },
+			{
+				kind: "item",
+				item: toolCall("task-1:read", { parentItemId: "task-1" }),
+				turnId: "t1",
+			},
+			{ kind: "delta", delta: { type: "text", itemId: "a1", append: "main" } },
+			{ kind: "item", item: agentMessage("a1", "main"), turnId: "t1" },
+			{
+				kind: "item",
+				item: approvalRequest("approval:sub:d:t", {
+					parentItemId: "subagent:d",
+					targetItemId: "sub:d:t",
+				}),
+				turnId: "t1",
+			},
+		],
+	],
+};
+
+const FLAT_ITEM_IDS = [
+	"subagent:c",
+	"task-1",
+	"task-1:read",
+	"a1",
+	"approval:sub:d:t",
+];
+
+function itemIdsOf(envelopes: Envelope[]): string[] {
+	return [
+		...new Set(
+			envelopes.flatMap((envelope) =>
+				isDurableEnvelope(envelope) &&
+				envelope.event.type === "item" &&
+				!(
+					envelope.event.item.kind === "user_message" &&
+					!envelope.event.item.parentItemId
+				)
+					? [envelope.event.item.id]
+					: [],
+			),
+		),
+	];
+}
+
+function deltaItemIdsOf(envelopes: Envelope[]): string[] {
+	return envelopes.flatMap((envelope) =>
+		isDeltaEnvelope(envelope) ? [envelope.delta.itemId] : [],
+	);
+}
+
+async function askedForApproval(
+	runtime: ChatRuntime,
+	sessionId: string,
+): Promise<void> {
+	const watcher = createRecordingSink();
+	runtime.subscribe(sessionId, { deltas: [] }, watcher.sink);
+	await waitFor(() =>
+		itemIdsOf(watcher.envelopes).includes("approval:sub:d:t"),
+	);
+}
 
 function startRuntime(script: FakeHarnessScript): {
 	runtime: ChatRuntime;
@@ -198,5 +317,89 @@ describe("SubscriptionHub", () => {
 		expect(snapshot.session?.status).toBe("idle");
 		expect(snapshot.items.get("a1")?.item).toMatchObject({ text: "abc" });
 		await runtime.dispose();
+	});
+
+	describe("subagent items", () => {
+		test("a client that does not opt in gets no subagent items or deltas, but gets their approvals", async () => {
+			const { runtime, sessionId } = startRuntime(SUBAGENT_TURN);
+			const flat = createRecordingSink();
+			runtime.subscribe(
+				sessionId,
+				{ deltas: ["text", "background"] },
+				flat.sink,
+			);
+
+			prompt(runtime, sessionId);
+			await askedForApproval(runtime, sessionId);
+			runtime.subscriptions.flushDeltas(sessionId);
+
+			expect(itemIdsOf(flat.envelopes)).toEqual(FLAT_ITEM_IDS);
+			expect(deltaItemIdsOf(flat.envelopes)).toEqual(["a1"]);
+
+			const late = createRecordingSink();
+			runtime.subscribe(sessionId, { deltas: [] }, late.sink);
+			expect(itemIdsOf(late.envelopes)).toEqual(FLAT_ITEM_IDS);
+			await runtime.dispose();
+		});
+
+		test("a client that opts in gets every subagent item and delta", async () => {
+			const { runtime, sessionId } = startRuntime(SUBAGENT_TURN);
+			const nested = createRecordingSink();
+			runtime.subscribe(
+				sessionId,
+				{ deltas: ["text", "background"], nestedSubagents: true },
+				nested.sink,
+			);
+
+			prompt(runtime, sessionId);
+			await askedForApproval(runtime, sessionId);
+			runtime.subscriptions.flushDeltas(sessionId);
+
+			expect(itemIdsOf(nested.envelopes)).toEqual(
+				expect.arrayContaining(["sub:c:u", "sub:c:a", "subagent:d", "sub:d:t"]),
+			);
+			expect(deltaItemIdsOf(nested.envelopes)).toEqual([
+				"sub:c:a",
+				"subagent:d",
+				"a1",
+			]);
+			await runtime.dispose();
+		});
+
+		test("getItems, getOutline and getItemBodies leave subagent items out unless asked", async () => {
+			const { runtime, sessionId } = startRuntime(SUBAGENT_TURN);
+			prompt(runtime, sessionId);
+			await askedForApproval(runtime, sessionId);
+
+			const page = runtime.commands.getItems({ sessionId });
+			const nestedPage = runtime.commands.getItems({
+				sessionId,
+				nestedSubagents: true,
+			});
+			expect(page.ok && itemIdsOf(page.envelopes)).toEqual(FLAT_ITEM_IDS);
+			expect(nestedPage.ok && itemIdsOf(nestedPage.envelopes)).toContain(
+				"sub:c:a",
+			);
+
+			const outline = runtime.commands.getOutline({ sessionId });
+			const nestedOutline = runtime.commands.getOutline({
+				sessionId,
+				nestedSubagents: true,
+			});
+			const outlineIds = (result: typeof outline) =>
+				result.ok ? result.outline.items.map((stored) => stored.item.id) : [];
+			expect(outlineIds(outline)).not.toContain("sub:c:a");
+			expect(outlineIds(outline)).toContain("approval:sub:d:t");
+			expect(outlineIds(nestedOutline)).toContain("sub:c:a");
+
+			const bodies = runtime.commands.getItemBodies({
+				sessionId,
+				itemIds: ["sub:c:a", "a1"],
+			});
+			expect(bodies.ok && bodies.items.map((stored) => stored.item.id)).toEqual(
+				["a1"],
+			);
+			await runtime.dispose();
+		});
 	});
 });

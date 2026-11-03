@@ -16,7 +16,7 @@ type EnvironmentListWire = {
 };
 
 /**
- * Cloud workspaces are sandboxes Superset runs for the organization, each
+ * Cloud workspaces are sandboxes Paradev runs for the organization, each
  * started from an environment whose repositories are its checkouts. The API
  * owns their records; terminals and agents run inside them (see
  * `terminals` and `agents`).
@@ -116,6 +116,7 @@ export class Workspaces extends APIResource {
 				prompt: params.prompt,
 				model: params.model,
 				effort: params.effort,
+				machineSize: params.machineSize,
 			},
 			options,
 		);
@@ -139,10 +140,10 @@ export class Workspaces extends APIResource {
 	}
 
 	/**
-	 * Delete a cloud workspace and tear down its sandbox. `deleted` is false
-	 * when no workspace has that id.
+	 * Archive a cloud workspace. Its sandbox stops within a minute and is
+	 * deleted after 7 days. `deleted` is false when no workspace has that id.
 	 *
-	 * Mirrors `superset workspaces delete`.
+	 * Mirrors `superset workspaces archive`.
 	 */
 	delete(
 		id: string,
@@ -215,6 +216,7 @@ export interface CloudWorkspace {
 	sandboxUrl: string | null;
 	hostVersion: string | null;
 	createdByUserId: string | null;
+	machineSize?: string | null;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
@@ -242,6 +244,8 @@ export interface WorkspaceCreateParams {
 	model?: string;
 	/** Reasoning effort for the agent. Supported values depend on the agent; omit to use its default. */
 	effort?: string;
+	/** `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB; the default) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where the plan includes them. */
+	machineSize?: "small" | "medium" | "large" | "xlarge" | "2xlarge";
 }
 
 export interface WorkspaceUpdateParams {

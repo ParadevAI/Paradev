@@ -12,3 +12,24 @@
 ## 2026-09-23 10:41 — Weekly docs update
 
 - [ ] Review the broader trimming pass across onboarding, orchestration, ports, editor, agent status, tasks, and PR guides.
+
+## 2026-09-30 17:45 — Weekly docs update
+
+- [ ] Review branch docs/update-2026-09-30 (commit c0af205d70); the commit message maps each PR to its doc change and lists the skipped PRs.
+- [ ] Confirm removing the `superset mcp` CLI section and the skills.mdx "Connected Service Plugins" section. #7776 made plugins/mcp internal and the Plugins page is staff-only, so both documented a gated feature.
+- [ ] #7983 (pane error screen) and #7958 (ship controls in the sidebar strip) merged after the 1.33.0 bump. The docs describe them before they are in a release.
+- [ ] Pre-existing and not fixed: use-with-ide.mdx and customization.mdx say "Settings → Editor" for the default editor, but no such setting exists in the current settings routes. Verify where the default editor is chosen.
+
+## 2026-10-07 16:01 — Weekly docs update
+
+- [ ] Review branch docs/update-2026-10-07 (commit 9d7d112d): added a "Restore a Workspace" section to workspaces.mdx for PR #8178 (restore deleted/merged workspaces). All other PRs from the last 7 days were either already self-documented, behind a flag (chat-v3/ACP chat, right-pane-area), internal/bugfix with no new documented surface, or outside apps/docs/content/docs/ (marketing, plugin skill files).
+- [ ] Notion MCP connector in this workspace only exposed static "docs/*" resources, not the `notion-fetch`/`notion-search` tools the automation SOP calls for (page ID 3b3b9d5b-f616-810d-baca-ca7dd2305259). Could not fetch the live SOP this run — fell back to the instructions embedded in the automation prompt. Please check the Notion MCP connection/permissions.
+- [ ] `.github/prompts/update-docs.md`, which the automation prompt calls "a pointer only," does not exist in this repo (checked git history too — never committed). Worth either adding it or updating the automation prompt.
+- [ ] Pre-existing gaps noticed but left alone (bigger than this week's diff): `superset browser import-login` has no docs page at all despite PR #8190 adding 13 more supported browsers; there is no public plugins/marketplace catalog page under apps/docs/content/docs/ despite several hosted plugins shipping recently (Neon, PostHog, Google Calendar, Vercel).
+
+## 2026-10-21 16:10 — Weekly docs update
+
+- [ ] Review branch docs/update-2026-10-21: #8651 (PR dropdown Commit/Push) and #8656 (PR link click modifiers) in diff-viewer.mdx, #8658 (close-warning setting) in terminal-integration.mdx, #8629 (archive notFound/failed output) in cli-reference.mdx.
+- [ ] Vale could not run (`bunx vale` fails to resolve); I checked the prose by hand for the banned words and em dashes. Run it before merging.
+- [ ] The Notion plugin is "not installed" in `superset plugins list`, and no Notion MCP tool is loaded. I read the SOP through the Notion REST API with $NOTION_MCP_TOKEN instead. Fix the connector so `notion-fetch` works.
+- [ ] Not documented: ACP chat/session CLI (#8668, #8585), chat paste cards (#8577), image gallery (#8573), and the plugins connect flow (#8646). They are flag-gated or the plugins page is staff-only. Re-check once they ship broadly.

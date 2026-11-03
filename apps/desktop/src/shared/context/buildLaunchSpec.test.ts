@@ -205,8 +205,8 @@ describe("buildLaunchSpec", () => {
 			getConfig("codex"),
 		);
 		const userText = (spec?.user[0] as { type: "text"; text: string }).text;
-		expect(userText).toContain(".superset/attachments/logs.txt");
-		expect(userText).toContain(".superset/attachments/screen.png");
+		expect(userText).toContain(".paradev/attachments/logs.txt");
+		expect(userText).toContain(".paradev/attachments/screen.png");
 		expect(spec?.attachments).toHaveLength(2);
 		expect(spec?.attachments[0]?.type).toBe("file");
 		expect(spec?.attachments[1]?.type).toBe("image");
@@ -277,7 +277,7 @@ describe("buildLaunchSpec", () => {
 		)?.text;
 		// Attachments list renders after the inline parts so a CLI agent
 		// reading just the flattened text still has the file path reference.
-		expect(lastText).toContain(".superset/attachments/trace.log");
+		expect(lastText).toContain(".paradev/attachments/trace.log");
 	});
 
 	test("empty userPrompt still renders system = [] and drops empty user template cleanly", () => {
@@ -348,12 +348,12 @@ Replaces plaintext token storage with encrypted KV.
 # Attached files
 
 The user attached these files alongside the prompt. They've been
-written into the worktree at \`.superset/attachments/\`. Read them
+written into the worktree at \`.paradev/attachments/\`. Read them
 to understand the request — they're part of the task, not
 optional reference.
 
-- .superset/attachments/logs.txt
-- .superset/attachments/screenshot.png"
+- .paradev/attachments/logs.txt
+- .paradev/attachments/screenshot.png"
 ,
 }
 `);
@@ -398,12 +398,12 @@ Replaces plaintext token storage with encrypted KV.
 # Attached files
 
 The user attached these files alongside the prompt. They've been
-written into the worktree at \`.superset/attachments/\`. Read them
+written into the worktree at \`.paradev/attachments/\`. Read them
 to understand the request — they're part of the task, not
 optional reference.
 
-- .superset/attachments/logs.txt
-- .superset/attachments/screenshot.png"
+- .paradev/attachments/logs.txt
+- .paradev/attachments/screenshot.png"
 ,
 }
 `);

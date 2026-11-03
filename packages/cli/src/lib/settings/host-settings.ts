@@ -1,11 +1,11 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { CLIError } from "@superset/cli-framework";
 import type { AppRouter as HostServiceRouter } from "@superset/host-service/trpc";
 import type { BranchPrefixMode } from "@superset/local-db/schema/zod";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import SuperJSON from "superjson";
-import { getSupersetHomeDir } from "./paths";
 
 // Git settings live in the host service's host_settings table (the v2 store
 // the desktop UI reads), not in local.db. The CLI reaches the local host
@@ -30,12 +30,12 @@ function isProcessAlive(pid: number): boolean {
 
 const NOT_RUNNING = new CLIError(
 	"The host service isn't running on this machine",
-	"Launch the Superset desktop app or run: superset start",
+	"Launch the Paradev desktop app or run: superset start",
 );
 
 /** Find a live host-service manifest, preferring the configured org. */
 function findManifest(): HostServiceManifest {
-	const home = getSupersetHomeDir();
+	const home = resolveAppHomeDir();
 	const orgIds: string[] = [];
 	try {
 		const config = JSON.parse(
@@ -106,7 +106,7 @@ async function callHost<T>(run: () => Promise<T>): Promise<T> {
 		}
 		throw new CLIError(
 			`Could not reach the host service (${message.slice(0, 80)})`,
-			"Launch the Superset desktop app or run: superset start",
+			"Launch the Paradev desktop app or run: superset start",
 		);
 	}
 }

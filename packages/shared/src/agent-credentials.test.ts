@@ -44,12 +44,13 @@ describe("agentCredentialToEnv", () => {
 		});
 	});
 
-	test("a Codex subscription has nowhere to go yet", () => {
+	test("a ChatGPT sign-in is not an environment variable", () => {
 		expect(
 			agentCredentialToEnv({
 				agent: "codex",
 				kind: "subscription",
-				value: "x",
+				value: "{}",
+				provider: "chatgpt",
 			}),
 		).toEqual({});
 	});

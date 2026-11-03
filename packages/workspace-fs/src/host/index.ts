@@ -1,6 +1,7 @@
 export * from "../error-message";
 export * from "../fs";
 export * from "../paths";
+export * from "../resolve-file-reference";
 export * from "../search";
 export * from "../types";
 export * from "../watch";

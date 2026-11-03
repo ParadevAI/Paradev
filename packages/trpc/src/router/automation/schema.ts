@@ -1,5 +1,7 @@
 import { automationSessionKindValues } from "@superset/db/schema";
+import { automationGroupInputSchema } from "@superset/shared/automation-group";
 import { draftTriggerSchema } from "@superset/shared/automation-triggers";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { workspaceTagsInputSchema } from "@superset/shared/workspace-tags";
 import { z } from "zod";
 
@@ -48,12 +50,19 @@ export const createAutomationSchema = z
 		// workspaces.create — no project means session).
 		v2ProjectId: z.string().uuid().nullish(),
 		v2WorkspaceId: z.string().uuid().nullish(),
+		// With targetHostId "cloud": a cloud workspace to reuse every run, and
+		// the environment to start one from each run (or when the pin is gone).
+		cloudWorkspaceId: z.string().uuid().nullish(),
+		environmentId: z.string().uuid().nullish(),
 		// Workspace tags applied to each run's created workspace, so runs file
 		// themselves into the matching sidebar folders.
 		tags: workspaceTagsInputSchema.optional(),
+		group: automationGroupInputSchema.optional(),
 		// Deliver each run's prompt into the session the previous run left
 		// behind instead of starting another beside it. Requires v2WorkspaceId.
 		continueAgentSession: z.boolean().optional(),
+		// Size of the cloud box each run starts; null = medium.
+		machineSize: z.enum(MACHINE_SIZES).nullish(),
 		// Optional because an automation may be entirely event-driven. Required
 		// only when no trigger set is supplied, which is the older client shape.
 		rrule: rruleBody.optional(),
@@ -80,13 +89,24 @@ export const updateAutomationSchema = z.object({
 	// the existing project.
 	v2ProjectId: z.string().uuid().nullish(),
 	v2WorkspaceId: z.string().uuid().nullish(),
+	cloudWorkspaceId: z.string().uuid().nullish(),
+	environmentId: z.string().uuid().nullish(),
 	// Full replacement of the tag set; undefined keeps the existing tags.
 	tags: workspaceTagsInputSchema.optional(),
+	// Undefined keeps the existing group; null ungroups.
+	group: automationGroupInputSchema.optional(),
 	continueAgentSession: z.boolean().optional(),
+	// Undefined keeps the existing size; null resets it to medium.
+	machineSize: z.enum(MACHINE_SIZES).nullish(),
 	rrule: rruleBody.optional(),
 	dtstart: z.coerce.date().optional(),
 	timezone: iana.optional(),
 	triggers,
+});
+
+export const setAutomationGroupSchema = z.object({
+	id: z.string().uuid(),
+	group: automationGroupInputSchema,
 });
 
 export const setAutomationPromptSchema = z.object({
@@ -100,6 +120,22 @@ export const listRunsSchema = z.object({
 	automationId: z.string().uuid(),
 	limit: z.number().int().min(1).max(100).default(20),
 });
+
+export const listOrgRunsSchema = z.object({
+	limit: z.number().int().min(1).max(100).default(50),
+	/** Narrows to one automation; the detail page's history is this list filtered. */
+	automationId: z.string().uuid().optional(),
+	// createdAt stays the database's own text form: a JS Date truncates
+	// Postgres microseconds to milliseconds, and the keyset comparison then
+	// skips every row sharing the truncated millisecond.
+	cursor: z
+		.object({ createdAt: z.string().min(1), id: z.string().uuid() })
+		.optional(),
+	status: z.enum(["all", "failed", "missed"]).default("all"),
+	scope: z.enum(["all", "mine"]).default("all"),
+});
+
+export const runPayloadSchema = z.object({ runId: z.string().uuid() });
 
 export const parseRruleSchema = z.object({
 	rrule: rruleBody,

@@ -38,6 +38,7 @@ const createSessionInputSchema = z.object({
 	agents: z.array(agentLaunchSchema).optional(),
 	command: z.string().min(1).optional(),
 	namingPrompt: z.string().min(1).optional(),
+	namingAgent: z.string().min(1).optional(),
 	// Sessions render in a flat lane (no per-project folders), but the tags
 	// are stored so listings and future consumers see them — automation
 	// dispatch sends its tag set for sessions and worktrees alike.
@@ -61,7 +62,7 @@ function claimedSessionNames(ctx: HostServiceContext): string[] {
 
 /**
  * Create a project-less "session" workspace: a standalone git repo in a
- * managed folder under `~/.superset/sessions`. No project row, no worktree,
+ * managed folder under `~/.paradev/sessions`. No project row, no worktree,
  * no branch semantics beyond the repo's own `main` — but a real workspace
  * row, so terminals, chat, agents, and git status all work unchanged.
  */
@@ -95,7 +96,7 @@ export const createSession = protectedProcedure
 		const composerPrompt =
 			input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
 		const wantAi = input.name === undefined && !!composerPrompt;
-		const namingAgent = input.agents?.[0]?.agent;
+		const namingAgent = input.agents?.[0]?.agent ?? input.namingAgent;
 
 		const typedName = input.name?.trim();
 		const folderCandidate =

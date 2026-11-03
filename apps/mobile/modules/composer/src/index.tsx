@@ -1,4 +1,4 @@
-import { requireNativeView } from "expo";
+import { requireNativeModule, requireNativeView } from "expo";
 import { forwardRef, type Ref, useImperativeHandle, useRef } from "react";
 
 /** The imperative surface the native view exposes through its ref. */
@@ -17,6 +17,9 @@ interface NativeComposerViewProps {
 	attachments?: ComposerAttachment[];
 	selectedModel?: ComposerMenuOption;
 	launchOptions?: ComposerMenuOption[];
+	modeOptions?: ComposerModeOption[];
+	selectedModeId?: string | null;
+	canStop?: boolean;
 	headerChips?: ComposerMenuOption[];
 	quickKeys?: ComposerQuickKey[];
 	sessionTabs?: ComposerSessionTab[];
@@ -26,12 +29,15 @@ interface NativeComposerViewProps {
 	slashCommands?: ComposerSlashCommand[];
 	showAttachments?: boolean;
 	autocapitalization?: "sentences" | "never";
+	compactEditor?: boolean;
 	isSending?: boolean;
 	onSubmit?: (event: { nativeEvent: { text: string } }) => void;
 	onAttachmentsPress?: () => void;
 	onDictationError?: (event: { nativeEvent: { message: string } }) => void;
 	onModelPress?: () => void;
 	onLaunchOptionPress?: (event: { nativeEvent: { id: string } }) => void;
+	onModeSelect?: (event: { nativeEvent: { id: string } }) => void;
+	onStop?: () => void;
 	onChipPress?: (event: { nativeEvent: { id: string } }) => void;
 	onQuickKeyPress?: (event: { nativeEvent: { id: string } }) => void;
 	onSessionTabPress?: (event: { nativeEvent: { id: string } }) => void;
@@ -51,6 +57,24 @@ interface NativeComposerViewProps {
 
 const NativeComposerView =
 	requireNativeView<NativeComposerViewProps>("Composer");
+
+const NativeComposerModule = requireNativeModule<{
+	presentImage: (uri: string) => Promise<void>;
+	fileThumbnail: (uri: string, side: number) => Promise<string | null>;
+}>("Composer");
+
+/** Opens an image full screen in the composer's own viewer. */
+export function presentImage(uri: string): Promise<void> {
+	return NativeComposerModule.presentImage(uri);
+}
+
+/** A PNG preview of a local file, as the composer's file card draws it. */
+export function fileThumbnail(
+	uri: string,
+	side: number,
+): Promise<string | null> {
+	return NativeComposerModule.fileThumbnail(uri, side);
+}
 
 /**
  * How the composer treats the screen behind it while expanded.
@@ -84,6 +108,15 @@ export interface ComposerMenuOption {
 	 * belongs to the project name beside it and should not compete with it.
 	 */
 	muted?: boolean;
+}
+
+/**
+ * One permission mode in the menu beside `+`. `symbol` is an SF Symbol name.
+ */
+export interface ComposerModeOption {
+	id: string;
+	label: string;
+	symbol: string;
 }
 
 /**
@@ -292,6 +325,11 @@ interface ComposerBaseProps {
 	 * lists stay in React Native like the agent's. Omit for agents with none.
 	 */
 	launchOptions?: ComposerMenuOption[];
+	/** The agent's permission modes, as a native menu beside `+`. */
+	modeOptions?: ComposerModeOption[];
+	selectedModeId?: string;
+	/** The agent is working: with an empty draft, send becomes stop. */
+	canStop?: boolean;
 	/** Frame 4's header row. Empty on the session surface (frame 13). */
 	headerChips?: ComposerMenuOption[];
 	/**
@@ -322,6 +360,12 @@ interface ComposerBaseProps {
 	/** `never` for the terminal — a shell command is not a sentence. */
 	autocapitalization?: "sentences" | "never";
 	/**
+	 * Shrinks the expanded editor's floor by two lines, so the terminal screen
+	 * can leave more of the transcript on screen when the composer is at its
+	 * smallest. Omit for the generous floor the reference frames show.
+	 */
+	compactEditor?: boolean;
+	/**
 	 * A submit is in flight. Send becomes a grey spinner and the mic steps
 	 * aside. The caller owns this because only it knows when delivery finished.
 	 */
@@ -340,6 +384,8 @@ interface ComposerBaseProps {
 	onDictationError?: (message: string) => void;
 	onModelPress?: () => void;
 	onLaunchOptionPress?: (id: string) => void;
+	onModeSelect?: (id: string) => void;
+	onStop?: () => void;
 	onChipPress?: (id: string) => void;
 	onQuickKeyPress?: (id: string) => void;
 	/** A tab was tapped — attach that session. */
@@ -428,6 +474,9 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 			attachments,
 			selectedModel,
 			launchOptions,
+			modeOptions,
+			selectedModeId,
+			canStop = false,
 			headerChips,
 			quickKeys,
 			sessionTabs,
@@ -436,12 +485,15 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 			slashCommands,
 			showAttachments = true,
 			autocapitalization = "sentences",
+			compactEditor = false,
 			isSending = false,
 			onSubmit,
 			onAttachmentsPress,
 			onDictationError,
 			onModelPress,
 			onLaunchOptionPress,
+			onModeSelect,
+			onStop,
 			onChipPress,
 			onQuickKeyPress,
 			onSessionTabPress,
@@ -478,6 +530,9 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 				attachments={attachments}
 				selectedModel={selectedModel}
 				launchOptions={launchOptions}
+				modeOptions={modeOptions ?? []}
+				selectedModeId={selectedModeId ?? null}
+				canStop={canStop}
 				headerChips={headerChips}
 				quickKeys={quickKeys}
 				sessionTabs={sessionTabs}
@@ -489,6 +544,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 				slashCommands={slashCommands}
 				showAttachments={showAttachments}
 				autocapitalization={autocapitalization}
+				compactEditor={compactEditor}
 				isSending={isSending}
 				onSubmit={(event) => onSubmit?.(event.nativeEvent.text)}
 				onAttachmentsPress={onAttachmentsPress}
@@ -499,6 +555,8 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
 				onLaunchOptionPress={(event) =>
 					onLaunchOptionPress?.(event.nativeEvent.id)
 				}
+				onModeSelect={(event) => onModeSelect?.(event.nativeEvent.id)}
+				onStop={() => onStop?.()}
 				onChipPress={(event) => onChipPress?.(event.nativeEvent.id)}
 				onQuickKeyPress={(event) => onQuickKeyPress?.(event.nativeEvent.id)}
 				onSessionTabPress={(event) => onSessionTabPress?.(event.nativeEvent.id)}

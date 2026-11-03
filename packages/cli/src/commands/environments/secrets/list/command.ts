@@ -6,7 +6,7 @@ export default command({
 	description: "List an environment's variables; values are never shown",
 	options: {
 		environment: string().desc(
-			"Environment (id or name); required when the organization has several",
+			"Environment ID (see: superset environments list); required when the organization has several",
 		),
 	},
 	display: (data) =>

@@ -1,8 +1,12 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db, dbWs } from "@superset/db/client";
 import {
+	automationEvents,
 	automationRuns,
 	automations,
 	automationTriggers,
+	cloudWorkspaces,
 	v2Hosts,
 	v2UsersHosts,
 	v2Workspaces,
@@ -15,16 +19,42 @@ import {
 	planTierFromSubscription,
 } from "@superset/shared/billing";
 import {
+	CLOUD_AGENT_PROMPT_MAX_LENGTH,
+	isCloudAgentId,
+} from "@superset/shared/cloud-agent-launch";
+import {
+	FAILED_RUN_STATUSES,
+	MISSED_RUN_STATUSES,
+	UNSUCCESSFUL_RUN_STATUSES,
+} from "@superset/shared/constants";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
+import {
 	describeSchedule,
 	nextOccurrenceAfter,
 	nextOccurrences,
 	parseRrule,
 } from "@superset/shared/rrule";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, ilike } from "drizzle-orm";
+import {
+	and,
+	asc,
+	desc,
+	eq,
+	gte,
+	ilike,
+	inArray,
+	notInArray,
+	sql,
+} from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
-import { planRequiredError, protectedProcedure, userError } from "../../trpc";
+import { assertCloudAccess } from "../../lib/cloud-guards";
+import { nudge } from "../../lib/realtime";
+import { personProcedure, planRequiredError, userError } from "../../trpc";
+import {
+	assertMachineSizeOffered,
+	loadUsableEnvironment,
+} from "../cloud-workspace/start";
 import { joinSlackTriggerChannels } from "../integration/slack/joinChannels";
 import {
 	requireActiveOrgMembership,
@@ -39,17 +69,32 @@ import {
 	promptSourceFromSession,
 	recordPromptVersion,
 	refreshScheduleNextRuns,
+	requireAutomationDeleteAccess,
+	resolveAutomationGroup,
 	scheduleSummariesFor,
 	summarizeSchedules,
 	syncScheduleTrigger,
 } from "./helpers";
 import {
 	createAutomationSchema,
+	listOrgRunsSchema,
 	listRunsSchema,
 	parseRruleSchema,
+	runPayloadSchema,
+	setAutomationGroupSchema,
 	setAutomationPromptSchema,
 	updateAutomationSchema,
 } from "./schema";
+import { recordCloudLaunch, reportCloudLaunchSchema } from "./sessionRecord";
+import {
+	type AutomationTarget,
+	NO_TARGET,
+	needsLegacyWorkspace,
+	newCloudPin,
+	planTarget,
+	type TargetInput,
+	type TargetLookups,
+} from "./targetPlan";
 import { saveTriggerSet } from "./triggerSet";
 import { automationVersionsRouter } from "./versions";
 import { generateWebhookToken, hashWebhookToken } from "./webhookSecret";
@@ -65,7 +110,10 @@ async function requireAutomationsPlan(
 ): Promise<string> {
 	const { organizationId, subscription } =
 		await requireActiveOrgMembershipWithSubscription(ctx);
-	if (!planAllowsAutomations(planTierFromSubscription(subscription))) {
+	const plan = billingUsesAutumn
+		? await organizationPlanFromAutumn(organizationId)
+		: planTierFromSubscription(subscription);
+	if (!planAllowsAutomations(plan)) {
 		throw planRequiredError({
 			message: "Automations require the Pro plan.",
 			i18nKey: "serverError.automation.automationsRequireThePro",
@@ -117,6 +165,191 @@ async function verifyHostAccess(
 			i18nKey: "serverError.automation.youDonTHaveAccess",
 		});
 	}
+}
+
+/**
+ * The one run query. Both run lists read through this: All runs org-wide, and
+ * an automation's own history as the same list filtered to it. Two queries
+ * drifted apart once already, rendering the same run differently per screen.
+ */
+function selectRuns(args: {
+	organizationId: string;
+	userId: string;
+	automationId?: string;
+	status?: "all" | "failed" | "missed";
+	scope?: "all" | "mine";
+	cursor?: { createdAt: string; id: string };
+	limit: number;
+}) {
+	return db
+		.select({
+			id: automationRuns.id,
+			automationId: automationRuns.automationId,
+			automationName: automations.name,
+			ownerUserId: automations.ownerUserId,
+			title: automationRuns.title,
+			status: automationRuns.status,
+			error: automationRuns.error,
+			errorCode: automationRuns.errorCode,
+			createdAt: automationRuns.createdAt,
+			cursorAt: sql<string>`${automationRuns.createdAt}::text`,
+			scheduledFor: automationRuns.scheduledFor,
+			dispatchedAt: automationRuns.dispatchedAt,
+			hostId: automationRuns.hostId,
+			triggerKind: automationTriggers.kind,
+			v2WorkspaceId: automationRuns.v2WorkspaceId,
+			cloudWorkspaceId: automationRuns.cloudWorkspaceId,
+			sessionKind: automationRuns.sessionKind,
+			chatSessionId: automationRuns.chatSessionId,
+			terminalSessionId: automationRuns.terminalSessionId,
+			eventId: automationRuns.eventId,
+		})
+		.from(automationRuns)
+		.innerJoin(automations, eq(automations.id, automationRuns.automationId))
+		.leftJoin(
+			automationTriggers,
+			eq(automationTriggers.id, automationRuns.triggerId),
+		)
+		.where(
+			and(
+				eq(automationRuns.organizationId, args.organizationId),
+				args.automationId
+					? eq(automationRuns.automationId, args.automationId)
+					: undefined,
+				args.status === "failed"
+					? inArray(automationRuns.status, [...FAILED_RUN_STATUSES])
+					: args.status === "missed"
+						? inArray(automationRuns.status, [...MISSED_RUN_STATUSES])
+						: undefined,
+				args.scope === "mine"
+					? eq(automations.ownerUserId, args.userId)
+					: undefined,
+				args.cursor
+					? sql`(${automationRuns.createdAt}, ${automationRuns.id}) < (${args.cursor.createdAt}::timestamptz, ${args.cursor.id}::uuid)`
+					: undefined,
+			),
+		)
+		.orderBy(desc(automationRuns.createdAt), desc(automationRuns.id))
+		.limit(args.limit);
+}
+
+/**
+ * A trigger set replaces the whole set, so a top-level `rrule` passed beside
+ * one is dropped and its schedule never fires. Refusing beats accepting a
+ * write we only half-apply — the caller asked for a schedule.
+ */
+function assertScheduleNotShadowed(
+	rrule: string | null | undefined,
+	triggers: DraftTrigger[] | null | undefined,
+): void {
+	if (!rrule || !triggers) return;
+	throw userError({
+		code: "BAD_REQUEST",
+		message:
+			"Pass the schedule inside triggers as a schedule trigger, not as rrule beside them",
+		i18nKey: "serverError.automation.rruleBesideTriggers",
+	});
+}
+
+/** Room for the trigger block the dispatcher puts ahead of the instructions. */
+const CLOUD_PROMPT_MAX_LENGTH = CLOUD_AGENT_PROMPT_MAX_LENGTH - 2_000;
+
+function assertPromptFitsTarget(targetHostId: string | null, prompt: string) {
+	if (
+		targetHostId === CLOUD_HOST_ID &&
+		prompt.length > CLOUD_PROMPT_MAX_LENGTH
+	) {
+		throw userError({
+			code: "BAD_REQUEST",
+			message: `A cloud automation's instructions can be at most ${CLOUD_PROMPT_MAX_LENGTH} characters`,
+			i18nKey: "serverError.automation.cloudPromptTooLong",
+			params: { max: CLOUD_PROMPT_MAX_LENGTH },
+		});
+	}
+}
+
+/** Looks up what the input names, plans the target, then runs the checks the plan asks for. */
+async function resolveTarget(
+	ctx: { session: { user: { id: string; email: string } } },
+	organizationId: string,
+	existing: AutomationTarget,
+	input: TargetInput,
+	agent: string,
+): Promise<AutomationTarget> {
+	const userId = ctx.session.user.id;
+	const lookups: TargetLookups = {};
+	if (needsLegacyWorkspace(input) && input.v2WorkspaceId) {
+		lookups.legacyWorkspace = await verifyWorkspaceInOrg(
+			organizationId,
+			input.v2WorkspaceId,
+		);
+	}
+	const pin = newCloudPin(existing, input);
+	if (pin) {
+		lookups.pinEnvironmentId = await ownCloudWorkspaceEnvironment(
+			userId,
+			organizationId,
+			pin,
+		);
+	}
+
+	const plan = planTarget(existing, input, lookups);
+	for (const hostId of plan.hostsToVerify) {
+		await verifyHostAccess(userId, organizationId, hostId);
+	}
+	if (plan.cloud) {
+		await assertCloudAccess(
+			{ principal: { userId }, session: ctx.session },
+			organizationId,
+		);
+		if (!isCloudAgentId(agent)) {
+			throw userError({
+				code: "BAD_REQUEST",
+				message: "This agent can't run in a cloud workspace",
+				i18nKey: "serverError.automation.cloudAgentUnsupported",
+			});
+		}
+		if (plan.cloud.environmentToVerify) {
+			await loadUsableEnvironment({
+				organizationId,
+				userId,
+				environmentId: plan.cloud.environmentToVerify,
+			});
+		}
+	}
+	return plan.target;
+}
+
+/** The pinned cloud workspace's environment, refused unless the caller created it. */
+async function ownCloudWorkspaceEnvironment(
+	userId: string,
+	organizationId: string,
+	cloudWorkspaceId: string,
+): Promise<string | null> {
+	const workspace = await db.query.cloudWorkspaces.findFirst({
+		where: and(
+			eq(cloudWorkspaces.id, cloudWorkspaceId),
+			eq(cloudWorkspaces.organizationId, organizationId),
+			notInArray(cloudWorkspaces.status, ["deleted", "failed"]),
+		),
+		columns: { environmentId: true, createdByUserId: true },
+	});
+	if (!workspace) {
+		throw userError({
+			code: "NOT_FOUND",
+			message: "Not found",
+			i18nKey: "serverError.cloudWorkspace.notFound",
+		});
+	}
+	// Waking a box hands it its creator's agent and GitHub credentials.
+	if (workspace.createdByUserId !== userId) {
+		throw userError({
+			code: "FORBIDDEN",
+			message: "An automation can only use a cloud workspace you created",
+			i18nKey: "serverError.automation.cloudWorkspaceNotYours",
+		});
+	}
+	return workspace.environmentId;
 }
 
 async function verifyWorkspaceInOrg(
@@ -211,7 +444,7 @@ export const automationRouter = {
 	 * List automations scoped to the caller's active organization. The
 	 * `prompt` body is omitted — call `getPrompt` to fetch it for one row.
 	 */
-	list: protectedProcedure
+	list: personProcedure
 		.input(
 			z
 				.object({
@@ -262,7 +495,7 @@ export const automationRouter = {
 	 * large markdown) — call `getPrompt` to fetch it. Use `listRuns` for
 	 * run history.
 	 */
-	get: protectedProcedure
+	get: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -291,6 +524,7 @@ export const automationRouter = {
 					id: automationTriggers.id,
 					kind: automationTriggers.kind,
 					config: automationTriggers.config,
+					connectionId: automationTriggers.connectionId,
 					nextRunAt: automationTriggers.nextRunAt,
 					secretPrefix: automationTriggers.secretPrefix,
 					secretRotatedAt: automationTriggers.secretRotatedAt,
@@ -309,70 +543,30 @@ export const automationRouter = {
 			};
 		}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
+			await assertMachineSizeOffered(organizationId, input.machineSize);
 
-			if (input.targetHostId) {
-				await verifyHostAccess(
-					ctx.session.user.id,
-					organizationId,
-					input.targetHostId,
-				);
-			}
+			const target = await resolveTarget(
+				ctx,
+				organizationId,
+				NO_TARGET,
+				{
+					targetHostId: input.targetHostId,
+					// A null project is the default here, never a conflicting one.
+					v2ProjectId: input.v2ProjectId ?? undefined,
+					v2WorkspaceId: input.v2WorkspaceId,
+					cloudWorkspaceId: input.cloudWorkspaceId,
+					environmentId: input.environmentId,
+					continueAgentSession: input.continueAgentSession,
+				},
+				input.agent,
+			);
+			assertPromptFitsTarget(target.targetHostId, input.prompt);
 
-			let targetHostId = input.targetHostId ?? null;
-			let v2ProjectId = input.v2ProjectId ?? null;
-			// Denormalized pin: a client that supplies hostId (and projectId, when
-			// the workspace has one) alongside the workspace id needs no registry
-			// lookup — hosts own workspace records. A null project means the pin
-			// is a session workspace. Host access is still verified below; a
-			// stale pin surfaces as a host-side error at run time, same as today.
-			if (input.v2WorkspaceId && !targetHostId) {
-				// Legacy clients (pre-denormalization) — resolve via the cloud
-				// table while it still exists; this branch is deleted in R3.
-				const workspace = await verifyWorkspaceInOrg(
-					organizationId,
-					input.v2WorkspaceId,
-				);
-				if (targetHostId && targetHostId !== workspace.hostId) {
-					throw userError({
-						code: "BAD_REQUEST",
-						message: "targetHostId does not match the workspace's host",
-						i18nKey:
-							"serverError.automation.targethostidDoesNotMatchTheWorkspace",
-					});
-				}
-				targetHostId = workspace.hostId;
-				if (v2ProjectId && v2ProjectId !== workspace.projectId) {
-					throw userError({
-						code: "BAD_REQUEST",
-						message: "v2ProjectId does not match the workspace's project",
-						i18nKey:
-							"serverError.automation.v2projectidDoesNotMatchTheWorkspace",
-					});
-				}
-				v2ProjectId = workspace.projectId;
-			}
-			if (input.continueAgentSession && !input.v2WorkspaceId) {
-				throw userError({
-					code: "BAD_REQUEST",
-					message: "Continuing an agent session requires a pinned workspace",
-					i18nKey: "serverError.automation.continueNeedsPinnedWorkspace",
-				});
-			}
-
-			// No project and no pin = session automation: each run creates a
-			// project-less session workspace on the host.
-
-			if (targetHostId && targetHostId !== input.targetHostId) {
-				await verifyHostAccess(
-					ctx.session.user.id,
-					organizationId,
-					targetHostId,
-				);
-			}
+			assertScheduleNotShadowed(input.rrule, input.triggers);
 
 			// Only the legacy shape carries a top-level schedule; a trigger set
 			// describes its own, or has none at all.
@@ -401,13 +595,15 @@ export const automationRouter = {
 						name: input.name,
 						prompt: input.prompt,
 						agent: input.agent,
-						targetHostId,
-						v2ProjectId,
-						v2WorkspaceId: input.v2WorkspaceId ?? null,
+						...target,
+						machineSize: input.machineSize ?? null,
 						// Every automation groups its runs out of the box; explicit
 						// tags (including []) override the default.
 						tags: input.tags ?? ["automation"],
-						continueAgentSession: input.continueAgentSession ?? false,
+						group: await resolveAutomationGroup(
+							organizationId,
+							input.group ?? null,
+						),
 					})
 					.returning();
 
@@ -464,7 +660,7 @@ export const automationRouter = {
 			return withSchedule(created, input.triggers ?? null, legacySchedule);
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -473,113 +669,28 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+			await assertMachineSizeOffered(organizationId, input.machineSize);
 
-			if (input.targetHostId !== undefined && input.targetHostId !== null) {
-				await verifyHostAccess(
-					ctx.session.user.id,
-					organizationId,
-					input.targetHostId,
-				);
-			}
+			const target = await resolveTarget(
+				ctx,
+				organizationId,
+				existing,
+				{
+					targetHostId: input.targetHostId,
+					v2ProjectId: input.v2ProjectId,
+					v2WorkspaceId: input.v2WorkspaceId,
+					cloudWorkspaceId: input.cloudWorkspaceId,
+					environmentId: input.environmentId,
+					continueAgentSession: input.continueAgentSession,
+				},
+				input.agent ?? existing.agent,
+			);
+			assertPromptFitsTarget(
+				target.targetHostId,
+				input.prompt ?? existing.prompt,
+			);
 
-			let nextTargetHostId =
-				input.targetHostId === undefined
-					? existing.targetHostId
-					: input.targetHostId;
-			// Explicit null switches to session mode; undefined keeps the project.
-			let nextProjectId =
-				input.v2ProjectId === undefined
-					? existing.v2ProjectId
-					: input.v2ProjectId;
-			let nextWorkspaceId =
-				input.v2WorkspaceId === undefined
-					? existing.v2WorkspaceId
-					: input.v2WorkspaceId;
-
-			if (input.v2WorkspaceId === undefined) {
-				const targetHostChanged =
-					input.targetHostId !== undefined &&
-					input.targetHostId !== existing.targetHostId;
-				const projectChanged =
-					input.v2ProjectId !== undefined &&
-					input.v2ProjectId !== existing.v2ProjectId;
-				if (targetHostChanged || projectChanged) {
-					nextWorkspaceId = null;
-				}
-			}
-
-			if (input.v2WorkspaceId && input.targetHostId) {
-				// Denormalized pin (see create): the client supplies host (and
-				// project, when the workspace has one) with the workspace id; no
-				// workspace registry lookup. A null project = session pin.
-				nextProjectId = input.v2ProjectId ?? null;
-				nextTargetHostId = input.targetHostId;
-			} else if (input.v2WorkspaceId) {
-				// Legacy clients changing the pin — resolve via the cloud table
-				// while it still exists; this branch is deleted in R3. A merely
-				// retained pin is never re-resolved here: hosts own workspace
-				// records, and session pins have no cloud row at all.
-				const workspace = await verifyWorkspaceInOrg(
-					organizationId,
-					input.v2WorkspaceId,
-				);
-				// Mirror create: derive the project from the workspace and only
-				// reject when the caller *explicitly* passed a conflicting project.
-				// Otherwise a legitimate cross-project workspace move (sending only
-				// v2WorkspaceId) would be wrongly rejected as a mismatch.
-				if (
-					input.v2ProjectId !== undefined &&
-					input.v2ProjectId !== workspace.projectId
-				) {
-					throw userError({
-						code: "BAD_REQUEST",
-						message: "v2ProjectId does not match the workspace's project",
-						i18nKey:
-							"serverError.automation.v2projectidDoesNotMatchTheWorkspace",
-					});
-				}
-				nextProjectId = workspace.projectId;
-				if (
-					input.targetHostId !== undefined &&
-					input.targetHostId !== null &&
-					input.targetHostId !== workspace.hostId
-				) {
-					throw userError({
-						code: "BAD_REQUEST",
-						message: "targetHostId does not match the workspace's host",
-						i18nKey:
-							"serverError.automation.targethostidDoesNotMatchTheWorkspace",
-					});
-				}
-				nextTargetHostId = workspace.hostId;
-			}
-			if (
-				nextTargetHostId &&
-				nextTargetHostId !== existing.targetHostId &&
-				nextTargetHostId !== input.targetHostId
-			) {
-				await verifyHostAccess(
-					ctx.session.user.id,
-					organizationId,
-					nextTargetHostId,
-				);
-			}
-
-			// Asking for it without a pin is a mistake worth reporting; losing the
-			// pin some other way (a host or project change nulls it above) just
-			// takes the flag with it, since the session it would continue lived
-			// in that workspace.
-			if (input.continueAgentSession === true && nextWorkspaceId === null) {
-				throw userError({
-					code: "BAD_REQUEST",
-					message: "Continuing an agent session requires a pinned workspace",
-					i18nKey: "serverError.automation.continueNeedsPinnedWorkspace",
-				});
-			}
-			const nextContinueAgentSession =
-				nextWorkspaceId === null
-					? false
-					: (input.continueAgentSession ?? existing.continueAgentSession);
+			assertScheduleNotShadowed(input.rrule, input.triggers);
 
 			const nextRrule = input.rrule ?? existing.rrule;
 			const nextDtstart = input.dtstart ?? existing.dtstart;
@@ -604,11 +715,19 @@ export const automationRouter = {
 					.set({
 						name: input.name ?? existing.name,
 						agent: input.agent ?? existing.agent,
-						targetHostId: nextTargetHostId,
-						v2ProjectId: nextProjectId,
-						v2WorkspaceId: nextWorkspaceId,
+						...target,
+						...(input.machineSize !== undefined
+							? { machineSize: input.machineSize }
+							: {}),
 						tags: input.tags ?? existing.tags,
-						continueAgentSession: nextContinueAgentSession,
+						...(input.group !== undefined
+							? {
+									group: await resolveAutomationGroup(
+										organizationId,
+										input.group,
+									),
+								}
+							: {}),
 						prompt: input.prompt ?? existing.prompt,
 					})
 					.where(eq(automations.id, input.id))
@@ -638,7 +757,14 @@ export const automationRouter = {
 						organizationId,
 						triggers: input.triggers,
 					});
-				} else if (nextRrule && nextDtstart && nextTimezone) {
+				} else if (
+					recurrenceChanged &&
+					nextRrule &&
+					nextDtstart &&
+					nextTimezone
+				) {
+					// Rewriting through the single-schedule shape keeps only one
+					// schedule, so an edit that leaves the schedule alone skips it.
 					await syncScheduleTrigger(tx, {
 						automationId: row.id,
 						organizationId,
@@ -676,7 +802,7 @@ export const automationRouter = {
 			);
 		}),
 
-	getPrompt: protectedProcedure
+	getPrompt: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -696,7 +822,22 @@ export const automationRouter = {
 			return existing;
 		}),
 
-	setPrompt: protectedProcedure
+	setGroup: personProcedure
+		.input(setAutomationGroupSchema)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			await getAutomationForUser(ctx.session.user.id, organizationId, input.id);
+
+			const group = await resolveAutomationGroup(organizationId, input.group);
+			await db
+				.update(automations)
+				.set({ group })
+				.where(eq(automations.id, input.id));
+
+			return { id: input.id, group };
+		}),
+
+	setPrompt: personProcedure
 		.input(setAutomationPromptSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -709,6 +850,7 @@ export const automationRouter = {
 			if (existing.prompt === input.prompt) {
 				return { ...existing, scheduleText: safeDescribeRrule(existing) };
 			}
+			assertPromptFitsTarget(existing.targetHostId, input.prompt);
 
 			const updated = await dbWs.transaction(async (tx) => {
 				const [row] = await tx
@@ -746,18 +888,23 @@ export const automationRouter = {
 			};
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
-			await getAutomationForUser(ctx.session.user.id, organizationId, input.id);
+			await requireAutomationDeleteAccess(
+				ctx.session.user.id,
+				organizationId,
+				input.id,
+			);
 
 			await db.delete(automations).where(eq(automations.id, input.id));
+			nudge(organizationId, "automation_runs");
 
 			return { ok: true };
 		}),
 
-	setEnabled: protectedProcedure
+	setEnabled: personProcedure
 		.input(z.object({ id: z.string().uuid(), enabled: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
 			// Pausing is always allowed; resuming is what needs the plan.
@@ -806,7 +953,7 @@ export const automationRouter = {
 			};
 		}),
 
-	runNow: protectedProcedure
+	runNow: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
@@ -863,7 +1010,7 @@ export const automationRouter = {
 	 * Issues a new bearer token for a webhook trigger, replacing any previous
 	 * one. The token is returned once; only its hash is stored.
 	 */
-	rotateWebhookSecret: protectedProcedure
+	rotateWebhookSecret: personProcedure
 		.input(z.object({ triggerId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -914,7 +1061,7 @@ export const automationRouter = {
 	 * Stores a provider-issued signing secret on a trigger, verbatim — an HMAC
 	 * verifier needs the raw key. Bearer-token kinds use `rotateWebhookSecret`.
 	 */
-	setTriggerSecret: protectedProcedure
+	setTriggerSecret: personProcedure
 		.input(
 			z.object({
 				triggerId: z.string().uuid(),
@@ -967,7 +1114,7 @@ export const automationRouter = {
 		}),
 
 	/** Run history for a given automation (paginated). */
-	listRuns: protectedProcedure
+	listRuns: personProcedure
 		.input(listRunsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -977,16 +1124,109 @@ export const automationRouter = {
 				input.automationId,
 			);
 
-			return db
-				.select()
+			// Reads through selectRuns so the CLI and MCP see the same rows the
+			// screens do. The shape stays as shipped: no cursor field, and the
+			// run columns `automations logs` prints.
+			const rows = await selectRuns({
+				organizationId,
+				userId: ctx.session.user.id,
+				automationId: input.automationId,
+				limit: input.limit,
+			});
+			return rows.map(({ cursorAt: _cursorAt, ...run }) => run);
+		}),
+
+	listOrgRuns: personProcedure
+		.input(listOrgRunsSchema)
+		.query(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const userId = ctx.session.user.id;
+
+			const rows = await selectRuns({
+				organizationId,
+				userId,
+				automationId: input.automationId,
+				status: input.status,
+				scope: input.scope,
+				cursor: input.cursor,
+				limit: input.limit + 1,
+			});
+
+			const hasMore = rows.length > input.limit;
+			const page = hasMore ? rows.slice(0, input.limit) : rows;
+			const last = page.at(-1);
+
+			return {
+				runs: page.map(({ eventId, cursorAt: _cursorAt, ...run }) => ({
+					...run,
+					hasPayload: eventId !== null,
+					// "Run again" dispatches a fresh schedule-caused run, so it
+					// cannot carry an event run's message, PR or issue — retrying
+					// one would start the agent with nothing. Until there is a
+					// retryRun that re-dispatches a row with its own cause, only
+					// failed schedule-caused runs can be retried.
+					canRetry:
+						run.ownerUserId === userId &&
+						(UNSUCCESSFUL_RUN_STATUSES as readonly string[]).includes(
+							run.status,
+						) &&
+						run.scheduledFor !== null,
+				})),
+				nextCursor:
+					hasMore && last ? { createdAt: last.cursorAt, id: last.id } : null,
+			};
+		}),
+
+	runPayload: personProcedure
+		.input(runPayloadSchema)
+		.query(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+
+			const [row] = await db
+				.select({
+					payload: automationEvents.payload,
+					provider: automationEvents.provider,
+					receivedAt: automationEvents.receivedAt,
+				})
 				.from(automationRuns)
-				.where(eq(automationRuns.automationId, input.automationId))
-				.orderBy(desc(automationRuns.createdAt))
-				.limit(input.limit);
+				.innerJoin(
+					automationEvents,
+					eq(automationEvents.id, automationRuns.eventId),
+				)
+				.where(
+					and(
+						eq(automationRuns.id, input.runId),
+						eq(automationRuns.organizationId, organizationId),
+					),
+				)
+				.limit(1);
+
+			if (!row) return { payload: null, provider: null, receivedAt: null };
+			return row;
+		}),
+
+	/**
+	 * A cloud workspace reporting the session its first-boot launch started,
+	 * for the automation run that created it. Only the box itself may call it.
+	 */
+	reportCloudLaunch: personProcedure
+		.input(reportCloudLaunchSchema)
+		.mutation(async ({ ctx, input }) => {
+			if (!ctx.sandboxCaller) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only a cloud workspace can report its own launch",
+				});
+			}
+			const result = await recordCloudLaunch(ctx.sandboxCaller, input);
+			if (result.recorded) {
+				nudge(ctx.sandboxCaller.organizationId, "automation_runs");
+			}
+			return result;
 		}),
 
 	/** Most recent run per automation across the caller's active organization. */
-	latestRuns: protectedProcedure.query(async ({ ctx }) => {
+	latestRuns: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 
 		return db
@@ -995,16 +1235,68 @@ export const automationRouter = {
 				status: automationRuns.status,
 				createdAt: automationRuns.createdAt,
 				v2WorkspaceId: automationRuns.v2WorkspaceId,
+				cloudWorkspaceId: automationRuns.cloudWorkspaceId,
+				sessionKind: automationRuns.sessionKind,
 				chatSessionId: automationRuns.chatSessionId,
 				terminalSessionId: automationRuns.terminalSessionId,
+				ownerUserId: automations.ownerUserId,
 			})
 			.from(automationRuns)
+			.innerJoin(automations, eq(automations.id, automationRuns.automationId))
 			.where(eq(automationRuns.organizationId, organizationId))
 			.orderBy(automationRuns.automationId, desc(automationRuns.createdAt));
 	}),
 
+	/**
+	 * Run volume for the org's last 7 days: success/failure totals for the
+	 * stat cards and 6-hour activity buckets for the run-history sparkline.
+	 * Aggregated in SQL — an org can have tens of thousands of runs a week.
+	 */
+	orgRunStats: personProcedure.query(async ({ ctx }) => {
+		const organizationId = await requireActiveOrgMembership(ctx);
+		const bucketSeconds = 6 * 60 * 60;
+		const bucketCount = 28;
+		// The window ends on the interval in progress, so the newest bar is the
+		// one drawing now. Anchoring it 28 intervals back instead would push
+		// that interval to index 28 and drop it off the end.
+		const baseBucket =
+			Math.floor(Date.now() / 1000 / bucketSeconds) - (bucketCount - 1);
+		const since = new Date(baseBucket * bucketSeconds * 1000);
+
+		const rows = await db
+			.select({
+				bucket: sql<number>`floor(extract(epoch from ${automationRuns.createdAt}) / ${bucketSeconds})::int`,
+				status: automationRuns.status,
+				count: sql<number>`count(*)::int`,
+			})
+			.from(automationRuns)
+			.where(
+				and(
+					eq(automationRuns.organizationId, organizationId),
+					gte(automationRuns.createdAt, since),
+				),
+			)
+			.groupBy(sql`1`, automationRuns.status);
+
+		let succeeded = 0;
+		let failed = 0;
+		let missed = 0;
+		const buckets: number[] = Array(bucketCount).fill(0);
+		for (const row of rows) {
+			if (row.status === "dispatched") succeeded += row.count;
+			else if ((FAILED_RUN_STATUSES as readonly string[]).includes(row.status))
+				failed += row.count;
+			else if ((MISSED_RUN_STATUSES as readonly string[]).includes(row.status))
+				missed += row.count;
+			const index = row.bucket - baseBucket;
+			if (index >= 0 && index < bucketCount)
+				buckets[index] = (buckets[index] ?? 0) + row.count;
+		}
+		return { succeeded, failed, missed, buckets };
+	}),
+
 	/** Validate an RRule body + preview its next occurrences. */
-	validateRrule: protectedProcedure
+	validateRrule: personProcedure
 		.input(parseRruleSchema)
 		.mutation(async ({ input }) => {
 			const dtstart = input.dtstart ?? new Date();

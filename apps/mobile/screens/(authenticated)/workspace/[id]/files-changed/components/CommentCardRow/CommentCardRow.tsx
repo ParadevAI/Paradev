@@ -1,5 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { View } from "react-native";
+import { useRef } from "react";
+import type { ViewInstance } from "react-native";
+import { findNodeHandle, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import type { DraftComment } from "../../../stores/draftCommentsStore";
@@ -14,14 +16,18 @@ export function CommentCardRow({
 	stale: boolean;
 	/** True when the anchored line/file no longer exists in the changeset. */
 	orphaned?: boolean;
-	onLongPress: (comment: DraftComment) => void;
+	onLongPress: (comment: DraftComment, anchor: number | null) => void;
 }) {
 	const { t } = useLingui();
+	const cardRef = useRef<ViewInstance>(null);
+	const openMenu = () =>
+		onLongPress(comment, findNodeHandle(cardRef.current) ?? null);
 	return (
 		<PressableScale
+			ref={cardRef}
 			className="bg-card border-border mx-3 my-1.5 ml-12 rounded-xl border px-3 py-2.5"
-			onLongPress={() => onLongPress(comment)}
-			onPress={() => onLongPress(comment)}
+			onLongPress={openMenu}
+			onPress={openMenu}
 		>
 			<View className="flex-row items-center gap-2">
 				<Text className="text-muted-foreground text-[11px]">

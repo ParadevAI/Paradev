@@ -22,12 +22,28 @@ provisions running indefinitely, and nothing in the product would ever have
 shown them.
 
 **An idle sandbox stops after its session timeout. Done, with a caveat.** A
-session ends four hours after its last extension; only the workspace someone
-has open extends it (every token refresh with `wake`), so a closed workspace
-stops within four hours and costs snapshot storage only. Still owed: a per-org
-quota and cost visibility in the product — and a decision on unattended agent
-runs, which die with the session (Blaxel froze processes; Vercel snapshots the
-filesystem and boots fresh).
+session ends one hour after its last extension. The workspace someone has
+open extends it (every token refresh with `wake`), and so does the box while
+its agent is active, so a closed workspace stops within an hour of its
+agent's last activity and costs snapshot storage only. Still owed: a per-org
+quota and cost visibility in the product. Work left running after a turn (a
+background shell, a dev server) dies with the session (Blaxel froze
+processes; Vercel snapshots the filesystem and boots fresh).
+
+**Box time is metered and capped.** Creating a workspace checks the
+organization may run boxes; every box start or wake takes a short Autumn
+balance lock first, recorded in `cloud_workspace_boots`, and is refused with
+"needs a paid plan" (free organizations) or "usage limit reached". A QStash
+schedule (`/api/cloud-workspaces/jobs/reconcile-usage`, every 30 minutes, set
+in the Upstash console and watched by a Sentry cron monitor) finalizes each
+running box's memory GB-minutes and takes the next lock; a box whose next lock
+is refused is stopped. Stopping, archiving or deleting a box settles the rest.
+Environment builds are not billed. Prices and limits live in Autumn, not here.
+Each paid seat adds its plan's GB-minutes to one team pool through Autumn
+seat licenses; see [Seats and cloud hours in Autumn](autumn-seat-licenses.md).
+Still owed: our own idle stop (boxes run until Vercel's session timeout, and
+every minute is billed), per-member billing for Teams, and confirming Autumn's
+lock behaviour (retried and expired finalize) in its sandbox.
 
 **A golden lives exactly as long as its environment. Fixed (2026-09-25).** A
 golden is a stopped persistent sandbox whose snapshot never expires, about
@@ -49,6 +65,12 @@ over: a pane still open on the deleted workspace keeps asking
 `cloudWorkspace.access` and logs "Cloud workspace is deleted" until it is
 closed.
 
+**Cloud automations start boxes on a schedule. Open.** An automation set to a
+new cloud workspace each run leaves one box per run. Each box stops after four
+idle hours but keeps its snapshot, and nothing deletes it. A pinned automation
+reuses one box. There is no spend limit; per-org rate limits are the planned
+answer.
+
 ## Credentials and blast radius
 
 **Model credentials are the person's sign-in, never ours and never the
@@ -56,7 +78,8 @@ environment's. Fixed (2026-09-25).** A sandbox's Anthropic or OpenAI credential
 comes from the creator's sign-in (Settings › Agents, per user,
 `agent_credentials`), brokered at the firewall by a rule that fires only on the
 placeholder the agent presents. An environment variable by one of those names
-(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`) is ignored:
+(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`,
+`CODEX_ACCESS_TOKEN`, `CODEX_API_KEY`) is ignored:
 it never reaches the box, so nothing that runs there, a launched agent, a
 hand-typed `claude`, a headless `claude -p`, `codex`, the app itself, can bill
 it; the environment sheet and `secrets set` say so. Measured on Claude Code
@@ -92,6 +115,16 @@ reaches every repository the creator can reach through the App, including ones
 the visitor cannot. Before cloud workspaces leave the team this needs an
 answer: per-member identity inside a shared box, or a workspace falling back
 to the installation token while someone other than its creator holds a ticket.
+
+**A box reaches its creator's private workspaces. Open.** `superset` in a
+box calls the API as the creator, held to the box's organization. Inside it,
+`access` and `hostTicket` mint shell tickets for every workspace the creator
+can see, their private ones included, and `delete` and `rename` reach the
+same set. A teammate who opened the box, or an agent prompted by an
+automation's event, gets that reach. Closing it means holding a box to
+itself and the workspaces its organization shares, in `loadReadyWorkspace`,
+`loadVisibleWorkspace` and `delete` together; a check on one of them is
+bypassed through the others.
 
 **A sandbox has exactly one gate, and it is ours.** A sandbox's own port is
 a public URL that clients never see; they reach a workspace through the
@@ -135,8 +168,32 @@ tray menu Linux does not have. Seen 2026-09-11 from a throwaway prompt that
 invited the agent to "try the new image". Recovery is a platform-side
 `vercel sandbox stop` (snapshots the disk, kills everything) followed by the
 app's Retry, which wakes a clean session. Still owed: memory pressure shown in
-the product, and a kill switch for the runaway process short of stopping the
-box. **Open.**
+the product. **The kill switch is done (2026-10-21):** measured on a 2 vCPU / 4 GB
+box, the kernel's killer was the last thing to act — with no swap it drops code
+pages first, and host-service's event loop stalled for 113 s while a 3 GB
+`tsc` refaulted everything. `superset-memguard` (bundle, started by boot as
+root) now ranks every process by what it is — host-service and pty-daemon
+−900, agent and desktop sessions −300, everything else the platform's 500 — because the
+kernel copies the score at fork and host-service's protection would otherwise
+reach every tool an agent runs; and it reaps the largest least-protected
+process when `MemAvailable` drops under 8% of the box, so the agent sees an
+exit 137 from its tool instead of the box dying. Boot also writes
+`SUPERSET_SANDBOX_MEMORY_MB` and `SUPERSET_SANDBOX_VCPUS` into every login
+shell from the cgroup, so a hook or an agent can size its work. **Swap is on demand
+(2026-10-22):** memguard adds 2 GB swapfiles under `/var/swap` when free memory
+drops below twice its reap floor, up to 1.5x the box (at least 6 GB, at most
+16 GB), at `vm.swappiness=10`, and drops the newest one after ten quiet
+minutes if RAM can take its pages back; the cgroup permits it
+(`memory.swap.max` is unbounded). A box that never needs swap holds none on
+disk, so no snapshot carries it. Measured on a 2/4 box: the host-service
+typecheck the kernel had killed at 3 GB finished in 22 s with 855 MB swapped;
+the `apps/desktop` typecheck, which needs about 8 GB in all, grew swap
+0 → 6 GB and finished in 86 s with host-service's health check never above
+47 ms, then swap shrank back to nothing. A GC keeps its hot set in RAM, so a
+swapped heap is slow, not a stall. Swap is never on without memguard: with a
+fixed 2 GB swapfile and no memguard, the desktop typecheck stalled
+host-service past 5 s and was killed by the kernel after 233 s. Still open: automatic resume of an agent whose own process was
+reaped while its terminal survived.
 
 ## Untested behaviour
 
@@ -179,8 +236,8 @@ older than a few minutes and tears down any sandbox they name, plus the same
 teardown on the paths that can't currently reach it. One row from that incident
 had to be cleared by hand.
 
-**The Superset CLI is offered but not installed. Open.** A cloud workspace's
-agent row includes "Superset CLI" alongside Claude, Codex and Copilot, and
+**The Paradev CLI is offered but not installed. Open.** A cloud workspace's
+agent row includes "Paradev CLI" alongside Claude, Codex and Copilot, and
 picking it fails with command-not-found: the image installs the agent CLIs but
 not ours. It also matters beyond the picker — the CLI is how an agent spawns
 workspaces and other agents, so a sandbox without it can't orchestrate. Install

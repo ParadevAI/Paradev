@@ -1,0 +1,1 @@
+export { registerTrailingParagraph } from "./trailingParagraph";

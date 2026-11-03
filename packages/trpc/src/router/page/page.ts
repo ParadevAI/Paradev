@@ -1,9 +1,9 @@
 import { db, dbWs } from "@superset/db/client";
 import {
-	attachments,
-	files,
 	members,
 	organizations,
+	pageComments,
+	pageCommentThreads,
 	pages,
 	pageVersions,
 	type SelectPage,
@@ -13,7 +13,6 @@ import {
 import { escapeLikePattern } from "@superset/db/utils";
 import { mintPageSlug } from "@superset/shared/page-slug";
 import {
-	fileOriginalKey,
 	pageManifestKey,
 	pageThumbnailKey,
 	pageThumbnailUrl,
@@ -27,7 +26,9 @@ import {
 	ilike,
 	inArray,
 	isNotNull,
+	isNull,
 	lt,
+	ne,
 	notExists,
 	or,
 	type SQL,
@@ -35,15 +36,33 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
+import { detachAll, reapOrphanFiles } from "../../lib/files";
+import { deletePageStorage } from "../../lib/page-store";
 import { deleteObjects, objectExists, presignedGetUrl } from "../../lib/r2";
-import { protectedProcedure, publicProcedure, userError } from "../../trpc";
+import {
+	actorProcedure,
+	personProcedure,
+	publicProcedure,
+	userError,
+} from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
-import { assertPageReadable, assertPageWritable } from "./access";
+import {
+	assertPageReadable,
+	assertPageWritable,
+	loadPageShareRole,
+	pageAccess,
+	pageReadableBy,
+	pageSharedWith,
+} from "./access";
 import { pageAssetRouter } from "./assets";
+import { withCommentSummaries } from "./comment-summary";
 import { decodePageCursor, encodePageCursor } from "./cursor";
+import { noPageAccess, pageCaller, pageReader } from "./page-caller";
 import { pageUrl } from "./page-url";
+import { pagePreview } from "./preview";
 import { publishPage } from "./publish";
 import { isEntryPathConflict } from "./publish-rules";
+import { pageReportRouter } from "./reports";
 import {
 	clearPageWatchSchema,
 	createPageSchema,
@@ -56,22 +75,26 @@ import {
 	type PageListScope,
 	pageCountsSchema,
 	pageFields,
+	pagePreviewSchema,
 	pageRefSchema,
 	publicPageSchema,
 	publishPageSchema,
 	pullPageSchema,
+	setPageOrganizationRoleSchema,
 	setPageVisibilitySchema,
 	setPageWatchSchema,
 	setSharedVersionSchema,
 	updatePageSchema,
 } from "./schema";
 import { resolveSharedVersion, servedVersion } from "./shared-version";
+import { pageSharingRouter } from "./sharing";
 import {
 	deletePageObjects,
 	mintPageTicket,
 	writePageManifest,
 } from "./storage";
 import { enqueuePageThumbnail } from "./thumbnail";
+import { pageToolRouter } from "./tools/router";
 import { watchState } from "./watch";
 import {
 	claimPageWatch,
@@ -82,20 +105,25 @@ import {
 } from "./watch-ownership";
 import { assertWorkspaceAccess } from "./workspace-access";
 
-function visibilityFilter(userId: string) {
-	return or(
-		eq(pages.visibility, "org"),
-		eq(pages.visibility, "everyone"),
-		and(eq(pages.visibility, "just_me"), eq(pages.createdByUserId, userId)),
+/** Someone else's page shared with `userId`, whatever its general access. */
+function sharedWithScope(userId: string) {
+	return and(
+		or(isNull(pages.createdByUserId), ne(pages.createdByUserId, userId)),
+		pageSharedWith(userId),
 	);
 }
 
-function scopeFilter(scope: PageListScope): SQL | undefined {
+function scopeFilter(scope: PageListScope, userId: string): SQL | undefined {
 	switch (scope) {
 		case "team":
 			return sql`${pages.visibility} <> 'just_me'`;
 		case "mine":
-			return eq(pages.visibility, "just_me");
+			return and(
+				eq(pages.visibility, "just_me"),
+				eq(pages.createdByUserId, userId),
+			);
+		case "shared":
+			return sharedWithScope(userId);
 		default:
 			return undefined;
 	}
@@ -105,12 +133,15 @@ function scopeFilter(scope: PageListScope): SQL | undefined {
  * Shared by `list` and `counts` so a tab's count and its contents can't be
  * answered by two different WHERE clauses.
  */
-function pageFilters(input: {
-	search?: string | undefined;
-	scope?: PageListScope | undefined;
-	authorId?: string | undefined;
-	ids?: string[] | undefined;
-}): (SQL | undefined)[] {
+function pageFilters(
+	input: {
+		search?: string | undefined;
+		scope?: PageListScope | undefined;
+		authorId?: string | undefined;
+		ids?: string[] | undefined;
+	},
+	userId: string,
+): (SQL | undefined)[] {
 	const filters: (SQL | undefined)[] = [];
 
 	if (input.search) {
@@ -124,7 +155,7 @@ function pageFilters(input: {
 		);
 	}
 
-	if (input.scope) filters.push(scopeFilter(input.scope));
+	if (input.scope) filters.push(scopeFilter(input.scope, userId));
 	if (input.authorId) filters.push(eq(pages.createdByUserId, input.authorId));
 	// An empty array is "no pins", which must return nothing rather than
 	// degrade to the unfiltered list.
@@ -145,7 +176,7 @@ async function pageNotFound(identity: SQL, userId: string): Promise<TRPCError> {
 			),
 		)
 		.innerJoin(organizations, eq(organizations.id, pages.organizationId))
-		.where(and(identity, visibilityFilter(userId)))
+		.where(and(identity, pageReadableBy(userId)))
 		.limit(1);
 
 	if (!elsewhere) {
@@ -190,7 +221,7 @@ async function loadPage({
 	if (!page) {
 		throw await pageNotFound(identity, userId);
 	}
-	assertPageReadable(page, userId);
+	assertPageReadable(page, userId, await loadPageShareRole(page, userId));
 	return page;
 }
 
@@ -217,6 +248,14 @@ async function latestVersionNumber(pageId: string): Promise<number | null> {
 		.orderBy(desc(pageVersions.version))
 		.limit(1);
 	return row?.version ?? null;
+}
+
+async function wipePageStorage(pageId: string): Promise<void> {
+	try {
+		await deletePageStorage(pageId);
+	} catch (error) {
+		console.error("[pages] hub wipe failed after delete", { pageId, error });
+	}
 }
 
 async function listPageBatch({
@@ -278,8 +317,8 @@ async function listPageBatch({
 
 	const filters: (SQL | undefined)[] = [
 		eq(pages.organizationId, organizationId),
-		visibilityFilter(userId),
-		...pageFilters(input ?? {}),
+		pageReadableBy(userId),
+		...pageFilters(input ?? {}, userId),
 	];
 
 	if (input?.cursor) {
@@ -383,13 +422,16 @@ async function listPageBatch({
 
 export const pageRouter = {
 	assets: pageAssetRouter,
+	sharing: pageSharingRouter,
+	...pageReportRouter,
+	...pageToolRouter,
 
 	/**
 	 * A page with no versions yet. Assets stage against a page id, so a first
 	 * publish that carries them creates the page here and publishes into it.
 	 * A publish with no assets still mints its own page and never needs this.
 	 */
-	create: protectedProcedure
+	create: personProcedure
 		.input(createPageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -454,18 +496,21 @@ export const pageRouter = {
 			});
 		}),
 
-	publish: protectedProcedure
+	publish: actorProcedure
 		.input(publishPageSchema)
 		.mutation(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
+			const caller = await pageCaller(ctx);
+			if (!caller.reader && (input.pageId || input.workspaceId)) {
+				throw noPageAccess();
+			}
 			return await publishPage({
 				input,
-				organizationId,
-				userId: ctx.session.user.id,
+				organizationId: caller.organizationId,
+				userId: caller.userId,
 			});
 		}),
 
-	list: protectedProcedure
+	list: personProcedure
 		.input(legacyListPagesSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -489,17 +534,24 @@ export const pageRouter = {
 			return all;
 		}),
 
-	listPaginated: protectedProcedure
+	listPaginated: actorProcedure
 		.input(listPagesSchema)
-		.query(async ({ ctx, input }) =>
-			listPageBatch({
-				organizationId: await requireActiveOrgMembership(ctx),
-				userId: ctx.session.user.id,
+		.query(async ({ ctx, input }) => {
+			const caller = await pageCaller(ctx);
+			const userId = caller.reader;
+			if (!userId) return { items: [], nextCursor: null };
+			const batch = await listPageBatch({
+				organizationId: caller.organizationId,
+				userId,
 				input,
-			}),
-		),
+			});
+			return {
+				...batch,
+				items: await withCommentSummaries(batch.items, userId),
+			};
+		}),
 
-	counts: protectedProcedure
+	counts: personProcedure
 		.input(pageCountsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -515,18 +567,19 @@ export const pageRouter = {
 
 			const filters: (SQL | undefined)[] = [
 				eq(pages.organizationId, organizationId),
-				visibilityFilter(userId),
-				...pageFilters({
-					search: input?.search,
-					authorId: input?.authorId,
-				}),
+				pageReadableBy(userId),
+				...pageFilters(
+					{ search: input?.search, authorId: input?.authorId },
+					userId,
+				),
 			];
 
 			const pinned = input?.pinnedIds ?? [];
 			const selection = {
 				all: sql<number>`count(*)::int`,
 				team: sql<number>`count(*) filter (where ${pages.visibility} <> 'just_me')::int`,
-				mine: sql<number>`count(*) filter (where ${pages.visibility} = 'just_me')::int`,
+				mine: sql<number>`count(*) filter (where ${scopeFilter("mine", userId)})::int`,
+				shared: sql<number>`count(*) filter (where ${sharedWithScope(userId)})::int`,
 				pinned: pinned.length
 					? sql<number>`count(*) filter (where ${inArray(pages.id, pinned)})::int`
 					: sql<number>`0::int`,
@@ -585,28 +638,28 @@ export const pageRouter = {
 				.where(
 					and(
 						eq(pages.organizationId, organizationId),
-						visibilityFilter(userId),
+						pageReadableBy(userId),
 						// `authorId` deliberately absent; `search` still applies.
-						...pageFilters({ search: input?.search }),
+						...pageFilters({ search: input?.search }, userId),
 						isNotNull(pages.createdByUserId),
 					),
 				)
 				.groupBy(pages.createdByUserId, users.name, users.image);
 
 			return {
-				...(row ?? { all: 0, team: 0, mine: 0, pinned: 0 }),
+				...(row ?? { all: 0, team: 0, mine: 0, shared: 0, pinned: 0 }),
 				workspaces,
 				authors,
 			};
 		}),
 
-	get: protectedProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
-		const organizationId = await requireActiveOrgMembership(ctx);
+	get: actorProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
+		const caller = await pageCaller(ctx);
 		const page = await loadPage({
 			id: input.id,
 			slug: input.slug,
-			organizationId,
-			userId: ctx.session.user.id,
+			organizationId: caller.organizationId,
+			userId: pageReader(caller),
 		});
 
 		const latestVersion = await latestVersionNumber(page.id);
@@ -638,13 +691,23 @@ export const pageRouter = {
 		};
 	}),
 
+	preview: personProcedure
+		.input(pagePreviewSchema)
+		.query(async ({ ctx, input }) =>
+			pagePreview({
+				slug: input.slug,
+				organizationId: await requireActiveOrgMembership(ctx),
+				userId: ctx.session.user.id,
+			}),
+		),
+
 	/**
 	 * The page a workspace path anchors to, for the CLI's directory publish:
 	 * it compares each asset's hash against the previous version and reuses
 	 * unchanged files instead of re-uploading. Mirrors the republish lookup —
 	 * only the caller's own pages match.
 	 */
-	resolveByEntryPath: protectedProcedure
+	resolveByEntryPath: personProcedure
 		.input(
 			z
 				.object({
@@ -702,7 +765,7 @@ export const pageRouter = {
 			};
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updatePageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -718,7 +781,7 @@ export const pageRouter = {
 						? { description: input.description }
 						: {}),
 				})
-				.where(eq(pages.id, page.id))
+				.where(and(eq(pages.id, page.id), isNull(pages.takenDownAt)))
 				.returning();
 
 			if (!updated) {
@@ -736,7 +799,7 @@ export const pageRouter = {
 			};
 		}),
 
-	setVisibility: protectedProcedure
+	setVisibility: personProcedure
 		.input(setPageVisibilitySchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -747,7 +810,7 @@ export const pageRouter = {
 			const [updated] = await db
 				.update(pages)
 				.set({ visibility: input.visibility })
-				.where(eq(pages.id, page.id))
+				.where(and(eq(pages.id, page.id), isNull(pages.takenDownAt)))
 				.returning();
 
 			if (!updated) {
@@ -769,7 +832,21 @@ export const pageRouter = {
 			return { id: updated.id, visibility: updated.visibility };
 		}),
 
-	claimWatch: protectedProcedure
+	setOrganizationRole: personProcedure
+		.input(setPageOrganizationRoleSchema)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const userId = ctx.session.user.id;
+			const page = await loadPage({ id: input.id, organizationId, userId });
+			assertPageWritable(page, userId);
+			await db
+				.update(pages)
+				.set({ organizationRole: input.role })
+				.where(eq(pages.id, page.id));
+			return { id: page.id, organizationRole: input.role };
+		}),
+
+	claimWatch: personProcedure
 		.input(
 			z.object({
 				id: pageFields.id,
@@ -787,7 +864,7 @@ export const pageRouter = {
 			assertPageWritable(page, ctx.session.user.id);
 			return claimPageWatch(input);
 		}),
-	renewWatch: protectedProcedure
+	renewWatch: personProcedure
 		.input(z.object({ id: pageFields.id, token: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -799,7 +876,7 @@ export const pageRouter = {
 			assertPageWritable(page, ctx.session.user.id);
 			return renewPageWatch(input);
 		}),
-	releaseWatch: protectedProcedure
+	releaseWatch: personProcedure
 		.input(z.object({ id: pageFields.id, token: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -811,7 +888,7 @@ export const pageRouter = {
 			assertPageWritable(page, ctx.session.user.id);
 			return releasePageWatch(input);
 		}),
-	reserveWatchDelivery: protectedProcedure
+	reserveWatchDelivery: personProcedure
 		.input(
 			z.object({
 				id: pageFields.id,
@@ -832,7 +909,7 @@ export const pageRouter = {
 			assertPageWritable(page, ctx.session.user.id);
 			return reservePageWatchDelivery(input);
 		}),
-	finishWatchDelivery: protectedProcedure
+	finishWatchDelivery: personProcedure
 		.input(
 			z.object({
 				id: pageFields.id,
@@ -852,7 +929,7 @@ export const pageRouter = {
 			return finishPageWatchDelivery(input);
 		}),
 
-	setWatch: protectedProcedure
+	setWatch: personProcedure
 		.input(setPageWatchSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -871,7 +948,7 @@ export const pageRouter = {
 			return { id: page.id };
 		}),
 
-	clearWatch: protectedProcedure
+	clearWatch: personProcedure
 		.input(clearPageWatchSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -887,21 +964,29 @@ export const pageRouter = {
 			return { id: page.id };
 		}),
 
-	access: protectedProcedure
-		.input(pageRefSchema)
-		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-			const page = await loadPage({
-				id: input.id,
-				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
-			});
+	access: personProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
+		const organizationId = await requireActiveOrgMembership(ctx);
+		const page = await loadPage({
+			id: input.id,
+			slug: input.slug,
+			organizationId,
+			userId: ctx.session.user.id,
+		});
 
-			return { owner: await loadOwner(page.createdByUserId) };
-		}),
+		const userId = ctx.session.user.id;
+		const { canComment, canManage } = pageAccess(
+			page,
+			userId,
+			await loadPageShareRole(page, userId),
+		);
+		return {
+			owner: await loadOwner(page.createdByUserId),
+			canComment,
+			canManage,
+		};
+	}),
 
-	setSharedVersion: protectedProcedure
+	setSharedVersion: personProcedure
 		.input(setSharedVersionSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -934,7 +1019,7 @@ export const pageRouter = {
 			const [updated] = await db
 				.update(pages)
 				.set({ sharedVersion: resolved })
-				.where(eq(pages.id, page.id))
+				.where(and(eq(pages.id, page.id), isNull(pages.takenDownAt)))
 				.returning();
 
 			if (!updated) {
@@ -954,7 +1039,7 @@ export const pageRouter = {
 			return { id: updated.id, sharedVersion: updated.sharedVersion };
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(deletePageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -977,6 +1062,19 @@ export const pageRouter = {
 						),
 					)
 					.returning({ id: pages.id });
+				if (discarded) {
+					try {
+						await reapOrphanFiles(
+							await detachAll({ parentKind: "page", parentIds: [page.id] }),
+						);
+					} catch (error) {
+						console.error("[pages] staged asset cleanup failed after delete", {
+							pageId: page.id,
+							error,
+						});
+					}
+					await wipePageStorage(page.id);
+				}
 				return { id: page.id, deleted: Boolean(discarded) };
 			}
 
@@ -988,6 +1086,20 @@ export const pageRouter = {
 				})
 				.from(pageVersions)
 				.where(eq(pageVersions.pageId, page.id));
+
+			// Like the versions, comment ids have to be read before the page
+			// row goes: the cascade takes the comments, and with them the only
+			// way to name their attachments.
+			const commentIds = (
+				await db
+					.select({ id: pageComments.id })
+					.from(pageComments)
+					.innerJoin(
+						pageCommentThreads,
+						eq(pageCommentThreads.id, pageComments.threadId),
+					)
+					.where(eq(pageCommentThreads.pageId, page.id))
+			).map((row) => row.id);
 
 			// The manifest is the Worker's authorization source: removing it
 			// first makes deletion fail closed. If this throws, nothing has
@@ -1002,37 +1114,31 @@ export const pageRouter = {
 					pageId: page.id,
 					versions: rows,
 				});
+			} catch (error) {
+				console.error("[pages] version object cleanup failed after delete", {
+					pageId: page.id,
+					error,
+				});
+			}
+
+			try {
 				// `attachments.parentId` carries no foreign key (its parent kind
-				// varies), so the version cascade leaves attachment rows behind;
-				// files referenced by nothing else go with them, bytes included.
-				const versionIds = rows.map((row) => row.id);
-				if (versionIds.length > 0) {
-					const removed = await db
-						.delete(attachments)
-						.where(
-							and(
-								eq(attachments.parentKind, "page_version"),
-								inArray(attachments.parentId, versionIds),
-							),
-						)
-						.returning({ fileId: attachments.fileId });
-					const fileIds = [...new Set(removed.map((row) => row.fileId))];
-					if (fileIds.length > 0) {
-						const stillReferenced = new Set(
-							(
-								await db
-									.select({ fileId: attachments.fileId })
-									.from(attachments)
-									.where(inArray(attachments.fileId, fileIds))
-							).map((row) => row.fileId),
-						);
-						const orphans = fileIds.filter((id) => !stillReferenced.has(id));
-						if (orphans.length > 0) {
-							await deleteObjects(orphans.map(fileOriginalKey));
-							await db.delete(files).where(inArray(files.id, orphans));
-						}
-					}
-				}
+				// varies), so the cascade leaves attachment rows behind — the
+				// versions' assets, anything still staged against the page, and
+				// the comments' images; files referenced by nothing else go with
+				// them, bytes included.
+				const fileIds = [
+					...(await detachAll({
+						parentKind: "page_version",
+						parentIds: rows.map((row) => row.id),
+					})),
+					...(await detachAll({ parentKind: "page", parentIds: [page.id] })),
+					...(await detachAll({
+						parentKind: "comment",
+						parentIds: commentIds,
+					})),
+				];
+				await reapOrphanFiles([...new Set(fileIds)]);
 			} catch (error) {
 				console.error("[pages] storage cleanup failed after delete", {
 					pageId: page.id,
@@ -1040,18 +1146,20 @@ export const pageRouter = {
 				});
 			}
 
+			await wipePageStorage(page.id);
+
 			return { id: page.id, deleted: true };
 		}),
 
-	versions: protectedProcedure
+	versions: actorProcedure
 		.input(pageRefSchema)
 		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
+			const caller = await pageCaller(ctx);
 			const page = await loadPage({
 				id: input.id,
 				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
+				organizationId: caller.organizationId,
+				userId: pageReader(caller),
 			});
 
 			const rows = await db
@@ -1082,93 +1190,91 @@ export const pageRouter = {
 			);
 		}),
 
-	pull: protectedProcedure
-		.input(pullPageSchema)
-		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-			const page = await loadPage({
-				id: input.id,
-				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
+	pull: actorProcedure.input(pullPageSchema).query(async ({ ctx, input }) => {
+		const caller = await pageCaller(ctx);
+		const page = await loadPage({
+			id: input.id,
+			slug: input.slug,
+			organizationId: caller.organizationId,
+			userId: pageReader(caller),
+		});
+
+		const latestVersion = await latestVersionNumber(page.id);
+		const version =
+			input.version ?? servedVersion(page.sharedVersion, latestVersion);
+		if (version === null) {
+			throw userError({
+				code: "NOT_FOUND",
+				message: "Page has no versions",
+				i18nKey: "serverError.page.pageHasNoVersions",
 			});
+		}
 
-			const latestVersion = await latestVersionNumber(page.id);
-			const version =
-				input.version ?? servedVersion(page.sharedVersion, latestVersion);
-			if (version === null) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Page has no versions",
-					i18nKey: "serverError.page.pageHasNoVersions",
-				});
-			}
+		const [row] = await db
+			.select()
+			.from(pageVersions)
+			.where(
+				and(
+					eq(pageVersions.pageId, page.id),
+					eq(pageVersions.version, version),
+				),
+			)
+			.limit(1);
 
-			const [row] = await db
-				.select()
-				.from(pageVersions)
-				.where(
-					and(
-						eq(pageVersions.pageId, page.id),
-						eq(pageVersions.version, version),
-					),
-				)
-				.limit(1);
+		if (!row) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: `Version ${version} not found`,
+			});
+		}
 
-			if (!row) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: `Version ${version} not found`,
-				});
-			}
-
-			let downloadUrl: string;
-			try {
-				downloadUrl = await presignedGetUrl(row.storageKey);
-			} catch (error) {
-				console.error("[pages] presign failed", {
-					pageId: page.id,
-					version,
-					error,
-				});
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Page content is not available",
-					i18nKey: "serverError.page.pageContentIsNotAvailable",
-				});
-			}
-
-			const viewUrl = pageViewUrl({
-				baseUrl: env.USERCONTENT_URL,
+		let downloadUrl: string;
+		try {
+			downloadUrl = await presignedGetUrl(row.storageKey);
+		} catch (error) {
+			console.error("[pages] presign failed", {
 				pageId: page.id,
-				version: row.version,
-				ticket: await mintPageTicket(page, { version: row.version }),
+				version,
+				error,
 			});
+			throw userError({
+				code: "NOT_FOUND",
+				message: "Page content is not available",
+				i18nKey: "serverError.page.pageContentIsNotAvailable",
+			});
+		}
 
-			return {
-				id: page.id,
-				slug: page.slug,
-				url: pageUrl(page.slug),
-				title: page.title,
-				description: page.description,
-				visibility: page.visibility,
-				createdByUserId: page.createdByUserId,
-				updatedAt: page.updatedAt,
-				sharedVersion: page.sharedVersion,
-				latestVersion,
-				servedVersion: servedVersion(page.sharedVersion, latestVersion),
-				watch: watchState(page, Date.now()),
-				version: row.version,
-				label: row.label,
-				contentType: row.contentType,
-				sizeBytes: row.sizeBytes,
-				sha256: row.sha256,
-				createdAt: row.createdAt,
-				storageKey: row.storageKey,
-				downloadUrl,
-				viewUrl,
-			};
-		}),
+		const viewUrl = pageViewUrl({
+			baseUrl: env.USERCONTENT_URL,
+			pageId: page.id,
+			version: row.version,
+			ticket: await mintPageTicket(page, { version: row.version }),
+		});
+
+		return {
+			id: page.id,
+			slug: page.slug,
+			url: pageUrl(page.slug),
+			title: page.title,
+			description: page.description,
+			visibility: page.visibility,
+			createdByUserId: page.createdByUserId,
+			updatedAt: page.updatedAt,
+			sharedVersion: page.sharedVersion,
+			latestVersion,
+			servedVersion: servedVersion(page.sharedVersion, latestVersion),
+			watch: watchState(page, Date.now()),
+			version: row.version,
+			label: row.label,
+			contentType: row.contentType,
+			sizeBytes: row.sizeBytes,
+			sha256: row.sha256,
+			createdAt: row.createdAt,
+			storageKey: row.storageKey,
+			downloadUrl,
+			viewUrl,
+		};
+	}),
 
 	publicView: publicProcedure
 		.input(publicPageSchema)
@@ -1179,6 +1285,7 @@ export const pageRouter = {
 				.where(eq(pages.slug, input.slug))
 				.limit(1);
 			if (!page || page.visibility !== "everyone") return null;
+			if (page.takenDownAt) return null;
 
 			const version = servedVersion(
 				page.sharedVersion,

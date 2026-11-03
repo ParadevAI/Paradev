@@ -4,7 +4,7 @@ import {
 	type BrowserOpenRequest,
 	browserManager,
 } from "main/lib/browser/browser-manager";
-import { screenshotManager } from "main/lib/browser/screenshot-manager";
+import { screenshotManager } from "main/lib/screenshot-manager";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -77,9 +77,13 @@ export const createBrowserRouter = () => {
 			.input(z.object({ paneId: z.string() }))
 			.mutation(async ({ input }) => {
 				const { image, url } = await browserManager.screenshot(input.paneId);
-				const saved = screenshotManager.save(image, url);
+				const saved = screenshotManager.save(image, { url });
 				return { base64: saved.base64, id: saved.id };
 			}),
+
+		capturePreview: publicProcedure
+			.input(z.object({ paneId: z.string() }))
+			.mutation(({ input }) => browserManager.capturePreview(input.paneId)),
 
 		evaluateJS: publicProcedure
 			.input(z.object({ paneId: z.string(), code: z.string() }))

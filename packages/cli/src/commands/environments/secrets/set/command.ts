@@ -4,6 +4,7 @@ import { isCloudWorkspaceIgnoredEnvName } from "@superset/shared/agent-credentia
 import { parseEnvContent } from "@superset/shared/env-file";
 import { command } from "../../../../lib/command";
 import { resolveEnvironment } from "../../../../lib/environments";
+import { type EnvFilePlan, planEnvFile } from "./planEnvFile";
 
 async function readStdin(): Promise<string> {
 	const chunks: Buffer[] = [];
@@ -29,7 +30,7 @@ export default command({
 			"Store it readable in settings instead of as a secret",
 		),
 		environment: string().desc(
-			"Environment (id or name); required when the organization has several",
+			"Environment ID (see: superset environments list); required when the organization has several",
 		),
 	},
 	run: async ({ ctx, args, options }) => {
@@ -48,10 +49,22 @@ export default command({
 		}
 
 		let entries: Array<{ key: string; value: string }>;
+		let skipped: EnvFilePlan["skipped"] = [];
 		if (options.envFile) {
-			entries = parseEnvContent(readFileSync(options.envFile, "utf-8"));
+			const plan = planEnvFile(
+				parseEnvContent(readFileSync(options.envFile, "utf-8")),
+			);
+			entries = plan.set;
+			skipped = plan.skipped;
 			if (entries.length === 0) {
-				throw new CLIError(`No variables found in ${options.envFile}`);
+				throw new CLIError(
+					`No variables to set from ${options.envFile}`,
+					skipped.length
+						? skipped
+								.map((entry) => `Skipped ${entry.key}: ${entry.reason}`)
+								.join("\n")
+						: undefined,
+				);
 			}
 		} else {
 			const value =
@@ -80,18 +93,20 @@ export default command({
 		}
 		const keys = entries.map((entry) => entry.key);
 		const agentKeys = keys.filter(isCloudWorkspaceIgnoredEnvName);
-		const warnings =
-			agentKeys.length === 0
+		const warnings = [
+			...(agentKeys.length === 0
 				? []
 				: [
-						`Cloud workspaces ignore ${agentKeys.join(", ")}. Agents sign in under Settings › Agents instead.`,
-					];
+						`Cloud workspaces ignore ${agentKeys.join(", ")}. Sign agents in with: superset connections agents set <agent>`,
+					]),
+			...skipped.map((entry) => `Skipped ${entry.key}: ${entry.reason}`),
+		];
 		const set =
 			keys.length === 1
 				? `Set ${keys[0]} on ${environment.name}`
 				: `Set ${keys.length} variables on ${environment.name}: ${keys.join(", ")}`;
 		return {
-			data: { environment: environment.name, keys, warnings },
+			data: { environment: environment.name, keys, skipped, warnings },
 			message: [set, ...warnings.map((warning) => `Warning: ${warning}`)].join(
 				"\n",
 			),

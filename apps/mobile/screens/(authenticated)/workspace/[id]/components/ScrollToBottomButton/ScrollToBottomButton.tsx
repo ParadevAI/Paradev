@@ -9,11 +9,14 @@ import {
 	buttonStyle,
 	frame,
 } from "@expo/ui/swift-ui/modifiers";
-import { useEffect, useRef } from "react";
+import { type ComponentProps, useEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
+import { cn } from "@/lib/utils";
 
 /** Matches the diameter the navigation bar's own glass buttons render at. */
 const SIZE = 44;
+/** The padding .glass draws around its label, measured on iOS 26. */
+const GLASS_PADDING = 7;
 const IN_MS = 180;
 const OUT_MS = 160;
 
@@ -33,12 +36,22 @@ const OUT_MS = 160;
  * .glass is always available and needs no fallback.
  */
 export function ScrollToBottomButton({
+	systemName,
 	visible,
 	onPress,
+	bottomInset = 0,
+	className,
+	diameter,
 }: {
+	systemName: NonNullable<ComponentProps<typeof SwiftUIImage>["systemName"]>;
 	visible: boolean;
 	onPress: () => void;
+	bottomInset?: number;
+	className?: string;
+	diameter?: number;
 }) {
+	const hostSize = Math.max(SIZE, diameter ?? 0);
+	const labelSize = diameter ? diameter - GLASS_PADDING * 2 : undefined;
 	// Mounted whenever a terminal is: fading out requires outliving the state
 	// change that hid it.
 	const progress = useRef(new Animated.Value(visible ? 1 : 0)).current;
@@ -58,11 +71,11 @@ export function ScrollToBottomButton({
 
 	return (
 		<Animated.View
-			className="absolute inset-x-0 bottom-3 items-center"
+			className={cn("absolute inset-x-0 bottom-3 items-center", className)}
 			pointerEvents={visible ? "box-none" : "none"}
-			style={{ opacity: progress }}
+			style={{ opacity: progress, marginBottom: bottomInset }}
 		>
-			<Host style={{ width: SIZE, height: SIZE }} colorScheme="dark">
+			<Host style={{ width: hostSize, height: hostSize }} colorScheme="dark">
 				<SwiftUIButton
 					onPress={onPress}
 					testID="terminal-scroll-to-bottom"
@@ -76,7 +89,16 @@ export function ScrollToBottomButton({
 						accessibilityLabel("Scroll to bottom"),
 					]}
 				>
-					<SwiftUIImage systemName="arrow.down" size={18} color="#fafafa" />
+					<SwiftUIImage
+						systemName={systemName}
+						size={18}
+						color="#fafafa"
+						modifiers={
+							labelSize
+								? [frame({ width: labelSize, height: labelSize })]
+								: undefined
+						}
+					/>
 				</SwiftUIButton>
 			</Host>
 		</Animated.View>

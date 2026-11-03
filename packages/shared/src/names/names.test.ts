@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { getInitials } from "./names";
+import { firstName, getInitials } from "./names";
 
 describe("getInitials", () => {
 	it("returns initials from full name", () => {
@@ -32,5 +32,22 @@ describe("getInitials", () => {
 		expect(getInitials()).toBe("");
 		expect(getInitials(null, null)).toBe("");
 		expect(getInitials("", "")).toBe("");
+	});
+});
+
+describe("firstName", () => {
+	it("returns the first word of a full name", () => {
+		expect(firstName("Priya Sharma")).toBe("Priya");
+		expect(firstName("  John   Doe  ")).toBe("John");
+	});
+
+	it("returns single names whole", () => {
+		expect(firstName("Cher")).toBe("Cher");
+	});
+
+	it("returns empty string when there is no name", () => {
+		expect(firstName(null)).toBe("");
+		expect(firstName(undefined)).toBe("");
+		expect(firstName("   ")).toBe("");
 	});
 });

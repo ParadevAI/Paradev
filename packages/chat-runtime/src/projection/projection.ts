@@ -1,12 +1,16 @@
+import type { SessionStatus } from "@superset/chat/protocol";
 import { desc, eq } from "drizzle-orm";
 import type { ChatDb, ChatSessionRow } from "../db";
 import { chatSessionsLocal } from "../db";
 
-export type SessionRowInsert = typeof chatSessionsLocal.$inferInsert;
+export type SessionRowInsert = typeof chatSessionsLocal.$inferInsert & {
+	closedAt: number | null;
+};
 
 export type SessionProjection = {
-	status: string;
+	status: SessionStatus;
 	title: string | null;
+	harnessSessionId: string | null;
 	queuedCount: number;
 	updatedAt: number;
 };
@@ -44,17 +48,46 @@ export function resetSessionForEpoch(
 	db: ChatDb,
 	sessionId: string,
 	epoch: string,
-	status: string,
+	status: SessionStatus,
 	updatedAt: number,
 ): void {
 	db.update(chatSessionsLocal)
-		.set({ epoch, status, title: null, queuedCount: 0, updatedAt })
+		.set({
+			epoch,
+			status,
+			title: null,
+			queuedCount: 0,
+			updatedAt,
+			closedAt: null,
+		})
+		.where(eq(chatSessionsLocal.sessionId, sessionId))
+		.run();
+}
+
+export function setHarnessSessionId(
+	db: ChatDb,
+	sessionId: string,
+	harnessSessionId: string | null,
+): void {
+	db.update(chatSessionsLocal)
+		.set({ harnessSessionId })
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
 }
 
 export function removeSessionRow(db: ChatDb, sessionId: string): void {
 	db.delete(chatSessionsLocal)
+		.where(eq(chatSessionsLocal.sessionId, sessionId))
+		.run();
+}
+
+export function markSessionClosed(
+	db: ChatDb,
+	sessionId: string,
+	closedAt: number,
+): void {
+	db.update(chatSessionsLocal)
+		.set({ closedAt })
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
 }
@@ -77,6 +110,10 @@ export class ChatSessionStore {
 		return readSessionRow(this.db, sessionId);
 	}
 
+	markClosed(sessionId: string, closedAt = Date.now()): void {
+		markSessionClosed(this.db, sessionId, closedAt);
+	}
+
 	list(): ChatSessionRow[] {
 		return this.db
 			.select()
@@ -92,16 +129,5 @@ export class ChatSessionStore {
 			.where(eq(chatSessionsLocal.scopeId, scopeId))
 			.orderBy(desc(chatSessionsLocal.updatedAt))
 			.all();
-	}
-
-	setHarnessSessionId(
-		sessionId: string,
-		harnessSessionId: string | null,
-	): void {
-		this.db
-			.update(chatSessionsLocal)
-			.set({ harnessSessionId, updatedAt: Date.now() })
-			.where(eq(chatSessionsLocal.sessionId, sessionId))
-			.run();
 	}
 }

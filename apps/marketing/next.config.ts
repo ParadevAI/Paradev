@@ -1,8 +1,13 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
+import { readRootDomain } from "@superset/shared/app-identity";
+import { CANONICAL_URLS } from "@superset/shared/constants";
+import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
+import { buildLegacyRedirects } from "./src/lib/legacy-redirects";
 
 // Load .env from monorepo root during development
 if (process.env.NODE_ENV !== "production") {
@@ -20,13 +25,13 @@ const isProduction = process.env.NODE_ENV === "production";
 const apiOrigin = process.env.NEXT_PUBLIC_API_URL
 	? new URL(process.env.NEXT_PUBLIC_API_URL).origin
 	: isProduction
-		? "https://api.superset.sh"
+		? CANONICAL_URLS.API
 		: null;
 
 // Third parties this site actually loads (probed against production):
 // - Google Ads gtag + Reddit pixel, injected in [lang]/layout.tsx
 // - Cloudflare Web Analytics, injected at the edge by the Cloudflare proxy
-// - Work at a Startup job board (+ its hCaptcha) on /join-us
+// - Work at a Startup job board (+ its hCaptcha) on /careers
 // - PostHog goes through the same-origin /ingest rewrite; ui_host is listed
 //   so the toolbar can still connect.
 // - Sentry browser SDK reports to *.ingest.sentry.io
@@ -43,7 +48,7 @@ const contentSecurityPolicy = [
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		apiOrigin,
+		...withOwnDomainTwins([apiOrigin]),
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.posthog.com",
@@ -67,6 +72,7 @@ const contentSecurityPolicy = [
 		"frame-src",
 		"https://td.doubleclick.net",
 		"https://www.googletagmanager.com",
+		"https://www.youtube-nocookie.com",
 		...hcaptcha,
 	].join(" "),
 	"img-src 'self' data: blob: https:",
@@ -92,6 +98,7 @@ const contentSecurityPolicy = [
 const config: NextConfig = {
 	reactStrictMode: true,
 	reactCompiler: true,
+	cacheComponents: true,
 	typescript: { ignoreBuildErrors: true },
 
 	// getInterBold reads the font through process.cwd(), which the tracer
@@ -102,6 +109,15 @@ const config: NextConfig = {
 			"./public/fonts/Inter-Bold.ttf",
 		],
 		"/[lang]/user/[handle]/opengraph-image": ["./public/fonts/Inter-Bold.ttf"],
+	},
+
+	// The OG image routes read public/ by a runtime path, so the tracer copies
+	// all of it into every function. They never read these.
+	outputFileTracingExcludes: {
+		"*": [
+			"./public/**/*.{mov,mp4,gif}",
+			"./public/{images,blog,hero,app-icons,media}/**",
+		],
 	},
 
 	// Compiles @lingui/react/macro at build time. Version must stay in
@@ -137,9 +153,8 @@ const config: NextConfig = {
 	},
 
 	async redirects() {
-		const docsUrl =
-			process.env.NEXT_PUBLIC_DOCS_URL || "https://docs.superset.sh";
-		return [
+		const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || CANONICAL_URLS.DOCS;
+		const redirects = [
 			// These URLs were advertised before discovery files were excluded
 			// from locale expansion. Keep existing inbound links working.
 			{
@@ -158,8 +173,18 @@ const config: NextConfig = {
 				permanent: true,
 			},
 			{
+				source: "/:lang(en)?/:page(join-us|career|hiring)",
+				destination: "/careers",
+				permanent: true,
+			},
+			{
+				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career|hiring)`,
+				destination: "/:lang/careers",
+				permanent: true,
+			},
+			{
 				source: "/mcp",
-				destination: "https://api.superset.sh/mcp",
+				destination: `${CANONICAL_URLS.API}/mcp`,
 				permanent: false,
 			},
 			{
@@ -172,7 +197,12 @@ const config: NextConfig = {
 				destination: `${docsUrl}/:path*`,
 				permanent: false,
 			},
+			...buildLegacyRedirects({ locales: SUPPORTED_LOCALES, docsUrl }),
 		];
+		return withLegacyHostRedirects(redirects, {
+			rootDomain: readRootDomain(),
+			site: "marketing",
+		});
 	},
 
 	async headers() {
@@ -187,7 +217,7 @@ const config: NextConfig = {
 							'</index.md>; rel="alternate"; type="text/markdown"',
 							'</llms.txt>; rel="describedby"; type="text/plain"',
 							'</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
-							'<https://api.superset.sh/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
+							`<${CANONICAL_URLS.API}/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"`,
 						].join(", "),
 					},
 				],

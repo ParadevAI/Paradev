@@ -1,29 +1,33 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { PLUGIN_CATEGORIES } from "@superset/shared/plugins";
-import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Skeleton } from "@superset/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@superset/ui/tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { LuSearch, LuSettings2 } from "react-icons/lu";
-import { PluginIcon } from "renderer/routes/_authenticated/_dashboard/plugins/components/PluginIcon";
+import { useEffect, useMemo, useState } from "react";
+import { LuSearch } from "react-icons/lu";
 import {
 	type CatalogPlugin,
 	usePluginCatalog,
-} from "renderer/routes/_authenticated/_dashboard/plugins/hooks/usePluginCatalog";
-import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/plugins/hooks/usePluginMutations";
-import { ManageInstalledDialog } from "./components/ManageInstalledDialog";
+} from "renderer/hooks/usePluginCatalog";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { electronTrpc } from "renderer/lib/electron-trpc";
+import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
+import { OrganizationPluginsSection } from "./components/OrganizationPluginsSection";
 import { PluginCard } from "./components/PluginCard";
 import { SkillsList } from "./components/SkillsList";
+import { groupPlugins } from "./utils/groupPlugins";
 
 export function PluginsView() {
 	const { t } = useLingui();
 	const [search, setSearch] = useState("");
-	const [isManageOpen, setIsManageOpen] = useState(false);
 	const navigate = useNavigate();
+	const utils = cloudTrpc.useUtils();
+	const machineUtils = electronTrpc.useUtils();
+
+	useEffect(() => {
+		void utils.plugins.list.invalidate();
+		void machineUtils.plugins.organizationVersions.invalidate();
+	}, [utils, machineUtils]);
 
 	const {
 		plugins: catalog,
@@ -34,7 +38,7 @@ export function PluginsView() {
 	const isConnected = (plugin: CatalogPlugin) =>
 		plugin.installed && (!plugin.connector || plugin.connections.length > 0);
 
-	const { add, uninstall, setEnabled, update, isBusy } = usePluginMutations();
+	const { add, uninstall, update, disable, isBusy } = usePluginMutations();
 
 	const handleOpen = (plugin: CatalogPlugin) => {
 		navigate({
@@ -60,17 +64,7 @@ export function PluginsView() {
 		);
 	}, [query, catalog]);
 
-	const installedPlugins = visiblePlugins.filter((plugin) => plugin.installed);
-	const allInstalled = catalog.filter((plugin) => plugin.installed);
-	const featured = visiblePlugins.filter((plugin) => plugin.featured);
-	// Featured plugins appear in their category section too — Featured is a
-	// spotlight, not a home.
-	const byCategory = PLUGIN_CATEGORIES.map((category) => ({
-		category,
-		plugins: visiblePlugins.filter(
-			(plugin) => plugin.interface.category === category,
-		),
-	})).filter(({ plugins }) => plugins.length > 0);
+	const { organization, categories } = groupPlugins(visiblePlugins);
 
 	const skeletonCards = (
 		<section className="flex flex-col gap-3">
@@ -99,18 +93,27 @@ export function PluginsView() {
 			plugin={plugin}
 			isInstalled={plugin.installed}
 			isConnected={isConnected(plugin)}
-			isDisabled={plugin.installed && !plugin.enabled}
 			isBusy={isBusy}
 			onOpen={handleOpen}
-			onInstall={(target) => void add(target.name)}
-			onUninstall={(target) => uninstall(target.name)}
-			onSetEnabled={setEnabled}
-			onUpdate={(name) => void update(name)}
+			onInstall={(target) => {
+				if (target.connector && target.connections.length === 0) {
+					navigate({
+						to: "/plugins/$pluginName",
+						params: { pluginName: target.name },
+						search: { connect: true },
+					});
+				} else {
+					void add(target.name, target.marketplace);
+				}
+			}}
+			onUninstall={(target) => uninstall(target.name, target.marketplace)}
+			onDisable={(target) => void disable(target.name, target.marketplace)}
+			onUpdate={(target) => void update(target.name, target.marketplace)}
 		/>
 	);
 
 	return (
-		<div className="mx-auto w-full max-w-3xl px-6 pb-16">
+		<div className="mx-auto w-full max-w-3xl px-6 pt-4 pb-16">
 			<Tabs defaultValue="plugins">
 				<TabsList className="mb-6">
 					<TabsTrigger value="plugins">
@@ -145,76 +148,13 @@ export function PluginsView() {
 
 					{isCatalogLoading && skeletonCards}
 
-					{!isCatalogLoading && installedPlugins.length > 0 && (
-						<section className="flex flex-col gap-3">
-							<div className="flex items-center justify-between">
-								<h2 className="text-sm font-semibold text-foreground">
-									<Trans>Installed</Trans>
-								</h2>
-								<Tooltip delayDuration={300}>
-									<TooltipTrigger asChild>
-										<Button
-											variant="ghost"
-											size="icon-xs"
-											className="text-muted-foreground"
-											aria-label={t({
-												message: "Manage plugins",
-											})}
-											onClick={() => setIsManageOpen(true)}
-										>
-											<LuSettings2 className="size-4" />
-										</Button>
-									</TooltipTrigger>
-									<TooltipContent>
-										<Trans>Manage plugins</Trans>
-									</TooltipContent>
-								</Tooltip>
-							</div>
-							<div className="flex flex-wrap gap-2">
-								{installedPlugins.map((plugin) => (
-									<Tooltip key={plugin.name} delayDuration={300}>
-										<TooltipTrigger asChild>
-											<button
-												type="button"
-												aria-label={plugin.interface.displayName}
-												onClick={() => handleOpen(plugin)}
-												className={cn(!plugin.enabled && "opacity-40")}
-											>
-												<PluginIcon
-													pluginName={plugin.name}
-													className="size-8"
-												/>
-											</button>
-										</TooltipTrigger>
-										<TooltipContent>
-											{plugin.interface.displayName}
-											{!plugin.enabled ? (
-												<>
-													{" "}
-													<Trans>(disabled)</Trans>
-												</>
-											) : (
-												""
-											)}
-										</TooltipContent>
-									</Tooltip>
-								))}
-							</div>
-						</section>
-					)}
+					<OrganizationPluginsSection
+						plugins={organization}
+						renderCard={renderCard}
+						showEmpty={!isCatalogLoading && !catalogError && query === ""}
+					/>
 
-					{featured.length > 0 && (
-						<section className="flex flex-col gap-3">
-							<h2 className="text-sm font-semibold text-foreground">
-								<Trans>Featured</Trans>
-							</h2>
-							<div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-								{featured.map(renderCard)}
-							</div>
-						</section>
-					)}
-
-					{byCategory.map(({ category, plugins }) => (
+					{categories.map(({ category, plugins }) => (
 						<section key={category} className="flex flex-col gap-3">
 							<h2 className="text-sm font-semibold text-foreground">
 								{category}
@@ -247,15 +187,6 @@ export function PluginsView() {
 								<Trans>No plugins available yet.</Trans>
 							</p>
 						)}
-
-					<ManageInstalledDialog
-						open={isManageOpen}
-						onOpenChange={setIsManageOpen}
-						installed={allInstalled}
-						isBusy={isBusy}
-						onSetEnabled={setEnabled}
-						onUninstall={uninstall}
-					/>
 				</TabsContent>
 
 				<TabsContent value="skills" className="flex flex-col gap-6">

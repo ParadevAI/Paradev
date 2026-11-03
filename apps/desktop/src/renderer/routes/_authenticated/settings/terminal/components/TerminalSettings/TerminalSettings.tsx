@@ -7,6 +7,7 @@ import {
 	type SettingItemId,
 } from "../../../utils/settings-search";
 import { BackgroundTerminalsSetting } from "./components/BackgroundTerminalsSetting";
+import { CloseConfirmSetting } from "./components/CloseConfirmSetting";
 import { CopyOnSelectSetting } from "./components/CopyOnSelectSetting";
 import { LinkBehaviorSetting } from "./components/LinkBehaviorSetting";
 import { PresetsSection } from "./components/PresetsSection";
@@ -75,6 +76,10 @@ export function TerminalSettings({
 		SETTING_ITEM_ID.TERMINAL_COPY_ON_SELECT,
 		visibleItems,
 	);
+	const showCloseConfirm = isItemVisible(
+		SETTING_ITEM_ID.TERMINAL_CLOSE_CONFIRM,
+		visibleItems,
+	);
 
 	return (
 		<div className="p-6 max-w-6xl w-full">
@@ -117,6 +122,7 @@ export function TerminalSettings({
 					<BackgroundTerminalsSetting key="background-limit" />
 				)}
 				{showCopyOnSelect && <CopyOnSelectSetting key="copy-on-select" />}
+				{showCloseConfirm && <CloseConfirmSetting key="close-confirm" />}
 				{showSessions &&
 					(isV2CloudEnabled ? (
 						<V2SessionsSection key="sessions" />

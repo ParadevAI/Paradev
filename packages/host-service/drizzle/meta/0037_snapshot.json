@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a8fb565c-71f9-4666-9a35-3393c7f8b68a",
+  "id": "6e31d154-2c43-47ea-9504-1311445e5bb8",
   "prevId": "13d58caa-30c2-44c8-a2c0-6fb6d13a01d3",
   "tables": {
     "host_agent_configs": {
@@ -286,6 +286,20 @@
           "notNull": true,
           "autoincrement": false,
           "default": "''"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_by_user_id": {
+          "name": "deleted_by_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "updated_at": {
           "name": "updated_at",
@@ -724,13 +738,6 @@
         },
         "custom_title": {
           "name": "custom_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "theme_id": {
-          "name": "theme_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

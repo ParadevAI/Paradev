@@ -7,12 +7,28 @@
 		"source": "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb",
 		"version": "153.0.8010.36"
 	},
-	"cli": {
-		"sha256": "66be5ff609582623dc943c2a6405553268c9b57d8ad215d2056cde9f746186ab",
+	"claude": {
+		"sha256": "1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b",
 		"suffix": "",
-		"dest": "/usr/local/share/superset/media/superset-1.29.0",
+		"dest": "/usr/local/share/superset/media/claude-2.1.280",
 		"mode": "0755",
-		"version": "1.29.0"
+		"source": "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.280/linux-x64/claude",
+		"version": "2.1.280"
+	},
+	"cli": {
+		"sha256": "5e49a1f3c2198662209bf97fd9ce991b6b140adece2b176710fca48482ead055",
+		"suffix": "",
+		"dest": "/usr/local/share/superset/media/superset-1.35.0",
+		"mode": "0755",
+		"version": "1.35.0"
+	},
+	"codex": {
+		"sha256": "a676f5722aae0d86cbe3764332f08eab1fdd89dc0a300b3ad4ffbf48611fa3e3",
+		"suffix": ".tar.gz",
+		"dest": "/usr/local/share/superset/media/codex-0.162.1.tar.gz",
+		"mode": "0644",
+		"source": "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-x86_64-unknown-linux-musl.tar.gz",
+		"version": "0.162.1"
 	},
 	"font-bold": {
 		"sha256": "e490660ad75e0b152c93b1604c2ea1a4ea675f1b8a3fe0d005b1998568f99f1f",
@@ -149,6 +165,14 @@
 		"mode": "0644",
 		"version": "1.29.0+bfc1ec72a",
 		"node": 24
+	},
+	"pdev": {
+		"sha256": "5a51852a4de0a40e20c0137b873f83e1b26255b4c5d01b6b0a2f608e152d8535",
+		"suffix": ".tar.gz",
+		"dest": "/usr/local/share/superset/media/pdev-0.2.5.tar.gz",
+		"mode": "0644",
+		"source": "https://github.com/ParadevAI/pdev/releases/download/v0.2.5/pdev-0.2.5-linux-x64.tar.gz",
+		"version": "0.2.5"
 	},
 	"wallpaper-0": {
 		"sha256": "497a4edb230a58ea385c8b63fe8135e47554cb4a5169de3f6bbae293a1f5435a",

@@ -6,9 +6,14 @@ import { cn } from "@superset/ui/utils";
 interface BillingToggleProps {
 	isYearly: boolean;
 	onChange: (isYearly: boolean) => void;
+	maxDiscount: string;
 }
 
-export function BillingToggle({ isYearly, onChange }: BillingToggleProps) {
+export function BillingToggle({
+	isYearly,
+	onChange,
+	maxDiscount,
+}: BillingToggleProps) {
 	return (
 		<div className="inline-flex items-center gap-1 rounded-md border border-border bg-card p-1">
 			<ToggleButton active={!isYearly} onClick={() => onChange(false)}>
@@ -24,7 +29,7 @@ export function BillingToggle({ isYearly, onChange }: BillingToggleProps) {
 							: "bg-accent/40 text-muted-foreground",
 					)}
 				>
-					<Trans>Save 25%</Trans>
+					<Trans>Save up to {maxDiscount}</Trans>
 				</span>
 			</ToggleButton>
 		</div>

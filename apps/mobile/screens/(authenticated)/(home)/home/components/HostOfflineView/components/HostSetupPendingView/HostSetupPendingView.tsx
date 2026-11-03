@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { useFocusEffect } from "expo-router";
 import { Laptop } from "lucide-react-native";
@@ -19,6 +20,7 @@ const PRESENCE_POLL_MS = 5_000;
 
 export function HostSetupPendingView({ hostName }: { hostName: string }) {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const refreshPresence = useRefreshHostsPresence();
 
 	useEffect(() => {
@@ -51,9 +53,9 @@ export function HostSetupPendingView({ hostName }: { hostName: string }) {
 					})}
 				</Text>
 			</View>
-			<View className="border-border bg-card w-full rounded-2xl border px-4">
+			<View className="border-border bg-card w-full max-w-md rounded-2xl border px-4">
 				<HintRow leading={<StepNumber step={1} />}>
-					<Trans>Open Superset on that computer</Trans>
+					<Trans>Open {appName} on that computer</Trans>
 				</HintRow>
 				<HintRow leading={<StepNumber step={2} />}>
 					<Trans>Go to Settings, then Remote Access</Trans>

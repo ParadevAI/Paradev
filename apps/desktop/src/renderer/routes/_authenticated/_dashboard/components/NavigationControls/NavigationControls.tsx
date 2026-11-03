@@ -1,8 +1,13 @@
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { useLocation, useRouter } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
-import { HotkeyLabel, useHotkey } from "renderer/hotkeys";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
+import { HotkeyLabel } from "renderer/hotkeys";
 // Temporarily hidden: import { HistoryDropdown } from "./components/HistoryDropdown";
 
 export function NavigationControls() {
@@ -11,24 +16,11 @@ export function NavigationControls() {
 
 	const canGoBack = router.history.canGoBack();
 	const canGoForward = location.state.__TSR_index < router.history.length - 1;
-
-	useHotkey("NAVIGATE_BACK", () => router.history.back());
-	useHotkey("NAVIGATE_FORWARD", () => router.history.forward());
-
-	useEffect(() => {
-		const handleMouseUp = (event: MouseEvent) => {
-			if (event.button === 3) {
-				event.preventDefault();
-				router.history.back();
-			} else if (event.button === 4) {
-				event.preventDefault();
-				router.history.forward();
-			}
-		};
-
-		window.addEventListener("mouseup", handleMouseUp);
-		return () => window.removeEventListener("mouseup", handleMouseUp);
-	}, [router]);
+	const isParadevShell = useParadevShell();
+	const buttonClassName = isParadevShell
+		? cn("no-drag", HEADER_ICON_BUTTON_CLASS)
+		: "no-drag flex items-center justify-center size-7 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors disabled:opacity-30 disabled:pointer-events-none";
+	const strokeWidth = isParadevShell ? HEADER_ICON_STROKE_WIDTH : 1.5;
 
 	return (
 		<div className="flex items-center">
@@ -38,9 +30,9 @@ export function NavigationControls() {
 						type="button"
 						onClick={() => router.history.back()}
 						disabled={!canGoBack}
-						className="no-drag flex items-center justify-center size-7 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors disabled:opacity-30 disabled:pointer-events-none"
+						className={buttonClassName}
 					>
-						<LuArrowLeft className="size-4" strokeWidth={1.5} />
+						<LuArrowLeft className="size-4" strokeWidth={strokeWidth} />
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
@@ -54,9 +46,9 @@ export function NavigationControls() {
 						type="button"
 						onClick={() => router.history.forward()}
 						disabled={!canGoForward}
-						className="no-drag flex items-center justify-center size-7 rounded-md text-muted-foreground hover:bg-fill-hover transition-colors disabled:opacity-30 disabled:pointer-events-none"
+						className={buttonClassName}
 					>
-						<LuArrowRight className="size-4" strokeWidth={1.5} />
+						<LuArrowRight className="size-4" strokeWidth={strokeWidth} />
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">

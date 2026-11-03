@@ -9,6 +9,7 @@ import {
 } from "@superset/ui/card";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { FaGithub } from "react-icons/fa";
 import { initServerI18n } from "@/lib/i18n-server";
 import { api } from "@/trpc/server";
@@ -47,7 +48,7 @@ export default async function GitHubIntegrationPage() {
 		already_connected: i18n._(
 			msg({
 				message:
-					"This GitHub installation is already connected to another Superset organization. Disconnect it there, or uninstall the Superset GitHub App, then try again.",
+					"This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again.",
 			}),
 		),
 		unauthorized: i18n._(
@@ -93,6 +94,14 @@ export default async function GitHubIntegrationPage() {
 				</p>
 			</div>
 		);
+	}
+
+	if (
+		!(await trpc.integration.syncAllowed.query({
+			organizationId: organization.id,
+		}))
+	) {
+		redirect("/integrations?pro=github");
 	}
 
 	const installation = await trpc.integration.github.getInstallation.query({
@@ -171,7 +180,7 @@ export default async function GitHubIntegrationPage() {
 						{i18n._(
 							msg({
 								message:
-									"Install the Superset GitHub App to connect your repositories.",
+									"Install the Paradev GitHub App to connect your repositories.",
 							}),
 						)}
 					</CardDescription>

@@ -1,4 +1,7 @@
+import type { UserContent } from "@superset/chat/protocol";
+import type { WorkspaceStore } from "@superset/panes";
 import type { AgentIdentityId } from "@superset/shared/agent-catalog";
+import type { StoreApi } from "zustand/vanilla";
 export interface FilePosition {
 	line: number;
 	column?: number;
@@ -45,6 +48,14 @@ export interface DevtoolsPaneData {
 
 export type DiffFocusSide = "deletions" | "additions";
 
+/** Narrows the pane to the files one chat turn changed. */
+export interface DiffPaneFilter {
+	/** Repo-relative paths; every other file is hidden. Absent, every file in `range` shows. */
+	paths?: string[];
+	/** Commits to diff instead of the workspace's scope. */
+	range?: { fromHash: string; toHash: string };
+}
+
 export interface DiffPaneData {
 	path: string;
 	changeKey?: string;
@@ -54,6 +65,7 @@ export interface DiffPaneData {
 	focusLine?: number;
 	focusSide?: DiffFocusSide;
 	focusTick?: number;
+	filter?: DiffPaneFilter;
 }
 
 export interface CommentPaneData {
@@ -77,12 +89,72 @@ export interface PagePaneData {
 	title?: string;
 }
 
-export interface ChatV3PaneData {
+export const PENDING_CLOUD_CHAT_PANE_KIND = "pending-cloud-chat";
+
+export interface PendingCloudChatPaneData {
+	draftId: string;
+	agentId: string;
+	promptHash: string;
+	/** What the user typed; shown until the box's transcript has it. */
+	launchPrompt?: string;
+	queuedPrompts?: UserContent[][];
+	chatModelId?: string;
+	chatModeId?: string;
+}
+
+export interface ChatPaneData {
+	terminalId: string;
+	draftId?: string;
 	sessionId: string | null;
+	agent?: {
+		id: string;
+		sessionId?: string;
+	};
+	pendingPrompt?: string;
+	pendingAttachments?: Array<{
+		attachmentId: string;
+		name: string;
+		mimeType: string;
+	}>;
+	queuedPrompts?: UserContent[][];
+	launchPrompt?: string;
+	chatModelId?: string;
+	chatModelLabel?: string;
+	chatModeId?: string;
+	chatTitle?: string;
+	/** A Paradev agent's session: the pane reads it from the agent session store, not the host. */
+	agentSession?: { id: string; agentName: string };
 }
 
 export interface DesktopPaneData {
 	kind: "desktop";
+}
+
+export interface MobilePaneData {
+	kind: "mobile";
+}
+
+export interface FilesPaneData {
+	kind: "files";
+}
+
+export interface ChangesListPaneData {
+	kind: "changes-list";
+}
+
+export interface ReviewPaneData {
+	kind: "review";
+}
+
+export interface PagesListPaneData {
+	kind: "pages-list";
+	page?: PagePaneData;
+}
+
+export const NEW_TAB_PANE_KIND = "new-tab";
+
+export interface NewTabPaneData {
+	kind: typeof NEW_TAB_PANE_KIND;
 }
 
 /**
@@ -99,6 +171,7 @@ export interface SubagentPaneData {
 }
 
 export type WorkspaceSearchKey =
+	| "sessionId"
 	| "terminalId"
 	| "focusRequestId"
 	| "subagentTerminalId"
@@ -117,10 +190,16 @@ export type WorkspaceSearchKey =
  */
 export type ConsumeSearch = (keys: WorkspaceSearchKey[]) => void;
 
+export interface PaneTarget {
+	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	reveal: () => void;
+}
+
 export type PaneViewerData =
 	| FilePaneData
 	| TerminalPaneData
-	| ChatV3PaneData
+	| ChatPaneData
+	| PendingCloudChatPaneData
 	| BrowserPaneData
 	| DevtoolsPaneData
 	| DiffPaneData
@@ -128,4 +207,10 @@ export type PaneViewerData =
 	| PullRequestPaneData
 	| PagePaneData
 	| DesktopPaneData
+	| MobilePaneData
+	| FilesPaneData
+	| ChangesListPaneData
+	| ReviewPaneData
+	| PagesListPaneData
+	| NewTabPaneData
 	| SubagentPaneData;

@@ -120,6 +120,12 @@ const editorSyntaxSchema = z
 		tagName: z.string().optional(),
 		attributeName: z.string().optional(),
 		invalid: z.string().optional(),
+		operator: z.string().optional(),
+		punctuation: z.string().optional(),
+		property: z.string().optional(),
+		parameter: z.string().optional(),
+		heading: z.string().optional(),
+		link: z.string().optional(),
 	})
 	.passthrough();
 
@@ -200,7 +206,7 @@ function parseThemeEntry(
 	if (RESERVED_THEME_IDS.has(id)) {
 		return {
 			ok: false,
-			issue: `Theme ${index + 1}: "${id}" is reserved by Superset`,
+			issue: `Theme ${index + 1}: "${id}" is reserved by Paradev`,
 		};
 	}
 

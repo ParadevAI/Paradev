@@ -1,63 +1,85 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
 	cloudWorkspaceRepositories,
 	cloudWorkspaces,
+	cloudWorkspaceTags,
+	cloudWorkspaceVisibilityEnum,
 	environments,
 	githubRepositories,
+	users,
 } from "@superset/db/schema";
-import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
+import { MAX_ATTACHMENTS } from "@superset/shared/attachment-limits";
+import { MACHINE_SIZES, machineSpec } from "@superset/shared/billing";
+import {
+	CLOUD_AGENT_PROMPT_MAX_LENGTH,
+	isCloudAgentId,
+} from "@superset/shared/cloud-agent-launch";
+import {
+	normalizeWorkspaceTags,
+	workspaceTagsInputSchema,
+} from "@superset/shared/workspace-tags";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
-import { Client } from "@upstash/qstash";
-import { and, asc, desc, eq, isNull, ne } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { env } from "../../env";
-import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
+import { organizationMachineSizes } from "../../lib/billing/plan";
 import {
-	githubRepositoriesOutOfReach,
-	githubUserTokenFor,
-} from "../../lib/github-user";
+	assertCloudAccess,
+	assertMember,
+	type MemberContext,
+	organizationOrFirst,
+} from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import {
-	buildSandboxClaim,
 	deleteSandbox,
 	describeSandbox,
-	environmentRepositoryRows,
 	HOST_SERVICE_PORT,
 	listRemoteBranches,
 	loadRepositories,
 	mintSandboxGateAccess,
 	primaryRepository,
-	recordWorkspaceRepositories,
 	SandboxNotReadyError,
 	SandboxUnavailableError,
-	wakeSandbox,
-	workspaceBranchName,
+	sandboxExists,
+	stopAndSnapshot,
 } from "../../lib/sandbox";
-import { jwtProcedure, userError } from "../../trpc";
+import { acpChatEnabled } from "../../lib/user-settings";
+import { pushWorkspaceAccess } from "../../lib/workspace-access";
+import { personProcedure, userError } from "../../trpc";
+import { hostServiceMutation } from "../automation/relay-client";
 import {
-	FALLBACK_NAME,
-	provisionCloudWorkspace,
-	sandboxNameFor,
-} from "./provision";
+	canOpenWorkspace,
+	isListed,
+	loadVisibleWorkspace,
+	notFound,
+	visibleTo,
+} from "./access";
+import { recordCloudWorkspaceActivity } from "./activity";
+import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
+import { nextSandboxNameFor } from "./provision";
+import { listPullRequests } from "./pull-requests";
+import { queueReap, reapWorkspaceFiles } from "./reap";
+import { cloudWorkspaceRecordRouter } from "./record";
+import { cloudWorkspaceSharingRouter } from "./sharing";
+import { queueProvision, startCloudWorkspace } from "./start";
 import { transitionCloudWorkspace } from "./transition";
+import {
+	markSandboxUnavailable,
+	restartCloudWorkspace,
+	wakeCloudWorkspace,
+} from "./wake";
 
-const qstash = new Client({ token: env.QSTASH_TOKEN });
-
-const PROVISION_JOB_URL = `${env.NEXT_PUBLIC_API_URL}/api/cloud-workspaces/provision`;
-
-/**
- * QStash only calls public URLs, so a local API would queue a job nothing ever
- * delivers. Run it in-process there instead — still detached, so the create
- * returns as fast as it does in production and the UI behaves the same.
- */
-const isLocalApi = /^https?:\/\/(localhost|127\.0\.0\.1)/.test(
-	env.NEXT_PUBLIC_API_URL,
-);
+const DESCRIPTION_PROMPT = [
+	"Write this workspace's description for a teammate who has not seen it:",
+	"what was asked, what is done, what is in progress or blocked, and any open pull requests.",
+	'Read the git log, the diff against the default branch, and `gh pr list --head "$(git branch --show-current)"` to find out; do not change any files.',
+	"Keep it to 2-4 sentences of markdown, and save it by piping it on stdin:",
+	"`superset workspaces description set <<'EOF'` followed by the description and `EOF`.",
+].join(" ");
 
 /** The caller's cloud workspace, refused unless it exists, they may use it, and it is ready. */
 async function loadReadyWorkspace(
-	ctx: Parameters<typeof assertCloudAccess>[0] & { organizationIds: string[] },
+	ctx: Parameters<typeof assertCloudAccess>[0] & MemberContext,
 	id: string,
 ) {
 	const row = await db.query.cloudWorkspaces.findFirst({
@@ -70,8 +92,9 @@ async function loadReadyWorkspace(
 			i18nKey: "serverError.cloudWorkspace.notFound",
 		});
 	}
-	await assertCloudAccess(ctx);
-	assertMember(ctx.organizationIds, row.organizationId);
+	await assertMember(ctx, row.organizationId);
+	await assertCloudAccess(ctx, row.organizationId);
+	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
 	if (row.status !== "ready") {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
@@ -82,59 +105,162 @@ async function loadReadyWorkspace(
 	return row;
 }
 
+/**
+ * Where this workspace's host-service answers. A wake resumes a stopped
+ * session and records a moved address, and a restart stops a running one
+ * first; a sandbox that can never resume turns the row failed, the state
+ * clients already offer a way out of.
+ */
+async function addressSandbox(
+	row: typeof cloudWorkspaces.$inferSelect,
+	mode: "address" | "wake" | "restart",
+): Promise<{
+	hostTarget: string;
+	running: boolean;
+	agentCredentialsChanged: boolean;
+}> {
+	try {
+		if (mode === "address") {
+			return {
+				...(await describeSandbox(row.providerSandboxId)),
+				agentCredentialsChanged: false,
+			};
+		}
+		const woken =
+			mode === "restart"
+				? await restartCloudWorkspace(row)
+				: await wakeCloudWorkspace(row);
+		return { ...woken, running: true };
+	} catch (error) {
+		if (error instanceof SandboxNotReadyError) {
+			throw new TRPCError({
+				code: "TIMEOUT",
+				message: "Cloud workspace is still starting",
+				cause: error,
+			});
+		}
+		if (!(error instanceof SandboxUnavailableError)) throw error;
+		await markSandboxUnavailable(row, error);
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: "Cloud workspace is failed",
+			cause: { kind: "CLOUD_WORKSPACE_NOT_READY", status: "failed" },
+		});
+	}
+}
+
+/** The caller's own tags per workspace, normalized and sorted; ids with none are absent. */
+async function loadCallerTags(
+	workspaceIds: string[],
+	userId: string,
+): Promise<Map<string, string[]>> {
+	const byWorkspaceId = new Map<string, string[]>();
+	if (workspaceIds.length === 0) return byWorkspaceId;
+	const rows = await db
+		.select({
+			cloudWorkspaceId: cloudWorkspaceTags.cloudWorkspaceId,
+			tag: cloudWorkspaceTags.tag,
+		})
+		.from(cloudWorkspaceTags)
+		.where(
+			and(
+				inArray(cloudWorkspaceTags.cloudWorkspaceId, workspaceIds),
+				eq(cloudWorkspaceTags.createdByUserId, userId),
+			),
+		);
+	for (const row of rows) {
+		const tags = byWorkspaceId.get(row.cloudWorkspaceId);
+		if (tags) tags.push(row.tag);
+		else byWorkspaceId.set(row.cloudWorkspaceId, [row.tag]);
+	}
+	for (const [id, tags] of byWorkspaceId) {
+		byWorkspaceId.set(id, normalizeWorkspaceTags(tags));
+	}
+	return byWorkspaceId;
+}
+
+/**
+ * Released desktop and mobile builds still read `presence`; it now lives in the realtime WorkspaceHub.
+ * TODO(2026-10-26): drop `presence` from list and create once MINIMUM_DESKTOP_VERSION is past the release that stopped reading it.
+ */
+const NO_PRESENCE: {
+	userId: string;
+	name: string;
+	image: string | null;
+	lastSeenAt: Date;
+}[] = [];
+
 export const cloudWorkspaceRouter = {
+	...cloudWorkspaceRecordRouter,
+	sharing: cloudWorkspaceSharingRouter,
+
 	/**
 	 * Whether this account may use cloud workspaces. Clients decide their
 	 * default location from it: a workspace command defaults to the cloud only
 	 * for an account that can use it, so nobody else's commands change.
 	 */
-	available: jwtProcedure.query(async ({ ctx }) => {
+	available: personProcedure.query(async ({ ctx }) => {
 		try {
-			await assertCloudAccess(ctx);
+			await assertCloudAccess(ctx, organizationOrFirst(ctx));
 			return { available: true };
 		} catch {
 			return { available: false };
 		}
 	}),
 
-	list: jwtProcedure
-		.input(z.object({ organizationId: z.string().uuid() }))
+	list: personProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				archived: z.boolean().default(false),
+			}),
+		)
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, input.organizationId);
-			return db
-				.select()
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
+			const rows = await db
+				.select({
+					workspace: cloudWorkspaces,
+					createdBy: { userId: users.id, name: users.name, image: users.image },
+				})
 				.from(cloudWorkspaces)
+				.leftJoin(users, eq(cloudWorkspaces.createdByUserId, users.id))
 				.where(
 					and(
 						eq(cloudWorkspaces.organizationId, input.organizationId),
-						// Deleted rows are kept briefly so a failed teardown is
-						// visible, but they are never a workspace you can open.
-						// Everything else is listed from the moment it is created:
-						// the client renders provisioning and failed rows off
-						// `status` rather than being told they don't exist yet.
-						ne(cloudWorkspaces.status, "deleted"),
+						visibleTo(ctx.principal.userId),
+						isListed(input.archived),
 					),
 				)
 				.orderBy(desc(cloudWorkspaces.createdAt));
+			const tagsByWorkspaceId = await loadCallerTags(
+				rows.map(({ workspace }) => workspace.id),
+				ctx.principal.userId,
+			);
+			return rows.map(({ workspace, createdBy }) => ({
+				...workspace,
+				createdBy,
+				presence: NO_PRESENCE,
+				tags: tagsByWorkspaceId.get(workspace.id) ?? [],
+			}));
 		}),
 
 	/**
 	 * The repositories each listed workspace checked out, by name, the one it
 	 * opens on marked primary.
 	 */
-	repositories: jwtProcedure
+	repositories: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const rows = await db
 				.select({
 					cloudWorkspaceId: cloudWorkspaceRepositories.cloudWorkspaceId,
 					repositoryId: githubRepositories.id,
 					fullName: githubRepositories.fullName,
 					path: cloudWorkspaceRepositories.path,
-					hooksRepositoryId: environments.hooksRepositoryId,
+					primaryRepositoryId: environments.primaryRepositoryId,
 				})
 				.from(cloudWorkspaceRepositories)
 				.innerJoin(
@@ -149,25 +275,60 @@ export const cloudWorkspaceRouter = {
 					githubRepositories,
 					eq(cloudWorkspaceRepositories.repositoryId, githubRepositories.id),
 				)
-				.where(eq(cloudWorkspaces.organizationId, input.organizationId))
+				.where(
+					and(
+						eq(cloudWorkspaces.organizationId, input.organizationId),
+						visibleTo(ctx.principal.userId),
+					),
+				)
 				.orderBy(asc(githubRepositories.fullName));
 			const primaryByWorkspace = new Map<string, string>();
 			for (const workspaceId of new Set(rows.map((r) => r.cloudWorkspaceId))) {
 				const own = rows.filter((r) => r.cloudWorkspaceId === workspaceId);
 				const primary = primaryRepository(
 					own.map((r) => ({ id: r.repositoryId, fullName: r.fullName })),
-					own[0]?.hooksRepositoryId,
+					own[0]?.primaryRepositoryId,
 				);
 				if (primary) primaryByWorkspace.set(workspaceId, primary.id);
 			}
-			return rows.map(({ hooksRepositoryId: _hooks, ...row }) => ({
+			return rows.map(({ primaryRepositoryId: _primary, ...row }) => ({
 				...row,
 				primary:
 					primaryByWorkspace.get(row.cloudWorkspaceId) === row.repositoryId,
 			}));
 		}),
 
-	listBranches: jwtProcedure
+	pullRequests: personProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				archived: z.boolean().default(false),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
+			return listPullRequests(
+				input.organizationId,
+				ctx.principal.userId,
+				input.archived,
+			);
+		}),
+
+	machineSizes: personProcedure
+		.input(z.object({ organizationId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			await assertMember(ctx, input.organizationId);
+			const { sizes, defaultSize } = await organizationMachineSizes(
+				input.organizationId,
+			);
+			return {
+				defaultSize,
+				sizes: sizes.map((name) => ({ name, ...machineSpec(name) })),
+			};
+		}),
+
+	listBranches: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -176,8 +337,8 @@ export const cloudWorkspaceRouter = {
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const [repo] = await loadRepositories({
 				organizationId: input.organizationId,
 				repositoryIds: [input.repositoryId],
@@ -186,25 +347,14 @@ export const cloudWorkspaceRouter = {
 			return listRemoteBranches(repo, input.query);
 		}),
 
-	/**
-	 * Records a cloud workspace and hands the sandbox off to a background job.
-	 *
-	 * Returns as soon as the row exists — in `provisioning`, with no sandbox
-	 * behind it yet — because the client opens the workspace on this id and
-	 * shows the provisioning screen itself. Nobody should watch a spinner on a
-	 * submit button while a sandbox and a naming model call happen behind it.
-	 *
-	 * The row is still written **before** anything is provisioned, so a crash
-	 * mid-provision leaves a `provisioning` row we can reconcile, rather than
-	 * an orphaned sandbox nothing references.
-	 */
-	create: jwtProcedure
+	/** See {@link startCloudWorkspace}. */
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
 				/** Omitted when the user didn't type one; then `prompt` names it. */
 				name: z.string().min(1).max(200).optional(),
-				prompt: z.string().max(20000).optional(),
+				prompt: z.string().max(CLOUD_AGENT_PROMPT_MAX_LENGTH).optional(),
 				/** Omitted = the repo's default branch, resolved here — a client
 				 * whose branch query hadn't answered must not guess "main". */
 				branch: z.string().min(1).max(300).optional(),
@@ -222,12 +372,21 @@ export const cloudWorkspaceRouter = {
 				 * bytes once it is up; the same cap `attachments.importFromCloud`
 				 * takes, since that is what runs in there.
 				 */
-				attachmentFileIds: z.array(z.string().uuid()).max(10).optional(),
+				attachmentFileIds: z
+					.array(z.string().uuid())
+					.max(MAX_ATTACHMENTS)
+					.optional(),
+				/** What the person typed, kept as the workspace's prompt; `prompt` may carry built context. */
+				typedPrompt: z.string().max(20000).optional(),
+				/** Tasks the composer linked; each must be in this organization. */
+				taskIds: z.array(z.string().uuid()).max(10).optional(),
+				/** A size the organization offers (see `machineSizes`); omitted = its default. */
+				machineSize: z.enum(MACHINE_SIZES).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			if (input.agent && !isCloudAgentId(input.agent)) {
 				// Only the built-in presets exist inside a sandbox; the clients offer
 				// nothing else, so this is a developer error, not a user one.
@@ -237,96 +396,18 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
-			const environment = await db.query.environments.findFirst({
-				where: and(
-					eq(environments.id, input.environmentId),
-					eq(environments.organizationId, input.organizationId),
-					isNull(environments.archivedAt),
-				),
-			});
-			if (
-				!environment ||
-				(environment.scope === "personal" &&
-					environment.createdByUserId !== ctx.userId)
-			) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Environment not found in this organization",
-					i18nKey: "serverError.cloudWorkspace.environmentNotFound",
-				});
-			}
-
-			// A workspace is started from an environment, and the environment's
-			// repositories are its checkouts.
-			const repositories = await environmentRepositoryRows(environment.id);
-			if (repositories.length === 0) {
-				throw userError({
-					code: "BAD_REQUEST",
-					message:
-						"This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it",
-					i18nKey: "serverError.cloudWorkspace.environmentHasNoRepositories",
-				});
-			}
-			const primary = primaryRepository(
-				repositories,
-				environment.hooksRepositoryId,
-			) as (typeof repositories)[number];
-			const branch = input.branch ?? primary.defaultBranch;
-			// A connected person's workspace acts as them on GitHub, so a
-			// repository they cannot see would fail to clone later; say so now.
-			const githubToken = await githubUserTokenFor(ctx.userId);
-			if (githubToken) {
-				const outOfReach = await githubRepositoriesOutOfReach({
-					token: githubToken,
-					repositories,
-				});
-				if (outOfReach.length > 0) {
-					throw userError({
-						code: "FORBIDDEN",
-						message: `Your GitHub account cannot reach ${outOfReach.join(", ")}`,
-						i18nKey: "serverError.cloudWorkspace.githubRepositoryOutOfReach",
-					});
-				}
-			}
-
-			// The id is generated here rather than by the database so the sandbox
-			// name can be derived before the insert. A placeholder would briefly
-			// leave two rows sharing ("vercel", ""), which the unique constraint
-			// rejects whenever two creates overlap.
-			const id = crypto.randomUUID();
-			const providerSandboxId = sandboxNameFor(id);
-			const name = input.name ?? FALLBACK_NAME;
-			const [row] = await db
-				.insert(cloudWorkspaces)
-				.values({
-					id,
-					organizationId: input.organizationId,
-					name,
-					branch: workspaceBranchName({ id, name }),
-					baseBranch: branch,
-					provider: "vercel",
-					providerSandboxId,
-					status: "provisioning",
-					environmentId: environment.id,
-					createdByUserId: ctx.userId,
-				})
-				.returning();
-			if (!row) {
-				throw userError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Could not record cloud workspace",
-					i18nKey: "serverError.cloudWorkspace.couldNotRecordCloudWorkspace",
-				});
-			}
-			await recordWorkspaceRepositories({
-				cloudWorkspaceId: row.id,
-				repositories,
-			});
-
-			// Naming reads the prompt, and only when the user didn't type a name.
-			const job = {
-				cloudWorkspaceId: row.id,
-				...(input.name ? {} : { namingPrompt: input.prompt ?? "" }),
+			const row = await startCloudWorkspace({
+				organizationId: input.organizationId,
+				userId: ctx.principal.userId,
+				environmentId: input.environmentId,
+				name: input.name,
+				prompt: input.prompt,
+				branch: input.branch,
+				typedPrompt: input.typedPrompt,
+				taskIds: input.taskIds,
+				attachmentFileIds: input.attachmentFileIds,
+				machineSize: input.machineSize,
+				chat: !!input.agent && (await acpChatEnabled(ctx.principal.userId)),
 				...(input.agent
 					? {
 							launch: {
@@ -339,51 +420,20 @@ export const cloudWorkspaceRouter = {
 							},
 						}
 					: {}),
+			});
+			// Shaped like a `list` row: clients seed the list with it.
+			const creator = await db.query.users.findFirst({
+				where: eq(users.id, ctx.principal.userId),
+				columns: { id: true, name: true, image: true },
+			});
+			return {
+				...row,
+				createdBy: creator
+					? { userId: creator.id, name: creator.name, image: creator.image }
+					: null,
+				presence: NO_PRESENCE,
+				tags: [] as string[],
 			};
-
-			nudge(row.organizationId, "cloud_workspaces");
-			if (isLocalApi) {
-				void provisionCloudWorkspace(job).catch((error) => {
-					console.error(
-						`[cloud-workspace] provisioning threw for ${row.id}`,
-						error,
-					);
-				});
-				return row;
-			}
-
-			try {
-				// Queued rather than fired off after the response: this runs on
-				// Vercel, where the function is frozen the moment it replies, and
-				// an unawaited promise dies with it. QStash also retries a delivery
-				// the function never finished, which is exactly the failure that
-				// stranded a row in `provisioning` when create still ran inline.
-				await qstash.publishJSON({
-					url: PROVISION_JOB_URL,
-					body: job,
-					retries: 2,
-				});
-			} catch (error) {
-				// Nothing was provisioned, so there is no sandbox to tear down —
-				// but the row must not sit in `provisioning` with no job coming.
-				await transitionCloudWorkspace({
-					id: row.id,
-					from: ["provisioning"],
-					to: "failed",
-				});
-				console.error(
-					`[cloud-workspace] could not queue provisioning for ${row.id}`,
-					error,
-				);
-				throw userError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Could not start cloud workspace provisioning",
-					i18nKey:
-						"serverError.cloudWorkspace.couldNotStartCloudWorkspaceProvisioning",
-				});
-			}
-
-			return row;
 		}),
 
 	/**
@@ -391,30 +441,68 @@ export const cloudWorkspaceRouter = {
 	 * is created, named and listed by this API; the row inside the sandbox
 	 * exists only so host-service has something to serve panes against.
 	 */
-	rename: jwtProcedure
+	rename: personProcedure
 		.input(
 			z.object({ id: z.string().uuid(), name: z.string().min(1).max(200) }),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const row = await db.query.cloudWorkspaces.findFirst({
-				where: eq(cloudWorkspaces.id, input.id),
-			});
-			if (!row) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Not found",
-					i18nKey: "serverError.cloudWorkspace.notFound",
-				});
-			}
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, row.organizationId);
+			const row = await loadVisibleWorkspace(ctx, input.id);
 			const [renamed] = await db
 				.update(cloudWorkspaces)
 				.set({ name: input.name })
 				.where(eq(cloudWorkspaces.id, input.id))
 				.returning();
+			if (input.name !== row.name) {
+				await recordCloudWorkspaceActivity(
+					db,
+					row.id,
+					{ kind: "user", userId: ctx.principal.userId },
+					{ fromName: row.name, toName: input.name },
+				);
+			}
 			nudge(row.organizationId, "cloud_workspaces");
 			return renamed ?? row;
+		}),
+
+	/**
+	 * Replaces the caller's tag set on a workspace — the sidebar's folder
+	 * membership, the same contract as host-service `workspace.update`. Tags
+	 * are personal, so anyone who can see the workspace may file it, and only
+	 * their own rows move.
+	 */
+	setTags: personProcedure
+		.input(z.object({ id: z.string().uuid(), tags: workspaceTagsInputSchema }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			await dbWs.transaction(async (tx) => {
+				// One replace-set write at a time per (workspace, user): two
+				// that overlap would each delete past the other's insert and
+				// leave the union of both sets.
+				await tx.execute(
+					sql`select pg_advisory_xact_lock(hashtext(${`${row.id}:${ctx.principal.userId}`}))`,
+				);
+				await tx
+					.delete(cloudWorkspaceTags)
+					.where(
+						and(
+							eq(cloudWorkspaceTags.cloudWorkspaceId, row.id),
+							eq(cloudWorkspaceTags.createdByUserId, ctx.principal.userId),
+						),
+					);
+				if (input.tags.length > 0) {
+					await tx.insert(cloudWorkspaceTags).values(
+						input.tags.map((tag) => ({
+							cloudWorkspaceId: row.id,
+							tag,
+							createdByUserId: ctx.principal.userId,
+						})),
+					);
+				}
+			});
+			// Tags are personal, but the caller's other windows learn of the
+			// change only through the organization channel.
+			nudge(row.organizationId, "cloud_workspaces");
+			return { ...row, tags: input.tags };
 		}),
 
 	/**
@@ -431,62 +519,19 @@ export const cloudWorkspaceRouter = {
 	 * which resumes a stopped session, re-applies the credential rules,
 	 * extends a running session, and pushes the managed environment again.
 	 */
-	access: jwtProcedure
+	access: personProcedure
 		.input(
 			z.object({ id: z.string().uuid(), wake: z.boolean().default(false) }),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
-			let address: {
-				hostTarget: string;
-				running: boolean;
-			};
-			try {
-				if (input.wake) {
-					const { claim } = await buildSandboxClaim({ row });
-					const woken = await wakeSandbox({
-						providerSandboxId: row.providerSandboxId,
-						claim,
-					});
-					if (woken.hostTarget !== row.sandboxUrl) {
-						await db
-							.update(cloudWorkspaces)
-							.set({ sandboxUrl: woken.hostTarget })
-							.where(eq(cloudWorkspaces.id, row.id));
-					}
-					address = { ...woken, running: true };
-				} else {
-					address = await describeSandbox(row.providerSandboxId);
-				}
-			} catch (error) {
-				if (error instanceof SandboxNotReadyError) {
-					throw new TRPCError({
-						code: "TIMEOUT",
-						message: "Cloud workspace is still starting",
-						cause: error,
-					});
-				}
-				if (!(error instanceof SandboxUnavailableError)) throw error;
-				// The sandbox is gone or can never resume. A `ready` row nothing
-				// can open would sit in the sidebar forever; failed is the state
-				// the client already renders with a way out.
-				await transitionCloudWorkspace({
-					id: row.id,
-					from: ["ready"],
-					to: "failed",
-					set: { sandboxUrl: null },
-				});
-				nudge(row.organizationId, "cloud_workspaces");
-				console.error(`[cloud-workspace] ${row.id} sandbox unavailable`, error);
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Cloud workspace is failed",
-					cause: { kind: "CLOUD_WORKSPACE_NOT_READY", status: "failed" },
-				});
-			}
+			const address = await addressSandbox(
+				row,
+				input.wake ? "wake" : "address",
+			);
 			const host = await mintSandboxGateAccess({
 				workspaceId: row.id,
-				userId: ctx.userId,
+				userId: ctx.principal.userId,
 				port: HOST_SERVICE_PORT,
 				target: address.hostTarget,
 			});
@@ -495,10 +540,33 @@ export const cloudWorkspaceRouter = {
 				token: host.token,
 				expiresAt: host.expiresAt,
 				running: address.running,
+				agentCredentialsChanged: address.agentCredentialsChanged,
 				// The display is served by host-service too: same address, same
 				// ticket. The sandbox's own desktop port is not published.
 				desktop: { url: host.url, token: host.token },
 			};
+		}),
+
+	/** Ends every terminal and agent on the box so they start again with the current agent sign-ins. */
+	restart: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			await addressSandbox(row, "restart");
+			return { restarted: true };
+		}),
+
+	/** Stops the sandbox so it costs storage only; the next `access` with `wake` boots it again. */
+	sleep: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			const { running } = await addressSandbox(row, "address");
+			if (running) {
+				await stopAndSnapshot(row.providerSandboxId);
+				await queueSettleWorkspace(row.id);
+			}
+			return { stopped: running };
 		}),
 
 	/**
@@ -508,7 +576,39 @@ export const cloudWorkspaceRouter = {
 	 * on resume, does not answer it, and they then ask `access` with `wake`,
 	 * which also records the current address.
 	 */
-	hostTicket: jwtProcedure
+	/**
+	 * Asks an agent in the box to write the workspace's description; it saves it
+	 * with `superset workspaces description set`, which lands as `setDescription`.
+	 */
+	generateDescription: personProcedure
+		.input(
+			z.object({
+				id: z.string().uuid(),
+				agent: z.string().refine(isCloudAgentId).default("claude"),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			const address = await addressSandbox(row, "wake");
+			const host = await mintSandboxGateAccess({
+				workspaceId: row.id,
+				userId: ctx.principal.userId,
+				port: HOST_SERVICE_PORT,
+				target: address.hostTarget,
+			});
+			await hostServiceMutation(
+				{
+					baseUrl: host.url,
+					headers: { authorization: `Bearer ${host.token}` },
+					timeoutMs: 60_000,
+				},
+				"agents.run",
+				{ workspaceId: row.id, agent: input.agent, prompt: DESCRIPTION_PROMPT },
+			);
+			return { requestedAt: new Date(), previous: row.description };
+		}),
+
+	hostTicket: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
@@ -517,36 +617,147 @@ export const cloudWorkspaceRouter = {
 				(await describeSandbox(row.providerSandboxId)).hostTarget;
 			const host = await mintSandboxGateAccess({
 				workspaceId: row.id,
-				userId: ctx.userId,
+				userId: ctx.principal.userId,
 				port: HOST_SERVICE_PORT,
 				target,
 			});
 			return { url: host.url, token: host.token, expiresAt: host.expiresAt };
 		}),
 
-	delete: jwtProcedure
+	setVisibility: personProcedure
+		.input(
+			z.object({
+				id: z.string().uuid(),
+				visibility: cloudWorkspaceVisibilityEnum,
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			if (row.createdByUserId !== ctx.principal.userId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only the creator can change who sees a cloud workspace",
+				});
+			}
+			await db
+				.update(cloudWorkspaces)
+				.set({ visibility: input.visibility })
+				.where(eq(cloudWorkspaces.id, input.id));
+			if (input.visibility !== row.visibility) {
+				await recordCloudWorkspaceActivity(
+					db,
+					row.id,
+					{ kind: "user", userId: ctx.principal.userId },
+					{ fromVisibility: row.visibility, toVisibility: input.visibility },
+				);
+			}
+			if (input.visibility !== row.visibility) {
+				pushWorkspaceAccess(row.organizationId, row.id);
+			}
+			nudge(row.organizationId, "cloud_workspaces");
+			return { visibility: input.visibility };
+		}),
+
+	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await db.query.cloudWorkspaces.findFirst({
 				where: eq(cloudWorkspaces.id, input.id),
 			});
 			if (!row) return { deleted: false };
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, row.organizationId);
-
-			// A row from a retired provider has no sandbox left to delete.
-			if (row.providerSandboxId && row.provider === "vercel") {
-				await deleteSandbox(row.providerSandboxId);
+			await assertMember(ctx, row.organizationId);
+			await assertCloudAccess(ctx, row.organizationId);
+			if (!(await canOpenWorkspace(row, ctx.principal.userId))) {
+				return { deleted: false };
 			}
+
+			const archivedAt = new Date();
 			// From any state, provisioning included: the job checks the row
 			// before it marks it ready and tears its box down when this won.
-			await transitionCloudWorkspace({
+			// The box keeps running until the reap stops it, so an undo is instant.
+			const archived = await transitionCloudWorkspace({
 				id: row.id,
 				from: ["provisioning", "ready", "failed"],
 				to: "deleted",
-				set: { sandboxUrl: null },
+				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
+			if (archived) {
+				// A row from a retired provider has no sandbox left to keep.
+				if (row.provider === "vercel") {
+					await queueReap(
+						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
+						row.providerSandboxId,
+					).catch(async (error) => {
+						console.error(
+							`[cloud-workspace] could not queue the reap for ${row.id}`,
+							error,
+						);
+						await settleWorkspaceNow(row.id).catch((meterError) =>
+							console.error(
+								`[cloud-workspace] ${row.id} final meter failed`,
+								meterError,
+							),
+						);
+						await deleteSandbox(row.providerSandboxId);
+						await reapWorkspaceFiles(row.id);
+					});
+				}
+				await recordCloudWorkspaceActivity(
+					db,
+					row.id,
+					{ kind: "user", userId: ctx.principal.userId },
+					{ event: "archived" },
+				).catch((error) => {
+					console.error(
+						`[cloud-workspace] ${row.id} archive activity write failed`,
+						error,
+					);
+				});
+			}
 			nudge(row.organizationId, "cloud_workspaces");
 			return { deleted: true };
+		}),
+
+	unarchive: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			const resumable =
+				row.status === "deleted" &&
+				row.provider === "vercel" &&
+				(await sandboxExists(row.providerSandboxId));
+			// Inside the grace period the box is still there, running for the
+			// first minute and stopped after, and wakes with its disk; after it, the row gets a fresh box from its
+			// environment and nothing on the old disk comes back.
+			const revived = await transitionCloudWorkspace(
+				resumable
+					? {
+							id: row.id,
+							from: ["deleted"],
+							to: "ready",
+							set: { deletedAt: null },
+						}
+					: {
+							id: row.id,
+							from: ["deleted"],
+							to: "provisioning",
+							set: {
+								provider: "vercel",
+								providerSandboxId: nextSandboxNameFor(row.id),
+								sandboxUrl: null,
+								deletedAt: null,
+							},
+						},
+			);
+			if (!revived) return { unarchived: false };
+			await recordCloudWorkspaceActivity(
+				db,
+				row.id,
+				{ kind: "user", userId: ctx.principal.userId },
+				{ event: "unarchived" },
+			);
+			nudge(row.organizationId, "cloud_workspaces");
+			if (!resumable) await queueProvision({ cloudWorkspaceId: row.id });
+			return { unarchived: true };
 		}),
 } satisfies TRPCRouterRecord;

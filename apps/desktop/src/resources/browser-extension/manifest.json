@@ -1,8 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "Superset Browser Tools",
+	"name": "Paradev Browser Tools",
 	"version": "0.1.0",
-	"description": "Browser tools for Superset desktop",
+	"description": "Browser tools for Paradev desktop",
 	"permissions": ["activeTab", "scripting"],
 	"background": {
 		"service_worker": "background.js"

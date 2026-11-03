@@ -120,7 +120,7 @@ describe("page viewport zoom", () => {
 			transformOrigin: "",
 			clipPath: "",
 		};
-		const surface = { style };
+		const surface = { offsetWidth: 800, offsetHeight: 600, style };
 		applyPageViewportZoom(surface, {
 			scale: 2,
 			x: 200,
@@ -144,5 +144,14 @@ describe("page viewport zoom", () => {
 		});
 		expect(style.transform).toBe("");
 		expect(style.clipPath).toBe("");
+	});
+	test("maps page pixels to element pixels when the page has its own zoom", () => {
+		const style = { transform: "", transformOrigin: "", clipPath: "" };
+		applyPageViewportZoom(
+			{ offsetWidth: 600, offsetHeight: 400, style },
+			{ scale: 2, x: 400, y: 300, width: 1200, height: 800 },
+		);
+		expect(style.transform).toBe("translate(-200px, -150px) scale(2)");
+		expect(style.clipPath).toBe("inset(75px 200px 125px 100px)");
 	});
 });

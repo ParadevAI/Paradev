@@ -10,8 +10,12 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../../env";
 import { installationOctokit } from "../../../lib/sandbox/clone-token";
-import { protectedProcedure, userError } from "../../../trpc";
+import { organizationSyncsNow } from "../../../lib/sync-policy/syncPolicy";
+import { personProcedure, planRequiredError, userError } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
+import { findInstalledRepository } from "./find-installed-repository";
+import { getPullRequestDiff } from "./get-pull-request-diff";
+import { pullRequestProcedures } from "./pull-request-procedures";
 import {
 	type PullRequestDetail,
 	toChecks,
@@ -24,7 +28,9 @@ import { listGithubRepositories } from "./trigger-options";
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
 export const githubRouter = {
-	getInstallation: protectedProcedure
+	...pullRequestProcedures,
+	getPullRequestDiff,
+	getInstallation: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -33,6 +39,7 @@ export const githubRouter = {
 				where: eq(githubInstallations.organizationId, input.organizationId),
 				columns: {
 					id: true,
+					installationId: true,
 					accountLogin: true,
 					accountType: true,
 					suspended: true,
@@ -44,7 +51,7 @@ export const githubRouter = {
 			return installation ?? null;
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
@@ -61,7 +68,7 @@ export const githubRouter = {
 			return { success: true };
 		}),
 
-	triggerSync: protectedProcedure
+	triggerSync: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -76,6 +83,16 @@ export const githubRouter = {
 					code: "NOT_FOUND",
 					message: "GitHub installation not found",
 					i18nKey: "serverError.integration.githubInstallationNotFound",
+				});
+			}
+
+			// The webhook drops this organization's deliveries, so a backfill here
+			// would go stale the moment it finished.
+			if (!(await organizationSyncsNow(input.organizationId))) {
+				throw planRequiredError({
+					message: "GitHub sync requires the Pro plan.",
+					i18nKey: "serverError.integration.githubSyncRequiresThePro",
+					requiredPlan: "pro",
 				});
 			}
 
@@ -105,14 +122,14 @@ export const githubRouter = {
 			return { success: true };
 		}),
 
-	listRepositories: protectedProcedure
+	listRepositories: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 			return listGithubRepositories(input.organizationId);
 		}),
 
-	listPullRequests: protectedProcedure
+	listPullRequests: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -176,7 +193,7 @@ export const githubRouter = {
 			});
 		}),
 
-	listOrganizationPullRequests: protectedProcedure
+	listOrganizationPullRequests: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -194,7 +211,7 @@ export const githubRouter = {
 	 * is not installed on has no entry; `hasInstallation` lets a client fall
 	 * back to a host it can reach.
 	 */
-	getByBranches: protectedProcedure
+	getByBranches: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -258,6 +275,8 @@ export const githubRouter = {
 					title: githubPullRequests.title,
 					state: githubPullRequests.state,
 					isDraft: githubPullRequests.isDraft,
+					additions: githubPullRequests.additions,
+					deletions: githubPullRequests.deletions,
 					reviewDecision: githubPullRequests.reviewDecision,
 					checksStatus: githubPullRequests.checksStatus,
 					checks: githubPullRequests.checks,
@@ -302,6 +321,8 @@ export const githubRouter = {
 					title: row.title,
 					state: toPullRequestState(row.state, row.mergedAt),
 					isDraft: row.isDraft,
+					additions: row.additions,
+					deletions: row.deletions,
 					reviewDecision: toReviewDecision(row.reviewDecision),
 					checksStatus: toChecksStatus(row.checksStatus),
 					checks: toChecks(row.checks),
@@ -315,8 +336,10 @@ export const githubRouter = {
 	 * detail pane that has no host in the loop: the webhook row supplies
 	 * everything but the description, which comes from GitHub with the
 	 * installation's token.
+	 *
+	 * @deprecated Use the API's `integration.github.getPullRequestDetail`, which acts as the viewer. Kept for released clients.
 	 */
-	getPullRequest: protectedProcedure
+	getPullRequest: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -326,31 +349,10 @@ export const githubRouter = {
 		)
 		.query(async ({ ctx, input }): Promise<PullRequestDetail> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-			});
-			if (!installation) {
-				throw userError({
-					code: "PRECONDITION_FAILED",
-					message: "GitHub installation not found",
-					i18nKey: "serverError.integration.githubInstallationNotFound",
-				});
-			}
-			const repo = await db.query.githubRepositories.findFirst({
-				where: and(
-					eq(githubRepositories.installationId, installation.id),
-					sql`lower(${githubRepositories.fullName}) = ${input.repoFullName.toLowerCase()}`,
-				),
-				columns: { id: true, fullName: true },
-			});
-			if (!repo) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: `${input.repoFullName} is not a repository the GitHub App is installed on`,
-					i18nKey: "serverError.integration.repositoryNotInstalled",
-					params: { repoFullName: input.repoFullName },
-				});
-			}
+			const { installation, repo } = await findInstalledRepository(
+				input.organizationId,
+				input.repoFullName,
+			);
 			const [owner, name] = repo.fullName.split("/");
 			const [row, octokit] = await Promise.all([
 				db.query.githubPullRequests.findFirst({
@@ -389,7 +391,7 @@ export const githubRouter = {
 			};
 		}),
 
-	getStats: protectedProcedure
+	getStats: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

@@ -9,7 +9,10 @@ import type { DiffAnnotationMetadata } from "../useDiffAnnotations";
 import { buildOrderedThreads } from "./buildOrderedThreads";
 
 interface UseDiffCommentNavigationOptions {
-	codeViewRef: RefObject<CodeViewHandle<DiffAnnotationMetadata> | null>;
+	codeViewRef: RefObject<CodeViewHandle<
+		DiffAnnotationMetadata,
+		undefined
+	> | null>;
 	items: readonly CodeViewItem<DiffAnnotationMetadata>[];
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	collapsedSet: ReadonlySet<string>;

@@ -57,6 +57,8 @@ export function SidebarCardSlot({
 						actionLabel={entry.actionLabel}
 						onAction={entry.onAction}
 						onDismiss={entry.onDismiss}
+						onClick={entry.onClick}
+						media={entry.media}
 						className={entry.className}
 					>
 						{entry.children}

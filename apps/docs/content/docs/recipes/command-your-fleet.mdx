@@ -9,7 +9,7 @@ description: Read every agent's screen and broadcast follow-ups across workspace
 
 ## The Idea
 
-Every terminal Superset runs is addressable from the [CLI](/cli/getting-started): `terminals list`, `read`, and `send`. Compose them with `workspaces list` and one shell loop sweeps a whole project: every agent's screen in one scroll, or one instruction delivered to all of them.
+Every terminal Paradev runs is addressable from the [CLI](/cli/getting-started): `terminals list`, `read`, and `send`. Compose them with `workspaces list` and one shell loop sweeps a whole project: every agent's screen in one scroll, or one instruction delivered to all of them.
 
 Workspaces are host-owned, and these loops target the machine you run them on. If your fleet spans hosts, add `--host <id>` to each command to sweep a remote host's share of it.
 
@@ -50,10 +50,10 @@ One caveat: `send` delivers to *every* terminal, including plain shells, where t
 ## Clean Up When You're Done
 
 ```bash
-superset workspaces list --project my-app --quiet | xargs -L1 superset workspaces delete
+superset workspaces list --project my-app --quiet | xargs -L1 superset workspaces archive
 ```
 
-Deletes every listed workspace (the project's `main` workspace is not deletable). Filter with `--search` to target only the fleet you launched.
+Archives every listed workspace (the project's `main` workspace cannot be archived). An archived workspace loses its uncommitted changes. Filter with `--search` to target only the fleet you launched.
 
 ## Variations
 

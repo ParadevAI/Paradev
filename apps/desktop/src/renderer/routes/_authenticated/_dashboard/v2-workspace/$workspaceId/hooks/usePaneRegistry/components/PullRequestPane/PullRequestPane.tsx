@@ -1,42 +1,69 @@
-import { useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
+import { useIsTabVisible } from "@superset/panes";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import {
 	isSamePullRequest,
 	pullRequestRefFromUrl,
 } from "renderer/lib/github/pullRequestRef";
-import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
-import { PullRequestDetailHeader } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailHeader";
-import { PullRequestSummaryContent } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestSummaryContent";
+import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
+import type { PullRequestActivityThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActivity";
+import { PullRequestDetailContent } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailContent";
+import {
+	type PullRequestDetailTab,
+	PullRequestDetailTabs,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
+import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
+import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
+import {
+	canActOnPullRequest,
+	type PullRequestTarget,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { normalizeThreadsToComments } from "../../../../components/CommentsSection/utils/normalizeThreadsToComments";
-import type { CommentPaneData, PullRequestPaneData } from "../../../../types";
+import type { PagePaneData, PullRequestPaneData } from "../../../../types";
 import {
 	type OpenReviewDiff,
 	useReviewCommentNavigation,
 } from "../../../useReviewCommentNavigation";
-import { PullRequestComments } from "./components/PullRequestComments";
+import { PullRequestEvidence } from "./components/PullRequestEvidence";
+import { usePullRequestEvidence } from "./hooks/usePullRequestEvidence";
 import { usePullRequestPaneDetail } from "./hooks/usePullRequestPaneDetail";
+import { buildReviewThreadEntries } from "./utils/buildReviewThreadEntries";
 
 interface PullRequestPaneProps {
 	data: PullRequestPaneData;
 	onOpenDiff: OpenReviewDiff;
-	onOpenComment: (comment: CommentPaneData) => void;
+	onOpenPage: (page: PagePaneData) => void;
 }
 
 export function PullRequestPane({
 	data,
 	onOpenDiff,
-	onOpenComment,
+	onOpenPage,
 }: PullRequestPaneProps) {
-	const { t } = useLingui();
-	const { workspace, hostUrl: workspaceHostUrl } = useWorkspace();
+	const navigate = useNavigate();
+	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
+	const { workspace, hostUrl } = useWorkspace();
+	const organizationId = useActiveOrganizationId();
 	const detail = usePullRequestPaneDetail(data);
+	const isTabVisible = useIsTabVisible();
+	const target = useMemo<PullRequestTarget>(
+		() => ({
+			organizationId,
+			repoFullName: data.repoFullName,
+			prNumber: data.number,
+		}),
+		[organizationId, data.repoFullName, data.number],
+	);
+	const { refresh, isRefreshing } = useRefreshPullRequest({
+		target,
+		url: detail.data?.url,
+	});
 
-	// Review threads and the header's actions still go through the host that
-	// pushed the PR, so they exist only when this workspace's linked PR is
-	// the one on screen.
+	// Pages and "open in diff" belong to the workspace, so they exist only
+	// when this workspace's linked PR is the one on screen.
 	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery({
 		workspaceId: workspace.id,
 	});
@@ -44,63 +71,105 @@ export function PullRequestPane({
 		? pullRequestRefFromUrl(linkedPR.data.url)
 		: null;
 	const isLinkedPR = linkedRef !== null && isSamePullRequest(linkedRef, data);
-	const threads = workspaceTrpc.git.getPullRequestThreads.useQuery(
-		{ workspaceId: workspace.id },
-		{
-			enabled: isLinkedPR,
-			refetchInterval: 30_000,
-			refetchOnWindowFocus: true,
-		},
+	const evidence = usePullRequestEvidence(
+		workspace.id,
+		isLinkedPR && activeTab === "summary" && isTabVisible,
 	);
-	const comments = useMemo(
-		() =>
-			isLinkedPR && threads.data
-				? normalizeThreadsToComments(threads.data, linkedPR.data?.url)
-				: [],
-		[isLinkedPR, threads.data, linkedPR.data?.url],
-	);
+	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
 	const onOpenInDiff = useReviewCommentNavigation(workspace.id, onOpenDiff);
+	const prUrl =
+		detail.data?.url ??
+		`https://github.com/${data.repoFullName}/pull/${data.number}`;
+	const activityThreads = useMemo<
+		PullRequestActivityThreads | undefined
+	>(() => {
+		if (!canActOnPullRequest(target)) return undefined;
+		// The conversation comes with the pull request itself; only review threads are added here.
+		const comments = threads.data
+			? normalizeThreadsToComments(threads.data, prUrl).filter(
+					(comment) => comment.kind === "review",
+				)
+			: [];
+		return {
+			entries: buildReviewThreadEntries({
+				comments,
+				target,
+				onOpenInDiff: isLinkedPR ? onOpenInDiff : undefined,
+			}),
+			commentCount: comments.length,
+			isLoading: threads.isLoading,
+			isError: threads.isError || Boolean(threads.data?.fetchFailed),
+		};
+	}, [
+		target,
+		threads.data,
+		threads.isLoading,
+		threads.isError,
+		prUrl,
+		isLinkedPR,
+		onOpenInDiff,
+	]);
+	const diffStat =
+		detail.data?.additions !== undefined && detail.data.deletions !== undefined
+			? { additions: detail.data.additions, deletions: detail.data.deletions }
+			: null;
+	const commentTarget = canActOnPullRequest(target) ? target : null;
 
 	return (
-		<div className="@container flex h-full w-full min-h-0 min-w-0 flex-col">
-			<div className="flex shrink-0 flex-col border-b border-border pt-3">
-				<PullRequestDetailHeader
-					projectId={isLinkedPR ? workspace.projectId : null}
-					hostId={isLinkedPR ? workspace.hostId : null}
-					hostUrl={isLinkedPR ? workspaceHostUrl : null}
-					prNumber={data.number}
-					data={detail.data}
-					isLoading={detail.isLoading}
-					showStartWorkspace={false}
-				/>
-			</div>
-			{detail.data ? (
-				<div className="min-h-0 flex-1">
-					<PullRequestSummaryContent data={detail.data}>
-						{isLinkedPR ? (
-							<PullRequestComments
-								workspaceId={workspace.id}
-								comments={comments}
-								isLoading={threads.isLoading}
-								isError={threads.isError}
-								onOpenComment={onOpenComment}
-								onOpenInDiff={onOpenInDiff}
-							/>
-						) : null}
-					</PullRequestSummaryContent>
+		<div className="flex h-full w-full min-h-0 min-w-0 flex-col">
+			<div className="@container/topbar flex h-11 shrink-0 items-center gap-2 px-3">
+				<div className="flex min-w-0 shrink items-center overflow-x-auto [scrollbar-width:none]">
+					<PullRequestDetailTabs
+						activeTab={activeTab}
+						onTabChange={setActiveTab}
+						diffStat={diffStat}
+					/>
 				</div>
-			) : (
-				<WorkItemDetailState
-					message={
-						detail.error
-							? errorMessage(detail.error)
-							: t({ message: "Loading pull request…" })
-					}
-					isLoading={detail.isLoading}
-					isError={!!detail.error}
-					onRetry={detail.error ? () => void detail.refetch() : undefined}
-				/>
-			)}
+				<div className="ml-auto flex shrink-0 items-center">
+					<PullRequestActions
+						target={target}
+						projectId={detail.projectId}
+						hostId={workspace.hostId}
+						hostUrl={hostUrl}
+						data={detail.data}
+						isLoading={detail.isLoading}
+						showStartWorkspace={false}
+						onRefresh={refresh}
+						isRefreshing={isRefreshing}
+					/>
+				</div>
+			</div>
+			<PullRequestDetailContent
+				activeTab={activeTab}
+				detail={detail}
+				projectId={detail.projectId}
+				repoFullName={data.repoFullName}
+				prNumber={data.number}
+				hostUrl={hostUrl}
+				hostId={workspace.hostId}
+				commentTarget={commentTarget}
+				threads={activityThreads}
+				summaryAside={
+					isLinkedPR ? (
+						<PullRequestEvidence
+							{...evidence}
+							onOpenPage={(page) =>
+								onOpenPage({
+									pageId: page.id,
+									slug: page.slug,
+									title: page.title,
+								})
+							}
+							onViewAll={() =>
+								void navigate({
+									to: "/pages",
+									search: { workspace: workspace.id },
+								})
+							}
+						/>
+					) : null
+				}
+			/>
 		</div>
 	);
 }

@@ -36,16 +36,21 @@ interface UseTasksDataParams {
 	filterTab: TabValue;
 	searchQuery: string;
 	assigneeFilter: string | null;
-	linearProjectFilter: string | null;
+	labelFilter: string | null;
 }
 
-export function useTasksJoinedWithStatuses(): TasksPagination & {
+export function useTasksJoinedWithStatuses(
+	labelFilter: string | null = null,
+): TasksPagination & {
 	tasks: TaskWithStatus[];
 	statuses: SelectTaskStatus[];
 } {
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
 		cloudTrpc.task.listPage.useInfiniteQuery(
-			{ limit: TASK_PAGE_SIZE },
+			{
+				limit: TASK_PAGE_SIZE,
+				labels: labelFilter ? [labelFilter] : undefined,
+			},
 			{
 				getNextPageParam: (page) => page.nextCursor,
 				refetchInterval: TASK_LIST_REFETCH_INTERVAL,
@@ -93,7 +98,7 @@ export function useTasksData({
 	filterTab,
 	searchQuery,
 	assigneeFilter,
-	linearProjectFilter,
+	labelFilter,
 }: UseTasksDataParams): TasksPagination & {
 	data: TaskWithStatus[];
 	allStatuses: SelectTaskStatus[];
@@ -105,7 +110,7 @@ export function useTasksData({
 		hasNextTasksPage,
 		isFetchingNextTasksPage,
 		isLoadingTasks,
-	} = useTasksJoinedWithStatuses();
+	} = useTasksJoinedWithStatuses(labelFilter);
 
 	const { search } = useHybridSearch(sortedData);
 
@@ -120,12 +125,6 @@ export function useTasksData({
 	const filteredData = useMemo(() => {
 		let result = searchedData;
 
-		if (linearProjectFilter) {
-			result = result.filter(
-				(task) => task.externalProjectId === linearProjectFilter,
-			);
-		}
-
 		if (filterTab !== "all") {
 			result = result.filter((task) =>
 				matchesTaskStatusFilter(task.status.type, filterTab),
@@ -135,17 +134,14 @@ export function useTasksData({
 		if (assigneeFilter) {
 			result = result.filter((task) => {
 				if (assigneeFilter === "unassigned") {
-					return task.assigneeId === null && task.assigneeExternalId === null;
-				}
-				if (assigneeFilter.startsWith("ext:")) {
-					return task.assigneeExternalId === assigneeFilter.slice(4);
+					return task.assigneeId === null;
 				}
 				return task.assigneeId === assigneeFilter;
 			});
 		}
 
 		return result;
-	}, [searchedData, filterTab, assigneeFilter, linearProjectFilter]);
+	}, [searchedData, filterTab, assigneeFilter]);
 
 	return {
 		data: filteredData,

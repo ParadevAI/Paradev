@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { computeChecksStatus } from "@superset/shared/pull-request-checks";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
@@ -14,6 +15,7 @@ import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
+import { ConditionalGh } from "./utils/conditional-gh";
 import {
 	GitHubAvailabilityGate,
 	type GitHubAvailabilityStatus,
@@ -44,7 +46,6 @@ import {
 	coerceChecksStatus,
 	coercePullRequestState,
 	coerceReviewDecision,
-	computeChecksStatus,
 	mapPullRequestState,
 	mapReviewDecision,
 	type PullRequestCheck,
@@ -68,9 +69,8 @@ const SAFETY_NET_INTERVAL_MS = 5 * 60_000;
 // branch/HEAD/upstream changes. The 60s repo-PR cache deduplicates across
 // concurrent triggers.
 const PROJECT_REFRESH_INTERVAL_MS = 5 * 60_000;
-// Must exceed every polling interval that hits this cache (SAFETY_NET and
-// PROJECT_REFRESH). Otherwise the cache is always stale at poll time and
-// each tick fires fresh GitHub calls for the same upstream branch.
+// Sweeps outlive this cache on purpose: they revalidate through ConditionalGh,
+// and a 304 costs no rate limit. Raising it past the sweep only makes PRs staler.
 const REPO_PULL_REQUEST_CACHE_TTL_MS = 60_000;
 // A fetch that keeps failing (payload over maxBuffer, revoked auth, …) must
 // not respawn `gh` at full cadence forever: each consecutive failure doubles
@@ -220,6 +220,7 @@ interface PullRequestDetails {
 export class PullRequestRuntimeManager {
 	private readonly db: HostDb;
 	private readonly execGh: ExecGh;
+	private readonly conditionalGh: ConditionalGh;
 	private readonly git: GitFactory;
 	private readonly github: () => Promise<Octokit>;
 	private readonly gitWatcher: GitWatcher;
@@ -279,10 +280,12 @@ export class PullRequestRuntimeManager {
 	private readonly missingWorktrees = new Map<string, string>();
 	private missingWorktreeProbeTimer: ReturnType<typeof setInterval> | null =
 		null;
+	private readonly linkListeners = new Set<() => void>();
 
 	constructor(options: PullRequestRuntimeManagerOptions) {
 		this.db = options.db;
-		this.execGh = options.execGh;
+		this.conditionalGh = new ConditionalGh(options.execGh);
+		this.execGh = this.conditionalGh.exec;
 		this.git = options.git;
 		this.github = options.github;
 		this.gitWatcher = options.gitWatcher;
@@ -358,6 +361,7 @@ export class PullRequestRuntimeManager {
 	}
 
 	stop() {
+		this.conditionalGh.clear();
 		if (this.safetyNetTimer) clearInterval(this.safetyNetTimer);
 		if (this.projectRefreshTimer) clearInterval(this.projectRefreshTimer);
 		if (this.missingWorktreeProbeTimer)
@@ -536,6 +540,35 @@ export class PullRequestRuntimeManager {
 		);
 	}
 
+	async listLinkedPullRequests(): Promise<
+		{ repository: string; number: number; linkedAt: number }[]
+	> {
+		const workspaceIds = this.db
+			.select({ id: workspaces.id })
+			.from(workspaces)
+			.all()
+			.map((row) => row.id);
+		const histories =
+			await this.getPullRequestHistoryByWorkspaces(workspaceIds);
+		const earliest = new Map<
+			string,
+			{ repository: string; number: number; linkedAt: number }
+		>();
+		for (const pullRequest of histories.flatMap((h) => h.pullRequests)) {
+			const repository = `${pullRequest.repoOwner}/${pullRequest.repoName}`;
+			const key = `${repository.toLowerCase()}#${pullRequest.number}`;
+			const seen = earliest.get(key);
+			if (!seen || pullRequest.linkedAt < seen.linkedAt) {
+				earliest.set(key, {
+					repository,
+					number: pullRequest.number,
+					linkedAt: pullRequest.linkedAt,
+				});
+			}
+		}
+		return [...earliest.values()];
+	}
+
 	// User-initiated "Remove PR Link". Recording the removed PR id keeps the
 	// refresh sweep from re-linking it while its branch still matches; a
 	// different PR on the branch (or an explicit re-link) still links.
@@ -629,11 +662,18 @@ export class PullRequestRuntimeManager {
 		pullRequestId: string,
 		linkedAt: number,
 	): void {
-		this.db
+		const { changes } = this.db
 			.insert(workspacePullRequests)
 			.values({ workspaceId, pullRequestId, linkedAt })
 			.onConflictDoNothing()
 			.run();
+		if (changes === 0) return;
+		for (const listener of this.linkListeners) listener();
+	}
+
+	onPullRequestLinked(listener: () => void): () => void {
+		this.linkListeners.add(listener);
+		return () => this.linkListeners.delete(listener);
 	}
 
 	private async syncWorkspaceBranches(): Promise<void> {

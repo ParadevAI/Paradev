@@ -3,6 +3,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
 import { clipboard, Menu, webContents } from "electron";
+import { writeClipboardImage } from "main/lib/clipboard-image";
 import { safeOpenExternal } from "main/lib/safe-url";
 import type {
 	DesignModeRect,
@@ -66,6 +67,10 @@ const MAX_CONSOLE_ENTRIES = 500;
 // bound each attempt, retry until the deadline.
 const CAPTURE_DEADLINE_MS = 15_000;
 const CAPTURE_ATTEMPT_TIMEOUT_MS = 1_500;
+const PREVIEW_CAPTURE_WIDTH = 720;
+// The hover card stops waiting after 1.5 s; past that a capture only holds a wake.
+const PREVIEW_CAPTURE_DEADLINE_MS = 1_500;
+const PREVIEW_CAPTURE_RATIO = 1.6;
 const CAPTURE_RETRY_INTERVAL_MS = 100;
 
 function sanitizeUrl(url: string): string {
@@ -775,9 +780,37 @@ class BrowserManager extends EventEmitter {
 		paneId: string,
 	): Promise<{ image: Electron.NativeImage; url: string }> {
 		const image = await this.capturePageImage(paneId);
-		clipboard.writeImage(image);
+		await writeClipboardImage(image);
 		const wc = this.getWebContents(paneId);
 		return { image, url: wc?.getURL() ?? "" };
+	}
+
+	/** A link preview card's picture of an open page; leaves the clipboard alone. */
+	async capturePreview(
+		paneId: string,
+	): Promise<{ dataUrl: string; width: number; height: number }> {
+		const image = await this.capturePageImage(
+			paneId,
+			undefined,
+			PREVIEW_CAPTURE_DEADLINE_MS,
+		);
+		const size = image.getSize();
+		const top = image.crop({
+			x: 0,
+			y: 0,
+			width: size.width,
+			height: Math.min(
+				size.height,
+				Math.round(size.width / PREVIEW_CAPTURE_RATIO),
+			),
+		});
+		const scaled =
+			size.width > PREVIEW_CAPTURE_WIDTH
+				? top.resize({ width: PREVIEW_CAPTURE_WIDTH })
+				: top;
+		const { width, height } = scaled.getSize();
+		const jpeg = scaled.toJPEG(80).toString("base64");
+		return { dataUrl: `data:image/jpeg;base64,${jpeg}`, width, height };
 	}
 
 	/** Screenshot for programmatic callers — must not clobber the clipboard. */
@@ -789,6 +822,7 @@ class BrowserManager extends EventEmitter {
 	private async capturePageImage(
 		paneId: string,
 		workspaceId?: string,
+		deadlineMs = CAPTURE_DEADLINE_MS,
 	): Promise<Electron.NativeImage> {
 		const wc = this.getWebContents(paneId, workspaceId);
 		if (!wc) throw new Error(`No webContents for pane ${paneId}`);
@@ -796,7 +830,7 @@ class BrowserManager extends EventEmitter {
 		// capture hangs or fails with "UnknownVizError".
 		const releaseWake = this.acquireAgentWake(paneId);
 		try {
-			const deadline = Date.now() + CAPTURE_DEADLINE_MS;
+			const deadline = Date.now() + deadlineMs;
 			let lastError: unknown = null;
 			do {
 				try {
@@ -1067,7 +1101,7 @@ class BrowserManager extends EventEmitter {
 								message: "Copy Link Address",
 							}),
 						),
-						click: () => clipboard.writeText(linkURL),
+						click: () => void clipboard.writeText(linkURL),
 					},
 					{ type: "separator" },
 				);
@@ -1163,7 +1197,7 @@ class BrowserManager extends EventEmitter {
 							}),
 						),
 						click: () => {
-							if (pageURL) clipboard.writeText(pageURL);
+							if (pageURL) void clipboard.writeText(pageURL);
 						},
 						enabled: !!pageURL && pageURL !== "about:blank",
 					},
@@ -1297,24 +1331,23 @@ class BrowserManager extends EventEmitter {
 	}
 
 	private setupConsoleCapture(paneId: string, wc: Electron.WebContents): void {
-		// Electron's console-message `level` is 0..3 = verbose, info, warning,
-		// error (per electron.d.ts). console.log fires level 1 (info), so a naive
-		// 0:log,1:warn,… map mislabels every message by one.
-		const LEVEL_MAP: Record<number, ConsoleEntry["level"]> = {
-			0: "debug",
-			1: "log",
-			2: "warn",
-			3: "error",
+		const LEVEL_MAP: Record<
+			Electron.WebContentsConsoleMessageEventParams["level"],
+			ConsoleEntry["level"]
+		> = {
+			debug: "debug",
+			info: "log",
+			warning: "warn",
+			error: "error",
 		};
 
-		const handler = (
-			_event: Electron.Event,
-			level: number,
-			message: string,
-		) => {
+		const handler = ({
+			level,
+			message,
+		}: Electron.Event<Electron.WebContentsConsoleMessageEventParams>) => {
 			const entries = this.consoleLogs.get(paneId) ?? [];
 			entries.push({
-				level: LEVEL_MAP[level] ?? "log",
+				level: LEVEL_MAP[level],
 				message,
 				timestamp: Date.now(),
 			});

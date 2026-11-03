@@ -64,8 +64,8 @@ const IS_AUTO_UPDATE_PLATFORM = PLATFORM.IS_MAC || PLATFORM.IS_LINUX;
 // - Stable: fetches from /releases/latest/download/ (latest non-prerelease)
 // - Canary: fetches from /releases/download/desktop-canary/ (rolling canary tag)
 const UPDATE_FEED_URL = IS_PRERELEASE
-	? "https://github.com/superset-sh/superset/releases/download/desktop-canary"
-	: "https://github.com/superset-sh/superset/releases/latest/download";
+	? "https://github.com/paradevai/paradev/releases/download/desktop-canary"
+	: "https://github.com/paradevai/paradev/releases/latest/download";
 
 export type { AutoUpdateStatusEvent } from "shared/auto-update";
 
@@ -177,6 +177,10 @@ export function getUpdateStatus(): AutoUpdateStatusEvent {
 // staging run at the same cache directory.
 export function isUpdateReadyToInstall(): boolean {
 	return isInstalling || currentStatus === AUTO_UPDATE_STATUS.READY;
+}
+
+export function isInstallingUpdate(): boolean {
+	return isInstalling;
 }
 
 export function installUpdate(): void {

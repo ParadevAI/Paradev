@@ -8,10 +8,15 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { LuClock, LuEllipsis, LuLink, LuPlay, LuTrash2 } from "react-icons/lu";
+import { AutomationGroupMenuItems } from "../../../components/AutomationGroupMenuItems";
 import { AutomationBreadcrumbBar } from "../AutomationBreadcrumbBar";
 
 interface AutomationDetailHeaderProps {
 	name: string;
+	group: string | null;
+	/** Every group in the organization, for "Move to group". */
+	groups: string[];
+	onMoveToGroup: (group: string | null) => void;
 	onCopyLink: () => void;
 	onDelete: () => void;
 	onRunNow: () => void;
@@ -20,10 +25,15 @@ interface AutomationDetailHeaderProps {
 	runNowDisabled?: boolean;
 	/** Disables the actions — they're all owner-gated server-side. */
 	readOnly?: boolean;
+	/** Owner or organization owner; delete is the one action that outlives read-only. */
+	canDelete?: boolean;
 }
 
 export function AutomationDetailHeader({
 	name,
+	group,
+	groups,
+	onMoveToGroup,
 	onCopyLink,
 	onDelete,
 	onRunNow,
@@ -31,10 +41,11 @@ export function AutomationDetailHeader({
 	deleteDisabled,
 	runNowDisabled,
 	readOnly,
+	canDelete = !readOnly,
 }: AutomationDetailHeaderProps) {
 	const { t } = useLingui();
 	return (
-		<AutomationBreadcrumbBar name={name}>
+		<AutomationBreadcrumbBar name={name} group={group}>
 			<Tooltip>
 				{/* Disabled buttons swallow hover events, so the trigger is a
 					    span — otherwise the read-only explanation never shows. */}
@@ -78,9 +89,17 @@ export function AutomationDetailHeader({
 						<LuLink className="size-4" />
 						<Trans>Copy link</Trans>
 					</DropdownMenuItem>
+					{!readOnly && (
+						<AutomationGroupMenuItems
+							kind="dropdown"
+							groups={groups}
+							currentGroup={group}
+							onMove={onMoveToGroup}
+						/>
+					)}
 					<DropdownMenuItem
 						variant="destructive"
-						disabled={readOnly || deleteDisabled}
+						disabled={!canDelete || deleteDisabled}
 						onSelect={onDelete}
 					>
 						<LuTrash2 className="size-4" />

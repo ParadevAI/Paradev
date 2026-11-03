@@ -9,17 +9,23 @@ import {
 } from "renderer/hooks/useCloudWorkspaces";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
+import { WorkspaceNotFoundState } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceNotFoundState";
+import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
+import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
+import { CloudWorkspaceArchivedState } from "../components/CloudWorkspaceArchivedState";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
-import { StateScreenShell } from "../components/StateScreenShell";
+import { PendingCloudChatPreview } from "../components/PendingCloudChatPreview";
 import { WorkspaceCreateErrorState } from "../components/WorkspaceCreateErrorState";
 import { WorkspaceCreatingState } from "../components/WorkspaceCreatingState";
 import { WorkspaceHostIncompatibleState } from "../components/WorkspaceHostIncompatibleState";
-import { WorkspaceNotFoundState } from "../components/WorkspaceNotFoundState";
+import { useArchivedCloudWorkspace } from "../hooks/useArchivedCloudWorkspace";
+import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useRemoteHostStatus } from "../hooks/useRemoteHostStatus";
 import { useWorkspaceMissVerdict } from "../hooks/useWorkspaceMissVerdict";
 import { WorkspaceProvider } from "../providers/WorkspaceProvider";
@@ -38,6 +44,7 @@ function V2WorkspaceLayout() {
 	// could always reach and this one cannot.
 	const { workspaceId } = Route.useParams();
 	const collections = useCollections();
+	const pendingCloudChat = usePendingCloudChat(workspaceId);
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const pendingTransaction = useWorkspaceTransactionsStore((state) =>
 		workspaceId ? (state.byWorkspaceId[workspaceId] ?? null) : null,
@@ -84,15 +91,23 @@ function V2WorkspaceLayout() {
 	const cloudWorkspace =
 		cloudWorkspaces.find((row) => row.id === workspaceId) ?? null;
 	// A ready cloud workspace opens on its own row; the box's row, when the
-	// fan-out has it, is the same workspace with live fields.
-	const workspace = useMemo(
-		() =>
-			hostWorkspace ??
-			(isCloud && cloudWorkspace?.status === "ready"
-				? hostShapedCloudWorkspace(cloudWorkspace)
-				: null),
-		[hostWorkspace, isCloud, cloudWorkspace],
+	// fan-out has it, is the same workspace with live fields. The box seeds its
+	// row with a placeholder name: the cloud row owns the real one.
+	const workspace = useMemo(() => {
+		if (hostWorkspace) {
+			return cloudWorkspace
+				? { ...hostWorkspace, name: cloudWorkspace.name }
+				: hostWorkspace;
+		}
+		return isCloud && cloudWorkspace?.status === "ready"
+			? hostShapedCloudWorkspace(cloudWorkspace)
+			: null;
+	}, [hostWorkspace, isCloud, cloudWorkspace]);
+	const archivedCloudWorkspace = useArchivedCloudWorkspace(
+		workspaceId,
+		!workspace && !cloudWorkspace,
 	);
+	const unarchive = useUnarchiveCloudWorkspace();
 	const { data: failedEntries } = useLiveQuery(
 		(q) =>
 			q
@@ -102,6 +117,7 @@ function V2WorkspaceLayout() {
 	);
 	const failedEntry = failedEntries?.[0] ?? null;
 
+	const setCloudInSidebar = useCloudSidebarStore((state) => state.setInSidebar);
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (!workspace || lastEnsuredWorkspaceIdRef.current === workspace.id)
@@ -109,6 +125,18 @@ function V2WorkspaceLayout() {
 		lastEnsuredWorkspaceIdRef.current = workspace.id;
 		ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
 	}, [ensureWorkspaceInSidebar, workspace]);
+
+	const lastShownCloudWorkspaceIdRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (
+			!workspace ||
+			!cloudWorkspace ||
+			lastShownCloudWorkspaceIdRef.current === cloudWorkspace.id
+		)
+			return;
+		lastShownCloudWorkspaceIdRef.current = cloudWorkspace.id;
+		setCloudInSidebar(cloudWorkspace.organizationId, cloudWorkspace.id, true);
+	}, [setCloudInSidebar, workspace, cloudWorkspace]);
 
 	// Sandboxes ship with the app's own host-service build, so the remote
 	// version gate has nothing to check and no host row to check it against.
@@ -134,6 +162,18 @@ function V2WorkspaceLayout() {
 	// provisioning there is no box to open, and once it has failed there never
 	// will be; a ready one only waits for its address to be minted.
 	if (!workspace && cloudWorkspace) {
+		if (cloudWorkspace.status === "ready" && pendingCloudChat) {
+			return (
+				<StateScreenShell>
+					<PendingCloudChatPreview
+						label={
+							pendingCloudChat.titleOverride ?? pendingCloudChat.data.agentId
+						}
+						prompt={pendingCloudChat.data.launchPrompt}
+					/>
+				</StateScreenShell>
+			);
+		}
 		if (cloudWorkspace.status === "ready") {
 			return <StateScreenShell>{null}</StateScreenShell>;
 		}
@@ -143,7 +183,18 @@ function V2WorkspaceLayout() {
 					workspaceId={cloudWorkspace.id}
 					name={cloudWorkspace.name}
 					status={cloudWorkspace.status}
-					createdAt={cloudWorkspace.createdAt}
+				/>
+			</StateScreenShell>
+		);
+	}
+
+	if (!workspace && archivedCloudWorkspace?.deletedAt) {
+		return (
+			<StateScreenShell>
+				<CloudWorkspaceArchivedState
+					name={archivedCloudWorkspace.name}
+					archivedAt={archivedCloudWorkspace.deletedAt}
+					onUnarchive={() => unarchive(archivedCloudWorkspace.id)}
 				/>
 			</StateScreenShell>
 		);
@@ -162,7 +213,10 @@ function V2WorkspaceLayout() {
 		}
 		return (
 			<StateScreenShell>
-				<WorkspaceNotFoundState workspaceId={workspaceId} />
+				<WorkspaceNotFoundState
+					workspaceId={workspaceId}
+					browseTo="/v2-workspaces"
+				/>
 			</StateScreenShell>
 		);
 	}

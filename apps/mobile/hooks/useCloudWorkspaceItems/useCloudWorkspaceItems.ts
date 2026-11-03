@@ -29,7 +29,7 @@ export interface CloudWorkspaceItem extends HostWorkspaceItem {
  * sandbox self-seeds its workspace as `local`. `hostReachable` is false so
  * decoration that needs the host (diff stats) waits for the workspace to open.
  */
-function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
+export function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
 	return {
 		id: cloud.id,
 		organizationId: cloud.organizationId,
@@ -44,8 +44,7 @@ function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
 		tags: [],
 		createdAt: cloud.createdAt,
 		updatedAt: cloud.updatedAt,
-		// Agent activity is stamped by the sandbox host; unknown until opened.
-		lastActivityAt: null,
+		lastActivityAt: (cloud.agentStatusAt ?? cloud.createdAt).getTime(),
 		worktreePath: "",
 		worktreeExists: true,
 		projectName: null,

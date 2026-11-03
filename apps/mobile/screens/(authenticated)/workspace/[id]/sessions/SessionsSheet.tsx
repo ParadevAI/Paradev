@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { getChatTransport } from "@/lib/chat";
 import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
@@ -86,11 +87,18 @@ export function SessionsSheet() {
 						style: "destructive",
 						onPress: () => {
 							if (!workspace || !hostUrl) return;
-							void getHostServiceClientByUrl(hostUrl)
-								.terminal.killSession.mutate({
-									terminalId: row.terminalId,
-									workspaceId: workspace.id,
-								})
+							const closing =
+								row.kind === "chat"
+									? getChatTransport(hostUrl).closeSession({
+											sessionId: row.terminalId,
+										})
+									: getHostServiceClientByUrl(
+											hostUrl,
+										).terminal.killSession.mutate({
+											terminalId: row.terminalId,
+											workspaceId: workspace.id,
+										});
+							void closing
 								// `finally` alone doesn't consume the rejection: a failed kill
 								// would close the alert and leave the session running silently.
 								.catch(() =>
@@ -126,6 +134,17 @@ export function SessionsSheet() {
 						message: "Close",
 					})}
 					onPress={() => router.back()}
+				/>
+			</Stack.Toolbar>
+			<Stack.Toolbar placement="right">
+				<Stack.Toolbar.Button
+					icon="plus"
+					accessibilityLabel={t({
+						message: "New session",
+					})}
+					onPress={() =>
+						router.replace(`/(authenticated)/workspace/${id}/new-session`)
+					}
 				/>
 			</Stack.Toolbar>
 			<SessionList

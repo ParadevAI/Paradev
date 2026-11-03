@@ -23,9 +23,8 @@ import {
 	useState,
 } from "react";
 import type {
-	NativeSyntheticEvent,
-	TextInputContentSizeChangeEventData,
-	TextInputKeyPressEventData,
+	TextInputContentSizeChangeEvent,
+	TextInputKeyPressEvent,
 } from "react-native";
 import { Alert, Pressable, View } from "react-native";
 import { Button, type ButtonProps } from "@/components/ui/button";
@@ -616,7 +615,7 @@ export const PromptInputTextarea = ({
 	);
 
 	const handleKeyPress = useCallback(
-		(event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+		(event: TextInputKeyPressEvent) => {
 			onKeyPress?.(event);
 			if (
 				event.nativeEvent.key === "Backspace" &&
@@ -633,7 +632,7 @@ export const PromptInputTextarea = ({
 	);
 
 	const handleContentSizeChange = useCallback(
-		(event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+		(event: TextInputContentSizeChangeEvent) => {
 			setContentHeight(event.nativeEvent.contentSize.height);
 			onContentSizeChange?.(event);
 		},

@@ -1,11 +1,52 @@
 import { describe, expect, it } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { getBuiltinAgentDefinition } from "./agent-catalog";
 import {
 	AGENT_LABELS,
 	AGENT_TYPES,
 	buildAgentFileCommand,
 	buildAgentPromptCommand,
 } from "./agent-command";
-import { getPresetById } from "./host-agent-presets";
+import { DEFAULT_TERMINAL_PRESET_AGENT_TYPES } from "./builtin-terminal-agents";
+import { FEATURE_FLAGS } from "./constants";
+import {
+	getDefaultSeedPresets,
+	getPresetById,
+	isAgentPresetEnabled,
+} from "./host-agent-presets";
+
+describe("UFO launches", () => {
+	it("passes a multiline prompt literally as one positional argument", () => {
+		const prompt =
+			"Review `echo unsafe` and $(echo unsafe)\nKeep 'quotes' and $variables";
+		const command = buildAgentPromptCommand({
+			prompt,
+			randomId: "ufo-test",
+			agent: "ufo",
+		});
+		const result = spawnSync(
+			"bash",
+			["-c", `ufo() { printf '%s\\0' "$@"; }\n${command}`],
+			{ encoding: "utf8" },
+		);
+		expect(result.status).toBe(0);
+		expect(result.stdout).toBe(`${prompt}\0`);
+	});
+
+	it("provides local launch and ID-based resume without unverified modes", () => {
+		expect(getPresetById("ufo")).toMatchObject({
+			command: "ufo",
+			args: [],
+			promptArgs: [],
+			promptTransport: "argv",
+			resumeArgs: ["--resume"],
+			forkArgs: [],
+		});
+		expect(
+			getBuiltinAgentDefinition("ufo").nonInteractiveCommand,
+		).toBeUndefined();
+	});
+});
 
 describe("buildAgentPromptCommand", () => {
 	it("adds `--` before codex prompt payload", () => {
@@ -296,5 +337,31 @@ describe("grok agent registration", () => {
 		expect(preset?.command).toBe("grok");
 		expect(preset?.args).toEqual(["--always-approve"]);
 		expect(preset?.promptArgs).toEqual([]);
+	});
+});
+
+describe("pdev agent registration", () => {
+	it("is a registered terminal agent with Pi-style session args", () => {
+		expect(AGENT_LABELS.pdev).toBe("pdev");
+		const preset = getPresetById("pdev");
+		expect(preset?.command).toBe("pdev");
+		expect(preset?.args).toEqual([]);
+		expect(preset?.resumeArgs).toEqual(["--session"]);
+		expect(preset?.forkArgs).toEqual(["--fork", "{sessionId}"]);
+	});
+
+	it("is never a default terminal preset or a seeded host agent", () => {
+		expect(DEFAULT_TERMINAL_PRESET_AGENT_TYPES).not.toContain("pdev");
+		const seeded = getDefaultSeedPresets().map((preset) => preset.presetId);
+		expect(seeded).not.toContain("pdev");
+		expect(seeded).toContain("pi");
+	});
+
+	it("is enabled only while the pdev-agent flag is active", () => {
+		expect(isAgentPresetEnabled("pdev", [])).toBe(false);
+		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.ACP_CHAT])).toBe(false);
+		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.PDEV_AGENT])).toBe(true);
+		expect(isAgentPresetEnabled("pi", [])).toBe(true);
+		expect(isAgentPresetEnabled("custom:pdev", [])).toBe(true);
 	});
 });

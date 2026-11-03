@@ -8,15 +8,23 @@ export interface GithubStatusEntry {
 
 /**
  * One notice for the sidebar. The hold is per host, so the local machine's
- * wins (it is the one the user can fix), else the first remote host's.
+ * wins (it is the one the user can fix), else the first remote host's. A
+ * hold past its `until` is skipped: it can come from the persisted query
+ * cache, or from a host whose query stopped polling.
  */
 export function pickGithubStatus(
 	entries: GithubStatusEntry[],
 	localMachineId: string | null,
-): DashboardSidebarGithubStatus | null {
-	const local = entries.find(
-		(entry) => entry.machineId === localMachineId && entry.status,
+	now: number,
+): { machineId: string; status: DashboardSidebarGithubStatus } | null {
+	const held = entries.filter(
+		(
+			entry,
+		): entry is GithubStatusEntry & {
+			status: DashboardSidebarGithubStatus;
+		} => !!entry.status && entry.status.until > now,
 	);
-	if (local?.status) return local.status;
-	return entries.find((entry) => entry.status)?.status ?? null;
+	const pick =
+		held.find((entry) => entry.machineId === localMachineId) ?? held[0];
+	return pick ? { machineId: pick.machineId, status: pick.status } : null;
 }

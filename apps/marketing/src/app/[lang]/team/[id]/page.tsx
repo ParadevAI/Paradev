@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
@@ -17,8 +18,8 @@ import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { BreadcrumbJsonLd, JsonLdScript } from "@/components/JsonLd";
 import { getAllPeople, getPersonById } from "@/lib/people";
+import { getTeamBioText } from "../../utils/teamBio";
 import { TeamBio } from "../components/TeamBio";
-import { getTeamBioText } from "../utils/teamBio";
 
 interface PageProps {
 	params: Promise<{ id: string }>;
@@ -52,7 +53,7 @@ function PersonJsonLd({
 		url,
 		worksFor: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		...(person.avatar && {
@@ -289,7 +290,9 @@ export default async function TeamMemberPage({ params }: PageProps) {
 }
 
 export function generateStaticParams() {
-	return getAllPeople().map((person) => ({ id: person.id }));
+	return getAllPeople()
+		.slice(0, 1)
+		.map((person) => ({ id: person.id }));
 }
 
 export async function generateMetadata({
@@ -306,25 +309,25 @@ export async function generateMetadata({
 	const url = localeUrl(lang, `/team/${id}`);
 	const description = person.bio
 		? getTeamBioText(person.bio)
-		: `${person.name}, ${person.role} at Superset`;
+		: `${person.name}, ${person.role} at ${BRAND.NAME}`;
 
 	return {
 		title: `${person.name} - ${person.role}`,
 		description,
 		alternates: localizedAlternates(lang, `/team/${id}`),
 		openGraph: {
-			title: `${person.name} - ${person.role} at Superset`,
+			title: `${person.name} - ${person.role} at ${BRAND.NAME}`,
 			description,
 			type: "profile",
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			...(person.avatar && {
 				images: [`${COMPANY.MARKETING_URL}${person.avatar}`],
 			}),
 		},
 		twitter: {
 			card: "summary",
-			title: `${person.name} - ${person.role} at Superset`,
+			title: `${person.name} - ${person.role} at ${BRAND.NAME}`,
 			description,
 			...(person.avatar && {
 				images: [`${COMPANY.MARKETING_URL}${person.avatar}`],

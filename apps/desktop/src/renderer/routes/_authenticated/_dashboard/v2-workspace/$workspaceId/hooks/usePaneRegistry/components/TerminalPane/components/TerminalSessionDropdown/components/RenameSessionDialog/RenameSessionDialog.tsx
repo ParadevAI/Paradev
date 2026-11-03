@@ -40,6 +40,7 @@ export function RenameSessionDialog({
 
 	return (
 		<Dialog
+			modal
 			open
 			onOpenChange={(open) => {
 				if (!open) onClose();

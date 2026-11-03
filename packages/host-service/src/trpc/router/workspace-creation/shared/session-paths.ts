@@ -1,15 +1,15 @@
 import { realpathSync } from "node:fs";
-import { homedir } from "node:os";
 import { join, resolve, sep } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { TRPCError } from "@trpc/server";
 
 /**
  * Managed home for project-less "session" workspace folders. Sibling of
- * `~/.superset/worktrees` — each entry is a standalone git repo owned by
+ * the worktrees root — each entry is a standalone git repo owned by
  * exactly one session workspace, created and removed by the host.
  */
 export function defaultSessionsRoot(): string {
-	return join(homedir(), ".superset", "sessions");
+	return join(resolveAppHomeDir(), "sessions");
 }
 
 /** Resolve `<sessionsRoot>/<folderName>` with a path-traversal guard. */

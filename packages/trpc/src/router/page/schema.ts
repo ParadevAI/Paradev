@@ -1,3 +1,8 @@
+import {
+	pageReportReasonValues,
+	pageReportStatusValues,
+	pageShareRoleEnum,
+} from "@superset/db/schema";
 import { z } from "zod";
 
 export const OFFERED_VISIBILITIES = ["just_me", "org", "everyone"] as const;
@@ -98,7 +103,7 @@ export const PAGE_LIST_MAX_LIMIT = 200;
  */
 export const PAGE_LIST_MAX_IDS = 200;
 
-export const PAGE_LIST_SCOPES = ["all", "team", "mine"] as const;
+export const PAGE_LIST_SCOPES = ["all", "team", "mine", "shared"] as const;
 
 export type PageListScope = (typeof PAGE_LIST_SCOPES)[number];
 
@@ -186,6 +191,11 @@ export const setPageVisibilitySchema = z.object({
 	visibility: pageFields.visibility,
 });
 
+export const setPageOrganizationRoleSchema = z.object({
+	id: pageFields.id,
+	role: pageShareRoleEnum,
+});
+
 export const setSharedVersionSchema = z.object({
 	id: pageFields.id,
 	version: pageFields.version.nullable(),
@@ -194,6 +204,30 @@ export const setSharedVersionSchema = z.object({
 export const deletePageSchema = z.object({
 	id: pageFields.id,
 	onlyIfEmpty: z.boolean().optional(),
+});
+
+export const reportPageSchema = z.object({
+	slug: pageFields.slug,
+	reason: z.enum(pageReportReasonValues),
+	details: z.string().max(4000).optional(),
+	reporterEmail: z.string().email().max(320).optional(),
+});
+
+export const listPageReportsSchema = z.object({
+	status: z.enum(pageReportStatusValues).optional(),
+	limit: z.number().int().positive().max(200).default(50),
+	cursor: z.string().datetime().optional(),
+});
+
+export const reviewPageReportSchema = z.object({
+	id: pageFields.id,
+	status: z.enum(["upheld", "dismissed"]),
+	note: z.string().max(2000).optional(),
+});
+
+export const takedownPageSchema = z.object({
+	id: pageFields.id,
+	note: z.string().max(2000).optional(),
 });
 
 export const pullPageSchema = pageRefFieldsSchema
@@ -208,6 +242,8 @@ export const setPageWatchSchema = z.object({
 export const clearPageWatchSchema = z.object({ id: pageFields.id });
 
 export const publicPageSchema = z.object({ slug: pageFields.slug });
+
+export const pagePreviewSchema = z.object({ slug: pageFields.slug });
 
 export const updatePageSchema = z
 	.object({

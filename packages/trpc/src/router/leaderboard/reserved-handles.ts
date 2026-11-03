@@ -2,7 +2,9 @@ import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 
 const ROUTES = [
 	"agent-orchestration",
+	"automations",
 	"blog",
+	"browser",
 	"changelog",
 	"cloud",
 	"community",
@@ -19,8 +21,10 @@ const ROUTES = [
 	"md",
 	"media",
 	"mobile",
+	"pages",
 	"parallel-coding-agents",
 	"people",
+	"plugins",
 	"pricing",
 	"roadmap",
 	"starchart",
@@ -91,6 +95,7 @@ const FUTURE = [
 	"signin",
 	"signup",
 	"sitemap",
+	"sitemaps",
 	"status",
 	"support",
 	"trust",

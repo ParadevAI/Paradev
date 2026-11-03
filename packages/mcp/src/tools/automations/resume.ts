@@ -8,7 +8,7 @@ export function register(server: McpServer): void {
 		name: "automations_resume",
 		annotations: { destructiveHint: false, idempotentHint: true },
 		description:
-			"Resume a paused automation. The next scheduled fire is recomputed from the RRULE. Caller must be the owner.",
+			"Resume a paused automation. Event triggers fire again, and the next scheduled fire is recomputed from the RRULE. Caller must be the owner.",
 		inputSchema: {
 			id: z.string().uuid().describe("Automation UUID."),
 		},

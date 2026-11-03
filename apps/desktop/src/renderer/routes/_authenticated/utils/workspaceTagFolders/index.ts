@@ -1,3 +1,8 @@
+export {
+	type CloudTagFolderWorkspace,
+	type HostTagFolderWorkspace,
+	mergeTagFolderWorkspaces,
+} from "./tagFolderWorkspaces";
 export { useTagFolderContext } from "./useTagFolderContext";
 export {
 	applyFolderTagChange,

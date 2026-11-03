@@ -1,0 +1,906 @@
+diff --git a/Libraries/Components/ScrollView/ScrollView.js b/Libraries/Components/ScrollView/ScrollView.js
+index 5c7974f..56fbd9b 100644
+--- a/Libraries/Components/ScrollView/ScrollView.js
++++ b/Libraries/Components/ScrollView/ScrollView.js
+@@ -16,6 +16,8 @@ import type {ColorValue} from '../../StyleSheet/StyleSheet';
+ import type {
+   GestureResponderEvent,
+   LayoutChangeEvent,
++  SafeAreaInsets,
++  SafeAreaInsetsChangeEvent,
+   ScrollEvent,
+ } from '../../Types/CoreEventTypes';
+ import type {EventSubscription} from '../../vendor/emitter/EventEmitter';
+@@ -23,6 +25,8 @@ import type {KeyboardEvent, KeyboardMetrics} from '../Keyboard/Keyboard';
+ import type {ViewProps} from '../View/ViewPropTypes';
+ import type {ScrollViewStickyHeaderProps} from './ScrollViewStickyHeader';
+ 
++import type {DimensionValue} from '../../StyleSheet/StyleSheetTypes';
++import I18nManager from '../../ReactNative/I18nManager';
+ import {
+   HScrollContentViewNativeComponent,
+   HScrollViewNativeComponent,
+@@ -386,8 +390,13 @@ export type ScrollViewPropsIOS = Readonly<{
+    */
+   zoomScale?: ?number,
+   /**
+-   * This property specifies how the safe area insets are used to modify the
+-   * content area of the scroll view.
++   * How the safe area insets modify the content area of the scroll view.
++   *
++   * Along the scrollable axis, the insets become content insets, so content
++   * scrolls under the system UI. Across it, every value except `'never'` pads
++   * the content container by the insets, so content is laid out clear of the
++   * system UI, such as the rail on iPhone Duo or camera cutout in landscape,
++   * while the container's background still extends edge to edge.
+    *
+    * @default `'never'`
+    * @platform ios
+@@ -883,6 +892,11 @@ class ScrollView extends React.Component<ScrollViewProps, ScrollViewState> {
+     layoutHeight: null,
+   };
+ 
++  // The latest safe area insets of the native view. Only the pair across the
++  // scrollable axis affects the content container, so a change to the other
++  // pair is kept here without a render.
++  _safeAreaInsets: ?SafeAreaInsets = null;
++
+   componentDidMount() {
+     this._keyboardMetrics = Keyboard.metrics();
+     this._additionalScrollOffset = 0;
+@@ -1247,6 +1261,30 @@ class ScrollView extends React.Component<ScrollViewProps, ScrollViewState> {
+     this.props.onScroll && this.props.onScroll(e);
+   };
+ 
++  _handleSafeAreaInsetsChange = (e: SafeAreaInsetsChangeEvent) => {
++    const {insets} = e.nativeEvent;
++    const previous = this._safeAreaInsets;
++    this._safeAreaInsets = insets;
++    const changedAcrossScrollableAxis =
++      previous == null ||
++      (this.props.horizontal === true
++        ? previous.top !== insets.top || previous.bottom !== insets.bottom
++        : previous.left !== insets.left || previous.right !== insets.right);
++    if (changedAcrossScrollableAxis && this._padsContentForSafeArea()) {
++      this.forceUpdate();
++    }
++    this.props.experimental_onSafeAreaInsetsChange?.(e);
++  };
++
++  /**
++   * Whether the content container is padded by the safe area across the
++   * scrollable axis.
++   */
++  _padsContentForSafeArea(): boolean {
++    const behavior = this.props.contentInsetAdjustmentBehavior;
++    return Platform.OS === 'ios' && behavior != null && behavior !== 'never';
++  }
++
+   _handleLayout = (e: LayoutChangeEvent) => {
+     if (this.props.invertStickyHeaders === true) {
+       this.setState({layoutHeight: e.nativeEvent.layout.height});
+@@ -1747,9 +1785,25 @@ class ScrollView extends React.Component<ScrollViewProps, ScrollViewState> {
+       ? HScrollContentViewNativeComponent
+       : VScrollContentViewNativeComponent;
+ 
++    // Along the scrollable axis UIKit turns the safe area into content insets,
++    // so content scrolls under the system UI. Across it there is nothing to
++    // scroll, so the content container is padded instead and content is laid
++    // out clear of the system UI, such as the rail on iPhone Duo. Native
++    // removes whatever UIKit insets across that axis, so the safe area applies
++    // once.
++    const padsContentForSafeArea = this._padsContentForSafeArea();
++    const safeAreaInsets = this._safeAreaInsets;
++
+     const contentContainerStyle = [
+       horizontal && styles.contentContainerHorizontal,
+       this.props.contentContainerStyle,
++      padsContentForSafeArea && safeAreaInsets != null
++        ? getSafeAreaContentPadding(
++            this.props.contentContainerStyle,
++            safeAreaInsets,
++            horizontal,
++          )
++        : null,
+     ];
+     if (__DEV__ && this.props.style !== undefined) {
+       // $FlowFixMe[underconstrained-implicit-instantiation]
+@@ -1886,6 +1940,14 @@ class ScrollView extends React.Component<ScrollViewProps, ScrollViewState> {
+       onTouchStart: this._handleTouchStart,
+       onTouchCancel: this._handleTouchCancel,
+       onScroll: this._handleScroll,
++      // Routed through the handler whenever the event is observed at all, so
++      // the insets it keeps are current when the behavior changes from
++      // 'never' and the content container starts padding for them.
++      experimental_onSafeAreaInsetsChange:
++        padsContentForSafeArea ||
++        this.props.experimental_onSafeAreaInsetsChange != null
++          ? this._handleSafeAreaInsetsChange
++          : undefined,
+       endDraggingSensitivityMultiplier:
+         experimental_endDraggingSensitivityMultiplier,
+       scrollEventThrottle: hasStickyHeaders
+@@ -2049,3 +2111,129 @@ ScrollViewWrapper.Context = ScrollViewContext;
+ 
+ export default ScrollViewWrapper as $FlowFixMe as typeof ScrollViewWrapper &
+   ScrollViewComponentStatics;
++
++type PhysicalEdge = 'top' | 'right' | 'bottom' | 'left';
++type FlatStyle = ?{readonly [key: string]: unknown, ...};
++type PaddingValue = DimensionValue | void;
++
++/**
++ * The padding keys that apply to one physical edge, most specific first, as
++ * Fabric resolves them: the `paddingInline*` and `paddingBlock*` aliases are
++ * applied over the keys they alias, and in RTL with `doLeftAndRightSwapInRTL`
++ * the physical left and right keys are copied over the logical start and end
++ * keys after everything else.
++ */
++function getPaddingKeys(edge: PhysicalEdge, isRTL: boolean): Array<string> {
++  if (edge === 'top') {
++    return [
++      'paddingTop',
++      'paddingBlockStart',
++      'paddingBlock',
++      'paddingVertical',
++      'padding',
++    ];
++  }
++  if (edge === 'bottom') {
++    return [
++      'paddingBottom',
++      'paddingBlockEnd',
++      'paddingBlock',
++      'paddingVertical',
++      'padding',
++    ];
++  }
++  const {doLeftAndRightSwapInRTL} = I18nManager.getConstants();
++  const swap = isRTL && doLeftAndRightSwapInRTL;
++  const leading = (edge === 'left') !== isRTL;
++  const logical = leading
++    ? ['paddingInlineStart', 'paddingStart']
++    : ['paddingInlineEnd', 'paddingEnd'];
++  const physical = (edge === 'left') !== swap ? 'paddingLeft' : 'paddingRight';
++  return [
++    ...(swap ? [physical, ...logical] : [...logical, physical]),
++    'paddingInline',
++    'paddingHorizontal',
++    'padding',
++  ];
++}
++
++/**
++ * The padding a flattened style sets on one physical edge, or `undefined` when
++ * it sets none.
++ */
++function resolvePadding(
++  style: FlatStyle,
++  edge: PhysicalEdge,
++  isRTL: boolean,
++): PaddingValue {
++  if (style == null) {
++    return undefined;
++  }
++  for (const key of getPaddingKeys(edge, isRTL)) {
++    const value = style[key];
++    if (typeof value === 'number' || typeof value === 'string') {
++      return value;
++    }
++  }
++  return undefined;
++}
++
++/**
++ * The padding the style resolves to on an edge, grown by that edge's inset.
++ * A value that is not a plain number, such as a percentage, keeps its meaning
++ * only where the inset is 0; on an inset edge it resolves to 0.
++ */
++function padEdge(value: PaddingValue, inset: number): PaddingValue {
++  if (inset === 0) {
++    return value;
++  }
++  return (typeof value === 'number' ? value : 0) + inset;
++}
++
++/**
++ * Padding that keeps a scroll view's content container clear of the safe area
++ * on the axis the scroll view does not scroll along, on top of the padding its
++ * style already has, or `null` when that axis has no safe area to clear.
++ *
++ * Across the row the logical keys carry the result, and the other keys on that
++ * axis are set to `null`: every one of them can otherwise take precedence over
++ * the logical keys once Fabric resolves the style, and `null` reaches native as
++ * a reset where `undefined` is left out of the props diff. The column needs no
++ * such care, since the physical keys take precedence over everything else
++ * there.
++ */
++function getSafeAreaContentPadding(
++  contentContainerStyle: ViewStyleProp,
++  insets: SafeAreaInsets,
++  horizontal: boolean,
++): ViewStyleProp {
++  const style: FlatStyle = flattenStyle(contentContainerStyle);
++  if (horizontal) {
++    if (insets.top === 0 && insets.bottom === 0) {
++      return null;
++    }
++    return {
++      paddingTop: padEdge(resolvePadding(style, 'top', false), insets.top),
++      paddingBottom: padEdge(
++        resolvePadding(style, 'bottom', false),
++        insets.bottom,
++      ),
++    };
++  }
++  if (insets.left === 0 && insets.right === 0) {
++    return null;
++  }
++  const isRTL = I18nManager.getConstants().isRTL;
++  const left = padEdge(resolvePadding(style, 'left', isRTL), insets.left);
++  const right = padEdge(resolvePadding(style, 'right', isRTL), insets.right);
++  return {
++    paddingStart: isRTL ? right : left,
++    paddingEnd: isRTL ? left : right,
++    paddingLeft: null,
++    paddingRight: null,
++    paddingHorizontal: null,
++    paddingInline: null,
++    paddingInlineStart: null,
++    paddingInlineEnd: null,
++  };
++}
+diff --git a/Libraries/Components/ScrollView/ScrollViewNativeComponent.js b/Libraries/Components/ScrollView/ScrollViewNativeComponent.js
+index eeee1a6..7b93610 100644
+--- a/Libraries/Components/ScrollView/ScrollViewNativeComponent.js
++++ b/Libraries/Components/ScrollView/ScrollViewNativeComponent.js
+@@ -124,6 +124,7 @@ export const __INTERNAL_VIEW_CONFIG: PartialViewConfig =
+           endDraggingSensitivityMultiplier: true,
+           directionalLockEnabled: true,
+           disableIntervalMomentum: true,
++          horizontal: true,
+           indicatorStyle: true,
+           inverted: true,
+           keyboardDismissMode: true,
+diff --git a/Libraries/Components/View/View.js b/Libraries/Components/View/View.js
+index 461f770..55f503e 100644
+--- a/Libraries/Components/View/View.js
++++ b/Libraries/Components/View/View.js
+@@ -9,6 +9,7 @@
+  */
+ 
+ import type {HostInstance} from '../../../src/private/types/HostInstance';
++import type {SafeAreaInsetsChangeEvent} from '../../Types/CoreEventTypes';
+ import type {ViewProps} from './ViewPropTypes';
+ 
+ import TextAncestorContext from '../../Text/TextAncestorContext';
+@@ -16,6 +17,12 @@ import ViewNativeComponent from './ViewNativeComponent';
+ import * as React from 'react';
+ import {use} from 'react';
+ 
++const warnOnRepeatedSafeAreaInsetsChanges: (
++  onSafeAreaInsetsChange: (event: SafeAreaInsetsChangeEvent) => unknown,
++) => (event: SafeAreaInsetsChangeEvent) => unknown = __DEV__
++  ? warnOnRepeatedSafeAreaInsetsChangesInDev
++  : onSafeAreaInsetsChange => onSafeAreaInsetsChange;
++
+ export type ViewInstance = HostInstance;
+ 
+ /**
+@@ -115,6 +122,15 @@ component View(ref?: React.RefSetter<ViewInstance>, ...props: ViewProps) {
+     };
+   }
+ 
++  if (__DEV__) {
++    const onSafeAreaInsetsChange =
++      resolvedProps.experimental_onSafeAreaInsetsChange;
++    if (onSafeAreaInsetsChange != null) {
++      resolvedProps.experimental_onSafeAreaInsetsChange =
++        warnOnRepeatedSafeAreaInsetsChanges(onSafeAreaInsetsChange);
++    }
++  }
++
+   const actualView =
+     ref == null ? (
+       <ViewNativeComponent {...resolvedProps} />
+@@ -133,3 +149,64 @@ component View(ref?: React.RefSetter<ViewInstance>, ...props: ViewProps) {
+ View.displayName = 'View';
+ 
+ export default View;
++
++const DISPATCH_WINDOW_MS = 1000;
++const MAX_DISPATCHES_PER_WINDOW = 10;
++
++type DispatchRate = {
++  count: number,
++  windowStart: number,
++  warned: boolean,
++};
++
++const dispatchRates: WeakMap<interface {}, DispatchRate> = new WeakMap();
++
++/**
++ * Wraps an `experimental_onSafeAreaInsetsChange` handler with a development
++ * check for a view that reports insets over and over.
++ */
++function warnOnRepeatedSafeAreaInsetsChangesInDev(
++  onSafeAreaInsetsChange: (event: SafeAreaInsetsChangeEvent) => unknown,
++): (event: SafeAreaInsetsChangeEvent) => unknown {
++  return event => {
++    // The target identifies the view without keeping it alive; events dispatched
++    // without one are simply not counted.
++    const target = event.target;
++    if (target != null && typeof target === 'object') {
++      warnIfDispatchingTooOften(target);
++    }
++    return onSafeAreaInsetsChange(event);
++  };
++}
++
++function warnIfDispatchingTooOften(target: interface {}): void {
++  const now = performance.now();
++  let dispatchRate: ?DispatchRate = dispatchRates.get(target);
++  if (dispatchRate == null) {
++    const newDispatchRate: DispatchRate = {
++      count: 0,
++      windowStart: now,
++      warned: false,
++    };
++    dispatchRates.set(target, newDispatchRate);
++    dispatchRate = newDispatchRate;
++  }
++  if (dispatchRate.warned) {
++    return;
++  }
++  if (now - dispatchRate.windowStart > DISPATCH_WINDOW_MS) {
++    dispatchRate.windowStart = now;
++    dispatchRate.count = 0;
++  }
++  dispatchRate.count++;
++  if (dispatchRate.count > MAX_DISPATCHES_PER_WINDOW) {
++    dispatchRate.warned = true;
++    console.warn(
++      `\`experimental_onSafeAreaInsetsChange\` fired more than ${MAX_DISPATCHES_PER_WINDOW} ` +
++        `times in ${DISPATCH_WINDOW_MS}ms on a single view. The safe area insets of a view ` +
++        'only change when the system UI moves or the view does, so this is usually a loop: ' +
++        'the view is laid out from the insets it reports, which moves it, which changes its ' +
++        'insets. Each event renders synchronously, so the loop costs frames.',
++    );
++  }
++}
+diff --git a/Libraries/Components/View/ViewPropTypes.js b/Libraries/Components/View/ViewPropTypes.js
+index 5afdaf3..961d184 100644
+--- a/Libraries/Components/View/ViewPropTypes.js
++++ b/Libraries/Components/View/ViewPropTypes.js
+@@ -23,6 +23,7 @@ import type {
+   LayoutRectangle,
+   MouseEvent,
+   PointerEvent,
++  SafeAreaInsetsChangeEvent,
+ } from '../../Types/CoreEventTypes';
+ import type {
+   AccessibilityActionEvent,
+@@ -63,6 +64,28 @@ type DirectEventProps = Readonly<{
+    */
+   onLayout?: ?(event: LayoutChangeEvent) => unknown,
+ 
++  /**
++   * Invoked when the part of this view that is covered by the system UI
++   * (status bar, navigation bar, home indicator, display cutouts, ...)
++   * changes, with:
++   *
++   * `{nativeEvent: {insets: {top, right, bottom, left}}}`
++   *
++   * `insets` are relative to this view: an inset is only non-zero for the part
++   * of the view that actually overlaps the system UI.
++   *
++   * The event is dispatched synchronously, so the rendering it schedules is
++   * applied in the same frame the insets changed in.
++   *
++   * Setting this prop makes the view observe safe area changes; views without
++   * it are unaffected.
++   *
++   * @experimental
++   */
++  experimental_onSafeAreaInsetsChange?: ?(
++    event: SafeAreaInsetsChangeEvent,
++  ) => unknown,
++
+   /**
+    * When `accessible` is `true`, the system will invoke this function when the
+    * user performs the magic tap gesture.
+diff --git a/Libraries/NativeComponent/BaseViewConfig.ios.js b/Libraries/NativeComponent/BaseViewConfig.ios.js
+index d22a686..80c413a 100644
+--- a/Libraries/NativeComponent/BaseViewConfig.ios.js
++++ b/Libraries/NativeComponent/BaseViewConfig.ios.js
+@@ -179,6 +179,9 @@ const directEventTypes = {
+   topLayout: {
+     registrationName: 'onLayout',
+   },
++  topSafeAreaInsetsChange: {
++    registrationName: 'experimental_onSafeAreaInsetsChange',
++  },
+   onGestureHandlerEvent: DynamicallyInjectedByGestureHandler({
+     registrationName: 'onGestureHandlerEvent',
+   }),
+@@ -380,6 +383,7 @@ const validAttributesForNonEventProps = {
+ // Props for bubbling and direct events
+ const validAttributesForEventProps = ConditionallyIgnoredEventHandlers({
+   onLayout: true,
++  experimental_onSafeAreaInsetsChange: true,
+   onMagicTap: true,
+ 
+   // Accessibility
+diff --git a/Libraries/Types/CoreEventTypes.js b/Libraries/Types/CoreEventTypes.js
+index dff10cb..c1dc360 100644
+--- a/Libraries/Types/CoreEventTypes.js
++++ b/Libraries/Types/CoreEventTypes.js
+@@ -76,6 +76,23 @@ export type LayoutChangeEvent = NativeSyntheticEvent<
+   }>,
+ >;
+ 
++export type SafeAreaInsets = Readonly<{
++  top: number,
++  right: number,
++  bottom: number,
++  left: number,
++}>;
++
++export type SafeAreaInsetsChangeEvent = NativeSyntheticEvent<
++  Readonly<{
++    /**
++     * The part of the view that is covered by the system UI, in the view's own
++     * coordinate space.
++     */
++    insets: SafeAreaInsets,
++  }>,
++>;
++
+ /**
+  * @deprecated Use `TextLayoutEvent` instead.
+  */
+diff --git a/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.h b/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.h
+index 6402bc6..8018ab5 100644
+--- a/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.h
++++ b/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.h
+@@ -52,6 +52,21 @@ NS_ASSUME_NONNULL_BEGIN
+ @property (nonatomic, assign) BOOL snapToEnd;
+ @property (nonatomic, copy) NSArray<NSNumber *> *snapToOffsets;
+ 
++/*
++ * The content inset before the correction across the scrollable axis: what the props and the content centering
++ * give. While `padsContentForSafeArea` is set, `contentInset` carries it less whatever UIKit adds across that axis
++ * for the safe area.
++ */
++@property (nonatomic, assign) UIEdgeInsets baseContentInset;
++@property (nonatomic, assign) BOOL horizontal;
++
++/*
++ * Whether `ScrollView` pads the content container by the safe area across the scrollable axis, which it does when
++ * its `contentInsetAdjustmentBehavior` prop is not `never`. UIKit's own `contentInsetAdjustmentBehavior` can differ,
++ * as react-native-screens sets it natively on the first scroll view of a screen.
++ */
++@property (nonatomic, assign) BOOL padsContentForSafeArea;
++
+ /*
+  * Makes `setContentOffset:` method no-op when given `block` is executed.
+  * The block is being executed synchronously.
+diff --git a/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.mm b/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.mm
+index b3481c1..e78069d 100644
+--- a/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.mm
++++ b/React/Fabric/Mounting/ComponentViews/ScrollView/RCTEnhancedScrollView.mm
+@@ -89,7 +89,69 @@ - (void)centerContentIfNeeded
+   if (contentSize.height < boundsSize.height) {
+     top = (boundsSize.height - contentSize.height) * 0.5f;
+   }
+-  self.contentInset = UIEdgeInsetsMake(top, left, top, left);
++  self.baseContentInset = UIEdgeInsetsMake(top, left, top, left);
++}
++
++- (void)setBaseContentInset:(UIEdgeInsets)baseContentInset
++{
++  _baseContentInset = baseContentInset;
++  [self applyBaseContentInset];
++}
++
++- (void)setHorizontal:(BOOL)horizontal
++{
++  _horizontal = horizontal;
++  [self applyBaseContentInset];
++}
++
++- (void)setPadsContentForSafeArea:(BOOL)padsContentForSafeArea
++{
++  _padsContentForSafeArea = padsContentForSafeArea;
++  [self applyBaseContentInset];
++}
++
++- (void)adjustedContentInsetDidChange
++{
++  [super adjustedContentInsetDidChange];
++  [self applyBaseContentInset];
++}
++
++/*
++ * Applies `baseContentInset`, less what UIKit adds across the scrollable axis for the safe area while the content is
++ * padded for it. `ScrollView` lays the content out clear of the system UI rather than scrolling it under; the
++ * content inset would apply the safe area a second time.
++ */
++- (void)applyBaseContentInset
++{
++  UIEdgeInsets contentInset = _baseContentInset;
++  if (_padsContentForSafeArea) {
++    UIEdgeInsets adjusted = self.adjustedContentInset;
++    UIEdgeInsets current = self.contentInset;
++    if (_horizontal) {
++      contentInset.top -= adjusted.top - current.top;
++      contentInset.bottom -= adjusted.bottom - current.bottom;
++    } else {
++      contentInset.left -= adjusted.left - current.left;
++      contentInset.right -= adjusted.right - current.right;
++    }
++  }
++  if (UIEdgeInsetsEqualToEdgeInsets(contentInset, self.contentInset)) {
++    return;
++  }
++  // Content pinned to the leading edge across the scrollable axis stays pinned, as UIKit keeps it when it changes the
++  // adjusted content inset itself.
++  UIEdgeInsets before = self.adjustedContentInset;
++  self.contentInset = contentInset;
++  UIEdgeInsets after = self.adjustedContentInset;
++  CGPoint contentOffset = self.contentOffset;
++  if (_horizontal && contentOffset.y <= -before.top) {
++    contentOffset.y = -after.top;
++  } else if (!_horizontal && contentOffset.x <= -before.left) {
++    contentOffset.x = -after.left;
++  }
++  if (!CGPointEqualToPoint(contentOffset, self.contentOffset)) {
++    self.contentOffset = contentOffset;
++  }
+ }
+ 
+ - (void)setContentOffset:(CGPoint)contentOffset
+diff --git a/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm b/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm
+index 14a08b4..8eceb7d 100644
+--- a/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm
++++ b/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm
+@@ -205,7 +205,7 @@ - (void)_keyboardWillChangeFrame:(NSNotification *)notification
+   CGPoint absoluteViewOrigin = [self convertPoint:self.bounds.origin toView:nil];
+   CGFloat scrollViewLowerY = isInverted ? absoluteViewOrigin.y : absoluteViewOrigin.y + self.bounds.size.height;
+ 
+-  UIEdgeInsets newEdgeInsets = _scrollView.contentInset;
++  UIEdgeInsets newEdgeInsets = ((RCTEnhancedScrollView *)_scrollView).baseContentInset;
+   CGFloat inset = MAX(scrollViewLowerY - keyboardEndFrame.origin.y, 0);
+   const auto &props = static_cast<const ScrollViewProps &>(*_props);
+   if (isInverted) {
+@@ -258,7 +258,7 @@ - (void)_keyboardWillChangeFrame:(NSNotification *)notification
+                         delay:0.0
+                       options:animationOptionsWithCurve(curve)
+                    animations:^{
+-                     self->_scrollView.contentInset = newEdgeInsets;
++                     ((RCTEnhancedScrollView *)self->_scrollView).baseContentInset = newEdgeInsets;
+                      self->_scrollView.verticalScrollIndicatorInsets = newEdgeInsets;
+                      [self scrollTo:newContentOffset.x y:newContentOffset.y animated:NO];
+                    }
+@@ -346,6 +346,7 @@ - (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &
+   MAP_SCROLL_VIEW_PROP(bouncesZoom);
+   MAP_SCROLL_VIEW_PROP(canCancelContentTouches);
+   MAP_SCROLL_VIEW_PROP(centerContent);
++  MAP_SCROLL_VIEW_PROP(horizontal);
+   // MAP_SCROLL_VIEW_PROP(automaticallyAdjustContentInsets);
+   MAP_SCROLL_VIEW_PROP(decelerationRate);
+   MAP_SCROLL_VIEW_PROP(directionalLockEnabled);
+@@ -397,13 +398,15 @@ - (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &
+   // When disabling centerContent, reset inset to prop value
+   // (enabling is handled automatically by the setCenterContent: setter)
+   if (oldScrollViewProps.centerContent && !newScrollViewProps.centerContent) {
+-    _scrollView.contentInset = RCTUIEdgeInsetsFromEdgeInsets(newScrollViewProps.contentInset);
++    ((RCTEnhancedScrollView *)_scrollView).baseContentInset =
++        RCTUIEdgeInsetsFromEdgeInsets(newScrollViewProps.contentInset);
+   }
+ 
+   // Only apply contentInset from props if centerContent is disabled
+   // When centerContent is enabled, the inset is calculated by centerContentIfNeeded
+   if (oldScrollViewProps.contentInset != newScrollViewProps.contentInset && !newScrollViewProps.centerContent) {
+-    _scrollView.contentInset = RCTUIEdgeInsetsFromEdgeInsets(newScrollViewProps.contentInset);
++    ((RCTEnhancedScrollView *)_scrollView).baseContentInset =
++        RCTUIEdgeInsetsFromEdgeInsets(newScrollViewProps.contentInset);
+   }
+   if (oldScrollViewProps.contentOffset != newScrollViewProps.contentOffset) {
+     _scrollView.contentOffset = RCTCGPointFromPoint(newScrollViewProps.contentOffset);
+@@ -444,6 +447,8 @@ - (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &
+     } else if (contentInsetAdjustmentBehavior == ContentInsetAdjustmentBehavior::Always) {
+       scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAlways;
+     }
++    ((RCTEnhancedScrollView *)_scrollView).padsContentForSafeArea =
++        contentInsetAdjustmentBehavior != ContentInsetAdjustmentBehavior::Never;
+     _shouldUpdateContentInsetAdjustmentBehavior = NO;
+   }
+ 
+@@ -593,7 +598,7 @@ - (BOOL)_shouldDisableScrollInteraction
+   auto metrics = ScrollViewEventEmitter::Metrics{};
+   metrics.contentSize = RCTSizeFromCGSize(_scrollView.contentSize);
+   metrics.contentOffset = RCTPointFromCGPoint(_scrollView.contentOffset);
+-  metrics.contentInset = RCTEdgeInsetsFromUIEdgeInsets(_scrollView.contentInset);
++  metrics.contentInset = RCTEdgeInsetsFromUIEdgeInsets(((RCTEnhancedScrollView *)_scrollView).baseContentInset);
+   metrics.containerSize = RCTSizeFromCGSize(_scrollView.bounds.size);
+   metrics.zoomScale = _scrollView.zoomScale;
+   metrics.timestamp = CACurrentMediaTime();
+@@ -695,11 +700,12 @@ - (void)prepareForRecycle
+   // Invalidate cached content size so that updateState: recalculates the
+   // container frame after zoomScale reset (which may have mutated it in RTL).
+   _contentSize = CGSizeZero;
+-  _scrollView.contentInset = RCTUIEdgeInsetsFromEdgeInsets(props.contentInset);
++  ((RCTEnhancedScrollView *)_scrollView).baseContentInset = RCTUIEdgeInsetsFromEdgeInsets(props.contentInset);
+   // We set the default behavior to "never" so that iOS
+   // doesn't do weird things to UIScrollView insets automatically
+   // and keeps it as an opt-in behavior.
+   _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
++  ((RCTEnhancedScrollView *)_scrollView).padsContentForSafeArea = NO;
+   _shouldUpdateContentInsetAdjustmentBehavior = YES;
+   _automaticallyAdjustKeyboardInsets = NO;
+   _isUserTriggeredScrolling = NO;
+diff --git a/React/Fabric/Mounting/ComponentViews/View/RCTViewComponentView.mm b/React/Fabric/Mounting/ComponentViews/View/RCTViewComponentView.mm
+index d44d1e0..3e329e8 100644
+--- a/React/Fabric/Mounting/ComponentViews/View/RCTViewComponentView.mm
++++ b/React/Fabric/Mounting/ComponentViews/View/RCTViewComponentView.mm
+@@ -25,6 +25,7 @@
+ #import <React/RCTLocalizedString.h>
+ #import <React/RCTLog.h>
+ #import <React/RCTRadialGradient.h>
++#import <React/RCTUtils.h>
+ #import <react/featureflags/ReactNativeFeatureFlags.h>
+ #import <react/renderer/components/view/ViewComponentDescriptor.h>
+ #import <react/renderer/components/view/ViewEventEmitter.h>
+@@ -104,6 +105,9 @@ static BOOL RCTViewIsInteractiveAccessibilityElement(UIView *view, const ViewPro
+ }
+ #endif
+ 
++// Sentinel for insets that have not been set yet.
++static const UIEdgeInsets RCTNoSafeAreaInsetsSent = {-1, -1, -1, -1};
++
+ @implementation RCTViewComponentView {
+   UIColor *_backgroundColor;
+   CALayer *_backgroundColorLayer;
+@@ -122,6 +126,7 @@ @implementation RCTViewComponentView {
+   NSMutableSet<NSString *> *_accessibilityOrderNativeIDs;
+   RCTSwiftUIContainerViewWrapper *_swiftUIWrapper;
+   BOOL _focusable;
++  UIEdgeInsets _lastSentSafeAreaInsets;
+ }
+ 
+ #ifdef RCT_DYNAMIC_FRAMEWORKS
+@@ -141,6 +146,7 @@ - (instancetype)initWithFrame:(CGRect)frame
+ #endif
+     _useCustomContainerView = NO;
+     _removeClippedSubviews = NO;
++    _lastSentSafeAreaInsets = RCTNoSafeAreaInsetsSent;
+   }
+   return self;
+ }
+@@ -438,6 +444,15 @@ - (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &
+         -newViewProps.hitSlop.right};
+   }
+ 
++  // `onSafeAreaInsetsChange`. Re-armed whenever the prop is set rather than on
++  // its transition: `oldViewProps` comes from `_props`, which a recycled view
++  // keeps from its previous occupant, so `!old && new` would miss a reuse.
++  if (newViewProps.onSafeAreaInsetsChange) {
++    [self setNeedsLayout];
++  } else if (oldViewProps.onSafeAreaInsetsChange) {
++    _lastSentSafeAreaInsets = RCTNoSafeAreaInsetsSent;
++  }
++
+   // `overflow`
+   if (oldViewProps.getClipsContentToBounds() != newViewProps.getClipsContentToBounds()) {
+     self.currentContainerView.clipsToBounds = newViewProps.getClipsContentToBounds();
+@@ -720,6 +735,78 @@ - (void)updateLayoutMetrics:(const LayoutMetrics &)layoutMetrics
+   }
+ }
+ 
++#pragma mark - Safe area insets
++
++static BOOL RCTEdgeInsetsEqualWithThreshold(UIEdgeInsets lhs, UIEdgeInsets rhs, CGFloat threshold)
++{
++  return ABS(lhs.left - rhs.left) <= threshold && ABS(lhs.top - rhs.top) <= threshold &&
++      ABS(lhs.right - rhs.right) <= threshold && ABS(lhs.bottom - rhs.bottom) <= threshold;
++}
++
++// The event is only ever emitted from `layoutSubviews`; everything that might
++// have changed the insets merely marks the view as needing layout. This defers
++// the emit out of arbitrary call contexts — in particular out of
++// `updateProps`, which runs inside the mounting transaction where
++// synchronously re-entering React is not safe — while keeping it in the same
++// frame: the layout pass runs before the frame is displayed.
++- (void)_safeAreaInsetsMayHaveChanged
++{
++  if (!_eventEmitter) {
++    return;
++  }
++
++  if (self.window == nil || CGSizeEqualToSize(self.bounds.size, CGSizeZero)) {
++    return;
++  }
++
++  UIEdgeInsets insets = self.safeAreaInsets;
++  if (_lastSentSafeAreaInsets.top >= 0 &&
++      RCTEdgeInsetsEqualWithThreshold(insets, _lastSentSafeAreaInsets, 1.0 / RCTScreenScale())) {
++    return;
++  }
++
++  _lastSentSafeAreaInsets = insets;
++
++  static_cast<const ViewEventEmitter &>(*_eventEmitter)
++      .onSafeAreaInsetsChange(
++          EdgeInsets{
++              .left = (Float)insets.left,
++              .top = (Float)insets.top,
++              .right = (Float)insets.right,
++              .bottom = (Float)insets.bottom});
++}
++
++- (BOOL)_observesSafeAreaInsets
++{
++  return static_cast<const ViewProps &>(*_props).onSafeAreaInsetsChange;
++}
++
++- (void)safeAreaInsetsDidChange
++{
++  [super safeAreaInsetsDidChange];
++  if ([self _observesSafeAreaInsets]) {
++    [self setNeedsLayout];
++  }
++}
++
++- (void)didMoveToWindow
++{
++  [super didMoveToWindow];
++  if ([self _observesSafeAreaInsets]) {
++    [self setNeedsLayout];
++  }
++}
++
++- (void)layoutSubviews
++{
++  [super layoutSubviews];
++  // A view's insets also change when it moves or resizes, and
++  // `safeAreaInsetsDidChange` does not fire for that; layout is the only hook.
++  if ([self _observesSafeAreaInsets]) {
++    [self _safeAreaInsetsMayHaveChanged];
++  }
++}
++
+ - (BOOL)isJSResponder
+ {
+   return _isJSResponder;
+@@ -775,6 +862,7 @@ - (void)prepareForRecycle
+   _filterLayer = nil;
+   [self clearExistingBackgroundImageLayers];
+ 
++  _lastSentSafeAreaInsets = RCTNoSafeAreaInsetsSent;
+   _propKeysManagedByAnimated_DO_NOT_USE_THIS_IS_BROKEN = nil;
+   _eventEmitter.reset();
+   _isJSResponder = NO;
+diff --git a/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.cpp b/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.cpp
+index 4e981ef..0aac07b 100644
+--- a/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.cpp
++++ b/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.cpp
+@@ -32,6 +32,29 @@ void BaseViewEventEmitter::onAccessibilityEscape() const {
+   dispatchEvent("accessibilityEscape");
+ }
+ 
++#pragma mark - Safe area
++
++void BaseViewEventEmitter::onSafeAreaInsetsChange(
++    const EdgeInsets& insets) const {
++  experimental_flushSync([this, insets]() {
++    dispatchEvent(
++        "safeAreaInsetsChange",
++        [insets](jsi::Runtime& runtime) {
++          auto payload = jsi::Object(runtime);
++          {
++            auto insetsPayload = jsi::Object(runtime);
++            insetsPayload.setProperty(runtime, "top", insets.top);
++            insetsPayload.setProperty(runtime, "right", insets.right);
++            insetsPayload.setProperty(runtime, "bottom", insets.bottom);
++            insetsPayload.setProperty(runtime, "left", insets.left);
++            payload.setProperty(runtime, "insets", insetsPayload);
++          }
++          return payload;
++        },
++        RawEvent::Category::Discrete);
++  });
++}
++
+ #pragma mark - Layout
+ 
+ void BaseViewEventEmitter::onLayout(const LayoutMetrics& layoutMetrics) const {
+diff --git a/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.h b/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.h
+index 8d9978a..51cd96d 100644
+--- a/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.h
++++ b/ReactCommon/react/renderer/components/view/BaseViewEventEmitter.h
+@@ -14,6 +14,7 @@
+ 
+ #include <react/renderer/core/LayoutMetrics.h>
+ #include <react/renderer/core/ReactPrimitives.h>
++#include <react/renderer/graphics/RectangleEdges.h>
+ 
+ #include "TouchEventEmitter.h"
+ 
+@@ -34,6 +35,14 @@ class BaseViewEventEmitter : public TouchEventEmitter {
+ 
+   void onLayout(const LayoutMetrics &layoutMetrics) const;
+ 
++#pragma mark - Safe area
++
++  /*
++   * Emits `onSafeAreaInsetsChange` with the portion of the view that is covered
++   * by the system UI (status bar, home indicator, display cutouts, ...).
++   */
++  void onSafeAreaInsetsChange(const EdgeInsets &insets) const;
++
+ #pragma mark - Focus
+   void onFocus() const;
+   void onBlur() const;
+diff --git a/ReactCommon/react/renderer/components/view/BaseViewProps.cpp b/ReactCommon/react/renderer/components/view/BaseViewProps.cpp
+index 1cb30b0..713ab14 100644
+--- a/ReactCommon/react/renderer/components/view/BaseViewProps.cpp
++++ b/ReactCommon/react/renderer/components/view/BaseViewProps.cpp
+@@ -303,6 +303,12 @@ BaseViewProps::BaseViewProps(
+           "onLayout",
+           sourceProps.onLayout,
+           {})),
++      onSafeAreaInsetsChange(convertRawProp(
++          context,
++          rawProps,
++          "experimental_onSafeAreaInsetsChange",
++          sourceProps.onSafeAreaInsetsChange,
++          {})),
+       events(convertRawProp(context, rawProps, sourceProps.events, {})),
+       collapsable(convertRawProp(
+           context,
+@@ -373,6 +379,8 @@ void BaseViewProps::setProp(
+     RAW_SET_PROP_SWITCH_CASE_BASIC(isolation);
+     RAW_SET_PROP_SWITCH_CASE_BASIC(hitSlop);
+     RAW_SET_PROP_SWITCH_CASE_BASIC(onLayout);
++    RAW_SET_PROP_SWITCH_CASE(
++        onSafeAreaInsetsChange, "experimental_onSafeAreaInsetsChange");
+     RAW_SET_PROP_SWITCH_CASE_BASIC(collapsable);
+     RAW_SET_PROP_SWITCH_CASE_BASIC(collapsableChildren);
+     RAW_SET_PROP_SWITCH_CASE_BASIC(removeClippedSubviews);
+@@ -609,6 +617,10 @@ SharedDebugStringConvertibleList BaseViewProps::getDebugProps() const {
+               "backgroundImage",
+               backgroundImage,
+               defaultBaseViewProps.backgroundImage),
++          debugStringConvertibleItem(
++              "experimental_onSafeAreaInsetsChange",
++              onSafeAreaInsetsChange,
++              defaultBaseViewProps.onSafeAreaInsetsChange),
+       };
+ }
+ #endif
+diff --git a/ReactCommon/react/renderer/components/view/BaseViewProps.h b/ReactCommon/react/renderer/components/view/BaseViewProps.h
+index c78c4f3..b72c5f9 100644
+--- a/ReactCommon/react/renderer/components/view/BaseViewProps.h
++++ b/ReactCommon/react/renderer/components/view/BaseViewProps.h
+@@ -103,6 +103,7 @@ class BaseViewProps : public YogaStylableProps, public AccessibilityProps {
+   PointerEventsMode pointerEvents{};
+   EdgeInsets hitSlop{};
+   bool onLayout{};
++  bool onSafeAreaInsetsChange{};
+ 
+   ViewEvents events{};
+ 
+diff --git a/ReactCommon/react/renderer/components/view/ViewShadowNode.cpp b/ReactCommon/react/renderer/components/view/ViewShadowNode.cpp
+index a166a90..035a657 100644
+--- a/ReactCommon/react/renderer/components/view/ViewShadowNode.cpp
++++ b/ReactCommon/react/renderer/components/view/ViewShadowNode.cpp
+@@ -55,7 +55,7 @@ void ViewShadowNode::initialize() noexcept {
+       viewProps.accessibilityViewIsModal ||
+       viewProps.importantForAccessibility != ImportantForAccessibility::Auto ||
+       viewProps.removeClippedSubviews || viewProps.cursor != Cursor::Auto ||
+-      !viewProps.filter.empty() ||
++      viewProps.onSafeAreaInsetsChange || !viewProps.filter.empty() ||
+       viewProps.mixBlendMode != BlendMode::Normal ||
+       viewProps.isolation == Isolation::Isolate ||
+       HostPlatformViewTraitsInitializer::formsStackingContext(viewProps) ||

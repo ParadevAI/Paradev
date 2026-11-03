@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { recordV1WorkspaceCreatedIfNew } from "renderer/stores/star-nag";
 import { useWorkspaceInitStore } from "renderer/stores/workspace-init";
 import type { WorkspaceInitProgress } from "shared/types/workspace-init";
 
@@ -21,8 +20,6 @@ export function useOpenMainRepoWorkspace(
 		...options,
 		onSuccess: async (data, ...rest) => {
 			await utils.workspaces.invalidate();
-
-			recordV1WorkspaceCreatedIfNew(data.wasExisting);
 
 			if (!data.wasExisting) {
 				let setupData = null;

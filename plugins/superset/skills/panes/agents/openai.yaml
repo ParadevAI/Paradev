@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paradev Panes"
+  short_description: "Arrange panes and the right sidebar in a Paradev workspace"
+  default_prompt: "Use $superset-panes to arrange this workspace's panes."

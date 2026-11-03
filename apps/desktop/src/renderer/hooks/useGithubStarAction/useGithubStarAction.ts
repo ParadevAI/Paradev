@@ -20,7 +20,7 @@ export function canActivateStarAction(state: GithubStarActionState): boolean {
 // How long a fresh star confirmation still counts as "just happened" for
 // useJustStarredWindow — long enough for AnimatedStarButton's confetti/label
 // celebration to finish before a surface that normally hides on "starred"
-// (GitHubStarPill, StarNagCard) unmounts it mid-animation.
+// (GitHubStarPill) unmounts it mid-animation.
 export const STAR_SUCCESS_ANIMATION_MS = 1700;
 
 /**
@@ -31,8 +31,7 @@ export const STAR_SUCCESS_ANIMATION_MS = 1700;
  * hiding. Not true for a repo that was *already* starred on mount — only a
  * live not_starred/unknown -> starred transition counts.
  *
- * Centralizes a subtlety two call sites (GitHubStarPill, StarNagCard) used
- * to reimplement by hand, with a real risk of drifting: the "just
+ * Centralizes a subtlety that is easy to get wrong: the "just
  * transitioned" value has to be computed twice — once synchronously during
  * render (so a caller's visibility check can't lag a render behind the state
  * flip) and once inside an effect keyed on `state` rather than on the
@@ -152,14 +151,6 @@ export function msUntilUnstarGraceWindowCloses(params: {
 
 interface UseGithubStarActionOptions {
 	/**
-	 * Skip the checkStarred query entirely. Every check shells out to the
-	 * user's local `gh` CLI, so a surface that isn't currently eligible to be
-	 * shown (e.g. a feature-flagged sidebar card that's collapsed or
-	 * disabled) has no reason to keep checking in the background. Defaults to
-	 * true.
-	 */
-	enabled?: boolean;
-	/**
 	 * Always fetch a fresh read on mount, ignoring staleTime (still never on
 	 * window focus). For a surface the user navigates to specifically to
 	 * check status — the Settings row — rather than one that's ambiently
@@ -171,19 +162,18 @@ interface UseGithubStarActionOptions {
 
 /**
  * Shared check-star-repo/star-repo flow, reused by every "Star Superset on
- * GitHub" surface (settings row, empty-state pill, threshold card, onboarding
- * toast). `state` is the live, truthful star status — backed by the shared
+ * GitHub" surface (settings row, empty-state pill, onboarding toast). `state` is the live, truthful star status — backed by the shared
  * query cache, so a confirmed star from any one surface is reflected on
  * every other mounted surface immediately.
  *
  * Suppression (whether a nag surface should show itself at all) is NOT this
- * hook's concern — StarNagCard and StarNagToast derive that straight from
- * useStarNagStore (shouldShowThresholdCard()/isEligible()), and the pill and
+ * hook's concern — StarNagToast derives that straight from
+ * useStarNagStore.isEligible(), and the pill and
  * Settings row are deliberately always-truthful with no suppression at all.
  * A "loading" or "unknown" read isn't trustworthy enough to act on, so
  * canActivateStarAction() gates clicking to `state === "not_starred"` only
- * — but that's not the same as each surface's *visibility* gate. Three of
- * the four (GitHubStarPill, StarNagCard, StarNagToast) also keep showing
+ * — but that's not the same as each surface's *visibility* gate. Two of
+ * the three (GitHubStarPill, StarNagToast) also keep showing
  * their button through the brief "starred" celebration window right after
  * a fresh star (see useJustStarredWindow), and GithubStarRow always shows
  * its button, just disabled when not actionable. Read each surface's own
@@ -194,11 +184,9 @@ interface UseGithubStarActionOptions {
  * mounted surfaces don't each run their own copy of the same effect.
  */
 export function useGithubStarAction(options?: UseGithubStarActionOptions) {
-	const enabled = options?.enabled ?? true;
 	const utils = electronTrpc.useUtils();
 	const { data: checkResult, isSuccess } =
 		electronTrpc.githubStar.checkStarred.useQuery(undefined, {
-			enabled,
 			staleTime: CHECK_STARRED_STALE_TIME_MS,
 			refetchOnWindowFocus: false,
 			refetchOnMount: options?.alwaysFreshOnMount ? "always" : true,

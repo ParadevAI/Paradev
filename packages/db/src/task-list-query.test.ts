@@ -38,6 +38,29 @@ describe("buildTaskListConditions", () => {
 		expect(sql.toLowerCase()).not.toContain("deleted_at");
 	});
 
+	test("a label filter matches the label and its sub-labels", () => {
+		const { sql, params } = render(
+			buildTaskListConditions({
+				organizationId: ORG,
+				labels: [" Acme / Web_1 "],
+			}),
+		);
+		expect(sql).toContain("label.name like");
+		expect(params).toEqual([
+			ORG,
+			"acme / web_1",
+			"acme/web_1",
+			"acme/web\\_1/%",
+		]);
+	});
+
+	test("a label that cannot exist still filters, matching nothing", () => {
+		const { params } = render(
+			buildTaskListConditions({ organizationId: ORG, labels: ["///"] }),
+		);
+		expect(params).toEqual([ORG, "///"]);
+	});
+
 	test("escapes LIKE wildcards in search and matches title or description", () => {
 		const { sql, params } = render(
 			buildTaskListConditions({ organizationId: ORG, search: "50%_off" }),
@@ -45,17 +68,6 @@ describe("buildTaskListConditions", () => {
 		expect(params).toContain("%50\\%\\_off%");
 		expect(sql.toLowerCase()).toContain("title");
 		expect(sql.toLowerCase()).toContain("description");
-	});
-
-	test("externalProjectName is an escaped case-insensitive prefix match", () => {
-		const { sql, params } = render(
-			buildTaskListConditions({
-				organizationId: ORG,
-				externalProjectName: "Al_pha",
-			}),
-		);
-		expect(sql.toLowerCase()).toContain("ilike");
-		expect(params).toContain("Al\\_pha%");
 	});
 
 	test("statusType filters via an IN-subquery on task_statuses", () => {
@@ -88,6 +100,13 @@ describe("buildTaskListOrderBy", () => {
 		expect(renderOne(primary).sql.toLowerCase()).toContain("desc");
 		expect(renderOne(tiebreak).sql.toLowerCase()).toContain("id");
 		expect(renderOne(tiebreak).sql.toLowerCase()).toContain("asc");
+	});
+
+	test("createdAt sorts on an expression so the org index is used", () => {
+		const [primary] = buildTaskListOrderBy("createdAt", "asc");
+		expect(renderOne(primary).sql.toLowerCase()).toContain(
+			"+ interval '0 seconds'",
+		);
 	});
 
 	test("priority desc ranks urgent highest via enum-derived CASE", () => {

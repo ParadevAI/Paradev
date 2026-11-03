@@ -1,4 +1,5 @@
 import type { ConnectorMethod } from "@superset/shared/connectors";
+import { pluginConnectorSlug } from "@superset/shared/plugins";
 import {
 	authorizeUrl,
 	connectorMethod,
@@ -12,7 +13,10 @@ import {
 import { encryptSecret } from "@superset/trpc/integrations/plugins";
 
 import { env } from "@/env";
-import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
+import {
+	beginOAuthFlow,
+	connectorStateCookie,
+} from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
 
 export async function GET(
@@ -26,7 +30,11 @@ export async function GET(
 	// Same reason as the callback: the generic connect page covers every
 	// connector, `/integrations/<slug>` only the seven older ones.
 	const connectUrl = `${env.NEXT_PUBLIC_WEB_URL}/connect/${slug}`;
-	const requested = new URL(request.url).searchParams.get("method");
+	const search = new URL(request.url).searchParams;
+	const requested = search.get("method");
+	const plugin = search.get("plugin");
+	const returnsToPlugin =
+		plugin !== null && pluginConnectorSlug(plugin) === slug;
 
 	let method: ConnectorMethod;
 	try {
@@ -49,19 +57,25 @@ export async function GET(
 
 	try {
 		const redirect = redirectUriFor(slug);
-		const wantsPkce =
-			method.type === "oauth2" &&
-			(await resolveEndpoints(slug, method, redirect)).pkce;
-		const codeVerifier = wantsPkce ? createCodeVerifier() : null;
+		const endpoints =
+			method.type === "oauth2"
+				? await resolveEndpoints(slug, method, redirect, { newGrant: true })
+				: undefined;
+		const codeVerifier = endpoints?.pkce ? createCodeVerifier() : null;
+		// The callback must redeem the code as the client that asked for it, and
+		// a dynamic connector can have several registered.
+		const clientId = endpoints?.issuer ? endpoints.clientId : null;
 
 		return await beginOAuthFlow({
-			cookie: STATE_COOKIES.connectors,
+			cookie: connectorStateCookie(slug),
 			payload: {
 				organizationId: member.organizationId,
 				userId: member.userId,
 				...(codeVerifier
 					? { codeVerifier: await encryptSecret(codeVerifier) }
 					: {}),
+				...(returnsToPlugin ? { plugin } : {}),
+				...(clientId ? { clientId } : {}),
 			},
 			authorizeUrl: async (state) =>
 				(
@@ -69,6 +83,7 @@ export async function GET(
 						redirectUri: redirect,
 						state,
 						codeVerifier,
+						endpoints,
 					})
 				).url,
 		});
@@ -77,6 +92,7 @@ export async function GET(
 			console.error(`[connectors/${slug}] ${error.message}`);
 			return Response.redirect(`${connectUrl}?error=not_configured`);
 		}
-		throw error;
+		console.error(`[connectors/${slug}] connect failed:`, error);
+		return Response.redirect(`${connectUrl}?error=connect_failed`);
 	}
 }

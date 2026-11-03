@@ -27,6 +27,14 @@ export function slugify(text: string): string {
 		.replace(/(^-|-$)/g, "");
 }
 
+export function stripInlineMarkdown(text: string): string {
+	return text
+		.replace(/<[^>]*>/g, "")
+		.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+		.replace(/[`*_]/g, "")
+		.trim();
+}
+
 function toDateInput(dateValue: Date | string | number): string {
 	return new Date(dateValue).toISOString().split("T")[0] as string;
 }
@@ -36,19 +44,19 @@ export function normalizeContentDate(
 	options: { fallbackToNow?: boolean } = {},
 ): string | undefined {
 	const { fallbackToNow = true } = options;
-	const fallback = fallbackToNow ? toDateInput(Date.now()) : undefined;
+	const fallback = () => (fallbackToNow ? toDateInput(Date.now()) : undefined);
 
 	if (value instanceof Date) {
 		return toDateInput(value);
 	}
 
 	if (typeof value === "string" || typeof value === "number") {
-		return value ? String(value) : fallback;
+		return value ? String(value) : fallback();
 	}
 
 	if (value) {
 		return String(value);
 	}
 
-	return fallback;
+	return fallback();
 }

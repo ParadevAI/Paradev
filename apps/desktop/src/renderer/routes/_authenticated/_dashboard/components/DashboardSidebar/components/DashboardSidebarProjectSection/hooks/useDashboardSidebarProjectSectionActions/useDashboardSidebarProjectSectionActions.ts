@@ -1,17 +1,21 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
-import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
+import {
+	useOpenNewWorkspace,
+	useOpenNewWorkspaceForHost,
+} from "renderer/hooks/useOpenNewWorkspace";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
-import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
+import { useProjectDeletionHosts } from "renderer/routes/_authenticated/hooks/useProjectDeletionHosts";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
@@ -27,6 +31,7 @@ export function useDashboardSidebarProjectSectionActions({
 }: UseDashboardSidebarProjectSectionActionsOptions) {
 	const { t } = useLingui();
 	const openNewWorkspace = useOpenNewWorkspace();
+	const openNewWorkspaceForHost = useOpenNewWorkspaceForHost();
 	const navigate = useNavigate();
 	// Renames commit on a host serving the project — host.db owns the name.
 	// Prefer the local host when it serves the project (always reachable);
@@ -62,7 +67,8 @@ export function useDashboardSidebarProjectSectionActions({
 		toggleProjectCollapsed,
 		toggleSectionCollapsed,
 	} = useDashboardSidebarState();
-	const canDeleteProject = useIsOrganizationOwner();
+	const canDeleteProject =
+		useProjectDeletionHosts(projectHostIds).hostIds.length > 0;
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 	// Hiding or deleting the project you are inside would leave the view
 	// pointing at a workspace the sidebar no longer shows (or that no longer
@@ -175,7 +181,13 @@ export function useDashboardSidebarProjectSectionActions({
 
 	const openDeleteDialog = () => setIsDeleteDialogOpen(true);
 
+	// A stand-in repo project has no host checkout to create in; only the
+	// cloud can. Its id is the one the cloud picker gives that repository.
 	const handleNewWorkspace = () => {
+		if (project.kind === "cloud-repo") {
+			openNewWorkspaceForHost(CLOUD_HOST_ID, project.id);
+			return;
+		}
 		openNewWorkspace(project.id);
 	};
 

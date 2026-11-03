@@ -1,9 +1,11 @@
 import { auth } from "@superset/auth/server";
-import { stripeClient } from "@superset/auth/stripe";
+import { syncCustomerName } from "@superset/auth/stripe";
 import { db } from "@superset/db/client";
+import { taskTrackerEnum } from "@superset/db/enums";
 import {
 	members,
 	organizations,
+	taskSequences,
 	teamMembers,
 	teams,
 	users,
@@ -13,19 +15,20 @@ import {
 	invitations,
 	verifications,
 } from "@superset/db/schema/auth";
-import { findOrgMembership } from "@superset/db/utils";
+import {
+	cleanupRemovedMember,
+	findMemberRemovalEffects,
+	findOrgMembership,
+} from "@superset/db/utils";
 import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
+import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
-import {
-	jwtProcedure,
-	protectedProcedure,
-	publicProcedure,
-	userError,
-} from "../../trpc";
-import { verifyOrgAdmin } from "../integration/utils";
+import { personProcedure, publicProcedure, userError } from "../../trpc";
+import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { organizationMembersRouter } from "./members";
 
@@ -68,16 +71,27 @@ function verificationMatchesInvitation({
 	);
 }
 
+function countEffects<T extends { automations: unknown[]; hosts: unknown[] }>(
+	effects: T,
+) {
+	return {
+		...effects,
+		automations: effects.automations.length,
+		hosts: effects.hosts.length,
+	};
+}
+
 export const organizationRouter = {
 	members: organizationMembersRouter,
 
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		return db
 			.select({
 				id: organizations.id,
 				name: organizations.name,
 				slug: organizations.slug,
 				logo: organizations.logo,
+				taskTracker: organizations.taskTracker,
 			})
 			.from(organizations)
 			.innerJoin(members, eq(members.organizationId, organizations.id))
@@ -85,7 +99,7 @@ export const organizationRouter = {
 			.orderBy(organizations.name);
 	}),
 
-	listMembers: protectedProcedure
+	listMembers: personProcedure
 		.input(
 			z.object({ includeDeactivated: z.boolean().default(false) }).nullish(),
 		)
@@ -114,7 +128,7 @@ export const organizationRouter = {
 				.where(and(...conditions));
 		}),
 
-	listInvitations: protectedProcedure.query(async ({ ctx }) => {
+	listInvitations: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		return db
 			.select({
@@ -143,7 +157,7 @@ export const organizationRouter = {
 			.orderBy(desc(invitations.createdAt));
 	}),
 
-	listTeams: protectedProcedure.query(async ({ ctx }) => {
+	listTeams: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const [teamRows, teamMemberRows] = await Promise.all([
 			db
@@ -151,9 +165,11 @@ export const organizationRouter = {
 					id: teams.id,
 					name: teams.name,
 					slug: teams.slug,
+					taskKey: taskSequences.key,
 					createdAt: teams.createdAt,
 				})
 				.from(teams)
+				.leftJoin(taskSequences, eq(taskSequences.teamId, teams.id))
 				.where(eq(teams.organizationId, organizationId))
 				.orderBy(teams.name),
 			db
@@ -186,7 +202,7 @@ export const organizationRouter = {
 		}));
 	}),
 
-	getActive: protectedProcedure.query(async ({ ctx }) => {
+	getActive: personProcedure.query(async ({ ctx }) => {
 		const orgId = ctx.activeOrganizationId;
 		if (!orgId) return null;
 
@@ -200,37 +216,38 @@ export const organizationRouter = {
 
 		const org = await db.query.organizations.findFirst({
 			where: eq(organizations.id, orgId),
-			columns: { id: true, name: true, slug: true },
+			columns: { id: true, name: true, slug: true, taskTracker: true },
 		});
 		return org ?? null;
 	}),
 
-	getActiveFromJwt: jwtProcedure.query(async ({ ctx }) => {
-		if (!ctx.activeOrganizationId) return null;
+	getActiveFromJwt: personProcedure.query(async ({ ctx }) => {
+		const organizationId = organizationOrFirst(ctx);
+		if (!organizationId) return null;
 
 		const membership = await db.query.members.findFirst({
 			where: and(
-				eq(members.userId, ctx.userId),
-				eq(members.organizationId, ctx.activeOrganizationId),
+				eq(members.userId, ctx.principal.userId),
+				eq(members.organizationId, organizationId),
 			),
 		});
 		if (!membership) return null;
 
 		const org = await db.query.organizations.findFirst({
-			where: eq(organizations.id, ctx.activeOrganizationId),
-			columns: { id: true, name: true, slug: true },
+			where: eq(organizations.id, organizationId),
+			columns: { id: true, name: true, slug: true, taskTracker: true },
 		});
 		return org ?? null;
 	}),
 
-	getByIdFromJwt: jwtProcedure
+	getByIdFromJwt: personProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.id)) return null;
+			if (!(await isMember(ctx, input.id))) return null;
 
 			const membership = await db.query.members.findFirst({
 				where: and(
-					eq(members.userId, ctx.userId),
+					eq(members.userId, ctx.principal.userId),
 					eq(members.organizationId, input.id),
 				),
 			});
@@ -238,12 +255,12 @@ export const organizationRouter = {
 
 			const org = await db.query.organizations.findFirst({
 				where: eq(organizations.id, input.id),
-				columns: { id: true, name: true, slug: true },
+				columns: { id: true, name: true, slug: true, taskTracker: true },
 			});
 			return org ?? null;
 		}),
 
-	getInvitation: protectedProcedure
+	getInvitation: personProcedure
 		.input(z.uuid())
 		.query(async ({ ctx, input }) => {
 			const invitation = await getInvitationById(input);
@@ -320,7 +337,7 @@ export const organizationRouter = {
 				},
 			};
 		}),
-	create: protectedProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -364,7 +381,7 @@ export const organizationRouter = {
 			return organization;
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -381,6 +398,7 @@ export const organizationRouter = {
 					.regex(/[a-z0-9]$/, "Slug must end with a letter or number")
 					.optional(),
 				logo: z.string().url().optional(),
+				taskTracker: taskTrackerEnum.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -408,6 +426,18 @@ export const organizationRouter = {
 				});
 			}
 
+			if (
+				data.taskTracker === "linear" &&
+				!(await userConnection(id, "linear", ctx.session.user.id))
+			) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message:
+						"Connect your Linear account before tracking tasks in Linear.",
+					i18nKey: "serverError.organization.connectLinearToTrackTasks",
+				});
+			}
+
 			if (data.slug) {
 				const existingOrg = await db.query.organizations.findFirst({
 					where: and(
@@ -432,22 +462,20 @@ export const organizationRouter = {
 				.returning();
 
 			if (organization?.stripeCustomerId && data.name) {
-				stripeClient.customers
-					.update(organization.stripeCustomerId, {
-						name: data.name,
-					})
-					.catch((error) => {
+				syncCustomerName(organization.stripeCustomerId, data.name).catch(
+					(error) => {
 						console.error(
 							"[org/update] Failed to sync Stripe customer info:",
 							error,
 						);
-					});
+					},
+				);
 			}
 
 			return organization;
 		}),
 
-	uploadLogo: protectedProcedure
+	uploadLogo: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -520,7 +548,7 @@ export const organizationRouter = {
 			}
 		}),
 
-	addMember: protectedProcedure
+	addMember: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -540,7 +568,7 @@ export const organizationRouter = {
 			return member;
 		}),
 
-	removeMember: protectedProcedure
+	removeMember: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -613,10 +641,36 @@ export const organizationRouter = {
 				headers: ctx.headers,
 			});
 
-			return { success: true };
+			const cleanup = await cleanupRemovedMember({
+				userId: input.userId,
+				organizationId: input.organizationId,
+			});
+
+			return { success: true, cleanup: countEffects(cleanup) };
 		}),
 
-	leave: protectedProcedure
+	/**
+	 * What removing a member takes with them, for the confirmation before it
+	 * happens. Anyone may ask about themselves; asking about someone else is
+	 * an admin question.
+	 */
+	memberRemovalEffects: personProcedure
+		.input(
+			z.object({
+				organizationId: z.uuid(),
+				userId: z.uuid(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			if (input.userId === ctx.session.user.id) {
+				await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			} else {
+				await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
+			}
+			return countEffects(await findMemberRemovalEffects(input));
+		}),
+
+	leave: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -651,6 +705,11 @@ export const organizationRouter = {
 				});
 			}
 
+			const cleanup = await cleanupRemovedMember({
+				userId: ctx.session.user.id,
+				organizationId: input.organizationId,
+			});
+
 			const otherMembership = await db.query.members.findFirst({
 				where: and(
 					eq(members.userId, ctx.session.user.id),
@@ -673,10 +732,11 @@ export const organizationRouter = {
 			return {
 				success: true,
 				activeOrganizationId: otherMembership?.organizationId ?? null,
+				cleanup: countEffects(cleanup),
 			};
 		}),
 
-	updateMemberRole: protectedProcedure
+	updateMemberRole: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),

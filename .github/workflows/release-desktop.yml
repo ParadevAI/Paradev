@@ -28,6 +28,7 @@ jobs:
     name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: startsWith(github.ref, 'refs/tags/desktop-v')
 
     steps:
@@ -141,6 +142,6 @@ jobs:
         run: |
           gh release create "${{ github.ref_name }}" \
             release-artifacts/* \
-            --title "Superset Desktop ${{ github.ref_name }}" \
+            --title "Paradev Desktop ${{ github.ref_name }}" \
             --notes-file release_notes.md \
             --draft

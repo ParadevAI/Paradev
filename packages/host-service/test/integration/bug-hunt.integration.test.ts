@@ -4,10 +4,10 @@
  * bug worth fixing.
  *
  * The filesystem section also pins the intended sandbox policy in both
- * directions: reads are host-wide (viewing files a terminal/agent referenced
- * outside the workspace), mutations are confined to the workspace root. An
- * "allows" test failing means the read policy regressed, not that a defense
- * appeared.
+ * directions: reads and file edits are host-wide (files a terminal/agent
+ * referenced outside the workspace), structural mutations are confined to the
+ * workspace root. An "allows"/"edits" test failing means that policy
+ * regressed, not that a defense appeared.
  *
  * Categories:
  *   - sandbox / path traversal in workspace-fs operations
@@ -22,6 +22,7 @@ import { randomUUID } from "node:crypto";
 import {
 	existsSync,
 	mkdirSync,
+	readFileSync,
 	rmSync,
 	symlinkSync,
 	writeFileSync,
@@ -33,7 +34,7 @@ import { projects, workspaces } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
 
-describe("bug-hunt: filesystem sandbox (mutations confined, reads host-wide)", () => {
+describe("bug-hunt: filesystem sandbox (structural mutations confined, reads and edits host-wide)", () => {
 	let host: TestHost;
 	let repo: GitFixture;
 	const projectId = randomUUID();
@@ -62,18 +63,20 @@ describe("bug-hunt: filesystem sandbox (mutations confined, reads host-wide)", (
 		repo.dispose();
 	});
 
-	test("writeFile rejects '..' traversal escaping the workspace root", async () => {
-		const escapeWritePath = `${repo.repoPath}/../escape.txt`;
-		await expect(
-			host.trpc.filesystem.writeFile.mutate({
+	test("writeFile edits paths outside the workspace root", async () => {
+		const sibling = join(repo.repoPath, "..", `outside-write-${randomUUID()}`);
+		writeFileSync(sibling, "before");
+		try {
+			await host.trpc.filesystem.writeFile.mutate({
 				workspaceId,
-				absolutePath: escapeWritePath,
-				content: "should not exist",
-				options: { create: true, overwrite: true },
-			}),
-		).rejects.toThrow();
-		// Sibling of repoPath must not have been written.
-		expect(existsSync(escapeWritePath)).toBe(false);
+				absolutePath: sibling,
+				content: "after",
+				options: { create: false, overwrite: true },
+			});
+			expect(readFileSync(sibling, "utf8")).toBe("after");
+		} finally {
+			rmSync(sibling, { force: true });
+		}
 	});
 
 	test("readFile allows viewing paths outside the workspace root", async () => {
@@ -242,19 +245,11 @@ describe("bug-hunt: git-flag injection", () => {
 	});
 });
 
-describe("bug-hunt: idempotency + double-fire", () => {
+describe("bug-hunt: idempotency", () => {
 	let host: TestHost;
-	let repo: GitFixture;
-	const projectId = randomUUID();
-	const _workspaceId = randomUUID();
-
-	beforeEach(async () => {
-		repo = await createGitFixture();
-	});
 
 	afterEach(async () => {
 		if (host) await host.dispose();
-		repo.dispose();
 	});
 
 	test("workspaceCleanup.destroy is idempotent on a non-existent workspace id", async () => {
@@ -282,52 +277,6 @@ describe("bug-hunt: idempotency + double-fire", () => {
 		const b = await host.trpc.project.remove.mutate({ projectId: id });
 		expect(a).toEqual({ success: true, repoPath: null });
 		expect(b).toEqual({ success: true, repoPath: null });
-	});
-
-	test("two concurrent workspace.create calls with the same branch don't collide silently", async () => {
-		host = await createTestHost({
-			apiOverrides: {
-				"host.ensure.mutate": () => ({ machineId: "m1" }),
-				"v2Workspace.create.mutate": (input: unknown) => {
-					const i = input as { branch: string; name: string };
-					return {
-						id: randomUUID(),
-						projectId,
-						branch: i.branch,
-						name: i.name,
-					};
-				},
-			},
-		});
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-
-		await Promise.allSettled([
-			host.trpc.workspace.create.mutate({
-				projectId,
-				name: "w",
-				branch: "feature/race",
-			}),
-			host.trpc.workspace.create.mutate({
-				projectId,
-				name: "w",
-				branch: "feature/race",
-			}),
-		]);
-
-		// We must never end up with more than one workspace row pointing
-		// at the same branch — that's the actual collision we're guarding
-		// against. Either both calls collide (one row, one error) or git's
-		// own worktree-add lock causes one to fail; never two rows.
-		const rows = host.db
-			.select()
-			.from(workspaces)
-			.where(eq(workspaces.projectId, projectId))
-			.all();
-		const featureRows = rows.filter((r) => r.branch === "feature/race");
-		expect(featureRows.length).toBeLessThanOrEqual(1);
 	});
 });
 

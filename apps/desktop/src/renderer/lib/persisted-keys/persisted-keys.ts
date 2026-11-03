@@ -9,6 +9,10 @@ interface DeadKey {
  * the writer.
  */
 export const DEAD_KEYS: DeadKey[] = [
+	// Device-local Chat setting; moved to the account (user_settings.experimental_chat)
+	{ key: "acp-chat", match: "exact" },
+	// The task page's inline agent picker; Start work opens New Workspace instead
+	{ key: "lastSelectedV2TaskAgent", match: "exact" },
 	{ key: "getting-started-v1", match: "exact" },
 	// Pending-create records; superseded by canonical workspaces.create (#3893)
 	{ key: "pending-workspaces-", match: "prefix" },
@@ -16,6 +20,8 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "v2-terminal-presets-migrated-", match: "prefix" },
 	// Replaced by v2-notifications-v1
 	{ key: "notification-center-store", match: "exact" },
+	// Right pane area opt-out; the right pane area is on for everyone
+	{ key: "right-pane-area", match: "exact" },
 	// Workspace details moved into the workspace item (#5392)
 	{ key: "workspace-details-store", match: "exact" },
 	// Replaced by the v2 onboarding setup flow (#4080)
@@ -44,8 +50,13 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "leaderboard-asked-v1", match: "exact" },
 	// Opening a page no longer routes to the last-visited workspace
 	{ key: "last-active-v2-workspace", match: "exact" },
-	// Sidebar automations failure badge removed; it polled for every window
-	{ key: "automation-failures-v1", match: "exact" },
+	// v1/v2 surface toggle; v2 is always on
+	{ key: "v2-local-override-v2", match: "exact" },
+	// New-sidebar experiment toggle; the new sidebar is always on
+	{ key: "new-dashboard-sidebar", match: "exact" },
+	// File explorer and search dialog zustand stores had no consumers
+	{ key: "file-explorer-store", match: "exact" },
+	{ key: "search-dialog-store", match: "exact" },
 ];
 
 function matchesDeadKey(key: string): boolean {

@@ -14,3 +14,6 @@
 "Could not start dictation" = "Diktování se nepodařilo spustit";
 "Uploading" = "Nahrávání";
 "Upload failed" = "Nahrání se nezdařilo";
+"Stop" = "Zastavit";
+"Dictation stopped. What was heard so far is in your message." = "Diktování se zastavilo. To, co bylo dosud slyšet, je ve zprávě.";
+"Transcription took too long. The last few words may be missing." = "Přepisování trvalo příliš dlouho. Několik posledních slov může chybět.";

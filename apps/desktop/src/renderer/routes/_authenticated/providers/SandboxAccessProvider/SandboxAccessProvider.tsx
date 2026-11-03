@@ -1,13 +1,27 @@
-import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
+import {
+	type UseQueryResult,
+	useQueries,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { useMatchRoute } from "@tanstack/react-router";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useMemo,
+	useState,
+} from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { setHostServiceSecret } from "renderer/lib/host-service-auth";
+import {
+	accessRefetchInterval,
+	createFailureStreak,
+	wakeRefetchInterval,
+} from "./utils/accessRefetchInterval";
 
-/** Re-mint with time to spare; a ticket lasts hours, so this is rare. */
-const REFRESH_AT = 0.8;
-const RETRY_MS = 30_000;
 /**
  * The open workspace's wake is also what extends its sandbox session, which
  * stops after hours of not being asked; and if the session stops anyway, the
@@ -28,14 +42,20 @@ export interface SandboxAccessValue {
 	targets: SandboxTarget[];
 	/** False until the cloud list is known and every ready workspace in it has been addressed once. */
 	isReady: boolean;
+	/** The open workspace, when its box booted with agent sign-ins its creator has since changed. */
+	agentCredentialsChangedWorkspaceId: string | null;
+	usageRefusal: { workspaceId: string; error: unknown } | null;
 }
 
-const SandboxAccessContext = createContext<SandboxAccessValue | null>(null);
+export const SandboxAccessContext = createContext<SandboxAccessValue | null>(
+	null,
+);
 
 interface SandboxAccess {
 	url: string;
 	desktopUrl: string;
 	expiresAt: number;
+	agentCredentialsChanged: boolean;
 }
 
 function sandboxAccessQueryKey(workspaceId: string) {
@@ -56,6 +76,17 @@ async function requestAccess(
 		url: granted.url,
 		desktopUrl: granted.desktop.url,
 		expiresAt: new Date(granted.expiresAt).getTime(),
+		agentCredentialsChanged: granted.agentCredentialsChanged,
+	};
+}
+
+// Module-level so useQueries keeps the combined result stable across renders:
+// the provider re-renders on every route change, and a new value would
+// re-render every consumer.
+function combineAccess(results: UseQueryResult<SandboxAccess>[]) {
+	return {
+		data: results.map((result) => result.data),
+		allFetched: results.every((result) => result.isFetched),
 	};
 }
 
@@ -75,7 +106,11 @@ async function requestAccess(
  */
 export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 	const { workspaces: cloudWorkspaces, organizationId } = useCloudWorkspaces();
-	const { workspaceId: openWorkspaceId } = useParams({ strict: false });
+	const openMatch = useMatchRoute()({
+		to: "/v2-workspace/$workspaceId",
+		fuzzy: true,
+	});
+	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;
 
 	// Only a `ready` row has a sandbox to address: `access` refuses anything
 	// else, and a provisioning workspace asking for a ticket every few seconds
@@ -88,26 +123,36 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		[cloudWorkspaces],
 	);
 
-	const results = useQueries({
+	const [failureStreak] = useState(createFailureStreak);
+	const access = useQueries({
 		queries: workspaces.map((workspace) => ({
 			queryKey: sandboxAccessQueryKey(workspace.id),
 			// The gate is reachable over the public internet, so this must not
 			// pause with navigator.onLine the way the default mode would.
 			networkMode: "always" as const,
 			queryFn: () => requestAccess(workspace.id, false),
-			refetchInterval: (query: { state: { data?: SandboxAccess } }): number => {
-				const expiresAt = query.state.data?.expiresAt;
-				if (!expiresAt) return RETRY_MS;
-				return Math.max(RETRY_MS, (expiresAt - Date.now()) * REFRESH_AT);
-			},
+			refetchInterval: (query: {
+				queryHash: string;
+				state: {
+					data?: SandboxAccess;
+					error: unknown;
+					errorUpdateCount: number;
+				};
+			}): number =>
+				accessRefetchInterval({
+					data: query.state.data,
+					error: query.state.error,
+					consecutiveFailures: failureStreak(query.queryHash, query.state),
+				}),
 			refetchIntervalInBackground: true,
 		})),
+		combine: combineAccess,
 	});
 
 	const queryClient = useQueryClient();
 	const openWorkspace =
 		workspaces.find((workspace) => workspace.id === openWorkspaceId) ?? null;
-	useQuery({
+	const wake = useQuery({
 		queryKey: ["cloud-workspace", "wake", openWorkspace?.id] as const,
 		enabled: openWorkspace !== null,
 		networkMode: "always",
@@ -117,30 +162,48 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 			queryClient.setQueryData(sandboxAccessQueryKey(openWorkspace.id), access);
 			return access;
 		},
-		refetchInterval: OPEN_WORKSPACE_KEEPALIVE_MS,
+		refetchInterval: (query) =>
+			wakeRefetchInterval(
+				{
+					error: query.state.error,
+					consecutiveFailures: failureStreak(query.queryHash, query.state),
+				},
+				OPEN_WORKSPACE_KEEPALIVE_MS,
+			),
 		refetchIntervalInBackground: true,
 		gcTime: 0,
 	});
 
-	const value = useMemo<SandboxAccessValue>(() => {
-		const targets: SandboxTarget[] = [];
+	const targets = useMemo(() => {
+		const next: SandboxTarget[] = [];
 		for (const [index, workspace] of workspaces.entries()) {
-			const data = results[index]?.data;
+			const data = access.data[index];
 			if (!data || !organizationId) continue;
-			targets.push({
+			next.push({
 				workspaceId: workspace.id,
 				organizationId,
 				url: data.url,
 				desktopUrl: data.desktopUrl,
 			});
 		}
-		return {
+		return next;
+	}, [workspaces, access, organizationId]);
+
+	const value = useMemo<SandboxAccessValue>(
+		() => ({
 			targets,
-			isReady:
-				cloudWorkspaces !== undefined &&
-				results.every((result) => result.isFetched),
-		};
-	}, [cloudWorkspaces, workspaces, results, organizationId]);
+			isReady: cloudWorkspaces !== undefined && access.allFetched,
+			agentCredentialsChangedWorkspaceId:
+				openWorkspace && wake.data?.agentCredentialsChanged
+					? openWorkspace.id
+					: null,
+			usageRefusal:
+				openWorkspace && isCloudUsageRefusal(wake.error)
+					? { workspaceId: openWorkspace.id, error: wake.error }
+					: null,
+		}),
+		[targets, cloudWorkspaces, access, openWorkspace, wake.data, wake.error],
+	);
 
 	return (
 		<SandboxAccessContext.Provider value={value}>
@@ -151,5 +214,12 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 
 /** Empty (never null) so consumers work outside the provider, e.g. in tests. */
 export function useSandboxAccess(): SandboxAccessValue {
-	return useContext(SandboxAccessContext) ?? { targets: [], isReady: true };
+	return (
+		useContext(SandboxAccessContext) ?? {
+			targets: [],
+			isReady: true,
+			agentCredentialsChangedWorkspaceId: null,
+			usageRefusal: null,
+		}
+	);
 }

@@ -71,6 +71,15 @@ const externalizedRuntimeModules: ExternalizedRuntimeModule[] = [
 	},
 ];
 
+/** The device hub runs as its own process from app.asar.unpacked, so it and
+ * everything it loads at runtime must be real files there. */
+const deviceHubUnpackGlobs = [
+	"**/node_modules/expo-device-hub/**/*",
+	"**/node_modules/ws/**/*",
+	"**/node_modules/mediabunny/**/*",
+	"**/node_modules/@fastify/busboy/**/*",
+];
+
 const packagedSupportModules = [
 	copyWholeModule("bindings"),
 	copyWholeModule("file-uri-to-path"),
@@ -93,6 +102,7 @@ export const packagedNodeModuleCopies = [
 
 export const packagedAsarUnpackGlobs = [
 	...externalizedRuntimeModules.flatMap((module) => module.asarUnpackGlobs),
+	...deviceHubUnpackGlobs,
 	"**/node_modules/bindings/**/*",
 	"**/node_modules/file-uri-to-path/**/*",
 ];

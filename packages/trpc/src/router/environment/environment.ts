@@ -1,25 +1,23 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
-	cloudWorkspaces,
+	environmentProjects,
 	environmentRepositories,
 	environmentScopeValues,
+	environmentSecrets,
 	environments,
 	githubRepositories,
 } from "@superset/db/schema";
-import {
-	SANDBOX_IMAGE_NAME,
-	SHARED_ENVIRONMENT_ORGANIZATION_ID,
-} from "@superset/shared/constants";
-import {
-	DEFAULT_SANDBOX_REGION,
-	nearestSandboxRegion,
-	SANDBOX_REGION_IDS,
-	type SandboxRegionId,
-} from "@superset/shared/sandbox-regions";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
+import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
-import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
+import {
+	assertCloudAccess,
+	assertMember,
+	isMember,
+	type MemberContext,
+} from "../../lib/cloud-guards";
 import {
 	buildSandboxClaim,
 	deleteSandbox,
@@ -30,21 +28,26 @@ import {
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
-import { jwtProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
+import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { currentBundleSha } from "./current-bundle";
+import {
+	assertEnvironmentCapacity,
+	assertEnvironmentCapacityLocked,
+} from "./limit";
+import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
+import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
 
 /** An environment the caller may see; another member's personal one does not exist to them. */
-export async function loadEnvironment(
-	id: string,
-	ctx: { organizationIds: string[]; userId: string },
-) {
+export async function loadEnvironment(id: string, ctx: MemberContext) {
 	const row = await db.query.environments.findFirst({
 		where: and(eq(environments.id, id), isNull(environments.archivedAt)),
 	});
 	const visible =
 		row &&
-		ctx.organizationIds.includes(row.organizationId) &&
-		(row.scope !== "personal" || row.createdByUserId === ctx.userId);
+		(await isMember(ctx, row.organizationId)) &&
+		(row.scope !== "personal" || row.createdByUserId === ctx.principal.userId);
 	if (!visible) {
 		throw userError({
 			code: "NOT_FOUND",
@@ -55,45 +58,36 @@ export async function loadEnvironment(
 	return row;
 }
 
-export function isSharedEnvironment(row: { organizationId: string }): boolean {
-	return row.organizationId === SHARED_ENVIRONMENT_ORGANIZATION_ID;
-}
-
-export function secretOwnerOrganizationId(
-	row: { organizationId: string },
-	activeOrganizationId: string | null,
+/**
+ * Who a personal environment belongs to: only its owner can see it, so a row
+ * nobody created (the release's) becomes the caller's, and another person's
+ * cannot be taken.
+ */
+function personalOwner(
+	row: { createdByUserId: string | null },
+	userId: string,
 ): string {
-	if (!isSharedEnvironment(row)) return row.organizationId;
-	if (!activeOrganizationId) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message: "No active organization",
-			i18nKey: "serverError.environment.noActiveOrganization",
-		});
-	}
-	return activeOrganizationId;
-}
-
-function assertOwned(row: { organizationId: string }): void {
-	if (isSharedEnvironment(row)) {
+	if (row.createdByUserId && row.createdByUserId !== userId) {
 		throw userError({
 			code: "FORBIDDEN",
-			message: "This environment is managed by Superset and cannot be changed",
-			i18nKey: "serverError.environment.sharedEnvironmentIsReadOnly",
+			message:
+				"Only the person who created this environment can make it personal",
+			i18nKey: "serverError.environment.personalNotCreator",
 		});
 	}
+	return userId;
 }
 
 /** The repositories of many environments at once, the primary first then by name. */
 async function repositoriesByEnvironment(
 	environmentRows: ReadonlyArray<{
 		id: string;
-		hooksRepositoryId: string | null;
+		primaryRepositoryId: string | null;
 	}>,
 ) {
 	const environmentIds = environmentRows.map((row) => row.id);
-	const hooksById = new Map(
-		environmentRows.map((row) => [row.id, row.hooksRepositoryId]),
+	const primaryById = new Map(
+		environmentRows.map((row) => [row.id, row.primaryRepositoryId]),
 	);
 	const rows = environmentIds.length
 		? await db
@@ -120,7 +114,7 @@ async function repositoriesByEnvironment(
 		map.set(environmentId, [...(map.get(environmentId) ?? []), repo]);
 	}
 	for (const [environmentId, repos] of map) {
-		const primary = primaryRepository(repos, hooksById.get(environmentId));
+		const primary = primaryRepository(repos, primaryById.get(environmentId));
 		map.set(environmentId, [
 			...(primary ? [primary] : []),
 			...sortRepositories(repos).filter((repo) => repo.id !== primary?.id),
@@ -129,11 +123,44 @@ async function repositoriesByEnvironment(
 	return map;
 }
 
+async function projectIdsByEnvironment(environmentIds: readonly string[]) {
+	const rows = environmentIds.length
+		? await db
+				.select({
+					environmentId: environmentProjects.environmentId,
+					projectId: environmentProjects.projectId,
+				})
+				.from(environmentProjects)
+				.where(inArray(environmentProjects.environmentId, [...environmentIds]))
+		: [];
+	const map = new Map<string, string[]>();
+	for (const { environmentId, projectId } of rows) {
+		map.set(environmentId, [...(map.get(environmentId) ?? []), projectId]);
+	}
+	return map;
+}
+
+async function linkProject(args: {
+	environmentId: string;
+	organizationId: string;
+	projectId: string;
+}) {
+	await db
+		.insert(environmentProjects)
+		.values(args)
+		.onConflictDoNothing({
+			target: [
+				environmentProjects.environmentId,
+				environmentProjects.projectId,
+			],
+		});
+}
+
 async function setEnvironmentRepositories(args: {
 	environmentId: string;
 	organizationId: string;
 	repositoryIds: readonly string[];
-	hooksRepositoryId: string | null | undefined;
+	primaryRepositoryId: string;
 }): Promise<void> {
 	let repositories: Awaited<ReturnType<typeof loadRepositories>>;
 	try {
@@ -149,16 +176,8 @@ async function setEnvironmentRepositories(args: {
 			i18nKey: "serverError.environment.repositoryNotConnected",
 		});
 	}
-	if (
-		args.hooksRepositoryId &&
-		!repositories.some((repo) => repo.id === args.hooksRepositoryId)
-	) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message:
-				"The hooks repository must be one of the environment's repositories",
-			i18nKey: "serverError.environment.hooksRepositoryNotIncluded",
-		});
+	if (!repositories.some((repo) => repo.id === args.primaryRepositoryId)) {
+		throw primaryNotIncluded();
 	}
 	await db
 		.delete(environmentRepositories)
@@ -173,34 +192,55 @@ async function setEnvironmentRepositories(args: {
 	}
 	await db
 		.update(environments)
-		.set({ hooksRepositoryId: args.hooksRepositoryId ?? null })
+		.set({ primaryRepositoryId: args.primaryRepositoryId })
 		.where(eq(environments.id, args.environmentId));
 }
 
-/**
- * The region nearest the caller, from the coordinates Vercel stamps on the
- * request; the default when they are missing (local dev, a proxy).
- */
-function regionForRequest(headers: Headers): SandboxRegionId {
-	const lat = Number(headers.get("x-vercel-ip-latitude"));
-	const lng = Number(headers.get("x-vercel-ip-longitude"));
-	return Number.isFinite(lat) && Number.isFinite(lng) && (lat || lng)
-		? nearestSandboxRegion(lat, lng)
-		: DEFAULT_SANDBOX_REGION;
+function primaryNotIncluded() {
+	return userError({
+		code: "BAD_REQUEST",
+		message:
+			"The primary repository must be one of the environment's repositories",
+		i18nKey: "serverError.environment.primaryRepositoryNotIncluded",
+	});
+}
+
+async function loadPromotable(
+	ctx: Parameters<typeof loadVisibleWorkspace>[0],
+	cloudWorkspaceId: string,
+) {
+	const workspace = await loadVisibleWorkspace(ctx, cloudWorkspaceId);
+	if (workspace.status !== "ready") {
+		throw userError({
+			code: "PRECONDITION_FAILED",
+			message: "Only a ready workspace can become an environment",
+			i18nKey: "serverError.environment.workspaceNotReady",
+		});
+	}
+	const source = await db.query.environments.findFirst({
+		where: eq(environments.id, workspace.environmentId),
+	});
+	const checkouts = await workspaceRepositories({
+		cloudWorkspaceId: workspace.id,
+		primaryRepositoryId: source?.primaryRepositoryId ?? null,
+		primaryBranch: workspace.baseBranch,
+		workingBranch: workspace.branch,
+	});
+	return { workspace, source, checkouts };
 }
 
 export const environmentRouter = {
 	secrets: secretsRouter,
 
-	suggestRegion: jwtProcedure.query(({ ctx }) => ({
+	suggestRegion: personProcedure.query(({ ctx }) => ({
 		region: regionForRequest(ctx.headers),
 	})),
 
-	list: jwtProcedure
+	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const rows = await db
 				.select()
 				.from(environments)
@@ -211,57 +251,78 @@ export const environmentRouter = {
 						// A personal environment is its creator's alone.
 						or(
 							eq(environments.scope, "organization"),
-							eq(environments.createdByUserId, ctx.userId),
+							eq(environments.createdByUserId, ctx.principal.userId),
 						),
 					),
 				)
 				.orderBy(asc(environments.name));
-			const repos = await repositoriesByEnvironment(rows);
+			const ids = rows.map((row) => row.id);
+			const [repos, projects] = await Promise.all([
+				repositoriesByEnvironment(rows),
+				projectIdsByEnvironment(ids),
+			]);
 			return rows.map((row) => ({
 				...row,
 				repositories: repos.get(row.id) ?? [],
+				projectIds: projects.get(row.id) ?? [],
 			}));
 		}),
 
-	get: jwtProcedure
+	get: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const row = await loadEnvironment(input.id, ctx);
-			const repos = await repositoriesByEnvironment([row]);
-			return { ...row, repositories: repos.get(row.id) ?? [] };
+			await assertCloudAccess(ctx, row.organizationId);
+			const [repos, projects] = await Promise.all([
+				repositoriesByEnvironment([row]),
+				projectIdsByEnvironment([row.id]),
+			]);
+			return {
+				...row,
+				repositories: repos.get(row.id) ?? [],
+				projectIds: projects.get(row.id) ?? [],
+			};
 		}),
 
-	create: jwtProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
 				name: z.string().min(1).max(100),
-				/** In order; the first is the primary, the one a workspace opens on. */
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20),
-				/** Which repository's `.superset/config.json` the box acts on. */
-				hooksRepositoryId: z.string().uuid().nullable().optional(),
+				/** The repository a workspace opens on; its Paradev config runs. */
+				primaryRepositoryId: z.string().uuid(),
 				scope: z.enum(environmentScopeValues).default("organization"),
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
+				projectId: z.string().min(1).max(200).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			assertMember(ctx.organizationIds, input.organizationId);
-			const [row] = await db
-				.insert(environments)
-				.values({
-					organizationId: input.organizationId,
-					name: input.name,
-					provider: "vercel",
-					sourceKind: "image",
-					sourceRef: SANDBOX_IMAGE_NAME,
-					region: input.region ?? regionForRequest(ctx.headers),
-					scope: input.scope,
-					createdByUserId: ctx.userId,
-				})
-				.returning();
+			await assertMember(ctx, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
+			const limit = await assertEnvironmentCapacity(input.organizationId);
+			if (!input.repositoryIds.includes(input.primaryRepositoryId)) {
+				throw primaryNotIncluded();
+			}
+			const [row] = await dbWs.transaction(async (tx) => {
+				await assertEnvironmentCapacityLocked(tx, input.organizationId, limit);
+				const bundleSha = await currentBundleSha();
+				return tx
+					.insert(environments)
+					.values({
+						organizationId: input.organizationId,
+						name: input.name,
+						provider: "vercel",
+						sourceKind: "image",
+						sourceRef: SANDBOX_IMAGE_NAME,
+						region: input.region ?? regionForRequest(ctx.headers),
+						bundleSha,
+						scope: input.scope,
+						createdByUserId: ctx.principal.userId,
+					})
+					.returning();
+			});
 			if (!row) {
 				throw userError({
 					code: "INTERNAL_SERVER_ERROR",
@@ -269,110 +330,290 @@ export const environmentRouter = {
 					i18nKey: "serverError.environment.couldNotRecord",
 				});
 			}
-			await setEnvironmentRepositories({
-				environmentId: row.id,
-				organizationId: input.organizationId,
-				repositoryIds: input.repositoryIds,
-				hooksRepositoryId: input.hooksRepositoryId,
-			});
-			return row;
+			try {
+				await setEnvironmentRepositories({
+					environmentId: row.id,
+					organizationId: input.organizationId,
+					repositoryIds: input.repositoryIds,
+					primaryRepositoryId: input.primaryRepositoryId,
+				});
+				if (input.projectId) {
+					await linkProject({
+						environmentId: row.id,
+						organizationId: input.organizationId,
+						projectId: input.projectId,
+					});
+				}
+			} catch (error) {
+				await db.delete(environments).where(eq(environments.id, row.id));
+				throw error;
+			}
+			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
 		}),
 
-	promote: jwtProcedure
+	linkProject: personProcedure
 		.input(
 			z.object({
-				cloudWorkspaceId: z.string().uuid(),
-				name: z.string().min(1).max(100),
+				environmentId: z.string().uuid(),
+				projectId: z.string().min(1).max(200),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
-			const workspace = await db.query.cloudWorkspaces.findFirst({
-				where: eq(cloudWorkspaces.id, input.cloudWorkspaceId),
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await linkProject({
+				environmentId: environment.id,
+				organizationId: environment.organizationId,
+				projectId: input.projectId,
 			});
-			if (!workspace) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Cloud workspace not found",
-					i18nKey: "serverError.environment.cloudWorkspaceNotFound",
-				});
-			}
-			assertMember(ctx.organizationIds, workspace.organizationId);
-			if (workspace.status !== "ready") {
-				throw userError({
-					code: "PRECONDITION_FAILED",
-					message: "Only a ready workspace can become an environment",
-					i18nKey: "serverError.environment.workspaceNotReady",
-				});
-			}
+			return { linked: true };
+		}),
 
-			const source = await db.query.environments.findFirst({
-				where: eq(environments.id, workspace.environmentId),
-			});
-			const checkouts = await workspaceRepositories({
-				cloudWorkspaceId: workspace.id,
-				hooksRepositoryId: source?.hooksRepositoryId ?? null,
-				primaryBranch: workspace.baseBranch,
-				workingBranch: workspace.branch,
-			});
-			const environmentId = crypto.randomUUID();
-			const goldenName = `env-${environmentId.replaceAll("-", "").slice(0, 24)}`;
+	unlinkProject: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				projectId: z.string().min(1).max(200),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await db
+				.delete(environmentProjects)
+				.where(
+					and(
+						eq(environmentProjects.environmentId, environment.id),
+						eq(environmentProjects.projectId, input.projectId),
+					),
+				);
+			return { linked: false };
+		}),
+
+	/** What promoting this workspace would make, before its golden is built. */
+	promotePreview: personProcedure
+		.input(z.object({ cloudWorkspaceId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			const { workspace, source, checkouts } = await loadPromotable(
+				ctx,
+				input.cloudWorkspaceId,
+			);
+			return {
+				name: workspace.name,
+				repositories: checkouts.map((entry, index) => ({
+					id: entry.repository.id,
+					fullName: entry.repository.fullName,
+					primary: index === 0,
+				})),
+				region: source?.region ?? null,
+				scope: source?.scope ?? "organization",
+			};
+		}),
+
+	promote: personProcedure
+		.input(
+			z
+				.object({
+					cloudWorkspaceId: z.string().uuid(),
+					/** Save as a new environment by this name. */
+					name: z.string().min(1).max(100).optional(),
+					/** Or rebuild this one from the workspace, keeping its id, name and secrets. */
+					environmentId: z.string().uuid().optional(),
+					scope: z.enum(environmentScopeValues).optional(),
+				})
+				.refine(
+					(input) => Boolean(input.name) !== Boolean(input.environmentId),
+					{
+						message: "Pass either a name or an environmentId",
+					},
+				),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { workspace, source, checkouts } = await loadPromotable(
+				ctx,
+				input.cloudWorkspaceId,
+			);
+			const target = input.environmentId
+				? await loadEnvironment(input.environmentId, ctx)
+				: null;
+			if (target) {
+				if (target.organizationId !== workspace.organizationId) {
+					throw userError({
+						code: "BAD_REQUEST",
+						message:
+							"The workspace and the environment are in different organizations",
+						i18nKey: "serverError.environment.organizationMismatch",
+					});
+				}
+			}
+			const targetOwner =
+				target && input.scope === "personal"
+					? personalOwner(target, ctx.principal.userId)
+					: null;
+
+			const environmentId = target?.id ?? crypto.randomUUID();
+			// The row keeps forking from the old golden until the update lands, so the new one needs its own name.
+			const goldenName = `env-${(target ? crypto.randomUUID() : environmentId).replaceAll("-", "").slice(0, 24)}`;
+			const inheritedSecrets =
+				target || !source
+					? []
+					: await db
+							.select()
+							.from(environmentSecrets)
+							.where(
+								and(
+									eq(environmentSecrets.environmentId, source.id),
+									eq(
+										environmentSecrets.organizationId,
+										workspace.organizationId,
+									),
+								),
+							);
+
+			const limit = target
+				? null
+				: await assertEnvironmentCapacity(workspace.organizationId);
 			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
 				claim,
 			});
-
-			const [row] = await db
-				.insert(environments)
-				.values({
-					id: environmentId,
-					organizationId: workspace.organizationId,
-					name: input.name,
-					provider: workspace.provider,
-					sourceKind: "fork",
-					sourceRef: goldenName,
-					region: golden.region,
-					bundleSha: source?.bundleSha ?? null,
-					scope: source?.scope ?? "organization",
-					createdByUserId: ctx.userId,
+			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
+			const fromGolden = {
+				provider: workspace.provider,
+				sourceKind: "fork" as const,
+				sourceRef: goldenName,
+				region: golden.region,
+				bundleSha: await currentBundleSha(),
+				primaryRepositoryId,
+			};
+			const row = await dbWs
+				.transaction(async (tx) => {
+					if (limit !== null) {
+						await assertEnvironmentCapacityLocked(
+							tx,
+							workspace.organizationId,
+							limit,
+						);
+					}
+					const [saved] = target
+						? await tx
+								.update(environments)
+								.set({
+									...fromGolden,
+									...(input.scope ? { scope: input.scope } : {}),
+									...(targetOwner ? { createdByUserId: targetOwner } : {}),
+								})
+								.where(
+									and(
+										eq(environments.id, target.id),
+										isNull(environments.archivedAt),
+										eq(environments.sourceRef, target.sourceRef),
+										eq(environments.scope, target.scope),
+										target.createdByUserId
+											? eq(environments.createdByUserId, target.createdByUserId)
+											: isNull(environments.createdByUserId),
+									),
+								)
+								.returning()
+						: await tx
+								.insert(environments)
+								.values({
+									id: environmentId,
+									organizationId: workspace.organizationId,
+									name: input.name as string,
+									...fromGolden,
+									scope: input.scope ?? source?.scope ?? "organization",
+									createdByUserId: ctx.principal.userId,
+								})
+								.returning();
+					// The golden baked these checkouts; a fork must ask for the same.
+					await tx
+						.delete(environmentRepositories)
+						.where(eq(environmentRepositories.environmentId, environmentId));
+					await tx.insert(environmentRepositories).values(
+						checkouts.map((entry) => ({
+							environmentId,
+							repositoryId: entry.repository.id,
+						})),
+					);
+					if (source && inheritedSecrets.length) {
+						await tx.insert(environmentSecrets).values(
+							inheritedSecrets.map((secret) => ({
+								organizationId: secret.organizationId,
+								environmentId,
+								key: secret.key,
+								encryptedValue: encryptSecret(
+									decryptSecret(secret.encryptedValue, {
+										environmentId: source.id,
+										organizationId: secret.organizationId,
+										key: secret.key,
+									}),
+									{
+										environmentId,
+										organizationId: secret.organizationId,
+										key: secret.key,
+									},
+								),
+								sensitive: secret.sensitive,
+								createdByUserId: secret.createdByUserId,
+							})),
+						);
+					}
+					if (!saved) {
+						throw userError({
+							code: "CONFLICT",
+							message:
+								"The environment changed while this workspace was being saved; run it again",
+							i18nKey: "serverError.environment.changedDuringPromote",
+						});
+					}
+					return saved;
 				})
-				.returning();
-			// The golden baked these checkouts; a fork must ask for the same.
-			await db.insert(environmentRepositories).values(
-				checkouts.map((entry) => ({
-					environmentId,
-					repositoryId: entry.repository.id,
-				})),
-			);
-			await db
-				.update(environments)
-				.set({
-					hooksRepositoryId:
-						checkouts.find((entry) => entry.hooks)?.repository.id ?? null,
-				})
-				.where(eq(environments.id, environmentId));
+				.catch(async (error: unknown) => {
+					await deleteSandbox(goldenName).catch((cleanup: unknown) =>
+						console.error(
+							`[environment/promote] could not delete unused golden ${goldenName}`,
+							cleanup,
+						),
+					);
+					throw error;
+				});
+			if (target?.sourceKind === "fork") {
+				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
+					console.error(
+						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
+						error,
+					),
+				);
+			}
 			return row;
 		}),
 
-	update: jwtProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
 				name: z.string().min(1).max(100).optional(),
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20).optional(),
-				hooksRepositoryId: z.string().uuid().nullable().optional(),
+				primaryRepositoryId: z.string().uuid().optional(),
 				scope: z.enum(environmentScopeValues).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const current = await loadEnvironment(input.id, ctx);
-			assertOwned(current);
-			// A golden was built for its repositories: cloned, set up, snapshotted.
-			// A different set means a different golden, so it is promoted again.
-			if (input.repositoryIds && current.sourceKind !== "image") {
+			await assertCloudAccess(ctx, current.organizationId);
+
+			// A golden was built for its repositories and set up by its primary.
+			// Changing either means a different golden, so it is promoted again.
+			const changesPrimary =
+				input.primaryRepositoryId !== undefined &&
+				input.primaryRepositoryId !== current.primaryRepositoryId;
+			if (
+				(input.repositoryIds || changesPrimary) &&
+				current.sourceKind !== "image"
+			) {
 				throw userError({
 					code: "FORBIDDEN",
 					message:
@@ -381,40 +622,34 @@ export const environmentRouter = {
 				});
 			}
 			if (input.repositoryIds) {
+				const primaryRepositoryId =
+					input.primaryRepositoryId ?? current.primaryRepositoryId;
+				if (!primaryRepositoryId) throw primaryNotIncluded();
 				await setEnvironmentRepositories({
 					environmentId: input.id,
 					organizationId: current.organizationId,
 					repositoryIds: input.repositoryIds,
-					hooksRepositoryId:
-						input.hooksRepositoryId === undefined
-							? current.hooksRepositoryId
-							: input.hooksRepositoryId,
+					primaryRepositoryId,
 				});
-			} else if (input.hooksRepositoryId !== undefined) {
-				if (input.hooksRepositoryId) {
-					const included = await db.query.environmentRepositories.findFirst({
-						where: and(
-							eq(environmentRepositories.environmentId, input.id),
-							eq(environmentRepositories.repositoryId, input.hooksRepositoryId),
-						),
-					});
-					if (!included) {
-						throw userError({
-							code: "BAD_REQUEST",
-							message:
-								"The hooks repository must be one of the environment's repositories",
-							i18nKey: "serverError.environment.hooksRepositoryNotIncluded",
-						});
-					}
-				}
+			} else if (input.primaryRepositoryId !== undefined) {
+				const included = await db.query.environmentRepositories.findFirst({
+					where: and(
+						eq(environmentRepositories.environmentId, input.id),
+						eq(environmentRepositories.repositoryId, input.primaryRepositoryId),
+					),
+				});
+				if (!included) throw primaryNotIncluded();
 				await db
 					.update(environments)
-					.set({ hooksRepositoryId: input.hooksRepositoryId })
+					.set({ primaryRepositoryId: input.primaryRepositoryId })
 					.where(eq(environments.id, input.id));
 			}
 			const patch = {
 				...(input.name ? { name: input.name } : {}),
 				...(input.scope ? { scope: input.scope } : {}),
+				...(input.scope === "personal"
+					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
+					: {}),
 			};
 			if (Object.keys(patch).length === 0) {
 				return loadEnvironment(input.id, ctx);
@@ -427,20 +662,23 @@ export const environmentRouter = {
 			return row;
 		}),
 
-	archive: jwtProcedure
+	archive: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.id, ctx);
-			assertOwned(environment);
-			await db
+			await assertCloudAccess(ctx, environment.organizationId);
+			const [archived] = await db
 				.update(environments)
 				.set({ archivedAt: new Date() })
-				.where(eq(environments.id, input.id));
+				.where(eq(environments.id, environment.id))
+				.returning({
+					sourceKind: environments.sourceKind,
+					sourceRef: environments.sourceRef,
+				});
 			// A golden is one environment's alone, and an archived environment
 			// never forks from it again; without this it bills storage forever.
-			if (environment.sourceKind === "fork") {
-				await deleteSandbox(environment.sourceRef);
+			if (archived?.sourceKind === "fork") {
+				await deleteSandbox(archived.sourceRef);
 			}
 			return { archived: true };
 		}),

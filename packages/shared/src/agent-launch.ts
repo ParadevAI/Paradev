@@ -10,6 +10,7 @@ import {
 	DEFAULT_TERMINAL_TASK_PROMPT_TEMPLATE,
 	renderTaskPromptTemplate,
 } from "./agent-prompt-template";
+import { WORKSPACE_ATTACHMENTS_DIR } from "./workspace-attachments";
 
 export const STARTABLE_AGENT_TYPES = BUILTIN_AGENT_IDS;
 
@@ -234,7 +235,7 @@ export function buildTaskLaunchRequest({
 		source,
 		terminal: {
 			command: buildAgentFileCommand({
-				filePath: `.superset/${taskPromptFileName}`,
+				filePath: `${WORKSPACE_ATTACHMENTS_DIR}/${taskPromptFileName}`,
 				agent: agentType,
 			}),
 			name: task.slug,

@@ -8,7 +8,7 @@ import type { UsageAgent } from "../types";
  * Longest-prefix match on the lowercased model id; unknown models fall back
  * to the agent's cheapest rate and mark the result approximate.
  */
-export const PRICING_TABLE_UPDATED = "2026-09-22";
+export const PRICING_TABLE_UPDATED = "2026-09-30";
 
 export interface ModelRate {
 	inputPerM: number;
@@ -19,6 +19,7 @@ export interface ModelRate {
 	 */
 	cacheReadPerM?: number;
 	longContext?: ModelRate;
+	longContextThreshold?: number;
 }
 
 /** Cache multipliers applied against the model's input rate. */
@@ -50,6 +51,13 @@ const CLAUDE_RATES: Record<string, ModelRate> = {
 };
 
 const CODEX_RATES: Record<string, ModelRate> = {
+	"gpt-6.1-sol": {
+		inputPerM: 2,
+		outputPerM: 10,
+		cacheReadPerM: 0.1,
+		longContextThreshold: 272_000,
+		longContext: { inputPerM: 4, outputPerM: 15, cacheReadPerM: 0.2 },
+	},
 	// GPT-6 Astra (2026-09-03): cached input is $1/M, the usual 0.1x.
 	"gpt-6-astra": { inputPerM: 10, outputPerM: 50 },
 	"gpt-6-sol": { inputPerM: 2, outputPerM: 10 },
@@ -118,9 +126,9 @@ const MUSE_RATES: Record<string, ModelRate> = {
 	"muse-spark": { inputPerM: 1.25, outputPerM: 4.25, cacheReadPerM: 0.15 },
 };
 
-/** Multi-model harnesses (opencode, pi, omp, copilot, fx, devin) route to many
- * upstream providers — match against every table we know. Harness-reported
- * costs, when present, take precedence over these rates anyway. */
+/** Multi-model harnesses (opencode, pi, omp, copilot, fx, devin, hermes) route
+ * to many upstream providers — match against every table we know.
+ * Harness-reported costs, when present, take precedence over these rates. */
 const MULTI_AGENT_RATES: Record<string, ModelRate> = {
 	...CLAUDE_RATES,
 	...CODEX_RATES,
@@ -142,6 +150,7 @@ const RATES_BY_AGENT: Record<UsageAgent, Record<string, ModelRate>> = {
 	// Devin's own SWE models are billed in ACUs with no published token
 	// price; they take the cheapest fallback, marked approximate.
 	devin: MULTI_AGENT_RATES,
+	hermes: MULTI_AGENT_RATES,
 };
 
 const cheapestByAgent = new Map<UsageAgent, ModelRate>();
@@ -195,7 +204,8 @@ export function matchModelRate(
 	}
 	if (best) {
 		const rate =
-			promptTokens > 200_000 && best.rate.longContext
+			promptTokens > (best.rate.longContextThreshold ?? 200_000) &&
+			best.rate.longContext
 				? best.rate.longContext
 				: best.rate;
 		return { ...rate, approximate: false };

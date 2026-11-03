@@ -1,6 +1,8 @@
 import { CommentModeButton, PageShareButton } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 import type { PagePaneData } from "../../../../types";
+import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { usePagePaneUi } from "../../hooks/usePagePaneUi";
 import { PageWatcherMenu } from "./components/PageWatcherMenu";
 
@@ -8,12 +10,14 @@ interface PagePaneHeaderExtrasProps {
 	data: PagePaneData;
 	paneId: string;
 	workspaceId: string;
+	onCreateNewAgentSession: CreateNewAgentSession;
 }
 
 export function PagePaneHeaderExtras({
 	data,
 	paneId,
 	workspaceId,
+	onCreateNewAgentSession,
 }: PagePaneHeaderExtrasProps) {
 	const {
 		page,
@@ -22,6 +26,8 @@ export function PagePaneHeaderExtras({
 		currentUserId,
 		onSetVisibility,
 		onSetSharedVersion,
+		sharing,
+		canComment,
 	} = usePageHeaderData(data);
 	const { commentsEnabled, setCommentsEnabled, shareOpen, setShareOpen } =
 		usePagePaneUi(paneId);
@@ -31,18 +37,25 @@ export function PagePaneHeaderExtras({
 
 	return (
 		<>
-			{owned ? (
-				<PageWatcherMenu workspaceId={workspaceId} pageId={page?.id} />
-			) : null}
-			<CommentModeButton
-				compact
-				enabled={commentsEnabled}
-				openCount={threads.filter((thread) => !thread.resolved).length}
-				onToggle={() => setCommentsEnabled(!commentsEnabled)}
+			<PagePresenceStack pageId={page?.id} viewerId={currentUserId} />
+			<PageWatcherMenu
+				workspaceId={workspaceId}
+				pageId={page?.id}
+				canManage={owned}
+				onCreateNewAgentSession={onCreateNewAgentSession}
 			/>
+			{canComment ? (
+				<CommentModeButton
+					compact
+					enabled={commentsEnabled}
+					openCount={threads.filter((thread) => !thread.resolved).length}
+					onToggle={() => setCommentsEnabled(!commentsEnabled)}
+				/>
+			) : null}
 			{page ? (
 				<PageShareButton
 					compact
+					labelClassName="hidden @min-[360px]/pane-header:inline"
 					page={page}
 					versions={versions}
 					editable={
@@ -53,6 +66,8 @@ export function PagePaneHeaderExtras({
 					onOpenChange={setShareOpen}
 					onSetVisibility={onSetVisibility}
 					onSetSharedVersion={onSetSharedVersion}
+					currentUserId={currentUserId}
+					sharing={sharing}
 				/>
 			) : null}
 		</>

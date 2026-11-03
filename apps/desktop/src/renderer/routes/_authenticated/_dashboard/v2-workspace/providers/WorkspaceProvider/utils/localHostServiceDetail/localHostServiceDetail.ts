@@ -27,6 +27,6 @@ export const LOCAL_HOST_SERVICE_DETAIL: Record<
 	}),
 	unknown: msg({
 		message:
-			"The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Superset.",
+			"The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev.",
 	}),
 };

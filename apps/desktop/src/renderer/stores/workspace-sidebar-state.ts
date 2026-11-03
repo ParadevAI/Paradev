@@ -3,7 +3,7 @@ import { devtools, persist } from "zustand/middleware";
 
 export const DEFAULT_WORKSPACE_SIDEBAR_WIDTH = 280;
 export const COLLAPSED_WORKSPACE_SIDEBAR_WIDTH = 52;
-const MIN_WORKSPACE_SIDEBAR_WIDTH = 225;
+export const MIN_WORKSPACE_SIDEBAR_WIDTH = 225;
 export const MAX_WORKSPACE_SIDEBAR_WIDTH = 400;
 export const WORKSPACE_SIDEBAR_STORAGE_KEY = "workspace-sidebar-store";
 
@@ -11,59 +11,39 @@ export const WORKSPACE_SIDEBAR_STORAGE_KEY = "workspace-sidebar-store";
 const COLLAPSE_THRESHOLD = 120;
 
 interface WorkspaceSidebarState {
-	isOpen: boolean;
 	width: number;
 	lastExpandedWidth: number;
+	autoCollapsed: boolean;
+	adjustedThisSession: boolean;
 	// Use string[] instead of Set<string> for JSON serialization with Zustand persist
 	collapsedProjectIds: string[];
-	isResizing: boolean;
 
-	toggleOpen: () => void;
-	setOpen: (open: boolean) => void;
 	setWidth: (width: number) => void;
-	setIsResizing: (isResizing: boolean) => void;
 	toggleProjectCollapsed: (projectId: string) => void;
 	isProjectCollapsed: (projectId: string) => boolean;
 	toggleCollapsed: () => void;
 	isCollapsed: () => boolean;
+	autoCollapse: () => void;
+	autoExpand: () => void;
 }
 
 export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				isOpen: true,
 				width: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 				lastExpandedWidth: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
+				autoCollapsed: false,
+				adjustedThisSession: false,
 				collapsedProjectIds: [],
-				isResizing: false,
-
-				toggleOpen: () => {
-					const { isOpen, lastExpandedWidth } = get();
-					if (isOpen) {
-						set({ isOpen: false, width: 0 });
-					} else {
-						set({
-							isOpen: true,
-							width: lastExpandedWidth,
-						});
-					}
-				},
-
-				setOpen: (open) => {
-					const { lastExpandedWidth } = get();
-					set({
-						isOpen: open,
-						width: open ? lastExpandedWidth : 0,
-					});
-				},
 
 				setWidth: (width) => {
-					// Snap to collapsed if below threshold (never allow closing completely via drag)
 					if (width < COLLAPSE_THRESHOLD) {
+						if (get().width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
 						set({
 							width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
-							isOpen: true,
+							autoCollapsed: false,
+							adjustedThisSession: true,
 						});
 						return;
 					}
@@ -77,12 +57,9 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 					set({
 						width: clampedWidth,
 						lastExpandedWidth: clampedWidth,
-						isOpen: true,
+						autoCollapsed: false,
+						adjustedThisSession: true,
 					});
-				},
-
-				setIsResizing: (isResizing) => {
-					set({ isResizing });
 				},
 
 				toggleProjectCollapsed: (projectId) => {
@@ -103,10 +80,45 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 						width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH;
 
 					if (isCurrentlyCollapsed) {
-						set({ width: lastExpandedWidth });
+						set({
+							width: lastExpandedWidth,
+							autoCollapsed: false,
+							adjustedThisSession: true,
+						});
 					} else {
-						set({ width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH });
+						set({
+							width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+							autoCollapsed: false,
+							adjustedThisSession: true,
+						});
 					}
+				},
+
+				autoCollapse: () => {
+					const { width, adjustedThisSession } = get();
+					if (adjustedThisSession) return;
+					if (width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
+					set({
+						width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+						autoCollapsed: true,
+					});
+				},
+
+				autoExpand: () => {
+					const {
+						autoCollapsed,
+						adjustedThisSession,
+						width,
+						lastExpandedWidth,
+					} = get();
+					if (!autoCollapsed || adjustedThisSession) return;
+					set({
+						width:
+							width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
+								? lastExpandedWidth
+								: width,
+						autoCollapsed: false,
+					});
 				},
 
 				isCollapsed: () => {
@@ -115,14 +127,25 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 			}),
 			{
 				name: WORKSPACE_SIDEBAR_STORAGE_KEY,
-				version: 2,
+				version: 3,
+				// v2 could close the sidebar entirely; that comes back as the rail.
+				migrate: (persisted, version) => {
+					const state = persisted as {
+						isOpen?: boolean;
+						width?: number;
+					} & Record<string, unknown>;
+					if (version >= 3) return state;
+					const { isOpen, ...rest } = state;
+					return isOpen === false
+						? { ...rest, width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH }
+						: rest;
+				},
 				// Exclude ephemeral state from persistence
 				partialize: (state) => ({
-					isOpen: state.isOpen,
 					width: state.width,
 					lastExpandedWidth: state.lastExpandedWidth,
+					autoCollapsed: state.autoCollapsed,
 					collapsedProjectIds: state.collapsedProjectIds,
-					// isResizing intentionally excluded - ephemeral UI state
 				}),
 			},
 		),

@@ -1,0 +1,1 @@
+export { PullRequestActivityComment } from "./PullRequestActivityComment";

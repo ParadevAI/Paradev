@@ -1,37 +1,39 @@
-import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
+import { stub } from "../../../test/stub";
+import * as crypto from "../../router/plugins/crypto";
+import * as discovery from "./discovery";
 
-// A refresh is a token-endpoint call plus what gets written back, so the
-// endpoint and the update are the two things stubbed here. `mock.module` is
-// process-wide, so each stub lists every export the real module has.
-//
-// The lookup rule lives here too rather than in its own file: these stubs are
-// stateful, and a second file stubbing the same modules would both lose the
-// race for whichever registration bun pins and leave its own `rows` binding
-// unread by the pinned closure.
-//
-// `./index`, `./client-identity` and the manifest module are deliberately NOT
-// stubbed: a partial stub of any of them pins process-wide and breaks every
-// other file that imports the rest. A real registry connector with a static
-// client is used instead, so `resolveEndpoints` runs for real and reaches no
-// network, and the token endpoint is intercepted at `globalThis.fetch` — the
-// same seam `connectors.test.ts` uses.
+// A refresh is a token-endpoint call plus what gets written back. A real
+// registry connector with a static client is used, so `resolveEndpoints` runs
+// for real and reaches no network, and the token endpoint is intercepted at
+// `globalThis.fetch`.
 
 let rows: Array<Record<string, unknown>> = [];
 let stored: Record<string, unknown> | null = null;
+let reads: Array<Record<string, unknown> | null> = [];
 let updates: Array<Record<string, unknown>> = [];
 let response: { status: number; ok: boolean; body: unknown } | null = null;
 let fetchError: Error | null = null;
+let tokenRequests: URLSearchParams[] = [];
+let oauthClients: Array<Record<string, unknown>> = [];
 
 let limits: number[] = [];
 
 // `refresh` re-reads one row by id; the lookups read two to detect a second.
+// The stored dynamic clients are read whole, ordered, with no limit.
 const selectChain = {
 	from: () => selectChain,
 	where: () => selectChain,
-	orderBy: () => selectChain,
+	orderBy: () =>
+		Object.assign(Promise.resolve(oauthClients), { limit: selectChain.limit }),
 	limit: (n: number) => {
 		limits.push(n);
 		if (rows.length) return Promise.resolve(rows.slice(0, n));
+		if (reads.length) {
+			const next = reads.shift();
+			return Promise.resolve(next ? [next] : []);
+		}
 		return Promise.resolve(stored ? [stored] : []);
 	},
 };
@@ -51,23 +53,29 @@ const updateChain = {
 	where: () => updateResult,
 };
 
-mock.module("@superset/db/client", () => ({
-	db: {
-		select: () => selectChain,
-		update: () => updateChain,
-		query: {},
-	},
-	dbWs: {
-		transaction: () => Promise.reject(new Error("dbWs is stubbed in tests")),
-	},
-}));
+stub(db, { select: () => selectChain, update: () => updateChain });
 
-mock.module("../../router/plugins/crypto", () => ({
+const ISSUER = "https://api.useautumn.com/api/auth";
+stub(discovery, {
+	discoverServer: () =>
+		Promise.resolve({
+			resource: "https://mcp.useautumn.com/mcp",
+			issuer: ISSUER,
+			metadata: {
+				issuer: ISSUER,
+				authorization_endpoint: `${ISSUER}/oauth2/authorize`,
+				token_endpoint: `${ISSUER}/oauth2/token`,
+				registration_endpoint: `${ISSUER}/oauth2/register`,
+			},
+		}),
+});
+
+stub(crypto, {
 	decryptSecret: (value: string) => Promise.resolve(value),
 	decryptOptional: (value: string | null) => Promise.resolve(value),
 	encryptSecret: (value: string) => Promise.resolve(value),
 	encryptOptional: (value: string | null) => Promise.resolve(value),
-}));
+});
 
 const {
 	ConnectorUnavailableError,
@@ -116,11 +124,15 @@ beforeEach(() => {
 	updates = [];
 	limits = [];
 	rows = [];
+	reads = [];
 	response = null;
 	fetchError = null;
+	tokenRequests = [];
+	oauthClients = [];
 	stored = connection();
-	globalThis.fetch = (async () => {
+	globalThis.fetch = (async (_input: string | URL, init?: RequestInit) => {
 		if (fetchError) throw fetchError;
+		tokenRequests.push(new URLSearchParams(String(init?.body)));
 		const current = response;
 		if (!current) throw new Error("no token-endpoint response configured");
 		return new Response(JSON.stringify(current.body), {
@@ -147,10 +159,53 @@ describe("a connection that cannot be refreshed", () => {
 	test("a rejected refresh token is recorded the same way", async () => {
 		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
 
-		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
-			UnrefreshableConnectionError,
-		);
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).rejects.toBeInstanceOf(UnrefreshableConnectionError);
 		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
+	});
+});
+
+describe("two processes refreshing a rotating refresh token at once", () => {
+	test("the loser adopts the winner's tokens instead of disconnecting", async () => {
+		const winner = connection({
+			accessToken: "new-access",
+			refreshToken: "rotated",
+			tokenExpiresAt: new Date(Date.now() + 3600_000),
+		});
+		reads = [connection(), winner];
+		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).resolves.toBe(winner);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("the loser waits for a winner that has not written yet", async () => {
+		const winner = connection({ accessToken: "new-access" });
+		reads = [connection(), connection(), winner];
+		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 1 }),
+		).resolves.toBe(winner);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("the winner's write clears a mark the loser made first", async () => {
+		response = {
+			ok: true,
+			status: 200,
+			body: { access_token: "new-access", expires_in: 3600 },
+		};
+
+		await ensureFreshConnection(connection());
+		expect(updates[0]).toMatchObject({
+			accessToken: "new-access",
+			disconnectedAt: null,
+			disconnectReason: null,
+		});
 	});
 });
 
@@ -211,5 +266,55 @@ describe("one account, or an error", () => {
 		rows = [{ id: "conn-1" }];
 		await userConnection("org", "linear", "user");
 		expect(limits).toEqual([2]);
+	});
+});
+
+describe("a dynamic client's connection", () => {
+	const autumn = (overrides: Record<string, unknown> = {}) =>
+		connection({ connector: "autumn_mcp", ...overrides });
+	const oauthClient = (clientId: string, scopes: string[] | null) => ({
+		issuer: ISSUER,
+		clientId,
+		clientSecret: `${clientId}-secret`,
+		clientSecretExpiresAt: null,
+		tokenEndpointAuthMethod: "client_secret_post",
+		scopes,
+	});
+
+	beforeEach(() => {
+		response = {
+			ok: true,
+			status: 200,
+			body: { access_token: "new-access", expires_in: 3600 },
+		};
+		oauthClients = [
+			oauthClient("legacy-client", null),
+			oauthClient("scoped-client", ["offline_access", "rewards:read"]),
+		];
+	});
+
+	test("refreshes as the client its grant was issued to", async () => {
+		stored = autumn({ oauthClientId: "scoped-client" });
+
+		await ensureFreshConnection(autumn({ oauthClientId: "scoped-client" }));
+		expect(tokenRequests[0]?.get("client_id")).toBe("scoped-client");
+		expect(tokenRequests[0]?.get("client_secret")).toBe("scoped-client-secret");
+	});
+
+	test("from before client ids were recorded refreshes as the oldest client", async () => {
+		stored = autumn({ oauthClientId: null });
+
+		await ensureFreshConnection(autumn({ oauthClientId: null }));
+		expect(tokenRequests[0]?.get("client_id")).toBe("legacy-client");
+	});
+
+	test("whose client was forgotten needs reauthorization", async () => {
+		stored = autumn({ oauthClientId: "deleted-client" });
+
+		await expect(
+			ensureFreshConnection(autumn({ oauthClientId: "deleted-client" })),
+		).rejects.toBeInstanceOf(UnrefreshableConnectionError);
+		expect(tokenRequests).toHaveLength(0);
+		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
 	});
 });

@@ -20,10 +20,8 @@ export {
 
 import fs from "node:fs";
 import os from "node:os";
-import {
-	TERMINAL_TERM_PROGRAM,
-	TERMINAL_TERM_PROGRAM_VERSION,
-} from "@superset/shared/constants";
+import { resolveAppHomeDir } from "@superset/agent-setup";
+import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
 	augmentPathForMacOS,
@@ -31,7 +29,7 @@ import {
 	getStrictShellEnvironment,
 } from "./clean-shell-env.ts";
 import { stripTerminalRuntimeEnv } from "./env-strip.ts";
-import { getShellBootstrapEnv } from "./shell-launch.ts";
+import { getShellBootstrapEnv, resolveLaunchShell } from "./shell-launch.ts";
 
 const MACOS_SYSTEM_CERT_FILE = "/etc/ssl/cert.pem";
 let cachedMacosSystemCertAvailable: boolean | null = null;
@@ -205,6 +203,41 @@ interface BuildV2TerminalEnvParams {
 }
 
 /**
+ * The env for anything this host launches on the user's behalf, PTY or not.
+ * Everything a caller cannot know better than the host — the shell snapshot,
+ * the launch shell, the org and run mode — is filled in here so a second
+ * launch path cannot drift from the terminal's.
+ */
+export function buildHostLaunchEnv(params: {
+	cwd: string;
+	workspaceId: string;
+	workspacePath: string;
+	rootPath: string;
+	terminalId?: string;
+	themeType?: "dark" | "light";
+	hostAgentHookUrl?: string;
+}): Record<string, string> {
+	const baseEnv = getTerminalBaseEnv();
+	return buildV2TerminalEnv({
+		baseEnv,
+		shell: resolveLaunchShell(baseEnv),
+		supersetHomeDir: resolveAppHomeDir(),
+		organizationId: process.env.ORGANIZATION_ID || "",
+		themeType: params.themeType,
+		cwd: params.cwd,
+		terminalId: params.terminalId ?? "",
+		workspaceId: params.workspaceId,
+		workspacePath: params.workspacePath,
+		rootPath: params.rootPath,
+		supersetEnv:
+			process.env.NODE_ENV === "development" ? "development" : "production",
+		agentHookPort: process.env.SUPERSET_AGENT_HOOK_PORT || "",
+		agentHookVersion: process.env.SUPERSET_AGENT_HOOK_VERSION || "",
+		hostAgentHookUrl: params.hostAgentHookUrl,
+	});
+}
+
+/**
  * Build the final v2 PTY environment.
  * baseEnv must be the preserved shell snapshot from getTerminalBaseEnv().
  */
@@ -236,13 +269,7 @@ export function buildV2TerminalEnv(
 
 	env.TERM = "xterm-256color";
 	env.SHELL = shell;
-	// See TERMINAL_TERM_PROGRAM for why we identify as kitty: the client's
-	// full-fidelity wheel handler produces a native-grade report stream that
-	// TUIs must trust as-is, not amplify with vscode-style compensation.
-	// Shift+Enter does NOT depend on this: line-edit-translations.ts sends
-	// ESC+CR directly.
-	env.TERM_PROGRAM = TERMINAL_TERM_PROGRAM;
-	env.TERM_PROGRAM_VERSION = TERMINAL_TERM_PROGRAM_VERSION;
+	for (const key of TERMINAL_IDENTITY_ENV_KEYS) delete env[key];
 	env.COLORTERM = "truecolor";
 	env.COLORFGBG = themeType === "light" ? "0;15" : "15;0";
 	// TERM_THEME is an explicit light/dark hint that cursor-agent (and other

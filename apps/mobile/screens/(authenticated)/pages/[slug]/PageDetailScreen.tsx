@@ -1,15 +1,13 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { useLingui } from "@lingui/react/macro";
-import { usePageComments, usePageCommentThreads } from "@superset/cloud-client";
-import { i18n } from "@superset/i18n";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { usePageCommentThreads } from "@superset/cloud-client";
 import { getInitials } from "@superset/shared/names";
-import type { CommentIntent } from "@superset/shared/page-comments";
 import {
 	type CommentAnchor,
 	type FrameMessage,
 	type FrameRect,
 	PENDING_ANCHOR_ID,
 } from "@superset/shared/page-comments-runtime";
+import { pagePresenceUrl } from "@superset/shared/page-presence";
 import * as Haptics from "expo-haptics";
 import {
 	Stack,
@@ -17,17 +15,23 @@ import {
 	useLocalSearchParams,
 	useRouter,
 } from "expo-router";
+import { useHeaderHeight } from "expo-router/react-navigation";
+import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
+import { getHostAuthToken } from "@/lib/host/client";
+import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { usePageQuery } from "../hooks/usePages";
 import { CommentPin } from "./components/CommentPin";
-import { CommentPopover } from "./components/CommentPopover";
 import { PageFrame, type PageFrameHandle } from "./components/PageFrame";
-import { usePageCommentUser } from "./hooks/usePageCommentUser";
+import { PagePresence } from "./components/PagePresence";
+import { usePageAccessQuery } from "./hooks/usePageSharing";
 import { usePageCommentStore } from "./stores/pageCommentStore";
 import { pinPointOf, stackPins } from "./utils/pinLayout";
 
@@ -68,6 +72,10 @@ export function PageDetailScreen({
 		slug: string;
 		scrollY?: string;
 	}>();
+	const headerHeight = useHeaderHeight();
+	const access = usePageAccessQuery(slug);
+	// Optimistic while loading: the server refuses a view-only reader's comment either way.
+	const canComment = access.data?.canComment ?? true;
 	const frameRef = useRef<PageFrameHandle>(null);
 	const scrollYRef = useRef(0);
 	const restoredScroll = useRef(false);
@@ -77,11 +85,11 @@ export function PageDetailScreen({
 	const [frameEpoch, setFrameEpoch] = useState(0);
 	const [commentMode, setCommentMode] = useState(false);
 	const [selection, setSelection] = useState<Selection | null>(null);
-	const rememberPickRef = useRef<(anchor: CommentAnchor) => void>(() => {});
-	const dismissSelectionRef = useRef<() => void>(() => {});
+	const startCommentRef = useRef<(anchor: CommentAnchor) => boolean>(
+		() => false,
+	);
 	const selectionRef = useRef(selection);
 	selectionRef.current = selection;
-	const submittingRef = useRef(false);
 	const [rects, setRects] = useState<Record<string, FrameRect>>({});
 
 	const page = usePageQuery(slug);
@@ -101,22 +109,22 @@ export function PageDetailScreen({
 	const setFocusThreadId = usePageCommentStore(
 		(state) => state.setFocusThreadId,
 	);
-	const user = usePageCommentUser();
-	const store = usePageComments({
-		pageId: pageId ?? "",
-		version: version ?? 0,
-		user,
-	});
-	const [overlay, setOverlay] = useState<{
-		width: number;
-		height: number;
-	} | null>(null);
-	submittingRef.current = store.submitting;
 
 	const unresolvedThreads = useMemo(
 		() => threads.filter((thread) => !thread.resolved),
 		[threads],
 	);
+
+	const presenceUrl = useCallback(async () => {
+		const token = await getHostAuthToken().catch(() => null);
+		return token && pageId
+			? pagePresenceUrl({
+					realtimeUrl: env.EXPO_PUBLIC_REALTIME_URL,
+					pageId,
+					token,
+				})
+			: null;
+	}, [pageId]);
 
 	const send = useCallback(
 		(message: Parameters<PageFrameHandle["send"]>[0]) =>
@@ -155,9 +163,10 @@ export function PageDetailScreen({
 	useFocusEffect(
 		useCallback(() => {
 			setFrameEpoch((epoch) => epoch + 1);
-			if (!usePageCommentStore.getState().anchor) setSelection(null);
+			setSelection(null);
+			clearPick();
 			refetchComments();
-		}, [refetchComments]),
+		}, [clearPick, refetchComments]),
 	);
 
 	useEffect(() => {
@@ -178,16 +187,13 @@ export function PageDetailScreen({
 			}
 			setRects((previous) => (sameRects(previous, next) ? previous : next));
 		}
-		if (message.type === "pointer-down" && !submittingRef.current) {
-			dismissSelectionRef.current();
-		}
 		if (message.type === "pick") {
 			if (!selectionRef.current) {
+				if (!startCommentRef.current(message.anchor)) return;
 				const next = { anchor: message.anchor, rect: message.rect };
 				selectionRef.current = next;
 				void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 				setSelection(next);
-				rememberPickRef.current(message.anchor);
 			}
 		}
 	}, []);
@@ -208,12 +214,17 @@ export function PageDetailScreen({
 		[pins],
 	);
 
-	rememberPickRef.current = useCallback(
+	startCommentRef.current = useCallback(
 		(anchor: CommentAnchor) => {
-			if (!pageId || !version) return;
+			if (!pageId || version === undefined) return false;
 			setPick({ pageId, version, anchor });
+			router.push({
+				pathname: "/(authenticated)/pages/[slug]/comment",
+				params: { slug },
+			});
+			return true;
 		},
-		[pageId, setPick, version],
+		[pageId, router, setPick, slug, version],
 	);
 
 	const openThread = useCallback(
@@ -228,39 +239,6 @@ export function PageDetailScreen({
 		[router, setFocusThreadId, slug],
 	);
 
-	const dismissSelection = useCallback(() => {
-		setSelection(null);
-		clearPick();
-	}, [clearPick]);
-	dismissSelectionRef.current = dismissSelection;
-
-	const createAnchored = useCallback(
-		async (body: string, intent?: CommentIntent) => {
-			const anchor = selectionRef.current?.anchor;
-			if (!anchor) return;
-			await store.createThread({
-				anchor,
-				anchorText: anchor.text,
-				body,
-				...(intent ? { intent } : {}),
-			});
-			dismissSelection();
-		},
-		[dismissSelection, store],
-	);
-
-	const postQuick = useCallback(
-		async (body: MessageDescriptor, intent: CommentIntent) => {
-			if (store.submitting) return;
-			try {
-				await createAnchored(i18n._(body), intent);
-			} catch (error) {
-				Alert.alert(t({ message: "Comment not posted" }), errorCopy(error));
-			}
-		},
-		[createAnchored, store.submitting, t],
-	);
-
 	const retryFrame = useCallback(async () => {
 		setFailedSrc(null);
 		setLoadedSrc(null);
@@ -270,10 +248,6 @@ export function PageDetailScreen({
 
 	return (
 		<View className="bg-background flex-1">
-			<Stack.Screen
-				options={{ title: page.data?.title ?? t({ message: "Page" }) }}
-			/>
-
 			{presentation === "sheet" ? (
 				<Stack.Toolbar placement="left">
 					<Stack.Toolbar.Button
@@ -298,19 +272,21 @@ export function PageDetailScreen({
 						}}
 					/>
 				) : null}
-				<Stack.Toolbar.Button
-					icon={commentMode ? "viewfinder.circle.fill" : "viewfinder"}
-					accessibilityLabel={
-						commentMode
-							? t({ message: "Leave comment mode" })
-							: t({ message: "Comment on this page" })
-					}
-					onPress={() => {
-						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-						setSelection(null);
-						setCommentMode((enabled) => !enabled);
-					}}
-				/>
+				{canComment ? (
+					<Stack.Toolbar.Button
+						icon={commentMode ? "viewfinder.circle.fill" : "viewfinder"}
+						accessibilityLabel={
+							commentMode
+								? t({ message: "Leave comment mode" })
+								: t({ message: "Comment on this page" })
+						}
+						onPress={() => {
+							void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+							setSelection(null);
+							setCommentMode((enabled) => !enabled);
+						}}
+					/>
+				) : null}
 				<Stack.Toolbar.Button
 					icon="bubble.left.and.bubble.right"
 					accessibilityLabel={t({ message: "Show all comments" })}
@@ -348,6 +324,19 @@ export function PageDetailScreen({
 							? t({ message: "It will open once the connection is back." })
 							: errorCopy(page.error)}
 					</Text>
+					{page.error && !offline ? (
+						<Button
+							className="mt-6"
+							variant="secondary"
+							onPress={() => {
+								void WebBrowser.openBrowserAsync(pageUrlForSlug(slug));
+							}}
+						>
+							<Text>
+								<Trans>Open in browser</Trans>
+							</Text>
+						</Button>
+					) : null}
 				</View>
 			) : null}
 
@@ -359,6 +348,7 @@ export function PageDetailScreen({
 					<PageFrame
 						ref={frameRef}
 						src={viewUrl}
+						insetTop={headerHeight}
 						onMessage={onFrameMessage}
 						onLoadEnd={() => {
 							setLoadedSrc(viewUrl);
@@ -368,16 +358,9 @@ export function PageDetailScreen({
 					/>
 
 					<View
-						className="absolute inset-0 overflow-hidden"
+						className="absolute inset-x-0 bottom-0 overflow-hidden"
+						style={{ top: headerHeight }}
 						pointerEvents="box-none"
-						onLayout={(event) => {
-							const { width, height } = event.nativeEvent.layout;
-							setOverlay((previous) =>
-								previous?.width === width && previous?.height === height
-									? previous
-									: { width, height },
-							);
-						}}
 					>
 						{unresolvedThreads.map((thread) => {
 							const point = pinPoints.get(thread.id);
@@ -407,24 +390,9 @@ export function PageDetailScreen({
 								className="absolute rounded-sm border border-blue-500 bg-blue-500/10"
 							/>
 						) : null}
-
-						{selection && selectionRect && overlay ? (
-							<CommentPopover
-								rect={selectionRect}
-								container={overlay}
-								pending={store.submitting}
-								onDismiss={dismissSelection}
-								onOpenPresets={() =>
-									router.push({
-										pathname: "/(authenticated)/pages/[slug]/quick",
-										params: { slug },
-									})
-								}
-								onQuick={(body, intent) => void postQuick(body, intent)}
-								onSubmit={(body) => createAnchored(body)}
-							/>
-						) : null}
 					</View>
+
+					{pageId ? <PagePresence key={pageId} url={presenceUrl} /> : null}
 
 					{commentMode && !selection ? (
 						<View

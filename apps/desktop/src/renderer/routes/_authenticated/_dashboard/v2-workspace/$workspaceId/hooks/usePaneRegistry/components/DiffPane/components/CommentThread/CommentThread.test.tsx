@@ -4,77 +4,51 @@ import {
 	beforeEach,
 	describe,
 	expect,
-	mock,
+	spyOn,
 	test,
 } from "bun:test";
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
-// happy-dom is process-wide; unregister in afterAll so the shared mock
-// document is restored for the other renderer suites.
-const alreadyRegistered = GlobalRegistrator.isRegistered;
-if (!alreadyRegistered) GlobalRegistrator.register();
-(
-	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
-).IS_REACT_ACT_ENVIRONMENT = true;
+const reactActGlobal = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+const previousActEnvironment = reactActGlobal.IS_REACT_ACT_ENVIRONMENT;
+reactActGlobal.IS_REACT_ACT_ENVIRONMENT = true;
 
-interface ReplyVariables {
-	workspaceId: string;
-	commentId: number;
-	body: string;
-}
-interface ReplyMutationOptions {
-	onSuccess?: () => void;
-	onError?: (error: Error, variables: ReplyVariables) => void;
-}
-
-const replyMutate = mock((_variables: ReplyVariables) => {});
-const invalidateThreads = mock((_input: { workspaceId: string }) => {});
-// The component wires its reply mutation once per render; capturing the
-// options lets a test settle the request the way tRPC would.
-let replyOptions: ReplyMutationOptions = {};
-let replyPending = false;
-
-mock.module("@superset/workspace-client", () => ({
-	workspaceTrpc: {
-		useUtils: () => ({
-			git: { getPullRequestThreads: { invalidate: invalidateThreads } },
-		}),
-		git: {
-			setReviewThreadResolution: {
-				useMutation: () => ({ mutate: () => {}, isPending: false }),
-			},
-			replyToReviewThread: {
-				useMutation: (options: ReplyMutationOptions) => {
-					replyOptions = options;
-					return { mutate: replyMutate, isPending: replyPending };
-				},
-			},
-		},
-	},
-}));
-
-// Comment bodies are irrelevant here, and the real renderer pulls in
-// react-syntax-highlighter, whose CommonJS build extends React.PureComponent
-// at load time. Two earlier suites replace `react` with a hooks-only stub
-// for the rest of the process, so loading it from here crashes on CI.
-mock.module("renderer/components/CommentMarkdown", () => ({
-	CommentMarkdown: ({ body }: { body: string }) => body,
-}));
-
-const { act, cleanup, fireEvent, render, within } = await import(
+const { QueryClient, QueryClientProvider } = await import(
+	"@tanstack/react-query"
+);
+const { act, cleanup, fireEvent, render, waitFor, within } = await import(
 	"@testing-library/react"
 );
+const { toast } = await import("@superset/ui/sonner");
 const { CommentThread } = await import("./CommentThread");
 
+interface Reply {
+	input: { commentId: number; body: string };
+	succeed: () => void;
+	fail: (error: Error) => void;
+}
+
+let replies: Reply[] = [];
+let toastError: ReturnType<typeof spyOn<typeof toast, "error">>;
+
+const onReply = (commentId: number, body: string) =>
+	new Promise<void>((resolve, reject) => {
+		replies.push({
+			input: { commentId, body },
+			succeed: resolve,
+			fail: reject,
+		});
+	});
+
 beforeEach(() => {
-	replyMutate.mockClear();
-	invalidateThreads.mockClear();
-	replyOptions = {};
-	replyPending = false;
+	replies = [];
+	toastError = spyOn(toast, "error").mockImplementation(() => "");
 });
-afterEach(cleanup);
+afterEach(() => {
+	cleanup();
+	toastError.mockRestore();
+});
 afterAll(async () => {
-	if (!alreadyRegistered) await GlobalRegistrator.unregister();
+	reactActGlobal.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
 });
 
 const COMMENTS = [
@@ -87,13 +61,15 @@ async function setup({ orphaned = false } = {}) {
 	let view!: ReturnType<typeof render>;
 	await act(async () => {
 		view = render(
-			<CommentThread
-				workspaceId="ws-1"
-				threadId="thread-1"
-				isResolved={false}
-				comments={COMMENTS}
-				replyToCommentId={orphaned ? undefined : 555}
-			/>,
+			<QueryClientProvider client={new QueryClient()}>
+				<CommentThread
+					isResolved={false}
+					comments={COMMENTS}
+					replyToCommentId={orphaned ? undefined : 555}
+					onReply={onReply}
+					onSetResolved={async () => {}}
+				/>
+			</QueryClientProvider>,
 		);
 	});
 	const ui = within(view.baseElement as HTMLElement);
@@ -115,15 +91,13 @@ describe("CommentThread reply", () => {
 			fireEvent.click(replyButton);
 		});
 
-		expect(replyMutate.mock.calls).toEqual([
-			[{ workspaceId: "ws-1", commentId: 555, body: "Looks good" }],
+		expect(replies.map((reply) => reply.input)).toEqual([
+			{ commentId: 555, body: "Looks good" },
 		]);
 		expect((textarea as HTMLTextAreaElement).value).toBe("");
 
-		await act(async () => {
-			replyOptions.onSuccess?.();
-		});
-		expect(invalidateThreads.mock.calls).toEqual([[{ workspaceId: "ws-1" }]]);
+		await act(async () => replies[0]?.succeed());
+		expect((textarea as HTMLTextAreaElement).value).toBe("");
 	});
 
 	test("Cmd+Enter submits from the textarea", async () => {
@@ -133,7 +107,7 @@ describe("CommentThread reply", () => {
 			fireEvent.keyDown(textarea, { key: "Enter", metaKey: true });
 		});
 
-		expect(replyMutate).toHaveBeenCalledTimes(1);
+		expect(replies).toHaveLength(1);
 	});
 
 	test("keeps Reply disabled until there is a non-blank draft", async () => {
@@ -146,15 +120,18 @@ describe("CommentThread reply", () => {
 	});
 
 	test("does not post while a reply is already in flight", async () => {
-		replyPending = true;
 		const { replyButton, textarea, type } = await setup();
+		await type("first");
+		await act(async () => {
+			fireEvent.click(replyButton);
+		});
 		await type("again");
 		await act(async () => {
 			fireEvent.keyDown(textarea, { key: "Enter", metaKey: true });
 		});
 
 		expect((replyButton as HTMLButtonElement).disabled).toBe(true);
-		expect(replyMutate).not.toHaveBeenCalled();
+		expect(replies).toHaveLength(1);
 	});
 
 	test("keeps the draft when the thread has no comment to reply onto", async () => {
@@ -164,7 +141,7 @@ describe("CommentThread reply", () => {
 			fireEvent.click(replyButton);
 		});
 
-		expect(replyMutate).not.toHaveBeenCalled();
+		expect(replies).toHaveLength(0);
 		expect((textarea as HTMLTextAreaElement).value).toBe("Orphaned");
 	});
 
@@ -176,13 +153,9 @@ describe("CommentThread reply", () => {
 		});
 		expect((textarea as HTMLTextAreaElement).value).toBe("");
 
-		await act(async () => {
-			replyOptions.onError?.(new Error("boom"), {
-				workspaceId: "ws-1",
-				commentId: 555,
-				body: "Looks good",
-			});
-		});
-		expect((textarea as HTMLTextAreaElement).value).toBe("Looks good");
+		await act(async () => replies[0]?.fail(new Error("boom")));
+		await waitFor(() =>
+			expect((textarea as HTMLTextAreaElement).value).toBe("Looks good"),
+		);
 	});
 });

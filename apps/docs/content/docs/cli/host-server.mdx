@@ -3,12 +3,12 @@ title: Host Server
 description: Set up the daemon the CLI and desktop app talk to when targeting the local machine.
 ---
 
-The `superset start` command runs a headless HTTP server that any Superset desktop app or CLI can communicate with.
+The `superset start` command runs a headless HTTP server that any Paradev desktop app or CLI can communicate with.
 
 It manages workspaces, ports, and agent runs on the machine it's running on. The desktop app starts it automatically; on a CLI-only or headless machine you start it yourself.
 
 If you installed the desktop app, it already includes the CLI and installs a
-`~/.superset/bin/superset` shim on app launch. Superset terminals prepend
+`~/.paradev/bin/superset` shim on app launch. Paradev terminals prepend
 that directory to `PATH` automatically. On a headless machine, use the
 standalone installer from [Getting Started](/cli/getting-started).
 
@@ -37,9 +37,9 @@ If you plan to run AI agents inside workspaces, install whichever agent CLIs you
 
 None are required to start the host server or create workspaces. Install only what you plan to run.
 
-## Authenticate the Superset CLI
+## Authenticate the Paradev CLI
 
-The host server starts under your Superset session. If you haven't already:
+The host server starts under your Paradev session. If you haven't already:
 
 ```bash
 superset auth login
@@ -55,7 +55,7 @@ superset start --daemon
 ```
 
 Spawns the daemon in the background and writes a manifest at
-`~/.superset/host/<organizationId>/manifest.json` so other clients can find
+`~/.paradev/host/<organizationId>/manifest.json` so other clients can find
 it. Binds to `127.0.0.1` only.
 
 Verify it's healthy:
@@ -64,11 +64,80 @@ Verify it's healthy:
 superset status
 ```
 
+### Keep it updated
+
+Automatic updates are off by default. To turn them on, start the host with
+`--auto-update`:
+
+```bash
+superset start --daemon --auto-update
+```
+
+- `--auto-update` requires `--daemon`.
+- The first check runs one hour after start, then every hour. A newer release
+  installs, and the host restarts with its health check and rollback.
+  Terminals reconnect after the restart.
+- Updates never downgrade the host. A release that fails its health check is
+  skipped on later automatic checks; `superset update` can still install it.
+- The flag applies to a new start only. To change it, stop the host and start
+  it again.
+
+If an update fails with a permission error on `superset.update-lock`, the host
+user cannot write the directory that contains the install. The error names the
+install path, the lock path, and the user. Give that user ownership of the
+install and its parent directory, or reinstall as that user.
+
+### Run it under systemd
+
+On a server, let systemd start the host server at boot and restart it on
+failure. Run `superset start` without `--daemon` so systemd tracks the
+process:
+
+```ini
+# /etc/systemd/system/superset-host.service
+[Unit]
+Description=Paradev host server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=<user>
+ExecStart=/home/<user>/superset/bin/superset start
+Restart=on-failure
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Keep `KillMode=process`. Other kill modes stop the terminal daemon, and with
+it every terminal and agent, whenever the service stops or restarts. The
+terminal daemon keeps running after the service stops, so the next start
+picks up the same terminals.
+
+This setup needs a CLI released after 1.30.2. With 1.30.2 and older,
+`systemctl restart` hangs until systemd kills the CLI, and the old host
+keeps running.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now superset-host
+```
+
+To end every terminal and agent too, stop the unit first, then stop the
+terminal daemon. If you run `superset stop` while the unit is active,
+systemd starts the host again.
+
+```bash
+sudo systemctl stop superset-host
+superset stop --terminals
+```
+
 ## Getting started
 
 ### Create or adopt a project
 
-A workspace branches off a project: a repo registered with Superset.
+A workspace branches off a project: a repo registered with Paradev.
 
 Each repo gets one cloud project record, shared across the organization.
 The first machine to register the repo runs `projects create`; every
@@ -152,13 +221,20 @@ superset workspaces create \
 superset stop
 ```
 
+Your terminals and agents keep running in the terminal daemon, and the next
+`superset start` picks them up. To end them as well:
+
+```bash
+superset stop --terminals
+```
+
 ## Shared state
 
-State lives under `~/.superset/host/<organizationId>/`:
+State lives under `~/.paradev/host/<organizationId>/`:
 
 ```text
-~/.superset/host/<organizationId>/manifest.json    # endpoint + auth token
-~/.superset/host/<organizationId>/host.db          # local host server DB
+~/.paradev/host/<organizationId>/manifest.json    # endpoint + auth token
+~/.paradev/host/<organizationId>/host.db          # local host server DB
 ```
 
 A host server started by the desktop app is visible to the CLI and

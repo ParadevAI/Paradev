@@ -11,6 +11,7 @@ import type {
 import type { FoldSignal } from "../ChangesFileList";
 import { ChangesFileList } from "../ChangesFileList";
 import { ChangesToolbar } from "../ChangesToolbar";
+import { ChangesListOptionsMenu } from "./components/ChangesListOptionsMenu";
 import { ChangesSearchInput } from "./components/ChangesSearchInput";
 import { filterChangesetFiles } from "./filterChangesetFiles";
 import { shouldShowChangesLoading } from "./shouldShowChangesLoading";
@@ -46,6 +47,7 @@ interface ChangesTabContentProps {
 	onBaseBranchChange: (branchName: string | null) => void;
 	onRenameBranch: (newName: string) => void;
 	canRenameBranch: boolean;
+	compact?: boolean;
 }
 
 export const ChangesTabContent = memo(function ChangesTabContent({
@@ -69,6 +71,7 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	onBaseBranchChange,
 	onRenameBranch,
 	canRenameBranch,
+	compact = false,
 }: ChangesTabContentProps) {
 	const [foldSignal, setFoldSignal] = useState<FoldSignal>({
 		epoch: 0,
@@ -132,42 +135,65 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="pt-1">
-				<ChangesToolbar
-					filter={filter}
-					onFilterChange={onFilterChange}
-					commits={commits.data?.commits ?? []}
-					uncommittedCount={
-						status.data.staged.length + status.data.unstaged.length
-					}
-					viewMode={viewMode}
-					onViewModeChange={onViewModeChange}
-					collapsed={foldCollapsed}
-					onToggleFold={toggleFold}
-					searchOpen={searchOpen}
-					onToggleSearch={toggleSearch}
-					baseBranch={baseBranch ?? status.data.defaultBranch.name}
-					branches={branches.data?.branches ?? []}
-					// Picking the repo default clears the override (null) instead of
-					// pinning it, so the workspace follows a later default change.
-					onBaseBranchChange={(branchName) =>
-						onBaseBranchChange(
-							branchName === status.data?.defaultBranch.name
-								? null
-								: branchName,
-						)
-					}
-					currentBranchName={status.data.currentBranch.name}
-					canRenameBranch={canRenameBranch}
-					onRenameBranch={onRenameBranch}
-				/>
-			</div>
-			{searchOpen && (
-				<ChangesSearchInput
-					query={searchQuery}
-					onQueryChange={setSearchQuery}
-					onClose={closeSearch}
-				/>
+			{compact ? (
+				<div className="flex items-center gap-1 pt-1 pr-1.5">
+					<div className="min-w-0 flex-1 [&>div]:mr-0">
+						<ChangesSearchInput
+							query={searchQuery}
+							onQueryChange={setSearchQuery}
+							onClose={() => setSearchQuery("")}
+							autoFocus={false}
+						/>
+					</div>
+					<div className="mt-1">
+						<ChangesListOptionsMenu
+							viewMode={viewMode}
+							onViewModeChange={onViewModeChange}
+							collapsed={foldCollapsed}
+							onToggleFold={toggleFold}
+						/>
+					</div>
+				</div>
+			) : (
+				<>
+					<div className="pt-1">
+						<ChangesToolbar
+							filter={filter}
+							onFilterChange={onFilterChange}
+							commits={commits.data?.commits ?? []}
+							uncommittedCount={
+								status.data.staged.length + status.data.unstaged.length
+							}
+							viewMode={viewMode}
+							onViewModeChange={onViewModeChange}
+							collapsed={foldCollapsed}
+							onToggleFold={toggleFold}
+							searchOpen={searchOpen}
+							onToggleSearch={toggleSearch}
+							baseBranch={baseBranch ?? status.data.defaultBranch.name}
+							branches={branches.data?.branches ?? []}
+							// Picking the repo default clears the override (null) instead of
+							// pinning it, so the workspace follows a later default change.
+							onBaseBranchChange={(branchName) =>
+								onBaseBranchChange(
+									branchName === status.data?.defaultBranch.name
+										? null
+										: branchName,
+								)
+							}
+							currentBranchName={status.data.currentBranch.name}
+							canRenameBranch={canRenameBranch}
+							onRenameBranch={onRenameBranch}
+						/>
+					</div>
+					{searchOpen && (
+						<ChangesSearchInput
+							query={searchQuery}
+							onQueryChange={setSearchQuery}
+							onClose={closeSearch}
+						/>
+					)}
+				</>
 			)}
 			<ChangesFileList
 				files={visibleFiles}

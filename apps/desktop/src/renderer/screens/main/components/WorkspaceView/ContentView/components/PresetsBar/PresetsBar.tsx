@@ -22,6 +22,8 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
+import { isTerminalPresetEnabled } from "renderer/lib/agent-launch-command";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { usePresets } from "renderer/react-query/presets";
 import { WorkspaceRunButton } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/WorkspaceRunButton";
@@ -128,6 +130,14 @@ export function PresetsBar() {
 	const { workspaceId } = useParams({ strict: false });
 	const navigate = useNavigate();
 	const isDark = useIsDarkTheme();
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const quickAddTemplates = useMemo(
+		() =>
+			QUICK_ADD_PRESET_TEMPLATES.filter((template) =>
+				isAgentPresetEnabled(template.name),
+			),
+		[isAgentPresetEnabled],
+	);
 	const { showPresetsBar, setShowPresetsBar } = useShowPresetsBar();
 	const { data: workspace } = electronTrpc.workspaces.get.useQuery(
 		{ id: workspaceId ?? "" },
@@ -143,8 +153,15 @@ export function PresetsBar() {
 	const { openPreset, openPresetInCurrentTerminal } = useTabsWithPresets(
 		workspace?.projectId,
 	);
+	const visiblePresets = useMemo(
+		() =>
+			matchedPresets.filter((preset) =>
+				isTerminalPresetEnabled(preset, isAgentPresetEnabled),
+			),
+		[matchedPresets, isAgentPresetEnabled],
+	);
 	const [localPinnedPresetIds, setLocalPinnedPresetIds] = useState<string[]>(
-		() => getPinnedPresetOrder(matchedPresets),
+		() => getPinnedPresetOrder(visiblePresets),
 	);
 	const presetsByName = useMemo(() => {
 		const map = new Map<string, typeof matchedPresets>();
@@ -172,40 +189,40 @@ export function PresetsBar() {
 			const item = presetById.get(presetId);
 			if (!item) continue;
 			if (!isPresetPinnedToBar(item.preset.pinnedToBar)) continue;
+			if (!isTerminalPresetEnabled(item.preset, isAgentPresetEnabled)) continue;
 			orderedPinnedPresets.push(item);
 			seenIds.add(presetId);
 		}
 
 		for (const [index, preset] of matchedPresets.entries()) {
 			if (!isPresetPinnedToBar(preset.pinnedToBar)) continue;
+			if (!isTerminalPresetEnabled(preset, isAgentPresetEnabled)) continue;
 			if (seenIds.has(preset.id)) continue;
 			orderedPinnedPresets.push({ preset, index });
 		}
 
 		return orderedPinnedPresets;
-	}, [matchedPresets, localPinnedPresetIds]);
+	}, [matchedPresets, localPinnedPresetIds, isAgentPresetEnabled]);
 	const presetIndexById = useMemo(
 		() => new Map(matchedPresets.map((preset, index) => [preset.id, index])),
 		[matchedPresets],
 	);
 	const managedPresets = useMemo(() => {
-		const templateNames = new Set(
-			QUICK_ADD_PRESET_TEMPLATES.map((t) => t.name),
-		);
+		const templateNames = new Set(quickAddTemplates.map((t) => t.name));
 		const primaryTemplatePresetIds = new Set(
-			QUICK_ADD_PRESET_TEMPLATES.flatMap((template) => {
+			quickAddTemplates.flatMap((template) => {
 				const match = presetsByName.get(template.name)?.[0];
 				return match ? [match.id] : [];
 			}),
 		);
-		const fromTemplates = QUICK_ADD_PRESET_TEMPLATES.map((template) => ({
+		const fromTemplates = quickAddTemplates.map((template) => ({
 			key: `template:${template.name}`,
 			name: template.name,
 			preset: presetsByName.get(template.name)?.[0],
 			template,
 			iconName: template.name,
 		}));
-		const customExisting = matchedPresets
+		const customExisting = visiblePresets
 			.filter(
 				(preset) =>
 					!templateNames.has(preset.name) ||
@@ -219,16 +236,16 @@ export function PresetsBar() {
 				iconName: preset.name,
 			}));
 		return [...fromTemplates, ...customExisting];
-	}, [matchedPresets, presetsByName]);
+	}, [visiblePresets, presetsByName, quickAddTemplates]);
 
 	useEffect(() => {
-		const serverPinnedPresetIds = getPinnedPresetOrder(matchedPresets);
+		const serverPinnedPresetIds = getPinnedPresetOrder(visiblePresets);
 		setLocalPinnedPresetIds((current) =>
 			areStringArraysEqual(current, serverPinnedPresetIds)
 				? current
 				: serverPinnedPresetIds,
 		);
-	}, [matchedPresets]);
+	}, [visiblePresets]);
 
 	const handleOpenPresetDefault = useCallback(
 		(preset: (typeof matchedPresets)[number]) => {

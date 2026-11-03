@@ -5,40 +5,38 @@ import {
 	type SerializedLexicalNode,
 	type Spread,
 } from "lexical";
-import type { JSX } from "react";
+import { type JSX, useContext } from "react";
+import { Chip } from "../../../Chip";
+import { useRenderChip } from "../../providers/ChipRenderProvider";
 import type { ComposerChip } from "../../types";
+import { ChipRendererContext } from "./chipRenderer";
 
 function MentionChipComponent({
 	nodeKey,
-	label,
-	brandColor,
-	iconUrl,
+	chip,
 }: {
 	nodeKey: NodeKey;
-	label: string;
-	brandColor: string | null;
-	iconUrl: string | null;
+	chip: ComposerChip;
 }) {
 	const [isSelected] = useLexicalNodeSelection(nodeKey);
-	return (
-		<span
-			className="prompt-input-chip"
-			data-mention-chip="true"
-			data-selected={isSelected || undefined}
-			style={
-				brandColor
-					? ({ "--chip-color": brandColor } as React.CSSProperties)
-					: undefined
-			}
-		>
-			{iconUrl && (
-				<span className="prompt-input-chip-icon">
-					<img src={iconUrl} alt="" draggable={false} />
-				</span>
-			)}
-			<span className="prompt-input-chip-label">{label}</span>
-		</span>
+	const custom = useContext(ChipRendererContext)?.(chip);
+	const renderChip = useRenderChip();
+	if (custom) {
+		return (
+			<span
+				data-mention-chip
+				data-selected={isSelected || undefined}
+				className="cursor-pointer select-none rounded-[4px] data-[selected]:ring-1 data-[selected]:ring-ring"
+			>
+				{custom}
+			</span>
+		);
+	}
+	const wrapped = renderChip?.(
+		chip,
+		<Chip chip={chip} mention selected={isSelected} tooltip={false} />,
 	);
+	return wrapped ?? <Chip chip={chip} mention selected={isSelected} />;
 }
 
 export type SerializedMentionChipNode = Spread<
@@ -48,9 +46,24 @@ export type SerializedMentionChipNode = Spread<
 		brandColor: string | null;
 		iconUrl: string | null;
 		dataJson: string | null;
+		description?: string;
 	},
 	SerializedLexicalNode
 >;
+
+export function chipFromJSON(
+	serialized: SerializedMentionChipNode,
+): ComposerChip {
+	return {
+		label: serialized.label,
+		serialized: serialized.serialized,
+		brandColor: serialized.brandColor ?? undefined,
+		iconUrl: serialized.iconUrl ?? undefined,
+		...(serialized.description ? { description: serialized.description } : {}),
+		data:
+			serialized.dataJson == null ? undefined : JSON.parse(serialized.dataJson),
+	};
+}
 
 export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	__label: string;
@@ -58,6 +71,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	__brandColor: string | null;
 	__iconUrl: string | null;
 	__dataJson: string | null;
+	__description: string | null;
 
 	static getType(): string {
 		return "mention-chip";
@@ -70,6 +84,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			node.__brandColor,
 			node.__iconUrl,
 			node.__dataJson,
+			node.__description,
 			node.__key,
 		);
 	}
@@ -80,9 +95,11 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 		brandColor: string | null,
 		iconUrl: string | null,
 		dataJson: string | null,
+		description: string | null = null,
 		key?: NodeKey,
 	) {
 		super(key);
+		this.__description = description;
 		this.__label = label;
 		this.__serialized = serialized;
 		this.__brandColor = brandColor;
@@ -97,6 +114,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			chip.brandColor ?? null,
 			chip.iconUrl ?? null,
 			chip.data === undefined ? null : JSON.stringify(chip.data),
+			chip.description ?? null,
 		);
 	}
 
@@ -106,6 +124,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			serialized: this.__serialized,
 			brandColor: this.__brandColor ?? undefined,
 			iconUrl: this.__iconUrl ?? undefined,
+			...(this.__description ? { description: this.__description } : {}),
 			data: this.__dataJson == null ? undefined : JSON.parse(this.__dataJson),
 		};
 	}
@@ -117,6 +136,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			serialized.brandColor,
 			serialized.iconUrl,
 			serialized.dataJson,
+			serialized.description ?? null,
 		);
 	}
 
@@ -129,6 +149,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			brandColor: this.__brandColor,
 			iconUrl: this.__iconUrl,
 			dataJson: this.__dataJson,
+			...(this.__description ? { description: this.__description } : {}),
 		};
 	}
 
@@ -149,13 +170,6 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	}
 
 	decorate(): JSX.Element {
-		return (
-			<MentionChipComponent
-				nodeKey={this.__key}
-				label={this.__label}
-				brandColor={this.__brandColor}
-				iconUrl={this.__iconUrl}
-			/>
-		);
+		return <MentionChipComponent nodeKey={this.__key} chip={this.toChip()} />;
 	}
 }

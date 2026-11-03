@@ -1,15 +1,28 @@
 import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
+import { IOS_APP } from "@superset/shared/app-identity";
+import { BRAND } from "@superset/shared/brand";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
 import { withIosAccentColor } from "./config-plugins/withIosAccentColor";
+import { withSceneLifecycle } from "./config-plugins/withSceneLifecycle";
 
-// Load .env file
-config({
-	path: path.resolve(__dirname, "../../.env"),
-	override: true,
-	quiet: true,
-});
+// The root .env belongs to the local dev stack. Every eas.json build profile
+// sets MOBILE_EAS_BUILD, so a build submitted from a dev checkout resolves the
+// same config, and the same runtime version, as EAS, which has no .env.
+if (process.env.MOBILE_EAS_BUILD !== "1") {
+	config({
+		path: path.resolve(__dirname, "../../.env"),
+		override: true,
+		quiet: true,
+	});
+}
+
+const webUrl = new URL(
+	process.env.EXPO_PUBLIC_WEB_URL || "https://app.superset.sh",
+);
+const associatedDomains =
+	webUrl.protocol === "https:" ? [`applinks:${webUrl.hostname}`] : undefined;
 
 const SIGNED_BUILD_PROFILES = ["preview", "production"];
 const signedUpdates = process.env.MOBILE_SIGNED_UPDATES === "1";
@@ -29,7 +42,7 @@ export default ({ config }: ConfigContext) => ({
 	locales: Object.fromEntries(
 		SUPPORTED_LOCALES.map((locale) => [locale, `./locales/${locale}.json`]),
 	),
-	version: "1.1.2",
+	version: "1.2.1",
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	userInterfaceStyle: "dark",
@@ -43,19 +56,29 @@ export default ({ config }: ConfigContext) => ({
 		}),
 	},
 	ios: {
-		supportsTablet: false,
-		appleTeamId: "NV9657CS5A",
+		supportsTablet: true,
+		appleTeamId: IOS_APP.TEAM_ID,
 		// Shared with the AgentActivity widget extension: the Live Activity
 		// sandbox has no network, so project icons are cached here by the app
 		// and read back by the extension from disk.
 		entitlements: {
 			"com.apple.security.application-groups": ["group.sh.superset.mobile"],
 		},
-		bundleIdentifier: "sh.superset.mobile",
+		bundleIdentifier: IOS_APP.BUNDLE_ID,
+		...(associatedDomains && { associatedDomains }),
 		usesAppleSignIn: true,
 		infoPlist: {
+			CFBundleDisplayName: BRAND.NAME,
+			"UISupportedInterfaceOrientations~ipad": [
+				"UIInterfaceOrientationPortrait",
+				"UIInterfaceOrientationPortraitUpsideDown",
+				"UIInterfaceOrientationLandscapeLeft",
+				"UIInterfaceOrientationLandscapeRight",
+			],
 			ITSAppUsesNonExemptEncryption: false,
 			NSSupportsLiveActivities: true,
+			// Voice mode keeps its WebRTC call up with the phone locked.
+			UIBackgroundModes: ["audio"],
 			// Dictation is native now (`modules/composer`), so no config plugin
 			// contributes this any more — `expo-speech-recognition` used to, and
 			// went with `GlassComposer`. Without it `SFSpeechRecognizer`'s
@@ -82,6 +105,8 @@ export default ({ config }: ConfigContext) => ({
 		// where the rest of that chrome is dark. The composer states its own
 		// tint (`ComposerRootView`) rather than inheriting this.
 		[withIosAccentColor, { color: "#262626" }],
+		// iOS 27 SDK: an app without the UIScene life cycle traps on launch.
+		withSceneLifecycle,
 		"@bacons/apple-targets",
 		"expo-router",
 		[
@@ -102,7 +127,8 @@ export default ({ config }: ConfigContext) => ({
 			{
 				organization: "superset-sh",
 				project: "mobile",
-				useNativeInit: true,
+				// Native init with no DSN crashes the app at launch.
+				useNativeInit: Boolean(process.env.EXPO_PUBLIC_SENTRY_DSN_MOBILE),
 				options: {
 					dsn: process.env.EXPO_PUBLIC_SENTRY_DSN_MOBILE,
 					environment: process.env.EXPO_PUBLIC_SENTRY_ENVIRONMENT,
@@ -127,6 +153,17 @@ export default ({ config }: ConfigContext) => ({
 			},
 		],
 		"expo-document-picker",
+		// Listed after expo-image-picker on purpose: both write the microphone
+		// string and the last one wins, so this names both uses.
+		[
+			"@config-plugins/react-native-webrtc",
+			{
+				cameraPermission:
+					"Superset uses the camera so you can attach photos to chat messages.",
+				microphonePermission:
+					"Superset uses the microphone for voice mode and to dictate chat messages.",
+			},
+		],
 		["expo-notifications", { enableBackgroundRemoteNotifications: false }],
 		// The composer is built on Liquid Glass, which silently no-ops before
 		// iOS 26 — an iOS 26 floor means one visual language instead of a glass
@@ -134,7 +171,7 @@ export default ({ config }: ConfigContext) => ({
 		[
 			"expo-build-properties",
 			{
-				ios: { deploymentTarget: "26.0" },
+				ios: { deploymentTarget: "26.0", buildReactNativeFromSource: true },
 			},
 		],
 		// SDK 57 no longer autolinks config plugins; every installed plugin has

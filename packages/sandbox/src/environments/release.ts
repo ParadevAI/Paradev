@@ -4,19 +4,25 @@
  * result the way a person would:
  *
  *   1. the host-service runtime asset (this checkout's host-service and
- *      pty-daemon, natives installed for the box) and the bundle, published
- *   2. the image in Vercel Container Registry, unless --skip-image
+ *      pty-daemon, natives installed for the box), this checkout's CLI, the
+ *      latest claude, codex and Chrome (a fetch that fails keeps the
+ *      committed pin) and the bundle, published
+ *   2. the image in Vercel Container Registry under a candidate tag, unless
+ *      --skip-image; `latest`, which every image environment resolves to,
+ *      stays on the previous release
  *   3. the internal golden: a box provisioned from the image exactly the way
  *      a workspace is, with the internal environment's setup hook run in it,
  *      verified, stripped of its identity and stopped so its snapshot is what
  *      forks start from
  *   4. a probe fork of that golden, checked as a workspace: host-service,
- *      the desktop stream, the checkout, the firewall, the gate
- *   5. the rows: the shared `Default` environment -> image + bundle, the
- *      internal organization's environment -> the new golden + bundle + the
+ *      the desktop stream, the checkout, the firewall, the gate; then
+ *      `latest` moved to the candidate
+ *   5. the rows, in one transaction: the shared `Default` environment and
+ *      every environment that has a bundle -> the new bundle, `Default` ->
+ *      image, the internal organization's environment -> the new golden + the
  *      setup and start overrides; the previous golden deleted
  *
- *   SUPERSET_INTERNAL_ORGANIZATION_ID=… bun run release [--production] [--skip-image] [--keep-old]
+ *   SUPERSET_INTERNAL_ORGANIZATION_ID=… SUPERSET_INTERNAL_ENVIRONMENT_ID=… bun run release [--production] [--skip-image] [--keep-old]
  *
  * Needs VERCEL_SANDBOX_*, SANDBOX_GATE_SECRET, CDN_R2_* and, for the image,
  * Docker with Buildx. Rows go to DATABASE_URL, or with
@@ -24,17 +30,14 @@
  * NEON_PROJECT_ID). SUPERSET_INTERNAL_ENV_FILE feeds the probe's managed
  * environment so the dev-stack checks can run; the golden never carries it.
  * Fails loudly and leaves the golden and probe up for inspection when any
- * check fails; the previous rows stay live.
+ * check fails; the previous rows and `latest` stay live.
  */
 
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import {
-	SANDBOX_IMAGE_NAME,
-	SHARED_ENVIRONMENT_NAME,
-	SHARED_ENVIRONMENT_ORGANIZATION_ID,
-} from "@superset/shared/constants";
+import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	SANDBOX_PATHS,
@@ -52,16 +55,19 @@ process.env.SKIP_ENV_VALIDATION ??= "1";
 const SKIP_IMAGE = process.argv.includes("--skip-image");
 const KEEP_OLD = process.argv.includes("--keep-old");
 const PRODUCTION = process.argv.includes("--production");
+const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome"];
+/** The environment the release rebuilds; without it, the release creates one named INTERNAL_NAME. */
+const ENVIRONMENT_ID = process.env.SUPERSET_INTERNAL_ENVIRONMENT_ID;
 const INTERNAL_NAME =
-	process.env.SUPERSET_INTERNAL_ENVIRONMENT_NAME ?? "Superset";
+	process.env.SUPERSET_INTERNAL_ENVIRONMENT_NAME ?? "Satya's Superset";
 const ORGANIZATION_ID = process.env.SUPERSET_INTERNAL_ORGANIZATION_ID;
 const ENV_FILE = process.env.SUPERSET_INTERNAL_ENV_FILE;
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-const REPO_URL = "https://github.com/superset-sh/superset.git";
+const REPO_URL = "https://github.com/paradevai/paradev.git";
 const REPO_PATH = SANDBOX_ROOT_CHECKOUT;
 const REPO_DIR = sandboxCheckoutDir(SANDBOX_PATHS.workspace, REPO_PATH);
-const REPO_FULL_NAME = "superset-sh/superset";
-/** The monorepo branch the golden is built from; its `.superset/config.json` supplies `start`. */
+const REPO_FULL_NAME = "paradevai/paradev";
+/** The monorepo branch the golden is built from; its `.paradev/config.json` supplies `start`. */
 const BRANCH = process.env.SUPERSET_INTERNAL_BRANCH ?? "main";
 const REGION = DEFAULT_SANDBOX_REGION;
 
@@ -121,33 +127,59 @@ const { producers } = await import("../assets/produce");
 const { buildBundle, publishBundle } = await import("../build");
 log("runtime: building host-service and pty-daemon into the runtime asset");
 await producers["host-service"]?.();
+log("cli: building this checkout's superset for the box");
+await producers.cli?.();
+for (const name of FOLLOWED_UPSTREAM) {
+	try {
+		await producers[name]?.();
+	} catch (error) {
+		console.log(
+			`::warning::${name}: kept the committed pin; the latest did not resolve: ${error}`,
+		);
+	}
+}
 const bundle = buildBundle();
+log(
+	`pins: ${["host-service", "cli", ...FOLLOWED_UPSTREAM]
+		.map((name) => `${name} ${bundle.assets[name]?.version}`)
+		.join(", ")}`,
+);
 await publishBundle(bundle, { dry: false });
 log(`bundle: ${bundle.sha256} published`);
 
 // 2. image
+const candidateTag = `release-${bundle.sha256.slice(0, 12)}`;
+const goldenImage = SKIP_IMAGE
+	? SANDBOX_IMAGE_NAME
+	: `${SANDBOX_IMAGE_NAME}:${candidateTag}`;
 if (SKIP_IMAGE) {
 	log("image: skipped (--skip-image)");
 } else {
 	const { buildImage } = await import("../image");
-	log(`image: building and pushing ${SANDBOX_IMAGE_NAME}`);
-	await buildImage(bundle, { local: false });
+	log(`image: building and pushing ${goldenImage}`);
+	await buildImage(bundle, { local: false, tag: candidateTag });
 }
 
 // 3. golden
+// The modules, not the `lib/sandbox` barrel: it also builds the billing and
+// email clients, whose secrets this job does not have.
 const {
 	deleteSandbox,
-	deriveSandboxCredentials,
 	provisionSandbox,
-	sandboxHostSecretFor,
 	stopAndSnapshot,
 	stripWorkspaceIdentity,
 	wakeSandbox,
-} = await import("@superset/trpc/lib/sandbox");
+} = await import("@superset/trpc/lib/sandbox/vercel");
+const { deriveSandboxCredentials } = await import(
+	"@superset/trpc/lib/sandbox/credentials"
+);
+const { sandboxHostSecretFor } = await import(
+	"@superset/trpc/lib/sandbox/access"
+);
 const { probeBox, checkWakeLog } = await import("./probe");
 
 const setupScript = readFileSync(
-	join(import.meta.dir, "internal-setup.sh"),
+	join(import.meta.dir, "satya-setup.sh"),
 	"utf8",
 );
 const setupHook = [setupScript];
@@ -160,7 +192,7 @@ function identityFor(workspaceId: string, sourceRef: string): SandboxIdentity {
 		SUPERSET_SANDBOX_WORKSPACE_ID: workspaceId,
 		SUPERSET_SANDBOX_ORGANIZATION_ID: ORGANIZATION_ID as string,
 		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
-			{ url: REPO_URL, branch: BRANCH, path: REPO_PATH, hooks: true },
+			{ url: REPO_URL, branch: BRANCH, path: REPO_PATH },
 		]),
 		SUPERSET_SANDBOX_IMAGE_TAG: sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
@@ -170,7 +202,7 @@ function identityFor(workspaceId: string, sourceRef: string): SandboxIdentity {
 const golden = `env-internal-${Date.now().toString(36)}`;
 const goldenWorkspaceId = randomUUID();
 const goldenSecret = await sandboxHostSecretFor(goldenWorkspaceId);
-log(`golden: provisioning ${golden} from ${SANDBOX_IMAGE_NAME}`);
+log(`golden: provisioning ${golden} from ${goldenImage}`);
 // A freshly pushed image sits in `Preparing` while the registry optimises it
 // for sandboxes, and create answers 409 until then.
 const deadline = Date.now() + 20 * 60_000;
@@ -181,14 +213,15 @@ for (;;) {
 			kind: "environment",
 			environment: {
 				sourceKind: "image",
-				sourceRef: SANDBOX_IMAGE_NAME,
+				sourceRef: goldenImage,
 				region: REGION,
 			},
 			claim: {
-				identity: identityFor(goldenWorkspaceId, SANDBOX_IMAGE_NAME),
+				identity: identityFor(goldenWorkspaceId, goldenImage),
 				hostSecret: goldenSecret,
 				managedEnv: {},
 				networkPolicy: "allow-all",
+				vcpus: GOLDEN_BOX_VCPUS,
 			},
 		});
 		break;
@@ -207,10 +240,11 @@ for (;;) {
 await wakeSandbox({
 	providerSandboxId: golden,
 	claim: {
-		identity: identityFor(goldenWorkspaceId, SANDBOX_IMAGE_NAME),
+		identity: identityFor(goldenWorkspaceId, goldenImage),
 		hostSecret: goldenSecret,
 		managedEnv: {},
 		networkPolicy: "allow-all",
+		vcpus: GOLDEN_BOX_VCPUS,
 	},
 });
 log("golden: host-service up; waiting for the checkout");
@@ -263,13 +297,13 @@ const setup = await runLong(
 );
 for (const line of setup.logs
 	.split("\n")
-	.filter((l) => l.includes("[internal-setup]")))
+	.filter((l) => l.includes("[satya-setup]")))
 	log(`  ${line.trim()}`);
 if (setup.code !== 0)
 	fail(`setup hook exited ${setup.code}; ${golden} left for inspection`);
 
 const checks: Array<[label: string, command: string, expect: RegExp]> = [
-	["repo", `git -C ${REPO_DIR} remote get-url origin`, /superset-sh\/superset/],
+	["repo", `git -C ${REPO_DIR} remote get-url origin`, /paradevai\/paradev/],
 	["dependencies", `test -d ${REPO_DIR}/node_modules && echo ok`, /ok/],
 	[
 		"turbo",
@@ -283,13 +317,17 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 	],
 	[
 		"the repository's cloud setup and dev stack",
-		"test -x /workspace/.superset/setup.cloud.sh && test -x /workspace/.superset/dev-stack.cloud.sh && echo ok",
+		"test -x /workspace/.paradev/setup.cloud.sh && test -x /workspace/.paradev/dev-stack.cloud.sh && echo ok",
 		/ok/,
 	],
 	["neonctl", "neonctl --version", /^\d+\.\d+/m],
 	["vercel", "vercel --version", /\d+\.\d+\.\d+/],
 	["wrangler", "wrangler --version", /\d+\.\d+\.\d+/],
 	["eas-cli", "eas --version", /\d+\.\d+\.\d+/],
+	["psql", "psql --version", /\d+\.\d+/],
+	["ntn", "ntn --version", /\d+\.\d+\.\d+/],
+	["agent-device", "agent-device --version", /\d+\.\d+\.\d+/],
+	["stripe", "stripe --version", /\d+\.\d+\.\d+/],
 ];
 let failed = 0;
 for (const [label, command, expect] of checks) {
@@ -367,6 +405,7 @@ const probeClaim = {
 	hostSecret: probeSecret,
 	managedEnv,
 	networkPolicy,
+	vcpus: GOLDEN_BOX_VCPUS,
 };
 log(`probe: provisioning ${probe} as a fork of ${golden}`);
 await provisionSandbox({
@@ -429,69 +468,82 @@ if (probeFailed)
 await deleteSandbox(probe);
 log(`probe: ${probe} deleted`);
 
+if (!SKIP_IMAGE) {
+	const { retagImage } = await import("../image");
+	await retagImage(candidateTag, "latest");
+	log(`image: ${SANDBOX_IMAGE_NAME}:latest -> ${goldenImage}`);
+}
+
 // 5. rows
 const { db, dbWs } = await import("@superset/db/client");
-const { environments, environmentRepositories, githubRepositories } =
-	await import("@superset/db/schema");
-const { and, eq } = await import("drizzle-orm");
-const { seedSharedEnvironments } = await import("./seed");
+const { environments, environmentRepositories } = await import(
+	"@superset/db/schema"
+);
+const { eq, isNull } = await import("drizzle-orm");
+const { releaseRepositoryWhere } = await import(
+	"./utils/releaseRepositoryWhere"
+);
+const { recordReleasedBundle } = await import("./record-bundle");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
-// the box acts on the monorepo's own .superset/config.json.
+// the box acts on the monorepo's own .paradev/config.json.
 const monorepo = await db.query.githubRepositories.findFirst({
-	where: and(
-		eq(githubRepositories.organizationId, ORGANIZATION_ID as string),
-		eq(githubRepositories.fullName, REPO_FULL_NAME),
-	),
+	where: releaseRepositoryWhere(ORGANIZATION_ID as string, REPO_FULL_NAME),
 });
 if (!monorepo)
 	fail(
 		`rows: ${REPO_FULL_NAME} is not connected to organization ${ORGANIZATION_ID}; install the GitHub App there first; ${golden} left for inspection`,
 	);
 
-await seedSharedEnvironments(SANDBOX_IMAGE_NAME);
-await db
-	.update(environments)
-	.set({ bundleSha: bundle.sha256 })
-	.where(eq(environments.organizationId, SHARED_ENVIRONMENT_ORGANIZATION_ID));
-log(
-	`rows: ${SHARED_ENVIRONMENT_NAME} -> image ${SANDBOX_IMAGE_NAME}, bundle ${bundle.sha256.slice(0, 12)}`,
-);
+const previous = ENVIRONMENT_ID
+	? await db.query.environments.findFirst({
+			where: (row, { and: both, eq: equals }) =>
+				both(
+					equals(row.id, ENVIRONMENT_ID),
+					equals(row.organizationId, ORGANIZATION_ID as string),
+				),
+		})
+	: undefined;
+if (ENVIRONMENT_ID && !previous)
+	fail(
+		`rows: environment ${ENVIRONMENT_ID} is not in organization ${ORGANIZATION_ID}; ${golden} left for inspection`,
+	);
 
-const previous = await db.query.environments.findFirst({
-	where: (row, { and: both, eq: equals }) =>
-		both(
-			equals(row.organizationId, ORGANIZATION_ID as string),
-			equals(row.name, INTERNAL_NAME),
-		),
+await recordReleasedBundle({
+	imageRef: SANDBOX_IMAGE_NAME,
+	bundleSha: bundle.sha256,
 });
-await dbWs.transaction(async (tx) => {
-	const [internal] = await tx
-		.insert(environments)
-		.values({
-			organizationId: ORGANIZATION_ID as string,
-			name: INTERNAL_NAME,
-			provider: "vercel",
-			sourceKind: "fork",
-			sourceRef: golden,
-			region: REGION,
-			bundleSha: bundle.sha256,
-			hooksRepositoryId: monorepo.id,
-		})
-		.onConflictDoUpdate({
-			target: [environments.organizationId, environments.name],
-			set: {
-				provider: "vercel",
-				sourceKind: "fork",
-				sourceRef: golden,
-				region: REGION,
-				bundleSha: bundle.sha256,
-				hooksRepositoryId: monorepo.id,
-				archivedAt: null,
-			},
-		})
+const fromGolden = {
+	provider: "vercel" as const,
+	sourceKind: "fork" as const,
+	sourceRef: golden,
+	region: REGION,
+	bundleSha: bundle.sha256,
+	primaryRepositoryId: monorepo.id,
+	archivedAt: null,
+};
+const { internal, bundled } = await dbWs.transaction(async (tx) => {
+	const bundled = await tx
+		.update(environments)
+		.set({ bundleSha: bundle.sha256 })
+		.where(isNull(environments.archivedAt))
 		.returning({ id: environments.id });
-	if (!internal) throw new Error(`${INTERNAL_NAME} row missing after upsert`);
+	const [internal] = previous
+		? await tx
+				.update(environments)
+				.set(fromGolden)
+				.where(eq(environments.id, previous.id))
+				.returning({ id: environments.id, name: environments.name })
+		: await tx
+				.insert(environments)
+				.values({
+					organizationId: ORGANIZATION_ID as string,
+					name: INTERNAL_NAME,
+					...fromGolden,
+				})
+				.returning({ id: environments.id, name: environments.name });
+	if (!internal)
+		throw new Error("internal environment row missing after write");
 	await tx
 		.delete(environmentRepositories)
 		.where(eq(environmentRepositories.environmentId, internal.id));
@@ -499,10 +551,18 @@ await dbWs.transaction(async (tx) => {
 		environmentId: internal.id,
 		repositoryId: monorepo.id,
 	});
+	return { internal, bundled };
 });
 log(
-	`rows: ${INTERNAL_NAME} -> fork of ${golden}, bundle ${bundle.sha256.slice(0, 12)}`,
+	`rows: bundle ${bundle.sha256.slice(0, 12)} recorded; ${bundled.length} environments -> it`,
 );
+log(
+	`rows: ${internal.name} (${internal.id}) -> fork of ${golden}, bundle ${bundle.sha256.slice(0, 12)}`,
+);
+if (!previous)
+	log(
+		`rows: created; set SUPERSET_INTERNAL_ENVIRONMENT_ID=${internal.id} so the next release updates it`,
+	);
 
 if (
 	previous &&

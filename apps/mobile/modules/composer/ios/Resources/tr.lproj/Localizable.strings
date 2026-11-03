@@ -14,3 +14,6 @@
 "Could not start dictation" = "Dikte başlatılamadı";
 "Uploading" = "Yükleniyor";
 "Upload failed" = "Yükleme başarısız";
+"Stop" = "Durdur";
+"Dictation stopped. What was heard so far is in your message." = "Dikte durdu. Şimdiye kadar duyulanlar mesajınızda.";
+"Transcription took too long. The last few words may be missing." = "Yazıya dönüştürme çok uzun sürdü. Son birkaç kelime eksik olabilir.";

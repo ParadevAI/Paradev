@@ -9,14 +9,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"github": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "github",
-		"version": "1.0.1",
+		"version": "1.0.4",
 		"description": "Work with issues, pull requests, and CI across your repositories.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"github",
@@ -37,7 +37,10 @@ export const FIRST_PARTY_MANIFESTS = {
 				},
 				"mcp": {
 					"type": "streamable-http",
-					"url": "https://api.githubcopilot.com/mcp/"
+					"url": "https://api.githubcopilot.com/mcp/",
+					"headers": {
+						"X-MCP-Toolsets": "context,repos,issues,pull_requests,users,actions"
+					}
 				}
 			}
 		},
@@ -55,14 +58,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"linear": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "linear",
-		"version": "1.5.2",
+		"version": "1.5.6",
 		"description": "Plan and build products: create, search, and update Linear issues.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"linear",
@@ -78,7 +81,7 @@ export const FIRST_PARTY_MANIFESTS = {
 					"icon": "linear"
 				},
 				"connector": {
-					"slug": "linear"
+					"slug": "linear_mcp"
 				},
 				"mcp": {
 					"type": "streamable-http",
@@ -104,14 +107,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"notion": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "notion",
-		"version": "1.0.3",
+		"version": "1.0.6",
 		"description": "Search, read, and write your Notion workspace: pages, databases, and comments.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"notion",
@@ -150,14 +153,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"slack": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "slack",
-		"version": "1.2.3",
+		"version": "1.2.5",
 		"description": "Search, read, and post across your Slack workspace: channels, DMs, and threads.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"slack",
@@ -180,17 +183,63 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"sentry": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "sentry",
+		"version": "1.0.3",
+		"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"sentry",
+			"errors",
+			"monitoring",
+			"debugging",
+			"observability"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Sentry",
+					"category": "Developer tools",
+					"icon": "sentry"
+				},
+				"connector": {
+					"slug": "sentry_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.sentry.dev/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "debug-with-sentry",
+				"description": "Root-cause a production error with Sentry's evidence before touching code — pull the issue, read the stack trace and breadcrumbs, and separate the crash from its trigger. Use when the user pastes a Sentry link or issue ID, reports a production error, or asks why something is crashing for users."
+			},
+			{
+				"name": "find-in-sentry",
+				"description": "Answer \"what's breaking\" questions from Sentry — find the right org and project, search issues and errors with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service."
+			}
+		]
+	} as const,
 	"gmail": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "gmail",
-		"version": "1.1.5",
+		"version": "1.1.7",
 		"description": "Read, search, send, and organize mail in your Gmail account.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"gmail",
@@ -208,6 +257,807 @@ export const FIRST_PARTY_MANIFESTS = {
 				},
 				"connector": {
 					"slug": "google"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"granola": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "granola",
+		"version": "1.0.3",
+		"description": "Recall what was said in your meetings: search, read, and query Granola notes and transcripts.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"granola",
+			"meetings",
+			"meeting-notes",
+			"transcripts",
+			"notes"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Granola",
+					"category": "Productivity",
+					"icon": "granola"
+				},
+				"connector": {
+					"slug": "granola_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.granola.ai/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "find-in-granola",
+				"description": "Answer \"what did we say, decide, or promise\" from Granola meeting notes — narrow to the meetings that can hold the answer, read the notes before the transcript, and cite the meeting behind every claim. Use when the user asks what happened in a meeting, what a customer or teammate said, what was decided or promised, or refers to a call, sync, standup, or demo."
+			},
+			{
+				"name": "follow-up-from-granola",
+				"description": "Turn a meeting into work — read its Granola notes, extract the commitments that belong to this user, and carry each one out or draft it (a code change, a ticket, a reply) with a trace back to the note. Use when the user says \"do the follow-ups from\", \"implement what we agreed\", \"make tickets from\", or points at a meeting after a sync, planning session, or customer call."
+			}
+		]
+	} as const,
+	"circleback": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "circleback",
+		"version": "1.0.3",
+		"description": "Meeting notes, action items, and transcripts from Circleback: search what was said and work what was captured.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"circleback",
+			"meetings",
+			"meeting-notes",
+			"action-items",
+			"transcripts"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Circleback",
+					"category": "Productivity",
+					"icon": "circleback"
+				},
+				"connector": {
+					"slug": "circleback_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://circleback.ai/api/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "find-in-circleback",
+				"description": "Answer \"what did we say, decide, or promise\" from Circleback meetings — search by attendee, company, tag, or date before keyword, read the notes before the transcript, and cite the meeting behind every claim. Use when the user asks what happened on a call, what a customer or teammate said, what was agreed, or refers to a meeting, sync, demo, or interview."
+			},
+			{
+				"name": "prep-with-circleback",
+				"description": "Build a brief for an upcoming meeting from Circleback — the calendar event, the history with the same people and company, open commitments on both sides, and what is still unresolved. Use when the user asks to prep for a call, \"what do I need to know before\", who someone is, or where things stand with a customer or partner."
+			},
+			{
+				"name": "work-circleback-action-items",
+				"description": "Work the action items Circleback captured — find what is assigned to this user, do the ones the workspace can do, and update status only for work that is actually finished. Use when the user asks what they owe, \"do my action items\", \"what's still open from\", or wants to close, reassign, or add an action item."
+			}
+		]
+	} as const,
+	"ynab": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "ynab",
+		"version": "1.0.2",
+		"description": "Track money in YNAB: accounts, categories, budgets, and transactions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"ynab",
+			"budget",
+			"finance",
+			"money",
+			"transactions"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "YNAB",
+					"category": "Productivity",
+					"icon": "ynab"
+				},
+				"connector": {
+					"slug": "ynab"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"autumn": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "autumn",
+		"version": "1.0.2",
+		"description": "Work with billing in Autumn: customers, plans, balances, and subscriptions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"autumn",
+			"billing",
+			"pricing",
+			"subscriptions",
+			"usage"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Autumn",
+					"category": "Data & APIs",
+					"icon": "autumn"
+				},
+				"connector": {
+					"slug": "autumn_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.useautumn.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"stripe": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "stripe",
+		"version": "1.0.3",
+		"description": "Work with payments in Stripe: trace charges and subscriptions, read billing data, and search Stripe's docs.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"stripe",
+			"payments",
+			"billing",
+			"subscriptions",
+			"invoices"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Stripe",
+					"category": "Data & APIs",
+					"icon": "stripe"
+				},
+				"connector": {
+					"slug": "stripe"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.stripe.com"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "build-a-stripe-integration",
+				"description": "Write Stripe code against what the API does today — plan the product shape, confirm every parameter from Stripe's own docs and schemas, and keep the agent in a sandbox. Use when adding checkout, billing, subscriptions, invoicing, or webhooks to a codebase, or when debugging Stripe integration code that compiles but behaves wrong."
+			},
+			{
+				"name": "refund-and-dispute",
+				"description": "Move money back to a customer in Stripe, or respond to a dispute, with the checks that belong in front of an irreversible write — read the charge first, fix the exact amount, and clear Stripe's human confirmation step. Use when the user asks to refund a payment, cancel and refund a subscription, or handle a chargeback or dispute."
+			},
+			{
+				"name": "trace-a-payment",
+				"description": "Answer a question about money that already moved in Stripe — why a charge failed, what a customer was billed, where an invoice or payout stands — by reading the object chain instead of guessing from a dashboard total. Use when the user pastes a Stripe id, asks why a payment failed, asks what a customer is paying, or wants revenue, invoice, or subscription state."
+			}
+		]
+	} as const,
+	"superhuman": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "superhuman",
+		"version": "1.0.3",
+		"description": "Work your inbox from Superhuman: find and read threads, triage what needs you, draft replies in your voice, and schedule from your calendar.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"superhuman",
+			"email",
+			"mail",
+			"inbox",
+			"calendar"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Superhuman",
+					"category": "Communication",
+					"icon": "superhuman"
+				},
+				"connector": {
+					"slug": "superhuman_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.mail.superhuman.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "find-in-superhuman",
+				"description": "Find and read mail in Superhuman — the thread where something was said, sent, or promised — by filtering on who, when, and which split before searching by words, reading the thread before answering, and linking the thread behind every claim. Use when the user asks what someone emailed, whether a reply or an invoice ever arrived, what the latest is on a thread, or what is on their calendar."
+			},
+			{
+				"name": "reply-from-superhuman",
+				"description": "Draft a reply, a follow-up, or a new email in Superhuman in the user's own voice — read the whole thread first, reuse an existing draft instead of adding a second one, keep the right people on the thread, and leave sending to the user unless they asked for it. Use when the user says reply to, answer, follow up with, draft an email to, or send, or when a triage turned up threads that need a response."
+			},
+			{
+				"name": "schedule-with-superhuman",
+				"description": "Find a time and put a meeting on the calendar through Superhuman — read what is already booked, check the participants' availability, propose slots, and create the event only once the user picks one. Use when the user asks what is on their calendar, when they are free, to find a time with someone, or to schedule, move, or set up a call."
+			},
+			{
+				"name": "triage-superhuman-inbox",
+				"description": "Work through a Superhuman inbox — sort what is there into needs a reply, waiting on someone else, worth knowing, and noise, then archive, star, label, remind, or unsubscribe only as the user directs. Use when the user asks what needs their attention, what they are waiting on, to triage or clean up their inbox, or to deal with newsletters and notifications."
+			}
+		]
+	} as const,
+	"neon": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "neon",
+		"version": "1.0.2",
+		"description": "Work with your Neon Postgres: inspect projects and branches, read schemas, and run SQL.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"neon",
+			"postgres",
+			"database",
+			"sql",
+			"branches"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Neon",
+					"category": "Data & APIs",
+					"icon": "neon"
+				},
+				"connector": {
+					"slug": "neon_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.neon.tech/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"exa": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "exa",
+		"version": "1.0.3",
+		"description": "Search the web, companies, and people with Exa.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"exa",
+			"search",
+			"research",
+			"companies",
+			"people"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Exa",
+					"category": "Data & APIs"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.exa.ai/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"posthog": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "posthog",
+		"version": "1.0.2",
+		"description": "Ask PostHog about your product: query events and insights, look up people, and check feature flags.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"posthog",
+			"analytics",
+			"events",
+			"feature-flags",
+			"product"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "PostHog",
+					"category": "Data & APIs",
+					"icon": "posthog"
+				},
+				"connector": {
+					"slug": "posthog_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.posthog.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"google-calendar": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "google-calendar",
+		"version": "1.0.2",
+		"description": "Read and manage your Google Calendar: find events, check free time, and schedule meetings.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"google",
+			"calendar",
+			"events",
+			"meetings",
+			"scheduling"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Google Calendar",
+					"category": "Productivity",
+					"icon": "google-calendar"
+				},
+				"connector": {
+					"slug": "google"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"vercel": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "vercel",
+		"version": "1.0.2",
+		"description": "Work with Vercel: inspect projects and deployments, read build and runtime logs, and search Vercel's docs.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"vercel",
+			"deployments",
+			"hosting",
+			"logs",
+			"nextjs"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Vercel",
+					"category": "Developer tools",
+					"icon": "vercel"
+				},
+				"connector": {
+					"slug": "vercel_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.vercel.com"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"resend": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "resend",
+		"version": "1.0.0",
+		"description": "Send and debug email with Resend: emails, domains, contacts, broadcasts, and inboxes.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"resend",
+			"email",
+			"transactional",
+			"domains",
+			"broadcasts"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Resend",
+					"category": "Developer tools",
+					"icon": "resend"
+				},
+				"connector": {
+					"slug": "resend_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.resend.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "debug-resend-delivery",
+				"description": "Find out why an email sent with Resend did not arrive — find the email, read its status, then check the API log, the suppression list, the sending domain, and the webhook that should have reported it. Use when the user says an email never arrived, went to spam, bounced, or that their app's sends or webhooks are failing."
+			},
+			{
+				"name": "send-with-resend",
+				"description": "Send email through Resend without surprising anyone — check the sending domain first, prove the message on Resend's test addresses, and get the user's confirmation before mail goes to a real inbox. Use when the user asks to send, schedule, or batch-send an email, test a template, or wire Resend sending into a codebase."
+			}
+		]
+	} as const,
+	"peec": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "peec",
+		"version": "1.0.1",
+		"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"peec",
+			"aeo",
+			"geo",
+			"ai-search",
+			"seo",
+			"visibility"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Peec AI",
+					"category": "Data & APIs",
+					"icon": "peec"
+				},
+				"connector": {
+					"slug": "peec_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.peec.ai/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "diagnose-ai-visibility",
+				"description": "Find out why AI search engines leave your brand out of an answer, and pick the one fix that matches the cause — read the answers and the sources they cite, map the question to your own page, then decide if the page is broken, missing, weak, or outweighed by third-party sources. Use when the user asks why ChatGPT, Gemini, Perplexity or Google AI Overviews do not mention them, which prompts they lose, what content to write next, or how to improve AI visibility."
+			},
+			{
+				"name": "work-peec-actions",
+				"description": "Work through Peec AI's recommended actions and keep the record honest — site fixes first, decline false positives with a reason, log work you shipped as completed actions on the date it shipped so Peec's Impact view measures it, and check before and after. Use when the user asks what to do next in Peec, wants to triage or clean up Peec actions, record shipped content or fixes in Peec, or see whether a change moved AI visibility."
+			}
+		]
+	} as const,
+	"sazabi": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "sazabi",
+		"version": "1.0.0",
+		"description": "Investigate production with Sazabi: ask questions about your logs and traces, triage issues, check deploys, build dashboards, and send app and coding-agent telemetry to Sazabi.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"sazabi",
+			"logs",
+			"observability",
+			"opentelemetry",
+			"debugging",
+			"incidents"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Sazabi",
+					"category": "Developer tools",
+					"icon": "sazabi"
+				},
+				"connector": {
+					"slug": "sazabi_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.sazabi.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "add-logging",
+				"description": "Before shipping a change, add structured log lines to the code path it touches so the next investigation has evidence — one line per decision and failure, with stable event names and the IDs needed to join requests, at the right level and without secrets. Use when writing or reviewing a feature or fix, when a bug was hard to diagnose because the logs were silent, or when the user asks to improve logging or observability in code."
+			},
+			{
+				"name": "build-a-dashboard",
+				"description": "Turn a question the user keeps asking about production (error rates, latency, signups, cost) into a saved Sazabi dashboard built from live log queries — check the fields exist, validate before saving, and confirm every panel returns data. Use when the user asks for a dashboard, a recurring view or report, or says they keep checking the same numbers."
+			},
+			{
+				"name": "instrument-with-sazabi",
+				"description": "Get an application's logs and traces into Sazabi with OpenTelemetry — pick the SDK for the runtime, export over OTLP/HTTP to a Sazabi intake URL kept in an environment variable, and prove data arrives before calling it done. Use when the user wants to connect an app or service to Sazabi, add OpenTelemetry, set up logging or tracing, or asks why Sazabi shows no data for a service."
+			},
+			{
+				"name": "investigate-production",
+				"description": "Find out what is actually happening in production from Sazabi's logs, traces and issues before touching code — ask the logs a precise question, read the lines behind the answer, and separate the symptom from its cause. Use when the user reports a production error, a slow or failing endpoint, a customer complaint, an alert, or asks what is broken, what changed, or why something stopped working."
+			},
+			{
+				"name": "send-agent-telemetry",
+				"description": "Stream coding-agent session telemetry (prompts, tool calls, model requests, tokens and cost) from Claude Code or Codex into Sazabi over OpenTelemetry, with privacy settings chosen on purpose. Use when the user wants observability for their coding agents or agent fleet, to track agent token usage or cost, to audit what agents ran, or to send agent telemetry to Sazabi."
+			},
+			{
+				"name": "triage-issues",
+				"description": "Work through the issues Sazabi opened on its own — rank them by severity and blast radius, find each one's cause in this repository with log evidence, and propose or draft one fix per issue, leaving issues open until a fix ships. Use when the user asks what is broken, what to fix first, to clean up or triage Sazabi issues, or for an on-call or morning review."
+			},
+			{
+				"name": "use-project-memory",
+				"description": "Read Sazabi project memory (how the system is laid out, what healthy looks like, runbooks, past incidents) before investigating or changing production behavior, and write back durable findings once they are verified. Use at the start of an investigation or on-call task, when the user mentions a runbook or a past incident, or after resolving something worth remembering."
+			},
+			{
+				"name": "verify-a-deploy",
+				"description": "Check in Sazabi that a change you shipped works in production before you call the task done — compare error rates and new kinds of log lines before and after the deploy, confirm the fixed error stopped, and catch regressions early. Use after merging or deploying a fix or feature, when the user asks whether a deploy is healthy, did the fix work, or is it safe to move on."
+			}
+		]
+	} as const,
+	"inngest": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "inngest",
+		"version": "1.0.0",
+		"description": "Debug and operate Inngest: inspect runs and traces, send events, invoke and rerun functions, and query Insights.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"inngest",
+			"workflows",
+			"durable-execution",
+			"background-jobs",
+			"events"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Inngest",
+					"category": "Developer tools",
+					"icon": "inngest"
+				},
+				"connector": {
+					"slug": "inngest_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.inngest.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"supabase": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "supabase",
+		"version": "1.0.0",
+		"description": "Work with your Supabase projects: inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"supabase",
+			"postgres",
+			"database",
+			"sql",
+			"migrations",
+			"edge-functions"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Supabase",
+					"category": "Data & APIs",
+					"icon": "supabase"
+				},
+				"connector": {
+					"slug": "supabase_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.supabase.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"firecrawl": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "firecrawl",
+		"version": "1.0.0",
+		"description": "Turn the web into agent-ready data with Firecrawl: search, scrape, map, and crawl sites, and parse documents.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"firecrawl",
+			"scraping",
+			"crawling",
+			"search",
+			"web-data"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Firecrawl",
+					"category": "Data & APIs",
+					"icon": "firecrawl"
+				},
+				"connector": {
+					"slug": "firecrawl_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"wispr": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "wispr",
+		"version": "1.0.0",
+		"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"wispr",
+			"wispr-flow",
+			"meetings",
+			"meeting-notes",
+			"transcripts",
+			"calendar"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Wispr Flow",
+					"category": "Productivity",
+					"icon": "wispr"
+				},
+				"connector": {
+					"slug": "wispr_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.wisprflow.ai/connect/mcp"
 				}
 			}
 		},

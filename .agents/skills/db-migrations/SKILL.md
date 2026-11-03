@@ -30,8 +30,11 @@ one legitimate reason to ask for that confirmation is statement order (rule 3).
 - [ ] Locks are taken child table first, then the tables it references (rule 3)
 - [ ] No long ACCESS EXCLUSIVE on a hot table (rule 4)
 - [ ] Every statement finishes well inside 60 seconds at production size
-- [ ] Rehearsed on a Neon branch of production **under load**
+- [ ] Rehearsed on a Neon branch of production **under load**, when the migration locks a hot
+      table (rule 4) or rewrites or scans a large one. Otherwise the size and lock checks are enough
 - [ ] If reads move to a new table or column, the data moves in the same release (rule 5)
+- [ ] No tRPC input or output change in the same PR, so a bad API change can still be reverted
+      (#7726; see `.agents/skills/trpc-compat/SKILL.md`)
 - [ ] After changing an already-pushed migration, the PR's preview Neon branch was deleted
 
 ### Check production sizes first
@@ -114,6 +117,10 @@ CI cannot catch this: unit tests mock the lookup layer
 A workspace's own Neon branch is a copy-on-write child of production at the same 0.25 to 2 CU
 size. A quiet rehearsal is not enough: the first one for 0119 passed in 2.3s
 and missed the deadlock entirely. pgbench found it immediately.
+
+Rehearse when the migration locks a table in rule 4 or rewrites or scans a large table. A migration
+that only touches small tables that no job holds open does not need it: check the sizes, the lock
+order and the statement types, and say in the PR that you did not rehearse and why.
 
 1. Point at a production-child branch that does not have your migration yet. The workspace `.env`
    has two `DATABASE_URL` entries and the last one is the workspace branch.

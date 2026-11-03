@@ -15,6 +15,7 @@ export const SETTING_ITEM_ID = {
 	ORGANIZATION_NAME: "organization-name",
 	ORGANIZATION_SLUG: "organization-slug",
 	ORGANIZATION_ID: "organization-id",
+	ORGANIZATION_TASK_TRACKER: "organization-task-tracker",
 	ORGANIZATION_MEMBERS_LIST: "organization-members-list",
 	ORGANIZATION_MEMBERS_INVITE: "organization-members-invite",
 	ORGANIZATION_MEMBERS_PENDING_INVITATIONS:
@@ -39,8 +40,10 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_CONFIRM_QUIT: "behavior-confirm-quit",
 	BEHAVIOR_FILE_OPEN_MODE: "behavior-file-open-mode",
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
+	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
+	BEHAVIOR_DICTATION: "behavior-dictation",
 	USAGE_IN_SIDEBAR: "usage-in-sidebar",
 	BEHAVIOR_OPEN_LINKS_IN_APP: "behavior-open-links-in-app",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
@@ -62,6 +65,7 @@ export const SETTING_ITEM_ID = {
 	TERMINAL_LINK_BEHAVIOR: "terminal-link-behavior",
 	TERMINAL_BACKGROUND_LIMIT: "terminal-background-limit",
 	TERMINAL_COPY_ON_SELECT: "terminal-copy-on-select",
+	TERMINAL_CLOSE_CONFIRM: "terminal-close-confirm",
 
 	LINKS_FILE: "links-file",
 	LINKS_FOLDER: "links-folder",
@@ -70,10 +74,11 @@ export const SETTING_ITEM_ID = {
 	LINKS_PORT: "links-port",
 	LINKS_PAGE: "links-page",
 
-	EXPERIMENTAL_SUPERSET_V2: "experimental-superset-v2",
 	EXPERIMENTAL_V1_MIGRATION: "experimental-v1-migration",
 	EXPERIMENTAL_INLINE_WORKSPACE_PORTS: "experimental-inline-workspace-ports",
 	EXPERIMENTAL_WORKSPACE_AGENTS: "experimental-workspace-agents",
+	EXPERIMENTAL_ACP_CHAT: "experimental-acp-chat",
+	EXPERIMENTAL_CHAT_TURN_SNAPSHOTS: "experimental-chat-turn-snapshots",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
 
@@ -88,6 +93,9 @@ export const SETTING_ITEM_ID = {
 	PROJECT_WORKTREE_LOCATION: "project-worktree-location",
 	PROJECT_SPARSE_CHECKOUT: "project-sparse-checkout",
 	PROJECT_IMPORT_WORKTREES: "project-import-worktrees",
+
+	ORGANIZATION_PLUGIN_SOURCES: "organization-plugin-sources",
+	ORGANIZATION_PLUGIN_ACCESS: "organization-plugin-access",
 
 	API_KEYS_LIST: "api-keys-list",
 	API_KEYS_GENERATE: "api-keys-generate",
@@ -164,6 +172,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.ORGANIZATION_NAME]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_SLUG]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_ID]: "shared",
+	[SETTING_ITEM_ID.ORGANIZATION_TASK_TRACKER]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_LIST]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_INVITE]: "shared",
 	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_PENDING_INVITATIONS]: "shared",
@@ -188,9 +197,12 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_CONFIRM_QUIT]: "shared",
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE]: "v1",
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE]: "v2",
+	[SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT]: "v2",
 	// The top-bar Changes control is a v2-only surface.
 	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
+	// The agent composers that offer dictation are v2-only.
+	[SETTING_ITEM_ID.BEHAVIOR_DICTATION]: "v2",
 	// The home sidebar (DashboardSidebar) only renders for v2 users.
 	[SETTING_ITEM_ID.USAGE_IN_SIDEBAR]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP]: "v1",
@@ -215,6 +227,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.TERMINAL_LINK_BEHAVIOR]: "v1",
 	[SETTING_ITEM_ID.TERMINAL_BACKGROUND_LIMIT]: "v2",
 	[SETTING_ITEM_ID.TERMINAL_COPY_ON_SELECT]: "v2",
+	[SETTING_ITEM_ID.TERMINAL_CLOSE_CONFIRM]: "v2",
 
 	[SETTING_ITEM_ID.LINKS_FILE]: "v2",
 	[SETTING_ITEM_ID.LINKS_FOLDER]: "v2",
@@ -223,10 +236,11 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.LINKS_PORT]: "v2",
 	[SETTING_ITEM_ID.LINKS_PAGE]: "v2",
 
-	[SETTING_ITEM_ID.EXPERIMENTAL_SUPERSET_V2]: "shared",
 	[SETTING_ITEM_ID.EXPERIMENTAL_V1_MIGRATION]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_INLINE_WORKSPACE_PORTS]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS]: "v2",
+	[SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT]: "v2",
+	[SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS]: "v2",
 	// Gates both the v1 renderer launch and the v2 host-side launch.
 	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
 
@@ -241,6 +255,9 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.PROJECT_WORKTREE_LOCATION]: "shared",
 	[SETTING_ITEM_ID.PROJECT_SPARSE_CHECKOUT]: "v2",
 	[SETTING_ITEM_ID.PROJECT_IMPORT_WORKTREES]: "v1",
+
+	[SETTING_ITEM_ID.ORGANIZATION_PLUGIN_SOURCES]: "shared",
+	[SETTING_ITEM_ID.ORGANIZATION_PLUGIN_ACCESS]: "shared",
 
 	[SETTING_ITEM_ID.API_KEYS_LIST]: "shared",
 	[SETTING_ITEM_ID.API_KEYS_GENERATE]: "shared",
@@ -340,7 +357,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.MOBILE_APP,
 		section: "mobile",
 		title: "Mobile",
-		description: "Use Superset on your iPhone",
+		description: "Use Paradev on your iPhone",
 		keywords: ["phone", "mobile", "qr", "scan", "ios", "app store"],
 	},
 	{
@@ -450,6 +467,20 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"subdomain",
 			"link",
 			"unique",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.ORGANIZATION_TASK_TRACKER,
+		section: "organization",
+		title: "Track tasks in",
+		description: "Use Paradev tasks or your Linear issues",
+		keywords: [
+			"organization",
+			"tasks",
+			"linear",
+			"tracker",
+			"issues",
+			"integration",
 		],
 	},
 	{
@@ -804,7 +835,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE,
-		section: "behavior",
+		section: "files",
 		title: "File open mode",
 		description:
 			"Choose how files open when clicked in the file tree or changes view",
@@ -823,7 +854,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE,
-		section: "behavior",
+		section: "files",
 		title: "Auto Save",
 		description: "Controls when manually edited files are saved",
 		keywords: [
@@ -837,6 +868,23 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"on focus change",
 			"onwindowchange",
 			"on window change",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT,
+		section: "behavior",
+		title: "New agent sessions",
+		description:
+			"Choose where agents started from comments, design mode, and Pages open.",
+		keywords: [
+			"agent",
+			"placement",
+			"split",
+			"pane",
+			"tab",
+			"design",
+			"comments",
+			"pages",
 		],
 	},
 	{
@@ -877,6 +925,24 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.BEHAVIOR_DICTATION,
+		section: "behavior",
+		title: "Dictation",
+		description:
+			"Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers.",
+		keywords: [
+			"dictation",
+			"dictate",
+			"voice",
+			"speech",
+			"microphone",
+			"mic",
+			"transcribe",
+			"chat",
+			"composer",
+		],
+	},
+	{
 		id: SETTING_ITEM_ID.USAGE_IN_SIDEBAR,
 		section: "usage",
 		title: "Show usage tab on sidebar",
@@ -912,7 +978,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP,
-		section: "behavior",
+		section: "browser",
 		title: "Open links in the in-app browser",
 		description:
 			"Open links from chat and terminal in the in-app browser instead of your default browser",
@@ -930,7 +996,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB,
 		section: "behavior",
-		title: "Star Superset on GitHub",
+		title: "Star Paradev on GitHub",
 		description: "Support the project with a GitHub star",
 		keywords: [
 			"star",
@@ -993,6 +1059,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"claude",
 			"codex",
 			"pi",
+			"ufo",
 		],
 	},
 	{
@@ -1023,6 +1090,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"muse",
 			"meta",
 			"devin",
+			"ufo",
 			"cognition",
 			"fx",
 			"vercel",
@@ -1099,6 +1167,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"muse",
 			"meta",
 			"devin",
+			"ufo",
 			"cognition",
 			"fx",
 			"vercel",
@@ -1167,6 +1236,27 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.TERMINAL_CLOSE_CONFIRM,
+		section: "terminal",
+		title: "Warn before closing a running terminal",
+		description: "Ask before closing a terminal or port with a running process",
+		keywords: [
+			"terminal",
+			"close",
+			"delete",
+			"tab",
+			"pane",
+			"port",
+			"warn",
+			"warning",
+			"confirm",
+			"prompt",
+			"running",
+			"process",
+			"ask",
+		],
+	},
+	{
 		id: SETTING_ITEM_ID.TERMINAL_LINK_BEHAVIOR,
 		section: "terminal",
 		title: "Link Behavior",
@@ -1188,7 +1278,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.LINKS_FILE,
-		section: "links",
+		section: "files",
 		title: "File links",
 		description:
 			"How file paths open when clicked in terminals, chat, and tasks",
@@ -1212,7 +1302,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.LINKS_FOLDER,
-		section: "links",
+		section: "files",
 		title: "Folder links",
 		description:
 			"How folder paths open when clicked in terminals: reveal in sidebar, editor, or Finder",
@@ -1237,7 +1327,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.LINKS_URL,
-		section: "links",
+		section: "browser",
 		title: "URL links",
 		description: "How URLs open when clicked in terminals, chat, and tasks",
 		keywords: [
@@ -1262,7 +1352,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.LINKS_SIDEBAR_FILE,
-		section: "links",
+		section: "files",
 		title: "Sidebar file rows",
 		description:
 			"How file rows in the file tree, changes list, and diff header open when clicked",
@@ -1288,7 +1378,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.LINKS_PORT,
-		section: "links",
+		section: "browser",
 		title: "Ports",
 		description:
 			"How detected-port badges in the sidebar open when clicked (in-app or system browser)",
@@ -1315,41 +1405,27 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.LINKS_PAGE,
-		section: "links",
-		title: "Pages",
+		section: "files",
+		title: "Page links",
 		description:
-			"Whether Page links (in terminals, chat, and task markdown) open inside Superset or the system browser",
+			"How pages open when clicked in the Pages menu, terminals, chat, and other pages",
 		keywords: [
 			"links",
 			"page",
 			"pages",
 			"click",
+			"cmd",
+			"ctrl",
+			"shift",
+			"meta",
+			"pane",
+			"new tab",
 			"browser",
-			"in-app",
-			"system",
 			"external",
 			"open",
+			"terminal",
+			"chat",
 			"behavior",
-		],
-	},
-	{
-		id: SETTING_ITEM_ID.EXPERIMENTAL_SUPERSET_V2,
-		section: "experimental",
-		title: "Try Superset Version 2 (Early Access)",
-		description: "Switch between Superset V1 and the new V2 experience",
-		keywords: [
-			"experimental",
-			"experiments",
-			"v2",
-			"v1",
-			"version",
-			"early access",
-			"beta",
-			"preview",
-			"workspace",
-			"workspaces",
-			"toggle",
-			"switch",
 		],
 	},
 	{
@@ -1408,6 +1484,46 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"workspace",
 			"workspaces",
 			"status",
+			"toggle",
+			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
+		section: "experimental",
+		title: "Chat",
+		description:
+			"Open Claude and Codex sessions in a chat pane instead of a terminal",
+		keywords: [
+			"experimental",
+			"chat",
+			"acp",
+			"agent",
+			"claude",
+			"codex",
+			"session",
+			"pane",
+			"toggle",
+			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
+		section: "experimental",
+		title: "Track file changes per turn",
+		description:
+			"Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them",
+		keywords: [
+			"experimental",
+			"chat",
+			"turn",
+			"snapshot",
+			"checkpoint",
+			"changes",
+			"files",
+			"edited",
+			"undo",
+			"diff",
 			"toggle",
 			"switch",
 		],
@@ -1587,7 +1703,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.PROJECT_IMPORT_WORKTREES,
 		section: "project",
 		title: "Import Worktrees",
-		description: "Import existing worktrees from disk into Superset",
+		description: "Import existing worktrees from disk into Paradev",
 		keywords: [
 			"project",
 			"import",
@@ -1599,6 +1715,36 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"existing",
 			"disk",
 			"add",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.ORGANIZATION_PLUGIN_SOURCES,
+		section: "plugins",
+		title: "Plugin Sources",
+		description: "GitHub repositories your organization's plugins sync from",
+		keywords: [
+			"plugins",
+			"marketplace",
+			"repository",
+			"github",
+			"source",
+			"sync",
+			"organization",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.ORGANIZATION_PLUGIN_ACCESS,
+		section: "plugins",
+		title: "Organization Plugins",
+		description: "Choose which roles can install each organization plugin",
+		keywords: [
+			"plugins",
+			"roles",
+			"access",
+			"policy",
+			"install",
+			"members",
+			"admins",
 		],
 	},
 	{
@@ -1728,7 +1874,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "security",
 		title: "Allow remote access to this device via relay",
 		description:
-			"Controls whether other devices can reach your local host service through the Superset relay",
+			"Controls whether other devices can reach your local host service through the Paradev relay",
 		keywords: [
 			"security",
 			"relay",
@@ -2010,11 +2156,13 @@ export function getVisibleMatchCountBySection(
 	isV2: boolean,
 	cloudWorkspaces: boolean,
 	mobileEnabled = false,
+	pluginsVisible = false,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, isV2, cloudWorkspaces) &&
-			(item.section !== "mobile" || mobileEnabled),
+			(item.section !== "mobile" || mobileEnabled) &&
+			(item.section !== "plugins" || pluginsVisible),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {

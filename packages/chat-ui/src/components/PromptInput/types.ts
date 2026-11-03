@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { SerializedEditorState } from "lexical";
+import type { ReactNode, Ref } from "react";
 
 export type ComposerChip = {
 	label: string;
@@ -6,6 +7,7 @@ export type ComposerChip = {
 	brandColor?: string;
 	// Icon as a URL string so chips stay serializable data.
 	iconUrl?: string;
+	description?: string;
 	data?: unknown;
 };
 
@@ -16,9 +18,16 @@ export type ComposerActionContext = {
 	query: string;
 };
 
+export type ComposerPanelControls = {
+	close(): void;
+};
+
 export type ComposerPanelContent = {
 	title: string;
-	render: () => ReactNode;
+	render: (controls: ComposerPanelControls) => ReactNode;
+	// Drawn without the titled frame and closed by a press outside the
+	// composer; the content owns its keyboard, including Escape.
+	bare?: boolean;
 };
 
 export type ComposerMentionEntry = {
@@ -27,10 +36,18 @@ export type ComposerMentionEntry = {
 	description?: string;
 	icon?: ReactNode;
 	keywords?: string[];
+	// Drawn in place of icon, label and description; label still drives matching.
+	row?: ReactNode;
 	// When set, selecting rewrites the query to this value and keeps the menu
 	// open (directory drilling); select() is not called.
 	completionQuery?: string;
+	opensSubmenu?: boolean;
 	select(ctx: ComposerActionContext): void | Promise<void>;
+};
+
+export type ComposerMentionBrowse = {
+	label: string;
+	placeholder: string;
 };
 
 export type ComposerMentionSource =
@@ -54,17 +71,24 @@ export type ComposerMentionProvider = {
 	id: string;
 	title: string;
 	priority: number;
+	// The character that opens this provider's menu; "@" when unset.
+	trigger?: string;
+	icon?: ReactNode;
+	browse?: ComposerMentionBrowse;
 	source: ComposerMentionSource;
 };
 
 export type PromptInputCommand = {
 	id: string;
 	title: string;
+	hint?: string;
 	description?: string;
 	icon?: ReactNode;
 	rightIcon?: ReactNode;
 	group?: string;
 	searchAliases?: string[];
+	// Tab inserts this chip in place of the typed command instead of selecting.
+	completion?: ComposerChip;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -73,12 +97,36 @@ export type PromptInputAttachment = {
 	file: File;
 	// Object URL for image attachments; owned and revoked by the composer.
 	previewUrl?: string;
+	pastedText?: string;
+	sourcePath?: string;
+};
+
+export type PromptInputLocalFiles = {
+	pathOf(file: File): string | undefined;
+	reveal(path: string): void;
+};
+
+/**
+ * `text` is markdown. The composer saves itself as one `editor` segment: its
+ * Lexical state, and the markdown the agent would receive.
+ */
+export type ComposerDraftSegment =
+	| { type: "text"; text: string }
+	| { type: "chip"; chip: ComposerChip }
+	| { type: "editor"; state: SerializedEditorState; text: string };
+
+export type ComposerDraft = {
+	segments: ComposerDraftSegment[];
+	attachments: PromptInputAttachment[];
+	usedDictation?: boolean;
 };
 
 export type PromptInputSubmitPayload = {
 	text: string;
 	files: File[];
 	mentions: ComposerChip[];
+	steer: boolean;
+	draft: ComposerDraft;
 };
 
 export type PromptInputDictationError = {
@@ -87,25 +135,76 @@ export type PromptInputDictationError = {
 };
 
 export type PromptInputDictation = {
-	transcribe(audio: Blob): Promise<string> | string;
+	// Reject with a DictationError to choose the message and whether retry
+	// is offered; any other rejection is retryable. The signal aborts when
+	// the user cancels or the composer unmounts.
+	transcribe(
+		audio: Blob,
+		options: { signal: AbortSignal },
+	): Promise<string> | string;
 	// Surfaced for app-owned toasts; retryable failures also keep the
 	// recording and show retry controls in the composer row.
 	onError?(error: PromptInputDictationError): void;
+	// Recording stops and transcribes on its own at this length.
+	maxSeconds?: number;
+	audioBitsPerSecond?: number;
 };
 
+export type PromptInputHandle = {
+	isEmpty(): boolean;
+	addFiles(files: File[]): void;
+	restoreDraft(draft: ComposerDraft): void;
+	insertChip(chip: ComposerChip): void;
+	openFileDialog(): void;
+	openPanel(panel: ComposerPanelContent): void;
+	focus(): void;
+	recallPreviousPrompt(): void;
+	blur(): void;
+};
+
+/**
+ * `stacked` puts the toolbar on a row under the text; `inline` is a single
+ * pill with the attach button and send controls beside the text, and the
+ * toolbar slots are not rendered.
+ */
+export type PromptInputLayout = "stacked" | "inline";
+
 export type PromptInputProps = {
+	ref?: Ref<PromptInputHandle>;
 	placeholder?: string;
+	layout?: PromptInputLayout;
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
 	status?: "ready" | "streaming";
-	placement?: "top" | "bottom";
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;
-	onSubmit?: (payload: PromptInputSubmitPayload) => void;
+	toolbarEnd?: ReactNode;
+	draft?: ComposerDraft;
+	onDraftChange?: (draft: ComposerDraft) => void;
+	/** Returning `false` keeps the draft in the editor. */
+	onSubmit?: (
+		payload: PromptInputSubmitPayload,
+	) => false | void | Promise<void>;
 	onStop?: () => void;
-	onMentionHighlight?: (entry: ComposerMentionEntry | null) => void;
-	onAttachmentClick?: (attachment: PromptInputAttachment) => void;
-	onChipClick?: (chip: ComposerChip) => void;
+	stopOnEscape?: boolean;
+	allowEmptySubmit?: boolean;
+	disabled?: boolean;
+	pending?: boolean;
+	autoFocus?: boolean;
+	/** The clicked pill, and every pending attachment in order. */
+	onAttachmentClick?: (
+		attachment: PromptInputAttachment,
+		attachments: readonly PromptInputAttachment[],
+	) => void;
+	/** A chip for pasted plain text, such as a link; null keeps the text. */
+	chipForPaste?: (text: string) => ComposerChip | null;
+	/**
+	 * Wraps a chip as the composer draws it, for example in a hover card.
+	 * `rendered` is the chip without its tooltip; null keeps the plain chip.
+	 */
+	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
+	localFiles?: PromptInputLocalFiles;
+	history?: string[];
 	className?: string;
 };

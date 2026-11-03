@@ -15,8 +15,8 @@ Only two things in a plugin directory are hand-written:
 | `.agent-marketplace.json` | `superset plugins create` / `publish` |
 | `packages/shared/src/plugins/manifests.generated.ts` | `superset plugins publish` |
 
-A plugin ships no code. Tools come either from the vendor's own MCP server, which Superset proxies
-to, or from a server Superset hosts itself for the handful of plugins whose vendor publishes none
+A plugin ships no code. Tools come either from the vendor's own MCP server, which Paradev proxies
+to, or from a server Paradev hosts itself for the handful of plugins whose vendor publishes none
 (`SUPERSET_HOSTED_PLUGINS` in `packages/shared/src/plugins/index.ts`, implemented under
 `packages/trpc/src/router/plugins/servers/`). Hosted tools ship on an API deploy, not a plugin tag.
 
@@ -34,10 +34,23 @@ and installs the working tree, which is what makes local authoring work.
 
 ```bash
 superset plugins publish <name> --bump patch   # rewrites the marketplace entry and the bundle
-git commit -am "publish <name>@<version>"
-git tag <name>@<version> && git push --tags    # the tag is the release
+git add .agent-marketplace.json plugins/<name> packages/shared/src/plugins/manifests.generated.ts
+git commit -m "publish <name>@<version>"
 bun run check:plugins                          # what CI runs; catches a change that skipped publish
 ```
+
+Merge to main and `.github/workflows/tag-plugin-releases.yml` pushes `<name>@<version>` at the
+merge commit. Don't tag by hand on a branch: a squash merge leaves that tag off main.
+
+`superset plugins validate` takes a path (`plugins/<name>`), not a name. To test a plugin locally,
+`superset plugins marketplace add <path>` then `superset plugins install <name>`. Install copies the
+plugin into a cache, so after an edit run `superset plugins install <name> --update`; `plugins sync`
+reads the cached copy and does not see the working tree.
+
+A third-party marketplace needs `.agent-marketplace.json` at its root (`$schema`, `name`,
+`description`, `owner`, `plugins: []`); `plugins create` refuses to run without it. Its plugins get
+skills only: `desiredPluginMcpServers` emits MCP entries for `PLUGIN_CATALOG` plugins alone, and
+`connector.slug` must already exist in `connectors.json`.
 
 `check:plugins` fails on a marketplace entry whose version disagrees with `plugin.json`, a `server/`
 build that is stale against `src/`, a `manifests.generated.ts` that a publish would rewrite, and a
@@ -50,7 +63,7 @@ that must not change under them.
 ## Manifest shape
 
 `plugin.json` follows the Codex plugin vocabulary — `name`, `version`, `description`, `author`,
-`license` — with everything Superset-specific under `extensions.superset`:
+`license` — with everything Paradev-specific under `extensions.superset`:
 
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
   `packages/shared/src/plugins/index.ts`), and `icon`.
@@ -63,9 +76,9 @@ that must not change under them.
   `${config.access_token}` and `${inputs.<name>}` placeholders are resolved server-side by
   `packages/trpc/src/router/plugins/manifest.ts`.
 - `mcp` — the vendor's own MCP server (`type: "streamable-http"`, `url`, optional `headers`), not a
-  map: a plugin serves tools from exactly one place. Omit it for a Superset-hosted plugin.
+  map: a plugin serves tools from exactly one place. Omit it for a Paradev-hosted plugin.
 
-The published JSON Schema at `https://superset.sh/schemas/plugin/1.0.0.json` is generated from
+The published JSON Schema at `https://paradev.com/schemas/plugin/1.0.0.json` is generated from
 `pluginManifestSchema` in `packages/shared/src/plugins/manifest-schema.ts`, and
 `superset plugins publish` validates against that same definition — so the schema we serve and the
 schema we enforce cannot drift.
@@ -107,8 +120,68 @@ writes the desired set and reaps whatever is absent, so a caller that hands in i
 instead of letting agent-setup read the file has just told it every other caller's plugins are gone.
 The desktop's next boot would undo a `plugins sync`, and vice versa.
 
-Skills land in `~/.agents/skills` (what Codex, Vibe, and Kimi read natively) and are mirrored into
-`~/.claude/skills` as a plugin directory, because Claude does not read the shared convention.
+The code that changes it lives in `@superset/agent-setup` (`plugin-install.ts`, `plugin-state.ts`,
+`plugin-organization.ts`): installing, removing, enabling, syncing, marketplace clones. The CLI's
+`plugins` commands are thin wrappers over it, and the desktop calls it in-process from its tRPC
+routes and awaits it, so a failure reaches the Plugins page as an error. The desktop does not run
+the CLI for plugins and keeps no install list of its own. The list it once kept in `local.db` is
+copied into the file at boot, each entry once; the column stays, written by nothing new, so an
+older build can still open the database, and what such a build adds is copied on the next boot. A refused change (not found, ambiguous, already or not installed) throws
+`PluginError`, and the CLI adds the command to run next; other failures (git, the filesystem, a
+timeout) are plain errors. In one process, wrap every change in `serializePluginChange`:
+each one reads the file and rewrites it, so two that overlap lose one's change. Authoring
+(`create`, `validate`, `publish`) stays in the CLI.
+
+Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vibe, and Kimi read
+natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
+read the shared convention.
+
+Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
+`~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors
+`PDEV_CODING_AGENT_DIR` when set. Claude and pdev entries share the ownership ledger at
+`$SUPERSET_HOME_DIR/plugins/mcp-ledger.json`: user-defined or user-edited servers are
+left alone, while disabling or uninstalling a plugin removes unchanged managed entries.
+Paradev proxy entries use `headersHelper` to read current auth at connection time rather
+than store a token. pdev needs a build with `headersHelper` support; older builds ignore it.
+
+## Organization plugins
+
+An organization gets its own plugins from a GitHub repository. An owner or admin adds the
+repository as a source (repository, ref, path). Sync reads `.agent-marketplace.json` at that path,
+the same format as this repository's marketplace: each plugin's `source` is a `./` directory in the
+repository. Like Codex, it packs the whole plugin directory into a bundle, so skills can use
+`scripts/`, `assets/` and other folders next to them, and executable files stay executable. It
+leaves out `.git`, `node_modules` and `hooks/`, which Superset does not run. A plugin may have at
+most 500 files and must pack to 2 MB gzipped (16 MB unpacked); sync checks the file count, the
+unpacked size and the size of already-compressed files such as images before it downloads any.
+Bundles go to the
+private R2 bucket; each plugin is a row in `organization_plugins` under a marketplace named
+`organization-<organization id>`. Two organizations' same-named plugins never share an install.
+
+Sync runs when an admin adds a source and when they click "Sync now" (or run
+`superset plugins organization sources sync`); there is no schedule. Like Codex, it reads the
+repository only with the GitHub account of the admin who added the source, while that admin is still
+an admin with GitHub connected; Settings shows it as "Syncs as @login". To take a source over,
+another admin adds the same repository again. A plugin whose files did not change, by the blob
+hashes in the tree listing, is not downloaded again. A plugin that fails to sync keeps its last good
+version, and its problem is listed on the source. A plugin that leaves the repository is marked "No
+longer in source": members who have it keep it, but it is not offered or installed anew. Changed
+content that reuses a declared version is refused. Removing a source removes its plugins from the
+organization and from every member.
+
+Each plugin has an access policy per role (owner, admin, member): `unavailable`, `available` or
+`installed`. A new plugin is available to owners and admins only. `installed` gives every member of
+the role an install that they can disable but not remove; setting it back to `available` keeps those
+installs, and `unavailable` removes them. A policy change only touches the roles it names. Every read
+path checks the policy in the plugin's own organization: the catalog, install, bundle download, the
+tool proxy and the cloud workspace plugin list. A machine keeps the plugins of every organization the
+member belongs to, and the proxy serves them whichever organization is active. `plugins.list`
+returns organization plugins only to clients that pass `includeOrganization`, because released
+clients cannot install them.
+
+A plugin may have only skills. A plugin with tools must name a connector that has a tool server of
+its own, or give an `https` `mcp.url` that is not a private or internal address. It cannot take a
+first-party plugin's name, because a client keys each tool server by plugin name.
 
 ## Command surface
 
@@ -118,6 +191,8 @@ superset plugins install|uninstall|list|sync    # this machine
 superset plugins enable|disable <name>          # without dropping its skills
 superset plugins connect|connections            # credentials
 superset plugins marketplace list|add|remove    # marketplace sources
+superset plugins organization list|access       # an organization's own plugins
+superset plugins organization sources add|list|remove|sync  # their GitHub sources
 superset mcp tools|call-tool                    # call a plugin's tools through the proxy
 superset skills list
 ```

@@ -1,7 +1,12 @@
+import { join } from "node:path";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
-import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import {
+	SUPERSET_RELAYED_HEADER,
+	SUPERSET_USER_ID_HEADER,
+} from "@superset/shared/host-routing";
 import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
@@ -13,21 +18,33 @@ import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createApiClient } from "./api";
-import { createChatV3Mount, registerChatV3Routes } from "./chat-v3";
+import {
+	createChatAgentBridge,
+	createChatV3Mount,
+	promptChatSession,
+	registerChatV3Routes,
+} from "./chat-v3";
 import { createDb, type HostDb } from "./db";
 import { EventBus, GitWatcher, registerEventBusRoute } from "./events";
 import { agentIsBusy, PageWatchManager } from "./page-watch/index.ts";
 import { registerForwardMuxRoute } from "./ports/forward-mux-route";
 import { portManager } from "./ports/port-manager";
+import {
+	PROJECT_PURGE_INTERVAL_MS,
+	purgeExpiredProjects,
+} from "./projects/project-deletion";
 import type { ApiAuthProvider } from "./providers/auth";
 import type { HostAuthProvider } from "./providers/host-auth";
+import { AgentJobRunner } from "./runtime/agent-jobs";
 import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
 import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
+import { applyLegacyHomeMove } from "./runtime/legacy-home-paths";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
+import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
@@ -42,8 +59,17 @@ import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
+import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
+import {
+	ATTACHMENT_SWEEP_INTERVAL_MS,
+	sweepAttachmentStore,
+} from "./trpc/router/attachments/sweep";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
+import {
+	disposeLocalMobileDevices,
+	startLocalMobileDeviceCleanup,
+} from "./trpc/router/mobile";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
@@ -109,6 +135,11 @@ export interface CreateAppResult {
 	 */
 	launchSandboxAgent: () => Promise<void>;
 	resumeCrashedAgents: () => Promise<void>;
+	recordUnfinishedChats: () => void;
+	readLinkedPullRequests: () => Promise<
+		{ repository: string; number: number; linkedAt: number }[]
+	>;
+	onPullRequestLinked: (listener: () => void) => () => void;
 	terminalAgentStore: TerminalAgentStore;
 	dispose: () => Promise<void>;
 }
@@ -120,6 +151,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		options.api ??
 		createApiClient(config.cloudApiUrl, providers.auth, config.organizationId);
 	const db = options.db ?? createDb(config.dbPath, config.migrationsFolder);
+	void applyLegacyHomeMove(db);
 	// A sandbox is provisioned for exactly one workspace, and the env says
 	// which. Seeding it here rather than from the API keeps the schema in one
 	// place and leaves provisioning with nothing to orchestrate.
@@ -184,13 +216,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	});
 	pullRequestRuntime.start();
 
-	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
-	// the routes sit behind the same auth as every other host route, and the
-	// runtime is built on first request, so chat.db is never created on a host
-	// nobody chats with. Exposure is a client concern — the renderer gates the
-	// pane on the `chat-v3` PostHog flag.
-	const chatV3 = createChatV3Mount({ db, dbPath: config.dbPath });
-
 	const app = new Hono();
 	const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
@@ -249,6 +274,21 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
+			const chat = terminalAgentStore.getChat(terminalId);
+			const chatSessionId = chat?.chatSessionId;
+			if (chatSessionId) {
+				if (!matchesAgentBinding(chat, expectedAgent)) {
+					throw new Error("The chat's agent changed before delivery");
+				}
+				await promptChatSession({
+					runtime: chatV3.runtime(),
+					chatSessionId,
+					text,
+					acquireDelivery,
+					signal,
+				});
+				return;
+			}
 			const result = await sendAgentMessage({
 				terminalId,
 				workspaceId,
@@ -266,22 +306,76 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				throw new Error(result.error);
 			}
 		},
-		isTerminalAlive: (terminalId, workspaceId) =>
-			isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus }),
+		isTerminalAlive: (terminalId, workspaceId) => {
+			const chat = terminalAgentStore.getChat(terminalId);
+			if (chat) return chat.lastEventType !== "Failed";
+			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
+		},
 		isAgentBusy: (terminalId) =>
-			agentIsBusy(terminalAgentStore.get(terminalId)?.lastEventType),
+			agentIsBusy(
+				(
+					terminalAgentStore.getChat(terminalId) ??
+					terminalAgentStore.get(terminalId)
+				)?.lastEventType,
+			),
 		getAgent: (terminalId) => {
-			const binding = terminalAgentStore.get(terminalId);
+			const binding =
+				terminalAgentStore.getChat(terminalId) ??
+				terminalAgentStore.get(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});
 	pageWatch.subscribeToTerminalEvents(eventBus);
 
+	const agentJobs = new AgentJobRunner({
+		rootDir: join(resolveAppHomeDir(), "agent-jobs"),
+		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
+	});
+
 	const runtime = {
+		agentJobs,
 		filesystem,
 		pullRequests: pullRequestRuntime,
 		pageWatch,
+		chat: () => chatV3.runtime(),
+		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
 	};
+
+	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
+	// the routes sit behind the same auth as every other host route, and the
+	// runtime is built on first request, so chat.db is never created on a host
+	// nobody chats with. Exposure is a client concern — the renderer gates the
+	// pane on the `chat-v3` PostHog flag.
+	const chatAgentContext: HostServiceContext = {
+		git,
+		credentials: providers.credentials,
+		github,
+		execGh,
+		api,
+		db,
+		runtime,
+		eventBus,
+		terminalAgentStore,
+		organizationId: config.organizationId,
+		isAuthenticated: true,
+		browserBridge: config.browserBridge,
+	};
+	const chatV3 = createChatV3Mount({
+		db,
+		api,
+		dbPath: config.dbPath,
+		agents: createChatAgentBridge(chatAgentContext),
+		onSessionChanged: ({ scopeId, occurredAt }) =>
+			eventBus.broadcastChatSessionsChanged({
+				workspaceId: scopeId,
+				occurredAt,
+			}),
+	});
+	try {
+		chatV3.resumeAfterUpdate();
+	} catch (error) {
+		console.warn("[host-service] chat resume after update failed:", error);
+	}
 
 	// Startup sweeps run in the background so they don't block server
 	// startup.
@@ -291,6 +385,39 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	// process crashed out of — and a sandbox is provisioned fresh with exactly
 	// one project and one workspace, seeded by us, that no earlier build ever
 	// touched. There is nothing to recover, so the sweeps can only invent.
+	const purgeContext = {
+		credentials: providers.credentials,
+		api,
+		db,
+		eventBus,
+		organizationId: config.organizationId,
+	};
+	const runProjectPurge = () =>
+		purgeExpiredProjects(purgeContext).catch((err) => {
+			console.warn("[host-service] project purge failed:", err);
+			return 0;
+		});
+	const projectPurgeTimer =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
+			? null
+			: setInterval(() => void runProjectPurge(), PROJECT_PURGE_INTERVAL_MS);
+	projectPurgeTimer?.unref?.();
+	const runAttachmentSweep = () =>
+		sweepAttachmentStore().catch((err) => {
+			console.warn("[host-service] attachment sweep failed:", err);
+		});
+	const attachmentSweepTimer =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
+			? null
+			: setInterval(
+					() => void runAttachmentSweep(),
+					ATTACHMENT_SWEEP_INTERVAL_MS,
+				);
+	attachmentSweepTimer?.unref?.();
+	if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") {
+		startLocalMobileDeviceCleanup(db);
+	}
+
 	void (async () => {
 		if (process.env.SUPERSET_HOST_RUN_MODE === "sandbox") return;
 		await runProjectBackfill({
@@ -316,6 +443,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		}).catch((err) => {
 			console.warn("[host-service] archived-workspace reconcile failed:", err);
 		});
+		await runProjectPurge();
+		await runAttachmentSweep();
 		// Re-share the default account's Claude/Codex config into the selected
 		// provider profiles. Last: it touches no host state the sweeps above
 		// repair, and a slow filesystem must not delay them.
@@ -407,6 +536,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	});
 	registerChatV3Routes({ app, db, mount: chatV3, upgradeWebSocket });
 
+	// tRPC answers a streamed batch before it has read the request body, and
+	// a sandbox's ingress treats that early response as the end of the
+	// exchange and drops the upload still in flight. Hand tRPC a body it
+	// already has, so no response starts before the request is complete.
+	app.use("/trpc/*", async (c, next) => {
+		if (c.req.raw.body !== null && !c.req.raw.bodyUsed) {
+			c.req.raw = new Request(c.req.raw, {
+				body: await c.req.raw.arrayBuffer(),
+			});
+		}
+		await next();
+	});
+
 	app.use(
 		"/trpc/*",
 		trpcServer({
@@ -437,6 +579,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 						c.req.header("x-superset-client-machine-id") ?? undefined,
 					userId: c.req.header(SUPERSET_USER_ID_HEADER)?.trim() || undefined,
 					browserBridge: config.browserBridge,
+					apiAuth: providers.auth,
+					isLocalCaller: c.req.header(SUPERSET_RELAYED_HEADER) === undefined,
 				} as Record<string, unknown>;
 			},
 		}),
@@ -444,6 +588,9 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		agentJobs.stopAll();
+		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
+		if (attachmentSweepTimer) clearInterval(attachmentSweepTimer);
 		await disposeWorkspaceTitleJobs(db);
 		// Each step is best-effort and isolated: a throw in one cleanup must
 		// not skip the others, otherwise a flaky `.stop()` could leak the
@@ -457,6 +604,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			pageWatch.stop();
 		} catch (err) {
 			console.warn("[host-service] pageWatch.stop failed:", err);
+		}
+		try {
+			await disposeLocalMobileDevices();
+		} catch (err) {
+			console.warn("[host-service] disposeLocalMobileDevices failed:", err);
 		}
 		try {
 			await chatV3.dispose();
@@ -515,6 +667,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	/** Same context the launcher above builds: a resume runs an agent. */
 	const resumeCrashedAgents = async () => {
+		await waitForSandboxManagedEnv();
 		const ctx = {
 			git,
 			credentials: providers.credentials,
@@ -540,6 +693,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		eventBus,
 		launchSandboxAgent,
 		resumeCrashedAgents,
+		recordUnfinishedChats: () => {
+			try {
+				chatV3.recordUnfinished();
+			} catch (error) {
+				console.warn(
+					"[host-service] could not record unfinished chats:",
+					error,
+				);
+			}
+		},
+		readLinkedPullRequests: () => pullRequestRuntime.listLinkedPullRequests(),
+		onPullRequestLinked: (listener) =>
+			pullRequestRuntime.onPullRequestLinked(listener),
 		terminalAgentStore,
 		dispose,
 	};

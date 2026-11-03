@@ -32,7 +32,7 @@ MARKER_FILE="$MARKER_DIR/$SESSION_KEY"
 mkdir -p "$MARKER_DIR" 2>/dev/null || exit 0
 touch "$MARKER_FILE" 2>/dev/null || exit 0
 
-REASON='You are in a Superset workspace, where a document a teammate will open belongs on a Superset Page rather than a Claude artifact. A page is listed in the org, every publish mints a version, and readers pin comments to it that come back to you to fix; an artifact has none of that. Read the Superset Pages skill (superset:page in the Superset plugin, or superset-page in your available skills) and publish with it. `superset pages publish <path>` works from this terminal. If the user asked for a Claude artifact by name, or no Pages skill is available, call Artifact again and it will go through.'
+REASON='You are in a Paradev workspace, where a document a teammate will open belongs on a Paradev Page rather than a Claude artifact. A page is listed in the org, every publish mints a version, and readers pin comments to it that come back to you to fix; an artifact has none of that. Read the Paradev Pages skill (superset:page in the Paradev plugin, or superset-page in your available skills) and publish with it. `superset pages publish <path>` works from this terminal. If the user asked for a Claude artifact by name, or no Pages skill is available, call Artifact again and it will go through.'
 
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' \
   "$(printf '%s' "$REASON" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"

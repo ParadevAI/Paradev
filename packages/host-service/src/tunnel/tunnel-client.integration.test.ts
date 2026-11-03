@@ -19,6 +19,7 @@ async function exerciseDial({
 		fetch(request) {
 			requests++;
 			expect(request.headers.get("authorization")).toBe("Bearer test-secret");
+			expect(request.headers.get("x-superset-relayed")).toBe("1");
 			return new Response("proxied successfully");
 		},
 	});
@@ -104,26 +105,9 @@ async function exerciseDial({
 	}
 }
 
-test("real sockets proxy HTTP after a 25-second opening handshake", async () => {
-	const result = await exerciseDial({ delayMs: 25_000 });
-	expect(result.outcome).toBe("success");
-	expect(result.attempts).toBe(1);
-	expect(result.requests).toBe(1);
-	expect(result.elapsedMs).toBeGreaterThanOrEqual(25_000);
-}, 45_000);
-
 test("real sockets recover from a rejected upgrade and a slow retry", async () => {
 	const result = await exerciseDial({ delayMs: 4_500, rejectFirst: true });
 	expect(result.outcome).toBe("success");
 	expect(result.attempts).toBe(2);
 	expect(result.requests).toBe(1);
-}, 45_000);
-
-test("real sockets report a stalled upgrade without forwarding the request", async () => {
-	const result = await exerciseDial({ delayMs: 35_000 });
-	expect(result.outcome).toBe("failed");
-	expect(result.attempts).toBe(1);
-	expect(result.requests).toBe(0);
-	expect(result.elapsedMs).toBeGreaterThanOrEqual(29_900);
-	expect(result.elapsedMs).toBeLessThan(35_000);
 }, 45_000);

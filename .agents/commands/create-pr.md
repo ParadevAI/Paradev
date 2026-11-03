@@ -1,6 +1,10 @@
+---
+description: Review the diff against AGENTS.md, then create a PR with gh and a body scaled to the change
+---
+
 # Persona & Goal
 
-You are an expert Superset engineer and technical writer creating high-signal PR descriptions for this repository.
+You are an expert Paradev engineer and technical writer creating high-signal PR descriptions for this repository.
 
 Write PR bodies that are:
 - reviewer-friendly (fast to understand + verify)
@@ -98,6 +102,14 @@ Do NOT proceed with the PR. Instead, present findings to the user:
     EOF
     )"
 
+- Then assign the PR to `superset-home`. This starts a review of the PR in a cloud workspace;
+  the findings are published as a Paradev page and linked in a PR comment.
+
+    gh pr edit <number> --add-assignee superset-home
+
+  Assigning needs write access to the repository. If it fails, the PR is still created: say so
+  and continue. Do not run `gh pr create` again.
+
 # PR Titles
 
 Prefer titles that front-load impact. Use type/scope only if the team finds it helpful.
@@ -179,7 +191,6 @@ Use **High-risk/Complex** when any of these are true:
     - `bun run typecheck` (required)
     - `bun run lint` (required)
     - `bun test <suite-or-file>` (when touching logic)
-    - `bun run lint:check-node-imports` (when touching Desktop renderer/shared)
     - `bun turbo run build --filter=@superset/desktop` (when touching Desktop)
 
     ## Design Decisions (optional)
@@ -274,7 +285,6 @@ For PRs bundling multiple features, use Part headers to organize (like PR #559):
     - `bun run typecheck` (required)
     - `bun run lint` (required)
     - `bun test` (required)
-    - `bun run lint:check-node-imports` (when touching Desktop renderer/shared)
     - `bun turbo run build --filter=@superset/desktop` (when touching Desktop)
 
     ## Design Decisions
@@ -318,7 +328,7 @@ Use these as templates for the Manual QA Checklist section. Pick categories appr
 - [ ] App launches without errors
 - [ ] No console errors in DevTools (main + renderer)
 - [ ] Feature works after app restart
-- [ ] Ran `bun run lint:check-node-imports` (no Node.js in renderer)
+- [ ] No Node.js imports in `apps/desktop/src/renderer/`
 
 ### tRPC over Electron IPC
 - [ ] tRPC router changes validated from renderer call-sites
@@ -515,7 +525,6 @@ Use these as templates for the Manual QA Checklist section. Pick categories appr
     ## Testing
     - `bun run typecheck`
     - `bun run lint`
-    - `bun run lint:check-node-imports`
     - Manual testing in dev mode
 
     ## Design Decisions

@@ -92,6 +92,14 @@ function ensureWithinRoot({
 	return normalizedAbsolutePath;
 }
 
+async function resolveRealRootPath(rootPath: string): Promise<string> {
+	try {
+		return normalizeAbsolutePath(await fs.realpath(rootPath));
+	} catch {
+		return normalizeAbsolutePath(rootPath);
+	}
+}
+
 async function assertParentWithinRoot(
 	rootPath: string,
 	absolutePath: string,
@@ -100,6 +108,7 @@ async function assertParentWithinRoot(
 		rootPath,
 		absolutePath: rootPath,
 	});
+	const realRootPath = await resolveRealRootPath(rootPath);
 	let currentPath = path.dirname(absolutePath);
 
 	while (currentPath !== path.dirname(currentPath)) {
@@ -116,7 +125,7 @@ async function assertParentWithinRoot(
 					const targetRealPath = normalizeAbsolutePath(
 						await fs.realpath(resolvedTarget),
 					);
-					if (!isPathWithinRoot(normalizedRootPath, targetRealPath)) {
+					if (!isPathWithinRoot(realRootPath, targetRealPath)) {
 						throw new WorkspaceFsPathError(
 							"Symlink in path resolves outside workspace root",
 							"SYMLINK_ESCAPE",
@@ -156,7 +165,7 @@ async function assertParentWithinRoot(
 			const parentRealPath = normalizeAbsolutePath(
 				await fs.realpath(currentPath),
 			);
-			if (!isPathWithinRoot(normalizedRootPath, parentRealPath)) {
+			if (!isPathWithinRoot(realRootPath, parentRealPath)) {
 				throw new WorkspaceFsPathError(
 					"Parent directory resolves outside workspace root",
 					"SYMLINK_ESCAPE",
@@ -238,14 +247,15 @@ async function assertRealpathWithinRoot(
 	rootPath: string,
 	absolutePath: string,
 ): Promise<void> {
-	const normalizedRootPath = ensureWithinRoot({
+	ensureWithinRoot({
 		rootPath,
 		absolutePath: rootPath,
 	});
+	const realRootPath = await resolveRealRootPath(rootPath);
 
 	try {
 		const realPath = normalizeAbsolutePath(await fs.realpath(absolutePath));
-		if (!isPathWithinRoot(normalizedRootPath, realPath)) {
+		if (!isPathWithinRoot(realRootPath, realPath)) {
 			throw new WorkspaceFsPathError(
 				"Path resolves outside workspace root",
 				"SYMLINK_ESCAPE",
@@ -346,19 +356,16 @@ async function resolveWriteTarget(absolutePath: string): Promise<string> {
 }
 
 async function writeAtomically({
-	rootPath,
 	absolutePath,
 	content,
 	encoding,
 }: {
-	rootPath: string;
 	absolutePath: string;
 	content: string | Uint8Array;
 	encoding?: string;
 }): Promise<void> {
 	const targetPath = await resolveWriteTarget(absolutePath);
 	const tempPath = `${targetPath}.superset-tmp-${randomUUID()}`;
-	await assertParentWithinRoot(rootPath, tempPath);
 
 	let sourceMode: number | undefined;
 	try {
@@ -388,11 +395,11 @@ async function writeAtomically({
 // per-entry stat calls bounds how much zombie work continues after an abort.
 const LIST_DIRECTORY_STAT_BATCH_SIZE = 16;
 
-// Read-only operations (listDirectory, readFile, getMetadata) are not
-// confined to the workspace root: terminals and agents routinely reference
-// files anywhere on the host, and viewing them is within the caller's trust
-// model (statPath/browseHost already expose arbitrary host paths). Mutations
-// remain strictly confined to the root.
+// listDirectory, readFile, getMetadata and writeFile are not confined to the
+// workspace root: terminals and agents routinely reference files anywhere on
+// the host, and viewing or editing them is within the caller's trust model
+// (the same caller can run any command in a terminal). Structural mutations
+// (create, delete, move, copy) remain confined to the root.
 export async function listDirectory({
 	absolutePath,
 	signal,
@@ -536,22 +543,19 @@ export async function getMetadata({
 }
 
 export async function writeFile({
-	rootPath,
 	absolutePath,
 	content,
 	encoding,
 	options,
 	precondition,
 }: {
-	rootPath: string;
 	absolutePath: string;
 	content: string | Uint8Array;
 	encoding?: string;
 	options?: { create: boolean; overwrite: boolean };
 	precondition?: { ifMatch: string };
 }): Promise<FsWriteResult> {
-	const targetPath = ensureWithinRoot({ rootPath, absolutePath });
-	await assertRealpathWithinRoot(rootPath, targetPath);
+	const targetPath = normalizeAbsolutePath(absolutePath);
 
 	const create = options?.create ?? true;
 	const overwrite = options?.overwrite ?? true;
@@ -604,7 +608,6 @@ export async function writeFile({
 		}
 
 		await writeAtomically({
-			rootPath,
 			absolutePath: targetPath,
 			content,
 			encoding,
@@ -920,7 +923,10 @@ export async function movePath({
 			if (await isCaseOnlyRenameOfSameEntry(sourcePath, destinationPath)) {
 				return;
 			}
-			throw new Error(`Destination already exists: ${destinationPath}`);
+			throw Object.assign(
+				new Error(`Destination already exists: ${destinationPath}`),
+				{ code: "EEXIST" },
+			);
 		},
 		(error: NodeJS.ErrnoException) => {
 			if (error.code !== "ENOENT") {

@@ -96,7 +96,7 @@ export function WallOfLoveSection() {
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				<div className="max-w-2xl mb-12 sm:mb-16">
 					<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.1] text-foreground">
-						<Trans>What builders say about Superset</Trans>
+						<Trans>What builders say about Paradev</Trans>
 					</h2>
 				</div>
 

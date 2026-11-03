@@ -14,3 +14,6 @@
 "Could not start dictation" = "Không thể bắt đầu đọc chính tả";
 "Uploading" = "Đang tải lên";
 "Upload failed" = "Tải lên thất bại";
+"Stop" = "Dừng";
+"Dictation stopped. What was heard so far is in your message." = "Đọc chính tả đã dừng. Nội dung nghe được đến giờ đã có trong tin nhắn.";
+"Transcription took too long. The last few words may be missing." = "Phiên âm mất quá lâu. Có thể thiếu vài từ cuối.";

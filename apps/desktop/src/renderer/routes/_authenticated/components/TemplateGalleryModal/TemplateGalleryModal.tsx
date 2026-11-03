@@ -49,7 +49,7 @@ export function TemplateGalleryModal({
 	const finalizeSetup = useFinalizeProjectSetup();
 	const createV1Project = useCreateV1Project();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const parentDir = homeDir ? `${homeDir}/.superset/projects` : null;
+	const parentDir = homeDir ? `${homeDir}/.paradev/projects` : null;
 	const [cloningId, setCloningId] = useState<string | null>(null);
 
 	const handleSelect = async (template: ProjectTemplate) => {

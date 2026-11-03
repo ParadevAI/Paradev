@@ -1,74 +1,38 @@
-import { afterAll, afterEach, beforeEach, expect, mock, test } from "bun:test";
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import type { useNavigate } from "@tanstack/react-router";
+import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
+import { useNewWorkspaceModalStore } from "renderer/stores/new-workspace-modal";
+import {
+	openNewSession,
+	openNewWorkspace,
+	openNewWorkspaceForLocalProject,
+} from "./useOpenNewWorkspace";
 
 const navigate = mock(() => Promise.resolve());
-let v2Enabled = true;
-mock.module("renderer/hooks/useIsV2CloudEnabled", () => ({
-	useIsV2CloudEnabled: () => v2Enabled,
-}));
-mock.module(
-	"renderer/routes/_authenticated/providers/LocalHostServiceProvider",
-	() => ({
-		useLocalHostService: () => ({ machineId: "this-machine" }),
-	}),
-);
+const MACHINE_ID = "this-machine";
+const v2 = {
+	isV2CloudEnabled: true,
+	machineId: MACHINE_ID,
+	navigate: navigate as unknown as ReturnType<typeof useNavigate>,
+};
 
-const alreadyRegistered = GlobalRegistrator.isRegistered;
-if (!alreadyRegistered) GlobalRegistrator.register();
-const {
-	act,
-	cleanup,
-	renderHook: renderHookWithOptions,
-} = await import("@testing-library/react");
-const {
-	createRootRoute,
-	createRouter,
-	createMemoryHistory,
-	RouterContextProvider,
-} = await import("@tanstack/react-router");
-const { createElement } = await import("react");
-function renderHook<Result>(hook: () => Result) {
-	const router = createRouter({
-		routeTree: createRootRoute(),
-		history: createMemoryHistory({ initialEntries: ["/"] }),
-	});
-	router.navigate = navigate;
-	return renderHookWithOptions(hook, {
-		wrapper: ({ children }) =>
-			createElement(RouterContextProvider, { router, children }),
-	});
+function resetStores() {
+	useNewWorkspaceDraftStore.getState().resetDraft();
+	useNewWorkspaceModalStore.getState().closeModal();
 }
-const { useNewWorkspaceDraftStore } = await import(
-	"renderer/stores/new-workspace-draft"
-);
-const { useNewWorkspaceModalStore } = await import(
-	"renderer/stores/new-workspace-modal"
-);
-const { useOpenNewWorkspace, useOpenNewWorkspaceForLocalProject } =
-	await import("./useOpenNewWorkspace");
 
 beforeEach(() => {
 	navigate.mockClear();
-	v2Enabled = true;
-	useNewWorkspaceDraftStore.getState().resetDraft();
+	resetStores();
 });
-afterEach(cleanup);
-afterAll(async () => {
-	if (!alreadyRegistered) await GlobalRegistrator.unregister();
-});
+afterEach(resetStores);
 
-test.each([
-	"cloud",
-	"other-machine",
-])("local project handoff overrides %s while preserving the draft", (hostId) => {
+test("local project handoff pins this machine for that open and keeps the draft", () => {
 	useNewWorkspaceDraftStore.getState().updateDraft({
-		hostId,
-		selectedProjectId: "old-project",
-		prompt: "Keep my prompt",
+		promptDraft: [{ type: "text", text: "Keep my prompt" }],
 		checkout: "local",
 	});
-	const { result } = renderHook(useOpenNewWorkspaceForLocalProject);
-	act(() => result.current("new-project"));
+	openNewWorkspaceForLocalProject(v2, "new-project");
 	expect(navigate).toHaveBeenCalledWith(
 		expect.objectContaining({
 			to: "/new-workspace",
@@ -76,31 +40,67 @@ test.each([
 		}),
 	);
 	expect(useNewWorkspaceDraftStore.getState()).toMatchObject({
-		hostId: "this-machine",
 		selectedProjectId: "new-project",
 		isSession: false,
-		prompt: "Keep my prompt",
+		promptDraft: [{ type: "text", text: "Keep my prompt" }],
 		checkout: "local",
 	});
-	useNewWorkspaceDraftStore.getState().updateDraft({ hostId: "cloud" });
-	act(() => result.current("second-project"));
-	expect(useNewWorkspaceDraftStore.getState().hostId).toBe("this-machine");
 });
 
-test("ordinary new workspace navigation preserves the selected remote host", () => {
-	useNewWorkspaceDraftStore.getState().updateDraft({ hostId: "other-machine" });
-	const { result } = renderHook(useOpenNewWorkspace);
-	act(() => result.current("existing-project"));
-	expect(useNewWorkspaceDraftStore.getState().hostId).toBe("other-machine");
+test("project handoff names no host, so the saved pick applies", () => {
+	openNewWorkspace(v2, "project-a");
+	expect(navigate).toHaveBeenCalledWith(
+		expect.objectContaining({
+			search: { projectId: "project-a", host: undefined },
+		}),
+	);
+	expect(useNewWorkspaceDraftStore.getState().selectedProjectId).toBe(
+		"project-a",
+	);
+});
+
+test("a host the caller asks for goes in the URL", () => {
+	openNewWorkspace(v2, "project-a", "cloud");
+	expect(navigate).toHaveBeenCalledWith(
+		expect.objectContaining({
+			search: { projectId: "project-a", host: "cloud" },
+		}),
+	);
+});
+
+test("session handoff names no host and selects the session", () => {
+	openNewSession(v2);
+	expect(navigate).toHaveBeenCalledWith(
+		expect.objectContaining({ search: { session: true } }),
+	);
+	expect(useNewWorkspaceDraftStore.getState().isSession).toBe(true);
+});
+
+test("session handoff re-selects the session when the URL already asks for it", () => {
+	useNewWorkspaceDraftStore.getState().selectProject("project-a");
+	openNewSession(v2);
+	expect(useNewWorkspaceDraftStore.getState()).toMatchObject({
+		isSession: true,
+		selectedProjectId: null,
+	});
 });
 
 test("v1 local project handoff still opens the project modal", () => {
-	v2Enabled = false;
-	const { result } = renderHook(useOpenNewWorkspaceForLocalProject);
-	act(() => result.current("v1-project"));
+	openNewWorkspaceForLocalProject(
+		{ ...v2, isV2CloudEnabled: false },
+		"v1-project",
+	);
 	expect(navigate).not.toHaveBeenCalled();
 	expect(useNewWorkspaceModalStore.getState()).toMatchObject({
 		isOpen: true,
 		preSelectedProjectId: "v1-project",
+	});
+});
+
+test("a handoff with a repository lets the pick follow it to another host", () => {
+	openNewWorkspace(v2, "stand-in", undefined, "thinkfiveable/hours");
+	expect(useNewWorkspaceDraftStore.getState()).toMatchObject({
+		selectedProjectId: "stand-in",
+		selectedProjectRepository: "thinkfiveable/hours",
 	});
 });

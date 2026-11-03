@@ -89,13 +89,27 @@ const identity = renderSandboxConf({
 	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
-			url: "https://github.com/superset-sh/superset.git",
+			url: "https://github.com/paradevai/paradev.git",
 			branch: "main",
 			path: ".",
 		},
 	]),
 	SUPERSET_SANDBOX_IMAGE_TAG: IMAGE,
 	SUPERSET_SANDBOX_PROVIDER: "docker",
+	SUPERSET_SANDBOX_PLUGINS: JSON.stringify([
+		{
+			marketplace: "superset",
+			name: "linear",
+			version: "0.0.0",
+			enabled: true,
+		},
+		{
+			marketplace: "acme",
+			name: "not-shipped",
+			version: "1.0.0",
+			enabled: true,
+		},
+	]),
 });
 
 docker(["rm", "-f", NAME], { check: false });
@@ -212,11 +226,38 @@ try {
 			),
 		),
 	);
+	// host-service is an asset pinned in bundle/assets.json, so the box runs a
+	// published build rather than this checkout: what it does with the plugin
+	// list belongs to the release probe and the unit tests. Handing the list
+	// over is the bundle's own job, so that is what this checks.
+	const hostEnv = exec(
+		`tr '\\0' '\\n' < /proc/$(cat ${SANDBOX_PATHS.run}/host-service.pid)/environ`,
+		{ check: false, user: "ubuntu" },
+	);
+	expect(
+		"plugins: the runner hands host-service the plugin list",
+		/SUPERSET_SANDBOX_PLUGINS=.*not-shipped/.test(hostEnv),
+		hostEnv
+			.split("\n")
+			.find((line) => line.startsWith("SUPERSET_SANDBOX_PLUGINS=")) ?? "unset",
+	);
+
 	// The control plane's push, so the runner's hook sequencing runs: this
 	// checkout declares no start hook, which the log must say.
 	exec(
 		`curl -fs -X POST -H 'Authorization: Bearer boot-twice-secret' -H 'Content-Type: application/json' -d '{"json":{"variables":{"FOO":"bar"}}}' http://127.0.0.1:${SANDBOX_PORTS.hostService}/trpc/sandbox.setEnvironment`,
 		{ check: false },
+	);
+	// The clone outlives host-service's readiness; a wake that interrupts it
+	// is its own case (the runner reclones), not this test's.
+	expect(
+		"first boot: checkout done",
+		/ready/.test(
+			exec(
+				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+				{ check: false },
+			),
+		),
 	);
 	expect(
 		"start hook: the runner asked host-service once the push landed",
@@ -245,17 +286,6 @@ try {
 		).trim(),
 	);
 
-	// The clone outlives host-service's readiness; a wake that interrupts it
-	// is its own case (the runner reclones), not this test's.
-	expect(
-		"first boot: checkout done",
-		/ready/.test(
-			exec(
-				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
-				{ check: false },
-			),
-		),
-	);
 	// Second boot: stop everything the way a wake would (no processes survive), then boot again.
 	exec(
 		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,

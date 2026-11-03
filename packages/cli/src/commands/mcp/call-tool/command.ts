@@ -1,5 +1,6 @@
 import { CLIError, positional, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
+import { resolveOrganizationId } from "../../../lib/config";
 import { resolvePluginName } from "../../../lib/plugins/connection-ref";
 import { readStdin } from "../../../lib/plugins/inputs";
 import { connectPluginMcp } from "../../../lib/plugins/mcp-client";
@@ -14,6 +15,9 @@ export default command({
 	],
 	options: {
 		plugin: string().desc("Plugin name from `superset plugins list`"),
+		account: string().desc(
+			"Connection id, when the plugin's connector has more than one account",
+		),
 		connection: string().desc("Deprecated alias for --plugin"),
 		pluginId: string().desc("Deprecated alias for --plugin"),
 	},
@@ -36,7 +40,14 @@ export default command({
 			);
 		}
 
-		const { client } = await connectPluginMcp(pluginName, ctx.bearer);
+		const { client } = await connectPluginMcp(
+			pluginName,
+			{
+				bearer: ctx.bearer,
+				organizationId: resolveOrganizationId(ctx.config),
+			},
+			options.account as string | undefined,
+		);
 		try {
 			const result = await client.callTool({
 				name: tool,

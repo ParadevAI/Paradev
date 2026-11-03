@@ -1,6 +1,11 @@
-import type { FileUIPart } from "ai";
-import { useCallback, useEffect, useRef } from "react";
-import { awaitUploads, pruneAttachmentUploads, startUpload } from "./store";
+import type { PromptInputAttachment } from "@superset/chat-ui/PromptInput";
+import { useCallback, useEffect } from "react";
+import {
+	awaitUploads,
+	pruneAttachmentUploads,
+	readyAttachmentId,
+	startUpload,
+} from "./store";
 
 export interface UploadFailure {
 	filename?: string;
@@ -10,16 +15,18 @@ export interface UploadFailure {
 export interface UseUploadAttachmentsApi {
 	awaitUploads: () => Promise<{
 		readyIds: string[];
+		ready: Array<{ attachmentId: string; name: string; mimeType: string }>;
 		errors: UploadFailure[];
 	}>;
 }
 
 /**
- * Drives background attachment uploads. Each file uploads exactly once, to
- * whichever target was active when the user added it; switching targets does
- * not re-upload. The upload store keys results by `(fileId, target)` so the
- * visible pill list (filtered via `useFileIdsForHost`) follows the picker
- * while previous targets' attachments stay cached for return visits.
+ * Drives background attachment uploads. Every attached file is uploaded to
+ * the current target, so switching the picker uploads the files to the new
+ * target too: what the pill list shows for a target is what the create will
+ * send to it. The store keys uploads by `(fileId, target)` and starts each
+ * pair once, so a file never uploads twice to the same target and an earlier
+ * target's upload stays cached for a return visit.
  *
  * A target is a host URL, or `CLOUD_UPLOAD_TARGET` when the workspace will be
  * a cloud one and has no host yet.
@@ -28,45 +35,41 @@ export function useUploadAttachments({
 	files,
 	hostUrl,
 }: {
-	files: (FileUIPart & { id: string })[];
+	files: PromptInputAttachment[];
 	hostUrl: string | null;
 }): UseUploadAttachmentsApi {
-	// File ids we've already kicked off an upload for. Prevents re-upload on
-	// host swap; keyed by fileId so a removed-and-re-added file (new id from
-	// the library) does start fresh.
-	const seenFileIdsRef = useRef<Set<string>>(new Set());
-
 	useEffect(() => {
 		if (hostUrl) {
 			for (const file of files) {
-				if (seenFileIdsRef.current.has(file.id)) continue;
-				seenFileIdsRef.current.add(file.id);
-				startUpload(hostUrl, {
-					id: file.id,
-					url: file.url,
-					mediaType: file.mediaType,
-					filename: file.filename,
-				});
+				startUpload(hostUrl, { id: file.id, file: file.file });
 			}
 		}
-		const liveIds = new Set(files.map((f) => f.id));
-		for (const id of seenFileIdsRef.current) {
-			if (!liveIds.has(id)) seenFileIdsRef.current.delete(id);
-		}
-		pruneAttachmentUploads(liveIds);
+		pruneAttachmentUploads(new Set(files.map((f) => f.id)));
 	}, [files, hostUrl]);
 
 	const awaitForCurrent = useCallback(async () => {
-		if (!hostUrl) return { readyIds: [], errors: [] };
+		if (!hostUrl) return { readyIds: [], ready: [], errors: [] };
 		const result = await awaitUploads(
 			hostUrl,
 			files.map((f) => f.id),
 		);
 		const errors: UploadFailure[] = result.failures.map((failure) => {
 			const file = files.find((f) => f.id === failure.fileId);
-			return { filename: file?.filename, message: failure.message };
+			return { filename: file?.file.name, message: failure.message };
 		});
-		return { readyIds: result.readyIds, errors };
+		const ready = files.flatMap((file) => {
+			const attachmentId = readyAttachmentId(file.id, hostUrl);
+			return attachmentId
+				? [
+						{
+							attachmentId,
+							name: file.file.name || attachmentId,
+							mimeType: file.file.type || "application/octet-stream",
+						},
+					]
+				: [];
+		});
+		return { readyIds: result.readyIds, ready, errors };
 	}, [hostUrl, files]);
 
 	return { awaitUploads: awaitForCurrent };

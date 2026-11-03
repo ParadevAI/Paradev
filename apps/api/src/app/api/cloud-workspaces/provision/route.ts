@@ -1,4 +1,8 @@
-import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
+import * as Sentry from "@sentry/nextjs";
+import {
+	CLOUD_AGENT_PROMPT_MAX_LENGTH,
+	cloudAgentLaunchSchema,
+} from "@superset/shared/cloud-agent-launch";
 import { provisionCloudWorkspace } from "@superset/trpc/cloud-workspace-provision";
 import { z } from "zod";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
@@ -12,16 +16,8 @@ const payloadSchema = z
 	.object({
 		cloudWorkspaceId: z.string().uuid(),
 		/** Absent when the user typed a name, which the row already holds. */
-		namingPrompt: z.string().max(20000).optional(),
-		launch: z
-			.object({
-				agent: z.string().refine(isCloudAgentId, "unknown cloud agent"),
-				prompt: z.string().max(20000),
-				model: z.string().min(1).optional(),
-				effort: z.string().min(1).optional(),
-				mode: z.string().min(1).optional(),
-			})
-			.optional(),
+		namingPrompt: z.string().max(CLOUD_AGENT_PROMPT_MAX_LENGTH).optional(),
+		launch: cloudAgentLaunchSchema.optional(),
 	})
 	.strict();
 
@@ -49,6 +45,13 @@ export async function POST(request: Request): Promise<Response> {
 	// torn down, so answering 200 is right: a redelivery would repeat work that
 	// deliberately gave up. QStash's retries are for the deliveries that never
 	// reach this line.
-	const outcome = await provisionCloudWorkspace(parsed.data);
+	// The start that queued this job forwarded its trace through QStash.
+	const outcome = await Sentry.continueTrace(
+		{
+			sentryTrace: request.headers.get("sentry-trace") ?? undefined,
+			baggage: request.headers.get("baggage") ?? undefined,
+		},
+		() => provisionCloudWorkspace(parsed.data),
+	);
 	return Response.json({ ok: true, outcome });
 }

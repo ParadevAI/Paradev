@@ -4,6 +4,7 @@ import { getI18nInstance } from "@superset/i18n/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
+import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { AttentionChart } from "./components/AttentionChart";
@@ -37,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 		openGraph: {
 			title: i18n._(
 				msg({
-					message: "Factory 2026 | Superset",
+					message: "Factory 2026 | Paradev",
 				}),
 			),
 			description,
@@ -48,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			card: "summary_large_image",
 			title: i18n._(
 				msg({
-					message: "Factory 2026 | Superset",
+					message: "Factory 2026 | Paradev",
 				}),
 			),
 			description,
@@ -236,18 +237,18 @@ export default async function Factory2026Page() {
 					</h2>
 					<p className="text-muted-foreground mt-3 max-w-lg mx-auto leading-relaxed">
 						<Trans>
-							Superset is the workbench for the F3 to F4 transition: parallel
-							agents in isolated workspaces, fleets you can actually supervise,
+							Paradev is the workbench for the F3 to F4 transition: parallel
+							agents on separate branches, fleets you can actually supervise,
 							and a review surface for code you did not write.
 						</Trans>
 					</p>
 					<div className="mt-8 flex items-center justify-center gap-4">
-						<Link
-							href="/download"
+						<DownloadLink
+							source="factory_2026"
 							className="bg-foreground text-background px-6 py-3 text-sm font-normal transition-colors hover:bg-brand hover:text-white"
 						>
-							<Trans>Download Superset</Trans>
-						</Link>
+							<Trans>Download Paradev</Trans>
+						</DownloadLink>
 						<Link
 							href="/changelog"
 							className="group inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

@@ -1,4 +1,5 @@
-import { Heading, Link, Section, Text } from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { EmailLayout } from "../../components";
 
 interface YcDealCodeEmailProps {
@@ -8,21 +9,17 @@ interface YcDealCodeEmailProps {
 
 export function YcDealCodeEmail({
 	firstName = "there",
-	code = "YC-XXXXXXXX",
+	code = "YCXXXXXXXX",
 }: YcDealCodeEmailProps) {
 	return (
-		<EmailLayout preview="Your code for 6 months of Superset Pro free">
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Your Superset YC deal
-			</Heading>
-
+		<EmailLayout preview="Your code for 6 months of Paradev Pro free">
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {firstName ?? "there"},
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Thanks for redeeming our deal on Bookface. Here is your code for 6
-				months of Superset Pro free:
+				months of Paradev Pro free:
 			</Text>
 
 			<Section className="bg-surface border border-solid border-border rounded-md px-4 py-3 mb-4 text-center">
@@ -38,15 +35,17 @@ export function YcDealCodeEmail({
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 				If you don't have the app yet, download it at{" "}
-				<Link href="https://superset.sh/download" className="text-foreground">
-					superset.sh/download
+				<Link
+					href={`${CANONICAL_URLS.MARKETING}/download`}
+					className="text-foreground"
+				>
+					{`${COMPANY.DOMAIN}/download`}
 				</Link>
 				. Questions? Just reply to this email.
 			</Text>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
-				You're receiving this because you redeemed the Superset deal on
-				Bookface.
+				You're receiving this because you redeemed the Paradev deal on Bookface.
 			</Text>
 		</EmailLayout>
 	);

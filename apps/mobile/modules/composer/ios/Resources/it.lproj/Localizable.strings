@@ -14,3 +14,6 @@
 "Could not start dictation" = "Impossibile avviare la dettatura";
 "Uploading" = "Caricamento in corso";
 "Upload failed" = "Caricamento non riuscito";
+"Stop" = "Arresta";
+"Dictation stopped. What was heard so far is in your message." = "La dettatura si è interrotta. Quanto ascoltato finora è nel tuo messaggio.";
+"Transcription took too long. The last few words may be missing." = "La trascrizione ha richiesto troppo tempo. Le ultime parole potrebbero mancare.";

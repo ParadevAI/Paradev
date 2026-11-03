@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { GoGitPullRequest } from "react-icons/go";
 import { LuRefreshCw } from "react-icons/lu";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
+import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { LoadMoreSentinel } from "renderer/routes/_authenticated/_dashboard/components/LoadMoreSentinel";
 import { serializeProjectFilters } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
@@ -68,7 +69,6 @@ export function PullRequestsContent({
 				"pullRequests",
 				"searchPullRequests",
 				target.key,
-				target.hostUrl,
 				debouncedQuery.trim(),
 				authorFilter,
 				reviewFilter,
@@ -107,6 +107,13 @@ export function PullRequestsContent({
 			enabled: !!target.hostUrl,
 			staleTime: 30_000,
 			gcTime: 10 * 60_000,
+			meta: {
+				persist:
+					page === 1 &&
+					!debouncedQuery.trim() &&
+					!authorFilter &&
+					!reviewFilter,
+			},
 		}),
 		getRows: (data) => data.pullRequests,
 		getRowKey: (pullRequest) =>
@@ -121,6 +128,7 @@ export function PullRequestsContent({
 			search: {
 				search: searchQuery || undefined,
 				project: pr.projectId,
+				repo: pullRequestRefFromUrl(pr.url)?.repoFullName,
 				projects: serializeProjectFilters(projectFilters),
 				author: authorFilter ?? undefined,
 				review: reviewFilter ?? undefined,

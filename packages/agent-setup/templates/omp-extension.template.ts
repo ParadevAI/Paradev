@@ -66,7 +66,7 @@ export default function (pi: OmpExtensionApi) {
 	if (!process.env.SUPERSET_TERMINAL_ID) return;
 
 	const supersetHome =
-		process.env.SUPERSET_HOME_DIR || join(homedir(), ".superset");
+		process.env.SUPERSET_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
 	const notifyScript = join(supersetHome, "hooks", "notify.sh");
 	if (!existsSync(notifyScript)) return;
 

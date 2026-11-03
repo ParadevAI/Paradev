@@ -1,65 +1,163 @@
-import type { RouterOutputs } from "@superset/trpc";
+import type {
+	PullRequestActivity,
+	PullRequestActor,
+	PullRequestCommit,
+	PullRequestCommitAuthor,
+	PullRequestConversationComment,
+	PullRequestDetail as PullRequestDetailBase,
+	PullRequestMergeability,
+} from "@superset/shared/pull-request";
+import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { fromHostPullRequestContent } from "../../utils/fromHostPullRequestContent";
+import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider/ElectronTRPCProvider";
+import { DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
+import { V2_WORKSPACES_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces/useAccessibleV2Workspaces";
+import {
+	type PullRequestTarget,
+	pullRequestThreadsQueryKey,
+	readPullRequestDetail,
+} from "../../utils/pullRequestClient";
+import {
+	type PullRequestProject,
+	resolvePullRequestTarget,
+} from "../../utils/resolvePullRequestTarget";
 
-export type PullRequestDetail =
-	RouterOutputs["integration"]["github"]["getPullRequest"];
+export type { PullRequestMergeability };
+export type PullRequestDetailActor = PullRequestActor;
+export type PullRequestDetailComment = PullRequestConversationComment;
+export type PullRequestDetailCommitAuthor = PullRequestCommitAuthor;
+export type PullRequestDetailCommit = PullRequestCommit;
 
-interface PullRequestDetailKey {
-	projectId: string | null;
-	hostUrl: string | null;
-	prNumber: number | null;
-}
+export type PullRequestDetail = PullRequestDetailBase &
+	PullRequestActivity & {
+		/** What GitHub lets the viewer do, so nothing is offered that would be refused. */
+		capabilities: PullRequestDetailRead["capabilities"];
+	};
 
-function pullRequestDetailQueryKey({
-	projectId,
-	hostUrl,
-	prNumber,
-}: PullRequestDetailKey) {
-	return ["pull-request-detail", projectId, hostUrl, prNumber] as const;
+export function pullRequestDetailQueryKey(
+	repoFullName: string | null,
+	prNumber: number | null,
+) {
+	return [
+		"pull-request-detail",
+		repoFullName?.toLowerCase() ?? null,
+		prNumber,
+	] as const;
 }
 
 /**
- * The PR's GitHub content (title, body, state, checks) for the detail
- * header and summary. Shared by the Pull requests page and the workspace's
- * pull-request pane, so both stay on one cache entry per PR.
+ * One pull request, read as the viewer. A project is resolved only to name
+ * the repository when the link carries none, and for the features that run
+ * on a host (agents, workspaces); the read itself never goes through one.
  */
 export function usePullRequestDetail({
 	projectId,
-	hostUrl,
 	prNumber,
+	repoFullName,
+	projectQuery,
 	enabled = true,
-}: PullRequestDetailKey & { enabled?: boolean }) {
-	return useQuery({
-		queryKey: pullRequestDetailQueryKey({ projectId, hostUrl, prNumber }),
-		queryFn: async () => {
-			if (!hostUrl || !projectId || prNumber === null) return null;
-			const client = getHostServiceClientByUrl(hostUrl);
-			const content = await client.pullRequests.getContent.query({
-				projectId,
+}: {
+	projectId: string | null;
+	prNumber: number | null;
+	repoFullName?: string | null;
+	projectQuery?: {
+		data?: PullRequestProject | null;
+		isPending: boolean;
+	};
+	enabled?: boolean;
+}) {
+	const organizationId = useActiveOrganizationId();
+	const { projects, isReady } = useHostProjects();
+	const availableProjects = projectQuery
+		? projectQuery.data
+			? [projectQuery.data]
+			: []
+		: projects;
+	const projectReady = projectQuery ? !projectQuery.isPending : isReady;
+	const target = resolvePullRequestTarget({
+		projectId,
+		repoFullName,
+		projects: availableProjects,
+	});
+
+	const isResolvingProject =
+		!!projectId &&
+		!projectReady &&
+		!availableProjects.some(
+			(project) => project.id === projectId || project.projectKey === projectId,
+		);
+	const query = useQuery<PullRequestDetail>({
+		queryKey: [
+			...pullRequestDetailQueryKey(target.repoFullName, prNumber),
+			organizationId,
+		],
+		queryFn: () => {
+			if (prNumber === null) throw new Error("Invalid pull request number");
+			return readPullRequestDetail({
+				organizationId,
+				repoFullName: target.repoFullName,
 				prNumber,
 			});
-			return fromHostPullRequestContent(content);
 		},
-		enabled: enabled && !!hostUrl && !!projectId && prNumber !== null,
+		enabled:
+			enabled &&
+			!isResolvingProject &&
+			!!target.repoFullName &&
+			prNumber !== null,
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});
+	return {
+		data: query.data,
+		error: query.error,
+		refetch: query.refetch,
+		...target,
+		repoFullName:
+			repoFullName ?? query.data?.repoFullName ?? target.repoFullName,
+		isResolvingProject,
+		isLoading: query.isLoading || isResolvingProject,
+	};
 }
 
 /**
- * Refetch this PR's detail and the PR list after a state-changing mutation
- * (merge, close, reopen).
+ * Refetch this PR's detail and threads, the PR list, and the sidebar and
+ * workspace chips after a state-changing mutation. Resolves when the detail
+ * refetch has landed, so a mutation that returns this stays pending until
+ * the header shows the new state instead of flashing the old one.
  */
-export function useInvalidatePullRequestDetail(key: PullRequestDetailKey) {
+export function useInvalidatePullRequestDetail(
+	target: PullRequestTarget | null,
+) {
 	const queryClient = useQueryClient();
-	const { projectId, hostUrl, prNumber } = key;
-	return useCallback(() => {
-		void queryClient.invalidateQueries({
-			queryKey: pullRequestDetailQueryKey({ projectId, hostUrl, prNumber }),
+	const repoFullName = target?.repoFullName ?? null;
+	const prNumber = target?.prNumber ?? null;
+	return useCallback((): Promise<void> => {
+		// Inside a workspace the context client is the workspace's own; the
+		// list and chip queries live on the root client and are unreachable
+		// from it, so both clients are told.
+		for (const client of new Set([queryClient, electronQueryClient])) {
+			void client.invalidateQueries({ queryKey: ["pullRequests"] });
+			void client.invalidateQueries({
+				queryKey: DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX,
+			});
+			void client.invalidateQueries({
+				queryKey: V2_WORKSPACES_PULL_REQUEST_QUERY_KEY_PREFIX,
+			});
+		}
+		if (prNumber !== null) {
+			void queryClient.invalidateQueries({
+				queryKey: pullRequestThreadsQueryKey({
+					organizationId: null,
+					repoFullName,
+					prNumber,
+				}),
+			});
+		}
+		return queryClient.invalidateQueries({
+			queryKey: pullRequestDetailQueryKey(repoFullName, prNumber),
 		});
-		void queryClient.invalidateQueries({ queryKey: ["pullRequests"] });
-	}, [queryClient, projectId, hostUrl, prNumber]);
+	}, [queryClient, repoFullName, prNumber]);
 }

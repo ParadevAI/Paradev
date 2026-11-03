@@ -1,12 +1,16 @@
-import { dirname } from "node:path";
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { NodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import type { DeltaChannel } from "@superset/chat/protocol";
 import { parseCursor } from "@superset/chat/protocol";
 import type {
 	ChatRuntime,
+	ChatSessionChange,
 	HarnessFactory,
 	HarnessRegistry,
+	ResolveAttachment,
 	WsSinkSocket,
 } from "@superset/chat-runtime";
 import {
@@ -17,37 +21,105 @@ import {
 	createWsSink,
 	DEFAULT_MIGRATIONS_FOLDER,
 } from "@superset/chat-runtime";
+import { HOST_CHAT_RESUME_MARKER_FILE } from "@superset/shared/host-version";
 import type { Hono, MiddlewareHandler } from "hono";
 import type { HostDb } from "../db";
+import { reportAttachmentResolveFailure } from "../sentry";
+import { importCloudAttachments } from "../trpc/router/attachments/attachments";
+import type { ApiClient } from "../types";
+import { cliFloor } from "./acpCatalogue";
+import { acpHarnessEntries } from "./acpHarnesses";
+import { resolveAgentCli } from "./agentCli";
+import { buildChatAgentEnv } from "./agentEnv";
+import type { ChatAgentBridge } from "./chatAgentBridge";
+import { createGitCheckpoints } from "./gitCheckpoints";
+import { createAttachmentResolver } from "./resolveAttachment";
 import { createResolveCwd } from "./resolveCwd";
+import {
+	recordUnfinishedChats,
+	resumeUnfinishedChats,
+} from "./resumeAfterUpdate";
 
 export const CHAT_V3_TRPC_PATH = "/chat-v3/trpc";
 export const CHAT_V3_STREAM_PATH = "/chat-v3/sessions/:sessionId/stream";
 
 /**
- * `src/db/drizzle/` is a runtime file dependency the desktop bundle does not
- * inline: packaged builds must ship the folder and point here at it.
+ * `src/db/drizzle/` is a runtime file dependency no bundle inlines: the desktop
+ * points here at its copy, and the host-service build emits it next to
+ * host-service.js.
  */
 function migrationsFolder(): string {
-	return process.env.SUPERSET_CHAT_V3_MIGRATIONS ?? DEFAULT_MIGRATIONS_FOLDER;
+	const fromEnv = process.env.SUPERSET_CHAT_V3_MIGRATIONS?.trim();
+	if (fromEnv) return fromEnv;
+	const sideBySide = join(
+		dirname(fileURLToPath(import.meta.url)),
+		"chat-migrations",
+	);
+	return existsSync(sideBySide) ? sideBySide : DEFAULT_MIGRATIONS_FOLDER;
 }
 
-function harnessRegistry(): HarnessRegistry {
+function harnessRegistry(
+	db: HostDb,
+	agents: ChatAgentBridge | undefined,
+	resolveAttachment: ResolveAttachment,
+): HarnessRegistry {
 	const entries: [string, HarnessFactory][] = [
 		[
 			"claude-code",
-			() =>
+			(options) =>
 				createClaudeAdapter({
-					pathToClaudeCodeExecutable: process.env.SUPERSET_CHAT_V3_CLAUDE_BIN,
+					resolveAttachment,
+					launch: async () => {
+						const cli = await resolveAgentCli({
+							binary: "claude",
+							...cliFloor("claude-acp"),
+							env: () =>
+								buildChatAgentEnv({
+									db,
+									cwd: options.cwd,
+									workspaceId: options.scopeId,
+									terminalId: options.terminalId,
+								}),
+						});
+						return {
+							pathToClaudeCodeExecutable:
+								process.env.SUPERSET_CHAT_V3_CLAUDE_BIN ?? cli.command,
+							env: cli.env,
+						};
+					},
 				}),
 		],
-		["codex", () => new CodexAdapter()],
+		[
+			"codex",
+			(options) =>
+				new CodexAdapter({
+					resolveAttachment,
+					launch: async () => {
+						const cli = await resolveAgentCli({
+							binary: "codex",
+							...cliFloor("codex-acp"),
+							env: () =>
+								buildChatAgentEnv({
+									db,
+									cwd: options.cwd,
+									workspaceId: options.scopeId,
+									terminalId: options.terminalId,
+								}),
+						});
+						return { command: cli.command, env: cli.env };
+					},
+				}),
+		],
+		...acpHarnessEntries(db, resolveAttachment, agents),
 	];
 	return new Map(entries);
 }
 
 export type ChatV3Mount = {
 	runtime(): ChatRuntime;
+	closeScope(scopeId: string): Promise<void>;
+	recordUnfinished(): void;
+	resumeAfterUpdate(): void;
 	dispose(): Promise<void>;
 };
 
@@ -57,22 +129,54 @@ export type ChatV3Mount = {
  */
 export function createChatV3Mount(options: {
 	db: HostDb;
+	api: ApiClient;
 	dbPath: string;
+	agents?: ChatAgentBridge;
+	onSessionChanged?: (change: ChatSessionChange) => void;
 }): ChatV3Mount {
 	let built: ChatRuntime | null = null;
+	const markerPath = join(
+		dirname(options.dbPath),
+		HOST_CHAT_RESUME_MARKER_FILE,
+	);
 
 	const runtime = (): ChatRuntime => {
 		if (built) return built;
 		built = createChatRuntime({
 			dataDir: dirname(options.dbPath),
 			migrationsFolder: migrationsFolder(),
-			harnesses: harnessRegistry(),
+			harnesses: harnessRegistry(
+				options.db,
+				options.agents,
+				createAttachmentResolver({
+					importCloud: (fileIds) => importCloudAttachments(options, fileIds),
+					report: reportAttachmentResolveFailure,
+				}),
+			),
+			observer: options.agents,
+			checkpoints: createGitCheckpoints(),
+			onSessionChanged: options.onSessionChanged,
 		});
 		return built;
 	};
 
 	return {
 		runtime,
+		closeScope: async (scopeId) => {
+			await built?.commands.closeScope(scopeId);
+		},
+		resumeAfterUpdate: () =>
+			resumeUnfinishedChats({
+				markerPath,
+				runtime,
+				resolveCwd: createResolveCwd(options.db),
+			}),
+		recordUnfinished: () => {
+			if (!built || !recordUnfinishedChats(built, markerPath)) return;
+			built.live.disposeAll().catch((error: unknown) => {
+				console.warn("[chat-v3] could not stop chats for the update", error);
+			});
+		},
 		dispose: async () => {
 			const current = built;
 			built = null;
@@ -109,6 +213,7 @@ export function registerChatV3Routes(options: {
 			const sessionId = c.req.param("sessionId") ?? "";
 			const sinceRaw = c.req.query("since");
 			const deltasRaw = c.req.query("deltas");
+			const nestedSubagents = c.req.query("nestedSubagents") === "1";
 			let unsubscribe: (() => void) | null = null;
 
 			return {
@@ -131,12 +236,17 @@ export function registerChatV3Routes(options: {
 							(channel): channel is DeltaChannel =>
 								channel === "text" ||
 								channel === "tool_input" ||
-								channel === "terminal",
+								channel === "terminal" ||
+								channel === "background",
 						);
 
 					const subscription = options.mount
 						.runtime()
-						.subscribe(sessionId, { since, deltas }, createWsSink(socket));
+						.subscribe(
+							sessionId,
+							{ since, deltas, nestedSubagents },
+							createWsSink(socket),
+						);
 					unsubscribe = () => subscription.unsubscribe();
 				},
 

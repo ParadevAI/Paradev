@@ -1,10 +1,5 @@
-import { afterAll, afterEach, describe, expect, test } from "bun:test";
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, test } from "bun:test";
 
-// happy-dom over the preloaded plain-object document. Process-wide, so this
-// unregisters in afterAll to leave the other renderer suites their document.
-const alreadyRegistered = GlobalRegistrator.isRegistered;
-if (!alreadyRegistered) GlobalRegistrator.register();
 (
 	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -14,10 +9,6 @@ const { TriggerSentence } = await import("../../TriggerSentence");
 const { slackProvider } = await import("./slack");
 
 afterEach(cleanup);
-afterAll(async () => {
-	if (!alreadyRegistered) await GlobalRegistrator.unregister();
-});
-
 /**
  * What a Slack row looks like, and must keep looking like.
  *
@@ -291,7 +282,7 @@ describe("a Slack row watching a channel the bot is not in", () => {
 		expect(
 			warningsFor(message({ channels: { mode: "list", ids: ["C1", "C2"] } })),
 		).toEqual([
-			"This trigger will not run for messages in #secret until @Superset is invited.",
+			"This trigger will not run for messages in #secret until @Paradev is invited.",
 		]);
 	});
 

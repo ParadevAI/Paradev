@@ -14,3 +14,6 @@
 "Could not start dictation" = "Tidak dapat memulai dikte";
 "Uploading" = "Mengunggah";
 "Upload failed" = "Gagal mengunggah";
+"Stop" = "Hentikan";
+"Dictation stopped. What was heard so far is in your message." = "Dikte berhenti. Yang sudah terdengar sejauh ini ada di pesan Anda.";
+"Transcription took too long. The last few words may be missing." = "Transkripsi terlalu lama. Beberapa kata terakhir mungkin hilang.";

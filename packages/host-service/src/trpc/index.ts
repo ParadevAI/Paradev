@@ -1,13 +1,21 @@
 import * as Sentry from "@sentry/node";
+import { isI18nErrorCause } from "@superset/trpc/i18n-error";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import {
+	inaccessiblePathMessage,
+	isPermissionDenied,
+	permissionDeniedPath,
+} from "../runtime/path-state";
 import type { HostServiceContext } from "../types";
 import { readErrorDiagnostics } from "./error-diagnostics";
 import {
 	type DeleteInProgressCause,
 	isDeleteInProgressCause,
+	isProjectDirMissingCause,
 	isProjectNotSetupCause,
 	isTeardownFailureCause,
+	type ProjectDirMissingCause,
 	type ProjectNotSetupCause,
 	type TeardownFailureCause,
 } from "./error-types";
@@ -50,17 +58,25 @@ const t = initTRPC
 							projectId: error.cause.projectId,
 						}
 					: undefined;
+			const projectDirMissing: ProjectDirMissingCause | undefined =
+				isProjectDirMissingCause(error.cause)
+					? { kind: "PROJECT_DIR_MISSING", repoPath: error.cause.repoPath }
+					: undefined;
 			const deleteInProgress: DeleteInProgressCause | undefined =
 				isDeleteInProgressCause(error.cause)
 					? { kind: "DELETE_IN_PROGRESS" }
 					: undefined;
+			const i18nCause = isI18nErrorCause(error.cause) ? error.cause : null;
 			return {
 				...shape,
 				data: {
 					...shape.data,
 					teardownFailure,
 					projectNotSetup,
+					projectDirMissing,
 					deleteInProgress,
+					i18nKey: i18nCause?.i18nKey ?? null,
+					i18nParams: i18nCause?.i18nParams ?? null,
 				},
 			};
 		},
@@ -99,7 +115,27 @@ const sentryMiddleware = t.middleware(async ({ next, path, type }) => {
 	return result;
 });
 
-const baseProcedure = t.procedure.use(sentryMiddleware);
+const permissionDeniedMiddleware = t.middleware(async ({ next }) => {
+	const result = await next();
+	if (
+		!result.ok &&
+		result.error.code === "INTERNAL_SERVER_ERROR" &&
+		isPermissionDenied(result.error.cause)
+	) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: inaccessiblePathMessage(
+				permissionDeniedPath(result.error.cause),
+			),
+			cause: result.error.cause,
+		});
+	}
+	return result;
+});
+
+const baseProcedure = t.procedure
+	.use(sentryMiddleware)
+	.use(permissionDeniedMiddleware);
 
 export const router = t.router;
 export const createCallerFactory = t.createCallerFactory;

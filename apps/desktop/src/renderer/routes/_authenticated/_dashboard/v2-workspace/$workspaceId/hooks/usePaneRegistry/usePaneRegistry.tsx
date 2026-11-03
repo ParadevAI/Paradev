@@ -6,22 +6,25 @@ import type {
 	RendererContext,
 	WorkspaceStore,
 } from "@superset/panes";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	Circle,
+	Files,
 	FileText,
+	FolderTree,
 	GitCompareArrows,
 	GitPullRequest,
+	GitPullRequestArrow,
 	Globe,
 	MessageSquare,
 	Monitor,
+	Plus,
+	Smartphone,
 } from "lucide-react";
-import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
 	LuArrowDownToLine,
 	LuBot,
@@ -52,6 +55,7 @@ import { useThemeStore } from "renderer/stores/theme";
 import { getV2NotificationSourcesForPane } from "renderer/stores/v2-notifications";
 import { builtInThemes, darkTheme, type Theme } from "shared/themes";
 import type { StoreApi } from "zustand/vanilla";
+import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
 import {
 	getDocument,
@@ -59,49 +63,75 @@ import {
 } from "../../state/fileDocumentStore";
 import {
 	type BrowserPaneData,
-	type ChatV3PaneData,
+	type ChatPaneData,
 	type CommentPaneData,
 	type DevtoolsPaneData,
 	type FilePaneData,
+	NEW_TAB_PANE_KIND,
 	type PagePaneData,
+	type PagesListPaneData,
 	type PaneViewerData,
+	PENDING_CLOUD_CHAT_PANE_KIND,
+	type PendingCloudChatPaneData,
 	type PullRequestPaneData,
 	SUBAGENT_PANE_KIND,
 	type SubagentPaneData,
 	type TerminalPaneData,
 } from "../../types";
+import { markCloudChatLaunchClosed } from "../../utils/closedChatSessions";
 import {
 	findTerminalPaneLocation,
 	focusOrAddTerminalPane,
+	focusTerminalPane,
 } from "../../utils/focusTerminalPane";
-import { openSubagentPaneInStore } from "../../utils/openSubagentPaneInStore";
+import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
+import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
+import { AccountUsage } from "./components/AccountUsage";
+import { AgentTerminalPane } from "./components/AgentTerminalPane";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
-import { ChatV3Pane } from "./components/ChatV3Pane";
+import { ChangesListPane } from "./components/ChangesListPane";
+import { ChatPane } from "./components/ChatPane";
+import { ChatHistoryPicker } from "./components/ChatPane/components/ChatHistoryPicker";
+import { ChatModeMenu } from "./components/ChatPane/components/ChatModeMenu";
+import { ChatPaneTitle } from "./components/ChatPaneTitle";
 import { CommentPane } from "./components/CommentPane";
 import { CommentPaneHeaderExtras } from "./components/CommentPane/components/CommentPaneHeaderExtras";
 import { CommentPaneTitle } from "./components/CommentPane/components/CommentPaneTitle";
 import { DesktopPane } from "./components/DesktopPane";
 import { DiffPane } from "./components/DiffPane";
-import { DiffPaneHeaderExtras } from "./components/DiffPane/components/DiffPaneHeaderExtras";
+import { DiffPaneHeaderSlot } from "./components/DiffPane/components/DiffPaneHeaderSlot";
+import {
+	diffPaneActionsSlotId,
+	diffPaneTitleSlotId,
+} from "./components/DiffPane/utils/headerSlots";
 import { FilePane } from "./components/FilePane";
 import { FilePaneHeaderExtras } from "./components/FilePane/components/FilePaneHeaderExtras";
+import { FilesTreePane } from "./components/FilesTreePane";
+import { FileViewLayout } from "./components/FileViewLayout";
+import { MobilePane } from "./components/MobilePane";
 import { PagePane } from "./components/PagePane";
 import { PagePaneHeaderExtras } from "./components/PagePaneHeaderExtras";
 import { PagePaneTitle } from "./components/PagePaneTitle";
+import { PagesListPane } from "./components/PagesListPane";
+import { PagesListPaneTitle } from "./components/PagesListPaneTitle";
+import { PendingCloudChatPane } from "./components/PendingCloudChatPane";
 import { PullRequestPane } from "./components/PullRequestPane";
 import { PullRequestPaneHeaderExtras } from "./components/PullRequestPane/components/PullRequestPaneHeaderExtras";
+import { ReviewPane } from "./components/ReviewPane";
 import { SubagentPane } from "./components/SubagentPane";
-import { TerminalPane } from "./components/TerminalPane";
 import { TerminalPaneHeaderExtras } from "./components/TerminalPane/components/TerminalPaneHeaderExtras";
 import { TerminalPaneIcon } from "./components/TerminalPane/components/TerminalPaneIcon";
 import { TerminalSessionDropdown } from "./components/TerminalPane/components/TerminalSessionDropdown";
 import { terminalContextMenuLinkStore } from "./components/TerminalPane/contextMenuLinkStore";
+import { useSurfaceFork } from "./hooks/useSurfaceFork";
+import { useUndoableChatClose } from "./hooks/useUndoableChatClose";
 import { findTerminalTheme } from "./utils/findTerminalTheme";
 import { openInActions } from "./utils/openInActions";
 import { pagePaneLabel } from "./utils/pagePaneLabel";
+import { pagesListPageUiId } from "./utils/pagesListPageUiId";
 import { replaceEndedTerminal } from "./utils/replaceEndedTerminal";
 
 function getFileName(filePath: string): string {
@@ -112,11 +142,13 @@ function FilePaneTabTitle({
 	filePath,
 	isActive,
 	pinned,
+	showDirty,
 	workspaceId,
 }: {
 	filePath: string;
 	isActive: boolean;
 	pinned: boolean;
+	showDirty: boolean;
 	workspaceId: string;
 }) {
 	const document = useSharedFileDocument({
@@ -136,7 +168,7 @@ function FilePaneTabTitle({
 			<span className={cn("min-w-0 truncate", !pinned && "italic")}>
 				{name}
 			</span>
-			{document.dirty && (
+			{showDirty && document.dirty && (
 				<Circle className="size-2 shrink-0 fill-current text-muted-foreground" />
 			)}
 		</div>
@@ -149,25 +181,36 @@ const MOD_KEY = navigator.platform.toLowerCase().includes("mac")
 
 interface UsePaneRegistryOptions {
 	onOpenDiff: OpenReviewDiff;
-	onOpenComment: (comment: CommentPaneData) => void;
 	onOpenFile: OpenFile;
-	onRevealPath: (path: string) => void;
+	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 	launcher: TerminalLauncher;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	linkedStores?: StoreApi<WorkspaceStore<PaneViewerData>>[];
+	onOpenSubagent: (data: SubagentPaneData) => void;
+	onSearch?: () => void;
+	/** File views in this store show the file tree and breadcrumb. */
+	rightStore?: StoreApi<WorkspaceStore<PaneViewerData>>;
 }
 
 export function usePaneRegistry({
 	onOpenDiff,
-	onOpenComment,
 	onOpenFile,
 	onRevealPath,
 	launcher,
 	store,
+	linkedStores,
+	onOpenSubagent,
+	onSearch,
+	rightStore,
 }: UsePaneRegistryOptions): PaneRegistry<PaneViewerData> {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
-	const isChatV3Enabled = useFeatureFlagEnabled(FEATURE_FLAGS.CHAT_V3) ?? false;
+	const closeChatWithUndo = useUndoableChatClose({
+		workspaceId,
+		store,
+		linkedStores,
+	});
 	const host = useWorkspaceHostTarget(workspaceId);
 	const desktopUrl =
 		host.status === "ready" && host.kind === "sandbox" ? host.desktopUrl : null;
@@ -228,6 +271,21 @@ export function usePaneRegistry({
 	const { createNewAgentSession, focusAgentTerminal } = useAgentSessionLauncher(
 		{ workspaceId, store },
 	);
+	const forkIntoOtherSurface = useSurfaceFork(
+		workspaceId,
+		createNewAgentSession,
+	);
+
+	const chatPaneIcon = useCallback(
+		({ agent, terminalId }: ChatPaneData) => (
+			<TerminalPaneIcon
+				agentId={agent?.id}
+				workspaceId={workspaceId}
+				terminalId={terminalId}
+			/>
+		),
+		[workspaceId],
+	);
 
 	return useMemo<PaneRegistry<PaneViewerData>>(
 		() => ({
@@ -245,15 +303,34 @@ export function usePaneRegistry({
 							filePath={data.filePath}
 							isActive={ctx.isActive}
 							pinned={Boolean(ctx.pane.pinned)}
+							showDirty={ctx.store !== rightStore}
 							workspaceId={workspaceId}
 						/>
 					);
 				},
-				renderPane: (ctx: RendererContext<PaneViewerData>) => (
-					<FilePane context={ctx} workspaceId={workspaceId} />
-				),
+				renderPane: (ctx: RendererContext<PaneViewerData>) => {
+					const inRightPane = ctx.store === rightStore;
+					return (
+						<FileViewLayout
+							context={ctx}
+							workspaceId={workspaceId}
+							showTree={inRightPane}
+							onSearch={onSearch}
+						>
+							<FilePane
+								context={ctx}
+								workspaceId={workspaceId}
+								inRightPane={inRightPane}
+							/>
+						</FileViewLayout>
+					);
+				},
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
-					<FilePaneHeaderExtras context={ctx} workspaceId={workspaceId} />
+					<FilePaneHeaderExtras
+						context={ctx}
+						workspaceId={workspaceId}
+						inRightPane={ctx.store === rightStore}
+					/>
 				),
 				onHeaderClick: (ctx: RendererContext<PaneViewerData>) =>
 					ctx.actions.pin(),
@@ -332,8 +409,17 @@ export function usePaneRegistry({
 					),
 			},
 			diff: {
+				keepAlive: true,
 				getIcon: () => <GitCompareArrows className="size-3.5" />,
 				getTitle: () => t({ message: "Changes" }),
+				// With the right pane area, the pane fills its own header (scope on
+				// the left, view controls on the right) through these slots.
+				renderTitle: (ctx: RendererContext<PaneViewerData>) => (
+					<DiffPaneHeaderSlot
+						id={diffPaneTitleSlotId(ctx.pane.id)}
+						className="flex min-w-0 items-center"
+					/>
+				),
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<DiffPane
 						context={ctx}
@@ -343,7 +429,10 @@ export function usePaneRegistry({
 					/>
 				),
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
-					<DiffPaneHeaderExtras workspaceId={workspaceId} store={ctx.store} />
+					<DiffPaneHeaderSlot
+						id={diffPaneActionsSlotId(ctx.pane.id)}
+						className="flex shrink-0 items-center"
+					/>
 				),
 				contextMenuActions: (_ctx, defaults) =>
 					defaults.map((d) =>
@@ -407,13 +496,20 @@ export function usePaneRegistry({
 				},
 				onAfterClose: (pane, closedPanes) => {
 					const { terminalId } = pane.data as TerminalPaneData;
+					if ((pane.data as { agentSurface?: string }).agentSurface === "acp") {
+						return;
+					}
 					const firstClosed = closedPanes.find(
 						(candidate) =>
 							candidate.kind === "terminal" &&
 							(candidate.data as TerminalPaneData).terminalId === terminalId,
 					);
 					if (firstClosed?.id !== pane.id) return;
-					if (findTerminalPaneLocation(store.getState(), terminalId)) {
+					if (
+						[store, ...(linkedStores ?? [])].some((candidate) =>
+							findTerminalPaneLocation(candidate.getState(), terminalId),
+						)
+					) {
 						terminalRuntimeRegistry.release(terminalId, pane.id);
 						return;
 					}
@@ -445,44 +541,48 @@ export function usePaneRegistry({
 					</div>
 				),
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => {
-					const { terminalId } = ctx.pane.data as TerminalPaneData;
+					const data = ctx.pane.data as TerminalPaneData;
+					const { terminalId } = data;
 					return (
-						<TerminalPaneHeaderExtras
-							workspaceId={workspaceId}
-							terminalId={terminalId}
-							terminalInstanceId={ctx.pane.id}
-							onNewShell={() =>
-								replaceEndedTerminal({
-									store: ctx.store,
-									paneId: ctx.pane.id,
-									terminalId,
-									create: () => launcher.create(),
-									dispose: (id) =>
-										workspaceTrpcUtils.client.terminal.killSession.mutate({
-											terminalId: id,
-											workspaceId,
-										}),
-									prepare: () =>
-										terminalRuntimeRegistry.prepareReplacement(
-											terminalId,
-											ctx.pane.id,
-											t({ message: "New shell" }),
-										),
-								})
-							}
-							onCreateNewAgentSession={createNewAgentSession}
-							onOpenSubagent={(data) =>
-								openSubagentPaneInStore(ctx.store, data)
-							}
-						/>
+						<div className="flex items-center gap-1">
+							<TerminalPaneHeaderExtras
+								workspaceId={workspaceId}
+								terminalId={terminalId}
+								terminalInstanceId={ctx.pane.id}
+								onNewShell={() =>
+									replaceEndedTerminal({
+										store: ctx.store,
+										paneId: ctx.pane.id,
+										terminalId,
+										create: () => launcher.create(),
+										dispose: (id) =>
+											workspaceTrpcUtils.client.terminal.killSession.mutate({
+												terminalId: id,
+												workspaceId,
+											}),
+										prepare: () =>
+											terminalRuntimeRegistry.prepareReplacement(
+												terminalId,
+												ctx.pane.id,
+												t({ message: "New shell" }),
+											),
+									})
+								}
+								onCreateNewAgentSession={createNewAgentSession}
+								onForkIntoOtherSurface={(source, placement) =>
+									void forkIntoOtherSurface(ctx, source, placement)
+								}
+								onOpenSubagent={onOpenSubagent}
+							/>
+						</div>
 					);
 				},
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
-					<TerminalPane
+					<AgentTerminalPane
 						ctx={ctx}
-						workspaceId={workspaceId}
 						onOpenFile={onOpenFile}
 						onRevealPath={onRevealPath}
+						workspaceId={workspaceId}
 					/>
 				),
 				contextMenuActions: (_ctx, defaults) => {
@@ -800,43 +900,186 @@ export function usePaneRegistry({
 						},
 					}
 				: {}),
-			...(isChatV3Enabled
-				? {
-						"chat-v3": {
-							getIcon: () => <MessageSquare className="size-3.5" />,
-							getTitle: () =>
-								t({
-									message: "Chat v3",
-								}),
-							renderPane: (ctx: RendererContext<PaneViewerData>) => {
-								const data = ctx.pane.data as ChatV3PaneData;
-								return (
-									<ChatV3Pane
-										workspaceId={workspaceId}
-										sessionId={data.sessionId}
-										onSessionIdChange={(id) =>
-											ctx.actions.updateData({ ...data, sessionId: id })
-										}
-									/>
-								);
-							},
-							contextMenuActions: (
-								_ctx: RendererContext<PaneViewerData>,
-								defaults: ContextMenuActionConfig<PaneViewerData>[],
-							) =>
-								defaults.map((d) =>
-									d.key === "close-pane"
-										? {
-												...d,
-												label: t({
-													message: "Close Chat",
-												}),
-											}
-										: d,
-								),
-						},
-					}
-				: {}),
+			files: {
+				getIcon: () => <FolderTree className="size-3.5" />,
+				getTitle: () => t({ message: "Files" }),
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<FilesTreePane
+						context={ctx}
+						workspaceId={workspaceId}
+						onSearch={onSearch}
+					/>
+				),
+			},
+			"changes-list": {
+				getIcon: () => <Files className="size-3.5" />,
+				getTitle: () => t({ message: "Files changed" }),
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<ChangesListPane context={ctx} workspaceId={workspaceId} />
+				),
+			},
+			review: {
+				getIcon: () => <GitPullRequestArrow className="size-3.5" />,
+				getTitle: () => t({ message: "Review" }),
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<ReviewPane context={ctx} workspaceId={workspaceId} />
+				),
+			},
+			"pages-list": {
+				getIcon: () => <FileText className="size-3.5" />,
+				getTitle: (pane) => {
+					const { page } = pane.data as PagesListPaneData;
+					return page ? pagePaneLabel(page) : t({ message: "Pages" });
+				},
+				renderTitle: (ctx: RendererContext<PaneViewerData>) => {
+					const { page } = ctx.pane.data as PagesListPaneData;
+					if (!page) return undefined;
+					return (
+						<PagesListPaneTitle
+							page={page}
+							pageUiId={pagesListPageUiId(ctx.pane.id, page)}
+							onBack={() => ctx.actions.updateData({ kind: "pages-list" })}
+						/>
+					);
+				},
+				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => {
+					const { page } = ctx.pane.data as PagesListPaneData;
+					if (!page) return undefined;
+					return (
+						<PagePaneHeaderExtras
+							onCreateNewAgentSession={createNewAgentSession}
+							data={page}
+							paneId={pagesListPageUiId(ctx.pane.id, page)}
+							workspaceId={workspaceId}
+						/>
+					);
+				},
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<PagesListPane
+						context={ctx}
+						workspaceId={workspaceId}
+						onCreateNewAgentSession={createNewAgentSession}
+						onFocusAgentTerminal={focusAgentTerminal}
+					/>
+				),
+			},
+			[NEW_TAB_PANE_KIND]: {
+				getIcon: () => <Plus className="size-3.5" />,
+				getTitle: () => t({ message: "New Tab" }),
+				hideHeader: (ctx) => ctx.pane.parentDirection === null,
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<RightPaneNewTab
+						onOpen={(pane) =>
+							replaceNewTabPane(
+								ctx.store,
+								{ tabId: ctx.tab.id, paneId: ctx.pane.id },
+								pane,
+							)
+						}
+					/>
+				),
+			},
+			mobile: {
+				getIcon: () => <Smartphone className="size-3.5" />,
+				getTitle: () =>
+					t({
+						message: "Mobile",
+					}),
+				renderPane: () => <MobilePane workspaceId={workspaceId} />,
+			},
+			[PENDING_CLOUD_CHAT_PANE_KIND]: {
+				getIcon: (ctx) => {
+					const data = ctx.pane.data as PendingCloudChatPaneData;
+					return chatPaneIcon({
+						terminalId: data.draftId,
+						sessionId: null,
+						agent: { id: data.agentId },
+					});
+				},
+				getTitle: () => t({ message: "Chat" }),
+				insetsAside: true,
+				onAfterClose: (pane) => {
+					const data = pane.data as PendingCloudChatPaneData;
+					markCloudChatLaunchClosed(workspaceId, data.promptHash);
+				},
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<PendingCloudChatPane ctx={ctx} workspaceId={workspaceId} />
+				),
+			},
+			"chat-v3": {
+				getIcon: (ctx) => chatPaneIcon(ctx.pane.data as ChatPaneData),
+				getTitle: () =>
+					t({
+						message: "Chat",
+					}),
+				titleSource: (pane) => {
+					const { chatTitle } = pane.data as ChatPaneData;
+					return {
+						subscribe: () => () => {},
+						getSnapshot: () => chatTitle,
+					};
+				},
+				onAfterClose: closeChatWithUndo,
+				insetsAside: true,
+				renderTitle: (ctx: RendererContext<PaneViewerData>) => {
+					const data = ctx.pane.data as ChatPaneData;
+					return (
+						<ChatPaneTitle
+							chatKey={data.terminalId}
+							icon={chatPaneIcon(data)}
+							isActive={ctx.isActive}
+							title={ctx.pane.titleOverride ?? t({ message: "Chat" })}
+						/>
+					);
+				},
+				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => {
+					const data = ctx.pane.data as ChatPaneData;
+					return (
+						<div className="flex items-center gap-1">
+							<ChatHistoryPicker
+								context={ctx}
+								workspaceId={workspaceId}
+								linkedStores={linkedStores}
+							/>
+							<AccountUsage
+								key={`${workspaceId}:${data.terminalId}`}
+								workspaceId={workspaceId}
+								terminalId={data.terminalId}
+							/>
+							<ChatModeMenu
+								data={data}
+								onFork={(source, placement) =>
+									void forkIntoOtherSurface(ctx, source, placement)
+								}
+								workspaceId={workspaceId}
+							/>
+						</div>
+					);
+				},
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<ChatPane
+						ctx={ctx}
+						onOpenDiff={onOpenDiff}
+						onOpenFile={onOpenFile}
+						onRevealPath={onRevealPath}
+						workspaceId={workspaceId}
+					/>
+				),
+				contextMenuActions: (
+					_ctx: RendererContext<PaneViewerData>,
+					defaults: ContextMenuActionConfig<PaneViewerData>[],
+				) =>
+					defaults.map((d) =>
+						d.key === "close-pane"
+							? {
+									...d,
+									label: t({
+										message: "Close Chat",
+									}),
+								}
+							: d,
+					),
+			},
 			comment: {
 				getIcon: (ctx: RendererContext<PaneViewerData>) => {
 					const data = ctx.pane.data as CommentPaneData;
@@ -877,6 +1120,7 @@ export function usePaneRegistry({
 					),
 			},
 			"pull-request": {
+				keepAlive: true,
 				getIcon: () => <GitPullRequest className="size-3.5" />,
 				getTitle: (pane) => {
 					const data = pane.data as PullRequestPaneData;
@@ -886,7 +1130,7 @@ export function usePaneRegistry({
 					<PullRequestPane
 						data={ctx.pane.data as PullRequestPaneData}
 						onOpenDiff={onOpenDiff}
-						onOpenComment={onOpenComment}
+						onOpenPage={(page) => openPagePaneInStore(ctx.store, page)}
 					/>
 				),
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
@@ -916,12 +1160,13 @@ export function usePaneRegistry({
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<SubagentPane
 						data={ctx.pane.data as SubagentPaneData}
-						onOpenParent={() =>
-							focusOrAddTerminalPane(
-								ctx.store,
-								(ctx.pane.data as SubagentPaneData).terminalId,
-							)
-						}
+						onOpenParent={() => {
+							const { terminalId } = ctx.pane.data as SubagentPaneData;
+							const focused = [store, ...(linkedStores ?? [])].some((s) =>
+								focusTerminalPane(s, terminalId),
+							);
+							if (!focused) focusOrAddTerminalPane(store, terminalId);
+						}}
 					/>
 				),
 			},
@@ -937,6 +1182,7 @@ export function usePaneRegistry({
 				),
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
 					<PagePaneHeaderExtras
+						onCreateNewAgentSession={createNewAgentSession}
 						data={ctx.pane.data as PagePaneData}
 						paneId={ctx.pane.id}
 						workspaceId={workspaceId}
@@ -982,8 +1228,10 @@ export function usePaneRegistry({
 		}),
 		[
 			store,
+			linkedStores,
 			workspaceId,
-			isChatV3Enabled,
+			forkIntoOtherSurface,
+			closeChatWithUndo,
 			clearWorkspaceRunTerminal,
 			clearShortcut,
 			scrollToBottomShortcut,
@@ -992,14 +1240,17 @@ export function usePaneRegistry({
 			isKillingTerminalSession,
 			launcher,
 			onOpenDiff,
-			onOpenComment,
 			onOpenFile,
 			onRevealPath,
+			onSearch,
 			createNewAgentSession,
 			focusAgentTerminal,
 			workspaceTrpcUtils,
 			t,
 			desktopUrl,
+			chatPaneIcon,
+			onOpenSubagent,
+			rightStore,
 		],
 	);
 }

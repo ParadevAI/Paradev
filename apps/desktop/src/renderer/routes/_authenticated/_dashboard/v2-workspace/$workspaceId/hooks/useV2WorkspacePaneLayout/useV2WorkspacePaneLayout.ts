@@ -5,10 +5,16 @@ import { useEffect, useMemo, useRef } from "react";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import {
+	type PaneLayoutSlot,
+	registerV2PaneLayoutStore,
+} from "renderer/stores/v2-pane-layout-stores";
+import {
 	applyRememberedV2PaneSelection,
 	rememberV2PaneSelection,
 } from "renderer/stores/v2-pane-selection";
 import type { PaneViewerData } from "../../types";
+import { getPaneKey } from "../../utils/getPaneKey";
+import { placeInTabs } from "./utils/placeInTabs";
 import {
 	getSharedPaneLayoutSnapshot,
 	preserveLocalPaneSelection,
@@ -24,9 +30,15 @@ function getSnapshot(state: WorkspaceState<PaneViewerData>): string {
 	return getSharedPaneLayoutSnapshot(state);
 }
 
-export function useV2WorkspacePaneLayout() {
+export function useV2WorkspacePaneLayout({
+	slot = "paneLayout",
+}: {
+	slot?: PaneLayoutSlot;
+} = {}) {
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
+	const selectionKey =
+		slot === "paneLayout" ? workspaceId : `${workspaceId}:${slot}`;
 	const collections = useCollections();
 	// Keep the volatile pane store scoped to the route workspace. During fast
 	// workspace switches, live queries can briefly return stale rows; sharing
@@ -40,11 +52,11 @@ export function useV2WorkspacePaneLayout() {
 	// effect-cycle late.
 	const workspaceRuntime = useMemo(() => {
 		const persistedLayout =
-			(collections.v2WorkspaceLocalState.get(workspaceId)?.paneLayout as
+			(collections.v2WorkspaceLocalState.get(workspaceId)?.[slot] as
 				| WorkspaceState<PaneViewerData>
 				| undefined) ?? EMPTY_STATE;
 		const seededLayout = applyRememberedV2PaneSelection(
-			workspaceId,
+			selectionKey,
 			persistedLayout,
 		);
 		return {
@@ -52,9 +64,11 @@ export function useV2WorkspacePaneLayout() {
 			seededSnapshot: getSnapshot(seededLayout),
 			store: createWorkspaceStore<PaneViewerData>({
 				initialState: seededLayout,
+				getPaneKey,
+				...(slot === "rightPaneLayout" ? { placePane: placeInTabs } : {}),
 			}),
 		};
-	}, [collections, workspaceId]);
+	}, [collections, workspaceId, slot, selectionKey]);
 	const { store } = workspaceRuntime;
 	const syncStateRef = useRef({
 		workspaceId,
@@ -77,11 +91,11 @@ export function useV2WorkspacePaneLayout() {
 	const persistedPaneLayout = useMemo(
 		() =>
 			localWorkspaceState?.workspaceId === workspaceId
-				? ((localWorkspaceState.paneLayout as
+				? ((localWorkspaceState[slot] as
 						| WorkspaceState<PaneViewerData>
 						| undefined) ?? EMPTY_STATE)
 				: EMPTY_STATE,
-		[localWorkspaceState, workspaceId],
+		[localWorkspaceState, workspaceId, slot],
 	);
 
 	useEffect(() => {
@@ -112,6 +126,11 @@ export function useV2WorkspacePaneLayout() {
 			);
 	}, [persistedPaneLayout, store, isLayoutReady]);
 
+	useEffect(
+		() => registerV2PaneLayoutStore(workspaceId, slot, store),
+		[store, workspaceId, slot],
+	);
+
 	useEffect(() => {
 		const unsubscribe = store.subscribe((nextStore) => {
 			const nextWorkspaceState: WorkspaceState<PaneViewerData> = {
@@ -119,7 +138,7 @@ export function useV2WorkspacePaneLayout() {
 				tabs: nextStore.tabs,
 				activeTabId: nextStore.activeTabId,
 			};
-			rememberV2PaneSelection(workspaceId, nextWorkspaceState);
+			rememberV2PaneSelection(selectionKey, nextWorkspaceState);
 			const nextSnapshot = getSnapshot(nextWorkspaceState);
 			if (nextSnapshot === syncStateRef.current.lastSyncedSnapshot) {
 				return;
@@ -130,7 +149,7 @@ export function useV2WorkspacePaneLayout() {
 			}
 
 			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-				draft.paneLayout = nextWorkspaceState;
+				draft[slot] = nextWorkspaceState;
 			});
 			syncStateRef.current.lastSyncedSnapshot = nextSnapshot;
 		});
@@ -138,7 +157,7 @@ export function useV2WorkspacePaneLayout() {
 		return () => {
 			unsubscribe();
 		};
-	}, [collections, store, workspaceId]);
+	}, [collections, store, workspaceId, slot, selectionKey]);
 
-	return { store, isLayoutReady };
+	return { store, isLayoutReady, hasRow: localWorkspaceState != null };
 }

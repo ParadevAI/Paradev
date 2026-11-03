@@ -7,7 +7,9 @@ import {
 import { i18n } from "@superset/i18n";
 import { useState } from "react";
 import { ComposerBody } from "./components/ComposerBody";
-import { MentionChipNode } from "./nodes/mentionChipNode";
+import { COMPOSER_NODES } from "./constants";
+import { ChipRenderProvider } from "./providers/ChipRenderProvider";
+import { COMPOSER_THEME } from "./theme";
 import type { PromptInputProps } from "./types";
 import "./prompt-input.css";
 import { msg } from "@lingui/core/macro";
@@ -15,39 +17,58 @@ import { msg } from "@lingui/core/macro";
 export type {
 	ComposerActionContext,
 	ComposerChip,
+	ComposerDraft,
+	ComposerDraftSegment,
+	ComposerMentionBrowse,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	ComposerMentionSource,
 	ComposerPanelContent,
+	ComposerPanelControls,
 	PromptInputAttachment,
 	PromptInputCommand,
 	PromptInputDictation,
+	PromptInputDictationError,
+	PromptInputHandle,
+	PromptInputLocalFiles,
 	PromptInputProps,
 	PromptInputSubmitPayload,
 } from "./types";
 
 export function PromptInput({
+	ref,
 	placeholder = i18n._(
 		msg({
 			message: "Do anything",
 		}),
 	),
+	layout = "stacked",
 	mentionProviders,
 	commands,
 	dictation,
 	status = "ready",
-	placement = "top",
 	toolbar,
+	toolbarEnd,
+	draft,
+	onDraftChange,
 	onSubmit,
 	onStop,
-	onMentionHighlight,
+	stopOnEscape = true,
+	allowEmptySubmit = false,
+	disabled = false,
+	pending = false,
+	autoFocus = false,
 	onAttachmentClick,
-	onChipClick,
+	chipForPaste,
+	renderChip,
+	localFiles,
+	history,
 	className,
 }: PromptInputProps) {
 	const [initialConfig] = useState<InitialConfigType>(() => ({
 		namespace: "prompt-input",
-		nodes: [MentionChipNode],
+		nodes: COMPOSER_NODES,
+		theme: COMPOSER_THEME,
 		onError: (error: Error) => {
 			throw error;
 		},
@@ -56,20 +77,32 @@ export function PromptInput({
 	return (
 		<div className={className}>
 			<LexicalRoot initialConfig={initialConfig}>
-				<ComposerBody
-					placeholder={placeholder}
-					mentionProviders={mentionProviders}
-					commands={commands}
-					dictation={dictation}
-					status={status}
-					placement={placement}
-					toolbar={toolbar}
-					onSubmit={onSubmit}
-					onStop={onStop}
-					onMentionHighlight={onMentionHighlight}
-					onAttachmentClick={onAttachmentClick}
-					onChipClick={onChipClick}
-				/>
+				<ChipRenderProvider renderChip={renderChip}>
+					<ComposerBody
+						ref={ref}
+						placeholder={placeholder}
+						layout={layout}
+						mentionProviders={mentionProviders}
+						commands={commands}
+						dictation={dictation}
+						status={status}
+						toolbar={toolbar}
+						toolbarEnd={toolbarEnd}
+						draft={draft}
+						onDraftChange={onDraftChange}
+						onSubmit={onSubmit}
+						onStop={onStop}
+						stopOnEscape={stopOnEscape}
+						allowEmptySubmit={allowEmptySubmit}
+						disabled={disabled}
+						pending={pending}
+						autoFocus={autoFocus}
+						onAttachmentClick={onAttachmentClick}
+						chipForPaste={chipForPaste}
+						localFiles={localFiles}
+						history={history}
+					/>
+				</ChipRenderProvider>
 			</LexicalRoot>
 		</div>
 	);

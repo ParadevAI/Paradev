@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { basename, isAbsolute, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import type { NodeWebSocket } from "@hono/node-ws";
-import { resolveSupersetHomeDir } from "@superset/agent-setup/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { hasRunningForegroundProcess } from "@superset/pty-daemon/process-tree";
 import {
 	buildFishPromptCommandString,
@@ -14,15 +14,19 @@ import {
 	sanitizePromptForPty,
 } from "@superset/shared/agent-prompt-launch";
 import {
+	boundTranscriptText,
+	buildBoundedTerminalSessionTranscript,
+	TERMINAL_HANDOFF_MAX_CHARS,
+} from "@superset/shared/session-handoff";
+import {
 	createScanState,
 	type ShellReadyScanState,
 	scanForShellReady,
 } from "@superset/shared/shell-ready-scanner";
 import {
-	boundTranscriptText,
-	buildBoundedTerminalSessionTranscript,
-	TERMINAL_HANDOFF_MAX_CHARS,
-} from "@superset/shared/terminal-session-handoff";
+	type TerminalColors,
+	terminalColorsSchema,
+} from "@superset/shared/terminal-colors";
 import {
 	createTerminalTitleScanState,
 	scanForTerminalTitle,
@@ -35,7 +39,11 @@ import { isProcessAlive, readPtyDaemonManifest } from "../daemon/manifest.ts";
 import type { HostDb } from "../db/index.ts";
 import { projects, terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
-import { portManager } from "../ports/port-manager.ts";
+import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
+import {
+	getPathState,
+	inaccessiblePathMessage,
+} from "../runtime/path-state/index.ts";
 import { issueAttributionToken } from "../terminal-agents/attribution-token.ts";
 import { sweepAgentBindingsAfterDaemonLoss } from "../terminal-agents/daemon-loss-sweep.ts";
 import { terminalHarnessSession } from "../terminal-agents/harness-session-ref.ts";
@@ -55,7 +63,7 @@ import {
 	onDaemonDisconnect,
 } from "./daemon-client-singleton.ts";
 import {
-	buildV2TerminalEnv,
+	buildHostLaunchEnv,
 	getShellLaunchArgs,
 	getTerminalBaseEnv,
 	resolveLaunchShell,
@@ -71,6 +79,7 @@ import {
 	getShellReadyMarkerEvidence,
 	recordShellReadyMarkerEvidence,
 } from "./shell-ready-evidence.ts";
+import { TerminalColorAuthority } from "./TerminalColorAuthority";
 import {
 	createModeTracker,
 	type ModeTracker,
@@ -98,6 +107,7 @@ interface DaemonPty {
 	writeOrThrow(data: string): void;
 	write(data: string): void;
 	resize(cols: number, rows: number): void;
+	setColors(colors: TerminalColors, resetOverrides?: boolean): void;
 	kill(signal?: NodeJS.Signals): Promise<void>;
 	onData(cb: (data: string) => void): PtyDataDisposer;
 	onExit(
@@ -122,6 +132,11 @@ function makeDaemonPty(
 				// Daemon socket died before the disconnect sweep ran; a throw
 				// here would escape the WS input handler uncaught.
 			}
+		},
+		setColors(colors, resetOverrides) {
+			try {
+				daemon.setColors(sessionId, colors, resetOverrides);
+			} catch {}
 		},
 		resize(cols, rows) {
 			try {
@@ -202,6 +217,7 @@ function getHostAgentHookUrl(): string {
 
 type TerminalClientMessage =
 	| { type: "input"; data: string }
+	| { type: "colors"; colors: TerminalColors; resetOverrides?: boolean }
 	| { type: "resize"; cols: number; rows: number }
 	// The client's current keyboard-focus state, sent on every attach. A
 	// reattaching client may hold focus the program last heard it lost (or
@@ -246,6 +262,10 @@ type TerminalServerMessage =
 	  }
 	| { type: "exit"; exitCode: number; signal: number }
 	| { type: "title"; title: string | null }
+	// The PTY's size, the smallest box across visible clients. Sent to every
+	// client when it changes, and to a client after each of its resizes, so a
+	// client larger than the PTY can say why its output is narrower.
+	| { type: "size"; cols: number; rows: number }
 	// Sequence anchor for seq-aware clients (`?seq=` on the attach URL). Sent
 	// once per attach, AFTER any host-synthesized bytes (mode preamble,
 	// restored notice) and BEFORE catch-up/live PTY bytes. The client sets its
@@ -533,6 +553,7 @@ interface TerminalSession {
 	/** Unsubscribe from the daemon's output/exit stream when disposed. */
 	unsubscribeDaemon: (() => void) | null;
 	sockets: Set<TerminalSocket>;
+	colorAuthority: TerminalColorAuthority<TerminalSocket>;
 	/**
 	 * Legacy replay FIFO for clients that attach without `?seq=` (pre-seq
 	 * renderers, raw WS consumers): fills only while zero sockets are
@@ -870,6 +891,8 @@ export type TerminalSessionErrorKind =
 	| "WORKSPACE_NOT_FOUND"
 	/** The workspace row exists but its worktree is gone from disk. */
 	| "WORKTREE_GONE"
+	/** The worktree exists but this process may not read it (OS privacy controls). */
+	| "WORKTREE_INACCESSIBLE"
 	/**
 	 * The daemon could not be reached (stalled, restarting, bootstrap
 	 * pending). The supervisor heals these and the session may still come up
@@ -1734,12 +1757,12 @@ function effectiveDims(
 function applyEffectiveDims(
 	session: TerminalSession,
 	options: { force?: boolean } = {},
-) {
-	if (session.exited) return;
+): boolean {
+	if (session.exited) return false;
 	const next = effectiveDims(session);
-	if (!next) return;
+	if (!next) return false;
 	const changed = next.cols !== session.cols || next.rows !== session.rows;
-	if (!changed && !options.force) return;
+	if (!changed && !options.force) return false;
 	if (changed) {
 		session.lastResizeSeq = session.outputSeq;
 		// Whatever follows is laid out for the new size; hidden clients still
@@ -1755,6 +1778,12 @@ function applyEffectiveDims(
 	session.modeTracker.resize(next.cols, next.rows);
 	session.cols = next.cols;
 	session.rows = next.rows;
+	if (changed) broadcastMessage(session, ptySizeMessage(session));
+	return changed;
+}
+
+function ptySizeMessage(session: TerminalSession): TerminalServerMessage {
+	return { type: "size", cols: session.cols, rows: session.rows };
 }
 
 /**
@@ -1804,6 +1833,7 @@ function resumeHiddenSocket(session: TerminalSession, ws: TerminalSocket) {
  */
 function detachSocket(session: TerminalSession, ws: TerminalSocket) {
 	session.sockets.delete(ws);
+	session.colorAuthority.remove(ws);
 	if (session.focusedSockets.delete(ws)) syncPtyFocus(session);
 	releaseSocketDims(session, ws);
 }
@@ -2797,7 +2827,8 @@ async function disposeSessionUnlocked(
 		closePromise = closeDaemonSessionById(terminalId, "SIGHUP");
 	}
 
-	portManager.unregisterSession(terminalId);
+	if (!chatPortTerminalIds.has(terminalId))
+		portManager.unregisterSession(terminalId);
 
 	const closeResult = closePromise
 		? await closePromise
@@ -2912,6 +2943,7 @@ interface CreateTerminalSessionOptions {
 	workspaceId: string;
 	themeType?: "dark" | "light";
 	themeId?: string | null;
+	colors?: TerminalColors;
 	db: HostDb;
 	eventBus?: EventBus;
 	initialCommand?: string;
@@ -3000,6 +3032,7 @@ async function createTerminalSessionUnlocked({
 	workspaceId,
 	themeType,
 	themeId: requestedThemeId,
+	colors,
 	db,
 	eventBus,
 	initialCommand,
@@ -3052,7 +3085,14 @@ async function createTerminalSessionUnlocked({
 	if (!workspace) {
 		return { kind: "WORKSPACE_NOT_FOUND", error: "Workspace not found" };
 	}
-	if (!existsSync(workspace.worktreePath)) {
+	const worktreeState = getPathState(workspace.worktreePath);
+	if (worktreeState === "inaccessible") {
+		return {
+			kind: "WORKTREE_INACCESSIBLE",
+			error: inaccessiblePathMessage(workspace.worktreePath),
+		};
+	}
+	if (worktreeState === "missing") {
 		return {
 			kind: "WORKTREE_GONE",
 			error: `Workspace worktree no longer exists: ${workspace.worktreePath}`,
@@ -3094,25 +3134,17 @@ async function createTerminalSessionUnlocked({
 	// Fallback matters for hosts not spawned by the desktop (CLI/systemd):
 	// without it the wrapper paths, hook guard env, and shell bootstrap all
 	// silently disable (#6254).
-	const supersetHomeDir = resolveSupersetHomeDir();
+	const supersetHomeDir = resolveAppHomeDir();
 	const shell = resolveLaunchShell(baseEnv);
 	const shellArgs = getShellLaunchArgs({ shell, supersetHomeDir });
 	const ptyEnv = {
-		...buildV2TerminalEnv({
-			baseEnv,
-			shell,
-			supersetHomeDir,
-			organizationId: process.env.ORGANIZATION_ID || "",
+		...buildHostLaunchEnv({
 			themeType,
 			cwd,
 			terminalId,
 			workspaceId,
 			workspacePath: workspace.worktreePath,
 			rootPath,
-			supersetEnv:
-				process.env.NODE_ENV === "development" ? "development" : "production",
-			agentHookPort: process.env.SUPERSET_AGENT_HOOK_PORT || "",
-			agentHookVersion: process.env.SUPERSET_AGENT_HOOK_VERSION || "",
 			hostAgentHookUrl: getHostAgentHookUrl(),
 		}),
 		// Usage-tab default account: provider CLIs typed or preset-launched in
@@ -3168,6 +3200,7 @@ async function createTerminalSessionUnlocked({
 					cols,
 					rows,
 					env: ptyEnv,
+					colors,
 				});
 			} catch (err) {
 				// After host-service restart the daemon may already own this
@@ -3299,6 +3332,9 @@ async function createTerminalSessionUnlocked({
 		rows,
 		unsubscribeDaemon: null,
 		sockets: new Set(),
+		colorAuthority: new TerminalColorAuthority((colors, resetOverrides) =>
+			pty.setColors(colors, resetOverrides),
+		),
 		buffer: [],
 		bufferBytes: 0,
 		// Adopted sessions kept a live shell — nothing was restored.
@@ -3441,7 +3477,8 @@ async function createTerminalSessionUnlocked({
 				session.exitSignal = signal ?? 0;
 				const occurredAt = Date.now();
 
-				portManager.unregisterSession(terminalId);
+				if (!chatPortTerminalIds.has(terminalId))
+					portManager.unregisterSession(terminalId);
 
 				db.update(terminalSessions)
 					.set({ status: "exited", endedAt: occurredAt })
@@ -3604,6 +3641,12 @@ export function registerWorkspaceTerminalRoute({
 			const createRequested = c.req.query("create") === "1";
 			const requestedThemeType = parseThemeType(c.req.query("themeType"));
 			const requestedThemeId = parseThemeId(c.req.query("themeId"));
+			let requestedColors: TerminalColors | undefined;
+			try {
+				requestedColors = terminalColorsSchema.parse(
+					JSON.parse(c.req.query("colors") ?? "null"),
+				);
+			} catch {}
 			const attachSocketToSession = (
 				session: TerminalSession,
 				ws: TerminalSocket,
@@ -3683,6 +3726,7 @@ export function registerWorkspaceTerminalRoute({
 							workspaceId: requestedWorkspaceId,
 							themeType: requestedThemeType,
 							themeId: requestedThemeId,
+							colors: requestedColors,
 							db,
 							eventBus,
 						});
@@ -3724,6 +3768,7 @@ export function registerWorkspaceTerminalRoute({
 					terminalId,
 					workspaceId: record.originWorkspaceId,
 					themeType: requestedThemeType,
+					colors: requestedColors,
 					db,
 					eventBus,
 					adoptOnly: true,
@@ -3752,6 +3797,7 @@ export function registerWorkspaceTerminalRoute({
 					terminalId,
 					workspaceId: record.originWorkspaceId,
 					themeType: requestedThemeType,
+					colors: requestedColors,
 					db,
 					eventBus,
 					restoredNotice: true,
@@ -3829,6 +3875,18 @@ export function registerWorkspaceTerminalRoute({
 
 					if (session.exited) return;
 
+					if (message.type === "colors") {
+						const parsed = terminalColorsSchema.safeParse(message.colors);
+						if (parsed.success && session.sockets.has(ws)) {
+							session.colorAuthority.update(
+								ws,
+								parsed.data,
+								message.resetOverrides === true,
+							);
+						}
+						return;
+					}
+
 					if (message.type === "input") {
 						session.pty.write(message.data);
 						return;
@@ -3885,7 +3943,8 @@ export function registerWorkspaceTerminalRoute({
 						const needsForcedNudge =
 							session.pendingRepaintNudge !== null && dimsUnchanged;
 						clearPendingRepaintNudge(session);
-						applyEffectiveDims(session, { force: true });
+						const changed = applyEffectiveDims(session, { force: true });
+						if (!changed) sendMessage(ws, ptySizeMessage(session));
 						if (needsForcedNudge) nudgeRepaint(session);
 					}
 				},

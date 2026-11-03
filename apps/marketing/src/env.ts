@@ -21,6 +21,7 @@ export const env = createEnv({
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		SERVER_ANTHROPIC_API_KEY: z.string().min(1),
+		AUTUMN_SECRET_KEY: z.string().min(1),
 		// Read-only PAT (no scopes needed) used to fetch stargazer timestamps for
 		// /starchart. GitHub's stargazers endpoint requires authentication even for
 		// public repos; without this the page falls back to a live total only.
@@ -29,6 +30,9 @@ export const env = createEnv({
 		// API's per-IP anonymous limiter does not count every render as one
 		// visitor. Absent means those reads are anonymous, as they always were.
 		LEADERBOARD_INTERNAL_TOKEN: z.string().min(1).optional(),
+		// PostHog project secret key (feature_flag:read). The proxy evaluates the
+		// homepage headline experiment locally; empty or absent means nobody is enrolled.
+		POSTHOG_PROJECT_SECRET_KEY: z.string().optional(),
 	},
 	client: {
 		NEXT_PUBLIC_API_URL: z.string().url(),

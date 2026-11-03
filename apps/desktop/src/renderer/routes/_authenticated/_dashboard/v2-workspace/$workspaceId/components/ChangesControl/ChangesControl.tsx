@@ -2,12 +2,13 @@ import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import { GitCompareArrows } from "lucide-react";
 import { memo, useMemo } from "react";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
+import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
-import { changesPillStats } from "./changesPillStats";
+import { changesPillStats } from "../../utils/changesPillStats";
+import { ChangesStats } from "../ChangesStats";
 import { PRStatusGroup } from "./components/PRStatusGroup";
 import { ShipControl } from "./components/ShipControl";
-import { usePRFlowState } from "./hooks/usePRFlowState";
 
 interface ChangesControlProps {
 	workspaceId: string;
@@ -16,11 +17,11 @@ interface ChangesControlProps {
 	/** Close the visible Changes pane, or open/focus one when none shows. */
 	onToggleChanges: () => void;
 	/** Open or focus the pane showing the linked PR's summary. */
-	onOpenPullRequest: (ref: PullRequestRef) => void;
+	onOpenPullRequest: OpenPullRequestPane;
 }
 
 /**
- * Top-bar Changes control: one bordered button with a single face covering
+ * Tab-bar Changes control: one bordered button with a single face covering
  * the branch's whole lifecycle. Before a PR exists the face is the diff
  * stats with the ship actions (commit → push → create PR) in the chevron —
  * or the ship action itself once the tree is clean; once a PR exists the
@@ -78,19 +79,7 @@ export const ChangesControl = memo(function ChangesControl({
 					)}
 				>
 					<GitCompareArrows className="size-3.5" />
-					{visibleStats.additions > 0 && (
-						<span className="tabular-nums text-emerald-600 [.dark_&]:text-[#34d399]">
-							+{visibleStats.additions}
-						</span>
-					)}
-					{visibleStats.deletions > 0 && (
-						<span className="tabular-nums text-red-600 [.dark_&]:text-[#f87171]">
-							−{visibleStats.deletions}
-						</span>
-					)}
-					{visibleStats.additions === 0 && visibleStats.deletions === 0 && (
-						<span className="tabular-nums">{visibleStats.fileCount}</span>
-					)}
+					<ChangesStats stats={visibleStats} />
 				</button>
 			)}
 			{flowState.kind === "no-pr" ? (

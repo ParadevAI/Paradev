@@ -72,6 +72,10 @@ export function useAgentCredential(presetId: string) {
 		chooseMethod: setChosen,
 		save: (input: SaveCredentialInput) =>
 			save.mutateAsync({ agent: presetId, ...input }),
+		signedIn: () => {
+			setChosen(null);
+			return invalidate();
+		},
 		disconnect: () => remove.mutateAsync({ agent: presetId }),
 		removing: remove.isPending,
 	};

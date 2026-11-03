@@ -1,4 +1,5 @@
-import { Heading, Link, Section, Text } from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { differenceInDays } from "date-fns";
 import { Button, EmailLayout } from "../../components";
 
@@ -15,7 +16,7 @@ interface OrganizationInvitationEmailProps {
 export function OrganizationInvitationEmail({
 	organizationName = "Acme Inc",
 	inviterName = "John Smith",
-	inviteLink = "https://app.superset.sh/accept-invitation/123?token=abc",
+	inviteLink = `${CANONICAL_URLS.APP}/accept-invitation/123?token=abc`,
 	role = "member",
 	inviteeName = "Satya Patel",
 	inviterEmail = "john@acme.com",
@@ -31,10 +32,6 @@ export function OrganizationInvitationEmail({
 		<EmailLayout
 			preview={`${inviterName} invited you to join ${organizationName}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Join {organizationName} on Superset
-			</Heading>
-
 			{inviteeName && (
 				<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 					Hi {inviteeName},
@@ -43,13 +40,13 @@ export function OrganizationInvitationEmail({
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				{inviterName} ({inviterEmail}) has invited you to join{" "}
-				<strong>{organizationName}</strong> on Superset as a{" "}
+				<strong>{organizationName}</strong> on Paradev as a{" "}
 				<strong>{roleDisplay}</strong>.
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-				Superset runs coding agents in parallel, each in an isolated copy of
-				your repo. Accept the invite to work alongside your team.
+				Paradev runs coding agents in parallel, each in an isolated copy of your
+				repo. Accept the invite to work alongside your team.
 			</Text>
 
 			<Section className="mb-6">

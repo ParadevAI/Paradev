@@ -11,10 +11,11 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import { terminalSessions, workspaces } from "../../src/db/schema";
+import { projects, terminalSessions, workspaces } from "../../src/db/schema";
 import {
 	runSandboxSelfSeed,
 	sandboxRepositoryWorkspaceId,
@@ -466,7 +467,7 @@ describe("local workspaces: deletion edge cases", () => {
 		expect(existsSync(join(scenario.repo.repoPath, "dirty.txt"))).toBe(true);
 	});
 
-	test("13. project.remove: local rows skip git worktree remove, worktree rows are removed, rows cascade", async () => {
+	test("13. project.remove keeps everything restorable; project.purge skips local rows, removes worktrees and rows", async () => {
 		const scenario = await createFeatureWorktreeScenario({ hostOptions });
 		dispose = scenario.dispose;
 		const local = await scenario.host.trpc.workspaces.create.mutate({
@@ -480,6 +481,13 @@ describe("local workspaces: deletion edge cases", () => {
 			projectId: scenario.projectId,
 		});
 		expect(result.success).toBe(true);
+		expect(existsSync(scenario.worktreePath)).toBe(true);
+		const archived = scenario.host.db.select().from(workspaces).all();
+		expect(archived.every((r) => r.archivedAt != null)).toBe(true);
+
+		await scenario.host.trpc.project.purge.mutate({
+			projectId: scenario.projectId,
+		});
 		expect(existsSync(scenario.repo.repoPath)).toBe(true);
 		expect(existsSync(join(scenario.repo.repoPath, ".git"))).toBe(true);
 		expect(existsSync(scenario.worktreePath)).toBe(false);
@@ -698,10 +706,13 @@ describe("local workspaces: sessions and sandbox seed", () => {
 					path: "docs",
 				},
 			],
-			hooksPath: "/workspace/repo",
 		} as Parameters<typeof runSandboxSelfSeed>[1];
-		runSandboxSelfSeed(host.db, identity);
-		runSandboxSelfSeed(host.db, identity);
+		const agentDir = join(dirname(host.dbPath), "pdev-agent");
+		runSandboxSelfSeed(host.db, identity, agentDir);
+		runSandboxSelfSeed(host.db, identity, agentDir);
+		expect(
+			JSON.parse(readFileSync(join(agentDir, "trust.json"), "utf8")),
+		).toEqual({ "/workspace": true });
 		const rows = host.db.select().from(workspaces).all();
 		// One local workspace per checkout: the primary under the cloud
 		// workspace's id, the sibling under an id derived from it.
@@ -717,6 +728,35 @@ describe("local workspaces: sessions and sandbox seed", () => {
 					row.id === sandboxRepositoryWorkspaceId(identity.workspaceId, "docs"),
 			),
 		).toMatchObject({ type: "local", worktreePath: "/workspace/docs" });
+		const primaryProjectId =
+			rows.find((row) => row.id === identity.workspaceId)?.projectId ?? "";
+		const readPrimaryProject = () =>
+			host.db
+				.select()
+				.from(projects)
+				.where(eq(projects.id, primaryProjectId))
+				.get();
+		const repoIdentity = {
+			repoProvider: "github",
+			repoOwner: "acme",
+			repoName: "repo",
+			repoUrl: "https://github.com/acme/repo",
+			remoteName: "origin",
+		};
+		expect(readPrimaryProject()).toMatchObject(repoIdentity);
+		host.db
+			.update(projects)
+			.set({
+				repoProvider: null,
+				repoOwner: null,
+				repoName: null,
+				repoUrl: null,
+				remoteName: null,
+			})
+			.where(eq(projects.id, primaryProjectId))
+			.run();
+		runSandboxSelfSeed(host.db, identity, agentDir);
+		expect(readPrimaryProject()).toMatchObject(repoIdentity);
 		// A sandbox's only workspace can still be retired record-only.
 		const preview = await host.trpc.workspaceCleanup.inspect.query({
 			workspaceId: identity.workspaceId,

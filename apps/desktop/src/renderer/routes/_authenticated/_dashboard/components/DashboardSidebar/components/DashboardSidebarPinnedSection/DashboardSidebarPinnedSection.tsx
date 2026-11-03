@@ -3,6 +3,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useLingui } from "@lingui/react/macro";
+import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import {
@@ -16,6 +17,8 @@ import { DashboardSidebarSectionHeader } from "../DashboardSidebarSectionHeader"
 import { DashboardSidebarWorkspaceItem } from "../DashboardSidebarWorkspaceItem";
 import { SidebarDropZone } from "../SidebarDropZone";
 import { SortableWorkspaceItem } from "../SortableWorkspaceItem";
+import { PinnedPageRow } from "./components/PinnedPageRow";
+import { usePinnedPages } from "./hooks/usePinnedPages";
 
 interface DashboardSidebarPinnedSectionProps {
 	pinnedWorkspaces: DashboardSidebarPinnedWorkspace[];
@@ -32,7 +35,7 @@ interface DashboardSidebarPinnedSectionProps {
  * the first pin can land. The header toggles a persisted section collapse that
  * hides the rows, exactly like the Projects header. The collapsed rail renders
  * no section chrome anywhere, so collapsed mode is a plain icon stack with a
- * trailing divider.
+ * trailing divider. Pinned pages follow the workspaces; they are not sortable.
  */
 export function DashboardSidebarPinnedSection({
 	pinnedWorkspaces,
@@ -53,9 +56,33 @@ export function DashboardSidebarPinnedSection({
 	const isSectionCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.pinned,
 	);
+	const navigate = useNavigate();
+	const matchRoute = useMatchRoute();
+	const { pinnedPages, setFavorite } = usePinnedPages();
+	const activePage = matchRoute({ to: "/pages/$slug", fuzzy: true });
+	const activePageSlug = activePage ? activePage.slug : null;
+	const renderPageRows = (collapsed: boolean) =>
+		pinnedPages.map((page) => (
+			<PinnedPageRow
+				key={page.id}
+				title={page.title}
+				isActive={page.slug === activePageSlug}
+				isCollapsed={collapsed}
+				onClick={() =>
+					void navigate({ to: "/pages/$slug", params: { slug: page.slug } })
+				}
+				onUnpin={() => setFavorite(page.id, false)}
+			/>
+		));
+	const hasPinnedPages = pinnedPages.length > 0;
+	// Snapshotted like `emptyAtPickup`: pages that load or drop out mid-drag
+	// must not mount or unmount the section under the pointer.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: hasPinnedPages is read at that moment on purpose
+	const pagesAtPickup = useMemo(() => hasPinnedPages, [isDraggingWorkspace]);
+	const showsPinnedPages = isDraggingWorkspace ? pagesAtPickup : hasPinnedPages;
 
 	if (isCollapsed) {
-		if (pinnedWorkspaces.length === 0) return null;
+		if (pinnedWorkspaces.length === 0 && !hasPinnedPages) return null;
 		return (
 			<div className="flex flex-col gap-0.5 py-1">
 				{pinnedWorkspaces.map((workspace) => (
@@ -66,12 +93,15 @@ export function DashboardSidebarPinnedSection({
 						onHoverCardOpen={onWorkspaceHover}
 					/>
 				))}
+				{renderPageRows(true)}
 				<div className="mx-3 mt-1 border-b border-border" />
 			</div>
 		);
 	}
 
-	if (pinnedItems.length === 0 && !isDraggingWorkspace) return null;
+	if (pinnedItems.length === 0 && !isDraggingWorkspace && !hasPinnedPages) {
+		return null;
+	}
 
 	// With nothing pinned, the section must not appear in-flow at pickup:
 	// mounting a header and drop zone above the dragged row shifts it under
@@ -81,69 +111,85 @@ export function DashboardSidebarPinnedSection({
 	// the scroller so it stays reachable however far the list is scrolled.
 	// A drag that started with pins keeps the in-flow section even after its
 	// last row transfers out, so the layout under the pointer holds still.
-	if (pinnedItems.length === 0 && emptyAtPickup) {
-		return (
-			// -mb-3 cancels the `mt-3 first:mt-0` the next section gains once
-			// it is no longer the scroller's first child — otherwise the float
-			// still nudges the list by that margin.
-			<div className="-mb-3 sticky top-0 z-20 h-0">
-				<div className="bg-sidebar/90 py-1 backdrop-blur-sm dark:bg-muted/90">
-					<SidebarDropZone
-						dropZoneId={dropZoneId(PINNED_CONTAINER)}
-						label={t({
-							message: "Drop to pin",
-						})}
-					/>
-				</div>
-			</div>
-		);
-	}
-
-	return (
-		<div className="mt-3 pb-1 first:mt-0">
-			<DashboardSidebarSectionHeader
-				label={t({ message: "Pinned" })}
-				section="pinned"
-			/>
-			{!isSectionCollapsed && (
-				<SortableContext
-					items={pinnedItems}
-					strategy={verticalListSortingStrategy}
-				>
-					{pinnedItems.map((id) => {
-						const parsed = parseId(id);
-						if (!parsed || parsed.type !== "workspace") return null;
-						const workspace = workspacesById.get(parsed.realId);
-						if (!workspace) return null;
-						const project = workspace.projectId
-							? projectsById.get(workspace.projectId)
-							: null;
-						return (
-							<SortableWorkspaceItem
-								key={String(id)}
-								sortableId={String(id)}
-								workspace={workspace}
-								indentation="top-level"
-								pinnedContext={{
-									projectName: project?.name ?? null,
-									projectIconUrl: project?.iconUrl ?? null,
-								}}
-								onHoverCardOpen={onWorkspaceHover}
-							/>
-						);
-					})}
-				</SortableContext>
-			)}
-			{/* An empty section only stays mounted mid-drag; the drop zone renders
-			    regardless of collapse so the first pin can always land. */}
-			{pinnedItems.length === 0 && (
+	const floatingDropZone = (
+		// -mb-3 cancels the `mt-3 first:mt-0` the next section gains once
+		// it is no longer the scroller's first child — otherwise the float
+		// still nudges the list by that margin.
+		<div className="-mb-3 sticky top-0 z-20 h-0">
+			<div className="bg-sidebar/90 py-1 backdrop-blur-sm dark:bg-muted/90">
 				<SidebarDropZone
 					dropZoneId={dropZoneId(PINNED_CONTAINER)}
 					label={t({
 						message: "Drop to pin",
 					})}
 				/>
-			)}
+			</div>
 		</div>
+	);
+	const isFloatingDropZone = pinnedItems.length === 0 && emptyAtPickup;
+
+	if (isFloatingDropZone && !showsPinnedPages) {
+		return floatingDropZone;
+	}
+
+	return (
+		<>
+			{/* Pinned pages keep the section mounted with no pinned workspace,
+			    so the first workspace pin still needs the floating target. */}
+			{isFloatingDropZone && floatingDropZone}
+			<div className="mt-3 pb-1 first:mt-0">
+				<DashboardSidebarSectionHeader
+					label={t({ message: "Pinned" })}
+					section="pinned"
+				/>
+				{!isSectionCollapsed && (
+					<SortableContext
+						items={pinnedItems}
+						strategy={verticalListSortingStrategy}
+					>
+						{pinnedItems.map((id) => {
+							const parsed = parseId(id);
+							if (!parsed || parsed.type !== "workspace") return null;
+							const workspace = workspacesById.get(parsed.realId);
+							if (!workspace) return null;
+							const project = workspace.projectId
+								? projectsById.get(workspace.projectId)
+								: null;
+							return (
+								<SortableWorkspaceItem
+									key={String(id)}
+									sortableId={String(id)}
+									workspace={workspace}
+									indentation="top-level"
+									pinnedContext={{
+										projectName: project?.name ?? null,
+										projectIconUrl: project?.iconUrl ?? null,
+									}}
+									onHoverCardOpen={onWorkspaceHover}
+								/>
+							);
+						})}
+					</SortableContext>
+				)}
+				{/* Takes the departing last workspace row's place, above the pages, so
+				    the rows under the pointer hold still. Renders regardless of
+				    collapse so the first pin can always land. */}
+				{pinnedItems.length === 0 &&
+					isDraggingWorkspace &&
+					!isFloatingDropZone && (
+						<SidebarDropZone
+							dropZoneId={dropZoneId(PINNED_CONTAINER)}
+							label={t({
+								message: "Drop to pin",
+							})}
+						/>
+					)}
+				{!isSectionCollapsed && showsPinnedPages && (
+					<div className="flex flex-col gap-px px-2">
+						{renderPageRows(false)}
+					</div>
+				)}
+			</div>
+		</>
 	);
 }

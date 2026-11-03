@@ -3,10 +3,12 @@
  *
  * Bundle layout (extracts into ~/superset/):
  *   bin/superset                 — Bun-compiled CLI binary
+ *   bin/paradev                  — Symlink to bin/superset (alias)
  *   bin/superset-host            — Shell wrapper to run the host-service
  *   lib/node                     — Standalone Node.js runtime
  *   lib/host-service.js          — Bundled host-service entry
  *   lib/agent-templates/         — Agent-setup templates (+ plugin/ = repo Claude plugin)
+ *   lib/chat-migrations/         — chat.db Drizzle migrations
  *   lib/node_modules/            — Full native addon packages (JS wrappers + bindings)
  *     better-sqlite3/
  *     node-pty/
@@ -34,6 +36,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { linkBinAliases } from "./link-bin-aliases";
 
 type Target = "darwin-arm64" | "darwin-x64" | "linux-x64" | "linux-arm64";
 
@@ -43,7 +46,7 @@ const VALID_TARGETS: Target[] = [
 	"linux-x64",
 	"linux-arm64",
 ];
-const NODE_VERSION = "22.13.0";
+const NODE_VERSION = "22.23.4";
 
 /**
  * Runtime packages that must be shipped alongside the bundled host-service
@@ -155,7 +158,7 @@ async function downloadAndExtractNode(
 	target: Target,
 	destDir: string,
 ): Promise<string> {
-	const cacheDir = join(homedir(), ".superset-build-cache");
+	const cacheDir = join(homedir(), ".paradev-build-cache");
 	if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
 
 	const archiveName = nodeArchiveName(target);
@@ -310,7 +313,7 @@ async function fixNativeBinariesForNode(
 	const bsqUrl =
 		`https://github.com/WiseLibs/better-sqlite3/releases/download/` +
 		`v${bsqVersion}/better-sqlite3-v${bsqVersion}-node-v${NODE_ABI}-${target}.tar.gz`;
-	const cacheDir = join(homedir(), ".superset-build-cache");
+	const cacheDir = join(homedir(), ".paradev-build-cache");
 	if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
 	const cachedTarball = join(
 		cacheDir,
@@ -416,6 +419,7 @@ async function main(): Promise<void> {
 
 	console.log("[build-dist] building CLI binary");
 	await buildCli(target, join(stagingRoot, "bin", "superset"));
+	linkBinAliases(join(stagingRoot, "bin"));
 
 	console.log("[build-dist] building host-service bundle");
 	const hostServiceBundle = await buildHostService();
@@ -450,6 +454,12 @@ async function main(): Promise<void> {
 	cpSync(migrationsSrc, join(stagingRoot, "share", "migrations"), {
 		recursive: true,
 	});
+
+	cpSync(
+		join(dirname(hostServiceBundle), "chat-migrations"),
+		join(stagingRoot, "lib", "chat-migrations"),
+		{ recursive: true },
+	);
 
 	// Agent-setup templates ship side-by-side with host-service.js (resolved
 	// by resolveAgentTemplatesDir in host-service) so headless hosts can

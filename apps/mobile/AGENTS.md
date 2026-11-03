@@ -1,8 +1,8 @@
-# Superset Mobile App
+# Paradev Mobile App
 
 ## Project Structure
 
-Guidelines for organizing the Superset mobile app mostly follow repo's patterns,
+Guidelines for organizing the Paradev mobile app mostly follow repo's patterns,
 with some caveats:
 
 ### Keep in app/
@@ -76,6 +76,39 @@ export default function AuthenticatedLayout() {
 - **Pending and failed are not answers.** A query with no data yet has not said "offline" or
   "empty". Keep loading while it is pending and say you could not check when it failed; Home once
   painted "is offline" on every cold start because presence defaulted to `false`.
-- **Verifying in the real app:** `.agents/skills/mobile-sim-verification/SKILL.md`.
+- **Verifying in the real app:** on a machine with Xcode, `.agents/skills/mobile-sim-verification/SKILL.md`.
+  On a cloud sandbox (no local Xcode/simulator), run `apps/mobile/scripts/eas-dev.sh`; see
+  `.agents/skills/mobile-eas-dev/SKILL.md`. The script encodes what was found getting the app running
+  on an EAS simulator from a sandbox (2026-10-09), so nobody has to rediscover it:
+  - **Builds are matched by fingerprint, not rebuilt per sandbox.** The script installs the finished
+    `development-simulator` build whose native fingerprint matches this checkout and builds one only
+    when none exists: the first time, or after a *native* change (new native module, Info.plist,
+    entitlements, native config). JS/TS changes ship through Metro against the same installed build.
+  - **The runtime version must come out the same here and on EAS,** or the build fails at "Configure
+    expo-updates". It is a fingerprint of the install and the app config, so `eas.json` pins bun and
+    marks every profile with `MOBILE_EAS_BUILD` (which makes `app.config.ts` skip the root `.env`),
+    and the script removes `EXPO_PUBLIC_*` from the build and fingerprint commands: a sandbox already
+    has the dev values in its shell.
+  - **The simulator reaches this machine only through local egress,** and the egress client can only
+    start once the session exists. The app's first load therefore always fails; the script loads it
+    again through the dev-client URL when the tunnel is up, and retries until the Metro log shows a
+    new `iOS Bundled` line. A port the app calls must be passed as `--egress-allow`; the script
+    reads `$API_PORT` from `.env` rather than assuming a fixed port.
+  - **An egress client serves only the session it started with.** It reads `.env.eas-simulator` once,
+    so after a new session a running client still tunnels to the old one and the app shows "Could
+    not connect to the server". `--new` replaces the client; never start a session by hand.
+  - **Reload with `eas-dev.sh --reload`, not `agent-device open Superset`.** A plain launch has no
+    Metro URL and fails; only
+    `superset://expo-development-client/?url=...&disableAutoLaunch=1&disableFab=1` loads the app
+    without the dev menu and its gear button.
+  - **The "slide to type" keyboard intro** covers the screen the first time a keyboard opens.
+    `simctl` is out of reach, so the script opens the keyboard once in Settings and presses Continue.
+  - **SwiftUI menu items (`@expo/ui` `Menu`) are not in `agent-device snapshot`.** Tap them by
+    coordinate from a screenshot. This is a limit of the tool.
+  - **Native Sentry starts only when `EXPO_PUBLIC_SENTRY_DSN_MOBILE` is set.** Native init without a
+    DSN crashes the app at launch with a bare SIGSEGV before any JS runs, and the EAS `development`
+    environment has no DSN.
+  - **Call `agent-device` directly.** Through `eas simulator:exec npx agent-device` each command
+    takes about 25 s on a sandbox; installed globally it takes about 1 s.
 - **Iterating on a native module?** Build its own pod scheme (`-scheme Composer`), not the app —
   the difference between ~6s and minutes.

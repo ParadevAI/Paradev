@@ -6,6 +6,7 @@ export type OutboxEntry = {
 	commandId: string;
 	clientId: string;
 	content: UserContent[];
+	steer?: { expectedTurnId: string };
 	state: OutboxEntryState;
 	attempts: number;
 	lastError: string | null;
@@ -13,6 +14,7 @@ export type OutboxEntry = {
 
 export type OutboxOptions = {
 	send: (entry: OutboxEntry) => Promise<void>;
+	canSend?: () => boolean;
 	mintId?: () => string;
 	maxAttempts?: number;
 };
@@ -21,20 +23,26 @@ export class Outbox {
 	private entries = new Map<string, OutboxEntry>();
 	private listeners = new Set<() => void>();
 	private readonly send: OutboxOptions["send"];
+	private readonly canSend: () => boolean;
 	private readonly mintId: () => string;
 	private readonly maxAttempts: number;
 
 	constructor(options: OutboxOptions) {
 		this.send = options.send;
+		this.canSend = options.canSend ?? (() => true);
 		this.mintId = options.mintId ?? (() => crypto.randomUUID());
 		this.maxAttempts = options.maxAttempts ?? 5;
 	}
 
-	enqueue(content: UserContent[]): OutboxEntry {
+	enqueue(
+		content: UserContent[],
+		steer?: { expectedTurnId: string },
+	): OutboxEntry {
 		const entry: OutboxEntry = {
 			commandId: this.mintId(),
 			clientId: this.mintId(),
 			content,
+			...(steer ? { steer } : {}),
 			state: "queued",
 			attempts: 0,
 			lastError: null,
@@ -45,8 +53,10 @@ export class Outbox {
 	}
 
 	async flush(): Promise<void> {
-		for (const entry of [...this.entries.values()]) {
-			if (entry.state === "inflight") continue;
+		for (const clientId of [...this.entries.keys()]) {
+			if (!this.canSend()) break;
+			const entry = this.entries.get(clientId);
+			if (!entry || entry.state === "inflight") continue;
 			if (entry.attempts >= this.maxAttempts) continue;
 			this.update(entry.clientId, {
 				state: "inflight",

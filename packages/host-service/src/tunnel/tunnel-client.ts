@@ -1,3 +1,4 @@
+import { SUPERSET_RELAYED_HEADER } from "@superset/shared/host-routing";
 import {
 	describeRelayClose,
 	type HttpDialFrame,
@@ -22,6 +23,9 @@ const STUCK_CONTROL_GRACE_MS = 60_000;
 // here — an auth or resolve call that never settles stalls the reconnect
 // cycle forever with no timer left running.
 const URL_PROVIDER_STEP_TIMEOUT_MS = 15_000;
+// Partysocket retries every few seconds while the relay is unreachable, and
+// each lookup is an API call; one per window is enough to follow a relay move.
+const RELAY_RESOLVE_INTERVAL_MS = 5 * 60_000;
 
 function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
 	return Promise.race([
@@ -73,9 +77,11 @@ export class TunnelClient {
 	private pingTimer: ReturnType<typeof setInterval> | null = null;
 	private watchdogTimer: ReturnType<typeof setInterval> | null = null;
 	private lastInboundAt = 0;
+	private connectedAt = 0;
 	private notOpenSince: number | null = null;
 	private relayUrl: string;
 	private lastAttemptOpened = true;
+	private lastRelayResolveAt = Number.NEGATIVE_INFINITY;
 	private closed = false;
 
 	constructor(options: TunnelClientOptions) {
@@ -86,50 +92,22 @@ export class TunnelClient {
 	async connect(): Promise<void> {
 		if (this.closed || this.control) return;
 
-		// Re-invoked on every reconnect, picking up rotated tokens and relay
-		// moves. It must never reject: a rejection kills partysocket's retry
-		// cycle permanently, wedging the host until a process restart.
-		const urlProvider = async (): Promise<string> => {
-			if (this.options.resolveRelayUrl && !this.lastAttemptOpened) {
-				try {
-					this.relayUrl = await withTimeout(
-						this.options.resolveRelayUrl(),
-						this.relayUrl,
-					);
-				} catch {
-					// keep the last known URL
-				}
-			}
-			let token: string | null = null;
-			try {
-				token = await withTimeout(this.options.getAuthToken(), null);
-			} catch (error) {
-				console.warn(
-					"[host-service:tunnel] token fetch failed; connecting unauthenticated so the retry cycle survives:",
-					error instanceof Error ? error.message : error,
-				);
-				reportTunnelRescue("token_fetch_failed", {
-					message: error instanceof Error ? error.message.slice(0, 200) : "",
-				});
-			}
-			this.lastAttemptOpened = false;
-			const url = new URL("/v2/control", toWs(this.relayUrl));
-			url.searchParams.set("hostId", this.options.hostId);
-			url.searchParams.set("token", token ?? "");
-			return url.toString();
-		};
-
-		const control = new ReconnectingWebSocket(urlProvider, [], {
-			WebSocket: globalThis.WebSocket,
-			maxReconnectionDelay: 5_000,
-			minReconnectionDelay: 1_000,
-			connectionTimeout: RELAY_CONNECT_TIMEOUT_MS,
-		});
+		const control = new ReconnectingWebSocket(
+			() => this.buildControlUrl(),
+			[],
+			{
+				WebSocket: globalThis.WebSocket,
+				maxReconnectionDelay: 5_000,
+				minReconnectionDelay: 1_000,
+				connectionTimeout: RELAY_CONNECT_TIMEOUT_MS,
+			},
+		);
 		this.control = control;
 
 		control.addEventListener("open", () => {
 			this.lastInboundAt = Date.now();
-			this.lastAttemptOpened = true;
+			this.connectedAt = this.lastInboundAt;
+			this.markOpened();
 			console.log(
 				`[host-service:tunnel] control connected for ${this.options.hostId}`,
 			);
@@ -149,12 +127,19 @@ export class TunnelClient {
 		});
 
 		control.addEventListener("close", (event) => {
-			const described = describeRelayClose(event.code) ?? "";
-			if (event.code === 1008 || described) {
-				console.warn(
-					`[host-service:tunnel] relay closed control (${event.code} ${described}): ${event.reason ?? ""}; partysocket will retry`,
-				);
-			}
+			const now = Date.now();
+			console.warn("[host-service:tunnel] control closed", {
+				timestamp: new Date(now).toISOString(),
+				hostId: this.options.hostId,
+				code: event.code,
+				description: describeRelayClose(event.code),
+				reason: event.reason,
+				wasClean: event.wasClean,
+				connectedForMs: this.connectedAt ? now - this.connectedAt : null,
+				inboundSilenceMs: this.lastInboundAt ? now - this.lastInboundAt : null,
+				retrying: !this.closed,
+			});
+			this.connectedAt = 0;
 		});
 
 		this.pingTimer = setInterval(() => {
@@ -187,6 +172,52 @@ export class TunnelClient {
 				control.reconnect();
 			}
 		}, WATCHDOG_INTERVAL_MS);
+	}
+
+	// Re-invoked on every reconnect, picking up rotated tokens and relay
+	// moves. It must never reject: a rejection kills partysocket's retry
+	// cycle permanently, wedging the host until a process restart.
+	// The next failure after a working connection looks the relay up again;
+	// only a run of failures is throttled.
+	private markOpened(): void {
+		this.lastAttemptOpened = true;
+		this.lastRelayResolveAt = Number.NEGATIVE_INFINITY;
+	}
+
+	private async buildControlUrl(): Promise<string> {
+		const now = performance.now();
+		if (
+			this.options.resolveRelayUrl &&
+			!this.lastAttemptOpened &&
+			now - this.lastRelayResolveAt >= RELAY_RESOLVE_INTERVAL_MS
+		) {
+			this.lastRelayResolveAt = now;
+			try {
+				this.relayUrl = await withTimeout(
+					this.options.resolveRelayUrl(),
+					this.relayUrl,
+				);
+			} catch {
+				// keep the last known URL
+			}
+		}
+		let token: string | null = null;
+		try {
+			token = await withTimeout(this.options.getAuthToken(), null);
+		} catch (error) {
+			console.warn(
+				"[host-service:tunnel] token fetch failed; connecting unauthenticated so the retry cycle survives:",
+				error instanceof Error ? error.message : error,
+			);
+			reportTunnelRescue("token_fetch_failed", {
+				message: error instanceof Error ? error.message.slice(0, 200) : "",
+			});
+		}
+		this.lastAttemptOpened = false;
+		const url = new URL("/v2/control", toWs(this.relayUrl));
+		url.searchParams.set("hostId", this.options.hostId);
+		url.searchParams.set("token", token ?? "");
+		return url.toString();
 	}
 
 	close(): void {
@@ -352,6 +383,7 @@ export class TunnelClient {
 					method: header.method,
 					headers: {
 						...header.headers,
+						[SUPERSET_RELAYED_HEADER]: "1",
 						Authorization: `Bearer ${this.options.hostServiceSecret}`,
 					},
 					body: size > 0 ? body : undefined,

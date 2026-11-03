@@ -1,0 +1,1 @@
+export { useDeviceScreenshots } from "./useDeviceScreenshots";

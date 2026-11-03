@@ -38,7 +38,7 @@ API and relay. "Rules" is what counts as valid evidence. "Mechanics" is how to g
 
 ### Services
 
-Start each in a Superset terminal so it outlives the tool call. `--local` is required; without it
+Start each in a Paradev terminal so it outlives the tool call. `--local` is required; without it
 the command returns nothing.
 
 ```bash
@@ -46,7 +46,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
 ```
 
 - **API:** `cd apps/api && bun run dev`. A 500 with `password authentication failed` means this
-  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.superset/lib/setup/steps.sh`
+  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.paradev/lib/setup/steps.sh`
   does and rewrite the three lines under `# Workspace Database` in `.env`.
 - **Relay:** run it in a loop. `wrangler dev` exits with an empty `✘ [ERROR]` when a client aborts a
   request, which every app relaunch does. Durable Object state survives the restart.
@@ -54,6 +54,8 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
   cd apps/relay && while true; do CI=1 WRANGLER_SEND_METRICS=false node_modules/.bin/wrangler dev \
     --port "$RELAY_PORT" --var NEXT_PUBLIC_API_URL:http://localhost:$API_PORT --local; sleep 1; done
   ```
+- **Realtime:** `bun dev:realtime`. It runs the Worker on this worktree's `REALTIME_PORT` and
+  restarts it when it exits. Without it, the app falls back to polling and nudges go nowhere.
 - **Metro:** `cd apps/mobile && CI=1 bunx expo start --dev-client --port 8081`. `CI=1` turns off file
   watching, so restart Metro after editing code. The first bundle after a dependency change takes
   minutes and the dev client gives up waiting: warm it first by fetching `launchAsset.url` from
@@ -68,7 +70,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
   `ios/` is gitignored.
 - Silence the first-run developer menu:
   `xcrun simctl spawn booted defaults write sh.superset.mobile EXDevMenuIsOnboardingFinished -bool YES`.
-- Sign in: `maestro test apps/mobile/.maestro/flows/sign-in.yml`
+- Sign in: tap the dev sign-in button with Maestro (`tapOn: { id: dev-sign-in-button }`, from `DevSignInOptions.tsx`), as `mobile-demo-record` does.
   (`JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home`).
 - The dev account has no plan, so Home shows the paywall. Give its org a temporary one on this
   worktree's Neon branch, and delete the row afterwards. Confirm `DATABASE_URL_UNPOOLED` is the
@@ -99,3 +101,27 @@ xcrun simctl ui booted content_size extra-extra-extra-large
 Count requests in the relay log to prove polling behavior (for example none while backgrounded).
 Reset the locale, text size and status bar, stop the services, and delete test hosts and the
 temporary plan when done.
+
+### EAS: no Mac (Linux, a cloud workspace)
+
+`apps/mobile/scripts/eas-dev.sh` runs the dev client on an EAS cloud simulator; see
+`.agents/skills/mobile-eas-dev/SKILL.md`. The `xcrun simctl` steps above become `agent-device`
+commands, and the simulator reaches this box only through local egress.
+
+- **App.** The script installs the simulator build that matches this checkout's fingerprint and
+  builds one only after a native change.
+- **Ports.** It forwards Metro, the API, the relay and realtime. A port that is not forwarded fails
+  as a network error in the app; without the relay running, Home says it cannot check the host.
+- **Input.** `agent-device snapshot -i`, `press`, `fill`, `screenshot`. `press` and `fill` take
+  `--settle` and print what changed. The dev-menu sheet covers the first screen: press `Continue`,
+  then `Close`.
+- **Request counts.** `.tmp/eas-dev/egress.log` in the checkout names each local port the simulator reached.
+- **Cloud screens.** The workspace's Neon branch is a copy of production, and cloud access is a
+  PostHog flag on the email, so the dev account sees no cloud workspaces. Prefer a test account
+  that has the flag. Use a real account only with its owner's approval: save its `auth.accounts`
+  credential `password`, set a temporary hash (`hashPassword` from `better-auth/crypto`), and sign
+  in with "Sign in with email (dev)". After the test, restore the hash and delete the sessions the
+  test created.
+- **Cleanup.** `eas simulator:stop` from `apps/mobile`; the session bills while it runs and stops
+  by itself after 15 idle minutes. Stop local processes by PID: `pkill -f <pattern>` also matches
+  the shell that runs it.

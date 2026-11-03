@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	type EnrichedSubscription,
 	formatSubscriptionCancelled,
+	planLabel,
 } from "./slack-blocks";
 
 function createEnrichedSubscription(
@@ -114,5 +115,16 @@ describe("formatSubscriptionCancelled", () => {
 		expect(serializedBlocks).toContain("&amp;");
 		expect(serializedBlocks).toContain("&lt;https://example.com|link&gt;");
 		expect(serializedBlocks).toContain("...");
+	});
+});
+
+describe("planLabel", () => {
+	test("capitalizes a known plan", () => {
+		expect(planLabel("pro")).toBe("Pro");
+	});
+
+	test("falls back to Unknown when the plan is missing", () => {
+		expect(planLabel(null)).toBe("Unknown");
+		expect(planLabel(undefined)).toBe("Unknown");
 	});
 });

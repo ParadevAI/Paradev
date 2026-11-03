@@ -21,7 +21,10 @@ export function BlogCard({
 						{post.category}
 					</span>
 					<span className="text-muted-foreground/50">·</span>
-					<time dateTime={post.date} className="text-xs text-muted-foreground">
+					<time
+						dateTime={post.date}
+						className="text-xs text-muted-foreground whitespace-nowrap"
+					>
 						{formattedDate}
 					</time>
 				</div>

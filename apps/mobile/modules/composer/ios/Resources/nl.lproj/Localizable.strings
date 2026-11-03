@@ -14,3 +14,6 @@
 "Could not start dictation" = "Dicteren kon niet worden gestart";
 "Uploading" = "Uploaden";
 "Upload failed" = "Uploaden mislukt";
+"Stop" = "Stoppen";
+"Dictation stopped. What was heard so far is in your message." = "Dicteren is gestopt. Wat tot nu toe is gehoord, staat in je bericht.";
+"Transcription took too long. The last few words may be missing." = "Het transcriberen duurde te lang. De laatste woorden kunnen ontbreken.";

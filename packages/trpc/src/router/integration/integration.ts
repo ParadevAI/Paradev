@@ -3,7 +3,8 @@ import { connections } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure } from "../../trpc";
+import { organizationSyncsNow } from "../../lib/sync-policy/syncPolicy";
+import { personProcedure } from "../../trpc";
 import { connectionStatusProcedure } from "./connection-status";
 import { githubRouter } from "./github";
 import { googleRouter } from "./google";
@@ -28,7 +29,14 @@ export const integrationRouter = {
 	/** Which providers are connected, for the trigger editor. */
 	connectionStatus: connectionStatusProcedure,
 
-	list: protectedProcedure
+	syncAllowed: personProcedure
+		.input(z.object({ organizationId: z.uuid() }))
+		.query(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			return organizationSyncsNow(input.organizationId);
+		}),
+
+	list: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

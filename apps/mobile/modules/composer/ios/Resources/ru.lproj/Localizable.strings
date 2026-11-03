@@ -14,3 +14,6 @@
 "Could not start dictation" = "Не удалось начать диктовку";
 "Uploading" = "Загрузка";
 "Upload failed" = "Не удалось загрузить";
+"Stop" = "Остановить";
+"Dictation stopped. What was heard so far is in your message." = "Диктовка остановлена. Всё, что было услышано, уже в сообщении.";
+"Transcription took too long. The last few words may be missing." = "Расшифровка заняла слишком много времени. Последних слов может не хватать.";

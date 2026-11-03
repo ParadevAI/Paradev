@@ -65,7 +65,7 @@ These apply to the Electron desktop app in `apps/desktop`.
 
 To check a change end-to-end against the real API/DB, drive the running dev app over CDP. Launch with an unused port, for example `RENDERER_REMOTE_DEBUG_PORT=9222 bun dev` (full stack; the app may restore a signed-in session), then attach via the page target's `webSocketDebuggerUrl` over a WebSocket (Bun built-in, no deps). Example: `apps/desktop/scripts/cdp-smoke-integrations.ts`.
 
-**Never assume port 9222 or attach to a renderer from another worktree.** Multiple Superset workspaces commonly run at once, each with different renderer, API, and CDP ports. Before testing:
+**Never assume port 9222 or attach to a renderer from another worktree.** Multiple Paradev workspaces commonly run at once, each with different renderer, API, and CDP ports. Before testing:
 
 1. Read this workspace's final `DESKTOP_VITE_PORT` and `NEXT_PUBLIC_API_URL` values from the root `.env`.
 2. Find the Electron process whose executable/parent command path is inside this workspace. Its renderer command line contains `--remote-debugging-port=<port>`; `lsof -nP -iTCP -sTCP:LISTEN` can confirm the owning PID.
@@ -78,8 +78,8 @@ Verify `/api/auth/get-session` from inside the matched renderer before testing.
 
 Check which setup script provisioned the workspace before repairing auth:
 
-- `.superset/setup.local.sh` creates a per-workspace local stack and runs the idempotent `bun run db:seed-dev`, but intentionally leaves sign-in as a separate step. If the account may be missing, rerun `bun run db:seed-dev` while the local DB stack is running.
-- `.superset/setup.sh` seeds `superset-dev-data/auth-token.enc` from `$HOME/.superset/auth-token.enc` when available. Rerunning it without `--force` can fill a missing token. Do not use `--force` merely to repair auth: it resets `superset-dev-data/` before reseeding.
+- `.paradev/setup.local.sh` creates a per-workspace local stack and runs the idempotent `bun run db:seed-dev`, but intentionally leaves sign-in as a separate step. If the account may be missing, rerun `bun run db:seed-dev` while the local DB stack is running.
+- `.paradev/setup.sh` seeds `paradev-dev-data/auth-token.enc` from `auth-token.enc` in the installed app's home, `~/.paradev` (`prod_app_home` in `.paradev/lib/common.sh`), when available. Rerunning it without `--force` can fill a missing token. Do not use `--force` merely to repair auth: it resets `paradev-dev-data/` before reseeding.
 
 The desktop hydrates a persisted token into an in-memory bearer-token closure. A raw `Runtime.evaluate` `fetch` cannot read that closure, and the local-dev sign-in button persists a bearer token but uses `credentials: "omit"`; neither guarantees the cookie required by a raw CDP probe. For a workspace created by `setup.local.sh`, repair the CDP session as follows:
 
@@ -94,7 +94,9 @@ For a non-local workspace, the normal desktop flow intentionally restores an enc
 
 Do not use setup `--force` to fix a stale connection string, a missing CDP cookie, or a corrupt generated Next.js cache. First rerun the applicable setup script without force. If every API route returns Next.js's HTML 404, stop the dev stack, move `apps/api/.next` aside, and restart. `--force` is normally only appropriate when the user explicitly intends to replace the copied local/host databases and encrypted auth token. The stale-state signature in the next paragraph is the one explicit exception.
 
-One failure signature where `./.superset/setup.sh --force` IS the fix (verified 2026-07-28): session restore hangs at "Restoring your session", the Local Admin sign-in button returns a bodyless 500, get-session returns 200, and a raw `select 1` against `DATABASE_URL` may still succeed; the worktree's seeded dev state (Neon branch credentials in `.env`, `auth-token.enc`, copied DBs) has gone stale as a set. Rerunning with `--force` recreates the Neon branch, rewrites `.env`, and reseeds `superset-dev-data/` together, which restores sign-in. Two side effects to expect: any manual `.env` edits (e.g. a port remap) are wiped and must be re-applied, and `superset-dev-data/` is reset.
+To run the local API against another database (a fresh Neon branch of production, say), passing `DATABASE_URL` in the environment is not enough: in development `apps/api/next.config.ts` reloads the root `.env` with `override: true` and puts the workspace's database back. The signs are "column ... does not exist" from a branch that has the column, and a sign-in that returns a user your edits on the branch no longer match. Change that database only through the root `.env`, or with a local, unpushed change to that guard, and check a query that only the target branch can answer. The Local Admin button signs in whichever user holds `DEV_EMAIL` in that database.
+
+One failure signature where `./.paradev/setup.sh --force` IS the fix (verified 2026-07-28): session restore hangs at "Restoring your session", the Local Admin sign-in button returns a bodyless 500, get-session returns 200, and a raw `select 1` against `DATABASE_URL` may still succeed; the worktree's seeded dev state (Neon branch credentials in `.env`, `auth-token.enc`, copied DBs) has gone stale as a set. Rerunning with `--force` recreates the Neon branch, rewrites `.env`, and reseeds `paradev-dev-data/` together, which restores sign-in. Two side effects to expect: any manual `.env` edits (e.g. a port remap) are wiped and must be re-applied, and `paradev-dev-data/` is reset.
 
 **Use `Runtime.evaluate` (`awaitPromise`, `returnByValue`), not `Network.*` interception**; sniffing misses React-Query-cached responses, and `refetchInterval` is paused while the window is backgrounded. After verifying the session through the applicable cookie or bearer path above, run requests inside the renderer. `API` below is the dev backend origin (`NEXT_PUBLIC_API_URL`, e.g. `http://localhost:5881`):
 

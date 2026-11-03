@@ -39,22 +39,24 @@ export interface PreviewReader {
 }
 
 export async function previewAccess(
-	page: Pick<SelectPage, "visibility" | "createdByUserId">,
+	page: Pick<SelectPage, "visibility" | "createdByUserId" | "takenDownAt">,
 	reader: PreviewReader | undefined,
 ): Promise<PagePreviewResult["status"]> {
-	if (page.visibility === "everyone") return "readable";
-	if (!reader) return "needs_user";
-	if (!(await reader.isMember())) return "missing";
-	if (page.visibility === "just_me" && page.createdByUserId !== reader.userId) {
-		return "missing";
+	if (page.takenDownAt) return "missing";
+	if (page.visibility === "everyone" || page.visibility === "org") {
+		return "readable";
 	}
+	if (!reader) return "needs_user";
+	if (page.createdByUserId !== reader.userId) return "missing";
+	if (!(await reader.isMember())) return "missing";
 	return "readable";
 }
 
 /**
- * What a link to a page may show outside the app, for a reader who is not
- * signed in to it (a Slack unfurl). `userId` is the reader when the caller
- * has resolved one; without it only public pages preview.
+ * What a link to a page may show in place of the page, to an audience the
+ * caller has already tied to `organizationId` (a Slack workspace connected to
+ * it, or a signed-in member). `userId` is the reader when the caller has
+ * resolved one; only a `just_me` page needs it.
  */
 export async function pagePreview({
 	slug,

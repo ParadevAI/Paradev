@@ -2,20 +2,35 @@ export type {
 	CreatePaneInput,
 	CreateTabInput,
 	CreateWorkspaceStoreOptions,
+	FocusRequest,
+	GetPaneKey,
+	OpenPaneArgs,
+	PaneOpenOptions,
+	PlacePane,
 	WorkspaceStore,
 } from "./core/store";
 export { createWorkspaceStore } from "./core/store";
 export type { FocusDirection } from "./core/store/utils";
 export {
 	findFirstPaneId,
+	findPanePath,
 	getActiveIdAfterRemoval,
 	getPaneParentDirection,
 	getSpatialNeighborPaneId,
 	removePaneFromLayout,
+	replacePaneIdInLayout,
 } from "./core/store/utils";
+export {
+	transferAllTabs,
+	transferPaneToNewTab,
+	transferPaneToSplit,
+	transferTabToIndex,
+	transferTabToSplit,
+} from "./core/transfer";
 export type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
+	PaneAppearance,
 	PaneContext,
 	PaneDefinition,
 	PaneRegistry,
@@ -25,7 +40,14 @@ export type {
 	WorkspaceInteractionState,
 	WorkspaceProps,
 } from "./react";
-export { resolveTabTitle, useTabTitle, Workspace } from "./react";
+export {
+	resolveTabTitle,
+	TabVisibilityContext,
+	useIsTabVisible,
+	usePaneFocus,
+	useTabTitle,
+	Workspace,
+} from "./react";
 export type {
 	LayoutNode,
 	Pane,

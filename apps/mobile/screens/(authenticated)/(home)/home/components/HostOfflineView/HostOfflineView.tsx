@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
+import { BRAND } from "@superset/shared/brand";
 import { useRouter } from "expo-router";
 import { CloudOff, Moon, Power, ToggleLeft } from "lucide-react-native";
 import { useState } from "react";
@@ -22,6 +23,7 @@ export function HostOfflineView({
 	lastSeenAt: number | null | undefined;
 }) {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const { hosts } = useOrgHosts();
 	const refreshPresence = useRefreshHostsPresence();
@@ -56,7 +58,7 @@ export function HostOfflineView({
 					{t({ message: `Last seen ${lastSeen}` })}
 				</Text>
 			</View>
-			<View className="border-border bg-card w-full rounded-2xl border px-4">
+			<View className="border-border bg-card w-full max-w-md rounded-2xl border px-4">
 				<HintRow
 					leading={<Icon as={Moon} className="text-muted-foreground size-4" />}
 				>
@@ -65,7 +67,7 @@ export function HostOfflineView({
 				<HintRow
 					leading={<Icon as={Power} className="text-muted-foreground size-4" />}
 				>
-					<Trans>Superset may be closed</Trans>
+					<Trans>{appName} may be closed</Trans>
 				</HintRow>
 				<HintRow
 					leading={

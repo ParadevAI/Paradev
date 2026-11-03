@@ -6,7 +6,11 @@ import {
 } from "@superset/shared/connectors";
 import { generateCodeChallenge } from "better-auth/oauth2";
 import { credentialFetch, readPath } from "../../router/plugins/manifest";
-import { forgetClient, resolveClientIdentity } from "./client-identity";
+import {
+	type ClientFor,
+	forgetClient,
+	resolveClientIdentity,
+} from "./client-identity";
 import { discoverServer, sameIssuer } from "./discovery";
 
 const TEMPLATE = /\$\{(env|params|config)\.([\w.-]+)\}/g;
@@ -109,6 +113,7 @@ export async function resolveEndpoints(
 	slug: string,
 	method: ConnectorMethod,
 	redirectUri: string,
+	client: ClientFor,
 ): Promise<ResolvedEndpoints> {
 	if (method.type !== "oauth2")
 		throw new Error(`Connector "${slug}" is not an oauth2 method.`);
@@ -124,6 +129,7 @@ export async function resolveEndpoints(
 			server,
 			method,
 			redirectUri,
+			client,
 		);
 		return {
 			authorizationEndpoint: server.metadata.authorization_endpoint,
@@ -174,7 +180,13 @@ export interface AuthorizeTarget {
 export async function authorizeUrl(
 	slug: string,
 	method: ConnectorMethod,
-	options: { redirectUri: string; state: string; codeVerifier?: string | null },
+	options: {
+		redirectUri: string;
+		state: string;
+		codeVerifier?: string | null;
+		/** Already resolved by the caller, so the URL names the client it recorded. */
+		endpoints?: ResolvedEndpoints;
+	},
 ): Promise<AuthorizeTarget> {
 	const env = connectorEnv(slug, method);
 
@@ -189,7 +201,10 @@ export async function authorizeUrl(
 
 	const endpoints =
 		method.type === "oauth2"
-			? await resolveEndpoints(slug, method, options.redirectUri)
+			? (options.endpoints ??
+				(await resolveEndpoints(slug, method, options.redirectUri, {
+					newGrant: true,
+				})))
 			: null;
 
 	const base =
@@ -243,6 +258,8 @@ export interface ConnectorTokens {
 	scopes: string[] | null;
 	stored: Record<string, unknown>;
 	raw: Record<string, unknown>;
+	/** The dynamic client the grant was issued to. */
+	clientId?: string;
 }
 
 export class IssuerMismatchError extends Error {}
@@ -280,6 +297,8 @@ export async function exchangeCode(
 		codeVerifier?: string | null;
 		params?: Record<string, string | undefined>;
 		issuer?: string | null;
+		/** The client the authorize request went out as; null when the flow did not record it. */
+		clientId: string | null;
 	},
 ): Promise<ConnectorTokens> {
 	if (method.type === "api_key")
@@ -287,7 +306,9 @@ export async function exchangeCode(
 
 	const endpoints =
 		method.type === "oauth2"
-			? await resolveEndpoints(slug, method, options.redirectUri)
+			? await resolveEndpoints(slug, method, options.redirectUri, {
+					issuedTo: options.clientId,
+				})
 			: null;
 	if (endpoints)
 		assertRespondingIssuer(slug, endpoints, options.issuer ?? null);
@@ -378,12 +399,190 @@ export async function exchangeCode(
 				: null,
 		stored,
 		raw: payload,
+		...(endpoints?.issuer ? { clientId } : {}),
 	};
 }
 
 export interface ConnectorIdentity {
 	account: { id: string; label: string | null };
 	user: { id: string; label: string | null } | null;
+}
+
+interface JsonRpcMessage {
+	id?: number | string;
+	method?: string;
+	result?: Record<string, unknown>;
+	error?: { message?: string };
+}
+
+const isJsonRpcResponse = (message: JsonRpcMessage): boolean =>
+	message.result !== undefined || message.error !== undefined;
+
+function readJsonRpc(text: string, id: number): JsonRpcMessage {
+	const messages: JsonRpcMessage[] = [];
+	const consider = (candidate: string) => {
+		if (!candidate) return;
+		try {
+			messages.push(JSON.parse(candidate) as JsonRpcMessage);
+		} catch {}
+	};
+
+	const trimmed = text.trim();
+	if (trimmed.startsWith("{")) {
+		consider(trimmed);
+	} else {
+		for (const event of text.split(/\r?\n\r?\n/)) {
+			consider(
+				event
+					.split(/\r?\n/)
+					.filter((line) => line.startsWith("data:"))
+					.map((line) => line.slice(5).replace(/^ /, ""))
+					.join("\n"),
+			);
+		}
+	}
+
+	const match =
+		messages.find(
+			(message) =>
+				isJsonRpcResponse(message) &&
+				message.id !== undefined &&
+				String(message.id) === String(id),
+		) ?? messages.filter(isJsonRpcResponse).at(-1);
+	if (!match)
+		throw new Error(`no JSON-RPC response in a ${text.length}-byte body`);
+	return match;
+}
+
+async function mcpIdentity(
+	slug: string,
+	probe: { mcp: string; tool: string; arguments: Record<string, unknown> },
+	accessToken: string,
+): Promise<Record<string, unknown>> {
+	let session: string | null = null;
+	let protocolVersion: string | null = null;
+	let requestId = 0;
+
+	const post = async (body: Record<string, unknown>) => {
+		const response = await credentialFetch(
+			probe.mcp,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json",
+					Accept: "application/json, text/event-stream",
+					...(session ? { "Mcp-Session-Id": session } : {}),
+					...(protocolVersion
+						? { "MCP-Protocol-Version": protocolVersion }
+						: {}),
+				},
+				body: JSON.stringify(body),
+			},
+			`Connector "${slug}" identity`,
+		);
+		session = response.headers.get("mcp-session-id") ?? session;
+		return response;
+	};
+
+	const request = async (
+		method: string,
+		params: Record<string, unknown>,
+	): Promise<Record<string, unknown>> => {
+		const id = ++requestId;
+		const response = await post({ jsonrpc: "2.0", id, method, params });
+		const text = await response.text();
+		if (!response.ok)
+			throw new Error(
+				`Connector "${slug}" identity probe failed at ${method}: ${response.status} ${text.slice(0, 200)}`,
+			);
+		const message = readJsonRpc(text, id);
+		if (message.error)
+			throw new Error(
+				`Connector "${slug}" identity probe failed at ${method}: ${message.error.message}`,
+			);
+		return message.result ?? {};
+	};
+
+	try {
+		const init = await request("initialize", {
+			protocolVersion: "2025-06-18",
+			capabilities: {},
+			clientInfo: { name: "superset-connectors", version: "1.0.0" },
+		});
+		if (typeof init.protocolVersion === "string")
+			protocolVersion = init.protocolVersion;
+		await post({ jsonrpc: "2.0", method: "notifications/initialized" });
+
+		const result = (await request("tools/call", {
+			name: probe.tool,
+			arguments: probe.arguments,
+		}).catch(async (error: unknown) => {
+			const listed = await request("tools/list", {}).then(
+				(tools) =>
+					(tools.tools as { name?: string; inputSchema?: unknown }[]).map(
+						(tool) =>
+							tool.name === probe.tool
+								? `${tool.name} ${JSON.stringify(tool.inputSchema)}`
+								: tool.name,
+					),
+				(listError: unknown) => [
+					`tools/list failed: ${listError instanceof Error ? listError.message : String(listError)}`,
+				],
+			);
+			throw new Error(
+				`${error instanceof Error ? error.message : String(error)}; server said ${JSON.stringify(init).slice(0, 1500)}; tools: ${listed.join(", ").slice(0, 1500)}`,
+			);
+		})) as {
+			structuredContent?: Record<string, unknown>;
+			content?: { type: string; text?: string }[];
+			isError?: boolean;
+		};
+
+		const firstText = result.content?.find(
+			(item) => typeof item.text === "string",
+		)?.text;
+		if (result.isError)
+			throw new Error(
+				`Connector "${slug}" identity tool errored: ${firstText?.slice(0, 200) ?? "no detail"}`,
+			);
+		if (result.structuredContent) return result.structuredContent;
+		if (!firstText)
+			throw new Error(`Connector "${slug}" identity tool returned no content.`);
+		try {
+			return JSON.parse(firstText) as Record<string, unknown>;
+		} catch {
+			throw new Error(
+				`Connector "${slug}" identity tool returned text that is not JSON: ${firstText.slice(0, 400)}`,
+			);
+		}
+	} finally {
+		if (session)
+			await credentialFetch(
+				probe.mcp,
+				{
+					method: "DELETE",
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+						"Mcp-Session-Id": session,
+						...(protocolVersion
+							? { "MCP-Protocol-Version": protocolVersion }
+							: {}),
+					},
+				},
+				`Connector "${slug}" identity`,
+			).catch(() => {});
+	}
+}
+
+/** A value's keys and types without its contents, so an error can show what came back and leak nothing. */
+function shapeOf(value: unknown): unknown {
+	if (Array.isArray(value)) return value.slice(0, 1).map(shapeOf);
+	if (value && typeof value === "object")
+		return Object.fromEntries(
+			Object.entries(value).map(([key, entry]) => [key, shapeOf(entry)]),
+		);
+	return typeof value;
 }
 
 export async function probeIdentity(
@@ -416,11 +615,20 @@ export async function probeIdentity(
 			},
 			`Connector "${slug}" identity`,
 		);
-		payload = (await response.json()) as Record<string, unknown>;
+		const text = await response.text();
 		if (!response.ok)
 			throw new Error(
-				`Connector "${slug}" identity probe failed: ${response.status}`,
+				`Connector "${slug}" identity probe failed: ${response.status} ${text.slice(0, 200)}`,
 			);
+		try {
+			payload = JSON.parse(text) as Record<string, unknown>;
+		} catch {
+			throw new Error(
+				`Connector "${slug}" identity probe returned a non-JSON body: ${text.slice(0, 200)}`,
+			);
+		}
+	} else if ("mcp" in probe) {
+		payload = await mcpIdentity(slug, probe, accessToken);
 	} else {
 		if (!tokenPayload)
 			throw new Error(
@@ -437,7 +645,7 @@ export async function probeIdentity(
 	const accountId = read(probe.account.id);
 	if (!accountId)
 		throw new Error(
-			`Connector "${slug}" identity probe returned nothing at ${probe.account.id}.`,
+			`Connector "${slug}" identity probe returned nothing at ${probe.account.id}. The result has the shape ${JSON.stringify(shapeOf(payload)).slice(0, 800)}`,
 		);
 
 	const userId = probe.user ? read(probe.user.id) : null;

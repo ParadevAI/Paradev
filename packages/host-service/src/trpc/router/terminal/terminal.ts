@@ -1,4 +1,5 @@
-import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/terminal-session-handoff";
+import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/session-handoff";
+import { terminalColorsSchema } from "@superset/shared/terminal-colors";
 import { normalizeTerminalTitle } from "@superset/shared/terminal-title-scanner";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -41,6 +42,7 @@ export const createSessionInputSchema = z.object({
 	cwd: z.string().optional(),
 	themeType: z.string().optional(),
 	themeId: z.string().min(1).max(MAX_THEME_ID_LENGTH).optional(),
+	colors: terminalColorsSchema.optional(),
 	cols: z.number().int().positive().optional(),
 	rows: z.number().int().positive().optional(),
 });
@@ -58,6 +60,7 @@ async function createTerminalSessionFromInput({
 		workspaceId: input.workspaceId,
 		themeType: parseThemeType(input.themeType),
 		themeId: input.themeId,
+		colors: input.colors,
 		db: ctx.db,
 		eventBus: ctx.eventBus,
 		initialCommand: input.initialCommand,

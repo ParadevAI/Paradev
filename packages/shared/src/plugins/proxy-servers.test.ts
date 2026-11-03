@@ -1,0 +1,106 @@
+import { describe, expect, test } from "bun:test";
+import { desiredPluginMcpServers, pluginProxyMcpServers } from "./index";
+
+function url(config: unknown): string {
+	return (config as { url: string }).url;
+}
+
+describe("pluginProxyMcpServers", () => {
+	test("is one entry under the plugin's plain name", () => {
+		const servers = pluginProxyMcpServers("linear", "superset");
+
+		expect(Object.keys(servers ?? {})).toEqual(["linear"]);
+		expect(url(servers?.linear)).toBe(
+			"https://api.superset.sh/mcp/plugins/superset/linear",
+		);
+	});
+
+	test("pins no account in the url", () => {
+		expect(
+			url(pluginProxyMcpServers("linear", "superset")?.linear),
+		).not.toContain("connection=");
+	});
+
+	test("carries the headers helper, so the entry needs no OAuth of its own", () => {
+		const servers = pluginProxyMcpServers("linear", "superset", {
+			headersHelper: "/bin/superset auth mcp-headers",
+		});
+
+		expect((servers?.linear as { headersHelper?: string }).headersHelper).toBe(
+			"/bin/superset auth mcp-headers",
+		);
+	});
+
+	test("a plugin that names no connector exposes no proxy entry", () => {
+		expect(
+			pluginProxyMcpServers("chrome-devtools", "superset"),
+		).toBeUndefined();
+	});
+});
+
+describe("desiredPluginMcpServers", () => {
+	test("is one entry per installed plugin", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "linear" },
+			{ name: "gmail" },
+		]);
+
+		expect(Object.keys(desired).sort()).toEqual(["gmail", "linear"]);
+	});
+
+	test("a disabled install contributes nothing, which is what reaps it", () => {
+		expect(
+			desiredPluginMcpServers([{ name: "linear", enabled: false }]),
+		).toEqual({});
+	});
+
+	test("an absent marketplace is the first-party one", () => {
+		const desired = desiredPluginMcpServers([{ name: "linear" }]);
+		expect(Object.keys(desired)).toEqual(["linear"]);
+		expect((desired.linear as { url: string }).url).toContain(
+			"/mcp/plugins/superset/linear",
+		);
+	});
+
+	test("an organization's plugin is served through the proxy under its own marketplace", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "team-tools", marketplace: "organization-org-1" },
+		]);
+		expect((desired["team-tools"] as { url: string }).url).toBe(
+			"https://api.superset.sh/mcp/plugins/organization-org-1/team-tools",
+		);
+	});
+
+	test("two organizations' same-named plugins get an entry each", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "deploy", marketplace: "organization-aaaaaaaa-1111" },
+			{ name: "deploy", marketplace: "organization-bbbbbbbb-2222" },
+		]);
+		expect(Object.keys(desired).sort()).toEqual([
+			"deploy-aaaaaaaa",
+			"deploy-bbbbbbbb",
+		]);
+		expect((desired["deploy-bbbbbbbb"] as { url: string }).url).toBe(
+			"https://api.superset.sh/mcp/plugins/organization-bbbbbbbb-2222/deploy",
+		);
+	});
+
+	test("an organization plugin with only skills gets no MCP entry", () => {
+		expect(
+			desiredPluginMcpServers([
+				{
+					name: "team-skills",
+					marketplace: "organization-org-1",
+					tools: false,
+				},
+			]),
+		).toEqual({});
+	});
+
+	test("another marketplace's same-named plugin is not served Paradev's", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "linear", marketplace: "acme" },
+		]);
+		expect(desired).toEqual({});
+	});
+});

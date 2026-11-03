@@ -3,13 +3,14 @@ import { randomBytes } from "node:crypto";
 import { closeSync, existsSync } from "node:fs";
 import { createServer } from "node:net";
 import { dirname, join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { HOST_INSTALL_SOURCE_ENV } from "@superset/shared/host-version";
 import {
 	MAX_HOST_LOG_BYTES,
 	openRotatingLogFd,
 } from "@superset/shared/rotating-log";
 import type { ApiClient } from "../api-client";
-import { SUPERSET_HOME_DIR } from "../config";
 import { env, isDesktopBundled } from "../env";
 import {
 	ensureManifestDir,
@@ -30,6 +31,7 @@ export interface SpawnHostOptions {
 	api: ApiClient;
 	port?: number;
 	daemon: boolean;
+	autoUpdate?: boolean;
 }
 
 export interface HostExit {
@@ -110,12 +112,13 @@ function resolveMigrationsFolder(): string {
 
 export async function spawnHostService(
 	options: SpawnHostOptions,
+	spawnProcess: typeof spawn = spawn,
 ): Promise<SpawnHostResult> {
 	const hostBin = resolveHostBinary();
 	if (!existsSync(hostBin)) {
 		if (isDesktopBundled()) {
 			throw new Error(
-				"`superset start` is not available in the CLI bundled with the Superset desktop app; the app runs the host service itself. For headless use, install the standalone CLI: curl -fsSL https://superset.sh/cli/install.sh | sh",
+				`\`superset start\` is not available in the CLI bundled with the Paradev desktop app; the app runs the host service itself. For headless use, install the standalone CLI: curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh`,
 			);
 		}
 		throw new Error(
@@ -138,7 +141,7 @@ export async function spawnHostService(
 				MAX_HOST_LOG_BYTES,
 			)
 		: -1;
-	const child = spawn(hostBin, [], {
+	const child = spawnProcess(hostBin, [], {
 		stdio: options.daemon
 			? logFd === -1
 				? "ignore"
@@ -162,11 +165,12 @@ export async function spawnHostService(
 			// A standalone install can replace itself in place (system.update);
 			// the host-service reports this so clients offer the right action.
 			[HOST_INSTALL_SOURCE_ENV]: "cli",
+			SUPERSET_HOST_AUTO_UPDATE: String(options.autoUpdate ?? false),
 			// The desktop injects this into hosts it spawns
 			// (host-service-coordinator.ts); without it the host's PTYs get no
 			// SUPERSET_HOME_DIR and every managed agent hook self-disables on
 			// its own guard (#6254).
-			SUPERSET_HOME_DIR,
+			SUPERSET_HOME_DIR: resolveAppHomeDir(),
 		},
 	});
 
@@ -199,7 +203,12 @@ export async function spawnHostService(
 		startedAt: Date.now(),
 		organizationId: options.organizationId,
 	};
-	writeManifest(manifest);
+	try {
+		writeManifest(manifest);
+	} catch (error) {
+		child.kill("SIGTERM");
+		throw error;
+	}
 
 	if (options.daemon) {
 		child.unref();

@@ -147,6 +147,16 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		nonInteractiveCommand: "pi --no-tools -p",
 	}),
 	createBuiltinTerminalAgent({
+		id: "pdev",
+		label: "pdev",
+		description:
+			"Coding agent built on Pi that routes each task to a model through its router.",
+		command: "pdev",
+		resumeCommand: "pdev --session",
+		forkCommand: "pdev --fork {sessionId}",
+		nonInteractiveCommand: "pdev -p",
+	}),
+	createBuiltinTerminalAgent({
 		id: "copilot",
 		label: "Copilot",
 		description:
@@ -278,6 +288,14 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		// Print mode cannot show the workspace trust prompt and fails in an
 		// untrusted directory without this.
 		nonInteractiveCommand: "devin --respect-workspace-trust false -p",
+	}),
+	createBuiltinTerminalAgent({
+		id: "ufo",
+		label: "UFO",
+		description:
+			"UFO's workspace assistant for local and remote terminal workflows.",
+		command: "ufo",
+		resumeCommand: "ufo --resume",
 	}),
 ] as const;
 

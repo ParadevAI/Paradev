@@ -79,6 +79,15 @@ describe("buildStreamUrl", () => {
 				since: null,
 			}),
 		).toBe("ws://host/chat-v3/sessions/s/stream");
+		expect(
+			buildStreamUrl({
+				baseUrl: "ws://host/chat-v3",
+				sessionId: "s",
+				deltas: ["text"],
+				since: null,
+				nestedSubagents: true,
+			}),
+		).toBe("ws://host/chat-v3/sessions/s/stream?deltas=text&nestedSubagents=1");
 	});
 });
 

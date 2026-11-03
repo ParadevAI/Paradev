@@ -1,4 +1,5 @@
 import { msg } from "@lingui/core/macro";
+import { formatNumber } from "./format";
 import { i18n } from "./index";
 
 // Catalog entries for user-facing server errors. Each entry pairs a stable
@@ -23,6 +24,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Anthropic rejected this token.",
+			}),
+		),
+	"serverError.agentCredential.chatgptSignInFailed": () =>
+		i18n._(
+			msg({
+				message: "OpenAI did not complete the sign-in. Start again.",
 			}),
 		),
 	"serverError.agentCredential.empty": () =>
@@ -85,6 +92,15 @@ export const serverErrorMessages: Record<
 				message: `${params?.agent} cannot be signed in this way yet.`,
 			}),
 		),
+	"serverError.agent.notFound": () =>
+		i18n._(msg({ message: "Agent not found" })),
+	"serverError.agent.adminRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
+			}),
+		),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({
@@ -121,6 +137,13 @@ export const serverErrorMessages: Record<
 				message: `This automation belongs to ${params?.organizationName}. Switch to that organization to open it.`,
 			}),
 		),
+	"serverError.automation.onlyTheOwnerOrAnOrganizationOwner": () =>
+		i18n._(
+			msg({
+				message:
+					"Only the owner or an organization owner can delete this automation",
+			}),
+		),
 	"serverError.automation.automationsRequireThePro": () =>
 		i18n._(
 			msg({
@@ -131,6 +154,39 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Automation not found",
+			}),
+		),
+	"serverError.automation.cloudAgentUnsupported": () =>
+		i18n._(
+			msg({
+				message: "This agent can't run in a cloud workspace",
+			}),
+		),
+	"serverError.automation.rruleBesideTriggers": () =>
+		i18n._(
+			msg({
+				message:
+					"Pass the schedule inside triggers as a schedule trigger, not as rrule beside them",
+			}),
+		),
+	"serverError.automation.cloudNeedsEnvironment": () =>
+		i18n._(
+			msg({
+				message: "A cloud automation needs an environment or a cloud workspace",
+			}),
+		),
+	"serverError.automation.cloudPromptTooLong": (params) => {
+		const max = formatNumber(Number(params?.max));
+		return i18n._(
+			msg({
+				message: `A cloud automation's instructions can be at most ${max} characters`,
+			}),
+		);
+	},
+	"serverError.automation.cloudWorkspaceNotYours": () =>
+		i18n._(
+			msg({
+				message: "An automation can only use a cloud workspace you created",
 			}),
 		),
 	"serverError.automation.continueNeedsPinnedWorkspace": () =>
@@ -217,13 +273,130 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.channel.notFound": () =>
+		i18n._(
+			msg({
+				message: "Channel not found",
+			}),
+		),
+	"serverError.channel.nameTaken": () =>
+		i18n._(
+			msg({
+				message: "A channel with this name already exists",
+			}),
+		),
+	"serverError.channel.invalidName": () =>
+		i18n._(
+			msg({
+				message: "Use lowercase letters, numbers, dashes and underscores",
+			}),
+		),
+	"serverError.channel.joinFirst": () =>
+		i18n._(
+			msg({
+				message: "Join the channel first",
+			}),
+		),
+	"serverError.channel.adminRequired": () =>
+		i18n._(
+			msg({
+				message: "Only channel admins can do that",
+			}),
+		),
+	"serverError.channel.archived": () =>
+		i18n._(
+			msg({
+				message: "This channel is archived",
+			}),
+		),
+	"serverError.channel.lastAdmin": () =>
+		i18n._(
+			msg({
+				message: "A channel needs at least one admin",
+			}),
+		),
+	"serverError.channel.cannotJoinPrivate": () =>
+		i18n._(
+			msg({
+				message: "Ask a member to add you to this channel",
+			}),
+		),
+	"serverError.channel.projectNotFound": () =>
+		i18n._(
+			msg({
+				message: "Project not found",
+			}),
+		),
+	"serverError.channel.notInOrganization": () =>
+		i18n._(
+			msg({
+				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
+			}),
+		),
+	"serverError.channelMessage.notFound": () =>
+		i18n._(
+			msg({
+				message: "Message not found",
+			}),
+		),
+	"serverError.channelMessage.notAuthor": () =>
+		i18n._(
+			msg({
+				message: "You can only edit your own messages",
+			}),
+		),
+	"serverError.channelMessage.cannotDelete": () =>
+		i18n._(
+			msg({
+				message: "You can only delete your own messages",
+			}),
+		),
+	"serverError.channelMessage.empty": () =>
+		i18n._(
+			msg({
+				message: "Write a message first",
+			}),
+		),
+	"serverError.channelMessage.tooLong": () =>
+		i18n._(
+			msg({
+				message: "This message is too long",
+			}),
+		),
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
 			message:
-				"Cloud sandboxes are not enabled for {account}. Ask the Superset team for access.",
+				"Cloud workspaces are not enabled for {account}. They come with the Team and Ultra plans: upgrade in Settings, Billing.",
 			values: params,
 		}),
+	"serverError.cloudWorkspace.cloudNeedsPaidPlan": () =>
+		i18n._(
+			msg({
+				message:
+					"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
+			}),
+		),
+	"serverError.cloudWorkspace.usageLimitReached": () =>
+		i18n._(
+			msg({
+				message:
+					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
+			}),
+		),
+	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>
+		i18n._(
+			msg({
+				message:
+					"This machine size is not available for your organization. Pick another size",
+			}),
+		),
 	"serverError.cloudWorkspace.environmentHasNoRepositories": () =>
 		i18n._(
 			msg({
@@ -238,17 +411,37 @@ export const serverErrorMessages: Record<
 					"A repository is not connected to this organization, or the repositories come from different GitHub installations",
 			}),
 		),
-	"serverError.environment.hooksRepositoryNotIncluded": () =>
+	"serverError.environment.primaryRepositoryNotIncluded": () =>
 		i18n._(
 			msg({
 				message:
-					"The config repository must be one of the environment's repositories",
+					"The primary repository must be one of the environment's repositories",
+			}),
+		),
+	"serverError.environment.limitReached": (params) =>
+		i18n._(
+			msg({
+				message: `Your organization has reached its environment limit (${params?.limit}). Archive an environment, or upgrade in Settings, Billing to add more.`,
+			}),
+		),
+	"serverError.environment.notIncluded": () =>
+		i18n._(
+			msg({
+				message:
+					"Your plan does not include cloud environments. Upgrade in Settings, Billing to create one.",
 			}),
 		),
 	"serverError.githubUser.notConfigured": () =>
 		i18n._(
 			msg({
 				message: "Connecting GitHub is not configured on this server",
+			}),
+		),
+	"serverError.githubUser.notConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Connect GitHub in Settings to act on pull requests as yourself",
 			}),
 		),
 	"serverError.cloudWorkspace.githubRepositoryOutOfReach": () =>
@@ -269,6 +462,24 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Could not record environment",
+			}),
+		),
+	"serverError.task.notFound": () =>
+		i18n._(
+			msg({
+				message: "Task not found",
+			}),
+		),
+	"serverError.task.invalidLabel": () =>
+		i18n._(
+			msg({
+				message: "Invalid label",
+			}),
+		),
+	"serverError.task.commentNotYours": () =>
+		i18n._(
+			msg({
+				message: "Only the author can change a comment",
 			}),
 		),
 	"serverError.cloudWorkspace.couldNotRecordCloudWorkspace": () =>
@@ -369,10 +580,40 @@ export const serverErrorMessages: Record<
 				message: "GitHub installation not found",
 			}),
 		),
+	"serverError.integration.githubSyncRequiresThePro": () =>
+		i18n._(
+			msg({
+				message: "GitHub sync requires the Pro plan.",
+			}),
+		),
+	"serverError.integration.linearIssueNotFound": () =>
+		i18n._(
+			msg({
+				message: "That Linear issue doesn't exist or you can't see it.",
+			}),
+		),
+	"serverError.integration.linearNotConnected": () =>
+		i18n._(
+			msg({
+				message: "Connect your Linear account to use Linear here.",
+			}),
+		),
+	"serverError.integration.linearRateLimited": () =>
+		i18n._(
+			msg({
+				message: "Linear is limiting requests. Try again in a few minutes.",
+			}),
+		),
 	"serverError.integration.notAMemberOfThisOrganization": () =>
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.integration.pullRequestNotFound": () =>
+		i18n._(
+			msg({
+				message: "Pull request not found",
 			}),
 		),
 	"serverError.integration.onlyOwnersCanDeleteProjects": () =>
@@ -496,6 +737,12 @@ export const serverErrorMessages: Record<
 				message: "Members cannot modify roles",
 			}),
 		),
+	"serverError.organization.connectLinearToTrackTasks": () =>
+		i18n._(
+			msg({
+				message: "Connect your Linear account before tracking tasks in Linear.",
+			}),
+		),
 	"serverError.organization.onlyOwnersCanUpdateOrganizationSettings": () =>
 		i18n._(
 			msg({
@@ -524,6 +771,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "You don't have permission to remove this member",
+			}),
+		),
+	"serverError.page.cannotComment": () =>
+		i18n._(
+			msg({
+				message: "You can view this page but not comment on it",
 			}),
 		),
 	"serverError.page.failedToCreatePage": () =>
@@ -568,6 +821,36 @@ export const serverErrorMessages: Record<
 				message: "Provide either id or slug",
 			}),
 		),
+	"serverError.page.reportNotFound": () =>
+		i18n._(
+			msg({
+				message: "Report not found",
+			}),
+		),
+	"serverError.page.reportRateLimitingIsNot": () =>
+		i18n._(
+			msg({
+				message: "Page report rate limiting is not configured",
+			}),
+		),
+	"serverError.page.reportingIsBrieflyUnavailable": () =>
+		i18n._(
+			msg({
+				message: "Reporting is briefly unavailable. Try again shortly.",
+			}),
+		),
+	"serverError.page.thisPageWasTakenDown": () =>
+		i18n._(
+			msg({
+				message: "This page was taken down and can no longer be changed",
+			}),
+		),
+	"serverError.page.tooManyReportsTryAgainLater": () =>
+		i18n._(
+			msg({
+				message: "Too many reports. Try again later.",
+			}),
+		),
 	"serverError.page.thisPageIsBeingPublishedFrom": () =>
 		i18n._(
 			msg({
@@ -594,6 +877,42 @@ export const serverErrorMessages: Record<
 				message: "Workspace not found",
 			}),
 		),
+	"serverError.routine.roomNotAllowed": () =>
+		i18n._(
+			msg({
+				message: "The Dev can't post there.",
+			}),
+		),
+	"serverError.routine.notFound": () =>
+		i18n._(
+			msg({
+				message: "Routine not found",
+			}),
+		),
+	"serverError.routine.nothingToDo": () =>
+		i18n._(
+			msg({
+				message: "A routine needs a schedule or something to watch.",
+			}),
+		),
+	"serverError.routine.invalidSchedule": () =>
+		i18n._(
+			msg({
+				message: "This schedule isn't valid.",
+			}),
+		),
+	"serverError.routine.tooFrequent": () =>
+		i18n._(
+			msg({
+				message: "A routine can run at most once an hour.",
+			}),
+		),
+	"serverError.routine.inThePast": () =>
+		i18n._(
+			msg({
+				message: "This schedule has no runs left.",
+			}),
+		),
 	"serverError.pageComment.commentNotFound": () =>
 		i18n._(
 			msg({
@@ -610,6 +929,24 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Failed to post reply",
+			}),
+		),
+	"serverError.pageComment.imageExpired": () =>
+		i18n._(
+			msg({
+				message: "The image upload expired — attach it again",
+			}),
+		),
+	"serverError.pageComment.imageNotFound": () =>
+		i18n._(
+			msg({
+				message: "Image not found — upload it first",
+			}),
+		),
+	"serverError.pageComment.onlyImages": () =>
+		i18n._(
+			msg({
+				message: "Only images can be attached to a comment",
 			}),
 		),
 	"serverError.pageComment.onlyTheAuthorCanEdit": () =>
@@ -723,12 +1060,60 @@ export const serverErrorMessages: Record<
 			message: "Plugin {plugin} is not installed",
 			values: params,
 		}),
+	"serverError.plugins.managedByOrganization": (params) =>
+		i18n._({
+			id: "serverError.plugins.managedByOrganization",
+			message:
+				"Your organization installs {plugin} for you, so it cannot be uninstalled. You can disable it.",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourceNeedsGithub": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceNeedsGithub",
+			message:
+				"Connect your GitHub account to add a repository; syncs read it with your account",
+		}),
+	"serverError.plugins.pluginSourceOutOfReach": (params) =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceOutOfReach",
+			message: "Your GitHub account cannot read {repo}",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourcePathOutside": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourcePathOutside",
+			message: "The path must stay inside the repository",
+		}),
+	"serverError.plugins.unknownPluginSource": () =>
+		i18n._({
+			id: "serverError.plugins.unknownPluginSource",
+			message: "That plugin source does not exist",
+		}),
 	"serverError.plugins.unknownPlugin": (params) =>
 		i18n._({
 			id: "serverError.plugins.unknownPlugin",
 			message: "Unknown plugin {plugin}",
 			values: params,
 		}),
+	"serverError.sharing.invitationNotPending": () =>
+		i18n._(
+			msg({
+				message: "That invitation is no longer pending",
+			}),
+		),
+	"serverError.sharing.notInOrganization": () =>
+		i18n._(
+			msg({
+				message:
+					"You can only share with people and teams in this organization",
+			}),
+		),
+	"serverError.sharing.onlyOwner": () =>
+		i18n._(
+			msg({
+				message: "Only the owner can change who this is shared with",
+			}),
+		),
 	"serverError.support.failedToSavePrompt": () =>
 		i18n._(
 			msg({
@@ -783,10 +1168,17 @@ export const serverErrorMessages: Record<
 				message: "Too many support reports. Try again later.",
 			}),
 		),
-	"serverError.task.failedToGenerateAUniqueTask": () =>
+	"serverError.team.taskKeyInvalid": () =>
 		i18n._(
 			msg({
-				message: "Failed to generate a unique task slug",
+				message:
+					"A task key is 1 to 5 letters or numbers and starts with a letter.",
+			}),
+		),
+	"serverError.team.taskKeyTaken": (params) =>
+		i18n._(
+			msg({
+				message: `${params?.key} is already used for tasks in this organization.`,
 			}),
 		),
 	"serverError.team.teamNotFoundInThisOrganization": () =>
@@ -810,7 +1202,7 @@ export const serverErrorMessages: Record<
 	"serverError.user.theRecoveryPeriodHasEndedContact": () =>
 		i18n._(
 			msg({
-				message: "The recovery period has ended. Contact support@superset.sh.",
+				message: "The recovery period has ended. Contact support@paradev.com.",
 			}),
 		),
 	"serverError.user.userNotFound": () =>
@@ -844,10 +1236,10 @@ export const serverErrorMessages: Record<
 				message: "Only host owners can change membership",
 			}),
 		),
-	"serverError.host.onlyHostOwnersCanDelete": () =>
+	"serverError.host.onlyHostOwnersOrOrganizationOwnersCanDelete": () =>
 		i18n._(
 			msg({
-				message: "Only host owners can delete this host",
+				message: "Only host owners or organization owners can delete this host",
 			}),
 		),
 	"serverError.host.thisUserRunsTheHostService": () =>
@@ -892,6 +1284,18 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.workspaces.restoreBranchMissing": (params) =>
+		i18n._(
+			msg({
+				message: `Branch "${params?.branch}" is not on this device or on ${params?.remote}. Only pushed commits can be restored.`,
+			}),
+		),
+	"serverError.workspaces.restoreFetchFailed": (params) =>
+		i18n._(
+			msg({
+				message: `Could not reach ${params?.remote} to look for branch "${params?.branch}". Check your connection and access to ${params?.remote}, then try again.`,
 			}),
 		),
 };

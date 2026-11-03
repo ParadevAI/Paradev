@@ -34,6 +34,13 @@ export function parseHostRoutingKey(
 export const SUPERSET_USER_ID_HEADER = "x-superset-user-id";
 
 /**
+ * Set by a host's tunnel on every request it forwards from the relay. The
+ * tunnel also adds the pre-shared secret, so this header is the only way the
+ * host can tell a teammate on the relay from a local caller.
+ */
+export const SUPERSET_RELAYED_HEADER = "x-superset-relayed";
+
+/**
  * Headers a relay forwards to a host over its tunnel. The relay is the only
  * party that verified the caller's JWT, so it is the one that names the user:
  * the user-id header is always set from the verified subject, and any value
@@ -54,3 +61,6 @@ export function buildUpstreamHeaders(
 	headers[SUPERSET_USER_ID_HEADER] = userId;
 	return headers;
 }
+
+/** The host id for the cloud. A cloud workspace has no `v2_hosts` row. */
+export const CLOUD_HOST_ID = "cloud";

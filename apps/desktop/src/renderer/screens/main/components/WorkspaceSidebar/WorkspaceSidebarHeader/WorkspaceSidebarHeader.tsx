@@ -50,10 +50,10 @@ export function WorkspaceSidebarHeader({
 	const {
 		tab: lastTab,
 		assignee: lastAssignee,
+		label: lastLabel,
 		search: lastSearch,
 		typeTab: lastTypeTab,
 		projectFilters: lastProjectFilters,
-		linearProjectFilter: lastLinearProjectFilter,
 		includeClosedIssues: lastIncludeClosedIssues,
 	} = useTasksFilterStore();
 	const {
@@ -72,10 +72,10 @@ export function WorkspaceSidebarHeader({
 				search: tasksSearchFromFilters({
 					tab: lastTab,
 					assignee: lastAssignee,
+					label: lastLabel,
 					search: lastSearch,
 					typeTab: lastTypeTab,
 					projectFilters: lastProjectFilters,
-					linearProjectFilter: lastLinearProjectFilter,
 					includeClosedIssues: lastIncludeClosedIssues,
 				}),
 			});

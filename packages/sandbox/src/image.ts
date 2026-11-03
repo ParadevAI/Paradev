@@ -49,7 +49,6 @@ const GO_VERSION = "1.27.1";
 /** Pinned by `bun run assets go`; verified before the tarball is unpacked. */
 const GO_SHA256 =
 	"63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445";
-const AGENT_CLI_VERSIONS = { claudeCode: "2.1.257", codex: "0.152.0" } as const;
 
 function aptList(name: string): string {
 	return readFileSync(
@@ -91,8 +90,6 @@ RUN curl -fsSL -o /tmp/go.tgz https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.
  && echo "${GO_SHA256}  /tmp/go.tgz" | sha256sum -c - \\
  && tar -C /usr/local -xzf /tmp/go.tgz && rm /tmp/go.tgz
 RUN npm install -g bun@${BUN_VERSION} --no-audit --no-fund && bun --version
-# The agents the sandbox can run; a sandbox has none of the user's local ones.
-RUN npm install -g @anthropic-ai/claude-code@${AGENT_CLI_VERSIONS.claudeCode} @openai/codex@${AGENT_CLI_VERSIONS.codex} --no-audit --no-fund && claude --version && codex --version
 # The sandbox user: the reference and the platform's own images run as one
 # with passwordless sudo; root is the boot runner only.
 # The base image ships a \`node\` user on uid 1000; ours takes that uid.
@@ -124,14 +121,13 @@ function assembleContext(bundle: BuiltBundle): string {
 	return context;
 }
 
-export const IMAGE_REF = `${SANDBOX_IMAGE_NAME}:${IMAGE_TAG}`;
-
 /** Builds the image from a built bundle; pushes unless `local`. Returns the image reference. */
 export async function buildImage(
 	bundle: BuiltBundle,
-	options: { local: boolean },
+	options: { local: boolean; tag?: string },
 ): Promise<string> {
 	const local = options.local;
+	const imageRef = `${SANDBOX_IMAGE_NAME}:${options.tag ?? IMAGE_TAG}`;
 	const context = assembleContext(bundle);
 	try {
 		const command = local
@@ -153,11 +149,11 @@ export async function buildImage(
 					"--platform",
 					"linux/amd64",
 					"--output",
-					`type=image,name=${await loginToRegistry()}/${IMAGE_REF},push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true`,
+					`type=image,name=${await loginToRegistry()}/${imageRef},push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true`,
 					context,
 				];
 		console.log(
-			`building bundle ${bundle.sha256.slice(0, 12)} into ${local ? LOCAL_IMAGE : IMAGE_REF}`,
+			`building bundle ${bundle.sha256.slice(0, 12)} into ${local ? LOCAL_IMAGE : imageRef}`,
 		);
 		const build = Bun.spawnSync(command, {
 			stdout: "inherit",
@@ -165,11 +161,30 @@ export async function buildImage(
 		});
 		if (build.exitCode !== 0)
 			throw new Error(`image build exited ${build.exitCode}`);
-		console.log(`built: ${local ? LOCAL_IMAGE : IMAGE_REF}`);
-		return local ? LOCAL_IMAGE : IMAGE_REF;
+		console.log(`built: ${local ? LOCAL_IMAGE : imageRef}`);
+		return local ? LOCAL_IMAGE : imageRef;
 	} finally {
 		rmSync(context, { recursive: true, force: true });
 	}
+}
+
+/** Points `to` at the manifest `from` names, in the registry; nothing is rebuilt or re-pushed. */
+export async function retagImage(from: string, to: string): Promise<void> {
+	const repository = `${await loginToRegistry()}/${SANDBOX_IMAGE_NAME}`;
+	const retag = Bun.spawnSync(
+		[
+			"docker",
+			"buildx",
+			"imagetools",
+			"create",
+			"--tag",
+			`${repository}:${to}`,
+			`${repository}:${from}`,
+		],
+		{ stdout: "inherit", stderr: "inherit" },
+	);
+	if (retag.exitCode !== 0)
+		throw new Error(`retag ${from} -> ${to} exited ${retag.exitCode}`);
 }
 
 if (import.meta.main) {

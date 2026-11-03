@@ -1,7 +1,9 @@
 import { CLIError } from "@superset/cli-framework";
+import type { MachineSize } from "@superset/shared/billing";
 import { TRPCClientError } from "@trpc/client";
 import type { ApiClient } from "../../../lib/api-client";
 import { resolveCloudEnvironment } from "../../../lib/cloud-workspaces";
+import { workspaceLinks } from "../../../lib/open-url";
 
 /** What `ws create` parsed; the host-only flags are here only to be refused. */
 export interface CloudCreateOptions {
@@ -13,6 +15,7 @@ export interface CloudCreateOptions {
 	model?: string;
 	effort?: string;
 	environment?: string;
+	machineSize?: MachineSize;
 	project?: string;
 	session?: boolean;
 	pr?: number;
@@ -43,7 +46,6 @@ export async function createCloudWorkspace(args: {
 		["--session", options.session || undefined],
 		["--pr", options.pr],
 		["--task", options.task],
-		["--base-branch", options.baseBranch],
 		["--skip-branch-prefix", options.skipBranchPrefix || undefined],
 		["--tag", options.tag?.length ? options.tag : undefined],
 		[
@@ -58,6 +60,13 @@ export async function createCloudWorkspace(args: {
 				"Your account creates workspaces in the cloud by default. Pass --local to create on this machine, or --host <id> for another host",
 			);
 		}
+	}
+
+	if (options.branch !== undefined) {
+		throw new CLIError(
+			"--branch does not apply to a cloud workspace",
+			"A cloud workspace always works on a new branch of its own. Pass --base-branch <name> to pick the branch it starts from",
+		);
 	}
 
 	// Same pairing rules as the host path.
@@ -93,17 +102,19 @@ export async function createCloudWorkspace(args: {
 			organizationId,
 			environmentId: environment.id,
 			...(options.name ? { name: options.name } : {}),
-			...(options.branch ? { branch: options.branch } : {}),
+			...(options.baseBranch ? { branch: options.baseBranch } : {}),
 			...(options.agent ? { agent: options.agent } : {}),
 			...(options.prompt ? { prompt: options.prompt } : {}),
 			...(options.model ? { model: options.model } : {}),
 			...(options.effort ? { effort: options.effort } : {}),
+			...(options.machineSize ? { machineSize: options.machineSize } : {}),
 		})
 		.catch(rethrowWithLocationHint);
 
+	const links = workspaceLinks(row.id);
 	return {
-		data: row,
-		message: `Provisioning cloud workspace ${row.id} on branch ${row.branch} (environment: ${environment.name})`,
+		data: { ...row, ...links },
+		message: `Provisioning cloud workspace ${row.id} on branch ${row.branch} (environment: ${environment.name})\n${links.webUrl}`,
 	};
 }
 

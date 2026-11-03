@@ -1,12 +1,78 @@
 export * from "./manifests.generated";
 
+import type { OrganizationRole } from "../auth/roles/roles";
 import { firstPartyManifest } from "./manifests.generated";
 
 export const DEFAULT_MARKETPLACE = "superset";
-export const DEFAULT_MARKETPLACE_REPO = "superset-sh/superset";
+export const DEFAULT_MARKETPLACE_REPO = "paradevai/paradev";
 export const DEFAULT_MARKETPLACE_REF = "main";
 
-export const SUPERSET_HOSTED_PLUGINS = ["gmail", "slack"] as const;
+const ORGANIZATION_MARKETPLACE_PREFIX = "organization-";
+
+/** Every organization has its own marketplace name, so two organizations' same-named plugins never share an install key. */
+export function organizationMarketplace(organizationId: string): string {
+	return `${ORGANIZATION_MARKETPLACE_PREFIX}${organizationId}`;
+}
+
+export function organizationIdOfMarketplace(
+	marketplace: string,
+): string | null {
+	return isOrganizationMarketplace(marketplace)
+		? marketplace.slice(ORGANIZATION_MARKETPLACE_PREFIX.length) || null
+		: null;
+}
+
+/** Whether a plugin manifest names a connector or its own MCP server. */
+export function manifestHasTools(manifest: unknown): boolean {
+	const superset = (
+		manifest as {
+			extensions?: {
+				superset?: { connector?: { slug?: unknown }; mcp?: { url?: unknown } };
+			};
+		}
+	)?.extensions?.superset;
+	return (
+		typeof superset?.connector?.slug === "string" ||
+		typeof superset?.mcp?.url === "string"
+	);
+}
+
+export function isOrganizationMarketplace(marketplace: string): boolean {
+	return marketplace.startsWith(ORGANIZATION_MARKETPLACE_PREFIX);
+}
+
+export const ORGANIZATION_PLUGIN_ACCESS = [
+	"unavailable",
+	"available",
+	"installed",
+] as const;
+
+export type OrganizationPluginAccess =
+	(typeof ORGANIZATION_PLUGIN_ACCESS)[number];
+
+export type OrganizationPluginPolicy = Partial<
+	Record<OrganizationRole, OrganizationPluginAccess>
+>;
+
+/** A plugin a repository sync adds stays with the admins until one of them opens it to members. */
+export const DEFAULT_ORGANIZATION_PLUGIN_POLICY: OrganizationPluginPolicy = {
+	owner: "available",
+	admin: "available",
+};
+
+export function organizationPluginAccess(
+	policy: OrganizationPluginPolicy,
+	role: string,
+): OrganizationPluginAccess {
+	return policy[role as OrganizationRole] ?? "unavailable";
+}
+
+export const SUPERSET_HOSTED_PLUGINS = [
+	"gmail",
+	"google-calendar",
+	"slack",
+	"ynab",
+] as const;
 export type SupersetHostedPlugin = (typeof SUPERSET_HOSTED_PLUGINS)[number];
 
 export function isSupersetHosted(name: string): boolean {
@@ -37,6 +103,12 @@ export type PluginMcpServerConfig =
 			type: "http" | "sse";
 			url: string;
 			headers?: Record<string, string>;
+			/**
+			 * A command printing a JSON object of headers on stdout, run per
+			 * connection without persisting credentials. Claude and pdev call it
+			 * `headersHelper`; Codex calls it `http_headers_helper`.
+			 */
+			headersHelper?: string;
 	  }
 	| {
 			command: string;
@@ -131,6 +203,20 @@ function packageFromArgs(args: readonly string[] | undefined): string | null {
 	return null;
 }
 
+function isPluginProxyUrl(value: string): boolean {
+	return value.startsWith(`${SUPERSET_API_URL}/mcp/plugins/`);
+}
+
+function sameEndpoint(a: string, b: string): boolean {
+	try {
+		const [x, y] = [new URL(a), new URL(b)];
+		const path = (url: URL) => url.pathname.replace(/\/+$/, "");
+		return x.host === y.host && path(x) === path(y) && x.search === y.search;
+	} catch {
+		return false;
+	}
+}
+
 function externalMatchesConfig(
 	server: ExternalMcpServer,
 	catalogName: string,
@@ -138,9 +224,12 @@ function externalMatchesConfig(
 ): boolean {
 	if (server.name === catalogName) return true;
 	if ("url" in config && server.url) {
-		const catalogHost = urlHost(config.url);
-		if (catalogHost !== null && catalogHost === urlHost(server.url)) {
-			return true;
+		if (isPluginProxyUrl(config.url)) {
+			if (sameEndpoint(config.url, server.url)) return true;
+		} else {
+			const catalogHost = urlHost(config.url);
+			if (catalogHost !== null && catalogHost === urlHost(server.url))
+				return true;
 		}
 	}
 	if ("command" in config) {
@@ -155,7 +244,8 @@ function externalMatchesConfig(
 
 /**
  * Whether one catalog server is already covered by an entry the user wrote
- * themselves — matched by name, remote URL hostname, or the npm package a
+ * themselves — matched by name, remote URL hostname (the full endpoint for a
+ * plugin proxy URL, which all share one host), or the npm package a
  * stdio server runs (people name servers freely, e.g. "linear-server").
  * The materializer skips satisfied servers so installing never duplicates.
  */
@@ -167,27 +257,6 @@ export function isServerSatisfiedExternally(
 	return external.some((server) =>
 		externalMatchesConfig(server, catalogName, config),
 	);
-}
-
-/** The user's own config entries that correspond to this plugin. */
-export function getMatchingExternalServers(
-	plugin: PluginCatalogEntry,
-	external: readonly ExternalMcpServer[],
-): ExternalMcpServer[] {
-	const entries = Object.entries(plugin.mcpServers);
-	return external.filter((server) =>
-		entries.some(([name, config]) =>
-			externalMatchesConfig(server, name, config),
-		),
-	);
-}
-
-/** Whether the user already has any of this plugin's servers configured themselves. */
-export function isPluginExternallyConfigured(
-	plugin: PluginCatalogEntry,
-	external: readonly ExternalMcpServer[],
-): boolean {
-	return getMatchingExternalServers(plugin, external).length > 0;
 }
 
 /** What a plugin puts on your machine, for at-a-glance labeling in the UI. */
@@ -220,11 +289,11 @@ export function getPluginComponentKinds(
 export const SUPERSET_MANAGED_SKILLS = [
 	{
 		name: "10x",
-		description: "Personalized audit of Superset features you're not using yet",
+		description: "Personalized audit of Paradev features you're not using yet",
 	},
 	{
 		name: "automate",
-		description: "Turn a recurring chore into a Superset automation",
+		description: "Turn a recurring chore into a Paradev automation",
 	},
 	{
 		name: "browser",
@@ -236,9 +305,9 @@ export const SUPERSET_MANAGED_SKILLS = [
 	},
 	{
 		name: "contribute",
-		description: "Set up an open-source contribution to Superset",
+		description: "Set up an open-source contribution to Paradev",
 	},
-	{ name: "doctor", description: "Diagnose and fix Superset problems" },
+	{ name: "doctor", description: "Diagnose and fix Paradev problems" },
 	{ name: "feedback", description: "Report bugs and request features" },
 	{
 		name: "orchestrate",
@@ -249,16 +318,16 @@ export const SUPERSET_MANAGED_SKILLS = [
 		description:
 			"Install plugins, connect their accounts, and call their MCP tools",
 	},
-	{ name: "setup", description: "Make a repository Superset-ready" },
-	{ name: "standup", description: "Digest of what your Superset agents did" },
+	{ name: "setup", description: "Make a repository Paradev-ready" },
+	{ name: "standup", description: "Digest of what your Paradev agents did" },
 ] as const;
 
 export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 	{
 		name: "superset",
 		version: "1.0.0",
-		description: "Manage Superset workspaces, tasks, and automations",
-		interface: { displayName: "Superset", category: "Productivity" },
+		description: "Manage Paradev workspaces, tasks, and automations",
+		interface: { displayName: "Paradev", category: "Productivity" },
 		mcpServers: {
 			superset: { type: "http", url: "https://api.superset.sh/mcp" },
 		},
@@ -302,6 +371,7 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		version: "1.0.0",
 		description: "Debug with production error context",
 		interface: { displayName: "Sentry", category: "Developer tools" },
+		auth: [{ type: "oauth2" }],
 		mcpServers: {
 			sentry: { type: "http", url: "https://mcp.sentry.dev/mcp" },
 		},
@@ -314,6 +384,16 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		interface: { displayName: "Figma", category: "Design" },
 		mcpServers: {
 			figma: { type: "http", url: "https://mcp.figma.com/mcp" },
+		},
+	},
+	{
+		name: "autumn",
+		version: "1.0.0",
+		description: "Manage customers, plans, and billing in Autumn",
+		interface: { displayName: "Autumn", category: "Data & APIs" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			autumn: { type: "http", url: "https://mcp.useautumn.com/mcp" },
 		},
 	},
 	{
@@ -332,6 +412,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		interface: { displayName: "Neon", category: "Data & APIs" },
 		mcpServers: {
 			neon: { type: "http", url: "https://mcp.neon.tech/mcp" },
+		},
+	},
+	{
+		name: "exa",
+		version: "1.0.1",
+		description: "Search the web, companies, and people",
+		interface: { displayName: "Exa", category: "Data & APIs" },
+		mcpServers: {
+			exa: { type: "http", url: "https://mcp.exa.ai/mcp" },
 		},
 	},
 	{
@@ -370,12 +459,30 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		mcpServers: {},
 	},
 	{
+		name: "google-calendar",
+		version: "1.0.0",
+		description: "Read and manage your Google Calendar",
+		interface: { displayName: "Google Calendar", category: "Productivity" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {},
+	},
+	{
 		name: "vercel",
 		version: "1.0.0",
 		description: "Manage deployments, projects, and logs",
 		interface: { displayName: "Vercel", category: "Developer tools" },
 		mcpServers: {
 			vercel: { type: "http", url: "https://mcp.vercel.com" },
+		},
+	},
+	{
+		name: "resend",
+		version: "1.0.0",
+		description: "Send and debug email",
+		interface: { displayName: "Resend", category: "Developer tools" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			resend: { type: "http", url: "https://mcp.resend.com/mcp" },
 		},
 	},
 	{
@@ -394,6 +501,54 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		interface: { displayName: "PostHog", category: "Data & APIs" },
 		mcpServers: {
 			posthog: { type: "http", url: "https://mcp.posthog.com/mcp" },
+		},
+	},
+	{
+		name: "peec",
+		version: "1.0.0",
+		description: "Track your brand in AI search",
+		interface: { displayName: "Peec AI", category: "Data & APIs" },
+		mcpServers: {
+			peec: { type: "http", url: "https://api.peec.ai/mcp" },
+		},
+	},
+	{
+		name: "sazabi",
+		version: "1.0.0",
+		description: "Investigate production logs and issues",
+		interface: { displayName: "Sazabi", category: "Developer tools" },
+		mcpServers: {
+			sazabi: { type: "http", url: "https://mcp.sazabi.com/mcp" },
+		},
+	},
+	{
+		name: "inngest",
+		version: "1.0.0",
+		description: "Debug runs and operate functions",
+		interface: { displayName: "Inngest", category: "Developer tools" },
+		mcpServers: {
+			inngest: { type: "http", url: "https://api.inngest.com/mcp" },
+		},
+	},
+	{
+		name: "firecrawl",
+		version: "1.0.0",
+		description: "Search, scrape, and crawl the web",
+		interface: { displayName: "Firecrawl", category: "Data & APIs" },
+		mcpServers: {
+			firecrawl: {
+				type: "http",
+				url: "https://mcp.firecrawl.dev/v2/mcp-oauth",
+			},
+		},
+	},
+	{
+		name: "wispr",
+		version: "1.0.0",
+		description: "Search your meeting notes and transcripts",
+		interface: { displayName: "Wispr Flow", category: "Productivity" },
+		mcpServers: {
+			wispr: { type: "http", url: "https://api.wisprflow.ai/connect/mcp" },
 		},
 	},
 	{
@@ -450,6 +605,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 			},
 		},
 	},
+	{
+		name: "ynab",
+		version: "1.0.0",
+		description:
+			"Track money in YNAB: accounts, categories, budgets, and transactions",
+		interface: { displayName: "YNAB", category: "Productivity" },
+		auth: [{ type: "api_key", label: "Personal Access Token" }],
+		mcpServers: {},
+	},
 ];
 
 export const SUPERSET_API_URL = "https://api.superset.sh";
@@ -464,17 +628,91 @@ export const SUPERSET_API_URL = "https://api.superset.sh";
 export function pluginProxyMcpServers(
 	name: string,
 	marketplace: string = DEFAULT_MARKETPLACE,
+	options: { headersHelper?: string } = {},
 ): Record<string, PluginMcpServerConfig> | undefined {
+	if (!pluginConnectorSlug(name)) return undefined;
+	return proxyMcpServer(name, marketplace, options);
+}
+
+function proxyMcpServer(
+	name: string,
+	marketplace: string,
+	options: { headersHelper?: string },
+	key: string = name,
+): Record<string, PluginMcpServerConfig> {
+	return {
+		[key]: {
+			type: "http",
+			url: `${SUPERSET_API_URL}/mcp/plugins/${marketplace}/${name}`,
+			...(options.headersHelper
+				? { headersHelper: options.headersHelper }
+				: {}),
+		},
+	};
+}
+
+/**
+ * The MCP entries an installed set should materialize, merged.
+ *
+ * Shared so the desktop and the host-service compute the same desired set from
+ * the same catalog: two copies of this is how one surface writes an entry the
+ * other reaps. A disabled install contributes nothing, which is what makes a
+ * disable reap its servers.
+ */
+export function desiredPluginMcpServers(
+	installed: readonly {
+		name: string;
+		marketplace?: string;
+		enabled?: boolean;
+		tools?: boolean;
+	}[],
+	options: {
+		/** Command printing the auth header, so no entry needs its own OAuth. */
+		headersHelper?: string;
+	} = {},
+): Record<string, PluginMcpServerConfig> {
+	const desired: Record<string, PluginMcpServerConfig> = {};
+	const organizationNames = new Map<string, number>();
+	for (const install of installed) {
+		if (install.marketplace && isOrganizationMarketplace(install.marketplace)) {
+			organizationNames.set(
+				install.name,
+				(organizationNames.get(install.name) ?? 0) + 1,
+			);
+		}
+	}
+	for (const install of installed) {
+		if (install.enabled === false) continue;
+		// This catalog is the first-party one, and the proxy URL names the
+		// marketplace it came from: another marketplace's same-named plugin
+		// would otherwise be served Superset's.
+		const marketplace = install.marketplace || DEFAULT_MARKETPLACE;
+		if (isOrganizationMarketplace(marketplace)) {
+			if (install.tools === false) continue;
+			const shared = (organizationNames.get(install.name) ?? 0) > 1;
+			const key = shared
+				? `${install.name}-${organizationIdOfMarketplace(marketplace)?.slice(0, 8)}`
+				: install.name;
+			Object.assign(
+				desired,
+				proxyMcpServer(install.name, marketplace, options, key),
+			);
+			continue;
+		}
+		if (marketplace !== DEFAULT_MARKETPLACE) continue;
+		const entry = PLUGIN_CATALOG.find((p) => p.name === install.name);
+		if (!entry) continue;
+		const proxied = pluginProxyMcpServers(install.name, marketplace, options);
+		Object.assign(desired, proxied ?? entry.mcpServers);
+	}
+	return desired;
+}
+
+export function pluginConnectorSlug(name: string): string | undefined {
 	const extension = firstPartyManifest(name)?.extensions?.superset as
 		| { connector?: { slug: string } }
 		| undefined;
-	if (!extension?.connector) return undefined;
-	return {
-		[name]: {
-			type: "http",
-			url: `${SUPERSET_API_URL}/mcp/plugins/${marketplace}/${name}`,
-		},
-	};
+	return extension?.connector?.slug;
 }
 
 export function getPluginByName(name: string): PluginCatalogEntry | undefined {
@@ -485,9 +723,10 @@ export function getPluginByName(name: string): PluginCatalogEntry | undefined {
 }
 
 /**
- * One install record, persisted as a JSON array on the local-db settings
- * singleton (mirrors `disabledAgentHooks`). Read by the main process at boot
- * to converge agent configs on the installed set.
+ * The desktop's old install record in local-db settings. Nothing writes it
+ * now. The desktop reads it at each boot only to copy entries it has not seen
+ * into installed_plugins.json; the column stays so a build from before the
+ * move can still open the database.
  */
 export interface InstalledPlugin {
 	name: string;

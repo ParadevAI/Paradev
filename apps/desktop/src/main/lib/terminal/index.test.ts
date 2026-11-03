@@ -5,15 +5,21 @@ import {
 	describe,
 	expect,
 	it,
-	mock,
 	spyOn,
 } from "bun:test";
 import type { ListSessionsResponse } from "main/lib/terminal-host/types";
+import {
+	restartDaemon as restartDaemonWith,
+	stopMigratedV1SessionsOnBoot,
+	type TerminalDaemonDeps,
+	tryListExistingDaemonSessions as tryListExistingDaemonSessionsWith,
+} from "./index";
 
 let listSessionsIfRunningResult: ListSessionsResponse | null = null;
 let listSessionsIfRunningError: Error | null = null;
 let shutdownIfRunningError: Error | null = null;
 let shutdownIfRunningCalls = 0;
+let shutdownRequests: unknown[] = [];
 let resetCalls = 0;
 
 function makeSession(
@@ -30,7 +36,7 @@ function makeSession(
 	};
 }
 
-mock.module("main/lib/terminal-host/client", () => ({
+const deps: TerminalDaemonDeps = {
 	getTerminalHostClient: () => ({
 		listSessionsIfRunning: async () => {
 			if (listSessionsIfRunningError) {
@@ -38,40 +44,38 @@ mock.module("main/lib/terminal-host/client", () => ({
 			}
 			return listSessionsIfRunningResult;
 		},
-		shutdownIfRunning: async () => {
+		shutdownIfRunning: async (request: unknown) => {
 			shutdownIfRunningCalls++;
+			shutdownRequests.push(request);
 			if (shutdownIfRunningError) {
 				throw shutdownIfRunningError;
 			}
 			return { wasRunning: true };
 		},
-		ensureConnected: async () => {},
 	}),
-	disposeTerminalHostClient: () => {},
-}));
-
-mock.module("./daemon", () => ({
-	DaemonTerminalManager: class {},
 	getDaemonTerminalManager: () => ({
 		reset: () => {
 			resetCalls++;
 		},
-		reconcileOnStartup: async () => {},
 	}),
-}));
+};
 
-const { restartDaemon, tryListExistingDaemonSessions } = await import(
-	"./index"
-);
+const restartDaemon = () => restartDaemonWith(deps);
+const tryListExistingDaemonSessions = () =>
+	tryListExistingDaemonSessionsWith(deps);
 
 describe("terminal index", () => {
+	let consoleSpies: { mockRestore: () => void }[] = [];
+
 	beforeAll(() => {
-		spyOn(console, "log").mockImplementation(() => {});
-		spyOn(console, "warn").mockImplementation(() => {});
+		consoleSpies = [
+			spyOn(console, "log").mockImplementation(() => {}),
+			spyOn(console, "warn").mockImplementation(() => {}),
+		];
 	});
 
 	afterAll(() => {
-		mock.restore();
+		for (const spy of consoleSpies) spy.mockRestore();
 	});
 
 	beforeEach(() => {
@@ -79,7 +83,42 @@ describe("terminal index", () => {
 		listSessionsIfRunningError = null;
 		shutdownIfRunningError = null;
 		shutdownIfRunningCalls = 0;
+		shutdownRequests = [];
 		resetCalls = 0;
+	});
+
+	it("on boot stops only sessions of migrated workspaces", async () => {
+		const killed: string[] = [];
+		await stopMigratedV1SessionsOnBoot(new Set(["w-done"]), {
+			listSessionsIfRunning: async () => ({
+				sessions: [
+					makeSession({ sessionId: "s-done", workspaceId: "w-done" }),
+					makeSession({ sessionId: "s-failed", workspaceId: "w-failed" }),
+				],
+			}),
+			killIfRunning: async ({ sessionId }) => {
+				killed.push(sessionId);
+				return true;
+			},
+			shutdownIfRunning: async (request) => {
+				shutdownRequests.push(request);
+				return { wasRunning: true };
+			},
+		});
+		expect(killed).toEqual(["s-done"]);
+		expect(shutdownRequests).toEqual([]);
+	});
+
+	it("a failed boot stop is logged, not thrown", async () => {
+		await expect(
+			stopMigratedV1SessionsOnBoot(new Set(["w-done"]), {
+				listSessionsIfRunning: async () => {
+					throw new Error("socket gone");
+				},
+				killIfRunning: async () => true,
+				shutdownIfRunning: async () => ({ wasRunning: false }),
+			}),
+		).resolves.toBeUndefined();
 	});
 
 	it("resets the daemon manager when no daemon is running", async () => {

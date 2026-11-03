@@ -5,6 +5,7 @@ import {
 	type WorkspaceState,
 } from "@superset/panes";
 import type { PagePaneData, PaneViewerData } from "../../types";
+import { getPaneKey } from "../getPaneKey";
 import { openPagePaneInStore } from "./openPagePaneInStore";
 
 function pagePane(id: string, data: PagePaneData) {
@@ -50,6 +51,7 @@ function workspaceState(
 
 function storeWith(pages: PagePaneData[] = []) {
 	return createWorkspaceStore<PaneViewerData>({
+		getPaneKey,
 		initialState: workspaceState(pages),
 	});
 }

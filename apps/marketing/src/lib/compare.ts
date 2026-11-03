@@ -3,7 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { slugify, type TocItem } from "./blog-utils";
 import type { ComparisonPage } from "./compare-utils";
-import { normalizeContentDate } from "./content-utils";
+import { normalizeContentDate, stripInlineMarkdown } from "./content-utils";
 
 export { type ComparisonPage, formatCompareDate } from "./compare-utils";
 
@@ -66,17 +66,6 @@ export function getComparisonPage(slug: string): ComparisonPage | undefined {
 	return parseFrontmatter(filePath) ?? undefined;
 }
 
-export function getAllComparisonSlugs(): string[] {
-	if (!fs.existsSync(COMPARE_DIR)) {
-		return [];
-	}
-
-	return fs
-		.readdirSync(COMPARE_DIR)
-		.filter((f) => f.endsWith(".mdx"))
-		.map((f) => f.replace(".mdx", ""));
-}
-
 export function extractCompareToc(content: string): TocItem[] {
 	const headingRegex = /^(#{2,3})\s+(.+)$/gm;
 	const toc: TocItem[] = [];
@@ -87,7 +76,7 @@ export function extractCompareToc(content: string): TocItem[] {
 		if (!hashes || !heading) continue;
 
 		const level = hashes.length;
-		const text = heading.trim();
+		const text = stripInlineMarkdown(heading);
 		const id = slugify(text);
 
 		toc.push({ id, text, level });

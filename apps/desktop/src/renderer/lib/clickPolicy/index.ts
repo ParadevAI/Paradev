@@ -23,16 +23,23 @@ export {
 	folderIntentLabel,
 } from "./policies/folderPolicy";
 export type { ClickPolicy } from "./policies/policy";
+export {
+	PULL_REQUEST_LINKS,
+	usePullRequestLinkPolicy,
+} from "./policies/pullRequestLinkPolicy";
 export { useChangesSidebarFilePolicy } from "./policies/useChangesSidebarFilePolicy";
 export { useInlineFilePolicy } from "./policies/useInlineFilePolicy";
-export { useInlineUrlPolicy } from "./policies/useInlineUrlPolicy";
+export { usePagePolicy } from "./policies/usePagePolicy";
 export { useSidebarFilePolicy } from "./policies/useSidebarFilePolicy";
 export { useTerminalFilePolicy } from "./policies/useTerminalFilePolicy";
 export {
 	type FolderClickPolicy,
 	useTerminalFolderPolicy,
 } from "./policies/useTerminalFolderPolicy";
-export { useTerminalUrlPolicy } from "./policies/useTerminalUrlPolicy";
+export {
+	type UrlLinkAction,
+	useUrlLinkAction,
+} from "./policies/useUrlLinkAction";
 export { tierFor } from "./tiers";
 export type {
 	LinkAction,

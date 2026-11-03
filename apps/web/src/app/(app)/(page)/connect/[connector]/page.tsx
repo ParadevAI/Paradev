@@ -43,7 +43,9 @@ export default async function ConnectorPage({
 	const live = await trpc.connectors.status.query({
 		organizationId: organization.id,
 	});
-	const connection = live.find((row) => row.connector === slug) ?? null;
+	// Every account, not the first match: a second one was invisible here, and
+	// so was its Disconnect.
+	const connections = live.filter((row) => row.connector === slug);
 
 	return (
 		<div className="mx-auto max-w-xl space-y-8 py-8">
@@ -79,7 +81,7 @@ export default async function ConnectorPage({
 						{i18n._(
 							msg({
 								message:
-									"Authorize Superset so your plugins, automations and triggers can act on your behalf.",
+									"Authorize Paradev so your plugins, automations and triggers can act on your behalf.",
 							}),
 						)}
 					</CardDescription>
@@ -90,15 +92,13 @@ export default async function ConnectorPage({
 						displayName={connector.displayName}
 						organizationId={organization.id}
 						methods={connector.methods}
-						connection={
-							connection
-								? {
-										id: connection.id,
-										externalAccountLabel: connection.externalAccountLabel,
-										externalUserLabel: connection.externalUserLabel,
-									}
-								: null
-						}
+						scope={connector.scope}
+						connections={connections.map((row) => ({
+							id: row.id,
+							externalAccountLabel: row.externalAccountLabel,
+							externalUserLabel: row.externalUserLabel,
+							needsReauth: row.needsReauth,
+						}))}
 					/>
 				</CardContent>
 			</Card>

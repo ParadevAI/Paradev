@@ -75,7 +75,7 @@ describe("assertRemovableProfileDir with Codex account injection", () => {
 		else process.env.SUPERSET_AMBIENT_CODEX_HOME = previousAmbientHome;
 	});
 
-	it("allows removal of a profile Superset injected into CODEX_HOME", () => {
+	it("allows removal of a profile Paradev injected into CODEX_HOME", () => {
 		const profile = join(homedir(), ".codex-injected-profile");
 		process.env.CODEX_HOME = profile;
 		process.env.SUPERSET_DEFAULT_CODEX_HOME = profile;

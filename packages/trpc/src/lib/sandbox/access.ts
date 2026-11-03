@@ -6,7 +6,7 @@ import {
 import { env } from "../../env";
 
 /**
- * A ticket outlives a sandbox session (four hours, extended while open):
+ * A ticket outlives a sandbox session (one hour, extended while in use):
  * the box is guarded by its own secret, so the ticket bounds how long a
  * person's open workspace stays addressable without asking again.
  */

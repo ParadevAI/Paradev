@@ -9,7 +9,7 @@ import type { tasks } from "@superset/db/schema";
 
 import { env } from "@/env";
 
-const SUPERSET_PRODUCT_NAME = "Superset";
+const SUPERSET_PRODUCT_NAME = "Paradev";
 
 type TaskWithRelations = typeof tasks.$inferSelect & {
 	status?: { id: string; name: string } | null;
@@ -17,6 +17,7 @@ type TaskWithRelations = typeof tasks.$inferSelect & {
 };
 
 type TaskWithFullRelations = TaskWithRelations & {
+	labels: string[];
 	creator?: { id: string; name: string | null; email: string } | null;
 	organization?: { id: string; name: string; slug: string } | null;
 };
@@ -128,9 +129,9 @@ export function createTaskFlexpaneObject(
 		user?: { text: string; email?: string };
 	}> = [];
 
-	const labels = task.labels as string[] | null;
+	const labels = task.labels;
 	customFields.push(
-		labels && labels.length > 0
+		labels.length > 0
 			? {
 					key: "labels",
 					label: "Labels",
@@ -216,7 +217,7 @@ export function createTaskFlexpaneObject(
 			actions: {
 				primary_actions: [
 					{
-						text: "Open in Superset",
+						text: "Open in Paradev",
 						action_id: "open_task",
 						style: "primary",
 						url: taskUrl,

@@ -6,6 +6,38 @@ public final class ComposerModule: Module {
   public func definition() -> ModuleDefinition {
     Name("Composer")
 
+    /// The composer's image viewer, for images shown outside the composer —
+    /// a sent message's attachments.
+    AsyncFunction("presentImage") { (uri: String) in
+      guard let presenter = self.appContext?.utilities?.currentViewController() else { return }
+      weak var host: UIViewController?
+      let viewer = UIHostingController(
+        rootView: ComposerImageViewer(uri: uri) { host?.dismiss(animated: true) }
+      )
+      host = viewer
+      viewer.modalPresentationStyle = .fullScreen
+      viewer.view.backgroundColor = .black
+      presenter.present(viewer, animated: true)
+    }.runOnQueue(.main)
+
+    /// The composer's file preview, rendered to a PNG beside the file so
+    /// React Native can show it. Nil when QuickLook has nothing to draw.
+    AsyncFunction("fileThumbnail") { (uri: String, side: Double) async -> String? in
+      guard let fileURL = URL(string: uri), fileURL.isFileURL else { return nil }
+      let scale = await MainActor.run { UIScreen.main.scale }
+      guard
+        let image = await ComposerThumbnailCache.shared.thumbnail(
+          for: uri,
+          fitting: CGSize(width: side, height: side),
+          scale: scale
+        ),
+        let png = image.pngData()
+      else { return nil }
+      let target = fileURL.appendingPathExtension("thumbnail.png")
+      guard (try? png.write(to: target, options: .atomic)) != nil else { return nil }
+      return target.absoluteString
+    }
+
     View(ComposerAnchorView.self) {
       Events(
         "onSubmit",
@@ -13,6 +45,8 @@ public final class ComposerModule: Module {
         "onDictationError",
         "onModelPress",
         "onLaunchOptionPress",
+        "onModeSelect",
+        "onStop",
         "onChipPress",
         "onQuickKeyPress",
         "onSessionTabPress",
@@ -64,6 +98,22 @@ public final class ComposerModule: Module {
       Prop("launchOptions") { (view: ComposerAnchorView, options: [ComposerMenuOption]) in
         placing(view.overlay.model, ComposerMetrics.controlSwap) {
           view.overlay.model.launchOptions = options
+        }
+      }
+
+      Prop("modeOptions") { (view: ComposerAnchorView, options: [ComposerModeOption]) in
+        placing(view.overlay.model, ComposerMetrics.controlSwap) {
+          view.overlay.model.modeOptions = options
+        }
+      }
+
+      Prop("selectedModeId") { (view: ComposerAnchorView, id: String?) in
+        view.overlay.model.selectedModeId = id
+      }
+
+      Prop("canStop") { (view: ComposerAnchorView, canStop: Bool) in
+        placing(view.overlay.model, ComposerMetrics.controlSwap) {
+          view.overlay.model.canStop = canStop
         }
       }
 
@@ -139,6 +189,13 @@ public final class ComposerModule: Module {
         view.overlay.model.autocapitalization = mode == "never" ? .never : .sentences
       }
 
+      /// The terminal's shorter floor for the expanded editor. Set once at
+      /// mount like `autocapitalization` — no transaction, since it never
+      /// changes under a caller that isn't flipping surfaces mid-session.
+      Prop("compactEditor") { (view: ComposerAnchorView, compact: Bool) in
+        view.overlay.model.compactEditor = compact
+      }
+
       /// Same reasoning as `attachments`: the chip row is a whole row of card
       /// height appearing or leaving.
       Prop("headerChips") { (view: ComposerAnchorView, chips: [ComposerMenuOption]) in
@@ -202,6 +259,8 @@ final class ComposerAnchorView: ExpoView {
   private let onDictationError = EventDispatcher()
   private let onModelPress = EventDispatcher()
   private let onLaunchOptionPress = EventDispatcher()
+  private let onModeSelect = EventDispatcher()
+  private let onStop = EventDispatcher()
   private let onChipPress = EventDispatcher()
   private let onQuickKeyPress = EventDispatcher()
   private let onSessionTabPress = EventDispatcher()
@@ -230,6 +289,10 @@ final class ComposerAnchorView: ExpoView {
     overlay.model.onLaunchOptionPress = { [weak self] id in
       self?.onLaunchOptionPress(["id": id])
     }
+    overlay.model.onModeSelect = { [weak self] id in
+      self?.onModeSelect(["id": id])
+    }
+    overlay.model.onStop = { [weak self] in self?.onStop([:]) }
     overlay.model.onQuickKeyPress = { [weak self] id in
       self?.onQuickKeyPress(["id": id])
     }

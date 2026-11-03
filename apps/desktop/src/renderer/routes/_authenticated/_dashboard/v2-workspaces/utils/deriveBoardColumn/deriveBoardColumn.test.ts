@@ -8,6 +8,7 @@ function make(overrides: {
 	agentStatus?: PaneStatus;
 	prState?: "open" | "draft" | "merged" | "closed" | "queued" | null;
 	type?: "local" | "worktree" | "session";
+	sandboxStatus?: "provisioning" | "failed" | null;
 }) {
 	return {
 		archivedAt: overrides.archivedAt ?? null,
@@ -15,6 +16,7 @@ function make(overrides: {
 		agentStatus: overrides.agentStatus ?? ("idle" as const),
 		pr: overrides.prState ? { state: overrides.prState } : null,
 		type: overrides.type ?? ("worktree" as const),
+		sandboxStatus: overrides.sandboxStatus ?? null,
 	};
 }
 
@@ -56,29 +58,37 @@ describe("deriveBoardColumn", () => {
 		).toBe("attention");
 	});
 
-	test("working outranks review signals", () => {
+	test("a failed sandbox needs attention; one being made is working", () => {
+		expect(
+			deriveBoardColumn(
+				make({ sandboxStatus: "failed", agentStatus: "working" }),
+			),
+		).toBe("attention");
+		expect(deriveBoardColumn(make({ sandboxStatus: "provisioning" }))).toBe(
+			"working",
+		);
+	});
+
+	test("working outranks finished and review signals", () => {
 		expect(
 			deriveBoardColumn(make({ agentStatus: "working", prState: "open" })),
 		).toBe("working");
 	});
 
-	test("agent review or an open/draft/queued PR means Needs review", () => {
-		expect(deriveBoardColumn(make({ agentStatus: "review" }))).toBe("review");
+	test("a finished, unread agent is Finished even with an open PR", () => {
+		expect(deriveBoardColumn(make({ agentStatus: "review" }))).toBe("finished");
+		expect(
+			deriveBoardColumn(make({ agentStatus: "review", prState: "open" })),
+		).toBe("finished");
+	});
+
+	test("an open, draft or queued PR with nothing unread is In review", () => {
 		expect(deriveBoardColumn(make({ prState: "open" }))).toBe("review");
 		expect(deriveBoardColumn(make({ prState: "draft" }))).toBe("review");
 		expect(deriveBoardColumn(make({ prState: "queued" }))).toBe("review");
 	});
 
-	test("a finished agent on a local or worktree checkout is review-worthy", () => {
-		expect(
-			deriveBoardColumn(make({ agentStatus: "review", type: "local" })),
-		).toBe("review");
-		expect(
-			deriveBoardColumn(make({ agentStatus: "review", type: "worktree" })),
-		).toBe("review");
-	});
-
-	test("a finished agent on a session workspace is Idle, not review", () => {
+	test("a finished agent on a session workspace is Idle, not Finished", () => {
 		expect(
 			deriveBoardColumn(make({ agentStatus: "review", type: "session" })),
 		).toBe("idle");

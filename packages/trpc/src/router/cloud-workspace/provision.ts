@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
@@ -9,11 +10,13 @@ import {
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
+	recordBootSpans,
 	SandboxNotReadyError,
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
 import { generateCloudWorkspaceName } from "./generate-name";
+import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -21,6 +24,15 @@ export const FALLBACK_NAME = "Cloud workspace";
 /** Derived from the row id so the name is stable and collision-free. */
 export function sandboxNameFor(cloudWorkspaceId: string): string {
 	return `ws-${cloudWorkspaceId.replaceAll("-", "").slice(0, 24)}`;
+}
+
+/**
+ * A later box for the same row. Vercel refuses a deleted sandbox's name
+ * with `image_not_ready` for a few minutes after the delete.
+ */
+export function nextSandboxNameFor(cloudWorkspaceId: string): string {
+	const prefix = cloudWorkspaceId.replaceAll("-", "").slice(0, 16);
+	return `ws-${prefix}${randomBytes(4).toString("hex")}`;
 }
 
 export interface ProvisionCloudWorkspaceInput {
@@ -79,7 +91,7 @@ async function provision(
 	if (!row) return "skipped";
 	if (row.status !== "provisioning") return "skipped";
 
-	const providerSandboxId = sandboxNameFor(row.id);
+	const providerSandboxId = row.providerSandboxId;
 	const naming =
 		input.namingPrompt === undefined
 			? Promise.resolve()
@@ -93,12 +105,18 @@ async function provision(
 						nudge(row.organizationId, "cloud_workspaces");
 					},
 				);
+	let bootId: string | null = null;
 	try {
-		const { claim, environment } = await Sentry.startSpan(
-			{ name: "claim", op: "sandbox" },
-			() =>
+		const { claim, environment, agentCredentialDigest } =
+			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
 				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
-		);
+			);
+		({ bootId } = await authorizeBoot({
+			organizationId: row.organizationId,
+			cloudWorkspaceId: row.id,
+			createdByUserId: row.createdByUserId,
+			...boxFor(claim.vcpus),
+		}));
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
 			() => provisionSandbox({ name: providerSandboxId, environment, claim }),
@@ -110,6 +128,7 @@ async function provision(
 			set: {
 				providerSandboxId: sandbox.providerSandboxId,
 				sandboxUrl: sandbox.sandboxUrl,
+				bootAgentCredentialDigest: agentCredentialDigest,
 			},
 		});
 		if (!ready) {
@@ -123,27 +142,51 @@ async function provision(
 			});
 			if (current?.status === "deleted") {
 				await deleteSandbox(providerSandboxId);
+				if (bootId) await releaseBoot(bootId);
 			}
 			await naming.catch(() => {});
 			return "skipped";
 		}
 		nudge(row.organizationId, "cloud_workspaces");
+		if (bootId) {
+			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
+				Sentry.captureException(error, { extra: { bootId } }),
+			);
+		}
 		// The box is booting; the environment it needs arrives once host-service
 		// answers. The client's own wake pushes it again, so a workspace nobody
 		// opens still gets it (an agent launched at boot waits for this).
-		await Sentry.startSpan({ name: "settle", op: "sandbox" }, () =>
-			settleSandbox({
-				providerSandboxId,
-				hostTarget: sandbox.hostTarget,
-				claim,
-			}),
+		const answer = await Sentry.startSpan(
+			{ name: "settle", op: "sandbox" },
+			() =>
+				settleSandbox({
+					providerSandboxId,
+					hostTarget: sandbox.hostTarget,
+					claim,
+				}),
 		);
+		try {
+			recordBootSpans(answer);
+		} catch (error) {
+			console.error(
+				`[cloud-workspace] could not trace the boot of ${row.id}`,
+				error,
+			);
+		}
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);
 		return "provisioned";
 	} catch (error) {
 		await naming.catch(() => {});
+		if (bootId) {
+			await releaseBoot(bootId).catch((releaseError) =>
+				console.error(
+					`[cloud-workspace] could not release boot ${bootId}`,
+					releaseError,
+				),
+			);
+		}
 		// A box that booted but whose host-service never answered is kept for
 		// diagnosis, stopped: its boot log, desktop and shell are a resume
 		// away, it costs storage rather than compute meanwhile, and a delete

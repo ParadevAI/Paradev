@@ -18,6 +18,7 @@ import {
 } from "@superset/ui/table";
 import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
@@ -54,9 +55,6 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 	const { data: membersData, isPending } =
 		cloudTrpc.organization.listMembers.useQuery({ includeDeactivated: true });
 
-	const { data: orgData } = cloudTrpc.organization.list.useQuery(undefined);
-	const organization = orgData?.find((org) => org.id === activeOrganizationId);
-
 	const members: TeamMember[] = useMemo(() => {
 		if (!activeOrganizationId) return [];
 		return (membersData ?? [])
@@ -86,6 +84,10 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 	const currentMember = members.find((m) => m.userId === currentUserId);
 	const currentUserRole = currentMember?.role;
 
+	const { plan, activePlan } = useCurrentPlan();
+	const seatPeriodEnd =
+		plan === "pro" && !activePlan?.cancelAt ? activePlan?.periodEnd : null;
+
 	const formatDate = (date: Date | string) => {
 		const d = date instanceof Date ? date : new Date(date);
 		return formatLocaleDate(d, {
@@ -106,21 +108,21 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 							Invite and manage members, assign roles, and control permissions
 						</Trans>
 					</p>
+					{seatPeriodEnd && (
+						<p className="text-xs text-muted-foreground mt-1">
+							{t({
+								message: `Seats removed mid-cycle stay active until ${formatLocaleDate(new Date(seatPeriodEnd), { month: "long", day: "numeric", year: "numeric" })}.`,
+							})}
+						</p>
+					)}
 				</div>
 			</div>
 
 			<div className="flex-1 overflow-auto">
 				<div className="p-8 space-y-12">
-					{currentUserRole && activeOrganizationId && organization?.name && (
-						<div className="max-w-5xl">
-							<PendingInvitations
-								visibleItems={visibleItems}
-								currentUserRole={currentUserRole}
-								organizationId={activeOrganizationId}
-								organizationName={organization.name}
-							/>
-						</div>
-					)}
+					<div className="max-w-5xl">
+						<PendingInvitations visibleItems={visibleItems} />
+					</div>
 
 					<div className="max-w-5xl space-y-4">
 						<h3 className="text-lg font-semibold">

@@ -97,16 +97,24 @@ Channels: `preview` for internal builds, `production` for the store build.
 
 | Change | Lane |
 |---|---|
-| JS merged to main | `deploy.yml` publishes to `preview` |
+| JS merged to main, under the `deploy.yml` trigger paths | `deploy.yml` publishes to `preview` and `production` |
 | Native merged to main | `deploy.yml` builds and uploads to App Store Connect; App Review stays manual |
 | JS on a pull request | `pr-preview.yml` publishes to a branch named after the git branch and comments a QR code, when a development build matches the fingerprint |
 | Native on a pull request | Add the `mobile-build` label; `build-pr.yml` builds a development client |
 
 ### Production
 
-Never automatic. Dispatch `update-production.yml`, approve it in the run, and it
-publishes to everyone on the production channel. No staged rollout: a small
-team with few users learns more from a fast rollback than a slow ramp.
+Every merge to main that touches the app or a package it imports (the
+`deploy.yml` trigger paths) publishes to everyone on the production channel,
+TestFlight and App Store alike — one binary, one channel. A new workspace
+dependency of the app goes in those paths, or its fixes never publish. Installed builds have to track
+main: the API and host-service move with every merge, and a build left on old
+JS meets them without the client half of each change. The runtime version
+keeps an update off any binary whose native layer it does not match.
+
+No staged rollout: a small team with few users learns more from a fast rollback
+than a slow ramp. `update-production.yml` (manual, with approval) republishes
+outside a merge.
 
 ```bash
 # Back out. Republishes the previous update to everyone, including users who
@@ -120,7 +128,7 @@ The private key lives in 1Password and nowhere in this repository. EAS holds a
 copy it will never show you, so 1Password is the only backup.
 
 Publish only from EAS, never `eas update` from a laptop: the workflows hold the
-signing key and the Sentry token, and production goes through an approval. A
+signing key and the Sentry token. A
 build accepts an update only when the update's runtime version equals the
 fingerprint computed when the binary was built, and an outdated eas-cli
 computes a different one — `cli.version` in `eas.json` sets the floor. The
@@ -180,14 +188,14 @@ for Claude Code / Codex" apps in the category; it says nothing about the
 build's quality and it is not resolved by resubmitting the same metadata.
 
 1. Reply in the submission's message thread before resubmitting, and make the
-   reply about *identity*, not features: Superset is our own product, the
+   reply about *identity*, not features: Paradev is our own product, the
    mobile app is its official client, the source is public in this repository
    (`apps/mobile`), the bundle id is our domain, and the app only works with
-   Superset accounts and hosts. Link the GitHub repository, the desktop app
+   Paradev accounts and hosts. Link the GitHub repository, the desktop app
    download, and a screen recording that shows the desktop app and the phone
    app driving the same session.
 2. Make the product page say the same thing. Title keeps the brand; the
-   subtitle and the first sentence of the description should name Superset as
+   subtitle and the first sentence of the description should name Paradev as
    the product the app pairs with, not a generic "run AI agents from
    anywhere". Generic metadata is what the reviewer matched on.
 3. Ask for a call in the same thread. 4.3(a) is a judgment call, and the
@@ -217,6 +225,6 @@ build's quality and it is not resolved by resubmitting the same metadata.
   recording.
 - Bumping the major version or going months between submissions right before
   a launch.
-- Any copy that reads as "build and run apps on your phone". Superset Mobile
+- Any copy that reads as "build and run apps on your phone". Paradev Mobile
   operates agents that run elsewhere; the wording in `store.config.js` and in
   the app should always say so.

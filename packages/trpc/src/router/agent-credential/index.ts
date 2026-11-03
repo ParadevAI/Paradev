@@ -1,4 +1,6 @@
 export {
+	type AgentSignIns,
 	agentCredentialRouter,
-	resolveAgentCredentialEnv,
+	type CodexChatgptSignIn,
+	resolveAgentSignIns,
 } from "./agent-credential";

@@ -2,8 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import type { IconType } from "react-icons";
 import { BsTerminalPlus } from "react-icons/bs";
-import { LuGitCompareArrows, LuSearch } from "react-icons/lu";
-import { TbMessageCirclePlus, TbWorld } from "react-icons/tb";
+import { LuGitCompareArrows, LuMessageSquare, LuSearch } from "react-icons/lu";
+import { TbWorld } from "react-icons/tb";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import supersetEmptyStateWordmark from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/assets/superset-empty-state-wordmark.svg";
@@ -13,7 +13,7 @@ import { useTheme } from "renderer/stores/theme";
 interface WorkspaceEmptyStateProps {
 	onOpenBrowser: () => void;
 	onOpenChanges: () => void;
-	onOpenChatV3?: (() => void) | undefined;
+	onOpenChat?: (() => void) | undefined;
 	onOpenQuickOpen: () => void;
 	onOpenTerminal: () => void;
 }
@@ -29,13 +29,14 @@ interface WorkspaceEmptyStateAction {
 export function WorkspaceEmptyState({
 	onOpenBrowser,
 	onOpenChanges,
-	onOpenChatV3,
+	onOpenChat,
 	onOpenQuickOpen,
 	onOpenTerminal,
 }: WorkspaceEmptyStateProps) {
 	const { t } = useLingui();
 	const activeTheme = useTheme();
 	const { keys: newGroupDisplay } = useHotkeyDisplay("NEW_GROUP");
+	const { keys: newChatDisplay } = useHotkeyDisplay("NEW_CHAT");
 	const { keys: newBrowserDisplay } = useHotkeyDisplay("NEW_BROWSER");
 	const { keys: quickOpenDisplay } = useHotkeyDisplay("QUICK_OPEN");
 	const { keys: openChangesDisplay } = useHotkeyDisplay("OPEN_DIFF_VIEWER");
@@ -51,16 +52,14 @@ export function WorkspaceEmptyState({
 				icon: BsTerminalPlus,
 				onClick: onOpenTerminal,
 			},
-			...(onOpenChatV3
+			...(onOpenChat
 				? [
 						{
-							id: "chat-v3",
-							label: t({
-								message: "Open Chat v3",
-							}),
-							display: [],
-							icon: TbMessageCirclePlus,
-							onClick: onOpenChatV3,
+							id: "chat",
+							label: t({ message: "Open Chat" }),
+							display: newChatDisplay,
+							icon: LuMessageSquare,
+							onClick: onOpenChat,
 						},
 					]
 				: []),
@@ -94,10 +93,11 @@ export function WorkspaceEmptyState({
 		],
 		[
 			newBrowserDisplay,
+			newChatDisplay,
 			newGroupDisplay,
 			onOpenBrowser,
 			onOpenChanges,
-			onOpenChatV3,
+			onOpenChat,
 			onOpenQuickOpen,
 			onOpenTerminal,
 			openChangesDisplay,
@@ -111,7 +111,7 @@ export function WorkspaceEmptyState({
 			<div className="w-full max-w-xl">
 				<div className="mb-7 flex items-center justify-center py-3">
 					<img
-						alt="Superset"
+						alt="Paradev"
 						className={`h-8 w-auto select-none ${
 							activeTheme?.type === "dark"
 								? "opacity-85"

@@ -7,7 +7,7 @@ import type { Theme } from "../types";
 export const darkTheme: Theme = {
 	id: "dark",
 	name: "Dark",
-	author: "Superset",
+	author: "Paradev",
 	type: "dark",
 	isBuiltIn: true,
 
@@ -45,7 +45,7 @@ export const darkTheme: Theme = {
 		destructiveForeground: "#ffcccc",
 		warning: "#e5c07b",
 		warningForeground: "#000000",
-		success: "#5fb37f",
+		success: "#00c950",
 
 		// Borders - subtle warm gray
 		border: "#2a2827",

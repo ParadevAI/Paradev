@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { ExternalApp } from "@superset/local-db";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,95 +6,40 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
-import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useCallback, useMemo } from "react";
 import { VscChevronDown } from "react-icons/vsc";
-import {
-	getAppOption,
-	OpenInExternalDropdownItems,
-} from "renderer/components/OpenInExternalDropdown";
-import { HotkeyLabel, useHotkey, useHotkeyDisplay } from "renderer/hotkeys";
-import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useV2ProjectDefaultApp } from "renderer/routes/_authenticated/hooks/useV2ProjectDefaultApp";
-import { useThemeStore } from "renderer/stores";
+import { OpenInExternalDropdownItems } from "renderer/components/OpenInExternalDropdown";
+import { HotkeyLabel } from "renderer/hotkeys";
+import { useWorkspaceOpenIn } from "../../hooks/useWorkspaceOpenIn";
 
 interface V2OpenInMenuButtonProps {
-	worktreePath: string;
-	branch: string;
+	path: string;
+	branch?: string;
 	/** Null for project-less "session" workspaces (no per-project default app). */
 	projectId: string | null;
+	/** Bind the open-in and copy-path hotkeys to this path. Defaults to true. */
+	hotkeys?: boolean;
 }
 
 export function V2OpenInMenuButton({
-	worktreePath,
+	path,
 	branch,
 	projectId,
+	hotkeys = true,
 }: V2OpenInMenuButtonProps) {
 	const { t } = useLingui();
-	const activeTheme = useThemeStore((state) => state.activeTheme);
-
-	const { app: persistedApp, setApp: persistDefaultApp } =
-		useV2ProjectDefaultApp(projectId ?? undefined);
-	const resolvedApp: ExternalApp = persistedApp ?? "finder";
-
-	const openInApp = electronTrpc.external.openInApp.useMutation({
-		onSuccess: (_data, variables) => {
-			persistDefaultApp(variables.app);
-		},
-		onError: (error) =>
-			toast.error(
-				t({
-					message: `Failed to open: ${error.message}`,
-				}),
-			),
-	});
-	const copyPath = electronTrpc.external.copyPath.useMutation({
-		onSuccess: () =>
-			toast.success(
-				t({
-					message: "Path copied to clipboard",
-				}),
-			),
-		onError: (error) =>
-			toast.error(
-				t({
-					message: `Failed to copy path: ${error.message}`,
-				}),
-			),
-	});
-
-	const currentApp = useMemo(
-		() => getAppOption(resolvedApp) ?? null,
-		[resolvedApp],
-	);
-	const openInDisplay = useHotkeyDisplay("OPEN_IN_APP");
-	const copyPathDisplay = useHotkeyDisplay("COPY_PATH");
-	const showOpenInShortcut = openInDisplay.text !== "Unassigned";
-	const showCopyPathShortcut = copyPathDisplay.text !== "Unassigned";
-	const isLoading = openInApp.isPending || copyPath.isPending;
-	const isDark = activeTheme?.type === "dark";
-
-	const handleOpenInEditor = useCallback(() => {
-		if (openInApp.isPending || copyPath.isPending) return;
-		openInApp.mutate({ path: worktreePath, app: resolvedApp });
-	}, [worktreePath, resolvedApp, openInApp, copyPath.isPending]);
-
-	const handleOpenInOtherApp = useCallback(
-		(appId: ExternalApp) => {
-			if (openInApp.isPending || copyPath.isPending) return;
-			openInApp.mutate({ path: worktreePath, app: appId });
-		},
-		[worktreePath, openInApp, copyPath.isPending],
-	);
-
-	const handleCopyPath = useCallback(() => {
-		if (openInApp.isPending || copyPath.isPending) return;
-		copyPath.mutate(worktreePath);
-	}, [worktreePath, copyPath, openInApp.isPending]);
-
-	useHotkey("OPEN_IN_APP", handleOpenInEditor);
+	const {
+		resolvedApp,
+		currentApp,
+		isDark,
+		isLoading,
+		openInShortcut,
+		copyPathShortcut,
+		openInDefaultApp,
+		openInOtherApp,
+		copyWorktreePath,
+	} = useWorkspaceOpenIn({ worktreePath: path, projectId, hotkeys });
 
 	return (
 		<div className="flex items-center no-drag">
@@ -103,7 +47,7 @@ export function V2OpenInMenuButton({
 				<TooltipTrigger asChild>
 					<button
 						type="button"
-						onClick={handleOpenInEditor}
+						onClick={openInDefaultApp}
 						disabled={isLoading || !currentApp}
 						aria-label={
 							currentApp
@@ -147,13 +91,17 @@ export function V2OpenInMenuButton({
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom" sideOffset={6}>
-					{currentApp ? (
+					{currentApp && hotkeys ? (
 						<HotkeyLabel
 							label={t({
 								message: `Open in ${currentApp.displayLabel ?? currentApp.label}`,
 							})}
 							id="OPEN_IN_APP"
 						/>
+					) : currentApp ? (
+						t({
+							message: `Open in ${currentApp.displayLabel ?? currentApp.label}`,
+						})
 					) : (
 						<Trans>Select an editor from the dropdown</Trans>
 					)}
@@ -182,27 +130,23 @@ export function V2OpenInMenuButton({
 					<OpenInExternalDropdownItems
 						isDark={isDark}
 						activeApp={resolvedApp}
-						onOpenIn={handleOpenInOtherApp}
-						onCopyPath={handleCopyPath}
+						onOpenIn={openInOtherApp}
+						onCopyPath={copyWorktreePath}
 						renderAppTrailing={(appId, group) => {
 							if (
 								appId !== resolvedApp ||
-								!showOpenInShortcut ||
+								!openInShortcut ||
 								group === "jetbrains"
 							) {
 								return null;
 							}
 							return (
-								<DropdownMenuShortcut>
-									{openInDisplay.text}
-								</DropdownMenuShortcut>
+								<DropdownMenuShortcut>{openInShortcut}</DropdownMenuShortcut>
 							);
 						}}
 						copyPathTrailing={
-							showCopyPathShortcut ? (
-								<DropdownMenuShortcut>
-									{copyPathDisplay.text}
-								</DropdownMenuShortcut>
+							copyPathShortcut ? (
+								<DropdownMenuShortcut>{copyPathShortcut}</DropdownMenuShortcut>
 							) : null
 						}
 						subContentClassName="w-40"

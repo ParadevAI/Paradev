@@ -16,7 +16,7 @@ import {
 	requireConnector,
 	upsertConnection,
 } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { forgetUpstreamTools } from "../plugins/proxy";
 
@@ -29,7 +29,7 @@ function methodSummary(method: ConnectorMethod) {
 }
 
 export const connectorsRouter = {
-	catalog: protectedProcedure.query(() =>
+	catalog: personProcedure.query(() =>
 		CONNECTOR_SLUGS.map((slug) => {
 			const connector = requireConnector(slug);
 			return {
@@ -43,7 +43,7 @@ export const connectorsRouter = {
 		}),
 	),
 
-	get: protectedProcedure
+	get: personProcedure
 		.input(z.object({ slug: z.string() }))
 		.query(({ input }) => {
 			const connector = getConnector(input.slug);
@@ -62,7 +62,7 @@ export const connectorsRouter = {
 			};
 		}),
 
-	status: protectedProcedure
+	status: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -71,6 +71,9 @@ export const connectorsRouter = {
 			// dropping it here would offer "Connect" for an account they already
 			// linked, losing the distinction between never-connected and expired.
 			const rows = await db.query.connections.findMany({
+				// Stable order, so the account list does not reshuffle between
+				// refetches.
+				orderBy: (row, { asc }) => [asc(row.createdAt), asc(row.id)],
 				where: and(
 					eq(connections.organizationId, input.organizationId),
 					or(
@@ -87,6 +90,7 @@ export const connectorsRouter = {
 					externalAccountLabel: true,
 					externalUserId: true,
 					externalUserLabel: true,
+					nickname: true,
 					disconnectedAt: true,
 					disconnectReason: true,
 				},
@@ -100,11 +104,12 @@ export const connectorsRouter = {
 				)
 				.map(({ disconnectedAt, disconnectReason, ...row }) => ({
 					...row,
+					externalUserLabel: row.nickname ?? row.externalUserLabel,
 					needsReauth: disconnectedAt !== null,
 				}));
 		}),
 
-	connectApiKey: protectedProcedure
+	connectApiKey: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -167,7 +172,79 @@ export const connectorsRouter = {
 			return { connectionId: result.connectionId };
 		}),
 
-	disconnect: protectedProcedure
+	rename: personProcedure
+		.input(
+			z
+				.object({
+					organizationId: z.uuid(),
+					connectionId: z.uuid(),
+					label: z.string().trim().min(1).max(64).optional(),
+					/** @deprecated desktop 1.36.0 sends this; use `label`. */
+					nickname: z.string().max(64).nullable().optional(),
+				})
+				.refine(
+					(input) => input.label !== undefined || input.nickname !== undefined,
+					{ message: "Pass label." },
+				),
+		)
+		.mutation(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+
+			const reachable = or(
+				isNull(connections.disconnectedAt),
+				eq(connections.disconnectReason, NEEDS_REAUTH),
+			);
+
+			const [existing] = await db
+				.select({
+					ownerKind: connections.ownerKind,
+					connectedByUserId: connections.connectedByUserId,
+				})
+				.from(connections)
+				.where(
+					and(
+						eq(connections.id, input.connectionId),
+						eq(connections.organizationId, input.organizationId),
+						reachable,
+					),
+				)
+				.limit(1);
+
+			if (!existing)
+				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
+
+			// Same rule as disconnect: an org-scoped row is the organization's, so
+			// renaming it is an admin action; a user-scoped row is only its owner's.
+			if (existing.ownerKind === "org")
+				await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
+			else if (existing.connectedByUserId !== ctx.session.user.id)
+				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
+
+			const label = input.label ?? (input.nickname?.trim() || undefined);
+			const [row] = await db
+				.update(connections)
+				.set({
+					...(label === undefined ? {} : { externalUserLabel: label }),
+					nickname: null,
+				})
+				.where(
+					and(
+						eq(connections.id, input.connectionId),
+						eq(connections.organizationId, input.organizationId),
+						reachable,
+					),
+				)
+				.returning({
+					id: connections.id,
+					label: connections.externalUserLabel,
+				});
+
+			if (!row)
+				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
+			return { ...row, nickname: row.label };
+		}),
+
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid(), connectionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Globe, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { Button } from "../../../../../ui/button";
 import type {
 	PageHeaderActions,
@@ -19,7 +19,10 @@ interface PageShareButtonProps {
 	onOpenChange: (open: boolean) => void;
 	onSetVisibility: PageHeaderActions["onSetVisibility"];
 	onSetSharedVersion: PageHeaderActions["onSetSharedVersion"];
+	currentUserId: string | undefined;
+	sharing: PageHeaderActions["sharing"];
 	compact?: boolean;
+	labelClassName?: string;
 }
 
 export function PageShareButton({
@@ -30,7 +33,10 @@ export function PageShareButton({
 	onOpenChange,
 	onSetVisibility,
 	onSetSharedVersion,
+	currentUserId,
+	sharing,
 	compact = false,
+	labelClassName,
 }: PageShareButtonProps) {
 	const { t } = useLingui();
 	const { visibility, setVisibility } = usePendingVisibility(
@@ -42,11 +48,6 @@ export function PageShareButton({
 	const label = isPublic
 		? t({ message: "Share page (public)" })
 		: t({ message: "Share page" });
-	const icon = isPublic ? (
-		<Globe className="size-3.5" />
-	) : (
-		<Share2 className="size-3.5" />
-	);
 
 	return (
 		<PageSharePopover
@@ -57,29 +58,25 @@ export function PageShareButton({
 			onOpenChange={onOpenChange}
 			onSetVisibility={setVisibility}
 			onSetSharedVersion={onSetSharedVersion}
+			currentUserId={currentUserId}
+			sharing={sharing}
 		>
-			{compact ? (
-				<Button
-					variant="ghost"
-					size="icon"
-					className="size-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
-					aria-label={label}
-					title={label}
-				>
-					{icon}
-				</Button>
-			) : (
-				<Button
-					size="xs"
-					variant="ghost"
-					className="gap-1.5"
-					aria-label={label}
-					title={label}
-				>
-					{icon}
+			<Button
+				variant="ghost"
+				size="xs"
+				className={
+					compact
+						? "h-6 gap-1 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+						: "gap-1.5"
+				}
+				aria-label={label}
+				title={label}
+			>
+				<Share2 className="size-3.5" />
+				<span className={labelClassName}>
 					<Trans>Share</Trans>
-				</Button>
-			)}
+				</span>
+			</Button>
 		</PageSharePopover>
 	);
 }

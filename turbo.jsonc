@@ -5,11 +5,15 @@
 		"DATABASE_URL",
 		"DATABASE_URL_UNPOOLED",
 		"USERCONTENT_URL",
+		"MEDIA_URL",
 		"NEXT_PUBLIC_API_URL",
 		"NEXT_PUBLIC_WEB_URL",
 		"NEXT_PUBLIC_MARKETING_URL",
 		"NEXT_PUBLIC_DOCS_URL",
 		"NEXT_PUBLIC_ROOT_DOMAIN",
+		"EXPO_PUBLIC_ROOT_DOMAIN",
+		"DESKTOP_DISPLAY_NAME",
+		"EMAIL_SENDING_DOMAIN",
 		"RELAY_BACKUP_URL",
 		"NEXT_PUBLIC_ADMIN_URL",
 		"POSTHOG_API_KEY",
@@ -49,12 +53,19 @@
 			// build them before anything imports @superset/i18n. Scoped to that one
 			// package so starting dev doesn't drag in every other build.
 			"dependsOn": ["@superset/i18n#build"],
+			// launchd gives the GUI session its ssh-agent socket; without it, ssh
+			// in dev-app terminals cannot use agent keys.
+			"passThroughEnv": ["SSH_AUTH_SOCK"],
 			"cache": false,
 			"persistent": true
 		},
 		"test": {
 			"dependsOn": ["^build"],
 			"outputs": ["coverage/**"]
+		},
+		"test:integration:terminal": {
+			"dependsOn": ["^build"],
+			"cache": false
 		},
 		"build:types": {
 			// Emits declarations from source, so it needs the same upstream

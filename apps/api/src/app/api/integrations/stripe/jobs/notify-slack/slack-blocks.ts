@@ -9,6 +9,11 @@ export function formatPrice(cents: number): string {
 	}).format(cents / 100);
 }
 
+export function planLabel(plan: string | null | undefined): string {
+	if (!plan) return "Unknown";
+	return `${plan.charAt(0).toUpperCase()}${plan.slice(1)}`;
+}
+
 export interface DiscountInfo {
 	name: string;
 	percentOff: number | null;

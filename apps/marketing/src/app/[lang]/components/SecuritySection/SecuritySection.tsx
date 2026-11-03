@@ -49,7 +49,7 @@ const SECURITY_FEATURES: {
 		}),
 		description: msg({
 			message:
-				"Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider.",
+				"Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider.",
 		}),
 	},
 ];

@@ -1,1 +1,1 @@
-export { CommentsSection } from "./CommentsSection";
+export { CommentsSection, type CommentsUnavailable } from "./CommentsSection";

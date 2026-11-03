@@ -136,7 +136,7 @@ export function ContactForm({ intent = "contact" }: ContactFormProps) {
 				>
 					{isCloudSignup ? (
 						<Trans>
-							What would you like to build with Superset in the cloud?
+							What would you like to build with Paradev in the cloud?
 						</Trans>
 					) : (
 						<Trans>How can we help?</Trans>
