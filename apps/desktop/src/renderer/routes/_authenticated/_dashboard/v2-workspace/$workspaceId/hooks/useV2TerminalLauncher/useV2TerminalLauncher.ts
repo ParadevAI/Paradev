@@ -3,8 +3,13 @@ import { useCallback, useMemo } from "react";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
-import { useTheme } from "renderer/stores/theme";
-import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
+import { useTheme, useThemeStore } from "renderer/stores/theme";
+import {
+	resolveTerminalThemeType,
+	toXtermTheme,
+} from "renderer/stores/theme/utils";
+import { getTerminalColors } from "shared/themes";
+import { findTerminalTheme } from "../usePaneRegistry/utils/findTerminalTheme";
 
 /** Worst-case legitimate create ≈ daemon bootstrap (5s connect + 15s open) +
  * shell env probe (8s); anything past this is a wedged transport, not work. */
@@ -46,15 +51,22 @@ export function useV2TerminalLauncher(): TerminalLauncher {
 	const { workspace } = useWorkspace();
 	const { trpcClient } = useWorkspaceClient();
 	const activeTheme = useTheme();
+	const customThemes = useThemeStore((state) => state.customThemes);
 	const appearance = useTerminalAppearance();
-	const themeType = resolveTerminalThemeType({
-		activeThemeType: activeTheme?.type,
-	});
 	const workspaceId = workspace.id;
 
 	const create = useCallback(
 		async (options?: CreateOptions): Promise<string> => {
 			const terminalId = options?.terminalId ?? crypto.randomUUID();
+			const terminalTheme = findTerminalTheme(options?.themeId, customThemes);
+			const themeType = resolveTerminalThemeType({
+				activeThemeType: terminalTheme?.type ?? activeTheme?.type,
+			});
+			const colors = terminalQueryColors(
+				terminalTheme
+					? toXtermTheme(getTerminalColors(terminalTheme))
+					: appearance.theme,
+			);
 			// Bounded: this rides the shared 6-per-origin HTTP pool, which can be
 			// starved for minutes under load — without a signal the click hangs
 			// silently forever (the server exempts mutations from its timeout).
@@ -64,7 +76,7 @@ export function useV2TerminalLauncher(): TerminalLauncher {
 					workspaceId,
 					themeType,
 					themeId: options?.themeId,
-					colors: terminalQueryColors(appearance.theme),
+					colors,
 					initialCommand: options?.command,
 					cwd: options?.cwd,
 				},
@@ -72,7 +84,13 @@ export function useV2TerminalLauncher(): TerminalLauncher {
 			);
 			return terminalId;
 		},
-		[trpcClient, workspaceId, themeType, appearance.theme],
+		[
+			trpcClient,
+			workspaceId,
+			customThemes,
+			activeTheme?.type,
+			appearance.theme,
+		],
 	);
 
 	const mint = useCallback((): string => crypto.randomUUID(), []);

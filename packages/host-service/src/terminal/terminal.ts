@@ -32,6 +32,7 @@ import {
 	scanForTerminalTitle,
 	type TerminalTitleScanState,
 } from "@superset/shared/terminal-title-scanner";
+import { MAX_THEME_ID_LENGTH } from "@superset/shared/themes/constants";
 import { and, eq, inArray, isNull, ne } from "drizzle-orm";
 import type { Hono } from "hono";
 import { getSupervisor } from "../daemon/index.ts";
@@ -195,8 +196,7 @@ export function parseThemeType(
 	return value === "dark" || value === "light" ? value : undefined;
 }
 
-// Keep in sync with MAX_THEME_ID_LENGTH in shared's themes/import.ts.
-export const MAX_THEME_ID_LENGTH = 200;
+export { MAX_THEME_ID_LENGTH } from "@superset/shared/themes/constants";
 
 export function parseThemeId(
 	value: string | null | undefined,

@@ -277,6 +277,10 @@
 			"types": "./src/themes/index.ts",
 			"default": "./src/themes/index.ts"
 		},
+		"./themes/constants": {
+			"types": "./src/themes/constants.ts",
+			"default": "./src/themes/constants.ts"
+		},
 		"./themes/types": {
 			"types": "./src/themes/types.ts",
 			"default": "./src/themes/types.ts"

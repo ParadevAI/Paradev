@@ -618,8 +618,8 @@ export function usePaneRegistry({
 									...paneData,
 									themeId,
 								} as PaneViewerData);
+								return;
 							}
-							if (!currentSession) return;
 							workspaceTrpcUtils.client.terminal.setTheme
 								.mutate({
 									terminalId: paneData.terminalId,

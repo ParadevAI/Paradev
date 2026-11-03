@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { builtInThemes, darkTheme, lightTheme } from "./built-in";
+import { MAX_THEME_ID_LENGTH } from "./constants";
 import { getEditorTheme } from "./editor-theme";
 import { getDefaultTerminalColors, type Theme } from "./types";
-
-// Keep in sync with MAX_THEME_ID_LENGTH in host-service's terminal.ts.
-const MAX_THEME_ID_LENGTH = 200;
 
 const uiColorsSchema = z
 	.object({

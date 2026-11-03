@@ -214,12 +214,13 @@ export function TerminalPane({
 	const paneRef = useRef(ctx);
 	paneRef.current = ctx;
 	const syncingThemeRef = useRef<string | null>(null);
+	const [, bumpThemeSync] = useState(0);
 	const hasSession = sessionThemeId !== undefined;
 	useEffect(() => {
 		if (pendingThemeId === undefined || !hasSession || !supportsTerminalThemes)
 			return;
 		const syncKey = `${terminalId}:${pendingThemeId}`;
-		if (syncingThemeRef.current === syncKey) return;
+		if (syncingThemeRef.current) return;
 		syncingThemeRef.current = syncKey;
 		workspaceTrpcUtils.client.terminal.setTheme
 			.mutate({ terminalId, workspaceId, themeId: pendingThemeId })
@@ -254,6 +255,7 @@ export function TerminalPane({
 			})
 			.finally(() => {
 				syncingThemeRef.current = null;
+				bumpThemeSync((version) => version + 1);
 			});
 	}, [
 		pendingThemeId,

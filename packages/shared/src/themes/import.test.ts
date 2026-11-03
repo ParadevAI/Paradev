@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { MAX_THEME_ID_LENGTH } from "./constants";
 import { parseThemeConfigFile } from "./import";
 
 describe("parseThemeConfigFile", () => {
@@ -149,11 +150,13 @@ describe("parseThemeConfigFile", () => {
 
 	it("rejects theme IDs that exceed the terminal limit", () => {
 		const result = parseThemeConfigFile(
-			JSON.stringify([{ id: "a".repeat(201) }]),
+			JSON.stringify([{ id: "a".repeat(MAX_THEME_ID_LENGTH + 1) }]),
 		);
 
 		expect(result.ok).toBe(false);
 		if (result.ok) return;
-		expect(result.error).toBe("Theme 1: Theme ID exceeds 200 characters");
+		expect(result.error).toBe(
+			`Theme 1: Theme ID exceeds ${MAX_THEME_ID_LENGTH} characters`,
+		);
 	});
 });
