@@ -2,6 +2,11 @@ import { boolean, CLIError, number, string } from "@superset/cli-framework";
 import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/session-handoff";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import {
+	placeTerminal,
+	resolveSplitPlacement,
+	splitOptions,
+} from "../../../lib/pane-placement";
 import { buildHandoffPromptFromTerminal } from "../../../lib/terminal-handoff";
 import { uploadAttachments } from "../../../lib/upload-attachments";
 
@@ -51,6 +56,7 @@ export default command({
 			.desc(
 				"Local file path to upload as an attachment to the host. Repeatable",
 			),
+		...splitOptions,
 	},
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
@@ -99,6 +105,11 @@ export default command({
 			},
 			options.workspace,
 		);
+		const placement = await resolveSplitPlacement(
+			target.client,
+			options.workspace,
+			options,
+		);
 
 		const prompt = options.fromTerminal
 			? await buildHandoffPromptFromTerminal(target.client, {
@@ -124,11 +135,25 @@ export default command({
 			attachmentIds: attachmentIds.length > 0 ? attachmentIds : undefined,
 		});
 
+		if (placement) {
+			await placeTerminal(
+				target.client,
+				options.workspace,
+				result.sessionId,
+				placement,
+			).catch((error) => {
+				throw new CLIError(
+					`${result.label} is running in terminal ${result.sessionId}, but it could not be placed beside ${placement.besidePaneId}: ${error instanceof Error ? error.message : String(error)}`,
+					"It shows in a new tab instead; move it with `superset panes move`",
+				);
+			});
+		}
+
 		return {
 			data: result,
 			message: options.fromTerminal
 				? `Handed ${options.fromTerminal} off to ${result.label} with ${prompt.length} characters of context (terminal ${result.sessionId})`
-				: `Launched ${result.label} (terminal ${result.sessionId}) in workspace ${options.workspace}`,
+				: `Launched ${result.label} (terminal ${result.sessionId}) in workspace ${options.workspace}${placement ? `, beside pane ${placement.besidePaneId}` : ""}`,
 		};
 	},
 });

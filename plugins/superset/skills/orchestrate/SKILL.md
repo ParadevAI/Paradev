@@ -90,7 +90,7 @@ superset agents create \
   --json
 ```
 
-Omit `--effort` or `--attachment` when they are not needed. The result is `{ "kind", "sessionId", "label" }`. Require `kind` to be `terminal`; store `sessionId` as the terminal ID. Launch all ready, independent tasks before monitoring them.
+Omit `--effort` or `--attachment` when they are not needed. When you run from a Paradev terminal and the user watches the desktop app, add `--split right` (or `left`, `down`, `up`): the worker opens in a pane beside yours, in your tab, so the user sees which workers are yours. Without it each worker gets a new tab. `terminals create` takes the same `--split`. The result is `{ "kind", "sessionId", "label" }`. Require `kind` to be `terminal`; store `sessionId` as the terminal ID. Launch all ready, independent tasks before monitoring them.
 
 Use `superset workspaces create` first when a worker needs an isolated branch. Do not create parallel editing workers in the same worktree unless their file ownership is explicitly disjoint.
 
@@ -201,4 +201,4 @@ superset terminals close \
   --json
 ```
 
-Closing a terminal ends that session. Deleting a workspace is a separate destructive action and requires explicit scope.
+Closing a terminal ends that session and closes the panes that show it. Close the terminals you started when you finish, so their panes do not stay behind as "Session ended". For a chat session, `superset sessions close` does the same. Deleting a workspace is a separate destructive action and requires explicit scope.

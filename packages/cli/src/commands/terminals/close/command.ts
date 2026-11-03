@@ -1,9 +1,11 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import { closePanes } from "../../../lib/pane-placement";
 
 export default command({
-	description: "Close (dispose) a terminal running in a workspace",
+	description:
+		"End a terminal running in a workspace and close the panes that show it",
 	options: {
 		workspace: string().required().desc("Workspace ID"),
 		host: string().desc(
@@ -29,14 +31,19 @@ export default command({
 			options.workspace,
 		);
 
+		const closedPaneIds = await closePanes(
+			target.client,
+			options.workspace,
+			(pane) => pane.terminalId === options.terminal,
+		);
 		const result = await target.client.terminal.killSession.mutate({
 			terminalId: options.terminal,
 			workspaceId: options.workspace,
 		});
 
 		return {
-			data: result,
-			message: `Closed terminal ${options.terminal}`,
+			data: { ...result, closedPaneIds },
+			message: `Closed terminal ${options.terminal}${closedPaneIds.length > 0 ? ` and its pane ${closedPaneIds.join(", ")}` : ""}`,
 		};
 	},
 });

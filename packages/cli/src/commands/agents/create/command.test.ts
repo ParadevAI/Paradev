@@ -7,6 +7,7 @@ let transcriptInput: Record<string, unknown> | undefined;
 let transcriptText = "";
 let transcriptFails = false;
 let bindings: Array<Record<string, unknown>> = [];
+let splitInput: Record<string, unknown> | undefined;
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -21,6 +22,39 @@ withLocalHostService("org-1", {
 	"settings.agentConfigs.list": () => [
 		{ id: "config-1", presetId: "claude", label: "Claude" },
 	],
+	"panes.list": () => ({
+		paneId: null,
+		tabId: null,
+		layout: {
+			activeTabId: "tab-1",
+			tabs: [
+				{
+					id: "tab-1",
+					title: null,
+					active: true,
+					activePaneId: "pane-caller",
+					layout: { type: "pane", paneId: "pane-caller" },
+					panes: [
+						{
+							id: "pane-caller",
+							kind: "terminal",
+							title: null,
+							terminalId: "terminal-caller",
+							active: true,
+						},
+					],
+				},
+			],
+		},
+	}),
+	"panes.split": (input) => {
+		splitInput = input;
+		return {
+			paneId: "pane-new",
+			tabId: "tab-1",
+			layout: { activeTabId: null, tabs: [] },
+		};
+	},
 	"agents.run": (input) => {
 		runInput = input;
 		return { kind: "terminal", sessionId: "terminal-1", label: "Codex" };
@@ -54,6 +88,8 @@ afterEach(() => {
 	transcriptText = "";
 	transcriptFails = false;
 	bindings = [];
+	splitInput = undefined;
+	delete process.env.SUPERSET_TERMINAL_ID;
 });
 
 describe("agents create", () => {
@@ -211,6 +247,28 @@ describe("agents create", () => {
 				forkSession: "thread-source",
 			}),
 		).rejects.toThrow(/Choose one session operation/);
+		expect(runInput).toBeUndefined();
+	});
+
+	test("--split shows the agent in a new pane beside the caller's pane", async () => {
+		process.env.SUPERSET_TERMINAL_ID = "terminal-caller";
+		await invoke(undefined, { prompt: "Review this diff", split: "right" });
+		expect(splitInput).toEqual({
+			workspaceId: WORKSPACE_ID,
+			paneId: "pane-caller",
+			direction: "right",
+			terminalId: "terminal-1",
+		});
+	});
+
+	test("--split with an unknown --pane fails before launching the agent", async () => {
+		await expect(
+			invoke(undefined, {
+				prompt: "Review this diff",
+				split: "down",
+				pane: "pane-gone",
+			}),
+		).rejects.toThrow("No pane pane-gone");
 		expect(runInput).toBeUndefined();
 	});
 });

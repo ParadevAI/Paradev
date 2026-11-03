@@ -103,6 +103,8 @@ export interface PaneLayoutPane {
 	kind: string;
 	title: string | null;
 	terminalId: string | null;
+	/** The chat session a chat pane shows. Older desktop apps leave it out. */
+	sessionId?: string | null;
 	active: boolean;
 	/** Filled in by the host for terminal panes: the shell's or the user's title. */
 	terminalTitle?: string | null;

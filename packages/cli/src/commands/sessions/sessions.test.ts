@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { withLocalHostService } from "../../lib/host/test-helpers";
+import closeSessionCommand from "./close/command";
 import listSessionsCommand from "./list/command";
 import openSessionCommand from "./open/command";
 import readSessionCommand from "./read/command";
@@ -11,6 +12,7 @@ const SESSION_ID = "chat-session-1";
 let readInput: Record<string, unknown> | undefined;
 let sendInput: Record<string, unknown> | undefined;
 let procedureError: Error | null = null;
+const calls: string[] = [];
 
 withLocalHostService("org-1", {
 	"workspace.list": () => [{ id: WORKSPACE_ID, name: "ws-1" }],
@@ -46,6 +48,44 @@ withLocalHostService("org-1", {
 		terminalId: "term-1",
 		label: "claude",
 	}),
+	"panes.list": () => ({
+		paneId: null,
+		tabId: null,
+		layout: {
+			activeTabId: "tab-1",
+			tabs: [
+				{
+					id: "tab-1",
+					title: null,
+					active: true,
+					activePaneId: "pane-chat",
+					layout: { type: "pane", paneId: "pane-chat" },
+					panes: [
+						{
+							id: "pane-chat",
+							kind: "chat-v3",
+							title: null,
+							terminalId: null,
+							sessionId: SESSION_ID,
+							active: true,
+						},
+					],
+				},
+			],
+		},
+	}),
+	"panes.close": (input) => {
+		calls.push(`panes.close ${input.paneId}`);
+		return {
+			paneId: null,
+			tabId: null,
+			layout: { activeTabId: null, tabs: [] },
+		};
+	},
+	"sessions.close": (input) => {
+		calls.push(`sessions.close ${input.sessionId}`);
+		return { ok: true };
+	},
 	"sessions.send": (input) => {
 		sendInput = input;
 		return { itemId: "item-2", queued: false };
@@ -75,9 +115,18 @@ afterEach(() => {
 	readInput = undefined;
 	sendInput = undefined;
 	procedureError = null;
+	calls.length = 0;
 });
 
 describe("sessions commands", () => {
+	test("close closes the chat pane before it stops the session", async () => {
+		await runCommand(closeSessionCommand, { session: SESSION_ID });
+		expect(calls).toEqual([
+			"panes.close pane-chat",
+			`sessions.close ${SESSION_ID}`,
+		]);
+	});
+
 	test("read parses a JSON --before cursor and rejects a malformed one before calling the host", async () => {
 		for (const before of ["epoch-1:3", '{"epoch":"","seq":3}', '{"seq":-1}'])
 			await expect(

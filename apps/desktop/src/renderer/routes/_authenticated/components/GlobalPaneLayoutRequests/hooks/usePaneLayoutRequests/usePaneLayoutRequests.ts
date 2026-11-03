@@ -5,7 +5,6 @@ import type {
 	PaneLayoutOpResult,
 } from "@superset/shared/pane-layout-ops";
 import { useEffect } from "react";
-import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -25,6 +24,7 @@ import {
 	PaneLayoutOpError,
 } from "./utils/applyPaneLayoutOp";
 import { describePaneLayout } from "./utils/describePaneLayout";
+import { keepClosedPaneClosed } from "./utils/keepClosedPaneClosed";
 
 type LayoutState = WorkspaceState<PaneViewerData>;
 
@@ -41,23 +41,6 @@ const SLOTS: Record<PaneArea, PaneLayoutSlot> = {
 
 const selectionKey = (workspaceId: string, area: PaneArea) =>
 	area === "main" ? workspaceId : `${workspaceId}:${SLOTS[area]}`;
-
-/** Keeps a terminal closed with `keepTerminal` from being re-adopted into a new tab. */
-function backgroundClosedTerminal(
-	areas: PaneAreas,
-	workspaceId: string,
-	op: PaneLayoutOp,
-): void {
-	if (op.type !== "close" || !op.keepTerminal) return;
-	for (const tab of [...areas.main.tabs, ...areas.sidebar.tabs]) {
-		const pane = tab.panes[op.paneId];
-		if (pane?.kind === "terminal") {
-			const { terminalId } = pane.data as { terminalId: string };
-			markTerminalForBackground(terminalId, workspaceId);
-			return;
-		}
-	}
-}
 
 function readArea(
 	row: { paneLayout?: unknown; rightPaneLayout?: unknown } | undefined,
@@ -114,7 +97,7 @@ function runPaneLayoutOp(
 		sidebar: readArea(row, workspaceId, "sidebar"),
 	};
 	const outcome = applyPaneLayoutOp(previous, op);
-	backgroundClosedTerminal(previous, workspaceId, op);
+	keepClosedPaneClosed(previous, workspaceId, op);
 
 	if (op.type !== "list") {
 		// Sidebar first: a non-terminal pane landing in the main area is moved to

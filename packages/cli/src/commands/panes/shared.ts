@@ -47,7 +47,11 @@ export const terminalOptions = {
 export async function withPaneTerminal<T>(
 	client: HostServiceClient,
 	workspaceId: string,
-	options: { terminal?: string | null; command?: string | null },
+	options: {
+		terminal?: string | null;
+		command?: string | null;
+		cwd?: string | null;
+	},
 	place: (terminalId: string) => Promise<T>,
 ): Promise<T & { terminalId: string }> {
 	if (options.terminal && options.command) {
@@ -62,6 +66,7 @@ export async function withPaneTerminal<T>(
 			await client.terminal.createSession.mutate({
 				workspaceId,
 				initialCommand: options.command ?? undefined,
+				cwd: options.cwd ?? undefined,
 			})
 		).terminalId;
 	try {
