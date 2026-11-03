@@ -52,12 +52,11 @@ test("a list left open when its last task ended stays closed for the next task",
 	expect(screen.queryByText("npm run build")).toBeNull();
 });
 
-test("opening the list does not focus a stop button", () => {
+test("opening the list focuses the list itself, not a stop button", () => {
 	render(chips([shell("dev")]));
 	openList();
-	expect(document.activeElement?.getAttribute("aria-label")).not.toBe(
-		"Stop npm run dev",
-	);
+	expect(document.activeElement?.getAttribute("role")).toBe("dialog");
+	expect(document.activeElement?.textContent).toContain("npm run dev");
 });
 
 test("a second click on stop while the first is pending sends no request", () => {

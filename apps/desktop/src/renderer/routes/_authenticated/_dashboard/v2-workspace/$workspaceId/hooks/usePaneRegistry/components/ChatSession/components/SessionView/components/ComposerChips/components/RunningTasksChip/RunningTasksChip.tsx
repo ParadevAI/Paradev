@@ -67,7 +67,11 @@ export function RunningTasksChip({
 			<PopoverContent
 				align="start"
 				className="w-72 p-1"
-				onOpenAutoFocus={(event) => event.preventDefault()}
+				onOpenAutoFocus={(event) => {
+					event.preventDefault();
+					if (event.currentTarget instanceof HTMLElement)
+						event.currentTarget.focus();
+				}}
 				side="top"
 			>
 				{work.map((item) => (
