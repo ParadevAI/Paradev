@@ -126,7 +126,7 @@ function waitForCallback({
 			// A callback from an earlier attempt can land on a reused loopback
 			// port. Judge the state before anything else and answer a mismatched
 			// callback without settling the wait, otherwise a stale denial ends
-			// the login that is waiting now (#6347 review).
+			// the login that is waiting now.
 			if (state !== expectedState) {
 				response
 					.writeHead(400, { "Content-Type": "text/html" })
@@ -438,7 +438,7 @@ export async function login(
 			} else {
 				// The paste flow was chosen, so nothing will ever hit the
 				// callback: release the port now instead of holding it through
-				// the prompt and until `finally` (#6347 review).
+				// the prompt and until `finally`.
 				loopback?.server.close();
 				callbacks
 					.promptForPastedCode(pasteController.signal)

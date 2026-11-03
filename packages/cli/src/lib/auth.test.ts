@@ -33,8 +33,7 @@ describe("login /authorize (single request)", () => {
 			// actually receive a code; the test only asserts on the URL(s).
 			bindLoopbackServer: async () => ({
 				// `waitForCallback` subscribes with `server.on`, so the fake has
-				// to look like a server instead of throwing on the first call
-				// (#6347 review).
+				// to look like a server instead of throwing on the first call.
 				server: { close: () => {}, on: () => {} } as never,
 				port: 51789,
 			}),

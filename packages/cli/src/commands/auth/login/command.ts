@@ -176,20 +176,20 @@ export default command({
 			process.stdout.isTTY && process.stdin.isTTY && !process.env.CI;
 
 		let pasteResolve: ((code: string) => void) | null = null;
-		let pasteReject: ((err: Error) => void) | null = null;
-		const pastePromise = new Promise<string>((resolve, reject) => {
+		const pastePromise = new Promise<string>((resolve) => {
 			pasteResolve = resolve;
-			pasteReject = reject;
 		});
 
 		let currentProps: LoginUIProps = {
 			url: null,
 			status: "starting",
 			onSubmit: (code) => pasteResolve?.(code),
-			onCancel: () => {
-				cancelController.abort();
-				pasteReject?.(new CLIError("Login cancelled"));
-			},
+			// Nothing awaits `pastePromise` on the loopback flow, so rejecting it
+			// here would be an unhandled rejection and would take the process
+			// down with a stack trace instead of the cancel path below. The
+			// abort alone settles both flows: `login` rejects with "Login
+			// cancelled" and the paste prompt's abort listener resolves it.
+			onCancel: () => cancelController.abort(),
 			onCopy: async () => false,
 		};
 
@@ -211,7 +211,7 @@ export default command({
 		// Escape or Ctrl+C in the Ink UI has to end the whole login, not just
 		// the paste prompt: once the loopback flow stops starting a paste
 		// prompt, rejecting that promise leaves a browser login waiting with no
-		// way out (#6347 review).
+		// way out.
 		const cancelController = new AbortController();
 		// Chained rather than `AbortSignal.any`, so the CLI keeps working on the
 		// Node versions it supports.
