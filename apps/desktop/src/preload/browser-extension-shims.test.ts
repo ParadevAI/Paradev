@@ -286,14 +286,12 @@ test("an extension's chrome.declarativeNetRequest calls main and keeps Chrome's 
 	expect(await dnr.getEnabledRulesets()).toEqual(["ublock-filters"]);
 	expect(dnr.RuleActionType).toEqual({ BLOCK: "block" });
 	expect(dnr.DYNAMIC_RULESET_ID).toBe("_dynamic");
-	const done = mock(() => undefined);
-	dnr.updateDynamicRules({ removeRuleIds: [1] }, done);
-	await Promise.resolve();
-	await Promise.resolve();
+	await new Promise<void>((done) =>
+		dnr.updateDynamicRules({ removeRuleIds: [1] }, done),
+	);
 	expect(callDnr).toHaveBeenLastCalledWith("updateDynamicRules", [
 		{ removeRuleIds: [1] },
 	]);
-	expect(done).toHaveBeenCalled();
 
 	expect(
 		runInMainWorld(shim, "chrome-extension://abc/background.js", {
