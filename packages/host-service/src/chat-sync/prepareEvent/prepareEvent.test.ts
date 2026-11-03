@@ -135,6 +135,24 @@ describe("prepareEventForCloud", () => {
 		});
 	});
 
+	test("keeps long ids whole", () => {
+		const id = "i".repeat(10_000);
+		const turnId = "t".repeat(10_000);
+		const long = toolCall({
+			content: Array.from({ length: 10 }, () => ({
+				type: "text",
+				text: "a".repeat(60_000),
+			})),
+		}) as Extract<DurableEvent, { type: "item" }>;
+		const prepared = prepareEventForCloud({
+			...long,
+			turnId,
+			item: { ...long.item, id },
+		} as DurableEvent);
+		expect(prepared.type === "item" && prepared.item.id).toBe(id);
+		expect(prepared.type === "item" && prepared.turnId).toBe(turnId);
+	});
+
 	test("does not cut a character in half", () => {
 		const event = prepareEventForCloud(
 			toolCall({ rawOutput: `${"a".repeat(64 * 1024 - 1)}😀tail` }),
