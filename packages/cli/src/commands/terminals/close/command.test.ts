@@ -28,10 +28,12 @@ const layout = {
 };
 let listError: Error | null = null;
 let closeError: Error | null = null;
+let killError: Error | null = null;
 let calls: string[] = [];
 
 const killSession = mock(async () => {
 	calls.push("killSession");
+	if (killError) throw killError;
 	return { success: true };
 });
 const close = mock(async (input: { paneId: string }) => {
@@ -62,6 +64,7 @@ function invoke(terminal: string) {
 beforeEach(() => {
 	listError = null;
 	closeError = null;
+	killError = null;
 	calls = [];
 	killSession.mockClear();
 	close.mockClear();
@@ -97,5 +100,12 @@ describe("terminals close", () => {
 			/Closed terminal term-child, but not the panes that show it: bridge disconnected/,
 		);
 		expect(calls).toEqual(["close pane-child", "killSession"]);
+	});
+
+	test("names the closed pane when ending the terminal fails", async () => {
+		killError = new Error("host busy");
+		await expect(invoke("term-child")).rejects.toThrow(
+			/Could not end terminal term-child: host busy\. Its pane pane-child is closed/,
+		);
 	});
 });

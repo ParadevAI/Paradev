@@ -42,8 +42,9 @@ export async function resolveSplitPlacement(
 	workspaceId: string,
 	options: { split?: PaneSplitDirection | null; pane?: string | null },
 ): Promise<SplitPlacement | null> {
+	const paneGiven = options.pane !== undefined && options.pane !== null;
 	if (!options.split) {
-		if (options.pane) {
+		if (paneGiven) {
 			throw new CLIError(
 				"--pane only applies with --split",
 				"Add --split right|left|down|up",
@@ -58,14 +59,14 @@ export async function resolveSplitPlacement(
 			"--split needs the Paradev desktop app open on that host",
 		);
 	});
-	const besidePane = options.pane
+	const besidePane = paneGiven
 		? panes.find((pane) => pane.id === options.pane)
 		: panes.find(
 				(pane) => callerTerminalId && pane.terminalId === callerTerminalId,
 			);
 	if (!besidePane) {
 		throw new CLIError(
-			options.pane
+			paneGiven
 				? `No pane ${options.pane} in workspace ${workspaceId}`
 				: "No pane shows the terminal you run this in",
 			"Pass --pane (see `superset panes list`), or run it from a terminal in that workspace",
@@ -139,6 +140,24 @@ export function paneCloseError(what: string, error: string): CLIError {
 	return new CLIError(
 		`Closed ${what}, but not the panes that show it: ${error}`,
 		"Check with `superset panes list`, then close them with `superset panes close`",
+	);
+}
+
+export function stopFailedError(
+	what: string,
+	panes: ClosedPanes,
+	error: unknown,
+): CLIError {
+	const reason = error instanceof Error ? error.message : String(error);
+	const ids = panes.closedPaneIds;
+	const closed =
+		ids.length === 0
+			? ""
+			: ` Its ${ids.length === 1 ? "pane" : "panes"} ${ids.join(", ")} ${ids.length === 1 ? "is" : "are"} closed.`;
+	const open = panes.error ? ` Some panes did not close: ${panes.error}.` : "";
+	return new CLIError(
+		`Could not end ${what}: ${reason}.${closed}${open}`,
+		"Run the same command again to retry",
 	);
 }
 

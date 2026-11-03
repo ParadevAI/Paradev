@@ -4,6 +4,7 @@ import {
 	closedPanesMessage,
 	closePanes,
 	paneCloseError,
+	stopFailedError,
 } from "../../../lib/pane-placement";
 import {
 	resolveSessionWorkspace,
@@ -25,10 +26,14 @@ export default command({
 			options.workspace,
 			(pane) => pane.sessionId === options.session,
 		);
-		await sessions.close.mutate({
-			workspaceId: options.workspace,
-			sessionId: options.session,
-		});
+		await sessions.close
+			.mutate({
+				workspaceId: options.workspace,
+				sessionId: options.session,
+			})
+			.catch((error: unknown) => {
+				throw stopFailedError(`session ${options.session}`, panes, error);
+			});
 
 		if (panes.error)
 			throw paneCloseError(`session ${options.session}`, panes.error);

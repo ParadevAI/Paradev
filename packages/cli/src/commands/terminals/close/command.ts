@@ -5,6 +5,7 @@ import {
 	closedPanesMessage,
 	closePanes,
 	paneCloseError,
+	stopFailedError,
 } from "../../../lib/pane-placement";
 
 export default command({
@@ -40,10 +41,14 @@ export default command({
 			options.workspace,
 			(pane) => pane.terminalId === options.terminal,
 		);
-		const result = await target.client.terminal.killSession.mutate({
-			terminalId: options.terminal,
-			workspaceId: options.workspace,
-		});
+		const result = await target.client.terminal.killSession
+			.mutate({
+				terminalId: options.terminal,
+				workspaceId: options.workspace,
+			})
+			.catch((error: unknown) => {
+				throw stopFailedError(`terminal ${options.terminal}`, panes, error);
+			});
 
 		if (panes.error)
 			throw paneCloseError(`terminal ${options.terminal}`, panes.error);

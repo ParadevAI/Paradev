@@ -90,7 +90,7 @@ superset agents create \
   --json
 ```
 
-Omit `--effort` or `--attachment` when they are not needed. When you run from a Paradev terminal on the workspace's own host and the user watches the desktop app, add `--split right` (or `left`, `down`, `up`): the worker opens in a pane beside yours, in your tab, so the user sees which workers are yours. Without it each worker gets a new tab. On another host your terminal has no pane, so pass `--pane <pane-id>` from `superset panes list --host <host-id>`, or leave out `--split`. `terminals create` takes the same `--split`. The result is `{ "kind", "sessionId", "label" }`. Require `kind` to be `terminal`; store `sessionId` as the terminal ID. Launch all ready, independent tasks before monitoring them.
+Omit `--effort` or `--attachment` when they are not needed. When you run from a Paradev terminal in the same workspace, on its own host, and the user watches the desktop app, add `--split right` (or `left`, `down`, `up`): the worker opens in a pane beside yours, in your tab, so the user sees which workers are yours. Without it each worker gets a new tab. From another workspace or host your terminal has no pane there, so pass `--pane <pane-id>` from `superset panes list`, or leave out `--split`. `terminals create` takes the same `--split`. The result is `{ "kind", "sessionId", "label" }`. Require `kind` to be `terminal`; store `sessionId` as the terminal ID. Launch all ready, independent tasks before monitoring them.
 
 Use `superset workspaces create` first when a worker needs an isolated branch. Do not create parallel editing workers in the same worktree unless their file ownership is explicitly disjoint.
 
