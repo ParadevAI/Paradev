@@ -152,5 +152,6 @@ export function serveNativeMessaging(session: Session): void {
 	session.extensions.on("extension-unloaded", (_event, extension) =>
 		ports.closeExtension(extension.id),
 	);
-	app.on("will-quit", () => ports.closeAll());
+	// Quit ends in app.exit, which skips will-quit.
+	app.on("before-quit", () => ports.closeAll());
 }
