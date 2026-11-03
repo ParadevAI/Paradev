@@ -5,6 +5,7 @@ import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections } from "../../core/rankCommands";
 import type { Command } from "../../core/types";
 import { useActiveCommands } from "../../core/useActiveCommands";
+import { ChatSearchResults } from "../ChatSearchResults";
 import { CommandItemRow } from "../CommandItemRow/CommandItemRow";
 
 interface CommandListViewProps {
@@ -37,6 +38,7 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 					))}
 				</CommandGroup>
 			))}
+			<ChatSearchResults query={query} />
 		</CommandList>
 	);
 }

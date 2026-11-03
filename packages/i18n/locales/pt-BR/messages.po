@@ -1079,6 +1079,9 @@ msgstr "{localHostName} (este dispositivo)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Copiando a conversa (# mensagem)} many {Copiando a conversa (# mensagens)} other {Copiando a conversa (# mensagens)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} de {0} objetivos fazendo a sua parte para {nextLabel} — {laggingLabels} estão mais atrás."
@@ -1948,6 +1951,9 @@ msgstr "Adicionar {0} à área de trabalho"
 
 msgid "Add {localizedName}?"
 msgstr "Adicionar {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Adicione {repositoryName} como projeto neste computador primeiro"
 
 msgid "Add a comment…"
 msgstr "Adicione um comentário…"
@@ -5478,6 +5484,9 @@ msgstr "Copie seu histórico de navegação e seus logins de outro navegador par
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Copie sua chave agora — você não vai poder vê-la de novo."
 
+msgid "Copying the conversation"
+msgstr "Copiando a conversa"
+
 msgid "Copyright or trademark"
 msgstr "Direitos autorais ou marca registrada"
 
@@ -5914,6 +5923,12 @@ msgstr "Não foi possível fazer o merge do pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Não foi possível mover o subagente para segundo plano"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "Não foi possível mover este chat para a nuvem"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "Não foi possível mover este chat para este computador"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Não foi possível nomear \"{name}\" automaticamente"
 
@@ -5995,6 +6010,9 @@ msgstr "Não foi possível salvar o Dev"
 msgid "Couldn't save the routine"
 msgstr "Não foi possível salvar a rotina"
 
+msgid "Couldn't search your chats"
+msgstr "Não foi possível pesquisar seus chats"
+
 msgid "Couldn't send comment"
 msgstr "Não foi possível enviar o comentário"
 
@@ -6054,6 +6072,9 @@ msgstr "Não foi possível parar o chat"
 
 msgid "Couldn't take a screenshot"
 msgstr "Não foi possível fazer a captura de tela"
+
+msgid "Couldn't try the move again"
+msgstr "Não foi possível tentar a mudança novamente"
 
 msgid "Couldn't undo the file changes."
 msgstr "Não foi possível desfazer as alterações de arquivos."
@@ -6324,6 +6345,9 @@ msgstr "Criando uma tarefa"
 
 msgid "Creating a workspace"
 msgstr "Criando uma área de trabalho"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Criando uma área de trabalho neste computador…"
 
 msgid "Creating PR..."
 msgstr "Criando PR…"
@@ -11703,8 +11727,17 @@ msgstr "Mover {count} para um grupo"
 msgid "Move {name} to background"
 msgstr "Mover {name} para segundo plano"
 
+msgid "Move this chat to the cloud?"
+msgstr "Mover este chat para a nuvem?"
+
+msgid "Move this chat to this computer?"
+msgstr "Mover este chat para este computador?"
+
 msgid "Move to background"
 msgstr "Mover para segundo plano"
+
+msgid "Move to cloud"
+msgstr "Mover para a nuvem"
 
 msgid "Move to group"
 msgstr "Mover para grupo"
@@ -11718,8 +11751,17 @@ msgstr "Mover para a direita"
 msgid "Move to Tab"
 msgstr "Mover para a aba"
 
+msgid "Move to this computer"
+msgstr "Mover para este computador"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" movida para {group}"
+
+msgid "Moving this chat here"
+msgstr "Movendo este chat para cá"
+
+msgid "Moving..."
+msgstr "Movendo..."
 
 msgid "Multi-select"
 msgstr "Múltipla escolha"
@@ -16077,6 +16119,9 @@ msgstr "\"{workspaceName}\" restaurado"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restaurando \"{workspaceName}\"…"
 
+msgid "Restoring Claude's session"
+msgstr "Restaurando a sessão do Claude"
+
 msgid "Restoring your session"
 msgstr "Restaurando sua sessão"
 
@@ -16559,6 +16604,12 @@ msgstr "Salvo em Downloads"
 
 msgid "Saving as an environment..."
 msgstr "Salvando como ambiente..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "Salvando o trabalho da área de trabalho na nuvem e esta conversa…"
+
+msgid "Saving your work and this conversation…"
+msgstr "Salvando seu trabalho e esta conversa…"
 
 msgid "Saving..."
 msgstr "Salvando..."
@@ -18261,8 +18312,14 @@ msgstr "Iniciando a área de trabalho na nuvem"
 msgid "Starting the agent…"
 msgstr "Iniciando o agente…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Iniciando a área de trabalho na nuvem…"
+
 msgid "Starting the simulator…"
 msgstr "Iniciando o simulador…"
+
+msgid "Starting the workspace"
+msgstr "Iniciando a área de trabalho"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Iniciando. Deve levar só um instante."
@@ -19062,6 +19119,9 @@ msgstr "O chat continua como está. Arquivos editados desde este turno, por qual
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "A área de trabalho na nuvem deveria ter iniciado, mas não respondeu a tempo. A próxima execução tentará novamente."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "O trabalho da área de trabalho na nuvem, incluindo alterações não confirmadas, é enviado para um novo branch. Uma área de trabalho neste computador é iniciada a partir desse branch, e esta conversa continua lá. Se o agente estiver trabalhando, ele para primeiro."
+
 msgid "The code expired. Start again."
 msgstr "O código expirou. Comece de novo."
 
@@ -19475,6 +19535,9 @@ msgstr "Não dá para desfazer."
 msgid "This channel is archived"
 msgstr "Este canal está arquivado"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Não foi possível mover este chat para cá. Ele continua na área de trabalho de onde veio."
+
 msgid "This chat has ended."
 msgstr "Este chat terminou."
 
@@ -19508,6 +19571,9 @@ msgstr "Não é possível iniciar esta área de trabalho na nuvem"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este workspace na nuvem está sendo ativado, o que pode levar até 30 segundos depois de um período inativo."
 
+msgid "This computer's host is not running"
+msgstr "O host deste computador não está em execução"
+
 msgid "This conversation is too long for the model"
 msgstr "Esta conversa é longa demais para o modelo"
 
@@ -19537,6 +19603,9 @@ msgstr "Este e-mail já está registrado com outro método de login, e o provedo
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Este ambiente não tem repositórios. Crie um ambiente com repositórios em Configurações e inicie a área de trabalho a partir dele"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "Este ambiente abre {environmentRepository}, não {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Os repositórios deste ambiente são fixos; promova uma área de trabalho novamente para alterá-los"
@@ -20589,6 +20658,9 @@ msgstr "Atualização necessária"
 
 msgid "update the branch prefix"
 msgstr "atualizar o prefixo da branch"
+
+msgid "Update the host service on this device and try again."
+msgstr "Atualize o serviço de host neste dispositivo e tente novamente."
 
 msgid "Update this host to message subagents"
 msgstr "Atualize este host para enviar mensagens aos subagentes"
@@ -21850,6 +21922,9 @@ msgstr "Suas alterações serão perdidas se você não salvar."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Seu código fica local por padrão, com controle explícito sobre os serviços conectados."
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "Seu trabalho atual, incluindo alterações não confirmadas, é enviado para um novo branch no remoto. Uma área de trabalho na nuvem é iniciada a partir desse branch no ambiente que você escolher, e esta conversa continua lá. Se o agente estiver trabalhando, ele para primeiro."
 
 msgid "Your download starts automatically."
 msgstr "Seu download começa automaticamente."

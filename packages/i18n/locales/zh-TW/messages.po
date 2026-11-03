@@ -1079,6 +1079,9 @@ msgstr "{localHostName}（此裝置）"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, other {正在複製對話（# 則訊息）}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{0} 項目標中有 {met} 項在為 {nextLabel} 出力 —— {laggingLabels} 落後最多。"
@@ -1948,6 +1951,9 @@ msgstr "將{0}新增到工作區"
 
 msgid "Add {localizedName}?"
 msgstr "要新增「{localizedName}」嗎？"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "請先將 {repositoryName} 新增為此電腦上的專案"
 
 msgid "Add a comment…"
 msgstr "新增留言…"
@@ -5478,6 +5484,9 @@ msgstr "把其他瀏覽器的瀏覽歷史和登入資訊複製到Paradev。原�
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "請立即複製你的金鑰，之後將無法再次檢視。"
 
+msgid "Copying the conversation"
+msgstr "正在複製對話"
+
 msgid "Copyright or trademark"
 msgstr "著作權或商標"
 
@@ -5914,6 +5923,12 @@ msgstr "無法合併拉取請求"
 msgid "Couldn't move the subagent to the background"
 msgstr "無法將子代理程式移到背景"
 
+msgid "Couldn't move this chat to the cloud"
+msgstr "無法將此聊天移至雲端"
+
+msgid "Couldn't move this chat to this computer"
+msgstr "無法將此聊天移到此電腦"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
 
@@ -5995,6 +6010,9 @@ msgstr "無法儲存 Dev"
 msgid "Couldn't save the routine"
 msgstr "無法儲存例行任務"
 
+msgid "Couldn't search your chats"
+msgstr "無法搜尋你的聊天"
+
 msgid "Couldn't send comment"
 msgstr "無法傳送評論"
 
@@ -6054,6 +6072,9 @@ msgstr "無法停止聊天"
 
 msgid "Couldn't take a screenshot"
 msgstr "無法擷取螢幕畫面"
+
+msgid "Couldn't try the move again"
+msgstr "無法重試移動"
 
 msgid "Couldn't undo the file changes."
 msgstr "無法撤銷檔案更改。"
@@ -6324,6 +6345,9 @@ msgstr "正在建立任務"
 
 msgid "Creating a workspace"
 msgstr "正在建立工作區"
+
+msgid "Creating a workspace on this computer…"
+msgstr "正在此電腦上建立工作區…"
 
 msgid "Creating PR..."
 msgstr "正在建立PR…"
@@ -11703,8 +11727,17 @@ msgstr "將{count}個移動到群組"
 msgid "Move {name} to background"
 msgstr "將 {name} 移到背景"
 
+msgid "Move this chat to the cloud?"
+msgstr "要將此聊天移至雲端嗎？"
+
+msgid "Move this chat to this computer?"
+msgstr "將此聊天移到此電腦？"
+
 msgid "Move to background"
 msgstr "移到背景"
+
+msgid "Move to cloud"
+msgstr "移至雲端"
 
 msgid "Move to group"
 msgstr "移動到群組"
@@ -11718,8 +11751,17 @@ msgstr "移到右側"
 msgid "Move to Tab"
 msgstr "移動到分頁"
 
+msgid "Move to this computer"
+msgstr "移到此電腦"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "已將「{name}」移動到 {group}"
+
+msgid "Moving this chat here"
+msgstr "正在將此聊天移到這裡"
+
+msgid "Moving..."
+msgstr "正在移動..."
 
 msgid "Multi-select"
 msgstr "多選"
@@ -16077,6 +16119,9 @@ msgstr "已還原「{workspaceName}」"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "正在還原「{workspaceName}」…"
 
+msgid "Restoring Claude's session"
+msgstr "正在還原 Claude 的工作階段"
+
 msgid "Restoring your session"
 msgstr "正在恢復你的會話"
 
@@ -16559,6 +16604,12 @@ msgstr "已儲存到「下載」資料夾"
 
 msgid "Saving as an environment..."
 msgstr "正在儲存為環境..."
+
+msgid "Saving the cloud workspace's work and this conversation…"
+msgstr "正在儲存雲端工作區的工作和此對話…"
+
+msgid "Saving your work and this conversation…"
+msgstr "正在儲存你的工作和此對話…"
 
 msgid "Saving..."
 msgstr "正在儲存..."
@@ -18261,8 +18312,14 @@ msgstr "正在啟動雲端工作區"
 msgid "Starting the agent…"
 msgstr "正在啟動代理…"
 
+msgid "Starting the cloud workspace…"
+msgstr "正在啟動雲端工作區…"
+
 msgid "Starting the simulator…"
 msgstr "正在啟動模擬器…"
+
+msgid "Starting the workspace"
+msgstr "正在啟動工作區"
 
 msgid "Starting up. This should only take a moment."
 msgstr "正在啟動，請稍等片刻。"
@@ -19062,6 +19119,9 @@ msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "雲端工作區應該已經啟動，但沒有及時回應。下次執行時會重試。"
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgstr "雲端工作區的工作（包括未提交的變更）會推送到一個新分支。此電腦上的工作區會從該分支啟動，此對話將在那裡繼續。如果代理程式正在工作，會先停止。"
+
 msgid "The code expired. Start again."
 msgstr "代碼已過期。請重新開始。"
 
@@ -19475,6 +19535,9 @@ msgstr "此操作無法復原。"
 msgid "This channel is archived"
 msgstr "此頻道已封存"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "無法將此聊天移到這裡。它仍在原本的工作區中。"
+
 msgid "This chat has ended."
 msgstr "此聊天已結束。"
 
@@ -19508,6 +19571,9 @@ msgstr "無法啟動此雲端工作區"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
 
+msgid "This computer's host is not running"
+msgstr "此電腦的主機服務未執行"
+
 msgid "This conversation is too long for the model"
 msgstr "此對話對模型來說太長了"
 
@@ -19537,6 +19603,9 @@ msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"
+
+msgid "This environment opens {environmentRepository}, not {chatRepository}"
+msgstr "此環境開啟的是 {environmentRepository}，而不是 {chatRepository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此環境的儲存庫已固定；請再次提升一個工作區以變更它們"
@@ -20589,6 +20658,9 @@ msgstr "需要更新"
 
 msgid "update the branch prefix"
 msgstr "更新分支字首"
+
+msgid "Update the host service on this device and try again."
+msgstr "請更新此裝置上的主機服務，然後再試一次。"
 
 msgid "Update this host to message subagents"
 msgstr "請更新此主機以傳送訊息給子代理程式"
@@ -21850,6 +21922,9 @@ msgstr "如果不儲存，你的更改將會丟失。"
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的程式碼預設留在本地，連線哪些服務由你明確決定。"
+
+msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
+msgstr "你目前的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，此對話將在那裡繼續。如果代理程式正在工作，會先停止。"
 
 msgid "Your download starts automatically."
 msgstr "下載會自動開始。"
