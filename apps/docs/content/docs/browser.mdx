@@ -42,6 +42,20 @@ Click **Design** in the browser toolbar to arm an element picker inside the page
 - Press **esc** to pick a different element; **esc** again (or the banner's ✕) exits design mode
 - Works on any page the pane can load, including your local dev server
 
+## Extensions
+
+Browser panes run Chrome extensions, so password managers, passkeys, and content blockers work in the pane.
+
+- **Install**: open an extension's page on the Chrome Web Store inside a pane and click the add button. Paradev lists the extension's permission warnings and asks before it installs.
+- **Pin**: open the puzzle-piece menu in the browser toolbar to pin an extension to the toolbar. Right-click a pinned extension to unpin it.
+- **Remove**: use the same menu. Removing asks first and deletes the extension's data.
+- **Content blockers**: extensions that use `declarativeNetRequest`, such as uBlock Origin Lite, block requests in the pane.
+- **Native messaging**: an extension that declares `nativeMessaging` can talk to its desktop app, for example a password manager. The desktop app must trust Paradev as a browser; 1Password lists it under **Settings → Browser → Add Browser**.
+
+Paradev checks an extension's files against the Chrome Web Store's signed hashes each time it starts. If a file changed, the extension is turned off and shows as greyed out in the menu. Reinstall it to keep its data, or remove it.
+
+Extensions run only in panes you open. Panes that agents open run in a separate session with none of your extensions and none of your logins unless you import them. Agents can manage extensions with [`superset browser extensions`](/cli/cli-reference#browser), and every install and removal still asks you in the app.
+
 ## Ports Integration
 
 When Paradev detects a port in use (e.g. `localhost:3000`), clicking its external link icon opens it in an in-app browser tab instead of the system browser.

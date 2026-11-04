@@ -1930,6 +1930,54 @@ browser-use / Playwright-class tools (mouse, keyboard, scroll, DOM, network).
 The URL embeds an auth token; treat it as a secret.
 </Command>
 
+<Command
+	name="superset browser extensions list"
+	options={[
+		{ flag: "--host <id>", description: "Host to ask (default: this machine)." },
+	]}
+	output={`Array<{ id; name; version; pinned }>`}
+>
+List the Chrome extensions installed in your browser panes. Only extensions
+installed from the Chrome Web Store appear.
+</Command>
+
+<Command
+	name="superset browser extensions install"
+	options={[
+		{ flag: "<extension>", required: true, description: "Extension ID or Chrome Web Store URL." },
+		{ flag: "--host <id>", description: "Host to install on (default: this machine)." },
+	]}
+>
+Install a Chrome Web Store extension in your browser panes. The app shows the
+extension's permission warnings and asks you first; a refusal fails the command,
+so an agent can't install an extension on its own.
+
+```bash
+superset browser extensions install <extension-id>
+```
+</Command>
+
+<Command
+	name="superset browser extensions remove"
+	options={[
+		{ flag: "<extension>", required: true, description: "Extension ID (from `browser extensions list`)." },
+		{ flag: "--host <id>", description: "Host to remove it from (default: this machine)." },
+	]}
+>
+Remove an extension and its data. The app asks you first.
+</Command>
+
+<Command
+	name="superset browser extensions pin"
+	options={[
+		{ flag: "<extension>", required: true, description: "Extension ID (from `browser extensions list`)." },
+		{ flag: "--host <id>", description: "Host the extension is on (default: this machine)." },
+	]}
+>
+Pin an extension to the browser pane toolbar. `superset browser extensions unpin`
+takes the same arguments and unpins it. Neither asks for confirmation.
+</Command>
+
 ---
 
 ### pages
