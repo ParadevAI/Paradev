@@ -1231,14 +1231,14 @@ msgstr "每使用者每月 {price},每席位每月 {gbHours} 雲端 GB 小時"
 msgid "{price}/user/mo"
 msgstr "{price}/使用者/月"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName}（原 {formerName}，YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（前身為 {formerName}，YC P26）是為 AI agent 時代打造的開源 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName}（原 {formerName}）"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName}（YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（YC P26）是為 AI agent 時代打造的開源 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
 
 msgid "{productName} for press"
 msgstr "給媒體的 {productName} 資訊"
@@ -1626,6 +1626,9 @@ msgstr "3個已歸檔的工作區"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3個檔案已更改，2個測試通過"
+
+msgid "3 running"
+msgstr "3 個執行中"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "每位工程師3條以上並行工作流"
@@ -2308,6 +2311,9 @@ msgstr "代理程式無法存取 {0} 的工具"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "代理程式無需中途干預即可完成常規工單。"
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "代理程式會在雲端持續工作。可在桌面版、iPhone 或 iPad 上重新開啟工作區。"
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "代理程式自己載入預覽、操作介面，並在標記為待審查之前附上截圖證據。"
 
@@ -2322,6 +2328,12 @@ msgstr "代理程式會記住它們對你程式碼庫的了解，讓每個新會
 
 msgid "Agents running at once"
 msgstr "同時執行的代理程式數"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "代理程式只會看到預留位置。Paradev 會把你的登入憑證加到外送請求中。"
+
+msgid "Agents that run while you're away"
+msgstr "你離開時也在執行的代理程式"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "代理程式呼叫 Linear 工具時會使用此帳號。"
@@ -2637,6 +2649,9 @@ msgstr "代理程式寫出完整的函式和檔案，人類盯著每一步、批
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "自動化只能使用你建立的雲端工作區"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "環境儲存你的儲存庫、變數和區域。可以從它啟動任意數量的工作區。"
 
 msgid "An error occurred"
 msgstr "發生錯誤"
@@ -3093,9 +3108,6 @@ msgstr "附加到聊天"
 msgid "Attached"
 msgstr "已附加"
 
-msgid "Attaching to the running session…"
-msgstr "正在連線到執行中的工作階段…"
-
 msgid "attachment"
 msgstr "附件"
 
@@ -3411,9 +3423,6 @@ msgstr "基於PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "基於最近30天的{0}個token，統計{1}。"
 
-msgid "Become a design partner"
-msgstr "成為共創夥伴"
-
 msgid "Before"
 msgstr "變更前"
 
@@ -3601,9 +3610,6 @@ msgstr "將 {companyName} 引入您的團隊。與我們聯繫以進一步瞭解
 msgid "Bring a link to something you built recently."
 msgstr "請帶上你最近做的作品連結。"
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "把 Claude Code、Codex、OpenCode 或任何程式碼代理帶進同一個工作區。在不同分支上平行執行任務，並在同一處審查所有內容。"
-
 msgid "Bring in an agent"
 msgstr "選擇代理程式"
 
@@ -3672,9 +3678,6 @@ msgstr "Bug 回報"
 
 msgid "Build in public"
 msgstr "公開建構"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "共創 Paradev 的雲端未來"
 
 msgid "Build your own"
 msgstr "自己動手打造"
@@ -4613,6 +4616,9 @@ msgstr "關閉工作區"
 msgid "Close Workspace"
 msgstr "關閉工作區"
 
+msgid "Close your laptop"
+msgstr "闔上筆電"
+
 msgid "Closed"
 msgstr "已關閉"
 
@@ -4635,6 +4641,9 @@ msgstr "關閉此終端將結束正在執行的處理程序。"
 msgid "Cloud"
 msgstr "雲端"
 
+msgid "Cloud · us-east"
+msgstr "雲端 · us-east"
+
 msgid "Cloud environment setup"
 msgstr "雲端環境設定"
 
@@ -4646,9 +4655,6 @@ msgstr "雲端環境會從 GitHub 檢出你的儲存庫。請先連結這些;只
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "每席位每月雲端 GB 小時"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "雲端版本即將推出。成為共創夥伴"
 
 msgid "Cloud sandboxes"
 msgstr "雲端沙箱"
@@ -4754,9 +4760,6 @@ msgstr "合併顯示=>和!==等序列。"
 
 msgid "Come build it with us."
 msgstr "來和我們一起建構吧。"
-
-msgid "Coming soon"
-msgstr "即將推出"
 
 msgid "Coming Soon"
 msgstr "即將推出"
@@ -5706,6 +5709,9 @@ msgstr "無法記錄雲端工作區"
 
 msgid "Could not record environment"
 msgstr "無法儲存環境"
+
+msgid "Could not reinstall {name}"
+msgstr "無法重新安裝 {name}"
 
 msgid "Could not remove {name}"
 msgstr "無法移除 {name}"
@@ -7451,6 +7457,9 @@ msgstr "每個介面都有各自的排版設定。更改會立即體現在即時
 msgid "Each task on its own branch"
 msgstr "每個任務都有自己的分支"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "每個工作區都有獨立的雲端機器，筆電闔上也能繼續工作。可在桌面版、iPhone 或 iPad 上查看進度。"
+
 msgid "Early 2024"
 msgstr "2024年初"
 
@@ -9033,8 +9042,8 @@ msgstr "全螢幕"
 msgid "Full self-driving"
 msgstr "完全自動駕駛"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "完整原始碼在GitHub上以Elastic License 2.0（ELv2）提供。可查閱、審計並參與貢獻。沒有黑箱，沒有隱藏功能。"
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "完整原始碼在GitHub上以MIT授權條款開源。可查閱、審計並參與貢獻。沒有黑箱，沒有隱藏功能。"
 
 msgid "Funding"
 msgstr "融資"
@@ -9937,6 +9946,9 @@ msgstr "包含"
 msgid "Included in Enterprise"
 msgstr "企業版包含"
 
+msgid "Included with Team and Ultra."
+msgstr "包含在 Team 和 Ultra 中。"
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "包含Paradev特有的box變體"
 
@@ -10345,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "加入"
 
-msgid "Join as a design partner"
-msgstr "加入成為設計夥伴"
-
 msgid "Join channel"
 msgstr "加入頻道"
 
@@ -10541,6 +10550,9 @@ msgstr "語言"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "語言已在此裝置上儲存，但同步到你的帳戶失敗。"
+
+msgid "Laptop closed"
+msgstr "筆電已闔上"
 
 msgid "Large"
 msgstr "大"
@@ -11606,6 +11618,9 @@ msgstr "缺少必填欄位。"
 msgid "serverError.plugins.missingInput"
 msgstr "缺少必填輸入 {input}"
 
+msgid "MIT License"
+msgstr "MIT 授權條款"
+
 msgid "Mobile"
 msgstr "行動裝置"
 
@@ -12370,6 +12385,9 @@ msgstr "未找到議題。"
 msgid "No items"
 msgstr "暫無條目"
 
+msgid "No keys in the sandbox"
+msgstr "沙箱中不存放金鑰"
+
 msgid "No known creators"
 msgstr "沒有已知的建立者"
 
@@ -13093,6 +13111,9 @@ msgstr "一句話"
 msgid "One line about how you work"
 msgstr "用一句話介紹你的工作方式"
 
+msgid "One machine per workspace."
+msgstr "每個工作區一台機器。"
+
 msgid "One of the first hundred on the board"
 msgstr "榜單最早的一百人之一"
 
@@ -13110,9 +13131,6 @@ msgstr "一個外掛，所有程式碼代理程式。"
 
 msgid "One step left"
 msgstr "還差一步"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "一個工作區，容納Claude Code、Codex和任何編碼代理程式。"
 
 msgid "online"
 msgstr "線上"
@@ -13619,6 +13637,9 @@ msgstr "開啟側邊面板"
 msgid "Open ship options"
 msgstr "開啟發布選項"
 
+msgid "Open Source"
+msgstr "開源"
+
 msgid "Open System Settings"
 msgstr "開啟系統設定"
 
@@ -14011,6 +14032,9 @@ msgstr "Paradev 自動化"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev 雲端工作區"
+
 msgid "Paradev components"
 msgstr "Paradev 元件"
 
@@ -14053,8 +14077,8 @@ msgstr "當你選取某個遠端工作區時，Paradev 會轉送它開啟的連�
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev有免費版。原始碼在GitHub上以Elastic License 2.0（ELv2）提供，你可以在許可條款範圍內查閱並自行部署。"
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev提供免費方案。原始碼在GitHub上以MIT授權條款開源，你可以查閱、修改並自行部署。"
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev遇到意外錯誤。重新載入以重試。"
@@ -14083,11 +14107,8 @@ msgstr "Paradev 就是在 Paradev 中建構的，因此我們自己就是它的�
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev的設計就是配合你現有的工具。我們原生支援深度連結到Cursor這類IDE，你可以直接在自己的IDE裡開啟工作區和檔案。"
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev是原始碼可見的：程式碼在GitHub上公開，採用Elastic License 2.0（ELv2），你可以在許可條款範圍內查閱並自行部署，但它不是OSI認可的開源許可。Paradev與商業智慧工具Apache Superset沒有任何關係。"
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev 原始碼可見。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev 是開源的。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev 是從 F3 邁向 F4 的工作台：在不同分支上平行執行的代理、真正能監督的代理群，以及用來審查非你所寫程式碼的介面。"
@@ -14365,6 +14386,9 @@ msgstr "選擇磁碟上的資料夾並將其新增為專案"
 
 msgid "Pick a folder…"
 msgstr "選擇資料夾…"
+
+msgid "Pick a machine size"
+msgstr "選擇機器規格"
 
 msgid "Pick a model"
 msgstr "選擇模型"
@@ -15266,6 +15290,9 @@ msgstr "閱讀指南"
 msgid "Read the guide to parallel coding agents"
 msgstr "閱讀並行編碼代理程式指南"
 
+msgid "Read the MIT License"
+msgstr "閱讀 MIT 授權條款"
+
 msgid "Read the page"
 msgstr "閱讀頁面"
 
@@ -15465,6 +15492,9 @@ msgstr "區域"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "在該代理程式的全域性配置中註冊生命週期鉤子，以便Paradev顯示狀態併發送通知。關閉後會在所有位置移除Paradev的條目，該代理程式的狀態和通知都會停止，包括在Paradev內部。"
+
+msgid "Reinstall {name}"
+msgstr "重新安裝 {name}"
 
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "應 {inviter} 邀請，與 {others} 一起重新加入了 {channel}。"
@@ -16178,9 +16208,6 @@ msgstr "將在重設後繼續"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒後繼續"
 
-msgid "Resuming the conversation…"
-msgstr "正在繼續對話…"
-
 msgid "Retry"
 msgstr "重試"
 
@@ -16425,6 +16452,9 @@ msgstr "在你的Microsoft Teams租戶中有訊息釋出或頻道被建立時執
 msgid "Run automations when Sentry issues change."
 msgstr "在Sentry問題發生變化時執行自動化。"
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "在雲端工作區中執行程式設計代理程式，筆電闔上也能繼續工作。包含在 Team 和 Ultra 中。"
+
 msgid "Run commands and navigate the application."
 msgstr "執行命令並在應用中導航。"
 
@@ -16490,6 +16520,9 @@ msgstr "在桌面、任何終端機或手機上執行你的 agent。"
 
 msgid "Run your agents from your phone."
 msgstr "在手機上執行你的 agent。"
+
+msgid "Run your coding agents in the cloud."
+msgstr "在雲端執行你的程式設計代理程式。"
 
 msgid "Run."
 msgstr "執行。"
@@ -17328,6 +17361,9 @@ msgstr "透過 SSH 設定主機"
 msgid "Set up an automation"
 msgstr "設定自動化"
 
+msgid "Set up once"
+msgstr "只需設定一次"
+
 msgid "Set up project on {hostName}"
 msgstr "在{hostName}上設定專案"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "小型"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "小型、中型或大型，最高 8 vCPU 和 16 GB。用量隨記憶體增加。"
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "清空你的待辦清單。"
@@ -18038,9 +18077,6 @@ msgstr "任務完成時的聲音和鈴聲"
 
 msgid "Source"
 msgstr "來源"
-
-msgid "Source Available"
-msgstr "原始碼可見"
 
 msgid "Source path (not an import)"
 msgstr "原始碼路徑（不是匯入路徑）"
@@ -18294,6 +18330,9 @@ msgstr "隨時隨地開始工作"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "在任務檢視中直接從 Linear 或 GitHub 議題啟動工作區，每個工作區都已有代理程式在處理。"
+
+msgid "Start your first cloud workspace."
+msgstr "啟動你的第一個雲端工作區。"
 
 msgid "Started"
 msgstr "開始時間"
@@ -19301,6 +19340,12 @@ msgstr "你的組織或團隊的名稱"
 msgid "The network connection changed"
 msgstr "網路連線已變更"
 
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "開源工作區，容納Claude Code、Codex和任何編碼代理程式。"
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何程式碼代理。在不同分支上平行執行任務，並在同一處審查所有內容。"
+
 msgid "The overnight shift"
 msgstr "夜班"
 
@@ -20287,6 +20332,9 @@ msgstr "把Slack對話變成任務，從工作區執行代理程式，讓隊友�
 msgid "turn the onboarding findings into a page"
 msgstr "把新手引導的調查結果做成頁面"
 
+msgid "Turned off because its files changed"
+msgstr "已關閉，因為其檔案已變更"
+
 msgid "Two Hands"
 msgstr "雙手齊開"
 
@@ -20705,6 +20753,12 @@ msgstr "升級至 {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "升級至 Pro"
+
+msgid "Upgrade to Team"
+msgstr "升級到 Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "升級你的組織，連結 GitHub，然後在新增工作區畫面中選擇「雲端」。"
 
 msgid "Upgrade your plan"
 msgstr "升級你的方案"
@@ -21185,9 +21239,6 @@ msgstr "我們正在舊金山招募工程師。來和我們一起打造工程師
 msgid "We're hiring in San Francisco"
 msgstr "我們在舊金山招聘"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "我們正在尋找共創夥伴，共同打造雲端產品。請告訴我們您的工作流程，我們會與您聯絡，探討合作機會。"
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "我們正在重做這個功能，敬請期待。"
 
@@ -21336,9 +21387,6 @@ msgstr "我們正在構建什麼"
 msgid "What we've shipped"
 msgstr "我們發布了什麼"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "您想用雲端 Paradev 建構什麼？"
-
 msgid "What would you like to know?"
 msgstr "你想了解什麼？"
 
@@ -21456,9 +21504,6 @@ msgstr "文字標誌，黑色"
 
 msgid "Wordmark, white"
 msgstr "文字標誌，白色"
-
-msgid "Work email"
-msgstr "工作電子郵件"
 
 msgid "Work from tickets"
 msgstr "從工單開始工作"
@@ -21717,6 +21762,9 @@ msgstr "可以。在包含雲端工作區的方案中，擁有者可以在設定
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "是的。Paradev已通過獨立審計機構的SOC 2 Type II審計，覆蓋我們的安全控制在一段時間內的實際執行情況。可在{trustHost}索取報告並查閱我們的安全文件。"
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "是的。Paradev 以 MIT 授權條款開源。程式碼公開在 GitHub 上，任何人都可以回報 issue、提出 pull request 或 fork。Paradev 與商業智慧工具 Apache Superset 無關。"
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "需要。Paradev是代理程式執行的工作區，不是模型提供商。帶上Claude Code、Codex、OpenCode或任意CLI代理程式，在任何方案下都可以使用你已有的帳號或API金鑰。"

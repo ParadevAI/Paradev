@@ -1231,14 +1231,14 @@ msgstr "{price} per gebruiker/maand, {gbHours} cloud-GB-uren per gebruiker per m
 msgid "{price}/user/mo"
 msgstr "{price}/gebruiker/mnd"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (voorheen {formerName}, YC P26) is de source-available IDE voor het tijdperk van AI-agents, waarin engineers honderden codeeragents zoals Claude Code en Codex parallel draaien."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (voorheen {formerName}, YC P26) is de open-source IDE voor het tijdperk van AI-agents, waarin engineers honderden codeeragents zoals Claude Code en Codex parallel draaien."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (voorheen {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) is de source-available IDE voor het tijdperk van AI-agents, waarin engineers honderden codeeragents zoals Claude Code en Codex parallel draaien."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) is de open-source IDE voor het tijdperk van AI-agents, waarin engineers honderden codeeragents zoals Claude Code en Codex parallel draaien."
 
 msgid "{productName} for press"
 msgstr "{productName} voor de pers"
@@ -1626,6 +1626,9 @@ msgstr "3 gearchiveerde werkruimtes"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3 bestanden gewijzigd, 2 tests geslaagd"
+
+msgid "3 running"
+msgstr "3 actief"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ gelijktijdige werkstromen per engineer"
@@ -2308,6 +2311,9 @@ msgstr "Agents kunnen de tools van {0} niet bereiken"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents voltooien routinetickets zonder tussentijds ingrijpen."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Agents blijven werken in de cloud. Open de werkruimte opnieuw op desktop, iPhone of iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agents laden hun eigen preview, bedienen de UI en voegen screenshotbewijs toe voordat ze werk klaarzetten voor review."
 
@@ -2322,6 +2328,12 @@ msgstr "Agents onthouden wat ze over je codebase leren, zodat elke nieuwe sessie
 
 msgid "Agents running at once"
 msgstr "Agents die tegelijk draaien"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Agents zien alleen een placeholder. Paradev voegt je aanmelding toe aan uitgaande verzoeken."
+
+msgid "Agents that run while you're away"
+msgstr "Agents die doorwerken als je weg bent"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."
@@ -2637,6 +2649,9 @@ msgstr "Een agent schrijft hele functies en bestanden terwijl een mens elke stap
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Een automatisering kan alleen een cloudwerkruimte gebruiken die je zelf hebt aangemaakt"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Een omgeving bevat je repository's, variabelen en regio. Start er zoveel werkruimtes uit als je nodig hebt."
 
 msgid "An error occurred"
 msgstr "Er is een fout opgetreden"
@@ -3093,9 +3108,6 @@ msgstr "Aan chat toevoegen"
 msgid "Attached"
 msgstr "Gekoppeld"
 
-msgid "Attaching to the running session…"
-msgstr "Verbinden met de actieve sessie…"
-
 msgid "attachment"
 msgstr "bijlage"
 
@@ -3411,9 +3423,6 @@ msgstr "gebaseerd op PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Op basis van {0} tokens in de laatste 30 dagen, gerekend over {1}."
 
-msgid "Become a design partner"
-msgstr "Word ontwerppartner"
-
 msgid "Before"
 msgstr "Voor"
 
@@ -3601,9 +3610,6 @@ msgstr "Breng {companyName} naar je team. Neem contact op voor meer informatie o
 msgid "Bring a link to something you built recently."
 msgstr "Neem een link mee naar iets wat je onlangs hebt gebouwd."
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Breng Claude Code, Codex, OpenCode of elke andere coding agent samen in één workspace. Voer taken parallel uit op aparte branches en review alles op één plek."
-
 msgid "Bring in an agent"
 msgstr "Een agent erbij halen"
 
@@ -3672,9 +3678,6 @@ msgstr "Bugmeldingen"
 
 msgid "Build in public"
 msgstr "Bouwen in het openbaar"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Bouw aan de toekomst van Paradev in de cloud"
 
 msgid "Build your own"
 msgstr "Bouw je eigen"
@@ -4613,6 +4616,9 @@ msgstr "Werkruimte sluiten"
 msgid "Close Workspace"
 msgstr "Werkruimte sluiten"
 
+msgid "Close your laptop"
+msgstr "Klap je laptop dicht"
+
 msgid "Closed"
 msgstr "Gesloten"
 
@@ -4635,6 +4641,9 @@ msgstr "Als je deze terminal sluit, wordt het draaiende proces beëindigd."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud · us-east"
+msgstr "Cloud · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Cloudomgeving instellen"
 
@@ -4646,9 +4655,6 @@ msgstr "Cloudomgevingen halen je repositories op van GitHub. Verbind deze eerst;
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "Cloud-GB-uren per gebruiker per maand"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "De cloud komt eraan. Word ontwerppartner"
 
 msgid "Cloud sandboxes"
 msgstr "Cloudsandboxen"
@@ -4754,9 +4760,6 @@ msgstr "Combineer reeksen zoals => en !==."
 
 msgid "Come build it with us."
 msgstr "Kom het samen met ons bouwen."
-
-msgid "Coming soon"
-msgstr "Binnenkort"
 
 msgid "Coming Soon"
 msgstr "Binnenkort"
@@ -5706,6 +5709,9 @@ msgstr "Kan cloudwerkruimte niet vastleggen"
 
 msgid "Could not record environment"
 msgstr "Omgeving kon niet worden opgeslagen"
+
+msgid "Could not reinstall {name}"
+msgstr "Kan {name} niet opnieuw installeren"
 
 msgid "Could not remove {name}"
 msgstr "Kan {name} niet verwijderen"
@@ -7451,6 +7457,9 @@ msgstr "Elk oppervlak heeft zijn eigen typografie. Wijzigingen zie je meteen in 
 msgid "Each task on its own branch"
 msgstr "Elke taak op een eigen branch"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Elke werkruimte krijgt een eigen cloudmachine en werkt door als je laptop dicht is. Kijk mee op desktop, iPhone of iPad."
+
 msgid "Early 2024"
 msgstr "Begin 2024"
 
@@ -9033,8 +9042,8 @@ msgstr "Volledig scherm"
 msgid "Full self-driving"
 msgstr "Volledig zelfrijdend"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Volledige broncode beschikbaar op GitHub onder Elastic License 2.0 (ELv2). Bekijk, audit en draag bij aan de code. Geen black boxes, geen verborgen functionaliteit."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Volledige broncode op GitHub onder de MIT-licentie. Bekijk, audit en draag bij aan de code. Geen black boxes, geen verborgen functionaliteit."
 
 msgid "Funding"
 msgstr "Financiering"
@@ -9937,6 +9946,9 @@ msgstr "Inbegrepen"
 msgid "Included in Enterprise"
 msgstr "Inbegrepen bij Enterprise"
 
+msgid "Included with Team and Ultra."
+msgstr "Inbegrepen bij Team en Ultra."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Inclusief de Paradev-specifieke box-variant"
 
@@ -10345,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Meedoen"
 
-msgid "Join as a design partner"
-msgstr "Word design partner"
-
 msgid "Join channel"
 msgstr "Kanaal joinen"
 
@@ -10541,6 +10550,9 @@ msgstr "Taal"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Taal opgeslagen op dit apparaat, maar synchroniseren naar je account is mislukt."
+
+msgid "Laptop closed"
+msgstr "Laptop dicht"
 
 msgid "Large"
 msgstr "Groot"
@@ -11606,6 +11618,9 @@ msgstr "Verplichte velden ontbreken."
 msgid "serverError.plugins.missingInput"
 msgstr "Verplichte invoer {input} ontbreekt"
 
+msgid "MIT License"
+msgstr "MIT-licentie"
+
 msgid "Mobile"
 msgstr "Mobiel"
 
@@ -12370,6 +12385,9 @@ msgstr "Geen issues gevonden."
 msgid "No items"
 msgstr "Geen items"
 
+msgid "No keys in the sandbox"
+msgstr "Geen sleutels in de sandbox"
+
 msgid "No known creators"
 msgstr "Geen bekende makers"
 
@@ -13093,6 +13111,9 @@ msgstr "Eén zin"
 msgid "One line about how you work"
 msgstr "Eén regel over hoe je werkt"
 
+msgid "One machine per workspace."
+msgstr "Eén machine per werkruimte."
+
 msgid "One of the first hundred on the board"
 msgstr "Bij de eerste honderd op het bord"
 
@@ -13110,9 +13131,6 @@ msgstr "Eén plugin. Elke coding-agent."
 
 msgid "One step left"
 msgstr "Nog één stap"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Eén werkruimte voor Claude Code, Codex en elke andere coding agent."
 
 msgid "online"
 msgstr "online"
@@ -13619,6 +13637,9 @@ msgstr "Sheet openen"
 msgid "Open ship options"
 msgstr "Verzendopties openen"
 
+msgid "Open Source"
+msgstr "Open source"
+
 msgid "Open System Settings"
 msgstr "Systeeminstellingen openen"
 
@@ -14011,6 +14032,9 @@ msgstr "Paradev Automatiseringen"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev-cloudwerkruimtes"
+
 msgid "Paradev components"
 msgstr "Paradev-componenten"
 
@@ -14053,8 +14077,8 @@ msgstr "Paradev stuurt de poorten door die een externe werkruimte opent terwijl 
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev heeft een gratis niveau. De broncode staat op GitHub onder Elastic License 2.0 (ELv2), dus je kunt hem inzien en zelf hosten binnen de licentievoorwaarden."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev heeft een gratis abonnement. De broncode staat op GitHub onder de MIT-licentie, dus je kunt hem inzien, aanpassen en zelf hosten."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev liep tegen een onverwachte fout aan. Herlaad om het opnieuw te proberen."
@@ -14083,11 +14107,8 @@ msgstr "Paradev wordt gebouwd in Paradev, dus we zijn zelf onze belangrijkste ge
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev is gemaakt om samen te werken met je bestaande tool; we ondersteunen deeplinks naar IDE's zoals Cursor, zodat je je werkruimtes en bestanden in je IDE kunt openen."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev is source-available: de code is openbaar op GitHub onder Elastic License 2.0 (ELv2), waarmee je hem kunt inzien en zelf hosten binnen de licentievoorwaarden, maar het is geen door OSI goedgekeurde open source. Paradev staat los van Apache Superset, de business-intelligencetool."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev is source-available. Elke pull request, review en bug is openbaar op GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev is open source. Elke pull request, review en bug is openbaar op GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev is de werkbank voor de overgang van F3 naar F4: parallelle agents op aparte branches, vloten die je echt kunt overzien, en een reviewomgeving voor code die je niet zelf hebt geschreven."
@@ -14365,6 +14386,9 @@ msgstr "Kies een map op schijf en voeg die toe als project"
 
 msgid "Pick a folder…"
 msgstr "Kies een map…"
+
+msgid "Pick a machine size"
+msgstr "Kies een machinegrootte"
 
 msgid "Pick a model"
 msgstr "Kies een model"
@@ -15266,6 +15290,9 @@ msgstr "Lees de gids"
 msgid "Read the guide to parallel coding agents"
 msgstr "Lees de gids over parallelle coding agents"
 
+msgid "Read the MIT License"
+msgstr "Lees de MIT-licentie"
+
 msgid "Read the page"
 msgstr "De pagina lezen"
 
@@ -15465,6 +15492,9 @@ msgstr "Regio"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registreert lifecycle-hooks in de globale configuratie van deze agent zodat Paradev status kan tonen en meldingen kan sturen. Uitzetten verwijdert de items van Paradev overal — status en meldingen stoppen voor deze agent, ook binnen Paradev."
+
+msgid "Reinstall {name}"
+msgstr "{name} opnieuw installeren"
 
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "is op uitnodiging van {inviter} samen met {others} opnieuw lid geworden van {channel}."
@@ -16178,9 +16208,6 @@ msgstr "Wordt hervat bij reset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wordt hervat over {resumeSeconds} s"
 
-msgid "Resuming the conversation…"
-msgstr "Gesprek wordt hervat…"
-
 msgid "Retry"
 msgstr "Opnieuw"
 
@@ -16425,6 +16452,9 @@ msgstr "Draai automatiseringen wanneer er berichten worden geplaatst of kanalen 
 msgid "Run automations when Sentry issues change."
 msgstr "Voer automatiseringen uit wanneer Sentry-issues wijzigen."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Draai codeeragents in cloudwerkruimtes die doorwerken als je laptop dicht is. Inbegrepen bij Team en Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Opdrachten uitvoeren en door de app navigeren."
 
@@ -16490,6 +16520,9 @@ msgstr "Draai je agents vanaf de desktop, elke terminal of je telefoon."
 
 msgid "Run your agents from your phone."
 msgstr "Draai je agents vanaf je telefoon."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Draai je codeeragents in de cloud."
 
 msgid "Run."
 msgstr "Voer uit."
@@ -17328,6 +17361,9 @@ msgstr "Host instellen via SSH"
 msgid "Set up an automation"
 msgstr "Stel een automatisering in"
 
+msgid "Set up once"
+msgstr "Eén keer instellen"
+
 msgid "Set up project on {hostName}"
 msgstr "Project instellen op {hostName}"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Klein"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Klein, Middel of Groot, tot 8 vCPU en 16 GB. Het verbruik hangt af van het geheugen."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Werk je backlog weg."
@@ -18038,9 +18077,6 @@ msgstr "Geluiden en beltoon voor afgeronde taken"
 
 msgid "Source"
 msgstr "Bron"
-
-msgid "Source Available"
-msgstr "Source available"
 
 msgid "Source path (not an import)"
 msgstr "Bronpad (geen import)"
@@ -18294,6 +18330,9 @@ msgstr "Begin overal met werken"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Start werkruimtes direct vanuit Linear- of GitHub-issues in de weergave Taken, met op elk ervan al een agent aan het werk."
+
+msgid "Start your first cloud workspace."
+msgstr "Start je eerste cloudwerkruimte."
 
 msgid "Started"
 msgstr "Gestart"
@@ -19301,6 +19340,12 @@ msgstr "De naam van je organisatie of team"
 msgid "The network connection changed"
 msgstr "De netwerkverbinding is gewijzigd"
 
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "De open-source werkruimte voor Claude Code, Codex en elke andere coding agent."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "De open-source workspace voor Claude Code, Codex, OpenCode en elke andere coding agent. Voer taken parallel uit op aparte branches en review alles op één plek."
+
 msgid "The overnight shift"
 msgstr "De nachtploeg"
 
@@ -20287,6 +20332,9 @@ msgstr "Zet Slack-gesprekken om in taken, laat agents draaien vanuit je werkruim
 msgid "turn the onboarding findings into a page"
 msgstr "maak van de onboarding-bevindingen een pagina"
 
+msgid "Turned off because its files changed"
+msgstr "Uitgeschakeld omdat de bestanden zijn gewijzigd"
+
 msgid "Two Hands"
 msgstr "Twee handen"
 
@@ -20705,6 +20753,12 @@ msgstr "Upgraden naar {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Upgraden naar Pro"
+
+msgid "Upgrade to Team"
+msgstr "Upgraden naar Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Upgrade je organisatie, koppel GitHub en kies Cloud in het scherm voor een nieuwe werkruimte."
 
 msgid "Upgrade your plan"
 msgstr "Upgrade je abonnement"
@@ -21185,9 +21239,6 @@ msgstr "We nemen engineers aan in San Francisco. Kom de tools bouwen waarmee eng
 msgid "We're hiring in San Francisco"
 msgstr "We zoeken mensen in San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "We zoeken ontwerppartners om ons cloudaanbod mee vorm te geven. Vertel ons over je werkwijze en we nemen contact op om een samenwerking te bespreken."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "We bouwen deze functie opnieuw op. Kom binnenkort terug."
 
@@ -21336,9 +21387,6 @@ msgstr "Wat we bouwen"
 msgid "What we've shipped"
 msgstr "Wat we hebben uitgebracht"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Wat wil je bouwen met Paradev in de cloud?"
-
 msgid "What would you like to know?"
 msgstr "Wat wil je weten?"
 
@@ -21456,9 +21504,6 @@ msgstr "Woordmerk, zwart"
 
 msgid "Wordmark, white"
 msgstr "Woordmerk, wit"
-
-msgid "Work email"
-msgstr "Zakelijk e-mailadres"
 
 msgid "Work from tickets"
 msgstr "Werken vanuit tickets"
@@ -21717,6 +21762,9 @@ msgstr "Ja. Bij abonnementen met cloudwerkruimtes kunnen eigenaren in Instelling
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Ja. Paradev heeft een SOC 2 Type II-audit door een onafhankelijke auditor afgerond, over de werking van onze securitycontroles in de tijd. Vraag het rapport aan en bekijk onze securitydocumentatie op {trustHost}."
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Ja. Paradev is open source onder de MIT-licentie. De code staat openbaar op GitHub, en iedereen kan issues melden, pull requests openen of een fork maken. Paradev heeft niets te maken met Apache Superset, de business-intelligencetool."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Ja. Paradev is de werkruimte waarin je agents draaien, geen modelprovider. Neem Claude Code, Codex, OpenCode of welke CLI-agent dan ook mee en gebruik je bestaande accounts of API-sleutels op elk plan."

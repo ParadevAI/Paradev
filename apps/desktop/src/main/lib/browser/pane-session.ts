@@ -6,6 +6,7 @@ import {
 	GOOGLE_SIGN_IN_HOST,
 } from "shared/chrome-user-agent";
 import { PANE_PARTITIONS } from "shared/constants";
+import { webRequestHub } from "./web-request-hub";
 
 /** Sites see Chrome in every pane session, and Google's sign-in sees Firefox. */
 export function preparePaneSessions(): void {
@@ -14,18 +15,18 @@ export function preparePaneSessions(): void {
 		const electronUserAgent = paneSession.getUserAgent();
 		paneSession.setUserAgent(chromeUserAgent(electronUserAgent));
 		const googleSignInUserAgent = firefoxUserAgent(electronUserAgent);
-		paneSession.webRequest.onBeforeSendHeaders(
-			{ urls: [`https://${GOOGLE_SIGN_IN_HOST}/*`] },
-			(details, callback) => {
+		webRequestHub(paneSession).add({
+			urls: [`https://${GOOGLE_SIGN_IN_HOST}/*`],
+			onBeforeSendHeaders: (_details, headers) => {
 				const requestHeaders = Object.fromEntries(
-					Object.entries(details.requestHeaders).filter(
+					Object.entries(headers).filter(
 						([name]) => !name.toLowerCase().startsWith("sec-ch-ua"),
 					),
 				);
 				requestHeaders["User-Agent"] = googleSignInUserAgent;
-				callback({ requestHeaders });
+				return requestHeaders;
 			},
-		);
+		});
 		const shimsPreload = path.join(
 			__dirname,
 			"../preload/browser-extension-shims.js",

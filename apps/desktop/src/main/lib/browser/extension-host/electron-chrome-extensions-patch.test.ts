@@ -253,11 +253,13 @@ function extensionHost({
 		}).map(([id, manifest]) => [id, { id, manifest }]),
 	);
 	const { jar, cookies, cookieChanged } = fakeCookies();
+	const extensionEvents = new EventEmitter();
 	const session = {
 		extensions: {
 			getExtension: (id: string) => extensions.get(id),
 			getAllExtensions: () => [...extensions.values()],
-			on: () => {},
+			on: (event: string, listener: (...args: unknown[]) => void) =>
+				extensionEvents.on(event, listener),
 		},
 		isPersistent: () => true,
 		cookies,
@@ -343,6 +345,12 @@ function extensionHost({
 		call,
 		sent,
 		cookieChanged,
+		unload: (extensionId: string) =>
+			extensionEvents.emit(
+				"extension-unloaded",
+				{},
+				extensions.get(extensionId),
+			),
 	};
 }
 
@@ -465,6 +473,16 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 		mail.url = "https://mail.example.com/inbox";
 		tabs.onUpdated(mail.id);
 		expect(await seesMail()).toBe(false);
+	});
+
+	test("an unloaded extension loses its activeTab grants, so a reinstall starts without them", async () => {
+		const { mail, tabs, call, unload } = extensionHost(api);
+		tabs.createTabDetails(mail);
+		api.grantActiveTab("activeTab", mail.id, mail.url);
+		unload("activeTab");
+		expect(
+			((await call("activeTab", "tabs.get", mail.id)) as TabDetails).url,
+		).toBeUndefined();
 	});
 
 	test("an extension styles only pages it may reach, and opens no file or data URL", async () => {
@@ -873,6 +891,74 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 		).toBe(true);
 	});
 
+	test("menu items are announced on each change, update edits one, and restored items come back unannounced", () => {
+		const start = source.indexOf("var DEFAULT_CONTEXTS");
+		const ContextMenusAPI = new Function(
+			`${source.slice(start, source.indexOf("// src/browser/api/runtime.ts", start))}
+			return ContextMenusAPI;`,
+		)() as new (
+			ctx: object,
+		) => { menus: Map<string, Map<string, object>> };
+		const handlers = new Map<string, (...args: unknown[]) => void>();
+		const announced: unknown[][] = [];
+		const menus = new ContextMenusAPI({
+			router: {
+				apiHandler:
+					() => (name: string, handler: (...args: unknown[]) => void) =>
+						handlers.set(name, handler),
+			},
+			session: { extensions: { on: () => {} } },
+			store: {},
+			emit: (...args: unknown[]) => announced.push(args),
+		});
+		const call = (name: string, ...args: unknown[]) =>
+			handlers.get(name)?.({ extension: { id: LASTPASS } }, ...args);
+
+		call("contextMenus.create", {
+			id: "fill",
+			title: "Fill",
+			contexts: ["editable"],
+		});
+		call("contextMenus.update", "fill", { title: "Fill %s", id: "renamed" });
+		expect(() => call("contextMenus.update", "missing", {})).toThrow(
+			"Cannot find menu item with id missing",
+		);
+		call("contextMenus.remove", "fill");
+		call("contextMenus.removeAll");
+
+		expect(announced).toEqual([
+			[
+				"context-menus-changed",
+				LASTPASS,
+				[{ id: "fill", title: "Fill", contexts: ["editable"] }],
+			],
+			[
+				"context-menus-changed",
+				LASTPASS,
+				[{ id: "fill", title: "Fill %s", contexts: ["editable"] }],
+			],
+			["context-menus-changed", LASTPASS, []],
+			["context-menus-changed", LASTPASS, []],
+		]);
+		expect([...handlers.keys()].filter((name) => !api.rules.has(name))).toEqual(
+			[],
+		);
+
+		const restoreStart = source.indexOf(
+			"restoreContextMenuItems(extensionId, items) {",
+		);
+		const { restoreContextMenuItems } = new Function(
+			`return { ${source.slice(restoreStart, source.indexOf("\n  }\n", restoreStart) + 4)} };`,
+		)() as {
+			restoreContextMenuItems(extensionId: string, items: object[]): void;
+		};
+		restoreContextMenuItems.call({ api: { contextMenus: menus } }, OTHER, [
+			{ id: "translate", title: "Translate" },
+		]);
+		expect([...(menus.menus.get(OTHER)?.keys() ?? [])]).toEqual(["translate"]);
+		expect(announced).toHaveLength(4);
+	});
+
 	test("every event sent to an extension has a rule", () => {
 		const unruled = [
 			...source.matchAll(
@@ -883,4 +969,13 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 			.filter((name) => !api.rules.has(name));
 		expect(unruled).toEqual([]);
 	});
+});
+
+test("the preload leaves chrome.storage to the app's shim and sends contextMenus.update", () => {
+	const preload = readFileSync(
+		require.resolve("electron-chrome-extensions/preload"),
+		"utf8",
+	);
+	expect(preload).not.toContain("sync: local");
+	expect(preload).toContain('update: invokeExtension2("contextMenus.update"),');
 });

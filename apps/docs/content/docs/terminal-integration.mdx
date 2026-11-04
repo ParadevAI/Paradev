@@ -5,13 +5,11 @@ description: Built-in terminal with multiple tabs and persistence
 
 ## Overview
 
-Built-in terminal per workspace with multiple tabs and session persistence.
+Each workspace has a built-in terminal with multiple tabs and session persistence.
 
 ![Terminal](/images/terminal.png)
 
 ## Multiple Tabs
-
-Open several terminal tabs per workspace. Each runs independently.
 
 - **⌘T** - New tab
 - **⌘W** - Close pane; **⌘⇧W** - Close tab
@@ -19,10 +17,7 @@ Open several terminal tabs per workspace. Each runs independently.
 
 ## Session Persistence
 
-Sessions survive app restarts:
-- Running processes continue
-- Output history preserved
-- Scrollback maintained
+Sessions survive app restarts. Running processes continue, and output history and scrollback are kept.
 
 If a terminal has ended, choose **New shell** to start a fresh session in the same pane. Recent output from the previous session stays visible. For agent recovery, see [Resume Interrupted Sessions](/agent-sessions#resume-interrupted-sessions).
 
@@ -64,6 +59,7 @@ Hold `Cmd` (macOS) or `Ctrl` and click links in terminal output:
 - URLs open in browser
 - File paths open in the built-in file viewer by default. A location such as `src/index.ts:240:7` jumps to line 240, column 7.
 - Links to Paradev Pages open in a Page pane when the click opens them in the app
+- A plain click on a URL opens a link menu at the pointer with the open actions and **Copy link**, unless you bound plain click to an action. A plain click on a GitHub pull request URL opens the pull request pane
 - Configure modifier keys for URLs in **Settings → Browser → URL links**, and for file, folder, and page links in **Settings → Files & Editor**
 
 ## Environment Variables

@@ -1231,14 +1231,14 @@ msgstr "每用户每月 {price},每席位每月 {gbHours} 云端 GB 小时"
 msgid "{price}/user/mo"
 msgstr "{price}/用户/月"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName}（原 {formerName}，YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（原 {formerName}，YC P26）是面向 AI 智能体时代的开源 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName}（原 {formerName}）"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName}（YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（YC P26）是面向 AI 智能体时代的开源 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
 
 msgid "{productName} for press"
 msgstr "面向媒体的 {productName}"
@@ -1626,6 +1626,9 @@ msgstr "3个已归档的工作区"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3个文件已更改，2个测试通过"
+
+msgid "3 running"
+msgstr "3 个运行中"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "每位工程师3条以上并行工作流"
@@ -2308,6 +2311,9 @@ msgstr "智能体无法访问 {0} 的工具"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "智能体无需中途干预即可完成常规工单。"
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "智能体在云端持续工作。可在桌面端、iPhone 或 iPad 上重新打开工作区。"
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "智能体自己加载预览、操作界面，并在标记为待审查之前附上截图证据。"
 
@@ -2322,6 +2328,12 @@ msgstr "智能体会记住它们对你代码库的了解，让每个新会话一
 
 msgid "Agents running at once"
 msgstr "同时运行的智能体数"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "智能体只看到占位符。Paradev 会把你的登录凭据添加到外发请求中。"
+
+msgid "Agents that run while you're away"
+msgstr "你离开时也在运行的智能体"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "智能体调用 Linear 工具时会使用此账号。"
@@ -2637,6 +2649,9 @@ msgstr "智能体写出完整的函数和文件，人类盯着每一步、批准
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "自动化只能使用你创建的云端工作区"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "环境保存你的仓库、变量和区域。可以基于它启动任意数量的工作区。"
 
 msgid "An error occurred"
 msgstr "发生错误"
@@ -3093,9 +3108,6 @@ msgstr "附加到聊天"
 msgid "Attached"
 msgstr "已附加"
 
-msgid "Attaching to the running session…"
-msgstr "正在连接运行中的会话…"
-
 msgid "attachment"
 msgstr "附件"
 
@@ -3411,9 +3423,6 @@ msgstr "基于PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "基于最近30天的{0}个token，统计{1}。"
 
-msgid "Become a design partner"
-msgstr "成为共创伙伴"
-
 msgid "Before"
 msgstr "变更前"
 
@@ -3601,9 +3610,6 @@ msgstr "把 {companyName} 带给你的团队。联系我们，了解企业版方
 msgid "Bring a link to something you built recently."
 msgstr "请带上你最近做的作品链接。"
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "把 Claude Code、Codex、OpenCode 或任何编码智能体带进同一个工作区。在不同分支上并行运行任务，并在一个地方审查所有内容。"
-
 msgid "Bring in an agent"
 msgstr "引入智能体"
 
@@ -3672,9 +3678,6 @@ msgstr "Bug 报告"
 
 msgid "Build in public"
 msgstr "公开构建"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "共创 Paradev 的云端未来"
 
 msgid "Build your own"
 msgstr "自己动手构建"
@@ -4613,6 +4616,9 @@ msgstr "关闭工作区"
 msgid "Close Workspace"
 msgstr "关闭工作区"
 
+msgid "Close your laptop"
+msgstr "合上笔记本"
+
 msgid "Closed"
 msgstr "已关闭"
 
@@ -4635,6 +4641,9 @@ msgstr "关闭此终端将结束正在运行的进程。"
 msgid "Cloud"
 msgstr "云端"
 
+msgid "Cloud · us-east"
+msgstr "云端 · us-east"
+
 msgid "Cloud environment setup"
 msgstr "云环境设置"
 
@@ -4646,9 +4655,6 @@ msgstr "云环境从 GitHub 检出你的仓库。请先连接这些;只需操作
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "每席位每月云端 GB 小时"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "云端版本即将推出。成为共创伙伴"
 
 msgid "Cloud sandboxes"
 msgstr "云端沙箱"
@@ -4754,9 +4760,6 @@ msgstr "合并显示=>和!==等序列。"
 
 msgid "Come build it with us."
 msgstr "来和我们一起构建吧。"
-
-msgid "Coming soon"
-msgstr "即将推出"
 
 msgid "Coming Soon"
 msgstr "即将推出"
@@ -5706,6 +5709,9 @@ msgstr "无法记录云端工作区"
 
 msgid "Could not record environment"
 msgstr "无法保存环境"
+
+msgid "Could not reinstall {name}"
+msgstr "无法重新安装 {name}"
 
 msgid "Could not remove {name}"
 msgstr "无法移除 {name}"
@@ -7451,6 +7457,9 @@ msgstr "每个界面都有各自的排版设置。更改会立即体现在实时
 msgid "Each task on its own branch"
 msgstr "每个任务都有自己的分支"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "每个工作区都有独立的云端机器，笔记本合上也能继续工作。可在桌面端、iPhone 或 iPad 上查看进度。"
+
 msgid "Early 2024"
 msgstr "2024年初"
 
@@ -9033,8 +9042,8 @@ msgstr "全屏"
 msgid "Full self-driving"
 msgstr "完全自动驾驶"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "完整源码在GitHub上以Elastic License 2.0（ELv2）提供。可查阅、审计并参与贡献。没有黑箱，没有隐藏功能。"
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "完整源码在GitHub上以MIT许可证开源。可查阅、审计并参与贡献。没有黑箱，没有隐藏功能。"
 
 msgid "Funding"
 msgstr "融资"
@@ -9937,6 +9946,9 @@ msgstr "包含"
 msgid "Included in Enterprise"
 msgstr "企业版包含"
 
+msgid "Included with Team and Ultra."
+msgstr "包含在 Team 和 Ultra 中。"
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "包含Paradev特有的box变体"
 
@@ -10345,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "加入"
 
-msgid "Join as a design partner"
-msgstr "加入成为设计合作伙伴"
-
 msgid "Join channel"
 msgstr "加入频道"
 
@@ -10541,6 +10550,9 @@ msgstr "语言"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "语言已在此设备上保存，但同步到你的账户失败。"
+
+msgid "Laptop closed"
+msgstr "笔记本已合上"
 
 msgid "Large"
 msgstr "大"
@@ -11606,6 +11618,9 @@ msgstr "缺少必填字段。"
 msgid "serverError.plugins.missingInput"
 msgstr "缺少必填输入 {input}"
 
+msgid "MIT License"
+msgstr "MIT 许可证"
+
 msgid "Mobile"
 msgstr "移动端"
 
@@ -12370,6 +12385,9 @@ msgstr "未找到议题。"
 msgid "No items"
 msgstr "暂无条目"
 
+msgid "No keys in the sandbox"
+msgstr "沙盒中不存放密钥"
+
 msgid "No known creators"
 msgstr "没有已知的创建者"
 
@@ -13093,6 +13111,9 @@ msgstr "一句话"
 msgid "One line about how you work"
 msgstr "用一句话介绍你的工作方式"
 
+msgid "One machine per workspace."
+msgstr "每个工作区一台机器。"
+
 msgid "One of the first hundred on the board"
 msgstr "榜单最早的一百人之一"
 
@@ -13110,9 +13131,6 @@ msgstr "一个插件，所有编码智能体。"
 
 msgid "One step left"
 msgstr "还差一步"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "一个工作区，容纳Claude Code、Codex和任何编码智能体。"
 
 msgid "online"
 msgstr "在线"
@@ -13619,6 +13637,9 @@ msgstr "打开侧边面板"
 msgid "Open ship options"
 msgstr "打开发布选项"
 
+msgid "Open Source"
+msgstr "开源"
+
 msgid "Open System Settings"
 msgstr "打开系统设置"
 
@@ -14011,6 +14032,9 @@ msgstr "Paradev 自动化"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev 云工作区"
+
 msgid "Paradev components"
 msgstr "Paradev 组件"
 
@@ -14053,8 +14077,8 @@ msgstr "当你选中某个远程工作区时，Paradev 会转发它打开的端�
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev有免费版。源代码在GitHub上以Elastic License 2.0（ELv2）提供，你可以在许可条款范围内查阅并自行部署。"
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev提供免费方案。源码在GitHub上以MIT许可证开源，你可以查阅、修改并自行部署。"
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev遇到意外错误。重新加载以重试。"
@@ -14083,11 +14107,8 @@ msgstr "Paradev 就是在 Paradev 中构建的，因此我们自己就是它的�
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev的设计就是配合你现有的工具。我们原生支持深度链接到Cursor这类IDE，你可以直接在自己的IDE里打开工作区和文件。"
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev是源码可见的：代码在GitHub上公开，采用Elastic License 2.0（ELv2），你可以在许可条款范围内查阅并自行部署，但它不是OSI认可的开源许可。Paradev与商业智能工具Apache Superset没有任何关系。"
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev 源码可见。每个拉取请求、评审和 bug 都在 GitHub 上公开。"
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev 是开源的。每个拉取请求、评审和 bug 都在 GitHub 上公开。"
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev 是从 F3 迈向 F4 的工作台：在不同分支上并行运行的智能体、真正能监督的智能体群，以及用于审查非你所写代码的界面。"
@@ -14365,6 +14386,9 @@ msgstr "选择磁盘上的文件夹并将其添加为项目"
 
 msgid "Pick a folder…"
 msgstr "选择文件夹…"
+
+msgid "Pick a machine size"
+msgstr "选择机器规格"
 
 msgid "Pick a model"
 msgstr "选择模型"
@@ -15266,6 +15290,9 @@ msgstr "阅读指南"
 msgid "Read the guide to parallel coding agents"
 msgstr "阅读并行编码智能体指南"
 
+msgid "Read the MIT License"
+msgstr "阅读 MIT 许可证"
+
 msgid "Read the page"
 msgstr "阅读页面"
 
@@ -15465,6 +15492,9 @@ msgstr "区域"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "在该智能体的全局配置中注册生命周期钩子，以便Paradev显示状态并发送通知。关闭后会在所有位置移除Paradev的条目，该智能体的状态和通知都会停止，包括在Paradev内部。"
+
+msgid "Reinstall {name}"
+msgstr "重新安装 {name}"
 
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "应 {inviter} 邀请，与 {others} 一起重新加入了 {channel}。"
@@ -16178,9 +16208,6 @@ msgstr "将在重置后继续"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒后继续"
 
-msgid "Resuming the conversation…"
-msgstr "正在继续对话…"
-
 msgid "Retry"
 msgstr "重试"
 
@@ -16425,6 +16452,9 @@ msgstr "在你的Microsoft Teams租户中有消息发布或频道被创建时运
 msgid "Run automations when Sentry issues change."
 msgstr "在Sentry问题发生变化时运行自动化。"
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "在云工作区中运行编程智能体，笔记本合上也能继续工作。包含在 Team 和 Ultra 中。"
+
 msgid "Run commands and navigate the application."
 msgstr "运行命令并在应用中导航。"
 
@@ -16490,6 +16520,9 @@ msgstr "在桌面端、任意终端或手机上运行你的智能体。"
 
 msgid "Run your agents from your phone."
 msgstr "在手机上运行你的智能体。"
+
+msgid "Run your coding agents in the cloud."
+msgstr "在云端运行你的编程智能体。"
 
 msgid "Run."
 msgstr "运行。"
@@ -17328,6 +17361,9 @@ msgstr "通过 SSH 设置主机"
 msgid "Set up an automation"
 msgstr "设置自动化"
 
+msgid "Set up once"
+msgstr "只需设置一次"
+
 msgid "Set up project on {hostName}"
 msgstr "在{hostName}上设置项目"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "小型"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "小型、中型或大型，最高 8 vCPU 和 16 GB。用量随内存增加。"
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "清空你的待办清单。"
@@ -18038,9 +18077,6 @@ msgstr "任务完成时的声音和铃声"
 
 msgid "Source"
 msgstr "来源"
-
-msgid "Source Available"
-msgstr "源码可见"
 
 msgid "Source path (not an import)"
 msgstr "源码路径（不是导入路径）"
@@ -18294,6 +18330,9 @@ msgstr "随时随地开始工作"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "在任务视图中直接从 Linear 或 GitHub 议题启动工作区，每个工作区都已有智能体在处理。"
+
+msgid "Start your first cloud workspace."
+msgstr "启动你的第一个云工作区。"
 
 msgid "Started"
 msgstr "开始时间"
@@ -19301,6 +19340,12 @@ msgstr "你的组织或团队的名称"
 msgid "The network connection changed"
 msgstr "网络连接已变更"
 
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "开源工作区，容纳Claude Code、Codex和任何编码智能体。"
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "开源工作区，容纳 Claude Code、Codex、OpenCode 和任何编码智能体。在不同分支上并行运行任务，并在一个地方审查所有内容。"
+
 msgid "The overnight shift"
 msgstr "夜班"
 
@@ -20287,6 +20332,9 @@ msgstr "把Slack对话变成任务，从工作区运行智能体，让队友在�
 msgid "turn the onboarding findings into a page"
 msgstr "把新手引导的调研结果做成页面"
 
+msgid "Turned off because its files changed"
+msgstr "已关闭，因为其文件已更改"
+
 msgid "Two Hands"
 msgstr "双手齐开"
 
@@ -20705,6 +20753,12 @@ msgstr "升级到 {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "升级到 Pro"
+
+msgid "Upgrade to Team"
+msgstr "升级到 Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "升级你的组织，连接 GitHub，然后在新建工作区界面中选择“云端”。"
 
 msgid "Upgrade your plan"
 msgstr "升级你的套餐"
@@ -21185,9 +21239,6 @@ msgstr "我们正在旧金山招聘工程师。来和我们一起打造工程师
 msgid "We're hiring in San Francisco"
 msgstr "我们在旧金山招聘"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "我们正在寻找共创伙伴，共同打造云端产品。请告诉我们您的工作流程，我们会与您联系，探讨合作机会。"
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "我们正在重做这个功能，敬请期待。"
 
@@ -21336,9 +21387,6 @@ msgstr "我们正在构建什么"
 msgid "What we've shipped"
 msgstr "我们发布了什么"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "您想用云端 Paradev 构建什么？"
-
 msgid "What would you like to know?"
 msgstr "你想了解什么？"
 
@@ -21456,9 +21504,6 @@ msgstr "文字标志，黑色"
 
 msgid "Wordmark, white"
 msgstr "文字标志，白色"
-
-msgid "Work email"
-msgstr "工作邮箱"
 
 msgid "Work from tickets"
 msgstr "从工单开始工作"
@@ -21717,6 +21762,9 @@ msgstr "可以。在包含云工作区的方案中，所有者可以在设置的
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "是的。Paradev已通过独立审计机构的SOC 2 Type II审计，覆盖我们的安全控制在一段时间内的实际运行情况。可在{trustHost}索取报告并查阅我们的安全文档。"
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "是的。Paradev 基于 MIT 许可证开源。代码公开在 GitHub 上，任何人都可以提交 issue、发起 pull request 或 fork。Paradev 与商业智能工具 Apache Superset 无关。"
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "需要。Paradev是智能体运行的工作区，不是模型提供商。带上Claude Code、Codex、OpenCode或任意CLI智能体，在任何方案下都可以使用你已有的账号或API密钥。"

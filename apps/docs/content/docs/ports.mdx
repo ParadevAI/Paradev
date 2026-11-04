@@ -5,7 +5,7 @@ description: View and manage active ports per workspace
 
 ## Overview
 
-Paradev does not assign per-workspace port ranges. It discovers listening ports from processes running in each workspace and lets you manage them from the UI.
+Paradev does not assign per-workspace port ranges. It discovers listening ports from processes in each workspace, and the list updates as processes start and stop listening.
 
 ![Port Panel](/images/ports.png)
 
@@ -31,24 +31,20 @@ Label detected ports by creating `ports.json` in your repository's config folder
 }
 ```
 
-**Fields:**
-- `port` - Port number (1-65535)
-- `label` - Display text shown in tooltip
+Fields:
+- `port`: port number (1-65535)
+- `label`: display text shown in the tooltip
 
-**Behavior:**
-- Labels apply only to ports detected as listening
-- Ports without a matching label still appear
-- Each workspace reads labels from its own worktree's file
-- Changes are detected automatically
-- Ports can be opened at `localhost:PORT` from the browser action (remote workspace ports are [forwarded to your machine](#remote-access) first)
+Behavior:
+- Labels apply only to ports detected as listening. Ports without a label still appear.
+- Each workspace reads labels from its own worktree's file.
+- Changes are detected automatically.
+- If `ports.json` is malformed, detected ports still appear without labels until you fix the file.
+- The browser action opens ports at `localhost:PORT`. Remote workspace ports are [forwarded to your machine](#remote-access) first.
 
-**Error Handling:**
+Commit `.paradev/ports.json` to share labels with your team.
 
-If `ports.json` is malformed, detected ports still appear without labels until you fix the file.
-
-**Tips:**
-- Commit `.paradev/ports.json` to share port labels with your team
-- **Pro tip:** If you want deterministic per-workspace port ranges, implement it in project lifecycle setup/teardown scripts by reserving a range in a shared file (for example `~/.paradev/port-allocations.json`) during setup and releasing it during teardown. See this repo's examples: [`.superset/setup.sh`](https://github.com/paradevai/paradev/blob/main/.superset/setup.sh) and [`.superset/teardown.sh`](https://github.com/paradevai/paradev/blob/main/.superset/teardown.sh).
+For deterministic per-workspace port ranges, reserve a range in a shared file (for example `~/.paradev/port-allocations.json`) in a setup script and release it in a teardown script. See this repo's examples: [`.superset/setup.sh`](https://github.com/paradevai/paradev/blob/main/.superset/setup.sh) and [`.superset/teardown.sh`](https://github.com/paradevai/paradev/blob/main/.superset/teardown.sh).
 
 ## Remote Access
 
@@ -69,7 +65,3 @@ tailscale serve 3000
 ```
 
 Both work for servers that only listen on loopback. If the server binds `0.0.0.0`, you can skip the tunnel and hit the host's Tailscale name directly (`http://remote-host:3000`).
-
-## Discovery and Updates
-
-The port list updates as workspace processes start and stop listening.

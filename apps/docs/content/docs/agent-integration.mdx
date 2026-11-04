@@ -5,7 +5,7 @@ description: Use Claude Code and other AI agents
 
 ## Overview
 
-Run AI coding agents in separate workspaces. Each agent gets its own Git worktree and branch, so agents don't edit the same working files.
+Run AI coding agents in separate workspaces. Each workspace has its own Git worktree and branch, so agents don't edit the same files.
 
 ![AI Agents](/images/agents.png)
 
@@ -36,19 +36,15 @@ Run AI coding agents in separate workspaces. Each agent gets its own Git worktre
 
 ## Chat
 
-Paradev includes a built-in chat panel for AI interactions without leaving the app.
+Paradev has a built-in chat panel.
 
-- Use the model picker to choose supported models and connect providers
-- Chat session titles are generated automatically from the conversation
-- Use the thinking level control to adjust reasoning effort for the selected model
+- Use the model picker to choose supported models and connect providers.
+- Session titles are generated from the conversation.
+- Use the thinking level control to set reasoning effort for the selected model.
 
 ## Models and Reasoning Effort
 
-The model pickers include **GPT-6 Astra**, **GPT-6 Sol**, and **GPT-6 Luna**,
-and **Opus 5.5** and **Sonnet 5.5**, wherever the agent supports them: Claude
-Code (Claude models), Codex (GPT models), Copilot, OpenCode, Oh My Pi, and Paradev
-Chat. The Codex picker also has **GPT-6.1 Sol** and **GPT-6.1 Terra**; the
-retired GPT-5.5, GPT-5.4, and GPT-5.3 Codex are gone. Available reasoning levels depend on the agent and model; see the [launch options](/cli/cli-reference#agent-effort-levels).
+The model pickers include **GPT-6 Astra**, **GPT-6 Sol**, **GPT-6 Luna**, **Opus 5.5**, and **Sonnet 5.5**, wherever the agent supports them: Claude Code (Claude models), Codex (GPT models), Copilot, OpenCode, Oh My Pi, and Paradev Chat. The Codex picker also has **GPT-6.1 Sol** and **GPT-6.1 Terra**; GPT-5.5, GPT-5.4, and GPT-5.3 Codex are retired. Available reasoning levels depend on the agent and model; see the [launch options](/cli/cli-reference#agent-effort-levels).
 
 ## Agent Settings
 
@@ -90,23 +86,23 @@ Resume an interrupted session, fork a session, or hand its work to another agent
 
 ## Parallel Agents
 
-Create multiple workspaces and run an agent in each. Compare results and merge the best solution.
-
-## Inline Prompts
-
-Agents can pause and ask questions, request tool approval, and ask for plan review directly in the chat pane.
+Run an agent in each of several workspaces, compare results, and merge the best one.
 
 ## Sandbox Access
 
-When an agent needs access to files outside its workspace, it will prompt for permission in chat so you can approve or deny the request inline.
+When an agent needs files outside its workspace, it asks for permission in chat. You approve or deny inline.
+
+## Inline Prompts
+
+Prompts, approvals, and plan reviews appear in the chat pane.
 
 ## Notifications
 
-Get notified when agents finish. Configure sounds in Settings.
+You are notified when agents finish. Configure sounds in Settings. See [Agent Status & Notifications](/agent-status).
 
 ## Agent Skills
 
-Teach any agent to drive Paradev itself with the official [skills](https://github.com/paradevai/skills), one for the `superset` CLI and one for the [MCP server](/mcp-server):
+Teach an agent to drive Paradev with the official [skills](https://github.com/paradevai/skills), one for the `superset` CLI and one for the [MCP server](/mcp-server):
 
 ```bash
 npx skills add paradevai/skills

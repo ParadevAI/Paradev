@@ -1231,14 +1231,14 @@ msgstr "{price} per user/month, {gbHours} cloud GB-hours per seat each month"
 msgid "{price}/user/mo"
 msgstr "{price}/user/mo"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (formerly {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 
 msgid "{productName} for press"
 msgstr "{productName} for press"
@@ -1626,6 +1626,9 @@ msgstr "3 archived workspaces"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3 files changed, 2 tests passing"
+
+msgid "3 running"
+msgstr "3 running"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ concurrent workstreams per engineer"
@@ -2308,6 +2311,9 @@ msgstr "Agents cannot reach {0}'s tools"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents complete routine tickets with no mid-task intervention."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 
@@ -2322,6 +2328,12 @@ msgstr "Agents remember what they learn about your codebase, so every new sessio
 
 msgid "Agents running at once"
 msgstr "Agents running at once"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+
+msgid "Agents that run while you're away"
+msgstr "Agents that run while you're away"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents use this account when they call Linear tools."
@@ -2637,6 +2649,9 @@ msgstr "An agent writes whole functions and files while a human watches every st
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "An automation can only use a cloud workspace you created"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 
 msgid "An error occurred"
 msgstr "An error occurred"
@@ -3093,9 +3108,6 @@ msgstr "Attach to chat"
 msgid "Attached"
 msgstr "Attached"
 
-msgid "Attaching to the running session…"
-msgstr "Attaching to the running session…"
-
 msgid "attachment"
 msgstr "attachment"
 
@@ -3411,9 +3423,6 @@ msgstr "based off PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Based on {0} tokens in the last 30 days, counting {1}."
 
-msgid "Become a design partner"
-msgstr "Become a design partner"
-
 msgid "Before"
 msgstr "Before"
 
@@ -3601,9 +3610,6 @@ msgstr "Bring {companyName} to your team. Get in touch to learn more about enter
 msgid "Bring a link to something you built recently."
 msgstr "Bring a link to something you built recently."
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-
 msgid "Bring in an agent"
 msgstr "Bring in an agent"
 
@@ -3672,9 +3678,6 @@ msgstr "Bug reports"
 
 msgid "Build in public"
 msgstr "Build in public"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Build the future of Paradev in the cloud"
 
 msgid "Build your own"
 msgstr "Build your own"
@@ -4613,6 +4616,9 @@ msgstr "Close workspace"
 msgid "Close Workspace"
 msgstr "Close Workspace"
 
+msgid "Close your laptop"
+msgstr "Close your laptop"
+
 msgid "Closed"
 msgstr "Closed"
 
@@ -4635,6 +4641,9 @@ msgstr "Closing this terminal will end the running process."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud · us-east"
+msgstr "Cloud · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Cloud environment setup"
 
@@ -4646,9 +4655,6 @@ msgstr "Cloud environments check out your repositories from GitHub. Connect thes
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "Cloud GB-hours per seat each month"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Cloud is coming. Become a design partner"
 
 msgid "Cloud sandboxes"
 msgstr "Cloud sandboxes"
@@ -4754,9 +4760,6 @@ msgstr "Combine sequences such as => and !==."
 
 msgid "Come build it with us."
 msgstr "Come build it with us."
-
-msgid "Coming soon"
-msgstr "Coming soon"
 
 msgid "Coming Soon"
 msgstr "Coming Soon"
@@ -5706,6 +5709,9 @@ msgstr "Could not record cloud workspace"
 
 msgid "Could not record environment"
 msgstr "Could not record environment"
+
+msgid "Could not reinstall {name}"
+msgstr "Could not reinstall {name}"
 
 msgid "Could not remove {name}"
 msgstr "Could not remove {name}"
@@ -7451,6 +7457,9 @@ msgstr "Each surface has its own typography. Changes appear immediately in the l
 msgid "Each task on its own branch"
 msgstr "Each task on its own branch"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+
 msgid "Early 2024"
 msgstr "Early 2024"
 
@@ -9033,8 +9042,8 @@ msgstr "Full screen"
 msgid "Full self-driving"
 msgstr "Full self-driving"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
 
 msgid "Funding"
 msgstr "Funding"
@@ -9937,6 +9946,9 @@ msgstr "Included"
 msgid "Included in Enterprise"
 msgstr "Included in Enterprise"
 
+msgid "Included with Team and Ultra."
+msgstr "Included with Team and Ultra."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Includes the Paradev-specific box variant"
 
@@ -10345,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Join"
 
-msgid "Join as a design partner"
-msgstr "Join as a design partner"
-
 msgid "Join channel"
 msgstr "Join channel"
 
@@ -10541,6 +10550,9 @@ msgstr "Language"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Language saved on this device, but syncing it to your account failed."
+
+msgid "Laptop closed"
+msgstr "Laptop closed"
 
 msgid "Large"
 msgstr "Large"
@@ -11606,6 +11618,9 @@ msgstr "Missing required fields."
 msgid "serverError.plugins.missingInput"
 msgstr "Missing required input {input}"
 
+msgid "MIT License"
+msgstr "MIT License"
+
 msgid "Mobile"
 msgstr "Mobile"
 
@@ -12370,6 +12385,9 @@ msgstr "No issues found."
 msgid "No items"
 msgstr "No items"
 
+msgid "No keys in the sandbox"
+msgstr "No keys in the sandbox"
+
 msgid "No known creators"
 msgstr "No known creators"
 
@@ -13093,6 +13111,9 @@ msgstr "One line"
 msgid "One line about how you work"
 msgstr "One line about how you work"
 
+msgid "One machine per workspace."
+msgstr "One machine per workspace."
+
 msgid "One of the first hundred on the board"
 msgstr "One of the first hundred on the board"
 
@@ -13110,9 +13131,6 @@ msgstr "One plugin. Every coding agent."
 
 msgid "One step left"
 msgstr "One step left"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "One workspace for Claude Code, Codex, and any coding agent."
 
 msgid "online"
 msgstr "online"
@@ -13619,6 +13637,9 @@ msgstr "Open sheet"
 msgid "Open ship options"
 msgstr "Open ship options"
 
+msgid "Open Source"
+msgstr "Open Source"
+
 msgid "Open System Settings"
 msgstr "Open System Settings"
 
@@ -14011,6 +14032,9 @@ msgstr "Paradev Automations"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev cloud workspaces"
+
 msgid "Paradev components"
 msgstr "Paradev components"
 
@@ -14053,8 +14077,8 @@ msgstr "Paradev forwards the ports a remote workspace opens while you have it se
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev hit an unexpected error. Reload to try again."
@@ -14083,11 +14107,8 @@ msgstr "Paradev is built in Paradev, so we're our own #1 users. You get paid to 
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev is source-available. Every pull request, review and bug is public on GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev is open source. Every pull request, review and bug is public on GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
@@ -14365,6 +14386,9 @@ msgstr "Pick a folder on disk and add it as a project"
 
 msgid "Pick a folder…"
 msgstr "Pick a folder…"
+
+msgid "Pick a machine size"
+msgstr "Pick a machine size"
 
 msgid "Pick a model"
 msgstr "Pick a model"
@@ -15266,6 +15290,9 @@ msgstr "Read the guide"
 msgid "Read the guide to parallel coding agents"
 msgstr "Read the guide to parallel coding agents"
 
+msgid "Read the MIT License"
+msgstr "Read the MIT License"
+
 msgid "Read the page"
 msgstr "Read the page"
 
@@ -15465,6 +15492,9 @@ msgstr "Region"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
+
+msgid "Reinstall {name}"
+msgstr "Reinstall {name}"
 
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "rejoined {channel} by invitation from {inviter}, along with {others}."
@@ -16178,9 +16208,6 @@ msgstr "Resuming at reset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Resuming in {resumeSeconds}s"
 
-msgid "Resuming the conversation…"
-msgstr "Resuming the conversation…"
-
 msgid "Retry"
 msgstr "Retry"
 
@@ -16425,6 +16452,9 @@ msgstr "Run automations when messages are posted or channels are created in your
 msgid "Run automations when Sentry issues change."
 msgstr "Run automations when Sentry issues change."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Run commands and navigate the application."
 
@@ -16490,6 +16520,9 @@ msgstr "Run your agents from the desktop, any terminal, or your phone."
 
 msgid "Run your agents from your phone."
 msgstr "Run your agents from your phone."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Run your coding agents in the cloud."
 
 msgid "Run."
 msgstr "Run."
@@ -17328,6 +17361,9 @@ msgstr "Set up a host over SSH"
 msgid "Set up an automation"
 msgstr "Set up an automation"
 
+msgid "Set up once"
+msgstr "Set up once"
+
 msgid "Set up project on {hostName}"
 msgstr "Set up project on {hostName}"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Small"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Smash your backlog."
@@ -18038,9 +18077,6 @@ msgstr "Sounds and ringtone for completed tasks"
 
 msgid "Source"
 msgstr "Source"
-
-msgid "Source Available"
-msgstr "Source Available"
 
 msgid "Source path (not an import)"
 msgstr "Source path (not an import)"
@@ -18294,6 +18330,9 @@ msgstr "Start work from anywhere"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
+
+msgid "Start your first cloud workspace."
+msgstr "Start your first cloud workspace."
 
 msgid "Started"
 msgstr "Started"
@@ -19301,6 +19340,12 @@ msgstr "The name of your organization or team"
 msgid "The network connection changed"
 msgstr "The network connection changed"
 
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "The open-source workspace for Claude Code, Codex, and any coding agent."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+
 msgid "The overnight shift"
 msgstr "The overnight shift"
 
@@ -20287,6 +20332,9 @@ msgstr "Turn Slack conversations into tasks, run agents from your workspace, and
 msgid "turn the onboarding findings into a page"
 msgstr "turn the onboarding findings into a page"
 
+msgid "Turned off because its files changed"
+msgstr "Turned off because its files changed"
+
 msgid "Two Hands"
 msgstr "Two Hands"
 
@@ -20705,6 +20753,12 @@ msgstr "Upgrade to {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Upgrade to Pro"
+
+msgid "Upgrade to Team"
+msgstr "Upgrade to Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
 
 msgid "Upgrade your plan"
 msgstr "Upgrade your plan"
@@ -21185,9 +21239,6 @@ msgstr "We're hiring engineers in San Francisco. Come build the tools engineers 
 msgid "We're hiring in San Francisco"
 msgstr "We're hiring in San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "We're rebuilding this feature. Check back soon."
 
@@ -21336,9 +21387,6 @@ msgstr "What We're Building"
 msgid "What we've shipped"
 msgstr "What we've shipped"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "What would you like to build with Paradev in the cloud?"
-
 msgid "What would you like to know?"
 msgstr "What would you like to know?"
 
@@ -21456,9 +21504,6 @@ msgstr "Wordmark, black"
 
 msgid "Wordmark, white"
 msgstr "Wordmark, white"
-
-msgid "Work email"
-msgstr "Work email"
 
 msgid "Work from tickets"
 msgstr "Work from tickets"
@@ -21717,6 +21762,9 @@ msgstr "Yes. On plans with cloud workspaces, owners can buy any amount of extra 
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."

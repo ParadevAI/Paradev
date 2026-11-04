@@ -1225,14 +1225,14 @@ msgstr "{price} за користувача на місяць, {gbHours} хма�
 msgid "{price}/user/mo"
 msgstr "{price}/користувач/міс."
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (раніше {formerName}, YC P26) — IDE з доступним вихідним кодом для епохи ШІ-агентів, де інженери паралельно запускають сотні кодинг-агентів, як-от Claude Code і Codex."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (раніше {formerName}, YC P26) — IDE з відкритим кодом для ери ШІ-агентів, де інженери паралельно запускають сотні агентів для програмування, як-от Claude Code і Codex."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (раніше {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) — IDE з доступним вихідним кодом для епохи ШІ-агентів, де інженери паралельно запускають сотні кодинг-агентів, як-от Claude Code і Codex."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) — IDE з відкритим кодом для ери ШІ-агентів, де інженери паралельно запускають сотні агентів для програмування, як-от Claude Code і Codex."
 
 msgid "{productName} for press"
 msgstr "{productName} для преси"
@@ -1620,6 +1620,9 @@ msgstr "3 архівовані робочі простори"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "Змінено 3 файли, 2 тести проходять"
+
+msgid "3 running"
+msgstr "3 запущено"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ паралельні робочі потоки на інженера"
@@ -2302,6 +2305,9 @@ msgstr "Агенти не мають доступу до інструменті�
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Агенти виконують рутинні тікети без втручання під час роботи."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Агенти самі відкривають попередній перегляд, керують інтерфейсом і додають скриншоти як доказ, перш ніж позначити роботу готовою до рев'ю."
 
@@ -2316,6 +2322,12 @@ msgstr "Агенти запам'ятовують, що дізналися про
 
 msgid "Agents running at once"
 msgstr "Агентів працює одночасно"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Агенти бачать лише заглушку. Paradev додає ваш вхід до вихідних запитів."
+
+msgid "Agents that run while you're away"
+msgstr "Агенти, що працюють, поки вас немає"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенти використовують цей обліковий запис, коли викликають інструменти Linear."
@@ -2631,6 +2643,9 @@ msgstr "Агент пише цілі функції й файли, а людин
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Автоматизація може використовувати лише хмарний робочий простір, який створили ви"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Середовище містить ваші репозиторії, змінні та регіон. Запускайте з нього стільки робочих просторів, скільки потрібно."
 
 msgid "An error occurred"
 msgstr "Сталася помилка"
@@ -3087,9 +3102,6 @@ msgstr "Прикріпити до чату"
 msgid "Attached"
 msgstr "Підключено"
 
-msgid "Attaching to the running session…"
-msgstr "Підключення до запущеного сеансу…"
-
 msgid "attachment"
 msgstr "вкладення"
 
@@ -3405,9 +3417,6 @@ msgstr "на основі PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "На основі {0} токенів за останні 30 днів з урахуванням {1}."
 
-msgid "Become a design partner"
-msgstr "Стати дизайн-партнером"
-
 msgid "Before"
 msgstr "До"
 
@@ -3595,9 +3604,6 @@ msgstr "Запровадьте {companyName} у своїй команді. Зв'
 msgid "Bring a link to something you built recently."
 msgstr "Підготуйте посилання на щось, що ви нещодавно створили."
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Зберіть Claude Code, Codex, OpenCode чи будь-якого кодинг-агента в одному робочому просторі. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
-
 msgid "Bring in an agent"
 msgstr "Підключіть агента"
 
@@ -3666,9 +3672,6 @@ msgstr "Баг-репорти"
 
 msgid "Build in public"
 msgstr "Працюємо відкрито"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Створюйте майбутнє Paradev у хмарі"
 
 msgid "Build your own"
 msgstr "Створіть свій"
@@ -4607,6 +4610,9 @@ msgstr "Закрити робочий простір"
 msgid "Close Workspace"
 msgstr "Закрити робочий простір"
 
+msgid "Close your laptop"
+msgstr "Закрийте ноутбук"
+
 msgid "Closed"
 msgstr "Закрито"
 
@@ -4629,6 +4635,9 @@ msgstr "Закриття цього термінала завершить зап
 msgid "Cloud"
 msgstr "Хмара"
 
+msgid "Cloud · us-east"
+msgstr "Хмара · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Налаштування хмарного середовища"
 
@@ -4640,9 +4649,6 @@ msgstr "Хмарні середовища клонують ваші репози
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "Хмарні ГБ-години на місце щомісяця"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Хмара вже скоро. Станьте дизайн-партнером"
 
 msgid "Cloud sandboxes"
 msgstr "Хмарні пісочниці"
@@ -4748,9 +4754,6 @@ msgstr "Об'єднувати послідовності на кшталт => і
 
 msgid "Come build it with us."
 msgstr "Приходьте створювати його разом з нами."
-
-msgid "Coming soon"
-msgstr "Незабаром"
 
 msgid "Coming Soon"
 msgstr "Незабаром"
@@ -5700,6 +5703,9 @@ msgstr "Не вдалося зберегти хмарний робочий пр�
 
 msgid "Could not record environment"
 msgstr "Не вдалося зберегти середовище"
+
+msgid "Could not reinstall {name}"
+msgstr "Не вдалося перевстановити {name}"
 
 msgid "Could not remove {name}"
 msgstr "Не вдалося видалити {name}"
@@ -7445,6 +7451,9 @@ msgstr "Кожна поверхня має власну типографіку. 
 msgid "Each task on its own branch"
 msgstr "Кожна задача у власній гілці"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Кожен робочий простір отримує власну хмарну машину і працює далі, коли ноутбук закрито. Стежте за ним з комп'ютера, iPhone або iPad."
+
 msgid "Early 2024"
 msgstr "Початок 2024"
 
@@ -9027,8 +9036,8 @@ msgstr "Повноекранний режим"
 msgid "Full self-driving"
 msgstr "Повна автономність"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Повний вихідний код доступний на GitHub за ліцензією Elastic License 2.0 (ELv2). Вивчайте, перевіряйте код і робіть внесок у нього. Жодних чорних скриньок, жодних прихованих функцій."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Повний вихідний код на GitHub за ліцензією MIT. Вивчайте, перевіряйте код і робіть внесок у нього. Жодних чорних скриньок, жодних прихованих функцій."
 
 msgid "Funding"
 msgstr "Фінансування"
@@ -9931,6 +9940,9 @@ msgstr "Входить"
 msgid "Included in Enterprise"
 msgstr "Входить в Enterprise"
 
+msgid "Included with Team and Ultra."
+msgstr "Входить у Team та Ultra."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Містить варіант box для Paradev"
 
@@ -10339,9 +10351,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Приєднатися"
 
-msgid "Join as a design partner"
-msgstr "Стати дизайн-партнером"
-
 msgid "Join channel"
 msgstr "Приєднатися до каналу"
 
@@ -10535,6 +10544,9 @@ msgstr "Мова"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Мову збережено на цьому пристрої, але не вдалося синхронізувати її з вашим обліковим записом."
+
+msgid "Laptop closed"
+msgstr "Ноутбук закрито"
 
 msgid "Large"
 msgstr "Великий"
@@ -11600,6 +11612,9 @@ msgstr "Не заповнено обов'язкові поля."
 msgid "serverError.plugins.missingInput"
 msgstr "Не заповнено обов'язкове поле {input}"
 
+msgid "MIT License"
+msgstr "Ліцензія MIT"
+
 msgid "Mobile"
 msgstr "Мобільні"
 
@@ -12364,6 +12379,9 @@ msgstr "Issues не знайдено."
 msgid "No items"
 msgstr "Немає елементів"
 
+msgid "No keys in the sandbox"
+msgstr "Жодних ключів у пісочниці"
+
 msgid "No known creators"
 msgstr "Немає відомих авторів"
 
@@ -13087,6 +13105,9 @@ msgstr "Один рядок"
 msgid "One line about how you work"
 msgstr "Один рядок про те, як ви працюєте"
 
+msgid "One machine per workspace."
+msgstr "Одна машина на робочий простір."
+
 msgid "One of the first hundred on the board"
 msgstr "Серед перших ста в рейтингу"
 
@@ -13104,9 +13125,6 @@ msgstr "Один плагін. Кожен кодинг-агент."
 
 msgid "One step left"
 msgstr "Залишився один крок"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Один робочий простір для Claude Code, Codex і будь-якого кодинг-агента."
 
 msgid "online"
 msgstr "онлайн"
@@ -13613,6 +13631,9 @@ msgstr "Відкрити панель"
 msgid "Open ship options"
 msgstr "Відкрити параметри відправлення"
 
+msgid "Open Source"
+msgstr "Відкритий код"
+
 msgid "Open System Settings"
 msgstr "Відкрити Системні параметри"
 
@@ -14005,6 +14026,9 @@ msgstr "Автоматизації Paradev"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Хмарні робочі простори Paradev"
+
 msgid "Paradev components"
 msgstr "Компоненти Paradev"
 
@@ -14047,8 +14071,8 @@ msgstr "Paradev переадресовує порти, які відкриває
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev має безкоштовний тариф. Вихідний код доступний на GitHub за ліцензією Elastic License 2.0 (ELv2), тож ви можете вивчати його й розгортати на власних серверах відповідно до умов ліцензії."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev має безкоштовний тариф. Вихідний код на GitHub за ліцензією MIT, тож ви можете вивчати, змінювати й розгортати його на власних серверах."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "У Paradev сталася неочікувана помилка. Перезавантажте, щоб спробувати знову."
@@ -14077,11 +14101,8 @@ msgstr "Paradev створюється в Paradev, тож ми самі його
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev створено для роботи з вашими наявними інструментами: ми нативно підтримуємо діплінки в IDE, як-от Cursor, тож ви можете відкривати робочі простори й файли у своїй IDE."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Вихідний код Paradev доступний публічно (source-available): код опубліковано на GitHub за ліцензією Elastic License 2.0 (ELv2), яка дозволяє вивчати його й розгортати на власних серверах відповідно до умов ліцензії, але це не відкрите програмне забезпечення, схвалене OSI. Paradev не пов'язаний з Apache Superset, інструментом бізнес-аналітики."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Вихідний код Paradev доступний публічно. Кожен пул-реквест, рев'ю та баг відкриті на GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Код Paradev відкритий. Кожен пул-реквест, рев'ю і баг публічні на GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev — робоче місце для переходу від F3 до F4: паралельні агенти в окремих гілках, флоти, за якими справді можна стежити, і місце для перегляду коду, який ви не писали."
@@ -14359,6 +14380,9 @@ msgstr "Виберіть папку на диску й додайте її як 
 
 msgid "Pick a folder…"
 msgstr "Вибрати папку…"
+
+msgid "Pick a machine size"
+msgstr "Виберіть розмір машини"
 
 msgid "Pick a model"
 msgstr "Виберіть модель"
@@ -15260,6 +15284,9 @@ msgstr "Прочитати посібник"
 msgid "Read the guide to parallel coding agents"
 msgstr "Прочитати посібник з паралельних кодинг-агентів"
 
+msgid "Read the MIT License"
+msgstr "Прочитати ліцензію MIT"
+
 msgid "Read the page"
 msgstr "Прочитати сторінку"
 
@@ -15459,6 +15486,9 @@ msgstr "Регіон"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Реєструє хуки життєвого циклу в глобальній конфігурації цього агента, щоб Paradev міг показувати статус і надсилати сповіщення. Якщо це вимкнути, записи Paradev буде видалено всюди — статус і сповіщення для цього агента припиняться, зокрема й усередині Paradev."
+
+msgid "Reinstall {name}"
+msgstr "Перевстановити {name}"
 
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "знову приєднався(-лася) до {channel} на запрошення {inviter}, як і {others}."
@@ -16172,9 +16202,6 @@ msgstr "Відновлення після скидання ліміту"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Відновлення через {resumeSeconds} с"
 
-msgid "Resuming the conversation…"
-msgstr "Відновлюємо розмову…"
-
 msgid "Retry"
 msgstr "Повторити"
 
@@ -16419,6 +16446,9 @@ msgstr "Запускайте автоматизації, коли у вашом�
 msgid "Run automations when Sentry issues change."
 msgstr "Запускайте автоматизації, коли змінюються issues у Sentry."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Запускайте кодинг-агентів у хмарних робочих просторах, які працюють далі, коли ноутбук закрито. Входить у Team та Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Виконуйте команди й переходьте між розділами застосунку."
 
@@ -16484,6 +16514,9 @@ msgstr "Запускайте агентів із комп'ютера, будь-�
 
 msgid "Run your agents from your phone."
 msgstr "Запускайте агентів із телефона."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Запускайте своїх кодинг-агентів у хмарі."
 
 msgid "Run."
 msgstr "Запустіть."
@@ -17322,6 +17355,9 @@ msgstr "Налаштувати хост через SSH"
 msgid "Set up an automation"
 msgstr "Налаштуйте автоматизацію"
 
+msgid "Set up once"
+msgstr "Налаштуйте один раз"
+
 msgid "Set up project on {hostName}"
 msgstr "Налаштувати проєкт на {hostName}"
 
@@ -17900,6 +17936,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Мала"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Мала, Середня або Велика, до 8 vCPU і 16 ГБ. Витрата залежить від пам'яті."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Розгребіть свій беклог."
@@ -18032,9 +18071,6 @@ msgstr "Звуки й мелодія для завершених завдань"
 
 msgid "Source"
 msgstr "Джерело"
-
-msgid "Source Available"
-msgstr "Вихідний код доступний"
 
 msgid "Source path (not an import)"
 msgstr "Шлях до вихідного файлу (не імпорт)"
@@ -18288,6 +18324,9 @@ msgstr "Починайте роботу будь-де"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Запускайте робочі простори просто з issues у Linear або GitHub у розділі «Завдання», і в кожному з них уже працюватиме агент."
+
+msgid "Start your first cloud workspace."
+msgstr "Запустіть свій перший хмарний робочий простір."
 
 msgid "Started"
 msgstr "Розпочато"
@@ -19295,6 +19334,12 @@ msgstr "Назва вашої організації чи команди"
 msgid "The network connection changed"
 msgstr "Мережеве з'єднання змінилося"
 
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "Робочий простір з відкритим кодом для Claude Code, Codex і будь-якого агента для програмування."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Робочий простір з відкритим кодом для Claude Code, Codex, OpenCode і будь-якого кодинг-агента. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
+
 msgid "The overnight shift"
 msgstr "Нічна зміна"
 
@@ -20281,6 +20326,9 @@ msgstr "Перетворюйте розмови в Slack на завдання, 
 msgid "turn the onboarding findings into a page"
 msgstr "перетвори висновки з онбордингу на сторінку"
 
+msgid "Turned off because its files changed"
+msgstr "Вимкнено, бо його файли змінилися"
+
 msgid "Two Hands"
 msgstr "Дві руки"
 
@@ -20699,6 +20747,12 @@ msgstr "Перейти на {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Перейти на Pro"
+
+msgid "Upgrade to Team"
+msgstr "Перейти на Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Перейдіть на вищий план для організації, підключіть GitHub і виберіть «Хмара» на екрані нового робочого простору."
 
 msgid "Upgrade your plan"
 msgstr "Покращте свій тариф"
@@ -21179,9 +21233,6 @@ msgstr "Ми наймаємо інженерів у Сан-Франциско. �
 msgid "We're hiring in San Francisco"
 msgstr "Ми наймаємо в Сан-Франциско"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Ми шукаємо дизайн-партнерів, які допоможуть сформувати нашу хмарну пропозицію. Розкажіть про свій робочий процес, і ми зв'яжемося з вами, щоб обговорити співпрацю."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Ми перебудовуємо цю функцію. Зазирніть пізніше."
 
@@ -21330,9 +21381,6 @@ msgstr "Що ми створюємо"
 msgid "What we've shipped"
 msgstr "Що ми випустили"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Що ви хотіли б створити з Paradev у хмарі?"
-
 msgid "What would you like to know?"
 msgstr "Що ви хочете дізнатися?"
 
@@ -21450,9 +21498,6 @@ msgstr "Логотип-напис, чорний"
 
 msgid "Wordmark, white"
 msgstr "Логотип-напис, білий"
-
-msgid "Work email"
-msgstr "Робоча електронна адреса"
 
 msgid "Work from tickets"
 msgstr "Робота за тікетами"
@@ -21711,6 +21756,9 @@ msgstr "Так. На тарифах із хмарними робочими пр�
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Так. Paradev пройшов аудит SOC 2 Type II у незалежного аудитора, який охоплює роботу наших засобів безпеки протягом певного часу. Запросіть звіт і перегляньте нашу документацію з безпеки на {trustHost}."
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Так. Код Paradev відкритий за ліцензією MIT. Він опублікований на GitHub, і будь-хто може повідомляти про проблеми, відкривати пул-реквести або робити форк. Paradev не пов'язаний з Apache Superset, інструментом бізнес-аналітики."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Так. Paradev — це робочий простір, у якому працюють ваші агенти, а не постачальник моделей. Використовуйте Claude Code, Codex, OpenCode або будь-якого CLI-агента разом зі своїми наявними обліковими записами чи ключами API на будь-якому тарифі."

@@ -1,5 +1,17 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
+	DNR_CHANNEL,
+	DNR_CONSTANTS,
+	DNR_METHODS,
+	type DnrMethod,
+} from "shared/browser-extension-dnr";
+import {
+	INSTALLED_CHANNEL,
+	type InstalledDetails,
+	type InstalledRequest,
+	type PendingInstalled,
+} from "shared/browser-extension-installed";
+import {
 	MAX_EXTENSION_MESSAGE_LENGTH,
 	NATIVE_MESSAGING_CHANNEL,
 	NATIVE_MESSAGING_EVENT_CHANNEL,
@@ -10,6 +22,7 @@ import {
 	OFFSCREEN_CHANNEL,
 	type OffscreenMethod,
 } from "shared/browser-extension-offscreen";
+import { shimChromeStorage } from "shared/browser-extension-storage-shim";
 import {
 	chromeUserAgent,
 	firefoxUserAgent,
@@ -30,6 +43,12 @@ contextBridge.executeInMainWorld({
 			listener: (portId: number, event: NativePortEvent) => void,
 		) => void,
 		maxMessageLength: number,
+		callDnr: (method: DnrMethod, args: unknown[]) => unknown,
+		dnrMethods: readonly DnrMethod[],
+		dnrConstants: Record<string, unknown>,
+		installedEvent: (
+			...request: InstalledRequest
+		) => Promise<PendingInstalled | null>,
 	) => {
 		// Session preloads run in website frames and workers too. The checks run
 		// here because a service worker's preload realm has no `location`.
@@ -73,7 +92,71 @@ contextBridge.executeInMainWorld({
 				configurable: true,
 			});
 		}
-		// ponytail: promises only, no callback form; add it when an extension needs it.
+		// Chrome sets runtime.lastError only while the callback runs.
+		// electron-chrome-extensions later swaps chrome.runtime for a copy, so
+		// it is looked up per call.
+		const withLastError = (message: string | undefined, run: () => void) => {
+			const current = global.chrome?.runtime as Record<string, unknown>;
+			if (message === undefined || !current) return run();
+			const previous = Object.getOwnPropertyDescriptor(current, "lastError");
+			try {
+				Object.defineProperty(current, "lastError", {
+					value: { message },
+					configurable: true,
+				});
+			} catch {
+				return run();
+			}
+			try {
+				run();
+			} finally {
+				if (previous) Object.defineProperty(current, "lastError", previous);
+				else delete current.lastError;
+			}
+		};
+		// Electron exposes Chromium's chrome.declarativeNetRequest but never
+		// enforces its rules; main keeps the rules and enforces them instead.
+		const nativeDnr = chrome?.declarativeNetRequest as
+			| Record<string, unknown>
+			| undefined;
+		if (chrome && nativeDnr) {
+			const dnr: Record<string, unknown> = { ...dnrConstants };
+			for (const key of Object.keys(nativeDnr)) {
+				const value = nativeDnr[key];
+				if (typeof value !== "function") dnr[key] = value;
+			}
+			for (const method of dnrMethods) {
+				dnr[method] = (...args: unknown[]) => {
+					const callback =
+						typeof args.at(-1) === "function"
+							? (args.pop() as (result: unknown) => void)
+							: undefined;
+					// ipcRenderer.invoke prefixes main's message; Chrome reports it bare.
+					const result = Promise.resolve(callDnr(method, args)).catch(
+						(error: unknown) => {
+							throw new Error(
+								String(
+									(error as { message?: unknown })?.message ?? error,
+								).replace(
+									/^Error invoking remote method '[^']*': (?:Error: )?/,
+									"",
+								),
+							);
+						},
+					);
+					if (!callback) return result;
+					void result.then(callback, (error: Error) =>
+						withLastError(error.message, () => callback(undefined)),
+					);
+				};
+			}
+			Object.defineProperty(chrome, "declarativeNetRequest", {
+				value: dnr,
+				writable: true,
+				enumerable: true,
+				configurable: true,
+			});
+		}
 		if (isServiceWorker && chrome && !chrome.offscreen) {
 			chrome.offscreen = {
 				Reason: new Proxy({}, { get: (_target, reason) => reason }),
@@ -83,17 +166,72 @@ contextBridge.executeInMainWorld({
 				hasDocument: () => callOffscreen("hasDocument"),
 			};
 		}
-
+		// Electron never fires runtime.onInstalled; the app tracks installs and
+		// updates, and the worker asks once its first listener is added. The app
+		// records the version only after the listeners ran, so a worker that
+		// stops first gets the event again.
 		const runtime = chrome?.runtime as Record<string, unknown> | undefined;
+		if (isServiceWorker && runtime?.onInstalled) {
+			type InstalledListener = (details: InstalledDetails) => void;
+			const listeners = new Set<InstalledListener>();
+			let asked = false;
+			runtime.onInstalled = {
+				addListener(listener: InstalledListener) {
+					listeners.add(listener);
+					if (asked) return;
+					asked = true;
+					installedEvent("pending").then(
+						(pending) => {
+							if (!pending) return;
+							// Asked again by the next listener; nothing ran.
+							if (listeners.size === 0) {
+								asked = false;
+								return;
+							}
+							for (const each of [...listeners]) {
+								try {
+									each(pending.details);
+								} catch (error) {
+									console.error(error);
+								}
+							}
+							installedEvent("delivered", pending.version).catch(
+								(error: unknown) => console.error(error),
+							);
+						},
+						(error: unknown) => {
+							asked = false;
+							console.error(error);
+						},
+					);
+				},
+				removeListener(listener: InstalledListener) {
+					listeners.delete(listener);
+				},
+				hasListener: (listener: InstalledListener) => listeners.has(listener),
+				hasListeners: () => listeners.size > 0,
+			};
+		}
+
+		if (!runtime) return;
+		// An optional grant can come later through permissions.request, so main
+		// checks the grant on each connect.
 		let declaresNativeMessaging = false;
 		try {
-			const { permissions } = (
-				runtime?.getManifest as () => { permissions?: unknown }
+			const manifest = (
+				runtime.getManifest as () => {
+					permissions?: unknown;
+					optional_permissions?: unknown;
+				}
 			)();
-			declaresNativeMessaging =
-				Array.isArray(permissions) && permissions.includes("nativeMessaging");
-		} catch {}
-		if (!runtime || !declaresNativeMessaging) return;
+			declaresNativeMessaging = [
+				manifest.permissions,
+				manifest.optional_permissions,
+			].some((list) => Array.isArray(list) && list.includes("nativeMessaging"));
+		} catch (error) {
+			console.warn("[native-messaging] Cannot read the manifest:", error);
+		}
+		if (!declaresNativeMessaging) return;
 
 		type Listener = (...args: unknown[]) => void;
 		const createEvent = () => {
@@ -130,28 +268,6 @@ contextBridge.executeInMainWorld({
 			postMessage(message: unknown): void;
 			disconnect(): void;
 		}
-		// Chrome sets runtime.lastError only while the callback runs.
-		// electron-chrome-extensions later swaps chrome.runtime for a copy, so
-		// it is looked up per call.
-		const withLastError = (message: string | undefined, run: () => void) => {
-			const current = global.chrome?.runtime as Record<string, unknown>;
-			if (message === undefined || !current) return run();
-			const previous = Object.getOwnPropertyDescriptor(current, "lastError");
-			try {
-				Object.defineProperty(current, "lastError", {
-					value: { message },
-					configurable: true,
-				});
-			} catch {
-				return run();
-			}
-			try {
-				run();
-			} finally {
-				if (previous) Object.defineProperty(current, "lastError", previous);
-				else delete current.lastError;
-			}
-		};
 
 		const handlers = new Map<number, (event: NativePortEvent) => void>();
 		const disconnectErrors = new WeakMap<NativePort, string | undefined>();
@@ -175,7 +291,10 @@ contextBridge.executeInMainWorld({
 						throw new Error("Attempting to use a disconnected port object");
 					}
 					const json = JSON.stringify(message === undefined ? null : message);
-					if (json.length > maxMessageLength) {
+					if (json === undefined) {
+						throw new Error("Could not serialize message.");
+					}
+					if (new TextEncoder().encode(json).length > maxMessageLength) {
 						throw new Error("Message length exceeded maximum allowed length.");
 					}
 					sendNative("post", portId, json);
@@ -217,7 +336,12 @@ contextBridge.executeInMainWorld({
 						new Error(disconnectErrors.get(port) ?? "Native host has exited."),
 					);
 				});
-				port.postMessage(message);
+				try {
+					port.postMessage(message);
+				} catch (error) {
+					port.disconnect();
+					reject(error);
+				}
 			});
 			if (typeof callback !== "function") return reply;
 			reply.then(
@@ -253,5 +377,13 @@ contextBridge.executeInMainWorld({
 			);
 		},
 		MAX_EXTENSION_MESSAGE_LENGTH,
+		(method: DnrMethod, args: unknown[]) =>
+			ipcRenderer.invoke(DNR_CHANNEL, method, args),
+		DNR_METHODS,
+		DNR_CONSTANTS,
+		(...request: InstalledRequest) =>
+			ipcRenderer.invoke(INSTALLED_CHANNEL, ...request),
 	],
 });
+
+contextBridge.executeInMainWorld({ func: shimChromeStorage, args: [true] });
