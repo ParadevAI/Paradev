@@ -23,10 +23,6 @@ import {
 } from "./constants";
 import { pendingLaunchOutcome } from "./utils/pendingLaunchOutcome";
 
-/**
- * Turns this waiting pane into what the box launched under the terminal id
- * the create promised: its chat, or its terminal if the launch fell back.
- */
 export function usePendingCloudChatLaunch({
 	ctx,
 	workspaceId,

@@ -2,7 +2,7 @@ import { PENDING_CLOUD_CHAT_PANE_KIND } from "../../types";
 
 export const BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS = 250;
 
-/** A pending cloud chat claims the terminal its launch was promised, which may turn out to be a terminal. */
+/** A pending cloud chat holds the terminal id its launch was promised. */
 const TERMINAL_CLAIMING_KINDS = new Set([
 	"terminal",
 	PENDING_CLOUD_CHAT_PANE_KIND,

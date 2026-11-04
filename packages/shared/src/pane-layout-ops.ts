@@ -64,7 +64,6 @@ export const paneLayoutOpSchema = z.discriminatedUnion("type", [
 			})
 			.optional(),
 		area: area.optional(),
-		/** Select the new tab instead of keeping the current selection. */
 		focus: z.boolean().optional(),
 	}),
 	z.object({ type: z.literal("swap"), paneId, withPaneId: paneId }),

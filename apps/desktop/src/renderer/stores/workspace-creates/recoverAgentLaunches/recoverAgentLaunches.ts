@@ -1,5 +1,5 @@
 import type { HostServiceClient } from "renderer/lib/host-service-client";
-import { resolveChatAgentIds } from "./resolveChatAgentIds";
+import { resolveChatAgentIds } from "../resolveChatAgentIds";
 
 /**
  * The agents a create launched, read back from the host's bindings when the

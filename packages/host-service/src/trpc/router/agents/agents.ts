@@ -165,7 +165,6 @@ export type AgentRunResult = {
 	sessionId: string;
 	label: string;
 	chatSessionId?: string;
-	/** The chat pane's agent id, set when the launch opened a chat session. */
 	chatAgentId?: string;
 };
 
