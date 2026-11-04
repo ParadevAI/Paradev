@@ -1,3 +1,4 @@
+import { cn } from "@superset/ui/utils";
 import {
 	createFileRoute,
 	Outlet,
@@ -46,10 +47,13 @@ import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
 import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
+import { browserRuntimeRegistry } from "./v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
 });
+
+const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 
 /** v1 only — v2 deletes go through the globally-mounted DeleteWorkspaceMount
  * (see delete-workspace-intent store). */
@@ -288,17 +292,19 @@ function DashboardLayout() {
 									<NavigationRail />
 									<WorkspaceSidebarPanel
 										collapsedWidth={0}
-										className={
-											isWorkspaceSidebarCollapsed
-												? "overflow-visible border-r-0"
-												: "border-r-0"
-										}
+										slides
+										onLayoutFrame={relayoutBrowserPanes}
+										className="border-r-0"
 									>
-										<DashboardSidebar
-											isCollapsed={isWorkspaceSidebarCollapsed}
-										/>
+										<DashboardSidebar />
 									</WorkspaceSidebarPanel>
-									<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+									<div
+										className={cn(
+											"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl",
+											!onV2WorkspaceRoute &&
+												"border border-border bg-background",
+										)}
+									>
 										<div className="relative flex min-h-0 min-w-0 flex-1">
 											{content}
 										</div>

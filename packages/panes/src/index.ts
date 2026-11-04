@@ -44,6 +44,7 @@ export {
 	resolveTabTitle,
 	TabVisibilityContext,
 	useIsTabVisible,
+	usePaneAppearance,
 	usePaneFocus,
 	useTabTitle,
 	Workspace,

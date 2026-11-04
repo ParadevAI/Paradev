@@ -103,6 +103,49 @@ describe("SidebarSlide", () => {
 		expect(node?.dataset.visible).toBe("true");
 	});
 
+	test("an always-mounted panel renders before its first open, hidden and inert, and shows once opened", async () => {
+		const ui = (mode: SidebarSlideMode) => (
+			<SidebarSlide mode={mode} width={300} alwaysMounted durationMs={1}>
+				{() => <Panel />}
+			</SidebarSlide>
+		);
+		const { getByTestId, rerender } = render(ui("closed"));
+		const node = getByTestId("panel");
+		expect(node.parentElement?.hasAttribute("inert")).toBe(true);
+		expect(node.dataset.visible).toBe("false");
+		rerender(ui("open"));
+		await settle();
+		expect(getByTestId("panel")).toBe(node);
+		expect(node.parentElement?.hasAttribute("inert")).toBe(false);
+		expect(node.dataset.visible).toBe("true");
+	});
+
+	test("a move that reverses another one starts from the width on screen", () => {
+		const ui = (mode: SidebarSlideMode) => (
+			<SidebarSlide mode={mode} width={300} durationMs={1000}>
+				{() => <Panel />}
+			</SidebarSlide>
+		);
+		const { container, rerender } = render(ui("open"));
+		rerender(ui("closed"));
+		const space = container.querySelector<HTMLElement>("[data-sidebar-slide]");
+		if (!space) throw new Error("slide not rendered");
+		space.getBoundingClientRect = () => ({ width: 120 }) as DOMRect;
+		rerender(ui("open"));
+		expect(space.style.width).toBe("120px");
+	});
+
+	test("a left-edge slide keeps its content pinned to the left while it moves", () => {
+		const ui = (mode: SidebarSlideMode) => (
+			<SidebarSlide mode={mode} width={300} edge="left" durationMs={1000}>
+				{() => <Panel />}
+			</SidebarSlide>
+		);
+		const { rerender, getByTestId } = render(ui("open"));
+		rerender(ui("closed"));
+		expect(getByTestId("panel").parentElement?.className).toContain("left-0");
+	});
+
 	test("settles on the last mode when toggled mid-move", async () => {
 		const slide = renderSlide("open", true);
 		slide.setMode("closed");
