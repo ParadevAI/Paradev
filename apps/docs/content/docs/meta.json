@@ -7,6 +7,7 @@
 		"first-workspace",
 		"superset-model",
 		"migrate-from-conductor",
+		"migrate-from-conductor-cloud",
 		"---Recipes---",
 		"recipes/race-agents",
 		"recipes/parallel-workstreams",
