@@ -18,7 +18,7 @@ Run `superset --help` for the top-level command list, or
 
 ## Choosing a host
 
-Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. Remote hosts go through the relay. `snapshot`, `panes`, `browser`, and `notifications` default to this machine.
+Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. If the cloud check fails, they target this machine. Remote hosts go through the relay. `snapshot`, `panes`, `browser`, and `notifications` default to this machine.
 
 ## Global options
 
@@ -612,7 +612,7 @@ superset projects create --name "my-app" --local --import ~/code/my-app
 Adopt an existing project onto a host without creating a duplicate cloud
 record. Use it instead of [`create`](#superset-projects-create) on a new
 machine when the repo is already in the org. Find the project ID with
-[`projects list`](#superset-projects-list). Re-running against a project already
+[`projects list`](#superset-projects-list) (add `--host <id>` for the host that already has the project). Re-running against a project already
 set up at the same path is a no-op.
 
 ```bash

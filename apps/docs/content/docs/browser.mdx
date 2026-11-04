@@ -50,9 +50,9 @@ Browser panes run Chrome extensions, so password managers, passkeys, and content
 - **Content blockers**: extensions that use `declarativeNetRequest`, such as uBlock Origin Lite, block requests in the pane.
 - **Native messaging**: an extension that declares `nativeMessaging` can talk to its desktop app, for example a password manager. The desktop app must trust Paradev as a browser; 1Password lists it under **Settings → Browser → Add Browser**.
 
-Paradev checks an extension's files against the Chrome Web Store's signed hashes each time it starts. If a file changed, the extension is turned off and shows as greyed out in the menu. Reinstall it to keep its data, or remove it.
+When Paradev has signed Chrome Web Store hashes for an extension, it checks the extension's files against them at every start. Extensions installed before this check existed are recorded on first use and checked from then on. If a file changed, the extension is turned off and shows as greyed out in the menu. Reinstall it to keep its data, or remove it.
 
-Extensions run only in panes you open. Panes that agents open run in a separate session with none of your extensions and none of your logins unless you import them. Agents can manage extensions with [`superset browser extensions`](/cli/cli-reference#browser), and every install and removal still asks you in the app.
+Extensions run in your own browser session. Panes that agents open run in a separate session with none of your extensions and none of your logins unless you import them. Agents can manage extensions with [`superset browser extensions`](/cli/cli-reference#browser), and every install and removal still asks you in the app.
 
 ## Ports Integration
 
@@ -76,7 +76,7 @@ superset browser console --workspace <id> --pane <paneId>
 
 For clicking, typing, scrolling, and form flows, `superset browser cdp` prints a raw [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) WebSocket endpoint for a browser-use or Playwright-class client. The endpoint drives only that pane's page (never the Paradev app itself), and pane operations are scoped to their workspace.
 
-Agents use this through the [`superset:browser` skill](/skills). A pane runs against the browser's real, logged-in session, and agents are instructed to confirm before consequential actions.
+Agents use this through the [`superset:browser` skill](/skills). A pane you open runs in your logged-in browser session. Panes that agents open use a separate session with none of your logins unless you import them. Agents are instructed to confirm before consequential actions.
 
 ## Pane or standalone browser?
 

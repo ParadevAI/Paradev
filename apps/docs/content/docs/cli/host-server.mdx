@@ -5,7 +5,7 @@ description: Set up the daemon the CLI and desktop app talk to when targeting th
 
 `superset start` runs a headless HTTP server that the Paradev desktop app and CLI talk to. It manages workspaces, ports, and agent runs on its machine. The desktop app starts it automatically. On a CLI-only or headless machine, start it yourself.
 
-The desktop app includes the CLI. On a headless machine, use the standalone
+The desktop app includes the CLI. It installs a `~/.paradev/bin/superset` shim on launch, and Paradev terminals add that directory to `PATH`. In other shells, add `~/.paradev/bin` to `PATH`. On a headless machine, use the standalone
 installer from [Getting Started](/cli/getting-started).
 
 ## Prerequisites
@@ -134,11 +134,11 @@ superset stop --terminals
 ### Create or adopt a project
 
 A workspace branches off a project: a repo registered with Paradev. Each
-repo has one cloud project record, shared across the organization. The first
-machine to register the repo runs `projects create`. Every later machine
-runs `projects setup` to attach to the existing project.
+repo should have one cloud project record, shared across the organization.
+The first machine to register the repo runs `projects create`. Every later
+machine runs `projects setup` to attach to the existing project.
 
-Check what your org already has:
+Check what this machine has (add `--host <id>` to check another host):
 
 ```bash
 superset projects list

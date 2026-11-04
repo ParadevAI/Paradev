@@ -6,7 +6,7 @@ pro: true
 
 ## Overview
 
-Automations run an agent session against a project when something happens (a review is requested, an issue is filed, a message lands in a channel) or on a schedule. Each run produces a live workspace you or a teammate can open, review, and continue.
+Automations run an agent session against a project when something happens (a review is requested, an issue is filed, a message lands in a channel) or on a schedule. A run that reaches a device produces a live workspace you or a teammate can open, review, and continue.
 
 ![The Automations list with scheduled agent sessions](/images/automations.png)
 
@@ -86,7 +86,7 @@ The body must be a JSON object or array of at most 1 MiB; an empty body counts a
 
 ### What the agent receives
 
-The agent gets your prompt after the event that started the run: the provider, event type, title, URL, and actor, plus the event payload (capped at 24,000 characters). For a webhook it is the JSON body you sent. So a prompt like "Review this pull request and leave comments" knows which pull request to use. When a pull request event runs in a project linked to that repository, the run's workspace checks out the pull request's branch, and reuses that pull request's workspace if one exists. If the device can't fetch the pull request, the run starts on a fresh branch.
+The event's details come before your prompt: the provider, event type, title, URL, and actor, plus the event payload (capped at 24,000 characters). For a webhook it is the JSON body you sent. So a prompt like "Review this pull request and leave comments" knows which pull request to use. When a pull request event runs in a project linked to that repository, the run's workspace checks out the pull request's branch, and reuses that pull request's workspace if one exists. If the device can't fetch the pull request, the run starts on a fresh branch.
 
 ### Guides
 
@@ -116,7 +116,7 @@ Each time an automation fires, a **run** is recorded on the detail page's **Run 
 
 The schedule advances to the next occurrence either way.
 
-In "new workspace" mode, each run gets a fresh workspace from the project's repo (or a session workspace when the automation has no project). Open it from the run row.
+In "new workspace" mode, each run that starts gets a fresh workspace from the project's repo (or a session workspace when the automation has no project). Pull request events can reuse that pull request's workspace; see [What the agent receives](#what-the-agent-receives). Open it from the run row.
 
 ## Pause, Run Now, Archive
 

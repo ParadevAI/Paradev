@@ -135,7 +135,7 @@ Returns `Array<Workspace>`. Rows include the host-served `projectName`
 
 ### `workspaces.create({ hostId, projectId, name, branch?, pr?, baseBranch?, taskId?, agents?, command? })`
 
-Create a worktree on a specific host. Provide exactly one of `branch` or `pr` (a pull request number; the host checks out the verified PR head and derives the branch). `baseBranch` picks the fork point when `branch` doesn't exist yet, and `taskId` links the new workspace to a task. Optionally spawn agents in it once the worktree is ready, and/or run a one-off shell `command`. Goes through the relay tunnel: the host must be online.
+Create a worktree on a specific host. Provide exactly one of `branch` or `pr` (a pull request number; the host checks out the verified PR head and derives the branch). `baseBranch` picks the fork point when `branch` doesn't exist yet, and `taskId` links the new workspace to a task. Optionally spawn agents in it once the worktree is ready, and/or run a one-off shell `command` in the worktree. Goes through the relay tunnel: the host must be online.
 
 Each entry in `agents` takes a preset id (e.g. `"claude"`) or a `HostAgentConfig` instance UUID: the host service resolves it against its configured rows and copies their stored `command`, `args`, and `env`. Set `model` or `effort` to override the agent's model or reasoning effort for that launch, or omit them to use the agent's own defaults. Use [`agents.list({ hostId })`](#agentslist-hostid-) to enumerate what's installed. Pass `command`, `agents`, or both.
 

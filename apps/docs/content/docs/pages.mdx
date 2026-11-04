@@ -139,7 +139,7 @@ superset pages storage <page-id-or-slug> --key data --scope shared --set '{"deal
 superset pages storage <page-id-or-slug> --key data --scope shared --remove
 ```
 
-Only signed-in members of the page's organization can read or write storage, and on a `just_me` page only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage.
+On `org` and `everyone` pages, only signed-in members of the page's organization can read or write storage. On a `just_me` page, only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage.
 
 ## Show Live Data from Your Tools
 
