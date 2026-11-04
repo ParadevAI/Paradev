@@ -55,7 +55,10 @@ function sendPrompt(
 	runtime: ChatRuntime,
 	sessionId: string,
 	text: string,
-	options: { snapshotWorktree?: boolean } = {},
+	options: {
+		snapshotWorktree?: boolean;
+		steer?: { expectedTurnId: string };
+	} = {},
 ) {
 	return runtime.commands.prompt({
 		commandId: randomUUID(),
@@ -730,8 +733,8 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
-	test("a prompt sent while the turn only waits on background work joins it", async () => {
-		const { runtime, sessionId } = startSession({
+	test("a plain prompt sent while the turn only waits on background work is queued, not steered", async () => {
+		const { runtime, sessionId, adapters } = startSessionWithAdapters({
 			...HELD_THEN_QUICK,
 			steer: true,
 		});
@@ -739,13 +742,26 @@ describe("LiveSession", () => {
 		await waitForApproval(runtime, sessionId);
 		const second = sendPrompt(runtime, sessionId, "second");
 
+		expect(second.queued).toBe(true);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
+		expect(adapters[0]?.steered).toEqual([]);
+		await runtime.dispose();
+	});
+
+	test("a prompt sent with steer while the turn only waits on background work joins it", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: true,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
+
 		expect(second.queued).toBe(false);
-		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
 		const snapshot = snapshotOf(runtime, sessionId);
 		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t1");
-		expect(snapshot.items.get(second.itemId)?.item).not.toHaveProperty(
-			"queued",
-		);
 		await runtime.dispose();
 	});
 
@@ -762,7 +778,7 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
-	test("prompts queued while the agent worked join the turn once it only waits on background work", async () => {
+	test("prompts queued while the agent worked stay queued once it only waits on background work", async () => {
 		const { runtime, sessionId } = startSession({
 			turns: [
 				[
@@ -782,10 +798,17 @@ describe("LiveSession", () => {
 
 		answerApproval(runtime, sessionId);
 
-		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 0);
-		const snapshot = snapshotOf(runtime, sessionId);
-		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t1");
-		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t1");
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get("ap2")?.item.kind ===
+				"approval_request",
+		);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(2);
+		expect(
+			deriveQueuedPrompts(snapshotOf(runtime, sessionId)).map(
+				(item) => item.id,
+			),
+		).toEqual([second.itemId, third.itemId]);
 		await runtime.dispose();
 	});
 
@@ -818,7 +841,9 @@ describe("LiveSession", () => {
 		});
 		sendPrompt(runtime, sessionId, "first");
 		await waitForApproval(runtime, sessionId);
-		const second = sendPrompt(runtime, sessionId, "second");
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
 
 		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
 		expect(
@@ -845,7 +870,10 @@ describe("LiveSession", () => {
 		});
 		sendPrompt(runtime, sessionId, "first", { snapshotWorktree: true });
 		await waitForApproval(runtime, sessionId);
-		sendPrompt(runtime, sessionId, "second", { snapshotWorktree: true });
+		sendPrompt(runtime, sessionId, "second", {
+			snapshotWorktree: true,
+			steer: { expectedTurnId: "t1" },
+		});
 		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
 
 		answerApproval(runtime, sessionId);
@@ -893,8 +921,12 @@ describe("LiveSession", () => {
 		});
 		sendPrompt(runtime, sessionId, "first");
 		await waitForApproval(runtime, sessionId);
-		const second = sendPrompt(runtime, sessionId, "second");
-		const third = sendPrompt(runtime, sessionId, "third");
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
+		const third = sendPrompt(runtime, sessionId, "third", {
+			steer: { expectedTurnId: "t1" },
+		});
 
 		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 2);
 		expect(
@@ -913,7 +945,9 @@ describe("LiveSession", () => {
 		});
 		sendPrompt(runtime, sessionId, "first");
 		await waitForApproval(runtime, sessionId);
-		const second = sendPrompt(runtime, sessionId, "second");
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
 		answerApproval(runtime, sessionId);
 		await waitFor(
 			() =>
@@ -986,8 +1020,12 @@ describe("LiveSession", () => {
 		});
 		sendPrompt(runtime, sessionId, "first");
 		await waitForApproval(runtime, sessionId);
-		sendPrompt(runtime, sessionId, "blocker");
-		const second = sendPrompt(runtime, sessionId, "second");
+		sendPrompt(runtime, sessionId, "blocker", {
+			steer: { expectedTurnId: "t1" },
+		});
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
 		await waitFor(() => adapters[0]?.steered.length === 1);
 
 		runtime.commands.cancelTurn({
@@ -1015,7 +1053,9 @@ describe("LiveSession", () => {
 		});
 		sendPrompt(runtime, sessionId, "first");
 		await waitForApproval(runtime, sessionId);
-		const second = sendPrompt(runtime, sessionId, "second");
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
 
 		await runtime.live.get(sessionId)?.dispose();
 		expect(
