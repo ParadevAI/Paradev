@@ -1064,6 +1064,9 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Akses {label} ke {pluginName}"
 
+msgid "{label} is set to manual"
+msgstr "{label} kini memakai login manual"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> bereaksi dengan {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>dari {1} di papan peringkat</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> atau <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Segera hadir di</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "Pilih tempat membuka agen yang dimulai dari komentar, mode desain, dan P
 msgid "Choose your default skin tone"
 msgstr "Pilih warna kulit default"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Memilih ini menghapus semua kredensial yang tersimpan di sini untuk {label}."
+
 msgid "CI failed"
 msgstr "CI gagal"
 
@@ -5748,6 +5757,9 @@ msgstr "Tidak dapat melanjutkan"
 
 msgid "Could not resume the chat"
 msgstr "Tidak dapat melanjutkan obrolan"
+
+msgid "Could not save the change."
+msgstr "Tidak dapat menyimpan perubahan."
 
 msgid "Could not send"
 msgstr "Tidak bisa mengirim"
@@ -11312,6 +11324,12 @@ msgstr "Manual"
 msgid "Manual order"
 msgstr "Urutan manual"
 
+msgid "manual sign-in"
+msgstr "login manual"
+
+msgid "Manual sign-in"
+msgstr "Login manual"
+
 msgid "Mark all read"
 msgstr "Tandai semua dibaca"
 
@@ -14059,6 +14077,9 @@ msgstr "Design System Paradev"
 msgid "Paradev desktop app"
 msgstr "Aplikasi desktop Paradev"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev tidak memasukkan agen ini di sini: skrip Anda sendiri yang menjaga loginnya tetap aktif. Setelah skrip melakukannya, lanjutkan."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev tidak memiliki izin untuk membaca \"{name}\"."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev punya paket gratis. Kode sumbernya ada di GitHub dengan Lisensi 
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev mengalami kesalahan tak terduga. Muat ulang untuk mencoba lagi."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev tidak menyimpan kredensial apa pun untuk {label} dan tidak menambahkannya ke workspace cloud Anda saat dimulai, dimulai ulang, atau diaktifkan kembali. Skrip yang Anda jalankan di dalam workspace menjaga {loginFile} tetap terbaru. Jika skrip berhenti, {label} tetap keluar sampai skrip Anda memasukkannya lagi."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev menyimpan token dan melakukan panggilannya. Agen tidak pernah melihatnya."
@@ -19120,6 +19144,9 @@ msgstr "Agen menyalin percakapan; cabang terbuka di tab baru"
 msgid "The agent crashed"
 msgstr "Agen mengalami crash"
 
+msgid "The agent is not signed in"
+msgstr "Agen belum masuk"
+
 msgid "The agent lost this conversation"
 msgstr "Agen kehilangan percakapan ini"
 
@@ -20847,6 +20874,9 @@ msgstr "Pakai bawaan global"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gunakan huruf kecil, angka, tanda hubung, dan garis bawah"
+
+msgid "Use manual sign-in"
+msgstr "Gunakan login manual"
 
 msgid "Use more browser features: {features}"
 msgstr "Memakai fitur browser lainnya: {features}"

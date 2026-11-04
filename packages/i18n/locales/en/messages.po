@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} theme"
 msgid "{label} access to {pluginName}"
 msgstr "{label} access to {pluginName}"
 
+msgid "{label} is set to manual"
+msgstr "{label} is set to manual"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> reacted with {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Coming soon to</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "Choose where agents started from comments, design mode, and Pages open."
 msgid "Choose your default skin tone"
 msgstr "Choose your default skin tone"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Choosing this removes any credential saved here for {label}."
+
 msgid "CI failed"
 msgstr "CI failed"
 
@@ -5748,6 +5757,9 @@ msgstr "Could not resume"
 
 msgid "Could not resume the chat"
 msgstr "Could not resume the chat"
+
+msgid "Could not save the change."
+msgstr "Could not save the change."
 
 msgid "Could not send"
 msgstr "Could not send"
@@ -11312,6 +11324,12 @@ msgstr "Manual"
 msgid "Manual order"
 msgstr "Manual order"
 
+msgid "manual sign-in"
+msgstr "manual sign-in"
+
+msgid "Manual sign-in"
+msgstr "Manual sign-in"
+
 msgid "Mark all read"
 msgstr "Mark all read"
 
@@ -14059,6 +14077,9 @@ msgstr "Paradev Design System"
 msgid "Paradev desktop app"
 msgstr "Paradev desktop app"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev doesn't have permission to read \"{name}\"."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev has a free tier. The source code is on GitHub under the MIT Lice
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev hit an unexpected error. Reload to try again."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev holds the token and makes the calls. Agents never see it."
@@ -19120,6 +19144,9 @@ msgstr "The agent copies the conversation; the branch opens in a new tab"
 msgid "The agent crashed"
 msgstr "The agent crashed"
 
+msgid "The agent is not signed in"
+msgstr "The agent is not signed in"
+
 msgid "The agent lost this conversation"
 msgstr "The agent lost this conversation"
 
@@ -20847,6 +20874,9 @@ msgstr "Use global default"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Use lowercase letters, numbers, dashes and underscores"
+
+msgid "Use manual sign-in"
+msgstr "Use manual sign-in"
 
 msgid "Use more browser features: {features}"
 msgstr "Use more browser features: {features}"

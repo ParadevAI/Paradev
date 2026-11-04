@@ -1064,6 +1064,9 @@ msgstr "{kindLabel}主題"
 msgid "{label} access to {pluginName}"
 msgstr "{label} 對 {pluginName} 的存取權限"
 
+msgid "{label} is set to manual"
+msgstr "{label} 已設為手動登入"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> 以 {shortcode} 回應"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>／排行榜 {1} 人中</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> 或 <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>即將上架</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "選擇從留言、設計模式和 Pages 啟動的代理程式的開啟�
 msgid "Choose your default skin tone"
 msgstr "選擇預設膚色"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "選擇此項會刪除此處為 {label} 儲存的所有憑證。"
+
 msgid "CI failed"
 msgstr "CI失敗"
 
@@ -5748,6 +5757,9 @@ msgstr "無法繼續"
 
 msgid "Could not resume the chat"
 msgstr "無法繼續聊天"
+
+msgid "Could not save the change."
+msgstr "無法儲存變更。"
 
 msgid "Could not send"
 msgstr "無法傳送"
@@ -11312,6 +11324,12 @@ msgstr "手動"
 msgid "Manual order"
 msgstr "手動排序"
 
+msgid "manual sign-in"
+msgstr "手動登入"
+
+msgid "Manual sign-in"
+msgstr "手動登入"
+
 msgid "Mark all read"
 msgstr "全部標示為已讀"
 
@@ -14059,6 +14077,9 @@ msgstr "Paradev設計系統"
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面 App"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev 不會在這裡為此代理登入：登入狀態由你自己的腳本維護。腳本更新後，請繼續。"
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev 沒有讀取「{name}」的權限。"
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev提供免費方案。原始碼在GitHub上以MIT授權條款開�
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev遇到意外錯誤。重新載入以重試。"
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev 不保存 {label} 的任何憑證，也不會在雲端工作區啟動、重新啟動或喚醒時加入憑證。你在工作區中執行的腳本負責讓 {loginFile} 保持最新。如果腳本停止，{label} 會一直維持登出狀態，直到你的腳本重新登入。"
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "權杖由 Paradev 保管並代為呼叫，代理程式永遠看不到它。"
@@ -19120,6 +19144,9 @@ msgstr "代理複製該對話，分支在新分頁中開啟"
 msgid "The agent crashed"
 msgstr "代理當機了"
 
+msgid "The agent is not signed in"
+msgstr "代理尚未登入"
+
 msgid "The agent lost this conversation"
 msgstr "代理遺失了此對話"
 
@@ -20847,6 +20874,9 @@ msgstr "使用全域性預設值"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "請使用小寫字母、數字、連字號和底線"
+
+msgid "Use manual sign-in"
+msgstr "使用手動登入"
 
 msgid "Use more browser features: {features}"
 msgstr "使用更多瀏覽器功能：{features}"

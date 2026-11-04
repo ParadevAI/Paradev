@@ -1064,6 +1064,9 @@ msgstr "Thème {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Accès {label} à {pluginName}"
 
+msgid "{label} is set to manual"
+msgstr "{label} est en connexion manuelle"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> a réagi avec {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>sur {1} au classement</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> ou un <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Bientôt disponible sur</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "Choisissez où ouvrir les agents lancés depuis les commentaires, le mod
 msgid "Choose your default skin tone"
 msgstr "Choisissez votre teinte de peau par défaut"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Ce choix supprime tout identifiant enregistré ici pour {label}."
+
 msgid "CI failed"
 msgstr "CI en échec"
 
@@ -5748,6 +5757,9 @@ msgstr "Impossible de reprendre"
 
 msgid "Could not resume the chat"
 msgstr "Impossible de reprendre la discussion"
+
+msgid "Could not save the change."
+msgstr "Impossible d’enregistrer la modification."
 
 msgid "Could not send"
 msgstr "Échec de l'envoi"
@@ -11312,6 +11324,12 @@ msgstr "Manuel"
 msgid "Manual order"
 msgstr "Ordre manuel"
 
+msgid "manual sign-in"
+msgstr "connexion manuelle"
+
+msgid "Manual sign-in"
+msgstr "Connexion manuelle"
+
 msgid "Mark all read"
 msgstr "Tout marquer comme lu"
 
@@ -14059,6 +14077,9 @@ msgstr "Système de design Paradev"
 msgid "Paradev desktop app"
 msgstr "Application de bureau Paradev"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev ne connecte pas cet agent ici : c’est votre propre script qui maintient sa connexion à jour. Une fois que c’est fait, continuez."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev n’a pas l’autorisation de lire « {name} »."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev propose une offre gratuite. Le code source est sur GitHub sous l
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev a rencontré une erreur inattendue. Rechargez pour réessayer."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev ne conserve aucun identifiant pour {label} et n’en ajoute aucun à vos espaces de travail cloud lorsqu’ils démarrent, redémarrent ou se réveillent. Un script que vous exécutez dans l’espace de travail maintient {loginFile} à jour. S’il s’arrête, {label} reste déconnecté jusqu’à ce que votre script le reconnecte."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev conserve le jeton et fait les appels. Les agents ne le voient jamais."
@@ -19120,6 +19144,9 @@ msgstr "L'agent copie la conversation ; la branche s'ouvre dans un nouvel onglet
 msgid "The agent crashed"
 msgstr "L'agent a planté"
 
+msgid "The agent is not signed in"
+msgstr "L’agent n’est pas connecté"
+
 msgid "The agent lost this conversation"
 msgstr "L'agent a perdu cette conversation"
 
@@ -20847,6 +20874,9 @@ msgstr "Utiliser la valeur globale par défaut"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Utilisez des minuscules, des chiffres, des tirets et des tirets bas"
+
+msgid "Use manual sign-in"
+msgstr "Utiliser la connexion manuelle"
 
 msgid "Use more browser features: {features}"
 msgstr "Utiliser d'autres fonctionnalités du navigateur : {features}"

@@ -29,6 +29,7 @@ import { CopyStateIcon } from "./components/CopyStateIcon";
 import { DisconnectMenu } from "./components/DisconnectMenu";
 import { ExternalTextLink } from "./components/ExternalTextLink";
 import { Field } from "./components/Field";
+import { ManualSignIn } from "./components/ManualSignIn";
 import { ProviderForm } from "./components/ProviderForm";
 import { SaveButton } from "./components/SaveButton";
 import { SavedSecret } from "./components/SavedSecret";
@@ -48,6 +49,7 @@ interface CloudAuthDialogProps {
 	save: (input: SaveCredentialInput) => Promise<unknown>;
 	signedIn: () => Promise<unknown>;
 	disconnect: () => Promise<unknown>;
+	setManual: () => Promise<unknown>;
 }
 
 export function CloudAuthDialog({
@@ -61,6 +63,7 @@ export function CloudAuthDialog({
 	save,
 	signedIn,
 	disconnect,
+	setManual,
 }: CloudAuthDialogProps) {
 	const { t } = useLingui();
 	const isClaude = presetId === "claude";
@@ -517,6 +520,40 @@ export function CloudAuthDialog({
 													</div>
 												</>
 											)}
+										</div>
+									) : null}
+								</div>
+								<div className={optionClass}>
+									<div className={optionRowClass}>
+										<Label
+											className={optionLabelClass}
+											htmlFor={`${presetId}-manual`}
+										>
+											<RadioGroupItem
+												id={`${presetId}-manual`}
+												value="manual"
+											/>
+											<Trans>Manual</Trans>
+											{state.manualOn ? (
+												<Check className="size-4 text-emerald-500" />
+											) : null}
+										</Label>
+										{state.manualOn ? (
+											<DisconnectMenu
+												agentLabel={label}
+												credential={t({ message: "manual sign-in" })}
+												disconnect={disconnect}
+											/>
+										) : null}
+									</div>
+									{state.method === "manual" ? (
+										<div className={optionBodyClass}>
+											<ManualSignIn
+												enable={setManual}
+												label={label}
+												manualOn={state.manualOn}
+												presetId={presetId}
+											/>
 										</div>
 									) : null}
 								</div>

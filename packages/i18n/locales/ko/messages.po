@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} 테마"
 msgid "{label} access to {pluginName}"
 msgstr "{label}의 {pluginName} 접근 권한"
 
+msgid "{label} is set to manual"
+msgstr "{label}이(가) 수동 로그인으로 설정되었습니다"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0>님이 {shortcode}(으)로 반응했습니다"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>· 리더보드 {1}명 중</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> 또는 <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<1>Google Play</1><0>출시 예정</0>"
@@ -4289,6 +4295,9 @@ msgstr "댓글, 디자인 모드 및 Pages에서 시작한 에이전트를 열 �
 msgid "Choose your default skin tone"
 msgstr "기본 피부색 선택"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "이 옵션을 선택하면 여기에 저장된 {label}의 자격 증명이 모두 삭제됩니다."
+
 msgid "CI failed"
 msgstr "CI 실패"
 
@@ -5748,6 +5757,9 @@ msgstr "재개할 수 없습니다"
 
 msgid "Could not resume the chat"
 msgstr "채팅을 재개할 수 없습니다"
+
+msgid "Could not save the change."
+msgstr "변경 사항을 저장할 수 없습니다."
 
 msgid "Could not send"
 msgstr "보낼 수 없습니다"
@@ -11312,6 +11324,12 @@ msgstr "수동"
 msgid "Manual order"
 msgstr "수동 정렬"
 
+msgid "manual sign-in"
+msgstr "수동 로그인"
+
+msgid "Manual sign-in"
+msgstr "수동 로그인"
+
 msgid "Mark all read"
 msgstr "모두 읽음으로 표시"
 
@@ -14059,6 +14077,9 @@ msgstr "Paradev 디자인 시스템"
 msgid "Paradev desktop app"
 msgstr "Paradev 데스크톱 앱"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev는 여기서 이 에이전트를 로그인시키지 않습니다. 로그인은 사용자의 스크립트가 유지합니다. 스크립트가 갱신하면 계속하세요."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev에 \"{name}\"을(를) 읽을 권한이 없습니다."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev에는 무료 플랜이 있습니다. 소스 코드가 MIT 라이
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev에서 예기치 않은 오류가 발생했습니다. 다시 로드해 보세요."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev는 {label}의 자격 증명을 보관하지 않으며, 클라우드 워크스페이스가 시작, 재시작 또는 재개될 때도 자격 증명을 추가하지 않습니다. 워크스페이스 안에서 실행하는 스크립트가 {loginFile}을(를) 최신 상태로 유지합니다. 스크립트가 멈추면 스크립트가 다시 로그인시킬 때까지 {label}은(는) 로그아웃 상태로 남습니다."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "토큰은 Paradev가 보관하고 호출도 대신합니다. 에이전트는 토큰을 보지 못합니다."
@@ -19120,6 +19144,9 @@ msgstr "에이전트가 대화를 복사하고 분기는 새 탭에서 열립니
 msgid "The agent crashed"
 msgstr "에이전트가 비정상 종료되었습니다"
 
+msgid "The agent is not signed in"
+msgstr "에이전트가 로그인되어 있지 않습니다"
+
 msgid "The agent lost this conversation"
 msgstr "에이전트가 이 대화를 잃어버렸습니다"
 
@@ -20847,6 +20874,9 @@ msgstr "전역 기본값 사용"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "소문자, 숫자, 하이픈, 밑줄을 사용하세요"
+
+msgid "Use manual sign-in"
+msgstr "수동 로그인 사용"
 
 msgid "Use more browser features: {features}"
 msgstr "추가 브라우저 기능 사용: {features}"

@@ -18,6 +18,8 @@ import {
 	FAILURE_ACTIONS,
 	FAILURE_TITLES,
 	type FailureAction,
+	MANUAL_SIGN_IN_ACTIONS,
+	MANUAL_SIGN_IN_TITLE,
 } from "./constants";
 
 type Running = "continue" | "restart" | "new_chat";
@@ -44,7 +46,10 @@ export function TurnFailureCard({
 	const { i18n, t } = useLingui();
 	const actions = useTurnFailureActions();
 	const kind = error?.kind ?? "unknown";
-	const title = i18n._(FAILURE_TITLES[kind]);
+	const manualSignIn = kind === "auth" && actions?.manualSignIn === true;
+	const title = i18n._(
+		manualSignIn ? MANUAL_SIGN_IN_TITLE : FAILURE_TITLES[kind],
+	);
 	const text = [error?.message, error?.detail].filter(Boolean).join("\n\n");
 	const [expanded, setExpanded] = useState(false);
 	const [clamped, setClamped] = useState(false);
@@ -156,10 +161,12 @@ export function TurnFailureCard({
 			}
 		: null;
 	const offered = buttons
-		? FAILURE_ACTIONS[kind].flatMap((action) => {
-				const button = buttons[action];
-				return button ? [{ action, ...button }] : [];
-			})
+		? (manualSignIn ? MANUAL_SIGN_IN_ACTIONS : FAILURE_ACTIONS[kind]).flatMap(
+				(action) => {
+					const button = buttons[action];
+					return button ? [{ action, ...button }] : [];
+				},
+			)
 		: [];
 
 	return (
@@ -184,6 +191,14 @@ export function TurnFailureCard({
 						tabIndex={expanded ? 0 : undefined}
 					>
 						{text}
+					</p>
+				)}
+				{manualSignIn && (
+					<p className="text-muted-foreground">
+						<Trans>
+							Paradev does not sign this agent in here: your own script keeps
+							its login current. Once it has, continue.
+						</Trans>
 					</p>
 				)}
 				{signingIn && recovery && (

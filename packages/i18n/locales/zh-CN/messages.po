@@ -1064,6 +1064,9 @@ msgstr "{kindLabel}主题"
 msgid "{label} access to {pluginName}"
 msgstr "{label} 对 {pluginName} 的访问权限"
 
+msgid "{label} is set to manual"
+msgstr "{label} 已设为手动登录"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> 用 {shortcode} 做出了回应"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>／排行榜共 {1} 人</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> 或 <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>即将上架</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "选择从评论、设计模式和 Pages 启动的智能体的打开位�
 msgid "Choose your default skin tone"
 msgstr "选择默认肤色"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "选择此项会删除此处为 {label} 保存的所有凭据。"
+
 msgid "CI failed"
 msgstr "CI失败"
 
@@ -5748,6 +5757,9 @@ msgstr "无法继续"
 
 msgid "Could not resume the chat"
 msgstr "无法继续聊天"
+
+msgid "Could not save the change."
+msgstr "无法保存更改。"
 
 msgid "Could not send"
 msgstr "无法发送"
@@ -11312,6 +11324,12 @@ msgstr "手动"
 msgid "Manual order"
 msgstr "手动排序"
 
+msgid "manual sign-in"
+msgstr "手动登录"
+
+msgid "Manual sign-in"
+msgstr "手动登录"
+
 msgid "Mark all read"
 msgstr "全部标记为已读"
 
@@ -14059,6 +14077,9 @@ msgstr "Paradev设计系统"
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面应用"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev 不会在这里为此智能体登录：登录状态由你自己的脚本维护。脚本更新后，请继续。"
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev 没有读取“{name}”的权限。"
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev提供免费方案。源码在GitHub上以MIT许可证开源，�
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev遇到意外错误。重新加载以重试。"
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev 不保存 {label} 的任何凭据，也不会在云工作区启动、重启或唤醒时添加凭据。你在工作区中运行的脚本负责保持 {loginFile} 为最新。如果脚本停止，{label} 会一直处于未登录状态，直到你的脚本重新登录。"
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "令牌由 Paradev 保管并代为调用，智能体永远看不到它。"
@@ -19120,6 +19144,9 @@ msgstr "智能体复制该对话，分支在新标签页中打开"
 msgid "The agent crashed"
 msgstr "智能体崩溃了"
 
+msgid "The agent is not signed in"
+msgstr "智能体未登录"
+
 msgid "The agent lost this conversation"
 msgstr "智能体丢失了此对话"
 
@@ -20847,6 +20874,9 @@ msgstr "使用全局默认值"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "请使用小写字母、数字、连字符和下划线"
+
+msgid "Use manual sign-in"
+msgstr "使用手动登录"
 
 msgid "Use more browser features: {features}"
 msgstr "使用更多浏览器功能：{features}"

@@ -1064,6 +1064,9 @@ msgstr "{kindLabel}テーマ"
 msgid "{label} access to {pluginName}"
 msgstr "{label} の {pluginName} へのアクセス"
 
+msgid "{label} is set to manual"
+msgstr "{label} を手動サインインに設定しました"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> が {shortcode} でリアクションしました"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>リーダーボード{1}人中</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> または <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<1>Google Play</1><0>で近日公開</0>"
@@ -4289,6 +4295,9 @@ msgstr "コメント、デザインモード、Pages から起動したエージ
 msgid "Choose your default skin tone"
 msgstr "デフォルトの肌の色を選択"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "これを選ぶと、ここに保存されている {label} の認証情報は削除されます。"
+
 msgid "CI failed"
 msgstr "CIが失敗しました"
 
@@ -5748,6 +5757,9 @@ msgstr "再開できませんでした"
 
 msgid "Could not resume the chat"
 msgstr "チャットを再開できませんでした"
+
+msgid "Could not save the change."
+msgstr "変更を保存できませんでした。"
 
 msgid "Could not send"
 msgstr "送信できませんでした"
@@ -11312,6 +11324,12 @@ msgstr "手作業"
 msgid "Manual order"
 msgstr "手動順"
 
+msgid "manual sign-in"
+msgstr "手動サインイン"
+
+msgid "Manual sign-in"
+msgstr "手動サインイン"
+
 msgid "Mark all read"
 msgstr "すべて既読にする"
 
@@ -14059,6 +14077,9 @@ msgstr "Paradevデザインシステム"
 msgid "Paradev desktop app"
 msgstr "Paradev デスクトップアプリ"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev はここでこのエージェントにサインインしません。ログインはあなた自身のスクリプトが維持します。更新されたら続行してください。"
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev には「{name}」を読み取る権限がありません。"
 
@@ -14082,6 +14103,9 @@ msgstr "Paradevには無料プランがあります。ソースコードはMIT�
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradevで予期しないエラーが発生しました。再読み込みしてお試しください。"
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev は {label} の認証情報を保持せず、クラウドワークスペースの起動・再起動・復帰時にも追加しません。ワークスペース内で実行するスクリプトが {loginFile} を最新に保ちます。スクリプトが止まると、再びサインインさせるまで {label} はサインアウトのままです。"
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "トークンはParadevが保持し、呼び出しも行います。エージェントには見えません。"
@@ -19120,6 +19144,9 @@ msgstr "エージェントが会話を複製し、分岐は新しいタブで開
 msgid "The agent crashed"
 msgstr "エージェントがクラッシュしました"
 
+msgid "The agent is not signed in"
+msgstr "エージェントがサインインしていません"
+
 msgid "The agent lost this conversation"
 msgstr "エージェントがこの会話を失いました"
 
@@ -20847,6 +20874,9 @@ msgstr "グローバルのデフォルトを使用"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "小文字、数字、ハイフン、アンダースコアを使用してください"
+
+msgid "Use manual sign-in"
+msgstr "手動サインインを使う"
 
 msgid "Use more browser features: {features}"
 msgstr "ブラウザの追加機能を使用: {features}"

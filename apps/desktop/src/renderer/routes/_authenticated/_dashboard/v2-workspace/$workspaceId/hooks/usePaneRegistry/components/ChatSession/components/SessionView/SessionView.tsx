@@ -79,6 +79,7 @@ import {
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useLaunchPromptDelivered } from "./hooks/useLaunchPromptDelivered";
 import { useMainSend } from "./hooks/useMainSend";
+import { useManualSignIn } from "./hooks/useManualSignIn";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
 import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
@@ -647,6 +648,7 @@ export function SessionView({
 		() => composerRef.current?.openModelPicker(),
 		[],
 	);
+	const manualSignIn = useManualSignIn(presetId);
 	const { failureActions, onSetConfigOption, onModelPickerOpenChange } =
 		useFailureRecovery({
 			blocked:
@@ -657,6 +659,7 @@ export function SessionView({
 				approvals.length > 0 ||
 				outbox.length > 0,
 			configOptions,
+			manualSignIn,
 			onRestartAndContinue,
 			onStartNewChat,
 			openModelPicker,

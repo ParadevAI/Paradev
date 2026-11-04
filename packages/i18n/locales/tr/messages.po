@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} tema"
 msgid "{label} access to {pluginName}"
 msgstr "{label} rolünün {pluginName} erişimi"
 
+msgid "{label} is set to manual"
+msgstr "{label} artık manuel oturum açma kullanıyor"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> {shortcode} ile tepki verdi"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>— liderlik tablosundaki {1} kişi arasında</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> veya bir <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<1>Google Play</1><0>'de yakında</0>"
@@ -4289,6 +4295,9 @@ msgstr "Yorumlardan, tasarım modundan ve Pages üzerinden başlatılan ajanlar�
 msgid "Choose your default skin tone"
 msgstr "Varsayılan ten rengini seç"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Bunu seçmek, burada {label} için kayıtlı tüm kimlik bilgilerini kaldırır."
+
 msgid "CI failed"
 msgstr "CI başarısız"
 
@@ -5748,6 +5757,9 @@ msgstr "Devam ettirilemedi"
 
 msgid "Could not resume the chat"
 msgstr "Sohbete devam edilemedi"
+
+msgid "Could not save the change."
+msgstr "Değişiklik kaydedilemedi."
 
 msgid "Could not send"
 msgstr "Gönderilemedi"
@@ -11312,6 +11324,12 @@ msgstr "Elle"
 msgid "Manual order"
 msgstr "Manuel sıralama"
 
+msgid "manual sign-in"
+msgstr "manuel oturum açma"
+
+msgid "Manual sign-in"
+msgstr "Manuel oturum açma"
+
 msgid "Mark all read"
 msgstr "Tümünü okundu işaretle"
 
@@ -14059,6 +14077,9 @@ msgstr "Paradev Tasarım Sistemi"
 msgid "Paradev desktop app"
 msgstr "Paradev masaüstü uygulaması"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev bu ajanın oturumunu burada açmaz: oturumu kendi betiğiniz güncel tutar. Betik bunu yaptıktan sonra devam edin."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev'in \"{name}\" dosyasını okuma izni yok."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev'in ücretsiz bir planı var. Kaynak kodu GitHub'da MIT Lisansı 
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev beklenmeyen bir hatayla karşılaştı. Yeniden denemek için sayfayı yeniden yükleyin."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev, {label} için hiçbir kimlik bilgisi saklamaz ve bulut çalışma alanlarınız başlarken, yeniden başlarken veya uyanırken hiçbirini eklemez. Çalışma alanında çalıştırdığınız bir betik {loginFile} dosyasını güncel tutar. Betik durursa, betiğiniz yeniden oturum açana kadar {label} oturumu kapalı kalır."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev token'ı saklar ve çağrıları yapar. Ajanlar onu asla görmez."
@@ -19120,6 +19144,9 @@ msgstr "Aracı konuşmayı kopyalar; çatal yeni bir sekmede açılır"
 msgid "The agent crashed"
 msgstr "Ajan çöktü"
 
+msgid "The agent is not signed in"
+msgstr "Ajanın oturumu açık değil"
+
 msgid "The agent lost this conversation"
 msgstr "Ajan bu konuşmayı kaybetti"
 
@@ -20847,6 +20874,9 @@ msgstr "Genel varsayılanı kullan"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Küçük harf, rakam, tire ve alt çizgi kullanın"
+
+msgid "Use manual sign-in"
+msgstr "Manuel oturum açmayı kullan"
 
 msgid "Use more browser features: {features}"
 msgstr "Daha fazla tarayıcı özelliği kullanma: {features}"

@@ -1064,6 +1064,9 @@ msgstr "Chủ đề {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Quyền {label} với {pluginName}"
 
+msgid "{label} is set to manual"
+msgstr "{label} đã chuyển sang đăng nhập thủ công"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> đã bày tỏ cảm xúc {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>trên {1} trong bảng xếp hạng</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> hoặc một <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Sắp có trên</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "Chọn nơi mở tác nhân được khởi chạy từ bình luận, ch
 msgid "Choose your default skin tone"
 msgstr "Chọn màu da mặc định"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Chọn mục này sẽ xóa mọi thông tin xác thực đã lưu ở đây cho {label}."
+
 msgid "CI failed"
 msgstr "CI thất bại"
 
@@ -5748,6 +5757,9 @@ msgstr "Không thể tiếp tục"
 
 msgid "Could not resume the chat"
 msgstr "Không thể tiếp tục cuộc trò chuyện"
+
+msgid "Could not save the change."
+msgstr "Không thể lưu thay đổi."
 
 msgid "Could not send"
 msgstr "Không thể gửi"
@@ -11312,6 +11324,12 @@ msgstr "Thủ công"
 msgid "Manual order"
 msgstr "Thứ tự thủ công"
 
+msgid "manual sign-in"
+msgstr "đăng nhập thủ công"
+
+msgid "Manual sign-in"
+msgstr "Đăng nhập thủ công"
+
 msgid "Mark all read"
 msgstr "Đánh dấu tất cả đã đọc"
 
@@ -14059,6 +14077,9 @@ msgstr "Hệ thống thiết kế Paradev"
 msgid "Paradev desktop app"
 msgstr "Ứng dụng Paradev cho máy tính"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev không đăng nhập cho agent này ở đây: script của bạn tự duy trì phiên đăng nhập. Khi script đã làm xong, hãy tiếp tục."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev không có quyền đọc \"{name}\"."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Giấy p
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev gặp lỗi không mong muốn. Tải lại để thử lại."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev không giữ thông tin xác thực nào cho {label} và không thêm thông tin xác thực vào không gian làm việc đám mây của bạn khi chúng khởi động, khởi động lại hoặc được đánh thức. Script bạn chạy trong không gian làm việc giữ {loginFile} luôn cập nhật. Nếu script dừng, {label} sẽ ở trạng thái đăng xuất cho đến khi script đăng nhập lại."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev giữ token và thực hiện các lệnh gọi. Agent không bao giờ thấy nó."
@@ -19120,6 +19144,9 @@ msgstr "Tác nhân sao chép hội thoại; nhánh mở trong một thẻ mới"
 msgid "The agent crashed"
 msgstr "Agent đã gặp sự cố"
 
+msgid "The agent is not signed in"
+msgstr "Agent chưa đăng nhập"
+
 msgid "The agent lost this conversation"
 msgstr "Agent đã mất cuộc trò chuyện này"
 
@@ -20847,6 +20874,9 @@ msgstr "Dùng mặc định toàn cục"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
+
+msgid "Use manual sign-in"
+msgstr "Dùng đăng nhập thủ công"
 
 msgid "Use more browser features: {features}"
 msgstr "Dùng thêm tính năng trình duyệt: {features}"

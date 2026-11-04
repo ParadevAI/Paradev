@@ -1058,6 +1058,9 @@ msgstr "Тема: {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Доступ ролі {label} до {pluginName}"
 
+msgid "{label} is set to manual"
+msgstr "Для {label} увімкнено ручний вхід"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1505,6 +1508,9 @@ msgstr "<0>{who}</0> відреагував(-ла) {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>з {1} у таблиці лідерів</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> або <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Незабаром у</0><1>Google Play</1>"
@@ -4283,6 +4289,9 @@ msgstr "Виберіть, де відкриваються агенти, запу
 msgid "Choose your default skin tone"
 msgstr "Виберіть тон шкіри за замовчуванням"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Якщо вибрати це, усі збережені тут облікові дані для {label} буде видалено."
+
 msgid "CI failed"
 msgstr "CI не пройдено"
 
@@ -5742,6 +5751,9 @@ msgstr "Не вдалося відновити"
 
 msgid "Could not resume the chat"
 msgstr "Не вдалося відновити чат"
+
+msgid "Could not save the change."
+msgstr "Не вдалося зберегти зміну."
 
 msgid "Could not send"
 msgstr "Не вдалося надіслати"
@@ -11306,6 +11318,12 @@ msgstr "Вручну"
 msgid "Manual order"
 msgstr "Порядок вручну"
 
+msgid "manual sign-in"
+msgstr "ручний вхід"
+
+msgid "Manual sign-in"
+msgstr "Ручний вхід"
+
 msgid "Mark all read"
 msgstr "Позначити всі як прочитані"
 
@@ -14053,6 +14071,9 @@ msgstr "Дизайн-система Paradev"
 msgid "Paradev desktop app"
 msgstr "Десктопний застосунок Paradev"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev не виконує вхід для цього агента тут: вхід підтримує ваш власний скрипт. Коли він це зробить, продовжте."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev не має дозволу на читання «{name}»."
 
@@ -14076,6 +14097,9 @@ msgstr "Paradev має безкоштовний тариф. Вихідний к�
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "У Paradev сталася неочікувана помилка. Перезавантажте, щоб спробувати знову."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev не зберігає облікових даних для {label} і не додає їх у ваші хмарні робочі простори під час запуску, перезапуску чи пробудження. Скрипт, який ви запускаєте в робочому просторі, підтримує {loginFile} в актуальному стані. Якщо він зупиниться, {label} залишиться без входу, доки ваш скрипт знову не виконає вхід."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev зберігає токен і сам виконує виклики. Агенти ніколи його не бачать."
@@ -19114,6 +19138,9 @@ msgstr "Агент копіює розмову; гілка відкриваєт�
 msgid "The agent crashed"
 msgstr "Агент аварійно завершив роботу"
 
+msgid "The agent is not signed in"
+msgstr "Агент не виконав вхід"
+
 msgid "The agent lost this conversation"
 msgstr "Агент втратив цю розмову"
 
@@ -20841,6 +20868,9 @@ msgstr "Використовувати глобальне значення за 
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Використовуйте малі літери, цифри, дефіси та підкреслення"
+
+msgid "Use manual sign-in"
+msgstr "Використати ручний вхід"
 
 msgid "Use more browser features: {features}"
 msgstr "Використовувати більше можливостей браузера: {features}"

@@ -10,6 +10,8 @@ export type TurnFailureActions = {
 	restartAndContinue?: () => Promise<boolean>;
 	/** Resolves false when the new chat could not be started. */
 	startNewChat?: () => Promise<boolean>;
+	/** The person's own script signs this agent in, so a sign-in prompt has nothing to offer. */
+	manualSignIn?: boolean;
 	dismissed: ReadonlySet<string>;
 	setDismissed: (turnId: string, dismissed: boolean) => void;
 };

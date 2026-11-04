@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} motiv"
 msgid "{label} access to {pluginName}"
 msgstr "Přístup role {label} k {pluginName}"
 
+msgid "{label} is set to manual"
+msgstr "{label} nyní používá ruční přihlášení"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1514,9 @@ msgstr "<0>{who}</0> reaguje pomocí {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>z {1} v žebříčku</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> nebo <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Již brzy na</0><1>Google Play</1>"
@@ -4289,6 +4295,9 @@ msgstr "Vyberte, kde se otevřou agenti spuštění z komentářů, režimu náv
 msgid "Choose your default skin tone"
 msgstr "Vyberte výchozí odstín pleti"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Touto volbou odstraníte všechny přihlašovací údaje uložené zde pro {label}."
+
 msgid "CI failed"
 msgstr "CI selhalo"
 
@@ -5748,6 +5757,9 @@ msgstr "Pokračování se nezdařilo"
 
 msgid "Could not resume the chat"
 msgstr "V chatu se nepodařilo pokračovat"
+
+msgid "Could not save the change."
+msgstr "Změnu se nepodařilo uložit."
 
 msgid "Could not send"
 msgstr "Nepodařilo se odeslat"
@@ -11312,6 +11324,12 @@ msgstr "Manuální"
 msgid "Manual order"
 msgstr "Ruční řazení"
 
+msgid "manual sign-in"
+msgstr "ruční přihlášení"
+
+msgid "Manual sign-in"
+msgstr "Ruční přihlášení"
+
 msgid "Mark all read"
 msgstr "Označit vše jako přečtené"
 
@@ -14059,6 +14077,9 @@ msgstr "Design systém Paradev"
 msgid "Paradev desktop app"
 msgstr "Desktopová aplikace Paradev"
 
+msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
+msgstr "Paradev tohoto agenta zde nepřihlašuje: přihlášení udržuje váš vlastní skript. Jakmile to udělá, pokračujte."
+
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev nemá oprávnění ke čtení „{name}“."
 
@@ -14082,6 +14103,9 @@ msgstr "Paradev má bezplatnou verzi. Zdrojový kód je na GitHubu pod licencí 
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "V Paradev došlo k neočekávané chybě. Zkuste to znovu načtením."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev pro {label} neuchovává žádné přihlašovací údaje a nepřidává je do vašich cloudových pracovních prostorů při spuštění, restartu ani probuzení. Skript, který spouštíte v pracovním prostoru, udržuje {loginFile} aktuální. Pokud se zastaví, {label} zůstane odhlášený, dokud ho váš skript znovu nepřihlásí."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev drží token a provádí volání. Agenti ho nikdy neuvidí."
@@ -19120,6 +19144,9 @@ msgstr "Agent zkopíruje konverzaci; větev se otevře na nové kartě"
 msgid "The agent crashed"
 msgstr "Agent spadl"
 
+msgid "The agent is not signed in"
+msgstr "Agent není přihlášený"
+
 msgid "The agent lost this conversation"
 msgstr "Agent tuto konverzaci ztratil"
 
@@ -20847,6 +20874,9 @@ msgstr "Použít globální výchozí"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Použijte malá písmena, číslice, pomlčky a podtržítka"
+
+msgid "Use manual sign-in"
+msgstr "Použít ruční přihlášení"
 
 msgid "Use more browser features: {features}"
 msgstr "Používat další funkce prohlížeče: {features}"
