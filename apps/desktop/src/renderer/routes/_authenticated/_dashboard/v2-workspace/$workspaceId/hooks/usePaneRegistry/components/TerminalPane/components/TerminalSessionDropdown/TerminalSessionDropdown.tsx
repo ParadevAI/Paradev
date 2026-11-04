@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { formatCompactRelativeTime } from "@superset/i18n/format";
-import type { RendererContext } from "@superset/panes";
+import { type RendererContext, usePaneAppearance } from "@superset/panes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,7 +18,6 @@ import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { Check, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -109,7 +108,7 @@ export function TerminalSessionDropdown({
 	onSessionRemoved,
 }: TerminalSessionDropdownProps) {
 	const { t } = useLingui();
-	const isParadevShell = useParadevShell();
+	const isCards = usePaneAppearance() === "cards";
 	const [isOpen, setIsOpen] = useState(false);
 	const collections = useCollections();
 	const { terminalId } = context.pane.data as TerminalPaneData;
@@ -374,7 +373,7 @@ export function TerminalSessionDropdown({
 						title={triggerTitle}
 						className={cn(
 							"flex min-w-0 max-w-96 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-							isParadevShell && "-ml-1.5",
+							isCards && "-ml-1.5",
 						)}
 						onClick={(event) => event.stopPropagation()}
 					>

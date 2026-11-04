@@ -24,16 +24,19 @@ export function DefaultHeaderContent({
 		<div
 			className={cn(
 				"flex h-full w-full min-w-0 items-center gap-2",
-				isCards ? "px-2" : "px-3",
+				isCards ? "pr-2 pl-0.5" : "px-3",
 			)}
 		>
 			{/* overflow-hidden: with flex-1's zero basis this area is the first
 			    to be squeezed, and a custom titleContent (e.g. the terminal
 			    session dropdown) has its own min-content width — without the
-			    clip it would keep painting past this box over the action icons. */}
+			    clip it would keep painting past this box over the action icons.
+			    In cards the left inset sits inside the clip, so a title button
+			    can pull its hover padding left of the title line unclipped. */}
 			<div
 				className={cn(
 					"flex min-w-0 flex-1 items-center gap-2 overflow-hidden",
+					isCards && "pl-1.5",
 					isActive && "font-medium",
 				)}
 			>
