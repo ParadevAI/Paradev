@@ -12,6 +12,7 @@ LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
 $$;
 --> statement-breakpoint
 CREATE TYPE "public"."chat_move_status" AS ENUM('pending', 'copying', 'restoring', 'ready', 'failed');--> statement-breakpoint
+CREATE TYPE "public"."workspace_move_status" AS ENUM('pending', 'moving', 'ready', 'partial', 'failed');--> statement-breakpoint
 CREATE TABLE "chat_items" (
 	"session_id" uuid NOT NULL,
 	"item_id" text NOT NULL,
@@ -32,6 +33,7 @@ CREATE TABLE "chat_items" (
 --> statement-breakpoint
 CREATE TABLE "chat_moves" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"workspace_move_id" uuid NOT NULL,
 	"session_id" uuid NOT NULL,
 	"organization_id" uuid NOT NULL,
 	"created_by" uuid NOT NULL,
@@ -77,6 +79,22 @@ CREATE TABLE "chat_turns" (
 	CONSTRAINT "chat_turns_session_id_turn_id_pk" PRIMARY KEY("session_id","turn_id")
 );
 --> statement-breakpoint
+CREATE TABLE "workspace_moves" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"organization_id" uuid NOT NULL,
+	"created_by" uuid NOT NULL,
+	"from_workspace_id" uuid NOT NULL,
+	"from_host_id" text,
+	"to_workspace_id" uuid NOT NULL,
+	"to_host_id" text,
+	"branch" text NOT NULL,
+	"status" "workspace_move_status" DEFAULT 'pending' NOT NULL,
+	"error" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"finished_at" timestamp with time zone
+);
+--> statement-breakpoint
 ALTER TABLE "chat_sessions" ADD COLUMN "harness" text;--> statement-breakpoint
 ALTER TABLE "chat_sessions" ADD COLUMN "harness_session_id" text;--> statement-breakpoint
 ALTER TABLE "chat_sessions" ADD COLUMN "epoch" text;--> statement-breakpoint
@@ -85,6 +103,7 @@ ALTER TABLE "chat_sessions" ADD COLUMN "status" text;--> statement-breakpoint
 ALTER TABLE "chat_items" ADD CONSTRAINT "chat_items_session_id_chat_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."chat_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_items" ADD CONSTRAINT "chat_items_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "auth"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_items" ADD CONSTRAINT "chat_items_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chat_moves" ADD CONSTRAINT "chat_moves_workspace_move_id_workspace_moves_id_fk" FOREIGN KEY ("workspace_move_id") REFERENCES "public"."workspace_moves"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_moves" ADD CONSTRAINT "chat_moves_session_id_chat_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."chat_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_moves" ADD CONSTRAINT "chat_moves_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "auth"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_moves" ADD CONSTRAINT "chat_moves_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -93,15 +112,21 @@ ALTER TABLE "chat_transcripts" ADD CONSTRAINT "chat_transcripts_session_id_chat_
 ALTER TABLE "chat_transcripts" ADD CONSTRAINT "chat_transcripts_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "auth"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_transcripts" ADD CONSTRAINT "chat_transcripts_file_id_files_id_fk" FOREIGN KEY ("file_id") REFERENCES "public"."files"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_turns" ADD CONSTRAINT "chat_turns_session_id_chat_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."chat_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "workspace_moves" ADD CONSTRAINT "workspace_moves_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "auth"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "workspace_moves" ADD CONSTRAINT "workspace_moves_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "chat_items_session_first_seq_idx" ON "chat_items" USING btree ("session_id","first_seq");--> statement-breakpoint
 CREATE INDEX "chat_items_created_by_idx" ON "chat_items" USING btree ("created_by");--> statement-breakpoint
 CREATE INDEX "chat_items_search_idx" ON "chat_items" USING gin ("search");--> statement-breakpoint
 CREATE INDEX "chat_moves_session_created_at_idx" ON "chat_moves" USING btree ("session_id","created_at");--> statement-breakpoint
 CREATE INDEX "chat_moves_to_workspace_idx" ON "chat_moves" USING btree ("to_workspace_id");--> statement-breakpoint
+CREATE INDEX "chat_moves_workspace_move_idx" ON "chat_moves" USING btree ("workspace_move_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "chat_moves_one_in_flight_idx" ON "chat_moves" USING btree ("session_id") WHERE "chat_moves"."status" in ('pending', 'copying', 'restoring');--> statement-breakpoint
 CREATE INDEX "chat_transcripts_session_created_at_idx" ON "chat_transcripts" USING btree ("session_id","created_at");--> statement-breakpoint
 CREATE INDEX "chat_transcripts_file_id_idx" ON "chat_transcripts" USING btree ("file_id");--> statement-breakpoint
 CREATE INDEX "chat_turns_session_first_seq_idx" ON "chat_turns" USING btree ("session_id","first_seq");--> statement-breakpoint
+CREATE INDEX "workspace_moves_from_workspace_idx" ON "workspace_moves" USING btree ("from_workspace_id","created_at");--> statement-breakpoint
+CREATE INDEX "workspace_moves_to_workspace_idx" ON "workspace_moves" USING btree ("to_workspace_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "workspace_moves_one_in_flight_idx" ON "workspace_moves" USING btree ("from_workspace_id") WHERE "workspace_moves"."status" in ('pending', 'moving');--> statement-breakpoint
 -- BM25 ranking for chat search through Neon's lakebase_text. Only Neon
 -- projects with Lakebase Search have the extension; plain Postgres (local
 -- docker, CI) and other Neon projects skip this, and chat search falls back
