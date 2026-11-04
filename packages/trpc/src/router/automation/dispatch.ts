@@ -38,6 +38,7 @@ import {
 	classifyDispatchError,
 	describeError,
 	nonForkPullRequest,
+	pinCreatedWorkspace,
 	previousRunSession,
 	type RunWorkspace,
 	replacePin,
@@ -248,6 +249,11 @@ export async function dispatchAutomation(
 				pullRequest,
 			});
 			placed({ v2WorkspaceId: created.workspaceId });
+			if (automation.continueAgentSession) {
+				await pinCreatedWorkspace(automation.id, {
+					v2WorkspaceId: created.workspaceId,
+				});
+			}
 			return created.workspaceId;
 		};
 

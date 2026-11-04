@@ -153,7 +153,6 @@ export function TriggersCard({
 											targetHostId: nextHostId,
 											v2WorkspaceId: null,
 											cloudWorkspaceId: null,
-											continueAgentSession: false,
 											...(nextHostId === CLOUD_HOST_ID
 												? {
 														v2ProjectId: null,
@@ -190,7 +189,6 @@ export function TriggersCard({
 										: {
 												v2ProjectId,
 												v2WorkspaceId: null,
-												continueAgentSession: false,
 											},
 								)
 							}
@@ -205,10 +203,7 @@ export function TriggersCard({
 							value={scope.cloudWorkspaceId}
 							disabled={readOnly}
 							onChange={(cloudWorkspaceId) =>
-								onScopeChange({
-									cloudWorkspaceId,
-									...(cloudWorkspaceId ? {} : { continueAgentSession: false }),
-								})
+								onScopeChange({ cloudWorkspaceId })
 							}
 						/>
 					) : (
@@ -221,7 +216,6 @@ export function TriggersCard({
 							onChange={(v2WorkspaceId) =>
 								onScopeChange({
 									v2WorkspaceId,
-									...(v2WorkspaceId ? {} : { continueAgentSession: false }),
 									// Denormalized pin: the cloud stores both without a registry lookup.
 									...(v2WorkspaceId && hostId
 										? {
@@ -253,19 +247,15 @@ export function TriggersCard({
 							/>
 						</>
 					)}
-					{(scope.v2WorkspaceId ?? scope.cloudWorkspaceId) && (
-						<>
-							<span>running</span>
-							<SessionModePicker
-								className={SCOPE_CHIP}
-								continueAgentSession={scope.continueAgentSession}
-								disabled={readOnly}
-								onChange={(continueAgentSession) =>
-									onScopeChange({ continueAgentSession })
-								}
-							/>
-						</>
-					)}
+					<span>running</span>
+					<SessionModePicker
+						className={SCOPE_CHIP}
+						continueAgentSession={scope.continueAgentSession}
+						disabled={readOnly}
+						onChange={(continueAgentSession) =>
+							onScopeChange({ continueAgentSession })
+						}
+					/>
 				</div>
 			</TriggersEditor>
 			<RelayOfflineNotice hostId={hostId} className="mt-1" />

@@ -76,22 +76,8 @@ export function planTarget(
 			? planCloud(existing, input, lookups, hostChanged)
 			: planHost(existing, input, lookups, hostChanged);
 
-	const pinned = Boolean(
-		plan.target.v2WorkspaceId ?? plan.target.cloudWorkspaceId,
-	);
-	// Asking for it without a pin is a mistake worth reporting; losing the pin
-	// some other way just takes the flag with it, since the session it would
-	// continue lived in that workspace.
-	if (input.continueAgentSession === true && !pinned) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message: "Continuing an agent session requires a pinned workspace",
-			i18nKey: "serverError.automation.continueNeedsPinnedWorkspace",
-		});
-	}
-	plan.target.continueAgentSession = pinned
-		? (input.continueAgentSession ?? existing.continueAgentSession)
-		: false;
+	plan.target.continueAgentSession =
+		input.continueAgentSession ?? existing.continueAgentSession;
 	return plan;
 }
 

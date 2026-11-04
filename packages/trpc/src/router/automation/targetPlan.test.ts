@@ -41,13 +41,13 @@ describe("planTarget on a host", () => {
 		expect(plan.cloud).toBeNull();
 	});
 
-	it("drops the workspace pin, and the session with it, when the host changes", () => {
+	it("drops the workspace pin but keeps continuing when the host changes", () => {
 		const plan = planTarget(onHost, { targetHostId: OTHER_HOST }, {});
 		expect(plan.target).toMatchObject({
 			targetHostId: OTHER_HOST,
 			v2ProjectId: PROJECT,
 			v2WorkspaceId: null,
-			continueAgentSession: false,
+			continueAgentSession: true,
 		});
 		expect(plan.hostsToVerify).toEqual([OTHER_HOST]);
 	});
@@ -109,6 +109,7 @@ describe("planTarget in the cloud", () => {
 			...NO_TARGET,
 			targetHostId: CLOUD_HOST_ID,
 			environmentId: ENV,
+			continueAgentSession: true,
 		});
 		expect(plan.hostsToVerify).toEqual([]);
 		expect(plan.cloud).toEqual({ environmentToVerify: ENV });
@@ -144,12 +145,12 @@ describe("planTarget in the cloud", () => {
 		expect(newCloudPin(pinnedInCloud, { cloudWorkspaceId: BOX })).toBeNull();
 	});
 
-	it("unpinning keeps the environment and ends the session", () => {
+	it("unpinning keeps the environment and the session mode", () => {
 		const plan = planTarget(pinnedInCloud, { cloudWorkspaceId: null }, {});
 		expect(plan.target).toMatchObject({
 			cloudWorkspaceId: null,
 			environmentId: ENV,
-			continueAgentSession: false,
+			continueAgentSession: true,
 		});
 	});
 
@@ -200,7 +201,11 @@ describe("planTarget in the cloud", () => {
 
 	it("clears the cloud fields when switching back to a host", () => {
 		const plan = planTarget(pinnedInCloud, { targetHostId: HOST }, {});
-		expect(plan.target).toEqual({ ...NO_TARGET, targetHostId: HOST });
+		expect(plan.target).toEqual({
+			...NO_TARGET,
+			targetHostId: HOST,
+			continueAgentSession: true,
+		});
 		expect(plan.hostsToVerify).toEqual([HOST]);
 	});
 });
@@ -219,24 +224,28 @@ describe("planTarget for a new automation", () => {
 		expect(plan.target).toEqual(pinnedInCloud);
 	});
 
-	it("refuses continuing a session with no pin", () => {
-		expect(() =>
-			planTarget(
-				NO_TARGET,
-				{
-					targetHostId: CLOUD_HOST_ID,
-					environmentId: ENV,
-					continueAgentSession: true,
-				},
-				{},
-			),
-		).toThrow("requires a pinned workspace");
-		expect(() =>
-			planTarget(
-				NO_TARGET,
-				{ targetHostId: HOST, continueAgentSession: true },
-				{},
-			),
-		).toThrow("requires a pinned workspace");
+	it("continues a session with no pin yet", () => {
+		const cloud = planTarget(
+			NO_TARGET,
+			{
+				targetHostId: CLOUD_HOST_ID,
+				environmentId: ENV,
+				continueAgentSession: true,
+			},
+			{},
+		);
+		expect(cloud.target).toMatchObject({
+			cloudWorkspaceId: null,
+			continueAgentSession: true,
+		});
+		const host = planTarget(
+			NO_TARGET,
+			{ targetHostId: HOST, continueAgentSession: true },
+			{},
+		);
+		expect(host.target).toMatchObject({
+			v2WorkspaceId: null,
+			continueAgentSession: true,
+		});
 	});
 });

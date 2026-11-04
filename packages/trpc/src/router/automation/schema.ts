@@ -59,7 +59,8 @@ export const createAutomationSchema = z
 		tags: workspaceTagsInputSchema.optional(),
 		group: automationGroupInputSchema.optional(),
 		// Deliver each run's prompt into the session the previous run left
-		// behind instead of starting another beside it. Requires v2WorkspaceId.
+		// behind instead of starting another beside it. With no pinned workspace,
+		// the first run's workspace becomes the pin.
 		continueAgentSession: z.boolean().optional(),
 		// Size of the cloud box each run starts; null = medium.
 		machineSize: z.enum(MACHINE_SIZES).nullish(),
