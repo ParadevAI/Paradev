@@ -440,7 +440,9 @@ function PlansPage() {
 			return gbMinutes ? formatNumber(gbMinutes / 60) : null;
 		}
 		if (row.cloudPack && plan.family) {
-			const pack = plan.family.pack;
+			const pack = advertisedGbMinutesPerSeat(plan.family)
+				? plan.family.pack
+				: null;
 			return pack
 				? t({
 						message: `${formatCurrency(gbHourPackPricePerGbHour(pack), PLAN_PRICE_CURRENCY, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} per GB-hour`,

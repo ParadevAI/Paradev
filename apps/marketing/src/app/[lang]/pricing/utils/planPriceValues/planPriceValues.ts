@@ -100,9 +100,10 @@ export function planPriceValues(
 					? perGbHour(family.overagePerGbHour)
 					: null,
 			environments: family.environments ? number(family.environments, 0) : null,
-			pack: family.pack
-				? perGbHour(gbHourPackPricePerGbHour(family.pack))
-				: null,
+			pack:
+				gbMinutesPerSeat && family.pack
+					? perGbHour(gbHourPackPricePerGbHour(family.pack))
+					: null,
 			previousName: catalog[index - 1]?.name ?? null,
 		};
 	});
