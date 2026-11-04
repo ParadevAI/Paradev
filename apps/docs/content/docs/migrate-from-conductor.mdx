@@ -44,7 +44,7 @@ Imported workspaces keep their paths, branches, and uncommitted changes. New wor
 If a worktree is missing from the list, run `git worktree list` in the repository. Paradev only imports worktrees that have a branch checked out. A worktree on a detached HEAD needs a branch first (`git switch -c <name>` inside it).
 
 <Callout type="warn">
-Do not archive these workspaces in Conductor after you import them. Archiving in Conductor deletes the workspace directory, which is now your Paradev workspace too. Quit Conductor instead. See [Remove Conductor](#6-remove-conductor).
+Do not archive these workspaces in Conductor after you import them. Archiving in Conductor deletes the workspace directory, which is now your Paradev workspace too. Quit Conductor instead. See [Remove Conductor](#7-remove-conductor).
 </Callout>
 
 ## 3. Convert Your Scripts
@@ -112,7 +112,28 @@ SUPERSET_* variables, and replace CONDUCTOR_PORT as the migration guide describe
 
 Commit `.paradev/` so your team gets the same scripts.
 
-## 4. Pick Up Your Agents
+## 4. Move Your Cloud Workspaces
+
+A Conductor cloud workspace lives on Conductor's servers, not on your disk, so you cannot import it. Push its work to GitHub, then continue in Paradev.
+
+<Callout type="warn">
+Commit and push every cloud workspace branch you want to keep before Conductor shuts down. Work that exists only in a Conductor cloud workspace is not on your machine.
+</Callout>
+
+1. **Push each branch.** In each Conductor cloud workspace, commit and push the branch.
+2. **Set up a Paradev environment.** Commit the `.paradev/config.json` from [step 3](#3-convert-your-scripts) first: cloud workspaces run its setup scripts. Then open **Settings → Environments**, click **New environment**, and add the repository. Add the variables and secrets your Conductor cloud workspaces used. Agents use your sign-in from **Settings → Agents**, so you do not need agent API keys here.
+3. **Continue each branch.** Press **⌘N**, pick **Cloud**, pick the project, and choose the pushed branch as the base branch. Paradev creates a new working branch from it. To continue on your own machine instead, create a local workspace from the **existing branch**.
+
+From the CLI:
+
+```bash
+superset workspaces create --branch <pushed-branch> --agent claude \
+  --prompt "Continue the work on this branch"
+```
+
+Cloud workspaces need a paid plan and are in early access. If you do not see **Cloud** in the device picker yet, continue the branches locally. Requirements, machine sizes, and usage are on [Cloud Workspaces](/cloud-workspaces).
+
+## 5. Pick Up Your Agents
 
 Claude Code, Codex, Cursor Agent, and OpenCode all run in Paradev on your existing subscriptions and keys. See [Supported Agents](/supported-agents) for the full list, or add any other CLI as a custom agent.
 
@@ -120,7 +141,7 @@ To continue a conversation from Conductor, open a terminal in the imported works
 
 Prefer a chat view to a terminal? Switch the agent pane to [Chat](/chat).
 
-## 5. Learn the Daily Loop
+## 6. Learn the Daily Loop
 
 | Task | In Paradev |
 |---|---|
@@ -133,7 +154,7 @@ Prefer a chat view to a terminal? Switch the agent pane to [Chat](/chat).
 
 The [first parallel session](/first-workspace) walks through this end to end. All [keyboard shortcuts](/keyboard-shortcuts) can be changed.
 
-## 6. Remove Conductor
+## 7. Remove Conductor
 
 When your workspaces are in Paradev:
 
