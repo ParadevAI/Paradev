@@ -36,6 +36,35 @@ const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
 const STOP_TIMEOUT_MS = 20_000;
 const STOP_POLL_MS = 200;
+/** As many chats as `chatMove.start` takes in one workspace move. */
+const MAX_MOVED_CHATS = 50;
+
+type MovableChat = {
+	sessionId: string;
+	harness: string;
+	harnessSessionId: string;
+	title: string | null;
+	provider: NonNullable<ReturnType<typeof teleportProviderFor>>;
+};
+
+type PreparedChat = {
+	chatSessionId: string;
+	harnessSessionId: string;
+	title: string | null;
+};
+
+type SkippedChat = {
+	chatSessionId: string;
+	title: string | null;
+	reason: "unsupported_agent" | "not_started" | "moved_away";
+};
+
+function errorCode(error: unknown): string | undefined {
+	if (typeof error !== "object" || error === null || !("data" in error)) {
+		return undefined;
+	}
+	return (error as { data?: { code?: string } }).data?.code;
+}
 
 function requireChat(
 	chat: ChatRuntime,
@@ -86,30 +115,21 @@ async function stopRunningTurn(chat: ChatRuntime, sessionId: string) {
 
 export const teleportRouter = router({
 	/**
-	 * Gets a chat ready to continue on another host: the worktree, uncommitted
-	 * work included, goes to a new branch, and the chat's history and its
-	 * agent's session files to the cloud. The caller starts the other side
-	 * from all three.
+	 * Gets a workspace ready to continue on another host: the worktree,
+	 * uncommitted work included, goes to one new branch, and each chat's
+	 * history and its agent's session files to the cloud. The caller starts
+	 * the other side from all of them. A chat that cannot move is returned in
+	 * `skipped` and stays here.
 	 */
-	prepare: protectedProcedure
+	prepareWorkspace: protectedProcedure
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				chatSessionId: z.string().uuid(),
 				stopIfBusy: z.boolean().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const chat = requireChatRuntime(ctx);
-			const session = requireChat(chat, input.workspaceId, input.chatSessionId);
-			const provider = teleportProviderFor(session.harness);
-			const harnessSessionId = session.harnessSessionId;
-			if (!provider || !harnessSessionId) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "This chat's agent cannot move yet",
-				});
-			}
 			const chatSync = ctx.runtime.chatSync;
 			if (!chatSync) {
 				throw new TRPCError({
@@ -117,9 +137,37 @@ export const teleportRouter = router({
 					message: "Chat sync is not available on this host",
 				});
 			}
-			if (BUSY_STATUSES.has(session.status) && !input.stopIfBusy) {
-				throw busyError();
+			const sessions = chat.commands.listSessions({
+				scopeId: input.workspaceId,
+				limit: MAX_MOVED_CHATS,
+			});
+			const skipped: SkippedChat[] = [];
+			const movable: MovableChat[] = [];
+			for (const session of sessions) {
+				const provider = teleportProviderFor(session.harness);
+				if (!provider || !session.harnessSessionId) {
+					skipped.push({
+						chatSessionId: session.sessionId,
+						title: session.title,
+						reason: provider ? "not_started" : "unsupported_agent",
+					});
+					continue;
+				}
+				movable.push({
+					sessionId: session.sessionId,
+					harness: session.harness,
+					harnessSessionId: session.harnessSessionId,
+					title: session.title,
+					provider,
+				});
 			}
+			const busy = () =>
+				movable.filter(({ sessionId }) =>
+					BUSY_STATUSES.has(
+						requireChat(chat, input.workspaceId, sessionId).status,
+					),
+				);
+			if (busy().length > 0 && !input.stopIfBusy) throw busyError();
 
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const env = resolveDefaultAccountTerminalEnv(ctx.db);
@@ -136,20 +184,15 @@ export const teleportRouter = router({
 			if (!target || !repository || repositories.some((repo) => !repo)) {
 				throw new TRPCError({
 					code: "PRECONDITION_FAILED",
-					message: "Moving a chat needs a GitHub repository",
+					message: "Moving a workspace needs a GitHub repository",
 				});
 			}
 
-			if (input.stopIfBusy) {
-				await stopRunningTurn(chat, input.chatSessionId);
+			for (const { sessionId } of busy()) {
+				await stopRunningTurn(chat, sessionId);
 			}
 			const assertIdle = () => {
-				const { status } = requireChat(
-					chat,
-					input.workspaceId,
-					input.chatSessionId,
-				);
-				if (BUSY_STATUSES.has(status)) throw busyError();
+				if (busy().length > 0) throw busyError();
 			};
 			assertIdle();
 
@@ -166,38 +209,56 @@ export const teleportRouter = router({
 				});
 
 			assertIdle();
-			await chatSync.syncSession(input.chatSessionId);
-			chatSync.follow(input.chatSessionId);
-			await withStage(async (stageDir) => {
-				const manifest = await provider.collect({
-					harnessSessionId,
-					worktreePath,
-					env,
-					stageDir,
-					locate: () =>
-						pool.run(harnessSessionFileTask, {
-							ref: {
-								agentId: "claude",
-								sessionId: harnessSessionId,
-								worktreePath,
-								env,
-							},
-						}),
+			const prepared: PreparedChat[] = [];
+			for (const session of movable) {
+				try {
+					await chatSync.syncSession(session.sessionId);
+				} catch (error) {
+					if (errorCode(error) !== "CONFLICT") throw error;
+					skipped.push({
+						chatSessionId: session.sessionId,
+						title: session.title,
+						reason: "moved_away",
+					});
+					continue;
+				}
+				chatSync.follow(session.sessionId);
+				await withStage(async (stageDir) => {
+					const manifest = await session.provider.collect({
+						harnessSessionId: session.harnessSessionId,
+						worktreePath,
+						env,
+						stageDir,
+						locate: () =>
+							pool.run(harnessSessionFileTask, {
+								ref: {
+									agentId: "claude",
+									sessionId: session.harnessSessionId,
+									worktreePath,
+									env,
+								},
+							}),
+					});
+					await uploadBundle({
+						api: ctx.api,
+						chatSessionId: session.sessionId,
+						harness: session.harness,
+						manifest,
+						stageDir,
+					});
 				});
-				await uploadBundle({
-					api: ctx.api,
-					chatSessionId: input.chatSessionId,
-					harness: session.harness,
-					manifest,
-					stageDir,
+				prepared.push({
+					chatSessionId: session.sessionId,
+					harnessSessionId: session.harnessSessionId,
+					title: session.title,
 				});
-			});
+			}
 
 			return {
 				branch,
 				repositoryFullName: `${repository.owner}/${repository.name}`,
-				harnessSessionId,
-				title: session.title,
+				chats: prepared,
+				skipped,
 			};
 		}),
 

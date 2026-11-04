@@ -1,29 +1,34 @@
 import { useLingui } from "@lingui/react/macro";
 import type { MachineSize } from "@superset/shared/billing";
-import { useWorkspaceClient } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
-import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
+import type { MovableWorkspace } from "../useWorkspaceMoveDirection";
 
 export type MoveToCloudStage = "saving" | "starting";
 
-export function useMoveChatToCloud(workspaceId: string) {
+/**
+ * Moves a workspace on this computer into a new cloud workspace: its work
+ * goes to one branch, and each of its chats moves on its own. Returns the
+ * chats that could not move and stayed here.
+ */
+export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
-	const { trpcClient } = useWorkspaceClient();
 	const organizationId = useActiveOrganizationId();
 	const collections = useCollections();
 	const utils = cloudTrpc.useUtils();
-	const { workspace } = useWorkspace();
-	const sourceHostId = workspace.hostId;
+	const { activeHostUrl } = useLocalHostService();
 	const { projects } = useHostProjects();
 	const sourceProject = projects.find(
-		(row) => row.projectKey === workspace.projectId,
+		(row) =>
+			row.projectKey === workspace.projectId || row.id === workspace.projectId,
 	);
 	const sourceRepository =
 		sourceProject?.repoOwner && sourceProject.repoName
@@ -32,35 +37,35 @@ export function useMoveChatToCloud(workspaceId: string) {
 
 	return useCallback(
 		async ({
-			chatSessionId,
-			name,
 			environment,
 			machineSize,
 			onStage,
 		}: {
-			chatSessionId: string;
-			name: string;
 			environment: { id: string; repositoryFullName: string | null };
 			machineSize: MachineSize;
 			onStage: (stage: MoveToCloudStage) => void;
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
-			const assertEnvironmentOpens = (chatRepository: string) => {
+			if (!activeHostUrl) {
+				throw new Error(t`This computer's host is not running`);
+			}
+			const assertEnvironmentOpens = (repository: string) => {
 				const environmentRepository = environment.repositoryFullName;
 				if (
 					environmentRepository &&
-					environmentRepository.toLowerCase() !== chatRepository.toLowerCase()
+					environmentRepository.toLowerCase() !== repository.toLowerCase()
 				) {
 					throw new Error(
-						t`This environment opens ${environmentRepository}, not ${chatRepository}`,
+						t`This environment opens ${environmentRepository}, not ${repository}`,
 					);
 				}
 			};
 			if (sourceRepository) assertEnvironmentOpens(sourceRepository);
 			onStage("saving");
-			const prepared = await trpcClient.teleport.prepare.mutate({
-				workspaceId,
-				chatSessionId,
+			const prepared = await getHostServiceClientByUrl(
+				activeHostUrl,
+			).teleport.prepareWorkspace.mutate({
+				workspaceId: workspace.id,
 				stopIfBusy: true,
 			});
 			assertEnvironmentOpens(prepared.repositoryFullName);
@@ -69,22 +74,30 @@ export function useMoveChatToCloud(workspaceId: string) {
 				organizationId,
 				environmentId: environment.id,
 				machineSize,
-				name,
+				name: workspace.name,
 				branch: prepared.branch,
-				move: {
-					chatSessionId,
-					...(sourceHostId ? { fromHostId: sourceHostId } : {}),
-				},
+				...(prepared.chats.length > 0
+					? {
+							move: {
+								chatSessionIds: prepared.chats.map(
+									(chat) => chat.chatSessionId,
+								),
+								fromHostId: workspace.hostId,
+							},
+						}
+					: {}),
 			});
-			seedMovedChat({
-				collections,
-				workspaceId: created.id,
-				projectId: null,
-				chatSessionId,
-				harnessSessionId: prepared.harnessSessionId,
-				agentId: "claude",
-				title: prepared.title ?? name,
-			});
+			for (const chat of prepared.chats) {
+				seedMovedChat({
+					collections,
+					workspaceId: created.id,
+					projectId: null,
+					chatSessionId: chat.chatSessionId,
+					harnessSessionId: chat.harnessSessionId,
+					agentId: "claude",
+					title: chat.title,
+				});
+			}
 			const listInput = { organizationId };
 			await utils.cloudWorkspace.list.cancel(listInput);
 			utils.cloudWorkspace.list.setData(listInput, (rows) =>
@@ -95,18 +108,21 @@ export function useMoveChatToCloud(workspaceId: string) {
 				to: "/v2-workspace/$workspaceId",
 				params: { workspaceId: created.id },
 			}).catch((error: unknown) => {
-				console.warn("[chat-move] could not open the cloud workspace", error);
+				console.warn(
+					"[workspace-move] could not open the cloud workspace",
+					error,
+				);
 			});
+			return { skipped: prepared.skipped };
 		},
 		[
 			organizationId,
+			activeHostUrl,
 			t,
-			trpcClient,
-			workspaceId,
+			workspace,
 			utils,
 			navigate,
 			collections,
-			sourceHostId,
 			sourceRepository,
 		],
 	);

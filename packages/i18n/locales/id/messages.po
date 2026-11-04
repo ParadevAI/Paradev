@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# file berubah} other {# file berubah}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {# chat ditutup}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# chat tetap di workspace lama} other {# chat tetap di workspace lama}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# komentar dilampirkan} other {# komentar dilampirkan}}"
@@ -5944,11 +5948,11 @@ msgstr "Tidak bisa merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "Tidak dapat memindahkan chat ini ke cloud"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Tidak dapat memindahkan workspace ini ke cloud"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "Tidak dapat memindahkan chat ini ke komputer ini"
+msgid "Couldn't move this workspace to this computer"
+msgstr "Tidak dapat memindahkan workspace ini ke komputer ini"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
@@ -11759,11 +11763,11 @@ msgstr "Pindahkan {count} ke Grup"
 msgid "Move {name} to background"
 msgstr "Pindahkan {name} ke latar belakang"
 
-msgid "Move this chat to the cloud?"
-msgstr "Pindahkan chat ini ke cloud?"
+msgid "Move this workspace to the cloud?"
+msgstr "Pindahkan workspace ini ke cloud?"
 
-msgid "Move this chat to this computer?"
-msgstr "Pindahkan chat ini ke komputer ini?"
+msgid "Move this workspace to this computer?"
+msgstr "Pindahkan workspace ini ke komputer ini?"
 
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
@@ -16666,11 +16670,11 @@ msgstr "Disimpan ke Downloads"
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "Menyimpan pekerjaan workspace cloud dan percakapan ini…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Menyimpan pekerjaan workspace cloud dan chat-nya…"
 
-msgid "Saving your work and this conversation…"
-msgstr "Menyimpan pekerjaan Anda dan percakapan ini…"
+msgid "Saving your work and its chats…"
+msgstr "Menyimpan pekerjaan Anda dan chat-nya…"
 
 msgid "Saving..."
 msgstr "Menyimpan..."
@@ -19183,8 +19187,8 @@ msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siap
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Pekerjaan workspace cloud, termasuk perubahan yang belum di-commit, didorong ke branch baru. Workspace di komputer ini dimulai dari branch tersebut, dan percakapan ini berlanjut di sana. Jika agen sedang bekerja, agen dihentikan terlebih dahulu."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Pekerjaan workspace cloud, termasuk perubahan yang belum di-commit, didorong ke branch baru. Workspace di komputer ini dimulai dari branch tersebut, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di cloud."
 
 msgid "The code expired. Start again."
 msgstr "Kode kedaluwarsa. Mulai lagi."
@@ -19671,8 +19675,8 @@ msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak m
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "Lingkungan ini membuka {environmentRepository}, bukan {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Lingkungan ini membuka {environmentRepository}, bukan {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repositori environment ini sudah tetap; promosikan workspace lagi untuk mengubahnya"
@@ -21990,9 +21994,6 @@ msgstr "Perubahan Anda akan hilang kalau tidak disimpan."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kode Anda tetap lokal secara bawaan, dengan kendali eksplisit atas layanan yang terhubung."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Pekerjaan Anda saat ini, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan percakapan ini berlanjut di sana. Jika agen sedang bekerja, agen dihentikan terlebih dahulu."
-
 msgid "Your download starts automatically."
 msgstr "Unduhan Anda dimulai secara otomatis."
 
@@ -22111,6 +22112,9 @@ msgstr "Proyek dan workspace v1 Anda sedang dipindahkan ke Paradev yang baru. Se
 
 msgid "Your version: {currentVersion}"
 msgstr "Versi Anda: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di sini."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Admin workspace Anda mengaktifkan masuk dengan kode perangkat untuk Codex."

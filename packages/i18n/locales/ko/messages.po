@@ -134,6 +134,10 @@ msgstr "{0, plural, one {변경된 파일 #개} other {변경된 파일 #개}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {채팅 #개를 닫았습니다}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {채팅 #개가 이전 워크스페이스에 남았습니다} other {채팅 #개가 이전 워크스페이스에 남았습니다}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {코멘트 #개 첨부됨} other {코멘트 #개 첨부됨}}"
@@ -5944,11 +5948,11 @@ msgstr "풀 리퀘스트를 머지하지 못했습니다"
 msgid "Couldn't move the subagent to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "이 채팅을 클라우드로 옮길 수 없습니다"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "이 워크스페이스를 클라우드로 옮길 수 없습니다"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "이 채팅을 이 컴퓨터로 옮기지 못했습니다"
+msgid "Couldn't move this workspace to this computer"
+msgstr "이 워크스페이스를 이 컴퓨터로 옮기지 못했습니다"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
@@ -11759,11 +11763,11 @@ msgstr "{count}개를 그룹으로 이동"
 msgid "Move {name} to background"
 msgstr "{name}을(를) 백그라운드로 이동"
 
-msgid "Move this chat to the cloud?"
-msgstr "이 채팅을 클라우드로 옮길까요?"
+msgid "Move this workspace to the cloud?"
+msgstr "이 워크스페이스를 클라우드로 옮길까요?"
 
-msgid "Move this chat to this computer?"
-msgstr "이 채팅을 이 컴퓨터로 옮길까요?"
+msgid "Move this workspace to this computer?"
+msgstr "이 워크스페이스를 이 컴퓨터로 옮길까요?"
 
 msgid "Move to background"
 msgstr "백그라운드로 이동"
@@ -16666,11 +16670,11 @@ msgstr "다운로드 폴더에 저장했습니다"
 msgid "Saving as an environment..."
 msgstr "환경으로 저장하는 중..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "클라우드 워크스페이스의 작업과 이 대화를 저장하는 중…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "클라우드 워크스페이스의 작업과 채팅을 저장하는 중…"
 
-msgid "Saving your work and this conversation…"
-msgstr "작업과 이 대화를 저장하는 중…"
+msgid "Saving your work and its chats…"
+msgstr "작업과 채팅을 저장하는 중…"
 
 msgid "Saving..."
 msgstr "저장 중..."
@@ -19183,8 +19187,8 @@ msgstr "채팅은 그대로 유지됩니다. 이 턴 이후 누군가 편집한 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "클라우드 워크스페이스가 시작되었어야 하지만 제시간에 응답하지 않았습니다. 다음 실행에서 다시 시도합니다."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "커밋하지 않은 변경 사항을 포함한 클라우드 워크스페이스의 작업이 새 브랜치로 푸시됩니다. 이 컴퓨터의 워크스페이스가 해당 브랜치에서 시작되고, 이 대화는 그곳에서 이어집니다. 에이전트가 작업 중이면 먼저 중지됩니다."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "커밋하지 않은 변경 사항을 포함한 클라우드 워크스페이스의 작업이 새 브랜치로 푸시됩니다. 이 컴퓨터의 워크스페이스가 해당 브랜치에서 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 중지됩니다. 터미널과 다른 채팅은 클라우드에 남습니다."
 
 msgid "The code expired. Start again."
 msgstr "코드가 만료되었습니다. 다시 시작하세요."
@@ -19671,8 +19675,8 @@ msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있�
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 있는 환경을 만든 다음 그 환경에서 워크스페이스를 시작하세요"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "이 환경은 {chatRepository}이(가) 아니라 {environmentRepository}을(를) 엽니다"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "이 환경은 {repository}이(가) 아니라 {environmentRepository}을(를) 엽니다"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "이 환경의 리포지토리는 고정되어 있습니다. 변경하려면 워크스페이스를 다시 승격하세요"
@@ -21990,9 +21994,6 @@ msgstr "저장하지 않으면 변경 사항이 사라집니다."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "코드는 기본적으로 로컬에 머물고, 연결된 서비스는 명시적으로 통제합니다."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "커밋하지 않은 변경 사항을 포함한 현재 작업이 원격의 새 브랜치로 푸시됩니다. 선택한 환경에서 해당 브랜치로 클라우드 워크스페이스가 시작되고, 이 대화는 그곳에서 이어집니다. 에이전트가 작업 중이면 먼저 중지됩니다."
-
 msgid "Your download starts automatically."
 msgstr "다운로드가 자동으로 시작됩니다."
 
@@ -22111,6 +22112,9 @@ msgstr "v1 프로젝트와 워크스페이스를 새 Paradev로 옮기는 중입
 
 msgid "Your version: {currentVersion}"
 msgstr "현재 버전: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "커밋하지 않은 변경 사항을 포함한 작업이 원격의 새 브랜치로 푸시됩니다. 선택한 환경에서 해당 브랜치로 클라우드 워크스페이스가 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 중지됩니다. 터미널과 다른 채팅은 여기에 남습니다."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex용 기기 코드 로그인은 워크스페이스 관리자가 켭니다."

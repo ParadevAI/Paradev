@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# arquivo alterado} other {# arquivos alterados}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat fechado} other {# chats fechados}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# chat ficou na área de trabalho antiga} other {# chats ficaram na área de trabalho antiga}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# comentário anexado} other {# comentários anexados}}"
@@ -5944,11 +5948,11 @@ msgstr "Não foi possível fazer o merge do pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Não foi possível mover o subagente para segundo plano"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "Não foi possível mover este chat para a nuvem"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Não foi possível mover esta área de trabalho para a nuvem"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "Não foi possível mover este chat para este computador"
+msgid "Couldn't move this workspace to this computer"
+msgstr "Não foi possível mover esta área de trabalho para este computador"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Não foi possível nomear \"{name}\" automaticamente"
@@ -11759,11 +11763,11 @@ msgstr "Mover {count} para um grupo"
 msgid "Move {name} to background"
 msgstr "Mover {name} para segundo plano"
 
-msgid "Move this chat to the cloud?"
-msgstr "Mover este chat para a nuvem?"
+msgid "Move this workspace to the cloud?"
+msgstr "Mover esta área de trabalho para a nuvem?"
 
-msgid "Move this chat to this computer?"
-msgstr "Mover este chat para este computador?"
+msgid "Move this workspace to this computer?"
+msgstr "Mover esta área de trabalho para este computador?"
 
 msgid "Move to background"
 msgstr "Mover para segundo plano"
@@ -16666,11 +16670,11 @@ msgstr "Salvo em Downloads"
 msgid "Saving as an environment..."
 msgstr "Salvando como ambiente..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "Salvando o trabalho da área de trabalho na nuvem e esta conversa…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Salvando o trabalho da área de trabalho na nuvem e os chats dela…"
 
-msgid "Saving your work and this conversation…"
-msgstr "Salvando seu trabalho e esta conversa…"
+msgid "Saving your work and its chats…"
+msgstr "Salvando seu trabalho e os chats dele…"
 
 msgid "Saving..."
 msgstr "Salvando..."
@@ -19183,8 +19187,8 @@ msgstr "O chat continua como está. Arquivos editados desde este turno, por qual
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "A área de trabalho na nuvem deveria ter iniciado, mas não respondeu a tempo. A próxima execução tentará novamente."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "O trabalho da área de trabalho na nuvem, incluindo alterações não confirmadas, é enviado para um novo branch. Uma área de trabalho neste computador é iniciada a partir desse branch, e esta conversa continua lá. Se o agente estiver trabalhando, ele para primeiro."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "O trabalho da área de trabalho na nuvem, incluindo alterações não confirmadas, é enviado para um novo branch. Uma área de trabalho neste computador é iniciada a partir desse branch, e cada chat do Claude continua lá. Os agentes que estiverem trabalhando param primeiro. Os terminais e os outros chats ficam na nuvem."
 
 msgid "The code expired. Start again."
 msgstr "O código expirou. Comece de novo."
@@ -19671,8 +19675,8 @@ msgstr "Este e-mail já está registrado com outro método de login, e o provedo
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Este ambiente não tem repositórios. Crie um ambiente com repositórios em Configurações e inicie a área de trabalho a partir dele"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "Este ambiente abre {environmentRepository}, não {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Este ambiente abre {environmentRepository}, não {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Os repositórios deste ambiente são fixos; promova uma área de trabalho novamente para alterá-los"
@@ -21990,9 +21994,6 @@ msgstr "Suas alterações serão perdidas se você não salvar."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Seu código fica local por padrão, com controle explícito sobre os serviços conectados."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Seu trabalho atual, incluindo alterações não confirmadas, é enviado para um novo branch no remoto. Uma área de trabalho na nuvem é iniciada a partir desse branch no ambiente que você escolher, e esta conversa continua lá. Se o agente estiver trabalhando, ele para primeiro."
-
 msgid "Your download starts automatically."
 msgstr "Seu download começa automaticamente."
 
@@ -22111,6 +22112,9 @@ msgstr "Seus projetos e workspaces da v1 estão sendo levados para o novo Parade
 
 msgid "Your version: {currentVersion}"
 msgstr "Sua versão: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Seu trabalho, incluindo alterações não confirmadas, é enviado para um novo branch no remoto. Uma área de trabalho na nuvem é iniciada a partir desse branch no ambiente que você escolher, e cada chat do Claude continua lá. Os agentes que estiverem trabalhando param primeiro. Os terminais e os outros chats ficam aqui."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "O administrador do seu workspace ativa o login com código de dispositivo para o Codex."

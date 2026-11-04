@@ -11,23 +11,49 @@ import { findMovableChat, lastTurnSeq } from "../findMovableChat";
 
 type Owner = { organizationId: string; userId: string };
 
+type CreatedMove = {
+	id: string;
+	chatSessionId: string;
+	toWorkspaceId: string;
+	toHostId: string | null;
+};
+
 /**
- * Records a `pending` move; nothing runs until it is queued. A workspace on a
- * computer may not be registered yet, so the caller names the host of each
- * side that is not a cloud workspace.
+ * Records a `pending` move for each chat of one workspace, all into the same
+ * destination, in one statement: either every chat's move is recorded or
+ * none is. Nothing runs until a move is queued. A workspace on a computer may
+ * not be registered yet, so the caller names the host of each side that is
+ * not a cloud workspace.
  */
-export async function createChatMove(
+export async function createChatMoves(
 	args: Owner & {
-		chatSessionId: string;
+		chatSessionIds: string[];
 		toWorkspaceId: string;
 		toHostId?: string;
 		fromHostId?: string;
 		/** A retry keeps its failed move's turn while it hands on the same bundle. */
 		retryOf?: { transcriptId: string; sourceTurnSeq: number | null };
 	},
-): Promise<{ id: string; toWorkspaceId: string; toHostId: string | null }> {
-	const { session, transcript } = await findMovableChat(args);
-	if (session.v2WorkspaceId === args.toWorkspaceId) {
+): Promise<CreatedMove[]> {
+	const chatSessionIds = [...new Set(args.chatSessionIds)];
+	if (chatSessionIds.length === 0) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Name at least one chat to move",
+		});
+	}
+	const chats = [];
+	for (const chatSessionId of chatSessionIds) {
+		chats.push(await findMovableChat({ ...args, chatSessionId }));
+	}
+	const fromWorkspaceId = chats[0]?.session.v2WorkspaceId ?? null;
+	if (chats.some(({ session }) => session.v2WorkspaceId !== fromWorkspaceId)) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "These chats are not in one workspace",
+		});
+	}
+	if (fromWorkspaceId === args.toWorkspaceId) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: "This chat is already in that workspace",
@@ -42,8 +68,8 @@ export async function createChatMove(
 			message: "Name the computer the chat moves to",
 		});
 	}
-	const fromHostId = session.v2WorkspaceId
-		? await hostOf(args, session.v2WorkspaceId, args.fromHostId)
+	const fromHostId = fromWorkspaceId
+		? await hostOf(args, fromWorkspaceId, args.fromHostId)
 		: null;
 	if (fromHostId === undefined) {
 		throw new TRPCError({
@@ -52,13 +78,13 @@ export async function createChatMove(
 		});
 	}
 
-	const [move] = await db
-		.insert(chatMoves)
-		.values({
+	const values = [];
+	for (const { session, transcript } of chats) {
+		values.push({
 			sessionId: session.id,
 			organizationId: session.organizationId,
 			createdBy: args.userId,
-			fromWorkspaceId: session.v2WorkspaceId,
+			fromWorkspaceId,
 			fromHostId,
 			toWorkspaceId: args.toWorkspaceId,
 			toHostId,
@@ -69,9 +95,14 @@ export async function createChatMove(
 					: await lastTurnSeq(session.id),
 			transcriptId: transcript.id,
 			harnessSessionId: transcript.harnessSessionId,
-		})
+		});
+	}
+	return db
+		.insert(chatMoves)
+		.values(values)
 		.returning({
 			id: chatMoves.id,
+			chatSessionId: chatMoves.sessionId,
 			toWorkspaceId: chatMoves.toWorkspaceId,
 			toHostId: chatMoves.toHostId,
 		})
@@ -84,6 +115,18 @@ export async function createChatMove(
 			}
 			throw error;
 		});
+}
+
+export async function createChatMove(
+	args: Omit<Parameters<typeof createChatMoves>[0], "chatSessionIds"> & {
+		chatSessionId: string;
+	},
+): Promise<CreatedMove> {
+	const { chatSessionId, ...rest } = args;
+	const [move] = await createChatMoves({
+		...rest,
+		chatSessionIds: [chatSessionId],
+	});
 	if (!move) throw new Error("Could not record the move");
 	return move;
 }

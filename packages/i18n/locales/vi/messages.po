@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# tệp thay đổi} other {# tệp thay đổi}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {Đã đóng # cuộc trò chuyện}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# cuộc trò chuyện vẫn ở không gian làm việc cũ} other {# cuộc trò chuyện vẫn ở không gian làm việc cũ}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {Đã đính kèm # bình luận} other {Đã đính kèm # bình luận}}"
@@ -5944,11 +5948,11 @@ msgstr "Không thể merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Không thể chuyển agent con sang chạy nền"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "Không thể chuyển cuộc trò chuyện này lên cloud"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Không thể chuyển không gian làm việc này lên cloud"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "Không thể chuyển cuộc trò chuyện này sang máy tính này"
+msgid "Couldn't move this workspace to this computer"
+msgstr "Không thể chuyển không gian làm việc này sang máy tính này"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
@@ -11759,11 +11763,11 @@ msgstr "Chuyển {count} vào nhóm"
 msgid "Move {name} to background"
 msgstr "Chuyển {name} sang chạy nền"
 
-msgid "Move this chat to the cloud?"
-msgstr "Chuyển cuộc trò chuyện này lên cloud?"
+msgid "Move this workspace to the cloud?"
+msgstr "Chuyển không gian làm việc này lên cloud?"
 
-msgid "Move this chat to this computer?"
-msgstr "Chuyển cuộc trò chuyện này sang máy tính này?"
+msgid "Move this workspace to this computer?"
+msgstr "Chuyển không gian làm việc này sang máy tính này?"
 
 msgid "Move to background"
 msgstr "Chuyển sang chạy nền"
@@ -16666,11 +16670,11 @@ msgstr "Đã lưu vào Downloads"
 msgid "Saving as an environment..."
 msgstr "Đang lưu làm môi trường..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "Đang lưu công việc của không gian làm việc đám mây và cuộc trò chuyện này…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Đang lưu công việc của không gian làm việc đám mây và các cuộc trò chuyện…"
 
-msgid "Saving your work and this conversation…"
-msgstr "Đang lưu công việc của bạn và cuộc trò chuyện này…"
+msgid "Saving your work and its chats…"
+msgstr "Đang lưu công việc của bạn và các cuộc trò chuyện…"
 
 msgid "Saving..."
 msgstr "Đang lưu..."
@@ -19183,8 +19187,8 @@ msgstr "Chat vẫn giữ nguyên. Các tệp đã được bất kỳ ai sửa k
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi kịp. Lần chạy tiếp theo sẽ thử lại."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Công việc của không gian làm việc đám mây, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Một không gian làm việc trên máy tính này khởi động từ nhánh đó, và cuộc trò chuyện này tiếp tục ở đó. Nếu tác tử đang làm việc, nó sẽ dừng trước."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Công việc của không gian làm việc đám mây, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Một không gian làm việc trên máy tính này khởi động từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các tác tử đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở trên đám mây."
 
 msgid "The code expired. Start again."
 msgstr "Mã đã hết hạn. Hãy bắt đầu lại."
@@ -19671,8 +19675,8 @@ msgstr "Email này đã được đăng ký bằng phương thức đăng nhập
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment này không có repository nào. Hãy tạo một environment có repository trong Settings, rồi khởi động workspace từ environment đó"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "Môi trường này mở {environmentRepository}, không phải {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Môi trường này mở {environmentRepository}, không phải {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Các repository của environment này đã cố định; hãy promote lại một workspace để thay đổi"
@@ -21990,9 +21994,6 @@ msgstr "Thay đổi của bạn sẽ mất nếu không lưu."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Code của bạn mặc định ở lại cục bộ, với quyền kiểm soát rõ ràng đối với các dịch vụ đã kết nối."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Công việc hiện tại của bạn, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới trên remote. Một không gian làm việc đám mây khởi động từ nhánh đó trong môi trường bạn chọn, và cuộc trò chuyện này tiếp tục ở đó. Nếu tác tử đang làm việc, nó sẽ dừng trước."
-
 msgid "Your download starts automatically."
 msgstr "Bản tải xuống sẽ tự động bắt đầu."
 
@@ -22111,6 +22112,9 @@ msgstr "Các dự án và workspace v1 của bạn đang được chuyển sang 
 
 msgid "Your version: {currentVersion}"
 msgstr "Phiên bản của bạn: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Công việc của bạn, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới trên remote. Một không gian làm việc đám mây khởi động từ nhánh đó trong môi trường bạn chọn, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các tác tử đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở đây."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Quản trị viên không gian làm việc của bạn bật đăng nhập bằng mã thiết bị cho Codex."

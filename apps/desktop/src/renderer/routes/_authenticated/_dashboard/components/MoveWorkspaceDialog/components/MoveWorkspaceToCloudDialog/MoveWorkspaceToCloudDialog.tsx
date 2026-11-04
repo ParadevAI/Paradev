@@ -28,36 +28,34 @@ import {
 } from "renderer/stores/v2-workspace-create-defaults";
 import {
 	type MoveToCloudStage,
-	useMoveChatToCloud,
-} from "../../../../hooks/useMoveChatToCloud";
+	useMoveWorkspaceToCloud,
+} from "../../../../hooks/useMoveWorkspaceToCloud";
+import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirection";
+import { useReportSkippedChats } from "../../hooks/useReportSkippedChats";
 
-interface MoveChatToCloudDialogProps {
+interface MoveWorkspaceToCloudDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	workspaceId: string;
-	projectId: string | null;
-	chatSessionId: string;
-	name: string;
+	workspace: MovableWorkspace;
 }
 
 /** The description's text size, so the pickers read as part of it. */
 const PICKER_TRIGGER_CLASS = "h-auto max-w-[240px] text-sm";
 
-export function MoveChatToCloudDialog({
+export function MoveWorkspaceToCloudDialog({
 	open,
 	onOpenChange,
-	workspaceId,
-	projectId,
-	chatSessionId,
-	name,
-}: MoveChatToCloudDialogProps) {
+	workspace,
+}: MoveWorkspaceToCloudDialogProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const organizationId = useActiveOrganizationId();
 	const [stage, setStage] = useState<MoveToCloudStage | null>(null);
 	const isMoving = stage !== null;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
-	const moveChatToCloud = useMoveChatToCloud(workspaceId);
+	const moveWorkspaceToCloud = useMoveWorkspaceToCloud(workspace);
+	const reportSkipped = useReportSkippedChats();
+	const projectId = workspace.projectId;
 
 	const { projects } = useHostProjects();
 	const project = projects.find((row) => row.projectKey === projectId);
@@ -101,9 +99,7 @@ export function MoveChatToCloudDialog({
 		if (!environment) return;
 		setStage("saving");
 		try {
-			await moveChatToCloud({
-				chatSessionId,
-				name,
+			const { skipped } = await moveWorkspaceToCloud({
 				environment: {
 					id: environment.id,
 					repositoryFullName: environment.repositories?.[0]?.fullName ?? null,
@@ -112,8 +108,9 @@ export function MoveChatToCloudDialog({
 				onStage: setStage,
 			});
 			onOpenChange(false);
+			reportSkipped(skipped);
 		} catch (error) {
-			toast.error(t({ message: "Couldn't move this chat to the cloud" }), {
+			toast.error(t({ message: "Couldn't move this workspace to the cloud" }), {
 				description: isMissingProcedureError(error)
 					? t({
 							message: "Update the host service on this device and try again.",
@@ -136,14 +133,15 @@ export function MoveChatToCloudDialog({
 				<DialogContent onClick={(event) => event.stopPropagation()}>
 					<DialogHeader>
 						<DialogTitle>
-							<Trans>Move this chat to the cloud?</Trans>
+							<Trans>Move this workspace to the cloud?</Trans>
 						</DialogTitle>
 						<DialogDescription>
 							<Trans>
-								Your current work, including uncommitted changes, is pushed to a
-								new branch on the remote. A cloud workspace starts from that
-								branch in the environment you pick, and this conversation
-								continues there. If the agent is working, it stops first.
+								Your work, including uncommitted changes, is pushed to a new
+								branch on the remote. A cloud workspace starts from that branch
+								in the environment you pick, and each Claude chat continues
+								there. Agents that are working stop first. Terminals and other
+								chats stay here.
 							</Trans>
 						</DialogDescription>
 					</DialogHeader>
@@ -175,7 +173,7 @@ export function MoveChatToCloudDialog({
 					{stage && (
 						<p className="text-sm text-muted-foreground" aria-live="polite">
 							{stage === "saving" ? (
-								<Trans>Saving your work and this conversation…</Trans>
+								<Trans>Saving your work and its chats…</Trans>
 							) : (
 								<Trans>Starting the cloud workspace…</Trans>
 							)}

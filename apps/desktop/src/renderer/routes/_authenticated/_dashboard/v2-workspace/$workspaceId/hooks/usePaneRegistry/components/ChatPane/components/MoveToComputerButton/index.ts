@@ -1,1 +1,0 @@
-export { MoveToComputerButton } from "./MoveToComputerButton";

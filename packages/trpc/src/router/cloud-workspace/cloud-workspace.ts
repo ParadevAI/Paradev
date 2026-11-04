@@ -47,7 +47,8 @@ import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { personProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
-import { createChatMove } from "../chat-move/utils/createChatMove";
+import { MAX_MOVED_CHATS } from "../chat-move/schema";
+import { createChatMoves } from "../chat-move/utils/createChatMove";
 import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import {
 	canOpenWorkspace,
@@ -385,13 +386,17 @@ export const cloudWorkspaceRouter = {
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
 				/**
-				 * A chat to move into the new workspace once its host answers, in
-				 * place of an agent. Its history and session bundle must be in
-				 * `chatHistory` first; `chatMove.latest` tracks the move.
+				 * The chats of a workspace to move into the new workspace once its
+				 * host answers, in place of an agent. Their history and session
+				 * bundles must be in `chatHistory` first; `chatMove.latest` tracks
+				 * each move.
 				 */
 				move: z
 					.object({
-						chatSessionId: z.string().uuid(),
+						chatSessionIds: z
+							.array(z.string().uuid())
+							.min(1)
+							.max(MAX_MOVED_CHATS),
 						/** The computer the chat leaves; omitted when it leaves a cloud workspace. */
 						fromHostId: z.string().min(1).max(200).optional(),
 					})
@@ -450,8 +455,8 @@ export const cloudWorkspaceRouter = {
 					? {
 							beforeProvision: async (workspaceId: string) => {
 								const move = input.move as NonNullable<typeof input.move>;
-								await createChatMove({
-									chatSessionId: move.chatSessionId,
+								await createChatMoves({
+									chatSessionIds: move.chatSessionIds,
 									...(move.fromHostId ? { fromHostId: move.fromHostId } : {}),
 									toWorkspaceId: workspaceId,
 									organizationId: input.organizationId,

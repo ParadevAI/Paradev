@@ -7,8 +7,8 @@ import { Check, Circle, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { runMoveOnThisComputer } from "renderer/routes/_authenticated/_dashboard/utils/runMoveOnThisComputer";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { runMoveOnThisComputer } from "../../../../utils/runMoveOnThisComputer";
 import { useMoveArrival } from "./hooks/useMoveArrival";
 
 const STEPS = ["pending", "copying", "restoring"] as const;

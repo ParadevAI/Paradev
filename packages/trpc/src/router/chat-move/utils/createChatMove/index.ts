@@ -1,1 +1,1 @@
-export { createChatMove } from "./createChatMove";
+export { createChatMove, createChatMoves } from "./createChatMove";

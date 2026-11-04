@@ -1,46 +1,38 @@
 import { useLingui } from "@lingui/react/macro";
-import { useWorkspaceClient } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { runMoveOnThisComputer } from "../../utils/runMoveOnThisComputer";
+import type { MovableWorkspace } from "../useWorkspaceMoveDirection";
 
 export type MoveToComputerStage = "saving" | "creating";
 
 /**
- * Moves a chat from a workspace on another host into a new workspace here.
- * The control plane records the move; this computer carries it out, since
- * the control plane cannot reach it.
+ * Moves a cloud workspace into a new workspace on this computer: its work
+ * comes over on one branch, and each of its chats moves on its own. The
+ * control plane records the moves; this computer carries them out, since the
+ * control plane cannot reach it. Returns the chats that could not move.
  */
-export function useMoveChatToComputer(workspaceId: string) {
+export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
-	const { trpcClient: remote } = useWorkspaceClient();
 	const { activeHostUrl, machineId } = useLocalHostService();
 	const { projects } = useHostProjects();
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
-	const { workspace } = useWorkspace();
-	const sourceHostId = workspace.hostId;
-	const sourceProjectId = workspace.projectId;
 
 	return useCallback(
-		async ({
-			chatSessionId,
-			onStage,
-		}: {
-			chatSessionId: string;
-			onStage: (stage: MoveToComputerStage) => void;
-		}) => {
-			if (!activeHostUrl)
+		async ({ onStage }: { onStage: (stage: MoveToComputerStage) => void }) => {
+			if (!activeHostUrl) {
 				throw new Error(t`This computer's host is not running`);
+			}
 			const requireLocalProject = (repositoryName: string) => {
 				const repository = repositoryName.toLowerCase();
 				const found = projects.find(
@@ -55,16 +47,21 @@ export function useMoveChatToComputer(workspaceId: string) {
 				}
 				return found;
 			};
-			const sourceProject = projects.find((row) => row.id === sourceProjectId);
+			const sourceProject = projects.find(
+				(row) => row.id === workspace.projectId,
+			);
 			if (sourceProject?.repoOwner && sourceProject.repoName) {
 				requireLocalProject(
 					`${sourceProject.repoOwner}/${sourceProject.repoName}`,
 				);
 			}
 			onStage("saving");
-			const prepared = await remote.teleport.prepare.mutate({
-				workspaceId,
-				chatSessionId,
+			// From the sidebar the box may be asleep: waking it also gives a fresh address.
+			const { url: remoteUrl } = await requestSandboxAccess(workspace.id, true);
+			const prepared = await getHostServiceClientByUrl(
+				remoteUrl,
+			).teleport.prepareWorkspace.mutate({
+				workspaceId: workspace.id,
 				stopIfBusy: true,
 			});
 			const project = requireLocalProject(prepared.repositoryFullName);
@@ -82,52 +79,68 @@ export function useMoveChatToComputer(workspaceId: string) {
 					projectId: project.id,
 					branch: prepared.branch,
 					skipBranchPrefix: true,
-					...(prepared.title ? { name: prepared.title } : {}),
+					name: workspace.name,
 				},
 			});
 			const created = await handle.completed;
 			if (!created.ok) throw new Error(created.error);
 
-			const { moveId } = await cloudTrpcClient.chatMove.start.mutate({
-				chatSessionId,
-				toWorkspaceId: created.workspaceId,
-				toHostId: machineId,
-				...(sourceHostId ? { fromHostId: sourceHostId } : {}),
-			});
-			seedMovedChat({
-				collections,
-				workspaceId: created.workspaceId,
-				projectId: project.id,
-				chatSessionId,
-				harnessSessionId: prepared.harnessSessionId,
-				agentId: "claude",
-				title: prepared.title,
-			});
+			const moves =
+				prepared.chats.length > 0
+					? (
+							await cloudTrpcClient.chatMove.start.mutate({
+								chatSessionIds: prepared.chats.map(
+									(chat) => chat.chatSessionId,
+								),
+								toWorkspaceId: created.workspaceId,
+								toHostId: machineId,
+							})
+						).moves
+					: [];
+			for (const chat of prepared.chats) {
+				seedMovedChat({
+					collections,
+					workspaceId: created.workspaceId,
+					projectId: project.id,
+					chatSessionId: chat.chatSessionId,
+					harnessSessionId: chat.harnessSessionId,
+					agentId: "claude",
+					title: chat.title,
+				});
+			}
 			await navigate({
 				to: "/v2-workspace/$workspaceId",
 				params: { workspaceId: created.workspaceId },
 			}).catch((error: unknown) => {
-				console.warn("[chat-move] could not open the new workspace", error);
+				console.warn(
+					"[workspace-move] could not open the new workspace",
+					error,
+				);
 			});
-			// The new workspace's pane shows how far this got, and a retry.
-			void runMoveOnThisComputer({ moveId, host: local }).catch(
-				(error: unknown) => {
-					console.warn("[chat-move] the move to this computer failed", error);
-				},
-			);
+			// Each chat's pane shows how far its move got, and a retry.
+			void (async () => {
+				for (const { moveId } of moves) {
+					await runMoveOnThisComputer({ moveId, host: local }).catch(
+						(error: unknown) => {
+							console.warn(
+								`[workspace-move] move ${moveId} to this computer failed`,
+								error,
+							);
+						},
+					);
+				}
+			})();
+			return { skipped: prepared.skipped };
 		},
 		[
 			t,
-			remote,
-			workspaceId,
+			workspace,
 			activeHostUrl,
 			machineId,
 			projects,
 			submit,
 			navigate,
 			collections,
-			sourceHostId,
-			sourceProjectId,
 		],
 	);
 }

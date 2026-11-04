@@ -4,8 +4,12 @@ export const chatMoveOfChatInputSchema = z.object({
 	chatSessionId: z.string().uuid(),
 });
 
+/** As many chats as one workspace move takes. */
+export const MAX_MOVED_CHATS = 50;
+
 export const startChatMoveInputSchema = z.object({
-	chatSessionId: z.string().uuid(),
+	/** Chats of one workspace, all moving to `toWorkspaceId`. */
+	chatSessionIds: z.array(z.string().uuid()).min(1).max(MAX_MOVED_CHATS),
 	/** A workspace in the caller's organization: on a computer, or in the cloud. */
 	toWorkspaceId: z.string().uuid(),
 	/** The computer `toWorkspaceId` is on; omitted for a cloud workspace. */

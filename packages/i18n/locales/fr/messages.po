@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# fichier modifié} other {# fichiers modifiés}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat fermé} other {# chats fermés}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# discussion est restée dans l'ancien espace de travail} other {# discussions sont restées dans l'ancien espace de travail}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# commentaire joint} other {# commentaires joints}}"
@@ -5944,11 +5948,11 @@ msgstr "Impossible de fusionner la pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Impossible de passer le sous-agent en arrière-plan"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "Impossible de déplacer cette discussion vers le cloud"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Impossible de déplacer cet espace de travail vers le cloud"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "Impossible de déplacer cette discussion vers cet ordinateur"
+msgid "Couldn't move this workspace to this computer"
+msgstr "Impossible de déplacer cet espace de travail vers cet ordinateur"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossible de nommer « {name} » automatiquement"
@@ -11759,11 +11763,11 @@ msgstr "Déplacer {count} vers un groupe"
 msgid "Move {name} to background"
 msgstr "Passer {name} en arrière-plan"
 
-msgid "Move this chat to the cloud?"
-msgstr "Déplacer cette discussion vers le cloud ?"
+msgid "Move this workspace to the cloud?"
+msgstr "Déplacer cet espace de travail vers le cloud ?"
 
-msgid "Move this chat to this computer?"
-msgstr "Déplacer cette discussion vers cet ordinateur ?"
+msgid "Move this workspace to this computer?"
+msgstr "Déplacer cet espace de travail vers cet ordinateur ?"
 
 msgid "Move to background"
 msgstr "Passer en arrière-plan"
@@ -16666,11 +16670,11 @@ msgstr "Enregistré dans Téléchargements"
 msgid "Saving as an environment..."
 msgstr "Enregistrement comme environnement..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "Enregistrement du travail de l'espace de travail cloud et de cette conversation…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Enregistrement du travail de l'espace de travail cloud et de ses discussions…"
 
-msgid "Saving your work and this conversation…"
-msgstr "Enregistrement de votre travail et de cette conversation…"
+msgid "Saving your work and its chats…"
+msgstr "Enregistrement de votre travail et de ses discussions…"
 
 msgid "Saving..."
 msgstr "Enregistrement..."
@@ -19183,8 +19187,8 @@ msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui q
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "L'espace de travail cloud aurait dû démarrer, mais n'a pas répondu à temps. La prochaine exécution réessaiera."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Le travail de l'espace de travail cloud, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur cet ordinateur démarre depuis cette branche, et cette conversation s'y poursuit. Si l'agent travaille, il s'arrête d'abord."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Le travail de l'espace de travail cloud, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur cet ordinateur démarre depuis cette branche, et chaque discussion Claude s'y poursuit. Les agents qui travaillent s'arrêtent d'abord. Les terminaux et les autres discussions restent dans le cloud."
 
 msgid "The code expired. Start again."
 msgstr "Le code a expiré. Recommencez."
@@ -19671,8 +19675,8 @@ msgstr "Cet e-mail est déjà enregistré avec une autre méthode de connexion e
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Cet environnement n'a aucun dépôt. Créez un environnement avec des dépôts dans les Paramètres, puis lancez l'espace de travail à partir de celui-ci"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "Cet environnement ouvre {environmentRepository}, et non {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Cet environnement ouvre {environmentRepository}, et non {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Les dépôts de cet environnement sont figés ; promouvez à nouveau un espace de travail pour les modifier"
@@ -21990,9 +21994,6 @@ msgstr "Vos modifications seront perdues si vous ne les enregistrez pas."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Votre code reste local par défaut, avec un contrôle explicite sur les services connectés."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Votre travail en cours, y compris les modifications non commitées, est poussé vers une nouvelle branche sur le dépôt distant. Un espace de travail cloud démarre depuis cette branche dans l'environnement que vous choisissez, et cette conversation s'y poursuit. Si l'agent travaille, il s'arrête d'abord."
-
 msgid "Your download starts automatically."
 msgstr "Votre téléchargement démarre automatiquement."
 
@@ -22111,6 +22112,9 @@ msgstr "Vos projets et espaces de travail v1 sont transférés vers le nouveau P
 
 msgid "Your version: {currentVersion}"
 msgstr "Votre version : {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Votre travail, y compris les modifications non commitées, est poussé vers une nouvelle branche sur le dépôt distant. Un espace de travail cloud démarre depuis cette branche dans l'environnement que vous choisissez, et chaque discussion Claude s'y poursuit. Les agents qui travaillent s'arrêtent d'abord. Les terminaux et les autres discussions restent ici."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "L’administrateur de votre espace de travail active la connexion par code d’appareil pour Codex."

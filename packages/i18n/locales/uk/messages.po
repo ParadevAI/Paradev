@@ -128,6 +128,10 @@ msgstr "{0, plural, one {# змінений файл} few {# змінені фа
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {Закрито # чат} few {Закрито # чати} many {Закрито # чатів} other {Закрито # чату}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# чат залишився в старому робочому просторі} few {# чати залишилися в старому робочому просторі} many {# чатів залишилися в старому робочому просторі} other {# чату залишилося в старому робочому просторі}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {Прикріплено # коментар} few {Прикріплено # коментарі} many {Прикріплено # коментарів} other {Прикріплено # коментаря}}"
@@ -5938,11 +5942,11 @@ msgstr "Не вдалося злити пул-реквест"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не вдалося перевести субагента у фоновий режим"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "Не вдалося перемістити цей чат у хмару"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Не вдалося перемістити цей робочий простір у хмару"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "Не вдалося перемістити цей чат на цей комп'ютер"
+msgid "Couldn't move this workspace to this computer"
+msgstr "Не вдалося перемістити цей робочий простір на цей комп'ютер"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
@@ -11753,11 +11757,11 @@ msgstr "Перемістити {count} до групи"
 msgid "Move {name} to background"
 msgstr "Перевести {name} у фоновий режим"
 
-msgid "Move this chat to the cloud?"
-msgstr "Перемістити цей чат у хмару?"
+msgid "Move this workspace to the cloud?"
+msgstr "Перемістити цей робочий простір у хмару?"
 
-msgid "Move this chat to this computer?"
-msgstr "Перемістити цей чат на цей комп'ютер?"
+msgid "Move this workspace to this computer?"
+msgstr "Перемістити цей робочий простір на цей комп'ютер?"
 
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
@@ -16660,11 +16664,11 @@ msgstr "Збережено в «Завантаження»"
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "Збереження роботи хмарного робочого простору та цієї розмови…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Збереження роботи хмарного робочого простору та його чатів…"
 
-msgid "Saving your work and this conversation…"
-msgstr "Збереження вашої роботи та цієї розмови…"
+msgid "Saving your work and its chats…"
+msgstr "Збереження вашої роботи та її чатів…"
 
 msgid "Saving..."
 msgstr "Збереження..."
@@ -19177,8 +19181,8 @@ msgstr "Чат залишиться без змін. Файли, які будь
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Хмарний робочий простір мав запуститися, але не відповів вчасно. Наступний запуск спробує знову."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Робота хмарного робочого простору, включно з незакомітованими змінами, надсилається до нової гілки. Робочий простір на цьому комп'ютері запускається з цієї гілки, і ця розмова продовжується там. Якщо агент працює, спочатку він зупиниться."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Робота хмарного робочого простору, включно з незакомітованими змінами, надсилається до нової гілки. Робочий простір на цьому комп'ютері запускається з цієї гілки, і кожен чат із Claude продовжується там. Агенти, що працюють, спочатку зупиняться. Термінали та інші чати залишаться в хмарі."
 
 msgid "The code expired. Start again."
 msgstr "Термін дії коду минув. Почніть знову."
@@ -19665,8 +19669,8 @@ msgstr "Цю електронну адресу вже зареєстровано
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "У цьому середовищі немає репозиторіїв. Створіть середовище з репозиторіями в налаштуваннях, а потім запустіть робочий простір із нього"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "Це середовище відкриває {environmentRepository}, а не {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Це середовище відкриває {environmentRepository}, а не {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозиторії цього середовища фіксовані; щоб змінити їх, ще раз створіть середовище з робочого простору"
@@ -21984,9 +21988,6 @@ msgstr "Якщо не зберегти зміни, їх буде втрачен�
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "За замовчуванням ваш код залишається локально, а підключеними сервісами ви керуєте явно."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Ваша поточна робота, включно з незакомітованими змінами, надсилається до нової гілки у віддаленому репозиторії. Хмарний робочий простір запускається з цієї гілки у вибраному вами середовищі, і ця розмова продовжується там. Якщо агент працює, спочатку він зупиниться."
-
 msgid "Your download starts automatically."
 msgstr "Завантаження почнеться автоматично."
 
@@ -22105,6 +22106,9 @@ msgstr "Ваші проєкти й робочі простори з v1 пере�
 
 msgid "Your version: {currentVersion}"
 msgstr "Ваша версія: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Ваша робота, включно з незакомітованими змінами, надсилається до нової гілки у віддаленому репозиторії. Хмарний робочий простір запускається з цієї гілки у вибраному вами середовищі, і кожен чат із Claude продовжується там. Агенти, що працюють, спочатку зупиняться. Термінали та інші чати залишаться тут."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Адміністратор вашого робочого простору вмикає вхід за кодом пристрою для Codex."

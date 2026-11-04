@@ -435,7 +435,77 @@ async function chatOnLaptop() {
 	return sessionId;
 }
 
+type Mover = ReturnType<typeof routerFor>["chatMove"];
+
+async function startOne(
+	mover: Mover,
+	input: Omit<Parameters<Mover["start"]>[0], "chatSessionIds"> & {
+		chatSessionId: string;
+	},
+) {
+	const { chatSessionId, ...rest } = input;
+	const started = await mover.start({
+		...rest,
+		chatSessionIds: [chatSessionId],
+	});
+	const moveId = started.moves[0]?.moveId;
+	if (!moveId) throw new Error("no move started");
+	return { moveId, runsOnThisComputer: started.runsOnThisComputer };
+}
+
 describe("chat moves", () => {
+	test("a workspace moves all its chats together, each as its own move", async () => {
+		const first = await chatOnLaptop();
+		const second = await chatOnLaptop();
+		const mover = routerFor(USER).chatMove;
+		const started = await mover.start({
+			chatSessionIds: [first, second],
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
+		});
+		expect(started.runsOnThisComputer).toBe(true);
+		expect(started.moves.map((move) => move.chatSessionId).sort()).toEqual(
+			[first, second].sort(),
+		);
+		for (const { moveId } of started.moves) {
+			expect(await moveOf(moveId)).toMatchObject({
+				status: "pending",
+				toWorkspaceId: DESKTOP_WORKSPACE,
+				fromWorkspaceId: WORKSPACE,
+			});
+		}
+
+		const [one] = started.moves;
+		await mover.claim({ moveId: one?.moveId as string });
+		await mover.fail({ moveId: one?.moveId as string, error: "import failed" });
+		const other = started.moves.find((move) => move !== one);
+		expect((await moveOf(other?.moveId as string)).status).toBe("pending");
+	});
+
+	test("refuses chats from two workspaces in one move, and records none", async () => {
+		const onLaptop = await chatOnLaptop();
+		const inCloud = newSession();
+		await push(inCloud, [{ seq: 1, event: agentMessage("a", "a") }], {
+			as: callerFor(USER, MY_CLOUD),
+			workspaceId: MY_CLOUD,
+		});
+		await storeBundle(inCloud);
+		await expect(
+			routerFor(USER).chatMove.start({
+				chatSessionIds: [onLaptop, inCloud],
+				toWorkspaceId: DESKTOP_WORKSPACE,
+				toHostId: DESKTOP,
+				fromHostId: LAPTOP,
+			}),
+		).rejects.toThrow("not in one workspace");
+		expect(
+			await db.query.chatMoves.findFirst({
+				where: inArray(chatMoves.sessionId, [onLaptop, inCloud]),
+			}),
+		).toBeUndefined();
+	});
+
 	test("into a cloud workspace: the job hands the chat over, switches it, then starts it and stops the old copy", async () => {
 		const sessionId = await chatOnLaptop();
 		const move = await createChatMove({
@@ -478,7 +548,7 @@ describe("chat moves", () => {
 	test("to a computer: the desktop there claims it and pages the history; nothing is queued", async () => {
 		const sessionId = await chatOnLaptop();
 		const mover = routerFor(USER).chatMove;
-		const started = await mover.start({
+		const started = await startOne(mover, {
 			chatSessionId: sessionId,
 			toWorkspaceId: DESKTOP_WORKSPACE,
 			toHostId: DESKTOP,
@@ -541,7 +611,7 @@ describe("chat moves", () => {
 		).rejects.toThrow("cloud workspace you started");
 		await expect(
 			routerFor(USER, MY_CLOUD).chatMove.start({
-				chatSessionId: sessionId,
+				chatSessionIds: [sessionId],
 				toWorkspaceId: DESKTOP_WORKSPACE,
 				toHostId: DESKTOP,
 			}),
@@ -590,7 +660,7 @@ describe("chat moves", () => {
 		await push(sessionId, [{ seq: 3, event: agentMessage("c", "c") }]);
 
 		const mover = routerFor(USER).chatMove;
-		const toDesktop = await mover.start({
+		const toDesktop = await startOne(mover, {
 			chatSessionId: sessionId,
 			toWorkspaceId: DESKTOP_WORKSPACE,
 			toHostId: DESKTOP,
@@ -635,7 +705,7 @@ describe("chat moves", () => {
 	test("a retry refuses a chat that went on after the failed move began", async () => {
 		const sessionId = await chatOnLaptop();
 		const mover = routerFor(USER).chatMove;
-		const first = await mover.start({
+		const first = await startOne(mover, {
 			chatSessionId: sessionId,
 			toWorkspaceId: DESKTOP_WORKSPACE,
 			toHostId: DESKTOP,

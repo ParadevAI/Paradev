@@ -21,7 +21,7 @@ import {
 	retryChatMoveInputSchema,
 	startChatMoveInputSchema,
 } from "./schema";
-import { createChatMove } from "./utils/createChatMove";
+import { createChatMove, createChatMoves } from "./utils/createChatMove";
 import { failStaleMoves, staleBefore } from "./utils/findMovableChat";
 import { queueChatMove } from "./utils/queueChatMove";
 import {
@@ -158,12 +158,22 @@ export const chatMoveRouter = {
 			};
 		}),
 
-	/** Moves a chat to a workspace that already exists, such as one on this computer. */
+	/**
+	 * Moves the chats of one workspace to a workspace that already exists,
+	 * such as one on this computer. Each chat moves, fails and retries on its
+	 * own; all of them are recorded together.
+	 */
 	start: personProcedure
 		.input(startChatMoveInputSchema)
 		.mutation(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			return startMove(await createChatMove({ ...input, ...mover }));
+			const created = await createChatMoves({ ...input, ...mover });
+			const moves = [];
+			for (const move of created) {
+				const { moveId } = await startMove(move);
+				moves.push({ moveId, chatSessionId: move.chatSessionId });
+			}
+			return { moves, runsOnThisComputer: input.toHostId !== undefined };
 		}),
 
 	/** Tries a failed move again, to the same workspace. */

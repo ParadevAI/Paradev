@@ -134,6 +134,10 @@ msgstr "{0, plural, one {#個已更改檔案} other {#個已更改檔案}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {已關閉 # 個聊天}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# 個聊天留在了原工作區} other {# 個聊天留在了原工作區}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {已附上#條評論} other {已附上#條評論}}"
@@ -5944,11 +5948,11 @@ msgstr "無法合併拉取請求"
 msgid "Couldn't move the subagent to the background"
 msgstr "無法將子代理程式移到背景"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "無法將此聊天移至雲端"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "無法將此工作區移至雲端"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "無法將此聊天移到此電腦"
+msgid "Couldn't move this workspace to this computer"
+msgstr "無法將此工作區移到此電腦"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
@@ -11759,11 +11763,11 @@ msgstr "將{count}個移動到群組"
 msgid "Move {name} to background"
 msgstr "將 {name} 移到背景"
 
-msgid "Move this chat to the cloud?"
-msgstr "要將此聊天移至雲端嗎？"
+msgid "Move this workspace to the cloud?"
+msgstr "要將此工作區移至雲端嗎？"
 
-msgid "Move this chat to this computer?"
-msgstr "將此聊天移到此電腦？"
+msgid "Move this workspace to this computer?"
+msgstr "將此工作區移到此電腦？"
 
 msgid "Move to background"
 msgstr "移到背景"
@@ -16666,11 +16670,11 @@ msgstr "已儲存到「下載」資料夾"
 msgid "Saving as an environment..."
 msgstr "正在儲存為環境..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "正在儲存雲端工作區的工作和此對話…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "正在儲存雲端工作區的工作及其聊天…"
 
-msgid "Saving your work and this conversation…"
-msgstr "正在儲存你的工作和此對話…"
+msgid "Saving your work and its chats…"
+msgstr "正在儲存你的工作及其聊天…"
 
 msgid "Saving..."
 msgstr "正在儲存..."
@@ -19183,8 +19187,8 @@ msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "雲端工作區應該已經啟動，但沒有及時回應。下次執行時會重試。"
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "雲端工作區的工作（包括未提交的變更）會推送到一個新分支。此電腦上的工作區會從該分支啟動，此對話將在那裡繼續。如果代理程式正在工作，會先停止。"
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "雲端工作區的工作（包括未提交的變更）會推送到一個新分支。此電腦上的工作區會從該分支啟動，每個 Claude 聊天都將在那裡繼續。正在工作的代理程式會先停止。終端和其他聊天會留在雲端。"
 
 msgid "The code expired. Start again."
 msgstr "代碼已過期。請重新開始。"
@@ -19671,8 +19675,8 @@ msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "此環境開啟的是 {environmentRepository}，而不是 {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "此環境開啟的是 {environmentRepository}，而不是 {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此環境的儲存庫已固定；請再次提升一個工作區以變更它們"
@@ -21990,9 +21994,6 @@ msgstr "如果不儲存，你的更改將會丟失。"
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的程式碼預設留在本地，連線哪些服務由你明確決定。"
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "你目前的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，此對話將在那裡繼續。如果代理程式正在工作，會先停止。"
-
 msgid "Your download starts automatically."
 msgstr "下載會自動開始。"
 
@@ -22111,6 +22112,9 @@ msgstr "你的 v1 專案和工作區正在移轉到新版 Paradev。每一項準
 
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "你的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，每個 Claude 聊天都將在那裡繼續。正在工作的代理程式會先停止。終端和其他聊天會留在這裡。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的裝置碼登入由你的工作區管理員開啟。"

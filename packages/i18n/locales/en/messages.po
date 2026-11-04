@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# changed file} other {# changed files}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat closed} other {# chats closed}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -5944,11 +5948,11 @@ msgstr "Couldn't merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Couldn't move the subagent to the background"
 
-msgid "Couldn't move this chat to the cloud"
-msgstr "Couldn't move this chat to the cloud"
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Couldn't move this workspace to the cloud"
 
-msgid "Couldn't move this chat to this computer"
-msgstr "Couldn't move this chat to this computer"
+msgid "Couldn't move this workspace to this computer"
+msgstr "Couldn't move this workspace to this computer"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
@@ -11759,11 +11763,11 @@ msgstr "Move {count} to Group"
 msgid "Move {name} to background"
 msgstr "Move {name} to background"
 
-msgid "Move this chat to the cloud?"
-msgstr "Move this chat to the cloud?"
+msgid "Move this workspace to the cloud?"
+msgstr "Move this workspace to the cloud?"
 
-msgid "Move this chat to this computer?"
-msgstr "Move this chat to this computer?"
+msgid "Move this workspace to this computer?"
+msgstr "Move this workspace to this computer?"
 
 msgid "Move to background"
 msgstr "Move to background"
@@ -16666,11 +16670,11 @@ msgstr "Saved to Downloads"
 msgid "Saving as an environment..."
 msgstr "Saving as an environment..."
 
-msgid "Saving the cloud workspace's work and this conversation…"
-msgstr "Saving the cloud workspace's work and this conversation…"
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Saving the cloud workspace's work and its chats…"
 
-msgid "Saving your work and this conversation…"
-msgstr "Saving your work and this conversation…"
+msgid "Saving your work and its chats…"
+msgstr "Saving your work and its chats…"
 
 msgid "Saving..."
 msgstr "Saving..."
@@ -19183,8 +19187,8 @@ msgstr "The chat stays as it is. Files edited since this turn, by anyone, are le
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "The cloud workspace should have started but didn't answer in time. The next run tries again."
 
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
-msgstr "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and this conversation continues there. If the agent is working, it stops first."
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
 
 msgid "The code expired. Start again."
 msgstr "The code expired. Start again."
@@ -19671,8 +19675,8 @@ msgstr "This email is already registered with another sign-in method, and the pr
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 
-msgid "This environment opens {environmentRepository}, not {chatRepository}"
-msgstr "This environment opens {environmentRepository}, not {chatRepository}"
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "This environment opens {environmentRepository}, not {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "This environment's repositories are fixed; promote a workspace again to change them"
@@ -21990,9 +21994,6 @@ msgstr "Your changes will be lost if you don't save them."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Your code stays local by default, with explicit control over connected services."
 
-msgid "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-msgstr "Your current work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and this conversation continues there. If the agent is working, it stops first."
-
 msgid "Your download starts automatically."
 msgstr "Your download starts automatically."
 
@@ -22111,6 +22112,9 @@ msgstr "Your v1 projects and workspaces are moving to the new Paradev. They appe
 
 msgid "Your version: {currentVersion}"
 msgstr "Your version: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Your workspace admin turns on device code sign-in for Codex."
