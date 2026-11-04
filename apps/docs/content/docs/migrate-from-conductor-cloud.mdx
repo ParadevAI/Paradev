@@ -29,7 +29,7 @@ For the local Conductor app, see [Migrate from Conductor](/migrate-from-conducto
 
 Do this first, before November 13 if you can.
 
-1. **Push every branch.** In each Conductor Cloud workspace, commit and push the branch. A pushed branch is safe on GitHub whatever you choose next.
+1. **Push every branch.** In each Conductor Cloud workspace, commit all changes, including new files (`git add -A`), and push the branch. A pushed branch is safe on GitHub whatever you choose next.
    A push does not include Git-ignored files, such as `.env` files or local data. Copy out any you need before November 20.
 2. **Export your data.** In Conductor, go to **Settings → Account → Export data**. This keeps a copy of your chats. Paradev cannot import Conductor chats, so this export is your record of them.
 
@@ -52,7 +52,7 @@ Cloud workspaces are in early access. If you do not see **Cloud** in the device 
 
 ### Add your setup scripts
 
-Cloud workspaces run the setup scripts in `.paradev/config.json` from the repository. Convert your Conductor setup script as described in [Convert Your Scripts](/migrate-from-conductor#3-convert-your-scripts), then commit and push the file to the base branch you will start from.
+Cloud workspaces run the setup scripts in `.paradev/config.json` from the repository. Convert your Conductor setup script as described in [Convert Your Scripts](/migrate-from-conductor#3-convert-your-scripts), then commit and push the file to every branch you will use as a base branch. A cloud workspace started from a branch without it does not run your setup.
 
 `CONDUCTOR_PORT` is not set in Conductor Cloud, so cloud scripts usually do not need a port change.
 
@@ -70,15 +70,17 @@ Not sure what the project needs? Click **Set up with an agent** in **Settings �
 
 1. Press **⌘N** and pick **Cloud** in the device picker.
 2. Pick the project and the environment.
-3. Choose the branch you pushed from Conductor as the base branch. Paradev creates a new working branch from it.
+3. Choose the branch you pushed from Conductor as the base branch. Paradev creates a new working branch from it, so an open pull request for the Conductor branch does not get the new commits. Open a new pull request from the new branch, or merge it into the old one.
 4. Tell the agent where to pick up, for example "Continue the work on this branch. Read the last commits and the open PR first."
 
 From the CLI:
 
 ```bash
-superset workspaces create --branch <pushed-branch> --agent claude \
+superset workspaces create --base-branch <pushed-branch> --agent claude \
   --prompt "Continue the work on this branch"
 ```
+
+If more than one environment has repositories, also pass `--environment <id>`. Run the command without it to see each environment's ID.
 
 When one workspace is fully set up, right-click it and choose **Save as environment**. New workspaces then start from that snapshot instead of running setup each time. See [Save a set-up workspace](/cloud-workspaces#4-save-a-set-up-workspace-as-an-environment).
 

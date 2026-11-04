@@ -122,7 +122,7 @@ Commit `.paradev/` so your team gets the same scripts.
 
 Claude Code, Codex, Cursor Agent, and OpenCode all run in Paradev on your existing subscriptions and keys. See [Supported Agents](/supported-agents) for the full list, or add any other CLI as a custom agent.
 
-To continue a conversation from Conductor, open a terminal in the imported workspace and run the agent's resume command, for example `claude --resume` or `codex resume`. Sessions that the agent saved for that folder appear in its picker. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
+To try to continue a conversation from Conductor, open a terminal in the imported workspace and run the agent's resume command, for example `claude --resume` or `codex resume`. The picker shows sessions that the agent CLI saved for that folder. Conductor may not have saved its chats there, so this does not always work. If it doesn't, give the agent the context again, or keep a copy with Conductor's **Settings → Account → Export data**. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
 
 Prefer a chat view to a terminal? Switch the agent pane to [Chat](/chat).
 

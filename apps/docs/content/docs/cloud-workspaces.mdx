@@ -101,7 +101,7 @@ superset workspaces create --machine-size large \
   --agent claude --prompt "Fix the login redirect"
 ```
 
-If your account has cloud workspaces, `workspaces create` makes a cloud workspace by default; pass `--local` to create one on this machine instead. `--branch` sets the base branch (default: the repository's default branch), and Paradev creates a new working branch from it.
+If your account has cloud workspaces, `workspaces create` makes a cloud workspace by default; pass `--local` to create one on this machine instead. `--base-branch` sets the branch to start from (default: the repository's default branch), and Paradev creates a new working branch from it. `--branch` applies only to workspaces on a host.
 
 If more than one environment has repositories, also pass `--environment <id>`. Run the command without it to see each environment's ID and name.
 
