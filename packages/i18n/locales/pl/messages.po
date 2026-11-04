@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# zmieniony plik} few {# zmienione pliki} many {# zmien
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# czat zamknięty} few {# czaty zamknięte} many {# czatów zamkniętych} other {# czatu zamkniętego}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# czat pozostał w starym obszarze roboczym} few {# czaty pozostały w starym obszarze roboczym} many {# czatów pozostało w starym obszarze roboczym} other {# czatu pozostało w starym obszarze roboczym}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {Dołączono # komentarz} few {Dołączono # komentarze} many {Dołączono # komentarzy} other {Dołączono # komentarza}}"
@@ -353,6 +357,10 @@ msgstr "{0, plural, one {zgłoszenie Linear} few {zgłoszenia Linear} many {zgł
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Przenieś # wybrany obszar roboczy do grupy} few {Przenieś # wybrane obszary robocze do grupy} many {Przenieś # wybranych obszarów roboczych do grupy} other {Przenieś # wybranego obszaru roboczego do grupy}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Przenoszenie # czatu tutaj…} few {Przenoszenie # czatów tutaj…} many {Przenoszenie # czatów tutaj…} other {Przenoszenie # czatu tutaj…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1081,6 +1089,9 @@ msgstr "{localHostName} (to urządzenie)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Kopiowanie rozmowy (# wiadomość)} few {Kopiowanie rozmowy (# wiadomości)} many {Kopiowanie rozmowy (# wiadomości)} other {Kopiowanie rozmowy (# wiadomości)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "Na {nextLabel} pracuje {met} z {0} celów — najbardziej w tyle jest {laggingLabels}."
@@ -1273,6 +1284,9 @@ msgstr "{rate} za GB-godzinę. Używane po miesięcznej puli, nigdy nie wygasaj�
 msgid "{readPercent}% read"
 msgstr "{readPercent}% przeczytane"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "Przeniesiono tutaj {ready} z {total} czatów"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1315,6 +1329,9 @@ msgstr "{starCount} gwiazdek i rośnie"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Uruchomiono # automatyzację} few {Uruchomiono # automatyzacje} many {Uruchomiono # automatyzacji} other {Uruchomiono # automatyzacji}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Ten obszar roboczy został przeniesiony. # czat został tutaj.} few {Ten obszar roboczy został przeniesiony. # czaty zostały tutaj.} many {Ten obszar roboczy został przeniesiony. # czatów zostało tutaj.} other {Ten obszar roboczy został przeniesiony. # czatu zostało tutaj.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent działa} few {# subagenty działają} many {# subagentów działa} other {# subagenta działa}}"
@@ -1953,6 +1970,9 @@ msgstr "Dodaj {0} do obszaru roboczego"
 
 msgid "Add {localizedName}?"
 msgstr "Dodać {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Najpierw dodaj {repositoryName} jako projekt na tym komputerze"
 
 msgid "Add a comment…"
 msgstr "Dodaj komentarz…"
@@ -5499,6 +5519,9 @@ msgstr "Skopiuj historię przeglądania i dane logowania z innej przeglądarki d
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Skopiuj klucz teraz — nie zobaczysz go ponownie."
 
+msgid "Copying the conversation"
+msgstr "Kopiowanie rozmowy"
+
 msgid "Copyright or trademark"
 msgstr "Prawa autorskie lub znak towarowy"
 
@@ -5935,6 +5958,12 @@ msgstr "Nie udało się scalić pull requesta"
 msgid "Couldn't move the subagent to the background"
 msgstr "Nie udało się przenieść subagenta w tło"
 
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Nie udało się przenieść tego obszaru roboczego do chmury"
+
+msgid "Couldn't move this workspace to this computer"
+msgstr "Nie udało się przenieść tego obszaru roboczego na ten komputer"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nie udało się automatycznie nazwać „{name}”"
 
@@ -6078,6 +6107,9 @@ msgstr "Nie udało się zatrzymać czatu"
 
 msgid "Couldn't take a screenshot"
 msgstr "Nie udało się zrobić zrzutu ekranu"
+
+msgid "Couldn't try the move again"
+msgstr "Nie udało się ponowić przeniesienia"
 
 msgid "Couldn't undo the file changes."
 msgstr "Nie udało się cofnąć zmian w plikach."
@@ -6348,6 +6380,9 @@ msgstr "Tworzenie zadania"
 
 msgid "Creating a workspace"
 msgstr "Tworzenie obszaru roboczego"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Tworzenie obszaru roboczego na tym komputerze…"
 
 msgid "Creating PR..."
 msgstr "Tworzenie PR…"
@@ -11738,8 +11773,17 @@ msgstr "Przenieś {count} do grupy"
 msgid "Move {name} to background"
 msgstr "Przenieś {name} w tło"
 
+msgid "Move this workspace to the cloud?"
+msgstr "Przenieść ten obszar roboczy do chmury?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Przenieść ten obszar roboczy na ten komputer?"
+
 msgid "Move to background"
 msgstr "Przenieś w tło"
+
+msgid "Move to cloud"
+msgstr "Przenieś do chmury"
 
 msgid "Move to group"
 msgstr "Przenieś do grupy"
@@ -11753,8 +11797,23 @@ msgstr "Przenieś na prawą stronę"
 msgid "Move to Tab"
 msgstr "Przenieś do karty"
 
+msgid "Move to this computer"
+msgstr "Przenieś na ten komputer"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "Przeniesiono „{name}” do grupy {group}"
+
+msgid "Moving this chat here"
+msgstr "Przenoszenie tego czatu tutaj"
+
+msgid "Moving this workspace here…"
+msgstr "Przenoszenie tego obszaru roboczego tutaj…"
+
+msgid "Moving this workspace…"
+msgstr "Przenoszenie tego obszaru roboczego…"
+
+msgid "Moving..."
+msgstr "Przenoszenie..."
 
 msgid "Multi-select"
 msgstr "Wielokrotny wybór"
@@ -16138,6 +16197,9 @@ msgstr "Przywrócono „{workspaceName}”"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Przywracanie „{workspaceName}”…"
 
+msgid "Restoring Claude's session"
+msgstr "Przywracanie sesji Claude"
+
 msgid "Restoring your session"
 msgstr "Przywracanie sesji"
 
@@ -16623,6 +16685,12 @@ msgstr "Zapisano w Pobranych"
 
 msgid "Saving as an environment..."
 msgstr "Zapisywanie jako środowisko..."
+
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Zapisywanie pracy obszaru roboczego w chmurze i jego czatów…"
+
+msgid "Saving your work and its chats…"
+msgstr "Zapisywanie Twojej pracy i jej czatów…"
 
 msgid "Saving..."
 msgstr "Zapisywanie..."
@@ -18325,8 +18393,14 @@ msgstr "Uruchamianie obszaru roboczego w chmurze"
 msgid "Starting the agent…"
 msgstr "Uruchamianie agenta…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Uruchamianie obszaru roboczego w chmurze…"
+
 msgid "Starting the simulator…"
 msgstr "Uruchamianie symulatora…"
+
+msgid "Starting the workspace"
+msgstr "Uruchamianie obszaru roboczego"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Uruchamianie. To powinno zająć tylko chwilę."
@@ -19129,6 +19203,9 @@ msgstr "Czat zostaje bez zmian. Pliki edytowane od tej tury przez kogokolwiek po
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Obszar roboczy w chmurze powinien był się uruchomić, ale nie odpowiedział na czas. Następne uruchomienie spróbuje ponownie."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Praca obszaru roboczego w chmurze, w tym niezatwierdzone zmiany, zostanie wypchnięta do nowej gałęzi. Obszar roboczy na tym komputerze uruchomi się z tej gałęzi, a każdy czat z Claude będzie tam kontynuowany. Pracujący agenci najpierw się zatrzymają. Terminale i pozostałe czaty zostaną w chmurze."
+
 msgid "The code expired. Start again."
 msgstr "Kod wygasł. Zacznij od nowa."
 
@@ -19545,6 +19622,9 @@ msgstr "Tej operacji nie można cofnąć."
 msgid "This channel is archived"
 msgstr "Ten kanał jest zarchiwizowany"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Nie udało się przenieść tego czatu tutaj. Nadal jest w obszarze roboczym, z którego pochodzi."
+
 msgid "This chat has ended."
 msgstr "Ten czat się zakończył."
 
@@ -19578,6 +19658,9 @@ msgstr "Nie można uruchomić tego obszaru roboczego w chmurze"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Ten obszar roboczy w chmurze jest wybudzany. Po okresie bezczynności może to potrwać do 30 sekund."
 
+msgid "This computer's host is not running"
+msgstr "Host tego komputera nie działa"
+
 msgid "This conversation is too long for the model"
 msgstr "Ta rozmowa jest za długa dla modelu"
 
@@ -19607,6 +19690,9 @@ msgstr "Ten e-mail jest już zarejestrowany inną metodą logowania, a dostawca 
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "To środowisko nie ma repozytoriów. Utwórz w Ustawieniach środowisko z repozytoriami i uruchom z niego obszar roboczy"
+
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "To środowisko otwiera {environmentRepository}, a nie {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozytoria tego środowiska są ustalone; aby je zmienić, ponownie awansuj obszar roboczy"
@@ -19905,6 +19991,9 @@ msgstr "Ten obszar roboczy nie ma projektu, z którego można się rozgałęzić
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Ten obszar roboczy mógł zostać usunięty albo nie masz już do niego dostępu."
+
+msgid "This workspace moved"
+msgstr "Ten obszar roboczy został przeniesiony"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Wpis tego obszaru roboczego wciąż istnieje, ale jego folderu worktree nie ma już na tym hoście. Terminale i operacje na plikach są niedostępne."
@@ -20659,6 +20748,9 @@ msgstr "Wymagana aktualizacja"
 
 msgid "update the branch prefix"
 msgstr "zaktualizować prefiksu gałęzi"
+
+msgid "Update the host service on this device and try again."
+msgstr "Zaktualizuj usługę hosta na tym urządzeniu i spróbuj ponownie."
 
 msgid "Update this host to message subagents"
 msgstr "Zaktualizuj tego hosta, aby wysyłać wiadomości do subagentów"
@@ -22039,6 +22131,9 @@ msgstr "Twoje projekty i obszary robocze z v1 są przenoszone do nowego Paradev.
 
 msgid "Your version: {currentVersion}"
 msgstr "Twoja wersja: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Twoja praca, w tym niezatwierdzone zmiany, zostanie wypchnięta do nowej gałęzi w repozytorium zdalnym. Obszar roboczy w chmurze uruchomi się z tej gałęzi w wybranym środowisku, a każdy czat z Claude będzie tam kontynuowany. Pracujący agenci najpierw się zatrzymają. Terminale i pozostałe czaty zostaną tutaj."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Logowanie kodem urządzenia dla Codex włącza administrator Twojego obszaru roboczego."

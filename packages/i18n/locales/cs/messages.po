@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# změněný soubor} few {# změněné soubory} many {#
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat zavřen} few {# chaty zavřeny} many {# chatů zavřeno} other {# chatů zavřeno}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# chat zůstal v původním pracovním prostoru} few {# chaty zůstaly v původním pracovním prostoru} many {# chatu zůstalo v původním pracovním prostoru} other {# chatů zůstalo v původním pracovním prostoru}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# připojený komentář} few {# připojené komentáře} many {# připojeného komentáře} other {# připojených komentářů}}"
@@ -353,6 +357,10 @@ msgstr "{0, plural, one {Linear issue} few {Linear issues} many {Linear issues} 
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Přesunout # vybraný pracovní prostor do skupiny} few {Přesunout # vybrané pracovní prostory do skupiny} many {Přesunout # vybraného pracovního prostoru do skupiny} other {Přesunout # vybraných pracovních prostorů do skupiny}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Sem se přesouvá # chat…} few {Sem se přesouvají # chaty…} many {Sem se přesouvá # chatu…} other {Sem se přesouvá # chatů…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1081,6 +1089,9 @@ msgstr "{localHostName} (toto zařízení)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Kopírování konverzace (# zpráva)} few {Kopírování konverzace (# zprávy)} many {Kopírování konverzace (# zprávy)} other {Kopírování konverzace (# zpráv)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "Na {nextLabel} táhne {met} z {0} cílů — nejvíc zaostává {laggingLabels}."
@@ -1273,6 +1284,9 @@ msgstr "{rate} za GB-hodinu. Čerpají se po měsíčním fondu a nikdy nevyprš
 msgid "{readPercent}% read"
 msgstr "přečteno {readPercent} %"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "Sem se přesunulo {ready} z {total} chatů"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1315,6 +1329,9 @@ msgstr "{starCount} hvězd a přibývá"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Spuštěna # automatizace} few {Spuštěny # automatizace} many {Spuštěno # automatizace} other {Spuštěno # automatizací}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Tento pracovní prostor byl přesunut. # chat zůstal zde.} few {Tento pracovní prostor byl přesunut. # chaty zůstaly zde.} many {Tento pracovní prostor byl přesunut. # chatu zůstalo zde.} other {Tento pracovní prostor byl přesunut. # chatů zůstalo zde.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent běží} few {# subagenti běží} many {# subagenta běží} other {# subagentů běží}}"
@@ -1953,6 +1970,9 @@ msgstr "Přidat {0} do pracovního prostoru"
 
 msgid "Add {localizedName}?"
 msgstr "Přidat {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto počítači"
 
 msgid "Add a comment…"
 msgstr "Přidat komentář…"
@@ -5499,6 +5519,9 @@ msgstr "Zkopírujte historii prohlížení a přihlášení z jiného prohlíže
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Zkopírujte si klíč teď — už ho znovu neuvidíte."
 
+msgid "Copying the conversation"
+msgstr "Kopírování konverzace"
+
 msgid "Copyright or trademark"
 msgstr "Autorská práva nebo ochranná známka"
 
@@ -5935,6 +5958,12 @@ msgstr "Pull request se nepodařilo sloučit"
 msgid "Couldn't move the subagent to the background"
 msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Tento pracovní prostor se nepodařilo přesunout do cloudu"
+
+msgid "Couldn't move this workspace to this computer"
+msgstr "Tento pracovní prostor se nepodařilo přesunout na tento počítač"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
 
@@ -6078,6 +6107,9 @@ msgstr "Chat se nepodařilo zastavit"
 
 msgid "Couldn't take a screenshot"
 msgstr "Snímek obrazovky se nepodařilo pořídit"
+
+msgid "Couldn't try the move again"
+msgstr "Přesun se nepodařilo zkusit znovu"
 
 msgid "Couldn't undo the file changes."
 msgstr "Změny souborů se nepodařilo vrátit."
@@ -6348,6 +6380,9 @@ msgstr "Vytváří se úkol"
 
 msgid "Creating a workspace"
 msgstr "Vytváří se pracovní prostor"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Vytváří se pracovní prostor na tomto počítači…"
 
 msgid "Creating PR..."
 msgstr "Vytváření PR…"
@@ -11738,8 +11773,17 @@ msgstr "Přesunout {count} do skupiny"
 msgid "Move {name} to background"
 msgstr "Přesunout {name} na pozadí"
 
+msgid "Move this workspace to the cloud?"
+msgstr "Přesunout tento pracovní prostor do cloudu?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Přesunout tento pracovní prostor na tento počítač?"
+
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
+
+msgid "Move to cloud"
+msgstr "Přesunout do cloudu"
 
 msgid "Move to group"
 msgstr "Přesunout do skupiny"
@@ -11753,8 +11797,23 @@ msgstr "Přesunout doprava"
 msgid "Move to Tab"
 msgstr "Přesunout na kartu"
 
+msgid "Move to this computer"
+msgstr "Přesunout na tento počítač"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "„{name}“ přesunuto do skupiny {group}"
+
+msgid "Moving this chat here"
+msgstr "Tento chat se přesouvá sem"
+
+msgid "Moving this workspace here…"
+msgstr "Sem se přesouvá tento pracovní prostor…"
+
+msgid "Moving this workspace…"
+msgstr "Přesouvá se tento pracovní prostor…"
+
+msgid "Moving..."
+msgstr "Přesouvání..."
 
 msgid "Multi-select"
 msgstr "Výběr více možností"
@@ -16138,6 +16197,9 @@ msgstr "„{workspaceName}“ obnoven"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Obnovuji „{workspaceName}“…"
 
+msgid "Restoring Claude's session"
+msgstr "Obnovování relace Claude"
+
 msgid "Restoring your session"
 msgstr "Obnovuji vaši relaci"
 
@@ -16623,6 +16685,12 @@ msgstr "Uloženo do Stažených souborů"
 
 msgid "Saving as an environment..."
 msgstr "Ukládání jako prostředí..."
+
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Ukládá se práce cloudového pracovního prostoru a jeho chaty…"
+
+msgid "Saving your work and its chats…"
+msgstr "Ukládá se vaše práce a její chaty…"
 
 msgid "Saving..."
 msgstr "Ukládání…"
@@ -18325,8 +18393,14 @@ msgstr "Spouštím cloudový pracovní prostor"
 msgid "Starting the agent…"
 msgstr "Spouštění agenta…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Spouští se cloudový pracovní prostor…"
+
 msgid "Starting the simulator…"
 msgstr "Spouštění simulátoru…"
+
+msgid "Starting the workspace"
+msgstr "Spouštění pracovního prostoru"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Spouští se. Mělo by to trvat jen chvilku."
@@ -19129,6 +19203,9 @@ msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, z
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Další běh to zkusí znovu."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Práce cloudového pracovního prostoru, včetně nepotvrzených změn, se odešle do nové větve. Z této větve se spustí pracovní prostor na tomto počítači a každý chat s Claude tam bude pokračovat. Agenti, kteří pracují, se nejprve zastaví. Terminály a ostatní chaty zůstanou v cloudu."
+
 msgid "The code expired. Start again."
 msgstr "Platnost kódu vypršela. Začněte znovu."
 
@@ -19545,6 +19622,9 @@ msgstr "Nelze vrátit zpět."
 msgid "This channel is archived"
 msgstr "Tento kanál je archivovaný"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Tento chat se sem nepodařilo přesunout. Zůstává v pracovním prostoru, ze kterého přišel."
+
 msgid "This chat has ended."
 msgstr "Tento chat skončil."
 
@@ -19578,6 +19658,9 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
+msgid "This computer's host is not running"
+msgstr "Hostitel tohoto počítače neběží"
+
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -19607,6 +19690,9 @@ msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a po
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"
+
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Toto prostředí otevírá {environmentRepository}, ne {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozitáře tohoto prostředí jsou pevně dané; pro jejich změnu znovu povyšte pracovní prostor"
@@ -19905,6 +19991,9 @@ msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Tento pracovní prostor mohl být odstraněn, nebo k němu už nemáte přístup."
+
+msgid "This workspace moved"
+msgstr "Tento pracovní prostor byl přesunut"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Záznam tohoto pracovního prostoru pořád existuje, ale jeho složka worktree už na tomto hostu není. Terminály a operace se soubory nejsou k dispozici."
@@ -20659,6 +20748,9 @@ msgstr "Vyžadována aktualizace"
 
 msgid "update the branch prefix"
 msgstr "aktualizovat prefix větve"
+
+msgid "Update the host service on this device and try again."
+msgstr "Aktualizujte službu hostitele na tomto zařízení a zkuste to znovu."
 
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
@@ -22039,6 +22131,9 @@ msgstr "Vaše projekty a pracovní prostory z v1 se přenášejí do nového Par
 
 msgid "Your version: {currentVersion}"
 msgstr "Vaše verze: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Vaše práce, včetně nepotvrzených změn, se odešle do nové větve ve vzdáleném repozitáři. Z této větve se v prostředí, které vyberete, spustí cloudový pracovní prostor a každý chat s Claude tam bude pokračovat. Agenti, kteří pracují, se nejprve zastaví. Terminály a ostatní chaty zůstanou zde."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Přihlášení kódem zařízení pro Codex zapíná správce vašeho pracovního prostoru."

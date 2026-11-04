@@ -131,6 +131,12 @@ export function ChatPane({
 			<AcpChatPane
 				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}`}
 				agent={data.agent}
+				awaitingMove={data.awaitingMove}
+				onMoveArrived={() => {
+					const { awaitingMove: _arrived, ...rest } = latest.current;
+					latest.current = rest;
+					ctx.actions.updateData(rest);
+				}}
 				draftId={data.draftId}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={clearPendingPrompts}

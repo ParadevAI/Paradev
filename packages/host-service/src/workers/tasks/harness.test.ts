@@ -10,7 +10,11 @@ import { tmpdir } from "node:os";
 import * as path from "node:path";
 import { claudeProjectDirName } from "@superset/agent-setup/claude-project-links";
 import { HostWorkerPool } from "../host-worker-pool.ts";
-import { harnessTasks, harnessTranscriptTask } from "./harness.ts";
+import {
+	harnessSessionFileTask,
+	harnessTasks,
+	harnessTranscriptTask,
+} from "./harness.ts";
 
 const WORKER_ENTRY = path.resolve(import.meta.dirname, "..", "host-worker.ts");
 const NATIVE_MODULES = ["better-sqlite3", "node-pty", "@parcel/watcher"];
@@ -92,5 +96,37 @@ describe("harness worker tasks", () => {
 		});
 
 		expect(result).toEqual({ text: "User: off the loop", harness: "claude" });
+	});
+
+	test("locates a Claude session file on a worker thread, or reports none", async () => {
+		const configDir = mkdtempSync(path.join(tmpdir(), "harness-task-"));
+		cleanup.push(() => rmSync(configDir, { recursive: true, force: true }));
+		const sessionId = "66666666-7777-4888-9999-000011112222";
+		const dir = path.join(
+			configDir,
+			"projects",
+			claudeProjectDirName("/work/tree"),
+		);
+		mkdirSync(dir, { recursive: true });
+		const file = path.join(dir, `${sessionId}.jsonl`);
+		writeFileSync(file, "{}\n");
+		const pool = new HostWorkerPool({ scriptPathResolver: () => WORKER_ENTRY });
+		cleanup.push(() => pool.dispose());
+		const ref = (id: string) => ({
+			ref: {
+				agentId: "claude" as const,
+				sessionId: id,
+				worktreePath: "/work/tree",
+				env: { CLAUDE_CONFIG_DIR: configDir },
+			},
+		});
+
+		expect(await pool.run(harnessSessionFileTask, ref(sessionId))).toBe(file);
+		expect(
+			await pool.run(
+				harnessSessionFileTask,
+				ref("77777777-8888-4999-aaaa-bbbbccccdddd"),
+			),
+		).toBeNull();
 	});
 });

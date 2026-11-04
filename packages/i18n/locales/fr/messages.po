@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# fichier modifié} other {# fichiers modifiés}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat fermé} other {# chats fermés}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# discussion est restée dans l'ancien espace de travail} other {# discussions sont restées dans l'ancien espace de travail}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# commentaire joint} other {# commentaires joints}}"
@@ -353,6 +357,10 @@ msgstr "{0, plural, one {issue Linear} other {issues Linear}}"
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Déplacer # espace de travail sélectionné vers un groupe} other {Déplacer # espaces de travail sélectionnés vers un groupe}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Déplacement de # discussion ici…} other {Déplacement de # discussions ici…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1081,6 +1089,9 @@ msgstr "{localHostName} (cet appareil)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Copie de la conversation (# message)} many {Copie de la conversation (# messages)} other {Copie de la conversation (# messages)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} objectifs sur {0} tirent leur poids pour {nextLabel} — {laggingLabels} sont les plus en retard."
@@ -1273,6 +1284,9 @@ msgstr "{rate} par Go-heure. Utilisées après la réserve mensuelle, elles n'ex
 msgid "{readPercent}% read"
 msgstr "{readPercent} % lu"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} discussions sur {total} ont été déplacées ici"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1315,6 +1329,9 @@ msgstr "{starCount} étoiles, et ça continue"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisation lancée} other {# automatisations lancées}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Cet espace de travail a été déplacé. # discussion est restée ici.} other {Cet espace de travail a été déplacé. # discussions sont restées ici.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# sous-agent en cours} other {# sous-agents en cours}}"
@@ -1953,6 +1970,9 @@ msgstr "Ajouter {0} à un espace de travail"
 
 msgid "Add {localizedName}?"
 msgstr "Ajouter {localizedName} ?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Ajoutez d'abord {repositoryName} comme projet sur cet ordinateur"
 
 msgid "Add a comment…"
 msgstr "Ajouter un commentaire…"
@@ -5499,6 +5519,9 @@ msgstr "Copiez votre historique de navigation et vos identifiants depuis un autr
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Copiez votre clé maintenant — vous ne pourrez plus la voir ensuite."
 
+msgid "Copying the conversation"
+msgstr "Copie de la conversation"
+
 msgid "Copyright or trademark"
 msgstr "Droit d'auteur ou marque"
 
@@ -5935,6 +5958,12 @@ msgstr "Impossible de fusionner la pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Impossible de passer le sous-agent en arrière-plan"
 
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Impossible de déplacer cet espace de travail vers le cloud"
+
+msgid "Couldn't move this workspace to this computer"
+msgstr "Impossible de déplacer cet espace de travail vers cet ordinateur"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossible de nommer « {name} » automatiquement"
 
@@ -6078,6 +6107,9 @@ msgstr "Impossible d'arrêter la discussion"
 
 msgid "Couldn't take a screenshot"
 msgstr "Impossible de faire la capture d’écran"
+
+msgid "Couldn't try the move again"
+msgstr "Impossible de relancer le déplacement"
 
 msgid "Couldn't undo the file changes."
 msgstr "Impossible d'annuler les modifications de fichiers."
@@ -6348,6 +6380,9 @@ msgstr "Création d’une tâche"
 
 msgid "Creating a workspace"
 msgstr "Création d’un espace de travail"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Création d'un espace de travail sur cet ordinateur…"
 
 msgid "Creating PR..."
 msgstr "Création de la PR…"
@@ -11738,8 +11773,17 @@ msgstr "Déplacer {count} vers un groupe"
 msgid "Move {name} to background"
 msgstr "Passer {name} en arrière-plan"
 
+msgid "Move this workspace to the cloud?"
+msgstr "Déplacer cet espace de travail vers le cloud ?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Déplacer cet espace de travail vers cet ordinateur ?"
+
 msgid "Move to background"
 msgstr "Passer en arrière-plan"
+
+msgid "Move to cloud"
+msgstr "Déplacer vers le cloud"
 
 msgid "Move to group"
 msgstr "Déplacer vers un groupe"
@@ -11753,8 +11797,23 @@ msgstr "Déplacer à droite"
 msgid "Move to Tab"
 msgstr "Déplacer vers un onglet"
 
+msgid "Move to this computer"
+msgstr "Déplacer vers cet ordinateur"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "« {name} » déplacée vers {group}"
+
+msgid "Moving this chat here"
+msgstr "Déplacement de cette discussion ici"
+
+msgid "Moving this workspace here…"
+msgstr "Déplacement de cet espace de travail ici…"
+
+msgid "Moving this workspace…"
+msgstr "Déplacement de cet espace de travail…"
+
+msgid "Moving..."
+msgstr "Déplacement..."
 
 msgid "Multi-select"
 msgstr "Sélection multiple"
@@ -16138,6 +16197,9 @@ msgstr "« {workspaceName} » restauré"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restauration de « {workspaceName} »…"
 
+msgid "Restoring Claude's session"
+msgstr "Restauration de la session de Claude"
+
 msgid "Restoring your session"
 msgstr "Restauration de votre session"
 
@@ -16623,6 +16685,12 @@ msgstr "Enregistré dans Téléchargements"
 
 msgid "Saving as an environment..."
 msgstr "Enregistrement comme environnement..."
+
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Enregistrement du travail de l'espace de travail cloud et de ses discussions…"
+
+msgid "Saving your work and its chats…"
+msgstr "Enregistrement de votre travail et de ses discussions…"
 
 msgid "Saving..."
 msgstr "Enregistrement..."
@@ -18325,8 +18393,14 @@ msgstr "Démarrage de l'espace de travail cloud"
 msgid "Starting the agent…"
 msgstr "Démarrage de l'agent…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Démarrage de l'espace de travail cloud…"
+
 msgid "Starting the simulator…"
 msgstr "Démarrage du simulateur…"
+
+msgid "Starting the workspace"
+msgstr "Démarrage de l'espace de travail"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Démarrage en cours. Cela ne devrait prendre qu’un instant."
@@ -19129,6 +19203,9 @@ msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui q
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "L'espace de travail cloud aurait dû démarrer, mais n'a pas répondu à temps. La prochaine exécution réessaiera."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "Le travail de l'espace de travail cloud, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur cet ordinateur démarre depuis cette branche, et chaque discussion Claude s'y poursuit. Les agents qui travaillent s'arrêtent d'abord. Les terminaux et les autres discussions restent dans le cloud."
+
 msgid "The code expired. Start again."
 msgstr "Le code a expiré. Recommencez."
 
@@ -19545,6 +19622,9 @@ msgstr "Cette action est irréversible."
 msgid "This channel is archived"
 msgstr "Ce canal est archivé"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Cette discussion n'a pas pu être déplacée ici. Elle est toujours dans l'espace de travail d'où elle vient."
+
 msgid "This chat has ended."
 msgstr "Ce chat est terminé."
 
@@ -19578,6 +19658,9 @@ msgstr "Impossible de démarrer cet espace de travail cloud"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Cet espace de travail cloud est en train de se réveiller, ce qui peut prendre jusqu’à 30 secondes après une période d’inactivité."
 
+msgid "This computer's host is not running"
+msgstr "L'hôte de cet ordinateur ne fonctionne pas"
+
 msgid "This conversation is too long for the model"
 msgstr "Cette conversation est trop longue pour le modèle"
 
@@ -19607,6 +19690,9 @@ msgstr "Cet e-mail est déjà enregistré avec une autre méthode de connexion e
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Cet environnement n'a aucun dépôt. Créez un environnement avec des dépôts dans les Paramètres, puis lancez l'espace de travail à partir de celui-ci"
+
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Cet environnement ouvre {environmentRepository}, et non {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Les dépôts de cet environnement sont figés ; promouvez à nouveau un espace de travail pour les modifier"
@@ -19905,6 +19991,9 @@ msgstr "Cet espace de travail n'a aucun projet depuis lequel dupliquer"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Cet espace de travail a peut-être été supprimé, ou vous n'y avez plus accès."
+
+msgid "This workspace moved"
+msgstr "Cet espace de travail a été déplacé"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "L'enregistrement de cet espace de travail existe toujours, mais son dossier worktree n'est plus sur cet hôte. Les terminaux et les actions sur les fichiers sont indisponibles."
@@ -20659,6 +20748,9 @@ msgstr "Mise à jour requise"
 
 msgid "update the branch prefix"
 msgstr "mettre à jour le préfixe de branche"
+
+msgid "Update the host service on this device and try again."
+msgstr "Mettez à jour le service hôte sur cet appareil, puis réessayez."
 
 msgid "Update this host to message subagents"
 msgstr "Mettez à jour cet hôte pour envoyer des messages aux sous-agents"
@@ -22039,6 +22131,9 @@ msgstr "Vos projets et espaces de travail v1 sont transférés vers le nouveau P
 
 msgid "Your version: {currentVersion}"
 msgstr "Votre version : {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Votre travail, y compris les modifications non commitées, est poussé vers une nouvelle branche sur le dépôt distant. Un espace de travail cloud démarre depuis cette branche dans l'environnement que vous choisissez, et chaque discussion Claude s'y poursuit. Les agents qui travaillent s'arrêtent d'abord. Les terminaux et les autres discussions restent ici."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "L’administrateur de votre espace de travail active la connexion par code d’appareil pour Codex."

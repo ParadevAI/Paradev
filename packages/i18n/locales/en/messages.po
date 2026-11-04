@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# changed file} other {# changed files}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat closed} other {# chats closed}}"
 
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -353,6 +357,10 @@ msgstr "{0, plural, one {Linear issue} other {Linear issues}}"
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1081,6 +1089,9 @@ msgstr "{localHostName} (this device)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
 msgstr "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1273,6 +1284,9 @@ msgstr "{rate} per GB-hour. Used after the monthly pool, and never expire."
 msgid "{readPercent}% read"
 msgstr "{readPercent}% read"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} of {total} chats moved here"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1315,6 +1329,9 @@ msgstr "{starCount} stars and counting"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Started # automation} other {Started # automations}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
@@ -1953,6 +1970,9 @@ msgstr "Add {0} to workspace"
 
 msgid "Add {localizedName}?"
 msgstr "Add {localizedName}?"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Add {repositoryName} as a project on this computer first"
 
 msgid "Add a comment…"
 msgstr "Add a comment…"
@@ -5499,6 +5519,9 @@ msgstr "Copy your browsing history and logins from another browser into Paradev.
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Copy your key now — you won't be able to see it again."
 
+msgid "Copying the conversation"
+msgstr "Copying the conversation"
+
 msgid "Copyright or trademark"
 msgstr "Copyright or trademark"
 
@@ -5935,6 +5958,12 @@ msgstr "Couldn't merge pull request"
 msgid "Couldn't move the subagent to the background"
 msgstr "Couldn't move the subagent to the background"
 
+msgid "Couldn't move this workspace to the cloud"
+msgstr "Couldn't move this workspace to the cloud"
+
+msgid "Couldn't move this workspace to this computer"
+msgstr "Couldn't move this workspace to this computer"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
 
@@ -6078,6 +6107,9 @@ msgstr "Couldn't stop the chat"
 
 msgid "Couldn't take a screenshot"
 msgstr "Couldn't take a screenshot"
+
+msgid "Couldn't try the move again"
+msgstr "Couldn't try the move again"
 
 msgid "Couldn't undo the file changes."
 msgstr "Couldn't undo the file changes."
@@ -6348,6 +6380,9 @@ msgstr "Creating a task"
 
 msgid "Creating a workspace"
 msgstr "Creating a workspace"
+
+msgid "Creating a workspace on this computer…"
+msgstr "Creating a workspace on this computer…"
 
 msgid "Creating PR..."
 msgstr "Creating PR..."
@@ -11738,8 +11773,17 @@ msgstr "Move {count} to Group"
 msgid "Move {name} to background"
 msgstr "Move {name} to background"
 
+msgid "Move this workspace to the cloud?"
+msgstr "Move this workspace to the cloud?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Move this workspace to this computer?"
+
 msgid "Move to background"
 msgstr "Move to background"
+
+msgid "Move to cloud"
+msgstr "Move to cloud"
 
 msgid "Move to group"
 msgstr "Move to group"
@@ -11753,8 +11797,23 @@ msgstr "Move to Right Side"
 msgid "Move to Tab"
 msgstr "Move to Tab"
 
+msgid "Move to this computer"
+msgstr "Move to this computer"
+
 msgid "Moved \"{name}\" to {group}"
 msgstr "Moved \"{name}\" to {group}"
+
+msgid "Moving this chat here"
+msgstr "Moving this chat here"
+
+msgid "Moving this workspace here…"
+msgstr "Moving this workspace here…"
+
+msgid "Moving this workspace…"
+msgstr "Moving this workspace…"
+
+msgid "Moving..."
+msgstr "Moving..."
 
 msgid "Multi-select"
 msgstr "Multi-select"
@@ -16138,6 +16197,9 @@ msgstr "Restored \"{workspaceName}\""
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restoring \"{workspaceName}\"…"
 
+msgid "Restoring Claude's session"
+msgstr "Restoring Claude's session"
+
 msgid "Restoring your session"
 msgstr "Restoring your session"
 
@@ -16623,6 +16685,12 @@ msgstr "Saved to Downloads"
 
 msgid "Saving as an environment..."
 msgstr "Saving as an environment..."
+
+msgid "Saving the cloud workspace's work and its chats…"
+msgstr "Saving the cloud workspace's work and its chats…"
+
+msgid "Saving your work and its chats…"
+msgstr "Saving your work and its chats…"
 
 msgid "Saving..."
 msgstr "Saving..."
@@ -18325,8 +18393,14 @@ msgstr "Starting cloud workspace"
 msgid "Starting the agent…"
 msgstr "Starting the agent…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Starting the cloud workspace…"
+
 msgid "Starting the simulator…"
 msgstr "Starting the simulator…"
+
+msgid "Starting the workspace"
+msgstr "Starting the workspace"
 
 msgid "Starting up. This should only take a moment."
 msgstr "Starting up. This should only take a moment."
@@ -19129,6 +19203,9 @@ msgstr "The chat stays as it is. Files edited since this turn, by anyone, are le
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "The cloud workspace should have started but didn't answer in time. The next run tries again."
 
+msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+msgstr "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
+
 msgid "The code expired. Start again."
 msgstr "The code expired. Start again."
 
@@ -19545,6 +19622,9 @@ msgstr "This cannot be undone."
 msgid "This channel is archived"
 msgstr "This channel is archived"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "This chat couldn't move here. It is still in the workspace it came from."
+
 msgid "This chat has ended."
 msgstr "This chat has ended."
 
@@ -19578,6 +19658,9 @@ msgstr "This cloud workspace can't start"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 
+msgid "This computer's host is not running"
+msgstr "This computer's host is not running"
+
 msgid "This conversation is too long for the model"
 msgstr "This conversation is too long for the model"
 
@@ -19607,6 +19690,9 @@ msgstr "This email is already registered with another sign-in method, and the pr
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
+
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "This environment opens {environmentRepository}, not {repository}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "This environment's repositories are fixed; promote a workspace again to change them"
@@ -19905,6 +19991,9 @@ msgstr "This workspace has no project to branch from"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "This workspace may have been removed, or you no longer have access to it."
+
+msgid "This workspace moved"
+msgstr "This workspace moved"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
@@ -20659,6 +20748,9 @@ msgstr "Update Required"
 
 msgid "update the branch prefix"
 msgstr "update the branch prefix"
+
+msgid "Update the host service on this device and try again."
+msgstr "Update the host service on this device and try again."
 
 msgid "Update this host to message subagents"
 msgstr "Update this host to message subagents"
@@ -22039,6 +22131,9 @@ msgstr "Your v1 projects and workspaces are moving to the new Paradev. They appe
 
 msgid "Your version: {currentVersion}"
 msgstr "Your version: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Your workspace admin turns on device code sign-in for Codex."

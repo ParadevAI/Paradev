@@ -24,6 +24,7 @@ afterEach(async () => {
 function setup(
 	options: {
 		reject?: (input: PushInput) => boolean;
+		rejectCode?: string;
 		harnessSessionId?: string;
 	} = {},
 ) {
@@ -37,8 +38,8 @@ function setup(
 			push: {
 				mutate: async (input: PushInput) => {
 					if (reject(input)) {
-						throw Object.assign(new Error("bad event"), {
-							data: { code: "BAD_REQUEST" },
+						throw Object.assign(new Error("rejected"), {
+							data: { code: options.rejectCode ?? "BAD_REQUEST" },
 						});
 					}
 					pushes.push(input);
@@ -161,5 +162,46 @@ describe("createChatSync", () => {
 		const order = pushes.map((push) => push.sessionId);
 		expect(order).toHaveLength(3);
 		expect(order.indexOf(OTHER_CHAT)).toBeLessThan(order.lastIndexOf(CHAT));
+	});
+
+	test("a host that does not sync keeps pushing a chat it follows", async () => {
+		const { sync, pushes, say, timers, appended } = setup();
+		say("before");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		expect(timers).toHaveLength(0);
+
+		sync.follow(CHAT);
+		say("during");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		timers.shift()?.();
+		await Bun.sleep(0);
+		expect(pushes.flatMap((push) => push.events.map((e) => e.seq))).toEqual([
+			1, 2,
+		]);
+	});
+
+	test("stops following a chat once the API says it moved", async () => {
+		let movedAway = false;
+		const { sync, pushes, say, timers, appended } = setup({
+			reject: () => movedAway,
+			rejectCode: "CONFLICT",
+		});
+		sync.follow(CHAT);
+		say("a");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		timers.shift()?.();
+		await Bun.sleep(0);
+		expect(pushes).toHaveLength(1);
+
+		movedAway = true;
+		say("b");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		timers.shift()?.();
+		await Bun.sleep(0);
+
+		say("c");
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+		expect(timers).toHaveLength(0);
+		expect(pushes).toHaveLength(1);
 	});
 });
