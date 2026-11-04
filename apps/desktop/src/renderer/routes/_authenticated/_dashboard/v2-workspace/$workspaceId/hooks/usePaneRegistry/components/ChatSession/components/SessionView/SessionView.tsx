@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import type { SessionClient } from "@superset/chat/client";
 import {
 	deriveQueuedPrompts,
