@@ -1,0 +1,1 @@
+export { currentModelOf } from "./currentModelOf";
