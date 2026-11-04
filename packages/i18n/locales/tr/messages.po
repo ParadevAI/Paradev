@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: kapatma başarısız"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} other {# worktree}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{repoLabel} içinde {worktreeLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "Kullanıcı başına {yearlyTotal}, yıllık faturalandırılır"
 
@@ -5262,9 +5265,6 @@ msgstr "Bağlam penceresi: {percent} kullanıldı"
 msgid "Continue"
 msgstr "Devam et"
 
-msgid "Continue from {toolNames}"
-msgstr "{toolNames} üzerinden devam et"
-
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
@@ -8986,9 +8986,6 @@ msgstr "Form denetimleri ve alan kompozisyonu"
 msgid "Forward"
 msgstr "İleri"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "{repoLabel} içinde {worktreeLabel} bulundu. Branch'ler ve commit edilmemiş değişiklikler olduğu gibi kalır."
-
 msgid "Found 12 tooltip call sites"
 msgstr "12 tooltip çağrı noktası bulundu"
 
@@ -9855,6 +9852,9 @@ msgstr "İçe aktarma başarısız"
 
 msgid "Import failed: {message}"
 msgstr "İçe aktarma başarısız: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "{toolNames} üzerinden içe aktar"
 
 msgid "Import from file"
 msgstr "Dosyadan içe aktar"

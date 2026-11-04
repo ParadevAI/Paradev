@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: ティアダウンに失敗しました"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {#件のワークツリー} other {#件のワークツリー}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{repoLabel}に{worktreeLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "年払いで1ユーザーあたり{yearlyTotal}"
 
@@ -5262,9 +5265,6 @@ msgstr "コンテキストウィンドウ: {percent} 使用済み"
 msgid "Continue"
 msgstr "続行"
 
-msgid "Continue from {toolNames}"
-msgstr "{toolNames}から引き継ぐ"
-
 msgid "Continue in your browser"
 msgstr "ブラウザで続行してください"
 
@@ -8986,9 +8986,6 @@ msgstr "フォームコントロールとフィールドの組み立て"
 msgid "Forward"
 msgstr "進む"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "{repoLabel}で{worktreeLabel}が見つかりました。ブランチと未コミットの変更はそのまま残ります。"
-
 msgid "Found 12 tooltip call sites"
 msgstr "tooltipの呼び出し元を12か所検出"
 
@@ -9855,6 +9852,9 @@ msgstr "インポートに失敗しました"
 
 msgid "Import failed: {message}"
 msgstr "インポートに失敗しました: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "{toolNames}からインポート"
 
 msgid "Import from file"
 msgstr "ファイルからインポート"

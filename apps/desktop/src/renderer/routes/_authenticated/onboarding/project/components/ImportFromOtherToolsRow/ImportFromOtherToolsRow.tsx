@@ -1,11 +1,10 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { formatList } from "@superset/i18n/format";
-import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LuArrowDownToLine } from "react-icons/lu";
+import { LuArrowDownToLine, LuChevronRight } from "react-icons/lu";
 import { track } from "renderer/lib/analytics";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
@@ -135,21 +134,24 @@ export function ImportFromOtherToolsRow({
 	});
 
 	return (
-		<div className="flex items-center gap-3 rounded-lg bg-foreground/[0.05] p-4">
+		<button
+			type="button"
+			onClick={handleImport}
+			disabled={disabled || importing}
+			className="flex items-center gap-3 rounded-lg bg-foreground/[0.05] p-4 text-left outline-none transition-colors hover:bg-foreground/[0.09] focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+		>
 			<LuArrowDownToLine className="size-5 shrink-0 text-foreground" />
-			<div className="flex min-w-0 flex-1 flex-col">
+			<span className="flex min-w-0 flex-1 flex-col">
 				<span className="truncate font-medium text-foreground text-sm">
-					{t({ message: `Continue from ${toolNames}` })}
+					{t({ message: `Import from ${toolNames}` })}
 				</span>
 				<span className="truncate text-muted-foreground text-xs">
-					{t({
-						message: `Found ${worktreeLabel} in ${repoLabel}. Branches and uncommitted changes stay as they are.`,
-					})}
+					{importing
+						? t`Importing…`
+						: t({ message: `${worktreeLabel} in ${repoLabel}` })}
 				</span>
-			</div>
-			<Button size="sm" onClick={handleImport} disabled={disabled || importing}>
-				{importing ? t`Importing…` : t`Import`}
-			</Button>
-		</div>
+			</span>
+			<LuChevronRight className="size-4 shrink-0 text-muted-foreground" />
+		</button>
 	);
 }

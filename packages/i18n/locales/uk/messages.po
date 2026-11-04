@@ -1422,6 +1422,9 @@ msgstr "{workspaceName}: не вдалося виконати очищення"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} ({repoLabel})"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за користувача в разі річної оплати"
 
@@ -5256,9 +5259,6 @@ msgstr "Контекстне вікно: використано {percent}"
 msgid "Continue"
 msgstr "Продовжити"
 
-msgid "Continue from {toolNames}"
-msgstr "Продовжити з {toolNames}"
-
 msgid "Continue in your browser"
 msgstr "Продовжте в браузері"
 
@@ -8980,9 +8980,6 @@ msgstr "Елементи форм і компонування полів"
 msgid "Forward"
 msgstr "Уперед"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "Знайдено: {worktreeLabel} ({repoLabel}). Гілки та незакомічені зміни залишаться як є."
-
 msgid "Found 12 tooltip call sites"
 msgstr "Знайдено 12 місць виклику підказок"
 
@@ -9849,6 +9846,9 @@ msgstr "Не вдалося імпортувати"
 
 msgid "Import failed: {message}"
 msgstr "Не вдалося імпортувати: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Імпортувати з {toolNames}"
 
 msgid "Import from file"
 msgstr "Імпортувати з файлу"

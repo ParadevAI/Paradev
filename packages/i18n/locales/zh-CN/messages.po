@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}：清理失败"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {#个worktree} other {#个worktree}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{repoLabel}中的{worktreeLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "每用户{yearlyTotal}，按年计费"
 
@@ -5262,9 +5265,6 @@ msgstr "上下文窗口：已使用 {percent}"
 msgid "Continue"
 msgstr "继续"
 
-msgid "Continue from {toolNames}"
-msgstr "从 {toolNames} 继续"
-
 msgid "Continue in your browser"
 msgstr "请在浏览器中继续"
 
@@ -8986,9 +8986,6 @@ msgstr "表单控件与字段组合"
 msgid "Forward"
 msgstr "前进"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "在{repoLabel}中找到{worktreeLabel}。分支和未提交的更改保持不变。"
-
 msgid "Found 12 tooltip call sites"
 msgstr "找到12处tooltip调用"
 
@@ -9855,6 +9852,9 @@ msgstr "导入失败"
 
 msgid "Import failed: {message}"
 msgstr "导入失败：{message}"
+
+msgid "Import from {toolNames}"
+msgstr "从 {toolNames} 导入"
 
 msgid "Import from file"
 msgstr "从文件导入"

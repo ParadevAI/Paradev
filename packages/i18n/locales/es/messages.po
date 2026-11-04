@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: falló la limpieza"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} en {repoLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} por usuario, facturación anual"
 
@@ -5262,9 +5265,6 @@ msgstr "Ventana de contexto: {percent} usado"
 msgid "Continue"
 msgstr "Continuar"
 
-msgid "Continue from {toolNames}"
-msgstr "Continuar desde {toolNames}"
-
 msgid "Continue in your browser"
 msgstr "Continúa en tu navegador"
 
@@ -8986,9 +8986,6 @@ msgstr "Controles de formulario y composición de campos"
 msgid "Forward"
 msgstr "Adelante"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "Encontrado: {worktreeLabel} en {repoLabel}. Las ramas y los cambios sin confirmar se mantienen tal cual."
-
 msgid "Found 12 tooltip call sites"
 msgstr "Se encontraron 12 puntos de llamada a tooltip"
 
@@ -9855,6 +9852,9 @@ msgstr "Error al importar"
 
 msgid "Import failed: {message}"
 msgstr "Error al importar: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Importar desde {toolNames}"
 
 msgid "Import from file"
 msgstr "Importar desde un archivo"

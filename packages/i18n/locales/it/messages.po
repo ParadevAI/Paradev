@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: teardown non riuscito"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} other {# worktree}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} in {repoLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per utente, fatturazione annuale"
 
@@ -5262,9 +5265,6 @@ msgstr "Finestra di contesto: {percent} utilizzato"
 msgid "Continue"
 msgstr "Continua"
 
-msgid "Continue from {toolNames}"
-msgstr "Continua da {toolNames}"
-
 msgid "Continue in your browser"
 msgstr "Continua nel browser"
 
@@ -8986,9 +8986,6 @@ msgstr "Controlli dei form e composizione dei campi"
 msgid "Forward"
 msgstr "Avanti"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "Trovato: {worktreeLabel} in {repoLabel}. Branch e modifiche non sottoposte a commit restano invariati."
-
 msgid "Found 12 tooltip call sites"
 msgstr "Trovati 12 punti di chiamata dei tooltip"
 
@@ -9855,6 +9852,9 @@ msgstr "Importazione non riuscita"
 
 msgid "Import failed: {message}"
 msgstr "Importazione non riuscita: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Importa da {toolNames}"
 
 msgid "Import from file"
 msgstr "Importa da file"

@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: 정리에 실패했습니다"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {worktree #개} other {worktree #개}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{repoLabel}에 {worktreeLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "사용자당 {yearlyTotal}, 연간 결제"
 
@@ -5262,9 +5265,6 @@ msgstr "컨텍스트 창: {percent} 사용됨"
 msgid "Continue"
 msgstr "계속"
 
-msgid "Continue from {toolNames}"
-msgstr "{toolNames}에서 이어서 작업"
-
 msgid "Continue in your browser"
 msgstr "브라우저에서 계속하세요"
 
@@ -8986,9 +8986,6 @@ msgstr "폼 컨트롤과 필드 구성"
 msgid "Forward"
 msgstr "앞으로"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "{repoLabel}에서 {worktreeLabel}를 찾았습니다. 브랜치와 커밋되지 않은 변경 사항은 그대로 유지됩니다."
-
 msgid "Found 12 tooltip call sites"
 msgstr "툴팁 호출 지점 12곳 발견"
 
@@ -9855,6 +9852,9 @@ msgstr "가져오기 실패"
 
 msgid "Import failed: {message}"
 msgstr "가져오기 실패: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "{toolNames}에서 가져오기"
 
 msgid "Import from file"
 msgstr "파일에서 가져오기"

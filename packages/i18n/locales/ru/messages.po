@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: не удалось выполнить очистку"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} ({repoLabel})"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за пользователя при годовой оплате"
 
@@ -5262,9 +5265,6 @@ msgstr "Контекстное окно: использовано {percent}"
 msgid "Continue"
 msgstr "Продолжить"
 
-msgid "Continue from {toolNames}"
-msgstr "Продолжить из {toolNames}"
-
 msgid "Continue in your browser"
 msgstr "Продолжите в браузере"
 
@@ -8986,9 +8986,6 @@ msgstr "Элементы формы и композиция полей"
 msgid "Forward"
 msgstr "Вперёд"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "Найдено: {worktreeLabel} ({repoLabel}). Ветки и незакоммиченные изменения останутся как есть."
-
 msgid "Found 12 tooltip call sites"
 msgstr "Найдено 12 мест вызова tooltip"
 
@@ -9855,6 +9852,9 @@ msgstr "Не удалось импортировать"
 
 msgid "Import failed: {message}"
 msgstr "Не удалось импортировать: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Импортировать из {toolNames}"
 
 msgid "Import from file"
 msgstr "Импорт из файла"

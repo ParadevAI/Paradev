@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: Teardown fehlgeschlagen"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# Worktree} other {# Worktrees}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} in {repoLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} pro Nutzer, jährlich abgerechnet"
 
@@ -5262,9 +5265,6 @@ msgstr "Kontextfenster: {percent} verbraucht"
 msgid "Continue"
 msgstr "Weiter"
 
-msgid "Continue from {toolNames}"
-msgstr "Von {toolNames} übernehmen"
-
 msgid "Continue in your browser"
 msgstr "Im Browser fortfahren"
 
@@ -8986,9 +8986,6 @@ msgstr "Formularelemente und Feldaufbau"
 msgid "Forward"
 msgstr "Vorwärts"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "{worktreeLabel} in {repoLabel} gefunden. Branches und nicht committete Änderungen bleiben unverändert."
-
 msgid "Found 12 tooltip call sites"
 msgstr "12 Tooltip-Aufrufstellen gefunden"
 
@@ -9855,6 +9852,9 @@ msgstr "Import fehlgeschlagen"
 
 msgid "Import failed: {message}"
 msgstr "Import fehlgeschlagen: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Aus {toolNames} importieren"
 
 msgid "Import from file"
 msgstr "Aus Datei importieren"

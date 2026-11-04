@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: teardown selhal"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} ({repoLabel})"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} na uživatele, účtováno ročně"
 
@@ -5262,9 +5265,6 @@ msgstr "Kontextové okno: využito {percent}"
 msgid "Continue"
 msgstr "Pokračovat"
 
-msgid "Continue from {toolNames}"
-msgstr "Pokračovat z {toolNames}"
-
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
@@ -8986,9 +8986,6 @@ msgstr "Prvky formuláře a skládání polí"
 msgid "Forward"
 msgstr "Vpřed"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "Nalezeno: {worktreeLabel} ({repoLabel}). Větve a necommitnuté změny zůstanou beze změny."
-
 msgid "Found 12 tooltip call sites"
 msgstr "Nalezeno 12 volání tooltipu"
 
@@ -9855,6 +9852,9 @@ msgstr "Import selhal"
 
 msgid "Import failed: {message}"
 msgstr "Import selhal: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Importovat z {toolNames}"
 
 msgid "Import from file"
 msgstr "Importovat ze souboru"

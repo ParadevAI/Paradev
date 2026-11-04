@@ -1428,6 +1428,9 @@ msgstr "{workspaceName}: o teardown falhou"
 msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 msgstr "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 
+msgid "{worktreeLabel} in {repoLabel}"
+msgstr "{worktreeLabel} em {repoLabel}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} por usuário, cobrança anual"
 
@@ -5262,9 +5265,6 @@ msgstr "Janela de contexto: {percent} usado"
 msgid "Continue"
 msgstr "Continuar"
 
-msgid "Continue from {toolNames}"
-msgstr "Continuar de {toolNames}"
-
 msgid "Continue in your browser"
 msgstr "Continue no seu navegador"
 
@@ -8986,9 +8986,6 @@ msgstr "Controles de formulário e composição de campos"
 msgid "Forward"
 msgstr "Avançar"
 
-msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
-msgstr "Encontrado: {worktreeLabel} em {repoLabel}. Branches e alterações não commitadas continuam como estão."
-
 msgid "Found 12 tooltip call sites"
 msgstr "12 pontos de chamada de tooltip encontrados"
 
@@ -9855,6 +9852,9 @@ msgstr "Falha na importação"
 
 msgid "Import failed: {message}"
 msgstr "Falha na importação: {message}"
+
+msgid "Import from {toolNames}"
+msgstr "Importar de {toolNames}"
 
 msgid "Import from file"
 msgstr "Importar de um arquivo"
