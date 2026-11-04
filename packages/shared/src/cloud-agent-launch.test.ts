@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import {
+	CLOUD_AGENT_LAUNCH_ENV_NAMES,
 	cloudAgentLaunchSchema,
 	cloudAgentLaunchToEnv,
 	describeCloudAgentLaunch,
@@ -7,6 +8,7 @@ import {
 	readCloudAgentLaunch,
 	supportsCloudAgentChat,
 } from "./cloud-agent-launch";
+import { sandboxIdentitySchema } from "./sandbox-contract";
 
 const fileId = "0b8f3c1e-5a2d-4f6b-9c7e-1d2e3f4a5b6c";
 
@@ -135,5 +137,12 @@ describe("cloud agent launch", () => {
 		expect(
 			cloudAgentLaunchSchema.safeParse({ agent: "nope", prompt: "" }).success,
 		).toBe(false);
+	});
+
+	it("writes every launch variable into sandbox.conf instead of stripping it", () => {
+		const keys = Object.keys(sandboxIdentitySchema.shape);
+		expect(
+			CLOUD_AGENT_LAUNCH_ENV_NAMES.filter((name) => !keys.includes(name)),
+		).toEqual([]);
 	});
 });
