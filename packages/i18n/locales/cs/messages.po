@@ -1886,6 +1886,9 @@ msgstr "Účet čeká na smazání"
 msgid "Account usage"
 msgstr "Využití účtu"
 
+msgid "Account usage: {limit} {used} used"
+msgstr "Využití účtu: {limit} – využito {used}"
+
 msgid "Achievements"
 msgstr "Úspěchy"
 
@@ -2282,9 +2285,6 @@ msgstr "Běh agenta selhal"
 
 msgid "Agent self-verification"
 msgstr "Sebeověření agenta"
-
-msgid "agent session ID"
-msgstr "ID relace agenta"
 
 msgid "Agent session started"
 msgstr "Relace agenta spuštěna"
@@ -4099,8 +4099,8 @@ msgstr "Chat se předělává"
 msgid "Chat Launch"
 msgstr "Spuštění chatu"
 
-msgid "Chat mode"
-msgstr "Režim chatu"
+msgid "Chat menu"
+msgstr "Nabídka chatu"
 
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
@@ -4400,9 +4400,6 @@ msgstr "CLI a SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentace CLI"
-
-msgid "CLI mode"
-msgstr "Režim CLI"
 
 msgid "CLI reference"
 msgstr "Reference CLI"
@@ -5243,9 +5240,6 @@ msgstr "Pokračovat"
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
-msgid "Continue or fork session"
-msgstr "Pokračovat nebo forkovat relaci"
-
 msgid "Continue the session the last run left"
 msgstr "Pokračovat v relaci, kterou zanechalo poslední spuštění"
 
@@ -5324,8 +5318,8 @@ msgstr "Zkopírováno"
 msgid "Copied {0}"
 msgstr "Zkopírováno {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Zkopírováno: {copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "ID relace agenta zkopírováno"
 
 msgid "Copied Link"
 msgstr "Odkaz zkopírován"
@@ -5394,9 +5388,6 @@ msgid "Copy file name"
 msgstr "Kopírovat název souboru"
 
 msgid "Copy ID"
-msgstr "Kopírovat ID"
-
-msgid "Copy IDs"
 msgstr "Kopírovat ID"
 
 msgid "Copy image"
@@ -5561,6 +5552,9 @@ msgstr "Nepodařilo se připojit {plugin}. Zkuste to znovu."
 
 msgid "Could not copy the link"
 msgstr "Odkaz se nepodařilo zkopírovat"
+
+msgid "Could not copy to the clipboard"
+msgstr "Kopírování do schránky se nezdařilo"
 
 msgid "Could not create cloud workspace"
 msgstr "Nepodařilo se vytvořit cloudový pracovní prostor"
@@ -15352,6 +15346,9 @@ msgstr "Nedávná aktivita"
 msgid "Recent apps"
 msgstr "Nedávné aplikace"
 
+msgid "Recent chats"
+msgstr "Nedávné chaty"
+
 msgid "Recent invoices"
 msgstr "Poslední faktury"
 
@@ -16724,6 +16721,9 @@ msgstr "Vyhledat vývojáře"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Hledejte v obsahu souborů a napříč všemi pracovními prostory naráz."
+
+msgid "Search all chats…"
+msgstr "Hledat ve všech chatech…"
 
 msgid "Search all emoji"
 msgstr "Hledat všechny emoji"
@@ -18953,9 +18953,6 @@ msgstr "Velikost písma terminálu"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Velikost písma terminálu, když má terminál fokus, přiblížení stránky v panelu prohlížeče, jinak celá aplikace"
-
-msgid "terminal ID"
-msgstr "ID terminálu"
 
 msgid "Terminal input"
 msgstr "Vstup terminálu"

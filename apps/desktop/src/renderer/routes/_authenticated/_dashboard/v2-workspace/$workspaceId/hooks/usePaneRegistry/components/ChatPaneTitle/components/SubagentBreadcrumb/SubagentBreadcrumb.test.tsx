@@ -35,3 +35,25 @@ test("selecting a parent subagent goes up one level", () => {
 	expect(onSelect).toHaveBeenCalledWith("subagent:c1");
 	expect(view.queryByRole("button", { name: "Nested" })).toBeNull();
 });
+
+test("the root menu sits next to the root crumb and does not navigate", () => {
+	const onSelect = mock((_id: string | null) => {});
+	const view = render(
+		<SubagentBreadcrumb
+			onSelect={onSelect}
+			path={path}
+			root="Chat"
+			rootMenu={
+				<button type="button" aria-label="Chat menu">
+					⌄
+				</button>
+			}
+		/>,
+	);
+	const root = view.getByRole("button", { name: "Chat" });
+	expect(root.nextElementSibling).toBe(
+		view.getByRole("button", { name: "Chat menu" }),
+	);
+	fireEvent.click(view.getByRole("button", { name: "Chat menu" }));
+	expect(onSelect).not.toHaveBeenCalled();
+});

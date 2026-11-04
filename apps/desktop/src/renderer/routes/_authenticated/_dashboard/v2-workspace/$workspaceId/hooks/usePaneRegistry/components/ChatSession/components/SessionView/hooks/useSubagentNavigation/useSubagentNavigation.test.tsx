@@ -12,7 +12,8 @@ import {
 	renderHook,
 } from "@testing-library/react";
 import { useState } from "react";
-import { ChatPaneTitle } from "../../../../../ChatPaneTitle";
+import { useChatSubagentStore } from "../../../../../../stores/chatSubagentStore";
+import { SubagentBreadcrumb } from "../../../../../ChatPaneTitle/components/SubagentBreadcrumb";
 import { SubagentView } from "../../../SubagentView";
 import { NestedToolCallRow } from "../../../Transcript/components/NestedToolCallRow";
 import { NestedItemsProvider } from "../../../Transcript/providers/NestedItemsProvider";
@@ -72,6 +73,19 @@ function snapshotOf(items: readonly Item[]): SessionSnapshot {
 	};
 }
 
+function Header({ chatKey }: { chatKey: string }) {
+	const path = useChatSubagentStore((state) => state.paths[chatKey]);
+	const open = useChatSubagentStore((state) => state.open);
+	if (!path?.length) return null;
+	return (
+		<SubagentBreadcrumb
+			onSelect={(id) => open(chatKey, id)}
+			path={path}
+			root="Chat"
+		/>
+	);
+}
+
 function ChatWithHeader({
 	chatKey,
 	snapshot,
@@ -85,7 +99,7 @@ function ChatWithHeader({
 	});
 	return (
 		<>
-			<ChatPaneTitle chatKey={chatKey} icon={null} isActive title="Chat" />
+			<Header chatKey={chatKey} />
 			<span data-testid="focused">{focusedId ?? "main"}</span>
 			<NestedItemsProvider
 				value={{

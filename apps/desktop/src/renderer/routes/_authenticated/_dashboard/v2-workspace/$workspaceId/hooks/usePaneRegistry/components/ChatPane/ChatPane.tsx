@@ -10,12 +10,12 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { openChatHistory } from "../../utils/chatHistoryOpen";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
-import { openChatHistory } from "./utils/chatHistoryOpen";
 import {
 	pendingChatPrompts,
 	prependChatPrompts,

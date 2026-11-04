@@ -85,13 +85,10 @@ import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
-import { AccountUsage } from "./components/AccountUsage";
 import { AgentTerminalPane } from "./components/AgentTerminalPane";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChangesListPane } from "./components/ChangesListPane";
 import { ChatPane } from "./components/ChatPane";
-import { ChatHistoryPicker } from "./components/ChatPane/components/ChatHistoryPicker";
-import { ChatModeMenu } from "./components/ChatPane/components/ChatModeMenu";
 import { ChatPaneTitle } from "./components/ChatPaneTitle";
 import { CommentPane } from "./components/CommentPane";
 import { CommentPaneHeaderExtras } from "./components/CommentPane/components/CommentPaneHeaderExtras";
@@ -120,7 +117,7 @@ import { ReviewPane } from "./components/ReviewPane";
 import { SubagentPane } from "./components/SubagentPane";
 import { TerminalPaneHeaderExtras } from "./components/TerminalPane/components/TerminalPaneHeaderExtras";
 import { TerminalPaneIcon } from "./components/TerminalPane/components/TerminalPaneIcon";
-import { TerminalSessionDropdown } from "./components/TerminalPane/components/TerminalSessionDropdown";
+import { TerminalPaneTitle } from "./components/TerminalPane/components/TerminalPaneTitle";
 import { terminalContextMenuLinkStore } from "./components/TerminalPane/contextMenuLinkStore";
 import { useSurfaceFork } from "./hooks/useSurfaceFork";
 import { useUndoableChatClose } from "./hooks/useUndoableChatClose";
@@ -524,11 +521,15 @@ export function usePaneRegistry({
 				},
 				renderTitle: (ctx: RendererContext<PaneViewerData>) => (
 					<div className="flex min-w-0 flex-1 items-center gap-1.5">
-						<TerminalSessionDropdown
+						<TerminalPaneTitle
 							onSessionRemoved={clearWorkspaceRunTerminal}
 							context={ctx}
 							launcher={launcher}
 							workspaceId={workspaceId}
+							onCreateNewAgentSession={createNewAgentSession}
+							onForkIntoOtherSurface={(source, placement) =>
+								void forkIntoOtherSurface(ctx, source, placement)
+							}
 						/>
 						<V2NotificationStatusIndicator
 							sources={getV2NotificationSourcesForPane(ctx.pane)}
@@ -562,10 +563,6 @@ export function usePaneRegistry({
 												t({ message: "New shell" }),
 											),
 									})
-								}
-								onCreateNewAgentSession={createNewAgentSession}
-								onForkIntoOtherSurface={(source, placement) =>
-									void forkIntoOtherSurface(ctx, source, placement)
 								}
 								onOpenSubagent={onOpenSubagent}
 							/>
@@ -925,41 +922,18 @@ export function usePaneRegistry({
 				},
 				onAfterClose: closeChatWithUndo,
 				insetsAside: true,
-				renderTitle: (ctx: RendererContext<PaneViewerData>) => {
-					const data = ctx.pane.data as ChatPaneData;
-					return (
-						<ChatPaneTitle
-							chatKey={data.terminalId}
-							icon={chatPaneIcon(data)}
-							isActive={ctx.isActive}
-							title={ctx.pane.titleOverride ?? t({ message: "Chat" })}
-						/>
-					);
-				},
-				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => {
-					const data = ctx.pane.data as ChatPaneData;
-					return (
-						<div className="flex items-center gap-1">
-							<ChatHistoryPicker
-								context={ctx}
-								workspaceId={workspaceId}
-								linkedStores={linkedStores}
-							/>
-							<AccountUsage
-								key={`${workspaceId}:${data.terminalId}`}
-								workspaceId={workspaceId}
-								terminalId={data.terminalId}
-							/>
-							<ChatModeMenu
-								data={data}
-								onFork={(source, placement) =>
-									void forkIntoOtherSurface(ctx, source, placement)
-								}
-								workspaceId={workspaceId}
-							/>
-						</div>
-					);
-				},
+				renderTitle: (ctx: RendererContext<PaneViewerData>) => (
+					<ChatPaneTitle
+						context={ctx}
+						workspaceId={workspaceId}
+						linkedStores={linkedStores ?? []}
+						icon={chatPaneIcon(ctx.pane.data as ChatPaneData)}
+						title={ctx.pane.titleOverride ?? t({ message: "Chat" })}
+						onFork={(source, placement) =>
+							void forkIntoOtherSurface(ctx, source, placement)
+						}
+					/>
+				),
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<ChatPane
 						ctx={ctx}

@@ -1886,6 +1886,9 @@ msgstr "Akun menunggu penghapusan"
 msgid "Account usage"
 msgstr "Penggunaan akun"
 
+msgid "Account usage: {limit} {used} used"
+msgstr "Penggunaan akun: {limit} {used} terpakai"
+
 msgid "Achievements"
 msgstr "Pencapaian"
 
@@ -2282,9 +2285,6 @@ msgstr "Proses agen gagal"
 
 msgid "Agent self-verification"
 msgstr "Verifikasi mandiri agen"
-
-msgid "agent session ID"
-msgstr "ID sesi agen"
 
 msgid "Agent session started"
 msgstr "Sesi agen dimulai"
@@ -4099,8 +4099,8 @@ msgstr "Chat sedang dirombak"
 msgid "Chat Launch"
 msgstr "Peluncuran Chat"
 
-msgid "Chat mode"
-msgstr "Mode chat"
+msgid "Chat menu"
+msgstr "Menu obrolan"
 
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
@@ -4400,9 +4400,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentasi CLI"
-
-msgid "CLI mode"
-msgstr "Mode CLI"
 
 msgid "CLI reference"
 msgstr "Referensi CLI"
@@ -5243,9 +5240,6 @@ msgstr "Lanjutkan"
 msgid "Continue in your browser"
 msgstr "Lanjutkan di browser Anda"
 
-msgid "Continue or fork session"
-msgstr "Lanjutkan atau fork sesi"
-
 msgid "Continue the session the last run left"
 msgstr "Lanjutkan sesi yang ditinggalkan proses terakhir"
 
@@ -5324,8 +5318,8 @@ msgstr "Tersalin"
 msgid "Copied {0}"
 msgstr "Menyalin {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Menyalin {copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "ID sesi agen disalin"
 
 msgid "Copied Link"
 msgstr "Tautan Disalin"
@@ -5394,9 +5388,6 @@ msgid "Copy file name"
 msgstr "Salin nama file"
 
 msgid "Copy ID"
-msgstr "Salin ID"
-
-msgid "Copy IDs"
 msgstr "Salin ID"
 
 msgid "Copy image"
@@ -5561,6 +5552,9 @@ msgstr "Tidak dapat menghubungkan {plugin}. Coba lagi."
 
 msgid "Could not copy the link"
 msgstr "Tidak bisa menyalin tautan"
+
+msgid "Could not copy to the clipboard"
+msgstr "Tidak dapat menyalin ke papan klip"
 
 msgid "Could not create cloud workspace"
 msgstr "Tidak bisa membuat workspace cloud"
@@ -15352,6 +15346,9 @@ msgstr "Aktivitas Terbaru"
 msgid "Recent apps"
 msgstr "Aplikasi terbaru"
 
+msgid "Recent chats"
+msgstr "Obrolan terbaru"
+
 msgid "Recent invoices"
 msgstr "Faktur terbaru"
 
@@ -16724,6 +16721,9 @@ msgstr "Cari pengembang"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cari isi file dan seluruh workspace Anda sekaligus."
+
+msgid "Search all chats…"
+msgstr "Cari semua obrolan…"
 
 msgid "Search all emoji"
 msgstr "Cari semua emoji"
@@ -18953,9 +18953,6 @@ msgstr "Ukuran font terminal"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Ukuran font terminal saat terminal difokuskan, zoom halaman di panel browser, selain itu seluruh aplikasi"
-
-msgid "terminal ID"
-msgstr "ID terminal"
 
 msgid "Terminal input"
 msgstr "Input terminal"
