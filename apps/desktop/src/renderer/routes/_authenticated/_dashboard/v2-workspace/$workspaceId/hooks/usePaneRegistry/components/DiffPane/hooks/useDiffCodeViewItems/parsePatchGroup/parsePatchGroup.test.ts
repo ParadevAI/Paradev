@@ -46,7 +46,7 @@ describe("parsePatchGroup", () => {
 			patch: FILE_A + FILE_B,
 			requestedPaths: ["a.ts", "b.ts"],
 			requestedUntrackedPaths: [],
-			whitespaceFiltered: false,
+			whitespaceFilteredPaths: [],
 		});
 		const after = parsePatchGroup(
 			"group",
@@ -55,7 +55,7 @@ describe("parsePatchGroup", () => {
 				patch: FILE_A + FILE_B_EDITED,
 				requestedPaths: ["a.ts", "b.ts"],
 				requestedUntrackedPaths: [],
-				whitespaceFiltered: false,
+				whitespaceFilteredPaths: [],
 			},
 			before,
 		);
@@ -101,7 +101,7 @@ describe("parsePatchGroup fallback files", () => {
 		files,
 		requestedPaths: ["indent.ts", "edit.ts", "mode.sh"],
 		requestedUntrackedPaths: [],
-		whitespaceFiltered: false,
+		whitespaceFilteredPaths: [],
 	};
 
 	test("keeps whitespace-only files by default", () => {
@@ -133,22 +133,30 @@ describe("isWhitespaceOnly", () => {
 		requestedPaths: ["a.ts"],
 		requestedUntrackedPaths: [],
 	};
-	const edited = { status: "modified" as const, additions: 2, deletions: 2 };
+	const edited = {
+		path: "a.ts",
+		status: "modified" as const,
+		additions: 2,
+		deletions: 2,
+	};
 
 	test("a tracked file with line changes missing from a filtered patch", () => {
 		expect(
-			isWhitespaceOnly({ ...base, whitespaceFiltered: true }, edited),
+			isWhitespaceOnly({ ...base, whitespaceFilteredPaths: ["a.ts"] }, edited),
 		).toBe(true);
 	});
 
-	test("not when the patch was truncated or whitespace was kept", () => {
+	test("not when its batch was truncated or whitespace was kept", () => {
 		expect(
-			isWhitespaceOnly({ ...base, whitespaceFiltered: false }, edited),
+			isWhitespaceOnly({ ...base, whitespaceFilteredPaths: [] }, edited),
+		).toBe(false);
+		expect(
+			isWhitespaceOnly({ ...base, whitespaceFilteredPaths: ["b.ts"] }, edited),
 		).toBe(false);
 	});
 
 	test("not for an untracked or a mode-only file", () => {
-		const result = { ...base, whitespaceFiltered: true };
+		const result = { ...base, whitespaceFilteredPaths: ["a.ts"] };
 		expect(
 			isWhitespaceOnly(result, { ...edited, status: "untracked" as const }),
 		).toBe(false);

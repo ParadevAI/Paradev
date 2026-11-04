@@ -16,12 +16,13 @@ export interface PatchGroupFile {
 /** `files` is the fallback for a host without `git.getDiffPatch`.
  * `requestedPaths` is what was asked for, not what came back;
  * `requestedUntrackedPaths` is the subset sent as `untrackedPaths`.
- * `whitespaceFiltered` is set only when whitespace was ignored and nothing
- * was cut, so a tracked file without a section changed only in whitespace. */
+ * `whitespaceFilteredPaths` lists paths diffed with whitespace ignored and
+ * not cut, so such a tracked file without a section changed only in
+ * whitespace. */
 export type PatchGroupResult = {
 	requestedPaths: string[];
 	requestedUntrackedPaths: string[];
-	whitespaceFiltered: boolean;
+	whitespaceFilteredPaths: string[];
 } & (
 	| { kind: "patch"; patch: string }
 	| { kind: "files"; files: PatchGroupFile[] }
@@ -38,10 +39,10 @@ export interface ParsedPatchGroup {
  * line changes (a mode-only edit) is not a whitespace change. */
 export function isWhitespaceOnly(
 	result: PatchGroupResult,
-	file: Pick<ChangesetFile, "status" | "additions" | "deletions">,
+	file: Pick<ChangesetFile, "path" | "status" | "additions" | "deletions">,
 ): boolean {
 	return (
-		result.whitespaceFiltered &&
+		result.whitespaceFilteredPaths.includes(file.path) &&
 		file.status !== "untracked" &&
 		(file.additions ?? 0) + (file.deletions ?? 0) > 0
 	);

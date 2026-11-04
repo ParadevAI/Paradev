@@ -33,14 +33,13 @@ import type {
 	DeferredDiffReason,
 	DiffAnnotationMetadata,
 } from "../useDiffAnnotations";
-import { boundPatch, MAX_PATCH_LENGTH } from "./boundPatch";
+import { type FetchedPatch, fetchPatchBatches } from "./fetchPatchBatches";
 import {
 	isWhitespaceOnly,
 	type ParsedPatchGroup,
 	type PatchGroupResult,
 	parsePatchGroup,
 } from "./parsePatchGroup";
-import { splitPatchInput } from "./splitPatchInput";
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
@@ -316,47 +315,23 @@ export function useDiffCodeViewItems({
 					return {
 						kind: "files",
 						files,
-						whitespaceFiltered: input.ignoreWhitespace === true,
+						whitespaceFilteredPaths: input.ignoreWhitespace
+							? (input.paths ?? [])
+							: [],
 						...requested,
 					};
 				};
-				const patches: string[] = [];
-				let length = 0;
-				let complete = true;
-				for (const batch of splitPatchInput(input)) {
-					if (length >= MAX_PATCH_LENGTH) {
-						complete = false;
-						break;
-					}
-					let response: Awaited<
-						ReturnType<typeof trpcClient.git.getDiffPatch.query>
-					>;
-					try {
-						response = await trpcClient.git.getDiffPatch.query(batch);
-					} catch (error) {
-						if (!isMissingProcedureError(error)) throw error;
-						return fetchFiles();
-					}
-					// A host without `truncated` drops `ignoreWhitespace` and
-					// returns the full patch.
-					if (input.ignoreWhitespace && response.truncated === undefined) {
-						return fetchFiles();
-					}
-					patches.push(response.patch);
-					length += response.patch.length;
-					if (response.truncated) complete = false;
+				let fetched: FetchedPatch | null;
+				try {
+					fetched = await fetchPatchBatches(input, (batch) =>
+						trpcClient.git.getDiffPatch.query(batch),
+					);
+				} catch (error) {
+					if (!isMissingProcedureError(error)) throw error;
+					fetched = null;
 				}
-				const joined = patches.join("");
-				const patch = boundPatch(joined);
-				return {
-					kind: "patch",
-					patch,
-					whitespaceFiltered:
-						input.ignoreWhitespace === true &&
-						complete &&
-						patch.length === joined.length,
-					...requested,
-				};
+				if (!fetched) return fetchFiles();
+				return { kind: "patch", ...fetched, ...requested };
 			},
 			staleTime: Number.POSITIVE_INFINITY,
 			enabled,
