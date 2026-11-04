@@ -52,6 +52,19 @@ describe("terminal env in a sandbox", () => {
 		expect(first.FOO).toBe("one");
 	});
 
+	test("a terminal has no display, so copy falls back to OSC 52", () => {
+		const env = buildV2TerminalEnv({
+			...params,
+			baseEnv: {
+				...params.baseEnv,
+				DISPLAY: ":1",
+				WAYLAND_DISPLAY: "wayland-0",
+			},
+		});
+		expect(env.DISPLAY).toBeUndefined();
+		expect(env.WAYLAND_DISPLAY).toBeUndefined();
+	});
+
 	test("outside a sandbox the managed set is ignored", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "local";
 		setManagedEnv({ FOO: "one" });

@@ -329,6 +329,10 @@ export function buildV2TerminalEnv(
 		// Claude refuses `--dangerously-skip-permissions` unless told it is
 		// inside a sandbox, which is exactly what this is.
 		env.IS_SANDBOX = "1";
+		// TUIs copy through xclip when a display exists, which fills the box's
+		// clipboard. Without one they fall back to OSC 52, which the desktop honors.
+		delete env.DISPLAY;
+		delete env.WAYLAND_DISPLAY;
 	}
 
 	// Electron child processes can't access macOS Keychain for TLS cert verification,
