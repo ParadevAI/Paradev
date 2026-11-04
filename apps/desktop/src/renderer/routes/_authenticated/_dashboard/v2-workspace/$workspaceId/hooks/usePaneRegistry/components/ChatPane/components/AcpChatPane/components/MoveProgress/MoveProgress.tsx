@@ -4,7 +4,7 @@ import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { Check, Circle, Loader2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { runMoveOnThisComputer } from "renderer/routes/_authenticated/_dashboard/utils/runMoveOnThisComputer";
@@ -60,10 +60,28 @@ export function MoveProgress({
 		onCheck: onCheckSession,
 		onArrived,
 	});
-	const { activeHostUrl } = useLocalHostService();
+	const { activeHostUrl, machineId } = useLocalHostService();
+	// A move here that no run on this computer has taken yet, as after a reload.
+	const waitingHere =
+		move?.status === "pending" && !!machineId && move.toHostId === machineId;
+	const pickedUp = useRef<string | null>(null);
+	useEffect(() => {
+		if (!waitingHere || !move || !activeHostUrl) return;
+		if (pickedUp.current === move.id) return;
+		pickedUp.current = move.id;
+		void runMoveOnThisComputer({
+			moveId: move.id,
+			host: getHostServiceClientByUrl(activeHostUrl),
+		})
+			.catch((error: unknown) =>
+				console.warn("[chat-move] the move to this computer failed", error),
+			)
+			.finally(() => utils.chatMove.latest.invalidate({ chatSessionId }));
+	}, [waitingHere, move, activeHostUrl, utils, chatSessionId]);
 	const retry = cloudTrpc.chatMove.retry.useMutation({
 		onSuccess: ({ moveId, runsOnThisComputer }) => {
 			void utils.chatMove.latest.invalidate({ chatSessionId });
+			void utils.workspaceMove.latest.invalidate({ workspaceId });
 			if (!runsOnThisComputer) return;
 			if (!activeHostUrl) {
 				void cloudTrpcClient.chatMove.fail

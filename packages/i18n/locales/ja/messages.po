@@ -358,6 +358,10 @@ msgstr "{0, plural, one {Linear issue} other {Linear issue}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {選択した#件のワークスペースをグループに移動} other {選択した#件のワークスペースをグループに移動}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {#件のチャットをここに移動しています…} other {#件のチャットをここに移動しています…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, other {オートメーション # 件を一時停止しました。}}"
@@ -1280,6 +1284,9 @@ msgstr "GB 時間あたり {rate}。月間プールの後に使われ、期限�
 msgid "{readPercent}% read"
 msgstr "{readPercent}%読了"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{total}件中{ready}件のチャットをここに移動しました"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "スター{starCount}件、まだ増えています"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {#件のオートメーションを開始しました} other {#件のオートメーションを開始しました}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {このワークスペースは移動しました。#件のチャットはここに残りました。} other {このワークスペースは移動しました。#件のチャットはここに残りました。}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 件のサブエージェントが実行中}}"
@@ -11796,6 +11806,12 @@ msgstr "「{name}」を {group} へ移動しました"
 msgid "Moving this chat here"
 msgstr "このチャットをここに移動しています"
 
+msgid "Moving this workspace here…"
+msgstr "このワークスペースをここに移動しています…"
+
+msgid "Moving this workspace…"
+msgstr "このワークスペースを移動しています…"
+
 msgid "Moving..."
 msgstr "移動中..."
 
@@ -19975,6 +19991,9 @@ msgstr "このワークスペースには分岐元のプロジェクトがあり
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "このワークスペースは削除されたか、アクセス権がなくなった可能性があります。"
+
+msgid "This workspace moved"
+msgstr "このワークスペースは移動しました"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "このワークスペースの記録は残っていますが、ワークツリーフォルダはこのホスト上にありません。ターミナルとファイル操作は利用できません。"

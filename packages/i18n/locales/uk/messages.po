@@ -352,6 +352,10 @@ msgstr "{0, plural, one {issue з Linear} few {issues з Linear} many {issues з
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Перемістити # вибраний робочий простір у групу} few {Перемістити # вибрані робочі простори в групу} many {Перемістити # вибраних робочих просторів у групу} other {Перемістити # вибраного робочого простору в групу}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Сюди переміщується # чат…} few {Сюди переміщуються # чати…} many {Сюди переміщуються # чатів…} other {Сюди переміщуються # чату…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {Призупинено # автоматизацію.} few {Призупинено # автоматизації.} many {Призупинено # автоматизацій.} other {Призупинено # автоматизації.}}"
@@ -1274,6 +1278,9 @@ msgstr "{rate} за ГБ-год. Використовуються після м�
 msgid "{readPercent}% read"
 msgstr "прочитано {readPercent}%"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "Сюди переміщено {ready} з {total} чатів"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1316,6 +1323,9 @@ msgstr "{starCount} зірок, і це не межа"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущено # автоматизацію} few {Запущено # автоматизації} many {Запущено # автоматизацій} other {Запущено # автоматизації}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Цей робочий простір переміщено. # чат залишився тут.} few {Цей робочий простір переміщено. # чати залишилися тут.} many {Цей робочий простір переміщено. # чатів залишилися тут.} other {Цей робочий простір переміщено. # чату залишилося тут.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {Працює # субагент} few {Працюють # субагенти} many {Працює # субагентів} other {Працює # субагента}}"
@@ -11790,6 +11800,12 @@ msgstr "«{name}» переміщено до {group}"
 msgid "Moving this chat here"
 msgstr "Перенесення цього чату сюди"
 
+msgid "Moving this workspace here…"
+msgstr "Цей робочий простір переміщується сюди…"
+
+msgid "Moving this workspace…"
+msgstr "Цей робочий простір переміщується…"
+
 msgid "Moving..."
 msgstr "Переміщення..."
 
@@ -19969,6 +19985,9 @@ msgstr "У цього робочого простору немає проєкт�
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Можливо, цей робочий простір видалено або ви більше не маєте до нього доступу."
+
+msgid "This workspace moved"
+msgstr "Цей робочий простір переміщено"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Запис цього робочого простору ще існує, але його папки worktree більше немає на цьому хості. Термінали й дії з файлами недоступні."

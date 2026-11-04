@@ -48,7 +48,10 @@ import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { personProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
 import { MAX_MOVED_CHATS } from "../chat-move/schema";
-import { createChatMoves } from "../chat-move/utils/createChatMove";
+import {
+	attachWorkspaceMove,
+	type SkippedChat,
+} from "../chat-move/utils/createWorkspaceMove";
 import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import {
 	canOpenWorkspace,
@@ -386,19 +389,19 @@ export const cloudWorkspaceRouter = {
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
 				/**
-				 * The chats of a workspace to move into the new workspace once its
-				 * host answers, in place of an agent. Their history and session
-				 * bundles must be in `chatHistory` first; `chatMove.latest` tracks
-				 * each move.
+				 * A workspace that moves into the new one, in place of an agent:
+				 * the move `workspaceMove.begin` recorded. The new workspace starts
+				 * from `branch`, and these chats move once its host answers. Their
+				 * history and session bundles must be in `chatHistory` first;
+				 * `workspaceMove.latest` tracks the move.
 				 */
 				move: z
 					.object({
+						workspaceMoveId: z.string().uuid(),
 						chatSessionIds: z
 							.array(z.string().uuid())
-							.min(1)
-							.max(MAX_MOVED_CHATS),
-						/** The computer the chat leaves; omitted when it leaves a cloud workspace. */
-						fromHostId: z.string().min(1).max(200).optional(),
+							.max(MAX_MOVED_CHATS)
+							.default([]),
 					})
 					.optional(),
 			}),
@@ -410,6 +413,12 @@ export const cloudWorkspaceRouter = {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
 					message: "A workspace a chat moves into starts no agent of its own",
+				});
+			}
+			if (input.move && !input.branch) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "A workspace that moves starts from its snapshot branch",
 				});
 			}
 			if (input.move && ctx.sandboxCaller) {
@@ -427,6 +436,7 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
+			let skippedChats: SkippedChat[] = [];
 			const row = await startCloudWorkspace({
 				organizationId: input.organizationId,
 				userId: ctx.principal.userId,
@@ -455,13 +465,15 @@ export const cloudWorkspaceRouter = {
 					? {
 							beforeProvision: async (workspaceId: string) => {
 								const move = input.move as NonNullable<typeof input.move>;
-								await createChatMoves({
-									chatSessionIds: move.chatSessionIds,
-									...(move.fromHostId ? { fromHostId: move.fromHostId } : {}),
+								const attached = await attachWorkspaceMove({
+									workspaceMoveId: move.workspaceMoveId,
 									toWorkspaceId: workspaceId,
+									branch: input.branch as string,
+									chatSessionIds: move.chatSessionIds,
 									organizationId: input.organizationId,
 									userId: ctx.principal.userId,
 								});
+								skippedChats = attached.skipped;
 							},
 						}
 					: {}),
@@ -478,6 +490,8 @@ export const cloudWorkspaceRouter = {
 					: null,
 				presence: NO_PRESENCE,
 				tags: [] as string[],
+				/** Chats of a moving workspace that could not move, and stay where they were. */
+				skippedChats,
 			};
 		}),
 

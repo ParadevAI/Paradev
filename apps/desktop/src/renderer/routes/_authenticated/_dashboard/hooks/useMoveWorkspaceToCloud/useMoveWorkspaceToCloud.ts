@@ -9,6 +9,7 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
+import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirection";
 
 export type MoveToCloudStage = "saving" | "starting";
@@ -62,32 +63,41 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			};
 			if (sourceRepository) assertEnvironmentOpens(sourceRepository);
 			onStage("saving");
-			const prepared = await getHostServiceClientByUrl(
-				activeHostUrl,
-			).teleport.prepareWorkspace.mutate({
-				workspaceId: workspace.id,
-				stopIfBusy: true,
+			const { workspaceMoveId } =
+				await cloudTrpcClient.workspaceMove.begin.mutate({
+					fromWorkspaceId: workspace.id,
+					fromHostId: workspace.hostId,
+				});
+			const { prepared, created } = await (async () => {
+				const prepared = await getHostServiceClientByUrl(
+					activeHostUrl,
+				).teleport.prepareWorkspace.mutate({
+					workspaceId: workspace.id,
+					stopIfBusy: true,
+				});
+				assertEnvironmentOpens(prepared.repositoryFullName);
+				onStage("starting");
+				const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
+					organizationId,
+					environmentId: environment.id,
+					machineSize,
+					name: workspace.name,
+					branch: prepared.branch,
+					move: {
+						workspaceMoveId,
+						chatSessionIds: prepared.chats.map((chat) => chat.chatSessionId),
+					},
+				});
+				return { prepared, created };
+			})().catch(async (error: unknown) => {
+				await abandonWorkspaceMove(workspaceMoveId, error);
+				throw error;
 			});
-			assertEnvironmentOpens(prepared.repositoryFullName);
-			onStage("starting");
-			const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
-				organizationId,
-				environmentId: environment.id,
-				machineSize,
-				name: workspace.name,
-				branch: prepared.branch,
-				...(prepared.chats.length > 0
-					? {
-							move: {
-								chatSessionIds: prepared.chats.map(
-									(chat) => chat.chatSessionId,
-								),
-								fromHostId: workspace.hostId,
-							},
-						}
-					: {}),
-			});
+			const refused = new Set(
+				created.skippedChats.map((chat) => chat.chatSessionId),
+			);
 			for (const chat of prepared.chats) {
+				if (refused.has(chat.chatSessionId)) continue;
 				seedMovedChat({
 					collections,
 					workspaceId: created.id,
@@ -113,7 +123,12 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					error,
 				);
 			});
-			return { skipped: prepared.skipped };
+			return {
+				skipped: [
+					...prepared.skipped,
+					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
+				],
+			};
 		},
 		[
 			organizationId,

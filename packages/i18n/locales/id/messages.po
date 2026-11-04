@@ -358,6 +358,10 @@ msgstr "{0, plural, one {issue Linear} other {issue Linear}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Pindahkan # workspace terpilih ke grup} other {Pindahkan # workspace terpilih ke grup}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Memindahkan # chat ke sini…} other {Memindahkan # chat ke sini…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, other {# otomatisasi dijeda.}}"
@@ -1280,6 +1284,9 @@ msgstr "{rate} per GB-jam. Dipakai setelah kumpulan bulanan, dan tidak pernah ke
 msgid "{readPercent}% read"
 msgstr "{readPercent}% dibaca"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} dari {total} chat telah dipindahkan ke sini"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "{starCount} star dan terus bertambah"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomatisasi dimulai} other {# otomatisasi dimulai}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Workspace ini telah dipindahkan. # chat tetap di sini.} other {Workspace ini telah dipindahkan. # chat tetap di sini.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# subagen berjalan}}"
@@ -11796,6 +11806,12 @@ msgstr "\"{name}\" dipindahkan ke {group}"
 msgid "Moving this chat here"
 msgstr "Memindahkan chat ini ke sini"
 
+msgid "Moving this workspace here…"
+msgstr "Memindahkan workspace ini ke sini…"
+
+msgid "Moving this workspace…"
+msgstr "Memindahkan workspace ini…"
+
 msgid "Moving..."
 msgstr "Memindahkan..."
 
@@ -19975,6 +19991,9 @@ msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace ini mungkin sudah dihapus, atau Anda sudah tidak punya akses ke sana."
+
+msgid "This workspace moved"
+msgstr "Workspace ini telah dipindahkan"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Catatan workspace ini masih ada, tapi folder worktree-nya sudah tidak ada di host ini. Terminal dan aksi file tidak tersedia."

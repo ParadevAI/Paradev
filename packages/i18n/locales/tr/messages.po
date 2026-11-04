@@ -358,6 +358,10 @@ msgstr "{0, plural, one {Linear issue'su} other {Linear issue'su}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Seçili # çalışma alanını bir gruba taşı} other {Seçili # çalışma alanını bir gruba taşı}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {# sohbet buraya taşınıyor…} other {# sohbet buraya taşınıyor…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {# otomasyon duraklatıldı.} other {# otomasyon duraklatıldı.}}"
@@ -1280,6 +1284,9 @@ msgstr "GB-saat başına {rate}. Aylık havuzdan sonra kullanılır ve süresi d
 msgid "{readPercent}% read"
 msgstr "%{readPercent} okundu"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{total} sohbetten {ready} tanesi buraya taşındı"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "{starCount} yıldız ve artıyor"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomasyon başlatıldı} other {# otomasyon başlatıldı}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Bu çalışma alanı taşındı. # sohbet burada kaldı.} other {Bu çalışma alanı taşındı. # sohbet burada kaldı.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# alt ajan çalışıyor} other {# alt ajan çalışıyor}}"
@@ -11796,6 +11806,12 @@ msgstr "\"{name}\", {group} grubuna taşındı"
 msgid "Moving this chat here"
 msgstr "Bu sohbet buraya taşınıyor"
 
+msgid "Moving this workspace here…"
+msgstr "Bu çalışma alanı buraya taşınıyor…"
+
+msgid "Moving this workspace…"
+msgstr "Bu çalışma alanı taşınıyor…"
+
 msgid "Moving..."
 msgstr "Taşınıyor..."
 
@@ -19975,6 +19991,9 @@ msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."
+
+msgid "This workspace moved"
+msgstr "Bu çalışma alanı taşındı"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Bu çalışma alanı kaydı hâlâ var, ancak worktree klasörü artık bu host'ta değil. Terminaller ve dosya eylemleri kullanılamıyor."

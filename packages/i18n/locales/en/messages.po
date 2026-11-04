@@ -358,6 +358,10 @@ msgstr "{0, plural, one {Linear issue} other {Linear issues}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1280,6 +1284,9 @@ msgstr "{rate} per GB-hour. Used after the monthly pool, and never expire."
 msgid "{readPercent}% read"
 msgstr "{readPercent}% read"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} of {total} chats moved here"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "{starCount} stars and counting"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Started # automation} other {Started # automations}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
@@ -11796,6 +11806,12 @@ msgstr "Moved \"{name}\" to {group}"
 msgid "Moving this chat here"
 msgstr "Moving this chat here"
 
+msgid "Moving this workspace here…"
+msgstr "Moving this workspace here…"
+
+msgid "Moving this workspace…"
+msgstr "Moving this workspace…"
+
 msgid "Moving..."
 msgstr "Moving..."
 
@@ -19975,6 +19991,9 @@ msgstr "This workspace has no project to branch from"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "This workspace may have been removed, or you no longer have access to it."
+
+msgid "This workspace moved"
+msgstr "This workspace moved"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."

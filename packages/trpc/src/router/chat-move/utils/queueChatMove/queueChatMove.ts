@@ -3,6 +3,7 @@ import { CHAT_MOVE_IN_FLIGHT, chatMoves } from "@superset/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { publishCloudWorkspaceJob } from "../../../cloud-workspace/jobs";
 import { failChatMove, runChatMove } from "../runChatMove";
+import { finishWorkspaceMovesTo } from "../settleWorkspaceMove";
 
 /** Queues a move into a cloud workspace; a move that cannot be queued fails. */
 export async function queueChatMove(moveId: string): Promise<void> {
@@ -18,7 +19,10 @@ export async function queueChatMove(moveId: string): Promise<void> {
 	}
 }
 
-/** Starts the moves waiting for a cloud workspace once its host answers. */
+/**
+ * Starts the moves waiting for a cloud workspace once its host answers; a
+ * workspace move with no chats is done once the workspace is up.
+ */
 export async function queueChatMovesTo(workspaceId: string): Promise<void> {
 	const waiting = await db
 		.select({ id: chatMoves.id })
@@ -37,6 +41,7 @@ export async function queueChatMovesTo(workspaceId: string): Promise<void> {
 			),
 		);
 	}
+	await finishWorkspaceMovesTo(workspaceId);
 }
 
 /** Fails the moves still running into a cloud workspace that will never answer. */
@@ -53,4 +58,5 @@ export async function failChatMovesTo(
 				inArray(chatMoves.status, CHAT_MOVE_IN_FLIGHT),
 			),
 		);
+	await finishWorkspaceMovesTo(workspaceId, error);
 }

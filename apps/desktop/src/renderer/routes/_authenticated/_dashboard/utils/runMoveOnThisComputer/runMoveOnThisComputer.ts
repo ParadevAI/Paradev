@@ -7,7 +7,7 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
  * cannot reach: the chat's history and session files go into this
  * computer's host, the control plane switches the chat here, then its agent
  * starts. Any failure is reported, so the move shows as failed and the chat
- * stays where it was.
+ * stays where it was. A move another run already claimed is left to it.
  */
 export async function runMoveOnThisComputer({
 	moveId,
@@ -21,8 +21,15 @@ export async function runMoveOnThisComputer({
 		chatSessionId: string;
 		harnessSessionId: string;
 	};
+	const claimed = await cloudTrpcClient.chatMove.claim
+		.mutate({ moveId })
+		.catch((error: unknown) => {
+			// Another run on this computer, or an earlier one, already took it.
+			if (isClaimed(error)) return null;
+			throw error;
+		});
+	if (!claimed) return;
 	try {
-		const claimed = await cloudTrpcClient.chatMove.claim.mutate({ moveId });
 		const events = [];
 		let afterSeq = 0;
 		for (;;) {
@@ -61,4 +68,13 @@ export async function runMoveOnThisComputer({
 	await host.teleport.continueChat.mutate(started).catch((error: unknown) => {
 		console.warn("[chat-move] the moved chat's agent did not start", error);
 	});
+}
+
+function isClaimed(error: unknown): boolean {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"data" in error &&
+		(error as { data?: { code?: string } }).data?.code === "CONFLICT"
+	);
 }

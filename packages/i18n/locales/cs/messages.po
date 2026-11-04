@@ -358,6 +358,10 @@ msgstr "{0, plural, one {Linear issue} few {Linear issues} many {Linear issues} 
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Přesunout # vybraný pracovní prostor do skupiny} few {Přesunout # vybrané pracovní prostory do skupiny} many {Přesunout # vybraného pracovního prostoru do skupiny} other {Přesunout # vybraných pracovních prostorů do skupiny}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Sem se přesouvá # chat…} few {Sem se přesouvají # chaty…} many {Sem se přesouvá # chatu…} other {Sem se přesouvá # chatů…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {Pozastavena # automatizace.} few {Pozastaveny # automatizace.} many {Pozastaveno # automatizace.} other {Pozastaveno # automatizací.}}"
@@ -1280,6 +1284,9 @@ msgstr "{rate} za GB-hodinu. Čerpají se po měsíčním fondu a nikdy nevyprš
 msgid "{readPercent}% read"
 msgstr "přečteno {readPercent} %"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "Sem se přesunulo {ready} z {total} chatů"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "{starCount} hvězd a přibývá"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Spuštěna # automatizace} few {Spuštěny # automatizace} many {Spuštěno # automatizace} other {Spuštěno # automatizací}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Tento pracovní prostor byl přesunut. # chat zůstal zde.} few {Tento pracovní prostor byl přesunut. # chaty zůstaly zde.} many {Tento pracovní prostor byl přesunut. # chatu zůstalo zde.} other {Tento pracovní prostor byl přesunut. # chatů zůstalo zde.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent běží} few {# subagenti běží} many {# subagenta běží} other {# subagentů běží}}"
@@ -11796,6 +11806,12 @@ msgstr "„{name}“ přesunuto do skupiny {group}"
 msgid "Moving this chat here"
 msgstr "Tento chat se přesouvá sem"
 
+msgid "Moving this workspace here…"
+msgstr "Sem se přesouvá tento pracovní prostor…"
+
+msgid "Moving this workspace…"
+msgstr "Přesouvá se tento pracovní prostor…"
+
 msgid "Moving..."
 msgstr "Přesouvání..."
 
@@ -19975,6 +19991,9 @@ msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Tento pracovní prostor mohl být odstraněn, nebo k němu už nemáte přístup."
+
+msgid "This workspace moved"
+msgstr "Tento pracovní prostor byl přesunut"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Záznam tohoto pracovního prostoru pořád existuje, ale jeho složka worktree už na tomto hostu není. Terminály a operace se soubory nejsou k dispozici."

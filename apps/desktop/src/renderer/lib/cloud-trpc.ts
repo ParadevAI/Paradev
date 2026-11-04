@@ -57,6 +57,7 @@ export const CLOUD_TRPC_ROUTER_ROOTS = [
 	"team",
 	"user",
 	"v2Project",
+	"workspaceMove",
 ] as const;
 
 export const cloudTrpcClient = cloudTrpc.createClient({

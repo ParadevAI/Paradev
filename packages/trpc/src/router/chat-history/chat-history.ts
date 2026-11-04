@@ -16,7 +16,7 @@ import { anchorAttachments } from "../../lib/attachments";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { presignedPutUrl } from "../../lib/r2";
 import { personProcedure, userError } from "../../trpc";
-import { staleBefore } from "../chat-move/utils/findMovableChat";
+import { staleBefore } from "../chat-move/utils/settleWorkspaceMove";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	createTranscriptUploadInputSchema,

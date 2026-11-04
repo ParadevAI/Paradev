@@ -9,6 +9,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
+import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
 import { runMoveOnThisComputer } from "../../utils/runMoveOnThisComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirection";
 
@@ -56,48 +57,59 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				);
 			}
 			onStage("saving");
-			// From the sidebar the box may be asleep: waking it also gives a fresh address.
-			const { url: remoteUrl } = await requestSandboxAccess(workspace.id, true);
-			const prepared = await getHostServiceClientByUrl(
-				remoteUrl,
-			).teleport.prepareWorkspace.mutate({
-				workspaceId: workspace.id,
-				stopIfBusy: true,
-			});
-			const project = requireLocalProject(prepared.repositoryFullName);
-
-			onStage("creating");
+			const { workspaceMoveId } =
+				await cloudTrpcClient.workspaceMove.begin.mutate({
+					fromWorkspaceId: workspace.id,
+					toHostId: machineId,
+				});
 			const local = getHostServiceClientByUrl(activeHostUrl);
-			await local.teleport.fetchBranch.mutate({
-				projectId: project.id,
-				branch: prepared.branch,
-			});
-			const handle = submit({
-				hostId: machineId,
-				snapshot: {
-					id: crypto.randomUUID(),
+			const { prepared, project, created } = await (async () => {
+				// From the sidebar the box may be asleep: waking it also gives a fresh address.
+				const { url: remoteUrl } = await requestSandboxAccess(
+					workspace.id,
+					true,
+				);
+				const prepared = await getHostServiceClientByUrl(
+					remoteUrl,
+				).teleport.prepareWorkspace.mutate({
+					workspaceId: workspace.id,
+					stopIfBusy: true,
+				});
+				const project = requireLocalProject(prepared.repositoryFullName);
+
+				onStage("creating");
+				await local.teleport.fetchBranch.mutate({
 					projectId: project.id,
 					branch: prepared.branch,
-					skipBranchPrefix: true,
-					name: workspace.name,
-				},
+				});
+				const handle = submit({
+					hostId: machineId,
+					snapshot: {
+						id: crypto.randomUUID(),
+						projectId: project.id,
+						branch: prepared.branch,
+						skipBranchPrefix: true,
+						name: workspace.name,
+					},
+				});
+				const created = await handle.completed;
+				if (!created.ok) throw new Error(created.error);
+				return { prepared, project, created };
+			})().catch(async (error: unknown) => {
+				await abandonWorkspaceMove(workspaceMoveId, error);
+				throw error;
 			});
-			const created = await handle.completed;
-			if (!created.ok) throw new Error(created.error);
 
-			const moves =
-				prepared.chats.length > 0
-					? (
-							await cloudTrpcClient.chatMove.start.mutate({
-								chatSessionIds: prepared.chats.map(
-									(chat) => chat.chatSessionId,
-								),
-								toWorkspaceId: created.workspaceId,
-								toHostId: machineId,
-							})
-						).moves
-					: [];
+			const { moves, skipped } =
+				await cloudTrpcClient.workspaceMove.attach.mutate({
+					workspaceMoveId,
+					toWorkspaceId: created.workspaceId,
+					branch: prepared.branch,
+					chatSessionIds: prepared.chats.map((chat) => chat.chatSessionId),
+				});
+			const refused = new Set(skipped.map((chat) => chat.chatSessionId));
 			for (const chat of prepared.chats) {
+				if (refused.has(chat.chatSessionId)) continue;
 				seedMovedChat({
 					collections,
 					workspaceId: created.workspaceId,
@@ -130,7 +142,12 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					);
 				}
 			})();
-			return { skipped: prepared.skipped };
+			return {
+				skipped: [
+					...prepared.skipped,
+					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
+				],
+			};
 		},
 		[
 			t,

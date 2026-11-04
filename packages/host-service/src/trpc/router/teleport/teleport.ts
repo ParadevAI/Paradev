@@ -36,7 +36,7 @@ const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
 const STOP_TIMEOUT_MS = 20_000;
 const STOP_POLL_MS = 200;
-/** As many chats as `chatMove.start` takes in one workspace move. */
+/** As many chats as `workspaceMove.start` takes in one workspace move. */
 const MAX_MOVED_CHATS = 50;
 
 type MovableChat = {

@@ -358,6 +358,10 @@ msgstr "{0, plural, one {Linear-issue} other {Linear-issues}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {# geselecteerde werkruimte naar een groep verplaatsen} other {# geselecteerde werkruimtes naar een groep verplaatsen}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {# chat wordt hierheen verplaatst…} other {# chats worden hierheen verplaatst…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {# automatisering gepauzeerd.} other {# automatiseringen gepauzeerd.}}"
@@ -1280,6 +1284,9 @@ msgstr "{rate} per GB-uur. Gebruikt na de maandelijkse pool, en verlopen nooit."
 msgid "{readPercent}% read"
 msgstr "{readPercent}% gelezen"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} van {total} chats zijn hierheen verplaatst"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "{starCount} sterren en het worden er meer"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisering gestart} other {# automatiseringen gestart}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Deze werkruimte is verplaatst. # chat is hier gebleven.} other {Deze werkruimte is verplaatst. # chats zijn hier gebleven.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent actief} other {# subagents actief}}"
@@ -11796,6 +11806,12 @@ msgstr "\"{name}\" verplaatst naar {group}"
 msgid "Moving this chat here"
 msgstr "Deze chat wordt hierheen verplaatst"
 
+msgid "Moving this workspace here…"
+msgstr "Deze werkruimte wordt hierheen verplaatst…"
+
+msgid "Moving this workspace…"
+msgstr "Deze werkruimte wordt verplaatst…"
+
 msgid "Moving..."
 msgstr "Verplaatsen..."
 
@@ -19975,6 +19991,9 @@ msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Deze werkruimte is mogelijk verwijderd, of je hebt er geen toegang meer toe."
+
+msgid "This workspace moved"
+msgstr "Deze werkruimte is verplaatst"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Dit werkruimterecord bestaat nog, maar de worktree-map staat niet meer op deze host. Terminals en bestandsacties zijn niet beschikbaar."

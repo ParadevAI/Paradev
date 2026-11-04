@@ -358,6 +358,10 @@ msgstr "{0, plural, one {issue do Linear} other {issues do Linear}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Mover # área de trabalho selecionada para um grupo} other {Mover # áreas de trabalho selecionadas para um grupo}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Movendo # chat para cá…} other {Movendo # chats para cá…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {# automação pausada.} other {# automações pausadas.}}"
@@ -1280,6 +1284,9 @@ msgstr "{rate} por GB-hora. Usadas depois do conjunto mensal, e nunca expiram."
 msgid "{readPercent}% read"
 msgstr "{readPercent}% lido"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} de {total} chats foram movidos para cá"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "{starCount} estrelas e subindo"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automação iniciada} other {# automações iniciadas}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Esta área de trabalho foi movida. # chat ficou aqui.} other {Esta área de trabalho foi movida. # chats ficaram aqui.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagente em execução} other {# subagentes em execução}}"
@@ -11796,6 +11806,12 @@ msgstr "\"{name}\" movida para {group}"
 msgid "Moving this chat here"
 msgstr "Movendo este chat para cá"
 
+msgid "Moving this workspace here…"
+msgstr "Movendo esta área de trabalho para cá…"
+
+msgid "Moving this workspace…"
+msgstr "Movendo esta área de trabalho…"
+
 msgid "Moving..."
 msgstr "Movendo..."
 
@@ -19975,6 +19991,9 @@ msgstr "Este workspace não tem projeto do qual ramificar"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Esta área de trabalho pode ter sido removida ou você não tem mais acesso a ela."
+
+msgid "This workspace moved"
+msgstr "Esta área de trabalho foi movida"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "O registro desta área de trabalho ainda existe, mas a pasta da worktree não está mais neste host. Terminais e ações de arquivo estão indisponíveis."

@@ -12,6 +12,10 @@ import { and, eq, inArray, max } from "drizzle-orm";
 import { presignedGetUrl } from "../../../../lib/r2";
 import { loadChatHistory } from "../../../chat-history/utils/loadChatHistory";
 import { lastTurnSeq } from "../findMovableChat";
+import {
+	settleWorkspaceMove,
+	settleWorkspaceMoves,
+} from "../settleWorkspaceMove";
 import { type WorkspaceHost, workspaceHost } from "../workspaceHost";
 
 // Wake (up to a minute) plus these stays inside the job's 300 s.
@@ -98,6 +102,7 @@ export async function claimMove(
 		.set({ status: "copying" })
 		.where(and(eq(chatMoves.id, moveId), eq(chatMoves.status, "pending")))
 		.returning();
+	if (move) await settleWorkspaceMove(move.workspaceMoveId);
 	return move ?? null;
 }
 
@@ -212,6 +217,7 @@ export async function completeChatMove(
 		await failChatMove(move.id, error);
 		throw error;
 	}
+	await settleWorkspaceMove(move.workspaceMoveId);
 	await destination
 		.continueChat?.()
 		.catch((error: unknown) =>
@@ -234,7 +240,7 @@ export async function failChatMove(
 	error: unknown,
 ): Promise<void> {
 	console.error(`[chat-move] move ${moveId} failed`, error);
-	await db
+	const failed = await db
 		.update(chatMoves)
 		.set({
 			status: "failed",
@@ -246,7 +252,9 @@ export async function failChatMove(
 				eq(chatMoves.id, moveId),
 				inArray(chatMoves.status, ["pending", "copying", "restoring"]),
 			),
-		);
+		)
+		.returning({ workspaceMoveId: chatMoves.workspaceMoveId });
+	await settleWorkspaceMoves(failed.map((row) => row.workspaceMoveId));
 }
 
 async function markSourceMoved(

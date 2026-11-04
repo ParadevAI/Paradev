@@ -9,32 +9,8 @@ import {
 	type SelectChatSession,
 } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, inArray, lt, max } from "drizzle-orm";
-
-/** Longer than a move job may run, so a move this quiet has stopped. */
-export const STALE_MOVE_MS = 6 * 60 * 1000;
-
-export function staleBefore(now = new Date()): Date {
-	return new Date(now.getTime() - STALE_MOVE_MS);
-}
-
-/** Fails a chat's moves that stopped changing state, so the chat can move again. */
-export async function failStaleMoves(sessionId: string): Promise<void> {
-	await db
-		.update(chatMoves)
-		.set({
-			status: "failed",
-			error: "The move stopped answering",
-			finishedAt: new Date(),
-		})
-		.where(
-			and(
-				eq(chatMoves.sessionId, sessionId),
-				inArray(chatMoves.status, CHAT_MOVE_IN_FLIGHT),
-				lt(chatMoves.updatedAt, staleBefore()),
-			),
-		);
-}
+import { and, desc, eq, inArray, max } from "drizzle-orm";
+import { failStaleMoves } from "../settleWorkspaceMove";
 
 /** The seq of the chat's newest turn, or 0 when it has none. */
 export async function lastTurnSeq(sessionId: string): Promise<number> {

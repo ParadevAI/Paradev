@@ -358,6 +358,10 @@ msgstr "{0, plural, one {Linear 이슈} other {Linear 이슈}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {선택한 워크스페이스 #개를 그룹으로 이동} other {선택한 워크스페이스 #개를 그룹으로 이동}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {채팅 #개를 여기로 옮기는 중…} other {채팅 #개를 여기로 옮기는 중…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, other {자동화 #개를 일시중지했습니다.}}"
@@ -1280,6 +1284,9 @@ msgstr "GB 시간당 {rate}. 월간 풀 다음에 사용되며 만료되지 않�
 msgid "{readPercent}% read"
 msgstr "{readPercent}% 읽음"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "채팅 {total}개 중 {ready}개를 여기로 옮겼습니다"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1322,6 +1329,9 @@ msgstr "스타 {starCount}개, 계속 늘어나는 중"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {자동화 #개를 시작했습니다} other {자동화 #개를 시작했습니다}}"
+
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {이 워크스페이스를 옮겼습니다. 채팅 #개는 여기에 남았습니다.} other {이 워크스페이스를 옮겼습니다. 채팅 #개는 여기에 남았습니다.}}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {서브 에이전트 #개 실행 중}}"
@@ -11796,6 +11806,12 @@ msgstr "\"{name}\"을(를) {group}(으)로 이동했습니다"
 msgid "Moving this chat here"
 msgstr "이 채팅을 여기로 옮기는 중"
 
+msgid "Moving this workspace here…"
+msgstr "이 워크스페이스를 여기로 옮기는 중…"
+
+msgid "Moving this workspace…"
+msgstr "이 워크스페이스를 옮기는 중…"
+
 msgid "Moving..."
 msgstr "옮기는 중..."
 
@@ -19975,6 +19991,9 @@ msgstr "이 워크스페이스에는 분기할 프로젝트가 없습니다"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "이 워크스페이스가 제거되었거나 더 이상 접근 권한이 없을 수 있습니다."
+
+msgid "This workspace moved"
+msgstr "이 워크스페이스를 옮겼습니다"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "이 워크스페이스 기록은 남아 있지만, worktree 폴더가 이 호스트에 더 이상 없습니다. 터미널과 파일 작업을 사용할 수 없습니다."

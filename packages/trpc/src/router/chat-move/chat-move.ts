@@ -4,7 +4,6 @@ import {
 	chatItems,
 	chatMoves,
 	chatSessions,
-	cloudWorkspaces,
 	type SelectChatMove,
 } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -12,45 +11,26 @@ import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { personProcedure } from "../../trpc";
 import { loadChatHistory } from "../chat-history/utils/loadChatHistory";
-import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	chatMoveEventsInputSchema,
 	chatMoveInputSchema,
 	chatMoveOfChatInputSchema,
 	failChatMoveInputSchema,
 	retryChatMoveInputSchema,
-	startChatMoveInputSchema,
 } from "./schema";
-import { createChatMove, createChatMoves } from "./utils/createChatMove";
-import { failStaleMoves, staleBefore } from "./utils/findMovableChat";
-import { queueChatMove } from "./utils/queueChatMove";
+import { retryChatMove } from "./utils/createWorkspaceMove";
+import { moverOf } from "./utils/moverOf";
 import {
 	buildChatImportHeader,
 	claimMove,
 	completeChatMove,
 	failChatMove,
 } from "./utils/runChatMove";
+import { failStaleMoves, staleBefore } from "./utils/settleWorkspaceMove";
+import { startChatMove } from "./utils/startChatMove";
 import { workspaceHost } from "./utils/workspaceHost";
 
 const MESSAGE_KINDS = ["user_message", "agent_message"];
-
-type ProtectedCtx = Parameters<typeof requireActiveOrgMembership>[0] & {
-	sandboxCaller: unknown;
-};
-
-/** The person moving the chat; a box cannot start or run a move. */
-async function moverOf(ctx: ProtectedCtx) {
-	if (ctx.sandboxCaller) {
-		throw new TRPCError({
-			code: "FORBIDDEN",
-			message: "A cloud workspace cannot move chats",
-		});
-	}
-	return {
-		organizationId: await requireActiveOrgMembership(ctx),
-		userId: ctx.session.user.id,
-	};
-}
 
 async function loadOwnMove(
 	mover: { organizationId: string; userId: string },
@@ -100,26 +80,6 @@ function assertRunsOnComputer(move: SelectChatMove): void {
 }
 
 /**
- * Queues a move into a cloud workspace that is up; one still provisioning
- * stays pending until provisioning queues it. A move to a computer waits
- * for `claim`.
- */
-async function startMove(move: {
-	id: string;
-	toWorkspaceId: string;
-	toHostId: string | null;
-}) {
-	if (!move.toHostId) {
-		const destination = await db.query.cloudWorkspaces.findFirst({
-			where: eq(cloudWorkspaces.id, move.toWorkspaceId),
-			columns: { status: true },
-		});
-		if (destination?.status !== "provisioning") await queueChatMove(move.id);
-	}
-	return { moveId: move.id, runsOnThisComputer: move.toHostId !== null };
-}
-
-/**
  * Moves a chat to another workspace. Every attempt is recorded and decided
  * here: a move into a cloud workspace runs in a job that reaches the box
  * directly, and a move to a computer is carried out by the desktop on that
@@ -158,24 +118,6 @@ export const chatMoveRouter = {
 			};
 		}),
 
-	/**
-	 * Moves the chats of one workspace to a workspace that already exists,
-	 * such as one on this computer. Each chat moves, fails and retries on its
-	 * own; all of them are recorded together.
-	 */
-	start: personProcedure
-		.input(startChatMoveInputSchema)
-		.mutation(async ({ ctx, input }) => {
-			const mover = await moverOf(ctx);
-			const created = await createChatMoves({ ...input, ...mover });
-			const moves = [];
-			for (const move of created) {
-				const { moveId } = await startMove(move);
-				moves.push({ moveId, chatSessionId: move.chatSessionId });
-			}
-			return { moves, runsOnThisComputer: input.toHostId !== undefined };
-		}),
-
 	/** Tries a failed move again, to the same workspace. */
 	retry: personProcedure
 		.input(retryChatMoveInputSchema)
@@ -188,23 +130,7 @@ export const chatMoveRouter = {
 					message: "Only a failed move can be tried again",
 				});
 			}
-			const session = await db.query.chatSessions.findFirst({
-				where: eq(chatSessions.id, failed.sessionId),
-				columns: { v2WorkspaceId: true },
-			});
-			const sameSource = session?.v2WorkspaceId === failed.fromWorkspaceId;
-			return startMove(
-				await createChatMove({
-					...mover,
-					chatSessionId: failed.sessionId,
-					toWorkspaceId: failed.toWorkspaceId,
-					retryOf: failed,
-					...(failed.toHostId ? { toHostId: failed.toHostId } : {}),
-					...(sameSource && failed.fromHostId
-						? { fromHostId: failed.fromHostId }
-						: {}),
-				}),
-			);
+			return startChatMove(await retryChatMove({ ...mover, failed }));
 		}),
 
 	/**
