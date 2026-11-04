@@ -6,16 +6,25 @@ type PackagedNodeModuleCopy = {
 
 type ExternalizedRuntimeModule = {
 	asarUnpackGlobs: string[];
+	/** Paths in the module, from building it or for other platforms, that never load at runtime. */
+	buildLeftovers?: string[];
 	materialize: string[];
 	packagedCopies: PackagedNodeModuleCopy[];
 	specifier: string;
 };
 
-function copyWholeModule(moduleName: string): PackagedNodeModuleCopy {
+function excluding(paths: string[], prefix = ""): string[] {
+	return paths.map((path) => `!${prefix}${path}`);
+}
+
+function copyWholeModule(
+	moduleName: string,
+	buildLeftovers: string[] = [],
+): PackagedNodeModuleCopy {
 	return {
 		from: `node_modules/${moduleName}`,
 		to: `node_modules/${moduleName}`,
-		filter: ["**/*"],
+		filter: ["**/*", ...excluding(buildLeftovers)],
 	};
 }
 
@@ -30,17 +39,36 @@ function copyModuleSubtree(
 	};
 }
 
+const betterSqliteLeftovers = [
+	"deps/**/*",
+	"src/**/*",
+	"build/Release/obj/**/*",
+	"build/Release/obj.target/**/*",
+	"build/Release/*.a",
+	"build/Release/test_extension.node",
+];
+const nodePtyLeftovers = [
+	"src/**/*",
+	"scripts/**/*",
+	"build/Release/obj.target/**/*",
+	"build/Release/.deps/**/*",
+	`prebuilds/!(\${platform}-\${arch})/**/*`,
+];
+const parcelWatcherLeftovers = ["src/**/*", "build/Release/obj.target/**/*"];
+
 const externalizedRuntimeModules: ExternalizedRuntimeModule[] = [
 	{
 		specifier: "better-sqlite3",
 		materialize: ["better-sqlite3"],
-		packagedCopies: [copyWholeModule("better-sqlite3")],
+		buildLeftovers: betterSqliteLeftovers,
+		packagedCopies: [copyWholeModule("better-sqlite3", betterSqliteLeftovers)],
 		asarUnpackGlobs: ["**/node_modules/better-sqlite3/**/*"],
 	},
 	{
 		specifier: "node-pty",
 		materialize: ["node-pty"],
-		packagedCopies: [copyWholeModule("node-pty")],
+		buildLeftovers: nodePtyLeftovers,
+		packagedCopies: [copyWholeModule("node-pty", nodePtyLeftovers)],
 		asarUnpackGlobs: ["**/node_modules/node-pty/**/*"],
 	},
 	{
@@ -56,16 +84,15 @@ const externalizedRuntimeModules: ExternalizedRuntimeModule[] = [
 		asarUnpackGlobs: ["**/node_modules/@superset/macos-process-metrics/**/*"],
 	},
 	{
-		specifier: "@ast-grep/napi",
-		materialize: ["@ast-grep/napi"],
-		packagedCopies: [copyWholeModule("@ast-grep")],
-		asarUnpackGlobs: ["**/node_modules/@ast-grep/napi*/**/*"],
-	},
-	{
 		specifier: "@parcel/watcher",
 		materialize: ["@parcel/watcher"],
+		buildLeftovers: parcelWatcherLeftovers,
 		packagedCopies: [
-			copyModuleSubtree("@parcel", ["watcher/**/*", "watcher-*/**/*"]),
+			copyModuleSubtree("@parcel", [
+				"watcher/**/*",
+				"watcher-*/**/*",
+				...excluding(parcelWatcherLeftovers, "watcher/"),
+			]),
 		],
 		asarUnpackGlobs: ["**/node_modules/@parcel/watcher*/**/*"],
 	},
@@ -99,6 +126,15 @@ export const packagedNodeModuleCopies = [
 	...externalizedRuntimeModules.flatMap((module) => module.packagedCopies),
 	...packagedSupportModules,
 ];
+
+/** The same leftovers for the copy electron-builder makes of every package in `dependencies`. */
+export const packagedNodeModuleExclusions = externalizedRuntimeModules.flatMap(
+	(module) =>
+		excluding(
+			module.buildLeftovers ?? [],
+			`**/node_modules/${module.specifier}/`,
+		),
+);
 
 export const packagedAsarUnpackGlobs = [
 	...externalizedRuntimeModules.flatMap((module) => module.asarUnpackGlobs),

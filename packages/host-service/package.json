@@ -8,6 +8,10 @@
 			"types": "./src/index.ts",
 			"default": "./src/index.ts"
 		},
+		"./acp-catalogue": {
+			"types": "./src/chat-v3/acpCatalogue.ts",
+			"default": "./src/chat-v3/acpCatalogue.ts"
+		},
 		"./db": {
 			"types": "./src/db/index.ts",
 			"default": "./src/db/index.ts"
