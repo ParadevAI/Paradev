@@ -10,6 +10,7 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { saveChatMode } from "../../utils/savedChatMode";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -21,7 +22,6 @@ import {
 	prependChatPrompts,
 } from "./utils/pendingChatPrompts";
 import { restartedChatPaneData } from "./utils/restartedChatPaneData";
-import { saveChatMode } from "./utils/savedChatMode";
 import { sessionInfoPaneData } from "./utils/sessionInfoPaneData";
 
 export function ChatPane({

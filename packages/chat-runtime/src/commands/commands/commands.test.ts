@@ -599,6 +599,51 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("forkSession starts the branch in the source's mode", async () => {
+		const startModes: (string | undefined)[] = [];
+		class ForkingHarness extends FakeHarness {
+			override start(options: Parameters<FakeHarness["start"]>[0]) {
+				startModes.push(options.modeId);
+				return super.start(options);
+			}
+			async fork() {
+				return "agent-forked";
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new ForkingHarness({
+							...SCRIPT,
+							start: [
+								{
+									kind: "session",
+									session: { status: "idle", modeId: "bypassPermissions" },
+								},
+							],
+						}),
+				],
+			]),
+		});
+		const source = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+
+		await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: source.sessionId,
+			cwd: "/tmp/workspace",
+		});
+
+		expect(startModes).toEqual([undefined, "bypassPermissions"]);
+		await runtime.dispose();
+	});
+
 	test("forkSession waits for a session that is still starting", async () => {
 		let sourceId = "";
 		const statusesAtFork: (string | undefined)[] = [];
