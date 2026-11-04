@@ -68,15 +68,13 @@ export async function createChatMoves(
 			message: "Name the computer the chat moves to",
 		});
 	}
+	// A computer registers only once it is exposed through the relay, which is
+	// also the only way to stop the copy it keeps; an unregistered one still moves.
 	const fromHostId = fromWorkspaceId
-		? await hostOf(args, fromWorkspaceId, args.fromHostId)
+		? ((await hostOf(args, fromWorkspaceId, args.fromHostId, {
+				unregistered: "allow",
+			})) ?? null)
 		: null;
-	if (fromHostId === undefined) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: "Name the computer the chat moves from",
-		});
-	}
 
 	const values = [];
 	for (const { session, transcript } of chats) {
@@ -134,7 +132,8 @@ export async function createChatMove(
 /**
  * Null for a cloud workspace in the organization, the computer it is on
  * (its registered host, else the named one) when the caller may use it, and
- * undefined when neither is known. A chat only moves into a cloud workspace
+ * undefined when neither is known, or when `unregistered` allows a computer
+ * the caller has no registration for. A chat only moves into a cloud workspace
  * the caller started: the move runs an agent there with that box's
  * credentials.
  */
@@ -142,7 +141,7 @@ async function hostOf(
 	owner: Owner,
 	workspaceId: string,
 	hostId: string | undefined,
-	options: { ownCloudWorkspace?: boolean } = {},
+	options: { ownCloudWorkspace?: boolean; unregistered?: "allow" } = {},
 ): Promise<string | null | undefined> {
 	const cloud = await db.query.cloudWorkspaces.findFirst({
 		where: and(
@@ -184,6 +183,7 @@ async function hostOf(
 		columns: { hostId: true },
 	});
 	if (!reachable) {
+		if (options.unregistered === "allow") return undefined;
 		throw new TRPCError({ code: "NOT_FOUND", message: "Host not found" });
 	}
 	return resolved;

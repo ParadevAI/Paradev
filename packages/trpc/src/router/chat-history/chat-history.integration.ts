@@ -483,6 +483,22 @@ describe("chat moves", () => {
 		expect((await moveOf(other?.moveId as string)).status).toBe("pending");
 	});
 
+	test("a computer that never registered still moves its chats, with no source host to stop", async () => {
+		const sessionId = await chatOnLaptop();
+		const move = await createChatMove({
+			chatSessionId: sessionId,
+			fromHostId: `unregistered-${crypto.randomUUID()}`,
+			toWorkspaceId: MY_CLOUD,
+			organizationId: ORG,
+			userId: USER,
+		});
+		expect(await moveOf(move.id)).toMatchObject({
+			fromWorkspaceId: WORKSPACE,
+			fromHostId: null,
+			status: "pending",
+		});
+	});
+
 	test("refuses chats from two workspaces in one move, and records none", async () => {
 		const onLaptop = await chatOnLaptop();
 		const inCloud = newSession();
@@ -599,13 +615,6 @@ describe("chat moves", () => {
 			organizationId: ORG,
 			userId: USER,
 		};
-		await expect(
-			createChatMove({
-				...target,
-				fromHostId: undefined,
-				toWorkspaceId: MY_CLOUD,
-			}),
-		).rejects.toThrow("Name the computer the chat moves from");
 		await expect(
 			createChatMove({ ...target, toWorkspaceId: THEIR_CLOUD }),
 		).rejects.toThrow("cloud workspace you started");
