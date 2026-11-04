@@ -41,6 +41,7 @@ import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
+import { sessionInfoFromState } from "./utils/sessionInfoFromState";
 import {
 	isChatCreateWatched,
 	sharedChatCreate,
@@ -792,18 +793,8 @@ export function AcpChatPane({
 			onOpenHistory={onOpenHistory}
 			onNewChat={newChat}
 			onSessionState={(state) => {
-				// A resume that found no transcript lands on a different agent
-				// session. Keep the pane pointed at the live one, or the trip back
-				// to the CLI resumes an id that no longer exists.
-				const bound = state?.harnessSessionId;
 				if (!mounted.current) return;
-				onSessionInfo({
-					...(bound && bound !== agent?.sessionId
-						? { harnessSessionId: bound }
-						: {}),
-					...(state?.title ? { title: state.title } : {}),
-					...(state?.modeId ? { modeId: state.modeId } : {}),
-				});
+				onSessionInfo(sessionInfoFromState(state, agent?.sessionId));
 			}}
 			pendingPrompts={pendingPrompts}
 			preferredModelLabel={modelLabel}
