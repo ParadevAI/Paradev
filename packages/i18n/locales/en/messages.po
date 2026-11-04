@@ -6013,6 +6013,9 @@ msgstr "Couldn't save the Dev"
 msgid "Couldn't save the routine"
 msgstr "Couldn't save the routine"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Couldn't save your choice. Try again."
+
 msgid "Couldn't send comment"
 msgstr "Couldn't send comment"
 
@@ -9610,6 +9613,9 @@ msgstr "How do I get started?"
 msgid "How do the paid plans work?"
 msgstr "How do the paid plans work?"
 
+msgid "How do you want to work?"
+msgstr "How do you want to work?"
+
 msgid "How does pricing work?"
 msgstr "How does pricing work?"
 
@@ -9666,6 +9672,9 @@ msgstr "How we protect code"
 
 msgid "How we work"
 msgstr "How we work"
+
+msgid "How you run agents"
+msgstr "How you run agents"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
@@ -21785,6 +21794,9 @@ msgstr "You are viewing version {version}, read-only"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "You can attach up to {MAX_ATTACHMENTS} files"
+
+msgid "You can change this later in Settings."
+msgstr "You can change this later in Settings."
 
 msgid "You can close this tab."
 msgstr "You can close this tab."

@@ -6013,6 +6013,9 @@ msgstr "Dev se nepodařilo uložit"
 msgid "Couldn't save the routine"
 msgstr "Rutinu se nepodařilo uložit"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Volbu se nepodařilo uložit. Zkuste to znovu."
+
 msgid "Couldn't send comment"
 msgstr "Nepodařilo se odeslat komentář"
 
@@ -9610,6 +9613,9 @@ msgstr "Jak začít?"
 msgid "How do the paid plans work?"
 msgstr "Jak fungují placené tarify?"
 
+msgid "How do you want to work?"
+msgstr "Jak chcete pracovat?"
+
 msgid "How does pricing work?"
 msgstr "Jak funguje cena?"
 
@@ -9666,6 +9672,9 @@ msgstr "Jak chráníme kód"
 
 msgid "How we work"
 msgstr "Jak pracujeme"
+
+msgid "How you run agents"
+msgstr "Jak spouštíte agenty"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Jak se vaši agenti přihlašují v cloudových pracovních prostorech. Ostatní připojují vlastní předplatné nebo API klíče; na tomto počítači každý agent dál používá přihlášení, které už na něm je."
@@ -21785,6 +21794,9 @@ msgstr "Prohlížíte si verzi {version}, jen pro čtení"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Můžete přiložit nejvýše {MAX_ATTACHMENTS} souborů"
+
+msgid "You can change this later in Settings."
+msgstr "Později to můžete změnit v Nastavení."
 
 msgid "You can close this tab."
 msgstr "Tuto kartu můžete zavřít."

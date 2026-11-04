@@ -6013,6 +6013,9 @@ msgstr "Kan de Dev niet opslaan"
 msgid "Couldn't save the routine"
 msgstr "Kan de routine niet opslaan"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Je keuze kon niet worden opgeslagen. Probeer het opnieuw."
+
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
 
@@ -9610,6 +9613,9 @@ msgstr "Hoe ga ik van start?"
 msgid "How do the paid plans work?"
 msgstr "Hoe werken de betaalde abonnementen?"
 
+msgid "How do you want to work?"
+msgstr "Hoe wil je werken?"
+
 msgid "How does pricing work?"
 msgstr "Hoe werkt de prijsstelling?"
 
@@ -9666,6 +9672,9 @@ msgstr "Zo beschermen we code"
 
 msgid "How we work"
 msgstr "Hoe we werken"
+
+msgid "How you run agents"
+msgstr "Hoe je agents uitvoert"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Hoe je agents inloggen binnen cloudwerkruimtes. Anderen koppelen hun eigen abonnementen of API-sleutels; op deze machine blijft elke agent de login gebruiken die er al op staat."
@@ -21785,6 +21794,9 @@ msgstr "Je bekijkt versie {version}, alleen-lezen"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Je kunt maximaal {MAX_ATTACHMENTS} bestanden toevoegen"
+
+msgid "You can change this later in Settings."
+msgstr "Je kunt dit later wijzigen in Instellingen."
 
 msgid "You can close this tab."
 msgstr "Je kunt dit tabblad sluiten."

@@ -6013,6 +6013,9 @@ msgstr "Dev를 저장할 수 없습니다"
 msgid "Couldn't save the routine"
 msgstr "루틴을 저장할 수 없습니다"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "선택을 저장하지 못했습니다. 다시 시도하세요."
+
 msgid "Couldn't send comment"
 msgstr "코멘트를 보내지 못했습니다"
 
@@ -9610,6 +9613,9 @@ msgstr "어떻게 시작하나요?"
 msgid "How do the paid plans work?"
 msgstr "유료 플랜은 어떻게 운영되나요?"
 
+msgid "How do you want to work?"
+msgstr "어떻게 작업하시겠어요?"
+
 msgid "How does pricing work?"
 msgstr "가격은 어떻게 책정되나요?"
 
@@ -9666,6 +9672,9 @@ msgstr "코드를 보호하는 방법"
 
 msgid "How we work"
 msgstr "일하는 방식"
+
+msgid "How you run agents"
+msgstr "에이전트 실행 방식"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "클라우드 워크스페이스 안에서 에이전트가 로그인하는 방식입니다. 다른 사람은 각자의 구독이나 API 키를 연결하며, 이 컴퓨터에서는 각 에이전트가 이미 있는 로그인을 계속 사용합니다."
@@ -21785,6 +21794,9 @@ msgstr "버전 {version}을 읽기 전용으로 보고 있습니다"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "파일은 최대 {MAX_ATTACHMENTS}개까지 첨부할 수 있습니다"
+
+msgid "You can change this later in Settings."
+msgstr "나중에 설정에서 바꿀 수 있습니다."
 
 msgid "You can close this tab."
 msgstr "이 탭을 닫아도 됩니다."

@@ -6013,6 +6013,9 @@ msgstr "Não foi possível salvar o Dev"
 msgid "Couldn't save the routine"
 msgstr "Não foi possível salvar a rotina"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Não foi possível salvar sua escolha. Tente novamente."
+
 msgid "Couldn't send comment"
 msgstr "Não foi possível enviar o comentário"
 
@@ -9610,6 +9613,9 @@ msgstr "Como eu começo?"
 msgid "How do the paid plans work?"
 msgstr "Como funcionam os planos pagos?"
 
+msgid "How do you want to work?"
+msgstr "Como você quer trabalhar?"
+
 msgid "How does pricing work?"
 msgstr "Como funciona o preço?"
 
@@ -9666,6 +9672,9 @@ msgstr "Como protegemos o código"
 
 msgid "How we work"
 msgstr "Como trabalhamos"
+
+msgid "How you run agents"
+msgstr "Como você executa agentes"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Como seus agentes entram dentro das áreas de trabalho na nuvem. Outras pessoas conectam as próprias assinaturas ou chaves de API; nesta máquina cada agente continua usando o login que já está nela."
@@ -21785,6 +21794,9 @@ msgstr "Você está vendo a versão {version}, somente leitura"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Você pode anexar até {MAX_ATTACHMENTS} arquivos"
+
+msgid "You can change this later in Settings."
+msgstr "Você pode mudar isso depois em Configurações."
 
 msgid "You can close this tab."
 msgstr "Você pode fechar esta aba."

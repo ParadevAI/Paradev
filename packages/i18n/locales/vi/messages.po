@@ -6013,6 +6013,9 @@ msgstr "Không thể lưu Dev"
 msgid "Couldn't save the routine"
 msgstr "Không thể lưu quy trình"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Không thể lưu lựa chọn của bạn. Hãy thử lại."
+
 msgid "Couldn't send comment"
 msgstr "Không thể gửi bình luận"
 
@@ -9610,6 +9613,9 @@ msgstr "Tôi bắt đầu thế nào?"
 msgid "How do the paid plans work?"
 msgstr "Các gói trả phí hoạt động thế nào?"
 
+msgid "How do you want to work?"
+msgstr "Bạn muốn làm việc như thế nào?"
+
 msgid "How does pricing work?"
 msgstr "Giá được tính thế nào?"
 
@@ -9666,6 +9672,9 @@ msgstr "Cách chúng tôi bảo vệ mã nguồn"
 
 msgid "How we work"
 msgstr "Cách chúng tôi làm việc"
+
+msgid "How you run agents"
+msgstr "Cách bạn chạy agent"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cách các agent của bạn đăng nhập bên trong workspace cloud. Người khác kết nối gói đăng ký hoặc khóa API của riêng họ; trên máy này mỗi agent vẫn dùng phiên đăng nhập sẵn có."
@@ -21785,6 +21794,9 @@ msgstr "Bạn đang xem phiên bản {version}, chỉ đọc"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Bạn có thể đính kèm tối đa {MAX_ATTACHMENTS} tệp"
+
+msgid "You can change this later in Settings."
+msgstr "Bạn có thể đổi lại sau trong Cài đặt."
 
 msgid "You can close this tab."
 msgstr "Bạn có thể đóng tab này."

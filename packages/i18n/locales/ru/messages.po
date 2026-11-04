@@ -6013,6 +6013,9 @@ msgstr "Не удалось сохранить Dev"
 msgid "Couldn't save the routine"
 msgstr "Не удалось сохранить рутину"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Не удалось сохранить выбор. Попробуйте ещё раз."
+
 msgid "Couldn't send comment"
 msgstr "Не удалось отправить комментарий"
 
@@ -9610,6 +9613,9 @@ msgstr "Как начать?"
 msgid "How do the paid plans work?"
 msgstr "Как работают платные тарифы?"
 
+msgid "How do you want to work?"
+msgstr "Как вы хотите работать?"
+
 msgid "How does pricing work?"
 msgstr "Как устроена цена?"
 
@@ -9666,6 +9672,9 @@ msgstr "Как мы защищаем код"
 
 msgid "How we work"
 msgstr "Как мы работаем"
+
+msgid "How you run agents"
+msgstr "Как вы запускаете агентов"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Как ваши агенты входят внутри облачных рабочих областей. Другие подключают свои подписки или ключи API; на этой машине каждый агент продолжает использовать вход, который уже на ней есть."
@@ -21785,6 +21794,9 @@ msgstr "Вы просматриваете версию {version}, только �
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Можно прикрепить не более {MAX_ATTACHMENTS} файлов"
+
+msgid "You can change this later in Settings."
+msgstr "Это можно изменить позже в настройках."
 
 msgid "You can close this tab."
 msgstr "Эту вкладку можно закрыть."

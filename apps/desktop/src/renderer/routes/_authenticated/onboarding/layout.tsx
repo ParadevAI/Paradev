@@ -33,6 +33,13 @@ const SETUP_STEP = {
 	}),
 };
 
+const MODE_STEP = {
+	path: "/onboarding/mode",
+	match: (p: string) => p === "/onboarding/mode",
+	title: msg({ message: "How do you want to work?" }),
+	subtitle: msg({ message: "You can change this later in Settings." }),
+};
+
 const PROJECT_STEP = {
 	path: "/onboarding/project",
 	match: (p: string) => p === "/onboarding/project",
@@ -42,7 +49,7 @@ const PROJECT_STEP = {
 	}),
 };
 
-const projectRedirect = <Redirect to="/onboarding/project" replace />;
+const modeRedirect = <Redirect to="/onboarding/mode" replace />;
 
 function OnboardingFlowLayout() {
 	const { data: session, isPending } = authClient.useSession();
@@ -78,10 +85,12 @@ function OnboardingFlowLayout() {
 
 	// Nothing to set up when GitHub CLI already works, so that step drops out.
 	// Decided on arrival: signing in mid-step must not unmount its own dialog.
-	const steps = ghReadyOnArrival ? [PROJECT_STEP] : [SETUP_STEP, PROJECT_STEP];
+	const steps = ghReadyOnArrival
+		? [MODE_STEP, PROJECT_STEP]
+		: [SETUP_STEP, MODE_STEP, PROJECT_STEP];
 	if (SETUP_STEP.match(location.pathname)) {
 		if (ghReadyOnArrival === null) return null;
-		if (ghReadyOnArrival) return projectRedirect;
+		if (ghReadyOnArrival) return modeRedirect;
 	}
 
 	const currentStepIdx = steps.findIndex((s) => s.match(location.pathname));
@@ -97,11 +106,11 @@ function OnboardingFlowLayout() {
 	};
 
 	// The project step finishes onboarding itself the moment a project is
-	// added, so only the GitHub step gets a footer action
-	const handleContinue =
-		currentStep === SETUP_STEP
-			? () => navigate({ to: PROJECT_STEP.path })
-			: null;
+	// added, so the last step has no footer action
+	const nextStep = isOnMainStep ? steps[currentStepIdx + 1] : undefined;
+	const handleContinue = nextStep
+		? () => navigate({ to: nextStep.path })
+		: null;
 
 	return (
 		<div className="flex h-full w-full flex-col bg-background">
