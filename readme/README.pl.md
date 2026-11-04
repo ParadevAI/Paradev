@@ -322,7 +322,6 @@ Skróty klawiszowe można dostosować w **Ustawienia → Skróty klawiszowe** (�
 
 ## Prywatność domyślnie
 
-- **Open source**: pełny kod źródłowy jest na GitHubie na licencji MIT.
 - **Jawne połączenia**: to Ty wybierasz, które agenty, dostawców i integracje podłączyć.
 
 ## Wnoszenie zmian

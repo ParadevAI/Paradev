@@ -321,7 +321,6 @@ Klávesové zkratky si můžete přizpůsobit přes **Nastavení → Klávesové
 
 ## Ve výchozím stavu soukromé
 
-- **Open source**: kompletní zdrojový kód je na GitHubu pod licencí MIT.
 - **Explicitní připojení**: sami si volíte, které agenty, poskytovatele a integrace připojíte.
 
 ## Přispívání

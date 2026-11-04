@@ -321,7 +321,6 @@ Le scorciatoie da tastiera sono personalizzabili in **Impostazioni → Scorciato
 
 ## Privato per impostazione predefinita
 
-- **Open source**: il codice sorgente completo è su GitHub sotto licenza MIT.
 - **Connessioni esplicite**: scegli tu quali agenti, provider e integrazioni collegare.
 
 ## Contribuire

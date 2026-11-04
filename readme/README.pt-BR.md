@@ -321,7 +321,6 @@ Os atalhos de teclado são personalizáveis em **Configurações → Atalhos de 
 
 ## Privado por padrão
 
-- **Código aberto**: o código completo está no GitHub sob a Licença MIT.
 - **Conexões explícitas**: você escolhe quais agentes, provedores e integrações conectar.
 
 ## Contribuindo

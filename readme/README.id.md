@@ -321,7 +321,6 @@ Pintasan keyboard bisa dikustomisasi lewat **Pengaturan → Pintasan Keyboard** 
 
 ## Privat Secara Default
 
-- **Open source**: kode sumber lengkap ada di GitHub di bawah Lisensi MIT.
 - **Koneksi eksplisit**: Anda yang memilih agen, provider, dan integrasi mana yang dihubungkan.
 
 ## Berkontribusi

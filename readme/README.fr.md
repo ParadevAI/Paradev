@@ -321,7 +321,6 @@ Les raccourcis clavier sont personnalisables via **Paramètres → Raccourcis cl
 
 ## Privé par défaut
 
-- **Open source** : le code source complet est sur GitHub sous licence MIT.
 - **Connexions explicites** : c'est vous qui choisissez quels agents, fournisseurs et intégrations connecter.
 
 ## Contribuer

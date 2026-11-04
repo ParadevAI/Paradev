@@ -321,7 +321,6 @@ Klavye kısayolları **Ayarlar → Klavye kısayolları** (⌘/) üzerinden öze
 
 ## Varsayılan Olarak Gizli
 
-- **Açık kaynak**: kaynak kodun tamamı MIT Lisansı altında GitHub'dadır.
 - **Açık Bağlantılar**: hangi ajanları, sağlayıcıları ve entegrasyonları bağlayacağınızı siz seçersiniz.
 
 ## Katkıda Bulunma

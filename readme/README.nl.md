@@ -321,7 +321,6 @@ Sneltoetsen zijn aanpasbaar via **Instellingen → Sneltoetsen** (⌘/); zie de 
 
 ## Standaard privé
 
-- **Open source**: de volledige broncode staat op GitHub onder de MIT-licentie.
 - **Expliciete verbindingen**: jij kiest welke agents, providers en integraties je verbindt.
 
 ## Bijdragen

@@ -321,7 +321,6 @@ Tastenkürzel lassen sich unter **Einstellungen → Tastenkürzel** (⌘/) anpas
 
 ## Standardmäßig privat
 
-- **Open Source**: der komplette Quellcode liegt auf GitHub unter der MIT-Lizenz.
 - **Explizite Verbindungen**: du entscheidest, welche Agenten, Provider und Integrationen verbunden werden.
 
 ## Mitmachen

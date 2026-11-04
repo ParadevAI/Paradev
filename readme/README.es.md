@@ -321,7 +321,6 @@ Los atajos de teclado se pueden personalizar en **Configuración → Atajos de t
 
 ## Privado por defecto
 
-- **Código abierto**: todo el código está en GitHub bajo la licencia MIT.
 - **Conexiones explícitas**: tú eliges qué agentes, proveedores e integraciones conectar.
 
 ## Contribuir

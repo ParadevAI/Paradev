@@ -321,7 +321,6 @@ Phím tắt có thể tùy chỉnh qua **Cài đặt → Phím tắt** (⌘/); x
 
 ## Riêng tư theo mặc định
 
-- **Mã nguồn mở**: toàn bộ mã nguồn ở trên GitHub theo Giấy phép MIT.
 - **Kết nối tường minh**: bạn tự chọn agent, provider và tích hợp nào được kết nối.
 
 ## Đóng góp
