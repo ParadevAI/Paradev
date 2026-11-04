@@ -3,7 +3,7 @@ title: Pages
 description: Share agent-created designs and reports with your team, and turn comments into updates
 ---
 
-Paradev Pages gives your agents a way to present designs, reports, and analysis to your team. Teammates comment directly on the page, and an agent picks up the feedback, makes changes, and publishes an updated version.
+Pages let agents present designs, reports, and analysis to your team. Teammates comment on the page, and an agent picks up the feedback and publishes an updated version.
 
 ![A Paradev Page presenting a cloud signup design review, with a comment pinned to the headline](/images/pages-design-review.png)
 
@@ -39,7 +39,7 @@ To publish from the CLI, run:
 superset pages publish design.html --title "Onboarding design" --label "First draft"
 ```
 
-The command returns a shareable URL. Publishing does not open the page or move the desktop to another workspace. See the [CLI reference](/cli/cli-reference#pages) for options.
+The command returns a shareable URL. Publishing does not open the page. See the [CLI reference](/cli/cli-reference#pages) for options.
 
 ## Find Workspace Pages
 
@@ -67,7 +67,7 @@ Anyone viewing a public page can use **Report** to flag it to the Paradev team w
 
 ## Send Feedback Directly to an Agent
 
-Open the page, enter comment mode, and click an element to pin feedback to it. The agent receives the comment along with context identifying the element, so teammates can point to exactly what they want changed.
+Open the page, enter comment mode, and click an element to pin feedback to it. The agent receives the comment with context that identifies the element.
 
 On iPhone, the comments sheet keeps replies inline. Tap **Reply** to target a thread, or clear the reply target to leave a page-level comment. Resolved threads appear under the resolved-comments disclosure.
 
@@ -77,7 +77,7 @@ Publishing from an agent's Paradev terminal attempts to register that session fo
 - The page's creator can click the **X** on a row to stop that agent watching.
 - The page's creator can use **Add listening agent** to assign a running agent in the workspace, or start a new agent session and assign it.
 
-Keep the host and agent session running for automatic feedback delivery. If the menu says **No listening agents**, the page's creator can add one. New comments are delivered when the agent is available to handle them.
+Keep the host and agent session running so feedback reaches the agent. If the menu says **No listening agents**, the page's creator can add one.
 
 The agent can change the page, answer a question in the thread, or leave feedback open when it needs more discussion. When it makes a change, it republishes the page, replies with what changed, and resolves the feedback it addressed.
 
@@ -139,11 +139,11 @@ superset pages storage <page-id-or-slug> --key data --scope shared --set '{"deal
 superset pages storage <page-id-or-slug> --key data --scope shared --remove
 ```
 
-Only signed-in members of the page's organization can write storage, and on a `just_me` page only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage. Reading storage and writing it both need membership in the page's organization.
+On `org` and `everyone` pages, only signed-in members of the page's organization can read or write storage. On a `just_me` page, only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage.
 
 ## Show Live Data from Your Tools
 
-A page can call a tool from a plugin, such as a read-only database query or a web search, and show the result. The call runs as the person viewing the page, through their own connected account. The page itself makes no network request; Paradev makes the call.
+A page can call a plugin tool, such as a database query or a web search, and show the result. The call runs as the viewer, through their own connected account. Paradev makes the call, not the page.
 
 ```js
 const tools = window.superset?.tools;
