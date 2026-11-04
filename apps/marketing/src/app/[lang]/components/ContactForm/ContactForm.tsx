@@ -5,17 +5,12 @@ import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { submitContactInquiry } from "../../contact/actions";
 
-interface ContactFormProps {
-	intent?: "contact" | "cloud-design-partner";
-}
-
-export function ContactForm({ intent = "contact" }: ContactFormProps) {
-	const isCloudSignup = intent === "cloud-design-partner";
+export function ContactForm() {
 	const { t, i18n } = useLingui();
 	const [formState, setFormState] = useState({
 		name: "",
 		email: "",
-		topic: isCloudSignup ? "Cloud design partnership" : "",
+		topic: "",
 		message: "",
 		honeypot: "",
 	});
@@ -94,7 +89,7 @@ export function ContactForm({ intent = "contact" }: ContactFormProps) {
 						htmlFor="contact-email"
 						className="block text-sm text-muted-foreground mb-1.5"
 					>
-						{isCloudSignup ? <Trans>Work email</Trans> : <Trans>Email</Trans>}
+						<Trans>Email</Trans>
 					</label>
 					<input
 						id="contact-email"
@@ -109,38 +104,30 @@ export function ContactForm({ intent = "contact" }: ContactFormProps) {
 				</div>
 			</div>
 
-			{!isCloudSignup && (
-				<div>
-					<label
-						htmlFor="contact-topic"
-						className="block text-sm text-muted-foreground mb-1.5"
-					>
-						<Trans>Topic</Trans>
-					</label>
-					<input
-						id="contact-topic"
-						type="text"
-						value={formState.topic}
-						onChange={(e) =>
-							setFormState((s) => ({ ...s, topic: e.target.value }))
-						}
-						className="w-full px-3.5 py-2.5 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/25 transition-colors"
-					/>
-				</div>
-			)}
+			<div>
+				<label
+					htmlFor="contact-topic"
+					className="block text-sm text-muted-foreground mb-1.5"
+				>
+					<Trans>Topic</Trans>
+				</label>
+				<input
+					id="contact-topic"
+					type="text"
+					value={formState.topic}
+					onChange={(e) =>
+						setFormState((s) => ({ ...s, topic: e.target.value }))
+					}
+					className="w-full px-3.5 py-2.5 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/25 transition-colors"
+				/>
+			</div>
 
 			<div>
 				<label
 					htmlFor="contact-message"
 					className="block text-sm text-muted-foreground mb-1.5"
 				>
-					{isCloudSignup ? (
-						<Trans>
-							What would you like to build with Paradev in the cloud?
-						</Trans>
-					) : (
-						<Trans>How can we help?</Trans>
-					)}
+					<Trans>How can we help?</Trans>
 				</label>
 				<textarea
 					id="contact-message"
@@ -185,11 +172,7 @@ export function ContactForm({ intent = "contact" }: ContactFormProps) {
 					</>
 				) : (
 					<>
-						{isCloudSignup ? (
-							<Trans>Become a design partner</Trans>
-						) : (
-							<Trans>Send message</Trans>
-						)}
+						<Trans>Send message</Trans>
 						<ArrowRight className="size-3.5" />
 					</>
 				)}

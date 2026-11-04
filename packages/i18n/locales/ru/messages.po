@@ -1627,6 +1627,9 @@ msgstr "3 архивные рабочие области"
 msgid "3 files changed, 2 tests passing"
 msgstr "Изменено 3 файла, 2 теста проходят"
 
+msgid "3 running"
+msgstr "3 запущено"
+
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ параллельных потока работы на инженера"
 
@@ -2308,6 +2311,9 @@ msgstr "Агенты не могут получить доступ к инстр
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Агенты закрывают рутинные тикеты без вмешательства по ходу задачи."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Агенты продолжают работать в облаке. Снова откройте рабочую область на компьютере, iPhone или iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Агенты сами открывают свой предпросмотр, управляют интерфейсом и прикладывают скриншоты как доказательство, прежде чем отметить работу готовой к ревью."
 
@@ -2322,6 +2328,12 @@ msgstr "Агенты запоминают, что узнали о вашей к�
 
 msgid "Agents running at once"
 msgstr "Агентов запущено одновременно"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Агенты видят только заглушку. Paradev добавляет ваш вход к исходящим запросам."
+
+msgid "Agents that run while you're away"
+msgstr "Агенты, которые работают, пока вас нет"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенты используют этот аккаунт, когда вызывают инструменты Linear."
@@ -2637,6 +2649,9 @@ msgstr "Агент пишет целые функции и файлы, а чел
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Автоматизация может использовать только облачную рабочую область, которую создали вы"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Окружение хранит репозитории, переменные и регион. Запускайте из него столько рабочих областей, сколько нужно."
 
 msgid "An error occurred"
 msgstr "Произошла ошибка"
@@ -3408,9 +3423,6 @@ msgstr "на основе PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "На основе {0} токенов за последние 30 дней, учитывая {1}."
 
-msgid "Become a design partner"
-msgstr "Стать партнёром по разработке"
-
 msgid "Before"
 msgstr "До"
 
@@ -3666,9 +3678,6 @@ msgstr "Отчёты о багах"
 
 msgid "Build in public"
 msgstr "Работаем открыто"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Создайте будущее Paradev в облаке"
 
 msgid "Build your own"
 msgstr "Создайте свой"
@@ -4607,6 +4616,9 @@ msgstr "Закрыть рабочую область"
 msgid "Close Workspace"
 msgstr "Закрыть рабочую область"
 
+msgid "Close your laptop"
+msgstr "Закройте ноутбук"
+
 msgid "Closed"
 msgstr "Закрыт"
 
@@ -4629,6 +4641,9 @@ msgstr "Закрытие этого терминала завершит рабо
 msgid "Cloud"
 msgstr "Облако"
 
+msgid "Cloud · us-east"
+msgstr "Облако · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Настройка облачного окружения"
 
@@ -4640,9 +4655,6 @@ msgstr "Облачные окружения получают ваши репоз
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "Облачные ГБ-часы на место в месяц"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Облачная версия скоро появится. Станьте партнёром по разработке"
 
 msgid "Cloud sandboxes"
 msgstr "Облачные песочницы"
@@ -4748,9 +4760,6 @@ msgstr "Объединять последовательности вроде => 
 
 msgid "Come build it with us."
 msgstr "Приходите создавать его вместе с нами."
-
-msgid "Coming soon"
-msgstr "Скоро"
 
 msgid "Coming Soon"
 msgstr "Скоро"
@@ -7448,6 +7457,9 @@ msgstr "У каждой поверхности своя типографика. 
 msgid "Each task on its own branch"
 msgstr "У каждой задачи своя ветка"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Каждая рабочая область получает свою облачную машину и продолжает работать, когда ноутбук закрыт. Следите за ней с компьютера, iPhone или iPad."
+
 msgid "Early 2024"
 msgstr "Начало 2024"
 
@@ -9934,6 +9946,9 @@ msgstr "Входит"
 msgid "Included in Enterprise"
 msgstr "Входит в Enterprise"
 
+msgid "Included with Team and Ultra."
+msgstr "Входит в Team и Ultra."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Включает специфичный для Paradev вариант box"
 
@@ -10342,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Присоединиться"
 
-msgid "Join as a design partner"
-msgstr "Стать дизайн-партнёром"
-
 msgid "Join channel"
 msgstr "Присоединиться к каналу"
 
@@ -10538,6 +10550,9 @@ msgstr "Язык"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Язык сохранён на этом устройстве, но синхронизировать его с аккаунтом не удалось."
+
+msgid "Laptop closed"
+msgstr "Ноутбук закрыт"
 
 msgid "Large"
 msgstr "Большой"
@@ -12370,6 +12385,9 @@ msgstr "Задачи не найдены."
 msgid "No items"
 msgstr "Пусто"
 
+msgid "No keys in the sandbox"
+msgstr "Никаких ключей в песочнице"
+
 msgid "No known creators"
 msgstr "Нет известных создателей"
 
@@ -13092,6 +13110,9 @@ msgstr "Одной строкой"
 
 msgid "One line about how you work"
 msgstr "Одна строка о том, как вы работаете"
+
+msgid "One machine per workspace."
+msgstr "Одна машина на рабочую область."
 
 msgid "One of the first hundred on the board"
 msgstr "В числе первых ста в рейтинге"
@@ -14011,6 +14032,9 @@ msgstr "Paradev Автоматизации"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Облачные рабочие области Paradev"
+
 msgid "Paradev components"
 msgstr "Компоненты Paradev"
 
@@ -14362,6 +14386,9 @@ msgstr "Выберите папку на диске и добавьте её к�
 
 msgid "Pick a folder…"
 msgstr "Выберите папку…"
+
+msgid "Pick a machine size"
+msgstr "Выберите размер машины"
 
 msgid "Pick a model"
 msgstr "Выберите модель"
@@ -16425,6 +16452,9 @@ msgstr "Запускайте автоматизации, когда в ваше�
 msgid "Run automations when Sentry issues change."
 msgstr "Запускайте автоматизации при изменении задач в Sentry."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Запускайте агентов для кода в облачных рабочих областях, которые продолжают работать, когда ноутбук закрыт. Входит в Team и Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Выполняйте команды и перемещайтесь по приложению."
 
@@ -16490,6 +16520,9 @@ msgstr "Запускайте агентов с десктопа, из любог
 
 msgid "Run your agents from your phone."
 msgstr "Запускайте агентов с телефона."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Запускайте своих агентов для кода в облаке."
 
 msgid "Run."
 msgstr "Запустите."
@@ -17328,6 +17361,9 @@ msgstr "Настроить хост по SSH"
 msgid "Set up an automation"
 msgstr "Настройте автоматизацию"
 
+msgid "Set up once"
+msgstr "Настройте один раз"
+
 msgid "Set up project on {hostName}"
 msgstr "Настроить проект на {hostName}"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Малая"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Малая, Средняя или Большая, до 8 vCPU и 16 ГБ. Расход зависит от памяти."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Расправьтесь со своим бэклогом."
@@ -18291,6 +18330,9 @@ msgstr "Начинайте работу откуда угодно"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Запускайте рабочие области прямо из задач Linear или GitHub в разделе «Задачи», и в каждой из них уже работает агент."
+
+msgid "Start your first cloud workspace."
+msgstr "Запустите свою первую облачную рабочую область."
 
 msgid "Started"
 msgstr "Начато"
@@ -20712,6 +20754,12 @@ msgstr "Перейти на {planName}"
 msgid "Upgrade to Pro"
 msgstr "Перейти на Pro"
 
+msgid "Upgrade to Team"
+msgstr "Перейти на Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Повысьте план организации, подключите GitHub и выберите «Облако» на экране новой рабочей области."
+
 msgid "Upgrade your plan"
 msgstr "Повысьте тариф"
 
@@ -21191,9 +21239,6 @@ msgstr "Мы нанимаем инженеров в Сан-Франциско. �
 msgid "We're hiring in San Francisco"
 msgstr "Мы нанимаем в Сан-Франциско"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Мы ищем партнёров по разработке, которые помогут создать наш облачный продукт. Расскажите о своём рабочем процессе, и мы свяжемся с вами, чтобы обсудить сотрудничество."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Мы переделываем эту функцию. Загляните позже."
 
@@ -21342,9 +21387,6 @@ msgstr "Что мы строим"
 msgid "What we've shipped"
 msgstr "Что мы выпустили"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Что вы хотели бы создать с помощью Paradev в облаке?"
-
 msgid "What would you like to know?"
 msgstr "Что вы хотите узнать?"
 
@@ -21462,9 +21504,6 @@ msgstr "Логотип-надпись, чёрный"
 
 msgid "Wordmark, white"
 msgstr "Логотип-надпись, белый"
-
-msgid "Work email"
-msgstr "Рабочая электронная почта"
 
 msgid "Work from tickets"
 msgstr "Работа из тикетов"

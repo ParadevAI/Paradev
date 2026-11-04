@@ -1627,6 +1627,9 @@ msgstr "3個已歸檔的工作區"
 msgid "3 files changed, 2 tests passing"
 msgstr "3個檔案已更改，2個測試通過"
 
+msgid "3 running"
+msgstr "3 個執行中"
+
 msgid "3+ concurrent workstreams per engineer"
 msgstr "每位工程師3條以上並行工作流"
 
@@ -2308,6 +2311,9 @@ msgstr "代理程式無法存取 {0} 的工具"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "代理程式無需中途干預即可完成常規工單。"
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "代理程式會在雲端持續工作。可在桌面版、iPhone 或 iPad 上重新開啟工作區。"
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "代理程式自己載入預覽、操作介面，並在標記為待審查之前附上截圖證據。"
 
@@ -2322,6 +2328,12 @@ msgstr "代理程式會記住它們對你程式碼庫的了解，讓每個新會
 
 msgid "Agents running at once"
 msgstr "同時執行的代理程式數"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "代理程式只會看到預留位置。Paradev 會把你的登入憑證加到外送請求中。"
+
+msgid "Agents that run while you're away"
+msgstr "你離開時也在執行的代理程式"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "代理程式呼叫 Linear 工具時會使用此帳號。"
@@ -2637,6 +2649,9 @@ msgstr "代理程式寫出完整的函式和檔案，人類盯著每一步、批
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "自動化只能使用你建立的雲端工作區"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "環境儲存你的儲存庫、變數和區域。可以從它啟動任意數量的工作區。"
 
 msgid "An error occurred"
 msgstr "發生錯誤"
@@ -3408,9 +3423,6 @@ msgstr "基於PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "基於最近30天的{0}個token，統計{1}。"
 
-msgid "Become a design partner"
-msgstr "成為共創夥伴"
-
 msgid "Before"
 msgstr "變更前"
 
@@ -3666,9 +3678,6 @@ msgstr "Bug 回報"
 
 msgid "Build in public"
 msgstr "公開建構"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "共創 Paradev 的雲端未來"
 
 msgid "Build your own"
 msgstr "自己動手打造"
@@ -4607,6 +4616,9 @@ msgstr "關閉工作區"
 msgid "Close Workspace"
 msgstr "關閉工作區"
 
+msgid "Close your laptop"
+msgstr "闔上筆電"
+
 msgid "Closed"
 msgstr "已關閉"
 
@@ -4629,6 +4641,9 @@ msgstr "關閉此終端將結束正在執行的處理程序。"
 msgid "Cloud"
 msgstr "雲端"
 
+msgid "Cloud · us-east"
+msgstr "雲端 · us-east"
+
 msgid "Cloud environment setup"
 msgstr "雲端環境設定"
 
@@ -4640,9 +4655,6 @@ msgstr "雲端環境會從 GitHub 檢出你的儲存庫。請先連結這些;只
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "每席位每月雲端 GB 小時"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "雲端版本即將推出。成為共創夥伴"
 
 msgid "Cloud sandboxes"
 msgstr "雲端沙箱"
@@ -4748,9 +4760,6 @@ msgstr "合併顯示=>和!==等序列。"
 
 msgid "Come build it with us."
 msgstr "來和我們一起建構吧。"
-
-msgid "Coming soon"
-msgstr "即將推出"
 
 msgid "Coming Soon"
 msgstr "即將推出"
@@ -7448,6 +7457,9 @@ msgstr "每個介面都有各自的排版設定。更改會立即體現在即時
 msgid "Each task on its own branch"
 msgstr "每個任務都有自己的分支"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "每個工作區都有獨立的雲端機器，筆電闔上也能繼續工作。可在桌面版、iPhone 或 iPad 上查看進度。"
+
 msgid "Early 2024"
 msgstr "2024年初"
 
@@ -9934,6 +9946,9 @@ msgstr "包含"
 msgid "Included in Enterprise"
 msgstr "企業版包含"
 
+msgid "Included with Team and Ultra."
+msgstr "包含在 Team 和 Ultra 中。"
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "包含Paradev特有的box變體"
 
@@ -10342,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "加入"
 
-msgid "Join as a design partner"
-msgstr "加入成為設計夥伴"
-
 msgid "Join channel"
 msgstr "加入頻道"
 
@@ -10538,6 +10550,9 @@ msgstr "語言"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "語言已在此裝置上儲存，但同步到你的帳戶失敗。"
+
+msgid "Laptop closed"
+msgstr "筆電已闔上"
 
 msgid "Large"
 msgstr "大"
@@ -12370,6 +12385,9 @@ msgstr "未找到議題。"
 msgid "No items"
 msgstr "暫無條目"
 
+msgid "No keys in the sandbox"
+msgstr "沙箱中不存放金鑰"
+
 msgid "No known creators"
 msgstr "沒有已知的建立者"
 
@@ -13092,6 +13110,9 @@ msgstr "一句話"
 
 msgid "One line about how you work"
 msgstr "用一句話介紹你的工作方式"
+
+msgid "One machine per workspace."
+msgstr "每個工作區一台機器。"
 
 msgid "One of the first hundred on the board"
 msgstr "榜單最早的一百人之一"
@@ -14011,6 +14032,9 @@ msgstr "Paradev 自動化"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev 雲端工作區"
+
 msgid "Paradev components"
 msgstr "Paradev 元件"
 
@@ -14362,6 +14386,9 @@ msgstr "選擇磁碟上的資料夾並將其新增為專案"
 
 msgid "Pick a folder…"
 msgstr "選擇資料夾…"
+
+msgid "Pick a machine size"
+msgstr "選擇機器規格"
 
 msgid "Pick a model"
 msgstr "選擇模型"
@@ -16425,6 +16452,9 @@ msgstr "在你的Microsoft Teams租戶中有訊息釋出或頻道被建立時執
 msgid "Run automations when Sentry issues change."
 msgstr "在Sentry問題發生變化時執行自動化。"
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "在雲端工作區中執行程式設計代理程式，筆電闔上也能繼續工作。包含在 Team 和 Ultra 中。"
+
 msgid "Run commands and navigate the application."
 msgstr "執行命令並在應用中導航。"
 
@@ -16490,6 +16520,9 @@ msgstr "在桌面、任何終端機或手機上執行你的 agent。"
 
 msgid "Run your agents from your phone."
 msgstr "在手機上執行你的 agent。"
+
+msgid "Run your coding agents in the cloud."
+msgstr "在雲端執行你的程式設計代理程式。"
 
 msgid "Run."
 msgstr "執行。"
@@ -17328,6 +17361,9 @@ msgstr "透過 SSH 設定主機"
 msgid "Set up an automation"
 msgstr "設定自動化"
 
+msgid "Set up once"
+msgstr "只需設定一次"
+
 msgid "Set up project on {hostName}"
 msgstr "在{hostName}上設定專案"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "小型"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "小型、中型或大型，最高 8 vCPU 和 16 GB。用量隨記憶體增加。"
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "清空你的待辦清單。"
@@ -18291,6 +18330,9 @@ msgstr "隨時隨地開始工作"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "在任務檢視中直接從 Linear 或 GitHub 議題啟動工作區，每個工作區都已有代理程式在處理。"
+
+msgid "Start your first cloud workspace."
+msgstr "啟動你的第一個雲端工作區。"
 
 msgid "Started"
 msgstr "開始時間"
@@ -20712,6 +20754,12 @@ msgstr "升級至 {planName}"
 msgid "Upgrade to Pro"
 msgstr "升級至 Pro"
 
+msgid "Upgrade to Team"
+msgstr "升級到 Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "升級你的組織，連結 GitHub，然後在新增工作區畫面中選擇「雲端」。"
+
 msgid "Upgrade your plan"
 msgstr "升級你的方案"
 
@@ -21191,9 +21239,6 @@ msgstr "我們正在舊金山招募工程師。來和我們一起打造工程師
 msgid "We're hiring in San Francisco"
 msgstr "我們在舊金山招聘"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "我們正在尋找共創夥伴，共同打造雲端產品。請告訴我們您的工作流程，我們會與您聯絡，探討合作機會。"
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "我們正在重做這個功能，敬請期待。"
 
@@ -21342,9 +21387,6 @@ msgstr "我們正在構建什麼"
 msgid "What we've shipped"
 msgstr "我們發布了什麼"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "您想用雲端 Paradev 建構什麼？"
-
 msgid "What would you like to know?"
 msgstr "你想了解什麼？"
 
@@ -21462,9 +21504,6 @@ msgstr "文字標誌，黑色"
 
 msgid "Wordmark, white"
 msgstr "文字標誌，白色"
-
-msgid "Work email"
-msgstr "工作電子郵件"
 
 msgid "Work from tickets"
 msgstr "從工單開始工作"
