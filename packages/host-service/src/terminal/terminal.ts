@@ -534,6 +534,7 @@ type ShellReadyState =
 	| "cancelled";
 
 interface TerminalSession {
+	readOnly?: boolean;
 	terminalId: string;
 	workspaceId: string;
 	/** Handle for db writes from module-scope handlers (daemon disconnect). */
@@ -868,6 +869,7 @@ export interface TerminalSessionSummary {
  * changing anyone's behaviour.
  */
 export type TerminalSessionErrorKind =
+	| "SESSION_READ_ONLY"
 	/** No session with this id, in memory or on the daemon. */
 	| "SESSION_NOT_FOUND"
 	/** The session exists but is owned by a different workspace. */
@@ -1017,6 +1019,24 @@ export async function listLiveTerminalSessions(
 	return merged;
 }
 
+export function isExternalTerminal(db: HostDb, terminalId: string): boolean {
+	return (
+		db
+			.select({ owner: terminalSessions.agentLifecycleOwner })
+			.from(terminalSessions)
+			.where(eq(terminalSessions.id, terminalId))
+			.get()?.owner === "external"
+	);
+}
+
+function externalReadOnlyError(): TerminalSessionError {
+	return {
+		kind: "SESSION_READ_ONLY",
+		error:
+			"This terminal observes an externally managed worker and does not accept input.",
+	};
+}
+
 export function writeInputToSession({
 	terminalId,
 	workspaceId,
@@ -1040,6 +1060,7 @@ export function writeInputToSession({
 		return { kind: "SESSION_EXITED", error: "Terminal session has exited" };
 	}
 
+	if (session.readOnly) return externalReadOnlyError();
 	session.pty.write(data);
 	return { success: true };
 }
@@ -1235,6 +1256,7 @@ async function writeSessionMessage(
 	}: SessionMessageInput,
 	agent?: AgentMessageTarget,
 ): Promise<{ success: true } | TerminalSessionError> {
+	if (isExternalTerminal(db, terminalId)) return externalReadOnlyError();
 	const session = await getOrAdoptSession({
 		terminalId,
 		workspaceId,
@@ -2907,6 +2929,8 @@ export async function disposeSessionsByWorktreePath(
 }
 
 interface CreateTerminalSessionOptions {
+	externalObservation?: boolean;
+	externalAgentConfigId?: string;
 	terminalId: string;
 	workspaceId: string;
 	themeType?: "dark" | "light";
@@ -2927,6 +2951,99 @@ interface CreateTerminalSessionOptions {
 	 * above a brand-new shell.
 	 */
 	restoredNotice?: boolean;
+}
+
+export function createExternalTerminalSession(
+	options: Omit<
+		CreateTerminalSessionOptions,
+		"adoptOnly" | "externalObservation"
+	> & { initialCommand: string },
+): Promise<TerminalSession | TerminalSessionError> {
+	const { db, terminalId, workspaceId } = options;
+	return lifecycleOperations.run(
+		terminalId,
+		async () => {
+			const record = db.query.terminalSessions
+				.findFirst({ where: eq(terminalSessions.id, terminalId) })
+				.sync();
+			if (
+				record &&
+				(record.originWorkspaceId !== workspaceId ||
+					record.agentLifecycleOwner !== "external")
+			)
+				return externalReadOnlyError();
+			if (
+				record &&
+				options.externalAgentConfigId &&
+				options.externalAgentConfigId !== record.externalAgentConfigId
+			)
+				return externalReadOnlyError();
+			if (record?.externalEndedAt != null)
+				return {
+					kind: "SESSION_EXITED",
+					error:
+						"The external worker has ended; a new worker needs a new terminal id.",
+				};
+			if (record && terminalLifecycleState(record) === "active") {
+				const adopted = await createTerminalSessionUnlocked({
+					...options,
+					initialCommand: undefined,
+					adoptOnly: true,
+					externalObservation: true,
+				});
+				if (!("error" in adopted) && !adopted.exited) {
+					if (
+						db.query.terminalSessions
+							.findFirst({ where: eq(terminalSessions.id, terminalId) })
+							.sync()?.externalEndedAt != null
+					)
+						return {
+							kind: "SESSION_EXITED",
+							error: "The external worker has ended.",
+						};
+					return adopted;
+				}
+				if ("error" in adopted && adopted.kind !== "SESSION_NOT_ACTIVE")
+					return adopted;
+			}
+			if (record) {
+				const disposed = await disposeSessionUnlocked(terminalId, db);
+				if (!disposed.daemonCloseSucceeded)
+					return {
+						kind: "DAEMON_UNAVAILABLE",
+						error: "Could not detach the prior observation terminal.",
+						transient: true,
+					};
+			}
+			if (
+				db.query.terminalSessions
+					.findFirst({ where: eq(terminalSessions.id, terminalId) })
+					.sync()?.externalEndedAt != null
+			) {
+				return {
+					kind: "SESSION_EXITED",
+					error: "The external worker has ended.",
+				};
+			}
+			db.insert(terminalSessions)
+				.values({
+					id: terminalId,
+					originWorkspaceId: workspaceId,
+					agentLifecycleOwner: "external",
+					externalAgentConfigId: options.externalAgentConfigId,
+				})
+				.onConflictDoUpdate({
+					target: terminalSessions.id,
+					set: { status: "active", endedAt: null, disposeRequestedAt: null },
+				})
+				.run();
+			return createTerminalSessionUnlocked({
+				...options,
+				externalObservation: true,
+			});
+		},
+		workspaceId,
+	);
 }
 
 function resolveTerminalCwd(
@@ -3008,12 +3125,20 @@ async function createTerminalSessionUnlocked({
 	rows: requestedRows,
 	adoptOnly = false,
 	restoredNotice = false,
+	externalObservation = false,
 }: CreateTerminalSessionOptions): Promise<
 	TerminalSession | CreateSessionError
 > {
 	const record = db.query.terminalSessions
 		.findFirst({ where: eq(terminalSessions.id, terminalId) })
 		.sync();
+	if (
+		record?.agentLifecycleOwner === "external" &&
+		!externalObservation &&
+		!adoptOnly
+	) {
+		return externalReadOnlyError();
+	}
 	const lifecycle = terminalLifecycleState(record);
 	if (lifecycle === "disposed" || lifecycle === "exited") {
 		return {
@@ -3032,7 +3157,8 @@ async function createTerminalSessionUnlocked({
 			return { kind: "SESSION_WRONG_WORKSPACE", error: mismatchError };
 
 		if (listed) existing.listed = true;
-		if (initialCommand) queueInitialCommand(existing, initialCommand);
+		if (initialCommand && !existing.readOnly)
+			queueInitialCommand(existing, initialCommand);
 		return existing;
 	}
 
@@ -3213,7 +3339,8 @@ async function createTerminalSessionUnlocked({
 		.sync();
 	if (
 		terminalLifecycleState(currentRecord) === "disposed" ||
-		terminalLifecycleState(currentRecord) === "exited"
+		terminalLifecycleState(currentRecord) === "exited" ||
+		currentRecord?.externalEndedAt != null
 	) {
 		await daemon.close(terminalId, "SIGHUP").catch(() => {});
 		return {
@@ -3285,6 +3412,7 @@ async function createTerminalSessionUnlocked({
 	);
 
 	const session: TerminalSession = {
+		readOnly: record?.agentLifecycleOwner === "external",
 		terminalId,
 		workspaceId,
 		db,
@@ -3733,7 +3861,11 @@ export function registerWorkspaceTerminalRoute({
 				// Daemon unreachable ≠ PTY lost: the shell may still be alive behind
 				// the stall, so don't end agent bindings or respawn — let the
 				// renderer retry until the daemon answers.
-				if (adopted.kind !== "SESSION_NOT_ACTIVE") return adopted;
+				if (
+					adopted.kind !== "SESSION_NOT_ACTIVE" ||
+					record.agentLifecycleOwner === "external"
+				)
+					return adopted;
 
 				// Active row but daemon no longer owns the PTY (laptop sleep,
 				// daemon restart, machine reboot). Respawn rather than dead-end
@@ -3844,6 +3976,7 @@ export function registerWorkspaceTerminalRoute({
 					}
 
 					if (message.type === "input") {
+						if (session.readOnly) return;
 						session.pty.write(message.data);
 						return;
 					}

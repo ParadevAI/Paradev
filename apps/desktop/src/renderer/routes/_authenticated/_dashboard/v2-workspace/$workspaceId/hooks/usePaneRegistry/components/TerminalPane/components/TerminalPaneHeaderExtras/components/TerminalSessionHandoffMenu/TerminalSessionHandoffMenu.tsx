@@ -23,6 +23,7 @@ import { Bot, GitFork, PanelRight, SquareStack } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { AgentSelect } from "renderer/components/AgentSelect";
 import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
+import { useTerminalReadOnly } from "renderer/hooks/host-service/useTerminalReadOnly";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
@@ -70,6 +71,7 @@ export function TerminalSessionHandoffMenu({
 
 	const { t } = useLingui();
 	const binding = useTerminalAgentBinding(workspaceId, terminalId);
+	const readOnly = useTerminalReadOnly(workspaceId, terminalId);
 	const surfaceFork = useSurfaceForkSource(workspaceId, {
 		kind: "terminal",
 		data: { terminalId },
@@ -136,7 +138,7 @@ export function TerminalSessionHandoffMenu({
 		if (defaultTargetConfigId) setTargetConfigId(defaultTargetConfigId);
 	}, [action, defaultTargetConfigId, targetConfigId]);
 
-	if (!binding) return null;
+	if (!binding || readOnly) return null;
 
 	const openAction = (nextAction: SessionAction) => {
 		setMenuOpen(false);

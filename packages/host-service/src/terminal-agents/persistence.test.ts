@@ -10,6 +10,7 @@ import { terminalAgentBindings, terminalSessions } from "../db/schema";
 import {
 	claimResumeCandidateBinding,
 	findResumeCandidateBinding,
+	listResumeCandidateBindings,
 	markTerminalAgentBindingEnded,
 	recordTerminalAgentTranscriptPath,
 	SqliteTerminalAgentBindingPersistence,
@@ -19,6 +20,91 @@ import {
 import { TerminalAgentStore } from "./store";
 
 const MIGRATIONS_FOLDER = resolve(import.meta.dir, "../../drizzle");
+
+describe("externally owned workers", () => {
+	it("keeps native identity, status and roster when only the observation terminal exits", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "external", status: "active", workspaceId: "ws-1" });
+		db.update(terminalSessions)
+			.set({ agentLifecycleOwner: "external" })
+			.where(eq(terminalSessions.id, "external"))
+			.run();
+		const persistence = new SqliteTerminalAgentBindingPersistence(db);
+		const store = new TerminalAgentStore(persistence);
+		store.recordEvent({
+			terminalId: "external",
+			workspaceId: "ws-1",
+			eventType: "Start",
+			agentId: "claude",
+			agentSessionId: "native-worker",
+			occurredAt: 5,
+		});
+		store.recordSubagentHook({
+			terminalId: "external",
+			workspaceId: "ws-1",
+			eventType: "SubagentStart",
+			subagentId: "child",
+			hint: { subagentId: "child" },
+			occurredAt: Date.now(),
+		});
+		store.markTerminalExited("external");
+		db.update(terminalSessions)
+			.set({ status: "disposed", disposeRequestedAt: 7 })
+			.where(eq(terminalSessions.id, "external"))
+			.run();
+		persistence.sweepDefunct();
+		const [binding] = store.listByWorkspace("ws-1");
+		expect(binding).toMatchObject({
+			agentLifecycleOwner: "external",
+			agentSessionId: "native-worker",
+			lastEventType: "Start",
+			observationConnected: false,
+		});
+		expect(binding?.subagents?.map((child) => child.id)).toEqual(["child"]);
+		expect(
+			new TerminalAgentStore(persistence).listByWorkspace("ws-1"),
+		).toHaveLength(1);
+		store.clearWorkspaceStatuses("ws-1", "external");
+		expect(store.get("external")?.lastEventType).toBe("Start");
+		store.recordEvent({
+			terminalId: "external",
+			workspaceId: "ws-1",
+			eventType: "Detached",
+			occurredAt: 8,
+		});
+		expect(store.listByWorkspace("ws-1")).toEqual([]);
+		store.recordEvent({
+			terminalId: "external",
+			workspaceId: "ws-1",
+			eventType: "Attached",
+			agentId: "claude",
+			agentSessionId: "native-worker",
+			occurredAt: 50_000,
+		});
+		expect(store.get("external")).toBeUndefined();
+		expect(persistence.listLive()).toEqual([]);
+	});
+
+	it("never offers or atomically claims an external native session for resume", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "external", status: "exited", workspaceId: "ws-1" });
+		db.update(terminalSessions)
+			.set({ agentLifecycleOwner: "external" })
+			.where(eq(terminalSessions.id, "external"))
+			.run();
+		db.update(terminalAgentBindings)
+			.set({
+				agentSessionId: "native-worker",
+				endedAt: 4,
+				endReason: "terminal-exited",
+			})
+			.where(eq(terminalAgentBindings.terminalId, "external"))
+			.run();
+		expect(findResumeCandidateBinding(db, "ws-1", "external")).toBeUndefined();
+		expect(listResumeCandidateBindings(db)).toEqual([]);
+		expect(claimResumeCandidateBinding(db, "ws-1", "external")).toBeUndefined();
+	});
+});
 
 function createTestDb(): HostDb {
 	const sqlite = new Database(":memory:");

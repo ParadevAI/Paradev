@@ -49,6 +49,9 @@ export interface TerminalSubagent {
 }
 
 export interface TerminalAgentBinding {
+	/** External workers own their lifecycle; this terminal only observes them. */
+	agentLifecycleOwner?: "paradev" | "external";
+	observationConnected?: boolean;
 	launchId?: string;
 	account?: import("../trpc/router/usage/session-account/session-account").SessionAccount;
 	terminalId: string;

@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { describe, expect, it } from "bun:test";
 import { resolve } from "node:path";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
@@ -655,4 +656,18 @@ describe("restartAccountSessions", () => {
 		expect(broadcasts).toEqual([]);
 		expect(findResumeCandidateBinding(db, "ws-1", "t1")).toBeDefined();
 	});
+});
+
+it("never restarts an external worker for an account change", async () => {
+	const db = createTestDb();
+	seedAgentConfig(db);
+	seedLiveBinding(db, { terminalId: "external" });
+	db.update(terminalSessions)
+		.set({ agentLifecycleOwner: "external" })
+		.where(eq(terminalSessions.id, "external"))
+		.run();
+	const store = new TerminalAgentStore(
+		new SqliteTerminalAgentBindingPersistence(db),
+	);
+	expect(listAccountRestartCandidates(db, store, "claude")).toEqual([]);
 });

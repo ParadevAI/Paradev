@@ -14,6 +14,33 @@ describe("TerminalAgentStore", () => {
 		store = new TerminalAgentStore();
 	});
 
+	it("retains hydrated external ownership when an adapter has no owner lookup", () => {
+		const original: TerminalAgentBinding = {
+			terminalId: "external",
+			workspaceId: WORKSPACE,
+			agentId: "codex",
+			agentSessionId: "native-worker",
+			agentLifecycleOwner: "external",
+			startedAt: 1,
+			lastEventAt: 1,
+			lastEventType: "Start",
+		};
+		store = new TerminalAgentStore({
+			load: () => [original],
+			upsert: () => {},
+			delete: () => {},
+		});
+		store.recordEvent({
+			terminalId: "external",
+			workspaceId: WORKSPACE,
+			eventType: "Stop",
+			occurredAt: 2,
+		});
+		expect(store.get("external")?.agentLifecycleOwner).toBe("external");
+		store.markTerminalExited("external");
+		expect(store.get("external")?.agentSessionId).toBe("native-worker");
+	});
+
 	it("reports every hook event as activity, a subagent's included, even when the status does not change", () => {
 		let activity = 0;
 		store.on("activity", () => {

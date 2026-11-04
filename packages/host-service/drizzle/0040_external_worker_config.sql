@@ -1,0 +1,1 @@
+ALTER TABLE `terminal_sessions` ADD `external_agent_config_id` text;

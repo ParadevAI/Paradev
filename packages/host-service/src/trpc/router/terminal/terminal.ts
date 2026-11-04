@@ -2,11 +2,16 @@ import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/session-handoff";
 import { terminalColorsSchema } from "@superset/shared/terminal-colors";
 import { normalizeTerminalTitle } from "@superset/shared/terminal-title-scanner";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { getSupervisor, waitForDaemonReady } from "../../../daemon";
-import { terminalSessions, workspaces } from "../../../db/schema";
 import {
+	hostAgentConfigs,
+	terminalSessions,
+	workspaces,
+} from "../../../db/schema";
+import {
+	createExternalTerminalSession,
 	createTerminalSessionInternal,
 	disposeSessionAndWait,
 	disposeSessionsByWorkspaceId,
@@ -122,6 +127,123 @@ const daemonRouter = router({
 });
 
 export const terminalRouter = router({
+	// Ownership exists before the first native hook and survives observation
+	// disposal, so panes must not infer it from the live agent binding list.
+	getLifecycleOwner: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
+		.query(({ ctx, input }) => {
+			const session = ctx.db.query.terminalSessions
+				.findFirst({ where: eq(terminalSessions.id, input.terminalId) })
+				.sync();
+			if (session && session.originWorkspaceId !== input.workspaceId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Terminal session does not belong to this workspace",
+				});
+			}
+			return { agentLifecycleOwner: session?.agentLifecycleOwner ?? "paradev" };
+		}),
+
+	createExternalSession: protectedProcedure
+		.input(
+			createSessionInputSchema
+				.extend({
+					terminalId: z.string().min(1),
+					initialCommand: z.string().trim().min(1),
+					agentConfigId: z.string().min(1).optional(),
+				})
+				.strict(),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({
+					where: and(
+						eq(workspaces.id, input.workspaceId),
+						isNull(workspaces.archivedAt),
+					),
+				})
+				.sync();
+			if (!workspace)
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			if (
+				input.agentConfigId &&
+				!ctx.db
+					.select({ id: hostAgentConfigs.id })
+					.from(hostAgentConfigs)
+					.where(eq(hostAgentConfigs.id, input.agentConfigId))
+					.get()
+			) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Agent configuration not found",
+				});
+			}
+			const result = await createExternalTerminalSession({
+				...input,
+				externalAgentConfigId: input.agentConfigId,
+				themeType: parseThemeType(input.themeType),
+				db: ctx.db,
+				eventBus: ctx.eventBus,
+			});
+			if ("error" in result) throw toTerminalSessionError(result);
+			return {
+				terminalId: result.terminalId,
+				agentLifecycleOwner: "external" as const,
+				readOnly: true as const,
+				agentConfigId:
+					ctx.db
+						.select({ id: terminalSessions.externalAgentConfigId })
+						.from(terminalSessions)
+						.where(eq(terminalSessions.id, result.terminalId))
+						.get()?.id ?? null,
+			};
+		}),
+
+	endExternalSession: protectedProcedure
+		.input(
+			z.object({ workspaceId: z.string(), terminalId: z.string() }).strict(),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const ended = ctx.db
+				.update(terminalSessions)
+				.set({ externalEndedAt: Date.now() })
+				.where(
+					and(
+						eq(terminalSessions.id, input.terminalId),
+						eq(terminalSessions.originWorkspaceId, input.workspaceId),
+						eq(terminalSessions.agentLifecycleOwner, "external"),
+					),
+				)
+				.returning({ terminalId: terminalSessions.id })
+				.get();
+			if (!ended)
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "External observation terminal not found",
+				});
+			ctx.terminalAgentStore.recordEvent({
+				...input,
+				eventType: "Detached",
+				occurredAt: Date.now(),
+			});
+			const disposal = await disposeSessionAndWait(input.terminalId, ctx.db);
+			if (!disposal.daemonCloseSucceeded) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message:
+						"External worker binding ended, but observation cleanup failed. Retry endExternalSession to finish cleanup.",
+				});
+			}
+			return {
+				terminalId: input.terminalId,
+				agentLifecycleOwner: "external" as const,
+				ended: true as const,
+			};
+		}),
+
 	createSession: protectedProcedure
 		.input(createSessionInputSchema)
 		.mutation(createTerminalSessionFromInput),

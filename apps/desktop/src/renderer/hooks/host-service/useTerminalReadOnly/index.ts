@@ -1,0 +1,1 @@
+export { useTerminalReadOnly } from "./useTerminalReadOnly";

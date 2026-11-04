@@ -7,6 +7,7 @@ import { mapEventType } from "../../../events";
 import { verifyAttributionToken } from "../../../terminal-agents/attribution-token";
 import { recordTerminalAgentTranscriptPath } from "../../../terminal-agents/persistence";
 import { isTrustedTranscriptPath } from "../../../terminal-agents/transcript-path";
+import type { TerminalAgentBinding } from "../../../terminal-agents/types";
 import { protectedProcedure, publicProcedure, router } from "../../index";
 import { captureSessionAccount } from "../usage/session-account/session-account";
 import { fanOutAgentLifecycle } from "./fan-out-agent-lifecycle";
@@ -72,6 +73,23 @@ function normalizeAgentIdentity(
 	};
 }
 
+function matchesExternalWorker(
+	binding: TerminalAgentBinding | undefined,
+	agent: AgentIdentity | undefined,
+	eventType: string,
+): boolean {
+	// The first native hook establishes the worker identity. Observation
+	// shells and delayed wrappers must never replace it or change its status.
+	return Boolean(
+		agent?.agentId &&
+			(!binding ||
+				(binding.agentId === agent.agentId &&
+					(!binding.agentSessionId ||
+						binding.agentSessionId === agent.sessionId))) &&
+			(eventType !== "Detached" || binding?.agentSessionId),
+	);
+}
+
 export const notificationsRouter = router({
 	/** A notification sent with `superset notifications show`, shown by the attached desktop app. */
 	show: protectedProcedure
@@ -101,10 +119,18 @@ export const notificationsRouter = router({
 		const terminalSession = ctx.db.query.terminalSessions
 			.findFirst({
 				where: eq(terminalSessions.id, input.terminalId),
-				columns: { originWorkspaceId: true },
+				columns: {
+					originWorkspaceId: true,
+					externalEndedAt: true,
+					agentLifecycleOwner: true,
+					externalAgentConfigId: true,
+				},
 			})
 			.sync();
-		if (!terminalSession?.originWorkspaceId) {
+		if (
+			!terminalSession?.originWorkspaceId ||
+			terminalSession.externalEndedAt != null
+		) {
 			return { success: true, ignored: true as const };
 		}
 
@@ -148,6 +174,12 @@ export const notificationsRouter = router({
 		const preview = trimOrUndefined(input.preview);
 
 		const prior = ctx.terminalAgentStore.get(input.terminalId);
+		if (
+			terminalSession.agentLifecycleOwner === "external" &&
+			!matchesExternalWorker(prior, agent, eventType)
+		) {
+			return { success: true, ignored: true as const };
+		}
 		const account =
 			verifyAttributionToken(input.terminalId, input.attributionToken) &&
 			eventType === "Attached" &&
@@ -164,6 +196,21 @@ export const notificationsRouter = router({
 						input.apiKey ?? false,
 					).catch(() => undefined)
 				: undefined;
+		if (
+			terminalSession.agentLifecycleOwner === "external" &&
+			(ctx.db.query.terminalSessions
+				.findFirst({
+					where: eq(terminalSessions.id, input.terminalId),
+					columns: { externalEndedAt: true },
+				})
+				.sync()?.externalEndedAt != null ||
+				!matchesExternalWorker(
+					ctx.terminalAgentStore.get(input.terminalId),
+					agent,
+					eventType,
+				))
+		)
+			return { success: true, ignored: true as const };
 		ctx.terminalAgentStore.recordEvent({
 			account,
 			launchId: trimOrUndefined(input.launchId),
@@ -172,7 +219,16 @@ export const notificationsRouter = router({
 			eventType,
 			...(agent?.agentId ? { agentId: agent.agentId } : {}),
 			...(agent?.sessionId ? { agentSessionId: agent.sessionId } : {}),
-			...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
+			...(terminalSession.agentLifecycleOwner === "external"
+				? terminalSession.externalAgentConfigId
+					? {
+							definitionId:
+								terminalSession.externalAgentConfigId as AgentIdentity["definitionId"],
+						}
+					: {}
+				: agent?.definitionId
+					? { definitionId: agent.definitionId }
+					: {}),
 			occurredAt,
 		});
 		const transcriptPath = trimOrUndefined(input.transcriptPath);

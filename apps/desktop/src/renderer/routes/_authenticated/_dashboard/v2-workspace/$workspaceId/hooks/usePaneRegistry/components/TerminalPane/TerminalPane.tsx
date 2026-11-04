@@ -14,6 +14,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import { useTerminalReadOnly } from "renderer/hooks/host-service/useTerminalReadOnly";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { useHotkey } from "renderer/hotkeys";
 import {
@@ -108,6 +109,7 @@ export function TerminalPane({
 	const worktreePath = workspaceQuery.data?.worktreePath ?? undefined;
 	const paneData = ctx.pane.data as TerminalPaneData;
 	const { terminalId } = paneData;
+	const isExternal = useTerminalReadOnly(workspaceId, terminalId);
 	const terminalInstanceId = ctx.pane.id;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	// Link actions are fired from event handlers (xterm clicks, context-menu
@@ -137,7 +139,8 @@ export function TerminalPane({
 	// button and the ⌘I hotkey toggle the same overlay, and the state survives
 	// the mounted pane being re-pointed across terminals (tab switch, session
 	// dropdown).
-	const isRichInputOpen = useTerminalRichInputOpen();
+	const richInputOpen = useTerminalRichInputOpen();
+	const isRichInputOpen = richInputOpen && !isExternal;
 
 	const appearance = useTerminalAppearance();
 	const appearanceRef = useRef(appearance);
@@ -437,6 +440,7 @@ export function TerminalPane({
 	// Fire-and-forget: ship files to the workspace, then paste the paths.
 	const uploadAndPasteFiles = useCallback(
 		(files: File[]) => {
+			if (isExternal) return;
 			void (async () => {
 				try {
 					const paths = await sendAttachments(files);
@@ -461,11 +465,11 @@ export function TerminalPane({
 				}
 			})();
 		},
-		[terminalId, terminalInstanceId, sendAttachments, t],
+		[terminalId, terminalInstanceId, sendAttachments, t, isExternal],
 	);
 
 	useEffect(() => {
-		if (!isRemoteHost) return;
+		if (!isRemoteHost && !isExternal) return;
 
 		terminalRuntimeRegistry.setImagePasteOverride(
 			terminalId,
@@ -479,7 +483,13 @@ export function TerminalPane({
 				terminalInstanceId,
 			);
 		};
-	}, [terminalId, terminalInstanceId, isRemoteHost, uploadAndPasteFiles]);
+	}, [
+		terminalId,
+		terminalInstanceId,
+		isRemoteHost,
+		isExternal,
+		uploadAndPasteFiles,
+	]);
 
 	useTerminalInterruptClear({
 		terminalId,
@@ -514,7 +524,7 @@ export function TerminalPane({
 	useHotkey(
 		"TOGGLE_TERMINAL_RICH_INPUT",
 		() => terminalRichInputOpenStore.toggle("hotkey"),
-		{ enabled: ctx.isActive, preventDefault: true },
+		{ enabled: ctx.isActive && !isExternal, preventDefault: true },
 	);
 
 	const closeRichInput = useCallback(() => {
@@ -530,6 +540,9 @@ export function TerminalPane({
 		() => terminalRuntimeRegistry.getTerminal(terminalId, terminalInstanceId),
 		[terminalId, terminalInstanceId, connectionState],
 	);
+	useEffect(() => {
+		if (terminal) terminal.options.disableStdin = isExternal;
+	}, [terminal, isExternal]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: connectionState is intentionally included to trigger re-derive
 	const searchAddon = useMemo(
@@ -555,13 +568,14 @@ export function TerminalPane({
 
 	const handleDragEnter = (event: React.DragEvent) => {
 		event.preventDefault();
+		if (isExternal) return;
 		dragCounterRef.current += 1;
 		setIsDropActive(true);
 	};
 
 	const handleDragOver = (event: React.DragEvent) => {
 		event.preventDefault();
-		event.dataTransfer.dropEffect = "copy";
+		event.dataTransfer.dropEffect = isExternal ? "none" : "copy";
 	};
 
 	const handleDragLeave = (event: React.DragEvent) => {
@@ -577,7 +591,7 @@ export function TerminalPane({
 		event.preventDefault();
 		dragCounterRef.current = 0;
 		setIsDropActive(false);
-		if (connectionState === "closed") return;
+		if (isExternal || connectionState === "closed") return;
 
 		// Dropped OS paths are local paths — meaningless on the machine a
 		// remote workspace's PTY runs on. When every dropped entry is a plain
@@ -637,21 +651,25 @@ export function TerminalPane({
 				/>
 				<ScrollToBottomButton terminal={terminal} />
 				<TerminalCopiedIndicator terminalInstanceId={terminalInstanceId} />
-				<TerminalAgentAutoResume
-					key={terminalId}
+				{!isExternal && (
+					<TerminalAgentAutoResume
+						key={terminalId}
+						workspaceId={workspaceId}
+						terminalId={terminalId}
+						connectionState={connectionState}
+						ctx={ctx}
+					/>
+				)}
+			</div>
+			{!isExternal && (
+				<TerminalRichInput
 					workspaceId={workspaceId}
 					terminalId={terminalId}
-					connectionState={connectionState}
-					ctx={ctx}
+					terminalInstanceId={terminalInstanceId}
+					isOpen={isRichInputOpen}
+					onClose={closeRichInput}
 				/>
-			</div>
-			<TerminalRichInput
-				workspaceId={workspaceId}
-				terminalId={terminalId}
-				terminalInstanceId={terminalInstanceId}
-				isOpen={isRichInputOpen}
-				onClose={closeRichInput}
-			/>
+			)}
 			<div
 				className={cn(
 					"pointer-events-none absolute inset-0 bg-primary/10 transition-opacity duration-100",

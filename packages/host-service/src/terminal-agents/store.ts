@@ -104,6 +104,8 @@ export interface TerminalAgentBindingPersistence {
 		endedAt?: number,
 	): { workspaceId: string } | undefined;
 	/** End state of the terminal's row, if it exists and has ended. */
+	isExternalEnded?(terminalId: string): boolean;
+	getLifecycleOwner?(terminalId: string): "paradev" | "external";
 	getEnded?(
 		terminalId: string,
 	): { endedAt: number; agentSessionId?: string } | undefined;
@@ -167,6 +169,7 @@ export class TerminalAgentStore extends EventEmitter {
 			return;
 		}
 
+		if (this.persistence?.isExternalEnded?.(terminalId)) return;
 		const ended = this.persistence?.getEnded?.(terminalId);
 		const existing = ended ? undefined : this.byTerminal.get(terminalId);
 		if (!agentId && !existing) return;
@@ -221,6 +224,10 @@ export class TerminalAgentStore extends EventEmitter {
 				: undefined;
 
 		const next: TerminalAgentBinding = {
+			...((this.persistence?.getLifecycleOwner?.(terminalId) ??
+				prior?.agentLifecycleOwner) === "external"
+				? { agentLifecycleOwner: "external" as const }
+				: {}),
 			terminalId,
 			workspaceId,
 			agentId: nextAgentId,
@@ -476,6 +483,7 @@ export class TerminalAgentStore extends EventEmitter {
 		let changed = false;
 		for (const [terminalId, binding] of this.byTerminal) {
 			if (binding.workspaceId !== workspaceId) continue;
+			if (binding.agentLifecycleOwner === "external") continue;
 			if (onlyTerminalId !== undefined && terminalId !== onlyTerminalId)
 				continue;
 			if (binding.lastEventType === "Stop") continue;
@@ -503,6 +511,7 @@ export class TerminalAgentStore extends EventEmitter {
 	}
 
 	get(terminalId: string): TerminalAgentBinding | undefined {
+		if (this.persistence?.isExternalEnded?.(terminalId)) return undefined;
 		if (this.persistence?.getEnded?.(terminalId)) return undefined;
 		const binding = this.byTerminal.get(terminalId);
 		return binding && this.withRuntimeState(binding);
@@ -649,6 +658,12 @@ export class TerminalAgentStore extends EventEmitter {
 		endedAt: number,
 	): void {
 		const existing = this.byTerminal.get(terminalId);
+		if (
+			(reason === "terminal-exited" || reason === "disposed") &&
+			(existing?.agentLifecycleOwner === "external" ||
+				this.persistence?.getLifecycleOwner?.(terminalId) === "external")
+		)
+			return;
 		this.byTerminal.delete(terminalId);
 		this.subagentsByTerminal.delete(terminalId);
 

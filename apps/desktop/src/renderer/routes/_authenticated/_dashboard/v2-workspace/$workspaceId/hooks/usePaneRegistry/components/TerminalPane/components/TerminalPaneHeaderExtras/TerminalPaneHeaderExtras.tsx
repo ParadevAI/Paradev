@@ -1,3 +1,4 @@
+import { useTerminalReadOnly } from "renderer/hooks/host-service/useTerminalReadOnly";
 import type { SubagentPaneData } from "../../../../../../types";
 import type {
 	SurfaceForkPlacement,
@@ -38,6 +39,7 @@ export function TerminalPaneHeaderExtras({
 	onOpenSubagent,
 	onNewShell,
 }: TerminalPaneHeaderExtrasProps) {
+	const readOnly = useTerminalReadOnly(workspaceId, terminalId);
 	return (
 		<div className="flex items-center gap-1">
 			<AccountUsage
@@ -54,6 +56,7 @@ export function TerminalPaneHeaderExtras({
 				terminalId={terminalId}
 				terminalInstanceId={terminalInstanceId}
 				onNewShell={onNewShell}
+				readOnly={readOnly}
 			/>
 			<TerminalPageWatchChip
 				workspaceId={workspaceId}
