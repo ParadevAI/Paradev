@@ -11,8 +11,8 @@ import { ChipButton } from "../../../../../components/TriggerSentence/components
 
 /**
  * Whether each run starts its own agent session or continues the one the
- * previous run left behind. Only rendered for a pinned workspace, which is
- * where that session lives.
+ * previous run left behind. Continuing with no pinned workspace keeps the
+ * first run's workspace as the pin.
  */
 export function SessionModePicker({
 	continueAgentSession,
