@@ -1,4 +1,4 @@
-import { type ReactNode, useSyncExternalStore } from "react";
+import { type ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 import { SidebarSlide } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import {
@@ -7,6 +7,7 @@ import {
 	useWorkspaceSidebarStore,
 } from "renderer/stores/workspace-sidebar-state";
 import { useAutoCollapseInNarrowWindow } from "./hooks/useAutoCollapseInNarrowWindow";
+import { closeFocusedMenu } from "./utils/closeFocusedMenu";
 import { getWorkspaceSidebarMaxWidth } from "./utils/getWorkspaceSidebarMaxWidth";
 
 const subscribeToResize = (onChange: () => void) => {
@@ -20,11 +21,13 @@ export function WorkspaceSidebarPanel({
 	/** What the panel shows while collapsed: its own icon rail, or nothing beside a separate one. */
 	collapsedWidth = COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
 	slides = false,
+	onLayoutFrame,
 	children,
 }: {
 	className?: string;
 	collapsedWidth?: number;
 	slides?: boolean;
+	onLayoutFrame?: () => void;
 	children: ReactNode;
 }) {
 	const width = useWorkspaceSidebarStore((s) => s.width);
@@ -39,6 +42,12 @@ export function WorkspaceSidebarPanel({
 		isCollapsed ? lastExpandedWidth : width,
 		maxWidth,
 	);
+	const wasCollapsedRef = useRef(isCollapsed);
+	useEffect(() => {
+		if (wasCollapsedRef.current === isCollapsed) return;
+		wasCollapsedRef.current = isCollapsed;
+		if (slides) closeFocusedMenu();
+	}, [slides, isCollapsed]);
 
 	const renderPanel = (shownWidth: number) => (
 		<ResizablePanel
@@ -65,6 +74,7 @@ export function WorkspaceSidebarPanel({
 			width={expandedWidth}
 			edge="left"
 			alwaysMounted
+			onLayoutFrame={onLayoutFrame}
 		>
 			{() => renderPanel(expandedWidth)}
 		</SidebarSlide>

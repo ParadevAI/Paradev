@@ -47,10 +47,13 @@ import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
 import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
+import { browserRuntimeRegistry } from "./v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
 });
+
+const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 
 /** v1 only — v2 deletes go through the globally-mounted DeleteWorkspaceMount
  * (see delete-workspace-intent store). */
@@ -290,6 +293,7 @@ function DashboardLayout() {
 									<WorkspaceSidebarPanel
 										collapsedWidth={0}
 										slides
+										onLayoutFrame={relayoutBrowserPanes}
 										className="border-r-0"
 									>
 										<DashboardSidebar />
