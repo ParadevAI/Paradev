@@ -7,7 +7,7 @@ import {
 	useLocation,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Redirect } from "renderer/components/Redirect";
 import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { authClient } from "renderer/lib/auth-client";
@@ -16,6 +16,7 @@ import { WindowControlsInset } from "../_dashboard/components/WindowControlsInse
 import { OnboardingHelpLinks } from "./components/OnboardingHelpLinks";
 import { OnboardingLanguagePicker } from "./components/OnboardingLanguagePicker";
 import { OnboardingNavigation } from "./components/OnboardingNavigation";
+import { useAgentModeStore } from "./stores/agentModeStore";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
 	component: OnboardingFlowLayout,
@@ -58,6 +59,7 @@ function OnboardingFlowLayout() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { i18n } = useLingui();
+	useEffect(() => () => useAgentModeStore.getState().reset(), []);
 	const { data: ghStatus, isPending: isPendingGh } =
 		electronTrpc.system.detectGhCli.useQuery();
 	const ghReady =
