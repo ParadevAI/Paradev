@@ -26,6 +26,7 @@ import { paidPlanIdFromFlags, tierFromFlags } from "./entitlements";
 import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
 import {
 	type GrantState,
+	initialGrantState,
 	monthlyGrantOf,
 	prorateGrant,
 } from "./grant-proration";
@@ -123,66 +124,91 @@ async function resolveStripeCustomerId(
 	return saveStripeCustomerId(organizationId, customer.stripeId);
 }
 
-async function autumnPlanFor(organizationId: string): Promise<{
-	tier: "pro" | "enterprise" | null;
-	paidPlanId: string | null;
-}> {
+type AutumnCustomer = Awaited<ReturnType<typeof getAutumnCustomer>>;
+
+async function autumnCustomerFor(
+	organizationId: string,
+): Promise<AutumnCustomer | null> {
 	try {
-		const { flags } = await getAutumnCustomer(organizationId);
-		const tier = tierFromFlags(flags);
-		return {
-			tier: tier === "free" ? null : tier,
-			paidPlanId: paidPlanIdFromFlags(flags),
-		};
+		return await getAutumnCustomer(organizationId);
 	} catch (error) {
 		console.error(
 			`[billing/projection] ${organizationId} Autumn lookup failed`,
 			error,
 		);
-		return { tier: null, paidPlanId: null };
+		return null;
 	}
+}
+
+function autumnPlanOf(customer: AutumnCustomer | null): {
+	tier: "pro" | "enterprise" | null;
+	paidPlanId: string | null;
+} {
+	if (!customer) return { tier: null, paidPlanId: null };
+	const tier = tierFromFlags(customer.flags);
+	return {
+		tier: tier === "free" ? null : tier,
+		paidPlanId: paidPlanIdFromFlags(customer.flags),
+	};
 }
 
 const grantStateKey = (organizationId: string) =>
 	`billing:gb-grant:${organizationId}`;
 
-async function monthlyGrantFor(organizationId: string) {
-	const customer = await getAutumnCustomer(organizationId);
-	return monthlyGrantOf(customer, paidPlanIdFromFlags(customer.flags));
-}
+const monthlyGrantFor = (customer: AutumnCustomer) =>
+	monthlyGrantOf(customer, paidPlanIdFromFlags(customer.flags));
 
 /** Runs under the sync lock, so a change seen by two webhooks is prorated once. */
-async function syncGrantProration(organizationId: string): Promise<void> {
+async function syncGrantProration(
+	organizationId: string,
+	customer: AutumnCustomer,
+): Promise<void> {
+	const key = grantStateKey(organizationId);
 	try {
-		const current = await monthlyGrantFor(organizationId);
-		if (!current) return;
-		const previous = await billingRedis.get<GrantState>(
-			grantStateKey(organizationId),
-		);
-		const { adjustment, state } = prorateGrant(previous, current, Date.now());
-		if (!state) return;
-		if (adjustment) {
-			await autumnClient.balances.update({
-				customerId: organizationId,
-				featureId: BOX_GB_MINUTES_FEATURE_ID,
-				balanceId: current.balanceId,
-				addToBalance: adjustment,
-			});
-			console.log(
-				`[billing/projection] ${organizationId} GB-minute grant prorated by ${adjustment}`,
-			);
-			const after = await monthlyGrantFor(organizationId);
-			if (after) state.includedGbMinutes = after.includedGbMinutes;
+		const current = monthlyGrantFor(customer);
+		if (!current) {
+			await billingRedis.del(key);
+			return;
 		}
-		await billingRedis.set(grantStateKey(organizationId), state, {
-			ex: GRANT_STATE_TTL_SECONDS,
+		const previous = await billingRedis.get<GrantState>(key);
+		const { state, remaining } = prorateGrant(previous, current, Date.now());
+		if (!state) return;
+		await billingRedis.set(key, state, { ex: GRANT_STATE_TTL_SECONDS });
+		if (remaining === null) return;
+		await autumnClient.balances.update({
+			customerId: organizationId,
+			featureId: BOX_GB_MINUTES_FEATURE_ID,
+			balanceId: current.balanceId,
+			remaining,
 		});
+		await billingRedis.set(
+			key,
+			{ ...state, applied: true },
+			{ ex: GRANT_STATE_TTL_SECONDS },
+		);
+		console.log(
+			`[billing/projection] ${organizationId} GB-minute grant prorated to ${state.targetGbMinutes}, ${remaining} remaining`,
+		);
 	} catch (error) {
 		console.error(
 			`[billing/projection] ${organizationId} grant proration failed`,
 			error,
 		);
 	}
+}
+
+/** Records the current grant for an organization that has none, so its next change can be prorated. */
+export async function seedGrantState(
+	organizationId: string,
+): Promise<"seeded" | "exists" | "no-grant"> {
+	const current = monthlyGrantFor(await getAutumnCustomer(organizationId));
+	if (!current) return "no-grant";
+	const written = await billingRedis.set(
+		grantStateKey(organizationId),
+		initialGrantState(current),
+		{ nx: true, ex: GRANT_STATE_TTL_SECONDS },
+	);
+	return written ? "seeded" : "exists";
 }
 
 const notifiedFamilyKey = (organizationId: string) =>
@@ -234,14 +260,15 @@ export async function syncOrganizationSubscription(
 			await tx.execute(
 				sql`select pg_advisory_xact_lock(hashtextextended(${`billing-sync:${organizationId}`}, 0))`,
 			);
-			const [autumnPlan, listed] = await Promise.all([
-				autumnPlanFor(organizationId),
+			const [customer, listed] = await Promise.all([
+				autumnCustomerFor(organizationId),
 				stripeClient.subscriptions.list({
 					customer: stripeCustomerId,
 					status: "all",
 					limit: RECENT_STRIPE_SUBSCRIPTIONS,
 				}),
 			]);
+			const autumnPlan = autumnPlanOf(customer);
 			const seatSubscriptions = listed.data.filter(holdsSeats);
 			const payingRows = await tx.query.subscriptions.findMany({
 				where: and(
@@ -276,7 +303,7 @@ export async function syncOrganizationSubscription(
 			const recorded = plan
 				? await recordFamily(organizationId, plan.family)
 				: ({ ok: false } as const);
-			await syncGrantProration(organizationId);
+			if (customer) await syncGrantProration(organizationId, customer);
 			return { changes: written, catalog, plan, recorded };
 		},
 	);
