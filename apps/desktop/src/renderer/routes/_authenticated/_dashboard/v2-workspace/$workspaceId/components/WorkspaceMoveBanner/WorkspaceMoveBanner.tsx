@@ -33,6 +33,7 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 	if (!move || move.id === dismissed) return null;
 
 	const inFlight = IN_FLIGHT.has(move.status);
+	const destination = move.toWorkspaceId;
 	const isSource = move.fromWorkspaceId === workspaceId;
 	const stayed = move.chats.total - move.chats.ready;
 	let label: ReactNode = null;
@@ -74,12 +75,10 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 				className="pointer-events-auto flex max-w-full items-center gap-2.5 rounded-full border border-border bg-popover py-1.5 pr-1.5 pl-3 text-sm text-popover-foreground shadow-lg"
 			>
 				<span className="truncate font-medium">{label}</span>
-				{isSource && !inFlight ? (
+				{isSource && !inFlight && destination ? (
 					<button
 						type="button"
-						onClick={() =>
-							void navigateToV2Workspace(move.toWorkspaceId, navigate)
-						}
+						onClick={() => void navigateToV2Workspace(destination, navigate)}
 						className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 font-medium hover:bg-accent/70"
 					>
 						<Trans>Open</Trans>
