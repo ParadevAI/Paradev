@@ -1231,14 +1231,14 @@ msgstr "{price} za użytkownika miesięcznie, {gbHours} GB-godzin w chmurze na m
 msgid "{price}/user/mo"
 msgstr "{price}/użytkownika/mies."
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (dawniej {formerName}, YC P26) to IDE z publicznie dostępnym kodem źródłowym na erę agentów AI, w którym inżynierowie uruchamiają równolegle setki agentów programistycznych, takich jak Claude Code i Codex."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (dawniej {formerName}, YC P26) to IDE open source na erę agentów AI, w którym inżynierowie uruchamiają równolegle setki agentów programistycznych, takich jak Claude Code i Codex."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (dawniej {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) to IDE z publicznie dostępnym kodem źródłowym na erę agentów AI, w którym inżynierowie uruchamiają równolegle setki agentów programistycznych, takich jak Claude Code i Codex."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) to IDE open source na erę agentów AI, w którym inżynierowie uruchamiają równolegle setki agentów programistycznych, takich jak Claude Code i Codex."
 
 msgid "{productName} for press"
 msgstr "{productName} dla prasy"
@@ -3600,9 +3600,6 @@ msgstr "Wdróż {companyName} w swoim zespole. Skontaktuj się z nami, aby dowie
 
 msgid "Bring a link to something you built recently."
 msgstr "Podeślij link do czegoś, co niedawno zbudowałeś."
-
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Połącz Claude Code, Codex, OpenCode lub dowolnego agenta kodującego w jednym workspace. Uruchamiaj zadania równolegle na osobnych gałęziach i przeglądaj wszystko w jednym miejscu."
 
 msgid "Bring in an agent"
 msgstr "Dodaj agenta"
@@ -9036,8 +9033,8 @@ msgstr "Pełny ekran"
 msgid "Full self-driving"
 msgstr "Pełna autonomia"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Pełny kod źródłowy dostępny na GitHub na licencji Elastic License 2.0 (ELv2). Przeglądaj, audytuj i współtwórz. Żadnych czarnych skrzynek ani ukrytych funkcji."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Pełny kod źródłowy na GitHub na licencji MIT. Przeglądaj, audytuj i współtwórz. Żadnych czarnych skrzynek ani ukrytych funkcji."
 
 msgid "Funding"
 msgstr "Finansowanie"
@@ -11609,6 +11606,9 @@ msgstr "Brak wymaganych pól."
 msgid "serverError.plugins.missingInput"
 msgstr "Brak wymaganych danych {input}"
 
+msgid "MIT License"
+msgstr "Licencja MIT"
+
 msgid "Mobile"
 msgstr "Mobile"
 
@@ -13114,9 +13114,6 @@ msgstr "Jedna wtyczka. Każdy agent kodujący."
 msgid "One step left"
 msgstr "Został jeden krok"
 
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Jeden obszar roboczy dla Claude Code, Codex i dowolnego agenta kodującego."
-
 msgid "online"
 msgstr "online"
 
@@ -13622,6 +13619,9 @@ msgstr "Otwórz arkusz"
 msgid "Open ship options"
 msgstr "Otwórz opcje wysyłki"
 
+msgid "Open Source"
+msgstr "Open source"
+
 msgid "Open System Settings"
 msgstr "Otwórz Ustawienia systemowe"
 
@@ -14056,8 +14056,8 @@ msgstr "Paradev przekierowuje porty otwierane przez zdalny obszar roboczy, dopó
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev ma darmowy plan. Kod źródłowy jest dostępny na GitHub na licencji Elastic License 2.0 (ELv2), więc można go przeglądać i hostować samodzielnie na warunkach licencji."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev ma darmowy plan. Kod źródłowy jest na GitHub na licencji MIT, więc możesz go przeglądać, modyfikować i hostować samodzielnie."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev napotkał nieoczekiwany błąd. Odśwież, aby spróbować ponownie."
@@ -14086,11 +14086,8 @@ msgstr "Paradev powstaje w Paradev, więc sami jesteśmy jego głównymi użytko
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev jest zaprojektowany tak, aby działać z narzędziem, którego już używasz — natywnie obsługujemy głębokie linki do IDE takich jak Cursor, więc otworzysz swoje obszary robocze i pliki we własnym IDE."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev jest source-available: kod jest publiczny na GitHub na licencji Elastic License 2.0 (ELv2), która pozwala go przeglądać i hostować samodzielnie na warunkach licencji, ale nie jest to open source zatwierdzony przez OSI. Paradev nie ma związku z Apache Superset, narzędziem business intelligence."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev jest source-available. Każdy pull request, review i bug jest publiczny na GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev jest open source. Każdy pull request, review i bug jest publiczny na GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev to warsztat na przejście z F3 do F4: równoległe agenty na osobnych gałęziach, floty, nad którymi naprawdę panujesz, i widok przeglądu dla kodu, którego nie napisałeś."
@@ -15268,6 +15265,9 @@ msgstr "Przeczytaj przewodnik"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "Przeczytaj przewodnik po równoległych agentach kodujących"
+
+msgid "Read the MIT License"
+msgstr "Przeczytaj licencję MIT"
 
 msgid "Read the page"
 msgstr "Czytanie strony"
@@ -18045,9 +18045,6 @@ msgstr "Dźwięki i dzwonek dla zakończonych zadań"
 msgid "Source"
 msgstr "Źródło"
 
-msgid "Source Available"
-msgstr "Kod dostępny"
-
 msgid "Source path (not an import)"
 msgstr "Ścieżka źródłowa (nie import)"
 
@@ -19306,6 +19303,12 @@ msgstr "Nazwa organizacji lub zespołu"
 
 msgid "The network connection changed"
 msgstr "Połączenie sieciowe się zmieniło"
+
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "Otwartoźródłowy obszar roboczy dla Claude Code, Codex i dowolnego agenta kodującego."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Otwartoźródłowy workspace dla Claude Code, Codex, OpenCode i dowolnego agenta kodującego. Uruchamiaj zadania równolegle na osobnych gałęziach i przeglądaj wszystko w jednym miejscu."
 
 msgid "The overnight shift"
 msgstr "Nocna zmiana"
@@ -21726,6 +21729,9 @@ msgstr "Tak. W planach z chmurowymi przestrzeniami roboczymi właściciele mogą
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Tak. Paradev przeszedł audyt SOC 2 Type II u niezależnego audytora, obejmujący działanie naszych zabezpieczeń w czasie. Poproś o raport i zapoznaj się z dokumentacją bezpieczeństwa na {trustHost}."
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Tak. Paradev jest otwartoźródłowy na licencji MIT. Kod jest publiczny na GitHubie i każdy może zgłaszać problemy, otwierać pull requesty lub tworzyć forki. Paradev nie ma związku z Apache Superset, narzędziem business intelligence."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Tak. Paradev to obszar roboczy, w którym działają Twoi agenci, a nie dostawca modeli. Przynieś Claude Code, Codex, OpenCode albo dowolnego agenta CLI i korzystaj z własnych kont lub kluczy API w każdym planie."

@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -322,7 +322,7 @@ Skróty klawiszowe można dostosować w **Ustawienia → Skróty klawiszowe** (�
 
 ## Prywatność domyślnie
 
-- **Source Available**: pełny kod źródłowy jest na GitHubie na licencji Elastic License 2.0 (ELv2).
+- **Open source**: pełny kod źródłowy jest na GitHubie na licencji MIT.
 - **Jawne połączenia**: to Ty wybierasz, które agenty, dostawców i integracje podłączyć.
 
 ## Wnoszenie zmian
@@ -352,4 +352,4 @@ Dołącz do społeczności Paradev, aby uzyskać pomoc, dzielić się opiniami i
 
 **Aplikacja desktopowa jest darmowa na zawsze.** Równoległe uruchamianie agentów na własnej maszynie nigdy nie będzie wymagać płatności. Wszystko, za co pobierzemy opłaty, będzie opcjonalną usługą dodatkową.
 
-Cała aplikacja znajduje się w tym repozytorium na licencji [Elastic License 2.0](../LICENSE.md): używaj jej, forkuj, modyfikuj, hostuj samodzielnie dla swojego zespołu. Jedyną rzeczą wykluczoną jest przepakowanie samego Paradev jako usługi sprzedawanej innym.
+Cała aplikacja znajduje się w tym repozytorium na [licencji MIT](../LICENSE.md): używaj jej, forkuj, modyfikuj, hostuj samodzielnie i rozpowszechniaj dalej.

@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -321,7 +321,7 @@ Klávesové zkratky si můžete přizpůsobit přes **Nastavení → Klávesové
 
 ## Ve výchozím stavu soukromé
 
-- **Dostupný zdrojový kód**: kompletní zdrojový kód je na GitHubu pod licencí Elastic License 2.0 (ELv2).
+- **Open source**: kompletní zdrojový kód je na GitHubu pod licencí MIT.
 - **Explicitní připojení**: sami si volíte, které agenty, poskytovatele a integrace připojíte.
 
 ## Přispívání
@@ -351,4 +351,4 @@ Připojte se ke komunitě Paradevu — získáte pomoc, můžete sdílet zpětno
 
 **Desktopová aplikace je navždy zdarma.** Paralelní spouštění agentů na vlastním počítači nebude nikdy vyžadovat platbu. Cokoli zpoplatníme, bude volitelná služba navíc.
 
-Celá aplikace je v tomto repozitáři pod licencí [Elastic License 2.0](../LICENSE.md): používejte ji, forkněte ji, upravujte ji, provozujte ji na vlastní infrastruktuře pro svůj tým. Jediné, co nejde, je přebalit samotný Paradev jako službu, kterou prodáváte ostatním.
+Celá aplikace je v tomto repozitáři pod licencí [MIT](../LICENSE.md): používejte ji, forkněte ji, upravujte ji, provozujte ji na vlastní infrastruktuře a šiřte ji dál.

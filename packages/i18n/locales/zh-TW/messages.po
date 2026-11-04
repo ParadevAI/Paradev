@@ -1231,14 +1231,14 @@ msgstr "每使用者每月 {price},每席位每月 {gbHours} 雲端 GB 小時"
 msgid "{price}/user/mo"
 msgstr "{price}/使用者/月"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName}（原 {formerName}，YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（前身為 {formerName}，YC P26）是為 AI agent 時代打造的開源 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName}（原 {formerName}）"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName}（YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（YC P26）是為 AI agent 時代打造的開源 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
 
 msgid "{productName} for press"
 msgstr "給媒體的 {productName} 資訊"
@@ -3600,9 +3600,6 @@ msgstr "將 {companyName} 引入您的團隊。與我們聯繫以進一步瞭解
 
 msgid "Bring a link to something you built recently."
 msgstr "請帶上你最近做的作品連結。"
-
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "把 Claude Code、Codex、OpenCode 或任何程式碼代理帶進同一個工作區。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
 msgid "Bring in an agent"
 msgstr "選擇代理程式"
@@ -9036,8 +9033,8 @@ msgstr "全螢幕"
 msgid "Full self-driving"
 msgstr "完全自動駕駛"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "完整原始碼在GitHub上以Elastic License 2.0（ELv2）提供。可查閱、審計並參與貢獻。沒有黑箱，沒有隱藏功能。"
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "完整原始碼在GitHub上以MIT授權條款開源。可查閱、審計並參與貢獻。沒有黑箱，沒有隱藏功能。"
 
 msgid "Funding"
 msgstr "融資"
@@ -11609,6 +11606,9 @@ msgstr "缺少必填欄位。"
 msgid "serverError.plugins.missingInput"
 msgstr "缺少必填輸入 {input}"
 
+msgid "MIT License"
+msgstr "MIT 授權條款"
+
 msgid "Mobile"
 msgstr "行動裝置"
 
@@ -13114,9 +13114,6 @@ msgstr "一個外掛，所有程式碼代理程式。"
 msgid "One step left"
 msgstr "還差一步"
 
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "一個工作區，容納Claude Code、Codex和任何編碼代理程式。"
-
 msgid "online"
 msgstr "線上"
 
@@ -13622,6 +13619,9 @@ msgstr "開啟側邊面板"
 msgid "Open ship options"
 msgstr "開啟發布選項"
 
+msgid "Open Source"
+msgstr "開源"
+
 msgid "Open System Settings"
 msgstr "開啟系統設定"
 
@@ -14056,8 +14056,8 @@ msgstr "當你選取某個遠端工作區時，Paradev 會轉送它開啟的連�
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev有免費版。原始碼在GitHub上以Elastic License 2.0（ELv2）提供，你可以在許可條款範圍內查閱並自行部署。"
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev提供免費方案。原始碼在GitHub上以MIT授權條款開源，你可以查閱、修改並自行部署。"
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev遇到意外錯誤。重新載入以重試。"
@@ -14086,11 +14086,8 @@ msgstr "Paradev 就是在 Paradev 中建構的，因此我們自己就是它的�
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev的設計就是配合你現有的工具。我們原生支援深度連結到Cursor這類IDE，你可以直接在自己的IDE裡開啟工作區和檔案。"
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev是原始碼可見的：程式碼在GitHub上公開，採用Elastic License 2.0（ELv2），你可以在許可條款範圍內查閱並自行部署，但它不是OSI認可的開源許可。Paradev與商業智慧工具Apache Superset沒有任何關係。"
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev 原始碼可見。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev 是開源的。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev 是從 F3 邁向 F4 的工作台：在不同分支上平行執行的代理、真正能監督的代理群，以及用來審查非你所寫程式碼的介面。"
@@ -15268,6 +15265,9 @@ msgstr "閱讀指南"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "閱讀並行編碼代理程式指南"
+
+msgid "Read the MIT License"
+msgstr "閱讀 MIT 授權條款"
 
 msgid "Read the page"
 msgstr "閱讀頁面"
@@ -18045,9 +18045,6 @@ msgstr "任務完成時的聲音和鈴聲"
 msgid "Source"
 msgstr "來源"
 
-msgid "Source Available"
-msgstr "原始碼可見"
-
 msgid "Source path (not an import)"
 msgstr "原始碼路徑（不是匯入路徑）"
 
@@ -19306,6 +19303,12 @@ msgstr "你的組織或團隊的名稱"
 
 msgid "The network connection changed"
 msgstr "網路連線已變更"
+
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "開源工作區，容納Claude Code、Codex和任何編碼代理程式。"
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何程式碼代理。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
 msgid "The overnight shift"
 msgstr "夜班"
@@ -21726,6 +21729,9 @@ msgstr "可以。在包含雲端工作區的方案中，擁有者可以在設定
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "是的。Paradev已通過獨立審計機構的SOC 2 Type II審計，覆蓋我們的安全控制在一段時間內的實際執行情況。可在{trustHost}索取報告並查閱我們的安全文件。"
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "是的。Paradev 以 MIT 授權條款開源。程式碼公開在 GitHub 上，任何人都可以回報 issue、提出 pull request 或 fork。Paradev 與商業智慧工具 Apache Superset 無關。"
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "需要。Paradev是代理程式執行的工作區，不是模型提供商。帶上Claude Code、Codex、OpenCode或任意CLI代理程式，在任何方案下都可以使用你已有的帳號或API金鑰。"

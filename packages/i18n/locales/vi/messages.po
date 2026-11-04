@@ -1231,14 +1231,14 @@ msgstr "{price} mỗi người/tháng, {gbHours} GB-giờ đám mây cho mỗi n
 msgid "{price}/user/mo"
 msgstr "{price}/người/tháng"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (trước đây là {formerName}, YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (trước đây là {formerName}, YC P26) là IDE mã nguồn mở cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (trước đây là {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) là IDE mã nguồn mở cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
 
 msgid "{productName} for press"
 msgstr "{productName} dành cho báo chí"
@@ -3600,9 +3600,6 @@ msgstr "Đưa {companyName} đến với đội của bạn. Liên hệ với ch
 
 msgid "Bring a link to something you built recently."
 msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần đây."
-
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Đưa Claude Code, Codex, OpenCode hoặc bất kỳ agent lập trình nào vào một workspace. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
 msgid "Bring in an agent"
 msgstr "Chọn một agent"
@@ -9036,8 +9033,8 @@ msgstr "Toàn màn hình"
 msgid "Full self-driving"
 msgstr "Tự vận hành hoàn toàn"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Toàn bộ mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2). Xem, kiểm tra và đóng góp cho mã nguồn. Không hộp đen, không chức năng ẩn."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Toàn bộ mã nguồn có trên GitHub theo Giấy phép MIT. Xem, kiểm tra và đóng góp cho mã nguồn. Không hộp đen, không chức năng ẩn."
 
 msgid "Funding"
 msgstr "Gọi vốn"
@@ -11609,6 +11606,9 @@ msgstr "Thiếu trường bắt buộc."
 msgid "serverError.plugins.missingInput"
 msgstr "Thiếu dữ liệu bắt buộc {input}"
 
+msgid "MIT License"
+msgstr "Giấy phép MIT"
+
 msgid "Mobile"
 msgstr "Di động"
 
@@ -13114,9 +13114,6 @@ msgstr "Một plugin. Mọi agent lập trình."
 msgid "One step left"
 msgstr "Còn một bước nữa"
 
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Một workspace cho Claude Code, Codex và mọi coding agent."
-
 msgid "online"
 msgstr "trực tuyến"
 
@@ -13622,6 +13619,9 @@ msgstr "Mở sheet"
 msgid "Open ship options"
 msgstr "Mở tùy chọn gửi"
 
+msgid "Open Source"
+msgstr "Mã nguồn mở"
+
 msgid "Open System Settings"
 msgstr "Mở System Settings"
 
@@ -14056,8 +14056,8 @@ msgstr "Paradev chuyển tiếp các cổng mà workspace từ xa mở trong lú
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2), nên bạn có thể xem và tự host theo các điều khoản của giấy phép."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Giấy phép MIT, nên bạn có thể xem, chỉnh sửa và tự host."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev gặp lỗi không mong muốn. Tải lại để thử lại."
@@ -14086,11 +14086,8 @@ msgstr "Paradev được xây dựng ngay trong Paradev, nên chúng tôi chính
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev được thiết kế để làm việc cùng công cụ sẵn có của bạn, chúng tôi hỗ trợ sẵn deep-link tới các IDE như Cursor để bạn mở workspace và tệp ngay trong IDE của mình."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev là source-available: mã nguồn công khai trên GitHub theo Elastic License 2.0 (ELv2), cho phép bạn xem và tự host theo các điều khoản của giấy phép, nhưng không phải mã nguồn mở được OSI công nhận. Paradev không liên quan tới Apache Superset, công cụ business intelligence."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev là source-available. Mọi pull request, review và bug đều công khai trên GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev là mã nguồn mở. Mọi pull request, review và bug đều công khai trên GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev là bàn làm việc cho bước chuyển từ F3 sang F4: các agent chạy song song trên các nhánh riêng, những đội agent bạn thực sự giám sát được, và một giao diện xem xét cho mã bạn không tự viết."
@@ -15268,6 +15265,9 @@ msgstr "Đọc hướng dẫn"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "Đọc hướng dẫn về coding agent chạy song song"
+
+msgid "Read the MIT License"
+msgstr "Đọc Giấy phép MIT"
 
 msgid "Read the page"
 msgstr "Đọc trang"
@@ -18045,9 +18045,6 @@ msgstr "Âm thanh và nhạc chuông cho tác vụ đã hoàn tất"
 msgid "Source"
 msgstr "Nguồn"
 
-msgid "Source Available"
-msgstr "Mã nguồn công khai"
-
 msgid "Source path (not an import)"
 msgstr "Đường dẫn nguồn (không phải import)"
 
@@ -19306,6 +19303,12 @@ msgstr "Tên tổ chức hoặc nhóm của bạn"
 
 msgid "The network connection changed"
 msgstr "Kết nối mạng đã thay đổi"
+
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "Workspace mã nguồn mở cho Claude Code, Codex và mọi coding agent."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Workspace mã nguồn mở cho Claude Code, Codex, OpenCode và mọi agent lập trình. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
 msgid "The overnight shift"
 msgstr "Ca đêm"
@@ -21726,6 +21729,9 @@ msgstr "Có. Với các gói có không gian làm việc trên đám mây, chủ
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Có. Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập, bao quát các biện pháp bảo mật vận hành theo thời gian. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại {trustHost}."
+
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Có. Paradev là mã nguồn mở theo Giấy phép MIT. Mã công khai trên GitHub, và ai cũng có thể báo issue, mở pull request hoặc fork. Paradev không liên quan đến Apache Superset, công cụ business intelligence."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Có. Paradev là nơi các agent của bạn chạy, không phải nhà cung cấp mô hình. Hãy mang Claude Code, Codex, OpenCode hay bất kỳ agent CLI nào, và dùng tài khoản hoặc khóa API sẵn có ở mọi gói."

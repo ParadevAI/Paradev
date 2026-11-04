@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -321,7 +321,7 @@ Phím tắt có thể tùy chỉnh qua **Cài đặt → Phím tắt** (⌘/); x
 
 ## Riêng tư theo mặc định
 
-- **Mã nguồn công khai**: toàn bộ mã nguồn ở trên GitHub theo giấy phép Elastic License 2.0 (ELv2).
+- **Mã nguồn mở**: toàn bộ mã nguồn ở trên GitHub theo Giấy phép MIT.
 - **Kết nối tường minh**: bạn tự chọn agent, provider và tích hợp nào được kết nối.
 
 ## Đóng góp
@@ -351,4 +351,4 @@ Tham gia cộng đồng Paradev để được trợ giúp, chia sẻ phản h�
 
 **Ứng dụng desktop miễn phí mãi mãi.** Chạy song song các agent trên máy của chính bạn sẽ không bao giờ phải trả tiền. Bất cứ thứ gì chúng tôi thu phí sẽ là dịch vụ tùy chọn nằm bên trên.
 
-Toàn bộ ứng dụng nằm trong repo này theo giấy phép [Elastic License 2.0](../LICENSE.md): cứ dùng, fork, chỉnh sửa, tự host cho đội ngũ của bạn. Điều duy nhất không được phép là đóng gói lại chính Paradev thành dịch vụ bạn bán cho người khác.
+Toàn bộ ứng dụng nằm trong repo này theo [Giấy phép MIT](../LICENSE.md): cứ dùng, fork, chỉnh sửa, tự host và phân phối lại.

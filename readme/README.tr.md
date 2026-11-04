@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -321,7 +321,7 @@ Klavye kısayolları **Ayarlar → Klavye kısayolları** (⌘/) üzerinden öze
 
 ## Varsayılan Olarak Gizli
 
-- **Source Available**: kaynak kodun tamamı Elastic License 2.0 (ELv2) altında GitHub'dadır.
+- **Açık kaynak**: kaynak kodun tamamı MIT Lisansı altında GitHub'dadır.
 - **Açık Bağlantılar**: hangi ajanları, sağlayıcıları ve entegrasyonları bağlayacağınızı siz seçersiniz.
 
 ## Katkıda Bulunma
@@ -351,4 +351,4 @@ Yardım almak, geri bildirim paylaşmak ve diğer kullanıcılarla bağlantı ku
 
 **Masaüstü uygulaması sonsuza kadar ücretsizdir.** Kendi makinenizde ajanları paralel çalıştırmak hiçbir zaman ödeme gerektirmeyecek. Ücretlendireceğimiz her şey, bunun üzerine isteğe bağlı bir hizmet olacak.
 
-Uygulamanın tamamı bu depoda [Elastic License 2.0](../LICENSE.md) altındadır: kullanın, fork edin, değiştirin, ekibiniz için kendiniz barındırın. Tek yasak, Paradev'in kendisini başkalarına sattığınız bir hizmet olarak yeniden paketlemektir.
+Uygulamanın tamamı bu depoda [MIT Lisansı](../LICENSE.md) altındadır: kullanın, fork edin, değiştirin, kendiniz barındırın ve yeniden dağıtın.

@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -316,7 +316,7 @@ bun run dev
 
 ## 預設保持私密
 
-- **原始碼公開**:完整原始碼以 Elastic License 2.0(ELv2)授權發布在 GitHub 上。
+- **開源**:完整原始碼以 MIT 授權條款發布在 GitHub 上。
 - **明確連接**:由你決定要連接哪些代理程式、供應商和整合。
 
 ## 貢獻
@@ -346,4 +346,4 @@ bun run dev
 
 **桌面應用程式永久免費。**在你自己的機器上平行執行代理程式永遠不需要付費。我們若收費,也會是建立在其上的選用服務。
 
-整個應用程式都在這個儲存庫中,採用 [Elastic License 2.0](../LICENSE.md) 授權:使用它、fork 它、修改它、為你的團隊自行架設,都可以。唯一不允許的,是把 Paradev 本身重新包裝成服務販售給他人。
+整個應用程式都在這個儲存庫中,採用 [MIT 授權條款](../LICENSE.md):使用它、fork 它、修改它、自行架設、再散布,都可以。

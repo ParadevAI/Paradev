@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -316,7 +316,7 @@ Neon 계정이나 서드파티 자격 증명은 필요 없습니다. `setup.loca
 
 ## 기본이 프라이빗
 
-- **소스 공개**: 전체 소스가 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있습니다.
+- **오픈 소스**: 전체 소스가 MIT 라이선스로 GitHub에 공개되어 있습니다.
 - **명시적 연결**: 어떤 에이전트, 프로바이더, 통합을 연결할지 직접 선택합니다.
 
 ## 기여
@@ -346,4 +346,4 @@ Paradev 커뮤니티에 참여해 도움을 받고, 피드백을 나누고, 다�
 
 **데스크톱 앱은 영원히 무료입니다.** 자신의 컴퓨터에서 에이전트를 병렬로 실행하는 데는 결코 비용이 들지 않습니다. 유료화가 있더라도 그 위에 얹히는 선택적 서비스일 뿐입니다.
 
-앱 전체가 이 저장소에 [Elastic License 2.0](../LICENSE.md)으로 공개되어 있습니다: 사용하고, 포크하고, 수정하고, 팀을 위해 셀프 호스팅하세요. 유일하게 안 되는 것은 Paradev 자체를 서비스로 재포장해 다른 사람에게 판매하는 것뿐입니다.
+앱 전체가 이 저장소에 [MIT 라이선스](../LICENSE.md)로 공개되어 있습니다: 사용하고, 포크하고, 수정하고, 셀프 호스팅하고, 재배포하세요.
