@@ -1,3 +1,4 @@
+import { homedir } from "node:os";
 import { basename, resolve as resolvePath } from "node:path";
 import {
 	type ParsedGitHubRemote,
@@ -7,8 +8,12 @@ import { BRANCH_PREFIX_MODES } from "@superset/shared/workspace-launch";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { projects } from "../../../db/schema";
+import { projects, workspaces } from "../../../db/schema";
 import type { TagSettingSnapshot } from "../../../events/types";
+import {
+	detectExternalWorktrees,
+	EXTERNAL_WORKTREE_SOURCES,
+} from "../../../projects/external-worktrees";
 import {
 	emitProjectChanged,
 	getLocalProject,
@@ -36,6 +41,10 @@ import {
 	parseSparseCheckoutPaths,
 	serializeSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
+import {
+	listGitWorktrees,
+	normalizeWorktreePath,
+} from "../workspace-creation/shared/worktree-list";
 import { normalizeWorktreeBaseDir } from "../workspace-creation/shared/worktree-paths";
 import {
 	createFromClone,
@@ -876,6 +885,27 @@ export const projectRouter = router({
 		}),
 
 	listDeleted: protectedProcedure.query(({ ctx }) => listDeletedProjects(ctx)),
+
+	/** Git worktrees that other agent tools (Conductor, T3 Code, Orca, …) left on
+	 * this machine and no workspace tracks yet, grouped by repository. */
+	detectExternalWorktrees: protectedProcedure.query(async ({ ctx }) => {
+		const trackedWorktreePaths = new Set(
+			ctx.db
+				.select({ worktreePath: workspaces.worktreePath })
+				.from(workspaces)
+				.where(isNull(workspaces.archivedAt))
+				.all()
+				.map((row) => normalizeWorktreePath(row.worktreePath)),
+		);
+		const repos = await detectExternalWorktrees({
+			homeDir: homedir(),
+			sources: EXTERNAL_WORKTREE_SOURCES,
+			listWorktrees: async (repoPath) =>
+				listGitWorktrees(await ctx.git(repoPath)),
+			trackedWorktreePaths,
+		});
+		return { repos };
+	}),
 
 	deletionImpact: protectedProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
