@@ -6,6 +6,7 @@
 		"install",
 		"first-workspace",
 		"superset-model",
+		"migrate-from-conductor",
 		"---Recipes---",
 		"recipes/race-agents",
 		"recipes/parallel-workstreams",
