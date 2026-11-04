@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import {
 	getPluginByName,
 	isServerSatisfiedExternally,
 	PLUGIN_CATALOG,
+	SUPERSET_MANAGED_SKILLS,
 } from "./index";
 import { FIRST_PARTY_MANIFESTS } from "./manifests.generated";
 
@@ -85,5 +88,27 @@ describe("isServerSatisfiedExternally", () => {
 				[{ name: "pw", url: "https://mcp.example.com/sse" }],
 			),
 		).toBe(true);
+	});
+});
+
+describe("SUPERSET_MANAGED_SKILLS", () => {
+	test("includes every skill bundled under plugins/superset/skills", () => {
+		const skillsDir = path.resolve(process.cwd(), "plugins/superset/skills");
+		const bundledSkills = fs
+			.readdirSync(skillsDir, { withFileTypes: true })
+			.filter(
+				(dirent) =>
+					dirent.isDirectory() &&
+					fs.existsSync(path.resolve(skillsDir, dirent.name, "SKILL.md")),
+			)
+			.map((dirent) => dirent.name);
+
+		const managedSkillNames: string[] = SUPERSET_MANAGED_SKILLS.map(
+			(skill) => skill.name,
+		);
+
+		for (const skill of bundledSkills) {
+			expect(managedSkillNames).toContain(skill);
+		}
 	});
 });
