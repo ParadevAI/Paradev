@@ -1,5 +1,5 @@
 {
-  "id": "5fe95728-705a-4bd7-bd5d-5d1d9bb9a8c4",
+  "id": "273f1c5b-6271-42d1-b710-8291488c173c",
   "prevId": "26026fb1-5a31-4856-b80d-1919168e8c82",
   "version": "7",
   "dialect": "postgresql",
@@ -4259,6 +4259,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "workspace_move_id": {
+          "name": "workspace_move_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "session_id": {
           "name": "session_id",
           "type": "uuid",
@@ -4391,6 +4397,21 @@
           "method": "btree",
           "with": {}
         },
+        "chat_moves_workspace_move_idx": {
+          "name": "chat_moves_workspace_move_idx",
+          "columns": [
+            {
+              "expression": "workspace_move_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "chat_moves_one_in_flight_idx": {
           "name": "chat_moves_one_in_flight_idx",
           "columns": [
@@ -4409,6 +4430,19 @@
         }
       },
       "foreignKeys": {
+        "chat_moves_workspace_move_id_workspace_moves_id_fk": {
+          "name": "chat_moves_workspace_move_id_workspace_moves_id_fk",
+          "tableFrom": "chat_moves",
+          "tableTo": "workspace_moves",
+          "columnsFrom": [
+            "workspace_move_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "chat_moves_session_id_chat_sessions_id_fk": {
           "name": "chat_moves_session_id_chat_sessions_id_fk",
           "tableFrom": "chat_moves",
@@ -4742,6 +4776,184 @@
           ]
         }
       },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.workspace_moves": {
+      "name": "workspace_moves",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_workspace_id": {
+          "name": "from_workspace_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_host_id": {
+          "name": "from_host_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "to_workspace_id": {
+          "name": "to_workspace_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "to_host_id": {
+          "name": "to_host_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "workspace_move_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "workspace_moves_from_workspace_idx": {
+          "name": "workspace_moves_from_workspace_idx",
+          "columns": [
+            {
+              "expression": "from_workspace_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "workspace_moves_to_workspace_idx": {
+          "name": "workspace_moves_to_workspace_idx",
+          "columns": [
+            {
+              "expression": "to_workspace_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "workspace_moves_one_in_flight_idx": {
+          "name": "workspace_moves_one_in_flight_idx",
+          "columns": [
+            {
+              "expression": "from_workspace_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"workspace_moves\".\"status\" in ('pending', 'moving')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "workspace_moves_organization_id_organizations_id_fk": {
+          "name": "workspace_moves_organization_id_organizations_id_fk",
+          "tableFrom": "workspace_moves",
+          "tableTo": "organizations",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "workspace_moves_created_by_users_id_fk": {
+          "name": "workspace_moves_created_by_users_id_fk",
+          "tableFrom": "workspace_moves",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -17599,6 +17811,17 @@
         "copying",
         "restoring",
         "ready",
+        "failed"
+      ]
+    },
+    "public.workspace_move_status": {
+      "name": "workspace_move_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "moving",
+        "ready",
+        "partial",
         "failed"
       ]
     },
