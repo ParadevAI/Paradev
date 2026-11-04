@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
 	agentCredentialKindValues,
@@ -312,17 +313,24 @@ function isFresh(tokens: ChatgptTokens): boolean {
 	);
 }
 
+interface ChatgptSession {
+	/** Null once OpenAI refuses the session for good. */
+	tokens: ChatgptTokens | null;
+	renewed: boolean;
+}
+
 /**
  * The stored ChatGPT session, renewed first when its access token is close to
  * expiring. The row is locked for the renewal: a refresh token works once, so
- * two boxes renewing together would sign the person out. Null once OpenAI
- * refuses the session: the row is removed so Settings asks for a new sign-in.
+ * two boxes renewing together would sign the person out. Only a refusal that
+ * proves the session is dead removes the row, so Settings asks for a new
+ * sign-in; any other failure keeps it for the next try.
  */
-async function currentChatgptTokens(
+async function currentChatgptSession(
 	row: AgentCredentialRow,
-): Promise<ChatgptTokens | null> {
+): Promise<ChatgptSession> {
 	const stored = chatgptTokensSchema.parse(JSON.parse(decryptRow(row)));
-	if (isFresh(stored)) return stored;
+	if (isFresh(stored)) return { tokens: stored, renewed: false };
 	const save = (tokens: ChatgptTokens) => ({
 		encryptedValue: encryptAgentCredential(JSON.stringify(tokens), {
 			userId: row.userId,
@@ -338,15 +346,15 @@ async function currentChatgptTokens(
 				.from(agentCredentials)
 				.where(eq(agentCredentials.id, row.id))
 				.for("update");
-			if (!locked) return stored;
+			if (!locked) return { tokens: stored, renewed: false };
 			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
-			if (isFresh(current)) return current;
+			if (isFresh(current)) return { tokens: current, renewed: false };
 			renewed = await refreshChatgptTokens(current);
 			await tx
 				.update(agentCredentials)
 				.set(save(renewed))
 				.where(eq(agentCredentials.id, locked.id));
-			return renewed;
+			return { tokens: renewed, renewed: true };
 		});
 	} catch (error) {
 		if (renewed) {
@@ -354,26 +362,69 @@ async function currentChatgptTokens(
 				.update(agentCredentials)
 				.set(save(renewed))
 				.where(eq(agentCredentials.id, row.id))
-				.catch((saveError) =>
+				.catch((saveError) => {
 					console.error(
 						"[agent-credential] renewed ChatGPT sign-in was not saved",
 						saveError,
-					),
-				);
-			return renewed;
+					);
+					Sentry.captureException(saveError, {
+						extra: { credentialId: row.id },
+					});
+				});
+			return { tokens: renewed, renewed: true };
 		}
+		const code = error instanceof ChatgptSignInError ? error.code : undefined;
 		if (error instanceof ChatgptSignInError && error.reason === "rejected") {
 			console.warn(
-				"[agent-credential] OpenAI refused the ChatGPT sign-in; removing it",
+				`[agent-credential] OpenAI refused the ChatGPT sign-in (${code}); removing it`,
 			);
+			Sentry.captureMessage("ChatGPT sign-in refused; removed", {
+				level: "warning",
+				extra: { credentialId: row.id, code },
+			});
 			await dbWs
 				.delete(agentCredentials)
 				.where(eq(agentCredentials.id, row.id));
-			return null;
+			return { tokens: null, renewed: false };
 		}
 		console.warn("[agent-credential] ChatGPT sign-in was not renewed", error);
-		return stored;
+		Sentry.captureException(error, {
+			extra: { credentialId: row.id, code },
+		});
+		return { tokens: stored, renewed: false };
 	}
+}
+
+/**
+ * Renews every ChatGPT sign-in close to expiring, whether or not a box is
+ * running, so a session nobody uses for a while does not lapse. Returns who
+ * was renewed, whose running boxes still carry the old token.
+ */
+export async function renewChatgptSignIns(args: {
+	deadline: number;
+}): Promise<{ checked: number; renewedUserIds: string[] }> {
+	const rows = await db
+		.select()
+		.from(agentCredentials)
+		.where(
+			and(
+				eq(agentCredentials.agent, "codex"),
+				eq(agentCredentials.provider, CHATGPT_PROVIDER),
+			),
+		);
+	const renewedUserIds: string[] = [];
+	let checked = 0;
+	for (const row of rows) {
+		if (Date.now() > args.deadline) break;
+		checked++;
+		try {
+			const session = await currentChatgptSession(row);
+			if (session.renewed) renewedUserIds.push(row.userId);
+		} catch (error) {
+			Sentry.captureException(error, { extra: { credentialId: row.id } });
+		}
+	}
+	return { checked, renewedUserIds };
 }
 
 /**
@@ -393,7 +444,7 @@ export async function resolveAgentSignIns(args: {
 	let codexChatgpt: CodexChatgptSignIn | null = null;
 	for (const row of rows) {
 		if (row.agent === "codex" && row.provider === CHATGPT_PROVIDER) {
-			const tokens = await currentChatgptTokens(row);
+			const { tokens } = await currentChatgptSession(row);
 			if (!tokens) continue;
 			codexChatgpt = {
 				accessToken: tokens.accessToken,
