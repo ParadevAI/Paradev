@@ -131,19 +131,22 @@ contextBridge.executeInMainWorld({
 						typeof args.at(-1) === "function"
 							? (args.pop() as (result: unknown) => void)
 							: undefined;
-					const result = callDnr(method, args);
+					// ipcRenderer.invoke prefixes main's message; Chrome reports it bare.
+					const result = Promise.resolve(callDnr(method, args)).catch(
+						(error: unknown) => {
+							throw new Error(
+								String(
+									(error as { message?: unknown })?.message ?? error,
+								).replace(
+									/^Error invoking remote method '[^']*': (?:Error: )?/,
+									"",
+								),
+							);
+						},
+					);
 					if (!callback) return result;
-					void Promise.resolve(result).then(callback, (error: unknown) =>
-						withLastError(
-							// ipcRenderer.invoke prefixes main's message; Chrome reports it bare.
-							String(
-								(error as { message?: unknown })?.message ?? error,
-							).replace(
-								/^Error invoking remote method '[^']*': (?:Error: )?/,
-								"",
-							),
-							() => callback(undefined),
-						),
+					void result.then(callback, (error: Error) =>
+						withLastError(error.message, () => callback(undefined)),
 					);
 				};
 			}

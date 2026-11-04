@@ -63,10 +63,54 @@ function isWebUrl(url: string): boolean {
 	return /^(https?|wss?):/i.test(url);
 }
 
+function isRedirectable(url: string): boolean {
+	try {
+		return new URL(url).protocol !== "javascript:";
+	} catch {
+		return false;
+	}
+}
+
 function substitute(substitution: string, match: RegExpExecArray): string {
 	return substitution.replace(/\\(\\|[0-9])/g, (_all, ref: string) =>
 		ref === "\\" ? "\\" : (match[Number(ref)] ?? ""),
 	);
+}
+
+interface HeaderState {
+	operation: HeaderInfo["operation"];
+	extensionId: string;
+}
+
+/**
+ * Chrome's order for one header across rules, highest priority first: after
+ * an append only appends follow, after a set only the same extension may
+ * append, and after a remove nothing changes it.
+ */
+function takeHeaders(
+	extensionId: string,
+	infos: HeaderInfo[] | undefined,
+	state: Map<string, HeaderState>,
+	into: HeaderChange[],
+): boolean {
+	let took = false;
+	for (const info of infos ?? []) {
+		const name = info.header.toLowerCase();
+		const previous = state.get(name);
+		if (previous) {
+			const appendable =
+				info.operation === "append" &&
+				(previous.operation === "append" ||
+					(previous.operation === "set" &&
+						previous.extensionId === extensionId));
+			if (!appendable) continue;
+		} else {
+			state.set(name, { operation: info.operation, extensionId });
+		}
+		into.push({ ...info, extensionId });
+		took = true;
+	}
+	return took;
 }
 
 function matchedRule(extensionId: string, rule: CompiledRule): MatchedRule {
@@ -86,8 +130,8 @@ export class DnrEngine {
 		Map<string, CompiledRule | null>
 	>();
 
+	/** A republished extension keeps its place in install order. */
 	setExtension(rules: EngineExtension): void {
-		this.extensions.delete(rules.extensionId);
 		this.extensions.set(rules.extensionId, rules);
 		this.frameCaches.delete(rules.extensionId);
 	}
@@ -119,6 +163,8 @@ export class DnrEngine {
 			requestHeaders: [],
 			responseHeaders: [],
 			matched: [],
+			requestHeaderRules: [],
+			responseHeaderRules: [],
 		};
 		if (this.extensions.size === 0 || !isWebUrl(request.url)) return none;
 		const prepared = prepareRequest(request);
@@ -130,11 +176,10 @@ export class DnrEngine {
 		}
 
 		let outcome: DnrOutcome = { kind: "none" };
-		const matched: MatchedRule[] = [];
+		const allowed: MatchedRule[] = [];
 		for (const [extension, { action, redirectUrl }] of results) {
 			if (!action) continue;
 			const rule = matchedRule(extension.extensionId, action);
-			matched.push(rule);
 			const type = action.rule.action.type;
 			if (type === "block") {
 				if (outcome.kind !== "block")
@@ -144,60 +189,40 @@ export class DnrEngine {
 					outcome = { kind: "redirect", url: redirectUrl, matched: rule };
 				}
 			} else if (type === "allow" || type === "allowAllRequests") {
+				allowed.push(rule);
 				if (outcome.kind === "none") outcome = { kind: "allow", matched: rule };
 			}
 		}
 		if (outcome.kind === "block" || outcome.kind === "redirect") {
-			return { ...none, outcome, matched };
+			return { ...none, outcome, matched: [outcome.matched] };
 		}
 
 		const requestHeaders: HeaderChange[] = [];
 		const responseHeaders: HeaderChange[] = [];
-		const requestState = new Map<string, HeaderInfo["operation"]>();
-		const responseState = new Map<string, HeaderInfo["operation"]>();
-		const take = (
-			extensionId: string,
-			infos: HeaderInfo[] | undefined,
-			state: Map<string, HeaderInfo["operation"]>,
-			into: HeaderChange[],
-		) => {
-			let took = false;
-			for (const info of infos ?? []) {
-				const name = info.header.toLowerCase();
-				const previous = state.get(name);
-				if (
-					previous &&
-					!(previous === "append" && info.operation === "append")
-				) {
-					continue;
-				}
-				state.set(name, info.operation);
-				into.push({ ...info, extensionId });
-				took = true;
-			}
-			return took;
-		};
+		const requestHeaderRules: MatchedRule[] = [];
+		const responseHeaderRules: MatchedRule[] = [];
+		const requestState = new Map<string, HeaderState>();
+		const responseState = new Map<string, HeaderState>();
 		for (const [extension, { headerRules }] of results) {
 			for (const rule of headerRules) {
 				const { requestHeaders: req, responseHeaders: res } = rule.rule.action;
-				const tookRequest = take(
-					extension.extensionId,
-					req,
-					requestState,
-					requestHeaders,
-				);
-				const tookResponse = take(
-					extension.extensionId,
-					res,
-					responseState,
-					responseHeaders,
-				);
-				if (tookRequest || tookResponse) {
-					matched.push(matchedRule(extension.extensionId, rule));
+				const { extensionId } = extension;
+				if (takeHeaders(extensionId, req, requestState, requestHeaders)) {
+					requestHeaderRules.push(matchedRule(extensionId, rule));
+				}
+				if (takeHeaders(extensionId, res, responseState, responseHeaders)) {
+					responseHeaderRules.push(matchedRule(extensionId, rule));
 				}
 			}
 		}
-		return { outcome, requestHeaders, responseHeaders, matched };
+		return {
+			outcome,
+			requestHeaders,
+			responseHeaders,
+			matched: allowed,
+			requestHeaderRules,
+			responseHeaderRules,
+		};
 	}
 
 	private evaluateExtension(
@@ -213,10 +238,13 @@ export class DnrEngine {
 		let allowPriority = frameAllow?.priority ?? Number.NEGATIVE_INFINITY;
 		const headerRules: CompiledRule[] = [];
 		const stamp = newLookupStamp();
+		const { initiator, resourceType } = request.request;
+		const isNavigation =
+			resourceType === "main_frame" || resourceType === "sub_frame";
+		// Chrome needs initiator access only for requests that are not navigations.
 		const requestAccess = () =>
 			extension.hasHostAccess(request.request.url) &&
-			(!request.request.initiator ||
-				extension.hasHostAccess(request.request.initiator));
+			(isNavigation || !initiator || extension.hasHostAccess(initiator));
 		let access: boolean | undefined;
 		const hasAccess = () => {
 			access ??= requestAccess();
@@ -288,7 +316,7 @@ export class DnrEngine {
 				url,
 			);
 		}
-		return target && target !== url ? target : null;
+		return target && target !== url && isRedirectable(target) ? target : null;
 	}
 
 	private redirectTarget(

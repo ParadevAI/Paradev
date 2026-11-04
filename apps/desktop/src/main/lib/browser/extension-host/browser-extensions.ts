@@ -373,15 +373,17 @@ export async function removeBrowserExtension(
 		);
 	}
 	// The extension is gone; what it kept is forgotten even if a step fails.
-	try {
-		await session.clearStorageData({
+	onRemoved(extensionId);
+	pins.setPinned(extensionId, false);
+	notifyBrowserExtensionsChanged();
+	const cleanup = await Promise.allSettled([
+		deleteExtensionRules(extensionId),
+		session.clearStorageData({
 			origin: `chrome-extension://${extensionId}`,
-		});
-		await deleteExtensionRules(extensionId);
-	} finally {
-		onRemoved(extensionId);
-		pins.setPinned(extensionId, false);
-		notifyBrowserExtensionsChanged();
+		}),
+	]);
+	for (const result of cleanup) {
+		if (result.status === "rejected") throw result.reason;
 	}
 }
 

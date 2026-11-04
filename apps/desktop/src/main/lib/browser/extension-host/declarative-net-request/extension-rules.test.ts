@@ -1,6 +1,10 @@
-import { expect, test } from "bun:test";
+import { expect, spyOn, test } from "bun:test";
 import { DnrEngine } from "./engine";
-import { ExtensionRules, type PersistedRules } from "./extension-rules";
+import {
+	ExtensionRules,
+	type PersistedRules,
+	StaticRulePool,
+} from "./extension-rules";
 import type { Rule } from "./types";
 
 const UBOL = "ddkjiahejlhfcafbddmgiahcphecmpfh";
@@ -45,7 +49,19 @@ const FILES: Record<string, unknown> = {
 	],
 };
 
-function setup(saved: PersistedRules | null = null, version = "2026.1") {
+function setup(
+	saved: PersistedRules | null = null,
+	version = "2026.1",
+	{
+		files = FILES,
+		pool = new StaticRulePool(),
+		extensionId = UBOL,
+	}: {
+		files?: Record<string, unknown>;
+		pool?: StaticRulePool;
+		extensionId?: string;
+	} = {},
+) {
 	const storage = {
 		saved,
 		load: async () => storage.saved,
@@ -54,20 +70,22 @@ function setup(saved: PersistedRules | null = null, version = "2026.1") {
 		},
 	};
 	const rules = new ExtensionRules(
-		UBOL,
+		extensionId,
 		version,
 		SOURCES,
 		storage,
-		async (path) => structuredClone(FILES[path]),
+		async (path) => structuredClone(files[path]),
+		pool,
 	);
 	const engine = new DnrEngine();
 	const publish = () =>
 		engine.setExtension({
-			extensionId: UBOL,
+			extensionId,
 			rulesets: rules.rulesets(),
 			hasHostAccess: () => true,
 			hostAccessForAllActions: false,
-			resolveExtensionPath: (path) => `chrome-extension://${UBOL}${path}`,
+			resolveExtensionPath: (path) =>
+				`chrome-extension://${extensionId}${path}`,
 		});
 	const outcome = (url: string) => {
 		publish();
@@ -128,6 +146,7 @@ test("updateEnabledRulesets and static rule toggles persist for this version onl
 		"ublock-filters",
 		"easyprivacy",
 	]);
+	expect(updated.rules.getDisabledRuleIds("ublock-filters")).toEqual([]);
 });
 
 test("dynamic rules persist and take effect; session rules do not persist", async () => {
@@ -191,4 +210,241 @@ test("saved rules that cannot be read are never overwritten", async () => {
 	});
 	expect(rules.getDynamicRules()).toHaveLength(1);
 	expect(saves).toBe(0);
+});
+
+const block = (id: number, condition: Rule["condition"] = {}): Rule => ({
+	id,
+	action: { type: "block" },
+	condition: { urlFilter: `||r${id}.example`, ...condition },
+});
+
+test("an update whose save fails changes nothing", async () => {
+	const { rules, storage, outcome } = setup();
+	await rules.load();
+	storage.save = async () => {
+		throw new Error("ENOSPC: no space left on device");
+	};
+	await expect(
+		rules.updateDynamicRules({ addRules: [block(1)] }),
+	).rejects.toThrow("ENOSPC");
+	expect(rules.getDynamicRules()).toEqual([]);
+	expect(outcome("https://r1.example/").kind).toBe("none");
+
+	await expect(
+		rules.updateEnabledRulesets({ disableRulesetIds: ["ublock-filters"] }),
+	).rejects.toThrow("ENOSPC");
+	expect(rules.getEnabledRulesets()).toEqual(["ublock-filters", "easyprivacy"]);
+	expect(outcome("https://ads.example/a.js").kind).toBe("block");
+
+	await expect(
+		rules.updateStaticRules({
+			rulesetId: "ublock-filters",
+			disableRuleIds: [1],
+		}),
+	).rejects.toThrow("ENOSPC");
+	expect(rules.getDisabledRuleIds("ublock-filters")).toEqual([]);
+	expect(outcome("https://ads.example/a.js").kind).toBe("block");
+});
+
+test("a static ruleset Chrome would ignore is not loaded or reported enabled", async () => {
+	const regexRules = Array.from({ length: 1_001 }, (_, index) => ({
+		id: index + 1,
+		action: { type: "block" },
+		condition: { regexFilter: `^https://r${index}\\.example/` },
+	}));
+	const { rules, outcome } = setup(null, "2026.1", {
+		files: {
+			...FILES,
+			"/rulesets/main/ublock-filters.json": [block(1), block(1)],
+			"/rulesets/main/easyprivacy.json": regexRules,
+		},
+	});
+	await rules.load();
+	expect(rules.getEnabledRulesets()).toEqual([]);
+	expect(outcome("https://r1.example/").kind).toBe("none");
+	await expect(
+		rules.updateEnabledRulesets({ enableRulesetIds: ["easyprivacy"] }),
+	).rejects.toThrow("regex rule count limit");
+});
+
+test("rule limits: disabled static, unsafe dynamic, and tab conditions", async () => {
+	const { rules } = setup();
+	await rules.load();
+	await expect(
+		rules.updateStaticRules({
+			rulesetId: "ublock-filters",
+			disableRuleIds: Array.from({ length: 5_001 }, (_, index) => index + 1),
+		}),
+	).rejects.toThrow("disabled rule count limit");
+	expect(rules.getDisabledRuleIds("ublock-filters")).toEqual([]);
+
+	const redirects = Array.from({ length: 5_001 }, (_, index) => ({
+		id: index + 1,
+		action: { type: "redirect", redirect: { url: "https://r.example/" } },
+		condition: { urlFilter: `||r${index}.example` },
+	})) as Rule[];
+	await expect(
+		rules.updateDynamicRules({ addRules: redirects }),
+	).rejects.toThrow("unsafe rule count limit");
+
+	const tabRule = block(1, { tabIds: [4] });
+	await expect(
+		rules.updateDynamicRules({ addRules: [tabRule] }),
+	).rejects.toThrow("outside session rules");
+	await rules.updateSessionRules({ addRules: [tabRule] });
+	expect(rules.getSessionRules()).toEqual([tabRule]);
+});
+
+test("malformed saved state falls back instead of failing the load", async () => {
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	const { rules } = setup({
+		version: "2026.1",
+		enabledRulesetIds: "easyprivacy" as never,
+		disabledRuleIds: { "ublock-filters": "1" } as never,
+		dynamicRules: [block(1), { id: "x" } as never],
+	});
+	await rules.load();
+	expect(rules.getEnabledRulesets()).toEqual(["ublock-filters", "easyprivacy"]);
+	expect(rules.getDynamicRules()).toEqual([block(1)]);
+	expect(rules.getDisabledRuleIds("ublock-filters")).toEqual([]);
+	expect(warn.mock.calls.flat().join(" ")).toContain(
+		"skipped 1 saved dynamic rules",
+	);
+	warn.mockRestore();
+});
+
+test("extensions share the global static rule pool", async () => {
+	const pool = new StaticRulePool();
+	const big = Array.from({ length: 40_000 }, (_, index) => block(index + 1));
+	const files = { ...FILES, "/rulesets/main/annoyances-cookies.json": big };
+	const first = setup(null, "2026.1", { files, pool });
+	await first.rules.load();
+	expect(first.rules.getAvailableStaticRuleCount()).toBe(330_000 - 2);
+	const second = setup(null, "2026.1", { files, pool, extensionId: "other" });
+	await second.rules.load();
+	await first.rules.updateEnabledRulesets({
+		enableRulesetIds: ["annoyances-cookies"],
+	});
+	expect(second.rules.getAvailableStaticRuleCount()).toBe(330_000 - 10_002 - 2);
+});
+
+test("a disposed extension stops saving once its last save lands", async () => {
+	const { rules, storage } = setup();
+	await rules.load();
+	let finishSave = () => {};
+	const save = storage.save;
+	let saves = 0;
+	storage.save = async (next) => {
+		saves++;
+		await new Promise<void>((resolve) => {
+			finishSave = resolve;
+		});
+		await save(next);
+	};
+	const pending = rules.updateDynamicRules({ addRules: [block(1)] });
+	await Bun.sleep(0);
+	let drained = false;
+	const disposed = rules.dispose().then(() => {
+		drained = true;
+	});
+	await Bun.sleep(0);
+	expect(drained).toBe(false);
+	finishSave();
+	await pending;
+	await disposed;
+	expect(storage.saved?.dynamicRules).toEqual([block(1)]);
+	await rules.updateDynamicRules({ addRules: [block(2)] });
+	expect(saves).toBe(1);
+});
+
+test("concurrent updates from two extensions cannot both overdraw the pool", async () => {
+	const pool = new StaticRulePool();
+	const big = Array.from({ length: 181_000 }, (_, index) => block(index + 1));
+	const files = { ...FILES, "/rulesets/main/annoyances-cookies.json": big };
+	const holdSaves = (setupResult: ReturnType<typeof setup>) => {
+		const release: (() => void)[] = [];
+		setupResult.storage.save = () =>
+			new Promise<void>((resolve) => {
+				release.push(resolve);
+			});
+		return release;
+	};
+	const first = setup(null, "2026.1", { files, pool });
+	const second = setup(null, "2026.1", { files, pool, extensionId: "other" });
+	await first.rules.load();
+	await second.rules.load();
+	const releases = [holdSaves(first), holdSaves(second)];
+	let settled = 0;
+	const updates = [first, second].map((each) =>
+		each.rules
+			.updateEnabledRulesets({ enableRulesetIds: ["annoyances-cookies"] })
+			.then(
+				() => "ok",
+				(error: Error) => error.message,
+			)
+			.finally(() => {
+				settled++;
+			}),
+	);
+	// Both updates are either waiting on their save or already refused.
+	while (releases.flat().length + settled < 2) await Bun.sleep(5);
+	for (const release of releases) for (const resolve of release) resolve();
+	const results = await Promise.all(updates);
+	expect(results.filter((result) => result === "ok")).toHaveLength(1);
+	expect(results.join()).toContain("static rule count limit");
+});
+
+test("saved state over the limits is cut back on load", async () => {
+	const regexRules = (offset: number) =>
+		Array.from({ length: 600 }, (_, index) => ({
+			id: offset + index,
+			action: { type: "block" },
+			condition: { regexFilter: `^https://r${index}\\.example/` },
+		}));
+	const redirects = Array.from({ length: 5_001 }, (_, index) => ({
+		id: index + 1,
+		action: { type: "redirect", redirect: { url: "https://r.example/" } },
+		condition: { urlFilter: `||r${index}.example` },
+	})) as Rule[];
+	const { rules } = setup(
+		{
+			version: "2026.1",
+			enabledRulesetIds: ["ublock-filters", "easyprivacy"],
+			disabledRuleIds: {
+				easyprivacy: Array.from({ length: 5_001 }, (_, index) => index + 1),
+			},
+			dynamicRules: redirects,
+		},
+		"2026.1",
+		{
+			files: {
+				...FILES,
+				"/rulesets/main/ublock-filters.json": regexRules(1),
+				"/rulesets/main/easyprivacy.json": regexRules(1),
+			},
+		},
+	);
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	await rules.load();
+	warn.mockRestore();
+	expect(rules.getEnabledRulesets()).toEqual(["ublock-filters"]);
+	expect(rules.getDisabledRuleIds("easyprivacy")).toEqual([]);
+	expect(rules.getDynamicRules()).toHaveLength(5_000);
+});
+
+test("an extension unloaded before its load finishes takes nothing from the pool", async () => {
+	const pool = new StaticRulePool();
+	const big = Array.from({ length: 40_000 }, (_, index) => block(index + 1));
+	const { rules } = setup(
+		{ version: "2026.1", enabledRulesetIds: ["annoyances-cookies"] },
+		"2026.1",
+		{
+			files: { ...FILES, "/rulesets/main/annoyances-cookies.json": big },
+			pool,
+		},
+	);
+	const loading = rules.load();
+	void rules.dispose();
+	await loading;
+	expect(pool.capacity("other")).toBe(330_000);
 });

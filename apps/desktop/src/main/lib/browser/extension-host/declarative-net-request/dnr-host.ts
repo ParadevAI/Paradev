@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { app, ipcMain, type Session } from "electron";
@@ -13,7 +14,9 @@ import {
 	ExtensionRules,
 	type PersistedRules,
 	type RulesStorage,
+	StaticRulePool,
 } from "./extension-rules";
+import { regexFilterProblem } from "./rule-validation";
 import type {
 	DnrRequest,
 	HeaderChange,
@@ -23,6 +26,30 @@ import type {
 
 const WEB_URLS = ["http://*/*", "https://*/*", "ws://*/*", "wss://*/*"];
 const MATCHED_RULES_LIMIT = 1_000;
+const MATCHED_RULES_TTL_MS = 5 * 60_000;
+// Saves still in flight from unloaded instances, per extension ID.
+const draining = new Map<string, Set<Promise<unknown>>>();
+
+/** Holds back deleteExtensionRules for `extensionId` until `pending` settles. */
+export function drainBeforeDelete(
+	extensionId: string,
+	pending: Promise<unknown>,
+): void {
+	let set = draining.get(extensionId);
+	if (!set) {
+		set = new Set();
+		draining.set(extensionId, set);
+	}
+	const tracked = pending
+		.catch(() => undefined)
+		.finally(() => {
+			set.delete(tracked);
+			if (set.size === 0 && draining.get(extensionId) === set) {
+				draining.delete(extensionId);
+			}
+		});
+	set.add(tracked);
+}
 
 interface DnrManifest {
 	permissions?: string[];
@@ -46,6 +73,10 @@ interface LoadedExtension {
 export interface DnrHostOptions {
 	/** Permissions and origins granted now, including at runtime. */
 	grantedAccess(extension: Electron.Extension): string[];
+}
+
+function matchedRuleKey(rule: MatchedRule): string {
+	return `${rule.extensionId}\n${rule.rulesetId}\n${rule.ruleId}`;
 }
 
 function rulesDirectory(): string {
@@ -74,14 +105,20 @@ function fileStorage(extensionId: string): RulesStorage {
 		},
 		save: async (rules) => {
 			await mkdir(rulesDirectory(), { recursive: true });
-			const temp = `${file}.${process.pid}.tmp`;
-			await writeFile(temp, JSON.stringify(rules));
-			await rename(temp, file);
+			const temp = `${file}.${randomUUID()}.tmp`;
+			try {
+				await writeFile(temp, JSON.stringify(rules));
+				await rename(temp, file);
+			} catch (error) {
+				await rm(temp, { force: true }).catch(() => {});
+				throw error;
+			}
 		},
 	};
 }
 
 export async function deleteExtensionRules(extensionId: string): Promise<void> {
+	await Promise.all(draining.get(extensionId) ?? []);
 	await rm(path.join(rulesDirectory(), `${extensionId}.json`), { force: true });
 }
 
@@ -126,7 +163,8 @@ function applyRequestHeaders(
 			if (key) delete next[key];
 			next[change.header] = change.value ?? "";
 		} else {
-			next[key] = `${next[key]}, ${change.value ?? ""}`;
+			const separator = key.toLowerCase() === "cookie" ? "; " : ", ";
+			next[key] = `${next[key]}${separator}${change.value ?? ""}`;
 		}
 	}
 	return next;
@@ -162,6 +200,7 @@ export function enforceDeclarativeNetRequest(
 	options: DnrHostOptions,
 ): void {
 	const engine = new DnrEngine();
+	const pool = new StaticRulePool();
 	const loaded = new Map<string, LoadedExtension>();
 	const hub = webRequestHub(session);
 	let removeRequestHook: (() => void) | null = null;
@@ -200,9 +239,7 @@ export function enforceDeclarativeNetRequest(
 					const decision = evaluate(details);
 					if (!decision) return undefined;
 					const { outcome } = decision;
-					if (outcome.kind === "block" || outcome.kind === "redirect") {
-						record(decision.matched, details.webContentsId ?? -1);
-					}
+					record(decision.matched, details.webContentsId ?? -1);
 					if (outcome.kind === "block") return { cancel: true };
 					if (outcome.kind === "redirect") return { redirectURL: outcome.url };
 					return undefined;
@@ -219,12 +256,22 @@ export function enforceDeclarativeNetRequest(
 			onBeforeSendHeaders: (details, headers) => {
 				const decision = evaluate(details);
 				if (!decision?.requestHeaders.length) return undefined;
-				record(decision.matched, details.webContentsId ?? -1);
+				record(decision.requestHeaderRules, details.webContentsId ?? -1);
 				return applyRequestHeaders(headers, decision.requestHeaders);
 			},
 			onHeadersReceived: (details, headers) => {
 				const decision = evaluate(details);
 				if (!decision?.responseHeaders.length) return undefined;
+				// Rules that also changed request headers were recorded then.
+				const recorded = new Set(
+					decision.requestHeaderRules.map(matchedRuleKey),
+				);
+				record(
+					decision.responseHeaderRules.filter(
+						(rule) => !recorded.has(matchedRuleKey(rule)),
+					),
+					details.webContentsId ?? -1,
+				);
 				return applyResponseHeaders(headers, decision.responseHeaders);
 			},
 		});
@@ -238,10 +285,17 @@ export function enforceDeclarativeNetRequest(
 		engine.setExtension({
 			extensionId: extension.id,
 			rulesets: entry.rules.rulesets(),
-			hasHostAccess: (url) =>
-				options
+			hasHostAccess: (raw) => {
+				let url: URL;
+				try {
+					url = new URL(raw);
+				} catch {
+					return false;
+				}
+				return options
 					.grantedAccess(extension)
-					.some((pattern) => urlMatchesPattern(pattern, url)),
+					.some((pattern) => urlMatchesPattern(pattern, url));
+			},
 			hostAccessForAllActions: !permissions.includes("declarativeNetRequest"),
 			resolveExtensionPath: (extensionPath) =>
 				`chrome-extension://${extension.id}${extensionPath}`,
@@ -264,6 +318,7 @@ export function enforceDeclarativeNetRequest(
 			rulesetSources(manifest),
 			fileStorage(extension.id),
 			readRulesetFile(extension),
+			pool,
 		);
 		const entry: LoadedExtension = {
 			extension,
@@ -290,6 +345,8 @@ export function enforceDeclarativeNetRequest(
 	};
 
 	const unload = (extensionId: string) => {
+		const entry = loaded.get(extensionId);
+		if (entry) drainBeforeDelete(extensionId, entry.rules.dispose());
 		loaded.delete(extensionId);
 		engine.removeExtension(extensionId);
 		syncHooks();
@@ -302,6 +359,7 @@ export function enforceDeclarativeNetRequest(
 			method?: string;
 			type?: DnrRequest["resourceType"];
 			tabId?: number;
+			topUrl?: string;
 		};
 		if (typeof details.url !== "string" || !details.type) {
 			throw new Error("testMatchOutcome needs a url and a type.");
@@ -312,9 +370,20 @@ export function enforceDeclarativeNetRequest(
 			method: details.method ?? "get",
 			resourceType: details.type,
 			tabId: details.tabId ?? -1,
+			frameUrls:
+				details.type !== "main_frame" && typeof details.topUrl === "string"
+					? [details.topUrl]
+					: [],
 		});
+		const matched = new Map(
+			[
+				...decision.matched,
+				...decision.requestHeaderRules,
+				...decision.responseHeaderRules,
+			].map((rule) => [matchedRuleKey(rule), rule]),
+		);
 		return {
-			matchedRules: decision.matched
+			matchedRules: [...matched.values()]
 				.filter((match) => match.extensionId === extensionId)
 				.map(({ ruleId, rulesetId }) => ({ ruleId, rulesetId })),
 		};
@@ -358,20 +427,34 @@ export function enforceDeclarativeNetRequest(
 			case "updateSessionRules":
 				return changed(rules.updateSessionRules(first ?? {}));
 			case "isRegexSupported": {
-				const regex = (first as { regex?: unknown } | undefined)?.regex;
-				try {
-					new RegExp(String(regex));
-					return { isSupported: true };
-				} catch {
-					return { isSupported: false, reason: "syntaxError" };
-				}
+				const reason = regexFilterProblem(
+					(first as { regex?: unknown } | undefined)?.regex,
+				);
+				return reason ? { isSupported: false, reason } : { isSupported: true };
 			}
 			case "setExtensionActionOptions":
 				return undefined;
 			case "getMatchedRules": {
+				if (
+					!options
+						.grantedAccess(entry.extension)
+						.includes("declarativeNetRequestFeedback")
+				) {
+					throw new Error(
+						"The extension needs the declarativeNetRequestFeedback permission.",
+					);
+				}
 				const filter = first as
 					| { tabId?: number; minTimeStamp?: number }
 					| undefined;
+				const expired = Date.now() - MATCHED_RULES_TTL_MS;
+				const firstLive = entry.matched.findIndex(
+					(info) => info.timeStamp >= expired,
+				);
+				entry.matched.splice(
+					0,
+					firstLive === -1 ? entry.matched.length : firstLive,
+				);
 				return {
 					rulesMatchedInfo: entry.matched.filter(
 						(info) =>

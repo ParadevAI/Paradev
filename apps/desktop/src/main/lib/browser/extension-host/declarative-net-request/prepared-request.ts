@@ -17,20 +17,18 @@ const KNOWN_METHODS = new Set([
 export interface PreparedRequest {
 	request: DnrRequest;
 	url: URL;
-	lowerUrl: string;
-	host: string;
 	hostSuffixes: string[];
 	tokens: Set<string>;
-	initiatorHost: string | null;
 	initiatorSuffixes: string[];
 	resourceBit: number;
 	method: string;
 	thirdParty: boolean;
 }
 
-/** `a.b.c` → `a.b.c`, `b.c`, `c`. */
+/** `a.b.c` → `a.b.c`, `b.c`, `c`. An IP address is only itself. */
 export function domainSuffixes(host: string): string[] {
 	const suffixes = [host];
+	if (host.includes(":") || /^\d+\.\d+\.\d+\.\d+$/.test(host)) return suffixes;
 	let dot = host.indexOf(".");
 	while (dot !== -1) {
 		suffixes.push(host.slice(dot + 1));
@@ -66,22 +64,19 @@ export function prepareRequest(request: DnrRequest): PreparedRequest | null {
 		return null;
 	}
 	const host = url.hostname.replace(/^\[|\]$/g, "").toLowerCase();
-	const lowerUrl = request.url.toLowerCase();
 	const initiatorHost = hostOf(request.initiator);
 	const method = request.method.toLowerCase();
 	return {
 		request,
 		url,
-		lowerUrl,
-		host,
 		hostSuffixes: domainSuffixes(host),
-		tokens: urlTokens(lowerUrl),
-		initiatorHost,
+		tokens: urlTokens(request.url.toLowerCase()),
 		initiatorSuffixes: initiatorHost ? domainSuffixes(initiatorHost) : [],
 		resourceBit: resourceTypeBit(request.resourceType),
 		method: KNOWN_METHODS.has(method) ? method : "other",
+		// Chrome treats a missing or opaque initiator as third-party.
 		thirdParty:
-			initiatorHost !== null &&
+			initiatorHost === null ||
 			registrableDomain(initiatorHost) !== registrableDomain(host),
 	};
 }

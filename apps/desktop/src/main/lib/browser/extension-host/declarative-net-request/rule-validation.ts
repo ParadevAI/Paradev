@@ -7,6 +7,27 @@ import {
 
 const FRAME_TYPES = new Set(["main_frame", "sub_frame"]);
 const HEADER_OPERATIONS = new Set(["append", "set", "remove"]);
+const DOMAIN_TYPES = new Set(["firstParty", "thirdParty"]);
+const TRANSFORM_SCHEMES = new Set(["http", "https", "ftp", "chrome-extension"]);
+const TRANSFORM_STRING_FIELDS = [
+	"scheme",
+	"host",
+	"port",
+	"path",
+	"query",
+	"fragment",
+	"username",
+	"password",
+] as const;
+const HEADER_NAME = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
+const BAD_HEADER_VALUE = /[\0\r\n]/;
+// biome-ignore lint/suspicious/noControlCharactersInRegex: Chrome refuses non-ASCII filters.
+const ASCII = /^[\x00-\x7f]*$/;
+
+export interface ValidateOptions {
+	/** Only session rules may name tabs. */
+	session?: boolean;
+}
 
 function fail(rule: { id?: unknown }, problem: string): never {
 	throw new Error(`Rule with id ${String(rule.id)} ${problem}`);
@@ -30,8 +51,63 @@ function checkList(
 	}
 }
 
+/**
+ * Why Chrome's RE2 matcher would refuse `regex`, or null. RE2 has no
+ * lookaround or backreferences and Chrome only takes ASCII patterns.
+ */
+export function regexFilterProblem(regex: unknown): "syntaxError" | null {
+	if (typeof regex !== "string" || !ASCII.test(regex)) return "syntaxError";
+	try {
+		new RegExp(regex);
+	} catch {
+		return "syntaxError";
+	}
+	let inClass = false;
+	for (let index = 0; index < regex.length; index++) {
+		const char = regex[index];
+		if (char === "\\") {
+			const next = regex[index + 1] ?? "";
+			// Backreferences, and \C, which RE2 reads as any byte and JS as "C".
+			if (/[1-9kC]/.test(next)) return "syntaxError";
+			index++;
+		} else if (inClass) {
+			if (char === "]") inClass = false;
+		} else if (char === "[") {
+			inClass = true;
+		} else if (char === "(" && /^\?<?[=!]/.test(regex.slice(index + 1))) {
+			return "syntaxError";
+		}
+	}
+	return null;
+}
+
+function isValidQueryTransform(value: unknown): boolean {
+	if (value === undefined) return true;
+	if (typeof value !== "object" || value === null) return false;
+	const { removeParams, addOrReplaceParams } = value as Record<string, unknown>;
+	const strings = (list: unknown) =>
+		Array.isArray(list) && list.every((item) => typeof item === "string");
+	return (
+		(removeParams === undefined || strings(removeParams)) &&
+		(addOrReplaceParams === undefined ||
+			(Array.isArray(addOrReplaceParams) &&
+				addOrReplaceParams.every(
+					(param) =>
+						typeof param?.key === "string" && typeof param.value === "string",
+				)))
+	);
+}
+
+function isValidRedirectUrl(raw: string): boolean {
+	try {
+		return new URL(raw).protocol !== "javascript:";
+	} catch {
+		return false;
+	}
+}
+
 /** Throws Chrome's style of message for a rule Chrome would refuse. */
-export function validateRule(rule: Rule): void {
+export function validateRule(rule: Rule, options: ValidateOptions = {}): void {
 	if (typeof rule !== "object" || rule === null) {
 		throw new Error("A rule must be an object.");
 	}
@@ -66,11 +142,52 @@ export function validateRule(rule: Rule): void {
 		if (redirect.extensionPath && !redirect.extensionPath.startsWith("/")) {
 			fail(rule, 'has an "extensionPath" that does not start with "/".');
 		}
+		if (
+			redirect.url !== undefined &&
+			(typeof redirect.url !== "string" || !isValidRedirectUrl(redirect.url))
+		) {
+			fail(rule, 'does not provide a valid URL for "action.redirect.url".');
+		}
+		const transform = redirect.transform;
+		if (
+			transform !== undefined &&
+			(typeof transform !== "object" ||
+				transform === null ||
+				Array.isArray(transform) ||
+				TRANSFORM_STRING_FIELDS.some(
+					(key) =>
+						transform[key] !== undefined && typeof transform[key] !== "string",
+				) ||
+				!isValidQueryTransform(transform.queryTransform))
+		) {
+			fail(rule, 'has an invalid "action.redirect.transform".');
+		}
+		if (
+			transform?.scheme !== undefined &&
+			!TRANSFORM_SCHEMES.has(transform.scheme)
+		) {
+			fail(rule, 'has an invalid "action.redirect.transform.scheme".');
+		}
+		if (
+			transform?.port !== undefined &&
+			!(
+				typeof transform.port === "string" &&
+				/^\d{0,5}$/.test(transform.port) &&
+				Number(transform.port) <= 65_535
+			)
+		) {
+			fail(rule, 'has an invalid "action.redirect.transform.port".');
+		}
 		if (redirect.regexSubstitution !== undefined && !condition.regexFilter) {
 			fail(rule, 'uses "regexSubstitution" without a "regexFilter".');
 		}
 	}
 	if (action.type === "modifyHeaders") {
+		for (const list of [action.requestHeaders, action.responseHeaders]) {
+			if (list !== undefined && !Array.isArray(list)) {
+				fail(rule, "has an invalid header modification.");
+			}
+		}
 		const headers = [
 			...(action.requestHeaders ?? []),
 			...(action.responseHeaders ?? []),
@@ -81,9 +198,10 @@ export function validateRule(rule: Rule): void {
 		for (const info of headers) {
 			if (
 				typeof info?.header !== "string" ||
-				info.header === "" ||
+				!HEADER_NAME.test(info.header) ||
 				!HEADER_OPERATIONS.has(info.operation) ||
-				(info.operation !== "remove" && typeof info.value !== "string")
+				(info.operation !== "remove" &&
+					(typeof info.value !== "string" || BAD_HEADER_VALUE.test(info.value)))
 			) {
 				fail(rule, "has an invalid header modification.");
 			}
@@ -99,18 +217,16 @@ export function validateRule(rule: Rule): void {
 		if (
 			typeof condition.urlFilter !== "string" ||
 			condition.urlFilter === "" ||
-			// biome-ignore lint/suspicious/noControlCharactersInRegex: Chrome refuses non-ASCII urlFilters.
-			!/^[\x00-\x7f]*$/.test(condition.urlFilter)
+			!ASCII.test(condition.urlFilter)
 		) {
 			fail(rule, 'has an invalid "condition.urlFilter".');
 		}
 	}
-	if (condition.regexFilter !== undefined) {
-		try {
-			new RegExp(condition.regexFilter);
-		} catch {
-			fail(rule, "specified an incorrect regular expression.");
-		}
+	if (
+		condition.regexFilter !== undefined &&
+		regexFilterProblem(condition.regexFilter)
+	) {
+		fail(rule, "specified an incorrect regular expression.");
 	}
 	if (condition.resourceTypes && condition.excludedResourceTypes) {
 		fail(rule, 'specifies both "resourceTypes" and "excludedResourceTypes".');
@@ -138,6 +254,25 @@ export function validateRule(rule: Rule): void {
 		"excludedDomains",
 	] as const) {
 		checkList(rule, key, condition[key]);
+	}
+	if (
+		condition.domainType !== undefined &&
+		!DOMAIN_TYPES.has(condition.domainType)
+	) {
+		fail(rule, 'has an invalid "condition.domainType".');
+	}
+	for (const key of ["tabIds", "excludedTabIds"] as const) {
+		const ids = condition[key];
+		if (ids === undefined) continue;
+		if (!options.session) {
+			fail(rule, `cannot specify "condition.${key}" outside session rules.`);
+		}
+		if (!Array.isArray(ids) || !ids.every((id) => Number.isInteger(id))) {
+			fail(rule, `has an invalid "condition.${key}" value.`);
+		}
+	}
+	if (condition.tabIds?.length === 0) {
+		fail(rule, 'has an empty "condition.tabIds" list.');
 	}
 	if (condition.requestDomains?.length === 0) {
 		fail(rule, 'has an empty "condition.requestDomains" list.');

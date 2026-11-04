@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { urlMatchesPattern, WebRequestHub } from "./web-request-hub";
+import {
+	globMatches,
+	urlMatchesPattern,
+	WebRequestHub,
+} from "./web-request-hub";
 
 type Listener = (details: object, callback: (response: object) => void) => void;
 
@@ -85,4 +89,31 @@ test("match patterns", () => {
 	expect(urlMatchesPattern("*://*/*", "chrome-extension://abc/")).toBe(false);
 	expect(urlMatchesPattern("<all_urls>", "https://a.example/")).toBe(true);
 	expect(urlMatchesPattern("storage", "https://a.example/")).toBe(false);
+});
+
+test("match patterns compare a port when they name one", () => {
+	const scoped = "https://example.com:8443/*";
+	expect(urlMatchesPattern(scoped, "https://example.com:8443/x")).toBe(true);
+	expect(urlMatchesPattern(scoped, "https://example.com/x")).toBe(false);
+	expect(
+		urlMatchesPattern("https://example.com:443/*", "https://example.com/"),
+	).toBe(true);
+	expect(
+		urlMatchesPattern("https://example.com:*/*", "https://example.com:9/"),
+	).toBe(true);
+	expect(
+		urlMatchesPattern("https://example.com/*", "https://example.com:8443/"),
+	).toBe(true);
+});
+
+test("a path with many wildcards does not backtrack on a long URL", () => {
+	const pattern = `https://example.com/${"*a".repeat(12)}b`;
+	const url = `https://example.com/${"a".repeat(5_000)}`;
+	// The old .* RegExp never finished on this input.
+	expect(urlMatchesPattern(pattern, url)).toBe(false);
+	expect(
+		urlMatchesPattern("https://example.com/*/x*", "https://example.com/a/b/xy"),
+	).toBe(true);
+	expect(globMatches("a*b*c", "aXbYc")).toBe(true);
+	expect(globMatches("a*b*c", "aXbY")).toBe(false);
 });

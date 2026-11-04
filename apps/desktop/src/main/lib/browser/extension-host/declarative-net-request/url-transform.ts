@@ -48,15 +48,38 @@ export function applyUrlTransform(
 	raw: string,
 	transform: UrlTransform,
 ): string | null {
-	let url: URL;
+	// Runs in the request path, so a malformed transform must fail, never throw.
 	try {
-		url = new URL(raw);
+		return transformed(new URL(raw), transform);
 	} catch {
 		return null;
 	}
-	if (transform.scheme) url.protocol = `${transform.scheme}:`;
-	if (transform.host !== undefined) url.hostname = transform.host;
-	if (transform.port !== undefined) url.port = transform.port;
+}
+
+function transformed(url: URL, transform: UrlTransform): string | null {
+	if (transform.scheme) {
+		url.protocol = `${transform.scheme}:`;
+		if (url.protocol !== `${transform.scheme.toLowerCase()}:`) return null;
+	}
+	if (transform.host !== undefined) {
+		if (typeof transform.host !== "string") return null;
+		const before = url.hostname;
+		url.hostname = transform.host;
+		const ignored =
+			url.hostname === before &&
+			transform.host.toLowerCase() !== before.toLowerCase();
+		// The setter stops at a delimiter and keeps only the part before it.
+		const truncated =
+			!/^\[[0-9a-f:.]+\]$/i.test(transform.host) &&
+			/[/?#:@\\\s]/.test(transform.host);
+		if (ignored || truncated) return null;
+	}
+	if (transform.port !== undefined) {
+		if (!/^\d{0,5}$/.test(transform.port) || Number(transform.port) > 65_535) {
+			return null;
+		}
+		url.port = transform.port;
+	}
 	if (transform.path !== undefined) url.pathname = transform.path || "/";
 	if (transform.query !== undefined) url.search = transform.query;
 	else if (transform.queryTransform) {
