@@ -76,7 +76,9 @@ if (!registered) {
 const { act, cleanup, render, waitFor } = await import(
 	"@testing-library/react"
 );
-const { useChatSessionLiveness } = await import("../useChatSessionLiveness");
+const { useChatSessionChecksFailing, useChatSessionLiveness } = await import(
+	"../useChatSessionLiveness"
+);
 const transport = {
 	getSession: async () => {
 		const host = hosts.get(hostUrl);
@@ -85,6 +87,7 @@ const transport = {
 	},
 };
 let current: ReturnType<typeof useChatSessionLiveness>;
+let hostChecksFailing = false;
 const renderedChecks: boolean[] = [];
 function Probe() {
 	current = useChatSessionLiveness({
@@ -92,6 +95,7 @@ function Probe() {
 		sessionId: "chat",
 		transport,
 	});
+	hostChecksFailing = useChatSessionChecksFailing(hostUrl).failing;
 	renderedChecks.push(current.checking);
 	return current.checking ? <div data-testid="held" /> : null;
 }
@@ -127,6 +131,7 @@ afterEach(() => {
 	}
 	hosts.clear();
 	renderedChecks.length = 0;
+	hostChecksFailing = false;
 	hostUrl = "https://sandbox-a";
 });
 afterAll(async () => {
@@ -152,7 +157,7 @@ test("a waking box holds the chat immediately without a tab switch", async () =>
 	expect(renderedChecks[0]).toBe(true);
 	expect(view.getByTestId("held")).toBeTruthy();
 	expect(current.checking).toBe(true);
-	expect(current.unreachable).toBe(false);
+	expect(hostChecksFailing).toBe(false);
 	expect(current.stored).toBeUndefined();
 	expect(reads).toBe(0);
 	await act(async () => host.emit("open"));
@@ -271,7 +276,7 @@ test("a failed liveness check recovers without another connection event", async 
 		await act(async () => jest.advanceTimersByTime(0));
 		expect(attempts).toBe(3);
 		expect(current.checking).toBe(true);
-		expect(current.unreachable).toBe(true);
+		expect(hostChecksFailing).toBe(true);
 		expect(current.stored).toBeUndefined();
 		expect(
 			queryClient.getQueryState([
@@ -285,7 +290,7 @@ test("a failed liveness check recovers without another connection event", async 
 		await act(async () => jest.advanceTimersByTime(2_000));
 		await act(async () => jest.advanceTimersByTime(0));
 		expect(current.checking).toBe(false);
-		expect(current.unreachable).toBe(false);
+		expect(hostChecksFailing).toBe(false);
 		expect(current.stored?.live).toBe(true);
 	} finally {
 		cleanup();

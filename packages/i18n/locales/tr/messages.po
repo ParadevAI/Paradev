@@ -3078,9 +3078,6 @@ msgstr "Sohbete ekle"
 msgid "Attached"
 msgstr "Bağlı"
 
-msgid "Attaching to the running session…"
-msgstr "Çalışan oturuma bağlanılıyor…"
-
 msgid "attachment"
 msgstr "ek"
 

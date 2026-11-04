@@ -3078,9 +3078,6 @@ msgstr "채팅에 첨부"
 msgid "Attached"
 msgstr "연결됨"
 
-msgid "Attaching to the running session…"
-msgstr "실행 중인 세션에 연결 중…"
-
 msgid "attachment"
 msgstr "첨부 파일"
 

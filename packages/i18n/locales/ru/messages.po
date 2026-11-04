@@ -3078,9 +3078,6 @@ msgstr "Прикрепить к чату"
 msgid "Attached"
 msgstr "Подключена"
 
-msgid "Attaching to the running session…"
-msgstr "Подключение к запущенной сессии…"
-
 msgid "attachment"
 msgstr "вложение"
 

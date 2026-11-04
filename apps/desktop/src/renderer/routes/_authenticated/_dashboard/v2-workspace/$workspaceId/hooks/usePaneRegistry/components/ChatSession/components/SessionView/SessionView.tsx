@@ -58,7 +58,6 @@ import {
 	type ComposerHandle,
 	prependToDraft,
 } from "../Composer";
-import { ConnectionNotice } from "../ConnectionNotice";
 import { LaunchPromptView } from "../LaunchPromptView";
 import { SessionHeader } from "../SessionHeader";
 import { SetupSessionHeader } from "../SetupSessionHeader";
@@ -142,8 +141,6 @@ export function SessionView({
 	terminalId?: string;
 	headerLeft?: ReactNode;
 	held?: {
-		/** Shown only when holding has gone wrong; a normal hold is silent. */
-		notice?: ReactNode;
 		queued: UserContent[][];
 		onQueue: (content: UserContent[]) => void;
 		/** Already sent, so shown only until the transcript has a user message. */
@@ -761,13 +758,6 @@ export function SessionView({
 						terminalId={terminalId}
 					/>
 				)}
-				{held
-					? held.notice && <ConnectionNotice>{held.notice}</ConnectionNotice>
-					: booting && (
-							<ConnectionNotice>
-								<Trans>Starting the agent…</Trans>
-							</ConnectionNotice>
-						)}
 				<WorkDrawer
 					notice={
 						usageLimit &&

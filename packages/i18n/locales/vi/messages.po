@@ -3078,9 +3078,6 @@ msgstr "Đính kèm vào cuộc trò chuyện"
 msgid "Attached"
 msgstr "Đã gắn"
 
-msgid "Attaching to the running session…"
-msgstr "Đang kết nối tới phiên đang chạy…"
-
 msgid "attachment"
 msgstr "tệp đính kèm"
 

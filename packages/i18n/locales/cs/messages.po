@@ -3078,9 +3078,6 @@ msgstr "Připojit k chatu"
 msgid "Attached"
 msgstr "Připojeno"
 
-msgid "Attaching to the running session…"
-msgstr "Připojuji se k běžící sezení…"
-
 msgid "attachment"
 msgstr "příloha"
 

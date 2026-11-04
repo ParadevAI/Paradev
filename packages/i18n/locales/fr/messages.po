@@ -3078,9 +3078,6 @@ msgstr "Joindre au chat"
 msgid "Attached"
 msgstr "Attachée"
 
-msgid "Attaching to the running session…"
-msgstr "Connexion à la session en cours…"
-
 msgid "attachment"
 msgstr "pièce jointe"
 

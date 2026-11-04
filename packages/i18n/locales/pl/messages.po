@@ -3078,9 +3078,6 @@ msgstr "Załącz do czatu"
 msgid "Attached"
 msgstr "Podłączona"
 
-msgid "Attaching to the running session…"
-msgstr "Łączenie z działającą sesją…"
-
 msgid "attachment"
 msgstr "załącznik"
 

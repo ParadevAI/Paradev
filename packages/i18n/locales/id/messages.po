@@ -3078,9 +3078,6 @@ msgstr "Lampirkan ke obrolan"
 msgid "Attached"
 msgstr "Terhubung"
 
-msgid "Attaching to the running session…"
-msgstr "Menghubungkan ke sesi yang berjalan…"
-
 msgid "attachment"
 msgstr "lampiran"
 

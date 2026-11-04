@@ -151,7 +151,7 @@ export function AcpChatPane({
 			.catch(() => undefined);
 	});
 
-	const { stored, checking, unreachable } = useChatSessionLiveness({
+	const { stored, checking } = useChatSessionLiveness({
 		hostUrl,
 		sessionId,
 		transport: wiring.transport,
@@ -696,13 +696,12 @@ export function AcpChatPane({
 				: undefined,
 		[launchPrompt],
 	);
-	const draft = (notice: ReactNode) => (
+	const draft = () => (
 		<DraftChat
 			draftKey={draftKey}
 			getOpenFilePaths={getOpenFilePaths}
 			isActive={isActive}
 			launched={launched}
-			notice={notice}
 			onOpenHistory={onOpenHistory}
 			onQueue={onQueuePrompt}
 			queued={pendingPrompts}
@@ -744,13 +743,7 @@ export function AcpChatPane({
 				</div>
 			);
 		}
-		return draft(
-			launchPrompt ? null : agentSessionId ? (
-				<Trans>Attaching to the running session…</Trans>
-			) : (
-				<Trans>Starting the agent…</Trans>
-			),
-		);
+		return draft();
 	}
 
 	return (
@@ -762,9 +755,6 @@ export function AcpChatPane({
 			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
-							...(unreachable
-								? { notice: <Trans>Can't reach the host</Trans> }
-								: {}),
 							queued: pendingPrompts,
 							onQueue: onQueuePrompt,
 							...(launched ? { launched } : {}),

@@ -3078,9 +3078,6 @@ msgstr "チャットに添付"
 msgid "Attached"
 msgstr "接続中"
 
-msgid "Attaching to the running session…"
-msgstr "実行中のセッションに接続しています…"
-
 msgid "attachment"
 msgstr "添付ファイル"
 
