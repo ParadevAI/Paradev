@@ -164,6 +164,16 @@ export const chatMoveStatusValues = [
 export const chatMoveStatusEnum = z.enum(chatMoveStatusValues);
 export type ChatMoveStatus = z.infer<typeof chatMoveStatusEnum>;
 
+export const workspaceMoveStatusValues = [
+	"pending",
+	"moving",
+	"ready",
+	"partial",
+	"failed",
+] as const;
+export const workspaceMoveStatusEnum = z.enum(workspaceMoveStatusValues);
+export type WorkspaceMoveStatus = z.infer<typeof workspaceMoveStatusEnum>;
+
 export const automationRunStatusValues = [
 	"dispatching",
 	"dispatched",

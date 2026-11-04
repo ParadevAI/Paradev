@@ -14,7 +14,7 @@ import {
 	uuid,
 } from "drizzle-orm/pg-core";
 import { organizations, users } from "./auth";
-import { chatMoveStatusValues } from "./enums";
+import { chatMoveStatusValues, workspaceMoveStatusValues } from "./enums";
 import { chatSessions, files } from "./schema";
 
 const tsvector = customType<{ data: string }>({
@@ -139,10 +139,67 @@ export const chatTranscripts = pgTable(
 export type InsertChatTranscript = typeof chatTranscripts.$inferInsert;
 export type SelectChatTranscript = typeof chatTranscripts.$inferSelect;
 
+export const workspaceMoveStatus = pgEnum(
+	"workspace_move_status",
+	workspaceMoveStatusValues,
+);
+
+/**
+ * One attempt to move a workspace to another one: its code, as one snapshot
+ * branch, and each of its chats, as a `chat_moves` row. `partial` means some
+ * chats moved and some did not; each one that did not can be tried again.
+ */
+export const workspaceMoves = pgTable(
+	"workspace_moves",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		createdBy: uuid("created_by")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		fromWorkspaceId: uuid("from_workspace_id").notNull(),
+		/** Null when it leaves a cloud workspace, or a computer that never registered. */
+		fromHostId: text("from_host_id"),
+		toWorkspaceId: uuid("to_workspace_id").notNull(),
+		/** Null when it moves to a cloud workspace. */
+		toHostId: text("to_host_id"),
+		/** The snapshot branch the new workspace starts from. */
+		branch: text().notNull(),
+		status: workspaceMoveStatus().notNull().default("pending"),
+		error: text(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+		finishedAt: timestamp("finished_at", { withTimezone: true }),
+	},
+	(table) => [
+		index("workspace_moves_from_workspace_idx").on(
+			table.fromWorkspaceId,
+			table.createdAt,
+		),
+		index("workspace_moves_to_workspace_idx").on(table.toWorkspaceId),
+		uniqueIndex("workspace_moves_one_in_flight_idx")
+			.on(table.fromWorkspaceId)
+			.where(sql`${table.status} in ('pending', 'moving')`),
+	],
+);
+
+/** A workspace move whose chats are still moving. */
+export const WORKSPACE_MOVE_IN_FLIGHT = ["pending", "moving"] as const;
+
+export type InsertWorkspaceMove = typeof workspaceMoves.$inferInsert;
+export type SelectWorkspaceMove = typeof workspaceMoves.$inferSelect;
+
 export const chatMoveStatus = pgEnum("chat_move_status", chatMoveStatusValues);
 
 /**
- * One attempt to move a chat to another workspace, run by the control plane.
+ * One chat's part of a workspace move, run by the control plane.
  * The chat's own row names its old workspace until the attempt is `ready`,
  * so a failed attempt leaves the chat where it was.
  */
@@ -150,6 +207,9 @@ export const chatMoves = pgTable(
 	"chat_moves",
 	{
 		id: uuid().primaryKey().defaultRandom(),
+		workspaceMoveId: uuid("workspace_move_id")
+			.notNull()
+			.references(() => workspaceMoves.id, { onDelete: "cascade" }),
 		sessionId: uuid("session_id")
 			.notNull()
 			.references(() => chatSessions.id, { onDelete: "cascade" }),
@@ -188,6 +248,7 @@ export const chatMoves = pgTable(
 			table.createdAt,
 		),
 		index("chat_moves_to_workspace_idx").on(table.toWorkspaceId),
+		index("chat_moves_workspace_move_idx").on(table.workspaceMoveId),
 		uniqueIndex("chat_moves_one_in_flight_idx")
 			.on(table.sessionId)
 			.where(sql`${table.status} in ('pending', 'copying', 'restoring')`),
