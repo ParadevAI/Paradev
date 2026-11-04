@@ -7,6 +7,7 @@ import {
 } from "@superset/shared/billing";
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type Stripe from "stripe";
+import { autumnClient } from "../../../autumn";
 import { env } from "../../../env";
 import { stripeClient } from "../../../stripe";
 import { planFromStripePrice } from "../legacy/plan-ids";
@@ -22,6 +23,12 @@ import {
 	saveStripeCustomerId,
 } from "./customer";
 import { paidPlanIdFromFlags, tierFromFlags } from "./entitlements";
+import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
+import {
+	type GrantState,
+	monthlyGrantOf,
+	prorateGrant,
+} from "./grant-proration";
 import { emailPlanFor, upgradedFrom } from "./plan-family";
 import { invalidateOrganizationBilling } from "./plan-state";
 import { billingRedis } from "./redis";
@@ -32,6 +39,7 @@ import {
 } from "./subscription-row";
 
 const RECENT_STRIPE_SUBSCRIPTIONS = 10;
+const GRANT_STATE_TTL_SECONDS = 62 * 24 * 60 * 60;
 
 type SubscriptionRow = typeof subscriptions.$inferSelect;
 type Transaction = Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
@@ -135,6 +143,48 @@ async function autumnPlanFor(organizationId: string): Promise<{
 	}
 }
 
+const grantStateKey = (organizationId: string) =>
+	`billing:gb-grant:${organizationId}`;
+
+async function monthlyGrantFor(organizationId: string) {
+	const customer = await getAutumnCustomer(organizationId);
+	return monthlyGrantOf(customer, paidPlanIdFromFlags(customer.flags));
+}
+
+/** Runs under the sync lock, so a change seen by two webhooks is prorated once. */
+async function syncGrantProration(organizationId: string): Promise<void> {
+	try {
+		const current = await monthlyGrantFor(organizationId);
+		if (!current) return;
+		const previous = await billingRedis.get<GrantState>(
+			grantStateKey(organizationId),
+		);
+		const { adjustment, state } = prorateGrant(previous, current, Date.now());
+		if (!state) return;
+		if (adjustment) {
+			await autumnClient.balances.update({
+				customerId: organizationId,
+				featureId: BOX_GB_MINUTES_FEATURE_ID,
+				balanceId: current.balanceId,
+				addToBalance: adjustment,
+			});
+			console.log(
+				`[billing/projection] ${organizationId} GB-minute grant prorated by ${adjustment}`,
+			);
+			const after = await monthlyGrantFor(organizationId);
+			if (after) state.includedGbMinutes = after.includedGbMinutes;
+		}
+		await billingRedis.set(grantStateKey(organizationId), state, {
+			ex: GRANT_STATE_TTL_SECONDS,
+		});
+	} catch (error) {
+		console.error(
+			`[billing/projection] ${organizationId} grant proration failed`,
+			error,
+		);
+	}
+}
+
 const notifiedFamilyKey = (organizationId: string) =>
 	`billing:notified-family:${organizationId}`;
 
@@ -226,6 +276,7 @@ export async function syncOrganizationSubscription(
 			const recorded = plan
 				? await recordFamily(organizationId, plan.family)
 				: ({ ok: false } as const);
+			await syncGrantProration(organizationId);
 			return { changes: written, catalog, plan, recorded };
 		},
 	);
