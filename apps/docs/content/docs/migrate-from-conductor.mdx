@@ -18,7 +18,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 | Conductor | Paradev |
 |---|---|
 | Workspace | [Workspace](/workspaces) (a Git worktree on its own branch) |
-| `~/conductor/workspaces/<repo>/<workspace>` | Imported workspaces keep their path. New ones go in `~/.paradev/worktrees/<project>/<branch>` |
+| `~/conductor/workspaces/<repo>/<workspace>`, or `<repo>/.conductor/<workspace>` in older versions | Imported workspaces keep their path. New ones go in `~/.paradev/worktrees/<project>/<branch>` |
 | `conductor.json` or `.conductor/settings.toml` | `.paradev/config.json` ([lifecycle scripts](/setup-teardown-scripts)) |
 | Setup script | `setup` |
 | Run script and named actions | `run` (Run button), plus [terminal scripts](/terminal-scripts) for other actions |
@@ -42,7 +42,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 Each Conductor workspace is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
 
 1. Right-click the project in the sidebar and choose **Import untracked worktrees**. You can also use the **Import** tab in the New Workspace modal.
-2. Check the list of branches and paths. Conductor's worktrees are usually under `~/conductor/workspaces/`.
+2. Check the list of branches and paths. Conductor's worktrees are usually under `~/conductor/workspaces/`. Older versions put them in a `.conductor/` folder inside the repository.
 3. Leave **Run setup script** off. These worktrees are already set up.
 
 Imported workspaces keep their paths, branches, and uncommitted changes. New workspaces you create in Paradev go under `~/.paradev/worktrees/`.
@@ -122,7 +122,7 @@ Commit `.paradev/` so your team gets the same scripts.
 
 Claude Code, Codex, Cursor Agent, and OpenCode all run in Paradev on your existing subscriptions and keys. See [Supported Agents](/supported-agents) for the full list, or add any other CLI as a custom agent.
 
-To try to continue a conversation from Conductor, open a terminal in the imported workspace and run the agent's resume command, for example `claude --resume` or `codex resume`. The picker shows sessions that the agent CLI saved for that folder. Conductor may not have saved its chats there, so this does not always work. If it doesn't, give the agent the context again, or keep a copy with Conductor's **Settings → Account → Export data**. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
+Conductor saves Claude Code sessions in your usual `~/.claude` folder, under the workspace's path. Import keeps that path, so open a terminal in the imported workspace and run `claude --resume` to pick a Conductor conversation. Claude Code deletes sessions older than 30 days by default, so very old chats may be gone. For other agents, try their own resume command, such as `codex resume`. To keep a copy of every chat, use Conductor's **Settings → Account → Export data**. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
 
 Prefer a chat view to a terminal? Switch the agent pane to [Chat](/chat).
 
@@ -144,9 +144,9 @@ The [first parallel session](/first-workspace) walks through this end to end. Al
 The local Conductor app keeps working until early 2027, but you cannot download it again. When your workspaces are in Paradev:
 
 1. Quit Conductor and move it to the Trash.
-2. Keep `~/conductor/workspaces/` while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.
+2. Keep `~/conductor/workspaces/` (or the repository's `.conductor/` folder) while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.
 3. Delete a workspace from Paradev when you finish it. Paradev runs `teardown` and removes the worktree, wherever it lives.
-4. After the last old workspace is gone, run `git worktree prune` in each repository and delete `~/conductor/`.
+4. After the last old workspace is gone, run `git worktree prune` in each repository, then delete `~/conductor/` and any `.conductor/` folders.
 
 ## Get Help
 
