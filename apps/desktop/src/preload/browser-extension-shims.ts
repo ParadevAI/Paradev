@@ -213,15 +213,25 @@ contextBridge.executeInMainWorld({
 			};
 		}
 
+		if (!runtime) return;
+		// An optional grant can come later through permissions.request, so main
+		// checks the grant on each connect.
 		let declaresNativeMessaging = false;
 		try {
-			const { permissions } = (
-				runtime?.getManifest as () => { permissions?: unknown }
+			const manifest = (
+				runtime.getManifest as () => {
+					permissions?: unknown;
+					optional_permissions?: unknown;
+				}
 			)();
-			declaresNativeMessaging =
-				Array.isArray(permissions) && permissions.includes("nativeMessaging");
-		} catch {}
-		if (!runtime || !declaresNativeMessaging) return;
+			declaresNativeMessaging = [
+				manifest.permissions,
+				manifest.optional_permissions,
+			].some((list) => Array.isArray(list) && list.includes("nativeMessaging"));
+		} catch (error) {
+			console.warn("[native-messaging] Cannot read the manifest:", error);
+		}
+		if (!declaresNativeMessaging) return;
 
 		type Listener = (...args: unknown[]) => void;
 		const createEvent = () => {
@@ -281,7 +291,10 @@ contextBridge.executeInMainWorld({
 						throw new Error("Attempting to use a disconnected port object");
 					}
 					const json = JSON.stringify(message === undefined ? null : message);
-					if (json.length > maxMessageLength) {
+					if (json === undefined) {
+						throw new Error("Could not serialize message.");
+					}
+					if (new TextEncoder().encode(json).length > maxMessageLength) {
 						throw new Error("Message length exceeded maximum allowed length.");
 					}
 					sendNative("post", portId, json);
@@ -323,7 +336,12 @@ contextBridge.executeInMainWorld({
 						new Error(disconnectErrors.get(port) ?? "Native host has exited."),
 					);
 				});
-				port.postMessage(message);
+				try {
+					port.postMessage(message);
+				} catch (error) {
+					port.disconnect();
+					reject(error);
+				}
 			});
 			if (typeof callback !== "function") return reply;
 			reply.then(

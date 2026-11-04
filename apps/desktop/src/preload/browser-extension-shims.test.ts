@@ -50,6 +50,7 @@ function runInMainWorld(
 		sendNative?: unknown;
 		listenNative?: unknown;
 		callDnr?: unknown;
+		console?: unknown;
 		installedEvent?: unknown;
 	} = {},
 ): MainWorld {
@@ -77,6 +78,8 @@ function runInMainWorld(
 			userAgentData: { brands: [{ brand: "Chromium", version: "152" }] },
 		},
 		chrome: overrides.chrome ?? {},
+		TextEncoder,
+		console: overrides.console ?? console,
 		args: [
 			overrides.isServiceWorker ?? false,
 			overrides.callOffscreen ?? callOffscreen,
@@ -170,15 +173,17 @@ interface NativeRuntime {
 function nativeWorld(
 	shim: Shim,
 	url: string,
-	permissions: string[] = ["nativeMessaging"],
+	manifest: Record<string, unknown> = { permissions: ["nativeMessaging"] },
+	worldConsole?: unknown,
 ) {
 	const sent: unknown[][] = [];
 	let deliver: (portId: number, event: unknown) => void = () => {};
 	const runtime: NativeRuntime & Record<string, unknown> = {
-		getManifest: () => ({ permissions }),
+		getManifest: () => manifest,
 	};
 	runInMainWorld(shim, url, {
 		isServiceWorker: true,
+		console: worldConsole,
 		chrome: { runtime },
 		sendNative: (...args: unknown[]) => sent.push(args),
 		listenNative: (listener: typeof deliver) => {
@@ -203,7 +208,9 @@ test("only an extension that declares nativeMessaging gets connectNative", async
 	);
 
 	for (const world of [
-		nativeWorld(shim, "chrome-extension://abc/background.js", ["storage"]),
+		nativeWorld(shim, "chrome-extension://abc/background.js", {
+			permissions: ["storage"],
+		}),
 		nativeWorld(shim, "https://example.com/"),
 	]) {
 		expect(world.runtime.connectNative).toBeUndefined();
@@ -263,6 +270,81 @@ test("sendNativeMessage closes the port after the first reply and reports failur
 	});
 	await done;
 	expect(callbackError).toBe("Specified native messaging host not found.");
+});
+
+test("an optional nativeMessaging permission gets connectNative, so a runtime grant can use it", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+		{
+			optional_permissions: ["nativeMessaging"],
+		},
+	);
+	expect(typeof runtime.connectNative).toBe("function");
+});
+
+test("a manifest that cannot be read is reported, not taken as no permission", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const warnings: unknown[][] = [];
+	const { runtime } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+		new Proxy(
+			{},
+			{
+				get: () => {
+					throw new Error("no manifest");
+				},
+			},
+		),
+		{ warn: (...args: unknown[]) => warnings.push(args) },
+	);
+	expect(runtime.connectNative).toBeUndefined();
+	expect(warnings).toHaveLength(1);
+});
+
+test("a native message is limited in UTF-8 bytes, as Chrome measures it", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime, sent } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+	);
+	const port = runtime.connectNative?.("com.example.host") as NativePort;
+	// 25M characters, but 75 MB of UTF-8.
+	expect(() => port.postMessage("日".repeat(25 * 1024 * 1024))).toThrow(
+		"Message length exceeded",
+	);
+	expect(sent).toEqual([["connect", 1, "com.example.host"]]);
+});
+
+test("a native message that cannot be serialized throws instead of reaching the host", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime, sent } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+	);
+	const port = runtime.connectNative?.("com.example.host") as NativePort;
+	expect(() => port.postMessage(() => {})).toThrow("Could not serialize");
+	expect(() => port.postMessage(Symbol("x"))).toThrow("Could not serialize");
+	expect(sent).toEqual([["connect", 1, "com.example.host"]]);
+});
+
+test("sendNativeMessage disconnects the port it opened when the message cannot be sent", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const { runtime, sent } = nativeWorld(
+		shim,
+		"chrome-extension://abc/background.js",
+	);
+	const circular: Record<string, unknown> = {};
+	circular.self = circular;
+	await expect(
+		runtime.sendNativeMessage?.("com.example.host", circular),
+	).rejects.toThrow();
+	expect(sent).toEqual([
+		["connect", 1, "com.example.host"],
+		["disconnect", 1],
+	]);
 });
 
 test("an extension's chrome.declarativeNetRequest calls main and keeps Chrome's constants", async () => {

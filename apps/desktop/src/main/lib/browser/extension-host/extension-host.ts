@@ -137,7 +137,6 @@ function startExtensionHost(): void {
 	};
 
 	serveOffscreenDocuments(browserSession);
-	serveNativeMessaging(browserSession);
 
 	const extensions = new ElectronChromeExtensions({
 		session: browserSession,
@@ -166,6 +165,10 @@ function startExtensionHost(): void {
 			}
 		},
 		requestPermissions: confirmPermissionRequest,
+	});
+
+	serveNativeMessaging(browserSession, {
+		grantedAccess: (extension) => grantedAccess(extensions, extension),
 	});
 
 	try {
