@@ -53,6 +53,10 @@ export const SandboxAccessContext = createContext<SandboxAccessValue | null>(
 	null,
 );
 
+function sandboxAccessQueryKey(workspaceId: string) {
+	return ["cloud-workspace", "access", workspaceId] as const;
+}
+
 // Module-level so useQueries keeps the combined result stable across renders:
 // the provider re-renders on every route change, and a new value would
 // re-render every consumer.
