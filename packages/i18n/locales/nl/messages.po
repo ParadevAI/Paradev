@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {Toch verwijderen} other {Toch # verw
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# agent-PR gemerged} other {# agent-PR's gemerged}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} tokens · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} onderbroken"
 
@@ -5231,6 +5234,9 @@ msgstr "Bevat deze tekst..."
 msgid "Context"
 msgstr "Context"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Context {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Contextmenu"
 
@@ -7740,6 +7746,9 @@ msgstr "esc om te sluiten"
 msgid "esc to exit"
 msgstr "esc om te verlaten"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Geschat tegen API-catalogusprijzen, geen werkelijk uitgegeven geld"
+
 msgid "Event"
 msgstr "Gebeurtenis"
 
@@ -9887,6 +9896,9 @@ msgstr "Verbeterde diff-viewer"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "in {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Invoer {input} · Uitvoer {output} · Gecachet {cached}"
 
 msgid "in a new session"
 msgstr "in een nieuwe sessie"
@@ -17308,6 +17320,9 @@ msgstr "Sessiesnapshots en terugdraaien"
 
 msgid "Session status"
 msgstr "Sessiestatus"
+
+msgid "Session usage"
+msgstr "Sessiegebruik"
 
 msgid "Sessions"
 msgstr "Sessies"

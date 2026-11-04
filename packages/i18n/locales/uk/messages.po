@@ -1331,6 +1331,9 @@ msgstr "{teardownFailureCount, plural, =1 {Усе одно видалити} one
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {Злито # агентський PR} few {Злито # агентські PR} many {Злито # агентських PR} other {Злито # агентського PR}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} токенів · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
 
@@ -5225,6 +5228,9 @@ msgstr "Містить цей текст..."
 msgid "Context"
 msgstr "Контекст"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Контекст {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Контекстне меню"
 
@@ -7734,6 +7740,9 @@ msgstr "esc, щоб закрити"
 msgid "esc to exit"
 msgstr "esc, щоб вийти"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Оцінка за прайсом API, а не фактичні витрати"
+
 msgid "Event"
 msgstr "Подія"
 
@@ -9881,6 +9890,9 @@ msgstr "Покращений переглядач diff"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "у {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Вхід {input} · Вихід {output} · У кеші {cached}"
 
 msgid "in a new session"
 msgstr "у новому сеансі"
@@ -17302,6 +17314,9 @@ msgstr "Знімки сеансів і відкат"
 
 msgid "Session status"
 msgstr "Стан сеансу"
+
+msgid "Session usage"
+msgstr "Використання сесії"
 
 msgid "Sessions"
 msgstr "Сеанси"

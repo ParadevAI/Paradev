@@ -20,7 +20,11 @@ import type {
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { terminalHarnessSession } from "../../../terminal-agents/harness-session-ref";
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
-import { readHarnessTranscriptOffLoop } from "../../../terminal-agents/harness-sessions/read-off-loop";
+import {
+	readClaudeUsageFileOffLoop,
+	readHarnessSessionUsageOffLoop,
+	readHarnessTranscriptOffLoop,
+} from "../../../terminal-agents/harness-sessions/read-off-loop";
 import {
 	claimResumeCandidateBinding,
 	findResumeCandidateBinding,
@@ -489,6 +493,42 @@ export const terminalAgentsRouter = router({
 						),
 					}
 				: null;
+		}),
+
+	/**
+	 * Context, token and estimated cost totals of a bound session, read from
+	 * the harness's own transcript. Null for a harness that records no usage.
+	 */
+	sessionUsage: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const binding = getTerminalAgentBinding(ctx.db, input.terminalId);
+			if (!binding || binding.workspaceId !== input.workspaceId) return null;
+			const bound = terminalHarnessSession(ctx.db, input.terminalId);
+			return bound ? readHarnessSessionUsageOffLoop(bound.ref) : null;
+		}),
+
+	/**
+	 * Tokens and estimated cost of one Claude subagent, from the transcript
+	 * path the roster recorded off the child's own hook events.
+	 */
+	subagentUsage: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				terminalId: z.string(),
+				subagentId: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const binding = getTerminalAgentBinding(ctx.db, input.terminalId);
+			if (binding?.workspaceId !== input.workspaceId) return null;
+			if (binding.agentId !== "claude") return null;
+			const path = ctx.terminalAgentStore.getSubagent(
+				input.terminalId,
+				input.subagentId,
+			)?.transcriptPath;
+			return path ? readClaudeUsageFileOffLoop(path) : null;
 		}),
 
 	/**

@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {Всё равно удалить} fe
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {влит # PR агента} few {влито # PR агента} many {влито # PR агента} other {влито # PR агента}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} токенов · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} прерван"
 
@@ -5231,6 +5234,9 @@ msgstr "Содержит этот текст..."
 msgid "Context"
 msgstr "Контекст"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Контекст {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Контекстное меню"
 
@@ -7740,6 +7746,9 @@ msgstr "esc — закрыть"
 msgid "esc to exit"
 msgstr "esc — выход"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Оценка по прайс-листу API, а не реальные расходы"
+
 msgid "Event"
 msgstr "Событие"
 
@@ -9887,6 +9896,9 @@ msgstr "Улучшенный просмотр diff"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "в {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Ввод {input} · Вывод {output} · В кэше {cached}"
 
 msgid "in a new session"
 msgstr "в новой сессии"
@@ -17308,6 +17320,9 @@ msgstr "Снимки сессий и откат"
 
 msgid "Session status"
 msgstr "Состояние сеанса"
+
+msgid "Session usage"
+msgstr "Использование сессии"
 
 msgid "Sessions"
 msgstr "Сессии"

@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {Delete anyway} other {Delete # anywa
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} tokens · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrupted"
 
@@ -5231,6 +5234,9 @@ msgstr "Contains this text..."
 msgid "Context"
 msgstr "Context"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Context {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Context Menu"
 
@@ -7740,6 +7746,9 @@ msgstr "esc to dismiss"
 msgid "esc to exit"
 msgstr "esc to exit"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Estimated at API list prices, not money spent"
+
 msgid "Event"
 msgstr "Event"
 
@@ -9887,6 +9896,9 @@ msgstr "Improved diff viewer"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "in {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "In {input} · Out {output} · Cached {cached}"
 
 msgid "in a new session"
 msgstr "in a new session"
@@ -17308,6 +17320,9 @@ msgstr "Session snapshots & revert"
 
 msgid "Session status"
 msgstr "Session status"
+
+msgid "Session usage"
+msgstr "Session usage"
 
 msgid "Sessions"
 msgstr "Sessions"

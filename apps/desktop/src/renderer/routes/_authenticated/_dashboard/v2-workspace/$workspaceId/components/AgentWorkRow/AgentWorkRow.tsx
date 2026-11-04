@@ -3,6 +3,7 @@ import { formatAge } from "@superset/i18n/format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { Bot, Square, SquareTerminal } from "lucide-react";
+import type { ReactNode } from "react";
 import type { AgentWork } from "../../utils/collectAgentWork";
 
 const ACTION_CLASSNAME =
@@ -16,9 +17,12 @@ export function AgentWorkRow({
 	onOpen,
 	onStop,
 	onMoveToBackground,
+	detail,
 }: {
 	work: AgentWork;
 	source?: string;
+	/** Extra line under the name, such as the subagent's token usage. */
+	detail?: ReactNode;
 	now: number;
 	pending?: boolean;
 	onOpen: (work: AgentWork) => void;
@@ -66,6 +70,7 @@ export function AgentWorkRow({
 							{[source, work.step].filter(Boolean).join(" · ")}
 						</span>
 					)}
+					{detail}
 				</span>
 				<span className="shrink-0 text-[11px] text-muted-foreground/70 tabular-nums group-hover:hidden">
 					{formatAge(work.startedAtMs, now)}

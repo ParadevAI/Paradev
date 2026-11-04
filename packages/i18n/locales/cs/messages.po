@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {Přesto smazat} few {Přesto smazat 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agenta} many {sloučeno # PR agenta} other {sloučeno # PR agenta}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} tokenů · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
 
@@ -5231,6 +5234,9 @@ msgstr "Obsahuje tento text..."
 msgid "Context"
 msgstr "Kontext"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Kontext {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Kontextová nabídka"
 
@@ -7740,6 +7746,9 @@ msgstr "esc zavře"
 msgid "esc to exit"
 msgstr "esc pro ukončení"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "Odhad podle ceníku API, nejde o skutečnou útratu"
+
 msgid "Event"
 msgstr "Událost"
 
@@ -9887,6 +9896,9 @@ msgstr "Vylepšený prohlížeč rozdílů"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "v {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Vstup {input} · Výstup {output} · V mezipaměti {cached}"
 
 msgid "in a new session"
 msgstr "v nové relaci"
@@ -17308,6 +17320,9 @@ msgstr "Snímky relace a návrat zpět"
 
 msgid "Session status"
 msgstr "Stav relace"
+
+msgid "Session usage"
+msgstr "Využití relace"
 
 msgid "Sessions"
 msgstr "Relace"

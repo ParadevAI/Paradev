@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {仍然删除} other {仍然删除#�
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} 个 token · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
 
@@ -5231,6 +5234,9 @@ msgstr "包含此文本..."
 msgid "Context"
 msgstr "上下文"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "上下文 {used} / {size}（{percent}）"
+
 msgid "Context Menu"
 msgstr "右键菜单"
 
@@ -7740,6 +7746,9 @@ msgstr "按esc关闭"
 msgid "esc to exit"
 msgstr "esc退出"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "按 API 标价估算，并非实际花费"
+
 msgid "Event"
 msgstr "事件"
 
@@ -9887,6 +9896,9 @@ msgstr "更好的差异查看器"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "于 {0}"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "输入 {input} · 输出 {output} · 缓存 {cached}"
 
 msgid "in a new session"
 msgstr "在新会话中"
@@ -17308,6 +17320,9 @@ msgstr "会话快照与回退"
 
 msgid "Session status"
 msgstr "会话状态"
+
+msgid "Session usage"
+msgstr "会话用量"
 
 msgid "Sessions"
 msgstr "会话"

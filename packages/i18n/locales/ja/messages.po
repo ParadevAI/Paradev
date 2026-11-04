@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {それでも削除} other {それで
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} トークン · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
 
@@ -5231,6 +5234,9 @@ msgstr "このテキストを含む..."
 msgid "Context"
 msgstr "Context"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "コンテキスト {used} / {size}（{percent}）"
+
 msgid "Context Menu"
 msgstr "Context Menu"
 
@@ -7740,6 +7746,9 @@ msgstr "escで閉じる"
 msgid "esc to exit"
 msgstr "escで終了"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "API の定価による見積もりで、実際の支出ではありません"
+
 msgid "Event"
 msgstr "イベント"
 
@@ -9887,6 +9896,9 @@ msgstr "差分ビューアの改善"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0} 内"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "入力 {input} · 出力 {output} · キャッシュ {cached}"
 
 msgid "in a new session"
 msgstr "新しいセッションで"
@@ -17308,6 +17320,9 @@ msgstr "セッションのスナップショットと巻き戻し"
 
 msgid "Session status"
 msgstr "セッションの状態"
+
+msgid "Session usage"
+msgstr "セッションの使用量"
 
 msgid "Sessions"
 msgstr "セッション"

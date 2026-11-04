@@ -1337,6 +1337,9 @@ msgstr "{teardownFailureCount, plural, one {Yine de sil} other {Yine de # tanesi
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'ı birleştirildi}}"
 
+msgid "{tokens} tokens · ~{cost}"
+msgstr "{tokens} token · ~{cost}"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
 
@@ -5231,6 +5234,9 @@ msgstr "Şu metni içerir..."
 msgid "Context"
 msgstr "Bağlam"
 
+msgid "Context {used} / {size} ({percent})"
+msgstr "Bağlam {used} / {size} ({percent})"
+
 msgid "Context Menu"
 msgstr "Bağlam menüsü"
 
@@ -7740,6 +7746,9 @@ msgstr "kapatmak için esc"
 msgid "esc to exit"
 msgstr "çıkmak için esc"
 
+msgid "Estimated at API list prices, not money spent"
+msgstr "API liste fiyatlarına göre tahmin, harcanan para değil"
+
 msgid "Event"
 msgstr "Olay"
 
@@ -9887,6 +9896,9 @@ msgstr "Geliştirilmiş fark görüntüleyici"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0} içinde"
+
+msgid "In {input} · Out {output} · Cached {cached}"
+msgstr "Girdi {input} · Çıktı {output} · Önbellek {cached}"
 
 msgid "in a new session"
 msgstr "yeni bir oturumda"
@@ -17308,6 +17320,9 @@ msgstr "Oturum anlık görüntüleri ve geri alma"
 
 msgid "Session status"
 msgstr "Oturum durumu"
+
+msgid "Session usage"
+msgstr "Oturum kullanımı"
 
 msgid "Sessions"
 msgstr "Oturumlar"

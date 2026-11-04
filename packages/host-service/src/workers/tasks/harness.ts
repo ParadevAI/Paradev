@@ -7,6 +7,11 @@ import {
 	readHarnessTranscript,
 } from "../../terminal-agents/harness-sessions/transcript.ts";
 import type { HarnessSessionRef } from "../../terminal-agents/harness-sessions/types.ts";
+import {
+	type HarnessSessionUsage,
+	readClaudeUsageFile,
+	readHarnessSessionUsage,
+} from "../../terminal-agents/harness-sessions/usage.ts";
 import { defineWorkerTask } from "../define-worker-task.ts";
 
 export const harnessTranscriptTask = defineWorkerTask<
@@ -17,4 +22,24 @@ export const harnessTranscriptTask = defineWorkerTask<
 	handler: async ({ ref, maxChars }) => readHarnessTranscript(ref, maxChars),
 });
 
-export const harnessTasks = [harnessTranscriptTask];
+export const harnessSessionUsageTask = defineWorkerTask<
+	{ ref: HarnessSessionRef },
+	HarnessSessionUsage | null
+>({
+	type: "harness/readSessionUsage",
+	handler: async ({ ref }) => readHarnessSessionUsage(ref),
+});
+
+export const claudeUsageFileTask = defineWorkerTask<
+	{ path: string },
+	HarnessSessionUsage | null
+>({
+	type: "harness/readClaudeUsageFile",
+	handler: async ({ path }) => readClaudeUsageFile(path),
+});
+
+export const harnessTasks = [
+	harnessTranscriptTask,
+	harnessSessionUsageTask,
+	claudeUsageFileTask,
+];
