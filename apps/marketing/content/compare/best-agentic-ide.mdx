@@ -1,8 +1,8 @@
 ---
 title: "Best Agentic IDE in 2026: Multi-Agent Coding Tools Compared"
-description: "Compare the best agentic IDEs of 2026, including Paradev, Cursor, Zed, Devin Desktop, VS Code + Copilot, JetBrains Junie, Conductor, and Orca."
+description: "Compare the best agentic IDEs of 2026, including Paradev, Cursor, Zed, Devin Desktop, VS Code + Copilot, JetBrains Junie, and Orca."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-04
 type: "roundup"
 competitors:
   - cursor
@@ -60,7 +60,7 @@ This roundup is published by Paradev. Its recommendations describe workflow fit;
 | **Devin Desktop** | Managing local and cloud agents on a board | Devin Local plus ACP agents | Cloud isolated; local mechanism unspecified | Newer rebrand of Windsurf; in transition |
 | **VS Code + Copilot** | Editor ecosystem and cloud coding agent | Copilot plus delegation to Claude/Codex | Cloud branch-to-PR; in-editor edits working copy | In-editor parallelism is limited |
 | **JetBrains + Junie** | Agentic coding inside JetBrains IDEs | Junie plus ACP agents | Cloud sandbox (in testing); no local worktrees | Tied to the JetBrains ecosystem |
-| **Conductor** | Mac workspaces and managed cloud collaboration | Claude Code, Codex, Cursor, OpenCode | Local Git worktrees or cloud sandboxes | Check cloud plan, compute costs, and harness requirements |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Claude Code, Codex, Cursor, OpenCode | Local Git worktrees; cloud shuts down November 20, 2026 | Closed to new users; winding down |
 | **Augment Intent** | Spec-driven, coordinator-managed features | Auggie or BYOA (Claude Code, Codex, OpenCode) | Git worktree per workspace; implementors on own branches | macOS Apple Silicon beta; best for PR-sized features |
 | **Orca** | Desktop workspace with remote hosts and mobile companions | Multiple CLI agents | Local and SSH worktrees | Mobile companions are documented as beta |
 
@@ -122,7 +122,9 @@ Junie is JetBrains' first-party coding agent, built into AI Chat across IntelliJ
 
 ### Conductor
 
-Conductor's [current documentation](https://www.conductor.build/docs) lists Claude Code, Codex, Cursor, and OpenCode. Its Mac app provides local workspaces and a review-and-merge flow, while its cloud offering supports sandboxed workspaces and team collaboration. Evaluate local and cloud costs separately and check the current plan requirements. Neither local worktrees nor cloud execution remove the need to review and integrate patches.
+Conductor's [current documentation](https://www.conductor.build/docs) lists Claude Code, Codex, Cursor, and OpenCode. Its Mac app provides local workspaces and a review-and-merge flow, and its cloud offering supports sandboxed workspaces and team collaboration until it shuts down.
+
+Conductor announced on November 4, 2026 that it is joining Meta. It no longer accepts new sign-ups or downloads. Conductor Cloud goes read-only on November 13 and shuts down on November 20, 2026. The Mac app gets new models and critical fixes until early 2027. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 For the direct comparison, see [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -144,7 +146,7 @@ Pick based on your primary bottleneck:
 
 - If your bottleneck is hands-on editing with an agent assist, use Cursor, Zed, VS Code + Copilot, or JetBrains + Junie.
 - If your bottleneck is hosting external CLI agents inside an editor, consider the ACP integrations in Zed, JetBrains, and Devin Desktop.
-- If your bottleneck is organizing independent tasks on one repository with separate working directories, use an agent workspace: Paradev, Conductor, Orca, or (for spec-driven features) Augment Intent.
+- If your bottleneck is organizing independent tasks on one repository with separate working directories, use an agent workspace: Paradev, Orca, or (for spec-driven features) Augment Intent.
 
 The more agent-heavy your workflow, the more the winning criterion shifts from editing experience to isolation, review, and orchestration.
 
@@ -165,10 +167,6 @@ Zed's ACP support and Parallel Agents threads provide a way to run Claude Code, 
 ### Editor and GitHub workflows: VS Code + Copilot
 
 Copilot offers in-editor agent mode and a cloud coding agent that opens pull requests.
-
-### Mac workspaces and managed cloud: Conductor
-
-Conductor supports Claude Code, Codex, Cursor, and OpenCode, with local Mac workspaces and managed cloud collaboration. Check its [cloud documentation](https://www.conductor.build/docs/cloud) for execution and team requirements.
 
 ## Verdict
 
