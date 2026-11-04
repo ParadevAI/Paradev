@@ -1,3 +1,5 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
 import { settings } from "@superset/local-db";
 import { type BrowserWindow, nativeImage } from "electron";
 import type { ElectronChromeExtensions } from "electron-chrome-extensions";
@@ -5,8 +7,13 @@ import { uninstallExtension } from "electron-chrome-web-store";
 import { localDb } from "main/lib/local-db";
 import { deleteExtensionRules } from "./declarative-net-request";
 import { createExtensionPins } from "./extension-pins";
+import type { TurnedOffExtension } from "./load-user-extensions";
 import { isUserExtension } from "./user-extensions";
-import { browserExtensionsPath } from "./web-store";
+import {
+	browserExtensionsPath,
+	installWebStoreExtension,
+	userExtensionPaths,
+} from "./web-store";
 
 export type BadgeColor = readonly [r: number, g: number, b: number, a: number];
 
@@ -20,6 +27,8 @@ export interface BrowserExtension {
 	badge: { text: string; color: BadgeColor | null } | null;
 	pinned: boolean;
 	popupOpen: boolean;
+	/** Not loaded: its files no longer match what the Web Store signed. */
+	turnedOff: boolean;
 }
 
 export interface AnchorRect {
@@ -60,6 +69,7 @@ interface Host {
 	session: Electron.Session;
 	actions: BrowserActionApi;
 	tabOf(paneId: string): Electron.WebContents | undefined;
+	onRemoved(extensionId: string): void;
 }
 
 interface PopupRef {
@@ -77,6 +87,7 @@ const POPUP_REOPEN_GUARD_MS = 300;
 const pins = createExtensionPins(localDb, settings);
 const listeners = new Set<() => void>();
 const iconCache = new Map<string, string | null>();
+const turnedOff = new Map<string, TurnedOffExtension>();
 let host: Host | null = null;
 let changeQueued = false;
 let activating: PopupRef | null = null;
@@ -129,17 +140,30 @@ export function attachBrowserExtensions(options: {
 	session: Electron.Session;
 	extensions: ElectronChromeExtensions;
 	tabOf: (paneId: string) => Electron.WebContents | undefined;
+	onRemoved: (extensionId: string) => void;
 }): void {
 	const actions = browserActionApi(options.extensions);
-	host = { session: options.session, actions, tabOf: options.tabOf };
+	host = {
+		session: options.session,
+		actions,
+		tabOf: options.tabOf,
+		onRemoved: options.onRemoved,
+	};
 	actions.observers.add({
 		isDestroyed: () => false,
 		send: notifyBrowserExtensionsChanged,
 	});
-	options.session.extensions.on(
-		"extension-loaded",
-		notifyBrowserExtensionsChanged,
-	);
+	options.session.extensions.on("extension-loaded", (_event, extension) => {
+		if (turnedOff.delete(extension.id)) {
+			deleteTurnedOffFiles(extension.id).catch((error: unknown) => {
+				console.error(
+					`[extension-host] Failed to delete ${extension.id}:`,
+					error,
+				);
+			});
+		}
+		notifyBrowserExtensionsChanged();
+	});
 	options.session.extensions.on(
 		"extension-unloaded",
 		notifyBrowserExtensionsChanged,
@@ -214,6 +238,42 @@ async function actionIcon(
 	return icon;
 }
 
+export function setTurnedOffBrowserExtensions(
+	extensions: TurnedOffExtension[],
+): void {
+	for (const extension of extensions) {
+		if (!host?.session.extensions.getExtension(extension.id)) {
+			turnedOff.set(extension.id, extension);
+		}
+	}
+	notifyBrowserExtensionsChanged();
+}
+
+function deleteTurnedOffFiles(extensionId: string): Promise<void> {
+	return rm(path.join(userExtensionPaths().turnedOffPath, extensionId), {
+		recursive: true,
+		force: true,
+	});
+}
+
+function turnedOffEntry({
+	id,
+	name,
+	version,
+}: TurnedOffExtension): BrowserExtension {
+	return {
+		id,
+		name,
+		version,
+		icon: null,
+		title: name,
+		badge: null,
+		pinned: false,
+		popupOpen: false,
+		turnedOff: true,
+	};
+}
+
 export async function listBrowserExtensions(
 	paneId: string,
 ): Promise<BrowserExtension[]> {
@@ -228,10 +288,9 @@ export async function listBrowserExtensions(
 	const installRoot = browserExtensionsPath();
 	const installed = host.session.extensions
 		.getAllExtensions()
-		.filter((extension) => isUserExtension(extension, installRoot))
-		.sort((a, b) => a.name.localeCompare(b.name));
-	return Promise.all(
-		installed.map(async (extension) => {
+		.filter((extension) => isUserExtension(extension, installRoot));
+	const loaded = await Promise.all(
+		installed.map(async (extension): Promise<BrowserExtension> => {
 			const action = actionById.get(extension.id);
 			const forTab = tabId === undefined ? undefined : action?.tabs[tabId];
 			const state = { ...action, ...forTab };
@@ -245,8 +304,12 @@ export async function listBrowserExtensions(
 				badge: text ? { text, color: parseBadgeColor(state.color) } : null,
 				pinned: pinned.has(extension.id),
 				popupOpen: samePopup(openPopup, { extensionId: extension.id, paneId }),
+				turnedOff: false,
 			};
 		}),
+	);
+	return [...loaded, ...[...turnedOff.values()].map(turnedOffEntry)].sort(
+		(a, b) => a.name.localeCompare(b.name),
 	);
 }
 
@@ -294,25 +357,41 @@ export async function removeBrowserExtension(
 	extensionId: string,
 ): Promise<void> {
 	if (!host) throw new Error("Browser extensions have not started yet");
-	const extension = host.session.extensions.getExtension(extensionId);
-	if (!extension || !isUserExtension(extension, browserExtensionsPath())) {
+	const { session, onRemoved } = host;
+	const extension = session.extensions.getExtension(extensionId);
+	if (!extension && turnedOff.has(extensionId)) {
+		await deleteTurnedOffFiles(extensionId);
+		turnedOff.delete(extensionId);
+	} else if (extension && isUserExtension(extension, browserExtensionsPath())) {
+		await uninstallExtension(extensionId, {
+			session,
+			extensionsPath: browserExtensionsPath(),
+		});
+	} else {
 		throw new Error(
 			"Only extensions installed from the Web Store can be removed",
 		);
 	}
-	await uninstallExtension(extensionId, {
-		session: host.session,
-		extensionsPath: browserExtensionsPath(),
-	});
+	// The extension is gone; what it kept is forgotten even if a step fails.
+	onRemoved(extensionId);
 	pins.setPinned(extensionId, false);
 	notifyBrowserExtensionsChanged();
 	const cleanup = await Promise.allSettled([
 		deleteExtensionRules(extensionId),
-		host.session.clearStorageData({
+		session.clearStorageData({
 			origin: `chrome-extension://${extensionId}`,
 		}),
 	]);
 	for (const result of cleanup) {
 		if (result.status === "rejected") throw result.reason;
 	}
+}
+
+/** Downloads a fresh copy of a turned-off extension; its local data is kept. */
+export async function reinstallBrowserExtension(
+	extensionId: string,
+	window: BrowserWindow | undefined,
+): Promise<void> {
+	if (!host || !turnedOff.has(extensionId)) return;
+	await installWebStoreExtension(host.session, extensionId, window);
 }

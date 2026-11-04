@@ -13,7 +13,13 @@ import {
 import { confirm } from "./confirm-dialog";
 import { verifyCrx3 } from "./crx3";
 import { extensionIcon } from "./extension-icon";
+import { saveSignedRecord } from "./extension-integrity";
 import { accessDetail, addedAccess, installWarnings } from "./install-warnings";
+import {
+	loadUserExtensions,
+	type TurnedOffExtension,
+	type UserExtensionPaths,
+} from "./load-user-extensions";
 
 // The package's own updater checks the moment it starts. An update then
 // deletes the old version's files while its service worker is still loading
@@ -25,9 +31,20 @@ export function browserExtensionsPath(): string {
 	return path.join(app.getPath("userData"), "browser-extensions");
 }
 
+export function userExtensionPaths(): UserExtensionPaths {
+	const userData = app.getPath("userData");
+	return {
+		extensionsPath: browserExtensionsPath(),
+		manifestsPath: path.join(userData, "browser-extension-manifests"),
+		turnedOffPath: path.join(userData, "browser-extensions-turned-off"),
+	};
+}
+
+/** Installs and updates unpack only a verified CRX, and save its signed record for `loadUserExtensions`. */
 export function enableCrxVerification(): void {
 	setCrxVerifier((crx) => {
-		verifyCrx3(crx);
+		const extensionId = verifyCrx3(crx);
+		saveSignedRecord(crx, extensionId, userExtensionPaths().manifestsPath);
 	});
 }
 
@@ -107,13 +124,19 @@ function confirmUpdate(
 	});
 }
 
-/** Install, load and update Web Store extensions; installs and updates both pass `verifyCrx3`. */
+/**
+ * Install, load and update Web Store extensions; installs and updates both pass
+ * `verifyCrx3`. `onTurnedOff` gets the extensions not loaded because their
+ * files changed, before the store itself is set up.
+ */
 export async function installBrowserWebStore(
 	browserSession: Electron.Session,
 	{
 		removeExtension,
+		onTurnedOff,
 	}: {
 		removeExtension: (extensionId: string) => Promise<void>;
+		onTurnedOff: (extensions: TurnedOffExtension[]) => void;
 	},
 ): Promise<void> {
 	enableCrxVerification();
@@ -178,9 +201,19 @@ export async function installBrowserWebStore(
 		if (!allowed) declinedUpdates.add(update);
 		return allowed;
 	};
+	// Before the store API exists, so its install path cannot load a folder that is not yet checked.
+	await app.whenReady();
+	onTurnedOff(
+		await loadUserExtensions(
+			browserSession,
+			userExtensionPaths(),
+			localizedName,
+		),
+	);
 	await installChromeWebStore({
 		session: browserSession,
 		extensionsPath: browserExtensionsPath(),
+		loadExtensions: false,
 		autoUpdate: false,
 		verifyInstall,
 		beforeInstall: async (details) => {

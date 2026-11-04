@@ -5707,6 +5707,9 @@ msgstr "Не удалось записать облачную рабочую о�
 msgid "Could not record environment"
 msgstr "Не удалось сохранить окружение"
 
+msgid "Could not reinstall {name}"
+msgstr "Не удалось переустановить {name}"
+
 msgid "Could not remove {name}"
 msgstr "Не удалось удалить {name}"
 
@@ -15466,6 +15469,9 @@ msgstr "Регион"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Регистрирует хуки жизненного цикла в глобальной конфигурации этого агента, чтобы Paradev мог показывать статус и отправлять уведомления. Отключение убирает записи Paradev везде — статус и уведомления для этого агента перестанут работать, в том числе внутри Paradev."
 
+msgid "Reinstall {name}"
+msgstr "Переустановить {name}"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "снова присоединился(-ась) к {channel} по приглашению пользователя {inviter}, как и {others}."
 
@@ -20286,6 +20292,9 @@ msgstr "Превращайте обсуждения в Slack в задачи, з
 
 msgid "turn the onboarding findings into a page"
 msgstr "сделай страницу из выводов по онбордингу"
+
+msgid "Turned off because its files changed"
+msgstr "Отключено, так как его файлы изменились"
 
 msgid "Two Hands"
 msgstr "Две руки"

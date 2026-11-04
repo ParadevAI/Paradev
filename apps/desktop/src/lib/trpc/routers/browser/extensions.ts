@@ -4,6 +4,7 @@ import {
 	type BrowserExtension,
 	listBrowserExtensions,
 	onBrowserExtensionsChanged,
+	reinstallBrowserExtension,
 	removeBrowserExtension,
 	setBrowserExtensionPinned,
 } from "main/lib/browser/extension-host/browser-extensions";
@@ -75,5 +76,14 @@ export const createBrowserExtensionsRouter = () => {
 		remove: publicProcedure
 			.input(z.object({ extensionId }))
 			.mutation(({ input }) => removeBrowserExtension(input.extensionId)),
+
+		reinstall: publicProcedure
+			.input(z.object({ extensionId }))
+			.mutation(({ ctx, input }) =>
+				reinstallBrowserExtension(
+					input.extensionId,
+					ctx.senderWindow ?? undefined,
+				),
+			),
 	});
 };

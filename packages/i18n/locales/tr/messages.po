@@ -5707,6 +5707,9 @@ msgstr "Bulut çalışma alanı kaydedilemedi"
 msgid "Could not record environment"
 msgstr "Ortam kaydedilemedi"
 
+msgid "Could not reinstall {name}"
+msgstr "{name} yeniden yüklenemedi"
+
 msgid "Could not remove {name}"
 msgstr "{name} kaldırılamadı"
 
@@ -15466,6 +15469,9 @@ msgstr "Bölge"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Paradev'in durum gösterebilmesi ve bildirim gönderebilmesi için bu ajanın genel yapılandırmasına yaşam döngüsü hook'ları kaydeder. Bunu kapatmak Paradev'in kayıtlarını her yerden kaldırır — Paradev içinde dahil olmak üzere bu ajan için durum ve bildirimler durur."
 
+msgid "Reinstall {name}"
+msgstr "{name} öğesini yeniden yükle"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "{inviter} tarafından davet edilerek {others} ile birlikte {channel} kanalına yeniden katıldı."
 
@@ -20286,6 +20292,9 @@ msgstr "Slack konuşmalarını göreve dönüştürün, çalışma alanınızdan
 
 msgid "turn the onboarding findings into a page"
 msgstr "onboarding bulgularını bir sayfaya dönüştür"
+
+msgid "Turned off because its files changed"
+msgstr "Dosyaları değiştiği için kapatıldı"
 
 msgid "Two Hands"
 msgstr "İki el"
