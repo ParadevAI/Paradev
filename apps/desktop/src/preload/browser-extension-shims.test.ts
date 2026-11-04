@@ -1,6 +1,7 @@
 import { expect, type Mock, mock, test } from "bun:test";
 import { runInNewContext } from "node:vm";
 import { contextBridge } from "electron";
+import { shimChromeStorage } from "shared/browser-extension-storage-shim";
 
 interface MainWorld {
 	location: { protocol: string; hostname: string };
@@ -33,7 +34,7 @@ async function importInWorkerPreloadRealm(): Promise<Shim> {
 	}
 	const calls = (contextBridge.executeInMainWorld as Mock<() => void>).mock
 		.calls as unknown as [Shim][];
-	const shim = calls.at(-1)?.[0];
+	const shim = calls.findLast(([call]) => call.func !== shimChromeStorage)?.[0];
 	if (!shim) throw new Error("the preload never reached the main world");
 	return shim;
 }
@@ -50,6 +51,7 @@ function runInMainWorld(
 		listenNative?: unknown;
 		callDnr?: unknown;
 		console?: unknown;
+		installedEvent?: unknown;
 	} = {},
 ): MainWorld {
 	const { protocol, hostname } = new URL(url);
@@ -63,7 +65,9 @@ function runInMainWorld(
 		listenNative,
 		maxMessageLength,
 		callDnr,
-		...rest
+		dnrMethods,
+		dnrConstants,
+		installedEvent,
 	] = args;
 	const world = {
 		location: { protocol, hostname },
@@ -86,7 +90,9 @@ function runInMainWorld(
 			overrides.listenNative ?? listenNative,
 			maxMessageLength,
 			overrides.callDnr ?? callDnr,
-			...rest,
+			dnrMethods,
+			dnrConstants,
+			overrides.installedEvent ?? installedEvent,
 		],
 	};
 	runInNewContext(`(${func.toString()})(...args)`, world);
@@ -374,6 +380,105 @@ test("an extension's chrome.declarativeNetRequest calls main and keeps Chrome's 
 			isServiceWorker: true,
 		}).chrome.declarativeNetRequest,
 	).toBeUndefined();
+});
+
+test("an extension service worker gets runtime.onInstalled once its listeners are added, and confirms only after they ran", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const reasons: string[] = [];
+	const installedEvent = mock(async (method: string, _version?: string) => {
+		if (method === "pending") {
+			return { details: { reason: "install" }, version: "2.0.18" };
+		}
+		reasons.push("confirmed");
+		return null;
+	});
+	type Listener = (details: { reason: string }) => void;
+	const runtime = { onInstalled: { addListener: (_listener: Listener) => {} } };
+
+	const worker = runInMainWorld(
+		shim,
+		"chrome-extension://aapbdbdomjkkjkaonfhkkikfgjllcleb/main.js",
+		{ isServiceWorker: true, chrome: { runtime }, installedEvent },
+	);
+	const onInstalled = (worker.chrome.runtime as typeof runtime).onInstalled;
+	onInstalled.addListener(({ reason }) => reasons.push(`menu ${reason}`));
+	onInstalled.addListener(() => {
+		throw new Error("options failed");
+	});
+	for (let tick = 0; tick < 5; tick++) await Promise.resolve();
+
+	expect(installedEvent.mock.calls).toEqual([
+		["pending"],
+		["delivered", "2.0.18"],
+	]);
+	expect(reasons).toEqual(["menu install", "confirmed"]);
+});
+
+test("runtime.onInstalled asks again when the first ask failed or every listener left before it answered", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	type Listener = (details: { reason: string }) => void;
+	const settle = async () => {
+		for (let tick = 0; tick < 5; tick++) await Promise.resolve();
+	};
+	const workerWith = (firstAnswer: () => Promise<unknown>) => {
+		const answers = [
+			firstAnswer,
+			async () => ({ details: { reason: "update" }, version: "3.0" }),
+		];
+		const installedEvent = mock(async (method: string, _version?: string) =>
+			method === "pending" ? answers.shift()?.() : null,
+		);
+		const runtime = {
+			onInstalled: {
+				addListener: (_listener: Listener) => {},
+				removeListener: (_listener: Listener) => {},
+			},
+		};
+		const worker = runInMainWorld(
+			shim,
+			"chrome-extension://aapbdbdomjkkjkaonfhkkikfgjllcleb/main.js",
+			{ isServiceWorker: true, chrome: { runtime }, installedEvent },
+		);
+		return {
+			installedEvent,
+			onInstalled: (worker.chrome.runtime as typeof runtime).onInstalled,
+		};
+	};
+
+	const failed = workerWith(async () => {
+		throw new Error("worker not ready");
+	});
+	const reasons: string[] = [];
+	failed.onInstalled.addListener(({ reason }) => reasons.push(`a ${reason}`));
+	await settle();
+	failed.onInstalled.addListener(({ reason }) => reasons.push(`b ${reason}`));
+	await settle();
+	expect(failed.installedEvent.mock.calls).toEqual([
+		["pending"],
+		["pending"],
+		["delivered", "3.0"],
+	]);
+	expect(reasons).toEqual(["a update", "b update"]);
+
+	const left = workerWith(async () => ({
+		details: { reason: "update" },
+		version: "3.0",
+	}));
+	const leaving: Listener = () => reasons.push("left");
+	left.onInstalled.addListener(leaving);
+	left.onInstalled.removeListener(leaving);
+	await settle();
+	left.onInstalled.addListener(({ reason }) => {
+		reasons.push(`c ${reason}`);
+		left.onInstalled.addListener(() => reasons.push("added while running"));
+	});
+	await settle();
+	expect(left.installedEvent.mock.calls).toEqual([
+		["pending"],
+		["pending"],
+		["delivered", "3.0"],
+	]);
+	expect(reasons).toEqual(["a update", "b update", "c update"]);
 });
 
 test("a failed chrome.declarativeNetRequest call still runs its callback, with runtime.lastError", async () => {

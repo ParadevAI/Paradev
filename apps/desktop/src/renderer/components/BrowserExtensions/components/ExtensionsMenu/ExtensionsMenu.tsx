@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { TbPlus, TbPuzzle } from "react-icons/tb";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { useActivateBrowserExtension } from "../../hooks/useActivateBrowserExtension";
+import { useReinstallBrowserExtension } from "../../hooks/useReinstallBrowserExtension";
 import { useSetBrowserExtensionPinned } from "../../hooks/useSetBrowserExtensionPinned";
 import { RemoveExtensionDialog } from "../RemoveExtensionDialog";
 import { ExtensionMenuRow } from "./components/ExtensionMenuRow";
@@ -48,6 +49,7 @@ export function ExtensionsMenu({
 	const { t } = useLingui();
 	const activate = useActivateBrowserExtension(paneId);
 	const setPinned = useSetBrowserExtensionPinned();
+	const reinstall = useReinstallBrowserExtension();
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const lastTypedAt = useRef(Number.NEGATIVE_INFINITY);
@@ -110,6 +112,10 @@ export function ExtensionsMenu({
 									isSearching={(at) =>
 										at - lastTypedAt.current < TYPEAHEAD_RESET_MS
 									}
+									onReinstall={() => {
+										setIsOpen(false);
+										reinstall(extension);
+									}}
 								/>
 							))}
 							<DropdownMenuSeparator />

@@ -5707,6 +5707,9 @@ msgstr "클라우드 워크스페이스를 기록할 수 없습니다"
 msgid "Could not record environment"
 msgstr "환경을 저장할 수 없습니다"
 
+msgid "Could not reinstall {name}"
+msgstr "{name}을(를) 다시 설치할 수 없습니다"
+
 msgid "Could not remove {name}"
 msgstr "{name}을(를) 제거할 수 없습니다"
 
@@ -15466,6 +15469,9 @@ msgstr "리전"
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "이 에이전트의 전역 구성에 라이프사이클 훅을 등록해 Paradev가 상태를 표시하고 알림을 보낼 수 있게 합니다. 이 기능을 끄면 모든 곳에서 Paradev의 항목이 제거되며, Paradev 안에서도 이 에이전트의 상태와 알림이 중단됩니다."
 
+msgid "Reinstall {name}"
+msgstr "{name} 다시 설치"
+
 msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
 msgstr "{inviter}님의 초대로 {others}와(과) 함께 {channel}에 다시 참여했습니다."
 
@@ -20286,6 +20292,9 @@ msgstr "Slack 대화를 작업으로 바꾸고, 워크스페이스에서 에이�
 
 msgid "turn the onboarding findings into a page"
 msgstr "온보딩 조사 결과를 페이지로 만들어 줘"
+
+msgid "Turned off because its files changed"
+msgstr "파일이 변경되어 꺼졌습니다"
 
 msgid "Two Hands"
 msgstr "양손"
