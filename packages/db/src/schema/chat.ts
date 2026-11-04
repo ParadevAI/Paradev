@@ -162,11 +162,12 @@ export const workspaceMoves = pgTable(
 		fromWorkspaceId: uuid("from_workspace_id").notNull(),
 		/** Null when it leaves a cloud workspace, or a computer that never registered. */
 		fromHostId: text("from_host_id"),
-		toWorkspaceId: uuid("to_workspace_id").notNull(),
+		/** Null until the destination exists: a move is recorded before its work is pushed. */
+		toWorkspaceId: uuid("to_workspace_id"),
 		/** Null when it moves to a cloud workspace. */
 		toHostId: text("to_host_id"),
-		/** The snapshot branch the new workspace starts from. */
-		branch: text().notNull(),
+		/** The snapshot branch the new workspace starts from; null until it is pushed. */
+		branch: text(),
 		status: workspaceMoveStatus().notNull().default("pending"),
 		error: text(),
 		createdAt: timestamp("created_at", { withTimezone: true })
@@ -185,7 +186,7 @@ export const workspaceMoves = pgTable(
 		),
 		index("workspace_moves_to_workspace_idx").on(table.toWorkspaceId),
 		uniqueIndex("workspace_moves_one_in_flight_idx")
-			.on(table.fromWorkspaceId)
+			.on(table.organizationId, table.fromWorkspaceId)
 			.where(sql`${table.status} in ('pending', 'moving')`),
 	],
 );

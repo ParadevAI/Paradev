@@ -1,5 +1,5 @@
 {
-  "id": "273f1c5b-6271-42d1-b710-8291488c173c",
+  "id": "67298fe8-1f13-43a1-a957-6d81421bacce",
   "prevId": "26026fb1-5a31-4856-b80d-1919168e8c82",
   "version": "7",
   "dialect": "postgresql",
@@ -4820,7 +4820,7 @@
           "name": "to_workspace_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "to_host_id": {
           "name": "to_host_id",
@@ -4832,7 +4832,7 @@
           "name": "branch",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "status": {
           "name": "status",
@@ -4909,6 +4909,12 @@
         "workspace_moves_one_in_flight_idx": {
           "name": "workspace_moves_one_in_flight_idx",
           "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
             {
               "expression": "from_workspace_id",
               "isExpression": false,

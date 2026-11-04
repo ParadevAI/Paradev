@@ -85,9 +85,9 @@ CREATE TABLE "workspace_moves" (
 	"created_by" uuid NOT NULL,
 	"from_workspace_id" uuid NOT NULL,
 	"from_host_id" text,
-	"to_workspace_id" uuid NOT NULL,
+	"to_workspace_id" uuid,
 	"to_host_id" text,
-	"branch" text NOT NULL,
+	"branch" text,
 	"status" "workspace_move_status" DEFAULT 'pending' NOT NULL,
 	"error" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -126,7 +126,7 @@ CREATE INDEX "chat_transcripts_file_id_idx" ON "chat_transcripts" USING btree ("
 CREATE INDEX "chat_turns_session_first_seq_idx" ON "chat_turns" USING btree ("session_id","first_seq");--> statement-breakpoint
 CREATE INDEX "workspace_moves_from_workspace_idx" ON "workspace_moves" USING btree ("from_workspace_id","created_at");--> statement-breakpoint
 CREATE INDEX "workspace_moves_to_workspace_idx" ON "workspace_moves" USING btree ("to_workspace_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "workspace_moves_one_in_flight_idx" ON "workspace_moves" USING btree ("from_workspace_id") WHERE "workspace_moves"."status" in ('pending', 'moving');--> statement-breakpoint
+CREATE UNIQUE INDEX "workspace_moves_one_in_flight_idx" ON "workspace_moves" USING btree ("organization_id","from_workspace_id") WHERE "workspace_moves"."status" in ('pending', 'moving');--> statement-breakpoint
 -- BM25 ranking for chat search through Neon's lakebase_text. Only Neon
 -- projects with Lakebase Search have the extension; plain Postgres (local
 -- docker, CI) and other Neon projects skip this, and chat search falls back
