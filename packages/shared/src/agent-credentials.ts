@@ -44,6 +44,23 @@ export function isCloudWorkspaceIgnoredEnvName(name: string): boolean {
 /** The provider a Codex subscription row carries when it is a ChatGPT sign-in. */
 export const CHATGPT_PROVIDER = "chatgpt";
 
+/**
+ * The provider of a row that records a choice, not a credential: the person's
+ * own tooling keeps the agent signed in on the box, so a cloud workspace gets
+ * no variable, firewall rule or login file for that agent. The row holds no
+ * secret.
+ */
+export const MANUAL_PROVIDER = "manual";
+
+/** Agents a cloud workspace can leave to the person's own sign-in. */
+export const MANUAL_SIGN_IN_AGENTS = ["claude", "codex"] as const;
+
+export function isManualSignIn(credential: {
+	provider?: string | null;
+}): boolean {
+	return credential.provider === MANUAL_PROVIDER;
+}
+
 const GATEWAY_BASE_URLS: Record<string, string> = {
 	claude: "https://ai-gateway.vercel.sh/claude-code",
 	codex: "https://ai-gateway.vercel.sh/codex/v1",
@@ -67,6 +84,7 @@ export function agentCredentialToEnv(
 	credential: AgentCredentialShape,
 ): Partial<Record<AgentCredentialEnvName, string>> {
 	const { agent, kind, value, provider } = credential;
+	if (provider === MANUAL_PROVIDER) return {};
 	const baseUrl =
 		credential.baseUrl ||
 		(provider === "gateway" ? gatewayBaseUrl(agent) : null);
