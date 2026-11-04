@@ -3,7 +3,15 @@ title: Migrate from Conductor
 description: Move your Conductor workspaces, scripts, and agents to Paradev
 ---
 
-Conductor has announced that it is shutting down. This guide moves your work to Paradev. Your branches, uncommitted changes, and agent subscriptions all come with you.
+Conductor is [joining Meta](https://www.conductor.build/announcement) and is winding down. This guide moves your work to Paradev. Your branches, uncommitted changes, and agent subscriptions all come with you.
+
+<Callout type="warn" title="Conductor's timeline">
+- **November 13, 2026:** Conductor Cloud goes read-only. You can no longer send messages to cloud agents.
+- **November 20, 2026:** Conductor Cloud shuts down and Conductor begins to delete cloud data.
+- **Early 2027:** the local Conductor app stops getting updates and winds down.
+
+If you use Conductor Cloud, do [step 4](#4-move-your-cloud-workspaces) first.
+</Callout>
 
 Both apps use the same model: one Git worktree and one branch per task, with an agent working inside it. Most of the move is pointing Paradev at the same repositories and translating one config file.
 
@@ -114,15 +122,24 @@ Commit `.paradev/` so your team gets the same scripts.
 
 ## 4. Move Your Cloud Workspaces
 
-A Conductor cloud workspace lives on Conductor's servers, not on your disk, so you cannot import it. Push its work to GitHub, then continue in Paradev.
+A Conductor cloud workspace lives on Conductor's servers, not on your disk, so Paradev cannot import it directly. Get its work out before November 20, 2026, when Conductor begins to delete cloud data. Do it before November 13 if you still want to send its agent messages in Conductor.
 
 <Callout type="warn">
-Commit and push every cloud workspace branch you want to keep before Conductor shuts down. Work that exists only in a Conductor cloud workspace is not on your machine.
+Work that exists only in a Conductor cloud workspace is not on your machine. Move every cloud workspace you want to keep before November 20.
 </Callout>
+
+### Continue on Your Mac
+
+1. In Conductor, right-click the cloud workspace and choose **Transfer to local**. Conductor moves the workspace and its chats to your Mac.
+2. Import it into Paradev as in [step 2](#2-import-your-conductor-workspaces).
+
+To keep a copy of all your Conductor data, including chats, use **Settings → Account → Export data** in Conductor.
+
+### Continue in a Paradev Cloud Workspace
 
 1. **Push each branch.** In each Conductor cloud workspace, commit and push the branch.
 2. **Set up a Paradev environment.** Commit the `.paradev/config.json` from [step 3](#3-convert-your-scripts) first: cloud workspaces run its setup scripts. Then open **Settings → Environments**, click **New environment**, and add the repository. Add the variables and secrets your Conductor cloud workspaces used. Agents use your sign-in from **Settings → Agents**, so you do not need agent API keys here.
-3. **Continue each branch.** Press **⌘N**, pick **Cloud**, pick the project, and choose the pushed branch as the base branch. Paradev creates a new working branch from it. To continue on your own machine instead, create a local workspace from the **existing branch**.
+3. **Continue each branch.** Press **⌘N**, pick **Cloud**, pick the project, and choose the pushed branch as the base branch. Paradev creates a new working branch from it.
 
 From the CLI:
 
@@ -156,7 +173,7 @@ The [first parallel session](/first-workspace) walks through this end to end. Al
 
 ## 7. Remove Conductor
 
-When your workspaces are in Paradev:
+The local Conductor app keeps working until early 2027, but you cannot download it again. When your workspaces are in Paradev:
 
 1. Quit Conductor and move it to the Trash.
 2. Keep `~/conductor/workspaces/` while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.
