@@ -210,17 +210,21 @@ jobs:
         run: |
           APP_DIR=$(find release -maxdepth 2 -name "*.app" -type d | head -1)
           UNPACKED="$APP_DIR/Contents/Resources/app.asar.unpacked/node_modules"
-          BINDING="$UNPACKED/better-sqlite3/build/Release/better_sqlite3.node"
           EXPECTED_ARCH=$([ "${{ matrix.arch }}" = "x64" ] && echo x86_64 || echo arm64)
-          test -f "$BINDING" || {
-            echo "::error::better-sqlite3 native binding missing from packaged app. Expected: $BINDING"
+          test -f "$UNPACKED/better-sqlite3/build/Release/better_sqlite3.node" || {
+            echo "::error::better-sqlite3 native binding missing from packaged app."
             exit 1
           }
-          lipo -archs "$BINDING" | grep -qw "$EXPECTED_ARCH" || {
-            echo "::error::better-sqlite3 binding is $(lipo -archs "$BINDING"), expected $EXPECTED_ARCH — launch will crash."
-            exit 1
-          }
-          echo "OK: bundled $BINDING ($EXPECTED_ARCH, $(du -h "$BINDING" | cut -f1))"
+          WRONG=0
+          while IFS= read -r BINDING; do
+            if lipo -archs "$BINDING" | grep -qw "$EXPECTED_ARCH"; then
+              echo "OK: $EXPECTED_ARCH ${BINDING#"$UNPACKED"/}"
+            else
+              echo "::error::${BINDING#"$UNPACKED"/} is $(lipo -archs "$BINDING"), expected $EXPECTED_ARCH — it will fail to load."
+              WRONG=1
+            fi
+          done < <(find "$UNPACKED" -path "*/build/Release/*.node")
+          exit "$WRONG"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

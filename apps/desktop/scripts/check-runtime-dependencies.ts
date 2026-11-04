@@ -18,7 +18,7 @@ const shipped = new Set(["electron", ...Object.keys(dependencies)]);
 
 // A quote before the call means generated code held in a string (ajv), not a real load.
 const RUNTIME_LOAD =
-	/(?<!["'`])\b(?:require(?:\$\d+)?|\)\.resolve|import)\s*\(\s*["']([^"'./][^"']*)["']/g;
+	/(?<!["'`])\b(?:require(?:\$\d+)?(?:\.resolve)?|\)\.resolve|import)\s*\(\s*["']([^"'./][^"']*)["']/g;
 
 function packageName(specifier: string): string {
 	const parts = specifier.split("/");
