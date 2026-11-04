@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import type { SessionClient } from "@superset/chat/client";
 import {
 	deriveQueuedPrompts,
@@ -46,7 +46,7 @@ import {
 import { TurnFailureActionsProvider } from "../../providers/TurnFailureActionsProvider";
 import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
-import { heldPromptQueue } from "../../utils/heldPromptQueue";
+import { heldOutboxEntries } from "../../utils/heldOutboxEntries";
 import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
 import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
@@ -58,7 +58,6 @@ import {
 	type ComposerHandle,
 	prependToDraft,
 } from "../Composer";
-import { ConnectionNotice } from "../ConnectionNotice";
 import { SessionHeader } from "../SessionHeader";
 import { SetupSessionHeader } from "../SetupSessionHeader";
 import { SubagentView } from "../SubagentView";
@@ -141,7 +140,6 @@ export function SessionView({
 	terminalId?: string;
 	headerLeft?: ReactNode;
 	held?: {
-		notice: ReactNode;
 		queued: UserContent[][];
 		onQueue: (content: UserContent[]) => void;
 		/** Already sent, so shown only until the transcript has a user message. */
@@ -629,15 +627,20 @@ export function SessionView({
 
 	const heldQueued = held?.queued;
 	const heldLaunched = held?.launched;
-	const heldQueue = useMemo(
+	const heldOutbox = useMemo(
 		() =>
-			heldQueued
-				? heldPromptQueue(heldQueued, {
-						launched: heldLaunched,
-						items: snapshotItems,
-					})
-				: undefined,
-		[heldQueued, heldLaunched, snapshotItems],
+			heldOutboxEntries(heldQueued ?? [], {
+				launched: heldLaunched,
+				items: snapshotItems,
+			}),
+		[heldLaunched, heldQueued, snapshotItems],
+	);
+	const transcriptOutbox = useMemo(
+		() =>
+			heldOutbox.length > 0
+				? [...session.outbox, ...heldOutbox]
+				: session.outbox,
+		[session.outbox, heldOutbox],
 	);
 	const booting = sessionState?.status === "starting";
 	const openModelPicker = useCallback(
@@ -660,7 +663,7 @@ export function SessionView({
 			sendPrompt,
 			setConfigOption,
 		});
-	const composerQueue = heldQueue ?? (held ? undefined : promptQueue);
+	const composerQueue = held ? undefined : promptQueue;
 	const drawerQueue = subagent.target === undefined ? composerQueue : undefined;
 
 	// w-full because the pane lays its children out in a row: without it this
@@ -725,7 +728,7 @@ export function SessionView({
 											onRespond={onRespond}
 											onMessageRevealed={clearRevealMessage}
 											onRetryPrompt={session.retryPrompt}
-											outbox={session.outbox}
+											outbox={transcriptOutbox}
 											ref={transcriptRef}
 											revealMessageId={revealMessageId}
 											sessionId={client.sessionId}
@@ -744,15 +747,6 @@ export function SessionView({
 						)}
 					</div>
 				</MessageScroller.Provider>
-				{held ? (
-					<ConnectionNotice>{held.notice}</ConnectionNotice>
-				) : (
-					booting && (
-						<ConnectionNotice>
-							<Trans>Starting the agent…</Trans>
-						</ConnectionNotice>
-					)
-				)}
 				{!focusedSubagentId && (
 					<ComposerChips
 						backgroundTasks={sessionState?.backgroundTasks}
@@ -809,6 +803,7 @@ export function SessionView({
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
+					promptPending={heldOutbox.length > 0}
 					terminalId={terminalId}
 					agentLabel={agentLabel}
 					onNewChat={onNewChat}

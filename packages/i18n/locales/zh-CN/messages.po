@@ -3093,9 +3093,6 @@ msgstr "附加到聊天"
 msgid "Attached"
 msgstr "已附加"
 
-msgid "Attaching to the running session…"
-msgstr "正在连接运行中的会话…"
-
 msgid "attachment"
 msgstr "附件"
 
@@ -16183,9 +16180,6 @@ msgstr "将在重置后继续"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒后继续"
-
-msgid "Resuming the conversation…"
-msgstr "正在继续对话…"
 
 msgid "Retry"
 msgstr "重试"

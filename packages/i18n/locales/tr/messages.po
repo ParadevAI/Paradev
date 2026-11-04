@@ -3093,9 +3093,6 @@ msgstr "Sohbete ekle"
 msgid "Attached"
 msgstr "Bağlı"
 
-msgid "Attaching to the running session…"
-msgstr "Çalışan oturuma bağlanılıyor…"
-
 msgid "attachment"
 msgstr "ek"
 
@@ -16183,9 +16180,6 @@ msgstr "Sıfırlanınca devam edilecek"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} sn içinde devam edilecek"
-
-msgid "Resuming the conversation…"
-msgstr "Sohbete devam ediliyor…"
 
 msgid "Retry"
 msgstr "Yeniden dene"

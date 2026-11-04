@@ -3093,9 +3093,6 @@ msgstr "Adjuntar al chat"
 msgid "Attached"
 msgstr "Conectada"
 
-msgid "Attaching to the running session…"
-msgstr "Conectando con la sesión en curso…"
-
 msgid "attachment"
 msgstr "adjunto"
 
@@ -16183,9 +16180,6 @@ msgstr "Se reanudará al restablecerse"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Se reanuda en {resumeSeconds} s"
-
-msgid "Resuming the conversation…"
-msgstr "Reanudando la conversación…"
 
 msgid "Retry"
 msgstr "Reintentar"

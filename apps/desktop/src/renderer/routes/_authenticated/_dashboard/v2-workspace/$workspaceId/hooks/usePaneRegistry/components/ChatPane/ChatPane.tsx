@@ -1,5 +1,5 @@
 import type { RendererContext } from "@superset/panes";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -82,7 +82,12 @@ export function ChatPane({
 		},
 		[agentId, store],
 	);
-	const pendingPrompts = pendingChatPrompts(data);
+	const { pendingPrompt, pendingAttachments, queuedPrompts } = data;
+	const pendingPrompts = useMemo(
+		() =>
+			pendingChatPrompts({ pendingPrompt, pendingAttachments, queuedPrompts }),
+		[pendingPrompt, pendingAttachments, queuedPrompts],
+	);
 
 	const clearPendingPrompts = () => {
 		const {

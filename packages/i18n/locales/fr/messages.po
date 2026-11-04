@@ -3093,9 +3093,6 @@ msgstr "Joindre au chat"
 msgid "Attached"
 msgstr "Attachée"
 
-msgid "Attaching to the running session…"
-msgstr "Connexion à la session en cours…"
-
 msgid "attachment"
 msgstr "pièce jointe"
 
@@ -16183,9 +16180,6 @@ msgstr "Reprise à la réinitialisation"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Reprise dans {resumeSeconds} s"
-
-msgid "Resuming the conversation…"
-msgstr "Reprise de la conversation…"
 
 msgid "Retry"
 msgstr "Réessayer"

@@ -3093,9 +3093,6 @@ msgstr "Załącz do czatu"
 msgid "Attached"
 msgstr "Podłączona"
 
-msgid "Attaching to the running session…"
-msgstr "Łączenie z działającą sesją…"
-
 msgid "attachment"
 msgstr "załącznik"
 
@@ -16183,9 +16180,6 @@ msgstr "Wznowienie po resecie"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wznowienie za {resumeSeconds} s"
-
-msgid "Resuming the conversation…"
-msgstr "Wznawianie rozmowy…"
 
 msgid "Retry"
 msgstr "Ponów"

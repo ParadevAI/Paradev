@@ -3093,9 +3093,6 @@ msgstr "Připojit k chatu"
 msgid "Attached"
 msgstr "Připojeno"
 
-msgid "Attaching to the running session…"
-msgstr "Připojuji se k běžící sezení…"
-
 msgid "attachment"
 msgstr "příloha"
 
@@ -16183,9 +16180,6 @@ msgstr "Pokračuje po obnovení"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Pokračování za {resumeSeconds} s"
-
-msgid "Resuming the conversation…"
-msgstr "Obnovuji konverzaci…"
 
 msgid "Retry"
 msgstr "Zkusit znovu"

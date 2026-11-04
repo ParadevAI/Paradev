@@ -3093,9 +3093,6 @@ msgstr "Lampirkan ke obrolan"
 msgid "Attached"
 msgstr "Terhubung"
 
-msgid "Attaching to the running session…"
-msgstr "Menghubungkan ke sesi yang berjalan…"
-
 msgid "attachment"
 msgstr "lampiran"
 
@@ -16183,9 +16180,6 @@ msgstr "Akan dilanjutkan saat direset"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
-
-msgid "Resuming the conversation…"
-msgstr "Melanjutkan percakapan…"
 
 msgid "Retry"
 msgstr "Coba lagi"

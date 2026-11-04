@@ -3093,9 +3093,6 @@ msgstr "Aan chat toevoegen"
 msgid "Attached"
 msgstr "Gekoppeld"
 
-msgid "Attaching to the running session…"
-msgstr "Verbinden met de actieve sessie…"
-
 msgid "attachment"
 msgstr "bijlage"
 
@@ -16183,9 +16180,6 @@ msgstr "Wordt hervat bij reset"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wordt hervat over {resumeSeconds} s"
-
-msgid "Resuming the conversation…"
-msgstr "Gesprek wordt hervat…"
 
 msgid "Retry"
 msgstr "Opnieuw"

@@ -12,7 +12,6 @@ import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
-import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
@@ -689,12 +688,19 @@ export function AcpChatPane({
 		[editMessage],
 	);
 
-	const draft = (notice: ReactNode) => (
+	const launched = useMemo(
+		() =>
+			launchPrompt
+				? [{ type: "text" as const, text: launchPrompt }]
+				: undefined,
+		[launchPrompt],
+	);
+	const draft = () => (
 		<DraftChat
 			draftKey={draftKey}
 			getOpenFilePaths={getOpenFilePaths}
 			isActive={isActive}
-			notice={notice}
+			launched={launched}
 			onOpenHistory={onOpenHistory}
 			onQueue={onQueuePrompt}
 			queued={pendingPrompts}
@@ -736,13 +742,7 @@ export function AcpChatPane({
 				</div>
 			);
 		}
-		return draft(
-			agentSessionId ? (
-				<Trans>Attaching to the running session…</Trans>
-			) : (
-				<Trans>Starting the agent…</Trans>
-			),
-		);
+		return draft();
 	}
 
 	return (
@@ -754,12 +754,9 @@ export function AcpChatPane({
 			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
-							notice: <Trans>Resuming the conversation…</Trans>,
 							queued: pendingPrompts,
 							onQueue: onQueuePrompt,
-							...(launchPrompt
-								? { launched: [{ type: "text" as const, text: launchPrompt }] }
-								: {}),
+							...(launched ? { launched } : {}),
 						},
 					}
 				: {})}

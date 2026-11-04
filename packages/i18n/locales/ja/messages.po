@@ -3093,9 +3093,6 @@ msgstr "チャットに添付"
 msgid "Attached"
 msgstr "接続中"
 
-msgid "Attaching to the running session…"
-msgstr "実行中のセッションに接続しています…"
-
 msgid "attachment"
 msgstr "添付ファイル"
 
@@ -16183,9 +16180,6 @@ msgstr "リセット時に再開します"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds}秒後に再開します"
-
-msgid "Resuming the conversation…"
-msgstr "会話を再開しています…"
 
 msgid "Retry"
 msgstr "再試行"

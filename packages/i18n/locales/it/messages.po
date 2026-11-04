@@ -3093,9 +3093,6 @@ msgstr "Allega alla chat"
 msgid "Attached"
 msgstr "Collegata"
 
-msgid "Attaching to the running session…"
-msgstr "Connessione alla sessione in corso…"
-
 msgid "attachment"
 msgstr "allegato"
 
@@ -16183,9 +16180,6 @@ msgstr "Ripresa all'azzeramento"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Ripresa tra {resumeSeconds} s"
-
-msgid "Resuming the conversation…"
-msgstr "Ripresa della conversazione…"
 
 msgid "Retry"
 msgstr "Riprova"

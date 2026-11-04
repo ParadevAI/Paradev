@@ -3093,9 +3093,6 @@ msgstr "Прикрепить к чату"
 msgid "Attached"
 msgstr "Подключена"
 
-msgid "Attaching to the running session…"
-msgstr "Подключение к запущенной сессии…"
-
 msgid "attachment"
 msgstr "вложение"
 
@@ -16183,9 +16180,6 @@ msgstr "Продолжится после сброса"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Продолжение через {resumeSeconds} с"
-
-msgid "Resuming the conversation…"
-msgstr "Возобновляем разговор…"
 
 msgid "Retry"
 msgstr "Повторить"

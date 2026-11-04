@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
 import { useMemo } from "react";
 import type {
@@ -15,20 +14,19 @@ export function PendingCloudChatPane({
 	workspaceId: string;
 }) {
 	const data = ctx.pane.data as PendingCloudChatPaneData;
-	const queued = useMemo(
-		() => [
-			...(data.launchPrompt
-				? [[{ type: "text" as const, text: data.launchPrompt }]]
-				: []),
-			...(data.queuedPrompts ?? []),
-		],
-		[data.launchPrompt, data.queuedPrompts],
+	const launched = useMemo(
+		() =>
+			data.launchPrompt
+				? [{ type: "text" as const, text: data.launchPrompt }]
+				: undefined,
+		[data.launchPrompt],
 	);
+	const queued = useMemo(() => data.queuedPrompts ?? [], [data.queuedPrompts]);
 	return (
 		<DraftChat
 			draftKey={`chat-v3-draft:${data.draftId}`}
 			isActive={ctx.isActive}
-			notice={<Trans>Starting the agent…</Trans>}
+			launched={launched}
 			onQueue={(content) => {
 				const current = ctx.store
 					.getState()

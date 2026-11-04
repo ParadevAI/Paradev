@@ -3093,9 +3093,6 @@ msgstr "An Chat anhängen"
 msgid "Attached"
 msgstr "Verbunden"
 
-msgid "Attaching to the running session…"
-msgstr "Verbindung zur laufenden Sitzung…"
-
 msgid "attachment"
 msgstr "Anhang"
 
@@ -16183,9 +16180,6 @@ msgstr "Wird bei Zurücksetzung fortgesetzt"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wird in {resumeSeconds} s fortgesetzt"
-
-msgid "Resuming the conversation…"
-msgstr "Unterhaltung wird fortgesetzt…"
 
 msgid "Retry"
 msgstr "Erneut versuchen"

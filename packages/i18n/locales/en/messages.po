@@ -3093,9 +3093,6 @@ msgstr "Attach to chat"
 msgid "Attached"
 msgstr "Attached"
 
-msgid "Attaching to the running session…"
-msgstr "Attaching to the running session…"
-
 msgid "attachment"
 msgstr "attachment"
 
@@ -16183,9 +16180,6 @@ msgstr "Resuming at reset"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Resuming in {resumeSeconds}s"
-
-msgid "Resuming the conversation…"
-msgstr "Resuming the conversation…"
 
 msgid "Retry"
 msgstr "Retry"
