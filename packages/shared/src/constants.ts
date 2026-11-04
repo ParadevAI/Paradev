@@ -237,10 +237,9 @@ export const FEATURE_FLAGS = {
 	 */
 	ACP_CHAT: "acp-chat",
 	/**
-	 * Shows Fork into chat on agent terminal headers and Fork into CLI on chat
-	 * headers: a native fork of the session, opened in the other surface beside
-	 * it. Off, unloaded or offline hide them. Audience is a release condition on
-	 * the flag, in both the Production and Local Development projects.
+	 * Legacy gate for the CLI mode / Chat mode fork menus, replaced by the account's
+	 * Chat experimental setting. Read only by released desktop builds 2.0.2 and 2.0.3;
+	 * remove it once no live build reads it.
 	 */
 	AGENT_SURFACE_FORK: "agent-surface-fork",
 	MOBILE_PANE: "mobile-pane",
