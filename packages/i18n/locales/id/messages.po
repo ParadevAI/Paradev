@@ -6013,6 +6013,9 @@ msgstr "Tidak dapat menyimpan Dev"
 msgid "Couldn't save the routine"
 msgstr "Tidak dapat menyimpan rutinitas"
 
+msgid "Couldn't search your chats"
+msgstr "Tidak dapat mencari chat Anda"
+
 msgid "Couldn't send comment"
 msgstr "Tidak bisa mengirim komentar"
 

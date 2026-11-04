@@ -6013,6 +6013,9 @@ msgstr "Dev se nepodařilo uložit"
 msgid "Couldn't save the routine"
 msgstr "Rutinu se nepodařilo uložit"
 
+msgid "Couldn't search your chats"
+msgstr "Chaty se nepodařilo prohledat"
+
 msgid "Couldn't send comment"
 msgstr "Nepodařilo se odeslat komentář"
 

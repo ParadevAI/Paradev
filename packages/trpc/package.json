@@ -52,6 +52,10 @@
 			"types": "./src/router/integration/linear/lookup.ts",
 			"default": "./src/router/integration/linear/lookup.ts"
 		},
+		"./chat-history-schema": {
+			"types": "./src/router/chat-history/schema.ts",
+			"default": "./src/router/chat-history/schema.ts"
+		},
 		"./page-schema": {
 			"types": "./src/router/page/schema.ts",
 			"default": "./src/router/page/schema.ts"
@@ -170,6 +174,7 @@
 		"@slack/web-api": "7.15.0",
 		"@superset/agent-harness": "workspace:*",
 		"@superset/auth": "workspace:*",
+		"@superset/chat": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/email": "workspace:*",
 		"@superset/i18n": "workspace:*",

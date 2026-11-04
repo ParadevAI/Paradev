@@ -6013,6 +6013,9 @@ msgstr "Dev kaydedilemedi"
 msgid "Couldn't save the routine"
 msgstr "Rutin kaydedilemedi"
 
+msgid "Couldn't search your chats"
+msgstr "Sohbetleriniz aranamadı"
+
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
 

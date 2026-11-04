@@ -6013,6 +6013,9 @@ msgstr "Impossible d'enregistrer le Dev"
 msgid "Couldn't save the routine"
 msgstr "Impossible d'enregistrer la routine"
 
+msgid "Couldn't search your chats"
+msgstr "Impossible de rechercher dans vos discussions"
+
 msgid "Couldn't send comment"
 msgstr "Impossible d'envoyer le commentaire"
 

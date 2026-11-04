@@ -6013,6 +6013,9 @@ msgstr "Não foi possível salvar o Dev"
 msgid "Couldn't save the routine"
 msgstr "Não foi possível salvar a rotina"
 
+msgid "Couldn't search your chats"
+msgstr "Não foi possível pesquisar seus chats"
+
 msgid "Couldn't send comment"
 msgstr "Não foi possível enviar o comentário"
 

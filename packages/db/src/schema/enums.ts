@@ -154,6 +154,26 @@ export const v2WorkspaceTypeValues = ["main", "worktree"] as const;
 export const v2WorkspaceTypeEnum = z.enum(v2WorkspaceTypeValues);
 export type V2WorkspaceType = z.infer<typeof v2WorkspaceTypeEnum>;
 
+export const chatMoveStatusValues = [
+	"pending",
+	"copying",
+	"restoring",
+	"ready",
+	"failed",
+] as const;
+export const chatMoveStatusEnum = z.enum(chatMoveStatusValues);
+export type ChatMoveStatus = z.infer<typeof chatMoveStatusEnum>;
+
+export const workspaceMoveStatusValues = [
+	"pending",
+	"moving",
+	"ready",
+	"partial",
+	"failed",
+] as const;
+export const workspaceMoveStatusEnum = z.enum(workspaceMoveStatusValues);
+export type WorkspaceMoveStatus = z.infer<typeof workspaceMoveStatusEnum>;
+
 export const automationRunStatusValues = [
 	"dispatching",
 	"dispatched",
