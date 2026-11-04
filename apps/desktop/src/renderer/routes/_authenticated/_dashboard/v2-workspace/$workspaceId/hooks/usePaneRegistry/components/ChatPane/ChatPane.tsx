@@ -22,6 +22,7 @@ import {
 } from "./utils/pendingChatPrompts";
 import { restartedChatPaneData } from "./utils/restartedChatPaneData";
 import { saveChatMode } from "./utils/savedChatMode";
+import { sessionInfoPaneData } from "./utils/sessionInfoPaneData";
 
 export function ChatPane({
 	ctx,
@@ -151,19 +152,11 @@ export function ChatPane({
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
-				onSessionInfo={({ harnessSessionId, title }) => {
-					const current = latest.current;
-					const rebound = harnessSessionId !== undefined && current.agent;
-					const retitled = title !== undefined && title !== current.chatTitle;
-					if (!rebound && !retitled) return;
-					latest.current = {
-						...current,
-						...(rebound
-							? { agent: { ...rebound, sessionId: harnessSessionId } }
-							: {}),
-						...(retitled ? { chatTitle: title } : {}),
-					};
-					ctx.actions.updateData(latest.current);
+				onSessionInfo={(info) => {
+					const next = sessionInfoPaneData(latest.current, info);
+					if (!next) return;
+					latest.current = next;
+					ctx.actions.updateData(next);
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
 					ctx.actions.setTitle(label);

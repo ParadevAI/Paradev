@@ -110,7 +110,11 @@ export function AcpChatPane({
 	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
-	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
+	onSessionInfo: (info: {
+		harnessSessionId?: string;
+		title?: string;
+		modeId?: string;
+	}) => void;
 	onOpenFile?: OpenFile;
 	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
@@ -798,6 +802,7 @@ export function AcpChatPane({
 						? { harnessSessionId: bound }
 						: {}),
 					...(state?.title ? { title: state.title } : {}),
+					...(state?.modeId ? { modeId: state.modeId } : {}),
 				});
 			}}
 			pendingPrompts={pendingPrompts}
