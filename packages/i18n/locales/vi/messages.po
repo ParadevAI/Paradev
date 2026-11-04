@@ -1627,6 +1627,9 @@ msgstr "3 workspace đã lưu trữ"
 msgid "3 files changed, 2 tests passing"
 msgstr "3 tệp thay đổi, 2 test đã qua"
 
+msgid "3 running"
+msgstr "3 đang chạy"
+
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ luồng công việc đồng thời trên mỗi kỹ sư"
 
@@ -2308,6 +2311,9 @@ msgstr "Agent không thể truy cập các công cụ của {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính, iPhone hoặc iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agent tự mở bản xem trước, thao tác giao diện và đính kèm ảnh chụp làm bằng chứng trước khi đánh dấu sẵn sàng review."
 
@@ -2322,6 +2328,12 @@ msgstr "Agent ghi nhớ những gì chúng học được về codebase của b�
 
 msgid "Agents running at once"
 msgstr "Số agent chạy cùng lúc"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Agent chỉ thấy một giá trị giữ chỗ. Paradev thêm thông tin đăng nhập của bạn vào các yêu cầu gửi đi."
+
+msgid "Agents that run while you're away"
+msgstr "Agent chạy khi bạn vắng mặt"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agent dùng tài khoản này khi gọi các công cụ Linear."
@@ -2637,6 +2649,9 @@ msgstr "Agent viết nguyên hàm và nguyên tệp trong khi con người theo 
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Tự động hóa chỉ có thể dùng workspace cloud do bạn tạo"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Một môi trường chứa các kho mã, biến và vùng của bạn. Khởi tạo bao nhiêu không gian làm việc từ đó tùy bạn."
 
 msgid "An error occurred"
 msgstr "Đã xảy ra lỗi"
@@ -3408,9 +3423,6 @@ msgstr "dựa trên PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Dựa trên {0} token trong 30 ngày qua, tính cả {1}."
 
-msgid "Become a design partner"
-msgstr "Trở thành đối tác đồng phát triển"
-
 msgid "Before"
 msgstr "Trước"
 
@@ -3666,9 +3678,6 @@ msgstr "Báo cáo lỗi"
 
 msgid "Build in public"
 msgstr "Xây dựng công khai"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Xây dựng tương lai của Paradev trên đám mây"
 
 msgid "Build your own"
 msgstr "Tự tạo plugin"
@@ -4607,6 +4616,9 @@ msgstr "Đóng workspace"
 msgid "Close Workspace"
 msgstr "Đóng workspace"
 
+msgid "Close your laptop"
+msgstr "Gập laptop lại"
+
 msgid "Closed"
 msgstr "Đã đóng"
 
@@ -4629,6 +4641,9 @@ msgstr "Đóng terminal này sẽ kết thúc tiến trình đang chạy."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud · us-east"
+msgstr "Cloud · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Thiết lập environment đám mây"
 
@@ -4640,9 +4655,6 @@ msgstr "Environment đám mây lấy các repository của bạn từ GitHub. H�
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-giờ đám mây cho mỗi người dùng mỗi tháng"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Phiên bản đám mây sắp ra mắt. Trở thành đối tác đồng phát triển"
 
 msgid "Cloud sandboxes"
 msgstr "Sandbox trên cloud"
@@ -4748,9 +4760,6 @@ msgstr "Ghép các chuỗi như => và !==."
 
 msgid "Come build it with us."
 msgstr "Hãy cùng chúng tôi tạo ra nó."
-
-msgid "Coming soon"
-msgstr "Sắp có"
 
 msgid "Coming Soon"
 msgstr "Sắp có"
@@ -7448,6 +7457,9 @@ msgstr "Mỗi bề mặt có kiểu chữ riêng. Thay đổi hiện ra ngay tro
 msgid "Each task on its own branch"
 msgstr "Mỗi tác vụ trên nhánh riêng"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Mỗi không gian làm việc có một máy đám mây riêng và vẫn làm việc khi laptop của bạn đã gập. Theo dõi từ máy tính, iPhone hoặc iPad."
+
 msgid "Early 2024"
 msgstr "Đầu 2024"
 
@@ -9934,6 +9946,9 @@ msgstr "Có"
 msgid "Included in Enterprise"
 msgstr "Có trong Enterprise"
 
+msgid "Included with Team and Ultra."
+msgstr "Có trong gói Team và Ultra."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Bao gồm biến thể box riêng của Paradev"
 
@@ -10342,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Tham gia"
 
-msgid "Join as a design partner"
-msgstr "Tham gia làm design partner"
-
 msgid "Join channel"
 msgstr "Tham gia kênh"
 
@@ -10538,6 +10550,9 @@ msgstr "Ngôn ngữ"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Đã lưu ngôn ngữ trên thiết bị này, nhưng không đồng bộ được lên tài khoản của bạn."
+
+msgid "Laptop closed"
+msgstr "Laptop đã gập"
 
 msgid "Large"
 msgstr "Lớn"
@@ -12370,6 +12385,9 @@ msgstr "Không tìm thấy issue nào."
 msgid "No items"
 msgstr "Không có mục nào"
 
+msgid "No keys in the sandbox"
+msgstr "Không có khóa nào trong sandbox"
+
 msgid "No known creators"
 msgstr "Không có người tạo nào được biết"
 
@@ -13092,6 +13110,9 @@ msgstr "Một câu"
 
 msgid "One line about how you work"
 msgstr "Một dòng về cách bạn làm việc"
+
+msgid "One machine per workspace."
+msgstr "Mỗi không gian làm việc một máy."
 
 msgid "One of the first hundred on the board"
 msgstr "Một trong một trăm người đầu tiên trên bảng"
@@ -14011,6 +14032,9 @@ msgstr "Tự động hóa Paradev"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Không gian làm việc đám mây của Paradev"
+
 msgid "Paradev components"
 msgstr "Các thành phần Paradev"
 
@@ -14362,6 +14386,9 @@ msgstr "Chọn một thư mục trên ổ đĩa và thêm nó làm dự án"
 
 msgid "Pick a folder…"
 msgstr "Chọn một thư mục…"
+
+msgid "Pick a machine size"
+msgstr "Chọn kích thước máy"
 
 msgid "Pick a model"
 msgstr "Chọn một mô hình"
@@ -16425,6 +16452,9 @@ msgstr "Chạy tự động hóa khi có tin nhắn được đăng hoặc kênh
 msgid "Run automations when Sentry issues change."
 msgstr "Chạy tự động hóa khi issue Sentry thay đổi."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Chạy agent lập trình trong không gian làm việc đám mây, vẫn làm việc khi laptop của bạn đã gập. Có trong gói Team và Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Chạy lệnh và điều hướng trong ứng dụng."
 
@@ -16490,6 +16520,9 @@ msgstr "Chạy agent của bạn từ desktop, bất kỳ terminal nào, hoặc 
 
 msgid "Run your agents from your phone."
 msgstr "Chạy agent của bạn từ điện thoại."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Chạy agent lập trình của bạn trên đám mây."
 
 msgid "Run."
 msgstr "Chạy."
@@ -17328,6 +17361,9 @@ msgstr "Thiết lập host qua SSH"
 msgid "Set up an automation"
 msgstr "Thiết lập tự động hóa"
 
+msgid "Set up once"
+msgstr "Thiết lập một lần"
+
 msgid "Set up project on {hostName}"
 msgstr "Thiết lập dự án trên {hostName}"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Nhỏ"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Nhỏ, Vừa hoặc Lớn, tối đa 8 vCPU và 16 GB. Mức sử dụng tăng theo bộ nhớ."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Xử gọn backlog của bạn."
@@ -18291,6 +18330,9 @@ msgstr "Bắt đầu công việc từ bất cứ đâu"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Bắt đầu workspace ngay từ issue Linear hoặc GitHub trong chế độ xem Tác vụ, mỗi workspace đều có sẵn một agent đang làm việc."
+
+msgid "Start your first cloud workspace."
+msgstr "Khởi tạo không gian làm việc đám mây đầu tiên của bạn."
 
 msgid "Started"
 msgstr "Bắt đầu"
@@ -20712,6 +20754,12 @@ msgstr "Nâng cấp lên {planName}"
 msgid "Upgrade to Pro"
 msgstr "Nâng cấp lên Pro"
 
+msgid "Upgrade to Team"
+msgstr "Nâng cấp lên Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Nâng cấp tổ chức của bạn, kết nối GitHub và chọn Cloud trong màn hình không gian làm việc mới."
+
 msgid "Upgrade your plan"
 msgstr "Nâng cấp gói của bạn"
 
@@ -21191,9 +21239,6 @@ msgstr "Chúng tôi đang tuyển kỹ sư tại San Francisco. Hãy cùng xây 
 msgid "We're hiring in San Francisco"
 msgstr "Chúng tôi đang tuyển tại San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Chúng tôi đang tìm kiếm đối tác đồng phát triển để cùng định hình sản phẩm đám mây. Hãy chia sẻ quy trình làm việc của bạn và chúng tôi sẽ liên hệ để trao đổi cơ hội hợp tác."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Chúng tôi đang xây dựng lại tính năng này. Hãy quay lại sau."
 
@@ -21342,9 +21387,6 @@ msgstr "Chúng tôi đang xây gì"
 msgid "What we've shipped"
 msgstr "Những gì chúng tôi đã ra mắt"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Bạn muốn xây dựng gì với Paradev trên đám mây?"
-
 msgid "What would you like to know?"
 msgstr "Bạn muốn biết điều gì?"
 
@@ -21462,9 +21504,6 @@ msgstr "Wordmark, đen"
 
 msgid "Wordmark, white"
 msgstr "Wordmark, trắng"
-
-msgid "Work email"
-msgstr "Email công việc"
 
 msgid "Work from tickets"
 msgstr "Làm việc từ ticket"

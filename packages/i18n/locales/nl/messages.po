@@ -1627,6 +1627,9 @@ msgstr "3 gearchiveerde werkruimtes"
 msgid "3 files changed, 2 tests passing"
 msgstr "3 bestanden gewijzigd, 2 tests geslaagd"
 
+msgid "3 running"
+msgstr "3 actief"
+
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ gelijktijdige werkstromen per engineer"
 
@@ -2308,6 +2311,9 @@ msgstr "Agents kunnen de tools van {0} niet bereiken"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents voltooien routinetickets zonder tussentijds ingrijpen."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Agents blijven werken in de cloud. Open de werkruimte opnieuw op desktop, iPhone of iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agents laden hun eigen preview, bedienen de UI en voegen screenshotbewijs toe voordat ze werk klaarzetten voor review."
 
@@ -2322,6 +2328,12 @@ msgstr "Agents onthouden wat ze over je codebase leren, zodat elke nieuwe sessie
 
 msgid "Agents running at once"
 msgstr "Agents die tegelijk draaien"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Agents zien alleen een placeholder. Paradev voegt je aanmelding toe aan uitgaande verzoeken."
+
+msgid "Agents that run while you're away"
+msgstr "Agents die doorwerken als je weg bent"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."
@@ -2637,6 +2649,9 @@ msgstr "Een agent schrijft hele functies en bestanden terwijl een mens elke stap
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Een automatisering kan alleen een cloudwerkruimte gebruiken die je zelf hebt aangemaakt"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Een omgeving bevat je repository's, variabelen en regio. Start er zoveel werkruimtes uit als je nodig hebt."
 
 msgid "An error occurred"
 msgstr "Er is een fout opgetreden"
@@ -3408,9 +3423,6 @@ msgstr "gebaseerd op PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Op basis van {0} tokens in de laatste 30 dagen, gerekend over {1}."
 
-msgid "Become a design partner"
-msgstr "Word ontwerppartner"
-
 msgid "Before"
 msgstr "Voor"
 
@@ -3666,9 +3678,6 @@ msgstr "Bugmeldingen"
 
 msgid "Build in public"
 msgstr "Bouwen in het openbaar"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Bouw aan de toekomst van Paradev in de cloud"
 
 msgid "Build your own"
 msgstr "Bouw je eigen"
@@ -4607,6 +4616,9 @@ msgstr "Werkruimte sluiten"
 msgid "Close Workspace"
 msgstr "Werkruimte sluiten"
 
+msgid "Close your laptop"
+msgstr "Klap je laptop dicht"
+
 msgid "Closed"
 msgstr "Gesloten"
 
@@ -4629,6 +4641,9 @@ msgstr "Als je deze terminal sluit, wordt het draaiende proces beëindigd."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud · us-east"
+msgstr "Cloud · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Cloudomgeving instellen"
 
@@ -4640,9 +4655,6 @@ msgstr "Cloudomgevingen halen je repositories op van GitHub. Verbind deze eerst;
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "Cloud-GB-uren per gebruiker per maand"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "De cloud komt eraan. Word ontwerppartner"
 
 msgid "Cloud sandboxes"
 msgstr "Cloudsandboxen"
@@ -4748,9 +4760,6 @@ msgstr "Combineer reeksen zoals => en !==."
 
 msgid "Come build it with us."
 msgstr "Kom het samen met ons bouwen."
-
-msgid "Coming soon"
-msgstr "Binnenkort"
 
 msgid "Coming Soon"
 msgstr "Binnenkort"
@@ -7448,6 +7457,9 @@ msgstr "Elk oppervlak heeft zijn eigen typografie. Wijzigingen zie je meteen in 
 msgid "Each task on its own branch"
 msgstr "Elke taak op een eigen branch"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Elke werkruimte krijgt een eigen cloudmachine en werkt door als je laptop dicht is. Kijk mee op desktop, iPhone of iPad."
+
 msgid "Early 2024"
 msgstr "Begin 2024"
 
@@ -9934,6 +9946,9 @@ msgstr "Inbegrepen"
 msgid "Included in Enterprise"
 msgstr "Inbegrepen bij Enterprise"
 
+msgid "Included with Team and Ultra."
+msgstr "Inbegrepen bij Team en Ultra."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Inclusief de Paradev-specifieke box-variant"
 
@@ -10342,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Meedoen"
 
-msgid "Join as a design partner"
-msgstr "Word design partner"
-
 msgid "Join channel"
 msgstr "Kanaal joinen"
 
@@ -10538,6 +10550,9 @@ msgstr "Taal"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Taal opgeslagen op dit apparaat, maar synchroniseren naar je account is mislukt."
+
+msgid "Laptop closed"
+msgstr "Laptop dicht"
 
 msgid "Large"
 msgstr "Groot"
@@ -12370,6 +12385,9 @@ msgstr "Geen issues gevonden."
 msgid "No items"
 msgstr "Geen items"
 
+msgid "No keys in the sandbox"
+msgstr "Geen sleutels in de sandbox"
+
 msgid "No known creators"
 msgstr "Geen bekende makers"
 
@@ -13092,6 +13110,9 @@ msgstr "Eén zin"
 
 msgid "One line about how you work"
 msgstr "Eén regel over hoe je werkt"
+
+msgid "One machine per workspace."
+msgstr "Eén machine per werkruimte."
 
 msgid "One of the first hundred on the board"
 msgstr "Bij de eerste honderd op het bord"
@@ -14011,6 +14032,9 @@ msgstr "Paradev Automatiseringen"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev-cloudwerkruimtes"
+
 msgid "Paradev components"
 msgstr "Paradev-componenten"
 
@@ -14362,6 +14386,9 @@ msgstr "Kies een map op schijf en voeg die toe als project"
 
 msgid "Pick a folder…"
 msgstr "Kies een map…"
+
+msgid "Pick a machine size"
+msgstr "Kies een machinegrootte"
 
 msgid "Pick a model"
 msgstr "Kies een model"
@@ -16425,6 +16452,9 @@ msgstr "Draai automatiseringen wanneer er berichten worden geplaatst of kanalen 
 msgid "Run automations when Sentry issues change."
 msgstr "Voer automatiseringen uit wanneer Sentry-issues wijzigen."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Draai codeeragents in cloudwerkruimtes die doorwerken als je laptop dicht is. Inbegrepen bij Team en Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Opdrachten uitvoeren en door de app navigeren."
 
@@ -16490,6 +16520,9 @@ msgstr "Draai je agents vanaf de desktop, elke terminal of je telefoon."
 
 msgid "Run your agents from your phone."
 msgstr "Draai je agents vanaf je telefoon."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Draai je codeeragents in de cloud."
 
 msgid "Run."
 msgstr "Voer uit."
@@ -17328,6 +17361,9 @@ msgstr "Host instellen via SSH"
 msgid "Set up an automation"
 msgstr "Stel een automatisering in"
 
+msgid "Set up once"
+msgstr "Eén keer instellen"
+
 msgid "Set up project on {hostName}"
 msgstr "Project instellen op {hostName}"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Klein"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Klein, Middel of Groot, tot 8 vCPU en 16 GB. Het verbruik hangt af van het geheugen."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Werk je backlog weg."
@@ -18291,6 +18330,9 @@ msgstr "Begin overal met werken"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Start werkruimtes direct vanuit Linear- of GitHub-issues in de weergave Taken, met op elk ervan al een agent aan het werk."
+
+msgid "Start your first cloud workspace."
+msgstr "Start je eerste cloudwerkruimte."
 
 msgid "Started"
 msgstr "Gestart"
@@ -20712,6 +20754,12 @@ msgstr "Upgraden naar {planName}"
 msgid "Upgrade to Pro"
 msgstr "Upgraden naar Pro"
 
+msgid "Upgrade to Team"
+msgstr "Upgraden naar Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Upgrade je organisatie, koppel GitHub en kies Cloud in het scherm voor een nieuwe werkruimte."
+
 msgid "Upgrade your plan"
 msgstr "Upgrade je abonnement"
 
@@ -21191,9 +21239,6 @@ msgstr "We nemen engineers aan in San Francisco. Kom de tools bouwen waarmee eng
 msgid "We're hiring in San Francisco"
 msgstr "We zoeken mensen in San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "We zoeken ontwerppartners om ons cloudaanbod mee vorm te geven. Vertel ons over je werkwijze en we nemen contact op om een samenwerking te bespreken."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "We bouwen deze functie opnieuw op. Kom binnenkort terug."
 
@@ -21342,9 +21387,6 @@ msgstr "Wat we bouwen"
 msgid "What we've shipped"
 msgstr "Wat we hebben uitgebracht"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Wat wil je bouwen met Paradev in de cloud?"
-
 msgid "What would you like to know?"
 msgstr "Wat wil je weten?"
 
@@ -21462,9 +21504,6 @@ msgstr "Woordmerk, zwart"
 
 msgid "Wordmark, white"
 msgstr "Woordmerk, wit"
-
-msgid "Work email"
-msgstr "Zakelijk e-mailadres"
 
 msgid "Work from tickets"
 msgstr "Werken vanuit tickets"

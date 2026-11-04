@@ -1627,6 +1627,9 @@ msgstr "3 arşivlenmiş çalışma alanı"
 msgid "3 files changed, 2 tests passing"
 msgstr "3 dosya değişti, 2 test geçiyor"
 
+msgid "3 running"
+msgstr "3 çalışıyor"
+
 msgid "3+ concurrent workstreams per engineer"
 msgstr "Mühendis başına 3+ eşzamanlı iş akışı"
 
@@ -2308,6 +2311,9 @@ msgstr "Ajanlar {0} araçlarına erişemiyor"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Ajanlar bulutta çalışmaya devam eder. Çalışma alanını masaüstünden, iPhone'dan veya iPad'den yeniden açın."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Ajanlar kendi önizlemelerini yükler, arayüzü kullanır ve işi incelemeye hazır işaretlemeden önce ekran görüntüsü kanıtı ekler."
 
@@ -2322,6 +2328,12 @@ msgstr "Ajanlar kod tabanınız hakkında öğrendiklerini hatırlar, böylece h
 
 msgid "Agents running at once"
 msgstr "Aynı anda çalışan ajanlar"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Ajanlar yalnızca bir yer tutucu görür. Paradev, giden isteklere oturumunuzu ekler."
+
+msgid "Agents that run while you're away"
+msgstr "Siz yokken çalışan ajanlar"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Ajanlar Linear araçlarını çağırırken bu hesabı kullanır."
@@ -2637,6 +2649,9 @@ msgstr "Bir ajan tüm fonksiyonları ve dosyaları yazarken bir insan her adım�
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Bir otomasyon yalnızca sizin oluşturduğunuz bir bulut çalışma alanını kullanabilir"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Bir ortam depolarınızı, değişkenlerinizi ve bölgenizi içerir. Ondan istediğiniz kadar çalışma alanı başlatın."
 
 msgid "An error occurred"
 msgstr "Bir hata oluştu"
@@ -3408,9 +3423,6 @@ msgstr "PR #{0} temel alınarak"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Son 30 gündeki {0} token temel alınmıştır; {1} sayılıyor."
 
-msgid "Become a design partner"
-msgstr "Geliştirme ortağı olun"
-
 msgid "Before"
 msgstr "Önce"
 
@@ -3666,9 +3678,6 @@ msgstr "Hata raporları"
 
 msgid "Build in public"
 msgstr "Herkesin gözü önünde geliştiriyoruz"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Paradev’in buluttaki geleceğini inşa edin"
 
 msgid "Build your own"
 msgstr "Kendinizinkini oluşturun"
@@ -4607,6 +4616,9 @@ msgstr "Çalışma alanını kapat"
 msgid "Close Workspace"
 msgstr "Çalışma alanını kapat"
 
+msgid "Close your laptop"
+msgstr "Dizüstünüzü kapatın"
+
 msgid "Closed"
 msgstr "Kapalı"
 
@@ -4629,6 +4641,9 @@ msgstr "Bu terminali kapatmak çalışan süreci sonlandırır."
 msgid "Cloud"
 msgstr "Bulut"
 
+msgid "Cloud · us-east"
+msgstr "Bulut · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Bulut ortamı kurulumu"
 
@@ -4640,9 +4655,6 @@ msgstr "Bulut ortamları depolarınızı GitHub'dan alır. Önce bunları bağla
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "Koltuk başına aylık bulut GB-saat"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Bulut sürümü yakında. Geliştirme ortağı olun"
 
 msgid "Cloud sandboxes"
 msgstr "Bulut sandbox'ları"
@@ -4748,9 +4760,6 @@ msgstr "=> ve !== gibi dizileri birleştirir."
 
 msgid "Come build it with us."
 msgstr "Gelin birlikte geliştirelim."
-
-msgid "Coming soon"
-msgstr "Yakında"
 
 msgid "Coming Soon"
 msgstr "Yakında"
@@ -7448,6 +7457,9 @@ msgstr "Her yüzeyin kendi tipografisi vardır. Değişiklikler canlı önizleme
 msgid "Each task on its own branch"
 msgstr "Her görev kendi dalında"
 
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Her çalışma alanı kendi bulut makinesini alır ve dizüstünüz kapalıyken de çalışmaya devam eder. Masaüstünden, iPhone'dan veya iPad'den kontrol edin."
+
 msgid "Early 2024"
 msgstr "2024 başı"
 
@@ -9934,6 +9946,9 @@ msgstr "Dahil"
 msgid "Included in Enterprise"
 msgstr "Enterprise'a dahil"
 
+msgid "Included with Team and Ultra."
+msgstr "Team ve Ultra'ya dahildir."
+
 msgid "Includes the Paradev-specific box variant"
 msgstr "Paradev'e özgü kutu varyantını içerir"
 
@@ -10342,9 +10357,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Katıl"
 
-msgid "Join as a design partner"
-msgstr "Tasarım ortağı olun"
-
 msgid "Join channel"
 msgstr "Kanala katıl"
 
@@ -10538,6 +10550,9 @@ msgstr "Dil"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Dil bu cihaza kaydedildi, ancak hesabınıza eşitlenemedi."
+
+msgid "Laptop closed"
+msgstr "Dizüstü kapalı"
 
 msgid "Large"
 msgstr "Büyük"
@@ -12370,6 +12385,9 @@ msgstr "Issue bulunamadı."
 msgid "No items"
 msgstr "Öğe yok"
 
+msgid "No keys in the sandbox"
+msgstr "Sandbox'ta anahtar yok"
+
 msgid "No known creators"
 msgstr "Bilinen oluşturan yok"
 
@@ -13092,6 +13110,9 @@ msgstr "Tek satır"
 
 msgid "One line about how you work"
 msgstr "Nasıl çalıştığını bir satırda anlat"
+
+msgid "One machine per workspace."
+msgstr "Her çalışma alanına bir makine."
 
 msgid "One of the first hundred on the board"
 msgstr "Tablodaki ilk yüz kişiden biri"
@@ -14011,6 +14032,9 @@ msgstr "Paradev Otomasyonlar"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Paradev bulut çalışma alanları"
+
 msgid "Paradev components"
 msgstr "Paradev bileşenleri"
 
@@ -14362,6 +14386,9 @@ msgstr "Diskte bir klasör seçip proje olarak ekleyin"
 
 msgid "Pick a folder…"
 msgstr "Bir klasör seçin…"
+
+msgid "Pick a machine size"
+msgstr "Bir makine boyutu seçin"
 
 msgid "Pick a model"
 msgstr "Bir model seçin"
@@ -16425,6 +16452,9 @@ msgstr "Microsoft Teams kiracınızda mesaj gönderildiğinde veya kanal oluştu
 msgid "Run automations when Sentry issues change."
 msgstr "Sentry issue'ları değiştiğinde otomasyon çalıştırın."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Kodlama ajanlarını, dizüstünüz kapalıyken de çalışmaya devam eden bulut çalışma alanlarında çalıştırın. Team ve Ultra'ya dahildir."
+
 msgid "Run commands and navigate the application."
 msgstr "Komutları çalıştırın ve uygulamada gezinin."
 
@@ -16490,6 +16520,9 @@ msgstr "Ajanlarınızı masaüstünden, herhangi bir terminalden veya telefonunu
 
 msgid "Run your agents from your phone."
 msgstr "Ajanlarınızı telefonunuzdan çalıştırın."
+
+msgid "Run your coding agents in the cloud."
+msgstr "Kodlama ajanlarınızı bulutta çalıştırın."
 
 msgid "Run."
 msgstr "Çalıştırın."
@@ -17328,6 +17361,9 @@ msgstr "SSH ile host kur"
 msgid "Set up an automation"
 msgstr "Bir otomasyon kur"
 
+msgid "Set up once"
+msgstr "Bir kez kurun"
+
 msgid "Set up project on {hostName}"
 msgstr "{hostName} üzerinde projeyi kur"
 
@@ -17906,6 +17942,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Küçük"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Küçük, Orta veya Büyük, 8 vCPU ve 16 GB'a kadar. Kullanım belleğe göre artar."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Birikmiş işlerinizi eritin."
@@ -18291,6 +18330,9 @@ msgstr "Her yerden işe başlayın"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Görevler görünümünde Linear veya GitHub issue'larından doğrudan çalışma alanları başlatın; her birinde zaten çalışan bir ajan olur."
+
+msgid "Start your first cloud workspace."
+msgstr "İlk bulut çalışma alanınızı başlatın."
 
 msgid "Started"
 msgstr "Başladı"
@@ -20712,6 +20754,12 @@ msgstr "{planName} planına yükselt"
 msgid "Upgrade to Pro"
 msgstr "Pro'ya yükselt"
 
+msgid "Upgrade to Team"
+msgstr "Team'e yükselt"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Kuruluşunuzu yükseltin, GitHub'ı bağlayın ve yeni çalışma alanı ekranında Bulut'u seçin."
+
 msgid "Upgrade your plan"
 msgstr "Planınızı yükseltin"
 
@@ -21191,9 +21239,6 @@ msgstr "San Francisco'da mühendis arıyoruz. Mühendislerin kodlama ajanların�
 msgid "We're hiring in San Francisco"
 msgstr "San Francisco'da işe alıyoruz"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Bulut ürünümüzü şekillendirmeye yardımcı olacak geliştirme ortakları arıyoruz. İş akışınızı anlatın; birlikte çalışma fırsatlarını değerlendirmek için sizinle iletişime geçelim."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Bu özelliği yeniden yapıyoruz. Yakında tekrar bakın."
 
@@ -21342,9 +21387,6 @@ msgstr "Ne geliştiriyoruz"
 msgid "What we've shipped"
 msgstr "Neler yayınladık"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Bulutta Paradev ile ne geliştirmek istersiniz?"
-
 msgid "What would you like to know?"
 msgstr "Ne öğrenmek istersiniz?"
 
@@ -21462,9 +21504,6 @@ msgstr "Yazı logosu, siyah"
 
 msgid "Wordmark, white"
 msgstr "Yazı logosu, beyaz"
-
-msgid "Work email"
-msgstr "İş e-postası"
 
 msgid "Work from tickets"
 msgstr "Biletlerden çalışma"
