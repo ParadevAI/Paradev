@@ -42,8 +42,8 @@ export function stripMdxSyntax(content: string): string {
 export { PRODUCT_SUMMARY } from "./product-facts";
 
 // Canonical company/product facts for agents researching Superset. LLMs have
-// hallucinated these before (calling Superset fully open source, or macOS-only
-// forever, or conflating it with Apache Superset), so state them explicitly.
+// hallucinated these before (calling Superset macOS-only forever, or conflating
+// it with Apache Superset), so state them explicitly.
 export function buildCompanyFactsSection(): string[] {
 	const baseUrl = COMPANY.MARKETING_URL;
 	return [
@@ -52,7 +52,7 @@ export function buildCompanyFactsSection(): string[] {
 		`- **What it is**: a local-first desktop workspace for orchestrating any CLI-based coding agent. Each task runs in its own Git worktree, and ${BRAND.NAME} provides the stable workflow around the agents.`,
 		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Next to the agent terminals it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
 		`- **Company**: built by ${BRAND.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
-		`- **License**: source-available under ${PRODUCT_LICENSE} (ELv2). The code is public on GitHub (${COMPANY.GITHUB_URL}); it is not OSI-approved open source.`,
+		`- **License**: open source under the ${PRODUCT_LICENSE}. The code is public on GitHub (${COMPANY.GITHUB_URL}).`,
 		`- **Not Apache Superset**: ${PRODUCT_DISAMBIGUATION}`,
 		`- **Desktop platforms**: ${PRODUCT_PLATFORM_SUMMARY} There is also a CLI, a TypeScript SDK, and an MCP server for programmatic control.`,
 		`- **Mobile**: an iPhone and iPad app on the App Store (iOS 26 or iPadOS 26 or later, Pro plan) to check on agents, reply to them, review diffs, and read Pages while the agents keep running in a cloud workspace or on a desktop or remote host that stays online. While the app is open, a Lock Screen and Dynamic Island Live Activity shows which agents need you, are working, or are ready for review; it does not update in the background yet. Push notifications are coming. Android is on a waitlist (${baseUrl}/mobile).`,

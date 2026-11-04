@@ -91,4 +91,4 @@ The workspace must be `ready`; otherwise the ticket request fails with a `412`.
 
 ## License
 
-Apache-2.0
+MIT
