@@ -430,11 +430,17 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
 				const replaced = parsed.resume?.replacesSessionId;
+				const replacedRow = replaced ? options.sessions.get(replaced) : null;
 				const replay =
-					replaced && options.sessions.get(replaced)?.scopeId === parsed.scopeId
+					replaced && replacedRow?.scopeId === parsed.scopeId
 						? replaySession(replaced)
 						: null;
 				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
+				const modeId =
+					parsed.modeId ??
+					(replay?.ok && replacedRow?.harness === parsed.harness
+						? replay.snapshot.session?.modeId
+						: undefined);
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
@@ -447,7 +453,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						scopeId: parsed.scopeId,
 						harness: parsed.harness,
 						cwd: parsed.cwd,
-						modeId: parsed.modeId,
+						modeId,
 						modelId: parsed.modelId,
 						resume: parsed.resume,
 						terminalId: parsed.terminalId,
