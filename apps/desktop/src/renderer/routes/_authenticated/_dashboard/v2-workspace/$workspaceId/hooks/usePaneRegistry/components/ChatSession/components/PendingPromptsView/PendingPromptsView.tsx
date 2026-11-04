@@ -10,15 +10,22 @@ import { UserMessageRow } from "../Transcript/components/UserMessageRow";
 const NOTHING = () => {};
 const DELIVERING = { failed: false, onRetry: NOTHING, onDiscard: NOTHING };
 
-export function LaunchPromptView({ prompt }: { prompt: UserContent[] }) {
-	const item = useMemo(
-		(): UserMessage => ({
-			id: "launch-prompt",
-			kind: "user_message",
-			startedAtMs: 0,
-			content: prompt,
-		}),
-		[prompt],
+export function PendingPromptsView({
+	prompts,
+}: {
+	prompts: readonly UserContent[][];
+}) {
+	const items = useMemo(
+		() =>
+			prompts.map(
+				(content, index): UserMessage => ({
+					id: `pending-prompt-${index}`,
+					kind: "user_message",
+					startedAtMs: 0,
+					content,
+				}),
+			),
+		[prompts],
 	);
 	return (
 		<div
@@ -28,13 +35,15 @@ export function LaunchPromptView({ prompt }: { prompt: UserContent[] }) {
 			)}
 		>
 			<div className={cn(CHAT_COLUMN_CLASSNAME, "flex flex-col pt-4 pb-8")}>
-				<div className="px-4 pb-1">
-					<UserMessageRow
-						harness={undefined}
-						item={item}
-						pending={DELIVERING}
-					/>
-				</div>
+				{items.map((item) => (
+					<div className="px-4 pb-1" key={item.id}>
+						<UserMessageRow
+							harness={undefined}
+							item={item}
+							pending={DELIVERING}
+						/>
+					</div>
+				))}
 			</div>
 		</div>
 	);
