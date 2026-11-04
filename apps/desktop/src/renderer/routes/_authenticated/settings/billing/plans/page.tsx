@@ -4,6 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import {
+	advertisedGbMinutesPerSeat,
 	familyForPlan,
 	gbHourPackPricePerGbHour,
 	offersYearlyDiscount,
@@ -435,7 +436,7 @@ function PlansPage() {
 		plan: PlanCardData,
 	): ComparisonValue | string => {
 		if (row.cloudGbHours && plan.family) {
-			const gbMinutes = plan.family.gbMinutesPerSeat;
+			const gbMinutes = advertisedGbMinutesPerSeat(plan.family);
 			return gbMinutes ? formatNumber(gbMinutes / 60) : null;
 		}
 		if (row.cloudPack && plan.family) {
