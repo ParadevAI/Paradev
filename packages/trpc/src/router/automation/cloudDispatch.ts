@@ -106,6 +106,7 @@ export async function runInCloud(
 		branch: launch.branch,
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
 		chat,
+		tags: automation.tags,
 		machineSize: (
 			await resolveMachineSize(
 				automation.organizationId,
