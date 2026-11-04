@@ -1,8 +1,8 @@
 ---
 title: "Best IDE for OpenAI Codex in 2026: Where to Run It"
-description: "The best places to run OpenAI Codex in 2026, from the CLI and IDE extension to the Codex cloud app, Conductor, and Paradev for parallel worktree sessions."
+description: "The best places to run OpenAI Codex in 2026, from the CLI and IDE extension to the Codex cloud app and Paradev for parallel worktree sessions."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-04
 type: "roundup"
 competitors:
   - vs-code
@@ -33,7 +33,7 @@ This guide covers each option, including how to get parallel Codex runs with Git
 | **Codex IDE extension** | Editing alongside Codex | Limited | In-editor, single working copy |
 | **Codex cloud / app** | Fire-and-forget parallel tasks | Yes -- isolated cloud sandboxes | Runs in OpenAI's cloud, tied to a plan |
 | **Cursor** | AI editor that can run Codex-style agents | Local worktrees (its own agents) | Centered on Cursor's own models |
-| **Conductor** | A focused Mac app for a few agents | Yes -- worktrees | macOS only |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Yes -- worktrees | macOS only |
 
 ## Where You Can Run Codex
 
@@ -65,7 +65,7 @@ For the direct comparison, see [Paradev vs Cursor](/compare/superset-vs-cursor).
 
 ### Conductor
 
-Conductor is a macOS app that runs Codex (along with Claude Code, Cursor, and OpenCode) in parallel, each in an isolated Git worktree, with a review-and-merge flow. It is a focused way to run a few agents in parallel on a Mac. It is macOS only.
+Conductor is a macOS app that runs Codex (along with Claude Code, Cursor, and OpenCode) in parallel, each in an isolated Git worktree, with a review-and-merge flow. It is macOS only. Conductor is joining Meta. Since November 4, 2026, it takes no new sign-ups, and you can no longer download the app. Conductor Cloud shuts down on November 20, 2026, and the Mac app gets only new models and critical bug fixes until early 2027. Existing users can follow the guides to [migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 For the direct comparison, see [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -78,7 +78,7 @@ Paradev runs the Codex CLI as a first-class agent, using separate Git worktrees 
 - For one task or a scriptable/SSH setup, use the Codex CLI.
 - To edit alongside Codex, use the IDE extension.
 - For fire-and-forget parallel tasks in the cloud, use Codex cloud.
-- For parallel local Codex runs in separate worktrees, use a workspace like Paradev or Conductor.
+- For parallel local Codex runs in separate worktrees, use a workspace like Paradev.
 
 ## Best Picks by Use Case
 
@@ -94,9 +94,9 @@ OpenAI's cloud sandboxes run multiple tasks in parallel without using your machi
 
 Paradev gives every Codex task its own worktree on your own machine, or its own cloud workspace, with review and orchestration built in.
 
-### Best focused Mac app: Conductor
+### Conductor status
 
-Conductor is a polished choice if Codex, Claude Code, and Cursor are your agents and you are on macOS.
+Conductor is joining Meta and is closed to new users. Existing users can keep using the Mac app while it winds down.
 
 ## Verdict
 
