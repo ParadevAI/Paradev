@@ -220,6 +220,7 @@ msgstr "{0, plural, one {# проєкт} few {# проєкти} many {# проє
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# відповідь} few {# відповіді} many {# відповідей} other {# відповіді}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1417,6 +1418,9 @@ msgstr "{workspaceName}: хост недоступний"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: не вдалося виконати очищення"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за користувача в разі річної оплати"
@@ -5252,6 +5256,9 @@ msgstr "Контекстне вікно: використано {percent}"
 msgid "Continue"
 msgstr "Продовжити"
 
+msgid "Continue from {toolNames}"
+msgstr "Продовжити з {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Продовжте в браузері"
 
@@ -8973,6 +8980,9 @@ msgstr "Елементи форм і компонування полів"
 msgid "Forward"
 msgstr "Уперед"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "Знайдено: {worktreeLabel} ({repoLabel}). Гілки та незакомічені зміни залишаться як є."
+
 msgid "Found 12 tooltip call sites"
 msgstr "Знайдено 12 місць виклику підказок"
 
@@ -9874,6 +9884,9 @@ msgstr "Важливо"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Імпортовано {imported} з {0} worktree: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "Імпортовано {imported} з {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Імпортовано {joinedMessages}"

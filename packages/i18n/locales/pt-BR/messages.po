@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# projeto} other {# projetos}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# resposta} other {# respostas}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: o host está indisponível"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: o teardown falhou"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} por usuário, cobrança anual"
@@ -5258,6 +5262,9 @@ msgstr "Janela de contexto: {percent} usado"
 msgid "Continue"
 msgstr "Continuar"
 
+msgid "Continue from {toolNames}"
+msgstr "Continuar de {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Continue no seu navegador"
 
@@ -8979,6 +8986,9 @@ msgstr "Controles de formulário e composição de campos"
 msgid "Forward"
 msgstr "Avançar"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "Encontrado: {worktreeLabel} em {repoLabel}. Branches e alterações não commitadas continuam como estão."
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 pontos de chamada de tooltip encontrados"
 
@@ -9880,6 +9890,9 @@ msgstr "Importante"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Importadas {imported} de {0} worktrees: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "Importadas {imported} de {worktreeCount} worktrees: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Importado: {joinedMessages}"

@@ -32,6 +32,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { GhAuthDialog } from "../components/GhAuthDialog";
 import { OnboardingTile } from "../components/OnboardingTile";
 import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
+import { ImportFromOtherToolsRow } from "./components/ImportFromOtherToolsRow";
 import {
 	ACQUISITION_SOURCE_EVENT,
 	type AcquisitionSourceAnswer,
@@ -225,6 +226,13 @@ function OnboardingProjectPage() {
 
 	return (
 		<div className="flex flex-col gap-3">
+			{isV2CloudEnabled && (
+				<ImportFromOtherToolsRow
+					disabled={busy}
+					onBusyChange={setBusy}
+					onImported={finish}
+				/>
+			)}
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				<OnboardingTile
 					icon={<LuFolderOpen />}

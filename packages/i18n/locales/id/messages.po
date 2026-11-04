@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# proyek} other {# proyek}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {# balasan}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: host tidak tersedia"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown gagal"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} other {# worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per pengguna, ditagih tahunan"
@@ -5258,6 +5262,9 @@ msgstr "Jendela konteks: {percent} terpakai"
 msgid "Continue"
 msgstr "Lanjutkan"
 
+msgid "Continue from {toolNames}"
+msgstr "Lanjutkan dari {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Lanjutkan di browser Anda"
 
@@ -8979,6 +8986,9 @@ msgstr "Kontrol form dan komposisi field"
 msgid "Forward"
 msgstr "Maju"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "Ditemukan {worktreeLabel} di {repoLabel}. Branch dan perubahan yang belum di-commit tetap apa adanya."
+
 msgid "Found 12 tooltip call sites"
 msgstr "Menemukan 12 call site tooltip"
 
@@ -9880,6 +9890,9 @@ msgstr "Penting"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Mengimpor {imported} dari {0} worktree: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "Mengimpor {imported} dari {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Mengimpor {joinedMessages}"

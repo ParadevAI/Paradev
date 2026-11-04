@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# project} other {# projecten}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# reactie} other {# reacties}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: host is niet beschikbaar"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown mislukt"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per gebruiker, jaarlijks gefactureerd"
@@ -5258,6 +5262,9 @@ msgstr "Contextvenster: {percent} gebruikt"
 msgid "Continue"
 msgstr "Doorgaan"
 
+msgid "Continue from {toolNames}"
+msgstr "Verdergaan vanuit {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Ga verder in je browser"
 
@@ -8979,6 +8986,9 @@ msgstr "Formulierbesturing en veldsamenstelling"
 msgid "Forward"
 msgstr "Vooruit"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "{worktreeLabel} gevonden in {repoLabel}. Branches en niet-gecommitte wijzigingen blijven zoals ze zijn."
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 tooltip-aanroepplekken gevonden"
 
@@ -9880,6 +9890,9 @@ msgstr "Belangrijk"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "{imported} van {0} worktrees geïmporteerd: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "{imported} van {worktreeCount} worktrees geïmporteerd: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "{joinedMessages} geïmporteerd"

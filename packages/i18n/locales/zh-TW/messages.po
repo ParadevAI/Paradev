@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# 個專案} other {# 個專案}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {# 則回覆}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}：主機不可用"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}：清理失敗"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {#個worktree} other {#個worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "每使用者{yearlyTotal}，按年計費"
@@ -5258,6 +5262,9 @@ msgstr "上下文視窗：已使用 {percent}"
 msgid "Continue"
 msgstr "繼續"
 
+msgid "Continue from {toolNames}"
+msgstr "從 {toolNames} 繼續"
+
 msgid "Continue in your browser"
 msgstr "請在瀏覽器中繼續"
 
@@ -8979,6 +8986,9 @@ msgstr "表單控制項與欄位組合"
 msgid "Forward"
 msgstr "前進"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "在{repoLabel}中找到{worktreeLabel}。分支與未提交的變更保持不變。"
+
 msgid "Found 12 tooltip call sites"
 msgstr "找到12處tooltip呼叫"
 
@@ -9880,6 +9890,9 @@ msgstr "重要"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "已匯入{0}個worktree中的{imported}個：{1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "已匯入{worktreeCount}個worktree中的{imported}個：{firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "已匯入{joinedMessages}"

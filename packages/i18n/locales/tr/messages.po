@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# proje} other {# proje}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {# yanıt}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: host kullanılamıyor"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: kapatma başarısız"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} other {# worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "Kullanıcı başına {yearlyTotal}, yıllık faturalandırılır"
@@ -5258,6 +5262,9 @@ msgstr "Bağlam penceresi: {percent} kullanıldı"
 msgid "Continue"
 msgstr "Devam et"
 
+msgid "Continue from {toolNames}"
+msgstr "{toolNames} üzerinden devam et"
+
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
@@ -8979,6 +8986,9 @@ msgstr "Form denetimleri ve alan kompozisyonu"
 msgid "Forward"
 msgstr "İleri"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "{repoLabel} içinde {worktreeLabel} bulundu. Branch'ler ve commit edilmemiş değişiklikler olduğu gibi kalır."
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 tooltip çağrı noktası bulundu"
 
@@ -9880,6 +9890,9 @@ msgstr "Önemli"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "{0} worktree'den {imported} tanesi içe aktarıldı: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "{worktreeCount} worktree'den {imported} tanesi içe aktarıldı: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "İçe aktarıldı: {joinedMessages}"

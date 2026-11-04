@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektów} other {
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} other {# odpowiedzi}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: host jest niedostępny"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: sprzątanie nie powiodło się"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} za użytkownika, rozliczenie roczne"
@@ -5258,6 +5262,9 @@ msgstr "Okno kontekstu: wykorzystano {percent}"
 msgid "Continue"
 msgstr "Kontynuuj"
 
+msgid "Continue from {toolNames}"
+msgstr "Kontynuuj z {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Kontynuuj w przeglądarce"
 
@@ -8979,6 +8986,9 @@ msgstr "Kontrolki formularza i kompozycja pól"
 msgid "Forward"
 msgstr "Dalej"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "Znaleziono: {worktreeLabel} ({repoLabel}). Gałęzie i niezatwierdzone zmiany pozostają bez zmian."
+
 msgid "Found 12 tooltip call sites"
 msgstr "Znaleziono 12 miejsc wywołania tooltipa"
 
@@ -9880,6 +9890,9 @@ msgstr "Ważne"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Zaimportowano {imported} z {0} worktree: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "Zaimportowano {imported} z {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Zaimportowano {joinedMessages}"

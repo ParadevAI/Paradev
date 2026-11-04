@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# проект} few {# проекта} many {# прое
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# ответ} few {# ответа} many {# ответов} other {# ответа}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: хост недоступен"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: не удалось выполнить очистку"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за пользователя при годовой оплате"
@@ -5258,6 +5262,9 @@ msgstr "Контекстное окно: использовано {percent}"
 msgid "Continue"
 msgstr "Продолжить"
 
+msgid "Continue from {toolNames}"
+msgstr "Продолжить из {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Продолжите в браузере"
 
@@ -8979,6 +8986,9 @@ msgstr "Элементы формы и композиция полей"
 msgid "Forward"
 msgstr "Вперёд"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "Найдено: {worktreeLabel} ({repoLabel}). Ветки и незакоммиченные изменения останутся как есть."
+
 msgid "Found 12 tooltip call sites"
 msgstr "Найдено 12 мест вызова tooltip"
 
@@ -9880,6 +9890,9 @@ msgstr "Важно"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Импортировано {imported} из {0} worktree: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "Импортировано {imported} из {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Импортировано: {joinedMessages}"

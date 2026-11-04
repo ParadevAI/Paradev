@@ -226,6 +226,7 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektu} other {# 
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# odpověď} few {# odpovědi} many {# odpovědí} other {# odpovědí}}"
 
+#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1423,6 +1424,9 @@ msgstr "{workspaceName}: host není dostupný"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown selhal"
+
+msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} na uživatele, účtováno ročně"
@@ -5258,6 +5262,9 @@ msgstr "Kontextové okno: využito {percent}"
 msgid "Continue"
 msgstr "Pokračovat"
 
+msgid "Continue from {toolNames}"
+msgstr "Pokračovat z {toolNames}"
+
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
@@ -8979,6 +8986,9 @@ msgstr "Prvky formuláře a skládání polí"
 msgid "Forward"
 msgstr "Vpřed"
 
+msgid "Found {worktreeLabel} in {repoLabel}. Branches and uncommitted changes stay as they are."
+msgstr "Nalezeno: {worktreeLabel} ({repoLabel}). Větve a necommitnuté změny zůstanou beze změny."
+
 msgid "Found 12 tooltip call sites"
 msgstr "Nalezeno 12 volání tooltipu"
 
@@ -9880,6 +9890,9 @@ msgstr "Důležité"
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Importováno {imported} z {0} worktree: {1}"
+
+msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
+msgstr "Importováno {imported} z {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Importováno: {joinedMessages}"
