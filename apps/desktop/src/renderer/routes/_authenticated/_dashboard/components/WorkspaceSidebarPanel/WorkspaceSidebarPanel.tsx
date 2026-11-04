@@ -25,7 +25,7 @@ export function WorkspaceSidebarPanel({
 	className?: string;
 	collapsedWidth?: number;
 	slides?: boolean;
-	children: ReactNode | ((hidden: boolean) => ReactNode);
+	children: ReactNode;
 }) {
 	const width = useWorkspaceSidebarStore((s) => s.width);
 	const lastExpandedWidth = useWorkspaceSidebarStore(
@@ -40,7 +40,7 @@ export function WorkspaceSidebarPanel({
 		maxWidth,
 	);
 
-	const renderPanel = (shownWidth: number, hidden: boolean) => (
+	const renderPanel = (shownWidth: number) => (
 		<ResizablePanel
 			width={shownWidth}
 			onWidthChange={(next) => setWidth(Math.min(next, maxWidth))}
@@ -51,15 +51,12 @@ export function WorkspaceSidebarPanel({
 			className={className}
 			onDoubleClickHandle={() => setWidth(DEFAULT_WORKSPACE_SIDEBAR_WIDTH)}
 		>
-			{typeof children === "function" ? children(hidden) : children}
+			{children}
 		</ResizablePanel>
 	);
 
 	if (!slides) {
-		return renderPanel(
-			isCollapsed ? collapsedWidth : expandedWidth,
-			isCollapsed,
-		);
+		return renderPanel(isCollapsed ? collapsedWidth : expandedWidth);
 	}
 
 	return (
@@ -69,7 +66,7 @@ export function WorkspaceSidebarPanel({
 			edge="left"
 			alwaysMounted
 		>
-			{(_fill, hidden) => renderPanel(expandedWidth, hidden)}
+			{() => renderPanel(expandedWidth)}
 		</SidebarSlide>
 	);
 }

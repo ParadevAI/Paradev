@@ -292,7 +292,7 @@ function DashboardLayout() {
 										slides
 										className="border-r-0"
 									>
-										{(hidden) => <DashboardSidebar isCollapsed={hidden} />}
+										<DashboardSidebar />
 									</WorkspaceSidebarPanel>
 									<div
 										className={cn(
