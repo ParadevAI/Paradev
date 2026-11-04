@@ -39,7 +39,7 @@ export function ModeCard({
 			/>
 			<div
 				className={cn(
-					"relative aspect-[5/3] overflow-hidden border-b transition-colors duration-500",
+					"relative aspect-[3/2] overflow-hidden border-b transition-colors duration-500",
 					selected
 						? "border-border bg-foreground/[0.06]"
 						: "border-border/60 bg-foreground/[0.03]",
