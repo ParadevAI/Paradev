@@ -317,7 +317,7 @@ export const SUPERSET_MANAGED_SKILLS = [
 	{
 		name: "integrations",
 		description:
-			"Add, configure, and inspect external integrations like GitHub or Slack",
+			"Discover and call tools exposed by connected integrations like GitHub or Slack",
 	},
 	{
 		name: "orchestrate",

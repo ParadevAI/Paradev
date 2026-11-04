@@ -93,7 +93,10 @@ describe("isServerSatisfiedExternally", () => {
 
 describe("SUPERSET_MANAGED_SKILLS", () => {
 	test("includes every skill bundled under plugins/superset/skills", () => {
-		const skillsDir = path.resolve(process.cwd(), "plugins/superset/skills");
+		const skillsDir = path.resolve(
+			import.meta.dir,
+			"../../../../plugins/superset/skills",
+		);
 		const bundledSkills = fs
 			.readdirSync(skillsDir, { withFileTypes: true })
 			.filter(
