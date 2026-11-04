@@ -8,10 +8,7 @@ export function CloudGraphic() {
 	const { t } = useLingui();
 
 	return (
-		<div
-			aria-hidden="true"
-			className="relative mt-12 py-20 sm:mt-16 sm:py-28"
-		>
+		<div aria-hidden="true" className="relative mt-12 py-20 sm:mt-16 sm:py-28">
 			<CloudSky className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2" />
 			<div className="relative mx-auto max-w-md">
 				<div className="overflow-hidden rounded-lg border border-border bg-background shadow-2xl shadow-black/60">

@@ -17,7 +17,10 @@ export function CloudSky({ className = "" }: CloudSkyProps) {
 	const reducedMotion = useReducedMotion();
 
 	return (
-		<div aria-hidden="true" className={`pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_75%,transparent)] ${className}`}>
+		<div
+			aria-hidden="true"
+			className={`pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_75%,transparent)] ${className}`}
+		>
 			<StarField />
 			<div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,black,black_35%,transparent_85%)]">
 				<Dithering
