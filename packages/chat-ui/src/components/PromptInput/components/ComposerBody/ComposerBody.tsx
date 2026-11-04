@@ -1321,7 +1321,7 @@ export function ComposerBody({
 							: t({ message: "Send message" })
 					}
 					title={
-						status === "streaming"
+						status === "streaming" && onStop
 							? t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}

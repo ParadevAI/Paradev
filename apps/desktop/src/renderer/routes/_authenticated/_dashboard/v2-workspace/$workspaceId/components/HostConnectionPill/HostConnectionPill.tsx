@@ -36,7 +36,6 @@ export function HostConnectionPill() {
 	} = useHostReachability(hostUrl);
 	const { failing: checksFailing, retry: retryChecks } =
 		useChatSessionChecksFailing(hostUrl);
-	const isCheckFailing = checksFailing && !isDegraded && !isAccessDenied;
 	const { hosts: hostRows } = useKnownHosts();
 	const { targets: sandboxes, usageRefusal } = useSandboxAccess();
 	const isSandbox = sandboxes.some(
@@ -44,6 +43,8 @@ export function HostConnectionPill() {
 	);
 	const isLocalRestartInFlight =
 		workspace.hostId === machineId && hostServiceStatus === "starting";
+	const isCheckFailing =
+		checksFailing && !isDegraded && !isAccessDenied && !isLocalRestartInFlight;
 	const isWakingUp = isSandbox && isReconnecting && !isAccessDenied;
 	const settingsHostId = isSandbox ? null : workspace.hostId;
 	const hostRow = hostRows.find(

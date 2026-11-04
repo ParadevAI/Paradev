@@ -51,12 +51,7 @@ export function RunningTasksChip({
 	return (
 		<Popover onOpenChange={setOpen} open={open}>
 			<PopoverTrigger asChild>
-				<button
-					aria-label={label}
-					className={COMPOSER_CHIP_CLASSNAME}
-					title={label}
-					type="button"
-				>
+				<button className={COMPOSER_CHIP_CLASSNAME} title={label} type="button">
 					<Icon
 						className={cn(
 							"size-3 shrink-0 animate-pulse",
@@ -64,10 +59,11 @@ export function RunningTasksChip({
 						)}
 					/>
 					<span className="hidden truncate @[28rem]:inline">{label}</span>
-					<span className="tabular-nums @[28rem]:hidden">
+					<span aria-hidden="true" className="tabular-nums @[28rem]:hidden">
 						{formatNumber(count)}
 					</span>
-					<span className="shrink-0 text-muted-foreground/60 tabular-nums">
+					<span className="sr-only @[28rem]:hidden">{label}</span>
+					<span className="shrink-0 text-muted-foreground/60 tabular-nums @max-[16rem]:hidden">
 						{formatAge(oldestStartedAtMs, now)}
 					</span>
 				</button>

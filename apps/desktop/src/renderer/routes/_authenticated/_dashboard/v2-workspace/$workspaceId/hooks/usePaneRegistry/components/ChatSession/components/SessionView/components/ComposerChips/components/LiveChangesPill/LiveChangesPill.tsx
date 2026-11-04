@@ -42,7 +42,6 @@ export function LiveChangesPill({
 	});
 	return (
 		<button
-			aria-label={label}
 			className={COMPOSER_CHIP_CLASSNAME}
 			disabled={!filter || !openDiff}
 			onClick={() => filter && openDiff?.(filter)}
@@ -51,9 +50,10 @@ export function LiveChangesPill({
 		>
 			<FileDiff className="size-3 shrink-0" />
 			<span className="hidden truncate @[28rem]:inline">{label}</span>
-			<span className="tabular-nums @[28rem]:hidden">
+			<span aria-hidden="true" className="tabular-nums @[28rem]:hidden">
 				{formatNumber(changedCount)}
 			</span>
+			<span className="sr-only @[28rem]:hidden">{label}</span>
 			<span className="shrink-0 font-mono tabular-nums">
 				<DiffStatText
 					additions={totals.additions}
