@@ -631,11 +631,13 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			if (!forked) return null;
 			const source = options.sessions.get(parsed.sessionId);
 			if (!source) return null;
+			const harness = parsed.harness ?? source.harness;
 			return this.createSession({
 				commandId: parsed.commandId,
 				scopeId: source.scopeId,
 				cwd: parsed.cwd,
-				harness: parsed.harness ?? source.harness,
+				harness,
+				...(harness === source.harness ? { modeId: live.state.modeId } : {}),
 				resume: { harnessSessionId: forked },
 				terminalId: parsed.terminalId ?? live.terminalId,
 			});

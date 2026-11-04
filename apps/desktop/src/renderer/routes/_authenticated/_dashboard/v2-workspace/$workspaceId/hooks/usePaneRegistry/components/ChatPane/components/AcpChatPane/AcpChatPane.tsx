@@ -21,6 +21,7 @@ import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnres
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
+import { readSavedChatMode } from "../../../../utils/savedChatMode";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -34,7 +35,6 @@ import type {
 } from "../../../ChatSession/types";
 import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPosition";
 import { useForkChat } from "../../hooks/useForkChat";
-import { readSavedChatMode } from "../../utils/savedChatMode";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
