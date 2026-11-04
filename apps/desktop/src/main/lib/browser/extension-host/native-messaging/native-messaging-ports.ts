@@ -4,7 +4,11 @@ import {
 	type NativePortEvent,
 } from "shared/browser-extension-native-messaging";
 import { extensionOrigin, type NativeHostLookup } from "./host-manifest";
-import type { NativeHostProcess, startNativeHost } from "./native-host-process";
+import {
+	MAX_PENDING_BYTES,
+	type NativeHostProcess,
+	type startNativeHost,
+} from "./native-host-process";
 
 /** One extension context: a service worker or an extension page's frame. */
 export interface PortOwner {
@@ -19,11 +23,12 @@ interface Port {
 	owner: PortOwner;
 	host: NativeHostProcess | null;
 	queued: string[];
+	queuedBytes: number;
 	release: () => void;
 }
 
 export interface NativeMessagingPortsDeps {
-	declaresNativeMessaging(extensionId: string): boolean;
+	allowsNativeMessaging(extensionId: string): boolean;
 	findHost(name: unknown, extensionId: string): Promise<NativeHostLookup>;
 	startHost: typeof startNativeHost;
 }
@@ -51,41 +56,54 @@ export function createNativeMessagingPorts(deps: NativeMessagingPortsDeps) {
 			owner,
 			host: null,
 			queued: [],
+			queuedBytes: 0,
 			release: owner.keepAlive(),
 		};
 		ports.set(id, port);
-		const lookup = deps.declaresNativeMessaging(owner.extensionId)
-			? await deps.findHost(name, owner.extensionId)
-			: ({ ok: false, error: NATIVE_MESSAGING_ERRORS.forbidden } as const);
-		if (ports.get(id) !== port) return;
-		if (!lookup.ok) return end(id, lookup.error);
-		port.host = deps.startHost(
-			{
-				hostPath: lookup.host.path,
-				origin: extensionOrigin(owner.extensionId),
-			},
-			{
-				onMessage: (json) => owner.send(portId, { type: "message", json }),
-				onClose: (error) => {
-					port.host = null;
-					end(id, error);
+		try {
+			const lookup = deps.allowsNativeMessaging(owner.extensionId)
+				? await deps.findHost(name, owner.extensionId)
+				: ({ ok: false, error: NATIVE_MESSAGING_ERRORS.forbidden } as const);
+			if (ports.get(id) !== port) return;
+			if (!lookup.ok) return end(id, lookup.error);
+			const host = deps.startHost(
+				{
+					hostPath: lookup.host.path,
+					origin: extensionOrigin(owner.extensionId),
 				},
-			},
-		);
-		for (const json of port.queued.splice(0)) port.host.post(json);
+				{
+					onMessage: (json) => owner.send(portId, { type: "message", json }),
+					onClose: (error) => {
+						port.host = null;
+						end(id, error);
+					},
+				},
+			);
+			port.host = host;
+			for (const json of port.queued.splice(0)) host.post(json);
+		} catch (error) {
+			console.error("[native-messaging] connect failed:", error);
+			end(id, NATIVE_MESSAGING_ERRORS.failedToStart);
+		}
 	};
 
 	const post = (owner: PortOwner, portId: number, json: unknown) => {
 		const port = ports.get(idOf(owner, portId));
 		if (!port) return;
-		if (
-			typeof json !== "string" ||
-			json.length > MAX_EXTENSION_MESSAGE_LENGTH
-		) {
+		if (typeof json !== "string") {
 			return end(idOf(owner, portId), NATIVE_MESSAGING_ERRORS.io);
 		}
-		if (port.host) port.host.post(json);
-		else port.queued.push(json);
+		const bytes = Buffer.byteLength(json);
+		if (bytes > MAX_EXTENSION_MESSAGE_LENGTH) {
+			return end(idOf(owner, portId), NATIVE_MESSAGING_ERRORS.io);
+		}
+		if (port.host) return port.host.post(json);
+		port.queuedBytes += bytes;
+		// The host lookup can stall; an extension could otherwise queue without limit.
+		if (port.queuedBytes > MAX_PENDING_BYTES) {
+			return end(idOf(owner, portId), NATIVE_MESSAGING_ERRORS.io);
+		}
+		port.queued.push(json);
 	};
 
 	const closeWhere = (matches: (owner: PortOwner) => boolean) => {

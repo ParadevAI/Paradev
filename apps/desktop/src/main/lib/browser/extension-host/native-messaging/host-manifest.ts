@@ -60,22 +60,47 @@ export function nativeHostDirectories({
 	return [];
 }
 
-/** Registry keys whose default value is a manifest path, in Chrome's order. */
-export function windowsHostRegistryKeys(name: string): string[] {
+/**
+ * Registry keys whose default value is a manifest path, in Chrome's order:
+ * per root, the 32-bit view and then the 64-bit one.
+ */
+export function windowsHostRegistryKeys(name: string): [string, string][] {
 	return ["HKCU", "HKLM"].flatMap((root) =>
-		["Google\\Chrome", "Chromium"].map(
-			(browser) =>
+		["/reg:32", "/reg:64"].flatMap((view) =>
+			["Google\\Chrome", "Chromium"].map((browser): [string, string] => [
 				`${root}\\Software\\${browser}\\NativeMessagingHosts\\${name}`,
+				view,
+			]),
 		),
 	);
 }
 
-function queryRegistryDefault(key: string): Promise<string | null> {
+/** The default value in `reg query /ve` output, with REG_EXPAND_SZ expanded. */
+export function parseRegistryDefault(
+	stdout: string,
+	env: NodeJS.ProcessEnv = process.env,
+): string | null {
+	const match = /REG_(EXPAND_)?SZ\s+(.+)\r?$/m.exec(stdout);
+	const value = match?.[2]?.trim();
+	if (!value) return null;
+	if (!match?.[1]) return value;
+	return value.replace(
+		/%([^%]+)%/g,
+		(reference, variable: string) => env[variable] ?? reference,
+	);
+}
+
+function queryRegistryDefault([key, view]: [string, string]): Promise<
+	string | null
+> {
 	return new Promise((resolve) => {
-		execFile("reg", ["query", key, "/ve"], (error, stdout) => {
-			if (error) return resolve(null);
-			const value = /REG_(?:EXPAND_)?SZ\s+(.+)\r?$/m.exec(stdout)?.[1];
-			resolve(value?.trim() || null);
+		execFile("reg", ["query", key, "/ve", view], (error, stdout) => {
+			if (!error) return resolve(parseRegistryDefault(stdout));
+			// reg exits with 1 when the key or value does not exist.
+			if (error.code !== 1) {
+				console.warn(`[native-messaging] Cannot query ${key} ${view}:`, error);
+			}
+			resolve(null);
 		});
 	});
 }
@@ -147,7 +172,7 @@ async function manifestPaths(
 
 /**
  * Finds the host `name` for `extensionId`. The first manifest that exists
- * wins, as in Chrome; an invalid one stops the lookup.
+ * wins, as in Chrome; an invalid or unreadable one stops the lookup.
  */
 export async function findNativeHost(
 	name: unknown,
@@ -161,8 +186,11 @@ export async function findNativeHost(
 		let raw: string;
 		try {
 			raw = await readFile(manifestPath, "utf8");
-		} catch {
-			continue;
+		} catch (error) {
+			const code = (error as NodeJS.ErrnoException).code;
+			if (code === "ENOENT" || code === "ENOTDIR") continue;
+			console.warn(`[native-messaging] Cannot read ${manifestPath}:`, error);
+			return { ok: false, error: NATIVE_MESSAGING_ERRORS.notFound };
 		}
 		let host: NativeHost;
 		try {

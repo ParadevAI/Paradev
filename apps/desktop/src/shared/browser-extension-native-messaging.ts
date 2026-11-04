@@ -8,7 +8,7 @@ export type NativePortEvent =
 	| { type: "message"; json: string }
 	| { type: "disconnect"; error?: string };
 
-/** Chrome's limit for one message from an extension, as serialized JSON. */
+/** Chrome's limit for one message from an extension, in UTF-8 bytes of JSON. */
 export const MAX_EXTENSION_MESSAGE_LENGTH = 64 * 1024 * 1024;
 
 export const NATIVE_MESSAGING_ERRORS = {

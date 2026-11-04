@@ -53,3 +53,13 @@ test("a host message over 1 MB or not JSON closes the stream", () => {
 	atLimit.read(encodeNativeMessage(json));
 	expect(atLimit.messages).toEqual([json]);
 });
+
+test("a host message that is not valid UTF-8 closes the stream instead of arriving altered", () => {
+	const invalid = reader();
+	const body = Buffer.from([0x22, 0xff, 0x22]);
+	const header = Buffer.alloc(4);
+	header.writeUInt32LE(body.length, 0);
+	invalid.read(Buffer.concat([header, body]));
+	expect(invalid.messages).toEqual([]);
+	expect(invalid.errors).toHaveLength(1);
+});

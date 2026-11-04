@@ -29,12 +29,16 @@ export function extensionIdOf(url: string | undefined): string | null {
 	}
 }
 
-export function declaresNativeMessaging(
-	extension: Pick<Electron.Extension, "manifest"> | null | undefined,
+export interface NativeMessagingOptions {
+	/** The extension's permissions, including those granted at runtime. */
+	grantedAccess(extension: Electron.Extension): string[];
+}
+
+export function allowsNativeMessaging(
+	extension: Electron.Extension | null | undefined,
+	{ grantedAccess }: NativeMessagingOptions,
 ): boolean {
-	const permissions = (extension?.manifest as { permissions?: unknown })
-		?.permissions;
-	return Array.isArray(permissions) && permissions.includes("nativeMessaging");
+	return !!extension && grantedAccess(extension).includes("nativeMessaging");
 }
 
 /**
@@ -43,15 +47,21 @@ export function declaresNativeMessaging(
  * spawned by this process, as Chrome's browser process spawns them, so a host
  * that checks its parent sees this app.
  */
-export function serveNativeMessaging(session: Session): void {
+export function serveNativeMessaging(
+	session: Session,
+	options: NativeMessagingOptions,
+): void {
 	const locations = {
 		platform: process.platform,
 		home: homedir(),
 		appHostsDir: path.join(app.getPath("userData"), "NativeMessagingHosts"),
 	};
 	const ports = createNativeMessagingPorts({
-		declaresNativeMessaging: (extensionId) =>
-			declaresNativeMessaging(session.extensions.getExtension(extensionId)),
+		allowsNativeMessaging: (extensionId) =>
+			allowsNativeMessaging(
+				session.extensions.getExtension(extensionId),
+				options,
+			),
 		findHost: (name, extensionId) =>
 			findNativeHost(name, extensionId, locations),
 		startHost: startNativeHost,
@@ -65,10 +75,7 @@ export function serveNativeMessaging(session: Session): void {
 	) => {
 		switch (op) {
 			case "connect":
-				void ports.connect(owner, portId, arg).catch((error: unknown) => {
-					console.error("[native-messaging] connect failed:", error);
-					ports.disconnect(owner, portId);
-				});
+				void ports.connect(owner, portId, arg);
 				return;
 			case "post":
 				return ports.post(owner, portId, arg);
@@ -102,7 +109,11 @@ export function serveNativeMessaging(session: Session): void {
 					try {
 						const task = worker.startTask();
 						return () => task.end();
-					} catch {
+					} catch (error) {
+						console.warn(
+							`[native-messaging] Cannot keep worker ${versionId} alive:`,
+							error,
+						);
 						return () => {};
 					}
 				},
