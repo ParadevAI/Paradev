@@ -597,6 +597,16 @@ wedged every exec — the reason goldens ran at 32 GB. The internal golden runs
 the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
 
+**A resize does not reach a running session.** `sandbox.update({ resources })`
+changes the sandbox's configured size at once, but a running session keeps the
+vCPUs and memory it booted with; only the next session gets the new size. So
+`sandbox.vcpus` is the configured size, and what a running box has is
+`sandbox.currentSession().vcpus`. Checked on a probe box (2026-11-04): after a
+2 → 4 vCPU update the session still had `nproc` 2 and 4 GB; after stop and
+resume it had 4 and 8 GB, with its files kept and its processes gone. That is
+why `cloudWorkspace.setMachineSize` restarts a running box, and why
+`describeSandbox` reports the session's vCPUs.
+
 **A session ends; the sandbox does not.** A session stops at its timeout
 (`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a

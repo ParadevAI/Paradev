@@ -1039,6 +1039,7 @@ superset workspaces get --field branch   # inside a workspace
 		{ flag: "--visibility <just_me|org>", description: "Who sees a cloud workspace. Only its creator can change it." },
 		{ flag: "--add-label <name>", description: "Add a label to a cloud workspace, creating it when new. Repeatable." },
 		{ flag: "--remove-label <name>", description: "Remove a label from a cloud workspace. Repeatable." },
+		{ flag: "--machine-size <size>", description: "Resize a cloud workspace: `small`, `medium`, `large`, or `xlarge` and `2xlarge` where your plan includes them. A running sandbox restarts at the new size." },
 	]}
 	output="Workspace"
 >
@@ -1050,12 +1051,18 @@ On a cloud workspace every field is saved by the API, so it works while the
 sandbox is asleep. There, `--task-id` also takes a task slug and adds a link
 (a cloud workspace can link several tasks), and `--clear-task` removes them all.
 
+`--machine-size` is the one field that reaches the sandbox. A running sandbox
+restarts at the new size: files and uncommitted changes stay, but every
+terminal and agent on it ends, and agents resume when you open the workspace.
+A sleeping sandbox starts at the new size the next time it wakes.
+
 ```bash
 superset workspaces update ws_… --name "better-name"
 superset workspaces update ws_… --task-id tsk_…
 superset workspaces update ws_… --tag perf --tag infra
 superset workspaces update ws_… --clear-task
 superset workspaces update ws_… --add-label bug --visibility org
+superset workspaces update ws_… --machine-size xlarge
 ```
 </Command>
 
