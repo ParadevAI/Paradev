@@ -21,10 +21,11 @@ export default function SignUpPage() {
 		setError(null);
 
 		try {
-			await authClient.signIn.social({
+			const { error } = await authClient.signIn.social({
 				provider: "google",
 				callbackURL: env.NEXT_PUBLIC_WEB_URL,
 			});
+			if (error) throw error;
 		} catch (err) {
 			console.error("Sign up failed:", err);
 			setError(
@@ -41,10 +42,11 @@ export default function SignUpPage() {
 		setError(null);
 
 		try {
-			await authClient.signIn.social({
+			const { error } = await authClient.signIn.social({
 				provider: "github",
 				callbackURL: env.NEXT_PUBLIC_WEB_URL,
 			});
+			if (error) throw error;
 		} catch (err) {
 			console.error("Sign up failed:", err);
 			setError(
