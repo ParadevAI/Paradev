@@ -11,13 +11,18 @@ const finding = (host: HostAsSeenByCreator | null) => mock(async () => host);
 
 describe("decideCloudWorkspaceAccess", () => {
 	test("lets the creator's box into a host they own and opened", async () => {
-		expect(
-			await decideCloudWorkspaceAccess(
-				box,
-				hostId,
-				finding({ role: "owner", allowCloudWorkspaces: true }),
-			),
-		).toEqual({ allowed: true, userId: "user-1", workspaceId: "ws-1" });
+		const findHost = finding({ role: "owner", allowCloudWorkspaces: true });
+
+		expect(await decideCloudWorkspaceAccess(box, hostId, findHost)).toEqual({
+			allowed: true,
+			userId: "user-1",
+			workspaceId: "ws-1",
+		});
+		expect(findHost).toHaveBeenCalledWith({
+			userId: "user-1",
+			organizationId: "org-1",
+			machineId: "machine-1",
+		});
 	});
 
 	test("refuses a host its owner has not opened", async () => {
