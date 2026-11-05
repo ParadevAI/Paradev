@@ -5243,14 +5243,15 @@ msgstr "Контекстне вікно: використано {percent}"
 msgid "Continue"
 msgstr "Продовжити"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Продовжити"
+
 msgid "Continue in your browser"
 msgstr "Продовжте в браузері"
 
 msgid "Continue or fork session"
 msgstr "Продовжити сеанс або створити його форк"
-
-msgid "Continue the session the last run left"
-msgstr "Продовжити сеанс, що залишився після останнього запуску"
 
 msgid "Continue this chat on another login"
 msgstr "Продовжити цей чат під іншим логіном"
@@ -5283,9 +5284,6 @@ msgstr "Продовжити через Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Щоб продовжити сеанс агента, потрібен закріплений робочий простір"
-
-msgid "continuing the last session"
-msgstr "продовжуючи останній сеанс"
 
 msgid "Continuing…"
 msgstr "Продовження…"
@@ -6036,6 +6034,9 @@ msgstr "Не вдалося зберегти Dev"
 
 msgid "Couldn't save the routine"
 msgstr "Не вдалося зберегти рутину"
+
+msgid "Couldn't save your choice. Try again."
+msgstr "Не вдалося зберегти вибір. Спробуйте ще раз."
 
 msgid "Couldn't send comment"
 msgstr "Не вдалося надіслати коментар"
@@ -7459,6 +7460,12 @@ msgstr "Кожне у власній новій вкладці"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Щоранку о 8:00 переглядай учорашні невдалі запуски CI, визначай найпоширенішу причину збою та відкривай PR з виправленням."
+
+msgid "Each run makes its own"
+msgstr "Кожен запуск створює свій"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Кожен запуск починає нову розмову з агентом"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Кожне місце додає години свого тарифу до спільного пулу вашої команди:"
@@ -9273,6 +9280,9 @@ msgstr "Перейти на наступну сторінку в історії"
 msgid "Go home"
 msgstr "На головну"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Пройдіть кроки першого запуску ще раз. Проєкти й налаштування залишаться без змін."
+
 msgid "Go to home"
 msgstr "На головну"
 
@@ -9637,6 +9647,9 @@ msgstr "Як почати?"
 msgid "How do the paid plans work?"
 msgstr "Як працюють платні тарифи?"
 
+msgid "How do you want to work?"
+msgstr "Як ви хочете працювати?"
+
 msgid "How does pricing work?"
 msgstr "Як формується ціна?"
 
@@ -9693,6 +9706,9 @@ msgstr "Як ми захищаємо код"
 
 msgid "How we work"
 msgstr "Як ми працюємо"
+
+msgid "How you run agents"
+msgstr "Як ви запускаєте агентів"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Як ваші агенти входять в облікові записи в хмарних робочих просторах. Інші люди підключають власні підписки або ключі API; на цьому комп'ютері кожен агент і далі використовує вхід, який на ньому вже є."
@@ -9909,9 +9925,6 @@ msgstr "Покращений переглядач diff"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "у {0}"
-
-msgid "in a new session"
-msgstr "у новому сеансі"
 
 msgid "in a terminal on this host."
 msgstr "у терміналі на цьому хості."
@@ -16106,6 +16119,9 @@ msgstr "Перезапустити службу хоста"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Перезапустіть їх зараз, щоб перенести на {accountLabel}; кожен сеанс продовжить розмову з того місця, де зупинився."
 
+msgid "Restart onboarding"
+msgstr "Пройти онбординг заново"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
@@ -16283,6 +16299,9 @@ msgstr "Багаторазові інструкції, які ваші аген�
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Багаторазові запуски термінала. Натисніть скрипт, щоб змінити його, або перетягніть, щоб змінити порядок. Команди налаштування, запуску й очищення проєкту — це скрипти життєвого циклу."
+
+msgid "Reusing {keptName}"
+msgstr "Використовується {keptName}"
 
 msgid "Reveal in Finder"
 msgstr "Показати у Finder"
@@ -16618,8 +16637,14 @@ msgstr "Виконується під час створення нового р�
 msgid "Runs when a workspace is deleted."
 msgstr "Виконується під час видалення робочого простору."
 
+msgid "Same session"
+msgstr "Той самий сеанс"
+
 msgid "Same version as this app."
 msgstr "Та сама версія, що й у цього застосунку."
+
+msgid "Same workspace"
+msgstr "Той самий робочий простір"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO і провізіонінг SCIM"
@@ -18305,9 +18330,6 @@ msgstr "Почніть розмову, щоб тут з'явилися пові�
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Запускає новий сеанс агента з недавнім контекстом цього термінала. Джерелом істини залишаються файли робочого простору."
 
-msgid "Start a new agent session each run"
-msgstr "Починати новий сеанс агента під час кожного запуску"
-
 msgid "Start a new chat"
 msgstr "Почати новий чат"
 
@@ -19169,6 +19191,9 @@ msgstr "Агент втратив цю розмову"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Агент веде завдання від тікета до diff. Людина перевіряє результат, а не натискання клавіш. Увага зміщується з написання коду на постановку завдань та оцінку результату. Один інженер запускає кількох агентів одночасно в ізольованих робочих просторах."
 
+msgid "The agent picks up where the last run left off"
+msgstr "Агент продовжує з того місця, де зупинився останній запуск"
+
 msgid "The agent stopped responding"
 msgstr "Агент перестав відповідати"
 
@@ -19279,6 +19304,9 @@ msgstr "Файл не містить тем, які можна імпортув�
 
 msgid "The first F4 teams"
 msgstr "Перші команди F4"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "Перший запуск створює його, наступні використовують повторно"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Перші команди, невеликі, випускають код, здебільшого написаний агентами, не читаючи кожного рядка, і рівень дефектів у них тримається. Жодної містики: кілька рівнів рев'ю, canary-релізи, швидкий відкат і звичка писати специфікації замість коду."
@@ -21876,6 +21904,9 @@ msgstr "Ви переглядаєте версію {version} лише для ч�
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Максимальна кількість файлів: {MAX_ATTACHMENTS}"
+
+msgid "You can change this later in Settings."
+msgstr "Це можна змінити пізніше в налаштуваннях."
 
 msgid "You can close this tab."
 msgstr "Цю вкладку можна закрити."

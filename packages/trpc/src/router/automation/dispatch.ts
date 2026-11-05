@@ -38,6 +38,7 @@ import {
 	classifyDispatchError,
 	describeError,
 	nonForkPullRequest,
+	pinCreatedWorkspace,
 	previousRunSession,
 	type RunWorkspace,
 	replacePin,
@@ -80,6 +81,7 @@ export type DispatchableAutomation = Pick<
 	| "environmentId"
 	| "tags"
 	| "continueAgentSession"
+	| "reuseWorkspace"
 	| "machineSize"
 >;
 
@@ -248,6 +250,12 @@ export async function dispatchAutomation(
 				pullRequest,
 			});
 			placed({ v2WorkspaceId: created.workspaceId });
+			if (automation.reuseWorkspace) {
+				await pinCreatedWorkspace(automation.id, {
+					v2WorkspaceId: created.workspaceId,
+					targetHostId: host.machineId,
+				});
+			}
 			return created.workspaceId;
 		};
 

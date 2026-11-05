@@ -81,6 +81,7 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_CHAT_TURN_SNAPSHOTS: "experimental-chat-turn-snapshots",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
+	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
@@ -243,6 +244,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS]: "v2",
 	// Gates both the v1 renderer launch and the v2 host-side launch.
 	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
+	[SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING]: "shared",
 
 	[SETTING_ITEM_ID.BILLING_OVERVIEW]: "shared",
 	[SETTING_ITEM_ID.BILLING_PLANS]: "shared",
@@ -1548,6 +1550,23 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"reuse",
 			"sequential",
 			"install",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
+		section: "experimental",
+		title: "Restart onboarding",
+		description:
+			"Go through the first-run steps again. Your projects and settings stay as they are.",
+		keywords: [
+			"experimental",
+			"onboarding",
+			"restart",
+			"first run",
+			"setup",
+			"welcome",
+			"terminal",
+			"chat",
 		],
 	},
 	...INTEGRATION_SEARCH_ITEMS,

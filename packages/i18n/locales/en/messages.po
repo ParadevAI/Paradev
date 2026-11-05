@@ -5249,14 +5249,15 @@ msgstr "Context window: {percent} used"
 msgid "Continue"
 msgstr "Continue"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Continue"
+
 msgid "Continue in your browser"
 msgstr "Continue in your browser"
 
 msgid "Continue or fork session"
 msgstr "Continue or fork session"
-
-msgid "Continue the session the last run left"
-msgstr "Continue the session the last run left"
 
 msgid "Continue this chat on another login"
 msgstr "Continue this chat on another login"
@@ -5289,9 +5290,6 @@ msgstr "Continue with Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Continuing an agent session requires a pinned workspace"
-
-msgid "continuing the last session"
-msgstr "continuing the last session"
 
 msgid "Continuing…"
 msgstr "Continuing…"
@@ -6042,6 +6040,9 @@ msgstr "Couldn't save the Dev"
 
 msgid "Couldn't save the routine"
 msgstr "Couldn't save the routine"
+
+msgid "Couldn't save your choice. Try again."
+msgstr "Couldn't save your choice. Try again."
 
 msgid "Couldn't send comment"
 msgstr "Couldn't send comment"
@@ -7465,6 +7466,12 @@ msgstr "Each in its own new tab"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
+
+msgid "Each run makes its own"
+msgstr "Each run makes its own"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Each run starts a new agent conversation"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Each seat adds its plan's hours to one pool your team shares:"
@@ -9279,6 +9286,9 @@ msgstr "Go forward to the next page in history"
 msgid "Go home"
 msgstr "Go home"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Go through the first-run steps again. Your projects and settings stay as they are."
+
 msgid "Go to home"
 msgstr "Go to home"
 
@@ -9643,6 +9653,9 @@ msgstr "How do I get started?"
 msgid "How do the paid plans work?"
 msgstr "How do the paid plans work?"
 
+msgid "How do you want to work?"
+msgstr "How do you want to work?"
+
 msgid "How does pricing work?"
 msgstr "How does pricing work?"
 
@@ -9699,6 +9712,9 @@ msgstr "How we protect code"
 
 msgid "How we work"
 msgstr "How we work"
+
+msgid "How you run agents"
+msgstr "How you run agents"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
@@ -9915,9 +9931,6 @@ msgstr "Improved diff viewer"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "in {0}"
-
-msgid "in a new session"
-msgstr "in a new session"
 
 msgid "in a terminal on this host."
 msgstr "in a terminal on this host."
@@ -16112,6 +16125,9 @@ msgstr "Restart host service"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 
+msgid "Restart onboarding"
+msgstr "Restart onboarding"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restart running {providerLabel} agents?"
 
@@ -16289,6 +16305,9 @@ msgstr "Reusable instructions your agents pick up automatically"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
+
+msgid "Reusing {keptName}"
+msgstr "Reusing {keptName}"
 
 msgid "Reveal in Finder"
 msgstr "Reveal in Finder"
@@ -16624,8 +16643,14 @@ msgstr "Runs when a new workspace is created."
 msgid "Runs when a workspace is deleted."
 msgstr "Runs when a workspace is deleted."
 
+msgid "Same session"
+msgstr "Same session"
+
 msgid "Same version as this app."
 msgstr "Same version as this app."
+
+msgid "Same workspace"
+msgstr "Same workspace"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO & SCIM provisioning"
@@ -18311,9 +18336,6 @@ msgstr "Start a conversation to see messages here"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 
-msgid "Start a new agent session each run"
-msgstr "Start a new agent session each run"
-
 msgid "Start a new chat"
 msgstr "Start a new chat"
 
@@ -19175,6 +19197,9 @@ msgstr "The agent lost this conversation"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 
+msgid "The agent picks up where the last run left off"
+msgstr "The agent picks up where the last run left off"
+
 msgid "The agent stopped responding"
 msgstr "The agent stopped responding"
 
@@ -19285,6 +19310,9 @@ msgstr "The file did not contain any importable themes."
 
 msgid "The first F4 teams"
 msgstr "The first F4 teams"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "The first run makes one, later runs reuse it"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
@@ -21882,6 +21910,9 @@ msgstr "You are viewing version {version}, read-only"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "You can attach up to {MAX_ATTACHMENTS} files"
+
+msgid "You can change this later in Settings."
+msgstr "You can change this later in Settings."
 
 msgid "You can close this tab."
 msgstr "You can close this tab."

@@ -313,6 +313,7 @@ export const automationBaseColumns = {
 	tags: automations.tags,
 	group: automations.group,
 	continueAgentSession: automations.continueAgentSession,
+	reuseWorkspace: automations.reuseWorkspace,
 	machineSize: automations.machineSize,
 	enabled: automations.enabled,
 	archivedAt: automations.archivedAt,
