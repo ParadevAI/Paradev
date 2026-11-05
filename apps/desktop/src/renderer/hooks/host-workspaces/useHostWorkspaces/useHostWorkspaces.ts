@@ -18,6 +18,7 @@ import {
 	getHostWorkspacesQueryKey,
 	type HostWorkspaceItem,
 	type HostWorkspaceRow,
+	hostWorkspacesQueryFn,
 	isEventBusReopen,
 	loadHostWorkspacesSnapshot,
 	mergeHostWorkspaces,
@@ -202,9 +203,8 @@ export function useHostWorkspacesSource(
 			// Bounded retries so an online-per-cloud but tunnel-less relay
 			// target settles into isError quickly instead of holding isReady.
 			retry: 1,
-			queryFn: async (): Promise<HostWorkspaceRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostWorkspacesQueryFn(target, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				const served = (
 					(await client.workspace.list.query()) as HostWorkspaceRow[]
 				).map(normalizeServedWorkspaceRow);
@@ -221,7 +221,7 @@ export function useHostWorkspacesSource(
 					rows,
 				);
 				return rows;
-			},
+			}),
 		})),
 		combine: pickQueryState,
 	});
@@ -240,16 +240,15 @@ export function useHostWorkspacesSource(
 			enabled: includeArchived && target.hostUrl !== null,
 			refetchInterval: WORKSPACES_FALLBACK_REFETCH_INTERVAL_MS,
 			networkMode: "always" as const,
-			queryFn: async (): Promise<HostWorkspaceRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostWorkspacesQueryFn(target, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				const rows = (await client.workspace.list.query({
 					includeArchived: true,
 				})) as HostWorkspaceRow[];
 				return rows
 					.filter((row) => row.archivedAt != null)
 					.map(normalizeServedWorkspaceRow);
-			},
+			}),
 		})),
 		combine: pickQueryState,
 	});

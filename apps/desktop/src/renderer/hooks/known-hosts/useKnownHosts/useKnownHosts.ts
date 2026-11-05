@@ -81,17 +81,9 @@ function useRelayPresence(
 			),
 		[rows, relayUrl],
 	);
-	const [presence, setPresence] = useState<Map<string, HostConnectionStatus>>(
-		() => new Map(),
-	);
+	const [presence, setPresence] = useState(() => readPresence(hostUrls));
 	useEffect(() => {
-		const read = () =>
-			new Map(
-				hostUrls.map(([machineId, hostUrl]) => [
-					machineId,
-					getHostEventBus(hostUrl).getConnectionStatus(),
-				]),
-			);
+		const read = () => readPresence(hostUrls);
 		setPresence(read());
 		const cleanups = hostUrls.map(([, hostUrl]) => {
 			const bus = getHostEventBus(hostUrl);
@@ -109,4 +101,15 @@ function useRelayPresence(
 		};
 	}, [hostUrls]);
 	return presence;
+}
+
+function readPresence(
+	hostUrls: ReadonlyArray<readonly [string, string]>,
+): Map<string, HostConnectionStatus> {
+	return new Map(
+		hostUrls.map(([machineId, hostUrl]) => [
+			machineId,
+			getHostEventBus(hostUrl).getConnectionStatus(),
+		]),
+	);
 }
