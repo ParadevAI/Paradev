@@ -8,7 +8,14 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { CheckIcon, MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
+import {
+	CheckIcon,
+	MinusIcon,
+	PlusIcon,
+	RotateCcwIcon,
+	Volume2Icon,
+	VolumeXIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { TbDots } from "react-icons/tb";
 import { ImportHistoryDialog } from "renderer/components/ImportHistoryDialog";
@@ -72,22 +79,47 @@ export function BrowserOverflowMenu({
 	const [isScreenshotsOpen, setIsScreenshotsOpen] = useState(false);
 	const [isClearDataOpen, setIsClearDataOpen] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const [isAudioMuted, setIsAudioMuted] = useState(false);
+	const [audioMuteState, setAudioMuteState] = useState<{
+		paneId: string;
+		muted: boolean;
+	} | null>(null);
+
+	const isAudioMuteLoaded = audioMuteState?.paneId === paneId;
+	const isAudioMuted = isAudioMuteLoaded ? audioMuteState.muted : false;
 
 	useEffect(() => {
 		if (!paneId) return;
+		let cancelled = false;
 		electronTrpcClient.browser.isAudioMuted
 			.query({ paneId })
-			.then(setIsAudioMuted)
-			.catch((error) => console.warn("[BrowserOverflowMenu] could not read audio mute state", { paneId, error }));
+			.then((muted) => {
+				if (!cancelled) {
+					setAudioMuteState({ paneId, muted });
+				}
+			})
+			.catch((error) => {
+				console.warn("[BrowserOverflowMenu] could not read audio mute state", {
+					paneId,
+					error,
+				});
+			});
+		return () => {
+			cancelled = true;
+		};
 	}, [paneId]);
 
 	const handleToggleMute = () => {
+		if (!paneId || !isAudioMuteLoaded) return;
 		const next = !isAudioMuted;
 		electronTrpcClient.browser.setAudioMuted
 			.mutate({ paneId, muted: next })
-			.then(() => setIsAudioMuted(next))
-			.catch(() => {});
+			.then(() => setAudioMuteState({ paneId, muted: next }))
+			.catch((error) => {
+				console.warn("[BrowserOverflowMenu] could not set audio mute state", {
+					paneId,
+					error,
+				});
+			});
 	};
 
 	// The webview swallows pointer events, so a click on the page would never
@@ -274,8 +306,17 @@ export function BrowserOverflowMenu({
 						<Trans>Take a screenshot</Trans>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={handleToggleMute} disabled={!hasPage}>
-						{isAudioMuted ? <Trans>Unmute tab</Trans> : <Trans>Mute tab</Trans>}
+					<DropdownMenuItem
+						onClick={handleToggleMute}
+						disabled={!hasPage || !isAudioMuteLoaded}
+						className="justify-between"
+					>
+						{isAudioMuted ? <Trans>Unmute</Trans> : <Trans>Mute</Trans>}
+						{isAudioMuted ? (
+							<VolumeXIcon className="size-3.5" />
+						) : (
+							<Volume2Icon className="size-3.5" />
+						)}
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={handleHardReload} disabled={!hasPage}>
 						<Trans>Hard reload</Trans>

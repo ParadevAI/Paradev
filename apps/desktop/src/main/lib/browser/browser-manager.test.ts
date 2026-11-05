@@ -8,23 +8,16 @@ import {
 	mock,
 	test,
 } from "bun:test";
+
+mock.module("@lingui/core/macro", () => ({
+	msg: (descriptor: unknown) => descriptor,
+	t: (descriptor: unknown) => descriptor,
+}));
+
+import { i18n } from "@superset/i18n";
 import { webContents } from "electron";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { browserManager } from "./browser-manager";
-
-mock.module("electron", () => ({
-	webContents: {
-		fromId: mock(() => null),
-	},
-	clipboard: {
-		writeText: mock(),
-		readText: mock(),
-	},
-	Menu: {
-		buildFromTemplate: mock(() => ({ popup: mock() })),
-	},
-	ClipboardItem: class ClipboardItem {},
-}));
 
 const wcById = new Map<number, FakeWebContents>();
 
@@ -33,6 +26,10 @@ const preloadFromId = fromIdMock.getMockImplementation();
 
 beforeAll(() => {
 	fromIdMock.mockImplementation((id: number) => wcById.get(id) ?? null);
+	if (!i18n.locale) {
+		i18n.load("en", {});
+		i18n.activate("en");
+	}
 });
 
 afterAll(() => {
@@ -902,31 +899,101 @@ describe("right-click menu", () => {
 describe("audio muting", () => {
 	test("sets audio muted on guest webContents and persists across registrations", () => {
 		const paneId = "test-audio-pane";
-		const { wc: wc1, id: id1 } = makeWc();
+		registered.push(paneId);
+		try {
+			const { wc: wc1, id: id1 } = makeWc();
 
-		// 1. Initial register: default unmuted
-		browserManager.register(paneId, id1);
-		expect(browserManager.isAudioMuted(paneId)).toBe(false);
-		expect(wc1.audioMuted).toBe(false);
+			// 1. Initial register: default unmuted
+			browserManager.register(paneId, id1);
+			expect(browserManager.isAudioMuted(paneId)).toBe(false);
+			expect(wc1.audioMuted).toBe(false);
 
-		// 2. Explicit mute: updates both manager and webContents
-		browserManager.setAudioMuted(paneId, true);
-		expect(browserManager.isAudioMuted(paneId)).toBe(true);
-		expect(wc1.audioMuted).toBe(true);
+			// 2. Explicit mute: updates both manager and webContents
+			browserManager.setAudioMuted(paneId, true);
+			expect(browserManager.isAudioMuted(paneId)).toBe(true);
+			expect(wc1.audioMuted).toBe(true);
 
-		// 3. Re-register with a new webContents ID (reloads / navigation / crash recovery)
-		const { wc: wc2, id: id2 } = makeWc();
-		browserManager.register(paneId, id2);
+			// 3. Re-register with a new webContents ID (reloads / navigation / crash recovery)
+			const { wc: wc2, id: id2 } = makeWc();
+			browserManager.register(paneId, id2);
 
-		// Mute state must persist and be applied to the new webContents
-		expect(browserManager.isAudioMuted(paneId)).toBe(true);
-		expect(wc2.audioMuted).toBe(true);
+			// Mute state must persist and be applied to the new webContents
+			expect(browserManager.isAudioMuted(paneId)).toBe(true);
+			expect(wc2.audioMuted).toBe(true);
 
-		// 4. Explicit unmute
-		browserManager.setAudioMuted(paneId, false);
-		expect(browserManager.isAudioMuted(paneId)).toBe(false);
-		expect(wc2.audioMuted).toBe(false);
+			// 4. Explicit unmute
+			browserManager.setAudioMuted(paneId, false);
+			expect(browserManager.isAudioMuted(paneId)).toBe(false);
+			expect(wc2.audioMuted).toBe(false);
+		} finally {
+			browserManager.unregister(paneId);
+		}
+	});
 
-		browserManager.unregister(paneId);
+	test("applies mute state to child popups both at creation and dynamically", () => {
+		const paneId = "test-popup-audio-pane";
+		registered.push(paneId);
+		try {
+			const { wc: guestWc, id: guestId } = makeWc();
+			browserManager.register(paneId, guestId);
+
+			const { wc: popupWc } = makeWc();
+			const windowListeners = new Map<string, (() => void)[]>();
+			const fakeWindow = {
+				webContents: popupWc,
+				on: (event: string, fn: () => void) => {
+					windowListeners.set(event, [
+						...(windowListeners.get(event) ?? []),
+						fn,
+					]);
+				},
+				once: (event: string, fn: () => void) => {
+					windowListeners.set(event, [
+						...(windowListeners.get(event) ?? []),
+						fn,
+					]);
+				},
+				close: () => {
+					for (const fn of windowListeners.get("closed") ?? []) {
+						fn();
+					}
+				},
+			};
+
+			// Simulate child popup creation while unmuted
+			for (const listener of guestWc.listeners.get("did-create-window") ?? []) {
+				listener(fakeWindow);
+			}
+			expect(popupWc.audioMuted).toBe(false);
+
+			// Muting pane updates the existing popup
+			browserManager.setAudioMuted(paneId, true);
+			expect(popupWc.audioMuted).toBe(true);
+
+			// Unmuting pane updates the existing popup
+			browserManager.setAudioMuted(paneId, false);
+			expect(popupWc.audioMuted).toBe(false);
+
+			// Muting pane again, then creating a second popup opens it muted
+			browserManager.setAudioMuted(paneId, true);
+			const { wc: popupWc2 } = makeWc();
+			const fakeWindow2 = {
+				webContents: popupWc2,
+				on: () => {},
+				once: () => {},
+			};
+			for (const listener of guestWc.listeners.get("did-create-window") ?? []) {
+				listener(fakeWindow2);
+			}
+			expect(popupWc2.audioMuted).toBe(true);
+
+			// Closing window unhooks it
+			fakeWindow.close();
+			browserManager.setAudioMuted(paneId, false);
+			// popupWc was closed, so it stays as it was
+			expect(popupWc2.audioMuted).toBe(false);
+		} finally {
+			browserManager.unregister(paneId);
+		}
 	});
 });

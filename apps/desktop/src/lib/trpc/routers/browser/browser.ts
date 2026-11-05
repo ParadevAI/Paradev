@@ -49,6 +49,7 @@ export const createBrowserRouter = () => {
 				return { success: true };
 			}),
 
+		/** Sets whether audio is muted for the given browser pane. */
 		setAudioMuted: publicProcedure
 			.input(
 				z.object({
@@ -61,6 +62,7 @@ export const createBrowserRouter = () => {
 				return { success: true };
 			}),
 
+		/** Queries whether audio is muted for the given browser pane. */
 		isAudioMuted: publicProcedure
 			.input(
 				z.object({
