@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { githubInstallations } from "@superset/db/schema";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
+import { isUniqueViolation } from "@superset/trpc/unique-violation";
 import { Client } from "@upstash/qstash";
 import { and, eq, ne } from "drizzle-orm";
 import { env } from "@/env";
@@ -78,31 +79,45 @@ export async function GET(request: Request) {
 			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
-		// Save the installation to our database
-		const [savedInstallation] = await db
+		const installationFields = {
+			connectedByUserId: userId,
+			accountLogin,
+			accountType,
+			permissions: installation.permissions as Record<string, string>,
+			suspended: false,
+			suspendedAt: null,
+		};
+		const savedInstallation = await db
 			.insert(githubInstallations)
 			.values({
+				...installationFields,
 				organizationId,
-				connectedByUserId: userId,
 				installationId: String(installation.id),
-				accountLogin,
-				accountType,
-				permissions: installation.permissions as Record<string, string>,
 			})
 			.onConflictDoUpdate({
-				target: [githubInstallations.organizationId],
-				set: {
-					connectedByUserId: userId,
-					installationId: String(installation.id),
-					accountLogin,
-					accountType,
-					permissions: installation.permissions as Record<string, string>,
-					suspended: false,
-					suspendedAt: null, // Clear suspension if reinstalling
-					updatedAt: new Date(),
-				},
+				target: [githubInstallations.installationId],
+				set: { ...installationFields, updatedAt: new Date() },
+				setWhere: eq(githubInstallations.organizationId, organizationId),
 			})
-			.returning();
+			.returning()
+			.then(([row]) => row)
+			.catch(async (error: unknown) => {
+				// Until the migration that drops this constraint is live, a second
+				// account replaces the first, as it always has.
+				if (!isUniqueViolation(error, "github_installations_org_unique")) {
+					throw error;
+				}
+				const [row] = await db
+					.update(githubInstallations)
+					.set({
+						...installationFields,
+						installationId: String(installation.id),
+						updatedAt: new Date(),
+					})
+					.where(eq(githubInstallations.organizationId, organizationId))
+					.returning();
+				return row;
+			});
 
 		if (!savedInstallation) {
 			return exit(`${settingsUrl}?error=save_failed`);
