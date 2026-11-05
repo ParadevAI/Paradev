@@ -1,3 +1,4 @@
+import { rethrowCloudUnreachable } from "@superset/host-service/cloud-api-error";
 import { isOrganizationMarketplace } from "@superset/shared/plugins";
 import { TRPCError } from "@trpc/server";
 import {
@@ -131,7 +132,12 @@ export const createPluginsRouter = () => {
 				z.object({ organizationId: z.string().min(1).optional() }).optional(),
 			)
 			.mutation(async ({ input }) => {
-				await syncPlugins(input?.organizationId);
+				try {
+					await syncPlugins(input?.organizationId);
+				} catch (error) {
+					rethrowCloudUnreachable(error);
+					throw error;
+				}
 				return { ok: true };
 			}),
 	});
