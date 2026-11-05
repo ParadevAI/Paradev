@@ -27,7 +27,7 @@ This comparison is published by Paradev. Multica details were checked against [m
 | Interface | Desktop app, CLI, iPhone and iPad app | Web app, desktop app (a wrapper for the web app), CLI and API; iOS app that you build from source |
 | Main view | Workspaces, each with a terminal, Changes pane, and browser | Issue board, with agents as assignees |
 | Where agents run | Your machine, remote hosts you add, your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | A daemon on a machine you connect (laptop or cloud server); Qoder Cloud Agents as a hosted option |
-| Isolation | Git worktree and branch per workspace | A directory per run, with a Git worktree from a shared repository cache |
+| Isolation | Git worktree and branch per local workspace; a separate clone per cloud workspace | A directory per run, with a Git worktree from a shared repository cache |
 | Agents | Any CLI agent: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | 26 agent CLIs, including Claude Code, Codex, Cursor Agent, Copilot CLI, OpenCode, Pi, Antigravity, Grok, Kimi, Kiro CLI, and Qwen Code |
 | How tasks start | App or CLI; automations on schedules and GitHub, Slack, and Linear events; tasks synced with Linear and GitHub Issues | Assign an issue, @-mention an agent, chat, quick actions, workflows, autopilots, wakeups, Slack and other chat apps |
 | Review | Changes pane with diff, commit, push, and PR; Pull Requests view with checks and line comments | `in_review` status, issue comments, deliverables, and linked pull requests on your Git host |
