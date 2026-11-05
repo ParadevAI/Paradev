@@ -59,14 +59,21 @@ export const githubRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 
+			// Released clients send no id after confirming the account that
+			// `getInstallation` showed them, so only that one goes.
+			const installationId =
+				input.installationId ??
+				(await organizationInstallations(input.organizationId))[0]?.id;
+			if (!installationId) {
+				return { success: false, error: "No installation found" };
+			}
+
 			const result = await db
 				.delete(githubInstallations)
 				.where(
 					and(
 						eq(githubInstallations.organizationId, input.organizationId),
-						input.installationId
-							? eq(githubInstallations.id, input.installationId)
-							: undefined,
+						eq(githubInstallations.id, installationId),
 					),
 				)
 				.returning({ id: githubInstallations.id });

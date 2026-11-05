@@ -83,6 +83,7 @@ export async function POST(request: Request) {
 				.onConflictDoUpdate({
 					target: [githubRepositories.repoId],
 					set: {
+						installationId: installation.id,
 						organizationId,
 						owner: repo.owner.login,
 						name: repo.name,
