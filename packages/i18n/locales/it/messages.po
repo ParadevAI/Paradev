@@ -9912,6 +9912,9 @@ msgstr "in un terminale su questo host."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In pochi mesi, <0>decine di migliaia di ingegneri</0> usano Paradev come IDE principale, in aziende come Wix, DoorDash e Netflix."
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "In modalità manuale, Paradev non esegue l'accesso per questo agente. Fai rieseguire l'accesso al tuo script e continua, oppure disattiva la modalità manuale nelle impostazioni degli agenti."
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "In presenza a San Francisco, cinque giorni a settimana. Lavori direttamente con i fondatori."
 
@@ -14082,9 +14085,6 @@ msgstr "App desktop di Paradev"
 
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev non ha l'autorizzazione per leggere \"{name}\"."
-
-msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
-msgstr "Paradev non esegue l'accesso per questo agente. Fai rieseguire l'accesso al tuo script e continua, oppure disattiva la modalità manuale nelle impostazioni degli agenti."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise è Paradev per i team. Contattaci per sapere cosa include e come può funzionare per la tua organizzazione."
@@ -19147,6 +19147,9 @@ msgstr "L'agente copia la conversazione; il ramo si apre in una nuova scheda"
 msgid "The agent crashed"
 msgstr "L'agente si è arrestato in modo anomalo"
 
+msgid "The agent is signed out"
+msgstr "L'agente è disconnesso"
+
 msgid "The agent lost this conversation"
 msgstr "L'agente ha perso questa conversazione"
 
@@ -21941,9 +21944,6 @@ msgstr "Stai per ottenere Paradev"
 
 msgid "You're all set!"
 msgstr "È tutto pronto!"
-
-msgid "You're in manual mode"
-msgstr "Sei in modalità manuale"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Sei in classifica, ma non ancora posizionato"

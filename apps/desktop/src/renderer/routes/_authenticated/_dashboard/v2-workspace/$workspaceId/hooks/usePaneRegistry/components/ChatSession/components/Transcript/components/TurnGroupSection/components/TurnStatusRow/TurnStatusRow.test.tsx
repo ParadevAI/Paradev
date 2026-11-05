@@ -153,7 +153,8 @@ test("an auth failure in manual mode offers no sign-in: Continue or agent settin
 		openAgentSettings,
 		restartAndContinue,
 	});
-	expect(view.container.textContent).toContain("You're in manual mode");
+	expect(view.container.textContent).toContain("The agent is signed out");
+	expect(view.container.textContent).toContain("In manual mode");
 	expect(view.container.textContent).toContain("turn off manual mode");
 	expect(view.queryByText("Sign in")).toBeNull();
 	expect(view.queryByText("Sign in to continue")).toBeNull();

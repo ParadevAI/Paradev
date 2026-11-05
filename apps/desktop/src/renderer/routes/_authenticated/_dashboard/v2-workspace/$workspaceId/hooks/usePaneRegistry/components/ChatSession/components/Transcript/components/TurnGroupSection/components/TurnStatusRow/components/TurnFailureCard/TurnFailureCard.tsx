@@ -203,9 +203,9 @@ export function TurnFailureCard({
 				{manualSignIn && (
 					<p className="text-muted-foreground">
 						<Trans>
-							Paradev doesn't sign this agent in. Either have your script sign
-							it in again and continue, or turn off manual mode in agent
-							settings.
+							In manual mode, Paradev doesn't sign this agent in. Have your
+							script sign it in again and continue, or turn off manual mode in
+							agent settings.
 						</Trans>
 					</p>
 				)}

@@ -9912,6 +9912,9 @@ msgstr "このホストのターミナルで実行してください。"
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "手動モードでは、Paradev はこのエージェントにサインインしません。スクリプトで再度サインインさせてから続行するか、エージェント設定で手動モードをオフにしてください。"
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "サンフランシスコのオフィスで週5日勤務。創業者と直接一緒に働きます。"
 
@@ -14082,9 +14085,6 @@ msgstr "Paradev デスクトップアプリ"
 
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev には「{name}」を読み取る権限がありません。"
-
-msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
-msgstr "Paradev はこのエージェントにサインインしません。スクリプトで再度サインインさせてから続行するか、エージェント設定で手動モードをオフにしてください。"
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterpriseは、チーム向けのParadevです。含まれる内容や組織での活用方法については、お問い合わせください。"
@@ -19147,6 +19147,9 @@ msgstr "エージェントが会話を複製し、分岐は新しいタブで開
 msgid "The agent crashed"
 msgstr "エージェントがクラッシュしました"
 
+msgid "The agent is signed out"
+msgstr "エージェントがサインアウトしています"
+
 msgid "The agent lost this conversation"
 msgstr "エージェントがこの会話を失いました"
 
@@ -21941,9 +21944,6 @@ msgstr "まもなくParadevを入手できます"
 
 msgid "You're all set!"
 msgstr "準備完了です!"
-
-msgid "You're in manual mode"
-msgstr "手動モードになっています"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "リーダーボードに参加済みですが、まだランク付けされていません"
