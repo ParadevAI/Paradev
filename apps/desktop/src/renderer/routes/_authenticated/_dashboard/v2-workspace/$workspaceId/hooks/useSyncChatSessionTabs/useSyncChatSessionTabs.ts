@@ -1,7 +1,7 @@
 import { createWorkspaceStore, type WorkspaceStore } from "@superset/panes";
 import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWorkspaceConnectionRefresh";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import type { StoreApi } from "zustand/vanilla";
@@ -55,6 +55,13 @@ export function useSyncChatSessionTabs({
 	);
 	const sessions = sessionsQuery.data;
 	const isFetchingSessions = sessionsQuery.isFetching;
+	const openedEmpty = useRef<boolean | null>(null);
+	useEffect(() => {
+		if (!isLayoutReady || openedEmpty.current !== null) return;
+		openedEmpty.current = [store, ...linkedStores].every(
+			(paneStore) => paneStore.getState().tabs.length === 0,
+		);
+	}, [isLayoutReady, store, linkedStores]);
 
 	useEffect(() => {
 		if (!isLayoutReady || !sessions || isFetchingSessions) return;
@@ -75,8 +82,15 @@ export function useSyncChatSessionTabs({
 				...linkedStores.flatMap((linked) => linked.getState().tabs),
 			],
 			workspaceId,
-			now: Date.now(),
 		});
+		// A workspace opened with no tabs of the user's lands on the newest chat,
+		// not on a setup terminal that was opened for it a moment earlier.
+		const selectChat =
+			openedEmpty.current === true &&
+			tabs.every((tab) =>
+				Object.values(tab.panes).every((pane) => pane.kind === "terminal"),
+			);
+		openedEmpty.current = false;
 		if (toAdopt.length === 0) return;
 		// One write with the user's tab still selected: `addTab` selects each new
 		// tab, and a selection change alone is not saved.
@@ -86,7 +100,7 @@ export function useSyncChatSessionTabs({
 		for (const session of toAdopt) {
 			addChatTab({ store: next, session, focus: false });
 		}
-		if (activeTabId) next.getState().setActiveTab(activeTabId);
+		if (activeTabId && !selectChat) next.getState().setActiveTab(activeTabId);
 		store.getState().replaceState({
 			version,
 			tabs: next.getState().tabs,

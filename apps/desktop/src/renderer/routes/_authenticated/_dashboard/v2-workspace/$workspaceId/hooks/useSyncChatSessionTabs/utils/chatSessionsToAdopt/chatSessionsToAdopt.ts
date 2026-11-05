@@ -10,7 +10,7 @@ import {
 	readPendingChatStops,
 	readPendingChatStopTerminalIds,
 } from "../../../../utils/pendingChatStops";
-import { CHAT_ADOPT_MAX_IDLE_MS } from "../../constants";
+import { CHAT_ADOPT_MAX_LIVE_CHATS } from "../../constants";
 
 interface ListedChatSession {
 	sessionId: string;
@@ -27,17 +27,17 @@ interface ListedChatSession {
  * claims a chat by its session id or by its terminal id, so a chat the
  * desktop is still creating (or a pending cloud launch) is never adopted twice.
  * A chat with no terminal uses its session id, as the host's `panes.newTab` does.
+ * Only the most recently active live chats are candidates, so a workspace with
+ * many idle chats does not open a tab for each of them.
  */
 export function chatSessionsToAdopt({
 	sessions,
 	tabs,
 	workspaceId,
-	now,
 }: {
 	sessions: readonly ListedChatSession[];
 	tabs: readonly Tab<PaneViewerData>[];
 	workspaceId: string;
-	now: number;
 }): ChatSessionTarget[] {
 	const claimedSessionIds = new Set<string>(readPendingChatStops(workspaceId));
 	const claimedTerminalIds = new Set<string>(
@@ -52,15 +52,21 @@ export function chatSessionsToAdopt({
 				claimedSessionIds.add(data.sessionId);
 		}
 	}
+	const recent = sessions
+		.filter(
+			(session) =>
+				session.live &&
+				presetForAcpHarness(session.harness) &&
+				!isChatSessionClosed(session.sessionId) &&
+				!isChatTerminalIgnored(session.terminalId ?? session.sessionId),
+		)
+		.sort((a, b) => b.updatedAt - a.updatedAt)
+		.slice(0, CHAT_ADOPT_MAX_LIVE_CHATS);
 	const targets: Array<ChatSessionTarget & { updatedAt: number }> = [];
-	for (const session of sessions) {
+	for (const session of recent) {
 		const terminalId = session.terminalId ?? session.sessionId;
-		if (!session.live) continue;
-		if (now - session.updatedAt > CHAT_ADOPT_MAX_IDLE_MS) continue;
 		if (claimedSessionIds.has(session.sessionId)) continue;
 		if (claimedTerminalIds.has(terminalId)) continue;
-		if (isChatSessionClosed(session.sessionId)) continue;
-		if (isChatTerminalIgnored(terminalId)) continue;
 		const presetId = presetForAcpHarness(session.harness);
 		if (!presetId) continue;
 		targets.push({

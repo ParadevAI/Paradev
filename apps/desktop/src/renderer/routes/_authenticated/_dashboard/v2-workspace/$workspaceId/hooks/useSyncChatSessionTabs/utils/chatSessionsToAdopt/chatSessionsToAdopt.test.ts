@@ -12,10 +12,10 @@ import {
 	addPendingChatStop,
 	removePendingChatStop,
 } from "../../../../utils/pendingChatStops";
-import { CHAT_ADOPT_MAX_IDLE_MS } from "../../constants";
+import { CHAT_ADOPT_MAX_LIVE_CHATS } from "../../constants";
 import { chatSessionsToAdopt } from "./chatSessionsToAdopt";
 
-const NOW = 10 * CHAT_ADOPT_MAX_IDLE_MS;
+const NOW = 1_000_000;
 const WORKSPACE_ID = "workspace-1";
 
 const listed = (sessionId: string, overrides = {}) => ({
@@ -37,7 +37,6 @@ const adoptedIds = (
 		sessions,
 		tabs,
 		workspaceId: WORKSPACE_ID,
-		now: NOW,
 	}).map((target) => target.sessionId);
 
 const cleanups: Array<() => void> = [];
@@ -55,7 +54,6 @@ describe("chatSessionsToAdopt", () => {
 				],
 				tabs: [],
 				workspaceId: WORKSPACE_ID,
-				now: NOW,
 			}),
 		).toEqual([
 			{
@@ -80,12 +78,11 @@ describe("chatSessionsToAdopt", () => {
 			sessions: [listed("mobile", { terminalId: null })],
 			tabs: [],
 			workspaceId: WORKSPACE_ID,
-			now: NOW,
 		});
 		expect(target?.terminalId).toBe("mobile");
 	});
 
-	it("skips dead, idle, unsupported, closed, and already shown chats", () => {
+	it("skips dead, unsupported, closed, and already shown chats", () => {
 		const store = createWorkspaceStore<PaneViewerData>();
 		store.getState().addTab({
 			panes: [
@@ -128,7 +125,6 @@ describe("chatSessionsToAdopt", () => {
 			adoptedIds(
 				[
 					listed("dead", { live: false }),
-					listed("idle", { updatedAt: NOW - CHAT_ADOPT_MAX_IDLE_MS - 1 }),
 					listed("unknown", { harness: "unknown" }),
 					listed("closed"),
 					listed("shown"),
@@ -138,6 +134,18 @@ describe("chatSessionsToAdopt", () => {
 				store.getState().tabs,
 			),
 		).toEqual([]);
+	});
+
+	it("adopts a chat however long it was idle, but only among the most recent live chats", () => {
+		const sessions = Array.from(
+			{ length: CHAT_ADOPT_MAX_LIVE_CHATS + 2 },
+			(_, index) => listed(`chat-${index}`, { updatedAt: index }),
+		);
+		const adopted = adoptedIds(sessions);
+		expect(adopted).toHaveLength(CHAT_ADOPT_MAX_LIVE_CHATS);
+		expect(adopted).not.toContain("chat-0");
+		expect(adopted).not.toContain("chat-1");
+		expect(adopted.at(-1)).toBe(`chat-${CHAT_ADOPT_MAX_LIVE_CHATS + 1}`);
 	});
 
 	it("skips chats on an ignored terminal, such as a closed tab's or a fork loader's", () => {
