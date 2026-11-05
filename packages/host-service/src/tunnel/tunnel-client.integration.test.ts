@@ -1,4 +1,5 @@
-import { expect, test } from "bun:test";
+import { expect, mock, test } from "bun:test";
+import { RELAY_CLOSE } from "@superset/shared/tunnel-protocol";
 import { TunnelClient } from "./tunnel-client";
 
 async function exerciseDial({
@@ -111,3 +112,69 @@ test("real sockets recover from a rejected upgrade and a slow retry", async () =
 	expect(result.attempts).toBe(2);
 	expect(result.requests).toBe(1);
 }, 45_000);
+
+test("a forbidden control close re-registers the host before reconnecting", async () => {
+	let connects = 0;
+	let onSecondConnect = () => {};
+	const reconnected = new Promise<void>((resolve) => {
+		onSecondConnect = resolve;
+	});
+	const relay = Bun.serve({
+		port: 0,
+		fetch(request, server) {
+			if (server.upgrade(request)) return;
+			return new Response("upgrade failed", { status: 400 });
+		},
+		websocket: {
+			open(socket) {
+				connects++;
+				if (connects === 1) {
+					socket.close(
+						RELAY_CLOSE.forbidden,
+						"Forbidden: host not registered to this account",
+					);
+					return;
+				}
+				onSecondConnect();
+			},
+			message() {},
+		},
+	});
+	let connectsWhenForbidden = 0;
+	let recovered = false;
+	const onForbidden = mock(async (_reason: string) => {
+		connectsWhenForbidden = connects;
+		await Bun.sleep(0);
+		recovered = true;
+	});
+	const client = new TunnelClient({
+		relayUrl: `http://127.0.0.1:${relay.port}`,
+		hostId: "org:host",
+		getAuthToken: async () => "test-token",
+		localPort: 1,
+		hostServiceSecret: "test-secret",
+		onForbidden,
+	});
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	try {
+		await client.connect();
+		await Promise.race([
+			reconnected,
+			new Promise<never>((_, reject) => {
+				timer = setTimeout(
+					() => reject(new Error("Control never reconnected")),
+					4_000,
+				);
+			}),
+		]);
+		expect(onForbidden).toHaveBeenCalledTimes(1);
+		expect(onForbidden.mock.calls[0]?.[0]).toContain("host not registered");
+		expect(connectsWhenForbidden).toBe(1);
+		expect(recovered).toBe(true);
+		expect(connects).toBe(2);
+	} finally {
+		clearTimeout(timer);
+		client.close();
+		relay.stop(true);
+	}
+});
