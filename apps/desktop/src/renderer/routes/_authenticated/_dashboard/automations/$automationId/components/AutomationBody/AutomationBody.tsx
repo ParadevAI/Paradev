@@ -136,8 +136,16 @@ export function AutomationBody({
 		discard,
 	} = useAutomationDraft(
 		saved,
-		async (next) => {
-			await updateMutation.mutateAsync(next);
+		async ({ v2WorkspaceId, cloudWorkspaceId, ...next }) => {
+			// A run may have kept a workspace since this page loaded; resending
+			// the stale pin would drop it.
+			await updateMutation.mutateAsync({
+				...next,
+				...(v2WorkspaceId !== saved.v2WorkspaceId ? { v2WorkspaceId } : {}),
+				...(cloudWorkspaceId !== saved.cloudWorkspaceId
+					? { cloudWorkspaceId }
+					: {}),
+			});
 			toast.success(
 				t({
 					message: "Automation saved",

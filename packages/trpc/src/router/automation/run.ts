@@ -105,7 +105,7 @@ export async function replacePin(
  */
 export async function pinCreatedWorkspace(
 	automationId: string,
-	workspace: RunWorkspace,
+	workspace: RunWorkspace | { v2WorkspaceId: string; targetHostId: string },
 ): Promise<void> {
 	const cloud = "cloudWorkspaceId" in workspace;
 	await db
@@ -113,7 +113,12 @@ export async function pinCreatedWorkspace(
 		.set(
 			cloud
 				? { cloudWorkspaceId: workspace.cloudWorkspaceId }
-				: { v2WorkspaceId: workspace.v2WorkspaceId },
+				: "targetHostId" in workspace
+					? {
+							v2WorkspaceId: workspace.v2WorkspaceId,
+							targetHostId: workspace.targetHostId,
+						}
+					: { v2WorkspaceId: workspace.v2WorkspaceId },
 		)
 		.where(
 			and(
