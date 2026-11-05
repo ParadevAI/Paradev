@@ -81,6 +81,26 @@ function chatTabTarget(
 	};
 }
 
+async function closeChatsOnTerminal(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	terminalId: string,
+) {
+	const chat = ctx.runtime.chat?.();
+	if (!chat) return;
+	const onTerminal = chat.commands
+		.listSessions({ scopeId: workspaceId, limit: 200 })
+		.filter((session) => session.live && session.terminalId === terminalId);
+	await Promise.all(
+		onTerminal.map((session) =>
+			chat.commands.closeSession({
+				sessionId: session.sessionId,
+				userClosed: true,
+			}),
+		),
+	);
+}
+
 function requireWorkspaceTerminal(
 	ctx: HostServiceContext,
 	workspaceId: string,
@@ -195,13 +215,14 @@ export const panesRouter = router({
 				paneId: input.paneId,
 				keepTerminal: input.keepTerminal,
 			});
-			// A live terminal left without a pane is re-adopted into a new tab
-			// by the desktop, so closing ends it unless it was backgrounded.
+			// A live terminal or chat left without a pane is re-adopted into a new
+			// tab by the desktop, so closing ends it unless it was backgrounded.
 			if (terminalId && !input.keepTerminal) {
 				await createTerminalCaller(ctx).killSession({
 					workspaceId: input.workspaceId,
 					terminalId,
 				});
+				await closeChatsOnTerminal(ctx, input.workspaceId, terminalId);
 			}
 			return { ...result, terminalId: terminalId ?? null };
 		}),

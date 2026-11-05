@@ -19,7 +19,10 @@ import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
-import { ignoreChatTerminal } from "../../../../../../utils/closedChatSessions";
+import {
+	ignoreChatTerminal,
+	isChatSessionReopened,
+} from "../../../../../../utils/closedChatSessions";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
@@ -465,8 +468,15 @@ export function AcpChatPane({
 				!binding.chatSessionId &&
 				binding.endedAt === undefined,
 		);
+	const closedElsewhere =
+		stored?.session?.closedByUser === true &&
+		!!sessionId &&
+		!isChatSessionReopened(sessionId);
 	const recoverable = Boolean(
-		(sessionStopped || sessionDead) && harness && !continuedInTerminal,
+		(sessionStopped || sessionDead) &&
+			harness &&
+			!continuedInTerminal &&
+			!closedElsewhere,
 	);
 	const recoveries = useRef(0);
 	if (stored?.live && !sessionDead) recoveries.current = 0;

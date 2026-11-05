@@ -36,6 +36,9 @@ export const chatSessionsLocal = sqliteTable(
 		queuedCount: integer("queued_count").notNull().default(0),
 		updatedAt: integer("updated_at").notNull(),
 		closedAt: integer("closed_at").default(0),
+		closedByUser: integer("closed_by_user", { mode: "boolean" })
+			.notNull()
+			.default(false),
 	},
 	(table) => [index("chat_sessions_local_scope_id_idx").on(table.scopeId)],
 );

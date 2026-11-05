@@ -173,6 +173,8 @@ export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
  */
 export const closeSessionInputSchema = z.object({
 	sessionId: z.string().min(1),
+	/** A person closed the chat, not a restart or cleanup: other clients drop its tabs instead of restarting it. */
+	userClosed: z.boolean().optional(),
 });
 export type CloseSessionInput = z.infer<typeof closeSessionInputSchema>;
 

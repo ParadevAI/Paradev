@@ -47,7 +47,7 @@ export function useUndoableChatClose({
 		async (sessionId: string) => {
 			const reopen = markChatSessionClosed(sessionId);
 			try {
-				await wiring.transport.closeSession({ sessionId });
+				await wiring.transport.closeSession({ sessionId, userClosed: true });
 				return true;
 			} catch (error) {
 				console.warn("[acp-chat] could not stop the chat session", error);

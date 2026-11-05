@@ -59,6 +59,7 @@ export function resetSessionForEpoch(
 			queuedCount: 0,
 			updatedAt,
 			closedAt: null,
+			closedByUser: false,
 		})
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
@@ -85,9 +86,10 @@ export function markSessionClosed(
 	db: ChatDb,
 	sessionId: string,
 	closedAt: number,
+	byUser = false,
 ): void {
 	db.update(chatSessionsLocal)
-		.set({ closedAt })
+		.set({ closedAt, ...(byUser ? { closedByUser: true } : {}) })
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
 }
@@ -110,8 +112,11 @@ export class ChatSessionStore {
 		return readSessionRow(this.db, sessionId);
 	}
 
-	markClosed(sessionId: string, closedAt = Date.now()): void {
-		markSessionClosed(this.db, sessionId, closedAt);
+	markClosed(
+		sessionId: string,
+		{ byUser = false, closedAt = Date.now() } = {},
+	): void {
+		markSessionClosed(this.db, sessionId, closedAt, byUser);
 	}
 
 	list(): ChatSessionRow[] {

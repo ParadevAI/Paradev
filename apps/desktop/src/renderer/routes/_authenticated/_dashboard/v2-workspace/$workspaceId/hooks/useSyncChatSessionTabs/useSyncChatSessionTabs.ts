@@ -9,21 +9,22 @@ import type { PaneViewerData } from "../../types";
 import { addChatTab } from "../../utils/focusChatSession";
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { CHAT_ADOPT_POLL_MS, CHAT_ADOPT_SESSIONS_LIMIT } from "./constants";
+import { chatPanesClosedElsewhere } from "./utils/chatPanesClosedElsewhere";
 import { chatSessionsToAdopt } from "./utils/chatSessionsToAdopt";
 
-interface UseAutoAdoptChatSessionsArgs {
+interface UseSyncChatSessionTabsArgs {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	linkedStores: readonly StoreApi<WorkspaceStore<PaneViewerData>>[];
 	workspaceId: string;
 	isLayoutReady: boolean;
 }
 
-export function useAutoAdoptChatSessions({
+export function useSyncChatSessionTabs({
 	store,
 	linkedStores,
 	workspaceId,
 	isLayoutReady,
-}: UseAutoAdoptChatSessionsArgs): void {
+}: UseSyncChatSessionTabsArgs): void {
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const queryKey = useMemo(
@@ -57,6 +58,15 @@ export function useAutoAdoptChatSessions({
 
 	useEffect(() => {
 		if (!isLayoutReady || !sessions || isFetchingSessions) return;
+		for (const paneStore of [store, ...linkedStores]) {
+			const panes = chatPanesClosedElsewhere(
+				sessions,
+				paneStore.getState().tabs,
+			);
+			for (const { tabId, paneId } of panes) {
+				paneStore.getState().closePane({ tabId, paneId, intent: "remove" });
+			}
+		}
 		const { version, tabs, activeTabId } = store.getState();
 		const toAdopt = chatSessionsToAdopt({
 			sessions,
