@@ -4099,6 +4099,9 @@ msgstr "Чат"
 msgid "Chat closed"
 msgstr "Чат закрито"
 
+msgid "Chat GUI"
+msgstr "Графічний чат"
+
 msgid "Chat history"
 msgstr "Історія чату"
 

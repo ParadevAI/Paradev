@@ -4105,6 +4105,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat zavřen"
 
+msgid "Chat GUI"
+msgstr "Grafický chat"
+
 msgid "Chat history"
 msgstr "Historie chatů"
 

@@ -4105,6 +4105,9 @@ msgstr "聊天"
 msgid "Chat closed"
 msgstr "聊天已关闭"
 
+msgid "Chat GUI"
+msgstr "聊天图形界面"
+
 msgid "Chat history"
 msgstr "聊天历史"
 

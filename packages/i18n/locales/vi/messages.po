@@ -4105,6 +4105,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Đã đóng cuộc trò chuyện"
 
+msgid "Chat GUI"
+msgstr "Giao diện chat"
+
 msgid "Chat history"
 msgstr "Lịch sử trò chuyện"
 

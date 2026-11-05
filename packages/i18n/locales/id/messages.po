@@ -4105,6 +4105,9 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat ditutup"
 
+msgid "Chat GUI"
+msgstr "GUI Chat"
+
 msgid "Chat history"
 msgstr "Riwayat obrolan"
 

@@ -4105,6 +4105,9 @@ msgstr "Чат"
 msgid "Chat closed"
 msgstr "Чат закрыт"
 
+msgid "Chat GUI"
+msgstr "Графический чат"
+
 msgid "Chat history"
 msgstr "История чатов"
 

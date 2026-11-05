@@ -4105,6 +4105,9 @@ msgstr "チャット"
 msgid "Chat closed"
 msgstr "チャットを閉じました"
 
+msgid "Chat GUI"
+msgstr "チャット GUI"
+
 msgid "Chat history"
 msgstr "チャット履歴"
 

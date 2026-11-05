@@ -4105,6 +4105,9 @@ msgstr "Sohbet"
 msgid "Chat closed"
 msgstr "Sohbet kapatıldı"
 
+msgid "Chat GUI"
+msgstr "Sohbet GUI'si"
+
 msgid "Chat history"
 msgstr "Sohbet geçmişi"
 

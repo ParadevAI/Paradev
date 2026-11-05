@@ -357,7 +357,7 @@ export function SettingsScreen() {
 								color={theme.mutedForeground}
 							/>
 						}
-						label={t({ message: "Chat" })}
+						label={t({ message: "Chat GUI" })}
 						subtitle={t({
 							message: "Open Claude and Codex sessions as chats",
 						})}
@@ -366,7 +366,7 @@ export function SettingsScreen() {
 								value={acpChatEnabled}
 								disabled={updateChatSetting.isPending}
 								onValueChange={(enabled) => updateChatSetting.mutate(enabled)}
-								accessibilityLabel={t({ message: "Chat" })}
+								accessibilityLabel={t({ message: "Chat GUI" })}
 							/>
 						}
 						isLast
