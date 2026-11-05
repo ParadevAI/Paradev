@@ -12,6 +12,20 @@ import { webContents } from "electron";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { browserManager } from "./browser-manager";
 
+mock.module("electron", () => ({
+	webContents: {
+		fromId: mock(() => null),
+	},
+	clipboard: {
+		writeText: mock(),
+		readText: mock(),
+	},
+	Menu: {
+		buildFromTemplate: mock(() => ({ popup: mock() })),
+	},
+	ClipboardItem: class ClipboardItem {},
+}));
+
 const wcById = new Map<number, FakeWebContents>();
 
 const fromIdMock = webContents.fromId as unknown as ReturnType<typeof mock>;
@@ -45,6 +59,9 @@ type WcListener = (...args: unknown[]) => void;
 
 interface FakeWebContents {
 	throttlingCalls: boolean[];
+	audioMuted: boolean;
+	setAudioMuted: (muted: boolean) => void;
+	isAudioMuted: () => boolean;
 	isDestroyed: () => boolean;
 	isCrashed: () => boolean;
 	setBackgroundThrottling: (allowed: boolean) => void;
@@ -65,13 +82,16 @@ interface FakeWebContents {
 		sendCommand: ReturnType<typeof mock>;
 	};
 }
-
 let nextId = 1;
-
 function makeWc(): { wc: FakeWebContents; id: number } {
 	const throttlingCalls: boolean[] = [];
 	const wc: FakeWebContents = {
 		throttlingCalls,
+		audioMuted: false,
+		setAudioMuted: (muted: boolean) => {
+			wc.audioMuted = muted;
+		},
+		isAudioMuted: () => wc.audioMuted,
 		isDestroyed: () => false,
 		isCrashed: () => false,
 		setBackgroundThrottling: (allowed: boolean) => {
@@ -876,5 +896,37 @@ describe("right-click menu", () => {
 		rightClick("pane-context-menu-broken");
 
 		expect(popup).toHaveBeenCalled();
+	});
+});
+
+describe("audio muting", () => {
+	test("sets audio muted on guest webContents and persists across registrations", () => {
+		const paneId = "test-audio-pane";
+		const { wc: wc1, id: id1 } = makeWc();
+
+		// 1. Initial register: default unmuted
+		browserManager.register(paneId, id1);
+		expect(browserManager.isAudioMuted(paneId)).toBe(false);
+		expect(wc1.audioMuted).toBe(false);
+
+		// 2. Explicit mute: updates both manager and webContents
+		browserManager.setAudioMuted(paneId, true);
+		expect(browserManager.isAudioMuted(paneId)).toBe(true);
+		expect(wc1.audioMuted).toBe(true);
+
+		// 3. Re-register with a new webContents ID (reloads / navigation / crash recovery)
+		const { wc: wc2, id: id2 } = makeWc();
+		browserManager.register(paneId, id2);
+
+		// Mute state must persist and be applied to the new webContents
+		expect(browserManager.isAudioMuted(paneId)).toBe(true);
+		expect(wc2.audioMuted).toBe(true);
+
+		// 4. Explicit unmute
+		browserManager.setAudioMuted(paneId, false);
+		expect(browserManager.isAudioMuted(paneId)).toBe(false);
+		expect(wc2.audioMuted).toBe(false);
+
+		browserManager.unregister(paneId);
 	});
 });

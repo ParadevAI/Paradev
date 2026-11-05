@@ -25,11 +25,106 @@
  * that has one; `test/superset-home-isolation.test.ts` fails loudly if a run
  * ever loses it.
  */
-
-import { afterAll } from "bun:test";
+import { afterAll, mock } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
+// Mock Electron so tests importing 'electron' don't fail in headless Bun runtime
+mock.module("electron", () => ({
+	webContents: {
+		fromId: mock(() => null),
+	},
+	clipboard: {
+		writeText: mock(),
+		readText: mock(),
+		writeImage: mock(),
+	},
+	Menu: {
+		buildFromTemplate: mock((items: unknown) => ({
+			popup: mock(),
+			items,
+		})),
+	},
+	shell: {
+		openExternal: mock(async () => {}),
+		openPath: mock(async () => ""),
+		showItemInFolder: mock(() => {}),
+		beep: mock(() => {}),
+	},
+	app: {
+		isPackaged: false,
+		getVersion: () => "0.0.0",
+		getAppPath: () => "/tmp/app",
+		getPath: (name: string) => `/tmp/${name}`,
+		on: mock(),
+		whenReady: mock(async () => {}),
+	},
+	BrowserWindow: class BrowserWindow {
+		webContents = {
+			on: mock(),
+			off: mock(),
+			setAudioMuted: mock(),
+			setWindowOpenHandler: mock(),
+		};
+		on = mock();
+		loadURL = mock(async () => {});
+		close = mock();
+		destroy = mock();
+	},
+	nativeImage: {
+		createEmpty: () => ({
+			isEmpty: () => true,
+			toPNG: () => Buffer.from(""),
+			toJPEG: () => Buffer.from(""),
+			getSize: () => ({ width: 0, height: 0 }),
+		}),
+		createFromBuffer: () => ({
+			isEmpty: () => false,
+			toPNG: () => Buffer.from(""),
+			toJPEG: () => Buffer.from(""),
+			getSize: () => ({ width: 100, height: 100 }),
+		}),
+	},
+	ipcMain: {
+		on: mock(),
+		handle: mock(),
+		removeHandler: mock(),
+	},
+	dialog: {
+		showErrorBox: mock(),
+		showMessageBox: mock(async () => ({ response: 0 })),
+	},
+	session: {
+		defaultSession: {
+			webRequest: {
+				onBeforeSendHeaders: mock(),
+				onHeadersReceived: mock(),
+			},
+		},
+	},
+	ClipboardItem: class ClipboardItem {},
+}));
+
+// Mock Lingui macros
+mock.module("@lingui/core/macro", () => ({
+	msg: (descriptor: { message: string } | string) =>
+		typeof descriptor === "string" ? descriptor : descriptor.message,
+	t: (descriptor: { message: string } | string) =>
+		typeof descriptor === "string" ? descriptor : descriptor.message,
+}));
+
+// Mock @superset/i18n runtime instance so i18n._ never throws uninitialized locale errors
+mock.module("@superset/i18n", () => ({
+	i18n: {
+		_: (id: unknown) =>
+			typeof id === "string"
+				? id
+				: ((id as { message?: string })?.message ?? String(id)),
+		activate: () => {},
+		load: () => {},
+	},
+}));
 
 const testSupersetHome = mkdtempSync(join(tmpdir(), "superset-test-home-"));
 process.env.SUPERSET_HOME_DIR = testSupersetHome;
@@ -39,10 +134,6 @@ Reflect.set(
 	testSupersetHome,
 );
 
-// Test processes are short-lived, but a full local run creates enough state
-// here to make relying on the OS's eventual temp cleanup needlessly noisy.
-// The exit hook is synchronous because Node/Bun cannot await async work once
-// process shutdown has begun; best-effort cleanup must never mask test status.
 function cleanupTestSupersetHome(): void {
 	try {
 		rmSync(testSupersetHome, { recursive: true, force: true });
@@ -51,8 +142,5 @@ function cleanupTestSupersetHome(): void {
 	}
 }
 
-// Bun's test runner does not consistently emit Node's process exit event, so
-// use its lifecycle hook as the primary cleanup and retain exit as a fallback
-// for alternate runners that load the same preload.
 afterAll(cleanupTestSupersetHome);
 process.once("exit", cleanupTestSupersetHome);

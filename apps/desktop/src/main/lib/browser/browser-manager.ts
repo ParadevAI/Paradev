@@ -260,6 +260,7 @@ class BrowserManager extends EventEmitter {
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	private mutedPanes = new Map<string, boolean>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
 	// un-throttled — see acquireAgentWake. The entry object's identity ties
@@ -270,8 +271,27 @@ class BrowserManager extends EventEmitter {
 	private forwardableChords = new Set<string>();
 	private designMode = new DesignModeController();
 
-	setForwardableChords(chords: string[]): void {
+	public setAudioMuted(paneId: string, muted: boolean): void {
+		this.mutedPanes.set(paneId, muted);
+		const entry = this.panes.get(paneId);
+		if (entry) {
+			const guest = webContents.fromId(entry.webContentsId);
+			if (guest && !guest.isDestroyed()) {
+				guest.setAudioMuted(muted);
+			}
+		}
+	}
+
+	public isAudioMuted(paneId: string): boolean {
+		return this.mutedPanes.get(paneId) ?? false;
+	}
+
+	public setForwardableChords(chords: string[]): void {
 		this.forwardableChords = new Set(chords);
+	}
+
+	public setExtensionMenuItems(items: ExtensionMenuItems): void {
+		this.extensionMenuItems = items;
 	}
 
 	register(paneId: string, webContentsId: number, workspaceId?: string): void {
@@ -300,6 +320,10 @@ class BrowserManager extends EventEmitter {
 		});
 		const wc = webContents.fromId(webContentsId);
 		if (wc) {
+			// Apply persisted or default audio mute state
+			const isMuted = this.isAudioMuted(paneId);
+			wc.setAudioMuted(isMuted); //
+
 			// Throttling stays enabled by default so parked/offscreen persistent
 			// webviews don't run at full speed in the background — except while
 			// agent work is in flight on the pane (see acquireAgentWake), where a
@@ -1081,6 +1105,9 @@ class BrowserManager extends EventEmitter {
 	): void {
 		const wc = window.webContents;
 		markBrowserPanePopup(wc);
+		if (this.isAudioMuted(paneId)) {
+			wc.setAudioMuted(true);
+		}
 		const detachGuard = attachNavigationGuard(wc, (url) =>
 			this.emit("deep-link", url),
 		);
@@ -1092,12 +1119,6 @@ class BrowserManager extends EventEmitter {
 		});
 		window.on("closed", detachGuard);
 	}
-
-	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
-	setExtensionMenuItems(items: ExtensionMenuItems): void {
-		this.extensionMenuItems = items;
-	}
-
 	// An extension's broken menu must not take the page's own menu with it.
 	private safeExtensionMenuItems(
 		...args: Parameters<ExtensionMenuItems>

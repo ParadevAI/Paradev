@@ -49,6 +49,28 @@ export const createBrowserRouter = () => {
 				return { success: true };
 			}),
 
+		setAudioMuted: publicProcedure
+			.input(
+				z.object({
+					paneId: z.string(),
+					muted: z.boolean(),
+				}),
+			)
+			.mutation(({ input }) => {
+				browserManager.setAudioMuted(input.paneId, input.muted);
+				return { success: true };
+			}),
+
+		isAudioMuted: publicProcedure
+			.input(
+				z.object({
+					paneId: z.string(),
+				}),
+			)
+			.query(({ input }) => {
+				return browserManager.isAudioMuted(input.paneId);
+			}),
+
 		goBack: publicProcedure
 			.input(z.object({ paneId: z.string() }))
 			.mutation(({ input }) => {

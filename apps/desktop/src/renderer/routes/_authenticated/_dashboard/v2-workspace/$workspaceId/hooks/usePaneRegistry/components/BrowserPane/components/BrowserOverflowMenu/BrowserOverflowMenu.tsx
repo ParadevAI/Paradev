@@ -72,6 +72,23 @@ export function BrowserOverflowMenu({
 	const [isScreenshotsOpen, setIsScreenshotsOpen] = useState(false);
 	const [isClearDataOpen, setIsClearDataOpen] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isAudioMuted, setIsAudioMuted] = useState(false);
+
+	useEffect(() => {
+		if (!paneId) return;
+		electronTrpcClient.browser.isAudioMuted
+			.query({ paneId })
+			.then(setIsAudioMuted)
+			.catch(() => {});
+	}, [paneId]);
+
+	const handleToggleMute = () => {
+		const next = !isAudioMuted;
+		electronTrpcClient.browser.setAudioMuted
+			.mutate({ paneId, muted: next })
+			.then(() => setIsAudioMuted(next))
+			.catch(() => {});
+	};
 
 	// The webview swallows pointer events, so a click on the page would never
 	// reach the document listener Radix dismisses on; passing the click
@@ -257,6 +274,9 @@ export function BrowserOverflowMenu({
 						<Trans>Take a screenshot</Trans>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={handleToggleMute} disabled={!hasPage}>
+						{isAudioMuted ? <Trans>Unmute tab</Trans> : <Trans>Mute tab</Trans>}
+					</DropdownMenuItem>
 					<DropdownMenuItem onClick={handleHardReload} disabled={!hasPage}>
 						<Trans>Hard reload</Trans>
 					</DropdownMenuItem>
