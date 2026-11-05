@@ -136,7 +136,7 @@ function transcriptBefore(
 	const events: DurableEvent[] = [];
 	for (const group of deriveTimeline(snapshot)) {
 		const items = group.entries.flatMap((entry) =>
-			entry.kind === "item" ? [entry.item] : entry.items,
+			entry.kind === "tool_run" ? entry.items : [entry.item],
 		);
 		const index = items.findIndex((item) => item.id === itemId);
 		const kept = (index === -1 ? items : items.slice(0, index)).filter(

@@ -6,10 +6,12 @@ import type {
 	UserMessage,
 } from "../../protocol/items";
 import type { SessionSnapshot, StoredItem } from "../reducer/reducer";
+import { type UserStop, userStopOf } from "../userStop/userStop";
 
 export type TimelineEntry =
 	| { kind: "item"; item: Item }
-	| { kind: "tool_run"; items: ToolCall[] };
+	| { kind: "tool_run"; items: ToolCall[] }
+	| { kind: "user_stop"; item: UserMessage; stop: UserStop };
 
 export type TurnGroup = {
 	turn: Turn | null;
@@ -44,7 +46,12 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 			continue;
 		}
 		flush();
-		entries.push({ kind: "item", item });
+		const stop = userStopOf(item);
+		entries.push(
+			stop
+				? { kind: "user_stop", item: item as UserMessage, stop }
+				: { kind: "item", item },
+		);
 	}
 	flush();
 	return entries;
@@ -95,9 +102,9 @@ export function deriveTimeline(
 function firstItemStart(group: TurnGroup): number {
 	const first = group.entries[0];
 	if (!first) return Number.MAX_SAFE_INTEGER;
-	return first.kind === "item"
-		? first.item.startedAtMs
-		: (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER);
+	return first.kind === "tool_run"
+		? (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER)
+		: first.item.startedAtMs;
 }
 
 export function deriveChildrenByParent(

@@ -438,7 +438,7 @@ describe("chat commands", () => {
 			reduceMany(emptySnapshot(), envelopes),
 		).flatMap((group) =>
 			group.entries.flatMap((entry) =>
-				entry.kind === "item" ? [entry.item] : entry.items,
+				entry.kind === "tool_run" ? entry.items : [entry.item],
 			),
 		);
 		expect(
