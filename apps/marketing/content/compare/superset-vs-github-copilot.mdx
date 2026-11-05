@@ -24,7 +24,7 @@ GitHub Copilot is an AI pair programmer that lives inside your editor, offering 
 | | **Paradev** | **GitHub Copilot** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI pair programmer (editor extension) |
-| **What it does** | Runs multiple coding agents in parallel with Git worktrees, a Chat view, diff/file review, and browser tooling | Inline code completions, chat, and Copilot Agent mode in your editor |
+| **What it does** | Runs multiple coding agents in parallel with Git worktrees, a chat interface, diff/file review, and browser tooling | Inline code completions, chat, and Copilot Agent mode in your editor |
 | **AI approach** | Agent-agnostic: orchestrates any CLI agent | Multiple frontier models (Claude, GPT, Gemini) via GitHub |
 | **Parallelism** | Core feature: many agents on separate branches simultaneously | In-editor agent mode; cloud coding agent runs on a branch and opens a PR |
 | **Editor** | Works alongside any editor | VS Code, JetBrains, Visual Studio, Neovim (extension) |
@@ -35,7 +35,7 @@ GitHub Copilot is an AI pair programmer that lives inside your editor, offering 
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a [Chat view](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Agents run on your Mac, on remote hosts, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta). Open source under the MIT License.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a [chat interface](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Agents run on your Mac, on remote hosts, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta). Open source under the MIT License.
 
 ---
 
@@ -49,7 +49,7 @@ GitHub Copilot is an AI coding assistant from GitHub (Microsoft). It integrates 
 
 ### Inline Assistant vs Parallel Orchestrator
 
-Copilot is built for the editing experience: it completes your code as you type, answers questions in a chat panel, and can make changes across files via Agent mode. Paradev runs many autonomous agents simultaneously, each on a separate task in a separate worktree, then adds a Chat view, file review, and browser preview around those tasks. Copilot makes you faster at writing code; Paradev makes many agents work in parallel while you do something else.
+Copilot is built for the editing experience: it completes your code as you type, answers questions in a chat panel, and can make changes across files via Agent mode. Paradev runs many autonomous agents simultaneously, each on a separate task in a separate worktree, then adds a chat interface, file review, and browser preview around those tasks. Copilot makes you faster at writing code; Paradev makes many agents work in parallel while you do something else.
 
 ### Completions vs Autonomous Tasks
 
@@ -98,7 +98,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 ### Is Paradev a Copilot replacement?
 
-No. Paradev is not an inline-completion assistant. It does provide a Chat view, diff/file editing, browser previews, and IDE handoff, but it does not try to replace Copilot's live suggestions while you type. Use Copilot for real-time editing assistance and Paradev for parallel autonomous tasks.
+No. Paradev is not an inline-completion assistant. It does provide a chat interface, diff/file editing, browser previews, and IDE handoff, but it does not try to replace Copilot's live suggestions while you type. Use Copilot for real-time editing assistance and Paradev for parallel autonomous tasks.
 
 ### How does Copilot's Coding Agent compare to Paradev?
 

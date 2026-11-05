@@ -15,7 +15,7 @@ keywords:
   - worktree agent workspace
 ---
 
-Paradev and T3 Code aim at the same idea: one app that runs several AI coding agents at once, each on its own branch in its own Git worktree, on your own subscriptions. They differ in how you work with the agent. T3 Code is an open-source "agent harness control surface" from T3 Tools that shows each agent as a chat thread on desktop, web, and phone. Paradev runs each agent's own CLI in a persistent terminal, with a Chat view, and wraps it in review, browser, remote and cloud hosting, and automation surfaces.
+Paradev and T3 Code aim at the same idea: one app that runs several AI coding agents at once, each on its own branch in its own Git worktree, on your own subscriptions. They differ in how you work with the agent. T3 Code is an open-source "agent harness control surface" from T3 Tools that shows each agent as a chat thread on desktop, web, and phone. Paradev runs each agent's own CLI in a persistent terminal, with a chat interface, and wraps it in review, browser, remote and cloud hosting, and automation surfaces.
 
 Note that T3 Code is a distinct product from T3 Chat, the AI chat app. For that comparison, see [Paradev vs T3 Chat](/compare/superset-vs-t3-chat).
 
@@ -28,7 +28,7 @@ T3 Code facts were checked against its [GitHub repository](https://github.com/pi
 | | **Paradev** | **T3 Code** |
 |---|---|---|
 | **What it does** | Runs multiple agents in parallel in separate Git worktrees, with review, browser, and automation | Controls the agents on your machines from desktop, web, and mobile apps; each thread on its own branch or worktree |
-| **How you work with agents** | The agent's own CLI in a persistent terminal; Chat view for Claude Code, Codex, OpenCode, and Pi | Chat threads that drive each agent through its SDK, app server, or ACP; built-in terminal |
+| **How you work with agents** | The agent's own CLI in a persistent terminal; chat interface for Claude Code, Codex, OpenCode, and Pi | Chat threads that drive each agent through its SDK, app server, or ACP; built-in terminal |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktree per agent thread (worktree/local toggle) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and more) | Claude Code, Codex, Cursor, Grok Build, OpenCode, Antigravity, Pi, Muse Code, and fx; Kiro in beta; more from the ACP Registry |
 | **Maturity** | Established, with SOC 2 Type II and remote/cloud workspaces | Stable releases since v0.1.0 (October 15, 2026), latest v0.1.7 (November 4, 2026), plus several nightly builds a day; its README says it is "very very early" |
@@ -43,7 +43,7 @@ T3 Code facts were checked against its [GitHub repository](https://github.com/pi
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a Chat view for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](/cloud) (beta), and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](/cloud) (beta), and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
 
 ## What Is T3 Code?
 
@@ -53,7 +53,7 @@ T3 Code is an open-source app from T3 Tools Inc. (Theo Browne's team) that calls
 
 ### Terminal or Chat
 
-T3 Code shows every agent as a chat thread and drives it through the agent's SDK, app server, or the Agent Client Protocol. Paradev runs each agent's own CLI in a persistent terminal, so the agent works the same as it does in your own terminal. Paradev also has a Chat view for Claude Code, Codex, OpenCode, and Pi, and a CLI / Chat toggle switches the same session between the two. Pick by how you prefer to read and steer agent work.
+T3 Code shows every agent as a chat thread and drives it through the agent's SDK, app server, or the Agent Client Protocol. Paradev runs each agent's own CLI in a persistent terminal, so the agent works the same as it does in your own terminal. Paradev also has a chat interface for Claude Code, Codex, OpenCode, and Pi, and a CLI / Chat toggle switches the same session between the two. Pick by how you prefer to read and steer agent work.
 
 ### Maturity and Scope
 
@@ -84,7 +84,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 **Choose Paradev if you:**
 
 - Want a mature workspace with review, browser, and automation built in
-- Want each agent's own CLI in a real terminal, with an optional Chat view
+- Want each agent's own CLI in a real terminal, with an optional chat interface
 - Need managed cloud workspaces or your own Linux server, plus a CLI, SDK, and MCP server
 - Run a broad or changing set of agents
 - Care about enterprise readiness like SSO, SCIM, and SOC 2
