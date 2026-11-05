@@ -37,6 +37,7 @@ export function ChangesRailPanel({
 		selectedDiffTarget,
 		onSelectFile,
 		onOpenFile,
+		compact: true,
 	});
 	const hideLabel = t({ message: "Hide changed files" });
 	const isInTitleBarShell = useIsInTitleBarShell();
