@@ -8,7 +8,7 @@ pro: true
 
 Paradev can run agents on a Linux server in your own cloud account. Your repos and agent sign-ins are stored on that server. You open its workspaces from the desktop or phone app, the same as workspaces on your laptop.
 
-What still leaves the server:
+What still leaves the server, besides normal calls to GitHub and the Paradev API:
 
 - The host keeps a connection to the Paradev relay, so your devices can find it.
 - Agents send what they read to their model provider, using your keys.
@@ -63,8 +63,10 @@ superset status
 To keep the host running across reboots, run it under systemd instead: [Run it under systemd](/cli/host-server#run-it-under-systemd). First stop the host you started above:
 
 ```bash
-superset stop
+superset stop --org <id|slug|name>
 ```
+
+Use the same `--org` you passed to `superset start`, or leave it out if you did.
 
 systemd does not see variables you exported in your shell. Put them in a file only root can read, such as `/etc/superset/host.env`:
 
