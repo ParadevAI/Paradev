@@ -19,6 +19,7 @@ import { hasComposerDraft } from "../../../ChatSession/components/Composer/hooks
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
 import {
 	PENDING_CLOUD_CHAT_POLL_MS,
+	PENDING_CLOUD_CHAT_SESSIONS_LIMIT,
 	PENDING_CLOUD_CHAT_TIMEOUT_MS,
 } from "./constants";
 import { pendingLaunchOutcome } from "./utils/pendingLaunchOutcome";
@@ -45,7 +46,11 @@ export function usePendingCloudChatLaunch({
 	);
 	const sessionsQuery = useQuery({
 		queryKey,
-		queryFn: () => transport.listSessions({ workspaceId }),
+		queryFn: () =>
+			transport.listSessions({
+				workspaceId,
+				limit: PENDING_CLOUD_CHAT_SESSIONS_LIMIT,
+			}),
 		enabled: !!terminalId,
 		refetchInterval: PENDING_CLOUD_CHAT_POLL_MS,
 		refetchOnWindowFocus: false,

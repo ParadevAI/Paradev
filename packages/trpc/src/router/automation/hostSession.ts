@@ -1,5 +1,9 @@
-import { isMissingProcedure } from "./relay-client";
-import type { AgentRunResult, PreviousRunSession } from "./run";
+import { isMissingProcedure, RelayDispatchError } from "./relay-client";
+import {
+	type AgentRunResult,
+	describeError,
+	type PreviousRunSession,
+} from "./run";
 
 /** One host-service, reached through the relay or directly for a sandbox. */
 export type HostCaller = {
@@ -54,7 +58,18 @@ export async function launchAgentSession(
 				workspaceId: args.workspaceId,
 				sessionId: result.sessionId,
 			})
-			.catch(() => {});
+			.catch((err: unknown) => {
+				if (
+					isMissingProcedure(err, "panes.newTab") ||
+					(err instanceof RelayDispatchError && err.status === 412)
+				) {
+					return;
+				}
+				console.warn(
+					`[automations] could not open chat ${result.sessionId} in a desktop tab for workspace ${args.workspaceId}:`,
+					describeError(err, "panes.newTab"),
+				);
+			});
 	}
 	return result;
 }

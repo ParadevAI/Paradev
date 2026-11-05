@@ -11,7 +11,13 @@ export async function recoverAgentLaunches(
 ) {
 	const bindings = await client.terminalAgents.listByWorkspace
 		.query({ workspaceId })
-		.catch(() => []);
+		.catch((error) => {
+			console.warn("[workspace-creates] could not read agent bindings", {
+				workspaceId,
+				error,
+			});
+			return [];
+		});
 	const launches = bindings
 		.filter((binding) => binding.endedAt === undefined)
 		.map((binding) => ({

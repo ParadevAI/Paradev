@@ -160,6 +160,21 @@ describe("applyPaneLayoutOp", () => {
 		expect(again.areas.main.activeTabId).toBe(first.tabId);
 	});
 
+	test("a focused newTab in the sidebar shows the sidebar", () => {
+		const focused = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", chat, area: "sidebar", focus: true },
+			() => "new",
+		);
+		const background = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", terminalId: "t-new", area: "sidebar" },
+			() => "new",
+		);
+		expect(focused.showSidebar).toBe(true);
+		expect(background.showSidebar).toBe(false);
+	});
+
 	test("newTab rejects a terminal and a chat together, or neither", () => {
 		expectError(
 			() =>

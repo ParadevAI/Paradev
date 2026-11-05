@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { resolveChatAgentIds } from "./resolveChatAgentIds";
 
-function clientWith(harness: string | null) {
+function clientWith(harness: string | null, failures = 0) {
 	const calls: string[] = [];
 	return {
 		calls,
@@ -10,7 +10,8 @@ function clientWith(harness: string | null) {
 				get: {
 					query: async ({ sessionId }: { sessionId: string }) => {
 						calls.push(sessionId);
-						if (!harness) throw new Error("No procedure");
+						if (!harness || calls.length <= failures)
+							throw new Error("No procedure");
 						return { session: { harness } };
 					},
 				},
@@ -57,10 +58,23 @@ describe("resolveChatAgentIds", () => {
 		expect(calls).toEqual([]);
 	});
 
-	it("leaves the agent unset when the host cannot answer", async () => {
-		const { client } = clientWith(null);
-		const [entry] = await resolveChatAgentIds(client, "ws-1", [chatLaunch]);
+	it("retries a failed lookup", async () => {
+		const { client, calls } = clientWith("claude-acp", 1);
+		const [entry] = await resolveChatAgentIds(client, "ws-1", [chatLaunch], {
+			retryDelayMs: 0,
+		});
 
+		expect(calls).toEqual(["chat-1", "chat-1"]);
+		expect(entry).toEqual({ ...chatLaunch, chatAgentId: "claude" });
+	});
+
+	it("leaves the agent unset when the host cannot answer", async () => {
+		const { client, calls } = clientWith(null);
+		const [entry] = await resolveChatAgentIds(client, "ws-1", [chatLaunch], {
+			retryDelayMs: 0,
+		});
+
+		expect(calls).toHaveLength(3);
 		expect(entry).toEqual(chatLaunch);
 	});
 });

@@ -507,16 +507,23 @@ export function applyPaneLayoutOp(
 							store.setActivePane({ tabId: open.tab.id, paneId: open.pane.id }),
 						)
 					: areas;
-				return done(next, open.pane.id, open.tab.id);
+				return done(
+					next,
+					open.pane.id,
+					open.tab.id,
+					!!op.focus && open.area === "sidebar",
+				);
 			}
 			const paneId = createPaneId();
-			const next = inArea(op.area ?? "main", (store) =>
+			const area = op.area ?? "main";
+			const next = inArea(area, (store) =>
 				store.addTab({ panes: [{ id: paneId, ...pane }], focus: !!op.focus }),
 			);
 			return done(
 				op.focus ? next : keepSelection(areas, next),
 				paneId,
 				tabIdOf(next, paneId),
+				!!op.focus && area === "sidebar",
 			);
 		}
 

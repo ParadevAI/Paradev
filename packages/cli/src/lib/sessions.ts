@@ -90,7 +90,17 @@ export async function resolveSessionWorkspace(
 					sessionId,
 				});
 				return true;
-			} catch {
+			} catch (error) {
+				const code = (error as { data?: { code?: string } } | null)?.data?.code;
+				const message = error instanceof Error ? error.message : String(error);
+				const expected =
+					code === "PRECONDITION_FAILED" ||
+					/No procedure found on path "?panes\./.test(message);
+				if (!expected) {
+					process.stderr.write(
+						`Could not open chat session ${sessionId} in a desktop tab: ${message}\n`,
+					);
+				}
 				return false;
 			}
 		},

@@ -49,6 +49,12 @@ export default command({
 				}
 				throw error;
 			});
+			if (options.sidebar) {
+				requireSidebar(
+					result.layout,
+					`tab ${result.tabId} opened in the main area instead`,
+				);
+			}
 			return layoutResult(
 				`New tab ${result.tabId}: pane ${result.paneId}, chat session ${sessionId}`,
 				result,

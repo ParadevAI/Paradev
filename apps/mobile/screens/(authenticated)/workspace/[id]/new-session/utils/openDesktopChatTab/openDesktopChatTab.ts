@@ -6,5 +6,15 @@ export function openDesktopChatTab(
 	workspaceId: string,
 	sessionId: string,
 ): void {
-	void client.panes.newTab.mutate({ workspaceId, sessionId }).catch(() => {});
+	void client.panes.newTab
+		.mutate({ workspaceId, sessionId })
+		.catch((error: unknown) => {
+			const code = (error as { data?: { code?: string } } | null)?.data?.code;
+			if (code === "PRECONDITION_FAILED" || code === "NOT_FOUND") return;
+			console.warn("[openDesktopChatTab] failed", {
+				workspaceId,
+				sessionId,
+				error,
+			});
+		});
 }
