@@ -1806,6 +1806,9 @@ msgstr "Một hồ sơ riêng tính phí theo token. Khóa nằm trong CLI {0}."
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Một hồ sơ riêng dùng chung skill, plugin, server MCP và cài đặt của bạn."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Ảnh chụp được chia sẻ từ nhật ký tác nhân cục bộ. Số liệu do người dùng tự báo cáo. Chi phí ước tính dựa trên giá API, không phải hóa đơn."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Khóa nhiệm vụ gồm 1 đến 5 chữ cái hoặc chữ số và bắt đầu bằng chữ cái."
 
@@ -2241,6 +2244,9 @@ msgstr "So với main"
 msgid "Agent"
 msgstr "Agent"
 
+msgid "Agent breakdown"
+msgstr "Chi tiết tác nhân"
+
 msgid "Agent commands"
 msgstr "Lệnh của agent"
 
@@ -2349,6 +2355,9 @@ msgstr "Agent chạy khi bạn vắng mặt"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agent dùng tài khoản này khi gọi các công cụ Linear."
+
+msgid "Agents used"
+msgstr "Tác nhân đã dùng"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Tổng hợp mức sử dụng agent của mọi lập trình viên trên bảng xếp hạng Paradev — token, chi phí, hành vi cache và những mô hình mọi người thực sự dùng."
@@ -6067,6 +6076,9 @@ msgstr "Không thể gửi cho agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Không gửi được tin nhắn. Tin nhắn đã được trả lại ô soạn thảo."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Không thể chia sẻ thẻ sử dụng. Hãy thử tải ảnh xuống."
+
 msgid "Couldn't stage changes"
 msgstr "Không thể stage các thay đổi"
 
@@ -6436,6 +6448,9 @@ msgstr "Hiện tại"
 
 msgid "Current access"
 msgstr "Quyền truy cập hiện tại"
+
+msgid "Current leaderboard tier"
+msgstr "Hạng bảng xếp hạng hiện tại"
 
 msgid "Current level"
 msgstr "Mức hiện tại"
@@ -7764,6 +7779,9 @@ msgstr "esc để đóng"
 msgid "esc to exit"
 msgstr "esc để thoát"
 
+msgid "Estimated cost"
+msgstr "Chi phí ước tính"
+
 msgid "Event"
 msgstr "Sự kiện"
 
@@ -9042,6 +9060,9 @@ msgstr "Lấy từ ảnh chụp worktree trước và sau lượt này. Một ch
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Lấy từ ảnh chụp worktree trước và sau lượt này. Một chat khác đã làm việc ở đây cùng lúc, nên danh sách này chỉ có các tệp mà chat này đã sửa bằng công cụ tệp của nó. Các thay đổi khác được liệt kê riêng."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "Từ nhật ký cục bộ của máy chủ này. Chi phí ước tính dùng giá niêm yết API, không phải hóa đơn của bạn. PR được liên kết với tác nhân trong không gian làm việc và có thể được tính cho nhiều tác nhân."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter đang ẩn — chuyển sang Markdown để sửa"
 
@@ -9152,6 +9173,9 @@ msgstr "Khai thác Paradev nhiều hơn"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Nhận thông báo khi Paradev có trên Windows."
+
+msgid "Get Paradev"
+msgstr "Tải Paradev"
 
 msgid "Get Paradev on your Mac"
 msgstr "Cài Paradev trên máy Mac"
@@ -10604,6 +10628,12 @@ msgstr "3 tháng qua"
 msgid "last 30 days"
 msgstr "30 ngày qua"
 
+msgid "Last 30 days"
+msgstr "30 ngày qua"
+
+msgid "Last 365 days"
+msgstr "365 ngày qua"
+
 msgid "Last 4 weeks"
 msgstr "4 tuần qua"
 
@@ -11191,6 +11221,9 @@ msgstr "Độ tin cậy dài hạn vượt một ngưỡng. Việc giao lúc 6 g
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip chỉ hiện phím tắt khi di chuột lâu; kiểu chip của nó giờ là mặc định của TooltipContent"
 
+msgid "Longest streak (days)"
+msgstr "Chuỗi dài nhất (ngày)"
+
 msgid "Looking at {what}"
 msgstr "Đang xem {what}"
 
@@ -11549,6 +11582,9 @@ msgstr "Đã merge"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Được merge bởi {0}"
+
+msgid "Merged PRs"
+msgstr "PR đã hợp nhất"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Đã merge, nhưng không làm mới được trạng thái PR — hãy thử lại sau giây lát"
@@ -13246,6 +13282,9 @@ msgstr "Chỉ những người được mời"
 
 msgid "Only people who opted in appear here."
 msgstr "Chỉ những người đã chọn tham gia mới xuất hiện ở đây."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Chỉ số liệu đã chọn mới được đưa vào ảnh và liên kết công khai. Tên kho mã và tiêu đề PR không bao giờ được đưa vào."
 
 msgid "Only the author can change a comment"
 msgstr "Chỉ tác giả mới có thể sửa bình luận"
@@ -17119,6 +17158,9 @@ msgstr "Chọn một môi trường"
 msgid "Select an organization"
 msgstr "Chọn một tổ chức"
 
+msgid "Select at least one available stat."
+msgstr "Chọn ít nhất một số liệu có sẵn."
+
 msgid "Select base branch…"
 msgstr "Chọn nhánh gốc…"
 
@@ -17493,6 +17535,12 @@ msgstr "Chia sẻ plugin từ một repo GitHub. Ghim bản phát hành bằng g
 
 msgid "Share this page"
 msgstr "Chia sẻ trang này"
+
+msgid "Share to X"
+msgstr "Chia sẻ lên X"
+
+msgid "Share usage"
+msgstr "Chia sẻ sử dụng"
 
 msgid "Share via…"
 msgstr "Chia sẻ qua…"
@@ -20222,6 +20270,12 @@ msgstr "Tooltip bật"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Tác nhân hàng đầu theo token"
+
+msgid "Top model"
+msgstr "Mô hình dùng nhiều nhất"
+
 msgid "Top models"
 msgstr "Mô hình hàng đầu"
 
@@ -20854,6 +20908,12 @@ msgstr "Định danh thân thiện với URL, duy nhất trong tổ chức của
 msgid "Usage"
 msgstr "Mức sử dụng"
 
+msgid "Usage card"
+msgstr "Thẻ sử dụng"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Thẻ sử dụng không khả dụng trên máy chủ này. Hãy cập nhật máy chủ và thử lại."
+
 msgid "Usage is out of date"
 msgstr "Dữ liệu sử dụng đã cũ"
 
@@ -21135,6 +21195,9 @@ msgstr "Xem bản phát hành trên GitHub"
 
 msgid "View usage"
 msgstr "Xem mức sử dụng"
+
+msgid "View usage dashboard"
+msgstr "Xem bảng điều khiển sử dụng"
 
 msgid "Violence or harassment"
 msgstr "Bạo lực hoặc quấy rối"

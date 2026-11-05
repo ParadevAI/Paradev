@@ -9,6 +9,7 @@ import { projects, workspaces } from "../../../db/schema";
 import {
 	leaderboardPayloadTask,
 	usageHistoryTask,
+	wrappedUsageTask,
 } from "../../../workers/tasks/usage";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { offLoop } from "../../off-loop";
@@ -29,6 +30,7 @@ import {
 } from "./default-account";
 import { fetchGrokAccounts } from "./grok-quota";
 import { countAgentPrsByDay } from "./history/agent-prs";
+import { countWrappedPrs } from "./history/wrapped";
 import { fetchOpencodeAccounts } from "./opencode-quota";
 import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
 import {
@@ -85,6 +87,38 @@ export const leaderboardPayloadInput = z.object({
 });
 
 export const usageRouter = router({
+	wrapped: queryProcedure
+		.meta({ timeoutMs: 120_000 })
+		.input(z.object({ days: z.union([z.literal(30), z.literal(365)]) }))
+		.query(
+			offLoop({
+				task: wrappedUsageTask,
+				prepare: ({ ctx, input }) => ({
+					days: input.days,
+					prs: countWrappedPrs(ctx.db, input.days),
+					cwdLabels: [
+						...ctx.db
+							.select({ prefix: workspaces.worktreePath })
+							.from(workspaces)
+							.all(),
+						...ctx.db
+							.select({ prefix: projects.repoPath })
+							.from(projects)
+							.all(),
+					]
+						.filter((row) => row.prefix)
+						.map(({ prefix }) => ({
+							prefix,
+							label: basename(prefix),
+							kind: "project" as const,
+						})),
+				}),
+				options: ({ input }) => ({
+					dedupeKey: `usage-wrapped:${input.days}`,
+					timeoutMs: 110_000,
+				}),
+			}),
+		),
 	sessionAccount: queryProcedure
 		.input(
 			z.object({

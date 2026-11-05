@@ -1806,6 +1806,9 @@ msgstr "Een apart profiel dat per token wordt afgerekend. De sleutel blijft in d
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Een apart profiel dat je skills, plugins, MCP-servers en instellingen deelt."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Een gedeelde momentopname van lokale agentlogboeken. Statistieken zijn zelf gerapporteerd. Geschatte kosten zijn gebaseerd op API-tarieven, niet op een factuur."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Een taaksleutel bestaat uit 1 tot 5 letters of cijfers en begint met een letter."
 
@@ -2241,6 +2244,9 @@ msgstr "Ten opzichte van main"
 msgid "Agent"
 msgstr "Agent"
 
+msgid "Agent breakdown"
+msgstr "Uitsplitsing per agent"
+
 msgid "Agent commands"
 msgstr "Agentcommando's"
 
@@ -2349,6 +2355,9 @@ msgstr "Agents die doorwerken als je weg bent"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."
+
+msgid "Agents used"
+msgstr "Gebruikte agents"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Totaal agentgebruik van alle developers op het Paradev-leaderboard — tokens, kosten, cachegedrag en welke modellen mensen echt gebruiken."
@@ -6067,6 +6076,9 @@ msgstr "Kan niet naar de agent sturen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Je bericht kon niet worden verzonden. Het staat weer in het invoerveld."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "De gebruikskaart kon niet worden gedeeld. Probeer de afbeelding te downloaden."
+
 msgid "Couldn't stage changes"
 msgstr "Kan wijzigingen niet stagen"
 
@@ -6436,6 +6448,9 @@ msgstr "Huidig"
 
 msgid "Current access"
 msgstr "Huidige toegang"
+
+msgid "Current leaderboard tier"
+msgstr "Huidig niveau in de ranglijst"
 
 msgid "Current level"
 msgstr "Huidig niveau"
@@ -7764,6 +7779,9 @@ msgstr "esc om te sluiten"
 msgid "esc to exit"
 msgstr "esc om te verlaten"
 
+msgid "Estimated cost"
+msgstr "Geschatte kosten"
+
 msgid "Event"
 msgstr "Gebeurtenis"
 
@@ -9042,6 +9060,9 @@ msgstr "Uit snapshots van de worktree voor en na deze beurt. Een andere chat wer
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Uit snapshots van de worktree voor en na deze beurt. Een andere chat werkte hier tegelijk, dus deze lijst bevat alleen de bestanden die deze chat met zijn bestandstools heeft bewerkt. Andere wijzigingen staan apart."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "Uit de lokale logboeken van deze host. Geschatte kosten gebruiken API-lijstprijzen, niet je factuur. PR’s zijn gekoppeld aan workspace-agents en kunnen voor meerdere agents meetellen."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter verborgen — schakel over naar Markdown om die te bewerken"
 
@@ -9152,6 +9173,9 @@ msgstr "Haal meer uit Paradev"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Krijg bericht wanneer Paradev beschikbaar is op Windows."
+
+msgid "Get Paradev"
+msgstr "Paradev downloaden"
 
 msgid "Get Paradev on your Mac"
 msgstr "Paradev op je Mac"
@@ -10604,6 +10628,12 @@ msgstr "Laatste 3 maanden"
 msgid "last 30 days"
 msgstr "laatste 30 dagen"
 
+msgid "Last 30 days"
+msgstr "Afgelopen 30 dagen"
+
+msgid "Last 365 days"
+msgstr "Afgelopen 365 dagen"
+
 msgid "Last 4 weeks"
 msgstr "Laatste 4 weken"
 
@@ -11191,6 +11221,9 @@ msgstr "Betrouwbaarheid over lange horizon overschrijdt een drempel. Werk dat om
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip met alleen de sneltoets bij lang hoveren; de chipstijl is nu de standaard voor TooltipContent"
 
+msgid "Longest streak (days)"
+msgstr "Langste reeks (dagen)"
+
 msgid "Looking at {what}"
 msgstr "{what} bekijken"
 
@@ -11549,6 +11582,9 @@ msgstr "Gemerged"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Gemerged door {0}"
+
+msgid "Merged PRs"
+msgstr "Samengevoegde PR’s"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Gemerged, maar de PR-status kon niet worden ververst — probeer het zo opnieuw"
@@ -13246,6 +13282,9 @@ msgstr "Alleen uitgenodigde personen"
 
 msgid "Only people who opted in appear here."
 msgstr "Alleen mensen die zich hebben aangemeld verschijnen hier."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Alleen geselecteerde statistieken komen in je afbeelding en openbare link. Repositorynamen en PR-titels worden nooit opgenomen."
 
 msgid "Only the author can change a comment"
 msgstr "Alleen de auteur kan een reactie wijzigen"
@@ -17119,6 +17158,9 @@ msgstr "Selecteer een omgeving"
 msgid "Select an organization"
 msgstr "Kies een organisatie"
 
+msgid "Select at least one available stat."
+msgstr "Selecteer minstens één beschikbare statistiek."
+
 msgid "Select base branch…"
 msgstr "Kies basisbranch…"
 
@@ -17493,6 +17535,12 @@ msgstr "Deel plugins vanuit een GitHub-repo. Zet releases vast met git-tags."
 
 msgid "Share this page"
 msgstr "Deze pagina delen"
+
+msgid "Share to X"
+msgstr "Delen op X"
+
+msgid "Share usage"
+msgstr "Gebruik delen"
 
 msgid "Share via…"
 msgstr "Delen via…"
@@ -20222,6 +20270,12 @@ msgstr "Tooltip aan"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Topagents op basis van tokens"
+
+msgid "Top model"
+msgstr "Meestgebruikte model"
+
 msgid "Top models"
 msgstr "Topmodellen"
 
@@ -20854,6 +20908,12 @@ msgstr "URL-vriendelijke identifier, uniek binnen je organisatie."
 msgid "Usage"
 msgstr "Gebruik"
 
+msgid "Usage card"
+msgstr "Gebruikskaart"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Gebruikskaarten zijn niet beschikbaar op deze host. Werk de host bij en probeer het opnieuw."
+
 msgid "Usage is out of date"
 msgstr "De gebruiksgegevens zijn verouderd"
 
@@ -21135,6 +21195,9 @@ msgstr "Releases bekijken op GitHub"
 
 msgid "View usage"
 msgstr "Gebruik bekijken"
+
+msgid "View usage dashboard"
+msgstr "Gebruiksdashboard bekijken"
 
 msgid "Violence or harassment"
 msgstr "Geweld of intimidatie"

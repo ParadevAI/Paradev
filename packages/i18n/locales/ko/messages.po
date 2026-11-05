@@ -1806,6 +1806,9 @@ msgstr "토큰 단위로 과금되는 별도 프로필입니다. 키는 {0} CLI 
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "스킬, 플러그인, MCP 서버, 설정을 공유하는 별도 프로필입니다."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "로컬 에이전트 로그에서 공유한 스냅샷입니다. 통계는 사용자가 제공한 값입니다. 예상 비용은 API 요금 기준이며 청구 금액이 아닙니다."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "작업 키는 문자로 시작하는 1~5자의 문자 또는 숫자입니다."
 
@@ -2241,6 +2244,9 @@ msgstr "main 기준"
 msgid "Agent"
 msgstr "에이전트"
 
+msgid "Agent breakdown"
+msgstr "에이전트별 내역"
+
 msgid "Agent commands"
 msgstr "에이전트 명령"
 
@@ -2349,6 +2355,9 @@ msgstr "자리를 비운 동안에도 실행되는 에이전트"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "에이전트는 Linear 도구를 호출할 때 이 계정을 사용합니다."
+
+msgid "Agents used"
+msgstr "사용한 에이전트"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Paradev 리더보드에 참여한 모든 개발자의 에이전트 사용량 집계 — 토큰, 비용, 캐시 동작, 그리고 실제로 많이 쓰이는 모델입니다."
@@ -6067,6 +6076,9 @@ msgstr "에이전트에 보내지 못했습니다"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "메시지를 보내지 못했습니다. 입력란으로 다시 옮겼습니다."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "사용량 카드를 공유하지 못했습니다. 이미지를 다운로드해 보세요."
+
 msgid "Couldn't stage changes"
 msgstr "변경 사항을 스테이징하지 못했습니다"
 
@@ -6436,6 +6448,9 @@ msgstr "현재"
 
 msgid "Current access"
 msgstr "현재 접근 권한"
+
+msgid "Current leaderboard tier"
+msgstr "현재 순위표 등급"
 
 msgid "Current level"
 msgstr "현재 단계"
@@ -7764,6 +7779,9 @@ msgstr "esc로 닫기"
 msgid "esc to exit"
 msgstr "esc로 종료"
 
+msgid "Estimated cost"
+msgstr "예상 비용"
+
 msgid "Event"
 msgstr "이벤트"
 
@@ -9042,6 +9060,9 @@ msgstr "이 턴 전후의 worktree 스냅샷을 기준으로 합니다. 같은 �
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "이 턴 전후의 worktree 스냅샷을 기준으로 합니다. 같은 시간에 다른 채팅이 여기서 작업했으므로, 이 목록에는 이 채팅이 파일 도구로 편집한 파일만 표시됩니다. 다른 변경은 따로 표시됩니다."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "이 호스트의 로컬 로그를 기반으로 합니다. 예상 비용은 API 정가를 사용하며 청구 금액이 아닙니다. PR은 워크스페이스 에이전트와 연결되며 여러 에이전트에 집계될 수 있습니다."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "프런트매터 숨김 — 편집하려면 Markdown으로 전환하세요"
 
@@ -9152,6 +9173,9 @@ msgstr "Paradev 더 잘 활용하기"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Paradev를 Windows에서 쓸 수 있게 되면 알려 드립니다."
+
+msgid "Get Paradev"
+msgstr "Paradev 받기"
 
 msgid "Get Paradev on your Mac"
 msgstr "Mac에서 Paradev 사용하기"
@@ -10604,6 +10628,12 @@ msgstr "최근 3개월"
 msgid "last 30 days"
 msgstr "최근 30일"
 
+msgid "Last 30 days"
+msgstr "최근 30일"
+
+msgid "Last 365 days"
+msgstr "최근 365일"
+
 msgid "Last 4 weeks"
 msgstr "최근 4주"
 
@@ -11191,6 +11221,9 @@ msgstr "장시간 작업의 신뢰성이 임계점을 넘습니다. 오후 6시�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "오래 호버하면 단축키만 보여 주는 툴팁이며, 그 칩 스타일이 이제 TooltipContent 기본값입니다"
 
+msgid "Longest streak (days)"
+msgstr "최장 연속 사용 일수"
+
 msgid "Looking at {what}"
 msgstr "{what} 확인 중"
 
@@ -11549,6 +11582,9 @@ msgstr "머지됨"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "{0}이(가) 머지함"
+
+msgid "Merged PRs"
+msgstr "병합된 PR"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "머지했지만 PR 상태를 새로 고치지 못했습니다 — 잠시 후 다시 시도하세요"
@@ -13246,6 +13282,9 @@ msgstr "초대된 사람만"
 
 msgid "Only people who opted in appear here."
 msgstr "참여를 선택한 사람만 여기에 표시됩니다."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "선택한 통계만 이미지와 공개 링크에 포함됩니다. 저장소 이름과 PR 제목은 포함되지 않습니다."
 
 msgid "Only the author can change a comment"
 msgstr "작성자만 댓글을 변경할 수 있습니다"
@@ -17119,6 +17158,9 @@ msgstr "환경을 선택하세요"
 msgid "Select an organization"
 msgstr "조직을 선택하세요"
 
+msgid "Select at least one available stat."
+msgstr "사용 가능한 통계를 하나 이상 선택하세요."
+
 msgid "Select base branch…"
 msgstr "기준 브랜치 선택…"
 
@@ -17493,6 +17535,12 @@ msgstr "GitHub 저장소에서 플러그인을 공유하세요. git 태그로 �
 
 msgid "Share this page"
 msgstr "이 페이지 공유"
+
+msgid "Share to X"
+msgstr "X에 공유"
+
+msgid "Share usage"
+msgstr "사용량 공유"
 
 msgid "Share via…"
 msgstr "공유 방법…"
@@ -20222,6 +20270,12 @@ msgstr "툴팁 켜짐"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "토큰 수 상위 에이전트"
+
+msgid "Top model"
+msgstr "최다 사용 모델"
+
 msgid "Top models"
 msgstr "상위 모델"
 
@@ -20854,6 +20908,12 @@ msgstr "URL에 쓰기 좋은 식별자로, 조직 안에서 고유해야 합니�
 msgid "Usage"
 msgstr "사용량"
 
+msgid "Usage card"
+msgstr "사용량 카드"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "이 호스트에서 사용량 카드를 사용할 수 없습니다. 호스트를 업데이트하고 다시 시도하세요."
+
 msgid "Usage is out of date"
 msgstr "사용량 정보가 오래되었습니다"
 
@@ -21135,6 +21195,9 @@ msgstr "GitHub에서 릴리스 보기"
 
 msgid "View usage"
 msgstr "사용량 보기"
+
+msgid "View usage dashboard"
+msgstr "사용량 대시보드 보기"
 
 msgid "Violence or harassment"
 msgstr "폭력 또는 괴롭힘"
