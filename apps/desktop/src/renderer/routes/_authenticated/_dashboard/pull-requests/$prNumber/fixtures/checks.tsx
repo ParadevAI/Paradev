@@ -37,6 +37,9 @@ const read = mock(() => detail);
 mock.module(`${root}/pull-requests/hooks/usePullRequestDetail`, () => ({
 	usePullRequestDetail: read,
 }));
+mock.module(`${root}/pull-requests/hooks/usePullRequestListPreview`, () => ({
+	usePullRequestListPreview: () => null,
+}));
 mock.module(`${root}/components/PageHeader`, () => ({
 	PageHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));

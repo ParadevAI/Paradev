@@ -483,11 +483,6 @@ msgstr "{0} GB-ore"
 msgid "{0} installed"
 msgstr "{0} installato"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} in {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -553,7 +548,6 @@ msgid "{0} of {1} checks running"
 msgstr "{0} controlli su {1} in esecuzione"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{0} di {totalCount}"
 
@@ -1351,9 +1345,6 @@ msgstr "{total, plural, one {Il controllo è passato} other {Tutti i # controlli
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issue GitHub}}"
-
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {pull request} other {pull request}}"
 
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {Importato # tema personalizzato} other {Importati # temi personalizzati}}"
@@ -5372,6 +5363,9 @@ msgstr "Copia come CSV"
 msgid "Copy as Markdown"
 msgstr "Copia come Markdown"
 
+msgid "Copy branch name"
+msgstr "Copia il nome del branch"
+
 msgid "Copy Branch Name"
 msgstr "Copia il nome del branch"
 
@@ -5507,6 +5501,9 @@ msgstr "Copia negli appunti"
 
 msgid "Copy URL"
 msgstr "Copia l'URL"
+
+msgid "Copy username"
+msgstr "Copia nome utente"
 
 msgid "Copy Workspace ID"
 msgstr "Copia l'ID del workspace"

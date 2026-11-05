@@ -1,6 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
+import type { PullRequestPreview } from "../../hooks/usePullRequestListPreview";
 import { PullRequestSkeleton as Skeleton } from "../PullRequestSkeleton";
+import { PullRequestPreviewHeader } from "./components/PullRequestPreviewHeader";
 
 const BODY_LINES = [
 	{ id: "first", width: "w-full" },
@@ -13,12 +15,15 @@ const BODY_LINES = [
 interface PullRequestDetailSkeletonProps {
 	/** True for the Changes tab: a file card shape instead of the summary page. */
 	variant?: "summary" | "diff";
+	/** The list's row for this pull request: its header shows at once. */
+	preview?: PullRequestPreview | null;
 	className?: string;
 }
 
 /** The page's shape while its detail (or the diff renderer) is on its way. */
 export function PullRequestDetailSkeleton({
 	variant = "summary",
+	preview = null,
 	className,
 }: PullRequestDetailSkeletonProps) {
 	const { t } = useLingui();
@@ -56,17 +61,23 @@ export function PullRequestDetailSkeleton({
 		>
 			<div className="mx-auto flex w-full max-w-[76rem] items-start gap-12 px-6 pt-4">
 				<div className="min-w-0 flex-1 space-y-4">
-					<div className="flex items-center gap-2">
-						<Skeleton className="h-6 w-16 rounded-full" />
-						<Skeleton className="h-3 w-24 rounded-full" />
-					</div>
-					<Skeleton className="h-8 w-4/5 rounded-md" />
-					<div className="flex items-center gap-2">
-						<Skeleton className="size-4 rounded-full" />
-						<Skeleton className="h-3 w-24 rounded-full" />
-						<Skeleton className="h-3 w-12 rounded-full" />
-						<Skeleton className="h-3 w-32 rounded-full" />
-					</div>
+					{preview ? (
+						<PullRequestPreviewHeader preview={preview} />
+					) : (
+						<>
+							<div className="flex items-center gap-2">
+								<Skeleton className="h-6 w-16 rounded-full" />
+								<Skeleton className="h-3 w-24 rounded-full" />
+							</div>
+							<Skeleton className="h-8 w-4/5 rounded-md" />
+							<div className="flex items-center gap-2">
+								<Skeleton className="size-4 rounded-full" />
+								<Skeleton className="h-3 w-24 rounded-full" />
+								<Skeleton className="h-3 w-12 rounded-full" />
+								<Skeleton className="h-3 w-32 rounded-full" />
+							</div>
+						</>
+					)}
 					<div className="space-y-2 pt-4">
 						<Skeleton className="h-4 w-24 rounded-full" />
 						{BODY_LINES.map(({ id, width }) => (
