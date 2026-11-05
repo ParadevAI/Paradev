@@ -56,6 +56,7 @@ export const browserRouter = router({
 				url: z.string(),
 				target: z.enum(["current-tab", "new-tab"]).default("current-tab"),
 				show: z.boolean().default(false),
+				activate: z.boolean().default(false),
 			}),
 		)
 		.mutation(({ ctx, input }) => {

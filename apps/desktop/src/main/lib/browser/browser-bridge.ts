@@ -215,7 +215,8 @@ export async function startBrowserBridge({
 	});
 
 	app.post("/open", (req, res) => {
-		const { workspaceId, projectId, url, target, show } = req.body ?? {};
+		const { workspaceId, projectId, url, target, show, activate } =
+			req.body ?? {};
 		if (typeof workspaceId !== "string" || typeof url !== "string") {
 			res.status(400).json({ error: "workspaceId and url are required" });
 			return;
@@ -300,6 +301,7 @@ export async function startBrowserBridge({
 					url: resolvedUrl,
 					target: resolvedTarget,
 					show: show === true,
+					activate: activate === true,
 					requestId,
 				} satisfies BrowserOpenRequest);
 			});

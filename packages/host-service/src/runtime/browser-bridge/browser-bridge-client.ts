@@ -67,6 +67,7 @@ export class BrowserBridgeClient {
 		url: string;
 		target: "current-tab" | "new-tab";
 		show?: boolean;
+		activate?: boolean;
 	}) {
 		return this.request<{ paneId: string; url: string; title: string }>(
 			"POST",
