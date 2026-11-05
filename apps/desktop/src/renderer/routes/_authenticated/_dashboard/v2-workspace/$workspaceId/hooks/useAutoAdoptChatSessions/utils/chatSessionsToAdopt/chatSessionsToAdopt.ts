@@ -1,7 +1,10 @@
 import { presetForAcpHarness } from "@superset/chat/core";
 import type { Tab } from "@superset/panes";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
-import { isChatSessionClosed } from "../../../../utils/closedChatSessions";
+import {
+	isChatSessionClosed,
+	isChatTerminalClosed,
+} from "../../../../utils/closedChatSessions";
 import type { ChatSessionTarget } from "../../../../utils/focusChatSession";
 
 interface ListedChatSession {
@@ -18,6 +21,7 @@ interface ListedChatSession {
  * Live chats in the workspace that no pane shows, oldest first. A pane
  * claims a chat by its session id or by its terminal id, so a chat the
  * desktop is still creating (or a pending cloud launch) is never adopted twice.
+ * A closed pane keeps its terminal claimed, so a session leaked on it is never adopted.
  */
 export function chatSessionsToAdopt(
 	sessions: readonly ListedChatSession[],
@@ -40,6 +44,7 @@ export function chatSessionsToAdopt(
 		if (claimedSessionIds.has(session.sessionId)) continue;
 		if (claimedTerminalIds.has(session.terminalId)) continue;
 		if (isChatSessionClosed(session.sessionId)) continue;
+		if (isChatTerminalClosed(session.terminalId)) continue;
 		const presetId = presetForAcpHarness(session.harness);
 		if (!presetId) continue;
 		targets.push({

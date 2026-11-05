@@ -6,6 +6,7 @@ import {
 } from "../../../../types";
 import {
 	markChatSessionClosed,
+	markChatTerminalClosed,
 	reopenChatSession,
 } from "../../../../utils/closedChatSessions";
 import { chatSessionsToAdopt } from "./chatSessionsToAdopt";
@@ -85,6 +86,7 @@ describe("chatSessionsToAdopt", () => {
 			],
 		});
 		markChatSessionClosed("closed");
+		const reopenTerminal = markChatTerminalClosed("terminal-stray");
 		try {
 			expect(
 				chatSessionsToAdopt(
@@ -95,12 +97,14 @@ describe("chatSessionsToAdopt", () => {
 						listed("shown"),
 						listed("creating"),
 						listed("pending"),
+						listed("stray"),
 					],
 					store.getState().tabs,
 				),
 			).toEqual([]);
 		} finally {
 			reopenChatSession("closed");
+			reopenTerminal();
 		}
 	});
 });

@@ -8,6 +8,7 @@ import type { ChatPaneData, PaneViewerData } from "../../../../types";
 import {
 	isChatSessionClosed,
 	markChatSessionClosed,
+	markChatTerminalClosed,
 } from "../../../../utils/closedChatSessions";
 import {
 	addPendingChatStop,
@@ -171,6 +172,7 @@ export function useUndoableChatClose({
 		(pane) => {
 			const data = pane.data as ChatPaneData;
 			const { sessionId, terminalId } = data;
+			const reopenTerminal = markChatTerminalClosed(terminalId);
 			void stopStrayChats(terminalId, sessionId);
 			if (!sessionId || isChatSessionClosed(sessionId)) return;
 			const index = previousTabs.current.findIndex(
@@ -185,7 +187,10 @@ export function useUndoableChatClose({
 					tab && Object.keys(tab.panes).length === 1 ? { tab, index } : null,
 				sessionId,
 				title: pane.titleOverride ?? data.chatTitle ?? t({ message: "Chat" }),
-				reopen: reopenSession,
+				reopen: () => {
+					reopenSession();
+					reopenTerminal();
+				},
 			});
 		},
 		[batches, workspaceId, t, stopStrayChats],
