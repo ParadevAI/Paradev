@@ -241,7 +241,7 @@ export function TriggersCard({
 							onChange={(machineSize) => onScopeChange({ machineSize })}
 						/>
 					)}
-					{!cloud && (
+					{!(scope.v2WorkspaceId ?? scope.cloudWorkspaceId) && (
 						<>
 							<span>tagged</span>
 							<AutomationTagsPicker

@@ -1,6 +1,11 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
+import {
+	cloudWorkspaces,
+	cloudWorkspaceTags,
+	environments,
+	tasks,
+} from "@superset/db/schema";
 import {
 	type CloudAgentLaunch,
 	describeCloudAgentLaunch,
@@ -129,6 +134,8 @@ export interface StartCloudWorkspaceInput {
 	taskIds?: string[];
 	attachmentFileIds?: string[];
 	machineSize?: string;
+	/** Normalized workspace tags, filed under `userId`. */
+	tags?: string[];
 	beforeProvision?: (workspaceId: string) => Promise<void>;
 }
 
@@ -209,6 +216,15 @@ async function start(args: StartCloudWorkspaceInput) {
 		cloudWorkspaceId: row.id,
 		repositories,
 	});
+	if (args.tags?.length) {
+		await db.insert(cloudWorkspaceTags).values(
+			args.tags.map((tag) => ({
+				cloudWorkspaceId: row.id,
+				tag,
+				createdByUserId: args.userId,
+			})),
+		);
+	}
 	const actor = { kind: "user" as const, userId: args.userId };
 	await recordCloudWorkspaceActivity(db, row.id, actor, { event: "created" });
 	if (args.taskIds?.length) {
