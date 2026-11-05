@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { manualSignInFor } from "./useManualSignIn";
+import { manualSignInFor } from "./manualSignInFor";
 
 const manualClaude = [{ agent: "claude", provider: "manual" }];
 

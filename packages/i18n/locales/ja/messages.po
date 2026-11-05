@@ -1064,6 +1064,9 @@ msgstr "{kindLabel}テーマ"
 msgid "{label} access to {pluginName}"
 msgstr "{label} の {pluginName} へのアクセス"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} は未設定の状態に戻ります。ワークスペース内では何も変わりません。スクリプトとそれが維持するログインは、削除するまで残ります。"
+
 msgid "{label} is set to manual"
 msgstr "{label} を手動サインインに設定しました"
 
@@ -11327,6 +11330,9 @@ msgstr "組織の管理者によって管理されています。"
 msgid "Manual"
 msgstr "手作業"
 
+msgid "Manual mode is off for {label}."
+msgstr "{label} の手動モードをオフにしました。"
+
 msgid "Manual order"
 msgstr "手動順"
 
@@ -16099,6 +16105,9 @@ msgstr "今すぐ再起動すると{accountLabel}に移行し、各セッショ�
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "実行中のワークスペースを再起動すると、エージェントに変更が反映されます。"
+
 msgid "Restart terminal daemon?"
 msgstr "ターミナルデーモンを再起動しますか?"
 
@@ -20346,6 +20355,12 @@ msgstr "定型作業を、スケジュールやイベントの発生で動くエ
 
 msgid "Turn Fast mode on or off"
 msgstr "高速モードのオン/オフを切り替え"
+
+msgid "Turn off manual mode"
+msgstr "手動モードをオフにする"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "{label} の手動モードをオフにしますか？"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "「リレー経由でこのデバイスへのリモートアクセスを許可」をオンにする"

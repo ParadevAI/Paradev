@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} motiv"
 msgid "{label} access to {pluginName}"
 msgstr "Přístup role {label} k {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se nic nezmění: váš skript a přihlášení, které udržuje, zůstanou, dokud je neodstraníte."
+
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
@@ -11327,6 +11330,9 @@ msgstr "Spravuje správce vaší organizace."
 msgid "Manual"
 msgstr "Manuální"
 
+msgid "Manual mode is off for {label}."
+msgstr "Ruční režim pro {label} je vypnutý."
+
 msgid "Manual order"
 msgstr "Ruční řazení"
 
@@ -16099,6 +16105,9 @@ msgstr "Restartujte je teď a přejdou na {accountLabel}; každá relace naváž
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restartovat běžící agenty {providerLabel}?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Restartujte spuštěné pracovní prostory, aby jejich agenti změnu převzali."
+
 msgid "Restart terminal daemon?"
 msgstr "Restartovat terminálového démona?"
 
@@ -20346,6 +20355,12 @@ msgstr "Proměňte rutinní práci v agenty, kteří běží podle plánu nebo p
 
 msgid "Turn Fast mode on or off"
 msgstr "Zapnout nebo vypnout rychlý režim"
+
+msgid "Turn off manual mode"
+msgstr "Vypnout ruční režim"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Vypnout ruční režim pro {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“"

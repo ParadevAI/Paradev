@@ -209,7 +209,7 @@ export function TurnFailureCard({
 						</Trans>
 					</p>
 				)}
-				{signingIn && recovery && (
+				{signingIn && recovery && !manualSignIn && (
 					<SignInCommand command={error?.loginCommand} />
 				)}
 				{newChatFailed && (

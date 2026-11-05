@@ -40,7 +40,8 @@ export function ManualSignIn({
 			await enable();
 			toast.success(t({ message: `${label} is set to manual` }), {
 				description: t({
-					message: "Restart workspaces to pick up new agent credentials.",
+					message:
+						"Restart running workspaces so their agents pick up the change.",
 				}),
 			});
 		} catch (error) {

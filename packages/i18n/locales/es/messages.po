@@ -1064,6 +1064,9 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Acceso de {label} a {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} vuelve a quedar sin configurar. Nada cambia dentro de tus espacios de trabajo: tu script y la sesión que mantiene siguen ahí hasta que los elimines."
+
 msgid "{label} is set to manual"
 msgstr "{label} usa inicio de sesión manual"
 
@@ -11327,6 +11330,9 @@ msgstr "Lo gestiona el administrador de tu organización."
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual mode is off for {label}."
+msgstr "El modo manual está desactivado para {label}."
+
 msgid "Manual order"
 msgstr "Orden manual"
 
@@ -16099,6 +16105,9 @@ msgstr "Reinícialos ahora para pasarlos a {accountLabel}; cada sesión retoma s
 msgid "Restart running {providerLabel} agents?"
 msgstr "¿Reiniciar los agentes de {providerLabel} en marcha?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Reinicia los espacios de trabajo en ejecución para que sus agentes apliquen el cambio."
+
 msgid "Restart terminal daemon?"
 msgstr "¿Reiniciar el daemon de terminal?"
 
@@ -16406,7 +16415,7 @@ msgid "Roundups"
 msgstr "Recopilaciones"
 
 msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
-msgstr "Enruta {label} a través de un proveedor que gestionas tú, con las credenciales que tienes, o deja su inicio de sesión a tus propias herramientas."
+msgstr "Enruta {label} a través de un proveedor que gestionas tú, con las credenciales que tienes, o deja que tus propias herramientas gestionen su inicio de sesión."
 
 msgid "Routine not found"
 msgstr "Rutina no encontrada"
@@ -20346,6 +20355,12 @@ msgstr "Convierte las tareas rutinarias en agentes que se ejecutan de forma prog
 
 msgid "Turn Fast mode on or off"
 msgstr "Activar o desactivar el modo rápido"
+
+msgid "Turn off manual mode"
+msgstr "Desactivar el modo manual"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "¿Desactivar el modo manual para {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Activa “Permitir el acceso remoto a este dispositivo a través del relay”"

@@ -1064,6 +1064,9 @@ msgstr "{kindLabel}-Theme"
 msgid "{label} access to {pluginName}"
 msgstr "{label}-Zugriff auf {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} ist danach wieder nicht eingerichtet. In deinen Arbeitsbereichen ändert sich nichts: Dein Skript und die Anmeldung, die es pflegt, bleiben, bis du sie entfernst."
+
 msgid "{label} is set to manual"
 msgstr "{label} nutzt jetzt die manuelle Anmeldung"
 
@@ -2302,7 +2305,7 @@ msgid "agent settings"
 msgstr "Agenten-Einstellungen"
 
 msgid "Agent settings"
-msgstr "Agent-Einstellungen"
+msgstr "Agenten-Einstellungen"
 
 msgid "Agent usage rankings"
 msgstr "Ranglisten zur Agentennutzung"
@@ -9913,7 +9916,7 @@ msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev a
 msgstr "In nur wenigen Monaten nutzen <0>Zehntausende Entwickler</0> Paradev als ihre primäre IDE, in Unternehmen wie Wix, DoorDash und Netflix."
 
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
-msgstr "Im manuellen Modus meldet Paradev diesen Agenten nicht an. Lass dein Skript ihn wieder anmelden und mach dann weiter, oder schalte den manuellen Modus in den Agent-Einstellungen aus."
+msgstr "Im manuellen Modus meldet Paradev diesen Agenten nicht an. Lass dein Skript ihn wieder anmelden und mach dann weiter, oder schalte den manuellen Modus in den Agenten-Einstellungen aus."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Vor Ort in San Francisco, fünf Tage pro Woche. Du arbeitest direkt mit den Gründern zusammen."
@@ -11326,6 +11329,9 @@ msgstr "Wird von der Admin deiner Organisation verwaltet."
 
 msgid "Manual"
 msgstr "Manuell"
+
+msgid "Manual mode is off for {label}."
+msgstr "Der manuelle Modus ist für {label} ausgeschaltet."
 
 msgid "Manual order"
 msgstr "Manuelle Reihenfolge"
@@ -16099,6 +16105,9 @@ msgstr "Starte sie jetzt neu, um sie auf {accountLabel} umzustellen; jede Sitzun
 msgid "Restart running {providerLabel} agents?"
 msgstr "Laufende {providerLabel}-Agenten neu starten?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Starte laufende Arbeitsbereiche neu, damit ihre Agenten die Änderung übernehmen."
+
 msgid "Restart terminal daemon?"
 msgstr "Terminal-Daemon neu starten?"
 
@@ -20346,6 +20355,12 @@ msgstr "Mach aus Routinearbeit Agenten, die nach Zeitplan oder bei einem Ereigni
 
 msgid "Turn Fast mode on or off"
 msgstr "Schnellmodus ein- oder ausschalten"
+
+msgid "Turn off manual mode"
+msgstr "Manuellen Modus ausschalten"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Manuellen Modus für {label} ausschalten?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Aktiviere „Fernzugriff auf dieses Gerät über den Relay erlauben“"

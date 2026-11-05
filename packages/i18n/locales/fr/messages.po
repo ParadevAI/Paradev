@@ -1064,6 +1064,9 @@ msgstr "Thème {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Accès {label} à {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} redevient non configuré. Rien ne change dans vos espaces de travail : votre script et la connexion qu’il maintient restent en place jusqu’à ce que vous les supprimiez."
+
 msgid "{label} is set to manual"
 msgstr "{label} est en connexion manuelle"
 
@@ -11327,6 +11330,9 @@ msgstr "Géré par l'administrateur de votre organisation."
 msgid "Manual"
 msgstr "Manuel"
 
+msgid "Manual mode is off for {label}."
+msgstr "Le mode manuel est désactivé pour {label}."
+
 msgid "Manual order"
 msgstr "Ordre manuel"
 
@@ -16099,6 +16105,9 @@ msgstr "Redémarrez-les maintenant pour les basculer vers {accountLabel} ; chaqu
 msgid "Restart running {providerLabel} agents?"
 msgstr "Redémarrer les agents {providerLabel} en cours ?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Redémarrez les espaces de travail en cours d’exécution pour que leurs agents prennent en compte le changement."
+
 msgid "Restart terminal daemon?"
 msgstr "Redémarrer le démon de terminal ?"
 
@@ -20346,6 +20355,12 @@ msgstr "Transformez les corvées en agents qui s'exécutent selon une planificat
 
 msgid "Turn Fast mode on or off"
 msgstr "Activer ou désactiver le mode rapide"
+
+msgid "Turn off manual mode"
+msgstr "Désactiver le mode manuel"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Désactiver le mode manuel pour {label} ?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Activez « Autoriser l'accès distant à cet appareil via le relais »"

@@ -1064,6 +1064,9 @@ msgstr "Motyw {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Dostęp roli {label} do {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} wraca do stanu nieskonfigurowanego. W obszarach roboczych nic się nie zmienia: Twój skrypt i utrzymywane przez niego logowanie zostają, dopóki ich nie usuniesz."
+
 msgid "{label} is set to manual"
 msgstr "{label} używa teraz logowania ręcznego"
 
@@ -11327,6 +11330,9 @@ msgstr "Zarządzane przez administratora Twojej organizacji."
 msgid "Manual"
 msgstr "Ręczny"
 
+msgid "Manual mode is off for {label}."
+msgstr "Tryb ręczny dla {label} jest wyłączony."
+
 msgid "Manual order"
 msgstr "Kolejność ręczna"
 
@@ -16099,6 +16105,9 @@ msgstr "Uruchom ich ponownie teraz, aby przenieść na {accountLabel}; każda se
 msgid "Restart running {providerLabel} agents?"
 msgstr "Uruchomić ponownie działających agentów {providerLabel}?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Uruchom ponownie działające obszary robocze, aby ich agenci przejęli zmianę."
+
 msgid "Restart terminal daemon?"
 msgstr "Zrestartować demona terminala?"
 
@@ -20346,6 +20355,12 @@ msgstr "Zamień rutynowe zadania w agentów, którzy działają według harmonog
 
 msgid "Turn Fast mode on or off"
 msgstr "Włącz lub wyłącz tryb szybki"
+
+msgid "Turn off manual mode"
+msgstr "Wyłącz tryb ręczny"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Wyłączyć tryb ręczny dla {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Włącz „Zezwól na zdalny dostęp do tego urządzenia przez przekaźnik”"

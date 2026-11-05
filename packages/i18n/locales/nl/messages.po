@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} thema"
 msgid "{label} access to {pluginName}"
 msgstr "{label}-toegang tot {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} is daarna weer niet ingesteld. In je werkruimtes verandert niets: je script en de login die het bijhoudt blijven staan tot je ze verwijdert."
+
 msgid "{label} is set to manual"
 msgstr "{label} gebruikt nu handmatig inloggen"
 
@@ -11327,6 +11330,9 @@ msgstr "Beheerd door de beheerder van je organisatie."
 msgid "Manual"
 msgstr "Handmatig"
 
+msgid "Manual mode is off for {label}."
+msgstr "De handmatige modus staat uit voor {label}."
+
 msgid "Manual order"
 msgstr "Handmatige volgorde"
 
@@ -16099,6 +16105,9 @@ msgstr "Herstart ze nu om ze naar {accountLabel} te verplaatsen; elke sessie pak
 msgid "Restart running {providerLabel} agents?"
 msgstr "Draaiende {providerLabel}-agents herstarten?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Herstart draaiende werkruimtes zodat hun agents de wijziging oppikken."
+
 msgid "Restart terminal daemon?"
 msgstr "Terminal-daemon herstarten?"
 
@@ -20346,6 +20355,12 @@ msgstr "Maak van routineklussen agents die op een schema draaien of wanneer er e
 
 msgid "Turn Fast mode on or off"
 msgstr "Snelle modus in- of uitschakelen"
+
+msgid "Turn off manual mode"
+msgstr "Handmatige modus uitzetten"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Handmatige modus uitzetten voor {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Zet “Externe toegang tot dit apparaat via de relay toestaan” aan"

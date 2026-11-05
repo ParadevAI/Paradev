@@ -1064,6 +1064,9 @@ msgstr "Chủ đề {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Quyền {label} với {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có gì thay đổi bên trong không gian làm việc: script của bạn và phiên đăng nhập nó duy trì vẫn còn cho đến khi bạn xóa chúng."
+
 msgid "{label} is set to manual"
 msgstr "{label} đã chuyển sang đăng nhập thủ công"
 
@@ -11327,6 +11330,9 @@ msgstr "Do admin tổ chức của bạn quản lý."
 msgid "Manual"
 msgstr "Thủ công"
 
+msgid "Manual mode is off for {label}."
+msgstr "Đã tắt chế độ thủ công cho {label}."
+
 msgid "Manual order"
 msgstr "Thứ tự thủ công"
 
@@ -16099,6 +16105,9 @@ msgstr "Khởi động lại ngay để chuyển sang {accountLabel}; mỗi phi�
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Hãy khởi động lại các không gian làm việc đang chạy để agent áp dụng thay đổi."
+
 msgid "Restart terminal daemon?"
 msgstr "Khởi động lại daemon terminal?"
 
@@ -20346,6 +20355,12 @@ msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có
 
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
+
+msgid "Turn off manual mode"
+msgstr "Tắt chế độ thủ công"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Tắt chế độ thủ công cho {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Bật “Cho phép truy cập từ xa vào thiết bị này qua relay”"

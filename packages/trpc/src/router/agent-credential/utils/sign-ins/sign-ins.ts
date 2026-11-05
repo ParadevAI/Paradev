@@ -29,10 +29,6 @@ export interface SignInRow {
 	provider: string | null;
 }
 
-/**
- * A Manual row is skipped before anything reads its value, so it never
- * decrypts, never renews a ChatGPT session and contributes nothing to a box.
- */
 export async function signInsFromRows<Row extends SignInRow>(
 	rows: Row[],
 	deps: {

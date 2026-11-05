@@ -41,7 +41,6 @@ export const FAILURE_ACTIONS: Record<
 	unknown: ["continue", "change_model"],
 };
 
-/** An auth failure when the person's own script signs the agent in: nothing to sign in with here. */
 export const MANUAL_SIGN_IN_TITLE = msg({
 	message: "The agent is signed out",
 });

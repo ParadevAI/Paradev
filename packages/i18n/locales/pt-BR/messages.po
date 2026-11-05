@@ -1064,6 +1064,9 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Acesso de {label} a {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "O {label} volta a ficar sem configuração. Nada muda nas suas áreas de trabalho: o seu script e o login que ele mantém continuam lá até você removê-los."
+
 msgid "{label} is set to manual"
 msgstr "{label} agora usa login manual"
 
@@ -11327,6 +11330,9 @@ msgstr "Gerenciado pelo administrador da sua organização."
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual mode is off for {label}."
+msgstr "O modo manual do {label} está desativado."
+
 msgid "Manual order"
 msgstr "Ordem manual"
 
@@ -16099,6 +16105,9 @@ msgstr "Reinicie agora para movê-los para {accountLabel}; cada sessão retoma a
 msgid "Restart running {providerLabel} agents?"
 msgstr "Reiniciar os agentes {providerLabel} em execução?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Reinicie as áreas de trabalho em execução para que os agentes apliquem a mudança."
+
 msgid "Restart terminal daemon?"
 msgstr "Reiniciar o daemon de terminal?"
 
@@ -20346,6 +20355,12 @@ msgstr "Transforme tarefas rotineiras em agentes que rodam por agenda ou quando 
 
 msgid "Turn Fast mode on or off"
 msgstr "Ativar ou desativar o modo rápido"
+
+msgid "Turn off manual mode"
+msgstr "Desativar o modo manual"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Desativar o modo manual do {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Ative “Permitir acesso remoto a este dispositivo via relay”"

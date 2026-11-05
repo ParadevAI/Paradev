@@ -61,9 +61,9 @@ export function useAgentCredential(presetId: string) {
 		onSuccess: () => invalidate(),
 	});
 	const manual = cloudTrpc.agentCredential.setManual.useMutation({
-		onSuccess: () => {
+		onSuccess: async () => {
+			await invalidate();
 			setChosen(null);
-			return invalidate();
 		},
 	});
 

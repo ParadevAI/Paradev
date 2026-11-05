@@ -1058,6 +1058,9 @@ msgstr "Тема: {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Доступ ролі {label} до {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} знову стане неналаштованим. У робочих просторах нічого не зміниться: ваш скрипт і вхід, який він підтримує, залишаться, доки ви їх не видалите."
+
 msgid "{label} is set to manual"
 msgstr "Для {label} увімкнено ручний вхід"
 
@@ -11321,6 +11324,9 @@ msgstr "Керується адміністратором вашої орган�
 msgid "Manual"
 msgstr "Вручну"
 
+msgid "Manual mode is off for {label}."
+msgstr "Ручний режим для {label} вимкнено."
+
 msgid "Manual order"
 msgstr "Порядок вручну"
 
@@ -16093,6 +16099,9 @@ msgstr "Перезапустіть їх зараз, щоб перенести н
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Перезапустіть запущені робочі простори, щоб їхні агенти застосували зміну."
+
 msgid "Restart terminal daemon?"
 msgstr "Перезапустити демон термінала?"
 
@@ -20340,6 +20349,12 @@ msgstr "Перетворіть рутинні справи на агентів, 
 
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
+
+msgid "Turn off manual mode"
+msgstr "Вимкнути ручний режим"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Вимкнути ручний режим для {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Увімкніть «Дозволити віддалений доступ до цього пристрою через релей»"

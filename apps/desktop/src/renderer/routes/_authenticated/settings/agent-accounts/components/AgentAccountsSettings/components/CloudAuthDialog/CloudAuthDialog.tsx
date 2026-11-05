@@ -286,6 +286,18 @@ export function CloudAuthDialog({
 									{state.manualOn ? (
 										<DisconnectMenu
 											agentLabel={label}
+											copy={{
+												action: t({ message: "Turn off manual mode" }),
+												title: t({
+													message: `Turn off manual mode for ${label}?`,
+												}),
+												description: t({
+													message: `${label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them.`,
+												}),
+												done: t({
+													message: `Manual mode is off for ${label}.`,
+												}),
+											}}
 											credential={t({ message: "manual sign-in" })}
 											disconnect={disconnect}
 										/>

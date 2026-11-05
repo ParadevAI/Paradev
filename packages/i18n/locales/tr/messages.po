@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} tema"
 msgid "{label} access to {pluginName}"
 msgstr "{label} rolünün {pluginName} erişimi"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} yeniden ayarlanmamış duruma döner. Çalışma alanlarınızda hiçbir şey değişmez: betiğiniz ve onun sürdürdüğü oturum, siz kaldırana kadar yerinde kalır."
+
 msgid "{label} is set to manual"
 msgstr "{label} artık manuel oturum açma kullanıyor"
 
@@ -11327,6 +11330,9 @@ msgstr "Kuruluş yöneticiniz tarafından yönetiliyor."
 msgid "Manual"
 msgstr "Elle"
 
+msgid "Manual mode is off for {label}."
+msgstr "{label} için manuel mod kapatıldı."
+
 msgid "Manual order"
 msgstr "Manuel sıralama"
 
@@ -16099,6 +16105,9 @@ msgstr "Şimdi yeniden başlatarak {accountLabel} hesabına taşıyın; her otur
 msgid "Restart running {providerLabel} agents?"
 msgstr "Çalışan {providerLabel} ajanları yeniden başlatılsın mı?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Ajanların değişikliği alması için çalışan çalışma alanlarını yeniden başlatın."
+
 msgid "Restart terminal daemon?"
 msgstr "Terminal daemon'u yeniden başlatılsın mı?"
 
@@ -20346,6 +20355,12 @@ msgstr "Rutin işleri zamanlamayla veya bir olay geldiğinde çalışan ajanlara
 
 msgid "Turn Fast mode on or off"
 msgstr "Hızlı modu aç veya kapat"
+
+msgid "Turn off manual mode"
+msgstr "Manuel modu kapat"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "{label} için manuel mod kapatılsın mı?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "“Bu cihaza röle üzerinden uzaktan erişime izin ver” seçeneğini açın"

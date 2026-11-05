@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} theme"
 msgid "{label} access to {pluginName}"
 msgstr "{label} access to {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+
 msgid "{label} is set to manual"
 msgstr "{label} is set to manual"
 
@@ -11327,6 +11330,9 @@ msgstr "Managed by your organization admin."
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual mode is off for {label}."
+msgstr "Manual mode is off for {label}."
+
 msgid "Manual order"
 msgstr "Manual order"
 
@@ -16099,6 +16105,9 @@ msgstr "Restart now to move them to {accountLabel}; each session picks its conve
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restart running {providerLabel} agents?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Restart running workspaces so their agents pick up the change."
+
 msgid "Restart terminal daemon?"
 msgstr "Restart terminal daemon?"
 
@@ -20346,6 +20355,12 @@ msgstr "Turn chores into agents that run on a schedule or when an event comes in
 
 msgid "Turn Fast mode on or off"
 msgstr "Turn Fast mode on or off"
+
+msgid "Turn off manual mode"
+msgstr "Turn off manual mode"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Turn off manual mode for {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Turn on “Allow remote access to this device via relay”"

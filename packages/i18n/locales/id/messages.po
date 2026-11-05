@@ -1064,6 +1064,9 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Akses {label} ke {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} kembali menjadi belum diatur. Tidak ada yang berubah di dalam workspace Anda: skrip Anda dan login yang dijaganya tetap ada sampai Anda menghapusnya."
+
 msgid "{label} is set to manual"
 msgstr "{label} kini memakai login manual"
 
@@ -9913,7 +9916,7 @@ msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev a
 msgstr "Hanya dalam beberapa bulan, <0>puluhan ribu engineer</0> memakai Paradev sebagai IDE utama mereka, di perusahaan seperti Wix, DoorDash, dan Netflix."
 
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
-msgstr "Dalam mode manual, Paradev tidak memasukkan agen ini. Minta skrip Anda memasukkannya lagi lalu lanjutkan, atau matikan mode manual di pengaturan agen."
+msgstr "Dalam mode manual, Paradev tidak melakukan login untuk agen ini. Minta skrip Anda login lagi, lalu lanjutkan, atau matikan mode manual di pengaturan agen."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Bekerja langsung di kantor San Francisco, lima hari seminggu. Anda bekerja langsung dengan para pendiri."
@@ -11326,6 +11329,9 @@ msgstr "Dikelola oleh admin organisasi Anda."
 
 msgid "Manual"
 msgstr "Manual"
+
+msgid "Manual mode is off for {label}."
+msgstr "Mode manual untuk {label} sudah mati."
 
 msgid "Manual order"
 msgstr "Urutan manual"
@@ -14108,7 +14114,7 @@ msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev mengalami kesalahan tak terduga. Muat ulang untuk mencoba lagi."
 
 msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
-msgstr "Paradev tidak menyimpan kredensial apa pun untuk {label} dan tidak menambahkannya ke workspace cloud Anda saat dimulai, dimulai ulang, atau diaktifkan kembali. Skrip yang Anda jalankan di dalam workspace menjaga {loginFile} tetap terbaru. Jika skrip berhenti, {label} tetap keluar sampai skrip Anda memasukkannya lagi."
+msgstr "Paradev tidak menyimpan kredensial apa pun untuk {label} dan tidak menambahkannya ke workspace cloud Anda saat dimulai, dimulai ulang, atau diaktifkan kembali. Skrip yang Anda jalankan di dalam workspace menjaga {loginFile} tetap terbaru. Jika skrip berhenti, {label} tetap dalam keadaan keluar sampai skrip Anda login lagi."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev menyimpan token dan melakukan panggilannya. Agen tidak pernah melihatnya."
@@ -16098,6 +16104,9 @@ msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap s
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"
+
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Mulai ulang workspace yang sedang berjalan agar agennya menerapkan perubahan ini."
 
 msgid "Restart terminal daemon?"
 msgstr "Mulai ulang daemon terminal?"
@@ -20346,6 +20355,12 @@ msgstr "Ubah pekerjaan rutin menjadi agen yang berjalan sesuai jadwal atau saat 
 
 msgid "Turn Fast mode on or off"
 msgstr "Aktifkan atau nonaktifkan mode cepat"
+
+msgid "Turn off manual mode"
+msgstr "Matikan mode manual"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Matikan mode manual untuk {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Aktifkan “Izinkan akses jarak jauh ke perangkat ini melalui relay”"

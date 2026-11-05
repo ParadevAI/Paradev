@@ -267,10 +267,7 @@ export const agentCredentialRouter = {
 			return { status: "connected" as const, accountLabel };
 		}),
 
-	/**
-	 * Leaves the agent's sign-in to the person's own tooling on the box. Any
-	 * stored credential for the agent is replaced, so nothing of it is kept.
-	 */
+	/** Replaces any stored credential for the agent: nothing of it is kept. */
 	setManual: personProcedure
 		.input(z.object({ agent: z.enum(MANUAL_SIGN_IN_AGENTS) }))
 		.mutation(async ({ ctx, input }) => {
@@ -358,7 +355,8 @@ async function currentChatgptTokens(
 				.from(agentCredentials)
 				.where(eq(agentCredentials.id, row.id))
 				.for("update");
-			if (!locked) return stored;
+			// Removed or set to Manual since it was read: the box gets no session.
+			if (!locked || locked.provider !== CHATGPT_PROVIDER) return null;
 			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
 			if (isFresh(current)) return current;
 			renewed = await refreshChatgptTokens(current);

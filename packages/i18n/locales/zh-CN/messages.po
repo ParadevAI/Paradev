@@ -1064,6 +1064,9 @@ msgstr "{kindLabel}主题"
 msgid "{label} access to {pluginName}"
 msgstr "{label} 对 {pluginName} 的访问权限"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} 将恢复为未设置。工作区内不会有任何变化：你的脚本及其维护的登录会一直保留，直到你将其删除。"
+
 msgid "{label} is set to manual"
 msgstr "{label} 已设为手动登录"
 
@@ -11327,6 +11330,9 @@ msgstr "由你所在组织的管理员管理。"
 msgid "Manual"
 msgstr "手动"
 
+msgid "Manual mode is off for {label}."
+msgstr "已关闭 {label} 的手动模式。"
+
 msgid "Manual order"
 msgstr "手动排序"
 
@@ -16099,6 +16105,9 @@ msgstr "立即重新启动即可迁移到{accountLabel}；每个会话都会从�
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "重启正在运行的工作区，让其中的智能体应用此更改。"
+
 msgid "Restart terminal daemon?"
 msgstr "重启终端守护进程？"
 
@@ -20346,6 +20355,12 @@ msgstr "把日常杂务交给按计划或在事件到来时运行的智能体：
 
 msgid "Turn Fast mode on or off"
 msgstr "开启或关闭快速模式"
+
+msgid "Turn off manual mode"
+msgstr "关闭手动模式"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "要关闭 {label} 的手动模式吗？"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "开启“允许通过中继远程访问本设备”"

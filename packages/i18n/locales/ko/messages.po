@@ -1064,6 +1064,9 @@ msgstr "{kindLabel} 테마"
 msgid "{label} access to {pluginName}"
 msgstr "{label}의 {pluginName} 접근 권한"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label}은(는) 설정되지 않은 상태로 돌아갑니다. 워크스페이스 안에서는 아무것도 바뀌지 않습니다. 스크립트와 스크립트가 유지하는 로그인은 직접 제거할 때까지 남아 있습니다."
+
 msgid "{label} is set to manual"
 msgstr "{label}이(가) 수동 로그인으로 설정되었습니다"
 
@@ -11327,6 +11330,9 @@ msgstr "조직 관리자가 관리합니다."
 msgid "Manual"
 msgstr "수동"
 
+msgid "Manual mode is off for {label}."
+msgstr "{label}의 수동 모드를 껐습니다."
+
 msgid "Manual order"
 msgstr "수동 정렬"
 
@@ -16099,6 +16105,9 @@ msgstr "지금 다시 시작하면 {accountLabel}(으)로 이동하며, 각 세�
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "실행 중인 워크스페이스를 재시작하면 에이전트에 변경 사항이 반영됩니다."
+
 msgid "Restart terminal daemon?"
 msgstr "터미널 데몬을 다시 시작할까요?"
 
@@ -20346,6 +20355,12 @@ msgstr "반복 작업을 일정에 따라 또는 이벤트가 발생할 때 실�
 
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
+
+msgid "Turn off manual mode"
+msgstr "수동 모드 끄기"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "{label}의 수동 모드를 끌까요?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "“릴레이를 통해 이 기기에 원격 액세스 허용” 켜기"
