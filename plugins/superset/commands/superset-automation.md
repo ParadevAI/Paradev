@@ -22,7 +22,7 @@ The CLI is required for all actions below; there's no MCP equivalent for the edi
 ```bash
 ID="<id-or-slug>"
 TMP=$(mktemp -t superset-prompt.XXXXXX.md)
-superset automations prompt get "$ID" > "$TMP"
+superset automations prompt get "$ID" --json | jq -j .prompt > "$TMP"
 ${EDITOR:-${VISUAL:-vi}} "$TMP"
 
 if [ ! -s "$TMP" ]; then
@@ -35,7 +35,7 @@ superset automations prompt set "$ID" --from-file "$TMP"
 rm -f "$TMP"
 ```
 
-`prompt get | prompt set` round-trips byte-exact, so this is safe to scripts/edits without trailing-newline drift. The CLI also refuses an empty prompt server-side as a backstop.
+`prompt get --json | jq -j .prompt` and `prompt set --from-file` round-trip byte-exact, so this is safe for scripts and edits without trailing-newline drift. Keep both parts: under CI and agent shells the CLI turns `--json` on by itself, so a bare `prompt get` prints `{"id", "prompt"}` and the round trip would save that JSON as the prompt, and `jq -r` adds a newline on every trip. From an agent shell, which has no terminal for `$EDITOR`, edit `$TMP` with your file tools instead. As a backstop, the CLI refuses an empty or whitespace-only prompt before sending it; the server accepts an empty one on purpose.
 
 ### `logs`: show recent runs
 
