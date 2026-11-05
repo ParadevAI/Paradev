@@ -1469,7 +1469,7 @@ export const v2Hosts = pgTable(
 		platform: text(),
 		installSource: text("install_source"),
 		// Whether the owner lets their cloud workspaces reach this host through
-		// the relay. Only `host.setCloudWorkspaceAccess` writes it.
+		// the relay.
 		allowCloudWorkspaces: boolean("allow_cloud_workspaces")
 			.notNull()
 			.default(false),
