@@ -79,7 +79,7 @@ export function BrowserOverflowMenu({
 		electronTrpcClient.browser.isAudioMuted
 			.query({ paneId })
 			.then(setIsAudioMuted)
-			.catch(() => {});
+			.catch((error) => console.warn("[BrowserOverflowMenu] could not read audio mute state", { paneId, error }));
 	}, [paneId]);
 
 	const handleToggleMute = () => {
