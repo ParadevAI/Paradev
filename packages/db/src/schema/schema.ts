@@ -1742,6 +1742,9 @@ export const automations = pgTable(
 		continueAgentSession: boolean("continue_agent_session")
 			.notNull()
 			.default(false),
+		// With no pinned workspace, keep the one the first run creates as the
+		// pin, so later runs reuse it.
+		reuseWorkspace: boolean("reuse_workspace").notNull().default(false),
 		machineSize: text("machine_size"),
 
 		// The schedule lives in the automation's `schedule` trigger.
