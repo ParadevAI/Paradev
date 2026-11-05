@@ -1064,6 +1064,12 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Akses {label} ke {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} kembali menjadi belum diatur. Tidak ada yang berubah di dalam workspace Anda: skrip Anda dan login yang dijaganya tetap ada sampai Anda menghapusnya."
+
+msgid "{label} is set to manual"
+msgstr "{label} kini memakai login manual"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1231,14 +1237,14 @@ msgstr "{price} per pengguna/bulan, {gbHours} GB-jam cloud per kursi setiap bula
 msgid "{price}/user/mo"
 msgstr "{price}/pengguna/bln"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (sebelumnya {formerName}, YC P26) adalah IDE source-available untuk era agen AI, tempat para engineer menjalankan ratusan agen coding seperti Claude Code dan Codex secara paralel."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (sebelumnya {formerName}, YC P26) adalah IDE open source untuk era agen AI, tempat para engineer menjalankan ratusan agen coding seperti Claude Code dan Codex secara paralel."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (sebelumnya {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) adalah IDE source-available untuk era agen AI, tempat para engineer menjalankan ratusan agen coding seperti Claude Code dan Codex secara paralel."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) adalah IDE open source untuk era agen AI, tempat para engineer menjalankan ratusan agen coding seperti Claude Code dan Codex secara paralel."
 
 msgid "{productName} for press"
 msgstr "{productName} untuk pers"
@@ -1512,6 +1518,9 @@ msgstr "<0>{who}</0> bereaksi dengan {shortcode}"
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>dari {1} di papan peringkat</1>"
 
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> atau <1>apiKeyHelper</1>"
+
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Segera hadir di</0><1>Google Play</1>"
 
@@ -1626,6 +1635,9 @@ msgstr "3 workspace diarsipkan"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3 file berubah, 2 tes lulus"
+
+msgid "3 running"
+msgstr "3 berjalan"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ alur kerja bersamaan per engineer"
@@ -2292,6 +2304,9 @@ msgstr "Sesi agen dimulai"
 msgid "agent settings"
 msgstr "pengaturan agen"
 
+msgid "Agent settings"
+msgstr "Pengaturan agen"
+
 msgid "Agent usage rankings"
 msgstr "Peringkat penggunaan agen"
 
@@ -2308,6 +2323,9 @@ msgstr "Agen tidak dapat menjangkau alat {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agen menyelesaikan tiket rutin tanpa intervensi di tengah tugas."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop, iPhone, atau iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agen memuat pratinjaunya sendiri, mengendalikan UI, dan melampirkan bukti tangkapan layar sebelum menandai pekerjaan siap direview."
 
@@ -2322,6 +2340,12 @@ msgstr "Agen mengingat apa yang mereka pelajari tentang codebase Anda, sehingga 
 
 msgid "Agents running at once"
 msgstr "Agen yang berjalan sekaligus"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Agen hanya melihat placeholder. Paradev menambahkan login Anda ke permintaan keluar."
+
+msgid "Agents that run while you're away"
+msgstr "Agen yang berjalan saat Anda pergi"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agen memakai akun ini saat memanggil tool Linear."
@@ -2637,6 +2661,9 @@ msgstr "Agen menulis fungsi dan file utuh sementara manusia mengawasi tiap langk
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Otomatisasi hanya bisa menggunakan workspace cloud yang kamu buat"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Lingkungan menyimpan repositori, variabel, dan region Anda. Mulai workspace sebanyak yang Anda perlukan darinya."
 
 msgid "An error occurred"
 msgstr "Terjadi kesalahan"
@@ -3093,9 +3120,6 @@ msgstr "Lampirkan ke obrolan"
 msgid "Attached"
 msgstr "Terhubung"
 
-msgid "Attaching to the running session…"
-msgstr "Menghubungkan ke sesi yang berjalan…"
-
 msgid "attachment"
 msgstr "lampiran"
 
@@ -3411,9 +3435,6 @@ msgstr "berdasarkan PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Berdasarkan {0} token dalam 30 hari terakhir, menghitung {1}."
 
-msgid "Become a design partner"
-msgstr "Jadi mitra pengembangan"
-
 msgid "Before"
 msgstr "Sebelum"
 
@@ -3601,9 +3622,6 @@ msgstr "Bawa {companyName} ke tim Anda. Hubungi kami untuk mempelajari lebih lan
 msgid "Bring a link to something you built recently."
 msgstr "Bawa tautan ke sesuatu yang baru-baru ini Anda bangun."
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Bawa Claude Code, Codex, OpenCode, atau agen coding apa pun ke dalam satu workspace. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
-
 msgid "Bring in an agent"
 msgstr "Libatkan agen"
 
@@ -3672,9 +3690,6 @@ msgstr "Laporan bug"
 
 msgid "Build in public"
 msgstr "Membangun secara terbuka"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Bangun masa depan Paradev di komputasi awan"
 
 msgid "Build your own"
 msgstr "Buat milik Anda sendiri"
@@ -4093,6 +4108,9 @@ msgstr "Chat ditutup"
 msgid "Chat history"
 msgstr "Riwayat obrolan"
 
+msgid "Chat interface"
+msgstr "Antarmuka chat"
+
 msgid "Chat is being reworked"
 msgstr "Chat sedang dirombak"
 
@@ -4285,6 +4303,9 @@ msgstr "Pilih tempat membuka agen yang dimulai dari komentar, mode desain, dan P
 
 msgid "Choose your default skin tone"
 msgstr "Pilih warna kulit default"
+
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Memilih ini menghapus semua kredensial yang tersimpan di sini untuk {label}."
 
 msgid "CI failed"
 msgstr "CI gagal"
@@ -4613,6 +4634,9 @@ msgstr "Tutup workspace"
 msgid "Close Workspace"
 msgstr "Tutup Workspace"
 
+msgid "Close your laptop"
+msgstr "Tutup laptop Anda"
+
 msgid "Closed"
 msgstr "Ditutup"
 
@@ -4635,6 +4659,9 @@ msgstr "Menutup terminal ini akan menghentikan proses yang berjalan."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud · us-east"
+msgstr "Cloud · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Penyiapan environment cloud"
 
@@ -4646,9 +4673,6 @@ msgstr "Environment cloud mengambil repositori Anda dari GitHub. Hubungkan ini d
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-jam cloud per kursi setiap bulan"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Versi awan segera hadir. Jadi mitra pengembangan"
 
 msgid "Cloud sandboxes"
 msgstr "Sandbox cloud"
@@ -4754,9 +4778,6 @@ msgstr "Gabungkan urutan seperti => dan !==."
 
 msgid "Come build it with us."
 msgstr "Mari bangun bersama kami."
-
-msgid "Coming soon"
-msgstr "Segera hadir"
 
 msgid "Coming Soon"
 msgstr "Segera Hadir"
@@ -5240,14 +5261,15 @@ msgstr "Jendela konteks: {percent} terpakai"
 msgid "Continue"
 msgstr "Lanjutkan"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Lanjutkan"
+
 msgid "Continue in your browser"
 msgstr "Lanjutkan di browser Anda"
 
 msgid "Continue or fork session"
 msgstr "Lanjutkan atau fork sesi"
-
-msgid "Continue the session the last run left"
-msgstr "Lanjutkan sesi yang ditinggalkan proses terakhir"
 
 msgid "Continue this chat on another login"
 msgstr "Lanjutkan chat ini dengan login lain"
@@ -5280,9 +5302,6 @@ msgstr "Lanjutkan dengan Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Melanjutkan sesi agen memerlukan ruang kerja yang disematkan"
-
-msgid "continuing the last session"
-msgstr "melanjutkan sesi terakhir"
 
 msgid "Continuing…"
 msgstr "Melanjutkan…"
@@ -5746,6 +5765,9 @@ msgstr "Tidak dapat melanjutkan"
 msgid "Could not resume the chat"
 msgstr "Tidak dapat melanjutkan obrolan"
 
+msgid "Could not save the change."
+msgstr "Tidak dapat menyimpan perubahan."
+
 msgid "Could not send"
 msgstr "Tidak bisa mengirim"
 
@@ -5815,6 +5837,9 @@ msgstr "Tidak dapat memverifikasi kredensial: {reason}"
 
 msgid "Couldn't add them to the channel"
 msgstr "Tidak dapat menambahkan mereka ke kanal"
+
+msgid "Couldn't add this repo"
+msgstr "Gagal menambahkan repo ini"
 
 msgid "Couldn't ask the workspace for a description"
 msgstr "Tidak dapat meminta deskripsi dari workspace"
@@ -5890,6 +5915,9 @@ msgstr "Tidak dapat melakukan fork ke chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Tidak dapat menyerahkan ini ke agen"
+
+msgid "Couldn't import"
+msgstr "Gagal mengimpor"
 
 msgid "Couldn't load {filename}"
 msgstr "Tidak dapat memuat {filename}"
@@ -6018,6 +6046,9 @@ msgstr "Tidak dapat menyimpan Dev"
 
 msgid "Couldn't save the routine"
 msgstr "Tidak dapat menyimpan rutinitas"
+
+msgid "Couldn't save your choice. Try again."
+msgstr "Pilihan Anda tidak dapat disimpan. Coba lagi."
 
 msgid "Couldn't send comment"
 msgstr "Tidak bisa mengirim komentar"
@@ -7442,6 +7473,12 @@ msgstr "Masing-masing di tab barunya sendiri"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Tiap pagi jam 8, lihat run CI yang gagal kemarin, diagnosis kegagalan paling umum, dan buka PR perbaikan."
 
+msgid "Each run makes its own"
+msgstr "Setiap run membuat miliknya sendiri"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Setiap run memulai percakapan baru dengan agent"
+
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Setiap kursi menambahkan jam paketnya ke satu kumpulan yang dibagi seluruh tim Anda:"
 
@@ -7453,6 +7490,9 @@ msgstr "Tiap permukaan punya tipografinya sendiri. Perubahan langsung terlihat d
 
 msgid "Each task on its own branch"
 msgstr "Setiap tugas di branch sendiri"
+
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Setiap workspace mendapat mesin cloud sendiri dan tetap bekerja saat laptop Anda tertutup. Pantau dari desktop, iPhone, atau iPad."
 
 msgid "Early 2024"
 msgstr "Awal 2024"
@@ -9036,8 +9076,8 @@ msgstr "Layar penuh"
 msgid "Full self-driving"
 msgstr "Full self-driving"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Sumber lengkap tersedia di GitHub dengan Elastic License 2.0 (ELv2). Periksa, audit, dan berkontribusi ke kodenya. Tanpa kotak hitam, tanpa fungsi tersembunyi."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Kode sumber lengkap ada di GitHub dengan Lisensi MIT. Periksa, audit, dan berkontribusi ke kodenya. Tanpa kotak hitam, tanpa fungsi tersembunyi."
 
 msgid "Funding"
 msgstr "Pendanaan"
@@ -9251,6 +9291,9 @@ msgstr "Maju ke halaman berikutnya di riwayat"
 
 msgid "Go home"
 msgstr "Ke beranda"
+
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Ulangi langkah-langkah penggunaan pertama. Proyek dan pengaturan Anda tetap seperti semula."
 
 msgid "Go to home"
 msgstr "Ke beranda"
@@ -9616,6 +9659,9 @@ msgstr "Bagaimana cara memulai?"
 msgid "How do the paid plans work?"
 msgstr "Bagaimana cara kerja paket berbayar?"
 
+msgid "How do you want to work?"
+msgstr "Bagaimana Anda ingin bekerja?"
+
 msgid "How does pricing work?"
 msgstr "Bagaimana skema harganya?"
 
@@ -9672,6 +9718,9 @@ msgstr "Cara kami melindungi kode"
 
 msgid "How we work"
 msgstr "Cara kami bekerja"
+
+msgid "How you run agents"
+msgstr "Cara Anda menjalankan agen"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cara agen Anda masuk di dalam workspace cloud. Orang lain menghubungkan langganan atau kunci API mereka sendiri; di mesin ini setiap agen tetap memakai login yang sudah ada."
@@ -9822,6 +9871,10 @@ msgstr "Impor gagal"
 msgid "Import failed: {message}"
 msgstr "Impor gagal: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Impor dari {0}"
+
 msgid "Import from file"
 msgstr "Impor dari file"
 
@@ -9851,6 +9904,9 @@ msgstr "Impor…"
 
 msgid "Important"
 msgstr "Penting"
+
+msgid "Imported"
+msgstr "Diimpor"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
@@ -9882,14 +9938,14 @@ msgstr "Penampil diff yang lebih baik"
 msgid "in {0}"
 msgstr "di {0}"
 
-msgid "in a new session"
-msgstr "dalam sesi baru"
-
 msgid "in a terminal on this host."
 msgstr "di terminal pada host ini."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Hanya dalam beberapa bulan, <0>puluhan ribu engineer</0> memakai Paradev sebagai IDE utama mereka, di perusahaan seperti Wix, DoorDash, dan Netflix."
+
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Dalam mode manual, Paradev tidak melakukan login untuk agen ini. Minta skrip Anda login lagi, lalu lanjutkan, atau matikan mode manual di pengaturan agen."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Bekerja langsung di kantor San Francisco, lima hari seminggu. Anda bekerja langsung dengan para pendiri."
@@ -9939,6 +9995,9 @@ msgstr "Termasuk"
 
 msgid "Included in Enterprise"
 msgstr "Termasuk di Enterprise"
+
+msgid "Included with Team and Ultra."
+msgstr "Termasuk dalam Team dan Ultra."
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Termasuk varian box khusus Paradev"
@@ -10348,9 +10407,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Gabung"
 
-msgid "Join as a design partner"
-msgstr "Bergabung sebagai design partner"
-
 msgid "Join channel"
 msgstr "Gabung ke kanal"
 
@@ -10544,6 +10600,9 @@ msgstr "Bahasa"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Bahasa tersimpan di perangkat ini, tapi sinkronisasi ke akun Anda gagal."
+
+msgid "Laptop closed"
+msgstr "Laptop tertutup"
 
 msgid "Large"
 msgstr "Besar"
@@ -11300,8 +11359,17 @@ msgstr "Dikelola oleh admin organisasi Anda."
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual mode is off for {label}."
+msgstr "Mode manual untuk {label} sudah mati."
+
 msgid "Manual order"
 msgstr "Urutan manual"
+
+msgid "manual sign-in"
+msgstr "login manual"
+
+msgid "Manual sign-in"
+msgstr "Login manual"
 
 msgid "Mark all read"
 msgstr "Tandai semua dibaca"
@@ -11608,6 +11676,9 @@ msgstr "Ada kolom wajib yang belum diisi."
 #. js-lingui-explicit-id
 msgid "serverError.plugins.missingInput"
 msgstr "Input wajib {input} tidak ada"
+
+msgid "MIT License"
+msgstr "Lisensi MIT"
 
 msgid "Mobile"
 msgstr "Mobile"
@@ -12373,6 +12444,9 @@ msgstr "Tidak ada issue ditemukan."
 msgid "No items"
 msgstr "Tidak ada item"
 
+msgid "No keys in the sandbox"
+msgstr "Tanpa kunci di sandbox"
+
 msgid "No known creators"
 msgstr "Tidak ada pembuat yang diketahui"
 
@@ -13096,6 +13170,9 @@ msgstr "Satu kalimat"
 msgid "One line about how you work"
 msgstr "Satu baris tentang cara Anda bekerja"
 
+msgid "One machine per workspace."
+msgstr "Satu mesin per workspace."
+
 msgid "One of the first hundred on the board"
 msgstr "Termasuk seratus orang pertama di papan"
 
@@ -13113,9 +13190,6 @@ msgstr "Satu plugin. Setiap agen coding."
 
 msgid "One step left"
 msgstr "Tinggal satu langkah"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Satu workspace untuk Claude Code, Codex, dan agen coding apa pun."
 
 msgid "online"
 msgstr "online"
@@ -13622,6 +13696,9 @@ msgstr "Buka sheet"
 msgid "Open ship options"
 msgstr "Buka opsi pengiriman"
 
+msgid "Open Source"
+msgstr "Open Source"
+
 msgid "Open System Settings"
 msgstr "Buka System Settings"
 
@@ -14014,6 +14091,9 @@ msgstr "Otomatisasi Paradev"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Workspace cloud Paradev"
+
 msgid "Paradev components"
 msgstr "Komponen Paradev"
 
@@ -14056,11 +14136,14 @@ msgstr "Paradev meneruskan port yang dibuka workspace jarak jauh selama workspac
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev punya paket gratis. Kode sumbernya tersedia di GitHub dengan Elastic License 2.0 (ELv2), jadi Anda bisa memeriksanya dan meng-host sendiri sesuai ketentuan lisensinya."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev punya paket gratis. Kode sumbernya ada di GitHub dengan Lisensi MIT, jadi Anda bisa memeriksa, mengubah, dan meng-host-nya sendiri."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev mengalami kesalahan tak terduga. Muat ulang untuk mencoba lagi."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev tidak menyimpan kredensial apa pun untuk {label} dan tidak menambahkannya ke workspace cloud Anda saat dimulai, dimulai ulang, atau diaktifkan kembali. Skrip yang Anda jalankan di dalam workspace menjaga {loginFile} tetap terbaru. Jika skrip berhenti, {label} tetap dalam keadaan keluar sampai skrip Anda login lagi."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev menyimpan token dan melakukan panggilannya. Agen tidak pernah melihatnya."
@@ -14086,11 +14169,8 @@ msgstr "Paradev dibangun menggunakan Paradev, jadi kami sendiri adalah pengguna 
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev dirancang untuk bekerja dengan alat yang sudah Anda pakai; kami mendukung deep-link ke IDE seperti Cursor secara native sehingga Anda bisa membuka workspace dan file di IDE Anda."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev bersifat source-available: kodenya publik di GitHub dengan Elastic License 2.0 (ELv2), yang memungkinkan Anda memeriksanya dan meng-host sendiri sesuai ketentuan lisensinya, tapi bukan open source yang disetujui OSI. Paradev tidak berhubungan dengan Apache Superset, alat business intelligence itu."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev bersifat source-available. Setiap pull request, review, dan bug terbuka untuk publik di GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev bersifat open source. Setiap pull request, review, dan bug terbuka untuk publik di GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev adalah meja kerja untuk transisi dari F3 ke F4: agen paralel di branch terpisah, armada yang benar-benar bisa Anda awasi, dan tampilan peninjauan untuk kode yang tidak Anda tulis."
@@ -14368,6 +14448,9 @@ msgstr "Pilih folder di disk dan tambahkan sebagai proyek"
 
 msgid "Pick a folder…"
 msgstr "Pilih folder…"
+
+msgid "Pick a machine size"
+msgstr "Pilih ukuran mesin"
 
 msgid "Pick a model"
 msgstr "Pilih sebuah model"
@@ -15269,6 +15352,9 @@ msgstr "Baca panduan"
 msgid "Read the guide to parallel coding agents"
 msgstr "Baca panduan agen coding paralel"
 
+msgid "Read the MIT License"
+msgstr "Baca Lisensi MIT"
+
 msgid "Read the page"
 msgstr "Membaca halaman"
 
@@ -16045,8 +16131,14 @@ msgstr "Mulai ulang layanan host"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap sesi melanjutkan percakapan dari titik terakhir."
 
+msgid "Restart onboarding"
+msgstr "Mulai ulang orientasi"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"
+
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Mulai ulang workspace yang sedang berjalan agar agennya menerapkan perubahan ini."
 
 msgid "Restart terminal daemon?"
 msgstr "Mulai ulang daemon terminal?"
@@ -16184,9 +16276,6 @@ msgstr "Akan dilanjutkan saat direset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
 
-msgid "Resuming the conversation…"
-msgstr "Melanjutkan percakapan…"
-
 msgid "Retry"
 msgstr "Coba lagi"
 
@@ -16222,6 +16311,9 @@ msgstr "Instruksi pakai ulang yang otomatis diambil agen Anda"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Peluncuran terminal pakai ulang. Klik sebuah skrip untuk mengedit atau seret untuk mengurutkan ulang. Perintah setup, run, dan teardown proyek adalah skrip lifecycle."
+
+msgid "Reusing {keptName}"
+msgstr "Memakai ulang {keptName}"
 
 msgid "Reveal in Finder"
 msgstr "Tampilkan di Finder"
@@ -16357,8 +16449,8 @@ msgstr "Putar perangkat"
 msgid "Roundups"
 msgstr "Rangkuman"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Arahkan {label} lewat penyedia yang Anda jalankan sendiri, dengan kredensial yang Anda pegang. Nilai yang tersimpan diserahkan ke agen saat peluncuran."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Arahkan {label} lewat penyedia yang Anda jalankan sendiri, dengan kredensial yang Anda pegang, atau serahkan login-nya ke alat Anda sendiri."
 
 msgid "Routine not found"
 msgstr "Rutinitas tidak ditemukan"
@@ -16431,6 +16523,9 @@ msgstr "Jalankan otomatisasi saat pesan diposting atau channel dibuat di tenant 
 msgid "Run automations when Sentry issues change."
 msgstr "Jalankan otomatisasi saat issue Sentry berubah."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Jalankan agen coding di workspace cloud yang tetap bekerja saat laptop Anda tertutup. Termasuk dalam Team dan Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Jalankan perintah dan navigasi aplikasi."
 
@@ -16497,6 +16592,9 @@ msgstr "Jalankan agen Anda dari desktop, terminal mana pun, atau ponsel Anda."
 msgid "Run your agents from your phone."
 msgstr "Jalankan agen Anda dari ponsel Anda."
 
+msgid "Run your coding agents in the cloud."
+msgstr "Jalankan agen coding Anda di cloud."
+
 msgid "Run."
 msgstr "Jalankan."
 
@@ -16551,8 +16649,14 @@ msgstr "Dijalankan saat ruang kerja baru dibuat."
 msgid "Runs when a workspace is deleted."
 msgstr "Dijalankan saat ruang kerja dihapus."
 
+msgid "Same session"
+msgstr "Sesi yang sama"
+
 msgid "Same version as this app."
 msgstr "Versi yang sama dengan aplikasi ini."
+
+msgid "Same workspace"
+msgstr "Workspace yang sama"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO & provisioning SCIM"
@@ -17334,6 +17438,9 @@ msgstr "Siapkan host lewat SSH"
 msgid "Set up an automation"
 msgstr "Siapkan otomatisasi"
 
+msgid "Set up once"
+msgstr "Atur sekali"
+
 msgid "Set up project on {hostName}"
 msgstr "Siapkan proyek di {hostName}"
 
@@ -17912,6 +18019,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Kecil"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Kecil, Sedang, atau Besar, hingga 8 vCPU dan 16 GB. Pemakaian sesuai memori."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Tuntaskan backlog Anda."
@@ -18044,9 +18154,6 @@ msgstr "Suara dan nada dering untuk tugas yang selesai"
 
 msgid "Source"
 msgstr "Sumber"
-
-msgid "Source Available"
-msgstr "Source Available"
 
 msgid "Source path (not an import)"
 msgstr "Path sumber (bukan impor)"
@@ -18235,9 +18342,6 @@ msgstr "Mulai percakapan untuk melihat pesan di sini"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Memulai sesi agen baru dengan konteks terbaru dari terminal ini. Berkas di ruang kerja tetap menjadi sumber kebenaran."
 
-msgid "Start a new agent session each run"
-msgstr "Mulai sesi agen baru setiap kali dijalankan"
-
 msgid "Start a new chat"
 msgstr "Mulai chat baru"
 
@@ -18300,6 +18404,9 @@ msgstr "Mulai bekerja dari mana saja"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Mulai workspace langsung dari issue Linear atau GitHub di tampilan Tugas, dengan agen yang sudah mengerjakan masing-masing."
+
+msgid "Start your first cloud workspace."
+msgstr "Mulai workspace cloud pertama Anda."
 
 msgid "Started"
 msgstr "Dimulai"
@@ -19087,11 +19194,17 @@ msgstr "Agen menyalin percakapan; cabang terbuka di tab baru"
 msgid "The agent crashed"
 msgstr "Agen mengalami crash"
 
+msgid "The agent is signed out"
+msgstr "Agen sudah keluar"
+
 msgid "The agent lost this conversation"
 msgstr "Agen kehilangan percakapan ini"
 
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Agen memegang tugas dari tiket sampai diff. Manusia mereview hasilnya, bukan tiap ketukan tombolnya. Perhatian bergeser dari menulis kode ke menentukan pekerjaan dan menilainya. Satu engineer menjalankan beberapa agen sekaligus di workspace terisolasi."
+
+msgid "The agent picks up where the last run left off"
+msgstr "Agent melanjutkan dari tempat run terakhir berhenti"
 
 msgid "The agent stopped responding"
 msgstr "Agen berhenti merespons"
@@ -19204,6 +19317,9 @@ msgstr "File itu tidak berisi tema yang bisa diimpor."
 msgid "The first F4 teams"
 msgstr "Tim F4 pertama"
 
+msgid "The first run makes one, later runs reuse it"
+msgstr "Run pertama membuatnya, run berikutnya memakainya ulang"
+
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Tim-tim pertama, yang berukuran kecil, merilis kode yang mayoritas ditulis agen tanpa membaca tiap barisnya, dan tingkat cacatnya tetap terjaga. Tidak ada yang gaib di baliknya: lapisan review, canary, rollback cepat, dan kebiasaan menulis spesifikasi alih-alih kode."
 
@@ -19306,6 +19422,12 @@ msgstr "Nama organisasi atau tim Anda"
 
 msgid "The network connection changed"
 msgstr "Koneksi jaringan berubah"
+
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
 msgid "The overnight shift"
 msgstr "Shift malam"
@@ -20278,6 +20400,12 @@ msgstr "Ubah pekerjaan rutin menjadi agen yang berjalan sesuai jadwal atau saat 
 msgid "Turn Fast mode on or off"
 msgstr "Aktifkan atau nonaktifkan mode cepat"
 
+msgid "Turn off manual mode"
+msgstr "Matikan mode manual"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Matikan mode manual untuk {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Aktifkan “Izinkan akses jarak jauh ke perangkat ini melalui relay”"
 
@@ -20715,6 +20843,12 @@ msgstr "Tingkatkan ke {planName}"
 msgid "Upgrade to Pro"
 msgstr "Upgrade ke Pro"
 
+msgid "Upgrade to Team"
+msgstr "Upgrade ke Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Upgrade organisasi Anda, hubungkan GitHub, dan pilih Cloud di layar workspace baru."
+
 msgid "Upgrade your plan"
 msgstr "Tingkatkan paket Anda"
 
@@ -20802,6 +20936,9 @@ msgstr "Pakai bawaan global"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gunakan huruf kecil, angka, tanda hubung, dan garis bawah"
+
+msgid "Use manual sign-in"
+msgstr "Gunakan login manual"
 
 msgid "Use more browser features: {features}"
 msgstr "Memakai fitur browser lainnya: {features}"
@@ -21194,9 +21331,6 @@ msgstr "Kami merekrut engineer di San Francisco. Mari bangun alat yang digunakan
 msgid "We're hiring in San Francisco"
 msgstr "Kami sedang merekrut di San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Kami mencari mitra pengembangan untuk membantu membentuk layanan awan kami. Ceritakan alur kerja Anda dan kami akan menghubungi Anda untuk menjajaki kerja sama."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Kami sedang membangun ulang fitur ini. Cek lagi nanti."
 
@@ -21345,9 +21479,6 @@ msgstr "Yang Sedang Kami Bangun"
 msgid "What we've shipped"
 msgstr "Yang sudah kami rilis"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Apa yang ingin Anda bangun dengan Paradev di komputasi awan?"
-
 msgid "What would you like to know?"
 msgstr "Apa yang ingin Anda ketahui?"
 
@@ -21465,9 +21596,6 @@ msgstr "Wordmark, hitam"
 
 msgid "Wordmark, white"
 msgstr "Wordmark, putih"
-
-msgid "Work email"
-msgstr "Email kerja"
 
 msgid "Work from tickets"
 msgstr "Bekerja dari tiket"
@@ -21727,6 +21855,9 @@ msgstr "Ya. Pada paket dengan workspace cloud, pemilik dapat membeli GB-jam tamb
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Ya. Paradev telah menyelesaikan audit SOC 2 Type II dengan auditor independen, yang mencakup kontrol keamanan kami saat beroperasi dari waktu ke waktu. Minta laporannya dan tinjau dokumentasi keamanan kami di {trustHost}."
 
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Ya. Paradev open source di bawah Lisensi MIT. Kodenya publik di GitHub, dan siapa pun bisa melaporkan issue, membuka pull request, atau membuat fork. Paradev tidak berhubungan dengan Apache Superset, alat business intelligence."
+
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Ya. Paradev adalah workspace tempat agen Anda berjalan, bukan penyedia model. Bawa Claude Code, Codex, OpenCode, atau agen CLI apa pun, dan pakai akun atau kunci API Anda yang sudah ada di semua paket."
 
@@ -21785,6 +21916,9 @@ msgstr "Anda melihat versi {version}, hanya-baca"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Anda dapat melampirkan hingga {MAX_ATTACHMENTS} file"
+
+msgid "You can change this later in Settings."
+msgstr "Anda dapat mengubahnya nanti di Pengaturan."
 
 msgid "You can close this tab."
 msgstr "Anda dapat menutup tab ini."

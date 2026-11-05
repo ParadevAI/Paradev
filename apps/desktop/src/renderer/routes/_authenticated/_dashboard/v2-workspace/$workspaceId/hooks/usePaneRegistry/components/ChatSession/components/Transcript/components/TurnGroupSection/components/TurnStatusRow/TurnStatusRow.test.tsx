@@ -117,3 +117,53 @@ test("a turn the usage limit stopped is one quiet line, not a failure card", () 
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 	expect(view.queryByText("Copy error")).toBeNull();
 });
+
+function authCard(actions: Partial<TurnFailureActions>) {
+	return render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+				...actions,
+			}}
+		>
+			<TurnStatusRow
+				error={{ message: "Not logged in. Please run /login", kind: "auth" }}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+}
+
+test("an auth failure offers Sign in", () => {
+	const view = authCard({});
+	expect(view.container.textContent).toContain("Sign in to continue");
+	expect(view.getByText("Sign in")).toBeTruthy();
+});
+
+test("an auth failure in manual mode offers no sign-in: Continue or agent settings", () => {
+	const restartAndContinue = mock(async () => true);
+	const openAgentSettings = mock(() => {});
+	const view = authCard({
+		manualSignIn: true,
+		openAgentSettings,
+		restartAndContinue,
+		changeModel: () => {},
+		startNewChat: async () => true,
+	});
+	expect(view.container.textContent).toContain("The agent is signed out");
+	expect(view.container.textContent).toContain("In manual mode");
+	expect(view.container.textContent).toContain("turn off manual mode");
+	expect(view.queryByText("Sign in")).toBeNull();
+	expect(view.queryByText("Sign in to continue")).toBeNull();
+	expect(view.queryByText("Change model")).toBeNull();
+	expect(view.queryByText("Start a new chat")).toBeNull();
+	fireEvent.click(view.getByText("Continue"));
+	expect(restartAndContinue).toHaveBeenCalledTimes(1);
+	fireEvent.click(view.getByText("Agent settings"));
+	expect(openAgentSettings).toHaveBeenCalledTimes(1);
+});

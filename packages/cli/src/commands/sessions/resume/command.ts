@@ -12,16 +12,17 @@ export default command({
 		session: string().required().desc("Chat session ID to resume"),
 	},
 	run: async ({ ctx, options }) => {
-		const { sessions } = await resolveSessionWorkspace(ctx, options);
+		const { sessions, openTab } = await resolveSessionWorkspace(ctx, options);
 
 		const result = await sessions.resume.mutate({
 			workspaceId: options.workspace,
 			sessionId: options.session,
 		});
 
+		const opened = await openTab(result.sessionId);
 		return {
 			data: result,
-			message: `Resumed ${result.label} chat session ${result.sessionId} in workspace ${options.workspace}`,
+			message: `Resumed ${result.label} chat session ${result.sessionId} in workspace ${options.workspace}${opened ? ", opened in a desktop tab" : ""}`,
 		};
 	},
 });

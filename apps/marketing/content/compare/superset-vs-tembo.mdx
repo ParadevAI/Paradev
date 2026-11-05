@@ -1,0 +1,133 @@
+---
+title: "Paradev vs Tembo (2026): Your Agent CLIs on Your Machines vs a Cloud Agent Platform"
+description: "Compare Paradev and Tembo for running coding agents: where agents run, which agents, how tasks start, review, self-hosting, and pricing."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - tembo
+keywords:
+  - superset vs tembo
+  - tembo vs superset
+  - paradev vs tembo
+  - tembo alternative
+  - cloud coding agents
+  - background coding agents
+---
+
+Paradev and Tembo both run coding agents such as Claude Code and Codex, one task at a time, with a pull request at the end. The difference is where the agent runs and who starts it. Tembo is a cloud platform: each session runs in a Linux VM that Tembo manages, and tasks start from the web app, Slack, Linear, Jira, pull request comments, events, or schedules. Paradev is a desktop workspace: it runs the agent CLIs you already use on your Mac, on hosts you add, on a Linux server in your own cloud account, or in Paradev [cloud workspaces](/cloud) (beta). Choose Tembo when you want a managed cloud fleet that your team triggers from its tools. Choose Paradev when you want to watch and steer agents in a real terminal, with review in the same app.
+
+This comparison is published by Paradev. Tembo details were checked against [tembo.io](https://www.tembo.io), its [docs](https://docs.tembo.io), [pricing](https://www.tembo.io/pricing), [self-hosted page](https://www.tembo.io/self-hosted), [enterprise page](https://www.tembo.io/enterprise), [changelog](https://www.tembo.io/changelog), [blog](https://www.tembo.io/blog), and [GitHub organization](https://github.com/tembo) on November 5, 2026.
+
+## At a Glance
+
+| Requirement | Paradev | Tembo |
+|---|---|---|
+| Interface | Desktop app, CLI, iPhone and iPad app | Web app (installable as a PWA), desktop app, CLI, API, and SDK |
+| Where agents run | Your machine, remote hosts you add, your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | A dedicated Linux VM per session in Tembo's cloud; self-hosted in your AWS, GCP, or Azure account |
+| Isolation | Git worktree and branch per workspace | One VM per session, destroyed when the session ends |
+| Agents | Any CLI agent: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Claude Code, Codex, Cursor, OpenCode, Pi, Amp, Grok Build, Antigravity, and Tembo's own fx |
+| Model billing | Your own subscriptions and keys; Paradev never proxies model calls | Your Claude, ChatGPT, or SuperGrok subscription, your own keys, or Tembo Gateway at per-token prices |
+| How tasks start | You start them in the app or CLI; automations on schedules and GitHub, Slack, Linear events; tasks synced with Linear and GitHub Issues | Dashboard, `@tembo` in Slack or pull request comments, Linear or Jira assignment, webhooks, schedules |
+| Review | Changes pane with diff, commit, push, and PR; Pull Requests view with checks and line comments | Changes tab before the PR, then `@tembo` comments on the PR; one PR per repo for multi-repo work |
+| Pricing | Free; Pro {{price:pro}}/user/month; Team {{price:team}}; Ultra {{price:ultra}}; Enterprise custom | 7-day trial; Pro $60/month; Max $200/month; Enterprise custom; usage billed from a balance |
+| License | Open source, MIT | Commercial platform; SDKs under Apache 2.0 |
+
+## What Is Tembo?
+
+Tembo calls itself a "cloud platform for running AI agents in complete, shareable software environments." Its docs say it lets you "run any coding agent across your repos, tickets, and tools." Each session runs in a dedicated Linux VM with your repositories, Docker, and preinstalled agents. Tembo Computer adds a desktop in the VM with VS Code, Chromium, and a terminal, so you can watch or step into the agent's machine. Previews expose dev servers through public links. Projects cache repositories and dependencies so sessions start faster.
+
+Tembo connects to GitHub, GitLab, Bitbucket, Linear, Jira, Slack, Microsoft Teams, Sentry, and many MCP servers. When a session ends, Tembo opens a pull request, except for sessions started from the dashboard, where it waits for you to open one. It also has agent templates for code review, migrations, and incident triage.
+
+## What Is Paradev?
+
+Paradev is a desktop workspace for CLI coding agents. Each workspace gets its own Git worktree and a persistent terminal. You run the agent you already installed, with its own login, settings, and MCP servers. Beside the agent, you get a Changes pane, a file editor, an in-app browser with Design Mode, and a Pull Requests view with CI checks. A chat interface shows Claude Code, Codex, OpenCode, and Pi sessions as a chat, and a CLI / Chat toggle switches the same session between the two. Paradev is open source under the MIT License.
+
+## Key Differences
+
+### Where do your agents run?
+
+Tembo runs agents in the cloud by default. Each session gets its own VM, metered per second, and the VM is destroyed when the session ends. You do not keep a machine on. With Session Devices, a session can also run commands on a machine you connect through the Tembo desktop app or CLI.
+
+Paradev runs agents on your machine by default, next to your local tools. To keep agents working away from your desk, you have three options:
+
+- Add a macOS or Linux machine as a host through the Paradev relay (Remote Access, paid plan).
+- Run the Paradev host on an x64 or arm64 Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Repos and agent sign-ins stay on that server, and it needs no inbound ports.
+- Use [cloud workspaces](/cloud) (beta), included with Team and Ultra. Paradev runs the sandbox, and agents keep working when your laptop is closed.
+
+### Which agents can you use?
+
+Both are agent-agnostic. Tembo lets you set a default agent and model per agent or session, and you can connect your Claude, ChatGPT, or SuperGrok subscription. Tembo still bills VM compute for those sessions.
+
+Paradev runs any CLI agent in a terminal, including custom commands. It uses your own subscriptions and keys and never proxies model calls. When a new agent CLI ships, you can run it in Paradev the same day.
+
+### How do tasks start?
+
+This is Tembo's strongest area. Teammates mention `@tembo` in a Slack thread or on a pull request, assign a Linear or Jira issue, or let a Sentry alert or schedule start an agent. Tembo posts PR links back to the Slack thread. Its public API, TypeScript SDK, and MCP server let other systems start sessions.
+
+Paradev starts most work from the desktop app, the CLI, or the phone app. Automations run on schedules or events from GitHub, Slack, Linear, and more, with run history. Tasks sync with Linear and GitHub Issues, and a Slack bot is available. The CLI, MIT-licensed TypeScript SDK, and MCP server let agents create workspaces and other agents.
+
+### How do you review the work?
+
+Tembo shows a live diff in a Changes tab, then opens a pull request in each repository the session changed. You ask for revisions by mentioning `@tembo` in a PR comment or the Slack thread. Commits on GitHub are signed.
+
+Paradev keeps review next to the agent. The Changes pane shows the diff, lets you edit files, and commits, pushes, and opens a pull request. The Pull Requests view shows CI checks and line comments, and you can send a comment to an agent. You can also open the worktree in VS Code, Cursor, or another editor.
+
+### Phone access
+
+Tembo's web app installs as a progressive web app on a phone. Paradev has a native iPhone and iPad app (iOS or iPadOS 26 or later, paid plan). It reaches cloud workspaces, Bring Your Own Cloud servers, and your own hosts that are awake and online. Android is on a waitlist.
+
+### Self-hosting and enterprise controls
+
+Tembo Self-hosted runs the full platform in your own AWS, GCP, or Azure account, with full feature parity and air-gapped support. You contact Tembo for it. Tembo lists SSO (Okta, Azure AD, Google Workspace, SAML, OIDC), RBAC, audit logs, and SOC 2 Type II.
+
+Paradev is MIT-licensed, so you can read, change, and self-host the code. Bring Your Own Cloud keeps agents on your own server on a paid plan. Enterprise adds SAML SSO, SCIM, and audit logs, and Paradev is SOC 2 Type II.
+
+## Pricing
+
+Both let you use your own model subscriptions. Tembo also bills cloud VM time.
+
+| Plan | Paradev | Tembo |
+|---|---|---|
+| Free | $0, one user, local workspaces, desktop app, CLI | 7-day trial of Max, up to 10 users |
+| Paid | Pro: {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly. Team: {{price:team}}. Ultra: {{price:ultra}} | Pro: $60/month with $90 of usage, up to 5 users, VMs up to Medium. Max: $200/month with $400 of usage, up to 10 users, VMs up to XL |
+| Large teams | Enterprise: custom, with SAML SSO, SCIM, and audit logs | Enterprise: custom usage, unlimited seats, SSO, SLA |
+
+Tembo usage covers VM compute ($0.0403 per vCPU-hour plus $0.0130 per GiB-hour) and Tembo Gateway inference at per-token prices. Inference through your own subscription or keys costs $0 through Tembo. Paradev Pro adds remote hosts, automations, the iPhone and iPad app, and integrations. Team and Ultra add cloud workspaces. Check [Paradev pricing](/pricing) and [Tembo pricing](https://www.tembo.io/pricing) for current terms.
+
+## Which Should You Choose?
+
+**Choose Tembo if you:**
+
+- Want agents to run in managed cloud VMs, with nothing to keep on.
+- Want teammates to start work from Slack, Linear, Jira, PR comments, or Sentry alerts.
+- Need a VM desktop, public preview links, and multi-repo pull requests in one session.
+- Need a self-hosted or air-gapped install of the full platform.
+
+**Choose Paradev if you:**
+
+- Want to run the agent CLIs you already use, on your own machine, in a real terminal.
+- Want to choose where agents run: your laptop, a host you add, your own Linux server, or cloud workspaces (beta).
+- Review through diffs, commits, and pull requests next to the agent, with a browser and Design Mode.
+- Want a native iPhone and iPad app, or open source code under the MIT License.
+
+**Verdict:** Tembo is a cloud agent platform. Your team sends tasks from its tools and gets pull requests back from managed VMs. Paradev is a workspace for the agents you already run. It keeps them in your terminal and on machines you choose, with review in the same app. Teams that want hands-off cloud runs started from Slack and issue trackers should try Tembo. Developers who want to watch, steer, and review each agent should try Paradev.
+
+## Frequently Asked Questions
+
+### Is Paradev a Tembo alternative?
+
+Yes. Both run Claude Code, Codex, and other agents on separate tasks and end with a pull request. Tembo runs them in its cloud VMs. Paradev runs them on your machine, your hosts, your own Linux server, or cloud workspaces (beta).
+
+### Does Tembo run Claude Code and Codex?
+
+Yes. Tembo lists Claude Code, Codex, Cursor, OpenCode, Pi, Amp, Grok Build, and Antigravity as harnesses. You can connect your Claude or ChatGPT subscription, or bring your own API keys.
+
+### Can I run Tembo or Paradev in my own cloud?
+
+Yes, for both. Tembo Self-hosted installs the platform in your AWS, GCP, or Azure account; contact Tembo for access. Paradev [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on a Linux server in your account, on a paid plan.
+
+### Is Tembo open source?
+
+Tembo publishes its SDKs and some tools on GitHub under Apache 2.0 or MIT. The platform itself is commercial, and self-hosted installs need a license key. Paradev is open source under the MIT License.
+

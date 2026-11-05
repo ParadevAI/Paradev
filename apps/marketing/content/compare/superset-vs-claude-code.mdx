@@ -2,7 +2,7 @@
 title: "Paradev vs Claude Code (2026): Agent Orchestrator vs AI Coding Agent"
 description: "Compare Paradev and Claude Code for AI-powered development. Paradev orchestrates many Claude Code instances in parallel across separate worktrees."
 date: 2026-02-18
-lastUpdated: 2026-09-24
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - claude-code
@@ -15,7 +15,7 @@ keywords:
   - ai coding agent comparison
 ---
 
-Claude Code is Anthropic's AI coding agent, with both terminal and desktop app surfaces. Paradev is a local-first desktop workspace that can run multiple Claude Code sessions, other agents, and Paradev Chat in parallel across separate Git worktrees. They're complementary: Claude Code is the agent, while Paradev is the orchestration and review layer around many agents.
+Claude Code is Anthropic's AI coding agent, with both terminal and desktop app surfaces. Paradev is a local-first desktop workspace that can run multiple Claude Code sessions and other agents in parallel across separate Git worktrees. They're complementary: Claude Code is the agent, while Paradev is the orchestration and review layer around many agents.
 
 ---
 
@@ -24,18 +24,18 @@ Claude Code is Anthropic's AI coding agent, with both terminal and desktop app s
 | | **Paradev** | **Claude Code** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI coding agent (CLI + desktop app) |
-| **What it does** | Runs multiple coding agents in parallel with Git worktrees, chat, diff/file review, and browser tooling | AI assistant that reads, writes, and debugs code in your terminal or desktop app |
-| **AI approach** | Agent-agnostic: orchestrates Claude Code, Codex, Aider, OpenCode, Paradev Chat, and more | Claude models only (Sonnet, Opus, Haiku) via Anthropic API |
+| **What it does** | Runs multiple coding agents in parallel with Git worktrees, a chat interface, diff/file review, and browser tooling | AI assistant that reads, writes, and debugs code in your terminal or desktop app |
+| **AI approach** | Agent-agnostic: orchestrates Claude Code, Codex, Aider, OpenCode, and more | Claude models only (Sonnet, Opus, Haiku) via Anthropic API |
 | **Parallelism** | Core feature: many agents on separate branches simultaneously | Single session; requires separate terminal tabs for parallelism |
 | **Isolation** | Git worktrees for local branch-based workspaces; separate working files | Shares your working directory. Manual worktree setup needed |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Claude Pro / Max / Teams / Enterprise / Console account, or provider usage |
-| **License** | Source-available (ELv2) | Source-available (not open source) |
+| **License** | Open source (MIT) | Source-available (not open source) |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a [chat interface](https://docs.paradev.com/chat) that shows a Claude Code session as a chat (a CLI/Chat toggle keeps the same session), an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Agents run on your Mac, on remote hosts, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta). Open source under the MIT License.
 
 ---
 
@@ -49,7 +49,7 @@ Claude Code is Anthropic's official coding agent. The CLI is still the core expe
 
 ### Orchestrator vs Agent
 
-Claude Code is the agent: it talks to Claude models, reads your code, and makes changes. Paradev is the orchestration workspace: it runs many Claude Code instances in parallel, each in its own Git worktree and branch, then gives you chat, browser preview, diff/file review, and MCP-connected workflow around them. Claude Code does the work; Paradev scales and organizes it.
+Claude Code is the agent: it talks to Claude models, reads your code, and makes changes. Paradev is the orchestration workspace: it runs many Claude Code instances in parallel, each in its own Git worktree and branch, then gives you a chat interface, browser preview, diff/file review, and MCP-connected workflow around them. Claude Code does the work; Paradev scales and organizes it.
 
 ### Single Product Surface vs Many Parallel Sessions
 
@@ -65,7 +65,7 @@ Claude Code only works with Anthropic's models. Paradev doesn't care which agent
 
 ### Session Persistence
 
-Claude Code gives you the agent surfaces themselves. Paradev adds the operational layer around them: task lists, long-lived sessions, in-app diff/file review, browser previews for local apps, and chat/MCP workflow tied to the same workspace. That matters once you are coordinating many tasks across one repo instead of staying inside a single Claude session.
+Claude Code gives you the agent surfaces themselves. Paradev adds the operational layer around them: task lists, long-lived sessions, in-app diff/file review, browser previews for local apps, and chat interface and MCP workflow tied to the same workspace. That matters once you are coordinating many tasks across one repo instead of staying inside a single Claude session.
 
 ---
 
@@ -98,7 +98,7 @@ Most Paradev users run Claude Code as their primary agent. Paradev doesn't compe
 
 ### Is Paradev a Claude Code replacement?
 
-Not really. Paradev now has built-in chat, MCP tooling, browser previews, and file review, but its core job is still coordinating agents and worktrees. Claude Code is the coding agent. Paradev is the layer that lets you run many Claude Code sessions in separate worktrees or mix Claude Code with other agents on the same repo.
+Not really. Paradev now has a chat interface, MCP tooling, browser previews, and file review, but its core job is still coordinating agents and worktrees. Claude Code is the coding agent. Paradev is the layer that lets you run many Claude Code sessions in separate worktrees or mix Claude Code with other agents on the same repo.
 
 ### Can I use Claude Code without Paradev?
 
@@ -114,4 +114,4 @@ No. Claude Code runs exactly as it would in any terminal. Paradev just provides 
 
 ### Is Paradev open source?
 
-No. Paradev is source-available on GitHub under Elastic License 2.0 (ELv2). Claude Code is also source-available rather than open source.
+Yes. Paradev is open source on GitHub under the MIT License. Claude Code is source-available rather than open source.

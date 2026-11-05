@@ -2,7 +2,7 @@
 title: "Paradev vs Augment Intent (2026): Developer-Led or Coordinator-Led Orchestration?"
 description: "Compare Paradev and Augment Intent for multi-agent development. Spec-driven coordination vs direct orchestration, agent support, pricing, and platform reach."
 date: 2026-08-17
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - augment-intent
@@ -28,14 +28,14 @@ Paradev and Augment Intent are both workspaces for running multiple coding agent
 | **Workflow** | You scope tasks, dispatch agents, review diffs per task | Three human checkpoints: spec review, task decomposition, diff review; PR generated in-app |
 | **Automations** | Scheduled recurring agent runs built in | Not documented |
 | **Programmatic control** | MCP server, CLI, TypeScript SDK | Context Engine exposed over MCP; no orchestration API documented |
-| **Platform** | macOS (experimental Linux AppImage); source-available ELv2 | macOS, plus an Intent Mobile app for iOS; no Windows or Linux release |
+| **Platform** | macOS (experimental Linux AppImage); open source (MIT) | macOS, plus an Intent Mobile app for iOS; no Windows or Linux release |
 | **Pricing** | Free tier plus paid seats; nothing proxied | Free app; usage billed in Augment credits, or via your own agent subscription in BYOA mode |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
 
 ![Claude streaming a billing migration in one Paradev workspace while other agents run in parallel workspaces](/images/readme/agents-working.gif)
 
@@ -63,7 +63,7 @@ Intent now runs CLI agents beside its native Auggie and lets you add custom agen
 
 ### Platforms, Editing, and Handoff
 
-Intent ships for macOS, with no Windows or Linux release, and adds an iOS companion app. Paradev is macOS with an experimental Linux AppImage, and hands off to VS Code, Cursor, JetBrains, or Xcode when you want a real editor. Neither product covers Windows today.
+Intent ships for macOS, with no Windows or Linux release, and adds an iOS companion app. Paradev is macOS with an experimental Linux AppImage. Agents can also run on Remote Access hosts, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta). It hands off to VS Code, Cursor, JetBrains, or Xcode when you want a real editor. Neither product covers Windows today.
 
 ### Automations and Being Driven by Other Agents
 

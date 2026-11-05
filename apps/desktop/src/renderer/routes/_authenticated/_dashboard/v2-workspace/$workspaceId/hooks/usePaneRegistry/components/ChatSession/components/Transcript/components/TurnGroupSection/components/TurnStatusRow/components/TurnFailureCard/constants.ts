@@ -6,6 +6,7 @@ export type FailureAction =
 	| "continue"
 	| "change_model"
 	| "sign_in"
+	| "agent_settings"
 	| "new_chat";
 
 export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
@@ -39,3 +40,11 @@ export const FAILURE_ACTIONS: Record<
 	session_lost: ["new_chat"],
 	unknown: ["continue", "change_model"],
 };
+
+export const MANUAL_SIGN_IN_TITLE = msg({
+	message: "The agent is signed out",
+});
+export const MANUAL_SIGN_IN_ACTIONS: readonly FailureAction[] = [
+	"continue",
+	"agent_settings",
+];

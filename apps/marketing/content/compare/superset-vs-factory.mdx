@@ -2,7 +2,7 @@
 title: "Paradev vs Factory (2026): Any-Agent Workspace vs Droid Platform"
 description: "Compare Paradev and Factory for running coding agents in parallel. An agent-agnostic worktree workspace on your own machines vs Factory's Droid platform with a desktop app, Droid Computers, and automations."
 date: 2026-10-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - factory
@@ -29,7 +29,7 @@ Paradev and Factory both run many coding agents at once, in Git worktrees, with 
 | **Agents** | Any CLI agent (Claude Code, Codex, Droid, Cursor Agent, OpenCode, Gemini CLI, Copilot, Muse Code, and more) | Droid and custom Droid subagents |
 | **Models** | Whatever each agent uses, on your own subscriptions | Claude, GPT, Gemini, Grok, and Factory's open-weight models through Droid; bring your own key in the CLI and desktop app |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktrees on your machine or on a Droid Computer |
-| **Remote** | Remote Access: add a macOS or Linux machine as a host; cloud workspaces | Droid Computers: managed cloud VMs or your own machine through Factory's relay |
+| **Remote** | Remote Access: add a macOS or Linux machine as a host; Bring Your Own Cloud on your own Linux server; cloud workspaces (beta) | Droid Computers: managed cloud VMs or your own machine through Factory's relay |
 | **Automation** | Scheduled automations, event triggers (GitHub, Slack, Linear, more), CLI, TypeScript SDK, MCP server, Slack bot | Automations from schedules, Slack, or GitHub; `droid exec`, SDKs, GitHub Action |
 | **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad app | macOS and Windows desktop; CLI on macOS, Linux, Windows; web |
 | **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Pro $20, Plus $100, Max $200 per month; Teams and Business; Enterprise with on-prem |
@@ -38,7 +38,7 @@ Paradev and Factory both run many coding agents at once, in Git worktrees, with 
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Factory's Droid, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, and any other CLI agent in separate Git worktrees and branches with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, cloud workspaces run without your own computer connected, and automations on a schedule or event trigger, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Factory's Droid, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, and any other CLI agent in separate Git worktrees and branches with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) puts the host on a Linux server in your own cloud account, [cloud workspaces](/cloud) (beta) run without your own computer connected, and automations on a schedule or event trigger, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Open source under the MIT License, with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is Factory?
 
@@ -56,7 +56,7 @@ Paradev never proxies model calls: each agent runs on your own subscription or A
 
 ### Remote Machines
 
-Both run agents away from your laptop. Factory's Droid Computers include managed cloud VMs on paid plans, as well as your own machines through its relay. Paradev's Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps, and Paradev's cloud workspaces run in the cloud, reachable from desktop, iPhone, and iPad without your own computer connected.
+Both run agents away from your laptop. Factory's Droid Computers include managed cloud VMs on paid plans, as well as your own machines through its relay. Paradev's Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account, with no inbound ports. Paradev's [cloud workspaces](/cloud) (beta) run in the cloud, reachable from desktop, iPhone, and iPad without your own computer connected.
 
 ### Platforms
 

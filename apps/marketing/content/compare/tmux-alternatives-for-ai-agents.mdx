@@ -1,8 +1,8 @@
 ---
 title: "tmux for AI Agents: 8 tmux Alternatives for Coding Agents Compared (2026)"
-description: "tmux alternatives for running coding agents in parallel: Zellij, Claude Squad, ClawTab, cmux, Worktrunk, Paradev, Conductor, and Orca compared."
+description: "tmux alternatives for running coding agents in parallel: Zellij, Claude Squad, ClawTab, cmux, Worktrunk, Paradev, and Orca compared."
 date: 2026-10-07
-lastUpdated: 2026-10-13
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - tmux
@@ -41,8 +41,8 @@ For the status and session-overload side of this question, read [How to Manage M
 | **ClawTab** | tmux control plane with apps | Not described | Yes, plus phone | No | macOS, Linux, iPhone, web | MIT, free; hosted remote $4.99/mo |
 | **cmux** | Native macOS agent terminal | Manual | Notification rings | No | macOS | GPL, free |
 | **Worktrunk** | Worktree CLI | Yes | `wt list` status | `wt merge` | macOS, Linux, Windows | MIT or Apache-2.0, free |
-| **Paradev** | Desktop app for parallel agents | Yes, per workspace | Board by state, hooks | Changes and PR panes | macOS, experimental Linux | ELv2; Free plan; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/user/mo |
-| **Conductor** | Mac app for parallel agents | Yes | Yes | Yes | macOS | See their site |
+| **Paradev** | Desktop app for parallel agents | Yes, per workspace | Board by state, hooks | Changes and PR panes | macOS, experimental Linux | MIT; Free plan; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/user/mo |
+| **Conductor** | Mac app for parallel agents | Yes | Yes | Yes | macOS | Joining Meta; closed to new users |
 | **Orca** | Desktop app for parallel agents | Yes | Yes | Diffs | macOS, Windows, Linux | MIT, free |
 
 ---
@@ -118,13 +118,14 @@ What it adds over a terminal setup:
 
 - **Status:** lifecycle hooks report when each agent starts, finishes, or waits for input. The Workspaces board groups every workspace by **Idle**, **Working**, **Needs attention**, **Needs review**, and **Merged** across repositories.
 - **Review:** the Changes pane shows diffs with per-file staging and lets you commit, push, and open a pull request. The PR pane shows checks and review threads and merges.
-- **Reach:** run agents on your own remote machines over a relay, and check on them from the iPhone and iPad app (iOS or iPadOS 26+, Pro).
+- **Reach:** run agents on your own remote machines over a relay, on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta), and check on them from the iPhone and iPad app (iOS or iPadOS 26+, Pro).
+- **Chat:** a chat interface shows a Claude Code, Codex, OpenCode, or Pi session as a chat, and a CLI/Chat toggle switches back to the terminal without losing context.
 
-Limits: macOS, with an experimental Linux AppImage and no Windows build. Waiting-for-input status depends on the agent; Claude Code reports both finished and waiting states. Worktrees separate files but do not sandbox processes or prevent merge conflicts. Paradev is source-available under ELv2. The Free plan covers one user; Pro is {{price:pro}} per user per month, or {{price:pro:yearly}} billed yearly. Team ({{price:team}}) and Ultra ({{price:ultra}}) add cloud workspaces. Paradev never proxies model calls.
+Limits: macOS, with an experimental Linux AppImage and no Windows build. Waiting-for-input status depends on the agent; Claude Code reports both finished and waiting states. Worktrees separate files but do not sandbox processes or prevent merge conflicts. Paradev is open source under the MIT License. The Free plan covers one user; Pro is {{price:pro}} per user per month, or {{price:pro:yearly}} billed yearly. Team ({{price:team}}) and Ultra ({{price:ultra}}) add cloud workspaces. Paradev never proxies model calls.
 
 ### Conductor
 
-Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel, each task in its own workspace and branch, with a review-and-merge flow. It is polished and focused, and macOS only. See [Paradev vs Conductor](/compare/superset-vs-conductor).
+Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel, each task in its own workspace and branch, with a review-and-merge flow. It is polished and focused, and macOS only. Conductor is joining Meta. Since November 4, 2026, it accepts no new sign-ups or downloads. Conductor Cloud shuts down on November 20, 2026, and the Mac app gets new models and critical fixes until early 2027. Existing users can [migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud). See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
 ### Orca
 
@@ -138,7 +139,7 @@ Orca is a free, MIT-licensed desktop app for macOS, Windows, and Linux, with ter
 - **You want to stay in the terminal with isolated sessions:** Claude Squad, or tmux plus Worktrunk.
 - **You want your tmux agents on your phone and on a schedule:** ClawTab.
 - **You are on a Mac and mostly need to know which agent is waiting:** cmux.
-- **You want separate worktrees, status, and diff review in one app:** Paradev, Conductor, or Orca. Paradev also has a pull request pane with checks, review threads, and merge.
+- **You want separate worktrees, status, and diff review in one app:** Paradev or Orca. Paradev also has a pull request pane with checks, review threads, and merge.
 
 ## Verdict
 
@@ -148,7 +149,7 @@ tmux is still a fine way to keep agents alive, and Zellij is a fine way to do th
 
 ### What is the best tmux alternative for AI coding agents?
 
-It depends on the gap. Zellij is the best plain multiplexer alternative. Claude Squad adds worktrees in a terminal UI. For worktrees, status, and review in one app, use a desktop workspace such as Paradev, Conductor, or Orca.
+It depends on the gap. Zellij is the best plain multiplexer alternative. Claude Squad adds worktrees in a terminal UI. For worktrees, status, and review in one app, use a desktop workspace such as Paradev or Orca.
 
 ### Is Zellij better than tmux for Claude Code?
 

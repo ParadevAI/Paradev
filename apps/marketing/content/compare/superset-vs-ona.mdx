@@ -1,0 +1,117 @@
+---
+title: "Paradev vs Ona (2026): Agent Workspace vs Enterprise Background Agents"
+description: "Compare Paradev and Ona (formerly Gitpod) for running coding agents: where agents run, VPC and Bring Your Own Cloud, agents and models, review, enterprise controls, and the status of Ona after it joined OpenAI."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - ona
+keywords:
+  - superset vs ona
+  - paradev vs ona
+  - ona alternative
+  - gitpod alternative
+  - gitpod ona
+  - ona cloud shutdown
+  - background coding agents
+  - coding agents in your vpc
+---
+
+Ona and Paradev both run coding agents away from your laptop, so work continues when you close it. They start from different places. Ona, the company formerly known as Gitpod, is an enterprise platform for background agents: a task goes in, an agent works in a cloud environment, and a pull request comes out. Ona can run those environments in your own AWS or GCP account. Paradev is a desktop workspace for the agent CLIs you already use, such as Claude Code and Codex. It runs them on your Mac, on hosts you add, on a Linux server in your own cloud account, or in Paradev [cloud workspaces](/cloud) (beta).
+
+Status matters here. Ona agreed to join OpenAI on June 11, 2026, and the deal closed on August 10, 2026. Ona Cloud, its hosted self-serve product, shut down on October 31, 2026, and new customer signups are closed. Existing Ona organizations can still use the platform.
+
+This comparison is published by Paradev. Ona details were checked against [ona.com](https://ona.com), the [Ona docs](https://ona.com/docs), the [Ona changelog](https://ona.com/docs/changelog), Ona's posts on [joining OpenAI](https://ona.com/stories/ona-joins-openai), [Anthropic model access](https://ona.com/stories/anthropic-model-access-in-ona), and the [Ona Cloud shutdown](https://ona.com/stories/ona-core-shutdown), OpenAI's [announcement](https://openai.com/index/openai-to-acquire-ona/), and the [gitpod-io/gitpod](https://github.com/gitpod-io/gitpod) repository, on November 5, 2026.
+
+## At a Glance
+
+| | **Paradev** | **Ona** |
+|---|---|---|
+| **What it is** | Desktop workspace that runs any CLI agent in its own Git worktree and terminal | Enterprise platform for background agents in cloud development environments |
+| **Where agents run** | Your Mac; any macOS or Linux host through Remote Access; your own Linux server (Bring Your Own Cloud); cloud workspaces (beta) | Ona environments on a runner in your AWS or GCP account (Enterprise); Ona Cloud shut down on October 31, 2026 |
+| **Agents** | Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Codex Agent (the open-source Codex harness) is the default; Ona says you can also run Claude Code, Codex CLI, and OpenCode in its environments |
+| **Models** | Your own subscriptions and keys; Paradev never proxies model calls | OpenAI models through Ona Intelligence or an approved OpenAI-compatible provider, such as AWS Bedrock; Ona's Anthropic harness is deprecated |
+| **How tasks start** | Desktop app, CLI, iPhone and iPad app, automations on schedules and events, Linear and GitHub Issues tasks, Slack bot | Ona app, Ona Desktop, and automations on schedules, pull request events, and webhooks |
+| **Environment setup** | Workspace setup scripts on your host; environments and snapshots for cloud workspaces | Dev Containers plus `.ona/config.yaml` |
+| **Review** | Changes pane, Pull Requests view with CI checks and line comments, in-app browser | Pull requests out; AI code review; open the environment in VS Code, Cursor, Windsurf, JetBrains, Zed, or the browser |
+| **Enterprise controls** | SAML SSO, SCIM, audit logs, SOC 2 Type II | SSO, OIDC, SCIM, audit logs, organization policies, command deny list, kernel-level Veto; SOC 2 and GDPR |
+| **Pricing** | Free; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month; Enterprise custom | Contact sales; new signups closed |
+| **License** | Open source, MIT | Commercial platform; the legacy Gitpod Classic repository is AGPL-3.0 |
+
+## What Is Ona?
+
+Ona started as Gitpod, a cloud development environment for GitHub repositories. On September 2, 2025, the company renamed itself Ona and moved its focus to software engineering agents. Its site now calls it "the Enterprise software factory" and says it runs "background agents in the cloud," "orchestrated, governed, secured at the kernel."
+
+Each agent gets its own cloud environment, defined as code with Dev Containers. Runners provision those environments. On the Enterprise plan, a runner deploys into your AWS account (with CloudFormation) or your GCP account, so source code and execution stay in your network. Automations run agents across many repositories at once, on a schedule, on pull request events, or through webhooks, and end in a pull request for a person to review. Developers can open any environment in VS Code, Cursor, Windsurf, JetBrains IDEs, Zed, or the browser.
+
+On August 5, 2026, Ona said Anthropic would end its model access, and it removed its Anthropic-based harness from Ona Cloud. Codex Agent is now the recommended agent, on OpenAI models.
+
+## What Is Paradev?
+
+Paradev is a desktop workspace for AI coding agents. It runs any CLI agent in its own Git worktree and persistent terminal, with your own subscriptions and keys. The Changes pane shows the diff and commits, pushes, and opens a pull request. The Pull Requests view shows CI checks and line comments that you can send to an agent. A [chat interface](https://docs.paradev.com/chat) shows a Claude Code, Codex, OpenCode, or Pi session as a chat, and a CLI / Chat toggle switches it back to the terminal. Automations, a CLI, a TypeScript SDK, an MCP server, and a Slack bot cover unattended work. Paradev is open source under the MIT License.
+
+## Key Differences
+
+### A platform's agent vs the agents you already use
+
+Ona gives you one platform agent, Codex Agent, plus the option to run other CLIs inside its environments. Its model access is now OpenAI-first. Paradev does not ship its own agent. It runs the CLI you already installed and signed in to, with the same settings and MCP servers. Run Claude Code on one task and Codex on the next. Paradev never proxies model calls, so model choice stays with you and your provider.
+
+### Your VPC vs your own server
+
+Ona's main enterprise answer to data control is a runner in your AWS or GCP account. Source code and agent execution stay in your cloud, and Ona adds organization policies, audit logs, and kernel-level enforcement on top.
+
+Paradev has a smaller version of the same idea. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server. It needs no inbound ports: it connects out to the Paradev relay. It is one server you run, not a fleet of environments provisioned per task. If you do not want to run a machine, Paradev [cloud workspaces](/cloud) (beta) run in Paradev's cloud.
+
+### Hands-off tasks vs a workspace you watch
+
+Ona is built for "task in, pull request out." Automations can run one change across hundreds of repositories, and a person reviews the pull requests at the end. Paradev is built for a developer who runs several agents and steers them: you see each terminal, redirect an agent, and review the diff before you open the pull request. Paradev automations also run on schedules and events, but Ona's fleet-wide migration tooling goes further than Paradev's automations for large changes across many repositories.
+
+### Enterprise governance
+
+Ona has deep runtime controls: SSO, OIDC, SCIM, audit logs, organization policies, a command deny list, and Veto, a kernel-level engine that blocks executables below the agent's reach. Paradev Enterprise has SAML SSO, SCIM, audit logs, and a SOC 2 Type II report. Paradev does not have an equivalent of Veto. If kernel-level enforcement on agent environments is a hard requirement, Ona has the stronger feature set.
+
+### Status and lock-in
+
+Ona is now part of OpenAI. Ona Cloud is gone, new signups are closed, and Ona points its Ona Cloud users to Codex cloud environments. Ona's docs and changelog are still active for existing organizations. Paradev is an independent, MIT-licensed project. You can read, fork, and self-host the code, and it works with agents from any vendor.
+
+## Pricing
+
+Ona does not publish prices. Its pricing page is a "Contact sales" form, and new customer signups are closed. When Ona Cloud shut down, Ona said it would refund October payments and unused credits.
+
+Paradev has a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly), Ultra at {{price:ultra}}, and a custom Enterprise plan. Pro adds Remote Access, automations, the iPhone and iPad app, and the GitHub, Linear, and Slack integrations. Bring Your Own Cloud needs a paid plan. Team and Ultra add cloud workspaces (beta). Model costs stay on your own agent subscriptions. See [Paradev pricing](/pricing).
+
+## Which Should You Choose?
+
+**Choose Ona if you:**
+
+- Are an existing Ona customer with runners in your AWS or GCP account
+- Want automations that change hundreds of repositories and return pull requests
+- Need kernel-level enforcement, a command deny list, and organization policies on agent environments
+- Are fine with Codex Agent and OpenAI models as the default
+
+**Choose Paradev if you:**
+
+- Want to run Claude Code, Codex, OpenCode, and other CLIs you already use, with your own subscriptions
+- Want to watch and steer agents, review diffs, and open pull requests in one desktop app
+- Want agents on your Mac, on hosts you add, on your own Linux server with Bring Your Own Cloud, or in cloud workspaces (beta)
+- Need a tool you can sign up for today, or an open-source tool under the MIT License
+
+**Verdict:** Ona is a strong enterprise platform for governed background agents in your own cloud, but it now serves existing customers inside OpenAI, and its hosted product is closed. Teams that look for a Gitpod or Ona replacement and want to keep their own agents should try Paradev. Teams that want OpenAI's managed cloud agents can look at Codex cloud environments, which Ona suggests for former Ona Cloud users.
+
+## Frequently Asked Questions
+
+### Is Ona the same as Gitpod?
+
+Yes. Gitpod renamed itself Ona on September 2, 2025. The old Gitpod Classic repository on GitHub now says Gitpod has been renamed to Ona and that its maintainers no longer recommend that version.
+
+### Is Ona still available?
+
+Partly. Ona Cloud shut down on October 31, 2026, and new customer signups are closed. Existing customers and members of existing organizations can still use Ona, according to its docs. Ona joined OpenAI when the deal closed on August 10, 2026.
+
+### What is the best Ona alternative?
+
+It depends on what you used Ona for. For agents that run in OpenAI's cloud, Ona points former Ona Cloud users to Codex cloud environments. For a workspace that runs any agent CLI on your machine, on your own Linux server, or in a managed cloud workspace, try Paradev.
+
+### Is Ona open source?
+
+The Ona platform is a commercial product. The legacy Gitpod Classic code on GitHub is under AGPL-3.0, and Ona publishes some tools, such as its Terraform module for GCP runners, under open-source licenses. Paradev is open source under the MIT License.

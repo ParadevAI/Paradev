@@ -2,7 +2,7 @@
 title: "Paradev vs Grok Bot (2026): Agent Workspace vs Always-On Cloud Teammates"
 description: "Compare Paradev and xAI's Grok Bot. A local-first workspace for running any coding agent in parallel Git worktrees vs always-on computer-use teammates on Cursor-hosted cloud computers."
 date: 2026-09-11
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - grok-bot
@@ -28,7 +28,7 @@ If you were looking for xAI's coding agent, that is Grok Build, a separate open-
 |---|---|---|
 | **What it does** | Runs multiple AI coding agents in parallel in separate Git worktrees, with chat, review, and browser | Always-on AI teammates on a shared cloud computer that work inside tools and apps 24/7 |
 | **Category** | Local-first agent workspace with remote hosts | Cloud computer-use agents (beta) |
-| **Where agents run** | Your machine, any machine you add as a host, or a Paradev cloud workspace | Cursor-hosted cloud computers only, one Firecracker microVM per user, US-only |
+| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, your own Linux server (BYOC), or a Paradev cloud workspace (beta) | Cursor-hosted cloud computers only, one Firecracker microVM per user, US-only |
 | **Agent and model choice** | Any CLI agent on your own subscription or keys (Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok Build, Kimi Code, Mistral Vibe, Amp, and more) | Cursor manages model selection; no customer-facing model picker |
 | **Focus** | Software engineering: worktrees, diffs, PRs, CI, dev servers | General work: sales, recruiting, ops, and some engineering triage |
 | **Isolation** | Git worktrees for local branch-based workspaces on your own repos | Persistent cloud VM per user |
@@ -40,7 +40,7 @@ If you were looking for xAI's coding agent, that is Grok Build, a separate open-
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Kimi Code, Mistral Vibe, Amp, and any other CLI agent in separate Git worktrees and branches with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Kimi Code, Mistral Vibe, Amp, and any other CLI agent in separate Git worktrees and branches with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on your own Linux server, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Open source under the MIT License, with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is Grok Bot?
 
@@ -50,7 +50,7 @@ Grok Bot is xAI's product for "durable AI teammates on a persistent cloud comput
 
 ### Where Agents Run
 
-Paradev's agents run on your laptop, your desktop, any machine you add as a host, or a Paradev cloud workspace, with your existing agent subscriptions. On your own machines they work against your real services and dependencies. Grok Bot's agents run exclusively on Cursor-hosted cloud computers you do not control, with no model picker and, during the beta, US-only availability. That is the deepest split: Paradev lets you pick where each coding agent runs, and Grok Bot is a managed general-purpose service.
+Paradev's agents run on your laptop, your desktop, any machine you add as a host, a Linux server in your own cloud account ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a Paradev cloud workspace (beta), with your existing agent subscriptions. On your own machines they work against your real services and dependencies. Grok Bot's agents run exclusively on Cursor-hosted cloud computers you do not control, with no model picker and, during the beta, US-only availability. That is the deepest split: Paradev lets you pick where each coding agent runs, and Grok Bot is a managed general-purpose service.
 
 ### Engineering Loop vs General Work
 

@@ -1,8 +1,8 @@
 ---
 title: "Vibe Kanban Is Shutting Down: What to Move To in 2026"
-description: "bloop announced on April 10, 2026 that Vibe Kanban is sunsetting. What still works, what was removed, how to export your data, and how to bring a parallel-agent workflow to Paradev, Orca, Emdash, Conductor, or Claude Squad."
+description: "bloop announced on April 10, 2026 that Vibe Kanban is sunsetting. What still works, what was removed, how to export your data, and how to bring a parallel-agent workflow to Paradev, Orca, Emdash, or Claude Squad."
 date: 2026-10-20
-lastUpdated: 2026-10-29
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - vibe-kanban
@@ -24,7 +24,7 @@ keywords:
 
 Vibe Kanban is sunsetting. On April 10, 2026, bloop, the company behind it, [announced its shutdown](https://www.vibekanban.com/blog/shutdown). The project continues as community-maintained open source, local workspaces keep working, and the remote services (issues, comments, projects, and organisations) stayed up for 30 days and were then removed. If you ran Claude Code, Codex, or other agents in parallel worktrees from Vibe Kanban and want an actively developed home for that workflow, move to Paradev (formerly Superset): it runs the same agents in their own Git worktrees, with a board of tasks and workspaces, review, and remote and cloud workspaces.
 
-**Our recommendation: move to Paradev if you want the same agents and worktrees with active development, a board, and review in one app.** If you want to stay fully open source, Orca and Emdash are the closest matches. If Vibe Kanban still works for you, you do not have to move today.
+**Our recommendation: move to Paradev if you want the same agents and worktrees with active development, a board, and review in one app.** Paradev is open source under the MIT License, so moving does not mean giving that up. Orca and Emdash are other open-source options. If Vibe Kanban still works for you, you do not have to move today.
 
 [Download Paradev](/download) and follow the migration steps below, or read [Paradev vs Vibe Kanban](/compare/superset-vs-vibe-kanban) for the direct comparison. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
 
@@ -34,10 +34,10 @@ Vibe Kanban is sunsetting. On April 10, 2026, bloop, the company behind it, [ann
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | Same agents and worktrees, with task and workspace boards, review, automations, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Paradev** | Same agents and worktrees, with task and workspace boards, review, automations, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Open source (MIT) |
 | **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
-| **Conductor** | Polished Mac app with team cloud workspaces | Mac + iOS | Proprietary |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Mac + iOS | Proprietary |
 | **Claude Squad** | Terminal-native parallel agents over tmux | macOS, Linux | Open source (AGPL) |
 
 ## Is Vibe Kanban Shutting Down?
@@ -78,7 +78,7 @@ Every agent on [Vibe Kanban's supported list](https://github.com/BloopAI/vibe-ka
 
 ### Paradev
 
-Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. You keep a board: the Tasks view shows Linear and Paradev tasks as a list or a kanban board, GitHub issues as a list, and **Run in workspace** starts a workspace with the agent already working. Around the agents, Paradev adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, and an in-app browser with Design Mode. Workspaces run on your machine, on hosts you add through Remote Access, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them (Pro). Worktrees separate each agent's working files; they do not sandbox processes or prevent merge conflicts.
+Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. You keep a board: the Tasks view shows Linear and Paradev tasks as a list or a kanban board, GitHub issues as a list, and **Run in workspace** starts a workspace with the agent already working. Around the agents, Paradev adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, and an in-app browser with Design Mode. Workspaces run on your machine, on hosts you add through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta), and the [iPhone and iPad app](/mobile) reaches all of them (Pro). Worktrees separate each agent's working files; they do not sandbox processes or prevent merge conflicts.
 
 For the direct comparison, see [Paradev vs Vibe Kanban](/compare/superset-vs-vibe-kanban).
 
@@ -96,7 +96,9 @@ See [Paradev vs Emdash](/compare/superset-vs-emdash).
 
 ### Conductor
 
-Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Its Pro plan at $50/month adds cloud workspaces, multiplayer, an API, and an iOS app. Choose it if your team wants shared agent conversations in a managed cloud.
+Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Its Pro plan added cloud workspaces, multiplayer, an API, and an iOS app.
+
+Conductor announced on November 4, 2026 that it is joining Meta. It no longer accepts new sign-ups or downloads. Conductor Cloud goes read-only on November 13 and shuts down on November 20, 2026. The Mac app gets new models and critical fixes until early 2027. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -111,7 +113,7 @@ See [Paradev vs Claude Squad](/compare/superset-vs-claude-squad).
 - For the same agents and worktrees with boards, review, automations, and remote and cloud workspaces, choose **Paradev**.
 - For a free, open-source, cross-platform ADE with mobile apps, choose **Orca**.
 - For open-source, issue-first planning across many trackers, choose **Emdash**.
-- For a polished Mac app with team cloud workspaces, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 - To stay in the terminal, choose **Claude Squad**.
 - If Vibe Kanban still does what you need locally and you are comfortable with community maintenance, stay and export your data now.
 
@@ -156,4 +158,4 @@ Yes. The Tasks view shows Linear and Paradev tasks as a kanban board, and the Wo
 
 ### Is there an open-source Vibe Kanban alternative?
 
-Yes. Orca (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source. Paradev is source-available under Elastic License 2.0.
+Yes. Paradev is open source under the MIT License. Orca (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source too.

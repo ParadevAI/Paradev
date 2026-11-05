@@ -2,7 +2,7 @@
 title: "Paradev vs GitHub Copilot (2026): Agent Orchestration vs AI Pair Programmer"
 description: "Compare Paradev and GitHub Copilot for AI-assisted development. See how parallel agent orchestration differs from inline AI code completion and chat."
 date: 2026-02-18
-lastUpdated: 2026-09-24
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - github-copilot
@@ -24,18 +24,18 @@ GitHub Copilot is an AI pair programmer that lives inside your editor, offering 
 | | **Paradev** | **GitHub Copilot** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI pair programmer (editor extension) |
-| **What it does** | Runs multiple coding agents in parallel with Git worktrees, chat, diff/file review, and browser tooling | Inline code completions, chat, and Copilot Agent mode in your editor |
+| **What it does** | Runs multiple coding agents in parallel with Git worktrees, a chat interface, diff/file review, and browser tooling | Inline code completions, chat, and Copilot Agent mode in your editor |
 | **AI approach** | Agent-agnostic: orchestrates any CLI agent | Multiple frontier models (Claude, GPT, Gemini) via GitHub |
 | **Parallelism** | Core feature: many agents on separate branches simultaneously | In-editor agent mode; cloud coding agent runs on a branch and opens a PR |
 | **Editor** | Works alongside any editor | VS Code, JetBrains, Visual Studio, Neovim (extension) |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free; Pro $10/mo, Pro+ $39/mo, Max $100/mo; Business $19/user, Enterprise $39/user |
-| **License** | Source-available (ELv2) | Closed source |
+| **License** | Open source (MIT) | Closed source |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a [chat interface](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Agents run on your Mac, on remote hosts, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta). Open source under the MIT License.
 
 ---
 
@@ -49,7 +49,7 @@ GitHub Copilot is an AI coding assistant from GitHub (Microsoft). It integrates 
 
 ### Inline Assistant vs Parallel Orchestrator
 
-Copilot is built for the editing experience: it completes your code as you type, answers questions in a chat panel, and can make changes across files via Agent mode. Paradev runs many autonomous agents simultaneously, each on a separate task in a separate worktree, then adds chat, file review, and browser preview around those tasks. Copilot makes you faster at writing code; Paradev makes many agents work in parallel while you do something else.
+Copilot is built for the editing experience: it completes your code as you type, answers questions in a chat panel, and can make changes across files via Agent mode. Paradev runs many autonomous agents simultaneously, each on a separate task in a separate worktree, then adds a chat interface, file review, and browser preview around those tasks. Copilot makes you faster at writing code; Paradev makes many agents work in parallel while you do something else.
 
 ### Completions vs Autonomous Tasks
 
@@ -65,7 +65,7 @@ Copilot supports multiple frontier models (Claude, GPT, Gemini) through GitHub's
 
 ### Privacy
 
-Paradev runs the workspace locally in Git worktrees, and its source-available codebase is fully auditable. Copilot sends code context to GitHub/Microsoft servers for processing. Copilot Business and Enterprise offer data retention controls, but code still transits external servers.
+Paradev runs the workspace locally in Git worktrees, and its open-source codebase is fully auditable. Copilot sends code context to GitHub/Microsoft servers for processing. Copilot Business and Enterprise offer data retention controls, but code still transits external servers.
 
 ---
 
@@ -98,11 +98,11 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 ### Is Paradev a Copilot replacement?
 
-No. Paradev is not an inline-completion assistant. It does provide in-app chat, diff/file editing, browser previews, and IDE handoff, but it does not try to replace Copilot's live suggestions while you type. Use Copilot for real-time editing assistance and Paradev for parallel autonomous tasks.
+No. Paradev is not an inline-completion assistant. It does provide a chat interface, diff/file editing, browser previews, and IDE handoff, but it does not try to replace Copilot's live suggestions while you type. Use Copilot for real-time editing assistance and Paradev for parallel autonomous tasks.
 
 ### How does Copilot's Coding Agent compare to Paradev?
 
-Copilot's Coding Agent runs in a cloud VM and creates PRs from GitHub Issues, one task at a time per repository. Paradev runs many agents locally in parallel across Git worktrees. Copilot's agent is cloud-hosted and GitHub-integrated; Paradev's approach is local, agent-agnostic, and parallel.
+Copilot's Coding Agent runs in a cloud VM and creates PRs from GitHub Issues, one task at a time per repository. Paradev runs many agents in parallel across Git worktrees, on your machine or on hosts you choose. Copilot's agent is cloud-hosted and GitHub-integrated; Paradev's approach is local, agent-agnostic, and parallel.
 
 ### Can I use Copilot inside a Paradev worktree?
 
@@ -110,4 +110,4 @@ Yes. When you open a Paradev worktree in VS Code, Copilot works normally: it see
 
 ### Is Paradev open source?
 
-No. Paradev is source-available on GitHub under Elastic License 2.0 (ELv2). GitHub Copilot is closed source.
+Yes. Paradev is open source on GitHub under the MIT License. GitHub Copilot is closed source.

@@ -2,7 +2,7 @@
 title: "Paradev vs Muse Code (2026): Agent Workspace vs Meta's Coding Agent"
 description: "Compare Paradev and Meta's Muse Code. See how a workspace that runs any coding agent in parallel Git worktrees differs from Meta's terminal coding agent built for Muse Spark, and how to run Muse Code inside Paradev."
 date: 2026-10-13
-lastUpdated: 2026-10-14
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - muse-code
@@ -25,18 +25,18 @@ Muse Code is Meta's coding agent for the terminal and CI, built for the Muse Spa
 | | **Paradev** | **Muse Code** |
 |---|---|---|
 | **Category** | Agent workspace and orchestrator | AI coding agent (terminal and CI) |
-| **What it does** | Runs multiple coding agents in parallel with Git worktrees, diff review, PRs, chat, and browser | Reads, writes, and runs code with Meta's Muse models, with subagents and workflows |
+| **What it does** | Runs multiple coding agents in parallel with Git worktrees, diff review, PRs, a chat interface, and browser | Reads, writes, and runs code with Meta's Muse models, with subagents and workflows |
 | **Models** | Any agent's models: Muse Spark through Muse Code, plus Claude, GPT-6, Gemini, and more | Muse Spark and Muse Wonder |
 | **Parallelism** | Many agents, from different vendors, on separate branches at once | Subagents and workflows inside one Muse Code session, up to 8 agents per tree by default |
 | **Isolation** | Git worktrees for local branch-based workspaces | Optional Muse-managed worktree per subagent, or the parent's checkout |
 | **Interface** | macOS desktop app (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Terminal UI, headless `muse exec`, TypeScript and Python SDKs |
-| **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Muse subscriptions with usage limits per 5 hours, or API pay-per-token |
+| **Pricing** | Open source (MIT); free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Muse subscriptions with usage limits per 5 hours, or API pay-per-token |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Muse Code, Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Amp, and any other CLI agent in separate Git worktrees and branches, with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Muse Code, Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Amp, and any other CLI agent in separate Git worktrees and branches, with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on your own Linux server, and [cloud workspaces](/cloud) are in beta. Scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Open source under the MIT License.
 
 ## What Is Muse Code?
 

@@ -52,11 +52,23 @@ describe("terminal env in a sandbox", () => {
 		expect(first.FOO).toBe("one");
 	});
 
+	test("a terminal reads as remote, so TUIs copy to the user's clipboard over OSC 52", () => {
+		const env = buildV2TerminalEnv(params);
+		expect(env.SSH_CONNECTION).toBe("127.0.0.1 0 127.0.0.1 0");
+	});
+
+	test("an environment's own SSH_CONNECTION wins", () => {
+		setManagedEnv({ SSH_CONNECTION: "10.0.0.1 5000 10.0.0.2 22" });
+		const env = buildV2TerminalEnv(params);
+		expect(env.SSH_CONNECTION).toBe("10.0.0.1 5000 10.0.0.2 22");
+	});
+
 	test("outside a sandbox the managed set is ignored", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "local";
 		setManagedEnv({ FOO: "one" });
 		const env = buildV2TerminalEnv(params);
 		expect(env.FOO).toBeUndefined();
 		expect(env.IS_SANDBOX).toBeUndefined();
+		expect(env.SSH_CONNECTION).toBeUndefined();
 	});
 });

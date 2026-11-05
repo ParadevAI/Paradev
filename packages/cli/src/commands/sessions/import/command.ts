@@ -20,7 +20,7 @@ export default command({
 			.desc("The agent's own session ID (e.g. from `claude --resume`)"),
 	},
 	run: async ({ ctx, options }) => {
-		const { sessions } = await resolveSessionWorkspace(ctx, options);
+		const { sessions, openTab } = await resolveSessionWorkspace(ctx, options);
 
 		const result = await sessions.create.mutate({
 			workspaceId: options.workspace,
@@ -28,9 +28,10 @@ export default command({
 			resumeSessionId: options.nativeSession,
 		});
 
+		const opened = await openTab(result.sessionId);
 		return {
 			data: result,
-			message: `Imported ${result.label} session ${options.nativeSession} as chat session ${result.sessionId} in workspace ${options.workspace}`,
+			message: `Imported ${result.label} session ${options.nativeSession} as chat session ${result.sessionId} in workspace ${options.workspace}${opened ? ", opened in a desktop tab" : ""}`,
 		};
 	},
 });

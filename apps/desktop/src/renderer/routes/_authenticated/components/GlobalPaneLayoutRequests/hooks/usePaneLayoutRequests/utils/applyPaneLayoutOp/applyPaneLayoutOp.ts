@@ -20,6 +20,7 @@ import { CENTER_PANE_KINDS } from "renderer/routes/_authenticated/_dashboard/v2-
 import { preserveLocalPaneSelection } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2WorkspacePaneLayout/utils/preserveLocalPaneSelection";
 import type {
 	BrowserPaneData,
+	ChatPaneData,
 	DiffPaneData,
 	FilePaneData,
 	PagesListPaneData,
@@ -49,6 +50,7 @@ export interface PaneLayoutOpOutcome {
 }
 
 type OpenOp = Extract<PaneLayoutOp, { type: "open" }>;
+type NewTabOp = Extract<PaneLayoutOp, { type: "newTab" }>;
 
 const SPLIT_POSITIONS: Record<PaneSplitDirection, SplitPosition> = {
 	right: "right",
@@ -187,6 +189,40 @@ function swapPanes(areas: PaneAreas, aId: string, bId: string): PaneAreas {
 		}),
 	});
 	return { main: swapIn(areas.main), sidebar: swapIn(areas.sidebar) };
+}
+
+function newTabPane(op: NewTabOp): Omit<CreatePaneInput<PaneViewerData>, "id"> {
+	if (op.chat && !op.terminalId) {
+		return {
+			kind: "chat-v3",
+			data: {
+				terminalId: op.chat.terminalId,
+				sessionId: op.chat.sessionId,
+				agent: { id: op.chat.agentId },
+			} satisfies ChatPaneData,
+		};
+	}
+	if (op.terminalId && !op.chat) {
+		return { kind: "terminal", data: { terminalId: op.terminalId } };
+	}
+	throw new PaneLayoutOpError(
+		"BAD_REQUEST",
+		"Say what the new tab shows: a terminal or a chat session, not both",
+	);
+}
+
+function findChatPane(areas: PaneAreas, sessionId: string): Located | null {
+	for (const area of ["main", "sidebar"] as const) {
+		for (const tab of areas[area].tabs) {
+			const pane = Object.values(tab.panes).find(
+				(candidate) =>
+					candidate.kind === "chat-v3" &&
+					(candidate.data as ChatPaneData).sessionId === sessionId,
+			);
+			if (pane) return { area, tab, pane };
+		}
+	}
+	return null;
 }
 
 interface SidebarPane {
@@ -463,19 +499,32 @@ export function applyPaneLayoutOp(
 		}
 
 		case "newTab": {
+			const pane = newTabPane(op);
+			const open = op.chat ? findChatPane(areas, op.chat.sessionId) : null;
+			if (open) {
+				const next = op.focus
+					? inArea(open.area, (store) =>
+							store.setActivePane({ tabId: open.tab.id, paneId: open.pane.id }),
+						)
+					: areas;
+				return done(
+					next,
+					open.pane.id,
+					open.tab.id,
+					!!op.focus && open.area === "sidebar",
+				);
+			}
 			const paneId = createPaneId();
-			const next = inArea(op.area ?? "main", (store) =>
-				store.addTab({
-					panes: [
-						{
-							id: paneId,
-							kind: "terminal",
-							data: { terminalId: op.terminalId },
-						},
-					],
-				}),
+			const area = op.area ?? "main";
+			const next = inArea(area, (store) =>
+				store.addTab({ panes: [{ id: paneId, ...pane }], focus: !!op.focus }),
 			);
-			return done(keepSelection(areas, next), paneId, tabIdOf(next, paneId));
+			return done(
+				op.focus ? next : keepSelection(areas, next),
+				paneId,
+				tabIdOf(next, paneId),
+				!!op.focus && area === "sidebar",
+			);
 		}
 
 		case "swap": {

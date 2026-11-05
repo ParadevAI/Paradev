@@ -1299,14 +1299,16 @@ export function ComposerBody({
 					<MicIcon className="size-4" />
 				</button>
 			)}
-			{status === "streaming" && onStop && !canSend ? (
+			{status === "streaming" && !canSend ? (
 				<button
 					type="button"
 					aria-label={t({
 						message: "Stop response",
 					})}
+					disabled={!onStop}
+					title={onStop ? undefined : t({ message: "Starting the agent…" })}
 					onClick={onStop}
-					className={buttons.filled}
+					className={onStop ? buttons.filled : buttons.inactiveSend}
 				>
 					<SquareIcon className="size-3 fill-current" />
 				</button>
@@ -1314,12 +1316,12 @@ export function ComposerBody({
 				<button
 					type="button"
 					aria-label={
-						status === "streaming"
-							? t({ message: "Queue message" })
-							: t({ message: "Send message" })
+						status === "ready"
+							? t({ message: "Send message" })
+							: t({ message: "Queue message" })
 					}
 					title={
-						status === "streaming"
+						(status === "streaming" && onStop) || status === "background"
 							? t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}

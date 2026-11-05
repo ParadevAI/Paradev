@@ -2,7 +2,7 @@
 title: "Paradev vs Nimbalyst (2026): Agent Workspace vs Visual Workspace for Claude Code and Codex"
 description: "Compare Paradev and Nimbalyst, the successor to Crystal. Any CLI agent in parallel Git worktrees with PR review and remote hosts vs a visual workspace with editors, a task board, and multiplayer for Claude Code and Codex."
 date: 2026-10-14
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - nimbalyst
@@ -32,17 +32,17 @@ Facts were checked against Nimbalyst's own site, docs, changelog, and repository
 | **Planning** | Tasks from Linear, GitHub Issues, and Paradev as a list or kanban board; Workspaces board by status; Slack bot | Kanban board of sessions by phase; plans split into tasks agents can update |
 | **Editors** | Diff and file editor; opens workspaces in VS Code, Cursor, JetBrains, Zed, Xcode | Markdown, sheets, mockups, Excalidraw, Mermaid, data models, mind maps, code, wiki |
 | **Review** | Changes pane commits, pushes, and opens PRs; Pull Requests view with CI checks | Per-file diff review with accept and reject; PR review mode; AI-written commits |
-| **Remote** | macOS or Linux hosts you add through Remote Access; cloud workspaces | Remote sessions in your own Cloudflare sandbox |
+| **Remote** | macOS or Linux hosts you add through Remote Access; your own Linux server (Bring Your Own Cloud); cloud workspaces (beta) | Remote sessions in your own Cloudflare sandbox |
 | **Mobile** | iPhone and iPad app for your own hosts and cloud workspaces (Pro; cloud workspaces need Team or Ultra) | iPhone and iPad app |
 | **Team** | Shared hosts with per-member access; Enterprise SAML SSO, SCIM, audit logs | Real-time multiplayer docs, boards, and shared agent sessions |
 | **Platforms** | macOS; experimental Linux AppImage; Windows not yet available | macOS, Windows, Linux |
-| **License and price** | Source-available (ELv2); Free, Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | MIT; Individual free; Teams $20 per user/month (free during beta) |
+| **License and price** | Open source (MIT); Free, Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | MIT; Individual free; Teams $20 per user/month (free during beta) |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so Claude Code, Codex, and any other agent run side by side on your own subscriptions; Paradev never proxies model calls. The Changes pane commits, pushes, and opens pull requests, and the Pull Requests view shows CI checks and sends line comments back to agents. Remote Access adds macOS or Linux machines as shared hosts, cloud workspaces run in the cloud, scheduled automations run agents on a host you choose, and a CLI, TypeScript SDK, MCP server, and Slack bot let other tools drive it. The [iPhone and iPad app](/mobile) reaches your hosts and cloud workspaces away from your desk.
+Paradev is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so Claude Code, Codex, and any other agent run side by side on your own subscriptions; Paradev never proxies model calls. The Changes pane commits, pushes, and opens pull requests, and the Pull Requests view shows CI checks and sends line comments back to agents. Remote Access adds macOS or Linux machines as shared hosts, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account, [cloud workspaces](/cloud) (beta) run in the cloud, scheduled automations run agents on a host you choose, and a CLI, TypeScript SDK, MCP server, and Slack bot let other tools drive it. The [iPhone and iPad app](/mobile) reaches your hosts and cloud workspaces away from your desk.
 
 ## What Is Nimbalyst?
 
@@ -60,11 +60,11 @@ Nimbalyst puts documents, diagrams, sheets, and a session board that agents can 
 
 ### Where Agents Run
 
-Paradev runs agents on your machine or on macOS or Linux hosts you add, which keeps them working on your real environment when your laptop sleeps. It also has cloud workspaces that run in the cloud without your own computer connected. Nimbalyst runs locally and can run remote sessions in your own Cloudflare sandbox.
+Paradev runs agents on your machine or on macOS or Linux hosts you add, which keeps them working on your real environment when your laptop sleeps. It can also run on a Linux server in your own cloud account with Bring Your Own Cloud, with no inbound ports. Cloud workspaces (beta) run in the cloud without your own computer connected. Nimbalyst runs locally and can run remote sessions in your own Cloudflare sandbox.
 
 ### Platforms and License
 
-Nimbalyst runs on Windows, macOS, and Linux and is MIT-licensed. Paradev runs on macOS with an experimental Linux build, has no Windows app yet, and is source-available under ELv2.
+Nimbalyst runs on Windows, macOS, and Linux and is MIT-licensed. Paradev runs on macOS with an experimental Linux build, has no Windows app yet, and is open source under the MIT License.
 
 ### Team Features
 
@@ -91,7 +91,7 @@ Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro
 
 - Mainly use Claude Code and Codex
 - Want visual editors for documents, sheets, diagrams, and mockups next to your agents
-- Need Windows, or want an MIT-licensed tool
+- Need Windows
 - Want real-time multiplayer on documents and sessions
 
 ---

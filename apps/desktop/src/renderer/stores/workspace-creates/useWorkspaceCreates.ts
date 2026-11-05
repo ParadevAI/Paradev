@@ -25,6 +25,8 @@ import type {
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
+import { recoverAgentLaunches } from "./recoverAgentLaunches";
+import { resolveChatAgentIds } from "./resolveChatAgentIds";
 import { useWorkspaceTransactionsStore } from "./workspaceTransactions";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
@@ -69,6 +71,7 @@ interface CreateOutcome {
 				sessionId: string;
 				label: string;
 				chatSessionId?: string;
+				chatAgentId?: string;
 		  }
 		| { ok: false; error: string }
 	>;
@@ -196,16 +199,14 @@ async function createViaEnqueue(
 
 		if (outcome === "timeout") {
 			// The event was lost, not necessarily the create. If the row exists
-			// the workspace is real — recover with an EMPTY pane seed rather
-			// than tearing down a workspace the user can already see. Launched
-			// terminals/agents aren't recoverable without the event; the
-			// background-session auto-adopt path surfaces them on open.
+			// the workspace is real: keep it, and read the agents it launched back
+			// from the host instead of tearing down a workspace the user can see.
 			const row = await probeWorkspaceRow(client, workspaceId);
 			if (row === "exists") {
 				return {
 					workspace: { id: workspaceId, projectId: payload.projectId },
 					terminals: [],
-					agents: [],
+					agents: await recoverAgentLaunches(client, workspaceId),
 				};
 			}
 			throw new Error(
@@ -362,7 +363,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 						// ultimately successful session create must not be recorded
 						// as failed (the row would pop back via workspace:changed).
 						// Spaced probes cover a create that hasn't inserted its row
-						// yet; the empty pane seed is healed by session auto-adopt.
+						// yet; the agents it launched are read back from the host.
 						if (
 							isTimeoutAbort(error) &&
 							(await probeWorkspaceRowWithRetries(client, workspaceId)) ===
@@ -371,7 +372,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 							return {
 								workspace: { id: workspaceId, projectId: null },
 								terminals: [],
-								agents: [],
+								agents: await recoverAgentLaunches(client, workspaceId),
 							};
 						}
 						throw error;
@@ -399,7 +400,12 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			);
 
 			const completed = createPromise
-				.then<SubmitOutcome>((result) => {
+				.then<SubmitOutcome>(async (result) => {
+					const agents = await resolveChatAgentIds(
+						getHostServiceClientByUrl(hostUrl),
+						result.workspace.id,
+						result.agents,
+					);
 					writeWorkspacePaneLayout(
 						collections,
 						{
@@ -407,7 +413,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 							projectId: result.workspace.projectId,
 						},
 						result.terminals,
-						result.agents,
+						agents,
 					);
 					if (result.workspace.id !== workspaceId) {
 						deleteWorkspaceLocalState(workspaceId);

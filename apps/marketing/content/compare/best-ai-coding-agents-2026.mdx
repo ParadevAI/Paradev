@@ -1,8 +1,8 @@
 ---
 title: "Best AI Coding Tools and Agents (2026): Complete Comparison"
-description: "Compare the top AI coding tools of 2026: Paradev, Cursor, Claude Code, Codex, Windsurf, Devin, Capy, Conductor, and more. Find the right stack for your workflow."
+description: "Compare the top AI coding tools of 2026: Paradev, Cursor, Claude Code, Codex, Windsurf, Devin, Capy, and more. Find the right stack for your workflow."
 date: 2026-02-18
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - cursor
@@ -40,7 +40,7 @@ This guide covers editors, orchestrators, and agents together. For a comparison 
 
 The right stack usually combines tools across those layers. This guide compares workflow options and explains where Paradev fits.
 
-Paradev is a desktop app, not a terminal. Around the agents' terminals it has its own chat surface, a Changes pane, a pull request pane, a file editor, an in-app browser, and MCP tooling.
+Paradev is a desktop app, not a terminal. Around the agents' terminals it has a chat interface, a Changes pane, a pull request pane, a file editor, an in-app browser, and MCP tooling.
 
 ---
 
@@ -71,7 +71,7 @@ These tools run and manage multiple agents:
 
 - **Paradev**: Workspace for organizing CLI-agent tasks, terminals, branches, and review
 - **Capy**: Hosted parallel-agent platform with isolated environments
-- **Conductor**: Mac workspaces and managed cloud collaboration for Claude Code, Codex, Cursor, and OpenCode
+- **Conductor**: Mac workspaces for Claude Code, Codex, Cursor, and OpenCode; joining Meta and closed to new users
 - **Augment Intent**: Spec-driven workspace where a coordinator agent decomposes features and runs implementors in parallel worktrees
 - **Parallel Code**: MIT-licensed desktop app for dispatching agents into worktrees with diff review and merge
 
@@ -93,7 +93,7 @@ A workflow can combine tools from more than one layer. The agent does the coding
 | **OpenCode** | Coding agent | Multiple sessions; verify working directories | Terminal, desktop, IDE | Local client + provider calls | Free + provider usage |
 | **Aider** | CLI agent | Single session | Terminal | Local client | Free + API usage |
 | **Capy** | Parallel-agent platform | Up to 25 concurrent jams on Pro | Hosted dashboard | Hosted runtime | Pro $20/mo, Enterprise custom |
-| **Conductor** | Agent workspace | Local worktrees or cloud sandboxes | Mac app + cloud | Local + managed cloud | See current [plans](https://www.conductor.build/pricing) |
+| **Conductor** | Agent workspace | Local worktrees | Mac app (existing users only) | Local; Conductor Cloud shuts down November 20, 2026 | Closed to new users; plans no longer on sale |
 | **Zed** | Editor + parallel agent threads | Threads Sidebar; optional worktree per thread | Editor (macOS, Windows, Linux) | Local, open source | Free personal tier, Pro $10/mo, Business $30/seat |
 | **Augment Intent** | Coordinator-led orchestrator | Implementor agents in waves, worktree per workspace | macOS app (Apple Silicon beta) | Local app + Augment platform | Free app; usage in Augment credits or BYOA |
 | **Parallel Code** | Orchestrator | Multiple agents, Git worktrees | macOS/Linux app | Local, open source (MIT) | Free |
@@ -103,7 +103,7 @@ A workflow can combine tools from more than one layer. The agent does the coding
 
 ### Paradev
 
-Choose Paradev when you want a visual workspace around your CLI agents: organize tasks, return to their terminals, and review patches in one place. It keeps terminals and changes alongside task workspaces, with chat, a browser, and MCP tooling. [Remote access](https://docs.paradev.com/remote-access) and [automations](https://docs.paradev.com/automations) are available on paid plans with a reachable execution host. Cloud workspaces run in the cloud without keeping your own computer connected. Desktop supports macOS and experimental Linux; Windows is not available. New local branch-based workspaces use Git worktrees; cloud workspaces use clones. Neither arrangement guarantees compatible patches or replaces review. Start with one task and add independent work as you need it. [Download Paradev](/download) to try the workflow.
+Choose Paradev when you want a visual workspace around your CLI agents: organize tasks, return to their terminals, and review patches in one place. It keeps terminals and changes alongside task workspaces, with a browser and MCP tooling. A [chat interface](https://docs.paradev.com/chat) shows Claude Code, Codex, OpenCode, or Pi sessions as a chat over the Agent Client Protocol, and a CLI / Chat toggle switches the same session back to the terminal. [Remote access](https://docs.paradev.com/remote-access) and [automations](https://docs.paradev.com/automations) are available on paid plans with a reachable execution host. You can also run the host on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). [Cloud workspaces](/cloud), in beta, run in the cloud without keeping your own computer connected. Desktop supports macOS and experimental Linux; Windows is not available. New local branch-based workspaces use Git worktrees; cloud workspaces use clones. Neither arrangement guarantees compatible patches or replaces review. Start with one task and add independent work as you need it. [Download Paradev](/download) to try the workflow.
 
 **Best for:** Organizing ongoing CLI-agent tasks and reviewing their patches, with optional parallel work and connected hosts
 
@@ -163,9 +163,11 @@ Capy describes itself as "the IDE for the parallel age" and focuses on orchestra
 
 ### Conductor
 
-Conductor’s [documentation](https://www.conductor.build/docs) lists Claude Code, Codex, Cursor, and OpenCode. It offers local Mac workspaces and [managed cloud workspaces](https://www.conductor.build/docs/cloud) for collaboration. Compare setup, review, and hosting requirements; check [current plans](https://www.conductor.build/pricing) rather than assuming all work runs locally.
+Conductor’s [documentation](https://www.conductor.build/docs) lists Claude Code, Codex, Cursor, and OpenCode. It offers local Mac workspaces and, until November 2026, managed cloud workspaces.
 
-**Best for:** Mac users evaluating local agent workspaces or managed cloud collaboration
+Conductor announced on November 4, 2026 that it is joining Meta. It no longer accepts new sign-ups or downloads. Conductor Cloud goes read-only on November 13 and shuts down on November 20, 2026. The Mac app gets new models and critical fixes until early 2027. Existing users can [move to Paradev from the Mac app](https://docs.paradev.com/migrate-from-conductor) or [from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
+
+**Status:** Existing users only; closed to new users
 
 ### Zed
 
@@ -183,7 +185,7 @@ Intent is Augment Code's coordinator-led workspace, in public beta on Apple Sili
 
 Parallel Code is an MIT-licensed macOS/Linux desktop app from the creator of Super Productivity: dispatch Claude Code, Codex, Gemini, Copilot, or Antigravity CLI agents into per-task worktrees, review diffs with inline comments, and merge from the sidebar. Extras include optional Docker sandboxing, an AI Arena race mode, and phone monitoring. It is free, fast-moving, and largely a single-maintainer project. See [Paradev vs Parallel Code](/compare/superset-vs-parallel-code).
 
-**Best for:** Open-source purists who want a focused dispatch-review-merge loop with no platform fees
+**Best for:** Developers who want a focused dispatch-review-merge loop with no platform fees
 
 ## Recommended Stacks
 
@@ -203,7 +205,7 @@ If you want one vendor-managed environment for hosted agents, model access, and 
 
 **Paradev + OpenCode + Aider**
 
-Use OpenCode for flexible provider routing, Aider for tight iterative edits, and Paradev to orchestrate them in parallel. Check each license and provider bill separately: Paradev uses Elastic License 2.0, and adding agents does not inherently reduce cost.
+Use OpenCode for flexible provider routing, Aider for tight iterative edits, and Paradev to orchestrate them in parallel. Check each license and provider bill separately: Paradev uses the MIT License, and adding agents does not inherently reduce cost.
 
 ### The Heavy Delegation Stack
 
@@ -233,4 +235,4 @@ Yes, because they change how people evaluate the products. Codex is no longer ju
 
 ### What changed most in the market recently?
 
-The biggest shifts are not just new models. The product surfaces changed: Paradev added GA chat, a built-in browser, richer MCP tooling, and a built-in editor; Zed shipped Parallel Agents and made agent threads an editor primitive; Augment launched Intent's coordinator-led workflow; Cursor expanded beyond the editor; Codex added an app and broader suite positioning; Claude Code added a desktop app; and hosted parallel-agent platforms like Capy became much more relevant.
+The biggest shifts are not just new models. The product surfaces changed: Paradev added a chat interface, a built-in browser, richer MCP tooling, and a built-in editor; Zed shipped Parallel Agents and made agent threads an editor primitive; Augment launched Intent's coordinator-led workflow; Cursor expanded beyond the editor; Codex added an app and broader suite positioning; Claude Code added a desktop app; and hosted parallel-agent platforms like Capy became much more relevant.

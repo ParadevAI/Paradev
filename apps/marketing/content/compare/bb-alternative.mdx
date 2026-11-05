@@ -2,7 +2,7 @@
 title: "Best bb Alternatives in 2026"
 description: "The best alternatives to bb (the agentic IDE that builds itself) for orchestrating AI coding agents, including Paradev, Orca, Emdash, and Herdr."
 date: 2026-08-07
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - bb
@@ -31,11 +31,11 @@ bb is the open-source "IDE that builds itself": agents run in live threads you c
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | A complete, supported workspace out of the box | macOS; experimental Linux AppImage; Windows unavailable | Source-available (ELv2) |
+| **Paradev** | A complete, supported workspace out of the box | macOS; experimental Linux AppImage; Windows unavailable | Open source (MIT) |
 | **Orca** | Free cross-platform desktop ADE, huge community | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Emdash** | Open-source ADE with tracker intake and cron automations | macOS, Windows, Linux | Open source (Apache-2.0) |
 | **Herdr** | Terminal-native runtime, deeply scriptable | macOS, Linux, Windows (beta) | Open source (Apache-2.0) |
-| **Conductor** | Focused, polished Mac app | macOS | Proprietary |
+| **Conductor** | Existing users only; joining Meta, closed to new users | macOS | Proprietary |
 
 ## Why Look for a bb Alternative?
 
@@ -45,7 +45,7 @@ bb optimizes for moldability: agents as first-class operators, a plugin store, f
 
 ### Paradev
 
-Paradev ships what bb expects you to grow: Git worktrees for new local branch-based workspaces, persistent terminals, a diff/file editor, an in-app browser, port management, and scheduled automations with a TypeScript SDK and Slack bot -- plus remote and cloud workspaces across your own devices. It keeps the scriptability bb fans care about through its CLI and MCP server, but as a supported product rather than a substrate. If you liked bb's ambition but want fewer moving parts, this is the alternative.
+Paradev ships what bb expects you to grow: Git worktrees for new local branch-based workspaces, persistent terminals, a diff/file editor, an in-app browser, port management, and scheduled automations with a TypeScript SDK and Slack bot -- plus Remote Access to your other machines, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) for your own Linux server, and [cloud workspaces](https://docs.paradev.com/cloud-workspaces) in beta. A chat interface shows Claude Code, Codex, OpenCode, and Pi sessions as a chat, and Paradev is open source under the MIT License. It keeps the scriptability bb fans care about through its CLI and MCP server, but as a supported product rather than a substrate. If you liked bb's ambition but want fewer moving parts, this is the alternative.
 
 For the direct comparison, see [Paradev vs bb](/compare/superset-vs-bb).
 
@@ -71,6 +71,8 @@ See [Paradev vs Herdr](/compare/superset-vs-herdr).
 
 Conductor is the opposite trade from bb: a proprietary, focused macOS app for Claude Code, Codex, and Cursor agents in parallel worktrees. No self-extension, no API surface -- just a polished loop.
 
+Conductor announced on November 4, 2026 that it is joining Meta. It no longer accepts new sign-ups or downloads, and the Mac app gets new models and critical fixes until early 2027. Existing users can follow the [migration guide](https://docs.paradev.com/migrate-from-conductor) to move to Paradev.
+
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
 ## How To Choose
@@ -79,7 +81,7 @@ See [Paradev vs Conductor](/compare/superset-vs-conductor).
 - For a free, community-heavy desktop ADE, choose **Orca**.
 - For open-source with tracker intake and scheduling built in, choose **Emdash**.
 - For agent-scriptable terminal infrastructure, choose **Herdr**.
-- For a simple polished Mac app, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 
 ## Verdict
 
@@ -93,7 +95,7 @@ For most developers, Paradev: the same parallel-agent orchestration with worktre
 
 ### Is there an open-source bb alternative?
 
-Yes -- bb itself is MIT, and so are Orca and Crystal/Nimbalyst; Emdash and Herdr are Apache-2.0. Paradev is source-available under ELv2 with a free tier.
+Yes -- bb itself is MIT, and so are Orca and Crystal/Nimbalyst; Emdash and Herdr are Apache-2.0. Paradev is open source under the MIT License with a free tier.
 
 ### Do these alternatives support agents driving the tool, like bb?
 

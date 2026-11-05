@@ -175,7 +175,8 @@ export type PromptInputProps = {
 	layout?: PromptInputLayout;
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
-	status?: "ready" | "streaming";
+	// "background": a turn runs but offers no Stop; Enter queues, ⌘↩ steers.
+	status?: "ready" | "streaming" | "background";
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;

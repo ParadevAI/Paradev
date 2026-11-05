@@ -1,4 +1,5 @@
 import type { BackgroundTask } from "@superset/chat/protocol";
+import { cn } from "@superset/ui/utils";
 import { useMemo } from "react";
 import { collectSessionWork } from "../../../../../../../../utils/collectAgentWork";
 import {
@@ -38,32 +39,39 @@ export function ComposerChips({
 		};
 	}, [backgroundTasks, sessionId, terminalId]);
 	return (
-		<div className={CHAT_GUTTER_CLASSNAME}>
-			<div className={CHAT_COLUMN_CLASSNAME}>
-				<div className="mb-1.5 flex flex-wrap gap-1.5 empty:hidden">
-					{runningTurnId && (
-						<LiveChangesPill
-							refreshKey={liveRefreshKey}
-							turnId={runningTurnId}
-						/>
-					)}
-					{subagents.length > 0 && (
-						<RunningTasksChip
-							kind="subagent"
-							onMoveToBackground={onMoveToBackground}
-							onOpen={onOpenSubagent}
-							onStop={onStopTask}
-							work={subagents}
-						/>
-					)}
-					{shells.length > 0 && (
-						<RunningTasksChip
-							kind="shell"
-							onMoveToBackground={onMoveToBackground}
-							onStop={onStopTask}
-							work={shells}
-						/>
-					)}
+		<div className="relative z-10 h-0">
+			<div
+				className={cn(
+					CHAT_GUTTER_CLASSNAME,
+					"pointer-events-none absolute inset-x-0 bottom-0",
+				)}
+			>
+				<div className={cn(CHAT_COLUMN_CLASSNAME, "@container")}>
+					<div className="mb-1.5 flex max-w-full gap-1.5 empty:hidden [&>*]:pointer-events-auto">
+						{runningTurnId && (
+							<LiveChangesPill
+								refreshKey={liveRefreshKey}
+								turnId={runningTurnId}
+							/>
+						)}
+						{subagents.length > 0 && (
+							<RunningTasksChip
+								kind="subagent"
+								onMoveToBackground={onMoveToBackground}
+								onOpen={onOpenSubagent}
+								onStop={onStopTask}
+								work={subagents}
+							/>
+						)}
+						{shells.length > 0 && (
+							<RunningTasksChip
+								kind="shell"
+								onMoveToBackground={onMoveToBackground}
+								onStop={onStopTask}
+								work={shells}
+							/>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

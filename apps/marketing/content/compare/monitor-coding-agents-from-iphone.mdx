@@ -2,7 +2,7 @@
 title: "How to Monitor and Reply to Claude Code and Codex From Your iPhone in 2026"
 description: "Check progress, answer prompts, and send follow-up instructions to Claude Code, Codex, and other agents from an iPhone. Claude Code Remote Control vs a separate workspace with a mobile app, SSH and tmux, and Paradev compared."
 date: 2026-10-07
-lastUpdated: 2026-10-30
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - claude-code
@@ -115,7 +115,7 @@ Use a client that writes into the agent's live session, not a new chat.
 - **Any terminal agent over SSH:** attach to its tmux session and type the follow-up into the prompt.
 - **Paradev:** open the workspace on your iPhone and reply in its terminal. The agent keeps its context because it is the same session on the host. For a Claude Code session, Remote Control from the Claude app works here too.
 
-Each option needs the computer awake and online. A laptop that sleeps when you close it drops the session. For work that should run overnight, use a machine that stays on, or a Paradev cloud workspace, which does not need your own computer connected. Our guide on [running coding agents on a remote machine](/compare/run-coding-agents-on-remote-machine) covers that setup.
+Each option needs the computer awake and online. A laptop that sleeps when you close it drops the session. For work that should run overnight, use a machine that stays on, such as a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or a Paradev cloud workspace, which does not need your own computer connected. Our guide on [running coding agents on a remote machine](/compare/run-coding-agents-on-remote-machine) covers that setup.
 
 ## What are the tradeoffs between Claude Code remote access and a separate workspace with a mobile companion?
 
@@ -142,7 +142,7 @@ What a one-computer setup needs:
 
 - **Keep the computer reachable.** Agents run in a background terminal daemon, so closing the Paradev window does not stop them. Quitting the app makes the computer unreachable from the phone until you open Paradev again, and a Mac that sleeps shows as offline. To keep a machine reachable with the app closed, run `superset start --daemon` from the standalone CLI. [Keep agents running](https://docs.paradev.com/keep-agents-running) has the details.
 - **Know the cost.** The iPhone app needs Paradev Pro and iOS 26 or later. Your agent subscriptions stay your own: Paradev does not proxy model calls.
-- **No computer at all.** If you do not want to leave a computer on, Paradev cloud workspaces run in the cloud and work from iPhone and iPad (Team and Ultra plans). They are in early access, so even on those plans your account may not show the **Cloud** option yet. Codex Cloud and Claude Code on the web are the vendor options.
+- **No computer at all.** If you do not want to leave a computer on, run the Paradev host on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud); it needs no inbound ports and shows up on the phone like any other host. Or use Paradev [cloud workspaces](/cloud), which run in the cloud and work from iPhone and iPad (Team and Ultra plans). They are in beta. Codex Cloud and Claude Code on the web are the vendor options.
 
 For a solo developer who already runs Claude Code and Codex on one Mac, this is the shortest path: no second machine, no SSH, and the same workspaces on the phone and the desktop.
 

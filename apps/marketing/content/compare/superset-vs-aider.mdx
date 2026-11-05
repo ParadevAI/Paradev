@@ -2,7 +2,7 @@
 title: "Paradev vs Aider (2026): Agent Workspace vs Terminal Pair Programmer"
 description: "Compare Paradev and Aider for AI coding. See how a local-first workspace that runs many agents in parallel differs from a single terminal pair-programming CLI."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - aider
@@ -23,17 +23,17 @@ Aider is one of the most popular open-source AI pair programmers: a single, focu
 | | **Paradev** | **Aider** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Terminal AI pair programmer |
-| **AI approach** | Agent-agnostic: runs Claude Code, Codex, Paradev Chat, or any CLI agent (Aider as a custom agent) | Model-agnostic: Claude, GPT, Gemini, DeepSeek, or local models |
+| **AI approach** | Agent-agnostic: runs Claude Code, Codex, OpenCode, or any CLI agent (Aider as a custom agent) | Model-agnostic: Claude, GPT, Gemini, DeepSeek, or local models |
 | **Parallelism** | Core feature: multiple agents across separate Git worktrees | One interactive session per terminal |
-| **Interface** | Desktop app: terminals, diff/file editor, chat, in-app browser | Command-line REPL in your terminal |
+| **Interface** | Desktop app: terminals, diff/file editor, chat interface, in-app browser | Command-line REPL in your terminal |
 | **Git model** | Own worktree per task | Auto-commits to your current branch |
-| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Free, open source (Apache-2.0); bring your own API keys |
+| **Pricing** | Open source (MIT); free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Free, open source (Apache-2.0); bring your own API keys |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, an in-app browser for docs and dev servers, port management, and MCP tooling. A [chat interface](https://docs.paradev.com/chat) shows Claude Code, Codex, OpenCode, and Pi sessions as a chat, and a CLI / Chat toggle keeps the same session. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Open source under the MIT License.
 
 ---
 
@@ -51,7 +51,7 @@ Aider is designed around one focused conversation: you and the model, iterating 
 
 ### Terminal Loop vs Full Workspace
 
-Aider is intentionally minimal: a terminal REPL that edits and commits. Paradev wraps agents in a desktop workspace with a diff/file editor, chat, an in-app browser for previewing dev servers and docs, port management, and MCP tooling, so reviewing and steering agents does not require leaving the app.
+Aider is intentionally minimal: a terminal REPL that edits and commits. Paradev wraps agents in a desktop workspace with a diff/file editor, a chat interface, an in-app browser for previewing dev servers and docs, port management, and MCP tooling, so reviewing and steering agents does not require leaving the app.
 
 ### Complementary, Not Mutually Exclusive
 
@@ -59,7 +59,7 @@ Aider runs in Paradev as a custom agent command. You can use Aider standalone fo
 
 ### Privacy
 
-Both keep the code on your machine and let you choose your own model provider. Paradev runs agents locally in Git worktrees and is source-available; Aider is fully open source. Neither routes your repository through a required hosted runtime.
+Both keep the code on your machine and let you choose your own model provider. Paradev runs agents locally in Git worktrees by default, and can also run them on your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)) or in [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta). It is open source under the MIT License; Aider is open source under Apache-2.0. Neither routes your repository through a required hosted runtime.
 
 ---
 

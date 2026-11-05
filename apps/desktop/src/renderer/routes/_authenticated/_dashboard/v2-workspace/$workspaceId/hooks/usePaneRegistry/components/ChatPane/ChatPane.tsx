@@ -1,5 +1,5 @@
 import type { RendererContext } from "@superset/panes";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -10,6 +10,7 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { saveChatMode } from "../../utils/savedChatMode";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -21,7 +22,7 @@ import {
 	prependChatPrompts,
 } from "./utils/pendingChatPrompts";
 import { restartedChatPaneData } from "./utils/restartedChatPaneData";
-import { saveChatMode } from "./utils/savedChatMode";
+import { sessionInfoPaneData } from "./utils/sessionInfoPaneData";
 
 export function ChatPane({
 	ctx,
@@ -82,7 +83,12 @@ export function ChatPane({
 		},
 		[agentId, store],
 	);
-	const pendingPrompts = pendingChatPrompts(data);
+	const { pendingPrompt, pendingAttachments, queuedPrompts } = data;
+	const pendingPrompts = useMemo(
+		() =>
+			pendingChatPrompts({ pendingPrompt, pendingAttachments, queuedPrompts }),
+		[pendingPrompt, pendingAttachments, queuedPrompts],
+	);
 
 	const clearPendingPrompts = () => {
 		const {
@@ -151,19 +157,11 @@ export function ChatPane({
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
-				onSessionInfo={({ harnessSessionId, title }) => {
-					const current = latest.current;
-					const rebound = harnessSessionId !== undefined && current.agent;
-					const retitled = title !== undefined && title !== current.chatTitle;
-					if (!rebound && !retitled) return;
-					latest.current = {
-						...current,
-						...(rebound
-							? { agent: { ...rebound, sessionId: harnessSessionId } }
-							: {}),
-						...(retitled ? { chatTitle: title } : {}),
-					};
-					ctx.actions.updateData(latest.current);
+				onSessionInfo={(info) => {
+					const next = sessionInfoPaneData(latest.current, info);
+					if (!next) return;
+					latest.current = next;
+					ctx.actions.updateData(next);
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
 					ctx.actions.setTitle(label);

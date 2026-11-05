@@ -2,7 +2,7 @@
 title: "Paradev vs Cline (2026): Agent Workspace vs In-Editor Agent"
 description: "Compare Paradev and Cline for AI coding. See how an editor-independent workspace running parallel agents differs from an autonomous agent embedded in VS Code."
 date: 2026-07-13
-lastUpdated: 2026-09-24
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - cline
@@ -24,16 +24,16 @@ Cline is a popular open-source autonomous coding agent that lives inside VS Code
 |---|---|---|
 | **Category** | Agent orchestration workspace | In-editor autonomous agent |
 | **Home** | Standalone desktop app | VS Code (and forks) extension |
-| **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, Paradev Chat, any CLI agent | Model-agnostic: Anthropic, OpenRouter, Bedrock, and more via your keys |
+| **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, OpenCode, any CLI agent | Model-agnostic: Anthropic, OpenRouter, Bedrock, and more via your keys |
 | **Parallelism** | Core feature: multiple agents across separate Git worktrees | One agent per editor window/session |
 | **Isolation** | Git worktrees for local branch-based workspaces | Works in your open workspace folder |
-| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Free, open source; bring your own API keys |
+| **Pricing** | Open source (MIT); free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Free, open source; bring your own API keys |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface (Claude Code, Codex, OpenCode, and Pi over ACP), an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Open source under the MIT License.
 
 ---
 
@@ -59,7 +59,7 @@ Cline operates in your currently open workspace folder. Paradev gives new local 
 
 ### Privacy
 
-Both keep code local and use your own model keys: no required hosted runtime. Cline is fully open source; Paradev is source-available (ELv2) and runs agents locally in worktrees.
+Both keep code local and use your own model keys: no required hosted runtime. Both are open source: Cline under Apache-2.0 and Paradev under MIT. Paradev runs agents locally in worktrees by default; it can also run them on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) or in [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta).
 
 ---
 

@@ -2,7 +2,7 @@
 title: "Paradev vs Orchestrator (2026): Parallel Coding Agents"
 description: "Compare Paradev and Orchestrator, formerly Agent Orchestrator, for PR feedback, reviews, scheduled work, mobile access, and supported platforms."
 date: 2026-08-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - agent-orchestrator
@@ -15,7 +15,7 @@ keywords:
   - parallel coding agents
 ---
 
-Paradev and [Orchestrator](https://orchestrator.inc/) (formerly Agent Orchestrator) both manage coding agents working in separate Git worktrees. Paradev centers the workspace, with terminals, diff review, connected hosts, and tools for scripting agent work. Orchestrator connects a project planning agent to workers, a live Kanban, pull requests, CI, and reviews. Its feedback loop can return a failed check, review comment, or merge conflict to the worker that owns the branch.
+Paradev and [Orchestrator.inc](https://orchestrator.inc/) (formerly Agent Orchestrator, or AO) both manage coding agents working in separate Git worktrees. Paradev centers the workspace, with terminals, diff review, connected hosts, and tools for scripting agent work. Orchestrator connects a project planning agent to workers, a live Kanban, pull requests, CI, and reviews. Its feedback loop can return a failed check, review comment, or merge conflict to the worker that owns the branch.
 
 ## At a Glance
 
@@ -26,12 +26,14 @@ Paradev and [Orchestrator](https://orchestrator.inc/) (formerly Agent Orchestrat
 | Review | Diff and file editor with PR context | Files and Reviews views, file editing, and reviewer-agent runs |
 | Recurring work | Scheduled automations | Recurring automations with run history; reusable project Cues |
 | Mobile | iPhone and iPad app for eligible Paradev plans | Paired iPhone, iPad, and Android companion apps |
+| Cloud | Remote Access hosts, Bring Your Own Cloud, and cloud workspaces (beta) on Team and Ultra | Orchestrator Cloud runs workers in hosted sandboxes on paid plans |
 | Desktop | macOS; experimental Linux AppImage | macOS, Windows, and Linux |
-| License | Source-available under Elastic License 2.0 | Open source under Apache-2.0 |
+| License | Open source under MIT | Open source under Apache-2.0 |
+| Pricing | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Free local app; Starter ($20 per month) and Pro ($40 per month) add cloud agents and more sessions; Enterprise custom |
 
 ## What Orchestrator Brings to the Workflow
 
-Orchestrator's project-level agent can turn a larger goal into worker tasks, pass context to each worker, and follow their progress. The board groups work by activity and PR state so the operator can see what needs attention. Supported sessions can switch between structured Chat and the agent's native terminal interface while keeping the same worktree. Orchestrator supports Claude Code, Codex, Cursor, OpenCode, and a broader [agent catalog](https://docs.orchestrator.inc/plugins/agents/).
+Orchestrator's project-level agent can turn a larger goal into worker tasks, pass context to each worker, and follow their progress. The board groups work by activity and PR state so the operator can see what needs attention. Supported sessions can switch between structured Chat and the agent's native terminal interface while keeping the same worktree. Orchestrator supports Claude Code, Codex, Cursor, OpenCode, and more than 30 other agents in its [agent catalog](https://docs.orchestrator.inc/plugins/agents/). Worker, Chat, and reviewer support differ by agent.
 
 Projects can also group a repository with its direct child repositories. With [opt-in issue intake](https://docs.orchestrator.inc/configuration/projects/), GitHub or GitLab issues can start worker sessions.
 
@@ -41,9 +43,11 @@ Orchestrator includes a current [CLI](https://docs.orchestrator.inc/cli/) for cr
 
 The [mobile companion](https://docs.orchestrator.inc/configuration/remote-access/) pairs with the desktop through an opt-in, password-protected connection. From a phone, users can follow sessions, reply to agents, handle input, and inspect PR and review state while execution stays on their computer. See [AO Mobile for iPhone and iPad](https://apps.apple.com/app/ao-mobile/id6792552173) and [AO Mobile for Android](https://play.google.com/store/apps/details?id=aoagents.dev). Remote connection options depend on the paired host and its setup.
 
+[Orchestrator Cloud](https://docs.orchestrator.inc/guides/cloud) runs a project's worker in a hosted sandbox instead of on your computer, so tasks keep going with your laptop closed. You choose **Clone to the cloud**, pick a GitHub repository, and follow the chat, files, and terminal from the desktop app. Its site lists cloud agents on the paid Starter, Pro, and Enterprise plans, and sign-up for the paid plans goes through a waitlist.
+
 ## What Paradev Brings to the Workflow
 
-Paradev runs CLI coding agents in branch-based workspaces with persistent terminals, a diff and file editor, an in-app browser, and port management. It provides a [CLI](https://docs.paradev.com/cli/getting-started), an [MCP server](https://docs.paradev.com/mcp-server), a TypeScript SDK, Slack integration, and automations around those workspaces. Connected hosts and cloud workspaces support work across devices and teams.
+Paradev runs CLI coding agents in branch-based workspaces with persistent terminals, a diff and file editor, an in-app browser, and port management. It provides a [CLI](https://docs.paradev.com/cli/getting-started), an [MCP server](https://docs.paradev.com/mcp-server), a TypeScript SDK, Slack integration, and automations around those workspaces. Connected hosts, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) servers, and [cloud workspaces](/cloud) (beta) support work across devices and teams. A chat interface shows Claude Code, Codex, OpenCode, and Pi sessions as a chat. Paradev is open source under the MIT License.
 
 Paradev desktop targets macOS and offers an experimental Linux AppImage. Its [iPhone and iPad app](/mobile), remote access, and automations have plan and host requirements; check [pricing](/pricing) and [remote access setup](https://docs.paradev.com/remote-access) before comparing a specific workflow.
 
@@ -53,7 +57,7 @@ Use the same repository, agent, model, and acceptance checks. Open the resulting
 
 ## Which Should You Choose?
 
-Choose Paradev if connected hosts, team controls, or its CLI, MCP, SDK, and Slack surfaces fit the way you coordinate work. Choose Orchestrator if you want a project planning agent, worker-owned PR feedback, GitHub and GitLab support, reviewer agents, or an Apache-2.0 desktop app with iOS and Android companions. Both let you inspect changes in the app and schedule agent work. A short trial in your own repository will show which flow fits your team.
+Choose Paradev if connected hosts, team controls, or its CLI, MCP, SDK, and Slack surfaces fit the way you coordinate work. Choose Orchestrator if you want a project planning agent, worker-owned PR feedback, GitHub and GitLab support, reviewer agents, hosted cloud workers, or an Apache-2.0 desktop app with iOS and Android companions. Both let you inspect changes in the app and schedule agent work. A short trial in your own repository will show which flow fits your team.
 
 ## Frequently Asked Questions
 
@@ -71,4 +75,4 @@ Yes. AO Mobile is available for [iPhone and iPad](https://apps.apple.com/app/ao-
 
 ### How are the products licensed?
 
-Orchestrator is open source under Apache-2.0. Paradev's source is available under Elastic License 2.0. Read the licenses if redistribution or service hosting matters to your team.
+Both are open source. Orchestrator uses Apache-2.0, and Paradev uses the MIT License.

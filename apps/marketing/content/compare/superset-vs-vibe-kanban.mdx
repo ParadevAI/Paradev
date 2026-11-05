@@ -2,7 +2,7 @@
 title: "Paradev vs Vibe Kanban (2026): Where to Move as Vibe Kanban Sunsets"
 description: "Compare Paradev and Vibe Kanban for running AI coding agents in parallel Git worktrees. Vibe Kanban is sunsetting and community-maintained since April 2026; see what carries over to Paradev."
 date: 2026-07-13
-lastUpdated: 2026-10-29
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - vibe-kanban
@@ -35,9 +35,9 @@ Vibe Kanban put a kanban board over AI coding agents: plan work as issues, then 
 | **Agent support** | Any CLI agent: Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Amp, Droid, and more | Claude Code, Codex, Copilot, Gemini CLI, Amp, Cursor Agent CLI, OpenCode, Droid, Claude Code Router, Qwen Code |
 | **Project status** | Actively developed | Sunsetting since April 10, 2026; community-maintained |
 | **Shared issues and teams** | Linear, GitHub issues, and Paradev tasks | Remote issues, comments, projects, and organisations removed after the shutdown |
-| **Remote / cloud** | Remote Access to machines you own, plus cloud workspaces | Local; self-hosting docs in the repository |
+| **Remote / cloud** | Remote Access to machines you own, your own Linux server (Bring Your Own Cloud), and cloud workspaces (beta) | Local; self-hosting docs in the repository |
 | **Platform** | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad app; CLI; MCP server | Runs locally with `npx vibe-kanban` |
-| **License** | Source-available (ELv2) | Open source (Apache-2.0) |
+| **License** | Open source (MIT) | Open source (Apache-2.0) |
 
 ## Why Look for a Vibe Kanban Alternative?
 
@@ -51,7 +51,7 @@ Vibe Kanban still runs, and its code stays Apache-2.0. The reasons to move are a
 
 ### Paradev
 
-Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Amp, Droid, and other agents in their own Git worktrees with persistent terminal sessions, on your own subscriptions and keys. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, a file editor, and an in-app browser with Design Mode. The Tasks view shows Linear and Paradev tasks as a list or board, and the Workspaces page has a board with Working, Needs attention, Needs review, and Merged columns. Remote Access, cloud workspaces, automations, and the iPhone and iPad app extend it past one laptop. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Amp, Droid, and other agents in their own Git worktrees with persistent terminal sessions, on your own subscriptions and keys. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, a file editor, and an in-app browser with Design Mode. The Tasks view shows Linear and Paradev tasks as a list or board, and the Workspaces page has a board with Working, Needs attention, Needs review, and Merged columns. Remote Access, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), [cloud workspaces](/cloud) (beta), automations, and the iPhone and iPad app extend it past one laptop. A [chat interface](https://docs.paradev.com/chat) shows Claude Code, Codex, OpenCode, or Pi sessions as a chat. Open source under the MIT License.
 
 ### Vibe Kanban
 
@@ -69,7 +69,7 @@ Vibe Kanban's board is the main surface, and each card maps to an agent run. Par
 
 ### Reach and Surfaces
 
-Paradev runs workspaces on machines you own through Remote Access and in cloud workspaces, and adds a CLI, a TypeScript SDK, an MCP server, and scheduled or event-triggered automations. Vibe Kanban runs locally.
+Paradev runs workspaces on machines you own through Remote Access, on your own Linux server with Bring Your Own Cloud, and in cloud workspaces, and adds a CLI, a TypeScript SDK, an MCP server, and scheduled or event-triggered automations. Vibe Kanban runs locally.
 
 ### Shared Foundation
 
@@ -77,7 +77,7 @@ Both run CLI agents in plain Git worktrees, so the move is small. Paradev can im
 
 ## Pricing
 
-Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Vibe Kanban is free and open source (Apache-2.0); its paid subscriptions ended with the shutdown. In both cases, you pay the agent providers for Claude Code, Codex, or any API usage.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Paradev is open source under the MIT License, and Vibe Kanban is free and open source (Apache-2.0); its paid subscriptions ended with the shutdown. In both cases, you pay the agent providers for Claude Code, Codex, or any API usage.
 
 ## How To Choose
 
@@ -92,7 +92,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 - Want a board-first app where the kanban board is the main surface
 - Are comfortable running community-maintained software
-- Want a fully permissive Apache-2.0 tool and are ready to maintain your own copy
+- Want an Apache-2.0 tool and are ready to maintain your own copy
 
 ## Verdict
 

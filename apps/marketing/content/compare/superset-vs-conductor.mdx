@@ -1,8 +1,8 @@
 ---
 title: "Paradev vs Conductor: local agents, cloud workspaces, and review"
-description: "Compare Paradev and Conductor for parallel coding agents, cloud workspaces, team collaboration, and iPhone access."
+description: "Conductor is joining Meta and winding down. How Paradev and Conductor compared for parallel coding agents, cloud workspaces, team collaboration, and iPhone access, and what Conductor users can do now."
 date: 2026-02-02
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - conductor
@@ -12,29 +12,34 @@ keywords:
   - ai agent orchestration
   - coding agent management
   - conductor vs superset
+  - conductor shutting down
+  - migrate from conductor
 ---
 
-Paradev and Conductor both organize parallel coding tasks into separate workspaces. Conductor now includes cloud workspaces, shared team conversations, an API and MCP server, scheduled Routines, and, since October 2, 2026, an iOS app that works with its cloud workspaces. Paradev's iPhone and iPad app connects to its cloud workspaces and to the hosts you own, so you can continue workspace terminals and review diffs wherever the agents run.
+On November 4, 2026, Conductor announced that it is joining Meta. It takes no new sign-ups, and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down. See [Conductor's announcement](https://www.conductor.build/announcement). If you use Conductor today, follow [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) for the local app or [Migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) for cloud workspaces.
+
+This page shows how the two products compared before the wind-down. Paradev and Conductor both organized parallel coding tasks into separate workspaces. Conductor added cloud workspaces, shared team conversations, an API and MCP server, scheduled Routines, and, on October 2, 2026, an iOS app that worked with its cloud workspaces. Paradev's iPhone and iPad app connects to its cloud workspaces and to the hosts you own, so you can continue workspace terminals and review diffs wherever the agents run.
 
 ## At a Glance
 
 | Requirement | Paradev | Conductor |
 |---|---|---|
 | Agents | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp, and any custom CLI agent you add | Claude Code, Codex, Cursor, OpenCode |
-| Work location | Local workspaces, connected hosts, and cloud workspaces | Local Mac workspaces and cloud sandboxes |
+| Status | Available | Joining Meta; closed to new users; local Mac app winds down after early 2027 |
+| Work location | Local workspaces, connected hosts, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), and [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta) | Local Mac workspaces; cloud sandboxes shut down November 20, 2026 |
 | Review | Changes pane commits, pushes, and opens PRs; PR pane shows checks, review threads, and merge | Diffs, checks, pull requests, merge and archive |
-| Team access | Hosts you add, with access granted per member, plus organization access | Shared cloud workspaces and conversations |
+| Team access | Hosts you add, with access granted per member, plus organization access | Shared cloud workspaces and conversations (Conductor Cloud, shuts down November 20, 2026) |
 | Browser | In-app browser pane with Design Mode: pick an element and send it to an agent | Browser preview |
-| Automations | Pro scheduled agent runs on a selected host, with run history and retry for failed runs | Routines on a schedule or from a GitHub action, run in the cloud (Pro and Teams) |
+| Automations | Pro scheduled agent runs on a selected host, with run history and retry for failed runs | Routines on a schedule or from a GitHub action, run in the cloud (ends with Conductor Cloud on November 20, 2026) |
 | Programmatic control | CLI, TypeScript SDK, and MCP server | API and Conductor MCP |
-| Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; works with cloud workspaces and your own hosts | iOS app (since October 2, 2026, Pro); works with cloud workspaces |
-| Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free (local Mac workspaces); Pro $50/month; Teams $60 per user/month; Enterprise custom |
+| Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; works with cloud workspaces and your own hosts | iOS app (October 2, 2026); worked with cloud workspaces, which shut down November 20, 2026 |
+| Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | No longer on sale; existing Pro users keep Pro features at no cost; active cloud subscribers get refunds |
 
-Conductor's [current introduction](https://www.conductor.build/docs) lists four agent harnesses and its review path. Its [Cloud documentation](https://www.conductor.build/docs/cloud) explains shared environments and isolated sandboxes. Its [iOS app](https://www.conductor.build/changelog/0.90.0-conductor-for-ios) shipped on October 2, 2026 for Pro users and works with cloud workspaces.
+Conductor's [introduction](https://www.conductor.build/docs) lists four agent harnesses and its review path. Its [Cloud documentation](https://www.conductor.build/docs/cloud) explains shared environments and isolated sandboxes. Its [iOS app](https://www.conductor.build/changelog/0.90.0-conductor-for-ios) shipped on October 2, 2026 for Pro users and worked with cloud workspaces.
 
 ## Paradev requirements
 
-Paradev runs CLI coding agents in separate workspaces, with terminals and diff review in one app. Desktop supports macOS and an experimental Linux AppImage. Windows is not yet available. Paradev is source-available under Elastic License 2.0.
+Paradev runs CLI coding agents in separate workspaces, with terminals and diff review in one app. Desktop supports macOS and an experimental Linux AppImage. Windows is not yet available. Paradev is open source under the MIT License. Conductor users who liked its chat can use the [chat interface](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi.
 
 For many sessions at once, the Workspaces page groups workspaces by state (Needs attention, Working, Needs review, Idle, Merged) across all your hosts. Interrupted agent sessions resume in the same pane, and subagents that Claude Code or Codex start show under their parent agent.
 
@@ -44,7 +49,7 @@ To use [Paradev on iPhone and iPad](/mobile), you need iOS 26 or iPadOS 26 or la
 
 This comparison is published by Paradev. The linked Conductor documentation supports the feature descriptions; the trial below is an evaluation method, not a measured performance ranking.
 
-Use the same repository commit, agent, model, and two independent task prompts in each app. Record the app and agent versions, the date, and any setup differences. The [parallel-task guide](/blog/parallel-coding-agents-guide) includes scoped prompts.
+If you still have the Conductor Mac app, use the same repository commit, agent, model, and two independent task prompts in each app. Record the app and agent versions, the date, and any setup differences. The [parallel-task guide](/blog/parallel-coding-agents-guide) includes scoped prompts.
 
 | Trial step | Evidence to record |
 |---|---|
@@ -58,23 +63,27 @@ Measure setup and review time separately from agent execution time. Repeat befor
 
 ![Reviewing a change in Paradev.](/images/readme/diff-viewer.png)
 
-## Which should you choose?
+## What Conductor users can do now
 
-Choose Paradev if you want to answer an agent from your iPhone and review its changes while the task runs on your own computer, a host, or a cloud workspace, with any CLI agent. Validate the setup with the [phone walkthrough](/blog/claude-code-codex-iphone).
+Conductor is closed to new users, so it is no longer an option to pick. Existing users keep the local Mac app until early 2027. If you use Conductor Cloud, read and export your chats before November 20, 2026, when Conductor begins to delete cloud data. Conductor says its team will ship something new early next year.
 
-Choose Conductor if its Mac app, supported harnesses, and shared team conversations match your team's workflow. Its cloud workspaces, Routines, and iOS app need Pro or Teams. It deserves a direct trial if shared agent conversations are central to your process.
+Choose Paradev if you want to answer an agent from your iPhone and review its changes while the task runs on your own computer, a host, or a cloud workspace, with any CLI agent. Validate the setup with the [phone walkthrough](/blog/claude-code-codex-iphone). To move your work, follow the [local app guide](https://docs.paradev.com/migrate-from-conductor) or the [Conductor Cloud guide](https://docs.paradev.com/migrate-from-conductor-cloud).
 
-Compare the current [Paradev plans](/pricing) and [Conductor pricing](https://www.conductor.build/pricing), including compute and agent-provider costs. Agent-provider usage is billed separately.
+Compare the current [Paradev plans](/pricing), including compute and agent-provider costs. Agent-provider usage is billed separately.
 
 ## Frequently Asked Questions
 
+### Is Conductor shutting down?
+
+Conductor is joining Meta. It takes no new sign-ups, and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down.
+
 ### Is Conductor only for local work?
 
-No. Conductor documents both local Mac workspaces and cloud sandboxes, including team collaboration.
+Until November 20, 2026, Conductor had both local Mac workspaces and cloud sandboxes, including team collaboration. After that date, only the local Mac app remains, for existing users.
 
 ### Can Conductor run OpenCode?
 
-Yes. Its current introduction lists OpenCode alongside Claude Code, Codex, and Cursor.
+Yes. Its introduction lists OpenCode alongside Claude Code, Codex, and Cursor.
 
 ### Does Paradev require switching editors?
 

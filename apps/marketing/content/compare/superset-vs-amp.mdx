@@ -1,8 +1,8 @@
 ---
 title: "Paradev vs Amp (2026): Any-Agent Workspace vs Amp's Agent and Runners"
-description: "Compare Paradev and Amp. A local-first workspace that runs any coding agent in parallel Git worktrees vs Amp's multi-model agent with cloud orbs, runners, and iOS and macOS apps. And how to run Amp inside Paradev."
+description: "Compare Paradev and Amp. A local-first workspace that runs any coding agent in parallel Git worktrees vs Amp's multi-model agent with cloud and self-hosted orbs, runners, and web, macOS, iOS, and Android apps. And how to run Amp inside Paradev."
 date: 2026-10-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - amp
@@ -13,12 +13,13 @@ keywords:
   - amp coding agent
   - amp runners worktrees
   - amp orbs
+  - amp self-hosted orbs
   - parallel coding agents
 ---
 
-Amp started as a coding agent and is growing into a development environment. Its agent picks models for you by mode, its "orbs" are cloud machines that keep working after you close your laptop, and since September 2026 its runners create Git worktrees, can be shared across a team, and include the Amp Mac app. Paradev is a local-first workspace that runs any CLI agent, Amp included, in parallel Git worktrees, with pull requests, a browser, automations, remote hosts, and cloud workspaces. The difference: Amp is one vendor's agent with its own infrastructure; Paradev is the workspace around every agent you use.
+Amp started as a coding agent and is growing into a development environment. Its agent picks models for you by mode, its "orbs" are cloud machines that keep working after you close your laptop, and since October 2026 you can also run orbs on your own infrastructure. Its runners create Git worktrees, can be shared across a team, and include the Amp Mac app. Orbs can start from Slack, Linear, GitHub, GitLab, webhooks, and schedules. Paradev is a local-first workspace that runs any CLI agent, Amp included, in parallel Git worktrees, with pull requests, a browser, automations, remote hosts, and cloud workspaces. The difference: Amp is one vendor's agent with its own infrastructure; Paradev is the workspace around every agent you use.
 
-Facts were checked against Amp's own manual, pricing, and news pages on October 13, 2026.
+Facts were checked against Amp's own manual, pricing, and news pages on November 5, 2026.
 
 ---
 
@@ -26,23 +27,27 @@ Facts were checked against Amp's own manual, pricing, and news pages on October 
 
 | | **Paradev** | **Amp** |
 |---|---|---|
-| **What it does** | Runs multiple AI coding agents in parallel in separate Git worktrees, with chat, review, and browser | A multi-model coding agent with cloud orbs, runners, and apps across terminal, web, iOS, and macOS |
-| **Agents** | Any CLI agent (Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, Copilot, Droid, Muse Code, and more) | Amp's own agent and subagents |
-| **Models** | Whatever each agent uses, on your own subscriptions | Several models chosen by mode, or pinned; your own keys or a linked ChatGPT or Claude plan |
+| **What it does** | Runs multiple AI coding agents in parallel in separate Git worktrees, with review, a browser, and a chat interface | A multi-model coding agent with cloud orbs, runners, and apps across terminal, web, macOS, iOS, and Android |
+| **Agents** | Any CLI agent (Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, Copilot, Droid, Muse Code, and more) | Amp's own agent and subagents, plus a Claude Code mode and custom agents on its mode dial |
+| **Models** | Whatever each agent uses, on your own subscriptions | Several models chosen by mode (low to ultra), or tuned per mode; your own keys or a linked ChatGPT or Claude plan |
 | **Isolation** | Git worktrees for local branch-based workspaces | Worktrees created by runners; orbs are per-thread cloud machines |
-| **Remote** | Cloud workspaces, or Remote Access to a macOS or Linux machine you add as a host | Orbs in the cloud, remote and shared team runners |
-| **Clients** | macOS desktop (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Terminal UI, web, iOS and macOS apps |
-| **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Free with your own compute and keys; Individual $20/mo with orb minutes; Enterprise custom |
+| **Remote** | Remote Access to a macOS or Linux machine you add as a host, Bring Your Own Cloud on your own Linux server, or cloud workspaces (beta) | Amp-hosted orbs, self-hosted orbs on your own infrastructure, cloud Macs for iOS and Mac builds, and shared team runners |
+| **Triggers** | Automations on schedules and GitHub, Slack, Linear, and other events; Slack bot | Slack mentions, Linear issue assignment, GitHub and GitLab listeners, webhooks, and schedules |
+| **Clients** | macOS desktop (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Terminal UI, web, macOS, iPhone, iPad, and Android apps, and an MCP server for its Puck assistant |
+| **License** | Open source (MIT) | Proprietary |
+| **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Free with your own compute and keys; Individual from $20/mo with orb minutes; Teams at no extra charge; Enterprise custom |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, GitHub Copilot, Droid, Muse Code, and any other CLI agent in separate Git worktrees and branches with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Amp, Antigravity CLI, Cursor's agent, OpenCode, GitHub Copilot, Droid, Muse Code, and any other CLI agent in separate Git worktrees and branches with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a [chat interface](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account. Scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Open source under the MIT License, with an enterprise tier that adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is Amp?
 
-Amp calls itself "a coding agent and development environment built for the frontier." Instead of a model picker, you choose a mode, from fast to "ultra," and Amp picks the model, though you can pin one. It runs subagents automatically, supports custom subagents through plugins, and lets agents start other agents. Orbs are cloud machines, one per thread, that keep working after you close your laptop. Runners execute threads on machines you choose: since September 22, 2026 a runner creates Git worktrees for its threads, and since September 24 runners can be shared across a team and the Amp Mac app can act as one. Threads follow you across the terminal UI, the web, and Amp's iOS and macOS apps. Amp is free if you bring your own compute and model keys ("Free Agent," September 13); the Individual plan is $20 a month with orb minutes included, and since October 10 you can use a Claude Pro or Max plan in Amp. It runs on macOS and Linux, and on Windows through WSL. Amp is proprietary and says it keeps "no backward compatibility, no legacy features."
+Amp calls itself "a coding agent and development environment built for the frontier." Instead of a model picker, you choose a mode on a dial from low to ultra, and Amp picks the model. You can tune the model behind each mode, and since October 10, 2026 a Claude Code mode runs on your Claude plan. It runs subagents automatically, supports custom agents through plugins, and lets agents start other agents. Puck, its assistant, launches and coordinates agents, and you can reach it from other apps through MCP.
+
+Orbs are cloud machines, one per thread, that keep working after you close your laptop. Since October 22, 2026 you can self-host orbs on your own infrastructure, such as Docker, Kubernetes, E2B, Modal, or Daytona, and since October 29 an orb can start a cloud Mac to build and test iOS and Mac apps. Orbs can start from a Slack mention, a Linear issue you assign to Amp, a new GitHub or GitLab issue or pull request, a webhook, or a schedule. Runners execute threads on machines you choose: they create Git worktrees, can be shared across a team, and the Amp Mac app can act as one. Threads follow you across the terminal UI, the web, and Amp's macOS, iPhone, iPad, and Android apps. Teams get shared threads, multiplayer, SAML/OIDC SSO, and service accounts that own threads for the whole team. Amp is free if you bring your own compute and model keys; the Individual plan starts at $20 a month with orb minutes included. Its home page lists CLI installs for macOS, Linux, WSL, and Windows. Amp is proprietary and says it keeps "no backward compatibility, no legacy features."
 
 ## Key Differences
 
@@ -52,25 +57,29 @@ Amp's environment runs Amp's agent. Paradev runs agents from every vendor in rea
 
 ### Who Picks the Model
 
-Amp chooses the model for each mode, which is simple and keeps you on whatever it considers best. In Paradev, each agent uses its own models on your own plan, and you choose the agent for each task.
+Amp chooses the model for each mode, which is simple and keeps you on whatever it considers best. You can tune the model behind a mode or switch to its Claude Code mode. In Paradev, each agent uses its own models on your own plan, and you choose the agent for each task.
 
 ### Cloud and Your Machines
 
-Amp's orbs give you a cloud machine per thread, and its runners cover your own machines and can be shared across a team. Paradev has cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected, and Remote Access, which adds machines you own as hosts and keeps workspaces running when your laptop sleeps.
+Both products now cover the same three places: their cloud, your cloud, and your own machines. Amp's orbs give you a cloud machine per thread, self-hosted orbs run that same model on your own infrastructure, and runners cover your own machines and can be shared across a team. Amp can also start a cloud Mac for iOS and Mac builds. Paradev has [cloud workspaces](/cloud) (beta), included with Team and Ultra, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on a Linux server in your own cloud account, with no inbound ports, and Remote Access adds machines you own as hosts and keeps workspaces running when your laptop sleeps. In each Paradev option, every agent runs, not only one vendor's.
+
+### Triggers and Team Work
+
+Amp can start work from Slack, Linear, GitHub, GitLab, webhooks, and schedules, and its service accounts let a team share the threads that automations create. Paradev's automations run on schedules and on GitHub, Slack, Linear, and other events, with run history, and tasks sync with Linear and GitHub Issues. The difference is again the agent: Amp's triggers start Amp, and Paradev's automations can start any agent you choose.
 
 ### Review and Pull Requests
 
-Paradev's Changes pane commits, pushes, and opens pull requests, and its Pull Requests view shows CI checks and sends line comments back to the agent. Amp's surface centers on threads you follow across devices.
+Paradev's Changes pane commits, pushes, and opens pull requests, and its Pull Requests view shows CI checks and sends line comments back to the agent. Amp shows diffs in the thread, and since October 2026 it follows up on the pull requests it opens: comments, reviews, and CI results come back to the same thread. Paradev also has a [chat interface](https://docs.paradev.com/chat) that shows a Claude Code, Codex, OpenCode, or Pi session as a transcript you can approve step by step.
 
 ### Platforms
 
-Amp has iOS and macOS apps and a web client, and runs on Linux. Paradev has a macOS desktop app, an experimental Linux build, and an iPhone and iPad app; Windows is not yet available for either as a native desktop app.
+Amp has macOS, iPhone, iPad, and Android apps and a web client, and its CLI runs on macOS, Linux, WSL, and Windows. Paradev has a macOS desktop app, an experimental Linux build, and an iPhone and iPad app; Android is on a [waitlist](/mobile#android), and Windows is not yet available. Neither has a native Windows desktop app.
 
 ---
 
 ## Pricing
 
-Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing; model costs are on your own agent subscriptions. Amp is free when you bring your own compute and model keys, Individual is $20 per month with 45,000 orb minutes, Teams adds no extra charge, and Enterprise is custom. Prices as of October 2026.
+Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing; model costs are on your own agent subscriptions. Amp is free when you bring your own compute and model keys, with pay-as-you-go Amp-hosted orbs and free self-hosted orbs. Individual starts at $20 per month with 45,000 orb minutes, and a larger Individual tier is listed. Teams adds no extra charge, and Enterprise is custom, with SCIM and audit logs. Prices as of November 2026.
 
 ---
 
@@ -80,16 +89,18 @@ Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro
 
 - Use more than one coding agent, and want them side by side
 - Want pull requests, CI checks, and line comments back to any agent in one place
-- Want agents on machines you own or in cloud workspaces, with scheduled automations and a Slack bot
+- Want any agent on machines you own, on your own cloud server, or in cloud workspaces, with scheduled automations and a Slack bot
+- Want an MIT-licensed workspace you can read, change, and self-host
 - Need enterprise controls: SAML SSO, SCIM, audit logs, SOC 2 Type II
 
 **Choose Amp if you:**
 
 - Want the vendor to pick the best model for each task
-- Want one cloud machine per thread and shared team runners from the agent vendor
-- Want the same threads in the terminal, on the web, and on iOS and macOS
+- Want one cloud machine per thread, hosted by Amp or on your own infrastructure, and shared team runners from the agent vendor
+- Want Amp to start work from Slack, Linear, GitHub, or GitLab
+- Want the same threads in the terminal, on the web, and on macOS, iOS, and Android
 
-**Verdict:** Amp is a strong agent with its own cloud and apps. Paradev is the workspace for teams that use several agents, Amp among them, and want review through to the pull request, on their own machines or in cloud workspaces.
+**Verdict:** Amp is a strong agent with its own cloud, self-hosted orbs, and apps. Paradev is the workspace for teams that use several agents, Amp among them, and want review through to the pull request, on their own machines or in cloud workspaces.
 
 ---
 
@@ -101,7 +112,7 @@ Yes. Amp is a built-in agent in Paradev. It runs in its own worktree next to Cla
 
 ### Is Amp free?
 
-Amp is free if you bring your own compute and model keys. The Individual plan is $20 per month with orb minutes. Paradev has a free tier, Pro at {{price:pro}} per user per month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces.
+Amp is free if you bring your own compute and model keys, and self-hosted orbs are free for individuals and teams. The Individual plan starts at $20 per month with orb minutes. Paradev has a free tier, Pro at {{price:pro}} per user per month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces.
 
 ### Does Amp use Git worktrees?
 
@@ -109,4 +120,8 @@ Yes. Since September 2026, Amp's runners create Git worktrees for their threads.
 
 ### Does Amp run on Windows?
 
-Amp runs on Windows through WSL. Paradev's desktop app runs on macOS, with an experimental Linux build.
+Amp's home page lists CLI installs for WSL and Windows. Its desktop app is for macOS. Paradev's desktop app runs on macOS, with an experimental Linux build.
+
+### Can Amp run in my own cloud?
+
+Yes. Since October 22, 2026, Amp supports self-hosted orbs on your own infrastructure. Paradev's [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on a Linux server in your own cloud account, and every agent you use runs there.

@@ -2,7 +2,7 @@
 title: "Paradev vs Codex App (2026): Codex Plus Every Other Agent, or OpenAI's Coding Surface"
 description: "Compare Paradev and the OpenAI Codex app in the ChatGPT desktop app for parallel AI coding: worktrees, scheduled tasks, phone control, platforms, and pricing, checked against OpenAI's docs."
 date: 2026-07-13
-lastUpdated: 2026-10-29
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - codex-app
@@ -32,12 +32,12 @@ Choose Paradev (formerly Superset) if you want Codex as one of several agents, n
 | **Category** | Desktop workspace for CLI coding agents | OpenAI's coding surface in the ChatGPT desktop app |
 | **Agents** | Any CLI agent: Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, and more | OpenAI Codex, with models such as GPT-6.1 Sol and GPT-6.1 Terra |
 | **Isolation** | Git worktree and branch for each local branch-based workspace | Local or Worktree chats; Codex Cloud runs tasks in cloud environments |
-| **Where code runs** | Your machine, any macOS or Linux host you add through Remote Access, or a cloud workspace | Your machine, SSH hosts, or OpenAI's cloud |
+| **Where code runs** | Your machine, any macOS or Linux host you add through Remote Access, your own Linux server (Bring Your Own Cloud), or a cloud workspace (beta) | Your machine, SSH hosts, or OpenAI's cloud |
 | **Mobile** | iPhone and iPad app for your hosts and cloud workspaces (Pro) | ChatGPT on iOS or Android controls a Mac or Windows host |
 | **Scheduling** | Automations on a schedule or from GitHub, Slack, Linear, Sentry, and other events | Scheduled tasks in your project or on a background worktree; Team Tasks in the cloud |
 | **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; CLI; MCP server | ChatGPT desktop app on macOS and Windows, Linux in preview; CLI; IDE extensions; web |
 | **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Included in ChatGPT Free, Go, Plus, Pro, Business, Edu, and Enterprise |
-| **License** | Source-available (ELv2) | Proprietary (the Codex CLI is open source) |
+| **License** | Open source (MIT) | Proprietary (the Codex CLI is open source) |
 
 ## Why Look for a Codex App Alternative?
 
@@ -50,7 +50,7 @@ Choose Paradev (formerly Superset) if you want Codex as one of several agents, n
 
 ### Paradev
 
-Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Amp, and other agents in their own Git worktrees with persistent terminal sessions, on your own subscriptions and keys. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, a file editor, an in-app browser with Design Mode, port management, and an MCP server. It runs on machines you own through Remote Access and in cloud workspaces, and automations start agent sessions on a schedule or from an event. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Amp, and other agents in their own Git worktrees with persistent terminal sessions, on your own subscriptions and keys. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, a file editor, an in-app browser with Design Mode, port management, and an MCP server. It runs on machines you own through Remote Access, on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](/cloud) (beta). For Claude Code, Codex, OpenCode, and Pi, a chat interface shows the session as a chat, and a CLI/Chat toggle keeps the same session. Automations start agent sessions on a schedule or from an event. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Open source under the MIT License.
 
 ### The Codex App
 
@@ -68,7 +68,7 @@ Both run parallel work in local Git worktrees. The Codex app manages its worktre
 
 ### Mobile and Remote Machines
 
-Both reach your own machine from a phone. Codex pairs ChatGPT on iOS or Android with a Mac or Windows computer running the desktop app, which must be awake and online. Paradev's iPhone and iPad app connects to cloud workspaces and to any macOS or Linux host you add through Remote Access, with terminals and diff review for any agent running there, not only Codex.
+Both reach your own machine from a phone. Codex pairs ChatGPT on iOS or Android with a Mac or Windows computer running the desktop app, which must be awake and online. Paradev's iPhone and iPad app connects to cloud workspaces, to Bring Your Own Cloud servers, and to any macOS or Linux host you add through Remote Access, with terminals and diff review for any agent running there, not only Codex.
 
 ### Scheduling and Automation
 

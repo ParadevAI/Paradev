@@ -20,7 +20,6 @@ import { useSandboxAccess } from "renderer/routes/_authenticated/providers/Sandb
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
 import { CloudWorkspaceArchivedState } from "../components/CloudWorkspaceArchivedState";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
-import { PendingCloudChatPreview } from "../components/PendingCloudChatPreview";
 import { WorkspaceCreateErrorState } from "../components/WorkspaceCreateErrorState";
 import { WorkspaceCreatingState } from "../components/WorkspaceCreatingState";
 import { WorkspaceHostIncompatibleState } from "../components/WorkspaceHostIncompatibleState";
@@ -162,19 +161,7 @@ function V2WorkspaceLayout() {
 	// provisioning there is no box to open, and once it has failed there never
 	// will be; a ready one only waits for its address to be minted.
 	if (!workspace && cloudWorkspace) {
-		if (cloudWorkspace.status === "ready" && pendingCloudChat) {
-			return (
-				<StateScreenShell>
-					<PendingCloudChatPreview
-						label={
-							pendingCloudChat.titleOverride ?? pendingCloudChat.data.agentId
-						}
-						prompt={pendingCloudChat.data.launchPrompt}
-					/>
-				</StateScreenShell>
-			);
-		}
-		if (cloudWorkspace.status === "ready") {
+		if (cloudWorkspace.status === "ready" && !pendingCloudChat) {
 			return <StateScreenShell>{null}</StateScreenShell>;
 		}
 		return (

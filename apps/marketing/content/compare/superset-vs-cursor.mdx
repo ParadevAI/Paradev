@@ -2,7 +2,7 @@
 title: "Paradev vs Cursor (2026): Run Claude Code and Codex in Parallel, or Cursor's Own Agent"
 description: "Compare Paradev and Cursor for parallel AI coding. A desktop workspace that runs Claude Code, Codex, and any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, CLI, and Grok-centered plans after joining SpaceX."
 date: 2026-02-02
-lastUpdated: 2026-10-29
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - cursor
@@ -32,7 +32,7 @@ Choose Paradev (formerly Superset) if you want to run Claude Code, Codex, and ot
 | **Category** | Desktop workspace for CLI coding agents | AI editor and agent platform |
 | **Agents** | Any CLI agent: Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and more | Cursor's own agent, with models from several vendors on paid plans |
 | **Parallel work** | Many agents, from different vendors, each in its own worktree and branch | Agents Window with worktrees for local agents; cloud agents on their own VMs |
-| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a cloud workspace | Your machine, remote SSH, Cursor's cloud VMs, or self-hosted machines |
+| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, your own Linux server (Bring Your Own Cloud), or a cloud workspace (beta) | Your machine, remote SSH, Cursor's cloud VMs, or self-hosted machines |
 | **Mobile** | iPhone and iPad app: terminals and diff review on your hosts and cloud workspaces (Pro) | iOS app for cloud agents, and remote control of local agents since October 6, 2026; web app at cursor.com/agents |
 | **Editor** | Works beside any editor | Cursor's own editor at the center |
 | **Model costs** | Your own subscriptions and keys, never proxied | Plus: Grok models only. Premium and up: third-party models billed at API list price |
@@ -49,7 +49,7 @@ Choose Paradev (formerly Superset) if you want to run Claude Code, Codex, and ot
 
 ### Paradev
 
-Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent in its own Git worktree and branch with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with CI checks and line comments you can send to agents, a file editor, an in-app browser with Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, cloud workspaces run without your own computer connected, and scheduled automations, a CLI, and a TypeScript SDK cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent in its own Git worktree and branch with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with CI checks and line comments you can send to agents, a file editor, an in-app browser with Design Mode, a [chat interface](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account, cloud workspaces run without your own computer connected, and scheduled automations, a CLI, and a TypeScript SDK cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Open source under the MIT License.
 
 ### Cursor
 
@@ -67,11 +67,11 @@ Paradev never proxies model calls: each agent runs on your own subscription or k
 
 ### Remote Agents and Mobile
 
-Both let you check on agents running on your own machine from a phone. Cursor's iOS app shows cloud agents and, since October 6, 2026, agents running on your computer, which must stay on. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
+Both let you check on agents running on your own machine from a phone. Cursor's iOS app shows cloud agents and, since October 6, 2026, agents running on your computer, which must stay on. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access, to Bring Your Own Cloud servers, and to cloud workspaces, with terminals and diff review for any agent running there.
 
 ### Cloud Infrastructure
 
-Cursor offers managed cloud agents on isolated VMs, plus self-hosted machines for running tools on your own hardware. Paradev has cloud workspaces on the Team and Ultra plans (Beta), and runs agents on machines you own through Remote Access on Pro.
+Cursor offers managed cloud agents on isolated VMs, plus self-hosted machines for running tools on your own hardware. Paradev has [cloud workspaces](/cloud) on the Team and Ultra plans (beta), and runs agents on machines you own through Remote Access on Pro. With [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), the Paradev host runs on a Linux server in your own cloud account, with no inbound ports.
 
 ### Editor-Centered vs Editor-Independent
 

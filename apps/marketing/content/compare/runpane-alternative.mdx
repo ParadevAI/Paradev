@@ -1,8 +1,8 @@
 ---
 title: "Best RunPane Alternatives in 2026"
-description: "The best alternatives to RunPane (Pane) for running AI coding agents in parallel worktrees, including Paradev, Orca, Emdash, Nimbalyst, and Conductor, compared by platform, review, mobile, and license."
+description: "The best alternatives to RunPane (Pane) for running AI coding agents in parallel worktrees, including Paradev, Orca, Emdash, and Nimbalyst, compared by platform, review, mobile, and license."
 date: 2026-10-20
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - runpane
@@ -21,7 +21,7 @@ keywords:
 
 RunPane is the site for Pane, a free, AGPL-3.0, keyboard-first desktop app for running CLI coding agents in parallel. Each pane is a Git worktree with agent terminals, a browser tab, diffs, and logs, and it runs on Windows, macOS, and Linux. If you want review built around the pull request, scheduled automations, team access to hosts, and a released iPhone and iPad app, Paradev is built for that loop.
 
-**Our recommendation: choose Paradev if you want PR review, automations, and team features around your parallel agents.** The alternatives below cover other preferences, including Windows support and fully open-source licenses.
+**Our recommendation: choose Paradev if you want PR review, automations, and team features around your parallel agents.** The alternatives below cover other preferences, including Windows support.
 
 [Download Paradev](/download) to try a small task, or read [Paradev vs RunPane](/compare/superset-vs-runpane) for the direct comparison. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
 
@@ -31,11 +31,11 @@ RunPane is the site for Pane, a free, AGPL-3.0, keyboard-first desktop app for r
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | PR review, automations, team hosts, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Paradev** | PR review, automations, team hosts, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Open source (MIT) |
 | **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
 | **Nimbalyst** | Visual workspace for Claude Code, Codex, and OpenCode | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
-| **Conductor** | Polished Mac app with team cloud workspaces | Mac + iOS | Proprietary |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Mac + iOS | Proprietary |
 
 ## Why Look for a RunPane Alternative?
 
@@ -44,14 +44,14 @@ Pane is free, needs no account, and ships often. Common reasons to look elsewher
 - **PR-centered review.** You want a pull request view with checks, review threads, and merge beside the diff.
 - **Scheduled runs.** You want agents to run on a schedule on a host you pick, with run history and retry.
 - **Team access.** You want an admin to grant teammates access to a shared host.
-- **A released phone app.** Pane's remote access uses a browser app, and its native companion app is in early access.
+- **A released phone app.** Pane's remote access uses a browser app, and its native companion app is in beta.
 - **Managed connectivity.** You prefer not to set up Tailscale, SSH tunnels, or HTTPS for remote hosts yourself.
 
 ## The Best Alternatives
 
 ### Paradev
 
-Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. The Changes pane commits, pushes, and opens a PR, and the PR pane shows checks and review threads next to the diff, with merge in the same place. It adds an in-app browser with Design Mode, port management, and a Workspaces page that shows which agents need you. Hosts connect through a relay, with access granted per team member on Pro, and cloud workspaces keep running without your laptop. The [iPhone and iPad app](/mobile) is on the App Store. Pro adds remote access, the iPhone and iPad app, and scheduled automations, and a CLI, TypeScript SDK, and MCP server let agents start other agents.
+Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. The Changes pane commits, pushes, and opens a PR, and the PR pane shows checks and review threads next to the diff, with merge in the same place. It adds an in-app browser with Design Mode, port management, and a Workspaces page that shows which agents need you. Hosts connect through a relay, with access granted per team member on Pro. You can also run the host on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta) keep running without your laptop. The [iPhone and iPad app](/mobile) is on the App Store. Pro adds remote access, the iPhone and iPad app, and scheduled automations, and a CLI, TypeScript SDK, and MCP server let agents start other agents.
 
 For the direct comparison, see [Paradev vs RunPane](/compare/superset-vs-runpane).
 
@@ -75,7 +75,9 @@ See [Paradev vs Nimbalyst](/compare/superset-vs-nimbalyst).
 
 ### Conductor
 
-Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Pane can read Conductor's `conductor.json` setup scripts, so moving between the two is easy. Conductor's Pro plan at $50/month adds cloud workspaces, multiplayer, an API, and an iOS app.
+Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Pane can read Conductor's `conductor.json` setup scripts, so moving between the two is easy. Conductor's Pro plan added cloud workspaces, multiplayer, an API, and an iOS app.
+
+Conductor announced on November 4, 2026 that it is joining Meta. It no longer accepts new sign-ups or downloads. Conductor Cloud goes read-only on November 13 and shuts down on November 20, 2026. The Mac app gets new models and critical fixes until early 2027. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -85,7 +87,7 @@ See [Paradev vs Conductor](/compare/superset-vs-conductor).
 - For a free, open-source, cross-platform ADE under MIT, choose **Orca**.
 - For open source with issue-tracker intake and many agent CLIs, choose **Emdash**.
 - For an open-source visual workspace with document editing, choose **Nimbalyst**.
-- For a polished Mac app with team cloud workspaces, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 
 ## Verdict
 
@@ -112,7 +114,7 @@ Orca, Emdash, and Nimbalyst run on Windows. Paradev runs on macOS with experimen
 
 ### Is there an open-source RunPane alternative?
 
-Yes. Orca (MIT), Nimbalyst (MIT), and Emdash (Apache-2.0) are open source. Pane itself is AGPL-3.0. Paradev is source-available under Elastic License 2.0.
+Yes. Orca (MIT), Nimbalyst (MIT), and Emdash (Apache-2.0) are open source. Pane itself is AGPL-3.0. Paradev is open source under the MIT License.
 
 ### Do these tools replace my coding-agent subscription?
 

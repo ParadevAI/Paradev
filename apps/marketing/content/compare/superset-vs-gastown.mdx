@@ -2,7 +2,7 @@
 title: "Paradev vs Gas Town (2026): Agent Workspace vs Autonomous Agent Fleet"
 description: "Compare Paradev and Gas Town (Steve Yegge's multi-agent orchestrator) for running AI coding agents: a desktop workspace vs an autonomous 20-30 agent fleet."
 date: 2026-08-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - gastown
@@ -23,7 +23,7 @@ Paradev and Gas Town both orchestrate many coding agents, but they sit at differ
 
 | | **Paradev** | **Gas Town** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | Coordinates fleets of 20-30 agents with an AI coordinator, work ledger, and merge queue |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with review, a browser, and a chat interface | Coordinates fleets of 20-30 agents with an AI coordinator, work ledger, and merge queue |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Autonomous multi-agent orchestration system |
 | **Interface** | Desktop GUI, CLI, MCP server | CLI (`gt`) + tmux + TUI feed + local web dashboard |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code (deepest), plus Codex, Gemini, Copilot, Cursor, Amp, OpenCode, Pi, and more |
@@ -31,13 +31,13 @@ Paradev and Gas Town both orchestrate many coding agents, but they sit at differ
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktree-backed "hooks" persisting agent work |
 | **Merging** | You review and merge (diff editor, PR flow) | Bors-style bisecting merge queue; workers never push to main |
 | **Automation** | Automations: scheduled agent sessions, TypeScript SDK, Slack bot | Autonomous dispatch loop + watchdog recovery; no time-based scheduler |
-| **License** | Source-available (ELv2) | Open source (MIT) |
+| **License** | Open source (MIT) | Open source (MIT) |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, in-app browser for docs and dev servers, port management, and MCP tooling, plus a chat interface for Claude Code, Codex, OpenCode, and Pi. It also runs on your other machines through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta), and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Open source under the MIT License.
 
 ## What Is Gas Town?
 
@@ -82,7 +82,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 - Want to run 20-30 agents on a sustained, autonomous basis
 - Like the Mayor/ledger/merge-queue model and are comfortable operating it
-- Live in the terminal and want MIT-licensed machinery you can inspect
+- Live in the terminal and want machinery you can inspect and run yourself
 - Accept the token spend that full-throttle autonomy implies
 
 **Verdict:** Gas Town is the most ambitious autonomy experiment in the space, and its ledger and merge-queue ideas will influence everything that comes after it. Most engineers and teams, though, want parallel agents with visibility, review, and predictable operations -- and that is Paradev's territory: the same fleet-scale parallelism with a workspace, automations, and a team story around it. Run Gas Town if you are the kind of operator it was built for; run Paradev if you want the fleet without the factory floor.

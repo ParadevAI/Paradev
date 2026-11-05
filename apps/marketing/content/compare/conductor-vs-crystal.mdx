@@ -2,7 +2,7 @@
 title: "Conductor vs Crystal (2026): Parallel Claude Code Apps Compared"
 description: "Compare Conductor and Crystal (now Nimbalyst) for running Claude Code and Codex in parallel Git worktrees, plus where Paradev fits as an agent-agnostic alternative."
 date: 2026-07-13
-lastUpdated: 2026-09-24
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - conductor
@@ -16,7 +16,9 @@ keywords:
   - parallel claude code
 ---
 
-Conductor and Crystal are close competitors: both are desktop apps that run Claude Code and Codex in parallel Git worktrees, with in-app diff review and merge. The main differences are platform, licensing, and project direction. Conductor is a proprietary macOS app; Crystal is open source and cross-platform, and is now continuing under the name Nimbalyst. Neither is agent-agnostic, which is where a broader workspace like [Paradev](/compare/superset-vs-conductor) comes in.
+Conductor is joining Meta and is winding down. Since November 4, 2026, it takes no new sign-ups and the app can no longer be downloaded. This page shows how Conductor and Crystal compared, and what existing Conductor users can do.
+
+Conductor and Crystal were close competitors: both are desktop apps that run Claude Code and Codex in parallel Git worktrees, with in-app diff review and merge. The main differences are platform, licensing, and project direction. Conductor is a proprietary macOS app; Crystal is open source and cross-platform, and is now continuing under the name Nimbalyst. Neither is agent-agnostic, which is where a broader workspace like [Paradev](/compare/superset-vs-conductor) comes in.
 
 This page compares all three.
 
@@ -29,16 +31,18 @@ This page compares all three.
 | **Agents** | Claude Code, Codex, Cursor | Claude Code, Codex | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, and more) |
 | **Isolation** | Git worktree per task | Git worktree per session | Git worktrees for local branch-based workspaces |
 | **Platform** | macOS only | macOS, Windows, Linux | macOS; experimental Linux AppImage; Windows unavailable |
-| **License** | Proprietary | Open source (MIT) | Source-available (ELv2) |
-| **Remote / cloud** | Local | Local | Remote and cloud workspaces |
-| **Status** | Active | Renamed to Nimbalyst | Active |
-| **Pricing** | Free, bring your own subscription | Free (open source) | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo |
+| **License** | Proprietary | Open source (MIT) | Open source (MIT) |
+| **Remote / cloud** | Local; Conductor Cloud shuts down November 20, 2026 | Local | Local, Remote Access hosts, your own Linux server (Bring Your Own Cloud), and cloud workspaces (beta) |
+| **Status** | Joining Meta; closed to new users | Renamed to Nimbalyst | Active |
+| **Pricing** | Not sold; closed to new users since November 4, 2026 | Free (open source) | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo |
 
 ---
 
 ## What Is Conductor?
 
-Conductor is a native macOS app from Melty Labs for running Claude Code, Codex, and Cursor agents in parallel, each in an isolated Git worktree, with a review-and-merge and pull-request flow. It is Mac only, proprietary, and free, reusing your existing agent subscriptions.
+Conductor is a native macOS app from Melty Labs for running Claude Code, Codex, and Cursor agents in parallel, each in an isolated Git worktree, with a review-and-merge and pull-request flow. It is Mac only, proprietary, and reuses your existing agent subscriptions.
+
+Conductor is joining Meta, announced on November 4, 2026. It no longer takes new sign-ups or sells plans, and existing Pro users keep Pro features for free. The local Mac app gets new models and critical bug fixes until early 2027, then winds down. Conductor Cloud goes read-only on November 13, 2026 and shuts down on November 20, 2026. If you use Conductor today, see [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) for the local Mac app and [Migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) for cloud workspaces.
 
 ## What Is Crystal?
 
@@ -48,7 +52,7 @@ Crystal is an open-source Electron desktop app for running Claude Code and Codex
 
 ### Platform and License
 
-Conductor is macOS only and proprietary. Crystal is open source (MIT) and runs on macOS, Windows, and Linux. If you need Windows or Linux, or want open-source code, Crystal (Nimbalyst) is the fit; if you want a polished native Mac app and do not mind proprietary, Conductor is strong.
+Conductor is macOS only and proprietary. Crystal is open source (MIT) and runs on macOS, Windows, and Linux. If you need Windows or Linux, or want open-source code, Crystal (Nimbalyst) is the fit. Conductor was a polished native Mac app, but it is now closed to new users.
 
 ### Agents
 
@@ -56,19 +60,19 @@ Conductor runs Claude Code, Codex, and Cursor. Crystal runs Claude Code and Code
 
 ### Project Direction
 
-Conductor is actively developed under its name. Crystal has been renamed and its active development moved to Nimbalyst, so evaluate Nimbalyst's current state rather than the legacy Crystal repo.
+Conductor is joining Meta. Its Mac app gets new models and critical bug fixes until early 2027, then winds down. Crystal has been renamed and its active development moved to Nimbalyst, so evaluate Nimbalyst's current state rather than the legacy Crystal repo.
 
 ## Where Paradev Fits
 
-Both Conductor and Crystal are focused on a small set of agents. If you want the same worktree-per-task model but agent-agnostic on macOS and experimental Linux, and extended with remote and cloud workspaces, Paradev is the broader option. It runs Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and custom agents, with review, an in-app browser, and MCP built in. See [Paradev vs Conductor](/compare/superset-vs-conductor) and [Paradev vs Crystal](/compare/superset-vs-crystal).
+Both Conductor and Crystal are focused on a small set of agents. If you want the same worktree-per-task model but agent-agnostic on macOS and experimental Linux, and extended with remote hosts, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and [cloud workspaces](/cloud) in beta, Paradev is the broader option. It runs Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and custom agents, with review, an in-app browser, and MCP built in. A chat interface shows Claude Code, Codex, OpenCode, and Pi sessions as a chat. Like Crystal, Paradev is open source under the MIT License. See [Paradev vs Conductor](/compare/superset-vs-conductor) and [Paradev vs Crystal](/compare/superset-vs-crystal).
 
 ## Which Should You Choose?
 
-- **Choose Conductor** if you want a polished native macOS app for Claude Code, Codex, and Cursor.
+- **Conductor** is closed to new users and is winding down. If you use it today, follow the [migration guide](https://docs.paradev.com/migrate-from-conductor) to move your work to Paradev.
 - **Choose Crystal (Nimbalyst)** if you want an open-source, cross-platform app for Claude Code and Codex.
 - **Choose Paradev** if you want agent-agnostic worktree orchestration across many agents, plus remote and cloud workspaces.
 
-**Verdict:** Conductor and Crystal are two takes on the same idea: a desktop app for parallel Claude Code and Codex in worktrees. Pick Conductor for a native Mac experience, Crystal (Nimbalyst) for open-source and cross-platform, and Paradev if you want the broadest agent support and remote hosting.
+**Verdict:** Conductor and Crystal were two takes on the same idea: a desktop app for parallel Claude Code and Codex in worktrees. Conductor is now closed to new users. Pick Crystal (Nimbalyst) for open-source and cross-platform, and Paradev if you want the broadest agent support and remote hosting.
 
 ---
 
@@ -81,6 +85,10 @@ Yes. Both give each agent session its own Git worktree and branch. Paradev uses 
 ### Is Crystal still maintained?
 
 Crystal has been renamed and its maintainers now direct active development to Nimbalyst. Evaluate Nimbalyst for current development.
+
+### Is Conductor still maintained?
+
+Conductor is joining Meta and is closed to new users. The local Mac app gets new models and critical bug fixes until early 2027, then winds down. Conductor Cloud shuts down on November 20, 2026.
 
 ### Which runs on Windows and Linux?
 

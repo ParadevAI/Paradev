@@ -12,6 +12,7 @@ import { useSandboxAccess } from "renderer/routes/_authenticated/providers/Sandb
 import { useHostReachability } from "../../../hooks/useHostReachability";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { LOCAL_HOST_SERVICE_DETAIL } from "../../../providers/WorkspaceProvider/utils/localHostServiceDetail";
+import { useChatSessionChecksFailing } from "../../hooks/usePaneRegistry/components/ChatPane/components/AcpChatPane/hooks/useChatSessionLiveness";
 
 const WAKE_UP_ESTIMATE_SECONDS = 30;
 
@@ -33,6 +34,8 @@ export function HostConnectionPill() {
 		detail: reachabilityDetail,
 		retry: onRetry,
 	} = useHostReachability(hostUrl);
+	const { failing: checksFailing, retry: retryChecks } =
+		useChatSessionChecksFailing(hostUrl);
 	const { hosts: hostRows } = useKnownHosts();
 	const { targets: sandboxes, usageRefusal } = useSandboxAccess();
 	const isSandbox = sandboxes.some(
@@ -40,6 +43,8 @@ export function HostConnectionPill() {
 	);
 	const isLocalRestartInFlight =
 		workspace.hostId === machineId && hostServiceStatus === "starting";
+	const isCheckFailing =
+		checksFailing && !isDegraded && !isAccessDenied && !isLocalRestartInFlight;
 	const isWakingUp = isSandbox && isReconnecting && !isAccessDenied;
 	const settingsHostId = isSandbox ? null : workspace.hostId;
 	const hostRow = hostRows.find(
@@ -65,28 +70,40 @@ export function HostConnectionPill() {
 						message:
 							"Couldn't reach this cloud workspace. It may still be waking up — try again.",
 					})
-			: reachabilityDetail;
+			: isCheckFailing
+				? workspace.hostId === machineId
+					? t({
+							message:
+								"Try again, or restart the host service from the Paradev tray menu.",
+						})
+					: t({
+							message: "Please try again, or restart Paradev on that device.",
+						})
+				: reachabilityDetail;
 	const isDialing =
-		!isAccessDenied && (isReconnecting || isLocalRestartInFlight);
+		!isAccessDenied &&
+		(isReconnecting || isLocalRestartInFlight || isCheckFailing);
 	const secondsLeft = useCountdown(
 		isWakingUp && isDegraded ? WAKE_UP_ESTIMATE_SECONDS : 0,
 	);
-	const label = isAccessDenied
-		? t({ message: "Access denied" })
-		: isLocalRestartInFlight
-			? t({ message: "Restarting…" })
-			: !isReconnecting
-				? t({ message: "Disconnected" })
-				: isWakingUp
-					? secondsLeft > 0
-						? t({ message: "Waking up workspace" })
-						: t({ message: "Still waking up…" })
-					: hasConnected
-						? t({ message: "Reconnecting…" })
-						: t({ message: "Connecting…" });
+	const label = isCheckFailing
+		? t({ message: "Can't reach the host" })
+		: isAccessDenied
+			? t({ message: "Access denied" })
+			: isLocalRestartInFlight
+				? t({ message: "Restarting…" })
+				: !isReconnecting
+					? t({ message: "Disconnected" })
+					: isWakingUp
+						? secondsLeft > 0
+							? t({ message: "Waking up workspace" })
+							: t({ message: "Still waking up…" })
+						: hasConnected
+							? t({ message: "Reconnecting…" })
+							: t({ message: "Connecting…" });
 
 	if (usageRefusal?.workspaceId === workspace.hostId) return null;
-	if (!isDegraded && !isAccessDenied) return null;
+	if (!isDegraded && !isAccessDenied && !isCheckFailing) return null;
 
 	return (
 		<div className="pointer-events-none absolute inset-x-0 top-32 z-20 flex justify-center px-4">
@@ -131,7 +148,7 @@ export function HostConnectionPill() {
 						) : null}
 						<button
 							type="button"
-							onClick={onRetry}
+							onClick={isCheckFailing ? retryChecks : onRetry}
 							className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 font-medium hover:bg-accent/70"
 						>
 							{t({ message: "Retry" })}

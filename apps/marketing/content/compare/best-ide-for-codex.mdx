@@ -1,8 +1,8 @@
 ---
 title: "Best IDE for OpenAI Codex in 2026: Where to Run It"
-description: "The best places to run OpenAI Codex in 2026, from the CLI and IDE extension to the Codex cloud app, Conductor, and Paradev for parallel worktree sessions."
+description: "The best places to run OpenAI Codex in 2026, from the CLI and IDE extension to the Codex cloud app and Paradev for parallel worktree sessions."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - vs-code
@@ -33,7 +33,7 @@ This guide covers each option, including how to get parallel Codex runs with Git
 | **Codex IDE extension** | Editing alongside Codex | Limited | In-editor, single working copy |
 | **Codex cloud / app** | Fire-and-forget parallel tasks | Yes -- isolated cloud sandboxes | Runs in OpenAI's cloud, tied to a plan |
 | **Cursor** | AI editor that can run Codex-style agents | Local worktrees (its own agents) | Centered on Cursor's own models |
-| **Conductor** | A focused Mac app for a few agents | Yes -- worktrees | macOS only |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Yes -- worktrees | macOS only |
 
 ## Where You Can Run Codex
 
@@ -65,20 +65,20 @@ For the direct comparison, see [Paradev vs Cursor](/compare/superset-vs-cursor).
 
 ### Conductor
 
-Conductor is a macOS app that runs Codex (along with Claude Code, Cursor, and OpenCode) in parallel, each in an isolated Git worktree, with a review-and-merge flow. It is a focused way to run a few agents in parallel on a Mac. It is macOS only.
+Conductor is a macOS app that runs Codex (along with Claude Code, Cursor, and OpenCode) in parallel, each in an isolated Git worktree, with a review-and-merge flow. It is macOS only. Conductor is joining Meta. Since November 4, 2026, it takes no new sign-ups, and you can no longer download the app. Conductor Cloud shuts down on November 20, 2026, and the Mac app gets only new models and critical bug fixes until early 2027. Existing users can follow the guides to [migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 For the direct comparison, see [Paradev vs Conductor](/compare/superset-vs-conductor).
 
 ### Paradev
 
-Paradev runs the Codex CLI as a first-class agent, using separate Git worktrees and terminals for new local branch-based workspaces, so multiple Codex tasks can run on the same repository at once in separate working directories -- locally, on your own remote hosts, or in cloud workspaces. Around that it adds a built-in diff and file editor, an in-app browser, port management, and MCP tooling. Interrupted Codex sessions resume with `codex resume`, subagents appear under their parent session, and the Usage tab tracks quotas and token spend per Codex login. The model picker includes GPT-6.1 Sol and GPT-6 Astra, Sol, and Luna, with Ultra effort on GPT-6 Astra. The iPhone and iPad app lets you check on Codex sessions and review diffs away from your desk. If your goal is parallel local Codex runs with real worktree isolation rather than cloud sandboxes, this is the fit. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.paradev.com/workspaces).
+Paradev runs the Codex CLI as a first-class agent, using separate Git worktrees and terminals for new local branch-based workspaces, so multiple Codex tasks can run on the same repository at once in separate working directories -- locally, on your own remote hosts through Remote Access, on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta). Around that it adds a built-in diff and file editor, an in-app browser, port management, and MCP tooling. Interrupted Codex sessions resume with `codex resume`, subagents appear under their parent session, and the Usage tab tracks quotas and token spend per Codex login. A [chat interface](https://docs.paradev.com/chat) can show a Codex session as a chat, and the CLI/Chat toggle switches back without losing context. The model picker includes GPT-6.1 Sol and GPT-6 Astra, Sol, and Luna, with Ultra effort on GPT-6 Astra. The iPhone and iPad app lets you check on Codex sessions and review diffs away from your desk. Paradev is open source under the MIT License. If your goal is parallel local Codex runs with real worktree isolation rather than cloud sandboxes, this is the fit. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.paradev.com/workspaces).
 
 ## How To Choose
 
 - For one task or a scriptable/SSH setup, use the Codex CLI.
 - To edit alongside Codex, use the IDE extension.
 - For fire-and-forget parallel tasks in the cloud, use Codex cloud.
-- For parallel local Codex runs in separate worktrees, use a workspace like Paradev or Conductor.
+- For parallel local Codex runs in separate worktrees, use a workspace like Paradev.
 
 ## Best Picks by Use Case
 
@@ -94,9 +94,9 @@ OpenAI's cloud sandboxes run multiple tasks in parallel without using your machi
 
 Paradev gives every Codex task its own worktree on your own machine, or its own cloud workspace, with review and orchestration built in.
 
-### Best focused Mac app: Conductor
+### Conductor status
 
-Conductor is a polished choice if Codex, Claude Code, and Cursor are your agents and you are on macOS.
+Conductor is joining Meta and is closed to new users. Existing users can keep using the Mac app while it winds down.
 
 ## Verdict
 
@@ -116,7 +116,7 @@ Give each Codex task its own worktree so tasks do not share a working directory.
 
 ### Can I run Codex over SSH?
 
-Yes. The Codex CLI runs in any terminal, including a remote machine over SSH. Paradev can also run agents on your own remote hosts through remote access.
+Yes. The Codex CLI runs in any terminal, including a remote machine over SSH. Paradev can also run agents on your own remote hosts through Remote Access, or on your own Linux server with Bring Your Own Cloud.
 
 ### Does Codex run tasks in parallel?
 

@@ -2,7 +2,7 @@
 title: "Paradev vs OpenAI dots (2026): Agent Workspace vs Always-On ChatGPT Agents"
 description: "Compare Paradev and OpenAI's dots. A local-first workspace for running any coding agent in parallel Git worktrees vs always-on ChatGPT agents that each have their own cloud computer and hand coding to Codex."
 date: 2026-10-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - openai-dots
@@ -26,9 +26,9 @@ If you want GPT-6 Astra working on your code, you do not need a dot to get it: P
 
 | | **Paradev** | **OpenAI dots** |
 |---|---|---|
-| **What it does** | Runs multiple AI coding agents in parallel in separate Git worktrees, with chat, review, and browser | Always-on ChatGPT agents that take on work across your apps, run scheduled tasks, and start Codex tasks |
+| **What it does** | Runs multiple AI coding agents in parallel in separate Git worktrees, with review, a browser, and a chat interface | Always-on ChatGPT agents that take on work across your apps, run scheduled tasks, and start Codex tasks |
 | **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Cloud personal and work agents inside ChatGPT |
-| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a Paradev cloud workspace | Each dot's own OpenAI cloud computer; optionally one connected personal computer (off by default) |
+| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, your own Linux server (Bring Your Own Cloud), or a Paradev cloud workspace (beta) | Each dot's own OpenAI cloud computer; optionally one connected personal computer (off by default) |
 | **Agent and model choice** | Any CLI agent on your own subscription or keys (Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok Build, Muse Code, Amp, and more) | GPT-6 Astra; coding work goes to Codex |
 | **Focus** | Software engineering: worktrees, diffs, PRs, CI, dev servers | General work across apps, with coding through Codex |
 | **Isolation** | Git worktrees for local branch-based workspaces on your own repos | A cloud computer and browser per dot |
@@ -40,7 +40,7 @@ If you want GPT-6 Astra working on your code, you do not need a dot to get it: P
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, Amp, and any other CLI agent in separate Git worktrees and branches, with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, Amp, and any other CLI agent in separate Git worktrees and branches, with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat interface that shows a Codex, Claude Code, OpenCode, or Pi session as a chat, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on your own Linux server, [cloud workspaces](https://docs.paradev.com/cloud-workspaces) are in beta, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Open source under the MIT License, with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is OpenAI dots?
 
@@ -50,7 +50,7 @@ OpenAI describes dots as "remarkably capable, always-on agents built to handle e
 
 ### Where Agents Run
 
-Paradev's agents run on your laptop, your desktop, any macOS or Linux machine you add as a host, or a Paradev cloud workspace. On your own machines they work against your real services and dependencies. A dot works on its own OpenAI-hosted cloud computer, and reaches your machine only if you connect one personal computer. Paradev is a coding workspace you point at your repositories; dots are a general agent service inside ChatGPT.
+Paradev's agents run on your laptop, your desktop, any macOS or Linux machine you add as a host, a Linux server in your own cloud account, or a Paradev cloud workspace. On your own machines they work against your real services and dependencies. A dot works on its own OpenAI-hosted cloud computer, and reaches your machine only if you connect one personal computer. Paradev is a coding workspace you point at your repositories; dots are a general agent service inside ChatGPT.
 
 ### Engineering Loop vs Everything Else
 
@@ -104,7 +104,7 @@ Yes. Paradev runs the Codex CLI as a built-in agent, and its model picker includ
 
 ### Does a dot run on my computer?
 
-Not by default. Each dot works on its own OpenAI cloud computer. You can connect one personal computer so a dot can continue local Codex tasks there; that is off by default. Paradev runs agents on your own machine, on any macOS or Linux machine you add as a host through Remote Access, or in a cloud workspace.
+Not by default. Each dot works on its own OpenAI cloud computer. You can connect one personal computer so a dot can continue local Codex tasks there; that is off by default. Paradev runs agents on your own machine, on any macOS or Linux machine you add as a host through Remote Access, on your own Linux server with Bring Your Own Cloud, or in a cloud workspace.
 
 ### How much do dots cost?
 

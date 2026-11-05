@@ -2,7 +2,7 @@
 title: "Paradev vs AQ (2026): Desktop Agent Workspace vs Cloud Team Harness"
 description: "Compare Paradev and AQ for running coding agents: desktop vs browser, local vs cloud runners, team sessions, review, and pricing."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - aq
@@ -15,7 +15,7 @@ keywords:
   - cloud coding agents for teams
 ---
 
-Paradev and AQ both run real CLI coding agents, such as Claude Code and Codex, with one Git worktree per task. The difference is where they run and who is in the session. AQ is a browser app: agents run on a cloud VM (yours or one AQ manages), and teammates open the same live terminal through a link. Paradev is a desktop app: agents run on your machine, a remote host you add, or a Paradev cloud workspace, with diff review, pull requests, and a browser beside them. Choose AQ when your team wants shared live sessions on an always-on machine. Choose Paradev when you want a local-first desktop workspace with a full review path.
+Paradev and AQ both run real CLI coding agents, such as Claude Code and Codex, with one Git worktree per task. The difference is where they run and who is in the session. AQ is a browser app: agents run on a cloud VM (yours or one AQ manages), and teammates open the same live terminal through a link. Paradev is a desktop app: agents run on your machine, a remote host you add, a Linux server in your own cloud, or a Paradev cloud workspace, with diff review, pull requests, and a browser beside them. Choose AQ when your team wants shared live sessions on an always-on machine. Choose Paradev when you want a local-first desktop workspace with a full review path.
 
 This comparison is published by Paradev. AQ details were checked against [aq.dev](https://aq.dev), its [docs](https://aq.dev/docs), [workspaces page](https://aq.dev/docs/workspaces), and [pricing](https://aq.dev/pricing) on October 7, 2026. AQ also uses the domain agentqueue.dev, which redirects to aq.dev.
 
@@ -24,7 +24,7 @@ This comparison is published by Paradev. AQ details were checked against [aq.dev
 | Requirement | Paradev | AQ |
 |---|---|---|
 | Interface | Desktop app | Browser app |
-| Where agents run | Your machine, remote hosts you add through the relay (Pro), or cloud workspaces | A runner VM: in your own cloud (Team) or AQ-managed |
+| Where agents run | Your machine, remote hosts you add through the relay (Pro), your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | A runner VM: in your own cloud (Team) or AQ-managed |
 | Isolation | Git worktree and branch per workspace | Git worktree and branch per workspace, on the runner |
 | Platforms | macOS; experimental Linux; Windows unavailable | Any modern browser on macOS, Windows, Linux, or a phone |
 | Agents | Any CLI agent, plus custom agents you add | Claude Code, Codex, Cursor Agent, Kimi, Grok, Antigravity CLI, and others, plus its own AQ Composer agent |
@@ -33,7 +33,7 @@ This comparison is published by Paradev. AQ details were checked against [aq.dev
 | Phone | iPhone and iPad app (iOS or iPadOS 26+, Pro) with Lock Screen Live Activity | Same workspace in a mobile browser |
 | Intake | Linear, GitHub, and Slack integrations (Pro) | Linear `ai-task` label creates a workspace; API, webhooks, MCP |
 | Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free solo sandbox; Team $50/user/month early access |
-| License | Source-available, Elastic License 2.0 | Proprietary |
+| License | Open source, MIT | Proprietary |
 
 ## What Is AQ?
 
@@ -43,7 +43,7 @@ AQ calls itself "the multiplayer coding harness." Its headline is "Run every cod
 
 This is the main split. AQ runs every session on a runner VM. On the Free plan that is a private AQ-managed sandbox that sleeps when idle. On Team it is either a VM you connect from your own cloud account or a dedicated AQ machine that never sleeps. Agents keep working when your laptop closes, and nothing runs on your laptop.
 
-Paradev is local-first. Agents run on your Mac or Linux machine by default, next to your editor and local tools. To keep work going away from your desk, add another machine as a host through the Paradev relay, and run workspaces there from the desktop or iPhone and iPad app (Pro). Paradev also has cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. If you want the runner VM in your own cloud account, AQ offers that and Paradev does not.
+Paradev is local-first. Agents run on your Mac or Linux machine by default, next to your editor and local tools. To keep work going away from your desk, add another machine as a host through the Paradev relay, and run workspaces there from the desktop or iPhone and iPad app (Pro). Paradev also has [cloud workspaces](/cloud) (beta), which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. To keep agents in your own cloud account, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server there. Repos and agent sign-ins stay on that server, and it needs no inbound ports.
 
 ## Can teammates join the same agent session?
 
@@ -81,11 +81,11 @@ Paradev Pro adds remote hosts, automations, the iPhone and iPad app, and the Git
 - You want agents on your own machine, next to your local tools, with no VM to run.
 - You review through diffs, commits, and pull requests, with checks and review threads in the same app.
 - You want a native iPhone and iPad app with a Lock Screen Live Activity.
-- You want scheduled automations with run history, any CLI agent, or source you can read under Elastic License 2.0.
+- You want scheduled automations with run history, any CLI agent, or open source under the MIT License.
 
 ## Verdict
 
-AQ is a cloud-first, multiplayer tool: one shared session on a VM, reached from any browser. Paradev is a local-first desktop workspace: one workspace per task on your machine, your hosts, or a cloud workspace, with review and merge in the app. Teams that pair on agent runs or want a runner in their own cloud account should try AQ. Developers who want a fast local loop and pull request review should try Paradev. Running the same task in both is the quickest test.
+AQ is a cloud-first, multiplayer tool: one shared session on a VM, reached from any browser. Paradev is a local-first desktop workspace: one workspace per task on your machine, your hosts, your own cloud server, or a cloud workspace, with review and merge in the app. Teams that pair on agent runs in one live shared session should try AQ. Developers who want a fast local loop and pull request review should try Paradev. Running the same task in both is the quickest test.
 
 ## Frequently Asked Questions
 
@@ -99,11 +99,11 @@ It depends on what "team" means. For live shared sessions on a cloud VM, AQ fits
 
 ### Does AQ use Git worktrees?
 
-Yes. Each AQ workspace is a Git worktree on its own branch, on the runner VM. Paradev also uses one worktree per workspace, on your machine or a host you add.
+Yes. Each AQ workspace is a Git worktree on its own branch, on the runner VM. Paradev also uses one worktree per workspace, on your machine, a host you add, or your own cloud server.
 
 ### Is AQ open source?
 
-AQ does not describe itself as open source; its site states all rights reserved. Paradev is source-available under Elastic License 2.0, which is not OSI open source.
+AQ does not describe itself as open source; its site states all rights reserved. Paradev is open source under the MIT License, an OSI-approved license.
 
 ### Does either tool charge for model usage?
 

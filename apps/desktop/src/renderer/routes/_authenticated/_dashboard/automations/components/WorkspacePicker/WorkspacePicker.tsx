@@ -10,10 +10,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
 import { useMemo, useState } from "react";
 import { HiCheck } from "react-icons/hi2";
-import { LuGitBranch, LuPlus, LuTriangleAlert } from "react-icons/lu";
+import { LuGitBranch, LuPlus, LuRepeat, LuTriangleAlert } from "react-icons/lu";
 import { PickerTrigger } from "renderer/components/PickerTrigger";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { RunWorkspaceItems } from "../RunWorkspaceItems";
 
 interface WorkspacePickerProps {
 	hostId: string | null;
@@ -25,7 +26,9 @@ interface WorkspacePickerProps {
 	 */
 	projectId: string | null | undefined;
 	value: string | null;
-	onChange: (workspaceId: string | null) => void;
+	/** Runs keep the first workspace they make; `value` is that one once made. */
+	reuse: boolean;
+	onChange: (next: { workspaceId: string | null; reuse: boolean }) => void;
 	className?: string;
 	disabled?: boolean;
 }
@@ -34,6 +37,7 @@ export function WorkspacePicker({
 	hostId,
 	projectId,
 	value,
+	reuse,
 	onChange,
 	className,
 	disabled,
@@ -73,6 +77,7 @@ export function WorkspacePicker({
 		? (workspaceRows.find((w) => w.id === value) ?? null)
 		: null;
 	const offScope =
+		!reuse &&
 		!!selected &&
 		(selected.hostId !== hostId || selected.projectId !== projectId);
 	const offScopeHostName = offScope
@@ -83,28 +88,36 @@ export function WorkspacePicker({
 		: null;
 	// A pinned value we can't resolve yet (live query still hydrating) is loading,
 	// not an empty "New workspace" selection — don't flash the wrong label/warning.
-	const resolving = !!value && !selected && !isReady;
+	const resolving = !reuse && !!value && !selected && !isReady;
 	// Pinned to a workspace no host list resolves — deleted, or an unreachable
 	// host with no cached snapshot. Never render this as "New workspace": that
 	// hides the broken pin while dispatch keeps failing.
-	const missing = !!value && !selected && isReady;
-	const label = selected
-		? selected.name
-		: resolving
-			? t({
-					message: "Loading…",
-				})
-			: missing
+	const missing = !reuse && !!value && !selected && isReady;
+	const label = reuse
+		? projectId === null
+			? t({ message: "Same session" })
+			: t({ message: "Same workspace" })
+		: selected
+			? selected.name
+			: resolving
 				? t({
-						message: "Workspace not found",
+						message: "Loading…",
 					})
-				: projectId === null
+				: missing
 					? t({
-							message: "New session",
+							message: "Workspace not found",
 						})
-					: t({
-							message: "New workspace",
-						});
+					: projectId === null
+						? t({
+								message: "New session",
+							})
+						: t({
+								message: "New workspace",
+							});
+	const pick = (next: { workspaceId: string | null; reuse: boolean }) => {
+		onChange(next);
+		setOpen(false);
+	};
 
 	return (
 		// Guard the open state, not just the trigger: Radix opens on pointerdown,
@@ -117,6 +130,8 @@ export function WorkspacePicker({
 					icon={
 						offScope || missing ? (
 							<LuTriangleAlert className="size-4 shrink-0" />
+						) : reuse ? (
+							<LuRepeat className="size-4 shrink-0" />
 						) : selected || resolving ? (
 							<LuGitBranch className="size-4 shrink-0" />
 						) : (
@@ -140,25 +155,14 @@ export function WorkspacePicker({
 					/>
 					<CommandList>
 						<CommandGroup>
-							<CommandItem
-								value="__new__"
-								onSelect={() => {
-									onChange(null);
-									setOpen(false);
-								}}
-							>
-								<LuPlus className="size-4" />
-								<span>
-									{projectId === null ? (
-										<Trans>New session</Trans>
-									) : (
-										<Trans>New workspace</Trans>
-									)}
-								</span>
-								{!selected && !resolving && !missing && (
-									<HiCheck className="ml-auto size-4" />
-								)}
-							</CommandItem>
+							<RunWorkspaceItems
+								sessions={projectId === null}
+								mode={reuse ? "same" : value ? "picked" : "new"}
+								keptName={reuse ? (selected?.name ?? null) : null}
+								onSelect={(mode) =>
+									pick({ workspaceId: null, reuse: mode === "same" })
+								}
+							/>
 							{missing && (
 								<CommandItem
 									value="__deleted__"
@@ -198,14 +202,13 @@ export function WorkspacePicker({
 								<CommandItem
 									key={workspace.id}
 									value={workspace.name}
-									onSelect={() => {
-										onChange(workspace.id);
-										setOpen(false);
-									}}
+									onSelect={() =>
+										pick({ workspaceId: workspace.id, reuse: false })
+									}
 								>
 									<LuGitBranch className="size-4" />
 									<span className="truncate">{workspace.name}</span>
-									{workspace.id === selected?.id && (
+									{!reuse && workspace.id === selected?.id && (
 										<HiCheck className="ml-auto size-4" />
 									)}
 								</CommandItem>

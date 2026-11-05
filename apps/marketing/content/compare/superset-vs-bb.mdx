@@ -2,7 +2,7 @@
 title: "Paradev vs bb (2026): Agent Workspace vs the IDE That Builds Itself"
 description: "Compare Paradev and bb for orchestrating AI coding agents. See how a full agent workspace differs from bb's self-extending, thread-based agentic IDE."
 date: 2026-08-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - bb
@@ -43,21 +43,21 @@ Git worktrees separate working files; they do not sandbox processes or guarantee
 
 | | **Paradev** | **bb** |
 |---|---|---|
-| **What it does** | Runs AI agents in parallel in separate Git worktrees, with chat, review, and browser | Orchestrates coding agents in live threads you can follow, steer, or hand off |
+| **What it does** | Runs AI agents in parallel in separate Git worktrees, with review, a browser, and a chat interface | Orchestrates coding agents in live threads you can follow, steer, or hand off |
 | **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Self-extending agentic IDE ("the IDE that builds itself") |
 | **Core unit** | Workspace (worktree + terminals + review) | Thread (agent run in an environment, optionally a worktree) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code, Codex, Cursor, Pi, OpenCode, Grok, omp, Hermes, plus any ACP agent |
 | **Isolation** | Git worktree for new local branch-based workspaces | Optional Git worktree per environment |
 | **Surfaces** | Desktop app, iPhone and iPad app, CLI, MCP server, TypeScript SDK | Desktop app, web app, CLI, HTTP API |
-| **Remote / cloud** | Remote Access to machines you own, plus cloud workspaces | bb Connect tunnel + multi-machine enrollment |
+| **Remote / cloud** | Remote Access to machines you own, Bring Your Own Cloud on your own Linux server, and cloud workspaces (beta) | bb Connect tunnel + multi-machine enrollment |
 | **Automation** | Scheduled agent sessions, TypeScript SDK, and MCP tools | Automations and extensible workflows |
-| **License** | Source-available (ELv2) | Open source (MIT) |
+| **License** | Open source (MIT) | Open source (MIT) |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a [chat interface](https://docs.paradev.com/chat) that runs Claude Code, Codex, OpenCode, and Pi over ACP, an in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access, on a Linux server in your own cloud account through [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](/cloud) (beta), and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Open source under the MIT License.
 
 Paradev desktop supports macOS and experimental Linux; Windows is not available. Its iPhone and iPad app requires iOS 26 or iPadOS 26 or later, Pro, and either a reachable host or a cloud workspace. See [platform and plan requirements](/pricing) and [remote access setup](https://docs.paradev.com/remote-access).
 
@@ -81,7 +81,7 @@ bb exposes CLI and API access for operating the environment. Paradev exposes a C
 
 ### Licensing and Support Requirements
 
-Paradev offers free and paid plans and uses Elastic License 2.0; bb uses MIT. Check the current [Paradev plans](/pricing) and bb’s published support arrangements against your requirements.
+Paradev offers free and paid plans; both Paradev and bb use the MIT License. Check the current [Paradev plans](/pricing) and bb’s published support arrangements against your requirements.
 
 ---
 
@@ -102,12 +102,12 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 **Choose bb if you:**
 
-- Want an MIT-licensed, free, self-extending IDE you can mold with plugins
+- Want a free, self-extending IDE you can mold with plugins
 - Like a thread model where agents spawn, steer, and hand off other agents in one view, rather than Paradev's orchestrate skill and session handoff across workspaces
 - Want desktop, web, CLI, and API access
 - Enjoy building your own workflow tooling with the agent's help
 
-**Verdict:** Choose Paradev if you want a task workspace around your CLI agents, with terminal context and patch review together. Try bb if its thread model, MIT license, and extensible interfaces fit your workflow. [Download Paradev](/download) and try a task with the CLI agent you already use, then inspect its diff and preview in the workspace.
+**Verdict:** Choose Paradev if you want a task workspace around your CLI agents, with terminal context and patch review together. Try bb if its thread model and extensible interfaces fit your workflow. [Download Paradev](/download) and try a task with the CLI agent you already use, then inspect its diff and preview in the workspace.
 
 ---
 
@@ -119,7 +119,7 @@ Yes. For Paradev, a new local branch-based workspace uses a worktree. bb support
 
 ### Is bb open source?
 
-Yes. bb is MIT licensed end to end and free to use. Paradev is source-available under the Elastic License 2.0, with a free tier and paid Pro.
+Yes. bb is MIT licensed end to end and free to use. Paradev is open source under the MIT License, with a free tier and paid Pro.
 
 ### Which agents does each support?
 
@@ -127,4 +127,4 @@ Both are agent-agnostic. Paradev runs Claude Code, Codex, OpenCode, Cursor, Copi
 
 ### Can either run agents on another machine?
 
-Yes. Paradev supports connected hosts; see [remote access setup](https://docs.paradev.com/remote-access) for plan and online-host requirements. bb’s [repository](https://github.com/get-bb/bb) documents remote access options. Compare where execution happens and how the client connects before choosing.
+Yes. Paradev supports connected hosts, including a Linux server in your own cloud account through [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud); see [remote access setup](https://docs.paradev.com/remote-access) for plan and online-host requirements. bb’s [repository](https://github.com/get-bb/bb) documents remote access options. Compare where execution happens and how the client connects before choosing.

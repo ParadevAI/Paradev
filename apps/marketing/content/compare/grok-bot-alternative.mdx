@@ -1,8 +1,8 @@
 ---
 title: "Best Grok Bot Alternatives in 2026"
-description: "The best alternatives to xAI's Grok Bot for always-on AI agents, including Paradev, Grok Build, Paseo, Herdr, and Conductor, from local-first workspaces to cloud sandboxes."
+description: "The best alternatives to xAI's Grok Bot for always-on AI agents, including Paradev, Grok Build, Paseo, and Herdr, from local-first workspaces to cloud sandboxes."
 date: 2026-09-11
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - grok-bot
@@ -34,11 +34,11 @@ One note before the list: Grok Bot is not xAI's coding agent. That is Grok Build
 
 | Alternative | Best for | Where agents run | License |
 |---|---|---|---|
-| **Paradev** | Any coding agent in parallel worktrees, with automations and Remote Access | Your machine, any host you add, or a cloud workspace | Source-available (ELv2) |
+| **Paradev** | Any coding agent in parallel worktrees, with automations and Remote Access | Your machine, any host you add, your own Linux server (BYOC), or a cloud workspace (beta) | Open source (MIT) |
 | **Grok Build** | xAI's own coding agent, in your terminal | Your machine | Open source (Apache-2.0) |
 | **Paseo** | Self-hosted daemon you drive from a native mobile app | Your machine or server | Open source (Apache-2.0) |
 | **Herdr** | Terminal runtime that keeps agents alive through disconnects | Your machine, a rented box, or Vercel Sandbox | Open source (Apache-2.0) |
-| **Conductor** | Polished Mac app with managed cloud workspaces | Your Mac, or Conductor Cloud on Pro | Proprietary |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Your Mac; Conductor Cloud shuts down November 20, 2026 | Proprietary |
 
 ## Why Look for a Grok Bot Alternative?
 
@@ -48,7 +48,7 @@ Grok Bot's design decisions are the reasons to look elsewhere. Agents run exclus
 
 ### Paradev
 
-Paradev is a local-first workspace that runs Claude Code, Codex, Grok Build, Cursor Agent, OpenCode, Gemini CLI, and any other CLI agent in parallel on machines you own or in cloud workspaces, using your own subscriptions. The always-on part comes from cloud workspaces, which run without keeping your own computer connected, from Remote Access, which adds any machine as a host so workspaces keep running when your laptop sleeps, and from scheduled automations that run agent sessions on a device you choose, with a CLI, a TypeScript SDK, an MCP server, and a Slack bot for dispatch. The engineering loop is built in: a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, and an in-app browser with Design Mode. Free tier, Pro at {{price:pro}} per user per month, Team ({{price:team}}) and Ultra ({{price:ultra}}) with cloud workspaces, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first workspace that runs Claude Code, Codex, Grok Build, Cursor Agent, OpenCode, Gemini CLI, and any other CLI agent in parallel on machines you own or in cloud workspaces, using your own subscriptions. The always-on part comes from [cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta), which run without keeping your own computer connected, from [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), which runs the Paradev host on a Linux server in your own cloud account, from Remote Access, which adds any machine as a host so workspaces keep running when your laptop sleeps, and from scheduled automations that run agent sessions on a device you choose, with a CLI, a TypeScript SDK, an MCP server, and a Slack bot for dispatch. The engineering loop is built in: a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, and an in-app browser with Design Mode. Free tier, Pro at {{price:pro}} per user per month, Team ({{price:team}}) and Ultra ({{price:ultra}}) with cloud workspaces, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 For the direct comparison, see [Paradev vs Grok Bot](/compare/superset-vs-grok-bot).
 
@@ -70,7 +70,9 @@ See [Paradev vs Herdr](/compare/superset-vs-herdr).
 
 ### Conductor
 
-Conductor is a proprietary macOS app for Claude Code, Codex, Cursor, and OpenCode with named agent teams and four coordination patterns. Its Pro plan at $50 per month adds Conductor Cloud, managed Linux sandboxes where sessions run off your machine, which is another managed-cloud option among engineering tools, while keeping local workspaces free.
+Conductor is a proprietary macOS app for Claude Code, Codex, Cursor, and OpenCode with named agent teams and four coordination patterns. Its Pro plan added Conductor Cloud, managed Linux sandboxes where sessions run off your machine.
+
+Conductor announced on November 4, 2026 that it is joining Meta. It no longer accepts new sign-ups or downloads. Conductor Cloud goes read-only on November 13 and shuts down on November 20, 2026. The Mac app gets new models and critical fixes until early 2027. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -80,7 +82,7 @@ See [Paradev vs Conductor](/compare/superset-vs-conductor).
 - For Grok itself on your code, open source and in your terminal, choose **Grok Build**, on its own or inside Paradev.
 - For a self-hosted daemon with native mobile apps, choose **Paseo**.
 - For a terminal runtime that keeps agents alive anywhere you can SSH, choose **Herdr**.
-- For a polished Mac app with optional managed cloud sandboxes, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 
 ## Verdict
 
@@ -98,8 +100,8 @@ No. Grok Bot is a beta of always-on computer-use teammates on Cursor-hosted clou
 
 ### Are there open-source Grok Bot alternatives?
 
-Grok Build, Paseo, and Herdr are Apache-2.0. Paradev is source-available under ELv2 with a free tier. Conductor is proprietary.
+Grok Build, Paseo, and Herdr are Apache-2.0. Paradev is open source under the MIT License with a free tier. Conductor is proprietary.
 
 ### Which alternatives keep agents running when my laptop is closed?
 
-Paradev through cloud workspaces, Remote Access hosts, and scheduled automations, Paseo through its self-hosted daemon, Herdr through its server-owned terminals, and Conductor through Conductor Cloud on its Pro plan. Grok Bot does it through a persistent cloud VM per user that you do not control.
+Paradev through cloud workspaces, Remote Access hosts, and scheduled automations, Paseo through its self-hosted daemon, and Herdr through its server-owned terminals. Conductor Cloud also did this, but it shuts down on November 20, 2026. Grok Bot does it through a persistent cloud VM per user that you do not control.

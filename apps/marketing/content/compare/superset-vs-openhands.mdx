@@ -2,7 +2,7 @@
 title: "Paradev vs OpenHands (2026): Local Worktrees vs Sandboxed Agent"
 description: "Compare Paradev and OpenHands for AI coding. See how a local-first workspace running CLI agents in Git worktrees differs from a sandboxed autonomous software engineer."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - openhands
@@ -24,7 +24,7 @@ OpenHands (formerly OpenDevin) is an open-source platform for autonomous AI soft
 |---|---|---|
 | **Category** | Agent orchestration workspace | Autonomous agent platform |
 | **Execution** | Git worktrees on your machine or other machines you own (Remote Access); cloud workspaces | Sandboxed runtime (Docker) or OpenHands Cloud |
-| **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, Paradev Chat, any CLI agent | Model-agnostic agent framework (via LiteLLM) |
+| **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, any CLI agent | Model-agnostic agent framework (via LiteLLM) |
 | **Parallelism** | Core feature: multiple agents across separate worktrees | Multiple sessions, typically one sandbox per task |
 | **Interface** | Desktop app: terminals, diff/file editor, chat, in-app browser | Web UI / CLI over a sandboxed agent |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Open source (MIT) to self-host; Cloud is usage-based |
@@ -33,7 +33,7 @@ OpenHands (formerly OpenDevin) is an open-source platform for autonomous AI soft
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. Remote Access (Pro) lets agents keep running on other macOS or Linux machines you own, and an iPhone/iPad app lets you check on them. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. Remote Access (Pro) lets agents keep running on other macOS or Linux machines you own, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs them on a Linux server in your own cloud account, [cloud workspaces](/cloud) (beta) run them in a sandbox that Paradev runs for you, and an iPhone/iPad app lets you check on them. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Open source under the MIT License.
 
 ---
 
@@ -59,7 +59,7 @@ OpenHands centers on the agent's task loop with a web or CLI view. Paradev cente
 
 ### Privacy
 
-By default Paradev keeps code in Git worktrees on machines you own (your laptop, or a remote host via Remote Access), with cloud workspaces as an option, and it is source-available. OpenHands can be fully self-hosted (MIT) for local control, or run via OpenHands Cloud, where execution happens on hosted infrastructure. Both give you a local-control option; the default execution model differs.
+By default Paradev keeps code in Git worktrees on machines you own (your laptop, a remote host via Remote Access, or your own Linux server via Bring Your Own Cloud), with cloud workspaces (beta) as an option, and it is open source (MIT). OpenHands can be fully self-hosted (MIT) for local control, or run via OpenHands Cloud, where execution happens on hosted infrastructure. Both give you a local-control option; the default execution model differs.
 
 ---
 
@@ -101,4 +101,4 @@ Not for local work. Local workspaces run agents directly in separate Git worktre
 
 ### Can I self-host either tool?
 
-OpenHands is open source (MIT) and designed to be self-hosted, with a managed cloud option. Paradev is a source-available (ELv2) local-first desktop app: it runs on your machine and on any remote hosts you add, plus cloud workspaces, with a free tier and paid plans from {{price:pro}}/seat/month. Cloud workspaces are on the Team and Ultra plans.
+OpenHands is open source (MIT) and designed to be self-hosted, with a managed cloud option. Paradev is an open-source (MIT) local-first desktop app: it runs on your machine and on any remote hosts you add, plus cloud workspaces, with a free tier and paid plans from {{price:pro}}/seat/month. Cloud workspaces are on the Team and Ultra plans.

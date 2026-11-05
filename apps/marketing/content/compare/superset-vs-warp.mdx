@@ -2,7 +2,7 @@
 title: "Paradev vs Warp (2026): Agent Orchestration vs AI-Powered Terminal"
 description: "Compare Paradev and Warp for AI-enhanced development workflows. See how multi-agent orchestration differs from an AI-powered terminal experience."
 date: 2026-02-02
-lastUpdated: 2026-10-07
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - warp
@@ -23,17 +23,17 @@ Paradev and Warp both help developers work with AI around the command line, but 
 | | **Paradev** | **Warp** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI-powered terminal emulator |
-| **What it does** | Runs multiple AI coding agents in parallel with Git worktrees, chat, diff/file review, and browser tooling | Modern terminal with built-in AI agents, code editing, and collaboration |
-| **AI approach** | Agent-agnostic: works with Claude Code, Codex, Aider, Paradev Chat, or any CLI agent | Built-in agents (OpenAI, Anthropic, Google); supports BYOK and third-party CLI agents |
+| **What it does** | Runs multiple AI coding agents in parallel with Git worktrees, diff/file review, browser tooling, and a chat interface | Modern terminal with built-in AI agents, code editing, and collaboration |
+| **AI approach** | Agent-agnostic: works with Claude Code, Codex, Aider, OpenCode, or any CLI agent | Built-in agents (OpenAI, Anthropic, Google); supports BYOK and third-party CLI agents |
 | **Parallelism** | Core feature: new local branch-based workspaces get separate worktrees and branches | Agents run in terminal panes; Oz cloud orchestrator for background agents |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free; Build $20/mo, Max $200/mo, Business $50/seat |
-| **License** | Source-available (ELv2) | Open source (AGPL-3.0) |
+| **License** | Open source (MIT) | Open source (AGPL-3.0) |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. New local branch-based workspaces give tasks separate Git worktrees and branches with terminals for your agents. Size concurrent workloads to your host resources and provider limits. Around that core, Paradev adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. Paradev ships no required model layer: you can bring Claude Code, Codex, Aider, OpenCode, or other agents, and you can review inside Paradev or jump into your editor of choice. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. New local branch-based workspaces give tasks separate Git worktrees and branches with terminals for your agents. Size concurrent workloads to your host resources and provider limits. Around that core, Paradev adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. Paradev ships no required model layer: you can bring Claude Code, Codex, Aider, OpenCode, or other agents, and you can review inside Paradev or jump into your editor of choice. Open source under the MIT License.
 
 ---
 
@@ -47,7 +47,7 @@ Warp is a Rust-based, GPU-accelerated terminal that evolved into an agentic deve
 
 ### Built-In Agents vs Bring-Your-Own
 
-Warp ships its own agents: type a prompt, get results, no external tools to install. Paradev is more bring-your-own by default: you install Claude Code, Codex, Aider, or another agent, and Paradev runs them in parallel. Warp is more convenient out of the box; Paradev gives you complete freedom over which agent, model, and provider you use, while still adding its own chat and workspace tooling around them.
+Warp ships its own agents: type a prompt, get results, no external tools to install. Paradev is more bring-your-own by default: you install Claude Code, Codex, Aider, or another agent, and Paradev runs them in parallel. Warp is more convenient out of the box; Paradev gives you complete freedom over which agent, model, and provider you use, while still adding its own workspace tooling around them, including a chat interface that runs your installed CLI over ACP.
 
 ### Parallelism and Isolation
 
@@ -82,7 +82,7 @@ Warp's terminal features are free, and the app is now open source. AI features c
 **Choose Paradev if you:**
 - Run many coding agents in parallel and need a separate Git worktree and branch for each
 - Want full control over which agent and model you use, with no lock-in
-- Require source-available tooling with local Git worktrees
+- Require open-source tooling with local Git worktrees
 - Already have a terminal you like and need an orchestration layer on top
 
 These tools complement each other. Use Warp as your daily terminal and Paradev for parallel agent orchestration across worktrees.
@@ -93,7 +93,7 @@ These tools complement each other. Use Warp as your daily terminal and Paradev f
 
 ### Is Paradev a replacement for Warp?
 
-No. Paradev is not your general daily-driver terminal. It now includes chat, browser, and diff/file review for agent workflows, but it is still specialized around orchestrating coding agents in parallel. You can use both: Warp for daily terminal work, Paradev for parallel agent workflows.
+No. Paradev is not your general daily-driver terminal. It now includes a chat interface, a browser, and diff/file review for agent workflows, but it is still specialized around orchestrating coding agents in parallel. You can use both: Warp for daily terminal work, Paradev for parallel agent workflows.
 
 ### Does Warp isolate agents with Git worktrees?
 

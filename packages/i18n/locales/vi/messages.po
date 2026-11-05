@@ -1064,6 +1064,12 @@ msgstr "Chủ đề {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Quyền {label} với {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có gì thay đổi bên trong không gian làm việc: script của bạn và phiên đăng nhập nó duy trì vẫn còn cho đến khi bạn xóa chúng."
+
+msgid "{label} is set to manual"
+msgstr "{label} đã chuyển sang đăng nhập thủ công"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1231,14 +1237,14 @@ msgstr "{price} mỗi người/tháng, {gbHours} GB-giờ đám mây cho mỗi n
 msgid "{price}/user/mo"
 msgstr "{price}/người/tháng"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (trước đây là {formerName}, YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (trước đây là {formerName}, YC P26) là IDE mã nguồn mở cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (trước đây là {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "{productName} (YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) là IDE mã nguồn mở cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
 
 msgid "{productName} for press"
 msgstr "{productName} dành cho báo chí"
@@ -1512,6 +1518,9 @@ msgstr "<0>{who}</0> đã bày tỏ cảm xúc {shortcode}"
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>trên {1} trong bảng xếp hạng</1>"
 
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> hoặc một <1>apiKeyHelper</1>"
+
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Sắp có trên</0><1>Google Play</1>"
 
@@ -1626,6 +1635,9 @@ msgstr "3 workspace đã lưu trữ"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3 tệp thay đổi, 2 test đã qua"
+
+msgid "3 running"
+msgstr "3 đang chạy"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3+ luồng công việc đồng thời trên mỗi kỹ sư"
@@ -2292,6 +2304,9 @@ msgstr "Phiên agent đã bắt đầu"
 msgid "agent settings"
 msgstr "cài đặt agent"
 
+msgid "Agent settings"
+msgstr "Cài đặt agent"
+
 msgid "Agent usage rankings"
 msgstr "Xếp hạng mức dùng agent"
 
@@ -2308,6 +2323,9 @@ msgstr "Agent không thể truy cập các công cụ của {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính, iPhone hoặc iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agent tự mở bản xem trước, thao tác giao diện và đính kèm ảnh chụp làm bằng chứng trước khi đánh dấu sẵn sàng review."
 
@@ -2322,6 +2340,12 @@ msgstr "Agent ghi nhớ những gì chúng học được về codebase của b�
 
 msgid "Agents running at once"
 msgstr "Số agent chạy cùng lúc"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Agent chỉ thấy một giá trị giữ chỗ. Paradev thêm thông tin đăng nhập của bạn vào các yêu cầu gửi đi."
+
+msgid "Agents that run while you're away"
+msgstr "Agent chạy khi bạn vắng mặt"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agent dùng tài khoản này khi gọi các công cụ Linear."
@@ -2637,6 +2661,9 @@ msgstr "Agent viết nguyên hàm và nguyên tệp trong khi con người theo 
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Tự động hóa chỉ có thể dùng workspace cloud do bạn tạo"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Một môi trường chứa các kho mã, biến và vùng của bạn. Khởi tạo bao nhiêu không gian làm việc từ đó tùy bạn."
 
 msgid "An error occurred"
 msgstr "Đã xảy ra lỗi"
@@ -3093,9 +3120,6 @@ msgstr "Đính kèm vào cuộc trò chuyện"
 msgid "Attached"
 msgstr "Đã gắn"
 
-msgid "Attaching to the running session…"
-msgstr "Đang kết nối tới phiên đang chạy…"
-
 msgid "attachment"
 msgstr "tệp đính kèm"
 
@@ -3411,9 +3435,6 @@ msgstr "dựa trên PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Dựa trên {0} token trong 30 ngày qua, tính cả {1}."
 
-msgid "Become a design partner"
-msgstr "Trở thành đối tác đồng phát triển"
-
 msgid "Before"
 msgstr "Trước"
 
@@ -3601,9 +3622,6 @@ msgstr "Đưa {companyName} đến với đội của bạn. Liên hệ với ch
 msgid "Bring a link to something you built recently."
 msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần đây."
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Đưa Claude Code, Codex, OpenCode hoặc bất kỳ agent lập trình nào vào một workspace. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
-
 msgid "Bring in an agent"
 msgstr "Chọn một agent"
 
@@ -3672,9 +3690,6 @@ msgstr "Báo cáo lỗi"
 
 msgid "Build in public"
 msgstr "Xây dựng công khai"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Xây dựng tương lai của Paradev trên đám mây"
 
 msgid "Build your own"
 msgstr "Tự tạo plugin"
@@ -4093,6 +4108,9 @@ msgstr "Đã đóng cuộc trò chuyện"
 msgid "Chat history"
 msgstr "Lịch sử trò chuyện"
 
+msgid "Chat interface"
+msgstr "Giao diện chat"
+
 msgid "Chat is being reworked"
 msgstr "Chat đang được làm lại"
 
@@ -4285,6 +4303,9 @@ msgstr "Chọn nơi mở tác nhân được khởi chạy từ bình luận, ch
 
 msgid "Choose your default skin tone"
 msgstr "Chọn màu da mặc định"
+
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Chọn mục này sẽ xóa mọi thông tin xác thực đã lưu ở đây cho {label}."
 
 msgid "CI failed"
 msgstr "CI thất bại"
@@ -4613,6 +4634,9 @@ msgstr "Đóng workspace"
 msgid "Close Workspace"
 msgstr "Đóng workspace"
 
+msgid "Close your laptop"
+msgstr "Gập laptop lại"
+
 msgid "Closed"
 msgstr "Đã đóng"
 
@@ -4635,6 +4659,9 @@ msgstr "Đóng terminal này sẽ kết thúc tiến trình đang chạy."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud · us-east"
+msgstr "Cloud · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Thiết lập environment đám mây"
 
@@ -4646,9 +4673,6 @@ msgstr "Environment đám mây lấy các repository của bạn từ GitHub. H�
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-giờ đám mây cho mỗi người dùng mỗi tháng"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "Phiên bản đám mây sắp ra mắt. Trở thành đối tác đồng phát triển"
 
 msgid "Cloud sandboxes"
 msgstr "Sandbox trên cloud"
@@ -4754,9 +4778,6 @@ msgstr "Ghép các chuỗi như => và !==."
 
 msgid "Come build it with us."
 msgstr "Hãy cùng chúng tôi tạo ra nó."
-
-msgid "Coming soon"
-msgstr "Sắp có"
 
 msgid "Coming Soon"
 msgstr "Sắp có"
@@ -5240,14 +5261,15 @@ msgstr "Cửa sổ ngữ cảnh: đã dùng {percent}"
 msgid "Continue"
 msgstr "Tiếp tục"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Tiếp tục"
+
 msgid "Continue in your browser"
 msgstr "Tiếp tục trong trình duyệt"
 
 msgid "Continue or fork session"
 msgstr "Tiếp tục hoặc fork phiên"
-
-msgid "Continue the session the last run left"
-msgstr "Tiếp tục phiên mà lần chạy trước để lại"
 
 msgid "Continue this chat on another login"
 msgstr "Tiếp tục cuộc trò chuyện này với tài khoản khác"
@@ -5280,9 +5302,6 @@ msgstr "Tiếp tục với Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Để tiếp tục phiên agent, cần ghim một workspace"
-
-msgid "continuing the last session"
-msgstr "tiếp tục phiên gần nhất"
 
 msgid "Continuing…"
 msgstr "Đang tiếp tục…"
@@ -5746,6 +5765,9 @@ msgstr "Không thể tiếp tục"
 msgid "Could not resume the chat"
 msgstr "Không thể tiếp tục cuộc trò chuyện"
 
+msgid "Could not save the change."
+msgstr "Không thể lưu thay đổi."
+
 msgid "Could not send"
 msgstr "Không thể gửi"
 
@@ -5815,6 +5837,9 @@ msgstr "Không xác minh được thông tin đăng nhập: {reason}"
 
 msgid "Couldn't add them to the channel"
 msgstr "Không thể thêm họ vào kênh"
+
+msgid "Couldn't add this repo"
+msgstr "Không thể thêm repo này"
 
 msgid "Couldn't ask the workspace for a description"
 msgstr "Không thể yêu cầu không gian làm việc tạo mô tả"
@@ -5890,6 +5915,9 @@ msgstr "Không thể fork sang chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Không thể giao việc này cho agent"
+
+msgid "Couldn't import"
+msgstr "Không thể nhập"
 
 msgid "Couldn't load {filename}"
 msgstr "Không thể tải {filename}"
@@ -6018,6 +6046,9 @@ msgstr "Không thể lưu Dev"
 
 msgid "Couldn't save the routine"
 msgstr "Không thể lưu quy trình"
+
+msgid "Couldn't save your choice. Try again."
+msgstr "Không thể lưu lựa chọn của bạn. Hãy thử lại."
 
 msgid "Couldn't send comment"
 msgstr "Không thể gửi bình luận"
@@ -7442,6 +7473,12 @@ msgstr "Mỗi lệnh một tab mới"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Mỗi sáng lúc 8h, xem các lần chạy CI thất bại hôm qua, chẩn đoán lỗi phổ biến nhất và mở một PR sửa lỗi."
 
+msgid "Each run makes its own"
+msgstr "Mỗi lần chạy tạo riêng"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Mỗi lần chạy bắt đầu một cuộc trò chuyện mới với agent"
+
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Mỗi người dùng thêm số giờ của gói mình vào một quỹ chung cho cả nhóm:"
 
@@ -7453,6 +7490,9 @@ msgstr "Mỗi bề mặt có kiểu chữ riêng. Thay đổi hiện ra ngay tro
 
 msgid "Each task on its own branch"
 msgstr "Mỗi tác vụ trên nhánh riêng"
+
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Mỗi không gian làm việc có một máy đám mây riêng và vẫn làm việc khi laptop của bạn đã gập. Theo dõi từ máy tính, iPhone hoặc iPad."
 
 msgid "Early 2024"
 msgstr "Đầu 2024"
@@ -9036,8 +9076,8 @@ msgstr "Toàn màn hình"
 msgid "Full self-driving"
 msgstr "Tự vận hành hoàn toàn"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Toàn bộ mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2). Xem, kiểm tra và đóng góp cho mã nguồn. Không hộp đen, không chức năng ẩn."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Toàn bộ mã nguồn có trên GitHub theo Giấy phép MIT. Xem, kiểm tra và đóng góp cho mã nguồn. Không hộp đen, không chức năng ẩn."
 
 msgid "Funding"
 msgstr "Gọi vốn"
@@ -9251,6 +9291,9 @@ msgstr "Đi tới trang kế tiếp trong lịch sử"
 
 msgid "Go home"
 msgstr "Về trang chủ"
+
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Đi lại các bước khi mở lần đầu. Dự án và cài đặt của bạn vẫn giữ nguyên."
 
 msgid "Go to home"
 msgstr "Về trang chủ"
@@ -9616,6 +9659,9 @@ msgstr "Tôi bắt đầu thế nào?"
 msgid "How do the paid plans work?"
 msgstr "Các gói trả phí hoạt động thế nào?"
 
+msgid "How do you want to work?"
+msgstr "Bạn muốn làm việc như thế nào?"
+
 msgid "How does pricing work?"
 msgstr "Giá được tính thế nào?"
 
@@ -9672,6 +9718,9 @@ msgstr "Cách chúng tôi bảo vệ mã nguồn"
 
 msgid "How we work"
 msgstr "Cách chúng tôi làm việc"
+
+msgid "How you run agents"
+msgstr "Cách bạn chạy agent"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cách các agent của bạn đăng nhập bên trong workspace cloud. Người khác kết nối gói đăng ký hoặc khóa API của riêng họ; trên máy này mỗi agent vẫn dùng phiên đăng nhập sẵn có."
@@ -9822,6 +9871,10 @@ msgstr "Nhập thất bại"
 msgid "Import failed: {message}"
 msgstr "Nhập thất bại: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Nhập từ {0}"
+
 msgid "Import from file"
 msgstr "Nhập từ tệp"
 
@@ -9851,6 +9904,9 @@ msgstr "Nhập…"
 
 msgid "Important"
 msgstr "Quan trọng"
+
+msgid "Imported"
+msgstr "Đã nhập"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
@@ -9882,14 +9938,14 @@ msgstr "Khung xem diff cải tiến"
 msgid "in {0}"
 msgstr "trong {0}"
 
-msgid "in a new session"
-msgstr "trong phiên mới"
-
 msgid "in a terminal on this host."
 msgstr "trong một terminal trên host này."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
+
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Ở chế độ thủ công, Paradev không đăng nhập cho agent này. Hãy để script của bạn đăng nhập lại rồi tiếp tục, hoặc tắt chế độ thủ công trong cài đặt agent."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Làm việc trực tiếp tại văn phòng San Francisco, năm ngày mỗi tuần. Bạn làm việc trực tiếp với các nhà sáng lập."
@@ -9939,6 +9995,9 @@ msgstr "Có"
 
 msgid "Included in Enterprise"
 msgstr "Có trong Enterprise"
+
+msgid "Included with Team and Ultra."
+msgstr "Có trong gói Team và Ultra."
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Bao gồm biến thể box riêng của Paradev"
@@ -10348,9 +10407,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Tham gia"
 
-msgid "Join as a design partner"
-msgstr "Tham gia làm design partner"
-
 msgid "Join channel"
 msgstr "Tham gia kênh"
 
@@ -10544,6 +10600,9 @@ msgstr "Ngôn ngữ"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "Đã lưu ngôn ngữ trên thiết bị này, nhưng không đồng bộ được lên tài khoản của bạn."
+
+msgid "Laptop closed"
+msgstr "Laptop đã gập"
 
 msgid "Large"
 msgstr "Lớn"
@@ -11300,8 +11359,17 @@ msgstr "Do admin tổ chức của bạn quản lý."
 msgid "Manual"
 msgstr "Thủ công"
 
+msgid "Manual mode is off for {label}."
+msgstr "Đã tắt chế độ thủ công cho {label}."
+
 msgid "Manual order"
 msgstr "Thứ tự thủ công"
+
+msgid "manual sign-in"
+msgstr "đăng nhập thủ công"
+
+msgid "Manual sign-in"
+msgstr "Đăng nhập thủ công"
 
 msgid "Mark all read"
 msgstr "Đánh dấu tất cả đã đọc"
@@ -11608,6 +11676,9 @@ msgstr "Thiếu trường bắt buộc."
 #. js-lingui-explicit-id
 msgid "serverError.plugins.missingInput"
 msgstr "Thiếu dữ liệu bắt buộc {input}"
+
+msgid "MIT License"
+msgstr "Giấy phép MIT"
 
 msgid "Mobile"
 msgstr "Di động"
@@ -12373,6 +12444,9 @@ msgstr "Không tìm thấy issue nào."
 msgid "No items"
 msgstr "Không có mục nào"
 
+msgid "No keys in the sandbox"
+msgstr "Không có khóa nào trong sandbox"
+
 msgid "No known creators"
 msgstr "Không có người tạo nào được biết"
 
@@ -13096,6 +13170,9 @@ msgstr "Một câu"
 msgid "One line about how you work"
 msgstr "Một dòng về cách bạn làm việc"
 
+msgid "One machine per workspace."
+msgstr "Mỗi không gian làm việc một máy."
+
 msgid "One of the first hundred on the board"
 msgstr "Một trong một trăm người đầu tiên trên bảng"
 
@@ -13113,9 +13190,6 @@ msgstr "Một plugin. Mọi agent lập trình."
 
 msgid "One step left"
 msgstr "Còn một bước nữa"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Một workspace cho Claude Code, Codex và mọi coding agent."
 
 msgid "online"
 msgstr "trực tuyến"
@@ -13622,6 +13696,9 @@ msgstr "Mở sheet"
 msgid "Open ship options"
 msgstr "Mở tùy chọn gửi"
 
+msgid "Open Source"
+msgstr "Mã nguồn mở"
+
 msgid "Open System Settings"
 msgstr "Mở System Settings"
 
@@ -14014,6 +14091,9 @@ msgstr "Tự động hóa Paradev"
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
+msgid "Paradev cloud workspaces"
+msgstr "Không gian làm việc đám mây của Paradev"
+
 msgid "Paradev components"
 msgstr "Các thành phần Paradev"
 
@@ -14056,11 +14136,14 @@ msgstr "Paradev chuyển tiếp các cổng mà workspace từ xa mở trong lú
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2), nên bạn có thể xem và tự host theo các điều khoản của giấy phép."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Giấy phép MIT, nên bạn có thể xem, chỉnh sửa và tự host."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev gặp lỗi không mong muốn. Tải lại để thử lại."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev không giữ thông tin xác thực nào cho {label} và không thêm thông tin xác thực vào không gian làm việc đám mây của bạn khi chúng khởi động, khởi động lại hoặc được đánh thức. Script bạn chạy trong không gian làm việc giữ {loginFile} luôn cập nhật. Nếu script dừng, {label} sẽ ở trạng thái đăng xuất cho đến khi script đăng nhập lại."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev giữ token và thực hiện các lệnh gọi. Agent không bao giờ thấy nó."
@@ -14086,11 +14169,8 @@ msgstr "Paradev được xây dựng ngay trong Paradev, nên chúng tôi chính
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev được thiết kế để làm việc cùng công cụ sẵn có của bạn, chúng tôi hỗ trợ sẵn deep-link tới các IDE như Cursor để bạn mở workspace và tệp ngay trong IDE của mình."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev là source-available: mã nguồn công khai trên GitHub theo Elastic License 2.0 (ELv2), cho phép bạn xem và tự host theo các điều khoản của giấy phép, nhưng không phải mã nguồn mở được OSI công nhận. Paradev không liên quan tới Apache Superset, công cụ business intelligence."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev là source-available. Mọi pull request, review và bug đều công khai trên GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev là mã nguồn mở. Mọi pull request, review và bug đều công khai trên GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev là bàn làm việc cho bước chuyển từ F3 sang F4: các agent chạy song song trên các nhánh riêng, những đội agent bạn thực sự giám sát được, và một giao diện xem xét cho mã bạn không tự viết."
@@ -14368,6 +14448,9 @@ msgstr "Chọn một thư mục trên ổ đĩa và thêm nó làm dự án"
 
 msgid "Pick a folder…"
 msgstr "Chọn một thư mục…"
+
+msgid "Pick a machine size"
+msgstr "Chọn kích thước máy"
 
 msgid "Pick a model"
 msgstr "Chọn một mô hình"
@@ -15269,6 +15352,9 @@ msgstr "Đọc hướng dẫn"
 msgid "Read the guide to parallel coding agents"
 msgstr "Đọc hướng dẫn về coding agent chạy song song"
 
+msgid "Read the MIT License"
+msgstr "Đọc Giấy phép MIT"
+
 msgid "Read the page"
 msgstr "Đọc trang"
 
@@ -16045,8 +16131,14 @@ msgstr "Khởi động lại dịch vụ host"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Khởi động lại ngay để chuyển sang {accountLabel}; mỗi phiên sẽ tiếp tục cuộc trò chuyện từ chỗ đang dở."
 
+msgid "Restart onboarding"
+msgstr "Bắt đầu lại phần hướng dẫn"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"
+
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Hãy khởi động lại các không gian làm việc đang chạy để agent áp dụng thay đổi."
 
 msgid "Restart terminal daemon?"
 msgstr "Khởi động lại daemon terminal?"
@@ -16184,9 +16276,6 @@ msgstr "Sẽ tiếp tục khi đặt lại"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Tiếp tục sau {resumeSeconds} giây"
 
-msgid "Resuming the conversation…"
-msgstr "Đang tiếp tục cuộc trò chuyện…"
-
 msgid "Retry"
 msgstr "Thử lại"
 
@@ -16222,6 +16311,9 @@ msgstr "Hướng dẫn tái sử dụng mà agent của bạn tự nhận"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Các lệnh terminal dùng lại được. Nhấp vào một script để sửa hoặc kéo để sắp xếp lại. Lệnh thiết lập, chạy và dọn dẹp của dự án là script vòng đời."
+
+msgid "Reusing {keptName}"
+msgstr "Đang dùng lại {keptName}"
 
 msgid "Reveal in Finder"
 msgstr "Hiện trong Finder"
@@ -16357,8 +16449,8 @@ msgstr "Xoay thiết bị"
 msgid "Roundups"
 msgstr "Tổng hợp"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Định tuyến {label} qua nhà cung cấp do bạn tự vận hành, với thông tin xác thực bạn nắm giữ. Giá trị đã lưu được chuyển cho agent khi khởi chạy."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Định tuyến {label} qua nhà cung cấp do bạn tự vận hành, với thông tin xác thực bạn nắm giữ, hoặc để công cụ của bạn tự lo việc đăng nhập."
 
 msgid "Routine not found"
 msgstr "Không tìm thấy quy trình"
@@ -16431,6 +16523,9 @@ msgstr "Chạy tự động hóa khi có tin nhắn được đăng hoặc kênh
 msgid "Run automations when Sentry issues change."
 msgstr "Chạy tự động hóa khi issue Sentry thay đổi."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Chạy agent lập trình trong không gian làm việc đám mây, vẫn làm việc khi laptop của bạn đã gập. Có trong gói Team và Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Chạy lệnh và điều hướng trong ứng dụng."
 
@@ -16497,6 +16592,9 @@ msgstr "Chạy agent của bạn từ desktop, bất kỳ terminal nào, hoặc 
 msgid "Run your agents from your phone."
 msgstr "Chạy agent của bạn từ điện thoại."
 
+msgid "Run your coding agents in the cloud."
+msgstr "Chạy agent lập trình của bạn trên đám mây."
+
 msgid "Run."
 msgstr "Chạy."
 
@@ -16551,8 +16649,14 @@ msgstr "Chạy khi tạo không gian làm việc mới."
 msgid "Runs when a workspace is deleted."
 msgstr "Chạy khi xóa không gian làm việc."
 
+msgid "Same session"
+msgstr "Cùng phiên"
+
 msgid "Same version as this app."
 msgstr "Cùng phiên bản với ứng dụng này."
+
+msgid "Same workspace"
+msgstr "Cùng workspace"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO & cấp phát SCIM"
@@ -17334,6 +17438,9 @@ msgstr "Thiết lập host qua SSH"
 msgid "Set up an automation"
 msgstr "Thiết lập tự động hóa"
 
+msgid "Set up once"
+msgstr "Thiết lập một lần"
+
 msgid "Set up project on {hostName}"
 msgstr "Thiết lập dự án trên {hostName}"
 
@@ -17912,6 +18019,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Nhỏ"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Nhỏ, Vừa hoặc Lớn, tối đa 8 vCPU và 16 GB. Mức sử dụng tăng theo bộ nhớ."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Xử gọn backlog của bạn."
@@ -18044,9 +18154,6 @@ msgstr "Âm thanh và nhạc chuông cho tác vụ đã hoàn tất"
 
 msgid "Source"
 msgstr "Nguồn"
-
-msgid "Source Available"
-msgstr "Mã nguồn công khai"
 
 msgid "Source path (not an import)"
 msgstr "Đường dẫn nguồn (không phải import)"
@@ -18235,9 +18342,6 @@ msgstr "Bắt đầu một cuộc trò chuyện để thấy tin nhắn ở đâ
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Bắt đầu một phiên agent mới với ngữ cảnh gần đây của terminal này. Tệp trong workspace vẫn là nguồn đáng tin cậy."
 
-msgid "Start a new agent session each run"
-msgstr "Bắt đầu một phiên agent mới mỗi lần chạy"
-
 msgid "Start a new chat"
 msgstr "Bắt đầu trò chuyện mới"
 
@@ -18300,6 +18404,9 @@ msgstr "Bắt đầu công việc từ bất cứ đâu"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Bắt đầu workspace ngay từ issue Linear hoặc GitHub trong chế độ xem Tác vụ, mỗi workspace đều có sẵn một agent đang làm việc."
+
+msgid "Start your first cloud workspace."
+msgstr "Khởi tạo không gian làm việc đám mây đầu tiên của bạn."
 
 msgid "Started"
 msgstr "Bắt đầu"
@@ -19087,11 +19194,17 @@ msgstr "Tác nhân sao chép hội thoại; nhánh mở trong một thẻ mới"
 msgid "The agent crashed"
 msgstr "Agent đã gặp sự cố"
 
+msgid "The agent is signed out"
+msgstr "Agent đã đăng xuất"
+
 msgid "The agent lost this conversation"
 msgstr "Agent đã mất cuộc trò chuyện này"
 
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Agent làm chủ một tác vụ từ ticket đến diff. Con người review kết quả, không phải từng thao tác gõ. Sự chú ý dịch từ viết code sang đặc tả công việc và đánh giá nó. Một kỹ sư chạy nhiều agent cùng lúc trong các workspace tách biệt."
+
+msgid "The agent picks up where the last run left off"
+msgstr "Agent tiếp tục từ chỗ lần chạy trước dừng lại"
 
 msgid "The agent stopped responding"
 msgstr "Agent đã ngừng phản hồi"
@@ -19204,6 +19317,9 @@ msgstr "Tệp không chứa theme nào có thể nhập."
 msgid "The first F4 teams"
 msgstr "Những đội F4 đầu tiên"
 
+msgid "The first run makes one, later runs reuse it"
+msgstr "Lần chạy đầu tạo ra, các lần sau dùng lại"
+
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Những đội đầu tiên, quy mô nhỏ, ship code phần lớn do agent viết mà không đọc từng dòng, và tỷ lệ lỗi vẫn ổn. Không có gì huyền bí đằng sau: các lớp review, canary, rollback nhanh, và thói quen viết đặc tả thay vì viết code."
 
@@ -19306,6 +19422,12 @@ msgstr "Tên tổ chức hoặc nhóm của bạn"
 
 msgid "The network connection changed"
 msgstr "Kết nối mạng đã thay đổi"
+
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "Workspace mã nguồn mở cho Claude Code, Codex và mọi coding agent."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Workspace mã nguồn mở cho Claude Code, Codex, OpenCode và mọi agent lập trình. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
 msgid "The overnight shift"
 msgstr "Ca đêm"
@@ -20278,6 +20400,12 @@ msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
 
+msgid "Turn off manual mode"
+msgstr "Tắt chế độ thủ công"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Tắt chế độ thủ công cho {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Bật “Cho phép truy cập từ xa vào thiết bị này qua relay”"
 
@@ -20715,6 +20843,12 @@ msgstr "Nâng cấp lên {planName}"
 msgid "Upgrade to Pro"
 msgstr "Nâng cấp lên Pro"
 
+msgid "Upgrade to Team"
+msgstr "Nâng cấp lên Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Nâng cấp tổ chức của bạn, kết nối GitHub và chọn Cloud trong màn hình không gian làm việc mới."
+
 msgid "Upgrade your plan"
 msgstr "Nâng cấp gói của bạn"
 
@@ -20802,6 +20936,9 @@ msgstr "Dùng mặc định toàn cục"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
+
+msgid "Use manual sign-in"
+msgstr "Dùng đăng nhập thủ công"
 
 msgid "Use more browser features: {features}"
 msgstr "Dùng thêm tính năng trình duyệt: {features}"
@@ -21194,9 +21331,6 @@ msgstr "Chúng tôi đang tuyển kỹ sư tại San Francisco. Hãy cùng xây 
 msgid "We're hiring in San Francisco"
 msgstr "Chúng tôi đang tuyển tại San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Chúng tôi đang tìm kiếm đối tác đồng phát triển để cùng định hình sản phẩm đám mây. Hãy chia sẻ quy trình làm việc của bạn và chúng tôi sẽ liên hệ để trao đổi cơ hội hợp tác."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Chúng tôi đang xây dựng lại tính năng này. Hãy quay lại sau."
 
@@ -21345,9 +21479,6 @@ msgstr "Chúng tôi đang xây gì"
 msgid "What we've shipped"
 msgstr "Những gì chúng tôi đã ra mắt"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "Bạn muốn xây dựng gì với Paradev trên đám mây?"
-
 msgid "What would you like to know?"
 msgstr "Bạn muốn biết điều gì?"
 
@@ -21465,9 +21596,6 @@ msgstr "Wordmark, đen"
 
 msgid "Wordmark, white"
 msgstr "Wordmark, trắng"
-
-msgid "Work email"
-msgstr "Email công việc"
 
 msgid "Work from tickets"
 msgstr "Làm việc từ ticket"
@@ -21727,6 +21855,9 @@ msgstr "Có. Với các gói có không gian làm việc trên đám mây, chủ
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Có. Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập, bao quát các biện pháp bảo mật vận hành theo thời gian. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại {trustHost}."
 
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Có. Paradev là mã nguồn mở theo Giấy phép MIT. Mã công khai trên GitHub, và ai cũng có thể báo issue, mở pull request hoặc fork. Paradev không liên quan đến Apache Superset, công cụ business intelligence."
+
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Có. Paradev là nơi các agent của bạn chạy, không phải nhà cung cấp mô hình. Hãy mang Claude Code, Codex, OpenCode hay bất kỳ agent CLI nào, và dùng tài khoản hoặc khóa API sẵn có ở mọi gói."
 
@@ -21785,6 +21916,9 @@ msgstr "Bạn đang xem phiên bản {version}, chỉ đọc"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Bạn có thể đính kèm tối đa {MAX_ATTACHMENTS} tệp"
+
+msgid "You can change this later in Settings."
+msgstr "Bạn có thể đổi lại sau trong Cài đặt."
 
 msgid "You can close this tab."
 msgstr "Bạn có thể đóng tab này."

@@ -2,7 +2,7 @@
 title: "Paradev vs Devin (2026): Local Agent Orchestration vs Cloud AI Engineer"
 description: "Compare Paradev and Devin for AI-powered development. See how local parallel agent orchestration differs from a fully remote AI software engineer."
 date: 2026-02-18
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - devin
@@ -23,18 +23,18 @@ Devin is a cloud-based AI software engineer that works autonomously in a remote 
 | | **Paradev** | **Devin** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Autonomous AI software engineer |
-| **Architecture** | Local-first: worktrees run on your machine or remote hosts you own; cloud workspaces run in the cloud | Fully remote: runs in cloud VMs |
-| **AI approach** | Agent-agnostic: orchestrates external agents plus Paradev Chat and MCP tools | Proprietary AI with browser, editor, and terminal in cloud |
+| **Architecture** | Local-first: worktrees run on your machine, remote hosts you own, or your own Linux server (BYOC); cloud workspaces (beta) run in the cloud | Fully remote: runs in cloud VMs |
+| **AI approach** | Agent-agnostic: orchestrates external CLI agents, with a chat interface and MCP tools | Proprietary AI with browser, editor, and terminal in cloud |
 | **Parallelism** | Multiple agents across separate local worktrees | Parallel cloud sessions |
 | **Code privacy** | Local-first; outbound model traffic depends on your chosen agents/providers | Code runs on Cognition's cloud infrastructure |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free; Pro $20/mo, Max $200/mo, Teams $80 + $40/seat |
-| **License** | Source-available (ELv2) | Closed source |
+| **License** | Open source (MIT) | Closed source |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
 
 ---
 
@@ -48,7 +48,7 @@ Devin is Cognition's AI software engineer: a cloud-based autonomous agent that r
 
 ### Local vs Cloud
 
-Paradev is local-first. By default your repo, worktrees, review flow, chat, and browser preview stay on your machine or on remote hosts you own, and outbound traffic depends on the specific agents or providers you choose. Cloud workspaces are there when you want a task to run in the cloud instead. Devin runs entirely in Cognition's cloud: your code is cloned into remote VMs where Devin operates. This is the fundamental architectural difference and drives most of the trade-offs below.
+Paradev is local-first. By default your repo, worktrees, review flow, chat, and browser preview stay on your machine, on remote hosts you own, or on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Outbound traffic depends on the specific agents or providers you choose. [Cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta) are there when you want Paradev to run a task in the cloud instead. Devin runs entirely in Cognition's cloud: your code is cloned into remote VMs where Devin operates. This is the fundamental architectural difference and drives most of the trade-offs below.
 
 ### Control vs Autonomy
 
@@ -80,7 +80,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 - Need local execution and direct control over each agent
 - Want agent flexibility (your choice per task: Claude Code, Codex, Aider, OpenCode)
 - Prefer the cost efficiency of local execution with direct API pricing
-- Need a source-available tool you can inspect and modify
+- Need an open-source tool you can inspect and modify
 
 ---
 
@@ -96,7 +96,7 @@ Since Devin 2.0, Cognition retired the old $500/month model. Devin now starts fr
 
 ### Is Paradev open source?
 
-No. Paradev is source-available on GitHub under Elastic License 2.0 (ELv2). Devin is closed source from Cognition.
+Yes. Paradev is open source on GitHub under the MIT License. Devin is closed source from Cognition.
 
 ### Which is better for security-sensitive codebases?
 

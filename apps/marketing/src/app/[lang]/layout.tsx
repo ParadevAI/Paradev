@@ -46,7 +46,7 @@ const inter = Inter({
 
 const siteDescription = msg({
 	message:
-		"Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place.",
+		"The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place.",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -66,6 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			"AI coding",
 			"git worktrees",
 			"code automation",
+			"open source",
 			"Claude Code",
 			"Cursor",
 			"Codex",

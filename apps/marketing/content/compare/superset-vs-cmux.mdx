@@ -2,7 +2,7 @@
 title: "Paradev vs cmux (2026): Agent Terminal vs Agent Orchestrator"
 description: "Compare Paradev and cmux for running AI coding agents. See how a native terminal for agents differs from a Git worktree orchestration workspace."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - cmux
@@ -28,20 +28,21 @@ Paradev and cmux both help you run many AI coding agents at once, but they sit i
 | **Isolation** | Git worktrees for local branch-based workspaces | None built in -- isolation is left to the agent or to you |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, and more) | Any terminal agent (Claude Code, Codex, OpenCode, Gemini, Aider, Goose, and more) |
 | **Review tooling** | Built-in diff/file editor; commit, push, and open PRs; PR pane with checks and review threads | Terminal-native; review happens in the agent or your editor |
-| **Platform** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | macOS only |
-| **License** | Source-available (ELv2) | Open source (GPL-3.0) |
+| **Remote and cloud** | Remote Access hosts, Bring Your Own Cloud, cloud workspaces (beta) on Team and Ultra | SSH workspaces; cmux Cloud VMs (early access, paid plans) |
+| **Platform** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | macOS desktop; iOS app in TestFlight beta |
+| **License** | Open source (MIT) | Open source (GPL-3.0-or-later); its server software uses BUSL-1.1 |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
 
 ## What Is cmux?
 
-cmux is a native macOS terminal built specifically for running AI coding agents. Built on a GPU-accelerated core, it adds vertical tabs, split panes, notification "rings" around a pane when a process needs attention, an embedded scriptable browser, and a programmable socket API. Its goal is to make many concurrent agent sessions visible and controllable in one native app, including surfacing an agent's subagents as their own panes. cmux runs any terminal-launchable agent and is free and open source under GPL-3.0, on macOS only.
+cmux is a native macOS terminal built specifically for running AI coding agents. It uses libghostty for GPU-accelerated rendering and adds vertical tabs, split panes, notification "rings" around a pane when a process needs attention, an embedded scriptable browser, and a CLI and socket API. Its goal is to make many concurrent agent sessions visible and controllable in one native app, including surfacing an agent's subagents and Claude Code teammates as their own panes. It also opens workspaces over SSH, restores sessions and resumes supported agents after a relaunch, and has beta agent chat panes. Paid plans add cmux Cloud, persistent Linux VMs that open as cmux workspaces and keep running when your laptop is closed (early access), and an iOS app in TestFlight beta that attaches to terminals on your Mac. cmux runs any terminal-launchable agent. The macOS app is free and open source under GPL-3.0-or-later; its server software uses the Business Source License 1.1.
 
-> Note: two actively maintained tools share the name "cmux." This page is about the native macOS agent terminal from manaflow. A separate, smaller project (craigsc/cmux) is a Claude-Code-only bash CLI that does use Git worktrees per agent; if that is the tool you mean, its model is closer to Paradev's but far narrower in scope.
+> Note: two tools share the name "cmux." This page is about the native macOS agent terminal from manaflow. A separate, smaller project (craigsc/cmux) is a Claude-Code-only bash CLI that does use Git worktrees per agent; if that is the tool you mean, its model is closer to Paradev's but far narrower in scope.
 
 ## Key Differences
 
@@ -55,17 +56,17 @@ Because cmux is terminal-native, reviewing and merging happens in the agent itse
 
 ### Beyond the Terminal
 
-Paradev extends past a single machine with Remote Access hosts and cloud workspaces, scheduled automations with a TypeScript SDK, and CLI and MCP server surfaces. Both have an embedded browser you can drive from scripts: Paradev's in-app browser takes `superset browser` commands, and its CLI, SDK, and MCP server drive workspaces and terminals. cmux is focused on being an excellent native terminal on macOS, with a socket API for driving sessions. They can even be complementary: some developers will keep cmux as their daily agent terminal and reach for a worktree orchestrator when multiple agents need to touch the same repo.
+Paradev extends past a single machine with Remote Access hosts, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) on your own Linux server, [cloud workspaces](/cloud) (beta), scheduled automations with a TypeScript SDK, and CLI and MCP server surfaces. Both have an embedded browser you can drive from scripts: Paradev's in-app browser takes `superset browser` commands, and its CLI, SDK, and MCP server drive workspaces and terminals. cmux is focused on being an excellent native terminal on macOS, with a CLI and socket API for driving sessions, SSH workspaces, and cmux Cloud VMs (early access) on paid plans. cmux does not have scheduled automations. They can even be complementary: some developers will keep cmux as their daily agent terminal and reach for a worktree orchestrator when multiple agents need to touch the same repo.
 
 ### Platform
 
-cmux is macOS only today. Paradev supports macOS and an experimental Linux AppImage, plus CLI and MCP surfaces. Windows is not available.
+The cmux desktop app is macOS only today, and its iOS app is a TestFlight beta. Paradev supports macOS and an experimental Linux AppImage, plus an iPhone and iPad app and CLI and MCP surfaces. Windows is not available.
 
 ---
 
 ## Pricing
 
-Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. cmux is free and open source, with an optional paid edition for early access to upcoming features. In both cases, you still pay the underlying providers for Claude Code, Codex, or any compatible API usage.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. cmux is free and open source. Its paid plans (Plus, Pro, Max, Team, and Enterprise) add cmux Cloud VMs, the iOS beta, and support. In both cases, you still pay the underlying providers for Claude Code, Codex, or any compatible API usage.
 
 ---
 
@@ -75,7 +76,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 - Want a Git worktree per task so agents on one repo do not edit the same working files
 - Want built-in diff review and merge inside the same app
-- Need remote, cloud, CLI, or MCP surfaces
+- Need Remote Access hosts, Bring Your Own Cloud, automations, or an MCP server
 - Work on more than just macOS, or plan to
 
 **Choose cmux if you:**
@@ -83,7 +84,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 - Want a fast, native macOS terminal purpose-built for agent sessions
 - Mostly run one agent (or manage isolation yourself) and value terminal polish
 - Want a GPU-accelerated native terminal that shows subagents as their own panes and marks panes that need attention
-- Prefer a fully open-source GPL tool
+- Prefer a GPL-licensed native macOS app
 
 **Verdict:** These tools are not really substitutes. cmux is the best fit if your goal is a beautiful native terminal that keeps many agent sessions organized. Paradev is the better fit if your goal is running multiple agents on the same repository in separate working directories, with review and orchestration built in. Many developers will end up using a terminal like cmux alongside an orchestrator like Paradev.
 
@@ -97,7 +98,7 @@ The native macOS cmux terminal does not isolate tasks in Git worktrees itself --
 
 ### Is cmux only for macOS?
 
-Yes. The cmux agent terminal is macOS only today. Paradev supports macOS and experimental Linux; Windows is not available. Paradev also offers CLI and MCP surfaces.
+The cmux desktop app is macOS only today. Its iOS app is in TestFlight beta and attaches to terminals that run on your Mac. Paradev supports macOS and experimental Linux; Windows is not available. Paradev also offers CLI and MCP surfaces.
 
 ### Can I use cmux and Paradev together?
 

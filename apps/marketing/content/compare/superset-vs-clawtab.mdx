@@ -2,7 +2,7 @@
 title: "Paradev vs ClawTab (2026): tmux control plane or agent workspace app?"
 description: "Compare Paradev and ClawTab for running Claude Code and Codex, checking on agents from an iPhone or iPad, scheduling jobs, review, pricing, and licensing."
 date: 2026-10-07
-lastUpdated: 2026-10-08
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - clawtab
@@ -30,9 +30,9 @@ ClawTab is a free, MIT-licensed control plane that runs Claude Code, Codex, and 
 | Phone | iPhone and iPad app on the App Store (iOS or iPadOS 26+, Pro) with a Lock Screen Live Activity | iPhone and iPad app on the App Store; web app works on Android |
 | Phone alerts | Live Activity today; push notifications coming | Alerts when an agent asks a question; push listed in its README |
 | Scheduling | Pro automations on a selected host, with run history and retry | Cron and one-time jobs run by the daemon |
-| Remote hosts | Hosts you add through the relay, with access per member (Pro) | Paired Mac and Linux hosts through hosted Remote or your own relay |
+| Remote hosts | Hosts you add through the relay, with access per member (Pro); your own Linux server (Bring Your Own Cloud); cloud workspaces (beta) | Paired Mac and Linux hosts through hosted Remote or your own relay |
 | Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Local tools free; hosted Remote $4.99/month |
-| License | Source-available, Elastic License 2.0 | MIT |
+| License | Open source, MIT | MIT |
 
 ClawTab's [homepage](https://clawtab.cc/), [mobile page](https://clawtab.cc/mobile), [Remote page](https://clawtab.cc/remote), and [GitHub README](https://github.com/tonisives/clawtab) are the sources for its column.
 
@@ -68,7 +68,7 @@ Both apps run on iPhone and iPad. ClawTab still reaches more devices: its web ap
 
 ClawTab pairs Mac and Linux hosts. You can pay $4.99/month for its hosted relay or run your own. Its Remote page says connections use TLS through the shared relay and that the relay can read terminal content.
 
-Paradev connects hosts through its relay. A headless machine runs `superset start --daemon`. On Pro, an organization shares hosts and grants access per member. Paradev never proxies model calls. Its [remote access docs](https://docs.paradev.com/remote-access) recommend a separate machine for shared work, because remote access makes that machine's files and terminals reachable.
+Paradev connects hosts through its relay. A headless machine runs `superset start --daemon`. On Pro, an organization shares hosts and grants access per member. Paradev never proxies model calls. Its [remote access docs](https://docs.paradev.com/remote-access) recommend a separate machine for shared work, because remote access makes that machine's files and terminals reachable. You can also run the host on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud); it needs no inbound ports. [Cloud workspaces](/cloud), in beta, run in a sandbox that Paradev manages.
 
 ## Pricing
 
@@ -82,7 +82,7 @@ Paradev is free for one user. Pro is {{price:pro}} per user/month, or {{price:pr
 
 - You live in tmux and want to keep that workflow
 - You need Android through the web, or Linux as a first-class desktop
-- You want an MIT license or a relay you host yourself
+- You want a relay you host yourself
 - You want phone access for a few dollars a month
 
 **Choose Paradev if:**
@@ -101,7 +101,7 @@ ClawTab is a light, open layer over tmux, and its web app reaches Android and an
 
 ### Is ClawTab open source?
 
-Yes. ClawTab's GitHub repository uses the MIT License, and local use needs no account. Paradev is source-available under Elastic License 2.0.
+Yes. ClawTab's GitHub repository uses the MIT License, and local use needs no account. Paradev is open source under the MIT License.
 
 ### Does ClawTab support Windows?
 

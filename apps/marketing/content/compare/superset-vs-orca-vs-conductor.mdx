@@ -1,8 +1,8 @@
 ---
 title: "Paradev vs Orca vs Conductor (2026): Agent Workspaces Compared"
-description: "Compare Paradev, Orca, and Conductor to choose an AI agent workspace for your team: agents, platforms, remote and cloud work, review, mobile apps, automation, and pricing."
+description: "Compare Paradev, Orca, and Conductor, now joining Meta and closed to new users: agents, platforms, remote and cloud work, review, mobile apps, automation, and pricing, and what Conductor users can do now."
 date: 2026-10-14
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - orca
@@ -13,13 +13,16 @@ keywords:
   - ai agent orchestration comparison
   - agent workspace comparison
   - conductor alternative
+  - conductor shutting down
   - orca alternative
   - parallel coding agents
 ---
 
 Paradev, Orca, and Conductor all run several AI coding agents at once, each in its own Git worktree, with review and pull requests in the same app. They differ in which agents they run, where those agents run, and how a team works together around them. This comparison is for solo developers and engineering teams choosing one.
 
-Facts were checked against each product's own site, docs, changelog, and pricing on October 13, 2026. This page is published by Paradev.
+On November 4, 2026, Conductor announced that it is joining Meta. It takes no new sign-ups, and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down. The Conductor column below shows how it compared before the wind-down. Existing Conductor users can follow [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [Migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
+
+Facts for Paradev and Orca were checked against each product's own site, docs, changelog, and pricing on November 5, 2026. Conductor's status was checked against its [announcement](https://www.conductor.build/announcement) on November 4, 2026. This page is published by Paradev.
 
 ---
 
@@ -27,17 +30,18 @@ Facts were checked against each product's own site, docs, changelog, and pricing
 
 | | **Paradev** | **Orca** | **Conductor** |
 |---|---|---|---|
-| **What it is** | Desktop workspace for orchestrating any CLI coding agent | Open-source agent development environment | Mac app for parallel coding agents, with managed cloud |
-| **Agents** | Any CLI agent; built-in presets for more than 20, including Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot, Amp, OpenCode, and Droid | 27 listed plus any CLI agent | Claude Code, Codex, Cursor, OpenCode |
-| **Platforms** | macOS; experimental Linux AppImage; Windows not yet available | macOS, Windows, Linux | macOS; Windows and Linux on a waitlist |
-| **Where agents run** | Your machine, macOS or Linux hosts you add through Remote Access, or cloud workspaces | Your machine, SSH worktrees, Remote Orca Servers (beta), experimental cloud VMs on your own provider | Your Mac, or managed Linux sandboxes in Conductor Cloud (Pro and above) |
+| **Status** | Available | Available | Joining Meta; closed to new users; Mac app winds down after early 2027 |
+| **What it is** | Desktop workspace for orchestrating any CLI coding agent | Open-source agent development environment | Mac app for parallel coding agents, with managed cloud until November 20, 2026 |
+| **Agents** | Any CLI agent; built-in presets for more than 20, including Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot, Amp, OpenCode, and Droid | More than 25 named, plus any CLI agent | Claude Code, Codex, Cursor, OpenCode |
+| **Platforms** | macOS; experimental Linux AppImage; Windows not yet available | macOS, Windows, Linux | macOS only |
+| **Where agents run** | Your machine, macOS or Linux hosts you add through Remote Access, your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | Your machine, SSH worktrees, Remote Orca Servers (beta), experimental cloud VMs on your own provider | Your Mac; Conductor Cloud sandboxes shut down November 20, 2026 |
 | **Review** | Changes pane commits, pushes, and opens PRs, with inline diff comments sent to an agent; Pull Requests view with CI checks and line comments sent back to agents | Inline diff comments sent back to the agent; GitHub and Linear PRs and issues in the app | Diff, checks, pull request, merge, and archive |
 | **Task intake** | Tasks synced with Linear and GitHub Issues; Slack bot | GitHub, Linear, and GitHub Projects in the app | Workspaces from GitHub and Linear issues |
-| **Automation and control** | Scheduled automations on a host you choose; CLI, TypeScript SDK, MCP server | Scheduled automations; CLI; orchestration is experimental | Routines in the cloud (Pro and Teams); API and MCP server |
-| **Mobile** | iPhone and iPad app for your own hosts and cloud workspaces (Pro; cloud workspaces need Team or Ultra) | iOS app and Android APK, both beta | iOS app for cloud workspaces (Pro) |
-| **Team and enterprise** | Pro covers unlimited users; Enterprise adds SAML SSO, SCIM, audit logs, SOC 2 Type II | SOC 2 readiness; self-hostable desktop and server | Multiplayer on Pro (up to 5) and Teams; Enterprise adds SAML SSO, SCIM; SOC 2 Type II |
-| **License** | Source-available (ELv2) | Open source (MIT) | Proprietary |
-| **Pricing** | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free | Free; Pro $50/month; Teams $60 per user/month; Enterprise custom |
+| **Automation and control** | Scheduled automations on a host you choose; CLI, TypeScript SDK, MCP server | Scheduled automations; CLI; orchestration is experimental | Routines in the cloud (end with Conductor Cloud); API and MCP server |
+| **Mobile** | iPhone and iPad app for your own hosts and cloud workspaces (Pro; cloud workspaces need Team or Ultra) | iOS app and Android APK, both beta | iOS app for cloud workspaces, which shut down November 20, 2026 |
+| **Team and enterprise** | Pro covers unlimited users; Enterprise adds SAML SSO, SCIM, audit logs, SOC 2 Type II | SOC 2 readiness; self-hostable desktop and server | Multiplayer in Conductor Cloud, which shuts down November 20, 2026; SOC 2 Type II |
+| **License** | Open source (MIT) | Open source (MIT) | Proprietary |
+| **Pricing** | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free | No longer on sale; existing Pro users keep Pro features at no cost |
 
 ---
 
@@ -45,15 +49,15 @@ Facts were checked against each product's own site, docs, changelog, and pricing
 
 ### Paradev
 
-Paradev is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so you can run Claude Code, Codex, and any other agent side by side, on your own subscriptions; Paradev never proxies model calls. Terminals run in a background daemon, so agents keep running when you close or update the app. Remote Access adds macOS or Linux machines as shared hosts for your team, and the [iPhone and iPad app](/mobile) reaches them away from your desk. Tasks sync with Linear and GitHub Issues, and a CLI, a TypeScript SDK, an MCP server, and a Slack bot let other tools and agents create workspaces and launch agents. Paradev works alongside your editor: open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode.
+Paradev is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so you can run Claude Code, Codex, and any other agent side by side, on your own subscriptions; Paradev never proxies model calls. Terminals run in a background daemon, so agents keep running when you close or update the app. Remote Access adds macOS or Linux machines as shared hosts for your team. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account, and [cloud workspaces](/cloud) (beta) run in a sandbox that Paradev manages. The [iPhone and iPad app](/mobile) reaches all of them away from your desk. Tasks sync with Linear and GitHub Issues, and a CLI, a TypeScript SDK, an MCP server, and a Slack bot let other tools and agents create workspaces and launch agents. Paradev works alongside your editor: open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. It is open source under the MIT License.
 
 ### Orca
 
-Orca is an MIT-licensed agent development environment for macOS, Windows, and Linux. It lists 27 supported agents, has an embedded browser with Design Mode, inline diff comments sent back to the agent, GitHub and Linear issues and PRs in the app, and usage tracking with an account switcher for several agents, including Gemini, Kimi, and MiniMax, which Paradev does not track. It reaches other machines through SSH worktrees, Remote Orca Servers in beta, and a headless `orca serve`, and has iOS and Android companion apps in beta. It is free.
+Orca is an MIT-licensed agent development environment for macOS, Windows, and Linux. It names more than 25 supported agents, lets you use each one in a terminal or a Chat UI (out of experimental since November 2, 2026), has an embedded browser with Design Mode, inline diff comments sent back to the agent, GitHub and Linear issues and PRs in the app, plugins, and usage tracking for about a dozen agents and plans, including Gemini, Kimi Code, and MiniMax, which Paradev does not track. It reaches other machines through SSH worktrees, Remote Orca Servers in beta, and a headless `orca serve`, and has iOS and Android companion apps in beta. It is free.
 
 ### Conductor
 
-Conductor is a Mac app for running Claude Code, Codex, Cursor, and OpenCode in parallel, each task in its own workspace and branch, through to merge. Its paid plans add Conductor Cloud, managed Linux sandboxes with team collaboration, plus cloud Routines, an API and MCP server, and an iOS app that works with cloud workspaces.
+Conductor is a Mac app for running Claude Code, Codex, Cursor, and OpenCode in parallel, each task in its own workspace and branch, through to merge. Its paid plans added Conductor Cloud, managed Linux sandboxes with team collaboration, plus cloud Routines, an API and MCP server, and an iOS app that worked with cloud workspaces. Conductor is joining Meta and is closed to new users. Conductor Cloud shuts down on November 20, 2026, and the local Mac app winds down after early 2027.
 
 ---
 
@@ -61,11 +65,11 @@ Conductor is a Mac app for running Claude Code, Codex, Cursor, and OpenCode in p
 
 ### Which Agents You Can Run
 
-Paradev and Orca run any CLI agent; Orca ships configurations for 27 and Paradev has built-in presets for more than 20. Conductor supports four. If your team uses agents beyond Claude Code and Codex, or wants to compare several on the same task, Paradev or Orca fits.
+Paradev and Orca run any CLI agent; Orca names more than 25 and Paradev has built-in presets for more than 20. Both can show some agents as a chat: Paradev has a chat interface for Claude Code, Codex, OpenCode, and Pi, and Orca's Chat UI is out of experimental. Conductor supports four. If your team uses agents beyond Claude Code and Codex, or wants to compare several on the same task, Paradev or Orca fits.
 
 ### Where Agents Run, and Who Pays for It
 
-Paradev and Orca run agents on machines you control: your laptop, or a shared host. Paradev also has cloud workspaces, which run in the cloud and are available from desktop, iPhone, and iPad without keeping your own computer connected. Conductor's cloud runs agents on its own sandboxes, on paid plans. Paradev's shared hosts are part of the same desktop workspace, with access granted per member, so a team can keep long-running agents on a Mac mini or Linux server with its real environment.
+Paradev and Orca run agents on machines you control: your laptop, or a shared host. Paradev can also run on a Linux server in your own cloud account, and it has cloud workspaces, which run in the cloud and are available from desktop, iPhone, and iPad without keeping your own computer connected. Conductor's cloud ran agents on its own sandboxes, on paid plans, until it shuts down on November 20, 2026. Paradev's shared hosts are part of the same desktop workspace, with access granted per member, so a team can keep long-running agents on a Mac mini or Linux server with its real environment.
 
 ### Review and Task Management
 
@@ -73,15 +77,15 @@ All three take work to a pull request. Paradev adds inline diff comments that go
 
 ### Driving It From Outside
 
-Paradev exposes a CLI, a TypeScript SDK, and an MCP server, so scripts and agents can create workspaces and launch other agents; scheduled automations run on a host you choose. Conductor has an API, an MCP server, and cloud Routines. Orca has a CLI and scheduled automations, with orchestration still experimental.
+Paradev exposes a CLI, a TypeScript SDK, and an MCP server, so scripts and agents can create workspaces and launch other agents; scheduled automations run on a host you choose. Conductor has an API and an MCP server; its cloud Routines end with Conductor Cloud. Orca has a CLI and scheduled automations, with orchestration still experimental.
 
 ### Platforms and License
 
-Orca is the only one of the three on Windows today, and the only open-source one. Paradev is source-available under ELv2 and runs on macOS with an experimental Linux build. Conductor is a proprietary Mac app.
+Orca is the only one of the three on Windows today. Orca and Paradev are both open source under the MIT License; Paradev runs on macOS with an experimental Linux build. Conductor is a proprietary Mac app, now closed to new users.
 
 ### Mobile
 
-All three now have an iPhone app. Paradev's connects to hosts you own and to cloud workspaces, and shows any agent running there. Orca's controls your desktop and is in beta, with an Android APK. Conductor's works with its cloud workspaces.
+Paradev and Orca have iPhone apps. Paradev's connects to hosts you own, Bring Your Own Cloud servers, and cloud workspaces, and shows any agent running there. Orca's controls your desktop and is in beta, with an Android APK. Conductor's iOS app worked with its cloud workspaces, which shut down on November 20, 2026.
 
 ---
 
@@ -96,15 +100,13 @@ All three now have an iPhone app. Paradev's connects to hosts you own and to clo
 
 **Choose Orca if you:**
 
-- Need Windows, or want an open-source, free tool
+- Need Windows, or want a free tool with no paid plans
 - Want Android
 - Want a wide agent list, with usage tracking that also covers Gemini, Kimi, and MiniMax
 
-**Choose Conductor if you:**
+**If you use Conductor today:**
 
-- Work on Macs, mainly with Claude Code or Codex
-- Want managed cloud sandboxes with multiplayer collaboration and cloud Routines
-- Are comfortable with Pro or Teams pricing for cloud, Routines, and mobile
+Conductor is closed to new users, so it is no longer an option to pick. Existing users keep the local Mac app until early 2027. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026, so export your chats before then. To move to Paradev, follow the [local app guide](https://docs.paradev.com/migrate-from-conductor) or the [Conductor Cloud guide](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 ---
 
@@ -112,7 +114,7 @@ All three now have an iPhone app. Paradev's connects to hosts you own and to clo
 
 ### What is the difference between Paradev, Orca, and Conductor?
 
-All three run AI coding agents in parallel Git worktrees. Paradev is a desktop workspace for any CLI agent, with shared hosts, task intake, and a CLI, SDK, and MCP server. Orca is a free, open-source, cross-platform environment with a wide agent list. Conductor is a Mac app for four agents, with managed cloud workspaces on paid plans.
+All three run AI coding agents in parallel Git worktrees. Paradev is a desktop workspace for any CLI agent, with shared hosts, task intake, and a CLI, SDK, and MCP server. Orca is a free, open-source, cross-platform environment with a wide agent list. Conductor is a Mac app for four agents that is joining Meta and is closed to new users; its managed cloud shuts down on November 20, 2026.
 
 ### Which works on Windows?
 
@@ -120,12 +122,16 @@ Orca. Paradev runs on macOS with an experimental Linux build, and Conductor is M
 
 ### Which is free?
 
-Orca is free. Paradev and Conductor both have free plans; Paradev Pro is {{price:pro}} per user per month, and Conductor Pro is $50 per month. Paradev Team ({{price:team}}) and Ultra ({{price:ultra}}) add cloud workspaces.
+Orca is free. Paradev has a free plan; Paradev Pro is {{price:pro}} per user per month. Conductor's plans are no longer on sale, and existing Conductor Pro users keep Pro features at no cost. Paradev Team ({{price:team}}) and Ultra ({{price:ultra}}) add cloud workspaces.
 
 ### Can I use my own Claude or Codex subscription?
 
-Yes, in all three for local workspaces. Paradev never proxies model calls, so each agent runs on your own plan or key.
+Yes, in all three for local workspaces, though Conductor is closed to new users. Paradev never proxies model calls, so each agent runs on your own plan or key.
+
+### Is Conductor shutting down?
+
+Conductor is joining Meta. It takes no new sign-ups, and the app can no longer be downloaded. Conductor Cloud shuts down on November 20, 2026, and the local Mac app gets new models and critical bug fixes until early 2027, then winds down.
 
 ### Which fits a team?
 
-It depends on where you want agents to run. For agents on machines you own or in cloud workspaces, with per-member access and enterprise controls, Paradev. For managed cloud sandboxes with multiplayer and cloud Routines, Conductor. For a free, cross-platform tool, Orca.
+It depends on where you want agents to run. For agents on machines you own or in cloud workspaces, with per-member access and enterprise controls, Paradev. For a free, cross-platform tool, Orca. Conductor is closed to new users, and its cloud shuts down on November 20, 2026.

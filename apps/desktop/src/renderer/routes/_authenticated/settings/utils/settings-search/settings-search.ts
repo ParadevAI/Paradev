@@ -41,6 +41,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_FILE_OPEN_MODE: "behavior-file-open-mode",
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
+	BEHAVIOR_ACP_CHAT: "behavior-acp-chat",
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
@@ -77,10 +78,10 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_V1_MIGRATION: "experimental-v1-migration",
 	EXPERIMENTAL_INLINE_WORKSPACE_PORTS: "experimental-inline-workspace-ports",
 	EXPERIMENTAL_WORKSPACE_AGENTS: "experimental-workspace-agents",
-	EXPERIMENTAL_ACP_CHAT: "experimental-acp-chat",
 	EXPERIMENTAL_CHAT_TURN_SNAPSHOTS: "experimental-chat-turn-snapshots",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
+	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
@@ -198,6 +199,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE]: "v1",
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT]: "v2",
+	[SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT]: "v2",
 	// The top-bar Changes control is a v2-only surface.
 	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
@@ -239,10 +241,10 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.EXPERIMENTAL_V1_MIGRATION]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_INLINE_WORKSPACE_PORTS]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS]: "v2",
-	[SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS]: "v2",
 	// Gates both the v1 renderer launch and the v2 host-side launch.
 	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
+	[SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING]: "shared",
 
 	[SETTING_ITEM_ID.BILLING_OVERVIEW]: "shared",
 	[SETTING_ITEM_ID.BILLING_PLANS]: "shared",
@@ -888,6 +890,25 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT,
+		section: "behavior",
+		title: "Chat interface",
+		description:
+			"Open Claude and Codex sessions in a chat pane instead of a terminal",
+		keywords: [
+			"chat",
+			"interface",
+			"acp",
+			"agent",
+			"claude",
+			"codex",
+			"session",
+			"pane",
+			"toggle",
+			"switch",
+		],
+	},
+	{
 		id: SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET,
 		section: "behavior",
 		title: "Changes open target",
@@ -1489,25 +1510,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
-		section: "experimental",
-		title: "Chat",
-		description:
-			"Open Claude and Codex sessions in a chat pane instead of a terminal",
-		keywords: [
-			"experimental",
-			"chat",
-			"acp",
-			"agent",
-			"claude",
-			"codex",
-			"session",
-			"pane",
-			"toggle",
-			"switch",
-		],
-	},
-	{
 		id: SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
 		section: "experimental",
 		title: "Track file changes per turn",
@@ -1548,6 +1550,23 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"reuse",
 			"sequential",
 			"install",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
+		section: "experimental",
+		title: "Restart onboarding",
+		description:
+			"Go through the first-run steps again. Your projects and settings stay as they are.",
+		keywords: [
+			"experimental",
+			"onboarding",
+			"restart",
+			"first run",
+			"setup",
+			"welcome",
+			"terminal",
+			"chat",
 		],
 	},
 	...INTEGRATION_SEARCH_ITEMS,

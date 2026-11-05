@@ -1,6 +1,6 @@
 {
 	"name": "@superset/host-service",
-	"version": "2.0.3",
+	"version": "2.0.5",
 	"private": true,
 	"type": "module",
 	"exports": {
@@ -55,6 +55,10 @@
 		"./settings": {
 			"types": "./src/trpc/router/settings/index.ts",
 			"default": "./src/trpc/router/settings/index.ts"
+		},
+		"./cloud-api-error": {
+			"types": "./src/trpc/router/host/cloud-api-error.ts",
+			"default": "./src/trpc/router/host/cloud-api-error.ts"
 		},
 		"./attachments": {
 			"types": "./src/trpc/router/attachments/index.ts",

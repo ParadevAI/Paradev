@@ -2,7 +2,7 @@
 title: "Paradev vs Emdash: parallel tasks, remote hosts, and automation"
 description: "Compare Paradev and Emdash for parallel coding agents, scheduled tasks, remote development, desktop platforms, and licensing."
 date: 2026-08-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - emdash
@@ -24,14 +24,14 @@ Paradev and Emdash both organize coding agents into worktrees, provide diff revi
 | Parallel tasks | Workspaces with separate branches and worktrees | Tasks with separate branches and worktrees |
 | Desktop | macOS; experimental Linux; Windows unavailable | macOS, Windows, Linux |
 | Scheduling | Pro automations on a selected host, with run history and retry | Scheduled tasks with run history |
-| Remote work | Hosts set up over SSH with `superset hosts add` or Settings, with membership controls; cloud workspaces | SSH projects and provisioned workspaces |
-| Source license | Elastic License 2.0 | Apache-2.0 |
+| Remote work | Hosts set up over SSH with `superset hosts add` or Settings, with membership controls; your own Linux server through Bring Your Own Cloud; cloud workspaces (beta) | SSH projects and provisioned workspaces |
+| Source license | MIT | Apache-2.0 |
 
 Emdash's [documentation](https://emdash.com/docs) covers agent providers, issue intake, previews, and review. Its [automation reference](https://emdash.com/docs/automations) describes scheduled and manual runs. It also offers [cloud workspaces](https://emdash.com/cloud) and an [enterprise plan](https://emdash.com/enterprise).
 
 ## Paradev requirements
 
-Paradev runs CLI coding agents in separate workspaces, with terminals and diff review in one app. Workspaces run on your machine, on hosts you add, or in the cloud. Desktop supports macOS and an experimental Linux AppImage. Windows is not yet available. Paradev is source-available under Elastic License 2.0.
+Paradev runs CLI coding agents in separate workspaces, with terminals and diff review in one app. A chat interface can show Claude Code, Codex, OpenCode, and Pi sessions as a chat. Workspaces run on your machine, on hosts you add, on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud) (beta). Desktop supports macOS and an experimental Linux AppImage. Windows is not yet available. Paradev is open source under the MIT License.
 
 To use [Paradev on iPhone and iPad](/mobile), you need iOS 26 or iPadOS 26 or later, Pro, and either a host that stays online or a cloud workspace. Remote access and automations also require a paid plan. See [pricing](/pricing) and [remote access setup](https://docs.paradev.com/remote-access).
 
@@ -61,4 +61,4 @@ Yes. Its documentation covers SSH and provisioned remote workspaces, and it has 
 
 ### Is Paradev open source under the same license?
 
-No. Paradev is source-available under Elastic License 2.0. Emdash uses Apache-2.0. Read the licenses if redistribution or service hosting is part of your requirements.
+No. Both are open source, under different licenses: Paradev uses the MIT License and Emdash uses Apache-2.0. Apache-2.0 adds an explicit patent grant; MIT does not.

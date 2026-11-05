@@ -2,7 +2,7 @@
 title: "How to Review Coding Agent Work as a Team: Branches, Diffs, and Owners (2026)"
 description: "Tools for giving each coding agent task its own branch and human reviewer, comparing two agents' diffs, and sending follow-ups before you merge."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - codex
@@ -43,7 +43,7 @@ The rest of this page answers the specific questions teams ask when they set thi
 | Paradev | Git worktree and branch per workspace | Changes pane, PR view with checks and merge | Select PR diff lines, send to a running or new agent | `superset` CLI, MCP server, TypeScript SDK (alpha) |
 | Codex app | Worktrees and cloud environments | Diff review in the app | Chat follow-up in the same thread | Codex CLI |
 | Cursor | Up to 8 agents in local worktrees, plus cloud agents | Agent diff view in the editor | Follow-up prompts in the agent pane | Cursor's own agents |
-| Conductor | Workspace per task, local Mac or cloud | Diffs, checks, PRs, merge | Chat in the workspace | Conductor API |
+| Conductor (closed to new users) | Workspace per task on a local Mac; cloud shuts down November 20, 2026 | Diffs, checks, PRs, merge | Chat in the workspace | Conductor API |
 | GitHub Copilot coding agent | Branch per assigned issue | GitHub pull request | PR review comments | Assign a GitHub issue |
 | Plain `git worktree` + tmux | Manual | Your editor and `git diff` | Type into the agent's pane | Shell scripts |
 
@@ -118,7 +118,7 @@ Keep one task, one branch, and one PR, and merge them one at a time with CI betw
 
 - **Plain `git worktree`** works for two or three agents. Name branches after the task.
 - **Vibe Kanban** maps each task card to a worktree and agent.
-- **Conductor** gives each workspace its own diff, checks, and merge.
+- **Conductor** gives each workspace its own diff, checks, and merge. It is joining Meta and is closed to new users. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 - **Graphite** fits when agent branches depend on each other and you want stacked PRs.
 - **Paradev** shows each workspace's PR state, review status, and CI checks on hover in the sidebar. `--tag` groups workspaces into sidebar folders, for example one folder per feature. The Pull requests view filters by several authors at once, and **Merge** offers squash, merge commit, or rebase.
 
@@ -152,7 +152,7 @@ The Linear custom-script setup is another dispatch path: **Work on issue → Cus
 
 - **Pick Codex, Cursor, or Claude Code alone** if one engineer runs two or three agents and is happy with one vendor's agent.
 - **Pick Copilot coding agent or Devin** if you want to assign an issue and get the work back as a PR.
-- **Pick Paradev** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, or a cloud workspace, does not proxy model calls, and has a free tier plus paid seats.
+- **Pick Paradev** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, your own Linux server with Bring Your Own Cloud, or a cloud workspace (beta). It is open source under the MIT License, does not proxy model calls, and has a free tier plus paid seats.
 - **Add branch protection and `CODEOWNERS` in every case.** That is where the accountable reviewer actually lives.
 
 ## Frequently Asked Questions

@@ -1,8 +1,8 @@
 ---
 title: "Best Orca Alternatives in 2026"
-description: "The best alternatives to Orca for running AI coding agents in parallel worktrees, including Paradev, Conductor, Emdash, Nimbalyst, and Herdr, compared by platform, mobile, hosting, and license."
+description: "The best alternatives to Orca for running AI coding agents in parallel worktrees, including Paradev, Emdash, Nimbalyst, and Herdr, compared by platform, mobile, hosting, and license."
 date: 2026-08-07
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - orca
@@ -19,11 +19,11 @@ keywords:
   - parallel ai coding agents
 ---
 
-Orca is a free, MIT-licensed desktop agent development environment. It runs agents in parallel worktrees with terminals, browser tabs, and Design Mode, and adds SSH worktrees, scheduled automations, and beta mobile apps. If you want an MCP server and TypeScript SDK that let agents run your workspaces, cloud workspaces that keep running without your laptop, and a released iPhone and iPad app, Paradev is built for that loop.
+Orca is a free, MIT-licensed desktop agent development environment. It runs agents in parallel worktrees with terminals or a Chat UI, browser tabs, and Design Mode, and adds SSH worktrees, scheduled automations, plugins, and beta mobile apps. If you want an MCP server and TypeScript SDK that let agents run your workspaces, cloud workspaces that keep running without your laptop, and a released iPhone and iPad app, Paradev is built for that loop.
 
 **Our recommendation: choose Paradev if you want parallel agents you can script, reach from your phone, and run on your own hosts or in the cloud.** The alternatives below cover other preferences, including team cloud products and terminal-native tools.
 
-[Download Paradev](/download) to try a small task, or read [Paradev vs Orca](/compare/superset-vs-orca) for the direct comparison. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
+[Download Paradev](/download) to try a small task, or read [Paradev vs Orca](/compare/superset-vs-orca) for the direct comparison. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results. Orca facts were checked against its site, docs, and GitHub releases on November 5, 2026.
 
 ---
 
@@ -31,15 +31,15 @@ Orca is a free, MIT-licensed desktop agent development environment. It runs agen
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | Worktrees, review, automations, MCP and SDK control, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
-| **Conductor** | Polished Mac app with team cloud workspaces | Mac + iOS | Proprietary |
+| **Paradev** | Worktrees, review, automations, MCP and SDK control, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Open source (MIT) |
+| **Conductor** | Existing users only; joining Meta, closed to new users | Mac + iOS | Proprietary |
 | **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
 | **Nimbalyst** | Visual workspace with markdown, mockups, and diagrams | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Herdr** | Terminal-native agent multiplexer | macOS, Linux, Windows | Open source (Apache-2.0) |
 
 ## Why Look for an Orca Alternative?
 
-Orca covers a lot: worktrees, an embedded browser with Design Mode, SSH worktrees, scheduled automations, and 27 supported agents. Its [mobile docs](https://www.onorca.dev/docs/mobile) describe the iOS app and the Android APK as beta, Remote Orca Servers are in beta, and multi-agent orchestration is an experimental setting. Common reasons to look elsewhere:
+Orca covers a lot: worktrees, a Chat UI that left experimental on November 2, 2026, an embedded browser with Design Mode, SSH worktrees, scheduled automations, plugins, and more than 25 named agents. Its [mobile docs](https://www.onorca.dev/docs/mobile) describe the iOS app and the Android APK as beta, Remote Orca Servers are in beta, and multi-agent orchestration is an experimental setting. Common reasons to look elsewhere:
 
 - **Programmatic control.** You want agents and scripts to create workspaces and launch agents through an MCP server or a TypeScript SDK, not only a CLI.
 - **Cloud workspaces.** You want workspaces that keep running without your own machine or cloud account.
@@ -51,13 +51,13 @@ Orca covers a lot: worktrees, an embedded browser with Design Mode, SSH worktree
 
 ### Paradev
 
-Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. It adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, and a Workspaces page that groups every workspace by state (Needs attention, Working, Needs review, Idle, Merged). Workspaces run on your machine, on any macOS or Linux host you add through Remote Access, or in a cloud workspace, and the [iPhone and iPad app](/mobile) reaches all of them. Pro adds remote access, the iPhone and iPad app, and scheduled automations with run history and retry. A CLI, TypeScript SDK, MCP server, and Slack bot let agents and teammates start work without opening the app.
+Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. It adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, and a Workspaces page that groups every workspace by state (Needs attention, Working, Needs review, Idle, Merged). Workspaces run on your machine, on any macOS or Linux host you add through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in a [cloud workspace](/cloud) (beta), and the [iPhone and iPad app](/mobile) reaches all of them. Pro adds remote access, the iPhone and iPad app, and scheduled automations with run history and retry. A CLI, TypeScript SDK, MCP server, and Slack bot let agents and teammates start work without opening the app. Like Orca, Paradev is open source under the MIT License.
 
 For the direct comparison, see [Paradev vs Orca](/compare/superset-vs-orca).
 
 ### Conductor
 
-Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Its Pro plan at $50/month adds cloud workspaces, multiplayer, an API, and an iOS app. Choose it if your team wants shared agent conversations in a managed cloud.
+Conductor is a Mac app that runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces. Conductor is joining Meta. Since November 4, 2026, it takes no new sign-ups, and you can no longer download the app. Conductor Cloud shuts down on November 20, 2026, and the Mac app gets only new models and critical bug fixes until early 2027. Existing users can follow the guides to [migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -82,14 +82,14 @@ See [Paradev vs Herdr](/compare/superset-vs-herdr).
 ## How To Choose
 
 - For worktrees, review, automations, MCP and SDK control, and remote and cloud workspaces, choose **Paradev**.
-- For a polished Mac app with team cloud workspaces, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 - For open source with issue-tracker intake and many agent CLIs, choose **Emdash**.
 - For an open-source visual workspace with document editing, choose **Nimbalyst**.
 - To stay terminal-native, choose **Herdr**.
 
 ## Verdict
 
-Orca is a strong free, open-source choice, especially if Windows, Android, or an MIT license is decisive. Choose Paradev when you want agents to drive your workspaces through MCP or the SDK, a released iPhone and iPad app, and cloud workspaces that run without your laptop. Run the same small task in both and compare the review step. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+Orca is a strong free, open-source choice, especially if Windows or Android is decisive. Choose Paradev when you want agents to drive your workspaces through MCP or the SDK, a released iPhone and iPad app, and cloud workspaces that run without your laptop. Run the same small task in both and compare the review step. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
 
 ## What To Try First
 
@@ -108,7 +108,7 @@ For developers who want parallel agents they can script through MCP or an SDK, r
 
 ### Is there an open-source Orca alternative?
 
-Yes. Emdash (Apache-2.0), Nimbalyst (MIT), and Herdr (Apache-2.0) are open source. Paradev is source-available under Elastic License 2.0. Conductor is proprietary.
+Yes. Emdash (Apache-2.0), Nimbalyst (MIT), and Herdr (Apache-2.0) are open source. Paradev is open source under the MIT License. Conductor is proprietary.
 
 ### Is there an Orca alternative for Windows?
 

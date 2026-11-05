@@ -1064,6 +1064,12 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Acesso de {label} a {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "O {label} volta a ficar sem configuração. Nada muda nas suas áreas de trabalho: o seu script e o login que ele mantém continuam lá até você removê-los."
+
+msgid "{label} is set to manual"
+msgstr "{label} agora usa login manual"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1231,14 +1237,14 @@ msgstr "{price} por usuário/mês, {gbHours} GB-horas na nuvem por assento ao m�
 msgid "{price}/user/mo"
 msgstr "{price}/usuário/mês"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "O {productName} (antigo {formerName}, YC P26) é o IDE com código-fonte disponível para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "O {productName} (antes {formerName}, YC P26) é o IDE de código aberto para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName} (antigo {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "O {productName} (YC P26) é o IDE com código-fonte disponível para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "O {productName} (YC P26) é o IDE de código aberto para a era dos agentes de IA, em que engenheiros executam centenas de agentes de programação como Claude Code e Codex em paralelo."
 
 msgid "{productName} for press"
 msgstr "{productName} para a imprensa"
@@ -1512,6 +1518,9 @@ msgstr "<0>{who}</0> reagiu com {shortcode}"
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>de {1} no ranking</1>"
 
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> ou um <1>apiKeyHelper</1>"
+
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Em breve no</0><1>Google Play</1>"
 
@@ -1626,6 +1635,9 @@ msgstr "3 áreas de trabalho arquivadas"
 
 msgid "3 files changed, 2 tests passing"
 msgstr "3 arquivos alterados, 2 testes passando"
+
+msgid "3 running"
+msgstr "3 em execução"
 
 msgid "3+ concurrent workstreams per engineer"
 msgstr "3 ou mais frentes simultâneas por pessoa"
@@ -2292,6 +2304,9 @@ msgstr "Sessão de agente iniciada"
 msgid "agent settings"
 msgstr "configurações do agente"
 
+msgid "Agent settings"
+msgstr "Configurações de agentes"
+
 msgid "Agent usage rankings"
 msgstr "Rankings de uso de agentes"
 
@@ -2308,6 +2323,9 @@ msgstr "Os agentes não conseguem acessar as ferramentas de {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Os agentes concluem tickets rotineiros sem intervenção no meio da tarefa."
 
+msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
+msgstr "Os agentes continuam trabalhando na nuvem. Abra a área de trabalho de novo no desktop, iPhone ou iPad."
+
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Os agentes carregam a própria prévia, usam a interface e anexam capturas de tela como prova antes de marcar o trabalho como pronto para revisão."
 
@@ -2322,6 +2340,12 @@ msgstr "Os agentes lembram o que aprendem sobre sua base de código, então cada
 
 msgid "Agents running at once"
 msgstr "Agentes rodando ao mesmo tempo"
+
+msgid "Agents see a placeholder. Paradev adds your sign-in to outgoing requests."
+msgstr "Os agentes veem só um marcador. O Paradev adiciona seu login às requisições de saída."
+
+msgid "Agents that run while you're away"
+msgstr "Agentes que trabalham enquanto você está fora"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Os agentes usam esta conta quando chamam as ferramentas do Linear."
@@ -2637,6 +2661,9 @@ msgstr "Um agente escreve funções e arquivos inteiros enquanto uma pessoa acom
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Uma automação só pode usar uma área de trabalho na nuvem criada por você"
+
+msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
+msgstr "Um ambiente guarda seus repositórios, variáveis e região. Inicie quantas áreas de trabalho precisar a partir dele."
 
 msgid "An error occurred"
 msgstr "Ocorreu um erro"
@@ -3093,9 +3120,6 @@ msgstr "Anexar ao chat"
 msgid "Attached"
 msgstr "Conectada"
 
-msgid "Attaching to the running session…"
-msgstr "Conectando à sessão em execução…"
-
 msgid "attachment"
 msgstr "anexo"
 
@@ -3411,9 +3435,6 @@ msgstr "baseado no PR #{0}"
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "Com base em {0} tokens nos últimos 30 dias, contando {1}."
 
-msgid "Become a design partner"
-msgstr "Torne-se um parceiro de desenvolvimento"
-
 msgid "Before"
 msgstr "Antes"
 
@@ -3601,9 +3622,6 @@ msgstr "Leve o {companyName} para sua equipe. Entre em contato para saber mais s
 msgid "Bring a link to something you built recently."
 msgstr "Traga o link de algo que você construiu recentemente."
 
-msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Traga Claude Code, Codex, OpenCode ou qualquer agente de código para um único workspace. Execute tarefas em paralelo em branches separadas e revise tudo em um só lugar."
-
 msgid "Bring in an agent"
 msgstr "Escolher um agente"
 
@@ -3672,9 +3690,6 @@ msgstr "Relatos de bugs"
 
 msgid "Build in public"
 msgstr "Construir em público"
-
-msgid "Build the future of Paradev in the cloud"
-msgstr "Construa o futuro do Paradev na nuvem"
 
 msgid "Build your own"
 msgstr "Crie o seu"
@@ -4093,6 +4108,9 @@ msgstr "Chat fechado"
 msgid "Chat history"
 msgstr "Histórico de chats"
 
+msgid "Chat interface"
+msgstr "Interface de chat"
+
 msgid "Chat is being reworked"
 msgstr "O chat está sendo refeito"
 
@@ -4285,6 +4303,9 @@ msgstr "Escolha onde abrir os agentes iniciados em comentários, no modo de desi
 
 msgid "Choose your default skin tone"
 msgstr "Escolha seu tom de pele padrão"
+
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Escolher isto remove qualquer credencial salva aqui para {label}."
 
 msgid "CI failed"
 msgstr "CI falhou"
@@ -4613,6 +4634,9 @@ msgstr "Fechar área de trabalho"
 msgid "Close Workspace"
 msgstr "Fechar área de trabalho"
 
+msgid "Close your laptop"
+msgstr "Feche o notebook"
+
 msgid "Closed"
 msgstr "Fechado"
 
@@ -4635,6 +4659,9 @@ msgstr "Fechar este terminal encerra o processo em execução."
 msgid "Cloud"
 msgstr "Nuvem"
 
+msgid "Cloud · us-east"
+msgstr "Nuvem · us-east"
+
 msgid "Cloud environment setup"
 msgstr "Configuração do ambiente na nuvem"
 
@@ -4646,9 +4673,6 @@ msgstr "Ambientes na nuvem obtêm seus repositórios do GitHub. Conecte estes pr
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-horas na nuvem por assento ao mês"
-
-msgid "Cloud is coming. Become a design partner"
-msgstr "A nuvem está chegando. Torne-se um parceiro de desenvolvimento"
 
 msgid "Cloud sandboxes"
 msgstr "Sandboxes na nuvem"
@@ -4754,9 +4778,6 @@ msgstr "Combina sequências como => e !==."
 
 msgid "Come build it with us."
 msgstr "Venha construir com a gente."
-
-msgid "Coming soon"
-msgstr "Em breve"
 
 msgid "Coming Soon"
 msgstr "Em breve"
@@ -5240,14 +5261,15 @@ msgstr "Janela de contexto: {percent} usado"
 msgid "Continue"
 msgstr "Continuar"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Continuar"
+
 msgid "Continue in your browser"
 msgstr "Continue no seu navegador"
 
 msgid "Continue or fork session"
 msgstr "Continuar ou bifurcar a sessão"
-
-msgid "Continue the session the last run left"
-msgstr "Retomar a sessão da última execução"
 
 msgid "Continue this chat on another login"
 msgstr "Continuar este chat em outro login"
@@ -5280,9 +5302,6 @@ msgstr "Continuar com o Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Continuar uma sessão de agente exige uma área de trabalho fixada"
-
-msgid "continuing the last session"
-msgstr "continuando a última sessão"
 
 msgid "Continuing…"
 msgstr "Continuando…"
@@ -5746,6 +5765,9 @@ msgstr "Não foi possível retomar"
 msgid "Could not resume the chat"
 msgstr "Não foi possível retomar o chat"
 
+msgid "Could not save the change."
+msgstr "Não foi possível salvar a alteração."
+
 msgid "Could not send"
 msgstr "Não foi possível enviar"
 
@@ -5815,6 +5837,9 @@ msgstr "Não foi possível verificar a credencial: {reason}"
 
 msgid "Couldn't add them to the channel"
 msgstr "Não foi possível adicioná-los ao canal"
+
+msgid "Couldn't add this repo"
+msgstr "Não foi possível adicionar este repositório"
 
 msgid "Couldn't ask the workspace for a description"
 msgstr "Não foi possível pedir uma descrição ao espaço de trabalho"
@@ -5890,6 +5915,9 @@ msgstr "Não foi possível bifurcar em um chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Não foi possível entregar isto a um agente"
+
+msgid "Couldn't import"
+msgstr "Não foi possível importar"
 
 msgid "Couldn't load {filename}"
 msgstr "Não foi possível carregar {filename}"
@@ -6018,6 +6046,9 @@ msgstr "Não foi possível salvar o Dev"
 
 msgid "Couldn't save the routine"
 msgstr "Não foi possível salvar a rotina"
+
+msgid "Couldn't save your choice. Try again."
+msgstr "Não foi possível salvar sua escolha. Tente novamente."
 
 msgid "Couldn't send comment"
 msgstr "Não foi possível enviar o comentário"
@@ -7442,6 +7473,12 @@ msgstr "Cada um em sua própria aba"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Toda manhã às 8h, veja as execuções de CI que falharam ontem, diagnostique a falha mais comum e abra um PR com a correção."
 
+msgid "Each run makes its own"
+msgstr "Cada execução cria a sua"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Cada execução inicia uma nova conversa com o agente"
+
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Cada assento adiciona as horas do seu plano a um único pool compartilhado por toda a equipe:"
 
@@ -7453,6 +7490,9 @@ msgstr "Cada superfície tem a própria tipografia. As mudanças aparecem na hor
 
 msgid "Each task on its own branch"
 msgstr "Cada tarefa em sua própria branch"
+
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
+msgstr "Cada área de trabalho tem sua própria máquina na nuvem e continua trabalhando com o notebook fechado. Acompanhe pelo desktop, iPhone ou iPad."
 
 msgid "Early 2024"
 msgstr "Início de 2024"
@@ -9036,8 +9076,8 @@ msgstr "Tela cheia"
 msgid "Full self-driving"
 msgstr "Autonomia total"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Código-fonte completo no GitHub sob a Elastic License 2.0 (ELv2). Inspecione, audite e contribua. Sem caixas-pretas, sem funcionalidade escondida."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "Código-fonte completo no GitHub sob a Licença MIT. Inspecione, audite e contribua. Sem caixas-pretas, sem funcionalidade escondida."
 
 msgid "Funding"
 msgstr "Investimento"
@@ -9251,6 +9291,9 @@ msgstr "Avançar para a próxima página do histórico"
 
 msgid "Go home"
 msgstr "Ir para o início"
+
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Refaça as etapas do primeiro uso. Seus projetos e configurações continuam como estão."
 
 msgid "Go to home"
 msgstr "Ir para o início"
@@ -9616,6 +9659,9 @@ msgstr "Como eu começo?"
 msgid "How do the paid plans work?"
 msgstr "Como funcionam os planos pagos?"
 
+msgid "How do you want to work?"
+msgstr "Como você quer trabalhar?"
+
 msgid "How does pricing work?"
 msgstr "Como funciona o preço?"
 
@@ -9672,6 +9718,9 @@ msgstr "Como protegemos o código"
 
 msgid "How we work"
 msgstr "Como trabalhamos"
+
+msgid "How you run agents"
+msgstr "Como você executa agentes"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Como seus agentes entram dentro das áreas de trabalho na nuvem. Outras pessoas conectam as próprias assinaturas ou chaves de API; nesta máquina cada agente continua usando o login que já está nela."
@@ -9822,6 +9871,10 @@ msgstr "Falha na importação"
 msgid "Import failed: {message}"
 msgstr "Falha na importação: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Importar de {0}"
+
 msgid "Import from file"
 msgstr "Importar de um arquivo"
 
@@ -9851,6 +9904,9 @@ msgstr "Importar…"
 
 msgid "Important"
 msgstr "Importante"
+
+msgid "Imported"
+msgstr "Importado"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
@@ -9882,14 +9938,14 @@ msgstr "Visualizador de diff melhorado"
 msgid "in {0}"
 msgstr "em {0}"
 
-msgid "in a new session"
-msgstr "em uma nova sessão"
-
 msgid "in a terminal on this host."
 msgstr "em um terminal neste host."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Em poucos meses, <0>dezenas de milhares de pessoas de engenharia</0> passaram a usar o Paradev como IDE principal, em empresas como Wix, DoorDash e Netflix."
+
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "No modo manual, o Paradev não faz login neste agente. Faça seu script entrar de novo e continue, ou desative o modo manual nas configurações de agentes."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Presencial em San Francisco, cinco dias por semana. Você trabalha diretamente com os fundadores."
@@ -9939,6 +9995,9 @@ msgstr "Incluído"
 
 msgid "Included in Enterprise"
 msgstr "Incluído no Enterprise"
+
+msgid "Included with Team and Ultra."
+msgstr "Incluído no Team e no Ultra."
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Inclui a variante box específica do Paradev"
@@ -10348,9 +10407,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "Entrar"
 
-msgid "Join as a design partner"
-msgstr "Participe como design partner"
-
 msgid "Join channel"
 msgstr "Entrar no canal"
 
@@ -10544,6 +10600,9 @@ msgstr "Idioma"
 
 msgid "Language saved on this device, but syncing it to your account failed."
 msgstr "O idioma foi salvo neste dispositivo, mas a sincronização com sua conta falhou."
+
+msgid "Laptop closed"
+msgstr "Notebook fechado"
 
 msgid "Large"
 msgstr "Grande"
@@ -11300,8 +11359,17 @@ msgstr "Gerenciado pelo administrador da sua organização."
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual mode is off for {label}."
+msgstr "O modo manual do {label} está desativado."
+
 msgid "Manual order"
 msgstr "Ordem manual"
+
+msgid "manual sign-in"
+msgstr "login manual"
+
+msgid "Manual sign-in"
+msgstr "Login manual"
 
 msgid "Mark all read"
 msgstr "Marcar tudo como lido"
@@ -11608,6 +11676,9 @@ msgstr "Faltam campos obrigatórios."
 #. js-lingui-explicit-id
 msgid "serverError.plugins.missingInput"
 msgstr "Entrada obrigatória {input} ausente"
+
+msgid "MIT License"
+msgstr "Licença MIT"
 
 msgid "Mobile"
 msgstr "Celular"
@@ -12373,6 +12444,9 @@ msgstr "Nenhuma issue encontrada."
 msgid "No items"
 msgstr "Nenhum item"
 
+msgid "No keys in the sandbox"
+msgstr "Nenhuma chave no sandbox"
+
 msgid "No known creators"
 msgstr "Nenhum criador conhecido"
 
@@ -13096,6 +13170,9 @@ msgstr "Uma linha"
 msgid "One line about how you work"
 msgstr "Uma linha sobre como você trabalha"
 
+msgid "One machine per workspace."
+msgstr "Uma máquina por área de trabalho."
+
 msgid "One of the first hundred on the board"
 msgstr "Entre os cem primeiros do ranking"
 
@@ -13113,9 +13190,6 @@ msgstr "Um plugin. Todos os agentes de código."
 
 msgid "One step left"
 msgstr "Falta um passo"
-
-msgid "One workspace for Claude Code, Codex, and any coding agent."
-msgstr "Uma área de trabalho só para Claude Code, Codex e qualquer agente de código."
 
 msgid "online"
 msgstr "online"
@@ -13622,6 +13696,9 @@ msgstr "Abrir sheet"
 msgid "Open ship options"
 msgstr "Abrir opções de envio"
 
+msgid "Open Source"
+msgstr "Código aberto"
+
 msgid "Open System Settings"
 msgstr "Abrir Ajustes do Sistema"
 
@@ -14014,6 +14091,9 @@ msgstr "Automações do Paradev"
 msgid "Paradev CLI"
 msgstr "CLI do Paradev"
 
+msgid "Paradev cloud workspaces"
+msgstr "Áreas de trabalho na nuvem do Paradev"
+
 msgid "Paradev components"
 msgstr "Componentes do Paradev"
 
@@ -14056,11 +14136,14 @@ msgstr "O Paradev encaminha as portas que uma área de trabalho remota abre enqu
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "O Paradev tem um plano gratuito. O código-fonte está no GitHub sob a Elastic License 2.0 (ELv2), então você pode inspecioná-lo e hospedá-lo por conta própria conforme os termos da licença."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "O Paradev tem um plano gratuito. O código-fonte está no GitHub sob a Licença MIT, então você pode inspecionar, modificar e hospedar por conta própria."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "O Paradev encontrou um erro inesperado. Recarregue para tentar novamente."
+
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "O Paradev não guarda nenhuma credencial do {label} e não adiciona nenhuma às suas áreas de trabalho na nuvem quando elas iniciam, reiniciam ou são retomadas. Um script que você executa dentro da área de trabalho mantém {loginFile} atualizado. Se ele parar, o {label} continua sem login até o seu script fazer login de novo."
 
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "O Paradev guarda o token e faz as chamadas. Os agentes nunca o veem."
@@ -14086,11 +14169,8 @@ msgstr "O Paradev é desenvolvido no Paradev, então somos nossos próprios usu�
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "O Paradev foi feito para funcionar com a ferramenta que você já usa. Temos suporte nativo a deep links para IDEs como o Cursor, então dá para abrir suas áreas de trabalho e arquivos direto na sua IDE."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "O Paradev é source-available: o código é público no GitHub sob a Elastic License 2.0 (ELv2), que permite inspecionar e hospedar por conta própria conforme os termos da licença, mas não é open source aprovado pela OSI. O Paradev não tem relação com o Apache Superset, a ferramenta de business intelligence."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "O código-fonte do Paradev é público para consulta. Cada pull request, revisão e bug é público no GitHub."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "O Paradev é de código aberto. Cada pull request, revisão e bug é público no GitHub."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "O Paradev é a bancada para a transição de F3 para F4: agentes em paralelo em branches separadas, frotas que você consegue de fato supervisionar e uma interface de revisão para código que você não escreveu."
@@ -14368,6 +14448,9 @@ msgstr "Escolha uma pasta no disco e adicione-a como projeto"
 
 msgid "Pick a folder…"
 msgstr "Escolha uma pasta…"
+
+msgid "Pick a machine size"
+msgstr "Escolha um tamanho de máquina"
 
 msgid "Pick a model"
 msgstr "Escolha um modelo"
@@ -15269,6 +15352,9 @@ msgstr "Ler o guia"
 msgid "Read the guide to parallel coding agents"
 msgstr "Leia o guia de agentes de código em paralelo"
 
+msgid "Read the MIT License"
+msgstr "Ler a licença MIT"
+
 msgid "Read the page"
 msgstr "Ler a página"
 
@@ -16045,8 +16131,14 @@ msgstr "Reiniciar o serviço do host"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Reinicie agora para movê-los para {accountLabel}; cada sessão retoma a conversa de onde parou."
 
+msgid "Restart onboarding"
+msgstr "Reiniciar a introdução"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Reiniciar os agentes {providerLabel} em execução?"
+
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Reinicie as áreas de trabalho em execução para que os agentes apliquem a mudança."
 
 msgid "Restart terminal daemon?"
 msgstr "Reiniciar o daemon de terminal?"
@@ -16184,9 +16276,6 @@ msgstr "Retomando na redefinição"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Retomando em {resumeSeconds} s"
 
-msgid "Resuming the conversation…"
-msgstr "Retomando a conversa…"
-
 msgid "Retry"
 msgstr "Tentar de novo"
 
@@ -16222,6 +16311,9 @@ msgstr "Instruções reutilizáveis que seus agentes adotam automaticamente"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Execuções de terminal reutilizáveis. Clique em um script para editar ou arraste para reordenar. Os comandos de setup, execução e teardown do projeto são scripts de ciclo de vida."
+
+msgid "Reusing {keptName}"
+msgstr "Reutilizando {keptName}"
 
 msgid "Reveal in Finder"
 msgstr "Mostrar no Finder"
@@ -16357,8 +16449,8 @@ msgstr "Girar o dispositivo"
 msgid "Roundups"
 msgstr "Panoramas"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Direcione o {label} por um provedor que você mesmo opera, com as credenciais que você tem. Os valores salvos são entregues ao agente na inicialização."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Direcione o {label} por um provedor que você mesmo opera, com as credenciais que você tem, ou deixe o login com as suas próprias ferramentas."
 
 msgid "Routine not found"
 msgstr "Rotina não encontrada"
@@ -16431,6 +16523,9 @@ msgstr "Rode automações quando mensagens forem publicadas ou canais forem cria
 msgid "Run automations when Sentry issues change."
 msgstr "Rode automações quando issues do Sentry mudarem."
 
+msgid "Run coding agents in cloud workspaces that keep working when your laptop is closed. Included with Team and Ultra."
+msgstr "Rode agentes de programação em áreas de trabalho na nuvem que continuam trabalhando com o notebook fechado. Incluído no Team e no Ultra."
+
 msgid "Run commands and navigate the application."
 msgstr "Execute comandos e navegue pelo aplicativo."
 
@@ -16497,6 +16592,9 @@ msgstr "Execute seus agentes no desktop, em qualquer terminal ou no seu celular.
 msgid "Run your agents from your phone."
 msgstr "Execute seus agentes no seu celular."
 
+msgid "Run your coding agents in the cloud."
+msgstr "Rode seus agentes de programação na nuvem."
+
 msgid "Run."
 msgstr "Execute."
 
@@ -16551,8 +16649,14 @@ msgstr "Executado quando um espaço de trabalho é criado."
 msgid "Runs when a workspace is deleted."
 msgstr "Executado quando um espaço de trabalho é excluído."
 
+msgid "Same session"
+msgstr "Mesma sessão"
+
 msgid "Same version as this app."
 msgstr "Mesma versão que este app."
+
+msgid "Same workspace"
+msgstr "Mesma área de trabalho"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SSO SAML e provisionamento SCIM"
@@ -17334,6 +17438,9 @@ msgstr "Configurar um host via SSH"
 msgid "Set up an automation"
 msgstr "Configure uma automação"
 
+msgid "Set up once"
+msgstr "Configure uma vez"
+
 msgid "Set up project on {hostName}"
 msgstr "Configurar o projeto em {hostName}"
 
@@ -17912,6 +18019,9 @@ msgctxt "machine size"
 msgid "Small"
 msgstr "Pequena"
 
+msgid "Small, Medium, or Large, up to 8 vCPU and 16 GB. Usage scales with memory."
+msgstr "Pequena, Média ou Grande, até 8 vCPU e 16 GB. O uso depende da memória."
+
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Acabe com o seu backlog."
@@ -18044,9 +18154,6 @@ msgstr "Sons e toque para tarefas concluídas"
 
 msgid "Source"
 msgstr "Origem"
-
-msgid "Source Available"
-msgstr "Código disponível"
 
 msgid "Source path (not an import)"
 msgstr "Caminho do fonte (não é um import)"
@@ -18235,9 +18342,6 @@ msgstr "Comece uma conversa para ver as mensagens aqui"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Inicia uma nova sessão de agente com o contexto recente deste terminal. Os arquivos do espaço de trabalho continuam sendo a fonte da verdade."
 
-msgid "Start a new agent session each run"
-msgstr "Iniciar uma nova sessão de agente a cada execução"
-
 msgid "Start a new chat"
 msgstr "Iniciar um novo chat"
 
@@ -18300,6 +18404,9 @@ msgstr "Comece a trabalhar de qualquer lugar"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Inicie áreas de trabalho direto de issues do Linear ou do GitHub na visualização Tarefas, com um agente já trabalhando em cada uma."
+
+msgid "Start your first cloud workspace."
+msgstr "Inicie sua primeira área de trabalho na nuvem."
 
 msgid "Started"
 msgstr "Iniciada"
@@ -19087,11 +19194,17 @@ msgstr "O agente copia a conversa; a ramificação abre em uma nova aba"
 msgid "The agent crashed"
 msgstr "O agente travou"
 
+msgid "The agent is signed out"
+msgstr "O agente está desconectado"
+
 msgid "The agent lost this conversation"
 msgstr "O agente perdeu esta conversa"
 
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "O agente é dono da tarefa, do ticket ao diff. A pessoa revisa o resultado, não as teclas digitadas. A atenção sai de escrever código e vai para especificar o trabalho e julgá-lo. Uma pessoa toca vários agentes ao mesmo tempo em áreas de trabalho isoladas."
+
+msgid "The agent picks up where the last run left off"
+msgstr "O agente continua de onde a última execução parou"
 
 msgid "The agent stopped responding"
 msgstr "O agente parou de responder"
@@ -19204,6 +19317,9 @@ msgstr "O arquivo não continha nenhum tema importável."
 msgid "The first F4 teams"
 msgstr "Os primeiros times F4"
 
+msgid "The first run makes one, later runs reuse it"
+msgstr "A primeira execução cria uma, as seguintes a reutilizam"
+
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Os primeiros times, pequenos, entregam código majoritariamente feito por agentes sem ler cada linha, e a taxa de defeitos se mantém. Nada de místico por trás: camadas de revisão, canários, rollback rápido e o hábito de escrever especificações em vez de código."
 
@@ -19306,6 +19422,12 @@ msgstr "O nome da sua organização ou equipe"
 
 msgid "The network connection changed"
 msgstr "A conexão de rede mudou"
+
+msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
+msgstr "A área de trabalho de código aberto para Claude Code, Codex e qualquer agente de código."
+
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "O workspace de código aberto para Claude Code, Codex, OpenCode e qualquer agente de código. Execute tarefas em paralelo em branches separadas e revise tudo em um só lugar."
 
 msgid "The overnight shift"
 msgstr "O turno da noite"
@@ -20278,6 +20400,12 @@ msgstr "Transforme tarefas rotineiras em agentes que rodam por agenda ou quando 
 msgid "Turn Fast mode on or off"
 msgstr "Ativar ou desativar o modo rápido"
 
+msgid "Turn off manual mode"
+msgstr "Desativar o modo manual"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Desativar o modo manual do {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Ative “Permitir acesso remoto a este dispositivo via relay”"
 
@@ -20715,6 +20843,12 @@ msgstr "Fazer upgrade para {planName}"
 msgid "Upgrade to Pro"
 msgstr "Fazer upgrade para o Pro"
 
+msgid "Upgrade to Team"
+msgstr "Fazer upgrade para Team"
+
+msgid "Upgrade your organization, connect GitHub, and pick Cloud in the new-workspace screen."
+msgstr "Faça upgrade da sua organização, conecte o GitHub e escolha Nuvem na tela de nova área de trabalho."
+
 msgid "Upgrade your plan"
 msgstr "Faça upgrade do seu plano"
 
@@ -20802,6 +20936,9 @@ msgstr "Usar o padrão global"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Use letras minúsculas, números, hífens e sublinhados"
+
+msgid "Use manual sign-in"
+msgstr "Usar login manual"
 
 msgid "Use more browser features: {features}"
 msgstr "Usar mais recursos do navegador: {features}"
@@ -21194,9 +21331,6 @@ msgstr "Estamos contratando engenheiros em San Francisco. Venha construir as fer
 msgid "We're hiring in San Francisco"
 msgstr "Estamos contratando em San Francisco"
 
-msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
-msgstr "Buscamos parceiros de desenvolvimento para ajudar a moldar nossa oferta na nuvem. Conte-nos sobre seu fluxo de trabalho e entraremos em contato para explorar uma colaboração."
-
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "Estamos reconstruindo este recurso. Volte em breve."
 
@@ -21345,9 +21479,6 @@ msgstr "O que estamos construindo"
 msgid "What we've shipped"
 msgstr "O que já lançamos"
 
-msgid "What would you like to build with Paradev in the cloud?"
-msgstr "O que você gostaria de criar com o Paradev na nuvem?"
-
 msgid "What would you like to know?"
 msgstr "O que você quer saber?"
 
@@ -21465,9 +21596,6 @@ msgstr "Logotipo, preto"
 
 msgid "Wordmark, white"
 msgstr "Logotipo, branco"
-
-msgid "Work email"
-msgstr "E-mail profissional"
 
 msgid "Work from tickets"
 msgstr "Trabalhar a partir de tickets"
@@ -21727,6 +21855,9 @@ msgstr "Sim. Nos planos com workspaces na nuvem, os proprietários podem comprar
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
 msgstr "Sim. O Paradev concluiu uma auditoria SOC 2 Tipo II com um auditor independente, cobrindo nossos controles de segurança em operação ao longo do tempo. Solicite o relatório e veja nossa documentação de segurança em {trustHost}."
 
+msgid "Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Sim. O Paradev é de código aberto sob a licença MIT. O código é público no GitHub, e qualquer pessoa pode abrir issues, enviar pull requests ou fazer um fork. O Paradev não tem relação com o Apache Superset, a ferramenta de business intelligence."
+
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Sim. O Paradev é a área de trabalho onde seus agentes rodam, não um provedor de modelos. Traga Claude Code, Codex, OpenCode ou qualquer agente de CLI e use suas contas ou chaves de API atuais em qualquer plano."
 
@@ -21785,6 +21916,9 @@ msgstr "Você está vendo a versão {version}, somente leitura"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Você pode anexar até {MAX_ATTACHMENTS} arquivos"
+
+msgid "You can change this later in Settings."
+msgstr "Você pode mudar isso depois em Configurações."
 
 msgid "You can close this tab."
 msgstr "Você pode fechar esta aba."

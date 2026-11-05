@@ -1,8 +1,8 @@
 ---
 title: "Best super.engineering Alternatives in 2026"
-description: "The best alternatives to super.engineering (formerly Superconductor) for running parallel AI coding agents, including Paradev, Conductor, Orca, Paseo, and cmux."
+description: "The best alternatives to super.engineering (formerly Superconductor) for running parallel AI coding agents, including Paradev, Orca, Paseo, and cmux."
 date: 2026-08-07
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - super-engineering
@@ -32,8 +32,8 @@ super.engineering (formerly Superconductor) is the performance purist's agent or
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | A shipping product with automations, CLI/SDK/MCP, and teams | macOS; experimental Linux AppImage; Windows unavailable | Source-available (ELv2) |
-| **Conductor** | Polished, stable Mac app with agent teams | macOS | Proprietary |
+| **Paradev** | A shipping product with automations, CLI/SDK/MCP, and teams | macOS; experimental Linux AppImage; Windows unavailable | Open source (MIT) |
+| **Conductor** | Existing users only; joining Meta, closed to new users | macOS | Proprietary |
 | **Orca** | Free cross-platform desktop ADE | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Paseo** | Self-hosted daemon with native mobile apps | macOS, Windows, Linux + iOS/Android/web | Open source (Apache-2.0) |
 | **cmux** | Native macOS terminal for agents | macOS | Open source (GPL) |
@@ -47,13 +47,13 @@ The native engineering is real, but so are the alpha caveats: nightly is the onl
 
 ### Paradev
 
-Paradev trades some native chrome for a complete product: any CLI agent, with each task in its own workspace, worktree, and branch, persistent daemon-backed terminals, diff review with commit, push, and PR creation, a Pull Requests view, an in-app browser with Design Mode and port detection, and -- the parts super.engineering lacks entirely -- scheduled automations, a CLI and TypeScript SDK, an MCP server, a Slack bot, and Remote Access to any machine you add as a host. It has published pricing, team plans, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report. If you want parallel agents as dependable infrastructure rather than an alpha experiment, this is the alternative.
+Paradev trades some native chrome for a complete product: any CLI agent, with each task in its own workspace, worktree, and branch, persistent daemon-backed terminals, diff review with commit, push, and PR creation, a Pull Requests view, an in-app browser with Design Mode and port detection, and -- the parts super.engineering lacks entirely -- scheduled automations, a CLI and TypeScript SDK, an MCP server, a Slack bot, Remote Access to any machine you add as a host, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) on your own Linux server, and [cloud workspaces](/cloud) in beta. It is open source under the MIT License, and it has published pricing, team plans, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report. If you want parallel agents as dependable infrastructure rather than an alpha experiment, this is the alternative.
 
 For the direct comparison, see [Paradev vs super.engineering](/compare/superset-vs-super-engineering).
 
 ### Conductor
 
-Conductor is the closest like-for-like: a proprietary, polished macOS app running Claude Code, Codex, Cursor, and OpenCode in parallel worktrees, with named agent teams and four coordination patterns. Fewer agents than super.engineering's fifteen-provider matrix, but stable and shipping, with a free tier and Pro at $50 per month for cloud workspaces.
+Conductor is the closest like-for-like: a proprietary, polished macOS app running Claude Code, Codex, Cursor, and OpenCode in parallel worktrees, with named agent teams and four coordination patterns. It has fewer agents than super.engineering's fifteen-provider matrix. Conductor is joining Meta. Since November 4, 2026, it takes no new sign-ups, and you can no longer download the app. Conductor Cloud shuts down on November 20, 2026, and the Mac app gets only new models and critical bug fixes until early 2027. Existing users can follow the guides to [migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -84,7 +84,7 @@ See [Paradev vs Emdash](/compare/superset-vs-emdash).
 ## How To Choose
 
 - For a dependable product with automations, programmable surfaces, and teams, choose **Paradev**.
-- For a stable, focused Mac app with agent teams, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 - For free and cross-platform with mobile apps, choose **Orca**.
 - For a self-hosted daemon with native mobile parity, choose **Paseo**.
 - For just a great native agent terminal, choose **cmux**.
@@ -92,7 +92,7 @@ See [Paradev vs Emdash](/compare/superset-vs-emdash).
 
 ## Verdict
 
-super.engineering may become a serious contender once it leaves alpha -- the native architecture is genuinely impressive, and its experimental orchestration layer is ambitious. Today, if you need parallel worktree agents that your team can rely on, Paradev is the strongest alternative, with Conductor as the stable Mac-native pick and Orca and Paseo as the open-source ones. For the full landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+super.engineering may become a serious contender once it leaves alpha -- the native architecture is genuinely impressive, and its experimental orchestration layer is ambitious. Today, if you need parallel worktree agents that your team can rely on, Paradev is the strongest alternative, with Orca and Paseo as the open-source ones. For the full landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
 
 ## Frequently Asked Questions
 
@@ -102,7 +102,7 @@ For most developers, Paradev: the same worktree orchestration with review built 
 
 ### Is there an open-source super.engineering alternative?
 
-super.engineering is closed source. Orca (MIT), Paseo (Apache-2.0), Emdash (Apache-2.0), and cmux (GPL) are open source; Paradev is source-available under ELv2 with a free tier.
+super.engineering is closed source. Orca (MIT), Paseo (Apache-2.0), Emdash (Apache-2.0), and cmux (GPL) are open source; Paradev is open source under the MIT License with a free tier.
 
 ### Which alternatives work beyond Apple Silicon Macs?
 

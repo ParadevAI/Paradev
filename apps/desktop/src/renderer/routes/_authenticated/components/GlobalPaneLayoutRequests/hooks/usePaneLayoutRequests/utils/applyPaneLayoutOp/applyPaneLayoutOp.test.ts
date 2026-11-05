@@ -119,6 +119,78 @@ describe("applyPaneLayoutOp", () => {
 		expect(state.activeTabId).toBe(tabId);
 	});
 
+	const chat = {
+		sessionId: "chat-1",
+		terminalId: "chat-term",
+		agentId: "claude",
+	};
+
+	test("newTab with a chat session opens a chat pane and can take focus", () => {
+		const {
+			areas: { main: state },
+			tabId,
+		} = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", chat, focus: true },
+			() => "new",
+		);
+		const pane = state.tabs.find((tab) => tab.id === tabId)?.panes.new;
+		expect(pane?.kind).toBe("chat-v3");
+		expect(pane?.data).toEqual({
+			terminalId: "chat-term",
+			sessionId: "chat-1",
+			agent: { id: "claude" },
+		});
+		expect(state.activeTabId).toBe(tabId);
+	});
+
+	test("newTab for a chat session that already has a pane reuses it", () => {
+		const first = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", chat },
+			() => "new",
+		);
+		const again = applyPaneLayoutOp(
+			first.areas,
+			{ type: "newTab", chat, focus: true },
+			() => "other",
+		);
+		expect(again.paneId).toBe("new");
+		expect(again.areas.main.tabs).toHaveLength(3);
+		expect(again.areas.main.activeTabId).toBe(first.tabId);
+	});
+
+	test("a focused newTab in the sidebar shows the sidebar", () => {
+		const focused = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", chat, area: "sidebar", focus: true },
+			() => "new",
+		);
+		const background = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", terminalId: "t-new", area: "sidebar" },
+			() => "new",
+		);
+		expect(focused.showSidebar).toBe(true);
+		expect(background.showSidebar).toBe(false);
+	});
+
+	test("newTab rejects a terminal and a chat together, or neither", () => {
+		expectError(
+			() =>
+				applyPaneLayoutOp(fixture(), {
+					type: "newTab",
+					terminalId: "t-new",
+					chat,
+				}),
+			"BAD_REQUEST",
+		);
+		expectError(
+			() => applyPaneLayoutOp(fixture(), { type: "newTab" }),
+			"BAD_REQUEST",
+		);
+	});
+
 	test("split puts a terminal pane on the requested side and keeps focus", () => {
 		const {
 			areas: { main: state },

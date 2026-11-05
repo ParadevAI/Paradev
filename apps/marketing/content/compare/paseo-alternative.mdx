@@ -1,8 +1,8 @@
 ---
 title: "Best Paseo Alternatives in 2026"
-description: "The best alternatives to Paseo for running coding agents in parallel, including Paradev, Orca, Conductor, Herdr, and Emdash, from desktop workspaces to terminal runtimes."
+description: "The best alternatives to Paseo for running coding agents in parallel, including Paradev, Orca, Herdr, and Emdash, from desktop workspaces to terminal runtimes."
 date: 2026-09-11
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - paseo
@@ -19,7 +19,7 @@ keywords:
   - self-hosted coding agent orchestrator
 ---
 
-Paseo is an Apache-2.0 "control plane for coding agents": a self-hosted daemon that runs Claude Code, Codex, OpenCode, Pi, and 30 or more ACP agents in worktrees, with native macOS, Windows, Linux, iOS, Android, and web clients, local-first voice, schedules, an MCP server, and plugins. It is free, needs no account, and is built by a solo developer. You might want an alternative if you want a deeper desktop review surface, any CLI agent without an adapter, a team and enterprise track, or a product with a company behind it. Here are the best Paseo alternatives in 2026.
+Paseo is an Apache-2.0 "agentic development environment" built on a self-hosted daemon. It runs Claude Code, Codex, OpenCode, Pi, Antigravity, Muse Code, and more than 30 ACP agents in worktrees, with native macOS, Windows, Linux, iOS, Android, and web clients, on-device voice, schedules, an MCP server, plugins, and agents that delegate work to other connected hosts. It is free, needs no account, and is built by a solo developer. You might want an alternative if you want a deeper desktop review surface, any CLI agent without an adapter, a team and enterprise track, or a product with a company behind it. Here are the best Paseo alternatives in 2026.
 
 **Our recommendation: choose Paradev if you want to run the CLI agents you already use in parallel worktrees, with review, a browser, automations, and remote and cloud workspaces in one place.** The alternatives below cover other preferences.
 
@@ -31,21 +31,21 @@ Paseo is an Apache-2.0 "control plane for coding agents": a self-hosted daemon t
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | The full desktop loop plus automations, MCP, and teams | macOS; experimental Linux AppImage; Windows unavailable | Source-available (ELv2) |
+| **Paradev** | The full desktop loop plus automations, MCP, and teams | macOS; experimental Linux AppImage; Windows unavailable | Open source (MIT) |
 | **Orca** | Free cross-platform ADE with the widest prebuilt agent list | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
-| **Conductor** | Polished Mac app with agent teams and cloud workspaces | macOS | Proprietary |
+| **Conductor** | Existing users only; joining Meta, closed to new users | macOS | Proprietary |
 | **Herdr** | Terminal-native runtime that keeps agents alive anywhere | macOS, Linux, Windows (beta) | Open source (Apache-2.0) |
 | **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
 
 ## Why Look for a Paseo Alternative?
 
-Paseo's daemon-plus-clients design is its strength and its constraint. You run and maintain the daemon, relay, and optional Hub yourself, and team features are early: Hub is in beta, with hosted seats at €15 per month, and by Paseo's own docs team provisioning and shared settings are not built yet. Agents outside its four native harnesses go through the Agent Client Protocol or a config-level custom provider rather than a plain terminal. There is no SSO, SCIM, audit log, or compliance report, and the project is maintained by one person. None of that matters for a solo developer who wants a phone-first control plane; all of it matters for a team.
+Paseo's daemon-plus-clients design is its strength and its constraint. You run and maintain the daemon on your own machines, and team features are early: Hub is in beta, free to self-host or hosted with Pro seats at $15 per month, and by Paseo's own site team provisioning and shared settings are still planned. Agents outside its six native providers go through the Agent Client Protocol or a config-level custom provider rather than a plain terminal. There is no SSO, SCIM, audit log, or compliance report, and the project is maintained by one person. None of that matters for a solo developer who wants a phone-first control plane; all of it matters for a team.
 
 ## The Best Alternatives
 
 ### Paradev
 
-Paradev keeps what makes Paseo good, parallel agents in separate worktrees, schedules, an MCP server, and remote hosts, and adds a deeper desktop surface: any CLI agent in a persistent terminal with mid-session agent switching, a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments sent to agents, an in-app browser with Design Mode, tasks synced with Linear and GitHub Issues, and a Slack bot. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps. It has published pricing, a Pro team plan, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report. [Paradev for iPhone is available on the App Store](https://apps.apple.com/app/id6788926383); Android is on the [waitlist](/mobile#android).
+Paradev keeps what makes Paseo good, parallel agents in separate worktrees, schedules, an MCP server, and remote hosts, and adds a deeper desktop surface: any CLI agent in a persistent terminal with mid-session agent switching, a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments sent to agents, an in-app browser with Design Mode, tasks synced with Linear and GitHub Issues, and a Slack bot. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account, and [cloud workspaces](/cloud) (beta) run in a sandbox that Paradev manages. It has published pricing, a Pro team plan, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report. [Paradev for iPhone is available on the App Store](https://apps.apple.com/app/id6788926383); Android is on the [waitlist](/mobile#android).
 
 For the direct comparison, see [Paradev vs Paseo](/compare/superset-vs-paseo).
 
@@ -57,7 +57,9 @@ See [Paradev vs Orca](/compare/superset-vs-orca).
 
 ### Conductor
 
-Conductor is a proprietary macOS app for Claude Code, Codex, Cursor, and OpenCode with named agent teams, four coordination patterns, and managed context. Pro at $50 per month adds cloud workspaces and multiplayer. It is the pick if you want polish and coordination over openness, and are fine with Mac only.
+Conductor is a proprietary macOS app for Claude Code, Codex, Cursor, and OpenCode with named agent teams, four coordination patterns, and managed context. Its paid plans added cloud workspaces and multiplayer.
+
+Conductor is joining Meta. Since November 4, 2026, it accepts no new sign-ups or downloads. Conductor Cloud shuts down on November 20, 2026, and the Mac app gets new models and critical fixes until early 2027. Existing users can [migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 
 See [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -77,7 +79,7 @@ See [Paradev vs Emdash](/compare/superset-vs-emdash).
 
 - For the full desktop loop with automations, MCP, Slack, and a team and enterprise track, choose **Paradev**.
 - For free, cross-platform, and mobile companions in an open-source desktop app, choose **Orca**.
-- For a polished Mac app with agent teams and cloud workspaces, choose **Conductor**.
+- **Conductor** is joining Meta and is closed to new users.
 - To stay server-first and terminal-native, choose **Herdr**.
 - For open source with issue-tracker intake, choose **Emdash**.
 
@@ -93,12 +95,12 @@ For most developers, Paradev: the same worktree orchestration, schedules, MCP se
 
 ### Is there an open-source Paseo alternative?
 
-Yes. Orca (MIT), Herdr (Apache-2.0), and Emdash (Apache-2.0) are open source. Paseo itself is Apache-2.0; Paradev is source-available under ELv2 with a free tier.
+Yes. Orca (MIT), Herdr (Apache-2.0), and Emdash (Apache-2.0) are open source. Paseo itself is Apache-2.0; Paradev is open source under the MIT License with a free tier.
 
 ### Which alternatives have mobile apps like Paseo?
 
-Orca ships iOS and Android companion apps. Conductor has announced a mobile app but not shipped it. Paradev has an [iPhone and iPad app](/mobile) requiring iOS 26 or iPadOS 26 or later, Pro, plus a cloud workspace or an awake, online host; Android is on the [waitlist](/mobile#android). Herdr's mobile story is an SSH client to its TUI.
+Orca ships iOS and Android companion apps. Conductor is closed to new users. Paradev has an [iPhone and iPad app](/mobile) requiring iOS 26 or iPadOS 26 or later and Pro. It reaches awake, online hosts, Bring Your Own Cloud servers, and cloud workspaces; Android is on the [waitlist](/mobile#android). Herdr's mobile story is an SSH client to its TUI.
 
 ### Does Paseo support any coding agent?
 
-Paseo has native harnesses for Claude Code, Codex, OpenCode, and Pi and runs 30 or more other agents through the Agent Client Protocol, with custom providers by config. Paradev and Orca run any CLI agent directly in a terminal.
+Paseo has native providers for Claude Code, Codex, OpenCode, Pi, Antigravity, and Muse Code and runs more than 30 other agents through the Agent Client Protocol, with custom providers by config. Paradev and Orca run any CLI agent directly in a terminal.

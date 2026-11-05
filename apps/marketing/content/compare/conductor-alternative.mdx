@@ -1,8 +1,8 @@
 ---
 title: "Best Conductor Alternatives in 2026"
-description: "The best alternatives to Conductor for running AI coding agents in parallel, including Paradev, Orca, Emdash, Nimbalyst, Claude Squad, and cmux, compared by agents, platforms, mobile, and license."
+description: "Conductor is joining Meta and winding down. The best alternatives for running AI coding agents in parallel, including Paradev, Orca, Emdash, Nimbalyst, Claude Squad, and cmux, compared by agents, platforms, mobile, and license."
 date: 2026-07-13
-lastUpdated: 2026-10-20
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - conductor
@@ -17,13 +17,19 @@ keywords:
   - conductor competitors
   - conductor vs superset
   - conductor build alternative
+  - conductor shutting down
+  - conductor meta acquisition
+  - conductor cloud shutdown
+  - migrate from conductor
   - parallel ai coding agents
   - agentic ide
 ---
 
-Conductor runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces on your Mac, with cloud workspaces, multiplayer, an API, and an iOS app on its $50/month Pro plan. If you want to run any CLI agent, keep work on your own machines, or reach those machines from your phone, Paradev gives you parallel worktrees, diff review, an in-app browser, and scheduled automations in one desktop workspace.
+On November 4, 2026, Conductor announced that it is joining Meta. Since that day, Conductor takes no new sign-ups and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down. See [Conductor's announcement](https://www.conductor.build/announcement).
 
-**Our recommendation: choose Paradev if you want Conductor's parallel-workspace model with any CLI agent and your own hosts.** The alternatives below cover other needs, including Windows support and fully open-source licenses.
+Conductor ran Claude Code, Codex, Cursor, and OpenCode in parallel workspaces on your Mac. If you need a new home for that workflow, Paradev gives you parallel worktrees, diff review, an in-app browser, and scheduled automations in one desktop workspace, with any CLI agent, on your own machines or in cloud workspaces.
+
+**Our recommendation: choose Paradev if you want Conductor's parallel-workspace model with any CLI agent and your own hosts.** The alternatives below cover other needs, including Windows support.
 
 [Download Paradev](/download) to try a small task, or read [Paradev vs Conductor](/compare/superset-vs-conductor) for the direct comparison. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
 
@@ -33,7 +39,8 @@ Conductor runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces o
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Paradev** | Any CLI agent, your own hosts and cloud workspaces, review, automations | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Conductor** | Existing users only; joining Meta, closed to new users | macOS | Proprietary |
+| **Paradev** | Any CLI agent, your own hosts and cloud workspaces, review, automations | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Open source (MIT) |
 | **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
 | **Nimbalyst** | Visual workspace for Claude Code, Codex, and OpenCode | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
@@ -42,19 +49,33 @@ Conductor runs Claude Code, Codex, Cursor, and OpenCode in parallel workspaces o
 
 ## Why Look for a Conductor Alternative?
 
-Conductor's [documentation](https://www.conductor.build/docs) lists four agents: Claude Code, Codex, Cursor, and OpenCode. Its desktop app runs on Mac. Cloud workspaces, the API, multiplayer, and the mobile app are on Pro at $50/month or Teams at $60 per user/month, according to its [pricing page](https://www.conductor.build/pricing). Common reasons to look elsewhere:
+The main reason is the wind-down. These are the dates Conductor published:
 
-- **Other agents.** You use Copilot CLI, Gemini CLI, Amp, Droid, or a custom CLI agent.
+| Date | What changes |
+|---|---|
+| November 4, 2026 | No new sign-ups, and no downloads. Free users cannot upgrade. Pro users keep Pro features at no cost. |
+| November 13, 2026 | Conductor Cloud becomes read-only. You can read chats and export, but you cannot send messages. Active subscribers get refunds. |
+| November 20, 2026 | Conductor Cloud shuts down, and Conductor begins to delete cloud data. |
+| Early 2027 | The local Mac app stops getting new models and critical bug fixes, then winds down. |
+
+Conductor says its team will ship something new early next year. Until then, existing users need a place to move their work. Other reasons people looked elsewhere before the news still apply:
+
+- **Other agents.** Conductor's [documentation](https://www.conductor.build/docs) lists four agents: Claude Code, Codex, Cursor, and OpenCode. You may use Copilot CLI, Gemini CLI, Amp, Droid, or a custom CLI agent.
 - **Your own machines.** You want agents to keep running on a desktop or server you own, and to reach them from your phone.
-- **Platform.** You need Windows or Linux.
-- **License.** You need open source, or you want to read the code.
-- **Cost.** You want mobile and remote access at a lower per-seat price.
+- **Platform.** Conductor's desktop app runs on Mac. You may need Windows or Linux.
+
+## Moving off Conductor
+
+If you use Conductor today, export what you need from Conductor Cloud before November 20, 2026. Paradev has two migration guides:
+
+- [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) for the local Mac app.
+- [Migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) for cloud workspaces.
 
 ## The Best Alternatives
 
 ### Paradev
 
-Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. Around the terminals, it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, and port management. Workspaces run on your machine, on any macOS or Linux host you add through Remote Access, or in a cloud workspace. The [iPhone and iPad app](/mobile) lets you answer an agent and review its diff on any of them. Pro is {{price:pro}} per user/month and adds scheduled automations, remote access, and mobile. Team ({{price:team}}) and Ultra ({{price:ultra}}) add cloud workspaces. A CLI, TypeScript SDK, and MCP server let agents and scripts create workspaces and launch agents.
+Paradev runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, each in its own Git worktree with persistent terminal sessions. Around the terminals, it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, an in-app browser with Design Mode, and port management. If you liked Conductor's chat, try the [chat interface](https://docs.paradev.com/chat): it shows a Claude Code, Codex, OpenCode, or Pi session as a chat, and a CLI / Chat toggle keeps the same session. Workspaces run on your machine, on any macOS or Linux host you add through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in a [cloud workspace](https://docs.paradev.com/cloud-workspaces) (beta). The [iPhone and iPad app](/mobile) lets you answer an agent and review its diff on any of them. Pro is {{price:pro}} per user/month and adds scheduled automations, remote access, and mobile. Team ({{price:team}}) and Ultra ({{price:ultra}}) add cloud workspaces. A CLI, TypeScript SDK, and MCP server let agents and scripts create workspaces and launch agents.
 
 For the direct comparison, see [Paradev vs Conductor](/compare/superset-vs-conductor).
 
@@ -99,7 +120,7 @@ See [Paradev vs cmux](/compare/superset-vs-cmux).
 
 ## Verdict
 
-Conductor is a polished Mac app, and it is a good fit if its four agents and its cloud are what your team wants. Choose Paradev when you want the same parallel-workspace model with any CLI agent, on your own machines or in the cloud, with review, a browser, and automations in one place. Run the same small task in both, then compare the review step. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+Conductor was a polished Mac app, and many teams built their workflow on it. It is now closed to new users, and Conductor Cloud shuts down on November 20, 2026. Choose Paradev when you want the same parallel-workspace model with any CLI agent, on your own machines or in the cloud, with review, a browser, and automations in one place. Run a small task you know well, then compare the review step with what you had in Conductor. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
 
 ## What To Try First
 
@@ -112,17 +133,25 @@ Conductor is a polished Mac app, and it is a good fit if its four agents and its
 
 ## Frequently Asked Questions
 
+### Is Conductor shutting down?
+
+Conductor is joining Meta. Since November 4, 2026, it takes no new sign-ups and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down.
+
+### How do I move from Conductor to Paradev?
+
+Follow [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) for the local Mac app, or [Migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) for cloud workspaces. Export your cloud chats before November 20, 2026.
+
 ### What is the best Conductor alternative?
 
 For developers who want to run any CLI agent in parallel worktrees on their own machines or in the cloud, Paradev is our recommendation. It combines worktrees, diff review, an in-app browser, scheduled automations, and an iPhone and iPad app. Orca and Emdash are strong open-source alternatives.
 
 ### Is there an open-source Conductor alternative?
 
-Yes. Orca (MIT), Nimbalyst (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source, and cmux publishes its source. Paradev is source-available under Elastic License 2.0.
+Yes. Orca (MIT), Nimbalyst (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source, and cmux publishes its source. Paradev is open source under the MIT License.
 
 ### Is there a Conductor alternative for Windows or Linux?
 
-Orca, Emdash, and Nimbalyst run on macOS, Windows, and Linux. Paradev runs on macOS with experimental Linux support; Windows is not yet available. Conductor runs on Mac.
+Orca, Emdash, and Nimbalyst run on macOS, Windows, and Linux. Paradev runs on macOS with experimental Linux support; Windows is not yet available. Conductor ran on Mac only and is now closed to new users.
 
 ### Which Conductor alternatives run agents other than Claude Code and Codex?
 
