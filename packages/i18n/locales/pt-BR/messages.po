@@ -9061,7 +9061,7 @@ msgid "From snapshots of the worktree before and after this turn. Another chat w
 msgstr "A partir de snapshots da worktree antes e depois deste turno. Outro chat trabalhou aqui ao mesmo tempo, então esta lista tem só os arquivos que este chat editou com suas ferramentas de arquivo. As outras alterações aparecem à parte."
 
 msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
-msgstr "Dos registros locais deste host. O custo estimado usa preços de tabela da API, não sua fatura. As PRs estão vinculadas aos agentes do workspace e podem contar para mais de um agente."
+msgstr "Dos registros locais deste host. O custo estimado usa preços de tabela da API, não sua fatura. As PRs estão vinculadas aos agentes do espaço de trabalho e podem contar para mais de um agente."
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter oculto — mude para Markdown para editá-lo"

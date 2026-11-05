@@ -1801,7 +1801,7 @@ msgid "A separate profile that shares your skills, plugins, MCP servers, and set
 msgstr "Окремий профіль, який використовує ваші навички, плагіни, MCP-сервери й налаштування."
 
 msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
-msgstr "Спільний знімок локальних журналів агентів. Статистику надано користувачем. Орієнтовну вартість розраховано за тарифами API, це не сума рахунку."
+msgstr "Спільний знімок локальних логів агентів. Статистику надано користувачем. Орієнтовну вартість розраховано за тарифами API, це не сума рахунку."
 
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Ключ завдань містить від 1 до 5 літер або цифр і починається з літери."
@@ -9055,7 +9055,7 @@ msgid "From snapshots of the worktree before and after this turn. Another chat w
 msgstr "За знімками worktree до і після цього ходу. Одночасно тут працював інший чат, тому в цьому списку лише файли, які цей чат змінив своїми інструментами для файлів. Інші зміни показано окремо."
 
 msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
-msgstr "З локальних журналів цього хоста. Орієнтовну вартість розраховано за тарифами API, а не за рахунком. PR пов’язані з агентами робочої області й можуть враховуватися для кількох агентів."
+msgstr "З локальних логів цього хоста. Орієнтовну вартість розраховано за тарифами API, а не за рахунком. PR пов’язані з агентами робочої області й можуть враховуватися для кількох агентів."
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter приховано — перейдіть у Markdown, щоб його редагувати"
@@ -21191,7 +21191,7 @@ msgid "View usage"
 msgstr "Переглянути використання"
 
 msgid "View usage dashboard"
-msgstr "Переглянути панель використання"
+msgstr "Переглянути дашборд використання"
 
 msgid "Violence or harassment"
 msgstr "Насильство або цькування"
