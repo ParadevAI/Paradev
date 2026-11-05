@@ -96,11 +96,16 @@ export class WorkspaceFilesystemManager {
 	 * Swap the workspace's native subscription onto a freshly derived ignore
 	 * set. Required after a directory is UN-ignored — the attach-time prune
 	 * would otherwise suppress its events until restart. Returns whether the
-	 * subscription was actually swapped.
+	 * subscription was actually swapped. `gitIgnoredDirs` is the caller's
+	 * fresh listing, used instead of a second scan.
 	 */
-	async refreshWatcherIgnores(workspaceId: string): Promise<boolean> {
+	async refreshWatcherIgnores(
+		workspaceId: string,
+		gitIgnoredDirs?: readonly string[],
+	): Promise<boolean> {
 		return await this.watcherManager.refreshIgnores(
 			this.resolveWorkspaceRoot(workspaceId),
+			gitIgnoredDirs,
 		);
 	}
 

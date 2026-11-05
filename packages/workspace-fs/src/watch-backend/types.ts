@@ -20,6 +20,8 @@ export interface NativeWatchRequest {
 
 export interface NativeWatchBackend {
 	readonly name: string;
+	/** Holds a native watch per file and directory, so an unpruned dir costs one per entry. */
+	readonly watchesEachPath?: boolean;
 	/** Resolves once the watch is live; rejects if it could not be established. */
 	subscribe(request: NativeWatchRequest): Promise<NativeWatchSubscription>;
 }
