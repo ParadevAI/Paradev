@@ -9249,6 +9249,9 @@ msgstr "Aller à la page suivante de l'historique"
 msgid "Go home"
 msgstr "Aller à l'accueil"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Refaites les étapes du premier lancement. Vos projets et réglages restent inchangés."
+
 msgid "Go to home"
 msgstr "Aller à l'accueil"
 
@@ -16050,6 +16053,9 @@ msgstr "Redémarrer le service hôte"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Redémarrez-les maintenant pour les basculer vers {accountLabel} ; chaque session reprend sa conversation là où elle s'était arrêtée."
+
+msgid "Restart onboarding"
+msgstr "Recommencer la prise en main"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Redémarrer les agents {providerLabel} en cours ?"

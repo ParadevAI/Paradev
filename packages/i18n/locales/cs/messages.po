@@ -9249,6 +9249,9 @@ msgstr "Přejít vpřed na další stránku v historii"
 msgid "Go home"
 msgstr "Přejít domů"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Projděte znovu kroky prvního spuštění. Vaše projekty a nastavení zůstanou beze změny."
+
 msgid "Go to home"
 msgstr "Přejít na úvod"
 
@@ -16050,6 +16053,9 @@ msgstr "Restartovat host service"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Restartujte je teď a přejdou na {accountLabel}; každá relace naváže na rozhovor tam, kde skončila."
+
+msgid "Restart onboarding"
+msgstr "Spustit úvodní průvodce znovu"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restartovat běžící agenty {providerLabel}?"

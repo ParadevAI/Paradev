@@ -9249,6 +9249,9 @@ msgstr "履歴の次のページに進む"
 msgid "Go home"
 msgstr "ホームへ"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "初回セットアップの手順をもう一度行います。プロジェクトと設定はそのまま残ります。"
+
 msgid "Go to home"
 msgstr "ホームへ"
 
@@ -16050,6 +16053,9 @@ msgstr "ホストサービスを再起動"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "今すぐ再起動すると{accountLabel}に移行し、各セッションは会話を中断したところから再開します。"
+
+msgid "Restart onboarding"
+msgstr "オンボーディングをやり直す"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"

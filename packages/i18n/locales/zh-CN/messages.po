@@ -9249,6 +9249,9 @@ msgstr "前进到历史记录中的下一页"
 msgid "Go home"
 msgstr "回到首页"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "重新完成首次使用的步骤。你的项目和设置保持不变。"
+
 msgid "Go to home"
 msgstr "前往主页"
 
@@ -16050,6 +16053,9 @@ msgstr "重启主机服务"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "立即重新启动即可迁移到{accountLabel}；每个会话都会从中断处继续。"
+
+msgid "Restart onboarding"
+msgstr "重新开始引导"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"

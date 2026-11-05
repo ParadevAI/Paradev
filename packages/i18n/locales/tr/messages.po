@@ -9249,6 +9249,9 @@ msgstr "Geçmişte sonraki sayfaya git"
 msgid "Go home"
 msgstr "Ana sayfaya git"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "İlk kullanım adımlarından yeniden geçin. Projeleriniz ve ayarlarınız olduğu gibi kalır."
+
 msgid "Go to home"
 msgstr "Ana sayfaya git"
 
@@ -16050,6 +16053,9 @@ msgstr "Host hizmetini yeniden başlat"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Şimdi yeniden başlatarak {accountLabel} hesabına taşıyın; her oturum konuşmasına kaldığı yerden devam eder."
+
+msgid "Restart onboarding"
+msgstr "Başlangıç adımlarını yeniden başlat"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Çalışan {providerLabel} ajanları yeniden başlatılsın mı?"

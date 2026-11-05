@@ -9249,6 +9249,9 @@ msgstr "前進到歷史記錄中的下一頁"
 msgid "Go home"
 msgstr "回到首頁"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "重新完成首次使用的步驟。你的專案和設定保持不變。"
+
 msgid "Go to home"
 msgstr "前往主頁"
 
@@ -16050,6 +16053,9 @@ msgstr "重啟主機服務"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "立即重新啟動即可移至{accountLabel}；每個會話都會從中斷處繼續對話。"
+
+msgid "Restart onboarding"
+msgstr "重新開始導覽"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新啟動執行中的{providerLabel}代理程式嗎？"

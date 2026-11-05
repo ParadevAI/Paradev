@@ -9249,6 +9249,9 @@ msgstr "Maju ke halaman berikutnya di riwayat"
 msgid "Go home"
 msgstr "Ke beranda"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Ulangi langkah-langkah penggunaan pertama. Proyek dan pengaturan Anda tetap seperti semula."
+
 msgid "Go to home"
 msgstr "Ke beranda"
 
@@ -16050,6 +16053,9 @@ msgstr "Mulai ulang layanan host"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap sesi melanjutkan percakapan dari titik terakhir."
+
+msgid "Restart onboarding"
+msgstr "Mulai ulang orientasi"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"

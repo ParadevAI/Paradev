@@ -13,6 +13,7 @@ import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { WindowControlsInset } from "../_dashboard/components/WindowControlsInset";
+import { useOnboardingRestartStore } from "../stores/onboardingRestartStore";
 import { OnboardingHelpLinks } from "./components/OnboardingHelpLinks";
 import { OnboardingLanguagePicker } from "./components/OnboardingLanguagePicker";
 import { OnboardingNavigation } from "./components/OnboardingNavigation";
@@ -59,7 +60,14 @@ function OnboardingFlowLayout() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { i18n } = useLingui();
-	useEffect(() => () => useAgentModeStore.getState().reset(), []);
+	const restarting = useOnboardingRestartStore((s) => s.restarting);
+	useEffect(
+		() => () => {
+			useAgentModeStore.getState().reset();
+			useOnboardingRestartStore.getState().end();
+		},
+		[],
+	);
 	const { data: ghStatus, isPending: isPendingGh } =
 		electronTrpc.system.detectGhCli.useQuery();
 	const ghReady =
@@ -81,7 +89,7 @@ function OnboardingFlowLayout() {
 	}
 
 	if (isPending) return null;
-	if (onboardedOnArrival) {
+	if (onboardedOnArrival && !restarting) {
 		return rootRedirect;
 	}
 
@@ -108,11 +116,13 @@ function OnboardingFlowLayout() {
 	};
 
 	// The project step finishes onboarding itself the moment a project is
-	// added, so the last step has no footer action
+	// added, so the last step has no footer action unless this is a restart
 	const nextStep = isOnMainStep ? steps[currentStepIdx + 1] : undefined;
 	const handleContinue = nextStep
 		? () => navigate({ to: nextStep.path })
-		: null;
+		: restarting && isOnMainStep
+			? () => navigate({ to: "/" })
+			: null;
 
 	return (
 		<div className="flex h-full w-full flex-col bg-background">

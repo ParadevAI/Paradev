@@ -9249,6 +9249,9 @@ msgstr "Đi tới trang kế tiếp trong lịch sử"
 msgid "Go home"
 msgstr "Về trang chủ"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Đi lại các bước khi mở lần đầu. Dự án và cài đặt của bạn vẫn giữ nguyên."
+
 msgid "Go to home"
 msgstr "Về trang chủ"
 
@@ -16050,6 +16053,9 @@ msgstr "Khởi động lại dịch vụ host"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Khởi động lại ngay để chuyển sang {accountLabel}; mỗi phiên sẽ tiếp tục cuộc trò chuyện từ chỗ đang dở."
+
+msgid "Restart onboarding"
+msgstr "Bắt đầu lại phần hướng dẫn"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"

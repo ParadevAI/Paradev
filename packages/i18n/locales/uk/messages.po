@@ -9243,6 +9243,9 @@ msgstr "Перейти на наступну сторінку в історії"
 msgid "Go home"
 msgstr "На головну"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Пройдіть кроки першого запуску ще раз. Проєкти й налаштування залишаться без змін."
+
 msgid "Go to home"
 msgstr "На головну"
 
@@ -16044,6 +16047,9 @@ msgstr "Перезапустити службу хоста"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Перезапустіть їх зараз, щоб перенести на {accountLabel}; кожен сеанс продовжить розмову з того місця, де зупинився."
+
+msgid "Restart onboarding"
+msgstr "Пройти онбординг заново"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"

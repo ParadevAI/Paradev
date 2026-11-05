@@ -9249,6 +9249,9 @@ msgstr "기록에서 다음 페이지로 이동합니다"
 msgid "Go home"
 msgstr "홈으로"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "처음 실행 단계를 다시 진행합니다. 프로젝트와 설정은 그대로 유지됩니다."
+
 msgid "Go to home"
 msgstr "홈으로 이동"
 
@@ -16050,6 +16053,9 @@ msgstr "호스트 서비스 다시 시작"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "지금 다시 시작하면 {accountLabel}(으)로 이동하며, 각 세션은 중단된 대화를 이어서 진행합니다."
+
+msgid "Restart onboarding"
+msgstr "온보딩 다시 시작"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"

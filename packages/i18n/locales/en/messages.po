@@ -9249,6 +9249,9 @@ msgstr "Go forward to the next page in history"
 msgid "Go home"
 msgstr "Go home"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Go through the first-run steps again. Your projects and settings stay as they are."
+
 msgid "Go to home"
 msgstr "Go to home"
 
@@ -16050,6 +16053,9 @@ msgstr "Restart host service"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
+
+msgid "Restart onboarding"
+msgstr "Restart onboarding"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restart running {providerLabel} agents?"

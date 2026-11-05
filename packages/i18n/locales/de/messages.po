@@ -9249,6 +9249,9 @@ msgstr "Zur nächsten Seite im Verlauf vorgehen"
 msgid "Go home"
 msgstr "Zur Startseite"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Gehe die Schritte des ersten Starts noch einmal durch. Deine Projekte und Einstellungen bleiben erhalten."
+
 msgid "Go to home"
 msgstr "Zur Startseite"
 
@@ -16050,6 +16053,9 @@ msgstr "Host-Dienst neu starten"
 
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Starte sie jetzt neu, um sie auf {accountLabel} umzustellen; jede Sitzung setzt ihre Unterhaltung dort fort, wo sie aufgehört hat."
+
+msgid "Restart onboarding"
+msgstr "Onboarding neu starten"
 
 msgid "Restart running {providerLabel} agents?"
 msgstr "Laufende {providerLabel}-Agenten neu starten?"
