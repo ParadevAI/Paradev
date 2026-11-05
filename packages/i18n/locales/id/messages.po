@@ -6492,6 +6492,9 @@ msgstr "Tidak bisa memperbarui pull request"
 msgid "Couldn't update the Chat setting"
 msgstr "Tidak dapat memperbarui pengaturan Chat"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Tidak dapat memperbarui pengaturan penamaan global"
+
 msgid "Couldn't update the queue"
 msgstr "Tidak dapat memperbarui antrean"
 
@@ -9861,6 +9864,12 @@ msgstr "Panduan"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Mengarahkan nama workspace dan branch yang dibuat AI untuk proyek ini. Kosong berarti memakai penamaan bawaan."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Mengarahkan nama workspace dan branch yang dibuat AI untuk proyek ini. Instruksi ini ditambahkan setelah instruksi global Anda dan diutamakan jika keduanya bertentangan. Kosong berarti memakai instruksi global."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Mengarahkan nama workspace dan branch yang dibuat AI di setiap proyek, di semua perangkat Anda. Instruksi milik proyek ditambahkan setelah ini dan diutamakan jika keduanya bertentangan."
+
 msgid "Guides and references"
 msgstr "Panduan dan referensi"
 
@@ -10290,6 +10299,9 @@ msgstr "Kalau sejauh ini Anda menikmati Paradev, satu star GitHub membantu devel
 
 msgid "Ignore @channel and @here"
 msgstr "Abaikan @channel dan @here"
+
+msgid "Ignore global naming instructions"
+msgstr "Abaikan instruksi penamaan global"
 
 msgid "Illegal content"
 msgstr "Konten ilegal"

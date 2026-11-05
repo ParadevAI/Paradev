@@ -88,6 +88,7 @@ import {
 import { resolveProjectBranchPrefix } from "../workspace-creation/utils/branch-prefix";
 import type { ExecGh } from "../workspace-creation/utils/exec-gh";
 import { listBranchNames } from "../workspace-creation/utils/list-branch-names";
+import { resolveNamingInstructions } from "../workspace-creation/utils/naming-instructions";
 import {
 	deleteMaterializedPrBranchIfSafe,
 	type MaterializePrBranchResult,
@@ -1562,21 +1563,25 @@ export const workspacesRouter = router({
 						return undefined;
 					})
 				: undefined;
-			void applyAiWorkspaceRename({
-				ctx,
-				workspaceId: input.workspaceId,
-				repoPath,
-				worktreePath: local.worktreePath,
-				oldBranchName: local.branch,
-				oldWorkspaceName: local.name || local.branch,
-				prompt: input.prompt,
-				namingInstructions: project.namingInstructions,
-				renameTitle: true,
-				renameBranch: true,
-				branchPrefix,
-			}).catch((err) => {
-				console.warn("[workspaces.aiRename] failed", err);
-			});
+			void resolveNamingInstructions(ctx.api, project)
+				.then((instructions) =>
+					applyAiWorkspaceRename({
+						ctx,
+						workspaceId: input.workspaceId,
+						repoPath,
+						worktreePath: local.worktreePath,
+						oldBranchName: local.branch,
+						oldWorkspaceName: local.name || local.branch,
+						prompt: input.prompt,
+						instructions,
+						renameTitle: true,
+						renameBranch: true,
+						branchPrefix,
+					}),
+				)
+				.catch((err) => {
+					console.warn("[workspaces.aiRename] failed", err);
+				});
 			return { success: true as const };
 		}),
 

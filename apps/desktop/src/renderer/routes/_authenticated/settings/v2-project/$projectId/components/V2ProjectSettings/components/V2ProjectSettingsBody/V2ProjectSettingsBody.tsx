@@ -30,6 +30,7 @@ interface V2ProjectSettingsBodyProps {
 	projectId: string;
 	project: HostProjectItem;
 	hostProject: HostProjectRow | null | undefined;
+	globalNamingInstructions: string | null;
 	targetHostUrl: string | null;
 	targetHostId: string | null;
 	targetHostName: string;
@@ -48,6 +49,7 @@ export function V2ProjectSettingsBody({
 	projectId,
 	project,
 	hostProject,
+	globalNamingInstructions,
 	targetHostUrl,
 	targetHostId,
 	targetHostName,
@@ -181,6 +183,10 @@ export function V2ProjectSettingsBody({
 							hostUrl={targetHostUrl}
 							// Hosts older than this setting omit the field entirely.
 							instructions={hostProject.namingInstructions ?? null}
+							globalInstructions={globalNamingInstructions}
+							ignoreGlobalInstructions={
+								hostProject.ignoreGlobalNamingInstructions
+							}
 							onChanged={() => onHostProjectChanged()}
 						/>
 					)}

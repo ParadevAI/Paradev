@@ -6486,6 +6486,9 @@ msgstr "Не вдалося оновити пул-реквест"
 msgid "Couldn't update the Chat setting"
 msgstr "Не вдалося оновити налаштування «Чат»"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Не вдалося оновити глобальне налаштування найменування"
+
 msgid "Couldn't update the queue"
 msgstr "Не вдалося оновити чергу"
 
@@ -9855,6 +9858,12 @@ msgstr "Посібники"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Задає правила для згенерованих ШІ назв робочих просторів і гілок у цьому проєкті. Якщо порожньо, використовується стандартне іменування."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Задає правила для згенерованих ШІ назв робочих просторів і гілок у цьому проєкті. Вони додаються після ваших глобальних інструкцій і мають перевагу в разі конфлікту. Якщо порожньо, використовуються глобальні інструкції."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Задає правила для згенерованих ШІ назв робочих просторів і гілок у всіх проєктах на всіх ваших пристроях. Інструкції проєкту додаються після цих і мають перевагу в разі конфлікту."
+
 msgid "Guides and references"
 msgstr "Посібники та довідка"
 
@@ -10284,6 +10293,9 @@ msgstr "Якщо вам подобається Paradev, поставте зір�
 
 msgid "Ignore @channel and @here"
 msgstr "Ігнорувати @channel і @here"
+
+msgid "Ignore global naming instructions"
+msgstr "Ігнорувати глобальні інструкції з найменування"
 
 msgid "Illegal content"
 msgstr "Незаконний вміст"

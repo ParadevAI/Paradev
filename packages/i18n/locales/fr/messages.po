@@ -6492,6 +6492,9 @@ msgstr "Impossible de mettre à jour la pull request"
 msgid "Couldn't update the Chat setting"
 msgstr "Impossible de mettre à jour le réglage Chat"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Impossible de mettre à jour le réglage de nommage global"
+
 msgid "Couldn't update the queue"
 msgstr "Impossible de mettre à jour la file"
 
@@ -9861,6 +9864,12 @@ msgstr "Guides"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Oriente les noms d'espaces de travail et de branches générés par l'IA pour ce projet. Vide, le nommage par défaut s'applique."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Oriente les noms d'espaces de travail et de branches générés par l'IA pour ce projet. Elles s'ajoutent après vos instructions globales et l'emportent en cas de conflit. Vide, les instructions globales s'appliquent."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Oriente les noms d'espaces de travail et de branches générés par l'IA dans tous les projets, sur tous vos appareils. Les instructions d'un projet s'ajoutent après celles-ci et l'emportent en cas de conflit."
+
 msgid "Guides and references"
 msgstr "Guides et références"
 
@@ -10290,6 +10299,9 @@ msgstr "Si Paradev vous plaît jusqu'ici, une étoile GitHub aide d'autres déve
 
 msgid "Ignore @channel and @here"
 msgstr "Ignorer @channel et @here"
+
+msgid "Ignore global naming instructions"
+msgstr "Ignorer les instructions de nommage globales"
 
 msgid "Illegal content"
 msgstr "Contenu illégal"

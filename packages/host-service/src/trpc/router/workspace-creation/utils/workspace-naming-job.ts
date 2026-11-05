@@ -30,6 +30,7 @@ import {
 	trimTitle,
 } from "./ai-workspace-names";
 import { listBranchNames } from "./list-branch-names";
+import { resolveNamingInstructions } from "./naming-instructions";
 import { findGitHubReferences, resolveNamingLinks } from "./naming-links";
 import { deduplicateBranchName } from "./sanitize-branch";
 
@@ -175,7 +176,7 @@ export function scheduleWorkspaceNaming(
 		const names = await generateWorkspaceNamesFromPrompt(
 			prompt,
 			agent ? { db: ctx.db, agent } : undefined,
-			project?.namingInstructions,
+			await resolveNamingInstructions(ctx.api, project),
 			signal,
 			false,
 			{ agentReply, links },

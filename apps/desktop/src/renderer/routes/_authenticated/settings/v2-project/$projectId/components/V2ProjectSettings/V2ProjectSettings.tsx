@@ -6,6 +6,7 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useMemo, useRef } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -104,6 +105,7 @@ export function V2ProjectSettings({
 			return client.project.get.query({ projectId });
 		},
 	});
+	const { data: userSettings } = cloudTrpc.userSettings.get.useQuery();
 	// External renames land on the merged fan-out item via project:changed;
 	// re-pull the targeted host's row so host-sourced fields (Name) follow.
 	const mergedUpdatedAt = project?.updatedAt;
@@ -141,6 +143,7 @@ export function V2ProjectSettings({
 			projectId={projectId}
 			project={project}
 			hostProject={hostProject}
+			globalNamingInstructions={userSettings?.namingInstructions ?? null}
 			targetHostUrl={targetHostUrl}
 			targetHostId={targetHostId}
 			targetHostName={targetHostName}
