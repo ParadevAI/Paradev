@@ -2871,6 +2871,9 @@ msgstr "Значок застосунку"
 msgid "App path"
 msgstr "Шлях до застосунку"
 
+msgid "App theme"
+msgstr "Тема застосунку"
+
 msgid "Appearance"
 msgstr "Вигляд"
 
@@ -8487,6 +8490,9 @@ msgstr "Не вдалося оновити трекер завдань"
 
 msgid "Failed to update team. Please try again."
 msgstr "Не вдалося оновити команду. Спробуйте ще раз."
+
+msgid "Failed to update terminal theme"
+msgstr "Не вдалося оновити тему термінала"
 
 msgid "Failed to update URL"
 msgstr "Не вдалося оновити URL"

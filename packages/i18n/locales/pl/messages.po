@@ -2877,6 +2877,9 @@ msgstr "Ikona aplikacji"
 msgid "App path"
 msgstr "Ścieżka aplikacji"
 
+msgid "App theme"
+msgstr "Motyw aplikacji"
+
 msgid "Appearance"
 msgstr "Wygląd"
 
@@ -8493,6 +8496,9 @@ msgstr "Nie udało się zaktualizować systemu śledzenia zadań"
 
 msgid "Failed to update team. Please try again."
 msgstr "Nie udało się zaktualizować zespołu. Spróbuj ponownie."
+
+msgid "Failed to update terminal theme"
+msgstr "Nie udało się zaktualizować motywu terminala"
 
 msgid "Failed to update URL"
 msgstr "Nie udało się zaktualizować adresu URL"

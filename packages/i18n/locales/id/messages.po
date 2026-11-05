@@ -2877,6 +2877,9 @@ msgstr "Ikon aplikasi"
 msgid "App path"
 msgstr "Jalur aplikasi"
 
+msgid "App theme"
+msgstr "Tema aplikasi"
+
 msgid "Appearance"
 msgstr "Tampilan"
 
@@ -8493,6 +8496,9 @@ msgstr "Gagal memperbarui pelacak tugas"
 
 msgid "Failed to update team. Please try again."
 msgstr "Gagal memperbarui tim. Silakan coba lagi."
+
+msgid "Failed to update terminal theme"
+msgstr "Gagal memperbarui tema terminal"
 
 msgid "Failed to update URL"
 msgstr "Gagal memperbarui URL"

@@ -2877,6 +2877,9 @@ msgstr "App-Symbol"
 msgid "App path"
 msgstr "App-Pfad"
 
+msgid "App theme"
+msgstr "App-Theme"
+
 msgid "Appearance"
 msgstr "Darstellung"
 
@@ -8493,6 +8496,9 @@ msgstr "Aufgabenverwaltung konnte nicht aktualisiert werden"
 
 msgid "Failed to update team. Please try again."
 msgstr "Team konnte nicht aktualisiert werden. Bitte versuche es erneut."
+
+msgid "Failed to update terminal theme"
+msgstr "Terminal-Theme konnte nicht aktualisiert werden"
 
 msgid "Failed to update URL"
 msgstr "URL konnte nicht aktualisiert werden"

@@ -2877,6 +2877,9 @@ msgstr "Icono de la app"
 msgid "App path"
 msgstr "Ruta de la app"
 
+msgid "App theme"
+msgstr "Tema de la aplicación"
+
 msgid "Appearance"
 msgstr "Apariencia"
 
@@ -8493,6 +8496,9 @@ msgstr "No se pudo actualizar el gestor de tareas"
 
 msgid "Failed to update team. Please try again."
 msgstr "No se pudo actualizar el equipo. Inténtalo de nuevo."
+
+msgid "Failed to update terminal theme"
+msgstr "No se pudo actualizar el tema de la terminal"
 
 msgid "Failed to update URL"
 msgstr "No se pudo actualizar la URL"

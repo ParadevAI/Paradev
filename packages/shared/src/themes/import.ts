@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { builtInThemes, darkTheme, lightTheme } from "./built-in";
+import { MAX_THEME_ID_LENGTH } from "./constants";
 import { getEditorTheme } from "./editor-theme";
 import { getDefaultTerminalColors, type Theme } from "./types";
 
@@ -200,6 +201,13 @@ function parseThemeEntry(
 		return {
 			ok: false,
 			issue: `Theme ${index + 1}: Theme ID resolved to empty value`,
+		};
+	}
+
+	if (id.length > MAX_THEME_ID_LENGTH) {
+		return {
+			ok: false,
+			issue: `Theme ${index + 1}: Theme ID exceeds ${MAX_THEME_ID_LENGTH} characters`,
 		};
 	}
 

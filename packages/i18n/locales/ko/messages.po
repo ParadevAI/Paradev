@@ -2877,6 +2877,9 @@ msgstr "앱 아이콘"
 msgid "App path"
 msgstr "앱 경로"
 
+msgid "App theme"
+msgstr "앱 테마"
+
 msgid "Appearance"
 msgstr "모양"
 
@@ -8493,6 +8496,9 @@ msgstr "작업 관리 위치를 업데이트하지 못했습니다"
 
 msgid "Failed to update team. Please try again."
 msgstr "팀을 변경하지 못했습니다. 다시 시도해 주세요."
+
+msgid "Failed to update terminal theme"
+msgstr "터미널 테마를 업데이트하지 못했습니다"
 
 msgid "Failed to update URL"
 msgstr "URL을 업데이트하지 못했습니다"

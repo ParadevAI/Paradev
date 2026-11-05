@@ -2877,6 +2877,9 @@ msgstr "Uygulama simgesi"
 msgid "App path"
 msgstr "Uygulama yolu"
 
+msgid "App theme"
+msgstr "Uygulama teması"
+
 msgid "Appearance"
 msgstr "Görünüm"
 
@@ -8493,6 +8496,9 @@ msgstr "Görev takibi güncellenemedi"
 
 msgid "Failed to update team. Please try again."
 msgstr "Takım güncellenemedi. Lütfen yeniden deneyin."
+
+msgid "Failed to update terminal theme"
+msgstr "Terminal teması güncellenemedi"
 
 msgid "Failed to update URL"
 msgstr "URL güncellenemedi"

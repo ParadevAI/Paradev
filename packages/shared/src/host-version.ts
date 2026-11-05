@@ -32,6 +32,9 @@ import { ATTACHMENT_PARTS_MIN_HOST_VERSION } from "./attachment-limits";
  */
 export const MIN_HOST_SERVICE_VERSION = "1.21.0";
 
+/** The first host release that ships terminal.setTheme. */
+export const TERMINAL_THEME_MIN_HOST_VERSION = "2.0.4";
+
 /**
  * What spawned the host-service, which decides how it can be updated:
  * - `desktop`: `host-service.js` inside the signed app bundle, run by the
@@ -118,5 +121,15 @@ export function hostReadsAttachmentParts(
 	const version = semver.coerce(hostVersion ?? "");
 	return (
 		version !== null && semver.gte(version, ATTACHMENT_PARTS_MIN_HOST_VERSION)
+	);
+}
+
+/** Whether a host can persist a selected terminal theme. */
+export function hostSupportsTerminalThemes(
+	hostVersion: string | null | undefined,
+): boolean {
+	const version = semver.coerce(hostVersion ?? "");
+	return (
+		version !== null && semver.gte(version, TERMINAL_THEME_MIN_HOST_VERSION)
 	);
 }

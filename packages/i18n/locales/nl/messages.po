@@ -2877,6 +2877,9 @@ msgstr "App-icoon"
 msgid "App path"
 msgstr "App-pad"
 
+msgid "App theme"
+msgstr "App-thema"
+
 msgid "Appearance"
 msgstr "Uiterlijk"
 
@@ -8493,6 +8496,9 @@ msgstr "Takenbeheer bijwerken mislukt"
 
 msgid "Failed to update team. Please try again."
 msgstr "Bijwerken van team mislukt. Probeer het opnieuw."
+
+msgid "Failed to update terminal theme"
+msgstr "Terminalthema kon niet worden bijgewerkt"
 
 msgid "Failed to update URL"
 msgstr "Bijwerken van URL mislukt"

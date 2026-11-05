@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { type RendererContext, usePaneFocus } from "@superset/panes";
+import { hostSupportsTerminalThemes } from "@superset/shared/host-version";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
@@ -14,6 +15,8 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { useHotkey } from "renderer/hotkeys";
 import {
@@ -43,11 +46,12 @@ import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/Host
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { ScrollToBottomButton } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/Terminal/ScrollToBottomButton";
 import { TerminalSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/Terminal/TerminalSearch";
-import { useTheme } from "renderer/stores/theme";
+import { useTheme, useThemeStore } from "renderer/stores/theme";
 import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 import { isWithinWorkspacePath } from "shared/absolute-paths";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { useSendAttachments } from "../../hooks/useSendAttachments";
+import { findTerminalTheme } from "../../utils/findTerminalTheme";
 import {
 	runFileLinkAction,
 	runFolderLinkAction,
@@ -61,6 +65,7 @@ import { TerminalAgentAutoResume } from "./components/TerminalAgentAutoResume";
 import { TerminalCopiedIndicator } from "./components/TerminalCopiedIndicator";
 import { TerminalNarrowedBanner } from "./components/TerminalNarrowedBanner";
 import { TerminalRichInput } from "./components/TerminalRichInput";
+import { TERMINAL_SESSION_LIST_STALE_MS } from "./components/TerminalSessionDropdown/TerminalSessionDropdown.utils";
 import { terminalContextMenuLinkStore } from "./contextMenuLinkStore";
 import { useCopyOnSelect } from "./hooks/useCopyOnSelect";
 import { useLinkActionMenu } from "./hooks/useLinkActionMenu";
@@ -139,7 +144,36 @@ export function TerminalPane({
 	// dropdown).
 	const isRichInputOpen = useTerminalRichInputOpen();
 
-	const appearance = useTerminalAppearance();
+	const { data: sessionThemeId } = workspaceTrpc.terminal.list.useQuery(
+		{ workspaceId },
+		{
+			select: (data) => {
+				const session = data.sessions.find(
+					(candidate) => candidate.terminalId === terminalId,
+				);
+				return session ? (session.themeId ?? null) : undefined;
+			},
+			staleTime: TERMINAL_SESSION_LIST_STALE_MS,
+			refetchOnWindowFocus: false,
+		},
+	);
+	const pendingThemeId = paneData.themeId;
+	const host = useWorkspaceHostTarget(workspaceId);
+	const remoteHostInfo = useHostServiceInfo(
+		host.status === "ready" && host.kind !== "local" ? host.url : null,
+	);
+	const supportsTerminalThemes =
+		host.status === "ready" &&
+		(host.kind === "local" ||
+			hostSupportsTerminalThemes(remoteHostInfo.data?.version));
+	const effectiveThemeId =
+		pendingThemeId !== undefined ? pendingThemeId : (sessionThemeId ?? null);
+	const customThemes = useThemeStore((state) => state.customThemes);
+	const sessionTheme = useMemo(
+		() => findTerminalTheme(effectiveThemeId, customThemes),
+		[effectiveThemeId, customThemes],
+	);
+	const appearance = useTerminalAppearance(sessionTheme);
 	const appearanceRef = useRef(appearance);
 	appearanceRef.current = appearance;
 
@@ -147,7 +181,7 @@ export function TerminalPane({
 	// gets the right COLORFGBG; PTY env is set at spawn time only.
 	const activeTheme = useTheme();
 	const themeType = resolveTerminalThemeType({
-		activeThemeType: activeTheme?.type,
+		activeThemeType: sessionTheme?.type ?? activeTheme?.type,
 	});
 	const baseWebsocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
 	const themedUrl = new URL(baseWebsocketUrl);
@@ -159,6 +193,8 @@ export function TerminalPane({
 	);
 	if (paneData.createOnAttach) {
 		themedUrl.searchParams.set("create", "1");
+		if (paneData.themeId)
+			themedUrl.searchParams.set("themeId", paneData.themeId);
 	}
 	const websocketUrl = themedUrl.toString();
 	const websocketUrlRef = useRef(websocketUrl);
@@ -172,6 +208,64 @@ export function TerminalPane({
 	);
 	invalidateTerminalSessionsRef.current =
 		workspaceTrpcUtils.terminal.list.invalidate;
+
+	// The socket attach creates the session before the list shows it, so a
+	// theme picked in that window is kept on the pane and sent from here.
+	const paneRef = useRef(ctx);
+	paneRef.current = ctx;
+	const syncingThemeRef = useRef<string | null>(null);
+	const [, bumpThemeSync] = useState(0);
+	const hasSession = sessionThemeId !== undefined;
+	useEffect(() => {
+		if (pendingThemeId === undefined || !hasSession || !supportsTerminalThemes)
+			return;
+		const syncKey = `${terminalId}:${pendingThemeId}`;
+		if (syncingThemeRef.current) return;
+		syncingThemeRef.current = syncKey;
+		workspaceTrpcUtils.client.terminal.setTheme
+			.mutate({ terminalId, workspaceId, themeId: pendingThemeId })
+			.then(async () => {
+				await workspaceTrpcUtils.terminal.list.invalidate({ workspaceId });
+				const { pane, actions } = paneRef.current;
+				const current = pane.data as TerminalPaneData;
+				if (
+					current.terminalId !== terminalId ||
+					current.themeId !== pendingThemeId
+				)
+					return;
+				actions.updateData({
+					...current,
+					themeId: undefined,
+				} as PaneViewerData);
+			})
+			.catch((error: unknown) => {
+				console.error("[terminal] Failed to save terminal theme", error);
+				toast.error(t({ message: "Failed to update terminal theme" }));
+				const { pane, actions } = paneRef.current;
+				const current = pane.data as TerminalPaneData;
+				if (
+					current.terminalId !== terminalId ||
+					current.themeId !== pendingThemeId
+				)
+					return;
+				actions.updateData({
+					...current,
+					themeId: undefined,
+				} as PaneViewerData);
+			})
+			.finally(() => {
+				syncingThemeRef.current = null;
+				bumpThemeSync((version) => version + 1);
+			});
+	}, [
+		pendingThemeId,
+		hasSession,
+		supportsTerminalThemes,
+		terminalId,
+		workspaceId,
+		workspaceTrpcUtils,
+		t,
+	]);
 
 	// useCallback so useSyncExternalStore doesn't re-subscribe every render —
 	// otherwise every keystroke-triggered re-render unsubscribes and

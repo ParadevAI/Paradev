@@ -2877,6 +2877,9 @@ msgstr "Ikona aplikace"
 msgid "App path"
 msgstr "Cesta k aplikaci"
 
+msgid "App theme"
+msgstr "Motiv aplikace"
+
 msgid "Appearance"
 msgstr "Vzhled"
 
@@ -8493,6 +8496,9 @@ msgstr "Sledování úkolů se nepodařilo aktualizovat"
 
 msgid "Failed to update team. Please try again."
 msgstr "Nepodařilo se aktualizovat tým. Zkuste to prosím znovu."
+
+msgid "Failed to update terminal theme"
+msgstr "Nepodařilo se aktualizovat motiv terminálu"
 
 msgid "Failed to update URL"
 msgstr "Nepodařilo se změnit URL"

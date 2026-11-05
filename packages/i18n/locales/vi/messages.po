@@ -2877,6 +2877,9 @@ msgstr "Biểu tượng ứng dụng"
 msgid "App path"
 msgstr "Đường dẫn ứng dụng"
 
+msgid "App theme"
+msgstr "Chủ đề ứng dụng"
+
 msgid "Appearance"
 msgstr "Giao diện"
 
@@ -8493,6 +8496,9 @@ msgstr "Không thể cập nhật nơi theo dõi công việc"
 
 msgid "Failed to update team. Please try again."
 msgstr "Không thể cập nhật nhóm. Vui lòng thử lại."
+
+msgid "Failed to update terminal theme"
+msgstr "Không thể cập nhật chủ đề terminal"
 
 msgid "Failed to update URL"
 msgstr "Không thể cập nhật URL"

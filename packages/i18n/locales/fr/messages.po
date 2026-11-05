@@ -2877,6 +2877,9 @@ msgstr "Icône de l’app"
 msgid "App path"
 msgstr "Chemin de l’app"
 
+msgid "App theme"
+msgstr "Thème de l'application"
+
 msgid "Appearance"
 msgstr "Apparence"
 
@@ -8493,6 +8496,9 @@ msgstr "Impossible de mettre à jour le suivi des tâches"
 
 msgid "Failed to update team. Please try again."
 msgstr "Échec de la mise à jour de l'équipe. Veuillez réessayer."
+
+msgid "Failed to update terminal theme"
+msgstr "Échec de la mise à jour du thème du terminal"
 
 msgid "Failed to update URL"
 msgstr "Échec de la mise à jour de l'URL"

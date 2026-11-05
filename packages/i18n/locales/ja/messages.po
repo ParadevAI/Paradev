@@ -2877,6 +2877,9 @@ msgstr "アプリアイコン"
 msgid "App path"
 msgstr "アプリのパス"
 
+msgid "App theme"
+msgstr "アプリのテーマ"
+
 msgid "Appearance"
 msgstr "外観"
 
@@ -8493,6 +8496,9 @@ msgstr "タスクの管理先を更新できませんでした"
 
 msgid "Failed to update team. Please try again."
 msgstr "チームを更新できませんでした。もう一度お試しください。"
+
+msgid "Failed to update terminal theme"
+msgstr "ターミナルテーマを更新できませんでした"
 
 msgid "Failed to update URL"
 msgstr "URLの更新に失敗しました"

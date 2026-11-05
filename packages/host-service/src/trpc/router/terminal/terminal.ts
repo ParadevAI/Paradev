@@ -13,10 +13,12 @@ import {
 	disposeSessionsByWorktreePath,
 	getPendingTerminalWorkspaceId,
 	listLiveTerminalSessions,
+	MAX_THEME_ID_LENGTH,
 	parseThemeType,
 	renameTerminalSession,
 	sendAgentMessage,
 	sessionHasRunningProcess,
+	setTerminalSessionTheme,
 	snapshotSession,
 	transcriptSession,
 	writeFramedInputToSession,
@@ -39,6 +41,7 @@ export const createSessionInputSchema = z.object({
 		.transform((value) => (value ? value : undefined)),
 	cwd: z.string().optional(),
 	themeType: z.string().optional(),
+	themeId: z.string().min(1).max(MAX_THEME_ID_LENGTH).optional(),
 	colors: terminalColorsSchema.optional(),
 	cols: z.number().int().positive().optional(),
 	rows: z.number().int().positive().optional(),
@@ -56,6 +59,7 @@ async function createTerminalSessionFromInput({
 		terminalId,
 		workspaceId: input.workspaceId,
 		themeType: parseThemeType(input.themeType),
+		themeId: input.themeId,
 		colors: input.colors,
 		db: ctx.db,
 		eventBus: ctx.eventBus,
@@ -300,6 +304,41 @@ export const terminalRouter = router({
 				db: ctx.db,
 			});
 			return { terminalId: input.terminalId, title: input.title };
+		}),
+
+	setTheme: protectedProcedure
+		.input(
+			z.object({
+				terminalId: z.string(),
+				workspaceId: z.string(),
+				themeId: z.string().min(1).max(MAX_THEME_ID_LENGTH).nullable(),
+			}),
+		)
+		.mutation(({ ctx, input }) => {
+			const session = ctx.db.query.terminalSessions
+				.findFirst({ where: eq(terminalSessions.id, input.terminalId) })
+				.sync();
+
+			if (!session) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Terminal session not found",
+				});
+			}
+
+			if (session.originWorkspaceId !== input.workspaceId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Terminal session does not belong to this workspace",
+				});
+			}
+
+			setTerminalSessionTheme({
+				terminalId: input.terminalId,
+				themeId: input.themeId,
+				db: ctx.db,
+			});
+			return { terminalId: input.terminalId, themeId: input.themeId };
 		}),
 
 	killSession: protectedProcedure

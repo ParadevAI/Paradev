@@ -6,6 +6,7 @@ import type {
 	RendererContext,
 	WorkspaceStore,
 } from "@superset/panes";
+import { hostSupportsTerminalThemes } from "@superset/shared/host-version";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
@@ -33,8 +34,11 @@ import {
 	LuEraser,
 	LuExternalLink,
 	LuLink,
+	LuPalette,
 	LuPower,
 } from "react-icons/lu";
+import { ThemeSwatch } from "renderer/components/ThemeSwatch";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
@@ -49,7 +53,9 @@ import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-
 import type { OpenFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useThemeStore } from "renderer/stores/theme";
 import { getV2NotificationSourcesForPane } from "renderer/stores/v2-notifications";
+import { builtInThemes, darkTheme, type Theme } from "shared/themes";
 import type { StoreApi } from "zustand/vanilla";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
@@ -123,6 +129,7 @@ import { TerminalSessionDropdown } from "./components/TerminalPane/components/Te
 import { terminalContextMenuLinkStore } from "./components/TerminalPane/contextMenuLinkStore";
 import { useSurfaceFork } from "./hooks/useSurfaceFork";
 import { useUndoableChatClose } from "./hooks/useUndoableChatClose";
+import { findTerminalTheme } from "./utils/findTerminalTheme";
 import { openInActions } from "./utils/openInActions";
 import { pagePaneLabel } from "./utils/pagePaneLabel";
 import { pagesListPageUiId } from "./utils/pagesListPageUiId";
@@ -206,6 +213,13 @@ export function usePaneRegistry({
 		linkedStores,
 	});
 	const host = useWorkspaceHostTarget(workspaceId);
+	const remoteHostInfo = useHostServiceInfo(
+		host.status === "ready" && host.kind !== "local" ? host.url : null,
+	);
+	const supportsTerminalThemes =
+		host.status === "ready" &&
+		(host.kind === "local" ||
+			hostSupportsTerminalThemes(remoteHostInfo.data?.version));
 	const desktopUrl =
 		host.status === "ready" && host.kind === "sandbox" ? host.desktopUrl : null;
 	const collections = useCollections();
@@ -580,6 +594,103 @@ export function usePaneRegistry({
 					/>
 				),
 				contextMenuActions: (_ctx, defaults) => {
+					const themeActions = (
+						ctx: RendererContext<PaneViewerData>,
+					): ContextMenuActionConfig<PaneViewerData>[] => {
+						const paneData = ctx.pane.data as TerminalPaneData;
+						const { customThemes, activeTheme } = useThemeStore.getState();
+						const currentSession = workspaceTrpcUtils.terminal.list
+							.getData({ workspaceId })
+							?.sessions.find(
+								(session) => session.terminalId === paneData.terminalId,
+							);
+						const storedThemeId =
+							paneData.themeId !== undefined
+								? paneData.themeId
+								: (currentSession?.themeId ?? null);
+						const currentThemeId =
+							findTerminalTheme(storedThemeId, customThemes)?.id ?? null;
+						const chooseTheme = (themeId: string | null) => {
+							if (currentSession && themeId === storedThemeId) return;
+							if (!currentSession || paneData.themeId !== undefined) {
+								ctx.actions.updateData({
+									...paneData,
+									themeId,
+								} as PaneViewerData);
+								return;
+							}
+							workspaceTrpcUtils.client.terminal.setTheme
+								.mutate({
+									terminalId: paneData.terminalId,
+									workspaceId,
+									themeId,
+								})
+								.then(
+									() =>
+										workspaceTrpcUtils.terminal.list.invalidate({
+											workspaceId,
+										}),
+									() => {
+										toast.error(
+											t({ message: "Failed to update terminal theme" }),
+										);
+									},
+								);
+						};
+						const themeChoices = (themes: Theme[]) =>
+							themes.map((theme) => ({
+								key: `terminal-theme-${theme.id}`,
+								label: theme.name,
+								icon: <ThemeSwatch theme={theme} />,
+								shortcut: currentThemeId === theme.id ? "✓" : undefined,
+								onSelect: () => chooseTheme(theme.id),
+							}));
+						const groups: ContextMenuActionConfig<PaneViewerData>[] = [
+							{
+								key: "terminal-theme-app",
+								label: t({ message: "App theme" }),
+								icon: <ThemeSwatch theme={activeTheme ?? darkTheme} />,
+								shortcut: currentThemeId === null ? "✓" : undefined,
+								onSelect: () => chooseTheme(null),
+							},
+							{ key: "sep-terminal-theme-app", type: "separator" },
+							{
+								key: "terminal-theme-light",
+								label: t({ message: "Light" }),
+								children: themeChoices(
+									builtInThemes.filter((theme) => theme.type === "light"),
+								),
+							},
+							{
+								key: "terminal-theme-dark",
+								label: t({ message: "Dark" }),
+								children: themeChoices(
+									builtInThemes.filter((theme) => theme.type === "dark"),
+								),
+							},
+						];
+						if (customThemes.length > 0) {
+							groups.push({
+								key: "terminal-theme-custom",
+								label: t({ message: "Custom" }),
+								children: themeChoices(customThemes),
+							});
+						}
+						return groups;
+					};
+					const terminalThemeActions: ContextMenuActionConfig<PaneViewerData>[] =
+						supportsTerminalThemes
+							? [
+									{ key: "sep-terminal-theme", type: "separator" },
+									{
+										key: "terminal-theme",
+										label: t({ message: "Theme" }),
+										icon: <LuPalette />,
+										children: themeActions,
+									},
+									{ key: "sep-terminal-defaults", type: "separator" },
+								]
+							: [];
 					const terminalActions: ContextMenuActionConfig<PaneViewerData>[] = [
 						{
 							key: "copy",
@@ -658,7 +769,7 @@ export function usePaneRegistry({
 								terminalRuntimeRegistry.scrollToBottom(terminalId, ctx.pane.id);
 							},
 						},
-						{ key: "sep-terminal-defaults", type: "separator" },
+						...terminalThemeActions,
 					];
 
 					// Only present when the right-click landed on a link. "Open in"
@@ -1145,6 +1256,7 @@ export function usePaneRegistry({
 			createNewAgentSession,
 			focusAgentTerminal,
 			workspaceTrpcUtils,
+			supportsTerminalThemes,
 			t,
 			desktopUrl,
 			chatPaneIcon,
