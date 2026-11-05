@@ -17,6 +17,7 @@ import { createCallerFactory, protectedProcedure, router } from "../../index";
 import { requireChatSession } from "../sessions/session-service";
 import { terminalRouter } from "../terminal";
 import { addPaneDetails } from "./add-pane-details";
+import { closeChatsOnTerminal } from "./close-chats-on-terminal";
 import { resolveOpenPath } from "./resolve-open-path";
 
 const createTerminalCaller = createCallerFactory(terminalRouter);
@@ -79,26 +80,6 @@ function chatTabTarget(
 		terminalId: chat.live.get(sessionId)?.terminalId ?? sessionId,
 		agentId,
 	};
-}
-
-async function closeChatsOnTerminal(
-	ctx: HostServiceContext,
-	workspaceId: string,
-	terminalId: string,
-) {
-	const chat = ctx.runtime.chat?.();
-	if (!chat) return;
-	const onTerminal = chat.commands
-		.listSessions({ scopeId: workspaceId, limit: 200 })
-		.filter((session) => session.live && session.terminalId === terminalId);
-	await Promise.all(
-		onTerminal.map((session) =>
-			chat.commands.closeSession({
-				sessionId: session.sessionId,
-				userClosed: true,
-			}),
-		),
-	);
 }
 
 function requireWorkspaceTerminal(
