@@ -55,6 +55,7 @@ export const SETTING_ITEM_ID = {
 	GIT_BRANCH_PREFIX: "git-branch-prefix",
 	GIT_DELETE_LOCAL_BRANCH: "git-delete-local-branch",
 	GIT_WORKTREE_LOCATION: "git-worktree-location",
+	GIT_NAMING_INSTRUCTIONS: "git-naming-instructions",
 
 	AGENTS_ENABLED: "agents-enabled",
 	AGENTS_COMMANDS: "agents-commands",
@@ -219,6 +220,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.GIT_BRANCH_PREFIX]: "shared",
 	[SETTING_ITEM_ID.GIT_DELETE_LOCAL_BRANCH]: "v1",
 	[SETTING_ITEM_ID.GIT_WORKTREE_LOCATION]: "shared",
+	[SETTING_ITEM_ID.GIT_NAMING_INSTRUCTIONS]: "v2",
 
 	[SETTING_ITEM_ID.AGENTS_ENABLED]: "shared",
 	[SETTING_ITEM_ID.AGENTS_COMMANDS]: "shared",
@@ -997,6 +999,25 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"storage",
 			"base",
 			"default",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.GIT_NAMING_INSTRUCTIONS,
+		section: "git",
+		title: "Naming instructions",
+		description:
+			"Account-wide instructions for AI-generated workspace and branch names",
+		keywords: [
+			"git",
+			"branch",
+			"workspace",
+			"naming",
+			"name",
+			"instructions",
+			"ai",
+			"global",
+			"prefix",
+			"ticket",
 		],
 	},
 	{

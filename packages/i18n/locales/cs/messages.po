@@ -6219,6 +6219,9 @@ msgstr "Pull request se nepodařilo aktualizovat"
 msgid "Couldn't update the Chat setting"
 msgstr "Nastavení Chat se nepodařilo aktualizovat"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Globální nastavení pojmenování se nepodařilo aktualizovat"
+
 msgid "Couldn't update the queue"
 msgstr "Frontu se nepodařilo aktualizovat"
 
@@ -9504,6 +9507,12 @@ msgstr "Průvodci"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Řídí názvy pracovních prostorů a větví generované AI pro tento projekt. Prázdné znamená výchozí pojmenování."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Řídí názvy pracovních prostorů a větví generované AI pro tento projekt. Přidávají se za vaše globální pravidla a při rozporu mají přednost. Prázdné znamená globální pravidla."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Řídí názvy pracovních prostorů a větví generované AI ve všech projektech na všech vašich zařízeních. Pravidla projektu se přidávají za tato a při rozporu mají přednost."
+
 msgid "Guides and references"
 msgstr "Průvodci a reference"
 
@@ -9927,6 +9936,9 @@ msgstr "Pokud se vám Paradev zatím líbí, hvězda na GitHubu pomůže další
 
 msgid "Ignore @channel and @here"
 msgstr "Ignorovat @channel a @here"
+
+msgid "Ignore global naming instructions"
+msgstr "Ignorovat globální pravidla pojmenování"
 
 msgid "Illegal content"
 msgstr "Nelegální obsah"

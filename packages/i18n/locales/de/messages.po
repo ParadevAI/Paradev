@@ -6219,6 +6219,9 @@ msgstr "Pull Request konnte nicht aktualisiert werden"
 msgid "Couldn't update the Chat setting"
 msgstr "Die Chat-Einstellung konnte nicht aktualisiert werden"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Die globale Benennungseinstellung konnte nicht aktualisiert werden"
+
 msgid "Couldn't update the queue"
 msgstr "Warteschlange konnte nicht aktualisiert werden"
 
@@ -9504,6 +9507,12 @@ msgstr "Anleitungen"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Steuert die KI-generierten Namen für Arbeitsbereiche und Branches in diesem Projekt. Leer bedeutet Standardbenennung."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Steuert die KI-generierten Namen für Arbeitsbereiche und Branches in diesem Projekt. Sie werden nach deinen globalen Vorgaben angewendet und haben bei Widersprüchen Vorrang. Leer bedeutet globale Vorgaben."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Steuert die KI-generierten Namen für Arbeitsbereiche und Branches in allen Projekten auf all deinen Geräten. Die Vorgaben eines Projekts werden danach angewendet und haben bei Widersprüchen Vorrang."
+
 msgid "Guides and references"
 msgstr "Anleitungen und Referenzen"
 
@@ -9927,6 +9936,9 @@ msgstr "Wenn dir Paradev bisher gefällt: Ein Stern auf GitHub hilft anderen Ent
 
 msgid "Ignore @channel and @here"
 msgstr "@channel und @here ignorieren"
+
+msgid "Ignore global naming instructions"
+msgstr "Globale Benennungsvorgaben ignorieren"
 
 msgid "Illegal content"
 msgstr "Illegale Inhalte"

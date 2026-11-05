@@ -246,6 +246,7 @@ export const projectRouter = router({
 				// Always an array; the column's JSON encoding stays internal.
 				sparseCheckoutPaths: parseSparseCheckoutPaths(row.sparseCheckoutPaths),
 				namingInstructions: row.namingInstructions,
+				ignoreGlobalNamingInstructions: row.ignoreGlobalNamingInstructions,
 			};
 		}),
 
@@ -378,6 +379,24 @@ export const projectRouter = router({
 				});
 			}
 			return { namingInstructions };
+		}),
+
+	setIgnoreGlobalNamingInstructions: protectedProcedure
+		.input(z.object({ projectId: z.string().uuid(), ignore: z.boolean() }))
+		.mutation(({ ctx, input }) => {
+			const updated = ctx.db
+				.update(projects)
+				.set({ ignoreGlobalNamingInstructions: input.ignore })
+				.where(eq(projects.id, input.projectId))
+				.returning({ id: projects.id })
+				.get();
+			if (!updated) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Project is not set up on this host",
+				});
+			}
+			return { ignoreGlobalNamingInstructions: input.ignore };
 		}),
 
 	/**

@@ -6219,6 +6219,9 @@ msgstr "プルリクエストを更新できませんでした"
 msgid "Couldn't update the Chat setting"
 msgstr "チャットの設定を更新できませんでした"
 
+msgid "Couldn't update the global naming setting"
+msgstr "グローバルの命名設定を更新できませんでした"
+
 msgid "Couldn't update the queue"
 msgstr "キューを更新できませんでした"
 
@@ -9504,6 +9507,12 @@ msgstr "ガイド"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "このプロジェクトのAI生成のワークスペース名とブランチ名を導きます。空欄でデフォルトの命名になります。"
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "このプロジェクトのAI生成のワークスペース名とブランチ名を導きます。グローバルの指示の後に追加され、両者が矛盾する場合はこちらが優先されます。空欄でグローバルの指示を使います。"
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "すべてのデバイスの、すべてのプロジェクトでAI生成のワークスペース名とブランチ名を導きます。プロジェクト独自の指示はこの後に追加され、両者が矛盾する場合はそちらが優先されます。"
+
 msgid "Guides and references"
 msgstr "ガイドとリファレンス"
 
@@ -9927,6 +9936,9 @@ msgstr "Paradevを気に入っていただけたら、GitHubスターが他の�
 
 msgid "Ignore @channel and @here"
 msgstr "@channel と @here を無視"
+
+msgid "Ignore global naming instructions"
+msgstr "グローバルの命名指示を無視"
 
 msgid "Illegal content"
 msgstr "違法なコンテンツ"
