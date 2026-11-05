@@ -1299,7 +1299,7 @@ export function ComposerBody({
 					<MicIcon className="size-4" />
 				</button>
 			)}
-			{status === "streaming" && !canSend ? (
+			{status === "streaming" && onStop && !canSend ? (
 				<button
 					type="button"
 					aria-label={t({

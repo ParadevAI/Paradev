@@ -637,7 +637,7 @@ export const Composer = memo(function Composer({
 						: (placeholder ??
 							t({ message: "Ask the agent, @mention files, run /commands" }))
 				}
-				status={stop ? "streaming" : "ready"}
+				status={stop || (!target && turnRunning) ? "streaming" : "ready"}
 				stopOnEscape={!escapeGoesBack}
 				toolbar={
 					target ? (

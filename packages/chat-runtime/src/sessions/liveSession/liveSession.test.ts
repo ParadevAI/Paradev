@@ -745,6 +745,17 @@ describe("LiveSession", () => {
 		expect(second.queued).toBe(true);
 		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
 		expect(adapters[0]?.steered).toEqual([]);
+
+		answerApproval(runtime, sessionId);
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId ===
+				"t2",
+		);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
+		expect(adapters[0]?.steered).toEqual([]);
+		expect(adapters[0]?.prompted).toHaveLength(2);
 		await runtime.dispose();
 	});
 
