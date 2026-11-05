@@ -305,10 +305,6 @@ class BrowserManager extends EventEmitter {
 		this.forwardableChords = new Set(chords);
 	}
 
-	public setExtensionMenuItems(items: ExtensionMenuItems): void {
-		this.extensionMenuItems = items;
-	}
-
 	register(paneId: string, webContentsId: number, workspaceId?: string): void {
 		// Clean even when prevId === webContentsId so BrowserManager owns
 		// listener idempotency; callers can re-register without duplicating.
@@ -1124,8 +1120,8 @@ class BrowserManager extends EventEmitter {
 	): void {
 		const wc = window.webContents;
 		markBrowserPanePopup(wc);
-		if (this.isAudioMuted(paneId) && typeof wc.setAudioMuted === "function") {
-			wc.setAudioMuted(true);
+		if (typeof wc.setAudioMuted === "function") {
+			wc.setAudioMuted(this.isAudioMuted(paneId));
 		}
 		let popups = this.popupWebContents.get(paneId);
 		if (!popups) {
@@ -1151,6 +1147,12 @@ class BrowserManager extends EventEmitter {
 			detachGuard();
 		});
 	}
+
+	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
+	setExtensionMenuItems(items: ExtensionMenuItems): void {
+		this.extensionMenuItems = items;
+	}
+
 	// An extension's broken menu must not take the page's own menu with it.
 	private safeExtensionMenuItems(
 		...args: Parameters<ExtensionMenuItems>

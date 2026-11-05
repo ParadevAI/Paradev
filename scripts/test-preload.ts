@@ -37,8 +37,9 @@ mock.module("electron", () => ({
 		fromId: mock(() => null),
 	},
 	clipboard: {
-		writeText: mock(),
-		readText: mock(),
+		write: mock(() => Promise.resolve()),
+		writeText: mock(() => Promise.resolve()),
+		readText: mock(() => ""),
 		writeImage: mock(),
 	},
 	Menu: {
@@ -46,6 +47,7 @@ mock.module("electron", () => ({
 			popup: mock(),
 			items,
 		})),
+		setApplicationMenu: mock(),
 	},
 	shell: {
 		openExternal: mock(async () => {}),
@@ -56,23 +58,37 @@ mock.module("electron", () => ({
 	app: {
 		isPackaged: false,
 		getVersion: () => "0.0.0",
+		getName: () => "test-app",
 		getAppPath: () => "/tmp/app",
 		getPath: (name: string) => `/tmp/${name}`,
 		on: mock(),
 		whenReady: mock(async () => {}),
 	},
-	BrowserWindow: class BrowserWindow {
-		webContents = {
+	BrowserWindow: Object.assign(
+		mock(() => ({
+			webContents: {
+				on: mock(),
+				off: mock(),
+				setAudioMuted: mock(),
+				setWindowOpenHandler: mock(),
+				send: mock(),
+			},
 			on: mock(),
-			off: mock(),
-			setAudioMuted: mock(),
-			setWindowOpenHandler: mock(),
-		};
-		on = mock();
-		loadURL = mock(async () => {});
-		close = mock();
-		destroy = mock();
-	},
+			once: mock(),
+			loadURL: mock(async () => {}),
+			close: mock(),
+			destroy: mock(),
+		})),
+		{ getFocusedWindow: mock(() => null), getAllWindows: mock(() => []) },
+	),
+	WebContentsView: mock(() => ({
+		webContents: {
+			send: mock(),
+			once: mock(),
+			loadURL: mock(() => Promise.resolve()),
+			close: mock(),
+		},
+	})),
 	nativeImage: {
 		createEmpty: () => ({
 			isEmpty: () => true,
@@ -93,6 +109,12 @@ mock.module("electron", () => ({
 		removeHandler: mock(),
 	},
 	dialog: {
+		showOpenDialog: mock(() =>
+			Promise.resolve({ canceled: false, filePaths: [] }),
+		),
+		showSaveDialog: mock(() =>
+			Promise.resolve({ canceled: false, filePath: "" }),
+		),
 		showErrorBox: mock(),
 		showMessageBox: mock(async () => ({ response: 0 })),
 	},
@@ -103,7 +125,33 @@ mock.module("electron", () => ({
 				onHeadersReceived: mock(),
 			},
 		},
+		fromPartition: mock(() => ({})),
 	},
+	screen: {
+		getPrimaryDisplay: mock(() => ({
+			workAreaSize: { width: 1920, height: 1080 },
+			bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+		})),
+		getAllDisplays: mock(() => [
+			{
+				bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+				workAreaSize: { width: 1920, height: 1080 },
+			},
+		]),
+	},
+	Notification: mock(() => ({
+		show: mock(),
+		on: mock(),
+	})),
+	powerMonitor: {
+		getSystemIdleState: mock(() => "active"),
+	},
+	contextBridge: {
+		executeInMainWorld: mock(),
+		exposeInMainWorld: mock(),
+	},
+	ipcRenderer: undefined,
+	net: {},
 	ClipboardItem: class ClipboardItem {},
 }));
 
