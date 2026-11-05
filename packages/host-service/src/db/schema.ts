@@ -111,6 +111,12 @@ export const projects = sqliteTable(
 		// this project (e.g. "include the Linear ticket id in the branch name").
 		// Null means the default naming behavior.
 		namingInstructions: text("naming_instructions"),
+		ignoreGlobalNamingInstructions: integer(
+			"ignore_global_naming_instructions",
+			{ mode: "boolean" },
+		)
+			.notNull()
+			.default(false),
 		// Empty string means "not yet backfilled" — the startup sweep targets
 		// these rows (name from cloud legacy row if reachable, else basename).
 		name: text().notNull().default(""),

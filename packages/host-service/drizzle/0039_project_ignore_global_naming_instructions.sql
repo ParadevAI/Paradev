@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD `ignore_global_naming_instructions` integer DEFAULT false NOT NULL;
