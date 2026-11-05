@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ImportFromOtherToolsDialog } from "../../components/ImportFromOtherToolsDialog";
 import { useExternalWorktrees } from "../useExternalWorktrees";
@@ -9,10 +10,17 @@ export function useImportFromOtherTools({
 	enabled: boolean;
 	onImported: (projectId: string) => Promise<void>;
 }) {
-	const { offer, visible, machineId } = useExternalWorktrees();
+	const queryClient = useQueryClient();
+	const { offer, visible, machineId } = useExternalWorktrees({ enabled });
 	const [open, setOpen] = useState(false);
 	const [dialogKey, setDialogKey] = useState(0);
-	const shown = enabled && visible && !!machineId;
+	const shown = visible && !!machineId;
+	const handleOpenChange = (next: boolean) => {
+		setOpen(next);
+		if (!next) {
+			void queryClient.invalidateQueries({ queryKey: ["external-worktrees"] });
+		}
+	};
 	return {
 		shown,
 		offer,
@@ -27,7 +35,7 @@ export function useImportFromOtherTools({
 					open={open}
 					offer={offer}
 					hostId={machineId}
-					onOpenChange={setOpen}
+					onOpenChange={handleOpenChange}
 					onImported={onImported}
 				/>
 			) : null,

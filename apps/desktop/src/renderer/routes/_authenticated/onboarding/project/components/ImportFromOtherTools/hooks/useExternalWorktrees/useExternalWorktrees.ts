@@ -6,12 +6,12 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { type ExternalWorktreeSource, SOURCE_NAMES } from "../../constants";
 
-export function useExternalWorktrees() {
+export function useExternalWorktrees({ enabled }: { enabled: boolean }) {
 	const { activeHostUrl, machineId } = useLocalHostService();
 	const offeredRef = useRef(false);
 	const { data } = useQuery({
 		queryKey: ["external-worktrees", activeHostUrl],
-		enabled: !!activeHostUrl,
+		enabled: enabled && !!activeHostUrl,
 		retry: false,
 		staleTime: Number.POSITIVE_INFINITY,
 		queryFn: () =>
@@ -39,7 +39,7 @@ export function useExternalWorktrees() {
 		};
 	}, [data]);
 
-	const visible = offer.repos.length > 0 && !!machineId;
+	const visible = enabled && offer.repos.length > 0 && !!machineId;
 
 	useEffect(() => {
 		if (!visible || offeredRef.current) return;
