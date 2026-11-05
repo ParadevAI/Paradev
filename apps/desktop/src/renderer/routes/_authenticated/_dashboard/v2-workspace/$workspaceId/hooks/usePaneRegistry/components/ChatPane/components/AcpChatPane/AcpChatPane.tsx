@@ -21,7 +21,10 @@ import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnres
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
-import { readSavedChatMode } from "../../../../utils/savedChatMode";
+import {
+	freshStartMode,
+	readSavedChatMode,
+} from "../../../../utils/savedChatMode";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -198,9 +201,12 @@ export function AcpChatPane({
 			attaching.current = true;
 			setFailure(null);
 			try {
-				const startModeId =
-					modeId ??
-					(resume || !agent ? undefined : readSavedChatMode(agent.id));
+				const startModeId = resume
+					? modeId
+					: freshStartMode(
+							modeId,
+							agent ? readSavedChatMode(agent.id) : undefined,
+						);
 				const commandId = crypto.randomUUID();
 				const createdId = await sharedChatCreate(
 					createKey,

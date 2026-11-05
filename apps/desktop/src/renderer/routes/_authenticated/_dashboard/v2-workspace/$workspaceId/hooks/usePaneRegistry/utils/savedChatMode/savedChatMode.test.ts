@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { withSavedMode } from "./savedChatMode";
+import { freshStartMode, withSavedMode } from "./savedChatMode";
 
 test("keeps one mode per agent, newest last, and at most 32 agents", () => {
 	expect(withSavedMode({ claude: "default" }, "claude", "auto")).toEqual({
@@ -18,4 +18,10 @@ test("never saves plan as the mode new chats start in", () => {
 	expect(withSavedMode({ claude: "auto" }, "claude", "plan")).toEqual({
 		claude: "auto",
 	});
+});
+
+test("a new chat starts in the pane's mode, but never in plan", () => {
+	expect(freshStartMode("default", "bypassPermissions")).toBe("default");
+	expect(freshStartMode("plan", "bypassPermissions")).toBe("bypassPermissions");
+	expect(freshStartMode(undefined, "auto")).toBe("auto");
 });
