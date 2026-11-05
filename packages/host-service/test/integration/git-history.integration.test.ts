@@ -66,6 +66,66 @@ describe("git history + diff procedures", () => {
 		expect(paths).toContain("y.txt");
 	});
 
+	test("commit ranges include files from the oldest selected commit", async () => {
+		const fromHash = await scenario.repo.commit("range start", {
+			"range-start.txt": "first\n",
+		});
+		await scenario.repo.commit("range middle", {
+			"range-middle.txt": "second\n",
+		});
+		const toHash = await scenario.repo.commit("range end", {
+			"range-end.txt": "third\n",
+		});
+
+		const files = await scenario.host.trpc.git.getCommitFiles.query({
+			workspaceId: scenario.workspaceId,
+			fromHash,
+			commitHash: toHash,
+			includeFrom: true,
+		});
+		const paths = files.files.map((file) => file.path);
+		expect(paths).toContain("range-start.txt");
+		expect(paths).toContain("range-middle.txt");
+		expect(paths).toContain("range-end.txt");
+
+		const diff = await scenario.host.trpc.git.getDiff.query({
+			workspaceId: scenario.workspaceId,
+			path: "range-start.txt",
+			category: "commit",
+			fromHash,
+			commitHash: toHash,
+			includeFrom: true,
+		});
+		expect(diff.oldFile.contents).toBe("");
+		expect(diff.newFile.contents).toBe("first\n");
+
+		const patch = await scenario.host.trpc.git.getDiffPatch.query({
+			workspaceId: scenario.workspaceId,
+			paths: ["range-start.txt"],
+			category: "commit",
+			fromHash,
+			commitHash: toHash,
+			includeFrom: true,
+		});
+		expect(patch.patch).toContain("range-start.txt");
+	});
+
+	test("inclusive commit ranges use the empty tree for a root commit", async () => {
+		await scenario.repo.git.raw(["checkout", "--orphan", "root-range"]);
+		const rootHash = await scenario.repo.commit("root range commit", {
+			"root-range.txt": "root\n",
+		});
+
+		const result = await scenario.host.trpc.git.getCommitFiles.query({
+			workspaceId: scenario.workspaceId,
+			fromHash: rootHash,
+			commitHash: rootHash,
+			includeFrom: true,
+		});
+
+		expect(result.files.map((file) => file.path)).toContain("root-range.txt");
+	});
+
 	test("getDiff returns staged content for a staged change", async () => {
 		const filePath = join(scenario.repo.repoPath, "README.md");
 		writeFileSync(filePath, "modified line\n");
