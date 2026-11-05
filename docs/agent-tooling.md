@@ -34,6 +34,22 @@ Everything else links to those:
 Agents other than Claude Code should read the relevant `.agents/skills/*/SKILL.md` when its
 description matches the task.
 
+## Codewhale
+
+Install with `npm install -g codewhale` and configure model access in Codewhale.
+Add the Codewhale preset in Settings → Agents. Task prompt launches use `--fresh` to
+avoid resuming another task in the same workspace. `run --prompt=<text>` preserves
+flag-like prompts and avoids the 0.10.2 root parser issue without bypassing approvals.
+Resume uses `codewhale --resume <session-id>` with a Codewhale session ID.
+These flags were checked against the published
+0.10.2 binary. The preset preserves Codewhale's approval and sandbox settings.
+
+The managed wrapper reports launch identity. Native lifecycle hooks, automatic
+session-ID discovery, usage tracking, unattended one-shot runs, and MCP provisioning
+are not integrated.
+Codewhale owns its config and credentials, including `CODEWHALE_HOME` and
+`CODEWHALE_CONFIG_PATH` overrides; the wrapper leaves them unchanged.
+
 ## UFO
 
 Install with `curl -fsSL https://ufo.ai/ufo | sh` and complete `ufo login` in a

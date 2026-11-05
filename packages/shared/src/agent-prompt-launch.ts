@@ -80,7 +80,7 @@ export function buildPromptCommandString({
 		return `${fullCommand} <<'${delimiter}'\n${prompt}\n${delimiter}`;
 	}
 
-	return `${command} "$(cat <<'${delimiter}'\n${prompt}\n${delimiter}\n)"${suffix ? ` ${suffix}` : ""}`;
+	return `${command}${command.endsWith("=") ? "" : " "}"$(cat <<'${delimiter}'\n${prompt}\n${delimiter}\n)"${suffix ? ` ${suffix}` : ""}`;
 }
 
 /**
@@ -105,7 +105,7 @@ export interface ParsedPromptHeredocCommand {
 // runs — never present in the prompt body (resolveDelimiter guarantees it),
 // so the backreference match is unambiguous.
 const ARGV_HEREDOC_PATTERN =
-	/^([\s\S]+?) "\$\(cat <<'(SUPERSET_PROMPT_[A-Za-z0-9_]+)'\n([\s\S]*)\n\2\n\)"([^\n]*)$/;
+	/^([\s\S]+?(?:=| ))"\$\(cat <<'(SUPERSET_PROMPT_[A-Za-z0-9_]+)'\n([\s\S]*)\n\2\n\)"([^\n]*)$/;
 const STDIN_HEREDOC_PATTERN =
 	/^([\s\S]+?) <<'(SUPERSET_PROMPT_[A-Za-z0-9_]+)'\n([\s\S]*)\n\2$/;
 
@@ -114,12 +114,12 @@ export function parsePromptHeredocCommand(
 ): ParsedPromptHeredocCommand | null {
 	const argv = ARGV_HEREDOC_PATTERN.exec(commandText);
 	if (argv) {
-		const [, command, , prompt, rawSuffix] = argv;
-		if (command === undefined || prompt === undefined) return null;
+		const [, commandPrefix, , prompt, rawSuffix] = argv;
+		if (commandPrefix === undefined || prompt === undefined) return null;
 		const suffix = rawSuffix?.replace(/^ /, "");
 		return {
 			transport: "argv",
-			command,
+			command: commandPrefix.trimEnd(),
 			prompt,
 			suffix: suffix || undefined,
 		};
@@ -160,7 +160,7 @@ export function buildFishPromptCommandString({
 	if (transport === "stdin") {
 		return `begin; command rm -f -- ${quotedPath}; ${joinCommand(command, suffix)}; end < ${quotedPath}`;
 	}
-	return `${command} (begin; cat ${quotedPath}; command rm -f -- ${quotedPath}; end | string collect --allow-empty)${suffix ? ` ${suffix}` : ""}`;
+	return `${command}${command.endsWith("=") ? "" : " "}(begin; cat ${quotedPath}; command rm -f -- ${quotedPath}; end | string collect --allow-empty)${suffix ? ` ${suffix}` : ""}`;
 }
 
 export function buildPromptFileCommandString({
@@ -181,5 +181,5 @@ export function buildPromptFileCommandString({
 		return `${fullCommand} < ${quotedPath}`;
 	}
 
-	return `${command} "$(cat ${quotedPath})"${suffix ? ` ${suffix}` : ""}`;
+	return `${command}${command.endsWith("=") ? "" : " "}"$(cat ${quotedPath})"${suffix ? ` ${suffix}` : ""}`;
 }
