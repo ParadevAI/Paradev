@@ -72,17 +72,19 @@ export function ManualSignIn({
 				</p>
 			)}
 			{manualOn ? null : (
-				<Button
-					className="grid place-items-center *:[grid-area:1/1]"
-					disabled={saving}
-					onClick={() => void handleEnable()}
-					size="sm"
-				>
-					<span className={saving ? "invisible" : undefined}>
-						<Trans>Use manual sign-in</Trans>
-					</span>
-					{saving ? <Spinner /> : null}
-				</Button>
+				<div className="flex justify-end">
+					<Button
+						className="grid place-items-center *:[grid-area:1/1]"
+						disabled={saving}
+						onClick={() => void handleEnable()}
+						size="sm"
+					>
+						<span className={saving ? "invisible" : undefined}>
+							<Trans>Use manual sign-in</Trans>
+						</span>
+						{saving ? <Spinner /> : null}
+					</Button>
+				</div>
 			)}
 		</div>
 	);
