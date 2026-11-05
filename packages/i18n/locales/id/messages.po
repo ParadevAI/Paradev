@@ -21981,6 +21981,12 @@ msgstr "Anda harus menjadi bagian dari organisasi untuk menghubungkan akun."
 msgid "You need to be part of an organization to use integrations."
 msgstr "Anda harus menjadi bagian dari sebuah organisasi untuk memakai integrasi."
 
+msgid "You stopped this response"
+msgstr "Anda menghentikan respons ini"
+
+msgid "You stopped this response before a tool ran"
+msgstr "Anda menghentikan respons ini sebelum alat dijalankan"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

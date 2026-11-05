@@ -21981,6 +21981,12 @@ msgstr "Pro připojení účtů musíte být součástí organizace."
 msgid "You need to be part of an organization to use integrations."
 msgstr "Pro používání integrací musíte být součástí organizace."
 
+msgid "You stopped this response"
+msgstr "Tuto odpověď jste zastavili"
+
+msgid "You stopped this response before a tool ran"
+msgstr "Tuto odpověď jste zastavili před spuštěním nástroje"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

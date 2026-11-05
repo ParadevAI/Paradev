@@ -21981,6 +21981,12 @@ msgstr "Hesap bağlamak için bir organizasyona üye olmanız gerekir."
 msgid "You need to be part of an organization to use integrations."
 msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerekir."
 
+msgid "You stopped this response"
+msgstr "Bu yanıtı durdurdunuz"
+
+msgid "You stopped this response before a tool ran"
+msgstr "Bu yanıtı bir araç çalışmadan önce durdurdunuz"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

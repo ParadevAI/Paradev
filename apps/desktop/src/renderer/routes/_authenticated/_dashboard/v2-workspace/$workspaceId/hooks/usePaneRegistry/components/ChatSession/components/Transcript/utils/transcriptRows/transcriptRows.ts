@@ -4,6 +4,7 @@ import {
 	type TurnGroup,
 	toolRunKey,
 	transcriptItemKey,
+	type UserStop,
 } from "@superset/chat/core";
 import type {
 	AgentMessage,
@@ -68,6 +69,8 @@ export type TranscriptRow =
 			error: TurnError | undefined;
 			/** No turn came after it, so its failure can still be acted on. */
 			latest: boolean;
+			/** The user stopped the response above it, as the agent recorded it. */
+			userStop?: UserStop;
 	  }
 	| {
 			kind: "reply_footer";
@@ -181,9 +184,12 @@ export function transcriptRows(
 				...(run.pages ? { pages: run.pages } : {}),
 			};
 		};
-		const pushItem = (item: Item) => {
+		const endRun = () => {
 			unwrapLoneCall();
 			run = null;
+		};
+		const pushItem = (item: Item) => {
+			endRun();
 			const clientId =
 				item.kind === "user_message"
 					? (item as UserMessage).clientId
@@ -240,6 +246,20 @@ export function transcriptRows(
 		};
 		for (const [index, entry] of group.entries.entries()) {
 			if (index > lastPrompt) placeClock();
+			if (entry.kind === "user_stop") {
+				endRun();
+				push({
+					kind: "turn_status",
+					key: `stop:${entry.item.id}`,
+					groupStart,
+					turnId: group.turnId,
+					status: "interrupted",
+					error: undefined,
+					latest: false,
+					userStop: entry.stop,
+				});
+				continue;
+			}
 			const tools =
 				entry.kind === "tool_run"
 					? entry.items

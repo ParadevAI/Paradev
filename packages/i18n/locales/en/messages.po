@@ -21981,6 +21981,12 @@ msgstr "You need to be part of an organization to connect accounts."
 msgid "You need to be part of an organization to use integrations."
 msgstr "You need to be part of an organization to use integrations."
 
+msgid "You stopped this response"
+msgstr "You stopped this response"
+
+msgid "You stopped this response before a tool ran"
+msgstr "You stopped this response before a tool ran"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."
