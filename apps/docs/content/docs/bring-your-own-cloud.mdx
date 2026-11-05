@@ -6,9 +6,11 @@ pro: true
 
 ## Overview
 
-Paradev can run agents on a Linux server in your own cloud account. Your code and agent sign-ins stay on that server. You open its workspaces from the desktop or phone app, the same as workspaces on your laptop.
+Paradev can run agents on a Linux server in your own cloud account. Your repos and agent sign-ins are stored on that server. You open its workspaces from the desktop or phone app, the same as workspaces on your laptop.
 
-This is different from [cloud workspaces](/cloud-workspaces), where Paradev runs the machine for you. Pick it when the code must stay in your account, or when you want to control the machine.
+Two kinds of traffic still leave the server: agents send what they read to their model provider, using your keys, and terminal and port traffic passes through the Paradev relay when you open the workspace from another device.
+
+This is different from [cloud workspaces](/cloud-workspaces), where Paradev runs the machine for you. Pick it when your repos must be stored in your own account, or when you want to control the machine.
 
 The host binds to `127.0.0.1` and reaches your devices through the Paradev relay, so the server needs no open inbound ports.
 
@@ -26,7 +28,13 @@ On the server:
 curl -fsSL https://paradev.com/cli/install.sh | sh
 ```
 
-This installs Paradev under `~/superset` and adds `~/superset/bin` to `PATH`. See [Getting Started](/cli/getting-started#standalone-install).
+This installs Paradev under `~/superset` and adds `~/superset/bin` to `PATH` for new shells. For the current session, run:
+
+```bash
+export PATH="$HOME/superset/bin:$PATH"
+```
+
+See [Getting Started](/cli/getting-started#standalone-install).
 
 ## 2. Sign in to GitHub and your agents
 
@@ -48,7 +56,7 @@ superset status
 
 `--org` is needed only if the key belongs to more than one organization. See [Headless hosts](/remote-access#headless-sandbox-ci-or-server).
 
-To keep the host running across reboots, run it under systemd instead of `--daemon`: [Run it under systemd](/cli/host-server#run-it-under-systemd).
+To keep the host running across reboots, run it under systemd instead of `--daemon`: [Run it under systemd](/cli/host-server#run-it-under-systemd). systemd does not see the key you exported, so put `SUPERSET_API_KEY=sk_live_…` in a file only root can read, such as `/etc/superset/host.env`, and add `EnvironmentFile=/etc/superset/host.env` to the unit's `[Service]` section.
 
 ## 4. Add your repos
 
