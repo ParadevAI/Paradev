@@ -2056,6 +2056,9 @@ msgstr "ファイルやアプリなどを追加"
 msgid "Add files, apps, and more (@)"
 msgstr "ファイルやアプリなどを追加(@)"
 
+msgid "Add GitHub organization"
+msgstr "GitHub 組織を追加"
+
 msgid "Add instructions"
 msgstr "指示を追加"
 
@@ -7133,6 +7136,9 @@ msgstr "破棄しました — 今後は確認しません"
 msgid "Disconnect"
 msgstr "切断"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "{accountLogin} を切断しますか？"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential}の接続を解除しますか？"
 
@@ -10111,8 +10117,8 @@ msgstr "プラグインをインストール"
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Paradev GitHub Appをインストールしてリポジトリを接続します。"
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "接続したいリポジトリがある GitHub の組織またはアカウントごとに、Paradev GitHub App をインストールしてください。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "すべてのワークスペースにまたがるMCPサーバーのインストール、認可、スコープ設定を1か所で。OAuthも一元管理します。"
@@ -14422,6 +14428,9 @@ msgstr "人"
 msgid "Personal"
 msgstr "個人"
 
+msgid "Personal account"
+msgstr "個人アカウント"
+
 msgid "Personal plan"
 msgstr "個人プラン"
 
@@ -15932,8 +15941,11 @@ msgstr "リポジトリ、ワークツリー、ターミナルの出力、エー
 msgid "Repositories"
 msgstr "リポジトリ"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "GitHub Appのインストールからアクセスできるリポジトリです。"
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "接続済みの GitHub アカウントからアクセスできるリポジトリ。"
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin} のリポジトリは同期されなくなります。接続済みのほかの GitHub アカウントには影響しません。GitHub App は {accountLogin} にインストールされたままで、いつでも再接続できます。"
 
 msgid "Repositories refreshed"
 msgstr "リポジトリを更新しました"
@@ -19976,9 +19988,6 @@ msgstr "組織の公開URLが変わります。ブックマークや共有リン
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "<0>{0}</0>を削除し、すべてのメンバーを外します。この操作は元に戻せません。"
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "組織からGitHubの接続を解除します。GitHub Appはインストールされたまま残りますが、データの同期は行われなくなります。いつでも再接続できます。"
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "実行中のすべてのセッションを終了し、ターミナルデーモンを再起動します。アプリは新しいデーモンでターミナルを再起動します。"

@@ -2056,6 +2056,9 @@ msgstr "Tambah file, aplikasi, dan lainnya"
 msgid "Add files, apps, and more (@)"
 msgstr "Tambah file, aplikasi, dan lainnya (@)"
 
+msgid "Add GitHub organization"
+msgstr "Tambahkan organisasi GitHub"
+
 msgid "Add instructions"
 msgstr "Tambahkan instruksi"
 
@@ -7133,6 +7136,9 @@ msgstr "Dibuang — tidak akan ditanya lagi"
 msgid "Disconnect"
 msgstr "Putuskan"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "Putuskan {accountLogin}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Putuskan {credential}?"
 
@@ -10111,8 +10117,8 @@ msgstr "Instal plugin"
 msgid "Install the desktop app"
 msgstr "Pasang aplikasi desktop"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Pasang GitHub App Paradev untuk menghubungkan repositori Anda."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Pasang Paradev GitHub App di setiap organisasi atau akun GitHub yang repositorinya ingin Anda hubungkan."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Pasang, otorisasi, dan atur cakupan server MCP di semua workspace Anda dari satu tempat, dengan OAuth terpusat."
@@ -14422,6 +14428,9 @@ msgstr "Orang"
 msgid "Personal"
 msgstr "Pribadi"
 
+msgid "Personal account"
+msgstr "Akun pribadi"
+
 msgid "Personal plan"
 msgstr "Paket pribadi"
 
@@ -15932,8 +15941,11 @@ msgstr "Repo, worktree, output terminal, dan sesi agen tetap di mesin Anda. Sink
 msgid "Repositories"
 msgstr "Repositori"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "Repositori yang bisa diakses lewat instalasi GitHub App."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Repositori yang dapat diakses melalui akun GitHub yang terhubung."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "Repositori dari {accountLogin} tidak akan disinkronkan lagi. Akun GitHub lain yang terhubung tidak terpengaruh. GitHub App tetap terpasang di {accountLogin}, dan Anda dapat menghubungkannya kembali kapan saja."
 
 msgid "Repositories refreshed"
 msgstr "Repositori disegarkan"
@@ -19976,9 +19988,6 @@ msgstr "Ini akan mengubah URL publik organisasi Anda. Pastikan memperbarui bookm
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Ini akan menghapus <0>{0}</0> dan mengeluarkan semua anggotanya. Ini tidak bisa dibatalkan."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Ini akan memutuskan GitHub dari organisasi Anda. GitHub App tetap terpasang tapi tidak lagi menyinkronkan data. Anda bisa menghubungkan ulang kapan saja."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Ini akan mematikan semua sesi yang berjalan dan memulai ulang daemon terminal. Aplikasi akan menjalankan ulang terminal dengan daemon yang baru."

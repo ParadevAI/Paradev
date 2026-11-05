@@ -2056,6 +2056,9 @@ msgstr "新增檔案、應用等"
 msgid "Add files, apps, and more (@)"
 msgstr "新增檔案、應用等（@）"
 
+msgid "Add GitHub organization"
+msgstr "新增 GitHub 組織"
+
 msgid "Add instructions"
 msgstr "新增指示"
 
@@ -7133,6 +7136,9 @@ msgstr "已放棄——不再詢問"
 msgid "Disconnect"
 msgstr "斷開連線"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "要中斷 {accountLogin} 的連線嗎？"
+
 msgid "Disconnect {credential}?"
 msgstr "中斷{credential}連線？"
 
@@ -10111,8 +10117,8 @@ msgstr "安裝外掛"
 msgid "Install the desktop app"
 msgstr "安裝桌面應用程式"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "安裝Paradev GitHub App以連線你的儲存庫。"
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "在每個你想連接其儲存庫的 GitHub 組織或帳號上安裝 Paradev GitHub App。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "在一處為所有工作區安裝、授權並劃定MCP伺服器的權限範圍，OAuth集中管理。"
@@ -14422,6 +14428,9 @@ msgstr "人員"
 msgid "Personal"
 msgstr "個人"
 
+msgid "Personal account"
+msgstr "個人帳號"
+
 msgid "Personal plan"
 msgstr "個人方案"
 
@@ -15932,8 +15941,11 @@ msgstr "儲存庫、worktree、終端輸出和代理程式會話都留在你的�
 msgid "Repositories"
 msgstr "儲存庫"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "通過GitHub App安裝可存取的儲存庫。"
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "可透過已連接的 GitHub 帳號存取的儲存庫。"
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin} 的儲存庫將停止同步。其他已連接的 GitHub 帳號不受影響。GitHub App 仍安裝在 {accountLogin} 上，你可以隨時重新連接。"
 
 msgid "Repositories refreshed"
 msgstr "儲存庫已重新整理"
@@ -19976,9 +19988,6 @@ msgstr "這會更改組織的公開URL。請記得更新書籤和已分享的連
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "這將刪除<0>{0}</0>並移除其所有成員。此操作無法復原。"
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "這會斷開GitHub與你組織的連線。GitHub App仍會保持安裝，但不再同步資料。你可以隨時重新連線。"
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "這將終止所有執行中的會話並重啟終端守護程式。應用會用全新的守護程式重啟終端。"

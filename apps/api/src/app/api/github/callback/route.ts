@@ -1,7 +1,6 @@
 import { db } from "@superset/db/client";
 import { githubInstallations } from "@superset/db/schema";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
-import { isUniqueViolation } from "@superset/trpc/unique-violation";
 import { Client } from "@upstash/qstash";
 import { and, eq, ne } from "drizzle-orm";
 import { env } from "@/env";
@@ -87,7 +86,7 @@ export async function GET(request: Request) {
 			suspended: false,
 			suspendedAt: null,
 		};
-		const savedInstallation = await db
+		const [savedInstallation] = await db
 			.insert(githubInstallations)
 			.values({
 				...installationFields,
@@ -99,25 +98,7 @@ export async function GET(request: Request) {
 				set: { ...installationFields, updatedAt: new Date() },
 				setWhere: eq(githubInstallations.organizationId, organizationId),
 			})
-			.returning()
-			.then(([row]) => row)
-			.catch(async (error: unknown) => {
-				// Until the migration that drops this constraint is live, a second
-				// account replaces the first, as it always has.
-				if (!isUniqueViolation(error, "github_installations_org_unique")) {
-					throw error;
-				}
-				const [row] = await db
-					.update(githubInstallations)
-					.set({
-						...installationFields,
-						installationId: String(installation.id),
-						updatedAt: new Date(),
-					})
-					.where(eq(githubInstallations.organizationId, organizationId))
-					.returning();
-				return row;
-			});
+			.returning();
 
 		if (!savedInstallation) {
 			return exit(`${settingsUrl}?error=save_failed`);

@@ -16,10 +16,6 @@
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
 		},
-		"./unique-violation": {
-			"types": "./src/router/utils/unique-violation.ts",
-			"default": "./src/router/utils/unique-violation.ts"
-		},
 		"./sync-policy": {
 			"types": "./src/lib/sync-policy/syncPolicy.ts",
 			"default": "./src/lib/sync-policy/syncPolicy.ts"

@@ -2056,6 +2056,9 @@ msgstr "Добавить файлы, приложения и другое"
 msgid "Add files, apps, and more (@)"
 msgstr "Добавить файлы, приложения и другое (@)"
 
+msgid "Add GitHub organization"
+msgstr "Добавить организацию GitHub"
+
 msgid "Add instructions"
 msgstr "Добавить инструкции"
 
@@ -7133,6 +7136,9 @@ msgstr "Изменения отменены — больше не спросим
 msgid "Disconnect"
 msgstr "Отключить"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "Отключить {accountLogin}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Отключить {credential}?"
 
@@ -10111,8 +10117,8 @@ msgstr "Установить плагин"
 msgid "Install the desktop app"
 msgstr "Установите десктопное приложение"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Установите GitHub App Paradev, чтобы подключить свои репозитории."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Установите GitHub App Paradev в каждую организацию или аккаунт GitHub, репозитории которых хотите подключить."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Устанавливайте, авторизуйте и ограничивайте серверы MCP во всех рабочих областях из одного места, с централизованным OAuth."
@@ -14422,6 +14428,9 @@ msgstr "Человек"
 msgid "Personal"
 msgstr "Личное"
 
+msgid "Personal account"
+msgstr "Личный аккаунт"
+
 msgid "Personal plan"
 msgstr "Личный тариф"
 
@@ -15932,8 +15941,11 @@ msgstr "Репозитории, worktree, вывод терминала и се�
 msgid "Repositories"
 msgstr "Репозитории"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "Репозитории, доступные через установку GitHub App."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Репозитории, доступные через подключённые аккаунты GitHub."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "Репозитории {accountLogin} перестанут синхронизироваться. Другие подключённые аккаунты GitHub это не затронет. GitHub App останется установленным в {accountLogin}, и его можно снова подключить в любое время."
 
 msgid "Repositories refreshed"
 msgstr "Репозитории обновлены"
@@ -19976,9 +19988,6 @@ msgstr "Это изменит публичный URL вашей организа
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Это удалит <0>{0}</0> и всех её участников. Отменить нельзя."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Это отключит GitHub от вашей организации. GitHub App останется установленным, но перестанет синхронизировать данные. Переподключиться можно в любой момент."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Это завершит все работающие сессии и перезапустит демон терминала. Приложение перезапустит терминалы с новым демоном."

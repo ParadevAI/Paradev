@@ -2056,6 +2056,9 @@ msgstr "Přidat soubory, aplikace a další"
 msgid "Add files, apps, and more (@)"
 msgstr "Přidat soubory, aplikace a další (@)"
 
+msgid "Add GitHub organization"
+msgstr "Přidat organizaci GitHub"
+
 msgid "Add instructions"
 msgstr "Přidat pokyny"
 
@@ -7133,6 +7136,9 @@ msgstr "Zahozeno — příště se nezeptáme"
 msgid "Disconnect"
 msgstr "Odpojit"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "Odpojit {accountLogin}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Odpojit {credential}?"
 
@@ -10111,8 +10117,8 @@ msgstr "Nainstalovat plugin"
 msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Nainstalujte Paradev GitHub App a připojte své repozitáře."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Nainstalujte aplikaci GitHub Paradev do každé organizace nebo účtu GitHub, jejichž repozitáře chcete připojit."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Instalujte, autorizujte a omezujte MCP servery napříč všemi pracovními prostory z jednoho místa, s centrálním OAuth."
@@ -14422,6 +14428,9 @@ msgstr "Osoba"
 msgid "Personal"
 msgstr "Osobní"
 
+msgid "Personal account"
+msgstr "Osobní účet"
+
 msgid "Personal plan"
 msgstr "Osobní plán"
 
@@ -15932,8 +15941,11 @@ msgstr "Repozitáře, worktree, výstup terminálu i relace agentů zůstávají
 msgid "Repositories"
 msgstr "Repozitáře"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "Repozitáře dostupné přes instalaci GitHub App."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Repozitáře dostupné přes vaše připojené účty GitHub."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "Repozitáře z {accountLogin} se přestanou synchronizovat. Ostatní připojené účty GitHub to neovlivní. Aplikace GitHub zůstane nainstalovaná na {accountLogin} a kdykoli ji můžete znovu připojit."
 
 msgid "Repositories refreshed"
 msgstr "Repozitáře obnoveny"
@@ -19976,9 +19988,6 @@ msgstr "Tímto se změní veřejná URL vaší organizace. Nezapomeňte aktualiz
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Tímto se smaže <0>{0}</0> a odeberou se všichni jeho členové. Nelze vrátit zpět."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Tímto odpojíte GitHub od své organizace. GitHub App zůstane nainstalovaná, ale přestane synchronizovat data. Kdykoli se můžete připojit znovu."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Tímto se ukončí všechny běžící relace a restartuje terminálový démon. Aplikace terminály spustí znovu s čerstvým démonem."
