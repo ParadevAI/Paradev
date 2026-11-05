@@ -1,10 +1,21 @@
+import { moveLegacyAppHome } from "@superset/agent-setup/legacy-home-move";
 import { middleware } from "@superset/cli-framework";
 import { trackCommandInvoked } from "../lib/analytics";
 import { resolveAuth } from "../lib/resolve-auth";
 
+moveLegacyAppHome();
+
+/** A host this spawns outlives the hour a borrowed host token lasts. */
+const COMMANDS_NEEDING_OWN_LOGIN = new Set(["start"]);
+
 export default middleware(async (opts) => {
 	const options = opts.options as { apiKey?: string };
-	const { config, api, bearer, authSource } = await resolveAuth(options.apiKey);
+	const { config, api, bearer, authSource } = await resolveAuth(
+		options.apiKey,
+		{
+			useHostToken: !COMMANDS_NEEDING_OWN_LOGIN.has(opts.commandPath[0] ?? ""),
+		},
+	);
 
 	trackCommandInvoked({
 		api,

@@ -11,7 +11,7 @@ export default async function PageNotFound() {
 		<PageMissingScreen
 			action={
 				<Button asChild size="sm" variant="outline">
-					<Link href="/">{i18n._(msg({ message: "Go to Superset" }))}</Link>
+					<Link href="/">{i18n._(msg({ message: "Go to Paradev" }))}</Link>
 				</Button>
 			}
 		/>

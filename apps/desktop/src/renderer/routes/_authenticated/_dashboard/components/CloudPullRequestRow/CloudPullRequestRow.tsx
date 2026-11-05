@@ -7,13 +7,17 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/utils/toPullRequestDisplayState";
 
 interface CloudPullRequestRowProps {
-	pullRequest: CloudPullRequest;
+	pullRequest: Omit<CloudPullRequest, "additions" | "deletions"> &
+		Partial<Pick<CloudPullRequest, "additions" | "deletions">>;
 	onOpen: () => void;
+	/** Spans its container, pushing the +/- counts to the right edge. */
+	fullWidth?: boolean;
 }
 
 export function CloudPullRequestRow({
 	pullRequest,
 	onOpen,
+	fullWidth = false,
 }: CloudPullRequestRowProps) {
 	const state = toPullRequestDisplayState(pullRequest);
 	const Icon = PULL_REQUEST_ICON[state];
@@ -21,7 +25,10 @@ export function CloudPullRequestRow({
 		<button
 			type="button"
 			onClick={onOpen}
-			className="flex h-7 w-fit max-w-full items-center gap-2 rounded-sm px-2 text-left text-xs hover:bg-fill-hover"
+			className={cn(
+				"flex h-7 max-w-full items-center gap-2 rounded-sm px-2 text-left text-xs hover:bg-fill-hover",
+				fullWidth ? "w-full" : "w-fit",
+			)}
 		>
 			<Icon
 				className={cn("size-3.5 shrink-0", PULL_REQUEST_COLOR[state])}
@@ -30,11 +37,16 @@ export function CloudPullRequestRow({
 			<span className="shrink-0 tabular-nums text-muted-foreground">
 				#{pullRequest.number}
 			</span>
-			<span className="min-w-0 truncate">{pullRequest.title}</span>
-			<span className="shrink-0 font-mono text-[11px] tabular-nums">
-				<span className="text-emerald-500">+{pullRequest.additions}</span>{" "}
-				<span className="text-destructive">−{pullRequest.deletions}</span>
+			<span className={cn("min-w-0 truncate", fullWidth && "flex-1")}>
+				{pullRequest.title}
 			</span>
+			{pullRequest.additions !== undefined &&
+				pullRequest.deletions !== undefined && (
+					<span className="shrink-0 font-mono text-[11px] tabular-nums">
+						<span className="text-emerald-500">+{pullRequest.additions}</span>{" "}
+						<span className="text-destructive">−{pullRequest.deletions}</span>
+					</span>
+				)}
 		</button>
 	);
 }

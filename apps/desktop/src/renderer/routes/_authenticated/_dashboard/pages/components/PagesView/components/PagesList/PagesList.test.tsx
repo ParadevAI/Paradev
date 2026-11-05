@@ -33,6 +33,7 @@ interface ListPage {
 interface Counts {
 	all: number;
 	team: number;
+	shared: number;
 	mine: number;
 	pinned: number;
 	workspaces: Array<{ workspaceId: string; count: number }>;
@@ -56,7 +57,7 @@ function page(id: string) {
 		updatedAt: new Date("2026-01-01T00:00:00Z"),
 		latestVersion: 1,
 		sharedVersion: null,
-		createdByUserId: null,
+		createdByUserId: null as string | null,
 		ownerName: null,
 	};
 }
@@ -65,6 +66,7 @@ const neverAnswers = () => new Promise<never>(() => {});
 
 let listInputs: Input[] = [];
 let countsInputs: Input[] = [];
+let deleteInputs: Input[] = [];
 let answerList: (input: Input) => ListPage | Promise<ListPage>;
 let answerCounts: () => Counts | Promise<Counts>;
 let counts: Counts;
@@ -77,6 +79,10 @@ const link: TRPCLink<AppRouter> = () => (call) =>
 				if (call.op.path === "page.listPaginated") {
 					listInputs.push(input);
 					return answerList(input);
+				}
+				if (call.op.path === "page.delete") {
+					deleteInputs.push(input);
+					return { success: true };
 				}
 				if (call.op.path === "page.counts") {
 					countsInputs.push(input);
@@ -115,10 +121,12 @@ const onSearchChange = mock((_search: string) => {});
 const PINS = ["pin-1", "pin-2"];
 
 function renderList({
-	scope = "all" as "all" | "pinned" | "team" | "mine",
+	scope = "all" as "all" | "pinned" | "team" | "shared" | "mine",
 	search = "",
 	authorId = null as string | null,
 	workspaceId = null as string | null,
+	currentUserId = undefined as string | undefined,
+	onTogglePin = mock((_pageId: string) => {}),
 } = {}) {
 	const queryClient = new QueryClient({
 		defaultOptions: { queries: { retry: false } },
@@ -138,10 +146,10 @@ function renderList({
 				onAuthorChange={mock()}
 				onWorkspaceChange={mock()}
 				onOpenPage={mock()}
-				currentUserId={undefined}
+				currentUserId={currentUserId}
 				favoritePageIds={PINS}
 				favoritePageIdSet={new Set(PINS)}
-				onTogglePin={mock()}
+				onTogglePin={onTogglePin}
 				workspaceNames={new Map([["ws-1", "Workspace One"]])}
 				creatingWithAgent={false}
 				onCreateWithAgent={mock()}
@@ -176,9 +184,11 @@ beforeEach(() => {
 	observed = [];
 	listInputs = [];
 	countsInputs = [];
+	deleteInputs = [];
 	counts = {
 		all: 1,
 		team: 1,
+		shared: 0,
 		mine: 0,
 		pinned: 2,
 		workspaces: [{ workspaceId: "ws-1", count: 3 }],
@@ -384,5 +394,41 @@ describe("PagesList pinned tab", () => {
 		await settled();
 		expect(view.queryByText("Pinned")).toBeTruthy();
 		expect(onScopeChange).not.toHaveBeenCalled();
+	});
+});
+
+describe("PagesList delete", () => {
+	async function deleteOwnPage(pageId: string) {
+		answerList = () => ({
+			items: [{ ...page(pageId), createdByUserId: "owner" }],
+			nextCursor: null,
+		});
+		const onTogglePin = mock((_pageId: string) => {});
+		const { view, settled } = renderList({
+			currentUserId: "owner",
+			onTogglePin,
+		});
+		await settled();
+		const trigger = view.getByRole("button", {
+			name: `Actions for Page ${pageId}`,
+		});
+		fireEvent.pointerDown(trigger, { button: 0, pointerType: "mouse" });
+		fireEvent.click(await view.findByRole("menuitem", { name: /Delete/ }));
+		fireEvent.click(await view.findByRole("button", { name: "Delete page" }));
+		await waitFor(() => expect(deleteInputs).toEqual([{ id: pageId }]));
+		await waitFor(() =>
+			expect(view.queryByRole("button", { name: "Delete page" })).toBeNull(),
+		);
+		return onTogglePin;
+	}
+
+	test("unpins a pinned page it deletes, so no pin outlives its page", async () => {
+		const onTogglePin = await deleteOwnPage("pin-1");
+		expect(onTogglePin).toHaveBeenCalledWith("pin-1");
+	});
+
+	test("leaves the pins alone when the deleted page was not pinned", async () => {
+		const onTogglePin = await deleteOwnPage("a");
+		expect(onTogglePin).not.toHaveBeenCalled();
 	});
 });

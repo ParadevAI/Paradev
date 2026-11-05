@@ -16,10 +16,12 @@ import {
 	type PageViewportZoom,
 } from "@superset/shared/page-zoom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useJoinPagePresence } from "../../hooks/useJoinPagePresence";
+import { useJoinPresence } from "../../../Presence";
 import { usePageStorageConnect } from "../../hooks/usePageStorageConnect";
+import { type PageToolHost, usePageTools } from "../../hooks/usePageTools";
 import { useComments } from "../../providers/CommentProvider";
 import { PageFrame } from "../PageFrame";
+import { PageToolConsentDialog } from "../PageToolConsentDialog";
 import { CommentBubble, pinClassName } from "./components/CommentBubble";
 import { CommentPopover } from "./components/CommentPopover";
 import {
@@ -45,6 +47,7 @@ interface PageCommentsViewProps {
 	onLinkClick?: (click: PageLinkClick) => void;
 	storageTicket?: () => Promise<string | null>;
 	presenceUrl?: () => Promise<string | null>;
+	toolHost?: PageToolHost;
 }
 
 export function PageCommentsView({
@@ -58,6 +61,7 @@ export function PageCommentsView({
 	onLinkClick,
 	storageTicket,
 	presenceUrl,
+	toolHost,
 }: PageCommentsViewProps) {
 	const onLinkClickRef = useRef(onLinkClick);
 	onLinkClickRef.current = onLinkClick;
@@ -102,7 +106,13 @@ export function PageCommentsView({
 	const frameOrigin = useMemo(() => new URL(src).origin, [src]);
 
 	usePageStorageConnect({ frameRef, frameOrigin, ticket: storageTicket });
-	useJoinPagePresence({ pageId, url: presenceUrl });
+	const tools = usePageTools({
+		frameRef,
+		frameOrigin,
+		host: toolHost,
+		pageId,
+	});
+	useJoinPresence({ roomId: pageId, url: presenceUrl });
 
 	const [lastHoverRect, setLastHoverRect] = useState<FrameRect | null>(null);
 	useEffect(() => {
@@ -404,12 +414,14 @@ export function PageCommentsView({
 						container={container}
 						thread={null}
 						initialValue={draft.body}
+						initialAttachments={draft.attachments}
 						onDismiss={discardDraft}
-						onSubmit={(body) =>
+						onSubmit={(body, attachments) =>
 							createThread({
 								anchor: draft.anchor,
 								anchorText: draft.anchor.text,
 								body,
+								attachments,
 							})
 						}
 						onQuick={(body, intent) => {
@@ -432,7 +444,9 @@ export function PageCommentsView({
 						container={container}
 						thread={popoverThread}
 						onDismiss={() => setActiveThreadId(null)}
-						onSubmit={(body) => addReply(popoverThread.id, body)}
+						onSubmit={(body, attachments) =>
+							addReply(popoverThread.id, body, attachments)
+						}
 						onEdit={(commentId, body) =>
 							editComment(popoverThread.id, commentId, body)
 						}
@@ -443,6 +457,17 @@ export function PageCommentsView({
 					/>
 				) : null}
 			</div>
+
+			<PageToolConsentDialog
+				key={
+					tools.prompt
+						? `${tools.prompt.kind}:${tools.prompt.pluginLabel}`
+						: "none"
+				}
+				pageTitle={title}
+				prompt={tools.prompt}
+				onAnswer={tools.answer}
+			/>
 		</div>
 	);
 }

@@ -8,6 +8,14 @@
 			"types": "./src/index.ts",
 			"default": "./src/index.ts"
 		},
+		"./acp-stream": {
+			"types": "./src/harness/acp/acp-stream.ts",
+			"default": "./src/harness/acp/acp-stream.ts"
+		},
+		"./acp-client": {
+			"types": "./src/harness/acp/rpcClient/index.ts",
+			"default": "./src/harness/acp/rpcClient/index.ts"
+		},
 		"./testing": {
 			"types": "./src/testing/index.ts",
 			"default": "./src/testing/index.ts"
@@ -18,7 +26,7 @@
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"generate": "drizzle-kit generate",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
-		"test": "bun test --isolate --pass-with-no-tests"
+		"test": "bun test --pass-with-no-tests"
 	},
 	"dependencies": {
 		"@anthropic-ai/claude-agent-sdk": "0.3.286",
@@ -31,7 +39,7 @@
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/better-sqlite3": "7.6.13",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/node": "24.12.0",
 		"drizzle-kit": "0.31.8",
 		"typescript": "7.0.2"

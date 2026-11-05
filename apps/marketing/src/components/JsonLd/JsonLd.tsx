@@ -1,4 +1,5 @@
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import {
 	PRODUCT_DISAMBIGUATION,
 	PRODUCT_PLATFORMS,
@@ -40,7 +41,9 @@ export function OrganizationJsonLd() {
 		"@context": "https://schema.org",
 		"@type": "Organization",
 		"@id": `${COMPANY.MARKETING_URL}/#organization`,
-		name: COMPANY.NAME,
+		name: BRAND.INTRO_NAME,
+		alternateName: BRAND.FORMER_NAME,
+		legalName: COMPANY.LEGAL_NAME,
 		url: COMPANY.MARKETING_URL,
 		logo: `${COMPANY.MARKETING_URL}/apple-touch-icon.png`,
 		description: "One workspace for orchestrating any coding agent",
@@ -61,22 +64,32 @@ export function OrganizationJsonLd() {
 		},
 		sameAs: [
 			COMPANY.GITHUB_URL,
-			"https://github.com/superset-sh",
+			"https://github.com/paradevai",
 			COMPANY.X_URL,
 			COMPANY.LINKEDIN_URL,
 			COMPANY.YOUTUBE_URL,
+			"https://github.com/superset-sh/superset",
+			"https://github.com/superset-sh",
+			SOCIAL.X_FORMER.url,
+			"https://www.linkedin.com/company/superset-sh",
+			"https://www.youtube.com/@superset-sh",
 		],
 	};
 
 	return <JsonLdScript schema={schema} />;
 }
 
-export function SoftwareApplicationJsonLd() {
+export function SoftwareApplicationJsonLd({
+	dateModified,
+}: {
+	dateModified?: string;
+}) {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "SoftwareApplication",
 		"@id": `${COMPANY.MARKETING_URL}/#software`,
-		name: COMPANY.NAME,
+		name: BRAND.INTRO_NAME,
+		alternateName: BRAND.FORMER_NAME,
 		operatingSystem: PRODUCT_PLATFORMS,
 		license: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
 		publisher: { "@id": `${COMPANY.MARKETING_URL}/#organization` },
@@ -90,6 +103,7 @@ export function SoftwareApplicationJsonLd() {
 		description: PRODUCT_SUMMARY,
 		disambiguatingDescription: PRODUCT_DISAMBIGUATION,
 		url: COMPANY.MARKETING_URL,
+		...(dateModified && { dateModified }),
 	};
 
 	return <JsonLdScript schema={schema} />;
@@ -134,7 +148,7 @@ export function ArticleJsonLd({
 		},
 		publisher: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -187,7 +201,8 @@ export function ComparisonJsonLd({
 		...(keywords && keywords.length > 0 && { keywords }),
 		publisher: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
+			alternateName: BRAND.FORMER_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -214,7 +229,8 @@ export function WebsiteJsonLd() {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: COMPANY.NAME,
+		name: BRAND.INTRO_NAME,
+		alternateName: BRAND.FORMER_NAME,
 		url: COMPANY.MARKETING_URL,
 	};
 
@@ -227,10 +243,10 @@ export function HomeWebPageJsonLd() {
 		"@type": "WebPage",
 		"@id": COMPANY.MARKETING_URL,
 		url: COMPANY.MARKETING_URL,
-		name: `${COMPANY.NAME}: Orchestrate any coding agent`,
+		name: `${BRAND.INTRO_NAME}: Run an army of coding agents`,
 		isPartOf: {
 			"@type": "WebSite",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		speakable: {
@@ -246,13 +262,13 @@ export function ServiceJsonLd() {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "Service",
-		name: `${COMPANY.NAME} agent orchestration`,
+		name: `${BRAND.INTRO_NAME} agent orchestration`,
 		serviceType: "AI coding agent orchestration platform",
 		description:
-			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel with isolated Git worktrees, diff review, persistent terminals, scheduled automations, and an MCP server for programmatic control.",
+			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel, each in its own Git worktree and branch, with diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
 		provider: {
 			"@type": "Organization",
-			name: COMPANY.NAME,
+			name: BRAND.INTRO_NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		url: COMPANY.MARKETING_URL,

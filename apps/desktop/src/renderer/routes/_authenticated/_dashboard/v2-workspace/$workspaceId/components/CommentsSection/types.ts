@@ -1,6 +1,8 @@
 /** Normalized comment shape, flattened from review threads + conversation comments. */
 export interface NormalizedComment {
 	id: string;
+	/** GitHub's REST id, which its reply endpoint takes; review comments only. */
+	databaseId?: number;
 	authorLogin: string;
 	avatarUrl?: string;
 	body: string;

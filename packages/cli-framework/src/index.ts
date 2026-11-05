@@ -36,3 +36,4 @@ export type {
 	SchemaOption,
 } from "./schema";
 export { generateSchema } from "./schema";
+export { wrapText } from "./wrap-text";

@@ -5,6 +5,7 @@ import { createUserSimpleGit } from "../../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../../types";
 import type { ProjectNotSetupCause } from "../../../error-types";
 import { getGitHubRemotes } from "../../project/utils/git-remote";
+import { readGitToplevel } from "../../project/utils/resolve-repo";
 
 export function projectNotSetupError(projectId: string): TRPCError {
 	return new TRPCError({
@@ -49,9 +50,7 @@ export async function resolveGithubRepo(
 
 	let gitRoot: string;
 	try {
-		gitRoot = (
-			await createUserSimpleGit(local.repoPath).revparse(["--show-toplevel"])
-		).trim();
+		gitRoot = await readGitToplevel(local.repoPath);
 	} catch (err) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",

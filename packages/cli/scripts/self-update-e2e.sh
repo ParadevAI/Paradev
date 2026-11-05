@@ -78,7 +78,7 @@ boot_host() {
     HOST_DB_PATH="$state/host.db" \
     HOST_MIGRATIONS_FOLDER="$root/share/migrations" \
     SUPERSET_HOST_INSTALL_SOURCE=cli \
-    SUPERSET_HOME_DIR="$TEST_HOME/.superset" \
+    SUPERSET_HOME_DIR="$TEST_HOME/.paradev" \
     "$root/bin/superset-host" >"$logfile" 2>&1 &
   HSPID=$!
   # What `superset start --daemon` would have written.

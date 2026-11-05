@@ -8,13 +8,13 @@ import {
 	decryptSecret,
 	userConnection,
 } from "../../../lib/connectors";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import { stopMailboxWatch } from "./gmail";
 import { findGoogleConnection, googleConfigOf } from "./state";
 
 export const googleRouter = {
-	getConnection: protectedProcedure
+	getConnection: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -40,7 +40,7 @@ export const googleRouter = {
 			};
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

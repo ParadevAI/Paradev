@@ -1,17 +1,25 @@
 import { useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
+import { draftText } from "@superset/chat-ui/PromptInput";
+import { errorMessage } from "@superset/i18n/errors";
+import {
+	isCloudUsageRefusal,
+	type MachineSize,
+} from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useRef, useState } from "react";
-import { useAwaitAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
+import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
@@ -32,19 +40,26 @@ export function useSubmitWorkspace(
 	selectedMode: string | null,
 	uploadAttachments: UseUploadAttachmentsApi,
 	promptContext: NewWorkspacePromptContextApi,
+	cloudEnvironmentId: string | null = null,
+	cloudMachineSize: MachineSize | null = null,
+	hostId: string | null = null,
+	isSession = false,
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const matchRoute = useMatchRoute();
 	const { closeAndResetDraft, draft } = useDashboardNewWorkspaceDraft();
+	const prompt = draftText(draft.promptDraft);
+	const { issues: linkedIssues, pr: linkedPR } = useMemo(
+		() => draftLinkedContext(draft.promptDraft),
+		[draft.promptDraft],
+	);
 	const { submit } = useWorkspaceCreates();
-	const { machineId } = useLocalHostService();
+	const collections = useCollections();
 	const activeOrganizationId = useActiveOrganizationId();
-	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
 	const utils = cloudTrpc.useUtils();
-
-	const isSession = draft.isSession;
 
 	// Submit is reachable from Cmd+Enter, the editor's Enter handler, and the
 	// create button, and it awaits uploads / environment lookup / prompt
@@ -56,7 +71,6 @@ export function useSubmitWorkspace(
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const submitWorkspaceInner = useCallback(async () => {
-		const hostId = draft.hostId ?? machineId;
 		const isCloud = hostId === CLOUD_HOST_ID;
 		// A cloud workspace clones the one cloud repo, so it has no use for a
 		// project — and the create surface hides the project picker when cloud
@@ -69,7 +83,7 @@ export function useSubmitWorkspace(
 			);
 			return;
 		}
-		if (isSession && draft.linkedPR !== null) {
+		if (isSession && linkedPR !== null) {
 			toast.error(
 				t({
 					message: "Checking out a PR requires a project",
@@ -116,22 +130,25 @@ export function useSubmitWorkspace(
 		// Cloud workspaces are provisioned by the API, not the local host, so
 		// they bypass the host `workspaces.create` path entirely.
 		if (isCloud) {
-			const environments = await cloudTrpcClient.environment.list.query({
-				organizationId: activeOrganizationId,
-			});
-			const startable = startableCloudEnvironments(environments);
-			const environment =
-				startable.find((row) => row.id === draft.environmentId) ?? startable[0];
-			if (!environment) {
-				toast.error(
-					t({
-						message:
-							"Add an environment in Settings before creating a cloud workspace",
-					}),
-				);
-				return;
-			}
 			try {
+				// Checked against the live list so a stale draft can't start a
+				// vanished environment.
+				const environmentId = cloudEnvironmentId
+					? startableCloudEnvironments(
+							await cloudTrpcClient.environment.list.query({
+								organizationId: activeOrganizationId,
+							}),
+						).find((row) => row.id === cloudEnvironmentId)?.id
+					: undefined;
+				if (!environmentId) {
+					toast.error(
+						t({
+							message:
+								"Add an environment in Settings before creating a cloud workspace",
+						}),
+					);
+					return;
+				}
 				// A typed name wins; otherwise the API names it from the prompt,
 				// since nothing about a cloud workspace runs on this device.
 				// Returns as soon as the row exists — the sandbox is still being
@@ -142,32 +159,30 @@ export function useSubmitWorkspace(
 				// sandbox resolves and pulls once it is up.
 				const wantCloudAgent =
 					selectedAgent !== "none" &&
-					(!!draft.prompt.trim() ||
-						draft.linkedPR !== null ||
-						draft.linkedIssues.length > 0);
+					(!!prompt.trim() || linkedPR !== null || linkedIssues.length > 0);
 				const cloudPrompt = wantCloudAgent
 					? await promptContext.build({
-							userPrompt: draft.prompt,
-							linkedPR: draft.linkedPR,
-							linkedIssues: draft.linkedIssues,
+							userPrompt: prompt,
+							linkedPR: linkedPR,
+							linkedIssues: linkedIssues,
 							timeoutMs: 2000,
 						})
 					: null;
-				const created = await createCloudWorkspace.mutateAsync({
+				const createdResult = await createCloudWorkspace.mutateAsync({
 					organizationId: activeOrganizationId,
-					environmentId: environment.id,
+					environmentId,
 					name: workspaceName ?? undefined,
 					// Linked PR and issue bodies can push this past the create input's
 					// 20,000-character cap.
-					prompt:
-						(cloudPrompt ?? draft.prompt).trim().slice(0, 20_000) || undefined,
-					typedPrompt: draft.prompt.trim().slice(0, 20_000) || undefined,
-					taskIds: draft.linkedIssues
+					prompt: (cloudPrompt ?? prompt).trim().slice(0, 20_000) || undefined,
+					typedPrompt: prompt.trim().slice(0, 20_000) || undefined,
+					taskIds: linkedIssues
 						.flatMap((issue) =>
 							issue.source === "internal" && issue.taskId ? [issue.taskId] : [],
 						)
 						.slice(0, 10),
 					branch: draft.baseBranch ?? branchName ?? undefined,
+					machineSize: cloudMachineSize ?? undefined,
 					...(attachmentIds.length > 0
 						? { attachmentFileIds: attachmentIds }
 						: {}),
@@ -177,9 +192,21 @@ export function useSubmitWorkspace(
 								model: selectedModel ?? undefined,
 								effort: selectedEffort ?? undefined,
 								mode: selectedMode ?? undefined,
+								agentTerminalId: crypto.randomUUID(),
 							}
 						: {}),
 				});
+				const { initialLaunch, ...created } = createdResult;
+				if (initialLaunch?.surface === "chat") {
+					seedPendingCloudChat({
+						collections,
+						workspaceId: created.id,
+						launch: initialLaunch,
+						prompt: prompt.trim(),
+						modelId: selectedModel,
+						modeId: selectedMode,
+					});
+				}
 				closeAndResetDraft();
 				// The cloud list is what both the sidebar and the workspace route
 				// read, and nothing used to tell it a workspace had been created —
@@ -208,36 +235,47 @@ export function useSubmitWorkspace(
 				void utils.cloudWorkspace.list.invalidate();
 			} catch (error) {
 				toast.error(
-					error instanceof Error
-						? error.message
-						: t({
-								message: "Could not create cloud workspace",
-							}),
+					errorMessage(
+						error,
+						t({
+							message: "Could not create cloud workspace",
+						}),
+					),
+					isCloudUsageRefusal(error)
+						? {
+								action: {
+									label: t({ message: "Open billing" }),
+									onClick: () => {
+										void navigate({ to: "/settings/billing" });
+									},
+								},
+							}
+						: undefined,
 				);
 			}
 			return;
 		}
 
-		const isPrCheckout = draft.linkedPR !== null;
+		const isPrCheckout = linkedPR !== null;
 		// A PR always needs its own worktree; otherwise the picker decides.
 		const isLocalCheckout = !isPrCheckout && draft.checkout === "local";
 
-		const linkedTaskId = draft.linkedIssues.find(
+		const linkedTaskId = linkedIssues.find(
 			(issue) => issue.source === "internal" && issue.taskId,
 		)?.taskId;
 
 		const hasAnyContext =
-			!!draft.prompt.trim() ||
-			draft.linkedPR !== null ||
-			draft.linkedIssues.length > 0 ||
+			!!prompt.trim() ||
+			linkedPR !== null ||
+			linkedIssues.length > 0 ||
 			attachmentIds.length > 0;
 		const wantAgent = selectedAgent !== "none" && hasAnyContext;
 
 		const finalPrompt = wantAgent
 			? await promptContext.build({
-					userPrompt: draft.prompt,
-					linkedPR: draft.linkedPR,
-					linkedIssues: draft.linkedIssues,
+					userPrompt: prompt,
+					linkedPR: linkedPR,
+					linkedIssues: linkedIssues,
 					timeoutMs: 2000,
 				})
 			: null;
@@ -245,7 +283,7 @@ export function useSubmitWorkspace(
 		const openAsChat =
 			wantAgent &&
 			Boolean(acpHarnessForPreset(selectedPresetId)) &&
-			(await awaitAcpChatEnabled());
+			(await resolveAcpChatEnabled());
 		const agents = wantAgent
 			? [
 					{
@@ -266,10 +304,10 @@ export function useSubmitWorkspace(
 		// seeds the branch slug; otherwise the server creates with a
 		// friendly random and AI-renames once names arrive.
 		const prName = isPrCheckout
-			? draft.linkedPR?.title || `PR #${draft.linkedPR?.prNumber}`
+			? linkedPR?.title || `PR #${linkedPR?.prNumber}`
 			: undefined;
 
-		const trimmedPrompt = draft.prompt.trim();
+		const trimmedPrompt = prompt.trim();
 		const namingPrompt = openAsChat
 			? (finalPrompt ?? trimmedPrompt).trim().slice(0, 20_000) || undefined
 			: !wantAgent && trimmedPrompt
@@ -308,7 +346,7 @@ export function useSubmitWorkspace(
 							draft.branchNameFromProvider
 								? true
 								: undefined,
-						pr: isPrCheckout ? draft.linkedPR?.prNumber : undefined,
+						pr: isPrCheckout ? linkedPR?.prNumber : undefined,
 						baseBranch: draft.baseBranch ?? undefined,
 						taskId: linkedTaskId,
 						agents,
@@ -358,14 +396,18 @@ export function useSubmitWorkspace(
 		});
 	}, [
 		activeOrganizationId,
-		awaitAcpChatEnabled,
+		resolveAcpChatEnabled,
 		selectedPresetId,
 		closeAndResetDraft,
+		collections,
 		createCloudWorkspace,
 		draft,
+		prompt,
+		linkedIssues,
+		linkedPR,
 		isSession,
 		matchRoute,
-		machineId,
+		hostId,
 		navigate,
 		projectId,
 		promptContext,
@@ -377,6 +419,8 @@ export function useSubmitWorkspace(
 		t,
 		uploadAttachments,
 		utils,
+		cloudEnvironmentId,
+		cloudMachineSize,
 	]);
 
 	const submitWorkspace = useCallback(async () => {

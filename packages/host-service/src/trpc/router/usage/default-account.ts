@@ -21,6 +21,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../db/index.ts";
 import { hostSettings, projects, workspaces } from "../../../db/schema.ts";
@@ -31,15 +32,6 @@ const POINTER_NAMES: Record<SwitchableAccountAgent, string> = {
 	claude: "default-claude-config-dir",
 	codex: "default-codex-home",
 };
-
-/**
- * Mirror of agent-setup's resolveSupersetHomeDir, not imported: this module
- * sits on the terminal env-resolution path (loaded by node --test) and must
- * stay free of the agent-setup surface — see account-provisioning.ts.
- */
-function supersetHomeDir(): string {
-	return process.env.SUPERSET_HOME_DIR?.trim() || join(homedir(), ".superset");
-}
 
 /**
  * Mirror of agent-setup's resolveWriteTarget, not imported for the reason
@@ -85,7 +77,7 @@ function canonicalAccountHome(target: string): string {
 }
 
 function defaultAccountPointerPath(agent: SwitchableAccountAgent): string {
-	return join(supersetHomeDir(), "state", POINTER_NAMES[agent]);
+	return join(resolveAppHomeDir(), "state", POINTER_NAMES[agent]);
 }
 
 function temporaryPointerPath(pointerPath: string): string {
@@ -136,7 +128,7 @@ const UNSCOPED_ORG_DIR = "_";
 
 function workspacePinOrgDir(): string {
 	return join(
-		supersetHomeDir(),
+		resolveAppHomeDir(),
 		"state",
 		"workspace-accounts",
 		process.env.ORGANIZATION_ID || UNSCOPED_ORG_DIR,
@@ -225,7 +217,7 @@ function migrateDefaultAccountPointer(
 	agent: SwitchableAccountAgent,
 	selection: string,
 ): void {
-	const dir = join(supersetHomeDir(), "state");
+	const dir = join(resolveAppHomeDir(), "state");
 	mkdirSync(dir, { recursive: true });
 	const pointerPath = defaultAccountPointerPath(agent);
 	const temporaryPath = temporaryPointerPath(pointerPath);

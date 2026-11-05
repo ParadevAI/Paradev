@@ -8,10 +8,12 @@ import type {
 	Decision,
 	UserContent,
 } from "@superset/chat/protocol";
+import { attachedFilesBlock } from "../../attachedFiles";
 import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
 } from "../../types";
 import { ClaudeTranslator } from "../translateStream";
 
@@ -77,12 +79,14 @@ export type ClaudeAdapterOptions = {
 	query: ClaudeQuery;
 	pathToClaudeCodeExecutable?: string;
 	launch?: () => Promise<ClaudeLaunch>;
+	resolveAttachment?: ResolveAttachment;
 	now?: () => number;
 	mintId?: () => string;
 };
 
 type PendingApproval = {
 	toolUseId: string;
+	turnId: string;
 	input: Record<string, unknown>;
 	settle: (result: PermissionResult) => void;
 };
@@ -168,10 +172,29 @@ class PromptQueue {
 	}
 }
 
+type SdkUserContent = SDKUserMessage["message"]["content"];
+type SdkContentBlock = Exclude<SdkUserContent, string>[number];
+type ClaudeImageType = "image/png" | "image/jpeg" | "image/gif" | "image/webp";
+
+const CLAUDE_IMAGE_TYPES = new Set<string>([
+	"image/png",
+	"image/jpeg",
+	"image/gif",
+	"image/webp",
+] satisfies ClaudeImageType[]);
+
 function promptText(content: UserContent[]): string {
 	return content
-		.map((part) => (part.type === "text" ? part.text : `[${part.name}]`))
+		.map((part) => (part.type === "text" ? part.text : ""))
 		.join("\n");
+}
+
+function userMessage(content: SdkUserContent): SDKUserMessage {
+	return {
+		type: "user",
+		message: { role: "user", content },
+		parent_tool_use_id: null,
+	};
 }
 
 export class ClaudeAdapter implements HarnessAdapter {
@@ -181,8 +204,10 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private readonly abortController = new AbortController();
 	private translator: ClaudeTranslator | null = null;
 	private session: ClaudeSession | null = null;
+	private sessionId: string | null = null;
 	private modeId: ClaudePermissionMode = "default";
 	private pump: Promise<void> | null = null;
+	private resolvingPrompt: Promise<void> | null = null;
 	private disposed = false;
 
 	constructor(private readonly options: ClaudeAdapterOptions) {}
@@ -255,11 +280,57 @@ export class ClaudeAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
-		this.prompts.push({
-			type: "user",
-			message: { role: "user", content: promptText(content) },
-			parent_tool_use_id: null,
+		const hasAttachment = content.some((part) => part.type === "attachment");
+		if (!hasAttachment && !this.resolvingPrompt) {
+			this.prompts.push(userMessage(promptText(content)));
+			return;
+		}
+		const blocks = this.contentBlocks(content);
+		const queued = (this.resolvingPrompt ?? Promise.resolve())
+			.then(() => blocks)
+			.then((resolved) => this.prompts.push(userMessage(resolved)));
+		this.resolvingPrompt = queued;
+		void queued.finally(() => {
+			if (this.resolvingPrompt === queued) this.resolvingPrompt = null;
 		});
+	}
+
+	private async contentBlocks(
+		content: UserContent[],
+	): Promise<SdkContentBlock[]> {
+		const blocks: SdkContentBlock[] = [];
+		for (const part of content) {
+			if (part.type === "text") {
+				if (part.text) blocks.push({ type: "text", text: part.text });
+				continue;
+			}
+			const file = await (
+				this.options.resolveAttachment?.(part) ?? Promise.resolve(null)
+			).catch(() => null);
+			if (!file) {
+				blocks.push({
+					type: "text",
+					text: `[${part.name}: could not be read]`,
+				});
+				continue;
+			}
+			blocks.push(
+				CLAUDE_IMAGE_TYPES.has(file.mimeType)
+					? {
+							type: "image",
+							source: {
+								type: "base64",
+								media_type: file.mimeType as ClaudeImageType,
+								data: file.data,
+							},
+						}
+					: {
+							type: "text",
+							text: attachedFilesBlock([{ name: part.name, path: file.path }]),
+						},
+			);
+		}
+		return blocks;
 	}
 
 	cancelTurn(): void {
@@ -290,7 +361,11 @@ export class ClaudeAdapter implements HarnessAdapter {
 			});
 		}
 
-		this.emitApproval(approvalId, pending.toolUseId, "answered", decision);
+		this.emitApproval(approvalId, pending, "answered", decision);
+		if (this.approvals.size === 0) {
+			const status = this.translator?.currentTurnId ? "running" : "idle";
+			this.events.push({ kind: "session", session: { status } });
+		}
 		if (decision.type === "cancel") this.cancelTurn();
 	}
 
@@ -325,15 +400,50 @@ export class ClaudeAdapter implements HarnessAdapter {
 		try {
 			for await (const message of stream) {
 				if (this.disposed) return;
-				for (const event of translator.translate(message)) {
-					this.events.push(event);
-				}
+				this.reportSessionId(message);
+				this.pushAll(translator.translate(message));
 			}
 		} catch (error) {
-			for (const event of translator.interrupt(String(error))) {
-				this.events.push(event);
+			const waiting = this.approvals.size > 0;
+			this.pushAll(translator.interrupt(String(error)));
+			if (waiting) {
+				this.events.push({ kind: "session", session: { status: "idle" } });
+				return;
 			}
 		}
+		if (this.staleApprovals()) {
+			this.events.push({ kind: "session", session: { status: "idle" } });
+		}
+	}
+
+	private pushAll(events: AdapterEvent[]): void {
+		for (const event of events) {
+			this.events.push(event);
+			if (event.kind === "turn" && event.turn.status !== "running") {
+				this.staleApprovals();
+			}
+		}
+	}
+
+	private staleApprovals(): boolean {
+		const stale = [...this.approvals];
+		this.approvals.clear();
+		for (const [approvalId, pending] of stale) {
+			pending.settle({ behavior: "deny", message: "The turn ended." });
+			this.emitApproval(approvalId, pending, "stale");
+		}
+		return stale.length > 0;
+	}
+
+	private reportSessionId(message: unknown): void {
+		if (typeof message !== "object" || message === null) return;
+		const sessionId = (message as { session_id?: unknown }).session_id;
+		if (typeof sessionId !== "string" || sessionId === this.sessionId) return;
+		this.sessionId = sessionId;
+		this.events.push({
+			kind: "session",
+			session: { harnessSessionId: sessionId },
+		});
 	}
 
 	private requestApproval(
@@ -341,15 +451,21 @@ export class ClaudeAdapter implements HarnessAdapter {
 		toolUseId: string,
 	): Promise<PermissionResult> {
 		const approvalId = this.mintId();
+		const turnId = this.translator?.currentTurnId ?? "unattributed";
 		return new Promise<PermissionResult>((settle) => {
-			this.approvals.set(approvalId, { toolUseId, input, settle });
-			this.emitApproval(approvalId, toolUseId, "pending");
+			const pending = { toolUseId, turnId, input, settle };
+			this.approvals.set(approvalId, pending);
+			this.emitApproval(approvalId, pending, "pending");
+			this.events.push({
+				kind: "session",
+				session: { status: "awaiting_input" },
+			});
 		});
 	}
 
 	private emitApproval(
 		approvalId: string,
-		toolUseId: string,
+		{ toolUseId, turnId }: PendingApproval,
 		status: ApprovalRequest["status"],
 		decision?: Decision,
 	): void {
@@ -363,11 +479,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 			status,
 			...(decision ? { decision } : {}),
 		};
-		this.events.push({
-			kind: "item",
-			item,
-			turnId: this.translator?.currentTurnId ?? "unattributed",
-		});
+		this.events.push({ kind: "item", item, turnId });
 	}
 
 	private now(): number {

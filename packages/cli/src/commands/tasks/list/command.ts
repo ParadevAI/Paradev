@@ -43,6 +43,9 @@ export default command({
 		assigneeMe: boolean().alias("m").desc("Filter to my tasks"),
 		creatorMe: boolean().desc("Filter to tasks I created"),
 		search: string().alias("s").desc("Search by title or description"),
+		labels: string().desc(
+			"Comma-separated labels; a task must have all of them. A label also matches its sub-labels (acme matches acme/web)",
+		),
 		dueFrom: string().desc("Tasks due on or after this date (YYYY-MM-DD)"),
 		dueTo: string().desc("Tasks due on or before this date (YYYY-MM-DD)"),
 		sortBy: string()
@@ -78,6 +81,10 @@ export default command({
 			assigneeMe: options.assigneeMe ?? undefined,
 			creatorMe: options.creatorMe ?? undefined,
 			search: options.search ?? undefined,
+			labels: options.labels
+				?.split(",")
+				.map((label) => label.trim())
+				.filter(Boolean),
 			dueDateFrom: toIsoDatetime(options.dueFrom),
 			dueDateTo: toIsoDatetime(options.dueTo),
 			sortBy: options.sortBy,
@@ -104,6 +111,7 @@ async function listLinearIssues(
 		offset: number;
 		priority?: string;
 		creatorMe?: boolean;
+		labels?: string;
 		dueFrom?: string;
 		dueTo?: string;
 		sortBy?: string;
@@ -114,6 +122,7 @@ async function listLinearIssues(
 	rejectUnsupported({
 		priority: options.priority,
 		creatorMe: options.creatorMe,
+		labels: options.labels,
 		dueFrom: options.dueFrom,
 		dueTo: options.dueTo,
 		sortBy: options.sortBy,

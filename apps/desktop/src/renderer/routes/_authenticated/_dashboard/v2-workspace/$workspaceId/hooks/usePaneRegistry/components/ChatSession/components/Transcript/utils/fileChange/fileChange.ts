@@ -14,15 +14,21 @@ type DiffToolContent = Extract<ToolContent, { type: "diff" }>;
 
 /**
  * Empty new text is what the file holds now, not proof it is gone: an edit
- * can leave a file empty. Only the call's own kind says it was deleted.
+ * can leave a file empty. Only the call's own kind or the diff's mark says it
+ * was deleted.
  */
 export function fileChangeKind(
 	content: DiffToolContent,
 	toolKind: ToolKind,
 ): FileChangeKind {
-	if (toolKind === "delete") return "deleted";
+	if (toolKind === "delete" || content.deleted) return "deleted";
 	if (content.oldText === null) return "added";
 	return "modified";
+}
+
+/** The path without its file name and the separator before it. */
+export function directoryOf(path: string, name: string): string {
+	return path.slice(0, path.length - name.length).replace(/[\\/]+$/, "");
 }
 
 export function fileName(path: string): string {

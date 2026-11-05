@@ -4,7 +4,7 @@ import { WebFetchTool } from "@/components/ai-elements/web-fetch-tool";
 
 const FETCHED_CONTENT = `# Workspaces
 
-Superset workspaces are isolated git worktrees. Each workspace gets:
+Paradev workspaces are isolated git worktrees. Each workspace gets:
 
 - Its own branch, checked out from the repo default branch
 - An isolated working directory under ~/.superset/worktrees
@@ -24,7 +24,7 @@ const meta = {
 	title: "ai-elements/WebFetchTool",
 	component: WebFetchTool,
 	args: {
-		url: "https://superset.sh/docs/workspaces",
+		url: "https://docs.paradev.com/workspaces",
 		state: "output-available",
 	},
 } satisfies Meta<typeof WebFetchTool>;
@@ -60,7 +60,7 @@ export const Fetching: Story = {
 export const NotFound: Story = {
 	args: {
 		statusCode: 404,
-		url: "https://superset.sh/docs/does-not-exist",
+		url: "https://docs.paradev.com/does-not-exist",
 	},
 	render: (args) => (
 		<View className="w-full">

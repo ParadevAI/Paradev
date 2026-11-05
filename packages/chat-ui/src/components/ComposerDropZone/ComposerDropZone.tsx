@@ -5,7 +5,9 @@ import { i18n } from "@superset/i18n";
 import { cn } from "@superset/ui/utils";
 import {
 	createContext,
+	type KeyboardEventHandler,
 	type ReactNode,
+	type Ref,
 	useContext,
 	useEffect,
 	useMemo,
@@ -30,6 +32,8 @@ export type ComposerDropZoneProps = {
 	children: ReactNode;
 	label?: string;
 	className?: string;
+	ref?: Ref<HTMLDivElement>;
+	onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
 };
 
 export function ComposerDropZone({
@@ -40,6 +44,8 @@ export function ComposerDropZone({
 		}),
 	),
 	className,
+	ref,
+	onKeyDown,
 }: ComposerDropZoneProps) {
 	const sinkRef = useRef<((files: FileList) => void) | null>(null);
 	const [isDraggingFiles, setIsDraggingFiles] = useState(false);
@@ -76,6 +82,8 @@ export function ComposerDropZone({
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the composer's file picker */}
 			<div
 				className={cn("relative", className)}
+				onKeyDown={onKeyDown}
+				ref={ref}
 				onDragOver={(event) => {
 					if (!event.dataTransfer.types.includes("Files")) return;
 					event.preventDefault();

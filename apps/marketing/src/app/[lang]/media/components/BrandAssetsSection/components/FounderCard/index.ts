@@ -1,0 +1,1 @@
+export { FounderCard } from "./FounderCard";

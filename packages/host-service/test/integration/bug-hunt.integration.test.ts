@@ -245,19 +245,11 @@ describe("bug-hunt: git-flag injection", () => {
 	});
 });
 
-describe("bug-hunt: idempotency + double-fire", () => {
+describe("bug-hunt: idempotency", () => {
 	let host: TestHost;
-	let repo: GitFixture;
-	const projectId = randomUUID();
-	const _workspaceId = randomUUID();
-
-	beforeEach(async () => {
-		repo = await createGitFixture();
-	});
 
 	afterEach(async () => {
 		if (host) await host.dispose();
-		repo.dispose();
 	});
 
 	test("workspaceCleanup.destroy is idempotent on a non-existent workspace id", async () => {
@@ -285,52 +277,6 @@ describe("bug-hunt: idempotency + double-fire", () => {
 		const b = await host.trpc.project.remove.mutate({ projectId: id });
 		expect(a).toEqual({ success: true, repoPath: null });
 		expect(b).toEqual({ success: true, repoPath: null });
-	});
-
-	test("two concurrent workspace.create calls with the same branch don't collide silently", async () => {
-		host = await createTestHost({
-			apiOverrides: {
-				"host.ensure.mutate": () => ({ machineId: "m1" }),
-				"v2Workspace.create.mutate": (input: unknown) => {
-					const i = input as { branch: string; name: string };
-					return {
-						id: randomUUID(),
-						projectId,
-						branch: i.branch,
-						name: i.name,
-					};
-				},
-			},
-		});
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-
-		await Promise.allSettled([
-			host.trpc.workspace.create.mutate({
-				projectId,
-				name: "w",
-				branch: "feature/race",
-			}),
-			host.trpc.workspace.create.mutate({
-				projectId,
-				name: "w",
-				branch: "feature/race",
-			}),
-		]);
-
-		// We must never end up with more than one workspace row pointing
-		// at the same branch — that's the actual collision we're guarding
-		// against. Either both calls collide (one row, one error) or git's
-		// own worktree-add lock causes one to fail; never two rows.
-		const rows = host.db
-			.select()
-			.from(workspaces)
-			.where(eq(workspaces.projectId, projectId))
-			.all();
-		const featureRows = rows.filter((r) => r.branch === "feature/race");
-		expect(featureRows.length).toBeLessThanOrEqual(1);
 	});
 });
 

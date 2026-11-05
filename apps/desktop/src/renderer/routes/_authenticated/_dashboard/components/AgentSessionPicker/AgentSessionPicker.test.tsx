@@ -96,6 +96,7 @@ test("names an existing session by the title its host reports", async () => {
 							targets: [],
 							isReady: true,
 							agentCredentialsChangedWorkspaceId: null,
+							usageRefusal: null,
 						}}
 					>
 						<AgentSessionPicker

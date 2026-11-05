@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type {
 	SessionClient,
 	SessionStream,
@@ -10,11 +17,33 @@ import {
 	DEFAULT_BACKOFF_MAX_MS,
 } from "../../client";
 import type { OutboxEntry, SessionSnapshot } from "../../core";
-import { emptySnapshot, Outbox, reduceMany } from "../../core";
+import {
+	emptySnapshot,
+	hasOmittedBody,
+	Outbox,
+	reduceMany,
+	snapshotFromOutline,
+	withItemBodies,
+} from "../../core";
+import type { UsageLimitAction } from "../../protocol/commands";
 import type { Cursor } from "../../protocol/cursor";
 import type { DeltaChannel, Envelope } from "../../protocol/envelope";
-import { isDurableEnvelope } from "../../protocol/envelope";
-import type { Decision, UserContent, UserMessage } from "../../protocol/items";
+import { isDurableEnvelope, isResetEnvelope } from "../../protocol/envelope";
+import type {
+	Decision,
+	ToolCall,
+	UserContent,
+	UserMessage,
+} from "../../protocol/items";
+
+import { newerThan } from "./utils/newerThan";
+import {
+	cachedSnapshot,
+	cacheSnapshot,
+	forgetSnapshot,
+	primeSnapshot,
+	takePrimedSnapshot,
+} from "./utils/snapshotCache";
 
 export type FrameScheduler = (flush: () => void) => () => void;
 
@@ -37,15 +66,98 @@ const defaultWait: Wait = (callback, delayMs) => {
 };
 
 const SEED_TIMEOUT_MS = 10_000;
+const MAX_BODIES_PER_REQUEST = 100;
+const MAX_BODY_ATTEMPTS = 3;
+
+type Seed =
+	| { kind: "outline"; snapshot: SessionSnapshot }
+	| { kind: "page"; envelopes: Envelope[]; nextBefore: Cursor | null };
+
+async function fetchSeed(
+	client: SessionClient,
+	pageSize: number | undefined,
+	timed: <T>(request: Promise<T>) => Promise<T> = (request) => request,
+): Promise<Seed | null> {
+	try {
+		const outline = await timed(client.getOutline());
+		if (outline.ok) {
+			return {
+				kind: "outline",
+				snapshot: snapshotFromOutline(outline.outline),
+			};
+		}
+	} catch {}
+	const page = await timed(client.getItems({ limit: pageSize }));
+	if (!page.ok) return null;
+	return {
+		kind: "page",
+		envelopes: page.envelopes,
+		nextBefore: page.nextBefore,
+	};
+}
+
+export async function prefetchChatSession(
+	client: SessionClient,
+	pageSize?: number,
+): Promise<boolean> {
+	const seed = await fetchSeed(client, pageSize).catch(() => null);
+	if (!seed) return false;
+	if (seed.kind === "outline") {
+		primeSnapshot(client.sessionId, seed.snapshot);
+	} else {
+		cacheSnapshot(
+			client.sessionId,
+			reduceMany(emptySnapshot(), seed.envelopes),
+		);
+	}
+	return true;
+}
+
+type InitialLoad = [
+	session: Awaited<ReturnType<SessionClient["getSession"]>>,
+	seed: Seed | null,
+];
+
+function fetchInitialLoad(
+	client: SessionClient,
+	pageSize: number | undefined,
+	timed: <T>(request: Promise<T>) => Promise<T> = (request) => request,
+): Promise<InitialLoad> {
+	return Promise.all([
+		timed(client.getSession()),
+		fetchSeed(client, pageSize, timed),
+	]);
+}
+
+function withCachedBodies(seed: Seed, cached: SessionSnapshot): Seed {
+	if (seed.kind !== "outline") return seed;
+	const bodies = [...cached.items.values()].filter(({ item }) => {
+		if (item.kind !== "tool_call" || hasOmittedBody(item)) return false;
+		const fresh = seed.snapshot.items.get(item.id)?.item;
+		return (
+			fresh?.kind === "tool_call" &&
+			(fresh as ToolCall).status !== "running" &&
+			(fresh as ToolCall).status === (item as ToolCall).status
+		);
+	});
+	if (bodies.length === 0) return seed;
+	return {
+		kind: "outline",
+		snapshot: withItemBodies(seed.snapshot, bodies),
+	};
+}
 
 export const DEFAULT_DELTAS: readonly DeltaChannel[] = [
 	"text",
 	"tool_input",
 	"terminal",
+	"background",
 ];
 
 export type UseChatSessionOptions = {
 	client: SessionClient;
+	sendEnabled?: boolean;
+	snapshotWorktree?: boolean;
 	deltas?: readonly DeltaChannel[];
 	pageSize?: number;
 	scheduler?: FrameScheduler;
@@ -61,6 +173,7 @@ export type ChatSession = {
 	unreachable: boolean;
 	outbox: OutboxEntry[];
 	hasOlder: boolean;
+	requestItemBodies(itemIds: readonly string[]): void;
 	sendPrompt(
 		content: UserContent[],
 		steer?: { expectedTurnId: string },
@@ -70,12 +183,18 @@ export type ChatSession = {
 	loadOlder(): Promise<boolean>;
 	removeQueuedPrompt(itemId: string): Promise<void>;
 	steerQueuedPrompt(itemId: string): Promise<void>;
+	updateQueuedPrompt(itemId: string, content: UserContent[]): Promise<void>;
 	resumeQueue(): Promise<void>;
+	respondToUsageLimit(action: UsageLimitAction): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
 	stopBackgroundTask(taskId: string): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
-	setConfigOption(configId: string, value: string): Promise<void>;
+	setConfigOption(
+		configId: string,
+		value: string,
+		options?: { confirm?: boolean },
+	): Promise<void>;
 };
 
 function confirmEchoes(outbox: Outbox, batch: readonly Envelope[]): void {
@@ -91,10 +210,21 @@ function confirmEchoes(outbox: Outbox, batch: readonly Envelope[]): void {
 
 export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const client = options.client;
+	const sendEnabled = options.sendEnabled ?? true;
+	const sendEnabledRef = useRef(sendEnabled);
+	sendEnabledRef.current = sendEnabled;
+	const snapshotWorktreeRef = useRef(options.snapshotWorktree === true);
+	snapshotWorktreeRef.current = options.snapshotWorktree === true;
 	const pageSize = options.pageSize;
 	const deltasKey = (options.deltas ?? DEFAULT_DELTAS).join(",");
 
-	const [snapshot, setSnapshot] = useState<SessionSnapshot>(emptySnapshot);
+	const [snapshot, setSnapshot] = useState<SessionSnapshot>(
+		() => cachedSnapshot(client.sessionId) ?? emptySnapshot(),
+	);
+	const snapshotRef = useRef(snapshot);
+	useLayoutEffect(() => {
+		snapshotRef.current = snapshot;
+	}, [snapshot]);
 	const [status, setStatus] = useState<ChatSessionStatus>("loading");
 	const [connection, setConnection] = useState<StreamStatus>("connecting");
 	const [unreachable, setUnreachable] = useState(false);
@@ -105,24 +235,31 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	schedulerRef.current = options.scheduler ?? defaultScheduler;
 	const waitRef = useRef(options.wait ?? defaultWait);
 	waitRef.current = options.wait ?? defaultWait;
-	const connectedRef = useRef(false);
+	const connectedRef = useRef<SessionClient | null>(null);
 
 	const pendingRef = useRef<Envelope[]>([]);
 	const cancelFlushRef = useRef<(() => void) | null>(null);
 	const nextBeforeRef = useRef<Cursor | null>(null);
 	const resyncingRef = useRef(false);
+	const resyncAgainRef = useRef(false);
+	const resyncBufferRef = useRef<Envelope[] | null>(null);
 	const clientRef = useRef(client);
 	clientRef.current = client;
 
 	const outbox = useMemo(
 		() =>
 			new Outbox({
+				canSend: () =>
+					sendEnabledRef.current &&
+					connectedRef.current === client &&
+					clientRef.current === client,
 				send: async (entry) => {
 					await client.prompt({
 						commandId: entry.commandId,
 						clientId: entry.clientId,
 						content: entry.content,
 						...(entry.steer ? { steer: entry.steer } : {}),
+						...(snapshotWorktreeRef.current ? { snapshotWorktree: true } : {}),
 					});
 				},
 			}),
@@ -135,9 +272,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	}, [outbox]);
 
 	useEffect(() => {
-		connectedRef.current = connection === "open";
-		if (connectedRef.current) void outbox.flush();
-	}, [connection, outbox]);
+		if (connection === "open" && sendEnabled) void outbox.flush();
+	}, [connection, outbox, sendEnabled]);
 
 	const commit = useCallback(() => {
 		cancelFlushRef.current = null;
@@ -145,6 +281,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		pendingRef.current = [];
 		if (batch.length === 0) return;
 		confirmEchoes(outbox, batch);
+		resyncBufferRef.current?.push(...batch);
 		setSnapshot((prev) => reduceMany(prev, batch));
 	}, [outbox]);
 
@@ -158,25 +295,130 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		[commit],
 	);
 
-	const resync = useCallback(async () => {
-		if (resyncingRef.current) return;
-		resyncingRef.current = true;
-		try {
-			const page = await client.getItems({ limit: pageSize });
-			if (clientRef.current !== client) return;
-			if (!page.ok) return;
-			nextBeforeRef.current = page.nextBefore;
-			setHasOlder(page.nextBefore !== null);
-			setSnapshot((prev) =>
+	const requestedBodiesRef = useRef(new Set<string>());
+	const bodyQueueRef = useRef<string[]>([]);
+	const bodyFlushRef = useRef(false);
+	const bodyAttemptsRef = useRef(new Map<string, number>());
+	const seedGenerationRef = useRef(0);
+	const requestItemBodiesRef = useRef<(itemIds: readonly string[]) => void>(
+		() => {},
+	);
+
+	const requestItemBodies = useCallback(
+		(itemIds: readonly string[]) => {
+			for (const id of itemIds) {
+				if (requestedBodiesRef.current.has(id)) continue;
+				requestedBodiesRef.current.add(id);
+				bodyQueueRef.current.push(id);
+			}
+			if (bodyFlushRef.current || bodyQueueRef.current.length === 0) return;
+			bodyFlushRef.current = true;
+			queueMicrotask(() => {
+				bodyFlushRef.current = false;
+				const queued = bodyQueueRef.current;
+				bodyQueueRef.current = [];
+				const generation = seedGenerationRef.current;
+				const current = () =>
+					clientRef.current === client &&
+					seedGenerationRef.current === generation;
+				for (let i = 0; i < queued.length; i += MAX_BODIES_PER_REQUEST) {
+					const chunk = queued.slice(i, i + MAX_BODIES_PER_REQUEST);
+					const retry = () => {
+						if (!current()) return;
+						const again: string[] = [];
+						for (const id of chunk) {
+							requestedBodiesRef.current.delete(id);
+							const attempts = (bodyAttemptsRef.current.get(id) ?? 0) + 1;
+							bodyAttemptsRef.current.set(id, attempts);
+							if (attempts < MAX_BODY_ATTEMPTS) again.push(id);
+						}
+						if (again.length === 0) return;
+						const attempt = bodyAttemptsRef.current.get(again[0] ?? "") ?? 1;
+						waitRef.current(
+							() => {
+								if (current()) requestItemBodiesRef.current(again);
+							},
+							DEFAULT_BACKOFF_INITIAL_MS * 2 ** attempt,
+						);
+					};
+					client.getItemBodies(chunk).then((result) => {
+						if (!current()) return;
+						if (!result.ok) return retry();
+						setSnapshot((prev) => withItemBodies(prev, result.items));
+					}, retry);
+				}
+			});
+		},
+		[client],
+	);
+	requestItemBodiesRef.current = requestItemBodies;
+
+	const applySeed = useCallback(
+		(seed: Seed, merge: boolean, arrived: readonly Envelope[] = []) => {
+			const requested = requestedBodiesRef.current;
+			requestedBodiesRef.current = new Set();
+			bodyAttemptsRef.current = new Map();
+			seedGenerationRef.current += 1;
+			if (seed.kind === "outline") {
+				nextBeforeRef.current = null;
+				setHasOlder(false);
+				const seeded = reduceMany(
+					seed.snapshot,
+					newerThan(seed.snapshot, arrived),
+				);
+				setSnapshot(seeded);
+				const stillOmitted = [...requested].filter((id) => {
+					const stored = seeded.items.get(id);
+					return stored !== undefined && hasOmittedBody(stored.item);
+				});
+				if (stillOmitted.length > 0) {
+					requestItemBodiesRef.current(stillOmitted);
+				}
+				return seeded;
+			}
+			nextBeforeRef.current = seed.nextBefore;
+			setHasOlder(seed.nextBefore !== null);
+			const apply = (prev: SessionSnapshot) =>
 				reduceMany(
 					{ ...prev, cursor: null, pendingReset: null },
-					page.envelopes,
-				),
-			);
-		} finally {
-			resyncingRef.current = false;
-		}
-	}, [client, pageSize]);
+					seed.envelopes,
+				);
+			if (merge) {
+				setSnapshot(apply);
+				return null;
+			}
+			const seeded = apply(emptySnapshot());
+			setSnapshot(seeded);
+			return seeded;
+		},
+		[],
+	);
+
+	const resync = useCallback(
+		async (afterReset = false) => {
+			if (resyncingRef.current) {
+				if (afterReset) resyncAgainRef.current = true;
+				return;
+			}
+			resyncingRef.current = true;
+			try {
+				do {
+					resyncAgainRef.current = false;
+					resyncBufferRef.current = [];
+					const seed = await fetchSeed(client, pageSize).catch(() => null);
+					if (clientRef.current !== client) return;
+					const seeded = seed
+						? applySeed(seed, true, resyncBufferRef.current)
+						: null;
+					if (seeded?.pendingReset) resyncAgainRef.current = true;
+				} while (resyncAgainRef.current);
+			} finally {
+				resyncingRef.current = false;
+				resyncBufferRef.current = null;
+			}
+		},
+		[client, pageSize, applySeed],
+	);
 
 	useEffect(() => {
 		if (snapshot.pendingReset) void resync();
@@ -190,8 +432,11 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		setStatus("loading");
 		setUnreachable(false);
 		setConnection("connecting");
-		setSnapshot(emptySnapshot());
+		const primed = takePrimedSnapshot(client.sessionId);
+		const cached = cachedSnapshot(client.sessionId);
+		setSnapshot(cached ?? emptySnapshot());
 		setHasOlder(false);
+		let loaded = false;
 		nextBeforeRef.current = null;
 		pendingRef.current = [];
 
@@ -226,11 +471,10 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 			});
 
 		const seed = async (attempt: number) => {
-			let session: Awaited<ReturnType<SessionClient["getSession"]>>;
-			let page: Awaited<ReturnType<SessionClient["getItems"]>>;
+			let session: InitialLoad[0];
+			let seed: InitialLoad[1];
 			try {
-				session = await timed(client.getSession());
-				page = await timed(client.getItems({ limit: pageSize }));
+				[session, seed] = await fetchInitialLoad(client, pageSize, timed);
 			} catch {
 				if (cancelled) return;
 				setUnreachable(true);
@@ -239,40 +483,65 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 			}
 			setUnreachable(false);
 			if (cancelled) return;
-			let seeded = emptySnapshot();
-			if (page.ok) {
-				seeded = reduceMany(seeded, page.envelopes);
-				nextBeforeRef.current = page.nextBefore;
-				setHasOlder(page.nextBefore !== null);
+			let seeded: SessionSnapshot | null = null;
+			if (seed) {
+				seeded = applySeed(
+					cached ? withCachedBodies(seed, cached) : seed,
+					false,
+				);
+			} else {
+				if (!session.session) forgetSnapshot(client.sessionId);
+				setSnapshot(emptySnapshot());
 			}
-			setSnapshot(seeded);
+			loaded = seed !== null;
 			setStatus("ready");
+			subscribe(seeded?.cursor ?? session.cursor);
+		};
+		const subscribe = (since: Cursor | null) => {
 			stream = client.subscribe({
 				deltas,
-				since: seeded.cursor ?? session.cursor,
-				onEnvelope: enqueue,
-				onReset: () => {
-					void resync();
+				since,
+				onEnvelope: (envelope) => {
+					if (!isResetEnvelope(envelope)) enqueue(envelope);
 				},
-				onStatusChange: setConnection,
+				onReset: () => {
+					void resync(true);
+				},
+				onStatusChange: (next) => {
+					if (cancelled) return;
+					connectedRef.current = next === "open" ? client : null;
+					setConnection(next);
+				},
 			});
 		};
-		void seed(0);
+		if (primed) {
+			const seeded = applySeed({ kind: "outline", snapshot: primed }, false);
+			loaded = true;
+			setStatus("ready");
+			subscribe(seeded?.cursor ?? null);
+		} else {
+			void seed(0);
+		}
 
 		return () => {
+			if (loaded && !snapshotRef.current.pendingReset) {
+				cacheSnapshot(client.sessionId, snapshotRef.current);
+			}
 			cancelled = true;
+			if (connectedRef.current === client) connectedRef.current = null;
+			seedGenerationRef.current += 1;
 			cancelRetry?.();
 			cancelFlushRef.current?.();
 			cancelFlushRef.current = null;
 			pendingRef.current = [];
 			stream?.close();
 		};
-	}, [client, deltasKey, pageSize, enqueue, resync]);
+	}, [client, deltasKey, pageSize, enqueue, resync, applySeed]);
 
 	const sendPrompt = useCallback(
 		(content: UserContent[], steer?: { expectedTurnId: string }) => {
 			const entry = outbox.enqueue(content, steer);
-			if (connectedRef.current) void outbox.flush();
+			void outbox.flush();
 			return entry;
 		},
 		[outbox],
@@ -281,7 +550,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const retryPrompt = useCallback(
 		(clientId: string) => {
 			outbox.retry(clientId);
-			if (connectedRef.current) void outbox.flush();
+			void outbox.flush();
 		},
 		[outbox],
 	);
@@ -324,8 +593,17 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		(itemId: string) => client.steerQueuedPrompt(itemId),
 		[client],
 	);
+	const updateQueuedPrompt = useCallback(
+		(itemId: string, content: UserContent[]) =>
+			client.updateQueuedPrompt(itemId, content),
+		[client],
+	);
 
 	const resumeQueue = useCallback(() => client.resumeQueue(), [client]);
+	const respondToUsageLimit = useCallback(
+		(action: UsageLimitAction) => client.respondToUsageLimit(action),
+		[client],
+	);
 
 	const cancelTurn = useCallback(
 		(turnId: string, options?: { pauseQueue?: boolean }) =>
@@ -347,8 +625,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	);
 
 	const setConfigOption = useCallback(
-		(configId: string, value: string) =>
-			client.setConfigOption(configId, value),
+		(configId: string, value: string, options?: { confirm?: boolean }) =>
+			client.setConfigOption(configId, value, options),
 		[client],
 	);
 
@@ -359,13 +637,16 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		unreachable,
 		outbox: outboxEntries,
 		hasOlder,
+		requestItemBodies,
 		sendPrompt,
 		retryPrompt,
 		discardPrompt,
 		loadOlder,
 		removeQueuedPrompt,
 		steerQueuedPrompt,
+		updateQueuedPrompt,
 		resumeQueue,
+		respondToUsageLimit,
 		cancelTurn,
 		stopBackgroundTask,
 		respondToApproval,

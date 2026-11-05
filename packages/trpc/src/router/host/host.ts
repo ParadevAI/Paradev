@@ -1,29 +1,20 @@
 import { db, dbWs } from "@superset/db/client";
-import {
-	members,
-	subscriptions,
-	users,
-	v2Hosts,
-	v2UsersHosts,
-} from "@superset/db/schema";
-import {
-	ACTIVE_SUBSCRIPTION_STATUSES,
-	isActiveSubscriptionStatus,
-	isPaidPlan,
-} from "@superset/shared/billing";
+import { members, users, v2Hosts, v2UsersHosts } from "@superset/db/schema";
 import {
 	buildHostRoutingKey,
 	parseHostRoutingKey,
 } from "@superset/shared/host-routing";
 import { HOST_INSTALL_SOURCES } from "@superset/shared/host-version";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { emitAppFirstOpened } from "../../lib/activation-events";
+import { organizationPlan } from "../../lib/billing/plan";
+import { isMember } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
-import { jwtProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { registerHost } from "./registration";
 import {
 	authorizeHostUpdate,
@@ -88,14 +79,14 @@ export const hostRouter = {
 	 * the desktop, its host-service, the CLI and the web app all read one
 	 * value instead of resolving it separately and landing on different relays.
 	 */
-	relayEndpoint: jwtProcedure.query(() => {
+	relayEndpoint: personProcedure.query(() => {
 		return { url: env.RELAY_URL };
 	}),
 
-	list: jwtProcedure
+	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.organizationId)) {
+			if (!(await isMember(ctx, input.organizationId))) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "Not a member of this organization",
@@ -124,7 +115,7 @@ export const hostRouter = {
 				.where(
 					and(
 						eq(v2Hosts.organizationId, input.organizationId),
-						eq(v2UsersHosts.userId, ctx.userId),
+						eq(v2UsersHosts.userId, ctx.principal.userId),
 					),
 				);
 
@@ -155,7 +146,7 @@ export const hostRouter = {
 			}));
 		}),
 
-	ensure: jwtProcedure
+	ensure: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -171,7 +162,7 @@ export const hostRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.organizationId)) {
+			if (!(await isMember(ctx, input.organizationId))) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "Not a member of this organization",
@@ -189,7 +180,7 @@ export const hostRouter = {
 						(
 							await tx
 								.insert(v2Hosts)
-								.values({ ...input, createdByUserId: ctx.userId })
+								.values({ ...input, createdByUserId: ctx.principal.userId })
 								.onConflictDoNothing({
 									target: [v2Hosts.organizationId, v2Hosts.machineId],
 								})
@@ -200,14 +191,19 @@ export const hostRouter = {
 							.insert(v2UsersHosts)
 							.values({
 								organizationId: input.organizationId,
-								userId: ctx.userId,
+								userId: ctx.principal.userId,
 								hostId: input.machineId,
 								role: "owner",
 							})
 							.onConflictDoNothing();
 					},
 					isOwner: () =>
-						isHostOwner(input.organizationId, input.machineId, ctx.userId, tx),
+						isHostOwner(
+							input.organizationId,
+							input.machineId,
+							ctx.principal.userId,
+							tx,
+						),
 					update: async (metadata) =>
 						(
 							await tx.update(v2Hosts).set(metadata).where(scope).returning()
@@ -225,7 +221,7 @@ export const hostRouter = {
 			}
 
 			if (inserted) {
-				await emitFirstHostEvent(ctx.userId);
+				await emitFirstHostEvent(ctx.principal.userId);
 			}
 			nudge(input.organizationId, "hosts");
 			return host;
@@ -233,51 +229,46 @@ export const hostRouter = {
 
 	// The host uses its own owner credential to check the relay-authenticated
 	// requester. Neither organization membership nor a claimed machine id is enough.
-	authorizeUpdate: jwtProcedure
+	authorizeUpdate: personProcedure
 		.input(hostUpdateAuthorizationSchema)
-		.query(({ ctx, input }) => authorizeHostUpdate(ctx, input, isHostOwner)),
+		.query(async ({ ctx, input }) =>
+			authorizeHostUpdate(
+				{
+					userId: ctx.principal.userId,
+					isMember: await isMember(ctx, input.organizationId),
+				},
+				input,
+				isHostOwner,
+			),
+		),
 
-	checkAccess: jwtProcedure
+	checkAccess: personProcedure
 		.input(z.object({ hostId: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
 			const parsed = parseHostRoutingKey(input.hostId);
 			if (!parsed) return { allowed: false, paidPlan: false };
-			if (!ctx.organizationIds.includes(parsed.organizationId)) {
+			if (!(await isMember(ctx, parsed.organizationId))) {
 				return { allowed: false, paidPlan: false };
 			}
 			const [row] = await db
-				.select({
-					hostId: v2UsersHosts.hostId,
-					subscriptionPlan: subscriptions.plan,
-					subscriptionStatus: subscriptions.status,
-				})
+				.select({ hostId: v2UsersHosts.hostId })
 				.from(v2UsersHosts)
-				.leftJoin(
-					subscriptions,
-					and(
-						eq(subscriptions.referenceId, v2UsersHosts.organizationId),
-						inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
-					),
-				)
 				.where(
 					and(
-						eq(v2UsersHosts.userId, ctx.userId),
+						eq(v2UsersHosts.userId, ctx.principal.userId),
 						eq(v2UsersHosts.organizationId, parsed.organizationId),
 						eq(v2UsersHosts.hostId, parsed.machineId),
 					),
 				)
-				.orderBy(desc(subscriptions.createdAt))
 				.limit(1);
 
 			const allowed = !!row;
 			const paidPlan =
-				!!row &&
-				isPaidPlan(row.subscriptionPlan) &&
-				isActiveSubscriptionStatus(row.subscriptionStatus);
+				allowed && (await organizationPlan(parsed.organizationId)) !== "free";
 			return { allowed, paidPlan };
 		}),
 
-	setWakeCommand: jwtProcedure
+	setWakeCommand: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -287,7 +278,7 @@ export const hostRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.organizationId)) {
+			if (!(await isMember(ctx, input.organizationId))) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "No access to this host",
@@ -299,7 +290,7 @@ export const hostRouter = {
 			// member who runs `hosts wake`, so only the owner may set it.
 			const access = await db.query.v2UsersHosts.findFirst({
 				where: and(
-					eq(v2UsersHosts.userId, ctx.userId),
+					eq(v2UsersHosts.userId, ctx.principal.userId),
 					eq(v2UsersHosts.organizationId, input.organizationId),
 					eq(v2UsersHosts.hostId, input.machineId),
 				),

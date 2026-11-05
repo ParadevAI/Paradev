@@ -1,4 +1,5 @@
-import { Heading, Hr, Link, Text } from "@react-email/components";
+import { Hr, Link, Text } from "@react-email/components";
+import { COMPANY } from "@superset/shared/constants";
 import { format } from "date-fns";
 import { DetailRow, EmailLayout } from "../../components";
 
@@ -32,10 +33,6 @@ export function SubscriptionCancelledEmail({
 					: `Your ${planName} subscription has been cancelled`
 			}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				{dueToPaymentFailure ? "Subscription ended" : "Subscription cancelled"}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>
@@ -50,9 +47,9 @@ export function SubscriptionCancelledEmail({
 					</Text>
 
 					<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-						Nothing has been deleted. Open Superset and go to{" "}
+						Nothing has been deleted. Open Paradev and go to{" "}
 						<strong>Settings → Billing</strong> to resubscribe with a working
-						card — {planName} turns straight back on.
+						card and {planName} turns straight back on.
 					</Text>
 				</>
 			) : (
@@ -67,27 +64,23 @@ export function SubscriptionCancelledEmail({
 					<Hr className="border-border my-4" />
 
 					<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
-						You'll continue to have access to all {planName} features until{" "}
-						{formattedEndDate}. After that, your organization moves to the free
-						plan.
+						You keep all {planName} features until {formattedEndDate}. After
+						that, your organization moves to the free plan.
 					</Text>
 
 					<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 						Changed your mind? You can resubscribe anytime before your access
-						ends from <strong>Settings → Billing</strong> in Superset.
+						ends from <strong>Settings → Billing</strong> in Paradev.
 					</Text>
 				</>
 			)}
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
-				Something not working?{" "}
-				<Link
-					href="mailto:support@superset.sh"
-					className="text-muted underline"
-				>
-					Tell us
-				</Link>{" "}
-				and we'll fix it.
+				If something wasn't working, please{" "}
+				<Link href={COMPANY.MAIL_TO} className="text-muted underline">
+					tell us
+				</Link>
+				.
 			</Text>
 		</EmailLayout>
 	);

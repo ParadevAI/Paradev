@@ -107,7 +107,7 @@ export function AutomationStatCards({
 				type="button"
 				onClick={onShowMissed}
 				title={t({
-					message: "Scheduled runs that found no host online",
+					message: "Runs that found no host online",
 				})}
 				className={cn(CARD, CLICKABLE)}
 			>

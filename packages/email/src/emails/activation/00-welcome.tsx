@@ -1,11 +1,5 @@
-import { Heading, Img, Section, Text } from "@react-email/components";
-import { Button, EmailLayout } from "../../components";
-import { env } from "../../lib/env";
-
-const utm = (content: string) =>
-	`?utm_source=email&utm_medium=lifecycle&utm_campaign=welcome&utm_content=${content}`;
-
-const DOWNLOAD = "https://superset.sh/download";
+import { Text } from "@react-email/components";
+import { EmailLayout } from "../../components";
 
 interface WelcomeEmailProps {
 	userName?: string;
@@ -17,47 +11,30 @@ export function WelcomeEmail({
 	userEmail,
 	unsubscribeUrl,
 }: WelcomeEmailProps = {}) {
-	const assets = `${env.NEXT_PUBLIC_MARKETING_URL}/assets/emails`;
-
 	return (
 		<EmailLayout
-			preview="They do the work. You review the diffs."
+			preview="How to get the most out of Paradev."
 			recipientEmail={userEmail}
 			unsubscribeUrl={unsubscribeUrl}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-3">
-				Welcome to Superset
-			</Heading>
-			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
-				Run Claude Code, Codex, or any CLI agent in parallel, each in an
-				isolated copy of your repo. They do the work. You review the diffs.
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
+				Paradev runs Claude Code, Codex, or any CLI agent in parallel, each in
+				an isolated copy of your repo. To get the most out of it:
 			</Text>
 
-			<a href={`${DOWNLOAD}${utm("hero-image")}`}>
-				<Img
-					src={`${assets}/welcome-hero.png`}
-					alt="Superset running coding agents across parallel workspaces"
-					width="512"
-					className="w-full rounded-lg mb-6"
-				/>
-			</a>
-
-			<Text className="text-[15px] leading-6 text-foreground font-medium m-0 mb-2">
-				Two minutes to your first agent:
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
+				<strong>1. One workspace per task.</strong> Start a few at once: a bug,
+				a small feature, the rename you&apos;ve been putting off.
 			</Text>
-			<Text className="text-[15px] leading-7 text-foreground m-0 mb-6">
-				1. Get the desktop app
-				<br />
-				2. Open a repo you&apos;re working on
-				<br />
-				3. Type the thing you were going to do anyway
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
+				<strong>2. Let an agent split the work.</strong> Give it a list and say
+				&quot;spin up an agent for each of these.&quot; It creates the
+				workspaces and checks on each one.
 			</Text>
-
-			<Section className="mb-8">
-				<Button href={`${DOWNLOAD}${utm("hero-cta")}`}>
-					Download Superset
-				</Button>
-			</Section>
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
+				<strong>3. Review the diffs.</strong> Come back when an agent is done,
+				read what changed, then merge it or send a follow-up.
+			</Text>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
 				Questions? Just reply. We read every message.

@@ -1,3 +1,8 @@
+export {
+	DICTATION_AUDIO_BITS_PER_SECOND,
+	DICTATION_MAX_AUDIO_BYTES,
+	DICTATION_MAX_SECONDS,
+} from "./dictation";
 export type { VoiceNavigateTarget, VoiceUiDirective } from "./directives";
 export {
 	type VoiceInstructionsContext,

@@ -1,9 +1,11 @@
 import type {
 	CodeViewItem,
 	DiffLineAnnotation,
+	FileContents,
 	FileDiffMetadata,
 	LineAnnotation,
 } from "@pierre/diffs";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useQueries } from "@tanstack/react-query";
 import { getQueryKey } from "@trpc/react-query";
@@ -19,30 +21,32 @@ import type {
 	DiffPatchScope,
 	GetDiffPatchInput,
 } from "renderer/lib/diffPatchQuery";
-import { isMissingProcedureError } from "renderer/lib/isMissingProcedureError";
+import { hashString } from "renderer/routes/_authenticated/_dashboard/utils/hashString";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
 } from "../../../../../useChangeset";
 import { createGetDiffInput } from "../../utils/createGetDiffInput";
 import { isGeneratedDiffFile } from "../../utils/diffLoadingGuards";
-import { hashString } from "../../utils/hashString";
 import type {
 	DeferredDiffReason,
 	DiffAnnotationMetadata,
 } from "../useDiffAnnotations";
+import { boundPatch, MAX_PATCH_LENGTH } from "./boundPatch";
 import {
 	type ParsedPatchGroup,
 	type PatchGroupResult,
 	parsePatchGroup,
 } from "./parsePatchGroup";
+import { splitPatchInput } from "./splitPatchInput";
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
+	/** False pauses patch fetches, also the refetch after a git change. */
+	enabled?: boolean;
 	files: ChangesetFile[];
 	collapsedSet: ReadonlySet<string>;
 	editingSet: ReadonlySet<string>;
-	editorRevisionByItemId: ReadonlyMap<string, number>;
 	annotationsByPath: ReadonlyMap<
 		string,
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
@@ -161,10 +165,10 @@ function groupKeyFor(input: DiffPatchScope): string {
 
 export function useDiffCodeViewItems({
 	workspaceId,
+	enabled = true,
 	files,
 	collapsedSet,
 	editingSet,
-	editorRevisionByItemId,
 	annotationsByPath,
 	extraAnnotationsByItemId,
 }: UseDiffCodeViewItemsOptions): UseDiffCodeViewItemsResult {
@@ -276,7 +280,15 @@ export function useDiffCodeViewItems({
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
 				try {
-					const { patch } = await trpcClient.git.getDiffPatch.query(input);
+					const patches: string[] = [];
+					let length = 0;
+					for (const batch of splitPatchInput(input)) {
+						if (length >= MAX_PATCH_LENGTH) break;
+						const { patch } = await trpcClient.git.getDiffPatch.query(batch);
+						patches.push(patch);
+						length += patch.length;
+					}
+					const patch = boundPatch(patches.join(""));
 					return { kind: "patch", patch, ...requested };
 				} catch (error) {
 					if (!isMissingProcedureError(error)) throw error;
@@ -309,6 +321,7 @@ export function useDiffCodeViewItems({
 				}
 			},
 			staleTime: Number.POSITIVE_INFINITY,
+			enabled,
 		})),
 	});
 
@@ -328,6 +341,7 @@ export function useDiffCodeViewItems({
 		new Map<string, { signature: string; data: PatchGroupResult }>(),
 	);
 	useEffect(() => {
+		if (!enabled) return;
 		patchGroups.forEach((group, index) => {
 			const query = patchQueries[index];
 			if (!query?.data || query.isFetching || query.isError) return;
@@ -346,7 +360,7 @@ export function useDiffCodeViewItems({
 			});
 			void query.refetch();
 		});
-	}, [patchGroups, patchQueries]);
+	}, [enabled, patchGroups, patchQueries]);
 
 	// Parsed in an effect, per section, reusing unchanged sections' objects:
 	// @pierre/diffs hydrates a partial diff in place, so a new object per
@@ -419,8 +433,35 @@ export function useDiffCodeViewItems({
 		return map;
 	}, [patchGroups, patchQueries, parsedGroups]);
 
+	// Pierre replaces an open edit session's document when its fileDiff
+	// changes, so a refetch mid-edit (the one a save triggers) would drop
+	// text typed while the write was in flight.
+	const editingDiffsRef = useRef(new Map<string, FileDiffMetadata>());
+	// Pierre compares files by content, so a fresh but equal object makes it
+	// lay out one file and render another, and it throws.
+	const placeholderFilesRef = useRef(new Map<string, FileContents>());
+
 	const items = useMemo<CodeViewItem<DiffAnnotationMetadata>[]>(() => {
 		const nextItems: CodeViewItem<DiffAnnotationMetadata>[] = [];
+		const editingDiffs = editingDiffsRef.current;
+		const placeholderFiles = placeholderFilesRef.current;
+		const getPlaceholderFile = (itemId: string, path: string) => {
+			const cached = placeholderFiles.get(itemId);
+			if (cached?.name === path) return cached;
+			const next = { name: path, contents: " " };
+			placeholderFiles.set(itemId, next);
+			return next;
+		};
+		for (const itemId of placeholderFiles.keys()) {
+			if (!files.some((file) => getDiffItemId(file) === itemId)) {
+				placeholderFiles.delete(itemId);
+			}
+		}
+		for (const itemId of editingDiffs.keys()) {
+			if (!files.some((file) => getDiffItemId(file) === itemId)) {
+				editingDiffs.delete(itemId);
+			}
+		}
 
 		for (const file of files) {
 			const itemId = getDiffItemId(file);
@@ -429,14 +470,27 @@ export function useDiffCodeViewItems({
 
 			if (file.isBinary) {
 				nextItems.push(
-					buildPlaceholderItem(annotationsByPath, file, itemId, collapsed, {
-						kind: "binary-placeholder",
-					}),
+					buildPlaceholderItem(
+						annotationsByPath,
+						file,
+						getPlaceholderFile(itemId, file.path),
+						itemId,
+						collapsed,
+						{
+							kind: "binary-placeholder",
+						},
+					),
 				);
 				continue;
 			}
 
-			const fileDiff = diffByItemId.get(itemId);
+			const latestDiff = diffByItemId.get(itemId);
+			const fileDiff =
+				editing && latestDiff
+					? (editingDiffs.get(itemId) ?? latestDiff)
+					: latestDiff;
+			if (editing && fileDiff) editingDiffs.set(itemId, fileDiff);
+			else editingDiffs.delete(itemId);
 			if (!fileDiff) {
 				const heldBack =
 					isGeneratedDiffFile(file.path) && !requestedItemIds.has(itemId);
@@ -451,10 +505,17 @@ export function useDiffCodeViewItems({
 						? "error"
 						: groupReason;
 				nextItems.push(
-					buildPlaceholderItem(annotationsByPath, file, itemId, collapsed, {
-						kind: "deferred-placeholder",
-						reason,
-					}),
+					buildPlaceholderItem(
+						annotationsByPath,
+						file,
+						getPlaceholderFile(itemId, file.path),
+						itemId,
+						collapsed,
+						{
+							kind: "deferred-placeholder",
+							reason,
+						},
+					),
 				);
 				continue;
 			}
@@ -475,7 +536,6 @@ export function useDiffCodeViewItems({
 					file.deletions,
 					collapsed ? "1" : "0",
 					editing ? "editing" : "readonly",
-					editorRevisionByItemId.get(itemId) ?? 0,
 					getAnnotationsVersion(annotations),
 				].join("\0"),
 			);
@@ -500,7 +560,6 @@ export function useDiffCodeViewItems({
 		annotationsByPath,
 		collapsedSet,
 		editingSet,
-		editorRevisionByItemId,
 		extraAnnotationsByItemId,
 	]);
 
@@ -519,6 +578,7 @@ function buildPlaceholderItem(
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	>,
 	file: ChangesetFile,
+	placeholderFile: FileContents,
 	itemId: string,
 	collapsed: boolean,
 	placeholder: DiffAnnotationMetadata,
@@ -531,7 +591,7 @@ function buildPlaceholderItem(
 	return {
 		id: itemId,
 		type: "file",
-		file: { name: file.path, contents: " " },
+		file: placeholderFile,
 		annotations,
 		collapsed,
 		version: hashString(

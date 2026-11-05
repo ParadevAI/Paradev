@@ -52,6 +52,7 @@ const expectedContent = {
 	reviewDecision: null,
 	reviewers: [],
 	comments: [],
+	commits: [],
 	labels: [],
 };
 
@@ -227,6 +228,28 @@ test("normalizes reviewers and comments from a populated gh payload", async () =
 			},
 			{ id: "C2", author: { login: "late" }, body: "no time", createdAt: null },
 		],
+		commits: [
+			{
+				oid: "abc1234def5678",
+				messageHeadline: " feat: first ",
+				committedDate: "2026-10-01T08:00:00Z",
+				authors: [
+					{ login: "", name: "Local Only" },
+					{ login: "octocat", name: "The Octocat" },
+				],
+			},
+			{
+				oid: "nodate",
+				messageHeadline: "lost",
+				committedDate: null,
+				authors: [{ login: "octocat", name: null }],
+			},
+			{
+				oid: "noauthor",
+				messageHeadline: null,
+				committedDate: "2026-10-01T08:30:00Z",
+			},
+		],
 		labels: [{ name: "bug", color: "" }],
 	});
 	const content = await caller.getContentByRepo({
@@ -262,6 +285,22 @@ test("normalizes reviewers and comments from a populated gh payload", async () =
 			createdAt: "2026-10-01T10:00:00Z",
 			reviewState: "CHANGES_REQUESTED",
 			url: null,
+		},
+	]);
+	expect(content.commits).toEqual([
+		{
+			oid: "abc1234def5678",
+			messageHeadline: "feat: first",
+			committedDate: "2026-10-01T08:00:00Z",
+			author: { login: null, name: "Local Only" },
+			url: "https://github.com/owner/repo/pull/12/commits/abc1234def5678",
+		},
+		{
+			oid: "noauthor",
+			messageHeadline: "",
+			committedDate: "2026-10-01T08:30:00Z",
+			author: null,
+			url: "https://github.com/owner/repo/pull/12/commits/noauthor",
 		},
 	]);
 });

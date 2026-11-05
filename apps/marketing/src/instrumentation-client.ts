@@ -1,6 +1,7 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 
 import { env } from "@/env";
+import { declineAnalytics } from "@/lib/analytics/decline";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
 
@@ -34,7 +35,7 @@ async function initPosthog() {
 		loaded: (posthog) => {
 			const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
 			if (consent === "declined") {
-				posthog.opt_out_capturing();
+				declineAnalytics(posthog);
 			}
 		},
 	});

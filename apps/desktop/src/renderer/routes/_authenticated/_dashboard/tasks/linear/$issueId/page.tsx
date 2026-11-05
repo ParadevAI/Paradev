@@ -36,6 +36,7 @@ function LinearIssueDetailPage() {
 			tasksSearchFromFilters({
 				tab: search.tab ?? "all",
 				assignee: search.assignee ?? null,
+				label: null,
 				search: search.search ?? "",
 				typeTab: "linear",
 				projectFilters: resolveProjectFilterParams(search.projects, null, []),

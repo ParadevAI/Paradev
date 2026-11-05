@@ -13,11 +13,11 @@
 	},
 	"scripts": {
 		"typecheck": "tsc --noEmit",
-		"test": "bun test --isolate"
+		"test": "bun test"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

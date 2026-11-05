@@ -1,8 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
 import { LuMessageSquare } from "react-icons/lu";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
+import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
+import { needsGithubConnection } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import { useLinkedPullRequest } from "../../../../hooks/useLinkedPullRequest";
 import type { CommentPaneData, DiffFocusSide } from "../../../../types";
 import {
 	coerceCheckStatus,
@@ -16,7 +18,7 @@ import type { NormalizedComment, NormalizedPR } from "./types";
 interface UseReviewTabParams {
 	workspaceId: string;
 	onOpenComment?: (comment: CommentPaneData) => void;
-	onOpenPullRequest?: (ref: PullRequestRef) => void;
+	onOpenPullRequest?: OpenPullRequestPane;
 	onOpenInDiff?: (
 		path: string,
 		line?: number,
@@ -32,25 +34,9 @@ export function useReviewTab({
 	onOpenInDiff,
 }: UseReviewTabParams): SidebarTabDefinition {
 	const { t } = useLingui();
-	const prQuery = workspaceTrpc.git.getPullRequest.useQuery(
-		{ workspaceId },
-		{
-			enabled: !!workspaceId,
-			refetchInterval: 10_000,
-			refetchOnWindowFocus: true,
-			staleTime: 10_000,
-		},
-	);
-
+	const { query: prQuery, target } = useLinkedPullRequest(workspaceId);
 	const hasPR = prQuery.isSuccess && prQuery.data != null;
-	const threadsQuery = workspaceTrpc.git.getPullRequestThreads.useQuery(
-		{ workspaceId },
-		{
-			enabled: !!workspaceId && hasPR,
-			refetchInterval: 30_000,
-			refetchOnWindowFocus: true,
-		},
-	);
+	const threadsQuery = usePullRequestThreads(target, { enabled: hasPR });
 
 	const pr = useMemo<NormalizedPR | null>(() => {
 		const raw = prQuery.data;
@@ -87,6 +73,14 @@ export function useReviewTab({
 	const content = (
 		<ReviewTabContent
 			workspaceId={workspaceId}
+			pullRequest={target}
+			commentsUnavailable={
+				needsGithubConnection(threadsQuery.error)
+					? "needs-github"
+					: threadsQuery.isError || threadsQuery.data?.fetchFailed
+						? "failed"
+						: null
+			}
 			pr={pr}
 			comments={comments}
 			isLoading={prQuery.isLoading}

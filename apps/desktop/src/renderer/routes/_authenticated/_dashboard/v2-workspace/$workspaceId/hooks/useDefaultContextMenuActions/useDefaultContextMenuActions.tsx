@@ -22,18 +22,22 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-works
 import type {
 	BrowserPaneData,
 	DesktopPaneData,
+	PaneTarget,
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
+import { splitWithViewer } from "./utils/splitWithViewer";
 
 export function useDefaultContextMenuActions({
 	paneRegistry,
 	launcher,
+	viewer,
 }: {
 	paneRegistry: PaneRegistry<PaneViewerData>;
 	launcher: TerminalLauncher;
+	viewer: PaneTarget;
 }): ContextMenuActionConfig<PaneViewerData>[] {
 	const { t } = useLingui();
 	const splitDownShortcut = useHotkeyDisplay("SPLIT_DOWN").text;
@@ -97,7 +101,7 @@ export function useDefaultContextMenuActions({
 						? splitWithBrowserShortcut
 						: undefined,
 				onSelect: (ctx) => {
-					ctx.actions.split("right", {
+					splitWithViewer(ctx, viewer, {
 						kind: "browser",
 						data: {
 							url: defaultBrowserUrl,
@@ -114,7 +118,7 @@ export function useDefaultContextMenuActions({
 							}),
 							icon: <LuMonitor />,
 							onSelect: (ctx) => {
-								ctx.actions.split("right", {
+								splitWithViewer(ctx, viewer, {
 									kind: "desktop",
 									data: { kind: "desktop" } as DesktopPaneData,
 								});
@@ -196,6 +200,7 @@ export function useDefaultContextMenuActions({
 			defaultBrowserUrl,
 			t,
 			isSandbox,
+			viewer,
 		],
 	);
 }

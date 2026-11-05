@@ -6,6 +6,7 @@ import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { declineAnalytics } from "@/lib/analytics/decline";
 import { withPosthog } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
 
@@ -27,7 +28,7 @@ export function CookieConsent() {
 
 	const handleOptOut = () => {
 		localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
-		withPosthog((posthog) => posthog.opt_out_capturing());
+		withPosthog(declineAnalytics);
 		setShowBanner(false);
 	};
 
@@ -47,13 +48,13 @@ export function CookieConsent() {
 							experience.
 						</Trans>
 					</p>
-					<div className="mt-3 flex items-center justify-between">
+					<div className="mt-3 flex flex-col items-start gap-2">
 						<Button variant="link" asChild className="px-0">
 							<Link href="/privacy">
 								<Trans>Privacy policy</Trans>
 							</Link>
 						</Button>
-						<div className="flex items-center gap-2">
+						<div className="grid w-full grid-cols-2 gap-2">
 							<Button variant="outline" onClick={handleOptOut}>
 								<Trans>Opt-out</Trans>
 							</Button>

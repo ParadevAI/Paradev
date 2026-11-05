@@ -1,0 +1,1 @@
+export { AutumnIcon } from "./AutumnIcon";

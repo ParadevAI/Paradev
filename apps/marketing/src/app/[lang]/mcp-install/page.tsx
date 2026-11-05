@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
@@ -25,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 				message:
 					"Connect Claude, Codex, Cursor, or any MCP client to {companyName}. Create tasks, spin up workspaces, launch agents, and run automations straight from your AI agent.",
 			}),
-			values: { companyName: COMPANY.NAME },
+			values: { companyName: BRAND.NAME },
 		}),
 		alternates: localizedAlternates(lang, "/mcp-install"),
 	};
@@ -46,7 +47,7 @@ export default async function McpPage() {
 						<Trans>MCP Server</Trans>
 					</span>
 					<h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mt-4">
-						<Trans>Install Superset MCP in your client</Trans>
+						<Trans>Install Paradev MCP in your client</Trans>
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-lg">
 						<Trans>

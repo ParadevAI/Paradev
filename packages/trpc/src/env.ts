@@ -26,8 +26,20 @@ export const env = createEnv({
 		// path is exercised against an S3-compatible emulator in tests/dev.
 		R2_ENDPOINT: z.string().url(),
 		USERCONTENT_URL: z.string().url(),
+		// The usercontent Worker's media host (`/files/<id>` with a ticket).
+		// Its own env names the same value; the two must agree or every
+		// attachment URL the API mints points somewhere the Worker won't serve.
+		MEDIA_URL: z.string().url(),
 		STATIC_URL: z.string().url(),
 		USERCONTENT_TOKEN_SECRET: z.string().min(32),
+		AGENT_WORKER_SECRET: z.string().min(32),
+		AGENT_TURN_SIGNING_SECRET: z.string().min(32),
+		AGENT_SESSION_SECRET: z.string().min(32),
+		TEMPORAL_ADDRESS: z.string().min(1).optional(),
+		TEMPORAL_NAMESPACE: z.string().min(1).default("default"),
+		TEMPORAL_API_KEY: z.string().min(1).optional(),
+		// Local only: on Vercel the channel router calls Jev with the deployment's OIDC token.
+		VERCEL_AI_GATEWAY_KEY: z.string().min(1).optional(),
 		// Optional: page thumbnails are skipped wherever this is unset.
 		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),
 		POSTHOG_API_KEY: z.string(),
@@ -79,8 +91,8 @@ export const env = createEnv({
 		GH_APP_CLIENT_ID: z.string().min(1).optional(),
 		GH_APP_CLIENT_SECRET: z.string().min(1).optional(),
 		SERVER_ANTHROPIC_API_KEY: z.string().min(1),
-		// Optional: mobile voice mode reports "not configured" wherever this
-		// is unset, and everything else keeps booting. Prefixed like the
+		// Optional: mobile voice mode and dictation report "not configured"
+		// wherever this is unset, and everything else keeps booting. Prefixed like the
 		// Anthropic key: a plain OPENAI_API_KEY never reaches a cloud box.
 		SERVER_OPENAI_API_KEY: z.string().min(1).optional(),
 		RELAY_URL: z.string().url().default("https://relay.superset.sh"),
@@ -93,29 +105,14 @@ export const env = createEnv({
 		// Optional: the Google connector, and so the Gmail plugin, reports "not
 		// configured" wherever these are unset, and every other connector and
 		// the Google sign-in above keep working.
-		GOOGLE_TEMP_CLIENT_ID: z.string().min(1).optional(),
-		GOOGLE_TEMP_CLIENT_SECRET: z.string().min(1).optional(),
+		GOOGLE_CONNECTIONS_CLIENT_ID: z.string().min(1).optional(),
+		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1).optional(),
 		SENTRY_CLIENT_ID: z.string().optional(),
 		SENTRY_CLIENT_SECRET: z.string().optional(),
 		// Optional: the Teams integration is off wherever these are unset, and
 		// every other environment keeps booting.
 		MICROSOFT_CLIENT_ID: z.string().min(1).optional(),
 		MICROSOFT_CLIENT_SECRET: z.string().min(1).optional(),
-		STRIPE_SECRET_KEY: z.string().optional(),
-		MERCURY_API_TOKEN: z.string().optional(),
-		// Optional read-only PAT (no scopes needed), shared with apps/marketing.
-		// GitHub's stargazers endpoint requires authentication even for public
-		// repos; without it the star history tiles report "not available" and
-		// every other growth tile keeps working.
-		GITHUB_TOKEN: z.string().min(1).optional(),
-		// Optional: the admin Growth page's Search Console tiles report "not
-		// connected" wherever the service account is unset. The account must be
-		// added as a user of the property in Search Console.
-		GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT: z.string().min(1).optional(),
-		GOOGLE_SEARCH_CONSOLE_SITE_URL: z
-			.string()
-			.min(1)
-			.default("sc-domain:superset.sh"),
 		// Optional, falls back to NEXT_PUBLIC_API_URL: the origin an
 		// authorization server fetches a plugin's client id metadata document
 		// from. Only needs setting where NEXT_PUBLIC_API_URL is unreachable from

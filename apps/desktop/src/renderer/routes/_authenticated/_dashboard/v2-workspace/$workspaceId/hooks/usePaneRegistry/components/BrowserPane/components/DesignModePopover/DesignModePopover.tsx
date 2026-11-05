@@ -158,10 +158,11 @@ export function DesignModePopover({
 					workspaceId,
 					terminalId: resolved.terminalId,
 					text: prompt,
+					submit: false,
 				});
 				toast.success(
 					t({
-						message: "Sent to agent",
+						message: "Added to agent input",
 					}),
 				);
 				onFocusAgentTerminal?.(resolved.terminalId);

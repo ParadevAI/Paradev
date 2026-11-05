@@ -7,6 +7,8 @@ interface ChangesSearchInputProps {
 	onQueryChange: (query: string) => void;
 	/** Escape closes the row (the toolbar's toggle clears the query with it). */
 	onClose: () => void;
+	/** False where the row is always showing rather than opened on demand. */
+	autoFocus?: boolean;
 }
 
 /**
@@ -18,13 +20,14 @@ export function ChangesSearchInput({
 	query,
 	onQueryChange,
 	onClose,
+	autoFocus = true,
 }: ChangesSearchInputProps) {
 	const { t } = useLingui();
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		inputRef.current?.focus();
-	}, []);
+		if (autoFocus) inputRef.current?.focus();
+	}, [autoFocus]);
 
 	return (
 		<div className="mx-1.5 mt-1 flex items-center gap-1 rounded-md bg-fill-hover px-1.5">

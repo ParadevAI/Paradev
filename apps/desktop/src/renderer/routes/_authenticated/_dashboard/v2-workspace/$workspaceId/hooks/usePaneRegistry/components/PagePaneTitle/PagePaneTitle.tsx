@@ -40,7 +40,9 @@ export function PagePaneTitle({ data, paneId, onClose }: PagePaneTitleProps) {
 				page={page}
 				versions={versions}
 				editable={
-					currentUserId !== undefined && currentUserId === page.createdByUserId
+					page.canEdit ??
+					(currentUserId !== undefined &&
+						currentUserId === page.createdByUserId)
 				}
 				isOwner={
 					currentUserId !== undefined && currentUserId === page.createdByUserId

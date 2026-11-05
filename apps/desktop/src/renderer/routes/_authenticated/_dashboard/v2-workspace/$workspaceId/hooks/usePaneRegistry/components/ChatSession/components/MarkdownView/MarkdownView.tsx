@@ -7,6 +7,7 @@ import { memo, type ReactNode, useMemo } from "react";
 import { env } from "renderer/env.renderer";
 import { CHAT_MARKDOWN_COMPONENTS, CHAT_REMARK_PLUGINS } from "../../constants";
 import { pageLinkFinder } from "../../utils/pageLinks";
+import { CODE_CARD_CLASSNAME } from "../ChatCodeBlock";
 import { PageLinkCard } from "../PageLinkCard";
 import { pageLinksByBlock } from "./utils/pageLinksByBlock";
 import { planMarkdown } from "./utils/planMarkdown";
@@ -35,6 +36,7 @@ export function MarkdownView({
 	className,
 	fading = false,
 	final = false,
+	findItemId,
 	pageCards = false,
 	pagesShownEarlier = "",
 	text,
@@ -42,6 +44,8 @@ export function MarkdownView({
 	text: string;
 	className?: string;
 	fading?: boolean;
+	/** The item whose text this is, for the find bar to highlight within. */
+	findItemId?: string;
 	/** A page link also shows as a card, under the first settled block that has it. */
 	pageCards?: boolean;
 	/** The text has stopped growing, so its last block is settled too. */
@@ -85,7 +89,10 @@ export function MarkdownView({
 		blocks.push(
 			plan.tailFenceOpen ? (
 				<pre
-					className="overflow-hidden whitespace-pre-wrap break-words rounded-lg border border-border/60 bg-background px-3 py-2 font-mono text-xs"
+					className={cn(
+						"overflow-x-auto whitespace-pre px-3 py-2 font-mono text-xs",
+						CODE_CARD_CLASSNAME,
+					)}
 					key={`fence:${tailKey}`}
 				>
 					{plan.tail}
@@ -108,6 +115,7 @@ export function MarkdownView({
 				fading && "[&>*]:animate-block-fade motion-reduce:[&>*]:animate-none",
 				className,
 			)}
+			data-find-item={findItemId}
 		>
 			{blocks}
 		</div>

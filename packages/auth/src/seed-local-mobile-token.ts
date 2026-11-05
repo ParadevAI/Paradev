@@ -2,28 +2,24 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { decrypt } from "@superset/shared/auth-token-crypto";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { mintOneTimeToken, mintSessionForUser } from "./cloud-session";
 import { auth } from "./server";
 
 const ROOT_ENV_FILE = ".env";
 const ENV_VAR = "EXPO_PUBLIC_DEV_ONE_TIME_TOKEN";
-const GLOBAL_TOKEN_FILE = path.join(
-	os.homedir(),
-	".superset",
-	"auth-token.enc",
-);
+const GLOBAL_TOKEN_FILE = path.join(os.homedir(), ".paradev", "auth-token.enc");
 // apps/desktop/src/renderer/env.renderer.ts's own default for
-// NEXT_PUBLIC_API_URL — the one place the production API's domain is
-// otherwise only ever supplied by Vercel, never literally written down.
-const PRODUCTION_API_URL = "https://api.superset.sh";
+// NEXT_PUBLIC_API_URL.
+const PRODUCTION_API_URL = CANONICAL_URLS.API;
 
 /**
  * The local counterpart of seed-cloud-mobile-token.ts, run by
- * .superset/setup.sh (lib/setup/main.sh) right after step_seed_auth_token —
+ * .paradev/setup.sh (lib/setup/main.sh) right after step_seed_auth_token —
  * fully automated, so unlike that script it can't ask who you are. Instead
  * it reuses the same signal step_seed_auth_token already trusts: whatever
  * desktop sign-in already exists on this machine
- * ($HOME/.superset/auth-token.enc, machine-key encrypted). That token was
+ * ($HOME/.paradev/auth-token.enc, machine-key encrypted). That token was
  * minted against production, not this worktree's fresh Neon branch, so the
  * only way to learn who it belongs to is to ask production — the same
  * /api/auth/get-session call the real desktop app makes to validate its own

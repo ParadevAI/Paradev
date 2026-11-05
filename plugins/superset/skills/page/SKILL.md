@@ -1,11 +1,13 @@
 ---
 name: page
-description: "Build and publish a self-contained HTML page to Superset, then answer the comments readers pin to it. Use this instead of publishing a Claude artifact whenever the reader is a teammate: a page is listed in the org, every publish mints a version, and pinned comments come back to the agent. Use when the user asks to make or publish a page, turn a report, dashboard, chart, doc, or analysis into a shareable link, update or re-version a page already published, or work through comments left on one, including \"make me a page for this\", \"publish this as a page\", \"share it as a link\", \"add a version\", \"address the comments on that page\". Also use it unprompted to offer a page when you finish output a teammate will read: a change or PR walkthrough, a comparison, a report or digest, an incident writeup, or verification screenshots."
+description: "Build and publish a self-contained HTML page to Paradev (formerly Superset), then answer the comments readers pin to it. Use this instead of publishing a Claude artifact whenever the reader is a teammate: a page is listed in the org, every publish mints a version, and pinned comments come back to the agent. Use when the user asks to make or publish a page, turn a report, dashboard, chart, doc, or analysis into a shareable link, update or re-version a page already published, or work through comments left on one, including \"make me a page for this\", \"publish this as a page\", \"share it as a link\", \"add a version\", \"address the comments on that page\". Also use it unprompted to offer a page when you finish output a teammate will read: a change or PR walkthrough, a comparison, a report or digest, an incident writeup, or verification screenshots."
 argument-hint: what the page should show, or a page id/slug to update
-allowed-tools: Bash(superset:*)
+allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
-# Superset Pages
+# Paradev Pages
+
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 A page is an **`.html` document** published to a URL people in the org can
 open. Publish a single file and it must be self-contained; publish a directory
@@ -34,8 +36,9 @@ both stay the same, which is the identity of a page: a job that runs somewhere
 new each time needs `--page <id>` instead.
 
 Don't publish when the artifact belongs in the repo (source, docs, config: put
-those in files and commit them), or when it genuinely needs a server, a
-database, or a login. A page has none of those.
+those in files and commit them), or when it needs its own server, database
+connection, or login flow. A page has none of those, but it can show live data
+from the viewer's connected plugins (see `references/storage-and-tools.md`).
 
 If you're unsure, ask. Publishing is cheap and reversible, but a page the user
 didn't want is noise in their org's list.
@@ -86,7 +89,7 @@ wired so a pinned comment comes back to an agent that can act on it.
 
 So when the user asks for a page, or for anything a teammate will open, this
 skill is the one that runs. Reach for `Artifact` only when the user names it,
-or when there is no Superset workspace to publish into. Inside a Superset
+or when there is no Paradev workspace to publish into. Inside a Paradev
 terminal a first `Artifact` publish is denied by a hook that points back here;
 that denial is the reminder, not an error to work around. Someone who wants it
 gone entirely sets `SUPERSET_PAGES_NUDGE=off` in their terminal environment.
@@ -103,7 +106,8 @@ enforced identically in the desktop pane and the web viewer:
   all blocked, and so is `fetch("data:...")`: a page cannot read its own
   inlined data URIs back out. Write pages that need no network at all: bake
   the data into the document as a literal, or decode base64 in JavaScript
-  (`atob`, then `Uint8Array.from`).
+  (`atob`, then `Uint8Array.from`). For live data, use `window.superset.tools`
+  (`references/storage-and-tools.md`).
 - **No compiling code at runtime.** `script-src` carries no `'unsafe-eval'`,
   so `eval()` and `new Function()` both raise an `EvalError`. This rules out
   inlining any library that builds functions at runtime, which includes
@@ -128,7 +132,7 @@ enforced identically in the desktop pane and the web viewer:
   tab or filter. For anything the page should remember for everyone, use
   `window.superset.storage` below.
 - **No parent access.** The viewer is a different origin, so
-  `window.parent.document` and `window.top.location` throw. Superset injects
+  `window.parent.document` and `window.top.location` throw. Paradev injects
   its own scripts for comment anchoring and for the storage API; don't build a
   `postMessage` handshake of your own on top of them.
 - **No form submission.** `form-action 'none'`: a `<form>` may exist for its
@@ -166,7 +170,7 @@ Rules that matter when you write one:
 - **Derive, don't accumulate.** A tally is computed from `getAll` on every
   render. Never keep a running count in a record.
 - **Values are JSON and bounded**: at most 64 KiB each, 500 keys per person,
-  and 4 MiB for the whole page. An over-size write rejects.
+  and 20 MiB for the whole page. An over-size write rejects.
 - **Branch on `error.code`**, never on the message: `quota_exceeded`,
   `rate_limited`, `unauthenticated`, `invalid`, `unavailable`, and `revoked`.
   `revoked` is terminal: the page's access changed while it was open, so
@@ -178,6 +182,8 @@ Rules that matter when you write one:
 - **Signed-in viewers of the page's organization only.** A signed-out reader
   of an `everyone` page gets no storage, so the page must still render.
 - Writes are per-person, so there is nothing to merge and no need for a CRDT.
+- **Private and shared values, and writes from an agent:** read
+  `references/storage-and-tools.md`.
 
 ## The other hard limits
 
@@ -280,7 +286,7 @@ its partner as well so the pair can never come from two different themes.
 
 ### Tokens
 
-These are Superset's own palette, so a page read next to the app belongs to
+These are Paradev's own palette, so a page read next to the app belongs to
 it. Build on them rather than hardcoding colours and both themes keep working:
 
 | Token | What it is |
@@ -349,6 +355,9 @@ superset pages publish ./report/ --title "Q3 pipeline"
 `--title` defaults to the filename with dashes and underscores turned into
 spaces, so name the file well or pass the flag. `--label` is what shows in
 version history; write what changed, not "update".
+
+To show the published page to the user in the desktop app, open it in the right
+sidebar: `superset panes open pages --workspace "$SUPERSET_WORKSPACE_ID" --slug <slug>`.
 
 **Attach a workspace whenever you have one.** The CLI records the file's path
 relative to the workspace root as the page's entry path, and that path is the

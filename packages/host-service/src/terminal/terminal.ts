@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { basename, isAbsolute, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import type { NodeWebSocket } from "@hono/node-ws";
-import { resolveSupersetHomeDir } from "@superset/agent-setup/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { hasRunningForegroundProcess } from "@superset/pty-daemon/process-tree";
 import {
 	buildFishPromptCommandString,
@@ -13,6 +13,11 @@ import {
 	parsePromptHeredocCommand,
 	sanitizePromptForPty,
 } from "@superset/shared/agent-prompt-launch";
+import {
+	boundTranscriptText,
+	buildBoundedTerminalSessionTranscript,
+	TERMINAL_HANDOFF_MAX_CHARS,
+} from "@superset/shared/session-handoff";
 import {
 	createScanState,
 	type ShellReadyScanState,
@@ -22,11 +27,6 @@ import {
 	type TerminalColors,
 	terminalColorsSchema,
 } from "@superset/shared/terminal-colors";
-import {
-	boundTranscriptText,
-	buildBoundedTerminalSessionTranscript,
-	TERMINAL_HANDOFF_MAX_CHARS,
-} from "@superset/shared/terminal-session-handoff";
 import {
 	createTerminalTitleScanState,
 	scanForTerminalTitle,
@@ -40,6 +40,10 @@ import type { HostDb } from "../db/index.ts";
 import { projects, terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
+import {
+	getPathState,
+	inaccessiblePathMessage,
+} from "../runtime/path-state/index.ts";
 import { issueAttributionToken } from "../terminal-agents/attribution-token.ts";
 import { sweepAgentBindingsAfterDaemonLoss } from "../terminal-agents/daemon-loss-sweep.ts";
 import { terminalHarnessSession } from "../terminal-agents/harness-session-ref.ts";
@@ -879,6 +883,8 @@ export type TerminalSessionErrorKind =
 	| "WORKSPACE_NOT_FOUND"
 	/** The workspace row exists but its worktree is gone from disk. */
 	| "WORKTREE_GONE"
+	/** The worktree exists but this process may not read it (OS privacy controls). */
+	| "WORKTREE_INACCESSIBLE"
 	/**
 	 * The daemon could not be reached (stalled, restarting, bootstrap
 	 * pending). The supervisor heals these and the session may still come up
@@ -3048,7 +3054,14 @@ async function createTerminalSessionUnlocked({
 	if (!workspace) {
 		return { kind: "WORKSPACE_NOT_FOUND", error: "Workspace not found" };
 	}
-	if (!existsSync(workspace.worktreePath)) {
+	const worktreeState = getPathState(workspace.worktreePath);
+	if (worktreeState === "inaccessible") {
+		return {
+			kind: "WORKTREE_INACCESSIBLE",
+			error: inaccessiblePathMessage(workspace.worktreePath),
+		};
+	}
+	if (worktreeState === "missing") {
 		return {
 			kind: "WORKTREE_GONE",
 			error: `Workspace worktree no longer exists: ${workspace.worktreePath}`,
@@ -3090,7 +3103,7 @@ async function createTerminalSessionUnlocked({
 	// Fallback matters for hosts not spawned by the desktop (CLI/systemd):
 	// without it the wrapper paths, hook guard env, and shell bootstrap all
 	// silently disable (#6254).
-	const supersetHomeDir = resolveSupersetHomeDir();
+	const supersetHomeDir = resolveAppHomeDir();
 	const shell = resolveLaunchShell(baseEnv);
 	const shellArgs = getShellLaunchArgs({ shell, supersetHomeDir });
 	let pinsPublished = true;

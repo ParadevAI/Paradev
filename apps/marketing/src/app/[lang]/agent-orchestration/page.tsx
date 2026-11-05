@@ -1,4 +1,4 @@
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryArticle } from "@/app/[lang]/components/CategoryArticle";
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			description: page.description,
 			type: "article",
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			publishedTime: page.date,
 			modifiedTime: page.lastUpdated ?? page.date,
 		},

@@ -10,6 +10,7 @@ export interface ClipboardShortcutOptions {
 	isMac: boolean;
 	isWindows: boolean;
 	hasSelection: boolean;
+	appOwnsSelection: boolean;
 }
 
 /** Match VS Code's macOS terminal `Cmd+A` binding. */
@@ -37,6 +38,10 @@ export function shouldSelectAllShortcut(
  * chords the terminal wants to intercept (Cmd+Left/Right/Backspace, Cmd+A, etc.)
  * must run before this check in the caller.
  *
+ * The one exception is Ghostty's `performable` copy: Cmd+C with no selection
+ * reaches an app that owns the selection (it captures the mouse and reads kitty
+ * keys), as `CSI 99;9u`, so Codex or Claude Code can copy what it highlighted.
+ *
  * Windows/Linux have standard copy/paste keybinds that bubble selectively:
  * Ctrl+C only bubbles with a selection because it doubles as SIGINT.
  */
@@ -44,9 +49,16 @@ export function shouldBubbleClipboardShortcut(
 	event: ClipboardShortcutEvent,
 	options: ClipboardShortcutOptions,
 ): boolean {
-	const { isMac, isWindows, hasSelection } = options;
+	const { isMac, isWindows, hasSelection, appOwnsSelection } = options;
 
 	if (isMac) {
+		const onlyMetaC =
+			event.code === "KeyC" &&
+			event.metaKey &&
+			!event.ctrlKey &&
+			!event.altKey &&
+			!event.shiftKey;
+		if (onlyMetaC && !hasSelection && appOwnsSelection) return false;
 		return event.metaKey;
 	}
 

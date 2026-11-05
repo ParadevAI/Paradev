@@ -1,1 +1,0 @@
-export { AutomationsListWindow } from "./AutomationsListWindow";

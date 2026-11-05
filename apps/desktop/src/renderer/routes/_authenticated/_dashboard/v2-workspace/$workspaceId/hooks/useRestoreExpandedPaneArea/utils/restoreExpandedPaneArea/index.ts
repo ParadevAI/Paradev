@@ -1,0 +1,1 @@
+export { restoreExpandedPaneArea } from "./restoreExpandedPaneArea";

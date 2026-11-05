@@ -14,9 +14,6 @@ export const EFFORT_STORAGE_KEY = "lastSelectedV2WorkspaceCreateEffortByPreset";
 // JSON map of presetId → launch mode id; same contract as MODEL_STORAGE_KEY.
 export const MODE_STORAGE_KEY = "lastSelectedV2WorkspaceCreateModeByPreset";
 
-export const PILL_BUTTON_CLASS =
-	"!h-[22px] min-h-0 rounded-md border-[0.5px] border-border bg-foreground/[0.04] shadow-none text-[11px]";
-
 export interface ProjectOption {
 	id: string;
 	name: string;
@@ -27,3 +24,14 @@ export interface ProjectOption {
 	// set up. null when we couldn't check (offline / unreachable host).
 	needsSetup: boolean | null;
 }
+
+/** A repository the organization's GitHub App can see that no project checks out yet. */
+export interface GitHubRepositoryOption extends ProjectOption {
+	fullName: string;
+}
+
+/** How the project picker reaches the GitHub connection: the App's settings, or connecting one. */
+export type GitHubConnectionAction =
+	| { kind: "configure"; url: string }
+	| { kind: "connect" }
+	| null;

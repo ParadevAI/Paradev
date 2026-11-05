@@ -20,11 +20,8 @@ export {
 
 import fs from "node:fs";
 import os from "node:os";
-import { resolveSupersetHomeDir } from "@superset/agent-setup";
-import {
-	TERMINAL_TERM_PROGRAM,
-	TERMINAL_TERM_PROGRAM_VERSION,
-} from "@superset/shared/constants";
+import { resolveAppHomeDir } from "@superset/agent-setup";
+import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
 	augmentPathForMacOS,
@@ -43,6 +40,9 @@ let cachedMacosSystemCertAvailable: boolean | null = null;
  * variables. Node ignores the system store without them, so an agent in a
  * terminal that lost them fails every model call with a certificate error.
  */
+/** `client_ip client_port server_ip server_port`, as sshd sets it. */
+const SANDBOX_SSH_CONNECTION = "127.0.0.1 0 127.0.0.1 0";
+
 const SANDBOX_FIREWALL_CA_KEYS = [
 	"NODE_EXTRA_CA_CERTS",
 	"NODE_USE_SYSTEM_CA",
@@ -224,7 +224,7 @@ export function buildHostLaunchEnv(params: {
 	return buildV2TerminalEnv({
 		baseEnv,
 		shell: resolveLaunchShell(baseEnv),
-		supersetHomeDir: resolveSupersetHomeDir(),
+		supersetHomeDir: resolveAppHomeDir(),
 		organizationId: process.env.ORGANIZATION_ID || "",
 		themeType: params.themeType,
 		cwd: params.cwd,
@@ -272,13 +272,7 @@ export function buildV2TerminalEnv(
 
 	env.TERM = "xterm-256color";
 	env.SHELL = shell;
-	// See TERMINAL_TERM_PROGRAM for why we identify as kitty: the client's
-	// full-fidelity wheel handler produces a native-grade report stream that
-	// TUIs must trust as-is, not amplify with vscode-style compensation.
-	// Shift+Enter does NOT depend on this: line-edit-translations.ts sends
-	// ESC+CR directly.
-	env.TERM_PROGRAM = TERMINAL_TERM_PROGRAM;
-	env.TERM_PROGRAM_VERSION = TERMINAL_TERM_PROGRAM_VERSION;
+	for (const key of TERMINAL_IDENTITY_ENV_KEYS) delete env[key];
 	env.COLORTERM = "truecolor";
 	env.COLORFGBG = themeType === "light" ? "0;15" : "15;0";
 	// TERM_THEME is an explicit light/dark hint that cursor-agent (and other
@@ -338,6 +332,9 @@ export function buildV2TerminalEnv(
 		// Claude refuses `--dangerously-skip-permissions` unless told it is
 		// inside a sandbox, which is exactly what this is.
 		env.IS_SANDBOX = "1";
+		// The box's X display is real but nobody sees it. TUIs (Codex, Claude
+		// Code) send a copy to the user's terminal over OSC 52 only under SSH.
+		env.SSH_CONNECTION ??= SANDBOX_SSH_CONNECTION;
 	}
 
 	// Electron child processes can't access macOS Keychain for TLS cert verification,

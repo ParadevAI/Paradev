@@ -39,6 +39,12 @@ export function initSentry(options: { organizationId?: string }): void {
 	initialized = true;
 }
 
+/** A file a user attached that the agent did not get. */
+export function reportAttachmentResolveFailure(error: unknown): void {
+	if (!initialized) return;
+	Sentry.captureException(error, { tags: { attachment_resolve: "failed" } });
+}
+
 export async function captureFatalStartupError(error: unknown): Promise<void> {
 	if (!initialized) return;
 	Sentry.captureException(error);

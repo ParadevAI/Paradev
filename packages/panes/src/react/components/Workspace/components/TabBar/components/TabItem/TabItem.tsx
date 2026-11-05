@@ -7,6 +7,11 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
+import {
+	HEADER_TAB_CLOSE_CLASS,
+	headerTabClassName,
+} from "@superset/ui/lib/header-controls";
 import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -14,6 +19,7 @@ import { PencilIcon, XIcon } from "lucide-react";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { Tab } from "../../../../../../../types";
+import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
 import type { PaneRegistry } from "../../../../../../types";
 import { useTabTitle } from "../../../../utils/useTabTitle";
 import { PANE_DRAG_TYPE } from "../../../Tab/components/Pane/components/PaneHeader";
@@ -32,7 +38,9 @@ interface TabItemProps<TData> {
 	onClose: () => void;
 	onCloseOthers: () => void;
 	onCloseAll: () => void;
-	onRename: (title: string | undefined) => void;
+	onRename?: (title: string | undefined) => void;
+	onClick?: () => void;
+	isPreview?: boolean;
 	icon?: ReactNode;
 	accessory?: ReactNode;
 }
@@ -49,13 +57,17 @@ export function TabItem<TData>({
 	onCloseOthers,
 	onCloseAll,
 	onRename,
+	onClick,
+	isPreview = false,
 	icon,
 	accessory,
 }: TabItemProps<TData>) {
 	const { t } = useLingui();
+	const isCards = usePaneAppearance() === "cards";
 	const [isEditing, setIsEditing] = useState(false);
 	const [editValue, setEditValue] = useState("");
 	const title = useTabTitle(tab, tabs, registry);
+	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 
 	const startEditing = () => {
 		setEditValue(title);
@@ -69,9 +81,9 @@ export function TabItem<TData>({
 	const saveEdit = () => {
 		const nextTitle = editValue.trim();
 		if (nextTitle.length === 0) {
-			onRename(undefined);
+			onRename?.(undefined);
 		} else if (nextTitle !== title) {
-			onRename(nextTitle);
+			onRename?.(nextTitle);
 		}
 		stopEditing();
 	};
@@ -120,17 +132,24 @@ export function TabItem<TData>({
 				<div
 					ref={setRef}
 					className={cn(
-						"group relative flex h-full w-full items-center rounded-t-md transition-colors",
-						isActive
-							? "border border-border/70 border-b-transparent bg-background text-foreground"
-							: "border border-transparent border-b-border text-muted-foreground/70 hover:bg-muted/40 hover:text-muted-foreground",
+						isCards
+							? cn(headerTabClassName(isActive), "group relative w-full")
+							: cn(
+									"group relative flex h-full w-full items-center rounded-t-md transition-colors",
+									isActive
+										? "border border-border/70 border-b-transparent bg-background text-foreground"
+										: "border border-transparent border-b-border text-muted-foreground/70 hover:bg-muted/40 hover:text-muted-foreground",
+								),
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}
 					// Select on click, not mousedown: the browser suppresses click after a
 					// drag, so starting a drag (reorder, or merging a tab into a pane) no
 					// longer switches the active tab mid-gesture.
-					onClick={() => onSelect()}
+					onClick={() => {
+						onSelect();
+						onClick?.();
+					}}
 				>
 					{isEditing ? (
 						<div className="flex h-full w-full shrink-0 items-center px-2">
@@ -152,60 +171,95 @@ export function TabItem<TData>({
 								<TooltipTrigger asChild>
 									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
 									<div
-										className="flex h-full min-w-0 flex-1 items-center gap-1.5 pl-3 pr-1 text-left text-xs transition-colors"
+										className={cn(
+											"flex h-full min-w-0 flex-1 items-center gap-1.5 pr-1 text-left text-xs transition-colors",
+											isCards ? "pl-2.5" : "pl-3",
+										)}
 										onAuxClick={(event) => {
 											if (event.button === 1) {
 												event.preventDefault();
 												onClose();
 											}
 										}}
-										onDoubleClick={startEditing}
+										onDoubleClick={onRename ? startEditing : undefined}
 									>
 										{icon && <span className="shrink-0">{icon}</span>}
-										<OverflowFadeText className="flex-1">
+										<OverflowFadeText
+											className={cn("flex-1", isPreview && "italic")}
+										>
 											{title}
 										</OverflowFadeText>
 									</div>
 								</TooltipTrigger>
 								<TooltipContent side="bottom">{title}</TooltipContent>
 							</Tooltip>
-							<div className="relative flex h-full w-7 shrink-0 items-center justify-center">
+							<div
+								className={cn(
+									"relative flex h-full shrink-0 items-center justify-center",
+									isCards ? "mr-1 w-4" : "w-7",
+								)}
+							>
 								{accessory && (
 									<span className="pointer-events-none absolute inset-0 flex items-center justify-center leading-none opacity-100 transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
 										{accessory}
 									</span>
 								)}
-								<Button
-									aria-label={t({ message: "Close tab" })}
-									className={cn(
-										"pointer-events-none size-5 cursor-pointer text-current opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
-										isActive ? "hover:bg-muted" : "hover:bg-foreground/10",
-									)}
-									onClick={(event) => {
-										event.stopPropagation();
-										onClose();
-									}}
-									onMouseDown={(event) => {
-										event.preventDefault();
-										event.stopPropagation();
-									}}
-									size="icon"
-									type="button"
-									variant="ghost"
-								>
-									<XIcon className="size-3.5" />
-								</Button>
+								{isCards ? (
+									<button
+										aria-label={t({ message: "Close tab" })}
+										className={cn(
+											HEADER_TAB_CLOSE_CLASS,
+											"pointer-events-none cursor-pointer opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+										)}
+										onClick={(event) => {
+											event.stopPropagation();
+											onClose();
+										}}
+										onMouseDown={(event) => {
+											event.preventDefault();
+											event.stopPropagation();
+										}}
+										type="button"
+									>
+										<XIcon className="size-3" />
+									</button>
+								) : (
+									<Button
+										aria-label={t({ message: "Close tab" })}
+										className={cn(
+											"pointer-events-none size-5 cursor-pointer text-current opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+											isActive ? "hover:bg-muted" : "hover:bg-foreground/10",
+										)}
+										onClick={(event) => {
+											event.stopPropagation();
+											onClose();
+										}}
+										onMouseDown={(event) => {
+											event.preventDefault();
+											event.stopPropagation();
+										}}
+										size="icon"
+										type="button"
+										variant="ghost"
+									>
+										<XIcon className="size-3.5" />
+									</Button>
+								)}
 							</div>
 						</>
 					)}
 				</div>
 			</ContextMenuTrigger>
-			<ContextMenuContent>
-				<ContextMenuItem onSelect={startEditing}>
-					<PencilIcon className="mr-2 size-4" />
-					<Trans>Rename</Trans>
-				</ContextMenuItem>
-				<ContextMenuSeparator />
+			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
+				{onRename && (
+					<>
+						<ContextMenuItem onSelect={() => runAfterClose(startEditing)}>
+							<PencilIcon className="mr-2 size-4" />
+							<Trans>Rename</Trans>
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+					</>
+				)}
 				<ContextMenuItem onSelect={onClose}>
 					<XIcon className="mr-2 size-4" />
 					<Trans>Close</Trans>

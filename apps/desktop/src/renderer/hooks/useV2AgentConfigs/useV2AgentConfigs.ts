@@ -1,5 +1,7 @@
 import type { HostAgentConfig } from "@superset/host-service/settings";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
 export const V2_AGENT_CONFIGS_QUERY_KEY = ["host-agent-configs"] as const;
@@ -29,9 +31,16 @@ export function v2AgentConfigsQueryOptions(hostUrl: string | null) {
 }
 
 export function useV2AgentConfigs(hostUrl: string | null) {
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const select = useCallback(
+		(configs: HostAgentConfig[]) =>
+			configs.filter((config) => isAgentPresetEnabled(config.presetId)),
+		[isAgentPresetEnabled],
+	);
 	return useQuery({
 		...v2AgentConfigsQueryOptions(hostUrl),
 		enabled: !!hostUrl,
 		refetchOnWindowFocus: "always",
+		select,
 	});
 }

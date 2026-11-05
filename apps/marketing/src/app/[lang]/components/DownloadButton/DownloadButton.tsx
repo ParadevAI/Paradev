@@ -7,20 +7,13 @@ import {
 	HiMiniClock,
 	HiMiniEnvelope,
 } from "react-icons/hi2";
-import { track } from "@/lib/analytics";
+import { type DownloadSource, track } from "@/lib/analytics";
 import { isMacPlatform, Platform, usePlatform } from "../../hooks/useOS";
 
 interface DownloadButtonProps {
 	size?: "sm" | "md";
 	className?: string;
-	source?:
-		| "header"
-		| "hero"
-		| "footer"
-		| "pages"
-		| "automations"
-		| "browser"
-		| "plugins";
+	source?: DownloadSource;
 	onJoinWaitlist?: () => void;
 }
 
@@ -77,6 +70,24 @@ export function DownloadButton({
 			>
 				<span className="hidden sm:inline">
 					<Trans>Download for macOS</Trans>
+				</span>
+				<span className="sm:hidden">
+					<Trans>Download</Trans>
+				</span>
+				{downloadIcon}
+			</button>
+		);
+	}
+
+	if (platform === Platform.Linux) {
+		return (
+			<button
+				type="button"
+				className={buttonClasses}
+				onClick={goToInterstitial}
+			>
+				<span className="hidden sm:inline">
+					<Trans>Download for Linux</Trans>
 				</span>
 				<span className="sm:hidden">
 					<Trans>Download</Trans>

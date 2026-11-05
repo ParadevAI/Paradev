@@ -5,6 +5,8 @@ import {
 import { useCallback, useMemo } from "react";
 import type { MosaicBranch } from "react-mosaic-component";
 import { useCreateOrAttachWithTheme } from "renderer/hooks/useCreateOrAttachWithTheme";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
+import { isTerminalPresetEnabled } from "renderer/lib/agent-launch-command";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	buildTerminalCommand,
@@ -73,8 +75,16 @@ export function useTabsWithPresets(projectId?: string | null) {
 		() => ({ projectId: projectId ?? null }),
 		[projectId],
 	);
-	const { data: newTabPresets = [] } =
+	const { data: storedNewTabPresets } =
 		electronTrpc.settings.getNewTabPresets.useQuery(newTabPresetsInput);
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const newTabPresets = useMemo(
+		() =>
+			(storedNewTabPresets ?? []).filter((preset) =>
+				isTerminalPresetEnabled(preset, isAgentPresetEnabled),
+			),
+		[storedNewTabPresets, isAgentPresetEnabled],
+	);
 
 	const storeAddTab = useTabsStore((s) => s.addTab);
 	const storeAddTabWithMultiplePanes = useTabsStore(

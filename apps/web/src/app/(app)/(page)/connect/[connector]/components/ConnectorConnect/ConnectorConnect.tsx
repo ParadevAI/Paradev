@@ -246,7 +246,7 @@ export function ConnectorConnect({
 			{/* Answers "should I grant this?", which is decided once. Shown only
 			    before the first grant, like the desktop dialog — this screen is
 			    reached from a share link, where the person may not know what
-			    Superset is about to be allowed to do. */}
+			    Paradev is about to be allowed to do. */}
 			{connections.length === 0 && (
 				<div className="divide-y divide-border rounded-lg border">
 					<div className="px-4 py-3">
@@ -255,7 +255,7 @@ export function ConnectorConnect({
 						</div>
 						<p className="mt-0.5 text-muted-foreground text-xs">
 							<Trans>
-								Superset only receives the permissions this connector asks for.
+								Paradev only receives the permissions this connector asks for.
 								Disconnect at any time to revoke them.
 							</Trans>
 						</p>
@@ -266,7 +266,7 @@ export function ConnectorConnect({
 						</div>
 						<p className="mt-0.5 text-muted-foreground text-xs">
 							<Trans>
-								Tokens are held by Superset and attached to requests there. They
+								Tokens are held by Paradev and attached to requests there. They
 								are never written into your local agent config.
 							</Trans>
 						</p>

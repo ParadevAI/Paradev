@@ -1,10 +1,10 @@
-import { existsSync } from "node:fs";
 import { basename } from "node:path";
 import { workspaceTagsInputSchema } from "@superset/shared/workspace-tags";
 import { TRPCError } from "@trpc/server";
 import { eq, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { isMissingPath } from "../../../runtime/path-state";
 import {
 	getWorkspaceTags,
 	getWorkspaceTagsByWorkspaceId,
@@ -33,8 +33,40 @@ export const workspaceRouter = router({
 
 			return {
 				...localWorkspace,
-				worktreeExists: existsSync(localWorkspace.worktreePath),
+				worktreeExists: !isMissingPath(localWorkspace.worktreePath),
 			};
+		}),
+
+	/**
+	 * The repositories a workspace holds, primary first. A workspace holds one
+	 * repository, at its root, until multi-repo workspaces land; the shape is
+	 * the one they will return.
+	 */
+	repositories: protectedProcedure
+		.input(z.object({ workspaceId: z.string() }))
+		.query(({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			const project = workspace.projectId
+				? ctx.db.query.projects
+						.findFirst({ where: eq(projects.id, workspace.projectId) })
+						.sync()
+				: undefined;
+			return [
+				{
+					id: workspace.id,
+					path: ".",
+					name: basename(project?.repoPath ?? workspace.worktreePath),
+					primary: true,
+				},
+			];
 		}),
 
 	/**
@@ -96,7 +128,7 @@ export const workspaceRouter = router({
 				// Tombstones' worktrees are gone by definition; stat-checking an
 				// unbounded, forever-growing archive on every poll adds up.
 				worktreeExists:
-					row.archivedAt == null ? existsSync(row.worktreePath) : false,
+					row.archivedAt == null ? !isMissingPath(row.worktreePath) : false,
 				projectName: row.projectId
 					? (projectNameById.get(row.projectId) ?? null)
 					: null,

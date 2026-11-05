@@ -9,39 +9,36 @@ import {
 import {
 	LuArrowUp,
 	LuCheck,
+	LuCircleOff,
 	LuEllipsis,
-	LuPause,
-	LuPlay,
 	LuTrash2,
 } from "react-icons/lu";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import type { CatalogPlugin } from "renderer/hooks/usePluginCatalog";
+import { ManagedBadge } from "renderer/routes/_authenticated/_dashboard/plugins/components/ManagedBadge";
 import { PluginKindBadges } from "renderer/routes/_authenticated/_dashboard/plugins/components/PluginKindBadges";
 
 interface PluginCardProps {
 	plugin: CatalogPlugin;
 	isInstalled: boolean;
 	isConnected: boolean;
-	/** Installed but disabled: record kept, nothing materialized. */
-	isDisabled: boolean;
 	isBusy: boolean;
 	onOpen: (plugin: CatalogPlugin) => void;
 	onInstall: (plugin: CatalogPlugin) => void;
 	onUninstall: (plugin: CatalogPlugin) => void;
-	onSetEnabled: (name: string, enabled: boolean) => void;
-	onUpdate: (name: string) => void;
+	onDisable: (plugin: CatalogPlugin) => void;
+	onUpdate: (plugin: CatalogPlugin) => void;
 }
 
 export function PluginCard({
 	plugin,
 	isInstalled,
 	isConnected,
-	isDisabled,
 	isBusy,
 	onOpen,
 	onInstall,
 	onUninstall,
-	onSetEnabled,
+	onDisable,
 	onUpdate,
 }: PluginCardProps) {
 	const { t } = useLingui();
@@ -70,22 +67,15 @@ export function PluginCard({
 					    painting over the ··· menu. */}
 					<span className="truncate">{plugin.interface.displayName}</span>
 					<PluginKindBadges plugin={plugin} />
-					{/* One status, most blocking first: disabled runs nothing,
-					    unconnected cannot answer a tool call, and an outdated
-					    plugin still works. Two of these side by side read as one
-					    run-on string, which is what they did. */}
-					{isDisabled ? (
-						<span className="shrink-0 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-							<Trans>Disabled</Trans>
-						</span>
-					) : isInstalled && !isConnected ? (
+					{plugin.managed && <ManagedBadge compact />}
+					{isInstalled && !isConnected ? (
 						<span className="shrink-0 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
 							<Trans>Not connected</Trans>
 						</span>
 					) : isConnected ? (
 						<LuCheck className="size-3.5 shrink-0 text-muted-foreground" />
 					) : null}
-					{plugin.updateAvailable && !isDisabled && (
+					{plugin.updateAvailable && isInstalled && (
 						<Button
 							variant="outline"
 							size="xs"
@@ -93,7 +83,7 @@ export function PluginCard({
 							className="h-4 shrink-0 gap-0.5 rounded px-1 text-[9px] font-medium tracking-wide uppercase"
 							onClick={(event) => {
 								event.stopPropagation();
-								onUpdate(plugin.name);
+								onUpdate(plugin);
 							}}
 						>
 							<LuArrowUp className="size-2.5" />
@@ -120,35 +110,37 @@ export function PluginCard({
 							<LuEllipsis className="size-4" />
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
+					<DropdownMenuContent
+						align="end"
+						onClick={(event) => event.stopPropagation()}
+					>
 						{plugin.updateAvailable && (
 							<DropdownMenuItem
 								disabled={isBusy}
-								onSelect={() => onUpdate(plugin.name)}
+								onSelect={() => onUpdate(plugin)}
 							>
 								<LuArrowUp className="size-4" />
 								<Trans>Update</Trans>
 							</DropdownMenuItem>
 						)}
-						<DropdownMenuItem
-							disabled={isBusy}
-							onSelect={() => onSetEnabled(plugin.name, isDisabled)}
-						>
-							{isDisabled ? (
-								<LuPlay className="size-4" />
-							) : (
-								<LuPause className="size-4" />
-							)}
-							{isDisabled ? <Trans>Enable</Trans> : <Trans>Disable</Trans>}
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							variant="destructive"
-							disabled={isBusy}
-							onSelect={() => onUninstall(plugin)}
-						>
-							<LuTrash2 className="size-4" />
-							<Trans>Remove</Trans>
-						</DropdownMenuItem>
+						{plugin.managed ? (
+							<DropdownMenuItem
+								disabled={isBusy}
+								onSelect={() => onDisable(plugin)}
+							>
+								<LuCircleOff className="size-4" />
+								<Trans>Disable</Trans>
+							</DropdownMenuItem>
+						) : (
+							<DropdownMenuItem
+								variant="destructive"
+								disabled={isBusy}
+								onSelect={() => onUninstall(plugin)}
+							>
+								<LuTrash2 className="size-4" />
+								<Trans>Remove</Trans>
+							</DropdownMenuItem>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			) : (

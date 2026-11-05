@@ -1,3 +1,4 @@
+import { subagentStatusSchema } from "@superset/chat/protocol";
 import { z } from "zod";
 
 /**
@@ -14,6 +15,11 @@ export const acpTextContentSchema = z.looseObject({
 export const acpContentBlockSchema = z.looseObject({
 	type: z.string(),
 	text: z.string().optional(),
+	data: z.string().optional(),
+	mimeType: z.string().optional(),
+	uri: z.string().optional(),
+	name: z.string().optional(),
+	title: z.string().optional(),
 });
 export type AcpContentBlock = z.infer<typeof acpContentBlockSchema>;
 
@@ -25,6 +31,8 @@ export type AcpContentBlock = z.infer<typeof acpContentBlockSchema>;
  */
 export const acpInitializeResponseSchema = z.looseObject({
 	protocolVersion: z.number().optional(),
+	agentInfo: z.looseObject({ name: z.string().optional() }).optional(),
+	info: z.looseObject({ name: z.string().optional() }).optional(),
 	agentCapabilities: z.looseObject({}).optional(),
 	capabilities: z.looseObject({}).optional(),
 	authMethods: z.array(z.unknown()).optional(),
@@ -35,6 +43,18 @@ export const acpInitializeResponseSchema = z.looseObject({
 		.optional(),
 });
 export type AcpInitializeResponse = z.infer<typeof acpInitializeResponseSchema>;
+
+export const acpListSessionsResponseSchema = z.looseObject({
+	sessions: z.array(
+		z.looseObject({
+			sessionId: z.string().min(1),
+			cwd: z.string().min(1),
+			title: z.string().nullable().optional(),
+			updatedAt: z.string().nullable().optional(),
+		}),
+	),
+	nextCursor: z.string().nullable().optional(),
+});
 
 export const acpNewSessionResponseSchema = z.looseObject({
 	sessionId: z.string().min(1),
@@ -48,15 +68,40 @@ export const acpNewSessionResponseSchema = z.looseObject({
 		.optional(),
 });
 
+export const acpPromptUsageSchema = z.looseObject({
+	inputTokens: z.number().nonnegative(),
+	outputTokens: z.number().nonnegative(),
+	cachedReadTokens: z.number().nonnegative().nullish(),
+});
+export type AcpPromptUsage = z.infer<typeof acpPromptUsageSchema>;
+
 export const acpPromptResponseSchema = z.looseObject({
-	stopReason: z.string(),
+	stopReason: z.string().optional(),
+	messageId: z.string().optional(),
+	usage: acpPromptUsageSchema.optional().catch(undefined),
 });
 
 export const acpUsageUpdateSchema = z.looseObject({
+	used: z.number().nonnegative().optional().catch(undefined),
+	size: z.number().positive().optional().catch(undefined),
 	cost: z.unknown().optional(),
+	_meta: z
+		.looseObject({
+			"_claude/rateLimit": z.unknown().optional(),
+			"_claude/model": z.unknown().optional(),
+		})
+		.nullish()
+		.catch(undefined),
+});
+export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
+
+export const acpUsdCostSchema = z.looseObject({
+	amount: z.number().nonnegative(),
+	currency: z.literal("USD"),
 });
 
 export const ACP_STEERING_METHOD = "_session/steering";
+export const SUBAGENT_BACKGROUND_METHOD = "_sh.superset/subagent/background";
 
 export const acpSteeringResponseSchema = z.looseObject({
 	outcome: z.string(),
@@ -86,6 +131,10 @@ const acpToolCallContentSchema = z.looseObject({
 		.looseObject({ format: z.string().optional(), text: z.string() })
 		.nullable()
 		.optional(),
+	_meta: z
+		.looseObject({ kind: z.string().optional() })
+		.optional()
+		.catch(undefined),
 });
 export type AcpToolCallContent = z.infer<typeof acpToolCallContentSchema>;
 
@@ -109,6 +158,19 @@ export const acpToolCallUpdateSchema = z.looseObject({
 	locations: z.array(acpLocationSchema).nullable().optional(),
 	rawInput: z.unknown().optional(),
 	rawOutput: z.unknown().optional(),
+	_meta: z
+		.looseObject({
+			claudeCode: z
+				.looseObject({
+					toolName: z.string().optional(),
+					mcpServer: z
+						.looseObject({ name: z.string(), source: z.string().optional() })
+						.optional(),
+				})
+				.optional(),
+		})
+		.nullish()
+		.catch(undefined),
 });
 export type AcpToolCallUpdate = z.infer<typeof acpToolCallUpdateSchema>;
 
@@ -125,6 +187,10 @@ export const acpAvailableCommandsUpdateSchema = z.looseObject({
 			description: z.string().optional(),
 			input: z
 				.looseObject({ hint: z.string().optional() })
+				.nullable()
+				.optional(),
+			_meta: z
+				.looseObject({ command_category: z.unknown().optional() })
 				.nullable()
 				.optional(),
 		}),
@@ -169,6 +235,10 @@ export const acpPlanUpdateSchema = z.looseObject({
 export const acpStateUpdateSchema = z.looseObject({
 	state: z.string(),
 	stopReason: z.string().nullable().optional(),
+	error: z
+		.looseObject({ message: z.string().optional() })
+		.nullable()
+		.optional(),
 });
 
 /**
@@ -179,9 +249,60 @@ export const acpSubagentUpdateSchema = z.looseObject({
 	sessionId: z.string().min(1),
 	title: z.string().nullable().optional(),
 	description: z.string().nullable().optional(),
-	state: z.looseObject({ state: z.string() }).nullable().optional(),
+	state: z
+		.looseObject({
+			state: z.string(),
+			stopReason: z.string().nullable().optional(),
+		})
+		.nullable()
+		.optional(),
+	capabilities: z
+		.looseObject({
+			cancel: z.unknown().optional(),
+			_meta: z
+				.looseObject({
+					"sh.superset": z
+						.looseObject({
+							prompt: z.unknown().optional(),
+							background: z.unknown().optional(),
+						})
+						.nullable()
+						.optional(),
+				})
+				.nullable()
+				.optional(),
+		})
+		.nullable()
+		.optional(),
+	_meta: z
+		.looseObject({
+			"sh.superset": z
+				.looseObject({
+					toolCallId: z.string().min(1).optional(),
+					name: z.string().min(1).optional().catch(undefined),
+					status: subagentStatusSchema.optional().catch(undefined),
+				})
+				.nullable()
+				.optional(),
+		})
+		.nullable()
+		.optional(),
 });
 export type AcpSubagentUpdate = z.infer<typeof acpSubagentUpdateSchema>;
+
+export const acpSessionMessageSchema = z.looseObject({
+	messageId: z.string().min(1),
+	senderSessionId: z.string().min(1),
+	recipientSessionId: z.string().min(1),
+	content: z.array(acpContentBlockSchema).nullable().optional(),
+});
+
+export const acpSessionMessageChunkSchema = z.looseObject({
+	messageId: z.string().min(1),
+	senderSessionId: z.string().min(1),
+	recipientSessionId: z.string().min(1),
+	content: acpContentBlockSchema,
+});
 
 export const acpSessionInfoUpdateSchema = z.looseObject({
 	title: z.string().nullable().optional(),
@@ -269,8 +390,56 @@ export type AcpPermissionOption = z.infer<typeof acpPermissionOptionSchema>;
 export const acpRequestPermissionParamsSchema = z.looseObject({
 	sessionId: z.string().min(1),
 	toolCall: acpToolCallUpdateSchema.partial({ toolCallId: true }).optional(),
+	title: z.string().nullable().optional(),
+	description: z.string().nullable().optional(),
+	subject: z
+		.looseObject({
+			toolCall: z
+				.looseObject({ title: z.string().nullable().optional() })
+				.nullable()
+				.optional(),
+		})
+		.nullable()
+		.optional(),
 	options: z.array(acpPermissionOptionSchema),
 });
 export type AcpRequestPermissionParams = z.infer<
 	typeof acpRequestPermissionParamsSchema
 >;
+
+const acpEnumOptionSchema = z.looseObject({
+	const: z.string(),
+	title: z.string().optional(),
+	description: z.string().optional(),
+});
+
+export const acpElicitationPropertySchema = z.looseObject({
+	type: z.string().optional(),
+	title: z.string().optional(),
+	description: z.string().optional(),
+	enum: z.array(z.string()).optional(),
+	enumNames: z.array(z.string()).optional(),
+	oneOf: z.array(acpEnumOptionSchema).optional(),
+	items: z
+		.looseObject({
+			enum: z.array(z.string()).optional(),
+			anyOf: z.array(acpEnumOptionSchema).optional(),
+		})
+		.optional(),
+});
+export type AcpElicitationProperty = z.infer<
+	typeof acpElicitationPropertySchema
+>;
+
+export const acpCreateElicitationParamsSchema = z.looseObject({
+	sessionId: z.string().min(1).optional(),
+	mode: z.string().optional(),
+	message: z.string(),
+	toolCallId: z.string().min(1).optional(),
+	requestedSchema: z
+		.looseObject({
+			properties: z.record(z.string(), acpElicitationPropertySchema).optional(),
+			required: z.array(z.string()).optional(),
+		})
+		.optional(),
+});

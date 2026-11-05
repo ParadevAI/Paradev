@@ -66,6 +66,7 @@ function renderBody(props: Partial<BodyProps> = {}) {
 					locationSection={<div data-testid="location" />}
 					agentAccounts={null}
 					scriptsEditor={<div data-testid="scripts" />}
+					usesConfigToml={false}
 					dangerZone={<div data-testid="danger" />}
 					{...props}
 				/>

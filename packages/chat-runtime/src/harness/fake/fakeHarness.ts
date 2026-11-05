@@ -19,6 +19,8 @@ export type FakeHarnessScript = {
 	turns: ScriptedEvent[][];
 	steer?: boolean;
 	steerDelayMs?: number;
+	steerableSubagents?: string[];
+	backgroundableSubagents?: string[];
 };
 
 type PendingApproval = {
@@ -80,7 +82,10 @@ export class FakeHarness implements HarnessAdapter {
 		return this.queue.iterable();
 	}
 
-	prompt(_content: UserContent[]): void {
+	readonly prompted: UserContent[][] = [];
+
+	prompt(content: UserContent[]): void {
+		this.prompted.push(content);
 		const turn = this.script.turns[this.nextTurnIndex];
 		if (!turn) throw new Error("fake harness script exhausted");
 		this.nextTurnIndex += 1;
@@ -102,6 +107,25 @@ export class FakeHarness implements HarnessAdapter {
 			await sleep(this.script.steerDelayMs);
 		}
 		return this.script.steer === true;
+	}
+
+	readonly steeredSubagents: { taskId: string; content: UserContent[] }[] = [];
+
+	async steerSubagent(
+		taskId: string,
+		content: UserContent[],
+	): Promise<boolean> {
+		if (!this.script.steerableSubagents?.includes(taskId)) return false;
+		this.steeredSubagents.push({ taskId, content });
+		return true;
+	}
+
+	readonly backgroundedSubagents: string[] = [];
+
+	async backgroundSubagent(taskId: string): Promise<boolean> {
+		if (!this.script.backgroundableSubagents?.includes(taskId)) return false;
+		this.backgroundedSubagents.push(taskId);
+		return true;
 	}
 
 	cancelTurn(): void {

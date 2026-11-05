@@ -1,11 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import type { ApprovalRequest, Decision } from "@superset/chat/protocol";
-import { ShieldQuestion } from "lucide-react-native";
+import { MessageCircleQuestion, ShieldQuestion } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
+import { AskerLabel } from "./components/AskerLabel";
 
 const DETAIL_CHARS = 600;
 
@@ -48,9 +49,11 @@ function choices(
 
 export function ApprovalCard({
 	approval,
+	asker,
 	onRespond,
 }: {
 	approval: ApprovalRequest;
+	asker?: string | undefined;
 	onRespond: (approvalId: string, decision: Decision) => Promise<void>;
 }) {
 	const [sending, setSending] = useState(false);
@@ -70,6 +73,46 @@ export function ApprovalCard({
 		);
 	}
 
+	if (approval.form) {
+		return (
+			<View className="w-full gap-3 rounded-xl border border-white/10 bg-[#1C1C1C] p-3">
+				{asker ? <AskerLabel name={asker} /> : null}
+				<View className="flex-row items-center gap-2">
+					<Icon
+						as={MessageCircleQuestion}
+						className="text-muted-foreground size-4"
+					/>
+					<Text className="text-foreground min-w-0 flex-1 text-[14px] font-medium">
+						{approval.form.message}
+					</Text>
+				</View>
+				<Text className="text-muted-foreground text-xs">
+					<Trans>Answer this question on desktop, or skip it.</Trans>
+				</Text>
+				<View className="flex-row justify-end">
+					<Pressable
+						accessibilityRole="button"
+						className={cn(
+							"rounded-md bg-white/10 px-3 py-1.5 active:opacity-70",
+							sending && "opacity-50",
+						)}
+						disabled={sending}
+						onPress={() => {
+							setSending(true);
+							void onRespond(approval.id, { type: "decline" }).finally(() =>
+								setSending(false),
+							);
+						}}
+					>
+						<Text className="text-foreground text-[13px] font-medium">
+							<Trans>Skip</Trans>
+						</Text>
+					</Pressable>
+				</View>
+			</View>
+		);
+	}
+
 	const detail = detailText(approval);
 	const long = detail.length > DETAIL_CHARS;
 	const respond = (decision: Decision) => {
@@ -79,6 +122,7 @@ export function ApprovalCard({
 
 	return (
 		<View className="w-full gap-3 rounded-xl border border-white/10 bg-[#1C1C1C] p-3">
+			{asker ? <AskerLabel name={asker} /> : null}
 			<View className="flex-row items-center gap-2">
 				<Icon as={ShieldQuestion} className="text-muted-foreground size-4" />
 				<Text className="text-foreground min-w-0 flex-1 text-[14px] font-medium">

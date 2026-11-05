@@ -21,11 +21,13 @@ const ORG = "11111111-1111-4111-8111-111111111111";
 const AUTHOR = "22222222-2222-4222-8222-222222222222";
 const MEMBER = "33333333-3333-4333-8333-333333333333";
 const OUTSIDER = "44444444-4444-4444-8444-444444444444";
+const BUSY_WRITER = "55555555-5555-4555-8555-555555555555";
 const ORG_PAGE = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa";
 const LEGACY_PAGE = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb";
 const PRIVATE_PAGE = "cccccccc-3333-4333-8333-cccccccccccc";
 const PUBLIC_PAGE = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee";
 const GUEST = "f0f0f0f0-6666-4666-8666-f0f0f0f0f0f0";
+const SHARED_ONLY_WRITER = "66666666-6666-4666-8666-666666666666";
 
 let failures = 0;
 const check = (name: string, ok: boolean, detail?: unknown) => {
@@ -365,11 +367,12 @@ async function main() {
 	}
 	const hello = first.first as Record<string, unknown>;
 	check(
-		"hello carries viewer, author and writable",
+		"hello carries viewer, author, writable and scopes",
 		hello.type === "hello" &&
 			(hello.viewer as Record<string, unknown>).userId === AUTHOR &&
 			hello.author === true &&
-			hello.writable === true,
+			hello.writable === true &&
+			hello.scopes === true,
 		hello,
 	);
 
@@ -554,6 +557,388 @@ async function main() {
 		"readback accepts a token shaped like the CLI's OAuth access token",
 		readbackOAuth.status === 200,
 		readbackOAuth,
+	);
+
+	console.log("\nscopes");
+	const scopedReadback = async (jwt: string, key: string, scope: string) => {
+		const response = await fetch(
+			`${base}/v2/page/${ORG_PAGE}/storage/records?key=${encodeURIComponent(key)}&scope=${scope}`,
+			{ headers: { authorization: `Bearer ${jwt}` } },
+		);
+		return {
+			status: response.status,
+			body: (await response.json().catch(() => null)) as Record<
+				string,
+				unknown
+			> | null,
+		};
+	};
+	const recordsOf = (reply: Record<string, unknown>) =>
+		((reply.result as { records?: Record<string, unknown>[] } | undefined)
+			?.records ?? []) as Record<string, unknown>[];
+
+	const privateWrite = await rpc(
+		other.socket,
+		{ op: "set", key: "note", value: "secret", scope: "private" },
+		"s1",
+	);
+	const ownPrivate = await rpc(
+		other.socket,
+		{ op: "getAll", key: "note", scope: "private" },
+		"s2",
+	);
+	check(
+		"a member reads back their own private record",
+		privateWrite.ok === true &&
+			recordsOf(ownPrivate).length === 1 &&
+			recordsOf(ownPrivate)[0]?.value === "secret",
+		{ privateWrite, ownPrivate },
+	);
+
+	const peekAll = await rpc(
+		first.socket,
+		{ op: "getAll", key: "note", scope: "private" },
+		"s3",
+	);
+	const peekOne = await rpc(
+		first.socket,
+		{ op: "get", key: "note", scope: "private" },
+		"s4",
+	);
+	const peekReadback = await scopedReadback(authorJwt, "note", "private");
+	const peekKeys = await readback(ORG_PAGE, authorJwt);
+	check(
+		"another member never sees a private record over getAll, get or readback",
+		recordsOf(peekAll).length === 0 &&
+			(peekOne.result as { value?: unknown } | undefined)?.value === null &&
+			peekReadback.status === 200 &&
+			((peekReadback.body?.records ?? []) as unknown[]).length === 0 &&
+			!((peekKeys.body?.keys ?? []) as Record<string, unknown>[]).some(
+				(entry) => entry.key === "note",
+			),
+		{ peekAll, peekOne, peekReadback, peekKeys },
+	);
+
+	const sharedFirst = await rpc(
+		first.socket,
+		{ op: "set", key: "board", value: "A", scope: "shared" },
+		"s5",
+	);
+	const sharedSecond = await rpc(
+		other.socket,
+		{ op: "set", key: "board", value: "B", scope: "shared" },
+		"s6",
+	);
+	const sharedRead = await rpc(
+		first.socket,
+		{ op: "getAll", key: "board", scope: "shared" },
+		"s7",
+	);
+	const sharedReadback = await scopedReadback(authorJwt, "board", "shared");
+	const sharedRecords = (sharedReadback.body?.records ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"a shared write overwrites the last one and names the last writer",
+		sharedFirst.ok === true &&
+			sharedSecond.ok === true &&
+			recordsOf(sharedRead).length === 1 &&
+			recordsOf(sharedRead)[0]?.value === "B" &&
+			sharedReadback.status === 200 &&
+			sharedReadback.body?.scope === "shared" &&
+			sharedRecords.length === 1 &&
+			sharedRecords[0]?.value === "B" &&
+			sharedRecords[0]?.userId === MEMBER &&
+			sharedRecords[0]?.name === "Grace",
+		{ sharedRead, sharedReadback },
+	);
+
+	const badScopeReadback = await scopedReadback(authorJwt, "board", "global");
+	check(
+		"readback refuses an unknown scope",
+		badScopeReadback.status === 400,
+		badScopeReadback,
+	);
+
+	const keysOf = (reply: Record<string, unknown>) =>
+		(
+			((reply.result as { keys?: { key: string }[] } | undefined)?.keys ??
+				[]) as { key: string }[]
+		).map((entry) => entry.key);
+	await rpc(
+		first.socket,
+		{ op: "set", key: "list:private", value: 1, scope: "private" },
+		"l1",
+	);
+	await rpc(
+		first.socket,
+		{ op: "set", key: "list:shared", value: 1, scope: "shared" },
+		"l2",
+	);
+	await rpc(first.socket, { op: "set", key: "list:slot", value: 1 }, "l3");
+	await rpc(first.socket, { op: "set", key: "other:slot", value: 1 }, "l4");
+	const ownList = await rpc(
+		first.socket,
+		{ op: "list", prefix: "list:", scope: "private" },
+		"l5",
+	);
+	const peekList = await rpc(
+		other.socket,
+		{ op: "list", prefix: "list:", scope: "private" },
+		"l6",
+	);
+	const sharedList = await rpc(
+		other.socket,
+		{ op: "list", prefix: "list:", scope: "shared" },
+		"l7",
+	);
+	const slotList = await rpc(
+		other.socket,
+		{ op: "list", prefix: "list:" },
+		"l8",
+	);
+	check(
+		"list shows another member's shared and slot keys under a prefix, never their private keys",
+		keysOf(ownList).join() === "list:private" &&
+			keysOf(peekList).length === 0 &&
+			peekList.ok === true &&
+			keysOf(sharedList).join() === "list:shared" &&
+			keysOf(slotList).join() === "list:slot",
+		{ ownList, peekList, sharedList, slotList },
+	);
+
+	console.log("\nwrite route");
+	const writeRoute = async (jwt: string | null, body: unknown) => {
+		const response = await fetch(
+			`${base}/v2/page/${ORG_PAGE}/storage/records`,
+			{
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+					...(jwt ? { authorization: `Bearer ${jwt}` } : {}),
+				},
+				body: JSON.stringify(body),
+			},
+		);
+		return {
+			status: response.status,
+			body: (await response.json().catch(() => null)) as Record<
+				string,
+				unknown
+			> | null,
+		};
+	};
+
+	const agentWrite = await writeRoute(memberJwt, {
+		op: "set",
+		key: "agent",
+		value: "from the agent",
+	});
+	const agentReadback = await readback(ORG_PAGE, authorJwt, "agent");
+	const agentRecords = (agentReadback.body?.records ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"a member's write through the route is visible in readback",
+		agentWrite.status === 200 &&
+			agentWrite.body?.ok === true &&
+			agentRecords.length === 1 &&
+			agentRecords[0]?.userId === MEMBER &&
+			agentRecords[0]?.value === "from the agent",
+		{ agentWrite, agentReadback },
+	);
+
+	const outsiderWrite = await writeRoute(outsiderJwt, {
+		op: "set",
+		key: "agent",
+		value: "nope",
+	});
+	check(
+		"the write route refuses a viewer from another organization",
+		outsiderWrite.status === 403,
+		outsiderWrite,
+	);
+
+	const anonymousWrite = await writeRoute(null, {
+		op: "set",
+		key: "agent",
+		value: "nope",
+	});
+	check(
+		"the write route refuses a request with no JWT",
+		anonymousWrite.status === 401,
+		anonymousWrite,
+	);
+
+	const badScopeWrite = await writeRoute(memberJwt, {
+		op: "set",
+		key: "agent",
+		value: "nope",
+		scope: "global",
+	});
+	check(
+		"the write route refuses an unknown scope",
+		badScopeWrite.status === 400,
+		badScopeWrite,
+	);
+
+	const namelessWrite = await writeRoute(oauthJwt, {
+		op: "set",
+		key: "agent-named",
+		value: "from the CLI",
+	});
+	const namelessReadback = await readback(ORG_PAGE, memberJwt, "agent-named");
+	const namelessRecords = (namelessReadback.body?.records ?? []) as Record<
+		string,
+		unknown
+	>[];
+	check(
+		"a write with a token that has no name keeps the writer's stored name",
+		namelessWrite.status === 200 &&
+			namelessRecords.length === 1 &&
+			namelessRecords[0]?.userId === AUTHOR &&
+			namelessRecords[0]?.name === "Ada",
+		{ namelessWrite, namelessReadback },
+	);
+
+	const oversizedWrite = await writeRoute(memberJwt, {
+		op: "set",
+		key: "agent",
+		value: "x".repeat(70 * 1024),
+	});
+	check(
+		"the write route refuses a body larger than one value",
+		oversizedWrite.status === 413 &&
+			oversizedWrite.body?.code === "quota_exceeded",
+		oversizedWrite,
+	);
+
+	const chunk = new TextEncoder().encode("x".repeat(8 * 1024));
+	let chunksSent = 0;
+	const streamedWrite = await fetch(
+		`${base}/v2/page/${ORG_PAGE}/storage/records`,
+		{
+			method: "POST",
+			headers: {
+				"content-type": "application/json",
+				authorization: `Bearer ${memberJwt}`,
+			},
+			body: new ReadableStream<Uint8Array>({
+				pull(controller) {
+					if (chunksSent++ >= 12) controller.close();
+					else controller.enqueue(chunk);
+				},
+			}),
+			duplex: "half",
+		} as RequestInit,
+	);
+	const streamedBody = (await streamedWrite.json().catch(() => null)) as {
+		code?: string;
+	} | null;
+	check(
+		"the write route refuses an oversized body sent with no Content-Length",
+		streamedWrite.status === 413 && streamedBody?.code === "quota_exceeded",
+		{ status: streamedWrite.status, streamedBody },
+	);
+
+	const busyJwt = await mint(BUSY_WRITER, [ORG], "Busy");
+	let throttled: Awaited<ReturnType<typeof writeRoute>> | null = null;
+	for (let n = 0; n < 130 && !throttled; n++) {
+		const write = await writeRoute(busyJwt, {
+			op: "set",
+			key: "busy",
+			value: n,
+		});
+		if (write.status === 429) throttled = write;
+	}
+	check(
+		"the write route is rate-limited per writer",
+		throttled?.body?.code === "rate_limited",
+		throttled,
+	);
+
+	console.log("\nscoped pushes");
+	const inbox = (socket: WebSocket) => {
+		const seen: Record<string, unknown>[] = [];
+		socket.addEventListener("message", (event) => {
+			const data = JSON.parse(String(event.data));
+			if (data.type === "records") seen.push(data);
+		});
+		return seen;
+	};
+	const unscoped = await open(
+		String((await ticket(ORG_PAGE, authorJwt)).url),
+		pageOrigin,
+	);
+	const unscopedSeen = inbox(unscoped.socket);
+	const authorSeen = inbox(first.socket);
+	const memberSeen = inbox(other.socket);
+
+	await rpc(
+		other.socket,
+		{ op: "set", key: "vote", value: "Shared", scope: "shared" },
+		"p1",
+	);
+	await new Promise((r) => setTimeout(r, 300));
+	check(
+		"a socket that never sent a scoped op gets no shared push",
+		unscopedSeen.length === 0 &&
+			authorSeen.some((m) => m.scope === "shared" && m.key === "vote"),
+		{ unscopedSeen, authorSeen },
+	);
+
+	authorSeen.length = 0;
+	memberSeen.length = 0;
+	await rpc(
+		other.socket,
+		{ op: "set", key: "vote", value: "Mine", scope: "private" },
+		"p2",
+	);
+	await new Promise((r) => setTimeout(r, 300));
+	check(
+		"a private push reaches only its owner",
+		unscopedSeen.length === 0 &&
+			authorSeen.length === 0 &&
+			memberSeen.some((m) => m.scope === "private" && m.key === "vote"),
+		{ unscopedSeen, authorSeen, memberSeen },
+	);
+	unscoped.socket.close();
+
+	const sharedOnlyJwt = await mint(SHARED_ONLY_WRITER, [ORG], "Lin");
+	await writeRoute(sharedOnlyJwt, {
+		op: "set",
+		key: "anonymized",
+		value: "kept",
+		scope: "shared",
+	});
+	await new Promise((r) => setTimeout(r, 300));
+	memberSeen.length = 0;
+	const anonymizedPurge = await fetch(
+		`${base}/v2/page/${ORG_PAGE}/storage/admin`,
+		{
+			method: "POST",
+			headers: {
+				authorization: `Bearer ${SECRET}`,
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({ op: "clearUser", userId: SHARED_ONLY_WRITER }),
+		},
+	);
+	const anonymizedBody = (await anonymizedPurge.json()) as {
+		cleared?: number;
+	};
+	await new Promise((r) => setTimeout(r, 300));
+	const anonymizedPush = memberSeen.findLast(
+		(m) => m.scope === "shared" && m.key === "anonymized",
+	) as { records?: { userId?: string; value?: unknown }[] } | undefined;
+	check(
+		"clearUser pushes a shared key it only anonymized",
+		anonymizedBody.cleared === 0 &&
+			anonymizedPush?.records?.[0]?.value === "kept" &&
+			anonymizedPush?.records?.[0]?.userId === "",
+		{ anonymizedBody, anonymizedPush },
 	);
 
 	console.log("\nrevocation");

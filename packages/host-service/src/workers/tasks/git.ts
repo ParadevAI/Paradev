@@ -3,8 +3,13 @@
 // host-service event loop. Credential env is resolved in-process (it needs
 // the credential provider) and crosses as plain data.
 
-import { existsSync, mkdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import {
+	detectExternalWorktrees,
+	EXTERNAL_WORKTREE_SOURCES,
+	type ExternalWorktreeRepo,
+} from "../../projects/external-worktrees/index.ts";
 import {
 	getGitAuthorName,
 	type ResolvedGitInfo,
@@ -12,6 +17,7 @@ import {
 } from "../../runtime/git/identity.ts";
 import { resolveRef } from "../../runtime/git/refs.ts";
 import { createUserSimpleGit } from "../../runtime/git/simple-git.ts";
+import { isMissingPath } from "../../runtime/path-state/index.ts";
 import {
 	readWorkspaceRefs,
 	type WorkspaceRefsSnapshot,
@@ -691,7 +697,7 @@ export const gitRestoreWorktreeTask = defineWorkerTask<
 				? { kind: "already-registered" }
 				: { kind: "registered-elsewhere", path: registeredPath };
 		}
-		if (existsSync(worktreePath)) return { kind: "path-occupied" };
+		if (!isMissingPath(worktreePath)) return { kind: "path-occupied" };
 
 		let ref = await resolveRef(git, branch, { remote: remoteName });
 		if (ref?.kind !== "local" && ref?.kind !== "remote-tracking") {
@@ -723,6 +729,27 @@ export const gitRestoreWorktreeTask = defineWorkerTask<
 	},
 });
 
+export const gitDetectExternalWorktreesTask = defineWorkerTask<
+	{ homeDir: string; trackedWorktreePaths: string[]; gitEnv: GitTaskEnv },
+	ExternalWorktreeRepo[]
+>({
+	type: "git/detectExternalWorktrees",
+	handler: ({ homeDir, trackedWorktreePaths, gitEnv }) =>
+		detectExternalWorktrees({
+			homeDir,
+			sources: EXTERNAL_WORKTREE_SOURCES,
+			trackedWorktreePaths: new Set(trackedWorktreePaths),
+			listWorktrees: async (repoPath) =>
+				parseWorktreeList(
+					await createUserSimpleGit(repoPath, { env: gitEnv }).raw([
+						"worktree",
+						"list",
+						"--porcelain",
+					]),
+				),
+		}),
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitStatusPartialTask,
@@ -744,4 +771,5 @@ export const gitTasks = [
 	gitPushTask,
 	gitPrHeadBaseTask,
 	gitRestoreWorktreeTask,
+	gitDetectExternalWorktreesTask,
 ];

@@ -6,11 +6,17 @@ export {
 	pageAssetResponsePolicy,
 } from "./file-policy";
 export {
+	contentRevision,
+	documentEtag,
 	injectHeadScriptTag,
 	injectScriptTag,
 	injectStyleTag,
+	isRuntimeScriptPath,
 	RUNTIME_SCRIPT_PATH,
 	STORAGE_SCRIPT_PATH,
+	storageScriptPath,
+	TOOLS_SCRIPT_PATH,
+	toolsScriptPath,
 } from "./inject";
 export {
 	fileOriginalKey,
@@ -29,12 +35,18 @@ export {
 } from "./manifest";
 export { PAGE_THEME_CSS } from "./theme";
 export {
+	type AgentSessionTicketClaims,
+	type AgentSessionTicketScope,
 	type FileTicketClaims,
 	type PageConnectTicketClaims,
 	type PageTicketClaims,
+	signAgentSessionTicket,
+	signClaims,
 	signFileTicket,
 	signPageConnectTicket,
 	signPageTicket,
+	verifyAgentSessionTicket,
+	verifyClaims,
 	verifyFileTicket,
 	verifyPageConnectTicket,
 	verifyPageTicket,

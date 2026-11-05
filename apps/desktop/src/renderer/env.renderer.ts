@@ -9,20 +9,23 @@
  *
  * For main process env vars, use src/main/env.main.ts instead.
  */
+import { BRAND } from "@superset/shared/brand";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { z } from "zod/v4";
 
 const envSchema = z.object({
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development"),
-	NEXT_PUBLIC_API_URL: z.url().default("https://api.superset.sh"),
-	NEXT_PUBLIC_WEB_URL: z.url().default("https://app.superset.sh"),
-	NEXT_PUBLIC_MARKETING_URL: z.url().default("https://superset.sh"),
+	NEXT_PUBLIC_API_URL: z.url().default(CANONICAL_URLS.API),
+	NEXT_PUBLIC_WEB_URL: z.url().default(CANONICAL_URLS.APP),
+	NEXT_PUBLIC_MARKETING_URL: z.url().default(CANONICAL_URLS.MARKETING),
 	NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
 	NEXT_PUBLIC_POSTHOG_HOST: z.string().default("https://us.i.posthog.com"),
 	SENTRY_DSN_DESKTOP: z.string().optional(),
 	RELAY_URL: z.url().default("https://relay.superset.sh"),
 	REALTIME_URL: z.url().default("https://realtime.superset.sh"),
+	DESKTOP_DISPLAY_NAME: z.string().default(BRAND.NAME),
 });
 
 /**
@@ -46,6 +49,7 @@ const rawEnv = {
 	SENTRY_DSN_DESKTOP: import.meta.env.SENTRY_DSN_DESKTOP as string | undefined,
 	RELAY_URL: process.env.RELAY_URL,
 	REALTIME_URL: process.env.REALTIME_URL,
+	DESKTOP_DISPLAY_NAME: process.env.DESKTOP_DISPLAY_NAME,
 };
 
 // Only allow skipping validation in development (never in production)

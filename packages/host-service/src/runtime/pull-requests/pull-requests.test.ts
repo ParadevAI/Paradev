@@ -2300,6 +2300,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 				reason: "rate-limited",
 				since: t0,
 				until: t0 + 605_000,
+				detail: "API rate limit exceeded for user ID 1.",
 			});
 
 			// Polling spawns nothing while the hold lasts.

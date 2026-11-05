@@ -3,8 +3,8 @@ import { Button } from "@superset/ui/button";
 import { type ApprovalOption, optionRole } from "../../utils/optionRole";
 
 /**
- * Deny sits alone on the left; the allow choices group on the right with the
- * narrowest grant as the primary, so the default-looking button is the one
+ * Every choice sits together on the right, deny first and quiet; the
+ * narrowest grant is the primary, so the default-looking button is the one
  * that gives away the least. When no option grants that little, none looks
  * like the default.
  */
@@ -26,29 +26,31 @@ export function OptionButtons({
 	const respond = (option: ApprovalOption) =>
 		onRespond(item.id, { type: "option", optionId: option.optionId });
 	return (
-		<div className="flex flex-wrap items-center gap-2">
+		<div className="flex flex-wrap items-center justify-end gap-2">
 			{rejects.map(({ option }) => (
 				<Button
 					key={option.optionId}
+					className="min-w-0 max-w-full"
 					onClick={() => respond(option)}
 					size="sm"
-					variant="ghost"
+					title={option.label}
+					variant="outline"
 				>
-					{option.label}
+					<span className="min-w-0 truncate">{option.label}</span>
 				</Button>
 			))}
-			<div className="flex flex-1 flex-wrap justify-end gap-2">
-				{allows.map(({ option }) => (
-					<Button
-						key={option.optionId}
-						onClick={() => respond(option)}
-						size="sm"
-						variant={option.optionId === primaryId ? "default" : "outline"}
-					>
-						{option.label}
-					</Button>
-				))}
-			</div>
+			{allows.map(({ option }) => (
+				<Button
+					key={option.optionId}
+					className="min-w-0 max-w-full"
+					onClick={() => respond(option)}
+					size="sm"
+					title={option.label}
+					variant={option.optionId === primaryId ? "default" : "outline"}
+				>
+					<span className="min-w-0 truncate">{option.label}</span>
+				</Button>
+			))}
 		</div>
 	);
 }

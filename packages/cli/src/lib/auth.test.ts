@@ -40,5 +40,24 @@ describe("refreshAccessToken", () => {
 		expect(visibleText).not.toContain("refresh-secret");
 		expect(visibleText).not.toContain("session-secret");
 		expect(visibleText).not.toContain("code-secret");
+		expect(error).toMatchObject({ status: 400, oauthError: "invalid_grant" });
+	});
+});
+
+describe("getPasteRedirectUri", () => {
+	test("defaults to app.superset.sh when the root domain moved and no web URL is set", () => {
+		const { SUPERSET_WEB_URL: _, ...env } = process.env;
+		const result = Bun.spawnSync({
+			cmd: [
+				process.execPath,
+				"-e",
+				'console.log((await import("./src/lib/auth.ts")).getPasteRedirectUri())',
+			],
+			cwd: `${import.meta.dir}/../..`,
+			env: { ...env, NEXT_PUBLIC_ROOT_DOMAIN: "paradev.com" },
+		});
+		expect(result.stdout.toString().trim()).toBe(
+			"https://app.superset.sh/cli/auth/code",
+		);
 	});
 });

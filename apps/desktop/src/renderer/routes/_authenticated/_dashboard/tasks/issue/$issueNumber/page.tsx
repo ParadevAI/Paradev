@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { GoIssueClosed, GoIssueOpened } from "react-icons/go";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { MarkdownRenderer } from "renderer/components/MarkdownRenderer";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
@@ -14,9 +15,14 @@ import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/c
 import { useProjectHost } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectHost";
 import { parsePositiveIntegerParam } from "renderer/routes/_authenticated/_dashboard/utils/parsePositiveIntegerParam";
 import {
+	linkedContextSeed,
+	linkedIssueChip,
+} from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
+import {
 	type LinkedIssue,
 	useNewWorkspaceDraftStore,
 } from "renderer/stores/new-workspace-draft";
+import { GitHubAuthorAvatar } from "../../components/GitHubAuthorAvatar";
 import { Route as TasksLayoutRoute } from "../../layout";
 import { tasksSearchFromFilters } from "../../stores/tasks-filter-state";
 
@@ -27,6 +33,7 @@ export const Route = createFileRoute(
 });
 
 function IssueDetailPage() {
+	const isDark = useIsDarkTheme();
 	const { t } = useLingui();
 	const { issueNumber: issueNumberRaw } = Route.useParams();
 	const issueNumber = parsePositiveIntegerParam(issueNumberRaw);
@@ -53,6 +60,7 @@ function IssueDetailPage() {
 			tasksSearchFromFilters({
 				tab: search.tab ?? "all",
 				assignee: search.assignee ?? null,
+				label: null,
 				search: search.search ?? "",
 				typeTab: "issues",
 				projectFilters: resolveProjectFilterParams(search.projects, null, []),
@@ -83,7 +91,7 @@ function IssueDetailPage() {
 	const handleAddToWorkspace = () => {
 		if (!projectId || !hostId || !data) return;
 		const linkedIssue: LinkedIssue = {
-			slug: `gh-${data.number}`,
+			slug: `#${data.number}`,
 			title: data.title,
 			source: "github",
 			url: data.url,
@@ -92,8 +100,10 @@ function IssueDetailPage() {
 		};
 		resetDraft();
 		selectProject(projectId);
-		updateDraft({ hostId, linkedIssues: [linkedIssue] });
-		openNewWorkspace(projectId);
+		updateDraft({
+			promptDraft: linkedContextSeed([linkedIssueChip(linkedIssue, isDark)]),
+		});
+		openNewWorkspace(projectId, hostId);
 	};
 
 	const isClosed = data?.state.toLowerCase() === "closed";
@@ -229,7 +239,8 @@ function IssueDetailPage() {
 						{data.author && (
 							<>
 								<span aria-hidden>·</span>
-								<span className="min-w-0 break-words">
+								<span className="flex min-w-0 items-center gap-1.5 break-words">
+									<GitHubAuthorAvatar login={data.author} />
 									<Trans>by {data.author}</Trans>
 								</span>
 							</>

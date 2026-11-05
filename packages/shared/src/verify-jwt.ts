@@ -4,6 +4,8 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
 export interface AuthContext {
 	sub: string;
 	organizationIds: string[];
+	/** Absent on tokens minted before the claim existed, and on OAuth and service tokens. */
+	teamIds: string[];
 	scope?: string;
 	name?: string | null;
 	image?: string | null;
@@ -37,10 +39,13 @@ export async function verifyJWT(
 		const sub = payload.sub;
 		const organizationIds = payload.organizationIds as string[] | undefined;
 		if (!sub || !organizationIds) return null;
+		const teamIds = Array.isArray(payload.teamIds)
+			? payload.teamIds.filter((id): id is string => typeof id === "string")
+			: [];
 		const scope = typeof payload.scope === "string" ? payload.scope : undefined;
 		const name = typeof payload.name === "string" ? payload.name : null;
 		const image = typeof payload.image === "string" ? payload.image : null;
-		return { sub, organizationIds, scope, name, image };
+		return { sub, organizationIds, teamIds, scope, name, image };
 	} catch (error) {
 		const code =
 			error instanceof Error && "code" in error

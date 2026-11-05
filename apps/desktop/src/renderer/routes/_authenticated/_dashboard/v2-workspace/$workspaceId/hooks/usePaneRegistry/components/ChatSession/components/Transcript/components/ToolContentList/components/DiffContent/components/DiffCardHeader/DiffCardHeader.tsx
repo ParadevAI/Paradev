@@ -4,12 +4,8 @@ import { DiffStatText } from "../../../../../../../../../../../../components/Dif
 import { useChatPaneActions } from "../../../../../../../../providers/ChatPaneActionsProvider";
 import { CopyButton } from "../../../../../../../CopyButton";
 import type { DiffStats } from "../../../../../../utils/diffStats";
-import { fileName } from "../../../../../../utils/fileChange";
-import { TruncateStart } from "./components/TruncateStart";
-
-function directoryOf(path: string, name: string): string {
-	return path.slice(0, path.length - name.length).replace(/[\\/]+$/, "");
-}
+import { directoryOf, fileName } from "../../../../../../utils/fileChange";
+import { TruncateStart } from "../../../../../TruncateStart";
 
 /**
  * The line that stays in view while the diff scrolls under it: the file by

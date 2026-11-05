@@ -4,3 +4,4 @@ export {
 	type RecentlyViewedFilesApi,
 	useRecentlyViewedFiles,
 } from "./useRecentlyViewedFiles";
+export { matchRecentFiles } from "./utils/matchRecentFiles";

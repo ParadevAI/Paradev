@@ -6,11 +6,14 @@
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
+		"test": "bun test",
 		"test:integration": "bun scripts/storage-integration.ts",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {
 		"@sentry/cloudflare": "10.68.0",
+		"@superset/agent-harness": "workspace:*",
+		"@superset/chat": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"hono": "4.13.7",
 		"partyserver": "0.5.9"
@@ -18,7 +21,7 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "5.20260801.1",
 		"@superset/typescript": "workspace:*",
-		"jose": "6.2.2",
+		"jose": "6.2.13",
 		"typescript": "7.0.2",
 		"wrangler": "4.118.0"
 	}

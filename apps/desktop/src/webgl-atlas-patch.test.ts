@@ -27,5 +27,11 @@ describe("@xterm/addon-webgl GPU atlas patch", () => {
 			expect(src.match(/canvas\.width\s*=\s*0/g) ?? []).toHaveLength(2);
 			expect(src.match(/canvas\.height\s*=\s*0/g) ?? []).toHaveLength(2);
 		});
+
+		test(`${name} carries the Emitter dispose fix`, () => {
+			// The addon compiles its own copy of xterm's Event.ts (patches/README.md).
+			expect(src).toContain("this._disposed=!0,this._listeners=[]");
+			expect(src).not.toContain("_listeners.length=0");
+		});
 	}
 });

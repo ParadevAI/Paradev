@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { ActivityIndicator, ScrollView, Share, View } from "react-native";
 import { CodeBlockContent } from "@/components/ai-elements/code-block";
 import { Text } from "@/components/ui/text";
@@ -32,7 +33,7 @@ export function FileViewerScreen() {
 			: null;
 
 	const category = (source ?? "unstaged") as ChangesetSource;
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 
 	const query = useQuery({
 		// Distinct from the files-changed screen's diff-row cache: same procedure,

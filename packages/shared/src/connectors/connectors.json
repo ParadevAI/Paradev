@@ -28,8 +28,8 @@
 					"token_request_auth_method": "client_secret_post",
 					"token_expiration_buffer": 300,
 					"requires_env": [
-						"GOOGLE_TEMP_CLIENT_ID",
-						"GOOGLE_TEMP_CLIENT_SECRET"
+						"GOOGLE_CONNECTIONS_CLIENT_ID",
+						"GOOGLE_CONNECTIONS_CLIENT_SECRET"
 					],
 					"authorization_params": {
 						"access_type": "offline",
@@ -382,6 +382,55 @@
 				}
 			]
 		},
+		"autumn_mcp": {
+			"displayName": "Autumn",
+			"icon": "autumn",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.useautumn.com/mcp",
+					"scopes": [
+						"offline_access",
+						"organisation:read",
+						"customers:read",
+						"customers:write",
+						"features:read",
+						"plans:read",
+						"plans:write",
+						"rewards:read",
+						"rewards:write",
+						"balances:read",
+						"billing:read",
+						"billing:write",
+						"analytics:read"
+					],
+					"identity": {
+						"mcp": "https://mcp.useautumn.com/mcp",
+						"tool": "getCurrentOrganization",
+						"arguments": {
+							"intent": "Identify the Autumn organization this connection belongs to."
+						},
+						"account": {
+							"id": "$.id",
+							"label": "$.name"
+						},
+						"user": {
+							"id": "$.user.id",
+							"label": "$.user.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"sentry_mcp": {
 			"displayName": "Sentry",
 			"icon": "sentry",
@@ -673,6 +722,72 @@
 				}
 			]
 		},
+		"resend_mcp": {
+			"displayName": "Resend",
+			"icon": "resend",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.resend.com/mcp",
+					"scopes": ["full_access"],
+					"identity": {
+						"url": "https://api.resend.com/me",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.team_id"
+						},
+						"user": {
+							"id": "$.team_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				},
+				{
+					"type": "api_key",
+					"label": "API key",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Resend API key",
+							"placeholder": "re_…",
+							"description": "Resend → API Keys → Create API key, with Full access",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"url": "https://api.resend.com/me",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.team_id"
+						},
+						"user": {
+							"id": "$.team_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"neon_mcp": {
 			"displayName": "Neon",
 			"icon": "neon",
@@ -769,6 +884,138 @@
 				}
 			]
 		},
+		"peec_mcp": {
+			"displayName": "Peec AI",
+			"icon": "peec",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.peec.ai/mcp",
+					"scopes": ["default"],
+					"identity": {
+						"mcp": "https://api.peec.ai/mcp",
+						"tool": "list_projects",
+						"account": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						},
+						"user": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				},
+				{
+					"type": "api_key",
+					"label": "Personal access token",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Peec AI personal access token",
+							"description": "Peec AI → API Keys → Personal Access Tokens → Create",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"mcp": "https://api.peec.ai/mcp",
+						"tool": "list_projects",
+						"account": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						},
+						"user": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"sazabi_mcp": {
+			"displayName": "Sazabi",
+			"icon": "sazabi",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.sazabi.com/mcp",
+					"scopes": ["openid", "profile", "email", "offline_access", "mcp"],
+					"identity": {
+						"url": "https://api.platform.sazabi.com/api/auth/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				},
+				{
+					"type": "api_key",
+					"label": "Secret key",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Sazabi secret key",
+							"description": "Sazabi \u2192 Settings \u2192 Secret keys \u2192 Create. A key scoped to one project limits the agent to that project.",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"url": "https://api.sazabi.com/v1/me",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.organization.id",
+							"label": "$.organization.name"
+						},
+						"user": {
+							"id": "$.organization.id",
+							"label": "$.keyName"
+						}
+					},
+					"bind": {
+						"headers": {
+							"X-Sazabi-Secret-Key": "${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"vercel_mcp": {
 			"displayName": "Vercel",
 			"icon": "vercel",
@@ -794,6 +1041,170 @@
 						"user": {
 							"id": "$.sub",
 							"label": "$.preferred_username"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"inngest_mcp": {
+			"displayName": "Inngest",
+			"icon": "inngest",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.inngest.com/mcp",
+					"scopes": [
+						"accounts:read:*",
+						"apps:read:*",
+						"apps:write:*",
+						"environments:read:*",
+						"environments:write:*",
+						"events:read:*",
+						"events:write:*",
+						"experiments:read:*",
+						"functions:read:*",
+						"functions:write:*",
+						"insights:read:*",
+						"runs:read:*",
+						"runs:write:*",
+						"sessions:read:*",
+						"webhooks:read:*",
+						"webhooks:write:*"
+					],
+					"identity": {
+						"url": "https://api.inngest.com/v2/account",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.data.id",
+							"label": "$.data.name"
+						},
+						"user": {
+							"id": "$.data.id",
+							"label": "$.data.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"supabase_mcp": {
+			"displayName": "Supabase",
+			"icon": "supabase",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.supabase.com/mcp",
+					"scopes": [
+						"organizations:read",
+						"projects:read",
+						"projects:write",
+						"database:read",
+						"database:write",
+						"analytics:read",
+						"secrets:read",
+						"edge_functions:read",
+						"edge_functions:write",
+						"environment:read",
+						"environment:write",
+						"storage:read",
+						"storage:write"
+					],
+					"identity": {
+						"url": "https://api.supabase.com/v1/organizations",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$[0].id",
+							"label": "$[0].name"
+						},
+						"user": {
+							"id": "$[0].id",
+							"label": "$[0].name"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"firecrawl_mcp": {
+			"displayName": "Firecrawl",
+			"icon": "firecrawl",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.firecrawl.dev/v2/mcp-oauth",
+					"scopes": ["firecrawl:global", "offline_access"],
+					"identity": {
+						"account": {
+							"id": "$.team_id"
+						},
+						"user": {
+							"id": "$.user_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"wispr_mcp": {
+			"displayName": "Wispr Flow",
+			"icon": "wispr",
+			"category": "Productivity",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.wisprflow.ai/connect/mcp",
+					"scopes": ["openid", "email", "profile", "offline_access"],
+					"identity": {
+						"url": "https://mcp-auth.wisprflow.com/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
 						}
 					},
 					"bind": {

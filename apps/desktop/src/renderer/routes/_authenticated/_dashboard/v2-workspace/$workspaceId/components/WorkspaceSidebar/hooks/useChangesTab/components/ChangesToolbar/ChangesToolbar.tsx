@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -7,9 +7,8 @@ import type {
 	ChangesFilter,
 	ChangesViewMode,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import { ChangesScopeControl } from "../../../../../ChangesScopeControl";
 import type { Branch, Commit } from "../../types";
-import { BaseBranchSelector } from "../BaseBranchSelector";
-import { CommitFilterDropdown } from "../CommitFilterDropdown";
 import { ViewModeToggle } from "./components/ViewModeToggle";
 
 interface ChangesToolbarProps {
@@ -73,29 +72,18 @@ export function ChangesToolbar({
 	});
 	return (
 		<div className="flex min-w-0 items-center gap-1 overflow-hidden py-1 pr-1 pl-1.5 text-xs">
-			<CommitFilterDropdown
+			<ChangesScopeControl
 				filter={filter}
 				onFilterChange={onFilterChange}
 				commits={commits}
 				uncommittedCount={uncommittedCount}
+				baseBranch={baseBranch}
+				branches={branches}
+				onBaseBranchChange={onBaseBranchChange}
 				currentBranchName={currentBranchName}
 				canRenameBranch={canRenameBranch}
 				onRenameBranch={onRenameBranch}
 			/>
-			{filter.kind === "all" && (
-				// Selector as a placeholder in the message: a bare "vs" cannot
-				// precede the branch in every language.
-				<span className="flex min-w-0 items-center gap-1 whitespace-nowrap">
-					<Trans>
-						<span className="shrink-0 text-muted-foreground/60">vs</span>{" "}
-						<BaseBranchSelector
-							branches={branches}
-							currentValue={baseBranch}
-							onChange={onBaseBranchChange}
-						/>
-					</Trans>
-				</span>
-			)}
 			<div className="ml-auto flex shrink-0 items-center gap-0.5">
 				<Tooltip>
 					<TooltipTrigger asChild>

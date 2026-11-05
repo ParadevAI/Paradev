@@ -13,7 +13,7 @@ import { OverlaysSection } from "./components/OverlaysSection";
 import { ShowcaseNav, type ShowcaseNavItem } from "./components/ShowcaseNav";
 
 export const metadata: Metadata = {
-	title: "Design · Superset",
+	title: "Design · Paradev",
 	description: "Living reference for every @superset/ui component",
 };
 
@@ -68,7 +68,7 @@ export default async function DesignPage() {
 				active="primitives"
 				title={i18n._(
 					msg({
-						message: "Superset Design System",
+						message: "Paradev Design System",
 					}),
 				)}
 				description={

@@ -7,6 +7,8 @@ export BROWSER=/usr/local/bin/google-chrome
 export DISPLAY="${DISPLAY:-${SUPERSET_DISPLAY:-:1}}"
 # The desktop session's bus, written by superset-desktop-init once it is up.
 [ -r "${SUPERSET_RUN_DIR:-/run/superset}/desktop.env" ] && . "${SUPERSET_RUN_DIR:-/run/superset}/desktop.env"
+# The box's memory ceiling and CPUs, written by superset-boot from the cgroup.
+[ -r "${SUPERSET_RUN_DIR:-/run/superset}/resources.env" ] && . "${SUPERSET_RUN_DIR:-/run/superset}/resources.env"
 case ":$PATH:" in *":/usr/local/go/bin:"*) ;; *) export PATH="$PATH:/usr/local/go/bin" ;; esac
 # The agent CLIs are pinned by the bundle (install-agent-clis); a self-update
 # would drift from the pin and only prints a warning every session.

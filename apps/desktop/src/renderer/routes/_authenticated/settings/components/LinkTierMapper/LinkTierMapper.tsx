@@ -17,6 +17,7 @@ import {
 	type Surface,
 } from "renderer/lib/clickPolicy";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
 type SlotValue = LinkAction | "none";
@@ -50,6 +51,7 @@ export function LinkTierMapper({
 	surface,
 }: LinkTierMapperProps) {
 	const searchQuery = useSettingsSearchQuery();
+	const isRightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
 	const pick = useCallback(
 		(tier: LinkTier, nextSlot: SlotValue) => {
 			const nextAction = fromSlot(nextSlot);
@@ -70,6 +72,11 @@ export function LinkTierMapper({
 			<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
 				{TIERS.map((tier) => {
 					const id = `${idPrefix}-${tier}`;
+					const actions: LinkAction[] =
+						surface === "url" &&
+						(isRightPaneAreaEnabled || value[tier] === "rightPane")
+							? [...ACTIONS, "rightPane"]
+							: ACTIONS;
 					return (
 						<div
 							key={tier}
@@ -91,9 +98,13 @@ export function LinkTierMapper({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="none">
-										<Trans>Do nothing</Trans>
+										{surface === "url" && tier === "plain" ? (
+											<Trans>Show link menu</Trans>
+										) : (
+											<Trans>Do nothing</Trans>
+										)}
 									</SelectItem>
-									{ACTIONS.map((action) => (
+									{actions.map((action) => (
 										<SelectItem key={action} value={action}>
 											{actionLabel(action, surface)}
 										</SelectItem>

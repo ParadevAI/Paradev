@@ -1,14 +1,22 @@
 import type { db, dbWs } from "@superset/db/client";
 import { taskLabelAssignments, taskLabels } from "@superset/db/schema";
 import { pickEntityColor } from "@superset/shared/entity-colors";
-import { normalizeLabelName } from "@superset/shared/labels";
+import {
+	labelAncestorNames,
+	labelParentName,
+	normalizeLabelName,
+} from "@superset/shared/labels";
 import { and, eq, inArray } from "drizzle-orm";
 
 type Executor =
 	| typeof db
 	| Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
 
-/** The organization's labels with these names, creating the ones it doesn't have yet. */
+/**
+ * The organization's labels with these names, creating the ones it doesn't
+ * have yet. A path name (`acme/web`) also creates its parents and links each
+ * label to its parent; only the named labels are returned.
+ */
 export async function ensureLabels(
 	executor: Executor,
 	organizationId: string,
@@ -22,25 +30,49 @@ export async function ensureLabels(
 		),
 	];
 	if (normalized.length === 0) return [];
+	const withAncestors = [
+		...new Set(
+			normalized.flatMap((name) => [...labelAncestorNames(name), name]),
+		),
+	];
 	await executor
 		.insert(taskLabels)
 		.values(
-			normalized.map((name) => ({
+			withAncestors.map((name) => ({
 				organizationId,
 				name,
 				color: pickEntityColor(),
 			})),
 		)
 		.onConflictDoNothing();
-	return executor
-		.select({ id: taskLabels.id, name: taskLabels.name })
+	const rows = await executor
+		.select({
+			id: taskLabels.id,
+			name: taskLabels.name,
+			parentId: taskLabels.parentId,
+		})
 		.from(taskLabels)
 		.where(
 			and(
 				eq(taskLabels.organizationId, organizationId),
-				inArray(taskLabels.name, normalized),
+				inArray(taskLabels.name, withAncestors),
 			),
 		);
+	const idByName = new Map(rows.map((row) => [row.name, row.id]));
+	for (const row of rows) {
+		const parentName = labelParentName(row.name);
+		const parentId = parentName ? idByName.get(parentName) : undefined;
+		if (parentId && row.parentId !== parentId) {
+			await executor
+				.update(taskLabels)
+				.set({ parentId })
+				.where(eq(taskLabels.id, row.id));
+		}
+	}
+	const requested = new Set(normalized);
+	return rows
+		.filter((row) => requested.has(row.name))
+		.map(({ id, name }) => ({ id, name }));
 }
 
 export async function addTaskLabels(

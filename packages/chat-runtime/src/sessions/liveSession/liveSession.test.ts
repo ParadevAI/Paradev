@@ -6,7 +6,8 @@ import {
 	reduceMany,
 } from "@superset/chat/core";
 import type { DurableEnvelope, UserMessage } from "@superset/chat/protocol";
-import { isDurableEnvelope } from "@superset/chat/protocol";
+import { isDurableEnvelope, wrapHiddenText } from "@superset/chat/protocol";
+import type { ChatCheckpoints } from "../../checkpoints";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
 import {
@@ -50,12 +51,18 @@ function startSessionWithAdapters(script: FakeHarnessScript) {
 	return { runtime, sessionId, adapters };
 }
 
-function sendPrompt(runtime: ChatRuntime, sessionId: string, text: string) {
+function sendPrompt(
+	runtime: ChatRuntime,
+	sessionId: string,
+	text: string,
+	options: { snapshotWorktree?: boolean } = {},
+) {
 	return runtime.commands.prompt({
 		commandId: randomUUID(),
 		sessionId,
 		clientId: `client-${text}`,
 		content: [{ type: "text", text }],
+		...options,
 	});
 }
 
@@ -117,6 +124,221 @@ describe("LiveSession", () => {
 		expect(snapshot.items.get(result.itemId)?.turnId).toBe("t1");
 		expect(snapshot.items.size).toBe(2);
 		expect(snapshot.session?.status).toBe("idle");
+		await runtime.dispose();
+	});
+
+	test("sends a hidden part to the agent but keeps it off the user message", async () => {
+		const { runtime, sessionId, adapters } =
+			startSessionWithAdapters(SINGLE_TURN);
+		const visible = { type: "text", text: "@mcp/linear list issues" } as const;
+		const hint = { type: "text", text: "MCP context", hidden: true } as const;
+		const result = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-hint",
+			content: [visible, hint],
+		});
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		expect(adapters[0]?.prompted).toEqual([
+			[visible, { type: "text", text: wrapHiddenText("MCP context") }],
+		]);
+		const prompts = userMessages(journalEnvelopes(runtime, sessionId));
+		expect(prompts.map((prompt) => prompt.item.id)).toContain(result.itemId);
+		for (const prompt of prompts)
+			expect(prompt.item.content).toEqual([visible]);
+		await runtime.dispose();
+	});
+
+	test("says so when a prompted turn ends without showing anything", async () => {
+		const { runtime, sessionId } = startSession({
+			start: [
+				{ kind: "turn", turn: turn("t0") },
+				{
+					kind: "turn",
+					turn: turn("t0", { status: "completed", completedAtMs: 1 }),
+				},
+			],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{
+						kind: "turn",
+						turn: turn("t1", { status: "completed", completedAtMs: 2 }),
+					},
+					{ kind: "session", session: { status: "idle" } },
+				],
+			],
+		});
+		await waitFor(
+			() => runtime.live.require(sessionId).turn?.status === "completed",
+		);
+		sendPrompt(runtime, sessionId, "hello");
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t1");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		const notices = journalEnvelopes(runtime, sessionId).flatMap((envelope) =>
+			envelope.event.type === "item" && envelope.event.item.kind === "notice"
+				? [{ turnId: envelope.event.turnId, item: envelope.event.item }]
+				: [],
+		);
+		expect(notices).toHaveLength(1);
+		expect(notices[0]).toMatchObject({
+			turnId: "t1",
+			item: { noticeKind: "error" },
+		});
+		await runtime.dispose();
+	});
+
+	function gatedCheckpoints() {
+		const calls: string[] = [];
+		let release = () => {};
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const checkpoints: ChatCheckpoints = {
+			capture: async ({ cwd }) => {
+				calls.push(`capture ${cwd}`);
+				await gate;
+				return "before-sha";
+			},
+			turnStarted: async ({ turnId, before }) => {
+				calls.push(`started ${turnId} ${before}`);
+			},
+			turnSettled: async ({ turnId, anchor }) => {
+				calls.push(
+					`settled ${turnId} ${anchor ? `${anchor.harnessSessionId}/${anchor.itemId}` : "-"}`,
+				);
+			},
+			changes: async () => null,
+			undo: async () => ({ status: "refused", reason: "unsupported" }),
+		};
+		return { calls, release: () => release(), checkpoints };
+	}
+
+	test("holds a prompt until the worktree is snapshotted, and names the snapshot for its turn", async () => {
+		const { harnesses } = fakeHarnessRegistry({
+			start: [
+				{
+					kind: "session",
+					session: { status: "idle", harnessSessionId: "h1" },
+				},
+			],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "item", item: toolCall("tc1"), turnId: "t1" },
+					{ kind: "item", item: toolCall("tc2"), turnId: "t1" },
+					{ kind: "item", item: agentMessage("a1", "done"), turnId: "t1" },
+					{
+						kind: "turn",
+						turn: turn("t1", { status: "completed", completedAtMs: 2 }),
+					},
+					{ kind: "session", session: { status: "idle" } },
+				],
+			],
+		});
+		const { calls, release, checkpoints } = gatedCheckpoints();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
+
+		await waitFor(() => calls.length === 1);
+		expect(runtime.live.require(sessionId).turn).toBeNull();
+
+		release();
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+		expect(calls).toEqual([
+			"capture /tmp/workspace",
+			"started t1 before-sha",
+			"settled t1 h1/tc1",
+		]);
+		await runtime.dispose();
+	});
+
+	test("a prompt that does not ask for a snapshot goes to the agent at once, and its turn is still reported", async () => {
+		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
+		const { calls, checkpoints } = gatedCheckpoints();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "hello");
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+		expect(calls).toEqual(["started t1 null", "settled t1 -"]);
+		await runtime.dispose();
+	});
+
+	test("a prompt the agent turns down after its snapshot leaves the chat running", async () => {
+		const { harnesses } = fakeHarnessRegistry({ turns: [] });
+		const { release, checkpoints } = gatedCheckpoints();
+		release();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const result = sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(result.itemId)?.item
+					.discarded === true,
+		);
+		const envelopes = journalEnvelopes(runtime, sessionId);
+		expect(sessionStatuses(envelopes)).not.toContain("dead");
+		expect(
+			envelopes.some(
+				(envelope) =>
+					envelope.event.type === "item" &&
+					envelope.event.item.kind === "notice" &&
+					envelope.event.item.text === "fake harness script exhausted",
+			),
+		).toBe(true);
+		await runtime.dispose();
+	});
+
+	test("a prompt cancelled while the worktree is snapshotted never reaches the agent", async () => {
+		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
+		const { calls, release, checkpoints } = gatedCheckpoints();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const result = sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
+		await waitFor(() => calls.length === 1);
+
+		runtime.live.require(sessionId).cancelTurn();
+		release();
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(result.itemId)?.item
+					.discarded === true,
+		);
+
+		expect(runtime.live.require(sessionId).turn).toBeNull();
+		expect(calls).toEqual(["capture /tmp/workspace"]);
 		await runtime.dispose();
 	});
 
@@ -200,6 +422,27 @@ describe("LiveSession", () => {
 		const snapshot = reduceMany(emptySnapshot(), envelopes);
 		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t2");
 		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
+		await runtime.dispose();
+	});
+
+	test("a queued prompt does not hide that the agent awaits input", async () => {
+		const { runtime, sessionId } = startSession({
+			start: [{ kind: "session", session: { status: "idle" } }],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "session", session: { status: "awaiting_input" } },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+				],
+			],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		expect(second.queued).toBe(true);
+
+		await waitForApproval(runtime, sessionId);
+		expect(runtime.sessions.get(sessionId)?.status).toBe("awaiting_input");
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
 		await runtime.dispose();
 	});
 
@@ -328,6 +571,165 @@ describe("LiveSession", () => {
 		});
 	}
 
+	test("a prompt that a turn the agent starts on its own overtakes while snapshotting waits for it", async () => {
+		const { harnesses, adapters } = fakeHarnessRegistry({
+			start: [
+				{ kind: "session", session: { status: "idle" } },
+				{ kind: "turn", turn: turn("agent-turn"), delayMs: 20 },
+				{
+					kind: "turn",
+					turn: turn("agent-turn", { status: "completed", completedAtMs: 2 }),
+					delayMs: 100,
+				},
+			],
+			turns: SINGLE_TURN.turns,
+		});
+		const { release, checkpoints } = gatedCheckpoints();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const result = sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
+		await waitFor(
+			() => runtime.live.require(sessionId).turn?.id === "agent-turn",
+		);
+
+		release();
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t1");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		expect(adapters[0]?.prompted).toHaveLength(1);
+		expect(
+			snapshotOf(runtime, sessionId).items.get(result.itemId)?.turnId,
+		).toBe("t1");
+		await runtime.dispose();
+	});
+
+	test("a prompt queued behind one being snapshotted waits for it when the agent ends a turn of its own", async () => {
+		const answer = (id: string): FakeHarnessScript["turns"][number] => [
+			{ kind: "turn", turn: turn(id) },
+			{
+				kind: "turn",
+				turn: turn(id, { status: "completed", completedAtMs: 2 }),
+			},
+			{ kind: "session", session: { status: "idle" } },
+		];
+		const { harnesses, adapters } = fakeHarnessRegistry({
+			start: [
+				{ kind: "session", session: { status: "idle" } },
+				{ kind: "turn", turn: turn("agent-turn"), delayMs: 20 },
+				{
+					kind: "turn",
+					turn: turn("agent-turn", { status: "completed", completedAtMs: 2 }),
+				},
+			],
+			turns: [answer("t1"), answer("t2")],
+		});
+		const { release, checkpoints } = gatedCheckpoints();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "first", {
+			snapshotWorktree: true,
+		});
+		sendPrompt(runtime, sessionId, "second", {
+			snapshotWorktree: true,
+		});
+		await waitFor(() => {
+			const current = runtime.live.require(sessionId).turn;
+			return current?.id === "agent-turn" && current.status === "completed";
+		});
+
+		release();
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t2");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		expect(
+			adapters[0]?.prompted.map((content) =>
+				content[0]?.type === "text" ? content[0].text : null,
+			),
+		).toEqual(["first", "second"]);
+		await runtime.dispose();
+	});
+
+	test("closing a chat mid-turn still settles the turn's snapshot", async () => {
+		const { harnesses } = fakeHarnessRegistry(HELD_THEN_QUICK);
+		const { calls, release, checkpoints } = gatedCheckpoints();
+		release();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
+		await waitFor(
+			() => runtime.live.require(sessionId).turn?.status === "running",
+		);
+
+		await runtime.live.dispose(sessionId);
+
+		expect(calls).toContain("settled t1 -");
+		await runtime.dispose();
+	});
+
+	test("refuses to undo a turn's files while any chat in that worktree is running", async () => {
+		const { harnesses } = fakeHarnessRegistry(HELD_THEN_QUICK);
+		const runtime = createTestRuntime({
+			harnesses,
+			checkpoints: {
+				capture: async () => "before-sha",
+				turnStarted: async () => {},
+				turnSettled: async () => {},
+				changes: async () => null,
+				undo: async ({ paths }) => ({
+					status: "undone",
+					restored: paths,
+					skipped: [],
+				}),
+			},
+		});
+		const create = () =>
+			runtime.commands.createSession({
+				commandId: randomUUID(),
+				scopeId: "workspace-1",
+				harness: FAKE_HARNESS,
+				cwd: "/tmp/workspace",
+			}).sessionId;
+		const working = create();
+		const idle = create();
+		const undo = () =>
+			runtime.commands.undoTurnFiles({
+				commandId: randomUUID(),
+				sessionId: idle,
+				turnId: "t0",
+				paths: ["a.ts"],
+				cwd: "/tmp/workspace",
+			});
+		sendPrompt(runtime, working, "hello");
+		await waitFor(
+			() => runtime.live.require(working).turn?.status === "running",
+		);
+
+		expect(await undo()).toEqual({ status: "refused", reason: "busy" });
+		answerApproval(runtime, working);
+		await waitFor(() => runtime.sessions.get(working)?.status === "idle");
+		expect(await undo()).toMatchObject({ status: "undone" });
+		await runtime.dispose();
+	});
+
 	test("a prompt sent while the turn only waits on background work joins it", async () => {
 		const { runtime, sessionId } = startSession({
 			...HELD_THEN_QUICK,
@@ -424,6 +826,39 @@ describe("LiveSession", () => {
 				(item) => item.id,
 			),
 		).toEqual([second.itemId]);
+		await runtime.dispose();
+	});
+
+	test("a prompt the agent does not take into the turn still gets its snapshot once delivered", async () => {
+		const { harnesses } = fakeHarnessRegistry({
+			...HELD_THEN_QUICK,
+			steer: false,
+		});
+		const { calls, release, checkpoints } = gatedCheckpoints();
+		release();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "first", { snapshotWorktree: true });
+		await waitForApproval(runtime, sessionId);
+		sendPrompt(runtime, sessionId, "second", { snapshotWorktree: true });
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
+
+		answerApproval(runtime, sessionId);
+		await waitFor(() => calls.includes("settled t2 -"));
+
+		expect(calls).toEqual([
+			"capture /tmp/workspace",
+			"started t1 before-sha",
+			"settled t1 -",
+			"capture /tmp/workspace",
+			"started t2 before-sha",
+			"settled t2 -",
+		]);
 		await runtime.dispose();
 	});
 
@@ -615,6 +1050,67 @@ describe("LiveSession", () => {
 			third.itemId,
 		]);
 		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
+		await runtime.dispose();
+	});
+
+	test("a turn reported again does not deliver the next queued prompt early", async () => {
+		const quick = (id: string, completedAtMs: number) => [
+			{ kind: "turn" as const, turn: turn(id) },
+			{
+				kind: "turn" as const,
+				turn: turn(id, { status: "completed", completedAtMs }),
+				delayMs: 30,
+			},
+			{
+				kind: "turn" as const,
+				turn: turn(id, { status: "completed", completedAtMs }),
+			},
+			{ kind: "session" as const, session: { status: "idle" as const } },
+		];
+		const { runtime, sessionId } = startSession({
+			turns: [quick("t1", 2), quick("t2", 4), quick("t3", 6)],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).turns.get("t3")?.status === "completed",
+		);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t2");
+		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t3");
+		await runtime.dispose();
+	});
+
+	test("updateQueuedPrompt rewrites a queued prompt without losing its place", async () => {
+		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+
+		runtime.commands.updateQueuedPrompt({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: second.itemId,
+			content: [{ type: "text", text: "second, revised" }],
+		});
+
+		const snapshot = reduceMany(
+			emptySnapshot(),
+			journalEnvelopes(runtime, sessionId),
+		);
+		expect(snapshot.items.get(second.itemId)?.item).toMatchObject({
+			queued: true,
+			content: [{ type: "text", text: "second, revised" }],
+		});
+		expect(deriveQueuedPrompts(snapshot).map((item) => item.id)).toEqual([
+			second.itemId,
+			third.itemId,
+		]);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(2);
 		await runtime.dispose();
 	});
 
@@ -881,6 +1377,36 @@ describe("LiveSession", () => {
 			journalEnvelopes(runtime, sessionId),
 		);
 		expect(deriveQueuedPrompts(snapshot)).toEqual([]);
+		expect(snapshot.items.get(second.itemId)?.item).toMatchObject({
+			discarded: true,
+		});
+		await runtime.dispose();
+	});
+
+	test("an agent that dies mid-turn discards the queue instead of sending the next prompt", async () => {
+		const { runtime, sessionId } = startSession({
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{
+						kind: "turn",
+						turn: turn("t1", { status: "failed", completedAtMs: 2 }),
+						delayMs: 20,
+					},
+					{ kind: "session", session: { status: "dead" } },
+				],
+				[],
+			],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		await waitFor(() =>
+			sessionStatuses(journalEnvelopes(runtime, sessionId)).includes("dead"),
+		);
+		const envelopes = journalEnvelopes(runtime, sessionId);
+		const snapshot = reduceMany(emptySnapshot(), envelopes);
+		expect(sessionStatuses(envelopes).at(-1)).toBe("dead");
 		expect(snapshot.items.get(second.itemId)?.item).toMatchObject({
 			discarded: true,
 		});

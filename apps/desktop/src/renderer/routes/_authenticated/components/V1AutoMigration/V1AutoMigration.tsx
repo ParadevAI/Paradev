@@ -8,6 +8,7 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { posthog } from "renderer/lib/posthog";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { runV1Migration } from "renderer/lib/v1-migration";
+import { listV1AttentionItems } from "renderer/lib/v1-migration/attention";
 import {
 	isV1FollowUpPending,
 	isV1MigrationComplete,
@@ -18,18 +19,28 @@ import {
 	migrateV1Groups,
 	type V1GroupTarget,
 } from "renderer/lib/v1-migration/groups";
-import { electronV1MigrationIpc } from "renderer/lib/v1-migration/ipc";
-import { planV2SurfacePass } from "renderer/lib/v1-migration/pass";
 import {
+	electronV1MigrationIpc,
+	type V1MigrationIpc,
+} from "renderer/lib/v1-migration/ipc";
+import { scopeV1MigrationIpc } from "renderer/lib/v1-migration/ownership";
+import { planV1AutoPass } from "renderer/lib/v1-migration/pass";
+import {
+	isHostVersionSkewV1MigrationFailure,
 	isTransientV1MigrationFailure,
 	nextV1MigrationRetryDelayMs,
 } from "renderer/lib/v1-migration/retry";
+import {
+	electronV1MigrationRunLock,
+	waitForV1MigrationRunLock,
+} from "renderer/lib/v1-migration/run-lock";
 import { v1MigrationEventProps } from "renderer/lib/v1-migration/telemetry";
 import { useFinalizeProjectSetup } from "renderer/react-query/projects";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { buildSidebarFolderKey } from "renderer/routes/_authenticated/utils/workspaceTagFolders/workspaceTagFolders";
+import { useV1MigrationStatusStore } from "renderer/stores/v1-migration-status";
 import { appendPendingMigratedTerminals } from "renderer/stores/workspace-creates/appendPendingMigratedTerminals";
 
 /**
@@ -46,12 +57,15 @@ import { appendPendingMigratedTerminals } from "renderer/stores/workspace-create
  * Cross-instance single-flight via a main-process lock file. A pass that
  * throws, or leaves the gate open only for transient reasons (network,
  * host-service down), re-arms itself on a short backoff within the session;
- * anything else waits for the next boot.
+ * anything else waits for the next boot. A pass that throws because the
+ * adopted host-service is older than this desktop resets that host-service
+ * once per session first, so the retry reaches a current one.
  */
 async function listGatingFailureReasons(
+	ipc: V1MigrationIpc,
 	organizationId: string,
 ): Promise<string[]> {
-	const rows = await electronV1MigrationIpc.ledgerList(organizationId);
+	const rows = await ipc.ledgerList(organizationId);
 	return [
 		...new Set(
 			rows
@@ -74,6 +88,8 @@ export function V1AutoMigration() {
 	const finalizeSetup = useFinalizeProjectSetup();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const agentsQuery = useV2AgentConfigs(activeHostUrl);
+	const setMigrationStatus = useV1MigrationStatusStore((s) => s.setStatus);
+	const clearRunningStatus = useV1MigrationStatusStore((s) => s.clearRunning);
 	// Rollout pacing: percentage ramp + high-profile org exclusions. Only
 	// gates NEW migrations (v1 surface) — post-flip catch-up must always run.
 	// undefined (flags not loaded / offline) counts as off: stay on v1.
@@ -83,7 +99,8 @@ export function V1AutoMigration() {
 	const startedOrgsRef = useRef<Set<string>>(new Set());
 	const retryAttemptsRef = useRef<Map<string, number>>(new Map());
 	const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const retryOrgRef = useRef<string | null>(null);
+	const activeOrgRef = useRef<string | null>(null);
+	const hostResetOrgsRef = useRef<Set<string>>(new Set());
 	const [retryTick, setRetryTick] = useState(0);
 
 	const organizationId = session?.session?.activeOrganizationId ?? null;
@@ -95,13 +112,24 @@ export function V1AutoMigration() {
 	const agents = agentsQuery.data ?? [];
 
 	useEffect(() => {
-		retryOrgRef.current = organizationId;
+		activeOrgRef.current = organizationId;
 		return () => {
-			retryOrgRef.current = null;
+			activeOrgRef.current = null;
 			if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
 			retryTimerRef.current = null;
 		};
 	}, [organizationId]);
+
+	const passRequests = useV1MigrationStatusStore((s) => s.passRequests);
+	useEffect(() => {
+		if (passRequests === 0 || !organizationId) return;
+		startedOrgsRef.current.delete(organizationId);
+		setRetryTick((tick) => tick + 1);
+	}, [passRequests, organizationId]);
+
+	useEffect(() => {
+		if (organizationId && !activeHostUrl) clearRunningStatus(organizationId);
+	}, [organizationId, activeHostUrl, clearRunningStatus]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: retryTick re-runs the pass after a scheduled retry
 	useEffect(() => {
@@ -114,13 +142,39 @@ export function V1AutoMigration() {
 
 		const hostUrl = activeHostUrl;
 		const trigger = isV2CloudEnabled ? "v2-followup" : "v1-surface";
-		const scheduleRetry = (reasons: string[]) => {
-			if (retryTimerRef.current || retryOrgRef.current !== organizationId) {
+		const isActiveOrg = () => activeOrgRef.current === organizationId;
+		const setStatus: typeof setMigrationStatus = (...args) => {
+			if (isActiveOrg()) setMigrationStatus(...args);
+		};
+		let ipc: V1MigrationIpc = electronV1MigrationIpc;
+		const settleStatus = async (blocked: boolean) => {
+			if (blocked) {
+				setStatus(organizationId, "blocked");
 				return;
+			}
+			const [ledgerRows, v1Projects, v1Workspaces, v1Worktrees] =
+				await Promise.all([
+					ipc.ledgerList(organizationId),
+					ipc.readV1Projects(),
+					ipc.readV1Workspaces(),
+					ipc.readV1Worktrees(),
+				]).catch(() => [null, [], [], []] as const);
+			if (!ledgerRows) return;
+			const items = listV1AttentionItems({
+				ledgerRows,
+				v1Projects,
+				v1Workspaces,
+				v1Worktrees,
+			});
+			setStatus(organizationId, items.length > 0 ? "attention" : "idle", items);
+		};
+		const scheduleRetry = (reasons: string[]): boolean => {
+			if (retryTimerRef.current || !isActiveOrg()) {
+				return true;
 			}
 			const attempt = (retryAttemptsRef.current.get(organizationId) ?? 0) + 1;
 			const delayMs = nextV1MigrationRetryDelayMs(attempt);
-			if (delayMs === null) return;
+			if (delayMs === null) return false;
 			retryAttemptsRef.current.set(organizationId, attempt);
 			posthog.capture("v1_auto_migration_retry_scheduled", {
 				trigger,
@@ -133,34 +187,63 @@ export function V1AutoMigration() {
 				startedOrgsRef.current.delete(organizationId);
 				setRetryTick((tick) => tick + 1);
 			}, delayMs);
+			return true;
+		};
+		// Terminals live in the pty-daemon, which outlives a host-service reset,
+		// so this is safe on either surface. Once per org per session.
+		const resetOutdatedHostOnce = async (
+			reasons: string[],
+		): Promise<"ok" | "failed" | undefined> => {
+			if (
+				!reasons.some(isHostVersionSkewV1MigrationFailure) ||
+				hostResetOrgsRef.current.has(organizationId)
+			) {
+				return undefined;
+			}
+			hostResetOrgsRef.current.add(organizationId);
+			try {
+				await electronTrpcClient.hostServiceCoordinator.reset.mutate({
+					organizationId,
+				});
+				return "ok";
+			} catch (resetError) {
+				console.error("[v1-migration] host-service reset failed", resetError);
+				return "failed";
+			}
 		};
 		void (async () => {
-			let locked = false;
+			let lockToken: string | null = null;
+			let hostReset: "ok" | "failed" | undefined;
+			let showsProgress = false;
 			const startedAt = Date.now();
 			try {
-				const lock = await electronTrpcClient.migration.acquireRunLock.mutate();
-				if (!lock.acquired) return;
-				locked = true;
+				lockToken = await waitForV1MigrationRunLock({
+					shouldStop: () => !isActiveOrg(),
+				});
+				if (lockToken === null) {
+					// Org switched while waiting: run again if the user comes back.
+					startedOrgsRef.current.delete(organizationId);
+					return;
+				}
+				const scoped = await scopeV1MigrationIpc(
+					electronV1MigrationIpc,
+					organizationId,
+				);
+				ipc = scoped.ipc;
 
 				let groupsOnly = false;
 				if (isV2CloudEnabled) {
-					const followUpPending = isV1FollowUpPending(organizationId);
-					const migrationComplete = isV1MigrationComplete(organizationId);
-					let hasV1Data = false;
-					if (!followUpPending && !migrationComplete) {
-						const [v1Projects, v1Workspaces] = await Promise.all([
-							electronV1MigrationIpc.readV1Projects(),
-							electronV1MigrationIpc.readV1Workspaces(),
-						]);
-						hasV1Data = v1Projects.length + v1Workspaces.length > 0;
-					}
-					groupsOnly =
-						planV2SurfacePass({
-							followUpPending,
-							migrationComplete,
-							hasV1Data,
-						}) === "groups-only";
+					const plan = await planV1AutoPass({
+						ipc,
+						leftOut: scoped.leftOut,
+						organizationId,
+						followUpPending: isV1FollowUpPending(organizationId),
+						migrationComplete: isV1MigrationComplete(organizationId),
+					});
+					groupsOnly = plan.pass === "groups-only";
+					showsProgress = plan.showsProgress;
 				}
+				if (showsProgress) setStatus(organizationId, "running");
 
 				const groupTarget: V1GroupTarget = (group, projectId, tag) => {
 					const sectionId = buildSidebarFolderKey(projectId, tag);
@@ -183,7 +266,7 @@ export function V1AutoMigration() {
 						groupTarget,
 						organizationId,
 						hostClient: getHostServiceClientByUrl(hostUrl),
-						ipc: electronV1MigrationIpc,
+						ipc,
 					});
 					return;
 				}
@@ -192,7 +275,7 @@ export function V1AutoMigration() {
 					groupTarget,
 					organizationId,
 					hostClient: getHostServiceClientByUrl(hostUrl),
-					ipc: electronV1MigrationIpc,
+					ipc,
 					reconcileWithHost: !isV2CloudEnabled,
 					presetTarget: {
 						agents,
@@ -220,14 +303,19 @@ export function V1AutoMigration() {
 				if (!summary.gateComplete) {
 					let gatingReasons: string[] = [];
 					try {
-						gatingReasons = await listGatingFailureReasons(organizationId);
+						gatingReasons = await listGatingFailureReasons(ipc, organizationId);
 					} catch {}
-					if (
+					// A per-item import that hit an outdated host-service is ledgered
+					// rather than thrown; reset it and retry like the thrown case.
+					hostReset = await resetOutdatedHostOnce(gatingReasons);
+					const retrying =
 						gatingReasons.length > 0 &&
-						gatingReasons.every(isTransientV1MigrationFailure)
-					) {
+						(hostReset === "ok" ||
+							gatingReasons.every(isTransientV1MigrationFailure)) &&
 						scheduleRetry(gatingReasons);
-					}
+					if (!retrying) await settleStatus(true);
+				} else {
+					await settleStatus(false);
 				}
 
 				let firstCompletion = false;
@@ -270,8 +358,7 @@ export function V1AutoMigration() {
 					0
 				) {
 					try {
-						const rows =
-							await electronV1MigrationIpc.ledgerList(organizationId);
+						const rows = await ipc.ledgerList(organizationId);
 						const reasons = (status: "error" | "skipped") =>
 							[
 								...new Set(
@@ -292,21 +379,27 @@ export function V1AutoMigration() {
 					duration_ms: Date.now() - startedAt,
 					failure_reasons: failureReasons,
 					skip_reasons: skipReasons,
+					host_reset: hostReset,
 				});
 			} catch (err) {
 				// Retries next boot; the ledger holds whatever progress landed.
 				console.error("[v1-migration] auto pass failed", err);
+				const message = err instanceof Error ? err.message : String(err);
+				const durationMs = Date.now() - startedAt;
+				hostReset = await resetOutdatedHostOnce([message]);
 				posthog.capture("v1_auto_migration_failed", {
 					trigger,
-					duration_ms: Date.now() - startedAt,
-					error: err instanceof Error ? err.message : String(err),
+					duration_ms: durationMs,
+					error: message,
+					host_reset: hostReset,
 				});
-				scheduleRetry([err instanceof Error ? err.message : String(err)]);
+				const retrying = scheduleRetry([message]);
+				if (showsProgress && !retrying) {
+					setStatus(organizationId, "blocked");
+				}
 			} finally {
-				if (locked) {
-					void electronTrpcClient.migration.releaseRunLock
-						.mutate()
-						.catch(() => {});
+				if (lockToken !== null) {
+					void electronV1MigrationRunLock.release(lockToken).catch(() => {});
 				}
 			}
 		})();
@@ -321,6 +414,7 @@ export function V1AutoMigration() {
 		collections,
 		finalizeSetup,
 		ensureWorkspaceInSidebar,
+		setMigrationStatus,
 		retryTick,
 	]);
 

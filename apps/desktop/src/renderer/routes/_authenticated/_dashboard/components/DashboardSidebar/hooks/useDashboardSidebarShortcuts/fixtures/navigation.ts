@@ -69,6 +69,8 @@ function workspace(
 		lastActivityAt: null,
 		taskId: null,
 		pendingTransaction: null,
+		isMine: null,
+		sandboxStatus: null,
 	};
 }
 const pinnedWorkspaces = [
@@ -105,7 +107,9 @@ beforeEach(() => {
 	useDeletingWorkspacesStore.setState({ deletingIds: new Set() });
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
+			channels: false,
 			cloud: false,
+			devs: false,
 			pinned: false,
 			sessions: false,
 			workspaces: false,
@@ -164,7 +168,9 @@ test("reveals a collapsed Workspaces section, not just Pinned, for a pinned targ
 	currentWorkspaceId = "project-workspace";
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
+			channels: false,
 			cloud: false,
+			devs: false,
 			pinned: false,
 			sessions: false,
 			workspaces: true,

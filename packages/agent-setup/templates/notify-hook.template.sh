@@ -69,7 +69,7 @@ SUBAGENT_TYPE=$(json_field agent_type agentType)
 TRANSCRIPT_PATH=$(json_field transcript_path transcriptPath)
 AGENT_TRANSCRIPT_PATH=$(json_field agent_transcript_path agentTranscriptPath)
 
-HOOK_SESSION_ID=$(json_field session_id sessionId)
+HOOK_SESSION_ID=$(json_field session_id sessionId conversationId)
 RESOURCE_ID=$(json_field resourceId resource_id)
 SESSION_ID=${RESOURCE_ID:-$HOOK_SESSION_ID}
 if [ -z "$SESSION_ID" ]; then
@@ -80,7 +80,11 @@ fi
 
 # Claude/Mastra/Droid/Kimi use "hook_event_name"; Grok uses camelCase
 # "hookEventName" (snake_case values, mapped server-side); Codex uses "type".
-EVENT_TYPE=$(json_field hook_event_name hookEventName)
+# Antigravity's payload names no event, so its hook config sets
+# SUPERSET_HOOK_EVENT. It wins over the payload, which carries the user's
+# prompt text verbatim.
+EVENT_TYPE="$SUPERSET_HOOK_EVENT"
+[ -z "$EVENT_TYPE" ] && EVENT_TYPE=$(json_field hook_event_name hookEventName)
 if [ -z "$EVENT_TYPE" ]; then
   CODEX_TYPE=$(json_field type)
   case "$CODEX_TYPE" in
@@ -140,7 +144,7 @@ json_escape() {
 # is frozen into the agent's env at terminal creation; after a host-service
 # restart on a new port it would point at a dead socket forever (a live
 # process's env can't change). Each org's manifest
-# (~/.superset/host/<orgId>/manifest.json) is rewritten with the live endpoint
+# (~/.paradev/host/<orgId>/manifest.json) is rewritten with the live endpoint
 # on every start, so it never goes stale. Try the env URL first (fast path),
 # then every org manifest's endpoint. Only the host that owns this terminal
 # answers "ignored":false; probing the other orgs' hosts is a harmless no-op.
@@ -152,7 +156,7 @@ dispatch_to_host() {
   HOOK_ACCEPTED="0"
   HOOK_DELIVERED_2XX="0"
   HOOK_CANDIDATE_URLS="$SUPERSET_HOST_AGENT_HOOK_URL"
-  for MANIFEST_FILE in "${SUPERSET_HOME_DIR:-$HOME/.superset}"/host/*/manifest.json; do
+  for MANIFEST_FILE in "${SUPERSET_HOME_DIR:-$HOME/{{APP_HOME_DIR_NAME}}}"/host/*/manifest.json; do
     [ -f "$MANIFEST_FILE" ] || continue
     MANIFEST_ENDPOINT=$(grep -oE '"endpoint"[[:space:]]*:[[:space:]]*"[^"]*"' "$MANIFEST_FILE" | head -1 | grep -oE '"[^"]*"$' | tr -d '"')
     [ -n "$MANIFEST_ENDPOINT" ] || continue

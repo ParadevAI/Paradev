@@ -27,10 +27,12 @@ import { UserMessageBubble } from "./components/UserMessageBubble";
 
 interface ChatRowViewProps {
 	row: ChatRow;
+	asker?: string | undefined;
 	isLastReply: boolean;
 	/** The streamed text for a message or thought, else its stored text. */
 	text: string;
 	harness: string | undefined;
+	hostUrl?: string;
 	onRespond: (approvalId: string, decision: Decision) => Promise<void>;
 	onRetryPrompt: (clientId: string) => void;
 	onDiscardPrompt: (clientId: string) => void;
@@ -62,9 +64,11 @@ function sameRow(a: ChatRow, b: ChatRow): boolean {
 export const ChatRowView = memo(
 	function ChatRowView({
 		row,
+		asker,
 		isLastReply,
 		text,
 		harness,
+		hostUrl,
 		onRespond,
 		onRetryPrompt,
 		onDiscardPrompt,
@@ -85,6 +89,7 @@ export const ChatRowView = memo(
 					<UserMessageBubble
 						content={row.entry.content}
 						harness={harness}
+						hostUrl={hostUrl}
 						pending={{
 							failed: row.entry.state === "failed",
 							onRetry: () => onRetryPrompt(row.entry.clientId),
@@ -122,6 +127,7 @@ export const ChatRowView = memo(
 					<UserMessageBubble
 						content={(item as UserMessage).content}
 						harness={harness}
+						hostUrl={hostUrl}
 					/>
 				);
 			case "agent_message":
@@ -159,6 +165,7 @@ export const ChatRowView = memo(
 				return (
 					<ApprovalCard
 						approval={item as ApprovalRequest}
+						asker={asker}
 						onRespond={onRespond}
 					/>
 				);
@@ -177,9 +184,11 @@ export const ChatRowView = memo(
 	},
 	(prev, next) =>
 		sameRow(prev.row, next.row) &&
+		prev.asker === next.asker &&
 		prev.isLastReply === next.isLastReply &&
 		prev.text === next.text &&
 		prev.harness === next.harness &&
+		prev.hostUrl === next.hostUrl &&
 		prev.onRespond === next.onRespond &&
 		prev.onRetryPrompt === next.onRetryPrompt &&
 		prev.onDiscardPrompt === next.onDiscardPrompt &&

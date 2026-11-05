@@ -11,6 +11,7 @@ process.env.SUPERSET_HOME_DIR = tempHome;
 
 const { resolveAuth } = await import("./resolve-auth");
 const { readConfig, writeConfig } = await import("./config");
+const { removeManifest, writeManifest } = await import("./host/manifest");
 
 function clearConfig(): void {
 	writeConfig({});
@@ -20,13 +21,18 @@ function clearConfig(): void {
 // would leak into every test. Clear it for the suite, restore in afterAll.
 const originalEnvKey = process.env.SUPERSET_API_KEY;
 const originalOrganizationId = process.env.SUPERSET_ORGANIZATION_ID;
+const originalWorkspaceId = process.env.SUPERSET_WORKSPACE_ID;
+const originalSandboxWorkspaceId = process.env.SUPERSET_SANDBOX_WORKSPACE_ID;
 delete process.env.SUPERSET_API_KEY;
 delete process.env.SUPERSET_ORGANIZATION_ID;
+delete process.env.SUPERSET_WORKSPACE_ID;
+delete process.env.SUPERSET_SANDBOX_WORKSPACE_ID;
 
 afterEach(() => {
 	clearConfig();
 	delete process.env.SUPERSET_API_KEY;
 	delete process.env.SUPERSET_ORGANIZATION_ID;
+	delete process.env.SUPERSET_WORKSPACE_ID;
 });
 
 afterAll(() => {
@@ -42,6 +48,14 @@ afterAll(() => {
 		delete process.env.SUPERSET_ORGANIZATION_ID;
 	} else {
 		process.env.SUPERSET_ORGANIZATION_ID = originalOrganizationId;
+	}
+	if (originalWorkspaceId === undefined) {
+		delete process.env.SUPERSET_WORKSPACE_ID;
+	} else {
+		process.env.SUPERSET_WORKSPACE_ID = originalWorkspaceId;
+	}
+	if (originalSandboxWorkspaceId !== undefined) {
+		process.env.SUPERSET_SANDBOX_WORKSPACE_ID = originalSandboxWorkspaceId;
 	}
 });
 
@@ -146,5 +160,146 @@ describe("resolveAuth", () => {
 		const result = await resolveAuth(undefined);
 		expect(result.bearer).toBe("sk_live_stored");
 		expect(result.authSource).toBe("config");
+	});
+});
+
+describe("resolveAuth in a Paradev terminal", () => {
+	let hostResponse: () => Response;
+	const host = Bun.serve({ port: 0, fetch: () => hostResponse() });
+
+	function enterTerminal(): void {
+		process.env.SUPERSET_ORGANIZATION_ID = "org_workspace";
+		process.env.SUPERSET_WORKSPACE_ID = "ws_1";
+		writeManifest({
+			pid: process.pid,
+			endpoint: `http://127.0.0.1:${host.port}`,
+			authToken: "host-secret",
+			startedAt: Date.now(),
+			organizationId: "org_workspace",
+		});
+	}
+
+	afterEach(() => removeManifest("org_workspace"));
+	afterAll(() => host.stop(true));
+
+	it("acts as the account that runs the workspace's host", async () => {
+		enterTerminal();
+		writeConfig({ apiKey: "sk_live_other_account" });
+		hostResponse = () =>
+			Response.json([{ result: { data: { json: { token: "host-jwt" } } } }]);
+
+		const result = await resolveAuth(undefined);
+
+		expect(result.bearer).toBe("host-jwt");
+		expect(result.authSource).toBe("host");
+		expect(result.config.organizationId).toBe("org_workspace");
+	});
+
+	it("falls back to its own login when the host gives no token", async () => {
+		enterTerminal();
+		writeConfig({ apiKey: "sk_live_own" });
+		hostResponse = () =>
+			Response.json(
+				[
+					{
+						error: {
+							json: {
+								message: "No procedure",
+								code: -32004,
+								data: { code: "NOT_FOUND", httpStatus: 404 },
+							},
+						},
+					},
+				],
+				{ status: 404 },
+			);
+
+		const result = await resolveAuth(undefined);
+
+		expect(result.bearer).toBe("sk_live_own");
+		expect(result.authSource).toBe("config");
+	});
+
+	it("keeps its own login for a command that outlives the host token", async () => {
+		enterTerminal();
+		writeConfig({ apiKey: "sk_live_own" });
+		hostResponse = () =>
+			Response.json([{ result: { data: { json: { token: "host-jwt" } } } }]);
+
+		const result = await resolveAuth(undefined, { useHostToken: false });
+
+		expect(result.bearer).toBe("sk_live_own");
+	});
+});
+
+describe("resolveAuth OAuth refresh", () => {
+	const realFetch = globalThis.fetch;
+	let tokenRequests = 0;
+
+	afterEach(() => {
+		globalThis.fetch = realFetch;
+		tokenRequests = 0;
+		fs.rmSync(path.join(tempHome, "auth-refresh.lock"), { force: true });
+	});
+
+	function stubTokenEndpoint(): void {
+		globalThis.fetch = (async (input: string | URL | Request) => {
+			if (!String(input).endsWith("/api/auth/oauth2/token")) {
+				throw new Error(`unexpected request ${String(input)}`);
+			}
+			tokenRequests++;
+			await new Promise((resolve) => setTimeout(resolve, 30));
+			return Response.json({
+				access_token: `fresh-${tokenRequests}`,
+				refresh_token: `rotated-${tokenRequests}`,
+				expires_in: 3600,
+			});
+		}) as typeof fetch;
+	}
+
+	const expiring = () => ({
+		accessToken: "stale",
+		refreshToken: "stale-refresh",
+		expiresAt: Date.now() + 60_000,
+	});
+
+	it("parallel commands in the refresh window send one refresh and share its token", async () => {
+		stubTokenEndpoint();
+		writeConfig({ auth: expiring() });
+
+		const results = await Promise.all([
+			resolveAuth(undefined),
+			resolveAuth(undefined),
+			resolveAuth(undefined),
+		]);
+
+		expect(tokenRequests).toBe(1);
+		expect(results.map((r) => r.bearer)).toEqual([
+			"fresh-1",
+			"fresh-1",
+			"fresh-1",
+		]);
+		expect(readConfig().auth?.refreshToken).toBe("rotated-1");
+	});
+
+	it("waits for a refresh another process holds and uses its token", async () => {
+		stubTokenEndpoint();
+		writeConfig({ auth: expiring() });
+		const lockPath = path.join(tempHome, "auth-refresh.lock");
+		fs.writeFileSync(lockPath, "other-process");
+
+		const pending = resolveAuth(undefined);
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		writeConfig({
+			auth: {
+				accessToken: "theirs",
+				refreshToken: "their-refresh",
+				expiresAt: Date.now() + 3_600_000,
+			},
+		});
+		fs.rmSync(lockPath);
+
+		expect((await pending).bearer).toBe("theirs");
+		expect(tokenRequests).toBe(0);
 	});
 });

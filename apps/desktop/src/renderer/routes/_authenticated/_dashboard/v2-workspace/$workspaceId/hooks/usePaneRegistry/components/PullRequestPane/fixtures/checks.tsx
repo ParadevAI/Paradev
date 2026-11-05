@@ -26,16 +26,29 @@ mock.module(`${pane}/hooks/usePullRequestPaneDetail`, () => ({
 }));
 mock.module("@superset/workspace-client", () => ({
 	workspaceTrpc: {
-		git: {
-			getPullRequest: { useQuery: () => ({ data: null }) },
-			getPullRequestThreads: { useQuery: () => ({ data: null }) },
-		},
+		git: { getPullRequest: { useQuery: () => ({ data: null }) } },
 	},
+}));
+mock.module(`${root}/pull-requests/hooks/usePullRequestThreads`, () => ({
+	usePullRequestThreads: () => ({
+		data: undefined,
+		isLoading: false,
+		isError: false,
+	}),
+}));
+mock.module("renderer/hooks/useActiveOrganizationId", () => ({
+	useActiveOrganizationId: () => "org",
+}));
+mock.module("renderer/lib/host-service-client", () => ({
+	getHostServiceClientByUrl: () => ({}),
 }));
 mock.module(
 	`${root}/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation`,
 	() => ({ useReviewCommentNavigation: () => mock() }),
 );
+mock.module(`${root}/pull-requests/hooks/useRefreshPullRequest`, () => ({
+	useRefreshPullRequest: () => ({ refresh: () => {}, isRefreshing: false }),
+}));
 mock.module(`${root}/pull-requests/components/PullRequestActions`, () => ({
 	PullRequestActions: () => null,
 }));
@@ -52,8 +65,8 @@ mock.module(
 	`${root}/pull-requests/components/PullRequestSummaryContent`,
 	() => ({ PullRequestSummaryContent: () => null }),
 );
-mock.module(`${pane}/components/PullRequestComments`, () => ({
-	PullRequestComments: () => null,
+mock.module(`${pane}/utils/buildReviewThreadEntries`, () => ({
+	buildReviewThreadEntries: () => [],
 }));
 mock.module(`${root}/components/WorkItemDetailState`, () => ({
 	WorkItemDetailState: ({ message }: { message: string }) => (
@@ -112,7 +125,6 @@ for (const state of ["loading", "error"] as const) {
 			<PullRequestPane
 				data={{ repoFullName: "owner/repo", number: 12 }}
 				onOpenDiff={mock()}
-				onOpenComment={mock()}
 				onOpenPage={mock()}
 			/>,
 		);
@@ -141,7 +153,6 @@ test("matching projects retain project actions even while Summary loads", async 
 		<PullRequestPane
 			data={{ repoFullName: "owner/repo", number: 12 }}
 			onOpenDiff={mock()}
-			onOpenComment={mock()}
 			onOpenPage={mock()}
 		/>,
 	);

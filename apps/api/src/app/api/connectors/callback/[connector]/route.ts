@@ -14,6 +14,7 @@ import { env } from "@/env";
 import { connectorStateCookie } from "@/lib/integrations/oauthFlow";
 import { resolveCallback } from "@/lib/integrations/resolveCallback";
 import { connectorStateSchema, verifySignedState } from "@/lib/oauth-state";
+import { enqueueWatchSetup } from "../../../integrations/google/lib/enqueueWatchSetup";
 
 function callbackParams(method: ConnectorMethod): string[] {
 	if (method.type === "oauth2") return ["code"];
@@ -51,10 +52,13 @@ export async function GET(
 		stateInCookieOnly: method.type === "app_install",
 	});
 	if (callback instanceof Response) return callback;
-	const web = (query: string) => callback.exit(`${connectUrl}${query}`);
+	const carried = verifySignedState(callback.state, connectorStateSchema);
+	const returnUrl = carried?.plugin
+		? `${env.NEXT_PUBLIC_WEB_URL}/plugins/${encodeURIComponent(carried.plugin)}`
+		: connectUrl;
+	const web = (query: string) => callback.exit(`${returnUrl}${query}`);
 
 	try {
-		const carried = verifySignedState(callback.state, connectorStateSchema);
 		const codeVerifier = carried?.codeVerifier
 			? await decryptSecret(carried.codeVerifier)
 			: null;
@@ -65,6 +69,7 @@ export async function GET(
 			codeVerifier,
 			params: callback.params,
 			issuer: callback.url.searchParams.get("iss"),
+			clientId: carried?.clientId ?? null,
 		});
 
 		const identity = await probeIdentity(
@@ -96,6 +101,8 @@ export async function GET(
 				: "";
 			return web(`?error=account_already_linked${owner}`);
 		}
+		// Gmail triggers need a mailbox watch, which nothing else creates.
+		if (slug === "google") await enqueueWatchSetup(result.connectionId);
 	} catch (error) {
 		console.error(`[connectors/${slug}] callback failed:`, error);
 		return web("?error=token_exchange_failed");

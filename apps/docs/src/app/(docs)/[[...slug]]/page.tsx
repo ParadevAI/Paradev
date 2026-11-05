@@ -30,8 +30,8 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
 				header: <div className="w-10 h-4"></div>,
 			}}
 			editOnGithub={{
-				owner: "superset-sh",
-				repo: "superset",
+				owner: "paradevai",
+				repo: "paradev",
 				path: `apps/docs/content/docs/${page.path}`,
 			}}
 		>
@@ -55,7 +55,7 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
 				<LLMCopyButton markdownUrl={markdownUrl} />
 				<ViewOptions
 					markdownUrl={markdownUrl}
-					githubUrl={`https://github.com/superset-sh/superset/blob/main/apps/docs/content/docs/${page.path}`}
+					githubUrl={`https://github.com/paradevai/paradev/blob/main/apps/docs/content/docs/${page.path}`}
 				/>
 			</div>
 			<DocsBody>

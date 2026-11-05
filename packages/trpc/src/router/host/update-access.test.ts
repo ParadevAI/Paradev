@@ -8,7 +8,7 @@ const input = { organizationId: "org", machineId: "host", userId: "requester" };
 test("an organization member cannot authorize an update using a known host id", async () => {
 	await expect(
 		authorizeHostUpdate(
-			{ userId: "member", organizationIds: ["org"] },
+			{ userId: "member", isMember: true },
 			input,
 			async (_o, _h, u) => u === "requester",
 		),
@@ -18,7 +18,7 @@ test("an owner credential cannot authorize across organizations", async () => {
 	let lookups = 0;
 	await expect(
 		authorizeHostUpdate(
-			{ userId: "owner", organizationIds: ["other"] },
+			{ userId: "owner", isMember: false },
 			input,
 			async () => {
 				lookups++;
@@ -31,7 +31,7 @@ test("an owner credential cannot authorize across organizations", async () => {
 test("host-owner credentials still cannot authorize a non-owner requester", async () => {
 	expect(
 		await authorizeHostUpdate(
-			{ userId: "owner", organizationIds: ["org"] },
+			{ userId: "owner", isMember: true },
 			input,
 			async (_o, _h, u) => u === "owner",
 		),
@@ -41,7 +41,7 @@ test("both owner checks are scoped to the host and organization supplied by the 
 	const seen: string[][] = [];
 	expect(
 		await authorizeHostUpdate(
-			{ userId: "owner", organizationIds: ["org"] },
+			{ userId: "owner", isMember: true },
 			input,
 			async (...args) => {
 				seen.push(args);

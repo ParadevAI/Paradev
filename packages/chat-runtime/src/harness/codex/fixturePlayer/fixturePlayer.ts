@@ -6,11 +6,18 @@ export class FixturePlayer {
 	private handlers: CodexTransportHandlers | null = null;
 	private pumping = false;
 	private readonly sentMethods: string[] = [];
+	private readonly sentParams: { method: string; params: unknown }[] = [];
 
 	constructor(private readonly frames: readonly RecordedFrame[]) {}
 
 	get methodsSent(): readonly string[] {
 		return this.sentMethods;
+	}
+
+	paramsSent(method: string): unknown[] {
+		return this.sentParams
+			.filter((sent) => sent.method === method)
+			.map((sent) => sent.params);
 	}
 
 	get exhausted(): boolean {
@@ -29,8 +36,11 @@ export class FixturePlayer {
 	}
 
 	private onSend(line: string): void {
-		const sent = JSON.parse(line) as { method?: string };
-		if (sent.method) this.sentMethods.push(sent.method);
+		const sent = JSON.parse(line) as { method?: string; params?: unknown };
+		if (sent.method) {
+			this.sentMethods.push(sent.method);
+			this.sentParams.push({ method: sent.method, params: sent.params });
+		}
 
 		const next = this.frames[this.index];
 		if (next?.direction === "out") {

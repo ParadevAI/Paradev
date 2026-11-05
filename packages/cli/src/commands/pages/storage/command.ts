@@ -1,7 +1,16 @@
-import { CLIError, positional, string, table } from "@superset/cli-framework";
+import {
+	boolean,
+	CLIError,
+	positional,
+	string,
+	table,
+} from "@superset/cli-framework";
 import {
 	MAX_PAGE_STORAGE_KEY_LENGTH,
 	type PageStorageReadback,
+	type PageStorageScope,
+	type PageStorageWriteRequest,
+	parsePageStorageScope,
 } from "@superset/shared/page-storage";
 import { pageStorageRecordsPath } from "@superset/shared/page-storage-hub";
 import { command } from "../../../lib/command";
@@ -37,18 +46,24 @@ export async function readStorage({
 	jwt,
 	pageId,
 	key,
+	scope,
 	fetchImpl = fetch,
 }: {
 	realtimeUrl: string;
 	jwt: string;
 	pageId: string;
 	key?: string;
+	scope?: PageStorageScope;
 	fetchImpl?: typeof fetch;
 }): Promise<PageStorageReadback> {
-	const response = await fetchImpl(
-		`${realtimeUrl}${pageStorageRecordsPath(pageId, key)}`,
-		{ headers: { authorization: `Bearer ${jwt}` } },
-	);
+	const path = pageStorageRecordsPath(pageId, key);
+	const url =
+		scope && scope !== "slot" && key !== undefined
+			? `${realtimeUrl}${path}&scope=${scope}`
+			: `${realtimeUrl}${path}`;
+	const response = await fetchImpl(url, {
+		headers: { authorization: `Bearer ${jwt}` },
+	});
 	if (response.ok) return (await response.json()) as PageStorageReadback;
 	const error = (
 		(await response.json().catch(() => null)) as { error?: string } | null
@@ -76,6 +91,53 @@ export async function readStorage({
 	}
 }
 
+export async function writeStorage({
+	realtimeUrl,
+	jwt,
+	pageId,
+	request,
+	fetchImpl = fetch,
+	timeoutMs = 10_000,
+}: {
+	realtimeUrl: string;
+	jwt: string;
+	pageId: string;
+	request: PageStorageWriteRequest;
+	fetchImpl?: typeof fetch;
+	timeoutMs?: number;
+}): Promise<{ ok: true }> {
+	const response = await fetchImpl(
+		`${realtimeUrl}${pageStorageRecordsPath(pageId)}`,
+		{
+			method: "POST",
+			headers: {
+				authorization: `Bearer ${jwt}`,
+				"content-type": "application/json",
+			},
+			body: JSON.stringify(request),
+			signal: AbortSignal.timeout(timeoutMs),
+		},
+	).catch((error: unknown) => {
+		if (error instanceof Error && error.name === "TimeoutError") {
+			throw new CLIError(
+				`Page storage did not answer within ${timeoutMs / 1000} seconds`,
+				"Try again. If it keeps happening, check your network",
+			);
+		}
+		throw error;
+	});
+	if (response.ok) return { ok: true };
+	const error = (
+		(await response.json().catch(() => null)) as { error?: string } | null
+	)?.error;
+	throw new CLIError(
+		error ?? `Page storage refused the write (${response.status})`,
+		response.status === 403
+			? "Only signed-in members of the page's organization can write its storage (on a just_me page, only its creator)"
+			: undefined,
+	);
+}
+
 function printable(text: string): string {
 	return text.replace(
 		/\p{Cc}/gu,
@@ -89,12 +151,13 @@ export function displayStorage(data: PageStorageReadback): string {
 		return table(
 			data.keys.map((row) => ({
 				key: printable(row.key),
+				scope: row.scope,
 				records: row.records,
 				updated: new Date(row.updatedAt).toLocaleString(),
 			})),
-			["key", "records", "updated"],
-			["KEY", "RECORDS", "UPDATED"],
-			[MAX_PAGE_STORAGE_KEY_LENGTH, 8, 24],
+			["key", "scope", "records", "updated"],
+			["KEY", "SCOPE", "RECORDS", "UPDATED"],
+			[MAX_PAGE_STORAGE_KEY_LENGTH, 8, 8, 24],
 		);
 	}
 	if (data.records.length === 0) return `No records for key "${data.key}".`;
@@ -111,18 +174,68 @@ export function displayStorage(data: PageStorageReadback): string {
 }
 
 export default command({
-	description: "Read a page's shared storage: keys, or every slot of one key",
+	description:
+		"Read or write a page's storage: keys, every slot of one key, or one value",
 	args: [positional("page").required().desc("Page id or slug")],
 	options: {
-		key: string().desc("Show every person's slot for this key"),
+		key: string().desc("The key to read or write"),
+		scope: string().desc("slot (default), private, or shared"),
+		set: string().desc("Store this JSON value under --key"),
+		remove: boolean().desc("Remove your value under --key"),
 	},
-	run: async ({ ctx, args, options }) => ({
-		data: await readStorage({
-			realtimeUrl: env.REALTIME_URL,
-			jwt: await userJwt(ctx.bearer),
-			pageId: await resolvePageId(ctx, args.page as string),
-			key: options.key,
-		}),
-	}),
-	display: (data) => displayStorage(data as PageStorageReadback),
+	run: async ({ ctx, args, options }) => {
+		const scope = parsePageStorageScope(options.scope);
+		if (!scope) {
+			throw new CLIError(
+				`Unknown scope "${options.scope}"`,
+				"Use slot, private, or shared",
+			);
+		}
+		const pageId = await resolvePageId(ctx, args.page as string);
+		const jwt = await userJwt(ctx.bearer);
+		if (options.set !== undefined || options.remove) {
+			if (!options.key) {
+				throw new CLIError("--set and --remove need --key");
+			}
+			if (options.set !== undefined && options.remove) {
+				throw new CLIError("Pass --set or --remove, not both");
+			}
+			let request: PageStorageWriteRequest;
+			if (options.remove) {
+				request = { op: "remove", key: options.key, scope };
+			} else {
+				let value: unknown;
+				try {
+					value = JSON.parse(options.set as string);
+				} catch {
+					throw new CLIError(
+						"--set takes JSON",
+						`For a string, quote it: --set '"text"'`,
+					);
+				}
+				request = { op: "set", key: options.key, value, scope };
+			}
+			return {
+				data: await writeStorage({
+					realtimeUrl: env.REALTIME_URL,
+					jwt,
+					pageId,
+					request,
+				}),
+			};
+		}
+		return {
+			data: await readStorage({
+				realtimeUrl: env.REALTIME_URL,
+				jwt,
+				pageId,
+				key: options.key,
+				scope,
+			}),
+		};
+	},
+	display: (data) =>
+		"ok" in (data as object)
+			? "Saved."
+			: displayStorage(data as PageStorageReadback),
 });

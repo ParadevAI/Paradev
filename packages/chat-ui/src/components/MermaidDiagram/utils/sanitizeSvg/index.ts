@@ -1,0 +1,1 @@
+export { sanitizeSvg } from "./sanitizeSvg";

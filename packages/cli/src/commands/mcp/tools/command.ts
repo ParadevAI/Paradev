@@ -1,5 +1,6 @@
 import { string, table } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
+import { resolveOrganizationId } from "../../../lib/config";
 import { resolvePluginName } from "../../../lib/plugins/connection-ref";
 import { connectPluginMcp } from "../../../lib/plugins/mcp-client";
 
@@ -30,7 +31,10 @@ export default command({
 
 		const { client, ref } = await connectPluginMcp(
 			pluginName,
-			ctx.bearer,
+			{
+				bearer: ctx.bearer,
+				organizationId: resolveOrganizationId(ctx.config),
+			},
 			options.account as string | undefined,
 		);
 		try {

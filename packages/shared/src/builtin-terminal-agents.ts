@@ -147,6 +147,16 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		nonInteractiveCommand: "pi --no-tools -p",
 	}),
 	createBuiltinTerminalAgent({
+		id: "pdev",
+		label: "pdev",
+		description:
+			"Coding agent built on Pi that routes each task to a model through its router.",
+		command: "pdev",
+		resumeCommand: "pdev --session",
+		forkCommand: "pdev --fork {sessionId}",
+		nonInteractiveCommand: "pdev -p",
+	}),
+	createBuiltinTerminalAgent({
 		id: "copilot",
 		label: "Copilot",
 		description:

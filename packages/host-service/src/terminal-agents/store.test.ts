@@ -14,6 +14,32 @@ describe("TerminalAgentStore", () => {
 		store = new TerminalAgentStore();
 	});
 
+	it("reports every hook event as activity, a subagent's included, even when the status does not change", () => {
+		let activity = 0;
+		store.on("activity", () => {
+			activity += 1;
+		});
+		for (const occurredAt of [1, 2, 3]) {
+			store.recordEvent({
+				terminalId: "t1",
+				workspaceId: WORKSPACE,
+				eventType: "Start",
+				agentId: "claude",
+				occurredAt,
+			});
+		}
+		expect(activity).toBe(3);
+
+		store.recordSubagentEvent({
+			terminalId: "t1",
+			workspaceId: WORKSPACE,
+			eventType: "SubagentStart",
+			subagentId: "a1",
+			occurredAt: 4,
+		});
+		expect(activity).toBe(4);
+	});
+
 	describe("subagent roster", () => {
 		// Roster staleness is measured against the wall clock.
 		const NOW = Date.now();

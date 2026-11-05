@@ -1,15 +1,9 @@
-import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { isViewerAlone } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacePresenceStack";
 import type { CloudWorkspaceListItem } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacesList/components/CloudWorkspaceListRow";
-import {
-	type CloudPullRequestRef,
-	cloudPullRequestRefKey,
-	useCloudPullRequests,
-} from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
+import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
 import { useOpenPullRequestInApp } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenPullRequestInApp";
 import {
@@ -37,17 +31,10 @@ export function useCloudWorkspaceListItems(workspaces: CloudWorkspaceRow[]) {
 	const { repositoriesById } = useCloudWorkspaceRepositories({
 		organizationId,
 	});
-	const pullRequestRefs = useMemo<CloudPullRequestRef[]>(
-		() =>
-			workspaces.flatMap((workspace) =>
-				(repositoriesById.get(workspace.id) ?? []).map((repoFullName) => ({
-					repoFullName,
-					headBranch: workspace.branch,
-				})),
-			),
-		[workspaces, repositoriesById],
-	);
-	const pullRequests = useCloudPullRequests(pullRequestRefs);
+	const { byWorkspace: pullRequestsById } = useCloudPullRequests({
+		active: workspaces.some((workspace) => workspace.status !== "deleted"),
+		archived: workspaces.some((workspace) => workspace.status === "deleted"),
+	});
 
 	const toItem = (workspace: CloudWorkspaceRow): CloudWorkspaceListItem => {
 		const repos = repositoriesById.get(workspace.id) ?? [];
@@ -55,18 +42,9 @@ export function useCloudWorkspaceListItems(workspaces: CloudWorkspaceRow[]) {
 		return {
 			workspace,
 			repos,
-			pullRequests: repos.flatMap((repoFullName) => {
-				const pullRequest = pullRequests.byRef.get(
-					cloudPullRequestRefKey({
-						repoFullName,
-						headBranch: workspace.branch,
-					}),
-				);
-				return pullRequest ? [pullRequest] : [];
-			}),
+			pullRequests: pullRequestsById.get(workspace.id) ?? [],
 			isInSidebar: isInCloudSidebar(workspace, entry, userId),
 			isMine: userId !== null && workspace.createdBy?.userId === userId,
-			showsPresence: !isViewerAlone(workspace.presence, userId ?? undefined),
 			isRead: isCloudWorkspaceRead(workspace, entry?.lastReadAt),
 		};
 	};

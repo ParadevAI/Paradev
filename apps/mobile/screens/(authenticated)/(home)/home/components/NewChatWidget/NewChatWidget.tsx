@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Composer, type ComposerHandle } from "@superset/composer";
 import { errorMessage } from "@superset/i18n/errors";
-import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { getPresetById } from "@superset/shared/host-agent-presets";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -16,6 +15,7 @@ import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useCloudCreateSelection } from "@/screens/(authenticated)/(home)/hooks/useCloudCreateSelection";
+import { useIsCloudAgentEnabled } from "@/screens/(authenticated)/(home)/hooks/useIsCloudAgentEnabled";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
 import {
 	agentLaunchPresetId,
@@ -35,9 +35,12 @@ import { useNewChatTargets } from "./hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "./stores/newSessionPreferencesStore";
 
 /** The built-in preset a cloud workspace launches, in the shape a host config has. */
-function cloudAgentConfig(agentId: string | null) {
+function cloudAgentConfig(
+	agentId: string | null,
+	isCloudAgentEnabled: (agentId: string) => boolean,
+) {
 	// A preset picked for a laptop may not exist in the sandbox image.
-	const wanted = agentId && isCloudAgentId(agentId) ? agentId : "claude";
+	const wanted = agentId && isCloudAgentEnabled(agentId) ? agentId : "claude";
 	const preset = getPresetById(wanted);
 	return preset
 		? {
@@ -122,6 +125,7 @@ export function NewChatWidget({
 	});
 
 	const createTerminalWorkspace = useCreateTerminalWorkspace();
+	const isCloudAgentEnabled = useIsCloudAgentEnabled();
 	const createCloudWorkspace = useCreateCloudWorkspace();
 	const { data: agentConfigs } = useHostAgentConfigs({
 		machineId: selectedTarget?.machineId ?? null,
@@ -131,7 +135,7 @@ export function NewChatWidget({
 		enabled: !isCloudTarget,
 	});
 	const selectedAgent = isCloudTarget
-		? cloudAgentConfig(agentId)
+		? cloudAgentConfig(agentId, isCloudAgentEnabled)
 		: agentConfigs?.find((config) => config.presetId === agentId);
 	// A preset picked for a laptop may not exist in the sandbox; under Cloud
 	// the effective agent is the one that will actually launch.
@@ -190,11 +194,12 @@ export function NewChatWidget({
 		createTerminalWorkspace.isPending ||
 		createCloudWorkspace.isPending;
 
-	// The draft and the tray are cleared together, on success only. The native
-	// composer's `clear()` reaches its own text and nothing else — the tray is
-	// React Native's — and the old React Native form used to clear both, so
-	// splitting them silently left attachments behind after every send.
-	const clearComposer = () => {
+	// Once the new workspace is open, not once its create settles: a host create
+	// that fails or times out is retried from that screen with its own copy of
+	// the input. The native `clear()` reaches only its own text — the tray is
+	// React Native's — so both are cleared here.
+	const resetComposer = () => {
+		setBaseBranch(null);
 		composerRef.current?.clear();
 		draft.clear();
 	};
@@ -258,10 +263,7 @@ export function NewChatWidget({
 					effort,
 					message,
 					attachmentFileIds,
-				})
-				.then(() => {
-					setBaseBranch(null);
-					clearComposer();
+					onOpened: resetComposer,
 				})
 				.catch(() => {});
 			return;
@@ -277,10 +279,7 @@ export function NewChatWidget({
 				effort,
 				message,
 				attachmentFileIds,
-			})
-			.then(() => {
-				setBaseBranch(null);
-				clearComposer();
+				onOpened: resetComposer,
 			})
 			.catch(() => {});
 	};

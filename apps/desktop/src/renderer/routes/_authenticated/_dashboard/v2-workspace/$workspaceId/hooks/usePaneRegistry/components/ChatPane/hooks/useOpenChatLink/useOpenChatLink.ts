@@ -10,18 +10,22 @@ import {
 	useUrlLinkAction,
 } from "renderer/lib/clickPolicy";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
+import { useRecentlyViewedFiles } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRevealInFinder";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
 	OpenFile,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import {
+	runChatPullRequestLink,
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
 } from "../../../../utils/runTerminalLinkAction";
 import type { OpenLink } from "../../../ChatSession/providers/ChatPaneActionsProvider";
+import { type LocatedPath, locatePath } from "./utils/locatePath";
 import { parseFileHref } from "./utils/parseFileHref";
 
 const WEB_URL = /^https?:\/\//i;
@@ -45,12 +49,26 @@ export function useOpenChatLink({
 	const getUrlAction = useUrlLinkAction("2-tier");
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const revealInFinder = useRevealInFinder(workspaceId);
+	const rightPane = useRightPaneLinkTarget();
 	const { data: workspace } = workspaceTrpc.workspace.get.useQuery({
 		id: workspaceId,
 	});
 	const statPath = workspaceTrpc.filesystem.statPath.useMutation();
-	const statPathRef = useRef(statPath.mutateAsync);
-	statPathRef.current = statPath.mutateAsync;
+	const hostClient = workspaceTrpc.useUtils().client;
+	const { recentFiles } = useRecentlyViewedFiles(workspaceId);
+	const locateRef = useRef<(path: string) => Promise<LocatedPath | null>>(
+		async () => null,
+	);
+	locateRef.current = (path) =>
+		locatePath(path, {
+			stat: (target) => statPath.mutateAsync({ workspaceId, path: target }),
+			resolveFile: (reference) =>
+				hostClient.filesystem.resolveFileReference.query({
+					workspaceId,
+					reference,
+					preferredRelativePaths: recentFiles.map((file) => file.relativePath),
+				}),
+		});
 
 	const depsRef = useRef<TerminalLinkActionDeps>({
 		store,
@@ -59,6 +77,7 @@ export function useOpenChatLink({
 		openInExternalEditor,
 		revealInFinder,
 		worktreePath: undefined,
+		rightPane,
 	});
 	depsRef.current = {
 		store,
@@ -67,13 +86,17 @@ export function useOpenChatLink({
 		openInExternalEditor,
 		revealInFinder,
 		worktreePath: workspace?.worktreePath ?? undefined,
+		rightPane,
 	};
 
 	return useCallback(
-		(href, event) => {
+		(href, event, chosen) => {
 			const isPlain = tierFor(event, "2-tier") === "plain";
 			if (WEB_URL.test(href)) {
-				const action = getUrlAction(event, href) ?? (isPlain ? "pane" : null);
+				if (runChatPullRequestLink(depsRef.current, href, event, chosen))
+					return true;
+				const action =
+					chosen ?? getUrlAction(event, href) ?? (isPlain ? "pane" : null);
 				if (action === null) showHint(event.clientX, event.clientY);
 				else runUrlLinkAction(depsRef.current, href, action);
 				return true;
@@ -81,7 +104,7 @@ export function useOpenChatLink({
 
 			const file = parseFileHref(href);
 			if (!file) return false;
-			void statPathRef.current({ workspaceId, path: file.path }).then(
+			void locateRef.current(file.path).then(
 				(stat) => {
 					if (!stat) {
 						const { path } = file;
@@ -89,16 +112,19 @@ export function useOpenChatLink({
 						return;
 					}
 					if (stat.isDirectory) {
-						const intent =
-							folderPolicy.map[tierFor(event, "2-tier")] ??
-							(isPlain ? "reveal" : null);
+						const intent = chosen
+							? chosen === "external"
+								? "external"
+								: "reveal"
+							: (folderPolicy.map[tierFor(event, "2-tier")] ??
+								(isPlain ? "reveal" : null));
 						if (intent === null) showHint(event.clientX, event.clientY);
 						else
 							runFolderLinkAction(depsRef.current, stat.resolvedPath, intent);
 						return;
 					}
 					const action =
-						filePolicy.getAction(event) ?? (isPlain ? "pane" : null);
+						chosen ?? filePolicy.getAction(event) ?? (isPlain ? "pane" : null);
 					if (action === null) {
 						showHint(event.clientX, event.clientY);
 						return;
@@ -116,6 +142,6 @@ export function useOpenChatLink({
 			);
 			return true;
 		},
-		[workspaceId, getUrlAction, filePolicy, folderPolicy, showHint, t],
+		[getUrlAction, filePolicy, folderPolicy, showHint, t],
 	);
 }

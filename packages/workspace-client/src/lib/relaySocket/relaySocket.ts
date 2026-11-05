@@ -41,6 +41,11 @@ export interface RelaySocketOptions {
 
 export type RelaySocket = ReconnectingWebSocket;
 
+// partysocket's own defaults, kept so callers that omit the delays see no change.
+const DEFAULT_MIN_RECONNECTION_DELAY = 3_000;
+const DEFAULT_MAX_RECONNECTION_DELAY = 10_000;
+const RECONNECTION_DELAY_GROW_FACTOR = 1.3;
+
 // Accepts http(s) host URLs and converts to ws(s), so consumers can pass
 // their host URL straight through without scheme juggling.
 function signUrl(url: string, token: string | null): string {
@@ -78,7 +83,19 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 	// otherwise a stale probe could make the diagnosis describe the prior endpoint.
 	let probeEpoch = 0;
 
+	const minDelay = opts.minReconnectionDelay ?? DEFAULT_MIN_RECONNECTION_DELAY;
+	const maxDelay = opts.maxReconnectionDelay ?? DEFAULT_MAX_RECONNECTION_DELAY;
+	const backoffDelay = (retryCount: number) =>
+		retryCount > 0
+			? Math.min(
+					minDelay * RECONNECTION_DELAY_GROW_FACTOR ** (retryCount - 1),
+					maxDelay,
+				)
+			: 0;
+
 	const provider = async (): Promise<string> => {
+		const retryCount = socket?.retryCount ?? 0;
+		if (retryCount > 0) await waitBeforeRetry(backoffDelay(retryCount));
 		const epoch = ++probeEpoch;
 		const url = signUrl(await opts.buildUrl(), await opts.getToken());
 		const probe = await probeRelayHost(url);
@@ -101,9 +118,12 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 		return url;
 	};
 
+	// partysocket sleeps out its backoff while holding its connection lock, so
+	// a reconnect() in that window does nothing. The backoff runs in the URL
+	// provider instead, where reconnect() can cut it short.
 	socket = new ReconnectingWebSocket(provider, [], {
-		minReconnectionDelay: opts.minReconnectionDelay,
-		maxReconnectionDelay: opts.maxReconnectionDelay,
+		minReconnectionDelay: 0,
+		maxReconnectionDelay: 0,
 		maxRetries: opts.maxRetries,
 		connectionTimeout: opts.connectionTimeout,
 		maxEnqueuedMessages: opts.maxEnqueuedMessages ?? 0,

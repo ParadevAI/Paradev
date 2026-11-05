@@ -242,16 +242,16 @@ export const HOTKEYS_REGISTRY = {
 			message: "Close or delete the current workspace",
 		}),
 	},
-	UNDO_ARCHIVE_WORKSPACE: {
+	UNDO: {
 		key: {
 			mac: L("meta+z"),
 			windows: L("ctrl+z"),
 			linux: L("ctrl+z"),
 		},
-		label: msg({ message: "Undo Archive" }),
+		label: msg({ message: "Undo" }),
 		category: "Workspace",
 		description: msg({
-			message: "Restore the workspace you just archived",
+			message: "Undo the last archived workspace or closed chats",
 		}),
 	},
 	NEW_WORKSPACE: {
@@ -343,11 +343,23 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({ message: "Toggle Right Sidebar" }),
 		category: "Layout",
 	},
-	OPEN_DIFF_VIEWER: {
+	TOGGLE_RIGHT_PANE_FULL_SCREEN: {
 		key: {
 			mac: L("meta+shift+l"),
 			windows: L("ctrl+shift+alt+l"),
 			linux: L("ctrl+shift+alt+l"),
+		},
+		label: msg({ message: "Toggle Right Pane Full Screen" }),
+		category: "Layout",
+		description: msg({
+			message: "Expand the right pane to fill the window, or restore it",
+		}),
+	},
+	OPEN_DIFF_VIEWER: {
+		key: {
+			mac: L("meta+shift+g"),
+			windows: L("ctrl+shift+alt+g"),
+			linux: L("ctrl+shift+alt+g"),
 		},
 		label: msg({
 			message: "Open Changes",
@@ -847,6 +859,15 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Focus Chat Input",
 		}),
+		category: "Chat",
+	},
+	NEW_CHAT: {
+		key: {
+			mac: L("meta+shift+j"),
+			windows: L("ctrl+shift+alt+j"),
+			linux: L("ctrl+shift+alt+j"),
+		},
+		label: msg({ message: "New Chat" }),
 		category: "Chat",
 	},
 	CHAT_ADD_ATTACHMENT: {

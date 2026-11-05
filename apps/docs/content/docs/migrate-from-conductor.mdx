@@ -1,0 +1,153 @@
+---
+title: Migrate from Conductor
+description: Move your local Conductor workspaces, scripts, and agents to Paradev
+---
+
+Conductor is [joining Meta](https://www.conductor.build/announcement) and is winding down. This guide moves your work to Paradev. Your branches, uncommitted changes, and agent subscriptions all come with you.
+
+The local Conductor app keeps working until early 2027, so you can move at your own pace.
+
+<Callout type="warn" title="Using Conductor Cloud?">
+Conductor Cloud goes read-only on November 13, 2026 and begins to delete data on November 20. Follow [Migrate from Conductor Cloud](/migrate-from-conductor-cloud) first.
+</Callout>
+
+Both apps use the same model: one Git worktree and one branch per task, with an agent working inside it. Most of the move is pointing Paradev at the same repositories and translating one config file.
+
+## What Maps to What
+
+| Conductor | Paradev |
+|---|---|
+| Workspace | [Workspace](/workspaces) (a Git worktree on its own branch) |
+| `~/conductor/workspaces/<repo>/<workspace>`, or `<repo>/.conductor/<workspace>` in older versions | Imported workspaces keep their path. New ones go in `~/.paradev/worktrees/<project>/<branch>` |
+| `conductor.json` or `.conductor/settings.toml` | `.paradev/config.json` ([lifecycle scripts](/setup-teardown-scripts)) |
+| Setup script | `setup` |
+| Run script and named actions | `run` (Run button), plus [terminal scripts](/terminal-scripts) for other actions |
+| Archive script | `teardown` |
+| Archive workspace | Delete workspace |
+| `CONDUCTOR_ROOT_PATH` | `SUPERSET_ROOT_PATH` |
+| `CONDUCTOR_WORKSPACE_PATH` | `SUPERSET_WORKSPACE_PATH` |
+| `CONDUCTOR_WORKSPACE_NAME` | `SUPERSET_WORKSPACE_NAME` |
+| `CONDUCTOR_PORT` | No equivalent. Paradev [detects ports](/ports) instead of assigning them |
+| Diff viewer and checks | [Changes pane](/diff-viewer) and [pull requests](/pull-requests) |
+| Conductor Cloud | [Cloud workspaces](/cloud-workspaces). See [Migrate from Conductor Cloud](/migrate-from-conductor-cloud) |
+| iOS app | [iPhone and iPad app](/mobile) |
+| API | [CLI](/cli/getting-started), [TypeScript SDK](/sdk/getting-started), and [MCP server](/mcp-server) |
+
+## 1. Install Paradev and Add Your Repositories
+
+[Install Paradev](/install), then add each repository you used in Conductor from its local folder. Add the same folder that Conductor used, not a new clone: Conductor's worktrees are attached to that checkout, and Paradev finds them through it.
+
+## 2. Import Your Conductor Workspaces
+
+Each Conductor workspace is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
+
+1. Right-click the project in the sidebar and choose **Import untracked worktrees**. You can also use the **Import** tab in the New Workspace modal.
+2. Check the list of branches and paths. Conductor's worktrees are usually under `~/conductor/workspaces/`. Older versions put them in a `.conductor/` folder inside the repository.
+3. Leave **Run setup script** off. These worktrees are already set up.
+
+Imported workspaces keep their paths, branches, and uncommitted changes. New workspaces you create in Paradev go under `~/.paradev/worktrees/`.
+
+If a worktree is missing from the list, run `git worktree list` in the repository. Paradev only imports worktrees that have a branch checked out. A worktree on a detached HEAD needs a branch first (`git switch -c <name>` inside it).
+
+<Callout type="warn">
+Do not archive these workspaces in Conductor after you import them. Archiving in Conductor deletes the workspace directory, which is now your Paradev workspace too. Quit Conductor instead. See [Remove Conductor](#6-remove-conductor).
+</Callout>
+
+## 3. Convert Your Scripts
+
+Move your scripts from `conductor.json` or `.conductor/settings.toml` into `.paradev/config.json` at the repository root.
+
+A `conductor.json` like this:
+
+```json
+{
+  "scripts": {
+    "setup": "bun install && cp \"$CONDUCTOR_ROOT_PATH/.env\" .env",
+    "run": "bun dev --port $CONDUCTOR_PORT",
+    "archive": "docker compose down"
+  }
+}
+```
+
+becomes:
+
+```json
+{
+  "setup": ["bun install", "cp \"$SUPERSET_ROOT_PATH/.env\" .env"],
+  "run": ["bun dev"],
+  "teardown": ["docker compose down"]
+}
+```
+
+Differences to know:
+
+- **Commands are arrays.** Each entry runs in order in the workspace directory.
+- **`run` is one command set.** It starts from the Run button in its own restartable pane. Save other named actions as [terminal scripts](/terminal-scripts) and launch them from the Scripts bar.
+- **`teardown` runs when you delete a workspace**, before Paradev removes the worktree. If it fails, you can still **Delete Anyway**.
+- **There is no `run_mode` setting.** Each workspace has its own Run pane.
+- **Personal overrides** go in `.paradev/config.local.json`, not in the committed file. Add it to `.gitignore` before you commit `.paradev/`. See [Local Config](/setup-teardown-scripts#local-config).
+
+### Keep Scripts That Read `CONDUCTOR_*`
+
+If your setup is a shell script that reads `CONDUCTOR_*` variables, you can keep it unchanged at first. Pass the Paradev values under the old names:
+
+```json
+{
+  "setup": [
+    "CONDUCTOR_ROOT_PATH=\"$SUPERSET_ROOT_PATH\" CONDUCTOR_WORKSPACE_PATH=\"$SUPERSET_WORKSPACE_PATH\" CONDUCTOR_WORKSPACE_NAME=\"$SUPERSET_WORKSPACE_NAME\" ./scripts/conductor-setup.sh"
+  ]
+}
+```
+
+### Replace `CONDUCTOR_PORT`
+
+Paradev does not reserve a port range for each workspace. It finds the ports that each workspace's processes listen on and shows them in the [Ports panel](/ports), where you can open them in the browser or stop them.
+
+Most dev servers pick a free port by themselves, so remove `--port $CONDUCTOR_PORT`. If your app needs a fixed port per workspace, reserve a range in `setup` and release it in `teardown`. The [Ports page](/ports) links to an example.
+
+### Let an Agent Do It
+
+Create a workspace with this prompt:
+
+```text
+Convert this repo's Conductor config (conductor.json or .conductor/settings.toml)
+into .paradev/config.json. Read docs.paradev.com/setup-teardown-scripts and
+docs.paradev.com/migrate-from-conductor first. Map CONDUCTOR_* variables to
+SUPERSET_* variables, and replace CONDUCTOR_PORT as the migration guide describes.
+```
+
+Commit `.paradev/` so your team gets the same scripts.
+
+## 4. Pick Up Your Agents
+
+Claude Code, Codex, Cursor Agent, and OpenCode all run in Paradev on your existing subscriptions and keys. See [Supported Agents](/supported-agents) for the full list, or add any other CLI as a custom agent.
+
+Conductor saves Claude Code sessions in your usual `~/.claude` folder, under the workspace's path. Import keeps that path, so open a terminal in the imported workspace and run `claude --resume` to pick a Conductor conversation. Claude Code deletes sessions older than 30 days by default, so very old chats may be gone. For other agents, try their own resume command, such as `codex resume`. To keep a copy of every chat, use Conductor's **Settings → Account → Export data**. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
+
+Prefer a chat view to a terminal? Switch the agent pane to [Chat](/chat).
+
+## 5. Learn the Daily Loop
+
+| Task | In Paradev |
+|---|---|
+| New workspace | **⌘N**, type a prompt, pick an agent |
+| Review a diff | **Changes** tab ([Diff Viewer](/diff-viewer)) |
+| Commit, push, open a PR | From the Changes pane |
+| Check CI and review threads | [Pull Requests](/pull-requests) |
+| Preview your app | [In-app browser](/browser) |
+| Finish a task | Delete the workspace |
+
+The [first parallel session](/first-workspace) walks through this end to end. All [keyboard shortcuts](/keyboard-shortcuts) can be changed.
+
+## 6. Remove Conductor
+
+The local Conductor app keeps working until early 2027, but you cannot download it again. When your workspaces are in Paradev:
+
+1. Quit Conductor and move it to the Trash.
+2. Keep `~/conductor/workspaces/` (or the repository's `.conductor/` folder) while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.
+3. Delete a workspace from Paradev when you finish it. Paradev runs `teardown` and removes the worktree, wherever it lives.
+4. After the last old workspace is gone, run `git worktree prune` in each repository, then delete `~/conductor/` and any `.conductor/` folders.
+
+## Get Help
+
+Stuck on a step? Ask in the [community](/community) or see [Troubleshooting](/troubleshooting).

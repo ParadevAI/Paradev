@@ -13,27 +13,5 @@ export function openBesidePane(
 		state.addTab({ panes: [pane] });
 		return;
 	}
-	const location = state.getPane(anchorPaneId);
-	const tab = location ? state.getTab(location.tabId) : null;
-	if (!tab) {
-		state.openPane({ pane });
-		return;
-	}
-	const reusable = Object.values(tab.panes).find(
-		(candidate) =>
-			candidate.kind === pane.kind &&
-			!candidate.pinned &&
-			candidate.id !== anchorPaneId,
-	);
-	if (reusable) {
-		state.setPaneData({ paneId: reusable.id, data: pane.data });
-		state.setActivePane({ tabId: tab.id, paneId: reusable.id });
-		return;
-	}
-	state.splitPane({
-		tabId: tab.id,
-		paneId: anchorPaneId,
-		position: "left",
-		newPane: pane,
-	});
+	state.openPane({ pane, beside: anchorPaneId });
 }

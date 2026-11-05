@@ -1,13 +1,19 @@
-import { existsSync, mkdirSync, statSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 // Recursive deletes go through async `rm`: a failed clone/init rolls back an
 // entire repo directory, and rmSync would hold the event loop for the whole
 // walk.
 import { rm } from "node:fs/promises";
-import { join, resolve as resolvePath } from "node:path";
+import { dirname, join, resolve as resolvePath } from "node:path";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import type { GitCredentialProvider } from "../../../../runtime/git";
 import { createUserSimpleGit } from "../../../../runtime/git/simple-git";
+import {
+	getPathState,
+	inaccessiblePathMessage,
+	isPermissionDenied,
+	isUnreadable,
+} from "../../../../runtime/path-state";
 import {
 	findMatchingRemote,
 	getGitHubRemotes,
@@ -35,13 +41,20 @@ export interface ResolvedGitHubRepo extends ResolvedRepo {
 }
 
 export function validateDirectoryPath(path: string, label: string): void {
-	if (!existsSync(path)) {
+	const state = getPathState(path);
+	if (state === "inaccessible") {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: inaccessiblePathMessage(path),
+		});
+	}
+	if (state === "missing") {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `${label} does not exist: ${path}`,
 		});
 	}
-	if (!statSync(path).isDirectory()) {
+	if (state !== "directory") {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `${label} is not a directory: ${path}`,
@@ -53,19 +66,24 @@ export function validateDirectoryPath(path: string, label: string): void {
  * Ensure the parent directory we're about to create a project under exists,
  * creating it (and any missing ancestors) when it doesn't. Unlike
  * `validateDirectoryPath`, a missing parent is a recoverable condition: the
- * default project location (e.g. `~/.superset/projects`) won't exist on a
+ * default project location (e.g. `~/.paradev/projects`) won't exist on a
  * fresh machine, and the user shouldn't have to pre-create it before their
  * first clone. Still rejects when the path exists but is a file.
  */
 function ensureParentDirectory(path: string): void {
-	if (existsSync(path)) {
-		if (!statSync(path).isDirectory()) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `Parent directory is not a directory: ${path}`,
-			});
-		}
-		return;
+	const state = getPathState(path);
+	if (state === "directory") return;
+	if (state === "inaccessible") {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: inaccessiblePathMessage(path),
+		});
+	}
+	if (state === "file") {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `Parent directory is not a directory: ${path}`,
+		});
 	}
 	try {
 		mkdirSync(path, { recursive: true });
@@ -200,29 +218,68 @@ async function commitInitialEmpty(repoPath: string): Promise<void> {
  * repo a caller points us at that already exists but was never committed to.
  */
 async function ensureNotUnborn(repoPath: string): Promise<void> {
+	const git = createUserSimpleGit(repoPath);
 	try {
-		await createUserSimpleGit(repoPath).raw(["rev-parse", "--verify", "HEAD"]);
+		await git.raw(["rev-parse", "--verify", "HEAD"]);
 		return;
-	} catch {
-		// Unborn HEAD — fall through and seed the same scaffold commit a
-		// freshly `git init`'d repo gets.
+	} catch {}
+	// git commits onto a HEAD that names an invalid ref, then cannot read
+	// that ref back, so only an unborn branch gets the scaffold commit.
+	try {
+		await git.raw(["symbolic-ref", "-q", "HEAD"]);
+	} catch (err) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"This repository's HEAD does not point to a valid branch. Run: git symbolic-ref HEAD refs/heads/main",
+			cause: err,
+		});
 	}
 	await commitInitialEmpty(repoPath);
 }
 
+// Git skips a `.git` it cannot read and reports "not a git repository".
+function findUnreadableRepoAbove(path: string): string | undefined {
+	for (let dir = resolvePath(path); ; dir = dirname(dir)) {
+		if (isUnreadable(join(dir, ".git"))) return dir;
+		if (dirname(dir) === dir) return undefined;
+	}
+}
+
+// simple-git's revparse() trims, which drops trailing spaces of a folder name.
+export async function readGitToplevel(path: string): Promise<string> {
+	const stdout = await createUserSimpleGit(path).raw([
+		"rev-parse",
+		"--show-toplevel",
+	]);
+	return stdout.replace(/\n$/, "");
+}
+
 /**
  * Returns the canonical git root for `path`, or `null` when `path` is not
- * inside a git work tree. Non-throwing variant of `revParseGitRoot` — callers
- * that want to branch on "is this a git repo?" use this instead of catching.
+ * inside a git work tree. Callers that want to branch on "is this a git
+ * repo?" use this instead of catching. Still throws FORBIDDEN when git may not
+ * read `path` or the repo that holds it, so a blocked repo is never offered
+ * `git init`.
  */
 export async function tryRevParseGitRoot(path: string): Promise<string | null> {
+	let error: unknown;
 	try {
-		return (
-			await createUserSimpleGit(path).revparse(["--show-toplevel"])
-		).trim();
-	} catch {
-		return null;
+		return await readGitToplevel(path);
+	} catch (err) {
+		error = err;
 	}
+	const blockedPath = isPermissionDenied(error)
+		? path
+		: findUnreadableRepoAbove(path);
+	if (blockedPath) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: inaccessiblePathMessage(blockedPath),
+			cause: error,
+		});
+	}
+	return null;
 }
 
 async function revParseGitRoot(path: string): Promise<string> {

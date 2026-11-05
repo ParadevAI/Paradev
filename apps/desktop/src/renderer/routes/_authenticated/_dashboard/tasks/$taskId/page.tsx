@@ -17,6 +17,7 @@ function TaskDetailPage() {
 	const {
 		tab,
 		assignee,
+		label,
 		search: searchQuery,
 		type,
 		project,
@@ -29,12 +30,13 @@ function TaskDetailPage() {
 		return tasksSearchFromFilters({
 			tab: tab ?? "all",
 			assignee: assignee ?? null,
+			label: label ?? null,
 			search: searchQuery ?? "",
 			typeTab: type === "issues" ? "issues" : "tasks",
 			projectFilters: resolveProjectFilterParams(projects, project, []),
 			includeClosedIssues: state === "all",
 		});
-	}, [tab, assignee, searchQuery, type, project, projects, state]);
+	}, [tab, assignee, label, searchQuery, type, project, projects, state]);
 	useEscapeToNavigate("/tasks", { search: backSearch });
 
 	return (

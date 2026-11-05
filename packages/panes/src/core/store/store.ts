@@ -102,14 +102,45 @@ export type CreatePaneInput<TData> = {
 	data: TData;
 };
 
-export type CreateTabInput<TData> = {
+export type PaneOpenOptions = {
+	/** Give the opened (or reused) pane keyboard focus. Defaults to true. */
+	focus?: boolean;
+	/** Focus an open pane with the same key instead of creating one. Defaults to true. */
+	reuse?: boolean;
+	/** When an open pane is reused, give it the new pane's data. */
+	replaceData?: boolean;
+};
+
+export type CreateTabInput<TData> = PaneOpenOptions & {
 	id?: string;
 	titleOverride?: string;
 	panes: [CreatePaneInput<TData>, ...CreatePaneInput<TData>[]];
 	activePaneId?: string;
 };
 
+export type OpenPaneArgs<TData> = PaneOpenOptions & {
+	pane: CreatePaneInput<TData>;
+	beside?: string;
+};
+
+export type GetPaneKey<TData> = (
+	pane: Pick<Pane<TData>, "kind" | "data">,
+) => string | undefined;
+
+export type FocusRequest = { paneId: string; seq: number };
+
+export type PlacePane<TData> = (
+	store: WorkspaceStore<TData>,
+	args: OpenPaneArgs<TData>,
+) => void;
+
 export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
+	/** One-shot request for a pane to take keyboard focus. Never persisted. */
+	focusRequest: FocusRequest | null;
+	focusPane: (paneId: string) => void;
+	clearFocusRequest: (seq: number) => void;
+	findPaneByKey: (key: string) => { tabId: string; pane: Pane<TData> } | null;
+
 	addTab: (args: CreateTabInput<TData>) => void;
 	removeTab: (tabId: string, options?: { intent?: "close" | "remove" }) => void;
 	insertTab: (args: { tab: Tab<TData>; index?: number }) => void;
@@ -147,7 +178,7 @@ export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
 		newPane: CreatePaneInput<TData>;
 	}) => void;
 
-	openPane: (args: { pane: CreatePaneInput<TData> }) => void;
+	openPane: (args: OpenPaneArgs<TData>) => void;
 
 	splitPane: (args: {
 		tabId: string;
@@ -155,12 +186,14 @@ export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
 		position: SplitPosition;
 		newPane: CreatePaneInput<TData>;
 		selectNewPane?: boolean;
+		focus?: boolean;
 	}) => void;
 	addPane: (args: {
 		tabId: string;
 		pane: CreatePaneInput<TData>;
 		position?: SplitPosition;
 		relativeToPaneId?: string;
+		focus?: boolean;
 	}) => void;
 	resizeSplit: (args: {
 		tabId: string;
@@ -195,6 +228,103 @@ export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
 
 export interface CreateWorkspaceStoreOptions<TData> {
 	initialState?: WorkspaceState<TData>;
+	placePane?: PlacePane<TData>;
+	/** Panes with the same key show the same thing; opening one again focuses it. */
+	getPaneKey?: GetPaneKey<TData>;
+}
+
+function reuseOpenPane<TData>(
+	get: () => WorkspaceStore<TData>,
+	getPaneKey: GetPaneKey<TData> | undefined,
+	pane: CreatePaneInput<TData>,
+	options: PaneOpenOptions,
+): boolean {
+	if (options.reuse === false || !getPaneKey) return false;
+	const key = getPaneKey(pane);
+	const open = key ? get().findPaneByKey(key) : null;
+	if (!open) return false;
+	if (options.replaceData) {
+		get().setPaneData({ paneId: open.pane.id, data: pane.data });
+	}
+	if (options.focus === false) {
+		get().setActivePane({ tabId: open.tabId, paneId: open.pane.id });
+	} else {
+		get().focusPane(open.pane.id);
+	}
+	return true;
+}
+
+function placeNewPane<TData>(
+	get: () => WorkspaceStore<TData>,
+	placePane: PlacePane<TData> | undefined,
+	args: OpenPaneArgs<TData>,
+): void {
+	const s = get();
+	if (placePane) {
+		placePane(s, args);
+		return;
+	}
+	const anchor = args.beside ? s.getPane(args.beside) : null;
+	const besideTab = anchor ? s.getTab(anchor.tabId) : null;
+	if (anchor && besideTab) {
+		const reusable = Object.values(besideTab.panes).find(
+			(p) => p.kind === args.pane.kind && !p.pinned && p.id !== anchor.pane.id,
+		);
+		if (reusable) {
+			s.setPaneData({ paneId: reusable.id, data: args.pane.data });
+			s.setActivePane({ tabId: besideTab.id, paneId: reusable.id });
+			return;
+		}
+		s.splitPane({
+			tabId: besideTab.id,
+			paneId: anchor.pane.id,
+			position: "left",
+			newPane: args.pane,
+			focus: false,
+		});
+		return;
+	}
+	const activeTabId = s.activeTabId;
+	const tab = activeTabId ? s.tabs.find((t) => t.id === activeTabId) : null;
+
+	// No tab → create one
+	if (!tab || !activeTabId) {
+		get().addTab({ panes: [args.pane], focus: false, reuse: false });
+		return;
+	}
+
+	// Find unpinned pane of same kind → replace
+	const unpinned = Object.values(tab.panes).find(
+		(p) => p.kind === args.pane.kind && !p.pinned,
+	);
+	if (unpinned) {
+		get().replacePane({
+			tabId: activeTabId,
+			paneId: unpinned.id,
+			newPane: args.pane,
+		});
+		return;
+	}
+
+	// Split the active pane right
+	const activePane = tab.activePaneId;
+	if (activePane && tab.layout && findPaneInLayout(tab.layout, activePane)) {
+		get().splitPane({
+			tabId: activeTabId,
+			paneId: activePane,
+			position: "right",
+			newPane: args.pane,
+			focus: false,
+		});
+		return;
+	}
+
+	// Fallback: add to tab
+	get().addPane({
+		tabId: activeTabId,
+		pane: args.pane,
+		focus: false,
+	});
 }
 
 export function createWorkspaceStore<TData>(
@@ -211,10 +341,49 @@ export function createWorkspaceStore<TData>(
 			}
 		}
 	};
+	const placePane = options?.placePane;
+	const getPaneKey = options?.getPaneKey;
+	let focusSeq = 0;
+	const requestFocus = (paneId: string): FocusRequest => ({
+		paneId,
+		seq: ++focusSeq,
+	});
 	return createStore<WorkspaceStore<TData>>((set, get) => ({
 		version: 1,
 		tabs: options?.initialState?.tabs ?? [],
 		activeTabId: options?.initialState?.activeTabId ?? null,
+		focusRequest: null,
+
+		focusPane: (paneId) => {
+			set((s) => {
+				const tab = s.tabs.find((t) => t.panes[paneId]);
+				if (!tab) return s;
+				return {
+					activeTabId: tab.id,
+					tabs:
+						tab.activePaneId === paneId
+							? s.tabs
+							: s.tabs.map((t) =>
+									t.id === tab.id ? { ...t, activePaneId: paneId } : t,
+								),
+					focusRequest: requestFocus(paneId),
+				};
+			});
+		},
+
+		clearFocusRequest: (seq) => {
+			set((s) => (s.focusRequest?.seq === seq ? { focusRequest: null } : s));
+		},
+
+		findPaneByKey: (key) => {
+			if (!getPaneKey) return null;
+			for (const tab of get().tabs) {
+				for (const pane of Object.values(tab.panes)) {
+					if (getPaneKey(pane) === key) return { tabId: tab.id, pane };
+				}
+			}
+			return null;
+		},
 
 		subscribePaneClose: (listener) => {
 			closeListeners.add(listener);
@@ -224,6 +393,12 @@ export function createWorkspaceStore<TData>(
 		},
 
 		addTab: (args) => {
+			if (
+				args.panes.length === 1 &&
+				reuseOpenPane(get, getPaneKey, args.panes[0], args)
+			) {
+				return;
+			}
 			const builtPanes = args.panes.map(buildPane) as [
 				Pane<TData>,
 				...Pane<TData>[],
@@ -232,6 +407,9 @@ export function createWorkspaceStore<TData>(
 			set((s) => ({
 				tabs: [...s.tabs, tab],
 				activeTabId: tab.id,
+				...(args.focus !== false && tab.activePaneId
+					? { focusRequest: requestFocus(tab.activePaneId) }
+					: {}),
 			}));
 		},
 
@@ -267,8 +445,14 @@ export function createWorkspaceStore<TData>(
 
 		setActiveTab: (tabId) => {
 			set((s) => {
-				if (!s.tabs.some((t) => t.id === tabId)) return s;
-				return { activeTabId: tabId };
+				const tab = s.tabs.find((t) => t.id === tabId);
+				if (!tab) return s;
+				const keepsFocusRequest =
+					!s.focusRequest || Boolean(tab.panes[s.focusRequest.paneId]);
+				return {
+					activeTabId: tabId,
+					...(keepsFocusRequest ? {} : { focusRequest: null }),
+				};
 			});
 		},
 
@@ -471,52 +655,19 @@ export function createWorkspaceStore<TData>(
 		},
 
 		openPane: (args) => {
-			const s = get();
-			const activeTabId = s.activeTabId;
-			const tab = activeTabId ? s.tabs.find((t) => t.id === activeTabId) : null;
-
-			// No tab → create one
-			if (!tab || !activeTabId) {
-				get().addTab({
-					panes: [args.pane],
-				});
-				return;
-			}
-
-			// Find unpinned pane of same kind → replace
-			const unpinned = Object.values(tab.panes).find(
-				(p) => p.kind === args.pane.kind && !p.pinned,
-			);
-			if (unpinned) {
-				get().replacePane({
-					tabId: activeTabId,
-					paneId: unpinned.id,
-					newPane: args.pane,
-				});
-				return;
-			}
-
-			// Split the active pane right
-			const activePane = tab.activePaneId;
-			if (
-				activePane &&
-				tab.layout &&
-				findPaneInLayout(tab.layout, activePane)
-			) {
-				get().splitPane({
-					tabId: activeTabId,
-					paneId: activePane,
-					position: "right",
-					newPane: args.pane,
-				});
-				return;
-			}
-
-			// Fallback: add to tab
-			get().addPane({
-				tabId: activeTabId,
-				pane: args.pane,
+			if (reuseOpenPane(get, getPaneKey, args.pane, args)) return;
+			const pane = { ...args.pane, id: args.pane.id ?? generateId("pane") };
+			placeNewPane(get, placePane, {
+				...args,
+				pane,
+				focus: false,
+				reuse: false,
 			});
+			if (args.focus === false) return;
+			// A beside-pane reuse keeps the old pane's id; it is then the active one.
+			const placedId =
+				get().getPane(pane.id)?.pane.id ?? get().getActivePane()?.pane.id;
+			if (placedId) get().focusPane(placedId);
 		},
 
 		splitPane: (args) => {
@@ -531,6 +682,7 @@ export function createWorkspaceStore<TData>(
 
 				const { layout } = tab;
 				const newPane = buildPane(args.newPane);
+				const selectNewPane = args.selectNewPane !== false;
 
 				return {
 					tabs: s.tabs.map((t) =>
@@ -547,23 +699,22 @@ export function createWorkspaceStore<TData>(
 										...tab.panes,
 										[newPane.id]: newPane,
 									},
-									activePaneId:
-										args.selectNewPane === false
-											? tab.activePaneId
-											: newPane.id,
+									activePaneId: selectNewPane ? newPane.id : tab.activePaneId,
 								}
 							: t,
 					),
+					...(selectNewPane && args.focus !== false
+						? { focusRequest: requestFocus(newPane.id) }
+						: {}),
 				};
 			});
 		},
 
 		addPane: (args) => {
+			const newPane = buildPane(args.pane);
 			set((s) => {
 				const tab = s.tabs.find((t) => t.id === args.tabId);
 				if (!tab) return s;
-
-				const newPane = buildPane(args.pane);
 
 				if (!tab.layout) {
 					return {
@@ -643,6 +794,9 @@ export function createWorkspaceStore<TData>(
 					),
 				};
 			});
+			if (args.focus !== false && get().getPane(newPane.id)) {
+				set({ focusRequest: requestFocus(newPane.id) });
+			}
 		},
 
 		resizeSplit: (args) => {

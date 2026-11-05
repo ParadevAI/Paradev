@@ -1,0 +1,138 @@
+---
+title: "How to Run GPT-6.1 Terra in Parallel with Codex"
+description: "GPT-6.1 Terra shipped in Codex on October 26, 2026. How to pick it in the Codex CLI, run several Terra sessions at once in separate Git worktrees, and do the same in Paradev."
+date: 2026-11-03
+lastUpdated: 2026-11-05
+type: "tutorial"
+competitors:
+  - codex
+  - git-worktrees
+keywords:
+  - gpt-6.1 terra
+  - gpt-6.1 terra codex
+  - run gpt-6.1 terra in parallel
+  - codex gpt-6.1-terra
+  - parallel codex sessions
+  - codex worktrees
+---
+
+To run GPT-6.1 Terra in parallel, start one Codex session per task, each in its own Git worktree and branch, and launch each with `codex --model gpt-6.1-terra`. In Paradev, create one workspace per task, choose Codex as the agent and GPT-6.1 Terra in the model picker, or pass `--agent codex --model gpt-6.1-terra` to `superset ws create`. Review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+
+## What shipped
+
+On October 26, 2026, OpenAI released [GPT-6.1 Terra](https://openai.com/index/introducing-gpt-6-1-terra/). Its [system card addendum](https://deploymentsafety.openai.com/gpt-6-1-terra) calls it "a fast, efficient model for high-volume professional work, with strong image analysis and computer use capabilities." The model replaces GPT-5.6 Terra.
+
+| | GPT-6.1 Terra |
+|---|---|
+| **Released** | October 26, 2026 |
+| **Where** | ChatGPT Work and Codex (Plus, Pro, Enterprise, Edu), and the OpenAI API |
+| **API model id** | `gpt-6.1-terra` |
+| **API price** | $1 per million input tokens, $5 per million output tokens; OpenAI says standard API prices are 50% lower than GPT-5.6 Terra |
+| **Coding result OpenAI reports** | 50.3% of tasks on a coding benchmark at maximum reasoning effort, against 21.5% for GPT-5.6 Terra |
+| **Codex CLI** | In the model catalog from [0.165.0](https://github.com/openai/codex/releases/tag/rust-v0.165.0) (October 27); [0.166.0](https://github.com/openai/codex/releases/tag/rust-v0.166.0) (October 29) adds it to the Vertex AI and Amazon Bedrock catalogs |
+
+OpenAI also [says](https://x.com/OpenAI/status/2114780715086754261) your Codex usage allowance goes further with GPT-6.1 Terra than with GPT-5.6 Terra. The benchmark and price figures come from OpenAI and are not independently checked.
+
+Terra is not the Codex default. The [Codex changelog](https://learn.chatgpt.com/docs/changelog) lists no default model change, so a new session still starts on GPT-6.1 Sol unless you pick another model.
+
+## Why Terra fits parallel work
+
+A cheaper, faster model changes how many sessions you can keep running. At lower prices per token, the same plan allowance or API budget covers more sessions. That makes Terra a sensible choice for the bounded tasks you fan out: tests, small fixes, docs, migrations with a clear spec. Keep the hardest task on the model you trust most and compare results before you switch everything.
+
+## Pick Terra in the Codex CLI
+
+Update Codex to 0.165.0 or later, then choose the model when you start a session:
+
+```bash
+codex --version
+codex --model gpt-6.1-terra
+```
+
+Inside a running session, `/model` switches models. Since 0.165.0, Codex also lets you change reasoning effort during a conversation on supported models.
+
+## Run several Terra sessions at once
+
+Give each task its own worktree and branch, so two sessions never edit the same working files:
+
+```bash
+git worktree add -b ai/terra-tests ../repo-terra-tests
+git worktree add -b ai/terra-docs ../repo-terra-docs
+```
+
+Open a terminal in each directory, install dependencies, and start Codex there:
+
+```bash
+cd ../repo-terra-tests && codex --model gpt-6.1-terra
+cd ../repo-terra-docs && codex --model gpt-6.1-terra
+```
+
+Codex has used worktrees by default since 0.156, and 0.165.0 added a repository filter to the session picker and directory grouping in the agent command center, so sessions across linked worktrees are easier to find. Use narrow prompts with a clear stop condition:
+
+```text
+Task A: Add regression tests for the input parser. Change only test
+files. Run the focused test command and report the result. Do not commit.
+
+Task B: Update the setup guide to match the package scripts. Change only
+documentation. List the commands you checked. Do not commit.
+```
+
+Check each session with `git branch --show-current` before it starts editing.
+
+### What worktrees do not separate
+
+Worktrees share repository history and run as your user. They do not give each task its own ports, database, credentials, or API quota. Two sessions can still change the same external service, and their branches can still conflict when you merge. Rerun your checks on the combined branch.
+
+## Run GPT-6.1 Terra in Paradev
+
+Paradev is a desktop app that runs Codex and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: Codex runs on your own ChatGPT plan or API key. Paradev is open source under the MIT License.
+
+From the app:
+
+1. Create a new workspace for each task.
+2. In the composer, choose **Codex** as the agent and **GPT-6.1 Terra** in the model picker.
+3. Write the task prompt and start it. Repeat for the next task.
+4. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
+
+From the `superset` CLI, start a batch of Terra workspaces and group them with a tag:
+
+```bash
+superset ws create --local --project PROJECT_ID --name terra-tests \
+  --branch ai/terra-tests --tag terra \
+  --agent codex --model gpt-6.1-terra --prompt "Add regression tests for the input parser"
+
+superset ws create --local --project PROJECT_ID --name terra-docs \
+  --branch ai/terra-docs --tag terra \
+  --agent codex --model gpt-6.1-terra --prompt "Update the setup guide to match the package scripts"
+
+superset ws list --local --tag terra
+```
+
+Tagged workspaces collect in a sidebar folder with the tag's name. `--effort` sets reasoning effort for the launch; omit it to use the Codex default. If you leave out `--model`, Codex starts on its own default model.
+
+To run the same task on Terra and Sol and compare the diffs, create two workspaces with the same prompt and different `--model` values. The [iPhone and iPad app](/mobile) lets you check on the sessions and review diffs while they keep running on your machine, a host you added, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud) (beta).
+
+## Frequently Asked Questions
+
+### Is GPT-6.1 Terra the default model in Codex?
+
+No. OpenAI's Codex changelog lists no default change with Terra. Select it with `codex --model gpt-6.1-terra` or `/model`, or pick it in Paradev's model picker.
+
+### Which Codex version do I need for GPT-6.1 Terra?
+
+Codex CLI 0.165.0, released October 27, 2026, added Terra to the model catalog. Version 0.166.0 added it to the Vertex AI and Amazon Bedrock catalogs too.
+
+### Can I use GPT-6.1 Terra with an API key instead of a ChatGPT plan?
+
+Yes. The API model id is `gpt-6.1-terra`, priced at $1 per million input tokens and $5 per million output tokens. In ChatGPT plans it is available to Plus, Pro, Enterprise, and Edu users.
+
+### Do parallel Terra sessions share files?
+
+Not if each runs in its own Git worktree. They still share ports, databases, credentials, and your model quota, and their branches can conflict when merged.
+
+### Can I mix Terra with Claude Code or other agents?
+
+Yes. In Paradev, each workspace runs the agent and model you choose, so a Codex session on Terra can run next to Claude Code, OpenCode, or Gemini CLI on the same repository.
+
+### Where can I read more about running Codex in parallel?
+
+See the [best IDE for Codex](/compare/best-ide-for-codex), [Paradev vs Codex](/compare/superset-vs-codex), and [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).

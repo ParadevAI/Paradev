@@ -3,7 +3,7 @@ import { devtools, persist } from "zustand/middleware";
 
 export const DEFAULT_WORKSPACE_SIDEBAR_WIDTH = 280;
 export const COLLAPSED_WORKSPACE_SIDEBAR_WIDTH = 52;
-const MIN_WORKSPACE_SIDEBAR_WIDTH = 225;
+export const MIN_WORKSPACE_SIDEBAR_WIDTH = 225;
 export const MAX_WORKSPACE_SIDEBAR_WIDTH = 400;
 export const WORKSPACE_SIDEBAR_STORAGE_KEY = "workspace-sidebar-store";
 
@@ -13,16 +13,18 @@ const COLLAPSE_THRESHOLD = 120;
 interface WorkspaceSidebarState {
 	width: number;
 	lastExpandedWidth: number;
+	autoCollapsed: boolean;
+	adjustedThisSession: boolean;
 	// Use string[] instead of Set<string> for JSON serialization with Zustand persist
 	collapsedProjectIds: string[];
-	isResizing: boolean;
 
 	setWidth: (width: number) => void;
-	setIsResizing: (isResizing: boolean) => void;
 	toggleProjectCollapsed: (projectId: string) => void;
 	isProjectCollapsed: (projectId: string) => boolean;
 	toggleCollapsed: () => void;
 	isCollapsed: () => boolean;
+	autoCollapse: () => void;
+	autoExpand: () => void;
 }
 
 export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
@@ -31,12 +33,18 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 			(set, get) => ({
 				width: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 				lastExpandedWidth: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
+				autoCollapsed: false,
+				adjustedThisSession: false,
 				collapsedProjectIds: [],
-				isResizing: false,
 
 				setWidth: (width) => {
 					if (width < COLLAPSE_THRESHOLD) {
-						set({ width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH });
+						if (get().width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
+						set({
+							width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+							autoCollapsed: false,
+							adjustedThisSession: true,
+						});
 						return;
 					}
 
@@ -49,11 +57,9 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 					set({
 						width: clampedWidth,
 						lastExpandedWidth: clampedWidth,
+						autoCollapsed: false,
+						adjustedThisSession: true,
 					});
-				},
-
-				setIsResizing: (isResizing) => {
-					set({ isResizing });
 				},
 
 				toggleProjectCollapsed: (projectId) => {
@@ -74,10 +80,45 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 						width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH;
 
 					if (isCurrentlyCollapsed) {
-						set({ width: lastExpandedWidth });
+						set({
+							width: lastExpandedWidth,
+							autoCollapsed: false,
+							adjustedThisSession: true,
+						});
 					} else {
-						set({ width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH });
+						set({
+							width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+							autoCollapsed: false,
+							adjustedThisSession: true,
+						});
 					}
+				},
+
+				autoCollapse: () => {
+					const { width, adjustedThisSession } = get();
+					if (adjustedThisSession) return;
+					if (width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
+					set({
+						width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+						autoCollapsed: true,
+					});
+				},
+
+				autoExpand: () => {
+					const {
+						autoCollapsed,
+						adjustedThisSession,
+						width,
+						lastExpandedWidth,
+					} = get();
+					if (!autoCollapsed || adjustedThisSession) return;
+					set({
+						width:
+							width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
+								? lastExpandedWidth
+								: width,
+						autoCollapsed: false,
+					});
 				},
 
 				isCollapsed: () => {
@@ -103,8 +144,8 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 				partialize: (state) => ({
 					width: state.width,
 					lastExpandedWidth: state.lastExpandedWidth,
+					autoCollapsed: state.autoCollapsed,
 					collapsedProjectIds: state.collapsedProjectIds,
-					// isResizing intentionally excluded - ephemeral UI state
 				}),
 			},
 		),

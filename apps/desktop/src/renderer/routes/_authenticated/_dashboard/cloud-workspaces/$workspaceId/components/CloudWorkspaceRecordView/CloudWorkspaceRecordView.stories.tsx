@@ -45,10 +45,10 @@ const meta = {
 				{ fullName: "superset-sh/superset", branch: "superset/lag-repro-01" },
 			],
 			presence: [
-				{ ...avi, lastSeenAt: ago(3) },
-				{ ...kiet, lastSeenAt: ago(1) },
-				{ ...harshith, lastSeenAt: ago(2) },
-				{ ...satya, lastSeenAt: ago(120) },
+				{ ...avi, lastSeenAt: ago(3).getTime(), active: true },
+				{ ...kiet, lastSeenAt: ago(1).getTime(), active: true },
+				{ ...harshith, lastSeenAt: ago(2).getTime(), active: true },
+				{ ...satya, lastSeenAt: ago(120).getTime(), active: false },
 			],
 			prompt:
 				"Reproduce the sidebar lag Harshith reported when 40+ workspaces are open. Profile the renderer, find the hot path, and open a PR with the fix and a before/after trace.",

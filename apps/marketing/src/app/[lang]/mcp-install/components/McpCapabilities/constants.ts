@@ -53,7 +53,7 @@ export const MCP_CAPABILITIES: McpCapability[] = [
 		}),
 		description: msg({
 			message:
-				"Schedule recurring runs, run on demand, pause, resume, and read logs.",
+				"Run on a schedule or on events, run on demand, pause, resume, and read logs.",
 		}),
 	},
 	{

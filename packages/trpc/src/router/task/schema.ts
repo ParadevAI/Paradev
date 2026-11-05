@@ -49,6 +49,7 @@ const taskListFilterSchema = z.object({
 	assigneeMe: z.boolean().nullish(),
 	creatorMe: z.boolean().nullish(),
 	search: z.string().min(1).nullish(),
+	labels: z.array(z.string().trim().min(1)).max(20).nullish(),
 	externalProjectId: z.string().min(1).nullish(),
 	externalProjectName: z.string().min(1).nullish(),
 	externalCycleId: z.string().min(1).nullish(),

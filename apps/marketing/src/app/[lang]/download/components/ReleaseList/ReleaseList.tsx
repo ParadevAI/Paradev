@@ -64,9 +64,7 @@ export function ReleaseList({ releases }: ReleaseListProps) {
 	return (
 		<section id="all-downloads" className="border-border border-t pt-12">
 			<p className="max-w-2xl font-light text-foreground text-xl sm:text-2xl">
-				<Trans>
-					The Superset desktop app is available for macOS and Linux.
-				</Trans>
+				<Trans>The Paradev desktop app is available for macOS and Linux.</Trans>
 			</p>
 
 			<div className="mt-8">

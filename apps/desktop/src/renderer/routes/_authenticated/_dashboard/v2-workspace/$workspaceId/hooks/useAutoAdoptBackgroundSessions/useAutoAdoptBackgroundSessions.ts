@@ -79,7 +79,7 @@ export function useAutoAdoptBackgroundSessions({
 		// adoption never steals focus.
 		const restoreActiveTabId = state.tabs.length > 0 ? state.activeTabId : null;
 		for (const session of toAdopt.reverse()) {
-			focusOrAddTerminalPane(store, session.terminalId);
+			focusOrAddTerminalPane(store, session.terminalId, { focus: false });
 		}
 		if (restoreActiveTabId) {
 			store.getState().setActiveTab(restoreActiveTabId);

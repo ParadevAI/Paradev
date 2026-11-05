@@ -5,6 +5,7 @@ import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { setTestEnv } from "../../../test/env";
 import { stub } from "../../../test/stub";
+import * as meter from "../../router/cloud-workspace/meter";
 import * as pageStore from "../page-store";
 
 interface FakeOrganization {
@@ -55,6 +56,11 @@ const tx = {
 	update: () => ({ set: () => ({ where: async () => {} }) }),
 };
 
+stub(meter, {
+	settleOrganizationNow: async (organizationId: string) => {
+		log.push(`settle ${organizationId}`);
+	},
+});
 stub(db.query.members, {
 	findMany: async () =>
 		organizations
@@ -204,6 +210,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-solo",
 			"subscription.cancel sub_solo",
 			"charges.list cus_solo",
 			"customer.delete cus_solo",
@@ -228,6 +235,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-paid",
 			"charges.list cus_paid",
 			"organization.delete org-paid",
 			"tombstone",
@@ -273,6 +281,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-solo",
 			"charges.list cus_gone",
 			"organization.delete org-solo",
 			"tombstone",
@@ -327,6 +336,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			"settle org-solo",
 			"charges.list cus_solo",
 		]);
 	});

@@ -2,7 +2,7 @@ import {
 	type AgentDefinitionId,
 	BUILTIN_AGENT_IDS,
 } from "@superset/shared/agent-catalog";
-import { boundTranscriptText } from "@superset/shared/terminal-session-handoff";
+import { boundTranscriptText } from "@superset/shared/session-handoff";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -521,6 +521,17 @@ export const terminalAgentsRouter = router({
 						),
 					}
 				: null;
+		}),
+
+	/**
+	 * The terminal's agent binding, ended ones included, so a caller can tell
+	 * an agent that exited from one that has not started yet.
+	 */
+	get: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
+		.query(({ ctx, input }) => {
+			const binding = getTerminalAgentBinding(ctx.db, input.terminalId);
+			return binding?.workspaceId === input.workspaceId ? binding : null;
 		}),
 
 	/** See {@link findResumedSuccessor}. */

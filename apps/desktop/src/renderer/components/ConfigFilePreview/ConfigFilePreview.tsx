@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { PROJECT_CONFIG_DIR } from "@superset/shared/project-config";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import { HiArrowTopRightOnSquare } from "react-icons/hi2";
@@ -8,7 +9,6 @@ import {
 	CONFIG_FILE_NAME,
 	CONFIG_TEMPLATE,
 	EXTERNAL_LINKS,
-	PROJECT_SUPERSET_DIR_NAME,
 } from "shared/constants";
 
 export interface ConfigFilePreviewProps {
@@ -48,7 +48,9 @@ export function ConfigFilePreview({
 			>
 				<div className="flex items-center justify-between gap-4 px-4 py-3 border-b border-border">
 					<span className="text-sm text-muted-foreground font-mono truncate">
-						{projectName}/{PROJECT_SUPERSET_DIR_NAME}/{CONFIG_FILE_NAME}
+						{projectName}/
+						{configFilePath?.split(/[\\/]/).at(-2) ?? PROJECT_CONFIG_DIR}/
+						{CONFIG_FILE_NAME}
 					</span>
 					<OpenInButton
 						path={configFilePath}

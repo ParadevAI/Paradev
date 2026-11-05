@@ -6,6 +6,8 @@ import type { RouterOutputs } from "@superset/trpc";
 import { useMemo } from "react";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { electronTrpc } from "renderer/lib/electron-trpc";
+import { isUpdateAvailable, localVersionKey } from "./utils/isUpdateAvailable";
 import { onePerName } from "./utils/onePerName";
 
 type CatalogRow = RouterOutputs["plugins"]["list"][number];
@@ -16,9 +18,9 @@ export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
 	connector: string | null;
 	marketplace: string;
 	installed: boolean;
+	managed: boolean;
 	latestVersion: string | null;
 	updateAvailable: boolean;
-	enabled: boolean;
 	accounts: string[];
 	connections: CatalogRow["connections"];
 	pluginSkills: PluginSkill[];
@@ -27,7 +29,10 @@ export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
 	license: string | null;
 }
 
-function toCatalogPlugin(plugin: CatalogRow): CatalogPlugin {
+function toCatalogPlugin(
+	plugin: CatalogRow,
+	localVersions: ReadonlyMap<string, string> | undefined,
+): CatalogPlugin {
 	return {
 		name: plugin.name,
 		version: plugin.version,
@@ -42,13 +47,10 @@ function toCatalogPlugin(plugin: CatalogRow): CatalogPlugin {
 		connector: plugin.connector,
 		skills: plugin.skills.map((skill) => skill.name),
 		marketplace: plugin.marketplace,
-		installed: plugin.installed,
+		installed: plugin.installed && plugin.enabled,
+		managed: plugin.managed,
 		latestVersion: plugin.latestVersion,
-		updateAvailable:
-			plugin.installed &&
-			plugin.latestVersion !== null &&
-			plugin.latestVersion !== plugin.version,
-		enabled: plugin.enabled,
+		updateAvailable: isUpdateAvailable(plugin, localVersions),
 		accounts: plugin.accounts,
 		connections: plugin.connections,
 		pluginSkills: plugin.skills,
@@ -58,18 +60,42 @@ function toCatalogPlugin(plugin: CatalogRow): CatalogPlugin {
 	};
 }
 
+/** Changes arrive as realtime nudges; a window focus after this long also refetches, in case one was missed. */
+const PLUGIN_CATALOG_STALE_MS = 5 * 60_000;
+
+export const INCLUDE_ORGANIZATION = { includeOrganization: true };
+
 export function usePluginCatalog() {
 	const { data: session } = authClient.useSession();
 	const userId = session?.user?.id ?? null;
 
-	const query = cloudTrpc.plugins.list.useQuery(undefined, {
+	const query = cloudTrpc.plugins.list.useQuery(INCLUDE_ORGANIZATION, {
 		enabled: Boolean(userId),
+		staleTime: PLUGIN_CATALOG_STALE_MS,
 		refetchOnWindowFocus: true,
 	});
 
+	const organizationVersions =
+		electronTrpc.plugins.organizationVersions.useQuery();
+	const localVersions = useMemo(
+		() =>
+			organizationVersions.data
+				? new Map(
+						organizationVersions.data.map((entry) => [
+							localVersionKey(entry.marketplace, entry.name),
+							entry.version,
+						]),
+					)
+				: undefined,
+		[organizationVersions.data],
+	);
+
 	const plugins = useMemo(
-		() => onePerName((query.data ?? []).map(toCatalogPlugin)),
-		[query.data],
+		() =>
+			onePerName(
+				(query.data ?? []).map((row) => toCatalogPlugin(row, localVersions)),
+			),
+		[query.data, localVersions],
 	);
 
 	return {

@@ -1,10 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, GitBranch } from "lucide-react";
+import { AlertCircle, Check, Copy, GitBranch } from "lucide-react";
+import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { FailedWorkspaceCreateRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
+import { failedCreatePrompt } from "./utils/failedCreatePrompt";
 
 interface WorkspaceCreateErrorStateProps {
 	entry: FailedWorkspaceCreateRow;
@@ -17,9 +19,11 @@ export function WorkspaceCreateErrorState({
 	const navigate = useNavigate();
 	const collections = useCollections();
 	const { submit } = useWorkspaceCreates();
+	const { copyToClipboard, copied } = useCopyToClipboard();
 
 	const name = entry.input.name;
 	const branch = "branch" in entry.input ? entry.input.branch : undefined;
+	const prompt = failedCreatePrompt(entry.input);
 
 	const handleRetry = () => {
 		const { workspaceId, completed } = submit({
@@ -87,6 +91,32 @@ export function WorkspaceCreateErrorState({
 						{entry.error}
 					</p>
 				</div>
+
+				{prompt && (
+					<div className="flex w-full flex-col gap-1.5">
+						<div className="flex items-center justify-between">
+							<span className="text-[11px] text-muted-foreground">
+								<Trans>Your prompt</Trans>
+							</span>
+							<Button
+								size="sm"
+								variant="ghost"
+								className="h-6 gap-1 px-1.5 text-[11px]"
+								onClick={() => void copyToClipboard(prompt)}
+							>
+								{copied ? (
+									<Check className="size-3" aria-hidden="true" />
+								) : (
+									<Copy className="size-3" aria-hidden="true" />
+								)}
+								{copied ? <Trans>Copied</Trans> : <Trans>Copy</Trans>}
+							</Button>
+						</div>
+						<p className="max-h-40 w-full select-text overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-border bg-muted/30 px-3 py-2.5 text-[12px] leading-relaxed text-foreground cursor-text">
+							{prompt}
+						</p>
+					</div>
+				)}
 
 				<div className="flex items-center gap-2">
 					<Button size="sm" onClick={handleRetry}>

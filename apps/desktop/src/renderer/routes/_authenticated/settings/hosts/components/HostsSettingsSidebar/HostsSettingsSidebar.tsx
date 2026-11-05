@@ -1,11 +1,12 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	deriveHostVersionState,
 	type HostVersionState,
 } from "@superset/shared/host-version";
 import { cn } from "@superset/ui/utils";
 import { Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useAppVersion } from "renderer/hooks/host-version/useHostVersionState";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { hostVersionDotClass } from "renderer/routes/_authenticated/components/HostVersionBadge";
@@ -14,6 +15,7 @@ import {
 	SettingsListSidebar,
 	settingsListItemClass,
 } from "../../../components/SettingsListSidebar";
+import { SetUpOverSshDialog } from "../SetUpOverSshDialog";
 
 interface HostRow {
 	id: string;
@@ -34,6 +36,7 @@ export function HostsSettingsSidebar({
 	const { t } = useLingui();
 	const appVersion = useAppVersion();
 	const { hosts } = useKnownHosts();
+	const [sshDialogOpen, setSshDialogOpen] = useState(false);
 
 	const listGroups = useMemo<Array<SettingsListGroup<HostRow>>>(() => {
 		const sorted = hosts
@@ -65,59 +68,80 @@ export function HostsSettingsSidebar({
 	}, [hosts, appVersion, t]);
 
 	return (
-		<SettingsListSidebar
-			searchPlaceholder={t({
-				message: "Filter hosts...",
-			})}
-			searchAriaLabel={t({
-				message: "Filter hosts",
-			})}
-			groups={listGroups}
-			filterRow={(row, q) =>
-				`${row.name} ${row.version ?? ""}`
-					.toLowerCase()
-					.includes(q.toLowerCase())
-			}
-			getRowKey={(row) => row.id}
-			emptyLabel={t({
-				message: "No hosts yet.",
-			})}
-			noMatchLabel={(q) =>
-				t({
-					message: `No hosts match "${q}".`,
-				})
-			}
-			renderRow={(row) => (
-				<Link
-					to="/settings/hosts/$hostId"
-					params={{ hostId: row.id }}
-					className={settingsListItemClass(row.id === selectedHostId, "gap-2")}
-				>
-					<span
-						className={cn(
-							"h-1.5 w-1.5 rounded-full shrink-0",
-							hostVersionDotClass(row.versionState, row.isOnline),
+		<>
+			<SettingsListSidebar
+				listHeader={
+					<button
+						type="button"
+						onClick={() => setSshDialogOpen(true)}
+						className={settingsListItemClass(false, "gap-2 w-full text-left")}
+					>
+						<Plus className="size-3.5 shrink-0" />
+						<span className="truncate flex-1">
+							<Trans>Set up a host over SSH</Trans>
+						</span>
+					</button>
+				}
+				searchPlaceholder={t({
+					message: "Filter hosts...",
+				})}
+				searchAriaLabel={t({
+					message: "Filter hosts",
+				})}
+				groups={listGroups}
+				filterRow={(row, q) =>
+					`${row.name} ${row.version ?? ""}`
+						.toLowerCase()
+						.includes(q.toLowerCase())
+				}
+				getRowKey={(row) => row.id}
+				emptyLabel={t({
+					message: "No hosts yet.",
+				})}
+				noMatchLabel={(q) =>
+					t({
+						message: `No hosts match "${q}".`,
+					})
+				}
+				renderRow={(row) => (
+					<Link
+						to="/settings/hosts/$hostId"
+						params={{ hostId: row.id }}
+						className={settingsListItemClass(
+							row.id === selectedHostId,
+							"gap-2",
 						)}
-					/>
-					<span className="truncate flex-1">{row.name}</span>
-					{row.version && (
+					>
 						<span
 							className={cn(
-								"shrink-0 font-mono text-[10.5px] tabular-nums",
-								!row.isOnline
-									? "text-muted-foreground/50"
-									: row.versionState === "incompatible"
-										? "text-destructive"
-										: row.versionState === "behind"
-											? "text-amber-600 dark:text-amber-400"
-											: "text-muted-foreground/60",
+								"h-1.5 w-1.5 rounded-full shrink-0",
+								hostVersionDotClass(row.versionState, row.isOnline),
 							)}
-						>
-							{row.version}
-						</span>
-					)}
-				</Link>
-			)}
-		/>
+						/>
+						<span className="truncate flex-1">{row.name}</span>
+						{row.version && (
+							<span
+								className={cn(
+									"shrink-0 font-mono text-[10.5px] tabular-nums",
+									!row.isOnline
+										? "text-muted-foreground/50"
+										: row.versionState === "incompatible"
+											? "text-destructive"
+											: row.versionState === "behind"
+												? "text-amber-600 dark:text-amber-400"
+												: "text-muted-foreground/60",
+								)}
+							>
+								{row.version}
+							</span>
+						)}
+					</Link>
+				)}
+			/>
+			<SetUpOverSshDialog
+				open={sshDialogOpen}
+				onOpenChange={setSshDialogOpen}
+			/>
+		</>
 	);
 }
