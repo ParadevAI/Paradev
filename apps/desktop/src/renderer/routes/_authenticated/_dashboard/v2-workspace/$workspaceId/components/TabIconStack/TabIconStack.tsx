@@ -88,7 +88,7 @@ export function TabIconStack({
 		if (pane.kind === "terminal" || pane.kind === "chat-v3") {
 			return (
 				<TabIconCard key={pane.id} depth={depth}>
-					<Terminal className="text-success" strokeWidth={2.5} />
+					<Terminal strokeWidth={2.5} />
 				</TabIconCard>
 			);
 		}

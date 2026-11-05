@@ -14,34 +14,27 @@ interface TabIconCardProps {
 	children: ReactNode;
 }
 
-/** A 16px cap over a 2px lip; the lip, edge and top catch are variables so a brand cap can bring its own. */
-const KEY_SHADOW =
-	"shadow-[0_0_0_0.5px_var(--tab-key-edge),inset_0_0.5px_0_var(--tab-key-top),inset_0_-0.5px_0_rgb(0_0_0/0.3),0_2px_0_var(--tab-key-lip),0_2.5px_1.5px_var(--tab-key-lip-shadow)]";
-/** The open tab's front key sits 1.5px down on a half-pixel lip. */
-const KEY_SHADOW_PRESSED =
-	"group-data-[active]:translate-y-[1.5px] group-data-[active]:shadow-[0_0_0_0.5px_var(--tab-key-edge),inset_0_0.5px_0_var(--tab-key-top),inset_0_-0.5px_0_rgb(0_0_0/0.3),0_0.5px_0_var(--tab-key-lip),0_1px_1px_var(--tab-key-lip-shadow)]";
-
-/** A brand colour as a key: lit from the top, darkened at the base, with a lip of the same hue. */
-function brandCap(color: string): CSSProperties {
+/**
+ * A brand colour as tinted glass, lit in its own hue: a pale top edge, a deep
+ * base, and a soft bloom, so the white sheen never washes it out.
+ */
+function brandGlass(color: string): CSSProperties {
 	return {
-		backgroundImage: `linear-gradient(to bottom, color-mix(in oklab, ${color} 86%, white), color-mix(in oklab, ${color} 90%, black))`,
-		"--tab-key-lip": `color-mix(in oklab, ${color} 58%, black)`,
-		"--tab-key-lip-shadow": "rgb(0 0 0 / 0.5)",
-		"--tab-key-edge": "transparent",
-		"--tab-key-top": "rgb(255 255 255 / 0.3)",
-	} as CSSProperties;
+		backgroundColor: `color-mix(in oklab, ${color} 94%, transparent)`,
+		backgroundImage: `linear-gradient(135deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0) 55%), linear-gradient(to bottom, transparent 40%, color-mix(in oklab, color-mix(in oklab, ${color} 55%, black) 28%, transparent))`,
+		boxShadow: `inset 0 0.5px 0 color-mix(in oklab, ${color} 25%, white), inset 0.5px 0 0 color-mix(in oklab, color-mix(in oklab, ${color} 25%, white) 30%, transparent), inset 0 -0.5px 0 color-mix(in oklab, ${color} 45%, black), 0 1px 2px rgb(0 0 0 / 0.45), 0 0 6px -1px color-mix(in oklab, ${color} 45%, transparent)`,
+	};
 }
 
 export function TabIconCard({ depth, color, children }: TabIconCardProps) {
 	return (
 		<span
 			className={cn(
-				"absolute top-0 flex h-4 items-center justify-center rounded-[4.5px] transition-[translate,box-shadow] duration-150 [&_img]:size-[11px] [&_svg]:size-3",
-				KEY_SHADOW,
-				depth === 0 && KEY_SHADOW_PRESSED,
+				"absolute top-0 flex h-[18px] items-center justify-center overflow-hidden rounded-[6px] backdrop-blur-[6px] backdrop-saturate-[1.3] [&_img]:size-[11px] [&_svg]:size-3",
+				"before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-linear-to-b before:to-transparent before:content-['']",
 				color
-					? "text-white [&_img]:brightness-0 [&_img]:invert"
-					: "bg-[image:linear-gradient(to_bottom,var(--tab-key-cap-top),var(--tab-key-cap))] text-muted-foreground",
+					? "text-white before:from-white/12 [&_img]:brightness-0 [&_img]:invert"
+					: "bg-[var(--tab-glass-fill)] bg-[image:linear-gradient(135deg,var(--tab-glass-sheen),rgb(255_255_255/0.03)_60%)] text-[var(--tab-glass-glyph)] shadow-[var(--tab-glass-shadow)] before:from-white/16 [&_svg]:drop-shadow-[var(--tab-glass-glyph-shadow)]",
 			)}
 			style={{
 				width: CARD_WIDTH_PX,
@@ -49,7 +42,7 @@ export function TabIconCard({ depth, color, children }: TabIconCardProps) {
 				zIndex: MAX_TAB_ICONS - depth,
 				transform: depth > 0 ? `scale(${CARD_SCALE_STEP ** depth})` : undefined,
 				transformOrigin: "right center",
-				...(color ? brandCap(color) : undefined),
+				...(color ? brandGlass(color) : undefined),
 			}}
 		>
 			{children}

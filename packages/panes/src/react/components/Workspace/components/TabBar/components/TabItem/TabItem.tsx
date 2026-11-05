@@ -143,7 +143,6 @@ export function TabItem<TData>({
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}
-					data-active={isActive || undefined}
 					// Select on click, not mousedown: the browser suppresses click after a
 					// drag, so starting a drag (reorder, or merging a tab into a pane) no
 					// longer switches the active tab mid-gesture.

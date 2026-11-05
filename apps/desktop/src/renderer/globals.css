@@ -81,13 +81,19 @@
 	--tab-selected: color-mix(in oklab, var(--foreground) 15%, var(--sidebar));
 	--tab-selected-shadow: inset 0 0 0 0.8px rgb(255 255 255 / 0.1);
 	--tab-switcher-hover: color-mix(in oklab, var(--foreground) 20%, #1a1716);
-	/* Tab icon keycaps: a 16px cap over a 2px lip */
-	--tab-key-cap-top: color-mix(in oklab, var(--foreground) 16%, var(--sidebar));
-	--tab-key-cap: color-mix(in oklab, var(--foreground) 9%, var(--sidebar));
-	--tab-key-lip: color-mix(in oklab, black 50%, var(--sidebar));
-	--tab-key-lip-shadow: rgb(0 0 0 / 0.5);
-	--tab-key-edge: transparent;
-	--tab-key-top: rgb(255 255 255 / 0.2);
+	/* Tab icon cards: frosted glass over the tab bar */
+	--tab-glass-fill: color-mix(
+		in oklab,
+		color-mix(in oklab, var(--foreground) 9%, var(--sidebar)) 82%,
+		transparent
+	);
+	--tab-glass-sheen: rgb(255 255 255 / 0.22);
+	--tab-glass-shadow:
+		inset 0 0.5px 0 rgb(255 255 255 / 0.55),
+		inset 0.5px 0 0 rgb(255 255 255 / 0.2), inset 0 -0.5px 0 rgb(0 0 0 / 0.35),
+		0 1px 2px rgb(0 0 0 / 0.45);
+	--tab-glass-glyph: #ffffff;
+	--tab-glass-glyph-shadow: 0 0.5px 1px rgb(0 0 0 / 0.5);
 }
 
 /* Light theme fallback values - applied before hydration if user has light theme saved */
@@ -142,13 +148,14 @@
 		0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent),
 		0 1.5px 3.5px rgb(0 0 0 / 0.1);
 	--tab-switcher-hover: color-mix(in oklab, var(--foreground) 4%, var(--card));
-	/* A white key is lit from the top already: its edge is a hairline, not a highlight */
-	--tab-key-cap-top: #ffffff;
-	--tab-key-cap: color-mix(in oklab, var(--foreground) 7%, white);
-	--tab-key-lip: color-mix(in oklab, var(--foreground) 22%, white);
-	--tab-key-lip-shadow: rgb(0 0 0 / 0.18);
-	--tab-key-edge: color-mix(in oklab, var(--foreground) 14%, transparent);
-	--tab-key-top: #ffffff;
+	--tab-glass-fill: rgb(255 255 255 / 0.78);
+	--tab-glass-sheen: rgb(255 255 255 / 0.22);
+	--tab-glass-shadow:
+		inset 0 0.5px 0 rgb(255 255 255 / 0.9), inset 0 -0.5px 0 rgb(0 0 0 / 0.12),
+		0 1px 2px rgb(0 0 0 / 0.18),
+		0 0 0 0.5px color-mix(in oklab, var(--foreground) 10%, transparent);
+	--tab-glass-glyph: var(--foreground);
+	--tab-glass-glyph-shadow: 0 0 0 transparent;
 }
 
 /* WindowFocusSync sets this while the OS window is not focused. */
