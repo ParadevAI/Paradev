@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import {
 	Command,
 	CommandGroup,
@@ -10,8 +10,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
-import { LuCloud, LuPlus, LuTriangleAlert } from "react-icons/lu";
+import { LuCloud, LuPlus, LuRepeat, LuTriangleAlert } from "react-icons/lu";
 import { PickerTrigger } from "renderer/components/PickerTrigger";
+import { RunWorkspaceItems } from "../../../../../components/RunWorkspaceItems";
 
 interface CloudWorkspacePickerProps {
 	/** The choices: only the caller's own, since a run wakes a box with its creator's credentials. */
@@ -19,7 +20,9 @@ interface CloudWorkspacePickerProps {
 	/** Every cloud workspace in the organization, to name a pin that isn't one of the choices. */
 	allWorkspaces: { id: string; name: string; status: string }[] | undefined;
 	value: string | null;
-	onChange: (cloudWorkspaceId: string | null) => void;
+	/** Runs keep the first workspace they make; `value` is that one once made. */
+	reuse: boolean;
+	onChange: (next: { cloudWorkspaceId: string | null; reuse: boolean }) => void;
 	className?: string;
 	disabled?: boolean;
 }
@@ -28,6 +31,7 @@ export function CloudWorkspacePicker({
 	workspaces,
 	allWorkspaces,
 	value,
+	reuse,
 	onChange,
 	className,
 	disabled,
@@ -41,25 +45,32 @@ export function CloudWorkspacePicker({
 	const gone = pinned?.status === "failed" || pinned?.status === "deleted";
 	// A viewer who isn't the owner may not see the owner's workspaces at all.
 	const unseen = !!value && !resolving && !pinned && !!disabled;
-	const missing = !!value && !resolving && !unseen && (!pinned || gone);
+	const missing =
+		!reuse && !!value && !resolving && !unseen && (!pinned || gone);
 	const selected = missing ? null : pinned;
-	const label = selected
-		? selected.name
-		: resolving
-			? t({
-					message: "Loading…",
-				})
-			: unseen
+	const label = reuse
+		? t({ message: "Same workspace" })
+		: selected
+			? selected.name
+			: resolving
 				? t({
-						message: "Cloud workspace",
+						message: "Loading…",
 					})
-				: missing
+				: unseen
 					? t({
-							message: "Workspace not found",
+							message: "Cloud workspace",
 						})
-					: t({
-							message: "New workspace",
-						});
+					: missing
+						? t({
+								message: "Workspace not found",
+							})
+						: t({
+								message: "New workspace",
+							});
+	const pick = (next: { cloudWorkspaceId: string | null; reuse: boolean }) => {
+		onChange(next);
+		setOpen(false);
+	};
 
 	return (
 		<Popover open={open} onOpenChange={(next) => !disabled && setOpen(next)}>
@@ -70,6 +81,8 @@ export function CloudWorkspacePicker({
 					icon={
 						missing ? (
 							<LuTriangleAlert className="size-4 shrink-0" />
+						) : reuse ? (
+							<LuRepeat className="size-4 shrink-0" />
 						) : selected || resolving || unseen ? (
 							<LuCloud className="size-4 shrink-0" />
 						) : (
@@ -93,31 +106,25 @@ export function CloudWorkspacePicker({
 					/>
 					<CommandList>
 						<CommandGroup>
-							<CommandItem
-								value="__new__"
-								onSelect={() => {
-									onChange(null);
-									setOpen(false);
-								}}
-							>
-								<LuPlus className="size-4" />
-								<span>
-									<Trans>New workspace</Trans>
-								</span>
-								{!value && <HiCheck className="ml-auto size-4" />}
-							</CommandItem>
+							<RunWorkspaceItems
+								sessions={false}
+								mode={reuse ? "same" : value ? "picked" : "new"}
+								keptName={reuse && !gone ? (pinned?.name ?? null) : null}
+								onSelect={(mode) =>
+									pick({ cloudWorkspaceId: null, reuse: mode === "same" })
+								}
+							/>
 							{(workspaces ?? []).map((workspace) => (
 								<CommandItem
 									key={workspace.id}
 									value={workspace.name}
-									onSelect={() => {
-										onChange(workspace.id);
-										setOpen(false);
-									}}
+									onSelect={() =>
+										pick({ cloudWorkspaceId: workspace.id, reuse: false })
+									}
 								>
 									<LuCloud className="size-4" />
 									<span className="truncate">{workspace.name}</span>
-									{workspace.id === value && (
+									{!reuse && workspace.id === value && (
 										<HiCheck className="ml-auto size-4" />
 									)}
 								</CommandItem>

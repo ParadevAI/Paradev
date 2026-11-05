@@ -5258,14 +5258,15 @@ msgstr "Контекстное окно: использовано {percent}"
 msgid "Continue"
 msgstr "Продолжить"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Продолжить"
+
 msgid "Continue in your browser"
 msgstr "Продолжите в браузере"
 
 msgid "Continue or fork session"
 msgstr "Продолжить или форкнуть сессию"
-
-msgid "Continue the session the last run left"
-msgstr "Продолжить сессию, оставшуюся от прошлого запуска"
 
 msgid "Continue this chat on another login"
 msgstr "Продолжить этот чат под другим аккаунтом"
@@ -5298,9 +5299,6 @@ msgstr "Продолжить с Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Для продолжения сессии агента нужно закреплённое рабочее пространство"
-
-msgid "continuing the last session"
-msgstr "продолжая последнюю сессию"
 
 msgid "Continuing…"
 msgstr "Продолжаем…"
@@ -7468,6 +7466,12 @@ msgstr "Каждая в своей новой вкладке"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Каждое утро в 8:00 смотри вчерашние упавшие запуски CI, определяй самую частую причину и открывай PR с исправлением."
+
+msgid "Each run makes its own"
+msgstr "Каждый запуск создаёт свою"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Каждый запуск начинает новый разговор с агентом"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Каждое место добавляет часы своего тарифа в общий пул всей команды:"
@@ -9918,9 +9922,6 @@ msgstr "Улучшенный просмотр diff"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "в {0}"
-
-msgid "in a new session"
-msgstr "в новой сессии"
 
 msgid "in a terminal on this host."
 msgstr "в терминале на этом хосте."
@@ -16293,6 +16294,9 @@ msgstr "Переиспользуемые инструкции, которые а
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Переиспользуемые запуски терминала. Нажмите на скрипт, чтобы изменить, или перетащите, чтобы изменить порядок. Команды настройки, запуска и очистки проекта — это скрипты жизненного цикла."
 
+msgid "Reusing {keptName}"
+msgstr "Используется {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "Показать в Finder"
 
@@ -16627,8 +16631,14 @@ msgstr "Выполняется при создании рабочего прос
 msgid "Runs when a workspace is deleted."
 msgstr "Выполняется при удалении рабочего пространства."
 
+msgid "Same session"
+msgstr "Та же сессия"
+
 msgid "Same version as this app."
 msgstr "Та же версия, что и у этого приложения."
+
+msgid "Same workspace"
+msgstr "Та же рабочая область"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO и провижининг SCIM"
@@ -18314,9 +18324,6 @@ msgstr "Начните диалог, чтобы сообщения появил�
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Запускает новую сессию агента с недавним контекстом этого терминала. Источником истины остаются файлы рабочего пространства."
 
-msgid "Start a new agent session each run"
-msgstr "Запускать новую сессию агента при каждом запуске"
-
 msgid "Start a new chat"
 msgstr "Начать новый чат"
 
@@ -19178,6 +19185,9 @@ msgstr "Агент потерял этот разговор"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Агент ведёт задачу от тикета до diff. Человек проверяет результат, а не нажатия клавиш. Внимание смещается с написания кода на постановку задач и оценку результата. Один инженер ведёт несколько агентов одновременно в изолированных рабочих областях."
 
+msgid "The agent picks up where the last run left off"
+msgstr "Агент продолжает с того места, где остановился последний запуск"
+
 msgid "The agent stopped responding"
 msgstr "Агент перестал отвечать"
 
@@ -19288,6 +19298,9 @@ msgstr "В файле нет тем, пригодных для импорта."
 
 msgid "The first F4 teams"
 msgstr "Первые команды на F4"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "Первый запуск создаёт её, следующие используют её снова"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Первые команды, небольшие, выпускают код, написанный преимущественно агентами, не читая каждую строку, и их уровень дефектов держится. Ничего мистического: слои ревью, канареечные выкладки, быстрый откат и привычка писать спецификации вместо кода."

@@ -81,6 +81,7 @@ export type DispatchableAutomation = Pick<
 	| "environmentId"
 	| "tags"
 	| "continueAgentSession"
+	| "reuseWorkspace"
 	| "machineSize"
 >;
 
@@ -249,7 +250,7 @@ export async function dispatchAutomation(
 				pullRequest,
 			});
 			placed({ v2WorkspaceId: created.workspaceId });
-			if (automation.continueAgentSession) {
+			if (automation.reuseWorkspace) {
 				await pinCreatedWorkspace(automation.id, {
 					v2WorkspaceId: created.workspaceId,
 				});

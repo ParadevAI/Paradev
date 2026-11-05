@@ -5258,14 +5258,15 @@ msgstr "Bağlam penceresi: {percent} kullanıldı"
 msgid "Continue"
 msgstr "Devam et"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Devam et"
+
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
 msgid "Continue or fork session"
 msgstr "Oturumu sürdür veya forkla"
-
-msgid "Continue the session the last run left"
-msgstr "Son çalıştırmanın bıraktığı oturumu sürdür"
 
 msgid "Continue this chat on another login"
 msgstr "Bu sohbete başka bir hesapla devam et"
@@ -5298,9 +5299,6 @@ msgstr "Google ile devam et"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Bir aracı oturumunu sürdürmek için sabitlenmiş bir çalışma alanı gerekir"
-
-msgid "continuing the last session"
-msgstr "son oturumu sürdürerek"
 
 msgid "Continuing…"
 msgstr "Devam ediliyor…"
@@ -7468,6 +7466,12 @@ msgstr "Her biri kendi yeni sekmesinde"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Her sabah 08.00'de dünkü başarısız CI çalıştırmalarına bak, en sık görülen hatayı teşhis et ve düzeltme PR'ı aç."
+
+msgid "Each run makes its own"
+msgstr "Her çalıştırma kendininkini oluşturur"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Her çalıştırma ajanla yeni bir konuşma başlatır"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Her koltuk, planının saatlerini tüm ekibinizin paylaştığı tek bir havuza ekler:"
@@ -9918,9 +9922,6 @@ msgstr "Geliştirilmiş fark görüntüleyici"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0} içinde"
-
-msgid "in a new session"
-msgstr "yeni bir oturumda"
 
 msgid "in a terminal on this host."
 msgstr "komutunu çalıştırın."
@@ -16293,6 +16294,9 @@ msgstr "Ajanlarınızın otomatik olarak aldığı yeniden kullanılabilir yöne
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Yeniden kullanılabilir terminal başlatmaları. Düzenlemek için bir betiğe tıklayın veya sıralamak için sürükleyin. Proje kurulum, çalıştırma ve kapatma komutları yaşam döngüsü betikleridir."
 
+msgid "Reusing {keptName}"
+msgstr "{keptName} yeniden kullanılıyor"
+
 msgid "Reveal in Finder"
 msgstr "Finder'da göster"
 
@@ -16627,8 +16631,14 @@ msgstr "Yeni bir çalışma alanı oluşturulduğunda çalışır."
 msgid "Runs when a workspace is deleted."
 msgstr "Bir çalışma alanı silindiğinde çalışır."
 
+msgid "Same session"
+msgstr "Aynı oturum"
+
 msgid "Same version as this app."
 msgstr "Bu uygulamayla aynı sürüm."
+
+msgid "Same workspace"
+msgstr "Aynı çalışma alanı"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO ve SCIM sağlama"
@@ -18314,9 +18324,6 @@ msgstr "Mesajları burada görmek için bir konuşma başlatın"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Bu terminalin son bağlamıyla yeni bir ajan oturumu başlatır. Çalışma alanındaki dosyalar doğruluğun kaynağı olmayı sürdürür."
 
-msgid "Start a new agent session each run"
-msgstr "Her çalıştırmada yeni bir aracı oturumu başlat"
-
 msgid "Start a new chat"
 msgstr "Yeni sohbet başlat"
 
@@ -19178,6 +19185,9 @@ msgstr "Ajan bu konuşmayı kaybetti"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Ajan, bir görevi biletten farka kadar sahiplenir. İnsan tuş vuruşlarını değil, sonucu inceler. Dikkat, kod yazmaktan işi tanımlamaya ve değerlendirmeye kayar. Bir mühendis, yalıtılmış çalışma alanlarında aynı anda birkaç ajan çalıştırır."
 
+msgid "The agent picks up where the last run left off"
+msgstr "Ajan son çalıştırmanın kaldığı yerden devam eder"
+
 msgid "The agent stopped responding"
 msgstr "Ajan yanıt vermeyi bıraktı"
 
@@ -19288,6 +19298,9 @@ msgstr "Dosya içe aktarılabilir tema içermiyordu."
 
 msgid "The first F4 teams"
 msgstr "İlk F4 takımları"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "İlk çalıştırma oluşturur, sonrakiler yeniden kullanır"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "İlk takımlar, küçük olanlar, her satırı okumadan çoğunlukla ajan üretimi kod göndermeye başlar ve hata oranları bozulmaz. Arkasında gizemli bir şey yok: inceleme katmanları, kanarya sürümleri, hızlı geri alma ve kod yerine spesifikasyon yazma alışkanlığı."

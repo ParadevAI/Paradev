@@ -5258,14 +5258,15 @@ msgstr "Fenêtre de contexte : {percent} utilisés"
 msgid "Continue"
 msgstr "Continuer"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Continuer"
+
 msgid "Continue in your browser"
 msgstr "Continuez dans votre navigateur"
 
 msgid "Continue or fork session"
 msgstr "Continuer ou forker la session"
-
-msgid "Continue the session the last run left"
-msgstr "Continuer la session laissée par la dernière exécution"
 
 msgid "Continue this chat on another login"
 msgstr "Continuer cette discussion avec un autre compte"
@@ -5298,9 +5299,6 @@ msgstr "Continuer avec Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Continuer une session d'agent nécessite un espace de travail épinglé"
-
-msgid "continuing the last session"
-msgstr "en continuant la dernière session"
 
 msgid "Continuing…"
 msgstr "Reprise en cours…"
@@ -7468,6 +7466,12 @@ msgstr "Chacune dans son propre nouvel onglet"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Chaque matin à 8 h, examine les exécutions CI en échec de la veille, diagnostique l'échec le plus fréquent et ouvre une pull request de correction."
+
+msgid "Each run makes its own"
+msgstr "Chaque exécution crée le sien"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Chaque exécution démarre une nouvelle conversation avec l'agent"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Chaque siège ajoute les heures de son forfait à une réserve unique partagée par toute votre équipe :"
@@ -9918,9 +9922,6 @@ msgstr "Visualiseur de diff amélioré"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "dans {0}"
-
-msgid "in a new session"
-msgstr "dans une nouvelle session"
 
 msgid "in a terminal on this host."
 msgstr "dans un terminal sur cet hôte."
@@ -16293,6 +16294,9 @@ msgstr "Des instructions réutilisables que vos agents adoptent automatiquement"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Lancements de terminal réutilisables. Cliquez sur un script pour le modifier ou glissez-le pour réordonner. Les commandes de configuration, d'exécution et de nettoyage du projet sont des scripts de cycle de vie."
 
+msgid "Reusing {keptName}"
+msgstr "Réutilise {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "Afficher dans le Finder"
 
@@ -16627,8 +16631,14 @@ msgstr "S’exécute à la création d’un espace de travail."
 msgid "Runs when a workspace is deleted."
 msgstr "S’exécute à la suppression d’un espace de travail."
 
+msgid "Same session"
+msgstr "Même session"
+
 msgid "Same version as this app."
 msgstr "Même version que cette application."
+
+msgid "Same workspace"
+msgstr "Même espace de travail"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SSO SAML et provisionnement SCIM"
@@ -18314,9 +18324,6 @@ msgstr "Démarrez une conversation pour voir les messages ici"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Démarre une nouvelle session d'agent avec le contexte récent de ce terminal. Les fichiers de l'espace de travail restent la source de vérité."
 
-msgid "Start a new agent session each run"
-msgstr "Démarrer une nouvelle session d'agent à chaque exécution"
-
 msgid "Start a new chat"
 msgstr "Démarrer une nouvelle discussion"
 
@@ -19178,6 +19185,9 @@ msgstr "L'agent a perdu cette conversation"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "L'agent prend en charge une tâche du ticket au diff. L'humain relit le résultat, pas les frappes au clavier. L'attention passe de l'écriture du code à la spécification du travail et à son évaluation. Un ingénieur fait tourner plusieurs agents à la fois dans des espaces de travail isolés."
 
+msgid "The agent picks up where the last run left off"
+msgstr "L'agent reprend là où la dernière exécution s'est arrêtée"
+
 msgid "The agent stopped responding"
 msgstr "L'agent ne répond plus"
 
@@ -19288,6 +19298,9 @@ msgstr "Le fichier ne contenait aucun thème importable."
 
 msgid "The first F4 teams"
 msgstr "Les premières équipes F4"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "La première exécution le crée, les suivantes le réutilisent"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Les premières équipes, de petite taille, livrent du code majoritairement écrit par des agents sans en lire chaque ligne, et leur taux de défauts tient. Rien de mystique derrière : des couches de revue, des canaries, un rollback rapide et l'habitude d'écrire des spécifications plutôt que du code."

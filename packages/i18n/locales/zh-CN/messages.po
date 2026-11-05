@@ -5258,14 +5258,15 @@ msgstr "上下文窗口：已使用 {percent}"
 msgid "Continue"
 msgstr "继续"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "继续"
+
 msgid "Continue in your browser"
 msgstr "请在浏览器中继续"
 
 msgid "Continue or fork session"
 msgstr "继续或分叉会话"
-
-msgid "Continue the session the last run left"
-msgstr "继续上次运行留下的会话"
 
 msgid "Continue this chat on another login"
 msgstr "使用其他账号继续此对话"
@@ -5298,9 +5299,6 @@ msgstr "使用Google继续"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "继续智能体会话需要固定的工作区"
-
-msgid "continuing the last session"
-msgstr "继续上一个会话"
 
 msgid "Continuing…"
 msgstr "正在继续…"
@@ -7468,6 +7466,12 @@ msgstr "每条各占一个新标签页"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "每天早上8点，查看昨天失败的CI运行，诊断最常见的失败原因，并提一个修复PR。"
+
+msgid "Each run makes its own"
+msgstr "每次运行都新建一个"
+
+msgid "Each run starts a new agent conversation"
+msgstr "每次运行都与智能体开始新的对话"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "每个席位会把其套餐的时长加入整个团队共享的一个时长池："
@@ -9918,9 +9922,6 @@ msgstr "更好的差异查看器"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "于 {0}"
-
-msgid "in a new session"
-msgstr "在新会话中"
 
 msgid "in a terminal on this host."
 msgstr "（在此主机的终端中）。"
@@ -16293,6 +16294,9 @@ msgstr "智能体会自动读取的可复用说明"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "可复用的终端启动项。点击脚本可编辑，拖动可重新排序。项目的初始化、运行和清理命令属于生命周期脚本。"
 
+msgid "Reusing {keptName}"
+msgstr "正在复用 {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "在Finder中显示"
 
@@ -16627,8 +16631,14 @@ msgstr "创建新工作区时运行。"
 msgid "Runs when a workspace is deleted."
 msgstr "删除工作区时运行。"
 
+msgid "Same session"
+msgstr "同一会话"
+
 msgid "Same version as this app."
 msgstr "与此应用版本相同。"
+
+msgid "Same workspace"
+msgstr "同一工作区"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO与SCIM账号开通"
@@ -18314,9 +18324,6 @@ msgstr "开始一段对话，消息会显示在这里"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "以该终端最近的上下文启动一个新的智能体会话。工作区中的文件仍是准确来源。"
 
-msgid "Start a new agent session each run"
-msgstr "每次运行都启动新的智能体会话"
-
 msgid "Start a new chat"
 msgstr "开始新的聊天"
 
@@ -19178,6 +19185,9 @@ msgstr "智能体丢失了此对话"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "智能体从工单一路负责到差异。人类审查结果，而不是击键过程。注意力从写代码转向定义工作和判断成果。一名工程师在隔离工作区里同时跑好几个智能体。"
 
+msgid "The agent picks up where the last run left off"
+msgstr "智能体会从上次运行停下的地方继续"
+
 msgid "The agent stopped responding"
 msgstr "智能体已停止响应"
 
@@ -19288,6 +19298,9 @@ msgstr "该文件不包含任何可导入的主题。"
 
 msgid "The first F4 teams"
 msgstr "第一批F4团队"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "首次运行时创建，之后的运行复用它"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "第一批团队，规模都不大，在不逐行阅读的情况下交付了以智能体为主的代码，缺陷率并没有恶化。背后没什么玄学：分层审查、灰度发布、快速回滚，以及写规格而不是写代码的习惯。"

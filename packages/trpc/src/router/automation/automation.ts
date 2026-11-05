@@ -585,6 +585,7 @@ export const automationRouter = {
 					cloudWorkspaceId: input.cloudWorkspaceId,
 					environmentId: input.environmentId,
 					continueAgentSession: input.continueAgentSession,
+					reuseWorkspace: input.reuseWorkspace,
 				},
 				input.agent,
 			);
@@ -706,6 +707,7 @@ export const automationRouter = {
 					cloudWorkspaceId: input.cloudWorkspaceId,
 					environmentId: input.environmentId,
 					continueAgentSession: input.continueAgentSession,
+					reuseWorkspace: input.reuseWorkspace,
 				},
 				input.agent ?? existing.agent,
 			);

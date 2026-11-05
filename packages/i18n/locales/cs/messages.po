@@ -5258,14 +5258,15 @@ msgstr "Kontextové okno: využito {percent}"
 msgid "Continue"
 msgstr "Pokračovat"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Pokračovat"
+
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
 msgid "Continue or fork session"
 msgstr "Pokračovat nebo forkovat relaci"
-
-msgid "Continue the session the last run left"
-msgstr "Pokračovat v relaci, kterou zanechalo poslední spuštění"
 
 msgid "Continue this chat on another login"
 msgstr "Pokračovat v tomto chatu pod jiným přihlášením"
@@ -5298,9 +5299,6 @@ msgstr "Pokračovat přes Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Pokračování v relaci agenta vyžaduje připnutý pracovní prostor"
-
-msgid "continuing the last session"
-msgstr "pokračováním v poslední relaci"
 
 msgid "Continuing…"
 msgstr "Pokračuje se…"
@@ -7468,6 +7466,12 @@ msgstr "Každý ve vlastní nové kartě"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Každé ráno v 8:00 se podívej na včerejší neúspěšné běhy CI, urči nejčastější příčinu selhání a otevři PR s opravou."
+
+msgid "Each run makes its own"
+msgstr "Každé spuštění si vytvoří vlastní"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Každé spuštění začne novou konverzaci s agentem"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Každé místo přidá hodiny svého plánu do jednoho fondu, který sdílí celý tým:"
@@ -9918,9 +9922,6 @@ msgstr "Vylepšený prohlížeč rozdílů"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "v {0}"
-
-msgid "in a new session"
-msgstr "v nové relaci"
 
 msgid "in a terminal on this host."
 msgstr "v terminálu na tomto hostu."
@@ -16293,6 +16294,9 @@ msgstr "Znovupoužitelné instrukce, které si agenti automaticky načtou"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Znovupoužitelná spuštění terminálu. Kliknutím skript upravíte, přetažením změníte pořadí. Příkazy pro setup, spuštění a teardown projektu jsou lifecycle skripty."
 
+msgid "Reusing {keptName}"
+msgstr "Znovu použito: {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "Zobrazit ve Finderu"
 
@@ -16627,8 +16631,14 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
 
+msgid "Same session"
+msgstr "Stejná relace"
+
 msgid "Same version as this app."
 msgstr "Stejná verze jako tato aplikace."
+
+msgid "Same workspace"
+msgstr "Stejný pracovní prostor"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO a provisioning přes SCIM"
@@ -18314,9 +18324,6 @@ msgstr "Začněte konverzaci a zprávy se objeví tady"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Spustí novou relaci agenta s nedávným kontextem tohoto terminálu. Zdrojem pravdy zůstávají soubory v pracovním prostoru."
 
-msgid "Start a new agent session each run"
-msgstr "Při každém spuštění začít novou relaci agenta"
-
 msgid "Start a new chat"
 msgstr "Zahájit nový chat"
 
@@ -19178,6 +19185,9 @@ msgstr "Agent tuto konverzaci ztratil"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Agent vlastní úkol od ticketu po diff. Člověk reviduje výsledek, ne úhozy. Pozornost se přesouvá od psaní kódu k zadávání práce a jejímu posuzování. Jeden inženýr běží několik agentů naráz v izolovaných pracovních prostorech."
 
+msgid "The agent picks up where the last run left off"
+msgstr "Agent naváže tam, kde poslední spuštění skončilo"
+
 msgid "The agent stopped responding"
 msgstr "Agent přestal odpovídat"
 
@@ -19288,6 +19298,9 @@ msgstr "Soubor neobsahoval žádné importovatelné motivy."
 
 msgid "The first F4 teams"
 msgstr "První týmy na úrovni F4"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "První spuštění ho vytvoří, další ho znovu použijí"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "První týmy, ty malé, dodávají kód psaný převážně agenty, aniž by četly každý řádek, a jejich chybovost drží. Nic mystického za tím není: vrstvy revizí, kanárkové nasazení, rychlý rollback a zvyk psát specifikace místo kódu."
