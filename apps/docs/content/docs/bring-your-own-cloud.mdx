@@ -1,21 +1,21 @@
 ---
 title: Bring Your Own Cloud
-description: Run Paradev on a server in your own cloud and reach it from desktop, iPhone, and iPad
+description: Run Paradev on a server in your own cloud and open it from the desktop or phone app
 pro: true
 ---
 
 ## Overview
 
-Paradev can run agents on a server you own, in AWS, GCP, Azure, Hetzner, or any other Linux host. Your code, your agent sign-ins, and your keys stay on that server. You open its workspaces from the desktop app and from iPhone or iPad, the same as workspaces on your laptop.
+Paradev can run agents on a Linux server in your own cloud account. Your code and agent sign-ins stay on that server. You open its workspaces from the desktop or phone app, the same as workspaces on your laptop.
 
-This is different from [cloud workspaces](/cloud-workspaces), where Paradev runs the machine for you. Pick bring your own cloud when the code must stay in your account, or when you want a machine size, region, or network that you control.
+This is different from [cloud workspaces](/cloud-workspaces), where Paradev runs the machine for you. Pick it when the code must stay in your account, or when you want to control the machine.
 
 The host binds to `127.0.0.1` and reaches your devices through the Paradev relay, so the server needs no open inbound ports.
 
 ## Requirements
 
 - **A paid plan.** The server is a [Remote Access](/remote-access) host.
-- **A Linux server**, x64 or arm64. If it runs well on an 8 GB laptop, a server with 4 vCPU and 8 GB runs it too.
+- **A Linux server**, x64 or arm64. If your project runs well on an 8 GB laptop, a server with 4 vCPU and 8 GB is enough.
 - **`git` and `gh`** on the server, and the agent CLIs you want to run. See [Host Server prerequisites](/cli/host-server#prerequisites).
 
 ## 1. Install the CLI
@@ -69,6 +69,6 @@ If the project already exists on another machine, attach this server to it with 
 
 ## Security
 
-- Use a server for Paradev only. Everything the host can reach (files, terminals, agent sign-ins) is reachable by the people you grant access to.
+- Use a server for Paradev only. Anyone you grant access to can reach everything the host can, including its agent sign-ins.
 - Keep only the repos and credentials you mean to share on it.
 - Agents still use your own subscriptions and keys. Paradev does not proxy model calls.
