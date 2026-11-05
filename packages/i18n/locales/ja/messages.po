@@ -4108,6 +4108,9 @@ msgstr "チャットを閉じました"
 msgid "Chat history"
 msgstr "チャット履歴"
 
+msgid "Chat interface"
+msgstr "チャット画面"
+
 msgid "Chat is being reworked"
 msgstr "チャットは再構築中です"
 

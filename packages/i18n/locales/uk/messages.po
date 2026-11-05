@@ -4102,6 +4102,9 @@ msgstr "Чат закрито"
 msgid "Chat history"
 msgstr "Історія чату"
 
+msgid "Chat interface"
+msgstr "Інтерфейс чату"
+
 msgid "Chat is being reworked"
 msgstr "Чат зараз переробляють"
 

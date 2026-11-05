@@ -4108,6 +4108,9 @@ msgstr "聊天已關閉"
 msgid "Chat history"
 msgstr "聊天記錄"
 
+msgid "Chat interface"
+msgstr "聊天介面"
+
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"
 
