@@ -6046,6 +6046,9 @@ msgstr "無法儲存 Dev"
 msgid "Couldn't save the routine"
 msgstr "無法儲存例行任務"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "無法儲存你的選擇。請再試一次。"
+
 msgid "Couldn't send comment"
 msgstr "無法傳送評論"
 
@@ -9282,6 +9285,9 @@ msgstr "前進到歷史記錄中的下一頁"
 msgid "Go home"
 msgstr "回到首頁"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "重新完成首次使用的步驟。你的專案和設定保持不變。"
+
 msgid "Go to home"
 msgstr "前往主頁"
 
@@ -9646,6 +9652,9 @@ msgstr "如何開始？"
 msgid "How do the paid plans work?"
 msgstr "付費方案如何計費?"
 
+msgid "How do you want to work?"
+msgstr "你想如何工作？"
+
 msgid "How does pricing work?"
 msgstr "價格是怎麼算的？"
 
@@ -9702,6 +9711,9 @@ msgstr "我們如何保護程式碼"
 
 msgid "How we work"
 msgstr "我們的工作方式"
+
+msgid "How you run agents"
+msgstr "執行代理程式的方式"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "你的代理程式在雲端工作區中如何登入。其他人連接各自的訂閱或API金鑰；在這台機器上，每個代理程式繼續使用它上面已有的登入。"
@@ -16115,6 +16127,9 @@ msgstr "重啟主機服務"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "立即重新啟動即可移至{accountLabel}；每個會話都會從中斷處繼續對話。"
 
+msgid "Restart onboarding"
+msgstr "重新開始導覽"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新啟動執行中的{providerLabel}代理程式嗎？"
 
@@ -21885,6 +21900,9 @@ msgstr "您正在檢視版本 {version}，唯讀"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "最多可附加{MAX_ATTACHMENTS}個檔案"
+
+msgid "You can change this later in Settings."
+msgstr "之後可以在設定中變更。"
 
 msgid "You can close this tab."
 msgstr "你可以關閉此分頁。"

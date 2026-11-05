@@ -6046,6 +6046,9 @@ msgstr "Impossible d'enregistrer le Dev"
 msgid "Couldn't save the routine"
 msgstr "Impossible d'enregistrer la routine"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Impossible d'enregistrer votre choix. Réessayez."
+
 msgid "Couldn't send comment"
 msgstr "Impossible d'envoyer le commentaire"
 
@@ -9282,6 +9285,9 @@ msgstr "Aller à la page suivante de l'historique"
 msgid "Go home"
 msgstr "Aller à l'accueil"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Refaites les étapes du premier lancement. Vos projets et réglages restent inchangés."
+
 msgid "Go to home"
 msgstr "Aller à l'accueil"
 
@@ -9646,6 +9652,9 @@ msgstr "Comment commencer ?"
 msgid "How do the paid plans work?"
 msgstr "Comment fonctionnent les forfaits payants ?"
 
+msgid "How do you want to work?"
+msgstr "Comment voulez-vous travailler ?"
+
 msgid "How does pricing work?"
 msgstr "Comment fonctionne la tarification ?"
 
@@ -9702,6 +9711,9 @@ msgstr "Comment nous protégeons le code"
 
 msgid "How we work"
 msgstr "Comment nous travaillons"
+
+msgid "How you run agents"
+msgstr "Votre façon d'exécuter les agents"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Comment vos agents se connectent dans les espaces de travail cloud. Les autres connectent leurs propres abonnements ou clés API ; sur cette machine, chaque agent continue d'utiliser la connexion déjà en place."
@@ -16115,6 +16127,9 @@ msgstr "Redémarrer le service hôte"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Redémarrez-les maintenant pour les basculer vers {accountLabel} ; chaque session reprend sa conversation là où elle s'était arrêtée."
 
+msgid "Restart onboarding"
+msgstr "Recommencer la prise en main"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Redémarrer les agents {providerLabel} en cours ?"
 
@@ -21885,6 +21900,9 @@ msgstr "Vous consultez la version {version}, en lecture seule"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Vous pouvez joindre jusqu'à {MAX_ATTACHMENTS} fichiers"
+
+msgid "You can change this later in Settings."
+msgstr "Vous pourrez changer cela plus tard dans les Réglages."
 
 msgid "You can close this tab."
 msgstr "Vous pouvez fermer cet onglet."

@@ -6040,6 +6040,9 @@ msgstr "Не вдалося зберегти Dev"
 msgid "Couldn't save the routine"
 msgstr "Не вдалося зберегти рутину"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Не вдалося зберегти вибір. Спробуйте ще раз."
+
 msgid "Couldn't send comment"
 msgstr "Не вдалося надіслати коментар"
 
@@ -9276,6 +9279,9 @@ msgstr "Перейти на наступну сторінку в історії"
 msgid "Go home"
 msgstr "На головну"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Пройдіть кроки першого запуску ще раз. Проєкти й налаштування залишаться без змін."
+
 msgid "Go to home"
 msgstr "На головну"
 
@@ -9640,6 +9646,9 @@ msgstr "Як почати?"
 msgid "How do the paid plans work?"
 msgstr "Як працюють платні тарифи?"
 
+msgid "How do you want to work?"
+msgstr "Як ви хочете працювати?"
+
 msgid "How does pricing work?"
 msgstr "Як формується ціна?"
 
@@ -9696,6 +9705,9 @@ msgstr "Як ми захищаємо код"
 
 msgid "How we work"
 msgstr "Як ми працюємо"
+
+msgid "How you run agents"
+msgstr "Як ви запускаєте агентів"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Як ваші агенти входять в облікові записи в хмарних робочих просторах. Інші люди підключають власні підписки або ключі API; на цьому комп'ютері кожен агент і далі використовує вхід, який на ньому вже є."
@@ -16109,6 +16121,9 @@ msgstr "Перезапустити службу хоста"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Перезапустіть їх зараз, щоб перенести на {accountLabel}; кожен сеанс продовжить розмову з того місця, де зупинився."
 
+msgid "Restart onboarding"
+msgstr "Пройти онбординг заново"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
@@ -21879,6 +21894,9 @@ msgstr "Ви переглядаєте версію {version} лише для ч�
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Максимальна кількість файлів: {MAX_ATTACHMENTS}"
+
+msgid "You can change this later in Settings."
+msgstr "Це можна змінити пізніше в налаштуваннях."
 
 msgid "You can close this tab."
 msgstr "Цю вкладку можна закрити."

@@ -6046,6 +6046,9 @@ msgstr "无法保存 Dev"
 msgid "Couldn't save the routine"
 msgstr "无法保存例行任务"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "无法保存你的选择。请重试。"
+
 msgid "Couldn't send comment"
 msgstr "无法发送评论"
 
@@ -9282,6 +9285,9 @@ msgstr "前进到历史记录中的下一页"
 msgid "Go home"
 msgstr "回到首页"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "重新完成首次使用的步骤。你的项目和设置保持不变。"
+
 msgid "Go to home"
 msgstr "前往主页"
 
@@ -9646,6 +9652,9 @@ msgstr "如何开始？"
 msgid "How do the paid plans work?"
 msgstr "付费套餐如何计费?"
 
+msgid "How do you want to work?"
+msgstr "你想如何工作？"
+
 msgid "How does pricing work?"
 msgstr "价格是怎么算的？"
 
@@ -9702,6 +9711,9 @@ msgstr "我们如何保护代码"
 
 msgid "How we work"
 msgstr "我们的工作方式"
+
+msgid "How you run agents"
+msgstr "运行智能体的方式"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "你的智能体在云端工作区中如何登录。其他人连接各自的订阅或API密钥；在这台机器上，每个智能体继续使用它上面已有的登录。"
@@ -16115,6 +16127,9 @@ msgstr "重启主机服务"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "立即重新启动即可迁移到{accountLabel}；每个会话都会从中断处继续。"
 
+msgid "Restart onboarding"
+msgstr "重新开始引导"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
@@ -21885,6 +21900,9 @@ msgstr "您正在查看版本 {version}，只读"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "最多可附加{MAX_ATTACHMENTS}个文件"
+
+msgid "You can change this later in Settings."
+msgstr "之后可以在设置中更改。"
 
 msgid "You can close this tab."
 msgstr "你可以关闭此标签页。"

@@ -6046,6 +6046,9 @@ msgstr "Kan de Dev niet opslaan"
 msgid "Couldn't save the routine"
 msgstr "Kan de routine niet opslaan"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Je keuze kon niet worden opgeslagen. Probeer het opnieuw."
+
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
 
@@ -9282,6 +9285,9 @@ msgstr "Vooruit naar de volgende pagina in de geschiedenis"
 msgid "Go home"
 msgstr "Naar home"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Doorloop de stappen van de eerste start opnieuw. Je projecten en instellingen blijven zoals ze zijn."
+
 msgid "Go to home"
 msgstr "Naar home"
 
@@ -9646,6 +9652,9 @@ msgstr "Hoe ga ik van start?"
 msgid "How do the paid plans work?"
 msgstr "Hoe werken de betaalde abonnementen?"
 
+msgid "How do you want to work?"
+msgstr "Hoe wil je werken?"
+
 msgid "How does pricing work?"
 msgstr "Hoe werkt de prijsstelling?"
 
@@ -9702,6 +9711,9 @@ msgstr "Zo beschermen we code"
 
 msgid "How we work"
 msgstr "Hoe we werken"
+
+msgid "How you run agents"
+msgstr "Hoe je agents uitvoert"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Hoe je agents inloggen binnen cloudwerkruimtes. Anderen koppelen hun eigen abonnementen of API-sleutels; op deze machine blijft elke agent de login gebruiken die er al op staat."
@@ -16115,6 +16127,9 @@ msgstr "Hostservice herstarten"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Herstart ze nu om ze naar {accountLabel} te verplaatsen; elke sessie pakt het gesprek op waar het gebleven was."
 
+msgid "Restart onboarding"
+msgstr "Onboarding opnieuw starten"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Draaiende {providerLabel}-agents herstarten?"
 
@@ -21885,6 +21900,9 @@ msgstr "Je bekijkt versie {version}, alleen-lezen"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Je kunt maximaal {MAX_ATTACHMENTS} bestanden toevoegen"
+
+msgid "You can change this later in Settings."
+msgstr "Je kunt dit later wijzigen in Instellingen."
 
 msgid "You can close this tab."
 msgstr "Je kunt dit tabblad sluiten."

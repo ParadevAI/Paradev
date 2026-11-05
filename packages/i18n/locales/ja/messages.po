@@ -6046,6 +6046,9 @@ msgstr "Devを保存できませんでした"
 msgid "Couldn't save the routine"
 msgstr "ルーティンを保存できませんでした"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "選択を保存できませんでした。もう一度お試しください。"
+
 msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
 
@@ -9282,6 +9285,9 @@ msgstr "履歴の次のページに進む"
 msgid "Go home"
 msgstr "ホームへ"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "初回セットアップの手順をもう一度行います。プロジェクトと設定はそのまま残ります。"
+
 msgid "Go to home"
 msgstr "ホームへ"
 
@@ -9646,6 +9652,9 @@ msgstr "どう始めればいいですか?"
 msgid "How do the paid plans work?"
 msgstr "有料プランの仕組みは?"
 
+msgid "How do you want to work?"
+msgstr "どのように作業しますか？"
+
 msgid "How does pricing work?"
 msgstr "料金はどのような仕組みですか?"
 
@@ -9702,6 +9711,9 @@ msgstr "コードを守る仕組み"
 
 msgid "How we work"
 msgstr "私たちの働き方"
+
+msgid "How you run agents"
+msgstr "エージェントの実行方法"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "クラウドワークスペース内でエージェントがどうサインインするかの設定です。ほかの人は自分のサブスクリプションやAPIキーを接続します。このマシンでは、各エージェントはすでにあるログインをそのまま使い続けます。"
@@ -16115,6 +16127,9 @@ msgstr "ホストサービスを再起動"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "今すぐ再起動すると{accountLabel}に移行し、各セッションは会話を中断したところから再開します。"
 
+msgid "Restart onboarding"
+msgstr "オンボーディングをやり直す"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
@@ -21885,6 +21900,9 @@ msgstr "バージョン {version} を閲覧中です（読み取り専用）"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "添付できるファイルは最大{MAX_ATTACHMENTS}件です"
+
+msgid "You can change this later in Settings."
+msgstr "あとで設定から変更できます。"
 
 msgid "You can close this tab."
 msgstr "このタブは閉じてかまいません。"

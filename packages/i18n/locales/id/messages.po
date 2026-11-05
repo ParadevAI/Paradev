@@ -6046,6 +6046,9 @@ msgstr "Tidak dapat menyimpan Dev"
 msgid "Couldn't save the routine"
 msgstr "Tidak dapat menyimpan rutinitas"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Pilihan Anda tidak dapat disimpan. Coba lagi."
+
 msgid "Couldn't send comment"
 msgstr "Tidak bisa mengirim komentar"
 
@@ -9282,6 +9285,9 @@ msgstr "Maju ke halaman berikutnya di riwayat"
 msgid "Go home"
 msgstr "Ke beranda"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Ulangi langkah-langkah penggunaan pertama. Proyek dan pengaturan Anda tetap seperti semula."
+
 msgid "Go to home"
 msgstr "Ke beranda"
 
@@ -9646,6 +9652,9 @@ msgstr "Bagaimana cara memulai?"
 msgid "How do the paid plans work?"
 msgstr "Bagaimana cara kerja paket berbayar?"
 
+msgid "How do you want to work?"
+msgstr "Bagaimana Anda ingin bekerja?"
+
 msgid "How does pricing work?"
 msgstr "Bagaimana skema harganya?"
 
@@ -9702,6 +9711,9 @@ msgstr "Cara kami melindungi kode"
 
 msgid "How we work"
 msgstr "Cara kami bekerja"
+
+msgid "How you run agents"
+msgstr "Cara Anda menjalankan agen"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cara agen Anda masuk di dalam workspace cloud. Orang lain menghubungkan langganan atau kunci API mereka sendiri; di mesin ini setiap agen tetap memakai login yang sudah ada."
@@ -16115,6 +16127,9 @@ msgstr "Mulai ulang layanan host"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap sesi melanjutkan percakapan dari titik terakhir."
 
+msgid "Restart onboarding"
+msgstr "Mulai ulang orientasi"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"
 
@@ -21885,6 +21900,9 @@ msgstr "Anda melihat versi {version}, hanya-baca"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Anda dapat melampirkan hingga {MAX_ATTACHMENTS} file"
+
+msgid "You can change this later in Settings."
+msgstr "Anda dapat mengubahnya nanti di Pengaturan."
 
 msgid "You can close this tab."
 msgstr "Anda dapat menutup tab ini."

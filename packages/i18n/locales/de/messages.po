@@ -6046,6 +6046,9 @@ msgstr "Der Dev konnte nicht gespeichert werden"
 msgid "Couldn't save the routine"
 msgstr "Die Routine konnte nicht gespeichert werden"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Deine Auswahl konnte nicht gespeichert werden. Versuche es erneut."
+
 msgid "Couldn't send comment"
 msgstr "Kommentar konnte nicht gesendet werden"
 
@@ -9282,6 +9285,9 @@ msgstr "Zur nächsten Seite im Verlauf vorgehen"
 msgid "Go home"
 msgstr "Zur Startseite"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Gehe die Schritte des ersten Starts noch einmal durch. Deine Projekte und Einstellungen bleiben erhalten."
+
 msgid "Go to home"
 msgstr "Zur Startseite"
 
@@ -9646,6 +9652,9 @@ msgstr "Wie fange ich an?"
 msgid "How do the paid plans work?"
 msgstr "Wie funktionieren die kostenpflichtigen Tarife?"
 
+msgid "How do you want to work?"
+msgstr "Wie möchtest du arbeiten?"
+
 msgid "How does pricing work?"
 msgstr "Wie funktioniert die Preisgestaltung?"
 
@@ -9702,6 +9711,9 @@ msgstr "Wie wir Code schützen"
 
 msgid "How we work"
 msgstr "Wie wir arbeiten"
+
+msgid "How you run agents"
+msgstr "Wie du Agenten ausführst"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Wie sich deine Agenten in Cloud-Arbeitsbereichen anmelden. Andere verbinden ihre eigenen Abos oder API-Schlüssel; auf diesem Rechner nutzt jeder Agent weiter die Anmeldung, die schon darauf liegt."
@@ -16115,6 +16127,9 @@ msgstr "Host-Dienst neu starten"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Starte sie jetzt neu, um sie auf {accountLabel} umzustellen; jede Sitzung setzt ihre Unterhaltung dort fort, wo sie aufgehört hat."
 
+msgid "Restart onboarding"
+msgstr "Onboarding neu starten"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Laufende {providerLabel}-Agenten neu starten?"
 
@@ -21885,6 +21900,9 @@ msgstr "Du siehst Version {version}, schreibgeschützt"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Du kannst bis zu {MAX_ATTACHMENTS} Dateien anhängen"
+
+msgid "You can change this later in Settings."
+msgstr "Du kannst das später in den Einstellungen ändern."
 
 msgid "You can close this tab."
 msgstr "Du kannst diesen Tab schließen."

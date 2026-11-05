@@ -6046,6 +6046,9 @@ msgstr "Nie udało się zapisać Deva"
 msgid "Couldn't save the routine"
 msgstr "Nie udało się zapisać rutyny"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Nie udało się zapisać wyboru. Spróbuj ponownie."
+
 msgid "Couldn't send comment"
 msgstr "Nie udało się wysłać komentarza"
 
@@ -9282,6 +9285,9 @@ msgstr "Przejdź do następnej strony w historii"
 msgid "Go home"
 msgstr "Strona główna"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "Przejdź ponownie przez kroki pierwszego uruchomienia. Projekty i ustawienia pozostaną bez zmian."
+
 msgid "Go to home"
 msgstr "Przejdź na stronę główną"
 
@@ -9646,6 +9652,9 @@ msgstr "Jak zacząć?"
 msgid "How do the paid plans work?"
 msgstr "Jak działają płatne plany?"
 
+msgid "How do you want to work?"
+msgstr "Jak chcesz pracować?"
+
 msgid "How does pricing work?"
 msgstr "Jak działa cennik?"
 
@@ -9702,6 +9711,9 @@ msgstr "Jak chronimy kod"
 
 msgid "How we work"
 msgstr "Jak pracujemy"
+
+msgid "How you run agents"
+msgstr "Jak uruchamiasz agentów"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Jak twoi agenci logują się w obszarach roboczych w chmurze. Inne osoby podłączają własne subskrypcje lub klucze API; na tej maszynie każdy agent nadal korzysta z logowania, które już na niej jest."
@@ -16115,6 +16127,9 @@ msgstr "Zrestartuj usługę hosta"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Uruchom ich ponownie teraz, aby przenieść na {accountLabel}; każda sesja podejmie rozmowę tam, gdzie ją przerwano."
 
+msgid "Restart onboarding"
+msgstr "Uruchom wprowadzenie ponownie"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Uruchomić ponownie działających agentów {providerLabel}?"
 
@@ -21885,6 +21900,9 @@ msgstr "Przeglądasz wersję {version}, tylko do odczytu"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Możesz dołączyć maksymalnie {MAX_ATTACHMENTS} plików"
+
+msgid "You can change this later in Settings."
+msgstr "Możesz to później zmienić w Ustawieniach."
 
 msgid "You can close this tab."
 msgstr "Możesz zamknąć tę kartę."

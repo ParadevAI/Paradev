@@ -6046,6 +6046,9 @@ msgstr "Dev kaydedilemedi"
 msgid "Couldn't save the routine"
 msgstr "Rutin kaydedilemedi"
 
+msgid "Couldn't save your choice. Try again."
+msgstr "Seçiminiz kaydedilemedi. Tekrar deneyin."
+
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
 
@@ -9282,6 +9285,9 @@ msgstr "Geçmişte sonraki sayfaya git"
 msgid "Go home"
 msgstr "Ana sayfaya git"
 
+msgid "Go through the first-run steps again. Your projects and settings stay as they are."
+msgstr "İlk kullanım adımlarından yeniden geçin. Projeleriniz ve ayarlarınız olduğu gibi kalır."
+
 msgid "Go to home"
 msgstr "Ana sayfaya git"
 
@@ -9646,6 +9652,9 @@ msgstr "Nasıl başlarım?"
 msgid "How do the paid plans work?"
 msgstr "Ücretli planlar nasıl işler?"
 
+msgid "How do you want to work?"
+msgstr "Nasıl çalışmak istersiniz?"
+
 msgid "How does pricing work?"
 msgstr "Fiyatlandırma nasıl işliyor?"
 
@@ -9702,6 +9711,9 @@ msgstr "Kodu nasıl koruyoruz"
 
 msgid "How we work"
 msgstr "Nasıl çalışıyoruz"
+
+msgid "How you run agents"
+msgstr "Ajanları nasıl çalıştırdığınız"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Ajanlarınızın bulut çalışma alanlarında nasıl oturum açtığı. Başkaları kendi aboneliklerini veya API anahtarlarını bağlar; bu makinede her ajan üzerinde zaten bulunan oturumu kullanmayı sürdürür."
@@ -16115,6 +16127,9 @@ msgstr "Host hizmetini yeniden başlat"
 msgid "Restart now to move them to {accountLabel}; each session picks its conversation back up where it left off."
 msgstr "Şimdi yeniden başlatarak {accountLabel} hesabına taşıyın; her oturum konuşmasına kaldığı yerden devam eder."
 
+msgid "Restart onboarding"
+msgstr "Başlangıç adımlarını yeniden başlat"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Çalışan {providerLabel} ajanları yeniden başlatılsın mı?"
 
@@ -21885,6 +21900,9 @@ msgstr "Sürüm {version} görüntüleniyor, salt okunur"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "En fazla {MAX_ATTACHMENTS} dosya ekleyebilirsiniz"
+
+msgid "You can change this later in Settings."
+msgstr "Bunu daha sonra Ayarlar'dan değiştirebilirsiniz."
 
 msgid "You can close this tab."
 msgstr "Bu sekmeyi kapatabilirsiniz."
