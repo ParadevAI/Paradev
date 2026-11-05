@@ -2,9 +2,15 @@
 import { afterAll, beforeEach, expect, test } from "bun:test";
 import relay from "./index";
 
-type ProxiedRequest = { method: string; pathWithQuery: string };
+type ProxiedRequest = {
+	method: string;
+	pathWithQuery: string;
+	headers?: Record<string, string>;
+};
 
 const proxied: ProxiedRequest[] = [];
+const proxiedHeaders: Record<string, string>[] = [];
+let boxAccess: unknown = { allowed: false, reason: "host_closed" };
 
 const tunnel = {
 	setName: async () => {},
@@ -13,6 +19,7 @@ const tunnel = {
 			method: request.method,
 			pathWithQuery: request.pathWithQuery,
 		});
+		proxiedHeaders.push(request.headers ?? {});
 		return {
 			ok: true,
 			status: 200,
@@ -39,7 +46,29 @@ const jwk = {
 };
 const jwks = Bun.serve({
 	port: 0,
-	fetch: () => Response.json({ keys: [jwk] }),
+	fetch: (request) => {
+		const url = new URL(request.url);
+		if (url.pathname.startsWith("/api/trpc/host.cloudWorkspaceAccess")) {
+			if (request.headers.get("x-superset-sandbox-credential") !== "ws-1.ok") {
+				return Response.json(
+					[
+						{
+							error: {
+								json: {
+									message: "no",
+									code: -32001,
+									data: { code: "UNAUTHORIZED", httpStatus: 401 },
+								},
+							},
+						},
+					],
+					{ status: 401 },
+				);
+			}
+			return Response.json([{ result: { data: { json: boxAccess } } }]);
+		}
+		return Response.json({ keys: [jwk] });
+	},
 });
 const apiUrl = `http://localhost:${jwks.port}`;
 
@@ -47,6 +76,8 @@ afterAll(() => jwks.stop(true));
 
 beforeEach(() => {
 	proxied.length = 0;
+	proxiedHeaders.length = 0;
+	boxAccess = { allowed: false, reason: "host_closed" };
 });
 
 const hostId = "org-1:machine-1";
@@ -175,4 +206,64 @@ test("rejects a stream path that a percent-encoded host id leaks into", async ()
 	});
 
 	expect(response.status).toBe(400);
+});
+
+function callAsBox(
+	path: string,
+	init: { credential?: string; headers?: Record<string, string> } = {},
+) {
+	return call(path, {
+		method: "POST",
+		authorized: false,
+		headers: {
+			"x-superset-sandbox-credential": init.credential ?? "ws-1.ok",
+			...init.headers,
+		},
+	});
+}
+
+test("a cloud workspace reaches a host that allowed it, and its credential stays at the relay", async () => {
+	boxAccess = { allowed: true, userId: "user-1", workspaceId: "ws-1" };
+
+	const response = await callAsBox("/trpc/workspace.list");
+
+	expect(response.status).toBe(200);
+	expect(proxied).toEqual([
+		{ method: "POST", pathWithQuery: "/trpc/workspace.list" },
+	]);
+	expect(proxiedHeaders[0]?.["x-superset-user-id"]).toBe("user-1");
+	expect(proxiedHeaders[0]?.["x-superset-sandbox-credential"]).toBeUndefined();
+});
+
+test("a cloud workspace is refused by a host that did not allow it, and told why", async () => {
+	const response = await callAsBox("/trpc/workspace.list");
+
+	expect(response.status).toBe(403);
+	expect(JSON.stringify(await response.json())).toContain(
+		"does not accept cloud workspaces",
+	);
+	expect(proxied).toEqual([]);
+});
+
+test("a credential the API does not accept is unauthorized", async () => {
+	const response = await callAsBox("/trpc/workspace.list", {
+		credential: "ws-1.forged",
+	});
+
+	expect(response.status).toBe(401);
+	expect(proxied).toEqual([]);
+});
+
+test("a cloud workspace cannot open a stream, even to a host that allowed it", async () => {
+	boxAccess = { allowed: true, userId: "user-1", workspaceId: "ws-1" };
+
+	const response = await call("/terminal/t1", {
+		authorized: false,
+		headers: {
+			"x-superset-sandbox-credential": "ws-1.ok",
+			Upgrade: "websocket",
+		},
+	});
+
+	expect(response.status).toBe(403);
 });
