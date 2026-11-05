@@ -1,3 +1,4 @@
+import type { WorkspacePullRequestSummary } from "renderer/lib/github/workspacePullRequests";
 import type { WorkspaceTransactionSnapshot } from "renderer/stores/workspace-creates";
 
 export type DashboardSidebarWorkspaceHostType =
@@ -41,6 +42,7 @@ export interface DashboardSidebarWorkspace {
 	name: string;
 	branch: string;
 	pullRequest: DashboardSidebarWorkspacePullRequest | null;
+	pullRequests?: WorkspacePullRequestSummary[];
 	repoUrl: string | null;
 	branchExistsOnRemote: boolean;
 	previewUrl: string | null;

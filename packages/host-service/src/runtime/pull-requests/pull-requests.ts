@@ -25,14 +25,16 @@ import {
 import {
 	fetchOpenPullRequests,
 	fetchOpenPullRequestsFromGh,
-	fetchPullRequestByHead,
-	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumber,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecks,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueState,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
+	fetchPullRequestsByHead,
+	fetchPullRequestsByHeadFromGh,
 	parseMergedAt,
 } from "./utils/github-query";
 import type {
@@ -76,6 +78,7 @@ const REPO_PULL_REQUEST_CACHE_TTL_MS = 60_000;
 // not respawn `gh` at full cadence forever: each consecutive failure doubles
 // the effective TTL of the cached rejection, capped here.
 const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
+const CLOSED_PULL_REQUEST_REFRESH_INTERVAL_MS = 24 * 60 * 60_000;
 // Re-probe cadence for worktrees observed missing on disk. existsSync-only —
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
@@ -109,6 +112,7 @@ export interface PullRequestStateSnapshot {
 export interface PullRequestWorkspaceSnapshot {
 	workspaceId: string;
 	pullRequest: PullRequestStateSnapshot | null;
+	pullRequests: WorkspacePullRequestHistoryEntry[];
 	error: string | null;
 	lastFetchedAt: string | null;
 }
@@ -132,6 +136,7 @@ export interface WorkspacePullRequestHistoryEntry {
 	linkedAt: number;
 	/** True for the PR the sidebar shows: the one on the current branch. */
 	isCurrent: boolean;
+	isSuppressed: boolean;
 }
 
 export interface WorkspacePullRequestHistory {
@@ -217,6 +222,14 @@ interface PullRequestDetails {
 	isInMergeQueue: boolean | null;
 }
 
+interface GitHubCacheEntry<T> {
+	promise: Promise<T>;
+	fetchedAt: number;
+	consecutiveFailures: number;
+	fingerprint?: string;
+	value?: T;
+}
+
 export class PullRequestRuntimeManager {
 	private readonly db: HostDb;
 	private readonly execGh: ExecGh;
@@ -242,11 +255,11 @@ export class PullRequestRuntimeManager {
 	>();
 	private readonly pullRequestHeadCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode | null>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		GitHubCacheEntry<GitHubPullRequestNode[]>
+	>();
+	private readonly pullRequestNumberCache = new Map<
+		string,
+		GitHubCacheEntry<GitHubPullRequestNode | null>
 	>();
 	// Review decision, checks, and merge-queue state per PR head. These were
 	// the bulk of the runtime's GitHub traffic: four uncached calls per linked
@@ -254,20 +267,11 @@ export class PullRequestRuntimeManager {
 	// spends the user's hourly quota by itself (SUPER-2107).
 	private pullRequestDetailsCache = new Map<
 		string,
-		{
-			promise: Promise<PullRequestDetails>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-			fingerprint?: string;
-		}
+		GitHubCacheEntry<PullRequestDetails>
 	>();
 	private readonly openPullRequestsCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode[]>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		GitHubCacheEntry<GitHubPullRequestNode[]>
 	>();
 	private readonly readWorkspaceRefs: (
 		worktreePath: string,
@@ -402,7 +406,17 @@ export class PullRequestRuntimeManager {
 			.where(inArray(workspaces.id, workspaceIds))
 			.all();
 
+		const histories =
+			await this.getPullRequestHistoryByWorkspaces(workspaceIds);
+		const byWorkspace = new Map(
+			histories.map((row) => [
+				row.workspaceId,
+				row.pullRequests.filter((pr) => !pr.isSuppressed),
+			]),
+		);
+
 		return rows.map((row) => ({
+			pullRequests: byWorkspace.get(row.workspaceId) ?? [],
 			workspaceId: row.workspaceId,
 			pullRequest:
 				row.pullRequestUrl &&
@@ -452,6 +466,7 @@ export class PullRequestRuntimeManager {
 				workspaceId: workspacePullRequests.workspaceId,
 				linkedAt: workspacePullRequests.linkedAt,
 				currentPullRequestId: workspaces.pullRequestId,
+				suppressedPullRequestId: workspaces.suppressedPullRequestId,
 				pullRequestRowId: pullRequests.id,
 				repoOwner: pullRequests.repoOwner,
 				repoName: pullRequests.repoName,
@@ -495,6 +510,7 @@ export class PullRequestRuntimeManager {
 				updatedAt: row.updatedAt,
 				linkedAt: row.linkedAt,
 				isCurrent: row.pullRequestRowId === row.currentPullRequestId,
+				isSuppressed: row.pullRequestRowId === row.suppressedPullRequestId,
 			};
 			const list = byWorkspace.get(row.workspaceId);
 			if (list) list.push(entry);
@@ -984,11 +1000,18 @@ export class PullRequestRuntimeManager {
 			}
 		}
 
-		const { failedKeys, matched: keyToPullRequest } =
+		const { failedKeys, matched: keyToPullRequests } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
 
-		for (const workspace of projectWorkspaces) {
+		for (const previousWorkspace of projectWorkspaces) {
+			const workspace = this.db
+				.select()
+				.from(workspaces)
+				.where(eq(workspaces.id, previousWorkspace.id))
+				.get();
+			if (!workspace || workspace.archivedAt !== null) continue;
 			const key = this.effectiveUpstreamKey(workspace, repo);
+			if (key && !wantedRefs.has(key)) continue;
 			if (!key) {
 				// PR checkouts recovered from GitHub's archived refs intentionally
 				// have no upstream. Keep the explicit PR link only while the
@@ -1015,7 +1038,15 @@ export class PullRequestRuntimeManager {
 				}
 				continue;
 			}
-			const rawMatch = keyToPullRequest.get(key);
+			const matches = keyToPullRequests.get(key) ?? [];
+			for (const candidate of matches) {
+				this.recordWorkspacePullRequestLink(
+					workspace.id,
+					candidate.id,
+					Date.now(),
+				);
+			}
+			const rawMatch = matches[0];
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
 				rawMatch?.id === workspace.suppressedPullRequestId
@@ -1029,9 +1060,6 @@ export class PullRequestRuntimeManager {
 						and(eq(workspaces.id, workspace.id), isNull(workspaces.archivedAt)),
 					)
 					.run();
-				// The sweep re-asserts the link every pass, so this also heals
-				// history rows for links that predate the table.
-				this.recordWorkspacePullRequestLink(workspace.id, match.id, Date.now());
 				continue;
 			}
 
@@ -1047,6 +1075,12 @@ export class PullRequestRuntimeManager {
 					.run();
 			}
 		}
+		await this.refreshLinkedPullRequests(
+			projectWorkspaces.map((workspace) => workspace.id),
+			new Set([...keyToPullRequests.values()].flat().map((pr) => pr.id)),
+			repo,
+			options,
+		);
 	}
 
 	private async getProjectRepository(
@@ -1333,15 +1367,7 @@ export class PullRequestRuntimeManager {
 	// next TTL boundary instead. Gate-held calls are the exception: they never
 	// reached GitHub, and must retry as soon as another lookup restores access.
 	private cachedGitHubFetch<T>(
-		cache: Map<
-			string,
-			{
-				promise: Promise<T>;
-				fetchedAt: number;
-				consecutiveFailures: number;
-				fingerprint?: string;
-			}
-		>,
+		cache: Map<string, GitHubCacheEntry<T>>,
 		cacheKey: string,
 		options: { bypassCache?: boolean; fingerprint?: string },
 		fetcher: () => Promise<T>,
@@ -1366,7 +1392,7 @@ export class PullRequestRuntimeManager {
 
 		// Carry the failure streak forward so an in-flight retry keeps the
 		// backed-off TTL until it actually resolves.
-		const entry = {
+		const entry: GitHubCacheEntry<T> = {
 			promise: fetcher(),
 			fetchedAt: Date.now(),
 			consecutiveFailures: cached?.consecutiveFailures ?? 0,
@@ -1375,7 +1401,8 @@ export class PullRequestRuntimeManager {
 		// The rejection observer also silences unhandledRejection warnings;
 		// real consumers observe it via their own await on the cached promise.
 		entry.promise.then(
-			() => {
+			(value) => {
+				entry.value = value;
 				entry.consecutiveFailures = 0;
 			},
 			(error: unknown) => {
@@ -1396,11 +1423,11 @@ export class PullRequestRuntimeManager {
 		return entry.promise;
 	}
 
-	private async getCachedPullRequestByHead(
+	private async getCachedPullRequestsByHead(
 		repo: NormalizedRepoIdentity,
 		head: GitHubPullRequestHeadRef,
 		options: { bypassCache?: boolean } = {},
-	): Promise<GitHubPullRequestNode | null> {
+	): Promise<GitHubPullRequestNode[]> {
 		// Branch stays case-sensitive so two case-variant branches can't share
 		// a cache entry and return each other's PR.
 		const cacheKey = [
@@ -1419,13 +1446,13 @@ export class PullRequestRuntimeManager {
 					"PR head lookup",
 					{ owner: repo.owner, name: repo.name, head },
 					() =>
-						fetchPullRequestByHeadFromGh(
+						fetchPullRequestsByHeadFromGh(
 							this.execGh,
 							{ owner: repo.owner, name: repo.name },
 							head,
 						),
 					async () =>
-						fetchPullRequestByHead(
+						fetchPullRequestsByHead(
 							await this.github(),
 							{ owner: repo.owner, name: repo.name },
 							head,
@@ -1437,13 +1464,26 @@ export class PullRequestRuntimeManager {
 
 	private getCachedPullRequestDetails(
 		repo: NormalizedRepoIdentity,
-		node: GitHubPullRequestNode,
+		node: Pick<
+			GitHubPullRequestNode,
+			"number" | "headRefOid" | "state" | "isDraft"
+		>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<PullRequestDetails> {
-		// One entry per PR; the head SHA is its fingerprint, so a new push
-		// refetches at once while approvals and check runs on the same SHA
-		// ride the TTL.
+		// Retain completed terminal checks; pending checks and failed fetches still retry.
 		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${node.number}`;
+		const fingerprint = `${node.headRefOid}:${node.state}`;
+		const cached = this.pullRequestDetailsCache.get(cacheKey);
+		if (
+			!options.bypassCache &&
+			node.state !== "OPEN" &&
+			cached?.value &&
+			cached.fingerprint === fingerprint &&
+			parseCheckContexts(cached.value.checks).every(
+				(check) => check.status !== "pending",
+			)
+		)
+			return cached.promise;
 		const context = {
 			owner: repo.owner,
 			name: repo.name,
@@ -1452,7 +1492,7 @@ export class PullRequestRuntimeManager {
 		return this.cachedGitHubFetch(
 			this.pullRequestDetailsCache,
 			cacheKey,
-			{ ...options, fingerprint: node.headRefOid },
+			{ ...options, fingerprint },
 			async () => {
 				const [reviewDecision, checks] = await this.fetchFromGitHub(
 					"PR review/check lookup",
@@ -1554,30 +1594,31 @@ export class PullRequestRuntimeManager {
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<{
-		matched: Map<string, { id: string }>;
+		matched: Map<string, { id: string }[]>;
 		failedKeys: Set<string>;
 	}> {
-		const matched = new Map<string, { id: string }>();
+		const matched = new Map<string, { id: string }[]>();
 		const failedKeys = new Set<string>();
 		if (wantedRefs.size === 0) return { matched, failedKeys };
 
-		const latestByKey = new Map<string, GitHubPullRequestNode>();
+		const candidatesByKey = new Map<string, GitHubPullRequestNode[]>();
 		await Promise.all(
 			Array.from(wantedRefs.entries()).map(async ([key, head]) => {
 				try {
-					const node = await this.getCachedPullRequestByHead(
+					const nodes = await this.getCachedPullRequestsByHead(
 						repo,
 						head,
 						options,
 					);
-					if (!node) return;
-
-					const nodeKey = upstreamKey(
-						node.headRepositoryOwner?.login ?? null,
-						node.headRepository?.name ?? null,
-						node.headRefName,
+					const matches = nodes.filter(
+						(node) =>
+							upstreamKey(
+								node.headRepositoryOwner?.login ?? null,
+								node.headRepository?.name ?? null,
+								node.headRefName,
+							) === key,
 					);
-					if (nodeKey === key) latestByKey.set(key, node);
+					if (matches.length > 0) candidatesByKey.set(key, matches);
 				} catch (error) {
 					failedKeys.add(key);
 					console.warn(
@@ -1599,15 +1640,15 @@ export class PullRequestRuntimeManager {
 		// headRefName gets nothing from the per-head lookups above. Sweep the
 		// repo's open PRs once and fill the gaps case-insensitively.
 		const unmatchedKeys = Array.from(wantedRefs.keys()).filter(
-			(key) => !latestByKey.has(key) && !failedKeys.has(key),
+			(key) => !candidatesByKey.has(key) && !failedKeys.has(key),
 		);
 		if (unmatchedKeys.length > 0) {
 			try {
 				const openNodes = await this.getCachedOpenPullRequests(repo, options);
 				// The one place drift is tolerated: index open PRs by a lowercased
-				// key. latestByKey stays keyed by the exact workspace key, so link
+				// key. candidatesByKey stays keyed by the exact workspace key, so link
 				// assignment downstream is unchanged.
-				const openByLowerKey = new Map<string, GitHubPullRequestNode>();
+				const openByLowerKey = new Map<string, GitHubPullRequestNode[]>();
 				for (const node of openNodes) {
 					const nodeKey = upstreamKey(
 						node.headRepositoryOwner?.login ?? null,
@@ -1616,12 +1657,13 @@ export class PullRequestRuntimeManager {
 					);
 					if (!nodeKey) continue;
 					const lower = nodeKey.toLowerCase();
-					// Sweep is sorted by updated desc; first hit per key wins.
-					if (!openByLowerKey.has(lower)) openByLowerKey.set(lower, node);
+					const matches = openByLowerKey.get(lower) ?? [];
+					matches.push(node);
+					openByLowerKey.set(lower, matches);
 				}
 				for (const key of unmatchedKeys) {
 					const node = openByLowerKey.get(key.toLowerCase());
-					if (node) latestByKey.set(key, node);
+					if (node) candidatesByKey.set(key, node);
 				}
 			} catch (error) {
 				// Treat the whole sweep as failed lookups so existing links are
@@ -1638,63 +1680,197 @@ export class PullRequestRuntimeManager {
 
 		const detailsByNumber = new Map<number, PullRequestDetails>();
 		await Promise.all(
-			Array.from(latestByKey.values()).map(async (node) => {
-				try {
-					detailsByNumber.set(
-						node.number,
-						await this.getCachedPullRequestDetails(repo, node, options),
-					);
-				} catch (error) {
-					console.warn(
-						"[host-service:pull-request-runtime] Failed to fetch PR review/check state",
-						{
-							projectId,
-							owner: repo.owner,
-							name: repo.name,
-							prNumber: node.number,
-							error,
-						},
-					);
-				}
-			}),
+			Array.from(candidatesByKey.values())
+				.flat()
+				.map(async (node) => {
+					try {
+						detailsByNumber.set(
+							node.number,
+							await this.getCachedPullRequestDetails(repo, node, options),
+						);
+					} catch (error) {
+						console.warn(
+							"[host-service:pull-request-runtime] Failed to fetch PR review/check state",
+							{
+								projectId,
+								owner: repo.owner,
+								name: repo.name,
+								prNumber: node.number,
+								error,
+							},
+						);
+					}
+				}),
 		);
 
-		for (const [key, node] of latestByKey) {
-			const existing = this.findPullRequestRow(repo, node.number);
-			// A failed fetch keeps the last-known state rather than blanking it.
-			const details = detailsByNumber.get(node.number);
-			const checks = details
-				? parseCheckContexts(details.checks)
-				: parseChecksJson(existing?.checksJson ?? null);
-			const reviewDecision = details
-				? mapReviewDecision(details.reviewDecision)
-				: coerceReviewDecision(existing?.reviewDecision ?? null);
-			const isInMergeQueue =
-				details?.isInMergeQueue ??
-				coercePullRequestState(existing?.state ?? null) === "queued";
-			const rowId = this.upsertPullRequestRow({
-				existing,
-				projectId,
-				prNumber: node.number,
-				repo,
-				url: node.url,
-				title: node.title,
-				state: mapPullRequestState(node.state, node.isDraft, isInMergeQueue),
-				isDraft: node.isDraft,
-				headBranch: node.headRefName,
-				headSha: node.headRefOid,
-				mergedAt: node.mergedAt,
-				reviewDecision,
-				checksStatus: computeChecksStatus(checks),
-				checksJson: JSON.stringify(checks),
-				lastFetchedAt: now,
-				error: null,
-				now,
-			});
+		for (const [key, nodes] of candidatesByKey) {
+			const matches: { id: string }[] = [];
+			for (const node of nodes) {
+				const rowId = this.storePullRequestNode(
+					projectId,
+					repo,
+					node,
+					detailsByNumber.get(node.number),
+					now,
+				);
 
-			matched.set(key, { id: rowId });
+				matches.push({ id: rowId });
+			}
+			matched.set(key, matches);
 		}
 
 		return { matched, failedKeys };
+	}
+
+	private storePullRequestNode(
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+		node: GitHubPullRequestNode,
+		details: PullRequestDetails | undefined,
+		now: number,
+	): string {
+		const existing = this.findPullRequestRow(repo, node.number);
+		// A failed fetch keeps the last-known state rather than blanking it.
+		const checks = details
+			? parseCheckContexts(details.checks)
+			: parseChecksJson(existing?.checksJson ?? null);
+		const reviewDecision = details
+			? mapReviewDecision(details.reviewDecision)
+			: coerceReviewDecision(existing?.reviewDecision ?? null);
+		const isInMergeQueue =
+			details?.isInMergeQueue ??
+			coercePullRequestState(existing?.state ?? null) === "queued";
+		const rowId = this.upsertPullRequestRow({
+			existing,
+			projectId,
+			prNumber: node.number,
+			repo,
+			url: node.url,
+			title: node.title,
+			state: mapPullRequestState(node.state, node.isDraft, isInMergeQueue),
+			isDraft: node.isDraft,
+			headBranch: node.headRefName,
+			headSha: node.headRefOid,
+			mergedAt: node.mergedAt,
+			reviewDecision,
+			checksStatus: computeChecksStatus(checks),
+			checksJson: JSON.stringify(checks),
+			lastFetchedAt: now,
+			error: null,
+			now,
+		});
+
+		return rowId;
+	}
+
+	private async refreshLinkedPullRequests(
+		workspaceIds: string[],
+		refreshedIds: Set<string>,
+		projectRepo: NormalizedRepoIdentity,
+		options: { bypassCache?: boolean },
+	): Promise<void> {
+		const rows = this.db
+			.select({
+				pr: pullRequests,
+				suppressedId: workspaces.suppressedPullRequestId,
+			})
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.innerJoin(
+				workspaces,
+				eq(workspacePullRequests.workspaceId, workspaces.id),
+			)
+			.where(
+				and(
+					inArray(workspaces.id, workspaceIds),
+					isNull(workspaces.archivedAt),
+				),
+			)
+			.all();
+		const linked = new Map(
+			rows
+				.filter(({ pr, suppressedId }) => pr.id !== suppressedId)
+				.map(({ pr }) => [pr.id, pr]),
+		);
+		for (const row of linked.values()) {
+			if (refreshedIds.has(row.id)) continue;
+			const repo = { ...projectRepo, owner: row.repoOwner, name: row.repoName };
+			try {
+				if (
+					!options.bypassCache &&
+					(row.state === "merged" ||
+						(row.state === "closed" &&
+							Date.now() - (row.lastFetchedAt ?? 0) <
+								CLOSED_PULL_REQUEST_REFRESH_INTERVAL_MS))
+				) {
+					const details = await this.getCachedPullRequestDetails(
+						repo,
+						{
+							number: row.prNumber,
+							headRefOid: row.headSha,
+							state: row.state === "merged" ? "MERGED" : "CLOSED",
+							isDraft: row.isDraft,
+						},
+						options,
+					);
+					const checks = parseCheckContexts(details.checks);
+					this.db
+						.update(pullRequests)
+						.set({
+							reviewDecision: mapReviewDecision(details.reviewDecision),
+							checksStatus: computeChecksStatus(checks),
+							checksJson: JSON.stringify(checks),
+							updatedAt: Date.now(),
+						})
+						.where(eq(pullRequests.id, row.id))
+						.run();
+					continue;
+				}
+				const node = await this.cachedGitHubFetch(
+					this.pullRequestNumberCache,
+					`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${row.prNumber}`,
+					options,
+					() =>
+						this.fetchFromGitHub(
+							"linked PR lookup",
+							{ owner: repo.owner, name: repo.name, prNumber: row.prNumber },
+							() =>
+								fetchPullRequestByNumberFromGh(this.execGh, repo, row.prNumber),
+							async () =>
+								fetchPullRequestByNumber(
+									await this.github(),
+									repo,
+									row.prNumber,
+								),
+							{ probe: options.bypassCache === true },
+						),
+				);
+				if (!node) continue;
+				let details: PullRequestDetails | undefined;
+				try {
+					details = await this.getCachedPullRequestDetails(repo, node, options);
+				} catch (error) {
+					console.warn(
+						"[host-service:pull-request-runtime] Linked PR details unavailable",
+						{ prNumber: row.prNumber, error },
+					);
+				}
+				this.storePullRequestNode(
+					row.projectId,
+					repo,
+					node,
+					details,
+					Date.now(),
+				);
+			} catch (error) {
+				console.warn(
+					"[host-service:pull-request-runtime] Linked PR refresh failed",
+					{ prNumber: row.prNumber, error },
+				);
+			}
+		}
 	}
 }

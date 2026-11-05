@@ -103,6 +103,36 @@ describe("buildCloudAccessibleWorkspaces", () => {
 		expect(row?.pr?.checks).toEqual([{ name: "ci", status: "pending" }]);
 	});
 
+	test.each([
+		"ready",
+		"deleted",
+	] as const)("keeps all PRs on a %s cloud workspace row", (status) => {
+		const prs = [
+			pullRequest({ isDraft: true }),
+			pullRequest({
+				number: 8,
+				url: "https://github.com/acme/app/pull/8",
+				state: "closed",
+			}),
+			pullRequest({
+				number: 7,
+				url: "https://github.com/acme/other/pull/7",
+				state: "merged",
+			}),
+		];
+		const [row] = build({
+			cloudWorkspaces: [workspace({ status })],
+			pullRequestsById: new Map([["ws-1", [...prs, ...prs]]]),
+		});
+		expect(row?.pr?.prNumber).toBe(7);
+		expect(row?.pr?.state).toBe("draft");
+		expect(row?.pullRequests?.map((pr) => [pr.url, pr.state])).toEqual([
+			[prs[0]?.url, "draft"],
+			[prs[1]?.url, "closed"],
+			[prs[2]?.url, "merged"],
+		]);
+	});
+
 	test("a finished agent is unread until the reported time has been seen", () => {
 		const reportedAt = new Date("2026-10-20T11:00:00Z");
 		const finished = workspace({

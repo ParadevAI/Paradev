@@ -4,6 +4,7 @@ import type {
 	PullRequestReviewDecision,
 	PullRequestState,
 } from "@superset/shared/pull-request";
+import { workspacePullRequests } from "renderer/lib/github/workspacePullRequests";
 import { buildCloudSidebarWorkspaces } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/buildCloudSidebarWorkspaces";
 import type { CloudSidebarEntry } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { isInCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
@@ -185,6 +186,10 @@ export function buildCloudAccessibleWorkspaces({
 					userId,
 				),
 				pr,
+				pullRequests: workspacePullRequests(
+					null,
+					pullRequestsById.get(workspace.id),
+				),
 				agentStatus: cloudAgentStatus(
 					workspace,
 					workspaceSeenAt[workspace.id],

@@ -24,6 +24,12 @@ const cloudRow = makeWorkspace({
 	hostIsOnline: null,
 	isMine: true,
 	projectId: "stale",
+	pullRequests: [7, 8].map((number) => ({
+		number,
+		url: `https://github.com/acme/app/pull/${number}`,
+		title: `PR ${number}`,
+		state: "open",
+	})),
 });
 const local = makeWorkspace({ id: "w1", name: "fix-login" });
 const cloudRowById = new Map([["c1", cloudRow]]);
@@ -89,5 +95,6 @@ describe("applyCloudSidebarRows", () => {
 		expect(pinned?.hostType).toBe("cloud");
 		expect(pinned?.isPinned).toBe(true);
 		expect(pinned?.projectName).toBe("Superset");
+		expect(pinned?.pullRequests).toBe(cloudRow.pullRequests);
 	});
 });
