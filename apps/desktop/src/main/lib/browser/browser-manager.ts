@@ -273,7 +273,7 @@ class BrowserManager extends EventEmitter {
 	private designMode = new DesignModeController();
 
 	/** Sets audio muted state for the given pane and its child popups. */
-	public setAudioMuted(paneId: string, muted: boolean): void {
+	setAudioMuted(paneId: string, muted: boolean): void {
 		this.mutedPanes.set(paneId, muted);
 		const entry = this.panes.get(paneId);
 		if (entry) {
@@ -297,11 +297,11 @@ class BrowserManager extends EventEmitter {
 	}
 
 	/** Returns true if the pane is currently set to mute audio. */
-	public isAudioMuted(paneId: string): boolean {
+	isAudioMuted(paneId: string): boolean {
 		return this.mutedPanes.get(paneId) ?? false;
 	}
 
-	public setForwardableChords(chords: string[]): void {
+	setForwardableChords(chords: string[]): void {
 		this.forwardableChords = new Set(chords);
 	}
 

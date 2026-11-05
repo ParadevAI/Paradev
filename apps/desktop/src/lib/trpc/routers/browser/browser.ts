@@ -12,6 +12,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { createBrowserExtensionsRouter } from "./extensions";
 
+/** Creates the tRPC router for browser pane management. */
 export const createBrowserRouter = () => {
 	return router({
 		extensions: createBrowserExtensionsRouter(),

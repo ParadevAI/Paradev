@@ -163,10 +163,14 @@ Reflect.set(
 	testSupersetHome,
 );
 
-// Test processes are short-lived, but a full local run creates enough state
-// here to make relying on the OS's eventual temp cleanup needlessly noisy.
-// The exit hook is synchronous because Node/Bun cannot await async work once
-// process shutdown has begun; best-effort cleanup must never mask test status.
+/**
+ * Cleans up the isolated test superset home directory synchronously on exit.
+ *
+ * Test processes are short-lived, but a full local run creates enough state
+ * here to make relying on the OS's eventual temp cleanup needlessly noisy.
+ * The exit hook is synchronous because Node/Bun cannot await async work once
+ * process shutdown has begun; best-effort cleanup must never mask test status.
+ */
 function cleanupTestSupersetHome(): void {
 	try {
 		rmSync(testSupersetHome, { recursive: true, force: true });

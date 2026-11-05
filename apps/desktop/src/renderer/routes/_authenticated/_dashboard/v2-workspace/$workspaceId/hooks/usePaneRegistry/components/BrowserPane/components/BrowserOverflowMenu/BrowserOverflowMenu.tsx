@@ -60,6 +60,10 @@ function openAfterClose(setOpen: (open: boolean) => void) {
 	};
 }
 
+/**
+ * Renders the overflow dropdown menu for browser pane actions, including
+ * zoom controls, developer tools, audio muting, navigation history, and clear data.
+ */
 export function BrowserOverflowMenu({
 	paneId,
 	currentUrl,
@@ -108,6 +112,7 @@ export function BrowserOverflowMenu({
 		};
 	}, [paneId]);
 
+	/** Toggles the audio mute state for the active browser pane. */
 	const handleToggleMute = () => {
 		if (!paneId || !isAudioMuteLoaded) return;
 		const next = !isAudioMuted;

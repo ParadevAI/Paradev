@@ -80,6 +80,8 @@ interface FakeWebContents {
 	};
 }
 let nextId = 1;
+
+/** Creates a fake WebContents test stub with event emitter and mute tracking. */
 function makeWc(): { wc: FakeWebContents; id: number } {
 	const throttlingCalls: boolean[] = [];
 	const wc: FakeWebContents = {
