@@ -4,7 +4,6 @@ import {
 	MIN_CHANGES_RAIL_WIDTH,
 } from "../../constants";
 
-/** The rail's width in this container, or null when it should not show. */
 export function getChangesRailWidth({
 	enabled,
 	changedFileCount,
