@@ -34,6 +34,15 @@ export function withSavedMode(
 	);
 }
 
+export function freshStartMode(
+	paneModeId: string | undefined,
+	savedModeId: string | undefined,
+): string | undefined {
+	return paneModeId && !NEVER_STARTING_MODES.has(paneModeId)
+		? paneModeId
+		: savedModeId;
+}
+
 export function readSavedChatMode(presetId: string): string | undefined {
 	return readSavedModes()[presetId];
 }

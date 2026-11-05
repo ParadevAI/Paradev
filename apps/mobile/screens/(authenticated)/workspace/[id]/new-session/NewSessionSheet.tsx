@@ -211,7 +211,10 @@ export function NewSessionSheet() {
 				commandId: randomUUID(),
 				workspaceId: workspace.id,
 				harness: chat.harness,
-				resume: { harnessSessionId: chat.harnessSessionId },
+				resume: {
+					harnessSessionId: chat.harnessSessionId,
+					replacesSessionId: chat.sessionId,
+				},
 			});
 			openDesktopChatTab(
 				getHostServiceClientByUrl(hostUrl),

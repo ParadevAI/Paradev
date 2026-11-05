@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
+import { acpHarnessForPreset, acpStartModes } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
 import type { CreatePaneInput, RendererContext } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
@@ -7,6 +7,7 @@ import { useCallback } from "react";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
+import { readSavedChatMode } from "../../utils/savedChatMode";
 
 export type SurfaceForkSource =
 	| { into: "chat"; presetId: string; harnessSessionId: string }
@@ -65,6 +66,8 @@ export function useSurfaceFork(
 				workspaceId,
 				harness,
 				terminalId: loaderTerminalId,
+				modeId:
+					readSavedChatMode(presetId) ?? acpStartModes(presetId)?.defaultModeId,
 				resume: { harnessSessionId },
 			});
 			try {

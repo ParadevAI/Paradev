@@ -191,7 +191,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["chatFavoriteModels"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatPane/utils/savedChatMode/savedChatMode.ts",
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/utils/savedChatMode/savedChatMode.ts",
 		["chatModeByAgent"],
 	],
 	[
