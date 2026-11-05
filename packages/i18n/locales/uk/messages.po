@@ -10200,6 +10200,9 @@ msgstr "Недійсна мітка"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Недійсна відповідь OAuth. Спробуйте ще раз."
 
+msgid "Invalid regular expression"
+msgstr "Некоректний регулярний вираз"
+
 msgid "Invalid Request"
 msgstr "Недійсний запит"
 
@@ -11419,11 +11422,17 @@ msgstr "Позначаємо як готовий до рев'ю..."
 msgid "Marking ready…"
 msgstr "Позначаємо як готовий…"
 
+msgid "Match case"
+msgstr "З урахуванням регістру"
+
 msgid "Match existing patterns"
 msgstr "Дотримуватися наявних патернів"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Зіставляти комбінації клавіш із позначками на клавіатурі (наприклад, ⌘Z завжди спрацьовує на клавіші з позначкою «Z» — фізична KeyY на QWERTZ). Якщо вимкнено, комбінації прив'язані до фізичного розташування клавіш і не враховують поточне джерело введення."
+
+msgid "Match whole word"
+msgstr "Ціле слово"
 
 msgid "Max"
 msgstr "Макс."
@@ -16892,6 +16901,9 @@ msgstr "Пошук в історії"
 msgid "Search in {frameTitle}…"
 msgstr "Пошук у {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Пошук у файлах"
+
 msgid "Search issues…"
 msgstr "Пошук issues…"
 
@@ -17010,6 +17022,9 @@ msgstr "Пошук"
 
 msgid "Searching for Kbd usages"
 msgstr "Шукаємо використання Kbd"
+
+msgid "Searching…"
+msgstr "Пошук…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -17743,6 +17758,9 @@ msgstr "Показати активність робочого простору"
 
 msgid "showArrow opt-in"
 msgstr "showArrow за бажанням"
+
+msgid "Showing the first 500 results."
+msgstr "Показано перші 500 результатів."
 
 msgid "Shown in launchers and this list."
 msgstr "Відображається в засобах запуску й у цьому списку."
@@ -20942,6 +20960,9 @@ msgstr "Використовуйте Paradev на мобільних прист�
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Користуйтеся Paradev на телефоні з Pro."
+
+msgid "Use regular expression"
+msgstr "Використовувати регулярний вираз"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Використовуйте десктопний застосунок, щоб запускати паралельних кодинг-агентів."

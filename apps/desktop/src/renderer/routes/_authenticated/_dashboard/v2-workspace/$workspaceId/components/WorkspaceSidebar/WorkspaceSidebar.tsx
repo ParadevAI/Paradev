@@ -3,6 +3,7 @@ import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { LuFile } from "react-icons/lu";
+import { useContentSearchStore } from "renderer/commandPalette/ui/ContentSearch/contentSearchStore";
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { useWorkspaceGitStatus } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -75,6 +76,9 @@ export function WorkspaceSidebar({
 	const { t } = useLingui();
 	const gitStatus = useWorkspaceGitStatus();
 	const collections = useCollections();
+	const contentSearchOpen = useContentSearchStore(
+		(state) => state.open && state.target?.workspaceId === workspaceId,
+	);
 	const { data: [localState] = [] } = useLiveQuery(
 		(query) =>
 			query
@@ -103,6 +107,10 @@ export function WorkspaceSidebar({
 		setWorkspaceSidebarTab(collections, workspaceId, rowlessTab);
 		clearRowlessTab(workspaceId);
 	}, [hasRow, rowlessTab, collections, workspaceId, clearRowlessTab]);
+
+	useEffect(() => {
+		if (contentSearchOpen) setWorkspaceSidebarTab(collections, workspaceId, "files");
+	}, [collections, contentSearchOpen, workspaceId]);
 
 	function setActiveTab(tab: string) {
 		if (!isSidebarTabId(tab)) return;
