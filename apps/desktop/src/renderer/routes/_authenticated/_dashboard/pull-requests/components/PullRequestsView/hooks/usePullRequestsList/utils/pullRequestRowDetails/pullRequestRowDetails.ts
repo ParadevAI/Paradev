@@ -13,7 +13,8 @@ type PullRequestRowDetailField =
 type PullRequestRow = PullRequestRowKey &
 	Record<PullRequestRowDetailField, unknown> & { detailsPending: boolean };
 
-function rowKey(row: PullRequestRowKey): string {
+/** PR numbers repeat across repositories, so a row is its project plus its number. */
+export function pullRequestRowKey(row: PullRequestRowKey): string {
 	return `${row.projectId}:${row.prNumber}`;
 }
 
@@ -30,12 +31,12 @@ export function applyPullRequestRowDetails<
 ): TPage {
 	if (details.length === 0) return page;
 	const detailByKey = new Map(
-		details.map((detail) => [rowKey(detail), detail]),
+		details.map((detail) => [pullRequestRowKey(detail), detail]),
 	);
 	return {
 		...page,
 		pullRequests: page.pullRequests.map((row) => {
-			const detail = detailByKey.get(rowKey(row));
+			const detail = detailByKey.get(pullRequestRowKey(row));
 			if (!detail) return row;
 			return {
 				...row,

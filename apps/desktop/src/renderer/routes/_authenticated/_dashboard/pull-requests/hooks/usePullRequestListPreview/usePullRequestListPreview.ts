@@ -1,5 +1,5 @@
 import { type QueryClient, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 
 export const PULL_REQUESTS_SEARCH_QUERY_KEY = [
@@ -67,6 +67,7 @@ export function findPullRequestListPreview(
 	return null;
 }
 
+/** Recomputed when list pages change, so a PR opened before the list loads still gets its header. */
 export function usePullRequestListPreview({
 	projectId,
 	repoFullName,
@@ -77,15 +78,29 @@ export function usePullRequestListPreview({
 	prNumber: number | null;
 }): PullRequestPreview | null {
 	const queryClient = useQueryClient();
+	const subscribe = useCallback(
+		(onChange: () => void) =>
+			queryClient.getQueryCache().subscribe(({ query }) => {
+				if (
+					query.queryKey[0] === PULL_REQUESTS_SEARCH_QUERY_KEY[0] &&
+					query.queryKey[1] === PULL_REQUESTS_SEARCH_QUERY_KEY[1]
+				) {
+					onChange();
+				}
+			}),
+		[queryClient],
+	);
+	const snapshot = useSyncExternalStore(subscribe, () => {
+		if (prNumber === null) return null;
+		const preview = findPullRequestListPreview(queryClient, {
+			projectId,
+			repoFullName,
+			prNumber,
+		});
+		return preview ? JSON.stringify(preview) : null;
+	});
 	return useMemo(
-		() =>
-			prNumber === null
-				? null
-				: findPullRequestListPreview(queryClient, {
-						projectId,
-						repoFullName,
-						prNumber,
-					}),
-		[queryClient, projectId, repoFullName, prNumber],
+		() => (snapshot ? (JSON.parse(snapshot) as PullRequestPreview) : null),
+		[snapshot],
 	);
 }

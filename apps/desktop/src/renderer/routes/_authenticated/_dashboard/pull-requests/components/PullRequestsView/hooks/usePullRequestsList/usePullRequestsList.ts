@@ -9,6 +9,7 @@ import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_da
 import {
 	applyPullRequestRowDetails,
 	pullRequestNumbersByProject,
+	pullRequestRowKey,
 } from "./utils/pullRequestRowDetails";
 
 const PAGE_SIZE = 30;
@@ -147,8 +148,7 @@ export function usePullRequestsList({
 			},
 		}),
 		getRows: (data) => data.pullRequests,
-		getRowKey: (pullRequest) =>
-			`${pullRequest.projectId}:${pullRequest.prNumber}`,
+		getRowKey: (pullRequest) => pullRequestRowKey(pullRequest),
 	});
 	return {
 		...list,

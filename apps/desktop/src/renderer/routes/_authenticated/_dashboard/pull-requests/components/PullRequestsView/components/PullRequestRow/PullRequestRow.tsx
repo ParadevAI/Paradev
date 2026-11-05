@@ -57,6 +57,11 @@ export function PullRequestRow({
 		if (hoverIntentTimer.current) clearTimeout(hoverIntentTimer.current);
 		hoverIntentTimer.current = null;
 	};
+	const scheduleHoverIntent = () => {
+		if (!onHoverIntent) return;
+		cancelHoverIntent();
+		hoverIntentTimer.current = setTimeout(onHoverIntent, HOVER_INTENT_DELAY_MS);
+	};
 	useEffect(
 		() => () => {
 			if (hoverIntentTimer.current) clearTimeout(hoverIntentTimer.current);
@@ -76,18 +81,12 @@ export function PullRequestRow({
 				isSelected && "bg-accent",
 			)}
 			onClick={onClick}
-			onPointerEnter={() => {
-				if (!onHoverIntent) return;
-				cancelHoverIntent();
-				hoverIntentTimer.current = setTimeout(
-					onHoverIntent,
-					HOVER_INTENT_DELAY_MS,
-				);
-			}}
+			onPointerEnter={scheduleHoverIntent}
 			onPointerLeave={cancelHoverIntent}
 			onFocus={(e) => {
-				if (e.target === e.currentTarget) onHoverIntent?.();
+				if (e.target === e.currentTarget) scheduleHoverIntent();
 			}}
+			onBlur={cancelHoverIntent}
 			onKeyDown={(e) => {
 				if (e.target !== e.currentTarget) return;
 				if (e.key === "Enter" || e.key === " ") {

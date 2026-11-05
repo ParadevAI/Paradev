@@ -1,9 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createElement, type ReactNode } from "react";
 import {
 	findPullRequestListPreview,
 	PULL_REQUESTS_SEARCH_QUERY_KEY,
+	usePullRequestListPreview,
 } from "./usePullRequestListPreview";
+
+const { act, renderHook } = await import("@testing-library/react");
 
 function row(projectId: string, repo: string, prNumber: number) {
 	return {
@@ -41,11 +45,11 @@ describe("findPullRequestListPreview", () => {
 		});
 		expect(
 			findPullRequestListPreview(queryClient, {
-				projectId: "p1",
+				projectId: "p2",
 				repoFullName: null,
 				prNumber: 7,
 			})?.repoFullName,
-		).toBe("acme/api");
+		).toBe("acme/Web");
 		expect(
 			findPullRequestListPreview(queryClient, {
 				projectId: "p1",
@@ -53,5 +57,29 @@ describe("findPullRequestListPreview", () => {
 				prNumber: 8,
 			}),
 		).toBeNull();
+	});
+});
+
+describe("usePullRequestListPreview", () => {
+	test("picks up the row when the list loads after the PR opened", () => {
+		const queryClient = new QueryClient();
+		const wrapper = ({ children }: { children: ReactNode }) =>
+			createElement(QueryClientProvider, { client: queryClient }, children);
+		const { result } = renderHook(
+			() =>
+				usePullRequestListPreview({
+					projectId: "p1",
+					repoFullName: "acme/api",
+					prNumber: 7,
+				}),
+			{ wrapper },
+		);
+		expect(result.current).toBeNull();
+		act(() => {
+			queryClient.setQueryData([...PULL_REQUESTS_SEARCH_QUERY_KEY, "host", 1], {
+				pullRequests: [row("p1", "acme/api", 7)],
+			});
+		});
+		expect(result.current?.title).toBe("acme/api #7");
 	});
 });

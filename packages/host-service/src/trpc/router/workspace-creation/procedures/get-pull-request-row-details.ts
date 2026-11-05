@@ -43,6 +43,10 @@ async function readRowDetails(
 	} catch (ghErr) {
 		// Octokit spends the same user's quota, so a rate limit is final.
 		if (isGithubRateLimitError(ghErr)) throw ghErr;
+		console.warn(
+			"[workspaceCreation.getPullRequestRowDetails] gh path failed; falling back to Octokit",
+			ghErr,
+		);
 		const octokit = await ctx.github();
 		return fetchPullRequestRowDetails(
 			(query, variables) => octokit.graphql(query, variables),
