@@ -1,4 +1,7 @@
 import { expect, test } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { ApiClient } from "../../../lib/api-client";
 import { workspaceLinks } from "../../../lib/open-url";
 import { createCloudWorkspace } from "./createCloudWorkspace";
@@ -74,4 +77,47 @@ test("returns the cloud workspace's desktop and web links", async () => {
 		options: {},
 	});
 	expect(result.data).toMatchObject({ id: "ws-1", ...workspaceLinks("ws-1") });
+});
+
+test("uploads --attachment files and hands their ids to the agent", async () => {
+	const { api, calls } = recordingApi();
+	const dir = mkdtempSync(join(tmpdir(), "cloud-create-"));
+	const path = join(dir, "brief.md");
+	writeFileSync(path, "# brief");
+	const withUploads = {
+		...api,
+		attachment: {
+			createUpload: {
+				mutate: async () => ({
+					fileId: "file-1",
+					upload: { url: "https://storage.test/put", headers: {} },
+				}),
+			},
+		},
+	} as unknown as ApiClient;
+	const fetchImpl = (async () =>
+		new Response(null, { status: 200 })) as unknown as typeof fetch;
+	await createCloudWorkspace({
+		api: withUploads,
+		organizationId: "org",
+		options: { agent: "claude", prompt: "Read the brief", attachment: [path] },
+		fetchImpl,
+	});
+	rmSync(dir, { recursive: true, force: true });
+	expect(calls.createInput).toMatchObject({
+		agent: "claude",
+		attachmentFileIds: ["file-1"],
+	});
+});
+
+test("rejects --attachment without --agent before contacting cloud", async () => {
+	const { api, calls } = recordingApi();
+	await expect(
+		createCloudWorkspace({
+			api,
+			organizationId: "org",
+			options: { attachment: ["brief.md"] },
+		}),
+	).rejects.toThrow("--attachment requires --agent");
+	expect(calls.createInput).toBeUndefined();
 });

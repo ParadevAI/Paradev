@@ -39,7 +39,11 @@ export default command({
 		);
 
 		const uploadedIds = options.attachment
-			? await uploadAttachments(target.client, options.attachment)
+			? await uploadAttachments({
+					target,
+					api: ctx.api,
+					paths: options.attachment,
+				})
 			: [];
 		const attachmentIds = [...(options.attachmentId ?? []), ...uploadedIds];
 
