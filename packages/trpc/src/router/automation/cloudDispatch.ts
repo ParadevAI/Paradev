@@ -33,6 +33,7 @@ import {
 	type AgentRunResult,
 	nonForkPullRequest,
 	type PreviousRunSession,
+	pinCreatedWorkspace,
 	previousRunSession,
 	RunFailure,
 	type RunWorkspace,
@@ -137,6 +138,8 @@ export async function runInCloud(
 			{ cloudWorkspaceId: automation.cloudWorkspaceId },
 			created.id,
 		);
+	} else if (automation.reuseWorkspace) {
+		await pinCreatedWorkspace(automation.id, { cloudWorkspaceId: created.id });
 	}
 	return null;
 }

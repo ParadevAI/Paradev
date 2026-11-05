@@ -2472,7 +2472,7 @@ Use [`automations logs`](#superset-automations-logs-id) for run history.
 		{ flag: "--host <hostId>", description: "Host the automation dispatches to, or `cloud` for `--cloud` (default: this machine)." },
 		{ flag: "--cloud", description: "Run in the cloud: each run starts a cloud workspace from `--environment`, or reuses the one `--workspace` names." },
 		{ flag: "--agent <agent>", description: "Host agent presetId, instance UUID, or 'superset' for built-in chat. Default: claude." },
-		{ flag: "--continue-session", description: "Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace." },
+		{ flag: "--continue-session", description: "Deliver each run's prompt into the agent session the previous run left, instead of starting another. Without --workspace, the first run's workspace is kept for the next runs." },
 		{ flag: "--tag <tag>", description: "Workspace tag applied to each run's created workspace. Repeatable. Default: automation." },
 		{ flag: "--group <name>", description: "Group the automation is listed under in the automations table. Default: none." },
 	]}
@@ -2537,7 +2537,7 @@ superset automations trigger-options --group slack
 		{ flag: "--workspace <workspaceId>", description: "New v2 workspace ID." },
 		{ flag: "--session", description: "Switch to session mode: clears the project and any workspace pin; each run creates a project-less session workspace. Mutually exclusive with --project/--workspace." },
 		{ flag: "--agent <agent>", description: "New host agent presetId, instance UUID, or 'superset'." },
-		{ flag: "--continue-session / --no-continue-session", description: "Continue the agent session the previous run left, or start a new one each run. Requires a pinned workspace." },
+		{ flag: "--continue-session / --no-continue-session", description: "Continue the agent session the previous run left, or start a new one each run. With no pinned workspace, the next run's workspace is kept for the runs after it." },
 		{ flag: "--mcp-scope <a,b,c>", description: "Comma-separated MCP scope strings." },
 		{ flag: "--tag <tag>", description: "Replace the tag set applied to each run's created workspace. Repeatable." },
 		{ flag: "--clear-tags", description: "Remove every tag (runs stop grouping). Mutually exclusive with --tag." },

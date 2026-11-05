@@ -5258,14 +5258,15 @@ msgstr "コンテキストウィンドウ: {percent} 使用済み"
 msgid "Continue"
 msgstr "続行"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "続ける"
+
 msgid "Continue in your browser"
 msgstr "ブラウザで続行してください"
 
 msgid "Continue or fork session"
 msgstr "セッションを続行またはフォーク"
-
-msgid "Continue the session the last run left"
-msgstr "前回の実行が残したセッションを継続"
 
 msgid "Continue this chat on another login"
 msgstr "別のログインでこのチャットを続ける"
@@ -5298,9 +5299,6 @@ msgstr "Googleで続行"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "エージェントセッションを継続するには、ワークスペースをピン留めする必要があります"
-
-msgid "continuing the last session"
-msgstr "前回のセッションを継続"
 
 msgid "Continuing…"
 msgstr "続行しています…"
@@ -7471,6 +7469,12 @@ msgstr "それぞれ新しいタブで"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "毎朝午前8時に、前日の失敗したCI実行を確認し、最も多い失敗原因を診断して修正PRを作成する。"
+
+msgid "Each run makes its own"
+msgstr "実行ごとに新しく作成します"
+
+msgid "Each run starts a new agent conversation"
+msgstr "実行ごとにエージェントとの新しい会話を開始します"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "各席はプランの時間をチーム全体で共有する 1 つのプールに追加します:"
@@ -9930,9 +9934,6 @@ msgstr "差分ビューアの改善"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0} 内"
-
-msgid "in a new session"
-msgstr "新しいセッションで"
 
 msgid "in a terminal on this host."
 msgstr "このホストのターミナルで実行してください。"
@@ -16308,6 +16309,9 @@ msgstr "エージェントが自動的に取り込む再利用可能な指示"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "再利用可能なターミナル起動。クリックで編集、ドラッグで並べ替え。プロジェクトのセットアップ・実行・ティアダウンコマンドはライフサイクルスクリプトです。"
 
+msgid "Reusing {keptName}"
+msgstr "{keptName} を再利用中"
+
 msgid "Reveal in Finder"
 msgstr "Finderに表示"
 
@@ -16642,8 +16646,14 @@ msgstr "新しいワークスペースの作成時に実行します。"
 msgid "Runs when a workspace is deleted."
 msgstr "ワークスペースの削除時に実行します。"
 
+msgid "Same session"
+msgstr "同じセッション"
+
 msgid "Same version as this app."
 msgstr "このアプリと同じバージョンです。"
+
+msgid "Same workspace"
+msgstr "同じワークスペース"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSOとSCIMプロビジョニング"
@@ -18329,9 +18339,6 @@ msgstr "会話を始めるとここにメッセージが表示されます"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "このターミナルの直近のコンテキストを引き継いで、新しいエージェントセッションを開始します。ワークスペースのファイルが引き続き信頼できる情報源です。"
 
-msgid "Start a new agent session each run"
-msgstr "実行ごとに新しいエージェントセッションを開始"
-
 msgid "Start a new chat"
 msgstr "新しいチャットを開始"
 
@@ -19193,6 +19200,9 @@ msgstr "エージェントがこの会話を失いました"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "エージェントがチケットから差分までタスクを引き受けます。人間はキー入力ではなく結果をレビューします。関心はコードを書くことから、作業を仕様化し判断することへ移ります。エンジニア1人が独立したワークスペースで複数のエージェントを同時に動かします。"
 
+msgid "The agent picks up where the last run left off"
+msgstr "エージェントは前回の実行の続きから再開します"
+
 msgid "The agent stopped responding"
 msgstr "エージェントが応答しなくなりました"
 
@@ -19303,6 +19313,9 @@ msgstr "ファイルにインポート可能なテーマが含まれていませ
 
 msgid "The first F4 teams"
 msgstr "最初のF4チーム"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "最初の実行で作成し、以降の実行で再利用します"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "最初のチーム、それも小規模なチームが、全行を読まずにエージェント中心のコードを出荷し、それでも不具合率を維持します。特別なことは何もありません。レビューの多層化、カナリア、素早いロールバック、そしてコードではなく仕様を書く習慣です。"
