@@ -2,7 +2,6 @@ import type { AppRouter } from "@superset/host-service";
 import { createHostServiceLinks } from "@superset/workspace-client";
 import { createTRPCClient } from "@trpc/client";
 import { getHostServiceHeaders } from "./host-service-auth";
-import { HostUnreachableError } from "./hostQueryFn";
 import { isHostServiceConnectionError } from "./utils/isHostServiceConnectionError";
 
 export { isHostServiceConnectionError } from "./utils/isHostServiceConnectionError";
@@ -40,18 +39,15 @@ const HOST_SERVICE_RETRY_DELAY_MS = 700;
  * Query-level `retry` for host-service requests: bounded retries with
  * backoff for connection-level failures only, so a query in flight during a
  * host-service restart self-heals instead of settling into a permanent
- * "Failed to fetch" that only a manual "Try again" click clears. A
- * HostUnreachableError retries too: the retry reads the latest observer's
- * host URL. Real application errors (404s, validation) still fail on the
- * first attempt.
+ * "Failed to fetch" that only a manual "Try again" click clears. Real
+ * application errors (404s, validation) still fail on the first attempt.
  */
 export function hostServiceQueryRetry(
 	failureCount: number,
 	error: unknown,
 ): boolean {
 	return (
-		(isHostServiceConnectionError(error) ||
-			error instanceof HostUnreachableError) &&
+		isHostServiceConnectionError(error) &&
 		failureCount < HOST_SERVICE_MAX_RETRIES
 	);
 }

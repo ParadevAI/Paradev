@@ -1,1 +1,1 @@
-export { HostUnreachableError, hostQueryFn } from "./hostQueryFn";
+export { hostQueryFn } from "./hostQueryFn";

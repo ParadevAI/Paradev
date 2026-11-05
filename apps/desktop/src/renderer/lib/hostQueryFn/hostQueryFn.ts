@@ -3,23 +3,15 @@ import type { QueryFunctionContext } from "@tanstack/react-query";
 /**
  * Query function for a host-keyed query whose host may be unreachable.
  *
- * An invalidation runs the queryFn of whichever observer rendered last, even a
- * disabled one. Fail when unreachable: an error keeps the cached data, an
- * empty answer replaces it.
+ * Every observer of a shared key sets the query's options, and an
+ * invalidation runs the last ones set, even a disabled observer's. With no
+ * URL there is no queryFn, so react-query borrows a reachable observer's
+ * instead of storing an empty answer over the cache.
  */
 export function hostQueryFn<T>(
 	hostUrl: string | null,
 	load: (hostUrl: string, context: QueryFunctionContext) => Promise<T>,
-): (context: QueryFunctionContext) => Promise<T> {
-	return async (context) => {
-		if (!hostUrl) throw new HostUnreachableError();
-		return load(hostUrl, context);
-	};
-}
-
-export class HostUnreachableError extends Error {
-	constructor() {
-		super("Host is unreachable");
-		this.name = "HostUnreachableError";
-	}
+): ((context: QueryFunctionContext) => Promise<T>) | undefined {
+	if (!hostUrl) return undefined;
+	return (context) => load(hostUrl, context);
 }
