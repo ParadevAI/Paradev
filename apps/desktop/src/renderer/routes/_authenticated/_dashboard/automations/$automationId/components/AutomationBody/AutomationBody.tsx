@@ -101,6 +101,7 @@ export function AutomationBody({
 				: null,
 			tags: automation.tags,
 			continueAgentSession: automation.continueAgentSession,
+			reuseWorkspace: automation.reuseWorkspace,
 			triggers: automation.triggers.map((trigger) => ({
 				id: trigger.id,
 				connectionId: trigger.connectionId,
@@ -339,6 +340,7 @@ export function AutomationBody({
 								machineSize: draft.machineSize,
 								tags: draft.tags,
 								continueAgentSession: draft.continueAgentSession,
+								reuseWorkspace: draft.reuseWorkspace,
 							}}
 							onScopeChange={(patch: Partial<ScopeDraft>) =>
 								edit({

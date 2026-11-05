@@ -43,8 +43,8 @@ export class RunFailure extends Error {
  *
  * Deliberately the automation's own previous run rather than any live agent in
  * the workspace: a person may be working in there too, and a scheduled prompt
- * must never land in a session they started. A continuing automation with no
- * pin yet keeps its first run's workspace (`pinCreatedWorkspace`).
+ * must never land in a session they started. An automation that reuses its
+ * workspace pins the first one a run creates (`pinCreatedWorkspace`).
  *
  * The host decides in the end — this only nominates, and a stale nomination
  * costs a launch, which is the old behaviour.
@@ -100,8 +100,8 @@ export async function replacePin(
 }
 
 /**
- * Keeps the workspace a continuing automation's run created, so the next run
- * goes back to it. Only an automation still unpinned and still continuing.
+ * Keeps the workspace a run created as the pin of an automation that reuses
+ * its workspace, unless someone pinned one meanwhile.
  */
 export async function pinCreatedWorkspace(
 	automationId: string,
@@ -118,7 +118,7 @@ export async function pinCreatedWorkspace(
 		.where(
 			and(
 				eq(automations.id, automationId),
-				eq(automations.continueAgentSession, true),
+				eq(automations.reuseWorkspace, true),
 				cloud
 					? isNull(automations.cloudWorkspaceId)
 					: isNull(automations.v2WorkspaceId),

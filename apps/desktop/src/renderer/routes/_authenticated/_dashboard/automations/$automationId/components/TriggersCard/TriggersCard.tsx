@@ -44,6 +44,7 @@ export interface ScopeDraft {
 	environmentId: string | null;
 	machineSize: MachineSize | null;
 	continueAgentSession: boolean;
+	reuseWorkspace: boolean;
 	tags: string[];
 }
 
@@ -201,10 +202,18 @@ export function TriggersCard({
 							workspaces={ownCloudWorkspaces}
 							allWorkspaces={cloudWorkspaces}
 							value={scope.cloudWorkspaceId}
+							reuse={scope.reuseWorkspace}
 							disabled={readOnly}
-							onChange={(cloudWorkspaceId) =>
-								onScopeChange({ cloudWorkspaceId })
-							}
+							onChange={({ cloudWorkspaceId, reuse }) => {
+								if (reuse && scope.reuseWorkspace) return;
+								onScopeChange({
+									cloudWorkspaceId,
+									reuseWorkspace: reuse,
+									...(cloudWorkspaceId || reuse
+										? {}
+										: { continueAgentSession: false }),
+								});
+							}}
 						/>
 					) : (
 						<WorkspacePicker
@@ -212,10 +221,16 @@ export function TriggersCard({
 							hostId={hostId}
 							projectId={scope.v2ProjectId}
 							value={scope.v2WorkspaceId}
+							reuse={scope.reuseWorkspace}
 							disabled={readOnly}
-							onChange={(v2WorkspaceId) =>
+							onChange={({ workspaceId: v2WorkspaceId, reuse }) => {
+								if (reuse && scope.reuseWorkspace) return;
 								onScopeChange({
 									v2WorkspaceId,
+									reuseWorkspace: reuse,
+									...(v2WorkspaceId || reuse
+										? {}
+										: { continueAgentSession: false }),
 									// Denormalized pin: the cloud stores both without a registry lookup.
 									...(v2WorkspaceId && hostId
 										? {
@@ -223,9 +238,24 @@ export function TriggersCard({
 												v2ProjectId: scope.v2ProjectId,
 											}
 										: {}),
-								})
-							}
+								});
+							}}
 						/>
+					)}
+					{(scope.reuseWorkspace ||
+						scope.v2WorkspaceId ||
+						scope.cloudWorkspaceId) && (
+						<>
+							<span>and</span>
+							<SessionModePicker
+								className={SCOPE_CHIP}
+								continueAgentSession={scope.continueAgentSession}
+								disabled={readOnly}
+								onChange={(continueAgentSession) =>
+									onScopeChange({ continueAgentSession })
+								}
+							/>
+						</>
 					)}
 					{cloud && !scope.cloudWorkspaceId && (
 						<MachineSizePicker
@@ -247,15 +277,6 @@ export function TriggersCard({
 							/>
 						</>
 					)}
-					<span>running</span>
-					<SessionModePicker
-						className={SCOPE_CHIP}
-						continueAgentSession={scope.continueAgentSession}
-						disabled={readOnly}
-						onChange={(continueAgentSession) =>
-							onScopeChange({ continueAgentSession })
-						}
-					/>
 				</div>
 			</TriggersEditor>
 			<RelayOfflineNotice hostId={hostId} className="mt-1" />

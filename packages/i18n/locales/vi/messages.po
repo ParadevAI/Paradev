@@ -5258,14 +5258,15 @@ msgstr "Cửa sổ ngữ cảnh: đã dùng {percent}"
 msgid "Continue"
 msgstr "Tiếp tục"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Tiếp tục"
+
 msgid "Continue in your browser"
 msgstr "Tiếp tục trong trình duyệt"
 
 msgid "Continue or fork session"
 msgstr "Tiếp tục hoặc fork phiên"
-
-msgid "Continue the session the last run left"
-msgstr "Tiếp tục phiên mà lần chạy trước để lại"
 
 msgid "Continue this chat on another login"
 msgstr "Tiếp tục cuộc trò chuyện này với tài khoản khác"
@@ -5298,9 +5299,6 @@ msgstr "Tiếp tục với Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Để tiếp tục phiên agent, cần ghim một workspace"
-
-msgid "continuing the last session"
-msgstr "tiếp tục phiên gần nhất"
 
 msgid "Continuing…"
 msgstr "Đang tiếp tục…"
@@ -7462,6 +7460,12 @@ msgstr "Mỗi lệnh một tab mới"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Mỗi sáng lúc 8h, xem các lần chạy CI thất bại hôm qua, chẩn đoán lỗi phổ biến nhất và mở một PR sửa lỗi."
+
+msgid "Each run makes its own"
+msgstr "Mỗi lần chạy tạo riêng"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Mỗi lần chạy bắt đầu một cuộc trò chuyện mới với agent"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Mỗi người dùng thêm số giờ của gói mình vào một quỹ chung cho cả nhóm:"
@@ -9905,9 +9909,6 @@ msgstr "Khung xem diff cải tiến"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "trong {0}"
-
-msgid "in a new session"
-msgstr "trong phiên mới"
 
 msgid "in a terminal on this host."
 msgstr "trong một terminal trên host này."
@@ -16280,6 +16281,9 @@ msgstr "Hướng dẫn tái sử dụng mà agent của bạn tự nhận"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Các lệnh terminal dùng lại được. Nhấp vào một script để sửa hoặc kéo để sắp xếp lại. Lệnh thiết lập, chạy và dọn dẹp của dự án là script vòng đời."
 
+msgid "Reusing {keptName}"
+msgstr "Đang dùng lại {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "Hiện trong Finder"
 
@@ -16614,8 +16618,14 @@ msgstr "Chạy khi tạo không gian làm việc mới."
 msgid "Runs when a workspace is deleted."
 msgstr "Chạy khi xóa không gian làm việc."
 
+msgid "Same session"
+msgstr "Cùng phiên"
+
 msgid "Same version as this app."
 msgstr "Cùng phiên bản với ứng dụng này."
+
+msgid "Same workspace"
+msgstr "Cùng workspace"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO & cấp phát SCIM"
@@ -18301,9 +18311,6 @@ msgstr "Bắt đầu một cuộc trò chuyện để thấy tin nhắn ở đâ
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Bắt đầu một phiên agent mới với ngữ cảnh gần đây của terminal này. Tệp trong workspace vẫn là nguồn đáng tin cậy."
 
-msgid "Start a new agent session each run"
-msgstr "Bắt đầu một phiên agent mới mỗi lần chạy"
-
 msgid "Start a new chat"
 msgstr "Bắt đầu trò chuyện mới"
 
@@ -19165,6 +19172,9 @@ msgstr "Agent đã mất cuộc trò chuyện này"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Agent làm chủ một tác vụ từ ticket đến diff. Con người review kết quả, không phải từng thao tác gõ. Sự chú ý dịch từ viết code sang đặc tả công việc và đánh giá nó. Một kỹ sư chạy nhiều agent cùng lúc trong các workspace tách biệt."
 
+msgid "The agent picks up where the last run left off"
+msgstr "Agent tiếp tục từ chỗ lần chạy trước dừng lại"
+
 msgid "The agent stopped responding"
 msgstr "Agent đã ngừng phản hồi"
 
@@ -19275,6 +19285,9 @@ msgstr "Tệp không chứa theme nào có thể nhập."
 
 msgid "The first F4 teams"
 msgstr "Những đội F4 đầu tiên"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "Lần chạy đầu tạo ra, các lần sau dùng lại"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Những đội đầu tiên, quy mô nhỏ, ship code phần lớn do agent viết mà không đọc từng dòng, và tỷ lệ lỗi vẫn ổn. Không có gì huyền bí đằng sau: các lớp review, canary, rollback nhanh, và thói quen viết đặc tả thay vì viết code."

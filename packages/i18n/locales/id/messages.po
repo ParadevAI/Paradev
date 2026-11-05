@@ -5258,14 +5258,15 @@ msgstr "Jendela konteks: {percent} terpakai"
 msgid "Continue"
 msgstr "Lanjutkan"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "Lanjutkan"
+
 msgid "Continue in your browser"
 msgstr "Lanjutkan di browser Anda"
 
 msgid "Continue or fork session"
 msgstr "Lanjutkan atau fork sesi"
-
-msgid "Continue the session the last run left"
-msgstr "Lanjutkan sesi yang ditinggalkan proses terakhir"
 
 msgid "Continue this chat on another login"
 msgstr "Lanjutkan chat ini dengan login lain"
@@ -5298,9 +5299,6 @@ msgstr "Lanjutkan dengan Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Melanjutkan sesi agen memerlukan ruang kerja yang disematkan"
-
-msgid "continuing the last session"
-msgstr "melanjutkan sesi terakhir"
 
 msgid "Continuing…"
 msgstr "Melanjutkan…"
@@ -7462,6 +7460,12 @@ msgstr "Masing-masing di tab barunya sendiri"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Tiap pagi jam 8, lihat run CI yang gagal kemarin, diagnosis kegagalan paling umum, dan buka PR perbaikan."
+
+msgid "Each run makes its own"
+msgstr "Setiap run membuat miliknya sendiri"
+
+msgid "Each run starts a new agent conversation"
+msgstr "Setiap run memulai percakapan baru dengan agent"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "Setiap kursi menambahkan jam paketnya ke satu kumpulan yang dibagi seluruh tim Anda:"
@@ -9905,9 +9909,6 @@ msgstr "Penampil diff yang lebih baik"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "di {0}"
-
-msgid "in a new session"
-msgstr "dalam sesi baru"
 
 msgid "in a terminal on this host."
 msgstr "di terminal pada host ini."
@@ -16280,6 +16281,9 @@ msgstr "Instruksi pakai ulang yang otomatis diambil agen Anda"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Peluncuran terminal pakai ulang. Klik sebuah skrip untuk mengedit atau seret untuk mengurutkan ulang. Perintah setup, run, dan teardown proyek adalah skrip lifecycle."
 
+msgid "Reusing {keptName}"
+msgstr "Memakai ulang {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "Tampilkan di Finder"
 
@@ -16614,8 +16618,14 @@ msgstr "Dijalankan saat ruang kerja baru dibuat."
 msgid "Runs when a workspace is deleted."
 msgstr "Dijalankan saat ruang kerja dihapus."
 
+msgid "Same session"
+msgstr "Sesi yang sama"
+
 msgid "Same version as this app."
 msgstr "Versi yang sama dengan aplikasi ini."
+
+msgid "Same workspace"
+msgstr "Workspace yang sama"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO & provisioning SCIM"
@@ -18301,9 +18311,6 @@ msgstr "Mulai percakapan untuk melihat pesan di sini"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Memulai sesi agen baru dengan konteks terbaru dari terminal ini. Berkas di ruang kerja tetap menjadi sumber kebenaran."
 
-msgid "Start a new agent session each run"
-msgstr "Mulai sesi agen baru setiap kali dijalankan"
-
 msgid "Start a new chat"
 msgstr "Mulai chat baru"
 
@@ -19165,6 +19172,9 @@ msgstr "Agen kehilangan percakapan ini"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Agen memegang tugas dari tiket sampai diff. Manusia mereview hasilnya, bukan tiap ketukan tombolnya. Perhatian bergeser dari menulis kode ke menentukan pekerjaan dan menilainya. Satu engineer menjalankan beberapa agen sekaligus di workspace terisolasi."
 
+msgid "The agent picks up where the last run left off"
+msgstr "Agent melanjutkan dari tempat run terakhir berhenti"
+
 msgid "The agent stopped responding"
 msgstr "Agen berhenti merespons"
 
@@ -19275,6 +19285,9 @@ msgstr "File itu tidak berisi tema yang bisa diimpor."
 
 msgid "The first F4 teams"
 msgstr "Tim F4 pertama"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "Run pertama membuatnya, run berikutnya memakainya ulang"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Tim-tim pertama, yang berukuran kecil, merilis kode yang mayoritas ditulis agen tanpa membaca tiap barisnya, dan tingkat cacatnya tetap terjaga. Tidak ada yang gaib di baliknya: lapisan review, canary, rollback cepat, dan kebiasaan menulis spesifikasi alih-alih kode."

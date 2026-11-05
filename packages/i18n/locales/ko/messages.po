@@ -5258,14 +5258,15 @@ msgstr "컨텍스트 창: {percent} 사용됨"
 msgid "Continue"
 msgstr "계속"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "이어서 하기"
+
 msgid "Continue in your browser"
 msgstr "브라우저에서 계속하세요"
 
 msgid "Continue or fork session"
 msgstr "세션 계속하기 또는 포크"
-
-msgid "Continue the session the last run left"
-msgstr "마지막 실행이 남긴 세션을 계속"
 
 msgid "Continue this chat on another login"
 msgstr "다른 로그인으로 이 채팅 계속하기"
@@ -5298,9 +5299,6 @@ msgstr "Google로 계속하기"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "에이전트 세션을 계속하려면 고정된 워크스페이스가 필요합니다"
-
-msgid "continuing the last session"
-msgstr "마지막 세션을 계속"
 
 msgid "Continuing…"
 msgstr "계속하는 중…"
@@ -7462,6 +7460,12 @@ msgstr "각각 새 탭에서"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "매일 오전 8시에 어제 실패한 CI 실행을 살펴보고, 가장 흔한 실패 원인을 진단해 수정 PR을 엽니다."
+
+msgid "Each run makes its own"
+msgstr "실행마다 새로 만듭니다"
+
+msgid "Each run starts a new agent conversation"
+msgstr "실행마다 에이전트와 새 대화를 시작합니다"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "각 좌석은 플랜의 시간을 팀 전체가 공유하는 하나의 풀에 더합니다:"
@@ -9905,9 +9909,6 @@ msgstr "차이 뷰어 개선"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0}에서"
-
-msgid "in a new session"
-msgstr "새 세션에서"
 
 msgid "in a terminal on this host."
 msgstr "(이 호스트의 터미널에서)"
@@ -16280,6 +16281,9 @@ msgstr "에이전트가 자동으로 가져다 쓰는 재사용 가능한 지침
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "재사용 가능한 터미널 실행입니다. 스크립트를 클릭하면 편집하고, 끌어서 순서를 바꿉니다. 프로젝트 설정, 실행, 정리 명령은 라이프사이클 스크립트입니다."
 
+msgid "Reusing {keptName}"
+msgstr "{keptName} 재사용 중"
+
 msgid "Reveal in Finder"
 msgstr "Finder에서 보기"
 
@@ -16614,8 +16618,14 @@ msgstr "새 작업 공간을 만들 때 실행됩니다."
 msgid "Runs when a workspace is deleted."
 msgstr "작업 공간을 삭제할 때 실행됩니다."
 
+msgid "Same session"
+msgstr "같은 세션"
+
 msgid "Same version as this app."
 msgstr "이 앱과 같은 버전입니다."
+
+msgid "Same workspace"
+msgstr "같은 워크스페이스"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO 및 SCIM 프로비저닝"
@@ -18301,9 +18311,6 @@ msgstr "대화를 시작하면 메시지가 여기에 표시됩니다"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "이 터미널의 최근 컨텍스트를 넘겨받아 새 에이전트 세션을 시작합니다. 워크스페이스의 파일이 여전히 기준입니다."
 
-msgid "Start a new agent session each run"
-msgstr "실행할 때마다 새 에이전트 세션 시작"
-
 msgid "Start a new chat"
 msgstr "새 채팅 시작"
 
@@ -19165,6 +19172,9 @@ msgstr "에이전트가 이 대화를 잃어버렸습니다"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "에이전트가 티켓부터 차이까지 작업을 맡습니다. 사람은 키 입력이 아니라 결과를 리뷰합니다. 관심은 코드를 쓰는 데서 일을 명세하고 판단하는 데로 옮겨 갑니다. 엔지니어 한 명이 격리된 워크스페이스에서 여러 에이전트를 동시에 돌립니다."
 
+msgid "The agent picks up where the last run left off"
+msgstr "에이전트가 마지막 실행이 끝난 곳에서 이어갑니다"
+
 msgid "The agent stopped responding"
 msgstr "에이전트가 응답하지 않습니다"
 
@@ -19275,6 +19285,9 @@ msgstr "파일에 가져올 수 있는 테마가 없습니다."
 
 msgid "The first F4 teams"
 msgstr "최초의 F4 팀"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "첫 실행에서 만들고 이후 실행에서 재사용합니다"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "규모가 작은 선발 팀들이 모든 줄을 읽지 않고도 대부분 에이전트가 쓴 코드를 출시하고, 결함률은 그대로 유지됩니다. 신비로운 비결은 없습니다. 리뷰 계층, 카나리, 빠른 롤백, 그리고 코드 대신 명세를 쓰는 습관입니다."

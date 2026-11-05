@@ -5258,14 +5258,15 @@ msgstr "上下文視窗：已使用 {percent}"
 msgid "Continue"
 msgstr "繼續"
 
+msgctxt "automation session mode"
+msgid "Continue"
+msgstr "繼續"
+
 msgid "Continue in your browser"
 msgstr "請在瀏覽器中繼續"
 
 msgid "Continue or fork session"
 msgstr "繼續或分支會話"
-
-msgid "Continue the session the last run left"
-msgstr "繼續上次執行留下的工作階段"
 
 msgid "Continue this chat on another login"
 msgstr "使用其他帳號繼續此對話"
@@ -5298,9 +5299,6 @@ msgstr "使用Google繼續"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "繼續代理程式工作階段需要已釘選的工作區"
-
-msgid "continuing the last session"
-msgstr "繼續上一個工作階段"
 
 msgid "Continuing…"
 msgstr "正在繼續…"
@@ -7462,6 +7460,12 @@ msgstr "每條各佔一個新分頁"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "每天早上8點，檢視昨天失敗的CI執行，診斷最常見的失敗原因，並提一個修復PR。"
+
+msgid "Each run makes its own"
+msgstr "每次執行都新建一個"
+
+msgid "Each run starts a new agent conversation"
+msgstr "每次執行都與代理開始新的對話"
 
 msgid "Each seat adds its plan's hours to one pool your team shares:"
 msgstr "每個席位會把其方案的時數加入整個團隊共用的一個時數池："
@@ -9905,9 +9909,6 @@ msgstr "更好的差異檢視器"
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "於 {0}"
-
-msgid "in a new session"
-msgstr "在新的工作階段中"
 
 msgid "in a terminal on this host."
 msgstr "（在此主機的終端中）。"
@@ -16280,6 +16281,9 @@ msgstr "代理程式會自動讀取的可複用說明"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "可複用的終端啟動項。點選指令碼可編輯，拖曳可重新排序。專案的初始化、執行和清理命令屬於生命週期指令碼。"
 
+msgid "Reusing {keptName}"
+msgstr "正在重複使用 {keptName}"
+
 msgid "Reveal in Finder"
 msgstr "在Finder中顯示"
 
@@ -16614,8 +16618,14 @@ msgstr "建立新工作區時執行。"
 msgid "Runs when a workspace is deleted."
 msgstr "刪除工作區時執行。"
 
+msgid "Same session"
+msgstr "同一會話"
+
 msgid "Same version as this app."
 msgstr "與此應用程式版本相同。"
+
+msgid "Same workspace"
+msgstr "同一工作區"
 
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO與SCIM帳號開通"
@@ -18301,9 +18311,6 @@ msgstr "開始一段對話，訊息會顯示在這裡"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "以這個終端最近的上下文啟動新的代理程式會話。工作區中的檔案仍是準確來源。"
 
-msgid "Start a new agent session each run"
-msgstr "每次執行都啟動新的代理程式工作階段"
-
 msgid "Start a new chat"
 msgstr "開始新的聊天"
 
@@ -19165,6 +19172,9 @@ msgstr "代理遺失了此對話"
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "代理程式從工單一路負責到差異。人類審查結果，而不是擊鍵過程。注意力從寫程式碼轉向定義工作和判斷成果。一名工程師在隔離工作區裡同時跑好幾個代理程式。"
 
+msgid "The agent picks up where the last run left off"
+msgstr "代理會從上次執行停下的地方繼續"
+
 msgid "The agent stopped responding"
 msgstr "代理已停止回應"
 
@@ -19275,6 +19285,9 @@ msgstr "該檔案不包含任何可匯入的主題。"
 
 msgid "The first F4 teams"
 msgstr "第一批F4團隊"
+
+msgid "The first run makes one, later runs reuse it"
+msgstr "首次執行時建立，之後的執行重複使用它"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "第一批團隊，規模都不大，在不逐行閱讀的情況下交付了以代理程式為主的程式碼，缺陷率並沒有惡化。背後沒什麼玄學：分層審查、灰度釋出、快速回滾，以及寫規格而不是寫程式碼的習慣。"
