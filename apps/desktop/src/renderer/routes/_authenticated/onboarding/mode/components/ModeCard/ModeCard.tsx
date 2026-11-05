@@ -1,4 +1,3 @@
-import { claudeIcon } from "@superset/ui/icons/preset-icons";
 import { cn } from "@superset/ui/utils";
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
@@ -54,26 +53,6 @@ export function ModeCard({
 							: "border-border/70 opacity-70 group-hover:opacity-90",
 					)}
 				>
-					<div className="flex h-7 items-center border-border/70 border-b px-2">
-						<span
-							className={cn(
-								"flex h-5 items-center gap-1.5 rounded-md px-1.5 text-[10px] transition-colors duration-500",
-								selected
-									? "bg-foreground/[0.07] text-foreground/80"
-									: "text-foreground/40",
-							)}
-						>
-							<img
-								src={claudeIcon}
-								alt=""
-								className={cn(
-									"size-3 transition-[filter] duration-500",
-									!selected && "grayscale",
-								)}
-							/>
-							Claude
-						</span>
-					</div>
 					{sketch}
 				</div>
 			</div>
