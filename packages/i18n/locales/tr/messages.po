@@ -2323,8 +2323,8 @@ msgstr "Ajanlar {0} araçlarına erişemiyor"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "Bulut çalışma alanlarındaki ajanlar bu host üzerinde <0>--host</0> gibi komutlar çalıştırabilir. Host'a röle üzerinden erişilebilmesi gerekir."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Bulut çalışma alanlarındaki ajanlar <0>--host</0> ile bu host üzerinde komut çalıştırabilir. Host'a röle üzerinden erişilebilmesi gerekir."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Ajanlar bulutta çalışmaya devam eder. Çalışma alanını masaüstünden, iPhone'dan veya iPad'den yeniden açın."

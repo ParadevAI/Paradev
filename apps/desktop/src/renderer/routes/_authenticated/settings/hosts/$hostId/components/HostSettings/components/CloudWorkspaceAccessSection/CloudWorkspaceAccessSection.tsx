@@ -31,9 +31,9 @@ export function CloudWorkspaceAccessSection({
 				</Label>
 				<p className="text-xs text-muted-foreground">
 					<Trans>
-						Agents in your cloud workspaces can then run commands like{" "}
-						<code>--host</code> against this host. The host must be reachable
-						through the relay.
+						Agents in your cloud workspaces can then use <code>--host</code> to
+						run commands on this host. The host must be reachable through the
+						relay.
 					</Trans>
 				</p>
 			</div>

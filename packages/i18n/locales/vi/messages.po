@@ -2323,8 +2323,8 @@ msgstr "Agent không thể truy cập các công cụ của {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "Agent trong các workspace cloud của bạn khi đó có thể chạy các lệnh như <0>--host</0> trên host này. Host phải truy cập được qua relay."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Agent trong các workspace cloud của bạn khi đó có thể dùng <0>--host</0> để chạy lệnh trên host này. Host phải truy cập được qua relay."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính, iPhone hoặc iPad."

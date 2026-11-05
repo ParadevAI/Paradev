@@ -2323,8 +2323,8 @@ msgstr "Agents kunnen de tools van {0} niet bereiken"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents voltooien routinetickets zonder tussentijds ingrijpen."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "Agents in je cloudwerkruimtes kunnen dan opdrachten zoals <0>--host</0> op deze host uitvoeren. De host moet bereikbaar zijn via de relay."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Agents in je cloudwerkruimtes kunnen dan met <0>--host</0> opdrachten op deze host uitvoeren. De host moet bereikbaar zijn via de relay."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agents blijven werken in de cloud. Open de werkruimte opnieuw op desktop, iPhone of iPad."
@@ -18561,7 +18561,7 @@ msgid "Stop workspace run command"
 msgstr "Run-commando van werkruimte stoppen"
 
 msgid "Stop your cloud workspaces reaching this host?"
-msgstr "De toegang van je cloudwerkruimtes tot deze host stoppen?"
+msgstr "Je cloudwerkruimtes geen toegang meer geven tot deze host?"
 
 msgid "stopped"
 msgstr "gestopt"

@@ -2323,8 +2323,8 @@ msgstr "Les agents ne peuvent pas accéder aux outils de {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Les agents terminent les tickets courants sans intervention en cours de tâche."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "Les agents de vos espaces de travail cloud pourront alors lancer des commandes comme <0>--host</0> sur cet hôte. L'hôte doit être joignable via le relais."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Les agents de vos espaces de travail cloud pourront alors utiliser <0>--host</0> pour lancer des commandes sur cet hôte. L'hôte doit être joignable via le relais."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Les agents continuent de travailler dans le cloud. Rouvrez l'espace de travail depuis le bureau, l'iPhone ou l'iPad."

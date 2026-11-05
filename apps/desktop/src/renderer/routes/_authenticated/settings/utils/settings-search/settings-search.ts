@@ -1929,6 +1929,10 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"remote",
 			"--host",
 			"agent",
+			"host",
+			"hosts",
+			"access",
+			"owner",
 		],
 	},
 	{

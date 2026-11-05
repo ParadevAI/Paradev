@@ -2323,8 +2323,8 @@ msgstr "代理程式無法存取 {0} 的工具"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "代理程式無需中途干預即可完成常規工單。"
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "之後，你的雲端工作區中的代理程式就能對此主機執行 <0>--host</0> 等指令。此主機必須能透過中繼存取。"
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "之後，你的雲端工作區中的代理程式就能使用 <0>--host</0> 參數在此主機上執行指令。此主機必須能透過中繼存取。"
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "代理程式會在雲端持續工作。可在桌面版、iPhone 或 iPad 上重新開啟工作區。"

@@ -2323,8 +2323,8 @@ msgstr "Agen tidak dapat menjangkau alat {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agen menyelesaikan tiket rutin tanpa intervensi di tengah tugas."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "Agen di workspace cloud Anda lalu bisa menjalankan perintah seperti <0>--host</0> di host ini. Host harus bisa dijangkau melalui relay."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Agen di workspace cloud Anda lalu bisa memakai <0>--host</0> untuk menjalankan perintah di host ini. Host harus bisa dijangkau melalui relay."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop, iPhone, atau iPad."

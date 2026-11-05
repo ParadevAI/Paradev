@@ -2323,8 +2323,8 @@ msgstr "エージェントは {0} のツールにアクセスできません"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "エージェントが定型チケットを途中の介入なしに完了する。"
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "クラウドワークスペースのエージェントが、このホストに対して <0>--host</0> などのコマンドを実行できるようになります。ホストにリレー経由で接続できる必要があります。"
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "クラウドワークスペースのエージェントが <0>--host</0> を使って、このホストでコマンドを実行できるようになります。ホストにリレー経由で接続できる必要があります。"
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "エージェントはクラウドで動き続けます。デスクトップ、iPhone、iPad からワークスペースをもう一度開けます。"

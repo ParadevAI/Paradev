@@ -10,22 +10,20 @@ import {
 import { Button } from "@superset/ui/button";
 
 interface CloudWorkspaceAccessConfirmDialogProps {
-	/** Null while closed. */
-	targetEnabled: boolean | null;
-	onCancel: () => void;
+	open: boolean;
+	targetEnabled: boolean;
+	onOpenChange: (open: boolean) => void;
 	onConfirm: () => void;
 }
 
 export function CloudWorkspaceAccessConfirmDialog({
+	open,
 	targetEnabled,
-	onCancel,
+	onOpenChange,
 	onConfirm,
 }: CloudWorkspaceAccessConfirmDialogProps) {
 	return (
-		<AlertDialog
-			open={targetEnabled !== null}
-			onOpenChange={(open) => !open && onCancel()}
-		>
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent className="max-w-[480px]">
 				<AlertDialogHeader>
 					<AlertDialogTitle>
@@ -59,7 +57,7 @@ export function CloudWorkspaceAccessConfirmDialog({
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<Button variant="ghost" size="sm" onClick={onCancel}>
+					<Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button

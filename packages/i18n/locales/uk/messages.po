@@ -2317,8 +2317,8 @@ msgstr "Агенти не мають доступу до інструменті�
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Агенти виконують рутинні тікети без втручання під час роботи."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "Агенти у ваших хмарних робочих просторах зможуть запускати на цьому хості команди на кшталт <0>--host</0>. Хост має бути доступним через релей."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Агенти у ваших хмарних робочих просторах зможуть за допомогою <0>--host</0> запускати команди на цьому хості. Хост має бути доступним через релей."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."

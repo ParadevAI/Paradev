@@ -2323,8 +2323,8 @@ msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완료합니다."
 
-msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
-msgstr "이후 클라우드 워크스페이스의 에이전트가 이 호스트에 대해 <0>--host</0> 같은 명령을 실행할 수 있습니다. 호스트는 릴레이를 통해 접근할 수 있어야 합니다."
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "이후 클라우드 워크스페이스의 에이전트가 <0>--host</0>를 사용해 이 호스트에서 명령을 실행할 수 있습니다. 호스트는 릴레이를 통해 접근할 수 있어야 합니다."
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱, iPhone, iPad에서 워크스페이스를 다시 열 수 있습니다."
