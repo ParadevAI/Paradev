@@ -236,7 +236,9 @@ organization as the active one; `user.myOrganizations` lists only the box's.
 Archiving the box from inside it
 (`workspaces archive`) cuts off the box's API access at once and stops the box
 about a minute later: put the box's own id last when archiving several, and
-unarchive from a signed-in client.
+unarchive from a signed-in client. Resizing the box's own workspace
+(`workspaces update --machine-size`) restarts it, which ends the agent that
+asked, usually before the answer comes back; resize it last, as with archive.
 
 **pdev signs in to its router with the box's credential.** On a laptop pdev
 gets a token from `superset auth mcp-headers`, which a box refuses because it
