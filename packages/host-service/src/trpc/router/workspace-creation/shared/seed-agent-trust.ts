@@ -31,7 +31,7 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
 import type { HostDb } from "../../../../db";
-import { resolveDefaultAccountEnv } from "../../usage/default-account";
+import { resolveAccountEnv } from "../../usage/default-account";
 
 type TrustFamily = "claude" | "codex" | "agy";
 
@@ -81,7 +81,7 @@ function resolveTrustTarget(
 			file: join(homedir(), ".gemini", "antigravity-cli", "settings.json"),
 		};
 	}
-	const env = { ...resolveDefaultAccountEnv(db, family), ...config.env };
+	const env = { ...resolveAccountEnv(db, family, null), ...config.env };
 	if (family === "claude") {
 		const configDir = env.CLAUDE_CONFIG_DIR;
 		return {

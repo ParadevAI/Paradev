@@ -1892,6 +1892,9 @@ msgstr "Le compte est en attente de suppression."
 msgid "Account name"
 msgstr "Nom du compte"
 
+msgid "Account not found: {pinned}"
+msgstr "Compte introuvable : {pinned}"
+
 msgid "Account pending deletion"
 msgstr "Compte en attente de suppression"
 
@@ -2240,6 +2243,9 @@ msgstr "Par rapport à main"
 
 msgid "Agent"
 msgstr "Agent"
+
+msgid "Agent accounts"
+msgstr "Comptes des agents"
 
 msgid "Agent commands"
 msgstr "Commandes des agents"
@@ -6617,6 +6623,10 @@ msgstr "Par défaut"
 msgid "default · secondary · outline · ghost · link · destructive"
 msgstr "default · secondary · outline · ghost · link · destructive"
 
+#. placeholder {0}: label(hostDefault)
+msgid "Default ({0})"
+msgstr "Par défaut ({0})"
+
 msgid "Default ({defaultWorktreePath})"
 msgstr "Par défaut ({defaultWorktreePath})"
 
@@ -8442,6 +8452,9 @@ msgstr "Échec du changement d'organisation. Veuillez réessayer."
 
 msgid "Failed to trigger run"
 msgstr "Échec du déclenchement de l'exécution"
+
+msgid "Failed to update agent account"
+msgstr "Impossible de mettre à jour le compte de l'agent"
 
 msgid "Failed to update agent settings"
 msgstr "Échec de la mise à jour des paramètres de l'agent"
@@ -16728,6 +16741,9 @@ msgstr "« {0} » enregistré comme environnement"
 msgid "Saved to Downloads"
 msgstr "Enregistré dans Téléchargements"
 
+msgid "Saved, but open terminals keep their current account until reopened."
+msgstr "Enregistré, mais les terminaux ouverts gardent leur compte actuel jusqu'à leur réouverture."
+
 msgid "Saving as an environment..."
 msgstr "Enregistrement comme environnement..."
 
@@ -18834,6 +18850,9 @@ msgstr "Système"
 
 msgid "System design"
 msgstr "Conception de système"
+
+msgid "System login"
+msgstr "Connexion système"
 
 msgid "System memory"
 msgstr "Mémoire système"
@@ -21547,6 +21566,9 @@ msgstr "Quels agents peuvent exécuter une automatisation ?"
 
 msgid "Which AI coding agents are supported?"
 msgstr "Quels agents de code IA sont pris en charge ?"
+
+msgid "Which login agents use in this project. Defaults to the account chosen in Usage."
+msgstr "Le compte que les agents utilisent dans ce projet. Par défaut, celui choisi dans Utilisation."
 
 msgid "Which plans include automations?"
 msgstr "Quels plans incluent les automatisations ?"

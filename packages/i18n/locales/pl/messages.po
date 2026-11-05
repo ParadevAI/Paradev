@@ -1892,6 +1892,9 @@ msgstr "Konto oczekuje na usunięcie."
 msgid "Account name"
 msgstr "Nazwa konta"
 
+msgid "Account not found: {pinned}"
+msgstr "Nie znaleziono konta: {pinned}"
+
 msgid "Account pending deletion"
 msgstr "Konto oczekuje na usunięcie"
 
@@ -2240,6 +2243,9 @@ msgstr "Względem main"
 
 msgid "Agent"
 msgstr "Agent"
+
+msgid "Agent accounts"
+msgstr "Konta agentów"
 
 msgid "Agent commands"
 msgstr "Polecenia agentów"
@@ -6617,6 +6623,10 @@ msgstr "Domyślny"
 msgid "default · secondary · outline · ghost · link · destructive"
 msgstr "default · secondary · outline · ghost · link · destructive"
 
+#. placeholder {0}: label(hostDefault)
+msgid "Default ({0})"
+msgstr "Domyślne ({0})"
+
 msgid "Default ({defaultWorktreePath})"
 msgstr "Domyślny ({defaultWorktreePath})"
 
@@ -8442,6 +8452,9 @@ msgstr "Nie udało się przełączyć organizacji. Spróbuj ponownie."
 
 msgid "Failed to trigger run"
 msgstr "Nie udało się wyzwolić uruchomienia"
+
+msgid "Failed to update agent account"
+msgstr "Nie udało się zaktualizować konta agenta"
 
 msgid "Failed to update agent settings"
 msgstr "Nie udało się zaktualizować ustawień agenta"
@@ -16728,6 +16741,9 @@ msgstr "Zapisano \"{0}\" jako środowisko"
 msgid "Saved to Downloads"
 msgstr "Zapisano w Pobranych"
 
+msgid "Saved, but open terminals keep their current account until reopened."
+msgstr "Zapisano, ale otwarte terminale zachowają obecne konto do ponownego otwarcia."
+
 msgid "Saving as an environment..."
 msgstr "Zapisywanie jako środowisko..."
 
@@ -18834,6 +18850,9 @@ msgstr "Systemowy"
 
 msgid "System design"
 msgstr "Projektowanie systemów"
+
+msgid "System login"
+msgstr "Logowanie systemowe"
 
 msgid "System memory"
 msgstr "Pamięć systemu"
@@ -21547,6 +21566,9 @@ msgstr "Którzy agenci mogą uruchamiać automatyzację?"
 
 msgid "Which AI coding agents are supported?"
 msgstr "Które agenty kodujące AI są obsługiwane?"
+
+msgid "Which login agents use in this project. Defaults to the account chosen in Usage."
+msgstr "Którego logowania używają agenci w tym projekcie. Domyślnie konto wybrane w Zużyciu."
 
 msgid "Which plans include automations?"
 msgstr "Które plany obejmują automatyzacje?"
