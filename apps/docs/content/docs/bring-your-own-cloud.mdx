@@ -1,0 +1,74 @@
+---
+title: Bring Your Own Cloud
+description: Run Paradev on a server in your own cloud and reach it from desktop, iPhone, and iPad
+pro: true
+---
+
+## Overview
+
+Paradev can run agents on a server you own, in AWS, GCP, Azure, Hetzner, or any other Linux host. Your code, your agent sign-ins, and your keys stay on that server. You open its workspaces from the desktop app and from iPhone or iPad, the same as workspaces on your laptop.
+
+This is different from [cloud workspaces](/cloud-workspaces), where Paradev runs the machine for you. Pick bring your own cloud when the code must stay in your account, or when you want a machine size, region, or network that you control.
+
+The host binds to `127.0.0.1` and reaches your devices through the Paradev relay, so the server needs no open inbound ports.
+
+## Requirements
+
+- **A paid plan.** The server is a [Remote Access](/remote-access) host.
+- **A Linux server**, x64 or arm64. If it runs well on an 8 GB laptop, a server with 4 vCPU and 8 GB runs it too.
+- **`git` and `gh`** on the server, and the agent CLIs you want to run. See [Host Server prerequisites](/cli/host-server#prerequisites).
+
+## 1. Install the CLI
+
+On the server:
+
+```bash
+curl -fsSL https://paradev.com/cli/install.sh | sh
+```
+
+This installs Paradev under `~/superset` and adds `~/superset/bin` to `PATH`. See [Getting Started](/cli/getting-started#standalone-install).
+
+## 2. Sign in to GitHub and your agents
+
+```bash
+gh auth login
+```
+
+For a server without a browser, set `GH_TOKEN` instead. Then start each agent CLI once over SSH (for example `claude`) and sign in, so it can run later without you.
+
+## 3. Start the host
+
+Create an API key in **Settings → API Keys**, then:
+
+```bash
+export SUPERSET_API_KEY=sk_live_…
+superset start --daemon --org <id|slug|name>
+superset status
+```
+
+`--org` is needed only if the key belongs to more than one organization. See [Headless hosts](/remote-access#headless-sandbox-ci-or-server).
+
+To keep the host running across reboots, run it under systemd instead of `--daemon`: [Run it under systemd](/cli/host-server#run-it-under-systemd).
+
+## 4. Add your repos
+
+Clone a repo onto the server:
+
+```bash
+superset projects create --name "My Project" --local \
+  --clone https://github.com/org/repo.git --parent-dir ~/code
+```
+
+If the project already exists on another machine, attach this server to it with `projects setup` instead. See [Create or adopt a project](/cli/host-server#create-or-adopt-a-project).
+
+## 5. Work on it
+
+- **Desktop:** press **⌘N**, pick the server in the device picker, and start a workspace. The ports its dev servers open are [forwarded to your machine](/remote-access#ports-on-a-remote-host).
+- **iPhone and iPad:** the server appears next to your other hosts in the [mobile app](/mobile).
+- **Teammates:** [grant them access](/remote-access#grant-teammates-access) to the host.
+
+## Security
+
+- Use a server for Paradev only. Everything the host can reach (files, terminals, agent sign-ins) is reachable by the people you grant access to.
+- Keep only the repos and credentials you mean to share on it.
+- Agents still use your own subscriptions and keys. Paradev does not proxy model calls.

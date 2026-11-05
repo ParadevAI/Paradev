@@ -24,6 +24,7 @@
 		"---Core Features---",
 		"workspaces",
 		"cloud-workspaces",
+		"bring-your-own-cloud",
 		"multiple-windows",
 		"diff-viewer",
 		"editor",
