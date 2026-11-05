@@ -7,13 +7,20 @@ import { listGitWorktrees } from "../../trpc/router/workspace-creation/shared/wo
 import { detectExternalWorktrees } from "./external-worktrees";
 import type { ExternalWorktreeSource } from "./sources";
 
-const home = realpathSync(mkdtempSync(join(tmpdir(), "external-worktrees-")));
-afterAll(() => rmSync(home, { recursive: true, force: true }));
+const homes: string[] = [];
+afterAll(() => {
+	for (const dir of homes) rmSync(dir, { recursive: true, force: true });
+});
+function makeHome(): string {
+	const dir = realpathSync(mkdtempSync(join(tmpdir(), "external-worktrees-")));
+	homes.push(dir);
+	return dir;
+}
 
 const SOURCES: ExternalWorktreeSource[] = [
 	{
 		id: "conductor",
-		homeDir: "tool",
+		toolOwnedDirs: ["tool/clones"],
 		roots: [{ path: "tool/workspaces", maxDepth: 2 }],
 	},
 ];
@@ -40,6 +47,7 @@ const listWorktrees = (repoPath: string) =>
 
 describe("detectExternalWorktrees", () => {
 	it("finds branch worktrees of the user's repos and skips detached, tool-owned, and tracked ones", async () => {
+		const home = makeHome();
 		const repo = join(home, "code/app");
 		const git = await initRepo(repo);
 		const feature = join(home, "tool/workspaces/app/feature");
@@ -59,6 +67,11 @@ describe("detectExternalWorktrees", () => {
 			join(home, "tool/workspaces/owned-x"),
 		]);
 
+		const userRepoInToolDir = join(home, "tool/repos/lib");
+		const libGit = await initRepo(userRepoInToolDir);
+		const libFeature = join(home, "tool/workspaces/lib/feature");
+		await libGit.raw(["worktree", "add", "-b", "feature", libFeature]);
+
 		const repos = await detectExternalWorktrees({
 			homeDir: home,
 			sources: SOURCES,
@@ -72,6 +85,61 @@ describe("detectExternalWorktrees", () => {
 				name: "app",
 				worktrees: [{ path: feature, branch: "feature", source: "conductor" }],
 			},
+			{
+				repoPath: userRepoInToolDir,
+				name: "lib",
+				worktrees: [
+					{ path: libFeature, branch: "feature", source: "conductor" },
+				],
+			},
 		]);
+	});
+
+	it("returns nothing when the roots are missing or hold no worktrees", async () => {
+		const home = makeHome();
+		mkdirSync(join(home, "tool/workspaces/empty"), { recursive: true });
+
+		const repos = await detectExternalWorktrees({
+			homeDir: home,
+			sources: [
+				...SOURCES,
+				{
+					id: "orca",
+					toolOwnedDirs: [],
+					roots: [{ path: "missing/workspaces", maxDepth: 2 }],
+				},
+			],
+			listWorktrees,
+		});
+
+		expect(repos).toEqual([]);
+	});
+
+	it("skips a repository whose worktree list fails and keeps the others", async () => {
+		const home = makeHome();
+		const good = join(home, "code/good");
+		const bad = join(home, "code/bad");
+		const goodGit = await initRepo(good);
+		const badGit = await initRepo(bad);
+		const goodFeature = join(home, "tool/workspaces/good/feature");
+		await goodGit.raw(["worktree", "add", "-b", "feature", goodFeature]);
+		await badGit.raw([
+			"worktree",
+			"add",
+			"-b",
+			"feature",
+			join(home, "tool/workspaces/bad/feature"),
+		]);
+
+		const repos = await detectExternalWorktrees({
+			homeDir: home,
+			sources: SOURCES,
+			listWorktrees: async (repoPath) => {
+				if (repoPath === bad) throw new Error("git failed");
+				return listWorktrees(repoPath);
+			},
+		});
+
+		expect(repos.map((repo) => repo.repoPath)).toEqual([good]);
 	});
 });

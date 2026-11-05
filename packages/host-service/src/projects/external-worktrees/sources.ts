@@ -14,8 +14,8 @@ export type ExternalWorktreeSourceId =
 
 export interface ExternalWorktreeSource {
 	id: ExternalWorktreeSourceId;
-	/** Relative to the home directory. A repository inside it is the tool's own clone, not the user's. */
-	homeDir: string;
+	/** Relative to the home directory. Repositories inside them are the tool's own clones, not the user's. */
+	toolOwnedDirs: string[];
 	/** Relative to the home directory. */
 	roots: { path: string; maxDepth: number }[];
 }
@@ -25,42 +25,45 @@ export interface ExternalWorktreeSource {
 export const EXTERNAL_WORKTREE_SOURCES: readonly ExternalWorktreeSource[] = [
 	{
 		id: "conductor",
-		homeDir: "conductor",
+		toolOwnedDirs: [
+			"conductor/cloud-workspaces",
+			"conductor/remote-workspace-sync",
+		],
 		roots: [{ path: "conductor/workspaces", maxDepth: 2 }],
 	},
 	{
 		id: "t3code",
-		homeDir: ".t3",
+		toolOwnedDirs: [],
 		roots: [{ path: ".t3/worktrees", maxDepth: 2 }],
 	},
 	{
 		id: "orca",
-		homeDir: "orca",
+		toolOwnedDirs: [],
 		roots: [{ path: "orca/workspaces", maxDepth: 2 }],
 	},
 	{
 		id: "emdash",
-		homeDir: "emdash",
+		toolOwnedDirs: [],
 		roots: [{ path: "emdash/worktrees", maxDepth: 2 }],
 	},
 	{
 		id: "claude-squad",
-		homeDir: ".claude-squad",
+		toolOwnedDirs: [],
 		roots: [{ path: ".claude-squad/worktrees", maxDepth: 1 }],
 	},
 	{
 		id: "cursor",
-		homeDir: ".cursor",
+		toolOwnedDirs: [],
 		roots: [{ path: ".cursor/worktrees", maxDepth: 2 }],
 	},
 	{
 		id: "herdr",
-		homeDir: ".herdr",
+		toolOwnedDirs: [],
 		roots: [{ path: ".herdr/worktrees", maxDepth: 2 }],
 	},
 	{
 		id: "paseo",
-		homeDir: ".paseo",
+		toolOwnedDirs: [],
 		roots: [{ path: ".paseo/worktrees", maxDepth: 2 }],
 	},
 ];

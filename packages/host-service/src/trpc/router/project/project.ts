@@ -6,14 +6,10 @@ import {
 } from "@superset/shared/github-remote";
 import { BRANCH_PREFIX_MODES } from "@superset/shared/workspace-launch";
 import { TRPCError } from "@trpc/server";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
 import type { TagSettingSnapshot } from "../../../events/types";
-import {
-	detectExternalWorktrees,
-	EXTERNAL_WORKTREE_SOURCES,
-} from "../../../projects/external-worktrees";
 import {
 	emitProjectChanged,
 	getLocalProject,
@@ -33,18 +29,23 @@ import {
 	getAllTagFolderSettings,
 	upsertTagFolderSetting,
 } from "../../../tag-folders";
+import { getStrictShellEnvironment } from "../../../terminal/clean-shell-env";
+import { gitDetectExternalWorktreesTask } from "../../../workers/tasks/git";
 import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
-import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
+import {
+	machineOnlyProcedure,
+	protectedProcedure,
+	queryProcedure,
+	router,
+} from "../../index";
+import { offLoop } from "../../off-loop";
 import { projectDirExists } from "../workspace-creation/shared/local-project";
 import {
 	normalizeSparseCheckoutPaths,
 	parseSparseCheckoutPaths,
 	serializeSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
-import {
-	listGitWorktrees,
-	normalizeWorktreePath,
-} from "../workspace-creation/shared/worktree-list";
+import { normalizeWorktreePath } from "../workspace-creation/shared/worktree-list";
 import { normalizeWorktreeBaseDir } from "../workspace-creation/shared/worktree-paths";
 import {
 	createFromClone,
@@ -888,24 +889,27 @@ export const projectRouter = router({
 
 	/** Git worktrees that other agent tools (Conductor, T3 Code, Orca, …) left on
 	 * this machine and no workspace tracks yet, grouped by repository. */
-	detectExternalWorktrees: protectedProcedure.query(async ({ ctx }) => {
-		const trackedWorktreePaths = new Set(
-			ctx.db
-				.select({ worktreePath: workspaces.worktreePath })
-				.from(workspaces)
-				.where(isNull(workspaces.archivedAt))
-				.all()
-				.map((row) => normalizeWorktreePath(row.worktreePath)),
-		);
-		const repos = await detectExternalWorktrees({
-			homeDir: homedir(),
-			sources: EXTERNAL_WORKTREE_SOURCES,
-			listWorktrees: async (repoPath) =>
-				listGitWorktrees(await ctx.git(repoPath)),
-			trackedWorktreePaths,
-		});
-		return { repos };
-	}),
+	detectExternalWorktrees: queryProcedure.query(async (args) => ({
+		repos: await offLoop({
+			task: gitDetectExternalWorktreesTask,
+			prepare: async ({ ctx }) => ({
+				homeDir: homedir(),
+				trackedWorktreePaths: ctx.db
+					.select({ worktreePath: workspaces.worktreePath })
+					.from(workspaces)
+					.leftJoin(projects, eq(projects.id, workspaces.projectId))
+					.where(
+						or(isNull(workspaces.archivedAt), isNotNull(projects.deletedAt)),
+					)
+					.all()
+					.map((row) => normalizeWorktreePath(row.worktreePath)),
+				gitEnv: await getStrictShellEnvironment().catch(
+					() => process.env as Record<string, string>,
+				),
+			}),
+			options: () => ({ timeoutMs: 4_000 }),
+		})(args),
+	})),
 
 	deletionImpact: protectedProcedure
 		.input(z.object({ projectId: z.string().uuid() }))

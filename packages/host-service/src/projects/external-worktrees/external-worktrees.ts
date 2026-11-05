@@ -46,8 +46,10 @@ export async function detectExternalWorktrees({
 			maxDepth: root.maxDepth,
 		})),
 	);
-	const toolOwnedPrefixes = sources.map((source) =>
-		withTrailingSep(normalizeWorktreePath(join(homeDir, source.homeDir))),
+	const toolOwnedPrefixes = sources.flatMap((source) =>
+		source.toolOwnedDirs.map((dir) =>
+			withTrailingSep(normalizeWorktreePath(join(homeDir, dir))),
+		),
 	);
 
 	const candidatesByRepo = new Map<
@@ -74,7 +76,16 @@ export async function detectExternalWorktrees({
 
 	const repos: ExternalWorktreeRepo[] = [];
 	for (const [repoPath, candidates] of candidatesByRepo) {
-		const records = await listWorktrees(repoPath);
+		let records: WorktreeRecord[];
+		try {
+			records = await listWorktrees(repoPath);
+		} catch (error) {
+			console.warn("[external-worktrees] skipped a repository", {
+				repoPath,
+				error,
+			});
+			continue;
+		}
 		const worktrees: ExternalWorktree[] = [];
 		for (const record of records) {
 			if (record.bare || record.prunable || !record.branch) continue;
@@ -118,6 +129,15 @@ function findWorktreeDirs(
 		}
 	};
 	if (isDirectory(root)) walk(root, 0);
+	if (visited >= maxEntries) {
+		console.warn(
+			"[external-worktrees] stopped scanning a folder at the entry limit",
+			{
+				root,
+				maxEntries,
+			},
+		);
+	}
 	return found;
 }
 

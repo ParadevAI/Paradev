@@ -226,7 +226,6 @@ msgstr "{0, plural, one {# dự án} other {# dự án}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {# câu trả lời}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1424,12 +1423,6 @@ msgstr "{workspaceName}: host không khả dụng"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown thất bại"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {# worktree} other {# worktree}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{worktreeLabel} trong {repoLabel}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} mỗi người, thanh toán theo năm"
@@ -5844,6 +5837,9 @@ msgstr "Không xác minh được thông tin đăng nhập: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Không thể thêm họ vào kênh"
 
+msgid "Couldn't add this repo"
+msgstr "Không thể thêm repo này"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Không thể yêu cầu không gian làm việc tạo mô tả"
 
@@ -5918,6 +5914,9 @@ msgstr "Không thể fork sang chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Không thể giao việc này cho agent"
+
+msgid "Couldn't import"
+msgstr "Không thể nhập"
 
 msgid "Couldn't load {filename}"
 msgstr "Không thể tải {filename}"
@@ -9853,8 +9852,9 @@ msgstr "Nhập thất bại"
 msgid "Import failed: {message}"
 msgstr "Nhập thất bại: {message}"
 
-msgid "Import from {toolNames}"
-msgstr "Nhập từ {toolNames}"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Nhập từ {0}"
 
 msgid "Import from file"
 msgstr "Nhập từ tệp"
@@ -9886,13 +9886,13 @@ msgstr "Nhập…"
 msgid "Important"
 msgstr "Quan trọng"
 
+msgid "Imported"
+msgstr "Đã nhập"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Đã nhập {imported} trong {0} worktree: {1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "Đã nhập {imported} trong {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Đã nhập {joinedMessages}"

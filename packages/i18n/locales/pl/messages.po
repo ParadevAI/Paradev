@@ -226,7 +226,6 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektów} other {
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} other {# odpowiedzi}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1424,12 +1423,6 @@ msgstr "{workspaceName}: host jest niedostępny"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: sprzątanie nie powiodło się"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{worktreeLabel} ({repoLabel})"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} za użytkownika, rozliczenie roczne"
@@ -5844,6 +5837,9 @@ msgstr "Nie udało się zweryfikować poświadczeń: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Nie udało się dodać ich do kanału"
 
+msgid "Couldn't add this repo"
+msgstr "Nie udało się dodać tego repozytorium"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Nie udało się poprosić obszaru roboczego o opis"
 
@@ -5918,6 +5914,9 @@ msgstr "Nie udało się sforkować do czatu"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Nie udało się przekazać tego agentowi"
+
+msgid "Couldn't import"
+msgstr "Nie udało się zaimportować"
 
 msgid "Couldn't load {filename}"
 msgstr "Nie udało się wczytać {filename}"
@@ -9853,8 +9852,9 @@ msgstr "Import nie powiódł się"
 msgid "Import failed: {message}"
 msgstr "Import nie powiódł się: {message}"
 
-msgid "Import from {toolNames}"
-msgstr "Importuj z {toolNames}"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Importuj z {0}"
 
 msgid "Import from file"
 msgstr "Importuj z pliku"
@@ -9886,13 +9886,13 @@ msgstr "Importuj…"
 msgid "Important"
 msgstr "Ważne"
 
+msgid "Imported"
+msgstr "Zaimportowano"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Zaimportowano {imported} z {0} worktree: {1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "Zaimportowano {imported} z {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Zaimportowano {joinedMessages}"

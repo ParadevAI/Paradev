@@ -226,7 +226,6 @@ msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {답글 #개}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1424,12 +1423,6 @@ msgstr "{workspaceName}: 호스트를 사용할 수 없습니다"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: 정리에 실패했습니다"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {worktree #개} other {worktree #개}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{repoLabel}에 {worktreeLabel}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "사용자당 {yearlyTotal}, 연간 결제"
@@ -5844,6 +5837,9 @@ msgstr "자격 증명을 확인하지 못했습니다: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "채널에 추가하지 못했습니다"
 
+msgid "Couldn't add this repo"
+msgstr "이 리포지토리를 추가할 수 없습니다"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "워크스페이스에 설명을 요청하지 못했습니다"
 
@@ -5918,6 +5914,9 @@ msgstr "채팅으로 포크할 수 없습니다"
 
 msgid "Couldn't hand this to an agent"
 msgstr "에이전트에게 넘길 수 없습니다"
+
+msgid "Couldn't import"
+msgstr "가져오지 못했습니다"
 
 msgid "Couldn't load {filename}"
 msgstr "{filename}을(를) 불러올 수 없습니다"
@@ -9853,8 +9852,9 @@ msgstr "가져오기 실패"
 msgid "Import failed: {message}"
 msgstr "가져오기 실패: {message}"
 
-msgid "Import from {toolNames}"
-msgstr "{toolNames}에서 가져오기"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "{0}에서 가져오기"
 
 msgid "Import from file"
 msgstr "파일에서 가져오기"
@@ -9886,13 +9886,13 @@ msgstr "가져오기…"
 msgid "Important"
 msgstr "중요"
 
+msgid "Imported"
+msgstr "가져왔습니다"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "worktree {0}개 중 {imported}개를 가져왔습니다: {1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "worktree {worktreeCount}개 중 {imported}개를 가져왔습니다: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "{joinedMessages} 가져옴"

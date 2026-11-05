@@ -226,7 +226,6 @@ msgstr "{0, plural, one {# projet} other {# projets}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# réponse} other {# réponses}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1424,12 +1423,6 @@ msgstr "{workspaceName} : hôte indisponible"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName} : échec du nettoyage"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{worktreeLabel} dans {repoLabel}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} par utilisateur, facturation annuelle"
@@ -5844,6 +5837,9 @@ msgstr "Impossible de vérifier les identifiants : {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Impossible de les ajouter au canal"
 
+msgid "Couldn't add this repo"
+msgstr "Impossible d'ajouter ce dépôt"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Impossible de demander une description à l’espace de travail"
 
@@ -5918,6 +5914,9 @@ msgstr "Impossible de forker dans un chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Impossible de confier ceci à un agent"
+
+msgid "Couldn't import"
+msgstr "Échec de l'import"
 
 msgid "Couldn't load {filename}"
 msgstr "Impossible de charger {filename}"
@@ -9853,8 +9852,9 @@ msgstr "Échec de l'import"
 msgid "Import failed: {message}"
 msgstr "Échec de l'import : {message}"
 
-msgid "Import from {toolNames}"
-msgstr "Importer depuis {toolNames}"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Importer depuis {0}"
 
 msgid "Import from file"
 msgstr "Importer depuis un fichier"
@@ -9886,13 +9886,13 @@ msgstr "Importer…"
 msgid "Important"
 msgstr "Important"
 
+msgid "Imported"
+msgstr "Importé"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "{imported} worktrees importés sur {0} : {1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "{imported} worktrees importés sur {worktreeCount} : {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Importé {joinedMessages}"

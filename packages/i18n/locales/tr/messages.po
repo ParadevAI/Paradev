@@ -226,7 +226,6 @@ msgstr "{0, plural, one {# proje} other {# proje}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {# yanıt}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1424,12 +1423,6 @@ msgstr "{workspaceName}: host kullanılamıyor"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: kapatma başarısız"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {# worktree} other {# worktree}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{repoLabel} içinde {worktreeLabel}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "Kullanıcı başına {yearlyTotal}, yıllık faturalandırılır"
@@ -5844,6 +5837,9 @@ msgstr "Kimlik bilgisi doğrulanamadı: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Kanala eklenemediler"
 
+msgid "Couldn't add this repo"
+msgstr "Bu depo eklenemedi"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Çalışma alanından açıklama istenemedi"
 
@@ -5918,6 +5914,9 @@ msgstr "Sohbete forklanamadı"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Bu bir ajana devredilemedi"
+
+msgid "Couldn't import"
+msgstr "İçe aktarılamadı"
 
 msgid "Couldn't load {filename}"
 msgstr "{filename} yüklenemedi"
@@ -9853,8 +9852,9 @@ msgstr "İçe aktarma başarısız"
 msgid "Import failed: {message}"
 msgstr "İçe aktarma başarısız: {message}"
 
-msgid "Import from {toolNames}"
-msgstr "{toolNames} üzerinden içe aktar"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "{0} üzerinden içe aktar"
 
 msgid "Import from file"
 msgstr "Dosyadan içe aktar"
@@ -9886,13 +9886,13 @@ msgstr "İçe aktar…"
 msgid "Important"
 msgstr "Önemli"
 
+msgid "Imported"
+msgstr "İçe aktarıldı"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "{0} worktree'den {imported} tanesi içe aktarıldı: {1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "{worktreeCount} worktree'den {imported} tanesi içe aktarıldı: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "İçe aktarıldı: {joinedMessages}"

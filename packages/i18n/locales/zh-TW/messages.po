@@ -226,7 +226,6 @@ msgstr "{0, plural, one {# 個專案} other {# 個專案}}"
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, other {# 則回覆}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1424,12 +1423,6 @@ msgstr "{workspaceName}：主機不可用"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}：清理失敗"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {#個worktree} other {#個worktree}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{repoLabel}中的{worktreeLabel}"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "每使用者{yearlyTotal}，按年計費"
@@ -5844,6 +5837,9 @@ msgstr "無法驗證憑證：{reason}"
 msgid "Couldn't add them to the channel"
 msgstr "無法將他們加入頻道"
 
+msgid "Couldn't add this repo"
+msgstr "無法新增此儲存庫"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "無法請求工作區產生描述"
 
@@ -5918,6 +5914,9 @@ msgstr "無法分叉到聊天"
 
 msgid "Couldn't hand this to an agent"
 msgstr "無法交給代理程式處理"
+
+msgid "Couldn't import"
+msgstr "無法匯入"
 
 msgid "Couldn't load {filename}"
 msgstr "無法載入 {filename}"
@@ -9853,8 +9852,9 @@ msgstr "匯入失敗"
 msgid "Import failed: {message}"
 msgstr "匯入失敗：{message}"
 
-msgid "Import from {toolNames}"
-msgstr "從 {toolNames} 匯入"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "從 {0} 匯入"
 
 msgid "Import from file"
 msgstr "從檔案匯入"
@@ -9886,13 +9886,13 @@ msgstr "匯入…"
 msgid "Important"
 msgstr "重要"
 
+msgid "Imported"
+msgstr "已匯入"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "已匯入{0}個worktree中的{imported}個：{1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "已匯入{worktreeCount}個worktree中的{imported}個：{firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "已匯入{joinedMessages}"

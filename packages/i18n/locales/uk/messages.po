@@ -220,7 +220,6 @@ msgstr "{0, plural, one {# проєкт} few {# проєкти} many {# проє
 msgid "{0, plural, one {# reply} other {# replies}}"
 msgstr "{0, plural, one {# відповідь} few {# відповіді} many {# відповідей} other {# відповіді}}"
 
-#. placeholder {0}: repos.length
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
@@ -1418,12 +1417,6 @@ msgstr "{workspaceName}: хост недоступний"
 
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: не вдалося виконати очищення"
-
-msgid "{worktreeCount, plural, one {# worktree} other {# worktrees}}"
-msgstr "{worktreeCount, plural, one {# worktree} few {# worktree} many {# worktree} other {# worktree}}"
-
-msgid "{worktreeLabel} in {repoLabel}"
-msgstr "{worktreeLabel} ({repoLabel})"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за користувача в разі річної оплати"
@@ -5838,6 +5831,9 @@ msgstr "Не вдалося перевірити облікові дані: {rea
 msgid "Couldn't add them to the channel"
 msgstr "Не вдалося додати їх до каналу"
 
+msgid "Couldn't add this repo"
+msgstr "Не вдалося додати репозиторій"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Не вдалося отримати опис від робочого простору"
 
@@ -5912,6 +5908,9 @@ msgstr "Не вдалося створити форк у чаті"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Не вдалося передати це агенту"
+
+msgid "Couldn't import"
+msgstr "Не вдалося імпортувати"
 
 msgid "Couldn't load {filename}"
 msgstr "Не вдалося завантажити {filename}"
@@ -9847,8 +9846,9 @@ msgstr "Не вдалося імпортувати"
 msgid "Import failed: {message}"
 msgstr "Не вдалося імпортувати: {message}"
 
-msgid "Import from {toolNames}"
-msgstr "Імпортувати з {toolNames}"
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Імпортувати з {0}"
 
 msgid "Import from file"
 msgstr "Імпортувати з файлу"
@@ -9880,13 +9880,13 @@ msgstr "Імпортувати…"
 msgid "Important"
 msgstr "Важливо"
 
+msgid "Imported"
+msgstr "Імпортовано"
+
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
 msgid "Imported {imported} of {0} worktrees: {1}"
 msgstr "Імпортовано {imported} з {0} worktree: {1}"
-
-msgid "Imported {imported} of {worktreeCount} worktrees: {firstError}"
-msgstr "Імпортовано {imported} з {worktreeCount} worktree: {firstError}"
 
 msgid "Imported {joinedMessages}"
 msgstr "Імпортовано {joinedMessages}"
