@@ -2,7 +2,7 @@
 title: "Where to Run Coding Agents: Laptops vs a Shared Host vs Cloud Workspaces (2026)"
 description: "The tradeoffs for a small engineering team between running coding agents on personal laptops, a shared host machine, and vendor cloud workspaces: cost, uptime, access to your environment, security, and which tools support each."
 date: 2026-10-14
-lastUpdated: 2026-10-30
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - codex-app
@@ -21,7 +21,7 @@ keywords:
 
 A small team that adopts coding agents soon asks where they should run. There are three answers: each developer's laptop, a shared machine the team owns, or a vendor's cloud. Most teams use more than one.
 
-Paradev covers all three. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. Paradev cloud workspaces, in early access, run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Other vendors' clouds still work from inside Paradev: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Paradev terminal. Use your own machines for work that needs your environment, a cloud workspace for tasks that need only the repository, and Paradev to keep all three in one place.
+Paradev covers all three. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. A shared host can also be a Linux server in your own cloud account, through [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Paradev [cloud workspaces](/cloud), in beta, run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Other vendors' clouds still work from inside Paradev: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Paradev terminal. Use your own machines for work that needs your environment, a cloud workspace for tasks that need only the repository, and Paradev to keep all three in one place.
 
 This guide compares the three on what matters day to day: whether agents keep working when you walk away, whether they can reach your real environment, what it costs, and what it exposes.
 
@@ -38,7 +38,7 @@ This guide compares the three on what matters day to day: whether agents keep wo
 | **Parallel capacity** | Limited by one laptop's CPU and memory | Limited by the host; you can add hosts | Scales with the vendor's machines |
 | **Security exposure** | Each developer's own machine | Everything on the host is reachable by people you grant access | Code and credentials live in the vendor's cloud |
 | **Setup** | None | One machine to provision and keep updated | Per-vendor environment setup |
-| **Tools that support it** | Paradev, Claude Code, Codex, Cursor, Conductor | Paradev (Remote Access host), VS Code Remote-SSH, SSH with tmux | Paradev cloud workspaces (early access), Codex cloud, Cursor cloud agents, Claude Code on the web, Devin |
+| **Tools that support it** | Paradev, Claude Code, Codex, Cursor, Conductor | Paradev (Remote Access host or Bring Your Own Cloud server), VS Code Remote-SSH, SSH with tmux | Paradev cloud workspaces (beta), Codex cloud, Cursor cloud agents, Claude Code on the web, Devin |
 
 ## Personal Laptops
 
@@ -58,13 +58,13 @@ What to plan for:
 - **Give it only what agents need.** Anyone you grant access to the host can reach what it can reach: files, terminals, and agent runs. Provision it with only the repositories and credentials you intend to share, and keep it separate from anyone's main workstation.
 - **Watch capacity.** Several agents plus their builds and dev servers add up. Add a second host rather than overloading one.
 
-Tools that support this: [Paradev](/) adds a macOS or Linux machine as a host through Remote Access, with each task in its own Git worktree and terminal, and developers reach it from the desktop app or the [iPhone and iPad app](/mobile). On a dedicated machine, run the host service from the standalone CLI so it keeps running without the desktop app; see [Keep Agents Running](https://docs.paradev.com/keep-agents-running) and [Remote Access](https://docs.paradev.com/remote-access). Cursor can also run its agents on self-hosted machines and worker pools, Factory's Droid can run on your own machine through its relay, Amp has shared team runners, and [Paseo](/compare/superset-vs-paseo) is a self-hosted daemon.
+Tools that support this: [Paradev](/) adds a macOS or Linux machine as a host through Remote Access, with each task in its own Git worktree and terminal, and developers reach it from the desktop app or the [iPhone and iPad app](/mobile). On a dedicated machine, run the host service from the standalone CLI so it keeps running without the desktop app; see [Keep Agents Running](https://docs.paradev.com/keep-agents-running) and [Remote Access](https://docs.paradev.com/remote-access). If the shared machine should be a server in your own cloud account, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server. Repos and agent sign-ins stay on that server, and it needs no inbound ports: it connects out to the relay. Cursor can also run its agents on self-hosted machines and worker pools, Factory's Droid can run on your own machine through its relay, Amp has shared team runners, and [Paseo](/compare/superset-vs-paseo) is a self-hosted daemon.
 
 **Best for:** teams that want agents working overnight on their real environment, on hardware they control.
 
 ## Vendor Cloud Workspaces
 
-Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. Paradev has cloud workspaces too, in early access, available from desktop, iPhone, and iPad without keeping your own computer connected. You hand off a task, close your laptop, and review the result later.
+Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. Paradev has cloud workspaces too, in beta, available from desktop, iPhone, and iPad without keeping your own computer connected. You hand off a task, close your laptop, and review the result later.
 
 The tradeoffs:
 
