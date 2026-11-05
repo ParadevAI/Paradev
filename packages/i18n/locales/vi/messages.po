@@ -2323,6 +2323,9 @@ msgstr "Agent không thể truy cập các công cụ của {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
+msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
+msgstr "Agent trong các workspace cloud của bạn khi đó có thể chạy các lệnh như <0>--host</0> trên host này. Host phải truy cập được qua relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính, iPhone hoặc iPad."
 
@@ -2565,6 +2568,9 @@ msgstr "Cho phép trong phiên này"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Cho phép truy cập micro để dùng đọc chính tả"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Cho phép workspace cloud của tôi truy cập host này"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Cho phép truy cập từ xa vào thiết bị này qua relay"
@@ -2824,6 +2830,9 @@ msgstr "bất kỳ điều gì"
 
 msgid "Anything else? (optional)"
 msgstr "Còn gì nữa không? (không bắt buộc)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Mọi thứ chạy trong một workspace cloud do bạn tạo khi đó đều có thể tạo workspace, khởi động agent và chạy lệnh trên host này, kể cả một agent làm theo chỉ dẫn mà nó tìm thấy trong một trang web hoặc một repository. Chỉ bật khi bạn cần."
 
 msgid "Anywhere"
 msgstr "Mọi nơi"
@@ -10833,6 +10842,9 @@ msgstr "Cho phép agent dùng thông tin đăng nhập {browserName} của bạn
 msgid "Let the agent drive."
 msgstr "Để agent điều khiển."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Cho phép workspace cloud của bạn truy cập host này?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Cho phép tổ chức của bạn liệt kê và clone repository"
 
@@ -18548,6 +18560,9 @@ msgstr "Ngừng theo dõi"
 msgid "Stop workspace run command"
 msgstr "Dừng lệnh chạy của workspace"
 
+msgid "Stop your cloud workspaces reaching this host?"
+msgstr "Ngừng cho workspace cloud của bạn truy cập host này?"
+
 msgid "stopped"
 msgstr "đã dừng"
 
@@ -20403,6 +20418,9 @@ msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
 
+msgid "Turn off"
+msgstr "Tắt"
+
 msgid "Turn off manual mode"
 msgstr "Tắt chế độ thủ công"
 
@@ -22060,6 +22078,9 @@ msgstr "Các thay đổi của bạn"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Thay đổi của bạn sẽ mất nếu không lưu."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Workspace cloud của bạn sẽ không thể truy cập host này nữa."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Code của bạn mặc định ở lại cục bộ, với quyền kiểm soát rõ ràng đối với các dịch vụ đã kết nối."

@@ -2323,6 +2323,9 @@ msgstr "Agents kunnen de tools van {0} niet bereiken"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents voltooien routinetickets zonder tussentijds ingrijpen."
 
+msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
+msgstr "Agents in je cloudwerkruimtes kunnen dan opdrachten zoals <0>--host</0> op deze host uitvoeren. De host moet bereikbaar zijn via de relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agents blijven werken in de cloud. Open de werkruimte opnieuw op desktop, iPhone of iPad."
 
@@ -2565,6 +2568,9 @@ msgstr "Toestaan voor deze sessie"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Geef toegang tot de microfoon om te dicteren"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Mijn cloudwerkruimtes toegang geven tot deze host"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Externe toegang tot dit apparaat via de relay toestaan"
@@ -2824,6 +2830,9 @@ msgstr "wat dan ook"
 
 msgid "Anything else? (optional)"
 msgstr "Nog iets? (optioneel)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Alles wat draait in een cloudwerkruimte die je hebt gemaakt, kan dan op deze host werkruimtes aanmaken, agents starten en opdrachten uitvoeren, ook een agent die instructies volgt die hij op een webpagina of in een repository vond. Zet dit alleen aan als je het nodig hebt."
 
 msgid "Anywhere"
 msgstr "Overal"
@@ -10833,6 +10842,9 @@ msgstr "Een agent je {browserName}-aanmeldingen laten gebruiken?"
 msgid "Let the agent drive."
 msgstr "Laat de agent sturen."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Je cloudwerkruimtes toegang geven tot deze host?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Laat je organisatie repositories weergeven en klonen"
 
@@ -18548,6 +18560,9 @@ msgstr "Stoppen met volgen"
 msgid "Stop workspace run command"
 msgstr "Run-commando van werkruimte stoppen"
 
+msgid "Stop your cloud workspaces reaching this host?"
+msgstr "De toegang van je cloudwerkruimtes tot deze host stoppen?"
+
 msgid "stopped"
 msgstr "gestopt"
 
@@ -20403,6 +20418,9 @@ msgstr "Maak van routineklussen agents die op een schema draaien of wanneer er e
 msgid "Turn Fast mode on or off"
 msgstr "Snelle modus in- of uitschakelen"
 
+msgid "Turn off"
+msgstr "Uitzetten"
+
 msgid "Turn off manual mode"
 msgstr "Handmatige modus uitzetten"
 
@@ -22060,6 +22078,9 @@ msgstr "Jouw wijzigingen"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Je wijzigingen gaan verloren als je ze niet opslaat."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Je cloudwerkruimtes hebben geen toegang meer tot deze host."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Je code blijft standaard lokaal, met expliciete controle over gekoppelde diensten."

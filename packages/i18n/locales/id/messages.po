@@ -2323,6 +2323,9 @@ msgstr "Agen tidak dapat menjangkau alat {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agen menyelesaikan tiket rutin tanpa intervensi di tengah tugas."
 
+msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
+msgstr "Agen di workspace cloud Anda lalu bisa menjalankan perintah seperti <0>--host</0> di host ini. Host harus bisa dijangkau melalui relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop, iPhone, atau iPad."
 
@@ -2565,6 +2568,9 @@ msgstr "Izinkan untuk sesi ini"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Izinkan akses mikrofon untuk memakai dikte"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Izinkan workspace cloud saya menjangkau host ini"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Izinkan akses jarak jauh ke perangkat ini melalui relay"
@@ -2824,6 +2830,9 @@ msgstr "apa saja"
 
 msgid "Anything else? (optional)"
 msgstr "Ada lagi? (opsional)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Apa pun yang berjalan di workspace cloud yang Anda buat lalu bisa membuat workspace, memulai agen, dan menjalankan perintah di host ini, termasuk agen yang mengikuti instruksi yang ditemukannya di halaman web atau repositori. Aktifkan hanya jika Anda membutuhkannya."
 
 msgid "Anywhere"
 msgstr "Di mana saja"
@@ -10833,6 +10842,9 @@ msgstr "Izinkan agen memakai login {browserName} Anda?"
 msgid "Let the agent drive."
 msgstr "Biarkan agen yang mengemudi."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Izinkan workspace cloud Anda menjangkau host ini?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Memungkinkan organisasi Anda menampilkan dan mengkloning repositori"
 
@@ -18548,6 +18560,9 @@ msgstr "Berhenti memantau"
 msgid "Stop workspace run command"
 msgstr "Hentikan perintah run workspace"
 
+msgid "Stop your cloud workspaces reaching this host?"
+msgstr "Hentikan akses workspace cloud Anda ke host ini?"
+
 msgid "stopped"
 msgstr "berhenti"
 
@@ -20403,6 +20418,9 @@ msgstr "Ubah pekerjaan rutin menjadi agen yang berjalan sesuai jadwal atau saat 
 msgid "Turn Fast mode on or off"
 msgstr "Aktifkan atau nonaktifkan mode cepat"
 
+msgid "Turn off"
+msgstr "Matikan"
+
 msgid "Turn off manual mode"
 msgstr "Matikan mode manual"
 
@@ -22060,6 +22078,9 @@ msgstr "Perubahan Anda"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Perubahan Anda akan hilang kalau tidak disimpan."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Workspace cloud Anda tidak akan bisa lagi menjangkau host ini."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kode Anda tetap lokal secara bawaan, dengan kendali eksplisit atas layanan yang terhubung."

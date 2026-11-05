@@ -2323,6 +2323,9 @@ msgstr "Agenci nie mają dostępu do narzędzi {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agenci kończą rutynowe zgłoszenia bez interwencji w trakcie zadania."
 
+msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
+msgstr "Agenci w Twoich obszarach roboczych w chmurze będą mogli uruchamiać na tym hoście polecenia takie jak <0>--host</0>. Host musi być osiągalny przez przekaźnik."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agenci pracują dalej w chmurze. Otwórz obszar roboczy ponownie na komputerze, iPhonie lub iPadzie."
 
@@ -2565,6 +2568,9 @@ msgstr "Zezwól na czas sesji"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Zezwól na dostęp do mikrofonu, aby korzystać z dyktowania"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Zezwól moim obszarom roboczym w chmurze na dostęp do tego hosta"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Zezwól na zdalny dostęp do tego urządzenia przez przekaźnik"
@@ -2824,6 +2830,9 @@ msgstr "cokolwiek"
 
 msgid "Anything else? (optional)"
 msgstr "Coś jeszcze? (opcjonalnie)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Wszystko, co działa w utworzonym przez Ciebie obszarze roboczym w chmurze, będzie mogło tworzyć obszary robocze, uruchamiać agentów i wykonywać polecenia na tym hoście — w tym agent wykonujący instrukcje znalezione na stronie internetowej lub w repozytorium. Włącz to tylko wtedy, gdy jest potrzebne."
 
 msgid "Anywhere"
 msgstr "Wszędzie"
@@ -10833,6 +10842,9 @@ msgstr "Pozwolić agentowi używać Twoich zalogowanych sesji z {browserName}?"
 msgid "Let the agent drive."
 msgstr "Pozwól agentowi działać."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Zezwolić Twoim obszarom roboczym w chmurze na dostęp do tego hosta?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Pozwala organizacji wyświetlać i klonować repozytoria"
 
@@ -18548,6 +18560,9 @@ msgstr "Przestań obserwować"
 msgid "Stop workspace run command"
 msgstr "Zatrzymaj polecenie uruchamiania obszaru roboczego"
 
+msgid "Stop your cloud workspaces reaching this host?"
+msgstr "Zablokować Twoim obszarom roboczym w chmurze dostęp do tego hosta?"
+
 msgid "stopped"
 msgstr "zatrzymana"
 
@@ -20403,6 +20418,9 @@ msgstr "Zamień rutynowe zadania w agentów, którzy działają według harmonog
 msgid "Turn Fast mode on or off"
 msgstr "Włącz lub wyłącz tryb szybki"
 
+msgid "Turn off"
+msgstr "Wyłącz"
+
 msgid "Turn off manual mode"
 msgstr "Wyłącz tryb ręczny"
 
@@ -22060,6 +22078,9 @@ msgstr "Twoje zmiany"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Twoje zmiany zostaną utracone, jeśli ich nie zapiszesz."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Twoje obszary robocze w chmurze nie będą już miały dostępu do tego hosta."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Twój kod domyślnie zostaje lokalnie, z jawną kontrolą nad podłączonymi usługami."

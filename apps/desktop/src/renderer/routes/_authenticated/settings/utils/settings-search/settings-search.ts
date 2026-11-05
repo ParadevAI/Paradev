@@ -111,6 +111,7 @@ export const SETTING_ITEM_ID = {
 		"security-expose-host-service-via-relay",
 
 	HOST_MEMBERS: "host-members",
+	HOST_ALLOW_CLOUD_WORKSPACES: "host-allow-cloud-workspaces",
 	ENVIRONMENTS_LIST: "environments-list",
 	AGENT_ACCOUNTS: "agent-accounts",
 	CONNECTIONS: "connections",
@@ -274,6 +275,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.MOBILE_APP]: "shared",
 
 	[SETTING_ITEM_ID.HOST_MEMBERS]: "shared",
+	[SETTING_ITEM_ID.HOST_ALLOW_CLOUD_WORKSPACES]: "shared",
 	[SETTING_ITEM_ID.ENVIRONMENTS_LIST]: "v2",
 	[SETTING_ITEM_ID.AGENT_ACCOUNTS]: "v2",
 	[SETTING_ITEM_ID.CONNECTIONS]: "v2",
@@ -1910,6 +1912,23 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"host service",
 			"tunnel",
 			"attack surface",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.HOST_ALLOW_CLOUD_WORKSPACES,
+		section: "hosts",
+		title: "Allow my cloud workspaces to reach this host",
+		description:
+			"Lets agents in your cloud workspaces call a host you own through the relay",
+		keywords: [
+			"security",
+			"cloud",
+			"cloud workspace",
+			"sandbox",
+			"relay",
+			"remote",
+			"--host",
+			"agent",
 		],
 	},
 	{

@@ -2323,6 +2323,9 @@ msgstr "Agenti nemají přístup k nástrojům {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agenti dokončí rutinní tickety bez zásahu uprostřed úkolu."
 
+msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
+msgstr "Agenti ve vašich cloudových pracovních prostorech pak mohou na tomto hostu spouštět příkazy jako <0>--host</0>. Host musí být dostupný přes relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agenti pracují dál v cloudu. Pracovní prostor znovu otevřete na počítači, iPhonu nebo iPadu."
 
@@ -2565,6 +2568,9 @@ msgstr "Povolit pro relaci"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Pro diktování povolte přístup k mikrofonu"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Povolit mým cloudovým pracovním prostorům přístup k tomuto hostu"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Povolit vzdálený přístup k tomuto zařízení přes relay"
@@ -2824,6 +2830,9 @@ msgstr "cokoli"
 
 msgid "Anything else? (optional)"
 msgstr "Ještě něco? (nepovinné)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Cokoli, co běží v cloudovém pracovním prostoru, který jste vytvořili, pak může na tomto hostu vytvářet pracovní prostory, spouštět agenty a provádět příkazy, včetně agenta, který se řídí pokyny nalezenými na webové stránce nebo v repozitáři. Zapněte to, jen pokud to potřebujete."
 
 msgid "Anywhere"
 msgstr "Kdekoli"
@@ -10833,6 +10842,9 @@ msgstr "Povolit agentovi používat vaše přihlášení z {browserName}?"
 msgid "Let the agent drive."
 msgstr "Nechte agenta řídit."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Povolit vašim cloudovým pracovním prostorům přístup k tomuto hostu?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Umožňuje organizaci vypisovat a klonovat repozitáře"
 
@@ -18548,6 +18560,9 @@ msgstr "Přestat sledovat"
 msgid "Stop workspace run command"
 msgstr "Zastavit spouštěcí příkaz pracovního prostoru"
 
+msgid "Stop your cloud workspaces reaching this host?"
+msgstr "Zakázat vašim cloudovým pracovním prostorům přístup k tomuto hostu?"
+
 msgid "stopped"
 msgstr "zastaveno"
 
@@ -20403,6 +20418,9 @@ msgstr "Proměňte rutinní práci v agenty, kteří běží podle plánu nebo p
 msgid "Turn Fast mode on or off"
 msgstr "Zapnout nebo vypnout rychlý režim"
 
+msgid "Turn off"
+msgstr "Vypnout"
+
 msgid "Turn off manual mode"
 msgstr "Vypnout ruční režim"
 
@@ -22060,6 +22078,9 @@ msgstr "Vaše změny"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Pokud změny neuložíte, budou ztraceny."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Vaše cloudové pracovní prostory už k tomuto hostu nebudou mít přístup."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Váš kód zůstává ve výchozím stavu lokálně a připojené služby máte výslovně pod kontrolou."

@@ -2323,6 +2323,9 @@ msgstr "Агенты не могут получить доступ к инстр
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Агенты закрывают рутинные тикеты без вмешательства по ходу задачи."
 
+msgid "Agents in your cloud workspaces can then run commands like <0>--host</0> against this host. The host must be reachable through the relay."
+msgstr "Агенты в ваших облачных рабочих областях смогут запускать на этом хосте команды вроде <0>--host</0>. Хост должен быть доступен через реле."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенты продолжают работать в облаке. Снова откройте рабочую область на компьютере, iPhone или iPad."
 
@@ -2565,6 +2568,9 @@ msgstr "Разрешить на сессию"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Разрешите доступ к микрофону, чтобы использовать диктовку"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Разрешить моим облачным рабочим областям доступ к этому хосту"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Разрешить удалённый доступ к этому устройству через реле"
@@ -2824,6 +2830,9 @@ msgstr "что угодно"
 
 msgid "Anything else? (optional)"
 msgstr "Что-нибудь ещё? (необязательно)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Всё, что работает в созданной вами облачной рабочей области, сможет создавать рабочие области, запускать агентов и выполнять команды на этом хосте — в том числе агент, который следует инструкциям, найденным на веб-странице или в репозитории. Включайте, только если это нужно."
 
 msgid "Anywhere"
 msgstr "Везде"
@@ -10833,6 +10842,9 @@ msgstr "Разрешить агенту использовать ваши вхо
 msgid "Let the agent drive."
 msgstr "Пусть агент управляет."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Разрешить вашим облачным рабочим областям доступ к этому хосту?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Позволяет организации видеть и клонировать репозитории"
 
@@ -18548,6 +18560,9 @@ msgstr "Прекратить отслеживание"
 msgid "Stop workspace run command"
 msgstr "Остановить команду запуска рабочей области"
 
+msgid "Stop your cloud workspaces reaching this host?"
+msgstr "Закрыть вашим облачным рабочим областям доступ к этому хосту?"
+
 msgid "stopped"
 msgstr "остановлена"
 
@@ -20403,6 +20418,9 @@ msgstr "Превратите рутину в агентов, которые за
 msgid "Turn Fast mode on or off"
 msgstr "Включить или выключить быстрый режим"
 
+msgid "Turn off"
+msgstr "Выключить"
+
 msgid "Turn off manual mode"
 msgstr "Отключить ручной режим"
 
@@ -22060,6 +22078,9 @@ msgstr "Ваши изменения"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Изменения будут потеряны, если их не сохранить."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Ваши облачные рабочие области больше не смогут получить доступ к этому хосту."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Ваш код по умолчанию остаётся локальным, с явным контролем над подключёнными сервисами."
