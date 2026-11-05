@@ -6,7 +6,7 @@ import {
 	markChatSessionClosed,
 } from "../closedChatSessions";
 import { addPendingChatStop, readPendingChatStops } from "../pendingChatStops";
-import { focusChatSession } from "./focusChatSession";
+import { addChatTab, focusChatSession } from "./focusChatSession";
 
 const session = {
 	sessionId: "chat-1",
@@ -70,15 +70,23 @@ describe("focusChatSession", () => {
 		).toBe("added");
 	});
 
-	it("finds an existing chat without moving focus to it", () => {
+	it("adds a chat tab even when a pane shows the same agent session", () => {
 		const store = newStore();
-		expect(focusChatSession({ store, session, focus: false })).toBe("added");
+		focusChatSession({ store, session });
 		store.getState().addTab({
 			panes: [{ kind: "terminal", data: { terminalId: "active" } }],
 		});
-		const activeTabId = store.getState().activeTabId;
-		expect(focusChatSession({ store, session, focus: false })).toBe("focused");
-		expect(store.getState().tabs).toHaveLength(2);
-		expect(store.getState().activeTabId).toBe(activeTabId);
+		addChatTab({
+			store,
+			session: { ...session, sessionId: "chat-resumed", terminalId: "t-2" },
+			focus: false,
+		});
+		const tabs = store.getState().tabs;
+		expect(tabs).toHaveLength(3);
+		expect(Object.values(tabs[2]?.panes ?? {})[0]?.data).toMatchObject({
+			sessionId: "chat-resumed",
+			terminalId: "t-2",
+			agent: { id: "claude", sessionId: "native-1" },
+		});
 	});
 });

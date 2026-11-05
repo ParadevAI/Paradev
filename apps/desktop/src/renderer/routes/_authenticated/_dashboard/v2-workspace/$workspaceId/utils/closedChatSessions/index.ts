@@ -1,7 +1,7 @@
 export {
+	ignoreChatTerminal,
 	isChatSessionClosed,
-	isChatTerminalClosed,
+	isChatTerminalIgnored,
 	markChatSessionClosed,
-	markChatTerminalClosed,
 	reopenChatSession,
 } from "./closedChatSessions";

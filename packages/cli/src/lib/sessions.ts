@@ -59,7 +59,7 @@ function sessionsClient(client: HostServiceClient): SessionsClient {
 export function desktopTabNote(opened: boolean): string {
 	return opened
 		? ", opened in a desktop tab"
-		: ". No desktop tab was opened (no desktop app is attached to this host); the Paradev desktop app adds one when it shows this workspace";
+		: ". No desktop tab was opened yet; the Paradev desktop app adds one when it shows this workspace";
 }
 
 export async function resolveSessionWorkspace(

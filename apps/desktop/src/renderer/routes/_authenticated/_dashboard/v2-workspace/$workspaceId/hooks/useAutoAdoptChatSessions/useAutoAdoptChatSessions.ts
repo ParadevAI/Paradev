@@ -1,4 +1,4 @@
-import type { WorkspaceStore } from "@superset/panes";
+import { createWorkspaceStore, type WorkspaceStore } from "@superset/panes";
 import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
@@ -6,7 +6,7 @@ import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWo
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../types";
-import { focusChatSession } from "../../utils/focusChatSession";
+import { addChatTab } from "../../utils/focusChatSession";
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { CHAT_ADOPT_POLL_MS, CHAT_ADOPT_SESSIONS_LIMIT } from "./constants";
 import { chatSessionsToAdopt } from "./utils/chatSessionsToAdopt";
@@ -57,16 +57,37 @@ export function useAutoAdoptChatSessions({
 
 	useEffect(() => {
 		if (!isLayoutReady || !sessions || isFetchingSessions) return;
-		const state = store.getState();
-		const toAdopt = chatSessionsToAdopt(sessions, [
-			...state.tabs,
-			...linkedStores.flatMap((linked) => linked.getState().tabs),
-		]);
+		const { version, tabs, activeTabId } = store.getState();
+		const toAdopt = chatSessionsToAdopt({
+			sessions,
+			tabs: [
+				...tabs,
+				...linkedStores.flatMap((linked) => linked.getState().tabs),
+			],
+			workspaceId,
+			now: Date.now(),
+		});
 		if (toAdopt.length === 0) return;
-		const restoreActiveTabId = state.tabs.length > 0 ? state.activeTabId : null;
+		// One write with the user's tab still selected: `addTab` selects each new
+		// tab, and a selection change alone is not saved.
+		const next = createWorkspaceStore<PaneViewerData>({
+			initialState: { version, tabs, activeTabId },
+		});
 		for (const session of toAdopt) {
-			focusChatSession({ store, linkedStores, session, focus: false });
+			addChatTab({ store: next, session, focus: false });
 		}
-		if (restoreActiveTabId) store.getState().setActiveTab(restoreActiveTabId);
-	}, [isLayoutReady, isFetchingSessions, sessions, store, linkedStores]);
+		if (activeTabId) next.getState().setActiveTab(activeTabId);
+		store.getState().replaceState({
+			version,
+			tabs: next.getState().tabs,
+			activeTabId: next.getState().activeTabId,
+		});
+	}, [
+		isLayoutReady,
+		isFetchingSessions,
+		sessions,
+		store,
+		linkedStores,
+		workspaceId,
+	]);
 }

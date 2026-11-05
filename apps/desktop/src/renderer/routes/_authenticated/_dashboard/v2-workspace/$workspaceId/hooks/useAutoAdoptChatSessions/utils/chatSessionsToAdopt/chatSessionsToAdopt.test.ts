@@ -1,34 +1,62 @@
-import { describe, expect, it } from "bun:test";
+import { afterEach, describe, expect, it } from "bun:test";
 import { createWorkspaceStore } from "@superset/panes";
 import {
 	type PaneViewerData,
 	PENDING_CLOUD_CHAT_PANE_KIND,
 } from "../../../../types";
 import {
+	ignoreChatTerminal,
 	markChatSessionClosed,
-	markChatTerminalClosed,
-	reopenChatSession,
 } from "../../../../utils/closedChatSessions";
+import {
+	addPendingChatStop,
+	removePendingChatStop,
+} from "../../../../utils/pendingChatStops";
+import { CHAT_ADOPT_MAX_IDLE_MS } from "../../constants";
 import { chatSessionsToAdopt } from "./chatSessionsToAdopt";
+
+const NOW = 10 * CHAT_ADOPT_MAX_IDLE_MS;
+const WORKSPACE_ID = "workspace-1";
 
 const listed = (sessionId: string, overrides = {}) => ({
 	sessionId,
 	harness: "claude-acp",
 	harnessSessionId: `native-${sessionId}`,
 	title: `Chat ${sessionId}`,
-	updatedAt: 1,
+	updatedAt: NOW - 1000,
 	live: true,
 	terminalId: `terminal-${sessionId}`,
 	...overrides,
 });
 
+const adoptedIds = (
+	sessions: ReturnType<typeof listed>[],
+	tabs = createWorkspaceStore<PaneViewerData>().getState().tabs,
+) =>
+	chatSessionsToAdopt({
+		sessions,
+		tabs,
+		workspaceId: WORKSPACE_ID,
+		now: NOW,
+	}).map((target) => target.sessionId);
+
+const cleanups: Array<() => void> = [];
+afterEach(() => {
+	for (const cleanup of cleanups.splice(0)) cleanup();
+});
+
 describe("chatSessionsToAdopt", () => {
 	it("adopts live chats no pane shows, oldest first", () => {
 		expect(
-			chatSessionsToAdopt(
-				[listed("new", { updatedAt: 2 }), listed("old", { updatedAt: 1 })],
-				[],
-			),
+			chatSessionsToAdopt({
+				sessions: [
+					listed("new", { updatedAt: NOW - 1 }),
+					listed("old", { updatedAt: NOW - 2 }),
+				],
+				tabs: [],
+				workspaceId: WORKSPACE_ID,
+				now: NOW,
+			}),
 		).toEqual([
 			{
 				sessionId: "old",
@@ -47,7 +75,17 @@ describe("chatSessionsToAdopt", () => {
 		]);
 	});
 
-	it("skips dead, unsupported, closed, and already shown chats", () => {
+	it("adopts a chat started without a terminal under its session id", () => {
+		const [target] = chatSessionsToAdopt({
+			sessions: [listed("mobile", { terminalId: null })],
+			tabs: [],
+			workspaceId: WORKSPACE_ID,
+			now: NOW,
+		});
+		expect(target?.terminalId).toBe("mobile");
+	});
+
+	it("skips dead, idle, unsupported, closed, and already shown chats", () => {
 		const store = createWorkspaceStore<PaneViewerData>();
 		store.getState().addTab({
 			panes: [
@@ -85,26 +123,39 @@ describe("chatSessionsToAdopt", () => {
 				},
 			],
 		});
-		markChatSessionClosed("closed");
-		const reopenTerminal = markChatTerminalClosed("terminal-stray");
-		try {
-			expect(
-				chatSessionsToAdopt(
-					[
-						listed("dead", { live: false }),
-						listed("unknown", { harness: "unknown" }),
-						listed("closed"),
-						listed("shown"),
-						listed("creating"),
-						listed("pending"),
-						listed("stray"),
-					],
-					store.getState().tabs,
-				),
-			).toEqual([]);
-		} finally {
-			reopenChatSession("closed");
-			reopenTerminal();
-		}
+		cleanups.push(markChatSessionClosed("closed"));
+		expect(
+			adoptedIds(
+				[
+					listed("dead", { live: false }),
+					listed("idle", { updatedAt: NOW - CHAT_ADOPT_MAX_IDLE_MS - 1 }),
+					listed("unknown", { harness: "unknown" }),
+					listed("closed"),
+					listed("shown"),
+					listed("creating"),
+					listed("pending"),
+				],
+				store.getState().tabs,
+			),
+		).toEqual([]);
+	});
+
+	it("skips chats on an ignored terminal, such as a closed tab's or a fork loader's", () => {
+		cleanups.push(ignoreChatTerminal("terminal-stray"));
+		expect(adoptedIds([listed("stray"), listed("other")])).toEqual(["other"]);
+	});
+
+	it("skips chats another window is stopping, by session or terminal", () => {
+		addPendingChatStop(WORKSPACE_ID, "stopping");
+		addPendingChatStop(WORKSPACE_ID, "replaced", "terminal-leaked");
+		addPendingChatStop("other-workspace", "elsewhere");
+		cleanups.push(
+			() => removePendingChatStop("stopping"),
+			() => removePendingChatStop("replaced"),
+			() => removePendingChatStop("elsewhere"),
+		);
+		expect(
+			adoptedIds([listed("stopping"), listed("leaked"), listed("elsewhere")]),
+		).toEqual(["elsewhere"]);
 	});
 });

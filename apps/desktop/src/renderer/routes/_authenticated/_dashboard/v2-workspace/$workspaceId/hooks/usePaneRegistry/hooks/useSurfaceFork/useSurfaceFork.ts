@@ -5,6 +5,7 @@ import type { CreatePaneInput, RendererContext } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
+import { ignoreChatTerminal } from "../../../../utils/closedChatSessions";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
 
@@ -60,6 +61,7 @@ export function useSurfaceFork(
 			// loaded into a hidden one. It needs its own terminal id: the CLI's would
 			// rebind that terminal's agent.
 			const loaderTerminalId = crypto.randomUUID();
+			ignoreChatTerminal(loaderTerminalId);
 			const loader = await transport.createSession({
 				commandId: crypto.randomUUID(),
 				workspaceId,
@@ -131,6 +133,7 @@ export function useSurfaceFork(
 			}
 
 			const terminalId = crypto.randomUUID();
+			ignoreChatTerminal(terminalId);
 			const toastId = toast.loading(t({ message: "Forking into a chat…" }));
 			try {
 				const forked = await forkIntoChat(
