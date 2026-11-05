@@ -5837,6 +5837,9 @@ msgstr "Tidak dapat memverifikasi kredensial: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Tidak dapat menambahkan mereka ke kanal"
 
+msgid "Couldn't add this repo"
+msgstr "Gagal menambahkan repo ini"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Tidak dapat meminta deskripsi dari workspace"
 
@@ -5911,6 +5914,9 @@ msgstr "Tidak dapat melakukan fork ke chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Tidak dapat menyerahkan ini ke agen"
+
+msgid "Couldn't import"
+msgstr "Gagal mengimpor"
 
 msgid "Couldn't load {filename}"
 msgstr "Tidak dapat memuat {filename}"
@@ -9846,6 +9852,10 @@ msgstr "Impor gagal"
 msgid "Import failed: {message}"
 msgstr "Impor gagal: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Impor dari {0}"
+
 msgid "Import from file"
 msgstr "Impor dari file"
 
@@ -9875,6 +9885,9 @@ msgstr "Impor…"
 
 msgid "Important"
 msgstr "Penting"
+
+msgid "Imported"
+msgstr "Diimpor"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

@@ -5837,6 +5837,9 @@ msgstr "자격 증명을 확인하지 못했습니다: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "채널에 추가하지 못했습니다"
 
+msgid "Couldn't add this repo"
+msgstr "이 리포지토리를 추가할 수 없습니다"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "워크스페이스에 설명을 요청하지 못했습니다"
 
@@ -5911,6 +5914,9 @@ msgstr "채팅으로 포크할 수 없습니다"
 
 msgid "Couldn't hand this to an agent"
 msgstr "에이전트에게 넘길 수 없습니다"
+
+msgid "Couldn't import"
+msgstr "가져오지 못했습니다"
 
 msgid "Couldn't load {filename}"
 msgstr "{filename}을(를) 불러올 수 없습니다"
@@ -9846,6 +9852,10 @@ msgstr "가져오기 실패"
 msgid "Import failed: {message}"
 msgstr "가져오기 실패: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "{0}에서 가져오기"
+
 msgid "Import from file"
 msgstr "파일에서 가져오기"
 
@@ -9875,6 +9885,9 @@ msgstr "가져오기…"
 
 msgid "Important"
 msgstr "중요"
+
+msgid "Imported"
+msgstr "가져왔습니다"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

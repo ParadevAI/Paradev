@@ -5837,6 +5837,9 @@ msgstr "Không xác minh được thông tin đăng nhập: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Không thể thêm họ vào kênh"
 
+msgid "Couldn't add this repo"
+msgstr "Không thể thêm repo này"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Không thể yêu cầu không gian làm việc tạo mô tả"
 
@@ -5911,6 +5914,9 @@ msgstr "Không thể fork sang chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Không thể giao việc này cho agent"
+
+msgid "Couldn't import"
+msgstr "Không thể nhập"
 
 msgid "Couldn't load {filename}"
 msgstr "Không thể tải {filename}"
@@ -9846,6 +9852,10 @@ msgstr "Nhập thất bại"
 msgid "Import failed: {message}"
 msgstr "Nhập thất bại: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Nhập từ {0}"
+
 msgid "Import from file"
 msgstr "Nhập từ tệp"
 
@@ -9875,6 +9885,9 @@ msgstr "Nhập…"
 
 msgid "Important"
 msgstr "Quan trọng"
+
+msgid "Imported"
+msgstr "Đã nhập"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

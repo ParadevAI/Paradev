@@ -5837,6 +5837,9 @@ msgstr "Kimlik bilgisi doğrulanamadı: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Kanala eklenemediler"
 
+msgid "Couldn't add this repo"
+msgstr "Bu depo eklenemedi"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Çalışma alanından açıklama istenemedi"
 
@@ -5911,6 +5914,9 @@ msgstr "Sohbete forklanamadı"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Bu bir ajana devredilemedi"
+
+msgid "Couldn't import"
+msgstr "İçe aktarılamadı"
 
 msgid "Couldn't load {filename}"
 msgstr "{filename} yüklenemedi"
@@ -9846,6 +9852,10 @@ msgstr "İçe aktarma başarısız"
 msgid "Import failed: {message}"
 msgstr "İçe aktarma başarısız: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "{0} üzerinden içe aktar"
+
 msgid "Import from file"
 msgstr "Dosyadan içe aktar"
 
@@ -9875,6 +9885,9 @@ msgstr "İçe aktar…"
 
 msgid "Important"
 msgstr "Önemli"
+
+msgid "Imported"
+msgstr "İçe aktarıldı"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

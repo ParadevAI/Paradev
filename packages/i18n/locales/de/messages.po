@@ -5837,6 +5837,9 @@ msgstr "Die Zugangsdaten konnten nicht überprüft werden: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Konnte sie nicht zum Kanal hinzufügen"
 
+msgid "Couldn't add this repo"
+msgstr "Repo konnte nicht hinzugefügt werden"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Der Arbeitsbereich konnte nicht nach einer Beschreibung gefragt werden"
 
@@ -5911,6 +5914,9 @@ msgstr "Sitzung konnte nicht in einen Chat geforkt werden"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Konnte nicht an einen Agenten übergeben werden"
+
+msgid "Couldn't import"
+msgstr "Import fehlgeschlagen"
 
 msgid "Couldn't load {filename}"
 msgstr "{filename} konnte nicht geladen werden"
@@ -9846,6 +9852,10 @@ msgstr "Import fehlgeschlagen"
 msgid "Import failed: {message}"
 msgstr "Import fehlgeschlagen: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Aus {0} importieren"
+
 msgid "Import from file"
 msgstr "Aus Datei importieren"
 
@@ -9875,6 +9885,9 @@ msgstr "Importieren…"
 
 msgid "Important"
 msgstr "Wichtig"
+
+msgid "Imported"
+msgstr "Importiert"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

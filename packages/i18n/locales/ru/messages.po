@@ -5837,6 +5837,9 @@ msgstr "Не удалось проверить учётные данные: {rea
 msgid "Couldn't add them to the channel"
 msgstr "Не удалось добавить их в канал"
 
+msgid "Couldn't add this repo"
+msgstr "Не удалось добавить репозиторий"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Не удалось запросить описание у рабочего пространства"
 
@@ -5911,6 +5914,9 @@ msgstr "Не удалось форкнуть в чат"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Не удалось передать агенту"
+
+msgid "Couldn't import"
+msgstr "Не удалось импортировать"
 
 msgid "Couldn't load {filename}"
 msgstr "Не удалось загрузить {filename}"
@@ -9846,6 +9852,10 @@ msgstr "Не удалось импортировать"
 msgid "Import failed: {message}"
 msgstr "Не удалось импортировать: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Импортировать из {0}"
+
 msgid "Import from file"
 msgstr "Импорт из файла"
 
@@ -9875,6 +9885,9 @@ msgstr "Импортировать…"
 
 msgid "Important"
 msgstr "Важно"
+
+msgid "Imported"
+msgstr "Импортировано"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

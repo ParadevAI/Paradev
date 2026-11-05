@@ -5837,6 +5837,9 @@ msgstr "Could not verify the credential: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Couldn't add them to the channel"
 
+msgid "Couldn't add this repo"
+msgstr "Couldn't add this repo"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Couldn't ask the workspace for a description"
 
@@ -5911,6 +5914,9 @@ msgstr "Couldn't fork into a chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Couldn't hand this to an agent"
+
+msgid "Couldn't import"
+msgstr "Couldn't import"
 
 msgid "Couldn't load {filename}"
 msgstr "Couldn't load {filename}"
@@ -9846,6 +9852,10 @@ msgstr "Import failed"
 msgid "Import failed: {message}"
 msgstr "Import failed: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Import from {0}"
+
 msgid "Import from file"
 msgstr "Import from file"
 
@@ -9875,6 +9885,9 @@ msgstr "Import…"
 
 msgid "Important"
 msgstr "Important"
+
+msgid "Imported"
+msgstr "Imported"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

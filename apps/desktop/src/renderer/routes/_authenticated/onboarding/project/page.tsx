@@ -33,6 +33,10 @@ import { GhAuthDialog } from "../components/GhAuthDialog";
 import { OnboardingTile } from "../components/OnboardingTile";
 import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
 import {
+	ImportOfferLine,
+	useImportFromOtherTools,
+} from "./components/ImportFromOtherTools";
+import {
 	ACQUISITION_SOURCE_EVENT,
 	type AcquisitionSourceAnswer,
 	buildAcquisitionSourceProperties,
@@ -223,6 +227,11 @@ function OnboardingProjectPage() {
 		}
 	};
 
+	const importOffer = useImportFromOtherTools({
+		enabled: isV2CloudEnabled,
+		onImported: finish,
+	});
+
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -252,6 +261,13 @@ function OnboardingProjectPage() {
 					disabled={busy}
 				/>
 			</div>
+			{importOffer.shown && (
+				<ImportOfferLine
+					offer={importOffer.offer}
+					disabled={busy}
+					onOpen={importOffer.openDialog}
+				/>
+			)}
 
 			{cloneOpen && (
 				<div className="flex flex-col gap-2">
@@ -325,6 +341,7 @@ function OnboardingProjectPage() {
 				onOpenChange={setGhAuthOpen}
 				onExit={() => setGhAuthOpen(false)}
 			/>
+			{importOffer.dialog}
 		</div>
 	);
 }

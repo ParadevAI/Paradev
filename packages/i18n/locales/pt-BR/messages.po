@@ -5837,6 +5837,9 @@ msgstr "Não foi possível verificar a credencial: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Não foi possível adicioná-los ao canal"
 
+msgid "Couldn't add this repo"
+msgstr "Não foi possível adicionar este repositório"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Não foi possível pedir uma descrição ao espaço de trabalho"
 
@@ -5911,6 +5914,9 @@ msgstr "Não foi possível bifurcar em um chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Não foi possível entregar isto a um agente"
+
+msgid "Couldn't import"
+msgstr "Não foi possível importar"
 
 msgid "Couldn't load {filename}"
 msgstr "Não foi possível carregar {filename}"
@@ -9846,6 +9852,10 @@ msgstr "Falha na importação"
 msgid "Import failed: {message}"
 msgstr "Falha na importação: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Importar de {0}"
+
 msgid "Import from file"
 msgstr "Importar de um arquivo"
 
@@ -9875,6 +9885,9 @@ msgstr "Importar…"
 
 msgid "Important"
 msgstr "Importante"
+
+msgid "Imported"
+msgstr "Importado"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

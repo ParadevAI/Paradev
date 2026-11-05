@@ -5831,6 +5831,9 @@ msgstr "Не вдалося перевірити облікові дані: {rea
 msgid "Couldn't add them to the channel"
 msgstr "Не вдалося додати їх до каналу"
 
+msgid "Couldn't add this repo"
+msgstr "Не вдалося додати репозиторій"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Не вдалося отримати опис від робочого простору"
 
@@ -5905,6 +5908,9 @@ msgstr "Не вдалося створити форк у чаті"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Не вдалося передати це агенту"
+
+msgid "Couldn't import"
+msgstr "Не вдалося імпортувати"
 
 msgid "Couldn't load {filename}"
 msgstr "Не вдалося завантажити {filename}"
@@ -9840,6 +9846,10 @@ msgstr "Не вдалося імпортувати"
 msgid "Import failed: {message}"
 msgstr "Не вдалося імпортувати: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Імпортувати з {0}"
+
 msgid "Import from file"
 msgstr "Імпортувати з файлу"
 
@@ -9869,6 +9879,9 @@ msgstr "Імпортувати…"
 
 msgid "Important"
 msgstr "Важливо"
+
+msgid "Imported"
+msgstr "Імпортовано"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

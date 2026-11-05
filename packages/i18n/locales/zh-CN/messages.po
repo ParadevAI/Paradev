@@ -5837,6 +5837,9 @@ msgstr "无法验证凭据：{reason}"
 msgid "Couldn't add them to the channel"
 msgstr "无法将他们添加到频道"
 
+msgid "Couldn't add this repo"
+msgstr "无法添加此仓库"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "无法请求工作区生成描述"
 
@@ -5911,6 +5914,9 @@ msgstr "无法分叉到聊天"
 
 msgid "Couldn't hand this to an agent"
 msgstr "无法交给智能体处理"
+
+msgid "Couldn't import"
+msgstr "无法导入"
 
 msgid "Couldn't load {filename}"
 msgstr "无法加载 {filename}"
@@ -9846,6 +9852,10 @@ msgstr "导入失败"
 msgid "Import failed: {message}"
 msgstr "导入失败：{message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "从 {0} 导入"
+
 msgid "Import from file"
 msgstr "从文件导入"
 
@@ -9875,6 +9885,9 @@ msgstr "导入…"
 
 msgid "Important"
 msgstr "重要"
+
+msgid "Imported"
+msgstr "已导入"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]

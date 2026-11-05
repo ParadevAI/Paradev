@@ -5837,6 +5837,9 @@ msgstr "Nie udało się zweryfikować poświadczeń: {reason}"
 msgid "Couldn't add them to the channel"
 msgstr "Nie udało się dodać ich do kanału"
 
+msgid "Couldn't add this repo"
+msgstr "Nie udało się dodać tego repozytorium"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Nie udało się poprosić obszaru roboczego o opis"
 
@@ -5911,6 +5914,9 @@ msgstr "Nie udało się sforkować do czatu"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Nie udało się przekazać tego agentowi"
+
+msgid "Couldn't import"
+msgstr "Nie udało się zaimportować"
 
 msgid "Couldn't load {filename}"
 msgstr "Nie udało się wczytać {filename}"
@@ -9846,6 +9852,10 @@ msgstr "Import nie powiódł się"
 msgid "Import failed: {message}"
 msgstr "Import nie powiódł się: {message}"
 
+#. placeholder {0}: offer.toolNames
+msgid "Import from {0}"
+msgstr "Importuj z {0}"
+
 msgid "Import from file"
 msgstr "Importuj z pliku"
 
@@ -9875,6 +9885,9 @@ msgstr "Importuj…"
 
 msgid "Important"
 msgstr "Ważne"
+
+msgid "Imported"
+msgstr "Zaimportowano"
 
 #. placeholder {0}: untracked.length
 #. placeholder {1}: errors[0]
