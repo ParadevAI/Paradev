@@ -379,6 +379,8 @@ export const cloudWorkspaceRouter = {
 				model: z.string().min(1).optional(),
 				effort: z.string().min(1).optional(),
 				mode: z.string().min(1).optional(),
+				/** The terminal id the agent launches under, so the caller can open its pane by that id. */
+				agentTerminalId: z.string().uuid().optional(),
 				/**
 				 * Cloud uploads to hand the agent with `prompt`. The box pulls the
 				 * bytes once it is up; the same cap `attachments.importFromCloud`
@@ -429,6 +431,7 @@ export const cloudWorkspaceRouter = {
 								effort: input.effort,
 								mode: input.mode,
 								attachmentFileIds: input.attachmentFileIds,
+								terminalId: input.agentTerminalId,
 							},
 						}
 					: {}),

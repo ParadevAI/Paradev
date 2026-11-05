@@ -192,6 +192,7 @@ export function useSubmitWorkspace(
 								model: selectedModel ?? undefined,
 								effort: selectedEffort ?? undefined,
 								mode: selectedMode ?? undefined,
+								agentTerminalId: crypto.randomUUID(),
 							}
 						: {}),
 				});

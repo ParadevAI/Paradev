@@ -271,6 +271,7 @@ export async function dispatchAutomation(
 				agent: automation.agent,
 				prompt,
 				chat,
+				openTab: true,
 				// Only the pinned workspace holds that session; the stale-pin
 				// recovery below branches a fresh one, which has none.
 				...(previous && targetWorkspaceId === automation.v2WorkspaceId

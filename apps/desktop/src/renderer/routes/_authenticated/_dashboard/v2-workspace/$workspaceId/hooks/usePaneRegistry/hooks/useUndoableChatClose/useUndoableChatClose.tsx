@@ -8,8 +8,6 @@ import type { ChatPaneData, PaneViewerData } from "../../../../types";
 import {
 	isChatSessionClosed,
 	markChatSessionClosed,
-	markChatTerminalClosed,
-	reopenChatTerminal,
 } from "../../../../utils/closedChatSessions";
 import {
 	addPendingChatStop,
@@ -101,13 +99,12 @@ export function useUndoableChatClose({
 	);
 
 	const [batches] = useState(() => {
-		const stopSession = (sessionId: string, terminalId?: string) => {
+		const stopSession = (sessionId: string) => {
 			if (!isChatSessionClosed(sessionId)) return;
 			void latest.current
 				.stopChat(sessionId)
 				.then((stopped) => {
 					if (!stopped) {
-						if (terminalId) reopenChatTerminal(terminalId);
 						toast.error(
 							latest.current.t({ message: "Couldn't stop the chat" }),
 						);
@@ -155,7 +152,7 @@ export function useUndoableChatClose({
 			},
 			stop: (chat) => {
 				const { terminalId } = chat.pane.data as ChatPaneData;
-				stopSession(chat.sessionId, terminalId);
+				stopSession(chat.sessionId);
 				useChatSubagentStore.getState().forget(terminalId);
 			},
 		});
@@ -174,7 +171,6 @@ export function useUndoableChatClose({
 		(pane) => {
 			const data = pane.data as ChatPaneData;
 			const { sessionId, terminalId } = data;
-			const reopenTerminal = markChatTerminalClosed(terminalId);
 			void stopStrayChats(terminalId, sessionId);
 			if (!sessionId || isChatSessionClosed(sessionId)) return;
 			const index = previousTabs.current.findIndex(
@@ -189,10 +185,7 @@ export function useUndoableChatClose({
 					tab && Object.keys(tab.panes).length === 1 ? { tab, index } : null,
 				sessionId,
 				title: pane.titleOverride ?? data.chatTitle ?? t({ message: "Chat" }),
-				reopen: () => {
-					reopenSession();
-					reopenTerminal();
-				},
+				reopen: reopenSession,
 			});
 		},
 		[batches, workspaceId, t, stopStrayChats],

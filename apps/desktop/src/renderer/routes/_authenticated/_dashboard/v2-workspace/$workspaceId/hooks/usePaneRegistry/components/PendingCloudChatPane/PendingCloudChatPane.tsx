@@ -5,6 +5,7 @@ import type {
 	PendingCloudChatPaneData,
 } from "../../../../types";
 import { DraftChat } from "../ChatPane/components/AcpChatPane/components/DraftChat";
+import { usePendingCloudChatLaunch } from "./hooks/usePendingCloudChatLaunch";
 
 export function PendingCloudChatPane({
 	ctx,
@@ -14,6 +15,7 @@ export function PendingCloudChatPane({
 	workspaceId: string;
 }) {
 	const data = ctx.pane.data as PendingCloudChatPaneData;
+	usePendingCloudChatLaunch({ ctx, workspaceId });
 	const launched = useMemo(
 		() =>
 			data.launchPrompt

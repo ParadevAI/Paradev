@@ -32,7 +32,10 @@ export default command({
 			),
 	},
 	run: async ({ ctx, options }) => {
-		const { target, sessions } = await resolveSessionWorkspace(ctx, options);
+		const { target, sessions, openTab } = await resolveSessionWorkspace(
+			ctx,
+			options,
+		);
 
 		const uploadedIds = options.attachment
 			? await uploadAttachments(target.client, options.attachment)
@@ -48,9 +51,10 @@ export default command({
 			attachmentIds: attachmentIds.length > 0 ? attachmentIds : undefined,
 		});
 
+		const opened = await openTab(result.sessionId);
 		return {
 			data: result,
-			message: `Started ${result.label} chat session ${result.sessionId} in workspace ${options.workspace}`,
+			message: `Started ${result.label} chat session ${result.sessionId} in workspace ${options.workspace}${opened ? ", opened in a desktop tab" : ""}`,
 		};
 	},
 });

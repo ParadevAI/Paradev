@@ -6,6 +6,7 @@ import {
 	DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 	useWorkspaceSidebarStore,
 } from "renderer/stores/workspace-sidebar-state";
+import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "./constants";
 import { useAutoCollapseInNarrowWindow } from "./hooks/useAutoCollapseInNarrowWindow";
 import { closeFocusedMenu } from "./utils/closeFocusedMenu";
 import { getWorkspaceSidebarMaxWidth } from "./utils/getWorkspaceSidebarMaxWidth";
@@ -64,19 +65,21 @@ export function WorkspaceSidebarPanel({
 		</ResizablePanel>
 	);
 
-	if (!slides) {
-		return renderPanel(isCollapsed ? collapsedWidth : expandedWidth);
-	}
-
 	return (
-		<SidebarSlide
-			mode={isCollapsed ? "closed" : "open"}
-			width={expandedWidth}
-			edge="left"
-			alwaysMounted
-			onLayoutFrame={onLayoutFrame}
-		>
-			{() => renderPanel(expandedWidth)}
-		</SidebarSlide>
+		<div {...{ [WORKSPACE_SIDEBAR_ATTRIBUTE]: "" }} className="contents">
+			{slides ? (
+				<SidebarSlide
+					mode={isCollapsed ? "closed" : "open"}
+					width={expandedWidth}
+					edge="left"
+					alwaysMounted
+					onLayoutFrame={onLayoutFrame}
+				>
+					{() => renderPanel(expandedWidth)}
+				</SidebarSlide>
+			) : (
+				renderPanel(isCollapsed ? collapsedWidth : expandedWidth)
+			)}
+		</div>
 	);
 }
