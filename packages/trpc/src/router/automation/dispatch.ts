@@ -253,6 +253,7 @@ export async function dispatchAutomation(
 			if (automation.reuseWorkspace) {
 				await pinCreatedWorkspace(automation.id, {
 					v2WorkspaceId: created.workspaceId,
+					targetHostId: host.machineId,
 				});
 			}
 			return created.workspaceId;
