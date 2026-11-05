@@ -16,10 +16,12 @@ export function focusChatSession({
 	store,
 	linkedStores = [],
 	session,
+	focus = true,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	linkedStores?: readonly StoreApi<WorkspaceStore<PaneViewerData>>[];
 	session: ChatSessionTarget;
+	focus?: boolean;
 }): "focused" | "added" {
 	if (session.sessionId) {
 		reopenChatSession(session.sessionId);
@@ -39,12 +41,13 @@ export function focusChatSession({
 				);
 			});
 			if (pane) {
-				paneStore.getState().focusPane(pane.id);
+				if (focus) paneStore.getState().focusPane(pane.id);
 				return "focused";
 			}
 		}
 	}
 	store.getState().addTab({
+		focus,
 		panes: [
 			{
 				kind: "chat-v3",

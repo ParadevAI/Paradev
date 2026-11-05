@@ -61,6 +61,7 @@ import {
 import { WorkspaceToolbar } from "./components/WorkspaceToolbar";
 import { useAgentSessionLauncher } from "./hooks/useAgentSessionLauncher";
 import { useAutoAdoptBackgroundSessions } from "./hooks/useAutoAdoptBackgroundSessions";
+import { useAutoAdoptChatSessions } from "./hooks/useAutoAdoptChatSessions";
 import { useCloseRightPaneAreaWhenEmpty } from "./hooks/useCloseRightPaneAreaWhenEmpty";
 import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
@@ -361,6 +362,12 @@ function V2WorkspaceContent() {
 		resolvePresetCommands,
 	});
 	useAutoAdoptBackgroundSessions({
+		store,
+		linkedStores: linkedPaneStores,
+		workspaceId,
+		isLayoutReady: isLayoutReady && isRightLayoutReady,
+	});
+	useAutoAdoptChatSessions({
 		store,
 		linkedStores: linkedPaneStores,
 		workspaceId,

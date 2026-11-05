@@ -69,4 +69,16 @@ describe("focusChatSession", () => {
 			}),
 		).toBe("added");
 	});
+
+	it("finds an existing chat without moving focus to it", () => {
+		const store = newStore();
+		expect(focusChatSession({ store, session, focus: false })).toBe("added");
+		store.getState().addTab({
+			panes: [{ kind: "terminal", data: { terminalId: "active" } }],
+		});
+		const activeTabId = store.getState().activeTabId;
+		expect(focusChatSession({ store, session, focus: false })).toBe("focused");
+		expect(store.getState().tabs).toHaveLength(2);
+		expect(store.getState().activeTabId).toBe(activeTabId);
+	});
 });
