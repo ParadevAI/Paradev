@@ -342,7 +342,7 @@ export async function handleStripeBillingEvent(
 					stripeSubscriptionId: stripeSubscription.id,
 					previousInterval,
 					previousPriceId,
-					previousSeats: previousItem?.quantity,
+					previousSeats: previousItem?.quantity ?? undefined,
 				},
 				retries: 3,
 			});

@@ -83,7 +83,7 @@ const payloadSchema = z.discriminatedUnion("eventType", [
 		eventType: z.literal("plan_changed"),
 		previousInterval: z.string().optional(),
 		previousPriceId: z.string().optional(),
-		previousSeats: z.number().optional(),
+		previousSeats: z.number().nullish(),
 	}),
 ]);
 
@@ -148,13 +148,14 @@ async function previousPlanFromPrice(
 		const price = await stripeClient.prices.retrieve(priceId, {
 			expand: ["product"],
 		});
+		if (price.unit_amount == null) return null;
 		const product =
 			typeof price.product === "string" || price.product.deleted
 				? null
 				: price.product;
 		return {
 			planName: product?.name ?? null,
-			pricePerSeatCents: price.unit_amount ?? 0,
+			pricePerSeatCents: price.unit_amount,
 			interval: price.recurring?.interval === "year" ? "yearly" : "monthly",
 			seatCount,
 		};
