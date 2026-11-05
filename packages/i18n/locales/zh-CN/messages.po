@@ -4105,11 +4105,11 @@ msgstr "聊天"
 msgid "Chat closed"
 msgstr "聊天已关闭"
 
-msgid "Chat GUI"
-msgstr "聊天图形界面"
-
 msgid "Chat history"
 msgstr "聊天历史"
+
+msgid "Chat interface"
+msgstr "聊天界面"
 
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"

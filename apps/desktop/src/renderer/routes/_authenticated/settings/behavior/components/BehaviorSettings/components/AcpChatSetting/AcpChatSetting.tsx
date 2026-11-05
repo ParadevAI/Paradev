@@ -27,7 +27,7 @@ export function AcpChatSetting() {
 			<div className="min-w-0 flex-1 space-y-0.5">
 				<Label htmlFor="acp-chat" className="text-sm font-medium">
 					<HighlightText
-						text={t({ message: "Chat GUI" })}
+						text={t({ message: "Chat interface" })}
 						query={searchQuery}
 					/>
 				</Label>

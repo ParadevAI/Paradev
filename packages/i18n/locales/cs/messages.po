@@ -4105,11 +4105,11 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat zavřen"
 
-msgid "Chat GUI"
-msgstr "Grafický chat"
-
 msgid "Chat history"
 msgstr "Historie chatů"
+
+msgid "Chat interface"
+msgstr "Rozhraní chatu"
 
 msgid "Chat is being reworked"
 msgstr "Chat se předělává"

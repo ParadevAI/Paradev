@@ -4105,11 +4105,11 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat gesloten"
 
-msgid "Chat GUI"
-msgstr "Chat-GUI"
-
 msgid "Chat history"
 msgstr "Chatgeschiedenis"
+
+msgid "Chat interface"
+msgstr "Chatinterface"
 
 msgid "Chat is being reworked"
 msgstr "Chat wordt herbouwd"

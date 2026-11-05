@@ -4105,11 +4105,11 @@ msgstr "チャット"
 msgid "Chat closed"
 msgstr "チャットを閉じました"
 
-msgid "Chat GUI"
-msgstr "チャット GUI"
-
 msgid "Chat history"
 msgstr "チャット履歴"
+
+msgid "Chat interface"
+msgstr "チャット画面"
 
 msgid "Chat is being reworked"
 msgstr "チャットは再構築中です"

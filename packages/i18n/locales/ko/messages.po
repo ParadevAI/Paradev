@@ -4105,11 +4105,11 @@ msgstr "채팅"
 msgid "Chat closed"
 msgstr "채팅을 닫았습니다"
 
-msgid "Chat GUI"
-msgstr "채팅 GUI"
-
 msgid "Chat history"
 msgstr "채팅 기록"
+
+msgid "Chat interface"
+msgstr "채팅 인터페이스"
 
 msgid "Chat is being reworked"
 msgstr "채팅을 개편하는 중입니다"

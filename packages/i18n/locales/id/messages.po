@@ -4105,11 +4105,11 @@ msgstr "Chat"
 msgid "Chat closed"
 msgstr "Chat ditutup"
 
-msgid "Chat GUI"
-msgstr "GUI Chat"
-
 msgid "Chat history"
 msgstr "Riwayat obrolan"
+
+msgid "Chat interface"
+msgstr "Antarmuka chat"
 
 msgid "Chat is being reworked"
 msgstr "Chat sedang dirombak"

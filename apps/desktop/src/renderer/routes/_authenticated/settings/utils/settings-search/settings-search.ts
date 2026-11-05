@@ -892,12 +892,12 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT,
 		section: "behavior",
-		title: "Chat GUI",
+		title: "Chat interface",
 		description:
 			"Open Claude and Codex sessions in a chat pane instead of a terminal",
 		keywords: [
 			"chat",
-			"gui",
+			"interface",
 			"acp",
 			"agent",
 			"claude",
