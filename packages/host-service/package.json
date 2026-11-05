@@ -56,6 +56,10 @@
 			"types": "./src/trpc/router/settings/index.ts",
 			"default": "./src/trpc/router/settings/index.ts"
 		},
+		"./cloud-api-error": {
+			"types": "./src/trpc/router/host/cloud-api-error.ts",
+			"default": "./src/trpc/router/host/cloud-api-error.ts"
+		},
 		"./attachments": {
 			"types": "./src/trpc/router/attachments/index.ts",
 			"default": "./src/trpc/router/attachments/index.ts"
