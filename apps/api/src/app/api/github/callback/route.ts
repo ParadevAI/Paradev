@@ -7,6 +7,7 @@ import { env } from "@/env";
 import { exitOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { resolveCallback } from "@/lib/integrations/resolveCallback";
 import { githubApp } from "../octokit";
+import { saveInstallation } from "./utils/saveInstallation";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
@@ -78,27 +79,14 @@ export async function GET(request: Request) {
 			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
-		const installationFields = {
-			connectedByUserId: userId,
+		const savedInstallation = await saveInstallation({
+			organizationId,
+			userId,
+			installationId: String(installation.id),
 			accountLogin,
 			accountType,
 			permissions: installation.permissions as Record<string, string>,
-			suspended: false,
-			suspendedAt: null,
-		};
-		const [savedInstallation] = await db
-			.insert(githubInstallations)
-			.values({
-				...installationFields,
-				organizationId,
-				installationId: String(installation.id),
-			})
-			.onConflictDoUpdate({
-				target: [githubInstallations.installationId],
-				set: { ...installationFields, updatedAt: new Date() },
-				setWhere: eq(githubInstallations.organizationId, organizationId),
-			})
-			.returning();
+		});
 
 		if (!savedInstallation) {
 			return exit(`${settingsUrl}?error=save_failed`);
