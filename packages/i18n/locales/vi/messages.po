@@ -13269,6 +13269,9 @@ msgstr "Chỉ tác giả mới có thể sửa bình luận"
 msgid "Only the author can edit a comment"
 msgstr "Chỉ tác giả mới sửa được bình luận"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Chỉ chủ sở hữu host mới có thể cho phép workspace cloud truy cập"
+
 msgid "Only the host owner can set its wake command"
 msgstr "Chỉ chủ sở hữu host mới đặt được lệnh đánh thức"
 

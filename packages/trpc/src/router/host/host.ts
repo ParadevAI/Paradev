@@ -1,3 +1,4 @@
+import { mintUserJwt } from "@superset/auth/server";
 import { db, dbWs } from "@superset/db/client";
 import { members, users, v2Hosts, v2UsersHosts } from "@superset/db/schema";
 import {
@@ -103,6 +104,7 @@ export const hostRouter = {
 					version: v2Hosts.version,
 					platform: v2Hosts.platform,
 					installSource: v2Hosts.installSource,
+					allowCloudWorkspaces: v2Hosts.allowCloudWorkspaces,
 				})
 				.from(v2Hosts)
 				.innerJoin(
@@ -119,18 +121,22 @@ export const hostRouter = {
 					),
 				);
 
-			// The relay's Durable Objects are the presence authority. Callers'
-			// own bearer token is forwarded for the access checks.
-			const bearer = ctx.headers.get("authorization")?.slice("Bearer ".length);
-			const presence = bearer
-				? await fetchRelayPresence(
-						env.RELAY_URL,
-						bearer,
-						rows.map((row) =>
-							buildHostRoutingKey(row.organizationId, row.machineId),
-						),
-					)
-				: null;
+			// A cloud workspace or an API key sends no bearer the relay accepts.
+			const bearer =
+				ctx.headers.get("authorization")?.slice("Bearer ".length) ||
+				(await mintUserJwt({
+					userId: ctx.principal.userId,
+					organizationIds: [input.organizationId],
+					scope: "automation-presence",
+					ttlSeconds: 60,
+				}));
+			const presence = await fetchRelayPresence(
+				env.RELAY_URL,
+				bearer,
+				rows.map((row) =>
+					buildHostRoutingKey(row.organizationId, row.machineId),
+				),
+			);
 
 			return rows.map((row) => ({
 				id: row.machineId,
@@ -143,6 +149,7 @@ export const hostRouter = {
 				version: row.version,
 				platform: row.platform,
 				installSource: row.installSource,
+				allowCloudWorkspaces: row.allowCloudWorkspaces,
 			}));
 		}),
 
@@ -268,6 +275,46 @@ export const hostRouter = {
 			return { allowed, paidPlan };
 		}),
 
+	// Called by the relay with the box's firewall-added credential.
+	cloudWorkspaceAccess: personProcedure
+		.input(z.object({ hostId: z.string().min(1) }))
+		.query(async ({ ctx, input }) => {
+			const box = ctx.sandboxCaller;
+			const parsed = parseHostRoutingKey(input.hostId);
+			if (!box || parsed?.organizationId !== box.organizationId) {
+				return { allowed: false as const, reason: "no_access" as const };
+			}
+			const [row] = await db
+				.select({ allowCloudWorkspaces: v2Hosts.allowCloudWorkspaces })
+				.from(v2UsersHosts)
+				.innerJoin(
+					v2Hosts,
+					and(
+						eq(v2Hosts.organizationId, v2UsersHosts.organizationId),
+						eq(v2Hosts.machineId, v2UsersHosts.hostId),
+					),
+				)
+				.where(
+					and(
+						eq(v2UsersHosts.userId, box.userId),
+						eq(v2UsersHosts.organizationId, parsed.organizationId),
+						eq(v2UsersHosts.hostId, parsed.machineId),
+					),
+				)
+				.limit(1);
+			if (!row) {
+				return { allowed: false as const, reason: "no_access" as const };
+			}
+			if (!row.allowCloudWorkspaces) {
+				return { allowed: false as const, reason: "host_closed" as const };
+			}
+			return {
+				allowed: true as const,
+				userId: box.userId,
+				workspaceId: box.workspaceId,
+			};
+		}),
+
 	setWakeCommand: personProcedure
 		.input(
 			z.object({
@@ -314,5 +361,49 @@ export const hostRouter = {
 					),
 				);
 			return { success: true };
+		}),
+
+	// Never add to SANDBOX_ALLOWED_PROCEDURES: a box must not open a host to itself.
+	setCloudWorkspaceAccess: personProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				machineId: z.string().min(1),
+				allowed: z.boolean(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			if (!(await isMember(ctx, input.organizationId))) {
+				throw userError({
+					code: "FORBIDDEN",
+					message: "No access to this host",
+					i18nKey: "serverError.host.noAccessToThisHost",
+				});
+			}
+			if (
+				!(await isHostOwner(
+					input.organizationId,
+					input.machineId,
+					ctx.principal.userId,
+				))
+			) {
+				throw userError({
+					code: "FORBIDDEN",
+					message: "Only the host owner can let cloud workspaces reach it",
+					i18nKey: "serverError.host.onlyTheHostOwnerCanAllowCloudWorkspaces",
+				});
+			}
+
+			await db
+				.update(v2Hosts)
+				.set({ allowCloudWorkspaces: input.allowed })
+				.where(
+					and(
+						eq(v2Hosts.organizationId, input.organizationId),
+						eq(v2Hosts.machineId, input.machineId),
+					),
+				);
+			nudge(input.organizationId, "hosts");
+			return { allowed: input.allowed };
 		}),
 } satisfies TRPCRouterRecord;

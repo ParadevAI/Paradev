@@ -46,6 +46,14 @@ export interface SandboxCredentialInputs {
 	gitAuthor: GitAuthor;
 }
 
+function relayHost(): string | null {
+	try {
+		return new URL(env.RELAY_URL).host;
+	} catch {
+		return null;
+	}
+}
+
 export interface GitAuthor {
 	name: string;
 	email: string;
@@ -310,6 +318,10 @@ export async function deriveSandboxCredentials(
 		// PDEV_TOKEN keeps pdev from asking `superset auth`, which a box refuses.
 		allow[PDEV_ROUTER_HOST] = boxCredential;
 		managedEnv.PDEV_TOKEN = SANDBOX_CREDENTIAL_PLACEHOLDER;
+		// The firewall refuses WebSocket upgrades on a host it rewrites, so a
+		// box reaches hosts over HTTP only.
+		const relay = relayHost();
+		if (relay) allow[relay] = boxCredential;
 	}
 
 	// The catch-all keeps the rest of the internet reachable; without it a

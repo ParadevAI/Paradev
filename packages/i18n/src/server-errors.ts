@@ -574,6 +574,12 @@ export const serverErrorMessages: Record<
 				message: "Not a member of this organization",
 			}),
 		),
+	"serverError.host.onlyTheHostOwnerCanAllowCloudWorkspaces": () =>
+		i18n._(
+			msg({
+				message: "Only the host owner can let cloud workspaces reach it",
+			}),
+		),
 	"serverError.host.onlyTheHostOwnerCanSet": () =>
 		i18n._(
 			msg({

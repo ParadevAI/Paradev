@@ -13269,6 +13269,9 @@ msgstr "작성자만 댓글을 변경할 수 있습니다"
 msgid "Only the author can edit a comment"
 msgstr "작성자만 코멘트를 수정할 수 있습니다"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "호스트 소유자만 클라우드 워크스페이스의 접근을 허용할 수 있습니다"
+
 msgid "Only the host owner can set its wake command"
 msgstr "호스트 소유자만 wake 명령을 설정할 수 있습니다"
 
