@@ -1,11 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import type { WorkspaceSnapshotPayload } from "@superset/workspace-client";
-import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import {
 	applyWorkspaceChangedEvent,
-	getHostWorkspacesQueryKey,
-	type HostWorkspacesQueryTarget,
-	hostWorkspacesQueryFn,
 	isEventBusReopen,
 	mergeHostWorkspaces,
 	toHostWorkspaceItem,
@@ -243,42 +239,5 @@ describe("toHostWorkspaceItem", () => {
 			lastActivityAt: null,
 			hostReachable: false,
 		});
-	});
-});
-
-const REMOTE_HOST = { organizationId: "org", machineId: "remote-mac" };
-const queryKey = getHostWorkspacesQueryKey(REMOTE_HOST);
-
-function observerOptions(hostUrl: string | null) {
-	const target: HostWorkspacesQueryTarget = {
-		...REMOTE_HOST,
-		hostUrl,
-		isLocal: false,
-	};
-	return {
-		queryKey,
-		enabled: hostUrl !== null,
-		retry: false,
-		networkMode: "always" as const,
-		queryFn: hostWorkspacesQueryFn(target, async () => ["W1", "W2"]),
-	};
-}
-
-describe("hostWorkspacesQueryFn", () => {
-	it("keeps a remote host's rows when an observer that saw it offline invalidates", async () => {
-		const client = new QueryClient();
-		const sidebar = new QueryObserver(client, observerOptions("relay/hosts/x"));
-		const stopSidebar = sidebar.subscribe(() => {});
-		await sidebar.refetch();
-		expect(client.getQueryData(queryKey)).toEqual(["W1", "W2"]);
-
-		const page = new QueryObserver(client, observerOptions(null));
-		const stopPage = page.subscribe(() => {});
-		await client.invalidateQueries({ queryKey });
-
-		expect(client.getQueryData(queryKey)).toEqual(["W1", "W2"]);
-		stopPage();
-		stopSidebar();
-		client.clear();
 	});
 });

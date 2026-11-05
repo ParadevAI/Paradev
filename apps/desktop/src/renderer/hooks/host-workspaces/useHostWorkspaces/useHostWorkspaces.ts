@@ -10,6 +10,7 @@ import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 import {
@@ -18,7 +19,6 @@ import {
 	getHostWorkspacesQueryKey,
 	type HostWorkspaceItem,
 	type HostWorkspaceRow,
-	hostWorkspacesQueryFn,
 	isEventBusReopen,
 	loadHostWorkspacesSnapshot,
 	mergeHostWorkspaces,
@@ -203,7 +203,7 @@ export function useHostWorkspacesSource(
 			// Bounded retries so an online-per-cloud but tunnel-less relay
 			// target settles into isError quickly instead of holding isReady.
 			retry: 1,
-			queryFn: hostWorkspacesQueryFn(target, async (hostUrl) => {
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
 				const client = getHostServiceClientByUrl(hostUrl);
 				const served = (
 					(await client.workspace.list.query()) as HostWorkspaceRow[]
@@ -240,7 +240,7 @@ export function useHostWorkspacesSource(
 			enabled: includeArchived && target.hostUrl !== null,
 			refetchInterval: WORKSPACES_FALLBACK_REFETCH_INTERVAL_MS,
 			networkMode: "always" as const,
-			queryFn: hostWorkspacesQueryFn(target, async (hostUrl) => {
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
 				const client = getHostServiceClientByUrl(hostUrl);
 				const rows = (await client.workspace.list.query({
 					includeArchived: true,

@@ -162,22 +162,6 @@ export function deriveHostWorkspacesQueryTargets({
 	return targets;
 }
 
-/**
- * An invalidation runs the queryFn of whichever observer rendered last, even a
- * disabled one. Fail when unreachable: an error keeps the cached rows, an
- * empty answer replaces them.
- */
-export function hostWorkspacesQueryFn<T>(
-	target: Pick<HostWorkspacesQueryTarget, "hostUrl" | "machineId">,
-	load: (hostUrl: string) => Promise<T>,
-): () => Promise<T> {
-	const { hostUrl, machineId } = target;
-	return async () => {
-		if (!hostUrl) throw new Error(`Host ${machineId} is unreachable`);
-		return load(hostUrl);
-	};
-}
-
 const SNAPSHOT_KEY_PREFIX = "host-workspaces:v1";
 
 function snapshotKey(organizationId: string, machineId: string): string {
