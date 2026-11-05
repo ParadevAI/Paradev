@@ -1064,6 +1064,12 @@ msgstr "Chủ đề {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Quyền {label} với {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có gì thay đổi bên trong không gian làm việc: script của bạn và phiên đăng nhập nó duy trì vẫn còn cho đến khi bạn xóa chúng."
+
+msgid "{label} is set to manual"
+msgstr "{label} đã chuyển sang đăng nhập thủ công"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1517,9 @@ msgstr "<0>{who}</0> đã bày tỏ cảm xúc {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>trên {1} trong bảng xếp hạng</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> hoặc một <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Sắp có trên</0><1>Google Play</1>"
@@ -2294,6 +2303,9 @@ msgstr "Phiên agent đã bắt đầu"
 
 msgid "agent settings"
 msgstr "cài đặt agent"
+
+msgid "Agent settings"
+msgstr "Cài đặt agent"
 
 msgid "Agent usage rankings"
 msgstr "Xếp hạng mức dùng agent"
@@ -4289,6 +4301,9 @@ msgstr "Chọn nơi mở tác nhân được khởi chạy từ bình luận, ch
 msgid "Choose your default skin tone"
 msgstr "Chọn màu da mặc định"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Chọn mục này sẽ xóa mọi thông tin xác thực đã lưu ở đây cho {label}."
+
 msgid "CI failed"
 msgstr "CI thất bại"
 
@@ -5748,6 +5763,9 @@ msgstr "Không thể tiếp tục"
 
 msgid "Could not resume the chat"
 msgstr "Không thể tiếp tục cuộc trò chuyện"
+
+msgid "Could not save the change."
+msgstr "Không thể lưu thay đổi."
 
 msgid "Could not send"
 msgstr "Không thể gửi"
@@ -9897,6 +9915,9 @@ msgstr "trong một terminal trên host này."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Ở chế độ thủ công, Paradev không đăng nhập cho agent này. Hãy để script của bạn đăng nhập lại rồi tiếp tục, hoặc tắt chế độ thủ công trong cài đặt agent."
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Làm việc trực tiếp tại văn phòng San Francisco, năm ngày mỗi tuần. Bạn làm việc trực tiếp với các nhà sáng lập."
 
@@ -11309,8 +11330,17 @@ msgstr "Do admin tổ chức của bạn quản lý."
 msgid "Manual"
 msgstr "Thủ công"
 
+msgid "Manual mode is off for {label}."
+msgstr "Đã tắt chế độ thủ công cho {label}."
+
 msgid "Manual order"
 msgstr "Thứ tự thủ công"
+
+msgid "manual sign-in"
+msgstr "đăng nhập thủ công"
+
+msgid "Manual sign-in"
+msgstr "Đăng nhập thủ công"
 
 msgid "Mark all read"
 msgstr "Đánh dấu tất cả đã đọc"
@@ -14083,6 +14113,9 @@ msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Giấy p
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev gặp lỗi không mong muốn. Tải lại để thử lại."
 
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev không giữ thông tin xác thực nào cho {label} và không thêm thông tin xác thực vào không gian làm việc đám mây của bạn khi chúng khởi động, khởi động lại hoặc được đánh thức. Script bạn chạy trong không gian làm việc giữ {loginFile} luôn cập nhật. Nếu script dừng, {label} sẽ ở trạng thái đăng xuất cho đến khi script đăng nhập lại."
+
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev giữ token và thực hiện các lệnh gọi. Agent không bao giờ thấy nó."
 
@@ -16072,6 +16105,9 @@ msgstr "Khởi động lại ngay để chuyển sang {accountLabel}; mỗi phi�
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Hãy khởi động lại các không gian làm việc đang chạy để agent áp dụng thay đổi."
+
 msgid "Restart terminal daemon?"
 msgstr "Khởi động lại daemon terminal?"
 
@@ -16378,8 +16414,8 @@ msgstr "Xoay thiết bị"
 msgid "Roundups"
 msgstr "Tổng hợp"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Định tuyến {label} qua nhà cung cấp do bạn tự vận hành, với thông tin xác thực bạn nắm giữ. Giá trị đã lưu được chuyển cho agent khi khởi chạy."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Định tuyến {label} qua nhà cung cấp do bạn tự vận hành, với thông tin xác thực bạn nắm giữ, hoặc để công cụ của bạn tự lo việc đăng nhập."
 
 msgid "Routine not found"
 msgstr "Không tìm thấy quy trình"
@@ -19120,6 +19156,9 @@ msgstr "Tác nhân sao chép hội thoại; nhánh mở trong một thẻ mới"
 msgid "The agent crashed"
 msgstr "Agent đã gặp sự cố"
 
+msgid "The agent is signed out"
+msgstr "Agent đã đăng xuất"
+
 msgid "The agent lost this conversation"
 msgstr "Agent đã mất cuộc trò chuyện này"
 
@@ -20317,6 +20356,12 @@ msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
 
+msgid "Turn off manual mode"
+msgstr "Tắt chế độ thủ công"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Tắt chế độ thủ công cho {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Bật “Cho phép truy cập từ xa vào thiết bị này qua relay”"
 
@@ -20847,6 +20892,9 @@ msgstr "Dùng mặc định toàn cục"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
+
+msgid "Use manual sign-in"
+msgstr "Dùng đăng nhập thủ công"
 
 msgid "Use more browser features: {features}"
 msgstr "Dùng thêm tính năng trình duyệt: {features}"

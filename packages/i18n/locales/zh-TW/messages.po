@@ -1064,6 +1064,12 @@ msgstr "{kindLabel}主題"
 msgid "{label} access to {pluginName}"
 msgstr "{label} 對 {pluginName} 的存取權限"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} 將恢復為未設定。工作區內不會有任何變化：你的腳本及其維護的登入會一直保留，直到你將其刪除。"
+
+msgid "{label} is set to manual"
+msgstr "{label} 已設為手動登入"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1517,9 @@ msgstr "<0>{who}</0> 以 {shortcode} 回應"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>／排行榜 {1} 人中</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> 或 <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>即將上架</0><1>Google Play</1>"
@@ -2293,6 +2302,9 @@ msgid "Agent session started"
 msgstr "代理程式會話已開始"
 
 msgid "agent settings"
+msgstr "代理程式設定"
+
+msgid "Agent settings"
 msgstr "代理程式設定"
 
 msgid "Agent usage rankings"
@@ -4289,6 +4301,9 @@ msgstr "選擇從留言、設計模式和 Pages 啟動的代理程式的開啟�
 msgid "Choose your default skin tone"
 msgstr "選擇預設膚色"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "選擇此項會刪除此處為 {label} 儲存的所有憑證。"
+
 msgid "CI failed"
 msgstr "CI失敗"
 
@@ -5748,6 +5763,9 @@ msgstr "無法繼續"
 
 msgid "Could not resume the chat"
 msgstr "無法繼續聊天"
+
+msgid "Could not save the change."
+msgstr "無法儲存變更。"
 
 msgid "Could not send"
 msgstr "無法傳送"
@@ -9897,6 +9915,9 @@ msgstr "（在此主機的終端中）。"
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "短短幾個月，<0>數萬名工程師</0>把Paradev當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "在手動模式下，Paradev 不會為此代理程式登入。請讓你的腳本重新登入後繼續，或在代理程式設定中關閉手動模式。"
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "在舊金山辦公室實體上班，每週五天。你將直接與創辦人共事。"
 
@@ -11309,8 +11330,17 @@ msgstr "由你所在組織的管理員管理。"
 msgid "Manual"
 msgstr "手動"
 
+msgid "Manual mode is off for {label}."
+msgstr "已關閉 {label} 的手動模式。"
+
 msgid "Manual order"
 msgstr "手動排序"
+
+msgid "manual sign-in"
+msgstr "手動登入"
+
+msgid "Manual sign-in"
+msgstr "手動登入"
 
 msgid "Mark all read"
 msgstr "全部標示為已讀"
@@ -14083,6 +14113,9 @@ msgstr "Paradev提供免費方案。原始碼在GitHub上以MIT授權條款開�
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev遇到意外錯誤。重新載入以重試。"
 
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev 不保存 {label} 的任何憑證，也不會在雲端工作區啟動、重新啟動或喚醒時加入憑證。你在工作區中執行的腳本負責讓 {loginFile} 保持最新。如果腳本停止，{label} 會一直維持登出狀態，直到你的腳本重新登入。"
+
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "權杖由 Paradev 保管並代為呼叫，代理程式永遠看不到它。"
 
@@ -16072,6 +16105,9 @@ msgstr "立即重新啟動即可移至{accountLabel}；每個會話都會從中�
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新啟動執行中的{providerLabel}代理程式嗎？"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "重新啟動執行中的工作區，讓其中的代理程式套用此變更。"
+
 msgid "Restart terminal daemon?"
 msgstr "重啟終端守護程式？"
 
@@ -16378,8 +16414,8 @@ msgstr "旋轉裝置"
 msgid "Roundups"
 msgstr "綜合評測"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "讓{label}走你自己運行的提供商，用你手中的憑證。已儲存的值會在啟動時交給代理程式。"
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "讓{label}走你自己運行的提供商，用你手中的憑證，或者把登入交給你自己的工具。"
 
 msgid "Routine not found"
 msgstr "找不到例行任務"
@@ -19120,6 +19156,9 @@ msgstr "代理複製該對話，分支在新分頁中開啟"
 msgid "The agent crashed"
 msgstr "代理當機了"
 
+msgid "The agent is signed out"
+msgstr "代理程式已登出"
+
 msgid "The agent lost this conversation"
 msgstr "代理遺失了此對話"
 
@@ -20317,6 +20356,12 @@ msgstr "把例行雜務交給依排程或在事件發生時執行的代理程式
 msgid "Turn Fast mode on or off"
 msgstr "開啟或關閉快速模式"
 
+msgid "Turn off manual mode"
+msgstr "關閉手動模式"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "要關閉 {label} 的手動模式嗎？"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "開啟「允許透過中繼遠端存取此裝置」"
 
@@ -20847,6 +20892,9 @@ msgstr "使用全域性預設值"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "請使用小寫字母、數字、連字號和底線"
+
+msgid "Use manual sign-in"
+msgstr "使用手動登入"
 
 msgid "Use more browser features: {features}"
 msgstr "使用更多瀏覽器功能：{features}"

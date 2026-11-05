@@ -1064,6 +1064,12 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Acceso de {label} a {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} vuelve a quedar sin configurar. Nada cambia dentro de tus espacios de trabajo: tu script y la sesión que mantiene siguen ahí hasta que los elimines."
+
+msgid "{label} is set to manual"
+msgstr "{label} usa inicio de sesión manual"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1517,9 @@ msgstr "<0>{who}</0> reaccionó con {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>de {1} en la clasificación</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> o un <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Próximamente en</0><1>Google Play</1>"
@@ -2294,6 +2303,9 @@ msgstr "Sesión de agente iniciada"
 
 msgid "agent settings"
 msgstr "configuración del agente"
+
+msgid "Agent settings"
+msgstr "Configuración de agentes"
 
 msgid "Agent usage rankings"
 msgstr "Rankings de uso de agentes"
@@ -4289,6 +4301,9 @@ msgstr "Elige dónde se abren los agentes iniciados desde comentarios, el modo d
 msgid "Choose your default skin tone"
 msgstr "Elige tu tono de piel predeterminado"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Al elegir esto se elimina cualquier credencial guardada aquí para {label}."
+
 msgid "CI failed"
 msgstr "CI falló"
 
@@ -5748,6 +5763,9 @@ msgstr "No se pudo reanudar"
 
 msgid "Could not resume the chat"
 msgstr "No se pudo reanudar el chat"
+
+msgid "Could not save the change."
+msgstr "No se pudo guardar el cambio."
 
 msgid "Could not send"
 msgstr "No se pudo enviar"
@@ -9897,6 +9915,9 @@ msgstr "en una terminal de este host."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "En solo unos meses, <0>decenas de miles de ingenieros</0> usan Paradev como su IDE principal, en empresas como Wix, DoorDash y Netflix."
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "En modo manual, Paradev no inicia sesión con este agente. Haz que tu script vuelva a iniciar sesión y continúa, o desactiva el modo manual en la configuración de agentes."
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Presencial en San Francisco, cinco días a la semana. Trabajas directamente con los fundadores."
 
@@ -11309,8 +11330,17 @@ msgstr "Lo gestiona el administrador de tu organización."
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual mode is off for {label}."
+msgstr "El modo manual está desactivado para {label}."
+
 msgid "Manual order"
 msgstr "Orden manual"
+
+msgid "manual sign-in"
+msgstr "inicio de sesión manual"
+
+msgid "Manual sign-in"
+msgstr "Inicio de sesión manual"
 
 msgid "Mark all read"
 msgstr "Marcar todo como leído"
@@ -14083,6 +14113,9 @@ msgstr "Paradev tiene un plan gratuito. El código fuente está en GitHub bajo l
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev ha encontrado un error inesperado. Recargar para volver a intentarlo."
 
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev no guarda ninguna credencial para {label} ni añade ninguna a tus espacios de trabajo en la nube cuando se inician, se reinician o se reactivan. Un script que ejecutas dentro del espacio de trabajo mantiene {loginFile} al día. Si se detiene, {label} sigue sin sesión hasta que tu script vuelva a iniciarla."
+
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev guarda el token y hace las llamadas. Los agentes nunca lo ven."
 
@@ -16072,6 +16105,9 @@ msgstr "Reinícialos ahora para pasarlos a {accountLabel}; cada sesión retoma s
 msgid "Restart running {providerLabel} agents?"
 msgstr "¿Reiniciar los agentes de {providerLabel} en marcha?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Reinicia los espacios de trabajo en ejecución para que sus agentes apliquen el cambio."
+
 msgid "Restart terminal daemon?"
 msgstr "¿Reiniciar el daemon de terminal?"
 
@@ -16378,8 +16414,8 @@ msgstr "Girar el dispositivo"
 msgid "Roundups"
 msgstr "Recopilaciones"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Enruta {label} a través de un proveedor que gestionas tú, con las credenciales que tienes. Los valores guardados se entregan al agente al iniciarse."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Enruta {label} a través de un proveedor que gestionas tú, con las credenciales que tienes, o deja que tus propias herramientas gestionen su inicio de sesión."
 
 msgid "Routine not found"
 msgstr "Rutina no encontrada"
@@ -19120,6 +19156,9 @@ msgstr "El agente copia la conversación; la rama se abre en una pestaña nueva"
 msgid "The agent crashed"
 msgstr "El agente se cerró inesperadamente"
 
+msgid "The agent is signed out"
+msgstr "El agente ha cerrado sesión"
+
 msgid "The agent lost this conversation"
 msgstr "El agente perdió esta conversación"
 
@@ -20317,6 +20356,12 @@ msgstr "Convierte las tareas rutinarias en agentes que se ejecutan de forma prog
 msgid "Turn Fast mode on or off"
 msgstr "Activar o desactivar el modo rápido"
 
+msgid "Turn off manual mode"
+msgstr "Desactivar el modo manual"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "¿Desactivar el modo manual para {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Activa “Permitir el acceso remoto a este dispositivo a través del relay”"
 
@@ -20847,6 +20892,9 @@ msgstr "Usar el valor global predeterminado"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Usa minúsculas, números, guiones y guiones bajos"
+
+msgid "Use manual sign-in"
+msgstr "Usar inicio de sesión manual"
 
 msgid "Use more browser features: {features}"
 msgstr "Usar más funciones del navegador: {features}"

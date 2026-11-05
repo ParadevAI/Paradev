@@ -1064,6 +1064,12 @@ msgstr "{kindLabel} 테마"
 msgid "{label} access to {pluginName}"
 msgstr "{label}의 {pluginName} 접근 권한"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label}은(는) 설정되지 않은 상태로 돌아갑니다. 워크스페이스 안에서는 아무것도 바뀌지 않습니다. 스크립트와 스크립트가 유지하는 로그인은 직접 제거할 때까지 남아 있습니다."
+
+msgid "{label} is set to manual"
+msgstr "{label}이(가) 수동 로그인으로 설정되었습니다"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1517,9 @@ msgstr "<0>{who}</0>님이 {shortcode}(으)로 반응했습니다"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>· 리더보드 {1}명 중</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> 또는 <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<1>Google Play</1><0>출시 예정</0>"
@@ -2293,6 +2302,9 @@ msgid "Agent session started"
 msgstr "에이전트 세션을 시작했습니다"
 
 msgid "agent settings"
+msgstr "에이전트 설정"
+
+msgid "Agent settings"
 msgstr "에이전트 설정"
 
 msgid "Agent usage rankings"
@@ -4289,6 +4301,9 @@ msgstr "댓글, 디자인 모드 및 Pages에서 시작한 에이전트를 열 �
 msgid "Choose your default skin tone"
 msgstr "기본 피부색 선택"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "이 옵션을 선택하면 여기에 저장된 {label}의 자격 증명이 모두 삭제됩니다."
+
 msgid "CI failed"
 msgstr "CI 실패"
 
@@ -5748,6 +5763,9 @@ msgstr "재개할 수 없습니다"
 
 msgid "Could not resume the chat"
 msgstr "채팅을 재개할 수 없습니다"
+
+msgid "Could not save the change."
+msgstr "변경 사항을 저장할 수 없습니다."
 
 msgid "Could not send"
 msgstr "보낼 수 없습니다"
@@ -9897,6 +9915,9 @@ msgstr "(이 호스트의 터미널에서)"
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "몇 달 만에 <0>수만 명의 엔지니어</0>가 Wix, DoorDash, Netflix 같은 회사에서 Paradev를 주력 IDE로 사용하고 있습니다."
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "수동 모드에서는 Paradev가 이 에이전트를 로그인시키지 않습니다. 스크립트로 다시 로그인시킨 뒤 계속하거나, 에이전트 설정에서 수동 모드를 끄세요."
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "샌프란시스코 사무실에서 주 5일 근무합니다. 창업자와 직접 함께 일합니다."
 
@@ -11309,8 +11330,17 @@ msgstr "조직 관리자가 관리합니다."
 msgid "Manual"
 msgstr "수동"
 
+msgid "Manual mode is off for {label}."
+msgstr "{label}의 수동 모드를 껐습니다."
+
 msgid "Manual order"
 msgstr "수동 정렬"
+
+msgid "manual sign-in"
+msgstr "수동 로그인"
+
+msgid "Manual sign-in"
+msgstr "수동 로그인"
 
 msgid "Mark all read"
 msgstr "모두 읽음으로 표시"
@@ -14083,6 +14113,9 @@ msgstr "Paradev에는 무료 플랜이 있습니다. 소스 코드가 MIT 라이
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev에서 예기치 않은 오류가 발생했습니다. 다시 로드해 보세요."
 
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev는 {label}의 자격 증명을 보관하지 않으며, 클라우드 워크스페이스가 시작, 재시작 또는 재개될 때도 자격 증명을 추가하지 않습니다. 워크스페이스 안에서 실행하는 스크립트가 {loginFile}을(를) 최신 상태로 유지합니다. 스크립트가 멈추면 스크립트가 다시 로그인시킬 때까지 {label}은(는) 로그아웃 상태로 남습니다."
+
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "토큰은 Paradev가 보관하고 호출도 대신합니다. 에이전트는 토큰을 보지 못합니다."
 
@@ -16072,6 +16105,9 @@ msgstr "지금 다시 시작하면 {accountLabel}(으)로 이동하며, 각 세�
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "실행 중인 워크스페이스를 재시작하면 에이전트에 변경 사항이 반영됩니다."
+
 msgid "Restart terminal daemon?"
 msgstr "터미널 데몬을 다시 시작할까요?"
 
@@ -16378,8 +16414,8 @@ msgstr "기기 회전"
 msgid "Roundups"
 msgstr "모아 보기"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "직접 운영하는 제공사와 보유한 자격 증명으로 {label}을(를) 경유시킵니다. 저장한 값은 실행 시 에이전트로 전달됩니다."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "직접 운영하는 제공사와 보유한 자격 증명으로 {label}을(를) 경유시키거나, 로그인을 사용자의 도구에 맡깁니다."
 
 msgid "Routine not found"
 msgstr "루틴을 찾을 수 없습니다"
@@ -19120,6 +19156,9 @@ msgstr "에이전트가 대화를 복사하고 분기는 새 탭에서 열립니
 msgid "The agent crashed"
 msgstr "에이전트가 비정상 종료되었습니다"
 
+msgid "The agent is signed out"
+msgstr "에이전트가 로그아웃되었습니다"
+
 msgid "The agent lost this conversation"
 msgstr "에이전트가 이 대화를 잃어버렸습니다"
 
@@ -20317,6 +20356,12 @@ msgstr "반복 작업을 일정에 따라 또는 이벤트가 발생할 때 실�
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
 
+msgid "Turn off manual mode"
+msgstr "수동 모드 끄기"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "{label}의 수동 모드를 끌까요?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "“릴레이를 통해 이 기기에 원격 액세스 허용” 켜기"
 
@@ -20847,6 +20892,9 @@ msgstr "전역 기본값 사용"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "소문자, 숫자, 하이픈, 밑줄을 사용하세요"
+
+msgid "Use manual sign-in"
+msgstr "수동 로그인 사용"
 
 msgid "Use more browser features: {features}"
 msgstr "추가 브라우저 기능 사용: {features}"

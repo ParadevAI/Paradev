@@ -1058,6 +1058,12 @@ msgstr "Тема: {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Доступ ролі {label} до {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} знову стане неналаштованим. У робочих просторах нічого не зміниться: ваш скрипт і вхід, який він підтримує, залишаться, доки ви їх не видалите."
+
+msgid "{label} is set to manual"
+msgstr "Для {label} увімкнено ручний вхід"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1505,6 +1511,9 @@ msgstr "<0>{who}</0> відреагував(-ла) {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>з {1} у таблиці лідерів</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> або <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Незабаром у</0><1>Google Play</1>"
@@ -2288,6 +2297,9 @@ msgstr "Сеанс агента запущено"
 
 msgid "agent settings"
 msgstr "налаштування агента"
+
+msgid "Agent settings"
+msgstr "Налаштування агентів"
 
 msgid "Agent usage rankings"
 msgstr "Рейтинги використання агентів"
@@ -4283,6 +4295,9 @@ msgstr "Виберіть, де відкриваються агенти, запу
 msgid "Choose your default skin tone"
 msgstr "Виберіть тон шкіри за замовчуванням"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Якщо вибрати це, усі збережені тут облікові дані для {label} буде видалено."
+
 msgid "CI failed"
 msgstr "CI не пройдено"
 
@@ -5742,6 +5757,9 @@ msgstr "Не вдалося відновити"
 
 msgid "Could not resume the chat"
 msgstr "Не вдалося відновити чат"
+
+msgid "Could not save the change."
+msgstr "Не вдалося зберегти зміну."
 
 msgid "Could not send"
 msgstr "Не вдалося надіслати"
@@ -9891,6 +9909,9 @@ msgstr "у терміналі на цьому хості."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Лише за кілька місяців <0>десятки тисяч інженерів</0> у таких компаніях, як Wix, DoorDash і Netflix, почали використовувати Paradev як основну IDE."
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "У ручному режимі Paradev не виконує вхід для цього агента. Нехай ваш скрипт знову виконає вхід, а потім продовжте, або вимкніть ручний режим у налаштуваннях агентів."
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Очно в Сан-Франциско, п'ять днів на тиждень. Ви працюєте безпосередньо із засновниками."
 
@@ -11303,8 +11324,17 @@ msgstr "Керується адміністратором вашої орган�
 msgid "Manual"
 msgstr "Вручну"
 
+msgid "Manual mode is off for {label}."
+msgstr "Ручний режим для {label} вимкнено."
+
 msgid "Manual order"
 msgstr "Порядок вручну"
+
+msgid "manual sign-in"
+msgstr "ручний вхід"
+
+msgid "Manual sign-in"
+msgstr "Ручний вхід"
 
 msgid "Mark all read"
 msgstr "Позначити всі як прочитані"
@@ -14077,6 +14107,9 @@ msgstr "Paradev має безкоштовний тариф. Вихідний к�
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "У Paradev сталася неочікувана помилка. Перезавантажте, щоб спробувати знову."
 
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev не зберігає облікових даних для {label} і не додає їх у ваші хмарні робочі простори під час запуску, перезапуску чи пробудження. Скрипт, який ви запускаєте в робочому просторі, підтримує {loginFile} в актуальному стані. Якщо він зупиниться, {label} залишиться без входу, доки ваш скрипт знову не виконає вхід."
+
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev зберігає токен і сам виконує виклики. Агенти ніколи його не бачать."
 
@@ -16066,6 +16099,9 @@ msgstr "Перезапустіть їх зараз, щоб перенести н
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Перезапустіть запущені робочі простори, щоб їхні агенти застосували зміну."
+
 msgid "Restart terminal daemon?"
 msgstr "Перезапустити демон термінала?"
 
@@ -16372,8 +16408,8 @@ msgstr "Повернути пристрій"
 msgid "Roundups"
 msgstr "Огляди"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Спрямуйте {label} через власного провайдера з вашими обліковими даними. Збережені значення передаються агенту під час запуску."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Спрямуйте {label} через власного провайдера з вашими обліковими даними або залиште вхід вашим власним інструментам."
 
 msgid "Routine not found"
 msgstr "Рутину не знайдено"
@@ -19114,6 +19150,9 @@ msgstr "Агент копіює розмову; гілка відкриваєт�
 msgid "The agent crashed"
 msgstr "Агент аварійно завершив роботу"
 
+msgid "The agent is signed out"
+msgstr "Агент вийшов із системи"
+
 msgid "The agent lost this conversation"
 msgstr "Агент втратив цю розмову"
 
@@ -20311,6 +20350,12 @@ msgstr "Перетворіть рутинні справи на агентів, 
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
 
+msgid "Turn off manual mode"
+msgstr "Вимкнути ручний режим"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Вимкнути ручний режим для {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Увімкніть «Дозволити віддалений доступ до цього пристрою через релей»"
 
@@ -20841,6 +20886,9 @@ msgstr "Використовувати глобальне значення за 
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Використовуйте малі літери, цифри, дефіси та підкреслення"
+
+msgid "Use manual sign-in"
+msgstr "Використати ручний вхід"
 
 msgid "Use more browser features: {features}"
 msgstr "Використовувати більше можливостей браузера: {features}"

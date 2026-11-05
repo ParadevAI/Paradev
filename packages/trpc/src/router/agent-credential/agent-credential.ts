@@ -7,6 +7,8 @@ import {
 	agentCredentialToEnv,
 	CHATGPT_PROVIDER,
 	gatewayBaseUrl,
+	MANUAL_PROVIDER,
+	MANUAL_SIGN_IN_AGENTS,
 } from "@superset/shared/agent-credentials";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq } from "drizzle-orm";
@@ -25,6 +27,7 @@ import {
 } from "./utils/chatgpt";
 import { decryptAgentCredential, encryptAgentCredential } from "./utils/crypto";
 import { checkPublicEndpoint } from "./utils/public-endpoint";
+import { type AgentSignIns, signInsFromRows } from "./utils/sign-ins";
 import { validateAgentCredential } from "./utils/validate";
 
 const agentId = z.string().min(1).max(64);
@@ -264,6 +267,37 @@ export const agentCredentialRouter = {
 			return { status: "connected" as const, accountLabel };
 		}),
 
+	/** Replaces any stored credential for the agent: nothing of it is kept. */
+	setManual: personProcedure
+		.input(z.object({ agent: z.enum(MANUAL_SIGN_IN_AGENTS) }))
+		.mutation(async ({ ctx, input }) => {
+			const row = {
+				userId: ctx.principal.userId,
+				agent: input.agent,
+				kind: "api_key" as const,
+				encryptedValue: "",
+				baseUrl: null,
+				provider: MANUAL_PROVIDER,
+				accountLabel: null,
+				lastValidatedAt: null,
+			};
+			await dbWs
+				.insert(agentCredentials)
+				.values(row)
+				.onConflictDoUpdate({
+					target: [agentCredentials.userId, agentCredentials.agent],
+					set: {
+						kind: row.kind,
+						encryptedValue: row.encryptedValue,
+						baseUrl: row.baseUrl,
+						provider: row.provider,
+						accountLabel: row.accountLabel,
+						lastValidatedAt: row.lastValidatedAt,
+					},
+				});
+			return { agent: input.agent };
+		}),
+
 	remove: personProcedure
 		.input(z.object({ agent: agentId }))
 		.mutation(async ({ ctx, input }) => {
@@ -278,23 +312,6 @@ export const agentCredentialRouter = {
 			return { agent: input.agent };
 		}),
 } satisfies TRPCRouterRecord;
-
-/**
- * A ChatGPT sign-in as a box needs it: the access token for the firewall and
- * who it is. Never the refresh token, and never the id token itself, which
- * OpenAI would trade for more.
- */
-export interface CodexChatgptSignIn {
-	accessToken: string;
-	accountId: string;
-	identity: ReturnType<typeof chatgptIdentity>;
-}
-
-export interface AgentSignIns {
-	/** What each signed-in agent reads from its environment. */
-	env: Record<string, string>;
-	codexChatgpt: CodexChatgptSignIn | null;
-}
 
 type AgentCredentialRow = typeof agentCredentials.$inferSelect;
 
@@ -338,7 +355,8 @@ async function currentChatgptTokens(
 				.from(agentCredentials)
 				.where(eq(agentCredentials.id, row.id))
 				.for("update");
-			if (!locked) return stored;
+			// Removed or set to Manual since it was read: the box gets no session.
+			if (!locked || locked.provider !== CHATGPT_PROVIDER) return null;
 			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
 			if (isFresh(current)) return current;
 			renewed = await refreshChatgptTokens(current);
@@ -389,29 +407,8 @@ export async function resolveAgentSignIns(args: {
 		.select()
 		.from(agentCredentials)
 		.where(eq(agentCredentials.userId, args.userId));
-	const env: Record<string, string> = {};
-	let codexChatgpt: CodexChatgptSignIn | null = null;
-	for (const row of rows) {
-		if (row.agent === "codex" && row.provider === CHATGPT_PROVIDER) {
-			const tokens = await currentChatgptTokens(row);
-			if (!tokens) continue;
-			codexChatgpt = {
-				accessToken: tokens.accessToken,
-				accountId: tokens.accountId,
-				identity: chatgptIdentity(tokens.idToken),
-			};
-			continue;
-		}
-		Object.assign(
-			env,
-			agentCredentialToEnv({
-				agent: row.agent,
-				kind: row.kind,
-				value: decryptRow(row),
-				baseUrl: row.baseUrl,
-				provider: row.provider,
-			}),
-		);
-	}
-	return { env, codexChatgpt };
+	return signInsFromRows(rows, {
+		value: decryptRow,
+		chatgptTokens: currentChatgptTokens,
+	});
 }

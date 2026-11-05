@@ -1064,6 +1064,12 @@ msgstr "{kindLabel} motiv"
 msgid "{label} access to {pluginName}"
 msgstr "Přístup role {label} k {pluginName}"
 
+msgid "{label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them."
+msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se nic nezmění: váš skript a přihlášení, které udržuje, zůstanou, dokud je neodstraníte."
+
+msgid "{label} is set to manual"
+msgstr "{label} nyní používá ruční přihlášení"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1511,6 +1517,9 @@ msgstr "<0>{who}</0> reaguje pomocí {shortcode}"
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>z {1} v žebříčku</1>"
+
+msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
+msgstr "<0>~/.claude/.credentials.json</0> nebo <1>apiKeyHelper</1>"
 
 msgid "<0>Coming soon to</0><1>Google Play</1>"
 msgstr "<0>Již brzy na</0><1>Google Play</1>"
@@ -2294,6 +2303,9 @@ msgstr "Relace agenta spuštěna"
 
 msgid "agent settings"
 msgstr "nastavení agenta"
+
+msgid "Agent settings"
+msgstr "Nastavení agentů"
 
 msgid "Agent usage rankings"
 msgstr "Žebříček využití agentů"
@@ -4289,6 +4301,9 @@ msgstr "Vyberte, kde se otevřou agenti spuštění z komentářů, režimu náv
 msgid "Choose your default skin tone"
 msgstr "Vyberte výchozí odstín pleti"
 
+msgid "Choosing this removes any credential saved here for {label}."
+msgstr "Touto volbou odstraníte všechny přihlašovací údaje uložené zde pro {label}."
+
 msgid "CI failed"
 msgstr "CI selhalo"
 
@@ -5748,6 +5763,9 @@ msgstr "Pokračování se nezdařilo"
 
 msgid "Could not resume the chat"
 msgstr "V chatu se nepodařilo pokračovat"
+
+msgid "Could not save the change."
+msgstr "Změnu se nepodařilo uložit."
 
 msgid "Could not send"
 msgstr "Nepodařilo se odeslat"
@@ -9897,6 +9915,9 @@ msgstr "v terminálu na tomto hostu."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Za pouhých pár měsíců používají Paradev jako hlavní IDE <0>desítky tisíc inženýrů</0>, ve firmách jako Wix, DoorDash nebo Netflix."
 
+msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "V ručním režimu Paradev tohoto agenta nepřihlašuje. Nechte svůj skript, ať ho znovu přihlásí, a pokračujte, nebo vypněte ruční režim v nastavení agentů."
+
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Osobně v San Franciscu, pět dní v týdnu. Pracujete přímo se zakladateli."
 
@@ -11309,8 +11330,17 @@ msgstr "Spravuje správce vaší organizace."
 msgid "Manual"
 msgstr "Manuální"
 
+msgid "Manual mode is off for {label}."
+msgstr "Ruční režim pro {label} je vypnutý."
+
 msgid "Manual order"
 msgstr "Ruční řazení"
+
+msgid "manual sign-in"
+msgstr "ruční přihlášení"
+
+msgid "Manual sign-in"
+msgstr "Ruční přihlášení"
 
 msgid "Mark all read"
 msgstr "Označit vše jako přečtené"
@@ -14083,6 +14113,9 @@ msgstr "Paradev má bezplatnou verzi. Zdrojový kód je na GitHubu pod licencí 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "V Paradev došlo k neočekávané chybě. Zkuste to znovu načtením."
 
+msgid "Paradev holds no credential for {label} and adds none to your cloud workspaces when they start, restart or wake. A script you run inside the workspace keeps {loginFile} up to date. If it stops, {label} stays signed out until your script signs it in again."
+msgstr "Paradev pro {label} neuchovává žádné přihlašovací údaje a nepřidává je do vašich cloudových pracovních prostorů při spuštění, restartu ani probuzení. Skript, který spouštíte v pracovním prostoru, udržuje {loginFile} aktuální. Pokud se zastaví, {label} zůstane odhlášený, dokud ho váš skript znovu nepřihlásí."
+
 msgid "Paradev holds the token and makes the calls. Agents never see it."
 msgstr "Paradev drží token a provádí volání. Agenti ho nikdy neuvidí."
 
@@ -16072,6 +16105,9 @@ msgstr "Restartujte je teď a přejdou na {accountLabel}; každá relace naváž
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restartovat běžící agenty {providerLabel}?"
 
+msgid "Restart running workspaces so their agents pick up the change."
+msgstr "Restartujte spuštěné pracovní prostory, aby jejich agenti změnu převzali."
+
 msgid "Restart terminal daemon?"
 msgstr "Restartovat terminálového démona?"
 
@@ -16378,8 +16414,8 @@ msgstr "Otočit zařízení"
 msgid "Roundups"
 msgstr "Přehledy"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Veďte {label} přes poskytovatele, kterého provozujete, s přihlašovacími údaji, které máte. Uložené hodnoty se agentovi předají při spuštění."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Veďte {label} přes poskytovatele, kterého provozujete, s přihlašovacími údaji, které máte, nebo přihlášení nechte na vlastních nástrojích."
 
 msgid "Routine not found"
 msgstr "Rutina nenalezena"
@@ -19120,6 +19156,9 @@ msgstr "Agent zkopíruje konverzaci; větev se otevře na nové kartě"
 msgid "The agent crashed"
 msgstr "Agent spadl"
 
+msgid "The agent is signed out"
+msgstr "Agent je odhlášený"
+
 msgid "The agent lost this conversation"
 msgstr "Agent tuto konverzaci ztratil"
 
@@ -20317,6 +20356,12 @@ msgstr "Proměňte rutinní práci v agenty, kteří běží podle plánu nebo p
 msgid "Turn Fast mode on or off"
 msgstr "Zapnout nebo vypnout rychlý režim"
 
+msgid "Turn off manual mode"
+msgstr "Vypnout ruční režim"
+
+msgid "Turn off manual mode for {label}?"
+msgstr "Vypnout ruční režim pro {label}?"
+
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“"
 
@@ -20847,6 +20892,9 @@ msgstr "Použít globální výchozí"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Použijte malá písmena, číslice, pomlčky a podtržítka"
+
+msgid "Use manual sign-in"
+msgstr "Použít ruční přihlášení"
 
 msgid "Use more browser features: {features}"
 msgstr "Používat další funkce prohlížeče: {features}"
