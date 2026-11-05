@@ -1,0 +1,141 @@
+---
+title: "Paradev vs Multica (2026): Agent Workspace vs an Issue Board for Agent Teammates"
+description: "Compare Paradev and Multica for running coding agents: where agents run, which agents, how tasks start, review, team features, self-hosting, license, and pricing."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - multica
+keywords:
+  - superset vs multica
+  - multica vs superset
+  - paradev vs multica
+  - multica alternative
+  - multica.ai
+  - ai agents as teammates
+  - assign issues to coding agents
+---
+
+Paradev and Multica both run the agent CLIs you already use, such as Claude Code and Codex, on machines you control. They start from different places. Multica is a project board for humans and agents: you assign an issue to an agent, a daemon on your machine runs the agent CLI, and the agent comments, moves the issue to review, and links a pull request. Paradev is a desktop workspace: each agent runs in its own Git worktree and terminal, with diff review, pull requests, and a browser beside it. Choose Multica when you want to manage agents like teammates on an issue board. Choose Paradev when you want to watch, steer, and review each agent in one app.
+
+This comparison is published by Paradev. Multica details were checked against [multica.ai](https://multica.ai), its [docs](https://multica.ai/docs), [licensing page](https://multica.ai/licensing), [changelog](https://multica.ai/changelog), and its [GitHub repository](https://github.com/multica-ai/multica) (README, LICENSE, and releases) on November 5, 2026.
+
+## At a Glance
+
+| Requirement | Paradev | Multica |
+|---|---|---|
+| Interface | Desktop app, CLI, iPhone and iPad app | Web app, desktop app (a wrapper for the web app), CLI and API; iOS app that you build from source |
+| Main view | Workspaces, each with a terminal, Changes pane, and browser | Issue board, with agents as assignees |
+| Where agents run | Your machine, remote hosts you add, your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | A daemon on a machine you connect (laptop or cloud server); Qoder Cloud Agents as a hosted option |
+| Isolation | Git worktree and branch per local workspace; a separate clone per cloud workspace | A directory per run, with a Git worktree from a shared repository cache |
+| Agents | Any CLI agent: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | 26 agent CLIs, including Claude Code, Codex, Cursor Agent, Copilot CLI, OpenCode, Pi, Antigravity, Grok, Kimi, Kiro CLI, and Qwen Code |
+| How tasks start | App or CLI; automations on schedules and GitHub, Slack, and Linear events; tasks synced with Linear and GitHub Issues | Assign an issue, @-mention an agent, chat, quick actions, workflows, autopilots, wakeups, Slack and other chat apps |
+| Review | Changes pane with diff, commit, push, and PR; Pull Requests view with checks and line comments | `in_review` status, issue comments, deliverables, and linked pull requests on your Git host |
+| Desktop platforms | macOS; experimental Linux; Windows not available yet | macOS, Windows, and Linux |
+| License | Open source, MIT | Multica License: Apache 2.0 text plus extra conditions on hosted services and branding |
+
+## What Is Multica?
+
+Multica calls itself "a source-available workspace where you assign work to AI coding agents the way you'd assign it to a teammate." Agents get a name, a provider, and a runtime, and they show up on the board next to people. When you assign an issue, the agent picks it up, comments as it works, raises blockers, and moves the issue to `in_review` when it delivers.
+
+Multica does not ship a model or an agent. A runtime is a machine with a Multica daemon and at least one signed-in agent CLI. The desktop app starts a daemon on the computer it runs on, and you can add other machines.
+
+Multica also has skills that every agent can reuse and a chat to ask the workspace a question. Each run has a replayable execution log, and usage analytics show the cost per agent and per issue. You can reply to a running agent and the message lands in the current run, for Claude Code, Codex, Grok, and Kiro. Multica is in active development: v0.8.0 shipped on November 3, 2026, and the team releases most weekdays.
+
+## What Is Paradev?
+
+Paradev is a desktop workspace for CLI coding agents. Each workspace gets its own Git worktree and a persistent terminal. You run the agent you already installed, with its own login, settings, and MCP servers. Beside the agent, you get a Changes pane, a file editor, an in-app browser with Design Mode, and a Pull Requests view with CI checks. A chat interface shows Claude Code, Codex, OpenCode, and Pi sessions as a chat, and a CLI / Chat toggle switches the same session between the two. Paradev is open source under the MIT License.
+
+## Key Differences
+
+### Issue board vs workspace
+
+Multica puts the issue first. You file an issue in a few sentences, set an agent or a squad as assignee, and follow the work through comments, the run log, and the inbox. You do not need a terminal to use it.
+
+Paradev puts the agent session first. You see the agent's terminal, or its chat interface, while it works. You can type into it, stop it, or continue the session with another agent. The diff, the browser, and the pull request are in panes next to it.
+
+### Where do your agents run?
+
+In Multica, agents run where you install the daemon: your laptop or a cloud server you manage. Since v0.7.0, you can also pick Qoder Cloud Agents, a hosted service that runs assigned issues in remote sessions and bills Qoder credits.
+
+Paradev runs agents on your machine by default. To keep them working away from your desk, you have three options:
+
+- Add a macOS or Linux machine as a host through the Paradev relay (Remote Access, paid plan).
+- Run the Paradev host on an x64 or arm64 Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Repos and agent sign-ins stay on that server, and it needs no inbound ports.
+- Use [cloud workspaces](/cloud) (beta), included with Team and Ultra. Paradev runs the sandbox, and agents keep working when your laptop is closed.
+
+### Which agents can you use?
+
+Both are agent-agnostic and use your own subscriptions. Multica supports 26 agent CLIs, with many from China-based vendors, such as Qwen Code, Kimi, Trae CLI, and DeepSeek Harness. Paradev runs any CLI agent in a terminal, including custom commands, and never proxies model calls.
+
+### How do tasks start?
+
+This is Multica's strongest area. Work starts when you assign an issue, @-mention an agent in a comment, run a quick action such as Code Review, or reach a step in a project workflow. Autopilots start recurring work, and wakeups bring an agent back to an issue later. In Slack, Feishu/Lark, DingTalk, WeCom, and Telegram, you DM or @-mention the bot, and `/issue` creates an issue.
+
+Paradev starts most work from the desktop app, the CLI, or the phone app. Automations run on schedules or on events from GitHub, Slack, Linear, and more, with run history. Tasks sync with Linear and GitHub Issues, and a Slack bot is available. The CLI, the MIT-licensed TypeScript SDK, and the MCP server let agents create workspaces and other agents.
+
+### How do you review the work?
+
+Multica tracks review on the issue. Agents move the issue to `in_review`, post files as deliverables, and answer review comments. A pull request links to the issue when the issue identifier is in the branch name or PR title. When every linked PR merges, the issue can move to done. It works with GitHub, GitLab, Gitea, and Forgejo. Its docs do not describe a diff view in the app.
+
+Paradev keeps code review next to the agent. The Changes pane shows the diff, lets you edit files, and commits, pushes, and opens a pull request. The Pull Requests view shows CI checks and line comments, and you can send a comment to an agent.
+
+### Team features
+
+Multica is built for teams. It has separate workspaces per team, `owner`, `admin`, and `member` roles, and scopes that set which agents each member can run. Squads mix agents and people under one leader agent.
+
+Paradev Pro adds remote hosts, automations, and integrations such as Linear and Slack. Enterprise adds SAML SSO, SCIM, and audit logs, and Paradev is SOC 2 Type II.
+
+### Phone and desktop platforms
+
+Multica Desktop runs on macOS, Windows, and Linux. Its iPhone and iPad app is not on the App Store yet: you build it from source on a Mac. There is no Android app.
+
+Paradev runs on macOS, with an experimental Linux build, and not yet on Windows. Its native iPhone and iPad app (iOS or iPadOS 26 or later, paid plan) reaches cloud workspaces, Bring Your Own Cloud servers, and your own hosts that are online. Android is on a [waitlist](/mobile#android).
+
+### Self-hosting and license
+
+Multica runs the full stack on your own infrastructure with Docker Compose or Helm. Use inside your own organization is free, including self-hosting. The Multica License is the Apache 2.0 text with extra conditions: you need a commercial license to offer Multica as a hosted service to people outside your organization, or to embed it in a product you sell. You also must keep the Multica logo, name, and copyright notices in its interface.
+
+Paradev is open source under the MIT License. You can use, change, fork, self-host, and redistribute it, also in commercial products.
+
+## Pricing
+
+| Plan | Paradev | Multica |
+|---|---|---|
+| Free | $0, one user, local workspaces, desktop app, CLI | Self-hosting for internal use is free |
+| Paid | Pro: {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly. Team: {{price:team}}. Ultra: {{price:ultra}} | Multica Cloud sign-up starts as a free trial; no public price list was found |
+| Large teams | Enterprise: custom, with SAML SSO, SCIM, and audit logs | Commercial license through sales |
+
+Both use your own agent subscriptions and keys. Paradev Team and Ultra add cloud workspaces. Check [Paradev pricing](/pricing) and [multica.ai](https://multica.ai) for current terms.
+
+## Which Should You Choose?
+
+**Choose Multica if you:**
+
+- Want to assign issues to agents on a board, with people and agents in one timeline.
+- Want squads, skills, autopilots, and per-run cost analytics.
+- Want to start agent work from Slack, Feishu/Lark, or other chat apps.
+- Need a desktop app on Windows, or a self-hosted stack with GitLab, Gitea, or Forgejo.
+
+**Choose Paradev if you:**
+
+- Want to watch and steer each agent in a real terminal or the chat interface.
+- Want diffs, commits, pull requests, and a browser with Design Mode next to the agent.
+- Want to choose where agents run: your laptop, a host you add, your own Linux server, or cloud workspaces (beta).
+- Want a native iPhone and iPad app from the App Store, or code under the MIT License.
+
+**Verdict:** Multica is a project board where agents are teammates. You give them issues and review the results on the issue and on your Git host. Paradev is a workspace for the agents you run. It keeps each agent in its own worktree and terminal, with review in the same app. Teams that plan in issues and want agents to take tickets should try Multica. Developers who want hands-on control of each agent session should try Paradev.
+
+## Frequently Asked Questions
+
+### Is Paradev a Multica alternative?
+
+Yes. Both run Claude Code, Codex, and other agent CLIs on machines you control, with a Git worktree per task. Multica organizes the work as issues on a board. Paradev organizes it as workspaces with a terminal, diff review, and pull requests.
+
+### Does Multica run agents in its cloud?
+
+Mostly no. Agents run on machines where you install the Multica daemon. The hosted exception is Qoder Cloud Agents, which runs issues in remote sessions on Qoder credits.
+
+### Is Multica open source?
+
+Multica calls itself source-available. Its license is the Apache 2.0 text plus extra conditions on hosted services, embedding, and branding. Internal use and self-hosting are free. Paradev is open source under the MIT License.
