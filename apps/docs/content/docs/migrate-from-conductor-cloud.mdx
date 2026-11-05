@@ -40,6 +40,14 @@ Then pick where to continue: on your Mac, or in a Paradev cloud workspace.
 1. In Conductor, right-click the cloud workspace and choose **Transfer to local**. Conductor moves the workspace and its chats to your Mac.
 2. Follow [Migrate from Conductor](/migrate-from-conductor) to import the workspace into Paradev and convert your scripts.
 
+Conductor can attach a cloud workspace on your Mac to its own copy of the repository under `~/conductor/`, not to your clone. Then the workspace does not appear in your project's import list. To check, run this in the workspace folder:
+
+```bash
+git rev-parse --path-format=absolute --git-common-dir
+```
+
+If the path is under `~/conductor/`, commit and push the branch from that folder. Then create a workspace from the **Existing branch** in your own clone.
+
 If you only pushed the branch, add the repository in Paradev and create a workspace from the **Existing branch** instead. See [Workspaces](/workspaces).
 
 ## 2b. Continue in a Paradev Cloud Workspace

@@ -22,7 +22,10 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { organizationMachineSizes } from "../../lib/billing/plan";
+import {
+	organizationMachineSizes,
+	resolveMachineSize,
+} from "../../lib/billing/plan";
 import {
 	assertCloudAccess,
 	assertMember,
@@ -55,13 +58,21 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
-import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
+import {
+	assertMayBoot,
+	queueSettleWorkspace,
+	settleWorkspaceNow,
+} from "./meter";
 import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { cloudWorkspaceSharingRouter } from "./sharing";
-import { queueProvision, startCloudWorkspace } from "./start";
+import {
+	machineSizeNotAvailable,
+	queueProvision,
+	startCloudWorkspace,
+} from "./start";
 import { transitionCloudWorkspace } from "./transition";
 import {
 	markSandboxUnavailable,
@@ -118,6 +129,7 @@ async function addressSandbox(
 	hostTarget: string;
 	running: boolean;
 	agentCredentialsChanged: boolean;
+	vcpus?: number;
 }> {
 	try {
 		if (mode === "address") {
@@ -557,6 +569,49 @@ export const cloudWorkspaceRouter = {
 			const row = await loadReadyWorkspace(ctx, input.id);
 			await addressSandbox(row, "restart");
 			return { restarted: true };
+		}),
+
+	/**
+	 * Sets the size the box runs at. A running box restarts at the new size,
+	 * which ends every process on it; a stopped one resizes on its next wake.
+	 */
+	setMachineSize: personProcedure
+		.input(
+			z.object({
+				id: z.string().uuid(),
+				machineSize: z.enum(MACHINE_SIZES),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			const size = await resolveMachineSize(
+				row.organizationId,
+				input.machineSize,
+			);
+			if (!size) throw machineSizeNotAvailable(input.machineSize);
+			await assertMayBoot(row.organizationId, size.vcpus);
+			const [updated] = await db
+				.update(cloudWorkspaces)
+				.set({ machineSize: size.name })
+				.where(eq(cloudWorkspaces.id, row.id))
+				.returning();
+			nudge(row.organizationId, "cloud_workspaces");
+			const resized = updated ?? { ...row, machineSize: size.name };
+			let box = await addressSandbox(resized, "address");
+			const restarted = box.running;
+			if (restarted) {
+				await addressSandbox(resized, "restart");
+				box = await addressSandbox(resized, "address");
+			}
+			return {
+				id: row.id,
+				machineSize: size.name,
+				vcpus: size.vcpus,
+				running: box.running,
+				restarted,
+				/** What the box runs at now; differs from `vcpus` until it boots again. */
+				boxVcpus: box.vcpus ?? null,
+			};
 		}),
 
 	/** Stops the sandbox so it costs storage only; the next `access` with `wake` boots it again. */
