@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	DropdownMenu,
+	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
@@ -9,6 +10,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { Ellipsis, Play, Settings, Square, X } from "lucide-react";
+import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
@@ -46,6 +48,7 @@ export function WorkspaceMoreMenu({
 	const configureRun = useConfigureWorkspaceRun(projectId, runDefinition);
 	const runHotkey = useHotkeyDisplay("RUN_WORKSPACE_COMMAND").text;
 	const hasRunCommand = (runDefinition?.commands ?? []).length > 0;
+	const { preferences, setChangesRailVisible } = useV2UserPreferences();
 	const label = t({ message: "More actions" });
 
 	return (
@@ -118,6 +121,13 @@ export function WorkspaceMoreMenu({
 						)}
 					</DropdownMenuItem>
 				)}
+				<DropdownMenuSeparator />
+				<DropdownMenuCheckboxItem
+					checked={preferences.changesRailVisible}
+					onCheckedChange={setChangesRailVisible}
+				>
+					<Trans>Show changed files</Trans>
+				</DropdownMenuCheckboxItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

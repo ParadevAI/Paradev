@@ -4039,6 +4039,9 @@ msgstr "Je privacyinstellingen wijzigen"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Het percentage mislukte wijzigingen ligt twee kwartalen op rij op of onder het niveau van het menselijke tijdperk."
 
+msgid "Changed files"
+msgstr "Gewijzigde bestanden"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Verbergen"
 
 msgid "Hide {displayName}"
 msgstr "Verberg {displayName}"
+
+msgid "Hide changed files"
+msgstr "Gewijzigde bestanden verbergen"
 
 msgid "Hide checks"
 msgstr "Checks verbergen"
@@ -17537,6 +17543,9 @@ msgstr "Gearchiveerde tonen"
 
 msgid "Show Borders"
 msgstr "Toon randen"
+
+msgid "Show changed files"
+msgstr "Gewijzigde bestanden tonen"
 
 msgid "Show checks"
 msgstr "Checks tonen"

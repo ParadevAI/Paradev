@@ -4039,6 +4039,9 @@ msgstr "Thay đổi các tùy chọn cài đặt liên quan đến quyền riên
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Tỷ lệ thay đổi gây lỗi bằng hoặc thấp hơn mức nền của thời con người trong hai quý liên tiếp."
 
+msgid "Changed files"
+msgstr "Tệp đã thay đổi"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Ẩn"
 
 msgid "Hide {displayName}"
 msgstr "Ẩn {displayName}"
+
+msgid "Hide changed files"
+msgstr "Ẩn tệp đã thay đổi"
 
 msgid "Hide checks"
 msgstr "Ẩn check"
@@ -17537,6 +17543,9 @@ msgstr "Hiện mục đã lưu trữ"
 
 msgid "Show Borders"
 msgstr "Hiển thị đường viền"
+
+msgid "Show changed files"
+msgstr "Hiện tệp đã thay đổi"
 
 msgid "Show checks"
 msgstr "Hiện check"

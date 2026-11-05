@@ -4039,6 +4039,9 @@ msgstr "Měnit nastavení ochrany soukromí"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Míra selhání změn na úrovni lidské éry nebo pod ní po dvě čtvrtletí po sobě."
 
+msgid "Changed files"
+msgstr "Změněné soubory"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Skrýt"
 
 msgid "Hide {displayName}"
 msgstr "Skrýt {displayName}"
+
+msgid "Hide changed files"
+msgstr "Skrýt změněné soubory"
 
 msgid "Hide checks"
 msgstr "Skrýt kontroly"
@@ -17537,6 +17543,9 @@ msgstr "Zobrazit archivované"
 
 msgid "Show Borders"
 msgstr "Zobrazit ohraničení"
+
+msgid "Show changed files"
+msgstr "Zobrazit změněné soubory"
 
 msgid "Show checks"
 msgstr "Zobrazit kontroly"

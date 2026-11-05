@@ -28,6 +28,7 @@ describe("healV2UserPreferences", () => {
 		expect(healed.rightSidebarOpen).toBe(false);
 		expect(healed.rightSidebarWidth).toBe(500);
 		expect(healed.terminalPresetsInitialized).toBe(false);
+		expect(healed.changesRailVisible).toBe(true);
 		expect(healed.sidebarFileLinks).toEqual(
 			DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks,
 		);

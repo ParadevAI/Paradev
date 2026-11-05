@@ -4039,6 +4039,9 @@ msgstr "Gizlilikle ilgili ayarlarınızı değiştirme"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Değişiklik hata oranı, iki ardışık çeyrek boyunca insan dönemi taban çizgisinde veya altında kalır."
 
+msgid "Changed files"
+msgstr "Değişen dosyalar"
+
 msgid "Changelog"
 msgstr "Değişiklik günlüğü"
 
@@ -9420,6 +9423,9 @@ msgstr "Gizle"
 
 msgid "Hide {displayName}"
 msgstr "{displayName} Uygulamasını Gizle"
+
+msgid "Hide changed files"
+msgstr "Değişen dosyaları gizle"
 
 msgid "Hide checks"
 msgstr "Kontrolleri gizle"
@@ -17537,6 +17543,9 @@ msgstr "Arşivlenenleri göster"
 
 msgid "Show Borders"
 msgstr "Kenarlıkları Göster"
+
+msgid "Show changed files"
+msgstr "Değişen dosyaları göster"
 
 msgid "Show checks"
 msgstr "Kontrolleri göster"

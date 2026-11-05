@@ -4039,6 +4039,9 @@ msgstr "Mengubah setelan terkait privasi"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Tingkat kegagalan perubahan sama atau di bawah baseline era manusia selama dua kuartal berturut-turut."
 
+msgid "Changed files"
+msgstr "File yang berubah"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Sembunyikan"
 
 msgid "Hide {displayName}"
 msgstr "Sembunyikan {displayName}"
+
+msgid "Hide changed files"
+msgstr "Sembunyikan file yang berubah"
 
 msgid "Hide checks"
 msgstr "Sembunyikan check"
@@ -17537,6 +17543,9 @@ msgstr "Tampilkan yang diarsipkan"
 
 msgid "Show Borders"
 msgstr "Tampilkan Batas"
+
+msgid "Show changed files"
+msgstr "Tampilkan file yang berubah"
 
 msgid "Show checks"
 msgstr "Tampilkan check"

@@ -4039,6 +4039,9 @@ msgstr "Cambiar tu configuración de privacidad"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Tasa de fallos por cambio igual o inferior a la de referencia de la era humana durante dos trimestres seguidos."
 
+msgid "Changed files"
+msgstr "Archivos modificados"
+
 msgid "Changelog"
 msgstr "Registro de cambios"
 
@@ -9420,6 +9423,9 @@ msgstr "Ocultar"
 
 msgid "Hide {displayName}"
 msgstr "Ocultar {displayName}"
+
+msgid "Hide changed files"
+msgstr "Ocultar archivos modificados"
 
 msgid "Hide checks"
 msgstr "Ocultar comprobaciones"
@@ -17537,6 +17543,9 @@ msgstr "Mostrar archivados"
 
 msgid "Show Borders"
 msgstr "Mostrar bordes"
+
+msgid "Show changed files"
+msgstr "Mostrar archivos modificados"
 
 msgid "Show checks"
 msgstr "Mostrar comprobaciones"

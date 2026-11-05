@@ -4033,6 +4033,9 @@ msgstr "Змінювати налаштування конфіденційнос
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Частка невдалих змін не вища за базовий рівень часів, коли код писали люди, два квартали поспіль."
 
+msgid "Changed files"
+msgstr "Змінені файли"
+
 msgid "Changelog"
 msgstr "Журнал змін"
 
@@ -9414,6 +9417,9 @@ msgstr "Приховати"
 
 msgid "Hide {displayName}"
 msgstr "Приховати {displayName}"
+
+msgid "Hide changed files"
+msgstr "Приховати змінені файли"
 
 msgid "Hide checks"
 msgstr "Приховати перевірки"
@@ -17531,6 +17537,9 @@ msgstr "Показати архівні"
 
 msgid "Show Borders"
 msgstr "Показувати межі"
+
+msgid "Show changed files"
+msgstr "Показати змінені файли"
 
 msgid "Show checks"
 msgstr "Показати перевірки"

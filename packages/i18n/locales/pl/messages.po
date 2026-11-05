@@ -4039,6 +4039,9 @@ msgstr "Zmieniać ustawienia prywatności"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Wskaźnik nieudanych zmian na poziomie ery ludzkiej lub niższy przez dwa kolejne kwartały."
 
+msgid "Changed files"
+msgstr "Zmienione pliki"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Ukryj"
 
 msgid "Hide {displayName}"
 msgstr "Ukryj {displayName}"
+
+msgid "Hide changed files"
+msgstr "Ukryj zmienione pliki"
 
 msgid "Hide checks"
 msgstr "Ukryj kontrole"
@@ -17537,6 +17543,9 @@ msgstr "Pokaż zarchiwizowane"
 
 msgid "Show Borders"
 msgstr "Pokaż obramowania"
+
+msgid "Show changed files"
+msgstr "Pokaż zmienione pliki"
 
 msgid "Show checks"
 msgstr "Pokaż kontrole"

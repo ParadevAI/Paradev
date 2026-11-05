@@ -4039,6 +4039,9 @@ msgstr "更改您的隐私相关设置"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "变更失败率连续两个季度不高于人类时代的基线。"
 
+msgid "Changed files"
+msgstr "更改的文件"
+
 msgid "Changelog"
 msgstr "更新日志"
 
@@ -9420,6 +9423,9 @@ msgstr "隐藏"
 
 msgid "Hide {displayName}"
 msgstr "隐藏 {displayName}"
+
+msgid "Hide changed files"
+msgstr "隐藏更改的文件"
 
 msgid "Hide checks"
 msgstr "隐藏检查"
@@ -17537,6 +17543,9 @@ msgstr "显示已归档"
 
 msgid "Show Borders"
 msgstr "显示边框"
+
+msgid "Show changed files"
+msgstr "显示更改的文件"
 
 msgid "Show checks"
 msgstr "显示检查"

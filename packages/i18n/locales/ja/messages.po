@@ -4039,6 +4039,9 @@ msgstr "プライバシー関連の設定の変更"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "変更失敗率が2四半期連続で人間の時代の基準値以下に収まる。"
 
+msgid "Changed files"
+msgstr "変更されたファイル"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "隠す"
 
 msgid "Hide {displayName}"
 msgstr "{displayName}を非表示"
+
+msgid "Hide changed files"
+msgstr "変更されたファイルを隠す"
 
 msgid "Hide checks"
 msgstr "チェックを隠す"
@@ -17537,6 +17543,9 @@ msgstr "アーカイブ済みを表示"
 
 msgid "Show Borders"
 msgstr "境界線を表示"
+
+msgid "Show changed files"
+msgstr "変更されたファイルを表示"
 
 msgid "Show checks"
 msgstr "チェックを表示"

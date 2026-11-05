@@ -4039,6 +4039,9 @@ msgstr "Datenschutzeinstellungen ändern"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Change-Failure-Rate auf oder unter dem Niveau der Menschen-Ära über zwei Quartale in Folge."
 
+msgid "Changed files"
+msgstr "Geänderte Dateien"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Ausblenden"
 
 msgid "Hide {displayName}"
 msgstr "{displayName} ausblenden"
+
+msgid "Hide changed files"
+msgstr "Geänderte Dateien ausblenden"
 
 msgid "Hide checks"
 msgstr "Prüfungen ausblenden"
@@ -17537,6 +17543,9 @@ msgstr "Archivierte anzeigen"
 
 msgid "Show Borders"
 msgstr "Rahmen anzeigen"
+
+msgid "Show changed files"
+msgstr "Geänderte Dateien anzeigen"
 
 msgid "Show checks"
 msgstr "Prüfungen anzeigen"

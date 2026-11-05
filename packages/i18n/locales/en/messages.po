@@ -4039,6 +4039,9 @@ msgstr "Change your privacy-related settings"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 
+msgid "Changed files"
+msgstr "Changed files"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Hide"
 
 msgid "Hide {displayName}"
 msgstr "Hide {displayName}"
+
+msgid "Hide changed files"
+msgstr "Hide changed files"
 
 msgid "Hide checks"
 msgstr "Hide checks"
@@ -17537,6 +17543,9 @@ msgstr "Show archived"
 
 msgid "Show Borders"
 msgstr "Show Borders"
+
+msgid "Show changed files"
+msgstr "Show changed files"
 
 msgid "Show checks"
 msgstr "Show checks"

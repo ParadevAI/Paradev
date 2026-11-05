@@ -4039,6 +4039,9 @@ msgstr "Изменять настройки конфиденциальности
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Доля неудачных изменений на уровне человеческой эпохи или ниже два квартала подряд."
 
+msgid "Changed files"
+msgstr "Изменённые файлы"
+
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -9420,6 +9423,9 @@ msgstr "Скрыть"
 
 msgid "Hide {displayName}"
 msgstr "Скрыть {displayName}"
+
+msgid "Hide changed files"
+msgstr "Скрыть изменённые файлы"
 
 msgid "Hide checks"
 msgstr "Скрыть проверки"
@@ -17537,6 +17543,9 @@ msgstr "Показать архивные"
 
 msgid "Show Borders"
 msgstr "Показывать границы"
+
+msgid "Show changed files"
+msgstr "Показать изменённые файлы"
 
 msgid "Show checks"
 msgstr "Показать проверки"

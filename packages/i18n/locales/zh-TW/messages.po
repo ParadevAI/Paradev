@@ -4039,6 +4039,9 @@ msgstr "變更你的隱私權相關設定"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "變更失敗率連續兩個季度不高於人類時代的基線。"
 
+msgid "Changed files"
+msgstr "更改的檔案"
+
 msgid "Changelog"
 msgstr "更新日誌"
 
@@ -9420,6 +9423,9 @@ msgstr "隱藏"
 
 msgid "Hide {displayName}"
 msgstr "隱藏 {displayName}"
+
+msgid "Hide changed files"
+msgstr "隱藏更改的檔案"
 
 msgid "Hide checks"
 msgstr "隱藏檢查"
@@ -17537,6 +17543,9 @@ msgstr "顯示已歸檔"
 
 msgid "Show Borders"
 msgstr "顯示邊框"
+
+msgid "Show changed files"
+msgstr "顯示更改的檔案"
 
 msgid "Show checks"
 msgstr "顯示檢查"

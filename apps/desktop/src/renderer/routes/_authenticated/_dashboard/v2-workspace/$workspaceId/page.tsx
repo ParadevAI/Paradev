@@ -33,6 +33,7 @@ import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useWorkspace } from "../providers/WorkspaceProvider";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
+import { ChangesRail } from "./components/ChangesRail";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
 import { HostConnectionPill } from "./components/HostConnectionPill";
 import { RightPaneArea } from "./components/RightPaneArea";
@@ -456,6 +457,12 @@ function V2WorkspaceContent() {
 		viewer: viewerTarget,
 	});
 	const diffPaneTarget = useDiffPaneTarget(store);
+	const rightDiffPaneTarget = useDiffPaneTarget(rightStore);
+	const openDiffFromChangesRail = useCallback(
+		(path: string, openInNewTab?: boolean, changeKey?: string) =>
+			openDiffPane(path, openInNewTab, undefined, undefined, changeKey),
+		[openDiffPane],
+	);
 	const isChangesPaneOpen = useStore(
 		store,
 		(state) => findVisibleChangesPane(state) != null,
@@ -694,7 +701,16 @@ function V2WorkspaceContent() {
 							data-pane-area="center"
 						>
 							{rightPaneMode !== "expanded" && <HostConnectionPill />}
-							{
+							<ChangesRail
+								workspaceId={workspaceId}
+								suppressed={
+									!isRightPaneAreaEnabled || rightPaneMode === "expanded"
+								}
+								selectedDiffTarget={rightDiffPaneTarget}
+								onSelectFile={openDiffFromChangesRail}
+								onOpenFile={openFilePaneFromTreeClick}
+								onResizingChange={onSidebarResizeDragging}
+							>
 								<Workspace<PaneViewerData>
 									key={workspaceId}
 									{...titleBarTabBarProps(titleBarMainSlot, {
@@ -796,7 +812,7 @@ function V2WorkspaceContent() {
 									onInteractionStateChange={onWorkspaceInteractionStateChange}
 									store={store}
 								/>
-							}
+							</ChangesRail>
 						</div>
 					</WorkspaceSplitLayout>
 				</WorkspaceGitStatusProvider>

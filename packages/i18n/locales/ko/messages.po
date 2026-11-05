@@ -4039,6 +4039,9 @@ msgstr "개인정보 보호 관련 설정 변경"
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "변경 실패율이 두 분기 연속으로 사람이 하던 시절의 기준치 이하를 유지합니다."
 
+msgid "Changed files"
+msgstr "변경된 파일"
+
 msgid "Changelog"
 msgstr "변경 로그"
 
@@ -9420,6 +9423,9 @@ msgstr "숨기기"
 
 msgid "Hide {displayName}"
 msgstr "{displayName} 가리기"
+
+msgid "Hide changed files"
+msgstr "변경된 파일 숨기기"
 
 msgid "Hide checks"
 msgstr "검사 숨기기"
@@ -17537,6 +17543,9 @@ msgstr "보관된 항목 표시"
 
 msgid "Show Borders"
 msgstr "테두리 표시"
+
+msgid "Show changed files"
+msgstr "변경된 파일 표시"
 
 msgid "Show checks"
 msgstr "검사 표시"
