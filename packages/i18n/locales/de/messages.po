@@ -2301,6 +2301,9 @@ msgstr "Agenten-Sitzung gestartet"
 msgid "agent settings"
 msgstr "Agenten-Einstellungen"
 
+msgid "Agent settings"
+msgstr "Agent-Einstellungen"
+
 msgid "Agent usage rankings"
 msgstr "Ranglisten zur Agentennutzung"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradev Design System"
 msgid "Paradev desktop app"
 msgstr "Paradev-Desktop-App"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev meldet diesen Agenten hier nicht an: Dein eigenes Skript hält die Anmeldung aktuell. Sobald es das getan hat, mach weiter."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev hat keine Berechtigung, \"{name}\" zu lesen."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev meldet diesen Agenten nicht an. Lass dein Skript ihn wieder anmelden und mach dann weiter, oder schalte den manuellen Modus in den Agent-Einstellungen aus."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise ist Paradev für Teams. Melde dich, um mehr darüber zu erfahren, was enthalten ist und wie es für deine Organisation funktionieren kann."
@@ -16402,8 +16405,8 @@ msgstr "Gerät drehen"
 msgid "Roundups"
 msgstr "Übersichten"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Leite {label} über einen Anbieter, den du selbst betreibst, mit deinen eigenen Zugangsdaten. Gespeicherte Werte werden dem Agenten beim Start übergeben."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Leite {label} über einen Anbieter, den du selbst betreibst, mit deinen eigenen Zugangsdaten, oder überlass die Anmeldung deinen eigenen Werkzeugen."
 
 msgid "Routine not found"
 msgstr "Routine nicht gefunden"
@@ -19143,9 +19146,6 @@ msgstr "Der Agent kopiert die Unterhaltung; der Zweig öffnet sich in einem neue
 
 msgid "The agent crashed"
 msgstr "Der Agent ist abgestürzt"
-
-msgid "The agent is not signed in"
-msgstr "Der Agent ist nicht angemeldet"
 
 msgid "The agent lost this conversation"
 msgstr "Der Agent hat diese Unterhaltung verloren"
@@ -21941,6 +21941,9 @@ msgstr "Gleich hast du Paradev"
 
 msgid "You're all set!"
 msgstr "Alles bereit!"
+
+msgid "You're in manual mode"
+msgstr "Du bist im manuellen Modus"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Du bist in der Bestenliste, aber noch nicht platziert"

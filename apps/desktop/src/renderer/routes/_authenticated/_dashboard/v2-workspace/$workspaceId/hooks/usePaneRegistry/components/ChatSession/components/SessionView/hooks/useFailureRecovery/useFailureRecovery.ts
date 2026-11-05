@@ -9,6 +9,7 @@ export function useFailureRecovery({
 	blocked,
 	configOptions,
 	manualSignIn,
+	openAgentSettings,
 	onRestartAndContinue,
 	onStartNewChat,
 	openModelPicker,
@@ -18,6 +19,7 @@ export function useFailureRecovery({
 	blocked: boolean;
 	configOptions: SessionConfigOption[] | undefined;
 	manualSignIn?: boolean;
+	openAgentSettings?: () => void;
 	onRestartAndContinue?: ((prompt: string) => Promise<boolean>) | undefined;
 	onStartNewChat?: (() => Promise<boolean>) | undefined;
 	openModelPicker: () => void;
@@ -87,7 +89,7 @@ export function useFailureRecovery({
 				? { restartAndContinue: () => onRestartAndContinue(CONTINUE_PROMPT) }
 				: {}),
 			...(onStartNewChat ? { startNewChat: onStartNewChat } : {}),
-			...(manualSignIn ? { manualSignIn } : {}),
+			...(manualSignIn ? { manualSignIn, openAgentSettings } : {}),
 			dismissed,
 			setDismissed,
 		}),
@@ -99,6 +101,7 @@ export function useFailureRecovery({
 			onRestartAndContinue,
 			onStartNewChat,
 			manualSignIn,
+			openAgentSettings,
 			dismissed,
 			setDismissed,
 		],

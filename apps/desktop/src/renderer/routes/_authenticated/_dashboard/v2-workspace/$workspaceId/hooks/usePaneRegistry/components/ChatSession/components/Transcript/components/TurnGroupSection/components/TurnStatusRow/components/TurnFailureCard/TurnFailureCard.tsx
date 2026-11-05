@@ -146,6 +146,13 @@ export function TurnFailureCard({
 					expanded: signingIn,
 					onClick: () => setSigningIn((open) => !open),
 				},
+				agent_settings: recovery.openAgentSettings
+					? {
+							label: <Trans>Agent settings</Trans>,
+							disabled: false,
+							onClick: recovery.openAgentSettings,
+						}
+					: null,
 				new_chat: newChat
 					? {
 							label:
@@ -196,8 +203,9 @@ export function TurnFailureCard({
 				{manualSignIn && (
 					<p className="text-muted-foreground">
 						<Trans>
-							Paradev does not sign this agent in here: your own script keeps
-							its login current. Once it has, continue.
+							Paradev doesn't sign this agent in. Either have your script sign
+							it in again and continue, or turn off manual mode in agent
+							settings.
 						</Trans>
 					</p>
 				)}

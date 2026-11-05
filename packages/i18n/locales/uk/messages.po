@@ -2295,6 +2295,9 @@ msgstr "Сеанс агента запущено"
 msgid "agent settings"
 msgstr "налаштування агента"
 
+msgid "Agent settings"
+msgstr "Налаштування агентів"
+
 msgid "Agent usage rankings"
 msgstr "Рейтинги використання агентів"
 
@@ -14071,11 +14074,11 @@ msgstr "Дизайн-система Paradev"
 msgid "Paradev desktop app"
 msgstr "Десктопний застосунок Paradev"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev не виконує вхід для цього агента тут: вхід підтримує ваш власний скрипт. Коли він це зробить, продовжте."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev не має дозволу на читання «{name}»."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev не виконує вхід для цього агента. Нехай ваш скрипт знову виконає вхід, а потім продовжте, або вимкніть ручний режим у налаштуваннях агентів."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise призначений для команд. Зв'яжіться з нами, щоб дізнатися більше про те, що входить у тариф і як він може працювати для вашої організації."
@@ -16396,8 +16399,8 @@ msgstr "Повернути пристрій"
 msgid "Roundups"
 msgstr "Огляди"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Спрямуйте {label} через власного провайдера з вашими обліковими даними. Збережені значення передаються агенту під час запуску."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Спрямуйте {label} через власного провайдера з вашими обліковими даними або залиште вхід вашим власним інструментам."
 
 msgid "Routine not found"
 msgstr "Рутину не знайдено"
@@ -19137,9 +19140,6 @@ msgstr "Агент копіює розмову; гілка відкриваєт�
 
 msgid "The agent crashed"
 msgstr "Агент аварійно завершив роботу"
-
-msgid "The agent is not signed in"
-msgstr "Агент не виконав вхід"
 
 msgid "The agent lost this conversation"
 msgstr "Агент втратив цю розмову"
@@ -21935,6 +21935,9 @@ msgstr "Ви от-от отримаєте Paradev"
 
 msgid "You're all set!"
 msgstr "Усе готово!"
+
+msgid "You're in manual mode"
+msgstr "Увімкнено ручний режим"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Ви в таблиці лідерів, але ще без рейтингу"

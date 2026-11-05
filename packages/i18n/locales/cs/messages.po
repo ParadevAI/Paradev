@@ -2301,6 +2301,9 @@ msgstr "Relace agenta spuštěna"
 msgid "agent settings"
 msgstr "nastavení agenta"
 
+msgid "Agent settings"
+msgstr "Nastavení agentů"
+
 msgid "Agent usage rankings"
 msgstr "Žebříček využití agentů"
 
@@ -14077,11 +14080,11 @@ msgstr "Design systém Paradev"
 msgid "Paradev desktop app"
 msgstr "Desktopová aplikace Paradev"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev tohoto agenta zde nepřihlašuje: přihlášení udržuje váš vlastní skript. Jakmile to udělá, pokračujte."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev nemá oprávnění ke čtení „{name}“."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev tohoto agenta nepřihlašuje. Nechte svůj skript, ať ho znovu přihlásí, a pokračujte, nebo vypněte ruční režim v nastavení agentů."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise je Paradev pro týmy. Ozvěte se a řekneme vám, co obsahuje a jak může fungovat ve vaší organizaci."
@@ -16402,8 +16405,8 @@ msgstr "Otočit zařízení"
 msgid "Roundups"
 msgstr "Přehledy"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Veďte {label} přes poskytovatele, kterého provozujete, s přihlašovacími údaji, které máte. Uložené hodnoty se agentovi předají při spuštění."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Veďte {label} přes poskytovatele, kterého provozujete, s přihlašovacími údaji, které máte, nebo přihlášení nechte na vlastních nástrojích."
 
 msgid "Routine not found"
 msgstr "Rutina nenalezena"
@@ -19143,9 +19146,6 @@ msgstr "Agent zkopíruje konverzaci; větev se otevře na nové kartě"
 
 msgid "The agent crashed"
 msgstr "Agent spadl"
-
-msgid "The agent is not signed in"
-msgstr "Agent není přihlášený"
 
 msgid "The agent lost this conversation"
 msgstr "Agent tuto konverzaci ztratil"
@@ -21941,6 +21941,9 @@ msgstr "Za chvíli budete mít Paradev"
 
 msgid "You're all set!"
 msgstr "Vše je připraveno!"
+
+msgid "You're in manual mode"
+msgstr "Jste v ručním režimu"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Jste v žebříčku, ale zatím bez pozice"

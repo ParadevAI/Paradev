@@ -2301,6 +2301,9 @@ msgstr "智能体会话已开始"
 msgid "agent settings"
 msgstr "智能体设置"
 
+msgid "Agent settings"
+msgstr "智能体设置"
+
 msgid "Agent usage rankings"
 msgstr "智能体使用量排行"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradev设计系统"
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面应用"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev 不会在这里为此智能体登录：登录状态由你自己的脚本维护。脚本更新后，请继续。"
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev 没有读取“{name}”的权限。"
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev 不会为此智能体登录。请让你的脚本重新登录后继续，或在智能体设置中关闭手动模式。"
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise是面向团队的Paradev。联系我们，了解它包含什么，以及如何适配你的组织。"
@@ -16402,8 +16405,8 @@ msgstr "旋转设备"
 msgid "Roundups"
 msgstr "综合评测"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "让{label}走你自己运行的提供商，用你手中的凭据。保存的值会在启动时交给智能体。"
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "让{label}走你自己运行的提供商，用你手中的凭据，或者把登录交给你自己的工具。"
 
 msgid "Routine not found"
 msgstr "未找到例行任务"
@@ -19143,9 +19146,6 @@ msgstr "智能体复制该对话，分支在新标签页中打开"
 
 msgid "The agent crashed"
 msgstr "智能体崩溃了"
-
-msgid "The agent is not signed in"
-msgstr "智能体未登录"
 
 msgid "The agent lost this conversation"
 msgstr "智能体丢失了此对话"
@@ -21941,6 +21941,9 @@ msgstr "马上就能用上Paradev"
 
 msgid "You're all set!"
 msgstr "一切就绪！"
+
+msgid "You're in manual mode"
+msgstr "你正处于手动模式"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "你已在排行榜上，但尚未获得排名"

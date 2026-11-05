@@ -145,13 +145,20 @@ test("an auth failure offers Sign in", () => {
 	expect(view.getByText("Sign in")).toBeTruthy();
 });
 
-test("an auth failure under Manual sign-in offers no sign-in, only Continue", () => {
+test("an auth failure in manual mode offers no sign-in: Continue or agent settings", () => {
 	const restartAndContinue = mock(async () => true);
-	const view = authCard({ manualSignIn: true, restartAndContinue });
-	expect(view.container.textContent).toContain("The agent is not signed in");
-	expect(view.container.textContent).toContain("your own script");
+	const openAgentSettings = mock(() => {});
+	const view = authCard({
+		manualSignIn: true,
+		openAgentSettings,
+		restartAndContinue,
+	});
+	expect(view.container.textContent).toContain("You're in manual mode");
+	expect(view.container.textContent).toContain("turn off manual mode");
 	expect(view.queryByText("Sign in")).toBeNull();
 	expect(view.queryByText("Sign in to continue")).toBeNull();
 	fireEvent.click(view.getByText("Continue"));
 	expect(restartAndContinue).toHaveBeenCalledTimes(1);
+	fireEvent.click(view.getByText("Agent settings"));
+	expect(openAgentSettings).toHaveBeenCalledTimes(1);
 });

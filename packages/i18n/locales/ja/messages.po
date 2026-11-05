@@ -2301,6 +2301,9 @@ msgstr "エージェントセッションを開始しました"
 msgid "agent settings"
 msgstr "エージェント設定"
 
+msgid "Agent settings"
+msgstr "エージェント設定"
+
 msgid "Agent usage rankings"
 msgstr "エージェント使用量ランキング"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradevデザインシステム"
 msgid "Paradev desktop app"
 msgstr "Paradev デスクトップアプリ"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev はここでこのエージェントにサインインしません。ログインはあなた自身のスクリプトが維持します。更新されたら続行してください。"
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev には「{name}」を読み取る権限がありません。"
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev はこのエージェントにサインインしません。スクリプトで再度サインインさせてから続行するか、エージェント設定で手動モードをオフにしてください。"
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterpriseは、チーム向けのParadevです。含まれる内容や組織での活用方法については、お問い合わせください。"
@@ -16402,8 +16405,8 @@ msgstr "デバイスを回転"
 msgid "Roundups"
 msgstr "まとめ"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "自分で運用するプロバイダーと自分が持つ認証情報を使って{label}を経由させます。保存した値は起動時にエージェントへ渡されます。"
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "自分で運用するプロバイダーと自分が持つ認証情報を使って{label}を経由させるか、サインインを自分のツールに任せます。"
 
 msgid "Routine not found"
 msgstr "ルーティンが見つかりません"
@@ -19143,9 +19146,6 @@ msgstr "エージェントが会話を複製し、分岐は新しいタブで開
 
 msgid "The agent crashed"
 msgstr "エージェントがクラッシュしました"
-
-msgid "The agent is not signed in"
-msgstr "エージェントがサインインしていません"
 
 msgid "The agent lost this conversation"
 msgstr "エージェントがこの会話を失いました"
@@ -21941,6 +21941,9 @@ msgstr "まもなくParadevを入手できます"
 
 msgid "You're all set!"
 msgstr "準備完了です!"
+
+msgid "You're in manual mode"
+msgstr "手動モードになっています"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "リーダーボードに参加済みですが、まだランク付けされていません"

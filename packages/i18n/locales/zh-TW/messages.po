@@ -2301,6 +2301,9 @@ msgstr "代理程式會話已開始"
 msgid "agent settings"
 msgstr "代理程式設定"
 
+msgid "Agent settings"
+msgstr "代理設定"
+
 msgid "Agent usage rankings"
 msgstr "代理程式使用量排行"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradev設計系統"
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面 App"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev 不會在這裡為此代理登入：登入狀態由你自己的腳本維護。腳本更新後，請繼續。"
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev 沒有讀取「{name}」的權限。"
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev 不會為此代理登入。請讓你的腳本重新登入後繼續，或在代理設定中關閉手動模式。"
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise是面向團隊的Paradev。聯絡我們，瞭解它包含什麼，以及如何適配你的組織。"
@@ -16402,8 +16405,8 @@ msgstr "旋轉裝置"
 msgid "Roundups"
 msgstr "綜合評測"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "讓{label}走你自己運行的提供商，用你手中的憑證。已儲存的值會在啟動時交給代理程式。"
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "讓{label}走你自己運行的提供商，用你手中的憑證，或者把登入交給你自己的工具。"
 
 msgid "Routine not found"
 msgstr "找不到例行任務"
@@ -19143,9 +19146,6 @@ msgstr "代理複製該對話，分支在新分頁中開啟"
 
 msgid "The agent crashed"
 msgstr "代理當機了"
-
-msgid "The agent is not signed in"
-msgstr "代理尚未登入"
 
 msgid "The agent lost this conversation"
 msgstr "代理遺失了此對話"
@@ -21941,6 +21941,9 @@ msgstr "馬上就能用上Paradev"
 
 msgid "You're all set!"
 msgstr "一切就緒！"
+
+msgid "You're in manual mode"
+msgstr "你正處於手動模式"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "你已加入排行榜，但尚未取得排名"

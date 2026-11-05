@@ -2301,6 +2301,9 @@ msgstr "Agentsessie gestart"
 msgid "agent settings"
 msgstr "agentinstellingen"
 
+msgid "Agent settings"
+msgstr "Agentinstellingen"
+
 msgid "Agent usage rankings"
 msgstr "Ranglijst van agentgebruik"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradev Design System"
 msgid "Paradev desktop app"
 msgstr "Paradev-desktopapp"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev logt deze agent hier niet in: je eigen script houdt de login actueel. Ga verder zodra het dat heeft gedaan."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev heeft geen toestemming om \"{name}\" te lezen."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev logt deze agent niet in. Laat je script hem opnieuw inloggen en ga verder, of zet de handmatige modus uit in de agentinstellingen."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise is Paradev voor teams. Neem contact op om te horen wat erbij zit en hoe het voor jouw organisatie kan werken."
@@ -16402,8 +16405,8 @@ msgstr "Apparaat draaien"
 msgid "Roundups"
 msgstr "Overzichten"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Stuur {label} via een provider die je zelf draait, met de inloggegevens die jij hebt. Opgeslagen waarden gaan bij het starten naar de agent."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Stuur {label} via een provider die je zelf draait, met de inloggegevens die jij hebt, of laat het inloggen over aan je eigen tooling."
 
 msgid "Routine not found"
 msgstr "Routine niet gevonden"
@@ -19143,9 +19146,6 @@ msgstr "De agent kopieert het gesprek; de aftakking opent in een nieuw tabblad"
 
 msgid "The agent crashed"
 msgstr "De agent is gecrasht"
-
-msgid "The agent is not signed in"
-msgstr "De agent is niet ingelogd"
 
 msgid "The agent lost this conversation"
 msgstr "De agent is dit gesprek kwijt"
@@ -21941,6 +21941,9 @@ msgstr "Je krijgt zo Paradev"
 
 msgid "You're all set!"
 msgstr "Je bent er klaar voor!"
+
+msgid "You're in manual mode"
+msgstr "Je zit in de handmatige modus"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Je staat op de ranglijst, maar hebt nog geen positie"

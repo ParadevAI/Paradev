@@ -12,6 +12,8 @@ export type TurnFailureActions = {
 	startNewChat?: () => Promise<boolean>;
 	/** The person's own script signs this agent in, so a sign-in prompt has nothing to offer. */
 	manualSignIn?: boolean;
+	/** Opens Settings › Agents, where manual mode is turned off. */
+	openAgentSettings?: () => void;
 	dismissed: ReadonlySet<string>;
 	setDismissed: (turnId: string, dismissed: boolean) => void;
 };

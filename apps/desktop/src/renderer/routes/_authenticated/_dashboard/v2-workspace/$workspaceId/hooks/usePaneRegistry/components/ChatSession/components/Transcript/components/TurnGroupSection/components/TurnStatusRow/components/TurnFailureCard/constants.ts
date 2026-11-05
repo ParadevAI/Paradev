@@ -6,6 +6,7 @@ export type FailureAction =
 	| "continue"
 	| "change_model"
 	| "sign_in"
+	| "agent_settings"
 	| "new_chat";
 
 export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
@@ -42,6 +43,9 @@ export const FAILURE_ACTIONS: Record<
 
 /** An auth failure when the person's own script signs the agent in: nothing to sign in with here. */
 export const MANUAL_SIGN_IN_TITLE = msg({
-	message: "The agent is not signed in",
+	message: "You're in manual mode",
 });
-export const MANUAL_SIGN_IN_ACTIONS: readonly FailureAction[] = ["continue"];
+export const MANUAL_SIGN_IN_ACTIONS: readonly FailureAction[] = [
+	"continue",
+	"agent_settings",
+];

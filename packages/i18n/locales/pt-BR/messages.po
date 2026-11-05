@@ -2301,6 +2301,9 @@ msgstr "Sessão de agente iniciada"
 msgid "agent settings"
 msgstr "configurações do agente"
 
+msgid "Agent settings"
+msgstr "Configurações de agentes"
+
 msgid "Agent usage rankings"
 msgstr "Rankings de uso de agentes"
 
@@ -14077,11 +14080,11 @@ msgstr "Design System do Paradev"
 msgid "Paradev desktop app"
 msgstr "App para desktop do Paradev"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "O Paradev não faz login neste agente aqui: o seu próprio script mantém o login atualizado. Depois que ele fizer isso, continue."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "O Paradev não tem permissão para ler \"{name}\"."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "O Paradev não faz login neste agente. Faça seu script entrar de novo e continue, ou desative o modo manual nas configurações de agentes."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "O Paradev Enterprise é o Paradev para times. Fale com a gente para saber o que está incluído e como ele pode funcionar na sua organização."
@@ -16402,8 +16405,8 @@ msgstr "Girar o dispositivo"
 msgid "Roundups"
 msgstr "Panoramas"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Direcione o {label} por um provedor que você mesmo opera, com as credenciais que você tem. Os valores salvos são entregues ao agente na inicialização."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Direcione o {label} por um provedor que você mesmo opera, com as credenciais que você tem, ou deixe o login com as suas próprias ferramentas."
 
 msgid "Routine not found"
 msgstr "Rotina não encontrada"
@@ -19143,9 +19146,6 @@ msgstr "O agente copia a conversa; a ramificação abre em uma nova aba"
 
 msgid "The agent crashed"
 msgstr "O agente travou"
-
-msgid "The agent is not signed in"
-msgstr "O agente não está conectado"
 
 msgid "The agent lost this conversation"
 msgstr "O agente perdeu esta conversa"
@@ -21941,6 +21941,9 @@ msgstr "Você está quase com o Paradev"
 
 msgid "You're all set!"
 msgstr "Tudo pronto!"
+
+msgid "You're in manual mode"
+msgstr "Você está no modo manual"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Você está no ranking, mas ainda sem posição"

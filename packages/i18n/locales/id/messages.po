@@ -2301,6 +2301,9 @@ msgstr "Sesi agen dimulai"
 msgid "agent settings"
 msgstr "pengaturan agen"
 
+msgid "Agent settings"
+msgstr "Pengaturan agen"
+
 msgid "Agent usage rankings"
 msgstr "Peringkat penggunaan agen"
 
@@ -14077,11 +14080,11 @@ msgstr "Design System Paradev"
 msgid "Paradev desktop app"
 msgstr "Aplikasi desktop Paradev"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev tidak memasukkan agen ini di sini: skrip Anda sendiri yang menjaga loginnya tetap aktif. Setelah skrip melakukannya, lanjutkan."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev tidak memiliki izin untuk membaca \"{name}\"."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev tidak memasukkan agen ini. Minta skrip Anda memasukkannya lagi lalu lanjutkan, atau matikan mode manual di pengaturan agen."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise adalah Paradev untuk tim. Hubungi kami untuk tahu lebih banyak soal apa saja yang termasuk dan bagaimana cocoknya untuk organisasi Anda."
@@ -16402,8 +16405,8 @@ msgstr "Putar perangkat"
 msgid "Roundups"
 msgstr "Rangkuman"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Arahkan {label} lewat penyedia yang Anda jalankan sendiri, dengan kredensial yang Anda pegang. Nilai yang tersimpan diserahkan ke agen saat peluncuran."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Arahkan {label} lewat penyedia yang Anda jalankan sendiri, dengan kredensial yang Anda pegang, atau serahkan login-nya ke alat Anda sendiri."
 
 msgid "Routine not found"
 msgstr "Rutinitas tidak ditemukan"
@@ -19143,9 +19146,6 @@ msgstr "Agen menyalin percakapan; cabang terbuka di tab baru"
 
 msgid "The agent crashed"
 msgstr "Agen mengalami crash"
-
-msgid "The agent is not signed in"
-msgstr "Agen belum masuk"
 
 msgid "The agent lost this conversation"
 msgstr "Agen kehilangan percakapan ini"
@@ -21941,6 +21941,9 @@ msgstr "Anda akan segera mendapatkan Paradev"
 
 msgid "You're all set!"
 msgstr "Semua siap!"
+
+msgid "You're in manual mode"
+msgstr "Anda dalam mode manual"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Anda ada di papan peringkat, tetapi belum diperingkat"

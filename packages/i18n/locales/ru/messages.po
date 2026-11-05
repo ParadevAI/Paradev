@@ -2301,6 +2301,9 @@ msgstr "Сессия агента запущена"
 msgid "agent settings"
 msgstr "настройки агента"
 
+msgid "Agent settings"
+msgstr "Настройки агентов"
+
 msgid "Agent usage rankings"
 msgstr "Рейтинги использования агентов"
 
@@ -14077,11 +14080,11 @@ msgstr "Дизайн-система Paradev"
 msgid "Paradev desktop app"
 msgstr "Десктопное приложение Paradev"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev не выполняет вход для этого агента здесь: актуальность входа поддерживает ваш собственный скрипт. Когда он это сделает, продолжите."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "У Paradev нет разрешения на чтение «{name}»."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev не выполняет вход для этого агента. Пусть ваш скрипт снова выполнит вход, затем продолжите, или отключите ручной режим в настройках агентов."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise — это Paradev для команд. Напишите нам, чтобы узнать, что входит и как это подойдёт вашей организации."
@@ -16402,8 +16405,8 @@ msgstr "Повернуть устройство"
 msgid "Roundups"
 msgstr "Обзоры"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "Направьте {label} через провайдера, которого держите вы, с вашими учётными данными. Сохранённые значения передаются агенту при запуске."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "Направьте {label} через провайдера, которого держите вы, с вашими учётными данными, или оставьте вход вашим собственным инструментам."
 
 msgid "Routine not found"
 msgstr "Рутина не найдена"
@@ -19143,9 +19146,6 @@ msgstr "Агент копирует разговор; ветвь откроет�
 
 msgid "The agent crashed"
 msgstr "Агент аварийно завершился"
-
-msgid "The agent is not signed in"
-msgstr "Агент не выполнил вход"
 
 msgid "The agent lost this conversation"
 msgstr "Агент потерял этот разговор"
@@ -21941,6 +21941,9 @@ msgstr "Сейчас вы получите Paradev"
 
 msgid "You're all set!"
 msgstr "Всё готово!"
+
+msgid "You're in manual mode"
+msgstr "Включён ручной режим"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Вы в рейтинге, но место пока не определено"

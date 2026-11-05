@@ -2301,6 +2301,9 @@ msgstr "Ajan oturumu başladı"
 msgid "agent settings"
 msgstr "ajan ayarları"
 
+msgid "Agent settings"
+msgstr "Ajan ayarları"
+
 msgid "Agent usage rankings"
 msgstr "Ajan kullanım sıralamaları"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradev Tasarım Sistemi"
 msgid "Paradev desktop app"
 msgstr "Paradev masaüstü uygulaması"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev bu ajanın oturumunu burada açmaz: oturumu kendi betiğiniz güncel tutar. Betik bunu yaptıktan sonra devam edin."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev'in \"{name}\" dosyasını okuma izni yok."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev bu ajanın oturumunu açmaz. Betiğinizin yeniden oturum açmasını sağlayıp devam edin ya da ajan ayarlarından manuel modu kapatın."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise, takımlar için Paradev'dir. Nelerin dahil olduğunu ve kuruluşunuzda nasıl işleyebileceğini öğrenmek için bize ulaşın."
@@ -16402,8 +16405,8 @@ msgstr "Cihazı döndür"
 msgid "Roundups"
 msgstr "Derlemeler"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "{label} ajanını kendi işlettiğiniz bir sağlayıcı üzerinden, elinizdeki kimlik bilgileriyle yönlendirin. Kaydedilen değerler başlatma sırasında ajana verilir."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "{label} ajanını kendi işlettiğiniz bir sağlayıcı üzerinden, elinizdeki kimlik bilgileriyle yönlendirin ya da oturum açmayı kendi araçlarınıza bırakın."
 
 msgid "Routine not found"
 msgstr "Rutin bulunamadı"
@@ -19143,9 +19146,6 @@ msgstr "Aracı konuşmayı kopyalar; çatal yeni bir sekmede açılır"
 
 msgid "The agent crashed"
 msgstr "Ajan çöktü"
-
-msgid "The agent is not signed in"
-msgstr "Ajanın oturumu açık değil"
 
 msgid "The agent lost this conversation"
 msgstr "Ajan bu konuşmayı kaybetti"
@@ -21941,6 +21941,9 @@ msgstr "Paradev'i indirmek üzeresiniz"
 
 msgid "You're all set!"
 msgstr "Her şey hazır!"
+
+msgid "You're in manual mode"
+msgstr "Manuel moddasınız"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "Liderlik tablosundasınız, ancak henüz sıralanmadınız"

@@ -648,7 +648,7 @@ export function SessionView({
 		() => composerRef.current?.openModelPicker(),
 		[],
 	);
-	const manualSignIn = useManualSignIn(presetId);
+	const { manualSignIn, openAgentSettings } = useManualSignIn(presetId);
 	const { failureActions, onSetConfigOption, onModelPickerOpenChange } =
 		useFailureRecovery({
 			blocked:
@@ -660,6 +660,7 @@ export function SessionView({
 				outbox.length > 0,
 			configOptions,
 			manualSignIn,
+			openAgentSettings,
 			onRestartAndContinue,
 			onStartNewChat,
 			openModelPicker,

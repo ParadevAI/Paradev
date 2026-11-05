@@ -2301,6 +2301,9 @@ msgstr "에이전트 세션을 시작했습니다"
 msgid "agent settings"
 msgstr "에이전트 설정"
 
+msgid "Agent settings"
+msgstr "에이전트 설정"
+
 msgid "Agent usage rankings"
 msgstr "에이전트 사용량 순위"
 
@@ -14077,11 +14080,11 @@ msgstr "Paradev 디자인 시스템"
 msgid "Paradev desktop app"
 msgstr "Paradev 데스크톱 앱"
 
-msgid "Paradev does not sign this agent in here: your own script keeps its login current. Once it has, continue."
-msgstr "Paradev는 여기서 이 에이전트를 로그인시키지 않습니다. 로그인은 사용자의 스크립트가 유지합니다. 스크립트가 갱신하면 계속하세요."
-
 msgid "Paradev doesn't have permission to read \"{name}\"."
 msgstr "Paradev에 \"{name}\"을(를) 읽을 권한이 없습니다."
+
+msgid "Paradev doesn't sign this agent in. Either have your script sign it in again and continue, or turn off manual mode in agent settings."
+msgstr "Paradev는 이 에이전트를 로그인시키지 않습니다. 스크립트로 다시 로그인시킨 뒤 계속하거나, 에이전트 설정에서 수동 모드를 끄세요."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise는 팀을 위한 Paradev입니다. 어떤 기능이 포함되고 조직에 어떻게 적용할 수 있는지 문의해 주세요."
@@ -16402,8 +16405,8 @@ msgstr "기기 회전"
 msgid "Roundups"
 msgstr "모아 보기"
 
-msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
-msgstr "직접 운영하는 제공사와 보유한 자격 증명으로 {label}을(를) 경유시킵니다. 저장한 값은 실행 시 에이전트로 전달됩니다."
+msgid "Route {label} through a provider you run, with the credentials you hold, or leave its sign-in to your own tooling."
+msgstr "직접 운영하는 제공사와 보유한 자격 증명으로 {label}을(를) 경유시키거나, 로그인을 사용자의 도구에 맡깁니다."
 
 msgid "Routine not found"
 msgstr "루틴을 찾을 수 없습니다"
@@ -19143,9 +19146,6 @@ msgstr "에이전트가 대화를 복사하고 분기는 새 탭에서 열립니
 
 msgid "The agent crashed"
 msgstr "에이전트가 비정상 종료되었습니다"
-
-msgid "The agent is not signed in"
-msgstr "에이전트가 로그인되어 있지 않습니다"
 
 msgid "The agent lost this conversation"
 msgstr "에이전트가 이 대화를 잃어버렸습니다"
@@ -21941,6 +21941,9 @@ msgstr "곧 Paradev를 받게 됩니다"
 
 msgid "You're all set!"
 msgstr "준비가 끝났습니다!"
+
+msgid "You're in manual mode"
+msgstr "수동 모드입니다"
 
 msgid "You're on the leaderboard, but not ranked yet"
 msgstr "리더보드에 등록되었지만 아직 순위가 없습니다"
