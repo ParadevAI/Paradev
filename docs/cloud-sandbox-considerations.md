@@ -129,8 +129,8 @@ bypassed through the others.
 **A box reaches its creator's own hosts, when a host allows it. Accepted
 (opt-in).** The firewall adds the workspace credential on requests to the
 relay as well as the API, and the relay asks `host.cloudWorkspaceAccess` on
-every call. A host is reachable only if the creator has access to it and its
-owner turned on "Allow my cloud workspaces to reach this host"
+every call. A host is reachable only if the creator owns it (a member's box is
+refused) and turned on "Allow my cloud workspaces to reach this host"
 (`v2_hosts.allow_cloud_workspaces`, set by `host.setCloudWorkspaceAccess`,
 which a box cannot call). The API is the only lock: host-service does not know
 the call came from a box, so a wrong value in that column opens the host. Once

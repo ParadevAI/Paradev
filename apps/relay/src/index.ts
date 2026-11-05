@@ -97,6 +97,13 @@ async function authenticate(
 	const token = extractToken(c);
 	const boxCredential = c.req.header(SANDBOX_API_CREDENTIAL_HEADER);
 	if (!token && boxCredential && purpose === "reach") {
+		// A stream would outlive the per-call access check.
+		if (isWsUpgrade(c)) {
+			return {
+				status: 403,
+				message: "Forbidden: a cloud workspace can only make HTTP calls",
+			};
+		}
 		return authenticateCloudWorkspace(c, hostId, boxCredential);
 	}
 	if (!token) return { status: 401, message: "Unauthorized" };
@@ -296,18 +303,15 @@ const authMiddleware: MiddlewareHandler<AppContext> = async (c, next) => {
 			return trpcErrorResponse(
 				c,
 				router,
-				result.status === 403 ? "FORBIDDEN" : "UNAUTHORIZED",
+				result.status === 403
+					? "FORBIDDEN"
+					: result.status === 500
+						? "INTERNAL_SERVER_ERROR"
+						: "UNAUTHORIZED",
 				result.message,
 			);
 		}
 		return c.json({ error: result.message }, result.status);
-	}
-	// A stream would outlive the per-call access check.
-	if (result.cloudWorkspaceId && isWsUpgrade(c)) {
-		return c.json(
-			{ error: "Forbidden: a cloud workspace can only make HTTP calls" },
-			403,
-		);
 	}
 	c.set("auth", result.auth);
 	c.set("caller", callerFor(result));

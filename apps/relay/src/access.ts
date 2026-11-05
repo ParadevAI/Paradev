@@ -97,6 +97,9 @@ export type CloudWorkspaceAccess =
 	| { ok: false; reason: AccessDenial }
 	| { ok: false; reason: "unauthorized" };
 
+// `<workspace uuid>.<base64url HMAC-SHA256>`, as the API mints it.
+const SANDBOX_CREDENTIAL_SHAPE = /^[0-9a-f-]{36}\.[A-Za-z0-9_-]{43}$/;
+
 // Not cached: turning the host's setting off must stop the next call.
 export async function checkCloudWorkspaceAccess(
 	credential: string,
@@ -105,6 +108,9 @@ export async function checkCloudWorkspaceAccess(
 ): Promise<CloudWorkspaceAccess> {
 	if (!parseHostRoutingKey(hostId)) {
 		return { ok: false, reason: "invalid_host" };
+	}
+	if (!SANDBOX_CREDENTIAL_SHAPE.test(credential)) {
+		return { ok: false, reason: "unauthorized" };
 	}
 	try {
 		const result = await createSandboxApiClient(

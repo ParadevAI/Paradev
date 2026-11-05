@@ -16,6 +16,7 @@ import { isMember } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
 import { personProcedure, userError } from "../../trpc";
+import { decideCloudWorkspaceAccess } from "./cloud-workspace-access";
 import { registerHost } from "./registration";
 import {
 	authorizeHostUpdate,
@@ -278,42 +279,36 @@ export const hostRouter = {
 	// Called by the relay with the box's firewall-added credential.
 	cloudWorkspaceAccess: personProcedure
 		.input(z.object({ hostId: z.string().min(1) }))
-		.query(async ({ ctx, input }) => {
-			const box = ctx.sandboxCaller;
-			const parsed = parseHostRoutingKey(input.hostId);
-			if (!box || parsed?.organizationId !== box.organizationId) {
-				return { allowed: false as const, reason: "no_access" as const };
-			}
-			const [row] = await db
-				.select({ allowCloudWorkspaces: v2Hosts.allowCloudWorkspaces })
-				.from(v2UsersHosts)
-				.innerJoin(
-					v2Hosts,
-					and(
-						eq(v2Hosts.organizationId, v2UsersHosts.organizationId),
-						eq(v2Hosts.machineId, v2UsersHosts.hostId),
-					),
-				)
-				.where(
-					and(
-						eq(v2UsersHosts.userId, box.userId),
-						eq(v2UsersHosts.organizationId, parsed.organizationId),
-						eq(v2UsersHosts.hostId, parsed.machineId),
-					),
-				)
-				.limit(1);
-			if (!row) {
-				return { allowed: false as const, reason: "no_access" as const };
-			}
-			if (!row.allowCloudWorkspaces) {
-				return { allowed: false as const, reason: "host_closed" as const };
-			}
-			return {
-				allowed: true as const,
-				userId: box.userId,
-				workspaceId: box.workspaceId,
-			};
-		}),
+		.query(({ ctx, input }) =>
+			decideCloudWorkspaceAccess(
+				ctx.sandboxCaller,
+				input.hostId,
+				async ({ userId, organizationId, machineId }) => {
+					const [row] = await db
+						.select({
+							role: v2UsersHosts.role,
+							allowCloudWorkspaces: v2Hosts.allowCloudWorkspaces,
+						})
+						.from(v2UsersHosts)
+						.innerJoin(
+							v2Hosts,
+							and(
+								eq(v2Hosts.organizationId, v2UsersHosts.organizationId),
+								eq(v2Hosts.machineId, v2UsersHosts.hostId),
+							),
+						)
+						.where(
+							and(
+								eq(v2UsersHosts.userId, userId),
+								eq(v2UsersHosts.organizationId, organizationId),
+								eq(v2UsersHosts.hostId, machineId),
+							),
+						)
+						.limit(1);
+					return row ?? null;
+				},
+			),
+		),
 
 	setWakeCommand: personProcedure
 		.input(

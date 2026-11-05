@@ -11,6 +11,10 @@ type ProxiedRequest = {
 const proxied: ProxiedRequest[] = [];
 const proxiedHeaders: Record<string, string>[] = [];
 let boxAccess: unknown = { allowed: false, reason: "host_closed" };
+let apiDown = false;
+let apiCalls = 0;
+const BOX_CREDENTIAL = `11111111-2222-4333-8444-555555555555.${"a".repeat(43)}`;
+const FORGED_CREDENTIAL = `11111111-2222-4333-8444-555555555555.${"b".repeat(43)}`;
 
 const tunnel = {
 	setName: async () => {},
@@ -49,7 +53,11 @@ const jwks = Bun.serve({
 	fetch: (request) => {
 		const url = new URL(request.url);
 		if (url.pathname.startsWith("/api/trpc/host.cloudWorkspaceAccess")) {
-			if (request.headers.get("x-superset-sandbox-credential") !== "ws-1.ok") {
+			apiCalls++;
+			if (apiDown) return new Response("down", { status: 502 });
+			if (
+				request.headers.get("x-superset-sandbox-credential") !== BOX_CREDENTIAL
+			) {
 				return Response.json(
 					[
 						{
@@ -78,6 +86,8 @@ beforeEach(() => {
 	proxied.length = 0;
 	proxiedHeaders.length = 0;
 	boxAccess = { allowed: false, reason: "host_closed" };
+	apiDown = false;
+	apiCalls = 0;
 });
 
 const hostId = "org-1:machine-1";
@@ -216,7 +226,7 @@ function callAsBox(
 		method: "POST",
 		authorized: false,
 		headers: {
-			"x-superset-sandbox-credential": init.credential ?? "ws-1.ok",
+			"x-superset-sandbox-credential": init.credential ?? BOX_CREDENTIAL,
 			...init.headers,
 		},
 	});
@@ -247,7 +257,7 @@ test("a cloud workspace is refused by a host that did not allow it, and told why
 
 test("a credential the API does not accept is unauthorized", async () => {
 	const response = await callAsBox("/trpc/workspace.list", {
-		credential: "ws-1.forged",
+		credential: FORGED_CREDENTIAL,
 	});
 
 	expect(response.status).toBe(401);
@@ -260,10 +270,32 @@ test("a cloud workspace cannot open a stream, even to a host that allowed it", a
 	const response = await call("/terminal/t1", {
 		authorized: false,
 		headers: {
-			"x-superset-sandbox-credential": "ws-1.ok",
+			"x-superset-sandbox-credential": BOX_CREDENTIAL,
 			Upgrade: "websocket",
 		},
 	});
 
 	expect(response.status).toBe(403);
+	expect(apiCalls).toBe(0);
+});
+
+test("a malformed credential is unauthorized without asking the API", async () => {
+	const response = await callAsBox("/trpc/workspace.list", {
+		credential: "anything",
+	});
+
+	expect(response.status).toBe(401);
+	expect(apiCalls).toBe(0);
+});
+
+test("an API outage during the box's access check is a server error, not an auth failure", async () => {
+	apiDown = true;
+
+	const response = await callAsBox("/trpc/workspace.list");
+
+	expect(response.status).toBe(500);
+	expect(JSON.stringify(await response.json())).toContain(
+		"INTERNAL_SERVER_ERROR",
+	);
+	expect(proxied).toEqual([]);
 });
