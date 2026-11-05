@@ -67,6 +67,7 @@
 		"use-with-ide",
 		"use-with-linear",
 		"use-with-slack",
+		"use-with-screenpipe",
 		"providers",
 		"add-agent-support",
 		"---Configuration---",
