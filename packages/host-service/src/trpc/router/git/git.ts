@@ -225,13 +225,21 @@ function sumSnapshotDiffStats(snapshot: {
 	return { additions, deletions, fileCount: byPath.size };
 }
 
+// Caller-supplied revisions and branch names become their own git argv
+// entries, and git parses options anywhere on the line: `--output=<file>`
+// makes `git diff`/`git log` write that file. No ref or object name starts
+// with `-`, so refusing the dash costs nothing.
+const gitRevisionSchema = z.string().refine((value) => !value.startsWith("-"), {
+	message: "Revision must not start with '-'",
+});
+
 const getDiffInputShape = z.object({
 	workspaceId: z.string(),
 	path: z.string(),
 	category: z.enum(["against-base", "staged", "unstaged", "commit"]),
-	baseBranch: z.string().optional(),
-	commitHash: z.string().optional(),
-	fromHash: z.string().optional(),
+	baseBranch: gitRevisionSchema.optional(),
+	commitHash: gitRevisionSchema.optional(),
+	fromHash: gitRevisionSchema.optional(),
 });
 
 /** Upper bound on one getDiffBulk call — generous headroom over the largest
@@ -300,7 +308,7 @@ export const gitRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				baseBranch: z.string().optional(),
+				baseBranch: gitRevisionSchema.optional(),
 				priority: z.enum(["foreground", "background"]).optional(),
 			}),
 		)
@@ -377,7 +385,7 @@ export const gitRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				baseBranch: z.string().optional(),
+				baseBranch: gitRevisionSchema.optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -417,8 +425,8 @@ export const gitRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				commitHash: z.string(),
-				fromHash: z.string().optional(),
+				commitHash: gitRevisionSchema,
+				fromHash: gitRevisionSchema.optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -468,7 +476,7 @@ export const gitRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				baseBranch: z.string().nullable(),
+				baseBranch: gitRevisionSchema.nullable(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -503,8 +511,8 @@ export const gitRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				oldName: z.string(),
-				newName: z.string(),
+				oldName: gitRevisionSchema,
+				newName: gitRevisionSchema,
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -840,9 +848,9 @@ export const gitRouter = router({
 				workspaceId: z.string(),
 				paths: z.array(z.string()).min(1).max(MAX_DIFF_BULK_PATHS),
 				category: z.enum(["against-base", "staged", "unstaged", "commit"]),
-				baseBranch: z.string().optional(),
-				commitHash: z.string().optional(),
-				fromHash: z.string().optional(),
+				baseBranch: gitRevisionSchema.optional(),
+				commitHash: gitRevisionSchema.optional(),
+				fromHash: gitRevisionSchema.optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -879,9 +887,9 @@ export const gitRouter = router({
 				category: z.enum(["against-base", "staged", "unstaged", "commit"]),
 				paths: z.array(z.string()).max(MAX_DIFF_BULK_PATHS).optional(),
 				untrackedPaths: z.array(z.string()).max(MAX_DIFF_BULK_PATHS).optional(),
-				baseBranch: z.string().optional(),
-				commitHash: z.string().optional(),
-				fromHash: z.string().optional(),
+				baseBranch: gitRevisionSchema.optional(),
+				commitHash: gitRevisionSchema.optional(),
+				fromHash: gitRevisionSchema.optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
