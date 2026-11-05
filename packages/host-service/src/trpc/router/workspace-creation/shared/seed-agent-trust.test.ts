@@ -1,4 +1,3 @@
-import { Database } from "bun:sqlite";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
 	chmodSync,
@@ -7,34 +6,19 @@ import {
 	mkdtempSync,
 	readdirSync,
 	readFileSync,
-	realpathSync,
 	rmSync,
 	statSync,
 	symlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir, tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import type { HostDb } from "../../../../db";
-import * as schema from "../../../../db/schema";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
 	resolveTrustFamily,
-	resolveTrustTarget,
-	seedAgentFolderTrust,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
 	seedCodexFolderTrust,
 } from "./seed-agent-trust";
-
-function createTestDb(): HostDb {
-	const db = drizzle(new Database(":memory:"), { schema });
-	migrate(db, {
-		migrationsFolder: resolve(import.meta.dir, "../../../../../drizzle"),
-	});
-	return db as unknown as HostDb;
-}
 
 let dir: string;
 
@@ -75,32 +59,6 @@ describe("resolveTrustFamily", () => {
 				command: "C:\\tools\\codex.exe",
 			}),
 		).toBe("codex");
-	});
-
-	test("sees through env wrappers and inline assignments", () => {
-		expect(
-			resolveTrustFamily({
-				presetId: "custom",
-				command:
-					"env CLAUDE_CONFIG_DIR=/p claude --dangerously-skip-permissions",
-			}),
-		).toBe("claude");
-		expect(
-			resolveTrustFamily({
-				presetId: "custom",
-				command: "/usr/bin/env",
-				args: ["CODEX_HOME=/p", "A=1", "codex"],
-			}),
-		).toBe("codex");
-		expect(
-			resolveTrustFamily({
-				presetId: "custom",
-				command: "CLAUDE_CONFIG_DIR=/p claude",
-			}),
-		).toBe("claude");
-		expect(
-			resolveTrustFamily({ presetId: "custom", command: "env my-agent" }),
-		).toBe(null);
 	});
 
 	test("returns null for providers without a known trust store", () => {
@@ -201,82 +159,6 @@ describe("seedClaudeFolderTrust", () => {
 			true,
 		);
 		expect(readdirSync(home)).toEqual([".claude.json"]);
-	});
-});
-
-describe("seedAgentFolderTrust", () => {
-	test("seeds the CLAUDE_CONFIG_DIR named by an env wrapper", async () => {
-		const profile = join(dir, "second-profile");
-		const session = join(dir, "session");
-		mkdirSync(profile);
-		mkdirSync(session);
-		await seedAgentFolderTrust(createTestDb(), session, {
-			presetId: "custom",
-			command: "env",
-			args: [`CLAUDE_CONFIG_DIR=${profile}`, "claude", "--verbose"],
-			env: { CLAUDE_CONFIG_DIR: join(dir, "overridden") },
-		});
-		const state = JSON.parse(
-			readFileSync(join(profile, ".claude.json"), "utf-8"),
-		);
-		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
-			true,
-		);
-	});
-
-	test("reads a quoted CLAUDE_CONFIG_DIR from a raw command string", async () => {
-		const profile = join(dir, "profile with spaces");
-		const session = join(dir, "session");
-		mkdirSync(profile);
-		mkdirSync(session);
-		await seedAgentFolderTrust(createTestDb(), session, {
-			presetId: "custom",
-			command: `env CLAUDE_CONFIG_DIR='${profile}' claude --verbose && true`,
-			env: {},
-		});
-		const state = JSON.parse(
-			readFileSync(join(profile, ".claude.json"), "utf-8"),
-		);
-		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
-			true,
-		);
-	});
-});
-
-describe("resolveTrustTarget", () => {
-	test("env -i and -u drop the inherited CLAUDE_CONFIG_DIR", () => {
-		const target = (args: string[]) =>
-			resolveTrustTarget(createTestDb(), {
-				presetId: "claude",
-				command: "env",
-				args: [...args, "claude"],
-				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
-			})?.file;
-		const defaultFile = join(homedir(), ".claude.json");
-		expect(target([])).toBe("/agent-profile/.claude.json");
-		expect(target(["-i"])).toBe(defaultFile);
-		expect(target(["-u", "CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
-		expect(target(["--unset=CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
-		expect(target(["-uCLAUDE_CONFIG_DIR"])).toBe(defaultFile);
-		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe("/p/.claude.json");
-	});
-
-	test("reads env options from a raw command string", () => {
-		const target = (command: string) =>
-			resolveTrustTarget(createTestDb(), {
-				presetId: "custom",
-				command,
-				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
-			})?.file;
-		const defaultFile = join(homedir(), ".claude.json");
-		expect(target("env -u CLAUDE_CONFIG_DIR claude --verbose")).toBe(
-			defaultFile,
-		);
-		expect(target("env --ignore-environment claude")).toBe(defaultFile);
-		expect(target("env -uCLAUDE_CONFIG_DIR claude")).toBe(defaultFile);
-		expect(target("env -i CLAUDE_CONFIG_DIR=/p claude")).toBe(
-			"/p/.claude.json",
-		);
 	});
 });
 

@@ -30,98 +30,30 @@ import {
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
-import { parse } from "shell-quote";
 import type { HostDb } from "../../../../db";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
 type TrustFamily = "claude" | "codex" | "agy";
-
-type LaunchCommand = { command: string; args?: readonly string[] };
-
-type AgentLaunchConfig = LaunchCommand & {
-	presetId: string;
-	env: Record<string, string>;
-};
 
 interface TrustTarget {
 	family: TrustFamily;
 	file: string;
 }
 
-const ENV_ASSIGNMENT = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s;
-
-function programName(token: string): string {
-	return (token.split(/[\\/]/).pop() ?? "").toLowerCase().replace(/\.exe$/, "");
-}
-
-function commandTokens(config: LaunchCommand): string[] {
-	const command = config.command.trim();
-	const args = config.args ?? [];
-	if (!/\s/.test(command)) return [command, ...args];
-	const tokens: string[] = [];
-	for (const token of parse(command, (key) => `$${key}`)) {
-		if (typeof token === "string") tokens.push(token);
-		else if ("op" in token && token.op === "glob") tokens.push(token.pattern);
-		else break;
-	}
-	return [...tokens, ...args];
-}
-
-/**
- * Splits `[env [-i] [-u NAME] ...] [VAR=value ...] <program>` into the program
- * name and how the wrapper changes the inherited env at launch.
- */
-function unwrapEnvCommand(config: LaunchCommand): {
-	executable: string;
-	env: Record<string, string>;
-	clearsInherited: boolean;
-	unset: string[];
-} {
-	const tokens = commandTokens(config);
-	let index = 0;
-	let clearsInherited = false;
-	const unset: string[] = [];
-	if (programName(tokens[0] ?? "") === "env") {
-		for (index = 1; index < tokens.length; index++) {
-			const token = tokens[index] ?? "";
-			if (token === "-i" || token === "-" || token === "--ignore-environment") {
-				clearsInherited = true;
-			} else if ((token === "-u" || token === "--unset") && tokens[index + 1]) {
-				unset.push(tokens[++index] ?? "");
-			} else if (token.startsWith("--unset=")) {
-				unset.push(token.slice("--unset=".length));
-			} else if (/^-u./.test(token)) {
-				unset.push(token.slice(2));
-			} else {
-				if (token === "--") index++;
-				break;
-			}
-		}
-	}
-	const env: Record<string, string> = {};
-	for (; index < tokens.length; index++) {
-		const match = ENV_ASSIGNMENT.exec(tokens[index] ?? "");
-		if (!match?.[1]) break;
-		env[match[1]] = match[2] ?? "";
-	}
-	return {
-		executable: programName(tokens[index] ?? ""),
-		env,
-		clearsInherited,
-		unset,
-	};
-}
-
 /**
  * Provider family of an agent config, from its preset id or launch
  * executable. The executable check covers custom presets that still run the
- * stock `claude`/`codex` binaries (possibly via absolute paths, `env`
- * wrappers, or wrappers named after them).
+ * stock `claude`/`codex` binaries (possibly via absolute paths or wrappers
+ * named after them).
  */
-export function resolveTrustFamily(
-	config: LaunchCommand & { presetId: string },
-): TrustFamily | null {
-	const { executable } = unwrapEnvCommand(config);
+export function resolveTrustFamily(config: {
+	presetId: string;
+	command: string;
+}): TrustFamily | null {
+	const [token = ""] = config.command.trim().split(/\s+/);
+	const executable = (token.split(/[\\/]/).pop() ?? "")
+		.toLowerCase()
+		.replace(/\.exe$/, "");
 	for (const family of ["claude", "codex", "agy"] as const) {
 		if (config.presetId === family || executable === family) return family;
 	}
@@ -132,15 +64,14 @@ export function resolveTrustFamily(
  * Trust-store file for one agent config, mirroring launch-time resolution:
  * per-agent env wins over the host-default account selection
  * (`{...accountEnv, ...config.env}` in buildTerminalAgentLaunch, and the
- * agent wrapper's pointer-file fallback reads the same DB-backed selection),
- * and an `env VAR=value` wrapper in the command wins over both.
+ * agent wrapper's pointer-file fallback reads the same DB-backed selection).
  * Claude keeps state inside a custom CLAUDE_CONFIG_DIR but next door at
  * `~/.claude.json` for the default home; Codex always uses
  * `$CODEX_HOME/config.toml`.
  */
-export function resolveTrustTarget(
+function resolveTrustTarget(
 	db: HostDb,
-	config: AgentLaunchConfig,
+	config: { presetId: string; command: string; env: Record<string, string> },
 ): TrustTarget | null {
 	const family = resolveTrustFamily(config);
 	if (family === null) return null;
@@ -150,12 +81,7 @@ export function resolveTrustTarget(
 			file: join(homedir(), ".gemini", "antigravity-cli", "settings.json"),
 		};
 	}
-	const wrapper = unwrapEnvCommand(config);
-	const inherited: Record<string, string> = wrapper.clearsInherited
-		? {}
-		: { ...resolveDefaultAccountEnv(db, family), ...config.env };
-	for (const name of wrapper.unset) delete inherited[name];
-	const env = { ...inherited, ...wrapper.env };
+	const env = { ...resolveDefaultAccountEnv(db, family), ...config.env };
 	if (family === "claude") {
 		const configDir = env.CLAUDE_CONFIG_DIR;
 		return {
@@ -312,7 +238,7 @@ function normalizeFolderPath(path: string): string {
 export async function seedAgentFolderTrust(
 	db: HostDb,
 	folderPath: string,
-	config: AgentLaunchConfig,
+	config: { presetId: string; command: string; env: Record<string, string> },
 ): Promise<void> {
 	try {
 		const target = resolveTrustTarget(db, config);
