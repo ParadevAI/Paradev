@@ -2018,9 +2018,6 @@ msgstr "Thêm một environment trong Settings trước khi tạo workspace clou
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Kết nối tài khoản khác, hoặc ngắt tài khoản bạn không còn dùng."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "Thêm bất kỳ máy nào làm host. Workspace vẫn chạy khi laptop của bạn ngủ, và bạn có thể kiểm tra từ bất cứ đâu."
-
 msgid "Add Attachment"
 msgstr "Thêm tệp đính kèm"
 
@@ -2056,6 +2053,9 @@ msgstr "Thêm tệp, ứng dụng và hơn thế"
 
 msgid "Add files, apps, and more (@)"
 msgstr "Thêm tệp, ứng dụng và hơn thế (@)"
+
+msgid "Add GitHub organization"
+msgstr "Thêm tổ chức GitHub"
 
 msgid "Add instructions"
 msgstr "Thêm hướng dẫn"
@@ -2356,6 +2356,9 @@ msgstr "Agent chỉ thấy một giá trị giữ chỗ. Paradev thêm thông ti
 
 msgid "Agents that run while you're away"
 msgstr "Agent chạy khi bạn vắng mặt"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "Agent tự phân loại issue, soạn changelog và cập nhật dependency. Bạn chỉ cần review PR."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agent dùng tài khoản này khi gọi các công cụ Linear."
@@ -2932,9 +2935,6 @@ msgstr "Áp dụng"
 msgctxt "job application"
 msgid "Apply"
 msgstr "Ứng tuyển"
-
-msgid "Approve"
-msgstr "Duyệt"
 
 msgid "Approve edits"
 msgstr "Duyệt chỉnh sửa"
@@ -4732,6 +4732,9 @@ msgstr "Workspace cloud — đang kết nối"
 msgid "Cloud workspaces"
 msgstr "Không gian làm việc đám mây"
 
+msgid "Cloud Workspaces"
+msgstr "Không gian làm việc đám mây"
+
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Không gian làm việc trên đám mây chưa được bật cho {account}. Tính năng này có trong gói Team và Ultra: nâng cấp trong Cài đặt, Thanh toán."
@@ -6373,6 +6376,9 @@ msgstr "Tạo bằng AI"
 msgid "Create workspace"
 msgstr "Tạo workspace"
 
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "Tạo workspace và khởi chạy agent từ CLI, SDK hoặc qua MCP."
+
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Tạo workspace, khởi chạy agent và đọc kết quả của chúng từ bất kỳ terminal hoặc script nào. macOS và Linux."
 
@@ -7224,6 +7230,9 @@ msgstr "Đã bỏ — sẽ không hỏi lại"
 msgid "Disconnect"
 msgstr "Ngắt kết nối"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "Ngắt kết nối {accountLogin}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Ngắt kết nối {credential}?"
 
@@ -7561,9 +7570,6 @@ msgstr "vd: Đánh giá cloud của tôi"
 msgid "e.g. plan-budget"
 msgstr "vd: plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "Mỗi agent làm việc trong Git worktree và nhánh riêng, nên các agent không ghi đè tệp của nhau. Xem xét và hợp nhất công việc khi bạn sẵn sàng."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Mỗi tệp đính kèm tối đa {0} MB."
@@ -7588,9 +7594,6 @@ msgstr "Mỗi phiên sẽ tiếp tục từ chỗ đang dở."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Mỗi bề mặt có kiểu chữ riêng. Thay đổi hiện ra ngay trong phần xem trước trực tiếp."
-
-msgid "Each task on its own branch"
-msgstr "Mỗi tác vụ trên nhánh riêng"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Mỗi không gian làm việc có một máy đám mây riêng và vẫn làm việc khi laptop của bạn đã gập. Theo dõi từ máy tính, iPhone hoặc iPad."
@@ -7964,9 +7967,6 @@ msgstr "Mọi thứ trong Ultra"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Mọi thứ trong Ultra, cùng GB-giờ đám mây tùy chỉnh, SSO và SAML, cấp phát SCIM, giới hạn IP, nhật ký kiểm tra, SLA tùy chỉnh, hỗ trợ riêng và hợp đồng tùy chỉnh. Giá được điều chỉnh theo tổ chức của bạn. Hãy liên hệ để chúng tôi đề xuất gói phù hợp."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Mọi thứ đều viết script được. Tạo workspace và agent từ CLI, nối Paradev vào CI bằng SDK, hoặc để agent của bạn điều khiển qua MCP."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Mọi thứ chúng tôi dựng trên nền các primitive — thành phần riêng của Paradev, bộ"
@@ -9198,9 +9198,6 @@ msgstr "Toàn màn hình"
 msgid "Full self-driving"
 msgstr "Tự vận hành hoàn toàn"
 
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Toàn bộ mã nguồn có trên GitHub theo Giấy phép MIT. Xem, kiểm tra và đóng góp cho mã nguồn. Không hộp đen, không chức năng ẩn."
-
 msgid "Funding"
 msgstr "Gọi vốn"
 
@@ -10072,6 +10069,9 @@ msgstr "trong một terminal trên host này."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "Trong workspace cục bộ, mã và phiên agent của bạn ở lại trên máy của bạn. Không gian làm việc đám mây chạy trong sandbox."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "Ở chế độ thủ công, Paradev không đăng nhập cho agent này. Hãy để script của bạn đăng nhập lại rồi tiếp tục, hoặc tắt chế độ thủ công trong cài đặt agent."
 
@@ -10242,8 +10242,8 @@ msgstr "Cài đặt plugin"
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Hãy cài Paradev GitHub App để kết nối các repository của bạn."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Cài đặt Paradev GitHub App trên từng tổ chức hoặc tài khoản GitHub có kho mã bạn muốn kết nối."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Cài đặt, ủy quyền và giới hạn phạm vi server MCP trên mọi workspace từ một chỗ, với OAuth tập trung."
@@ -10611,9 +10611,6 @@ msgstr "Đang tham gia…"
 msgid "Jump"
 msgstr "Đi tới"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "Nhảy vào editor yêu thích chỉ với một cú nhấp. VS Code, Cursor, Xcode, các IDE JetBrains hay bất kỳ terminal nào: mở worktree đúng nơi bạn cần."
-
 msgid "Jump to a specific date"
 msgstr "Chuyển đến ngày cụ thể"
 
@@ -10848,9 +10845,6 @@ msgstr "Tin tức mới nhất"
 
 msgid "Launch"
 msgstr "Khởi chạy"
-
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "Khởi chạy agent cho tính năng, sửa lỗi và refactor, tất cả song song. Trạng thái hiển thị ngay cho biết agent nào đang làm, agent nào bị chặn và agent nào đang chờ bạn."
 
 msgid "Launch mode"
 msgstr "Chế độ chạy"
@@ -11310,6 +11304,9 @@ msgstr "Workspace cục bộ"
 
 msgid "Local workspaces"
 msgstr "Workspace cục bộ"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "Workspace cục bộ chạy trên máy của bạn. Bạn quyết định những gì kết nối với chúng."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Trên máy, trên host, hoặc trên cloud"
@@ -11852,6 +11849,9 @@ msgstr "Ứng dụng di động"
 
 msgid "Mobile App"
 msgstr "Ứng dụng di động"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "Di động, cloud, hoặc cloud của riêng bạn"
 
 msgid "Mode"
 msgstr "Chế độ"
@@ -13569,9 +13569,6 @@ msgstr "Vẫn mở"
 msgid "Open Anyway"
 msgstr "Vẫn mở"
 
-msgid "Open Anywhere"
-msgstr "Mở ở bất cứ đâu"
-
 msgid "Open App Store"
 msgstr "Mở App Store"
 
@@ -13611,11 +13608,11 @@ msgstr "Mở cài đặt quản trị ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Mở cài đặt ChatGPT"
 
-msgid "Open Claude and Codex sessions as chats"
-msgstr "Mở phiên Claude và Codex dưới dạng trò chuyện"
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
+msgstr "Mở phiên Claude Code, Codex, OpenCode và Pi dưới dạng trò chuyện"
 
-msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
-msgstr "Mở phiên Claude và Codex trong một khung chat thay vì terminal."
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
+msgstr "Mở phiên Claude Code, Codex, OpenCode và Pi trong một khung chat thay vì terminal."
 
 msgid "Open Command Palette"
 msgstr "Mở bảng lệnh"
@@ -13683,9 +13680,6 @@ msgstr "Mở trong {0}"
 
 msgid "Open in {app}"
 msgstr "Mở trong {app}"
-
-msgid "Open in any IDE"
-msgstr "Mở trong mọi IDE"
 
 msgid "Open in Any IDE"
 msgstr "Mở trong IDE bất kỳ"
@@ -14357,6 +14351,9 @@ msgstr "Paradev được xây dựng ngay trong Paradev, nên chúng tôi chính
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev được thiết kế để làm việc cùng công cụ sẵn có của bạn, chúng tôi hỗ trợ sẵn deep-link tới các IDE như Cursor để bạn mở workspace và tệp ngay trong IDE của mình."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev dùng giấy phép MIT, nên bạn không bao giờ bị khóa chặt. Đọc hoặc sửa mã trên GitHub."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev là mã nguồn mở. Mọi pull request, review và bug đều công khai trên GitHub."
 
@@ -14612,6 +14609,9 @@ msgstr "Người"
 
 msgid "Personal"
 msgstr "Cá nhân"
+
+msgid "Personal account"
+msgstr "Tài khoản cá nhân"
 
 msgid "Personal plan"
 msgstr "Gói cá nhân"
@@ -15268,9 +15268,15 @@ msgstr "Xuất bản từ repo của bạn"
 msgid "Publish new versions, rename and share"
 msgstr "Xuất bản phiên bản mới, đổi tên và chia sẻ"
 
+msgid "Publish Pages"
+msgstr "Xuất bản trang"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Đã xuất bản"
+
+msgid "Published version 1."
+msgstr "Đã xuất bản phiên bản 1."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Công khai số token và tên mô hình của bạn, không bao giờ công khai tên repo, đường dẫn tệp hay prompt. Bạn có thể rời khỏi bất cứ lúc nào, khi đó mọi thứ bạn đã công khai sẽ bị xóa."
@@ -16138,14 +16144,14 @@ msgstr "Repo"
 msgid "Repos, worktrees and branches"
 msgstr "Repo, worktree và nhánh"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "Repo, worktree, output terminal và phiên agent vẫn nằm trên máy bạn. Đồng bộ cloud chỉ gồm metadata tài khoản và tổ chức."
-
 msgid "Repositories"
 msgstr "Repository"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "Các repository truy cập được qua bản cài đặt GitHub App."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Các kho mã truy cập được qua các tài khoản GitHub đã kết nối."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "Các kho mã của {accountLogin} sẽ ngừng đồng bộ. Các tài khoản GitHub đã kết nối khác không bị ảnh hưởng. GitHub App vẫn được cài trên {accountLogin} và bạn có thể kết nối lại bất cứ lúc nào."
 
 msgid "Repositories refreshed"
 msgstr "Đã làm mới repository"
@@ -16762,6 +16768,9 @@ msgstr "Chạy ngay"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Chạy theo lịch hoặc theo sự kiện, chạy khi cần, tạm dừng, tiếp tục và đọc log."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "Chạy song song các agent lập trình cho tính năng, sửa lỗi và refactor. Mỗi agent làm việc trên nhánh riêng, cục bộ hoặc trên cloud."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Chạy song song các coding agent với Paradev"
 
@@ -16783,6 +16792,9 @@ msgstr "Chạy lệnh terminal và tương tác với ứng dụng khác."
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "Chạy agent trong terminal Workspace Setup sau khi setup xong thay vì mở thêm một terminal thứ hai bên cạnh"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "Chạy eval hằng đêm và sửa mọi lỗi hồi quy"
+
 msgid "Run this command?"
 msgstr "Chạy lệnh này?"
 
@@ -16795,14 +16807,8 @@ msgstr "Chạy lệnh của workspace"
 msgid "Run Workspace Command"
 msgstr "Chạy lệnh của workspace"
 
-msgid "Run workspaces anywhere"
-msgstr "Chạy workspace ở bất cứ đâu"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Chạy agent của bạn từ desktop, bất kỳ terminal nào, hoặc điện thoại."
-
-msgid "Run your agents from your phone."
-msgstr "Chạy agent của bạn từ điện thoại."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Chạy agent lập trình của bạn trên đám mây."
@@ -17710,6 +17716,9 @@ msgstr "Script thiết lập, sau khi bạn chuyển đổi conductor.json"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Quá trình thiết lập đã dừng. Lý do có trong output bên dưới."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Có nhiều tài khoản GitHub đang được kết nối. Hãy chọn tài khoản cần ngắt kết nối trong ứng dụng web hoặc cập nhật CLI."
+
 msgid "Sexual content"
 msgstr "Nội dung tình dục"
 
@@ -18106,6 +18115,12 @@ msgstr "Đăng nhập thất bại"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Đăng nhập thất bại ({reason}). Vui lòng thử lại."
+
+msgid "Sign-up completion"
+msgstr "Tỷ lệ hoàn tất đăng ký"
+
+msgid "Sign-up steps"
+msgstr "Số bước đăng ký"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Đang đăng nhập với <0>{userName}</0>"
@@ -20228,9 +20243,6 @@ msgstr "Thao tác này sẽ đổi URL công khai của tổ chức. Hãy nhớ 
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Thao tác này sẽ xóa <0>{0}</0> và gỡ toàn bộ thành viên. Không thể hoàn tác."
 
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Thao tác này sẽ ngắt kết nối GitHub khỏi tổ chức của bạn. GitHub App vẫn được cài nhưng sẽ không đồng bộ dữ liệu nữa. Bạn có thể kết nối lại bất cứ lúc nào."
-
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Thao tác này sẽ kết thúc mọi phiên đang chạy và khởi động lại daemon terminal. Ứng dụng sẽ khởi động lại các terminal với một daemon mới."
 
@@ -20323,6 +20335,9 @@ msgstr "Hạng"
 
 msgid "Time"
 msgstr "Thời gian"
+
+msgid "Time to first workspace"
+msgstr "Thời gian đến workspace đầu tiên"
 
 msgid "Time zone"
 msgstr "Múi giờ"
@@ -20641,9 +20656,6 @@ msgstr "Tufte"
 
 msgid "Tunnel established"
 msgstr "Đã thiết lập tunnel"
-
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có sự kiện: phân loại issue, soạn nháp changelog, cập nhật dependency. Chúng tự chạy và mở PR để bạn review."
 
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
@@ -21176,8 +21188,8 @@ msgstr "Dùng làm lệnh chạy của workspace"
 msgid "Use cases"
 msgstr "Trường hợp sử dụng"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "Dùng Claude Code, Codex, OpenCode hay bất kỳ coding agent nào cho từng tác vụ. Workspace, nhánh và quy trình review của bạn vẫn giữ nguyên."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Dùng Claude Code, Codex, OpenCode hoặc bất kỳ agent CLI nào. Workspace, nhánh và quy trình review của bạn vẫn giữ nguyên."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Dùng Claude Code, Codex hay bất kỳ coding agent nào. Chọn theo từng tác vụ hoặc chạy nhiều agent cạnh nhau."
@@ -21203,6 +21215,9 @@ msgstr "Dùng Paradev trên điện thoại"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Dùng Paradev trên điện thoại với Pro."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "Dùng gói agent và khóa API bạn đã có. Lệnh gọi mô hình đi thẳng tới nhà cung cấp của bạn."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Dùng ứng dụng máy tính để chạy song song nhiều agent lập trình."
 
@@ -21226,9 +21241,6 @@ msgstr "Dùng ID này khi gọi API của Paradev."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Dùng tính năng chuyển giọng nói thành văn bản và nhấn để nói."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "Dùng gói đăng ký agent và khóa API sẵn có của bạn. Paradev không bao giờ proxy lệnh gọi mô hình hay trói quy trình của bạn vào một nhà cung cấp."
 
 msgid "Used"
 msgstr "Đã dùng"
@@ -21641,6 +21653,9 @@ msgstr "Đã đạt giới hạn hằng tuần của Opus"
 
 msgid "Weekly release notes"
 msgstr "Ghi chú phát hành hằng tuần"
+
+msgid "Weekly sign-up completion"
+msgstr "Tỷ lệ hoàn tất đăng ký theo tuần"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Đã đạt giới hạn hằng tuần của Sonnet"
@@ -22341,9 +22356,6 @@ msgstr "Thay đổi của bạn sẽ mất nếu không lưu."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Workspace cloud của bạn sẽ không thể truy cập host này nữa."
-
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "Code của bạn mặc định ở lại cục bộ, với quyền kiểm soát rõ ràng đối với các dịch vụ đã kết nối."
 
 msgid "Your download starts automatically."
 msgstr "Bản tải xuống sẽ tự động bắt đầu."

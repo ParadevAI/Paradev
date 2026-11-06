@@ -598,6 +598,13 @@ export const serverErrorMessages: Record<
 				message: "GitHub installation not found",
 			}),
 		),
+	"serverError.integration.severalGithubAccountsConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
+			}),
+		),
 	"serverError.integration.githubSyncRequiresThePro": () =>
 		i18n._(
 			msg({
