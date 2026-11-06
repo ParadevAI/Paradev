@@ -757,7 +757,7 @@ export function WorkspaceActivityMenu({
 						aria-controls={open ? panelId : undefined}
 						aria-describedby={hasNew ? newPageStatusId : undefined}
 						className={cn(
-							"no-drag relative flex h-[34px] shrink-0 items-center rounded-full p-[3px] font-medium text-xs transition-colors",
+							"no-drag relative flex h-7 shrink-0 items-center rounded-full p-0.5 font-medium text-xs transition-colors",
 							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
 							floating
 								? "bg-[var(--tab-capsule)] text-foreground"

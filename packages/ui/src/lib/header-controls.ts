@@ -10,22 +10,22 @@ export function headerTabClassName(isActive: boolean): string {
 	);
 }
 
-/** The rounded container around a tab bar's tabs. A lone tab keeps its pill but gets no fill. */
+/** The rounded container around a tab bar's tabs, as tall as the workspace switcher. A lone tab keeps its pill but gets no fill. */
 export function tabCapsuleClassName(tabCount: number): string {
 	return cn(
-		"flex h-[34px] min-w-0 items-center rounded-full p-[3px] transition-colors",
+		"flex h-7 min-w-0 items-center rounded-full p-0.5 transition-colors",
 		tabCount > 1 && "bg-[var(--tab-capsule)]",
 	);
 }
 
 /** The box one capsule tab takes: tabs share the bar equally, from 120px up to 240px. */
 export const CAPSULE_TAB_SLOT_CLASS =
-	"relative flex h-7 w-60 min-w-[120px] shrink";
+	"relative flex h-6 w-60 min-w-[120px] shrink";
 
 /** A tab inside a capsule: the open tab is a raised pill, the others are muted text with a hover fill. */
 export function capsuleTabClassName(isActive: boolean): string {
 	return cn(
-		"flex h-7 w-full min-w-0 items-center rounded-full text-[13px] transition-colors",
+		"flex h-6 w-full min-w-0 items-center rounded-full text-[13px] transition-colors",
 		isActive
 			? "bg-[var(--tab-selected)] text-foreground shadow-[var(--tab-selected-shadow)]"
 			: "text-muted-foreground hover:bg-[var(--tab-hover)] hover:text-foreground",
@@ -34,7 +34,7 @@ export function capsuleTabClassName(isActive: boolean): string {
 
 /** The line between two capsule tabs, drawn at the left edge of the later one. Leave it out next to the open or hovered tab. */
 export const TAB_DIVIDER_CLASS =
-	"pointer-events-none absolute top-2 bottom-2 -left-px w-px bg-foreground/10";
+	"pointer-events-none absolute top-1.5 bottom-1.5 -left-px w-px bg-foreground/10";
 
 /** The close button at the end of a header tab. */
 export const HEADER_TAB_CLOSE_CLASS =
