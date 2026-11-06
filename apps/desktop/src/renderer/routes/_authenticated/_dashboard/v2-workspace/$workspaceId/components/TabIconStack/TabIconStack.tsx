@@ -11,6 +11,9 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
+import { useTerminalAgentStatuses } from "renderer/hooks/host-service/useTerminalAgentStatuses";
+import { getV2NotificationSourcesForPane } from "renderer/stores/v2-notifications";
+import { getHighestPriorityStatus } from "shared/tabs-types";
 import type { StoreApi } from "zustand/vanilla";
 import { BrowserTabFavicon } from "../../hooks/usePaneRegistry/components/BrowserPane/components/BrowserTabFavicon";
 import type {
@@ -26,6 +29,7 @@ import {
 	CARD_WIDTH_PX,
 	MAX_TAB_ICONS,
 } from "./constants";
+import { cardStatuses } from "./utils/cardStatuses";
 import { orderTabPanes } from "./utils/orderTabPanes";
 
 const NO_ACTIONS: RendererContext<PaneViewerData>["actions"] = {
@@ -56,9 +60,21 @@ export function TabIconStack({
 	workspaceId,
 }: TabIconStackProps) {
 	const bindings = useTerminalAgentBindings(workspaceId);
+	const statuses = useTerminalAgentStatuses(workspaceId);
 	const isDark = useIsDarkTheme();
-	const panes = orderTabPanes(tab).slice(0, MAX_TAB_ICONS);
+	const ordered = orderTabPanes(tab);
+	const panes = ordered.slice(0, MAX_TAB_ICONS);
 	if (panes.length === 0) return null;
+	const statusByCard = cardStatuses(
+		ordered,
+		MAX_TAB_ICONS,
+		(pane) =>
+			getHighestPriorityStatus(
+				getV2NotificationSourcesForPane(pane).map((source) =>
+					statuses.get(source.id),
+				),
+			) ?? undefined,
+	);
 
 	const agentIdOf = (pane: Pane<PaneViewerData>) => {
 		if (pane.kind === "chat-v3") {
@@ -80,6 +96,7 @@ export function TabIconStack({
 					key={pane.id}
 					depth={depth}
 					color={AGENT_CARD_COLORS[agentId]}
+					status={statusByCard[depth]}
 				>
 					<img src={agentIcon} alt="" draggable={false} />
 				</TabIconCard>
@@ -87,7 +104,7 @@ export function TabIconStack({
 		}
 		if (pane.kind === "terminal" || pane.kind === "chat-v3") {
 			return (
-				<TabIconCard key={pane.id} depth={depth}>
+				<TabIconCard key={pane.id} depth={depth} status={statusByCard[depth]}>
 					<Terminal strokeWidth={2.5} />
 				</TabIconCard>
 			);
@@ -95,13 +112,13 @@ export function TabIconStack({
 		if (pane.kind === "browser") {
 			const { url, faviconUrl = null } = pane.data as BrowserPaneData;
 			return (
-				<TabIconCard key={pane.id} depth={depth}>
+				<TabIconCard key={pane.id} depth={depth} status={statusByCard[depth]}>
 					<BrowserTabFavicon key={`${url}|${faviconUrl}`} src={faviconUrl} />
 				</TabIconCard>
 			);
 		}
 		return (
-			<TabIconCard key={pane.id} depth={depth}>
+			<TabIconCard key={pane.id} depth={depth} status={statusByCard[depth]}>
 				{registry[pane.kind]?.getIcon?.({
 					pane: { ...pane, parentDirection: null },
 					tab: { ...tab, position: 0 },

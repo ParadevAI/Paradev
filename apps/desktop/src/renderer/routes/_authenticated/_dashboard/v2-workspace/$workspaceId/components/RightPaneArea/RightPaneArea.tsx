@@ -128,11 +128,15 @@ export function RightPaneArea({
 						store.getState().setPanePinned({ paneId: pane.id, pinned: true });
 					}
 				}}
-				renderTabAccessory={(tab) => (
-					<V2NotificationStatusIndicator
-						sources={getV2NotificationSourcesForTab(tab)}
-					/>
-				)}
+				renderTabAccessory={
+					isParadevShell
+						? undefined
+						: (tab) => (
+								<V2NotificationStatusIndicator
+									sources={getV2NotificationSourcesForTab(tab)}
+								/>
+							)
+				}
 				renderTabBarLeading={isFullScreen ? () => <WindowChrome /> : undefined}
 				onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
 				renderTabBarTrailing={() => (

@@ -743,11 +743,16 @@ function V2WorkspaceContent() {
 												)
 											: renderBrowserTabIcon
 									}
-									renderTabAccessory={(tab) => (
-										<V2NotificationStatusIndicator
-											sources={getV2NotificationSourcesForTab(tab)}
-										/>
-									)}
+									renderTabAccessory={
+										// The shell draws status on the pane's own card in the icon stack.
+										isParadevShell
+											? undefined
+											: (tab) => (
+													<V2NotificationStatusIndicator
+														sources={getV2NotificationSourcesForTab(tab)}
+													/>
+												)
+									}
 									renderBelowTabBar={() =>
 										showPresetsBar ? (
 											<V2PresetsBar

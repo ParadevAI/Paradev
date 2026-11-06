@@ -93,6 +93,7 @@
 		inset 0.5px 0 0 rgb(255 255 255 / 0.2), inset 0 -0.5px 0 rgb(0 0 0 / 0.35),
 		0 1px 2px rgb(0 0 0 / 0.45);
 	--tab-glass-glyph: #ffffff;
+	--tab-status-ring: rgb(0 0 0 / 0.55);
 	--tab-glass-glyph-shadow: 0 0.5px 1px rgb(0 0 0 / 0.5);
 }
 
@@ -155,6 +156,7 @@
 		0 1px 2px rgb(0 0 0 / 0.18),
 		0 0 0 0.5px color-mix(in oklab, var(--foreground) 10%, transparent);
 	--tab-glass-glyph: var(--foreground);
+	--tab-status-ring: rgb(255 255 255 / 0.95);
 	--tab-glass-glyph-shadow: 0 0 0 transparent;
 }
 

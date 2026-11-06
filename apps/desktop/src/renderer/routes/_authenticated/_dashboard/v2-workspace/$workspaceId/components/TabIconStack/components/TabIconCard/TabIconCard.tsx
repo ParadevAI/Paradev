@@ -1,5 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import type { CSSProperties, ReactNode } from "react";
+import { StatusIndicator } from "renderer/screens/main/components/StatusIndicator";
+import type { ActivePaneStatus } from "shared/tabs-types";
 import {
 	CARD_PEEK_PX,
 	CARD_SCALE_STEP,
@@ -11,6 +13,8 @@ interface TabIconCardProps {
 	/** 0 for the front card; each step back sits further right, smaller and lower. */
 	depth: number;
 	color?: string;
+	/** The pane's agent status, drawn as a dot in the card's top-right corner. */
+	status?: ActivePaneStatus | null;
 	children: ReactNode;
 }
 
@@ -26,7 +30,12 @@ function brandGlass(color: string): CSSProperties {
 	};
 }
 
-export function TabIconCard({ depth, color, children }: TabIconCardProps) {
+export function TabIconCard({
+	depth,
+	color,
+	status,
+	children,
+}: TabIconCardProps) {
 	return (
 		<span
 			className={cn(
@@ -46,6 +55,12 @@ export function TabIconCard({ depth, color, children }: TabIconCardProps) {
 			}}
 		>
 			{children}
+			{status ? (
+				<StatusIndicator
+					status={status}
+					className="absolute top-[1.5px] right-[1.5px] size-[5px] rounded-full shadow-[0_0_0_1px_var(--tab-status-ring)]"
+				/>
+			) : null}
 		</span>
 	);
 }
