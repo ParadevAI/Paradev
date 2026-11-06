@@ -28,6 +28,11 @@ The Linear document **Dev doctor notes** (id `b74e1574-7fef-4297-b3b9-d99976cfcd
   your parts with `save_document`'s `patch`, never a full rewrite. Keep everything people wrote. Add one line at the top
   of "Run log" for this run. Update the "Failure kinds" table and the "Rough edges" list from what
   you learned. When you research something, add a section with what you found and the sources.
+- A Linear document holds at most 250,000 characters, and a save over that fails. When the
+  notebook is over 230,000, first append the run-log lines older than 7 days to the document
+  **Dev doctor run log archive** in the same project (create it once and put its id under the
+  notebook's "Run log" heading). Remove those lines from the notebook only after the
+  archive save succeeds.
 - When this procedure is wrong or missing something, open a PR that edits this file.
 
 Reach the plugins with `superset mcp call-tool <tool> '<json args>' --plugin <linear|neon|posthog|sentry> --json`, or the matching MCP tools if your agent has them.
