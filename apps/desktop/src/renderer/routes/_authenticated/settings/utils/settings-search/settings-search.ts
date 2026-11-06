@@ -896,7 +896,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "behavior",
 		title: "Chat interface",
 		description:
-			"Open Claude and Codex sessions in a chat pane instead of a terminal",
+			"Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal",
 		keywords: [
 			"chat",
 			"interface",
@@ -904,6 +904,8 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"agent",
 			"claude",
 			"codex",
+			"opencode",
+			"pi",
 			"session",
 			"pane",
 			"toggle",

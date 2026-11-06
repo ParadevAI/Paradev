@@ -35,7 +35,7 @@ export function AcpChatSetting() {
 					<HighlightText
 						text={t({
 							message:
-								"Open Claude and Codex sessions in a chat pane instead of a terminal.",
+								"Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal.",
 						})}
 						query={searchQuery}
 					/>
