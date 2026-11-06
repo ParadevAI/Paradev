@@ -2,11 +2,21 @@ import { db, dbWs } from "@superset/db/client";
 import {
 	connections,
 	type IntegrationConfig,
+	members,
 	type SelectConnection,
 	users,
 } from "@superset/db/schema";
 import type { Connector } from "@superset/shared/connectors";
-import { and, eq, isNull, ne, type SQL, sql } from "drizzle-orm";
+import {
+	and,
+	eq,
+	exists,
+	isNull,
+	ne,
+	notExists,
+	type SQL,
+	sql,
+} from "drizzle-orm";
 import {
 	decryptOptional,
 	decryptSecret,
@@ -16,11 +26,32 @@ import {
 import type { ConnectorIdentity, ConnectorTokens } from "./index";
 import { userConnection } from "./lookup";
 import {
+	type ConnectorTx,
 	liveConnectionIds,
 	pinTriggersToExistingAccount,
 } from "./trigger-pins";
 
 export type ConnectionConflict = { ownerEmail: string | null };
+
+export const ORGANIZATION_ABANDONED = "organization_abandoned";
+
+const organizationMembers = db
+	.select({ id: members.id })
+	.from(members)
+	.where(eq(members.organizationId, connections.organizationId));
+
+function liveElsewhere(
+	connector: string,
+	externalAccountId: string,
+	organizationId: string,
+): SQL | undefined {
+	return and(
+		eq(connections.connector, connector),
+		eq(connections.externalAccountId, externalAccountId),
+		isNull(connections.disconnectedAt),
+		ne(connections.organizationId, organizationId),
+	);
+}
 
 export async function connectionConflict(
 	connector: string,
@@ -33,14 +64,36 @@ export async function connectionConflict(
 		.innerJoin(users, eq(users.id, connections.connectedByUserId))
 		.where(
 			and(
-				eq(connections.connector, connector),
-				eq(connections.externalAccountId, externalAccountId),
-				isNull(connections.disconnectedAt),
-				ne(connections.organizationId, organizationId),
+				liveElsewhere(connector, externalAccountId, organizationId),
+				exists(organizationMembers),
 			),
 		)
 		.limit(1);
 	return conflict ? { ownerEmail: conflict.email } : null;
+}
+
+/**
+ * An organization with no members is one nobody can reach, which is what a
+ * failed deletion left behind. Its connections no longer hold the account.
+ */
+export async function releaseAbandonedConnections(
+	connector: string,
+	externalAccountId: string,
+	organizationId: string,
+	tx: ConnectorTx = db,
+): Promise<void> {
+	await tx
+		.update(connections)
+		.set({
+			disconnectedAt: new Date(),
+			disconnectReason: ORGANIZATION_ABANDONED,
+		})
+		.where(
+			and(
+				liveElsewhere(connector, externalAccountId, organizationId),
+				notExists(organizationMembers),
+			),
+		);
 }
 
 export type UpsertConnectionResult =
@@ -99,6 +152,13 @@ export async function upsertConnection(input: {
 	// then the new row is in `previousConnectionIds` and the transition it
 	// keys on has already happened.
 	return dbWs.transaction(async (tx) => {
+		await releaseAbandonedConnections(
+			slug,
+			identity.account.id,
+			organizationId,
+			tx,
+		);
+
 		const previousConnectionIds =
 			ownerKind === "user"
 				? await liveConnectionIds(organizationId, slug, userId, tx)

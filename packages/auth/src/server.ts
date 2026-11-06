@@ -676,15 +676,22 @@ export const auth = betterAuth({
 				},
 
 				beforeDeleteOrganization: async ({ organization }) => {
-					if (!organization.stripeCustomerId) return;
-
-					const subs = await stripeClient.subscriptions.list({
-						customer: organization.stripeCustomerId,
-						status: "active",
-					});
-					for (const sub of subs.data) {
-						await stripeClient.subscriptions.cancel(sub.id);
+					if (organization.stripeCustomerId) {
+						const subs = await stripeClient.subscriptions.list({
+							customer: organization.stripeCustomerId,
+							status: "active",
+						});
+						for (const sub of subs.data) {
+							await stripeClient.subscriptions.cancel(sub.id);
+						}
 					}
+
+					// better-auth deletes members, then the org, without a transaction: a
+					// failed org delete left a memberless org with live connections. One
+					// cascading statement is atomic; better-auth's deletes then match nothing.
+					await db
+						.delete(authSchema.organizations)
+						.where(eq(authSchema.organizations.id, organization.id));
 				},
 
 				afterUpdateOrganization: async ({ organization }) => {
