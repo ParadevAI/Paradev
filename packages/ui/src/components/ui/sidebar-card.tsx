@@ -49,11 +49,9 @@ function SidebarCard({
 					className,
 				)}
 			>
-				<div className="relative px-3.5 pt-3.5">
-					<div className="overflow-hidden rounded-md border border-white/10">
-						<div className="transition-transform duration-500 ease-out group-hover:scale-[1.04]">
-							{media}
-						</div>
+				<div className="relative">
+					<div className="transition-transform duration-500 ease-out group-hover:scale-[1.04]">
+						{media}
 					</div>
 					<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 via-35% to-transparent to-70%" />
 					<div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5">

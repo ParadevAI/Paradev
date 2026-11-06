@@ -49,11 +49,7 @@ export function useReleaseNotesCard(): SidebarCardEntry | null {
 		title: t({ message: `Paradev ${version}` }),
 		description: formatReleaseDate(release.date, { withYear: false }),
 		media: release.image ? (
-			<img
-				src={release.image}
-				alt=""
-				className="aspect-[5/4] w-full object-cover object-top"
-			/>
+			<img src={release.image} alt="" className="block h-auto w-full" />
 		) : undefined,
 		onClick: () => {
 			track("release_notes_card_clicked", { version });
