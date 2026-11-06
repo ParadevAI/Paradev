@@ -201,6 +201,53 @@ describe("chat selections", () => {
 		await runtime.dispose();
 	});
 
+	test("a default model and effort win over the last pick until cleared, and an explicit pick still wins", async () => {
+		const { runtime, starts, create, pick } = selectionRuntime();
+		const set = (defaults: { modelId?: string; effortId?: string }) =>
+			runtime.commands.setDefaultSelections({
+				harness: FAKE_HARNESS,
+				...defaults,
+			});
+
+		expect(set({ modelId: "default", effortId: "medium" })).toEqual({
+			modelId: "default",
+			effortId: "medium",
+		});
+		await pick(create(FAKE_HARNESS).sessionId);
+		create(FAKE_HARNESS);
+		create(FAKE_HARNESS, { modelId: "deepseek-v4.1-flash" });
+		create(OTHER_HARNESS);
+		expect(set({ effortId: "medium" })).toEqual({ effortId: "medium" });
+		create(FAKE_HARNESS);
+		set({});
+		create(FAKE_HARNESS);
+
+		expect(starts).toEqual([
+			{ modelId: "default", effortId: "medium" },
+			{ modelId: "default", effortId: "medium", modeId: "acceptEdits" },
+			{
+				modelId: "deepseek-v4.1-flash",
+				effortId: "medium",
+				modeId: "acceptEdits",
+			},
+			{},
+			{
+				modelId: "deepseek-v4.1-flash",
+				effortId: "medium",
+				modeId: "acceptEdits",
+			},
+			{
+				modelId: "deepseek-v4.1-flash",
+				effortId: "high",
+				modeId: "acceptEdits",
+			},
+		]);
+		expect(
+			runtime.commands.getDefaultSelections({ harness: FAKE_HARNESS }),
+		).toEqual({});
+		await runtime.dispose();
+	});
+
 	test("a chat nobody opened takes the remembered model and effort, but not the mode", async () => {
 		const { runtime, starts, create, pick } = selectionRuntime();
 		await pick(create(FAKE_HARNESS).sessionId);

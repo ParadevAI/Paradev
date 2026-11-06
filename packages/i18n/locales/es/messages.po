@@ -6135,6 +6135,9 @@ msgstr "No se pudieron guardar las ediciones"
 msgid "Couldn't save the change"
 msgstr "No se pudo guardar el cambio"
 
+msgid "Couldn't save the default for new chats"
+msgstr "No se pudo guardar el valor predeterminado para los chats nuevos"
+
 msgid "Couldn't save the Dev"
 msgstr "No se pudo guardar el Dev"
 
@@ -21193,6 +21196,9 @@ msgstr "Usa Claude Code, Codex o cualquier agente de código. Elige uno por tare
 
 msgid "Use for new agents"
 msgstr "Usar para los agentes nuevos"
+
+msgid "Use for new chats"
+msgstr "Usar para los chats nuevos"
 
 msgid "Use global default"
 msgstr "Usar el valor global predeterminado"

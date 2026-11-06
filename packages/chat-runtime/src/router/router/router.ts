@@ -5,6 +5,7 @@ import {
 	createSessionInputSchema,
 	discoverSessionsInputSchema,
 	forkSessionInputSchema,
+	getDefaultSelectionsInputSchema,
 	getItemBodiesInputSchema,
 	getItemsInputSchema,
 	getOutlineInputSchema,
@@ -18,6 +19,7 @@ import {
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
+	setDefaultSelectionsInputSchema,
 	setModeInputSchema,
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
@@ -192,6 +194,14 @@ export function createChatRouter(
 			.mutation(({ input }) =>
 				guarded(() => runtime.commands.setConfigOption(input)),
 			),
+
+		getDefaultSelections: t.procedure
+			.input(getDefaultSelectionsInputSchema)
+			.query(({ input }) => runtime.commands.getDefaultSelections(input)),
+
+		setDefaultSelections: t.procedure
+			.input(setDefaultSelectionsInputSchema)
+			.mutation(({ input }) => runtime.commands.setDefaultSelections(input)),
 
 		forkSession: t.procedure
 			.input(forkSessionInputSchema.extend({ workspaceId: z.string().min(1) }))

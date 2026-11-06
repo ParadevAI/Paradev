@@ -147,6 +147,23 @@ export const setConfigOptionInputSchema = z.object({
 });
 export type SetConfigOptionInput = z.infer<typeof setConfigOptionInputSchema>;
 
+export const getDefaultSelectionsInputSchema = z.object({
+	harness: z.string().min(1),
+});
+export type GetDefaultSelectionsInput = z.infer<
+	typeof getDefaultSelectionsInputSchema
+>;
+
+/** The model and effort every new chat of a harness starts on; a field left out follows the last pick. */
+export const setDefaultSelectionsInputSchema = z.object({
+	harness: z.string().min(1),
+	modelId: z.string().min(1).optional(),
+	effortId: z.string().min(1).optional(),
+});
+export type SetDefaultSelectionsInput = z.infer<
+	typeof setDefaultSelectionsInputSchema
+>;
+
 export const forkSessionInputSchema = z.object({
 	...commandBaseFields,
 	fromItemId: z.string().min(1).optional(),

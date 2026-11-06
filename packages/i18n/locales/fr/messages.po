@@ -6135,6 +6135,9 @@ msgstr "Impossible d'enregistrer les modifications"
 msgid "Couldn't save the change"
 msgstr "Impossible d’enregistrer la modification"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Impossible d'enregistrer le réglage par défaut des nouvelles discussions"
+
 msgid "Couldn't save the Dev"
 msgstr "Impossible d'enregistrer le Dev"
 
@@ -21193,6 +21196,9 @@ msgstr "Utilisez Claude Code, Codex ou n'importe quel agent de code. Choisissez 
 
 msgid "Use for new agents"
 msgstr "Utiliser pour les nouveaux agents"
+
+msgid "Use for new chats"
+msgstr "Utiliser pour les nouvelles discussions"
 
 msgid "Use global default"
 msgstr "Utiliser la valeur globale par défaut"

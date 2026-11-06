@@ -14,3 +14,9 @@ export type AgentSwitcher = {
 		model: { id: string; label: string } | null,
 	) => void;
 };
+
+/** The model and effort every new chat of this agent starts on, over the last pick. */
+export type NewChatDefaults = {
+	value: { modelId?: string; effortId?: string };
+	onChange: (value: { modelId?: string; effortId?: string }) => void;
+};

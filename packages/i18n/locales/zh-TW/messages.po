@@ -6135,6 +6135,9 @@ msgstr "無法儲存編輯"
 msgid "Couldn't save the change"
 msgstr "無法儲存變更"
 
+msgid "Couldn't save the default for new chats"
+msgstr "無法儲存新聊天的預設設定"
+
 msgid "Couldn't save the Dev"
 msgstr "無法儲存 Dev"
 
@@ -21193,6 +21196,9 @@ msgstr "使用Claude Code、Codex或任何編碼代理程式。按任務選擇�
 
 msgid "Use for new agents"
 msgstr "用於新代理程式"
+
+msgid "Use for new chats"
+msgstr "用於新聊天"
 
 msgid "Use global default"
 msgstr "使用全域性預設值"

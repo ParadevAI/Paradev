@@ -6135,6 +6135,9 @@ msgstr "Düzenlemeler kaydedilemedi"
 msgid "Couldn't save the change"
 msgstr "Değişiklik kaydedilemedi"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Yeni sohbetler için varsayılan kaydedilemedi"
+
 msgid "Couldn't save the Dev"
 msgstr "Dev kaydedilemedi"
 
@@ -21193,6 +21196,9 @@ msgstr "Claude Code, Codex veya herhangi bir kodlama ajanını kullanın. Görev
 
 msgid "Use for new agents"
 msgstr "Yeni ajanlar için kullan"
+
+msgid "Use for new chats"
+msgstr "Yeni sohbetler için kullan"
 
 msgid "Use global default"
 msgstr "Genel varsayılanı kullan"
