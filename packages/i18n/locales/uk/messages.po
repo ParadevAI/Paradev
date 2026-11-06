@@ -2012,9 +2012,6 @@ msgstr "Перш ніж створювати хмарний робочий пр�
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Додайте ще один обліковий запис або від'єднайте той, яким більше не користуєтеся."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "Додайте будь-який комп'ютер як хост. Робочі простори продовжують працювати, коли ваш ноутбук у режимі сну, а перевірити їх можна звідусіль."
-
 msgid "Add Attachment"
 msgstr "Додати вкладення"
 
@@ -2233,9 +2230,6 @@ msgstr "Після затримки (3 с)"
 msgid "Against base"
 msgstr "Порівняно з базовою гілкою"
 
-msgid "Against Main"
-msgstr "Порівняно з main"
-
 msgid "Agent"
 msgstr "Агент"
 
@@ -2350,6 +2344,9 @@ msgstr "Агенти бачать лише заглушку. Paradev додає 
 
 msgid "Agents that run while you're away"
 msgstr "Агенти, що працюють, поки вас немає"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "Агенти самі сортують issues, пишуть чернетки changelog і оновлюють залежності. Вам лишається переглянути PR."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенти використовують цей обліковий запис, коли викликають інструменти Linear."
@@ -2926,9 +2923,6 @@ msgstr "Застосувати"
 msgctxt "job application"
 msgid "Apply"
 msgstr "Подати заявку"
-
-msgid "Approve"
-msgstr "Схвалити"
 
 msgid "Approve edits"
 msgstr "Схвалювати редагування"
@@ -4726,6 +4720,9 @@ msgstr "Хмарний робочий простір — підключення"
 msgid "Cloud workspaces"
 msgstr "Хмарні робочі простори"
 
+msgid "Cloud Workspaces"
+msgstr "Хмарні робочі простори"
+
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Хмарні робочі простори не ввімкнено для {account}. Вони входять до тарифів Team і Ultra: перейдіть на вищий тариф у розділі Налаштування, Оплата."
@@ -6367,6 +6364,9 @@ msgstr "Створити за допомогою ШІ"
 msgid "Create workspace"
 msgstr "Створити робочий простір"
 
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "Створюйте робочі простори й запускайте агентів із CLI, SDK або через MCP."
+
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Створюйте робочі простори, запускайте агентів і читайте їхній вивід з будь-якого термінала чи скрипту. macOS і Linux."
 
@@ -7555,9 +7555,6 @@ msgstr "наприклад, Мої хмарні рев'ю"
 msgid "e.g. plan-budget"
 msgstr "наприклад, plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "Кожен агент працює у власному Git worktree і гілці, тож агенти не перезаписують файли одне одного. Переглядайте й зливайте роботу, коли будете готові."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Розмір кожного вкладення не перевищує {0} МБ."
@@ -7582,9 +7579,6 @@ msgstr "Кожен сеанс продовжиться з того місця, �
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Кожна поверхня має власну типографіку. Зміни одразу видно в живому попередньому перегляді."
-
-msgid "Each task on its own branch"
-msgstr "Кожна задача у власній гілці"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Кожен робочий простір отримує власну хмарну машину і працює далі, коли ноутбук закрито. Стежте за ним з комп'ютера, iPhone або iPad."
@@ -7958,9 +7952,6 @@ msgstr "Усе з Ultra"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Усе з Ultra, а також індивідуальні хмарні ГБ-години, SSO і SAML, надання доступу через SCIM, обмеження за IP, журнали аудиту, індивідуальний SLA, виділена підтримка та індивідуальні договори. Ціну підбираємо під вашу організацію. Зв'яжіться з нами, і ми підберемо відповідний варіант."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Усе можна автоматизувати скриптами. Запускайте робочі простори й агентів із CLI, інтегруйте Paradev у CI через SDK або дозвольте агенту керувати ним через MCP."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Усе, що ми збудували поверх примітивів — власні компоненти Paradev, а також"
@@ -9192,9 +9183,6 @@ msgstr "Повноекранний режим"
 msgid "Full self-driving"
 msgstr "Повна автономність"
 
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Повний вихідний код на GitHub за ліцензією MIT. Вивчайте, перевіряйте код і робіть внесок у нього. Жодних чорних скриньок, жодних прихованих функцій."
-
 msgid "Funding"
 msgstr "Фінансування"
 
@@ -10157,9 +10145,6 @@ msgstr "Ініціалізація..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Ініціали як запасний варіант через getInitials, розміри xs → xl"
 
-msgid "Inline"
-msgstr "У рядку"
-
 msgid "Inline Citation"
 msgstr "Вбудована цитата"
 
@@ -10605,9 +10590,6 @@ msgstr "Приєднання…"
 msgid "Jump"
 msgstr "Перейти"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "Відкривайте улюблений редактор одним кліком. VS Code, Cursor, Xcode, IDE від JetBrains або будь-який термінал: відкривайте worktree саме там, де вони вам потрібні."
-
 msgid "Jump to a specific date"
 msgstr "Перейти до певної дати"
 
@@ -10842,9 +10824,6 @@ msgstr "Останні новини"
 
 msgid "Launch"
 msgstr "Запустити"
-
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "Запускайте паралельно агентів для нових функцій, виправлення помилок і рефакторингу. Статус одразу показує, які агенти працюють, які заблоковані, а які чекають на вас."
 
 msgid "Launch mode"
 msgstr "Режим запуску"
@@ -11846,6 +11825,9 @@ msgstr "Мобільний застосунок"
 
 msgid "Mobile App"
 msgstr "Мобільний застосунок"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "Телефон, хмара або власна хмара"
 
 msgid "Mode"
 msgstr "Режим"
@@ -13563,9 +13545,6 @@ msgstr "Усе одно відкрити"
 msgid "Open Anyway"
 msgstr "Усе одно відкрити"
 
-msgid "Open Anywhere"
-msgstr "Відкривайте будь-де"
-
 msgid "Open App Store"
 msgstr "Відкрити App Store"
 
@@ -13677,9 +13656,6 @@ msgstr "Відкрити в {0}"
 
 msgid "Open in {app}"
 msgstr "Відкрити в {app}"
-
-msgid "Open in any IDE"
-msgstr "Відкривайте в будь-якій IDE"
 
 msgid "Open in Any IDE"
 msgstr "Відкривайте в будь-якій IDE"
@@ -14351,6 +14327,9 @@ msgstr "Paradev створюється в Paradev, тож ми самі його
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev створено для роботи з вашими наявними інструментами: ми нативно підтримуємо діплінки в IDE, як-от Cursor, тож ви можете відкривати робочі простори й файли у своїй IDE."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev має ліцензію MIT, тож ви ні до чого не прив'язані. Читайте або змінюйте код на GitHub."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Код Paradev відкритий. Кожен пул-реквест, рев'ю і баг публічні на GitHub."
 
@@ -14404,6 +14383,9 @@ msgstr "Плагіни Paradev"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev працює локально на комп'ютерах ваших розробників. Ми не зберігаємо ваш код або розмови з ШІ, а Paradev пройшов аудит SOC 2 Type II у незалежного аудитора. Запросіть звіт і перегляньте нашу документацію з безпеки на {trustHost}."
+
+msgid "Paradev runs on your machine. You decide what connects to it."
+msgstr "Paradev працює на вашому комп'ютері. Що до нього підключати, вирішуєте ви."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev почався як хакатонний проєкт у листопаді 2025 року. Це був простий десктопний застосунок для керування worktree."
@@ -15262,9 +15244,15 @@ msgstr "Публікуйте з власного репозиторію"
 msgid "Publish new versions, rename and share"
 msgstr "Публікувати нові версії, перейменовувати й ділитися"
 
+msgid "Publish Pages"
+msgstr "Публікуйте сторінки"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Опубліковано"
+
+msgid "Published version 1."
+msgstr "Опубліковано версію 1."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Публікує кількість ваших токенів і назви моделей, але ніколи не назви репозиторіїв, шляхи до файлів чи промпти. Ви можете вийти будь-коли, і все, що ви опублікували, буде видалено."
@@ -16132,9 +16120,6 @@ msgstr "Репозиторії"
 msgid "Repos, worktrees and branches"
 msgstr "Репозиторії, worktree та гілки"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "Репозиторії, worktree, вивід термінала й сеанси агентів залишаються на вашому комп'ютері. Хмарна синхронізація охоплює лише метадані облікового запису та організації."
-
 msgid "Repositories"
 msgstr "Репозиторії"
 
@@ -16756,6 +16741,9 @@ msgstr "Запустити зараз"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Запуск за розкладом або за подіями, запуск на вимогу, пауза, відновлення й читання логів."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
+msgstr "Запускайте паралельних агентів для нових функцій, виправлень і рефакторингу. Кожен отримує власний worktree і гілку."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Запускайте кодинг-агентів паралельно з Paradev"
 
@@ -16777,6 +16765,9 @@ msgstr "Виконувати команди в терміналі та взає�
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "Запускати агента в терміналі «Налаштування робочого простору» після завершення налаштування, а не відкривати поруч другий термінал"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "Запусти нічні evals і виправ регресії"
+
 msgid "Run this command?"
 msgstr "Виконати цю команду?"
 
@@ -16789,14 +16780,8 @@ msgstr "Виконати команду робочого простору"
 msgid "Run Workspace Command"
 msgstr "Виконати команду робочого простору"
 
-msgid "Run workspaces anywhere"
-msgstr "Запускайте робочі простори будь-де"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Запускайте агентів із комп'ютера, будь-якого термінала або телефона."
-
-msgid "Run your agents from your phone."
-msgstr "Запускайте агентів із телефона."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Запускайте своїх кодинг-агентів у хмарі."
@@ -17388,9 +17373,6 @@ msgstr "Виберіть середовище"
 
 msgid "Select every run"
 msgstr "Вибрати всі запуски"
-
-msgid "Select IDE"
-msgstr "Вибрати IDE"
 
 msgid "Select issue"
 msgstr "Вибрати issue"
@@ -17984,9 +17966,6 @@ msgstr "Закривається {shutdownDate}"
 msgid "Side by side"
 msgstr "Порівняння"
 
-msgid "Side by Side"
-msgstr "Поруч"
-
 msgid "sidebar"
 msgstr "бічна панель"
 
@@ -18100,6 +18079,12 @@ msgstr "Не вдалося увійти"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Не вдалося увійти ({reason}). Спробуйте ще раз."
+
+msgid "Sign-up completion"
+msgstr "Завершені реєстрації"
+
+msgid "Sign-up steps"
+msgstr "Кроки реєстрації"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ви ввійшли як <0>{userName}</0>"
@@ -18622,6 +18607,9 @@ msgstr "Почніть із роботи."
 
 msgid "Start work from anywhere"
 msgstr "Починайте роботу будь-де"
+
+msgid "Start workspace"
+msgstr "Запустити робочий простір"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Запускайте робочі простори просто з issues у Linear або GitHub у розділі «Завдання», і в кожному з них уже працюватиме агент."
@@ -20318,6 +20306,9 @@ msgstr "Рівень"
 msgid "Time"
 msgstr "Час"
 
+msgid "Time to first workspace"
+msgstr "Час до першого робочого простору"
+
 msgid "Time zone"
 msgstr "Часовий пояс"
 
@@ -20635,9 +20626,6 @@ msgstr "Tufte"
 
 msgid "Tunnel established"
 msgstr "Тунель встановлено"
-
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Перетворіть рутинні справи на агентів, які запускаються за розкладом або коли надходить подія: розбір issues, чернетки журналу змін, оновлення залежностей. Вони працюють самостійно й відкривають PR, які ви переглядаєте."
 
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
@@ -21170,8 +21158,8 @@ msgstr "Використати як запуск робочого простор
 msgid "Use cases"
 msgstr "Сценарії використання"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "Використовуйте Claude Code, Codex, OpenCode або будь-якого кодинг-агента для кожного завдання. Ваші робочі простори, гілки та процес рев'ю залишаються незмінними."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Використовуйте Claude Code, Codex, OpenCode або будь-який CLI-агент. Робочі простори, гілки й рев'ю залишаються такими ж."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Використовуйте Claude Code, Codex або будь-якого кодинг-агента. Вибирайте для кожного завдання окремо або запускайте кількох паралельно."
@@ -21197,6 +21185,9 @@ msgstr "Використовуйте Paradev на мобільних прист�
 msgid "Use Paradev on your phone with Pro."
 msgstr "Користуйтеся Paradev на телефоні з Pro."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "Використовуйте тарифи агентів і API-ключі, які у вас уже є. Запити до моделей ідуть напряму до вашого провайдера."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Використовуйте десктопний застосунок, щоб запускати паралельних кодинг-агентів."
 
@@ -21220,9 +21211,6 @@ msgstr "Використовуйте це під час викликів API Par
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Використовуйте голосове розшифрування та функцію «натисни й говори»."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "Використовуйте свої наявні підписки на агентів і ключі API. Paradev ніколи не проксіює виклики моделей і не прив'язує ваш робочий процес до одного провайдера."
 
 msgid "Used"
 msgstr "Використано"
@@ -21635,6 +21623,9 @@ msgstr "Досягнуто тижневого ліміту Opus"
 
 msgid "Weekly release notes"
 msgstr "Щотижневі нотатки до релізів"
+
+msgid "Weekly sign-up completion"
+msgstr "Завершені реєстрації за тижнями"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Досягнуто тижневого ліміту Sonnet"
@@ -22336,8 +22327,8 @@ msgstr "Якщо не зберегти зміни, їх буде втрачен�
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Ваші хмарні робочі простори більше не матимуть доступу до цього хоста."
 
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "За замовчуванням ваш код залишається локально, а підключеними сервісами ви керуєте явно."
+msgid "Your code, terminals, and agent sessions stay on your own machine."
+msgstr "Ваш код, термінали й сесії агентів лишаються на вашому комп'ютері."
 
 msgid "Your download starts automatically."
 msgstr "Завантаження почнеться автоматично."
