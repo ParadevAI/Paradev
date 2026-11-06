@@ -21,6 +21,7 @@ import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import {
+	forgetSavedChatMode,
 	freshStartMode,
 	readSavedChatMode,
 } from "../../../../utils/savedChatMode";
@@ -43,7 +44,10 @@ import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
-import { sessionInfoFromState } from "./utils/sessionInfoFromState";
+import {
+	type SessionInfo,
+	sessionInfoFromState,
+} from "./utils/sessionInfoFromState";
 import {
 	isChatCreateWatched,
 	sharedChatCreate,
@@ -94,7 +98,7 @@ export function AcpChatPane({
 	terminalId,
 	workspaceId,
 	modelId,
-	modelLabel,
+	effortId,
 	modeId,
 }: {
 	workspaceId: string;
@@ -113,11 +117,7 @@ export function AcpChatPane({
 	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
-	onSessionInfo: (info: {
-		harnessSessionId?: string;
-		title?: string;
-		modeId?: string;
-	}) => void;
+	onSessionInfo: (info: SessionInfo) => void;
 	onOpenFile?: OpenFile;
 	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
@@ -132,7 +132,7 @@ export function AcpChatPane({
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
 	onRewound?: (prompt: string) => void;
 	modelId?: string;
-	modelLabel?: string;
+	effortId?: string;
 	modeId?: string;
 }) {
 	const { t } = useLingui();
@@ -200,12 +200,11 @@ export function AcpChatPane({
 			attaching.current = true;
 			setFailure(null);
 			try {
+				const savedModeId =
+					resume || !agent ? undefined : readSavedChatMode(agent.id);
 				const startModeId = resume
 					? modeId
-					: freshStartMode(
-							modeId,
-							agent ? readSavedChatMode(agent.id) : undefined,
-						);
+					: freshStartMode(modeId, savedModeId);
 				const commandId = crypto.randomUUID();
 				const createdId = await sharedChatCreate(
 					createKey,
@@ -219,6 +218,7 @@ export function AcpChatPane({
 										harness: resumeHarness,
 										terminalId,
 										...(modelId ? { modelId } : {}),
+										...(effortId ? { effortId } : {}),
 										...(startModeId ? { modeId: startModeId } : {}),
 										...(resume
 											? {
@@ -242,6 +242,17 @@ export function AcpChatPane({
 							.catch(() => undefined);
 					},
 				);
+				if (agent && savedModeId && startModeId === savedModeId) {
+					// Hands the mode to the host, which remembers what is set in a chat.
+					void wiring.transport
+						.setMode({
+							commandId: crypto.randomUUID(),
+							sessionId: createdId,
+							modeId: savedModeId,
+						})
+						.then(() => forgetSavedChatMode(agent.id))
+						.catch(() => undefined);
+				}
 				if (!mounted.current) return false;
 				if (replacing) holdReplacement(createdId);
 				else onSessionCreated(createdId);
@@ -261,6 +272,7 @@ export function AcpChatPane({
 			onSessionCreated,
 			holdReplacement,
 			modelId,
+			effortId,
 			modeId,
 			agent,
 			sessionId,
@@ -394,13 +406,10 @@ export function AcpChatPane({
 					presetId,
 					label,
 					model: nextModel,
-					// Never more access than the chat being left, unless the user
-					// already chose otherwise for the agent being switched to.
-					modeId:
-						readSavedChatMode(presetId) ??
-						(isUnrestrictedMode(currentModeId)
-							? undefined
-							: AGENT_DEFAULT_MODE),
+					// Never more access than the chat being left.
+					modeId: isUnrestrictedMode(currentModeId)
+						? undefined
+						: AGENT_DEFAULT_MODE,
 					handoffPrompt: transcript.trim()
 						? buildChatSessionHandoffPrompt({
 								transcript,
@@ -644,6 +653,7 @@ export function AcpChatPane({
 					prompt: request.messageText,
 					...(handoffPrompt ? { handoffPrompt } : {}),
 					...(modelId ? { modelId } : {}),
+					...(effortId ? { effortId } : {}),
 					...(modeId ? { modeId } : {}),
 					...(snapshotWorktree ? { snapshotWorktree: true } : {}),
 				});
@@ -690,6 +700,7 @@ export function AcpChatPane({
 			t,
 			agentLabel,
 			modelId,
+			effortId,
 			modeId,
 			snapshotWorktree,
 		],
@@ -800,7 +811,6 @@ export function AcpChatPane({
 				onSessionInfo(sessionInfoFromState(state, agent?.sessionId));
 			}}
 			pendingPrompts={pendingPrompts}
-			preferredModelLabel={modelLabel}
 			terminalId={terminalId}
 			workspaceId={workspaceId}
 		/>
