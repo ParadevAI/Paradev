@@ -1,4 +1,5 @@
 import type { Item, UserMessage } from "../../protocol/items";
+import { claudeBookkeeping } from "../bookkeeping/claude";
 
 export type UserStop = "response" | "tool_use";
 
@@ -16,10 +17,15 @@ export function userStopMarker(text: string): UserStop | null {
  * history brings that message back. A prompt sent from this chat carries a
  * `clientId`, so one the user typed is never taken for a stop.
  */
-export function userStopOf(item: Item): UserStop | null {
+export function userStopOf(
+	item: Item,
+	harness: string | undefined,
+): UserStop | null {
 	if (item.kind !== "user_message") return null;
+	if (!harness || !claudeBookkeeping.harnesses.includes(harness)) return null;
 	const message = item as UserMessage;
-	if (message.clientId || message.content.length !== 1) return null;
+	if (message.clientId || message.from || message.content.length !== 1)
+		return null;
 	const [part] = message.content;
 	return part?.type === "text" ? userStopMarker(part.text) : null;
 }

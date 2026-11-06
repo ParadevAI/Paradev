@@ -28,7 +28,10 @@ function isToolCall(item: Item): item is ToolCall {
 	return item.kind === "tool_call";
 }
 
-export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
+export function collapseWorkLog(
+	items: readonly Item[],
+	harness?: string,
+): TimelineEntry[] {
 	const entries: TimelineEntry[] = [];
 	let run: ToolCall[] = [];
 
@@ -46,7 +49,7 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 			continue;
 		}
 		flush();
-		const stop = userStopOf(item);
+		const stop = userStopOf(item, harness);
 		entries.push(
 			stop
 				? { kind: "user_stop", item: item as UserMessage, stop }
@@ -59,6 +62,8 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 
 export type DeriveTimelineOptions = {
 	nestChildItems?: boolean;
+	/** `SessionState.harness`. A stop marker counts only in the harness that writes it. */
+	harness?: string;
 };
 
 export function deriveTimeline(
@@ -86,7 +91,7 @@ export function deriveTimeline(
 		groups.push({
 			turn: snapshot.turns.get(turnId) ?? null,
 			turnId,
-			entries: collapseWorkLog(items),
+			entries: collapseWorkLog(items, options?.harness),
 		});
 	}
 

@@ -36,23 +36,29 @@ describe("userStopMarker", () => {
 });
 
 describe("userStopOf", () => {
-	test("a replayed marker message is a stop", () => {
-		expect(
-			userStopOf(
-				userMessage([
-					{ type: "text", text: "[Request interrupted by user for tool use]" },
-				]),
-			),
-		).toBe("tool_use");
+	const stop = userMessage([
+		{ type: "text", text: "[Request interrupted by user for tool use]" },
+	]);
+
+	test("a replayed marker message in a Claude session is a stop", () => {
+		expect(userStopOf(stop, "claude-acp")).toBe("tool_use");
+		expect(userStopOf(stop, "claude-code")).toBe("tool_use");
 	});
 
-	test("a marker the user typed in this chat stays a prompt", () => {
+	test("the same text in another harness, or before the harness is known, stays a prompt", () => {
+		expect(userStopOf(stop, "codex-acp")).toBeNull();
+		expect(userStopOf(stop, undefined)).toBeNull();
+	});
+
+	test("a marker the user typed or the parent agent sent stays a prompt", () => {
+		const text = [
+			{ type: "text" as const, text: "[Request interrupted by user]" },
+		];
 		expect(
-			userStopOf(
-				userMessage([{ type: "text", text: "[Request interrupted by user]" }], {
-					clientId: "c1",
-				}),
-			),
+			userStopOf(userMessage(text, { clientId: "c1" }), "claude-acp"),
+		).toBeNull();
+		expect(
+			userStopOf(userMessage(text, { from: "parent" }), "claude-acp"),
 		).toBeNull();
 	});
 
@@ -68,6 +74,7 @@ describe("userStopOf", () => {
 						mimeType: "image/png",
 					},
 				]),
+				"claude-acp",
 			),
 		).toBeNull();
 		expect(
@@ -76,18 +83,22 @@ describe("userStopOf", () => {
 					{ type: "text", text: "[Request interrupted by user]" },
 					{ type: "text", text: "now try again" },
 				]),
+				"claude-acp",
 			),
 		).toBeNull();
 	});
 
 	test("only a user message can be a stop", () => {
 		expect(
-			userStopOf({
-				id: "a1",
-				kind: "agent_message",
-				startedAtMs: 1,
-				text: "[Request interrupted by user]",
-			}),
+			userStopOf(
+				{
+					id: "a1",
+					kind: "agent_message",
+					startedAtMs: 1,
+					text: "[Request interrupted by user]",
+				},
+				"claude-acp",
+			),
 		).toBeNull();
 	});
 });

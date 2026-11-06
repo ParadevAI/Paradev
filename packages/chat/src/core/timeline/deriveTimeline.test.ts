@@ -127,7 +127,7 @@ describe("deriveTimeline", () => {
 			env(prompt("p2", "only rename it", 13), "h2"),
 			env(message("reply", 14), "h2"),
 		]);
-		const groups = deriveTimeline(snapshot);
+		const groups = deriveTimeline(snapshot, { harness: "claude-acp" });
 		expect(groups[1]?.entries).toEqual([
 			{
 				kind: "user_stop",

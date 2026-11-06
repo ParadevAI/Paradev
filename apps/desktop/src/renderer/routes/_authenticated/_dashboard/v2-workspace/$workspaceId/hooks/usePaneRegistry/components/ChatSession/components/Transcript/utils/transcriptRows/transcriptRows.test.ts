@@ -626,7 +626,9 @@ test("a stop replayed from Claude Code history is a stopped row where it happene
 	}));
 
 	const rows = transcriptRows(
-		deriveTimeline(reduceMany(emptySnapshot(), stored)),
+		deriveTimeline(reduceMany(emptySnapshot(), stored), {
+			harness: "claude-acp",
+		}),
 		[],
 		new Set(),
 		find,

@@ -7,9 +7,10 @@ export function useTimeline(
 	options?: DeriveTimelineOptions,
 ): TurnGroup[] {
 	const { items, turns } = snapshot;
+	const harness = snapshot.session?.harness;
 	const nestChildItems = options?.nestChildItems ?? false;
 	return useMemo(
-		() => deriveTimeline({ items, turns }, { nestChildItems }),
-		[items, turns, nestChildItems],
+		() => deriveTimeline({ items, turns }, { nestChildItems, harness }),
+		[items, turns, nestChildItems, harness],
 	);
 }
