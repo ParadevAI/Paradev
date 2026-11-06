@@ -331,6 +331,8 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "anthropic/claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
 			{ id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5" },
 			{ id: "google/gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+			{ id: "minimax/MiniMax-M3.1-Flash", label: "MiniMax M3.1 Flash" },
+			{ id: "minimax/MiniMax-M3", label: "MiniMax M3" },
 			{ id: "openai/gpt-6-astra", label: "GPT-6 Astra" },
 			{ id: "openai/gpt-6-sol", label: "GPT-6 Sol" },
 			{ id: "openai/gpt-6-luna", label: "GPT-6 Luna" },

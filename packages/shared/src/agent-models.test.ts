@@ -719,3 +719,13 @@ describe("September 2026 model launches", () => {
 		}
 	});
 });
+
+describe("October 2026 MiniMax model launches", () => {
+	it.each([
+		"minimax/MiniMax-M3.1-Flash",
+		"minimax/MiniMax-M3",
+	])("launches OpenCode with the exact model id %s", (model) => {
+		expect(isCuratedAgentModel("opencode", model)).toBe(true);
+		expect(buildAgentModelArgs("opencode", model)).toEqual(["--model", model]);
+	});
+});
