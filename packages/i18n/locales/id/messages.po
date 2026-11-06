@@ -427,6 +427,10 @@ msgstr "{0} → {1} tertunda"
 msgid "{0} actions"
 msgstr "Aksi {0}"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} dan {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0} di belakang Anda"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {# komentar} other {# komentar}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# file} other {# file}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, other {# pesan}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# pencarian} other {# pencarian}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name} bertanya"
 msgid "{name} can't be messaged"
 msgstr "{name} tidak bisa dikirimi pesan"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} tidak menanggapi ini."
+
 msgid "{name} failed"
 msgstr "{name} gagal"
 
 msgid "{name} finished"
 msgstr "{name} selesai"
+
+msgid "{name} is answering…"
+msgstr "{name} sedang menjawab…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} selesai"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} belum ditambahkan"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} sedang dijeda, jadi tidak melihat ini."
+
 msgid "{name} joined"
 msgstr "{name} bergabung"
 
@@ -1195,6 +1211,9 @@ msgstr "{name} membuka #{number}"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} mengalami masalah dan tidak menjawab."
 
 msgid "{name} started working"
 msgstr "{name} mulai bekerja"
@@ -2682,6 +2701,9 @@ msgstr "Juga: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Selalu tahu agen mana yang membutuhkan Anda, dengan notifikasi yang langsung menuju agen yang terhambat."
+
+msgid "an agent"
+msgstr "agen"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agen menyelesaikan perubahan lintas file dari awal sampai akhir."
@@ -11776,6 +11798,11 @@ msgstr "Pesan untuk {name}…"
 msgid "Message #{channelName}"
 msgstr "Pesan ke #{channelName}"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "Pesan dari <0>{0}{1}</0>"
+
 msgid "Message in channel"
 msgstr "Pesan di channel"
 
@@ -12426,6 +12453,9 @@ msgstr "Belum ada agen."
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "Belum ada agen. Beri tag #{0} pada workspace dan ia muncul di sini, beserta apa yang dibutuhkannya darimu."
+
+msgid "No answer yet"
+msgstr "Belum ada jawaban"
 
 msgid "No API keys yet."
 msgstr "Belum ada kunci API."
@@ -14022,6 +14052,9 @@ msgstr "Buka workspace di aplikasi yang dipilih di menu \"Buka di\" (VS Code, Cu
 
 msgid "Open this run's workspace"
 msgstr "Buka workspace run ini"
+
+msgid "Open thread"
+msgstr "Buka utas"
 
 msgid "Open workspace"
 msgstr "Buka workspace"
@@ -16200,6 +16233,9 @@ msgstr "Membalas pesan langsung Anda"
 msgid "Reply"
 msgstr "Balas"
 
+msgid "Reply in thread"
+msgstr "Balas di utas"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "Balas {0}…"
@@ -17345,6 +17381,10 @@ msgstr "Bagian"
 
 msgid "Security"
 msgstr "Keamanan"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "Lihat semua {0} balasan"
 
 msgid "See all downloads"
 msgstr "Lihat semua unduhan"
@@ -19627,6 +19667,9 @@ msgstr "Kami sedang membawa Paradev ke Windows & Linux. Tinggalkan email Anda da
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Aplikasi desktopnya berjalan di macOS, dengan AppImage Linux eksperimental; Windows belum tersedia. Selain aplikasi desktop ada CLI, SDK TypeScript, dan server MCP, jadi Anda bisa mengendalikan Paradev dari skrip, terminal, dan agen lain. Aplikasi iPhone dan iPad di App Store memungkinkan Anda memantau agen dan meninjau diff mereka saat jauh dari meja."
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "Dev tidak dapat memposting di sana."

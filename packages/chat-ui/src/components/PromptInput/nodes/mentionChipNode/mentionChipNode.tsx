@@ -47,6 +47,7 @@ export type SerializedMentionChipNode = Spread<
 		iconUrl: string | null;
 		dataJson: string | null;
 		description?: string;
+		variant?: "member";
 	},
 	SerializedLexicalNode
 >;
@@ -60,6 +61,7 @@ export function chipFromJSON(
 		brandColor: serialized.brandColor ?? undefined,
 		iconUrl: serialized.iconUrl ?? undefined,
 		...(serialized.description ? { description: serialized.description } : {}),
+		...(serialized.variant ? { variant: serialized.variant } : {}),
 		data:
 			serialized.dataJson == null ? undefined : JSON.parse(serialized.dataJson),
 	};
@@ -72,6 +74,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	__iconUrl: string | null;
 	__dataJson: string | null;
 	__description: string | null;
+	__variant: "member" | null;
 
 	static getType(): string {
 		return "mention-chip";
@@ -85,6 +88,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			node.__iconUrl,
 			node.__dataJson,
 			node.__description,
+			node.__variant,
 			node.__key,
 		);
 	}
@@ -96,10 +100,12 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 		iconUrl: string | null,
 		dataJson: string | null,
 		description: string | null = null,
+		variant: "member" | null = null,
 		key?: NodeKey,
 	) {
 		super(key);
 		this.__description = description;
+		this.__variant = variant;
 		this.__label = label;
 		this.__serialized = serialized;
 		this.__brandColor = brandColor;
@@ -115,6 +121,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			chip.iconUrl ?? null,
 			chip.data === undefined ? null : JSON.stringify(chip.data),
 			chip.description ?? null,
+			chip.variant ?? null,
 		);
 	}
 
@@ -125,6 +132,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			brandColor: this.__brandColor ?? undefined,
 			iconUrl: this.__iconUrl ?? undefined,
 			...(this.__description ? { description: this.__description } : {}),
+			...(this.__variant ? { variant: this.__variant } : {}),
 			data: this.__dataJson == null ? undefined : JSON.parse(this.__dataJson),
 		};
 	}
@@ -137,6 +145,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			serialized.iconUrl,
 			serialized.dataJson,
 			serialized.description ?? null,
+			serialized.variant ?? null,
 		);
 	}
 
@@ -150,6 +159,7 @@ export class MentionChipNode extends DecoratorNode<JSX.Element> {
 			iconUrl: this.__iconUrl,
 			dataJson: this.__dataJson,
 			...(this.__description ? { description: this.__description } : {}),
+			...(this.__variant ? { variant: this.__variant } : {}),
 		};
 	}
 

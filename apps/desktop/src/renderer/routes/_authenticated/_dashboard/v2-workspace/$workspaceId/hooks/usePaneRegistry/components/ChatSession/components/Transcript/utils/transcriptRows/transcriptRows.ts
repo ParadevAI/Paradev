@@ -18,6 +18,7 @@ import type {
 import type { TranscriptCardRef } from "../../../../providers/TranscriptCardsProvider";
 import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
 import {
+	type CardCombiner,
 	type CardFinder,
 	type MessageCardFinder,
 	turnCards,
@@ -194,6 +195,7 @@ export function transcriptRows(
 	findMessageCards: MessageCardFinder = () => [],
 	collapseLoneTools = false,
 	isHarnessNote: HarnessNoteTest = () => false,
+	combineCards?: CardCombiner,
 ): TranscriptRow[] {
 	const rows: TranscriptRow[] = [];
 	const echoedClientIds = new Set<string>();
@@ -222,7 +224,7 @@ export function transcriptRows(
 		};
 		const turnSettled = turn !== null && turn.status !== "running";
 		const links = turnPageLinks(group.entries, turnSettled, findPageLinks);
-		const cards = turnCards(group.entries, findCards);
+		const cards = turnCards(group.entries, findCards, combineCards);
 		const lastPrompt = group.entries.findLastIndex(
 			(entry) => entry.kind === "item" && entry.item.kind === "user_message",
 		);

@@ -17,6 +17,7 @@ describe("sessionCardsFromTool", () => {
 				sessionId: SESSION,
 				agent: "Claude",
 				prompt: "Investigate the title tabs.",
+				text: "Investigate the title tabs.\nReport here.",
 			},
 		]);
 	});
@@ -32,6 +33,7 @@ describe("sessionCardsFromTool", () => {
 				sessionId: SESSION,
 				agent: "Codex",
 				prompt: null,
+				text: null,
 			},
 		]);
 	});

@@ -427,6 +427,10 @@ msgstr "{0} → {1} 保留中"
 msgid "{0} actions"
 msgstr "{0}の操作"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} と {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0}差で後続"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {#件のコメント} other {#件のコメント}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#件のファイル} other {#件のファイル}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, other {# 件のメッセージ}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#件の検索} other {#件の検索}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name} が確認を求めています"
 msgid "{name} can't be messaged"
 msgstr "{name} にはメッセージを送れません"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} はこれを受け取りませんでした。"
+
 msgid "{name} failed"
 msgstr "{name} が失敗しました"
 
 msgid "{name} finished"
 msgstr "{name} が完了しました"
+
+msgid "{name} is answering…"
+msgstr "{name} が回答中…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} が完了しました"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} は追加されていません"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} は一時停止中のため、これを見ていません。"
+
 msgid "{name} joined"
 msgstr "{name} が参加しました"
 
@@ -1195,6 +1211,9 @@ msgstr "{name} が #{number} を作成しました"
 
 msgid "{name} plugin"
 msgstr "{name} プラグイン"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} で問題が発生したため、回答がありません。"
 
 msgid "{name} started working"
 msgstr "{name} が作業を開始しました"
@@ -2682,6 +2701,9 @@ msgstr "その他: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "どのエージェントがあなたを必要としているかが常に分かります。通知からブロック中のエージェントへ直接ジャンプできます。"
+
+msgid "an agent"
+msgstr "エージェント"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "エージェントが複数ファイルにまたがる変更を最後までやり切る。"
@@ -11776,6 +11798,11 @@ msgstr "{name} へのメッセージ…"
 msgid "Message #{channelName}"
 msgstr "#{channelName} へのメッセージ"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "<0>{0}{1}</0> からのメッセージ"
+
 msgid "Message in channel"
 msgstr "チャンネルのメッセージ"
 
@@ -12426,6 +12453,9 @@ msgstr "エージェントはまだありません。"
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "まだエージェントはいません。ワークスペースに#{0}タグを付けると、あなたに必要なことと一緒にここに表示されます。"
+
+msgid "No answer yet"
+msgstr "まだ回答はありません"
 
 msgid "No API keys yet."
 msgstr "APIキーはまだありません。"
@@ -14022,6 +14052,9 @@ msgstr "「開く」メニューで選んだアプリ (VS Code、Cursorなど) �
 
 msgid "Open this run's workspace"
 msgstr "この実行のワークスペースを開く"
+
+msgid "Open thread"
+msgstr "スレッドを開く"
 
 msgid "Open workspace"
 msgstr "ワークスペースを開く"
@@ -16200,6 +16233,9 @@ msgstr "あなたのダイレクトメッセージに返信しました"
 msgid "Reply"
 msgstr "返信"
 
+msgid "Reply in thread"
+msgstr "スレッドで返信"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "{0}に返信…"
@@ -17345,6 +17381,10 @@ msgstr "セクション"
 
 msgid "Security"
 msgstr "セキュリティ"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "{0} 件の返信をすべて表示"
 
 msgid "See all downloads"
 msgstr "すべてのダウンロードを見る"
@@ -19627,6 +19667,9 @@ msgstr "デスクトップアプリは現在macOSとLinuxに対応していま�
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "デスクトップアプリはmacOSで動作し、Linux向けには実験的なAppImageがあります。Windowsはまだ利用できません。デスクトップアプリのほかにCLI、TypeScript SDK、MCPサーバーがあるので、スクリプトやターミナル、他のエージェントからParadevを操作できます。App StoreのiPhone・iPadアプリを使えば、デスクを離れていてもエージェントの状況を確認し、差分をレビューできます。"
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "Dev はそこに投稿できません。"

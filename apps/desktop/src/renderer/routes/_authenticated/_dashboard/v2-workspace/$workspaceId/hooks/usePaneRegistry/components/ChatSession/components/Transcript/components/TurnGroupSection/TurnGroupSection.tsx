@@ -278,6 +278,7 @@ export function TurnGroupSection({
 			<SpeakerHeader
 				at={speakerAt ?? null}
 				newDay={speakerNewDay === true}
+				relayed={speaker === "relay"}
 				speaker={who}
 			/>
 			{body}

@@ -3,11 +3,12 @@ import type { TranscriptCardRef } from "renderer/routes/_authenticated/_dashboar
 import { decisionCardsFromMessage } from "../../../../utils/decisionCards";
 import { pullRequestCardsFromTool } from "../pullRequestCards";
 import { reportCardsFromTool } from "../reportCards";
+import { sendCardsFromTool } from "../sendCards";
 import { sessionCardsFromTool } from "../sessionCards";
 import { workspaceCardsFromTool } from "../workspaceCards";
 
 const CARD_COMMANDS =
-	/\bsuperset\s+(workspaces|ws|sessions)\s+(create|read)\b|\bgh\s+pr\s+(create|merge|ready|view)\b/;
+	/\bsuperset\s+(workspaces|ws|sessions)\s+(create|read|send)\b|\bgh\s+pr\s+(create|merge|ready|view)\b/;
 
 /** Whether a tool call's command can earn a card, so its body is worth fetching. */
 export function channelWantsBody(tool: ToolCall): boolean {
@@ -20,6 +21,7 @@ export function channelCardsFromTool(tool: ToolCall): TranscriptCardRef[] {
 		...workspaceCardsFromTool(tool),
 		...sessionCardsFromTool(tool),
 		...pullRequestCardsFromTool(tool),
+		...sendCardsFromTool(tool),
 		...reportCardsFromTool(tool),
 	];
 }

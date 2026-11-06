@@ -427,6 +427,10 @@ msgstr "{0} → {1} bekliyor"
 msgid "{0} actions"
 msgstr "{0} eylemleri"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} ve {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0} arkanızda"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {# yorum} other {# yorum}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# dosya} other {# dosya}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, one {# mesaj} other {# mesaj}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# arama} other {# arama}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name} soruyor"
 msgid "{name} can't be messaged"
 msgstr "{name} mesaj alamıyor"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} bunu almadı."
+
 msgid "{name} failed"
 msgstr "{name} başarısız oldu"
 
 msgid "{name} finished"
 msgstr "{name} bitti"
+
+msgid "{name} is answering…"
+msgstr "{name} yanıtlıyor…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} tamamlandı"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} eklenmedi"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} duraklatıldı, bu yüzden bunu görmedi."
+
 msgid "{name} joined"
 msgstr "{name} katıldı"
 
@@ -1195,6 +1211,9 @@ msgstr "{name} #{number} açtı"
 
 msgid "{name} plugin"
 msgstr "{name} eklentisi"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} bir sorunla karşılaştı ve yanıt vermedi."
 
 msgid "{name} started working"
 msgstr "{name} çalışmaya başladı"
@@ -2682,6 +2701,9 @@ msgstr "Ayrıca: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Doğrudan engellenen ajana bağlanan bildirimlerle, hangi ajanın size ihtiyacı olduğunu her zaman bilin."
+
+msgid "an agent"
+msgstr "bir ajan"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Bir ajan, çok dosyalı değişiklikleri baştan sona tamamlar."
@@ -11776,6 +11798,11 @@ msgstr "Mesaj gönder: {name}…"
 msgid "Message #{channelName}"
 msgstr "#{channelName} kanalına mesaj"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "<0>{0}{1}</0> kaynaklı mesaj"
+
 msgid "Message in channel"
 msgstr "Kanalda mesaj"
 
@@ -12426,6 +12453,9 @@ msgstr "Henüz ajan yok."
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "Henüz ajan yok. Bir workspace'i #{0} ile etiketleyin, senden ne beklediğiyle birlikte burada görünsün."
+
+msgid "No answer yet"
+msgstr "Henüz yanıt yok"
 
 msgid "No API keys yet."
 msgstr "Henüz API anahtarı yok."
@@ -14022,6 +14052,9 @@ msgstr "Çalışma alanını \"Şununla aç\" menüsünde seçilen uygulamada a�
 
 msgid "Open this run's workspace"
 msgstr "Bu çalıştırmanın çalışma alanını aç"
+
+msgid "Open thread"
+msgstr "Konuyu aç"
 
 msgid "Open workspace"
 msgstr "Çalışma alanını aç"
@@ -16200,6 +16233,9 @@ msgstr "Doğrudan mesajınızı yanıtladı"
 msgid "Reply"
 msgstr "Yanıtla"
 
+msgid "Reply in thread"
+msgstr "Konuda yanıtla"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "{0} için yanıtla…"
@@ -17345,6 +17381,10 @@ msgstr "Bölümler"
 
 msgid "Security"
 msgstr "Güvenlik"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "{0} yanıtın tümünü gör"
 
 msgid "See all downloads"
 msgstr "Tüm indirmeleri gör"
@@ -19627,6 +19667,9 @@ msgstr "Paradev'i Windows ve Linux'a getiriyoruz. E-postanızı bırakın, hazı
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Masaüstü uygulaması macOS'ta çalışır; deneysel bir Linux AppImage vardır, Windows henüz kullanılamıyor. Masaüstü uygulamasının ötesinde bir CLI, bir TypeScript SDK ve bir MCP sunucusu var; böylece Paradev'i betiklerden, terminallerden ve diğer ajanlardan yönetebilirsiniz. App Store'daki iPhone ve iPad uygulamasıyla masanızdan uzaktayken de ajanlarınızı takip edebilir ve diff'lerini inceleyebilirsiniz."
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "Dev oraya gönderi yapamaz."

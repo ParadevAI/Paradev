@@ -14,6 +14,7 @@ const SESSION_ID = /"sessionId"\s*:\s*"([^"]+)"/;
 const LABEL = /"label"\s*:\s*"([^"]+)"/;
 const STARTED = /Started (\S+) chat session (\S+) in workspace (\S+)/;
 const PROMPT_MAX = 160;
+const TEXT_MAX = 4000;
 
 /**
  * The chat session a tool call started in an agent's workspace, from the
@@ -37,6 +38,11 @@ export function sessionCardsFromTool(tool: ToolCall): TranscriptCardRef[] {
 			agent:
 				LABEL.exec(output)?.[1] ?? started?.[1] ?? wordOption(command, "agent"),
 			prompt: prompt ? firstLine(prompt, PROMPT_MAX) : null,
+			text: prompt
+				? prompt.length > TEXT_MAX
+					? `${prompt.slice(0, TEXT_MAX - 1)}…`
+					: prompt.trim()
+				: null,
 		},
 	];
 }

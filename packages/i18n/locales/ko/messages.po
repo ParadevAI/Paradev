@@ -427,6 +427,10 @@ msgstr "{0} → {1} 대기 중"
 msgid "{0} actions"
 msgstr "{0} 작업"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0}와 {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0} 차이로 뒤"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {댓글 #개} other {댓글 #개}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {파일 #개} other {파일 #개}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, other {메시지 #개}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {검색 #회} other {검색 #회}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name}이(가) 요청함"
 msgid "{name} can't be messaged"
 msgstr "{name}에게 메시지를 보낼 수 없습니다"
 
+msgid "{name} didn't pick this up."
+msgstr "{name}이(가) 이 메시지를 받지 못했습니다."
+
 msgid "{name} failed"
 msgstr "{name} 실패"
 
 msgid "{name} finished"
 msgstr "{name} 완료"
+
+msgid "{name} is answering…"
+msgstr "{name}이(가) 답하는 중…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} 완료됨"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name}이(가) 추가되지 않았습니다"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name}이(가) 일시 중지되어 이 메시지를 보지 못했습니다."
+
 msgid "{name} joined"
 msgstr "{name}이(가) 참여함"
 
@@ -1195,6 +1211,9 @@ msgstr "{name}이(가) #{number} 열음"
 
 msgid "{name} plugin"
 msgstr "{name} 플러그인"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name}에 문제가 생겨 답하지 못했습니다."
 
 msgid "{name} started working"
 msgstr "{name} 작업 시작"
@@ -2682,6 +2701,9 @@ msgstr "참고: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습니다. 알림을 누르면 막힌 에이전트로 바로 이동합니다."
+
+msgid "an agent"
+msgstr "에이전트"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
@@ -11776,6 +11798,11 @@ msgstr "{name}에게 메시지…"
 msgid "Message #{channelName}"
 msgstr "#{channelName}에 메시지 보내기"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "<0>{0}{1}</0>의 메시지"
+
 msgid "Message in channel"
 msgstr "채널 내 메시지"
 
@@ -12426,6 +12453,9 @@ msgstr "아직 에이전트가 없습니다."
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "아직 에이전트가 없습니다. 워크스페이스에 #{0} 태그를 달면 필요한 사항과 함께 여기에 표시됩니다."
+
+msgid "No answer yet"
+msgstr "아직 답이 없습니다"
 
 msgid "No API keys yet."
 msgstr "아직 API 키가 없습니다."
@@ -14022,6 +14052,9 @@ msgstr "'다음에서 열기' 메뉴에서 선택한 앱(VS Code, Cursor 등)에
 
 msgid "Open this run's workspace"
 msgstr "이 실행의 워크스페이스 열기"
+
+msgid "Open thread"
+msgstr "스레드 열기"
 
 msgid "Open workspace"
 msgstr "워크스페이스 열기"
@@ -16200,6 +16233,9 @@ msgstr "내 다이렉트 메시지에 답장함"
 msgid "Reply"
 msgstr "답글"
 
+msgid "Reply in thread"
+msgstr "스레드에서 답글"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "{0}에게 답장…"
@@ -17345,6 +17381,10 @@ msgstr "섹션"
 
 msgid "Security"
 msgstr "보안"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "답글 {0}개 모두 보기"
 
 msgid "See all downloads"
 msgstr "전체 다운로드 보기"
@@ -19627,6 +19667,9 @@ msgstr "Paradev를 Windows와 Linux로 확장하고 있습니다. 이메일을 �
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "데스크톱 앱은 macOS에서 실행되며 실험적인 Linux AppImage가 있습니다. Windows는 아직 지원하지 않습니다. 데스크톱 앱 외에 CLI, TypeScript SDK, MCP 서버가 있어 스크립트, 터미널, 다른 에이전트에서 Paradev를 조작할 수 있습니다. App Store의 iPhone 및 iPad 앱으로 자리를 비운 동안에도 에이전트를 확인하고 diff를 검토할 수 있습니다."
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "Dev는 그곳에 게시할 수 없습니다."

@@ -24,7 +24,7 @@ describe("reportCardsFromTool", () => {
 		expect(reportCardsFromTool(claudeTool(COMMAND, output))).toEqual([
 			{
 				kind: "report",
-				key: "report:s-77",
+				key: expect.stringMatching(/^report:s-77:/),
 				workspaceId: WORKSPACE,
 				sessionId: "s-77",
 				text: "Found three problems:\n1. The tab strip clips.\n2. Close buttons overlap.\n\nOpened a PR.",
@@ -73,7 +73,7 @@ describe("reportCardsFromTool", () => {
 		).toEqual([
 			{
 				kind: "report",
-				key: "report:s-77",
+				key: expect.stringMatching(/^report:s-77:/),
 				workspaceId: WORKSPACE,
 				sessionId: "s-77",
 				text: "",

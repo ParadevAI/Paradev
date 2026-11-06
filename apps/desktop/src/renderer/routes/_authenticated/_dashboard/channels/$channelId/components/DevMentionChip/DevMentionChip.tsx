@@ -14,7 +14,7 @@ export function DevMentionChip({ agentId, children }: DevMentionChipProps) {
 			onClick={() =>
 				void navigate({ to: "/devs/$devId", params: { devId: agentId } })
 			}
-			className="rounded bg-accent px-0.5 font-medium text-foreground hover:underline"
+			className="rounded-[4px] bg-link/14 px-[3px] font-medium text-link hover:bg-link/24"
 		>
 			{children}
 		</button>

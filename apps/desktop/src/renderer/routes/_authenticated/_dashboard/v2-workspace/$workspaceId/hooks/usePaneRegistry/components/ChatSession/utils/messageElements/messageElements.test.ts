@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { elementsForChips, splitByElements } from "./messageElements";
+import {
+	elementsForChips,
+	memberChip,
+	splitByElements,
+} from "./messageElements";
 
 describe("messageElements", () => {
 	test("round-trips chips through byte ranges, past non-ASCII text", () => {
@@ -19,6 +23,28 @@ describe("messageElements", () => {
 				segment.element ? `[${segment.element.label}]` : segment.text,
 			),
 		).toEqual(["café: look at ", "[a.ts]", " and ", "[a.ts]", " again"]);
+	});
+
+	test("keeps a mention of an agent drawn as a mention", () => {
+		const text = "@Ticket can you check this";
+		const [element] = elementsForChips(text, [
+			{
+				label: "@Ticket",
+				serialized: "@Ticket",
+				variant: "member",
+				data: { workspaceId: "ws-1" },
+			},
+		]);
+		expect(element?.elementKind).toBe("other");
+		const segment = splitByElements(text, element ? [element] : [])[0];
+		expect(
+			segment?.element ? memberChip(segment.text, segment.element) : null,
+		).toEqual({
+			label: "@Ticket",
+			serialized: "@Ticket",
+			variant: "member",
+			data: { workspaceId: "ws-1", variant: "member" },
+		});
 	});
 
 	test("sends a link chip as its plain URL, with no element", () => {

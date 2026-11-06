@@ -73,7 +73,8 @@ export function UserMessageRow({
 	const textRef = useRef<HTMLDivElement>(null);
 	const oneLine = useFitsOneLine(textRef);
 	const { editMessage, editableMessageIds } = useChatPaneActions();
-	const flat = useTranscriptCards().speakers !== undefined;
+	const { speakers, afterUserMessage } = useTranscriptCards();
+	const flat = speakers !== undefined;
 	const [editing, setEditing] = useState(false);
 	if (note && !pending) return <BookkeepingRow label={note.label} />;
 
@@ -220,6 +221,7 @@ export function UserMessageRow({
 					</div>
 				</MessageContent>
 			)}
+			{flat && !pending && afterUserMessage?.(item, text)}
 			{copyable && (
 				<div
 					className={cn(

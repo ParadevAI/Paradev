@@ -228,6 +228,7 @@ export function Transcript({
 		quietTools,
 		keepOut,
 		speakers,
+		combineCards,
 	} = useTranscriptCards();
 	const harness = snapshot.session?.harness;
 	const isHarnessNote = useCallback(
@@ -280,6 +281,7 @@ export function Transcript({
 					findMessageCards,
 					quietTools === true,
 					isHarnessNote,
+					combineCards,
 				),
 			),
 		[
@@ -292,6 +294,7 @@ export function Transcript({
 			findMessageCards,
 			quietTools,
 			isHarnessNote,
+			combineCards,
 		],
 	);
 	const runs = useMemo(() => {

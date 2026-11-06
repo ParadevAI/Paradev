@@ -427,6 +427,10 @@ msgstr "{0} → {1} đang chờ"
 msgid "{0} actions"
 msgstr "Hành động {0}"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} và {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0} phía sau bạn"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {# bình luận} other {# bình luận}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# tệp} other {# tệp}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, other {# tin nhắn}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# lượt tìm} other {# lượt tìm}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name} hỏi"
 msgid "{name} can't be messaged"
 msgstr "Không thể nhắn tin cho {name}"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} chưa nhận tin này."
+
 msgid "{name} failed"
 msgstr "{name} đã thất bại"
 
 msgid "{name} finished"
 msgstr "{name} đã xong"
+
+msgid "{name} is answering…"
+msgstr "{name} đang trả lời…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} đã xong"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} chưa được thêm"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} đang tạm dừng nên chưa thấy tin này."
+
 msgid "{name} joined"
 msgstr "{name} đã tham gia"
 
@@ -1195,6 +1211,9 @@ msgstr "{name} đã mở #{number}"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} gặp sự cố và chưa trả lời."
 
 msgid "{name} started working"
 msgstr "{name} đã bắt đầu làm việc"
@@ -2682,6 +2701,9 @@ msgstr "Ngoài ra: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Luôn biết agent nào cần bạn, với thông báo dẫn thẳng tới agent đang bị chặn."
+
+msgid "an agent"
+msgstr "một agent"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agent hoàn thành trọn vẹn các thay đổi trên nhiều tệp."
@@ -11776,6 +11798,11 @@ msgstr "Nhắn cho {name}…"
 msgid "Message #{channelName}"
 msgstr "Nhắn vào #{channelName}"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "Tin nhắn từ <0>{0}{1}</0>"
+
 msgid "Message in channel"
 msgstr "Tin nhắn trong kênh"
 
@@ -12426,6 +12453,9 @@ msgstr "Chưa có agent nào."
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "Chưa có tác nhân. Gắn thẻ #{0} cho một workspace và nó sẽ hiện ở đây cùng những gì nó cần ở bạn."
+
+msgid "No answer yet"
+msgstr "Chưa có câu trả lời"
 
 msgid "No API keys yet."
 msgstr "Chưa có khóa API nào."
@@ -14022,6 +14052,9 @@ msgstr "Mở workspace trong ứng dụng đã chọn ở menu \"Mở trong\" (V
 
 msgid "Open this run's workspace"
 msgstr "Mở workspace của lần chạy này"
+
+msgid "Open thread"
+msgstr "Mở chuỗi"
 
 msgid "Open workspace"
 msgstr "Mở workspace"
@@ -16200,6 +16233,9 @@ msgstr "Đã trả lời tin nhắn trực tiếp của bạn"
 msgid "Reply"
 msgstr "Trả lời"
 
+msgid "Reply in thread"
+msgstr "Trả lời trong chuỗi"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "Trả lời {0}…"
@@ -17345,6 +17381,10 @@ msgstr "Các mục"
 
 msgid "Security"
 msgstr "Bảo mật"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "Xem tất cả {0} câu trả lời"
 
 msgid "See all downloads"
 msgstr "Xem tất cả bản tải xuống"
@@ -19627,6 +19667,9 @@ msgstr "Chúng tôi đang đưa Paradev lên Windows & Linux. Để lại email 
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux thử nghiệm; Windows chưa có. Ngoài ứng dụng máy tính còn có CLI, SDK TypeScript và server MCP, nên bạn có thể điều khiển Paradev từ script, terminal và các agent khác. Ứng dụng cho iPhone và iPad trên App Store cho phép bạn theo dõi các agent và xem lại diff của chúng khi không ngồi tại bàn làm việc."
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "Dev không thể đăng ở đó."

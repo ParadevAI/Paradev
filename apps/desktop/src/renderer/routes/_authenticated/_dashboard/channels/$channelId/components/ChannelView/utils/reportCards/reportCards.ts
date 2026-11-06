@@ -28,7 +28,7 @@ export function reportCardsFromTool(tool: ToolCall): TranscriptCardRef[] {
 	return [
 		{
 			kind: "report",
-			key: `report:${sessionId}`,
+			key: `report:${sessionId}:${tool.id}`,
 			workspaceId,
 			sessionId,
 			text: text.length > TEXT_MAX ? `${text.slice(0, TEXT_MAX - 1)}…` : text,

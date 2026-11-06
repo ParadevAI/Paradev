@@ -19,6 +19,7 @@ import {
 	channelCardsFromTool,
 	channelWantsBody,
 } from "../../../ChannelView/utils/channelCards";
+import { combineExchanges } from "../../../ChannelView/utils/exchangeCards";
 import { WorkingNote } from "./components/WorkingNote";
 
 interface AgentPageProps {
@@ -59,11 +60,16 @@ export function AgentPage({ channelId, workspaceId }: AgentPageProps) {
 			wantsBody: channelWantsBody,
 			findMessageCards: channelCardsFromMessage,
 			quietTools: true,
-			keepOut: (card) => card.kind !== "session" && card.kind !== "report",
+			combineCards: combineExchanges,
+			keepOut: (card) =>
+				card.kind !== "session" &&
+				card.kind !== "report" &&
+				card.kind !== "sent",
 			speakers,
 			renderCard: (card, className) => (
 				<ChannelCard
 					channelId={channelId}
+					self={speakers.agent}
 					card={card}
 					className={className}
 					onAnswer={answer}

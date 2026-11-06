@@ -53,3 +53,18 @@
 	text-decoration-thickness: 1px;
 	text-underline-offset: 3px;
 }
+
+.prompt-input-chip[data-variant="member"] {
+	padding: 0 3px;
+	background: color-mix(in oklch, var(--link) 14%, transparent);
+	color: var(--link);
+}
+
+.prompt-input-chip[data-variant="member"]:hover,
+.prompt-input-chip[data-variant="member"][data-selected="true"] {
+	background: color-mix(in oklch, var(--link) 24%, transparent);
+}
+
+.prompt-input-chip[data-variant="member"] .prompt-input-chip-label {
+	text-decoration: none;
+}

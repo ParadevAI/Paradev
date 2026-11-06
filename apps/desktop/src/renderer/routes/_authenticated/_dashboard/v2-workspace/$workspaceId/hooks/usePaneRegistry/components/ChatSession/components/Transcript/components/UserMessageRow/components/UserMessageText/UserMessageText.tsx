@@ -17,10 +17,14 @@ import {
 	CHAT_MARKDOWN_COMPONENTS,
 	CHAT_REMARK_PLUGINS,
 } from "../../../../../../constants";
+import { useTranscriptCards } from "../../../../../../providers/TranscriptCardsProvider";
 import { commandChip } from "../../../../../../utils/commandChip";
 import { fileMentionChip } from "../../../../../../utils/fileMentions";
 import { linkChip } from "../../../../../../utils/linkChip";
-import type { MessageSegment } from "../../../../../../utils/messageElements";
+import {
+	type MessageSegment,
+	memberChip,
+} from "../../../../../../utils/messageElements";
 import { ChatLink } from "../../../../../ChatLink";
 import { MessageChip } from "./components/MessageChip";
 import { remarkLineBreaks } from "./utils/remarkLineBreaks";
@@ -42,6 +46,8 @@ function segmentChip(
 	if (!element) return null;
 	const linked = linkedContextData(element.data);
 	if (linked) return linkedContextChip(linked, isDark);
+	const member = memberChip(text, element);
+	if (member) return member;
 	if (element.elementKind === "slash_command") {
 		const name = text.replace(/^\//, "");
 		return {
@@ -74,6 +80,7 @@ export function UserMessageText({
 }) {
 	const { t } = useLingui();
 	const isDark = useIsDarkTheme();
+	const { renderChip } = useTranscriptCards();
 	const chatLabel = t({ message: "Chat" });
 	const chips = useMemo(
 		() => segments.map((segment) => segmentChip(segment, commands, isDark)),
@@ -96,11 +103,10 @@ export function UserMessageText({
 					const chip = chips[index];
 					const source = segments[index]?.text;
 					if (chip) {
+						const rendered = <MessageChip chip={chip} />;
 						return (
-							<span
-								data-source-text={chip.label === source ? undefined : source}
-							>
-								<MessageChip chip={chip} />
+							<span data-source-text={source}>
+								{renderChip?.(chip, rendered) ?? rendered}
 							</span>
 						);
 					}
@@ -122,7 +128,7 @@ export function UserMessageText({
 				return <ChatLink {...props} />;
 			},
 		}),
-		[chips, segments, isDark, chatLabel],
+		[chips, segments, isDark, chatLabel, renderChip],
 	);
 	return (
 		<ChatMarkdown

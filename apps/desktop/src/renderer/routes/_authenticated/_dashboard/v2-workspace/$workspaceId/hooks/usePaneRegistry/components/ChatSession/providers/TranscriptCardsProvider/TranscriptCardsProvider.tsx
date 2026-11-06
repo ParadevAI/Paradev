@@ -3,6 +3,7 @@ import type {
 	ToolCall,
 	UserMessage,
 } from "@superset/chat/protocol";
+import type { ComposerChip } from "@superset/chat-ui/PromptInput";
 import { createContext, type ReactNode, useContext } from "react";
 
 /**
@@ -27,6 +28,28 @@ export type TranscriptCardRef =
 			agent: string | null;
 			/** The first line of the prompt the session started with. */
 			prompt: string | null;
+			/** The whole prompt, for an exchange that shows what was said. */
+			text?: string | null;
+	  }
+	| {
+			kind: "sent";
+			key: string;
+			workspaceId: string;
+			sessionId: string;
+			text: string;
+	  }
+	| {
+			kind: "exchange";
+			key: string;
+			workspaceId: string;
+			/** What the exchange is about: the first thing said in it, short. */
+			title: string;
+			/** In order. "self" is the agent whose chat this is; "peer" is the one it talked to. */
+			messages: {
+				from: "self" | "peer";
+				text: string;
+				sessionId: string | null;
+			}[];
 	  }
 	| {
 			kind: "pull_request";
@@ -76,6 +99,13 @@ export interface TranscriptCards {
 	 * standing as a row of its own.
 	 */
 	quietTools?: boolean;
+	/**
+	 * Merges a turn's cards, such as the messages two agents traded into one
+	 * exchange. Each result names the card whose place it takes.
+	 */
+	combineCards?: (
+		cards: readonly TranscriptCardRef[],
+	) => { card: TranscriptCardRef; at: string }[];
 	/** Which cards stay in view when the turn's work is folded; the rest fold with it. */
 	keepOut?: (card: TranscriptCardRef) => boolean;
 	/**
@@ -89,6 +119,10 @@ export interface TranscriptCards {
 		relay?: TranscriptSpeaker & { sent: (message: UserMessage) => boolean };
 	};
 	renderCard: (card: TranscriptCardRef, className: string) => ReactNode;
+	/** Drawn under a person's message, such as the answers of the Devs it named; `text` is its words as shown. */
+	afterUserMessage?: (message: UserMessage, text: string) => ReactNode;
+	/** Wraps a chip in a sent message, such as an agent it names, so a click opens it; null keeps the chip as drawn. */
+	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
 }
 
 const NONE: TranscriptCards = {

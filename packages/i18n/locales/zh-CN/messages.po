@@ -427,6 +427,10 @@ msgstr "{0} → {1}待更新"
 msgid "{0} actions"
 msgstr "{0}的操作"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} 和 {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "落后你{0}"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {#条评论} other {#条评论}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#个文件} other {#个文件}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, other {# 条消息}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#次搜索} other {#次搜索}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name} 请求确认"
 msgid "{name} can't be messaged"
 msgstr "无法向 {name} 发送消息"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} 没有接手这条消息。"
+
 msgid "{name} failed"
 msgstr "{name} 失败"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
+
+msgid "{name} is answering…"
+msgstr "{name} 正在回答…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} 已完成"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未添加"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} 已暂停，所以没有看到这条消息。"
+
 msgid "{name} joined"
 msgstr "{name} 已加入"
 
@@ -1195,6 +1211,9 @@ msgstr "{name} 打开了 #{number}"
 
 msgid "{name} plugin"
 msgstr "{name} 插件"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} 遇到问题，没有回答。"
 
 msgid "{name} started working"
 msgstr "{name} 开始工作"
@@ -2682,6 +2701,9 @@ msgstr "另有：@superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "随时知道哪个智能体需要你，通知可直接跳转到被阻塞的智能体。"
+
+msgid "an agent"
+msgstr "一个智能体"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "智能体能端到端完成跨文件改动。"
@@ -11776,6 +11798,11 @@ msgstr "发消息给 {name}…"
 msgid "Message #{channelName}"
 msgstr "发送消息到 #{channelName}"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "来自 <0>{0}{1}</0> 的消息"
+
 msgid "Message in channel"
 msgstr "频道中的消息"
 
@@ -12426,6 +12453,9 @@ msgstr "暂无智能体。"
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "还没有代理。给工作区打上 #{0} 标签，它就会显示在这里，连同它需要你做的事。"
+
+msgid "No answer yet"
+msgstr "还没有回答"
 
 msgid "No API keys yet."
 msgstr "暂无API密钥。"
@@ -14022,6 +14052,9 @@ msgstr "在“打开方式”菜单中选定的应用（VS Code、Cursor等）�
 
 msgid "Open this run's workspace"
 msgstr "打开此次运行的工作区"
+
+msgid "Open thread"
+msgstr "打开话题"
 
 msgid "Open workspace"
 msgstr "打开工作区"
@@ -16200,6 +16233,9 @@ msgstr "回复了你的私信"
 msgid "Reply"
 msgstr "回复"
 
+msgid "Reply in thread"
+msgstr "在话题中回复"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "回复 {0}…"
@@ -17345,6 +17381,10 @@ msgstr "分区"
 
 msgid "Security"
 msgstr "安全"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "查看全部 {0} 条回复"
 
 msgid "See all downloads"
 msgstr "查看全部下载"
@@ -19627,6 +19667,9 @@ msgstr "桌面应用目前支持macOS和Linux。留下邮箱，Windows版本一�
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "桌面应用支持macOS，另有实验性的Linux AppImage；Windows暂未提供。除了桌面应用，还有CLI、TypeScript SDK和MCP服务器，你可以从脚本、终端和其他智能体来驱动Paradev。App Store上的iPhone和iPad应用让你离开工位时也能查看智能体并审阅它们的差异。"
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "该 Dev 无法在那里发帖。"

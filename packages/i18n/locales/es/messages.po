@@ -427,6 +427,10 @@ msgstr "{0} → {1} pendiente"
 msgid "{0} actions"
 msgstr "Acciones de {0}"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} y {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0} por detrás de ti"
@@ -865,6 +869,9 @@ msgstr "{count, plural, one {# comentario} other {# comentarios}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# archivo} other {# archivos}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, one {# mensaje} other {# mensajes}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# búsqueda} other {# búsquedas}}"
 
@@ -1160,11 +1167,17 @@ msgstr "{name} pregunta"
 msgid "{name} can't be messaged"
 msgstr "No se pueden enviar mensajes a {name}"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} no lo ha recogido."
+
 msgid "{name} failed"
 msgstr "{name} falló"
 
 msgid "{name} finished"
 msgstr "{name} terminó"
+
+msgid "{name} is answering…"
+msgstr "{name} está respondiendo…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1181,6 +1194,9 @@ msgstr "{name} terminó"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} no está añadido"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} está en pausa, así que no lo vio."
+
 msgid "{name} joined"
 msgstr "{name} se unió"
 
@@ -1195,6 +1211,9 @@ msgstr "{name} abrió #{number}"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} tuvo un problema y no respondió."
 
 msgid "{name} started working"
 msgstr "{name} empezó a trabajar"
@@ -2682,6 +2701,9 @@ msgstr "También: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Sabrás siempre qué agente te necesita, con notificaciones que llevan directamente al agente bloqueado."
+
+msgid "an agent"
+msgstr "un agente"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Un agente completa cambios en varios archivos de principio a fin."
@@ -11776,6 +11798,11 @@ msgstr "Mensaje para {name}…"
 msgid "Message #{channelName}"
 msgstr "Mensaje a #{channelName}"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "Mensaje de <0>{0}{1}</0>"
+
 msgid "Message in channel"
 msgstr "Mensaje en un canal"
 
@@ -12426,6 +12453,9 @@ msgstr "Aún no hay agentes."
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "Aún no hay agentes. Etiqueta un workspace con #{0} y aparecerá aquí, con lo que necesita de ti."
+
+msgid "No answer yet"
+msgstr "Aún sin respuesta"
 
 msgid "No API keys yet."
 msgstr "Aún no hay claves de API."
@@ -14022,6 +14052,9 @@ msgstr "Abrir el espacio de trabajo en la app elegida en el menú «Abrir en» (
 
 msgid "Open this run's workspace"
 msgstr "Abrir el espacio de trabajo de esta ejecución"
+
+msgid "Open thread"
+msgstr "Abrir hilo"
 
 msgid "Open workspace"
 msgstr "Abrir el espacio de trabajo"
@@ -16200,6 +16233,9 @@ msgstr "Respondió a tu mensaje directo"
 msgid "Reply"
 msgstr "Responder"
 
+msgid "Reply in thread"
+msgstr "Responder en el hilo"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "Responder a {0}…"
@@ -17345,6 +17381,10 @@ msgstr "Secciones"
 
 msgid "Security"
 msgstr "Seguridad"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "Ver las {0} respuestas"
 
 msgid "See all downloads"
 msgstr "Ver todas las descargas"
@@ -19627,6 +19667,9 @@ msgstr "Estamos llevando Paradev a Windows y Linux. Déjanos tu correo y te avis
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "La app de escritorio funciona en macOS, con un AppImage experimental para Linux; Windows todavía no está disponible. Además de la app de escritorio hay una CLI, un SDK de TypeScript y un servidor MCP, así que puedes manejar Paradev desde scripts, terminales y otros agentes. Una app para iPhone y iPad en la App Store te permite consultar el estado de tus agentes y revisar sus diffs lejos de tu escritorio."
+
+msgid "The Dev"
+msgstr "El Dev"
 
 msgid "The Dev can't post there."
 msgstr "El Dev no puede publicar allí."

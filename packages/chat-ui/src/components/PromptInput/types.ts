@@ -8,6 +8,8 @@ export type ComposerChip = {
 	// Icon as a URL string so chips stay serializable data.
 	iconUrl?: string;
 	description?: string;
+	/** "member": the chip names a person or an agent in the conversation and reads as a mention. */
+	variant?: "member";
 	data?: unknown;
 };
 

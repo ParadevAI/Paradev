@@ -1,4 +1,5 @@
 export {
+	type CardCombiner,
 	type CardFinder,
 	type MessageCardFinder,
 	turnCards,

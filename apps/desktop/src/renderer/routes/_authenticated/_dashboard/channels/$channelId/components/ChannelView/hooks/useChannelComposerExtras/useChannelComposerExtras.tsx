@@ -14,16 +14,12 @@ import { useSendChannelText } from "../../../../hooks/useSendChannelText";
 import { useChannelDevs } from "../../../ChannelPane/hooks/useChannelDevs";
 import { STATE_LABELS } from "../../../ChannelPane/utils/agentLabels";
 import { StateDot } from "../../../StateDot";
-
-const AGENT_CHIP = "channelAgentWorkspaceId";
-const DEV_CHIP = "channelDevActorId";
-
-function chipData(chip: ComposerChip, key: string): string | null {
-	const data = chip.data;
-	if (typeof data !== "object" || data === null) return null;
-	const value = (data as Record<string, unknown>)[key];
-	return typeof value === "string" ? value : null;
-}
+import {
+	agentChip,
+	chipAgentId,
+	chipDevId,
+	devChip,
+} from "../../utils/memberChips";
 
 /**
  * The @ menu of a channel's agents and Devs in the coordinator's composer.
@@ -63,13 +59,7 @@ export function useChannelComposerExtras(
 				description: `${t(STATE_LABELS[state])} · ${workspace.branch}`,
 				icon: <StateDot state={state} />,
 				keywords: [workspace.branch],
-				select: (ctx) =>
-					ctx.insertChip({
-						label: workspace.name,
-						serialized: `@${workspace.name}`,
-						description: workspace.branch,
-						data: { [AGENT_CHIP]: workspace.id },
-					}),
+				select: (ctx) => ctx.insertChip(agentChip(workspace)),
 			}),
 		);
 		const devEntries = devs.map(
@@ -78,18 +68,13 @@ export function useChannelComposerExtras(
 				label: dev.name,
 				description: t({ message: "Dev · answers in the channel" }),
 				icon: <DevAvatar avatar={dev.avatar} size={16} />,
-				select: (ctx) =>
-					ctx.insertChip({
-						label: dev.name,
-						serialized: `@${dev.name}`,
-						data: { [DEV_CHIP]: dev.actorId },
-					}),
+				select: (ctx) => ctx.insertChip(devChip(dev)),
 			}),
 		);
 		const entries = [...agentEntries, ...devEntries];
 		const devsOf = (chips: readonly ComposerChip[]) =>
 			devs.filter((dev) =>
-				chips.some((chip) => chipData(chip, DEV_CHIP) === dev.actorId),
+				chips.some((chip) => chipDevId(chip) === dev.actorId),
 			);
 		return {
 			mentionProviders:
@@ -106,7 +91,7 @@ export function useChannelComposerExtras(
 			contextLine: (chips) => {
 				const lines = new Map<string, string>();
 				for (const chip of chips) {
-					const id = chipData(chip, AGENT_CHIP);
+					const id = chipAgentId(chip);
 					const agent = id
 						? agents.find((candidate) => candidate.workspace.id === id)
 						: undefined;
@@ -122,7 +107,7 @@ export function useChannelComposerExtras(
 				for (const dev of devsOf(chips)) {
 					lines.set(
 						dev.actorId,
-						`- @${dev.name} is a Dev, a teammate agent of this channel. This message was also posted to the channel for it, and it answers there. Do not act for it; answer only what is yours.`,
+						`- @${dev.name} is a Dev, a teammate agent of this channel. This message was also posted to the channel for it, and the person sees its answer under their message. Do not act for it and do not say that it will answer. If nothing else in the message is for you, reply in a few words at most.`,
 					);
 				}
 				if (lines.size === 0) return null;

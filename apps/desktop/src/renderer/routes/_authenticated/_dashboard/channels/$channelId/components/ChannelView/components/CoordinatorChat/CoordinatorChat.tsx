@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AcpChatPane } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatPane/components/AcpChatPane";
 import { ComposerExtrasProvider } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/providers/ComposerExtrasProvider";
@@ -13,13 +14,22 @@ import {
 	type ChannelCoordinator,
 	useChannelCoordinatorStore,
 } from "../../../../stores/channelCoordinatorStore";
+import { useChannelPaneStore } from "../../../../stores/channelPaneStore";
+import { useChannelDevs } from "../../../ChannelPane/hooks/useChannelDevs";
 import { useChannelComposerExtras } from "../../hooks/useChannelComposerExtras";
 import {
 	channelCardsFromMessage,
 	channelCardsFromTool,
 	channelWantsBody,
 } from "../../utils/channelCards";
+import { combineExchanges } from "../../utils/exchangeCards";
+import {
+	chipAgentId,
+	chipDevId,
+	mentionedDevIds,
+} from "../../utils/memberChips";
 import { ChannelCard } from "../ChannelCard";
+import { DevReplies } from "./components/DevReplies";
 
 interface CoordinatorChatProps {
 	channelId: string;
@@ -39,6 +49,7 @@ export function CoordinatorChat({
 	const { t } = useLingui();
 	const composerExtras = useChannelComposerExtras(channelId, channelName);
 	const speakers = useChannelSpeakers();
+	const devs = useChannelDevs(channelId);
 	const { workspaces, isReady } = useHostWorkspaces();
 	const setSessionId = useChannelCoordinatorStore(
 		(state) => state.setSessionId,
@@ -47,19 +58,62 @@ export function CoordinatorChat({
 		(state) => state.setPendingPrompts,
 	);
 	const unlink = useChannelCoordinatorStore((state) => state.unlink);
+	const pushPage = useChannelPaneStore((state) => state.push);
+	const navigate = useNavigate();
 	const cards = useMemo<TranscriptCards>(
 		() => ({
 			findCards: channelCardsFromTool,
 			wantsBody: channelWantsBody,
 			findMessageCards: channelCardsFromMessage,
 			quietTools: true,
-			keepOut: (card) => card.kind !== "session" && card.kind !== "report",
+			combineCards: combineExchanges,
+			keepOut: (card) =>
+				card.kind !== "session" &&
+				card.kind !== "report" &&
+				card.kind !== "sent",
 			speakers,
 			renderCard: (card, className) => (
-				<ChannelCard channelId={channelId} card={card} className={className} />
+				<ChannelCard
+					channelId={channelId}
+					self={speakers.agent}
+					card={card}
+					className={className}
+				/>
 			),
+			afterUserMessage: (message, text) => {
+				const elements =
+					message.content.find((part) => part.type === "text")?.elements ?? [];
+				const devIds = mentionedDevIds(text, elements, devs);
+				if (devIds.length === 0) return null;
+				return (
+					<DevReplies
+						channelId={channelId}
+						text={text}
+						postedAt={message.startedAtMs}
+						devIds={devIds}
+					/>
+				);
+			},
+			renderChip: (chip, rendered) => {
+				const agentId = chipAgentId(chip);
+				const devId = chipDevId(chip);
+				if (!agentId && !devId) return null;
+				return (
+					<button
+						type="button"
+						onClick={() => {
+							if (agentId) pushPage(channelId, { kind: "agent", id: agentId });
+							else if (devId) {
+								void navigate({ to: "/devs/$devId", params: { devId } });
+							}
+						}}
+					>
+						{rendered}
+					</button>
+				);
+			},
 		}),
-		[channelId, speakers],
+		[channelId, speakers, devs, pushPage, navigate],
 	);
 	const workspace = workspaces.find(
 		(row) => row.id === coordinator.workspaceId,

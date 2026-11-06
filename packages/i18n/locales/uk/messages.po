@@ -421,6 +421,10 @@ msgstr "{0} → {1} в очікуванні"
 msgid "{0} actions"
 msgstr "Дії {0}"
 
+#. placeholder {0}: self.name
+msgid "{0} and {peerName}"
+msgstr "{0} і {peerName}"
+
 #. placeholder {0}: formatTokens(belowGap > 0n ? belowGap : 0n)
 msgid "{0} behind you"
 msgstr "{0} позаду вас"
@@ -859,6 +863,9 @@ msgstr "{count, plural, one {# коментар} few {# коментарі} many
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
 
+msgid "{count, plural, one {# message} other {# messages}}"
+msgstr "{count, plural, one {# повідомлення} few {# повідомлення} many {# повідомлень} other {# повідомлення}}"
+
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# пошук} few {# пошуки} many {# пошуків} other {# пошуку}}"
 
@@ -1154,11 +1161,17 @@ msgstr "{name} запитує"
 msgid "{name} can't be messaged"
 msgstr "{name} не може отримувати повідомлення"
 
+msgid "{name} didn't pick this up."
+msgstr "{name} не взяв це в роботу."
+
 msgid "{name} failed"
 msgstr "{name}: помилка"
 
 msgid "{name} finished"
 msgstr "{name}: роботу завершено"
+
+msgid "{name} is answering…"
+msgstr "{name} відповідає…"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1175,6 +1188,9 @@ msgstr "{name} завершив роботу"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} не додано"
 
+msgid "{name} is paused, so it didn't see this."
+msgstr "{name} на паузі, тому не побачив це."
+
 msgid "{name} joined"
 msgstr "{name} приєднався"
 
@@ -1189,6 +1205,9 @@ msgstr "{name} відкрив #{number}"
 
 msgid "{name} plugin"
 msgstr "Плагін {name}"
+
+msgid "{name} ran into a problem and didn't answer."
+msgstr "{name} натрапив на проблему й не відповів."
 
 msgid "{name} started working"
 msgstr "{name}: роботу розпочато"
@@ -2676,6 +2695,9 @@ msgstr "Також: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Завжди знайте, якому агенту ви потрібні, завдяки сповіщенням, що ведуть просто до заблокованого агента."
+
+msgid "an agent"
+msgstr "агент"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
@@ -11770,6 +11792,11 @@ msgstr "Повідомлення для {name}…"
 msgid "Message #{channelName}"
 msgstr "Повідомлення в #{channelName}"
 
+#. placeholder {0}: speaker.avatar
+#. placeholder {1}: speaker.name
+msgid "Message from <0>{0}{1}</0>"
+msgstr "Повідомлення від <0>{0}{1}</0>"
+
 msgid "Message in channel"
 msgstr "Повідомлення в каналі"
 
@@ -12420,6 +12447,9 @@ msgstr "Агентів ще немає."
 #. placeholder {0}: channel.name
 msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
 msgstr "Агентів ще немає. Позначте workspace тегом #{0}, і він з'явиться тут разом із тим, що йому потрібно від вас."
+
+msgid "No answer yet"
+msgstr "Відповіді ще немає"
 
 msgid "No API keys yet."
 msgstr "Ключів API ще немає."
@@ -14016,6 +14046,9 @@ msgstr "Відкрити робочий простір у застосунку, 
 
 msgid "Open this run's workspace"
 msgstr "Відкрити робочий простір цього запуску"
+
+msgid "Open thread"
+msgstr "Відкрити тред"
 
 msgid "Open workspace"
 msgstr "Відкрити робочий простір"
@@ -16194,6 +16227,9 @@ msgstr "Відповів(-ла) на ваше особисте повідомл�
 msgid "Reply"
 msgstr "Відповісти"
 
+msgid "Reply in thread"
+msgstr "Відповісти в треді"
+
 #. placeholder {0}: workspace.name
 msgid "Reply to {0}…"
 msgstr "Відповісти {0}…"
@@ -17339,6 +17375,10 @@ msgstr "Розділи"
 
 msgid "Security"
 msgstr "Безпека"
+
+#. placeholder {0}: replies.length
+msgid "See all {0} replies"
+msgstr "Усі відповіді ({0})"
 
 msgid "See all downloads"
 msgstr "Усі варіанти завантаження"
@@ -19621,6 +19661,9 @@ msgstr "Десктопний застосунок уже працює на macOS
 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Десктопний застосунок працює на macOS, а для Linux є експериментальний AppImage; Windows поки не підтримується. Окрім десктопного застосунку, є CLI, TypeScript SDK і MCP-сервер, тож ви можете керувати Paradev зі скриптів, терміналів та інших агентів. Застосунок для iPhone та iPad в App Store дає змогу стежити за агентами й переглядати їхні diff, коли ви не за робочим столом."
+
+msgid "The Dev"
+msgstr "Dev"
 
 msgid "The Dev can't post there."
 msgstr "Dev не може публікувати там повідомлення."
