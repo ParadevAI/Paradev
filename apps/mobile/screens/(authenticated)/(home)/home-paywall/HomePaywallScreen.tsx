@@ -1,17 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { AppState, View } from "react-native";
-import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
-import { openUrl } from "@/lib/open-url";
-import { billingSettingsUrl } from "@/lib/web-links";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { OrganizationHeaderButton } from "../home/components/OrganizationHeaderButton";
 
@@ -27,9 +23,9 @@ export function HomePaywallScreen() {
 	const theme = useTheme();
 	const router = useRouter();
 	const { refetch } = useSession();
-	const { activeOrganization, activeOrganizationId } = useOrganizations();
+	const { activeOrganization } = useOrganizations();
 
-	// Paying happens in the browser, so the plan flips while this screen is
+	// Paying happens on the web, so the plan flips while this screen is
 	// up or backgrounded. iOS freezes timers in the background; the AppState
 	// listener is the resume path.
 	useEffect(() => {
@@ -75,16 +71,6 @@ export function HomePaywallScreen() {
 								})}
 					</Text>
 				</View>
-
-				<Button
-					size="lg"
-					className="w-4/5 max-w-sm"
-					onPress={() => openUrl(billingSettingsUrl(activeOrganizationId))}
-				>
-					<Text>
-						<Trans>Upgrade on {COMPANY.DOMAIN}</Trans>
-					</Text>
-				</Button>
 			</View>
 		</>
 	);

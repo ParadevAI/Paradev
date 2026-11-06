@@ -11471,10 +11471,6 @@ msgstr "管理用於MCP伺服器存取以及Claude Desktop、Claude Code等外�
 msgid "Manage members"
 msgstr "管理成員"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "在{0}管理"
-
 msgid "Manage Plan"
 msgstr "管理方案"
 
@@ -21086,10 +21082,6 @@ msgstr "升級"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "升級一個相依性，並修好被它弄壞的地方…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "在 {0} 升級"
 
 msgid "Upgrade to {planName}"
 msgstr "升級至 {planName}"

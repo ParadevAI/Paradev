@@ -11471,10 +11471,6 @@ msgstr "Beheer sleutels voor toegang tot MCP-servers en externe integraties zoal
 msgid "Manage members"
 msgstr "Leden beheren"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Beheren op {0}"
-
 msgid "Manage Plan"
 msgstr "Plan beheren"
 
@@ -21086,10 +21082,6 @@ msgstr "Upgraden"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Werk een dependency bij en fix wat er stukgaat…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Upgraden op {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Upgraden naar {planName}"

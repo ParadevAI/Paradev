@@ -72,7 +72,12 @@ rejections in this category are one of these.
 - [ ] No in-app button, link, or copy points at a web page where a plan can be
       bought (guideline 3.1.1 outside the US storefront; we ship one build
       worldwide). Mentioning that plans are managed on the web is fine;
-      linking to it is not.
+      linking to it is not. `no-purchase-links.test.ts` fails on billing paths.
+      Reviewers sign in with Sign in with Apple as a new free account every
+      time, so they always see this screen.
+- [ ] Every `UIBackgroundModes` entry has a feature the reviewer can reach, or
+      a screen recording on a physical device in `APP_REVIEW_VOICE_VIDEO_URL`
+      and in the review attachment (2.5.4).
 - [ ] Sign in with Apple is present on the sign-in screen whenever any other
       third-party sign-in is (4.8).
 - [ ] Account deletion works from Settings without leaving the app (5.1.1 v).

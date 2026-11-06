@@ -23,7 +23,6 @@ import { useSession } from "@/lib/auth/client";
 import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
 import { apiClient } from "@/lib/trpc/client";
-import { billingSettingsUrl } from "@/lib/web-links";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
@@ -57,7 +56,7 @@ export function SettingsScreen() {
 	const insets = useSafeAreaInsets();
 	const { data: session } = useSession();
 	const queryClient = useQueryClient();
-	const { activeOrganization, activeOrganizationId } = useOrganizations();
+	const { activeOrganization } = useOrganizations();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
@@ -108,10 +107,6 @@ export function SettingsScreen() {
 				{
 					style: "cancel",
 					text: t({ message: "Dismiss" }),
-				},
-				{
-					onPress: () => openUrl(billingSettingsUrl(activeOrganizationId)),
-					text: t({ message: `Manage on ${COMPANY.DOMAIN}` }),
 				},
 			],
 		);
