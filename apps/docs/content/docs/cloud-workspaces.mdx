@@ -4,10 +4,6 @@ description: Set up cloud workspaces, environments, and machine sizes
 pro: true
 ---
 
-<Callout type="info" title="Early access">
-Cloud workspaces are in early access. They are not yet available to every account, so you might not see the **Cloud** option in the app yet.
-</Callout>
-
 ## Overview
 
 A cloud workspace runs in a cloud sandbox instead of on your computer. Agents keep working when your laptop is closed, and you can open the workspace from desktop, iPhone, or iPad.
@@ -18,7 +14,7 @@ To run agents on a server in your own cloud account instead, see [Bring Your Own
 
 ## Requirements
 
-- **A paid plan.** Cloud workspaces need a paid Paradev plan. Usage counts against your organization's cloud usage limit (see [Usage and billing](#usage-and-billing)).
+- **Team or Ultra.** Cloud workspaces come with the Team and Ultra plans (see [pricing](https://paradev.com/pricing)). Usage counts against your organization's cloud usage limit (see [Usage and billing](#usage-and-billing)).
 - **GitHub.** Connect GitHub in **Integrations** and give the Paradev GitHub App access to each repository you want to use. A cloud workspace clones its repositories through the app.
 - **Agent sign-in.** Sign in to your agents under **Settings → Agents**. Cloud workspaces use that sign-in; see [Credentials](#credentials).
 
@@ -136,7 +132,7 @@ The checkout lives at `/workspace`. An environment with more than one repository
 
 ## Troubleshooting
 
-- **No Cloud option**, or "Cloud sandboxes are not enabled" from the CLI: your account does not have early access yet.
+- **No Cloud option**, or "Cloud sandboxes are not enabled" from the CLI: cloud workspaces come with the Team and Ultra plans. Upgrade in **Settings → Billing**.
 - **The project is missing from the Cloud picker**: link the project to a GitHub repository, and make sure the Paradev GitHub App can access it.
 - **The environment editor says a repository "isn't shared with the Paradev GitHub App yet"**: click **Configure GitHub App** and add the repository.
 - **"Your GitHub account cannot reach…"**: your connected GitHub account has no access to a repository in the environment. Ask for access, or pick another environment.

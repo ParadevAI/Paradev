@@ -43,7 +43,7 @@ For a code change, the bot starts a cloud workspace, launches a coding agent the
 
 Once the bot has replied in a thread, and thread follow-ups are on for your Slack team, replies in that thread reach the bot without another mention. `!stop` ends the bot's current Slack turn, but it does not stop a coding agent the bot already started in a workspace; open that workspace to stop it. `!mute` brings back mention-only mode for that thread.
 
-Two limits: code changes from the bot run in [cloud workspaces](https://docs.paradev.com/cloud-workspaces), which need a paid plan. And the bot's own tools for Linear and GitHub cannot delete resources, merge pull requests, or make bulk writes.
+Two limits: code changes from the bot run in [cloud workspaces](https://docs.paradev.com/cloud-workspaces), which come with the Team and Ultra plans. And the bot's own tools for Linear and GitHub cannot delete resources, merge pull requests, or make bulk writes.
 
 ## Option 2: a Slack trigger that runs your agent on your machine
 
@@ -117,4 +117,4 @@ Yes. Set Codex as the automation's agent, or pass `--agent codex` on the CLI.
 
 ### Which plan do I need?
 
-The Slack integration and automations are on Pro. Cloud workspaces need a paid plan. See [pricing](/pricing).
+The Slack integration and automations are on Pro. Cloud workspaces come with the Team and Ultra plans. See [pricing](/pricing).
