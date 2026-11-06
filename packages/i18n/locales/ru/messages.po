@@ -6219,6 +6219,9 @@ msgstr "Не удалось обновить пул-реквест"
 msgid "Couldn't update the Chat setting"
 msgstr "Не удалось обновить настройку чата"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Не удалось обновить глобальную настройку именования"
+
 msgid "Couldn't update the queue"
 msgstr "Не удалось обновить очередь"
 
@@ -9504,6 +9507,12 @@ msgstr "Руководства"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Задаёт правила для AI-генерации имён рабочих областей и веток в этом проекте. Пусто — используется именование по умолчанию."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Задаёт правила для AI-генерации имён рабочих областей и веток в этом проекте. Они добавляются после ваших глобальных правил и важнее их при конфликте. Пусто — используются глобальные правила."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Задаёт правила для AI-генерации имён рабочих областей и веток во всех проектах на всех ваших устройствах. Правила проекта добавляются после этих и важнее их при конфликте."
+
 msgid "Guides and references"
 msgstr "Руководства и справочник"
 
@@ -9927,6 +9936,9 @@ msgstr "Если Paradev вам нравится, звезда на GitHub по�
 
 msgid "Ignore @channel and @here"
 msgstr "Игнорировать @channel и @here"
+
+msgid "Ignore global naming instructions"
+msgstr "Игнорировать глобальные правила именования"
 
 msgid "Illegal content"
 msgstr "Незаконный контент"

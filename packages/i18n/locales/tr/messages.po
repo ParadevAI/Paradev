@@ -6219,6 +6219,9 @@ msgstr "Pull request güncellenemedi"
 msgid "Couldn't update the Chat setting"
 msgstr "Sohbet ayarı güncellenemedi"
 
+msgid "Couldn't update the global naming setting"
+msgstr "Genel adlandırma ayarı güncellenemedi"
+
 msgid "Couldn't update the queue"
 msgstr "Kuyruk güncellenemedi"
 
@@ -9504,6 +9507,12 @@ msgstr "Kılavuzlar"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "Bu proje için AI tarafından üretilen çalışma alanı ve dal adlarını yönlendirir. Boş bırakılırsa varsayılan adlandırma kullanılır."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "Bu proje için AI tarafından üretilen çalışma alanı ve dal adlarını yönlendirir. Genel yönergelerinizden sonra eklenir ve çakıştıklarında bunlar geçerli olur. Boş bırakılırsa genel yönergeler kullanılır."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "Tüm cihazlarınızda, her projede AI tarafından üretilen çalışma alanı ve dal adlarını yönlendirir. Bir projenin kendi yönergeleri bunlardan sonra eklenir ve çakıştıklarında onlar geçerli olur."
+
 msgid "Guides and references"
 msgstr "Kılavuzlar ve başvuru"
 
@@ -9927,6 +9936,9 @@ msgstr "Paradev'den şimdiye kadar memnunsanız, bir GitHub yıldızı diğer ge
 
 msgid "Ignore @channel and @here"
 msgstr "@channel ve @here yoksay"
+
+msgid "Ignore global naming instructions"
+msgstr "Genel adlandırma yönergelerini yok say"
 
 msgid "Illegal content"
 msgstr "Yasa dışı içerik"

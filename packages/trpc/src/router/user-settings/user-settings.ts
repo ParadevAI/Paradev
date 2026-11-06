@@ -5,6 +5,8 @@ import { z } from "zod";
 import {
 	DEFAULT_USER_SETTINGS,
 	loadUserSettings,
+	MAX_NAMING_INSTRUCTIONS_LENGTH,
+	type UserSettings,
 } from "../../lib/user-settings";
 import { personProcedure } from "../../trpc";
 
@@ -14,12 +16,25 @@ export const userSettingsRouter = {
 	),
 
 	update: personProcedure
-		.input(z.object({ experimentalChat: z.boolean().optional() }))
+		.input(
+			z.object({
+				experimentalChat: z.boolean().optional(),
+				namingInstructions: z
+					.string()
+					.max(MAX_NAMING_INSTRUCTIONS_LENGTH)
+					.nullable()
+					.optional(),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const set = Object.fromEntries(
-				Object.entries(input).filter(([, value]) => value !== undefined),
-			) as Partial<typeof DEFAULT_USER_SETTINGS>;
+			const set: Partial<UserSettings> = {};
+			if (input.experimentalChat !== undefined) {
+				set.experimentalChat = input.experimentalChat;
+			}
+			if (input.namingInstructions !== undefined) {
+				set.namingInstructions = input.namingInstructions?.trim() || null;
+			}
 			if (Object.keys(set).length > 0) {
 				await db
 					.insert(userSettings)

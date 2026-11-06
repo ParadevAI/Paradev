@@ -55,6 +55,7 @@ function renderBody(props: Partial<BodyProps> = {}) {
 					projectId="project-1"
 					project={project}
 					hostProject={hostProject}
+					globalNamingInstructions={null}
 					targetHostUrl={HOST_URL}
 					targetHostId="host-1"
 					targetHostName="This device"

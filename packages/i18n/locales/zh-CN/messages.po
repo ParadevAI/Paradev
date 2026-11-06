@@ -6219,6 +6219,9 @@ msgstr "无法更新拉取请求"
 msgid "Couldn't update the Chat setting"
 msgstr "无法更新聊天设置"
 
+msgid "Couldn't update the global naming setting"
+msgstr "无法更新全局命名设置"
+
 msgid "Couldn't update the queue"
 msgstr "无法更新队列"
 
@@ -9504,6 +9507,12 @@ msgstr "指南"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "指导此项目中AI生成的工作区和分支名称。留空则使用默认命名。"
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "指导此项目中AI生成的工作区和分支名称。这些说明会添加在你的全局说明之后，两者冲突时以此为准。留空则使用全局说明。"
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "指导你所有设备上每个项目中AI生成的工作区和分支名称。项目自己的说明会添加在这些说明之后，两者冲突时以项目说明为准。"
+
 msgid "Guides and references"
 msgstr "指南与参考"
 
@@ -9927,6 +9936,9 @@ msgstr "如果你觉得Paradev还不错，一个GitHub星标能帮助更多开�
 
 msgid "Ignore @channel and @here"
 msgstr "忽略 @channel 和 @here"
+
+msgid "Ignore global naming instructions"
+msgstr "忽略全局命名说明"
 
 msgid "Illegal content"
 msgstr "违法内容"
