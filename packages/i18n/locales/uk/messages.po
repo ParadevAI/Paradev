@@ -8575,6 +8575,12 @@ msgstr "Не вдалося відновити значення за замов�
 msgid "Failed to resume {0}"
 msgstr "Не вдалося відновити {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Не вдалося показати у Провіднику"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Не вдалося показати у файловому менеджері"
+
 msgid "Failed to reveal in Finder"
 msgstr "Не вдалося показати у Finder"
 
@@ -16783,6 +16789,12 @@ msgstr "Багаторазові запуски термінала. Натисн
 
 msgid "Reusing {keptName}"
 msgstr "Використовується {keptName}"
+
+msgid "Reveal in File Explorer"
+msgstr "Показати у Провіднику"
+
+msgid "Reveal in File Manager"
+msgstr "Показати у файловому менеджері"
 
 msgid "Reveal in Finder"
 msgstr "Показати у Finder"
