@@ -1,1 +1,1 @@
-export { ChannelHeader, type ChannelTab } from "./ChannelHeader";
+export { ChannelHeader } from "./ChannelHeader";

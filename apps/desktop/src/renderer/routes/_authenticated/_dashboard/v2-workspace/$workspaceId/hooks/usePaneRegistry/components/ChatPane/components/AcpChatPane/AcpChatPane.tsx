@@ -106,6 +106,9 @@ export function AcpChatPane({
 	modelId,
 	effortId,
 	modeId,
+	composerPlaceholder,
+	composerCompact,
+	wakeOnReply = false,
 }: {
 	workspaceId: string;
 	terminalId: string;
@@ -140,6 +143,16 @@ export function AcpChatPane({
 	modelId?: string;
 	effortId?: string;
 	modeId?: string;
+	/** What the empty composer says, where the screen around it knows better. */
+	composerPlaceholder?: string;
+	/** Only the text box and send: no mode or model controls, for a reply box in a narrow pane. */
+	composerCompact?: boolean;
+	/**
+	 * A stopped session stays as it is until the person replies, and the reply
+	 * wakes it. For a pane that looks in on an agent: opening it must not mint
+	 * a new session every time.
+	 */
+	wakeOnReply?: boolean;
 }) {
 	const { t } = useLingui();
 	const snapshotWorktree = useChatTurnSnapshotsEnabled();
@@ -624,10 +637,11 @@ export function AcpChatPane({
 		releaseReplacement,
 		t,
 	]);
+	const asleep = wakeOnReply && recoverable && pendingPrompts.length === 0;
 	const recovering =
 		switchingAccount ||
 		replacement !== null ||
-		(recoverable && recoveries.current < MAX_RECOVERIES);
+		(recoverable && recoveries.current < MAX_RECOVERIES && !asleep);
 	useEffect(() => {
 		if (!recovering || recoveryInFlight.current) return;
 		const delayMs =
@@ -734,6 +748,8 @@ export function AcpChatPane({
 	const draft = () => (
 		<DraftChat
 			draftKey={draftKey}
+			placeholder={composerPlaceholder}
+			compact={composerCompact}
 			getOpenFilePaths={getOpenFilePaths}
 			isActive={isActive}
 			launched={launched}
@@ -749,7 +765,8 @@ export function AcpChatPane({
 		harness &&
 		sessionId &&
 		(sessionDead || sessionStopped || lost) &&
-		!recovering
+		!recovering &&
+		!asleep
 	) {
 		return (
 			<AcpRecovery
@@ -784,10 +801,12 @@ export function AcpChatPane({
 	return (
 		<SessionView
 			chatKey={terminalId}
+			composerPlaceholder={composerPlaceholder}
+			composerCompact={composerCompact}
 			presetId={agent?.id}
 			client={client}
 			draftKey={draftKey}
-			{...(recovering || checking || transferredFrom === sessionId
+			{...(recovering || checking || transferredFrom === sessionId || asleep
 				? {
 						held: {
 							queued: pendingPrompts,

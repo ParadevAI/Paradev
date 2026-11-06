@@ -102,6 +102,10 @@ msgstr "(vy)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+#. placeholder {0}: data.replies.length
+msgid "{0, plural, =0 {No replies yet} one {# reply} other {# replies}}"
+msgstr "{0, plural, =0 {Zatím žádné odpovědi} one {# odpověď} few {# odpovědi} many {# odpovědi} other {# odpovědí}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktivní port — skrýt podrobnosti} few {# aktivní porty — skrýt podrobnosti} many {# aktivního portu — skrýt podrobnosti} other {# aktivních portů — skrýt podrobnosti}}"
@@ -195,10 +199,6 @@ msgstr "{0, plural, one {# přihlášení} few {# přihlášení} many {# přihl
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nová odpověď} few {# nové odpovědi} many {# nových odpovědí} other {# nových odpovědí}}"
 
-#. placeholder {0}: actorIds.length
-msgid "{0, plural, one {# other} other {# others}}"
-msgstr "{0, plural, one {# další} few {# další} many {# dalšího} other {# dalších}}"
-
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# prošlo} few {# prošlo} many {# prošlo} other {# prošlo}}"
@@ -220,11 +220,6 @@ msgstr "{0, plural, one {Vybrán # projekt.} few {Vybrány # projekty.} many {Vy
 #. placeholder {0}: chosenProjects.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektu} other {# projektů}}"
-
-#. placeholder {0}: data.replies.length
-#. placeholder {0}: message.replyCount
-msgid "{0, plural, one {# reply} other {# replies}}"
-msgstr "{0, plural, one {# odpověď} few {# odpovědi} many {# odpovědí} other {# odpovědí}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -444,10 +439,6 @@ msgstr "{0} větev"
 msgid "{0} cannot be signed in this way yet."
 msgstr "{0} se zatím nedá přihlásit tímto způsobem."
 
-#. placeholder {0}: creator.name
-msgid "{0} created this channel on {created}."
-msgstr "{0} vytvořil(a) tento kanál {created}."
-
 #. placeholder {0}: formatNumber(participants)
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Počet vývojářů v žebříčku podle využití agentů: {0}. Vašich posledních 30 dní se už počítá, jen je skryto. Pouze počty tokenů a názvy modelů, žádné názvy repozitářů, cesty k souborům ani prompty."
@@ -471,6 +462,10 @@ msgstr "{0} zapnuto"
 msgid "{0} ending in {1}"
 msgstr "{0} končící na {1}"
 
+#. placeholder {0}: entry.turns.length
+msgid "{0} events handled"
+msgstr "{0} událostí vyřízeno"
+
 #. placeholder {0}: collisions.length
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "V {where} už existuje {0} souborů. Chcete je nahradit?"
@@ -478,6 +473,10 @@ msgstr "V {where} už existuje {0} souborů. Chcete je nahradit?"
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-hodin"
+
+#. placeholder {0}: names(idle, agentsCount)
+msgid "{0} idle."
+msgstr "{0} nečinné."
 
 #. placeholder {0}: displayName(variables.name)
 msgid "{0} installed"
@@ -531,6 +530,14 @@ msgstr "{0} běží na host service {1} — tato aplikace potřebuje {2} nebo no
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} je nastaven na tomto počítači, ale ne ve vašem účtu"
 
+#. placeholder {0}: nameOf(message.authorId)
+msgid "{0} joined"
+msgstr "{0} se připojil/a"
+
+#. placeholder {0}: nameOf(message.authorId)
+msgid "{0} left"
+msgstr "{0} odešel/a"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more — refine your search"
 msgstr "Ještě {0} — upřesněte hledání"
@@ -555,10 +562,6 @@ msgstr "Běží {0} z {1} kontrol"
 msgid "{0} of {totalCount}"
 msgstr "{0} z {totalCount}"
 
-#. placeholder {0}: creator.name
-msgid "{0} on {created}"
-msgstr "{0}, {created}"
-
 #. placeholder {0}: plugin.interface.displayName
 msgid "{0} options"
 msgstr "Možnosti {0}"
@@ -570,6 +573,14 @@ msgstr "{0} za GB-hodinu"
 #. placeholder {0}: normalizedProjectIds.length
 msgid "{0} projects"
 msgstr "{0} projektů"
+
+#. placeholder {0}: names(review, agentsCount)
+msgid "{0} ready for review."
+msgstr "{0} čeká na kontrolu."
+
+#. placeholder {0}: entry.replies
+msgid "{0} replies"
+msgstr "{0} odpovědí"
 
 #. placeholder {0}: tally.running
 msgid "{0} Running"
@@ -854,9 +865,6 @@ msgstr "{count, plural, one {# komentář} few {# komentáře} many {# komentá�
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
 
-msgid "{count, plural, one {# new message} other {# new messages}}"
-msgstr "{count, plural, one {# nová zpráva} few {# nové zprávy} many {# nových zpráv} other {# nových zpráv}}"
-
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# hledání} few {# hledání} many {# hledání} other {# hledání}}"
 
@@ -968,6 +976,27 @@ msgstr "{daysRemaining, plural, one {Váš účet je deaktivovaný a za # den bu
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} answered a mention"
+msgstr "{devName} odpověděl/a na zmínku"
+
+msgid "{devName} ran an automation"
+msgstr "{devName} spustil automatizaci"
+
+msgid "{devName} replied"
+msgstr "{devName} odpověděl/a"
+
+msgid "{devName} replied in a thread"
+msgstr "{devName} odpověděl/a ve vlákně"
+
+msgid "{devName} reported on a task"
+msgstr "{devName} podal/a zprávu o úkolu"
+
+msgid "{devName} started a task"
+msgstr "{devName} zahájil/a úkol"
+
+msgid "{devName} took a turn"
+msgstr "{devName} odehrál/a tah"
+
 msgid "{distance} ago"
 msgstr "před {distance}"
 
@@ -993,6 +1022,9 @@ msgstr "{fileCount, plural, one {V tomto pracovním prostoru se změnil # soubor
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Upraven # soubor} few {Upraveny # soubory} many {Upraveno # souboru} other {Upraveno # souborů}}"
 
+msgid "{files} files"
+msgstr "{files} souborů"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pro zaměření"
 
@@ -1013,6 +1045,9 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
+
+msgid "{handled} events handled today"
+msgstr "{handled} událostí dnes vyřízeno"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# skrytý řádek} few {# skryté řádky} many {# skrytého řádku} other {# skrytých řádků}}"
@@ -1071,6 +1106,9 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
+msgid "{label} started in <0>{name}</0>"
+msgstr "{label} spuštěn v <0>{name}</0>"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1110,6 +1148,9 @@ msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prio
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
 
+msgid "{n} agents"
+msgstr "{n} agentů"
+
 msgid "{name} accounts"
 msgstr "Účty {name}"
 
@@ -1133,9 +1174,24 @@ msgstr "{name} je vestavěný a nelze jej odebrat"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} je vestavěný a nelze jej nahradit"
 
+msgid "{name} is done"
+msgstr "{name} je hotov"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} není přidán"
+
+msgid "{name} joined"
+msgstr "{name} se připojil"
+
+msgid "{name} merged #{number}"
+msgstr "{name} sloučil #{number}"
+
+msgid "{name} needs you"
+msgstr "{name} vás potřebuje"
+
+msgid "{name} opened #{number}"
+msgstr "{name} otevřel #{number}"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
@@ -1149,6 +1205,9 @@ msgstr "{name} byl zastaven"
 msgid "{name} wants more access"
 msgstr "{name} chce rozšířený přístup"
 
+msgid "{name} went idle"
+msgstr "{name} je nečinný"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} hodin ({gbHours} GB-hodin) na místo"
 
@@ -1157,6 +1216,9 @@ msgstr "{name}: {monthly} za uživatele/měsíc"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za uživatele/měsíc, nebo {yearly} při roční fakturaci"
+
+msgid "{newActivity} new"
+msgstr "{newActivity} nových"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Zadejte alespoň jednu osobu, nebo zvolte {choice}.} sender {Zadejte alespoň jednoho odesílatele, nebo zvolte {choice}.} other {Zadejte alespoň jednu položku, nebo zvolte {choice}.}}"
@@ -1383,30 +1445,6 @@ msgstr "{used} z {size} tokenů"
 msgid "{used} used"
 msgstr "Využito {used}"
 
-msgid "{user} and {others} joined and left."
-msgstr "{user} a {others} se připojili a zase kanál opustili."
-
-msgid "{user} and {others} joined."
-msgstr "{user} a {others} se připojili."
-
-msgid "{user} and {others} left."
-msgstr "{user} a {others} opustili kanál."
-
-msgid "{user} and {others} rejoined."
-msgstr "{user} a {others} se znovu připojili."
-
-msgid "{user} joined and left."
-msgstr "{user} se připojil(a) a zase kanál opustil(a)."
-
-msgid "{user} joined."
-msgstr "{user} se připojil(a)."
-
-msgid "{user} left."
-msgstr "{user} opustil(a) kanál."
-
-msgid "{user} rejoined."
-msgstr "{user} se znovu připojil(a)."
-
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -1507,9 +1545,6 @@ msgstr "<0>{displayName}</0> žádá o přístup k vašemu účtu Paradev"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "<0>{primaryFont}</0> není v tomto systému nainstalovaný. Použije se další dostupný font."
-
-msgid "<0>{who}</0> reacted with {shortcode}"
-msgstr "<0>{who}</0> reaguje pomocí {shortcode}"
 
 #. placeholder {0}: formatNumber(rank)
 #. placeholder {1}: formatNumber(total)
@@ -1820,6 +1855,9 @@ msgstr "Vlákno v #{0}"
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Jedinečný identifikátor vaší organizace (vygenerovaný z názvu)"
 
+msgid "a workspace"
+msgstr "pracovním prostoru"
+
 msgid "Aa"
 msgstr "Aa"
 
@@ -1831,6 +1869,12 @@ msgstr "O aplikaci {displayName}"
 
 msgid "About Paradev"
 msgstr "O Paradev"
+
+msgid "About this channel"
+msgstr "O tomto kanálu"
+
+msgid "About this Dev"
+msgstr "O tomto Devovi"
 
 msgid "About three weeks from first call to offer, ending with a paid work trial. Every step is with a founder, and you hear back within 48 hours."
 msgstr "Zhruba tři týdny od prvního hovoru po nabídku, na konci placená zkušební spolupráce. Každý krok probíhá se zakladatelem a odpověď dostanete do 48 hodin."
@@ -1944,9 +1988,6 @@ msgstr "K vytvoření API klíče je potřeba aktivní organizace"
 msgid "Active sessions"
 msgstr "Aktivní relace"
 
-msgid "Activities"
-msgstr "Aktivity"
-
 msgid "Activity"
 msgstr "Aktivita"
 
@@ -1981,6 +2022,9 @@ msgstr "Přidat filtr"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Přidejte lifecycle run skript v nastavení projektu, nebo označte terminálový skript jako spuštění pracovního prostoru."
+
+msgid "Add a note to #{channelName}"
+msgstr "Přidat poznámku do #{channelName}"
 
 msgid "Add a project to see GitHub issues."
 msgstr "Přidejte projekt a uvidíte GitHub issues."
@@ -2039,9 +2083,6 @@ msgstr "Přidat komentář"
 msgid "Add custom audio"
 msgstr "Přidat vlastní zvuk"
 
-msgid "Add Description"
-msgstr "Přidat popis"
-
 msgid "Add description..."
 msgstr "Přidat popis..."
 
@@ -2085,9 +2126,6 @@ msgstr "Přidat lidi"
 msgid "Add people or teams by name or email"
 msgstr "Přidejte lidi nebo týmy podle jména nebo e-mailu"
 
-msgid "Add People to Channel"
-msgstr "Přidat lidi do kanálu"
-
 msgid "Add photos or files"
 msgstr "Přidat fotky nebo soubory"
 
@@ -2102,9 +2140,6 @@ msgstr "Přidat projekt ze složky..."
 
 msgid "Add prompt e.g. look for crashes in $sentry"
 msgstr "Přidejte prompt, např. hledej pády v $sentry"
-
-msgid "Add reaction…"
-msgstr "Přidat reakci…"
 
 msgid "Add repository"
 msgstr "Přidat repozitář"
@@ -2257,6 +2292,9 @@ msgstr "Konfigurace agentů"
 msgid "Agent credentials changed"
 msgstr "Přihlašovací údaje agenta se změnily"
 
+msgid "Agent failed"
+msgstr "Agent selhal"
+
 msgid "Agent finished"
 msgstr "Agent dokončil"
 
@@ -2271,6 +2309,9 @@ msgstr "Konfigurace spuštění agenta"
 
 msgid "Agent not found"
 msgstr "Agent nebyl nalezen"
+
+msgid "Agent options"
+msgstr "Možnosti agenta"
 
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Výběr agenta (Claude, Codex, Cursor…) používaný ve všech tocích vytváření relace"
@@ -2624,30 +2665,6 @@ msgstr "Navíc může upravovat kanál a jeho členy"
 msgid "Also viewing this page"
 msgstr "Tuto stránku si také prohlížejí"
 
-msgid "Also, {user} and {others} joined and left."
-msgstr "Také {user} a {others} se připojili a zase kanál opustili."
-
-msgid "Also, {user} and {others} joined."
-msgstr "Také {user} a {others} se připojili."
-
-msgid "Also, {user} and {others} left."
-msgstr "Také {user} a {others} opustili kanál."
-
-msgid "Also, {user} and {others} rejoined."
-msgstr "Také {user} a {others} se znovu připojili."
-
-msgid "Also, {user} joined and left."
-msgstr "Také {user} se připojil(a) a zase kanál opustil(a)."
-
-msgid "Also, {user} joined."
-msgstr "Také {user} se připojil(a)."
-
-msgid "Also, {user} left."
-msgstr "Také {user} opustil(a) kanál."
-
-msgid "Also, {user} rejoined."
-msgstr "Také {user} se znovu připojil(a)."
-
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Také: @superset/ui/ai-elements/braille-spinner"
 
@@ -2693,9 +2710,6 @@ msgstr "Aktualizace je připravena k instalaci."
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android je na cestě. Dozvíte se jako první, až vyjde."
 
-msgid "Animals & Nature"
-msgstr "Zvířata a příroda"
-
 msgid "Animate the active terminal cursor."
 msgstr "Animovat kurzor v aktivním terminálu."
 
@@ -2738,8 +2752,8 @@ msgstr "Odpovězte na tuto otázku na počítači, nebo ji přeskočte."
 msgid "Answered"
 msgstr "Zodpovězeno"
 
-msgid "Answered {who} in #{channel}"
-msgstr "Odpověděl(a) uživateli {who} v #{channel}"
+msgid "Answered {name} in #{channel}"
+msgstr "Odpověděl {name} v #{channel}"
 
 msgid "Answered you in #{channel}"
 msgstr "Odpověděl(a) vám v #{channel}"
@@ -3090,6 +3104,9 @@ msgstr "Ptá se před úpravami a příkazy"
 
 msgid "Asks only for risky actions"
 msgstr "Ptá se jen u rizikových akcí"
+
+msgid "asks you"
+msgstr "ptá se tě"
 
 msgid "Aspect Ratio"
 msgstr "Poměr stran"
@@ -3453,6 +3470,9 @@ msgstr "Na základě {0} tokenů za posledních 30 dní, počítáno z {1}."
 
 msgid "Before"
 msgstr "Před"
+
+msgid "Begin a fresh session; this one stays in its workspace"
+msgstr "Začít novou relaci; tato zůstane ve svém pracovním prostoru"
 
 msgid "Behavior"
 msgstr "Chování"
@@ -4094,9 +4114,6 @@ msgstr "Kanál"
 msgid "Channel created"
 msgstr "Kanál vytvořen"
 
-msgid "Channel details"
-msgstr "Podrobnosti kanálu"
-
 msgid "Channel Manager"
 msgstr "Správce kanálu"
 
@@ -4138,6 +4155,9 @@ msgstr "Režim chatu"
 
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
+
+msgid "Chat started in <0>{name}</0>"
+msgstr "Chat spuštěn v <0>{name}</0>"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Plochy chatu: zprávy, uvažování, návrhy"
@@ -4242,11 +4262,23 @@ msgstr "Kontroly"
 msgid "Checks completed"
 msgstr "Kontroly dokončeny"
 
+msgid "checks failed"
+msgstr "kontroly selhaly"
+
 msgid "Checks failed"
 msgstr "Kontroly selhaly"
 
+msgid "checks passed"
+msgstr "kontroly prošly"
+
 msgid "Checks passed"
 msgstr "Kontroly prošly"
+
+msgid "checks running"
+msgstr "kontroly běží"
+
+msgid "Checks running"
+msgstr "Kontroly běží"
 
 msgid "Checks Skipped"
 msgstr "Kontroly přeskočeny"
@@ -4319,9 +4351,6 @@ msgstr "Zvolte, kdy vás Paradev upozorní."
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Vyberte, kde se otevřou agenti spuštění z komentářů, režimu návrhu a stránek Pages."
-
-msgid "Choose your default skin tone"
-msgstr "Vyberte výchozí odstín pleti"
 
 msgid "Choosing this removes any credential saved here for {label}."
 msgstr "Touto volbou odstraníte všechny přihlašovací údaje uložené zde pro {label}."
@@ -4527,9 +4556,6 @@ msgstr "Zavřít {0}"
 msgid "Close {displayName}"
 msgstr "Zavřít {displayName}"
 
-msgid "Close {label} tab"
-msgstr "Zavřít kartu {label}"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "Zavřít #{0}?"
@@ -4592,9 +4618,6 @@ msgstr "Zavřít nebo smazat aktuální pracovní prostor"
 msgid "Close other apps using the microphone"
 msgstr "Zavřete ostatní aplikace, které používají mikrofon"
 
-msgid "Close other tabs"
-msgstr "Zavřít ostatní karty"
-
 msgid "Close Others"
 msgstr "Zavřít ostatní"
 
@@ -4638,9 +4661,6 @@ msgstr "Zavřít kartu"
 msgid "Close Tab"
 msgstr "Zavřít kartu"
 
-msgid "Close tabs to the right"
-msgstr "Zavřít karty vpravo"
-
 msgid "Close terminal"
 msgstr "Zavřít terminál"
 
@@ -4664,6 +4684,9 @@ msgstr "Zavřít pracovní prostor"
 
 msgid "Close your laptop"
 msgstr "Zavřete notebook"
+
+msgid "closed"
+msgstr "zavřeno"
 
 msgid "Closed"
 msgstr "Uzavřený"
@@ -5418,6 +5441,21 @@ msgstr "cookies a data webů"
 msgid "Cookies and site data — signs you out of most sites"
 msgstr "Cookies a data webů — odhlásí vás z většiny webů"
 
+msgid "Coordinator"
+msgstr "Koordinátor"
+
+#. placeholder {0}: coordinator.label
+msgid "Coordinator · {0}"
+msgstr "Koordinátor · {0}"
+
+#. placeholder {0}: coordinator.label
+msgid "Coordinator · {0} · agents at work"
+msgstr "Koordinátor · {0} · agenti pracují"
+
+#. placeholder {0}: preview.line
+msgid "Coordinator: {0}"
+msgstr "Koordinátor: {0}"
+
 msgid "Copied"
 msgstr "Zkopírováno"
 
@@ -5520,9 +5558,6 @@ msgstr "Kopírovat odkaz"
 
 msgid "Copy Link"
 msgstr "Kopírovat odkaz"
-
-msgid "Copy link address"
-msgstr "Kopírovat adresu odkazu"
 
 msgid "Copy Link Address"
 msgstr "Kopírovat adresu odkazu"
@@ -6820,9 +6855,6 @@ msgstr "Smazat obrázek"
 msgid "Delete local branch on workspace removal"
 msgstr "Smazat lokální větev při odstranění pracovního prostoru"
 
-msgid "Delete message"
-msgstr "Smazat zprávu"
-
 msgid "Delete organization"
 msgstr "Smazat organizaci"
 
@@ -7066,6 +7098,9 @@ msgstr "Zjišťovat vaši fyzickou polohu"
 
 msgid "Dev"
 msgstr "Vývoj"
+
+msgid "Dev · answers in the channel"
+msgstr "Dev · odpovídá v kanálu"
 
 msgid "Dev options"
 msgstr "Možnosti Deva"
@@ -7457,6 +7492,9 @@ msgstr "Stahuji..."
 msgid "Downloads"
 msgstr "Stahování"
 
+msgid "draft"
+msgstr "koncept"
+
 msgid "Draft"
 msgstr "Koncept"
 
@@ -7623,16 +7661,10 @@ msgstr "Získáno: {name} ×{tier}"
 msgid "Edit"
 msgstr "Upravit"
 
-msgid "Edit Channel Name"
-msgstr "Upravit název kanálu"
-
 msgid "Edit comment"
 msgstr "Upravit komentář"
 
 msgid "Edit description"
-msgstr "Upravit popis"
-
-msgid "Edit Description"
 msgstr "Upravit popis"
 
 msgid "Edit environment"
@@ -7640,6 +7672,9 @@ msgstr "Upravit prostředí"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Upravovat soubory bez ptaní; ptát se před příkazy"
+
+msgid "Edit goal"
+msgstr "Upravit cíl"
 
 msgid "Edit message"
 msgstr "Upravit zprávu"
@@ -7937,6 +7972,9 @@ msgstr "Každou středu v 9:00 projdi sloučené PR za tento týden a aktualizuj
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Každý všední den v 9:00 přečti nové GitHub issues, přiřaď štítky a připrav první odpověď ke kontrole."
+
+msgid "Every workspace is already here"
+msgstr "Všechny workspace už tu jsou"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Všichni se dohadují, jestli se to dá zobecnit. Právě ten spor je známkou toho, že úroveň byla dosažena."
@@ -8802,9 +8840,6 @@ msgstr "Najít tým…"
 msgid "Find and fix a small bug"
 msgstr "Najít a opravit malou chybu"
 
-msgid "Find another reaction"
-msgstr "Najít jinou reakci"
-
 msgid "Find in Changes"
 msgstr "Najít ve změnách"
 
@@ -8841,6 +8876,9 @@ msgstr "Hotovo · nepřečteno"
 msgid "finished · worked for 7s"
 msgstr "hotovo · pracoval 7 s"
 
+msgid "Finished, unread"
+msgstr "Hotovo, nepřečteno"
+
 msgid "Fit"
 msgstr "Přizpůsobit"
 
@@ -8876,9 +8914,6 @@ msgstr "FK"
 
 msgid "Flag"
 msgstr "Přepínač"
-
-msgid "Flags"
-msgstr "Vlajky"
 
 msgid "Flame"
 msgstr "Plamen"
@@ -8940,11 +8975,11 @@ msgstr "Zobrazení složek"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Složky, které se mají vytáhnout do nových worktree, jedna na řádek, relativně ke kořeni repozitáře. Soubory v kořeni jsou vždy zahrnuty. Prázdné vytáhne vše."
 
+msgid "Follow"
+msgstr "Sledovat"
+
 msgid "FOLLOW ON X"
 msgstr "SLEDOVAT NA X"
-
-msgid "Follow thread"
-msgstr "Sledovat vlákno"
 
 msgid "FOLLOW US"
 msgstr "SLEDUJTE NÁS"
@@ -8955,11 +8990,14 @@ msgstr "Sledujte nás na LinkedInu"
 msgid "Follow us on X/Twitter"
 msgstr "Sledujte nás na X/Twitteru"
 
-msgid "Followed up with {who} in #{channel}"
-msgstr "Navázal(a) s uživatelem {who} v #{channel}"
+msgid "Followed up with {name} in #{channel}"
+msgstr "Navázal s {name} v #{channel}"
 
 msgid "Followed up with you in #{channel}"
 msgstr "Navázal(a) s vámi v #{channel}"
+
+msgid "Following"
+msgstr "Sledujete"
 
 msgid "Font family"
 msgstr "Rodina písma"
@@ -8969,9 +9007,6 @@ msgstr "Velikost písma"
 
 msgid "Font weight"
 msgstr "Tloušťka písma"
-
-msgid "Food & Drink"
-msgstr "Jídlo a pití"
 
 msgid "For 1 hour"
 msgstr "Na 1 hodinu"
@@ -9135,9 +9170,6 @@ msgstr "Zdarma pro jednoho uživatele. Pro od {proPrice} za uživatele/měs."
 msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
 msgstr "Zdarma pro jednoho uživatele. Pro stojí {proPrice} za uživatele měsíčně a přidává automatizace a mobilní aplikaci. Team stojí {teamPrice} a přidává cloudové pracovní prostory."
 
-msgid "Frequently Used"
-msgstr "Často používané"
-
 msgid "Frequently<0/>asked questions"
 msgstr "Často<0/>kladené otázky"
 
@@ -9267,9 +9299,6 @@ msgstr "Získat {plan}"
 msgid "Get an API key"
 msgstr "Získat API klíč"
 
-msgid "Get channel details"
-msgstr "Zobrazit podrobnosti kanálu"
-
 msgid "Get extensions"
 msgstr "Získat rozšíření"
 
@@ -9305,9 +9334,6 @@ msgstr "Stáhnout aplikaci pro iPhone a iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
-
-msgid "Getting Work Done"
-msgstr "Pracovní"
 
 msgid "Ghost"
 msgstr "Ghost"
@@ -9440,6 +9466,9 @@ msgstr "Přejít do nastavení integrace Slacku"
 
 msgid "Go to workspace"
 msgstr "Přejít do pracovního prostoru"
+
+msgid "Goal"
+msgstr "Cíl"
 
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google neudělil trvalý přístup. Odeberte Paradev z přístupu třetích stran ve svém účtu Google a zkuste to znovu."
@@ -9835,6 +9864,9 @@ msgstr "Jak nainstalovat {name} do Paradev"
 msgid "How to install Paradev"
 msgstr "Jak nainstalovat Paradev"
 
+msgid "How to split the work, what to check before a PR, what to leave alone"
+msgstr "Jak rozdělit práci, co zkontrolovat před PR, čeho se nedotýkat"
+
 msgid "How we build it, in long form."
 msgstr "Jak to stavíme, podrobně."
 
@@ -10066,6 +10098,9 @@ msgstr "Vylepšený prohlížeč rozdílů"
 msgid "in {0}"
 msgstr "v {0}"
 
+msgid "In #{channelName}"
+msgstr "V #{channelName}"
+
 msgid "in a terminal on this host."
 msgstr "v terminálu na tomto hostu."
 
@@ -10094,8 +10129,14 @@ msgstr "V revizi"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "V desktopové aplikaci {appName} otevřete Nastavení → Vzdálený přístup a zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“."
 
+msgid "in the merge queue"
+msgstr "ve frontě na sloučení"
+
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "V desktopové aplikaci Paradev otevřete <0>Nastavení → Vzhled → Motiv</0>."
+
+msgid "In this channel"
+msgstr "V tomto kanálu"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "Za méně než rok spustilo {productName} více než 145 000 vývojářů ze 180 zemí a vytvořilo přes 1,85 milionu pracovních prostorů agentů."
@@ -10593,38 +10634,17 @@ msgstr "Připojeno"
 msgid "Joined {0}"
 msgstr "Připojen(a) {0}"
 
-msgid "joined {channel} along with {others}."
-msgstr "se připojil(a) ke kanálu {channel}, stejně jako {others}."
-
-msgid "joined {channel}."
-msgstr "se připojil(a) ke kanálu {channel}."
-
-msgid "joined and left {channel} along with {others}."
-msgstr "se připojil(a) ke kanálu {channel} a zase ho opustil(a), stejně jako {others}."
-
-msgid "joined and left {channel}."
-msgstr "se připojil(a) ke kanálu {channel} a zase ho opustil(a)."
-
 msgid "Joining…"
 msgstr "Připojuji…"
 
-msgid "Jump"
-msgstr "Přejít"
-
 msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
 msgstr "Skočte do svého oblíbeného editoru jedním kliknutím. VS Code, Cursor, Xcode, JetBrains IDE nebo libovolný terminál: otevřete worktree přesně tam, kde ho potřebujete."
-
-msgid "Jump to a specific date"
-msgstr "Přejít na konkrétní datum"
 
 msgid "Jump to file"
 msgstr "Přejít na soubor"
 
 msgid "Jump to user message {position}"
 msgstr "Přejít na zprávu uživatele {position}"
-
-msgid "Jump to…"
-msgstr "Přejít na…"
 
 msgid "Just ask"
 msgstr "Stačí říct"
@@ -10791,12 +10811,9 @@ msgstr "Poslední den v měsíci"
 msgid "Last day of each month at {time}"
 msgstr "Poslední den v měsíci v {time}"
 
-msgid "Last month"
-msgstr "Minulý měsíc"
-
-#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
-msgid "Last reply {0}"
-msgstr "Poslední odpověď {0}"
+#. placeholder {0}: formatCompactRelativeTime(new Date(last.startedAt))
+msgid "Last replied {0}"
+msgstr "Naposledy odpověděl {0}"
 
 msgid "Last run"
 msgstr "Poslední běh"
@@ -10825,8 +10842,12 @@ msgstr "Naposledy aktualizováno: {lastUpdated}"
 msgid "Last used"
 msgstr "Naposledy použito"
 
-msgid "Last week"
-msgstr "Minulý týden"
+#. placeholder {0}: newestTurn.channelName
+msgid "Last: in #{0}"
+msgstr "Naposledy: v #{0}"
+
+msgid "Last: replied to your DM"
+msgstr "Naposledy: odpověděl na tvou zprávu"
 
 msgid "Late 2026"
 msgstr "Konec 2026"
@@ -10949,11 +10970,8 @@ msgstr "Opouštím organizaci..."
 msgid "Leaving..."
 msgstr "Odcházím..."
 
-msgid "left {channel} along with {others}."
-msgstr "opustil(a) kanál {channel}, stejně jako {others}."
-
-msgid "left {channel}."
-msgstr "opustil(a) kanál {channel}."
+msgid "Left"
+msgstr "Odešel"
 
 msgid "Left alone, changed since this turn: {skippedNames}"
 msgstr "Ponecháno beze změny, změněno od tohoto tahu: {skippedNames}"
@@ -11371,6 +11389,9 @@ msgstr "Hledám mobilní simulátor…"
 msgid "Looking for installed browsers…"
 msgstr "Hledám nainstalované prohlížeče…"
 
+msgid "Looking for its chat…"
+msgstr "Hledám jeho chat…"
+
 msgid "Looking for pages"
 msgstr "Hledám stránky"
 
@@ -11511,9 +11532,6 @@ msgstr "Spravujte vzhled a členy své organizace."
 msgid "Managed"
 msgstr "Spravováno"
 
-msgid "Managed by"
-msgstr "Spravuje"
-
 msgid "Managed by your organization admin."
 msgstr "Spravuje správce vaší organizace."
 
@@ -11555,9 +11573,6 @@ msgstr "Označit vše jako přečtené?"
 
 msgid "Mark Ready"
 msgstr "Označit jako připravené"
-
-msgid "Mark unread"
-msgstr "Označit jako nepřečtené"
 
 msgid "Markdown"
 msgstr "Markdown"
@@ -11672,6 +11687,9 @@ msgstr "Členové"
 msgid "Members cannot modify roles"
 msgstr "Členové nemohou měnit role"
 
+msgid "Membership"
+msgstr "Členství"
+
 msgid "Memory"
 msgstr "Paměť"
 
@@ -11716,12 +11734,19 @@ msgstr "Stav sloučení"
 msgid "Merge status unknown"
 msgstr "Stav sloučení neznámý"
 
+msgid "merged"
+msgstr "sloučeno"
+
 msgid "Merged"
 msgstr "Sloučený"
 
 msgctxt "pull request state"
 msgid "Merged"
 msgstr "Sloučeno"
+
+#. placeholder {0}: pr.prNumber
+msgid "Merged #{0}"
+msgstr "Sloučeno #{0}"
 
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
@@ -11748,9 +11773,8 @@ msgstr "Napsat {name}"
 msgid "Message {name}…"
 msgstr "Zpráva pro {name}…"
 
-#. placeholder {0}: channel.name
-msgid "Message #{0}"
-msgstr "Zpráva do #{0}"
+msgid "Message #{channelName}"
+msgstr "Zpráva do #{channelName}"
 
 msgid "Message in channel"
 msgstr "Zpráva v kanálu"
@@ -12113,9 +12137,16 @@ msgstr "vyžaduje aktualizaci"
 msgid "Needs update"
 msgstr "Vyžaduje aktualizaci"
 
+msgid "Needs you"
+msgstr "Potřebuje vás"
+
 msgctxt "agent status"
 msgid "Needs you"
 msgstr "Čeká na tebe"
+
+#. placeholder {0}: names(waiting, agentsCount)
+msgid "Needs you for {0}."
+msgstr "Potřebuje vás kvůli {0}."
 
 msgid "Nerd Fonts"
 msgstr "Nerd Fonts"
@@ -12202,9 +12233,6 @@ msgstr "Nová skupina…"
 
 msgid "New issue"
 msgstr "Nová issue"
-
-msgid "New messages"
-msgstr "Nové zprávy"
 
 msgid "New page"
 msgstr "Nová stránka"
@@ -12339,9 +12367,6 @@ msgstr "Dobrý přístup"
 msgid "Nice, open a PR when ready."
 msgstr "Super, až budeš mít hotovo, otevři PR."
 
-msgid "Nicely done"
-msgstr "Skvělá práce"
-
 msgid "Nightly audit"
 msgstr "Noční audit"
 
@@ -12398,6 +12423,10 @@ msgstr "Zatím žádní agenti"
 msgid "No agents yet."
 msgstr "Zatím žádní agenti."
 
+#. placeholder {0}: channel.name
+msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
+msgstr "Zatím žádní agenti. Označ workspace štítkem #{0} a objeví se tady i s tím, co od tebe potřebuje."
+
 msgid "No API keys yet."
 msgstr "Zatím žádné API klíče."
 
@@ -12416,14 +12445,29 @@ msgstr "Žádné přílohy"
 msgid "No authors found."
 msgstr "Nenalezeni žádní autoři."
 
+msgid "No automations answer in this channel yet. Ask the Dev to set one up here."
+msgstr "V tomto kanálu zatím neodpovídají žádné automatizace. Požádejte Dev, aby zde nějakou nastavil."
+
 msgid "No automations match"
 msgstr "Žádná automatizace neodpovídá"
+
+msgid "No automations yet. Ask the Dev to set one up."
+msgstr "Zatím žádné automatizace. Požádej Deva, ať nějakou nastaví."
+
+msgid "No automations. Add a Dev to this channel and ask it to set one up here."
+msgstr "Žádné automatizace. Přidej do kanálu Deva a požádej ho, ať tu nějakou nastaví."
+
+msgid "No badges or sounds from this channel"
+msgstr "Žádné odznaky ani zvuky z tohoto kanálu"
 
 msgid "No branches found"
 msgstr "Nenalezeny žádné větve"
 
 msgid "No changed files."
 msgstr "Žádné změněné soubory."
+
+msgid "no changes"
+msgstr "beze změn"
 
 msgid "No changes"
 msgstr "Žádné změny"
@@ -12439,6 +12483,12 @@ msgstr "Žádný kanál"
 
 msgid "No channels"
 msgstr "Žádné kanály"
+
+msgid "No channels yet"
+msgstr "Zatím žádné kanály"
+
+msgid "No chat session in this workspace yet. Open the workspace to start one."
+msgstr "V tomto workspace zatím není žádná chatová relace. Otevři workspace a nějakou spusť."
 
 msgid "No chats found"
 msgstr "Nebyly nalezeny žádné chaty"
@@ -12520,6 +12570,9 @@ msgstr "Žádné zařízení neběží."
 
 msgid "No devices yet"
 msgstr "Zatím žádná zařízení"
+
+msgid "No Devs yet"
+msgstr "Zatím žádný Dev"
 
 msgid "No downloads yet"
 msgstr "Zatím žádná stahování"
@@ -12837,6 +12890,9 @@ msgstr "Zatím žádné veřejné konfigurace agentů. Tato adresa je připraven
 msgid "No pull requests found."
 msgstr "Nenalezeny žádné pull requesty."
 
+msgid "No pull requests yet. When an agent opens one, it shows here with its checks and review."
+msgstr "Zatím žádné pull requesty. Až nějaký agent otevře, zobrazí se zde s kontrolami a review."
+
 msgid "No release notes at {url}"
 msgstr "Žádné poznámky k vydání na {url}"
 
@@ -12948,12 +13004,6 @@ msgstr "Nenalezeny žádné motivy."
 msgid "No themes were imported"
 msgstr "Nebyly importovány žádné motivy"
 
-msgid "No threads or tasks match"
-msgstr "Žádná vlákna ani úkoly neodpovídají"
-
-msgid "No threads or tasks yet"
-msgstr "Zatím žádná vlákna ani úkoly"
-
 msgid "No threads yet"
 msgstr "Zatím žádná vlákna"
 
@@ -12989,6 +13039,9 @@ msgstr "Zatím žádné verze"
 
 msgid "No versions yet."
 msgstr "Zatím žádné verze."
+
+msgid "No workspace on this machine"
+msgstr "Na tomto počítači není žádný workspace"
 
 msgid "No workspace run command configured"
 msgstr "Není nastavený žádný spouštěcí příkaz pracovního prostoru"
@@ -13040,6 +13093,9 @@ msgstr "Žádný ze souborů tohoto tahu tu nemá změny"
 
 msgid "None selected"
 msgstr "Nic nevybráno"
+
+msgid "None yet"
+msgstr "Zatím žádné"
 
 msgid "None. This is the floor."
 msgstr "Žádná. Tohle je základ."
@@ -13134,6 +13190,12 @@ msgstr "Nepřihlášeno"
 msgid "not sorted"
 msgstr "neseřazeno"
 
+msgid "Not started yet."
+msgstr "Zatím nespuštěno."
+
+msgid "Not started. The channel asks where to run it and what to do."
+msgstr "Nespuštěno. Kanál se zeptá, kde ho spustit a co má dělat."
+
 msgid "Not synced yet"
 msgstr "Zatím nesynchronizováno"
 
@@ -13162,6 +13224,9 @@ msgstr "Nic tu není."
 msgid "Nothing is running. Archive it and create a new one."
 msgstr "Nic neběží. Archivujte ho a vytvořte nový."
 
+msgid "Nothing left in this channel."
+msgstr "V tomto kanálu už nic nezbývá."
+
 msgid "Nothing lives at {pathname}."
 msgstr "Na {pathname} nic není."
 
@@ -13180,6 +13245,9 @@ msgstr "Nic nebylo zmeškáno"
 msgid "Nothing yet"
 msgstr "Zatím nic"
 
+msgid "Nothing yet. Agents, Devs and people show up here as the channel moves."
+msgstr "Zatím nic. Agenti, Devs a lidé se tu objeví, jak se kanál hýbe."
+
 msgid "Notice"
 msgstr "Upozornění"
 
@@ -13194,6 +13262,9 @@ msgstr "Zvuky oznámení"
 
 msgid "Notifications"
 msgstr "Oznámení"
+
+msgid "Notifications and settings"
+msgstr "Oznámení a nastavení"
 
 msgid "Notify every online member in this channel"
 msgstr "Upozornit všechny členy tohoto kanálu, kteří jsou online"
@@ -13237,9 +13308,6 @@ msgstr "OAuth 2.0"
 
 msgid "OAuth by default, API keys for CI"
 msgstr "Ve výchozím stavu OAuth, pro CI API klíče"
-
-msgid "Objects"
-msgstr "Předměty"
 
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
@@ -13285,6 +13353,10 @@ msgstr "Starší"
 
 msgid "On"
 msgstr "Zapnuto"
+
+#. placeholder {0}: workspace.branch
+msgid "On {0}"
+msgstr "Na {0}"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "na {offScopeHostName} — tady nepoběží"
@@ -13774,9 +13846,6 @@ msgstr "Otevřít v T3 Chat"
 msgid "Open in tab"
 msgstr "Otevřít na kartě"
 
-msgid "Open in Tasks"
-msgstr "Otevřít v Úkolech"
-
 msgid "Open in…"
 msgstr "Otevřít v…"
 
@@ -13790,11 +13859,11 @@ msgstr "Otevřít issue na GitHubu"
 msgid "Open issue in Linear"
 msgstr "Otevřít issue v Linearu"
 
+msgid "Open it in its workspace"
+msgstr "Otevřít v jeho workspace"
+
 msgid "Open leaderboard"
 msgstr "Otevřít žebříček"
-
-msgid "Open link"
-msgstr "Otevřít odkaz"
 
 msgid "Open Link as New Split"
 msgstr "Otevřít odkaz v novém rozdělení"
@@ -13853,6 +13922,7 @@ msgid "Open Pull Request"
 msgstr "Otevřít pull request"
 
 #. placeholder {0}: pr.number
+#. placeholder {0}: pr.prNumber
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
 msgstr "Otevřít pull request #{0}"
@@ -13985,6 +14055,9 @@ msgstr "Otevírání složek"
 
 msgid "Opening pages"
 msgstr "Otevírání stránek"
+
+msgid "Opening the coordinator…"
+msgstr "Otevírám koordinátora…"
 
 msgid "Opens beside this pane. This one keeps running."
 msgstr "Otevře se vedle tohoto panelu. Tento dál běží."
@@ -14564,6 +14637,9 @@ msgstr "Čekající pozvánky"
 msgid "People"
 msgstr "Lidé"
 
+msgid "People in this channel"
+msgstr "Lidé v tomto kanálu"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Lidé mimo {organizationName} ztratí přístup a veřejný odkaz přestane fungovat."
 
@@ -14855,10 +14931,26 @@ msgstr "Odeslat odpověď"
 msgid "PR"
 msgstr "PR"
 
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0}"
+msgstr "PR #{0}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
 msgstr "PR #{0} — {1}"
+
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0} · checks failed"
+msgstr "PR #{0} · kontroly selhaly"
+
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0} · checks passed"
+msgstr "PR #{0} · kontroly prošly"
+
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0} · checks running"
+msgstr "PR #{0} · kontroly běží"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -15087,6 +15179,9 @@ msgstr "Produktivita"
 
 msgid "Products"
 msgstr "Produkty"
+
+msgid "Profile"
+msgstr "Profil"
 
 msgid "Profile name"
 msgstr "Název profilu"
@@ -15409,6 +15504,9 @@ msgstr "Rychle vytvořit pracovní prostor v aktuálním projektu"
 msgid "Quiet"
 msgstr "Potichu"
 
+msgid "Quiet today"
+msgstr "Dnes klid"
+
 msgid "Quit"
 msgstr "Ukončit"
 
@@ -15446,6 +15544,9 @@ msgstr "Dokumentace Radix Tooltip"
 msgid "RAM Share"
 msgstr "Podíl RAM"
 
+msgid "Ran an automation in #{channel}"
+msgstr "Spustil automatizaci v #{channel}"
+
 msgid "Random icon"
 msgstr "Náhodná ikona"
 
@@ -15467,6 +15568,12 @@ msgstr "Překročen limit požadavků."
 msgid "Rate limits"
 msgstr "Limity využití"
 
+msgid "Re-brief"
+msgstr "Nový brief"
+
+msgid "Re-brief: read the goal and rules again, then tell me in two lines where the channel stands."
+msgstr "Nový brief: znovu si přečti cíl a pravidla a ve dvou řádcích mi řekni, jak na tom kanál je."
+
 msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Dosáhněte na tento Mac odkudkoli přes Paradev relay nebo spusťte cloudové pracovní prostory. Připojte se z libovolného klienta."
 
@@ -15478,9 +15585,6 @@ msgstr "React vrstva sdíleného enginu rozvržení panelů/pracovních prostor�
 
 msgid "React Native"
 msgstr "React Native"
-
-msgid "React with {name}"
-msgstr "Reagovat pomocí {name}"
 
 msgid "Reaction added"
 msgstr "Přidána reakce"
@@ -15595,6 +15699,9 @@ msgstr "Načítám vaše lokální využití…"
 msgid "Reads and posts"
 msgstr "Čte a píše"
 
+msgid "Reads and posts here"
+msgstr "Čte a píše tady"
+
 msgid "Ready"
 msgstr "Připraven"
 
@@ -15620,6 +15727,9 @@ msgstr "Připraveno ke sloučení"
 msgid "Ready to try Paradev?"
 msgstr "Chcete Paradev vyzkoušet?"
 
+msgid "Ready. Tag a workspace with #{channelName} to run it here."
+msgstr "Připraveno. Označ workspace štítkem #{channelName} a spustí se tady."
+
 msgid "Reapply all commits"
 msgstr "Znovu aplikuje všechny commity"
 
@@ -15637,6 +15747,9 @@ msgstr "Rebase a sloučit"
 
 msgid "Recall what was said in meetings"
 msgstr "Připomeňte si, co zaznělo na schůzkách"
+
+msgid "Recent"
+msgstr "Nedávné"
 
 msgid "Recent Activity"
 msgstr "Nedávná aktivita"
@@ -15764,18 +15877,6 @@ msgstr "Zaregistruje lifecycle hooky do globální konfigurace tohoto agenta, ab
 msgid "Reinstall {name}"
 msgstr "Znovu nainstalovat {name}"
 
-msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
-msgstr "se znovu připojil(a) ke kanálu {channel} na pozvání uživatele {inviter}, stejně jako {others}."
-
-msgid "rejoined {channel} by invitation from {inviter}."
-msgstr "se znovu připojil(a) ke kanálu {channel} na pozvání uživatele {inviter}."
-
-msgid "rejoined {channel}, along with {others}."
-msgstr "se znovu připojil(a) ke kanálu {channel}, stejně jako {others}."
-
-msgid "rejoined {channel}."
-msgstr "se znovu připojil(a) ke kanálu {channel}."
-
 msgid "Related Posts"
 msgstr "Související články"
 
@@ -15897,6 +15998,9 @@ msgstr "Odebrat z postranního panelu"
 
 msgid "Remove from Sidebar"
 msgstr "Odebrat z postranního panelu"
+
+msgid "Remove from this channel"
+msgstr "Odebrat z tohoto kanálu"
 
 msgid "Remove icon"
 msgstr "Odebrat ikonu"
@@ -16096,8 +16200,9 @@ msgstr "Odpověděl(a) na vaši přímou zprávu"
 msgid "Reply"
 msgstr "Odpovědět"
 
-msgid "Reply in thread"
-msgstr "Odpovědět ve vlákně"
+#. placeholder {0}: workspace.name
+msgid "Reply to {0}…"
+msgstr "Odpovědět {0}…"
 
 msgid "Reply to thread…"
 msgstr "Odpovědět do vlákna…"
@@ -16670,9 +16775,6 @@ msgstr "Možnosti rutiny"
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Rutinní tickety bez zásahu uprostřed úkolu"
 
-msgid "Routines"
-msgstr "Rutiny"
-
 msgid "Routines, ending with Cloud"
 msgstr "Rutiny, končí spolu s cloudem"
 
@@ -16861,6 +16963,9 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
 
+msgid "said"
+msgstr "řekl"
+
 msgid "Same session"
 msgstr "Stejná relace"
 
@@ -16875,6 +16980,9 @@ msgstr "SAML SSO a provisioning přes SCIM"
 
 msgid "San Francisco"
 msgstr "San Francisco"
+
+msgid "Sandbox failed"
+msgstr "Sandbox selhal"
 
 msgid "Sandbox stopped responding"
 msgstr "Sandbox přestal odpovídat"
@@ -17041,9 +17149,6 @@ msgstr "Vyhledat vývojáře"
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Hledejte v obsahu souborů a napříč všemi pracovními prostory naráz."
 
-msgid "Search all emoji"
-msgstr "Hledat všechny emoji"
-
 msgid "Search and open files in the current workspace"
 msgstr "Hledat a otevírat soubory v aktuálním pracovním prostoru"
 
@@ -17161,9 +17266,6 @@ msgstr "Hledat pull requesty…"
 msgid "Search repositories..."
 msgstr "Hledat repozitáře..."
 
-msgid "Search results"
-msgstr "Výsledky hledání"
-
 msgid "Search settings..."
 msgstr "Hledat v nastavení..."
 
@@ -17193,9 +17295,6 @@ msgstr "Vyhledat soupeře v žebříčku"
 
 msgid "Search the web"
 msgstr "Hledejte na webu"
-
-msgid "Search threads and tasks"
-msgstr "Hledat vlákna a úkoly"
 
 msgid "Search triggers..."
 msgstr "Hledat spouštěče..."
@@ -17487,6 +17586,9 @@ msgstr "Odeslat pozvánku"
 
 msgid "Send invoices in a minute"
 msgstr "Faktury odešlete za minutu"
+
+msgid "Send it the goal and the rules again"
+msgstr "Znovu mu pošle cíl a pravidla"
 
 msgid "Send keystrokes, manage windows, and control other applications."
 msgstr "Posílat stisky kláves, spravovat okna a ovládat další aplikace."
@@ -18197,9 +18299,6 @@ msgstr "Skills a nástroje MCP pro vaše agenty. Odešlete vlastní."
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skills se dodávají s pluginem Paradev a v každém agentovi, kterého používáte, se udržují automaticky aktuální. Kliknutím si je zobrazíte."
 
-msgid "Skin Tone"
-msgstr "Odstín pleti"
-
 msgid "Skip"
 msgstr "Přeskočit"
 
@@ -18252,9 +18351,6 @@ msgstr "Malý, Střední nebo Velký, až 8 vCPU a 16 GB. Spotřeba závisí na 
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Zdolejte svůj backlog."
-
-msgid "Smileys & People"
-msgstr "Smajlíci a lidé"
 
 msgid "Smoother onboarding"
 msgstr "Plynulejší onboarding"
@@ -18320,10 +18416,6 @@ msgstr "Část vaší práce z v1 vyžaduje pozornost"
 msgid "someone"
 msgstr "někomu"
 
-msgid "Someone"
-msgstr "Někdo"
-
-msgctxt "reaction tooltip"
 msgid "Someone"
 msgstr "Někdo"
 
@@ -18559,6 +18651,9 @@ msgstr "Získané hvězdy za den"
 msgid "Stars gained per week"
 msgstr "Získané hvězdy za týden"
 
+msgid "Start"
+msgstr "Spustit"
+
 msgctxt "project date"
 msgid "Start"
 msgstr "Začátek"
@@ -18619,6 +18714,15 @@ msgstr "Spusťte ji pomocí + v liště karet."
 
 msgid "Start or stop the workspace run command"
 msgstr "Spustit nebo zastavit spouštěcí příkaz pracovního prostoru"
+
+msgid "Start over"
+msgstr "Začít znovu"
+
+msgid "Start the coordinator"
+msgstr "Spustit koordinátora"
+
+msgid "Start the coordinator over?"
+msgstr "Spustit koordinátora znovu?"
 
 msgid "Start voice mode"
 msgstr "Spustit hlasový režim"
@@ -19032,9 +19136,6 @@ msgstr "Přejde na {nextPlanName} dne {0}."
 msgid "Symbol, light"
 msgstr "Symbol, světlý"
 
-msgid "Symbols"
-msgstr "Symboly"
-
 msgid "Sync"
 msgstr "Synchronizovat"
 
@@ -19107,6 +19208,9 @@ msgstr "tabulka s"
 msgid "Tabs"
 msgstr "Karty"
 
+msgid "Tag a workspace with #{tag}"
+msgstr "Označit workspace štítkem #{tag}"
+
 msgid "Tailwind v4 theme reference"
 msgstr "Reference motivu Tailwind v4"
 
@@ -19128,17 +19232,20 @@ msgstr "Obsazeno"
 msgid "Takes effect in new agent sessions."
 msgstr "Projeví se v nových relacích agenta."
 
-msgid "Taking a look…"
-msgstr "Podívám se…"
+msgid "Takes effect on the next session"
+msgstr "Platí od další relace"
+
+msgid "Takes effect when it starts"
+msgstr "Platí od spuštění"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Trvá to déle než obvykle. Pokračuje to, i když odejdete."
 
-msgid "Talk to it"
-msgstr "Jak s ním mluvit"
-
 msgid "Talk to Paradev"
 msgstr "Napište nám"
+
+msgid "Talks in"
+msgstr "Komunikuje v"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Klepnutím na cokoli na stránce to okomentuješ"
@@ -19502,6 +19609,13 @@ msgstr "Vypršel časový limit spojení"
 msgid "The connection was closed"
 msgstr "Spojení bylo uzavřeno"
 
+#. placeholder {0}: channel.name
+msgid "The coordinator is a chat session of your own. It splits the work of this channel into agents, one workspace each, and reports back here. Pick where it runs and tell it what #{0} should get done."
+msgstr "Koordinátor je tvoje vlastní chatová relace. Rozdělí práci tohoto kanálu mezi agenty, každý ve vlastním workspace, a hlásí se tady. Vyber, kde poběží, a řekni mu, co má #{0} dokončit."
+
+msgid "The coordinator's workspace is gone."
+msgstr "Workspace koordinátora už neexistuje."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Současný prompt bude nahrazen vybranou verzí. Do historie přibude nový záznam „Obnoveno“, takže půjde vrátit zpět."
 
@@ -19803,9 +19917,6 @@ msgstr "Tah selhal"
 msgid "The update can also:"
 msgstr "Aktualizace může navíc:"
 
-msgid "The very beginning"
-msgstr "Úplný začátek"
-
 msgid "The workspace is not ready yet. Try again."
 msgstr "Pracovní prostor ještě není připravený. Zkuste to znovu."
 
@@ -19951,6 +20062,9 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
+msgid "This conversation"
+msgstr "Tato konverzace"
+
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -20020,9 +20134,6 @@ msgstr "Trvá to déle než obvykle. Relace už možná je připravená — nač
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "Trvá to déle než obvykle. Pracovní prostor už možná je připravený — načtení znovu ho může zachytit."
 
-msgid "This is the very beginning of the {name} channel."
-msgstr "Toto je úplný začátek kanálu {name}."
-
 msgid "This issue link is invalid."
 msgstr "Tento odkaz na issue je neplatný."
 
@@ -20046,9 +20157,6 @@ msgstr "Tato velikost stroje není pro vaši organizaci dostupná. Vyberte jinou
 
 msgid "This message is too long"
 msgstr "Tato zpráva je příliš dlouhá"
-
-msgid "This message was deleted"
-msgstr "Tato zpráva byla smazána"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tento tenant Microsoftu už má připojený {detail}. Požádejte je, ať se nejdřív odpojí."
@@ -20170,6 +20278,9 @@ msgstr "Tento plán není platný."
 msgid "This screen doesn't exist"
 msgstr "Tato obrazovka neexistuje"
 
+msgid "This session stays in its workspace. The next one starts with the agent and instructions above."
+msgstr "Tato relace zůstane ve svém pracovním prostoru. Další začne s agentem a pokyny výše."
+
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "Tento Slack workspace už má připojený {owner}. Požádejte je, ať se nejdřív odpojí."
 
@@ -20275,6 +20386,9 @@ msgstr "Tento pracovní prostor"
 
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
+
+msgid "This workspace is gone."
+msgstr "Tento workspace už neexistuje."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Tento pracovní prostor mohl být odstraněn, nebo k němu už nemáte přístup."
@@ -20564,9 +20678,6 @@ msgstr "Přepisování…"
 msgid "Translated"
 msgstr "Přeloženo"
 
-msgid "Travel & Places"
-msgstr "Cestování a místa"
-
 msgid "Tree view"
 msgstr "Stromové zobrazení"
 
@@ -20659,6 +20770,9 @@ msgstr "Vypnout ruční režim pro {label}?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“"
+
+msgid "Turn on Chat in Settings → Experimental first; the coordinator is a chat session."
+msgstr "Nejdřív zapni Chat v Nastavení → Experimentální; koordinátor je chatová relace."
 
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "Zapněte Design a klikněte na část stránky, kterou chcete změnit."
@@ -20810,9 +20924,6 @@ msgstr "Vrátit změny souborů v této kartě?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Vrátit poslední archivaci pracovního prostoru nebo zavření chatů"
-
-msgid "Unfollow thread"
-msgstr "Přestat sledovat vlákno"
 
 msgid "Ungroup"
 msgstr "Zrušit skupinu"
@@ -21363,9 +21474,6 @@ msgstr "Zobrazit vše"
 msgid "View all (+{moreCount} more)"
 msgstr "Zobrazit vše (+{moreCount} navíc)"
 
-msgid "View all members of this channel"
-msgstr "Zobrazit všechny členy kanálu"
-
 #. placeholder {0}: comment.authorLogin
 msgid "View comment by {0}"
 msgstr "Zobrazit komentář od {0}"
@@ -21495,23 +21603,15 @@ msgstr "Varování"
 msgid "Warning occurred."
 msgstr "Došlo k varování."
 
-msgid "was added to {channel} by {inviter}, along with {others}."
-msgstr "byl(a) přidán(a) do kanálu {channel} uživatelem {inviter}, stejně jako {others}."
-
-msgid "was added to {channel} by {inviter}."
-msgstr "byl(a) přidán(a) do kanálu {channel} uživatelem {inviter}."
-
-msgid "was added to this conversation by {inviter}."
-msgstr "byl(a) přidán(a) do této konverzace uživatelem {inviter}."
-
-msgid "was removed from this conversation by {inviter}."
-msgstr "byl(a) odebrán(a) z této konverzace uživatelem {inviter}."
-
 msgid "Watch a design review go from comment to new version."
 msgstr "Podívejte se, jak se design review dostane od komentáře k nové verzi."
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Podívejte se na video o Automatizacích Paradev na YouTube"
+
+#. placeholder {0}: names(working, agentsCount)
+msgid "Watching {0}."
+msgstr "Sleduje {0}."
 
 msgid "Wayfinding and disclosure"
 msgstr "Orientace a postupné odkrývání"
@@ -21715,6 +21815,9 @@ msgstr "Co bylo vydáno"
 msgid "What should run automatically?"
 msgstr "Co by mělo běžet automaticky?"
 
+msgid "What should the coordinator do first?"
+msgstr "Co má koordinátor udělat jako první?"
+
 msgid "What should the page show?"
 msgstr "Co má stránka zobrazovat?"
 
@@ -21726,6 +21829,9 @@ msgstr "Co týmy automatizují"
 
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "To, k čemu byly napsané, už na stránce není, takže nemají značku."
+
+msgid "What this channel is for, in a sentence"
+msgstr "K čemu tento kanál slouží, jednou větou"
 
 msgid "What we believe"
 msgstr "Čemu věříme"
@@ -21869,6 +21975,9 @@ msgstr "Plnění úkolů z hovoru"
 msgid "Work with your agents across your favorite tools"
 msgstr "Pracujte s agenty napříč svými oblíbenými nástroji"
 
+msgid "Worked"
+msgstr "Pracoval"
+
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
 msgid "Worked for {0}m {1}s"
@@ -21876,6 +21985,9 @@ msgstr "Pracoval {0} m {1} s"
 
 msgid "Worked for {seconds}s"
 msgstr "Pracoval {seconds} s"
+
+msgid "Worked on a task in #{channel}"
+msgstr "Pracoval na úkolu v #{channel}"
 
 msgid "Workflow run completed…"
 msgstr "Dokončen běh workflow…"
@@ -22154,10 +22266,6 @@ msgstr "vy"
 msgid "You"
 msgstr "Vy"
 
-msgctxt "reaction tooltip"
-msgid "You"
-msgstr "Vy"
-
 msgid "YOU"
 msgstr "VY"
 
@@ -22232,9 +22340,6 @@ msgstr "Tuto akci nelze vrátit zpět. Panely terminálu zobrazí „Proces skon
 msgid "You control the access"
 msgstr "Přístup máte pod kontrolou"
 
-msgid "You created this channel on {created}."
-msgstr "Tento kanál jste vytvořili {created}."
-
 msgid "You declined the {plugin} authorization request."
 msgstr "Žádost o autorizaci pro {plugin} jste odmítli."
 
@@ -22261,6 +22366,9 @@ msgstr "Pro připojení účtů musíte být součástí organizace."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Pro používání integrací musíte být součástí organizace."
+
+msgid "You: {line}"
+msgstr "Ty: {line}"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
@@ -22299,9 +22407,6 @@ msgstr "Jste přihlášeni"
 
 msgid "You're up to date!"
 msgstr "Máte aktuální verzi!"
-
-msgid "You're viewing #{channelName}"
-msgstr "Prohlížíte si #{channelName}"
 
 msgid "You've been invited to join {organization}"
 msgstr "Byli jste pozváni do {organization}"
@@ -22344,6 +22449,10 @@ msgstr "Vaše cloudové pracovní prostory už k tomuto hostu nebudou mít pří
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Váš kód zůstává ve výchozím stavu lokálně a připojené služby máte výslovně pod kontrolou."
+
+#. placeholder {0}: dev.name
+msgid "Your conversation with {0}, since {created}."
+msgstr "Tvoje konverzace s {0}, od {created}."
 
 msgid "Your download starts automatically."
 msgstr "Stahování začne automaticky."

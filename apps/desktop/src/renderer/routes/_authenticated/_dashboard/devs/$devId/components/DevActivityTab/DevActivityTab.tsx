@@ -1,44 +1,61 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatCompactRelativeTime } from "@superset/i18n/format";
-import type { RouterOutputs } from "@superset/trpc";
+import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
-import { LuLoader } from "react-icons/lu";
+import { useState } from "react";
+import { LuChevronRight, LuLoader, LuZap } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
-import { TurnStatus } from "./components/TurnStatus";
-
-type Turn = RouterOutputs["agent"]["activity"]["turns"][number];
+import { type DevTurn, describeDevTurn } from "../../utils/describeDevTurn";
+import { TurnStatus } from "../TurnStatus";
 
 interface DevActivityTabProps {
 	devId: string;
 	onOpenChat: () => void;
 }
 
+type Entry =
+	| { kind: "turn"; turn: DevTurn }
+	| { kind: "batch"; key: string; turns: DevTurn[] };
+
+/** Automation runs that follow one another read as one line: "3 events handled". */
+function foldRoutines(turns: readonly DevTurn[]): Entry[] {
+	const entries: Entry[] = [];
+	for (const turn of turns) {
+		const last = entries.at(-1);
+		if (turn.reason !== "routine") {
+			entries.push({ kind: "turn", turn });
+			continue;
+		}
+		if (last?.kind === "batch") last.turns.push(turn);
+		else
+			entries.push({ kind: "batch", key: `batch:${turn.id}`, turns: [turn] });
+	}
+	return entries.map((entry) => {
+		const only = entry.kind === "batch" ? entry.turns[0] : undefined;
+		return entry.kind === "batch" && entry.turns.length === 1 && only
+			? { kind: "turn", turn: only }
+			: entry;
+	});
+}
+
 export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const { people, currentUserId } = useOrganizationPeople();
+	const [opened, setOpened] = useState<ReadonlySet<string>>(new Set());
 	const query = cloudTrpc.agent.activity.useInfiniteQuery(
 		{ agentId: devId },
 		{ getNextPageParam: (page) => page.nextCursor },
 	);
 	const turns = query.data?.pages.flatMap((page) => page.turns) ?? [];
-	const describe = (turn: Turn) => {
-		const channel = turn.channelName;
-		if (turn.channelKind === "dm") return t({ message: "Replied to your DM" });
-		if (turn.actingUserId === currentUserId) {
-			return turn.reason === "mention"
-				? t({ message: `Answered you in #${channel}` })
-				: t({ message: `Followed up with you in #${channel}` });
-		}
-		const who =
-			people.find((person) => person.id === turn.actingUserId)?.name ??
-			t({ message: "someone" });
-		return turn.reason === "mention"
-			? t({ message: `Answered ${who} in #${channel}` })
-			: t({ message: `Followed up with ${who} in #${channel}` });
+	const who = {
+		currentUserId,
+		nameOf: (id: string | null) =>
+			people.find((person) => person.id === id)?.name ??
+			t({ message: "someone" }),
 	};
-	const open = (turn: Turn) => {
+	const open = (turn: DevTurn) => {
 		if (turn.channelKind === "dm") {
 			onOpenChat();
 			return;
@@ -49,6 +66,32 @@ export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 			search: turn.threadRootId ? { thread: turn.threadRootId } : {},
 		});
 	};
+	const turnRow = (turn: DevTurn, nested = false) => (
+		<button
+			key={turn.id}
+			type="button"
+			onClick={() => open(turn)}
+			className={cn(
+				"flex h-10 items-center gap-3 rounded-md px-2 text-left text-[13px] hover:bg-fill-hover",
+				nested && "ml-7",
+			)}
+		>
+			<span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
+				<TurnStatus status={turn.status} />
+			</span>
+			<span className="min-w-0 flex-1 truncate">
+				{t(describeDevTurn(turn, who))}
+			</span>
+			{turn.settledAt && (
+				<span className="shrink-0 text-muted-foreground tabular-nums">
+					{durationOf(turn.startedAt, turn.settledAt)}
+				</span>
+			)}
+			<span className="w-16 shrink-0 text-right text-muted-foreground">
+				{formatCompactRelativeTime(new Date(turn.startedAt))}
+			</span>
+		</button>
+	);
 
 	if (query.isPending) {
 		return (
@@ -81,27 +124,46 @@ export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 	return (
 		<div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
 			<div className="flex flex-col">
-				{turns.map((turn) => (
-					<button
-						key={turn.id}
-						type="button"
-						onClick={() => open(turn)}
-						className="flex h-10 items-center gap-3 rounded-md px-2 text-left text-[13px] hover:bg-fill-hover"
-					>
-						<span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
-							<TurnStatus status={turn.status} />
-						</span>
-						<span className="min-w-0 flex-1 truncate">{describe(turn)}</span>
-						{turn.settledAt && (
-							<span className="shrink-0 text-muted-foreground tabular-nums">
-								{durationOf(turn.startedAt, turn.settledAt)}
-							</span>
-						)}
-						<span className="w-16 shrink-0 text-right text-muted-foreground">
-							{formatCompactRelativeTime(new Date(turn.startedAt))}
-						</span>
-					</button>
-				))}
+				{foldRoutines(turns).map((entry) => {
+					if (entry.kind === "turn") return turnRow(entry.turn);
+					const isOpen = opened.has(entry.key);
+					const newest = entry.turns[0];
+					return (
+						<div key={entry.key} className="flex flex-col">
+							<button
+								type="button"
+								onClick={() =>
+									setOpened((current) => {
+										const next = new Set(current);
+										if (next.has(entry.key)) next.delete(entry.key);
+										else next.add(entry.key);
+										return next;
+									})
+								}
+								className="flex h-10 items-center gap-3 rounded-md px-2 text-left text-[13px] hover:bg-fill-hover"
+							>
+								<span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
+									<LuZap className="size-3.5" />
+								</span>
+								<span className="min-w-0 flex-1 truncate">
+									{t({ message: `${entry.turns.length} events handled` })}
+								</span>
+								<LuChevronRight
+									className={cn(
+										"size-3.5 shrink-0 text-muted-foreground/60 transition-transform",
+										isOpen && "rotate-90",
+									)}
+								/>
+								{newest && (
+									<span className="w-16 shrink-0 text-right text-muted-foreground">
+										{formatCompactRelativeTime(new Date(newest.startedAt))}
+									</span>
+								)}
+							</button>
+							{isOpen && entry.turns.map((turn) => turnRow(turn, true))}
+						</div>
+					);
+				})}
 				{query.hasNextPage && (
 					<button
 						type="button"

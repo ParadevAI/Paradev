@@ -1,0 +1,1 @@
+export { AttentionStrip } from "./AttentionStrip";

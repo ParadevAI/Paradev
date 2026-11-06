@@ -9,6 +9,10 @@ interface DeadKey {
  * the writer.
  */
 export const DEAD_KEYS: DeadKey[] = [
+	// The channel side panel's tab strip; replaced by one stack of pages (channel-panes-v2)
+	{ key: "channel-panels-v1", match: "exact" },
+	// The channel message rows' emoji picker; reactions left with the old timeline
+	{ key: "channels-emoji-skin-tone", match: "exact" },
 	// Device-local Chat setting; moved to the account (user_settings.experimental_chat)
 	{ key: "acp-chat", match: "exact" },
 	// The task page's inline agent picker; Start work opens New Workspace instead

@@ -1,1 +1,0 @@
-export { SkinTonePicker } from "./SkinTonePicker";

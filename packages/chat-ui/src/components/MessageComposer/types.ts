@@ -40,5 +40,7 @@ export type MessageComposerProps = {
 	/** Present when editing: Escape and Cancel call it, and the footer offers Cancel and Save. */
 	onCancel?: () => void;
 	autoFocus?: boolean;
+	/** The bold, italic, link and list buttons above the text; on by default. */
+	formatToolbar?: boolean;
 	className?: string;
 };

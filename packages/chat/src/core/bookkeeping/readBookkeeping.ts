@@ -23,3 +23,14 @@ export function readBookkeeping(
 	);
 	return reader?.read(text) ?? null;
 }
+
+/** As `readBookkeeping` for a transcript whose harness is not known yet: any reader's match counts. */
+export function readAnyBookkeeping(text: string): BookkeepingNote | null {
+	const own = supersetBookkeeping.read(text);
+	if (own) return own;
+	for (const reader of READERS) {
+		const note = reader.read(text);
+		if (note) return note;
+	}
+	return null;
+}

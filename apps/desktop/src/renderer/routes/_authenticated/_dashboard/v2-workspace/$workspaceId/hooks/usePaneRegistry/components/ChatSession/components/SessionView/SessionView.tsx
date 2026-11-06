@@ -128,6 +128,8 @@ export function SessionView({
 	terminalId,
 	onNewChat,
 	workspaceId,
+	composerPlaceholder,
+	composerCompact = false,
 }: {
 	client: SessionClient;
 	chatKey: string;
@@ -136,6 +138,10 @@ export function SessionView({
 	workspaceId: string;
 	terminalId?: string;
 	headerLeft?: ReactNode;
+	/** What the empty composer says, where the screen around it knows better. */
+	composerPlaceholder?: string;
+	/** Only the text box and send: no mode or model controls, for a reply box in a narrow pane. */
+	composerCompact?: boolean;
 	held?: {
 		queued: UserContent[][];
 		onQueue: (content: UserContent[]) => void;
@@ -749,6 +755,8 @@ export function SessionView({
 				/>
 				<Composer
 					presetId={presetId}
+					placeholder={composerPlaceholder}
+					compact={composerCompact}
 					sessionId={client.sessionId}
 					agentSwitcher={agentSwitcher}
 					availableCommands={sessionState?.availableCommands ?? NO_COMMANDS}

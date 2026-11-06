@@ -33,10 +33,15 @@ import {
 	or,
 	sql,
 } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { personProcedure } from "../../trpc";
+import {
+	latestPostAuthorIdSql,
+	latestPostBodySql,
+} from "../channel/latest-post";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
 import { announceAgentChanged } from "./agents-changed";
 import { ensureDirectMessage } from "./direct-message";
@@ -79,9 +84,39 @@ export const agentRouter = {
 				organizationId: input.organizationId,
 			});
 			if (!membership) return [];
+			const userId = ctx.session.user.id;
+			const dm = alias(channels, "dm");
+			const dmMember = alias(channelMembers, "dm_member");
 			return db
-				.select(listColumns)
+				.select({
+					...listColumns,
+					dmChannelId: dm.id,
+					dmLastMessageAt: dm.lastMessageAt,
+					dmLastMessageBody: latestPostBodySql(dm.id),
+					dmLastMessageAuthorId: latestPostAuthorIdSql(dm.id),
+					dmHasUnread: sql<boolean>`${dmMember.actorId} is not null and exists (
+						select 1 from ${channelMessages} m
+						where m.channel_id = ${dm.id}
+							and m.seq > ${dmMember.lastReadSeq}
+							and m.thread_root_id is null
+							and m.deleted_at is null
+							and m.author_id is distinct from ${userId}
+					)`,
+				})
 				.from(agents)
+				.leftJoin(
+					dm,
+					and(
+						eq(dm.organizationId, agents.organizationId),
+						eq(dm.kind, "dm"),
+						eq(dm.name, sql`'dm-' || ${agents.id}::text || '-' || ${userId}`),
+						isNull(dm.archivedAt),
+					),
+				)
+				.leftJoin(
+					dmMember,
+					and(eq(dmMember.channelId, dm.id), eq(dmMember.actorId, userId)),
+				)
 				.where(
 					and(
 						eq(agents.organizationId, input.organizationId),

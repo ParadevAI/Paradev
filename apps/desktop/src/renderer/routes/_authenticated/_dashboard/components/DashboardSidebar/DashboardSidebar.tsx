@@ -38,14 +38,13 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
+import { ChatSidebar } from "./components/ChatSidebar";
 import {
 	type ActiveWorkspaceSwitcherOption,
 	DashboardSidebarActiveWorkspaceSwitcher,
 } from "./components/DashboardSidebarActiveWorkspaceSwitcher";
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
-import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarChannelsSection";
-import { DashboardSidebarDevsSection } from "./components/DashboardSidebarDevsSection";
 import { DashboardSidebarGithubNotice } from "./components/DashboardSidebarGithubNotice";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
@@ -595,12 +594,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 												fadeEdges={["top", "bottom"]}
 												className="flex-1 overflow-y-auto hide-scrollbar"
 											>
-												{isChannelsEnabled && isChatSection && (
-													<>
-														<DashboardSidebarChannelsSection />
-														<DashboardSidebarDevsSection />
-													</>
-												)}
+												{isChannelsEnabled && isChatSection && <ChatSidebar />}
 												{!isChatSection && (
 													<>
 														<DashboardSidebarGithubNotice
@@ -626,12 +620,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 												status={githubStatus}
 												isCollapsed={isCollapsed}
 											/>
-											{isChannelsEnabled && !isCollapsed && (
-												<>
-													<DashboardSidebarChannelsSection />
-													<DashboardSidebarDevsSection />
-												</>
-											)}
+											{isChannelsEnabled && !isCollapsed && <ChatSidebar />}
 											{workspaceList}
 										</OverflowFadeContainer>
 										{cardSlot}

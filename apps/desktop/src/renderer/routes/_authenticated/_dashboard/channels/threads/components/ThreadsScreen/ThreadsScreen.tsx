@@ -2,15 +2,12 @@ import { Trans } from "@lingui/react/macro";
 import { useEffect, useMemo } from "react";
 import { LuLoader, LuMessageSquareText } from "react-icons/lu";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
 import { useViewedChannelStore } from "renderer/routes/_authenticated/stores/viewedChannelStore";
-import type { ChannelPerson } from "../../../$channelId/components/ChannelMessageRow";
+import type { ChannelPerson } from "../../../$channelId/components/MessageBody";
 import { ThreadCard } from "./components/ThreadCard";
-
-const NOW_TICK_MS = 30_000;
 
 /** Slack's Threads view: followed threads, unread first. Opening one marks it read. */
 export function ThreadsScreen() {
@@ -20,7 +17,6 @@ export function ThreadsScreen() {
 		setThreadsView(true);
 		return () => setThreadsView(false);
 	}, [setThreadsView]);
-	const now = useNow(NOW_TICK_MS);
 	const { people, currentUserId } = useOrganizationPeople();
 	const peopleById = useMemo(
 		() => new Map<string, ChannelPerson>(people.map((p) => [p.id, p])),
@@ -61,7 +57,6 @@ export function ThreadsScreen() {
 								thread={thread}
 								peopleById={peopleById}
 								currentUserId={currentUserId}
-								now={now}
 							/>
 						))}
 					</div>

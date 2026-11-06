@@ -1,1 +1,0 @@
-export { OthersLabel } from "./OthersLabel";

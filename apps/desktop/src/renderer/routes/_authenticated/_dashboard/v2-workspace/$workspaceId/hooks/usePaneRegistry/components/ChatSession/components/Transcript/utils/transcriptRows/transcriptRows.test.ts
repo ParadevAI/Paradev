@@ -592,3 +592,185 @@ describe("the changed-files card", () => {
 		expect(commandOnly).toMatchObject({ files: [] });
 	});
 });
+
+describe("transcriptRows, quiet", () => {
+	const settled: TurnGroup = {
+		turnId: "turn-q",
+		turn: {
+			id: "turn-q",
+			status: "completed",
+			startedAtMs: 2,
+			completedAtMs: 9,
+		},
+		entries: [
+			{ kind: "item", item: { ...prompt, id: "q-prompt", turnId: "turn-q" } },
+			{
+				kind: "item",
+				item: {
+					id: "q-narration",
+					kind: "agent_message",
+					turnId: "turn-q",
+					startedAtMs: 3,
+					completedAtMs: 4,
+					text: "Creating the workspace.",
+				} as Item,
+			},
+			{ kind: "item", item: { ...publish("q-tool", 5), turnId: "turn-q" } },
+			{
+				kind: "item",
+				item: {
+					id: "q-reply",
+					kind: "agent_message",
+					turnId: "turn-q",
+					startedAtMs: 7,
+					completedAtMs: 8,
+					text: "Done.",
+				} as Item,
+			},
+		],
+	};
+
+	test("folds a settled turn's work between its clock and its last reply", () => {
+		const rows = transcriptRows(
+			[settled],
+			[],
+			new Set(),
+			find,
+			new Set(),
+			() => false,
+			() => [],
+			() => [],
+			true,
+		);
+		const clock = rows.find((row) => row.kind === "working");
+		expect(clock?.kind === "working" && clock.foldable).toBe(true);
+		const folded = rows
+			.filter(
+				(row) => (row.kind === "item" || row.kind === "tool_run") && row.folded,
+			)
+			.map((row) => row.key);
+		expect(folded).toContain("q-narration");
+		expect(folded.some((key) => key.includes("q-tool"))).toBe(true);
+		expect(folded).not.toContain("q-reply");
+		expect(folded).not.toContain("q-prompt");
+		expect(
+			rows.every(
+				(row) =>
+					!((row.kind === "item" || row.kind === "tool_run") && row.folded) ||
+					row.foldKey === "working:turn-q",
+			),
+		).toBe(true);
+	});
+
+	test("a notice after the reply folds with the work, the reply stays out", () => {
+		const trailing: TurnGroup = {
+			...settled,
+			entries: [
+				...settled.entries,
+				{
+					kind: "item",
+					item: {
+						id: "q-notice",
+						kind: "notice",
+						turnId: "turn-q",
+						startedAtMs: 9,
+						text: "Background command finished.",
+					} as Item,
+				},
+			],
+		};
+		const rows = transcriptRows(
+			[trailing],
+			[],
+			new Set(),
+			find,
+			new Set(),
+			() => false,
+			() => [],
+			() => [],
+			true,
+		);
+		const folded = rows
+			.filter(
+				(row) => (row.kind === "item" || row.kind === "tool_run") && row.folded,
+			)
+			.map((row) => row.key);
+		expect(folded).toContain("q-notice");
+		expect(folded).not.toContain("q-reply");
+	});
+
+	test("a harness's own note that opens the next turn folds with the last", () => {
+		const noted: TurnGroup = {
+			turnId: "turn-r",
+			turn: {
+				id: "turn-r",
+				status: "completed",
+				startedAtMs: 10,
+				completedAtMs: 12,
+			},
+			entries: [
+				{
+					kind: "item",
+					item: {
+						...prompt,
+						id: "q-book",
+						clientId: "client-book",
+						turnId: "turn-r",
+						startedAtMs: 10,
+						content: [{ type: "text", text: "Background command finished." }],
+					},
+				},
+				{
+					kind: "item",
+					item: {
+						id: "r-reply",
+						kind: "agent_message",
+						turnId: "turn-r",
+						startedAtMs: 11,
+						completedAtMs: 12,
+						text: "Noted.",
+					} as Item,
+				},
+			],
+		};
+		const rows = transcriptRows(
+			[settled, noted],
+			[],
+			new Set(),
+			find,
+			new Set(),
+			() => false,
+			() => [],
+			() => [],
+			true,
+			(item) => item.id === "q-book",
+		);
+		const note = rows.find(
+			(row) => row.kind === "item" && row.item.id === "q-book",
+		);
+		expect(note?.kind === "item" && note.folded).toBe(true);
+		expect(note?.kind === "item" && note.foldKey).toBe("working:turn-q");
+		// The turn the note woke is the same work: its clock and the reply
+		// before the note fold too, and only the final reply stays out.
+		const woken = rows.find(
+			(row) => row.kind === "working" && row.key === "working:turn-r",
+		);
+		expect(woken?.kind === "working" && woken.folded).toBe(true);
+		const foldedIds = rows.flatMap((row) =>
+			row.kind === "item" && row.folded ? [row.item.id] : [],
+		);
+		expect(foldedIds).toContain("q-reply");
+		expect(foldedIds).not.toContain("r-reply");
+	});
+
+	test("folds nothing in the ordinary transcript", () => {
+		const rows = transcriptRows([settled], [], new Set(), find);
+		expect(
+			rows.some(
+				(row) =>
+					(row.kind === "working" && row.foldable) ||
+					((row.kind === "item" || row.kind === "tool_run") && row.folded),
+			),
+		).toBe(false);
+	});
+});

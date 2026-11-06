@@ -107,7 +107,7 @@ export const chatMarkdownComponents = {
 	a: Link,
 	inlineCode: styled(
 		"code",
-		"rounded bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-xs",
+		"rounded bg-foreground/[0.06] px-1 py-0.5 font-mono text-xs",
 	),
 	blockquote: styled(
 		"blockquote",

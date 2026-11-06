@@ -1,1 +1,0 @@
-export { EmojiGlyph } from "./EmojiGlyph";

@@ -1,17 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type { ChannelDetailsTab } from "./components/ChannelDetailsDialog";
-import { ChannelScreen } from "./components/ChannelScreen";
-
-const DETAILS_TABS: readonly ChannelDetailsTab[] = [
-	"about",
-	"members",
-	"settings",
-];
+import { ChannelView } from "./components/ChannelView";
 
 export type ChannelSearch = {
 	thread?: string;
 	message?: string;
-	details?: ChannelDetailsTab;
 };
 
 export const Route = createFileRoute(
@@ -27,20 +19,11 @@ export const Route = createFileRoute(
 			typeof search.message === "string" && search.message
 				? search.message
 				: undefined,
-		details: DETAILS_TABS.find((tab) => tab === search.details),
 	}),
 });
 
 function ChannelPage() {
 	const { channelId } = Route.useParams();
-	const { thread, message, details } = Route.useSearch();
-	return (
-		<ChannelScreen
-			key={channelId}
-			channelId={channelId}
-			thread={thread}
-			message={message}
-			details={details}
-		/>
-	);
+	const { thread } = Route.useSearch();
+	return <ChannelView key={channelId} channelId={channelId} thread={thread} />;
 }

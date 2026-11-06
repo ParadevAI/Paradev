@@ -102,6 +102,10 @@ msgstr "(siz)"
 msgid "[prompt]"
 msgstr "[istem]"
 
+#. placeholder {0}: data.replies.length
+msgid "{0, plural, =0 {No replies yet} one {# reply} other {# replies}}"
+msgstr "{0, plural, =0 {Henüz yanıt yok} one {# yanıt} other {# yanıt}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# etkin port — ayrıntıları gizle} other {# etkin port — ayrıntıları gizle}}"
@@ -195,10 +199,6 @@ msgstr "{0, plural, one {# oturum bilgisi} other {# oturum bilgisi}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# yeni yanıt}}"
 
-#. placeholder {0}: actorIds.length
-msgid "{0, plural, one {# other} other {# others}}"
-msgstr "{0, plural, one {# kişi daha} other {# kişi daha}}"
-
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# geçti} other {# geçti}}"
@@ -220,11 +220,6 @@ msgstr "{0, plural, one {# proje seçildi.} other {# proje seçildi.}}"
 #. placeholder {0}: chosenProjects.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# proje} other {# proje}}"
-
-#. placeholder {0}: data.replies.length
-#. placeholder {0}: message.replyCount
-msgid "{0, plural, one {# reply} other {# replies}}"
-msgstr "{0, plural, other {# yanıt}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -444,10 +439,6 @@ msgstr "{0} dalı"
 msgid "{0} cannot be signed in this way yet."
 msgstr "{0} henüz bu şekilde oturum açamıyor."
 
-#. placeholder {0}: creator.name
-msgid "{0} created this channel on {created}."
-msgstr "{0} bu kanalı {created} tarihinde oluşturdu."
-
 #. placeholder {0}: formatNumber(participants)
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0} geliştirici ajan kullanımına göre sıralanıyor. Son 30 gününüz zaten sayılıyor, yalnızca gizli. Yalnızca token sayıları ve model adları; repo adları, dosya yolları veya prompt'lar yok."
@@ -471,6 +462,10 @@ msgstr "{0} etkin"
 msgid "{0} ending in {1}"
 msgstr "{1} ile biten {0}"
 
+#. placeholder {0}: entry.turns.length
+msgid "{0} events handled"
+msgstr "{0} olay işlendi"
+
 #. placeholder {0}: collisions.length
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where} konumunda {0} dosya zaten var. Bunları değiştirmek istiyor musunuz?"
@@ -478,6 +473,10 @@ msgstr "{where} konumunda {0} dosya zaten var. Bunları değiştirmek istiyor mu
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-saat"
+
+#. placeholder {0}: names(idle, agentsCount)
+msgid "{0} idle."
+msgstr "{0} boşta."
 
 #. placeholder {0}: displayName(variables.name)
 msgid "{0} installed"
@@ -531,6 +530,14 @@ msgstr "{0} üzerinde host hizmeti {1} çalışıyor — bu uygulama {2} veya da
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} bu makinede kurulu, ancak hesabınızda değil"
 
+#. placeholder {0}: nameOf(message.authorId)
+msgid "{0} joined"
+msgstr "{0} katıldı"
+
+#. placeholder {0}: nameOf(message.authorId)
+msgid "{0} left"
+msgstr "{0} ayrıldı"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more — refine your search"
 msgstr "{0} tane daha — aramanızı daraltın"
@@ -555,10 +562,6 @@ msgstr "{1} kontrolden {0} tanesi çalışıyor"
 msgid "{0} of {totalCount}"
 msgstr "{totalCount} içinden {0}"
 
-#. placeholder {0}: creator.name
-msgid "{0} on {created}"
-msgstr "{0}, {created}"
-
 #. placeholder {0}: plugin.interface.displayName
 msgid "{0} options"
 msgstr "{0} seçenekleri"
@@ -570,6 +573,14 @@ msgstr "GB-saat başına {0}"
 #. placeholder {0}: normalizedProjectIds.length
 msgid "{0} projects"
 msgstr "{0} proje"
+
+#. placeholder {0}: names(review, agentsCount)
+msgid "{0} ready for review."
+msgstr "{0} incelemeye hazır."
+
+#. placeholder {0}: entry.replies
+msgid "{0} replies"
+msgstr "{0} yanıt"
 
 #. placeholder {0}: tally.running
 msgid "{0} Running"
@@ -854,9 +865,6 @@ msgstr "{count, plural, one {# yorum} other {# yorum}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# dosya} other {# dosya}}"
 
-msgid "{count, plural, one {# new message} other {# new messages}}"
-msgstr "{count, plural, other {# yeni mesaj}}"
-
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# arama} other {# arama}}"
 
@@ -968,6 +976,27 @@ msgstr "{daysRemaining, plural, one {Hesabınız devre dışı bırakıldı ve #
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} answered a mention"
+msgstr "{devName} bir bahsetmeye yanıt verdi"
+
+msgid "{devName} ran an automation"
+msgstr "{devName} bir otomasyon çalıştırdı"
+
+msgid "{devName} replied"
+msgstr "{devName} yanıtladı"
+
+msgid "{devName} replied in a thread"
+msgstr "{devName} bir konuda yanıtladı"
+
+msgid "{devName} reported on a task"
+msgstr "{devName} bir görevi raporladı"
+
+msgid "{devName} started a task"
+msgstr "{devName} bir göreve başladı"
+
+msgid "{devName} took a turn"
+msgstr "{devName} bir tur yaptı"
+
 msgid "{distance} ago"
 msgstr "{distance} önce"
 
@@ -993,6 +1022,9 @@ msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} othe
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# dosya düzenlendi} other {# dosya düzenlendi}}"
 
+msgid "{files} files"
+msgstr "{files} dosya"
+
 msgid "{focusShortcutText} to focus"
 msgstr "Odaklanmak için {focusShortcutText}"
 
@@ -1013,6 +1045,9 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
+
+msgid "{handled} events handled today"
+msgstr "Bugün {handled} olay işlendi"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# gizli satır} other {# gizli satır}}"
@@ -1071,6 +1106,9 @@ msgstr "{label} yeniden ayarlanmamış duruma döner. Çalışma alanlarınızda
 msgid "{label} is set to manual"
 msgstr "{label} artık manuel oturum açma kullanıyor"
 
+msgid "{label} started in <0>{name}</0>"
+msgstr "{label}, <0>{name}</0> içinde başlatıldı"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1110,6 +1148,9 @@ msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, önceli
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
 
+msgid "{n} agents"
+msgstr "{n} ajan"
+
 msgid "{name} accounts"
 msgstr "{name} hesapları"
 
@@ -1133,9 +1174,24 @@ msgstr "{name} yerleşiktir ve kaldırılamaz"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} yerleşiktir ve değiştirilemez"
 
+msgid "{name} is done"
+msgstr "{name} tamamlandı"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} eklenmedi"
+
+msgid "{name} joined"
+msgstr "{name} katıldı"
+
+msgid "{name} merged #{number}"
+msgstr "{name} #{number} birleştirdi"
+
+msgid "{name} needs you"
+msgstr "{name} size ihtiyaç duyuyor"
+
+msgid "{name} opened #{number}"
+msgstr "{name} #{number} açtı"
 
 msgid "{name} plugin"
 msgstr "{name} eklentisi"
@@ -1149,6 +1205,9 @@ msgstr "{name} durduruldu"
 msgid "{name} wants more access"
 msgstr "{name} daha fazla erişim istiyor"
 
+msgid "{name} went idle"
+msgstr "{name} boşta kaldı"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: koltuk başına {hours} saat ({gbHours} GB-saat)"
 
@@ -1157,6 +1216,9 @@ msgstr "{name}: kullanıcı başına aylık {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: kullanıcı başına aylık {monthly} veya yıllık faturalandırmayla {yearly}"
+
+msgid "{newActivity} new"
+msgstr "{newActivity} yeni"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {En az bir kişi belirtin veya {choice} seçeneğini seçin.} sender {En az bir gönderen belirtin veya {choice} seçeneğini seçin.} other {En az bir öğe belirtin veya {choice} seçeneğini seçin.}}"
@@ -1383,30 +1445,6 @@ msgstr "{used} / {size} token"
 msgid "{used} used"
 msgstr "{used} kullanıldı"
 
-msgid "{user} and {others} joined and left."
-msgstr "{user} ve {others} katıldı ve ayrıldı."
-
-msgid "{user} and {others} joined."
-msgstr "{user} ve {others} katıldı."
-
-msgid "{user} and {others} left."
-msgstr "{user} ve {others} ayrıldı."
-
-msgid "{user} and {others} rejoined."
-msgstr "{user} ve {others} yeniden katıldı."
-
-msgid "{user} joined and left."
-msgstr "{user} katıldı ve ayrıldı."
-
-msgid "{user} joined."
-msgstr "{user} katıldı."
-
-msgid "{user} left."
-msgstr "{user} ayrıldı."
-
-msgid "{user} rejoined."
-msgstr "{user} yeniden katıldı."
-
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -1507,9 +1545,6 @@ msgstr "<0>{displayName}</0> Paradev hesabınıza erişim istiyor"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "<0>{primaryFont}</0> bu sistemde kurulu değil. Sıradaki kullanılabilir yazı tipine geçiliyor."
-
-msgid "<0>{who}</0> reacted with {shortcode}"
-msgstr "<0>{who}</0> {shortcode} ile tepki verdi"
 
 #. placeholder {0}: formatNumber(rank)
 #. placeholder {1}: formatNumber(total)
@@ -1820,6 +1855,9 @@ msgstr "#{0} içinde bir ileti dizisi"
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Kuruluşunuz için benzersiz bir tanımlayıcı (addan otomatik oluşturulur)"
 
+msgid "a workspace"
+msgstr "bir çalışma alanı"
+
 msgid "Aa"
 msgstr "Aa"
 
@@ -1831,6 +1869,12 @@ msgstr "{displayName} Hakkında"
 
 msgid "About Paradev"
 msgstr "Paradev hakkında"
+
+msgid "About this channel"
+msgstr "Bu kanal hakkında"
+
+msgid "About this Dev"
+msgstr "Bu Dev hakkında"
 
 msgid "About three weeks from first call to offer, ending with a paid work trial. Every step is with a founder, and you hear back within 48 hours."
 msgstr "İlk görüşmeden teklife yaklaşık üç hafta sürer ve ücretli bir deneme çalışmasıyla biter. Her adımda bir kurucuyla görüşürsünüz ve 48 saat içinde yanıt alırsınız."
@@ -1944,9 +1988,6 @@ msgstr "API anahtarı oluşturmak için etkin bir kuruluş gerekir"
 msgid "Active sessions"
 msgstr "Etkin oturumlar"
 
-msgid "Activities"
-msgstr "Etkinlikler"
-
 msgid "Activity"
 msgstr "Etkinlik"
 
@@ -1981,6 +2022,9 @@ msgstr "Filtre ekle"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Proje Ayarları'nda bir yaşam döngüsü çalıştırma betiği ekleyin veya bir terminal betiğini çalışma alanı çalıştırması olarak işaretleyin."
+
+msgid "Add a note to #{channelName}"
+msgstr "#{channelName} kanalına not ekle"
 
 msgid "Add a project to see GitHub issues."
 msgstr "GitHub issue'larını görmek için bir proje ekleyin."
@@ -2039,9 +2083,6 @@ msgstr "Yorum ekle"
 msgid "Add custom audio"
 msgstr "Özel ses ekle"
 
-msgid "Add Description"
-msgstr "Açıklama Ekle"
-
 msgid "Add description..."
 msgstr "Açıklama ekleyin..."
 
@@ -2085,9 +2126,6 @@ msgstr "Kişi ekle"
 msgid "Add people or teams by name or email"
 msgstr "Ad veya e-posta ile kişi ya da takım ekleyin"
 
-msgid "Add People to Channel"
-msgstr "Kanala Kişi Ekle"
-
 msgid "Add photos or files"
 msgstr "Fotoğraf veya dosya ekle"
 
@@ -2102,9 +2140,6 @@ msgstr "Klasörden proje ekle..."
 
 msgid "Add prompt e.g. look for crashes in $sentry"
 msgstr "İstem ekleyin, örn. $sentry içinde çökmeleri ara"
-
-msgid "Add reaction…"
-msgstr "Tepki ekle…"
 
 msgid "Add repository"
 msgstr "Depo ekle"
@@ -2257,6 +2292,9 @@ msgstr "Ajan yapılandırmaları"
 msgid "Agent credentials changed"
 msgstr "Ajan kimlik bilgileri değişti"
 
+msgid "Agent failed"
+msgstr "Ajan başarısız oldu"
+
 msgid "Agent finished"
 msgstr "Ajan bitirdi"
 
@@ -2271,6 +2309,9 @@ msgstr "Ajan başlatma yapılandırması"
 
 msgid "Agent not found"
 msgstr "Ajan bulunamadı"
+
+msgid "Agent options"
+msgstr "Ajan seçenekleri"
 
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Her oturum oluşturma akışının kullandığı ajan seçici (Claude, Codex, Cursor…)"
@@ -2624,30 +2665,6 @@ msgstr "Kanalı ve üyelerini de düzenleyebilir"
 msgid "Also viewing this page"
 msgstr "Bu sayfayı görüntüleyen diğer kişiler"
 
-msgid "Also, {user} and {others} joined and left."
-msgstr "Ayrıca {user} ve {others} katıldı ve ayrıldı."
-
-msgid "Also, {user} and {others} joined."
-msgstr "Ayrıca {user} ve {others} katıldı."
-
-msgid "Also, {user} and {others} left."
-msgstr "Ayrıca {user} ve {others} ayrıldı."
-
-msgid "Also, {user} and {others} rejoined."
-msgstr "Ayrıca {user} ve {others} yeniden katıldı."
-
-msgid "Also, {user} joined and left."
-msgstr "Ayrıca {user} katıldı ve ayrıldı."
-
-msgid "Also, {user} joined."
-msgstr "Ayrıca {user} katıldı."
-
-msgid "Also, {user} left."
-msgstr "Ayrıca {user} ayrıldı."
-
-msgid "Also, {user} rejoined."
-msgstr "Ayrıca {user} yeniden katıldı."
-
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Ayrıca: @superset/ui/ai-elements/braille-spinner"
 
@@ -2693,9 +2710,6 @@ msgstr "Yüklenmeye hazır bir güncelleme var."
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android yolda. Çıktığında ilk siz haberdar olun."
 
-msgid "Animals & Nature"
-msgstr "Hayvanlar ve Doğa"
-
 msgid "Animate the active terminal cursor."
 msgstr "Etkin terminal imlecini canlandır."
 
@@ -2738,8 +2752,8 @@ msgstr "Bu soruyu masaüstünde yanıtlayın veya atlayın."
 msgid "Answered"
 msgstr "Yanıtlandı"
 
-msgid "Answered {who} in #{channel}"
-msgstr "#{channel} kanalında {who} kişisini yanıtladı"
+msgid "Answered {name} in #{channel}"
+msgstr "#{channel} içinde {name} kişisine yanıt verdi"
 
 msgid "Answered you in #{channel}"
 msgstr "#{channel} kanalında sizi yanıtladı"
@@ -3090,6 +3104,9 @@ msgstr "Düzenleme ve komutlardan önce sorar"
 
 msgid "Asks only for risky actions"
 msgstr "Yalnızca riskli işlemlerde sorar"
+
+msgid "asks you"
+msgstr "sana soruyor"
 
 msgid "Aspect Ratio"
 msgstr "En boy oranı"
@@ -3453,6 +3470,9 @@ msgstr "Son 30 gündeki {0} token temel alınmıştır; {1} sayılıyor."
 
 msgid "Before"
 msgstr "Önce"
+
+msgid "Begin a fresh session; this one stays in its workspace"
+msgstr "Yeni bir oturum başlat; bu oturum çalışma alanında kalır"
 
 msgid "Behavior"
 msgstr "Davranış"
@@ -4094,9 +4114,6 @@ msgstr "Kanal"
 msgid "Channel created"
 msgstr "Kanal oluşturuldu"
 
-msgid "Channel details"
-msgstr "Kanal ayrıntıları"
-
 msgid "Channel Manager"
 msgstr "Kanal Yöneticisi"
 
@@ -4138,6 +4155,9 @@ msgstr "Sohbet modu"
 
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
+
+msgid "Chat started in <0>{name}</0>"
+msgstr "<0>{name}</0> içinde sohbet başlatıldı"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Sohbet yüzeyleri: mesajlar, akıl yürütme, öneriler"
@@ -4242,11 +4262,23 @@ msgstr "Kontroller"
 msgid "Checks completed"
 msgstr "Kontroller tamamlandı"
 
+msgid "checks failed"
+msgstr "kontroller başarısız"
+
 msgid "Checks failed"
 msgstr "Kontroller başarısız"
 
+msgid "checks passed"
+msgstr "kontroller geçti"
+
 msgid "Checks passed"
 msgstr "Kontroller geçti"
+
+msgid "checks running"
+msgstr "kontroller çalışıyor"
+
+msgid "Checks running"
+msgstr "Kontroller çalışıyor"
 
 msgid "Checks Skipped"
 msgstr "Kontroller atlandı"
@@ -4319,9 +4351,6 @@ msgstr "Paradev'in sizi ne zaman uyaracağını seçin."
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Yorumlardan, tasarım modundan ve Pages üzerinden başlatılan ajanların nerede açılacağını seçin."
-
-msgid "Choose your default skin tone"
-msgstr "Varsayılan ten rengini seç"
 
 msgid "Choosing this removes any credential saved here for {label}."
 msgstr "Bunu seçmek, burada {label} için kayıtlı tüm kimlik bilgilerini kaldırır."
@@ -4527,9 +4556,6 @@ msgstr "{0} oturumunu kapat"
 msgid "Close {displayName}"
 msgstr "{displayName}'i kapat"
 
-msgid "Close {label} tab"
-msgstr "{label} sekmesini kapat"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0} kapatılsın mı?"
@@ -4592,9 +4618,6 @@ msgstr "Geçerli çalışma alanını kapat veya sil"
 msgid "Close other apps using the microphone"
 msgstr "Mikrofonu kullanan diğer uygulamaları kapatın"
 
-msgid "Close other tabs"
-msgstr "Diğer sekmeleri kapat"
-
 msgid "Close Others"
 msgstr "Diğerlerini kapat"
 
@@ -4638,9 +4661,6 @@ msgstr "Sekmeyi kapat"
 msgid "Close Tab"
 msgstr "Sekmeyi kapat"
 
-msgid "Close tabs to the right"
-msgstr "Sağdaki sekmeleri kapat"
-
 msgid "Close terminal"
 msgstr "Terminali kapat"
 
@@ -4664,6 +4684,9 @@ msgstr "Çalışma alanını kapat"
 
 msgid "Close your laptop"
 msgstr "Dizüstünüzü kapatın"
+
+msgid "closed"
+msgstr "kapalı"
 
 msgid "Closed"
 msgstr "Kapalı"
@@ -5418,6 +5441,21 @@ msgstr "çerezler ve site verileri"
 msgid "Cookies and site data — signs you out of most sites"
 msgstr "Çerezler ve site verileri — çoğu sitedeki oturumunuzu kapatır"
 
+msgid "Coordinator"
+msgstr "Koordinatör"
+
+#. placeholder {0}: coordinator.label
+msgid "Coordinator · {0}"
+msgstr "Koordinatör · {0}"
+
+#. placeholder {0}: coordinator.label
+msgid "Coordinator · {0} · agents at work"
+msgstr "Koordinatör · {0} · ajanlar çalışıyor"
+
+#. placeholder {0}: preview.line
+msgid "Coordinator: {0}"
+msgstr "Koordinatör: {0}"
+
 msgid "Copied"
 msgstr "Kopyalandı"
 
@@ -5520,9 +5558,6 @@ msgstr "Bağlantıyı kopyala"
 
 msgid "Copy Link"
 msgstr "Bağlantıyı kopyala"
-
-msgid "Copy link address"
-msgstr "Bağlantı adresini kopyala"
 
 msgid "Copy Link Address"
 msgstr "Bağlantı adresini kopyala"
@@ -6820,9 +6855,6 @@ msgstr "Görseli sil"
 msgid "Delete local branch on workspace removal"
 msgstr "Çalışma alanı kaldırılırken yerel dalı sil"
 
-msgid "Delete message"
-msgstr "Mesajı sil"
-
 msgid "Delete organization"
 msgstr "Kuruluşu sil"
 
@@ -7066,6 +7098,9 @@ msgstr "Fiziksel konumunuzu algılama"
 
 msgid "Dev"
 msgstr "Geliştirme"
+
+msgid "Dev · answers in the channel"
+msgstr "Dev · kanalda yanıtlar"
 
 msgid "Dev options"
 msgstr "Dev seçenekleri"
@@ -7457,6 +7492,9 @@ msgstr "İndiriliyor..."
 msgid "Downloads"
 msgstr "İndirilenler"
 
+msgid "draft"
+msgstr "taslak"
+
 msgid "Draft"
 msgstr "Taslak"
 
@@ -7623,23 +7661,20 @@ msgstr "{name} ×{tier} kazanıldı"
 msgid "Edit"
 msgstr "Düzenle"
 
-msgid "Edit Channel Name"
-msgstr "Kanal Adını Düzenle"
-
 msgid "Edit comment"
 msgstr "Yorumu düzenle"
 
 msgid "Edit description"
 msgstr "Açıklamayı düzenle"
 
-msgid "Edit Description"
-msgstr "Açıklamayı Düzenle"
-
 msgid "Edit environment"
 msgstr "Ortamı düzenle"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Dosyaları sormadan düzenle; komutlardan önce sor"
+
+msgid "Edit goal"
+msgstr "Hedefi düzenle"
 
 msgid "Edit message"
 msgstr "Mesajı düzenle"
@@ -7937,6 +7972,9 @@ msgstr "Her çarşamba 09.00'da bu haftanın birleştirilen PR'larını incele v
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Her hafta içi 09.00'da yeni GitHub issue'larını oku, etiket uygula ve incelemem için ilk yanıt taslağını hazırla."
+
+msgid "Every workspace is already here"
+msgstr "Tüm workspace'ler zaten burada"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Herkes bunun genellenebilir olup olmadığını tartışır. Bu tartışma, düzeye ulaşıldığının işaretidir."
@@ -8802,9 +8840,6 @@ msgstr "Takım bul…"
 msgid "Find and fix a small bug"
 msgstr "Küçük bir hata bul ve düzelt"
 
-msgid "Find another reaction"
-msgstr "Başka tepki bul"
-
 msgid "Find in Changes"
 msgstr "Değişikliklerde bul"
 
@@ -8841,6 +8876,9 @@ msgstr "Tamamlandı · okunmadı"
 msgid "finished · worked for 7s"
 msgstr "bitti · 7 sn çalıştı"
 
+msgid "Finished, unread"
+msgstr "Bitti, okunmadı"
+
 msgid "Fit"
 msgstr "Sığdır"
 
@@ -8876,9 +8914,6 @@ msgstr "FK"
 
 msgid "Flag"
 msgstr "Bayrak"
-
-msgid "Flags"
-msgstr "Bayraklar"
 
 msgid "Flame"
 msgstr "Alev"
@@ -8940,11 +8975,11 @@ msgstr "Klasör görünümü"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Yeni worktree'lere checkout edilecek klasörler; her satıra bir tane, depo köküne göre. Kökteki dosyalar her zaman dahildir. Boş bırakılırsa her şey checkout edilir."
 
+msgid "Follow"
+msgstr "Takip et"
+
 msgid "FOLLOW ON X"
 msgstr "X'TE TAKİP EDİN"
-
-msgid "Follow thread"
-msgstr "İleti dizisini takip et"
 
 msgid "FOLLOW US"
 msgstr "BİZİ TAKİP EDİN"
@@ -8955,11 +8990,14 @@ msgstr "LinkedIn'de bizi takip edin"
 msgid "Follow us on X/Twitter"
 msgstr "X/Twitter'da bizi takip edin"
 
-msgid "Followed up with {who} in #{channel}"
-msgstr "#{channel} kanalında {who} ile devam etti"
+msgid "Followed up with {name} in #{channel}"
+msgstr "#{channel} içinde {name} ile devam etti"
 
 msgid "Followed up with you in #{channel}"
 msgstr "#{channel} kanalında sizinle devam etti"
+
+msgid "Following"
+msgstr "Takip ediliyor"
 
 msgid "Font family"
 msgstr "Yazı tipi ailesi"
@@ -8969,9 +9007,6 @@ msgstr "Yazı tipi boyutu"
 
 msgid "Font weight"
 msgstr "Yazı tipi kalınlığı"
-
-msgid "Food & Drink"
-msgstr "Yiyecek ve İçecek"
 
 msgid "For 1 hour"
 msgstr "1 saatliğine"
@@ -9135,9 +9170,6 @@ msgstr "Tek kullanıcı için ücretsiz. Pro {proPrice}/kullanıcı/ay'dan başl
 msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
 msgstr "Tek kullanıcı için ücretsiz. Pro, kullanıcı başına aylık {proPrice}'dır ve otomasyonları ve mobil uygulamayı ekler. Team {teamPrice}'dır ve bulut çalışma alanlarını ekler."
 
-msgid "Frequently Used"
-msgstr "Sık Kullanılanlar"
-
 msgid "Frequently<0/>asked questions"
 msgstr "Sık sorulan<0/>sorular"
 
@@ -9267,9 +9299,6 @@ msgstr "{plan} al"
 msgid "Get an API key"
 msgstr "API anahtarı alın"
 
-msgid "Get channel details"
-msgstr "Kanal ayrıntılarını gör"
-
 msgid "Get extensions"
 msgstr "Uzantı ekle"
 
@@ -9305,9 +9334,6 @@ msgstr "iPhone ve iPad uygulamasını edinin"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
-
-msgid "Getting Work Done"
-msgstr "İş Bitirme"
 
 msgid "Ghost"
 msgstr "Hayalet"
@@ -9440,6 +9466,9 @@ msgstr "Slack entegrasyon ayarlarına git"
 
 msgid "Go to workspace"
 msgstr "Çalışma alanına git"
+
+msgid "Goal"
+msgstr "Hedef"
 
 msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
 msgstr "Google kalıcı erişim vermedi. Paradev'i Google hesabınızın üçüncü taraf erişiminden kaldırıp yeniden deneyin."
@@ -9835,6 +9864,9 @@ msgstr "{name} teması Paradev'e nasıl kurulur"
 msgid "How to install Paradev"
 msgstr "Paradev nasıl yüklenir"
 
+msgid "How to split the work, what to check before a PR, what to leave alone"
+msgstr "İşi nasıl böleceği, PR öncesi neyi kontrol edeceği, neye dokunmayacağı"
+
 msgid "How we build it, in long form."
 msgstr "Nasıl geliştirdiğimiz, ayrıntılı olarak."
 
@@ -10066,6 +10098,9 @@ msgstr "Geliştirilmiş fark görüntüleyici"
 msgid "in {0}"
 msgstr "{0} içinde"
 
+msgid "In #{channelName}"
+msgstr "#{channelName} içinde"
+
 msgid "in a terminal on this host."
 msgstr "komutunu çalıştırın."
 
@@ -10094,8 +10129,14 @@ msgstr "İncelemede"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "{appName} masaüstü uygulamasında Ayarlar → Uzaktan erişim bölümünü açın ve “Bu cihaza röle üzerinden uzaktan erişime izin ver” seçeneğini açın."
 
+msgid "in the merge queue"
+msgstr "birleştirme kuyruğunda"
+
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Paradev masaüstü uygulamasında <0>Ayarlar → Görünüm → Tema</0> bölümünü açın."
+
+msgid "In this channel"
+msgstr "Bu kanalda"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "Bir yıldan kısa sürede 180 ülkeden 145.000'den fazla geliştirici {productName}'i çalıştırdı ve 1,85 milyondan fazla ajan çalışma alanı oluşturdu."
@@ -10593,38 +10634,17 @@ msgstr "Katılım"
 msgid "Joined {0}"
 msgstr "Katılma: {0}"
 
-msgid "joined {channel} along with {others}."
-msgstr "{others} ile birlikte {channel} kanalına katıldı."
-
-msgid "joined {channel}."
-msgstr "{channel} kanalına katıldı."
-
-msgid "joined and left {channel} along with {others}."
-msgstr "{others} ile birlikte {channel} kanalına katıldı ve ayrıldı."
-
-msgid "joined and left {channel}."
-msgstr "{channel} kanalına katıldı ve ayrıldı."
-
 msgid "Joining…"
 msgstr "Katılınıyor…"
 
-msgid "Jump"
-msgstr "Git"
-
 msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
 msgstr "Tek tıkla en sevdiğiniz düzenleyiciye atlayın. VS Code, Cursor, Xcode, JetBrains IDE'leri veya herhangi bir terminal: worktree'leri tam ihtiyacınız olan yerde açın."
-
-msgid "Jump to a specific date"
-msgstr "Belirli bir tarihe git"
 
 msgid "Jump to file"
 msgstr "Dosyaya git"
 
 msgid "Jump to user message {position}"
 msgstr "{position} numaralı kullanıcı mesajına git"
-
-msgid "Jump to…"
-msgstr "Git…"
 
 msgid "Just ask"
 msgstr "Sadece sorun"
@@ -10791,11 +10811,8 @@ msgstr "Her ayın son günü"
 msgid "Last day of each month at {time}"
 msgstr "Her ayın son günü saat {time}"
 
-msgid "Last month"
-msgstr "Geçen ay"
-
-#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
-msgid "Last reply {0}"
+#. placeholder {0}: formatCompactRelativeTime(new Date(last.startedAt))
+msgid "Last replied {0}"
 msgstr "Son yanıt {0}"
 
 msgid "Last run"
@@ -10825,8 +10842,12 @@ msgstr "Son güncelleme: {lastUpdated}"
 msgid "Last used"
 msgstr "Son kullanılan"
 
-msgid "Last week"
-msgstr "Geçen hafta"
+#. placeholder {0}: newestTurn.channelName
+msgid "Last: in #{0}"
+msgstr "Son: #{0} içinde"
+
+msgid "Last: replied to your DM"
+msgstr "Son: DM'ine yanıt verdi"
 
 msgid "Late 2026"
 msgstr "2026 sonu"
@@ -10949,11 +10970,8 @@ msgstr "Kuruluştan ayrılınıyor..."
 msgid "Leaving..."
 msgstr "Ayrılınıyor..."
 
-msgid "left {channel} along with {others}."
-msgstr "{others} ile birlikte {channel} kanalından ayrıldı."
-
-msgid "left {channel}."
-msgstr "{channel} kanalından ayrıldı."
+msgid "Left"
+msgstr "Ayrıldı"
 
 msgid "Left alone, changed since this turn: {skippedNames}"
 msgstr "Dokunulmadı, bu turdan sonra değişti: {skippedNames}"
@@ -11371,6 +11389,9 @@ msgstr "Mobil simülatör aranıyor…"
 msgid "Looking for installed browsers…"
 msgstr "Kurulu tarayıcılar aranıyor…"
 
+msgid "Looking for its chat…"
+msgstr "Sohbeti aranıyor…"
+
 msgid "Looking for pages"
 msgstr "Sayfalar aranıyor"
 
@@ -11511,9 +11532,6 @@ msgstr "Kuruluşunuzun marka görünümünü ve üyelerini yönetin."
 msgid "Managed"
 msgstr "Yönetilen"
 
-msgid "Managed by"
-msgstr "Yöneten"
-
 msgid "Managed by your organization admin."
 msgstr "Kuruluş yöneticiniz tarafından yönetiliyor."
 
@@ -11555,9 +11573,6 @@ msgstr "Her şey okundu olarak işaretlensin mi?"
 
 msgid "Mark Ready"
 msgstr "Hazır işaretle"
-
-msgid "Mark unread"
-msgstr "Okunmadı olarak işaretle"
 
 msgid "Markdown"
 msgstr "Markdown"
@@ -11672,6 +11687,9 @@ msgstr "Üyeler"
 msgid "Members cannot modify roles"
 msgstr "Üyeler rolleri değiştiremez"
 
+msgid "Membership"
+msgstr "Üyelik"
+
 msgid "Memory"
 msgstr "Bellek"
 
@@ -11716,12 +11734,19 @@ msgstr "Birleştirme durumu"
 msgid "Merge status unknown"
 msgstr "Birleştirme durumu bilinmiyor"
 
+msgid "merged"
+msgstr "birleştirildi"
+
 msgid "Merged"
 msgstr "Birleştirildi"
 
 msgctxt "pull request state"
 msgid "Merged"
 msgstr "Birleştirildi"
+
+#. placeholder {0}: pr.prNumber
+msgid "Merged #{0}"
+msgstr "#{0} birleştirildi"
 
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
@@ -11748,9 +11773,8 @@ msgstr "{name} adlı kişiye mesaj gönder"
 msgid "Message {name}…"
 msgstr "Mesaj gönder: {name}…"
 
-#. placeholder {0}: channel.name
-msgid "Message #{0}"
-msgstr "#{0} kanalına mesaj"
+msgid "Message #{channelName}"
+msgstr "#{channelName} kanalına mesaj"
 
 msgid "Message in channel"
 msgstr "Kanalda mesaj"
@@ -12113,9 +12137,16 @@ msgstr "güncelleme gerekli"
 msgid "Needs update"
 msgstr "Güncelleme gerekli"
 
+msgid "Needs you"
+msgstr "Size ihtiyaç duyuyor"
+
 msgctxt "agent status"
 msgid "Needs you"
 msgstr "Seni bekliyor"
+
+#. placeholder {0}: names(waiting, agentsCount)
+msgid "Needs you for {0}."
+msgstr "{0} için size ihtiyaç duyuyor."
 
 msgid "Nerd Fonts"
 msgstr "Nerd Fonts"
@@ -12202,9 +12233,6 @@ msgstr "Yeni grup…"
 
 msgid "New issue"
 msgstr "Yeni issue"
-
-msgid "New messages"
-msgstr "Yeni mesajlar"
 
 msgid "New page"
 msgstr "Yeni sayfa"
@@ -12339,9 +12367,6 @@ msgstr "Güzel yaklaşım"
 msgid "Nice, open a PR when ready."
 msgstr "Güzel, hazır olduğunda bir PR aç."
 
-msgid "Nicely done"
-msgstr "Harika iş"
-
 msgid "Nightly audit"
 msgstr "Gece denetimi"
 
@@ -12398,6 +12423,10 @@ msgstr "Henüz ajan yok"
 msgid "No agents yet."
 msgstr "Henüz ajan yok."
 
+#. placeholder {0}: channel.name
+msgid "No agents yet. Tag a workspace with #{0} and it shows up here, with what it needs from you."
+msgstr "Henüz ajan yok. Bir workspace'i #{0} ile etiketleyin, senden ne beklediğiyle birlikte burada görünsün."
+
 msgid "No API keys yet."
 msgstr "Henüz API anahtarı yok."
 
@@ -12416,14 +12445,29 @@ msgstr "Ek yok"
 msgid "No authors found."
 msgstr "Yazar bulunamadı."
 
+msgid "No automations answer in this channel yet. Ask the Dev to set one up here."
+msgstr "Bu kanalda henüz yanıt veren otomasyon yok. Dev'den burada bir tane kurmasını isteyin."
+
 msgid "No automations match"
 msgstr "Eşleşen otomasyon yok"
+
+msgid "No automations yet. Ask the Dev to set one up."
+msgstr "Henüz otomasyon yok. Dev'den bir tane ayarlamasını iste."
+
+msgid "No automations. Add a Dev to this channel and ask it to set one up here."
+msgstr "Otomasyon yok. Bu kanala bir Dev ekle ve burada bir tane ayarlamasını iste."
+
+msgid "No badges or sounds from this channel"
+msgstr "Bu kanaldan rozet veya ses yok"
 
 msgid "No branches found"
 msgstr "Dal bulunamadı"
 
 msgid "No changed files."
 msgstr "Değişen dosya yok."
+
+msgid "no changes"
+msgstr "değişiklik yok"
 
 msgid "No changes"
 msgstr "Değişiklik yok"
@@ -12439,6 +12483,12 @@ msgstr "Kanal yok"
 
 msgid "No channels"
 msgstr "Kanal yok"
+
+msgid "No channels yet"
+msgstr "Henüz kanal yok"
+
+msgid "No chat session in this workspace yet. Open the workspace to start one."
+msgstr "Bu workspace'te henüz sohbet oturumu yok. Başlatmak için workspace'i aç."
 
 msgid "No chats found"
 msgstr "Sohbet bulunamadı"
@@ -12520,6 +12570,9 @@ msgstr "Çalışan cihaz yok."
 
 msgid "No devices yet"
 msgstr "Henüz cihaz yok"
+
+msgid "No Devs yet"
+msgstr "Henüz Dev yok"
 
 msgid "No downloads yet"
 msgstr "Henüz indirme yok"
@@ -12837,6 +12890,9 @@ msgstr "Henüz herkese açık ajan yapılandırması yok. Bu bölüm gelecekteki
 msgid "No pull requests found."
 msgstr "Pull request bulunamadı."
 
+msgid "No pull requests yet. When an agent opens one, it shows here with its checks and review."
+msgstr "Henüz pull request yok. Bir ajan açtığında burada kontrolleri ve incelemesiyle görünür."
+
 msgid "No release notes at {url}"
 msgstr "{url} adresinde sürüm notu yok"
 
@@ -12948,12 +13004,6 @@ msgstr "Tema bulunamadı."
 msgid "No themes were imported"
 msgstr "Hiçbir tema içe aktarılmadı"
 
-msgid "No threads or tasks match"
-msgstr "Eşleşen konu veya görev yok"
-
-msgid "No threads or tasks yet"
-msgstr "Henüz konu veya görev yok"
-
 msgid "No threads yet"
 msgstr "Henüz ileti dizisi yok"
 
@@ -12989,6 +13039,9 @@ msgstr "Henüz sürüm yok"
 
 msgid "No versions yet."
 msgstr "Henüz sürüm yok."
+
+msgid "No workspace on this machine"
+msgstr "Bu makinede workspace yok"
 
 msgid "No workspace run command configured"
 msgstr "Yapılandırılmış çalışma alanı çalıştırma komutu yok"
@@ -13040,6 +13093,9 @@ msgstr "Bu turun dosyalarının hiçbirinde burada değişiklik yok"
 
 msgid "None selected"
 msgstr "Hiçbiri seçilmedi"
+
+msgid "None yet"
+msgstr "Henüz yok"
 
 msgid "None. This is the floor."
 msgstr "Yok. Bu, taban düzeydir."
@@ -13134,6 +13190,12 @@ msgstr "Oturum açılmadı"
 msgid "not sorted"
 msgstr "sıralanmamış"
 
+msgid "Not started yet."
+msgstr "Henüz başlatılmadı."
+
+msgid "Not started. The channel asks where to run it and what to do."
+msgstr "Başlatılmadı. Kanal nerede çalışacağını ve ne yapacağını sorar."
+
 msgid "Not synced yet"
 msgstr "Henüz eşitlenmedi"
 
@@ -13162,6 +13224,9 @@ msgstr "Burada bir şey yok."
 msgid "Nothing is running. Archive it and create a new one."
 msgstr "Hiçbir şey çalışmıyor. Bunu arşivleyip yeni bir tane oluşturun."
 
+msgid "Nothing left in this channel."
+msgstr "Bu kanalda kalan bir şey yok."
+
 msgid "Nothing lives at {pathname}."
 msgstr "{pathname} yolunda bir şey yok."
 
@@ -13180,6 +13245,9 @@ msgstr "Hiçbir şey kaçırılmadı"
 msgid "Nothing yet"
 msgstr "Henüz bir şey yok"
 
+msgid "Nothing yet. Agents, Devs and people show up here as the channel moves."
+msgstr "Henüz bir şey yok. Kanal hareketlendikçe ajanlar, Dev'ler ve kişiler burada görünür."
+
 msgid "Notice"
 msgstr "Bildirim"
 
@@ -13194,6 +13262,9 @@ msgstr "Bildirim sesleri"
 
 msgid "Notifications"
 msgstr "Bildirimler"
+
+msgid "Notifications and settings"
+msgstr "Bildirimler ve ayarlar"
 
 msgid "Notify every online member in this channel"
 msgstr "Bu kanaldaki tüm çevrimiçi üyeleri bilgilendir"
@@ -13237,9 +13308,6 @@ msgstr "OAuth 2.0"
 
 msgid "OAuth by default, API keys for CI"
 msgstr "Varsayılan OAuth, CI için API anahtarları"
-
-msgid "Objects"
-msgstr "Nesneler"
 
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
@@ -13285,6 +13353,10 @@ msgstr "Daha eski"
 
 msgid "On"
 msgstr "Açık"
+
+#. placeholder {0}: workspace.branch
+msgid "On {0}"
+msgstr "{0} üzerinde"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName} üzerinde — burada çalışmaz"
@@ -13774,9 +13846,6 @@ msgstr "T3 Chat'te aç"
 msgid "Open in tab"
 msgstr "Sekmede aç"
 
-msgid "Open in Tasks"
-msgstr "Görevlerde aç"
-
 msgid "Open in…"
 msgstr "Şununla aç…"
 
@@ -13790,11 +13859,11 @@ msgstr "Issue'yu GitHub'da aç"
 msgid "Open issue in Linear"
 msgstr "Issue'yu Linear'da aç"
 
+msgid "Open it in its workspace"
+msgstr "Workspace'inde aç"
+
 msgid "Open leaderboard"
 msgstr "Liderlik tablosunu aç"
-
-msgid "Open link"
-msgstr "Bağlantıyı aç"
 
 msgid "Open Link as New Split"
 msgstr "Bağlantıyı yeni bölmede aç"
@@ -13853,6 +13922,7 @@ msgid "Open Pull Request"
 msgstr "Pull request aç"
 
 #. placeholder {0}: pr.number
+#. placeholder {0}: pr.prNumber
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
 msgstr "#{0} pull request'ini aç"
@@ -13985,6 +14055,9 @@ msgstr "Klasörleri açma"
 
 msgid "Opening pages"
 msgstr "Sayfaları açma"
+
+msgid "Opening the coordinator…"
+msgstr "Koordinatör açılıyor…"
 
 msgid "Opens beside this pane. This one keeps running."
 msgstr "Bu bölmenin yanında açılır. Bu bölme çalışmaya devam eder."
@@ -14564,6 +14637,9 @@ msgstr "Bekleyen davetler"
 msgid "People"
 msgstr "Kişiler"
 
+msgid "People in this channel"
+msgstr "Bu kanaldaki kişiler"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "{organizationName} dışındaki kişiler erişimini kaybeder ve herkese açık bağlantı çalışmayı durdurur."
 
@@ -14855,10 +14931,26 @@ msgstr "Yanıt gönder"
 msgid "PR"
 msgstr "PR"
 
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0}"
+msgstr "PR #{0}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
 msgstr "PR #{0} — {1}"
+
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0} · checks failed"
+msgstr "PR #{0} · kontroller başarısız"
+
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0} · checks passed"
+msgstr "PR #{0} · kontroller geçti"
+
+#. placeholder {0}: pr.prNumber
+msgid "PR #{0} · checks running"
+msgstr "PR #{0} · kontroller çalışıyor"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -15087,6 +15179,9 @@ msgstr "Verimlilik"
 
 msgid "Products"
 msgstr "Ürünler"
+
+msgid "Profile"
+msgstr "Profil"
 
 msgid "Profile name"
 msgstr "Profil adı"
@@ -15409,6 +15504,9 @@ msgstr "Geçerli projede hızlıca çalışma alanı oluştur"
 msgid "Quiet"
 msgstr "Sessiz"
 
+msgid "Quiet today"
+msgstr "Bugün sakin"
+
 msgid "Quit"
 msgstr "Çık"
 
@@ -15446,6 +15544,9 @@ msgstr "Radix Tooltip belgeleri"
 msgid "RAM Share"
 msgstr "RAM payı"
 
+msgid "Ran an automation in #{channel}"
+msgstr "#{channel} içinde bir otomasyon çalıştırdı"
+
 msgid "Random icon"
 msgstr "Rastgele simge"
 
@@ -15467,6 +15568,12 @@ msgstr "Hız sınırı aşıldı."
 msgid "Rate limits"
 msgstr "Kullanım sınırları"
 
+msgid "Re-brief"
+msgstr "Yeniden brifing"
+
+msgid "Re-brief: read the goal and rules again, then tell me in two lines where the channel stands."
+msgstr "Yeniden brifing: hedefi ve kuralları tekrar oku, sonra kanalın durumunu iki satırda anlat."
+
 msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Paradev rölesi üzerinden bu Mac'e her yerden erişin veya bulut çalışma alanları başlatın. Herhangi bir istemciden bağlanın."
 
@@ -15478,9 +15585,6 @@ msgstr "Paylaşılan bölme/çalışma alanı düzen motorunun React katmanı"
 
 msgid "React Native"
 msgstr "React Native"
-
-msgid "React with {name}"
-msgstr "{name} ile tepki ver"
 
 msgid "Reaction added"
 msgstr "Tepki eklendi"
@@ -15595,6 +15699,9 @@ msgstr "Yerel kullanımınız okunuyor…"
 msgid "Reads and posts"
 msgstr "Okur ve paylaşır"
 
+msgid "Reads and posts here"
+msgstr "Burada okur ve paylaşır"
+
 msgid "Ready"
 msgstr "Hazır"
 
@@ -15620,6 +15727,9 @@ msgstr "Birleştirmeye hazır"
 msgid "Ready to try Paradev?"
 msgstr "Paradev'i denemeye hazır mısınız?"
 
+msgid "Ready. Tag a workspace with #{channelName} to run it here."
+msgstr "Hazır. Burada çalıştırmak için bir workspace'i #{channelName} ile etiketle."
+
 msgid "Reapply all commits"
 msgstr "Tüm commit'leri yeniden uygular"
 
@@ -15637,6 +15747,9 @@ msgstr "Rebase ve birleştir"
 
 msgid "Recall what was said in meetings"
 msgstr "Toplantılarda söylenenleri hatırlayın"
+
+msgid "Recent"
+msgstr "Son"
 
 msgid "Recent Activity"
 msgstr "Son etkinlik"
@@ -15764,18 +15877,6 @@ msgstr "Paradev'in durum gösterebilmesi ve bildirim gönderebilmesi için bu aj
 msgid "Reinstall {name}"
 msgstr "{name} öğesini yeniden yükle"
 
-msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
-msgstr "{inviter} tarafından davet edilerek {others} ile birlikte {channel} kanalına yeniden katıldı."
-
-msgid "rejoined {channel} by invitation from {inviter}."
-msgstr "{inviter} tarafından davet edilerek {channel} kanalına yeniden katıldı."
-
-msgid "rejoined {channel}, along with {others}."
-msgstr "{others} ile birlikte {channel} kanalına yeniden katıldı."
-
-msgid "rejoined {channel}."
-msgstr "{channel} kanalına yeniden katıldı."
-
 msgid "Related Posts"
 msgstr "İlgili yazılar"
 
@@ -15897,6 +15998,9 @@ msgstr "Kenar çubuğundan kaldır"
 
 msgid "Remove from Sidebar"
 msgstr "Kenar çubuğundan kaldır"
+
+msgid "Remove from this channel"
+msgstr "Bu kanaldan kaldır"
 
 msgid "Remove icon"
 msgstr "Simgeyi kaldır"
@@ -16096,8 +16200,9 @@ msgstr "Doğrudan mesajınızı yanıtladı"
 msgid "Reply"
 msgstr "Yanıtla"
 
-msgid "Reply in thread"
-msgstr "Konu içinde yanıtla"
+#. placeholder {0}: workspace.name
+msgid "Reply to {0}…"
+msgstr "{0} için yanıtla…"
 
 msgid "Reply to thread…"
 msgstr "Konuya yanıt verin…"
@@ -16670,9 +16775,6 @@ msgstr "Rutin seçenekleri"
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Görev ortasında müdahale olmadan rutin biletler"
 
-msgid "Routines"
-msgstr "Rutinler"
-
 msgid "Routines, ending with Cloud"
 msgstr "Routines, Bulut ile birlikte sona eriyor"
 
@@ -16861,6 +16963,9 @@ msgstr "Yeni bir çalışma alanı oluşturulduğunda çalışır."
 msgid "Runs when a workspace is deleted."
 msgstr "Bir çalışma alanı silindiğinde çalışır."
 
+msgid "said"
+msgstr "dedi"
+
 msgid "Same session"
 msgstr "Aynı oturum"
 
@@ -16875,6 +16980,9 @@ msgstr "SAML SSO ve SCIM sağlama"
 
 msgid "San Francisco"
 msgstr "San Francisco"
+
+msgid "Sandbox failed"
+msgstr "Sandbox başarısız oldu"
 
 msgid "Sandbox stopped responding"
 msgstr "Sandbox yanıt vermiyor"
@@ -17041,9 +17149,6 @@ msgstr "Geliştirici ara"
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Dosya içeriklerinde ve tüm çalışma alanlarınızda aynı anda arama yapın."
 
-msgid "Search all emoji"
-msgstr "Tüm emojilerde ara"
-
 msgid "Search and open files in the current workspace"
 msgstr "Geçerli çalışma alanında dosya ara ve aç"
 
@@ -17161,9 +17266,6 @@ msgstr "Pull request ara…"
 msgid "Search repositories..."
 msgstr "Depolarda ara..."
 
-msgid "Search results"
-msgstr "Arama sonuçları"
-
 msgid "Search settings..."
 msgstr "Ayarlarda ara..."
 
@@ -17193,9 +17295,6 @@ msgstr "Sıralamada bir rakip ara"
 
 msgid "Search the web"
 msgstr "Web'de arayın"
-
-msgid "Search threads and tasks"
-msgstr "Konu ve görev ara"
 
 msgid "Search triggers..."
 msgstr "Tetikleyici ara..."
@@ -17487,6 +17586,9 @@ msgstr "Davet gönder"
 
 msgid "Send invoices in a minute"
 msgstr "Faturaları bir dakikada gönderin"
+
+msgid "Send it the goal and the rules again"
+msgstr "Hedefi ve kuralları ona yeniden gönderir"
 
 msgid "Send keystrokes, manage windows, and control other applications."
 msgstr "Tuş vuruşları gönderin, pencereleri yönetin ve diğer uygulamaları denetleyin."
@@ -18197,9 +18299,6 @@ msgstr "Ajanlarınız için beceriler ve MCP araçları. Kendi eklentinizi gönd
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Beceriler Paradev eklentisiyle gelir ve kullandığınız her ajanda otomatik olarak güncel tutulur. Önizlemek için birine tıklayın."
 
-msgid "Skin Tone"
-msgstr "Ten Rengi"
-
 msgid "Skip"
 msgstr "Atla"
 
@@ -18252,9 +18351,6 @@ msgstr "Küçük, Orta veya Büyük, 8 vCPU ve 16 GB'a kadar. Kullanım belleğe
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "Birikmiş işlerinizi eritin."
-
-msgid "Smileys & People"
-msgstr "Suratlar ve İnsanlar"
 
 msgid "Smoother onboarding"
 msgstr "Daha akıcı ilk kurulum"
@@ -18320,10 +18416,6 @@ msgstr "v1 çalışmalarınızın bir kısmı ilgi bekliyor"
 msgid "someone"
 msgstr "birisi"
 
-msgid "Someone"
-msgstr "Biri"
-
-msgctxt "reaction tooltip"
 msgid "Someone"
 msgstr "Biri"
 
@@ -18559,6 +18651,9 @@ msgstr "Gün başına kazanılan yıldız"
 msgid "Stars gained per week"
 msgstr "Hafta başına kazanılan yıldız"
 
+msgid "Start"
+msgstr "Başlat"
+
 msgctxt "project date"
 msgid "Start"
 msgstr "Başlangıç"
@@ -18619,6 +18714,15 @@ msgstr "Sekme şeridindeki + ile bir tane başlatın."
 
 msgid "Start or stop the workspace run command"
 msgstr "Çalışma alanı çalıştırma komutunu başlat veya durdur"
+
+msgid "Start over"
+msgstr "Baştan başla"
+
+msgid "Start the coordinator"
+msgstr "Koordinatörü başlat"
+
+msgid "Start the coordinator over?"
+msgstr "Koordinatörü yeniden başlatılsın mı?"
 
 msgid "Start voice mode"
 msgstr "Sesli modu başlat"
@@ -19032,9 +19136,6 @@ msgstr "{0} tarihinde {nextPlanName} planına geçer."
 msgid "Symbol, light"
 msgstr "Sembol, açık"
 
-msgid "Symbols"
-msgstr "Semboller"
-
 msgid "Sync"
 msgstr "Eşitle"
 
@@ -19107,6 +19208,9 @@ msgstr "şu sütunlarla tablo"
 msgid "Tabs"
 msgstr "Sekmeler"
 
+msgid "Tag a workspace with #{tag}"
+msgstr "Bir workspace'i #{tag} ile etiketle"
+
 msgid "Tailwind v4 theme reference"
 msgstr "Tailwind v4 tema referansı"
 
@@ -19128,17 +19232,20 @@ msgstr "Alınmış"
 msgid "Takes effect in new agent sessions."
 msgstr "Yeni ajan oturumlarında geçerli olur."
 
-msgid "Taking a look…"
-msgstr "Bakıyorum…"
+msgid "Takes effect on the next session"
+msgstr "Sonraki oturumda geçerli olur"
+
+msgid "Takes effect when it starts"
+msgstr "Başladığında geçerli olur"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Normalden uzun sürüyor. Ayrılsanız da devam eder."
 
-msgid "Talk to it"
-msgstr "Onunla konuş"
-
 msgid "Talk to Paradev"
 msgstr "Paradev ile konuşun"
+
+msgid "Talks in"
+msgstr "Konuştuğu yerler"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Yorum yapmak için sayfadaki herhangi bir yere dokun"
@@ -19502,6 +19609,13 @@ msgstr "Bağlantı zaman aşımına uğradı"
 msgid "The connection was closed"
 msgstr "Bağlantı kapatıldı"
 
+#. placeholder {0}: channel.name
+msgid "The coordinator is a chat session of your own. It splits the work of this channel into agents, one workspace each, and reports back here. Pick where it runs and tell it what #{0} should get done."
+msgstr "Koordinatör senin kendi sohbet oturumundur. Bu kanalın işini ajanlara böler, her biri bir workspace'te, ve buraya rapor verir. Nerede çalışacağını seç ve #{0} için ne yapılması gerektiğini söyle."
+
+msgid "The coordinator's workspace is gone."
+msgstr "Koordinatörün workspace'i artık yok."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Geçerli istem, seçilen sürümle değiştirilecek. Bunu geri alabilmeniz için geçmişe yeni bir \"Geri yüklendi\" kaydı eklenecek."
 
@@ -19803,9 +19917,6 @@ msgstr "Tur başarısız oldu"
 msgid "The update can also:"
 msgstr "Güncelleme ayrıca şunları yapabilir:"
 
-msgid "The very beginning"
-msgstr "En başı"
-
 msgid "The workspace is not ready yet. Try again."
 msgstr "Çalışma alanı henüz hazır değil. Yeniden deneyin."
 
@@ -19951,6 +20062,9 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
 
+msgid "This conversation"
+msgstr "Bu konuşma"
+
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
 
@@ -20020,9 +20134,6 @@ msgstr "Bu normalden uzun sürüyor. Oturum zaten hazır olabilir — yeniden y�
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "Bu normalden uzun sürüyor. Çalışma alanı zaten hazır olabilir — yeniden yüklemek onu getirebilir."
 
-msgid "This is the very beginning of the {name} channel."
-msgstr "Bu, {name} kanalının en başı."
-
 msgid "This issue link is invalid."
 msgstr "Bu issue bağlantısı geçersiz."
 
@@ -20046,9 +20157,6 @@ msgstr "Bu makine boyutu kuruluşunuz için kullanılamıyor. Başka bir boyut s
 
 msgid "This message is too long"
 msgstr "Bu mesaj çok uzun"
-
-msgid "This message was deleted"
-msgstr "Bu mesaj silindi"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Bu Microsoft kiracısı {detail} tarafından zaten bağlanmış. Önce bağlantıyı kesmesini isteyin."
@@ -20170,6 +20278,9 @@ msgstr "Bu zamanlama geçerli değil."
 msgid "This screen doesn't exist"
 msgstr "Bu ekran mevcut değil"
 
+msgid "This session stays in its workspace. The next one starts with the agent and instructions above."
+msgstr "Bu oturum çalışma alanında kalır. Sonraki, yukarıdaki ajan ve talimatlarla başlar."
+
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "Bu Slack çalışma alanı {owner} tarafından zaten bağlanmış. Önce bağlantıyı kesmesini isteyin."
 
@@ -20275,6 +20386,9 @@ msgstr "Bu çalışma alanı"
 
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
+
+msgid "This workspace is gone."
+msgstr "Bu workspace artık yok."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."
@@ -20564,9 +20678,6 @@ msgstr "Yazıya dökülüyor…"
 msgid "Translated"
 msgstr "Çevrildi"
 
-msgid "Travel & Places"
-msgstr "Seyahat ve Yerler"
-
 msgid "Tree view"
 msgstr "Ağaç görünümü"
 
@@ -20659,6 +20770,9 @@ msgstr "{label} için manuel mod kapatılsın mı?"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "“Bu cihaza röle üzerinden uzaktan erişime izin ver” seçeneğini açın"
+
+msgid "Turn on Chat in Settings → Experimental first; the coordinator is a chat session."
+msgstr "Önce Ayarlar → Deneysel'den Sohbet'i aç; koordinatör bir sohbet oturumudur."
 
 msgid "Turn on Design and click the part of the page you want to change."
 msgstr "Tasarım'ı açın ve sayfada değiştirmek istediğiniz bölüme tıklayın."
@@ -20810,9 +20924,6 @@ msgstr "Bu karttaki dosya değişiklikleri geri alınsın mı?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Son arşivlenen çalışma alanını veya kapatılan sohbetleri geri al"
-
-msgid "Unfollow thread"
-msgstr "İleti dizisini takip etmeyi bırak"
 
 msgid "Ungroup"
 msgstr "Gruptan çıkar"
@@ -21363,9 +21474,6 @@ msgstr "Tümünü görüntüle"
 msgid "View all (+{moreCount} more)"
 msgstr "Tümünü göster (+{moreCount} tane daha)"
 
-msgid "View all members of this channel"
-msgstr "Bu kanalın tüm üyelerini gör"
-
 #. placeholder {0}: comment.authorLogin
 msgid "View comment by {0}"
 msgstr "{0} kişisinin yorumunu görüntüle"
@@ -21495,23 +21603,15 @@ msgstr "Uyarı"
 msgid "Warning occurred."
 msgstr "Bir uyarı oluştu."
 
-msgid "was added to {channel} by {inviter}, along with {others}."
-msgstr "{inviter} tarafından {others} ile birlikte {channel} kanalına eklendi."
-
-msgid "was added to {channel} by {inviter}."
-msgstr "{inviter} tarafından {channel} kanalına eklendi."
-
-msgid "was added to this conversation by {inviter}."
-msgstr "{inviter} tarafından bu sohbete eklendi."
-
-msgid "was removed from this conversation by {inviter}."
-msgstr "{inviter} tarafından bu sohbetten çıkarıldı."
-
 msgid "Watch a design review go from comment to new version."
 msgstr "Bir tasarım incelemesinin yorumdan yeni sürüme nasıl geçtiğini izleyin."
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "YouTube'da Paradev Otomasyonlar videosunu izleyin"
+
+#. placeholder {0}: names(working, agentsCount)
+msgid "Watching {0}."
+msgstr "{0} izleniyor."
 
 msgid "Wayfinding and disclosure"
 msgstr "Yönlendirme ve açma-kapama"
@@ -21715,6 +21815,9 @@ msgstr "Yayınlananlar"
 msgid "What should run automatically?"
 msgstr "Ne otomatik çalışmalı?"
 
+msgid "What should the coordinator do first?"
+msgstr "Koordinatör önce ne yapmalı?"
+
 msgid "What should the page show?"
 msgstr "Sayfa ne göstermeli?"
 
@@ -21726,6 +21829,9 @@ msgstr "Ekipler neleri otomatikleştiriyor"
 
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Yazıldıkları öğe artık sayfada olmadığı için işaretleri yok."
+
+msgid "What this channel is for, in a sentence"
+msgstr "Bu kanal ne için, tek cümleyle"
 
 msgid "What we believe"
 msgstr "Neye inanıyoruz"
@@ -21869,6 +21975,9 @@ msgstr "Bir görüşmenin aksiyon maddelerini yürütün"
 msgid "Work with your agents across your favorite tools"
 msgstr "Ajanlarınızla en sevdiğiniz araçlar üzerinden çalışın"
 
+msgid "Worked"
+msgstr "Çalıştı"
+
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
 msgid "Worked for {0}m {1}s"
@@ -21876,6 +21985,9 @@ msgstr "{0} dk {1} sn çalıştı"
 
 msgid "Worked for {seconds}s"
 msgstr "{seconds} sn çalıştı"
+
+msgid "Worked on a task in #{channel}"
+msgstr "#{channel} içinde bir görev üzerinde çalıştı"
 
 msgid "Workflow run completed…"
 msgstr "Workflow çalıştırması tamamlandı…"
@@ -22154,10 +22266,6 @@ msgstr "siz"
 msgid "You"
 msgstr "Siz"
 
-msgctxt "reaction tooltip"
-msgid "You"
-msgstr "Sen"
-
 msgid "YOU"
 msgstr "SİZ"
 
@@ -22232,9 +22340,6 @@ msgstr "Bu işlemi geri alamazsınız. Terminal bölmelerinde \"Process exited\"
 msgid "You control the access"
 msgstr "Erişimi siz kontrol edersiniz"
 
-msgid "You created this channel on {created}."
-msgstr "Bu kanalı {created} tarihinde oluşturdunuz."
-
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} yetkilendirme isteğini reddettiniz."
 
@@ -22261,6 +22366,9 @@ msgstr "Hesap bağlamak için bir organizasyona üye olmanız gerekir."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerekir."
+
+msgid "You: {line}"
+msgstr "Sen: {line}"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
@@ -22299,9 +22407,6 @@ msgstr "Giriş yaptınız"
 
 msgid "You're up to date!"
 msgstr "Her şey güncel!"
-
-msgid "You're viewing #{channelName}"
-msgstr "#{channelName} kanalını görüntülüyorsunuz"
 
 msgid "You've been invited to join {organization}"
 msgstr "{organization} kuruluşuna katılmaya davet edildiniz"
@@ -22344,6 +22449,10 @@ msgstr "Bulut çalışma alanlarınız artık bu host'a erişemeyecek."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
+
+#. placeholder {0}: dev.name
+msgid "Your conversation with {0}, since {created}."
+msgstr "{0} ile sohbetin, {created} tarihinden beri."
 
 msgid "Your download starts automatically."
 msgstr "İndirmen otomatik olarak başlar."

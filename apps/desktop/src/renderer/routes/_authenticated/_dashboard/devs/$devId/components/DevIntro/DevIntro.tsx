@@ -5,9 +5,25 @@ import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/
 
 type Dev = RouterOutputs["agent"]["get"];
 
+interface DevIntroProps {
+	dev: Dev;
+	/** The pane beside the conversation already shows the face and name large; say it once, small. */
+	compact?: boolean;
+}
+
 /** The top of a Dev's DM, where a channel shows its own intro. */
-export function DevIntro({ dev }: { dev: Dev }) {
+export function DevIntro({ dev, compact = false }: DevIntroProps) {
 	const created = formatDate(new Date(dev.createdAt));
+	if (compact) {
+		return (
+			<p className="flex items-center gap-2 px-4 pt-8 pb-4 text-[13px] text-muted-foreground">
+				<DevAvatar avatar={dev.avatar} size={20} />
+				<Trans>
+					Your conversation with {dev.name}, since {created}.
+				</Trans>
+			</p>
+		);
+	}
 	return (
 		<div className="flex flex-col gap-2 px-4 pt-10 pb-4">
 			<div className="flex items-center gap-3">

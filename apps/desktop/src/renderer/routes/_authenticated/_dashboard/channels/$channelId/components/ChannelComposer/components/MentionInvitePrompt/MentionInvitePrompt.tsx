@@ -3,7 +3,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import type { ChannelPerson } from "../../../ChannelMessageRow";
+import type { ChannelPerson } from "../../../MessageBody";
 
 interface MentionInvitePromptProps {
 	channelId: string;

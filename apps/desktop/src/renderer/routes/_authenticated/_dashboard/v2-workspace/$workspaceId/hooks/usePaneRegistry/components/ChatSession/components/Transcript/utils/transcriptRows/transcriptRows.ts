@@ -15,7 +15,13 @@ import type {
 	TurnError,
 	UserMessage,
 } from "@superset/chat/protocol";
+import type { TranscriptCardRef } from "../../../../providers/TranscriptCardsProvider";
 import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
+import {
+	type CardFinder,
+	type MessageCardFinder,
+	turnCards,
+} from "../turnCards";
 import {
 	changesFiles,
 	type TurnFileChange,
@@ -33,6 +39,11 @@ export type TranscriptRow =
 			running: boolean;
 			/** The turn is held on a question or approval only the user can answer. */
 			waiting: boolean;
+			/** The turn's work is folded under this row until it is opened. */
+			foldable?: boolean;
+			/** This turn only continued the one before (the harness woke it), so its clock folds with that turn's work. */
+			folded?: boolean;
+			foldKey?: string;
 	  }
 	| {
 			kind: "item";
@@ -41,10 +52,16 @@ export type TranscriptRow =
 			item: Item;
 			/** Pages to show as cards under a tool call. */
 			pages?: readonly PageLink[];
+			/** Things the tool call made, shown as cards under it. */
+			cards?: readonly TranscriptCardRef[];
 			/** Slugs an agent message leaves to the earlier message that shows them. */
 			pagesShownEarlier?: string;
 			/** An approval whose target tool call is the row right above it. */
 			afterTarget?: boolean;
+			/** Part of a settled turn's work; shown only when the turn is opened. */
+			folded?: boolean;
+			/** The clock row this row folds under. */
+			foldKey?: string;
 	  }
 	| { kind: "outbox"; key: string; groupStart: boolean; entry: OutboxEntry }
 	| {
@@ -58,6 +75,14 @@ export type TranscriptRow =
 			active?: boolean;
 			/** Pages to show as cards under the run, so a collapsed run still shows them. */
 			pages?: readonly PageLink[];
+			/** Things the run made, shown as cards under it. */
+			cards?: readonly TranscriptCardRef[];
+			/** How many of the run's calls earned a card; all of them means the run can hide behind its cards. */
+			cardToolCount?: number;
+			/** Part of a settled turn's work; shown only when the turn is opened. */
+			folded?: boolean;
+			/** The clock row this row folds under. */
+			foldKey?: string;
 	  }
 	| {
 			kind: "turn_status";
@@ -122,6 +147,36 @@ function withNoticeDetail(
 
 const MAX_ANCHOR_IDS = 100;
 
+/**
+ * A replayed turn can carry no span of its own; its items still say when
+ * the work started and ended.
+ */
+function turnSpan(
+	turn: Turn,
+	entries: TurnGroup["entries"],
+): { startedAtMs: number; completedAtMs: number | undefined } {
+	if (
+		turn.completedAtMs === undefined ||
+		turn.completedAtMs > turn.startedAtMs
+	) {
+		return { startedAtMs: turn.startedAtMs, completedAtMs: turn.completedAtMs };
+	}
+	let first = Number.POSITIVE_INFINITY;
+	let last = 0;
+	for (const entry of entries) {
+		const items = entry.kind === "tool_run" ? entry.items : [entry.item];
+		for (const item of items) {
+			if (item.kind === "user_message") continue;
+			first = Math.min(first, item.startedAtMs);
+			last = Math.max(last, item.completedAtMs ?? item.startedAtMs);
+		}
+	}
+	if (!Number.isFinite(first) || last <= first) {
+		return { startedAtMs: turn.startedAtMs, completedAtMs: turn.completedAtMs };
+	}
+	return { startedAtMs: first, completedAtMs: last };
+}
+
 /** A shell command or a subagent can change files no diff shows; only a snapshot sees them. */
 function editsUnseen(call: ToolCall): boolean {
 	if (call.status === "running" || call.status === "declined") return false;
@@ -135,6 +190,10 @@ export function transcriptRows(
 	findPageLinks: PageLinkFinder,
 	hiddenToolIds: ReadonlySet<string> = new Set(),
 	standaloneTool: (tool: ToolCall) => boolean = () => false,
+	findCards: CardFinder = () => [],
+	findMessageCards: MessageCardFinder = () => [],
+	collapseLoneTools = false,
+	isHarnessNote: HarnessNoteTest = () => false,
 ): TranscriptRow[] {
 	const rows: TranscriptRow[] = [];
 	const echoedClientIds = new Set<string>();
@@ -150,18 +209,20 @@ export function transcriptRows(
 		const placeClock = () => {
 			if (clockPlaced || !turn) return;
 			clockPlaced = true;
+			const span = turnSpan(turn, group.entries);
 			push({
 				kind: "working",
 				key: `working:${group.turnId}`,
 				groupStart,
-				startedAtMs: turn.startedAtMs,
-				completedAtMs: turn.completedAtMs,
+				startedAtMs: span.startedAtMs,
+				completedAtMs: span.completedAtMs,
 				running: turn.status === "running",
 				waiting: turn.status === "running" && group.entries.some(asksTheUser),
 			});
 		};
 		const turnSettled = turn !== null && turn.status !== "running";
 		const links = turnPageLinks(group.entries, turnSettled, findPageLinks);
+		const cards = turnCards(group.entries, findCards);
 		const lastPrompt = group.entries.findLastIndex(
 			(entry) => entry.kind === "item" && entry.item.kind === "user_message",
 		);
@@ -171,6 +232,7 @@ export function transcriptRows(
 		let lastReplyAt = -1;
 		const calls: ToolCall[] = [];
 		const unwrapLoneCall = () => {
+			if (collapseLoneTools) return;
 			const only = run?.steps.length === 1 ? run.items[0] : undefined;
 			if (!run || !only) return;
 			rows[runAt] = {
@@ -179,6 +241,7 @@ export function transcriptRows(
 				groupStart: run.groupStart,
 				item: only,
 				...(run.pages ? { pages: run.pages } : {}),
+				...(run.cards ? { cards: run.cards } : {}),
 			};
 		};
 		const pushItem = (item: Item) => {
@@ -190,6 +253,7 @@ export function transcriptRows(
 					: undefined;
 			if (clientId) echoedClientIds.add(clientId);
 			const pages = links.fromTools.get(item.id);
+			const itemCards = cards.get(item.id);
 			const pagesShownEarlier = links.shownEarlier.get(item.id);
 			const targetId =
 				item.kind === "approval_request"
@@ -206,6 +270,7 @@ export function transcriptRows(
 				groupStart,
 				item,
 				...(pages ? { pages } : {}),
+				...(itemCards ? { cards: itemCards } : {}),
 				...(pagesShownEarlier ? { pagesShownEarlier } : {}),
 				...(afterTarget ? { afterTarget } : {}),
 			});
@@ -218,12 +283,18 @@ export function transcriptRows(
 		) => {
 			if (items.length === 0) return;
 			const pages = items.flatMap((tool) => links.fromTools.get(tool.id) ?? []);
+			const toolCards = items.flatMap((tool) => cards.get(tool.id) ?? []);
+			const cardTools = items.filter((tool) => cards.has(tool.id)).length;
 			const waiting = items.some((tool) => pendingApprovalTargets.has(tool.id));
 			if (run) {
 				run.items.push(...items);
 				run.steps.push(...items);
 				if (waiting) run.defaultCollapsed = false;
 				if (pages.length > 0) run.pages = [...(run.pages ?? []), ...pages];
+				if (toolCards.length > 0)
+					run.cards = [...(run.cards ?? []), ...toolCards];
+				if (cardTools > 0)
+					run.cardToolCount = (run.cardToolCount ?? 0) + cardTools;
 				return;
 			}
 			run = {
@@ -234,6 +305,8 @@ export function transcriptRows(
 				steps: [...items],
 				defaultCollapsed: !waiting,
 				...(pages.length > 0 ? { pages } : {}),
+				...(toolCards.length > 0 ? { cards: toolCards } : {}),
+				...(cardTools > 0 ? { cardToolCount: cardTools } : {}),
 			};
 			runAt = rows.length;
 			push(run);
@@ -311,6 +384,9 @@ export function transcriptRows(
 		}
 	}
 
+	attachAsked(rows, groups, outbox, findMessageCards);
+	if (collapseLoneTools) foldWork(rows, isHarnessNote);
+
 	const newestCard = rows.findLast((row) => row.kind === "changed_files");
 	if (
 		newestCard?.kind === "changed_files" &&
@@ -324,6 +400,105 @@ export function transcriptRows(
 		rows.push({ kind: "outbox", key: entry.clientId, groupStart: true, entry });
 	}
 	return rows;
+}
+
+/**
+ * In a quiet transcript a settled turn shows its clock and its last reply;
+ * the work between them (narration, folded tool runs, notices) waits
+ * behind the clock. A running turn stays open so progress shows.
+ */
+/**
+ * Everything between a settled turn's clock and its last reply folds behind
+ * the clock, as does what trails the reply before the next turn: a notice or
+ * a background result is work, not an answer.
+ */
+/** A user message the harness wrote to itself, such as a background result, rather than the person. */
+export type HarnessNoteTest = (item: UserMessage) => boolean;
+
+function foldWork(rows: TranscriptRow[], isHarnessNote: HarnessNoteTest): void {
+	let clockAt = -1;
+	let replyAt = -1;
+	// A harness note (a background result) wakes the agent for another turn
+	// that is the same piece of work to the person: it folds under one clock.
+	let continued = false;
+	const close = (endAt: number) => {
+		if (clockAt === -1 || replyAt === -1) return;
+		const clock = rows[clockAt];
+		if (clock?.kind !== "working") return;
+		let folded = false;
+		for (let index = clockAt + 1; index < endAt; index += 1) {
+			const row = rows[index];
+			if (
+				row?.kind !== "item" &&
+				row?.kind !== "tool_run" &&
+				row?.kind !== "working"
+			)
+				continue;
+			if (
+				index > replyAt &&
+				row.kind === "item" &&
+				row.item.kind === "agent_message"
+			)
+				continue;
+			if (index === replyAt) continue;
+			row.folded = true;
+			row.foldKey = clock.key;
+			folded = true;
+		}
+		if (folded) clock.foldable = true;
+	};
+	for (const [index, row] of rows.entries()) {
+		if (row.kind === "working") {
+			if (continued && clockAt !== -1 && !row.running) {
+				continued = false;
+				continue;
+			}
+			close(index);
+			clockAt = row.running ? -1 : index;
+			replyAt = -1;
+			continued = false;
+			continue;
+		}
+		if (row.kind === "item" && row.item.kind === "user_message") {
+			if (isHarnessNote(row.item as UserMessage)) {
+				continued = clockAt !== -1;
+				continue;
+			}
+			close(index);
+			clockAt = -1;
+			replyAt = -1;
+			continued = false;
+			continue;
+		}
+		if (row.kind === "item" && row.item.kind === "agent_message") {
+			replyAt = index;
+		}
+	}
+	close(rows.length);
+}
+
+/**
+ * What the newest reply asks goes under it as cards, but only while the
+ * question is open: no turn running, nothing being sent, and no prompt after
+ * the reply.
+ */
+function attachAsked(
+	rows: TranscriptRow[],
+	groups: readonly TurnGroup[],
+	outbox: readonly OutboxEntry[],
+	findMessageCards: MessageCardFinder,
+): void {
+	if (outbox.length > 0 || groups.at(-1)?.turn?.status === "running") return;
+	const replyAt = rows.findLastIndex(
+		(row) => row.kind === "item" && row.item.kind === "agent_message",
+	);
+	const promptAt = rows.findLastIndex(
+		(row) => row.kind === "item" && row.item.kind === "user_message",
+	);
+	const reply = rows[replyAt];
+	if (replyAt < promptAt || reply?.kind !== "item") return;
+	const asked = findMessageCards(reply.item as AgentMessage);
+	if (asked.length > 0) reply.cards = [...(reply.cards ?? []), ...asked];
 }
 
 /** The id a row registers with the scroller, so a jump can land on it. */

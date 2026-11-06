@@ -1,0 +1,1 @@
+export { ReportCard } from "./ReportCard";

@@ -14,6 +14,7 @@ import { cn } from "@superset/ui/utils";
 import { Pencil } from "lucide-react";
 import { useRef, useState } from "react";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
+import { useTranscriptCards } from "../../../../providers/TranscriptCardsProvider";
 import {
 	attachmentDisplayName,
 	parseAttachmentTags,
@@ -72,6 +73,7 @@ export function UserMessageRow({
 	const textRef = useRef<HTMLDivElement>(null);
 	const oneLine = useFitsOneLine(textRef);
 	const { editMessage, editableMessageIds } = useChatPaneActions();
+	const flat = useTranscriptCards().speakers !== undefined;
 	const [editing, setEditing] = useState(false);
 	if (note && !pending) return <BookkeepingRow label={note.label} />;
 
@@ -112,7 +114,10 @@ export function UserMessageRow({
 		imageParts.length === 0;
 	if (editing && editable) {
 		return (
-			<Message className="pt-1.5 pb-5 pl-10" from="user">
+			<Message
+				className={flat ? "pt-0.5 pb-2" : "pt-1.5 pb-5 pl-10"}
+				from={flat ? "assistant" : "user"}
+			>
 				<UserMessageEditor
 					initialText={text}
 					onCancel={() => setEditing(false)}
@@ -126,10 +131,15 @@ export function UserMessageRow({
 	}
 	return (
 		<Message
-			className={cn("group/message pt-1.5 pl-10", copyable ? "pb-0" : "pb-5")}
-			from="user"
+			className={cn(
+				"group/message",
+				flat
+					? "relative gap-1.5 pt-0.5 pb-2"
+					: cn("pt-1.5 pl-10", copyable ? "pb-0" : "pb-5"),
+			)}
+			from={flat ? "assistant" : "user"}
 		>
-			{sender && (
+			{sender && !flat && (
 				<span className="self-end font-sans text-foreground/45 text-xs">
 					{sender}
 				</span>
@@ -137,7 +147,8 @@ export function UserMessageRow({
 			{(images.length > 0 || imageParts.length > 0) && (
 				<div
 					className={cn(
-						"ml-auto flex max-w-[min(100%,36rem)] flex-wrap justify-end gap-2 transition-opacity",
+						"flex max-w-[min(100%,36rem)] flex-wrap gap-2 transition-opacity",
+						!flat && "ml-auto justify-end",
 						pending && !pending.failed && "opacity-60",
 					)}
 				>
@@ -158,7 +169,8 @@ export function UserMessageRow({
 			{files.length > 0 && (
 				<div
 					className={cn(
-						"ml-auto flex max-w-[min(100%,36rem)] flex-wrap justify-end gap-2 transition-opacity",
+						"flex max-w-[min(100%,36rem)] flex-wrap gap-2 transition-opacity",
+						!flat && "ml-auto justify-end",
 						pending && !pending.failed && "opacity-60",
 					)}
 				>
@@ -175,7 +187,8 @@ export function UserMessageRow({
 			{pastedTexts.length > 0 && (
 				<div
 					className={cn(
-						"ml-auto flex w-full flex-col items-end gap-1.5 transition-opacity",
+						"flex w-full flex-col gap-1.5 transition-opacity",
+						flat ? "items-start" : "ml-auto items-end",
 						pending && !pending.failed && "opacity-60",
 					)}
 				>
@@ -188,10 +201,13 @@ export function UserMessageRow({
 			{text && (
 				<MessageContent
 					className={cn(
-						"max-w-[min(100%,36rem)] font-sans transition-opacity group-[.is-user]:bg-foreground/10 group-[.is-user]:px-3 group-[.is-user]:py-2",
-						oneLine
-							? "group-[.is-user]:rounded-full"
-							: "group-[.is-user]:rounded-xl",
+						"font-sans transition-opacity",
+						!flat &&
+							"max-w-[min(100%,36rem)] group-[.is-user]:bg-foreground/10 group-[.is-user]:px-3 group-[.is-user]:py-2",
+						!flat &&
+							(oneLine
+								? "group-[.is-user]:rounded-full"
+								: "group-[.is-user]:rounded-xl"),
 						pending && !pending.failed && "opacity-60",
 					)}
 				>
@@ -205,8 +221,15 @@ export function UserMessageRow({
 				</MessageContent>
 			)}
 			{copyable && (
-				<div className="-mt-1.5 flex items-center justify-end gap-2 text-muted-foreground/60 opacity-0 transition-opacity focus-within:opacity-100 group-hover/message:opacity-100">
-					<MessageTime atMs={item.startedAtMs} />
+				<div
+					className={cn(
+						"flex items-center gap-2 text-muted-foreground/60 opacity-0 transition-opacity focus-within:opacity-100 group-hover/message:opacity-100",
+						flat
+							? "absolute -top-3 right-0 rounded-md border border-border bg-background px-1.5 py-0.5 shadow-sm"
+							: "-mt-1.5 justify-end",
+					)}
+				>
+					{!flat && <MessageTime atMs={item.startedAtMs} />}
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<span>
@@ -240,7 +263,12 @@ export function UserMessageRow({
 				</div>
 			)}
 			{pending?.failed && (
-				<div className="flex items-center gap-2 self-end">
+				<div
+					className={cn(
+						"flex items-center gap-2",
+						flat ? "self-start" : "self-end",
+					)}
+				>
 					<Badge variant="destructive">
 						<Trans>Failed to send</Trans>
 					</Badge>

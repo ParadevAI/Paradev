@@ -1,1 +1,0 @@
-export { ChannelJoinBar } from "./ChannelJoinBar";
