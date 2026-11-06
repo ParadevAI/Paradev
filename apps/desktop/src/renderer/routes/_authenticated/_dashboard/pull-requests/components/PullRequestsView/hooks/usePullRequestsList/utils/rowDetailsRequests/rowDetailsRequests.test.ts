@@ -19,8 +19,12 @@ describe("startRowDetailsRequest", () => {
 		const fromRemountedList = startRowDetailsRequest(queryClient, "page-1");
 		expect(fromUnmountedList.isLatest()).toBe(false);
 		expect(fromRemountedList.isLatest()).toBe(true);
-		expect(startRowDetailsRequest(new QueryClient(), "page-1").isLatest()).toBe(
-			true,
-		);
+	});
+
+	test("one cache's requests never displace another cache's", () => {
+		const first = startRowDetailsRequest(new QueryClient(), "page-1");
+		const second = startRowDetailsRequest(new QueryClient(), "page-1");
+		expect(first.isLatest()).toBe(true);
+		expect(second.isLatest()).toBe(true);
 	});
 });

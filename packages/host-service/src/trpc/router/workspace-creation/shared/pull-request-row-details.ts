@@ -83,7 +83,9 @@ export async function fetchPullRequestRowDetails(
 
 	for (let pageCount = 1; cursors.size > 0; pageCount++) {
 		if (pageCount > MAX_CHECK_PAGES) {
-			throw new Error(`Check rollup ran past ${MAX_CHECK_PAGES} pages`);
+			throw new Error(
+				`Check rollup ran past ${MAX_CHECK_PAGES} pages for PRs ${[...cursors.keys()].join(", ")}`,
+			);
 		}
 		const cursorDefinitions = [...cursors]
 			.flatMap(([number, cursor]) =>

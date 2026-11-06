@@ -96,13 +96,24 @@ export function PullRequestsContent({
 		},
 		[queryClient, organizationId],
 	);
-	// One hover read at a time: sweeping across rows must not queue a GitHub read per row.
-	const hoverPrefetchInFlight = useRef(false);
+	// One hover read at a time, and only the row the pointer settled on last
+	// waits its turn: sweeping across rows must not queue a GitHub read per row.
+	const hoverPrefetch = useRef<{ running: boolean; nextUrl: string | null }>({
+		running: false,
+		nextUrl: null,
+	});
 	const prefetchHovered = (url: string) => {
-		if (hoverPrefetchInFlight.current) return;
-		hoverPrefetchInFlight.current = true;
+		const state = hoverPrefetch.current;
+		if (state.running) {
+			state.nextUrl = url;
+			return;
+		}
+		state.running = true;
 		void prefetchDetail(url).finally(() => {
-			hoverPrefetchInFlight.current = false;
+			state.running = false;
+			const next = state.nextUrl;
+			state.nextUrl = null;
+			if (next) prefetchHovered(next);
 		});
 	};
 
