@@ -4,7 +4,7 @@ import { type DeriveTimelineOptions, deriveTimeline } from "../../core";
 
 export function useTimeline(
 	snapshot: SessionSnapshot,
-	options?: DeriveTimelineOptions,
+	options?: Pick<DeriveTimelineOptions, "nestChildItems">,
 ): TurnGroup[] {
 	const { items, turns } = snapshot;
 	const harness = snapshot.session?.harness;
