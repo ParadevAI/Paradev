@@ -19878,11 +19878,11 @@ msgstr "思考中..."
 msgid "Thirty"
 msgstr "30日"
 
-msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
-msgstr "この {plugin} アカウントはすでに {owner} が接続しています。先に接続を解除してもらってください。"
-
 msgid "This {plugin} account is already connected by another Paradev organization."
 msgstr "この {plugin} アカウントはすでに別の Paradev 組織が接続しています。"
+
+msgid "This {plugin} account is already connected to another Paradev organization by {owner}. Ask them to disconnect it there first."
+msgstr "この {plugin} アカウントはすでに {owner} が別の Paradev 組織に接続しています。そちらで先に接続を解除してもらってください。"
 
 msgid "This action is irreversible."
 msgstr "この操作は元に戻せません。"
