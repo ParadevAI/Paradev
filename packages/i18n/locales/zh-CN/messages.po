@@ -3463,9 +3463,6 @@ msgstr "落后main ?个提交，需要变基"
 msgid "Being built right now."
 msgstr "正在构建中。"
 
-msgid "Beta"
-msgstr "测试版"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "再往后：F5不是近期的主张"
 
@@ -14006,9 +14003,6 @@ msgstr "Option快捷键可能会影响特殊字符的输入"
 
 msgid "Optional"
 msgstr "可选"
-
-msgid "Optional · Beta"
-msgstr "可选 · 测试版"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "可选说明，显示在终端脚本列表中。"

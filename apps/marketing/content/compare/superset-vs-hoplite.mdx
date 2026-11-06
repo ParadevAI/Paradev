@@ -16,7 +16,7 @@ keywords:
   - background coding agents
 ---
 
-Paradev and Hoplite both hand a task to a coding agent in isolation and return a pull request. Hoplite is a cloud agent platform: each task runs as a thread in a managed cloud sandbox, and it ends in a pull request that a person reviews. Paradev is a desktop workspace that runs the agent CLIs you already use, such as Claude Code and Codex. It runs them on your Mac, on hosts you add, on your own Linux server, or in Paradev [cloud workspaces](/cloud) (beta). Choose Hoplite when you want a managed cloud service that your team drives from Slack, Linear, and GitHub. Choose Paradev when you want your own agent CLIs and your own machines, with review in a desktop app.
+Paradev and Hoplite both hand a task to a coding agent in isolation and return a pull request. Hoplite is a cloud agent platform: each task runs as a thread in a managed cloud sandbox, and it ends in a pull request that a person reviews. Paradev is a desktop workspace that runs the agent CLIs you already use, such as Claude Code and Codex. It runs them on your Mac, on hosts you add, on your own Linux server, or in Paradev [cloud workspaces](/cloud). Choose Hoplite when you want a managed cloud service that your team drives from Slack, Linear, and GitHub. Choose Paradev when you want your own agent CLIs and your own machines, with review in a desktop app.
 
 This comparison is published by Paradev. Hoplite details were checked against [hoplite.sh](https://hoplite.sh), its [documentation](https://hoplite.sh/docs), [pricing](https://hoplite.sh/pricing), [billing docs](https://hoplite.sh/docs/workspace/billing), [desktop app docs](https://hoplite.sh/docs/desktop), and [blog](https://hoplite.sh/blog) on November 5, 2026.
 
@@ -25,7 +25,7 @@ This comparison is published by Paradev. Hoplite details were checked against [h
 | Requirement | Paradev | Hoplite |
 |---|---|---|
 | Category | Desktop workspace for the agent CLIs you already use | Cloud coding-agent platform |
-| Where agents run | Your Mac, remote hosts you add (Remote Access), your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | Hoplite-managed cloud sandboxes, one per thread; local Codex or Claude Code threads in its macOS app |
+| Where agents run | Your Mac, remote hosts you add (Remote Access), your own Linux server (Bring Your Own Cloud), or cloud workspaces | Hoplite-managed cloud sandboxes, one per thread; local Codex or Claude Code threads in its macOS app |
 | Agent in the cloud | The same CLI you run locally (Claude Code, Codex, OpenCode, and others) | Hoplite's managed agent, with a model you pick |
 | Isolation | Git worktree and branch per workspace | Separate sandbox workspace per cloud thread |
 | Task intake | Automations (schedules; GitHub, Slack, Linear, and more), Linear and GitHub Issues tasks, Slack bot, CLI, MCP server | Web app, Slack, Linear delegation, `@hoplite` PR comments, iMessage, automations, Platform API, MCP server |
@@ -49,7 +49,7 @@ Hoplite describes itself as "effortless cloud coding agents that feel good to us
 
 Hoplite is cloud-first. Each cloud thread has its own sandbox workspace, and follow-up messages reuse it. The docs name Modal as the default sandbox provider. Repositories that use Docker Compose can get an isolated VM with a private Docker daemon. Closing the browser does not stop the work. Hoplite also has a macOS app (Apple silicon) that can run your installed Codex or Claude Code CLI against a local folder or Git worktree, but its managed preview and terminal panels are for cloud threads only.
 
-Paradev is local-first, with more places to run. Agents run on your Mac by default. With Remote Access you add any macOS or Linux machine as a host. With [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), you run the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server, and it needs no inbound ports. [Cloud workspaces](/cloud) (beta) let Paradev run the sandbox for you, so agents keep working when your laptop is closed.
+Paradev is local-first, with more places to run. Agents run on your Mac by default. With Remote Access you add any macOS or Linux machine as a host. With [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), you run the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server, and it needs no inbound ports. [Cloud workspaces](/cloud) let Paradev run the sandbox for you, so agents keep working when your laptop is closed.
 
 ### Which agent does the work
 
@@ -81,7 +81,7 @@ Hoplite reaches your phone through iMessage and notifications; we found no nativ
 | Paid | Pro: {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly. Team: {{price:team}}. Ultra: {{price:ultra}} | Team: $60/seat/month, or $50 billed yearly, with more included usage, bigger sandboxes, and unlimited projects |
 | Large teams | Enterprise: custom | Enterprise: custom, annual agreement |
 
-Hoplite bills usage on prepaid credits, where one credit is US$1. Model calls draw credits at per-model token rates unless they go to your own subscription or keys. Sandbox time also draws credits, from $0.08 per hour (1 vCPU, 4 GiB) to $1.50 per hour (16 vCPU, 64 GiB), billed only while the agent works. Paradev does not charge for model usage. Team and Ultra add cloud workspaces (beta), and Bring Your Own Cloud needs a paid plan. Check [Paradev pricing](/pricing) and [Hoplite pricing](https://hoplite.sh/pricing) for current terms.
+Hoplite bills usage on prepaid credits, where one credit is US$1. Model calls draw credits at per-model token rates unless they go to your own subscription or keys. Sandbox time also draws credits, from $0.08 per hour (1 vCPU, 4 GiB) to $1.50 per hour (16 vCPU, 64 GiB), billed only while the agent works. Paradev does not charge for model usage. Team and Ultra add cloud workspaces, and Bring Your Own Cloud needs a paid plan. Check [Paradev pricing](/pricing) and [Hoplite pricing](https://hoplite.sh/pricing) for current terms.
 
 ## Which Should You Choose?
 
@@ -108,7 +108,7 @@ We found no public source repository for the Hoplite product. Its GitHub organiz
 
 ### Can I run Claude Code or Codex in Hoplite?
 
-Yes, in two ways. Its macOS app runs your installed Codex or Claude Code CLI in local threads. In cloud threads, Hoplite runs its own managed agent, which can use your Claude or ChatGPT subscription for model calls. Paradev runs the CLI itself in every location, including cloud workspaces (beta).
+Yes, in two ways. Its macOS app runs your installed Codex or Claude Code CLI in local threads. In cloud threads, Hoplite runs its own managed agent, which can use your Claude or ChatGPT subscription for model calls. Paradev runs the CLI itself in every location, including cloud workspaces.
 
 ### Can I keep my code in my own cloud account?
 

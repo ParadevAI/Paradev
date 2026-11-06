@@ -3463,9 +3463,6 @@ msgstr "main dalının ? commit gerisinde, rebase gerekiyor"
 msgid "Being built right now."
 msgstr "Şu anda geliştiriliyor."
 
-msgid "Beta"
-msgstr "Beta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Ötesi: F5 yakın vadeli bir iddia değil"
 
@@ -14006,9 +14003,6 @@ msgstr "Option kısayolları özel karakter yazmayı engelleyebilir"
 
 msgid "Optional"
 msgstr "İsteğe bağlı"
-
-msgid "Optional · Beta"
-msgstr "İsteğe bağlı · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Terminal betikleri listesinde gösterilen isteğe bağlı açıklama."

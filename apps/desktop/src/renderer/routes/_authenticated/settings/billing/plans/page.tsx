@@ -14,7 +14,6 @@ import {
 	seatPricePerMonth,
 } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
-import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
@@ -75,7 +74,6 @@ type ComparisonRow = {
 	values: [free: ComparisonValue, paid: ComparisonValue, enterprise: ComparisonValue];
 	cloudGbHours?: boolean;
 	cloudPack?: boolean;
-	badge?: { label: MessageDescriptor; variant: "default" | "secondary" };
 };
 
 type ComparisonSection = {
@@ -199,7 +197,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 				}),
 				values: [null, null, msg({ message: "Custom" })],
 				cloudGbHours: true,
-				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 			{
 				label: msg({
@@ -207,7 +204,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 				}),
 				values: [null, null, msg({ message: "Custom" })],
 				cloudPack: true,
-				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 		],
 	},
@@ -847,14 +843,6 @@ function PlansPage() {
 													</a>
 												) : (
 													i18n._(row.label)
-												)}
-												{row.badge && (
-													<Badge
-														variant={row.badge.variant}
-														className="px-1.5 py-0 text-[10px] font-medium"
-													>
-														{i18n._(row.badge.label)}
-													</Badge>
 												)}
 											</div>
 											{planCards.map((plan) => (

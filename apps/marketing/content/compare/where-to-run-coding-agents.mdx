@@ -21,7 +21,7 @@ keywords:
 
 A small team that adopts coding agents soon asks where they should run. There are three answers: each developer's laptop, a shared machine the team owns, or a vendor's cloud. Most teams use more than one.
 
-Paradev covers all three. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. A shared host can also be a Linux server in your own cloud account, through [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Paradev [cloud workspaces](/cloud), in beta, run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Other vendors' clouds still work from inside Paradev: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Paradev terminal. Use your own machines for work that needs your environment, a cloud workspace for tasks that need only the repository, and Paradev to keep all three in one place.
+Paradev covers all three. Laptops and shared hosts appear in the same app through Remote Access, and each task gets its own worktree on whichever machine you pick. A shared host can also be a Linux server in your own cloud account, through [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Paradev [cloud workspaces](/cloud) run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Other vendors' clouds still work from inside Paradev: it runs the real `claude` and `codex` CLIs, so `claude --cloud` starts a Claude Code cloud session and `codex cloud exec` submits a Codex cloud task from a Paradev terminal. Use your own machines for work that needs your environment, a cloud workspace for tasks that need only the repository, and Paradev to keep all three in one place.
 
 This guide compares the three on what matters day to day: whether agents keep working when you walk away, whether they can reach your real environment, what it costs, and what it exposes.
 
@@ -38,7 +38,7 @@ This guide compares the three on what matters day to day: whether agents keep wo
 | **Parallel capacity** | Limited by one laptop's CPU and memory | Limited by the host; you can add hosts | Scales with the vendor's machines |
 | **Security exposure** | Each developer's own machine | Everything on the host is reachable by people you grant access | Code and credentials live in the vendor's cloud |
 | **Setup** | None | One machine to provision and keep updated | Per-vendor environment setup |
-| **Tools that support it** | Paradev, Claude Code, Codex, Cursor, Conductor | Paradev (Remote Access host or Bring Your Own Cloud server), VS Code Remote-SSH, SSH with tmux | Paradev cloud workspaces (beta), Codex cloud, Cursor cloud agents, Claude Code on the web, Devin |
+| **Tools that support it** | Paradev, Claude Code, Codex, Cursor, Conductor | Paradev (Remote Access host or Bring Your Own Cloud server), VS Code Remote-SSH, SSH with tmux | Paradev cloud workspaces, Codex cloud, Cursor cloud agents, Claude Code on the web, Devin |
 
 ## Personal Laptops
 
@@ -64,7 +64,7 @@ Tools that support this: [Paradev](/) adds a macOS or Linux machine as a host th
 
 ## Vendor Cloud Workspaces
 
-Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. Paradev has cloud workspaces too, in beta, available from desktop, iPhone, and iPad without keeping your own computer connected. You hand off a task, close your laptop, and review the result later.
+Most agent vendors now run agents on their own machines: Codex cloud tasks, Cursor's Cloud Agents, Devin's per-session VMs, Factory's managed Droid Computers, Amp's orbs, Claude Code's cloud sessions, and Copilot's cloud agent. Paradev has cloud workspaces too, available from desktop, iPhone, and iPad without keeping your own computer connected. You hand off a task, close your laptop, and review the result later.
 
 The tradeoffs:
 

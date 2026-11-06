@@ -3463,9 +3463,6 @@ msgstr "Отстаёт от main на ? коммитов, нужен rebase"
 msgid "Being built right now."
 msgstr "Делается прямо сейчас."
 
-msgid "Beta"
-msgstr "Бета"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Дальше: F5 — не заявка на ближайшее будущее"
 
@@ -14006,9 +14003,6 @@ msgstr "Сочетания с Option могут мешать вводу спец
 
 msgid "Optional"
 msgstr "Необязательное"
-
-msgid "Optional · Beta"
-msgstr "Необязательно · Бета"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Необязательное пояснение, показываемое в списке скриптов терминала."
