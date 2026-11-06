@@ -19,6 +19,8 @@ export const createSessionInputSchema = z.object({
 	effortId: z.string().optional(),
 	/** The model, effort and mode sent here are the user's own picks, so later chats start on them too. */
 	rememberSelections: z.boolean().optional(),
+	/** The mode to start in when neither the request nor the user's remembered picks name one. */
+	fallbackModeId: z.string().optional(),
 	resume: z
 		.object({
 			harnessSessionId: z.string().min(1),

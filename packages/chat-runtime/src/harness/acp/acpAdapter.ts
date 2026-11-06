@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { ChatSelections } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	AvailableCommand,
@@ -196,6 +197,7 @@ export type AcpImageStoreContext = {
 };
 
 const STARTUP_TIMEOUT_MS = 120_000;
+const START_OPTIONS_GRACE_MS = 1_000;
 const REQUEST_TIMEOUT_MS = 30_000;
 const STDERR_TAIL_CHARS = 4000;
 const ASK_MODE_ID = "default";
@@ -232,6 +234,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
+	startOptionsGraceMs?: number;
 	resolveAttachment?: ResolveAttachment;
 	/** Without it, images the agent sends are dropped. */
 	storeImage?: (
@@ -451,6 +454,13 @@ export class AcpAdapter implements HarnessAdapter {
 	private modeConfigId: string | null = null;
 	private modeId: string | undefined;
 	private readonly selectionsInFlight = new Set<Promise<void>>();
+	private pendingStart: { apply: (listed: boolean) => void } | null = null;
+	private settleStartSelections: (taken: ChatSelections) => void = () => {};
+	private readonly takenStartSelections = new Promise<ChatSelections>(
+		(resolve) => {
+			this.settleStartSelections = resolve;
+		},
+	);
 	private configOptions: SessionConfigOption[] = [];
 	private replaying = false;
 	private agentName: string | null = null;
@@ -891,6 +901,8 @@ export class AcpAdapter implements HarnessAdapter {
 	async dispose(): Promise<void> {
 		if (this.disposed) return;
 		this.disposed = true;
+		this.pendingStart?.apply(false);
+		this.settleStartSelections({});
 		this.stalePendingApprovals();
 		this.backgroundTasks.dispose();
 		this.endCompactions();
@@ -1969,6 +1981,9 @@ export class AcpAdapter implements HarnessAdapter {
 					}
 				: {}),
 		});
+		if (this.pendingStart && this.configOptions.length > 0) {
+			this.pendingStart.apply(true);
+		}
 	}
 
 	private startModeId(
@@ -1980,22 +1995,67 @@ export class AcpAdapter implements HarnessAdapter {
 		return resumed ? undefined : this.options.defaultModeId;
 	}
 
+	/** Resolves to the value the agent took, or undefined when it took none. */
 	private applyStartSelection(
 		category: "model" | "thought_level" | "mode",
 		wanted: string | undefined,
-	): Promise<boolean> | undefined {
+	): Promise<string | undefined> {
 		const option = this.configOptions.find(
 			(entry) => entry.category === category,
 		);
-		if (!wanted || !option) return undefined;
+		if (!wanted || !option) return Promise.resolve(undefined);
 		const value =
 			category === "mode"
 				? option.options.some((entry) => entry.id === wanted)
 					? wanted
 					: undefined
 				: startOptionId(option.options, wanted);
-		if (!value || option.currentValue === value) return undefined;
-		return this.setConfigOption(option.id, value);
+		if (!value) return Promise.resolve(undefined);
+		if (option.currentValue === value) return Promise.resolve(value);
+		return this.setConfigOption(option.id, value).then((taken) =>
+			taken ? value : undefined,
+		);
+	}
+
+	private applyConfigSelections(
+		wanted: ChatSelections,
+	): Promise<ChatSelections> {
+		const model = this.applyStartSelection("model", wanted.modelId);
+		const { effortId } = wanted;
+		// The effort levels on offer belong to the model, so they are only known once it is set.
+		const effort = model.then((modelId) =>
+			effortId && (modelId || !wanted.modelId)
+				? this.applyStartSelection("thought_level", effortId)
+				: undefined,
+		);
+		this.trackSelection(effort);
+		const mode = this.applyStartSelection("mode", wanted.modeId);
+		return Promise.all([model, effort, mode]).then(
+			([modelId, effortId, modeId]) => ({
+				...(modelId ? { modelId } : {}),
+				...(effortId ? { effortId } : {}),
+				...(modeId ? { modeId } : {}),
+			}),
+		);
+	}
+
+	/** An agent may list its options after `session/new`; the first prompt waits a moment for them. */
+	private awaitStartOptions(wanted: ChatSelections): Promise<ChatSelections> {
+		const taken = new Promise<ChatSelections>((resolve) => {
+			const timer = setTimeout(
+				() => this.pendingStart?.apply(false),
+				this.options.startOptionsGraceMs ?? START_OPTIONS_GRACE_MS,
+			);
+			this.pendingStart = {
+				apply: (listed) => {
+					clearTimeout(timer);
+					this.pendingStart = null;
+					resolve(listed ? this.applyConfigSelections(wanted) : {});
+				},
+			};
+		});
+		this.trackSelection(taken);
+		return taken;
 	}
 
 	private applyStartSelections(
@@ -2004,28 +2064,48 @@ export class AcpAdapter implements HarnessAdapter {
 		resumed: boolean,
 	): void {
 		const modeId = this.startModeId(startOptions, resumed);
-		const modelSet = this.applyStartSelection("model", startOptions.modelId);
-		const { effortId } = startOptions;
-		if (effortId) {
-			// The effort levels on offer belong to the model, so they are only known once it is set.
-			this.trackSelection(
-				(modelSet ?? Promise.resolve(true)).then(() => {
-					this.applyStartSelection("thought_level", effortId);
-				}),
-			);
-		}
-		this.applyStartSelection(
-			"mode",
-			this.options.clientApprovalModes ? undefined : modeId,
+		const wanted: ChatSelections = {
+			...(startOptions.modelId ? { modelId: startOptions.modelId } : {}),
+			...(startOptions.effortId ? { effortId: startOptions.effortId } : {}),
+			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
+		};
+		const configured =
+			this.configOptions.length > 0
+				? this.applyConfigSelections(wanted)
+				: Object.keys(wanted).length > 0
+					? this.awaitStartOptions(wanted)
+					: Promise.resolve({});
+		let sessionMode: Promise<string | undefined> = Promise.resolve(
+			this.options.clientApprovalModes && modeId && isClientApprovalMode(modeId)
+				? modeId
+				: undefined,
 		);
 		if (
 			modeId &&
 			!this.modeConfigId &&
-			sessionModes?.currentModeId !== modeId &&
+			sessionModes?.currentModeId === modeId
+		) {
+			sessionMode = Promise.resolve(modeId);
+		} else if (
+			modeId &&
+			!this.modeConfigId &&
 			sessionModes?.availableModes?.some((mode) => mode.id === modeId)
 		) {
-			void this.setMode(modeId);
+			sessionMode = this.setMode(modeId).then((taken) =>
+				taken ? modeId : undefined,
+			);
 		}
+		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) =>
+			this.settleStartSelections({
+				...taken,
+				...(takenMode ? { modeId: takenMode } : {}),
+			}),
+		);
+	}
+
+	/** The start model, effort and mode the agent took. */
+	startSelections(): Promise<ChatSelections> {
+		return this.takenStartSelections;
 	}
 
 	private handleServerRequest(request: AcpServerRequest): void {

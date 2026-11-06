@@ -14,6 +14,10 @@ const SELECTION_KEYS = {
 	mode: "modeId",
 } as const satisfies Record<SelectionCategory, keyof ChatSelections>;
 
+export const SELECTION_CATEGORIES = Object.keys(
+	SELECTION_KEYS,
+) as SelectionCategory[];
+
 /** A plan mode is a step the user takes for one task, never where a chat starts. */
 const NEVER_STARTING_MODES = new Set(["plan"]);
 
@@ -24,7 +28,7 @@ export function isStartingMode(modeId: string): boolean {
 export function isSelectionCategory(
 	category: string | undefined,
 ): category is SelectionCategory {
-	return category !== undefined && category in SELECTION_KEYS;
+	return category !== undefined && Object.hasOwn(SELECTION_KEYS, category);
 }
 
 export function selectionKey(

@@ -550,6 +550,7 @@ function startAdapter(
 		| "shellPollMs"
 		| "backgroundDetailIntervalMs"
 		| "startupTimeoutMs"
+		| "startOptionsGraceMs"
 		| "launch"
 	> = {},
 ): { adapter: AcpAdapter; events: AdapterEvent[] } {
@@ -5804,6 +5805,51 @@ describe("AcpAdapter config options", () => {
 			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
 			{ sessionId: "sess-1", configId: "effort", value: "low" },
 		]);
+
+		await adapter.dispose();
+	});
+
+	it("skips the start effort when the agent refuses the start model, and reports what it took", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [MODEL_OPTION, EFFORT_OPTION];
+		agent.rejectSelections = true;
+		const { adapter } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			effortId: "low",
+		});
+		await flush(20);
+
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => (f.params as { configId: string }).configId),
+		).toEqual(["model"]);
+		expect(await adapter.startSelections()).toEqual({});
+
+		await adapter.dispose();
+	});
+
+	it("applies start selections from options the agent lists after session/new", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{ modelId: "sonnet" },
+			{ startOptionsGraceMs: 50 },
+		);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "config_option_update",
+			configOptions: [MODEL_OPTION],
+		});
+		await flush();
+
+		expect(
+			agent.sent.find((f) => f.method === "session/set_config_option")?.params,
+		).toEqual({ sessionId: "sess-1", configId: "model", value: "sonnet" });
+		expect(await adapter.startSelections()).toEqual({ modelId: "sonnet" });
 
 		await adapter.dispose();
 	});

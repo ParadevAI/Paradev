@@ -223,9 +223,7 @@ export function AcpChatPane({
 										...(modelId ? { modelId } : {}),
 										...(effortId ? { effortId } : {}),
 										...(startModeId ? { modeId: startModeId } : {}),
-										...(savedModeId && startModeId === savedModeId
-											? { rememberSelections: true }
-											: {}),
+										...(resume ? {} : { rememberSelections: true }),
 										...(resume
 											? {
 													resume: {

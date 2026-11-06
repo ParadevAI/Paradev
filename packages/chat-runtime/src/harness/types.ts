@@ -51,6 +51,8 @@ export interface HarnessAdapter {
 	respondToApproval(approvalId: string, decision: Decision): void;
 	/** Resolves false when the agent refused the mode. */
 	setMode(modeId: string): Promise<boolean>;
+	/** The start model, effort and mode the agent took. */
+	startSelections?(): Promise<ChatSelections>;
 	/** Resolves false when the agent refused the change. */
 	setConfigOption?(configId: string, value: string): Promise<boolean>;
 	/**

@@ -562,6 +562,11 @@ export class LiveSession {
 		return this.options.adapter.setMode(modeId);
 	}
 
+	/** Null when the agent cannot say which start selections it took. */
+	startSelections(): Promise<ChatSelections | null> {
+		return this.options.adapter.startSelections?.() ?? Promise.resolve(null);
+	}
+
 	setConfigOption(configId: string, value: string): Promise<boolean> {
 		if (!this.options.adapter.setConfigOption) {
 			throw new Error("this agent has no settings to change");

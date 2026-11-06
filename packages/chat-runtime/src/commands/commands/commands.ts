@@ -6,11 +6,15 @@ import {
 	deriveTimeline,
 	emptySnapshot,
 	isSelectionCategory,
+	isStartingMode,
 	outlineSnapshot,
 	reduceMany,
+	SELECTION_CATEGORIES,
+	type SelectionCategory,
 	type SessionOutline,
 	type SessionSnapshot,
 	type StoredItem,
+	selectionKey,
 	sessionSelections,
 } from "@superset/chat/core";
 import type {
@@ -305,15 +309,26 @@ function explicitSelections(input: ChatSelections): ChatSelections {
 }
 
 export function createCommands(options: CommandsOptions): ChatCommands {
-	const rememberPicks = (harness: string, picks: ChatSelections) => {
-		const memory = options.selections;
-		if (!memory) return;
-		if (picks.modelId) memory.remember(harness, "model", picks.modelId);
-		if (picks.effortId)
-			memory.remember(harness, "thought_level", picks.effortId);
-		if (picks.modeId && picks.modeId !== AGENT_DEFAULT_MODE) {
-			memory.remember(harness, "mode", picks.modeId);
+	// A pick that settles after a newer one from the same chat has been saved is stale.
+	let lastPick = 0;
+	const savedPicks = new Map<string, number>();
+	const pickOrder = () => ++lastPick;
+	const rememberTaken = (
+		live: { sessionId: string; harness: string },
+		category: SelectionCategory,
+		value: string,
+		order: number,
+	) => {
+		if (
+			category === "mode" &&
+			(value === AGENT_DEFAULT_MODE || !isStartingMode(value))
+		) {
+			return;
 		}
+		const key = `${live.sessionId}:${category}`;
+		if ((savedPicks.get(key) ?? 0) > order) return;
+		savedPicks.set(key, order);
+		options.selections?.remember(live.harness, category, value);
 	};
 	const turnAnchors = (
 		sessionId: string,
@@ -462,19 +477,23 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						? replaySession(replaced)
 						: null;
 				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
-				const { modeId: rememberedModeId, ...remembered } = parsed.resume
-					? {}
-					: (options.selections?.get(parsed.harness) ?? {});
+				const continued =
+					replay?.ok && replacedRow?.harness === parsed.harness
+						? sessionSelections(replay.snapshot.session)
+						: null;
+				const { modeId: rememberedModeId, ...remembered } =
+					options.selections?.get(parsed.harness) ?? {};
 				const selections: ChatSelections = {
-					...remembered,
-					...(parsed.interactive && rememberedModeId
+					...(parsed.resume ? {} : remembered),
+					...(parsed.interactive && !continued && rememberedModeId
 						? { modeId: rememberedModeId }
 						: {}),
-					...(replay?.ok && replacedRow?.harness === parsed.harness
-						? sessionSelections(replay.snapshot.session)
-						: {}),
+					...continued,
 					...explicitSelections(parsed),
 				};
+				if (!selections.modeId && parsed.fallbackModeId) {
+					selections.modeId = parsed.fallbackModeId;
+				}
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
@@ -496,7 +515,17 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					throw error;
 				}
 				if (parsed.rememberSelections && !parsed.resume) {
-					rememberPicks(parsed.harness, explicitSelections(parsed));
+					const live = options.live.require(sessionId);
+					const picks = explicitSelections(parsed);
+					const order = pickOrder();
+					void live.startSelections().then((taken) => {
+						for (const category of SELECTION_CATEGORIES) {
+							const key = selectionKey(category);
+							const value = taken?.[key];
+							if (picks[key] && value)
+								rememberTaken(live, category, value, order);
+						}
+					});
 				}
 				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
 				if (resumed) sendPending(resumed, sessionId);
@@ -641,10 +670,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			const parsed: SetModeInput = setModeInputSchema.parse(input);
 			options.dedupe.run(`setMode:${parsed.commandId}`, () => {
 				const live = options.live.require(parsed.sessionId);
+				const order = pickOrder();
 				void live.setMode(parsed.modeId).then((accepted) => {
-					if (accepted) {
-						options.selections?.remember(live.harness, "mode", parsed.modeId);
-					}
+					if (accepted) rememberTaken(live, "mode", parsed.modeId, order);
 				});
 			});
 		},
@@ -659,14 +687,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				)?.category;
 				const taken = live.setConfigOption(parsed.configId, parsed.value);
 				if (isSelectionCategory(category)) {
+					const order = pickOrder();
 					void taken.then((accepted) => {
-						if (accepted) {
-							options.selections?.remember(
-								live.harness,
-								category,
-								parsed.value,
-							);
-						}
+						if (accepted) rememberTaken(live, category, parsed.value, order);
 					});
 				}
 				if (!parsed.confirm) return;
@@ -746,7 +769,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						scopeId: source.scopeId,
 						cwd: parsed.cwd,
 						harness: source.harness,
-						...sessionSelections(sourceLive?.state),
+						...sessionSelections(sourceLive?.state ?? replay.snapshot.session),
 						...explicitSelections(parsed),
 						terminalId: sourceLive?.terminalId,
 						...(forked
@@ -789,6 +812,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			options.sessions.markClosed(parsed.sessionId);
 			replays.delete(parsed.sessionId);
 			subagentItems.forget(parsed.sessionId);
+			for (const category of SELECTION_CATEGORIES) {
+				savedPicks.delete(`${parsed.sessionId}:${category}`);
+			}
 			try {
 				await options.live.dispose(parsed.sessionId);
 			} finally {
