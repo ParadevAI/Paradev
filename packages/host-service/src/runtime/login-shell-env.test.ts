@@ -16,7 +16,7 @@ describe("applyLoginShellEnvToProcess", () => {
 		});
 		const target = { PATH: "/usr/bin:/bin" };
 
-		await applyLoginShellEnvToProcess(target);
+		expect(await applyLoginShellEnvToProcess(target)).toBe(true);
 
 		expect(target.PATH).toBe(
 			"/usr/bin:/bin:/opt/homebrew/bin:/home/u/.local/bin",
@@ -27,7 +27,7 @@ describe("applyLoginShellEnvToProcess", () => {
 		initTerminalBaseEnv({ PATH: "/usr/bin" });
 		const target = { PATH: "/custom/git:/usr/bin" };
 
-		await applyLoginShellEnvToProcess(target);
+		expect(await applyLoginShellEnvToProcess(target)).toBe(false);
 
 		expect(target.PATH).toBe("/custom/git:/usr/bin");
 	});

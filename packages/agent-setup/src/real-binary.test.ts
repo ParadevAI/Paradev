@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { isRealBinaryOnPath } from "./real-binary";
+import { isRealBinaryOnPath, withAgentSearchPath } from "./real-binary";
 
 const ORIGINAL_HOME = process.env.HOME;
 const ORIGINAL_SUPERSET_HOME_DIR = process.env.SUPERSET_HOME_DIR;
@@ -71,5 +71,20 @@ describe("isRealBinaryOnPath", () => {
 			path.join(linkDir, "devin"),
 		);
 		expect(isRealBinaryOnPath(["devin"], linkDir)).toBe(true);
+	});
+	it("uses the scoped search path instead of process.env.PATH while set", () => {
+		const bin = path.join(root, "login-only-bin");
+		writeExecutable(bin, "devin");
+		const originalPath = process.env.PATH;
+		process.env.PATH = path.join(root, "empty-bin");
+		try {
+			expect(isRealBinaryOnPath(["devin"])).toBe(false);
+			expect(
+				withAgentSearchPath(bin, () => isRealBinaryOnPath(["devin"])),
+			).toBe(true);
+			expect(isRealBinaryOnPath(["devin"])).toBe(false);
+		} finally {
+			process.env.PATH = originalPath;
+		}
 	});
 });

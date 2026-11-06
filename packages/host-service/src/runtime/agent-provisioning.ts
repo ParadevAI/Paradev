@@ -106,3 +106,15 @@ export async function provisionAgentIntegrations(): Promise<void> {
 		);
 	}
 }
+
+/** Agent hooks only: plugins and MCP entries do not depend on PATH. */
+export function reprovisionAgentHooks(): void {
+	try {
+		setupAgentIntegrations();
+	} catch (error) {
+		console.warn(
+			"[host-service] agent hook re-provisioning failed (continuing):",
+			error,
+		);
+	}
+}

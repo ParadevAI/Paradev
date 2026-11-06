@@ -32,7 +32,10 @@ import {
 	loadToken,
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
-import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
+import {
+	applyShellEnvToProcess,
+	getProcessEnvWithShellPath,
+} from "lib/trpc/routers/workspaces/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
 	APP_PARTITION,
@@ -106,7 +109,7 @@ import {
 console.log("[main] Local database ready:", !!localDb);
 const IS_DEV = process.env.NODE_ENV === "development";
 
-const shellEnvApplied = applyShellEnvToProcess().catch((error) => {
+void applyShellEnvToProcess().catch((error) => {
 	console.error("[main] Failed to apply shell environment:", error);
 });
 
@@ -666,7 +669,7 @@ if (!gotTheLock) {
 			// The vite build copies @superset/agent-setup's templates (plus the
 			// bundled Claude plugin) next to this bundle; see vite/helpers.ts.
 			setAgentSetupTemplatesDir(path.join(__dirname, "templates"));
-			const setupAgentIntegrationsFromSettings = () => {
+			const setupAgentIntegrationsFromSettings = (agentSearchPath?: string) => {
 				const settingsRow = localDb.select().from(settings).get();
 				const disabledAgentHooks = settingsRow?.disabledAgentHooks ?? [];
 				const disabledSkills = settingsRow?.disabledSkills ?? [];
@@ -677,17 +680,20 @@ if (!gotTheLock) {
 				setupAgentIntegrations({
 					disabledAgentIds: disabledAgentHooks,
 					disabledSkillIds: disabledSkills,
+					agentSearchPath,
 				});
 			};
 			setupAgentIntegrationsFromSettings();
-			// Setup skips agents absent from PATH; the shell PATH can reveal more.
-			void shellEnvApplied.then(() => {
-				try {
-					setupAgentIntegrationsFromSettings();
-				} catch (error) {
-					console.error("[main] Failed to set up agent integrations:", error);
-				}
-			});
+			// Setup skips agents absent from PATH; the login-shell PATH can reveal more.
+			void getProcessEnvWithShellPath()
+				.then(({ PATH: shellPath }) => {
+					if (shellPath && shellPath !== process.env.PATH) {
+						setupAgentIntegrationsFromSettings(shellPath);
+					}
+				})
+				.catch((error) =>
+					console.error("[main] Failed to set up agent integrations:", error),
+				);
 		} catch (error) {
 			console.error("[main] Failed to set up agent integrations:", error);
 		}

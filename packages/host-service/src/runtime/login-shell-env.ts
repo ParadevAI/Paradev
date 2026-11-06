@@ -31,9 +31,10 @@ const MERGE_DENYLIST = new Set([
  * Reuses the terminal base-env snapshot (startTerminalBaseEnvResolution) so
  * the login shell is probed once per boot.
  */
+/** Resolves true when it appended login-shell entries to PATH. */
 export async function applyLoginShellEnvToProcess(
 	targetEnv: NodeJS.ProcessEnv = process.env,
-): Promise<void> {
+): Promise<boolean> {
 	try {
 		await waitForTerminalBaseEnv();
 		const shellEnv = getTerminalBaseEnv();
@@ -45,7 +46,7 @@ export async function applyLoginShellEnvToProcess(
 		}
 
 		const shellPath = shellEnv.PATH;
-		if (!shellPath) return;
+		if (!shellPath) return false;
 		const current = (targetEnv.PATH ?? "")
 			.split(path.delimiter)
 			.filter(Boolean);
@@ -53,15 +54,17 @@ export async function applyLoginShellEnvToProcess(
 		const missing = shellPath
 			.split(path.delimiter)
 			.filter((entry) => entry && !currentSet.has(entry));
-		if (missing.length === 0) return;
+		if (missing.length === 0) return false;
 		targetEnv.PATH = [...current, ...missing].join(path.delimiter);
 		console.log(
 			`[host-service] merged ${missing.length} login-shell PATH entries into process env`,
 		);
+		return true;
 	} catch (error) {
 		console.warn(
 			"[host-service] login-shell env merge failed (continuing):",
 			error,
 		);
+		return false;
 	}
 }

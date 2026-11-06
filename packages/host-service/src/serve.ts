@@ -11,7 +11,10 @@ import {
 } from "./providers/auth";
 import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
-import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
+import {
+	provisionAgentIntegrations,
+	reprovisionAgentHooks,
+} from "./runtime/agent-provisioning";
 import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
@@ -73,7 +76,9 @@ async function main(): Promise<void> {
 	// launches, which previously had no notify hooks or shell wrappers (#6254).
 	await provisionAgentIntegrations();
 	// Setup skips agents absent from PATH; the login-shell PATH can reveal more.
-	void loginShellEnvApplied.then(() => provisionAgentIntegrations());
+	void loginShellEnvApplied.then((pathGrew) => {
+		if (pathGrew) reprovisionAgentHooks();
+	});
 
 	const configTokenSource = env.SUPERSET_AUTH_CONFIG_PATH
 		? new ConfigFileSessionTokenSource({

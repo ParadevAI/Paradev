@@ -16,6 +16,7 @@ import {
 	getOpenCodePluginDir,
 	getZshDir,
 } from "./paths";
+import { withAgentSearchPath } from "./real-binary";
 import {
 	createBashWrapper,
 	createZshWrapper,
@@ -42,6 +43,8 @@ export function setupAgentIntegrations(
 	options: {
 		disabledAgentIds?: readonly string[];
 		disabledSkillIds?: readonly string[];
+		/** PATH used to detect installed agents; defaults to process.env.PATH. */
+		agentSearchPath?: string;
 	} = {},
 ): void {
 	console.log("[agent-setup] Provisioning agent integrations...");
@@ -54,7 +57,9 @@ export function setupAgentIntegrations(
 	fs.mkdirSync(getBashDir(), { recursive: true });
 	fs.mkdirSync(getOpenCodePluginDir(), { recursive: true });
 
-	setupAgentCapabilities({ disabledAgentIds, disabledSkillIds });
+	withAgentSearchPath(options.agentSearchPath, () =>
+		setupAgentCapabilities({ disabledAgentIds, disabledSkillIds }),
+	);
 
 	runSetupAction("zsh-wrapper", createZshWrapper);
 	runSetupAction("bash-wrapper", createBashWrapper);

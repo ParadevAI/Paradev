@@ -43,9 +43,24 @@ function candidateNames(binaryNames: readonly string[]): string[] {
 	);
 }
 
+let searchPathOverride: string | undefined;
+
+export function withAgentSearchPath<T>(
+	searchPath: string | undefined,
+	run: () => T,
+): T {
+	const previous = searchPathOverride;
+	searchPathOverride = searchPath;
+	try {
+		return run();
+	} finally {
+		searchPathOverride = previous;
+	}
+}
+
 export function isRealBinaryOnPath(
 	binaryNames: readonly string[],
-	searchPath: string = process.env.PATH ?? "",
+	searchPath: string = searchPathOverride ?? process.env.PATH ?? "",
 ): boolean {
 	const names = candidateNames(binaryNames);
 	for (const entry of searchPath.split(path.delimiter)) {
