@@ -53,7 +53,7 @@ import {
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
-	terminalPullRequestLinkAction,
+	terminalUrlLinkAction,
 } from "../../utils/runTerminalLinkAction";
 import { AttachmentLimitError } from "../../utils/sendAttachmentsToWorkspace";
 import { LinkActionMenu } from "./components/LinkActionMenu";
@@ -359,9 +359,7 @@ export function TerminalPane({
 					);
 				},
 				onUrlClick: (event, url) => {
-					const action =
-						terminalPullRequestLinkAction(event, url) ??
-						getUrlAction(event, url);
+					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
 						if (tierFor(event, "4-tier") === "plain") {
 							event.preventDefault();
@@ -705,9 +703,7 @@ function resolveHoverLabel(
 		shiftKey: hovered.shift,
 	};
 	if (hovered.info.kind === "url") {
-		const action =
-			terminalPullRequestLinkAction(event, hovered.info.url) ??
-			getUrlAction(event, hovered.info.url);
+		const action = terminalUrlLinkAction(event, hovered.info.url, getUrlAction);
 		return action ? actionLabel(action, "url") : null;
 	}
 	if (hovered.info.isDirectory) {
