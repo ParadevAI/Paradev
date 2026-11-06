@@ -28,7 +28,7 @@ function explodingRegistry(): HarnessRegistry {
 				prompt: () => undefined,
 				cancelTurn: () => undefined,
 				respondToApproval: () => undefined,
-				setMode: () => undefined,
+				setMode: () => Promise.resolve(true),
 				dispose: async () => undefined,
 			}),
 		],

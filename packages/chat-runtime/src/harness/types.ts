@@ -1,3 +1,4 @@
+import type { ChatSelections } from "@superset/chat/core";
 import type {
 	Decision,
 	Delta,
@@ -28,10 +29,8 @@ export type ResolveAttachment = (
 	part: AttachmentPart,
 ) => Promise<ResolvedAttachment | null>;
 
-export type HarnessStartOptions = {
+export type HarnessStartOptions = ChatSelections & {
 	cwd: string;
-	modeId?: string;
-	modelId?: string;
 	/** `quiet` loads the agent's history without replaying it as items. */
 	resume?: { harnessSessionId: string; quiet?: boolean };
 };
@@ -50,7 +49,10 @@ export interface HarnessAdapter {
 	/** Resolves false when the agent did not accept the prompt, so the caller queues it. */
 	steer?(content: UserContent[]): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): void;
-	setMode(modeId: string): void;
+	/** Resolves false when the agent refused the mode. */
+	setMode(modeId: string): Promise<boolean>;
+	/** The start model, effort and mode the agent took. */
+	startSelections?(): Promise<ChatSelections>;
 	/** Resolves false when the agent refused the change. */
 	setConfigOption?(configId: string, value: string): Promise<boolean>;
 	/**

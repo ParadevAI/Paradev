@@ -1,5 +1,5 @@
 export {
+	forgetSavedChatMode,
 	freshStartMode,
 	readSavedChatMode,
-	saveChatMode,
 } from "./savedChatMode";

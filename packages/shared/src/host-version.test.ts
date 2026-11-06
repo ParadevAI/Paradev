@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { ATTACHMENT_PARTS_MIN_HOST_VERSION } from "./attachment-limits";
 import {
+	CHAT_SELECTIONS_MIN_HOST_VERSION,
 	deriveHostVersionState,
 	hostNeedsUpdate,
 	hostReadsAttachmentParts,
+	hostRemembersChatSelections,
 	isHostUpdateTarget,
 	parseHostInstallSource,
 } from "./host-version";
@@ -92,5 +94,15 @@ describe("hostReadsAttachmentParts", () => {
 		expect(hostReadsAttachmentParts("9.0.0")).toBe(true);
 		expect(hostReadsAttachmentParts("1.40.0")).toBe(false);
 		expect(hostReadsAttachmentParts(undefined)).toBe(false);
+	});
+});
+
+describe("hostRemembersChatSelections", () => {
+	test("a host at or above the floor keeps chat picks; an older or unknown one does not", () => {
+		expect(hostRemembersChatSelections(CHAT_SELECTIONS_MIN_HOST_VERSION)).toBe(
+			true,
+		);
+		expect(hostRemembersChatSelections("2.0.5")).toBe(false);
+		expect(hostRemembersChatSelections(undefined)).toBe(false);
 	});
 });
