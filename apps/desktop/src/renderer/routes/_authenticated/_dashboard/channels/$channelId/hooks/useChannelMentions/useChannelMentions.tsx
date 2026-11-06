@@ -9,7 +9,6 @@ import { useCallback, useMemo } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { usePluginMentionProvider } from "renderer/routes/_authenticated/components/AgentComposer/hooks/usePluginMentionProvider";
 import { BroadcastChip } from "../../components/BroadcastChip";
-import type { ChannelPerson } from "../../components/ChannelMessageRow";
 import { ChannelRefChip } from "../../components/ChannelRefChip";
 import { DevMentionChip } from "../../components/DevMentionChip";
 import { MentionBroadcastRow } from "../../components/MentionBroadcastRow";
@@ -18,6 +17,7 @@ import { MentionChip } from "../../components/MentionChip";
 import { MentionDevRow } from "../../components/MentionDevRow";
 import { MentionPersonRow } from "../../components/MentionPersonRow";
 import { MentionTaskRow } from "../../components/MentionTaskRow";
+import type { ChannelPerson } from "../../components/MessageBody";
 import {
 	matchingBroadcasts,
 	rankMentionCandidates,

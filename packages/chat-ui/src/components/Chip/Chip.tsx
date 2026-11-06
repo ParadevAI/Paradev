@@ -11,7 +11,12 @@ export function Chip({
 }: {
 	chip: Pick<
 		ComposerChip,
-		"label" | "serialized" | "brandColor" | "iconUrl" | "description"
+		| "label"
+		| "serialized"
+		| "brandColor"
+		| "iconUrl"
+		| "description"
+		| "variant"
 	>;
 	selected?: boolean;
 	mention?: boolean;
@@ -22,6 +27,7 @@ export function Chip({
 		<span
 			className="prompt-input-chip"
 			data-mention-chip={mention || undefined}
+			data-variant={chip.variant}
 			data-selected={selected || undefined}
 			style={
 				chip.brandColor
@@ -44,7 +50,9 @@ export function Chip({
 		<Tooltip>
 			<TooltipTrigger asChild>{body}</TooltipTrigger>
 			<TooltipContent className="max-w-xs" side="top">
-				<p className="break-all font-mono">{chip.serialized}</p>
+				{chip.serialized !== chip.label && (
+					<p className="break-all font-mono">{chip.serialized}</p>
+				)}
 				{chip.description && (
 					<p className="line-clamp-4 text-muted-foreground">
 						{chip.description}

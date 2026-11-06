@@ -14,7 +14,7 @@ import {
 } from "../../hooks/useChannelMentions";
 import { useEmojiSuggestions } from "../../hooks/useEmojiSuggestions";
 import { strongestBroadcast } from "../../utils/mentionGroups";
-import type { ChannelPerson } from "../ChannelMessageRow";
+import type { ChannelPerson } from "../MessageBody";
 import { MentionInvitePrompt } from "./components/MentionInvitePrompt";
 import { uploadChannelFile } from "./utils/uploadChannelFile";
 
@@ -25,6 +25,8 @@ interface ChannelComposerProps {
 	currentUserId: string;
 	placeholder: string;
 	autoFocus?: boolean;
+	/** A note box without the formatting toolbar, for a narrow pane. */
+	compact?: boolean;
 }
 
 export function ChannelComposer({
@@ -34,6 +36,7 @@ export function ChannelComposer({
 	currentUserId,
 	placeholder,
 	autoFocus,
+	compact = false,
 }: ChannelComposerProps) {
 	const { t } = useLingui();
 	const { apply, discard } = useApplyChannelMessage();
@@ -135,6 +138,7 @@ export function ChannelComposer({
 				/>
 			)}
 			<MessageComposer
+				formatToolbar={!compact}
 				key={draft.key}
 				initialMarkdown={draft.markdown || undefined}
 				placeholder={placeholder}

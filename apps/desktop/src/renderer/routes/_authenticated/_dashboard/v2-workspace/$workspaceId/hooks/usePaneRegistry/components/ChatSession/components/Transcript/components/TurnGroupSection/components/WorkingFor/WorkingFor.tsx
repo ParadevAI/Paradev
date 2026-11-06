@@ -49,15 +49,18 @@ export function WorkingFor({
 
 	if (!running && seconds === 0 && !onToggle) return null;
 
+	// A reopened chat can replay a turn with no span; the fold still needs a name.
 	const label = waiting
 		? t({ message: "Needs input" })
-		: seconds < 60
-			? running
-				? t`Working for ${seconds}s`
-				: t`Worked for ${seconds}s`
-			: running
-				? t`Working for ${Math.floor(seconds / 60)}m ${seconds % 60}s`
-				: t`Worked for ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+		: !running && seconds === 0
+			? t({ message: "Worked" })
+			: seconds < 60
+				? running
+					? t`Working for ${seconds}s`
+					: t`Worked for ${seconds}s`
+				: running
+					? t`Working for ${Math.floor(seconds / 60)}m ${seconds % 60}s`
+					: t`Worked for ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 
 	const content = (
 		<>

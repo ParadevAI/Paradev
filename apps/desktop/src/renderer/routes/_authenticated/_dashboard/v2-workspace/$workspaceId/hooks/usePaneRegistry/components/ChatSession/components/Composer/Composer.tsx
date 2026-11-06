@@ -54,6 +54,7 @@ import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
+import { useComposerExtras } from "../../providers/ComposerExtrasProvider";
 import type { ChatForkTarget } from "../../types";
 import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
 import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
@@ -119,6 +120,8 @@ export type ComposerProps = {
 	history?: string[];
 	isActive?: boolean;
 	placeholder?: string;
+	/** Only the text box and send: no mode or model controls, for a reply box in a narrow pane. */
+	compact?: boolean;
 	disabled?: boolean;
 	onCancelTurn?: (() => void) | null;
 	target?: ComposerTarget;
@@ -188,6 +191,7 @@ export const Composer = memo(function Composer({
 	onSend,
 	onOpenHistory,
 	placeholder,
+	compact = false,
 	sessionUsage,
 	target,
 	turnRunning = false,
@@ -401,8 +405,10 @@ export const Composer = memo(function Composer({
 		[transport, workspaceId, sessionId, isDark, t],
 	);
 
+	const extras = useComposerExtras();
 	const mentionProviders = useMemo<ComposerMentionProvider[]>(
 		() => [
+			...extras.mentionProviders,
 			{
 				id: "files",
 				title: t({ message: "Files" }),
@@ -425,7 +431,7 @@ export const Composer = memo(function Composer({
 			},
 			...githubProviders,
 		],
-		[githubProviders, searchFiles, searchChats, t],
+		[extras.mentionProviders, githubProviders, searchFiles, searchChats, t],
 	);
 
 	const linkChips = useLinkChips();
@@ -456,7 +462,7 @@ export const Composer = memo(function Composer({
 	const canCompact = availableCommands.some(
 		(command) => command.name === "compact",
 	);
-	const compact = useCallback(
+	const compactContext = useCallback(
 		() =>
 			onSend([{ type: "text", text: "/compact" }], {
 				steer: false,
@@ -553,6 +559,7 @@ export const Composer = memo(function Composer({
 				env.NEXT_PUBLIC_WEB_URL,
 				otherHostOf,
 			);
+			const extraContext = extras.contextLine(mentions);
 			const body = [message, ...tags].filter(Boolean).join("\n");
 			onSend(
 				[
@@ -565,7 +572,7 @@ export const Composer = memo(function Composer({
 								},
 							]
 						: []),
-					...[mcpContext, chatContext].flatMap((context) =>
+					...[mcpContext, chatContext, extraContext].flatMap((context) =>
 						context
 							? [{ type: "text" as const, text: context, hidden: true }]
 							: [],
@@ -574,6 +581,7 @@ export const Composer = memo(function Composer({
 				],
 				{ steer, draft },
 			);
+			extras.afterSend?.(message, mentions);
 			clearDraft();
 		},
 		[
@@ -583,6 +591,7 @@ export const Composer = memo(function Composer({
 			draftKey,
 			mcpPicker.serverNameOf,
 			otherHostOf,
+			extras,
 		],
 	);
 
@@ -657,7 +666,7 @@ export const Composer = memo(function Composer({
 								<Trans>to {name}</Trans>
 							</span>
 						</span>
-					) : modes && onSetMode ? (
+					) : modes && onSetMode && !compact ? (
 						<ModePicker
 							currentModeId={currentModeId}
 							iconOnly={footerTier >= 2}
@@ -667,12 +676,12 @@ export const Composer = memo(function Composer({
 					) : undefined
 				}
 				toolbarEnd={
-					target ? undefined : (
+					target || compact ? undefined : (
 						<>
 							{sessionUsage && (
 								<ContextWindowRing
 									usage={sessionUsage}
-									onCompact={canCompact ? compact : undefined}
+									onCompact={canCompact ? compactContext : undefined}
 									compactDisabled={blocked || turnRunning}
 								/>
 							)}

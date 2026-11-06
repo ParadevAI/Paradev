@@ -1,1 +1,1 @@
-export { DevHeader, type DevTab } from "./DevHeader";
+export { DevHeader } from "./DevHeader";

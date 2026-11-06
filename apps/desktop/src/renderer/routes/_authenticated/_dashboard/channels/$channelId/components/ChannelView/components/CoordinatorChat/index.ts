@@ -1,0 +1,1 @@
+export { CoordinatorChat } from "./CoordinatorChat";

@@ -1,0 +1,1 @@
+export { markWorkspaceSeen } from "./markWorkspaceSeen";

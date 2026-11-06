@@ -1,13 +1,18 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type {
-	OutboxEntry,
-	SessionSnapshot,
-	TurnGroup,
+import {
+	hasOmittedBody,
+	type OutboxEntry,
+	readAnyBookkeeping,
+	readBookkeeping,
+	type SessionSnapshot,
+	type TurnGroup,
+	userMessageText,
 } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	Decision,
 	ToolCall,
+	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	MessageScroller,
@@ -36,6 +41,7 @@ import {
 	CHAT_COLUMN_CLASSNAME,
 	CHAT_SCROLLER_GUTTER_CLASSNAME,
 } from "../../constants";
+import { useTranscriptCards } from "../../providers/TranscriptCardsProvider";
 import type { ChatForkTarget } from "../../types";
 import { pageLinkFinder } from "../../utils/pageLinks";
 import { TranscriptFindBar } from "./components/TranscriptFindBar";
@@ -53,6 +59,7 @@ import { useTranscriptPlugins } from "./providers/TranscriptPluginsProvider";
 import { copySourceText } from "./utils/copySourceText";
 import { galleryImages } from "./utils/galleryImages";
 import { replyFooters } from "./utils/replyFooters";
+import { speakerStarts } from "./utils/speakerStarts";
 import { subagentLines } from "./utils/subagentLines";
 import {
 	rowMessageId,
@@ -214,6 +221,52 @@ export function Transcript({
 	}, [approvals, snapshot.items]);
 
 	const { childrenByParent } = useNestedItems();
+	const {
+		findCards,
+		findMessageCards,
+		wantsBody,
+		quietTools,
+		keepOut,
+		speakers,
+		combineCards,
+	} = useTranscriptCards();
+	const harness = snapshot.session?.harness;
+	const isHarnessNote = useCallback(
+		(item: UserMessage) => {
+			const text = userMessageText(item);
+			return (
+				(harness
+					? readBookkeeping(harness, text)
+					: readAnyBookkeeping(text)) !== null
+			);
+		},
+		[harness],
+	);
+	// A folded row with nothing kept out draws nothing, so it gets no shell
+	// either: the shells' padding alone would leave a gap under the fold.
+	const hiddenRow = (row: TranscriptRow): boolean =>
+		(row.kind === "item" ||
+			row.kind === "tool_run" ||
+			row.kind === "working") &&
+		row.folded === true &&
+		row.foldKey !== undefined &&
+		isEntryCollapsed(row.foldKey, true) &&
+		!(
+			row.kind !== "working" &&
+			row.cards?.some((card) => keepOut?.(card) ?? true)
+		);
+	const cardBodyIds = useMemo(() => {
+		if (!wantsBody) return [];
+		const ids: string[] = [];
+		for (const { item } of snapshot.items.values()) {
+			if (hasOmittedBody(item) && wantsBody(item as ToolCall))
+				ids.push(item.id);
+		}
+		return ids;
+	}, [snapshot.items, wantsBody]);
+	useEffect(() => {
+		if (cardBodyIds.length > 0) onRequestItemBodies(cardBodyIds);
+	}, [cardBodyIds, onRequestItemBodies]);
 	const { rows, inlineReplyKeys } = useMemo(
 		() =>
 			replyFooters(
@@ -224,6 +277,11 @@ export function Transcript({
 					findPageLinks,
 					commandsInApprovals,
 					(tool) => subagentLines(tool, childrenByParent.get(tool.id)) !== null,
+					findCards,
+					findMessageCards,
+					quietTools === true,
+					isHarnessNote,
+					combineCards,
 				),
 			),
 		[
@@ -232,8 +290,33 @@ export function Transcript({
 			pendingApprovalTargets,
 			commandsInApprovals,
 			childrenByParent,
+			findCards,
+			findMessageCards,
+			quietTools,
+			isHarnessNote,
+			combineCards,
 		],
 	);
+	const runs = useMemo(() => {
+		if (!speakers) return null;
+		// A resumed session replays its history stamped with the replay's
+		// clock; each replayed turn starts and ends in the same millisecond.
+		const replayed = (turnId: string | undefined) => {
+			const turn = turnId ? snapshot.turns.get(turnId) : undefined;
+			return (
+				turn?.status === "completed" && turn.completedAtMs === turn.startedAtMs
+			);
+		};
+		return speakerStarts(rows, isHarnessNote, {
+			...(speakers.relay ? { relayed: speakers.relay.sent } : {}),
+			untimed: (row) =>
+				row.kind === "working"
+					? replayed(row.key.slice("working:".length))
+					: row.kind === "item"
+						? replayed(snapshot.items.get(row.item.id)?.turnId)
+						: false,
+		});
+	}, [speakers, rows, isHarnessNote, snapshot.turns, snapshot.items]);
 
 	useEffect(() => {
 		const opened = rows.filter(
@@ -351,13 +434,21 @@ export function Transcript({
 		.map((row, offset) => {
 			const index = transcriptWindow.startIndex + offset;
 			const recent = index >= rows.length - RECENT_ROWS_RENDERED_IN_FULL;
+			if (hiddenRow(row)) return null;
+			const run = runs?.get(row.key);
 			return (
 				<TranscriptRowItem
 					canForkToWorktree={canForkToWorktree}
 					className={cn(
 						REMEMBER_SIZE_CLASSNAME,
 						!recent && OFFSCREEN_CLASSNAME,
-						row.kind === "changed_files" ? "px-4" : "px-4 pb-1",
+						speakers ? "pr-4 pl-14" : "px-4",
+						speakers &&
+							row.kind === "item" &&
+							(row.item.kind === "user_message" ||
+								row.item.kind === "agent_message") &&
+							"rounded-lg transition-colors hover:bg-foreground/[0.03]",
+						row.kind !== "changed_files" && "pb-1",
 						proseTopPadding(row, rows[index - 1]),
 					)}
 					commands={commands}
@@ -382,6 +473,9 @@ export function Transcript({
 					row={row}
 					rowRef={transcriptWindow.rowRef(row.key)}
 					snapshot={snapshot}
+					speaker={run?.speaker}
+					speakerAt={run?.at}
+					speakerNewDay={run?.newDay}
 				/>
 			);
 		});

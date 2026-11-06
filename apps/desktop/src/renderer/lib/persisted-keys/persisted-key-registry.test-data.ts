@@ -103,12 +103,16 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["list-display"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPanelStore/channelPanelStore.ts",
-		["channel-panels-v1"],
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPaneStore/channelPaneStore.ts",
+		["channel-panes-v2"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/components/ChannelMessageRow/components/EmojiPicker/hooks/useSkinTone/useSkinTone.ts",
-		["channels-emoji-skin-tone"],
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelCoordinatorStore/channelCoordinatorStore.ts",
+		["channel-coordinators-v1"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelActivityStore/channelActivityStore.ts",
+		["channel-activity-v1"],
 	],
 	[
 		"src/renderer/stores/sidebar-sections-collapse.ts",

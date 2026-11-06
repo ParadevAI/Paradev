@@ -1,12 +1,12 @@
 import { useCallback } from "react";
-import { useChannelPanelStore } from "../../stores/channelPanelStore";
+import { useChannelPaneStore } from "../../stores/channelPaneStore";
 
-/** Opens a person's profile as a tab in the channel's side panel. */
+/** Opens a person's profile as a page in the channel's side pane. */
 export function useOpenProfile(channelId: string) {
-	const open = useChannelPanelStore((state) => state.open);
+	const push = useChannelPaneStore((state) => state.push);
 	return useCallback(
-		(person: { id: string; name: string }) =>
-			open(channelId, { kind: "profile", id: person.id, label: person.name }),
-		[channelId, open],
+		(person: { id: string }) =>
+			push(channelId, { kind: "profile", id: person.id }),
+		[channelId, push],
 	);
 }

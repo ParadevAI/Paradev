@@ -139,6 +139,7 @@ export function MessageComposerBody({
 	getEmojiSuggestions,
 	onCancel,
 	autoFocus,
+	formatToolbar = true,
 }: MessageComposerBodyProps) {
 	const { t } = useLingui();
 	const [editor] = useLexicalComposerContext();
@@ -499,7 +500,7 @@ export function MessageComposerBody({
 					/>
 				)}
 			</div>
-			<FormatToolbar />
+			{formatToolbar && <FormatToolbar />}
 			<AttachmentPills
 				attachments={files.attachments}
 				onRemove={files.remove}

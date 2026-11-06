@@ -1,1 +1,0 @@
-export { AboutTab } from "./AboutTab";

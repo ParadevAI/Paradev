@@ -42,6 +42,7 @@ import {
 	type OpenPage,
 	type TurnChangesSource,
 } from "../../providers/ChatPaneActionsProvider";
+import { useTranscriptCards } from "../../providers/TranscriptCardsProvider";
 import { TurnFailureActionsProvider } from "../../providers/TurnFailureActionsProvider";
 import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
@@ -128,6 +129,8 @@ export function SessionView({
 	terminalId,
 	onNewChat,
 	workspaceId,
+	composerPlaceholder,
+	composerCompact = false,
 }: {
 	client: SessionClient;
 	chatKey: string;
@@ -136,6 +139,10 @@ export function SessionView({
 	workspaceId: string;
 	terminalId?: string;
 	headerLeft?: ReactNode;
+	/** What the empty composer says, where the screen around it knows better. */
+	composerPlaceholder?: string;
+	/** Only the text box and send: no mode or model controls, for a reply box in a narrow pane. */
+	composerCompact?: boolean;
 	held?: {
 		queued: UserContent[][];
 		onQueue: (content: UserContent[]) => void;
@@ -240,6 +247,7 @@ export function SessionView({
 	}, [outbox]);
 	useRestoreUnsentPrompts(draftKey, outbox, draftOf);
 	const timeline = useTimeline(session.snapshot, { nestChildItems: true });
+	const asChannel = useTranscriptCards().speakers !== undefined;
 	const rail = useStableList(
 		useMemo(() => railMessages(timeline), [timeline]),
 		(previous, next) =>
@@ -706,7 +714,7 @@ export function SessionView({
 								)}
 							</NestedItemsProvider>
 						</TranscriptPluginsProvider>
-						{!focusedSubagentId && rail.length > 1 && (
+						{!focusedSubagentId && !asChannel && rail.length > 1 && (
 							<ChatHistorySidebarScroller
 								className="absolute inset-y-0 left-0 my-auto hidden h-fit max-h-full flex-col pl-3 @[56rem]:flex"
 								messages={rail}
@@ -749,6 +757,8 @@ export function SessionView({
 				/>
 				<Composer
 					presetId={presetId}
+					placeholder={composerPlaceholder}
+					compact={composerCompact}
 					sessionId={client.sessionId}
 					agentSwitcher={agentSwitcher}
 					availableCommands={sessionState?.availableCommands ?? NO_COMMANDS}

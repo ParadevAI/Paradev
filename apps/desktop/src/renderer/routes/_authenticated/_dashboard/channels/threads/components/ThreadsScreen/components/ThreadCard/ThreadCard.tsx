@@ -2,11 +2,12 @@ import { Plural, Trans } from "@lingui/react/macro";
 import type { RouterOutputs } from "@superset/trpc";
 import { useNavigate } from "@tanstack/react-router";
 import { LuHash } from "react-icons/lu";
-import {
-	ChannelMessageRow,
-	type ChannelPerson,
-} from "../../../../../$channelId/components/ChannelMessageRow";
+import type { ChannelPerson } from "../../../../../$channelId/components/MessageBody";
 import { NewMessagesLine } from "../../../../../$channelId/components/NewMessagesLine";
+import {
+	ThreadMessage,
+	useDevFaces,
+} from "../../../../../$channelId/components/ThreadMessage";
 import { unreadState } from "../../../../../$channelId/utils/unreadState";
 
 type FollowedThread = RouterOutputs["channelThread"]["list"][number];
@@ -15,16 +16,15 @@ interface ThreadCardProps {
 	thread: FollowedThread;
 	peopleById: Map<string, ChannelPerson>;
 	currentUserId: string | null;
-	now: Date;
 }
 
 export function ThreadCard({
 	thread,
 	peopleById,
 	currentUserId,
-	now,
 }: ThreadCardProps) {
 	const navigate = useNavigate();
+	const devsById = useDevFaces();
 	const { root, latestReplies } = thread;
 	const hidden = root.replyCount - latestReplies.length;
 	const { firstUnread } = unreadState(
@@ -32,8 +32,6 @@ export function ThreadCard({
 		thread.lastReadSeq,
 		currentUserId,
 	);
-	const authorOf = (id: string | null) =>
-		id ? (peopleById.get(id) ?? null) : null;
 	const openThread = () =>
 		void navigate({
 			to: "/channels/$channelId",
@@ -67,15 +65,11 @@ export function ThreadCard({
 					</span>
 				)}
 			</div>
-			<ChannelMessageRow
+			<ThreadMessage
 				message={root}
-				author={authorOf(root.authorId)}
-				compact={false}
-				now={now}
-				currentUserId={currentUserId}
-				canModerate={false}
-				canReact={false}
 				peopleById={peopleById}
+				devsById={devsById}
+				currentUserId={currentUserId}
 			/>
 			{hidden > 0 && (
 				<button
@@ -93,15 +87,11 @@ export function ThreadCard({
 			{latestReplies.map((reply) => (
 				<div key={reply.id}>
 					{reply.id === firstUnread?.id && <NewMessagesLine />}
-					<ChannelMessageRow
+					<ThreadMessage
 						message={reply}
-						author={authorOf(reply.authorId)}
-						compact={false}
-						now={now}
-						currentUserId={currentUserId}
-						canModerate={false}
-						canReact={false}
 						peopleById={peopleById}
+						devsById={devsById}
+						currentUserId={currentUserId}
 					/>
 				</div>
 			))}

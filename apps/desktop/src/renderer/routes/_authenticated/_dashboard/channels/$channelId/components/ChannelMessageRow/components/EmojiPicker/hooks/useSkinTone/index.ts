@@ -1,1 +1,0 @@
-export { useSkinTone } from "./useSkinTone";

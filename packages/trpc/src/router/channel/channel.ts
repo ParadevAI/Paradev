@@ -34,6 +34,7 @@ import {
 	canManage,
 	loadChannelAccess,
 } from "./access";
+import { latestPostAuthorIdSql, latestPostBodySql } from "./latest-post";
 import {
 	allOrgMemberIds,
 	channelDevs,
@@ -209,9 +210,12 @@ export const channelRouter = {
 				.select({
 					id: channels.id,
 					name: channels.name,
+					description: channels.description,
 					visibility: channels.visibility,
 					lastSeq: channels.lastSeq,
 					lastMessageAt: channels.lastMessageAt,
+					lastMessageBody: latestPostBodySql(channels.id),
+					lastMessageAuthorId: latestPostAuthorIdSql(channels.id),
 					notify: channelMembers.notify,
 					muted: sql<boolean>`coalesce(${channelMembers.muted}, false)`,
 					lastReadSeq: channelMembers.lastReadSeq,

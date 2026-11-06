@@ -12,6 +12,32 @@ function elementKindOf(chip: ComposerChip): TextElement["elementKind"] {
 	return kind === "file_mention" || kind === "slash_command" ? kind : "other";
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function elementData(chip: ComposerChip): unknown {
+	if (linkedContextData(chip.data)) return chip.data;
+	if (chip.variant === "member") {
+		return { ...(isRecord(chip.data) ? chip.data : {}), variant: "member" };
+	}
+	return undefined;
+}
+
+/** A sent message's mention of a person or an agent, as the composer drew it. */
+export function memberChip(
+	text: string,
+	element: TextElement,
+): ComposerChip | null {
+	if (!isRecord(element.data) || element.data.variant !== "member") return null;
+	return {
+		label: element.label ?? text,
+		serialized: text,
+		variant: "member",
+		data: element.data,
+	};
+}
+
 export function elementsForChips(
 	text: string,
 	chips: readonly ComposerChip[],
@@ -25,6 +51,7 @@ export function elementsForChips(
 		if (start === -1) continue;
 		cursor = start + chip.serialized.length;
 		const byteStart = encoder.encode(text.slice(0, start)).length;
+		const data = elementData(chip);
 		elements.push({
 			byteRange: {
 				start: byteStart,
@@ -32,7 +59,7 @@ export function elementsForChips(
 			},
 			elementKind: elementKindOf(chip),
 			label: chip.label,
-			...(linkedContextData(chip.data) ? { data: chip.data } : {}),
+			...(data === undefined ? {} : { data }),
 		});
 	}
 	return elements;

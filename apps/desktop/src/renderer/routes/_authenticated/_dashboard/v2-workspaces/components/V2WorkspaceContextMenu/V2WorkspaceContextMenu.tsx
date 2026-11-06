@@ -30,11 +30,11 @@ import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hook
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { markWorkspaceSeen } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/markWorkspaceSeen";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useRestoreCloudWorkspaceIntent } from "renderer/stores/restore-cloud-workspace-intent";
 import { useSaveAsEnvironmentIntent } from "renderer/stores/save-as-environment-intent";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 
 export interface V2WorkspaceActions {
@@ -95,19 +95,7 @@ export function V2WorkspaceContextMenu({
 	// committed: a store write first re-renders every row in the same tick
 	// the route transition starts, and the list can stay on screen for
 	// seconds while the URL already says otherwise.
-	const markSeen = useCallback(() => {
-		const notifications = useV2NotificationStore.getState();
-		notifications.clearManualUnread(workspace.id);
-		for (const terminal of workspace.seenMarks.terminals) {
-			notifications.markTerminalSeen(terminal.terminalId, terminal.lastEventAt);
-		}
-		if (workspace.seenMarks.reportedAt !== null) {
-			notifications.markWorkspaceSeen(
-				workspace.id,
-				workspace.seenMarks.reportedAt,
-			);
-		}
-	}, [workspace.id, workspace.seenMarks]);
+	const markSeen = useCallback(() => markWorkspaceSeen(workspace), [workspace]);
 
 	const open = useCallback(() => {
 		if (isArchived) return;

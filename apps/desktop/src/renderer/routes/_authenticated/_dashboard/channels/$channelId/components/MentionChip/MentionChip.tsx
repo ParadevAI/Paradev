@@ -1,6 +1,6 @@
 import { cn } from "@superset/ui/utils";
 import type { ReactNode } from "react";
-import type { ChannelPerson } from "../ChannelMessageRow";
+import type { ChannelPerson } from "../MessageBody";
 import { PersonHoverCard } from "../PersonHoverCard";
 
 interface MentionChipProps {
@@ -20,10 +20,10 @@ export function MentionChip({
 		<PersonHoverCard channelId={channelId} person={person} isSelf={isSelf}>
 			<span
 				className={cn(
-					"rounded px-0.5 font-medium hover:underline",
+					"rounded-[4px] px-[3px] font-medium",
 					isSelf
 						? "bg-primary/15 text-foreground"
-						: "bg-accent text-foreground",
+						: "bg-link/14 text-link hover:bg-link/24",
 				)}
 			>
 				{children}

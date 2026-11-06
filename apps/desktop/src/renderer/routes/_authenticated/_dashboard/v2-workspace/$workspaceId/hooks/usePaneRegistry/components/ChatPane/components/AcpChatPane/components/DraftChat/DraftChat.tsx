@@ -21,6 +21,8 @@ export function DraftChat({
 	launched,
 	onOpenHistory,
 	onQueue,
+	placeholder,
+	compact,
 	queued,
 	workspaceId,
 }: {
@@ -30,6 +32,8 @@ export function DraftChat({
 	launched?: UserContent[];
 	onOpenHistory?: () => void;
 	onQueue: (content: UserContent[]) => void;
+	placeholder?: string;
+	compact?: boolean;
 	queued: UserContent[][];
 	workspaceId: string;
 }) {
@@ -74,6 +78,8 @@ export function DraftChat({
 					onEnterDrawer={enterDrawer}
 					onOpenHistory={onOpenHistory}
 					onSend={(content) => onQueue(content)}
+					placeholder={placeholder}
+					compact={compact}
 					workspaceId={workspaceId}
 				/>
 			</ChatPaneActionsProvider>
