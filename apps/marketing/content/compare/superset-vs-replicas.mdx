@@ -16,7 +16,7 @@ keywords:
   - background coding agents
 ---
 
-Paradev and Replicas both run real CLI coding agents, such as Claude Code and Codex, on your own model accounts. The difference is where the agents run and how work gets to them. Replicas is a cloud agent platform: each task gets its own Linux VM in Replicas cloud, and work starts from Slack, Linear, GitHub, GitLab, the dashboard, automations, or the API. Paradev is a desktop workspace: agents run on your Mac, on a host you add, on a Linux server in your own cloud account, or in a Paradev cloud workspace (beta). Choose Replicas when your team wants to hand off tickets to agents that run in the cloud and come back with pull requests. Choose Paradev when you want to run and watch the agents you already use, next to your local tools, with the option to move them to your own servers.
+Paradev and Replicas both run real CLI coding agents, such as Claude Code and Codex, on your own model accounts. The difference is where the agents run and how work gets to them. Replicas is a cloud agent platform: each task gets its own Linux VM in Replicas cloud, and work starts from Slack, Linear, GitHub, GitLab, the dashboard, automations, or the API. Paradev is a desktop workspace: agents run on your Mac, on a host you add, on a Linux server in your own cloud account, or in a Paradev cloud workspace. Choose Replicas when your team wants to hand off tickets to agents that run in the cloud and come back with pull requests. Choose Paradev when you want to run and watch the agents you already use, next to your local tools, with the option to move them to your own servers.
 
 This comparison is published by Paradev. Replicas details were checked against [replicas.dev](https://replicas.dev), its [docs](https://docs.replicas.dev), [pricing](https://replicas.dev/pricing), [billing docs](https://docs.replicas.dev/admin/billing), [enterprise page](https://replicas.dev/enterprise), and [changelog](https://docs.replicas.dev/changelog) on November 5, 2026.
 
@@ -25,7 +25,7 @@ This comparison is published by Paradev. Replicas details were checked against [
 | Requirement | Paradev | Replicas |
 |---|---|---|
 | Category | Desktop workspace for CLI coding agents | Cloud coding-agent platform for engineering teams |
-| Where agents run | Your machine, remote hosts you add through the relay (paid plan), your own Linux server (Bring Your Own Cloud), or [cloud workspaces](/cloud) (beta) | One isolated Linux VM per task in Replicas cloud; Enterprise adds dedicated single-tenant or self-hosted options |
+| Where agents run | Your machine, remote hosts you add through the relay (paid plan), your own Linux server (Bring Your Own Cloud), or [cloud workspaces](/cloud) | One isolated Linux VM per task in Replicas cloud; Enterprise adds dedicated single-tenant or self-hosted options |
 | Isolation | Git worktree and branch per workspace | A VM per workspace, with a Linux desktop and Chrome |
 | Interface | Desktop app with terminals, Changes pane, browser, and a chat interface | Web app with a chat per workspace, plus desktop apps for macOS, Windows, and Linux that wrap the web app |
 | Agents | Any CLI agent: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Claude Code, Codex, Cursor, OpenCode, Pi, and Muse Code |
@@ -49,7 +49,7 @@ Replicas describes itself as "cloud coding agents for engineering teams," with t
 
 This is the main split. Every Replicas task runs on a VM that Replicas starts for it, and nothing runs on your laptop. That makes it easy to run many agents at once, with full machines, and to keep them going when you close your laptop. Enterprise customers can also get a dedicated single-tenant deployment or run Replicas in their own infrastructure.
 
-Paradev is local-first. Agents run on your machine by default, next to your editor, local databases, and tools. To keep work going away from your desk, add another macOS or Linux machine as a host through the Paradev relay. To keep agents in your own cloud account on any paid plan, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server. Repos and agent sign-ins stay on that server, and it needs no inbound ports. If you do not want to run a machine, [cloud workspaces](/cloud) (beta) on Team and Ultra start a cloud sandbox for you.
+Paradev is local-first. Agents run on your machine by default, next to your editor, local databases, and tools. To keep work going away from your desk, add another macOS or Linux machine as a host through the Paradev relay. To keep agents in your own cloud account on any paid plan, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server. Repos and agent sign-ins stay on that server, and it needs no inbound ports. If you do not want to run a machine, [cloud workspaces](/cloud) on Team and Ultra start a cloud sandbox for you.
 
 ### Handing off tasks vs running agents
 
@@ -83,7 +83,7 @@ Neither tool charges for model usage. You pay your model provider on your own pl
 | Paid | Pro: {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly. Team: {{price:team}}. Ultra: {{price:ultra}} | Developer: $50/month with $50 of usage. Team: $200+/month in $100 steps, with the same amount of usage |
 | Large teams | Enterprise: custom | Enterprise: custom |
 
-Paradev charges per user. Paid plans add Remote Access hosts, Bring Your Own Cloud, automations, and the iPhone and iPad app. Team and Ultra add cloud workspaces (beta).
+Paradev charges per user. Paid plans add Remote Access hosts, Bring Your Own Cloud, automations, and the iPhone and iPad app. Team and Ultra add cloud workspaces.
 
 Replicas charges for compute, not seats. Workspaces are billed per minute while awake: $0.004 per minute for small (2 vCPU, 8 GB), $0.008 for large (4 vCPU, 16 GB), and $0.016 for ultra (8 vCPU, 32 GB). Usage over the plan is billed at 1.5 times those rates. Sleeping workspaces cost nothing. Check [Paradev pricing](/pricing) and [Replicas pricing](https://replicas.dev/pricing) for current terms.
 
@@ -109,7 +109,7 @@ Replicas charges for compute, not seats. Workspaces are billed per minute while 
 
 ### What is the best Replicas alternative?
 
-If you want agents on machines you control, Paradev is a close alternative: it runs the same agent CLIs, on your Mac, your hosts, your own Linux server, or a Paradev cloud workspace (beta). If you want another hosted cloud agent, see [Paradev vs Devin](/compare/superset-vs-devin) and [Paradev vs AQ](/compare/superset-vs-aq).
+If you want agents on machines you control, Paradev is a close alternative: it runs the same agent CLIs, on your Mac, your hosts, your own Linux server, or a Paradev cloud workspace. If you want another hosted cloud agent, see [Paradev vs Devin](/compare/superset-vs-devin) and [Paradev vs AQ](/compare/superset-vs-aq).
 
 ### Can I self-host Replicas?
 

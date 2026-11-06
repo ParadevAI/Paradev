@@ -34,7 +34,7 @@ T3 Code facts were checked against its [GitHub repository](https://github.com/pi
 | **Maturity** | Established, with SOC 2 Type II and remote/cloud workspaces | Stable releases since v0.1.0 (October 15, 2026), latest v0.1.7 (November 4, 2026), plus several nightly builds a day; its README says it is "very very early" |
 | **Review tooling** | Built-in diff/file editor; commit, push, and open PRs; PR pane with checks and review threads | Inline diff review, commit-by-commit review, one-button commit/push/PR; GitHub, GitLab, Forgejo, Gitea, Bitbucket, Azure DevOps, and GitCafe |
 | **Automation** | Scheduled automations and event triggers (GitHub, Slack, Linear, more), with run history | Scheduled tasks (recurring or once) and webhook triggers |
-| **Remote / cloud** | Remote hosts through Remote Access, your own Linux server (BYOC), plus cloud workspaces (beta) | Run the server on any machine with `t3 up`; reach it through T3 Connect, LAN, or Tailscale; no managed cloud workspaces |
+| **Remote / cloud** | Remote hosts through Remote Access, your own Linux server (BYOC), plus cloud workspaces | Run the server on any machine with `t3 up`; reach it through T3 Connect, LAN, or Tailscale; no managed cloud workspaces |
 | **Platform** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Desktop (macOS, Windows, Linux), web app, iOS and Android apps, `t3` CLI, MCP server for outside agents |
 | **Admin controls** | Enterprise: SAML SSO, SCIM, audit logs | Managed policies per machine, including Windows Group Policy |
 | **License** | Open source (MIT) | Open source (MIT) |
@@ -43,7 +43,7 @@ T3 Code facts were checked against its [GitHub repository](https://github.com/pi
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](/cloud) (beta), and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and in [cloud workspaces](/cloud), and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
 
 ## What Is T3 Code?
 
@@ -69,7 +69,7 @@ T3 Code supports a set list of agents, adds Kiro in beta, and reaches more throu
 
 ### Reach Beyond One Machine
 
-Both reach beyond your laptop. T3 Code runs its server on any machine you have, and its free T3 Connect links up to 3 machines (more with a paid T3 Chat plan), with LAN pairing and Tailscale as other options. Its iOS and Android apps and web app connect to those machines. Paradev adds macOS or Linux hosts through Remote Access, runs on your own Linux server with Bring Your Own Cloud, and runs [cloud workspaces](/cloud) (beta) that Paradev manages, so agents keep working with no machine of yours turned on. Paradev's mobile app is for iPhone and iPad; Android is on the waitlist.
+Both reach beyond your laptop. T3 Code runs its server on any machine you have, and its free T3 Connect links up to 3 machines (more with a paid T3 Chat plan), with LAN pairing and Tailscale as other options. Its iOS and Android apps and web app connect to those machines. Paradev adds macOS or Linux hosts through Remote Access, runs on your own Linux server with Bring Your Own Cloud, and runs [cloud workspaces](/cloud) that Paradev manages, so agents keep working with no machine of yours turned on. Paradev's mobile app is for iPhone and iPad; Android is on the waitlist.
 
 ---
 

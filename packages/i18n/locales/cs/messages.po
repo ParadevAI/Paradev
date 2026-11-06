@@ -3463,9 +3463,6 @@ msgstr "Zaostává za main o ? commitů, je potřeba rebase"
 msgid "Being built right now."
 msgstr "Právě se staví."
 
-msgid "Beta"
-msgstr "Beta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Za obzorem: F5 není tvrzení o blízké budoucnosti"
 
@@ -14006,9 +14003,6 @@ msgstr "Zkratky s Option mohou bránit psaní speciálních znaků"
 
 msgid "Optional"
 msgstr "Volitelné"
-
-msgid "Optional · Beta"
-msgstr "Volitelné · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Volitelný popis zobrazený v seznamu terminálových skriptů."

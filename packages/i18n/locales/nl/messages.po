@@ -3463,9 +3463,6 @@ msgstr "? commits achter op main, rebase nodig"
 msgid "Being built right now."
 msgstr "Wordt nu gebouwd."
 
-msgid "Beta"
-msgstr "Bèta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Verder: F5 is geen claim voor de korte termijn"
 
@@ -14006,9 +14003,6 @@ msgstr "Option-sneltoetsen kunnen het typen van speciale tekens blokkeren"
 
 msgid "Optional"
 msgstr "Optioneel"
-
-msgid "Optional · Beta"
-msgstr "Optioneel · Bèta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Optionele context die in de lijst met terminalscripts wordt getoond."

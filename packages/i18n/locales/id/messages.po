@@ -3463,9 +3463,6 @@ msgstr "Tertinggal ? commit dari main, perlu rebase"
 msgid "Being built right now."
 msgstr "Sedang dibangun sekarang."
 
-msgid "Beta"
-msgstr "Beta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Di luar itu: F5 bukan klaim jangka dekat"
 
@@ -14006,9 +14003,6 @@ msgstr "Pintasan Option bisa menghalangi pengetikan karakter khusus"
 
 msgid "Optional"
 msgstr "Opsional"
-
-msgid "Optional · Beta"
-msgstr "Opsional · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Konteks opsional yang ditampilkan di daftar skrip terminal."

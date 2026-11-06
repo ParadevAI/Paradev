@@ -3463,9 +3463,6 @@ msgstr "Chậm hơn main ? commit, cần rebase"
 msgid "Being built right now."
 msgstr "Đang được xây ngay lúc này."
 
-msgid "Beta"
-msgstr "Beta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Xa hơn: F5 không phải tuyên bố cho tương lai gần"
 
@@ -14006,9 +14003,6 @@ msgstr "Phím tắt Option có thể cản trở việc gõ ký tự đặc bi�
 
 msgid "Optional"
 msgstr "Tùy chọn"
-
-msgid "Optional · Beta"
-msgstr "Tùy chọn · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Ghi chú tùy chọn hiện trong danh sách script terminal."

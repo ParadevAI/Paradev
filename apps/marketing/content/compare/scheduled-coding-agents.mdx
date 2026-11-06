@@ -51,7 +51,7 @@ For a team that wants the agents on one shared machine, use a tool that runs on 
 
 Review stays human. A teammate with host access opens the run's workspace, reads the diff, and continues the session or opens a PR. The Automations list has **Mine** and **Team** tabs. Team automations are read-only: only the owner can edit, pause, run, or delete one. Run workspaces are tagged `automation` by default, so they collect in one sidebar folder per project instead of mixing with hand-made workspaces. Details: [Automations](https://docs.paradev.com/automations) and [Remote access](https://docs.paradev.com/remote-access).
 
-Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on the machine you picked, so if it is offline at fire time the run is recorded as missed and the schedule moves on. To avoid missed runs, pick **Cloud** as the device: each run then starts in a [cloud workspace](/cloud) (beta, Team and Ultra).
+Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on the machine you picked, so if it is offline at fire time the run is recorded as missed and the schedule moves on. To avoid missed runs, pick **Cloud** as the device: each run then starts in a [cloud workspace](/cloud) (Team and Ultra).
 
 **DIY: cron + worktrees + headless CLI.** A systemd timer or cron job runs a script that calls `git worktree add`, starts `claude -p "..."` or another headless agent, runs tests, and pushes a branch. It costs nothing extra and you control everything. You also own port and database collisions between runs, cleanup of old worktrees, and finding out which run failed.
 

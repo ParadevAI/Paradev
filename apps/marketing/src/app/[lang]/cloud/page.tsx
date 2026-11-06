@@ -36,9 +36,6 @@ export default async function CloudPage() {
 						<p className="inline-flex items-center gap-2 font-mono text-brand text-xs uppercase tracking-wider">
 							<FaCloud aria-hidden="true" className="size-4" />
 							<Trans>Cloud workspaces</Trans>
-							<span className="border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
-								<Trans>Beta</Trans>
-							</span>
 						</p>
 						<h1 className="mt-4 font-medium text-balance text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>Run your coding agents in the cloud.</Trans>

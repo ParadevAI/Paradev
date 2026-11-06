@@ -26,7 +26,7 @@ This comparison is published by Paradev. Multica details were checked against [m
 |---|---|---|
 | Interface | Desktop app, CLI, iPhone and iPad app | Web app, desktop app (a wrapper for the web app), CLI and API; iOS app that you build from source |
 | Main view | Workspaces, each with a terminal, Changes pane, and browser | Issue board, with agents as assignees |
-| Where agents run | Your machine, remote hosts you add, your own Linux server (Bring Your Own Cloud), or cloud workspaces (beta) | A daemon on a machine you connect (laptop or cloud server); Qoder Cloud Agents as a hosted option |
+| Where agents run | Your machine, remote hosts you add, your own Linux server (Bring Your Own Cloud), or cloud workspaces | A daemon on a machine you connect (laptop or cloud server); Qoder Cloud Agents as a hosted option |
 | Isolation | Git worktree and branch per local workspace; a separate clone per cloud workspace | A directory per run, with a Git worktree from a shared repository cache |
 | Agents | Any CLI agent: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | 26 agent CLIs, including Claude Code, Codex, Cursor Agent, Copilot CLI, OpenCode, Pi, Antigravity, Grok, Kimi, Kiro CLI, and Qwen Code |
 | How tasks start | App or CLI; automations on schedules and GitHub, Slack, and Linear events; tasks synced with Linear and GitHub Issues | Assign an issue, @-mention an agent, chat, quick actions, workflows, autopilots, wakeups, Slack and other chat apps |
@@ -62,7 +62,7 @@ Paradev runs agents on your machine by default. To keep them working away from y
 
 - Add a macOS or Linux machine as a host through the Paradev relay (Remote Access, paid plan).
 - Run the Paradev host on an x64 or arm64 Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Repos and agent sign-ins stay on that server, and it needs no inbound ports.
-- Use [cloud workspaces](/cloud) (beta), included with Team and Ultra. Paradev runs the sandbox, and agents keep working when your laptop is closed.
+- Use [cloud workspaces](/cloud), included with Team and Ultra. Paradev runs the sandbox, and agents keep working when your laptop is closed.
 
 ### Which agents can you use?
 
@@ -121,7 +121,7 @@ Both use your own agent subscriptions and keys. Paradev Team and Ultra add cloud
 
 - Want to watch and steer each agent in a real terminal or the chat interface.
 - Want diffs, commits, pull requests, and a browser with Design Mode next to the agent.
-- Want to choose where agents run: your laptop, a host you add, your own Linux server, or cloud workspaces (beta).
+- Want to choose where agents run: your laptop, a host you add, your own Linux server, or cloud workspaces.
 - Want a native iPhone and iPad app from the App Store, or code under the MIT License.
 
 **Verdict:** Multica is a project board where agents are teammates. You give them issues and review the results on the issue and on your Git host. Paradev is a workspace for the agents you run. It keeps each agent in its own worktree and terminal, with review in the same app. Teams that plan in issues and want agents to take tickets should try Multica. Developers who want hands-on control of each agent session should try Paradev.

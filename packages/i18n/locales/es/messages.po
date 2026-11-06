@@ -3463,9 +3463,6 @@ msgstr "? commits por detrás de main, necesita rebase"
 msgid "Being built right now."
 msgstr "Se está construyendo ahora mismo."
 
-msgid "Beta"
-msgstr "Beta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Más allá: F5 no es una afirmación a corto plazo"
 
@@ -14006,9 +14003,6 @@ msgstr "Los atajos con Option pueden impedir escribir caracteres especiales"
 
 msgid "Optional"
 msgstr "Opcional"
-
-msgid "Optional · Beta"
-msgstr "Opcional · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Contexto opcional que se muestra en la lista de scripts de terminal."

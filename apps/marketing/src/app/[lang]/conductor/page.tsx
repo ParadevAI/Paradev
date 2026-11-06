@@ -134,11 +134,6 @@ export default async function ConductorPage() {
 							<li key={item.title.id} className="bg-background p-6">
 								<h2 className="flex flex-wrap items-center gap-2 font-medium text-foreground">
 									{t(item.title)}
-									{item.beta && (
-										<span className="border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-											<Trans>Beta</Trans>
-										</span>
-									)}
 								</h2>
 								<p className="mt-2 text-muted-foreground text-sm leading-relaxed">
 									{t(item.detail)}
@@ -223,7 +218,7 @@ export default async function ConductorPage() {
 										{t(step.title)}
 										{step.optional && (
 											<span className="border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-												<Trans>Optional · Beta</Trans>
+												<Trans>Optional</Trans>
 											</span>
 										)}
 									</h3>
@@ -293,11 +288,6 @@ export default async function ConductorPage() {
 										</th>
 										<td className="py-4 pr-4 align-top text-foreground">
 											{priced(row.paradev, row.unpricedParadev)}
-											{row.beta && (
-												<span className="ml-2 border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-													<Trans>Beta</Trans>
-												</span>
-											)}
 										</td>
 										<td className="py-4 align-top text-muted-foreground">
 											{t(row.conductor)}
