@@ -8,7 +8,7 @@ import {
 } from "../shared/github-search";
 import {
 	type ResolvedGithubRepo,
-	resolveGithubRepo,
+	resolveGithubBaseRepo,
 } from "../shared/project-helpers";
 import {
 	fetchPullRequestRowDetails,
@@ -66,7 +66,7 @@ export const getPullRequestRowDetails = protectedProcedure
 		async ({ ctx, input }): Promise<{ rows: PullRequestRowDetailsRow[] }> => {
 			const settled = await Promise.allSettled(
 				input.projects.map(async ({ projectId, prNumbers }) => {
-					const repo = await resolveGithubRepo(ctx, projectId);
+					const repo = await resolveGithubBaseRepo(ctx, projectId);
 					const details = await readRowDetails(ctx, repo, prNumbers);
 					return [...details].map(
 						([prNumber, row]): PullRequestRowDetailsRow => ({
