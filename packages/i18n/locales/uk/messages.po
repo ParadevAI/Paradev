@@ -2230,6 +2230,9 @@ msgstr "Після затримки (3 с)"
 msgid "Against base"
 msgstr "Порівняно з базовою гілкою"
 
+msgid "Against Main"
+msgstr "Порівняно з main"
+
 msgid "Agent"
 msgstr "Агент"
 
@@ -10145,6 +10148,9 @@ msgstr "Ініціалізація..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Ініціали як запасний варіант через getInitials, розміри xs → xl"
 
+msgid "Inline"
+msgstr "У рядку"
+
 msgid "Inline Citation"
 msgstr "Вбудована цитата"
 
@@ -17374,6 +17380,9 @@ msgstr "Виберіть середовище"
 msgid "Select every run"
 msgstr "Вибрати всі запуски"
 
+msgid "Select IDE"
+msgstr "Вибрати IDE"
+
 msgid "Select issue"
 msgstr "Вибрати issue"
 
@@ -17965,6 +17974,9 @@ msgstr "Закривається {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Порівняння"
+
+msgid "Side by Side"
+msgstr "Поруч"
 
 msgid "sidebar"
 msgstr "бічна панель"
@@ -18607,9 +18619,6 @@ msgstr "Почніть із роботи."
 
 msgid "Start work from anywhere"
 msgstr "Починайте роботу будь-де"
-
-msgid "Start workspace"
-msgstr "Запустити робочий простір"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Запускайте робочі простори просто з issues у Linear або GitHub у розділі «Завдання», і в кожному з них уже працюватиме агент."

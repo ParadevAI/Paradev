@@ -2236,6 +2236,9 @@ msgstr "После задержки (3 с)"
 msgid "Against base"
 msgstr "Против базовой ветки"
 
+msgid "Against Main"
+msgstr "Против main"
+
 msgid "Agent"
 msgstr "Агент"
 
@@ -10151,6 +10154,9 @@ msgstr "Инициализация..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Запасной вариант с инициалами через getInitials, размеры xs → xl"
 
+msgid "Inline"
+msgstr "В строке"
+
 msgid "Inline Citation"
 msgstr "Ссылка в тексте"
 
@@ -17380,6 +17386,9 @@ msgstr "Выберите окружение"
 msgid "Select every run"
 msgstr "Выбрать все запуски"
 
+msgid "Select IDE"
+msgstr "Выбрать IDE"
+
 msgid "Select issue"
 msgstr "Выбрать задачу"
 
@@ -17971,6 +17980,9 @@ msgstr "Закрывается {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Сравнение"
+
+msgid "Side by Side"
+msgstr "Рядом"
 
 msgid "sidebar"
 msgstr "боковая панель"
@@ -18613,9 +18625,6 @@ msgstr "Начните с работы."
 
 msgid "Start work from anywhere"
 msgstr "Начинайте работу откуда угодно"
-
-msgid "Start workspace"
-msgstr "Запустить рабочую область"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Запускайте рабочие области прямо из задач Linear или GitHub в разделе «Задачи», и в каждой из них уже работает агент."

@@ -2236,6 +2236,9 @@ msgstr "Po zpoždění (3s)"
 msgid "Against base"
 msgstr "Proti základní větvi"
 
+msgid "Against Main"
+msgstr "Proti main"
+
 msgid "Agent"
 msgstr "Agent"
 
@@ -10151,6 +10154,9 @@ msgstr "Inicializuji..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Záložní iniciály přes getInitials, velikosti xs → xl"
 
+msgid "Inline"
+msgstr "V řádku"
+
 msgid "Inline Citation"
 msgstr "Citace v textu"
 
@@ -17380,6 +17386,9 @@ msgstr "Vybrat prostředí"
 msgid "Select every run"
 msgstr "Vybrat všechny běhy"
 
+msgid "Select IDE"
+msgstr "Vyberte IDE"
+
 msgid "Select issue"
 msgstr "Vybrat issue"
 
@@ -17971,6 +17980,9 @@ msgstr "Končí {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Srovnání"
+
+msgid "Side by Side"
+msgstr "Vedle sebe"
 
 msgid "sidebar"
 msgstr "postranní panel"
@@ -18613,9 +18625,6 @@ msgstr "Začněte prací."
 
 msgid "Start work from anywhere"
 msgstr "Začněte pracovat odkudkoli"
-
-msgid "Start workspace"
-msgstr "Spustit pracovní prostor"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Spouštějte pracovní prostory přímo z issues v Linear nebo GitHub v zobrazení Úkoly, s agentem, který na každém z nich už pracuje."

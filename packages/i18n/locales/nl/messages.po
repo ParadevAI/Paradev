@@ -2236,6 +2236,9 @@ msgstr "Na vertraging (3 s)"
 msgid "Against base"
 msgstr "Ten opzichte van basis"
 
+msgid "Against Main"
+msgstr "Ten opzichte van main"
+
 msgid "Agent"
 msgstr "Agent"
 
@@ -10151,6 +10154,9 @@ msgstr "Initialiseren..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Terugval op initialen via getInitials, formaten xs → xl"
 
+msgid "Inline"
+msgstr "Inline"
+
 msgid "Inline Citation"
 msgstr "Inline-citaat"
 
@@ -17380,6 +17386,9 @@ msgstr "Omgeving selecteren"
 msgid "Select every run"
 msgstr "Alle runs selecteren"
 
+msgid "Select IDE"
+msgstr "IDE kiezen"
+
 msgid "Select issue"
 msgstr "Issue kiezen"
 
@@ -17970,6 +17979,9 @@ msgid "Shuts down {shutdownDate}"
 msgstr "Stopt op {shutdownDate}"
 
 msgid "Side by side"
+msgstr "Naast elkaar"
+
+msgid "Side by Side"
 msgstr "Naast elkaar"
 
 msgid "sidebar"
@@ -18613,9 +18625,6 @@ msgstr "Begin bij het werk."
 
 msgid "Start work from anywhere"
 msgstr "Begin overal met werken"
-
-msgid "Start workspace"
-msgstr "Werkruimte starten"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Start werkruimtes direct vanuit Linear- of GitHub-issues in de weergave Taken, met op elk ervan al een agent aan het werk."

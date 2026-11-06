@@ -2236,6 +2236,9 @@ msgstr "延遲後（3 秒）"
 msgid "Against base"
 msgstr "對比基準分支"
 
+msgid "Against Main"
+msgstr "對比main"
+
 msgid "Agent"
 msgstr "代理程式"
 
@@ -10151,6 +10154,9 @@ msgstr "正在初始化..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "通過getInitials生成首字母備用值，尺寸xs→xl"
 
+msgid "Inline"
+msgstr "行內"
+
 msgid "Inline Citation"
 msgstr "行內引用"
 
@@ -17380,6 +17386,9 @@ msgstr "選擇環境"
 msgid "Select every run"
 msgstr "選擇所有執行"
 
+msgid "Select IDE"
+msgstr "選擇IDE"
+
 msgid "Select issue"
 msgstr "選擇議題"
 
@@ -17971,6 +17980,9 @@ msgstr "{shutdownDate}關閉"
 
 msgid "Side by side"
 msgstr "並排比較"
+
+msgid "Side by Side"
+msgstr "並排"
 
 msgid "sidebar"
 msgstr "側邊欄"
@@ -18613,9 +18625,6 @@ msgstr "從工作本身開始。"
 
 msgid "Start work from anywhere"
 msgstr "隨時隨地開始工作"
-
-msgid "Start workspace"
-msgstr "啟動工作區"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "在任務檢視中直接從 Linear 或 GitHub 議題啟動工作區，每個工作區都已有代理程式在處理。"

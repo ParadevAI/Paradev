@@ -1,79 +1,100 @@
 "use client";
 
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
-	LuBox,
+	LuArrowUp,
 	LuChevronDown,
-	LuCpu,
+	LuChevronsRight,
+	LuFolder,
 	LuGitBranch,
-	LuLaptop,
+	LuGitFork,
+	LuMic,
 	LuPlus,
 } from "react-icons/lu";
 import { TbCloud } from "react-icons/tb";
 import { Picker } from "./components/Picker";
 
-export function NewCloudWorkspaceDialog() {
+const TYPE_START_MS = 400;
+const TYPE_CHAR_MS = 32;
+
+interface NewCloudWorkspaceDialogProps {
+	active: boolean;
+}
+
+export function NewCloudWorkspaceDialog({
+	active,
+}: NewCloudWorkspaceDialogProps) {
+	const { t } = useLingui();
+	const prompt = t({
+		message: "Run the nightly evals and fix any regressions",
+	});
+	const [typed, setTyped] = useState(prompt.length);
+
+	useEffect(() => {
+		if (!active) return;
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			setTyped(prompt.length);
+			return;
+		}
+		setTyped(0);
+		let interval: ReturnType<typeof setInterval>;
+		const start = setTimeout(() => {
+			interval = setInterval(() => {
+				setTyped((count) => {
+					if (count >= prompt.length) clearInterval(interval);
+					return Math.min(count + 1, prompt.length);
+				});
+			}, TYPE_CHAR_MS);
+		}, TYPE_START_MS);
+		return () => {
+			clearTimeout(start);
+			clearInterval(interval);
+		};
+	}, [active, prompt]);
+
+	const ready = typed >= prompt.length;
+
 	return (
-		<div className="flex w-[560px] flex-col gap-2.5 rounded-xl border border-white/[0.1] bg-[#1b1b1b] p-3 font-sans shadow-[0_30px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.04)]">
-			<div className="flex items-center">
-				<div className="flex rounded-lg border border-border/60 bg-foreground/[0.04] p-0.5 text-[10.5px]">
-					<span className="flex h-6 items-center gap-1.5 rounded-md px-2.5 text-muted-foreground/70">
-						<LuLaptop className="size-3" />
-						<Trans>This Mac</Trans>
-					</span>
-					<span className="flex h-6 items-center gap-1.5 rounded-md bg-foreground/[0.1] px-2.5 text-foreground/95 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
-						<TbCloud className="size-3" />
-						<Trans>Cloud</Trans>
-					</span>
+		<div className="flex w-[600px] flex-col gap-2.5 font-sans">
+			<div className="rounded-2xl border border-white/[0.08] bg-[#1c1c1c]/95 px-4 pt-3.5 pb-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+				<div className="h-12 text-[13.5px] leading-relaxed text-foreground/95">
+					{prompt.slice(0, typed)}
+					<span className="ml-px inline-block h-[15px] w-[1.5px] translate-y-[3px] animate-pulse bg-foreground/80" />
 				</div>
-				<span className="ml-auto text-[10px] text-muted-foreground/45">⌘N</span>
-			</div>
-
-			<div className="rounded-lg border border-white/[0.09] bg-[#161616] px-3 pt-3 pb-2">
-				<div className="h-12 text-[12.5px] leading-relaxed text-foreground/95">
-					<Trans>Run the nightly evals and fix any regressions</Trans>
-				</div>
-				<div className="flex items-center gap-2">
-					<LuPlus className="size-3 text-muted-foreground/60" />
-					<span className="inline-flex h-6 items-center gap-1.5 rounded-md bg-foreground/[0.05] px-2 text-[10.5px] text-foreground/90">
-						<Image
-							src="/app-icons/claude.svg"
-							alt="Claude"
-							width={11}
-							height={11}
-						/>
-						Claude Code
-						<LuChevronDown className="size-2.5 text-muted-foreground/45" />
+				<div className="flex items-center gap-3.5 text-[11px]">
+					<LuPlus className="size-4 text-muted-foreground/70" />
+					<span className="flex items-center gap-1.5 text-foreground/90">
+						<LuChevronsRight className="size-4 text-brand-light" />
+						<Trans>Full access</Trans>
+						<LuChevronDown className="size-3 text-muted-foreground/50" />
+					</span>
+					<span className="ml-auto flex items-center gap-1.5 text-foreground/90">
+						<Image src="/app-icons/claude.svg" alt="" width={13} height={13} />
+						<Trans>Default model</Trans>
+						<LuChevronDown className="size-3 text-muted-foreground/50" />
+					</span>
+					<LuMic className="size-4 text-muted-foreground/70" />
+					<span
+						className={`flex size-7 items-center justify-center rounded-lg transition-colors duration-200 ${ready ? "bg-foreground text-background" : "bg-foreground/15 text-foreground/50"}`}
+					>
+						<LuArrowUp className="size-4" />
 					</span>
 				</div>
 			</div>
 
-			<div className="flex items-center gap-0.5">
-				<Picker
-					icon={
-						<span className="grid size-3.5 place-items-center rounded-[3px] border border-border/60 bg-[#262626] text-[7.5px] text-muted-foreground/75">
-							P
-						</span>
-					}
-				>
-					paradev
+			<div className="flex items-center gap-1.5 px-1">
+				<Picker highlighted icon={<TbCloud className="size-3.5" />}>
+					<Trans>Cloud</Trans>
 				</Picker>
-				<Picker
-					icon={<LuGitBranch className="size-2.5 text-muted-foreground/65" />}
-				>
+				<Picker icon={<LuFolder className="size-3.5" />}>Paradev</Picker>
+				<Picker icon={<LuGitFork className="size-3.5" />}>
+					<Trans>Worktree</Trans>
+				</Picker>
+				<Picker icon={<LuGitBranch className="size-3.5" />}>
 					<span className="font-mono">main</span>
 				</Picker>
-				<Picker icon={<LuBox className="size-2.5 text-muted-foreground/65" />}>
-					paradev · us-east
-				</Picker>
-				<Picker icon={<LuCpu className="size-2.5 text-muted-foreground/65" />}>
-					<Trans context="machine size">Medium</Trans>
-				</Picker>
-				<span className="ml-auto inline-flex h-7 items-center gap-2 rounded-md bg-foreground px-3 text-[10.5px] font-medium text-background">
-					<Trans>Start workspace</Trans>
-					<span className="text-[9.5px] opacity-55">⌘↵</span>
-				</span>
 			</div>
 		</div>
 	);

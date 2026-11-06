@@ -2236,6 +2236,9 @@ msgstr "Setelah penundaan (3 dtk)"
 msgid "Against base"
 msgstr "Terhadap base"
 
+msgid "Against Main"
+msgstr "Terhadap Main"
+
 msgid "Agent"
 msgstr "Agen"
 
@@ -10151,6 +10154,9 @@ msgstr "Menginisialisasi..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Fallback inisial lewat getInitials, ukuran xs → xl"
 
+msgid "Inline"
+msgstr "Sebaris"
+
 msgid "Inline Citation"
 msgstr "Kutipan Sebaris"
 
@@ -17380,6 +17386,9 @@ msgstr "Pilih environment"
 msgid "Select every run"
 msgstr "Pilih semua run"
 
+msgid "Select IDE"
+msgstr "Pilih IDE"
+
 msgid "Select issue"
 msgstr "Pilih issue"
 
@@ -17970,6 +17979,9 @@ msgid "Shuts down {shutdownDate}"
 msgstr "Ditutup {shutdownDate}"
 
 msgid "Side by side"
+msgstr "Berdampingan"
+
+msgid "Side by Side"
 msgstr "Berdampingan"
 
 msgid "sidebar"
@@ -18613,9 +18625,6 @@ msgstr "Mulai dari pekerjaannya."
 
 msgid "Start work from anywhere"
 msgstr "Mulai bekerja dari mana saja"
-
-msgid "Start workspace"
-msgstr "Mulai workspace"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Mulai workspace langsung dari issue Linear atau GitHub di tampilan Tugas, dengan agen yang sudah mengerjakan masing-masing."

@@ -205,7 +205,7 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 							animate={{ y: isCloud ? 0 : 10, scale: isCloud ? 1 : 0.98 }}
 							transition={{ duration: 0.25, ease: "easeOut" }}
 						>
-							<NewCloudWorkspaceDialog />
+							<NewCloudWorkspaceDialog active={isCloud} />
 						</m.div>
 					</div>
 				</m.div>

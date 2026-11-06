@@ -2236,6 +2236,9 @@ msgstr "延迟后（3 秒）"
 msgid "Against base"
 msgstr "对比基准分支"
 
+msgid "Against Main"
+msgstr "对比main"
+
 msgid "Agent"
 msgstr "智能体"
 
@@ -10151,6 +10154,9 @@ msgstr "正在初始化..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "通过getInitials生成首字母兜底，尺寸xs→xl"
 
+msgid "Inline"
+msgstr "行内"
+
 msgid "Inline Citation"
 msgstr "内联引用"
 
@@ -17380,6 +17386,9 @@ msgstr "选择环境"
 msgid "Select every run"
 msgstr "选择所有运行"
 
+msgid "Select IDE"
+msgstr "选择IDE"
+
 msgid "Select issue"
 msgstr "选择议题"
 
@@ -17971,6 +17980,9 @@ msgstr "{shutdownDate}关闭"
 
 msgid "Side by side"
 msgstr "并排对比"
+
+msgid "Side by Side"
+msgstr "并排"
 
 msgid "sidebar"
 msgstr "侧边栏"
@@ -18613,9 +18625,6 @@ msgstr "从工作本身开始。"
 
 msgid "Start work from anywhere"
 msgstr "随时随地开始工作"
-
-msgid "Start workspace"
-msgstr "启动工作区"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "在任务视图中直接从 Linear 或 GitHub 议题启动工作区，每个工作区都已有智能体在处理。"

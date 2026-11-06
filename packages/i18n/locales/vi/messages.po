@@ -2236,6 +2236,9 @@ msgstr "Sau khoảng trễ (3 giây)"
 msgid "Against base"
 msgstr "So với nhánh gốc"
 
+msgid "Against Main"
+msgstr "So với main"
+
 msgid "Agent"
 msgstr "Agent"
 
@@ -10151,6 +10154,9 @@ msgstr "Đang khởi tạo..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Dự phòng bằng chữ cái đầu qua getInitials, cỡ xs → xl"
 
+msgid "Inline"
+msgstr "Nội dòng"
+
 msgid "Inline Citation"
 msgstr "Inline Citation"
 
@@ -17380,6 +17386,9 @@ msgstr "Chọn environment"
 msgid "Select every run"
 msgstr "Chọn tất cả lần chạy"
 
+msgid "Select IDE"
+msgstr "Chọn IDE"
+
 msgid "Select issue"
 msgstr "Chọn issue"
 
@@ -17971,6 +17980,9 @@ msgstr "Ngừng hoạt động vào {shutdownDate}"
 
 msgid "Side by side"
 msgstr "So sánh song song"
+
+msgid "Side by Side"
+msgstr "Cạnh nhau"
 
 msgid "sidebar"
 msgstr "sidebar"
@@ -18613,9 +18625,6 @@ msgstr "Bắt đầu từ công việc."
 
 msgid "Start work from anywhere"
 msgstr "Bắt đầu công việc từ bất cứ đâu"
-
-msgid "Start workspace"
-msgstr "Khởi động workspace"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Bắt đầu workspace ngay từ issue Linear hoặc GitHub trong chế độ xem Tác vụ, mỗi workspace đều có sẵn một agent đang làm việc."

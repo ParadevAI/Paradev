@@ -2236,6 +2236,9 @@ msgstr "遅延後（3秒）"
 msgid "Against base"
 msgstr "ベースとの差分"
 
+msgid "Against Main"
+msgstr "mainとの比較"
+
 msgid "Agent"
 msgstr "エージェント"
 
@@ -10151,6 +10154,9 @@ msgstr "初期化中..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "getInitialsによるイニシャルのフォールバック、サイズはxs → xl"
 
+msgid "Inline"
+msgstr "インライン"
+
 msgid "Inline Citation"
 msgstr "Inline Citation"
 
@@ -17380,6 +17386,9 @@ msgstr "環境を選択"
 msgid "Select every run"
 msgstr "すべての実行を選択"
 
+msgid "Select IDE"
+msgstr "IDEを選択"
+
 msgid "Select issue"
 msgstr "issueを選択"
 
@@ -17971,6 +17980,9 @@ msgstr "{shutdownDate}に終了"
 
 msgid "Side by side"
 msgstr "並べて比較"
+
+msgid "Side by Side"
+msgstr "並べて表示"
 
 msgid "sidebar"
 msgstr "サイドバー"
@@ -18613,9 +18625,6 @@ msgstr "仕事から始める。"
 
 msgid "Start work from anywhere"
 msgstr "どこからでも作業を開始"
-
-msgid "Start workspace"
-msgstr "ワークスペースを開始"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "タスクビューでLinearやGitHubのIssueから直接ワークスペースを開始でき、それぞれでエージェントがすでに作業を始めています。"

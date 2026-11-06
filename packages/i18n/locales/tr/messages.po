@@ -2236,6 +2236,9 @@ msgstr "Gecikmeden sonra (3 sn)"
 msgid "Against base"
 msgstr "Temele göre"
 
+msgid "Against Main"
+msgstr "main ile karşılaştır"
+
 msgid "Agent"
 msgstr "Ajan"
 
@@ -10151,6 +10154,9 @@ msgstr "Başlatılıyor..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "getInitials ile baş harf yedeği, xs → xl boyutları"
 
+msgid "Inline"
+msgstr "Satır içi"
+
 msgid "Inline Citation"
 msgstr "Satır içi kaynak"
 
@@ -17380,6 +17386,9 @@ msgstr "Ortam seç"
 msgid "Select every run"
 msgstr "Tüm çalıştırmaları seç"
 
+msgid "Select IDE"
+msgstr "IDE seçin"
+
 msgid "Select issue"
 msgstr "Issue seç"
 
@@ -17970,6 +17979,9 @@ msgid "Shuts down {shutdownDate}"
 msgstr "{shutdownDate} tarihinde kapanıyor"
 
 msgid "Side by side"
+msgstr "Yan yana"
+
+msgid "Side by Side"
 msgstr "Yan yana"
 
 msgid "sidebar"
@@ -18613,9 +18625,6 @@ msgstr "İşle başlayın."
 
 msgid "Start work from anywhere"
 msgstr "Her yerden işe başlayın"
-
-msgid "Start workspace"
-msgstr "Çalışma alanını başlat"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Görevler görünümünde Linear veya GitHub issue'larından doğrudan çalışma alanları başlatın; her birinde zaten çalışan bir ajan olur."

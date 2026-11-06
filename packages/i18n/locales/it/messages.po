@@ -2236,6 +2236,9 @@ msgstr "Dopo un ritardo (3s)"
 msgid "Against base"
 msgstr "Rispetto alla base"
 
+msgid "Against Main"
+msgstr "Rispetto a main"
+
 msgid "Agent"
 msgstr "Agente"
 
@@ -10151,6 +10154,9 @@ msgstr "Inizializzazione..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Fallback con le iniziali tramite getInitials, dimensioni da xs a xl"
 
+msgid "Inline"
+msgstr "In linea"
+
 msgid "Inline Citation"
 msgstr "Inline Citation"
 
@@ -17380,6 +17386,9 @@ msgstr "Seleziona ambiente"
 msgid "Select every run"
 msgstr "Seleziona tutte le esecuzioni"
 
+msgid "Select IDE"
+msgstr "Seleziona l'IDE"
+
 msgid "Select issue"
 msgstr "Seleziona la issue"
 
@@ -17971,6 +17980,9 @@ msgstr "Chiude il {shutdownDate}"
 
 msgid "Side by side"
 msgstr "A confronto"
+
+msgid "Side by Side"
+msgstr "Affiancato"
 
 msgid "sidebar"
 msgstr "sidebar"
@@ -18613,9 +18625,6 @@ msgstr "Parti dal lavoro."
 
 msgid "Start work from anywhere"
 msgstr "Inizia a lavorare ovunque"
-
-msgid "Start workspace"
-msgstr "Avvia workspace"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Avvia workspace direttamente dalle issue di Linear o GitHub nella vista Task, con un agente già al lavoro su ciascuna."

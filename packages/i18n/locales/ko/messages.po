@@ -2236,6 +2236,9 @@ msgstr "지연 후(3초)"
 msgid "Against base"
 msgstr "기준 대비"
 
+msgid "Against Main"
+msgstr "main 기준"
+
 msgid "Agent"
 msgstr "에이전트"
 
@@ -10151,6 +10154,9 @@ msgstr "초기화하는 중..."
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "getInitials로 이니셜 대체, 크기 xs → xl"
 
+msgid "Inline"
+msgstr "인라인"
+
 msgid "Inline Citation"
 msgstr "인라인 인용"
 
@@ -17380,6 +17386,9 @@ msgstr "환경 선택"
 msgid "Select every run"
 msgstr "모든 실행 선택"
 
+msgid "Select IDE"
+msgstr "IDE 선택"
+
 msgid "Select issue"
 msgstr "이슈 선택"
 
@@ -17971,6 +17980,9 @@ msgstr "{shutdownDate}에 종료"
 
 msgid "Side by side"
 msgstr "나란히 비교"
+
+msgid "Side by Side"
+msgstr "나란히 보기"
 
 msgid "sidebar"
 msgstr "사이드바"
@@ -18613,9 +18625,6 @@ msgstr "할 일에서 시작하세요."
 
 msgid "Start work from anywhere"
 msgstr "어디서든 작업 시작"
-
-msgid "Start workspace"
-msgstr "워크스페이스 시작"
 
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "작업 보기에서 Linear 또는 GitHub 이슈로 바로 워크스페이스를 시작하면, 각 워크스페이스에서 에이전트가 이미 작업하고 있습니다."
