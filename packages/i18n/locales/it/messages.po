@@ -11471,10 +11471,6 @@ msgstr "Gestisci le chiavi per l'accesso ai server MCP e per le integrazioni est
 msgid "Manage members"
 msgstr "Gestisci i membri"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Gestisci su {0}"
-
 msgid "Manage Plan"
 msgstr "Gestisci il piano"
 
@@ -21086,10 +21082,6 @@ msgstr "Passa a Pro"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aggiorna una dipendenza e correggi ciò che si rompe…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Esegui l'upgrade su {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Passa a {planName}"

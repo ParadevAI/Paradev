@@ -11471,10 +11471,6 @@ msgstr "Kelola kunci untuk akses server MCP dan integrasi eksternal seperti Clau
 msgid "Manage members"
 msgstr "Kelola anggota"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Kelola di {0}"
-
 msgid "Manage Plan"
 msgstr "Kelola Paket"
 
@@ -21086,10 +21082,6 @@ msgstr "Upgrade"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Upgrade di {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Tingkatkan ke {planName}"

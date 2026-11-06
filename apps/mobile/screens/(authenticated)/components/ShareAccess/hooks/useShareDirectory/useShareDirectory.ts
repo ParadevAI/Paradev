@@ -17,9 +17,7 @@ import * as Haptics from "expo-haptics";
 import { useMemo } from "react";
 import { Alert } from "react-native";
 import { authClient, useSession } from "@/lib/auth/client";
-import { openUrl } from "@/lib/open-url";
 import { apiClient } from "@/lib/trpc/client";
-import { billingSettingsUrl } from "@/lib/web-links";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { useOrgMembers } from "@/screens/(authenticated)/hooks/useOrgMembers";
 
@@ -76,13 +74,7 @@ export function useShareDirectory() {
 			t({
 				message: `Adding people to ${organizationName} needs a paid plan. Your organization's plan is managed by its owner at ${COMPANY.DOMAIN}.`,
 			}),
-			[
-				{ style: "cancel", text: t({ message: "Dismiss" }) },
-				{
-					onPress: () => openUrl(billingSettingsUrl(organizationId)),
-					text: t({ message: `Manage on ${COMPANY.DOMAIN}` }),
-				},
-			],
+			[{ style: "cancel", text: t({ message: "Dismiss" }) }],
 		);
 
 	/** Invites any new emails, then grants everyone access through `add`. Resolves false after showing the error. */

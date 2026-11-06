@@ -11471,10 +11471,6 @@ msgstr "Manage keys for MCP server access and external integrations like Claude 
 msgid "Manage members"
 msgstr "Manage members"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Manage on {0}"
-
 msgid "Manage Plan"
 msgstr "Manage Plan"
 
@@ -21086,10 +21082,6 @@ msgstr "Upgrade"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade a dependency and fix what breaks…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Upgrade on {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Upgrade to {planName}"

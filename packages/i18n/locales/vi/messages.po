@@ -11471,10 +11471,6 @@ msgstr "Quản lý khóa để truy cập server MCP và các tích hợp bên n
 msgid "Manage members"
 msgstr "Quản lý thành viên"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Quản lý tại {0}"
-
 msgid "Manage Plan"
 msgstr "Quản lý gói"
 
@@ -21086,10 +21082,6 @@ msgstr "Nâng cấp"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Nâng cấp một dependency và sửa những gì hỏng…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Nâng cấp trên {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Nâng cấp lên {planName}"
