@@ -4,7 +4,6 @@ import {
 	deriveQueuedPrompts,
 	runningTurnId as findRunningTurnId,
 	latestSessionUsage,
-	launchConfigSelections,
 	type OutboxEntry,
 	presetForAnyHarness,
 	userMessageText,
@@ -93,8 +92,6 @@ const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
 
-const MODEL_OPTIONS_GRACE_MS = 1000;
-
 function contentText(content: UserContent[]): string {
 	return userMessageText({ content });
 }
@@ -112,7 +109,6 @@ export function SessionView({
 	isActive,
 	onModeChange,
 	pendingPrompts,
-	preferredModelLabel,
 	onPendingPromptsSent,
 	onLaunchPromptDelivered,
 	onFork,
@@ -148,8 +144,6 @@ export function SessionView({
 	};
 	isActive?: boolean;
 	pendingPrompts: UserContent[][];
-	/** Selected by name once the agent lists its models, before the first prompt goes out. */
-	preferredModelLabel?: string;
 	onPendingPromptsSent: () => void;
 	onLaunchPromptDelivered?: () => void;
 	onSessionState?: (session: SessionState | null) => void;
@@ -260,42 +254,12 @@ export function SessionView({
 	);
 
 	const configOptions = session.snapshot.session?.configOptions;
-	const agentStatus = session.snapshot.session?.status;
-	const [modelSettled, setModelSettled] = useState(
-		preferredModelLabel === undefined,
-	);
-	const modelRequested = useRef(false);
-	useEffect(() => {
-		if (modelSettled || session.status !== "ready") return;
-		if (configOptions === undefined) {
-			// An agent that reports no options never sends them.
-			if (agentStatus !== "idle") return;
-			const timer = setTimeout(
-				() => setModelSettled(true),
-				MODEL_OPTIONS_GRACE_MS,
-			);
-			return () => clearTimeout(timer);
-		}
-		if (modelRequested.current) return;
-		const [selection] = launchConfigSelections(configOptions, {
-			modelLabel: preferredModelLabel ?? null,
-			effortLabel: null,
-		});
-		if (!selection) {
-			setModelSettled(true);
-			return;
-		}
-		modelRequested.current = true;
-		void session
-			.setConfigOption(selection.configId, selection.value)
-			.finally(() => setModelSettled(true));
-	}, [agentStatus, configOptions, modelSettled, preferredModelLabel, session]);
 
 	usePendingPrompts({
 		held: held !== undefined,
 		onSent: onPendingPromptsSent,
 		prompts: pendingPrompts,
-		ready: session.status === "ready" && modelSettled,
+		ready: session.status === "ready",
 		sendPrompt: session.sendPrompt,
 	});
 
@@ -808,6 +772,7 @@ export function SessionView({
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
 					promptPending={heldOutbox.length > 0}
+					awaitingBackground={awaitingBackground}
 					terminalId={terminalId}
 					agentLabel={agentLabel}
 					onNewChat={onNewChat}

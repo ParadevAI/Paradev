@@ -42,3 +42,15 @@ export const chatSessionsLocal = sqliteTable(
 
 export type JournalRow = typeof chatJournal.$inferSelect;
 export type ChatSessionRow = typeof chatSessionsLocal.$inferSelect;
+
+/** The model, effort and mode the user last picked for each harness. */
+export const chatSelections = sqliteTable(
+	"chat_selections",
+	{
+		harness: text().notNull(),
+		category: text().notNull(),
+		value: text().notNull(),
+		updatedAt: integer("updated_at").notNull(),
+	},
+	(table) => [primaryKey({ columns: [table.harness, table.category] })],
+);

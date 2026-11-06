@@ -1,0 +1,121 @@
+---
+title: "Paradev vs Open SWE (2026): Agent Workspace vs Self-Hosted Async Coding Agent"
+description: "Compare Paradev and Open SWE, LangChain's open-source async coding agent (now named Robin in its repo): where agents run, self-hosting, models, triggers, review, and what each costs to run."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - open-swe
+keywords:
+  - superset vs open swe
+  - paradev vs open swe
+  - open swe alternative
+  - langchain open swe
+  - langchain robin coding agent
+  - open source async coding agent
+  - self-hosted coding agent
+  - internal coding agent
+---
+
+Open SWE and Paradev are both open source under the MIT License, and both let agents work on your code while you do something else. They solve different problems. Open SWE is LangChain's framework for an internal coding agent: you deploy one agent service for your team, and people start tasks from Slack, Linear, GitHub, or a dashboard. Each task runs in a cloud sandbox and ends in a pull request. Paradev is a desktop workspace for the agent CLIs you already use, such as Claude Code and Codex. It runs them on your Mac, on hosts you add, on your own Linux server with Bring Your Own Cloud, or in Paradev [cloud workspaces](/cloud) (beta).
+
+On November 5, 2026, the Open SWE repository renamed its user-facing product to **Robin**. The repository, package names, and URLs still use `open-swe`. This page uses both names.
+
+This comparison is published by Paradev. Open SWE details were checked against the [langchain-ai/open-swe](https://github.com/langchain-ai/open-swe) repository (README, LICENSE, `docs/INSTALLATION.md`, `docs/CUSTOMIZATION.md`, `docs/ROBIN_ROLLOUT.md`, `desktop/README.md`, and the commit history) and LangChain's [launch post](https://www.langchain.com/blog/open-swe-an-open-source-framework-for-internal-coding-agents) of March 17, 2026, on November 5, 2026.
+
+## At a Glance
+
+| | **Paradev** | **Open SWE (Robin)** |
+|---|---|---|
+| **What it is** | Desktop workspace that runs any CLI agent in its own Git worktree and terminal | An open-source coding agent you deploy for your team, built on Deep Agents and LangGraph |
+| **Where agents run** | Your Mac; any macOS or Linux host through Remote Access; your own Linux server (Bring Your Own Cloud); cloud workspaces (beta) | A persistent Linux sandbox per thread, a LangSmith sandbox by default; the experimental desktop app can run a thread on your Mac |
+| **Agents** | Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Its own agent, with subagents for research and parallel work |
+| **Models** | Whatever your agent CLI uses, on your own subscriptions and keys | Anthropic, OpenAI, or Google models by API key, or the LangSmith LLM Gateway |
+| **How tasks start** | Desktop app, CLI, iPhone and iPad app, automations on schedules and events, Linear and GitHub Issues tasks, Slack bot | Dashboard, GitHub issues and PR comments, Slack, Linear, and schedules |
+| **Review** | Changes pane, Pull Requests view with CI checks and line comments, in-app browser | Opens and updates PRs, reviews PRs and learns review preferences, watches CI with `/baby-sit`, read-only PR chat |
+| **Self-hosting** | MIT code; Bring Your Own Cloud host on your Linux server | You deploy it: LangGraph Platform, or a Docker image with Postgres, Redis, and LangSmith keys |
+| **Status** | Shipped desktop app with paid plans | Under active development; breaking changes expected; no issues or outside contributions accepted |
+| **Pricing** | Free; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month; Enterprise custom | No license fee; you pay for hosting, LangSmith services, and model usage |
+| **License** | Open source, MIT | Open source, MIT (vendored code excluded) |
+
+## What Is Open SWE?
+
+LangChain relaunched Open SWE on March 17, 2026, as "an open-source framework for internal coding agents." The launch post says it follows the patterns of internal agents at Stripe, Ramp, and Coinbase: isolated cloud sandboxes, curated tools, subagents, and hooks into a team's existing tools.
+
+The current README describes Robin as "an open-source software factory built on Deep Agents by LangChain." It investigates a codebase, makes changes, validates them, and delivers a pull request. It can also review pull requests, learn a repository's review preferences, watch CI, and answer feedback. Deep Agents supplies planning, filesystem, shell, skills, and subagents. LangGraph supplies durable execution and thread state.
+
+Each cloud thread runs in a persistent Linux sandbox, a LangSmith sandbox by default (4 vCPUs and 16 GiB of memory). You can boot sandboxes from your own snapshot. Follow-ups reuse the thread's sandbox, and separate threads run in parallel. An experimental macOS desktop app can also run a thread on your own Mac, in the current checkout or a new Git worktree.
+
+## What Is Paradev?
+
+Paradev is a desktop workspace for AI coding agents. It runs any CLI agent in its own Git worktree and persistent terminal, with your own subscriptions and keys. The Changes pane shows the diff and commits, pushes, and opens a pull request. The Pull Requests view shows CI checks and line comments that you can send to an agent. A [chat interface](https://docs.paradev.com/chat) shows a Claude Code, Codex, OpenCode, or Pi session as a chat, and a CLI / Chat toggle switches it back to the terminal. Automations, a CLI, a TypeScript SDK, an MCP server, and a Slack bot cover unattended work. Paradev is open source under the MIT License.
+
+## Key Differences
+
+### One team agent vs the agents you already use
+
+Open SWE is one agent harness. You choose its model, prompt, tools, skills, and middleware, and you change its Python code to go further. That suits a team that wants to build its own agent. Paradev does not ship its own agent. It runs Claude Code, Codex, and other CLIs as they are, with the login, settings, and MCP servers you use today.
+
+### A service you operate vs an app you install
+
+Open SWE is a server deployment. The installation guide covers a LangGraph server, a FastAPI app for webhooks and the dashboard, a GitHub App, a required Slack app, and optional Linear. You can deploy on LangGraph Platform or run the Docker image with your own Postgres and Redis, plus a LangSmith API key and a LangGraph license key. The README says that deploying it as is needs Managed Deep Agents, which runs its agent. Without it, LangChain recommends that you fork the code and adapt it to your own runtime.
+
+Paradev installs as a desktop app and works on your Mac first. To keep agents on your own infrastructure, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server in your cloud account. Repos and agent sign-ins stay on that server. It needs no inbound ports: it binds to 127.0.0.1 and connects out to the Paradev relay. If you do not want to run a server, [cloud workspaces](/cloud) (beta) run in Paradev's cloud.
+
+### Delegation from chat tools vs a workspace you watch
+
+Open SWE is asynchronous by design. A teammate mentions the bot in Slack, delegates a Linear issue, or tags it on a GitHub pull request, and comes back to a PR. Paradev can start work the same way, through automations, the Slack bot, and Linear and GitHub Issues tasks. But it is built for a developer who watches several agents at once: you see each terminal, redirect an agent mid-task, and review the diff before you open the pull request.
+
+### Access model
+
+Open SWE documents a clear trust model. Coding sandboxes normally use the GitHub App's installation-wide access, not the permissions of the person who started the task. LangChain says a deployment is for "a team trusted with shared repository access," and that separate trust groups need separate deployments. In Paradev, each agent uses the Git and agent credentials on the host where it runs. Paradev Enterprise adds SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+
+### Maturity
+
+The Open SWE README says to expect breaking changes, and LangChain does not accept issues or outside contributions at this time. Paradev is a shipped product with paid plans and support.
+
+## Pricing
+
+Open SWE has no license fee. To run it, you pay for the parts it uses: hosting or LangGraph Platform, LangSmith sandboxes and tracing, Managed Deep Agents if you deploy it as is, and your model provider. Check LangChain's pricing for those services.
+
+Paradev has a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly), Ultra at {{price:ultra}}, and a custom Enterprise plan. Pro adds Remote Access, automations, the iPhone and iPad app, and the GitHub, Linear, and Slack integrations. Bring Your Own Cloud needs a paid plan. Team and Ultra add cloud workspaces (beta). Model costs stay on your own agent subscriptions. See [Paradev pricing](/pricing).
+
+## Which Should You Choose?
+
+**Choose Open SWE if you:**
+
+- Want to build and own an internal coding agent, and have engineers to run and change it
+- Want your team to delegate work from Slack, Linear, and GitHub without a desktop app
+- Already use LangChain, LangGraph, or LangSmith
+- Want PR review that learns your repository's preferences, and CI monitoring on PRs
+
+**Choose Paradev if you:**
+
+- Want to run Claude Code, Codex, OpenCode, and other CLIs you already pay for
+- Want to watch and steer several agents, review diffs, and open pull requests in one desktop app
+- Want agents on your Mac, on hosts you add, on your own Linux server, or in cloud workspaces (beta), with no service to operate
+- Want a shipped product with a free tier and an Enterprise plan
+
+**Verdict:** Open SWE is a strong, MIT-licensed starting point for a team that wants to build its own background coding agent on LangChain's stack. Paradev is the faster path for developers who want to use the agents they already have, with review in one place. The two can also work side by side.
+
+## Frequently Asked Questions
+
+### Is Open SWE now called Robin?
+
+Yes, in its repository. On November 5, 2026, a commit renamed the user-facing product to Robin. The GitHub repository, package names, and URLs still use `open-swe`, and the `oswe` CLI command remains as an alias for `robin`.
+
+### Is Open SWE free?
+
+The code is free under the MIT License. Code under its `vendor/` directory is not covered by that license. Running it costs money: hosting, LangSmith services, and model usage. Paradev has a free tier, and paid plans start at {{price:pro}} per user per month.
+
+### Can I self-host Open SWE?
+
+Yes, with work. You can deploy it on LangGraph Platform or run its Docker image with your own Postgres and Redis. The README says the deployment as it ships needs Managed Deep Agents. Without it, you fork the code and adapt it to your runtime. With Paradev, Bring Your Own Cloud runs the host on your own Linux server.
+
+### Does Open SWE run Claude Code or Codex?
+
+No. Open SWE runs its own agent, built on Deep Agents, and uses models by API key. Its repository has a Claude Code plugin that mirrors Claude Code sessions into Robin threads. Paradev runs the Claude Code and Codex CLIs directly.
+
+### Is Paradev an Open SWE alternative?
+
+For many teams, yes. Both run agents in parallel and end in pull requests. Open SWE is a service you deploy and change. Paradev is a desktop workspace for the agent CLIs you already use.

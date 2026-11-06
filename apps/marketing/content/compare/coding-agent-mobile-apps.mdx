@@ -2,7 +2,7 @@
 title: "Coding Agent Mobile Apps in 2026: Run Claude Code, Codex, and More From Your Phone"
 description: "Every way to run and check on coding agents from your phone in 2026: Paradev, Codex in ChatGPT, Cursor, Claude Code Remote Control, GitHub Copilot, Amp, Orca, Paseo, and T3 Code compared."
 date: 2026-10-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - codex-app
@@ -34,7 +34,7 @@ The apps differ in one important way: whether your phone talks to **agents on yo
 
 | App | Agents | Where agents run | Phones |
 |---|---|---|---|
-| **Paradev** | Any CLI agent | Your machines (any host you add) or Paradev's cloud workspaces | iPhone and iPad |
+| **Paradev** | Any CLI agent | Your machines (any host you add), your own Linux server (BYOC), or Paradev's cloud workspaces (beta) | iPhone and iPad |
 | **Codex in ChatGPT** | Codex | Your Mac or Windows computer, or OpenAI's cloud | iOS; Android can control a host |
 | **Cursor** | Cursor's agent | Your computer (remote control) or Cursor's cloud | iPhone and iPad |
 | **Claude Code** | Claude Code | Your computer (Remote Control) or Anthropic's cloud sessions | Claude apps |
@@ -46,7 +46,7 @@ The apps differ in one important way: whether your phone talks to **agents on yo
 
 ### Paradev
 
-Paradev's [iPhone and iPad app](/mobile) connects to cloud workspaces and to any machine you add as a host through Remote Access, and shows the terminals and diffs of every agent running there: Claude Code, Codex, Cursor's agent, OpenCode, Antigravity CLI, and any other CLI agent. You can answer prompts, send follow-ups, and review diffs. It needs iOS 26 or iPadOS 26 or later and a Pro plan. Cloud workspaces work without keeping your own computer connected; a host you add must stay awake and online. Agents use your own subscriptions, and on your own machines they also use your real environment.
+Paradev's [iPhone and iPad app](/mobile) connects to [cloud workspaces](/cloud) (beta), to a Linux server you run with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), and to any machine you add as a host through Remote Access, and shows the terminals and diffs of every agent running there: Claude Code, Codex, Cursor's agent, OpenCode, Antigravity CLI, and any other CLI agent. You can answer prompts, send follow-ups, and review diffs. It needs iOS 26 or iPadOS 26 or later and a Pro plan. Cloud workspaces work without keeping your own computer connected; a host you add must stay awake and online. Agents use your own subscriptions, and on your own machines they also use your real environment.
 
 **Best for:** running several different agents, on your own machines or in cloud workspaces, and checking on all of them from one app.
 
@@ -94,7 +94,7 @@ See [Paradev vs Orca](/compare/superset-vs-orca), [Paradev vs Paseo](/compare/su
 
 ## Keep Your Agents Reachable
 
-Every option that runs agents on your own machine needs that machine to stay awake and online. For an always-on setup, run agents on a dedicated machine, such as a Mac mini or a Linux server. In Paradev, run the host service from the standalone CLI so it stays reachable while the desktop app is closed; see [Keep Agents Running](https://docs.paradev.com/keep-agents-running). Or use a Paradev cloud workspace, which does not need your own computer connected.
+Every option that runs agents on your own machine needs that machine to stay awake and online. For an always-on setup, run agents on a dedicated machine, such as a Mac mini or a Linux server. In Paradev, run the host service from the standalone CLI so it stays reachable while the desktop app is closed; see [Keep Agents Running](https://docs.paradev.com/keep-agents-running). You can also run the Paradev host on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or use a Paradev cloud workspace, which does not need your own computer connected.
 
 ## Frequently Asked Questions
 

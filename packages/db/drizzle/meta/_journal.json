@@ -1335,8 +1335,15 @@
     {
       "idx": 190,
       "version": "7",
-      "when": 1793907883525,
-      "tag": "0190_github_installations_multiple_per_org",
+      "when": 1793918434220,
+      "tag": "0190_v2_hosts_allow_cloud_workspaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 191,
+      "version": "7",
+      "when": 1793929228633,
+      "tag": "0191_github_installations_multiple_per_org",
       "breakpoints": true
     }
   ]

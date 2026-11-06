@@ -2326,6 +2326,9 @@ msgstr "Os agentes não conseguem acessar as ferramentas de {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Os agentes concluem tickets rotineiros sem intervenção no meio da tarefa."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Os agentes nas suas áreas de trabalho na nuvem poderão usar <0>--host</0> para executar comandos neste host. O host precisa estar acessível pelo relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Os agentes continuam trabalhando na nuvem. Abra a área de trabalho de novo no desktop, iPhone ou iPad."
 
@@ -2568,6 +2571,9 @@ msgstr "Permitir nesta sessão"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Permita o acesso ao microfone para usar o ditado"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Permitir que minhas áreas de trabalho na nuvem acessem este host"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Permitir acesso remoto a este dispositivo via relay"
@@ -2827,6 +2833,9 @@ msgstr "qualquer coisa"
 
 msgid "Anything else? (optional)"
 msgstr "Mais alguma coisa? (opcional)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Qualquer coisa executada em uma área de trabalho na nuvem que você criou poderá criar áreas de trabalho, iniciar agentes e executar comandos neste host, incluindo um agente que siga instruções encontradas em uma página da web ou em um repositório. Ative somente se precisar."
 
 msgid "Anywhere"
 msgstr "Em qualquer lugar"
@@ -4110,6 +4119,9 @@ msgstr "Chat fechado"
 
 msgid "Chat history"
 msgstr "Histórico de chats"
+
+msgid "Chat interface"
+msgstr "Interface de chat"
 
 msgid "Chat is being reworked"
 msgstr "O chat está sendo refeito"
@@ -10836,6 +10848,9 @@ msgstr "Permitir que um agente use seus logins do {browserName}?"
 msgid "Let the agent drive."
 msgstr "Deixe o agente conduzir."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Permitir que suas áreas de trabalho na nuvem acessem este host?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Permite que sua organização liste e clone repositórios"
 
@@ -13271,6 +13286,9 @@ msgstr "Somente o autor pode alterar um comentário"
 
 msgid "Only the author can edit a comment"
 msgstr "Só a pessoa autora pode editar um comentário"
+
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Só o dono do host pode permitir que áreas de trabalho na nuvem o acessem"
 
 msgid "Only the host owner can set its wake command"
 msgstr "Só o proprietário do host pode definir o comando de wake dele"
@@ -18554,6 +18572,9 @@ msgstr "Parar de observar"
 msgid "Stop workspace run command"
 msgstr "Parar o comando de execução da área de trabalho"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "Impedir que suas áreas de trabalho na nuvem acessem este host?"
+
 msgid "stopped"
 msgstr "parado"
 
@@ -20406,6 +20427,9 @@ msgstr "Transforme tarefas rotineiras em agentes que rodam por agenda ou quando 
 msgid "Turn Fast mode on or off"
 msgstr "Ativar ou desativar o modo rápido"
 
+msgid "Turn off"
+msgstr "Desativar"
+
 msgid "Turn off manual mode"
 msgstr "Desativar o modo manual"
 
@@ -22063,6 +22087,9 @@ msgstr "Suas alterações"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Suas alterações serão perdidas se você não salvar."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Suas áreas de trabalho na nuvem não poderão mais acessar este host."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Seu código fica local por padrão, com controle explícito sobre os serviços conectados."

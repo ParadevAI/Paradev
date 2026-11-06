@@ -2326,6 +2326,9 @@ msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완료합니다."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "이후 클라우드 워크스페이스의 에이전트가 <0>--host</0>를 사용해 이 호스트에서 명령을 실행할 수 있습니다. 호스트는 릴레이를 통해 접근할 수 있어야 합니다."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱, iPhone, iPad에서 워크스페이스를 다시 열 수 있습니다."
 
@@ -2568,6 +2571,9 @@ msgstr "세션 동안 허용"
 
 msgid "Allow microphone access to use dictation"
 msgstr "받아쓰기를 사용하려면 마이크 접근을 허용하세요"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "내 클라우드 워크스페이스가 이 호스트에 접근하도록 허용"
 
 msgid "Allow remote access to this device via relay"
 msgstr "릴레이를 통해 이 기기에 원격 액세스 허용"
@@ -2827,6 +2833,9 @@ msgstr "모든 내용"
 
 msgid "Anything else? (optional)"
 msgstr "그 밖에 알려줄 내용이 있나요? (선택)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "직접 만든 클라우드 워크스페이스에서 실행되는 모든 것이 이 호스트에서 워크스페이스를 만들고, 에이전트를 시작하고, 명령을 실행할 수 있게 됩니다. 웹 페이지나 저장소에서 찾은 지시를 따르는 에이전트도 포함됩니다. 필요할 때만 켜세요."
 
 msgid "Anywhere"
 msgstr "모든 위치"
@@ -4110,6 +4119,9 @@ msgstr "채팅을 닫았습니다"
 
 msgid "Chat history"
 msgstr "채팅 기록"
+
+msgid "Chat interface"
+msgstr "채팅 인터페이스"
 
 msgid "Chat is being reworked"
 msgstr "채팅을 개편하는 중입니다"
@@ -10836,6 +10848,9 @@ msgstr "에이전트가 {browserName} 로그인을 사용하도록 허용할까�
 msgid "Let the agent drive."
 msgstr "에이전트가 조작하게 하세요."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "클라우드 워크스페이스가 이 호스트에 접근하도록 허용할까요?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "조직이 리포지토리를 나열하고 복제할 수 있게 합니다"
 
@@ -13271,6 +13286,9 @@ msgstr "작성자만 댓글을 변경할 수 있습니다"
 
 msgid "Only the author can edit a comment"
 msgstr "작성자만 코멘트를 수정할 수 있습니다"
+
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "호스트 소유자만 클라우드 워크스페이스의 접근을 허용할 수 있습니다"
 
 msgid "Only the host owner can set its wake command"
 msgstr "호스트 소유자만 wake 명령을 설정할 수 있습니다"
@@ -18554,6 +18572,9 @@ msgstr "감시 중지"
 msgid "Stop workspace run command"
 msgstr "워크스페이스 실행 명령 중지"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "클라우드 워크스페이스의 이 호스트 접근을 중지할까요?"
+
 msgid "stopped"
 msgstr "중지됨"
 
@@ -20406,6 +20427,9 @@ msgstr "반복 작업을 일정에 따라 또는 이벤트가 발생할 때 실�
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
 
+msgid "Turn off"
+msgstr "끄기"
+
 msgid "Turn off manual mode"
 msgstr "수동 모드 끄기"
 
@@ -22063,6 +22087,9 @@ msgstr "내 변경 내용"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "저장하지 않으면 변경 사항이 사라집니다."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "클라우드 워크스페이스가 더 이상 이 호스트에 접근할 수 없습니다."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "코드는 기본적으로 로컬에 머물고, 연결된 서비스는 명시적으로 통제합니다."

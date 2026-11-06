@@ -21,6 +21,7 @@ const sessionSchema = z.object({
 	terminalId: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	effortId: z.string().optional(),
 	interrupted: z.boolean(),
 	prompts: z.array(z.array(userContentSchema).min(1)),
 	pausedPrompts: z.array(z.array(userContentSchema).min(1)).default([]),

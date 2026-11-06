@@ -2,7 +2,7 @@
 title: "Scheduled Coding Agents in 2026: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs You Review"
 description: "How to run coding agents on a schedule and review their work in the morning: nightly maintenance, a weekly flaky-test agent that leaves a reviewable fix, and dispatching runs from a CLI. GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations compared."
 date: 2026-10-07
-lastUpdated: 2026-10-30
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - github-actions
@@ -47,11 +47,11 @@ Every working setup has five parts: a **trigger** that fires without you opening
 
 For a team that wants the agents on one shared machine, use a tool that runs on that machine and gives each run its own worktree: Paradev Automations, or cron plus a worktree script if you want to build it yourself. If you would rather not own a machine, GitHub Actions or a cloud scheduler (Claude Code Routines, Cursor Automations, Codex Team Tasks) moves the runs off it.
 
-**Paradev on a shared machine.** Run the Paradev host on the shared box (a Mac mini or a spare workstation) with `superset auth login` and `superset start --daemon`, then add teammates under **Settings → Hosts → Add member**. Each person creates automations under **Automations → New automation** and picks that machine as the **Device**. Choose **New workspace** as the workspace, so each run gets its own branch and worktree instead of reusing one workspace. When a schedule fires, Paradev creates a fresh workspace from the project's repo, with its own branch, worktree, and terminals, and starts the agent you chose (Claude, Codex, Amp, or any agent set up under **Settings → Agents**).
+**Paradev on a shared machine.** Run the Paradev host on the shared box (a Mac mini, a spare workstation, or a Linux server in your own cloud account through [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)) with `superset auth login` and `superset start --daemon`, then add teammates under **Settings → Hosts → Add member**. Each person creates automations under **Automations → New automation** and picks that machine as the **Device**. Choose **New workspace** as the workspace, so each run gets its own branch and worktree instead of reusing one workspace. When a schedule fires, Paradev creates a fresh workspace from the project's repo, with its own branch, worktree, and terminals, and starts the agent you chose (Claude, Codex, Amp, or any agent set up under **Settings → Agents**).
 
 Review stays human. A teammate with host access opens the run's workspace, reads the diff, and continues the session or opens a PR. The Automations list has **Mine** and **Team** tabs. Team automations are read-only: only the owner can edit, pause, run, or delete one. Run workspaces are tagged `automation` by default, so they collect in one sidebar folder per project instead of mixing with hand-made workspaces. Details: [Automations](https://docs.paradev.com/automations) and [Remote access](https://docs.paradev.com/remote-access).
 
-Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on the machine you picked, so if it is offline at fire time the run is recorded as missed and the schedule moves on. Cloud automations are in early access and not generally available.
+Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on the machine you picked, so if it is offline at fire time the run is recorded as missed and the schedule moves on. To avoid missed runs, pick **Cloud** as the device: each run then starts in a [cloud workspace](/cloud) (beta, Team and Ultra).
 
 **DIY: cron + worktrees + headless CLI.** A systemd timer or cron job runs a script that calls `git worktree add`, starts `claude -p "..."` or another headless agent, runs tests, and pushes a branch. It costs nothing extra and you control everything. You also own port and database collisions between runs, cleanup of old worktrees, and finding out which run failed.
 

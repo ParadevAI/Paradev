@@ -1,5 +1,5 @@
 {
-  "id": "0273d599-1a0b-4526-ba5a-dbff66c156b3",
+  "id": "49c27396-569a-44bb-a44a-e2a08168119d",
   "prevId": "25de1116-ccf9-4f41-9b9d-a10bfe1c285c",
   "version": "7",
   "dialect": "postgresql",
@@ -4125,21 +4125,6 @@
         }
       },
       "indexes": {
-        "github_installations_org_id_idx": {
-          "name": "github_installations_org_id_idx",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "github_installations_installation_id_idx": {
           "name": "github_installations_installation_id_idx",
           "columns": [
@@ -4193,6 +4178,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "installation_id"
+          ]
+        },
+        "github_installations_org_unique": {
+          "name": "github_installations_org_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "organization_id"
           ]
         }
       },
@@ -15713,6 +15705,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "allow_cloud_workspaces": {
+          "name": "allow_cloud_workspaces",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_by_user_id": {
           "name": "created_by_user_id",

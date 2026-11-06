@@ -1468,6 +1468,11 @@ export const v2Hosts = pgTable(
 		version: text(),
 		platform: text(),
 		installSource: text("install_source"),
+		// Whether the owner lets their cloud workspaces reach this host through
+		// the relay.
+		allowCloudWorkspaces: boolean("allow_cloud_workspaces")
+			.notNull()
+			.default(false),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
