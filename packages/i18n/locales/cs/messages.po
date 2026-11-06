@@ -916,6 +916,12 @@ msgstr "{count, plural, one {přečten # soubor} few {přečteny # soubory} many
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# automatizace odebrána ze skupiny} few {# automatizace odebrány ze skupin} many {# automatizace odebráno ze skupin} other {# automatizací odebráno ze skupin}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Obnovit # chat?} few {Obnovit # chaty?} many {Obnovit # chatu?} other {Obnovit # chatů?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, one {Tento chat běžel, když se Paradev zavřel} few {Tyto chaty běžely, když se Paradev zavřel} many {Tyto chaty běžely, když se Paradev zavřel} other {Tyto chaty běžely, když se Paradev zavřel}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Použit # zdroj} few {Použity # zdroje} many {Použito # zdroje} other {Použito # zdrojů}}"
 
@@ -10512,6 +10518,9 @@ msgstr "Udržovat dokumentaci aktuální"
 
 msgid "Keep editing"
 msgstr "Pokračovat v úpravách"
+
+msgid "Keep paused"
+msgstr "Ponechat pozastavené"
 
 msgid "Keep typing an email to invite"
 msgstr "Pokračujte v psaní e-mailu pro pozvání"
@@ -21983,6 +21992,14 @@ msgstr "Pro připojení účtů musíte být součástí organizace."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Pro používání integrací musíte být součástí organizace."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Zastavili jste po {0} min {1} s"
+
+msgid "You stopped after {seconds}s"
+msgstr "Zastavili jste po {seconds} s"
 
 msgid "You stopped this response"
 msgstr "Tuto odpověď jste zastavili"

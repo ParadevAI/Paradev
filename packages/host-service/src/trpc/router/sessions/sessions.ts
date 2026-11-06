@@ -19,6 +19,17 @@ const sessionInput = z.object({
 });
 
 export const sessionsRouter = router({
+	/** Chats the last quit cut off mid-turn, for the launch prompt. */
+	closedMidTurn: protectedProcedure.query(
+		({ ctx }) => ctx.runtime.closedMidTurn?.list() ?? [],
+	),
+	resumeClosedMidTurn: protectedProcedure.mutation(async ({ ctx }) => ({
+		resumed: (await ctx.runtime.closedMidTurn?.resume()) ?? 0,
+	})),
+	keepClosedMidTurnPaused: protectedProcedure.mutation(({ ctx }) => {
+		ctx.runtime.closedMidTurn?.keepPaused();
+		return { ok: true };
+	}),
 	capabilities: protectedProcedure
 		.input(z.object({ agent: z.string().min(1) }))
 		.query(({ ctx, input }) => {

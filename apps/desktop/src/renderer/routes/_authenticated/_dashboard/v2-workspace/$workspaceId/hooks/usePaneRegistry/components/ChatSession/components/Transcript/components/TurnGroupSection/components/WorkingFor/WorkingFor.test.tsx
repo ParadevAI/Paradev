@@ -26,3 +26,11 @@ test("a turn waiting on the user says so instead of counting", () => {
 	expect(view.getByText("Needs input")).toBeTruthy();
 	expect(view.queryByText(/Working for/)).toBeNull();
 });
+
+test("a turn the user stopped says when, instead of how long it worked", () => {
+	const view = render(
+		<WorkingFor completedAtMs={95_000} startedAtMs={0} stopped />,
+	);
+	expect(view.getByText("You stopped after 1m 35s")).toBeTruthy();
+	expect(view.queryByText(/Worked for/)).toBeNull();
+});

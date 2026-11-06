@@ -311,13 +311,31 @@ describe("replacing a chat whose agent died", () => {
 					: [],
 		);
 		expect(replayed.at(-1)).toMatchObject({ status: "canceled" });
-		const marker = journalEnvelopes(runtime, replacement.sessionId).flatMap(
-			(envelope) =>
-				envelope.event.type === "item" && envelope.event.item.id === "marker-1"
-					? [envelope.event.item]
-					: [],
+		expect(markerOf(runtime, replacement.sessionId)).toMatchObject({
+			discarded: true,
+		});
+
+		runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId: replacement.sessionId,
+			clientId: "client-2",
+			content: [{ type: "text", text: "and the docs" }],
+		});
+		await waitFor(
+			() =>
+				runtime.live.get(replacement.sessionId)?.turn?.status === "completed",
 		);
-		expect(marker.at(-1)).toMatchObject({ discarded: true });
+		await runtime.live.dispose(replacement.sessionId);
+		const reopened = createChat(runtime, replacement.sessionId);
+		await waitFor(
+			() => runtime.live.get(reopened.sessionId)?.state.status === "idle",
+		);
+		expect(markerOf(runtime, reopened.sessionId)).toMatchObject({
+			discarded: true,
+		});
+		expect(commandOf(runtime, reopened.sessionId)).toMatchObject({
+			status: "canceled",
+		});
 		await runtime.dispose();
 	});
 
@@ -353,7 +371,8 @@ function hangingRegistry(): HarnessRegistry {
 		[
 			FAKE_HARNESS,
 			(): HarnessAdapter => {
-				if (agents++ > 0) {
+				const generation = agents++;
+				if (generation > 0) {
 					return new FakeHarness({
 						start: [
 							{
@@ -365,7 +384,7 @@ function hangingRegistry(): HarnessRegistry {
 								kind: "item",
 								turnId: "history",
 								item: {
-									id: "marker-1",
+									id: `user_message:replay-${generation}:marker-1`,
 									kind: "user_message",
 									startedAtMs: 3,
 									content: [
@@ -378,7 +397,15 @@ function hangingRegistry(): HarnessRegistry {
 							},
 							{ kind: "session", session: { status: "idle" } },
 						],
-						turns: [],
+						turns: [
+							[
+								{ kind: "turn", turn: turn(`later-${generation}`) },
+								{
+									kind: "turn",
+									turn: turn(`later-${generation}`, { status: "completed" }),
+								},
+							],
+						],
 					});
 				}
 				let release = () => {};
@@ -449,6 +476,33 @@ function lastTurnOf(
 	return journalEnvelopes(runtime, sessionId)
 		.flatMap((envelope) =>
 			envelope.event.type === "turn" ? [envelope.event.turn] : [],
+		)
+		.at(-1);
+}
+
+function markerOf(
+	runtime: ReturnType<typeof createTestRuntime>,
+	sessionId: string,
+) {
+	return journalEnvelopes(runtime, sessionId)
+		.flatMap((envelope) =>
+			envelope.event.type === "item" &&
+			envelope.event.item.id.endsWith(":marker-1")
+				? [envelope.event.item]
+				: [],
+		)
+		.at(-1);
+}
+
+function commandOf(
+	runtime: ReturnType<typeof createTestRuntime>,
+	sessionId: string,
+) {
+	return journalEnvelopes(runtime, sessionId)
+		.flatMap((envelope) =>
+			envelope.event.type === "item" && envelope.event.item.id === "toolu-1"
+				? [envelope.event.item]
+				: [],
 		)
 		.at(-1);
 }

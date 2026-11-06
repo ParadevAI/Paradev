@@ -916,6 +916,12 @@ msgstr "{count, plural, one {odczytano # plik} few {odczytano # pliki} many {odc
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {Usunięto # automatyzację z grupy} few {Usunięto # automatyzacje z grup} many {Usunięto # automatyzacji z grup} other {Usunięto # automatyzacji z grup}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Wznowić # czat?} few {Wznowić # czaty?} many {Wznowić # czatów?} other {Wznowić # czatu?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, one {Ten czat działał, gdy zamknięto Paradev} few {Te czaty działały, gdy zamknięto Paradev} many {Te czaty działały, gdy zamknięto Paradev} other {Te czaty działały, gdy zamknięto Paradev}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Użyto # źródła} few {Użyto # źródeł} many {Użyto # źródeł} other {Użyto # źródła}}"
 
@@ -10512,6 +10518,9 @@ msgstr "Utrzymuj dokumentację aktualną"
 
 msgid "Keep editing"
 msgstr "Kontynuuj edycję"
+
+msgid "Keep paused"
+msgstr "Pozostaw wstrzymane"
 
 msgid "Keep typing an email to invite"
 msgstr "Wpisuj dalej adres e-mail, aby zaprosić"
@@ -21983,6 +21992,14 @@ msgstr "Aby łączyć konta, musisz należeć do organizacji."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Aby korzystać z integracji, trzeba należeć do organizacji."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Zatrzymano po {0} min {1} s"
+
+msgid "You stopped after {seconds}s"
+msgstr "Zatrzymano po {seconds} s"
 
 msgid "You stopped this response"
 msgstr "Zatrzymano tę odpowiedź"

@@ -34,6 +34,8 @@ export type TranscriptRow =
 			running: boolean;
 			/** The turn is held on a question or approval only the user can answer. */
 			waiting: boolean;
+			/** The user stopped the turn, so its clock says so instead of "Worked for". */
+			stopped: boolean;
 	  }
 	| {
 			kind: "item";
@@ -113,6 +115,10 @@ function repeatedTurnFailure(
 	return { extra: text.slice(message.length).trim() };
 }
 
+function stoppedByUser(turn: Turn): boolean {
+	return turn.status === "interrupted" && !turn.error?.kind;
+}
+
 function asksTheUser(entry: TurnGroup["entries"][number]): boolean {
 	return entry.kind === "item" && isPendingApproval(entry.item);
 }
@@ -163,6 +169,7 @@ export function transcriptRows(
 				completedAtMs: turn.completedAtMs,
 				running: turn.status === "running",
 				waiting: turn.status === "running" && group.entries.some(asksTheUser),
+				stopped: stoppedByUser(turn),
 			});
 		};
 		const turnSettled = turn !== null && turn.status !== "running";
@@ -320,7 +327,14 @@ export function transcriptRows(
 			if (lastReplyAt === -1) push(card);
 			else rows.splice(lastReplyAt + 1, 0, card);
 		}
-		if (turn?.status === "failed" || turn?.status === "interrupted") {
+		const clockSaysStopped =
+			turn !== null &&
+			stoppedByUser(turn) &&
+			(turn.completedAtMs ?? turn.startedAtMs) - turn.startedAtMs >= 1000;
+		if (
+			(turn?.status === "failed" || turn?.status === "interrupted") &&
+			!clockSaysStopped
+		) {
 			push({
 				kind: "turn_status",
 				key: `status:${group.turnId}`,

@@ -916,6 +916,12 @@ msgstr "{count, plural, one {прочитан # файл} few {прочитан�
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# автоматизация убрана из группы} few {# автоматизации убраны из групп} many {# автоматизаций убрано из групп} other {# автоматизации убрано из групп}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Возобновить # чат?} few {Возобновить # чата?} many {Возобновить # чатов?} other {Возобновить # чата?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, one {Этот чат работал, когда Paradev закрылся} few {Эти чаты работали, когда Paradev закрылся} many {Эти чаты работали, когда Paradev закрылся} other {Эти чаты работали, когда Paradev закрылся}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Использован # источник} few {Использовано # источника} many {Использовано # источников} other {Использовано # источника}}"
 
@@ -10512,6 +10518,9 @@ msgstr "Держать документацию актуальной"
 
 msgid "Keep editing"
 msgstr "Продолжить редактирование"
+
+msgid "Keep paused"
+msgstr "Оставить на паузе"
 
 msgid "Keep typing an email to invite"
 msgstr "Продолжайте вводить email, чтобы пригласить"
@@ -21983,6 +21992,14 @@ msgstr "Чтобы подключать учётные записи, нужно 
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Чтобы пользоваться интеграциями, нужно состоять в организации."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Вы остановили через {0} мин {1} с"
+
+msgid "You stopped after {seconds}s"
+msgstr "Вы остановили через {seconds} с"
 
 msgid "You stopped this response"
 msgstr "Вы остановили этот ответ"

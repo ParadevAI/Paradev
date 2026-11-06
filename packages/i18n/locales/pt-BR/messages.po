@@ -916,6 +916,12 @@ msgstr "{count, plural, one {leu # arquivo} other {leu # arquivos}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# automação removida do grupo} other {# automações removidas dos grupos}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Retomar # chat?} other {Retomar # chats?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, one {Este chat estava em andamento quando o Paradev foi fechado} other {Estes chats estavam em andamento quando o Paradev foi fechado}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Usou # fonte} other {Usou # fontes}}"
 
@@ -10512,6 +10518,9 @@ msgstr "Manter a documentação em dia"
 
 msgid "Keep editing"
 msgstr "Continuar editando"
+
+msgid "Keep paused"
+msgstr "Manter pausado"
 
 msgid "Keep typing an email to invite"
 msgstr "Continue digitando um e-mail para convidar"
@@ -21983,6 +21992,14 @@ msgstr "Você precisa fazer parte de uma organização para conectar contas."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Você precisa fazer parte de uma organização para usar integrações."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Você parou após {0} min {1} s"
+
+msgid "You stopped after {seconds}s"
+msgstr "Você parou após {seconds} s"
 
 msgid "You stopped this response"
 msgstr "Você interrompeu esta resposta"

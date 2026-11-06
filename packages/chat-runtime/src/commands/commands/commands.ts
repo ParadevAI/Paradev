@@ -9,6 +9,7 @@ import {
 	type SessionOutline,
 	type SessionSnapshot,
 	type StoredItem,
+	userStopMarker,
 } from "@superset/chat/core";
 import type {
 	AgentMessage,
@@ -32,6 +33,7 @@ import type {
 	SteerSubagentInput,
 	StopBackgroundTaskInput,
 	Turn,
+	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	backgroundSubagentInputSchema,
@@ -74,11 +76,13 @@ import type { ChatSessionStore } from "../../projection";
 import type { ChatResetReason, PageResult } from "../../replay";
 import { latestSeq, readPage, readSince } from "../../replay";
 import type {
+	CarriedSession,
 	LiveSessionRegistry,
 	PromptResult,
 	QueueState,
 	UnfinishedSession,
 } from "../../sessions";
+import { replayKey } from "../../sessions";
 import { SubagentItems } from "../../stream";
 
 export const createSessionCommandSchema = createSessionInputSchema
@@ -166,17 +170,26 @@ export function sessionsTitled<Row extends { title: string | null }>(
 		: rows;
 }
 
-function canceledTools(snapshot: SessionSnapshot, turnId: string): Set<string> {
-	const ids = new Set<string>();
-	for (const { item, turnId: owner } of snapshot.items.values()) {
+function carriedFrom(snapshot: SessionSnapshot): CarriedSession {
+	const canceledToolIds = new Set<string>();
+	const hiddenStopKeys = new Set<string>();
+	for (const { item } of snapshot.items.values()) {
+		if (item.kind === "tool_call" && item.status === "canceled") {
+			canceledToolIds.add(item.id);
+			continue;
+		}
+		if (item.kind !== "user_message") continue;
+		const message = item as UserMessage;
+		const [part] = message.content;
 		if (
-			owner === turnId &&
-			item.kind === "tool_call" &&
-			item.status === "canceled"
+			message.discarded &&
+			message.content.length === 1 &&
+			part?.type === "text" &&
+			userStopMarker(part.text)
 		)
-			ids.add(item.id);
+			hiddenStopKeys.add(replayKey(message.id));
 	}
-	return ids;
+	return { turn: failedLastTurn(snapshot), canceledToolIds, hiddenStopKeys };
 }
 
 /** A turn that ended without the user asking stays visible in the session that replaces it. */
@@ -226,7 +239,11 @@ export type GetSessionResult = {
 export type ResumeSessionInput = Omit<
 	UnfinishedSession,
 	"sessionId" | "interrupted"
-> & { cwd: string };
+> & {
+	cwd: string;
+	/** The cut-off session this one continues, whose ending it carries over. */
+	replacesSessionId?: string;
+};
 
 type ResumedChat = {
 	terminalId: string;
@@ -451,7 +468,6 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					replaced && options.sessions.get(replaced)?.scopeId === parsed.scopeId
 						? replaySession(replaced)
 						: null;
-				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
@@ -473,13 +489,10 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					options.journal.discard(sessionId);
 					throw error;
 				}
-				if (carried && replay?.ok) {
+				if (replay?.ok) {
 					options.live
 						.require(sessionId)
-						.carryFailedTurn(
-							carried,
-							canceledTools(replay.snapshot, carried.id),
-						);
+						.carryFrom(carriedFrom(replay.snapshot));
 				}
 				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };
@@ -495,7 +508,12 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				modeId: input.modeId,
 				modelId: input.modelId,
 				terminalId: input.terminalId,
-				resume: { harnessSessionId: input.harnessSessionId },
+				resume: {
+					harnessSessionId: input.harnessSessionId,
+					...(input.replacesSessionId
+						? { replacesSessionId: input.replacesSessionId }
+						: {}),
+				},
 			});
 			const pending = {
 				prompts: input.prompts,

@@ -32,6 +32,7 @@ import { acpHarnessEntries } from "./acpHarnesses";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
 import type { ChatAgentBridge } from "./chatAgentBridge";
+import { type ClosedMidTurnChat, createClosedMidTurn } from "./closedMidTurn";
 import { createGitCheckpoints } from "./gitCheckpoints";
 import { createAttachmentResolver } from "./resolveAttachment";
 import { createResolveCwd } from "./resolveCwd";
@@ -124,6 +125,10 @@ export type ChatV3Mount = {
 	closeScope(scopeId: string): Promise<void>;
 	recordUnfinished(): void;
 	resumeAfterUpdate(): void;
+	/** Chats the last quit cut off mid-turn that nobody has picked up yet. */
+	closedMidTurn(): ClosedMidTurnChat[];
+	resumeClosedMidTurn(): Promise<number>;
+	keepClosedMidTurnPaused(): void;
 	dispose(): Promise<void>;
 };
 
@@ -165,6 +170,11 @@ export function createChatV3Mount(options: {
 		return built;
 	};
 
+	const closedChats = createClosedMidTurn({
+		runtime,
+		resolveCwd: createResolveCwd(options.db),
+	});
+
 	return {
 		runtime,
 		closeScope: async (scopeId) => {
@@ -176,13 +186,14 @@ export function createChatV3Mount(options: {
 				runtime,
 				resolveCwd: createResolveCwd(options.db),
 			});
-			const agents = options.agents;
-			if (agents) {
-				restoreClosedChats(closedChatsPath, (chat) =>
-					agents.closedMidTurn(chat),
-				);
-			}
+			restoreClosedChats(closedChatsPath, (chat) => {
+				closedChats.add(chat);
+				options.agents?.closedMidTurn(chat);
+			});
 		},
+		closedMidTurn: () => closedChats.list(),
+		resumeClosedMidTurn: () => closedChats.resume(),
+		keepClosedMidTurnPaused: () => closedChats.keepPaused(),
 		recordUnfinished: () => {
 			if (!built) return;
 			if (!recordUnfinishedChats(built, markerPath)) {

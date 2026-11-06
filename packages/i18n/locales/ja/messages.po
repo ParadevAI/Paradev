@@ -916,6 +916,12 @@ msgstr "{count, plural, one {#件のファイルを読み取り} other {#件の�
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {#件のオートメーションをグループから外しました} other {#件のオートメーションをグループから外しました}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, other {# 件のチャットを再開しますか?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, other {Paradev の終了時に実行中だったチャットです}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {#件のソースを使用} other {#件のソースを使用}}"
 
@@ -10512,6 +10518,9 @@ msgstr "ドキュメントを最新に保つ"
 
 msgid "Keep editing"
 msgstr "編集を続ける"
+
+msgid "Keep paused"
+msgstr "一時停止のままにする"
 
 msgid "Keep typing an email to invite"
 msgstr "招待するにはメールアドレスを入力し続けてください"
@@ -21983,6 +21992,14 @@ msgstr "アカウントを接続するには、組織に所属している必要
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "連携を使うには組織に所属している必要があります。"
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "{0} 分 {1} 秒後に停止しました"
+
+msgid "You stopped after {seconds}s"
+msgstr "{seconds} 秒後に停止しました"
 
 msgid "You stopped this response"
 msgstr "この応答を停止しました"

@@ -69,6 +69,21 @@ export type QueueState = {
 	}[];
 };
 
+export type CarriedSession = {
+	turn: Turn | null;
+	canceledToolIds: ReadonlySet<string>;
+	/** `replayKey`s of the stop notes the replaced session hid. */
+	hiddenStopKeys: ReadonlySet<string>;
+};
+
+/**
+ * A replay mints new item ids for messages but keeps the agent's own id as the
+ * last segment, so the same message matches across replays.
+ */
+export function replayKey(itemId: string): string {
+	return itemId.slice(itemId.lastIndexOf(":") + 1);
+}
+
 export type UnfinishedSession = {
 	sessionId: string;
 	scopeId: string;
@@ -130,6 +145,7 @@ export class LiveSession {
 	private onHeldReleased: (() => void) | null = null;
 	private carriedFailure: Turn | null = null;
 	private carriedCanceledToolIds: ReadonlySet<string> = new Set();
+	private hiddenStopKeys: ReadonlySet<string> = new Set();
 	/** The agent's "stopped by user" note the shutdown wrote, replayed after the last prompt. */
 	private replayedShutdownStop: { item: UserMessage; turnId: string } | null =
 		null;
@@ -250,15 +266,18 @@ export class LiveSession {
 	 * latest turn.
 	 */
 	/**
-	 * `canceledToolIds`: commands the cut-off session settled as canceled. The
-	 * agent's replay reports them failed, which reads as an error the user made.
+	 * What the agent's replay of history cannot know, taken from the session
+	 * this one replaces. Its replay reports commands Paradev stopped as failed,
+	 * and replays the stop notes a shutdown made the agent write.
 	 */
-	carryFailedTurn(
-		turn: Turn,
-		canceledToolIds: ReadonlySet<string> = new Set(),
-	): void {
+	carryFrom(replaced: CarriedSession): void {
+		this.carriedCanceledToolIds = replaced.canceledToolIds;
+		this.hiddenStopKeys = replaced.hiddenStopKeys;
+		if (replaced.turn) this.carryFailedTurn(replaced.turn);
+	}
+
+	carryFailedTurn(turn: Turn): void {
 		this.carriedFailure = turn;
-		this.carriedCanceledToolIds = canceledToolIds;
 		this.releaseCarriedFailure();
 	}
 
@@ -748,11 +767,18 @@ export class LiveSession {
 	}
 
 	private withCarriedCancel(item: Item): Item {
-		return item.kind === "tool_call" &&
+		if (
+			item.kind === "tool_call" &&
 			item.status === "failed" &&
 			this.carriedCanceledToolIds.has(item.id)
-			? { ...item, status: "canceled" }
-			: item;
+		)
+			return { ...item, status: "canceled" };
+		if (
+			item.kind === "user_message" &&
+			this.hiddenStopKeys.has(replayKey(item.id))
+		)
+			return { ...item, discarded: true };
+		return item;
 	}
 
 	private releaseCarriedFailure(): void {

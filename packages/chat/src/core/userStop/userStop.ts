@@ -12,6 +12,11 @@ export function userStopMarker(text: string): UserStop | null {
 	return CLAUDE_CODE_STOP_MARKERS.get(text.trim()) ?? null;
 }
 
+/** The reply Claude Code writes for itself after a stop, with no model behind it. */
+export function userStopReply(text: string): boolean {
+	return text.trim() === "No response requested.";
+}
+
 /**
  * Claude Code records a stop as a user message of its own, and a replay of its
  * history brings that message back. A prompt sent from this chat carries a

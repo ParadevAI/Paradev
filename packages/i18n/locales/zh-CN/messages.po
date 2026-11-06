@@ -916,6 +916,12 @@ msgstr "{count, plural, one {读取了 # 个文件} other {读取了 # 个文件
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {已将 # 个自动化移出分组} other {已将 # 个自动化移出分组}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, other {要继续 # 个聊天吗?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, other {Paradev 关闭时这些聊天正在运行}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
 
@@ -10512,6 +10518,9 @@ msgstr "让文档保持最新"
 
 msgid "Keep editing"
 msgstr "继续编辑"
+
+msgid "Keep paused"
+msgstr "保持暂停"
 
 msgid "Keep typing an email to invite"
 msgstr "继续输入邮箱以邀请"
@@ -21983,6 +21992,14 @@ msgstr "您需要加入一个组织才能连接账户。"
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "你需要加入一个组织才能使用集成。"
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "你在 {0} 分 {1} 秒后停止了"
+
+msgid "You stopped after {seconds}s"
+msgstr "你在 {seconds} 秒后停止了"
 
 msgid "You stopped this response"
 msgstr "你停止了这条回复"

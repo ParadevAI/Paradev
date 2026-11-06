@@ -916,6 +916,12 @@ msgstr "{count, plural, one {membaca # file} other {membaca # file}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# otomatisasi dikeluarkan dari grupnya} other {# otomatisasi dikeluarkan dari grupnya}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, other {Lanjutkan # chat?}}"
+
+msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgstr "{count, plural, other {Chat ini sedang berjalan saat Paradev ditutup}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Memakai # sumber} other {Memakai # sumber}}"
 
@@ -10512,6 +10518,9 @@ msgstr "Jaga dokumentasi tetap segar"
 
 msgid "Keep editing"
 msgstr "Lanjutkan mengedit"
+
+msgid "Keep paused"
+msgstr "Biarkan dijeda"
 
 msgid "Keep typing an email to invite"
 msgstr "Terus ketik email untuk mengundang"
@@ -21983,6 +21992,14 @@ msgstr "Anda harus menjadi bagian dari organisasi untuk menghubungkan akun."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Anda harus menjadi bagian dari sebuah organisasi untuk memakai integrasi."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Anda menghentikannya setelah {0} mnt {1} dtk"
+
+msgid "You stopped after {seconds}s"
+msgstr "Anda menghentikannya setelah {seconds} dtk"
 
 msgid "You stopped this response"
 msgstr "Anda menghentikan respons ini"

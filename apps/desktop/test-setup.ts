@@ -369,7 +369,13 @@ mock.module("@lingui/react/macro", () => ({
 	SelectOrdinal: ({ value, ...branches }: { value: number }) =>
 		pickPluralBranch(value, branches),
 	useLingui: () => ({
-		t: (descriptor: MessageDescriptor) => renderMessage(descriptor),
+		t: (
+			descriptor: MessageDescriptor | TemplateStringsArray,
+			...values: unknown[]
+		) =>
+			Array.isArray(descriptor)
+				? String.raw({ raw: descriptor }, ...values)
+				: renderMessage(descriptor as MessageDescriptor),
 		i18n: { _: (descriptor: MessageDescriptor) => renderMessage(descriptor) },
 	}),
 }));

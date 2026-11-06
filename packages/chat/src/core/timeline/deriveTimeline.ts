@@ -6,7 +6,7 @@ import type {
 	UserMessage,
 } from "../../protocol/items";
 import type { SessionSnapshot, StoredItem } from "../reducer/reducer";
-import { type UserStop, userStopOf } from "../userStop/userStop";
+import { type UserStop, userStopOf, userStopReply } from "../userStop/userStop";
 
 export type TimelineEntry =
 	| { kind: "item"; item: Item }
@@ -28,6 +28,35 @@ function isToolCall(item: Item): item is ToolCall {
 	return item.kind === "tool_call";
 }
 
+/** The agent reports a command it was stopped in as failed. */
+function stoppedCall(call: ToolCall): ToolCall {
+	return call.status === "failed" ? { ...call, status: "canceled" } : call;
+}
+
+/** A replay opens a turn at the stop note, so the calls it stopped end the turn before. */
+function stopTrailingCalls(entries: TimelineEntry[]): void {
+	for (let index = entries.length - 1; index >= 0; index--) {
+		const entry = entries[index];
+		if (entry?.kind === "tool_run") {
+			entries[index] = {
+				kind: "tool_run",
+				items: entry.items.map(stoppedCall),
+			};
+		} else if (entry?.kind === "item" && isToolCall(entry.item)) {
+			entries[index] = { kind: "item", item: stoppedCall(entry.item) };
+		} else {
+			return;
+		}
+	}
+}
+
+function isStopReply(item: Item): boolean {
+	return (
+		item.kind === "agent_message" &&
+		userStopReply((item as { text?: string }).text ?? "")
+	);
+}
+
 export function collapseWorkLog(
 	items: readonly Item[],
 	harness?: string,
@@ -43,13 +72,18 @@ export function collapseWorkLog(
 		run = [];
 	};
 
+	let afterStop = false;
 	for (const item of items) {
 		if (isToolCall(item)) {
+			afterStop = false;
 			run.push(item);
 			continue;
 		}
-		flush();
 		const stop = userStopOf(item, harness);
+		if (stop) run = run.map(stoppedCall);
+		flush();
+		if (afterStop && isStopReply(item)) continue;
+		afterStop = stop !== null;
 		entries.push(
 			stop
 				? { kind: "user_stop", item: item as UserMessage, stop }
@@ -101,6 +135,11 @@ export function deriveTimeline(
 		if (aStart !== bStart) return aStart - bStart;
 		return a.turnId < b.turnId ? -1 : a.turnId > b.turnId ? 1 : 0;
 	});
+	for (const [index, group] of groups.entries()) {
+		if (groups[index + 1]?.entries[0]?.kind === "user_stop") {
+			stopTrailingCalls(group.entries);
+		}
+	}
 	return groups;
 }
 

@@ -152,6 +152,54 @@ describe("transcriptRows", () => {
 		expect(rows.at(-1)).toMatchObject({ kind: "turn_status", error });
 	});
 
+	test("a turn the user stopped says so once, on its clock", () => {
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 30_000,
+					},
+					entries: [{ kind: "item", item: prompt }],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.find((row) => row.kind === "working")).toMatchObject({
+			stopped: true,
+		});
+		expect(rows.some((row) => row.kind === "turn_status")).toBe(false);
+	});
+
+	test("a stop too quick for a clock still gets its line", () => {
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 200,
+					},
+					entries: [{ kind: "item", item: prompt }],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.at(-1)).toMatchObject({
+			kind: "turn_status",
+			status: "interrupted",
+		});
+	});
+
 	test("an approval is after its target only when the target row is right above", () => {
 		const approval: ApprovalRequest = {
 			id: "approval:tool-1",
