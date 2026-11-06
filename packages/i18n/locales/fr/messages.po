@@ -21984,6 +21984,12 @@ msgstr "Vous devez faire partie d'une organisation pour connecter des comptes."
 msgid "You need to be part of an organization to use integrations."
 msgstr "Vous devez faire partie d'une organisation pour utiliser les intégrations."
 
+msgid "You stopped this response"
+msgstr "Vous avez arrêté cette réponse"
+
+msgid "You stopped this response at a tool call"
+msgstr "Vous avez arrêté cette réponse lors d'un appel d'outil"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

@@ -1,11 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import {
 	collapseWorkLog,
+	deriveTimeline,
+	emptySnapshot,
 	type OutboxEntry,
+	reduceMany,
 	type TurnGroup,
 } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
+	DurableEnvelope,
 	Item,
 	ToolCall,
 	UserMessage,
@@ -628,5 +632,56 @@ describe("the changed-files card", () => {
 			find,
 		).find((row) => row.kind === "changed_files");
 		expect(commandOnly).toMatchObject({ files: [] });
+	});
+});
+
+test("a stop replayed from Claude Code history is a stopped row where it happened, not a prompt", () => {
+	const replayed = (id: string, text: string, startedAtMs: number): Item => ({
+		id,
+		kind: "user_message",
+		startedAtMs,
+		content: [{ type: "text", text }],
+	});
+	const reply = (id: string, startedAtMs: number): Item => ({
+		id,
+		kind: "agent_message",
+		text: id,
+		startedAtMs,
+		completedAtMs: startedAtMs,
+	});
+	const stored: DurableEnvelope[] = [
+		["h1", replayed("p1", "delete the build folder", 10)],
+		["h1", reply("asks-to-run", 11)],
+		["h2", replayed("stop", "[Request interrupted by user for tool use]", 12)],
+		["h2", replayed("p2", "keep it, clean the cache", 13)],
+		["h2", reply("done", 14)],
+	].map(([turnId, item], index) => ({
+		v: 1,
+		sessionId: "s1",
+		ts: index,
+		cursor: { epoch: "e1", seq: index + 1 },
+		event: { type: "item", item: item as Item, turnId: turnId as string },
+	}));
+
+	const rows = transcriptRows(
+		deriveTimeline(reduceMany(emptySnapshot(), stored), {
+			harness: "claude-acp",
+		}),
+		[],
+		new Set(),
+		find,
+	);
+
+	expect(rows.map((row) => row.key)).toEqual([
+		"p1",
+		"asks-to-run",
+		"stop:stop",
+		"p2",
+		"done",
+	]);
+	expect(rows[2]).toMatchObject({
+		kind: "turn_status",
+		status: "interrupted",
+		userStop: "tool_use",
 	});
 });

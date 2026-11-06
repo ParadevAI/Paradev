@@ -111,6 +111,33 @@ describe("deriveTimeline", () => {
 		if (firstEntry?.kind !== "item") throw new Error("expected item entry");
 		expect(firstEntry.item.id).toBe("m1");
 	});
+
+	test("a replayed Claude Code stop is a user_stop entry, not a prompt", () => {
+		seq = 0;
+		const prompt = (id: string, text: string, startedAtMs: number): Item => ({
+			id,
+			kind: "user_message",
+			startedAtMs,
+			content: [{ type: "text", text }],
+		});
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(prompt("p1", "refactor the parser", 10), "h1"),
+			env(message("partial", 11), "h1"),
+			env(prompt("stop", "[Request interrupted by user]\n", 12), "h2"),
+			env(prompt("p2", "only rename it", 13), "h2"),
+			env(message("reply", 14), "h2"),
+		]);
+		const groups = deriveTimeline(snapshot, { harness: "claude-acp" });
+		expect(groups[1]?.entries).toEqual([
+			{
+				kind: "user_stop",
+				item: prompt("stop", "[Request interrupted by user]\n", 12),
+				stop: "response",
+			},
+			{ kind: "item", item: prompt("p2", "only rename it", 13) },
+			{ kind: "item", item: message("reply", 14) },
+		]);
+	});
 });
 
 describe("deriveTimeline with nested items", () => {

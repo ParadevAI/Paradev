@@ -21984,6 +21984,12 @@ msgstr "계정을 연결하려면 조직에 속해 있어야 합니다."
 msgid "You need to be part of an organization to use integrations."
 msgstr "연동을 사용하려면 조직에 속해 있어야 합니다."
 
+msgid "You stopped this response"
+msgstr "이 응답을 중지했습니다"
+
+msgid "You stopped this response at a tool call"
+msgstr "도구 호출 시점에 이 응답을 중지했습니다"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

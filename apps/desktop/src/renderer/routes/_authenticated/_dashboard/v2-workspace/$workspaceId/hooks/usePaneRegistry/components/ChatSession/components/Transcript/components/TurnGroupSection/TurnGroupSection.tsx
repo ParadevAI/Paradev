@@ -181,6 +181,7 @@ export function TurnGroupSection({
 					latest={row.latest}
 					status={row.status}
 					turnId={row.turnId}
+					userStop={row.userStop}
 				/>
 			);
 		case "changed_files":

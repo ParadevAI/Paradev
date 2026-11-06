@@ -21984,6 +21984,12 @@ msgstr "您需要加入組織才能連接帳戶。"
 msgid "You need to be part of an organization to use integrations."
 msgstr "你需要加入一個組織才能使用整合。"
 
+msgid "You stopped this response"
+msgstr "你停止了這則回覆"
+
+msgid "You stopped this response at a tool call"
+msgstr "你在工具呼叫時停止了這則回覆"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

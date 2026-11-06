@@ -59,6 +59,15 @@ export function chatRows(
 				});
 				return;
 			}
+			if (entry.kind === "user_stop") {
+				rows.push({
+					kind: "turn_status",
+					key: `stop:${entry.item.id}`,
+					status: "interrupted",
+					message: undefined,
+				});
+				return;
+			}
 			rows.push({
 				kind: "tool_run",
 				key: toolRunKey(group.turnId, entry.items, index),

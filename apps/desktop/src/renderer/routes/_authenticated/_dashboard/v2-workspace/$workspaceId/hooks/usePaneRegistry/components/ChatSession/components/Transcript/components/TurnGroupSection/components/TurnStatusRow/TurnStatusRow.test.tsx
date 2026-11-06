@@ -104,6 +104,24 @@ test("a turn the user stopped is one quiet line", () => {
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 });
 
+test("a stop the agent recorded says the user stopped it, and whether it was at a tool call", () => {
+	const line = (userStop: "response" | "tool_use") =>
+		render(
+			<TurnStatusRow
+				error={undefined}
+				latest={false}
+				status="interrupted"
+				turnId="t1"
+				userStop={userStop}
+			/>,
+		).container;
+	expect(line("response").textContent).toBe("You stopped this response");
+	expect(line("tool_use").textContent).toBe(
+		"You stopped this response at a tool call",
+	);
+	expect(line("response").querySelector("button, textarea")).toBeNull();
+});
+
 test("a turn the usage limit stopped is one quiet line, not a failure card", () => {
 	const view = render(
 		<TurnStatusRow

@@ -21978,6 +21978,12 @@ msgstr "Щоб підключати облікові записи, потріб�
 msgid "You need to be part of an organization to use integrations."
 msgstr "Щоб використовувати інтеграції, потрібно бути учасником організації."
 
+msgid "You stopped this response"
+msgstr "Ви зупинили цю відповідь"
+
+msgid "You stopped this response at a tool call"
+msgstr "Ви зупинили цю відповідь на виклику інструмента"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."

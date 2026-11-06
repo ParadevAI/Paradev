@@ -6,10 +6,12 @@ import type {
 	UserMessage,
 } from "../../protocol/items";
 import type { SessionSnapshot, StoredItem } from "../reducer/reducer";
+import { type UserStop, userStopOf } from "../userStop/userStop";
 
 export type TimelineEntry =
 	| { kind: "item"; item: Item }
-	| { kind: "tool_run"; items: ToolCall[] };
+	| { kind: "tool_run"; items: ToolCall[] }
+	| { kind: "user_stop"; item: UserMessage; stop: UserStop };
 
 export type TurnGroup = {
 	turn: Turn | null;
@@ -26,7 +28,10 @@ function isToolCall(item: Item): item is ToolCall {
 	return item.kind === "tool_call";
 }
 
-export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
+export function collapseWorkLog(
+	items: readonly Item[],
+	harness?: string,
+): TimelineEntry[] {
 	const entries: TimelineEntry[] = [];
 	let run: ToolCall[] = [];
 
@@ -44,7 +49,12 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 			continue;
 		}
 		flush();
-		entries.push({ kind: "item", item });
+		const stop = userStopOf(item, harness);
+		entries.push(
+			stop
+				? { kind: "user_stop", item: item as UserMessage, stop }
+				: { kind: "item", item },
+		);
 	}
 	flush();
 	return entries;
@@ -52,6 +62,8 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 
 export type DeriveTimelineOptions = {
 	nestChildItems?: boolean;
+	/** `SessionState.harness`. A stop marker counts only in the harness that writes it. */
+	harness?: string;
 };
 
 export function deriveTimeline(
@@ -79,7 +91,7 @@ export function deriveTimeline(
 		groups.push({
 			turn: snapshot.turns.get(turnId) ?? null,
 			turnId,
-			entries: collapseWorkLog(items),
+			entries: collapseWorkLog(items, options?.harness),
 		});
 	}
 
@@ -95,9 +107,9 @@ export function deriveTimeline(
 function firstItemStart(group: TurnGroup): number {
 	const first = group.entries[0];
 	if (!first) return Number.MAX_SAFE_INTEGER;
-	return first.kind === "item"
-		? first.item.startedAtMs
-		: (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER);
+	return first.kind === "tool_run"
+		? (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER)
+		: first.item.startedAtMs;
 }
 
 export function deriveChildrenByParent(

@@ -86,7 +86,7 @@ async function foldFixture(
 	return {
 		items: groups.flatMap((group) =>
 			group.entries.flatMap((entry) =>
-				entry.kind === "item" ? [entry.item] : entry.items,
+				entry.kind === "tool_run" ? entry.items : [entry.item],
 			),
 		),
 		turns: [...snapshot.turns.values()],
