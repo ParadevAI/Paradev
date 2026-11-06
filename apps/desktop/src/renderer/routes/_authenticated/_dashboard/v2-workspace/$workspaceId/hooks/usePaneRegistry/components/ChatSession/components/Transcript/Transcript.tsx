@@ -443,6 +443,11 @@ export function Transcript({
 						REMEMBER_SIZE_CLASSNAME,
 						!recent && OFFSCREEN_CLASSNAME,
 						speakers ? "pr-4 pl-14" : "px-4",
+						speakers &&
+							row.kind === "item" &&
+							(row.item.kind === "user_message" ||
+								row.item.kind === "agent_message") &&
+							"rounded-lg transition-colors hover:bg-foreground/[0.03]",
 						row.kind !== "changed_files" && "pb-1",
 						proseTopPadding(row, rows[index - 1]),
 					)}
