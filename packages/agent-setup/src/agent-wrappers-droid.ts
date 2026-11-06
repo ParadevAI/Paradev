@@ -49,6 +49,7 @@ function droidHooksSpec(
 		fileLabel: "Droid settings.json",
 		agentLabel: "Droid",
 		getFilePath: getDroidSettingsJsonPath,
+		binaryNames: ["droid"],
 		eventsContainerKey: "hooks",
 		// Guarded on SUPERSET_HOME_DIR so the hook is a no-op in droid sessions
 		// launched outside Superset terminals (~/.factory/settings.json is global).

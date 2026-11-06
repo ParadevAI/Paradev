@@ -20,6 +20,13 @@ export const MANAGED_NOTIFY_RELATIVE_PATH = `hooks/${NOTIFY_SCRIPT_NAME}`;
 export const DYNAMIC_NOTIFY_PATH_MARKER = `$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}`;
 
 /**
+ * No-op first word of each managed command. Harnesses that print a failed
+ * hook show only its first characters (Devin: 80), so the owner shows there.
+ */
+export const MANAGED_NOTIFY_COMMAND_LABEL = ": paradev-notify;";
+export const MANAGED_ARTIFACT_GUARD_COMMAND_LABEL = ": paradev-artifact-guard;";
+
+/**
  * Shell command written into an agent's global hook config. The notify path is
  * resolved at runtime from SUPERSET_HOME_DIR so one shared config works for both
  * dev and prod installs. `SUPERSET_HOOK_HARNESS` names the harness whose config
@@ -39,7 +46,7 @@ export function getManagedNotifyHookCommand(
 	eventType?: string,
 ): string {
 	const eventAssignment = eventType ? ` SUPERSET_HOOK_EVENT=${eventType}` : "";
-	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId}${eventAssignment} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
+	return `${MANAGED_NOTIFY_COMMAND_LABEL} [ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId}${eventAssignment} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
 }
 
 export const MANAGED_ARTIFACT_GUARD_RELATIVE_PATH = `hooks/${ARTIFACT_GUARD_SCRIPT_NAME}`;
@@ -47,7 +54,7 @@ export const MANAGED_ARTIFACT_GUARD_RELATIVE_PATH = `hooks/${ARTIFACT_GUARD_SCRI
 export const DYNAMIC_ARTIFACT_GUARD_PATH_MARKER = `$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}`;
 
 export function getManagedArtifactGuardHookCommand(): string {
-	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" ] && "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" || true`;
+	return `${MANAGED_ARTIFACT_GUARD_COMMAND_LABEL} [ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" ] && "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" || true`;
 }
 
 // Dev setup (.paradev/lib/setup/steps.sh) points SUPERSET_HOME_DIR at

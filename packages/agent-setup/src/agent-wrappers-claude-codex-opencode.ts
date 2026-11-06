@@ -120,6 +120,7 @@ function claudeHooksSpec(
 		fileLabel: "Claude settings.json",
 		agentLabel: "Claude",
 		getFilePath: getClaudeGlobalSettingsJsonPath,
+		binaryNames: ["claude"],
 		eventsContainerKey: "hooks",
 		desiredEntriesByEvent,
 		cleanEntry: (definition) =>
@@ -214,6 +215,7 @@ function codexHooksSpec(
 		fileLabel: "Codex hooks.json",
 		agentLabel: "Codex",
 		getFilePath: getCodexGlobalHooksJsonPath,
+		binaryNames: ["codex"],
 		eventsContainerKey: "hooks",
 		// Guarded on SUPERSET_HOME_DIR so the hook is a no-op in codex sessions
 		// launched outside Superset terminals. Superset terminals without the

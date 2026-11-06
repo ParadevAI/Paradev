@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { getCodexGlobalHooksJsonContent } from "./agent-wrappers-claude-codex-opencode";
 
 const command =
-	'[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/hooks/notify.sh" ] && SUPERSET_HOOK_HARNESS=codex "$SUPERSET_HOME_DIR/hooks/notify.sh" || true';
+	': paradev-notify; [ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/hooks/notify.sh" ] && SUPERSET_HOOK_HARNESS=codex "$SUPERSET_HOME_DIR/hooks/notify.sh" || true';
 
 describe("Codex working status hooks", () => {
 	it("reasserts working after every tool while keeping pre-tool waiting scoped", () => {

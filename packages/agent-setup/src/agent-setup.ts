@@ -285,6 +285,22 @@ export function setupSingleAgent(agentId: string): boolean {
 	return true;
 }
 
+export function isAgentSetupTargetId(id: string): id is AgentSetupTargetId {
+	return id in AGENT_SETUP_DEFINITIONS;
+}
+
+/** Runs each agent's teardown and returns the labels of the actions that failed. */
+export function teardownAgents(
+	agentIds: readonly AgentSetupTargetId[],
+): string[] {
+	const failed: string[] = [];
+	for (const agentId of agentIds) {
+		runAgentActions(agentId, AGENT_SETUP_DEFINITIONS[agentId].teardown, failed);
+	}
+	warnOnFailures(failed);
+	return failed;
+}
+
 /**
  * Removes one agent's Superset footprint from its global config. Returns
  * `false` for unknown ids; `true` even when the agent has no teardown

@@ -72,6 +72,7 @@ function cursorHooksSpec(
 		fileLabel: "Cursor hooks.json",
 		agentLabel: "Cursor",
 		getFilePath: getCursorGlobalHooksJsonPath,
+		binaryNames: ["cursor-agent"],
 		eventsContainerKey: "hooks",
 		desiredEntriesByEvent: Object.fromEntries(
 			Object.entries(CURSOR_MANAGED_EVENT_ARGS).map(([eventName, arg]) => [

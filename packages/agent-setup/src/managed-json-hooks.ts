@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { writeFileIfChanged } from "./agent-wrappers-common";
+import { isRealBinaryOnPath } from "./real-binary";
 
 /**
  * Shared merge/remove engine for agents whose global config is a JSON file
@@ -15,6 +16,8 @@ export interface ManagedJsonHooksSpec<Entry> {
 	/** Agent label for teardown logs, e.g. "Claude". */
 	agentLabel: string;
 	getFilePath(): string;
+	/** With no config dir and none of these on PATH, setup writes nothing. */
+	binaryNames: readonly string[];
 	/**
 	 * Key of the event→entries map on the root object, or null when the root
 	 * object itself is the event map (Mastra).
@@ -126,9 +129,22 @@ export function getManagedJsonHooksContent<Entry>(
 	return JSON.stringify(root, null, 2);
 }
 
+function isAgentInstalled<Entry>(spec: ManagedJsonHooksSpec<Entry>): boolean {
+	return (
+		fs.existsSync(path.dirname(spec.getFilePath())) ||
+		isRealBinaryOnPath(spec.binaryNames)
+	);
+}
+
 export function ensureManagedJsonHooks<Entry>(
 	spec: ManagedJsonHooksSpec<Entry>,
 ): void {
+	if (!isAgentInstalled(spec)) {
+		console.log(
+			`[agent-setup] Skipped ${spec.fileLabel}: ${spec.agentLabel} is not installed`,
+		);
+		return;
+	}
 	const content = getManagedJsonHooksContent(spec);
 	if (content === null) return;
 

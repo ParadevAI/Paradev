@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import {
+	isAgentSetupTargetId,
 	runSetupAction,
 	setupAgentCapabilities,
 	setupSingleAgent,
+	teardownAgents,
 	teardownSingleAgent,
 } from "./agent-setup";
 import { resolveDisabledAgentIds } from "./disabled-agent-hooks";
@@ -60,7 +62,16 @@ export function setupAgentIntegrations(
 	console.log("[agent-setup] Agent integrations provisioned");
 }
 
-export { setupSingleAgent, teardownSingleAgent };
+export {
+	AGENT_SETUP_TARGETS,
+	type AgentSetupTargetId,
+} from "./agent-setup-targets";
+export {
+	isAgentSetupTargetId,
+	setupSingleAgent,
+	teardownAgents,
+	teardownSingleAgent,
+};
 
 export {
 	ensureClaudeManagedHooksAt,

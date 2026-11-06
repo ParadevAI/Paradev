@@ -24,8 +24,9 @@ interface DevinHookDefinition {
 
 /**
  * Devin CLI reads its user config from `$XDG_CONFIG_HOME/devin/config.json`
- * (`~/.config/devin/config.json` by default); `--config` can point elsewhere
- * but Superset launches never pass it.
+ * (`~/.config/devin/config.json` by default). `--config` cannot scope our
+ * hooks to Superset launches: it replaces this file instead of merging with
+ * it, and Devin writes settings back into the file it names (3000.11.234).
  */
 export function getDevinConfigJsonPath(): string {
 	const xdgConfigHome = process.env.XDG_CONFIG_HOME?.trim();
@@ -57,6 +58,7 @@ function devinHooksSpec(
 		fileLabel: "Devin config.json",
 		agentLabel: "Devin",
 		getFilePath: getDevinConfigJsonPath,
+		binaryNames: ["devin"],
 		eventsContainerKey: "hooks",
 		desiredEntriesByEvent: buildNestedDesiredEntries(
 			DEVIN_MANAGED_EVENTS,

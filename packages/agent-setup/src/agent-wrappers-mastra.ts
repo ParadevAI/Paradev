@@ -50,6 +50,7 @@ function mastraHooksSpec(
 		fileLabel: "Mastra hooks.json",
 		agentLabel: "Mastra",
 		getFilePath: getMastraGlobalHooksJsonPath,
+		binaryNames: ["mastracode"],
 		// Mastra's hooks.json maps event names at the root, with flat entries:
 		//   { EventName: [{ type, command }] }
 		eventsContainerKey: null,

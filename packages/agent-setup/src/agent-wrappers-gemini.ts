@@ -66,6 +66,7 @@ function geminiHooksSpec(
 		fileLabel: "Gemini settings.json",
 		agentLabel: "Gemini",
 		getFilePath: getGeminiSettingsJsonPath,
+		binaryNames: ["gemini"],
 		eventsContainerKey: "hooks",
 		desiredEntriesByEvent: Object.fromEntries(
 			GEMINI_MANAGED_EVENTS.map((eventName) => [

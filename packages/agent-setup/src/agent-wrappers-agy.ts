@@ -45,6 +45,7 @@ const agyHooksSpec: ManagedJsonHooksSpec<AgyHookEntry> = {
 	fileLabel: "Antigravity hooks.json",
 	agentLabel: "Antigravity",
 	getFilePath: getAgyHooksJsonPath,
+	binaryNames: ["agy"],
 	eventsContainerKey: AGY_HOOKS_NAME,
 	desiredEntriesByEvent: Object.fromEntries(
 		Object.entries(AGY_MANAGED_EVENTS).map(([agyEvent, eventType]) => [
