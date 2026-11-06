@@ -217,7 +217,7 @@ export class FakeHarness implements HarnessAdapter {
 		}
 	}
 
-	private emit(event: AdapterEvent): void {
+	protected emit(event: AdapterEvent): void {
 		if (event.kind === "turn") this.currentTurn = event.turn;
 		if (event.kind === "item" && event.item.kind === "tool_call") {
 			const running = asRunningToolCall(event);

@@ -1,3 +1,4 @@
+import type { ChatSelections } from "@superset/chat/core";
 import type {
 	Decision,
 	Delta,
@@ -28,10 +29,8 @@ export type ResolveAttachment = (
 	part: AttachmentPart,
 ) => Promise<ResolvedAttachment | null>;
 
-export type HarnessStartOptions = {
+export type HarnessStartOptions = ChatSelections & {
 	cwd: string;
-	modeId?: string;
-	modelId?: string;
 	/** `quiet` loads the agent's history without replaying it as items. */
 	resume?: { harnessSessionId: string; quiet?: boolean };
 };

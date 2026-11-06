@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { CONTINUE_PROMPT } from "@superset/chat/core";
+import {
+	type ChatSelections,
+	CONTINUE_PROMPT,
+	sessionSelections,
+} from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
@@ -67,14 +71,12 @@ export type QueueState = {
 	}[];
 };
 
-export type UnfinishedSession = {
+export type UnfinishedSession = ChatSelections & {
 	sessionId: string;
 	scopeId: string;
 	harness: string;
 	harnessSessionId: string;
 	terminalId?: string;
-	modeId?: string;
-	modelId?: string;
 	interrupted: boolean;
 	prompts: UserContent[][];
 	pausedPrompts: UserContent[][];
@@ -219,8 +221,7 @@ export class LiveSession {
 			harness: this.options.harness,
 			harnessSessionId,
 			terminalId: this.options.terminalId,
-			modeId: this.sessionState.modeId,
-			modelId: this.sessionState.modelId,
+			...sessionSelections(this.sessionState),
 			interrupted,
 			prompts,
 			pausedPrompts,

@@ -1976,30 +1976,44 @@ export class AcpAdapter implements HarnessAdapter {
 		return resumed ? undefined : this.options.defaultModeId;
 	}
 
+	private applyStartSelection(
+		category: "model" | "thought_level" | "mode",
+		wanted: string | undefined,
+	): Promise<boolean> | undefined {
+		const option = this.configOptions.find(
+			(entry) => entry.category === category,
+		);
+		if (!wanted || !option) return undefined;
+		const value =
+			category === "mode"
+				? option.options.some((entry) => entry.id === wanted)
+					? wanted
+					: undefined
+				: startOptionId(option.options, wanted);
+		if (!value || option.currentValue === value) return undefined;
+		return this.setConfigOption(option.id, value);
+	}
+
 	private applyStartSelections(
 		startOptions: HarnessStartOptions,
 		sessionModes: AcpSessionModes | undefined,
 		resumed: boolean,
 	): void {
 		const modeId = this.startModeId(startOptions, resumed);
-		for (const [category, wanted] of [
-			["model", startOptions.modelId],
-			["mode", this.options.clientApprovalModes ? undefined : modeId],
-		] as const) {
-			const option = this.configOptions.find(
-				(entry) => entry.category === category,
+		const modelSet = this.applyStartSelection("model", startOptions.modelId);
+		const { effortId } = startOptions;
+		if (effortId) {
+			// The effort levels on offer belong to the model, so they are only known once it is set.
+			this.trackSelection(
+				(modelSet ?? Promise.resolve(true)).then(() => {
+					this.applyStartSelection("thought_level", effortId);
+				}),
 			);
-			if (!wanted || !option) continue;
-			const value =
-				category === "model"
-					? startOptionId(option.options, wanted)
-					: option.options.some((entry) => entry.id === wanted)
-						? wanted
-						: undefined;
-			if (value && option.currentValue !== value) {
-				this.setConfigOption(option.id, value);
-			}
 		}
+		this.applyStartSelection(
+			"mode",
+			this.options.clientApprovalModes ? undefined : modeId,
+		);
 		if (
 			modeId &&
 			!this.modeConfigId &&
