@@ -4,7 +4,8 @@ import { useMemo } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { TbLayoutColumns, TbLayoutRows } from "react-icons/tb";
 import { HotkeyLabel } from "renderer/hotkeys";
-import type { PaneViewerData, TerminalPaneData } from "../../types";
+import type { PaneViewerData } from "../../types";
+import { newSplitPane } from "../../utils/newSplitPane";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
 export function useDefaultPaneActions({
@@ -34,13 +35,7 @@ export function useDefaultPaneActions({
 				onClick: (ctx) => {
 					const position =
 						ctx.pane.parentDirection === "horizontal" ? "down" : "right";
-					ctx.actions.split(position, {
-						kind: "terminal",
-						data: {
-							terminalId: launcher.mint(),
-							createOnAttach: true,
-						} as TerminalPaneData,
-					});
+					ctx.actions.split(position, newSplitPane(ctx.pane, launcher.mint));
 				},
 			},
 			{

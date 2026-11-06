@@ -1,0 +1,1 @@
+export { newSplitPane } from "./newSplitPane";

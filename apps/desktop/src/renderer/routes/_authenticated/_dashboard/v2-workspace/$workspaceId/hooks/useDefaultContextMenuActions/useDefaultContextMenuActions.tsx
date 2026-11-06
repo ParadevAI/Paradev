@@ -24,8 +24,8 @@ import type {
 	DesktopPaneData,
 	PaneTarget,
 	PaneViewerData,
-	TerminalPaneData,
 } from "../../types";
+import { newSplitPane } from "../../utils/newSplitPane";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 import { splitWithViewer } from "./utils/splitWithViewer";
@@ -63,13 +63,7 @@ export function useDefaultContextMenuActions({
 				shortcut:
 					splitDownShortcut !== "Unassigned" ? splitDownShortcut : undefined,
 				onSelect: (ctx) => {
-					ctx.actions.split("down", {
-						kind: "terminal",
-						data: {
-							terminalId: launcher.mint(),
-							createOnAttach: true,
-						} as TerminalPaneData,
-					});
+					ctx.actions.split("down", newSplitPane(ctx.pane, launcher.mint));
 				},
 			},
 			{
@@ -81,13 +75,7 @@ export function useDefaultContextMenuActions({
 				shortcut:
 					splitRightShortcut !== "Unassigned" ? splitRightShortcut : undefined,
 				onSelect: (ctx) => {
-					ctx.actions.split("right", {
-						kind: "terminal",
-						data: {
-							terminalId: launcher.mint(),
-							createOnAttach: true,
-						} as TerminalPaneData,
-					});
+					ctx.actions.split("right", newSplitPane(ctx.pane, launcher.mint));
 				},
 			},
 			{

@@ -22,8 +22,8 @@ import {
 	NEW_TAB_PANE_KIND,
 	type PaneTarget,
 	type PaneViewerData,
-	type TerminalPaneData,
 } from "../../types";
+import { newSplitPane } from "../../utils/newSplitPane";
 import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
@@ -232,13 +232,7 @@ export function useWorkspaceHotkeys({
 			tabId: active.tabId,
 			paneId: active.pane.id,
 			position,
-			newPane: {
-				kind: "terminal",
-				data: {
-					terminalId: launcher.mint(),
-					createOnAttach: true,
-				} as TerminalPaneData,
-			},
+			newPane: newSplitPane(active.pane, launcher.mint),
 		});
 	});
 
@@ -250,13 +244,7 @@ export function useWorkspaceHotkeys({
 			tabId: active.tabId,
 			paneId: active.pane.id,
 			position: "right",
-			newPane: {
-				kind: "terminal",
-				data: {
-					terminalId: launcher.mint(),
-					createOnAttach: true,
-				} as TerminalPaneData,
-			},
+			newPane: newSplitPane(active.pane, launcher.mint),
 		});
 	});
 
@@ -268,13 +256,7 @@ export function useWorkspaceHotkeys({
 			tabId: active.tabId,
 			paneId: active.pane.id,
 			position: "bottom",
-			newPane: {
-				kind: "terminal",
-				data: {
-					terminalId: launcher.mint(),
-					createOnAttach: true,
-				} as TerminalPaneData,
-			},
+			newPane: newSplitPane(active.pane, launcher.mint),
 		});
 	});
 
