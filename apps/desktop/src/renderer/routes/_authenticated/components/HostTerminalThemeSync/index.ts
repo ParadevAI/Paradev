@@ -1,0 +1,1 @@
+export { HostTerminalThemeSync } from "./HostTerminalThemeSync";

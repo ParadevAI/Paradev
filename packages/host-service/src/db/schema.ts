@@ -2,6 +2,7 @@ import type {
 	AgentDefinitionId,
 	AgentIdentityId,
 } from "@superset/shared/agent-catalog";
+import type { TerminalColors } from "@superset/shared/terminal-colors";
 import type { BranchPrefixMode } from "@superset/shared/workspace-launch";
 import {
 	index,
@@ -143,6 +144,10 @@ export const hostSettings = sqliteTable("host_settings", {
 	// inject (CLAUDE_CONFIG_DIR / CODEX_HOME). Null = the system default login.
 	defaultClaudeConfigDir: text("default_claude_config_dir"),
 	defaultCodexHome: text("default_codex_home"),
+	terminalThemeType: text("terminal_theme_type").$type<"dark" | "light">(),
+	terminalColors: text("terminal_colors", {
+		mode: "json",
+	}).$type<TerminalColors>(),
 });
 
 export const pullRequests = sqliteTable(
