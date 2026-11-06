@@ -58,6 +58,7 @@ export function describePaneLayout<TData>(
 						kind: pane.kind,
 						title: paneTitle(pane),
 						terminalId: readString(pane.data, "terminalId"),
+						sessionId: readString(pane.data, "sessionId"),
 						active: id === tab.activePaneId,
 					},
 				];

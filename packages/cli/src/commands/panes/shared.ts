@@ -6,6 +6,7 @@ import type {
 import { PANE_SPLIT_DIRECTIONS } from "@superset/shared/pane-layout-ops";
 import type { HostServiceClient } from "../../lib/host-target";
 import { formatLayout } from "../../lib/pane-layout-format";
+import { isMissingPanesRouter } from "../../lib/pane-placement";
 
 export const workspaceOptions = {
 	workspace: string().required().desc("Workspace ID"),
@@ -22,10 +23,7 @@ export async function callPanes<T>(call: () => Promise<T>): Promise<T> {
 	try {
 		return await call();
 	} catch (error) {
-		if (
-			error instanceof Error &&
-			/No procedure found on path "?panes\./.test(error.message)
-		) {
+		if (isMissingPanesRouter(error)) {
 			throw new CLIError(
 				"This host is too old for `superset panes`",
 				"Update the Paradev desktop app on that host",
@@ -40,14 +38,15 @@ export const terminalOptions = {
 	command: string().desc("Command to run in the new terminal"),
 };
 
-/**
- * Runs `place` with `terminal`, or with a terminal created for it. A created
- * terminal is killed if placing it fails, so no orphan session is left.
- */
+/** Runs `place` with `terminal`, or with a terminal created for it. */
 export async function withPaneTerminal<T>(
 	client: HostServiceClient,
 	workspaceId: string,
-	options: { terminal?: string | null; command?: string | null },
+	options: {
+		terminal?: string | null;
+		command?: string | null;
+		cwd?: string | null;
+	},
 	place: (terminalId: string) => Promise<T>,
 ): Promise<T & { terminalId: string }> {
 	if (options.terminal && options.command) {
@@ -62,8 +61,29 @@ export async function withPaneTerminal<T>(
 			await client.terminal.createSession.mutate({
 				workspaceId,
 				initialCommand: options.command ?? undefined,
+				cwd: options.cwd ?? undefined,
 			})
 		).terminalId;
+	return placeOrDispose(
+		client,
+		workspaceId,
+		terminalId,
+		!options.terminal,
+		place,
+	);
+}
+
+/**
+ * Runs `place` for `terminalId`. A terminal this command started (`owned`) is
+ * killed if placing it fails, so no orphan session is left.
+ */
+export async function placeOrDispose<T>(
+	client: HostServiceClient,
+	workspaceId: string,
+	terminalId: string,
+	owned: boolean,
+	place: (terminalId: string) => Promise<T>,
+): Promise<T & { terminalId: string }> {
 	try {
 		return { ...(await callPanes(() => place(terminalId))), terminalId };
 	} catch (error) {
@@ -75,10 +95,16 @@ export async function withPaneTerminal<T>(
 				"Check with `superset panes list`; close it with `superset terminals close` if no pane shows it",
 			);
 		}
-		if (!options.terminal) {
+		if (owned) {
 			await client.terminal.killSession
 				.mutate({ workspaceId, terminalId })
-				.catch(() => {});
+				.catch((killError: unknown) => {
+					throw new CLIError(
+						`${error instanceof Error ? error.message : String(error)}; terminal ${terminalId} is still running: ${killError instanceof Error ? killError.message : String(killError)}`,
+						(error instanceof CLIError && error.suggestion) ||
+							`Close it with \`superset terminals close --terminal ${terminalId}\``,
+					);
+				});
 		}
 		throw error;
 	}

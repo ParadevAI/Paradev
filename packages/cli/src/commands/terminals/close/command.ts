@@ -1,9 +1,16 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import {
+	closedPanesMessage,
+	closePanes,
+	paneCloseError,
+	stopFailedError,
+} from "../../../lib/pane-placement";
 
 export default command({
-	description: "Close (dispose) a terminal running in a workspace",
+	description:
+		"End a terminal running in a workspace and close the panes that show it",
 	options: {
 		workspace: string().required().desc("Workspace ID"),
 		host: string().desc(
@@ -29,14 +36,29 @@ export default command({
 			options.workspace,
 		);
 
-		const result = await target.client.terminal.killSession.mutate({
-			terminalId: options.terminal,
-			workspaceId: options.workspace,
-		});
+		const panes = await closePanes(
+			target.client,
+			options.workspace,
+			(pane) => pane.terminalId === options.terminal,
+		);
+		const result = await target.client.terminal.killSession
+			.mutate({
+				terminalId: options.terminal,
+				workspaceId: options.workspace,
+			})
+			.catch((error: unknown) => {
+				throw stopFailedError(`terminal ${options.terminal}`, panes, error);
+			});
+
+		if (panes.error)
+			throw paneCloseError(`terminal ${options.terminal}`, panes.error);
 
 		return {
-			data: result,
-			message: `Closed terminal ${options.terminal}`,
+			data: { ...result, closedPaneIds: panes.closedPaneIds },
+			message: closedPanesMessage(
+				`terminal ${options.terminal}`,
+				panes.closedPaneIds,
+			),
 		};
 	},
 });

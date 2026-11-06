@@ -1,6 +1,12 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import {
+	placeTerminal,
+	resolveSplitPlacement,
+	splitOptions,
+} from "../../../lib/pane-placement";
+import { withPaneTerminal } from "../../panes/shared";
 
 export default command({
 	description: "Create a terminal session in an existing workspace",
@@ -16,6 +22,7 @@ export default command({
 		cwd: string().desc(
 			"Working directory for the terminal (defaults to the worktree)",
 		),
+		...splitOptions,
 	},
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
@@ -33,6 +40,34 @@ export default command({
 			},
 			options.workspace,
 		);
+
+		const placement = await resolveSplitPlacement(
+			target.client,
+			options.workspace,
+			options,
+		);
+		if (placement) {
+			const placed = await withPaneTerminal(
+				target.client,
+				options.workspace,
+				options,
+				(terminalId) =>
+					placeTerminal(
+						target.client,
+						options.workspace,
+						terminalId,
+						placement,
+					),
+			);
+			return {
+				data: {
+					terminalId: placed.terminalId,
+					status: "active" as const,
+					paneId: placed.paneId,
+				},
+				message: `Created terminal ${placed.terminalId} in pane ${placed.paneId}, beside ${placement.besidePaneId}`,
+			};
+		}
 
 		const result = await target.client.terminal.createSession.mutate({
 			workspaceId: options.workspace,
