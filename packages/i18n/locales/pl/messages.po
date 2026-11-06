@@ -4733,7 +4733,7 @@ msgid "Cloud workspaces"
 msgstr "Chmurowe obszary robocze"
 
 msgid "Cloud Workspaces"
-msgstr "Obszary robocze w chmurze"
+msgstr "Chmurowe obszary robocze"
 
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
@@ -10069,6 +10069,9 @@ msgstr "w terminalu na tym hoście."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "W zaledwie kilka miesięcy <0>dziesiątki tysięcy inżynierów</0> zaczęło używać Paradev jako głównego IDE, w firmach takich jak Wix, DoorDash czy Netflix."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "W lokalnych obszarach roboczych twój kod i sesje agentów zostają na twoim komputerze. Chmurowe obszary robocze działają w piaskownicy."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "W trybie ręcznym Paradev nie loguje tego agenta. Niech Twój skrypt zaloguje go ponownie, a potem kontynuuj, albo wyłącz tryb ręczny w ustawieniach agentów."
 
@@ -11301,6 +11304,9 @@ msgstr "Lokalny obszar roboczy"
 
 msgid "Local workspaces"
 msgstr "Lokalne obszary robocze"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "Lokalne obszary robocze działają na twoim komputerze. Ty decydujesz, co się z nimi łączy."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokalnie, na hoście lub w chmurze"
@@ -14402,9 +14408,6 @@ msgstr "Paradev Wtyczki"
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev działa lokalnie na maszynach Twoich programistów. Nie przechowujemy Twojego kodu ani rozmów z AI, a Paradev przeszedł audyt SOC 2 Type II u niezależnego audytora. Poproś o raport i zapoznaj się z dokumentacją bezpieczeństwa na {trustHost}."
 
-msgid "Paradev runs on your machine. You decide what connects to it."
-msgstr "Paradev działa na twoim komputerze. Ty decydujesz, co się z nim łączy."
-
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev zaczął się jako projekt hackathonowy w listopadzie 2025. Była to prosta aplikacja desktopowa do zarządzania worktree."
 
@@ -16765,8 +16768,8 @@ msgstr "Uruchom teraz"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Uruchamiaj według harmonogramu lub zdarzeń, na żądanie, wstrzymuj, wznawiaj i czytaj logi."
 
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
-msgstr "Uruchamiaj równolegle agentów kodujących do funkcji, poprawek i refaktoryzacji. Każdy dostaje własny worktree i gałąź."
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "Uruchamiaj równolegle agentów kodujących do funkcji, poprawek i refaktoryzacji. Każdy pracuje na własnej gałęzi, lokalnie lub w chmurze."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Uruchamiaj równoległe agenty kodujące z Paradev"
@@ -18114,7 +18117,7 @@ msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Logowanie nie powiodło się ({reason}). Spróbuj ponownie."
 
 msgid "Sign-up completion"
-msgstr "Ukończone rejestracje"
+msgstr "Odsetek ukończonych rejestracji"
 
 msgid "Sign-up steps"
 msgstr "Kroki rejestracji"
@@ -21652,7 +21655,7 @@ msgid "Weekly release notes"
 msgstr "Cotygodniowe notatki wydania"
 
 msgid "Weekly sign-up completion"
-msgstr "Ukończone rejestracje tygodniowo"
+msgstr "Tygodniowy odsetek ukończonych rejestracji"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Osiągnięto tygodniowy limit Sonnet"
@@ -22353,9 +22356,6 @@ msgstr "Twoje zmiany zostaną utracone, jeśli ich nie zapiszesz."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Twoje obszary robocze w chmurze nie będą już miały dostępu do tego hosta."
-
-msgid "Your code, terminals, and agent sessions stay on your own machine."
-msgstr "Twój kod, terminale i sesje agentów zostają na twoim komputerze."
 
 msgid "Your download starts automatically."
 msgstr "Pobieranie rozpocznie się automatycznie."

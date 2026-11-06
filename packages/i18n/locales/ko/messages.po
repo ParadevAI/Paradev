@@ -10069,6 +10069,9 @@ msgstr "(이 호스트의 터미널에서)"
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "몇 달 만에 <0>수만 명의 엔지니어</0>가 Wix, DoorDash, Netflix 같은 회사에서 Paradev를 주력 IDE로 사용하고 있습니다."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "로컬 워크스페이스에서는 코드와 에이전트 세션이 당신의 기기에 남습니다. 클라우드 워크스페이스는 샌드박스에서 실행됩니다."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "수동 모드에서는 Paradev가 이 에이전트를 로그인시키지 않습니다. 스크립트로 다시 로그인시킨 뒤 계속하거나, 에이전트 설정에서 수동 모드를 끄세요."
 
@@ -11301,6 +11304,9 @@ msgstr "로컬 워크스페이스"
 
 msgid "Local workspaces"
 msgstr "로컬 워크스페이스"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "로컬 워크스페이스는 당신의 기기에서 실행됩니다. 무엇을 연결할지는 당신이 정합니다."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "로컬, 호스트 또는 클라우드에서"
@@ -14402,9 +14408,6 @@ msgstr "Paradev 플러그인"
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. {trustHost}에서 보고서를 요청하고 보안 문서를 확인하세요."
 
-msgid "Paradev runs on your machine. You decide what connects to it."
-msgstr "Paradev는 당신의 기기에서 실행됩니다. 무엇을 연결할지는 당신이 정합니다."
-
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev는 2025년 11월 해커톤 프로젝트로 시작했습니다. worktree를 관리하는 간단한 데스크톱 앱이었습니다."
 
@@ -16765,8 +16768,8 @@ msgstr "지금 실행"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "일정이나 이벤트로 실행, 필요할 때 실행, 일시 중지, 재개, 로그 확인."
 
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
-msgstr "기능, 수정, 리팩터링에 코딩 에이전트를 병렬로 실행하세요. 각 에이전트는 자체 워크트리와 브랜치를 가집니다."
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "기능, 수정, 리팩터링에 코딩 에이전트를 병렬로 실행하세요. 각 에이전트는 로컬이나 클라우드에서 자체 브랜치로 작업합니다."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Paradev로 병렬 코딩 에이전트 실행"
@@ -22353,9 +22356,6 @@ msgstr "저장하지 않으면 변경 사항이 사라집니다."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "클라우드 워크스페이스가 더 이상 이 호스트에 접근할 수 없습니다."
-
-msgid "Your code, terminals, and agent sessions stay on your own machine."
-msgstr "코드, 터미널, 에이전트 세션은 당신의 기기에 남습니다."
 
 msgid "Your download starts automatically."
 msgstr "다운로드가 자동으로 시작됩니다."

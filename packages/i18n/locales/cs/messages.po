@@ -10069,6 +10069,9 @@ msgstr "v terminálu na tomto hostu."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Za pouhých pár měsíců používají Paradev jako hlavní IDE <0>desítky tisíc inženýrů</0>, ve firmách jako Wix, DoorDash nebo Netflix."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "V lokálních pracovních prostorech zůstávají váš kód a relace agentů na vašem počítači. Cloudové pracovní prostory běží v sandboxu."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "V ručním režimu Paradev tohoto agenta nepřihlašuje. Nechte svůj skript, ať ho znovu přihlásí, a pokračujte, nebo vypněte ruční režim v nastavení agentů."
 
@@ -11301,6 +11304,9 @@ msgstr "Lokální pracovní prostor"
 
 msgid "Local workspaces"
 msgstr "Lokální pracovní prostory"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "Lokální pracovní prostory běží na vašem počítači. Co se k nim připojí, rozhodujete vy."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokálně, na hostiteli nebo v cloudu"
@@ -14402,9 +14408,6 @@ msgstr "Pluginy Paradev"
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev běží lokálně na počítačích vašich vývojářů. Neukládáme váš kód ani konverzace s AI a Paradev prošel auditem SOC 2 Type II u nezávislého auditora. Vyžádejte si zprávu a projděte si dokumentaci k bezpečnosti na {trustHost}."
 
-msgid "Paradev runs on your machine. You decide what connects to it."
-msgstr "Paradev běží na vašem počítači. Co se k němu připojí, rozhodujete vy."
-
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev vznikl jako projekt na hackathonu v listopadu 2025. Byla to jednoduchá desktopová aplikace na správu worktree."
 
@@ -16765,8 +16768,8 @@ msgstr "Spustit teď"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Spouštění podle plánu nebo událostí, na vyžádání, pozastavení, obnovení a čtení logů."
 
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
-msgstr "Spouštějte paralelní kódovací agenty na funkce, opravy a refaktory. Každý dostane vlastní worktree a větev."
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "Spouštějte paralelní kódovací agenty na funkce, opravy a refaktory. Každý pracuje na vlastní větvi, lokálně nebo v cloudu."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Spouštějte paralelní coding agenty s Paradev"
@@ -22353,9 +22356,6 @@ msgstr "Pokud změny neuložíte, budou ztraceny."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Vaše cloudové pracovní prostory už k tomuto hostu nebudou mít přístup."
-
-msgid "Your code, terminals, and agent sessions stay on your own machine."
-msgstr "Váš kód, terminály a relace agentů zůstávají na vašem počítači."
 
 msgid "Your download starts automatically."
 msgstr "Stahování začne automaticky."
