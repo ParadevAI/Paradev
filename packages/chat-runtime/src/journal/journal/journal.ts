@@ -135,7 +135,6 @@ export class ChatJournal {
 		};
 	}
 
-	/** Settles what a session's agent left running or pending when it went away. */
 	settleStranded(
 		sessionId: string,
 		options: {

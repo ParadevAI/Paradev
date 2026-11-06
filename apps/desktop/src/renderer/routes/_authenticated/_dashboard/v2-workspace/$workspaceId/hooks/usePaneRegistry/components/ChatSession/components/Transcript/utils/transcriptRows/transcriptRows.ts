@@ -34,7 +34,6 @@ export type TranscriptRow =
 			running: boolean;
 			/** The turn is held on a question or approval only the user can answer. */
 			waiting: boolean;
-			/** The user stopped the turn, so its clock says so instead of "Worked for". */
 			stopped: boolean;
 	  }
 	| {

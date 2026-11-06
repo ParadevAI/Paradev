@@ -8,7 +8,6 @@ export type ClosedMidTurnChat = {
 	title: string | null;
 };
 
-/** Chats the last quit cut off mid-turn that nobody has picked up yet. */
 export function createClosedMidTurn(options: {
 	runtime: () => ChatRuntime;
 	resolveCwd: (scopeId: string) => string;

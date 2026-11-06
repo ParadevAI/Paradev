@@ -30,7 +30,6 @@ export function WorkingFor({
 	expanded?: boolean | undefined;
 	onToggle?: (() => void) | undefined;
 	waiting?: boolean | undefined;
-	/** The user stopped the turn. */
 	stopped?: boolean | undefined;
 }) {
 	const { t } = useLingui();

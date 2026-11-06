@@ -125,7 +125,6 @@ export type ChatV3Mount = {
 	closeScope(scopeId: string): Promise<void>;
 	recordUnfinished(): void;
 	resumeAfterUpdate(): void;
-	/** Chats the last quit cut off mid-turn that nobody has picked up yet. */
 	closedMidTurn(): ClosedMidTurnChat[];
 	resumeClosedMidTurn(): Promise<number>;
 	keepClosedMidTurnPaused(): void;

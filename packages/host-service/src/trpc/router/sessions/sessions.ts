@@ -19,7 +19,6 @@ const sessionInput = z.object({
 });
 
 export const sessionsRouter = router({
-	/** Chats the last quit cut off mid-turn, for the launch prompt. */
 	closedMidTurn: protectedProcedure.query(
 		({ ctx }) => ctx.runtime.closedMidTurn?.list() ?? [],
 	),
