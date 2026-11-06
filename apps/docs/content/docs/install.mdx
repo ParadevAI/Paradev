@@ -38,6 +38,44 @@ Follow [mobile setup](/remote-access#connect-from-an-iphone-or-ipad) to connect 
 
 Paradev checks for updates automatically. New releases ship daily; the [changelog](https://paradev.com/changelog) rounds up each week's highlights.
 
+## Uninstall
+
+Paradev writes lifecycle hooks into the global config of each agent installed on your machine.
+Deleting the app does not remove them. Remove them first, while the `superset` CLI is still
+installed:
+
+```bash
+superset agents hooks remove --all
+```
+
+The command keeps your own hooks and settings. Paradev adds its hooks again the next time it
+starts, so quit the app before you delete it. To keep one agent's hooks out while you still use
+Paradev, turn off **Settings → Agents → Paradev hooks** for that agent.
+
+If the CLI is already gone, edit these files by hand. Files named `superset-*` belong to Paradev;
+delete them. In the other files, delete the hook entries whose command contains `paradev-notify`,
+`paradev-artifact-guard`, or `hooks/notify.sh`, and the blocks marked `superset-managed`:
+
+| Agent | File |
+| --- | --- |
+| Claude Code | `~/.claude/settings.json` |
+| Codex | `~/.codex/hooks.json` |
+| Cursor | `~/.cursor/hooks.json` |
+| Devin | `~/.config/devin/config.json` |
+| Droid | `~/.factory/settings.json` |
+| Gemini | `~/.gemini/settings.json` |
+| Antigravity | `~/.gemini/config/hooks.json` |
+| Mastra Code | `~/.mastracode/hooks.json` |
+| Grok | `~/.grok/config.toml`, `~/.grok/hooks/superset-notify.json` |
+| Kimi | `~/.kimi-code/config.toml` |
+| Vibe | `~/.vibe/hooks.toml` |
+| Muse | `~/.config/muse/settings.json` |
+| Amp | `~/.config/amp/plugins/superset-lifecycle.ts` |
+| Oh My Pi, Pi | `~/.omp/agent/extensions/superset-hooks.ts`, `~/.pi/agent/extensions/superset-hooks.ts` |
+
+Then delete `~/.paradev/` (wrappers, hook scripts, and local state) and the Paradev skills in
+`~/.claude/skills/superset/`, `~/.agents/skills/superset-*/`, and `~/.agents/commands/superset/`.
+
 ## Next
 
 You're two minutes in; the next ten are the fun part: [Your First Parallel Session](/first-workspace).

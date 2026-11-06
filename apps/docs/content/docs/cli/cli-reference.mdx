@@ -1451,6 +1451,25 @@ The last hook arrived 1 second ago; the session started 2 seconds ago.
 </CommandReturns>
 </Command>
 
+<Command
+	name="superset agents hooks remove"
+	options={[
+		{ flag: "--all", description: "Remove the hooks of every supported agent." },
+		{ flag: "--agent <id>", description: "Agent id (e.g. `devin`, `claude`). Repeatable." },
+	]}
+	output={`{ agents: string[] }`}
+>
+Remove the hooks Paradev wrote into agents' global configs, such as
+`~/.claude/settings.json` and `~/.config/devin/config.json`. Your own hooks and
+settings stay. Runs on this machine and needs no sign-in. The Paradev app adds
+the hooks again when it starts; see [Uninstall](/install#uninstall).
+
+```bash
+superset agents hooks remove --all
+superset agents hooks remove --agent devin
+```
+</Command>
+
 #### Agent models
 
 Model is an override for one launch. Without `--model`, Paradev passes no

@@ -60,6 +60,16 @@ Paradev detects installed agents automatically, but each agent can be enabled or
 
 **Fix:** check **Settings → Agents**: confirm the agent is **Enabled** and its command is correct. **Reset to Defaults** restores the shipped configuration.
 
+## Another Tool Shows "Hook failed" for a Paradev Hook
+
+Paradev's hooks live in each agent's global config, so they also run when you start the agent
+outside Paradev. They do nothing there. But if the session's working directory was deleted (for
+example, a workspace another tool archived), the agent cannot start any hook, and it reports
+`Failed to spawn command: No such file or directory`.
+
+**Fix:** start the agent in a directory that exists. To remove Paradev's hooks, run
+`superset agents hooks remove --all` (see [Uninstall](/install#uninstall)).
+
 ## Remote Host Won't Connect
 
 The host machine must be awake, online, and connected to the relay. On the host, enable **Settings → Remote Access → Allow remote access to this device via relay** (desktop), or run `superset start --daemon` (CLI).
