@@ -87,6 +87,29 @@ describe("gitRouter.getDiffPatch", () => {
 		expect(unstaged.patch).toBe("");
 	});
 
+	test("ignoreWhitespace drops a whitespace-only file and keeps a real edit", async () => {
+		await writeFile(join(repo, "other.txt"), "alpha\nbeta\n");
+		await git.add(["other.txt"]);
+		await git.commit("add other");
+		await writeFile(join(repo, "tracked.txt"), "one\n  two\nthree\n");
+		await writeFile(join(repo, "other.txt"), "alpha\nBETA\n");
+		const caller = createCaller(repo);
+
+		const full = await caller.getDiffPatch({
+			workspaceId: "ws",
+			category: "unstaged",
+		});
+		expect(full.patch).toContain("+  two");
+
+		const { patch } = await caller.getDiffPatch({
+			workspaceId: "ws",
+			category: "unstaged",
+			ignoreWhitespace: true,
+		});
+		expect(patch).not.toContain("tracked.txt");
+		expect(patch).toContain("+BETA");
+	});
+
 	test("untracked files get their own /dev/null patch section", async () => {
 		await writeFile(join(repo, "fresh.txt"), "brand new\n");
 		const { patch } = await createCaller(repo).getDiffPatch({
