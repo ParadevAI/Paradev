@@ -19872,11 +19872,11 @@ msgstr "Berpikir..."
 msgid "Thirty"
 msgstr "Tiga puluh"
 
-msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
-msgstr "Akun {plugin} ini sudah dihubungkan oleh {owner}. Minta dia memutuskannya terlebih dahulu."
-
 msgid "This {plugin} account is already connected by another Paradev organization."
 msgstr "Akun {plugin} ini sudah dihubungkan oleh organisasi Paradev lain."
+
+msgid "This {plugin} account is already connected to another Paradev organization by {owner}. Ask them to disconnect it there first."
+msgstr "Akun {plugin} ini sudah dihubungkan ke organisasi Paradev lain oleh {owner}. Minta dia memutuskannya di sana terlebih dahulu."
 
 msgid "This action is irreversible."
 msgstr "Tindakan ini tidak bisa dibatalkan."

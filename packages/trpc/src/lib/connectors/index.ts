@@ -685,6 +685,7 @@ export {
 	connectionBotToken,
 	connectionById,
 	connectorConnections,
+	grantSharedWithAnotherConnection,
 	orgConnection,
 	userConnection,
 } from "./lookup";

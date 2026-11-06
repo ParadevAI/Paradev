@@ -66,7 +66,7 @@ function useConnectOutcome(plugin: string, onConnected: () => void) {
 			toast.error(
 				owner
 					? t({
-							message: `This ${plugin} account is already connected by ${owner}. Ask them to disconnect first.`,
+							message: `This ${plugin} account is already connected to another Paradev organization by ${owner}. Ask them to disconnect it there first.`,
 						})
 					: t({
 							message: `This ${plugin} account is already connected by another Paradev organization.`,
