@@ -290,4 +290,25 @@ describe("resuming chats after a restart", () => {
 		expect(reattach("agent-1").sessionId).not.toBe(resumed.sessionId);
 		await runtime.dispose();
 	});
+
+	test("replacing a stopped chat whose agent session already runs elsewhere hands back the running chat", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const replace = (replacesSessionId: string) =>
+			runtime.commands.createSession({
+				commandId: randomUUID(),
+				scopeId: "workspace-1",
+				harness: FAKE_HARNESS,
+				cwd: "/tmp/workspace",
+				resume: { harnessSessionId: "agent-1", replacesSessionId },
+			});
+
+		const first = replace("stopped-on-desktop");
+		await waitFor(
+			() => runtime.live.get(first.sessionId)?.state.status === "idle",
+		);
+
+		expect(replace("stopped-on-desktop")).toEqual(first);
+		expect(started).toHaveLength(1);
+		await runtime.dispose();
+	});
 });

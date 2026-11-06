@@ -412,6 +412,24 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		if (!resumed.pending) resumedByTerminal.delete(resumed.terminalId);
 		return { sessionId: resumed.sessionId, epoch: row.epoch };
 	};
+	const runningResume = (
+		input: z.output<typeof createSessionCommandSchema>,
+	): CreateSessionResult | null => {
+		if (!input.resume?.replacesSessionId) return null;
+		for (const row of options.sessions.listByScope(input.scopeId)) {
+			if (
+				row.harness !== input.harness ||
+				row.harnessSessionId !== input.resume.harnessSessionId
+			) {
+				continue;
+			}
+			const live = options.live.get(row.sessionId);
+			if (live && live.state.status !== "dead") {
+				return { sessionId: row.sessionId, epoch: row.epoch };
+			}
+		}
+		return null;
+	};
 	const sendPending = (resumed: ResumedChat, sessionId: string): void => {
 		const pending = resumed.pending;
 		if (!pending) {
@@ -467,6 +485,8 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				const resumed = resumedFor(parsed);
 				const handedOff = resumed && handOff(resumed);
 				if (handedOff) return handedOff;
+				const running = resumed ? null : runningResume(parsed);
+				if (running) return running;
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
