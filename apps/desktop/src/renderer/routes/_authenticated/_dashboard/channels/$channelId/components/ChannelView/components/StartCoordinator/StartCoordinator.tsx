@@ -11,6 +11,8 @@ import { LuArrowUp, LuChevronDown, LuDiamond } from "react-icons/lu";
 import { useAccessibleV2Workspaces } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { WHERE_FILTER_ANYWHERE } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { channelTag } from "../../../../hooks/useChannelAgents";
+import { useOrgChannels } from "../../../../hooks/useOrgChannels";
 
 type ChannelSummary = RouterOutputs["channel"]["get"];
 const MAX_CHOICES = 30;
@@ -41,21 +43,28 @@ export function StartCoordinator({
 		whereFilter: WHERE_FILTER_ANYWHERE,
 	});
 	const { workspaces: hostRows } = useHostWorkspaces();
-	// A tagged workspace is some channel's agent; the coordinator belongs in
-	// one of the person's own, so those come first.
-	const tagged = new Set(
-		hostRows.filter((row) => row.tags?.length).map((row) => row.id),
+	const channels = useOrgChannels();
+	// A workspace tagged with a channel's name is that channel's agent. A
+	// coordinator started in it would share its chats, so it is never offered.
+	const channelTags = new Set(
+		(channels ?? []).map((other) => channelTag(other.name)),
+	);
+	const agentWorkspaces = new Set(
+		hostRows
+			.filter((row) => row.tags?.some((tag) => channelTags.has(tag)))
+			.map((row) => row.id),
 	);
 	const choices = all
 		.filter(
 			(workspace) =>
-				workspace.hostType !== "cloud" && workspace.archivedAt === null,
+				workspace.hostType !== "cloud" &&
+				workspace.archivedAt === null &&
+				!agentWorkspaces.has(workspace.id),
 		)
 		.sort(
 			(a, b) =>
-				Number(tagged.has(a.id)) - Number(tagged.has(b.id)) ||
 				(b.lastAgentEventAt ?? b.createdAt.getTime()) -
-					(a.lastAgentEventAt ?? a.createdAt.getTime()),
+				(a.lastAgentEventAt ?? a.createdAt.getTime()),
 		)
 		.slice(0, MAX_CHOICES);
 	const [workspaceId, setWorkspaceId] = useState<string | null>(null);

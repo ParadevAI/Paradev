@@ -1,16 +1,18 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useChannelCoordinatorStore } from "../../stores/channelCoordinatorStore";
 import { lastAgentMessage } from "./lastAgentMessage";
+import { pickAgentSession } from "./pickAgentSession";
 
 const SESSIONS_POLL_MS = 10_000;
-const SESSION_LIMIT = 10;
+const SESSION_LIMIT = 100;
 const MESSAGE_POLL_MS = 15_000;
 const MESSAGE_EVENTS = 80;
 
 /**
- * The agent's chat session in its workspace: a live one first, then the
- * newest that got past starting. A session that stopped while still starting
- * never carried a conversation, so it never stands for the agent.
+ * The agent's chat session in its workspace (see `pickAgentSession`). A
+ * session that stopped while still starting never carried a conversation, so
+ * it never stands for the agent.
  */
 export function useAgentSession(workspaceId: string, hostUrl: string | null) {
 	return useQuery({
@@ -22,12 +24,12 @@ export function useAgentSession(workspaceId: string, hostUrl: string | null) {
 			const sessions = await getHostServiceClientByUrl(
 				hostUrl,
 			).sessions.list.query({ workspaceId, limit: SESSION_LIMIT });
-			const rank = (session: (typeof sessions)[number]) =>
-				session.live ? 2 : session.status === "starting" ? 0 : 1;
-			const sorted = [...sessions].sort(
-				(a, b) => rank(b) - rank(a) || b.updatedAt - a.updatedAt,
+			const coordinators = new Set(
+				Object.values(
+					useChannelCoordinatorStore.getState().byChannelId,
+				).flatMap((coordinator) => coordinator?.sessionId ?? []),
 			);
-			return sorted[0] ?? null;
+			return pickAgentSession(sessions, coordinators);
 		},
 	});
 }
