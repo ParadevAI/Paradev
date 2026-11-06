@@ -1,5 +1,6 @@
 export const CELL = 4;
 export const DOT = 3;
+export const MAX_DPR = 2;
 export const FRAME_MS = 1000 / 15;
 export const DRIFT_PER_FRAME = 0.0044;
 

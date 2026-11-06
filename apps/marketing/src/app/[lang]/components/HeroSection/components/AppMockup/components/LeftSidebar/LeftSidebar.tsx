@@ -51,6 +51,7 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 					label={t({
 						message: "Pages",
 					})}
+					active={activeDemo === "Publish Pages"}
 				/>
 				<NavRow
 					icon={LuPlus}

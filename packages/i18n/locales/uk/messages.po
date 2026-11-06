@@ -10063,6 +10063,9 @@ msgstr "у терміналі на цьому хості."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Лише за кілька місяців <0>десятки тисяч інженерів</0> у таких компаніях, як Wix, DoorDash і Netflix, почали використовувати Paradev як основну IDE."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "У локальних робочих просторах код і сесії агентів лишаються на вашому комп'ютері. Хмарні робочі простори працюють у пісочниці."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "У ручному режимі Paradev не виконує вхід для цього агента. Нехай ваш скрипт знову виконає вхід, а потім продовжте, або вимкніть ручний режим у налаштуваннях агентів."
 
@@ -11295,6 +11298,9 @@ msgstr "Локальний робочий простір"
 
 msgid "Local workspaces"
 msgstr "Локальні робочі простори"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "Локальні робочі простори працюють на вашому комп'ютері. Що до них підключати, вирішуєте ви."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Локально, на хості або в хмарі"
@@ -14396,9 +14402,6 @@ msgstr "Плагіни Paradev"
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev працює локально на комп'ютерах ваших розробників. Ми не зберігаємо ваш код або розмови з ШІ, а Paradev пройшов аудит SOC 2 Type II у незалежного аудитора. Запросіть звіт і перегляньте нашу документацію з безпеки на {trustHost}."
 
-msgid "Paradev runs on your machine. You decide what connects to it."
-msgstr "Paradev працює на вашому комп'ютері. Що до нього підключати, вирішуєте ви."
-
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev почався як хакатонний проєкт у листопаді 2025 року. Це був простий десктопний застосунок для керування worktree."
 
@@ -16759,8 +16762,8 @@ msgstr "Запустити зараз"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Запуск за розкладом або за подіями, запуск на вимогу, пауза, відновлення й читання логів."
 
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
-msgstr "Запускайте паралельних агентів для нових функцій, виправлень і рефакторингу. Кожен отримує власний worktree і гілку."
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "Запускайте паралельних агентів для нових функцій, виправлень і рефакторингу. Кожен працює у власній гілці, локально або в хмарі."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Запускайте кодинг-агентів паралельно з Paradev"
@@ -18108,7 +18111,7 @@ msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Не вдалося увійти ({reason}). Спробуйте ще раз."
 
 msgid "Sign-up completion"
-msgstr "Завершені реєстрації"
+msgstr "Частка завершених реєстрацій"
 
 msgid "Sign-up steps"
 msgstr "Кроки реєстрації"
@@ -21646,7 +21649,7 @@ msgid "Weekly release notes"
 msgstr "Щотижневі нотатки до релізів"
 
 msgid "Weekly sign-up completion"
-msgstr "Завершені реєстрації за тижнями"
+msgstr "Частка завершених реєстрацій за тижнями"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Досягнуто тижневого ліміту Sonnet"
@@ -22347,9 +22350,6 @@ msgstr "Якщо не зберегти зміни, їх буде втрачен�
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Ваші хмарні робочі простори більше не матимуть доступу до цього хоста."
-
-msgid "Your code, terminals, and agent sessions stay on your own machine."
-msgstr "Ваш код, термінали й сесії агентів лишаються на вашому комп'ютері."
 
 msgid "Your download starts automatically."
 msgstr "Завантаження почнеться автоматично."

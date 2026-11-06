@@ -21,6 +21,7 @@ export function PagePopup({ visible, phase }: PagePopupProps) {
 		<m.div
 			className="absolute top-[300px] right-5 w-[66%] overflow-hidden rounded-lg border border-border bg-background shadow-[0_1px_1px_rgba(0,0,0,0.4),0_24px_70px_-16px_rgba(0,0,0,0.75)]"
 			style={{ pointerEvents: visible ? "auto" : "none" }}
+			aria-hidden={!visible}
 			initial={false}
 			animate={{
 				opacity: visible ? 1 : 0,
