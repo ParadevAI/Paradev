@@ -20,6 +20,9 @@ describe("resolveAgentIds", () => {
 		expect(() => resolveAgentIds({ agent: ["nope"] })).toThrow(
 			"Unknown agent: nope",
 		);
+		expect(() => resolveAgentIds({ agent: ["toString"] })).toThrow(
+			"Unknown agent: toString",
+		);
 		expect(() => resolveAgentIds({})).toThrow("Pass --all");
 		expect(() => resolveAgentIds({ all: true, agent: ["devni"] })).toThrow(
 			"not both",

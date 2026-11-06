@@ -120,6 +120,21 @@ describe("provisionClaudeProfile", () => {
 		expect(JSON.stringify(hooks)).toContain("notify.sh");
 	});
 
+	it("removes Paradev hooks from the profile when Claude hooks are disabled", async () => {
+		seedDefaultAccount();
+		seedProfile();
+		await provisionClaudeProfile(PROFILE, { homeDir: HOME });
+
+		await provisionClaudeProfile(PROFILE, {
+			homeDir: HOME,
+			disabledAgentIds: ["claude"],
+		});
+
+		const settings = readJson(path.join(PROFILE, "settings.json"));
+		expect(JSON.stringify(settings)).not.toContain("notify.sh");
+		expect(settings.model).toBe("claude-opus-5");
+	});
+
 	it("shares MCP servers and completes onboarding without touching identity", async () => {
 		seedDefaultAccount();
 		seedProfile();

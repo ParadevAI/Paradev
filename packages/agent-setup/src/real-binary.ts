@@ -4,22 +4,31 @@ import { getBinDir, resolveUserHomeDir } from "./paths";
 
 const APP_HOME_DIR_NAME_PATTERN = /^\.(?:paradev|superset)(?:-[^/\\]+)?$/;
 
+function resolveDir(dir: string): string {
+	try {
+		return fs.realpathSync(dir);
+	} catch {
+		return path.resolve(dir);
+	}
+}
+
 /** Same skip list as the wrapper's find_real_binary: our wrappers are not the agent. */
 function isAppBinDir(dir: string): boolean {
-	if (dir === path.resolve(getBinDir())) return true;
-	if (path.basename(dir) !== "bin") return false;
-	const appHome = path.dirname(dir);
+	const resolved = resolveDir(dir);
+	if (resolved === resolveDir(getBinDir())) return true;
+	if (path.basename(resolved) !== "bin") return false;
+	const appHome = path.dirname(resolved);
 	return (
-		path.dirname(appHome) === path.resolve(resolveUserHomeDir()) &&
+		path.dirname(appHome) === resolveDir(resolveUserHomeDir()) &&
 		APP_HOME_DIR_NAME_PATTERN.test(path.basename(appHome))
 	);
 }
 
-function isExecutableFile(filePath: string): boolean {
+function isRealExecutable(filePath: string): boolean {
 	try {
 		if (!fs.statSync(filePath).isFile()) return false;
 		fs.accessSync(filePath, fs.constants.X_OK);
-		return true;
+		return !isAppBinDir(path.dirname(fs.realpathSync(filePath)));
 	} catch {
 		return false;
 	}
@@ -43,7 +52,7 @@ export function isRealBinaryOnPath(
 		if (!entry) continue;
 		const dir = path.resolve(entry);
 		if (isAppBinDir(dir)) continue;
-		if (names.some((name) => isExecutableFile(path.join(dir, name)))) {
+		if (names.some((name) => isRealExecutable(path.join(dir, name)))) {
 			return true;
 		}
 	}

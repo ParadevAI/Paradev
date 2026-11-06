@@ -49,14 +49,21 @@ superset agents hooks remove --all
 ```
 
 The command keeps your own hooks and settings. One exception: in Muse's `managed_hooks_env_vars`,
-it removes the variable names Paradev adds, even if you also listed them yourself. Paradev adds its hooks again the next time it
-starts, so quit the app before you delete it. To keep one agent's hooks out while you still use
-Paradev, turn off **Settings → Agents → Paradev hooks** for that agent.
+it removes the variable names Paradev adds, even if you also listed them yourself. Paradev adds its
+hooks again the next time it starts, so quit the app before you delete it. To keep one agent's hooks
+out while you still use Paradev, turn off **Settings → Agents → Paradev hooks** for that agent.
+
+The command covers each agent's default config. If you added extra Claude or Codex accounts in
+Paradev, their profile directories (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`) keep their hooks: remove
+them by hand from `<profile>/settings.json` or `<profile>/hooks.json`, as below.
 
 If the CLI is already gone, edit these files by hand. Files named `superset-*` belong to Paradev;
-delete them. In the other files, delete the hook entries whose command contains `paradev-notify`,
-`paradev-artifact-guard`, `hooks/notify.sh`, `hooks/cursor-hook.sh`, or `hooks/gemini-hook.sh`, and
-the blocks marked `superset-managed`:
+delete them. In the other files, delete the blocks marked `superset-managed` and the hook entries
+whose command starts with `: paradev-notify;` or `: paradev-artifact-guard;`. Entries written by
+older versions have no label: their command runs a script in Paradev's hooks directory
+(`$SUPERSET_HOME_DIR/hooks/`, `~/.paradev/hooks/`, or `~/.superset/hooks/`) named `notify.sh`,
+`artifact-guard.sh`, `cursor-hook.sh`, or `gemini-hook.sh`. Check the full path before you delete an
+entry, so you keep any hook of your own that uses the same script name.
 
 | Agent | File |
 | --- | --- |
@@ -79,8 +86,10 @@ GitHub Copilot reads hooks only from the project, so Paradev writes `.github/hoo
 in each repository where you start Copilot from Paradev (and lists it in `.git/info/exclude`).
 Delete that file from those repositories.
 
-Then delete `~/.paradev/` (wrappers, hook scripts, and local state) and the Paradev skills in
-`~/.claude/skills/superset/`, `~/.agents/skills/superset-*/`, and `~/.agents/commands/superset/`.
+Then delete Paradev's home directory (wrappers, hook scripts, sign-in data, and local state). It is
+`~/.paradev/` unless you set `SUPERSET_HOME_DIR`; run `echo "$SUPERSET_HOME_DIR"` in a Paradev
+terminal to see the one in use, and look inside before you delete it. Also delete the Paradev skills
+in `~/.claude/skills/superset/`, `~/.agents/skills/superset-*/`, and `~/.agents/commands/superset/`.
 
 ## Next
 

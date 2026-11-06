@@ -179,6 +179,13 @@ export function ensureClaudeManagedHooksAt(configDir: string): void {
 	});
 }
 
+export function removeClaudeManagedHooksAt(configDir: string): void {
+	removeManagedJsonHooks({
+		...claudeHooksSpec(getNotifyScriptPath()),
+		getFilePath: () => path.join(configDir, "settings.json"),
+	});
+}
+
 // ---------------------------------------------------------------------------
 // Codex ~/.codex/hooks.json direct merge
 // ---------------------------------------------------------------------------
@@ -278,6 +285,13 @@ export function removeCodexManagedHooks(): void {
  */
 export function ensureCodexManagedHooksAt(codexHome: string): void {
 	ensureManagedJsonHooks({
+		...codexHooksSpec(getNotifyScriptPath()),
+		getFilePath: () => path.join(codexHome, "hooks.json"),
+	});
+}
+
+export function removeCodexManagedHooksAt(codexHome: string): void {
+	removeManagedJsonHooks({
 		...codexHooksSpec(getNotifyScriptPath()),
 		getFilePath: () => path.join(codexHome, "hooks.json"),
 	});

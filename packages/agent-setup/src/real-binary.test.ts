@@ -54,4 +54,22 @@ describe("isRealBinaryOnPath", () => {
 			),
 		).toBe(false);
 	});
+	it("ignores a link to a wrapper but follows a link to a real binary", () => {
+		const appBin = path.join(root, "app-home", "bin");
+		const realBin = path.join(root, "opt", "devin", "bin");
+		const linkDir = path.join(root, "local-bin");
+		writeExecutable(appBin, "devin");
+		writeExecutable(realBin, "devin-real");
+		fs.mkdirSync(linkDir, { recursive: true });
+		fs.symlinkSync(path.join(appBin, "devin"), path.join(linkDir, "devin"));
+
+		expect(isRealBinaryOnPath(["devin"], linkDir)).toBe(false);
+
+		fs.rmSync(path.join(linkDir, "devin"));
+		fs.symlinkSync(
+			path.join(realBin, "devin-real"),
+			path.join(linkDir, "devin"),
+		);
+		expect(isRealBinaryOnPath(["devin"], linkDir)).toBe(true);
+	});
 });

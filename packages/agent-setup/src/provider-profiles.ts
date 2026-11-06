@@ -20,7 +20,10 @@ import path from "node:path";
 import {
 	ensureClaudeManagedHooksAt,
 	ensureCodexManagedHooksAt,
+	removeClaudeManagedHooksAt,
+	removeCodexManagedHooksAt,
 } from "./agent-wrappers-claude-codex-opencode";
+import { resolveDisabledAgentIds } from "./disabled-agent-hooks";
 import { resolveDisabledSkillIds } from "./disabled-skills";
 import { provisionManagedClaudePluginAt } from "./managed-skills";
 import {
@@ -41,6 +44,17 @@ export interface ProfileProvisionReport {
 export interface ProvisionProfileOptions {
 	/** Overridden in tests; the real home in every other caller. */
 	homeDir?: string;
+	/** Defaults to the machine-shared disable list (Settings → Agents → Paradev hooks). */
+	disabledAgentIds?: readonly string[];
+}
+
+function isHooksDisabled(
+	agentId: "claude" | "codex",
+	options: ProvisionProfileOptions,
+): boolean {
+	return (options.disabledAgentIds ?? resolveDisabledAgentIds()).includes(
+		agentId,
+	);
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -229,7 +243,8 @@ export async function provisionClaudeProfile(
 	writeProfileLedger(target, ledger);
 	// After the settings merge: the merge only writes shared keys, and the
 	// hook entries have to survive it.
-	ensureClaudeManagedHooksAt(target);
+	if (isHooksDisabled("claude", options)) removeClaudeManagedHooksAt(target);
+	else ensureClaudeManagedHooksAt(target);
 
 	if (surfaces["skills/"] === "user-owned") {
 		// The profile brought its own skills dir, so it isn't sharing ours —
@@ -333,7 +348,8 @@ export async function provisionCodexProfile(
 	}
 
 	writeProfileLedger(target, ledger);
-	ensureCodexManagedHooksAt(target);
+	if (isHooksDisabled("codex", options)) removeCodexManagedHooksAt(target);
+	else ensureCodexManagedHooksAt(target);
 
 	const report = { configDir: target, surfaces };
 	logReport("Codex", report);
