@@ -521,6 +521,10 @@ msgstr "{0} sedang offline."
 msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "{0} memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
 
+#. placeholder {0}: BRAND.NAME
+msgid "{0} is open source, so you're never locked in. Run parallel agents the way you're used to, with chat, cloud and mobile built in."
+msgstr "{0} bersifat open source, jadi Anda tidak pernah terkunci. Jalankan agen paralel seperti biasa, dengan chat, cloud, dan mobile bawaan."
+
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
@@ -815,6 +819,9 @@ msgstr "{closedCount} tertutup"
 
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {# commit} other {# commit}}"
+
+msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} menemukan worktree Conductor Anda dan mengimpornya di tempat, beserta perubahan yang belum di-commit."
 
 msgid "{companyName} makes {productName}."
 msgstr "{productName} dikembangkan oleh {companyName}"
@@ -1696,6 +1703,9 @@ msgstr "Kanal dengan nama ini sudah ada"
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Chat tidak bisa beralih ke penyedia lain di tengah jalan. Mulai chat {label} baru, atau cabangkan percakapan ini ke chat baru. Chat {currentLabel} ini tetap terbuka."
 
+msgid "A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions."
+msgstr "Antarmuka chat untuk Claude Code, Codex, OpenCode, dan Pi. Melanjutkan sesi Claude Code Anda."
+
 msgid "A chat takes its name from the agent."
 msgstr "Chat mengambil namanya dari agen."
 
@@ -2171,6 +2181,9 @@ msgstr "Tambahkan proyek pertama Anda"
 msgid "Add your own terminal agent to this device."
 msgstr "Tambahkan agen terminal Anda sendiri ke perangkat ini."
 
+msgid "Add your repos"
+msgstr "Tambahkan repo Anda"
+
 msgid "Added {added}"
 msgstr "{added} ditambahkan"
 
@@ -2328,6 +2341,9 @@ msgstr "Agen di workspace cloud Anda lalu bisa memakai <0>--host</0> untuk menja
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop, iPhone, atau iPad."
+
+msgid "Agents keep working when your laptop is closed."
+msgstr "Agen tetap bekerja saat laptop Anda tertutup."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Agen memuat pratinjaunya sendiri, mengendalikan UI, dan melampirkan bukti tangkapan layar sebelum menandai pekerjaan siap direview."
@@ -3854,6 +3870,9 @@ msgstr "Bisakah saya memakai kunci API saya sendiri?"
 msgid "Can merge without conflicts"
 msgstr "Dapat di-merge tanpa konflik"
 
+msgid "Can my team share workspaces?"
+msgstr "Bisakah tim saya berbagi workspace?"
+
 msgid "Can only be viewed or joined by invitation"
 msgstr "Hanya dapat dilihat atau diikuti melalui undangan"
 
@@ -4153,6 +4172,9 @@ msgstr "Periksa Pembaruan"
 msgid "Check for Updates..."
 msgstr "Periksa Pembaruan..."
 
+msgid "Check on agents and review their work from iPhone or iPad."
+msgstr "Pantau agen dan tinjau pekerjaan mereka dari iPhone atau iPad."
+
 msgid "Check on running agents and read what they changed from your iPhone or iPad."
 msgstr "Pantau agen yang sedang berjalan dan baca apa yang mereka ubah dari iPhone atau iPad Anda."
 
@@ -4322,8 +4344,17 @@ msgstr "CI gagal"
 msgid "Clarify this"
 msgstr "Perjelas ini"
 
+msgid "Claude Code sessions, with claude --resume"
+msgstr "Sesi Claude Code, dengan claude --resume"
+
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code, Codex, dan OpenCode adalah agennya; Paradev adalah tempat Anda menjalankan banyak agen sekaligus. Setiap tugas mendapat Git worktree dan branch sendiri, sehingga sepuluh agen dapat bekerja di sepuluh branch secara bersamaan sementara Anda memantau, meninjau, dan menggabungkan dari satu tempat."
+
+msgid "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI"
+msgstr "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, CLI apa pun"
+
+msgid "Claude Code, Codex, Cursor, OpenCode"
+msgstr "Claude Code, Codex, Cursor, OpenCode"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode, dan lainnya. Tanpa penyiapan per agen."
@@ -4671,6 +4702,15 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
+msgid "Cloud credentials"
+msgstr "Kredensial cloud"
+
+msgid "Cloud data gets deleted. Push your branches first."
+msgstr "Data cloud akan dihapus. Push branch Anda terlebih dahulu."
+
+msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
+msgstr "Cloud berakhir {shutdownDate}. Aplikasi Mac berakhir awal 2027"
+
 msgid "Cloud environment setup"
 msgstr "Penyiapan environment cloud"
 
@@ -4683,8 +4723,14 @@ msgstr "Environment cloud mengambil repositori Anda dari GitHub. Hubungkan ini d
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-jam cloud per kursi setiap bulan"
 
+msgid "Cloud goes read-only"
+msgstr "Cloud menjadi hanya-baca"
+
 msgid "Cloud sandboxes"
 msgstr "Sandbox cloud"
+
+msgid "Cloud shuts down"
+msgstr "Cloud ditutup"
 
 msgid "Cloud usage"
 msgstr "Penggunaan cloud"
@@ -4787,6 +4833,9 @@ msgstr "Gabungkan urutan seperti => dan !==."
 
 msgid "Come build it with us."
 msgstr "Mari bangun bersama kami."
+
+msgid "Comes with you"
+msgstr "Ikut pindah"
 
 msgid "Coming Soon"
 msgstr "Segera Hadir"
@@ -4946,6 +4995,39 @@ msgstr "component-showcase"
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "Tata letak form yang bisa dikomposisi — berpasangan dengan @superset/ui/form untuk react-hook-form"
 
+msgid "Conductor chat history. Export it in Conductor under Settings → Account"
+msgstr "Riwayat chat Conductor. Ekspor di Conductor melalui Settings → Account"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
+msgstr "Conductor Cloud berakhir {shutdownDate}. Pindah ke {0} dalam hitungan menit."
+
+msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
+msgstr "Conductor Cloud berakhir {shutdownDate}. Beralih ke {companyName}"
+
+msgid "Conductor Cloud guide"
+msgstr "Panduan Conductor Cloud"
+
+msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Conductor Cloud ditutup pada {shutdownDateLong}. Pindahkan worktree dan agen Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
+
+msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
+msgstr "Conductor menghapusnya setelah {shutdownDate}, dan {companyName} tidak dapat mengaksesnya. Push branch dan ekspor chat Anda sebelum tanggal itu."
+
+msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
+msgstr "Detail Conductor diambil dari dokumentasi publiknya. Lihat <0>perbandingan lengkap</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
+msgstr "Conductor adalah merek dagang milik pemiliknya. {0} tidak berafiliasi dengan atau didukung oleh Conductor maupun Meta."
+
+msgid "Conductor joins Meta"
+msgstr "Conductor bergabung dengan Meta"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
+msgstr "Workspace Conductor adalah Git worktree biasa. {0} menggunakannya di lokasi aslinya."
+
 msgid "Config file contents"
 msgstr "Isi file konfigurasi"
 
@@ -5000,6 +5082,9 @@ msgstr "Konfirmasi perpindahan"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Konflik dengan {0}"
+
+msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
+msgstr "Selamat kepada tim Conductor yang bergabung dengan Meta. Tanggal diambil dari <0>pengumuman mereka</0>."
 
 msgid "Connect"
 msgstr "Hubungkan"
@@ -7241,6 +7326,9 @@ msgstr "Apakah saya perlu langganan agen coding sendiri?"
 msgid "Do nothing"
 msgstr "Tidak melakukan apa pun"
 
+msgid "Do you proxy my model calls?"
+msgstr "Apakah Anda mem-proxy panggilan model saya?"
+
 msgid "Do you sponsor visas?"
 msgstr "Apakah Anda mensponsori visa?"
 
@@ -7260,6 +7348,9 @@ msgstr "Dokumentasi"
 
 msgid "Documentation"
 msgstr "Dokumentasi"
+
+msgid "Does it run on Windows?"
+msgstr "Apakah bisa berjalan di Windows?"
 
 msgid "Don't allow"
 msgstr "Jangan izinkan"
@@ -7298,9 +7389,16 @@ msgstr "Menurunkan..."
 msgid "Download"
 msgstr "Unduh"
 
+#. placeholder {0}: BRAND.NAME
+msgid "Download {0}"
+msgstr "Unduh {0}"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Download {appName} at <0>{0}/download</0>."
 msgstr "Unduh {appName} di <0>{0}/download</0>."
+
+msgid "Download {companyName}"
+msgstr "Unduh {companyName}"
 
 msgid "Download {name}"
 msgstr "Unduh {name}"
@@ -8539,6 +8637,9 @@ msgstr "Kegagalan"
 msgid "Favorites"
 msgstr "Favorit"
 
+msgid "Feature"
+msgstr "Fitur"
+
 msgid "Featured"
 msgstr "Unggulan"
 
@@ -9022,6 +9123,24 @@ msgstr "Gratis"
 msgid "Free for everyone"
 msgstr "Gratis untuk semua orang"
 
+msgid "Free for one user. macOS, with an experimental Linux build."
+msgstr "Gratis untuk satu pengguna. macOS, dengan build Linux eksperimental."
+
+msgid "Free for one user. Open source under MIT."
+msgstr "Gratis untuk satu pengguna. Open source dengan lisensi MIT."
+
+msgid "Free for one user. Paid plans per user"
+msgstr "Gratis untuk satu pengguna. Paket berbayar per pengguna"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
+msgstr "Gratis untuk satu pengguna. Pro menambahkan otomasi dan aplikasi mobile. Team menambahkan workspace cloud."
+
+msgid "Free for one user. Pro from {proPrice}/user/mo"
+msgstr "Gratis untuk satu pengguna. Pro mulai {proPrice}/pengguna/bln"
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
+msgstr "Gratis untuk satu pengguna. Pro seharga {proPrice} per pengguna per bulan dan menambahkan otomasi serta aplikasi mobile. Team seharga {teamPrice} dan menambahkan workspace cloud."
+
 msgid "Frequently Used"
 msgstr "Sering Digunakan"
 
@@ -9213,6 +9332,9 @@ msgstr "Git & Worktree"
 
 msgid "Git author name"
 msgstr "Nama author Git"
+
+msgid "Git-ignored files in Cloud, like .env. Copy them out"
+msgstr "File yang diabaikan Git di Cloud, seperti .env. Salin keluar"
 
 msgid "GitHub"
 msgstr "GitHub"
@@ -9697,6 +9819,9 @@ msgstr "Berapa banyak pemicu yang bisa dimiliki satu otomatisasi?"
 
 msgid "How much agent work engineers are actually running — tokens, cost, models and sessions, published by people who opted in."
 msgstr "Seberapa banyak pekerjaan agen yang benar-benar dijalankan engineer — token, biaya, model, dan sesi, dipublikasikan oleh mereka yang ikut serta."
+
+msgid "How much does it cost?"
+msgstr "Berapa biayanya?"
 
 msgid "How should the agent's actions be approved?"
 msgstr "Bagaimana tindakan agen harus disetujui?"
@@ -10278,6 +10403,9 @@ msgstr "Faktur dan metode pembayaran"
 msgid "iOS app"
 msgstr "Aplikasi iOS"
 
+msgid "iOS app, ending {shutdownDate}"
+msgstr "Aplikasi iOS, berakhir {shutdownDate}"
+
 msgid "iOS Simulator"
 msgstr "Simulator iOS"
 
@@ -10286,6 +10414,12 @@ msgstr "Panel simulator iOS"
 
 msgid "IP restrictions"
 msgstr "Pembatasan IP"
+
+msgid "iPhone and iPad"
+msgstr "iPhone dan iPad"
+
+msgid "Is {companyName} open source?"
+msgstr "Apakah {companyName} open source?"
 
 msgid "Is my data secure?"
 msgstr "Apakah data saya aman?"
@@ -10364,6 +10498,9 @@ msgstr "Mungkin sedang tidur"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mungkin sudah dihapus, atau milik organisasi lain."
+
+msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
+msgstr "Hanya butuh beberapa menit. Memakai Conductor Cloud? Mulai dengan <0>panduan cloud</0>."
 
 msgid "It will open once the connection is back."
 msgstr "Akan terbuka saat koneksi kembali."
@@ -10539,6 +10676,9 @@ msgstr "File baru dipertahankan — isinya berubah setelah dibuat"
 
 msgid "Kept the new folder — it is no longer empty"
 msgstr "Folder baru dipertahankan — sudah tidak kosong"
+
+msgid "Key dates"
+msgstr "Tanggal penting"
 
 msgid "Key name"
 msgstr "Nama kunci"
@@ -11168,11 +11308,17 @@ msgstr "Local First"
 msgid "Local Network"
 msgstr "Local Network"
 
+msgid "Local work can move at your own pace."
+msgstr "Pekerjaan lokal bisa dipindahkan sesuai kecepatan Anda."
+
 msgid "Local workspace"
 msgstr "Workspace lokal"
 
 msgid "Local workspaces"
 msgstr "Workspace lokal"
+
+msgid "Local, on a host, or in the cloud"
+msgstr "Lokal, di host, atau di cloud"
 
 msgid "Location"
 msgstr "Lokasi"
@@ -11250,6 +11396,9 @@ msgstr "Rendah"
 msgid "Low severity"
 msgstr "Tingkat keparahan rendah"
 
+msgid "Mac app winds down"
+msgstr "Aplikasi Mac dihentikan"
+
 msgid "Machine resources"
 msgstr "Sumber daya mesin"
 
@@ -11261,6 +11410,12 @@ msgstr "Ukuran mesin: {label}"
 
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Workspace cloud yang tidak terikat mesin, siap dalam hitungan detik dan bisa dibagikan ke rekan tim."
+
+msgid "macOS"
+msgstr "macOS"
+
+msgid "macOS, Linux (experimental)"
+msgstr "macOS, Linux (eksperimental)"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -11633,6 +11788,9 @@ msgstr "Pertengahan 2026"
 msgid "Mid 2027"
 msgstr "Pertengahan 2027"
 
+msgid "Migration guide"
+msgstr "Panduan migrasi"
+
 msgid "Min iOS"
 msgstr "iOS min."
 
@@ -11821,6 +11979,9 @@ msgstr "Pindahkan {count} ke Grup"
 msgid "Move {name} to background"
 msgstr "Pindahkan {name} ke latar belakang"
 
+msgid "Move cloud work"
+msgstr "Pindahkan pekerjaan cloud"
+
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
 
@@ -11835,6 +11996,9 @@ msgstr "Pindahkan ke kanan"
 
 msgid "Move to Tab"
 msgstr "Pindahkan ke Tab"
+
+msgid "Move your agents before {shutdownDate}."
+msgstr "Pindahkan agen Anda sebelum {shutdownDate}."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" dipindahkan ke {group}"
@@ -12480,6 +12644,9 @@ msgstr "Tidak ada sesi aktif"
 msgid "No local workspaces"
 msgstr "Tidak ada workspace lokal"
 
+msgid "No lock-in"
+msgstr "Tanpa lock-in"
+
 msgid "No log lines yet"
 msgstr "Belum ada baris log"
 
@@ -12488,6 +12655,9 @@ msgstr "tanpa login"
 
 msgid "No longer in source"
 msgstr "Tidak lagi ada di sumber"
+
+msgid "No longer on sale"
+msgstr "Tidak lagi dijual"
 
 msgid "No match"
 msgstr "Tidak ada yang cocok"
@@ -12940,6 +13110,9 @@ msgstr "Tidak ada di papan peringkat. Ikut serta dulu."
 msgid "Not on this version"
 msgstr "Tidak ada di versi ini"
 
+msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
+msgstr "Tidak di mesin Anda. Agen memanggil penyedianya secara langsung dan menagih Anda di sana. Di workspace cloud, kunci Anda tidak pernah masuk ke sandbox. {companyName} menambahkan info masuk Anda ke permintaan keluar."
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Belum menerima event: Microsoft Graph menolak langganan notifikasi. Periksa persetujuan admin aplikasi dan persetujuan protected API, lalu hubungkan ulang."
 
@@ -12973,6 +13146,9 @@ msgstr "Belum disinkronkan"
 msgctxt "agent status"
 msgid "Not updating"
 msgstr "Tidak diperbarui"
+
+msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgstr "Belum. Berjalan di macOS, dengan build Linux eksperimental. Pengguna Windows dapat bergabung ke daftar tunggu dari tombol unduh."
 
 msgid "Note"
 msgstr "Catatan"
@@ -13714,6 +13890,9 @@ msgstr "Buka opsi pengiriman"
 msgid "Open Source"
 msgstr "Open Source"
 
+msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
+msgstr "Open source dengan lisensi MIT. Gunakan agen apa pun dengan langganan dan kunci Anda sendiri."
+
 msgid "Open System Settings"
 msgstr "Buka System Settings"
 
@@ -13830,6 +14009,9 @@ msgstr "Pintasan Option bisa menghalangi pengetikan karakter khusus"
 
 msgid "Optional"
 msgstr "Opsional"
+
+msgid "Optional · Beta"
+msgstr "Opsional · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Konteks opsional yang ditampilkan di daftar skrip terminal."
@@ -14446,6 +14628,9 @@ msgstr "Paket pribadi"
 msgid "Phantom Forklift"
 msgstr "Forklift Hantu"
 
+msgid "Phone"
+msgstr "Ponsel"
+
 msgid "Phone number"
 msgstr "Nomor telepon"
 
@@ -14521,6 +14706,9 @@ msgstr "Pilih folder worktree di {hostName}."
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Pilih agen Anda untuk pemasangan satu baris, atau salin konfigurasinya secara manual. Semua klien, termasuk penyiapan OAuth dan kunci API, dibahas di <0>dokumentasi lengkap server MCP</0>."
 
+msgid "Pick your agents"
+msgstr "Pilih agen Anda"
+
 msgid "PID"
 msgstr "PID"
 
@@ -14575,6 +14763,9 @@ msgid "Plant Manager"
 msgstr "Manajer Pabrik"
 
 msgid "Platform"
+msgstr "Platform"
+
+msgid "Platforms"
 msgstr "Platform"
 
 #. placeholder {0}: ringtone.name
@@ -14821,6 +15012,9 @@ msgstr "Tab Sebelumnya (Pintasan Kedua)"
 
 msgid "Previous Workspace"
 msgstr "Workspace Sebelumnya"
+
+msgid "Price"
+msgstr "Harga"
 
 msgid "Pricing"
 msgstr "Harga"
@@ -15145,6 +15339,9 @@ msgstr "Push"
 msgid "Push failed: {0}"
 msgstr "Push gagal: {0}"
 
+msgid "Push your branches, then keep going on your Mac or in a {companyName} cloud workspace."
+msgstr "Push branch Anda, lalu lanjutkan di Mac atau di workspace cloud {companyName}."
+
 msgid "Pushed"
 msgstr "Di-push"
 
@@ -15366,6 +15563,9 @@ msgstr "Baca panduan"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "Baca panduan agen coding paralel"
+
+msgid "Read the migration guide"
+msgstr "Baca panduan migrasi"
 
 msgid "Read the MIT License"
 msgstr "Baca Lisensi MIT"
@@ -15944,6 +16144,9 @@ msgstr "Pelaporan sedang tidak tersedia sesaat. Coba lagi sebentar lagi."
 msgid "Repos"
 msgstr "Repo"
 
+msgid "Repos, worktrees and branches"
+msgstr "Repo, worktree, dan branch"
+
 msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
 msgstr "Repo, worktree, output terminal, dan sesi agen tetap di mesin Anda. Sinkronisasi cloud hanya mencakup metadata akun dan organisasi."
 
@@ -16478,6 +16681,9 @@ msgstr "Tiket rutin tanpa intervensi di tengah tugas"
 
 msgid "Routines"
 msgstr "Rutinitas"
+
+msgid "Routines, ending with Cloud"
+msgstr "Routines, berakhir bersama Cloud"
 
 msgid "Row actions"
 msgstr "Aksi baris"
@@ -17077,11 +17283,17 @@ msgstr "Bandingkan penggunaan agen Anda dengan pengguna lain. Jelajahi model di 
 msgid "See Less"
 msgstr "Lihat Lebih Sedikit"
 
+msgid "See migration steps"
+msgstr "Lihat langkah migrasi"
+
 msgid "See More"
 msgstr "Lihat Selengkapnya"
 
 msgid "See open roles ↑"
 msgstr "Lihat lowongan ↑"
+
+msgid "See pricing"
+msgstr "Lihat harga"
 
 msgid "See the <0>available tools reference</0> for every tool name and parameter."
 msgstr "Lihat <0>referensi alat yang tersedia</0> untuk tiap nama alat dan parameternya."
@@ -17501,6 +17713,9 @@ msgstr "Setup"
 msgid "Setup script"
 msgstr "Skrip setup"
 
+msgid "Setup scripts, once you convert conductor.json"
+msgstr "Skrip setup, setelah Anda mengonversi conductor.json"
+
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Penyiapan berhenti. Alasannya ada di output di bawah."
 
@@ -17777,6 +17992,12 @@ msgstr "Ditampilkan secara publik di samping nama Anda."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Matikan {0}"
+
+msgid "Shuts down {shutdownDate}"
+msgstr "Ditutup {shutdownDate}"
+
+msgid "Side by side"
+msgstr "Berdampingan"
 
 msgid "Side by Side"
 msgstr "Berdampingan"
@@ -18494,6 +18715,9 @@ msgstr "Status: {0}"
 msgid "Stay connected (refresh tokens)"
 msgstr "Tetap terhubung (refresh token)"
 
+msgid "Stays behind"
+msgstr "Tertinggal"
+
 msgid "Steer"
 msgstr "Arahkan"
 
@@ -18704,6 +18928,9 @@ msgstr "Pembatasan laju dukungan belum dikonfigurasi"
 msgid "Support the project with a GitHub star"
 msgstr "Dukung proyek ini dengan star GitHub"
 
+msgid "Supported agents"
+msgstr "Agen yang didukung"
+
 msgid "Surprise me"
 msgstr "Kejutkan aku"
 
@@ -18724,6 +18951,9 @@ msgstr "Ganti agen. Pertahankan alur kerja Anda"
 
 msgid "Switch host"
 msgstr "Ganti host"
+
+msgid "Switch in four steps"
+msgstr "Beralih dalam empat langkah"
 
 msgid "Switch organization"
 msgstr "Ganti organisasi"
@@ -19000,6 +19230,9 @@ msgstr "Tim"
 
 msgid "Team activity feed"
 msgstr "Feed aktivitas tim"
+
+msgid "Team and Ultra plans"
+msgstr "Paket Team dan Ultra"
 
 msgid "Team collaboration"
 msgstr "Kolaborasi tim"
@@ -19564,6 +19797,9 @@ msgstr "host tujuan"
 msgid "The team"
 msgstr "Tim"
 
+msgid "The team announced the news."
+msgstr "Tim mengumumkan kabar ini."
+
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Undangan tim ini sudah kedaluwarsa atau tidak ada. Minta tautan baru dari pemilik tim atau periksa URL-nya sudah benar."
 
@@ -19620,6 +19856,9 @@ msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke 
 
 msgid "These ports are still in use"
 msgstr "Port ini masih dipakai"
+
+msgid "They run on the subscriptions and keys you already have."
+msgstr "Agen berjalan dengan langganan dan kunci yang sudah Anda miliki."
 
 msgid "Thinking"
 msgstr "Pemikiran"
@@ -20698,6 +20937,9 @@ msgstr "Publikasi dibatalkan"
 msgid "Unpushed"
 msgstr "Belum di-push"
 
+msgid "Unpushed Cloud work. Push before {shutdownDate}"
+msgstr "Pekerjaan Cloud yang belum di-push. Push sebelum {shutdownDate}"
+
 msgid "Unranked"
 msgstr "Belum berperingkat"
 
@@ -21434,6 +21676,9 @@ msgstr "Apa saja tunjangannya?"
 msgid "What builders say about Paradev"
 msgstr "Apa kata builder tentang Paradev"
 
+msgid "What comes with you"
+msgstr "Yang ikut pindah"
+
 msgid "What did you see on the page?"
 msgstr "Apa yang Anda lihat di halaman ini?"
 
@@ -21445,6 +21690,9 @@ msgstr "Kata para pengguna awal"
 
 msgid "What general access allows"
 msgstr "Yang diizinkan akses umum"
+
+msgid "What happens to my Conductor Cloud data?"
+msgstr "Apa yang terjadi pada data Conductor Cloud saya?"
 
 msgid "What has to become true"
 msgstr "Apa yang harus terjadi"
@@ -21502,6 +21750,9 @@ msgstr "Yang sudah kami rilis"
 
 msgid "What would you like to know?"
 msgstr "Apa yang ingin Anda ketahui?"
+
+msgid "What you get"
+msgstr "Yang Anda dapatkan"
 
 msgid "What your agent can do"
 msgstr "Apa yang bisa dilakukan agen Anda"
@@ -21783,6 +22034,9 @@ msgstr "Worktree hilang"
 msgid "Worktree out of sync"
 msgstr "Worktree tidak sinkron"
 
+msgid "Worktree per task"
+msgstr "Worktree per tugas"
+
 msgid "Worktrees"
 msgstr "Worktree"
 
@@ -21863,6 +22117,15 @@ msgstr "Ya"
 
 msgid "Yes, demote me"
 msgstr "Ya, turunkan peran saya"
+
+msgid "Yes, on paid plans."
+msgstr "Ya, di paket berbayar."
+
+msgid "Yes, resumes Claude Code sessions"
+msgstr "Ya, melanjutkan sesi Claude Code"
+
+msgid "Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in."
+msgstr "Ya, dengan Lisensi MIT. Anda bisa melakukan fork pada kode dan membangunnya sendiri, jadi Anda tidak pernah terkunci."
 
 msgid "Yes. Apply to the role that fits best and tell us what you would build. Include a repo, PR or demo."
 msgstr "Ya. Lamar posisi yang paling sesuai dan ceritakan apa yang ingin Anda bangun. Sertakan repo, PR, atau demo."
@@ -21952,6 +22215,9 @@ msgstr "Anda hanya dapat mengedit pesan Anda sendiri"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "Anda hanya dapat berbagi dengan orang dan tim di organisasi ini"
+
+msgid "You can read and export, but not run agents."
+msgstr "Anda bisa membaca dan mengekspor, tetapi tidak bisa menjalankan agen."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari. Folder repositori tidak pernah dihapus."
@@ -22069,6 +22335,9 @@ msgstr "Agen Anda menerbitkan desain dan laporan untuk ditinjau tim Anda. Saat s
 
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "Agen Anda menerbitkan desain dan laporan. Tim Anda berkomentar, lalu agen mulai bekerja."
+
+msgid "Your agent subscriptions and keys"
+msgstr "Langganan dan kunci agen Anda"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Agen Anda, Akun Anda"
