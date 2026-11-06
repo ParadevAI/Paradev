@@ -123,7 +123,13 @@ describe("provisionClaudeProfile", () => {
 	it("removes Paradev hooks from the profile when Claude hooks are disabled", async () => {
 		seedDefaultAccount();
 		seedProfile();
-		await provisionClaudeProfile(PROFILE, { homeDir: HOME });
+		await provisionClaudeProfile(PROFILE, {
+			homeDir: HOME,
+			disabledAgentIds: [],
+		});
+		expect(
+			JSON.stringify(readJson(path.join(PROFILE, "settings.json"))),
+		).toContain("notify.sh");
 
 		await provisionClaudeProfile(PROFILE, {
 			homeDir: HOME,
@@ -133,6 +139,29 @@ describe("provisionClaudeProfile", () => {
 		const settings = readJson(path.join(PROFILE, "settings.json"));
 		expect(JSON.stringify(settings)).not.toContain("notify.sh");
 		expect(settings.model).toBe("claude-opus-5");
+	});
+
+	it("applies SUPERSET_DISABLED_AGENT_HOOKS on top of an explicit disable list", async () => {
+		seedDefaultAccount();
+		seedProfile();
+		const original = process.env.SUPERSET_DISABLED_AGENT_HOOKS;
+		process.env.SUPERSET_DISABLED_AGENT_HOOKS = "claude";
+		try {
+			await provisionClaudeProfile(PROFILE, {
+				homeDir: HOME,
+				disabledAgentIds: [],
+			});
+		} finally {
+			if (original === undefined) {
+				delete process.env.SUPERSET_DISABLED_AGENT_HOOKS;
+			} else {
+				process.env.SUPERSET_DISABLED_AGENT_HOOKS = original;
+			}
+		}
+
+		expect(
+			JSON.stringify(readJson(path.join(PROFILE, "settings.json"))),
+		).not.toContain("notify.sh");
 	});
 
 	it("shares MCP servers and completes onboarding without touching identity", async () => {

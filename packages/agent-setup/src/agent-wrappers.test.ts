@@ -1498,6 +1498,52 @@ exit 0
 		expect(JSON.parse(content2)).toEqual(JSON.parse(content));
 	});
 
+	it("keeps user hooks that share a definition with a Gemini managed hook", () => {
+		const geminiSettingsPath = path.join(
+			TEST_HOME_DIR,
+			".gemini",
+			"settings.json",
+		);
+		const hookPath = "/tmp/.superset-new/hooks/gemini-hook.sh";
+		mkdirSync(path.dirname(geminiSettingsPath), { recursive: true });
+		writeFileSync(
+			geminiSettingsPath,
+			JSON.stringify({
+				hooks: {
+					AfterTool: [
+						{
+							matcher: "write_file",
+							hooks: [
+								{ type: "command", command: hookPath },
+								{ type: "command", command: "/opt/custom-hook.sh" },
+							],
+						},
+					],
+				},
+			}),
+		);
+
+		const parsed = JSON.parse(
+			requireContent(getGeminiSettingsJsonContent(hookPath)),
+		) as {
+			hooks: Record<
+				string,
+				Array<{
+					matcher?: string;
+					hooks?: Array<{ type: string; command: string }>;
+				}>
+			>;
+		};
+
+		expect(parsed.hooks.AfterTool).toEqual([
+			{
+				matcher: "write_file",
+				hooks: [{ type: "command", command: "/opt/custom-hook.sh" }],
+			},
+			{ hooks: [{ type: "command", command: hookPath }] },
+		]);
+	});
+
 	it("bumps hook script markers when hook semantics change", () => {
 		expect(COPILOT_HOOK_MARKER).toBe("# Superset copilot hook v6");
 		expect(CURSOR_HOOK_MARKER).toBe("# Superset cursor hook v8");

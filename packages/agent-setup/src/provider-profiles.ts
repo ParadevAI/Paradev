@@ -52,9 +52,7 @@ function isHooksDisabled(
 	agentId: "claude" | "codex",
 	options: ProvisionProfileOptions,
 ): boolean {
-	return (options.disabledAgentIds ?? resolveDisabledAgentIds()).includes(
-		agentId,
-	);
+	return resolveDisabledAgentIds(options.disabledAgentIds).includes(agentId);
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

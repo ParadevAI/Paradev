@@ -9,10 +9,28 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+	appendMissingPathEntries,
 	applyShellEnvToProcess,
 	getProcessEnvWithShellEnv,
 	getProcessEnvWithShellPath,
 } from "./shell-env";
+
+describe("appendMissingPathEntries", () => {
+	test("appends shell-only entries after the current ones", () => {
+		expect(
+			appendMissingPathEntries(
+				"/usr/bin:/bin",
+				"/opt/homebrew/bin:/usr/bin:/home/u/.local/bin",
+			),
+		).toBe("/usr/bin:/bin:/opt/homebrew/bin:/home/u/.local/bin");
+	});
+
+	test("returns null when the shell PATH adds no entries", () => {
+		expect(
+			appendMissingPathEntries("/custom:/usr/bin:/bin", "/bin:/usr/bin"),
+		).toBeNull();
+	});
+});
 
 describe("shell env merging", () => {
 	test("getProcessEnvWithShellEnv fills in missing shell variables", async () => {

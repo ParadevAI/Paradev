@@ -29,9 +29,9 @@ const MERGE_DENYLIST = new Set([
  * so a unit file that pins a specific binary first stays pinned.
  *
  * Reuses the terminal base-env snapshot (startTerminalBaseEnvResolution) so
- * the login shell is probed once per boot.
+ * the login shell is probed once per boot. Resolves true when it appended
+ * login-shell entries to PATH.
  */
-/** Resolves true when it appended login-shell entries to PATH. */
 export async function applyLoginShellEnvToProcess(
 	targetEnv: NodeJS.ProcessEnv = process.env,
 ): Promise<boolean> {

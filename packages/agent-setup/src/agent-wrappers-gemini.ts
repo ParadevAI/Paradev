@@ -8,6 +8,7 @@ import {
 } from "./agent-wrappers-common";
 import { getTemplatePath, getV1NotificationsPort } from "./config";
 import {
+	cleanNestedHookDefinition,
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
 	type ManagedJsonHooksSpec,
@@ -59,8 +60,8 @@ const GEMINI_MANAGED_EVENTS = [
 function geminiHooksSpec(
 	hookScriptPath: string,
 ): ManagedJsonHooksSpec<GeminiHookDefinition> {
-	const isManagedCommand = (command: string | undefined) =>
-		command?.includes(hookScriptPath) ||
+	const isManagedCommand = (command: string) =>
+		command.includes(hookScriptPath) ||
 		isSupersetManagedHookCommand(command, GEMINI_HOOK_SCRIPT_NAME);
 	return {
 		fileLabel: "Gemini settings.json",
@@ -74,16 +75,10 @@ function geminiHooksSpec(
 				[{ hooks: [{ type: "command", command: hookScriptPath }] }],
 			]),
 		),
-		// A definition is dropped whole when it carries our command either as a
-		// legacy flat `command` or inside its nested hooks — Superset never
-		// shares a definition with user hooks in Gemini's config.
 		cleanEntry: (definition) =>
-			isSupersetManagedHookCommand(
-				definition.command,
-				GEMINI_HOOK_SCRIPT_NAME,
-			) || definition.hooks?.some((hook) => isManagedCommand(hook.command))
+			isSupersetManagedHookCommand(definition.command, GEMINI_HOOK_SCRIPT_NAME)
 				? null
-				: definition,
+				: cleanNestedHookDefinition(definition, isManagedCommand),
 		dropEmptyContainerOnRemove: true,
 	};
 }

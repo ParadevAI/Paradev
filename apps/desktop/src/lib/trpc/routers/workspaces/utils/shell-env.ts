@@ -2,6 +2,7 @@ import {
 	type ExecFileOptionsWithStringEncoding,
 	execFile,
 } from "node:child_process";
+import path from "node:path";
 import { promisify } from "node:util";
 import { shellEnv } from "shell-env";
 
@@ -270,6 +271,20 @@ export async function execWithShellEnv(
 			throw retryError;
 		}
 	}
+}
+
+/** `currentPath` with the entries of `extraPath` it lacks appended; null when it lacks none. */
+export function appendMissingPathEntries(
+	currentPath: string,
+	extraPath: string,
+): string | null {
+	const current = currentPath.split(path.delimiter).filter(Boolean);
+	const currentSet = new Set(current);
+	const missing = extraPath
+		.split(path.delimiter)
+		.filter((entry) => entry && !currentSet.has(entry));
+	if (missing.length === 0) return null;
+	return [...current, ...new Set(missing)].join(path.delimiter);
 }
 
 /**

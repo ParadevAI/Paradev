@@ -1464,7 +1464,8 @@ Remove the hooks Paradev wrote into agents' global configs, such as
 settings stay, except that Paradev's variable names are removed from Muse's
 `managed_hooks_env_vars` even if you also listed them. Pass either `--all` or
 `--agent`, not both. Runs on this machine and needs no sign-in. The Paradev app
-adds the hooks again at start for installed agents; see [Uninstall](/install#uninstall).
+adds the hooks again at start for installed agents unless **Settings → Agents →
+Paradev hooks** is off for that agent; see [Uninstall](/install#uninstall).
 
 ```bash
 superset agents hooks remove --all

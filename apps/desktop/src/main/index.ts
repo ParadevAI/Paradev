@@ -33,6 +33,7 @@ import {
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
 import {
+	appendMissingPathEntries,
 	applyShellEnvToProcess,
 	getProcessEnvWithShellPath,
 } from "lib/trpc/routers/workspaces/utils/shell-env";
@@ -687,9 +688,10 @@ if (!gotTheLock) {
 			// Setup skips agents absent from PATH; the login-shell PATH can reveal more.
 			void getProcessEnvWithShellPath()
 				.then(({ PATH: shellPath }) => {
-					if (shellPath && shellPath !== process.env.PATH) {
-						setupAgentIntegrationsFromSettings(shellPath);
-					}
+					const searchPath =
+						shellPath &&
+						appendMissingPathEntries(process.env.PATH ?? "", shellPath);
+					if (searchPath) setupAgentIntegrationsFromSettings(searchPath);
 				})
 				.catch((error) =>
 					console.error("[main] Failed to set up agent integrations:", error),
