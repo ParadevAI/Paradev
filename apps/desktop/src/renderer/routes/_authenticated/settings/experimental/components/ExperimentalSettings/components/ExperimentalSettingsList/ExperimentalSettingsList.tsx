@@ -19,6 +19,7 @@ import {
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
 import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
+import { CloseSetupOnSuccessSetting } from "../CloseSetupOnSuccessSetting";
 import { RestartOnboardingSetting } from "../RestartOnboardingSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
@@ -51,6 +52,10 @@ export function ExperimentalSettingsList({
 	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
+		visibleItems,
+	);
+	const showCloseSetupOnSuccess = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_CLOSE_SETUP_ON_SUCCESS,
 		visibleItems,
 	);
 	const showRestartOnboarding = isItemVisible(
@@ -174,6 +179,7 @@ export function ExperimentalSettingsList({
 				)}
 				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
+				{showCloseSetupOnSuccess && <CloseSetupOnSuccessSetting />}
 				{showRestartOnboarding && <RestartOnboardingSetting />}
 			</div>
 		</div>

@@ -134,6 +134,8 @@ const createInputSchema = z
 		// terminal sugar agent is chained behind them in the setup terminal
 		// (`setup && agent`) instead of launching in parallel.
 		waitForSetupBeforeAgents: z.boolean().optional(),
+		// Desktop "Close Workspace Setup tab when setup succeeds" setting.
+		closeSetupOnSuccess: z.boolean().optional(),
 		command: z.string().min(1).optional(),
 		namingPrompt: z.string().min(1).optional(),
 		namingAgent: z.string().min(1).optional(),
@@ -1355,6 +1357,7 @@ export const workspacesRouter = router({
 						ctx,
 						workspaceId: workspaceRow.id,
 						...(chainAgent ? { chainCommand: chainAgent.fullCommand } : {}),
+						closeOnSuccess: input.closeSetupOnSuccess,
 					});
 				if (warning) {
 					console.warn(`[workspaces.create] setup warning: ${warning}`);
