@@ -32,4 +32,17 @@ describe("resolveHostTarget", () => {
 		expect(target.kind).toBe("remote");
 		expect(seen.at(-1)?.get("authorization")).toBeNull();
 	});
+
+	test("a signed-in caller still sends its bearer to the relay", async () => {
+		const target = await resolveHostTarget({
+			requestedHostId: "some-other-host",
+			organizationId: "1c0587c9-a74c-423c-ae40-b97296ad9b27",
+			userJwt: "user-jwt",
+			api,
+		});
+
+		await target.client.workspace.list.query();
+
+		expect(seen.at(-1)?.get("authorization")).toBe("Bearer user-jwt");
+	});
 });
