@@ -1,5 +1,5 @@
 import { hashKey, type QueryKey, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
@@ -8,9 +8,11 @@ import { PULL_REQUESTS_SEARCH_QUERY_KEY } from "renderer/routes/_authenticated/_
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
 import {
 	applyPullRequestRowDetails,
+	carryOverPullRequestRowDetails,
 	pullRequestNumbersByProject,
 	pullRequestRowKey,
 } from "./utils/pullRequestRowDetails";
+import { startRowDetailsRequest } from "./utils/rowDetailsRequests";
 
 const PAGE_SIZE = 30;
 
@@ -22,8 +24,10 @@ type SearchPullRequestsPage = Awaited<
 >;
 type PullRequestsPage = Omit<SearchPullRequestsPage, "pullRequests"> & {
 	pullRequests: (SearchPullRequestsPage["pullRequests"][number] & {
-		/** Checks, diff stat and branch are still on their way. */
+		/** Checks, diff stat and branch from this fetch are still on their way. */
 		detailsPending: boolean;
+		/** The values shown are the previous fetch's, kept while fresh ones load. */
+		detailsCarried?: boolean;
 	})[];
 };
 
@@ -45,10 +49,8 @@ export function usePullRequestsList({
 }) {
 	const query = useDebouncedValue(searchQuery, 300).trim();
 	const queryClient = useQueryClient();
-	const latestRowDetailsRequest = useRef(new Map<string, number>());
 	const [rowDetailsInFlight, setRowDetailsInFlight] = useState(0);
 
-	// A refetch may land before this one; only the newest request per page writes.
 	const loadRowDetails = (
 		client: HostServiceClient,
 		queryKey: QueryKey,
@@ -56,17 +58,12 @@ export function usePullRequestsList({
 	) => {
 		const projects = pullRequestNumbersByProject(page.pullRequests);
 		if (projects.length === 0) return;
-		const requestKey = hashKey(queryKey);
-		const requestId =
-			(latestRowDetailsRequest.current.get(requestKey) ?? 0) + 1;
-		latestRowDetailsRequest.current.set(requestKey, requestId);
-		const isLatest = () =>
-			latestRowDetailsRequest.current.get(requestKey) === requestId;
+		const request = startRowDetailsRequest(queryClient, hashKey(queryKey));
 		setRowDetailsInFlight((count) => count + 1);
 		client.workspaceCreation.getPullRequestRowDetails
 			.query({ projects })
 			.then(({ rows }) => {
-				if (!isLatest()) return;
+				if (!request.isLatest()) return;
 				queryClient.setQueryData<PullRequestsPage | null>(
 					queryKey,
 					(current) =>
@@ -78,7 +75,7 @@ export function usePullRequestsList({
 			})
 			.finally(() => {
 				setRowDetailsInFlight((count) => count - 1);
-				if (isLatest()) latestRowDetailsRequest.current.delete(requestKey);
+				request.finish();
 			});
 	};
 
@@ -134,10 +131,7 @@ export function usePullRequestsList({
 					queryKey,
 				);
 				return previous
-					? applyPullRequestRowDetails(
-							pageData,
-							previous.pullRequests.filter((row) => !row.detailsPending),
-						)
+					? carryOverPullRequestRowDetails(pageData, previous.pullRequests)
 					: pageData;
 			},
 			enabled: !!target.hostUrl,

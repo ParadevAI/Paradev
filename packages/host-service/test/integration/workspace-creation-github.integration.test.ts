@@ -92,6 +92,9 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 				repository: {
 					pr88: {
 						number: 88,
+						additions: 5,
+						deletions: 2,
+						headRefName: "ci-fix",
 						statusCheckRollup: {
 							contexts: {
 								pageInfo: { hasNextPage: false, endCursor: null },
@@ -413,9 +416,9 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 					},
 				],
 				checksStatus: "success",
-				additions: null,
-				deletions: null,
-				headRefName: null,
+				additions: 5,
+				deletions: 2,
+				headRefName: "ci-fix",
 			},
 		]);
 	});
@@ -713,6 +716,9 @@ describe("gh CLI is first-class when execGh succeeds", () => {
 					repository: {
 						pr101: {
 							number: 101,
+							additions: 12,
+							deletions: 3,
+							headRefName: "fix-checks",
 							statusCheckRollup: {
 								contexts: {
 									pageInfo: {
@@ -951,6 +957,9 @@ describe("gh CLI is first-class when execGh succeeds", () => {
 			projectId,
 			prNumber: 101,
 			checksStatus: "failure",
+			additions: 12,
+			deletions: 3,
+			headRefName: "fix-checks",
 		});
 		expect(result.rows[0].checks).toHaveLength(2);
 		expect(ghCalls.map((call) => call.args.slice(0, 2))).toEqual([

@@ -41,10 +41,14 @@ export function findPullRequestListPreview(
 		prNumber: number;
 	},
 ): PullRequestPreview | null {
-	const pages = queryClient.getQueriesData<{
-		pullRequests?: PullRequestListRow[];
-	} | null>({ queryKey: PULL_REQUESTS_SEARCH_QUERY_KEY });
-	for (const [, page] of pages) {
+	const newestFirst = queryClient
+		.getQueryCache()
+		.findAll({ queryKey: PULL_REQUESTS_SEARCH_QUERY_KEY })
+		.sort((a, b) => b.state.dataUpdatedAt - a.state.dataUpdatedAt);
+	for (const query of newestFirst) {
+		const page = query.state.data as {
+			pullRequests?: PullRequestListRow[];
+		} | null;
 		for (const row of page?.pullRequests ?? []) {
 			if (row.prNumber !== prNumber) continue;
 			const rowRepo = pullRequestRefFromUrl(row.url)?.repoFullName;

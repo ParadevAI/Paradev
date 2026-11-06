@@ -28,6 +28,8 @@ export interface PullRequestRowData {
 	checks: PullRequestCheck[];
 	/** Checks, diff stat and branch are still on their way. */
 	detailsPending?: boolean;
+	/** The values shown are the previous fetch's, kept while fresh ones load. */
+	detailsCarried?: boolean;
 }
 
 interface PullRequestRowProps {
@@ -41,7 +43,7 @@ interface PullRequestRowProps {
 	onHoverIntent?: () => void;
 }
 
-const HOVER_INTENT_DELAY_MS = 150;
+const HOVER_INTENT_DELAY_MS = 300;
 
 export function PullRequestRow({
 	pr,
@@ -51,7 +53,10 @@ export function PullRequestRow({
 	onClick,
 	onHoverIntent,
 }: PullRequestRowProps) {
-	const showPlaceholders = !!pr.detailsPending && detailsLoading;
+	const pending = !!pr.detailsPending;
+	const showPlaceholders = pending && !pr.detailsCarried && detailsLoading;
+	// Nothing left to confirm them, so the checks are unknown, not current.
+	const checksUnknown = pending && !detailsLoading;
 	const hoverIntentTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const cancelHoverIntent = () => {
 		if (hoverIntentTimer.current) clearTimeout(hoverIntentTimer.current);
@@ -146,7 +151,7 @@ export function PullRequestRow({
 				<div className="flex items-center gap-2">
 					{showPlaceholders ? (
 						<Skeleton className="size-3.5 rounded-full" />
-					) : pr.detailsPending ? null : (
+					) : checksUnknown ? null : (
 						<PullRequestChecksSummary checks={pr.checks} />
 					)}
 					{updatedAtMs != null && (

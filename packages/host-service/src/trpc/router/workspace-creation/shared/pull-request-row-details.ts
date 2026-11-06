@@ -56,6 +56,9 @@ const rowDetailsGraphqlDataSchema = z.object({
 		.nullable(),
 });
 
+// 100 checks a page, so 2,000 per PR before giving up on a runaway cursor.
+const MAX_CHECK_PAGES = 20;
+
 type GraphqlDetails = Pick<
 	PullRequestRowDetails,
 	"additions" | "deletions" | "headRefName"
@@ -76,8 +79,12 @@ export async function fetchPullRequestRowDetails(
 	let cursors = new Map<number, string | null>(
 		pullRequestNumbers.map((number) => [number, null]),
 	);
+	const seenCursors = new Map<number, Set<string>>();
 
-	while (cursors.size > 0) {
+	for (let pageCount = 1; cursors.size > 0; pageCount++) {
+		if (pageCount > MAX_CHECK_PAGES) {
+			throw new Error(`Check rollup ran past ${MAX_CHECK_PAGES} pages`);
+		}
 		const cursorDefinitions = [...cursors]
 			.flatMap(([number, cursor]) =>
 				cursor ? [`$cursor${number}: String!`] : [],
@@ -156,11 +163,14 @@ export async function fetchPullRequestRowDetails(
 						`Missing check-rollup cursor for PR #${pullRequest.number}`,
 					);
 				}
-				if (pageInfo.endCursor === cursors.get(pullRequest.number)) {
+				const seen = seenCursors.get(pullRequest.number) ?? new Set<string>();
+				if (seen.has(pageInfo.endCursor)) {
 					throw new Error(
-						`Check-rollup cursor did not advance for PR #${pullRequest.number}`,
+						`Check-rollup cursor repeated for PR #${pullRequest.number}`,
 					);
 				}
+				seen.add(pageInfo.endCursor);
+				seenCursors.set(pullRequest.number, seen);
 				nextCursors.set(pullRequest.number, pageInfo.endCursor);
 			}
 		}

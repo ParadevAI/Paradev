@@ -3,7 +3,7 @@ import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GoGitPullRequest } from "react-icons/go";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
@@ -13,7 +13,10 @@ import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboa
 import { pullRequestDetailQueryOptions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
 import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
-import type { PullRequestsList } from "../../hooks/usePullRequestsList";
+import {
+	type PullRequestsList,
+	pullRequestRowKey,
+} from "../../hooks/usePullRequestsList";
 import { PullRequestRow } from "../PullRequestRow";
 import { PullRequestRowSkeleton } from "./components/PullRequestRowSkeleton";
 
@@ -80,10 +83,10 @@ export function PullRequestsContent({
 	} = list;
 
 	const prefetchDetail = useCallback(
-		(url: string) => {
+		async (url: string) => {
 			const ref = pullRequestRefFromUrl(url);
 			if (!ref) return;
-			void queryClient.prefetchQuery(
+			await queryClient.prefetchQuery(
 				pullRequestDetailQueryOptions({
 					organizationId,
 					repoFullName: ref.repoFullName,
@@ -93,6 +96,15 @@ export function PullRequestsContent({
 		},
 		[queryClient, organizationId],
 	);
+	// One hover read at a time: sweeping across rows must not queue a GitHub read per row.
+	const hoverPrefetchInFlight = useRef(false);
+	const prefetchHovered = (url: string) => {
+		if (hoverPrefetchInFlight.current) return;
+		hoverPrefetchInFlight.current = true;
+		void prefetchDetail(url).finally(() => {
+			hoverPrefetchInFlight.current = false;
+		});
+	};
 
 	const selectedIndex = pullRequests.findIndex(
 		(pr) =>
@@ -108,7 +120,7 @@ export function PullRequestsContent({
 	useEffect(() => {
 		if (!neighborUrls) return;
 		const timer = setTimeout(() => {
-			for (const url of neighborUrls.split(" ")) prefetchDetail(url);
+			for (const url of neighborUrls.split(" ")) void prefetchDetail(url);
 		}, NEIGHBOR_PREFETCH_DELAY_MS);
 		return () => clearTimeout(timer);
 	}, [neighborUrls, prefetchDetail]);
@@ -235,7 +247,7 @@ export function PullRequestsContent({
 							</div>
 						)}
 						{pullRequests.map((pr, index) => {
-							const rowKey = `${pr.projectId}:${pr.prNumber}`;
+							const rowKey = pullRequestRowKey(pr);
 							const isSelected =
 								selectedPrNumber === pr.prNumber &&
 								(selectedPrProjectId != null
@@ -250,7 +262,7 @@ export function PullRequestsContent({
 									isSelected={isSelected}
 									detailsLoading={isLoadingRowDetails}
 									onClick={() => handleOpenPreview(pr)}
-									onHoverIntent={() => prefetchDetail(pr.url)}
+									onHoverIntent={() => prefetchHovered(pr.url)}
 								/>
 							);
 						})}

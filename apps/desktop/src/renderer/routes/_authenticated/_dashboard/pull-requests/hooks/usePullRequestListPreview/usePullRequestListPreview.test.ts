@@ -60,6 +60,29 @@ describe("findPullRequestListPreview", () => {
 	});
 });
 
+describe("findPullRequestListPreview freshness", () => {
+	test("takes the row from the most recently updated page", () => {
+		const queryClient = new QueryClient();
+		queryClient.setQueryData(
+			[...PULL_REQUESTS_SEARCH_QUERY_KEY, "host", "open"],
+			{ pullRequests: [{ ...row("p1", "acme/api", 7), title: "Renamed" }] },
+			{ updatedAt: 2_000 },
+		);
+		queryClient.setQueryData(
+			[...PULL_REQUESTS_SEARCH_QUERY_KEY, "host", "all"],
+			{ pullRequests: [{ ...row("p1", "acme/api", 7), title: "Old title" }] },
+			{ updatedAt: 1_000 },
+		);
+		expect(
+			findPullRequestListPreview(queryClient, {
+				projectId: "p1",
+				repoFullName: null,
+				prNumber: 7,
+			})?.title,
+		).toBe("Renamed");
+	});
+});
+
 describe("usePullRequestListPreview", () => {
 	test("picks up the row when the list loads after the PR opened", () => {
 		const queryClient = new QueryClient();

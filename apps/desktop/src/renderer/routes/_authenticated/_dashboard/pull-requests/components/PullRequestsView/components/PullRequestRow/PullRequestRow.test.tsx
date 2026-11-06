@@ -45,4 +45,37 @@ describe("PullRequestRow pending details", () => {
 		expect(stale.container.querySelectorAll(".pr-skeleton").length).toBe(0);
 		expect(stale.container.querySelector("output")).toBeNull();
 	});
+
+	test("carried checks show while a refresh loads and are hidden if nothing confirms them", () => {
+		const carriedRow: PullRequestRowData = {
+			...pendingRow,
+			checks: [{ name: "CI", status: "success", url: null }],
+			detailsCarried: true,
+		};
+		const refreshing = render(
+			<PullRequestRow
+				pr={carriedRow}
+				repoSlug={undefined}
+				isSelected={false}
+				detailsLoading
+				onClick={() => {}}
+			/>,
+		);
+		expect(refreshing.container.querySelectorAll(".pr-skeleton").length).toBe(
+			0,
+		);
+		expect(refreshing.container.querySelector("output")).not.toBeNull();
+		refreshing.unmount();
+
+		const unconfirmed = render(
+			<PullRequestRow
+				pr={carriedRow}
+				repoSlug={undefined}
+				isSelected={false}
+				detailsLoading={false}
+				onClick={() => {}}
+			/>,
+		);
+		expect(unconfirmed.container.querySelector("output")).toBeNull();
+	});
 });
