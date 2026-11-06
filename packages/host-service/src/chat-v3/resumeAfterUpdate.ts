@@ -98,6 +98,8 @@ const closedChatSchema = sessionSchema
 		harness: true,
 		harnessSessionId: true,
 		terminalId: true,
+		modeId: true,
+		modelId: true,
 	})
 	.extend({ sessionId: z.string().min(1) });
 
@@ -106,13 +108,25 @@ export function recordClosedChats(runtime: ChatRuntime, path: string): void {
 	const sessions = runtime.live
 		.unfinished()
 		.filter((session) => session.interrupted)
-		.map(({ sessionId, scopeId, harness, harnessSessionId, terminalId }) => ({
-			sessionId,
-			scopeId,
-			harness,
-			harnessSessionId,
-			terminalId,
-		}));
+		.map(
+			({
+				sessionId,
+				scopeId,
+				harness,
+				harnessSessionId,
+				terminalId,
+				modeId,
+				modelId,
+			}) => ({
+				sessionId,
+				scopeId,
+				harness,
+				harnessSessionId,
+				terminalId,
+				modeId,
+				modelId,
+			}),
+		);
 	if (sessions.length === 0) return;
 	const pending = `${path}.${process.pid}.tmp`;
 	writeFileSync(pending, JSON.stringify({ sessions }));

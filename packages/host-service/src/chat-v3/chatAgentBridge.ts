@@ -82,6 +82,8 @@ export type ClosedChat = {
 	harness: string;
 	harnessSessionId: string;
 	terminalId?: string;
+	modeId?: string;
+	modelId?: string;
 };
 
 export function agentIdForHarness(

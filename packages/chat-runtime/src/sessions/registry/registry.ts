@@ -199,6 +199,15 @@ export class LiveSessionRegistry {
 		return false;
 	}
 
+	/** The newest live session bound to a terminal: where a reopened pane's chat lives now. */
+	forTerminal(terminalId: string): LiveSession | null {
+		let found: LiveSession | null = null;
+		for (const session of this.live.values()) {
+			if (session.terminalId === terminalId) found = session;
+		}
+		return found;
+	}
+
 	get(sessionId: string): LiveSession | null {
 		return this.live.get(sessionId) ?? null;
 	}
