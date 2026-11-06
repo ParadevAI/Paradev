@@ -2018,9 +2018,6 @@ msgstr "Před vytvořením cloudového pracovního prostoru přidejte prostřed�
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Připoj další účet nebo odpoj ten, který už nepoužíváš."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "Přidejte jako hosta libovolný počítač. Pracovní prostory běží dál, i když váš laptop usne, a vy se můžete kdykoli podívat, jak si vedou."
-
 msgid "Add Attachment"
 msgstr "Přidat přílohu"
 
@@ -2356,6 +2353,9 @@ msgstr "Agenti vidí jen zástupný údaj. Paradev přidá vaše přihlášení 
 
 msgid "Agents that run while you're away"
 msgstr "Agenti, kteří běží, když jste pryč"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "Agenti sami třídí issues, píší changelogy a aktualizují závislosti. Vy jen kontrolujete PR."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agenti používají tento účet, když volají nástroje Linear."
@@ -2932,9 +2932,6 @@ msgstr "Použít"
 msgctxt "job application"
 msgid "Apply"
 msgstr "Přihlásit se"
-
-msgid "Approve"
-msgstr "Schválit"
 
 msgid "Approve edits"
 msgstr "Schvalovat úpravy"
@@ -4732,6 +4729,9 @@ msgstr "Cloudový pracovní prostor — připojuji"
 msgid "Cloud workspaces"
 msgstr "Cloudové pracovní prostory"
 
+msgid "Cloud Workspaces"
+msgstr "Cloudové pracovní prostory"
+
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součástí plánů Team a Ultra: přejděte na vyšší plán v Nastavení, Fakturace."
@@ -6373,6 +6373,9 @@ msgstr "Vytvořit s AI"
 msgid "Create workspace"
 msgstr "Vytvořit pracovní prostor"
 
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "Vytvářejte pracovní prostory a spouštějte agenty z CLI, SDK nebo přes MCP."
+
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Vytvářejte pracovní prostory, spouštějte agenty a čtěte jejich výstup z libovolného terminálu nebo skriptu. macOS a Linux."
 
@@ -7561,9 +7564,6 @@ msgstr "např. Moje cloudové kontroly"
 msgid "e.g. plan-budget"
 msgstr "např. plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "Každý agent pracuje ve vlastním Git worktree a větvi, takže si agenti navzájem nepřepisují soubory. Práci zkontrolujte a slučte, až budete připraveni."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Každá příloha může mít nejvýše {0} MB."
@@ -7588,9 +7588,6 @@ msgstr "Každá relace naváže tam, kde skončila."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Každá plocha má vlastní typografii. Změny se okamžitě projeví v živých náhledech."
-
-msgid "Each task on its own branch"
-msgstr "Každý úkol na vlastní větvi"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Každý pracovní prostor dostane vlastní cloudový stroj a pracuje dál i se zavřeným notebookem. Stav sledujte na počítači, iPhonu nebo iPadu."
@@ -7964,9 +7961,6 @@ msgstr "Vše z Ultra"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Vše z Ultra a navíc GB-hodiny v cloudu na míru, SSO a SAML, zřizování SCIM, omezení IP, auditní protokoly, SLA na míru, vyhrazená podpora a smlouvy na míru. Cena se přizpůsobí vaší organizaci. Ozvěte se a navrhneme vhodné řešení."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Všechno jde skriptovat. Vytvářejte pracovní prostory a agenty z CLI, zapojte Paradev do CI přes SDK nebo ho nechte řídit svého agenta přes MCP."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Vše, co jsme postavili nad primitivy — originály Paradev, sada"
@@ -9197,9 +9191,6 @@ msgstr "Celá obrazovka"
 
 msgid "Full self-driving"
 msgstr "Plná autonomie"
-
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Kompletní zdrojový kód je na GitHubu pod licencí MIT. Prohlédněte si ho, zauditujte ho a přispějte. Žádné černé skříňky, žádné skryté funkce."
 
 msgid "Funding"
 msgstr "Financování"
@@ -10611,9 +10602,6 @@ msgstr "Připojuji…"
 msgid "Jump"
 msgstr "Přejít"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "Skočte do svého oblíbeného editoru jedním kliknutím. VS Code, Cursor, Xcode, JetBrains IDE nebo libovolný terminál: otevřete worktree přesně tam, kde ho potřebujete."
-
 msgid "Jump to a specific date"
 msgstr "Přejít na konkrétní datum"
 
@@ -10848,9 +10836,6 @@ msgstr "Novinky"
 
 msgid "Launch"
 msgstr "Spuštění"
-
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "Spouštějte agenty na funkce, opravy chyb i refaktory, všechno paralelně. Stav na první pohled ukáže, kteří agenti pracují, kteří jsou zablokovaní a kteří čekají na vás."
 
 msgid "Launch mode"
 msgstr "Režim spuštění"
@@ -11852,6 +11837,9 @@ msgstr "Mobilní aplikace"
 
 msgid "Mobile App"
 msgstr "Mobilní aplikace"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "Mobil, cloud nebo vlastní cloud"
 
 msgid "Mode"
 msgstr "Režim"
@@ -13569,9 +13557,6 @@ msgstr "Přesto otevřít"
 msgid "Open Anyway"
 msgstr "Přesto otevřít"
 
-msgid "Open Anywhere"
-msgstr "Otevřete kdekoli"
-
 msgid "Open App Store"
 msgstr "Otevřít App Store"
 
@@ -13683,9 +13668,6 @@ msgstr "Otevřít v {0}"
 
 msgid "Open in {app}"
 msgstr "Otevřít v {app}"
-
-msgid "Open in any IDE"
-msgstr "Otevřete v jakémkoli IDE"
 
 msgid "Open in Any IDE"
 msgstr "Otevřete v libovolném IDE"
@@ -14357,6 +14339,9 @@ msgstr "Paradev vyvíjíme v Paradev, takže jsme sami jeho největšími uživa
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev je navržený tak, aby fungoval s vaším stávajícím nástrojem. Nativně podporujeme hluboké odkazy do IDE, jako je Cursor, takže si pracovní prostory a soubory otevřete ve svém IDE."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev je pod licencí MIT, takže nejste na nikom závislí. Kód si můžete přečíst nebo upravit na GitHubu."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev je open source. Každý pull request, review i bug je veřejně na GitHubu."
 
@@ -14410,6 +14395,9 @@ msgstr "Pluginy Paradev"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev běží lokálně na počítačích vašich vývojářů. Neukládáme váš kód ani konverzace s AI a Paradev prošel auditem SOC 2 Type II u nezávislého auditora. Vyžádejte si zprávu a projděte si dokumentaci k bezpečnosti na {trustHost}."
+
+msgid "Paradev runs on your machine. You decide what connects to it."
+msgstr "Paradev běží na vašem počítači. Co se k němu připojí, rozhodujete vy."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev vznikl jako projekt na hackathonu v listopadu 2025. Byla to jednoduchá desktopová aplikace na správu worktree."
@@ -15268,9 +15256,15 @@ msgstr "Publikujte z vlastního repozitáře"
 msgid "Publish new versions, rename and share"
 msgstr "Publikovat nové verze, přejmenovat a sdílet"
 
+msgid "Publish Pages"
+msgstr "Publikujte stránky"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Publikováno"
+
+msgid "Published version 1."
+msgstr "Publikována verze 1."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Zveřejní počty tokenů a názvy modelů, nikdy názvy repozitářů, cesty k souborům ani prompty. Kdykoli můžete odejít — tím se smaže vše, co jste zveřejnili."
@@ -16138,9 +16132,6 @@ msgstr "Repozitáře"
 msgid "Repos, worktrees and branches"
 msgstr "Repozitáře, worktree a větve"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "Repozitáře, worktree, výstup terminálu i relace agentů zůstávají na vašem počítači. Cloudová synchronizace se týká jen metadat účtu a organizace."
-
 msgid "Repositories"
 msgstr "Repozitáře"
 
@@ -16762,6 +16753,9 @@ msgstr "Spustit teď"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Spouštění podle plánu nebo událostí, na vyžádání, pozastavení, obnovení a čtení logů."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
+msgstr "Spouštějte paralelní kódovací agenty na funkce, opravy a refaktory. Každý dostane vlastní worktree a větev."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Spouštějte paralelní coding agenty s Paradev"
 
@@ -16783,6 +16777,9 @@ msgstr "Spouštět příkazy v terminálu a pracovat s dalšími aplikacemi."
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "Spustit agenta v terminálu Workspace Setup, jakmile setup doběhne, místo spuštění druhého terminálu vedle něj"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "Spusťte noční evaluace a opravte případné regrese"
+
 msgid "Run this command?"
 msgstr "Spustit tento příkaz?"
 
@@ -16795,14 +16792,8 @@ msgstr "Spustit příkaz pracovního prostoru"
 msgid "Run Workspace Command"
 msgstr "Spustit příkaz pracovního prostoru"
 
-msgid "Run workspaces anywhere"
-msgstr "Spouštějte pracovní prostory kdekoli"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Spouštějte své agenty z desktopu, libovolného terminálu nebo telefonu."
-
-msgid "Run your agents from your phone."
-msgstr "Spouštějte své agenty z telefonu."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Spouštějte své programovací agenty v cloudu."
@@ -18106,6 +18097,12 @@ msgstr "Přihlášení selhalo"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Přihlášení se nezdařilo ({reason}). Zkuste to prosím znovu."
+
+msgid "Sign-up completion"
+msgstr "Dokončení registrace"
+
+msgid "Sign-up steps"
+msgstr "Kroky registrace"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Přihlášeni jako <0>{userName}</0>"
@@ -20324,6 +20321,9 @@ msgstr "Tarif"
 msgid "Time"
 msgstr "Čas"
 
+msgid "Time to first workspace"
+msgstr "Čas do prvního pracovního prostoru"
+
 msgid "Time zone"
 msgstr "Časové pásmo"
 
@@ -20641,9 +20641,6 @@ msgstr "Tufte"
 
 msgid "Tunnel established"
 msgstr "Tunel navázán"
-
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Proměňte rutinní práci v agenty, kteří běží podle plánu nebo při události: třídění issues, koncepty changelogu, aktualizace závislostí. Pracují samostatně a otevírají PR, které zkontrolujete."
 
 msgid "Turn Fast mode on or off"
 msgstr "Zapnout nebo vypnout rychlý režim"
@@ -21176,8 +21173,8 @@ msgstr "Použít jako spuštění pracovního prostoru"
 msgid "Use cases"
 msgstr "Případy použití"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "Pro každý úkol použijte Claude Code, Codex, OpenCode nebo libovolného kódovacího agenta. Vaše pracovní prostory, větve i způsob revize zůstanou stejné."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Používejte Claude Code, Codex, OpenCode nebo jakéhokoli CLI agenta. Vaše pracovní prostory, větve i kontrola zůstávají stejné."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Použijte Claude Code, Codex nebo libovolného kódovacího agenta. Vyberte podle úkolu nebo jich spusťte několik vedle sebe."
@@ -21203,6 +21200,9 @@ msgstr "Používejte Paradev na mobilu"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Používejte Paradev na telefonu s Pro."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "Používejte tarify agentů a API klíče, které už máte. Volání modelů jdou přímo k vašemu poskytovateli."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pro spouštění paralelních kódovacích agentů použijte desktopovou aplikaci."
 
@@ -21226,9 +21226,6 @@ msgstr "Použijte při volání Paradev API."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Používat přepis řeči a funkce push-to-talk."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "Používejte svá stávající předplatná agentů a API klíče. Paradev nikdy nepřeposílá volání modelů ani neváže vaše workflow na jednoho poskytovatele."
 
 msgid "Used"
 msgstr "Využito"
@@ -21641,6 +21638,9 @@ msgstr "Dosažen týdenní limit Opus"
 
 msgid "Weekly release notes"
 msgstr "Týdenní poznámky k vydání"
+
+msgid "Weekly sign-up completion"
+msgstr "Týdenní dokončení registrace"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Dosažen týdenní limit Sonnet"
@@ -22342,8 +22342,8 @@ msgstr "Pokud změny neuložíte, budou ztraceny."
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Vaše cloudové pracovní prostory už k tomuto hostu nebudou mít přístup."
 
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "Váš kód zůstává ve výchozím stavu lokálně a připojené služby máte výslovně pod kontrolou."
+msgid "Your code, terminals, and agent sessions stay on your own machine."
+msgstr "Váš kód, terminály a relace agentů zůstávají na vašem počítači."
 
 msgid "Your download starts automatically."
 msgstr "Stahování začne automaticky."

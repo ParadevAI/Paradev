@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { EdgeGlare } from "@/app/[lang]/components/EdgeGlare";
 import { LeftSidebar } from "./components/LeftSidebar";
 import { MainPanel } from "./components/MainPanel";
-import { RemoteSessionPopup } from "./components/RemoteSessionPopup";
+import { PagePopup } from "./components/PagePopup";
 import { RightSidebar } from "./components/RightSidebar";
 import { TabBar } from "./components/TabBar";
+import { PAGE_PHASE_MS, PAGE_PHASES } from "./constants";
+import { useLoopPhase } from "./hooks/useLoopPhase";
 import type { AppMockupProps } from "./types";
 
 export type { ActiveDemo } from "./types";
@@ -17,11 +19,14 @@ const DESIGN_WIDTH = 1280;
 const DESIGN_HEIGHT = 800;
 
 export function AppMockup({
-	activeDemo = "Orchestrate Parallel Agents",
+	activeDemo = "Cloud Workspaces",
 	edgeGlare = false,
 }: AppMockupProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [scale, setScale] = useState(0.72);
+	const isPages = activeDemo === "Publish Pages";
+	const pagePhase =
+		PAGE_PHASES[useLoopPhase(isPages, PAGE_PHASE_MS)] ?? "published";
 
 	useEffect(() => {
 		const el = containerRef.current;
@@ -65,12 +70,12 @@ export function AppMockup({
 					<LeftSidebar activeDemo={activeDemo} />
 					<div className="flex min-w-0 flex-1 flex-col">
 						<TabBar activeDemo={activeDemo} />
-						<MainPanel activeDemo={activeDemo} />
+						<MainPanel activeDemo={activeDemo} pagePhase={pagePhase} />
 					</div>
 					<RightSidebar activeDemo={activeDemo} />
 				</div>
 
-				<RemoteSessionPopup activeDemo={activeDemo} />
+				<PagePopup visible={isPages} phase={pagePhase} />
 			</div>
 		</div>
 	);

@@ -2018,9 +2018,6 @@ msgstr "Bulut çalışma alanı oluşturmadan önce Ayarlar'da bir ortam ekleyin
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Başka bir hesap bağla ya da artık kullanmadığın birini kaldır."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "Herhangi bir makineyi host olarak ekleyin. Dizüstünüz uykuya geçtiğinde çalışma alanları çalışmaya devam eder ve nerede olursanız olun durumu kontrol edebilirsiniz."
-
 msgid "Add Attachment"
 msgstr "Ek ekle"
 
@@ -2356,6 +2353,9 @@ msgstr "Ajanlar yalnızca bir yer tutucu görür. Paradev, giden isteklere oturu
 
 msgid "Agents that run while you're away"
 msgstr "Siz yokken çalışan ajanlar"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "Ajanlar issue'ları ayıklar, changelog taslakları yazar ve bağımlılıkları kendi başına günceller. Siz PR'ları incelersiniz."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Ajanlar Linear araçlarını çağırırken bu hesabı kullanır."
@@ -2932,9 +2932,6 @@ msgstr "Uygula"
 msgctxt "job application"
 msgid "Apply"
 msgstr "Başvur"
-
-msgid "Approve"
-msgstr "Onayla"
 
 msgid "Approve edits"
 msgstr "Düzenlemeleri onayla"
@@ -4732,6 +4729,9 @@ msgstr "Bulut çalışma alanı — bağlanılıyor"
 msgid "Cloud workspaces"
 msgstr "Bulut çalışma alanları"
 
+msgid "Cloud Workspaces"
+msgstr "Bulut çalışma alanları"
+
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Bulut çalışma alanları {account} için etkin değil. Team ve Ultra planlarıyla gelir: Ayarlar, Faturalandırma bölümünden yükseltin."
@@ -6373,6 +6373,9 @@ msgstr "AI ile oluştur"
 msgid "Create workspace"
 msgstr "Çalışma alanı oluştur"
 
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "CLI, SDK veya MCP üzerinden çalışma alanları oluşturun ve ajanları başlatın."
+
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Herhangi bir terminal veya betikten çalışma alanları oluşturun, ajanlar başlatın ve çıktılarını okuyun. macOS ve Linux."
 
@@ -7561,9 +7564,6 @@ msgstr "ör. Bulut incelemelerim"
 msgid "e.g. plan-budget"
 msgstr "ör. plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "Her ajan kendi Git worktree'sinde ve dalında çalışır, böylece ajanlar birbirlerinin dosyalarının üzerine yazmaz. Hazır olduğunuzda işi inceleyin ve birleştirin."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Her ek en fazla {0} MB olabilir."
@@ -7588,9 +7588,6 @@ msgstr "Her oturum kaldığı yerden devam eder."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Her yüzeyin kendi tipografisi vardır. Değişiklikler canlı önizlemelerde hemen görünür."
-
-msgid "Each task on its own branch"
-msgstr "Her görev kendi dalında"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Her çalışma alanı kendi bulut makinesini alır ve dizüstünüz kapalıyken de çalışmaya devam eder. Masaüstünden, iPhone'dan veya iPad'den kontrol edin."
@@ -7964,9 +7961,6 @@ msgstr "Ultra'daki her şey"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra'daki her şeye ek olarak özel bulut GB-saatleri, SSO ve SAML, SCIM sağlama, IP kısıtlamaları, denetim günlükleri, özel SLA, özel destek ve özel sözleşmeler. Fiyat kuruluşunuza göre belirlenir. Bize ulaşın, size uygun bir paket hazırlayalım."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Her şey betiklenebilir. CLI'den çalışma alanı ve ajan başlatın, SDK ile Paradev'i CI'ye bağlayın veya ajanınızın MCP üzerinden yönetmesine izin verin."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "İlkellerin üzerine kurduğumuz her şey — Paradev özgünleri, ajan arayüzleri için"
@@ -9197,9 +9191,6 @@ msgstr "Tam ekran"
 
 msgid "Full self-driving"
 msgstr "Tam otonomi"
-
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Tüm kaynak kodu GitHub'da MIT Lisansı altındadır. Kodu inceleyin, denetleyin ve katkıda bulunun. Kara kutu yok, gizli işlev yok."
 
 msgid "Funding"
 msgstr "Yatırım"
@@ -10611,9 +10602,6 @@ msgstr "Katılınıyor…"
 msgid "Jump"
 msgstr "Git"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "Tek tıkla en sevdiğiniz düzenleyiciye atlayın. VS Code, Cursor, Xcode, JetBrains IDE'leri veya herhangi bir terminal: worktree'leri tam ihtiyacınız olan yerde açın."
-
 msgid "Jump to a specific date"
 msgstr "Belirli bir tarihe git"
 
@@ -10848,9 +10836,6 @@ msgstr "Son haberler"
 
 msgid "Launch"
 msgstr "Başlatma"
-
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "Özellikler, hata düzeltmeleri ve yeniden düzenlemeler için ajanları paralel başlatın. Tek bakışta durum, hangi ajanların çalıştığını, hangilerinin engellendiğini ve hangilerinin sizi beklediğini gösterir."
 
 msgid "Launch mode"
 msgstr "Başlatma modu"
@@ -11852,6 +11837,9 @@ msgstr "Mobil uygulama"
 
 msgid "Mobile App"
 msgstr "Mobil uygulama"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "Mobil, bulut veya kendi bulutunuz"
 
 msgid "Mode"
 msgstr "Mod"
@@ -13569,9 +13557,6 @@ msgstr "Yine de aç"
 msgid "Open Anyway"
 msgstr "Yine de aç"
 
-msgid "Open Anywhere"
-msgstr "Her yerde aç"
-
 msgid "Open App Store"
 msgstr "App Store’u aç"
 
@@ -13683,9 +13668,6 @@ msgstr "{0} ile aç"
 
 msgid "Open in {app}"
 msgstr "{app} ile aç"
-
-msgid "Open in any IDE"
-msgstr "Herhangi bir IDE'de açın"
 
 msgid "Open in Any IDE"
 msgstr "Herhangi bir IDE'de açın"
@@ -14357,6 +14339,9 @@ msgstr "Paradev, Paradev içinde geliştiriliyor; yani en büyük kullanıcımı
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev mevcut aracınızla çalışacak şekilde tasarlandı; Cursor gibi IDE'lere derin bağlantıyı yerel olarak destekliyoruz, böylece çalışma alanlarınızı ve dosyalarınızı IDE'nizde açabilirsiniz."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev MIT lisanslıdır, yani asla bağlı kalmazsınız. Kodu GitHub'da okuyun veya değiştirin."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev açık kaynaklıdır. Her pull request, inceleme ve hata GitHub'da herkese açık."
 
@@ -14410,6 +14395,9 @@ msgstr "Paradev Eklentileri"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
+
+msgid "Paradev runs on your machine. You decide what connects to it."
+msgstr "Paradev makinenizde çalışır. Ona neyin bağlanacağına siz karar verirsiniz."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
@@ -15268,9 +15256,15 @@ msgstr "Kendi deponuzdan yayımlayın"
 msgid "Publish new versions, rename and share"
 msgstr "Yeni sürümler yayımlayabilir, yeniden adlandırabilir ve paylaşabilir"
 
+msgid "Publish Pages"
+msgstr "Sayfaları yayınlayın"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Yayınlandı"
+
+msgid "Published version 1."
+msgstr "Sürüm 1 yayınlandı."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Token sayılarınızı ve model adlarınızı yayımlar; depo adlarını, dosya yollarını veya istemleri asla yayımlamaz. İstediğiniz zaman ayrılabilirsiniz; ayrıldığınızda yayımladığınız her şey silinir."
@@ -16138,9 +16132,6 @@ msgstr "Depolar"
 msgid "Repos, worktrees and branches"
 msgstr "Depolar, worktree'ler ve dallar"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "Depolar, worktree'ler, terminal çıktısı ve ajan oturumları makinenizde kalır. Bulut eşitlemesi yalnızca hesap ve kuruluş meta verilerini kapsar."
-
 msgid "Repositories"
 msgstr "Depolar"
 
@@ -16762,6 +16753,9 @@ msgstr "Şimdi çalıştır"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Zamanlamayla veya olaylarla çalıştırın, isteğe bağlı çalıştırın, duraklatın, sürdürün ve günlükleri okuyun."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
+msgstr "Özellikler, düzeltmeler ve yeniden düzenlemeler için paralel kodlama ajanları çalıştırın. Her birinin kendi worktree'si ve dalı olur."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Paradev ile paralel kodlama ajanları çalıştırın"
 
@@ -16783,6 +16777,9 @@ msgstr "Terminal komutları çalıştırın ve diğer uygulamalarla etkileşin."
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "Yanında ikinci bir terminal başlatmak yerine, kurulum bittikten sonra ajanı Çalışma Alanı Kurulumu terminalinde çalıştır"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "Gece değerlendirmelerini çalıştır ve gerilemeleri düzelt"
+
 msgid "Run this command?"
 msgstr "Bu komut çalıştırılsın mı?"
 
@@ -16795,14 +16792,8 @@ msgstr "Çalışma alanı komutunu çalıştır"
 msgid "Run Workspace Command"
 msgstr "Çalışma alanı komutunu çalıştır"
 
-msgid "Run workspaces anywhere"
-msgstr "Çalışma alanlarını her yerde çalıştırın"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Ajanlarınızı masaüstünden, herhangi bir terminalden veya telefonunuzdan çalıştırın."
-
-msgid "Run your agents from your phone."
-msgstr "Ajanlarınızı telefonunuzdan çalıştırın."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Kodlama ajanlarınızı bulutta çalıştırın."
@@ -18106,6 +18097,12 @@ msgstr "Oturum açılamadı"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Oturum açılamadı ({reason}). Lütfen tekrar deneyin."
+
+msgid "Sign-up completion"
+msgstr "Kayıt tamamlama"
+
+msgid "Sign-up steps"
+msgstr "Kayıt adımları"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"
@@ -20324,6 +20321,9 @@ msgstr "Katman"
 msgid "Time"
 msgstr "Zaman"
 
+msgid "Time to first workspace"
+msgstr "İlk çalışma alanına kadar geçen süre"
+
 msgid "Time zone"
 msgstr "Saat dilimi"
 
@@ -20641,9 +20641,6 @@ msgstr "Tufte"
 
 msgid "Tunnel established"
 msgstr "Tünel kuruldu"
-
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Rutin işleri zamanlamayla veya bir olay geldiğinde çalışan ajanlara dönüştürün: issue önceliklendirme, değişiklik günlüğü taslakları, bağımlılık güncellemeleri. Kendi başlarına çalışır ve incelemeniz için PR açarlar."
 
 msgid "Turn Fast mode on or off"
 msgstr "Hızlı modu aç veya kapat"
@@ -21176,8 +21173,8 @@ msgstr "Çalışma alanı çalıştırması olarak kullan"
 msgid "Use cases"
 msgstr "Kullanım alanları"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "Her görev için Claude Code, Codex, OpenCode veya herhangi bir kodlama ajanını kullanın. Çalışma alanlarınız, dallarınız ve inceleme akışınız aynı kalır."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Claude Code, Codex, OpenCode veya herhangi bir CLI ajanını kullanın. Çalışma alanlarınız, dallarınız ve incelemeleriniz aynı kalır."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Claude Code, Codex veya herhangi bir kodlama ajanını kullanın. Göreve göre seçin ya da birkaçını yan yana çalıştırın."
@@ -21203,6 +21200,9 @@ msgstr "Paradev’i mobilde kullanın"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro ile Paradev’i telefonunuzda kullanın."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "Elinizdeki ajan planlarını ve API anahtarlarını kullanın. Model çağrıları doğrudan sağlayıcınıza gider."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Paralel kodlama ajanları çalıştırmaya başlamak için masaüstü uygulamasını kullanın."
 
@@ -21226,9 +21226,6 @@ msgstr "Paradev API'yi çağırırken bunu kullanın."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Sesli yazıya dökme ve bas-konuş özelliklerini kullanın."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "Mevcut ajan aboneliklerinizi ve API anahtarlarınızı kullanın. Paradev model çağrılarını asla vekil olarak iletmez ve iş akışınızı tek bir sağlayıcıya kilitlemez."
 
 msgid "Used"
 msgstr "Kullanılan"
@@ -21641,6 +21638,9 @@ msgstr "Haftalık Opus sınırına ulaşıldı"
 
 msgid "Weekly release notes"
 msgstr "Haftalık sürüm notları"
+
+msgid "Weekly sign-up completion"
+msgstr "Haftalık kayıt tamamlama"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Haftalık Sonnet sınırına ulaşıldı"
@@ -22342,8 +22342,8 @@ msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Bulut çalışma alanlarınız artık bu host'a erişemeyecek."
 
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
+msgid "Your code, terminals, and agent sessions stay on your own machine."
+msgstr "Kodunuz, terminalleriniz ve ajan oturumlarınız kendi makinenizde kalır."
 
 msgid "Your download starts automatically."
 msgstr "İndirmen otomatik olarak başlar."

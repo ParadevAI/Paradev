@@ -1,6 +1,6 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { AgentTab, FileChange, WorkspaceData } from "./types";
+import type { AgentTab, FileChange, PagePhase, WorkspaceData } from "./types";
 
 export const WORKSPACES: WorkspaceData[] = [
 	{
@@ -9,7 +9,6 @@ export const WORKSPACES: WorkspaceData[] = [
 		add: 46,
 		del: 1,
 		pr: "#733",
-		isActive: true,
 		status: "working",
 	},
 	{
@@ -148,3 +147,11 @@ export const AUTOMATIONS: AutomationRow[] = [
 		}),
 	},
 ];
+
+export const PAGE_PHASES: readonly PagePhase[] = [
+	"published",
+	"commented",
+	"revised",
+];
+
+export const PAGE_PHASE_MS = [1800, 2400, 5000] as const;

@@ -2018,9 +2018,6 @@ msgstr "Voeg een omgeving toe in Instellingen voordat je een cloudwerkruimte aan
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Verbind nog een account, of verbreek er een die je niet meer gebruikt."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "Voeg elke machine toe als host. Werkruimtes blijven draaien als je laptop slaapt, en je kunt overal vandaan bijchecken."
-
 msgid "Add Attachment"
 msgstr "Bijlage toevoegen"
 
@@ -2356,6 +2353,9 @@ msgstr "Agents zien alleen een placeholder. Paradev voegt je aanmelding toe aan 
 
 msgid "Agents that run while you're away"
 msgstr "Agents die doorwerken als je weg bent"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "Agents sorteren issues, schrijven changelogs en werken dependencies bij, helemaal zelf. Jij reviewt de PR's."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."
@@ -2932,9 +2932,6 @@ msgstr "Toepassen"
 msgctxt "job application"
 msgid "Apply"
 msgstr "Solliciteer"
-
-msgid "Approve"
-msgstr "Goedkeuren"
 
 msgid "Approve edits"
 msgstr "Bewerkingen goedkeuren"
@@ -4732,6 +4729,9 @@ msgstr "Cloudwerkruimte — verbinden"
 msgid "Cloud workspaces"
 msgstr "Cloudwerkruimtes"
 
+msgid "Cloud Workspaces"
+msgstr "Cloudwerkruimtes"
+
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudwerkruimtes zijn niet ingeschakeld voor {account}. Ze horen bij de Team- en Ultra-abonnementen: upgrade in Instellingen, Facturering."
@@ -6373,6 +6373,9 @@ msgstr "Maken met AI"
 msgid "Create workspace"
 msgstr "Werkruimte aanmaken"
 
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "Maak werkruimtes en start agents vanuit de CLI, de SDK of via MCP."
+
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Maak werkruimtes aan, start agents en lees hun output vanuit elke terminal of elk script. macOS en Linux."
 
@@ -7561,9 +7564,6 @@ msgstr "bijv. Mijn cloudreviews"
 msgid "e.g. plan-budget"
 msgstr "bijv. plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "Elke agent werkt in een eigen Git-worktree en branch, zodat agents elkaars bestanden niet overschrijven. Review en merge het werk wanneer je er klaar voor bent."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Elke bijlage is maximaal {0} MB."
@@ -7588,9 +7588,6 @@ msgstr "Elke sessie gaat verder waar die gebleven was."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Elk oppervlak heeft zijn eigen typografie. Wijzigingen zie je meteen in de live previews."
-
-msgid "Each task on its own branch"
-msgstr "Elke taak op een eigen branch"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Elke werkruimte krijgt een eigen cloudmachine en werkt door als je laptop dicht is. Kijk mee op desktop, iPhone of iPad."
@@ -7964,9 +7961,6 @@ msgstr "Alles van Ultra"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Alles van Ultra plus GB-uren in de cloud op maat, SSO & SAML, SCIM-provisioning, IP-beperkingen, auditlogs, een SLA op maat, toegewijde support en contracten op maat. De prijs is afgestemd op je organisatie. Neem contact op en we stellen iets passends samen."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Alles is scriptbaar. Start werkruimtes en agents vanaf de CLI, koppel Paradev aan CI met de SDK, of laat je agent het via MCP aansturen."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Alles wat we boven op de primitives hebben gebouwd — Paradev-originelen, de"
@@ -9197,9 +9191,6 @@ msgstr "Volledig scherm"
 
 msgid "Full self-driving"
 msgstr "Volledig zelfrijdend"
-
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Volledige broncode op GitHub onder de MIT-licentie. Bekijk, audit en draag bij aan de code. Geen black boxes, geen verborgen functionaliteit."
 
 msgid "Funding"
 msgstr "Financiering"
@@ -10611,9 +10602,6 @@ msgstr "Meedoen…"
 msgid "Jump"
 msgstr "Springen"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "Spring met één klik in je favoriete editor. VS Code, Cursor, Xcode, JetBrains-IDE's of welke terminal dan ook: open worktrees precies waar je ze nodig hebt."
-
 msgid "Jump to a specific date"
 msgstr "Naar een specifieke datum gaan"
 
@@ -10848,9 +10836,6 @@ msgstr "Laatste nieuws"
 
 msgid "Launch"
 msgstr "Starten"
-
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "Start agents op features, bugfixes en refactors, allemaal parallel. In één oogopslag zie je welke agents werken, welke vastzitten en welke op jou wachten."
 
 msgid "Launch mode"
 msgstr "Startmodus"
@@ -11852,6 +11837,9 @@ msgstr "Mobiele app"
 
 msgid "Mobile App"
 msgstr "Mobiele app"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "Mobiel, cloud of je eigen cloud"
 
 msgid "Mode"
 msgstr "Modus"
@@ -13569,9 +13557,6 @@ msgstr "Toch openen"
 msgid "Open Anyway"
 msgstr "Toch openen"
 
-msgid "Open Anywhere"
-msgstr "Overal openen"
-
 msgid "Open App Store"
 msgstr "App Store openen"
 
@@ -13683,9 +13668,6 @@ msgstr "Openen in {0}"
 
 msgid "Open in {app}"
 msgstr "Openen in {app}"
-
-msgid "Open in any IDE"
-msgstr "Openen in elke IDE"
 
 msgid "Open in Any IDE"
 msgstr "Openen in elke IDE"
@@ -14357,6 +14339,9 @@ msgstr "Paradev wordt gebouwd in Paradev, dus we zijn zelf onze belangrijkste ge
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev is gemaakt om samen te werken met je bestaande tool; we ondersteunen deeplinks naar IDE's zoals Cursor, zodat je je werkruimtes en bestanden in je IDE kunt openen."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev heeft een MIT-licentie, dus je zit nooit vast. Lees of wijzig de code op GitHub."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev is open source. Elke pull request, review en bug is openbaar op GitHub."
 
@@ -14410,6 +14395,9 @@ msgstr "Paradev Plugins"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev draait lokaal op de machines van je ontwikkelaars. We slaan je code of AI-gesprekken niet op, en Paradev heeft een SOC 2 Type II-audit door een onafhankelijke auditor afgerond. Vraag het rapport aan en bekijk onze securitydocumentatie op {trustHost}."
+
+msgid "Paradev runs on your machine. You decide what connects to it."
+msgstr "Paradev draait op je machine. Jij bepaalt wat er verbinding mee maakt."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev begon in november 2025 als hackathonproject. Het was een simpele desktop-app om worktrees te beheren."
@@ -15268,9 +15256,15 @@ msgstr "Publiceer vanuit je eigen repo"
 msgid "Publish new versions, rename and share"
 msgstr "Nieuwe versies publiceren, hernoemen en delen"
 
+msgid "Publish Pages"
+msgstr "Pagina's publiceren"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Gepubliceerd"
+
+msgid "Published version 1."
+msgstr "Versie 1 gepubliceerd."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Publiceert je tokenaantallen en modelnamen, nooit repositorynamen, bestandspaden of prompts. Je kunt op elk moment stoppen; daarmee wordt alles wat je hebt gepubliceerd verwijderd."
@@ -16138,9 +16132,6 @@ msgstr "Repo's"
 msgid "Repos, worktrees and branches"
 msgstr "Repo's, worktrees en branches"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "Repo's, worktrees, terminaluitvoer en agentsessies blijven op je machine. Cloudsynchronisatie omvat alleen metadata van account en organisatie."
-
 msgid "Repositories"
 msgstr "Repository's"
 
@@ -16762,6 +16753,9 @@ msgstr "Nu uitvoeren"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Draai volgens schema of bij gebeurtenissen, op aanvraag, pauzeer, hervat en lees logs."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch."
+msgstr "Draai parallelle coding agents op features, fixes en refactors. Elke agent krijgt een eigen worktree en branch."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Voer parallelle coding agents uit met Paradev"
 
@@ -16783,6 +16777,9 @@ msgstr "Terminalcommando's uitvoeren en met andere applicaties werken."
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "Draai de agent in de terminal van de werkruimte-setup zodra die klaar is, in plaats van er een tweede terminal naast te starten"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "Voer de nachtelijke evals uit en los regressies op"
+
 msgid "Run this command?"
 msgstr "Deze opdracht uitvoeren?"
 
@@ -16795,14 +16792,8 @@ msgstr "Werkruimtecommando uitvoeren"
 msgid "Run Workspace Command"
 msgstr "Werkruimtecommando uitvoeren"
 
-msgid "Run workspaces anywhere"
-msgstr "Draai werkruimtes overal"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Draai je agents vanaf de desktop, elke terminal of je telefoon."
-
-msgid "Run your agents from your phone."
-msgstr "Draai je agents vanaf je telefoon."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Draai je codeeragents in de cloud."
@@ -18106,6 +18097,12 @@ msgstr "Inloggen mislukt"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Inloggen mislukt ({reason}). Probeer het opnieuw."
+
+msgid "Sign-up completion"
+msgstr "Voltooide aanmeldingen"
+
+msgid "Sign-up steps"
+msgstr "Aanmeldstappen"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ingelogd als <0>{userName}</0>"
@@ -20324,6 +20321,9 @@ msgstr "Tier"
 msgid "Time"
 msgstr "Tijd"
 
+msgid "Time to first workspace"
+msgstr "Tijd tot eerste werkruimte"
+
 msgid "Time zone"
 msgstr "Tijdzone"
 
@@ -20641,9 +20641,6 @@ msgstr "Tufte"
 
 msgid "Tunnel established"
 msgstr "Tunnel opgezet"
-
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Maak van routineklussen agents die op een schema draaien of wanneer er een event binnenkomt: issue-triage, changelog-concepten, dependency-updates. Ze werken zelfstandig en openen PR's die jij kunt reviewen."
 
 msgid "Turn Fast mode on or off"
 msgstr "Snelle modus in- of uitschakelen"
@@ -21176,8 +21173,8 @@ msgstr "Gebruiken als run van de werkruimte"
 msgid "Use cases"
 msgstr "Toepassingen"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "Gebruik Claude Code, Codex, OpenCode of welke coding agent dan ook voor elke taak. Je werkruimtes, branches en reviewproces blijven hetzelfde."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Gebruik Claude Code, Codex, OpenCode of elke CLI-agent. Je werkruimtes, branches en reviews blijven hetzelfde."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Gebruik Claude Code, Codex of welke coding agent dan ook. Kies per taak of laat er meerdere naast elkaar draaien."
@@ -21203,6 +21200,9 @@ msgstr "Gebruik Paradev op je mobiel"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Gebruik Paradev op je telefoon met Pro."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "Gebruik de agentabonnementen en API-sleutels die je al hebt. Modelaanroepen gaan rechtstreeks naar je provider."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Gebruik de desktop-app om parallelle coding agents te draaien."
 
@@ -21226,9 +21226,6 @@ msgstr "Gebruik dit bij het aanroepen van de Paradev-API."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Spraaktranscriptie en push-to-talk gebruiken."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "Gebruik je bestaande agentabonnementen en API-sleutels. Paradev proxyt nooit modelaanroepen en zet je workflow niet vast op één provider."
 
 msgid "Used"
 msgstr "Gebruikt"
@@ -21641,6 +21638,9 @@ msgstr "Weeklimiet Opus bereikt"
 
 msgid "Weekly release notes"
 msgstr "Wekelijkse release notes"
+
+msgid "Weekly sign-up completion"
+msgstr "Voltooide aanmeldingen per week"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Weeklimiet Sonnet bereikt"
@@ -22342,8 +22342,8 @@ msgstr "Je wijzigingen gaan verloren als je ze niet opslaat."
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Je cloudwerkruimtes hebben geen toegang meer tot deze host."
 
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "Je code blijft standaard lokaal, met expliciete controle over gekoppelde diensten."
+msgid "Your code, terminals, and agent sessions stay on your own machine."
+msgstr "Je code, terminals en agentsessies blijven op je eigen machine."
 
 msgid "Your download starts automatically."
 msgstr "Je download start automatisch."
