@@ -32,7 +32,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Run parallel coding agents on features, fixes, and refactors. Each one gets its own worktree and branch.",
+				"Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud.",
 		}),
 	},
 	{

@@ -44,7 +44,7 @@ const SECURITY_FEATURES: {
 		}),
 		description: msg({
 			message:
-				"Your code, terminals, and agent sessions stay on your own machine.",
+				"In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox.",
 		}),
 	},
 	{
@@ -87,7 +87,8 @@ export function SecuritySection() {
 						</h2>
 						<p className="text-base sm:text-lg font-light text-muted-foreground max-w-[700px]">
 							<Trans>
-								Paradev runs on your machine. You decide what connects to it.
+								Local workspaces run on your machine. You decide what connects
+								to them.
 							</Trans>
 						</p>
 					</div>
