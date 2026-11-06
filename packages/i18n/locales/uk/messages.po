@@ -18554,7 +18554,7 @@ msgstr "Припинити стеження"
 msgid "Stop workspace run command"
 msgstr "Зупинити команду запуску робочого простору"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Закрити вашим хмарним робочим просторам доступ до цього хоста?"
 
 msgid "stopped"

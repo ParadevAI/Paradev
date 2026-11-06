@@ -222,7 +222,7 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 							/>
 						</h3>
 						<CloudWorkspaceAccessSection
-							key={host.machineId}
+							key={`${host.organizationId}:${host.machineId}`}
 							organizationId={host.organizationId}
 							machineId={host.machineId}
 							allowed={host.allowCloudWorkspaces ?? false}

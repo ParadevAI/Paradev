@@ -18560,7 +18560,7 @@ msgstr "Прекратить отслеживание"
 msgid "Stop workspace run command"
 msgstr "Остановить команду запуска рабочей области"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Закрыть вашим облачным рабочим областям доступ к этому хосту?"
 
 msgid "stopped"

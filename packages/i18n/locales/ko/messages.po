@@ -18560,7 +18560,7 @@ msgstr "감시 중지"
 msgid "Stop workspace run command"
 msgstr "워크스페이스 실행 명령 중지"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "클라우드 워크스페이스의 이 호스트 접근을 중지할까요?"
 
 msgid "stopped"

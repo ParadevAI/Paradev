@@ -18560,7 +18560,7 @@ msgstr "Ngừng theo dõi"
 msgid "Stop workspace run command"
 msgstr "Dừng lệnh chạy của workspace"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Ngừng cho workspace cloud của bạn truy cập host này?"
 
 msgid "stopped"

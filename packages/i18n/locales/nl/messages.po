@@ -18560,7 +18560,7 @@ msgstr "Stoppen met volgen"
 msgid "Stop workspace run command"
 msgstr "Run-commando van werkruimte stoppen"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Je cloudwerkruimtes geen toegang meer geven tot deze host?"
 
 msgid "stopped"

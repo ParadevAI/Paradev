@@ -18560,7 +18560,7 @@ msgstr "Parar de observar"
 msgid "Stop workspace run command"
 msgstr "Parar o comando de execução da área de trabalho"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Impedir que suas áreas de trabalho na nuvem acessem este host?"
 
 msgid "stopped"

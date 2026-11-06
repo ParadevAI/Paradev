@@ -18560,7 +18560,7 @@ msgstr "İzlemeyi durdur"
 msgid "Stop workspace run command"
 msgstr "Çalışma alanı çalıştırma komutunu durdur"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Bulut çalışma alanlarınızın bu host'a erişimi durdurulsun mu?"
 
 msgid "stopped"

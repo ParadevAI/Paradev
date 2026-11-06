@@ -18560,7 +18560,7 @@ msgstr "Berhenti memantau"
 msgid "Stop workspace run command"
 msgstr "Hentikan perintah run workspace"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Hentikan akses workspace cloud Anda ke host ini?"
 
 msgid "stopped"

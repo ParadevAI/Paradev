@@ -30,7 +30,7 @@ export function CloudWorkspaceAccessConfirmDialog({
 						{targetEnabled ? (
 							<Trans>Let your cloud workspaces reach this host?</Trans>
 						) : (
-							<Trans>Stop your cloud workspaces reaching this host?</Trans>
+							<Trans>Stop your cloud workspaces from reaching this host?</Trans>
 						)}
 					</AlertDialogTitle>
 					<AlertDialogDescription asChild>

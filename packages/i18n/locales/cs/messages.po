@@ -18560,7 +18560,7 @@ msgstr "Přestat sledovat"
 msgid "Stop workspace run command"
 msgstr "Zastavit spouštěcí příkaz pracovního prostoru"
 
-msgid "Stop your cloud workspaces reaching this host?"
+msgid "Stop your cloud workspaces from reaching this host?"
 msgstr "Zakázat vašim cloudovým pracovním prostorům přístup k tomuto hostu?"
 
 msgid "stopped"
