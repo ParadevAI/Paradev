@@ -1,6 +1,7 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
@@ -31,10 +32,11 @@ export function NewCloudWorkspaceDialog({
 		message: "Run the nightly evals and fix any regressions",
 	});
 	const [typed, setTyped] = useState(prompt.length);
+	const reducedMotion = useReducedMotion() ?? false;
 
 	useEffect(() => {
 		if (!active) return;
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		if (reducedMotion) {
 			setTyped(prompt.length);
 			return;
 		}
@@ -52,7 +54,7 @@ export function NewCloudWorkspaceDialog({
 			clearTimeout(start);
 			clearInterval(interval);
 		};
-	}, [active, prompt]);
+	}, [active, prompt, reducedMotion]);
 
 	const ready = typed >= prompt.length;
 
@@ -61,7 +63,7 @@ export function NewCloudWorkspaceDialog({
 			<div className="rounded-2xl border border-white/[0.08] bg-[#1c1c1c]/95 px-4 pt-3.5 pb-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-sm">
 				<div className="h-12 text-[13.5px] leading-relaxed text-foreground/95">
 					{prompt.slice(0, typed)}
-					<span className="ml-px inline-block h-[15px] w-[1.5px] translate-y-[3px] animate-pulse bg-foreground/80" />
+					<span className="ml-px inline-block h-[15px] w-[1.5px] translate-y-[3px] bg-foreground/80 motion-safe:animate-pulse" />
 				</div>
 				<div className="flex items-center gap-3.5 text-[11px]">
 					<LuPlus className="size-4 text-muted-foreground/70" />

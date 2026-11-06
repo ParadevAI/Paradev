@@ -1,8 +1,15 @@
 "use client";
 
-import { m } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
-import { BAYER, CELL, DOT, DRIFT_PER_FRAME, FRAME_MS } from "./constants";
+import {
+	BAYER,
+	CELL,
+	DOT,
+	DRIFT_PER_FRAME,
+	FRAME_MS,
+	MAX_DPR,
+} from "./constants";
 
 const hash = (i: number, j: number) => {
 	const h = Math.sin(i * 127.1 + j * 311.7) * 43758.5453;
@@ -97,6 +104,7 @@ interface DitherCloudsProps {
 export function DitherClouds({ visible, className }: DitherCloudsProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const frameRef = useRef(0);
+	const reducedMotion = useReducedMotion() ?? false;
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -106,7 +114,7 @@ export function DitherClouds({ visible, className }: DitherCloudsProps) {
 		let width = 0;
 		let height = 0;
 		const resize = () => {
-			const dpr = window.devicePixelRatio || 1;
+			const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
 			width = canvas.clientWidth;
 			height = canvas.clientHeight;
 			canvas.width = Math.round(width * dpr);
@@ -114,13 +122,11 @@ export function DitherClouds({ visible, className }: DitherCloudsProps) {
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			draw(ctx, width, height, frameRef.current);
 		};
-		const observer = new ResizeObserver(resize);
-		observer.observe(canvas);
+		const resizeObserver = new ResizeObserver(resize);
+		resizeObserver.observe(canvas);
 		resize();
 
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-			return () => observer.disconnect();
-		}
+		if (reducedMotion) return () => resizeObserver.disconnect();
 
 		let raf = 0;
 		let last = 0;
@@ -131,13 +137,18 @@ export function DitherClouds({ visible, className }: DitherCloudsProps) {
 			frameRef.current += 1;
 			draw(ctx, width, height, frameRef.current);
 		};
-		raf = requestAnimationFrame(tick);
+		const viewObserver = new IntersectionObserver(([entry]) => {
+			cancelAnimationFrame(raf);
+			if (entry?.isIntersecting) raf = requestAnimationFrame(tick);
+		});
+		viewObserver.observe(canvas);
 
 		return () => {
 			cancelAnimationFrame(raf);
-			observer.disconnect();
+			viewObserver.disconnect();
+			resizeObserver.disconnect();
 		};
-	}, [visible]);
+	}, [visible, reducedMotion]);
 
 	return (
 		<m.canvas

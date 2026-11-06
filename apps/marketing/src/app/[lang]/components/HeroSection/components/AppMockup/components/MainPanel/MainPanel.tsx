@@ -38,6 +38,7 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 					className="flex h-full flex-col"
 					initial={false}
 					animate={{ opacity: isDefault ? 1 : 0 }}
+					aria-hidden={!isDefault}
 					transition={{ duration: 0.2 }}
 				>
 					<div>
@@ -145,6 +146,7 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 					animate={{ opacity: isAutomate ? 1 : 0 }}
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					style={{ pointerEvents: isAutomate ? "auto" : "none" }}
+					aria-hidden={!isAutomate}
 				>
 					<div className="mb-5 text-foreground">
 						<span className="text-muted-foreground/55">❯</span>{" "}
@@ -194,6 +196,7 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 					animate={{ opacity: isCloud ? 1 : 0 }}
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					style={{ pointerEvents: isCloud ? "auto" : "none" }}
+					aria-hidden={!isCloud}
 				>
 					<DitherClouds
 						visible={isCloud}
@@ -216,6 +219,7 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 					animate={{ opacity: isPages ? 1 : 0 }}
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					style={{ pointerEvents: isPages ? "auto" : "none" }}
+					aria-hidden={!isPages}
 				>
 					<div className="mb-3 text-foreground">
 						<span className="text-muted-foreground/55">❯</span>{" "}
