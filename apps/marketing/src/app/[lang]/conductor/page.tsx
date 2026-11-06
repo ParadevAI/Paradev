@@ -2,6 +2,7 @@ import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HiCheck, HiXMark } from "react-icons/hi2";
+import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
 import { FAQDisclosure } from "@/app/[lang]/components/FAQDisclosure";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { fetchPlanCatalog } from "@/app/[lang]/pricing/utils/fetchPlanCatalog";
@@ -15,6 +16,7 @@ import {
 	CONDUCTOR_ANNOUNCEMENT_URL,
 	DOES_NOT_TRANSFER,
 	FAQ_ITEMS,
+	HIGHLIGHTS,
 	MIGRATE_CLOUD_URL,
 	MIGRATION_STEPS,
 	TIMELINE,
@@ -22,9 +24,9 @@ import {
 } from "./constants";
 
 const PATH = "/conductor";
-const TITLE = "Conductor Cloud is shutting down — switch to Paradev";
+const TITLE = "Conductor Cloud ends Nov 20. Switch to Paradev";
 const DESCRIPTION =
-	"Conductor Cloud goes read-only on November 13 and shuts down on November 20, 2026. Move your worktrees and agents to Paradev (formerly Superset), the open-source app for parallel coding agents.";
+	"Conductor Cloud shuts down on November 20, 2026. Move your worktrees and agents to Paradev (formerly Superset) in a few minutes. Free and open source.";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -65,23 +67,37 @@ export default async function ConductorPage() {
 					<p className="font-mono text-brand text-xs uppercase tracking-wider">
 						For Conductor users
 					</p>
-					<h1 className="mt-4 text-balance font-medium text-4xl text-foreground tracking-tight sm:text-5xl">
-						Conductor Cloud is shutting down. Bring your agents to Paradev.
+					<h1 className="mt-4 text-balance font-medium text-4xl text-foreground tracking-tight sm:text-6xl">
+						Conductor Cloud ends Nov 20. Move to Paradev in minutes.
 					</h1>
 					<p className="mt-5 max-w-xl text-lg text-muted-foreground leading-relaxed">
-						Conductor Cloud goes read-only on{" "}
-						<strong className="font-medium text-foreground">November 13</strong>{" "}
-						and deletes data after{" "}
-						<strong className="font-medium text-foreground">
-							November 20, 2026
-						</strong>
-						. {BRAND.INTRO_NAME} runs the same model you know: parallel coding
-						agents, each in its own Git worktree and branch.
+						{BRAND.NAME} is open source, so you're never locked in. Run parallel
+						agents the way you're used to, with chat, cloud and mobile built in.
 					</p>
 					<SwitchActions placement="hero" />
 					<p className="mt-4 text-muted-foreground text-xs">
-						Free for one user. Open source under the MIT License.
+						Free for one user. Open source under MIT.
 					</p>
+				</section>
+
+				<section aria-label="What you get" className="mt-16 sm:mt-20">
+					<ul className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+						{HIGHLIGHTS.map((item) => (
+							<li key={item.title} className="bg-background p-6">
+								<h2 className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+									{item.title}
+									{item.beta && (
+										<span className="border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+											Beta
+										</span>
+									)}
+								</h2>
+								<p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+									{item.detail}
+								</p>
+							</li>
+						))}
+					</ul>
 				</section>
 
 				<section className="mt-24 sm:mt-32" aria-labelledby="timeline">
@@ -89,16 +105,15 @@ export default async function ConductorPage() {
 						id="timeline"
 						className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl"
 					>
-						The dates that matter
+						Key dates
 					</h2>
 					<p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
-						Congratulations to the Conductor team on joining Meta. Here is what
-						changes for people who use Conductor today, from{" "}
+						Congrats to the Conductor team on joining Meta. Dates are from{" "}
 						<a
 							href={CONDUCTOR_ANNOUNCEMENT_URL}
 							className="text-foreground underline underline-offset-4 hover:text-brand"
 						>
-							Conductor's announcement
+							their announcement
 						</a>
 						.
 					</p>
@@ -134,11 +149,11 @@ export default async function ConductorPage() {
 						id="migrate-heading"
 						className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl"
 					>
-						Move in about five minutes
+						Switch in four steps
 					</h2>
 					<p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
-						Your Conductor workspaces are ordinary Git worktrees, so Paradev
-						adopts them where they are.
+						Conductor workspaces are plain Git worktrees. Paradev uses them
+						where they are.
 					</p>
 					<ol className="mt-10 border-border border-t">
 						{MIGRATION_STEPS.map((step, index) => (
@@ -161,6 +176,14 @@ export default async function ConductorPage() {
 									<p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
 										{step.detail}
 									</p>
+									{step.download && (
+										<DownloadLink
+											source="conductor"
+											className="mt-4 inline-block bg-foreground px-5 py-2.5 font-medium text-background text-sm transition-opacity hover:opacity-90"
+										>
+											Download Paradev
+										</DownloadLink>
+									)}
 									{step.link && (
 										<a
 											href={step.link.href}
@@ -180,7 +203,7 @@ export default async function ConductorPage() {
 						id="compare"
 						className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl"
 					>
-						Conductor and Paradev side by side
+						Side by side
 					</h2>
 					<div className="mt-10 overflow-x-auto">
 						<table className="w-full min-w-[36rem] border-collapse text-left text-sm">
@@ -229,8 +252,7 @@ export default async function ConductorPage() {
 						</table>
 					</div>
 					<p className="mt-4 text-muted-foreground text-sm">
-						Conductor details come from Conductor's public documentation and
-						announcement. Read the{" "}
+						Conductor details are from its public docs. See the{" "}
 						<Link
 							href={COMPARE_PATH}
 							className="text-foreground underline underline-offset-4 hover:text-brand"
@@ -248,9 +270,10 @@ export default async function ConductorPage() {
 					>
 						What comes with you
 					</h2>
+
 					<div className="mt-10 grid gap-10 md:grid-cols-2">
 						<div>
-							<h3 className="font-medium text-foreground">Transfers</h3>
+							<h3 className="font-medium text-foreground">Comes with you</h3>
 							<ul className="mt-4 space-y-3">
 								{TRANSFERS.map((item) => (
 									<li
@@ -267,7 +290,7 @@ export default async function ConductorPage() {
 							</ul>
 						</div>
 						<div>
-							<h3 className="font-medium text-foreground">Does not transfer</h3>
+							<h3 className="font-medium text-foreground">Stays behind</h3>
 							<ul className="mt-4 space-y-3">
 								{DOES_NOT_TRANSFER.map((item) => (
 									<li
@@ -291,7 +314,7 @@ export default async function ConductorPage() {
 						id="faq"
 						className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl"
 					>
-						Questions from Conductor users
+						FAQ
 					</h2>
 					<div className="mt-8 max-w-3xl border-border border-t">
 						{faqItems.map((item) => (
@@ -316,19 +339,18 @@ export default async function ConductorPage() {
 				</section>
 
 				<section className="mt-24 border border-border p-8 sm:mt-32 sm:p-12">
-					<h2 className="font-medium text-2xl text-foreground tracking-tight sm:text-3xl">
-						Keep your agents running.
+					<h2 className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl">
+						Move your agents before Nov 20.
 					</h2>
 					<p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
-						Install Paradev, import your Conductor worktrees, and pick up where
-						you left off. Using Conductor Cloud? Start with the{" "}
+						It takes a few minutes. On Conductor Cloud? Start with the{" "}
 						<a
 							href={MIGRATE_CLOUD_URL}
 							className="text-foreground underline underline-offset-4 hover:text-brand"
 						>
 							cloud guide
-						</a>{" "}
-						before November 20.
+						</a>
+						.
 					</p>
 					<SwitchActions placement="footer" />
 					<p className="mt-6 text-muted-foreground text-xs">

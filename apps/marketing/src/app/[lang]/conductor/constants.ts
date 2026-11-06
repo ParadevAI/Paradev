@@ -11,6 +11,33 @@ interface TextLink {
 	href: string;
 }
 
+interface Highlight {
+	title: string;
+	detail: string;
+	beta?: boolean;
+}
+
+export const HIGHLIGHTS: Highlight[] = [
+	{
+		title: "No lock-in",
+		detail:
+			"Open source under MIT. Use any agent on your own subscriptions and keys.",
+	},
+	{
+		title: "Chat",
+		detail: "A chat UI built for agents. Picks up your Claude Code sessions.",
+	},
+	{
+		title: "Cloud",
+		detail: "Agents keep working when your laptop is closed.",
+		beta: true,
+	},
+	{
+		title: "Mobile",
+		detail: "Check on agents and review their work from iPhone or iPad.",
+	},
+];
+
 interface TimelineEntry {
 	date: string;
 	dateTime: string;
@@ -21,33 +48,30 @@ interface TimelineEntry {
 
 export const TIMELINE: TimelineEntry[] = [
 	{
-		date: "Nov 4, 2026",
+		date: "Nov 4",
 		dateTime: "2026-11-04",
 		title: "Conductor joins Meta",
-		detail: "The Conductor team announces it is joining Meta.",
+		detail: "The team announced the news.",
 	},
 	{
-		date: "Nov 13, 2026",
+		date: "Nov 13",
 		dateTime: "2026-11-13",
-		title: "Conductor Cloud goes read-only",
-		detail:
-			"You can still read chats and export data, but you cannot send messages to agents.",
+		title: "Cloud goes read-only",
+		detail: "You can read and export, but not run agents.",
 		urgent: true,
 	},
 	{
-		date: "Nov 20, 2026",
+		date: "Nov 20",
 		dateTime: "2026-11-20",
-		title: "Conductor Cloud shuts down",
-		detail:
-			"Conductor begins to delete cloud data. Push branches and export chats before this date.",
+		title: "Cloud shuts down",
+		detail: "Cloud data gets deleted. Push your branches first.",
 		urgent: true,
 	},
 	{
 		date: "Early 2027",
 		dateTime: "2027",
-		title: "The Mac app winds down",
-		detail:
-			"The local Conductor app keeps working until then, so local work can move at your own pace.",
+		title: "Mac app winds down",
+		detail: "Local work can move at your own pace.",
 	},
 ];
 
@@ -55,39 +79,35 @@ interface MigrationStep {
 	title: string;
 	detail: string;
 	link?: TextLink;
+	/** Render the tracked download button (source "conductor") under the step. */
+	download?: boolean;
 	optional?: boolean;
 }
 
 export const MIGRATION_STEPS: MigrationStep[] = [
 	{
-		title: "Install Paradev",
-		detail:
-			"Download the desktop app for macOS. A Linux AppImage is available as an experimental build.",
+		title: "Download Paradev",
+		detail: "Free for one user. macOS, with an experimental Linux build.",
+		download: true,
 	},
 	{
-		title: "Sign in",
+		title: "Add your repos",
 		detail:
-			"Create an account or sign in. The Free plan covers one user with local workspaces.",
-	},
-	{
-		title: "Add your repos and worktrees",
-		detail:
-			"Add the same repository folders Conductor used. Paradev finds Conductor's worktrees and imports them in place, with their branches and uncommitted changes. Nothing is copied or moved.",
+			"Paradev finds your Conductor worktrees and imports them in place, with uncommitted changes.",
 		link: { label: "Migration guide", href: MIGRATE_LOCAL_URL },
 	},
 	{
 		title: "Pick your agents",
-		detail:
-			"Claude Code, Codex, Cursor Agent, and OpenCode run on the subscriptions and keys you already have. Add any other CLI as a custom agent.",
+		detail: "They run on the subscriptions and keys you already have.",
 		link: {
 			label: "Supported agents",
 			href: `${COMPANY.DOCS_URL}/supported-agents`,
 		},
 	},
 	{
-		title: "Add cloud workspaces",
+		title: "Move cloud work",
 		detail:
-			"Coming from Conductor Cloud? Push your branches, then continue on your Mac or in a Paradev cloud workspace on the Team or Ultra plan.",
+			"Push your branches, then keep going on your Mac or in a Paradev cloud workspace.",
 		link: { label: "Conductor Cloud guide", href: MIGRATE_CLOUD_URL },
 		optional: true,
 	},
@@ -104,75 +124,65 @@ interface ComparisonRow {
 export const COMPARISON_ROWS: ComparisonRow[] = [
 	{
 		label: "Status",
-		paradev: "Available and open to new users",
-		conductor:
-			"Joining Meta. Cloud shuts down Nov 20, 2026. The Mac app winds down in early 2027",
+		paradev: "Available",
+		conductor: "Cloud ends Nov 20. Mac app ends early 2027",
 	},
 	{
-		label: "Workspace model",
-		paradev: "One Git worktree and branch per task",
-		conductor: "One Git worktree and branch per task",
+		label: "Worktree per task",
+		paradev: "Yes",
+		conductor: "Yes",
 	},
 	{
 		label: "Agents",
-		paradev:
-			"Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Copilot, Amp, and any CLI agent you add",
+		paradev: "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI",
 		conductor: "Claude Code, Codex, Cursor, OpenCode",
 	},
 	{
 		label: "Cloud workspaces",
-		paradev: "On Team and Ultra plans",
-		conductor: "Read-only Nov 13, shut down Nov 20, 2026",
+		paradev: "Team and Ultra plans",
+		conductor: "Shuts down Nov 20",
 		beta: true,
 	},
 	{
-		label: "Review",
-		paradev:
-			"Changes pane to commit, push, and open PRs; checks and review threads",
-		conductor: "Diffs, checks, pull requests",
+		label: "Chat UI",
+		paradev: "Yes, resumes Claude Code sessions",
+		conductor: "Yes",
 	},
 	{
-		label: "Scheduled runs",
-		paradev: "Automations on your machine, a host, or the cloud",
-		conductor: "Routines, which end with Conductor Cloud",
+		label: "Automations",
+		paradev: "Local, on a host, or in the cloud",
+		conductor: "Routines, ending with Cloud",
 	},
 	{
 		label: "Phone",
-		paradev: "iPhone and iPad app on paid plans",
-		conductor: "iOS app for cloud workspaces, which shut down Nov 20",
+		paradev: "iPhone and iPad",
+		conductor: "iOS app, ending Nov 20",
 	},
 	{
-		label: "Programmatic control",
-		paradev: "CLI, TypeScript SDK, and MCP server",
-		conductor: "API and MCP server",
-	},
-	{
-		label: "Desktop platforms",
-		paradev: "macOS; Linux (experimental). No Windows yet",
+		label: "Platforms",
+		paradev: "macOS, Linux (experimental)",
 		conductor: "macOS",
 	},
 	{
-		label: "Pricing",
-		paradev:
-			"Free for one user; Pro {{price:pro}} per user/month; Team {{price:team}} per user/month",
-		unpricedParadev: "Free for one user; paid Pro, Team, and Ultra plans",
+		label: "Price",
+		paradev: "Free for one user. Pro from {{price:pro}}/user/mo",
+		unpricedParadev: "Free for one user. Paid plans per user",
 		conductor: "No longer on sale",
 	},
 ];
 
 export const TRANSFERS: string[] = [
-	"Your repositories, worktrees, and branches, imported in place",
-	"Uncommitted changes in those worktrees",
-	"Your agent subscriptions and API keys",
-	"Setup, run, and archive scripts, after you convert conductor.json to .paradev/config.json",
-	"Claude Code sessions: run claude --resume in an imported workspace (Claude Code deletes sessions older than 30 days by default)",
+	"Repos, worktrees and branches",
+	"Uncommitted changes",
+	"Your agent subscriptions and keys",
+	"Claude Code sessions, with claude --resume",
+	"Setup scripts, once you convert conductor.json",
 ];
 
 export const DOES_NOT_TRANSFER: string[] = [
-	"Conductor's chat history. No tool, Paradev included, can import it. Export it from Conductor under Settings → Account → Export data",
-	"Unpushed work in Conductor Cloud. Commit and push every branch before November 20",
-	"Git-ignored files in cloud workspaces, such as .env files. Copy them out yourself",
-	"CONDUCTOR_PORT. Paradev detects the ports each workspace listens on instead of assigning them",
+	"Conductor chat history. Export it in Conductor under Settings → Account",
+	"Unpushed Cloud work. Push before Nov 20",
+	"Git-ignored files in Cloud, like .env. Copy them out",
 ];
 
 interface FaqItem {
@@ -188,14 +198,14 @@ export const FAQ_ITEMS: FaqItem[] = [
 		id: "open-source",
 		question: "Is Paradev open source?",
 		answer:
-			"Yes. Paradev (formerly Superset) is open source under the MIT License, and the code is on GitHub.",
+			"Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in.",
 		link: { label: "View on GitHub", href: COMPANY.GITHUB_URL },
 	},
 	{
 		id: "model-calls",
 		question: "Do you proxy my model calls?",
 		answer:
-			"No. Agents use your own subscriptions and keys, and the provider bills you directly. On your own machine, agents call their providers without Paradev in between. In cloud workspaces, no key is copied into the sandbox: agents see a placeholder, and Paradev adds your sign-in to their outgoing requests.",
+			"Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. Paradev adds your sign-in to outgoing requests.",
 		link: {
 			label: "Cloud credentials",
 			href: `${COMPANY.DOCS_URL}/cloud-workspaces#credentials`,
@@ -203,31 +213,30 @@ export const FAQ_ITEMS: FaqItem[] = [
 	},
 	{
 		id: "windows",
-		question: "Does Paradev run on Windows?",
+		question: "Does it run on Windows?",
 		answer:
-			"Not yet. The desktop app runs on macOS, and Linux is available as an experimental AppImage. On Windows, you can join the waitlist from the download button.",
+			"Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button.",
 	},
 	{
 		id: "pricing",
-		question: "How much does Paradev cost?",
+		question: "How much does it cost?",
 		answer:
-			"Paradev is free for one user with local workspaces. Pro is {{price:pro}} per user/month, or {{price:pro:yearly}} billed yearly, and adds remote access, automations, and the mobile app. Team is {{price:team}} per user/month, or {{price:team:yearly}} billed yearly, and adds cloud workspaces (beta). Agent-provider usage is billed separately by the provider.",
+			"Free for one user. Pro is {{price:pro}} per user per month and adds automations and the mobile app. Team is {{price:team}} and adds cloud workspaces.",
 		unpricedAnswer:
-			"Paradev is free for one user with local workspaces. Paid plans are priced per user per month: Pro adds remote access, automations, and the mobile app, and Team adds cloud workspaces (beta). Agent-provider usage is billed separately by the provider.",
+			"Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces.",
 		link: { label: "See pricing", href: "/pricing" },
 	},
 	{
 		id: "team",
 		question: "Can my team share workspaces?",
-		answer:
-			"Yes, on paid plans. Members of a Paradev organization can work on the hosts you grant them access to, and cloud environments are visible to the whole organization by default.",
+		answer: "Yes, on paid plans.",
 		link: { label: "Cloud workspaces", href: "/cloud" },
 	},
 	{
 		id: "cloud-data",
 		question: "What happens to my Conductor Cloud data?",
 		answer:
-			"Conductor Cloud goes read-only on November 13, 2026, and Conductor begins to delete cloud data after it shuts down on November 20. Paradev cannot reach or import that data. Before then, push every branch, copy out any Git-ignored files you need, and export your chats from Conductor. You can also transfer a cloud workspace to your Mac in Conductor, then import it into Paradev.",
+			"Conductor deletes it after Nov 20, and Paradev can't reach it. Push your branches and export your chats before then.",
 		link: { label: "Conductor Cloud guide", href: MIGRATE_CLOUD_URL },
 	},
 ];
