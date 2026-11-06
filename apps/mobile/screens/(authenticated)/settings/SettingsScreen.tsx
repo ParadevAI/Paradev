@@ -359,8 +359,10 @@ export function SettingsScreen() {
 						}
 						label={t({ message: "Chat interface" })}
 						subtitle={t({
-							message: "Open Claude and Codex sessions as chats",
+							message:
+								"Open Claude Code, Codex, OpenCode, and Pi sessions as chats",
 						})}
+						subtitleLines={3}
 						trailing={
 							<Switch
 								value={acpChatEnabled}

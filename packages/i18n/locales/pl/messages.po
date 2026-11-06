@@ -13602,11 +13602,11 @@ msgstr "Otwórz ustawienia administratora ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Otwórz ustawienia ChatGPT"
 
-msgid "Open Claude and Codex sessions as chats"
-msgstr "Otwieraj sesje Claude i Codex jako czaty"
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
+msgstr "Otwieraj sesje Claude Code, Codex, OpenCode i Pi jako czaty"
 
-msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
-msgstr "Otwieraj sesje Claude i Codex w panelu czatu zamiast w terminalu."
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
+msgstr "Otwieraj sesje Claude Code, Codex, OpenCode i Pi w panelu czatu zamiast w terminalu."
 
 msgid "Open Command Palette"
 msgstr "Otwórz paletę poleceń"
