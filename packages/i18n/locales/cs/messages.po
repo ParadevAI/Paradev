@@ -10130,7 +10130,7 @@ msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
-msgstr "Nainstalujte aplikaci GitHub Paradev do každé organizace nebo účtu GitHub, jejichž repozitáře chcete připojit."
+msgstr "Nainstalujte aplikaci Paradev GitHub App do každé organizace nebo účtu GitHub, jejichž repozitáře chcete připojit."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Instalujte, autorizujte a omezujte MCP servery napříč všemi pracovními prostory z jednoho místa, s centrálním OAuth."
@@ -17515,6 +17515,9 @@ msgstr "Setup skript"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Nastavení se zastavilo. Důvod je ve výstupu níže."
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Je připojeno více účtů GitHub. Ve webové aplikaci vyberte účet, který chcete odpojit, nebo aktualizujte CLI."
 
 msgid "Sexual content"
 msgstr "Sexuální obsah"

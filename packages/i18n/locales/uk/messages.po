@@ -17510,6 +17510,9 @@ msgstr "Скрипт налаштування"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Налаштування зупинено. Причину вказано у виводі нижче."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Під’єднано кілька облікових записів GitHub. Виберіть у вебзастосунку, який від’єднати, або оновіть CLI."
+
 msgid "Sexual content"
 msgstr "Сексуальний контент"
 

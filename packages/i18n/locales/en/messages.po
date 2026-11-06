@@ -17516,6 +17516,9 @@ msgstr "Setup script"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Setup stopped. The reason is in the output below."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+
 msgid "Sexual content"
 msgstr "Sexual content"
 

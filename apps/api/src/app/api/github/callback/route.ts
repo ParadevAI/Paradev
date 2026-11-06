@@ -89,7 +89,7 @@ export async function GET(request: Request) {
 		});
 
 		if (!savedInstallation) {
-			return exit(`${settingsUrl}?error=save_failed`);
+			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
 		// Queue initial sync job. In development the queue cannot reach

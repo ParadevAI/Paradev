@@ -59,11 +59,23 @@ export const githubRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 
-			// Released clients send no id after confirming the account that
-			// `getInstallation` showed them, so only that one goes.
-			const installationId =
-				input.installationId ??
-				(await organizationInstallations(input.organizationId))[0]?.id;
+			let installationId = input.installationId;
+			if (!installationId) {
+				// Released clients send no id. With several accounts there is no
+				// telling which one they confirmed, so refuse rather than guess.
+				const installations = await organizationInstallations(
+					input.organizationId,
+				);
+				if (installations.length > 1) {
+					throw userError({
+						code: "PRECONDITION_FAILED",
+						message:
+							"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
+						i18nKey: "serverError.integration.severalGithubAccountsConnected",
+					});
+				}
+				installationId = installations[0]?.id;
+			}
 			if (!installationId) {
 				return { success: false, error: "No installation found" };
 			}
@@ -121,6 +133,7 @@ export const githubRouter = {
 			}
 
 			const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
+			const publishFailures: unknown[] = [];
 			for (const installation of installations) {
 				const syncBody = {
 					installationDbId: installation.id,
@@ -137,13 +150,22 @@ export const githubRouter = {
 						console.error("[github/triggerSync] Dev sync failed:", error);
 					});
 				} else {
-					await qstash.publishJSON({
-						url: syncUrl,
-						body: syncBody,
-						retries: 3,
-					});
+					try {
+						await qstash.publishJSON({
+							url: syncUrl,
+							body: syncBody,
+							retries: 3,
+						});
+					} catch (error) {
+						console.error(
+							`[github/triggerSync] Failed to queue sync for installation ${installation.id}:`,
+							error,
+						);
+						publishFailures.push(error);
+					}
 				}
 			}
+			if (publishFailures.length > 0) throw publishFailures[0];
 
 			return { success: true };
 		}),

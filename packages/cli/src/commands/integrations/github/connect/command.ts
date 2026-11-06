@@ -46,7 +46,11 @@ export default command({
 		if (options.noWait) {
 			return { data: { url }, message: instructions };
 		}
-		process.stderr.write(`${instructions}\nWaiting for the installation…\n`);
+		const waiting =
+			existing.length > 0
+				? "Waiting for a new GitHub account… Picking an account that is already connected only updates its repository access; press Ctrl+C once you have saved it."
+				: "Waiting for the installation…";
+		process.stderr.write(`${instructions}\n${waiting}\n`);
 
 		const deadline = Date.now() + POLL_TIMEOUT_MS;
 		while (Date.now() < deadline) {

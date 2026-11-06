@@ -107,7 +107,10 @@ export default async function GitHubIntegrationPage() {
 	const installations = await trpc.integration.github.listInstallations.query({
 		organizationId: organization.id,
 	});
-	const isConnected = installations.length > 0;
+	const hasInstallations = installations.length > 0;
+	const isConnected = installations.some(
+		(installation) => !installation.suspended,
+	);
 
 	return (
 		<div className="space-y-8">
@@ -193,7 +196,7 @@ export default async function GitHubIntegrationPage() {
 				</CardContent>
 			</Card>
 
-			{isConnected && (
+			{hasInstallations && (
 				<Card>
 					<CardHeader>
 						<CardTitle>

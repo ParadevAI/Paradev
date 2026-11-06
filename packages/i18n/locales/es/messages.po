@@ -17516,6 +17516,9 @@ msgstr "Script de setup"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "La configuración se detuvo. El motivo aparece en la salida de abajo."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Hay varias cuentas de GitHub conectadas. Elige cuál desconectar en la aplicación web o actualiza la CLI."
+
 msgid "Sexual content"
 msgstr "Contenido sexual"
 

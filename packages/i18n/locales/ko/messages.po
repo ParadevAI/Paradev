@@ -17516,6 +17516,9 @@ msgstr "설정 스크립트"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "설정이 중지되었습니다. 이유는 아래 출력에 있습니다."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "여러 GitHub 계정이 연결되어 있습니다. 웹 앱에서 연결을 해제할 계정을 선택하거나 CLI를 업데이트하세요."
+
 msgid "Sexual content"
 msgstr "성적인 콘텐츠"
 

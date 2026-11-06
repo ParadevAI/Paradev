@@ -17516,6 +17516,9 @@ msgstr "Скрипт установки"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Настройка остановлена. Причина указана в выводе ниже."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Подключено несколько аккаунтов GitHub. Выберите, какой отключить, в веб-приложении или обновите CLI."
+
 msgid "Sexual content"
 msgstr "Сексуальный контент"
 

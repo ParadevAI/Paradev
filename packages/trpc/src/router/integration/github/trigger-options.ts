@@ -63,8 +63,8 @@ const people: TriggerOptionSource = async ({ organizationId }) => {
 	const seen = new Map<string, string>();
 	for (const installation of installations) {
 		if (seen.size >= MAX_PEOPLE) break;
-		const octokit = await installationOctokit(installation.installationId);
 		try {
+			const octokit = await installationOctokit(installation.installationId);
 			if (installation.accountType === "Organization") {
 				await collect(seen, (page) =>
 					octokit.request("GET /orgs/{org}/members", {
@@ -73,13 +73,15 @@ const people: TriggerOptionSource = async ({ organizationId }) => {
 						page,
 					}),
 				);
-			} else {
-				const repositories = await db.query.githubRepositories.findMany({
-					where: eq(githubRepositories.installationId, installation.id),
-					columns: { owner: true, name: true },
-				});
-				for (const repository of repositories) {
-					if (seen.size >= MAX_PEOPLE) break;
+				continue;
+			}
+			const repositories = await db.query.githubRepositories.findMany({
+				where: eq(githubRepositories.installationId, installation.id),
+				columns: { owner: true, name: true },
+			});
+			for (const repository of repositories) {
+				if (seen.size >= MAX_PEOPLE) break;
+				try {
 					await collect(seen, (page) =>
 						octokit.request("GET /repos/{owner}/{repo}/collaborators", {
 							owner: repository.owner,
@@ -88,11 +90,17 @@ const people: TriggerOptionSource = async ({ organizationId }) => {
 							page,
 						}),
 					);
+				} catch (error) {
+					if (!isPermissionError(error)) throw error;
+					console.warn(
+						`[integration.github] collaborators refused for ${repository.owner}/${repository.name}:`,
+						error,
+					);
 				}
 			}
 		} catch (error) {
 			// The App was installed without the members permission (or the
-			// repository is gone): skip this account, not a red editor.
+			// installation is gone): skip this account, not a red editor.
 			if (!isPermissionError(error)) throw error;
 			console.warn("[integration.github] people refused:", error);
 		}

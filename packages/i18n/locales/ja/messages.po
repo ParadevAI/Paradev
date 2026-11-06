@@ -7149,7 +7149,7 @@ msgid "Disconnect"
 msgstr "切断"
 
 msgid "Disconnect {accountLogin}?"
-msgstr "{accountLogin} を切断しますか？"
+msgstr "{accountLogin}の接続を解除しますか？"
 
 msgid "Disconnect {credential}?"
 msgstr "{credential}の接続を解除しますか？"
@@ -17515,6 +17515,9 @@ msgstr "セットアップスクリプト"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "設定が停止しました。理由は下の出力に表示されています。"
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "複数の GitHub アカウントが接続されています。Web アプリで接続を解除するアカウントを選ぶか、CLI を更新してください。"
 
 msgid "Sexual content"
 msgstr "性的なコンテンツ"

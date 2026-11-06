@@ -15963,7 +15963,7 @@ msgid "Repositories accessible through your connected GitHub accounts."
 msgstr "Repositories, die über deine verbundenen GitHub-Konten erreichbar sind."
 
 msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
-msgstr "Repositories von {accountLogin} werden nicht mehr synchronisiert. Andere verbundene GitHub-Konten sind nicht betroffen. Die GitHub-App bleibt auf {accountLogin} installiert, und du kannst sie jederzeit wieder verbinden."
+msgstr "Repositories von {accountLogin} werden nicht mehr synchronisiert. Andere verbundene GitHub-Konten sind nicht betroffen. Die GitHub-App bleibt für {accountLogin} installiert, und du kannst sie jederzeit wieder verbinden."
 
 msgid "Repositories refreshed"
 msgstr "Repositories aktualisiert"
@@ -17515,6 +17515,9 @@ msgstr "Setup-Skript"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Die Einrichtung wurde angehalten. Den Grund siehst du in der Ausgabe unten."
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Mehrere GitHub-Konten sind verbunden. Wähle in der Web-App das Konto aus, das du trennen willst, oder aktualisiere die CLI."
 
 msgid "Sexual content"
 msgstr "Sexuelle Inhalte"

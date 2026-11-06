@@ -17516,6 +17516,9 @@ msgstr "Skrip setup"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Penyiapan berhenti. Alasannya ada di output di bawah."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Beberapa akun GitHub terhubung. Pilih akun yang ingin diputuskan di aplikasi web, atau perbarui CLI."
+
 msgid "Sexual content"
 msgstr "Konten seksual"
 

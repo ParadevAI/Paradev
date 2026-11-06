@@ -17516,6 +17516,9 @@ msgstr "设置脚本"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "设置已停止。原因见下方输出。"
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "已连接多个 GitHub 账号。请在网页应用中选择要断开连接的账号，或更新 CLI。"
+
 msgid "Sexual content"
 msgstr "色情内容"
 

@@ -17516,6 +17516,9 @@ msgstr "Script thiết lập"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Quá trình thiết lập đã dừng. Lý do có trong output bên dưới."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Có nhiều tài khoản GitHub đang được kết nối. Hãy chọn tài khoản cần ngắt kết nối trong ứng dụng web hoặc cập nhật CLI."
+
 msgid "Sexual content"
 msgstr "Nội dung tình dục"
 

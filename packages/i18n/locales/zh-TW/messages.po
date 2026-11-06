@@ -17516,6 +17516,9 @@ msgstr "設定指令碼"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "設定已停止。原因請見下方輸出。"
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "已連接多個 GitHub 帳號。請在網頁應用程式中選擇要中斷連線的帳號，或更新 CLI。"
+
 msgid "Sexual content"
 msgstr "色情內容"
 

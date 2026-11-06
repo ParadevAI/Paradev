@@ -14,7 +14,7 @@ import {
 } from "@superset/ui/alert-dialog";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Unplug } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FaGithub } from "react-icons/fa";
@@ -36,10 +36,18 @@ export function InstallationRow({
 }: InstallationRowProps) {
 	const trpc = useTRPC();
 	const router = useRouter();
+	const queryClient = useQueryClient();
 
 	const disconnectMutation = useMutation(
 		trpc.integration.github.disconnect.mutationOptions({
-			onSuccess: () => router.refresh(),
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.integration.github.listRepositories.queryKey({
+						organizationId,
+					}),
+				});
+				router.refresh();
+			},
 		}),
 	);
 
