@@ -1,7 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import type { ChatSelections } from "@superset/chat/core";
-import type { SessionConfigOption } from "@superset/chat/protocol";
+import {
+	AGENT_DEFAULT_MODE,
+	type SessionConfigOption,
+} from "@superset/chat/protocol";
 import type { HarnessStartOptions } from "../../harness";
 import { FakeHarness } from "../../harness/fake";
 import { createTestRuntime } from "../../testing/testRuntime";
@@ -54,6 +57,11 @@ function selectionRuntime() {
 			this.emit({ kind: "session", session: { configOptions: this.options } });
 			return Promise.resolve(true);
 		}
+
+		override setMode(modeId: string): Promise<boolean> {
+			if (modeId === "refused") return Promise.resolve(false);
+			return super.setMode(modeId);
+		}
 	}
 	const harness = () =>
 		new SelectableHarness({
@@ -75,8 +83,10 @@ function selectionRuntime() {
 		harness: string,
 		extra: {
 			modelId?: string;
+			modeId?: string;
 			replacesSessionId?: string;
 			headless?: boolean;
+			rememberSelections?: boolean;
 		} = {},
 	) =>
 		runtime.commands.createSession({
@@ -86,6 +96,8 @@ function selectionRuntime() {
 			cwd: "/tmp/workspace",
 			...(extra.headless ? {} : { interactive: true }),
 			...(extra.modelId ? { modelId: extra.modelId } : {}),
+			...(extra.modeId ? { modeId: extra.modeId } : {}),
+			...(extra.rememberSelections ? { rememberSelections: true } : {}),
 			...(extra.replacesSessionId
 				? {
 						resume: {
@@ -95,6 +107,7 @@ function selectionRuntime() {
 					}
 				: {}),
 		});
+	const settled = () => new Promise((resolve) => setTimeout(resolve, 0));
 	const idle = (sessionId: string) =>
 		waitFor(() => runtime.live.get(sessionId)?.state.status === "idle");
 	const pick = async (sessionId: string) => {
@@ -123,6 +136,12 @@ function selectionRuntime() {
 			sessionId,
 			modeId: "plan",
 		});
+		runtime.commands.setMode({
+			commandId: randomUUID(),
+			sessionId,
+			modeId: "refused",
+		});
+		await settled();
 	};
 	return { runtime, starts, create, idle, pick };
 }
@@ -157,6 +176,28 @@ describe("chat selections", () => {
 		expect(starts[1]).toEqual({
 			modelId: "deepseek-v4.1-flash",
 			effortId: "high",
+		});
+		await runtime.dispose();
+	});
+
+	test("picks a chat is opened with are remembered when the client says they are the user's own", async () => {
+		const { runtime, starts, create } = selectionRuntime();
+
+		create(OTHER_HARNESS, {
+			modelId: "deepseek-v4.1-flash",
+			modeId: "acceptEdits",
+			rememberSelections: true,
+		});
+		create(OTHER_HARNESS, {
+			modeId: AGENT_DEFAULT_MODE,
+			rememberSelections: true,
+		});
+		create(OTHER_HARNESS, { modelId: "default" });
+		create(OTHER_HARNESS);
+
+		expect(starts[3]).toEqual({
+			modelId: "deepseek-v4.1-flash",
+			modeId: "acceptEdits",
 		});
 		await runtime.dispose();
 	});

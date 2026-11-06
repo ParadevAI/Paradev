@@ -37,6 +37,7 @@ import type {
 	Turn,
 } from "@superset/chat/protocol";
 import {
+	AGENT_DEFAULT_MODE,
 	backgroundSubagentInputSchema,
 	cancelTurnInputSchema,
 	closeSessionInputSchema,
@@ -304,6 +305,16 @@ function explicitSelections(input: ChatSelections): ChatSelections {
 }
 
 export function createCommands(options: CommandsOptions): ChatCommands {
+	const rememberPicks = (harness: string, picks: ChatSelections) => {
+		const memory = options.selections;
+		if (!memory) return;
+		if (picks.modelId) memory.remember(harness, "model", picks.modelId);
+		if (picks.effortId)
+			memory.remember(harness, "thought_level", picks.effortId);
+		if (picks.modeId && picks.modeId !== AGENT_DEFAULT_MODE) {
+			memory.remember(harness, "mode", picks.modeId);
+		}
+	};
 	const turnAnchors = (
 		sessionId: string,
 		anchorItemIds: string[] | undefined,
@@ -484,6 +495,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					options.journal.discard(sessionId);
 					throw error;
 				}
+				if (parsed.rememberSelections && !parsed.resume) {
+					rememberPicks(parsed.harness, explicitSelections(parsed));
+				}
 				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
 				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };
@@ -627,8 +641,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			const parsed: SetModeInput = setModeInputSchema.parse(input);
 			options.dedupe.run(`setMode:${parsed.commandId}`, () => {
 				const live = options.live.require(parsed.sessionId);
-				live.setMode(parsed.modeId);
-				options.selections?.remember(live.harness, "mode", parsed.modeId);
+				void live.setMode(parsed.modeId).then((accepted) => {
+					if (accepted) {
+						options.selections?.remember(live.harness, "mode", parsed.modeId);
+					}
+				});
 			});
 		},
 
@@ -729,8 +746,8 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						scopeId: source.scopeId,
 						cwd: parsed.cwd,
 						harness: source.harness,
-						...explicitSelections(parsed),
 						...sessionSelections(sourceLive?.state),
+						...explicitSelections(parsed),
 						terminalId: sourceLive?.terminalId,
 						...(forked
 							? { resume: { harnessSessionId: forked, quiet: true } }

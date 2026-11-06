@@ -558,8 +558,8 @@ export class LiveSession {
 		this.options.adapter.respondToApproval(approvalId, decision);
 	}
 
-	setMode(modeId: string): void {
-		this.options.adapter.setMode(modeId);
+	setMode(modeId: string): Promise<boolean> {
+		return this.options.adapter.setMode(modeId);
 	}
 
 	setConfigOption(configId: string, value: string): Promise<boolean> {

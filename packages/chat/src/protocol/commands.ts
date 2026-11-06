@@ -17,6 +17,8 @@ export const createSessionInputSchema = z.object({
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
 	effortId: z.string().optional(),
+	/** The model, effort and mode sent here are the user's own picks, so later chats start on them too. */
+	rememberSelections: z.boolean().optional(),
 	resume: z
 		.object({
 			harnessSessionId: z.string().min(1),

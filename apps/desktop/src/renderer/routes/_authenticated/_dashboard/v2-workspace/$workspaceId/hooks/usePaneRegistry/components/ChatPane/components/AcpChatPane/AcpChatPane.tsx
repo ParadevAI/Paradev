@@ -3,6 +3,7 @@ import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
 import { errorMessage } from "@superset/i18n/errors";
 import { getAgentModelSupport } from "@superset/shared/agent-models";
+import { hostRemembersChatSelections } from "@superset/shared/host-version";
 import {
 	buildChatRewindPrompt,
 	buildChatSessionHandoffPrompt,
@@ -13,6 +14,7 @@ import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
@@ -140,6 +142,7 @@ export function AcpChatPane({
 	const { client, wiring } = useSessionClient(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
+	const hostInfo = useHostServiceInfo(hostUrl);
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const agentLabel = agentConfigs?.find(
 		(config) => config.id === agent?.id,
@@ -220,6 +223,9 @@ export function AcpChatPane({
 										...(modelId ? { modelId } : {}),
 										...(effortId ? { effortId } : {}),
 										...(startModeId ? { modeId: startModeId } : {}),
+										...(savedModeId && startModeId === savedModeId
+											? { rememberSelections: true }
+											: {}),
 										...(resume
 											? {
 													resume: {
@@ -242,16 +248,13 @@ export function AcpChatPane({
 							.catch(() => undefined);
 					},
 				);
-				if (agent && savedModeId && startModeId === savedModeId) {
-					// Hands the mode to the host, which remembers what is set in a chat.
-					void wiring.transport
-						.setMode({
-							commandId: crypto.randomUUID(),
-							sessionId: createdId,
-							modeId: savedModeId,
-						})
-						.then(() => forgetSavedChatMode(agent.id))
-						.catch(() => undefined);
+				if (
+					agent &&
+					savedModeId &&
+					startModeId === savedModeId &&
+					hostRemembersChatSelections(hostInfo.data?.version)
+				) {
+					forgetSavedChatMode(agent.id);
 				}
 				if (!mounted.current) return false;
 				if (replacing) holdReplacement(createdId);
@@ -276,6 +279,7 @@ export function AcpChatPane({
 			modeId,
 			agent,
 			sessionId,
+			hostInfo.data?.version,
 		],
 	);
 

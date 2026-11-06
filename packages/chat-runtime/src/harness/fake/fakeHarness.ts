@@ -176,8 +176,9 @@ export class FakeHarness implements HarnessAdapter {
 		pending.release();
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
 		this.emit({ kind: "session", session: { modeId } });
+		return Promise.resolve(true);
 	}
 
 	async dispose(): Promise<void> {

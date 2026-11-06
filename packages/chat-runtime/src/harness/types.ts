@@ -49,7 +49,8 @@ export interface HarnessAdapter {
 	/** Resolves false when the agent did not accept the prompt, so the caller queues it. */
 	steer?(content: UserContent[]): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): void;
-	setMode(modeId: string): void;
+	/** Resolves false when the agent refused the mode. */
+	setMode(modeId: string): Promise<boolean>;
 	/** Resolves false when the agent refused the change. */
 	setConfigOption?(configId: string, value: string): Promise<boolean>;
 	/**

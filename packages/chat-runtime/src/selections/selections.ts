@@ -20,11 +20,20 @@ export class SelectionMemory {
 	) {}
 
 	get(harness: string): ChatSelections {
-		const rows = this.db
-			.select()
-			.from(chatSelections)
-			.where(eq(chatSelections.harness, harness))
-			.all();
+		let rows: (typeof chatSelections.$inferSelect)[];
+		try {
+			rows = this.db
+				.select()
+				.from(chatSelections)
+				.where(eq(chatSelections.harness, harness))
+				.all();
+		} catch (error) {
+			console.warn(
+				"[chat-runtime] could not read remembered selections",
+				error,
+			);
+			return {};
+		}
 		const remembered: ChatSelections = {};
 		for (const row of rows) {
 			if (isSelectionCategory(row.category)) {

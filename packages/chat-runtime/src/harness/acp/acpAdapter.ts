@@ -626,16 +626,16 @@ export class AcpAdapter implements HarnessAdapter {
 		this.emitSession({ status: this.statusAfterApprovals() });
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
 		if (this.options.clientApprovalModes) {
-			if (!isClientApprovalMode(modeId)) return;
+			if (!isClientApprovalMode(modeId)) return Promise.resolve(false);
 			this.emitSession({ modeId });
 			if (autoApproves(modeId)) this.approvePendingPermissions();
-			return;
+			return Promise.resolve(true);
 		}
 		const previous = this.modeId;
 		this.emitSession({ modeId });
-		if (!this.client || !this.sessionId) return;
+		if (!this.client || !this.sessionId) return Promise.resolve(false);
 		// v2 dropped session/set_mode outright: a mode is a config option there,
 		// and `config_option_update` is what told us which one.
 		const pending =
@@ -666,6 +666,10 @@ export class AcpAdapter implements HarnessAdapter {
 			}
 			this.emitNotice("error", error.message);
 		});
+		return pending.then(
+			() => true,
+			() => false,
+		);
 	}
 
 	private trackSelection(request: Promise<unknown>): void {
@@ -2020,7 +2024,7 @@ export class AcpAdapter implements HarnessAdapter {
 			sessionModes?.currentModeId !== modeId &&
 			sessionModes?.availableModes?.some((mode) => mode.id === modeId)
 		) {
-			this.setMode(modeId);
+			void this.setMode(modeId);
 		}
 	}
 
