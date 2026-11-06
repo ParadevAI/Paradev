@@ -808,6 +808,7 @@ export function SessionView({
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
 					promptPending={heldOutbox.length > 0}
+					awaitingBackground={awaitingBackground}
 					terminalId={terminalId}
 					agentLabel={agentLabel}
 					onNewChat={onNewChat}
