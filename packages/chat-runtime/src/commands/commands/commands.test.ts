@@ -67,6 +67,25 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("closeSession records whether a person closed the chat", async () => {
+		const { runtime } = newRuntime();
+		const byUser = createSession(runtime);
+		const internal = createSession(runtime);
+		await runtime.commands.closeSession({
+			sessionId: byUser.sessionId,
+			userClosed: true,
+		});
+		await runtime.commands.closeSession({ sessionId: internal.sessionId });
+		const listed = runtime.commands.listSessions({ scopeId: "workspace-1" });
+		expect(
+			listed.find((row) => row.sessionId === byUser.sessionId),
+		).toMatchObject({ live: false, closedByUser: true });
+		expect(
+			listed.find((row) => row.sessionId === internal.sessionId),
+		).toMatchObject({ live: false, closedByUser: false });
+		await runtime.dispose();
+	});
+
 	test("closing a session drops its cached subagent tree", async () => {
 		const forget = spyOn(SubagentItems.prototype, "forget");
 		try {

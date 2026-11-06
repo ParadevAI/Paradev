@@ -56,6 +56,12 @@ function sessionsClient(client: HostServiceClient): SessionsClient {
 	};
 }
 
+export function desktopTabNote(opened: boolean): string {
+	return opened
+		? ", opened in a desktop tab"
+		: ". No desktop tab was opened yet; the Paradev desktop app adds one when it shows this workspace";
+}
+
 export async function resolveSessionWorkspace(
 	ctx: CliContext,
 	options: { workspace: string; host?: string | null; local?: boolean | null },

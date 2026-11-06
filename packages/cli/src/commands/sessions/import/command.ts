@@ -1,6 +1,7 @@
 import { string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import {
+	desktopTabNote,
 	resolveSessionWorkspace,
 	sessionWorkspaceOptions,
 } from "../../../lib/sessions";
@@ -30,8 +31,8 @@ export default command({
 
 		const opened = await openTab(result.sessionId);
 		return {
-			data: result,
-			message: `Imported ${result.label} session ${options.nativeSession} as chat session ${result.sessionId} in workspace ${options.workspace}${opened ? ", opened in a desktop tab" : ""}`,
+			data: { ...result, openedInDesktop: opened },
+			message: `Imported ${result.label} session ${options.nativeSession} as chat session ${result.sessionId} in workspace ${options.workspace}${desktopTabNote(opened)}`,
 		};
 	},
 });

@@ -8,6 +8,7 @@ import { useWorkspaceClient } from "@superset/workspace-client";
 import { useCallback } from "react";
 import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
+import { ignoreChatTerminal } from "../../../../utils/closedChatSessions";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
 import { readSavedChatMode } from "../../utils/savedChatMode";
@@ -66,6 +67,7 @@ export function useSurfaceFork(
 			// loaded into a hidden one. It needs its own terminal id: the CLI's would
 			// rebind that terminal's agent.
 			const loaderTerminalId = crypto.randomUUID();
+			ignoreChatTerminal(loaderTerminalId);
 			const defaultModeId = acpStartModes(presetId)?.defaultModeId;
 			const modeId =
 				readSavedChatMode(presetId) ??
@@ -145,6 +147,7 @@ export function useSurfaceFork(
 			}
 
 			const terminalId = crypto.randomUUID();
+			ignoreChatTerminal(terminalId);
 			const toastId = toast.loading(t({ message: "Forking into a chat…" }));
 			try {
 				const forked = await forkIntoChat(
