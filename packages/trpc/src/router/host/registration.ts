@@ -17,6 +17,8 @@ export async function registerHost<Row>(
 		insert(): Promise<Row | undefined>;
 		grantOwner(): Promise<void>;
 		isOwner(): Promise<boolean>;
+		hasOwnerInOrg(): Promise<boolean>;
+		replaceOrphan(): Promise<Row | undefined>;
 		update(
 			metadata: Pick<
 				HostRegistration,
@@ -30,6 +32,14 @@ export async function registerHost<Row>(
 	if (inserted) {
 		await store.grantOwner();
 		return { host: inserted, inserted: true };
+	}
+	// Hosts orphaned before member removal swept them still exist; replacing one cascades its workspaces and access rows.
+	if (!(await store.hasOwnerInOrg())) {
+		const replaced = await store.replaceOrphan();
+		if (replaced) {
+			await store.grantOwner();
+			return { host: replaced, inserted: true };
+		}
 	}
 	const metadata = {
 		...(input.version !== undefined ? { version: input.version } : {}),

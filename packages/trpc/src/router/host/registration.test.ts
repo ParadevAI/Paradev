@@ -32,6 +32,8 @@ function fixture(owner: boolean) {
 				grants++;
 			},
 			isOwner: async () => owner,
+			hasOwnerInOrg: async () => true,
+			replaceOrphan: async () => undefined,
 			update: async (metadata: object) => {
 				writes++;
 				row = { ...row, ...metadata };
@@ -85,4 +87,31 @@ test("platform-only metadata writes also require ownership", async () => {
 		),
 	).rejects.toMatchObject({ code: "FORBIDDEN" });
 	expect(f.writes).toBe(0);
+});
+test("a host whose owners all left the organization is replaced and granted to the caller", async () => {
+	const f = fixture(false);
+	const fresh = { name: "original", version: "1.28.0" };
+	const result = await registerHost(input, {
+		...f.store,
+		hasOwnerInOrg: async () => false,
+		replaceOrphan: async () => fresh,
+	});
+	expect(result).toEqual({ host: fresh, inserted: true });
+	expect(f.grants).toBe(1);
+	expect(f.writes).toBe(0);
+});
+test("a host that still has an owner in the organization is never replaced", async () => {
+	const f = fixture(false);
+	let replaced = 0;
+	await expect(
+		registerHost(input, {
+			...f.store,
+			replaceOrphan: async () => {
+				replaced++;
+				return f.row;
+			},
+		}),
+	).rejects.toMatchObject({ code: "FORBIDDEN" });
+	expect(replaced).toBe(0);
+	expect(f.grants).toBe(0);
 });

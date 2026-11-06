@@ -75,6 +75,32 @@ async function isHostOwner(
 	return !!owner;
 }
 
+async function hostHasOwnerInOrg(
+	organizationId: string,
+	machineId: string,
+	database: Pick<typeof db, "select">,
+): Promise<boolean> {
+	const [owner] = await database
+		.select({ hostId: v2UsersHosts.hostId })
+		.from(v2UsersHosts)
+		.innerJoin(
+			members,
+			and(
+				eq(members.organizationId, v2UsersHosts.organizationId),
+				eq(members.userId, v2UsersHosts.userId),
+			),
+		)
+		.where(
+			and(
+				eq(v2UsersHosts.organizationId, organizationId),
+				eq(v2UsersHosts.hostId, machineId),
+				eq(v2UsersHosts.role, "owner"),
+			),
+		)
+		.limit(1);
+	return !!owner;
+}
+
 export const hostRouter = {
 	/**
 	 * The relay every client and host of this user must use. Answered here so
@@ -212,6 +238,20 @@ export const hostRouter = {
 							ctx.principal.userId,
 							tx,
 						),
+					hasOwnerInOrg: () =>
+						hostHasOwnerInOrg(input.organizationId, input.machineId, tx),
+					replaceOrphan: async () => {
+						await tx.delete(v2Hosts).where(scope);
+						return (
+							await tx
+								.insert(v2Hosts)
+								.values({ ...input, createdByUserId: ctx.principal.userId })
+								.onConflictDoNothing({
+									target: [v2Hosts.organizationId, v2Hosts.machineId],
+								})
+								.returning()
+						)[0];
+					},
 					update: async (metadata) =>
 						(
 							await tx.update(v2Hosts).set(metadata).where(scope).returning()
