@@ -11,7 +11,7 @@ import type {
 } from "@superset/chat-ui/PromptInput";
 import { COMPANY } from "@superset/shared/constants";
 import { toast } from "@superset/ui/sonner";
-import { type RefObject, useCallback, useMemo, useState } from "react";
+import { type RefObject, useCallback, useMemo } from "react";
 import { useCreateAutomation } from "renderer/routes/_authenticated/_dashboard/hooks/useCreateAutomation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { fastOption } from "renderer/routes/_authenticated/components/AgentComposer/utils/toggleOption";
@@ -24,8 +24,8 @@ import {
 } from "../../utils/appCommands";
 import { splitInvocation } from "../../utils/commandArgs";
 import { resolveCollisions } from "../../utils/commandCollisions";
-import { PLAN_ID, type PlanSwitch, planControl } from "../../utils/planControl";
 import { restoreCommand } from "../../utils/restoreCommand";
+import type { PlanToggleControl } from "../usePlanControl";
 
 export type TypedCommandOutcome = "not-app" | "ran" | "kept";
 
@@ -40,9 +40,7 @@ export type UseAppCommandsOptions = {
 	presetId?: string;
 	configOptions?: SessionConfigOption[];
 	onSetConfigOption?: (configId: string, value: string) => unknown;
-	modes?: { id: string }[];
-	currentModeId?: string;
-	onSetMode?: (modeId: string) => void;
+	plan?: PlanToggleControl | null;
 	openModelPicker?: () => void;
 	onNewChat?: () => void;
 	onFork?: (target: ChatForkTarget) => void;
@@ -61,9 +59,7 @@ export function useAppCommands({
 	presetId,
 	configOptions,
 	onSetConfigOption,
-	modes,
-	currentModeId,
-	onSetMode,
+	plan,
 	openModelPicker,
 	onNewChat,
 	onFork,
@@ -83,15 +79,6 @@ export function useAppCommands({
 	const { create: createAutomation } = useCreateAutomation();
 	const projectId = workspace.projectId;
 
-	const [modeBeforePlan, setModeBeforePlan] = useState(currentModeId);
-	if (
-		currentModeId &&
-		currentModeId !== PLAN_ID &&
-		currentModeId !== modeBeforePlan
-	) {
-		setModeBeforePlan(currentModeId);
-	}
-
 	const context = useMemo<AppCommandContext>(() => {
 		const leaveComposer = (action: () => void) => () =>
 			queueMicrotask(() => {
@@ -106,16 +93,6 @@ export function useAppCommands({
 			: {};
 		if (toSubagent) return mcp;
 		const fast = fastOption(configOptions ?? []);
-		const plan = planControl({
-			configOptions: configOptions ?? [],
-			modes: modes ?? [],
-			currentModeId,
-			modeBeforePlan,
-		});
-		const apply = (change: PlanSwitch) => {
-			if ("modeId" in change) onSetMode?.(change.modeId);
-			else onSetConfigOption?.(change.configId, change.value);
-		};
 		return {
 			...mcp,
 			...(onNewChat ? { newChat: onNewChat } : {}),
@@ -137,12 +114,12 @@ export function useAppCommands({
 						},
 					}
 				: {}),
-			...(plan && ("modeId" in plan.enter ? onSetMode : onSetConfigOption)
+			...(plan
 				? {
 						plan: {
 							active: plan.active,
-							enter: () => apply(plan.enter),
-							leave: () => apply(plan.leave),
+							enter: plan.enter,
+							leave: plan.leave,
 						},
 					}
 				: {}),
@@ -184,17 +161,14 @@ export function useAppCommands({
 		canForkToWorktree,
 		configOptions,
 		createAutomation,
-		currentModeId,
 		inputRef,
-		modeBeforePlan,
-		modes,
 		onFork,
 		onNewChat,
 		onOpenFind,
 		onOpenHistory,
 		onSetConfigOption,
-		onSetMode,
 		openMcp,
+		plan,
 		openModelPicker,
 		openStatus,
 		presetId,
