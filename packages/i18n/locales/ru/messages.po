@@ -483,11 +483,6 @@ msgstr "{0} ГБ-часов"
 msgid "{0} installed"
 msgstr "{0} установлен"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} в {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -557,7 +552,6 @@ msgid "{0} of {1} checks running"
 msgstr "{0} из {1} проверок выполняется"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{0} из {totalCount}"
 
@@ -1358,9 +1352,6 @@ msgstr "{total, plural, one {Проверка пройдена} few {Все # п
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {задача GitHub} few {задачи GitHub} many {задач GitHub} other {задачи GitHub}}"
-
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {пул-реквест} few {пул-реквеста} many {пул-реквестов} other {пул-реквеста}}"
 
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {Импортирована # своя тема} few {Импортировано # свои темы} many {Импортировано # своих тем} other {Импортировано # своей темы}}"
@@ -5467,6 +5458,9 @@ msgstr "Копировать как CSV"
 msgid "Copy as Markdown"
 msgstr "Копировать как Markdown"
 
+msgid "Copy branch name"
+msgstr "Скопировать имя ветки"
+
 msgid "Copy Branch Name"
 msgstr "Скопировать имя ветки"
 
@@ -5602,6 +5596,9 @@ msgstr "Скопировать в буфер обмена"
 
 msgid "Copy URL"
 msgstr "Скопировать URL"
+
+msgid "Copy username"
+msgstr "Скопировать имя пользователя"
 
 msgid "Copy Workspace ID"
 msgstr "Скопировать ID рабочей области"

@@ -483,11 +483,6 @@ msgstr "{0} GB-jam"
 msgid "{0} installed"
 msgstr "{0} terpasang"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} ke {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -557,7 +552,6 @@ msgid "{0} of {1} checks running"
 msgstr "{0} dari {1} check berjalan"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{0} dari {totalCount}"
 
@@ -1358,9 +1352,6 @@ msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issue GitHub}}"
-
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {pull request} other {pull request}}"
 
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {Mengimpor # tema kustom} other {Mengimpor # tema kustom}}"
@@ -5467,6 +5458,9 @@ msgstr "Salin sebagai CSV"
 msgid "Copy as Markdown"
 msgstr "Salin sebagai Markdown"
 
+msgid "Copy branch name"
+msgstr "Salin nama branch"
+
 msgid "Copy Branch Name"
 msgstr "Salin Nama Branch"
 
@@ -5602,6 +5596,9 @@ msgstr "Salin ke clipboard"
 
 msgid "Copy URL"
 msgstr "Salin URL"
+
+msgid "Copy username"
+msgstr "Salin username"
 
 msgid "Copy Workspace ID"
 msgstr "Salin ID Workspace"

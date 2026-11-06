@@ -483,11 +483,6 @@ msgstr "{0} GB 時間"
 msgid "{0} installed"
 msgstr "{0}をインストールしました"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} → {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -557,7 +552,6 @@ msgid "{0} of {1} checks running"
 msgstr "{1}件中{0}件のチェックが実行中です"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{totalCount}件中{0}件目"
 
@@ -1358,9 +1352,6 @@ msgstr "{total, plural, one {#件のチェックにすべて成功しました} 
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issue}}"
-
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {プルリクエスト} other {プルリクエスト}}"
 
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {カスタムテーマを#件インポートしました} other {カスタムテーマを#件インポートしました}}"
@@ -5467,6 +5458,9 @@ msgstr "CSVとしてコピー"
 msgid "Copy as Markdown"
 msgstr "Markdownとしてコピー"
 
+msgid "Copy branch name"
+msgstr "ブランチ名をコピー"
+
 msgid "Copy Branch Name"
 msgstr "ブランチ名をコピー"
 
@@ -5602,6 +5596,9 @@ msgstr "クリップボードにコピー"
 
 msgid "Copy URL"
 msgstr "URLをコピー"
+
+msgid "Copy username"
+msgstr "ユーザー名をコピー"
 
 msgid "Copy Workspace ID"
 msgstr "ワークスペースIDをコピー"

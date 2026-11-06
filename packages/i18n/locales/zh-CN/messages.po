@@ -483,11 +483,6 @@ msgstr "{0} GB 小时"
 msgid "{0} installed"
 msgstr "{0}已安装"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} → {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -557,7 +552,6 @@ msgid "{0} of {1} checks running"
 msgstr "{1}项检查中有{0}项在运行"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{0}/{totalCount}"
 
@@ -1358,9 +1352,6 @@ msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通�
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub议题} other {GitHub议题}}"
-
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {拉取请求} other {拉取请求}}"
 
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {已导入#个自定义主题} other {已导入#个自定义主题}}"
@@ -5467,6 +5458,9 @@ msgstr "复制为 CSV"
 msgid "Copy as Markdown"
 msgstr "复制为 Markdown"
 
+msgid "Copy branch name"
+msgstr "复制分支名"
+
 msgid "Copy Branch Name"
 msgstr "复制分支名"
 
@@ -5602,6 +5596,9 @@ msgstr "复制到剪贴板"
 
 msgid "Copy URL"
 msgstr "复制URL"
+
+msgid "Copy username"
+msgstr "复制用户名"
 
 msgid "Copy Workspace ID"
 msgstr "复制工作区ID"
