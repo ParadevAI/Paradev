@@ -1461,8 +1461,9 @@ The last hook arrived 1 second ago; the session started 2 seconds ago.
 >
 Remove the hooks Paradev wrote into agents' global configs, such as
 `~/.claude/settings.json` and `~/.config/devin/config.json`. Your own hooks and
-settings stay, except that Paradev's variable names are removed from Muse's
-`managed_hooks_env_vars` even if you also listed them. Pass either `--all` or
+settings stay, except that Paradev's `SUPERSET_*` variable names are removed
+from Muse's `managed_hooks_env_vars` even if you also listed them. `NODE_ENV`
+stays in the list. Pass either `--all` or
 `--agent`, not both. Runs on this machine and needs no sign-in. The Paradev app
 adds the hooks again at start for installed agents unless **Settings → Agents →
 Paradev hooks** is off for that agent; see [Uninstall](/install#uninstall).

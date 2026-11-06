@@ -49,7 +49,8 @@ superset agents hooks remove --all
 ```
 
 The command keeps your own hooks and settings. One exception: in Muse's `managed_hooks_env_vars`,
-it removes the variable names Paradev adds, even if you also listed them yourself. Paradev adds its
+it removes the `SUPERSET_*` variable names Paradev adds, even if you also listed them yourself.
+`NODE_ENV` stays in the list. Paradev adds its
 hooks again the next time it starts, so quit the app before you delete it. To keep one agent's hooks
 out while you still use Paradev, turn off **Settings → Agents → Paradev hooks** for that agent.
 

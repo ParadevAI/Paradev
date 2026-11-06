@@ -151,7 +151,10 @@ export function getMuseSettingsJsonWithoutManagedHooks(
 		changed = true;
 	}
 	if (Array.isArray(root.managed_hooks_env_vars)) {
-		const ours = new Set<string>(MUSE_HOOK_ENV_VARS);
+		// NODE_ENV is not ours alone: a user can allow it for their own hooks.
+		const ours = new Set<string>(
+			MUSE_HOOK_ENV_VARS.filter((name) => name.startsWith("SUPERSET_")),
+		);
 		const kept = stringList(root.managed_hooks_env_vars).filter(
 			(name) => !ours.has(name),
 		);

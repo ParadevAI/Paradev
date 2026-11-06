@@ -1840,7 +1840,7 @@ describe("agent-wrappers claude settings.json", () => {
 		}
 	});
 
-	it("removes only Paradev's pointer and env names from Muse settings.json", () => {
+	it("removes only Paradev's pointer and SUPERSET_* env names from Muse settings.json", () => {
 		const after = getMuseSettingsJsonWithoutManagedHooks(
 			JSON.stringify({
 				schema_version: 1,
@@ -1852,7 +1852,7 @@ describe("agent-wrappers claude settings.json", () => {
 		expect(JSON.parse(requireContent(after))).toEqual({
 			schema_version: 1,
 			tui: { theme: "dark" },
-			managed_hooks_env_vars: ["MY_VAR"],
+			managed_hooks_env_vars: ["MY_VAR", "NODE_ENV"],
 		});
 		expect(
 			getMuseSettingsJsonWithoutManagedHooks(
