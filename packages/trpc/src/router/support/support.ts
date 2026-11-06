@@ -9,6 +9,7 @@ import {
 	FeedbackReportEmail,
 	feedbackReportText,
 } from "@superset/email/emails/feedback-report";
+import { NOREPLY_FROM } from "@superset/email/sender";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -18,7 +19,7 @@ import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
 import { posthog } from "../../lib/analytics";
-import { createTRPCRouter, protectedProcedure, userError } from "../../trpc";
+import { createTRPCRouter, personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const SUPPORT_EMAIL = COMPANY.MAIL_TO.replace(/^mailto:/, "");
@@ -129,7 +130,7 @@ function sanitizeEmailBodyLine(value: string): string {
 }
 
 export const supportRouter = createTRPCRouter({
-	sendMigrationReport: protectedProcedure
+	sendMigrationReport: personProcedure
 		.input(
 			z.object({
 				report: z.string().min(1).max(20_000),
@@ -148,10 +149,10 @@ export const supportRouter = createTRPCRouter({
 
 			try {
 				const { error } = await resend.emails.send({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: SUPPORT_EMAIL,
 					replyTo: user.email,
-					subject: "Superset V1 to V2 migration issue",
+					subject: "Paradev V1 to V2 migration issue",
 					text: [
 						`User: ${userLabel}`,
 						`User ID: ${user.id}`,
@@ -171,7 +172,7 @@ export const supportRouter = createTRPCRouter({
 			}
 		}),
 
-	submitFeedback: protectedProcedure
+	submitFeedback: personProcedure
 		.input(
 			z
 				.object({
@@ -289,7 +290,7 @@ export const supportRouter = createTRPCRouter({
 				// Resend reports API failures via the resolved `error` field, not by
 				// throwing — without this check a rejected email would "succeed".
 				const { error } = await resend.emails.send({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: SUPPORT_EMAIL,
 					// CC the reporter so they keep a copy and stay on the thread.
 					cc: user.email,
@@ -325,7 +326,7 @@ export const supportRouter = createTRPCRouter({
 			});
 		}),
 
-	submitPrompt: protectedProcedure
+	submitPrompt: personProcedure
 		.input(
 			z.object({
 				promptText: z.string().min(1).max(10_000),

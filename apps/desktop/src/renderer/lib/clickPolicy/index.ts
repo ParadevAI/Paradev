@@ -23,6 +23,10 @@ export {
 	folderIntentLabel,
 } from "./policies/folderPolicy";
 export type { ClickPolicy } from "./policies/policy";
+export {
+	PULL_REQUEST_LINKS,
+	usePullRequestLinkPolicy,
+} from "./policies/pullRequestLinkPolicy";
 export { useChangesSidebarFilePolicy } from "./policies/useChangesSidebarFilePolicy";
 export { useInlineFilePolicy } from "./policies/useInlineFilePolicy";
 export { usePagePolicy } from "./policies/usePagePolicy";

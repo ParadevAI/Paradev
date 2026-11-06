@@ -1,8 +1,12 @@
+import { parseGithubWorkItemUrl } from "../githubWorkItem";
 import { stripLocation } from "../pathText";
 import { parseSupersetAppLink } from "../supersetAppLink";
 
 export type LinkUnfurl = {
-	icon: { kind: "plugin"; name: string } | { kind: "file"; fileName: string };
+	icon:
+		| { kind: "plugin"; name: string }
+		| { kind: "file"; fileName: string }
+		| { kind: "environment" };
 	label?: string;
 };
 
@@ -20,6 +24,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)sentry\.io$/, "sentry"],
 	[/(^|\.)posthog\.com$/, "posthog"],
 	[/(^|\.)vercel\.com$/, "vercel"],
+	[/(^|\.)resend\.com$/, "resend"],
 	[/(^|\.)figma\.com$/, "figma"],
 	[/(^|\.)stripe\.com$/, "stripe"],
 	[/(^|\.)neon\.(tech|com)$/, "neon"],
@@ -27,7 +32,12 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)granola\.(ai|so)$/, "granola"],
 	[/(^|\.)superhuman\.com$/, "superhuman"],
 	[/(^|\.)circleback\.ai$/, "circleback"],
+	[/(^|\.)peec\.ai$/, "peec"],
+	[/(^|\.)sazabi\.com$/, "sazabi"],
 	[/(^|\.)supabase\.(com|co)$/, "supabase"],
+	[/(^|\.)inngest\.com$/, "inngest"],
+	[/(^|\.)firecrawl\.dev$/, "firecrawl"],
+	[/(^|\.)wisprflow\.ai$/, "wispr"],
 ];
 
 const FILE_EXTENSION = /[^.]\.((?=\d*[a-z])[a-z0-9]{1,8})$/i;
@@ -63,6 +73,8 @@ const supersetApp: LinkUnfurler = ({ href }, webUrl) => {
 			return { icon, label: link.taskId };
 		case "plugin":
 			return { icon: { kind: "plugin", name: link.pluginName } };
+		case "environment":
+			return { icon: { kind: "environment" } };
 		default:
 			return { icon };
 	}
@@ -76,15 +88,12 @@ const googleDocs: LinkUnfurler = ({ url }) => {
 	return { icon: { kind: "plugin", name: "google-docs" } };
 };
 
-const githubReference: LinkUnfurler = ({ url }) => {
-	if (url?.hostname !== "github.com") return null;
-	const match = url.pathname.match(
-		/^\/([^/]+)\/([^/]+)\/(?:pull|issues)\/(\d+)\/?$/,
-	);
-	if (!match) return null;
+const githubReference: LinkUnfurler = ({ href }) => {
+	const item = parseGithubWorkItemUrl(href);
+	if (!item) return null;
 	return {
 		icon: { kind: "plugin", name: "github" },
-		label: `${match[1]}/${match[2]}#${match[3]}`,
+		label: `${item.owner}/${item.repo}#${item.number}`,
 	};
 };
 

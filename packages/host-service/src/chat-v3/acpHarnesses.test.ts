@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import { valid } from "semver";
-import { ACP_HARNESSES, UNGATED_VERSION } from "./acpCatalogue";
+import {
+	ACP_HARNESSES,
+	acpHarnessForPreset,
+	UNGATED_VERSION,
+} from "./acpCatalogue";
 
 const entries = Object.entries(ACP_HARNESSES);
 
@@ -10,6 +14,16 @@ describe("ACP_HARNESSES", () => {
 		expect(ids).toContain("claude-acp");
 		expect(ids).toContain("codex-acp");
 		expect(ids).toContain("pi-acp");
+		expect(ids).toContain("pdev-acp");
+	});
+
+	it("runs pdev as its own ACP server with no adapter", () => {
+		expect(acpHarnessForPreset("pdev")).toBe("pdev-acp");
+		expect(ACP_HARNESSES["pdev-acp"]).toMatchObject({
+			binary: "pdev",
+			args: ["acp"],
+		});
+		expect(ACP_HARNESSES["pdev-acp"]?.adapter).toBeUndefined();
 	});
 
 	it.each(entries)("%s names a binary and a usable floor", (_id, entry) => {

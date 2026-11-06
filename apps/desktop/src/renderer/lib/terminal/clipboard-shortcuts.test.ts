@@ -49,6 +49,7 @@ describe("shouldBubbleClipboardShortcut", () => {
 					isMac: true,
 					isWindows: false,
 					hasSelection: false,
+					appOwnsSelection: false,
 				}),
 				name,
 			).toBe(true);
@@ -78,9 +79,52 @@ describe("shouldBubbleClipboardShortcut", () => {
 					isMac: true,
 					isWindows: false,
 					hasSelection: false,
+					appOwnsSelection: false,
 				}),
 				name,
 			).toBe(false);
+		}
+	});
+
+	it("sends Mac Cmd+C to an app that owns the selection only when xterm has none", () => {
+		const mac = { isMac: true, isWindows: false };
+		const cases = [
+			{
+				name: "Cmd+C, no selection, app owns the selection",
+				event: makeEvent({ code: "KeyC", metaKey: true }),
+				options: { ...mac, hasSelection: false, appOwnsSelection: true },
+				expected: false,
+			},
+			{
+				name: "Cmd+C with a selection copies it",
+				event: makeEvent({ code: "KeyC", metaKey: true }),
+				options: { ...mac, hasSelection: true, appOwnsSelection: true },
+				expected: true,
+			},
+			{
+				name: "Cmd+C to an app without its own selection stays out of the PTY",
+				event: makeEvent({ code: "KeyC", metaKey: true }),
+				options: { ...mac, hasSelection: false, appOwnsSelection: false },
+				expected: true,
+			},
+			{
+				name: "Cmd+Shift+C still bubbles",
+				event: makeEvent({ code: "KeyC", metaKey: true, shiftKey: true }),
+				options: { ...mac, hasSelection: false, appOwnsSelection: true },
+				expected: true,
+			},
+			{
+				name: "Cmd+V still bubbles",
+				event: makeEvent({ code: "KeyV", metaKey: true }),
+				options: { ...mac, hasSelection: false, appOwnsSelection: true },
+				expected: true,
+			},
+		];
+
+		for (const { name, event, options, expected } of cases) {
+			expect(shouldBubbleClipboardShortcut(event, options), name).toBe(
+				expected,
+			);
 		}
 	});
 
@@ -89,55 +133,100 @@ describe("shouldBubbleClipboardShortcut", () => {
 			{
 				name: "Windows Ctrl+V",
 				event: makeEvent({ code: "KeyV", ctrlKey: true }),
-				options: { isMac: false, isWindows: true, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: true,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Windows Ctrl+Shift+V",
 				event: makeEvent({ code: "KeyV", ctrlKey: true, shiftKey: true }),
-				options: { isMac: false, isWindows: true, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: true,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Windows Ctrl+C with selection",
 				event: makeEvent({ code: "KeyC", ctrlKey: true }),
-				options: { isMac: false, isWindows: true, hasSelection: true },
+				options: {
+					isMac: false,
+					isWindows: true,
+					hasSelection: true,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Windows Ctrl+C without selection stays with PTY (SIGINT)",
 				event: makeEvent({ code: "KeyC", ctrlKey: true }),
-				options: { isMac: false, isWindows: true, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: true,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: false,
 			},
 			{
 				name: "Windows Ctrl+Shift+C without selection still bubbles",
 				event: makeEvent({ code: "KeyC", ctrlKey: true, shiftKey: true }),
-				options: { isMac: false, isWindows: true, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: true,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Linux Ctrl+Shift+V",
 				event: makeEvent({ code: "KeyV", ctrlKey: true, shiftKey: true }),
-				options: { isMac: false, isWindows: false, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: false,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Linux Shift+Insert",
 				event: makeEvent({ code: "Insert", shiftKey: true }),
-				options: { isMac: false, isWindows: false, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: false,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Linux Ctrl+Shift+C without selection still bubbles",
 				event: makeEvent({ code: "KeyC", ctrlKey: true, shiftKey: true }),
-				options: { isMac: false, isWindows: false, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: false,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: true,
 			},
 			{
 				name: "Linux Ctrl+Insert stays with the PTY",
 				event: makeEvent({ code: "Insert", ctrlKey: true }),
-				options: { isMac: false, isWindows: false, hasSelection: false },
+				options: {
+					isMac: false,
+					isWindows: false,
+					hasSelection: false,
+					appOwnsSelection: false,
+				},
 				expected: false,
 			},
 		];

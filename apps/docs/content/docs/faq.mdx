@@ -3,22 +3,27 @@ title: FAQ
 description: Frequently asked questions
 ---
 
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
+
 ## Platforms
 
 **What platforms are supported?**
 macOS (Apple Silicon and Intel) is the supported target. A Linux x64 AppImage ships with each release but is experimental and untested. Windows is planned with no date. The CLI also supports Linux x64 and arm64.
 
-**Is Superset a terminal app?**
-No. It's a desktop app with a full interface. Agents run in terminals, and next to them you get the [Changes pane](/diff-viewer), [pull requests](/pull-requests) with checks and review threads, an [in-app browser](/browser) with Design Mode, and a [file editor](/editor).
+**Is Paradev a terminal app?**
+No. Agents run in terminals, and next to them you get the [Changes pane](/diff-viewer), [pull requests](/pull-requests) with checks and review threads, an [in-app browser](/browser) with Design Mode, and a [file editor](/editor).
 
 **Is there a mobile app or web dashboard?**
-Yes, [Superset for iPhone and iPad](/install#iphone-and-ipad) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Superset Pro. Push notifications are coming. Android is not available yet; join the [Android waitlist](https://superset.sh/mobile#android). There's no supported web dashboard today.
+Yes, [Paradev for iPhone and iPad](/install#iphone-and-ipad) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Paradev Pro. Push notifications are coming. Android is not available yet; join the [Android waitlist](https://paradev.com/mobile#android). There's no supported web dashboard today.
+
+**Do I need to keep my computer on to use the mobile app?**
+Only for workspaces hosted on that computer. Enable Remote Access and keep the host awake and online. [Cloud workspaces](/cloud-workspaces) work on iPhone and iPad without keeping your own computer connected.
 
 **Does it work with GitLab or self-hosted remotes?**
 GitHub is fully supported via the `gh` CLI. Repos with other remotes work locally, but cross-machine project identity is currently tied to GitHub, so the same project can show up twice across devices.
 
-**I was looking for the Superset hiring platform.**
-That's a different company (joinsuperset.com). This Superset is a desktop app for running AI coding agents.
+**I was looking for the Paradev hiring platform.**
+That's a different company (joinsuperset.com). This Paradev is a desktop app for running AI coding agents.
 
 ## Accounts and Billing
 
@@ -28,19 +33,22 @@ GitHub and Google sign-ins create **separate accounts**, even with the same emai
 **I paid for Pro but can't find the features.**
 Pro features (remote access, automations, and more) live in the current v2 interface. If your app looks like the older UI, enable it under **Settings → Experimental**.
 
-**Does Superset bill my model usage?**
-No. Superset never proxies model calls. Agents use your own subscriptions and API keys, and your provider bills you directly.
+**Does Paradev bill my model usage?**
+No. Paradev never proxies model calls. Agents use your own subscriptions and API keys, and your provider bills you directly.
 
-**How do I cancel or get a refund?**
-Email [support@superset.sh](mailto:support@superset.sh). Refunds are handled promptly.
+**How do I manage billing or cancel my subscription?**
+Open **Settings → Billing**. From there you can cancel or restore your plan, switch between monthly and yearly billing, and open the billing portal to update your payment method or download invoices.
+
+**How do I get a refund, or ask a billing question?**
+Email <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EMAIL}</a>.
 
 **How do I delete my account, change my email, or move projects between orgs?**
-These aren't self-serve yet; email [support@superset.sh](mailto:support@superset.sh).
+These aren't self-serve yet; email <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EMAIL}</a>.
 
 ## Workspaces and Git
 
 **Do I need a git repo?**
-For projects, yes: every project must be a git repository, and its workspaces are git worktrees. For a fresh folder, run `git init && git add -A && git commit -m "init"` first. If you just want a scratch space without setting up a repo, create a [session](/workspaces#sessions) instead.
+For projects, yes: every project must be a git repository, and its workspaces are git worktrees. For a fresh folder, run `git init && git add -A && git commit -m "init"` first. For a scratch space without a repo, create a [session](/workspaces#sessions).
 
 **Is each worktree a sandbox?**
 No. A worktree gives each task its own working files and branch. Agents still run on the same machine, so they share processes, the network, and files outside the worktree. Worktrees also don't prevent merge conflicts.
@@ -49,10 +57,16 @@ No. A worktree gives each task its own working files and branch. Agents still ru
 No. One branch = one workspace. Create a new branch if needed.
 
 **Where are workspaces stored on disk?**
-`~/.superset/worktrees/`, as ordinary git worktrees (sessions live at `~/.superset/sessions/`). Deleting a workspace removes its worktree; Superset never deletes worktrees behind your back.
+`~/.paradev/worktrees/`, as ordinary git worktrees (sessions live at `~/.paradev/sessions/`). Deleting a workspace removes its worktree; Paradev never deletes worktrees behind your back.
+
+**Where did `~/.superset` go?**
+Paradev moves its folder from `~/.superset` to `~/.paradev` the first time an updated app, CLI or host starts. Your worktrees, sessions and settings move with it, and `~/.superset` becomes a link to `~/.paradev`, so old paths and older CLI builds keep working. Open terminals keep running through the move. If something blocks the move (for example a file with the same name already in `~/.paradev`), Paradev keeps using `~/.superset` for that run and tries again the next time it starts.
+
+**My repo has a `.superset/` folder. Do I need to change it?**
+No. Paradev still reads a repo's config from `.superset/` and keeps editing it there. New repos get `.paradev/`. To move an existing one, once everyone on the team runs a current Paradev, do it in one commit: move the files from `.superset/` into `.paradev/` (keep anything already in `.paradev/`, such as pdev's `settings.json`; `git mv .superset .paradev` is only right when `.paradev/` doesn't exist yet), and change any `./.superset/` paths in your config commands and scripts to `./.paradev/`.
 
 **I already have worktrees from another tool.**
-Use the **Import** tab in the New Workspace modal to bring existing worktrees in. See [Workspaces](/workspaces).
+Use the **Import** tab in the New Workspace modal to bring existing worktrees in. See [Workspaces](/workspaces). Coming from Conductor? Follow [Migrate from Conductor](/migrate-from-conductor) or [Migrate from Conductor Cloud](/migrate-from-conductor-cloud).
 
 **Why did my branch get a random name like `interesting-forest`?**
 Branch names are generated from your prompt by a small model. When no usable model credential is available, naming falls back to random words; check your connected models in Settings.
@@ -66,10 +80,10 @@ It removes that worktree and runs your [lifecycle teardown scripts](/setup-teard
 See [AI Agents](/agent-integration) for the full list. If an installed agent doesn't appear in launchers, check it's **Enabled** under **Settings → Agents**.
 
 **Where do I set the model or reasoning effort an agent launches with?**
-Under **Settings → Agents**, per agent. Preset-level tweaks don't override the agent's own launch settings.
+Under **Settings → Agents**, per agent. Preset-level tweaks do not override the agent's own launch settings.
 
-**Why did Superset add hooks to my agent configs?**
-Superset installs lifecycle hooks and command wrappers (in `~/.superset/bin`) so it can show agent status and send finished/waiting notifications. Removing them disables those features.
+**Why did Paradev add hooks to my agent configs?**
+Paradev installs lifecycle hooks and command wrappers (in `~/.paradev/bin`) so it can show agent status and send finished/waiting notifications. Removing them disables those features.
 
 **Do sessions survive restarts?**
 Yes. Terminals are backed by a background daemon, so running processes and scrollback survive app restarts and updates.
@@ -77,7 +91,7 @@ Yes. Terminals are backed by a background daemon, so running processes and scrol
 ## Remote and Automations
 
 **Why does my host show offline when the machine is up?**
-"Online" means connected to the Superset relay, not "the process is running." Remote access via relay is **off by default**; enable it under **Settings → Remote Access** (or run `superset start --daemon` on CLI hosts). See [Remote Access](/remote-access). The local CLI works regardless of relay state.
+"Online" means connected to the Paradev relay, not "the process is running." Remote access via relay is **off by default**; enable it under **Settings → Remote Access** (or run `superset start --daemon` on CLI hosts). See [Remote Access](/remote-access). The local CLI works regardless of relay state.
 
 **Can I open a remote host's ports on my Mac?**
 Yes. The desktop app forwards detected ports for the selected remote workspace to your machine. If a local port is busy, choose **Use another port**. See [Remote Access](/remote-access#ports-on-a-remote-host) for requirements.
@@ -91,7 +105,7 @@ Runs fail when the target device isn't relay-connected at fire time. Use **Retry
 Local workspace files live on their host machine. Enabling Remote Access sends workspace traffic through the relay; cloud workspaces run your code in the cloud, and publishing a Page uploads its content. Agents also send prompts and context to the model providers you configure.
 
 **Does it modify git config?**
-No. Superset uses standard git commands.
+No. Paradev uses standard git commands.
 
 ## CLI
 
@@ -101,7 +115,7 @@ The CLI works against the v2 local-first model only. If you're on the legacy v1 
 ## Getting Help
 
 - [Troubleshooting](/troubleshooting) for symptom-by-symptom fixes
-- [Discord](https://discord.gg/cZeD9WYcV7) for the fastest answers
-- Report issues: [github.com/superset-sh/superset/issues](https://github.com/superset-sh/superset/issues)
-- Email: [support@superset.sh](mailto:support@superset.sh)
+- <a href={COMPANY.DISCORD_URL}>Discord</a> for the fastest answers
+- Report issues: <a href={`${COMPANY.GITHUB_URL}/issues`}>{`${SOCIAL.GITHUB.handle}/issues`}</a>
+- Email: <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EMAIL}</a>
 - All channels: [Community & Support](/community)

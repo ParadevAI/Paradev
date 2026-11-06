@@ -1,9 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type {
+	ContextMenuAnchorRect,
 	FileTreeDropResult,
 	FileTreeRenameEvent,
-	FileTreeRowDecoration,
-	FileTreeRowDecorationContext,
 	ContextMenuItem as PierreContextMenuItem,
 	ContextMenuOpenContext as PierreContextMenuOpenContext,
 } from "@pierre/trees";
@@ -12,7 +11,9 @@ import {
 	useFileTree as usePierreFileTree,
 } from "@pierre/trees/react";
 import type { AppRouter } from "@superset/host-service";
+import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
@@ -23,7 +24,7 @@ import {
 	RefreshCw,
 	Search,
 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGitStatusMap } from "renderer/hooks/host-service/useGitStatusMap";
 import {
 	ShadowClickHint,
@@ -52,18 +53,20 @@ import { useFilesTabBridge } from "./hooks/useFilesTabBridge";
 import { useFilesTabDrop } from "./hooks/useFilesTabDrop";
 import { useFileTreeScrollFade } from "./hooks/useFileTreeScrollFade";
 import { buildPierreGitStatus } from "./utils/buildPierreGitStatus";
-import { stripTrailingSlash, toAbs, toRel } from "./utils/treePath";
+import { stripTrailingSlash, toAbs } from "./utils/treePath";
 
 const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: FILE_EXPLORER_ROW_HEIGHT,
 	levelIndent: FILE_EXPLORER_INDENT,
 	withSearchChrome: true,
 });
 
 type GitStatusData = inferRouterOutputs<AppRouter>["git"]["getStatus"];
 
+const NARROW_HIDDEN = "hidden @min-[200px]/file-tree-header:inline-flex";
+
 interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
+	variant?: "sidebar" | "fileView";
 	selectedFilePath?: string;
 	pendingReveal?: {
 		path: string;
@@ -76,6 +79,7 @@ interface FilesTabProps {
 
 export function FilesTab({
 	onSelectFile,
+	variant = "sidebar",
 	selectedFilePath,
 	pendingReveal,
 	workspaceId,
@@ -115,11 +119,6 @@ export function FilesTab({
 		onMove(_event: FileTreeDropResult) {},
 		onMoveError(_message: string) {},
 		onRenameError(_message: string) {},
-		renderRowDecoration(
-			_ctx: FileTreeRowDecorationContext,
-		): FileTreeRowDecoration | null {
-			return null;
-		},
 	});
 
 	const { model } = usePierreFileTree({
@@ -140,7 +139,6 @@ export function FilesTab({
 		itemHeight: FILE_EXPLORER_ROW_HEIGHT,
 		overscan: FILE_EXPLORER_OVERSCAN,
 		stickyFolders: true,
-		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
 	});
 
 	const bridge = useFilesTabBridge({ model, workspaceId, rootPath });
@@ -188,6 +186,35 @@ export function FilesTab({
 		[model],
 	);
 
+	const [rootMenuAnchor, setRootMenuAnchor] =
+		useState<ContextMenuAnchorRect | null>(null);
+	const handleTreeBackgroundContextMenu = useCallback(
+		(event: React.MouseEvent<HTMLDivElement>) => {
+			for (const node of event.nativeEvent.composedPath()) {
+				if (!(node instanceof HTMLElement)) continue;
+				if (
+					node.dataset.itemPath !== undefined ||
+					node.closest("[data-file-tree-context-menu-root]")
+				) {
+					return;
+				}
+			}
+			event.preventDefault();
+			const { clientX: x, clientY: y } = event;
+			setRootMenuAnchor({
+				top: y,
+				bottom: y,
+				left: x,
+				right: x,
+				width: 0,
+				height: 0,
+				x,
+				y,
+			});
+		},
+		[],
+	);
+
 	const drop = useFilesTabDrop({ model, bridge, rootPath, workspaceId });
 
 	// Pierre stamps its own drag with the tree-relative path and
@@ -219,13 +246,14 @@ export function FilesTab({
 
 	useFallthroughIcons(model);
 
-	// Reflect external selection changes (e.g. tab switch) back into the model.
+	// Reveal reads the latest tree, but only a new open file should move the
+	// selection; re-running on every folder load would yank the scroll.
+	const revealRef = useRef(reveal);
+	revealRef.current = reveal;
 	useEffect(() => {
 		if (!selectedFilePath || !rootPath) return;
-		const rel = toRel(rootPath, selectedFilePath);
-		if (!bridge.knownPaths.has(rel)) return;
-		model.focusPath(rel);
-	}, [model, selectedFilePath, rootPath, bridge.knownPaths]);
+		void revealRef.current(selectedFilePath, false);
+	}, [selectedFilePath, rootPath]);
 
 	useEffect(() => {
 		if (!pendingReveal || !rootPath) return;
@@ -238,11 +266,6 @@ export function FilesTab({
 	handlersRef.current.onRenameError = (message) => handleRenameError(message);
 	handlersRef.current.onMove = (event) => void handleMove(event);
 	handlersRef.current.onMoveError = (message) => toast.error(message);
-	// No-op: Pierre's setGitStatus already renders its own per-row status
-	// indicator (and tints the row text), so a custom decoration here would
-	// duplicate it. Kept the wiring in place in case we want to layer
-	// something Pierre doesn't show (e.g. lock icons, debug markers).
-	handlersRef.current.renderRowDecoration = () => null;
 
 	// Hint tooltip uses ShadowClickHint to anchor a single shadcn Tooltip
 	// over the hovered row's bounding rect — Pierre owns the row DOM inside
@@ -311,7 +334,7 @@ export function FilesTab({
 
 	if (!rootPath) {
 		return (
-			<div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+			<div className="flex h-full w-full items-center justify-center gap-2 text-sm text-muted-foreground">
 				{workspaceQuery.isLoading ? (
 					<>
 						<Loader2 className="size-3.5 animate-spin" />
@@ -336,6 +359,7 @@ export function FilesTab({
 			className="relative flex h-full min-h-0 flex-col overflow-hidden"
 			onClickCapture={handleClickCapture}
 			onClick={handleTreeBackgroundClick}
+			onContextMenu={handleTreeBackgroundContextMenu}
 			onDragStart={handleRowDragStart}
 			onDragOver={drop.onDragOver}
 			onDragLeave={drop.onDragLeave}
@@ -349,16 +373,22 @@ export function FilesTab({
 					header={
 						<div
 							data-file-tree-header="true"
-							className="group flex h-10 items-center gap-1 bg-background px-2"
+							className="group @container/file-tree-header flex h-10 items-center gap-1 bg-background px-2"
 						>
 							{onSearch && (
 								<button
 									type="button"
 									onClick={onSearch}
-									className="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+									aria-label={t({ message: "Search files" })}
+									className={cn(
+										"flex min-w-0 items-center gap-1.5 @min-[150px]/file-tree-header:flex-1 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+										variant === "fileView"
+											? "h-7 rounded-full border border-border/60 bg-background px-2.5 shadow-sm"
+											: "h-8 rounded-md px-1.5",
+									)}
 								>
 									<Search className="size-3.5 shrink-0" />
-									<span className="truncate">
+									<span className="hidden truncate @min-[150px]/file-tree-header:inline">
 										<Trans>Search files</Trans>
 									</span>
 								</button>
@@ -369,6 +399,7 @@ export function FilesTab({
 									label={t({
 										message: "New File",
 									})}
+									className={NARROW_HIDDEN}
 									onClick={() => void startCreating("file")}
 								/>
 								<FilesTabHeaderButton
@@ -376,6 +407,7 @@ export function FilesTab({
 									label={t({
 										message: "New Folder",
 									})}
+									className={NARROW_HIDDEN}
 									onClick={() => void startCreating("folder")}
 								/>
 								<FilesTabHeaderButton
@@ -401,6 +433,26 @@ export function FilesTab({
 			</ShadowClickHint>
 
 			{drop.dropTarget && <FilesTabDropOverlay target={drop.dropTarget} />}
+			{rootMenuAnchor && (
+				<PierreRowContextMenu
+					anchorRect={rootMenuAnchor}
+					onClose={() => setRootMenuAnchor(null)}
+					data-file-tree-context-menu-root="true"
+				>
+					<DropdownMenuItem
+						onSelect={() => setTimeout(() => void startCreating("file"), 0)}
+					>
+						<FilePlus />
+						<Trans>New File...</Trans>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onSelect={() => setTimeout(() => void startCreating("folder"), 0)}
+					>
+						<FolderPlus />
+						<Trans>New Folder...</Trans>
+					</DropdownMenuItem>
+				</PierreRowContextMenu>
+			)}
 		</div>
 	);
 }

@@ -1,9 +1,12 @@
 import "../../../scripts/test-preload.ts";
 
 process.env.SKIP_ENV_VALIDATION = "1";
+process.env.BILLING_PROVIDER = "stripe";
 // Importing a module that constructs a client throws without these. None
 // connects until it is used.
 process.env.STRIPE_SECRET_KEY ??= "sk_test_placeholder";
+process.env.AUTUMN_SECRET_KEY ??= "am_sk_test_placeholder";
+process.env.AUTUMN_WEBHOOK_SECRET ??= "whsec_cGxhY2Vob2xkZXI=";
 process.env.RESEND_API_KEY ??= "re_placeholder";
 process.env.NEXT_PUBLIC_POSTHOG_KEY ??= "phc_placeholder";
 // @superset/email validates this at import and has no opt-out.
@@ -21,4 +24,6 @@ Object.assign(process.env, {
 	QSTASH_TOKEN: "qstash-token",
 	SERVER_ANTHROPIC_API_KEY: "test",
 	SLACK_SIGNING_SECRET: "test-secret",
+	YC_BOOKFACE_REWARD_ID: "yc-bookface-3mo-team",
+	YC_DEALS_WEBHOOK_SECRET: "test-secret",
 });

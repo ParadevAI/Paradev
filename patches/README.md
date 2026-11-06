@@ -77,20 +77,8 @@ worst-case pages at 64 MiB instead of 1 GiB.
 patch markers in the installed bundles. If it fails after a version bump,
 regenerate the patch — don't delete the test.
 
-**Regenerating after a version bump** (~10 min):
-
-```bash
-bun patch @xterm/addon-webgl@<new-version>
-# edit node_modules/@xterm/addon-webgl per the three changes above:
-#   - both lib bundles are minified; find `getParameter(<gl>.MAX_TEXTURE_SIZE)`
-#     (2 sites) and wrap each in Math.min(4096, ...)
-#   - find `_onRemoveTextureAtlasCanvas.fire(<p>.canvas)` (merge path) and the
-#     `_evictAllPages` loop; add `<p>.canvas.width=0,<p>.canvas.height=0`
-#   - mirror the edits in src/GlyphRenderer.ts, src/WebglRenderer.ts,
-#     src/TextureAtlas.ts
-bun patch --commit 'node_modules/@xterm/addon-webgl'
-bun test apps/desktop/src/webgl-atlas-patch.test.ts
-```
+**Regenerating after a version bump:** follow the xterm procedure below; the
+addon builds from the same upstream commit.
 
 Before regenerating, check whether the new version made the patch obsolete:
 upstream already absorbed the render-loop page-count clamp and `_evictAllPages`
@@ -103,16 +91,17 @@ for upstreaming. If upstream ships them, delete the patch, the
 **Why:** SUPER-2120 / DESKTOP-12J. `Terminal.resize()` drains the write queue
 through `WriteBuffer.flushSync()`, which ignores the promise an async parser
 handler returns and then re-enters the parser without the continuation token
-it needs. `@xterm/addon-image` decodes inline images asynchronously (cursor-agent
-draws them with the kitty protocol because we identify as kitty), so a re-fit
+it needs. `@xterm/addon-image` decodes inline images asynchronously (any program that
+draws sixel, iTerm or kitty graphics), so a re-fit
 landing mid-decode put the parser in its FAIL state: every later write throws,
 the pane never renders again while the program keeps running, and only
 recreating the pane recovers. `flushSync` also drained from index 0 regardless
 of `_bufferOffset`, re-parsing chunks a sliced `_innerWrite` had already
 applied — duplicated output on a resize during heavy output.
 
-**What it changes** (`lib/xterm.js`, `lib/xterm.mjs`, and
-`src/common/input/WriteBuffer.ts` for readability — bundles are what run):
+**What it changes** (`lib/xterm.js`, `lib/xterm.mjs`, rebuilt from upstream
+source with the `src/` files in this patch; those files are what the bundles
+were built from):
 
 1. `flushSync` returns early while a chunk is paused in an async handler
    (`_asyncPending`), drains from `_bufferOffset` instead of index 0, and when a
@@ -147,6 +136,21 @@ applied — duplicated output on a resize during heavy output.
    helper and Unicode-service injection. Existing buffer/disposal bundle code
    is preserved. No font substitution or dependency upgrade is involved.
 
+5. `Emitter` (also `src/common/Event.ts`): since 6.1.0-beta.304, `fire()`
+   iterates the listener array in place, and `dispose()` truncated that same
+   array with `length = 0`. A listener that disposes its own emitter (a
+   terminal disposed from a render callback) then crashed the loop with
+   "undefined is not an object (evaluating 't[i].fn')". `dispose()` now
+   replaces the array. Still present on upstream master; the render-debouncer
+   guard test reproduces it.
+
+6. `IModes.mouseEncoding` (also `src/browser/public/Terminal.ts` and
+   `typings/xterm.d.ts`): `terminal.modes` reports the active mouse encoding
+   (`'default' | 'sgr' | 'sgr-pixels'`), so `@xterm/addon-serialize` can
+   restore it. Backported from
+   [xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174), commit
+   `793883591` (open, not yet released). See the addon-serialize section below.
+
 **IME removal condition:** Follow-up: [Superset #7490](https://github.com/superset-sh/superset/issues/7490). Track [upstream fix #6162](https://github.com/xtermjs/xterm.js/pull/6162)
 and [upstream issue #6161](https://github.com/xtermjs/xterm.js/issues/6161).
 An upstream merge alone is not enough: wait for a published xterm version
@@ -176,26 +180,102 @@ scheduled and nothing may throw.
 both installed bundles: CJK cell widths, combining and supplementary characters,
 right-edge constraints, font resizing, clearing preedit, and committing once.
 
-**Regenerating after a version bump** (~10 min), unless upstream has absorbed
-it (check `WriteBuffer.flushSync` for `_asyncPending` or an equivalent guard,
-`RenderDebouncer.dispose` for a disposed flag or callback clearing, and
-`CompositionHelper` for Unicode-aware cell layout; drop
-whichever hunks upstream carries, and delete the patch, the
-`patchedDependencies` entry, and the tests only once all are gone):
+Before regenerating, check whether upstream has absorbed any hunk:
+`WriteBuffer.flushSync` for `_asyncPending` or an equivalent guard,
+`RenderDebouncer.dispose` for a disposed flag or callback clearing,
+`CompositionHelper` for Unicode-aware cell layout, and `Emitter.dispose` for
+replacing rather than truncating its listeners. Drop whichever hunks upstream
+carries, and delete the patch, the `patchedDependencies` entry, and the tests
+only once all are gone.
+
+**Regenerating after a version bump** (~15 min). The bundles are rebuilt from
+upstream source with the readable `src/` changes applied, never hand-edited:
+a minified bundle renames identifiers and module ids on every build.
 
 ```bash
+# 1. The npm package.json carries the source commit ("commit": "<sha>").
+git clone https://github.com/xtermjs/xterm.js && cd xterm.js
+git checkout <sha> && npm ci
+# Stamp the version so the bundle matches npm byte for byte, then confirm it:
+#   src/common/Version.ts -> export const XTERM_VERSION = '<new-version>';
+npm run package          # lib/xterm.js (webpack), lib/xterm.mjs and addon .mjs (esbuild)
+(cd addons/addon-webgl && npx webpack)   # lib/addon-webgl.js
+# Compare lib/*.js and lib/*.mjs with the published package: they must be
+# identical before any change is applied.
+
+# 2. Apply the src/ hunks from the current patch files, rebuild, run upstream tests:
+npm run package && (cd addons/addon-webgl && npx webpack)
+npx mocha out/common/Event.test.js out/common/input/WriteBuffer.test.js out/browser/input/CompositionHelper.test.js
+
+# 3. From the Superset repo, copy the rebuilt bundles and changed src/ files into the bun patch:
+XTERM=$PWD && cd <superset>
 bun patch @xterm/xterm@<new-version>
-# edit node_modules/@xterm/xterm per the four changes above — in both lib
-# bundles find `flushSync(){` and the `if(<promise>){...}` branch inside
-# `_innerWrite`, and the class holding `_runRefreshCallbacks(){`; mirror the
-# edits in src/common/input/WriteBuffer.ts and src/browser/RenderDebouncer.ts
-# For composition, port the upstream CompositionHelper source and transpile
-# that helper into both bundles, retaining their surrounding code. Add the
-# IUnicodeService constructor injection (index 6) and UnicodeService import;
-# bundled module identifiers vary between versions. Check both bundle tests.
+cp "$XTERM"/lib/xterm.js "$XTERM"/lib/xterm.mjs node_modules/@xterm/xterm/lib/
+cp "$XTERM"/<changed src files> node_modules/@xterm/xterm/src/...
 bun patch --commit 'node_modules/@xterm/xterm'
-bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts
+bun patch @xterm/addon-webgl@<new-version>
+cp "$XTERM"/addons/addon-webgl/lib/addon-webgl.{js,mjs} node_modules/@xterm/addon-webgl/lib/
+cp "$XTERM"/addons/addon-webgl/<changed src files> node_modules/@xterm/addon-webgl/src/...
+bun patch --commit 'node_modules/@xterm/addon-webgl'
+bun patch @xterm/addon-serialize@<new-version>
+(cd "$XTERM"/addons/addon-serialize && npx webpack)   # lib/addon-serialize.js
+cp "$XTERM"/addons/addon-serialize/lib/addon-serialize.{js,mjs} node_modules/@xterm/addon-serialize/lib/
+cp "$XTERM"/addons/addon-serialize/src/SerializeAddon.ts node_modules/@xterm/addon-serialize/src/
+bun patch --commit 'node_modules/@xterm/addon-serialize'
+# bun patch --commit can record a .bun-tag-* file; drop that hunk from the patch.
+bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts
 ```
+
+Use a real `node_modules` from `npm ci`. A symlinked one changes webpack's
+module ids, and `lib/xterm.js` no longer matches npm.
+
+`@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
+taken the day it ships; this rebuild is the review. Every `@xterm/*` version
+moves together (sherif), and `apps/mobile` needs
+`bun run scripts/generate-terminal-html.ts`.
+
+## @xterm/addon-serialize (`@xterm%2Faddon-serialize@<version>.patch`)
+
+**Why:** `serialize()` restores mouse tracking (`?1000h`/`?1002h`/`?1003h`)
+but not the mouse encoding (`?1006h` SGR, `?1016h` SGR-pixels). The mobile
+terminal repaints a pooled session from `serialize()` when you switch tabs,
+so the display came back with the default encoding. xterm emits those
+reports through `onBinary`, and Codex, which arms SGR once at startup, stopped
+scrolling after a tab switch until the session was reopened. Claude Code
+re-arms SGR on redraw, so it hid the bug.
+
+**What it changes** (`lib/addon-serialize.js`, `lib/addon-serialize.mjs`,
+`src/SerializeAddon.ts`): the mode preamble writes `?1006h` or `?1016h` from
+`terminal.modes.mouseEncoding` (xterm hunk 6). With an unpatched xterm the
+field is undefined and nothing is written. Backported from
+[xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174).
+
+**Guard test:** `apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts`
+round-trips each encoding through `serialize()` into a fresh terminal.
+
+**Regenerating:** part of the xterm procedure above; both packages build from
+the same upstream commit.
+
+**Removing:** once a published xterm and addon-serialize carry #6174, drop
+this patch, xterm hunk 6, and the `patchedDependencies` entry. Keep the guard
+test.
+
+## @xterm/addon-ligatures (`@xterm%2Faddon-ligatures@<version>.patch`)
+
+**Why:** the package's ESM build (`lib/addon-ligatures.mjs`) imports
+`node:diagnostics_channel`. Vite externalizes it for the browser, so the
+renderer throws at module load and never mounts (a white screen). The CommonJS
+build has no such import.
+
+**What it changes:** `package.json` only: `module` points at
+`lib/addon-ligatures.js`, and an `exports` map sends `import` and `default`
+there too.
+
+**Regenerating:** `bun patch @xterm/addon-ligatures@<new-version>`, make the
+same two `package.json` edits, `bun patch --commit`, clear
+`apps/desktop/node_modules/.vite`, and boot the renderer. Unit tests never load
+this addon; `apps/desktop/src/xterm-ligatures-patch.test.ts` checks instead
+that the entry Vite resolves has no `node:diagnostics_channel` import.
 
 ## trpc-electron (`trpc-electron@<version>.patch`)
 
@@ -320,48 +400,43 @@ port-clearing exec trampoline; keep the patched helper (or ship our own) for it.
 
 ## react-native-screens (`react-native-screens@<version>.patch`)
 
-**Why:** on iOS, a form sheet screen (`presentation: "formSheet"`) finds the
-`ScrollView` in its content on every layout pass and sizes it to the sheet's
-frame. When a sheet is replaced by a pushed screen (`router.replace` from the
-pull-requests sheet), Fabric recycles the sheet's `UIScrollView` into the new
-screen, and the dismissed sheet still gets one more layout pass *after* it has
-been invalidated: it finds that recycled scroll view down its old subview chain
-and sizes it to the sheet again. The PR screen came up with its scroll view at
-464pt (the `[0.5]` detent), everything below the fold unpainted and untappable,
-and every later screen that reused that scroll view instance did the same.
-Upstream #4091 (in 4.26.0) only removes the KVO observer in `invalidate`; the
-layout-pass path is untouched and still present on `4.28-stable` as of
-2026-09-12. Diagnosed with `NSLog` in `correctScrollViewFrame:` and
-`invalidateImpl`: the correction to 464pt logs 4ms after the sheet's
-invalidate, on the same scroll view pointer the new screen had just laid out at
-956pt.
+The form sheet scroll view fix this patch used to carry (a dismissed sheet
+resizing a recycled `UIScrollView` in the screen that replaced it) is upstream
+since 4.30 (#4651). `apps/mobile/react-native-screens-sheet-patch.test.ts` now
+checks that the installed package still has it; if a bump loses it, restore the
+early return on `_invalidated` in `applyFrameCorrectionForDescendantScrollView`
+(`ios/RNSScreen.mm`). Verify in the simulator: open a workspace with two PRs,
+tap the PR chip, tap a row, go back, reopen the sheet, tap the other row. The
+second PR must show its description and the Files row without scrolling.
 
-**What it changes** (`ios/RNSScreen.mm`): an `_invalidated` flag set in
-`invalidateImpl`; `applyFrameCorrectionForDescendantScrollView` returns early
-once it is set. Reproduced unpatched on 4.27.0 (latest stable, 2026-09-12) in
-the same flow, so bumping alone does not fix it. 4.27.0 already declares an
-`invalidated` property on `RNSScreenView` (set in `invalidateImpl`, used only
-for transition progress and header config), so a regenerated patch for 4.27+
-must not add the ivar again — only the early return is needed.
+### Interactive push
 
-**Guard test:** `apps/mobile/react-native-screens-sheet-patch.test.ts`.
+**Why:** Home's right-edge swipe returns to the last workspace, and the pushed
+screen follows the finger like the back swipe does. react-native-screens can
+only drive a *pop* interactively; UIKit asks for an interaction controller only
+when the stack returns a custom animator, and the stack returns none for a
+default push.
 
-**Regenerating after a version bump** (~2 min, plus a native rebuild to verify):
+**What it changes:** `RNSScreenStackView` gets `armInteractivePush`,
+`updateInteractivePush:` and `endInteractivePush:`, called by
+`apps/mobile/modules/forward-swipe`. The next push after `arm` (JS performs it)
+gets `RNSScreenStackAnimator` and an `RNSPercentDrivenInteractiveTransition`.
+Progress and the release that arrive before UIKit starts the transition are
+kept and applied from the new `onStart` hook. The simple-push animator starts
+paused and linear when interactive, like its pop branch. A cancelled push
+leaves UIKit's stack, and `RNSScreen` sends `onDismissed`, so JS drops the
+route. An arm with no push in 1 s expires. `arm` does not call
+`cancelTouchesInParent`: the forward-swipe module resets
+`RCTSurfaceTouchHandler` itself when its pan begins, so the row under the
+finger does not press on release. A second reset from `arm` throws
+"Inconsistency between local and UIKit touch registries".
 
-```bash
-bun patch react-native-screens@<new-version>
-# in node_modules/react-native-screens/ios/RNSScreen.mm, return early from
-# applyFrameCorrectionForDescendantScrollView when `_invalidated` is set.
-# Before 4.27.0 only: also add `BOOL _invalidated;` to the RNSScreenView ivar
-# block and set `_invalidated = YES;` first thing in invalidateImpl (4.27.0+
-# already has both; adding the ivar again fails to compile).
-bun patch --commit 'node_modules/react-native-screens'
-bun test apps/mobile/react-native-screens-sheet-patch.test.ts
-```
+**Guard test:** `apps/mobile/react-native-screens-interactive-push-patch.test.ts`.
 
-Verify in the simulator: open a workspace with two PRs, tap the PR chip, tap a
-row, go back, reopen the sheet, tap the other row. The second PR must show its
-description and the Files row without scrolling.
+**Regenerating:** re-apply the hunks in `ios/RNSScreenStack.h`,
+`ios/RNSScreenStack.mm`, `ios/RNSPercentDrivenInteractiveTransition.{h,mm}` and
+`ios/RNSScreenStackAnimator.mm`. Verify in the simulator: open a workspace, go
+back, swipe in from Home's right edge, let go past half way and short of it.
 
 ## @pierre/trees (`@pierre%2Ftrees@<version>.patch`)
 
@@ -380,8 +455,8 @@ exactly that shape whenever a loaded directory comes back from the host as a
 non-directory (a dangling symlink, or a directory replaced by a file between
 listings) while a row beneath it is still selected; the throw leaves the
 controller half-reset (store swapped, subscription dropped, projection stale)
-until the next refresh. Reproduced against 1.0.0-beta.5; 1.0.0-beta.6 carries
-the same code.
+until the next refresh. Reproduced against 1.0.0-beta.5; 1.0.0-beta.6 still
+carries the same code.
 
 **What it changes** (`dist/path-store/src/canonical.js`): one line in
 `findNodeIdBySegments` — return null when the node reached so far is not a
@@ -404,6 +479,42 @@ bun test apps/desktop/src/pierre-trees-lookup-patch.test.ts
 **Removing:** delete the patch, the `patchedDependencies` entry and the guard
 test once @pierre/trees ships a release whose segment walk stops at a file
 node.
+
+## @pierre/diffs (`@pierre%2Fdiffs@<version>.patch`)
+
+**Why:** GH #9136 stress testing. The Changes pane showed `VirtualizedFile.render:
+rendered a different file than its prepared layout` in place of every visible
+diff whenever its patch request failed (reproduced with 3,000 untracked files:
+7 errors per load, every load). `VirtualizedFile.finalizeRender` compares the
+rendered file with the prepared one by object identity. The renderer can hand
+back the result it cached for an earlier, equal file object, so an equal file
+throws. `VirtualizedFileDiff.finalizeRender` already compares by target
+(`areDiffTargetsEqual`). 1.6.2 is the latest release.
+
+**What it changes** (`dist/components/VirtualizedFile.js`): one line in
+`finalizeRender` — compare with `areFileTargetsEqual` (cache key, or name,
+contents and language), which the same file already uses everywhere else.
+
+**Guard test:** `apps/desktop/src/pierre-diffs-finalize-render-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch @pierre/diffs@<new-version>
+# in node_modules/@pierre/diffs/dist/components/VirtualizedFile.js, in
+# finalizeRender, replace `this.getRenderedFile() !== this.pendingRender?.file`
+# with `!areFileTargetsEqual(this.getRenderedFile(), this.pendingRender?.file)`
+bun patch --commit 'node_modules/@pierre/diffs'
+bun test apps/desktop/src/pierre-diffs-finalize-render-patch.test.ts
+```
+
+`bun patch --commit` can also record deletions of the bundled
+`dist/node_modules/.pnpm/@types_*` files. Keep only the `VirtualizedFile.js`
+hunk.
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test once @pierre/diffs ships a release whose `VirtualizedFile.finalizeRender`
+compares by target.
 
 ## expo-observe (`expo-observe@<version>.patch`)
 
@@ -441,3 +552,225 @@ version's files, write the diff to
 package root), update the key in `patchedDependencies`, run `bun install`, then
 `bun test apps/mobile/react-native-enriched-markdown-list-patch.test.ts`. It is
 a native change: rebuild the app to see it.
+
+## @better-auth/oauth-provider (`@better-auth%2Foauth-provider@<version>.patch`)
+
+**Why:** the token endpoint rotates the refresh token on every refresh. When a
+rotated token is sent again, it treats that as theft and deletes every refresh
+and access token the user holds for that client, on every machine. Several CLI
+processes on one machine, or the CLI and a host-service, refresh at the same
+moment as a matter of course, and a client that loses a response retries it.
+Both send the rotated token again within seconds, and the user is logged out
+everywhere (GH #8426). A check in a `before` hook cannot fix this: between the
+hook's read and the provider's read, another request can rotate the token.
+
+**What it changes** (`dist/index.mjs`, `handleRefreshTokenGrant`): when the
+token was revoked less than 10 minutes ago, the request still fails with
+`invalid_grant` but the token family is kept, and the server logs a
+`[oauth-refresh-reuse-grace]` warning so a stolen-token reuse stays visible.
+Reuse after 10 minutes still deletes it. The CLI and the host-service retry a refresh with an unknown
+outcome only within 5 minutes (`REFRESH_TIMINGS.retryWindowMs` in
+`packages/shared/src/oauth-refresh.ts`), so keep that below this window. The
+guard test checks it.
+
+**Guard test:** `packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+It runs the installed provider against an in-memory database.
+
+**Regenerating after a version bump:** `bun patch @better-auth/oauth-provider`,
+make the same change in `handleRefreshTokenGrant` (keep the
+`superset-patch: refresh-reuse-grace` comment), `bun patch --commit
+'node_modules/@better-auth/oauth-provider'`, then
+`bun test packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+
+## react-native (`react-native@<version>.patch`)
+
+**Why:** On iPhone Duo the status bar and navigation buttons sit in a column on
+one side of the window. UIKit reports it as a side safe area, but
+`ScrollView`'s `contentInsetAdjustmentBehavior` only clears the safe area along
+the scrolling axis, so list rows run under the column. The upstream fix is
+facebook/react-native#59194 (open), built on #58109
+(`experimental_onSafeAreaInsetsChange`, on `main` since 2026-10-09). Neither is
+in 0.88.
+
+**What it changes:** the iOS and shared parts of both PRs. A `View` reports its
+native safe-area insets; a `ScrollView` whose `contentInsetAdjustmentBehavior`
+is not `never` pads its content container by the insets across its scrolling
+axis, and `RCTEnhancedScrollView` stops UIKit adding the same inset again. bun
+cannot apply a patch that creates files, so the two new modules of the PRs
+(`getSafeAreaContentPadding`, `warnOnRepeatedSafeAreaInsetsChanges`) are
+inlined at the end of `ScrollView.js` and `View.js`. The native half is in
+React Native's core, so `app.config.ts` sets `buildReactNativeFromSource`.
+
+**Guard test:** `apps/mobile/react-native-safe-area-scroll-patch.test.ts`.
+
+**Removing:** delete the patch, its `patchedDependencies` entry and
+`buildReactNativeFromSource` once the React Native in use ships #59194.
+
+**Regenerating:** apply `gh pr diff 58109` and `gh pr diff 59194` (React Native
+repo, without Android, tests, rn-tester and API snapshots) to a copy of the
+package with `patch -p3`, inline the two new files as above, and write
+`git diff` as the patch. Verify on the folded iPhone Duo: Settings rows end
+before the button column.
+
+## electron-chrome-web-store (`electron-chrome-web-store@<version>.patch`)
+
+**Why:** the package reads the CRX3 header and checks that the declared
+extension ID matches a public key, but never verifies a signature, and it
+unpacks CRX2 files with no check at all. HTTPS to Google is then the only guard
+on code that runs in every page of the browser pane. Installs and updates
+download, parse and unpack in one internal call chain (`downloadExtensionFromURL`
+→ `parseCrx` → `unpackCrx`), so no option or hook of the package can see the
+bytes in between.
+
+**What it changes** (`dist/cjs/browser/index.js`, `dist/esm/browser/index.mjs`
+and the types): `parseCrx`, the one function every install and update passes
+through, first calls a verifier set with the new `setCrxVerifier` export, and
+refuses every CRX while none is set. It also exports the existing
+`downloadExtensionFromURL`, so a test can serve a CRX from a local server. The
+verifier is `apps/desktop/src/main/lib/browser/extension-host/crx3.ts`.
+
+Two more changes. The store page's preload swaps "Chrome" for the app name in
+every label on every pass, so a name that contains "Chrome" (a dev build's
+does) grew without end; `updateBranding` now skips a label that already holds
+the name. And the store's Remove ignored `showConfirmDialog` and deleted the
+extension at once; a new `onUninstall` option hands the removal to the app,
+which asks first and removes through its own path.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/web-store.test.ts`.
+It downloads a real Web Store CRX, the same bytes with one flipped byte, and an
+unsigned CRX2 through the installed package, and checks that only the first
+reaches disk. Without the patch its imports do not exist and typecheck fails.
+Its second test runs the installed `updateBranding` five times with an app name
+that contains "Chrome" and expects the name once.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-web-store`
+(without `CI=1` it runs the native rebuild), make the same change in `parseCrx`
+and both export lists of both bundles, `CI=1 bun patch --commit
+'node_modules/electron-chrome-web-store'`, then run the guard test.
+
+## electron-chrome-extensions (`electron-chrome-extensions@<version>.patch`)
+
+**Why:** the package checks almost no extension permissions at its API
+boundary.
+
+1. The router takes the extension ID from the IPC message and runs the handler
+   as that extension. A renderer that reaches raw IPC could then act as another
+   extension, for example LastPass, for tabs, windows, menus and toolbar
+   actions.
+2. Every extension gets each tab's `url`, `pendingUrl`, `title` and
+   `favIconUrl` from `tabs.*`, and again inside each window's `tabs` from
+   `windows.*`, whatever its permissions. The install dialog warns about
+   browsing history only for `tabs`.
+3. The preload gives every extension `chrome.cookies`. With no permission, an
+   extension could read, set and remove any site's cookies, session cookies
+   included, and `cookies.onChanged` went to all of them.
+4. Every frame navigation, with its URL, went to every extension through
+   `webNavigation.*` events, and `getFrame`/`getAllFrames` had no check.
+5. `notifications.*` and `contextMenus.*` had no permission check.
+   `permissions.request` granted without asking when the app had no prompt,
+   and its grants were never read.
+
+**What it changes** (`dist/cjs/index.js`, `dist/esm/index.mjs`):
+
+1. The router's `crx-msg`, `crx-add-listener` and `crx-remove-listener`
+   handlers derive the ID from the sender (the frame's URL, or the service
+   worker's scope) and refuse a message whose ID differs. A message with no ID
+   (the app's own UI) still passes; handlers that need an extension already
+   refuse it.
+2. One table, `extensionApiRules`, keyed by handler and event name, holds
+   Chrome's rule for the `tabs`, `windows`, `cookies`, `webNavigation`,
+   `notifications` and `contextMenus` namespaces (`ruledApiNamespaces`). A rule names the API permission it needs (`permission`), a
+   check on the call's arguments (`allowed`), and a filter for the result
+   (`result`) or for an event's arguments (`args`), run for the extension that
+   calls or listens. `onExtensionMessage` refuses the call before the handler
+   runs and filters what it returns. `sendEvent` skips a listener without the
+   permission, filters the arguments per listener, and skips it when the filter
+   returns nothing. A name in those namespaces with no rule fails closed:
+   the call throws, and the event goes to nobody.
+3. Tabs: an extension sees the four fields with `tabs`, a host permission
+   (`permissions` or `host_permissions`) that matches the tab's URL, or
+   `activeTab` on the active tab (`canSeeTabUrl`). Otherwise it gets a copy
+   without them (`tabDetailsForExtension`); the `tabDetailsCache` entry stays
+   whole. `tabs.query` matches no hidden tab on `url` or `title`, and an
+   `onUpdated` whose only changes were hidden fields is dropped.
+   `browserAction.onClicked` and `tabs.onCreated` carry the tab through the
+   same filter. `tabs.insertCSS` needs a host permission or `activeTab` for the
+   tab. Windows: each embedded tab goes through the same filter, in a copy of
+   the cached window.
+4. Cookies: every call and `onChanged` needs `cookies`. A cookie is visible
+   only with a host permission for its URL (`https` or `http` by `secure`, its
+   domain, its path), as Chrome builds it. `get` returns `null` and `getAll`
+   leaves out the others; `set` and `remove` throw without a host permission
+   for `details.url`.
+5. webNavigation: every call and event needs `webNavigation`. Notifications
+   and context menus: every call and event needs `notifications` or
+   `contextMenus`.
+6. Grants: an extension holds its manifest's `permissions` and
+   `host_permissions`, plus what `permissions.request` granted
+   (`grantedPermissions`, kept in `runtimeGrants` until the extension
+   unloads). `request` takes only what the manifest declares as required or
+   optional; a host pattern covers origins, never an API permission
+   (`originCovered`). It asks the app, refuses when the app has no prompt, and
+   sends `permissions.onAdded`. `remove` refuses a required entry. `getAll`
+   and `contains` read the same grants.
+7. `activeTab`: a click on the extension's toolbar button or one of its
+   context-menu items grants it for that tab's origin (`grantActiveTab`). It
+   ends when the tab moves to another origin or closes, and a return to the
+   origin does not bring it back.
+8. `browserAction.getState` and `browserAction.activate` are no longer IPC
+   handlers; the app calls them in the main process. `windows.create`,
+   `tabs.create` and `tabs.update` refuse `file:` and `data:` URLs, as they
+   already refused `chrome:` and `javascript:`. With no window focused,
+   `windows.getCurrent` and `windows.getLastFocused` answer the newest open
+   window, and throw as in Chrome when none is open.
+
+9. Context menus: `create`, `update`, `remove` and `removeAll` emit
+   `context-menus-changed` with the extension's items, and
+   `restoreContextMenuItems` puts saved items back without an event. The app
+   keeps them across restarts, as Chrome does (`extension-lifecycle.ts`).
+   `contextMenus.update` is a real handler, with a rule, instead of a no-op.
+10. Native messaging: the package's `runtime.connectNative` and
+   `runtime.sendNativeMessage` handlers are removed. They read one message per
+   chunk of host output, counted characters instead of bytes, and left hosts
+   running. The app's `extension-host/native-messaging/` is the only path.
+
+**What it changes** (`dist/chrome-extension-api.preload.js`): `chrome.storage`
+is no longer replaced. The package made `sync` and `managed` the same object
+as `local`; the app's `shimChromeStorage` gives each its own area instead.
+`contextMenus.update` calls the handler. The `runtime.connectNative` and
+`runtime.sendNativeMessage` entries are removed; the app's shim adds its own.
+
+Host patterns are matched by scheme, host and path, not by the package's
+`matchesPattern` glob, which lets `*://*.example.com/*` match any URL that
+contains `.example.com/`.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/electron-chrome-extensions-patch.test.ts`.
+It loads the router, `TabsAPI`, `WindowsAPI`, `CookiesAPI` and
+`WebNavigationAPI` from both installed bundles, with fake Electron objects. It
+runs `assertSenderIsExtension` against a popup that claims another extension's
+ID and a website that claims one. It calls handlers through
+`onExtensionMessage` and fires events through `sendEvent`, as extensions with
+no permission, `tabs`, a host permission, `activeTab`, `cookies` with and
+without a host, `webNavigation`, `notifications` and `contextMenus`, and
+through `permissions.request`. Two tests list every handler the API classes
+register and every event name their code sends, and fail when one has no rule
+in `extensionApiRules`. One drives `ContextMenusAPI` through each handler and
+`restoreContextMenuItems`, and one reads the preload for the two changes there.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-extensions`.
+In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
+`RoutingDelegate` and call it first in the three handlers; add the helpers and
+the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
+add the `canSeeTabUrl` line to the `TabsAPI.query` filter; add `update` and
+`emitChanged` to `ContextMenusAPI` and `restoreContextMenuItems` after
+`addWindow`; remove the `runtime.connectNative`, `runtime.disconnectNative`
+and `runtime.sendNativeMessage` handlers from `RuntimeAPI`. In the preload,
+delete the `storage` entry, the `connectNative` and `sendNativeMessage` entries,
+and the `noop` option of `contextMenus.update`. In
+`ExtensionRouter.onExtensionMessage`, look up `extensionApiRule(handlerName)`
+before the handler runs and pass the result through `apiRule.result`; in
+`sendEvent`, look up `extensionApiRule(eventName)` and check and filter per
+listener. Then `CI=1 bun patch --commit
+'node_modules/electron-chrome-extensions'`, drop the empty `.bun-tag-*` entry
+it adds, run `bun install`, and run the guard test. A new handler or event in
+a ruled namespace fails that test until it has a rule.

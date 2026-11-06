@@ -9,14 +9,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"github": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "github",
-		"version": "1.0.1",
+		"version": "1.0.4",
 		"description": "Work with issues, pull requests, and CI across your repositories.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"github",
@@ -37,7 +37,10 @@ export const FIRST_PARTY_MANIFESTS = {
 				},
 				"mcp": {
 					"type": "streamable-http",
-					"url": "https://api.githubcopilot.com/mcp/"
+					"url": "https://api.githubcopilot.com/mcp/",
+					"headers": {
+						"X-MCP-Toolsets": "context,repos,issues,pull_requests,users,actions"
+					}
 				}
 			}
 		},
@@ -55,14 +58,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"linear": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "linear",
-		"version": "1.5.3",
+		"version": "1.5.6",
 		"description": "Plan and build products: create, search, and update Linear issues.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"linear",
@@ -104,14 +107,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"notion": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "notion",
-		"version": "1.0.3",
+		"version": "1.0.6",
 		"description": "Search, read, and write your Notion workspace: pages, databases, and comments.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"notion",
@@ -150,14 +153,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"slack": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "slack",
-		"version": "1.2.3",
+		"version": "1.2.5",
 		"description": "Search, read, and post across your Slack workspace: channels, DMs, and threads.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"slack",
@@ -183,14 +186,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"sentry": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "sentry",
-		"version": "1.0.0",
+		"version": "1.0.3",
 		"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"sentry",
@@ -222,21 +225,21 @@ export const FIRST_PARTY_MANIFESTS = {
 			},
 			{
 				"name": "find-in-sentry",
-				"description": "Answer \"what's breaking\" questions from Sentry — find the right org and project, search issues and events with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service."
+				"description": "Answer \"what's breaking\" questions from Sentry — find the right org and project, search issues and errors with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service."
 			}
 		]
 	} as const,
 	"gmail": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "gmail",
-		"version": "1.1.5",
+		"version": "1.1.7",
 		"description": "Read, search, send, and organize mail in your Gmail account.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"gmail",
@@ -262,14 +265,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"granola": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "granola",
-		"version": "1.0.0",
+		"version": "1.0.3",
 		"description": "Recall what was said in your meetings: search, read, and query Granola notes and transcripts.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"granola",
@@ -308,14 +311,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"circleback": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "circleback",
-		"version": "1.0.0",
+		"version": "1.0.3",
 		"description": "Meeting notes, action items, and transcripts from Circleback: search what was said and work what was captured.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"circleback",
@@ -358,14 +361,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"ynab": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "ynab",
-		"version": "1.0.0",
+		"version": "1.0.2",
 		"description": "Track money in YNAB: accounts, categories, budgets, and transactions.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"ynab",
@@ -388,17 +391,54 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"autumn": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "autumn",
+		"version": "1.0.2",
+		"description": "Work with billing in Autumn: customers, plans, balances, and subscriptions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"autumn",
+			"billing",
+			"pricing",
+			"subscriptions",
+			"usage"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Autumn",
+					"category": "Data & APIs",
+					"icon": "autumn"
+				},
+				"connector": {
+					"slug": "autumn_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.useautumn.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 	"stripe": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "stripe",
-		"version": "1.0.0",
+		"version": "1.0.3",
 		"description": "Work with payments in Stripe: trace charges and subscriptions, read billing data, and search Stripe's docs.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"stripe",
@@ -441,14 +481,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"superhuman": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "superhuman",
-		"version": "1.0.0",
+		"version": "1.0.3",
 		"description": "Work your inbox from Superhuman: find and read threads, triage what needs you, draft replies in your voice, and schedule from your calendar.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"superhuman",
@@ -495,14 +535,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"neon": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "neon",
-		"version": "1.0.0",
+		"version": "1.0.2",
 		"description": "Work with your Neon Postgres: inspect projects and branches, read schemas, and run SQL.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"neon",
@@ -534,59 +574,17 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
-	"neon-readonly": {
-		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
-		"name": "neon-readonly",
-		"version": "1.0.1",
-		"description": "Read your Neon Postgres without writing to it: inspect projects and branches, read schemas, and run read-only SQL.",
-		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
-		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
-		"license": "MIT",
-		"keywords": [
-			"neon",
-			"postgres",
-			"database",
-			"sql",
-			"read-only"
-		],
-		"extensions": {
-			"superset": {
-				"interface": {
-					"displayName": "Neon (read-only)",
-					"category": "Data & APIs",
-					"icon": "neon"
-				},
-				"connector": {
-					"slug": "neon_mcp"
-				},
-				"bind": {
-					"headers": {
-						"Authorization": "Bearer ${config.access_token}"
-					}
-				},
-				"mcp": {
-					"type": "streamable-http",
-					"url": "https://mcp.neon.tech/mcp?readonly=true"
-				}
-			}
-		},
-		"skills": []
-	} as const,
 	"exa": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "exa",
-		"version": "1.0.1",
+		"version": "1.0.3",
 		"description": "Search the web, companies, and people with Exa.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"exa",
@@ -612,14 +610,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"posthog": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "posthog",
-		"version": "1.0.0",
+		"version": "1.0.2",
 		"description": "Ask PostHog about your product: query events and insights, look up people, and check feature flags.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"posthog",
@@ -654,14 +652,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"google-calendar": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "google-calendar",
-		"version": "1.0.0",
+		"version": "1.0.2",
 		"description": "Read and manage your Google Calendar: find events, check free time, and schedule meetings.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"google",
@@ -687,14 +685,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"vercel": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "vercel",
-		"version": "1.0.0",
+		"version": "1.0.2",
 		"description": "Work with Vercel: inspect projects and deployments, read build and runtime logs, and search Vercel's docs.",
 		"author": {
-			"name": "Superset",
-			"url": "https://superset.sh"
+			"name": "Paradev",
+			"url": "https://paradev.com"
 		},
-		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"vercel",
@@ -716,6 +714,350 @@ export const FIRST_PARTY_MANIFESTS = {
 				"mcp": {
 					"type": "streamable-http",
 					"url": "https://mcp.vercel.com"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"resend": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "resend",
+		"version": "1.0.0",
+		"description": "Send and debug email with Resend: emails, domains, contacts, broadcasts, and inboxes.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"resend",
+			"email",
+			"transactional",
+			"domains",
+			"broadcasts"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Resend",
+					"category": "Developer tools",
+					"icon": "resend"
+				},
+				"connector": {
+					"slug": "resend_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.resend.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "debug-resend-delivery",
+				"description": "Find out why an email sent with Resend did not arrive — find the email, read its status, then check the API log, the suppression list, the sending domain, and the webhook that should have reported it. Use when the user says an email never arrived, went to spam, bounced, or that their app's sends or webhooks are failing."
+			},
+			{
+				"name": "send-with-resend",
+				"description": "Send email through Resend without surprising anyone — check the sending domain first, prove the message on Resend's test addresses, and get the user's confirmation before mail goes to a real inbox. Use when the user asks to send, schedule, or batch-send an email, test a template, or wire Resend sending into a codebase."
+			}
+		]
+	} as const,
+	"peec": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "peec",
+		"version": "1.0.1",
+		"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"peec",
+			"aeo",
+			"geo",
+			"ai-search",
+			"seo",
+			"visibility"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Peec AI",
+					"category": "Data & APIs",
+					"icon": "peec"
+				},
+				"connector": {
+					"slug": "peec_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.peec.ai/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "diagnose-ai-visibility",
+				"description": "Find out why AI search engines leave your brand out of an answer, and pick the one fix that matches the cause — read the answers and the sources they cite, map the question to your own page, then decide if the page is broken, missing, weak, or outweighed by third-party sources. Use when the user asks why ChatGPT, Gemini, Perplexity or Google AI Overviews do not mention them, which prompts they lose, what content to write next, or how to improve AI visibility."
+			},
+			{
+				"name": "work-peec-actions",
+				"description": "Work through Peec AI's recommended actions and keep the record honest — site fixes first, decline false positives with a reason, log work you shipped as completed actions on the date it shipped so Peec's Impact view measures it, and check before and after. Use when the user asks what to do next in Peec, wants to triage or clean up Peec actions, record shipped content or fixes in Peec, or see whether a change moved AI visibility."
+			}
+		]
+	} as const,
+	"sazabi": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "sazabi",
+		"version": "1.0.0",
+		"description": "Investigate production with Sazabi: ask questions about your logs and traces, triage issues, check deploys, build dashboards, and send app and coding-agent telemetry to Sazabi.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"sazabi",
+			"logs",
+			"observability",
+			"opentelemetry",
+			"debugging",
+			"incidents"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Sazabi",
+					"category": "Developer tools",
+					"icon": "sazabi"
+				},
+				"connector": {
+					"slug": "sazabi_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.sazabi.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "add-logging",
+				"description": "Before shipping a change, add structured log lines to the code path it touches so the next investigation has evidence — one line per decision and failure, with stable event names and the IDs needed to join requests, at the right level and without secrets. Use when writing or reviewing a feature or fix, when a bug was hard to diagnose because the logs were silent, or when the user asks to improve logging or observability in code."
+			},
+			{
+				"name": "build-a-dashboard",
+				"description": "Turn a question the user keeps asking about production (error rates, latency, signups, cost) into a saved Sazabi dashboard built from live log queries — check the fields exist, validate before saving, and confirm every panel returns data. Use when the user asks for a dashboard, a recurring view or report, or says they keep checking the same numbers."
+			},
+			{
+				"name": "instrument-with-sazabi",
+				"description": "Get an application's logs and traces into Sazabi with OpenTelemetry — pick the SDK for the runtime, export over OTLP/HTTP to a Sazabi intake URL kept in an environment variable, and prove data arrives before calling it done. Use when the user wants to connect an app or service to Sazabi, add OpenTelemetry, set up logging or tracing, or asks why Sazabi shows no data for a service."
+			},
+			{
+				"name": "investigate-production",
+				"description": "Find out what is actually happening in production from Sazabi's logs, traces and issues before touching code — ask the logs a precise question, read the lines behind the answer, and separate the symptom from its cause. Use when the user reports a production error, a slow or failing endpoint, a customer complaint, an alert, or asks what is broken, what changed, or why something stopped working."
+			},
+			{
+				"name": "send-agent-telemetry",
+				"description": "Stream coding-agent session telemetry (prompts, tool calls, model requests, tokens and cost) from Claude Code or Codex into Sazabi over OpenTelemetry, with privacy settings chosen on purpose. Use when the user wants observability for their coding agents or agent fleet, to track agent token usage or cost, to audit what agents ran, or to send agent telemetry to Sazabi."
+			},
+			{
+				"name": "triage-issues",
+				"description": "Work through the issues Sazabi opened on its own — rank them by severity and blast radius, find each one's cause in this repository with log evidence, and propose or draft one fix per issue, leaving issues open until a fix ships. Use when the user asks what is broken, what to fix first, to clean up or triage Sazabi issues, or for an on-call or morning review."
+			},
+			{
+				"name": "use-project-memory",
+				"description": "Read Sazabi project memory (how the system is laid out, what healthy looks like, runbooks, past incidents) before investigating or changing production behavior, and write back durable findings once they are verified. Use at the start of an investigation or on-call task, when the user mentions a runbook or a past incident, or after resolving something worth remembering."
+			},
+			{
+				"name": "verify-a-deploy",
+				"description": "Check in Sazabi that a change you shipped works in production before you call the task done — compare error rates and new kinds of log lines before and after the deploy, confirm the fixed error stopped, and catch regressions early. Use after merging or deploying a fix or feature, when the user asks whether a deploy is healthy, did the fix work, or is it safe to move on."
+			}
+		]
+	} as const,
+	"inngest": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "inngest",
+		"version": "1.0.0",
+		"description": "Debug and operate Inngest: inspect runs and traces, send events, invoke and rerun functions, and query Insights.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"inngest",
+			"workflows",
+			"durable-execution",
+			"background-jobs",
+			"events"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Inngest",
+					"category": "Developer tools",
+					"icon": "inngest"
+				},
+				"connector": {
+					"slug": "inngest_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.inngest.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"supabase": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "supabase",
+		"version": "1.0.0",
+		"description": "Work with your Supabase projects: inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"supabase",
+			"postgres",
+			"database",
+			"sql",
+			"migrations",
+			"edge-functions"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Supabase",
+					"category": "Data & APIs",
+					"icon": "supabase"
+				},
+				"connector": {
+					"slug": "supabase_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.supabase.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"firecrawl": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "firecrawl",
+		"version": "1.0.0",
+		"description": "Turn the web into agent-ready data with Firecrawl: search, scrape, map, and crawl sites, and parse documents.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"firecrawl",
+			"scraping",
+			"crawling",
+			"search",
+			"web-data"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Firecrawl",
+					"category": "Data & APIs",
+					"icon": "firecrawl"
+				},
+				"connector": {
+					"slug": "firecrawl_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"wispr": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "wispr",
+		"version": "1.0.0",
+		"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"wispr",
+			"wispr-flow",
+			"meetings",
+			"meeting-notes",
+			"transcripts",
+			"calendar"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Wispr Flow",
+					"category": "Productivity",
+					"icon": "wispr"
+				},
+				"connector": {
+					"slug": "wispr_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.wisprflow.ai/connect/mcp"
 				}
 			}
 		},

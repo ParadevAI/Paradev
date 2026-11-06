@@ -1,3 +1,5 @@
+import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
+import { attachedFilesBlock } from "@superset/chat-runtime";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
@@ -44,7 +46,11 @@ import {
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
-import { resolveAttachmentPath } from "../attachments/storage";
+import {
+	handOutAttachment,
+	resolveAttachmentPath,
+} from "../attachments/storage";
+import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
 
@@ -130,12 +136,10 @@ function buildForkArgv(forkArgs: string[], rawSessionId: string): string[] {
 
 function buildAttachmentBlock(
 	prompt: string,
-	resolved: Array<{ attachmentId: string; path: string }>,
+	resolved: Array<{ name: string; path: string }>,
 ): string {
 	if (resolved.length === 0) return prompt;
-	const lines = resolved.map((item) => `- ${item.path}`);
-	const block = `\n\n# Attached files\n\nThe user attached these files. They are available on this host at:\n\n${lines.join("\n")}`;
-	return prompt + block;
+	return `${prompt}\n\n${attachedFilesBlock(resolved)}`;
 }
 
 export interface AgentRunInput {
@@ -168,6 +172,7 @@ export type AgentRunResult = {
 	sessionId: string;
 	label: string;
 	chatSessionId?: string;
+	chatAgentId?: string;
 };
 
 /**
@@ -222,8 +227,8 @@ export function validateAgentEffortSelection(
 		});
 	}
 
-	// Some efforts only exist on some of the agent's models (Codex's max and
-	// ultra need GPT-5.6; cursor-agent only has a ladder for some models),
+	// Some efforts only exist on some of the agent's models (Codex's Luna
+	// models stop at max; cursor-agent only has a ladder for some models),
 	// so the accepted set follows the selected model.
 	const efforts = getAgentEfforts(presetId, model);
 	if (efforts.length === 0) {
@@ -242,16 +247,20 @@ export function validateAgentEffortSelection(
 
 /**
  * Validate an explicit launch mode before launch. Omitting mode delegates to
- * the underlying agent's default behaviour.
+ * the underlying agent's default behaviour. A chat launch carries a chat
+ * permission mode, not a terminal launch mode.
  */
 export function validateAgentModeSelection(
 	presetId: string,
 	label: string,
 	mode: string | undefined,
+	surface?: AgentRunInput["surface"],
 ): void {
 	if (!mode) return;
 
-	const support = getAgentModeSupport(presetId);
+	const support =
+		(surface === "chat" ? acpStartModes(presetId) : undefined) ??
+		getAgentModeSupport(presetId);
 	if (!support) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -360,7 +369,7 @@ function validateForkSessionIsResolvable(
  */
 export function validateAgentLaunchOptions(
 	db: HostDb,
-	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode">,
+	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode" | "surface">,
 ): void {
 	if (!input.model && !input.effort && !input.mode) return;
 
@@ -382,7 +391,12 @@ export function validateAgentLaunchOptions(
 		input.effort,
 		input.model,
 	);
-	validateAgentModeSelection(launchPresetId, config.label, input.mode);
+	validateAgentModeSelection(
+		launchPresetId,
+		config.label,
+		input.mode,
+		input.surface,
+	);
 }
 
 /**
@@ -429,16 +443,19 @@ export function buildTerminalAgentLaunch(
 	validateAgentForkSelection(config, input.forkSessionId);
 	validateForkSessionIsResolvable(db, config, input);
 
-	const resolvedAttachments: Array<{ attachmentId: string; path: string }> = [];
+	const resolvedAttachments: Array<{ name: string; path: string }> = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
-		const resolved = resolveAttachmentPath(attachmentId);
+		const resolved = handOutAttachment(attachmentId);
 		if (!resolved) {
 			throw new TRPCError({
 				code: "NOT_FOUND",
 				message: `Attachment not found: ${attachmentId}`,
 			});
 		}
-		resolvedAttachments.push({ attachmentId, path: resolved.path });
+		resolvedAttachments.push({
+			name: resolved.metadata.originalFilename ?? attachmentId,
+			path: resolved.path,
+		});
 	}
 
 	const prompt = buildAttachmentBlock(input.prompt, resolvedAttachments);
@@ -501,10 +518,10 @@ export function bindResumedSession(
 async function runTerminalAgent(
 	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
 	input: AgentRunInput,
+	terminalId: string = crypto.randomUUID(),
 ): Promise<AgentRunResult> {
 	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
-	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
 		terminalId,
 		workspaceId: input.workspaceId,
@@ -525,6 +542,22 @@ async function runTerminalAgent(
 		sessionId: result.terminalId,
 		label,
 	};
+}
+
+/**
+ * The agent identity a terminal reports once this config launches in it.
+ *
+ * A binding recorded by the lifecycle hook carries no instance: the wrapper
+ * Superset installs for a binary exports that binary's builtin id as
+ * `SUPERSET_AGENT_ID` and the session hook never reports a definition, so a
+ * custom agent running `claude` arrives looking exactly like a preset one.
+ * That is the granularity such a binding has, which is what this returns.
+ */
+function launchIdentity(config: ResolvedHostAgentConfig): string {
+	if (isBuiltinAgentId(config.presetId)) return config.presetId;
+	const [command = ""] = config.command.trim().split(/\s+/);
+	const executable = command.split(/[\\/]/).pop() ?? "";
+	return executable.toLowerCase() || config.presetId;
 }
 
 /**
@@ -612,11 +645,29 @@ function bindingRunsConfig(
 	binding: Pick<TerminalAgentBinding, "definitionId" | "agentId">,
 	config: ResolvedHostAgentConfig,
 ): boolean {
-	const bound = resolveHostAgentConfig(
-		db,
-		binding.definitionId ?? binding.agentId,
-	);
-	return bound?.id === config.id;
+	if (binding.definitionId) {
+		// The binding knows which instance it runs.
+		return resolveHostAgentConfig(db, binding.definitionId)?.id === config.id;
+	}
+	// The binding knows only the binary. A caller that names an instance of it
+	// - an automation pinned to a second agent of one preset, or to a custom
+	// agent that runs the same binary - is still the agent this terminal
+	// holds; the candidate is that automation's own last session, so the
+	// instance it names is the instance that is running. Compared as is: a
+	// host may have no preset row left for the binary to resolve to.
+	return binding.agentId === launchIdentity(config);
+}
+
+/**
+ * An imported copy keeps its `fileId` next to the host id: the adapters read
+ * `attachmentId` today, and `fileId` is what renders the part without this box.
+ */
+export interface ChatLaunchAttachment {
+	attachmentId: string;
+	fileId?: string;
+	name: string;
+	mimeType: string;
+	sizeBytes: number;
 }
 
 export function chatLaunchTarget(
@@ -625,7 +676,7 @@ export function chatLaunchTarget(
 ): {
 	harness: string;
 	label: string;
-	attachments: Array<{ attachmentId: string; name: string; mimeType: string }>;
+	attachments: ChatLaunchAttachment[];
 } | null {
 	if (
 		input.surface !== "chat" ||
@@ -635,18 +686,16 @@ export function chatLaunchTarget(
 	) {
 		return null;
 	}
-	const attachments: Array<{
-		attachmentId: string;
-		name: string;
-		mimeType: string;
-	}> = [];
+	const attachments: ChatLaunchAttachment[] = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
 		const resolved = resolveAttachmentPath(attachmentId);
 		if (!resolved) return null;
 		attachments.push({
 			attachmentId,
+			...(resolved.metadata.fileId ? { fileId: resolved.metadata.fileId } : {}),
 			name: resolved.metadata.originalFilename ?? attachmentId,
 			mimeType: resolved.metadata.mediaType,
+			sizeBytes: resolved.metadata.sizeBytes,
 		});
 	}
 	const config = resolveHostAgentConfig(db, input.agent);
@@ -658,6 +707,7 @@ export function chatLaunchTarget(
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
 	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
 	return { harness, label: config.label, attachments };
 }
 
@@ -692,6 +742,7 @@ function continueChatAgent(
 		kind: "terminal",
 		sessionId: target.terminalId,
 		label: target.label,
+		chatSessionId: target.chatSessionId,
 	};
 }
 
@@ -699,45 +750,21 @@ function launchChatAgent(
 	ctx: Pick<HostServiceContext, "db" | "runtime">,
 	input: AgentRunInput,
 	cwd: string,
+	terminalId?: string,
 ): AgentRunResult | null {
 	const target = chatLaunchTarget(ctx.db, input);
 	if (!target) return null;
 	const chat = ctx.runtime.chat?.();
 	if (!chat?.live.supports(target.harness)) return null;
 
-	const terminalId = crypto.randomUUID();
-	const { sessionId } = chat.commands.createSession({
-		commandId: crypto.randomUUID(),
-		scopeId: input.workspaceId,
-		harness: target.harness,
-		cwd,
-		terminalId,
-		...(input.model ? { modelId: input.model } : {}),
-		...(input.mode ? { modeId: input.mode } : {}),
-	});
-	const content = [
-		...(input.prompt.trim() !== ""
-			? [{ type: "text" as const, text: input.prompt }]
-			: []),
-		...target.attachments.map((attachment) => ({
-			type: "attachment" as const,
-			...attachment,
-		})),
-	];
-	if (content.length > 0) {
-		chat.commands.prompt({
-			commandId: crypto.randomUUID(),
-			sessionId,
-			clientId: crypto.randomUUID(),
-			content,
-		});
-	}
-
+	const created = createChatSession(chat, target, input, cwd, terminalId);
+	const chatAgentId = presetForAcpHarness(target.harness);
 	return {
 		kind: "terminal",
-		sessionId: terminalId,
-		label: target.label,
-		chatSessionId: sessionId,
+		sessionId: created.terminalId,
+		label: created.label,
+		chatSessionId: created.sessionId,
+		...(chatAgentId ? { chatAgentId } : {}),
 	};
 }
 
@@ -781,9 +808,11 @@ async function continueTerminalAgent(
 	};
 }
 
+/** `launch.terminalId` is host-internal: the id a cloud launch was promised. */
 export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
+	launch: { terminalId?: string } = {},
 ): Promise<AgentRunResult> {
 	const workspace = ctx.db.query.workspaces
 		.findFirst({
@@ -822,8 +851,8 @@ export async function runAgentInWorkspace(
 		}
 	}
 	return (
-		launchChatAgent(ctx, input, workspace.worktreePath) ??
-		runTerminalAgent(ctx, input)
+		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
+		runTerminalAgent(ctx, input, launch.terminalId)
 	);
 }
 

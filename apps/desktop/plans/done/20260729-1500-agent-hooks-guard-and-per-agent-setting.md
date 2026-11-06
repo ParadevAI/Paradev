@@ -2,7 +2,7 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-Reference: This plan follows conventions from AGENTS.md and the ExecPlan template. Background investigation: `HOOKS_INVESTIGATION.md` at the repo root (written 2026-07-29; summarizes the leak report from a Factory Droid user).
+Reference: This plan follows conventions from AGENTS.md and the ExecPlan template. Background: a 2026-07-29 report from a Factory Droid user that Superset hooks ran in a plain terminal.
 
 ## Purpose / Big Picture
 

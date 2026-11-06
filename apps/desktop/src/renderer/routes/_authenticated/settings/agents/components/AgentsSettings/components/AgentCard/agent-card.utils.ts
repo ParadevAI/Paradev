@@ -7,6 +7,7 @@ import {
 	renderTaskPromptTemplate,
 	validateTaskPromptTemplate,
 } from "@superset/shared/agent-settings";
+import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
 import type { AgentEditableField } from "./agent-card.types";
 
 const SAMPLE_TASK = {
@@ -37,7 +38,7 @@ export function getPreviewNoPromptCommand(preset: ResolvedAgentConfig): string {
 export function getPreviewTaskCommand(preset: ResolvedAgentConfig): string {
 	return (
 		buildFileCommandFromAgentConfig({
-			filePath: `.superset/task-${SAMPLE_TASK.slug}.md`,
+			filePath: `${WORKSPACE_ATTACHMENTS_DIR}/task-${SAMPLE_TASK.slug}.md`,
 			config: preset,
 		}) ??
 		i18n._(

@@ -1,19 +1,21 @@
 ---
 name: 10x
-description: Personalized audit that teaches the advanced Superset features the user isn't using yet (automations, parallel agents, tasks, multi-host, terminal remote control, custom commands, MCP, pages) and sets them up live. Use when the user wants to get more out of Superset, asks "what else can Superset do", "how do I 10x my workflow", "what am I missing", or wants to learn a specific Superset feature.
+description: Personalized audit that teaches the advanced Paradev (formerly Superset) features the user isn't using yet (automations, parallel agents, tasks, multi-host, terminal remote control, custom commands, MCP, pages) and sets them up live. Use when the user wants to get more out of Paradev, asks "what else can Paradev do", "how do I 10x my workflow", "what am I missing", or wants to learn a specific Paradev feature.
 argument-hint: optional topic, e.g. automations
-allowed-tools: Bash(superset:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh *)
+allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh *)
 ---
 
-# Superset 10x
+# Paradev 10x
 
-Teach the user the advanced Superset features they aren't using yet, grounded in their real usage rather than a lecture. If they named a topic after the command, skip the audit and go straight to that topic.
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+
+Teach the user the advanced Paradev features they aren't using yet, grounded in their real usage rather than a lecture. If they named a topic after the command, skip the audit and go straight to that topic.
 
 ## 1. Audit (read-only)
 
-Run `bash scripts/audit.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh` in Claude Code). It runs `superset auth whoami`, `automations list`, `workspaces list`, `agents list --local`, `hosts list`, `tasks list`, and `pages list` with `--json`, tolerating individual failures, and prints one JSON object.
+Run `bash scripts/audit.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh` in Claude Code). It runs `superset auth whoami`, `automations list`, `workspaces list` (the cloud for accounts with cloud workspaces, else this machine) and `workspaces list --local`, `agents list --local`, `hosts list`, `tasks list`, and `pages list` with `--json`, tolerating individual failures, and prints one JSON object.
 
-If the CLI is missing, offer to install it: `curl -fsSL https://superset.sh/cli/install.sh | sh`. If unauthenticated, `superset auth login`. If the audit is impossible, ask the user what their current workflow looks like and proceed from their answer.
+If the CLI is missing, offer to install it: `curl -fsSL https://paradev.com/cli/install.sh | sh`. If unauthenticated, `superset auth login`. If the audit is impossible, ask the user what their current workflow looks like and proceed from their answer.
 
 ## 2. Scorecard
 
@@ -28,8 +30,9 @@ For each recommendation in order: a two-sentence pitch, then ask (use the ask_us
 | Feature | Why it 10x's you | Live setup |
 | --- | --- | --- |
 | Automations | Scheduled agents: triage, changelogs, standups run while you sleep | `superset automations create`, then `superset automations logs` to review runs |
-| Parallel workspaces | Every task gets an isolated worktree; run several agents at once instead of queueing | `superset workspaces create --local --project <id>` then `superset agents create --workspace <id> --agent claude --prompt "..."` |
-| PR review workspaces | Check out any PR into its own workspace in one command | `superset workspaces create --local --pr <number>` |
+| Parallel workspaces | Every task gets an isolated worktree; run several agents at once instead of queueing | `superset workspaces create --local --project <id> --name "<task>" --branch <branch> --agent claude --prompt "..."` |
+| PR review workspaces | Check out any PR into its own workspace in one command | `superset workspaces create --local --project <id> --pr <number> --name "PR <number>"` |
+| Cloud workspaces | Agents keep working with the laptop shut, and teammates can open them | `superset workspaces create --environment <id> --name "<task>" --agent claude --prompt "..."`, `superset workspaces share add <id> --user <email>` |
 | Tasks | A shared queue agents can pick up; track work across sessions | `superset tasks create --title "..."`, `superset tasks update` |
 | Multi-host | Run agents on your desktop from your laptop; wake offline machines | `superset hosts list`, `superset hosts set-wake`, `superset hosts wake <id>` |
 | Terminal remote-control | Read and drive any agent's terminal from anywhere | `superset terminals list / read / send` |

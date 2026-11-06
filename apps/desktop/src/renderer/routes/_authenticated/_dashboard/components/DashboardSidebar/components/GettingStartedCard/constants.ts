@@ -10,7 +10,7 @@ export const GETTING_STARTED_STEPS = [
 	},
 	{
 		progressIndex: 0,
-		label: msg({ message: "Use Superset on mobile" }),
+		label: msg({ message: "Use Paradev on mobile" }),
 		feature: GATED_FEATURES.MOBILE_APP,
 		to: "/settings/mobile",
 	},

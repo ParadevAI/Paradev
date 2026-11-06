@@ -4,6 +4,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { canonicalPathname } from "@/lib/canonical-pathname";
 
+export function proxy(request: NextRequest) {
+	return route(request);
+}
+
 /**
  * Locale routing. The whole route tree lives under app/[lang], but English
  * keeps the bare URLs it has always had — every inbound link and its
@@ -18,7 +22,7 @@ import { canonicalPathname } from "@/lib/canonical-pathname";
  * localized pages from crawlers (which send en or nothing) and break shared
  * links. Discovery is hreflang, the sitemap, and the visible switcher.
  */
-export function proxy(request: NextRequest) {
+function route(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 	const canonical = canonicalPathname(pathname);
 	const segments = canonical.split("/").slice(1);

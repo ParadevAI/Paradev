@@ -1,5 +1,7 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
+import { readRootDomain } from "@superset/shared/app-identity";
+import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
 import { config as dotenvConfig } from "dotenv";
 import { createMDX } from "fumadocs-mdx/next";
 
@@ -23,7 +25,7 @@ const config = {
 		swcPlugins: [["@lingui/swc-plugin", {}]],
 	},
 	async redirects() {
-		return [
+		const redirects = [
 			{
 				source: "/docs",
 				destination: "/",
@@ -61,6 +63,11 @@ const config = {
 				destination: "/terminal-scripts",
 				permanent: true,
 			},
+			{
+				source: "/cli",
+				destination: "/cli/getting-started",
+				permanent: true,
+			},
 			// Remote Workspaces was renamed to Remote Access.
 			{
 				source: "/remote-workspaces",
@@ -68,6 +75,10 @@ const config = {
 				permanent: true,
 			},
 		];
+		return withLegacyHostRedirects(redirects, {
+			rootDomain: readRootDomain(),
+			site: "docs",
+		});
 	},
 	async headers() {
 		// Keep raw markdown surfaces out of the index (they duplicate rendered pages).

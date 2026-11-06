@@ -51,8 +51,10 @@ export function formatAgentPromptWithFileContext({
 export interface SendToTerminalAgentInput {
 	workspaceId: string;
 	terminalId: string;
-	/** Already-formatted prompt body. The host submits it with Enter. */
+	/** Already-formatted prompt body. */
 	text: string;
+	/** Press Enter after the paste. False leaves the text in the agent's input. */
+	submit: boolean;
 }
 
 interface UseSendToTerminalAgentResult {
@@ -74,13 +76,18 @@ export function useSendToTerminalAgent(): UseSendToTerminalAgentResult {
 	const sendToTerminal = workspaceTrpc.terminal.send.useMutation();
 
 	const send = useCallback(
-		async ({ workspaceId, terminalId, text }: SendToTerminalAgentInput) => {
+		async ({
+			workspaceId,
+			terminalId,
+			text,
+			submit,
+		}: SendToTerminalAgentInput) => {
 			try {
 				await sendToTerminal.mutateAsync({
 					workspaceId,
 					terminalId,
 					text: sanitizePromptForPty(text).trimEnd(),
-					submit: true,
+					submit,
 				});
 			} catch (error) {
 				// The likeliest failure is a target whose pty died (daemon crash,

@@ -1058,6 +1058,286 @@
       "when": 1791845922148,
       "tag": "0150_drop_hiring_ats",
       "breakpoints": true
+    },
+    {
+      "idx": 151,
+      "version": "7",
+      "when": 1791943359446,
+      "tag": "0151_cloud_workspace_boots",
+      "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1792197917616,
+      "tag": "0152_sharing_people_and_teams",
+      "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1792277453335,
+      "tag": "0153_oauth_refresh_token_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1792461474743,
+      "tag": "0154_sandbox_bundles",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1792461856907,
+      "tag": "0155_seed_sandbox_bundles",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1792463931612,
+      "tag": "0156_backfill_environments_bundle_sha",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1792463950392,
+      "tag": "0157_environments_bundle_sha_not_null",
+      "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1792465715977,
+      "tag": "0158_retire_shared_environment_organization",
+      "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1792472299402,
+      "tag": "0159_drop_cloud_workspace_presence",
+      "breakpoints": true
+    },
+    {
+      "idx": 160,
+      "version": "7",
+      "when": 1792474455579,
+      "tag": "0160_cloud_machine_size",
+      "breakpoints": true
+    },
+    {
+      "idx": 161,
+      "version": "7",
+      "when": 1792535962543,
+      "tag": "0161_backfill_cloud_machine_size",
+      "breakpoints": true
+    },
+    {
+      "idx": 162,
+      "version": "7",
+      "when": 1792556364446,
+      "tag": "0162_cloud_workspace_pull_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 163,
+      "version": "7",
+      "when": 1792659321968,
+      "tag": "0163_cloud_workspace_tags",
+      "breakpoints": true
+    },
+    {
+      "idx": 164,
+      "version": "7",
+      "when": 1792723955672,
+      "tag": "0164_rename_environments_primary_repository",
+      "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1793053915894,
+      "tag": "0165_channels",
+      "breakpoints": true
+    },
+    {
+      "idx": 166,
+      "version": "7",
+      "when": 1793061654318,
+      "tag": "0166_channel_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1793131420950,
+      "tag": "0167_agents_and_actors",
+      "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1793131434999,
+      "tag": "0168_actors_backfill_and_triggers",
+      "breakpoints": true
+    },
+    {
+      "idx": 169,
+      "version": "7",
+      "when": 1793131506318,
+      "tag": "0169_channels_on_actors",
+      "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1793131554984,
+      "tag": "0170_authz_melange_functions",
+      "breakpoints": true
+    },
+    {
+      "idx": 171,
+      "version": "7",
+      "when": 1793159809685,
+      "tag": "0171_environment_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1793239078531,
+      "tag": "0172_channel_membership_messages",
+      "breakpoints": true
+    },
+    {
+      "idx": 173,
+      "version": "7",
+      "when": 1793294675546,
+      "tag": "0173_devs_main_session_and_tasks",
+      "breakpoints": true
+    },
+    {
+      "idx": 174,
+      "version": "7",
+      "when": 1793294677035,
+      "tag": "0174_authz_cloud_workspace_functions",
+      "breakpoints": true
+    },
+    {
+      "idx": 175,
+      "version": "7",
+      "when": 1793316840789,
+      "tag": "0175_organization_plugin_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 176,
+      "version": "7",
+      "when": 1793323413294,
+      "tag": "0176_agent_session_task",
+      "breakpoints": true
+    },
+    {
+      "idx": 177,
+      "version": "7",
+      "when": 1793324442665,
+      "tag": "0177_drop_agent_session_task_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 178,
+      "version": "7",
+      "when": 1793333882261,
+      "tag": "0178_agent_routines",
+      "breakpoints": true
+    },
+    {
+      "idx": 179,
+      "version": "7",
+      "when": 1793392134011,
+      "tag": "0179_user_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 180,
+      "version": "7",
+      "when": 1793475236973,
+      "tag": "0180_dynamic_client_scopes",
+      "breakpoints": true
+    },
+    {
+      "idx": 181,
+      "version": "7",
+      "when": 1793484147154,
+      "tag": "0181_automation_group",
+      "breakpoints": true
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1793572485694,
+      "tag": "0182_channel_task_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 183,
+      "version": "7",
+      "when": 1793572489433,
+      "tag": "0183_channel_tasks_into_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1793572726455,
+      "tag": "0184_drop_channel_tasks",
+      "breakpoints": true
+    },
+    {
+      "idx": 185,
+      "version": "7",
+      "when": 1793583125863,
+      "tag": "0185_channel_linear_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 186,
+      "version": "7",
+      "when": 1793679430808,
+      "tag": "0186_agent_turn_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 187,
+      "version": "7",
+      "when": 1793682579399,
+      "tag": "0187_page_share_role_edit",
+      "breakpoints": true
+    },
+    {
+      "idx": 188,
+      "version": "7",
+      "when": 1793684241648,
+      "tag": "0188_automation_archived_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 189,
+      "version": "7",
+      "when": 1793841262226,
+      "tag": "0189_automation_reuse_workspace",
+      "breakpoints": true
+    },
+    {
+      "idx": 190,
+      "version": "7",
+      "when": 1793918434220,
+      "tag": "0190_v2_hosts_allow_cloud_workspaces",
+      "breakpoints": true
     }
   ]
 }

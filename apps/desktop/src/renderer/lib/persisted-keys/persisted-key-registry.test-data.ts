@@ -83,9 +83,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/stores/markdown-preferences/store.ts",
 		["markdown-preferences"],
 	],
-	["src/renderer/stores/file-explorer.ts", ["file-explorer-store"]],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
-	["src/renderer/stores/search-dialog-state.ts", ["search-dialog-store"]],
 	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
 	["src/renderer/stores/new-workspace-width.ts", ["new-workspace-width"]],
 	[
@@ -97,8 +95,20 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["cloud-sidebar"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/stores/chatTabsStore/chatTabsStore.ts",
+		["chat-tabs"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/listDisplayStore/listDisplayStore.ts",
 		["list-display"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPanelStore/channelPanelStore.ts",
+		["channel-panels-v1"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/components/ChannelMessageRow/components/EmojiPicker/hooks/useSkinTone/useSkinTone.ts",
+		["channels-emoji-skin-tone"],
 	],
 	[
 		"src/renderer/stores/sidebar-sections-collapse.ts",
@@ -116,6 +126,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	["src/renderer/stores/v2-notifications/store.ts", ["v2-notifications-v1"]],
 	["src/renderer/stores/hiring-banner/store.ts", ["hiring-banner-v1"]],
 	["src/renderer/stores/star-nag/store.ts", ["star-nag-v1"]],
+	[
+		"src/renderer/stores/release-notes-card/store.ts",
+		["release-notes-card-v1"],
+	],
 	[
 		"src/renderer/stores/terminal-close-confirm/store.ts",
 		["terminal-close-confirm-v1"],
@@ -137,6 +151,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		],
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
+	["src/renderer/stores/chat-turn-snapshots.ts", ["chat-turn-snapshots"]],
 	[
 		"src/renderer/routes/_authenticated/settings/usage/utils/usageLastSection/usageLastSection.ts",
 		["usage-last-section-v1"],
@@ -172,12 +187,16 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["leaderboard-auto-publish-v2"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/components/Composer/components/ModelPicker/hooks/useFavoriteModels/useFavoriteModels.ts",
+		"src/renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker/hooks/useFavoriteModels/useFavoriteModels.ts",
 		["chatFavoriteModels"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatPane/utils/savedChatMode/savedChatMode.ts",
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/utils/savedChatMode/savedChatMode.ts",
 		["chatModeByAgent"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/lastChatAgent/lastChatAgent.ts",
+		["chatLastAgent"],
 	],
 	[
 		"src/renderer/hooks/useAgentModelPreference/useAgentModelPreference.ts",

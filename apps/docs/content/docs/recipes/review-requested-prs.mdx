@@ -1,0 +1,43 @@
+---
+title: Review Pull Requests When Your Review Is Requested
+description: An agent reviews a pull request when someone requests your review
+---
+
+<Callout type="info" title="Use when">
+	you get many review requests and want the agent to check each pull request for bugs, missing tests, and risky changes before you read it.
+</Callout>
+
+## The Idea
+
+A GitHub **Review requested** trigger starts a run when someone asks you to review a pull request. The agent gets the pull request in its prompt, and the run's workspace checks out its branch, so it can read and run the code.
+
+## Steps
+
+1. Connect GitHub under **Integrations**, including your personal GitHub account. A trigger that filters by **Me** doesn't fire without it.
+2. Go to **Automations → New automation**. Pick the project linked to the repository, a device that stays online, and an agent.
+3. Under **Triggers**, click **Add Trigger → GitHub → Pull request… → Review requested**. Set the sentence to "Review requested from **Me** in **your repository** by **Anyone**", then press **Save**.
+4. Write a prompt that leaves comments and stops there:
+
+```text
+You were asked to review the pull request in the event above. The branch
+is checked out. Read the description and every changed file. Run the tests
+that cover the changed code.
+Post one review with `gh pr review <number> --comment --body-file review.md`:
+bugs first, then missing tests, then risky changes. Quote file and line for
+each point. Skip style nits. Do not approve, request changes, push, or merge.
+If you already posted a review on this pull request's latest commit, stop.
+```
+
+5. When a request comes in, open the run from **Run History** to see what the agent checked, then read its review on GitHub before you write yours.
+
+## Tips
+
+- **Comment, don't approve**: `--comment` keeps the decision with you. The agent's review shows up as yours, because `gh` uses your account.
+- **No loop**: the agent's own review doesn't request a review, so it doesn't start another run. If you also add a **Comment added** trigger, filter it by people so the agent's comments don't fire it.
+- **Forks**: GitHub triggers skip pull request events from forks, so reviews requested on fork pull requests don't start a run.
+- **Offline device**: a request that comes in while the device is offline is a missed run, and it isn't retried. Use **Run now** on the detail page to review it later.
+
+## Variations
+
+- **Review every new pull request**: use **Pull request… → Opened** instead, with **Anyone** as the author.
+- **Re-review after pushes**: add a second trigger, **Pull request… → Pushed**, scoped to the same repository.

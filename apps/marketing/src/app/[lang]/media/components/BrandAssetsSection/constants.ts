@@ -4,7 +4,7 @@ import { msg } from "@lingui/core/macro";
 export interface BrandAsset {
 	src: string;
 	fileName: string;
-	format: "PNG" | "SVG";
+	format: "PNG" | "SVG" | "JPG";
 	dimensions?: string;
 	label: MessageDescriptor;
 	previewClassName: string;
@@ -13,21 +13,21 @@ export interface BrandAsset {
 export const LOGO_ASSETS: BrandAsset[] = [
 	{
 		src: "/title.svg",
-		fileName: "superset-logo-light.svg",
+		fileName: "paradev-logo-light.svg",
 		format: "SVG",
 		label: msg({ message: "Logo, light" }),
 		previewClassName: "bg-black p-6",
 	},
 	{
 		src: "/media/superset-symbol.svg",
-		fileName: "superset-symbol-light.svg",
+		fileName: "paradev-symbol-light.svg",
 		format: "SVG",
 		label: msg({ message: "Symbol, light" }),
 		previewClassName: "bg-black p-10",
 	},
 	{
 		src: "/media/superset-app-icon.png",
-		fileName: "superset-app-icon.png",
+		fileName: "paradev-app-icon.png",
 		format: "PNG",
 		dimensions: "1024 × 1024",
 		label: msg({ message: "App icon" }),
@@ -35,17 +35,17 @@ export const LOGO_ASSETS: BrandAsset[] = [
 	},
 	{
 		src: "/assets/emails/logo-full.png",
-		fileName: "superset-wordmark-black.png",
+		fileName: "paradev-wordmark-black.png",
 		format: "PNG",
-		dimensions: "512 × 83",
+		dimensions: "446 × 83",
 		label: msg({ message: "Wordmark, black" }),
 		previewClassName: "bg-white p-8",
 	},
 	{
 		src: "/assets/emails/logo-full-white.png",
-		fileName: "superset-wordmark-white.png",
+		fileName: "paradev-wordmark-white.png",
 		format: "PNG",
-		dimensions: "512 × 83",
+		dimensions: "446 × 83",
 		label: msg({ message: "Wordmark, white" }),
 		previewClassName: "bg-black p-8",
 	},
@@ -54,26 +54,49 @@ export const LOGO_ASSETS: BrandAsset[] = [
 export const PRODUCT_IMAGE_ASSETS: BrandAsset[] = [
 	{
 		src: "/og-image.png",
-		fileName: "superset-desktop.png",
+		fileName: "paradev-desktop.png",
 		format: "PNG",
 		dimensions: "2400 × 1260",
-		label: msg({ message: "Superset desktop app" }),
+		label: msg({ message: "Paradev desktop app" }),
 		previewClassName: "",
 	},
 	{
 		src: "/images/blog/superset-mobile/hero.png",
-		fileName: "superset-mobile-terminal.png",
+		fileName: "paradev-mobile-terminal.png",
 		format: "PNG",
 		dimensions: "1600 × 1000",
-		label: msg({ message: "Superset Mobile terminal on iPhone" }),
+		label: msg({ message: "Paradev Mobile terminal on iPhone" }),
 		previewClassName: "",
 	},
 	{
 		src: "/images/blog/superset-mobile/diffs.png",
-		fileName: "superset-mobile-diff.png",
+		fileName: "paradev-mobile-diff.png",
 		format: "PNG",
 		dimensions: "1600 × 1000",
-		label: msg({ message: "Superset Mobile code diff on iPhone" }),
+		label: msg({ message: "Paradev Mobile code diff on iPhone" }),
 		previewClassName: "",
+	},
+];
+
+export const FOUNDER_PHOTO_ASSETS: BrandAsset[] = [
+	{
+		src: "/media/founders/paradev-founders-demo-day.jpg",
+		fileName: "paradev-founders-demo-day.jpg",
+		format: "JPG",
+		dimensions: "3000 × 2000",
+		label: msg({
+			message: "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day",
+		}),
+		previewClassName: "bg-muted",
+	},
+	{
+		src: "/media/founders/paradev-founders-yc-talk.jpg",
+		fileName: "paradev-founders-yc-talk.jpg",
+		format: "JPG",
+		dimensions: "3000 × 2000",
+		label: msg({
+			message: "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC",
+		}),
+		previewClassName: "bg-muted",
 	},
 ];

@@ -49,6 +49,7 @@ export function ReasoningRow({
 						"min-w-0 flex-1 truncate text-foreground/50 transition-colors duration-200 group-hover:text-foreground/75",
 						streaming && "animate-thinking-pulse motion-reduce:animate-none",
 					)}
+					data-find-item={summary ? item.id : undefined}
 				>
 					{summary || t({ message: "Thought for a few seconds" })}
 				</span>

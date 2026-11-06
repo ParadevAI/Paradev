@@ -28,23 +28,26 @@ export function findTerminalPaneLocation(
 export function focusTerminalPane(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	terminalId: string,
+	{ focus = true }: { focus?: boolean } = {},
 ): boolean {
 	const state = store.getState();
 	const location = findTerminalPaneLocation(state, terminalId);
 	if (!location) return false;
 
-	state.setActiveTab(location.tabId);
-	state.setActivePane(location);
+	if (focus) state.focusPane(location.paneId);
+	else state.setActivePane(location);
 	return true;
 }
 
 export function focusOrAddTerminalPane(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	terminalId: string,
+	{ focus = true }: { focus?: boolean } = {},
 ): FocusOrAddTerminalPaneResult {
-	if (focusTerminalPane(store, terminalId)) return "focused";
+	if (focusTerminalPane(store, terminalId, { focus })) return "focused";
 
 	store.getState().addTab({
+		focus,
 		panes: [
 			{
 				kind: "terminal",

@@ -2,10 +2,11 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { cn } from "@superset/ui/utils";
 import { LuArrowRight, LuArrowUpRight } from "react-icons/lu";
+import { ClickHint, usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import {
-	type PullRequestRef,
-	pullRequestRefFromUrl,
-} from "renderer/lib/github/pullRequestRef";
+	type OpenPullRequestPane,
+	openPullRequestLink,
+} from "renderer/lib/github/openPullRequestLink";
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
 import type { NormalizedPR } from "../../types";
 
@@ -37,7 +38,7 @@ interface PRHeaderProps {
 	 * Opens the PR's summary pane in the workspace. Without it the title is
 	 * a plain GitHub link, for hosts that have no pane store to open into.
 	 */
-	onOpenPullRequest?: (ref: PullRequestRef) => void;
+	onOpenPullRequest?: OpenPullRequestPane;
 }
 
 const titleClass =
@@ -46,6 +47,7 @@ const arrowClass =
 	"size-3.5 shrink-0 text-muted-foreground/70 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100";
 
 export function PRHeader({ pr, onOpenPullRequest }: PRHeaderProps) {
+	const linkPolicy = usePullRequestLinkPolicy();
 	const titleContent = (
 		<>
 			<PRIcon state={pr.state} className="size-4 shrink-0" />
@@ -60,18 +62,22 @@ export function PRHeader({ pr, onOpenPullRequest }: PRHeaderProps) {
 	return (
 		<div className="space-y-1.5 px-2 py-2">
 			{onOpenPullRequest ? (
-				<button
-					type="button"
-					onClick={() => {
-						const ref = pullRequestRefFromUrl(pr.url);
-						if (ref) onOpenPullRequest(ref);
-						else window.open(pr.url, "_blank");
-					}}
-					className={titleClass}
-				>
-					{titleContent}
-					<LuArrowRight aria-hidden="true" className={arrowClass} />
-				</button>
+				<ClickHint hint={linkPolicy.hint}>
+					<button
+						type="button"
+						onClick={(event) =>
+							openPullRequestLink(
+								pr.url,
+								linkPolicy.getAction(event),
+								onOpenPullRequest,
+							)
+						}
+						className={titleClass}
+					>
+						{titleContent}
+						<LuArrowRight aria-hidden="true" className={arrowClass} />
+					</button>
+				</ClickHint>
 			) : (
 				<a
 					href={pr.url}

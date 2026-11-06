@@ -16,7 +16,7 @@ import {
 	type PageViewportZoom,
 } from "@superset/shared/page-zoom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useJoinPagePresence } from "../../hooks/useJoinPagePresence";
+import { useJoinPresence } from "../../../Presence";
 import { usePageStorageConnect } from "../../hooks/usePageStorageConnect";
 import { type PageToolHost, usePageTools } from "../../hooks/usePageTools";
 import { useComments } from "../../providers/CommentProvider";
@@ -112,7 +112,7 @@ export function PageCommentsView({
 		host: toolHost,
 		pageId,
 	});
-	useJoinPagePresence({ pageId, url: presenceUrl });
+	useJoinPresence({ roomId: pageId, url: presenceUrl });
 
 	const [lastHoverRect, setLastHoverRect] = useState<FrameRect | null>(null);
 	useEffect(() => {
@@ -414,12 +414,14 @@ export function PageCommentsView({
 						container={container}
 						thread={null}
 						initialValue={draft.body}
+						initialAttachments={draft.attachments}
 						onDismiss={discardDraft}
-						onSubmit={(body) =>
+						onSubmit={(body, attachments) =>
 							createThread({
 								anchor: draft.anchor,
 								anchorText: draft.anchor.text,
 								body,
+								attachments,
 							})
 						}
 						onQuick={(body, intent) => {
@@ -442,7 +444,9 @@ export function PageCommentsView({
 						container={container}
 						thread={popoverThread}
 						onDismiss={() => setActiveThreadId(null)}
-						onSubmit={(body) => addReply(popoverThread.id, body)}
+						onSubmit={(body, attachments) =>
+							addReply(popoverThread.id, body, attachments)
+						}
 						onEdit={(commentId, body) =>
 							editComment(popoverThread.id, commentId, body)
 						}

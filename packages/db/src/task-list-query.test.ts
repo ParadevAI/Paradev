@@ -38,6 +38,29 @@ describe("buildTaskListConditions", () => {
 		expect(sql.toLowerCase()).not.toContain("deleted_at");
 	});
 
+	test("a label filter matches the label and its sub-labels", () => {
+		const { sql, params } = render(
+			buildTaskListConditions({
+				organizationId: ORG,
+				labels: [" Acme / Web_1 "],
+			}),
+		);
+		expect(sql).toContain("label.name like");
+		expect(params).toEqual([
+			ORG,
+			"acme / web_1",
+			"acme/web_1",
+			"acme/web\\_1/%",
+		]);
+	});
+
+	test("a label that cannot exist still filters, matching nothing", () => {
+		const { params } = render(
+			buildTaskListConditions({ organizationId: ORG, labels: ["///"] }),
+		);
+		expect(params).toEqual([ORG, "///"]);
+	});
+
 	test("escapes LIKE wildcards in search and matches title or description", () => {
 		const { sql, params } = render(
 			buildTaskListConditions({ organizationId: ORG, search: "50%_off" }),

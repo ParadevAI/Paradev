@@ -5,22 +5,11 @@ import {
 	SUBAGENT_PANE_KIND,
 	type SubagentPaneData,
 } from "../../types";
-import { focusOrOpenPane } from "../focusOrOpenPane";
 
-/**
- * Focus the pane showing this subagent's transcript, creating one when none
- * exists. One pane per child: a second open for the same child focuses it.
- */
+/** One pane per subagent: opening the same one again focuses its pane. */
 export function openSubagentPaneInStore(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
 	data: SubagentPaneData,
 ): void {
-	focusOrOpenPane<SubagentPaneData>(
-		store,
-		SUBAGENT_PANE_KIND,
-		(pane) =>
-			pane.terminalId === data.terminalId &&
-			pane.subagentId === data.subagentId,
-		data,
-	);
+	store.getState().openPane({ pane: { kind: SUBAGENT_PANE_KIND, data } });
 }

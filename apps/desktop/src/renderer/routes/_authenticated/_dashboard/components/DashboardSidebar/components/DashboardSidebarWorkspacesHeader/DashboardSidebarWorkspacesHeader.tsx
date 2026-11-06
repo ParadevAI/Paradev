@@ -17,7 +17,10 @@ import {
 } from "react-icons/vsc";
 import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWorkspace";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
-import type { SidebarProjectSortMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type {
+	SidebarProjectHostFilter,
+	SidebarProjectSortMode,
+} from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import {
 	useOpenEmptyProjectModal,
 	useOpenNewProjectModal,
@@ -32,6 +35,9 @@ import { useProjectFilterExpanded } from "./hooks/useProjectFilterExpanded";
 interface DashboardSidebarWorkspacesHeaderProps {
 	sortMode: SidebarProjectSortMode;
 	onSortModeChange: (mode: SidebarProjectSortMode) => void;
+	/** Null hides the host filter (cloud rows are not inline). */
+	hostFilter: SidebarProjectHostFilter | null;
+	onHostFilterChange: (filter: SidebarProjectHostFilter) => void;
 	filterQuery: string;
 	onFilterQueryChange: (query: string) => void;
 }
@@ -39,6 +45,8 @@ interface DashboardSidebarWorkspacesHeaderProps {
 export function DashboardSidebarWorkspacesHeader({
 	sortMode,
 	onSortModeChange,
+	hostFilter,
+	onHostFilterChange,
 	filterQuery,
 	onFilterQueryChange,
 }: DashboardSidebarWorkspacesHeaderProps) {
@@ -133,6 +141,8 @@ export function DashboardSidebarWorkspacesHeader({
 			<DashboardSidebarProjectsSortMenu
 				sortMode={sortMode}
 				onSortModeChange={onSortModeChange}
+				hostFilter={hostFilter}
+				onHostFilterChange={onHostFilterChange}
 			/>
 			<DropdownMenu>
 				<Tooltip delayDuration={700}>

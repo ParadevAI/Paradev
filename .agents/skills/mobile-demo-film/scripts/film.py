@@ -320,7 +320,7 @@ def render_end(spec, seg, work, index, base):
         text_y = (height + logo.height) // 2 + px(10)
     else:
         mark = font(SERIF, px(104), spec.get("titleFont"))
-        centered(draw, width, height // 2 - px(90), seg.get("wordmark", "Superset"), mark, hex_rgb(spec.get("ink", "#1B1A18")))
+        centered(draw, width, height // 2 - px(90), seg.get("wordmark", "Paradev"), mark, hex_rgb(spec.get("ink", "#1B1A18")))
         text_y = height // 2 + px(60)
     if seg.get("caption"):
         centered(draw, width, text_y, seg["caption"], font(SANS, px(32), spec.get("sansFont")),

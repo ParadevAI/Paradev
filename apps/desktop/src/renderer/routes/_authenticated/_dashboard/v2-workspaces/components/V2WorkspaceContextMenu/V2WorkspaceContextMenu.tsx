@@ -11,28 +11,46 @@ import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useCallback } from "react";
 import {
+	LuArchive,
 	LuArchiveRestore,
 	LuArrowUpRight,
+	LuBox,
 	LuGitBranch,
+	LuLink,
 	LuPanelLeftClose,
 	LuPanelLeftOpen,
 	LuTrash2,
 } from "react-icons/lu";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
+import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
+import { useRestoreCloudWorkspaceIntent } from "renderer/stores/restore-cloud-workspace-intent";
+import { useSaveAsEnvironmentIntent } from "renderer/stores/save-as-environment-intent";
+import { useV2NotificationStore } from "renderer/stores/v2-notifications";
+import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 
 export interface V2WorkspaceActions {
 	/** Navigate to the workspace (paywall-gated for remote hosts). */
 	open: () => void;
 	addToSidebar: () => void;
 	removeFromSidebar: () => void;
+	/** False for your own cloud workspace, which is in the sidebar by definition. */
+	canRemoveFromSidebar: boolean;
+	/** Archives a cloud workspace, deletes a host one, through the global dialog. */
 	openDeleteDialog: () => void;
+	restore: () => void;
+	/** An archived row that can come back: every cloud row, a host row that isn't a session. */
+	canRestore: boolean;
+	/** The restore waits on the row's device coming online. */
+	isRestoreBlocked: boolean;
 }
 
 interface V2WorkspaceContextMenuProps {
@@ -40,7 +58,7 @@ interface V2WorkspaceContextMenuProps {
 	/** Hiding the current route's workspace from the sidebar is blocked. */
 	isCurrentRoute?: boolean;
 	/** Rendered as the context-menu trigger; receives the shared actions so
-	 * inline affordances (pin cell, trash button, card click) reuse them. */
+	 * inline affordances (hover buttons, card click) reuse them. */
 	children: (actions: V2WorkspaceActions) => ReactNode;
 }
 
@@ -59,22 +77,68 @@ export function V2WorkspaceContextMenu({
 	const { ensureWorkspaceInSidebar, hideWorkspaceInSidebar } =
 		useDashboardSidebarState();
 	const { copyToClipboard } = useCopyToClipboard();
+	const copyShareLink = useCopyShareLink();
+	const organizationId = useActiveOrganizationId();
 	const hostUrl = useHostUrl(workspace.hostId);
+	const isCloud = workspace.hostType === "cloud";
 	const isArchived = workspace.archivedAt != null;
+	const workspaceName = getV2WorkspaceDisplayName(workspace);
 	const canReachHost =
 		hostUrl !== null &&
 		(workspace.hostType === "local-device" || workspace.hostIsOnline);
+	const canRestore = isArchived && (isCloud || workspace.type !== "session");
+	const isRestoreBlocked = canRestore && !isCloud && !canReachHost;
+	const canRemoveFromSidebar = !(isCloud && workspace.isCreatedByCurrentUser);
+
+	// Opening the row is looking at it: the finished-unread mark clears the
+	// same way it does from the sidebar. Written once the navigation has
+	// committed: a store write first re-renders every row in the same tick
+	// the route transition starts, and the list can stay on screen for
+	// seconds while the URL already says otherwise.
+	const markSeen = useCallback(() => {
+		const notifications = useV2NotificationStore.getState();
+		notifications.clearManualUnread(workspace.id);
+		for (const terminal of workspace.seenMarks.terminals) {
+			notifications.markTerminalSeen(terminal.terminalId, terminal.lastEventAt);
+		}
+		if (workspace.seenMarks.reportedAt !== null) {
+			notifications.markWorkspaceSeen(
+				workspace.id,
+				workspace.seenMarks.reportedAt,
+			);
+		}
+	}, [workspace.id, workspace.seenMarks]);
 
 	const open = useCallback(() => {
-		const go = () => navigateToV2Workspace(workspace.id, navigate);
-		if (workspace.hostType === "local-device") {
-			go();
+		if (isArchived) return;
+		const go = () => {
+			void navigateToV2Workspace(workspace.id, navigate).then(markSeen);
+		};
+		if (workspace.hostType === "remote-device") {
+			gateFeature(GATED_FEATURES.REMOTE_ACCESS, go);
 			return;
 		}
-		gateFeature(GATED_FEATURES.REMOTE_ACCESS, go);
-	}, [gateFeature, navigate, workspace.hostType, workspace.id]);
+		go();
+	}, [
+		gateFeature,
+		isArchived,
+		markSeen,
+		navigate,
+		workspace.hostType,
+		workspace.id,
+	]);
 
+	// The cloud sidebar store is read at call time: a subscription per row
+	// would re-render the whole list on every pin.
 	const addToSidebar = useCallback(() => {
+		if (isCloud) {
+			if (organizationId) {
+				useCloudSidebarStore
+					.getState()
+					.setInSidebar(organizationId, workspace.id, true);
+			}
+			return;
+		}
 		const add = () =>
 			ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
 		if (workspace.hostType === "local-device") {
@@ -85,13 +149,23 @@ export function V2WorkspaceContextMenu({
 	}, [
 		ensureWorkspaceInSidebar,
 		gateFeature,
+		isCloud,
+		organizationId,
 		workspace.hostType,
 		workspace.id,
 		workspace.projectId,
 	]);
 
 	const removeFromSidebar = useCallback(() => {
-		if (isCurrentRoute) return;
+		if (isCurrentRoute || !canRemoveFromSidebar) return;
+		if (isCloud) {
+			if (organizationId) {
+				useCloudSidebarStore
+					.getState()
+					.setInSidebar(organizationId, workspace.id, false);
+			}
+			return;
+		}
 		// Hide directly (synchronous optimistic write) rather than routing
 		// through the intent store + RemoveFromSidebarMount effect, which adds
 		// an extra render cycle of latency. The list view is never a workspace
@@ -103,8 +177,11 @@ export function V2WorkspaceContextMenu({
 		// the hidden state.
 		hideWorkspaceInSidebar(workspace.id, workspace.projectId);
 	}, [
+		canRemoveFromSidebar,
+		isCloud,
 		isCurrentRoute,
 		hideWorkspaceInSidebar,
+		organizationId,
 		workspace.id,
 		workspace.projectId,
 	]);
@@ -131,9 +208,26 @@ export function V2WorkspaceContextMenu({
 		}
 	}, [copyToClipboard, workspace.branch, t]);
 
+	const handleCopyLink = useCallback(() => {
+		copyShareLink(`workspaces/${workspace.id}`);
+	}, [copyShareLink, workspace.id]);
+
+	const handleSaveAsEnvironment = useCallback(() => {
+		useSaveAsEnvironmentIntent.getState().request(workspace.id);
+	}, [workspace.id]);
+
+	// A cloud restore goes through the one globally-mounted
+	// RestoreCloudWorkspaceMount, which owns the mutation for every row.
 	const restore = useCallback(async () => {
+		if (!canRestore || isRestoreBlocked) return;
+		if (isCloud) {
+			useRestoreCloudWorkspaceIntent.getState().request({
+				workspaceId: workspace.id,
+				workspaceName,
+			});
+			return;
+		}
 		if (!hostUrl) return;
-		const workspaceName = workspace.name || workspace.branch;
 		const toastId = toast.loading(
 			t({ message: `Restoring "${workspaceName}"…` }),
 		);
@@ -157,17 +251,27 @@ export function V2WorkspaceContextMenu({
 				{ id: toastId },
 			);
 		}
-	}, [hostUrl, navigate, t, workspace.branch, workspace.id, workspace.name]);
+	}, [
+		canRestore,
+		hostUrl,
+		isCloud,
+		isRestoreBlocked,
+		navigate,
+		t,
+		workspace.id,
+		workspaceName,
+	]);
 
 	// Globally-mounted dialog (DeleteWorkspaceMount): archive-first
 	// tombstoning drops this row the moment the destroy starts, which
-	// would unmount a row-local dialog mid-flight.
+	// would unmount a row-local dialog mid-flight. A cloud id goes straight
+	// to archive there.
 	const openDeleteDialog = useCallback(() => {
 		useDeleteWorkspaceIntent.getState().request({
 			workspaceId: workspace.id,
-			workspaceName: workspace.name || workspace.branch,
+			workspaceName,
 		});
-	}, [workspace.id, workspace.name, workspace.branch]);
+	}, [workspace.id, workspaceName]);
 
 	return (
 		<ContextMenu>
@@ -176,17 +280,21 @@ export function V2WorkspaceContextMenu({
 					open,
 					addToSidebar,
 					removeFromSidebar,
+					canRemoveFromSidebar,
 					openDeleteDialog,
+					restore,
+					canRestore,
+					isRestoreBlocked,
 				})}
 			</ContextMenuTrigger>
 			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
 				{isArchived ? (
-					workspace.type === "session" ? null : (
-						<ContextMenuItem onSelect={restore} disabled={!canReachHost}>
+					canRestore ? (
+						<ContextMenuItem onSelect={restore} disabled={isRestoreBlocked}>
 							<LuArchiveRestore className="size-4" />
 							<Trans>Restore</Trans>
 						</ContextMenuItem>
-					)
+					) : null
 				) : (
 					<ContextMenuItem onSelect={open}>
 						<LuArrowUpRight className="size-4" />
@@ -197,17 +305,33 @@ export function V2WorkspaceContextMenu({
 					<LuGitBranch className="size-4" />
 					<Trans>Copy Branch Name</Trans>
 				</ContextMenuItem>
+				{isCloud && !isArchived ? (
+					<>
+						<ContextMenuItem onSelect={handleCopyLink}>
+							<LuLink className="size-4" />
+							<Trans>Copy link</Trans>
+						</ContextMenuItem>
+						{workspace.sandboxStatus === null ? (
+							<ContextMenuItem onSelect={handleSaveAsEnvironment}>
+								<LuBox className="size-4" />
+								<Trans>Save as environment</Trans>
+							</ContextMenuItem>
+						) : null}
+					</>
+				) : null}
 				{isArchived ? null : (
 					<>
 						<ContextMenuSeparator />
 						{workspace.isInSidebar ? (
-							<ContextMenuItem
-								onSelect={removeFromSidebar}
-								disabled={isCurrentRoute}
-							>
-								<LuPanelLeftClose className="size-4" />
-								<Trans>Hide from Sidebar</Trans>
-							</ContextMenuItem>
+							canRemoveFromSidebar ? (
+								<ContextMenuItem
+									onSelect={removeFromSidebar}
+									disabled={isCurrentRoute}
+								>
+									<LuPanelLeftClose className="size-4" />
+									<Trans>Hide from Sidebar</Trans>
+								</ContextMenuItem>
+							) : null
 						) : (
 							<ContextMenuItem onSelect={addToSidebar}>
 								<LuPanelLeftOpen className="size-4" />
@@ -219,8 +343,17 @@ export function V2WorkspaceContextMenu({
 							onSelect={openDeleteDialog}
 							className="text-destructive focus:text-destructive"
 						>
-							<LuTrash2 className="size-4 text-destructive" />
-							<Trans>Delete</Trans>
+							{isCloud ? (
+								<>
+									<LuArchive className="size-4 text-destructive" />
+									<Trans>Archive</Trans>
+								</>
+							) : (
+								<>
+									<LuTrash2 className="size-4 text-destructive" />
+									<Trans>Delete</Trans>
+								</>
+							)}
 						</ContextMenuItem>
 					</>
 				)}

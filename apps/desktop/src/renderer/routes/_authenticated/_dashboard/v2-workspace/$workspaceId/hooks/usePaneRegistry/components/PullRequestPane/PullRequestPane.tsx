@@ -1,6 +1,8 @@
+import { useIsTabVisible } from "@superset/panes";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import {
 	isSamePullRequest,
 	pullRequestRefFromUrl,
@@ -12,6 +14,12 @@ import {
 	type PullRequestDetailTab,
 	PullRequestDetailTabs,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
+import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
+import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
+import {
+	canActOnPullRequest,
+	type PullRequestTarget,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { normalizeThreadsToComments } from "../../../../components/CommentsSection/utils/normalizeThreadsToComments";
 import type { PagePaneData, PullRequestPaneData } from "../../../../types";
@@ -37,12 +45,25 @@ export function PullRequestPane({
 }: PullRequestPaneProps) {
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
-	const { workspace, hostUrl: workspaceHostUrl } = useWorkspace();
+	const { workspace, hostUrl } = useWorkspace();
+	const organizationId = useActiveOrganizationId();
 	const detail = usePullRequestPaneDetail(data);
+	const isTabVisible = useIsTabVisible();
+	const target = useMemo<PullRequestTarget>(
+		() => ({
+			organizationId,
+			repoFullName: data.repoFullName,
+			prNumber: data.number,
+		}),
+		[organizationId, data.repoFullName, data.number],
+	);
+	const { refresh, isRefreshing } = useRefreshPullRequest({
+		target,
+		url: detail.data?.url,
+	});
 
-	// Review threads and the header's actions still go through the host that
-	// pushed the PR, so they exist only when this workspace's linked PR is
-	// the one on screen.
+	// Pages and "open in diff" belong to the workspace, so they exist only
+	// when this workspace's linked PR is the one on screen.
 	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery({
 		workspaceId: workspace.id,
 	});
@@ -52,60 +73,47 @@ export function PullRequestPane({
 	const isLinkedPR = linkedRef !== null && isSamePullRequest(linkedRef, data);
 	const evidence = usePullRequestEvidence(
 		workspace.id,
-		isLinkedPR && activeTab === "summary",
+		isLinkedPR && activeTab === "summary" && isTabVisible,
 	);
-	const threads = workspaceTrpc.git.getPullRequestThreads.useQuery(
-		{ workspaceId: workspace.id },
-		{
-			enabled: isLinkedPR,
-			refetchInterval: 30_000,
-			refetchOnWindowFocus: true,
-		},
-	);
+	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
 	const onOpenInDiff = useReviewCommentNavigation(workspace.id, onOpenDiff);
-	// The host's content read already carries the conversation; the threads
-	// query's copy of it only fills in for a host too old to send one.
-	const hasConversation = detail.data?.comments !== undefined;
+	const prUrl =
+		detail.data?.url ??
+		`https://github.com/${data.repoFullName}/pull/${data.number}`;
 	const activityThreads = useMemo<
 		PullRequestActivityThreads | undefined
 	>(() => {
-		if (!isLinkedPR) return undefined;
-		const comments = (
-			threads.data
-				? normalizeThreadsToComments(threads.data, linkedPR.data?.url)
-				: []
-		).filter((comment) => comment.kind === "review" || !hasConversation);
+		if (!canActOnPullRequest(target)) return undefined;
+		// The conversation comes with the pull request itself; only review threads are added here.
+		const comments = threads.data
+			? normalizeThreadsToComments(threads.data, prUrl).filter(
+					(comment) => comment.kind === "review",
+				)
+			: [];
 		return {
 			entries: buildReviewThreadEntries({
 				comments,
-				workspaceId: workspace.id,
-				onOpenInDiff,
+				target,
+				onOpenInDiff: isLinkedPR ? onOpenInDiff : undefined,
 			}),
 			commentCount: comments.length,
 			isLoading: threads.isLoading,
-			isError: threads.isError,
+			isError: threads.isError || Boolean(threads.data?.fetchFailed),
 		};
 	}, [
-		isLinkedPR,
+		target,
 		threads.data,
 		threads.isLoading,
 		threads.isError,
-		linkedPR.data?.url,
-		hasConversation,
-		workspace.id,
+		prUrl,
+		isLinkedPR,
 		onOpenInDiff,
 	]);
-	const projectId = isLinkedPR ? workspace.projectId : null;
-	const hostId = isLinkedPR ? workspace.hostId : null;
-	const hostUrl = isLinkedPR ? workspaceHostUrl : null;
 	const diffStat =
 		detail.data?.additions !== undefined && detail.data.deletions !== undefined
 			? { additions: detail.data.additions, deletions: detail.data.deletions }
 			: null;
-	const commentTarget =
-		projectId && hostUrl && detail.data?.mergeability !== undefined
-			? { projectId, hostUrl, prNumber: data.number }
-			: null;
+	const commentTarget = canActOnPullRequest(target) ? target : null;
 
 	return (
 		<div className="flex h-full w-full min-h-0 min-w-0 flex-col">
@@ -119,13 +127,15 @@ export function PullRequestPane({
 				</div>
 				<div className="ml-auto flex shrink-0 items-center">
 					<PullRequestActions
-						projectId={projectId}
-						hostId={hostId}
+						target={target}
+						projectId={detail.projectId}
+						hostId={workspace.hostId}
 						hostUrl={hostUrl}
-						prNumber={data.number}
 						data={detail.data}
 						isLoading={detail.isLoading}
 						showStartWorkspace={false}
+						onRefresh={refresh}
+						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</div>
@@ -135,7 +145,7 @@ export function PullRequestPane({
 				projectId={detail.projectId}
 				repoFullName={data.repoFullName}
 				prNumber={data.number}
-				hostUrl={workspaceHostUrl}
+				hostUrl={hostUrl}
 				hostId={workspace.hostId}
 				commentTarget={commentTarget}
 				threads={activityThreads}

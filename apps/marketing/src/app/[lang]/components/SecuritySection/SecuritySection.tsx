@@ -20,14 +20,14 @@ const SECURITY_FEATURES: {
 	description: MessageDescriptor;
 }[] = [
 	{
-		id: "source-available",
+		id: "open-source",
 		icon: <HiOutlineCodeBracket className="w-5 h-5 text-foreground/70" />,
 		title: msg({
-			message: "Source Available",
+			message: "Open Source",
 		}),
 		description: msg({
 			message:
-				"Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality.",
+				"Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality.",
 		}),
 	},
 	{
@@ -49,7 +49,7 @@ const SECURITY_FEATURES: {
 		}),
 		description: msg({
 			message:
-				"Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider.",
+				"Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider.",
 		}),
 	},
 ];

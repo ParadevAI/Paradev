@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import { isMissingProcedureError } from "@/lib/host-service/errors";
 
 /**
@@ -12,10 +13,11 @@ import { isMissingProcedureError } from "@/lib/host-service/errors";
  */
 export function asAttachmentError(error: unknown): unknown {
 	if (!isMissingProcedureError(error)) return error;
+	const appName = BRAND.NAME;
 	return new Error(
 		i18n._(
 			msg({
-				message: "Update Superset on this machine to attach files",
+				message: `Update ${appName} on this machine to attach files`,
 			}),
 		),
 	);

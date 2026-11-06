@@ -38,7 +38,7 @@ API and relay. "Rules" is what counts as valid evidence. "Mechanics" is how to g
 
 ### Services
 
-Start each in a Superset terminal so it outlives the tool call. `--local` is required; without it
+Start each in a Paradev terminal so it outlives the tool call. `--local` is required; without it
 the command returns nothing.
 
 ```bash
@@ -46,7 +46,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
 ```
 
 - **API:** `cd apps/api && bun run dev`. A 500 with `password authentication failed` means this
-  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.superset/lib/setup/steps.sh`
+  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.paradev/lib/setup/steps.sh`
   does and rewrite the three lines under `# Workspace Database` in `.env`.
 - **Relay:** run it in a loop. `wrangler dev` exits with an empty `✘ [ERROR]` when a client aborts a
   request, which every app relaunch does. Durable Object state survives the restart.
@@ -70,7 +70,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
   `ios/` is gitignored.
 - Silence the first-run developer menu:
   `xcrun simctl spawn booted defaults write sh.superset.mobile EXDevMenuIsOnboardingFinished -bool YES`.
-- Sign in: `maestro test apps/mobile/.maestro/flows/sign-in.yml`
+- Sign in: tap the dev sign-in button with Maestro (`tapOn: { id: dev-sign-in-button }`, from `DevSignInOptions.tsx`), as `mobile-demo-record` does.
   (`JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home`).
 - The dev account has no plan, so Home shows the paywall. Give its org a temporary one on this
   worktree's Neon branch, and delete the row afterwards. Confirm `DATABASE_URL_UNPOOLED` is the
@@ -102,37 +102,26 @@ Count requests in the relay log to prove polling behavior (for example none whil
 Reset the locale, text size and status bar, stop the services, and delete test hosts and the
 temporary plan when done.
 
-### Limrun: no Mac (Linux, a cloud workspace)
+### EAS: no Mac (Linux, a cloud workspace)
 
-`lim` runs the simulator remotely; `LIM_API_KEY` is set in cloud workspaces. The `xcrun simctl`
-steps above become `lim ios` commands, and the simulator reaches this box only through a tunnel.
+`apps/mobile/scripts/eas-dev.sh` runs the dev client on an EAS cloud simulator; see
+`.agents/skills/mobile-eas-dev/SKILL.md`. The `xcrun simctl` steps above become `agent-device`
+commands, and the simulator reaches this box only through local egress.
 
-- **App.** JavaScript-only changes reuse a Debug dev-client build: `lim asset list` and
-  `lim ios create --install-asset <name> --inactivity-timeout 30m --hard-timeout 2h --json`. Build a
-  new one with `lim xcode build` only after a native change.
-- **Tunnel.** One selector for each local port the app calls, all in one command, because selector
-  sets cannot change: `lim ios tunnel --selector localhost:8081 --selector localhost:$API_PORT
-  --selector localhost:$RELAY_PORT --selector localhost:$REALTIME_PORT --detach --id <id>`. A port
-  with no selector fails as a network error in the app; without the relay, Home says it cannot
-  check the host.
-- **Metro.** Start it with `EXPO_PACKAGER_PROXY_URL=http://localhost:8081`. Without it, Metro
-  advertises `127.0.0.1`, which the tunnel does not route. Set `EXPO_PUBLIC_*` overrides inline;
-  they take precedence over the root `.env`.
-- **Launch.** `lim ios open-url --id <id> "superset://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"`.
-  The dev-menu sheet takes the first link: tap `Continue` and `Close` with
-  `lim ios tap-element --ax-label`, then open the URL again.
-- **Input.** `lim ios tap-element --ax-label`, `lim ios type`, `lim ios element-tree`. Rows inside a
-  list are often missing from the tree; use `lim ios screenshot`.
-- **Background and foreground.** Always pass `-d`, or the command streams logs and does not return:
-  `lim ios launch-app com.apple.Preferences -d`, then
-  `lim ios launch-app sh.superset.mobile -d --mode ForegroundIfRunning`.
-- **Request counts.** The tunnel logs every request the app makes, in
-  `~/.lim/tunnels/<dir>/<tunnel-id>.log`. Note its line count, act, and read the new lines.
+- **App.** The script installs the simulator build that matches this checkout's fingerprint and
+  builds one only after a native change.
+- **Ports.** It forwards Metro, the API, the relay and realtime. A port that is not forwarded fails
+  as a network error in the app; without the relay running, Home says it cannot check the host.
+- **Input.** `agent-device snapshot -i`, `press`, `fill`, `screenshot`. `press` and `fill` take
+  `--settle` and print what changed. The dev-menu sheet covers the first screen: press `Continue`,
+  then `Close`.
+- **Request counts.** `.tmp/eas-dev/egress.log` in the checkout names each local port the simulator reached.
 - **Cloud screens.** The workspace's Neon branch is a copy of production, and cloud access is a
   PostHog flag on the email, so the dev account sees no cloud workspaces. Prefer a test account
   that has the flag. Use a real account only with its owner's approval: save its `auth.accounts`
   credential `password`, set a temporary hash (`hashPassword` from `better-auth/crypto`), and sign
   in with "Sign in with email (dev)". After the test, restore the hash and delete the sessions the
   test created.
-- **Cleanup.** `lim ios tunnel stop --id <id>` and `lim ios delete <id>`; the simulator bills while
-  it runs. Stop local processes by PID: `pkill -f <pattern>` also matches the shell that runs it.
+- **Cleanup.** `eas simulator:stop` from `apps/mobile`; the session bills while it runs and stops
+  by itself after 15 idle minutes. Stop local processes by PID: `pkill -f <pattern>` also matches
+  the shell that runs it.

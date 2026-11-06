@@ -8,7 +8,7 @@ export function register(server: McpServer): void {
 		name: "automations_pause",
 		annotations: { destructiveHint: false, idempotentHint: true },
 		description:
-			"Pause an automation. The recurring schedule stops firing until resumed. Caller must be the owner.",
+			"Pause an automation. Its schedules and event triggers stop firing until resumed. Caller must be the owner.",
 		inputSchema: {
 			id: z.string().uuid().describe("Automation UUID."),
 		},

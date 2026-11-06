@@ -27,7 +27,7 @@ export function pluginMcpUrl(ref: PluginRef, connection?: string): URL {
 	return url;
 }
 
-function pluginMcpHeaders(
+export function pluginMcpHeaders(
 	bearer: string,
 	organizationId: string | undefined,
 ): Record<string, string> {

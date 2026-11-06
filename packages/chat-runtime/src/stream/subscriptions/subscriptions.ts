@@ -9,6 +9,7 @@ import { isDeltaEnvelope } from "@superset/chat/protocol";
 import type { ChatDb } from "../../db";
 import type { ChatResetReason } from "../../replay";
 import { readPage, readSince } from "../../replay";
+import { SubagentItems } from "../subagentItems";
 
 export const DELTA_FLUSH_MS = 33;
 export const DEFAULT_BOOTSTRAP_LIMIT = 200;
@@ -21,6 +22,7 @@ export type Sink = {
 export type SubscribeOptions = {
 	since?: Cursor;
 	deltas: DeltaChannel[];
+	nestedSubagents?: boolean;
 };
 
 export type Subscription = {
@@ -32,11 +34,13 @@ export type Schedule = (callback: () => void) => () => void;
 export type SubscriptionHubOptions = {
 	schedule?: Schedule;
 	bootstrapLimit?: number;
+	subagentItems?: SubagentItems;
 };
 
 type Subscriber = {
 	sink: Sink;
 	deltas: Set<DeltaChannel>;
+	nestedSubagents: boolean;
 };
 
 const defaultSchedule: Schedule = (callback) => {
@@ -75,6 +79,7 @@ export class SubscriptionHub {
 	private readonly coalescers = new Map<string, Coalescer<DeltaEnvelope>>();
 	private readonly schedule: Schedule;
 	private readonly bootstrapLimit: number;
+	private readonly subagentItems: SubagentItems;
 
 	constructor(
 		private readonly db: ChatDb,
@@ -82,6 +87,7 @@ export class SubscriptionHub {
 	) {
 		this.schedule = options.schedule ?? defaultSchedule;
 		this.bootstrapLimit = options.bootstrapLimit ?? DEFAULT_BOOTSTRAP_LIMIT;
+		this.subagentItems = options.subagentItems ?? new SubagentItems(db);
 	}
 
 	subscribe(
@@ -97,7 +103,14 @@ export class SubscriptionHub {
 
 		try {
 			if (replay.ok) {
-				for (const envelope of replay.envelopes) sink.send(envelope);
+				for (const envelope of replay.envelopes) {
+					if (
+						!options.nestedSubagents &&
+						this.subagentItems.hiddenFromFlatView(envelope)
+					)
+						continue;
+					sink.send(envelope);
+				}
 			} else {
 				sink.send(this.resetEnvelope(sessionId, replay.reset));
 			}
@@ -105,7 +118,11 @@ export class SubscriptionHub {
 			return { unsubscribe: () => undefined };
 		}
 
-		const subscriber: Subscriber = { sink, deltas: new Set(options.deltas) };
+		const subscriber: Subscriber = {
+			sink,
+			deltas: new Set(options.deltas),
+			nestedSubagents: options.nestedSubagents === true,
+		};
 		const existing = this.subscribers.get(sessionId);
 		if (existing) existing.add(subscriber);
 		else this.subscribers.set(sessionId, new Set([subscriber]));
@@ -119,6 +136,7 @@ export class SubscriptionHub {
 			this.coalescerFor(envelope.sessionId).push(envelope);
 			return;
 		}
+		this.subagentItems.observe(envelope);
 		this.flushDeltas(envelope.sessionId);
 		this.deliver(envelope.sessionId, envelope);
 	}
@@ -156,8 +174,13 @@ export class SubscriptionHub {
 		const set = this.subscribers.get(sessionId);
 		if (!set) return;
 		const delta = isDeltaEnvelope(envelope) ? envelope.delta : null;
+		let hidden: boolean | undefined;
 		for (const subscriber of [...set]) {
 			if (delta && !subscriber.deltas.has(delta.type)) continue;
+			if (!subscriber.nestedSubagents) {
+				hidden ??= this.subagentItems.hiddenFromFlatView(envelope);
+				if (hidden) continue;
+			}
 			try {
 				subscriber.sink.send(envelope);
 			} catch {

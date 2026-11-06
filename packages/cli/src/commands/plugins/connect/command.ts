@@ -1,8 +1,13 @@
+import { syncPluginMcpServers } from "@superset/agent-setup";
 import { CLIError, positional, string, table } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
-import { getApiUrl } from "../../../lib/config";
 import {
-	findInstalled,
+	authorizeUrl,
+	chooseAuthMethod,
+	findConnectTarget,
+} from "../../../lib/plugins/connect";
+import { toCliError } from "../../../lib/plugins/errors";
+import {
 	readInstalledPlugins,
 	resolvePluginRef,
 } from "../../../lib/plugins/host";
@@ -11,7 +16,6 @@ import {
 	missingInputsError,
 	parseInputs,
 } from "../../../lib/plugins/inputs";
-import { syncPluginMcpServers } from "../../../lib/plugins/mcp-servers";
 
 export default command({
 	sandbox: false,
@@ -44,8 +48,21 @@ export default command({
 			args.plugin as string,
 			options.marketplace as string | undefined,
 		);
-		const installed = findInstalled(readInstalledPlugins(), name, marketplace);
-		if (!installed) {
+		const catalog = await ctx.api.plugins.list.query({
+			includeOrganization: true,
+		});
+		let target: ReturnType<typeof findConnectTarget>;
+		try {
+			target = findConnectTarget(
+				catalog,
+				readInstalledPlugins(),
+				name,
+				marketplace,
+			);
+		} catch (error) {
+			throw toCliError(error);
+		}
+		if (!target) {
 			throw new CLIError(
 				marketplace
 					? `"${name}" is not installed from "${marketplace}". Run: superset plugins install ${name} --marketplace ${marketplace}`
@@ -53,13 +70,7 @@ export default command({
 			);
 		}
 
-		const catalog = await ctx.api.plugins.list.query();
-		const slug =
-			catalog.find(
-				(entry) =>
-					entry.name === name &&
-					(!marketplace || entry.marketplace === marketplace),
-			)?.connector ?? undefined;
+		const slug = target.connector ?? undefined;
 
 		if (!slug) {
 			return {
@@ -71,29 +82,13 @@ export default command({
 		const connector = await ctx.api.connectors.get.query({ slug });
 		const methods = connector.methods;
 
-		const requested = options.method as string | undefined;
-		const auth = requested
-			? methods.find((entry) => entry.type === requested)
-			: methods.length === 1
-				? methods[0]
-				: undefined;
-
-		if (methods.length > 1 && !auth) {
-			throw new CLIError(
-				[
-					`"${name}" offers more than one way to connect. Ask the user which they prefer, then run:`,
-					"",
-					...methods.map(
-						(entry) =>
-							`  superset plugins connect ${name} --method ${entry.type}${entry.label ? `   (${entry.label})` : ""}`,
-					),
-				].join("\n"),
-			);
-		}
-
-		if (!auth) {
-			throw new CLIError(`"${slug}" has no ${requested ?? "default"} method.`);
-		}
+		const auth = chooseAuthMethod({
+			command: "connect",
+			pluginName: name,
+			slug,
+			methods,
+			requested: options.method as string | undefined,
+		});
 
 		const declared = (auth.inputs ?? []) as AuthInputSpec[];
 		const provided = await parseInputs(options.inputs as string | undefined);
@@ -129,38 +124,20 @@ export default command({
 			};
 		}
 
-		const secrets = declared.filter((input) => input.secret);
-		if (secrets.length) {
-			throw new CLIError(
-				`"${name}" declares ${secrets
-					.map((input) => `"${input.name}"`)
-					.join(
-						", ",
-					)} as secret on its oauth2 method. A browser authorization URL cannot carry a secret; report this to the plugin's author.`,
-			);
-		}
-
-		const missing = declared.filter(
-			(input) => input.required && !provided[input.name],
-		);
-		if (missing.length) throw missingInputsError(name, missing, declared);
-
-		const params = new URLSearchParams({
-			...Object.fromEntries(
-				declared
-					.filter((input) => !input.secret && input.name in provided)
-					.map((input) => [input.name, provided[input.name] as string]),
-			),
-			method: auth.type,
-		});
 		const organization = await ctx.api.user.myOrganization.query();
 		if (!organization) {
 			throw new CLIError(
 				"You need to be part of an organization to connect accounts.",
 			);
 		}
-		params.set("organizationId", organization.id);
-		const url = `${getApiUrl()}/api/connectors/${slug}/connect?${params}`;
+		const url = authorizeUrl({
+			command: "connect",
+			pluginName: name,
+			slug,
+			auth,
+			provided,
+			organizationId: organization.id,
+		});
 
 		return {
 			data: [{ plugin: name, status: "authorize", detail: url }],

@@ -82,7 +82,7 @@ export function WorkspaceHostIncompatibleState({
 							</Trans>
 						) : (
 							<Trans>
-								Update Superset on that device. In-app updates require a
+								Update Paradev on that device. In-app updates require a
 								supported standalone install and a released app version.
 							</Trans>
 						)}
@@ -105,9 +105,9 @@ export function WorkspaceHostIncompatibleState({
 						</div>
 						<span className="shrink-0 font-mono text-[11px] text-muted-foreground/70">
 							{installSource === "cli" ? (
-								<Trans>Superset CLI</Trans>
+								<Trans>Paradev CLI</Trans>
 							) : installSource === "desktop" ? (
-								<Trans>Superset app</Trans>
+								<Trans>Paradev app</Trans>
 							) : null}
 						</span>
 					</div>

@@ -1,5 +1,6 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { Button } from "@superset/ui/button";
 import {
 	Empty,
@@ -9,30 +10,41 @@ import {
 	EmptyMedia,
 	EmptyTitle,
 } from "@superset/ui/empty";
+import { cn } from "@superset/ui/utils";
 import { useMatchRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { type Range, useVirtualizer } from "@tanstack/react-virtual";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
+	LuArchive,
 	LuChevronDown,
 	LuChevronRight,
 	LuLayers,
+	LuMonitor,
 	LuSearchX,
+	LuTerminal,
 } from "react-icons/lu";
 import { BoardColumnIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/BoardColumnIcon";
+import { V2WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceProjectIcon";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { useCurrentViewFilters } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useCurrentViewFilters";
 import {
-	DEVICE_FILTER_THIS_DEVICE,
+	BUILT_IN_VIEW_ALL,
+	getViewFilters,
+	sameViewFilters,
 	useV2WorkspacesFilterStore,
-	type V2WorkspacesArchivedWindow,
-	type V2WorkspacesSortMode,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
-import { isWithinArchivedWindow } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/archivedWindow";
+import { BOARD_COLUMN_LABELS } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/deriveBoardColumn";
 import {
-	BOARD_COLUMN_LABELS,
-	BOARD_COLUMN_ORDER,
-	type BoardColumnKey,
-	deriveBoardColumn,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/deriveBoardColumn";
-import { compareWorkspaces } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
+	GROUP_KEY_ARCHIVED,
+	GROUP_KEY_CLOUD,
+	groupWorkspaces,
+	type WorkspaceSection,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/groupWorkspaces";
+import {
+	activeHeaderIndex,
+	pinnedHeaderRange,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/pinnedHeaderRange";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { useV2ProjectLocalMetaStore } from "renderer/stores/v2-project-local-meta";
 import { V2WorkspaceRow } from "./components/V2WorkspaceRow";
 
@@ -41,52 +53,20 @@ interface V2WorkspacesListProps {
 	isReady: boolean;
 }
 
-interface StatusSection {
-	column: BoardColumnKey;
-	workspaces: AccessibleV2Workspace[];
-}
+const ESTIMATED_HEADER_HEIGHT = 30;
+const ESTIMATED_ROW_HEIGHT = 45;
+const OVERSCAN = 8;
 
-/** Board order reads left-to-right along the workflow; a vertical list must
- * lead with what needs the user, so it walks the same buckets urgency-first. */
-const LIST_SECTION_ORDER: BoardColumnKey[] = [
-	"attention",
-	"working",
-	"review",
-	"idle",
-	"merged",
-	"deleted",
-];
-
-/** Same buckets as the board — the two views must agree on what
- * "needs attention" means. Row order inside a section follows the user's
- * sort mode. */
-function groupByStatus(
-	workspaces: AccessibleV2Workspace[],
-	archivedWindow: V2WorkspacesArchivedWindow,
-	sortMode: V2WorkspacesSortMode,
-): StatusSection[] {
-	const now = Date.now();
-	const byColumn = new Map<BoardColumnKey, AccessibleV2Workspace[]>(
-		BOARD_COLUMN_ORDER.map((column) => [column, []]),
-	);
-	for (const workspace of workspaces) {
-		if (
-			workspace.archivedAt != null &&
-			!isWithinArchivedWindow(workspace.archivedAt, archivedWindow, now)
-		) {
-			continue;
-		}
-		byColumn.get(deriveBoardColumn(workspace))?.push(workspace);
-	}
-	const sections: StatusSection[] = [];
-	for (const column of LIST_SECTION_ORDER) {
-		const rows = byColumn.get(column) ?? [];
-		if (rows.length === 0) continue;
-		rows.sort((a, b) => compareWorkspaces(a, b, sortMode));
-		sections.push({ column, workspaces: rows });
-	}
-	return sections;
-}
+type ListItem =
+	| {
+			kind: "header";
+			key: string;
+			section: WorkspaceSection;
+			collapseKey: string;
+			isCollapsed: boolean;
+			containsCurrent: boolean;
+	  }
+	| { kind: "row"; key: string; workspace: AccessibleV2Workspace };
 
 export function V2WorkspacesList({
 	workspaces,
@@ -100,44 +80,122 @@ export function V2WorkspacesList({
 		currentWorkspaceMatch !== false ? currentWorkspaceMatch.workspaceId : null;
 
 	const searchQuery = useV2WorkspacesFilterStore((state) => state.searchQuery);
-	const deviceFilter = useV2WorkspacesFilterStore(
-		(state) => state.deviceFilter,
+	const activeViewId = useV2WorkspacesFilterStore(
+		(state) => state.activeViewId,
 	);
-	const projectFilters = useV2WorkspacesFilterStore(
-		(state) => state.projectFilters,
+	const savedViews = useV2WorkspacesFilterStore((state) => state.savedViews);
+	const currentFilters = useCurrentViewFilters();
+	const applyView = useV2WorkspacesFilterStore((state) => state.applyView);
+	const setSearchQuery = useV2WorkspacesFilterStore(
+		(state) => state.setSearchQuery,
 	);
-	const prStateFilters = useV2WorkspacesFilterStore(
-		(state) => state.prStateFilters,
+	const showArchived = useV2WorkspacesFilterStore(
+		(state) => state.showArchived,
 	);
-	const agentStatusFilters = useV2WorkspacesFilterStore(
-		(state) => state.agentStatusFilters,
+	const groupBy = useV2WorkspacesFilterStore((state) => state.groupBy);
+	const orderBy = useV2WorkspacesFilterStore((state) => state.orderBy);
+	// Status sections persist their collapse in the project-meta store under a
+	// fixed seven-key set; project, host and creator keys have no deletion
+	// path in that store, so they only collapse for the session.
+	const persistedCollapsed = useV2ProjectLocalMetaStore(
+		(state) => state.projects,
 	);
-	const creatorFilters = useV2WorkspacesFilterStore(
-		(state) => state.creatorFilters,
+	const togglePersistedCollapsed = useV2ProjectLocalMetaStore(
+		(state) => state.toggleProjectCollapsed,
 	);
-	const pinFilter = useV2WorkspacesFilterStore((state) => state.pinFilter);
-	const resetFilters = useV2WorkspacesFilterStore((state) => state.reset);
-	const archivedWindow = useV2WorkspacesFilterStore(
-		(state) => state.archivedWindow,
+	const [sessionCollapsed, setSessionCollapsed] = useState<ReadonlySet<string>>(
+		() => new Set(),
 	);
-	const sortMode = useV2WorkspacesFilterStore((state) => state.sortMode);
+	const toggleCollapsed = useCallback(
+		(collapseKey: string) => {
+			if (collapseKey.startsWith("status:")) {
+				togglePersistedCollapsed(collapseKey);
+				return;
+			}
+			setSessionCollapsed((current) => {
+				const next = new Set(current);
+				if (next.has(collapseKey)) next.delete(collapseKey);
+				else next.add(collapseKey);
+				return next;
+			});
+		},
+		[togglePersistedCollapsed],
+	);
 
 	const sections = useMemo(
-		() => groupByStatus(workspaces, archivedWindow, sortMode),
-		[workspaces, archivedWindow, sortMode],
+		() => groupWorkspaces(workspaces, { groupBy, orderBy, showArchived }),
+		[workspaces, groupBy, orderBy, showArchived],
 	);
 
+	// One flat header/row sequence for the virtualizer; collapsed sections
+	// contribute their header only.
+	const items = useMemo<ListItem[]>(() => {
+		const list: ListItem[] = [];
+		for (const section of sections) {
+			const collapseKey = `${section.groupBy}:${section.key}`;
+			const containsCurrent = section.workspaces.some(
+				(workspace) => workspace.id === currentWorkspaceId,
+			);
+			const wantsCollapsed =
+				section.groupBy === "status"
+					? (persistedCollapsed[collapseKey]?.isCollapsed ?? false)
+					: sessionCollapsed.has(collapseKey);
+			const isCollapsed = wantsCollapsed && !containsCurrent;
+			// Flat list: no band, except the archived tail, which keeps its own.
+			if (section.groupBy === "none" && section.key !== GROUP_KEY_ARCHIVED) {
+				for (const workspace of section.workspaces) {
+					list.push({ kind: "row", key: workspace.id, workspace });
+				}
+				continue;
+			}
+			list.push({
+				kind: "header",
+				key: `header:${collapseKey}`,
+				section,
+				collapseKey,
+				isCollapsed,
+				containsCurrent,
+			});
+			if (isCollapsed) continue;
+			for (const workspace of section.workspaces) {
+				list.push({ kind: "row", key: workspace.id, workspace });
+			}
+		}
+		return list;
+	}, [sections, persistedCollapsed, sessionCollapsed, currentWorkspaceId]);
+
+	const headerIndexes = useMemo(
+		() =>
+			items.flatMap((item, index) => (item.kind === "header" ? [index] : [])),
+		[items],
+	);
+
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const rangeExtractor = useCallback(
+		(range: Range) => pinnedHeaderRange(range, headerIndexes),
+		[headerIndexes],
+	);
+	const virtualizer = useVirtualizer({
+		count: items.length,
+		getScrollElement: () => scrollRef.current,
+		estimateSize: (index) =>
+			items[index]?.kind === "header"
+				? ESTIMATED_HEADER_HEIGHT
+				: ESTIMATED_ROW_HEIGHT,
+		getItemKey: (index) => items[index]?.key ?? index,
+		overscan: OVERSCAN,
+		rangeExtractor,
+	});
+
+	// Anything the user can undo from here: a search, or filters beyond
+	// what the plain "All" view pins.
 	const hasActiveFilters =
 		searchQuery.trim() !== "" ||
-		deviceFilter !== DEVICE_FILTER_THIS_DEVICE ||
-		projectFilters.length > 0 ||
-		prStateFilters.length > 0 ||
-		agentStatusFilters.length > 0 ||
-		creatorFilters.length > 0 ||
-		pinFilter !== "all" ||
-		// A narrowed archive window can hide every row (e.g. all tombstones
-		// with "Hide archived") — that's a filter, not an empty account.
-		archivedWindow !== "none";
+		activeViewId !== BUILT_IN_VIEW_ALL ||
+		!sameViewFilters(
+			currentFilters,
+			getViewFilters(BUILT_IN_VIEW_ALL, savedViews),
+		);
 
 	// Sections, not the input rows: the archived window can drop everything.
 	if (sections.length === 0) {
@@ -161,15 +219,22 @@ export function V2WorkspacesList({
 					</EmptyTitle>
 					<EmptyDescription>
 						{hasActiveFilters ? (
-							<Trans>Try a different search term or another device.</Trans>
+							<Trans>Try a different search term or another place.</Trans>
 						) : (
-							<Trans>Workspaces on this device will show up here.</Trans>
+							<Trans>Workspaces you can open will show up here.</Trans>
 						)}
 					</EmptyDescription>
 				</EmptyHeader>
 				{hasActiveFilters ? (
 					<EmptyContent>
-						<Button variant="outline" size="sm" onClick={() => resetFilters()}>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => {
+								setSearchQuery("");
+								applyView(BUILT_IN_VIEW_ALL);
+							}}
+						>
 							<Trans>Clear filters</Trans>
 						</Button>
 					</EmptyContent>
@@ -180,90 +245,166 @@ export function V2WorkspacesList({
 
 	return (
 		// @container so rows can shed metadata as the pane narrows.
-		<div className="@container min-h-0 flex-1 overflow-y-auto">
-			{sections.map((section) => (
-				<StatusSectionGroup
-					key={section.column}
-					section={section}
-					currentWorkspaceId={currentWorkspaceId}
-				/>
-			))}
+		<div ref={scrollRef} className="@container min-h-0 flex-1 overflow-y-auto">
+			<div
+				className="relative w-full"
+				style={{ height: virtualizer.getTotalSize() }}
+			>
+				{virtualizer.getVirtualItems().map((virtualItem) => {
+					const item = items[virtualItem.index];
+					if (!item) return null;
+					const isActiveHeader =
+						item.kind === "header" &&
+						virtualItem.index ===
+							activeHeaderIndex(
+								virtualizer.range?.startIndex ?? 0,
+								headerIndexes,
+							);
+					return (
+						<div
+							key={virtualItem.key}
+							data-index={virtualItem.index}
+							ref={virtualizer.measureElement}
+							className={cn("w-full", item.kind === "header" && "z-[5]")}
+							style={
+								isActiveHeader
+									? { position: "sticky", top: 0 }
+									: {
+											position: "absolute",
+											top: 0,
+											left: 0,
+											transform: `translateY(${virtualItem.start}px)`,
+										}
+							}
+						>
+							{item.kind === "header" ? (
+								<SectionHeader
+									section={item.section}
+									isCollapsed={item.isCollapsed}
+									containsCurrent={item.containsCurrent}
+									onToggle={() => toggleCollapsed(item.collapseKey)}
+								/>
+							) : (
+								<V2WorkspaceRow
+									workspace={item.workspace}
+									isCurrentRoute={item.workspace.id === currentWorkspaceId}
+								/>
+							)}
+						</div>
+					);
+				})}
+			</div>
 		</div>
 	);
 }
 
-interface StatusSectionGroupProps {
-	section: StatusSection;
-	currentWorkspaceId: string | null;
+interface SectionHeaderProps {
+	section: WorkspaceSection;
+	isCollapsed: boolean;
+	containsCurrent: boolean;
+	onToggle: () => void;
 }
 
-function StatusSectionGroup({
+function SectionHeader({
 	section,
-	currentWorkspaceId,
-}: StatusSectionGroupProps) {
-	// Reuses the project-collapse store with a status-scoped key; the key set
-	// is fixed (six columns), so the persisted map stays bounded.
-	const collapseKey = `status:${section.column}`;
-	const persistedCollapsed = useV2ProjectLocalMetaStore(
-		(state) => state.projects[collapseKey]?.isCollapsed ?? false,
-	);
-	const toggleCollapsed = useV2ProjectLocalMetaStore(
-		(state) => state.toggleProjectCollapsed,
-	);
-	const containsCurrent = section.workspaces.some(
-		(workspace) => workspace.id === currentWorkspaceId,
-	);
-	// The current workspace's section never hides, so its toggle is inert —
-	// disable it instead of letting clicks appear to do nothing.
-	const isCollapsed = persistedCollapsed && !containsCurrent;
+	isCollapsed,
+	containsCurrent,
+	onToggle,
+}: SectionHeaderProps) {
+	const { t } = useLingui();
 	const Chevron = isCollapsed ? LuChevronRight : LuChevronDown;
-	const rowsId = `v2-workspaces-status-${section.column}-rows`;
 
 	return (
-		<section>
-			{/* A tinted band + uppercase micro-label (same vocabulary as the
-			    sidebar's SESSIONS/PROJECTS headers) so groups never read as
-			    rows; the dot keeps the row-glyph column alignment. */}
-			<button
-				type="button"
-				onClick={() => toggleCollapsed(collapseKey)}
-				disabled={containsCurrent}
-				title={
-					containsCurrent
-						? "Can't collapse the current workspace's section"
-						: undefined
-				}
-				aria-expanded={!isCollapsed}
-				aria-controls={rowsId}
-				className="sticky top-0 z-[5] flex w-full items-center gap-2 border-b border-border/60 bg-muted/70 px-6 py-1.5 text-left outline-none backdrop-blur transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset"
-			>
-				{/* Disclosure lives in the left padding gutter so the status icon
-				    stays locked to the row-glyph column. */}
-				<Chevron className="absolute left-1.5 size-3 shrink-0 text-muted-foreground/60" />
-				<span
-					aria-hidden
-					className="flex size-4 shrink-0 items-center justify-center"
-				>
-					<BoardColumnIcon column={section.column} />
-				</span>
-				<h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-					{i18n._(BOARD_COLUMN_LABELS[section.column])}
-				</h3>
-				<span className="shrink-0 text-[11px] tabular-nums text-muted-foreground/70">
-					{section.workspaces.length}
-				</span>
-			</button>
-			<div id={rowsId}>
-				{isCollapsed
-					? null
-					: section.workspaces.map((workspace) => (
-							<V2WorkspaceRow
-								key={workspace.id}
-								workspace={workspace}
-								isCurrentRoute={workspace.id === currentWorkspaceId}
-							/>
-						))}
-			</div>
-		</section>
+		// The toggle is inert for the current workspace's section (it never
+		// hides), so it is disabled instead of letting clicks appear to do nothing.
+		<button
+			type="button"
+			onClick={onToggle}
+			disabled={containsCurrent}
+			title={
+				containsCurrent
+					? t({ message: "Can't collapse the current workspace's section" })
+					: undefined
+			}
+			aria-expanded={!isCollapsed}
+			className="relative flex w-full items-center gap-1.5 border-b border-border/60 bg-muted/70 px-6 py-1.5 text-left outline-none backdrop-blur transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset"
+		>
+			<Chevron className="absolute left-1.5 size-2.5 shrink-0 text-muted-foreground/60" />
+			<span aria-hidden className="flex w-3 shrink-0 items-center">
+				<SectionGlyph section={section} />
+			</span>
+			<h3 className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+				<SectionLabel section={section} />
+			</h3>
+			<span className="shrink-0 text-[11px] tabular-nums text-muted-foreground/70">
+				{section.workspaces.length}
+			</span>
+		</button>
 	);
+}
+
+function SectionLabel({ section }: { section: WorkspaceSection }) {
+	const { sample } = section;
+	if (section.key === GROUP_KEY_ARCHIVED) return <Trans>Archived</Trans>;
+	switch (section.groupBy) {
+		case "status":
+			return section.column
+				? i18n._(BOARD_COLUMN_LABELS[section.column])
+				: null;
+		case "project":
+			return sample.projectName ?? <Trans>Sessions</Trans>;
+		case "where":
+			return section.key === GROUP_KEY_CLOUD ? (
+				<Trans>Cloud</Trans>
+			) : (
+				sample.hostName
+			);
+		case "creator":
+			return sample.createdByName ?? <Trans>Unknown creator</Trans>;
+		default:
+			return null;
+	}
+}
+
+function SectionGlyph({ section }: { section: WorkspaceSection }) {
+	const { sample } = section;
+	if (section.key === GROUP_KEY_ARCHIVED) {
+		return <LuArchive className="size-3 text-muted-foreground/70" />;
+	}
+	switch (section.groupBy) {
+		case "status":
+			return section.column ? (
+				<BoardColumnIcon column={section.column} className="justify-start" />
+			) : null;
+		case "project":
+			return sample.projectId ? (
+				<V2WorkspaceProjectIcon
+					projectName={sample.projectName ?? ""}
+					iconUrl={sample.projectIconUrl}
+					size="sm"
+					className="size-4 rounded-sm text-[9px]"
+				/>
+			) : (
+				<LuTerminal className="size-3.5 text-muted-foreground" />
+			);
+		case "where":
+			return section.key === GROUP_KEY_CLOUD ? (
+				<CloudGlyph className="size-3.5 text-muted-foreground" />
+			) : (
+				<LuMonitor className="size-3.5 text-muted-foreground" />
+			);
+		case "creator":
+			return (
+				<Avatar className="size-4">
+					{sample.createdByImage ? (
+						<AvatarImage src={sample.createdByImage} />
+					) : null}
+					<AvatarFallback className="text-[8px]">
+						{(sample.createdByName ?? "?").slice(0, 1).toUpperCase()}
+					</AvatarFallback>
+				</Avatar>
+			);
+		default:
+			return null;
+	}
 }

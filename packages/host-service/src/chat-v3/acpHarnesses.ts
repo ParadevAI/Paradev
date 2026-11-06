@@ -1,26 +1,15 @@
-import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import type { HarnessFactory } from "@superset/chat-runtime";
+import type { HarnessFactory, ResolveAttachment } from "@superset/chat-runtime";
 import { createAcpAdapter } from "@superset/chat-runtime";
 import type { HostDb } from "../db";
-import { resolveAttachmentPath } from "../trpc/router/attachments/storage";
 import { captureSessionAccount } from "../trpc/router/usage/session-account/session-account";
 import { ACP_HARNESSES } from "./acpCatalogue";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
 import { storeAgentImage } from "./agentImages";
+import { agentLoginCommand } from "./agentLogin";
 import type { ChatAgentBridge } from "./chatAgentBridge";
-
-async function resolveAttachment(attachmentId: string) {
-	const resolved = resolveAttachmentPath(attachmentId);
-	if (!resolved) return null;
-	return {
-		path: resolved.path,
-		mimeType: resolved.metadata.mediaType,
-		data: (await readFile(resolved.path)).toString("base64"),
-	};
-}
 
 function resolveAdapterEntry(packageName: string): string {
 	const moduleRequire = createRequire(import.meta.url);
@@ -31,6 +20,7 @@ function resolveAdapterEntry(packageName: string): string {
 export function acpHarnessFactory(
 	harness: string,
 	db: HostDb,
+	resolveAttachment: ResolveAttachment,
 	agents?: ChatAgentBridge,
 ): HarnessFactory | null {
 	const entry = ACP_HARNESSES[harness];
@@ -54,6 +44,8 @@ export function acpHarnessFactory(
 			...(entry.fullAccessModeId
 				? { defaultModeId: entry.fullAccessModeId }
 				: {}),
+			...(entry.clientApprovalModes ? { clientApprovalModes: true } : {}),
+			...(entry.forkAtMessage ? { forkAtMessage: true } : {}),
 			onSpawn: (pid) => agents?.spawned(options.sessionId, pid),
 			launch: async () => {
 				const cli = await resolveAgentCli({
@@ -83,8 +75,10 @@ export function acpHarnessFactory(
 						if (account) agents?.accountCaptured(options.sessionId, account);
 					})
 					.catch(() => undefined);
+				const loginCommand = agentLoginCommand(entry.binary, env);
+				const login = loginCommand ? { loginCommand } : {};
 				if (!adapterEntry) {
-					return { command: cli.command, args: entry.args, env };
+					return { command: cli.command, args: entry.args, env, ...login };
 				}
 				if (!entry.executableEnv) {
 					throw new Error(
@@ -99,6 +93,7 @@ export function acpHarnessFactory(
 						ELECTRON_RUN_AS_NODE: "1",
 						[entry.executableEnv]: cli.command,
 					},
+					...login,
 				};
 			},
 		});
@@ -106,11 +101,12 @@ export function acpHarnessFactory(
 
 export function acpHarnessEntries(
 	db: HostDb,
+	resolveAttachment: ResolveAttachment,
 	agents?: ChatAgentBridge,
 ): [string, HarnessFactory][] {
 	const entries: [string, HarnessFactory][] = [];
 	for (const harness of Object.keys(ACP_HARNESSES)) {
-		const factory = acpHarnessFactory(harness, db, agents);
+		const factory = acpHarnessFactory(harness, db, resolveAttachment, agents);
 		if (factory) entries.push([harness, factory]);
 	}
 	return entries;

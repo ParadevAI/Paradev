@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -55,7 +56,7 @@ export async function generateMetadata({
 
 	const { profile } = lookup;
 	const who = profile.name ?? `@${profile.handle}`;
-	const title = `${who} · #${profile.rank} on the ${COMPANY.NAME} leaderboard`;
+	const title = `${who} · #${profile.rank} on the ${BRAND.NAME} leaderboard`;
 	const description = `${formatTokens(profile.allTime.tokens, lang)} tokens and ${formatUsd(
 		profile.allTime.usd,
 		lang,
@@ -74,7 +75,7 @@ export async function generateMetadata({
 			title,
 			description,
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			type: "profile",
 		},
 		twitter: {
@@ -101,15 +102,13 @@ export default async function UserProfilePage({ params }: PageProps) {
 	const { profile } = lookup;
 	const colors = buildModelColors([profile.models]);
 	const shareUrl = `${COMPANY.MARKETING_URL.replace(/\/$/, "")}/${profile.handle}`;
-	const company = COMPANY.NAME;
+	const company = BRAND.NAME;
 	const profileHandle = profile.handle;
 	const rank = profile.rank;
 	const total = profile.total;
 	const tokens = formatTokens(profile.allTime.tokens, locale);
 	const days = profile.dayRange ? dayCount(profile.dayRange) : 0;
-	const shareText = t({
-		message: `I'm #${rank} on the ${company} leaderboard with ${tokens} tokens of agent usage.`,
-	});
+	const shareText = t`I'm #${rank} on the ${company} leaderboard with ${tokens} tokens of agent usage.`;
 
 	const tier = profile.factory?.tier ?? 0;
 
@@ -172,20 +171,14 @@ export default async function UserProfilePage({ params }: PageProps) {
 									message: "Rank",
 								}),
 								value: `#${rank}`,
-								hint: t({
-									message: `of ${total}`,
-								}),
+								hint: t`of ${total}`,
 							},
 							{
 								label: t({
 									message: "Tracking",
 								}),
 
-								value: profile.dayRange
-									? t({
-											message: `${days}d`,
-										})
-									: "—",
+								value: profile.dayRange ? t`${days}d` : "—",
 								hint: profile.dayRange
 									? formatDayRange(profile.dayRange, locale)
 									: undefined,

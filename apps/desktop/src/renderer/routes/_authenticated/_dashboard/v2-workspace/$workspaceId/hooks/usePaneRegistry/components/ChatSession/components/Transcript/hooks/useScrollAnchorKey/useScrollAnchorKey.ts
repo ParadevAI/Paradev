@@ -3,8 +3,8 @@ import { type RefObject, useMemo, useRef, useState } from "react";
 import type { TranscriptRow } from "../../utils/transcriptRows";
 
 /**
- * The key of the latest message sent from this view: the scroller pins it to
- * the top and follows the reply once it outgrows the screen. A message is
+ * The key of the latest message sent from this view: the transcript scrolls
+ * to the end when it changes and follows the reply from there. A message is
  * sent here when it went through this view's outbox after the view opened,
  * so a message from another client never takes the anchor.
  */

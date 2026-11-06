@@ -1,3 +1,5 @@
+import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
+
 declare global {
 	interface Window {
 		rdt?: (...args: unknown[]) => void;
@@ -12,9 +14,18 @@ function generateConversionId(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function hasDeclinedAnalytics(): boolean {
+	try {
+		return window.localStorage?.getItem(ANALYTICS_CONSENT_KEY) === "declined";
+	} catch {
+		return false;
+	}
+}
+
 /**
- * Fire a Reddit Pixel conversion event. No-ops on the server or before the
- * base pixel (injected in the root layout) has defined `window.rdt`. Reddit
+ * Fire a Reddit Pixel conversion event. No-ops on the server, before the
+ * base pixel (injected in the root layout) has defined `window.rdt`, or after
+ * the visitor declines analytics. Reddit
  * standard events include "PageVisit", "Lead", "SignUp", and "Purchase".
  *
  * A unique `conversionId` is attached for deduplication; pass an explicit
@@ -25,7 +36,11 @@ export function trackReddit(
 	event: string,
 	properties?: Record<string, unknown>,
 ): void {
-	if (typeof window === "undefined" || typeof window.rdt !== "function") {
+	if (
+		typeof window === "undefined" ||
+		typeof window.rdt !== "function" ||
+		hasDeclinedAnalytics()
+	) {
 		return;
 	}
 

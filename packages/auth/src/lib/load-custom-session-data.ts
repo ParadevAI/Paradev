@@ -66,9 +66,12 @@ function toDate(value: string | Date | null): Date | null {
 export async function loadCustomSessionData({
 	userId,
 	activeOrganizationId,
+	withPlan = true,
 }: {
 	userId: string;
 	activeOrganizationId: string | null;
+	/** Off when the plan comes from Autumn, so the session skips the subscriptions read. */
+	withPlan?: boolean;
 }): Promise<CustomSessionData> {
 	const statuses = sql.join(
 		ACTIVE_SUBSCRIPTION_STATUSES.map((status) => sql`${status}`),
@@ -109,10 +112,14 @@ export async function loadCustomSessionData({
 				) ORDER BY created_at DESC), '[]'::json)
 			 FROM memberships) AS memberships,
 			(SELECT organization_id FROM active) AS active_organization_id,
-			(SELECT s.plan FROM subscriptions s, active a
+			${
+				withPlan
+					? sql`(SELECT s.plan FROM subscriptions s, active a
 			 WHERE s.reference_id = a.organization_id
 			   AND s.status IN (${statuses})
-			 LIMIT 1) AS plan,
+			 LIMIT 1)`
+					: sql`NULL`
+			} AS plan,
 			u.last_active_organization_id,
 			u.onboarded_at,
 			u.deletion_requested_at

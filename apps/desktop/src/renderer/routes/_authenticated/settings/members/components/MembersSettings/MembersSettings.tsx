@@ -18,6 +18,7 @@ import {
 } from "@superset/ui/table";
 import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
@@ -83,6 +84,10 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 	const currentMember = members.find((m) => m.userId === currentUserId);
 	const currentUserRole = currentMember?.role;
 
+	const { plan, activePlan } = useCurrentPlan();
+	const seatPeriodEnd =
+		plan === "pro" && !activePlan?.cancelAt ? activePlan?.periodEnd : null;
+
 	const formatDate = (date: Date | string) => {
 		const d = date instanceof Date ? date : new Date(date);
 		return formatLocaleDate(d, {
@@ -103,6 +108,13 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 							Invite and manage members, assign roles, and control permissions
 						</Trans>
 					</p>
+					{seatPeriodEnd && (
+						<p className="text-xs text-muted-foreground mt-1">
+							{t({
+								message: `Seats removed mid-cycle stay active until ${formatLocaleDate(new Date(seatPeriodEnd), { month: "long", day: "numeric", year: "numeric" })}.`,
+							})}
+						</p>
+					)}
 				</div>
 			</div>
 

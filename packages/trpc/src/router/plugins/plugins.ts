@@ -1,19 +1,33 @@
 import { db } from "@superset/db/client";
 import {
 	connections,
+	organizationPlugins,
 	pluginInstalls,
 	pluginMarketplaces,
 } from "@superset/db/schema";
 import {
 	FIRST_PARTY_MANIFESTS,
 	firstPartyManifest,
+	isOrganizationMarketplace,
+	organizationMarketplace,
+	organizationPluginAccess,
 } from "@superset/shared/plugins";
 import type { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { userError } from "../../i18n-error";
 import { AmbiguousConnectionError } from "../../lib/connectors/lookup";
-import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import {
+	accessiblePlugin,
+	accessibleTo,
+	ensureManagedInstalls,
+	memberRole,
+} from "../../lib/organization-plugins";
+import { createTRPCRouter, personProcedure } from "../../trpc";
+import {
+	requireActiveOrgId,
+	requireActiveOrgMembership,
+} from "../utils/active-org";
 import {
 	AmbiguousPluginError,
 	installedPlugin,
@@ -26,7 +40,10 @@ import {
 	pluginNeedsConnection,
 	supersetExtension,
 } from "./manifest";
-import { forgetUpstreamTools } from "./proxy";
+import { organizationPluginsRouter } from "./organization";
+import { forgetUpstreamTools, resolveTarget } from "./proxy";
+import { slack } from "./servers/slack/tools";
+import { createSlackLinkPreviewLoader } from "./slack-link-preview";
 
 const FIRST_PARTY = "superset";
 
@@ -92,7 +109,7 @@ function describe(
 }
 
 const marketplacesRouter = {
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		const rows = await db
 			.select()
 			.from(pluginMarketplaces)
@@ -125,7 +142,7 @@ const marketplacesRouter = {
 		];
 	}),
 
-	add: protectedProcedure
+	add: personProcedure
 		.input(
 			z.discriminatedUnion("sourceKind", [
 				z.object({
@@ -145,12 +162,12 @@ const marketplacesRouter = {
 			]),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (input.name === FIRST_PARTY) {
+			if (input.name === FIRST_PARTY || isOrganizationMarketplace(input.name)) {
 				throw userError({
 					code: "BAD_REQUEST",
-					message: `"${FIRST_PARTY}" is built in and cannot be replaced`,
+					message: `"${input.name}" is built in and cannot be replaced`,
 					i18nKey: "serverError.plugins.marketplaceReserved",
-					params: { name: FIRST_PARTY },
+					params: { name: input.name },
 				});
 			}
 
@@ -179,7 +196,7 @@ const marketplacesRouter = {
 			return { id: row?.id, name: input.name };
 		}),
 
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(z.object({ name: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			if (input.name === FIRST_PARTY) {
@@ -233,7 +250,7 @@ const marketplacesRouter = {
 } satisfies TRPCRouterRecord;
 
 const connectionsRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(z.object({ plugin: z.string().min(1).optional() }).optional())
 		.query(async ({ ctx, input }) => {
 			const install = input?.plugin
@@ -272,7 +289,7 @@ const connectionsRouter = {
 			}));
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ connectionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const [row] = await db
@@ -299,97 +316,211 @@ const connectionsRouter = {
 		}),
 } satisfies TRPCRouterRecord;
 
+const loadSlackPreview = createSlackLinkPreviewLoader({
+	resolveTarget,
+	slackApi: slack,
+});
+
 export const pluginsRouter = createTRPCRouter({
-	list: protectedProcedure.query(async ({ ctx }) => {
-		const [installs, live] = await Promise.all([
-			db
-				.select()
-				.from(pluginInstalls)
-				.where(eq(pluginInstalls.userId, ctx.session.user.id))
-				.orderBy(asc(pluginInstalls.pluginName)),
-			db
-				.select({
-					id: connections.id,
-					connector: connections.connector,
-					account: connections.externalAccountLabel,
-					user: connections.externalUserLabel,
+	/** A Slack message or profile link, read with the caller's own Slack. */
+	slackLinkPreview: personProcedure
+		.input(z.object({ url: z.string().max(2048) }))
+		.query(async ({ ctx, input }) =>
+			loadSlackPreview({
+				href: input.url,
+				userId: ctx.session.user.id,
+				organizationId: await requireActiveOrgMembership(ctx),
+			}),
+		),
+
+	list: personProcedure
+		.input(
+			z
+				.object({
+					/** Released clients cannot install organization plugins, so they get none unless they ask. */
+					includeOrganization: z.boolean().optional(),
 				})
-				.from(connections)
-				.where(
-					and(
-						eq(connections.connectedByUserId, ctx.session.user.id),
-						isNull(connections.disconnectedAt),
+				.optional(),
+		)
+		.query(async ({ ctx, input }) => {
+			const organizationId = input?.includeOrganization
+				? ctx.activeOrganizationId
+				: null;
+			const role = organizationId
+				? await memberRole(ctx.session.user.id, organizationId)
+				: null;
+			if (organizationId) {
+				await ensureManagedInstalls(ctx.session.user.id, organizationId);
+			}
+			const [everyInstall, live, published] = await Promise.all([
+				db
+					.select()
+					.from(pluginInstalls)
+					.where(eq(pluginInstalls.userId, ctx.session.user.id))
+					.orderBy(asc(pluginInstalls.pluginName)),
+				db
+					.select({
+						id: connections.id,
+						connector: connections.connector,
+						account: connections.externalAccountLabel,
+						user: connections.externalUserLabel,
+					})
+					.from(connections)
+					.where(
+						and(
+							eq(connections.connectedByUserId, ctx.session.user.id),
+							isNull(connections.disconnectedAt),
+						),
 					),
-				),
-		]);
+				organizationId
+					? db
+							.select()
+							.from(organizationPlugins)
+							.where(
+								and(
+									eq(organizationPlugins.organizationId, organizationId),
+									accessibleTo(role),
+								),
+							)
+							.orderBy(asc(organizationPlugins.name))
+					: [],
+			]);
 
-		const held = new Map<
-			string,
-			{ id: string; account: string | null; user: string | null }[]
-		>();
-		for (const row of live) {
-			const list = held.get(row.connector) ?? [];
-			list.push({ id: row.id, account: row.account, user: row.user });
-			held.set(row.connector, list);
-		}
-
-		const installed = installs.map((row) => {
-			const slug = installConnector(row);
-			const held_ = slug ? (held.get(slug) ?? []) : [];
-			const published =
-				row.marketplace === FIRST_PARTY
-					? firstPartyManifest(row.pluginName)?.version
-					: undefined;
-			return {
-				...describe(row.manifest as PluginManifest, row.marketplace),
-				connector: slug ?? null,
-				installed: true,
-				enabled: row.enabled,
-				installedAt: row.installedAt as Date | null,
-				latestVersion: published ?? null,
-				connections: held_,
-				accounts: accountLabels(held_),
-			};
-		});
-
-		const installedKeys = new Set(
-			installs.map((row) => `${row.marketplace}/${row.pluginName}`),
-		);
-
-		const claimed = new Set(
-			installs
-				.map((row) => installConnector(row))
-				.filter((slug): slug is string => slug !== undefined),
-		);
-
-		const available = Object.values(FIRST_PARTY_MANIFESTS)
-			.filter(
-				(manifest) => !installedKeys.has(`${FIRST_PARTY}/${manifest.name}`),
-			)
-			.map((manifest) => {
-				const described = describe(
-					manifest as unknown as PluginManifest,
-					FIRST_PARTY,
-				);
-				const held_ =
-					described.connector && !claimed.has(described.connector)
-						? (held.get(described.connector) ?? [])
+			const publishedById = new Map(published.map((row) => [row.id, row]));
+			const installs = everyInstall.flatMap(
+				(
+					row,
+				): ((typeof everyInstall)[number] & {
+					latest?: string;
+					managed?: boolean;
+				})[] => {
+					if (!row.organizationPluginId) return [row];
+					const current = publishedById.get(row.organizationPluginId);
+					return current
+						? [
+								{
+									...row,
+									manifest: current.manifest,
+									latest: current.version,
+									managed:
+										organizationPluginAccess(
+											current.installPolicy,
+											role ?? "",
+										) === "installed",
+								},
+							]
 						: [];
+				},
+			);
+
+			const held = new Map<
+				string,
+				{ id: string; account: string | null; user: string | null }[]
+			>();
+			for (const row of live) {
+				const list = held.get(row.connector) ?? [];
+				list.push({ id: row.id, account: row.account, user: row.user });
+				held.set(row.connector, list);
+			}
+
+			const installed = installs.map((row) => {
+				const slug = installConnector(row);
+				const held_ = slug ? (held.get(slug) ?? []) : [];
+				const latest =
+					row.marketplace === FIRST_PARTY
+						? firstPartyManifest(row.pluginName)?.version
+						: row.latest;
 				return {
-					...described,
-					installed: false,
-					enabled: false,
-					installedAt: null as Date | null,
-					latestVersion: (manifest.version as string) ?? null,
+					...describe(row.manifest as PluginManifest, row.marketplace),
+					connector: slug ?? null,
+					installed: true,
+					enabled: row.enabled,
+					installedAt: row.installedAt as Date | null,
+					latestVersion: latest ?? null,
+					managed: row.managed ?? false,
 					connections: held_,
 					accounts: accountLabels(held_),
 				};
 			});
 
-		return [...installed, ...available];
-	}),
+			const installedKeys = new Set(
+				installs.map((row) => `${row.marketplace}/${row.pluginName}`),
+			);
 
-	install: protectedProcedure
+			const claimedByOthers = new Set(
+				installs
+					.filter((row) => row.marketplace !== FIRST_PARTY)
+					.map((row) => installConnector(row))
+					.filter((slug): slug is string => slug !== undefined),
+			);
+
+			const available = Object.values(FIRST_PARTY_MANIFESTS)
+				.filter(
+					(manifest) => !installedKeys.has(`${FIRST_PARTY}/${manifest.name}`),
+				)
+				.map((manifest) => {
+					const described = describe(
+						manifest as unknown as PluginManifest,
+						FIRST_PARTY,
+					);
+					const held_ =
+						described.connector && !claimedByOthers.has(described.connector)
+							? (held.get(described.connector) ?? [])
+							: [];
+					return {
+						...described,
+						installed: false,
+						enabled: false,
+						installedAt: null as Date | null,
+						latestVersion: (manifest.version as string) ?? null,
+						managed: false,
+						connections: held_,
+						accounts: accountLabels(held_),
+					};
+				});
+
+			const claimedByAnyInstall = new Set(
+				installs
+					.map((row) => installConnector(row))
+					.filter((slug): slug is string => slug !== undefined),
+			);
+
+			const organizationAvailable = organizationId
+				? published
+						.filter(
+							(row) =>
+								!row.removedFromSourceAt &&
+								!installedKeys.has(
+									`${organizationMarketplace(organizationId)}/${row.name}`,
+								),
+						)
+						.map((row) => {
+							const described = describe(
+								row.manifest as PluginManifest,
+								organizationMarketplace(organizationId),
+							);
+							const held_ =
+								described.connector &&
+								!claimedByAnyInstall.has(described.connector)
+									? (held.get(described.connector) ?? [])
+									: [];
+							return {
+								...described,
+								installed: false,
+								enabled: false,
+								installedAt: null as Date | null,
+								latestVersion: row.version as string | null,
+								managed: false,
+								connections: held_,
+								accounts: accountLabels(held_),
+							};
+						})
+				: [];
+
+			return [...installed, ...available, ...organizationAvailable];
+		}),
+
+	install: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -397,6 +528,61 @@ export const pluginsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			if (input.marketplace && isOrganizationMarketplace(input.marketplace)) {
+				const organizationId = requireActiveOrgId(ctx);
+				const role = await memberRole(ctx.session.user.id, organizationId);
+				const plugin =
+					input.marketplace === organizationMarketplace(organizationId)
+						? await accessiblePlugin(organizationId, role, input.name, {
+								offered: true,
+							})
+						: null;
+				if (!plugin) {
+					throw userError({
+						code: "NOT_FOUND",
+						message: `Unknown plugin "${input.name}"`,
+						i18nKey: "serverError.plugins.unknownPlugin",
+						params: { plugin: input.name },
+					});
+				}
+
+				const manifest = plugin.manifest as PluginManifest;
+				const [row] = await db
+					.insert(pluginInstalls)
+					.values({
+						userId: ctx.session.user.id,
+						organizationId,
+						marketplace: input.marketplace,
+						pluginName: plugin.name,
+						version: plugin.version,
+						manifest,
+						organizationPluginId: plugin.id,
+						enabled: true,
+					})
+					.onConflictDoUpdate({
+						target: [
+							pluginInstalls.userId,
+							pluginInstalls.marketplace,
+							pluginInstalls.pluginName,
+						],
+						set: {
+							version: plugin.version,
+							manifest,
+							organizationPluginId: plugin.id,
+						},
+					})
+					.returning();
+
+				return {
+					id: row?.id,
+					plugin: plugin.name,
+					version: plugin.version,
+					marketplace: input.marketplace,
+					connector: pluginConnector(manifest) ?? null,
+					needsConnection: pluginNeedsConnection(manifest),
+				};
+			}
+
 			if (input.marketplace && input.marketplace !== FIRST_PARTY) {
 				throw userError({
 					code: "BAD_REQUEST",
@@ -450,7 +636,7 @@ export const pluginsRouter = createTRPCRouter({
 			};
 		}),
 
-	setEnabled: protectedProcedure
+	setEnabled: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -480,7 +666,7 @@ export const pluginsRouter = createTRPCRouter({
 			};
 		}),
 
-	uninstall: protectedProcedure
+	uninstall: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -502,10 +688,34 @@ export const pluginsRouter = createTRPCRouter({
 					manifest: pluginInstalls.manifest,
 					marketplace: pluginInstalls.marketplace,
 					pluginName: pluginInstalls.pluginName,
+					organizationId: pluginInstalls.organizationId,
+					policy: organizationPlugins.installPolicy,
 				})
 				.from(pluginInstalls)
+				.leftJoin(
+					organizationPlugins,
+					eq(organizationPlugins.id, pluginInstalls.organizationPluginId),
+				)
 				.where(eq(pluginInstalls.id, id))
 				.limit(1);
+
+			if (uninstalled?.policy && uninstalled.organizationId) {
+				const role = await memberRole(
+					ctx.session.user.id,
+					uninstalled.organizationId,
+				);
+				if (
+					organizationPluginAccess(uninstalled.policy, role ?? "") ===
+					"installed"
+				) {
+					throw userError({
+						code: "FORBIDDEN",
+						message: `Your organization installs ${input.name} for you, so it cannot be uninstalled. You can disable it.`,
+						i18nKey: "serverError.plugins.managedByOrganization",
+						params: { plugin: input.name },
+					});
+				}
+			}
 
 			await db.delete(pluginInstalls).where(eq(pluginInstalls.id, id));
 
@@ -554,4 +764,5 @@ export const pluginsRouter = createTRPCRouter({
 
 	marketplaces: marketplacesRouter,
 	connections: connectionsRouter,
+	organization: organizationPluginsRouter,
 });

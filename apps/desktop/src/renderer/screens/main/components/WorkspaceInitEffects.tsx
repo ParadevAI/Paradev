@@ -8,6 +8,8 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { useCallback, useEffect, useRef } from "react";
 import { useCreateOrAttachWithTheme } from "renderer/hooks/useCreateOrAttachWithTheme";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
+import { isTerminalPresetEnabled } from "renderer/lib/agent-launch-command";
 import { launchAgentSession } from "renderer/lib/agent-session-orchestrator";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { writeCommandsInPane } from "renderer/lib/terminal/launch-command";
@@ -49,6 +51,7 @@ export function WorkspaceInitEffects() {
 	const addTab = useTabsStore((state) => state.addTab);
 	const setTabAutoTitle = useTabsStore((state) => state.setTabAutoTitle);
 	const { openPreset } = useTabsWithPresets();
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
 	const createOrAttach = useCreateOrAttachWithTheme();
 	const terminalCreateOrAttach =
 		electronTrpc.terminal.createOrAttach.useMutation();
@@ -59,10 +62,11 @@ export function WorkspaceInitEffects() {
 		(workspaceId: string, presets: PendingTerminalSetup["defaultPresets"]) => {
 			for (const preset of presets ?? []) {
 				if (preset.commands.length === 0) continue;
+				if (!isTerminalPresetEnabled(preset, isAgentPresetEnabled)) continue;
 				openPreset(workspaceId, preset, { target: "active-tab" });
 			}
 		},
-		[openPreset],
+		[openPreset, isAgentPresetEnabled],
 	);
 
 	const resolveSetupLaunchRequest = useCallback(

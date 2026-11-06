@@ -1,0 +1,4 @@
+# Debian's zsh reads no /etc/profile.d, so the sandbox user's login shells
+# (zsh) never saw superset.sh while bash did. Only that file: /etc/profile
+# itself resets PATH, which would drop what host-service put there.
+[ -r /etc/profile.d/superset.sh ] && emulate sh -c '. /etc/profile.d/superset.sh'

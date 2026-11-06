@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { moveLegacyAppHome } from "@superset/agent-setup/legacy-home-move";
 import { createApp } from "./app";
 import { getSupervisor, startDaemonBootstrap } from "./daemon";
 import { env } from "./env";
@@ -16,6 +17,8 @@ import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
 import { startSandboxAgentStatusReporter } from "./runtime/sandbox-agent-status";
 import { startSandboxCredentialRefresh } from "./runtime/sandbox-credential-refresh";
+import { startSandboxKeepalive } from "./runtime/sandbox-keepalive";
+import { startSandboxPullRequestReporter } from "./runtime/sandbox-pull-requests";
 import { startVitalsLog } from "./runtime/vitals";
 import { detachFromLaunchDirectory } from "./runtime/working-directory";
 import { installProcessSafetyNet, installUpgradeSocketGuard } from "./safety";
@@ -37,6 +40,13 @@ async function main(): Promise<void> {
 	console.log(
 		`[host-service] starting (org=${env.ORGANIZATION_ID}, port=${env.PORT}, NODE_ENV=${process.env.NODE_ENV ?? "unset"})`,
 	);
+
+	const appHome = moveLegacyAppHome();
+	if (appHome.move === "moved" || appHome.move === "failed") {
+		console.log(
+			`[host-service] app home: ${appHome.homeDir} (${appHome.move})`,
+		);
+	}
 
 	// Resolve the shell-env snapshot in the background — it must not block the
 	// server from listening (the login-shell probe can burn the full 8s
@@ -90,6 +100,8 @@ async function main(): Promise<void> {
 		db,
 		launchSandboxAgent,
 		resumeCrashedAgents,
+		readLinkedPullRequests,
+		onPullRequestLinked,
 		terminalAgentStore,
 	} = createApp({
 		config: {
@@ -174,6 +186,19 @@ async function main(): Promise<void> {
 				workspaceId: sandboxWorkspaceId,
 				hostSecret: env.HOST_SERVICE_SECRET,
 				store: terminalAgentStore,
+			});
+			startSandboxKeepalive({
+				keepalive: () => api.sandbox.keepalive.mutate(),
+				store: terminalAgentStore,
+			});
+			startSandboxPullRequestReporter({
+				read: readLinkedPullRequests,
+				report: (pullRequests) =>
+					api.cloudWorkspace.reportPullRequests.mutate({
+						id: sandboxWorkspaceId,
+						pullRequests,
+					}),
+				onLinked: onPullRequestLinked,
 			});
 		}
 

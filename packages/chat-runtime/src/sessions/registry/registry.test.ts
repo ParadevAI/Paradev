@@ -66,7 +66,7 @@ describe("LiveSessionRegistry", () => {
 				prompt: () => undefined,
 				cancelTurn: () => undefined,
 				respondToApproval: () => undefined,
-				setMode: () => undefined,
+				setMode: () => Promise.resolve(true),
 				dispose: async () => {
 					disposed = true;
 				},

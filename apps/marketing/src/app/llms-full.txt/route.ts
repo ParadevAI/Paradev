@@ -1,15 +1,13 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { getBlogPosts } from "@/lib/blog";
-import { getComparisonPages } from "@/lib/compare";
-import { PRODUCT_SUMMARY, stripMdxSyntax } from "@/lib/llms";
-import {
-	FAQ_ITEMS,
-	faqSourceText,
-} from "../[lang]/components/FAQSection/constants";
+import { getPricedComparisonPages } from "@/lib/compare-prices";
+import { englishText, PRODUCT_SUMMARY, stripMdxSyntax } from "@/lib/llms";
+import { FAQ_ITEMS } from "../[lang]/components/FAQSection/constants";
 
 export async function GET() {
 	const posts = getBlogPosts();
-	const comparisons = getComparisonPages();
+	const comparisons = await getPricedComparisonPages();
 	const baseUrl = COMPANY.MARKETING_URL;
 	const docsUrl = COMPANY.DOCS_URL;
 
@@ -18,7 +16,7 @@ export async function GET() {
 	// Header section (same as llms.txt)
 	sections.push(
 		[
-			`# ${COMPANY.NAME}`,
+			`# ${BRAND.INTRO_NAME}`,
 			"",
 			"> Run 100+ parallel coding agents on your machine",
 			"",
@@ -83,9 +81,9 @@ export async function GET() {
 			"# FAQ",
 			"",
 			...FAQ_ITEMS.flatMap((item) => [
-				`## ${faqSourceText(item.question)}`,
+				`## ${englishText(item.question)}`,
 				"",
-				faqSourceText(item.answer),
+				englishText(item.answer),
 				"",
 			]),
 		].join("\n"),

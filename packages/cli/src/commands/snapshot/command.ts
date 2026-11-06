@@ -12,7 +12,9 @@ export default command({
 	description:
 		"One view of a host: every workspace, its terminals, the agent in each and its state, and the pane layout",
 	options: {
-		host: string().desc("Host to read (default: this machine)"),
+		host: string().desc(
+			"Host to read (default: this machine), or `cloud` with --workspace",
+		),
 		workspace: string().desc("Only this workspace"),
 	},
 	run: async ({ ctx, options }) => {

@@ -628,6 +628,13 @@ const runtimeJs = /* js */ `
 	}
 
 	term.onData(sendInput);
+	// Mouse reports in the default encoding arrive here as one byte per char.
+	// Input reaches the PTY as UTF-8, so only 7-bit reports (cells below 95)
+	// survive the trip; a mangled report is worse than none.
+	var NON_ASCII = /[^\\x00-\\x7f]/;
+	term.onBinary(function (data) {
+		if (!NON_ASCII.test(data)) sendInput(data);
+	});
 	term.onResize(function () {
 		sessions.forEach(function (session) {
 			session.buffer.resize(term.cols, term.rows);

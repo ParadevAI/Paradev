@@ -1,14 +1,25 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
-import { workspaceTrpc } from "@superset/workspace-client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { LuArrowUpRight, LuCheck, LuCopy, LuUndo2 } from "react-icons/lu";
+import {
+	LuArrowUpRight,
+	LuCheck,
+	LuCopy,
+	LuLoaderCircle,
+	LuUndo2,
+} from "react-icons/lu";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { PullRequestActivityCard } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActivityCard";
 import { PullRequestMarkdown } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMarkdown";
 import { usePullRequestActivityLayout } from "renderer/routes/_authenticated/_dashboard/pull-requests/providers/PullRequestActivityLayoutProvider";
 import { usePullRequestActivityReply } from "renderer/routes/_authenticated/_dashboard/pull-requests/providers/PullRequestActivityReplyProvider";
+import {
+	type PullRequestTarget,
+	pullRequestThreadsQueryKey,
+	setPullRequestThreadResolution,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import type { NormalizedComment } from "../../../../../../components/CommentsSection/types";
 import type { DiffFocusSide } from "../../../../../../types";
 import { PullRequestCommentReply } from "./components/PullRequestCommentReply";
@@ -18,7 +29,7 @@ const REPLY_CLASS_NAME =
 	"rounded px-1.5 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground";
 
 export interface PullRequestCommentCardProps {
-	workspaceId: string;
+	target: PullRequestTarget;
 	comment: NormalizedComment;
 	/** Later comments in the same thread. */
 	replies?: NormalizedComment[];
@@ -32,7 +43,7 @@ export interface PullRequestCommentCardProps {
 
 /** A review thread on the activity rail: file and state in the header, copy and Reply beside them, replies under the body, resolve and open-in-diff in the footer. */
 export function PullRequestCommentCard({
-	workspaceId,
+	target,
 	comment,
 	replies = [],
 	onOpenInDiff,
@@ -41,11 +52,23 @@ export function PullRequestCommentCard({
 	const layout = usePullRequestActivityLayout();
 	const requestReply = usePullRequestActivityReply();
 	const [copied, setCopied] = useState(false);
-	const utils = workspaceTrpc.useUtils();
-	const resolve = workspaceTrpc.git.setReviewThreadResolution.useMutation({
-		onSuccess: () => {
-			void utils.git.getPullRequestThreads.invalidate({ workspaceId });
-		},
+	const foldable = comment.isResolved || Boolean(comment.isOutdated);
+	const [expanded, setExpanded] = useState(false);
+	const [wasFoldable, setWasFoldable] = useState(foldable);
+	if (foldable !== wasFoldable) {
+		setWasFoldable(foldable);
+		if (foldable) setExpanded(false);
+	}
+	const collapsed = foldable && !expanded;
+	const queryClient = useQueryClient();
+	const resolve = useMutation({
+		mutationFn: (thread: { threadId: string; resolved: boolean }) =>
+			setPullRequestThreadResolution(target, thread),
+		// Returned so the button stays pending until the refetched thread shows the new state.
+		onSuccess: () =>
+			queryClient.invalidateQueries({
+				queryKey: pullRequestThreadsQueryKey(target),
+			}),
 		onError: () => {
 			toast.error(t({ message: "Couldn't update thread" }));
 		},
@@ -56,9 +79,9 @@ export function PullRequestCommentCard({
 		return () => clearTimeout(timer);
 	}, [copied]);
 	const canOpenCode = Boolean(comment.path && onOpenInDiff);
-	// A folded row is itself a button, so the path cannot be one inside it;
-	// the footer's "Open in diff" still opens the file there.
-	const pathOpensDiff = canOpenCode && layout === "card";
+	// A folded row or a collapsed card is itself a button, so the path cannot
+	// be one inside it; the footer's "Open in diff" still opens the file there.
+	const pathOpensDiff = canOpenCode && layout === "card" && !collapsed;
 	const openCode = () => {
 		if (comment.path)
 			onOpenInDiff?.(
@@ -117,6 +140,8 @@ export function PullRequestCommentCard({
 			}
 			createdAt={comment.createdAt}
 			url={comment.url}
+			collapsed={collapsed}
+			onCollapsedChange={foldable ? (value) => setExpanded(!value) : undefined}
 			actions={
 				<>
 					<Button
@@ -169,13 +194,17 @@ export function PullRequestCommentCard({
 								onClick={() => {
 									if (comment.threadId)
 										resolve.mutate({
-											workspaceId,
 											threadId: comment.threadId,
 											resolved: !comment.isResolved,
 										});
 								}}
 							>
-								{comment.isResolved ? (
+								{resolve.isPending ? (
+									<LuLoaderCircle
+										aria-hidden
+										className="size-3.5 animate-spin"
+									/>
+								) : comment.isResolved ? (
 									<LuUndo2 className="size-3.5" />
 								) : (
 									<LuCheck className="size-3.5" />

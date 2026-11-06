@@ -14,6 +14,9 @@ const submit = mock((_args: unknown) => ({
 const navigate = mock(() => Promise.resolve());
 const showError = mock(() => {});
 
+mock.module("renderer/hooks/useAcpChatEnabled", () => ({
+	useResolveAcpChatEnabled: () => async () => false,
+}));
 mock.module("renderer/hooks/useV2AgentChoices", () => ({
 	useV2AgentChoices: () => ({ agents }),
 }));

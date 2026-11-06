@@ -382,8 +382,23 @@ async function reapStaleCommands(
 	}
 }
 
-export async function createManagedSkills(
+let provisioning: Promise<void> = Promise.resolve();
+
+/**
+ * Runs one provisioning after another. Each reads installed_plugins.json when
+ * it starts and reaps what is absent, so an overlapping older run could delete
+ * the skills a newer one just wrote; boot starts one without waiting for it.
+ */
+export function createManagedSkills(
 	options: ManagedSkillsOptions = {},
+): Promise<void> {
+	const next = provisioning.then(() => provisionManagedSkills(options));
+	provisioning = next.catch(() => undefined);
+	return next;
+}
+
+async function provisionManagedSkills(
+	options: ManagedSkillsOptions,
 ): Promise<void> {
 	const homeDir = options.homeDir ?? os.homedir();
 	const bundledPluginDir = options.templatesDir

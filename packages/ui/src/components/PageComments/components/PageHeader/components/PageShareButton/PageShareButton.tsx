@@ -19,7 +19,10 @@ interface PageShareButtonProps {
 	onOpenChange: (open: boolean) => void;
 	onSetVisibility: PageHeaderActions["onSetVisibility"];
 	onSetSharedVersion: PageHeaderActions["onSetSharedVersion"];
+	currentUserId: string | undefined;
+	sharing: PageHeaderActions["sharing"];
 	compact?: boolean;
+	labelClassName?: string;
 }
 
 export function PageShareButton({
@@ -30,7 +33,10 @@ export function PageShareButton({
 	onOpenChange,
 	onSetVisibility,
 	onSetSharedVersion,
+	currentUserId,
+	sharing,
 	compact = false,
+	labelClassName,
 }: PageShareButtonProps) {
 	const { t } = useLingui();
 	const { visibility, setVisibility } = usePendingVisibility(
@@ -52,6 +58,8 @@ export function PageShareButton({
 			onOpenChange={onOpenChange}
 			onSetVisibility={setVisibility}
 			onSetSharedVersion={onSetSharedVersion}
+			currentUserId={currentUserId}
+			sharing={sharing}
 		>
 			<Button
 				variant="ghost"
@@ -65,7 +73,9 @@ export function PageShareButton({
 				title={label}
 			>
 				<Share2 className="size-3.5" />
-				<Trans>Share</Trans>
+				<span className={labelClassName}>
+					<Trans>Share</Trans>
+				</span>
 			</Button>
 		</PageSharePopover>
 	);

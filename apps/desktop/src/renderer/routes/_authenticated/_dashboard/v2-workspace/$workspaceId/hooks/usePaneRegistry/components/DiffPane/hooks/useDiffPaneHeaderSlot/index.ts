@@ -1,0 +1,1 @@
+export { useDiffPaneHeaderSlot } from "./useDiffPaneHeaderSlot";

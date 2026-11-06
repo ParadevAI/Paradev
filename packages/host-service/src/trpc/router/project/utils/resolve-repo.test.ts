@@ -301,6 +301,19 @@ describe("adoptLocalRepo", () => {
 		expect(head).toMatch(/^[0-9a-f]{40}$/);
 	});
 
+	test("rejects a HEAD that names an invalid ref without committing", async () => {
+		const repo = join(workRoot, "invalid-head-ref");
+		await initRepoAt(repo);
+		writeFileSync(join(repo, ".git", "HEAD"), "ref: refs/heads/.invalid\n");
+
+		await expect(adoptLocalRepo(repo)).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+		});
+		expect(existsSync(join(repo, ".git", "refs", "heads", ".invalid"))).toBe(
+			false,
+		);
+	});
+
 	test("is a no-op when the repo already has commits", async () => {
 		const repo = join(workRoot, "already-committed");
 		const git = await initRepoAt(repo);
@@ -362,6 +375,15 @@ describe("initLocalRepoInPlace", () => {
 		).trim();
 		expect(branch).toBe("main");
 		expect(await commitCount(dir)).toBe(1);
+	});
+
+	test("keeps trailing whitespace in the folder name", async () => {
+		const dir = join(workRoot, "plain ");
+		mkdirSync(dir);
+
+		const resolved = await initLocalRepoInPlace(dir);
+
+		expect(eqRealpath(resolved.repoPath, dir)).toBe(true);
 	});
 
 	test("adopts a non-empty folder without erroring and preserves its files", async () => {

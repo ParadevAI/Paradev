@@ -1,0 +1,1 @@
+export { $insertTranscript } from "./insertTranscript";

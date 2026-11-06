@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
 import { Input } from "@superset/ui/input";
+import { cn } from "@superset/ui/utils";
 import { Plus, Search } from "lucide-react";
 import { type MouseEvent, type ReactNode, useCallback, useState } from "react";
 import { env } from "renderer/env.renderer";
@@ -10,12 +11,21 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { useStore } from "zustand";
 import { NewPageComposer } from "../../../../components/NewPageComposer";
+import {
+	PagesListCard,
+	type PagesListItem,
+} from "../../../../components/PagesListCard";
 import type { CreateNewAgentSession } from "../../../../hooks/useAgentSessionLauncher";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
-import type { PagePaneData, PaneViewerData } from "../../../../types";
+import type {
+	PagePaneData,
+	PagesListPaneData,
+	PaneViewerData,
+} from "../../../../types";
 import { openBesidePane } from "../../../../utils/openBesidePane";
 import { openPagePaneInStore } from "../../../../utils/openPagePaneInStore";
-import { PagesListCard, type PagesListItem } from "./components/PagesListCard";
+import { pagesListPageUiId } from "../../utils/pagesListPageUiId";
+import { PagePane } from "../PagePane";
 
 const WORKSPACE_PAGE_LIMIT = 200;
 
@@ -35,9 +45,10 @@ export function PagesListPane({
 	onFocusAgentTerminal,
 }: PagesListPaneProps) {
 	const { t } = useLingui();
-	const { store } = context;
+	const { store, actions } = context;
 	const paneId = context.pane.id;
 	const tabId = context.tab.id;
+	const openPage = (context.pane.data as PagesListPaneData).page;
 	const pagePolicy = usePagePolicy("4-tier");
 	const rightPane = useRightPaneLinkTarget();
 	const [search, setSearch] = useState("");
@@ -61,13 +72,14 @@ export function PagesListPane({
 		allPages.items.length > 0 &&
 		!allPages.hasNextPage;
 
-	const activePageId = useStore(store, (state) => {
+	const activePanePageId = useStore(store, (state) => {
 		const tab = state.getTab(tabId);
 		const active = tab?.activePaneId ? tab.panes[tab.activePaneId] : undefined;
 		return active?.kind === "page"
 			? (active.data as PagePaneData).pageId
 			: undefined;
 	});
+	const activePageId = openPage?.pageId ?? activePanePageId;
 
 	const handleOpen = useCallback(
 		(page: PagesListItem, event: MouseEvent) => {
@@ -92,19 +104,13 @@ export function PagesListPane({
 				openPagePaneInStore(rightPane.store, pageData, "tab");
 				return;
 			}
-			const pagePane = { kind: "page", data: pageData } as const;
-			const state = store.getState();
 			if (action === "newTab") {
-				openBesidePane(store, paneId, pagePane, true);
+				openBesidePane(store, paneId, { kind: "page", data: pageData }, true);
 				return;
 			}
-			if (state.getTab(tabId)?.panes[paneId]?.pinned) {
-				openBesidePane(store, paneId, pagePane);
-				return;
-			}
-			state.replacePane({ tabId, paneId, newPane: pagePane });
+			actions.updateData({ kind: "pages-list", page: pageData });
 		},
-		[pagePolicy, rightPane, store, tabId, paneId],
+		[pagePolicy, rightPane, store, paneId, actions],
 	);
 
 	const cards = (pages: PagesListItem[]) => (
@@ -162,59 +168,79 @@ export function PagesListPane({
 	);
 
 	return (
-		<div className="flex h-full min-h-0 w-full flex-col">
-			<div className="relative shrink-0 p-2">
-				<Search className="pointer-events-none absolute top-1/2 left-4 size-3.5 -translate-y-1/2 text-muted-foreground" />
-				<Input
-					value={search}
-					onChange={(event) => setSearch(event.target.value)}
-					placeholder={t({ message: "Search pages" })}
-					className="h-8 w-full pl-7 text-xs"
-				/>
+		<div className="relative h-full min-h-0 w-full">
+			<div
+				className={cn(
+					"flex h-full min-h-0 w-full flex-col",
+					openPage && "invisible",
+				)}
+			>
+				<div className="relative shrink-0 p-2">
+					<Search className="pointer-events-none absolute top-1/2 left-4 size-3.5 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						placeholder={t({ message: "Search pages" })}
+						className="h-8 w-full pl-7 text-xs"
+					/>
+				</div>
+				{composing && (
+					<div className="mx-2 mb-1 shrink-0 rounded-md border border-border/60 bg-muted/20">
+						<NewPageComposer
+							workspaceId={workspaceId}
+							onSent={() => setComposing(false)}
+							onCancel={() => setComposing(false)}
+							onCreateNewAgentSession={onCreateNewAgentSession}
+							onFocusAgentTerminal={onFocusAgentTerminal}
+						/>
+					</div>
+				)}
+				<div
+					ref={(node) => {
+						workspacePages.scrollRef.current = node;
+						allPages.scrollRef.current = node;
+					}}
+					className="min-h-0 flex-1 overflow-y-auto px-1 pb-2"
+				>
+					<section className="py-1">
+						<div className="flex h-7 items-center justify-between pr-1 pl-2 text-[11px] font-medium text-muted-foreground">
+							<Trans>This workspace</Trans>
+							<button
+								type="button"
+								aria-label={t({ message: "New page" })}
+								title={t({ message: "New page" })}
+								aria-pressed={composing}
+								onClick={() => setComposing((value) => !value)}
+								className="flex size-6 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent aria-pressed:bg-accent aria-pressed:text-foreground"
+							>
+								<Plus className="size-3.5" />
+							</button>
+						</div>
+						{sectionBody(workspacePages, workspacePages.items)}
+					</section>
+					{!allPagesInWorkspace && (
+						<section className="py-1">
+							<div className="flex h-7 items-center px-2 text-[11px] font-medium text-muted-foreground">
+								<Trans>All pages</Trans>
+							</div>
+							{sectionBody(allPages, otherPages)}
+						</section>
+					)}
+				</div>
 			</div>
-			{composing && (
-				<div className="mx-2 mb-1 shrink-0 rounded-md border border-border/60 bg-muted/20">
-					<NewPageComposer
-						workspaceId={workspaceId}
-						onSent={() => setComposing(false)}
-						onCancel={() => setComposing(false)}
-						onCreateNewAgentSession={onCreateNewAgentSession}
-						onFocusAgentTerminal={onFocusAgentTerminal}
+			{openPage && (
+				<div className="absolute inset-0 bg-background">
+					<PagePane
+						store={store}
+						data={openPage}
+						paneId={pagesListPageUiId(paneId, openPage)}
+						onDataChange={(page) =>
+							actions.updateData({ kind: "pages-list", page })
+						}
+						onFocus={actions.focus}
 					/>
 				</div>
 			)}
-			<div
-				ref={(node) => {
-					workspacePages.scrollRef.current = node;
-					allPages.scrollRef.current = node;
-				}}
-				className="min-h-0 flex-1 overflow-y-auto px-1 pb-2"
-			>
-				<section className="py-1">
-					<div className="flex h-7 items-center justify-between pr-1 pl-2 text-[11px] font-medium text-muted-foreground">
-						<Trans>This workspace</Trans>
-						<button
-							type="button"
-							aria-label={t({ message: "New page" })}
-							title={t({ message: "New page" })}
-							aria-pressed={composing}
-							onClick={() => setComposing((value) => !value)}
-							className="flex size-6 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent aria-pressed:bg-accent aria-pressed:text-foreground"
-						>
-							<Plus className="size-3.5" />
-						</button>
-					</div>
-					{sectionBody(workspacePages, workspacePages.items)}
-				</section>
-				{!allPagesInWorkspace && (
-					<section className="py-1">
-						<div className="flex h-7 items-center px-2 text-[11px] font-medium text-muted-foreground">
-							<Trans>All pages</Trans>
-						</div>
-						{sectionBody(allPages, otherPages)}
-					</section>
-				)}
-			</div>
 		</div>
 	);
 }

@@ -3,6 +3,7 @@
 import { Trans } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
 import { HiMiniArrowRight } from "react-icons/hi2";
+import { track } from "@/lib/analytics";
 import { CliMock } from "../CliMock";
 import { CopyCommand } from "../CopyCommand";
 import { DesktopDownloadButton } from "../DesktopDownloadButton";
@@ -105,6 +106,12 @@ export function SurfaceCards() {
 						<div className={CARD_ACTION_CLASS}>
 							<a
 								href={COMPANY.APP_STORE_URL}
+								onClick={() =>
+									track("mobile_store_clicked", {
+										store: "app_store",
+										source: "download_page",
+									})
+								}
 								className="group flex items-center gap-2 bg-foreground px-5 py-2.5 font-normal text-background text-sm transition-colors hover:bg-brand hover:text-white"
 							>
 								<Trans>Get the iPhone and iPad app</Trans>

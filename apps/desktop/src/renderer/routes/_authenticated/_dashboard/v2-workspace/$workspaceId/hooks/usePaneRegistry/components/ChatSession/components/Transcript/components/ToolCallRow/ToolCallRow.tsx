@@ -9,19 +9,23 @@ import {
 import { cn } from "@superset/ui/utils";
 import { ChevronRight, CircleDashed } from "lucide-react";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { PluginIcon } from "renderer/components/PluginIcon";
-import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
-import { fileChangeOf } from "../../utils/fileChange";
+import { useTranscriptPlugins } from "../../providers/TranscriptPluginsProvider";
+import { toolCallCommand, unwrapShellCommand } from "../../utils/shellIntent";
+import { toolTitle } from "../../utils/toolTitle";
 import { ToolContentList } from "../ToolContentList";
 import { FileChangeTitle } from "./components/FileChangeTitle";
+import { RunningTime } from "./components/RunningTime";
+import { ShellIntentTitle } from "./components/ShellIntentTitle";
 import { StatusWord } from "./components/StatusWord";
 
 const TITLE_SWEEP_SECONDS = 1.6;
 
 /**
  * One line per call on a rail of steps: what the agent did, a command in
- * mono, a file as a chip that previews its edit. A running call turns a
+ * mono, a file as a chip that previews its edit, a shell command that only
+ * read or searched as that read or search. A running call turns a
  * dashed ring and sweeps its title; a settled one recedes. The line opens
  * what the call produced: a button under the whole row toggles it, so the
  * chip can be a button of its own without one inside the other.
@@ -29,17 +33,23 @@ const TITLE_SWEEP_SECONDS = 1.6;
 export function ToolCallRow({ item }: { item: ToolCall }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
-	const hasBody = item.content.length > 0;
 	const running = item.status === "running";
-	const command = item.toolKind === "execute";
-	const change = useMemo(() => fileChangeOf(item), [item]);
-	const installedPlugins = usePluginMentionOptions();
+	const installedPlugins = useTranscriptPlugins();
 	const mcpServer = item.mcpServer;
 	const plugin = mcpServer
 		? installedPlugins.find((candidate) => candidate.name === mcpServer.name)
 		: undefined;
+	const { change, command, intent, label } = toolTitle(
+		item,
+		t,
+		Boolean(plugin),
+	);
+	const intentCommand =
+		intent && !item.content.some((content) => content.type === "terminal")
+			? toolCallCommand(item)
+			: null;
+	const hasBody = item.content.length > 0 || intentCommand !== null;
 	const toggle = hasBody ? () => setOpen((value) => !value) : undefined;
-
 	let title: ReactNode;
 	if (change) {
 		title = (
@@ -48,26 +58,26 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 				item={item}
 				onToggle={toggle}
 				running={running}
+				verb={label}
 			/>
 		);
+	} else if (intent) {
+		title = <ShellIntentTitle intent={intent} running={running} verb={label} />;
 	} else {
-		// The translator names a command "Terminal" until the command itself
-		// arrives a beat later; "Running" says more in the meantime.
-		const rawMcpTitle =
-			!item.title ||
-			item.title.startsWith("mcp__") ||
-			item.title === `${mcpServer?.tool} (${mcpServer?.name})`;
-		const label =
-			plugin && mcpServer && rawMcpTitle
-				? mcpServer.tool
-				: running && command && item.title === "Terminal"
-					? t({ message: "Running" })
-					: item.title;
 		const face = command ? "font-mono text-[13px]" : undefined;
+		const verb = command && label !== t`Running` ? t`Running` : null;
 		title = running ? (
-			<span className="min-w-0 truncate">
+			<span className="flex min-w-0 items-baseline gap-1.5 truncate">
+				{verb && (
+					<ShimmerLabel
+						className="shrink-0 font-normal"
+						duration={TITLE_SWEEP_SECONDS}
+					>
+						{verb}
+					</ShimmerLabel>
+				)}
 				<ShimmerLabel
-					className={cn("font-normal", face)}
+					className={cn("min-w-0 truncate font-normal", face)}
 					duration={TITLE_SWEEP_SECONDS}
 				>
 					{label}
@@ -106,7 +116,13 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 							/>
 						)
 					)}
-					<span className="flex min-w-0 items-center gap-1.5">{title}</span>
+					<span
+						className="flex min-w-0 items-center gap-1.5"
+						data-find-item={item.id}
+					>
+						{title}
+					</span>
+					{running && <RunningTime startedAtMs={item.startedAtMs} />}
 					<StatusWord status={item.status} />
 					{hasBody && (
 						<ChevronRight
@@ -121,6 +137,11 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 			{hasBody && (
 				<CollapsibleContent>
 					<div className="mt-1 mb-2 ml-[7px] flex flex-col gap-2 border-border/60 border-l pl-3">
+						{intentCommand && (
+							<div className="whitespace-pre-wrap break-words font-mono text-muted-foreground text-xs">
+								$ {unwrapShellCommand(intentCommand)}
+							</div>
+						)}
 						<ToolContentList
 							itemId={item.id}
 							items={item.content}

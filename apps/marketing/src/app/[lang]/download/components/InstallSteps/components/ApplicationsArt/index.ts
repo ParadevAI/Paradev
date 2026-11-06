@@ -1,0 +1,1 @@
+export { ApplicationsArt } from "./ApplicationsArt";

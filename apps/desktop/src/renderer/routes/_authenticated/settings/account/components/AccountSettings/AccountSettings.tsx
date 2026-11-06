@@ -228,7 +228,7 @@ export function AccountSettings({ visibleItems }: AccountSettingsProps) {
 							})}
 							hint={t({
 								message:
-									"You'll need to sign in again to use Superset on this device.",
+									"You'll need to sign in again to use Paradev on this device.",
 							})}
 						>
 							<Button

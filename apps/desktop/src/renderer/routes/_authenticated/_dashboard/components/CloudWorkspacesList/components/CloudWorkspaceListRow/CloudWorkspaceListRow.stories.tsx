@@ -20,14 +20,6 @@ const meta = {
 			workspace: {
 				id: "ws-1",
 				name: "Cloud presence",
-				presence: [
-					{
-						userId: "satya",
-						name: "Satya Patel",
-						image: "https://github.com/github.png",
-						lastSeenAt: new Date("2026-09-25T11:59:00Z"),
-					},
-				],
 				status: "ready",
 				agentStatus: null,
 				agentStatusAt: new Date("2026-09-25T11:55:00Z"),
@@ -53,7 +45,6 @@ const meta = {
 			isInSidebar: true,
 			isMine: false,
 			isRead: true,
-			showsPresence: true,
 		},
 		now: new Date("2026-09-25T12:00:00Z"),
 		onOpen: fn(),
@@ -156,32 +147,6 @@ export const ManyPeople: Story = {
 			...meta.args.item,
 			workspace: {
 				...meta.args.item.workspace,
-				presence: [
-					{
-						userId: "satya",
-						name: "Satya Patel",
-						image: "https://github.com/github.png",
-						lastSeenAt: new Date("2026-09-25T11:59:00Z"),
-					},
-					{
-						userId: "kiet",
-						name: "Kiet Ho",
-						image: null,
-						lastSeenAt: new Date("2026-09-25T11:55:00Z"),
-					},
-					{
-						userId: "avi",
-						name: "Avi Peltz",
-						image: null,
-						lastSeenAt: new Date("2026-09-24T12:00:00Z"),
-					},
-					{
-						userId: "harshith",
-						name: "Harshith Mullapudi",
-						image: null,
-						lastSeenAt: new Date("2026-09-23T12:00:00Z"),
-					},
-				],
 			},
 		},
 	},

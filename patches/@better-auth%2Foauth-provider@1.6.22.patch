@@ -1,0 +1,16 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 4d997fc61d436f35f722986f4fcc6601a1fb2068..8eb2d58434c29183b652d6b1bd30e276c29d9f82 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -772,7 +772,10 @@ async function handleRefreshTokenGrant(ctx, opts) {
+ 		error: "invalid_grant"
+ 	});
+ 	if (refreshToken.revoked) {
+-		await invalidateRefreshFamily(ctx, client_id, refreshToken.userId);
++		// superset-patch: refresh-reuse-grace. A token rotated in the last 10 minutes is a lost race or a retry, not theft (superset-sh/superset#8426).
++		const revokedAgoMs = Date.now() - new Date(refreshToken.revoked).getTime();
++		if (revokedAgoMs >= 10 * 60 * 1e3) await invalidateRefreshFamily(ctx, client_id, refreshToken.userId);
++		else ctx.context.logger.warn(`[oauth-refresh-reuse-grace] rotated refresh token sent again ${revokedAgoMs}ms after rotation; family kept`, { clientId: client_id, userId: refreshToken.userId, refreshTokenId: refreshToken.id });
+ 		throw new APIError("BAD_REQUEST", {
+ 			error_description: "invalid refresh token",
+ 			error: "invalid_grant"

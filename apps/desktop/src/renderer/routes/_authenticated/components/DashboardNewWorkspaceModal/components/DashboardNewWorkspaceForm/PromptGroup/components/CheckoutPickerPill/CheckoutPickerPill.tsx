@@ -6,10 +6,15 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { CgLaptop } from "react-icons/cg";
-import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
+import { HiCheck } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
-import { FormPickerTrigger } from "../FormPickerTrigger";
+import { PickerChevron } from "../../../components/PickerChevron";
+import {
+	FORM_PICKER_MENU_CLASS,
+	FormPickerTrigger,
+} from "../FormPickerTrigger";
 
 interface CheckoutPickerPillProps {
 	checkout: WorkspaceCheckout;
@@ -29,6 +34,7 @@ export function CheckoutPickerPill({
 	disabled = false,
 }: CheckoutPickerPillProps) {
 	const { t } = useLingui();
+	const isParadevShell = useParadevShell();
 	const label =
 		checkout === "local" ? t({ message: "Local" }) : t({ message: "Worktree" });
 	const Icon = checkout === "local" ? CgLaptop : LuGitFork;
@@ -45,12 +51,17 @@ export function CheckoutPickerPill({
 					}
 					disabled={disabled}
 				>
-					<Icon className="size-3 shrink-0" />
+					<Icon
+						className={isParadevShell ? "size-3.5 shrink-0" : "size-3 shrink-0"}
+					/>
 					<span className="truncate">{label}</span>
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<PickerChevron />
 				</FormPickerTrigger>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" className="w-72">
+			<DropdownMenuContent
+				align="start"
+				className={`w-72 ${FORM_PICKER_MENU_CLASS}`}
+			>
 				<DropdownMenuItem
 					onSelect={() => onSelectCheckout("worktree")}
 					className="items-start gap-2"

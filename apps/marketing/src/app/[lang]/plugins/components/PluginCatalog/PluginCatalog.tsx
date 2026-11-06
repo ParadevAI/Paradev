@@ -7,8 +7,20 @@ export function PluginCatalog() {
 	const { t } = useLingui();
 
 	return (
-		<div className="relative mt-14 border border-border bg-[radial-gradient(ellipse_at_30%_0%,rgba(232,128,74,0.08),transparent_60%)] p-3 sm:p-8">
-			<div className="overflow-hidden rounded-lg border border-border bg-background shadow-2xl">
+		<div className="relative mt-14 rounded-lg border border-border bg-background shadow-2xl">
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute -inset-px z-10 rounded-lg p-px"
+				style={{
+					background:
+						"radial-gradient(520px circle at 0% 0%, rgba(255,255,255,0.28), rgba(255,255,255,0.07) 45%, transparent 75%)",
+					WebkitMask:
+						"linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+					WebkitMaskComposite: "xor",
+					maskComposite: "exclude",
+				}}
+			/>
+			<div className="overflow-hidden rounded-lg">
 				<div className="flex h-10 items-center gap-2 border-border border-b px-4 text-xs">
 					<span className="font-medium text-foreground">
 						<Trans>Plugins</Trans>

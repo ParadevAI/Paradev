@@ -37,6 +37,9 @@ export async function POST(
 	if (!automation) {
 		return Response.json({ ok: true, skipped: "deleted" });
 	}
+	if (automation.archivedAt) {
+		return Response.json({ ok: true, skipped: "archived" });
+	}
 	if (!automation.enabled) {
 		return Response.json({ ok: true, skipped: "disabled" });
 	}

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Puts the pinned `claude` and `codex` on PATH. Both are rows in assets.json,
-# so a version bump is a row change and every box picks it up on its next
-# boot. Codex unpacks into /opt/codex/<sha>/: its binary finds the bundled
-# rg, bwrap and code-mode host through the codex-package.json beside it.
+# Puts the pinned `claude`, `codex` and `pdev` on PATH. Each is a row in
+# assets.json, so a version bump is a row change and every box picks it up on
+# its next boot. Codex unpacks into /opt/codex/<sha>/: its binary finds the
+# bundled rg, bwrap and code-mode host through the codex-package.json beside
+# it. pdev unpacks the same way, into /opt/pdev/<sha>/.
 set -euo pipefail
 . /etc/superset/contract.sh
 
@@ -30,20 +31,27 @@ claude="$(staged 'claude-*')"
 chmod 0755 "$claude"
 link /usr/local/bin/claude "$claude"
 
-archive="$(staged 'codex-*.tar.gz')"
-sha="$(tr -d '\n\r' < "${archive}.hash")"
-target="/opt/codex/${sha}"
-if [ ! -x "${target}/bin/codex" ]; then
-	rm -rf "$target" "${target}.partial"
-	mkdir -p "${target}.partial"
-	tar -xzf "$archive" -C "${target}.partial"
-	mv -T "${target}.partial" "$target"
-fi
-link /usr/local/bin/codex "${target}/bin/codex"
-for dir in /opt/codex/*/; do
-	dir="${dir%/}"
-	[ "$dir" = "$target" ] || rm -rf "$dir"
-done
+unpack() {
+	local name="$1" bin="$2" archive sha target dir
+	archive="$(staged "${name}-*.tar.gz")"
+	sha="$(tr -d '\n\r' < "${archive}.hash")"
+	target="/opt/${name}/${sha}"
+	if [ ! -x "${target}/${bin}" ]; then
+		rm -rf "$target" "${target}.partial"
+		mkdir -p "${target}.partial"
+		tar -xzf "$archive" -C "${target}.partial"
+		mv -T "${target}.partial" "$target"
+	fi
+	link "/usr/local/bin/${name}" "${target}/${bin}"
+	for dir in "/opt/${name}"/*/; do
+		dir="${dir%/}"
+		[ "$dir" = "$target" ] || rm -rf "$dir"
+	done
+}
+
+unpack codex bin/codex
+unpack pdev pdev/pdev
 
 claude --version
 codex --version
+pdev --version

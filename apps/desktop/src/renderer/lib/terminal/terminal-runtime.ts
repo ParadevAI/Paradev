@@ -33,6 +33,7 @@ import {
 import { installTerminalKeyEventHandler } from "./terminal-key-event-handler";
 import { getTerminalParkingContainer } from "./terminal-parking";
 import { persistSeqAnchor } from "./terminal-seq-anchor";
+import { installTerminalVersionReply } from "./terminal-version-reply";
 import { installInputModeReclaimer } from "./terminalInputModeReclaimer";
 
 const SERIALIZE_SCROLLBACK = 1000;
@@ -113,6 +114,7 @@ function createTerminal(
 	// live shell prompt by a TUI killed while attached (#4949). The parser
 	// handlers are owned by the terminal and cleaned up on terminal.dispose().
 	installInputModeReclaimer(terminal);
+	installTerminalVersionReply(terminal);
 	return { terminal, fitAddon, serializeAddon };
 }
 

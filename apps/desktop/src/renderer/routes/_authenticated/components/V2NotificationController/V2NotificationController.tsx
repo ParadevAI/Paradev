@@ -1,8 +1,6 @@
 import type { WorkspaceState } from "@superset/panes";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffectEvent, useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
@@ -14,6 +12,7 @@ import { useVisibleSidebarWorkspaceIds } from "renderer/routes/_authenticated/ho
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { NOTIFICATION_EVENTS } from "shared/constants";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import {
@@ -71,8 +70,7 @@ export function V2NotificationController() {
 	const visibleWorkspaceIds = useVisibleSidebarWorkspaceIds();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const isRightAreaOpen = useV2UserPreferences().preferences.rightSidebarOpen;
-	const isPerWorkspaceRightArea =
-		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
+	const isPerWorkspaceRightArea = useRightPaneAreaEnabled() === true;
 	const allWorkspaceHosts = useMemo<WorkspaceHostRow[]>(
 		() =>
 			hostWorkspaces.map((workspace) => ({
@@ -227,7 +225,7 @@ function getNotificationWorkspaceStatesById({
 		localWorkspaceRows
 			.filter((row) =>
 				isPerWorkspaceRightArea
-					? (row.rightSidebarOpen ?? isRightAreaOpen)
+					? (row.rightSidebarOpen ?? false)
 					: isRightAreaOpen,
 			)
 			.map((row) => [

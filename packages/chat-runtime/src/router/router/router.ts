@@ -1,24 +1,33 @@
 import {
+	backgroundSubagentInputSchema,
 	cancelTurnInputSchema,
 	closeSessionInputSchema,
 	createSessionInputSchema,
+	discoverSessionsInputSchema,
 	forkSessionInputSchema,
 	getItemBodiesInputSchema,
 	getItemsInputSchema,
 	getOutlineInputSchema,
 	getSessionInputSchema,
+	getTurnChangesInputSchema,
 	listSessionsInputSchema,
 	promptInputSchema,
 	queuedPromptInputSchema,
 	respondToApprovalInputSchema,
+	respondToUsageLimitInputSchema,
 	resumeQueueInputSchema,
+	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
+	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
+	undoTurnFilesInputSchema,
+	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { z } from "zod";
+import type { TurnUndoResult } from "../../checkpoints";
 import type { ChatRuntime } from "../../index";
 
 const t = initTRPC.create();
@@ -67,10 +76,25 @@ export function createChatRouter(
 ) {
 	function guarded<T>(execute: () => T): T {
 		try {
-			return execute();
+			const result = execute();
+			if (result instanceof Promise) {
+				return result.catch((error: unknown) => {
+					throw mapCommandError(runtime, error);
+				}) as T;
+			}
+			return result;
 		} catch (error) {
 			throw mapCommandError(runtime, error);
 		}
+	}
+
+	/** The worktree of the session's own workspace; null when the caller names another. */
+	async function sessionCwd(
+		sessionId: string,
+		workspaceId: string,
+	): Promise<string | null> {
+		const scopeId = runtime.sessions.get(sessionId)?.scopeId;
+		return scopeId === workspaceId ? options.resolveCwd(scopeId) : null;
 	}
 
 	return t.router({
@@ -84,6 +108,7 @@ export function createChatRouter(
 						...rest,
 						scopeId: workspaceId,
 						cwd,
+						interactive: true,
 					}),
 				);
 			}),
@@ -104,10 +129,22 @@ export function createChatRouter(
 				guarded(() => runtime.commands.steerQueuedPrompt(input)),
 			),
 
+		updateQueuedPrompt: t.procedure
+			.input(updateQueuedPromptInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.updateQueuedPrompt(input)),
+			),
+
 		resumeQueue: t.procedure
 			.input(resumeQueueInputSchema)
 			.mutation(({ input }) =>
 				guarded(() => runtime.commands.resumeQueue(input)),
+			),
+
+		respondToUsageLimit: t.procedure
+			.input(respondToUsageLimitInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.respondToUsageLimit(input)),
 			),
 
 		cancelTurn: t.procedure
@@ -121,6 +158,24 @@ export function createChatRouter(
 			.mutation(({ input }) =>
 				guarded(() => runtime.commands.stopBackgroundTask(input)),
 			),
+
+		steerSubagent: t.procedure
+			.input(steerSubagentInputSchema)
+			.mutation(async ({ input }) => ({
+				result: (await guarded(() => runtime.commands.steerSubagent(input)))
+					? ("steered" as const)
+					: ("finished" as const),
+			})),
+
+		backgroundSubagent: t.procedure
+			.input(backgroundSubagentInputSchema)
+			.mutation(async ({ input }) => ({
+				result: (await guarded(() =>
+					runtime.commands.backgroundSubagent(input),
+				))
+					? ("moved" as const)
+					: ("refused" as const),
+			})),
 
 		respondToApproval: t.procedure
 			.input(respondToApprovalInputSchema)
@@ -146,6 +201,16 @@ export function createChatRouter(
 				return guarded(() => runtime.commands.forkSession({ ...rest, cwd }));
 			}),
 
+		rewindSession: t.procedure
+			.input(
+				rewindSessionInputSchema.extend({ workspaceId: z.string().min(1) }),
+			)
+			.mutation(async ({ input }) => {
+				const { workspaceId, ...rest } = input;
+				const cwd = await options.resolveCwd(workspaceId);
+				return guarded(() => runtime.commands.rewindSession({ ...rest, cwd }));
+			}),
+
 		closeSession: t.procedure
 			.input(closeSessionInputSchema)
 			.mutation(({ input }) => runtime.commands.closeSession(input)),
@@ -153,6 +218,28 @@ export function createChatRouter(
 		getSession: t.procedure
 			.input(getSessionInputSchema)
 			.query(({ input }) => runtime.commands.getSession(input)),
+
+		undoTurnFiles: t.procedure
+			.input(
+				undoTurnFilesInputSchema.extend({ workspaceId: z.string().min(1) }),
+			)
+			.mutation(async ({ input }): Promise<TurnUndoResult> => {
+				const { workspaceId, ...rest } = input;
+				const cwd = await sessionCwd(rest.sessionId, workspaceId);
+				if (!cwd) return { status: "refused", reason: "missing" };
+				return runtime.commands.undoTurnFiles({ ...rest, cwd });
+			}),
+
+		getTurnChanges: t.procedure
+			.input(
+				getTurnChangesInputSchema.extend({ workspaceId: z.string().min(1) }),
+			)
+			.query(async ({ input }) => {
+				const { workspaceId, ...rest } = input;
+				const cwd = await sessionCwd(rest.sessionId, workspaceId);
+				if (!cwd) return null;
+				return runtime.commands.getTurnChanges({ ...rest, cwd });
+			}),
 
 		getQueue: t.procedure
 			.input(getSessionInputSchema)
@@ -163,11 +250,28 @@ export function createChatRouter(
 			.query(({ input }) =>
 				runtime.commands.listSessions({
 					limit: input.limit,
+					...(input.query === undefined ? {} : { query: input.query }),
 					...(input.workspaceId === undefined
 						? {}
 						: { scopeId: input.workspaceId }),
 				}),
 			),
+
+		discoverSessions: t.procedure
+			.input(discoverSessionsInputSchema)
+			.query(async ({ input }) => {
+				const cwd = await options.resolveCwd(input.workspaceId);
+				try {
+					return await runtime.commands.discoverSessions({
+						harness: input.harness,
+						scopeId: input.workspaceId,
+						cwd,
+						...(input.cursor ? { cursor: input.cursor } : {}),
+					});
+				} catch (error) {
+					throw mapCommandError(runtime, error);
+				}
+			}),
 
 		getItems: t.procedure
 			.input(getItemsInputSchema)

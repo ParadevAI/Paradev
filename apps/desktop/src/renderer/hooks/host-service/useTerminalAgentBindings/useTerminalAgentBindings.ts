@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useWorkspaceConnectionRefresh } from "../useWorkspaceConnectionRefresh";
 import { useWorkspaceEvent } from "../useWorkspaceEvent";
 import { useWorkspaceHostUrl } from "../useWorkspaceHostUrl";
@@ -42,12 +43,12 @@ export function useTerminalAgentBindings(
 	const { data } = useQuery({
 		queryKey,
 		enabled,
-		queryFn: ({ signal }) => {
-			if (!hostUrl) return [] as TerminalAgentBindings;
-			return getHostServiceClientByUrl(
-				hostUrl,
-			).terminalAgents.listByWorkspace.query({ workspaceId }, { signal });
-		},
+		queryFn: hostQueryFn(hostUrl, (url, { signal }) =>
+			getHostServiceClientByUrl(url).terminalAgents.listByWorkspace.query(
+				{ workspaceId },
+				{ signal },
+			),
+		),
 		staleTime: 30_000,
 	});
 

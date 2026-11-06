@@ -25,6 +25,7 @@ import type { TaskWithStatus } from "../../hooks/useTasksData";
 import type { SelectedIssue } from "../GitHubIssuesContent";
 import { AssigneeFilter } from "./components/AssigneeFilter";
 import { CreateLinearIssueDialog } from "./components/CreateLinearIssueDialog";
+import { LabelFilter } from "./components/LabelFilter";
 import { LinearAssigneeFilter } from "./components/LinearAssigneeFilter";
 import { LinearTeamFilter } from "./components/LinearTeamFilter";
 import { RunInWorkspacePopover } from "./components/RunInWorkspacePopover";
@@ -48,6 +49,8 @@ interface TasksTopBarProps {
 	onSearchChange: (query: string) => void;
 	assigneeFilter: string | null;
 	onAssigneeFilterChange: (value: string | null) => void;
+	labelFilter: string | null;
+	onLabelFilterChange: (value: string | null) => void;
 	selectedTasks?: TaskWithStatus[];
 	onClearSelection?: () => void;
 	selectedIssues?: SelectedIssue[];
@@ -81,6 +84,8 @@ export function TasksTopBar({
 	onSearchChange,
 	assigneeFilter,
 	onAssigneeFilterChange,
+	labelFilter,
+	onLabelFilterChange,
 	selectedTasks = [],
 	onClearSelection,
 	selectedIssues = [],
@@ -224,6 +229,10 @@ export function TasksTopBar({
 											value={assigneeFilter}
 											onChange={onAssigneeFilterChange}
 										/>
+										<LabelFilter
+											value={labelFilter}
+											onChange={onLabelFilterChange}
+										/>
 									</>
 								) : (
 									<>
@@ -362,6 +371,7 @@ export function TasksTopBar({
 					const search: Record<string, string> = {};
 					if (currentTab !== "all") search.tab = currentTab;
 					if (assigneeFilter) search.assignee = assigneeFilter;
+					if (labelFilter) search.label = labelFilter;
 					if (searchQuery) search.search = searchQuery;
 					navigate({
 						to: "/tasks/$taskId",

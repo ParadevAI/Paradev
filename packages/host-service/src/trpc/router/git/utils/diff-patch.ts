@@ -261,6 +261,16 @@ async function untrackedPatches(
 	});
 }
 
+/** The base ref stopped resolving after the file list was read, such as a
+ * stacked base whose remote branch was deleted and pruned. Checked by name in
+ * the router: the worker boundary keeps only name and message. */
+export class BaseRefMissingError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "BaseRefMissingError";
+	}
+}
+
 export interface DiffPatchRequest extends GitSpawnOptions {
 	category: DiffCategory;
 	refs: DiffCategoryRefs;
@@ -291,10 +301,21 @@ export async function buildDiffPatch({
 	const args = diffArgsForCategory(category, refs);
 	if (paths?.length) args.push("--", ...paths);
 
-	// No `.catch` here on purpose: swallowing a failure would return an empty
-	// patch, which the renderer can't tell apart from "nothing changed" — it
-	// would render every file as a placeholder with no way to retry.
-	const tracked = await runDiff(args, options, budget);
+	// Rejects rather than returning an empty patch, which the renderer can't
+	// tell apart from "nothing changed" — it would render every file as a
+	// placeholder with no way to retry.
+	const tracked = await runDiff(args, options, budget).catch(
+		(error: unknown) => {
+			if (
+				category === "against-base" &&
+				error instanceof Error &&
+				error.message.trimEnd() === `fatal: bad revision '${refs.originRef}'`
+			) {
+				throw new BaseRefMissingError(error.message.trimEnd());
+			}
+			throw error;
+		},
+	);
 	const untracked = untrackedPaths?.length
 		? await untrackedPatches(untrackedPaths, options, budget)
 		: [];

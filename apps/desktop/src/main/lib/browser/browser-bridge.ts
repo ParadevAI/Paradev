@@ -10,10 +10,14 @@
 
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, Server } from "node:http";
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
 import { desktopNotificationSchema } from "@superset/shared/desktop-notification";
 import { paneLayoutRequestSchema } from "@superset/shared/pane-layout-ops";
+import { BrowserWindow, dialog, session } from "electron";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
+import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import { type WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
 import { showCliNotification } from "../notifications/show-cli-notification";
@@ -40,6 +44,80 @@ import {
 const OPEN_PANE_TIMEOUT_MS = 15_000;
 const MAX_CDP_MESSAGE_BYTES = 4 * 1024 * 1024;
 const CDP_PATH = /^\/panes\/([^/]+)\/cdp$/;
+const USER_PANE_ERROR =
+	"This pane is the user's own browser, with their logins and extensions. Agents can use only the panes they open.";
+
+const LOGIN_IMPORT_REFUSED = "The user did not allow this login import.";
+const EXTENSION_ID = /^[a-p]{32}$/;
+const EXTENSION_INSTALL_REFUSED = "The user did not allow this extension.";
+const EXTENSION_REMOVE_REFUSED = "The user kept this extension.";
+const EXTENSION_UNANSWERED =
+	"Nobody answered the question in the app in time. Nothing changed.";
+// Under the relay's 65 s request limit, so a CLI that gives up never sees a later yes take effect.
+const ANSWER_DEADLINE_MS = 50_000;
+
+export interface UserExtensionSummary {
+	id: string;
+	name: string;
+	version: string;
+}
+
+export type UserExtensionInstall =
+	| {
+			status: "installed" | "already-installed";
+			extension: UserExtensionSummary;
+	  }
+	| { status: "declined" };
+
+/**
+ * The extensions in the user's own browser. The CLI can manage them but never
+ * open, click or read them: an agent there could reach a password manager.
+ */
+export interface UserExtensions {
+	list(): (UserExtensionSummary & { pinned: boolean })[];
+	/** The question closes, as a no, when `signal` aborts. */
+	install(
+		extensionId: string,
+		signal: AbortSignal,
+	): Promise<UserExtensionInstall>;
+	/** False when the user says no, or `signal` aborts first. */
+	remove(extensionId: string, signal: AbortSignal): Promise<boolean>;
+	setPinned(extensionId: string, pinned: boolean): void;
+}
+
+// Cookies are live sign-ins, so the user says yes to each copy into an agent's pane.
+async function confirmLoginImport(
+	browserName: string,
+	profileName: string,
+): Promise<boolean> {
+	const box: Electron.MessageBoxOptions = {
+		type: "question",
+		buttons: [
+			i18n._(msg({ message: "Allow" })),
+			i18n._(msg({ message: "Don't allow" })),
+		],
+		defaultId: 1,
+		cancelId: 1,
+		message: i18n._(
+			msg({ message: `Let an agent use your ${browserName} logins?` }),
+		),
+		detail: i18n._(
+			msg({
+				message: `It copies the cookies from your "${profileName}" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to.`,
+			}),
+		),
+	};
+	const window =
+		BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+	const { response } = window
+		? await dialog.showMessageBox(window, box)
+		: await dialog.showMessageBox(box);
+	return response === 0;
+}
+
+function isAgentPane(wc: Electron.WebContents): boolean {
+	return wc.session === session.fromPartition(AGENT_BROWSER_PARTITION);
+}
 
 let server: Server | null = null;
 
@@ -76,6 +154,11 @@ function requireScope(
 		res.status(400).json({ error: "workspaceId is required" });
 		return null;
 	}
+	const wc = browserManager.getWebContents(paneId, raw);
+	if (wc && !isAgentPane(wc)) {
+		res.status(403).json({ error: USER_PANE_ERROR });
+		return null;
+	}
 	return { paneId, workspaceId: raw };
 }
 
@@ -97,7 +180,15 @@ function withPane(
 	fn(wc, scope.paneId, scope.workspaceId);
 }
 
-export async function startBrowserBridge(): Promise<void> {
+export async function startBrowserBridge({
+	homeDir,
+	extensions,
+	answerDeadlineMs = ANSWER_DEADLINE_MS,
+}: {
+	homeDir?: string;
+	extensions?: UserExtensions;
+	answerDeadlineMs?: number;
+} = {}): Promise<void> {
 	if (server) return;
 	const secret = randomBytes(32).toString("hex");
 	const app = express();
@@ -116,7 +207,11 @@ export async function startBrowserBridge(): Promise<void> {
 			typeof req.query.workspaceId === "string"
 				? req.query.workspaceId
 				: undefined;
-		res.json({ panes: browserManager.listPanes(workspaceId) });
+		const panes = browserManager.listPanes(workspaceId).filter((pane) => {
+			const wc = browserManager.getWebContents(pane.paneId);
+			return wc !== null && isAgentPane(wc);
+		});
+		res.json({ panes });
 	});
 
 	app.post("/open", (req, res) => {
@@ -184,6 +279,8 @@ export async function startBrowserBridge(): Promise<void> {
 				}) => {
 					if (event.workspaceId !== workspaceId) return;
 					if (known.has(event.paneId)) return;
+					const wc = browserManager.getWebContents(event.paneId);
+					if (!wc || !isAgentPane(wc)) return;
 					const info = browserManager
 						.listPanes(workspaceId)
 						.find((p) => p.paneId === event.paneId);
@@ -337,7 +434,7 @@ export async function startBrowserBridge(): Promise<void> {
 			res.status(400).json({ error: "sourceId is required" });
 			return;
 		}
-		const profile = resolveImportProfile(sourceId);
+		const profile = resolveImportProfile(sourceId, homeDir);
 		if (!profile) {
 			res.status(404).json({ error: "Unknown import source" });
 			return;
@@ -349,10 +446,123 @@ export async function startBrowserBridge(): Promise<void> {
 				.json({ error: `No live pane ${scope.paneId} in this workspace` });
 			return;
 		}
-		importCookiesIntoSession(wc.session, profile.profileDir, profile.browserKey)
-			.then((result) => res.json(result))
+		confirmLoginImport(profile.browserName, profile.profileName)
+			.then(async (allowed) => {
+				if (!allowed) {
+					res.status(403).json({ error: LOGIN_IMPORT_REFUSED });
+					return;
+				}
+				res.json(
+					await importCookiesIntoSession(
+						wc.session,
+						profile.profileDir,
+						profile.browserKey,
+					),
+				);
+			})
 			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 	});
+
+	const extensionRoute = (
+		{ requireInstalled }: { requireInstalled: boolean },
+		handler: (
+			extensions: UserExtensions,
+			extensionId: string,
+			req: Request,
+			res: Response,
+		) => Promise<void>,
+	) => {
+		return (req: Request, res: Response) => {
+			if (!extensions) {
+				res.status(503).json({ error: "Browser extensions are not available" });
+				return;
+			}
+			const extensionId = req.body?.extensionId;
+			if (typeof extensionId !== "string" || !EXTENSION_ID.test(extensionId)) {
+				res
+					.status(400)
+					.json({ error: "extensionId must be a Chrome Web Store ID" });
+				return;
+			}
+			if (
+				requireInstalled &&
+				!extensions.list().some((extension) => extension.id === extensionId)
+			) {
+				res
+					.status(404)
+					.json({ error: `No extension ${extensionId} is installed` });
+				return;
+			}
+			handler(extensions, extensionId, req, res).catch((err) =>
+				res.status(500).json({ error: errorMessage(err) }),
+			);
+		};
+	};
+
+	app.get("/extensions", (_req, res) => {
+		if (!extensions) {
+			res.status(503).json({ error: "Browser extensions are not available" });
+			return;
+		}
+		res.json({ extensions: extensions.list() });
+	});
+
+	// The question closes when the caller hangs up or the deadline passes.
+	const answerSignal = (res: Response): AbortSignal => {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), answerDeadlineMs);
+		res.on("close", () => {
+			clearTimeout(timer);
+			controller.abort();
+		});
+		return controller.signal;
+	};
+	const refuse = (res: Response, signal: AbortSignal, refusal: string) => {
+		if (signal.aborted) res.status(408).json({ error: EXTENSION_UNANSWERED });
+		else res.status(403).json({ error: refusal });
+	};
+
+	app.post(
+		"/extensions/install",
+		extensionRoute(
+			{ requireInstalled: false },
+			async (extensions, extensionId, _req, res) => {
+				const signal = answerSignal(res);
+				const result = await extensions.install(extensionId, signal);
+				if (result.status === "declined") {
+					refuse(res, signal, EXTENSION_INSTALL_REFUSED);
+					return;
+				}
+				res.json(result);
+			},
+		),
+	);
+
+	app.post(
+		"/extensions/remove",
+		extensionRoute(
+			{ requireInstalled: true },
+			async (extensions, extensionId, _req, res) => {
+				const signal = answerSignal(res);
+				if (!(await extensions.remove(extensionId, signal))) {
+					refuse(res, signal, EXTENSION_REMOVE_REFUSED);
+					return;
+				}
+				res.json({ ok: true });
+			},
+		),
+	);
+
+	app.post(
+		"/extensions/pin",
+		extensionRoute(
+			{ requireInstalled: true },
+			async (extensions, extensionId, req, res) => {
+				extensions.setPinned(extensionId, req.body?.pinned !== false);
+				res.json({ ok: true });
+			},
+		),
+	);
 
 	const wss = new WebSocketServer({
 		noServer: true,
@@ -388,14 +598,27 @@ export async function startBrowserBridge(): Promise<void> {
 	log.info(`[browser-bridge] listening on ${endpoint}`);
 }
 
+export async function stopBrowserBridge(): Promise<void> {
+	const running = server;
+	if (!running) return;
+	server = null;
+	running.closeAllConnections();
+	await new Promise<void>((resolve) => running.close(() => resolve()));
+}
+
 function handleCdpSocket(
 	paneId: string,
 	workspaceId: string,
 	ws: WebSocket,
 ): void {
-	let session: ReturnType<typeof browserManager.attachCdp>;
+	const wc = browserManager.getWebContents(paneId, workspaceId);
+	if (wc && !isAgentPane(wc)) {
+		ws.close(1008, "This pane is the user's own browser.");
+		return;
+	}
+	let cdp: ReturnType<typeof browserManager.attachCdp>;
 	try {
-		session = browserManager.attachCdp(
+		cdp = browserManager.attachCdp(
 			paneId,
 			workspaceId,
 			(payload) => {
@@ -413,13 +636,13 @@ function handleCdpSocket(
 		return;
 	}
 	ws.on("message", (data) => {
-		session.send(data.toString());
+		cdp.send(data.toString());
 	});
 	ws.on("close", () => {
-		session.detach();
+		cdp.detach();
 	});
 	ws.on("error", () => {
-		session.detach();
+		cdp.detach();
 	});
 }
 

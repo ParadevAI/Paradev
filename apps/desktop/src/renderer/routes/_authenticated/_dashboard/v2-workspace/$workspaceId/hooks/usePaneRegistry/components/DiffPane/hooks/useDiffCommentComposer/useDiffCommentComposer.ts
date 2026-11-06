@@ -45,7 +45,10 @@ interface CreateNewAgentSessionInput {
 
 interface UseDiffCommentComposerArgs {
 	workspaceId: string;
-	codeViewRef: RefObject<CodeViewHandle<DiffAnnotationMetadata> | null>;
+	codeViewRef: RefObject<CodeViewHandle<
+		DiffAnnotationMetadata,
+		undefined
+	> | null>;
 	/** Resolves the changeset file behind a CodeView item id. We take a
 	 *  getter (not the map directly) because the map is produced by
 	 *  `useDiffCodeViewItems`, which itself consumes this hook's annotation
@@ -57,7 +60,7 @@ interface UseDiffCommentComposerArgs {
 }
 
 type OnLineSelectionEnd = NonNullable<
-	CodeViewOptions<DiffAnnotationMetadata>["onLineSelectionEnd"]
+	CodeViewOptions<DiffAnnotationMetadata, undefined>["onLineSelectionEnd"]
 >;
 
 interface UseDiffCommentComposerResult {
@@ -192,6 +195,7 @@ export function useDiffCommentComposer({
 					workspaceId,
 					terminalId: input.target.terminalId,
 					text,
+					submit: true,
 				});
 				clearIfStillCurrent(submitted);
 			} catch {

@@ -49,6 +49,7 @@ export interface WorkspaceHostResult {
 	sandboxUnreachable: boolean;
 	/** Cloud only: addressed, but not yet woken since it was opened. */
 	sandboxWaking: boolean;
+	sandboxRefusal: string | null;
 	retrySandbox: () => void;
 	/** True while no host has answered yet. */
 	isResolving: boolean;
@@ -77,6 +78,7 @@ export function useWorkspaceHost(
 		target: sandbox,
 		isError: sandboxUnreachable,
 		isWaking: sandboxWaking,
+		refusalMessage: sandboxRefusal,
 		retry: retrySandbox,
 	} = useSandboxAccess(cloud);
 
@@ -125,6 +127,7 @@ export function useWorkspaceHost(
 						version: null,
 						platform: null,
 						installSource: null,
+						allowCloudWorkspaces: false,
 						// A sandbox is reachable or it isn't; there is no offline
 						// device behind it to report on.
 						isOnline: true,
@@ -136,6 +139,7 @@ export function useWorkspaceHost(
 				cloud,
 				sandboxUnreachable: !host && sandboxUnreachable,
 				sandboxWaking,
+				sandboxRefusal,
 				retrySandbox: () => {
 					retrySandbox();
 					void served?.refetch();
@@ -164,6 +168,7 @@ export function useWorkspaceHost(
 			cloud: null,
 			sandboxUnreachable: false,
 			sandboxWaking: false,
+			sandboxRefusal: null,
 			retrySandbox,
 			isResolving,
 		};
@@ -172,6 +177,7 @@ export function useWorkspaceHost(
 		sandbox,
 		sandboxUnreachable,
 		sandboxWaking,
+		sandboxRefusal,
 		retrySandbox,
 		targets,
 		queries,

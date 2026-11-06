@@ -17,8 +17,8 @@ import {
 const ENV = {
 	SLACK_CLIENT_ID: "sc",
 	SLACK_CLIENT_SECRET: "ss",
-	GOOGLE_TEMP_CLIENT_ID: "gc",
-	GOOGLE_TEMP_CLIENT_SECRET: "gs",
+	GOOGLE_CONNECTIONS_CLIENT_ID: "gc",
+	GOOGLE_CONNECTIONS_CLIENT_SECRET: "gs",
 	SENTRY_CLIENT_ID: "xc",
 	SENTRY_CLIENT_SECRET: "xs",
 	SENTRY_APP_SLUG: "superset-app",
@@ -350,6 +350,56 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "org-cold-bar", label: "Tegon" });
 	});
 
+	test("peec_mcp reads the first project from a columnar result", async () => {
+		const projects = {
+			columns: ["id", "name", "status"],
+			rows: [["or_7499a251", "Tegon", "ACTIVE"]],
+			rowCount: 1,
+		};
+		const calls: { method?: string; name?: string; auth: string | null }[] = [];
+		globalThis.fetch = (async (_url: string, init: RequestInit) => {
+			const body = init.body
+				? (JSON.parse(String(init.body)) as {
+						id?: number;
+						method?: string;
+						params?: { name?: string };
+					})
+				: {};
+			calls.push({
+				method: body.method,
+				name: body.params?.name,
+				auth: new Headers(init.headers).get("Authorization"),
+			});
+			if (init.method === "DELETE") return new Response(null, { status: 204 });
+			if (body.id === undefined) return new Response(null, { status: 202 });
+			const result =
+				body.method === "tools/call"
+					? { content: [{ type: "text", text: JSON.stringify(projects) }] }
+					: { protocolVersion: "2025-06-18" };
+			return new Response(
+				JSON.stringify({ jsonrpc: "2.0", id: body.id, result }),
+				{
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}) as unknown as typeof fetch;
+
+		const identity = await probeIdentity(
+			"peec_mcp",
+			connectorMethod(requireConnector("peec_mcp")),
+			"peec-test",
+		);
+
+		expect(calls[2]).toEqual({
+			method: "tools/call",
+			name: "list_projects",
+			auth: "Bearer peec-test",
+		});
+		expect(identity.account).toEqual({ id: "or_7499a251", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "or_7499a251", label: "Tegon" });
+	});
+
 	test("posthog_mcp asks the authorization server's userinfo endpoint", async () => {
 		const calls = respond({ sub: "user_01", email: "h@tegon.ai" });
 
@@ -368,6 +418,107 @@ describe("probeIdentity", () => {
 		]);
 		expect(identity.account).toEqual({ id: "user_01", label: "h@tegon.ai" });
 		expect(identity.user).toEqual({ id: "user_01", label: "h@tegon.ai" });
+	});
+
+	test("sazabi_mcp asks Sazabi's userinfo endpoint after OAuth", async () => {
+		const calls = respond({ sub: "usr_01", email: "h@tegon.ai" });
+
+		const identity = await probeIdentity(
+			"sazabi_mcp",
+			connectorMethod(requireConnector("sazabi_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.platform.sazabi.com/api/auth/oauth2/userinfo",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "usr_01", label: "h@tegon.ai" });
+		expect(identity.user).toEqual({ id: "usr_01", label: "h@tegon.ai" });
+	});
+
+	test("sazabi_mcp reads a secret key's organization from /v1/me", async () => {
+		const calls = respond({
+			credentialType: "secret",
+			organization: { id: "org_01", name: "Tegon", slug: "tegon" },
+			keyName: "paradev",
+			projectId: null,
+		});
+
+		const identity = await probeIdentity(
+			"sazabi_mcp",
+			connectorMethod(requireConnector("sazabi_mcp"), "api_key"),
+			"sk-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.sazabi.com/v1/me",
+				method: "GET",
+				auth: "Bearer sk-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "org_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "org_01", label: "paradev" });
+	});
+
+	test("inngest_mcp reads the account under data", async () => {
+		const calls = respond({
+			data: { id: "acct_01", email: "h@tegon.ai", name: "Tegon" },
+			metadata: {},
+		});
+
+		const identity = await probeIdentity(
+			"inngest_mcp",
+			connectorMethod(requireConnector("inngest_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.inngest.com/v2/account",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "acct_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "acct_01", label: "h@tegon.ai" });
+	});
+
+	test("supabase_mcp reads the authorized organization", async () => {
+		const calls = respond([{ id: "org_01", name: "Tegon" }]);
+
+		const identity = await probeIdentity(
+			"supabase_mcp",
+			connectorMethod(requireConnector("supabase_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.supabase.com/v1/organizations",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "org_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "org_01", label: "Tegon" });
+	});
+
+	test("firecrawl_mcp takes the team and user from the token response", async () => {
+		const identity = await probeIdentity(
+			"firecrawl_mcp",
+			connectorMethod(requireConnector("firecrawl_mcp")),
+			"fco_test",
+			undefined,
+			{ access_token: "fco_test", team_id: "team_01", user_id: "user_01" },
+		);
+
+		expect(identity.account).toEqual({ id: "team_01", label: null });
+		expect(identity.user).toEqual({ id: "user_01", label: null });
 	});
 
 	test("stripe survives an account with no name", async () => {
@@ -481,6 +632,26 @@ describe("probeIdentity", () => {
 		]);
 		expect(identity.account).toEqual({ id: "user_abc", label: "h@tegon.ai" });
 		expect(identity.user).toEqual({ id: "user_abc", label: "harshith" });
+	});
+
+	test("resend_mcp reads the team behind the token from /me", async () => {
+		const calls = respond({ object: "me", team_id: "team_abc" });
+
+		const identity = await probeIdentity(
+			"resend_mcp",
+			connectorMethod(requireConnector("resend_mcp")),
+			"re-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.resend.com/me",
+				method: "GET",
+				auth: "Bearer re-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "team_abc", label: null });
+		expect(identity.user?.id).toBe("team_abc");
 	});
 
 	test("superhuman_mcp reads the default account wherever the server lists it", async () => {
@@ -694,6 +865,17 @@ describe("authorizeUrl for a dynamic client", () => {
 					code_challenge_methods_supported: ["S256"],
 					client_id_metadata_document_supported: true,
 				},
+			"https://mcp.resend.com/.well-known/oauth-protected-resource": {
+				resource: "https://mcp.resend.com",
+				authorization_servers: ["https://api.resend.com"],
+			},
+			"https://api.resend.com/.well-known/oauth-authorization-server": {
+				issuer: "https://api.resend.com",
+				authorization_endpoint: "https://api.resend.com/oauth/authorize",
+				token_endpoint: "https://api.resend.com/oauth/token",
+				code_challenge_methods_supported: ["S256"],
+				client_id_metadata_document_supported: true,
+			},
 		};
 		globalThis.fetch = (async (input: string | URL) => {
 			const route = routes[String(input)];
@@ -743,5 +925,17 @@ describe("authorizeUrl for a dynamic client", () => {
 		expect(url.searchParams.get("scope")).toBe(
 			"openid email profile offline_access",
 		);
+	});
+	test("resend_mcp finds its metadata at the root well-known path", async () => {
+		const url = await authorize("resend_mcp");
+
+		expect(`${url.origin}${url.pathname}`).toBe(
+			"https://api.resend.com/oauth/authorize",
+		);
+		expect(url.searchParams.get("client_id")).toBe(
+			"https://api.test/api/connectors/resend_mcp/client-metadata",
+		);
+		expect(url.searchParams.get("resource")).toBe("https://mcp.resend.com");
+		expect(url.searchParams.get("scope")).toBe("full_access");
 	});
 });

@@ -1,1 +1,1 @@
-export { Transcript } from "./Transcript";
+export { Transcript, type TranscriptHandle } from "./Transcript";

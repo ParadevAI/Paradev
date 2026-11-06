@@ -4,6 +4,7 @@ import { env } from "@/lib/env";
 import { openUrl } from "@/lib/open-url";
 import { pageSlugFromUrl } from "@/lib/page-links";
 import { pullRequestFromUrl } from "@/lib/pull-request-links";
+import { workspaceIdFromUrl } from "@/lib/workspace-links";
 
 /** Pull request links only open in-app with a workspace: its host is what answers for the PR. */
 export function useOpenLink({
@@ -20,6 +21,17 @@ export function useOpenLink({
 				router.push({
 					pathname: "/(authenticated)/pages/[slug]/preview",
 					params: { slug },
+				});
+				return;
+			}
+			const linkedWorkspaceId = workspaceIdFromUrl(
+				url,
+				env.EXPO_PUBLIC_WEB_URL,
+			);
+			if (linkedWorkspaceId !== null) {
+				router.push({
+					pathname: "/workspace/[id]",
+					params: { id: linkedWorkspaceId },
 				});
 				return;
 			}

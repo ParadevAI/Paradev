@@ -19,6 +19,7 @@ import {
 	type ConnectionSecrets,
 	connectionSecrets,
 } from "../../../lib/connectors/upsert";
+import { isInternalUrl } from "../../../lib/organization-plugins/internal-host";
 import { installedPlugin } from "../connections";
 import {
 	type PluginManifest,
@@ -65,6 +66,7 @@ export type PluginTarget = TargetIdentity &
 				kind: "remote";
 				url: string;
 				headers: Record<string, string>;
+				publicOnly?: boolean;
 				connectionId: string;
 				account?: AccountRef;
 				storedAccessToken?: string;
@@ -142,7 +144,9 @@ export function targetKey(target: PluginTarget): string {
 
 // A dynamic client registers against the tool server itself, so that address is
 // the one place the connector's credential was issued for.
-function connectorServer(method: ConnectorMethod | undefined): string | null {
+export function connectorServer(
+	method: ConnectorMethod | undefined,
+): string | null {
 	return method?.type === "oauth2" && method.client === "dynamic"
 		? (method.authorization_url ?? null)
 		: null;
@@ -153,7 +157,11 @@ function remoteBinding(
 	slug: string | undefined,
 	scope: TemplateScope,
 	authMethod: string | null,
-): { url: string; headers: Record<string, string> } | null {
+): {
+	url: string;
+	headers: Record<string, string>;
+	publicOnly?: boolean;
+} | null {
 	const extension = supersetExtension(install.manifest);
 	const mcp = extension?.mcp;
 
@@ -178,13 +186,23 @@ function remoteBinding(
 
 	if (!mcp?.url) return null;
 
+	const url = resolveUrlTemplate(
+		mcp.url,
+		scope,
+		method ? secretInputNames(method) : undefined,
+		"mcp.url",
+	);
+	const untrusted = !trustedManifest(install.marketplace);
+	if (untrusted && isInternalUrl(url)) {
+		throw new PluginTargetError(
+			`"${install.manifest.name}" points at a private or internal address.`,
+			403,
+		);
+	}
+
 	return {
-		url: resolveUrlTemplate(
-			mcp.url,
-			scope,
-			method ? secretInputNames(method) : undefined,
-			"mcp.url",
-		),
+		url,
+		publicOnly: untrusted,
 		headers: {
 			...resolveTemplateDeep(mcp.headers ?? {}, scope),
 			...resolveTemplateDeep(method?.bind ?? extension?.bind ?? {}, scope)
@@ -194,8 +212,9 @@ function remoteBinding(
 }
 
 export async function resolveTarget(
-	request: TargetRequest,
+	targetRequest: TargetRequest,
 ): Promise<PluginTarget> {
+	let request = targetRequest;
 	const install = await installedPlugin(
 		request.userId,
 		request.plugin,
@@ -207,6 +226,13 @@ export async function resolveTarget(
 				? `"${request.plugin}" is not installed from ${request.marketplace}.`
 				: `"${request.plugin}" is not installed.`,
 		);
+	}
+
+	// installedPlugin checked the member's access in the plugin's own
+	// organization, so it is served whichever organization is active; its
+	// connections are looked up there too.
+	if (install.organizationId) {
+		request = { ...request, organizationId: install.organizationId };
 	}
 
 	const identity: TargetIdentity = {

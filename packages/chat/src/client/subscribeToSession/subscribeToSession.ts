@@ -51,6 +51,7 @@ export type StreamUrlParams = {
 	sessionId: string;
 	deltas: readonly DeltaChannel[];
 	since: Cursor | null;
+	nestedSubagents?: boolean;
 };
 
 export function buildStreamUrl(params: StreamUrlParams): string {
@@ -64,6 +65,7 @@ export function buildStreamUrl(params: StreamUrlParams): string {
 	if (params.deltas.length > 0) {
 		query.push(`deltas=${params.deltas.join(",")}`);
 	}
+	if (params.nestedSubagents) query.push("nestedSubagents=1");
 	const suffix = query.length > 0 ? `?${query.join("&")}` : "";
 	return `${base}/sessions/${encodeURIComponent(params.sessionId)}/stream${suffix}`;
 }

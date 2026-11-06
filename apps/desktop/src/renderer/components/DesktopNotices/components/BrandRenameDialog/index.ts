@@ -1,0 +1,1 @@
+export { BrandRenameDialog } from "./BrandRenameDialog";

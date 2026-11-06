@@ -1,14 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { MAX_INLINE_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
 import type { HostServiceContext } from "../../../types";
-import { attachmentsRouter } from "./attachments";
-import { MAX_INLINE_ATTACHMENT_BYTES } from "./constants";
+import { attachmentsRouter, importCloudAttachments } from "./attachments";
 import {
 	getAttachmentDir,
 	getAttachmentFilePath,
 	getAttachmentsRoot,
+	handOutAttachmentByFileId,
+	readAttachmentMetadata,
+	writeAttachmentMetadata,
 } from "./storage";
 
 let tempBase: string;
@@ -173,6 +177,80 @@ describe("attachmentsRouter.upload", () => {
 	});
 });
 
+describe("attachmentsRouter.read", () => {
+	it("returns an uploaded attachment's bytes", async () => {
+		const caller = createCaller();
+		const { attachmentId } = await caller.upload({
+			data: { kind: "base64", data: PNG_BASE64 },
+			mediaType: "image/png",
+		});
+
+		expect(await caller.read({ attachmentId })).toEqual({
+			mediaType: "image/png",
+			data: PNG_BASE64,
+		});
+	});
+
+	it("stamps the attachment as used", async () => {
+		const caller = createCaller();
+		const { attachmentId } = await caller.upload({
+			data: { kind: "base64", data: PNG_BASE64 },
+			mediaType: "image/png",
+		});
+		const metadata = readAttachmentMetadata(attachmentId);
+		if (!metadata) throw new Error("upload wrote no metadata");
+		writeAttachmentMetadata({ ...metadata, lastUsedAt: 0 });
+
+		await caller.read({ attachmentId });
+		expect(readAttachmentMetadata(attachmentId)?.lastUsedAt).toBeGreaterThan(0);
+	});
+
+	it("reports a missing attachment as NOT_FOUND", async () => {
+		await expect(
+			createCaller().read({
+				attachmentId: "00000000-0000-4000-8000-000000000000",
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
+	});
+});
+
+describe("importCloudAttachments", () => {
+	it("records the fileId a copy came from, so a lookup by fileId finds it", async () => {
+		const server = Bun.serve({
+			port: 0,
+			fetch: () => new Response(Buffer.from(PNG_BASE64, "base64")),
+		});
+		try {
+			const fileId = crypto.randomUUID();
+			const ctx = {
+				api: {
+					attachment: {
+						resolve: {
+							mutate: async () => [
+								{
+									fileId,
+									name: "shot.png",
+									contentType: "image/png",
+									sizeBytes: 68,
+									url: server.url.href,
+								},
+							],
+						},
+					},
+				},
+			};
+
+			const [imported] = await importCloudAttachments(ctx, [fileId]);
+			expect(imported?.fileId).toBe(fileId);
+			expect(handOutAttachmentByFileId(fileId)?.metadata.attachmentId).toBe(
+				imported?.attachmentId,
+			);
+		} finally {
+			server.stop(true);
+		}
+	});
+});
+
 describe("attachmentsRouter.delete", () => {
 	it("removes the attachment directory", async () => {
 		const caller = createCaller();
@@ -206,13 +284,13 @@ describe("attachmentsRouter.delete", () => {
 });
 
 describe("getAttachmentsRoot", () => {
-	it("falls back to ~/.superset/host/standalone when HOST_MANIFEST_DIR is blank", () => {
+	it("falls back to the app home's host/standalone when HOST_MANIFEST_DIR is blank", () => {
 		const original = process.env.HOST_MANIFEST_DIR;
 		process.env.HOST_MANIFEST_DIR = "";
 		try {
 			const root = getAttachmentsRoot();
 			expect(root).toBe(
-				join(homedir(), ".superset", "host", "standalone", "attachments"),
+				join(resolveAppHomeDir(), "host", "standalone", "attachments"),
 			);
 		} finally {
 			if (original === undefined) delete process.env.HOST_MANIFEST_DIR;
@@ -226,7 +304,7 @@ describe("getAttachmentsRoot", () => {
 		try {
 			const root = getAttachmentsRoot();
 			expect(root).toBe(
-				join(homedir(), ".superset", "host", "standalone", "attachments"),
+				join(resolveAppHomeDir(), "host", "standalone", "attachments"),
 			);
 		} finally {
 			if (original === undefined) delete process.env.HOST_MANIFEST_DIR;

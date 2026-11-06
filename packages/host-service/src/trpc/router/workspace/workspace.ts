@@ -38,6 +38,38 @@ export const workspaceRouter = router({
 		}),
 
 	/**
+	 * The repositories a workspace holds, primary first. A workspace holds one
+	 * repository, at its root, until multi-repo workspaces land; the shape is
+	 * the one they will return.
+	 */
+	repositories: protectedProcedure
+		.input(z.object({ workspaceId: z.string() }))
+		.query(({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			const project = workspace.projectId
+				? ctx.db.query.projects
+						.findFirst({ where: eq(projects.id, workspace.projectId) })
+						.sync()
+				: undefined;
+			return [
+				{
+					id: workspace.id,
+					path: ".",
+					name: basename(project?.repoPath ?? workspace.worktreePath),
+					primary: true,
+				},
+			];
+		}),
+
+	/**
 	 * Authoritative list of this host's workspaces, served entirely from
 	 * host.db — works with zero cloud availability. Rows are shaped like
 	 * cloud rows (plus local extras) so consumers of either read path agree.

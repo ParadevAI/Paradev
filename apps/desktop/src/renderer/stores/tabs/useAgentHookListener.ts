@@ -60,6 +60,12 @@ export function useAgentHookListener() {
 				// handled by useSettingsExternalChangeListener
 				return;
 			}
+			if (
+				event.type === NOTIFICATION_EVENTS.OPEN_ROUTE ||
+				event.type === NOTIFICATION_EVENTS.NOTIFICATION_REPLY
+			) {
+				return;
+			}
 
 			const state = useTabsStore.getState();
 			const target = resolveNotificationTarget(event.data, state);

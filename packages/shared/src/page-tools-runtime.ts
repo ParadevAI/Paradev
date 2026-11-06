@@ -98,7 +98,7 @@ export function pageToolsRuntimeSource({
 			}
 			await ready;
 			if (state === "signed_out") {
-				throw fail("unavailable_signed_out", "Sign in to Superset to use this page's tools");
+				throw fail("unavailable_signed_out", "Sign in to Paradev to use this page's tools");
 			}
 			if (state !== "available") {
 				throw fail("unavailable", "Tools are not available in this view");

@@ -4,13 +4,15 @@
  * check talks to the box the way a client would (its published ports) or
  * the way the boot runner left it (its log and run directory).
  */
+import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
+import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
 import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
 } from "@superset/shared/sandbox-contract";
-import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox";
+import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox/access";
 import { Sandbox } from "@vercel/sandbox";
 
 export interface ProbeArgs {
@@ -118,6 +120,20 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 			),
 		),
 	);
+	for (const preset of HOST_AGENT_PRESETS) {
+		if (!isCloudAgentId(preset.presetId)) continue;
+		const out = await run(
+			`cd /tmp && timeout 15 ${[preset.command, ...preset.args].join(" ")} </dev/null >/tmp/preset.out 2>&1; echo "exit=$?"; head -5 /tmp/preset.out`,
+		);
+		check(
+			`${preset.presetId} accepts its preset's flags`,
+			!/^exit=12[67]$/m.test(out) &&
+				!/unknown option|unexpected argument|not found in PATH/i.test(out),
+			out.trim().split("\n").slice(0, 2).join(" "),
+		);
+	}
+	const cliVersion = await run("superset --version");
+	check("superset runs", /^\d+\.\d+\.\d+/m.test(cliVersion), cliVersion.trim());
 	if (
 		!(await until(
 			"checkout on the branch",

@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
 import { setTestEnv } from "../../../test/env";
-import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import {
+	CODEX_AUTH_PATH,
+	CODEX_SYSTEM_CONFIG_PATH,
+	deriveSandboxCredentials,
+	gitAuthorFor,
+} from "./credentials";
 
 setTestEnv({ NEXT_PUBLIC_API_URL: undefined });
 
@@ -14,6 +19,11 @@ type Policy = {
 const rules = (
 	policy: Awaited<ReturnType<typeof deriveSandboxCredentials>>["networkPolicy"],
 ) => (policy as Policy).allow;
+
+function restore(key: string, value: string | undefined): void {
+	if (value === undefined) delete process.env[key];
+	else process.env[key] = value;
+}
 
 const WORKSPACE_ID = "11111111-2222-4333-8444-555555555555";
 
@@ -127,6 +137,34 @@ describe("deriveSandboxCredentials", () => {
 		expect(JSON.stringify(managedEnv)).not.toContain("ghs_token");
 	});
 
+	test("the relay gets the same workspace credential as the API", async () => {
+		const saved = {
+			api: process.env.NEXT_PUBLIC_API_URL,
+			relay: process.env.RELAY_URL,
+		};
+		process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
+		process.env.RELAY_URL = "https://relay.example.com";
+		try {
+			const { networkPolicy } = await deriveSandboxCredentials({
+				workspaceId: WORKSPACE_ID,
+				environmentEnv: {},
+				userAgentEnv: {},
+				githubToken: null,
+				gitAuthor: author,
+			});
+			const allow = rules(networkPolicy);
+			expect(allow["relay.example.com"]).toEqual(allow["api.example.com"]);
+			expect(
+				allow["relay.example.com"]?.[0]?.transform[0]?.headers[
+					"x-superset-sandbox-credential"
+				],
+			).toStartWith(`${WORKSPACE_ID}.`);
+		} finally {
+			restore("NEXT_PUBLIC_API_URL", saved.api);
+			restore("RELAY_URL", saved.relay);
+		}
+	});
+
 	test("brokered names in the environment's variables never reach the box", async () => {
 		const { managedEnv } = await deriveSandboxCredentials({
 			workspaceId: WORKSPACE_ID,
@@ -179,12 +217,82 @@ describe("gitAuthorFor", () => {
 		).toBe("octocat");
 	});
 
-	test("without a connected account, the Superset account's name and email", () => {
+	test("without a connected account, the Paradev account's name and email", () => {
 		expect(
 			gitAuthorFor({
 				github: null,
 				user: { name: "Ada", email: "ada@example.com" },
 			}),
 		).toEqual({ name: "Ada", email: "ada@example.com" });
+	});
+});
+
+describe("deriveSandboxCredentials for Codex", () => {
+	const chatgpt = {
+		accessToken: "chatgpt-access",
+		accountId: "acct-1",
+		identity: {
+			email: "ada@example.com",
+			planType: "plus",
+			userId: "user-1",
+			accountId: "acct-1",
+		},
+	};
+	const derive = (
+		inputs: Partial<Parameters<typeof deriveSandboxCredentials>[0]>,
+	) =>
+		deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
+			environmentEnv: {},
+			userAgentEnv: {},
+			githubToken: null,
+			gitAuthor: author,
+			...inputs,
+		});
+	const file = (
+		result: Awaited<ReturnType<typeof deriveSandboxCredentials>>,
+		path: string,
+	) => result.files.find((entry) => entry.path === path)?.content;
+
+	test("a ChatGPT sign-in is a bearer swap on chatgpt.com and a login file of placeholders", async () => {
+		const result = await derive({ codexChatgpt: chatgpt });
+		expect(
+			rules(result.networkPolicy)["chatgpt.com"]?.[0]?.transform[0]?.headers,
+		).toEqual({ authorization: "Bearer chatgpt-access" });
+		const auth = JSON.parse(file(result, CODEX_AUTH_PATH) ?? "{}");
+		expect(auth.auth_mode).toBe("chatgpt");
+		expect(auth.tokens.access_token).toBe(SANDBOX_CREDENTIAL_PLACEHOLDER);
+		expect(auth.tokens.refresh_token).toBe(SANDBOX_CREDENTIAL_PLACEHOLDER);
+		expect(auth.tokens.account_id).toBe("acct-1");
+		const claims = JSON.parse(
+			Buffer.from(auth.tokens.id_token.split(".")[1], "base64url").toString(),
+		);
+		expect(claims["https://api.openai.com/auth"].chatgpt_plan_type).toBe(
+			"plus",
+		);
+		expect(JSON.stringify(result.files)).not.toContain("chatgpt-access");
+		expect(file(result, CODEX_SYSTEM_CONFIG_PATH)).toContain(
+			"supports_websockets = false",
+		);
+	});
+
+	test("an OpenAI key rewrites the login file, so a box once signed in with ChatGPT follows the switch", async () => {
+		const result = await derive({
+			userAgentEnv: { OPENAI_API_KEY: "sk-mine" },
+		});
+		expect(JSON.parse(file(result, CODEX_AUTH_PATH) ?? "{}")).toEqual({
+			auth_mode: "apikey",
+			OPENAI_API_KEY: SANDBOX_CREDENTIAL_PLACEHOLDER,
+		});
+		expect(file(result, CODEX_SYSTEM_CONFIG_PATH)).toBe("");
+	});
+
+	test("an environment's Codex token is ignored like any provider credential", async () => {
+		const result = await derive({
+			environmentEnv: { CODEX_ACCESS_TOKEN: "at-app", CODEX_API_KEY: "k" },
+		});
+		expect(result.managedEnv.CODEX_ACCESS_TOKEN).toBeUndefined();
+		expect(result.managedEnv.CODEX_API_KEY).toBeUndefined();
+		expect(file(result, CODEX_AUTH_PATH)).toBeUndefined();
 	});
 });

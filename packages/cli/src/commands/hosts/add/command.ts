@@ -6,6 +6,7 @@ import {
 	string,
 	wrapText,
 } from "@superset/cli-framework";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { getHostId, hostIdFromMachineId } from "@superset/shared/host-info";
 import { type ApiClient, createApiClient } from "../../../lib/api-client";
 import { command } from "../../../lib/command";
@@ -36,7 +37,7 @@ import {
 } from "../../../lib/ssh-host-setup/service";
 import { SshSession } from "../../../lib/ssh-host-setup/ssh-session";
 
-const INSTALL_URL = "https://superset.sh/cli/install.sh";
+const INSTALL_URL = `${CANONICAL_URLS.MARKETING}/cli/install.sh`;
 const ONLINE_TIMEOUT_MS = 120_000;
 
 async function confirmStep(message: string, yes: boolean): Promise<boolean> {
@@ -57,15 +58,15 @@ async function install(
 ): Promise<{ bin: string; installed: boolean }> {
 	const wanted = env.VERSION === "0.0.0-dev" ? null : env.VERSION;
 	if (facts.bin && facts.hostRuntime && (!wanted || facts.version === wanted)) {
-		log.info(`Superset CLI ${facts.version ?? ""} found at ${facts.bin}`);
+		log.info(`Paradev CLI ${facts.version ?? ""} found at ${facts.bin}`);
 		return { bin: facts.bin, installed: false };
 	}
 	const action =
 		facts.bin && facts.hostRuntime
-			? `Update the Superset CLI on ${ssh.target} from ${facts.version ?? "an unknown version"} to ${wanted}?`
-			: `Install the Superset CLI${wanted ? ` ${wanted}` : ""} on ${ssh.target} (into ~/superset)?`;
+			? `Update the Paradev CLI on ${ssh.target} from ${facts.version ?? "an unknown version"} to ${wanted}?`
+			: `Install the Paradev CLI${wanted ? ` ${wanted}` : ""} on ${ssh.target} (into ~/superset)?`;
 	if (!(await confirmStep(action, yes))) {
-		throw new CLIError("Cancelled", "The host needs the Superset CLI to run.");
+		throw new CLIError("Cancelled", "The host needs the Paradev CLI to run.");
 	}
 	if (!facts.curl) {
 		throw new CLIError(
@@ -80,7 +81,7 @@ trap 'rm -f "$script"' EXIT
 curl -fsSL ${INSTALL_URL} -o "$script"
 SUPERSET_HOME="$HOME/superset" SUPERSET_VERSION=${tag} sh "$script" --no-next-steps`);
 	if (exitCode !== 0) {
-		throw new CLIError(`Installing the Superset CLI on ${ssh.target} failed`);
+		throw new CLIError(`Installing the Paradev CLI on ${ssh.target} failed`);
 	}
 	return { bin: `${facts.home}/superset/bin/superset`, installed: true };
 }
@@ -299,7 +300,7 @@ export default command({
 			const platform = checkPlatform(facts.system, facts.machine, facts.ldd);
 			if (!platform.ok) {
 				throw new CLIError(
-					`${target} cannot run a Superset host: ${platform.reason}`,
+					`${target} cannot run a Paradev host: ${platform.reason}`,
 				);
 			}
 			if (facts.system === "Linux") {

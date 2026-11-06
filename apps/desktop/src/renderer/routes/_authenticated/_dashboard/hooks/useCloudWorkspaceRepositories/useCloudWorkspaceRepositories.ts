@@ -8,10 +8,11 @@ export function useCloudWorkspaceRepositories({
 	organizationId: string | null;
 	enabled?: boolean;
 }) {
-	const { data } = cloudTrpc.cloudWorkspace.repositories.useQuery(
-		{ organizationId: organizationId ?? "" },
-		{ enabled: enabled && organizationId !== null, staleTime: 5 * 60_000 },
-	);
+	const { data, refetch, isError } =
+		cloudTrpc.cloudWorkspace.repositories.useQuery(
+			{ organizationId: organizationId ?? "" },
+			{ enabled: enabled && organizationId !== null, staleTime: 5 * 60_000 },
+		);
 	return useMemo(() => {
 		const repositoriesById = new Map<string, string[]>();
 		const primaryRepositoryById = new Map<string, string>();
@@ -25,6 +26,13 @@ export function useCloudWorkspaceRepositories({
 			}
 			repositoriesById.set(row.cloudWorkspaceId, names);
 		}
-		return { repositoriesById, primaryRepositoryById };
-	}, [data]);
+		return {
+			repositoriesById,
+			primaryRepositoryById,
+			// An errored lookup still counts: rows file under the "Cloud" stand-in
+			// rather than never being placed.
+			isReady: data !== undefined || isError,
+			refetch,
+		};
+	}, [data, refetch, isError]);
 }

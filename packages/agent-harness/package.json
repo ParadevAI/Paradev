@@ -1,0 +1,39 @@
+{
+	"name": "@superset/agent-harness",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"default": "./src/index.ts"
+		},
+		"./events": {
+			"types": "./src/events/index.ts",
+			"default": "./src/events/index.ts"
+		},
+		"./session": {
+			"types": "./src/session/index.ts",
+			"default": "./src/session/index.ts"
+		},
+		"./session/definitions": {
+			"types": "./src/session/definitions.ts",
+			"default": "./src/session/definitions.ts"
+		}
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
+		"test": "bun test --pass-with-no-tests"
+	},
+	"dependencies": {
+		"@superset/chat": "workspace:*",
+		"@superset/chat-runtime": "workspace:*",
+		"@temporalio/client": "1.24.0",
+		"@temporalio/workflow": "1.24.0"
+	},
+	"devDependencies": {
+		"@superset/typescript": "workspace:*",
+		"bun-types": "1.4.3",
+		"typescript": "7.0.2"
+	}
+}

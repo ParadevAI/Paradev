@@ -22,8 +22,11 @@ import {
 	type CSSProperties,
 	type KeyboardEvent,
 	type PointerEvent,
+	type Ref,
 	useCallback,
+	useDeferredValue,
 	useEffect,
+	useImperativeHandle,
 	useMemo,
 	useRef,
 	useState,
@@ -35,14 +38,27 @@ import {
 } from "../../constants";
 import type { ChatForkTarget } from "../../types";
 import { pageLinkFinder } from "../../utils/pageLinks";
+import { TranscriptFindBar } from "./components/TranscriptFindBar";
 import { TranscriptRowItem } from "./components/TranscriptRowItem";
+import { useCarriedReaderPosition } from "./hooks/useCarriedReaderPosition";
 import { useLoadOlderOnReach } from "./hooks/useLoadOlderOnReach";
 import { useNearRows } from "./hooks/useNearRows";
 import { useScrollAnchorKey } from "./hooks/useScrollAnchorKey";
 import { useScrollbarGutter } from "./hooks/useScrollbarGutter";
+import { useTranscriptFind } from "./hooks/useTranscriptFind";
+import { useTranscriptWindow } from "./hooks/useTranscriptWindow";
+import { ChatImageGalleryProvider } from "./providers/ChatImageGalleryProvider";
+import { useNestedItems } from "./providers/NestedItemsProvider";
+import { useTranscriptPlugins } from "./providers/TranscriptPluginsProvider";
 import { copySourceText } from "./utils/copySourceText";
-import { lastReplyKeys } from "./utils/lastReplyKeys";
-import { type TranscriptRow, transcriptRows } from "./utils/transcriptRows";
+import { galleryImages } from "./utils/galleryImages";
+import { replyFooters } from "./utils/replyFooters";
+import { subagentLines } from "./utils/subagentLines";
+import {
+	rowMessageId,
+	type TranscriptRow,
+	transcriptRows,
+} from "./utils/transcriptRows";
 
 const findPageLinks = pageLinkFinder(env.NEXT_PUBLIC_WEB_URL);
 const REMEMBER_SIZE_CLASSNAME = "[contain-intrinsic-size:auto_240px]";
@@ -59,6 +75,9 @@ const SCROLL_KEYS = new Set([
 ]);
 
 export type TranscriptProps = {
+	sessionId: string;
+	revealMessageId?: string | null;
+	onMessageRevealed?: () => void;
 	groups: TurnGroup[];
 	snapshot: SessionSnapshot;
 	approvals: ApprovalRequest[];
@@ -71,7 +90,14 @@ export type TranscriptProps = {
 	canForkToWorktree?: boolean;
 	onRetryPrompt: (clientId: string) => void;
 	onDiscardPrompt: (clientId: string) => void;
+	/** The pane has focus, so ⌘F opens the find bar here. */
+	isActive?: boolean;
+	/** The reader closed the find bar; focus belongs back in the composer. */
+	onCloseFind?: (() => void) | undefined;
+	ref?: Ref<TranscriptHandle>;
 };
+
+export type TranscriptHandle = { openFind: () => void };
 
 function isWork(row: TranscriptRow | undefined): boolean {
 	if (!row) return false;
@@ -90,30 +116,34 @@ function proseTopPadding(
 	return isWork(previous) ? "pt-1" : "pt-3";
 }
 
-function rowMessageId(row: TranscriptRow): string {
-	if (row.kind === "item") return row.item.id;
-	if (row.kind === "tool_run") return row.items[0]?.id ?? row.key;
-	return row.key;
-}
-
 export function Transcript({
 	approvals,
 	canForkToWorktree,
 	groups,
 	hasOlder,
+	isActive = false,
+	onCloseFind,
 	onDiscardPrompt,
 	onFork,
 	onLoadOlder,
 	onRequestItemBodies,
 	onRespond,
 	onRetryPrompt,
+	onMessageRevealed,
 	outbox,
+	ref,
+	revealMessageId = null,
+	sessionId,
 	snapshot,
 }: TranscriptProps) {
 	const { t } = useLingui();
+	const plugins = useTranscriptPlugins();
+	const installedPluginNames = useMemo(
+		() => new Set(plugins.map((plugin) => plugin.name)),
+		[plugins],
+	);
 	const [viewportRef, scrollbarGutter, viewport] =
 		useScrollbarGutter<HTMLDivElement>();
-	const olderPages = useLoadOlderOnReach({ hasOlder, onLoadOlder });
 	const scroller = useMessageScroller();
 	const scrollerRef = useRef(scroller);
 	scrollerRef.current = scroller;
@@ -183,16 +213,26 @@ export function Transcript({
 		return ids;
 	}, [approvals, snapshot.items]);
 
-	const rows = useMemo(
+	const { childrenByParent } = useNestedItems();
+	const { rows, inlineReplyKeys } = useMemo(
 		() =>
-			transcriptRows(
-				groups,
-				outbox,
-				pendingApprovalTargets,
-				findPageLinks,
-				commandsInApprovals,
+			replyFooters(
+				transcriptRows(
+					groups,
+					outbox,
+					pendingApprovalTargets,
+					findPageLinks,
+					commandsInApprovals,
+					(tool) => subagentLines(tool, childrenByParent.get(tool.id)) !== null,
+				),
 			),
-		[groups, outbox, pendingApprovalTargets, commandsInApprovals],
+		[
+			groups,
+			outbox,
+			pendingApprovalTargets,
+			commandsInApprovals,
+			childrenByParent,
+		],
 	);
 
 	useEffect(() => {
@@ -210,7 +250,7 @@ export function Transcript({
 		});
 	}, [rows, entryOverrides]);
 
-	const lastReplies = useMemo(() => lastReplyKeys(rows), [rows]);
+	const gallery = useMemo(() => galleryImages(rows), [rows]);
 	const availableCommands = snapshot.session?.availableCommands;
 	const commands = useMemo(
 		() => new Map(availableCommands?.map((command) => [command.name, command])),
@@ -226,6 +266,77 @@ export function Transcript({
 		turnRunning: groups.at(-1)?.turn?.status === "running",
 		readerScrolledAway,
 	});
+	useEffect(() => {
+		if (anchorRowKey === null) return;
+		scrollerRef.current.scrollToEnd({ behavior: "smooth" });
+	}, [anchorRowKey]);
+
+	const carriedRowKey = useCarriedReaderPosition({
+		sessionId,
+		rows,
+		viewport,
+		awayFromEndRef,
+		scrollerRef,
+	});
+
+	const find = useTranscriptFind({
+		rows,
+		onRequestItemBodies,
+		installedPluginNames,
+		snapshot,
+		viewport,
+		isActive,
+		isEntryCollapsed,
+		onToggleEntry,
+		scrollToMessage: scroller.scrollToMessage,
+		onClose: onCloseFind,
+	});
+	useImperativeHandle(ref, () => ({ openFind: find.show }), [find.show]);
+	// A search covers the whole conversation, so it pages every turn in.
+	const olderPages = useLoadOlderOnReach({
+		hasOlder,
+		onLoadOlder,
+		eager: find.isOpen,
+	});
+
+	const revealRowKey = useMemo(
+		() =>
+			revealMessageId === null
+				? null
+				: (rows.find((row) => rowMessageId(row) === revealMessageId)?.key ??
+					null),
+		[rows, revealMessageId],
+	);
+	const findMountsAll = useDeferredValue(find.isOpen);
+	const transcriptWindow = useTranscriptWindow({
+		rows,
+		viewport,
+		sessionId,
+		pinnedRowKeys: [
+			anchorRowKey,
+			findMountsAll ? (rows[0]?.key ?? null) : null,
+			find.currentRowKey,
+			revealRowKey,
+			carriedRowKey,
+		],
+		observeRow,
+		find: {
+			isOpen: find.isOpen,
+			mountsAll: findMountsAll,
+			awayFromEnd: scrollable.end,
+		},
+	});
+	const { holdRevealUntilScrollEnds } = transcriptWindow;
+
+	useEffect(() => {
+		if (revealMessageId === null) return;
+		holdRevealUntilScrollEnds();
+		scrollerRef.current.scrollToMessage(revealMessageId, {
+			align: "start",
+			behavior: "smooth",
+		});
+		onMessageRevealed?.();
+	}, [revealMessageId, onMessageRevealed, holdRevealUntilScrollEnds]);
 
 	const firstPendingApprovalId = approvals[0]?.id ?? null;
 	useEffect(() => {
@@ -235,84 +346,116 @@ export function Transcript({
 		});
 	}, [firstPendingApprovalId]);
 
-	const contentChildren = rows.map((row, index) => {
-		const recent = index >= rows.length - RECENT_ROWS_RENDERED_IN_FULL;
-		const scrollAnchor = row.key === anchorRowKey;
-		return (
-			<TranscriptRowItem
-				canForkToWorktree={canForkToWorktree}
-				className={cn(
-					REMEMBER_SIZE_CLASSNAME,
-					!recent && OFFSCREEN_CLASSNAME,
-					"px-4 pb-1",
-					proseTopPadding(row, rows[index - 1]),
-				)}
-				commands={commands}
-				isEntryCollapsed={isEntryCollapsed}
-				key={row.key}
-				lastReply={lastReplies.has(row.key)}
-				messageId={rowMessageId(row)}
-				onDiscardPrompt={onDiscardPrompt}
-				onFork={onFork}
-				onRespond={onRespond}
-				onRetryPrompt={onRetryPrompt}
-				onToggleEntry={onToggleEntry}
-				rendered={recent || scrollAnchor || seenRowKeys.has(row.key)}
-				row={row}
-				rowRef={observeRow(row.key)}
-				scrollAnchor={scrollAnchor}
-				snapshot={snapshot}
-			/>
-		);
-	});
+	const contentChildren = rows
+		.slice(transcriptWindow.startIndex)
+		.map((row, offset) => {
+			const index = transcriptWindow.startIndex + offset;
+			const recent = index >= rows.length - RECENT_ROWS_RENDERED_IN_FULL;
+			return (
+				<TranscriptRowItem
+					canForkToWorktree={canForkToWorktree}
+					className={cn(
+						REMEMBER_SIZE_CLASSNAME,
+						!recent && OFFSCREEN_CLASSNAME,
+						row.kind === "changed_files" ? "px-4" : "px-4 pb-1",
+						proseTopPadding(row, rows[index - 1]),
+					)}
+					commands={commands}
+					childrenByParent={childrenByParent}
+					isEntryCollapsed={isEntryCollapsed}
+					key={row.key}
+					lastReply={inlineReplyKeys.has(row.key)}
+					messageId={rowMessageId(row)}
+					onDiscardPrompt={onDiscardPrompt}
+					onFork={onFork}
+					onRespond={onRespond}
+					onRetryPrompt={onRetryPrompt}
+					onToggleEntry={onToggleEntry}
+					rendered={
+						recent ||
+						row.key === anchorRowKey ||
+						seenRowKeys.has(row.key) ||
+						row.key === find.currentRowKey ||
+						row.key === revealRowKey ||
+						row.key === carriedRowKey
+					}
+					row={row}
+					rowRef={transcriptWindow.rowRef(row.key)}
+					snapshot={snapshot}
+				/>
+			);
+		});
 
 	return (
 		<MessageScroller.Root className="relative flex min-h-0 min-w-0 flex-1 flex-col">
-			<MessageScroller.Viewport
-				aria-label={t({ message: "Messages" })}
-				className={cn(
-					"min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
-					CHAT_SCROLLER_GUTTER_CLASSNAME,
-				)}
-				onCopy={copySourceText}
-				onKeyDown={onViewportKeyDown}
-				onPointerDown={onViewportPointerDown}
-				onTouchMove={markReaderScroll}
-				onWheel={markReaderScroll}
-				ref={viewportRef}
-				style={
-					{ "--scrollbar-gutter": `${scrollbarGutter}px` } as CSSProperties
-				}
-			>
-				{hasOlder && (
-					<div
+			<ChatImageGalleryProvider images={gallery}>
+				<TranscriptFindBar
+					currentIndex={find.currentIndex}
+					inputRef={find.inputRef}
+					isOpen={find.isOpen}
+					loading={
+						find.loading || (find.isOpen && hasOlder && !olderPages.failed)
+					}
+					matchCount={find.matchCount}
+					onClose={find.close}
+					onNext={find.next}
+					onPrevious={find.previous}
+					onQueryChange={find.setQuery}
+					query={find.query}
+				/>
+				<MessageScroller.Viewport
+					aria-label={t({ message: "Messages" })}
+					className={cn(
+						"min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
+						CHAT_SCROLLER_GUTTER_CLASSNAME,
+					)}
+					onCopy={copySourceText}
+					onKeyDown={onViewportKeyDown}
+					onPointerDown={onViewportPointerDown}
+					onTouchMove={markReaderScroll}
+					onWheel={markReaderScroll}
+					ref={viewportRef}
+					style={
+						{ "--scrollbar-gutter": `${scrollbarGutter}px` } as CSSProperties
+					}
+				>
+					{hasOlder && (
+						<div
+							className={cn(
+								CHAT_COLUMN_CLASSNAME,
+								"flex h-10 items-center justify-center",
+							)}
+							ref={olderPages.sentinelRef}
+						>
+							{olderPages.failed ? (
+								<Button onClick={olderPages.retry} size="sm" variant="ghost">
+									<Trans>Couldn't load earlier messages. Retry</Trans>
+								</Button>
+							) : (
+								olderPages.loading && <Spinner className="size-4" />
+							)}
+						</div>
+					)}
+					{transcriptWindow.startIndex > 0 && (
+						<div
+							aria-hidden="true"
+							ref={transcriptWindow.spacerRef}
+							style={{ height: transcriptWindow.spacerHeight }}
+						/>
+					)}
+					<MessageScroller.Content
 						className={cn(
 							CHAT_COLUMN_CLASSNAME,
-							"flex h-10 items-center justify-center",
+							"flex select-text flex-col pt-4 pb-8",
 						)}
-						ref={olderPages.sentinelRef}
 					>
-						{olderPages.failed ? (
-							<Button onClick={olderPages.retry} size="sm" variant="ghost">
-								<Trans>Couldn't load earlier messages. Retry</Trans>
-							</Button>
-						) : (
-							olderPages.loading && <Spinner className="size-4" />
-						)}
-					</div>
-				)}
-				<MessageScroller.Content
-					className={cn(
-						CHAT_COLUMN_CLASSNAME,
-						"flex select-text flex-col pt-4 pb-8",
-					)}
-				>
-					{contentChildren}
-				</MessageScroller.Content>
-			</MessageScroller.Viewport>
-			<div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
-				<ScrollToBottomButton />
-			</div>
+						{contentChildren}
+					</MessageScroller.Content>
+				</MessageScroller.Viewport>
+				<div className="pointer-events-none absolute inset-x-0 bottom-9 flex justify-center">
+					<ScrollToBottomButton />
+				</div>
+			</ChatImageGalleryProvider>
 		</MessageScroller.Root>
 	);
 }

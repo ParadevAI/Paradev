@@ -26,7 +26,7 @@ Group only when the underlying cause is plausibly identical. Two issues that bot
 "page is slow" are the same report only if they are slow for the same reason; merging them
 buries whichever one nobody reproduced.
 
-When you are unsure, link them as related and say why rather than merging. An incorrect merge
+When you are unsure, link them as related (`save_issue` with `relatedTo`) and say why rather than merging. An incorrect merge
 loses an issue silently, and nobody goes looking for what they think is already tracked.
 
 ## 3. Pick the survivor deliberately
@@ -47,7 +47,7 @@ or on the set if the user prefers, before the first write.
 
 Anything only present on the duplicate — reproduction steps, a customer name, a log line, a
 subscriber who wants to know when it is fixed — goes onto the survivor first. Then close the
-duplicate with a comment pointing at it, so someone arriving from a search or an old link
+duplicate with `save_issue` and `duplicateOf: <survivor>`, plus a comment pointing at it, so someone arriving from a search or an old link
 lands somewhere useful.
 
 Never delete. A closed issue with a pointer is how the next person's search finds the survivor.

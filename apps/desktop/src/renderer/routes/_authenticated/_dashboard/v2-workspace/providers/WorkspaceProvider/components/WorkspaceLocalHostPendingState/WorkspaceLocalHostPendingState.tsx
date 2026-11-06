@@ -28,7 +28,7 @@ export function WorkspaceLocalHostPendingState({ hostId }: { hostId: string }) {
 				}),
 				{
 					description: t({
-						message: `${error.message} — try the Superset tray menu > Host Service > Restart.`,
+						message: `${error.message} — try the Paradev tray menu > Host Service > Restart.`,
 					}),
 				},
 			);

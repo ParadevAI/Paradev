@@ -7,6 +7,7 @@ import {
 import posthog from "posthog-js";
 
 import { env } from "@/env";
+import { stripAuthProviderReferrer } from "@/lib/auth-provider-referrer";
 import { registerBaseProperties } from "@/lib/posthog-client";
 
 posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
@@ -21,6 +22,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	person_profiles: "always",
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
+	before_send: stripAuthProviderReferrer,
 });
 
 registerBaseProperties();

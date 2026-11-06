@@ -606,6 +606,8 @@ describe("env", () => {
 			"CLERK_SECRET_KEY",
 			"SSL_CERT_FILE",
 			"SUPERSET_HOME_DIR",
+			"TERM_PROGRAM",
+			"TERM_PROGRAM_VERSION",
 		];
 
 		beforeEach(() => {
@@ -671,9 +673,12 @@ describe("env", () => {
 		});
 
 		describe("terminal metadata", () => {
-			it("should set TERM_PROGRAM to kitty", () => {
+			it("should claim no terminal identity, even one inherited from Electron", () => {
+				process.env.TERM_PROGRAM = "vscode";
+				process.env.TERM_PROGRAM_VERSION = "1.105.0";
 				const result = buildTerminalEnv(baseParams);
-				expect(result.TERM_PROGRAM).toBe("kitty");
+				expect(result.TERM_PROGRAM).toBeUndefined();
+				expect(result.TERM_PROGRAM_VERSION).toBeUndefined();
 			});
 
 			it("should set COLORTERM to truecolor", () => {
@@ -681,7 +686,7 @@ describe("env", () => {
 				expect(result.COLORTERM).toBe("truecolor");
 			});
 
-			it("should set Superset-specific env vars", () => {
+			it("should set Paradev-specific env vars", () => {
 				const result = buildTerminalEnv(baseParams);
 
 				expect(result.SUPERSET_PANE_ID).toBe("pane-1");

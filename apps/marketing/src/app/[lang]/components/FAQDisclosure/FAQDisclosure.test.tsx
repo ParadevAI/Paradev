@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
+import type { MessageDescriptor } from "@lingui/core";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PRICING_FAQ_ITEMS } from "../../pricing/constants";
-import { FAQ_ITEMS, faqSourceText } from "../FAQSection/constants";
+import { FAQ_ITEMS } from "../FAQSection/constants";
 import { FAQDisclosure } from "./FAQDisclosure";
+
+const faqSourceText = (descriptor: MessageDescriptor) =>
+	descriptor.message ?? "";
 
 describe("FAQ disclosure server content", () => {
 	for (const [name, items] of [

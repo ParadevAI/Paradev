@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function scrollParentFits(element: HTMLElement): boolean {
 	const viewport = element.parentElement;
@@ -8,14 +8,32 @@ function scrollParentFits(element: HTMLElement): boolean {
 export function useLoadOlderOnReach({
 	hasOlder,
 	onLoadOlder,
+	eager = false,
 }: {
 	hasOlder: boolean;
 	onLoadOlder: () => Promise<boolean>;
+	/** Page everything in without waiting for the reader to reach the top. */
+	eager?: boolean;
 }) {
 	const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [failed, setFailed] = useState(false);
 	const leftView = useRef(false);
+
+	const load = useCallback(() => {
+		setLoading(true);
+		void onLoadOlder()
+			.catch(() => false)
+			.then((loaded) => {
+				setLoading(false);
+				if (!loaded) setFailed(true);
+			});
+	}, [onLoadOlder]);
+
+	useEffect(() => {
+		if (!eager || !hasOlder || loading || failed) return;
+		load();
+	}, [eager, hasOlder, loading, failed, load]);
 
 	useEffect(() => {
 		if (!sentinel || !hasOlder || loading || failed) return;
@@ -31,20 +49,14 @@ export function useLoadOlderOnReach({
 			active = false;
 			leftView.current = false;
 			observer.disconnect();
-			setLoading(true);
-			void onLoadOlder()
-				.catch(() => false)
-				.then((loaded) => {
-					setLoading(false);
-					if (!loaded) setFailed(true);
-				});
+			load();
 		});
 		observer.observe(sentinel);
 		return () => {
 			active = false;
 			observer.disconnect();
 		};
-	}, [sentinel, hasOlder, loading, failed, onLoadOlder]);
+	}, [sentinel, hasOlder, loading, failed, load]);
 
 	return {
 		sentinelRef: setSentinel,

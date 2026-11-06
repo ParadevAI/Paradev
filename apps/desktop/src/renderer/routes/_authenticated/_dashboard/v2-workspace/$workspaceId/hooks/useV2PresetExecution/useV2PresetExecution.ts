@@ -4,8 +4,13 @@ import type { CreatePaneInput, Pane, WorkspaceStore } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useLiveQuery } from "@tanstack/react-db";
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
+import {
+	useV2AgentConfigs,
+	v2AgentConfigsQueryOptions,
+} from "renderer/hooks/useV2AgentConfigs";
 import {
 	findLinkedAgent,
 	resolvePresetLaunchCommands,
@@ -24,6 +29,7 @@ import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { OpenAgentChat } from "../useAgentSessionLauncher";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
+import { isLinkedPresetLaunchable } from "./utils/linkedPresetGating";
 
 function makeTerminalPane(
 	terminalId: string,
@@ -106,7 +112,7 @@ export function useV2PresetExecution({
 	);
 	const sendToTerminal = workspaceTrpc.terminal.send.useMutation();
 
-	const { data: allPresets = [] } = useLiveQuery(
+	const { data: storedPresets = [] } = useLiveQuery(
 		(query) =>
 			query
 				.from({ v2TerminalPresets: collections.v2TerminalPresets })
@@ -119,6 +125,22 @@ export function useV2PresetExecution({
 	// already invalidated by mutations in the agents settings page.
 	const { activeHostUrl } = useLocalHostService();
 	const { data: agents = [] } = useV2AgentConfigs(activeHostUrl);
+	const { data: unfilteredAgents } = useQuery({
+		...v2AgentConfigsQueryOptions(activeHostUrl),
+		enabled: !!activeHostUrl,
+	});
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const allPresets = useMemo(
+		() =>
+			storedPresets.filter((preset) =>
+				isLinkedPresetLaunchable(
+					preset,
+					unfilteredAgents,
+					isAgentPresetEnabled,
+				),
+			),
+		[storedPresets, unfilteredAgents, isAgentPresetEnabled],
+	);
 
 	const matchedPresets = useMemo(
 		() => filterMatchingPresetsForProject(allPresets, projectId),
@@ -146,6 +168,15 @@ export function useV2PresetExecution({
 			preset: V2TerminalPresetRow,
 			options?: { target?: "new-tab" | "active-tab" },
 		) => {
+			if (
+				!isLinkedPresetLaunchable(
+					preset,
+					unfilteredAgents,
+					isAgentPresetEnabled,
+				)
+			) {
+				return;
+			}
 			const state = store.getState();
 			const activeTabId = state.activeTabId;
 			const target = options?.target ?? resolveTarget(preset.executionMode);
@@ -314,6 +345,8 @@ export function useV2PresetExecution({
 			workspaceQuery.data?.worktreePath,
 			sendToTerminal,
 			agents,
+			unfilteredAgents,
+			isAgentPresetEnabled,
 			openAgentChat,
 		],
 	);

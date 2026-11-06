@@ -60,6 +60,8 @@ function sameTasks(
 				task.id === prior[index]?.id &&
 				task.name === prior[index]?.name &&
 				task.canStop === prior[index]?.canStop &&
+				task.canBackground === prior[index]?.canBackground &&
+				task.subagentStatus === prior[index]?.subagentStatus &&
 				(!withDetail || task.detail === prior[index]?.detail),
 		)
 	);
@@ -240,8 +242,13 @@ export function createChatAgentBridge(
 			if (!isDurableEnvelope(envelope)) return;
 			const event = envelope.event;
 			if (event.type === "item") {
-				const { kind, text } = event.item;
-				if (kind === "agent_message" && typeof text === "string") {
+				ctx.terminalAgentStore.noteActivity(chat.workspaceId);
+				const { kind, text, parentItemId } = event.item;
+				if (
+					kind === "agent_message" &&
+					typeof text === "string" &&
+					!parentItemId
+				) {
 					chat.lastReply = text.slice(0, MAX_PREVIEW_LENGTH);
 				}
 				return;

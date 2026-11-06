@@ -54,7 +54,7 @@ export function LeaderboardTable({
 					{emptyReason === "search" ? (
 						<Trans>Only people who opted in appear here.</Trans>
 					) : (
-						<Trans>Opt in from Superset under Settings → Account.</Trans>
+						<Trans>Opt in from Paradev under Settings → Account.</Trans>
 					)}
 				</p>
 				{emptyReason === "search" ? (

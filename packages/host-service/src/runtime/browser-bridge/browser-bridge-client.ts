@@ -1,9 +1,28 @@
 import { TRPCError } from "@trpc/server";
 import type { BrowserBridgeConfig } from "../../types";
 import { bridgeErrorDetail, bridgeFetch } from "./bridge-fetch";
-import type { BrowserPane, ConsoleEntry } from "./types";
+import type {
+	BrowserExtension,
+	BrowserExtensionInstall,
+	BrowserPane,
+	ConsoleEntry,
+} from "./types";
 
-export type { BrowserPane, ConsoleEntry } from "./types";
+export type {
+	BrowserExtension,
+	BrowserExtensionInstall,
+	BrowserPane,
+	ConsoleEntry,
+} from "./types";
+
+// A missing pane or a not-yet-open workspace is a caller-fixable precondition, not an internal fault.
+const BRIDGE_ERROR_CODES: Partial<Record<number, TRPCError["code"]>> = {
+	403: "FORBIDDEN",
+	404: "NOT_FOUND",
+	408: "TIMEOUT",
+	503: "PRECONDITION_FAILED",
+	504: "NOT_FOUND",
+};
 
 /**
  * Thin HTTP client for the desktop's browser bridge. The bridge is the only
@@ -27,12 +46,7 @@ export class BrowserBridgeClient {
 		);
 		if (!res.ok) {
 			throw new TRPCError({
-				// A missing pane / not-yet-open workspace is a caller-fixable
-				// precondition, not an internal fault.
-				code:
-					res.status === 404 || res.status === 504
-						? "NOT_FOUND"
-						: "BAD_REQUEST",
+				code: BRIDGE_ERROR_CODES[res.status] ?? "BAD_REQUEST",
 				message:
 					bridgeErrorDetail(res.body) ?? `Browser bridge error (${res.status})`,
 			});
@@ -114,6 +128,36 @@ export class BrowserBridgeClient {
 		}>("POST", `/panes/${encodeURIComponent(paneId)}/import-cookies`, {
 			workspaceId,
 			sourceId,
+		});
+	}
+
+	listExtensions() {
+		return this.request<{ extensions: BrowserExtension[] }>(
+			"GET",
+			"/extensions",
+		);
+	}
+
+	installExtension(extensionId: string) {
+		return this.request<BrowserExtensionInstall>(
+			"POST",
+			"/extensions/install",
+			{
+				extensionId,
+			},
+		);
+	}
+
+	removeExtension(extensionId: string) {
+		return this.request<{ ok: true }>("POST", "/extensions/remove", {
+			extensionId,
+		});
+	}
+
+	setExtensionPinned(extensionId: string, pinned: boolean) {
+		return this.request<{ ok: true }>("POST", "/extensions/pin", {
+			extensionId,
+			pinned,
 		});
 	}
 }
