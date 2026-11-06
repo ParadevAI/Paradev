@@ -58,7 +58,7 @@ async function main(): Promise<void> {
 	// into hosts it spawns. Fire-and-forget for the same reason as the base-env
 	// resolution above; git/gh calls racing the probe just see the launcher env
 	// once, same as before this merge existed.
-	void applyLoginShellEnvToProcess();
+	const loginShellEnvApplied = applyLoginShellEnvToProcess();
 
 	// Fire-and-track: kick off pty-daemon spawn-or-adopt without blocking
 	// host-service startup. Terminal request handlers `await
@@ -72,6 +72,8 @@ async function main(): Promise<void> {
 	// spawns (with its per-agent disable settings); this covers CLI/systemd
 	// launches, which previously had no notify hooks or shell wrappers (#6254).
 	await provisionAgentIntegrations();
+	// Setup skips agents absent from PATH; the login-shell PATH can reveal more.
+	void loginShellEnvApplied.then(() => provisionAgentIntegrations());
 
 	const configTokenSource = env.SUPERSET_AUTH_CONFIG_PATH
 		? new ConfigFileSessionTokenSource({

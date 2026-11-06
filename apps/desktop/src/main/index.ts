@@ -106,7 +106,7 @@ import {
 console.log("[main] Local database ready:", !!localDb);
 const IS_DEV = process.env.NODE_ENV === "development";
 
-void applyShellEnvToProcess().catch((error) => {
+const shellEnvApplied = applyShellEnvToProcess().catch((error) => {
 	console.error("[main] Failed to apply shell environment:", error);
 });
 
@@ -666,16 +666,27 @@ if (!gotTheLock) {
 			// The vite build copies @superset/agent-setup's templates (plus the
 			// bundled Claude plugin) next to this bundle; see vite/helpers.ts.
 			setAgentSetupTemplatesDir(path.join(__dirname, "templates"));
-			const settingsRow = localDb.select().from(settings).get();
-			const disabledAgentHooks = settingsRow?.disabledAgentHooks ?? [];
-			const disabledSkills = settingsRow?.disabledSkills ?? [];
-			// Mirror the disable lists so CLI-launched host-services on this
-			// machine honor them instead of re-provisioning disabled agents/skills.
-			writeSharedDisabledAgentIds(disabledAgentHooks);
-			writeSharedDisabledSkillIds(disabledSkills);
-			setupAgentIntegrations({
-				disabledAgentIds: disabledAgentHooks,
-				disabledSkillIds: disabledSkills,
+			const setupAgentIntegrationsFromSettings = () => {
+				const settingsRow = localDb.select().from(settings).get();
+				const disabledAgentHooks = settingsRow?.disabledAgentHooks ?? [];
+				const disabledSkills = settingsRow?.disabledSkills ?? [];
+				// Mirror the disable lists so CLI-launched host-services on this
+				// machine honor them instead of re-provisioning disabled agents/skills.
+				writeSharedDisabledAgentIds(disabledAgentHooks);
+				writeSharedDisabledSkillIds(disabledSkills);
+				setupAgentIntegrations({
+					disabledAgentIds: disabledAgentHooks,
+					disabledSkillIds: disabledSkills,
+				});
+			};
+			setupAgentIntegrationsFromSettings();
+			// Setup skips agents absent from PATH; the shell PATH can reveal more.
+			void shellEnvApplied.then(() => {
+				try {
+					setupAgentIntegrationsFromSettings();
+				} catch (error) {
+					console.error("[main] Failed to set up agent integrations:", error);
+				}
 			});
 		} catch (error) {
 			console.error("[main] Failed to set up agent integrations:", error);

@@ -3,6 +3,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
+	createClaudeSettingsJson,
+	createCodexHooksJson,
+	getClaudeGlobalSettingsJsonPath,
+	getCodexGlobalHooksJsonPath,
+} from "./agent-wrappers-claude-codex-opencode";
+import {
 	getManagedNotifyHookCommand,
 	MANAGED_NOTIFY_COMMAND_LABEL,
 } from "./agent-wrappers-common";
@@ -14,6 +20,7 @@ import {
 	createGeminiSettingsJson,
 	getGeminiSettingsJsonPath,
 } from "./agent-wrappers-gemini";
+import { createManagedSkills } from "./managed-skills";
 
 const ORIGINAL_ENV = {
 	HOME: process.env.HOME,
@@ -58,6 +65,34 @@ describe("ensureManagedJsonHooks", () => {
 		createDevinConfigJson();
 
 		expect(fs.existsSync(path.dirname(getDevinConfigJsonPath()))).toBe(false);
+	});
+
+	it("stays absent across boots although Paradev's own files create the config dirs", async () => {
+		const home = path.join(root, "home");
+		const boot = async () => {
+			await createManagedSkills({ homeDir: home, pluginSources: [] });
+			fs.mkdirSync(path.join(home, ".codex"), { recursive: true });
+			fs.writeFileSync(path.join(home, ".codex", "config.toml"), "");
+			createClaudeSettingsJson();
+			createCodexHooksJson();
+		};
+
+		await boot();
+		await boot();
+
+		expect(fs.existsSync(path.join(home, ".claude", "skills"))).toBe(true);
+		expect(fs.existsSync(getClaudeGlobalSettingsJsonPath())).toBe(false);
+		expect(fs.existsSync(getCodexGlobalHooksJsonPath())).toBe(false);
+	});
+
+	it("counts a path only the agent creates as installed", () => {
+		fs.mkdirSync(path.join(root, "home", ".claude", "projects"), {
+			recursive: true,
+		});
+
+		createClaudeSettingsJson();
+
+		expect(fs.existsSync(getClaudeGlobalSettingsJsonPath())).toBe(true);
 	});
 
 	it("does not take a directory another agent shares as proof of install", () => {

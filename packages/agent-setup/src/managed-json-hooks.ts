@@ -16,10 +16,13 @@ export interface ManagedJsonHooksSpec<Entry> {
 	/** Agent label for teardown logs, e.g. "Claude". */
 	agentLabel: string;
 	getFilePath(): string;
-	/** With no config dir and none of these on PATH, setup writes nothing. */
+	/**
+	 * Without the config file, one of these binaries on PATH, or one of
+	 * agentOwnedPaths, the agent counts as absent and setup writes nothing.
+	 */
 	binaryNames: readonly string[];
-	/** Path whose existence marks the agent installed; defaults to the config's dir. */
-	installMarkerPath?(): string;
+	/** Paths the agent creates and Paradev never does (config dirs get our skills and MCP files). */
+	agentOwnedPaths?(): readonly string[];
 	/**
 	 * Key of the event→entries map on the root object, or null when the root
 	 * object itself is the event map (Mastra).
@@ -133,9 +136,9 @@ export function getManagedJsonHooksContent<Entry>(
 
 function isAgentInstalled<Entry>(spec: ManagedJsonHooksSpec<Entry>): boolean {
 	return (
-		fs.existsSync(
-			spec.installMarkerPath?.() ?? path.dirname(spec.getFilePath()),
-		) || isRealBinaryOnPath(spec.binaryNames)
+		fs.existsSync(spec.getFilePath()) ||
+		(spec.agentOwnedPaths?.() ?? []).some((marker) => fs.existsSync(marker)) ||
+		isRealBinaryOnPath(spec.binaryNames)
 	);
 }
 

@@ -121,6 +121,9 @@ function claudeHooksSpec(
 		agentLabel: "Claude",
 		getFilePath: getClaudeGlobalSettingsJsonPath,
 		binaryNames: ["claude"],
+		agentOwnedPaths: () => [
+			path.join(resolveUserHomeDir(), ".claude", "projects"),
+		],
 		eventsContainerKey: "hooks",
 		desiredEntriesByEvent,
 		cleanEntry: (definition) =>
@@ -176,6 +179,7 @@ export function ensureClaudeManagedHooksAt(configDir: string): void {
 	ensureManagedJsonHooks({
 		...claudeHooksSpec(getNotifyScriptPath()),
 		getFilePath: () => path.join(configDir, "settings.json"),
+		agentOwnedPaths: () => [configDir],
 	});
 }
 
@@ -223,6 +227,13 @@ function codexHooksSpec(
 		agentLabel: "Codex",
 		getFilePath: getCodexGlobalHooksJsonPath,
 		binaryNames: ["codex"],
+		agentOwnedPaths: () => {
+			const codexHome = path.join(resolveUserHomeDir(), ".codex");
+			return [
+				path.join(codexHome, "sessions"),
+				path.join(codexHome, "auth.json"),
+			];
+		},
 		eventsContainerKey: "hooks",
 		// Guarded on SUPERSET_HOME_DIR so the hook is a no-op in codex sessions
 		// launched outside Superset terminals. Superset terminals without the
@@ -287,6 +298,7 @@ export function ensureCodexManagedHooksAt(codexHome: string): void {
 	ensureManagedJsonHooks({
 		...codexHooksSpec(getNotifyScriptPath()),
 		getFilePath: () => path.join(codexHome, "hooks.json"),
+		agentOwnedPaths: () => [codexHome],
 	});
 }
 

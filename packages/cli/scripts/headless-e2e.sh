@@ -22,7 +22,7 @@
 #      tear down (and re-enabling restores) per-agent hook configs.
 #   7. Two hosts provisioning concurrently leave valid, deduplicated configs.
 #
-# DESTRUCTIVE: wipes $HOME/.paradev, $HOME/.superset, ~/.claude, ~/.agents, ~/.codex,
+# DESTRUCTIVE: wipes $HOME/.paradev, $HOME/.superset, ~/.claude, ~/.agents, ~/.codex, ~/.config/devin,
 # ~/.gemini and appends to the login-shell profile. Only runs when
 # SUPERSET_HEADLESS_E2E=1 — set by build-dist-linux-docker.sh (throwaway
 # container) and by the Linux jobs in .github/workflows/build-cli.yml
@@ -44,7 +44,15 @@ if [[ "$(uname -s)" != "Linux" ]]; then
 fi
 
 # ── Fixture: a fresh home with login-shell-only env additions ────────────
-rm -rf "$HOME/.paradev" "$HOME/.superset" "$HOME/.claude" "$HOME/.agents" "$HOME/.codex" "$HOME/.gemini"
+rm -rf "$HOME/.paradev" "$HOME/.superset" "$HOME/.claude" "$HOME/.agents" "$HOME/.codex" "$HOME/.gemini" "$HOME/.config/devin"
+# Setup writes hooks only for agents it can find, so the ones asserted below
+# are on the host's PATH; devin stays absent and must get no config.
+AGENT_STUBS_DIR="${TMPDIR:-/tmp}/superset-e2e-agent-stubs/bin"
+mkdir -p "$AGENT_STUBS_DIR"
+for agent in claude codex droid gemini mastracode; do
+  printf '#!/bin/sh\nexit 0\n' > "$AGENT_STUBS_DIR/$agent"
+  chmod +x "$AGENT_STUBS_DIR/$agent"
+done
 FAKE_TOOLS_DIR="${TMPDIR:-/tmp}/superset-e2e-fake-tools/bin"
 mkdir -p "$FAKE_TOOLS_DIR"
 # bash login shells read .bash_profile and ignore .profile when both exist.
@@ -79,7 +87,7 @@ boot_host() {
   local org="$1" db="$2" log="$3" port="$4"
   shift 4
   env -i \
-    PATH=/usr/sbin:/usr/bin:/sbin:/bin \
+    PATH="/usr/sbin:/usr/bin:/sbin:/bin:$AGENT_STUBS_DIR" \
     HOME="$HOME" \
     SHELL=/bin/bash \
     ORGANIZATION_ID="$org" \
@@ -158,6 +166,7 @@ echo "[e2e] === assert: managed hook configs ==="
 '
 test -f "$HOME/.codex/hooks.json"
 test -f "$HOME/.gemini/settings.json"
+[[ ! -e "$HOME/.config/devin" ]] || { echo "[e2e] FAIL config written for absent agent devin"; exit 1; }
 
 echo "[e2e] === assert: managed skills from bundled templates ==="
 test -f "$HOME/.claude/skills/superset/skills/doctor/SKILL.md"

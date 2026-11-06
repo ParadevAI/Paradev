@@ -43,6 +43,7 @@ const otherToolHooks = {
 describe("agy hooks.json", () => {
 	it("registers PreInvocation and Stop with the event carried in the command", () => {
 		mkdirSync(path.dirname(getAgyHooksJsonPath()), { recursive: true });
+		writeFileSync(getAgyHooksJsonPath(), "{}");
 		createAgyHooksJson();
 
 		const managed = readHooks()[AGY_HOOKS_NAME];
