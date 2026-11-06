@@ -25,7 +25,8 @@ export const HIGHLIGHTS: Highlight[] = [
 	},
 	{
 		title: "Chat",
-		detail: "A chat UI built for agents. Picks up your Claude Code sessions.",
+		detail:
+			"A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions.",
 	},
 	{
 		title: "Cloud",
@@ -144,7 +145,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 		beta: true,
 	},
 	{
-		label: "Chat UI",
+		label: "Chat interface",
 		paradev: "Yes, resumes Claude Code sessions",
 		conductor: "Yes",
 	},
