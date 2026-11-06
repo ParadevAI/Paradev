@@ -46,6 +46,7 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"environment.list",
 	"environment.secrets.list",
 	"githubUser.get",
+	"host.cloudWorkspaceAccess",
 	"host.list",
 	"host.relayEndpoint",
 	"integration.github.getInstallation",

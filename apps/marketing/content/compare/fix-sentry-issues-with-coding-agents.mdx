@@ -2,7 +2,7 @@
 title: "How to Have Coding Agents Pick Up New Sentry Issues Automatically (2026)"
 description: "Start Claude Code or Codex on every new Sentry error so it reproduces the bug in a test and opens a draft pull request. Paradev automations, Sentry Seer, and GitHub Copilot compared."
 date: 2026-10-30
-lastUpdated: 2026-10-30
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - sentry-seer
@@ -86,7 +86,7 @@ Start narrow. A noisy Sentry project can create dozens of issues an hour, and ea
 
 ## What should I know before I leave it running?
 
-- **The device must be online.** Runs fire on the device you picked. If it is asleep or offline when Sentry reports the issue, the run is recorded as missed and is not retried. Use a machine that stays on, such as a Mac mini or a Linux server running `superset start --daemon`, or pick **Cloud** as the device if your account has cloud workspaces (early access).
+- **The device must be online.** Runs fire on the device you picked. If it is asleep or offline when Sentry reports the issue, the run is recorded as missed and is not retried. Use a machine that stays on, such as a Mac mini or a Linux server running `superset start --daemon`, or pick **Cloud** as the device if your account has cloud workspaces (beta).
 - **Runs can be delivered twice.** Delivery is at least once. The "if a pull request already exists, stop" line catches most repeats, but two runs that start at the same moment can both pass it, so a duplicate pull request is still possible. Close the extra one.
 - **A created run is not a fixed bug.** The run history shows that the workspace was created, not whether the agent's fix is right. Read the test and the diff.
 - **Production data.** The event payload can include request data or user details that Sentry captured. It goes into the agent's prompt, so set Sentry's data scrubbing to match what you are willing to send to your model provider.
@@ -95,7 +95,7 @@ Start narrow. A noisy Sentry project can create dozens of issues an hour, and ea
 
 | Option | Who does the analysis | Who writes the fix | Where it runs |
 | --- | --- | --- | --- |
-| Paradev automation on Sentry issues | Your agent (Claude Code, Codex, or another CLI agent), with your prompt | The same agent | Your machine, a shared host, or a cloud workspace |
+| Paradev automation on Sentry issues | Your agent (Claude Code, Codex, or another CLI agent), with your prompt | The same agent | Your machine, a shared host, your own Linux server (Bring Your Own Cloud), or a cloud workspace (beta) |
 | [Sentry Seer Autofix](https://docs.sentry.io/product/ai-in-sentry/seer/) | Seer, with Sentry's traces, logs, and profiles | Seer, or a handoff to Claude, Cursor Cloud Agents, or GitHub Copilot agents | Sentry and the chosen agent's environment |
 | Sentry MCP server in your own agent | Your agent, when you ask it | Your agent | Wherever you run it, started by hand |
 | [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) | Copilot, in a session started from a GitHub issue | Copilot | GitHub |

@@ -121,7 +121,7 @@ export interface ChatPaneData {
 	queuedPrompts?: UserContent[][];
 	launchPrompt?: string;
 	chatModelId?: string;
-	chatModelLabel?: string;
+	chatEffortId?: string;
 	chatModeId?: string;
 	chatTitle?: string;
 	/** A Paradev agent's session: the pane reads it from the agent session store, not the host. */

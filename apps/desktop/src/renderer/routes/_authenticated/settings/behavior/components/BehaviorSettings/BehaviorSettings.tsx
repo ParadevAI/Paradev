@@ -17,6 +17,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
 
@@ -139,6 +140,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 					SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT,
 					visibleItems,
 				) && <AgentSessionPlacementSetting searchQuery={searchQuery} />}
+
+				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
+					<AcpChatSetting />
+				)}
 
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">

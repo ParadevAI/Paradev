@@ -1,0 +1,173 @@
+---
+title: "Best Jules Alternatives in 2026"
+description: "Google Jules winds down on December 31, 2026. The best alternatives for asynchronous coding agents, including Paradev, Google Antigravity, Codex cloud, GitHub Copilot, Cursor Cloud Agents, Devin, and Claude Code on the web, compared by where agents run, which agents you can use, and license."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "roundup"
+competitors:
+  - jules
+  - antigravity
+  - codex
+  - github-copilot
+  - cursor
+  - devin
+  - claude-code
+keywords:
+  - jules alternative
+  - jules alternatives
+  - google jules alternative
+  - jules shutting down
+  - jules shutdown
+  - jules turndown
+  - jules read-only
+  - migrate from jules
+  - jules vs antigravity
+  - asynchronous coding agent
+  - cloud coding agent
+---
+
+On October 29, 2026, Google announced that Jules will wind down on December 31, 2026. You can finish your sessions until November 11, 2026. After that date, Jules is read-only until the end of the year. Google says Jules was an experiment in asynchronous coding agents, and that what it learned now shapes other Google products, including Google Antigravity. See the [Jules changelog](https://jules.google/docs/changelog/).
+
+Jules took a GitHub repository, cloned it into a cloud VM, planned the work with Gemini, and opened a pull request. If you need a new home for that workflow, Paradev runs the CLI agents you already use in parallel workspaces, and [cloud workspaces](/cloud) (beta) keep those agents working when your laptop is closed.
+
+**Our recommendation: choose Paradev if you want agents that keep working in the cloud, with any CLI agent, and the option to run on your own machines or your own cloud account.** The alternatives below cover other needs, including single-vendor cloud agents.
+
+[Download Paradev](/download) to try a small task. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Where agents run | Agents | License |
+|---|---|---|---|---|
+| **Jules** | Existing users only; read-only after November 11, 2026 | Google cloud VM | Jules (Gemini) | Proprietary |
+| **Paradev** | Any CLI agent in parallel, locally or in the cloud, with review and automations | Your machine, your hosts, your own Linux server (BYOC), or cloud workspaces (beta) | Claude Code, Codex, Gemini CLI, Cursor Agent, Copilot CLI, OpenCode, Amp, custom commands | Open source (MIT) |
+| **Google Antigravity** | Google's agent-first desktop app | Your machine | Antigravity's agent | Proprietary |
+| **Codex cloud** | OpenAI's cloud tasks on a ChatGPT plan | OpenAI cloud, or your machine | Codex | Proprietary app; open-source CLI |
+| **GitHub Copilot** | Cloud sessions inside GitHub | GitHub Actions | Copilot | Proprietary |
+| **Cursor Cloud Agents** | Cloud agents tied to an editor | Cursor cloud VMs | Cursor's agent | Proprietary |
+| **Devin** | A managed autonomous agent with team intake | Devin's workspace | Devin | Proprietary |
+| **Claude Code on the web** | Claude Code sessions in the cloud | Anthropic cloud, or your own environment | Claude Code | Proprietary |
+
+## What the Jules Wind-Down Means
+
+These are the dates in Google's notice:
+
+| Date | What changes |
+|---|---|
+| October 29, 2026 | Google announces the wind-down. You can export your Jules data. |
+| November 11, 2026 | Last day to continue sessions. After it, Jules is read-only. |
+| December 31, 2026 | Jules winds down. |
+
+The notice says the export covers account settings, environment variables, scheduled tasks, connected repositories, memories, setup scripts, and sessions with their prompts, plans, activity logs, and code patches. Your code, branches, and pull requests stay in GitHub and are not part of the export. The exported environment variables include secret values, so keep that file private. The export uses Jules Tools, the Jules CLI. Follow the steps in the [changelog](https://jules.google/docs/changelog/), and export before you lose access.
+
+The notice does not say that Antigravity replaces Jules, and it does not describe a migration path. It also does not say what happens to your data after December 31, 2026, or what happens to subscriptions.
+
+## Moving Your Jules Setup
+
+Most of a Jules setup moves to a new tool by hand:
+
+- **Setup scripts.** Use your Jules setup script as the setup step in your new tool. In Paradev, a [cloud workspaces](https://docs.paradev.com/cloud-workspaces) environment holds your repositories, variables, and secrets, and you can save a set-up workspace as a snapshot.
+- **Environment variables.** Add them again as secrets in the new tool. Do not commit the exported file.
+- **Scheduled tasks.** Recreate them as scheduled jobs. In Paradev, use [automations](https://docs.paradev.com/automations).
+- **Memories.** Copy useful memories into an instructions file in your repository, such as `AGENTS.md` or `CLAUDE.md`, so every agent reads them.
+
+## The Best Alternatives
+
+### Paradev
+
+Paradev runs any CLI agent, such as Claude Code, Codex, Gemini CLI, Cursor Agent, GitHub Copilot CLI, OpenCode, and Amp, each in its own Git worktree with a persistent terminal session. It uses your own subscriptions and keys, and never proxies model calls. A Changes pane commits, pushes, and opens PRs, and a Pull Requests view shows CI checks and sends line comments back to the agent.
+
+For Jules-style work that continues without you, Paradev has three options:
+
+- **[Cloud workspaces](/cloud) (beta).** Paradev runs a cloud sandbox for you, and agents keep working when your laptop is closed. Start from an environment with up to 20 GitHub repositories, variables, secrets, and a region, then pick a machine size. Cloud workspaces are included with Team and Ultra.
+- **[Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud).** Run the Paradev host on an x64 or arm64 Linux server in your own cloud account. Your repositories and agent sign-ins stay on that server, and it needs no inbound ports.
+- **Remote Access.** Add any macOS or Linux machine you own as a host.
+
+Automations start work on a schedule or from GitHub, Slack, and Linear events, and the [iPhone and iPad app](/mobile) reaches every host. Paradev is open source under the MIT License.
+
+**Best for:** developers who want to keep the agent they choose and decide where it runs.
+
+### Google Antigravity
+
+Antigravity is Google's agent-first desktop app, with a CLI (`agy`) and an SDK. It runs Antigravity's own agent on Gemini and other models, gives each agent a Git worktree, and has background tasks and scheduled Automations. Remote Control lets you drive sessions on your own machines from a web browser. It is free to start, and Google AI Pro and Ultra raise the limits. Google's Jules notice names Antigravity as one of the products that Jules' learnings now shape. Choose it if you want to stay with Google and Gemini.
+
+See [Paradev vs Google Antigravity](/compare/superset-vs-antigravity) or [Best Google Antigravity Alternatives](/compare/antigravity-alternative).
+
+### Codex cloud
+
+Codex cloud runs OpenAI's Codex agent on tasks in the cloud. You pick GitHub repositories, Codex sets up an environment with dependencies, secrets, and network rules, and each task runs in its own workspace. OpenAI's [docs](https://learn.chatgpt.com/docs/cloud) say tasks keep working while your computer is asleep. You review the changes and test results, then commit or open a pull request. You start tasks from the web, desktop, mobile, or CLI. Choose it if you already pay for ChatGPT and want cloud tasks on that plan.
+
+See [Paradev vs Codex App](/compare/superset-vs-codex-app).
+
+### GitHub Copilot
+
+GitHub Copilot can plan changes and do them in the background: it edits files, runs tests and linters, and opens one pull request per task. Sessions run on GitHub Actions, with a limit of 59 minutes per session. You start them from github.com, the Agents tab in a repository, GitHub Mobile, an IDE, or Copilot CLI, and automations can run on a schedule or on repository events. GitHub's [docs](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) say the new Copilot in the cloud experience is available on paid Copilot plans from October 28, 2026. Choose it if your team lives in GitHub and wants the agent there.
+
+See [Paradev vs GitHub Copilot](/compare/superset-vs-github-copilot).
+
+### Cursor Cloud Agents
+
+Cursor Cloud Agents run in isolated cloud VMs with your repositories, dependencies, and secrets, so they keep working when your laptop is offline. They work on a branch and produce PRs with screenshots, videos, and logs. You start them from Cursor's web app, desktop app, iOS app, Slack, GitHub, Linear, or the API. Cursor's [docs](https://cursor.com/docs/cloud-agent) say Cloud Agents need a Premium, Teams, Enterprise, or legacy paid plan. Choose it if you want cloud agents tied to an AI editor.
+
+See [Paradev vs Cursor](/compare/superset-vs-cursor).
+
+### Devin
+
+Devin is Cognition's autonomous software engineer. Each task runs in a Devin workspace with a shell, an IDE, and a browser, and you can watch it work or take over. You can tag Devin in Slack or Teams, give it Linear or Jira tickets, and come back to draft PRs. Choose it if you want a managed agent with team intake.
+
+See [Paradev vs Devin](/compare/superset-vs-devin) or [Best Devin Alternatives](/compare/devin-alternative).
+
+### Claude Code on the web
+
+Claude Code on the web runs Claude Code sessions in the cloud, on Anthropic's infrastructure or on your organization's self-hosted environment. Anthropic's [docs](https://code.claude.com/docs/en/claude-code-on-the-web) say a session keeps running after you close your laptop. You start sessions from claude.ai/code, the Claude mobile app, the desktop app, or `claude --cloud` in your terminal, and you can pull a session back to your terminal with `--teleport`. It is available on Claude Pro, Max, Ultra, and Team plans, and for some Enterprise seats. Choose it if Claude Code is your main agent.
+
+See [Paradev vs Claude Code App](/compare/superset-vs-claude-code-app).
+
+## How To Choose
+
+- For any CLI agent, in the cloud, on your own machines, or in your own cloud account, choose **Paradev**.
+- To stay with Google and Gemini on your desktop, choose **Google Antigravity**.
+- For cloud tasks on your ChatGPT plan, choose **Codex cloud**.
+- For an agent that works inside GitHub and GitHub Actions, choose **GitHub Copilot**.
+- For cloud agents tied to an editor, choose **Cursor Cloud Agents**.
+- For a managed autonomous agent with Slack and ticket intake, choose **Devin**.
+- For Claude Code sessions in the cloud, choose **Claude Code on the web**.
+
+## Verdict
+
+Jules made it easy to hand a GitHub task to a cloud agent and come back to a pull request. Sessions end on November 11, 2026, and the service ends on December 31, 2026. Choose Paradev when you want the same hands-off flow with the agent you pick, in cloud workspaces or on machines you control, with review and automations in one place. Run a small task you gave to Jules before, then compare the pull request. For the wider landscape, see [Where to Run Coding Agents](/compare/where-to-run-coding-agents).
+
+## What To Try First
+
+- **Export from Jules:** follow the steps in the [Jules changelog](https://jules.google/docs/changelog/) before November 11, 2026.
+- **Pick your agent:** launch Gemini CLI, Claude Code, or Codex in a Paradev workspace.
+- **Go to the cloud:** create a [cloud workspace](/cloud) from an environment with your repository and setup script, then close your laptop.
+
+[Download Paradev](/download), then follow the [parallel-task walkthrough](/blog/parallel-coding-agents-guide).
+
+## Frequently Asked Questions
+
+### Is Google Jules shutting down?
+
+Yes. On October 29, 2026, Google announced in the [Jules changelog](https://jules.google/docs/changelog/) that Jules will wind down on December 31, 2026. You can continue sessions until November 11, 2026. After that, Jules is read-only until the end of the year.
+
+### How do I export my data from Jules?
+
+Google's notice describes an export through Jules Tools, the Jules CLI. It saves your settings, environment variables, scheduled tasks, connected repositories, memories, setup scripts, and sessions to a local folder. Your code and pull requests are already in GitHub.
+
+### Is Antigravity the replacement for Jules?
+
+Google says Jules' learnings shape its other products, including Antigravity. The notice does not call Antigravity a replacement or give a migration path. Antigravity is a desktop app that runs agents on your machine.
+
+### What is the best Jules alternative?
+
+For developers who want an agent that keeps working in the cloud, with the agent of their choice, Paradev is our recommendation. For a single-vendor cloud agent, Codex cloud, GitHub Copilot, Cursor Cloud Agents, Devin, and Claude Code on the web are all good options.
+
+### Is there an open-source Jules alternative?
+
+Paradev is open source under the MIT License. The Codex CLI is also open source. The other cloud agents in this guide are proprietary.
+
+### How much does Paradev cost?
+
+Paradev has a free tier. Pro is {{price:pro}} per user/month, Team is {{price:team}}, and Ultra is {{price:ultra}}. Cloud workspaces are included with Team and Ultra. You pay your agent providers for model usage.

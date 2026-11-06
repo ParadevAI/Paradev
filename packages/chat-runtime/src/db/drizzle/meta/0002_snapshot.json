@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "cb6b8987-5445-4211-9144-3ebf1cae9501",
+  "id": "f2149b87-59bc-4d8f-94e2-fed53dcb6cca",
   "prevId": "b8a18ee1-85df-4b1f-aa8b-8cbdba827af3",
   "tables": {
     "chat_journal": {
@@ -53,6 +53,52 @@
             "seq"
           ],
           "name": "chat_journal_session_id_epoch_seq_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "chat_selections": {
+      "name": "chat_selections",
+      "columns": {
+        "harness": {
+          "name": "harness",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "chat_selections_harness_category_pk": {
+          "columns": [
+            "harness",
+            "category"
+          ],
+          "name": "chat_selections_harness_category_pk"
         }
       },
       "uniqueConstraints": {},
@@ -132,14 +178,6 @@
           "notNull": false,
           "autoincrement": false,
           "default": 0
-        },
-        "closed_by_user": {
-          "name": "closed_by_user",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
         }
       },
       "indexes": {

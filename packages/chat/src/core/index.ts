@@ -2,6 +2,7 @@ export * from "./attachmentTags/attachmentTags";
 export * from "./bookkeeping/readBookkeeping";
 export * from "./coalesce";
 export * from "./config/launchConfigSelections";
+export * from "./config/sessionSelections";
 export * from "./continuePrompt/continuePrompt";
 export * from "./harness/harness";
 export * from "./markdown/fenceState";

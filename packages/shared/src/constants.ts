@@ -231,12 +231,6 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
-	 * Legacy gate for the ACP chat pane, replaced by the account's Chat
-	 * experimental setting (`user_settings.experimental_chat`). Read only by released
-	 * desktop and mobile builds; remove it once no live build reads it.
-	 */
-	ACP_CHAT: "acp-chat",
-	/**
 	 * Legacy gate for the CLI mode / Chat mode fork menus, replaced by the account's
 	 * Chat experimental setting. Read only by released desktop builds 2.0.2 and 2.0.3;
 	 * remove it once no live build reads it.

@@ -28,7 +28,7 @@ function explodingRegistry(): HarnessRegistry {
 				prompt: () => undefined,
 				cancelTurn: () => undefined,
 				respondToApproval: () => undefined,
-				setMode: () => undefined,
+				setMode: () => Promise.resolve(true),
 				dispose: async () => undefined,
 			}),
 		],
@@ -283,6 +283,78 @@ describe("replacing a chat whose agent died", () => {
 			"turn-a",
 		]);
 
+		await runtime.dispose();
+	});
+});
+
+describe("replacing a chat keeps its mode", () => {
+	function modeRecordingRuntime() {
+		const startModes: (string | undefined)[] = [];
+		class RecordingHarness extends FakeHarness {
+			override start(options: Parameters<FakeHarness["start"]>[0]) {
+				startModes.push(options.modeId);
+				return super.start(options);
+			}
+		}
+		const harness = () =>
+			new RecordingHarness({
+				start: [
+					{
+						kind: "session",
+						session: { status: "idle", modeId: "bypassPermissions" },
+					},
+				],
+				turns: [],
+			});
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[FAKE_HARNESS, harness],
+				[HARNESS, harness],
+			]),
+		});
+		const create = (
+			harnessId: string,
+			extra: { modeId?: string; replacesSessionId?: string } = {},
+		) =>
+			runtime.commands.createSession({
+				commandId: randomUUID(),
+				scopeId: "workspace-1",
+				harness: harnessId,
+				cwd: "/tmp/workspace",
+				...(extra.modeId ? { modeId: extra.modeId } : {}),
+				...(extra.replacesSessionId
+					? {
+							resume: {
+								harnessSessionId: "agent-1",
+								replacesSessionId: extra.replacesSessionId,
+							},
+						}
+					: {}),
+			});
+		return { runtime, startModes, create };
+	}
+
+	test("a replacement that asks for no mode resumes in the mode the chat it replaces was in", async () => {
+		const { runtime, startModes, create } = modeRecordingRuntime();
+		const source = create(FAKE_HARNESS);
+		await waitFor(
+			() => runtime.live.get(source.sessionId)?.state.status === "idle",
+		);
+		await runtime.commands.closeSession({ sessionId: source.sessionId });
+
+		create(FAKE_HARNESS, { replacesSessionId: source.sessionId });
+		create(FAKE_HARNESS, {
+			replacesSessionId: source.sessionId,
+			modeId: "default",
+		});
+		create(HARNESS, { replacesSessionId: source.sessionId });
+
+		expect(startModes).toEqual([
+			undefined,
+			"bypassPermissions",
+			"default",
+			undefined,
+		]);
 		await runtime.dispose();
 	});
 });

@@ -1,0 +1,136 @@
+---
+title: "Paradev vs Kilo Code (2026): Workspace for Any CLI Agent vs One Agent Everywhere, Cloud Agents Included"
+description: "Compare Paradev and Kilo Code for coding agents: Kilo Cloud Agents in hosted containers vs Paradev workspaces on your machine, your hosts, your own Linux server, or cloud workspaces (beta). Agents, review, triggers, and pricing."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - kilo-code
+keywords:
+  - superset vs kilo code
+  - paradev vs kilo code
+  - kilo code alternative
+  - kilo cloud agents alternative
+  - kilo code cloud agent
+  - kilo cli alternative
+  - background coding agents
+---
+
+Paradev and Kilo Code both let you run coding agents away from your editor, but they start from different places. Kilo Code is one agent. It runs in VS Code, JetBrains, a CLI, a desktop app (beta), and Kilo Cloud Agents, which run the same agent in a Linux container that Kilo hosts. Paradev is a workspace for the agent CLIs you already use, such as Claude Code, Codex, and OpenCode. Each task gets its own Git worktree and terminal, on your Mac, on hosts you add, on your own Linux server, or in a Paradev cloud workspace (beta). Choose Kilo when you want one agent with many models in every surface, plus hosted containers billed per second. Choose Paradev when you want to keep your own agents and subscriptions and choose where each task runs.
+
+This comparison is published by Paradev. Kilo Code details were checked against [kilo.ai](https://kilo.ai), the [Cloud Agents page](https://kilo.ai/features/cloud-agents), the [Cloud Agent docs](https://kilo.ai/docs/advanced-usage/cloud-agent), the [Slack page](https://kilo.ai/features/slack-integration), [pricing](https://kilo.ai/pricing), and the [Kilo-Org/kilocode](https://github.com/Kilo-Org/kilocode) repository and README on November 5, 2026.
+
+## At a Glance
+
+| Requirement | Paradev | Kilo Code |
+|---|---|---|
+| What it is | A workspace that runs any CLI coding agent, one Git worktree per task | One coding agent in VS Code, JetBrains, CLI, Kilo Desktop (beta), Cloud Agents, Slack, and mobile |
+| Agents | Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Kilo's own agent, with Code, Plan, Ask, and Debug modes and custom agents |
+| Models | Whatever your agent uses, on your own subscriptions or keys; Paradev never proxies model calls | 500+ models through the Kilo Gateway at provider rates, your own keys, or local models |
+| Where agents run | Your Mac; hosts you add with Remote Access; your own x64 or arm64 Linux server (Bring Your Own Cloud); [cloud workspaces](/cloud) (beta) | Your editor or terminal; Kilo Cloud Agents in a Linux container that Kilo hosts |
+| Cloud isolation | One worktree and branch per workspace on the host | One container per user; each worktree has its own checkout and branch |
+| Triggers | Automations on a schedule or on GitHub, Slack, Linear, and other events, with run history | Cloud Agent triggers (beta): webhook or cron, minimum 10-minute interval; Slack @Kilo |
+| Review | Changes pane with diff, commit, push, and open PR; Pull Requests view with CI checks and line comments | Changes view with a saved snapshot of file status; optional auto-commit and push; Code Reviews on pull requests |
+| Phone | iPhone and iPad app (iOS or iPadOS 26+, paid plan) | Mobile apps that view and control sessions |
+| Pricing | Free; Pro {{price:pro}}/user/month; Team {{price:team}}; Ultra {{price:ultra}}; Enterprise custom | Free; Teams $15/user/month; Enterprise custom; model usage and cloud compute billed from Kilo credits |
+| License | Open source, MIT | Open source, MIT |
+
+## What Is Kilo Code?
+
+Kilo's site calls it "one open agent for every developer workflow." The README describes "the open source coding agent for building with AI in VS Code, JetBrains, or the CLI." You pick from more than 500 models, switch models in the middle of a task, and pay the provider's rate with no markup. The Kilo CLI is a fork of OpenCode. Kilo also has a Marketplace for agents, skills, MCP servers, and plugins, and an `--auto` mode for CI pipelines.
+
+**Kilo Cloud Agents** run Kilo Code in a remote Linux container that you open from a browser. The docs say each user gets an isolated container with Node.js, git, `gh`, and `glab`. A new worktree clones the repo, makes a unique branch, runs your startup commands, and adds your environment variables. Environment profiles hold reusable variables, encrypted secrets, and setup commands. GitHub, GitLab, and Bitbucket repos are supported. Each message can run for up to 15 minutes, and auto mode is always on, so the agent edits code without asking. Containers spin down when idle. During the beta, inactive sessions are deleted after 7 days.
+
+Around the cloud agent, Kilo has triggers (beta) that start sessions from a webhook or a cron schedule, a Slack app where you mention @Kilo to make changes and open pull requests, automated Code Reviews on pull requests, and mobile apps. A remote mode also shows a local CLI session in the web and mobile apps while the CLI keeps running.
+
+## What Is Paradev?
+
+Paradev is a workspace for the coding agents you already use. It runs each agent CLI in its own Git worktree and persistent terminal, with presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, and Pi, plus custom commands. You can run the Kilo CLI that way too. The Changes pane shows the diff and lets you commit, push, and open a pull request. The Pull Requests view shows CI checks and line comments you can send to an agent. An in-app browser with port detection and Design Mode, Automations, Tasks synced with Linear and GitHub Issues, a Slack bot, a CLI, a TypeScript SDK, and an MCP server sit around that. A [chat interface](https://docs.paradev.com/chat) shows a Claude Code, Codex, OpenCode, or Pi session as a chat, and a CLI / Chat toggle switches the same session back to the terminal. Paradev is open source under the MIT License.
+
+## Key Differences
+
+### One agent everywhere vs the agents you already use
+
+Kilo gives you one agent, and you change the model. The same Kilo agent runs in your editor, your terminal, the desktop app, the cloud, and Slack. That is simple if your team agrees on Kilo.
+
+Paradev does not ship its own agent. It runs Claude Code, Codex, and the other CLIs with their own logins, settings, and MCP servers. You can use a different agent for each task, or continue a session with another agent. Claude Code and Codex have a structured handoff. If your team already pays for Claude or ChatGPT plans and likes those agents, Paradev keeps them.
+
+### Where the cloud agent runs
+
+Kilo Cloud Agents run in containers that Kilo hosts. You do not manage a machine. Kilo bills the container per second while it is awake, and you can pick a sandbox per account or per repository. Vercel sandboxes are offered for GitHub repos.
+
+Paradev gives you four places to run a workspace. The default is your own Mac, next to your local tools. Remote Access adds any macOS or Linux machine as a host through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server, and it needs no inbound ports. [Cloud workspaces](/cloud) (beta) are hosted by Paradev: you start from an environment with 1 to 20 GitHub repos, variables, secrets, and a region, pick a machine size, and agents keep working when your laptop is closed. The last three keep running when your Mac sleeps.
+
+### Interactive control vs autonomous runs
+
+In a Kilo Cloud Agent session, auto mode is always on and each message has a 15-minute limit. The docs suggest you break tasks into smaller steps. This fits clear, scoped tasks that you send and check later.
+
+A Paradev workspace is a full terminal session. You watch the agent, interrupt it, answer its prompts, and run your own commands in the same worktree. The agent's own approval settings stay in effect. Long tasks run until the agent stops.
+
+### Review and pull requests
+
+Kilo's Changes view is a saved snapshot of file status and line counts against a base branch, not a live view. With auto-commit on, the agent commits and pushes to the session branch after each message. Kilo Code Reviews add automated AI review on pull requests.
+
+Paradev puts review in the workspace. The Changes pane shows a live diff, lets you edit files, and commits, pushes, and opens the pull request. The Pull Requests view shows checks and review threads, and you can send a line comment back to the agent.
+
+### Triggers and team intake
+
+Kilo triggers start a cloud session from an HTTP webhook or a cron schedule. The docs list limits: a 256 KB payload, a 10-minute minimum interval, and 20 in-flight requests per trigger. They also warn that webhooks can carry prompt injection, so use trusted sources only. Organization triggers run as a bot user on dedicated compute.
+
+Paradev Automations run on a schedule or on events from GitHub, Slack, Linear, and more. Each run makes a workspace you can review, and the history stays visible. Tasks sync with Linear and GitHub Issues, and the Slack bot starts workspaces and agents from a mention.
+
+## Pricing
+
+Both tools are free to start, and both are open source under MIT.
+
+| Plan | Paradev | Kilo Code |
+|---|---|---|
+| Free | $0: desktop app, local workspaces, CLI | $0: VS Code, JetBrains, and CLI extensions; usage billed separately |
+| Paid | Pro {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly; Team {{price:team}}; Ultra {{price:ultra}} | Teams $15/user/month with shared BYOK, usage analytics, and shared custom agents |
+| Large teams | Enterprise: custom, with SAML SSO, SCIM, audit logs, SOC 2 Type II | Enterprise: custom, with SSO, OIDC, SCIM, audit logs, and SLAs |
+| Models | Your own agent subscriptions or keys; Paradev never proxies model calls | Kilo Gateway at provider rates, or Kilo Pass from $19/month with bonus credits; BYOK or local models at $0; 5% credit purchase fee |
+| Cloud compute | Cloud workspaces included with Team and Ultra (beta); BYOC uses your own server | Cloud Agent $0.60/hour (Docker or Small) or $1.20/hour (Standard), per second; Code Review $0.33/hour |
+
+Paradev paid plans add Remote Access, Bring Your Own Cloud, and the iPhone and iPad app. Team and Ultra add cloud workspaces. Kilo bills compute and model inference from the same credit balance, and a container needs at least $5 in the balance to start. BYOK users still pay for Kilo compute. Check [Paradev pricing](/pricing) and [Kilo pricing](https://kilo.ai/pricing) for current terms.
+
+## Which Should You Choose?
+
+**Choose Kilo Code if you:**
+
+- Want one agent in VS Code, JetBrains, the CLI, the cloud, Slack, and mobile.
+- Want to pick from 500+ models and switch between them mid-task.
+- Want hosted cloud containers that you do not manage, billed per second.
+- Use GitLab or Bitbucket for cloud sessions.
+
+**Choose Paradev if you:**
+
+- Want to keep Claude Code, Codex, or another CLI agent on your own subscriptions.
+- Want to choose per task between your Mac, your own hosts, your own Linux server, and cloud workspaces (beta).
+- Want a live diff, commits, and pull request review next to the agent's terminal.
+- Want long, interactive sessions you can watch and steer.
+
+## Verdict
+
+Kilo Code is a strong choice if your team standardizes on one open source agent and wants it everywhere, including hosted cloud containers. Paradev is the better fit if you want the agents you already use, a full terminal and review loop, and a choice of where each workspace runs, including a server in your own cloud. You can also run the Kilo CLI inside a Paradev workspace as a custom command.
+
+## Frequently Asked Questions
+
+### Is Kilo Code open source?
+
+Yes. The Kilo-Org/kilocode repository is under the MIT License. Paradev is also open source under the MIT License.
+
+### Where do Kilo Cloud Agents run?
+
+In a remote Linux container that Kilo hosts. Each user gets an isolated container, and each worktree has its own checkout and branch. Containers spin down when idle.
+
+### Can Paradev run agents in the cloud?
+
+Yes. [Cloud workspaces](/cloud) (beta) are included with Team and Ultra. You can also run the Paradev host on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or add any macOS or Linux machine as a host with Remote Access.
+
+### Can I use Kilo with Paradev?
+
+Yes. Paradev runs any CLI agent as a custom command, so you can start the `kilo` CLI in a Paradev workspace with its own worktree and terminal.
+
+### Does either tool mark up model usage?
+
+Kilo says its Gateway bills at provider rates with no markup, with a 5% fee on credit purchases. Paradev never proxies model calls; your agents use your own subscriptions or keys.

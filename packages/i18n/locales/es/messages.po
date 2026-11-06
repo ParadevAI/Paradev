@@ -2323,6 +2323,9 @@ msgstr "Los agentes no pueden acceder a las herramientas de {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Los agentes completan tickets rutinarios sin intervención a mitad de la tarea."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Los agentes de tus espacios de trabajo en la nube podrán usar <0>--host</0> para ejecutar comandos en este host. El host debe estar accesible a través del relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Los agentes siguen trabajando en la nube. Vuelve a abrir el espacio de trabajo desde el escritorio, el iPhone o el iPad."
 
@@ -2565,6 +2568,9 @@ msgstr "Permitir en esta sesión"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Permitir el acceso al micrófono para usar el dictado"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Permitir que mis espacios de trabajo en la nube accedan a este host"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Permitir el acceso remoto a este dispositivo a través del relay"
@@ -2824,6 +2830,9 @@ msgstr "cualquier cosa"
 
 msgid "Anything else? (optional)"
 msgstr "¿Algo más? (opcional)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Cualquier cosa que se ejecute en un espacio de trabajo en la nube que hayas creado podrá crear espacios de trabajo, iniciar agentes y ejecutar comandos en este host, incluido un agente que siga instrucciones que encontró en una página web o un repositorio. Actívalo solo si lo necesitas."
 
 msgid "Anywhere"
 msgstr "En cualquier lugar"
@@ -4107,6 +4116,9 @@ msgstr "Chat cerrado"
 
 msgid "Chat history"
 msgstr "Historial de chats"
+
+msgid "Chat interface"
+msgstr "Interfaz de chat"
 
 msgid "Chat is being reworked"
 msgstr "El chat se está rehaciendo"
@@ -10830,6 +10842,9 @@ msgstr "¿Permitir que un agente use tus sesiones de {browserName}?"
 msgid "Let the agent drive."
 msgstr "Deja que el agente lo maneje."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "¿Permitir que tus espacios de trabajo en la nube accedan a este host?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Permite a tu organización listar y clonar repositorios"
 
@@ -13265,6 +13280,9 @@ msgstr "Solo el autor puede cambiar un comentario"
 
 msgid "Only the author can edit a comment"
 msgstr "Solo el autor puede editar un comentario"
+
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Solo el propietario del host puede permitir que los espacios de trabajo en la nube accedan a él"
 
 msgid "Only the host owner can set its wake command"
 msgstr "Solo el propietario del host puede definir su comando de arranque"
@@ -18542,6 +18560,9 @@ msgstr "Dejar de observar"
 msgid "Stop workspace run command"
 msgstr "Detener el comando de ejecución del espacio de trabajo"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "¿Impedir que tus espacios de trabajo en la nube accedan a este host?"
+
 msgid "stopped"
 msgstr "detenido"
 
@@ -20397,6 +20418,9 @@ msgstr "Convierte las tareas rutinarias en agentes que se ejecutan de forma prog
 msgid "Turn Fast mode on or off"
 msgstr "Activar o desactivar el modo rápido"
 
+msgid "Turn off"
+msgstr "Desactivar"
+
 msgid "Turn off manual mode"
 msgstr "Desactivar el modo manual"
 
@@ -22054,6 +22078,9 @@ msgstr "Tus cambios"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Perderás los cambios si no los guardas."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Tus espacios de trabajo en la nube ya no podrán acceder a este host."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Tu código se queda en local por defecto, con control explícito sobre los servicios conectados."

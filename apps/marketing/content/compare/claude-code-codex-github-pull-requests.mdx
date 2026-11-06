@@ -2,7 +2,7 @@
 title: "Claude Code and Codex on GitHub Pull Requests: Review, Fix Checks, and Address Comments (2026)"
 description: "Use Claude Code and Codex side by side on GitHub pull requests: one writes the change, the other reviews it, and either one fixes failing checks or review comments. Paradev, GitHub Actions, Copilot, and Codex cloud compared."
 date: 2026-10-30
-lastUpdated: 2026-10-30
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - claude-code
@@ -23,7 +23,7 @@ keywords:
 
 To use Claude Code and Codex together on GitHub pull requests, check out each pull request in its own workspace, run one agent to write or fix the change and the other to review it, and read both results next to the PR's checks before you merge. In [Paradev](https://paradev.com), press **⌘N**, choose **Pull request**, and pick the PR. Paradev checks out its branch in a new workspace where you can start Claude Code, Codex, or both. The **Pull requests** view shows the same PR's description, checks, review threads, and diff, and you can select lines in the diff and send them to an agent as a comment.
 
-For work that should start without you, an [Automation](https://docs.paradev.com/automations) (Pro) runs an agent when GitHub reports an event: a review request, a failed check, or a new comment. The alternatives are Anthropic's Claude Code action or OpenAI's Codex action in GitHub Actions, GitHub Copilot's cloud agent and code review, and Codex code review. They run on GitHub runners or in the vendor's cloud and post back to the PR. Paradev runs the agent CLIs on your own machines, with your local environment.
+For work that should start without you, an [Automation](https://docs.paradev.com/automations) (Pro) runs an agent when GitHub reports an event: a review request, a failed check, or a new comment. The alternatives are Anthropic's Claude Code action or OpenAI's Codex action in GitHub Actions, GitHub Copilot's cloud agent and code review, and Codex code review. They run on GitHub runners or in the vendor's cloud and post back to the PR. Paradev runs the agent CLIs on your own machines or your own Linux server, with your local environment, or in cloud workspaces (beta).
 
 This guide covers a small team that already works in GitHub pull requests. It is published by Paradev. Details about other tools come from their own docs as of October 2026.
 
@@ -94,7 +94,7 @@ The [review-requested recipe](https://docs.paradev.com/recipes/review-requested-
 
 | Option | Where it runs | Agents | Strength | Tradeoff |
 | --- | --- | --- | --- | --- |
-| Paradev | Your machines, a shared host, or cloud workspaces (early access) | Claude Code, Codex, and other CLI agents | Local environment; review the diff before anything is pushed; both agents in one app | Desktop app on macOS (Linux AppImage experimental); a device must be online for automations |
+| Paradev | Your machines, a shared host, your own Linux server ([BYOC](https://docs.paradev.com/bring-your-own-cloud)), or [cloud workspaces](/cloud) (beta) | Claude Code, Codex, and other CLI agents | Local environment; review the diff before anything is pushed; both agents in one app | Desktop app on macOS (Linux AppImage experimental); a device must be online for automations |
 | [Claude Code action](https://github.com/anthropics/claude-code-action) or [Codex action](https://github.com/openai/codex-action) in GitHub Actions | Your GitHub runners | Claude Code or Codex | Runs from a workflow, for example a review when a PR opens, with no machine to keep on | On GitHub-hosted runners, each run starts fresh; secrets and services must be set up in CI |
 | [GitHub Copilot cloud agent and code review](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) | GitHub (Actions-based or cloud environment) | Copilot | Built into GitHub: start an agent session from an issue or a failing Actions run, and request a Copilot code review on a PR | Copilot only |
 | [Codex code review](https://learn.chatgpt.com/docs/third-party/github) | OpenAI's cloud | Codex | Comment `@codex review` for a review on the PR, or `@codex` with other instructions to start a cloud chat that can push a fix; optional automatic reviews | Codex only; the environment is OpenAI's |
@@ -122,4 +122,4 @@ When it uses `gh` in a Paradev workspace, yes. `gh` is signed in with your GitHu
 
 ### Which Paradev plan do I need?
 
-Automations, remote hosts, the iPhone and iPad app, and the Linear and Slack integrations are on Pro. See [pricing](/pricing) for what each plan includes.
+Paradev is open source under the MIT License. Automations, remote hosts, the iPhone and iPad app, and the Linear and Slack integrations are on Pro. Bring Your Own Cloud needs a paid plan, and Team and Ultra include cloud workspaces (beta). See [pricing](/pricing) for what each plan includes.
