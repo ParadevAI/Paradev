@@ -4,10 +4,10 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import reactPlugin from "@vitejs/plugin-react";
 import { config } from "dotenv";
-import { defineConfig, externalizeDepsPlugin } from "electron-vite";
+import { defineConfig } from "electron-vite";
 import injectProcessEnvPlugin from "rollup-plugin-inject-process-env";
 import tsconfigPathsPlugin from "vite-tsconfig-paths";
-import { dependencies, resources, version } from "./package.json";
+import { resources, version } from "./package.json";
 import { mainExternalizedDependencies } from "./runtime-dependencies";
 import {
 	copyResourcesPlugin,
@@ -28,10 +28,6 @@ await import("./src/main/env.main");
 const tsconfigPaths = tsconfigPathsPlugin({
 	projects: [resolve("tsconfig.json")],
 });
-
-const workspaceDependencies = Object.keys(dependencies).filter((dependency) =>
-	dependency.startsWith("@superset/"),
-);
 
 // Sentry plugin for uploading sourcemaps (only in CI with auth token)
 const sentryPlugin = process.env.SENTRY_AUTH_TOKEN
@@ -59,6 +55,8 @@ const hostServiceSentryPlugin = process.env.SENTRY_AUTH_TOKEN
 		})
 	: null;
 
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+
 export default defineConfig({
 	main: {
 		plugins: [tsconfigPaths, linguiMacroPlugin(), copyResourcesPlugin()],
@@ -75,7 +73,7 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_STREAMS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_STREAMS_URL,
-				"https://streams.superset.sh",
+				`https://streams.${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_WEB_URL": defineEnv(
 				process.env.NEXT_PUBLIC_WEB_URL,
@@ -83,15 +81,15 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_MARKETING_URL": defineEnv(
 				process.env.NEXT_PUBLIC_MARKETING_URL,
-				"https://superset.sh",
+				`https://${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_DOCS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_DOCS_URL,
-				"https://docs.superset.sh",
+				`https://docs.${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_ROOT_DOMAIN": defineEnv(
 				process.env.NEXT_PUBLIC_ROOT_DOMAIN,
-				"superset.sh",
+				rootDomain,
 			),
 			"process.env.SENTRY_DSN_DESKTOP": defineEnv(
 				process.env.SENTRY_DSN_DESKTOP,
@@ -118,6 +116,10 @@ export default defineConfig({
 			),
 			"process.env.SUPERSET_WORKSPACE_NAME": defineEnv(
 				process.env.SUPERSET_WORKSPACE_NAME,
+			),
+			"process.env.DESKTOP_DISPLAY_NAME": defineEnv(
+				process.env.DESKTOP_DISPLAY_NAME,
+				"",
 			),
 		},
 
@@ -158,16 +160,7 @@ export default defineConfig({
 	},
 
 	preload: {
-		plugins: [
-			tsconfigPaths,
-			externalizeDepsPlugin({
-				exclude: [
-					"trpc-electron",
-					"@sentry/electron",
-					...workspaceDependencies,
-				],
-			}),
-		],
+		plugins: [tsconfigPaths],
 
 		define: {
 			"process.env.NODE_ENV": defineEnv(process.env.NODE_ENV, "production"),
@@ -183,6 +176,9 @@ export default defineConfig({
 			rollupOptions: {
 				input: {
 					index: resolve("src/preload/index.ts"),
+					"browser-extension-shims": resolve(
+						"src/preload/browser-extension-shims.ts",
+					),
 				},
 			},
 		},
@@ -206,15 +202,15 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_MARKETING_URL": defineEnv(
 				process.env.NEXT_PUBLIC_MARKETING_URL,
-				"https://superset.sh",
+				`https://${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_DOCS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_DOCS_URL,
-				"https://docs.superset.sh",
+				`https://docs.${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_ROOT_DOMAIN": defineEnv(
 				process.env.NEXT_PUBLIC_ROOT_DOMAIN,
-				"superset.sh",
+				rootDomain,
 			),
 			"import.meta.env.DEV_SERVER_PORT": defineEnv(String(DEV_SERVER_PORT)),
 			"import.meta.env.NEXT_PUBLIC_POSTHOG_KEY": defineEnv(
@@ -238,6 +234,10 @@ export default defineConfig({
 			),
 			"process.env.SUPERSET_WORKSPACE_NAME": defineEnv(
 				process.env.SUPERSET_WORKSPACE_NAME,
+			),
+			"process.env.DESKTOP_DISPLAY_NAME": defineEnv(
+				process.env.DESKTOP_DISPLAY_NAME,
+				"Superset",
 			),
 		},
 

@@ -1,0 +1,1 @@
+export { useMermaidDiagram } from "./useMermaidDiagram";

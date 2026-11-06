@@ -1,8 +1,8 @@
 import type { AppRouter as HostServiceAppRouter } from "@superset/host-service";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { useQuery } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { isMissingProcedureError } from "renderer/lib/isMissingProcedureError";
 
 export type PullRequestStack = NonNullable<
 	inferRouterOutputs<HostServiceAppRouter>["pullRequests"]["getStack"]
@@ -15,6 +15,9 @@ export interface PullRequestStackQuery {
 	/** The stack read failed: the PR may be a layer of a stack nobody can see. */
 	isIncomplete: boolean;
 	refetch: () => void;
+	/** Where the stack was read; a stack merge must go to the same place. */
+	projectId: string | null;
+	hostUrl: string | null;
 }
 
 export const PULL_REQUEST_STACK_QUERY_KEY_PREFIX = ["pull-request-stack"];
@@ -57,5 +60,7 @@ export function usePullRequestStack({
 		isLoading: query.isLoading,
 		isIncomplete: query.isError,
 		refetch: () => void query.refetch(),
+		projectId,
+		hostUrl,
 	};
 }

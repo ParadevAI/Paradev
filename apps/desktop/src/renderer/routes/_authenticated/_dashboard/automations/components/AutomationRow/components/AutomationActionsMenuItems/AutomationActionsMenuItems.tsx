@@ -9,6 +9,8 @@ import {
 } from "@superset/ui/dropdown-menu";
 import type { ReactNode } from "react";
 import {
+	LuArchive,
+	LuArchiveRestore,
 	LuClock,
 	LuLink,
 	LuPause,
@@ -16,31 +18,44 @@ import {
 	LuPlay,
 	LuTrash2,
 } from "react-icons/lu";
+import { AutomationGroupMenuItems } from "../../../AutomationGroupMenuItems";
 
 interface AutomationActionsMenuItemsProps {
 	kind: "context" | "dropdown";
 	isOwner: boolean;
-	/** Owner or organization owner: deleting runs nothing on anyone's machine. */
-	canDelete: boolean;
+	/** Owner or organization owner: archiving runs nothing on anyone's machine. */
+	canArchive: boolean;
+	archived: boolean;
 	enabled: boolean;
+	groups: string[];
+	currentGroup: string | null;
 	onEdit: () => void;
 	onCopyLink: () => void;
 	onRunNow: () => void;
 	onToggleEnabled: () => void;
 	onHistory: () => void;
+	onMoveToGroup: (group: string | null) => void;
+	onArchive: () => void;
+	onRestore: () => void;
 	onDelete: () => void;
 }
 
 export function AutomationActionsMenuItems({
 	kind,
 	isOwner,
-	canDelete,
+	canArchive,
+	archived,
 	enabled,
+	groups,
+	currentGroup,
 	onEdit,
 	onCopyLink,
 	onRunNow,
 	onToggleEnabled,
 	onHistory,
+	onMoveToGroup,
+	onArchive,
+	onRestore,
 	onDelete,
 }: AutomationActionsMenuItemsProps) {
 	const renderItem = ({
@@ -62,6 +77,8 @@ export function AutomationActionsMenuItems({
 			</Item>
 		);
 	};
+	const separator =
+		kind === "context" ? <ContextMenuSeparator /> : <DropdownMenuSeparator />;
 
 	return (
 		<>
@@ -70,7 +87,7 @@ export function AutomationActionsMenuItems({
 				children: (
 					<>
 						<LuPencil className="size-4" />
-						{isOwner ? <Trans>Edit</Trans> : <Trans>View</Trans>}
+						{isOwner && !archived ? <Trans>Edit</Trans> : <Trans>View</Trans>}
 					</>
 				),
 			})}
@@ -83,7 +100,7 @@ export function AutomationActionsMenuItems({
 					</>
 				),
 			})}
-			{isOwner && (
+			{isOwner && !archived && (
 				<>
 					{renderItem({
 						onSelect: onRunNow,
@@ -117,25 +134,50 @@ export function AutomationActionsMenuItems({
 							</>
 						),
 					})}
+					<AutomationGroupMenuItems
+						kind={kind}
+						groups={groups}
+						currentGroup={currentGroup}
+						onMove={onMoveToGroup}
+					/>
 				</>
 			)}
-			{canDelete && (
+			{canArchive && (
 				<>
-					{kind === "context" ? (
-						<ContextMenuSeparator />
+					{separator}
+					{archived ? (
+						<>
+							{renderItem({
+								onSelect: onRestore,
+								children: (
+									<>
+										<LuArchiveRestore className="size-4" />
+										<Trans>Restore</Trans>
+									</>
+								),
+							})}
+							{renderItem({
+								destructive: true,
+								onSelect: onDelete,
+								children: (
+									<>
+										<LuTrash2 className="size-4" />
+										<Trans>Delete permanently</Trans>
+									</>
+								),
+							})}
+						</>
 					) : (
-						<DropdownMenuSeparator />
+						renderItem({
+							onSelect: onArchive,
+							children: (
+								<>
+									<LuArchive className="size-4" />
+									<Trans>Archive</Trans>
+								</>
+							),
+						})
 					)}
-					{renderItem({
-						destructive: true,
-						onSelect: onDelete,
-						children: (
-							<>
-								<LuTrash2 className="size-4" />
-								<Trans>Delete</Trans>
-							</>
-						),
-					})}
 				</>
 			)}
 		</>

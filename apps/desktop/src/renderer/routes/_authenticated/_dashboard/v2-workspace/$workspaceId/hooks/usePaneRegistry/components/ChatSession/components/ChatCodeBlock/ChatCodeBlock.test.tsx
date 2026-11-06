@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, expect, mock, test } from "bun:test";
 import { ChatMarkdown } from "@superset/chat-ui/ChatMarkdown";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import {
 	ChatPaneActionsProvider,
 	type OpenLink,
@@ -68,7 +68,7 @@ test("a plain text or unmarked fence is labelled as plain text", () => {
 	}
 });
 
-test("lines scroll sideways until the reader asks for them to wrap", () => {
+test("lines scroll sideways until the reader asks for them to wrap", async () => {
 	const view = renderFence("text");
 	const overflow = () =>
 		[...view.container.querySelectorAll("*")]
@@ -77,9 +77,33 @@ test("lines scroll sideways until the reader asks for them to wrap", () => {
 			?.getAttribute("data-overflow");
 	const toggle = view.getByRole("button", { name: "Wrap lines" });
 	expect(toggle.getAttribute("aria-pressed")).toBe("false");
-	expect(overflow()).toBe("scroll");
+	await waitFor(() => expect(overflow()).toBe("scroll"));
 
 	fireEvent.click(toggle);
 	expect(toggle.getAttribute("aria-pressed")).toBe("true");
-	expect(overflow()).toBe("wrap");
+	await waitFor(() => expect(overflow()).toBe("wrap"));
+});
+
+test("a diff fence spanning several files shows each file as a diff", async () => {
+	const patch = ["a.ts", "b.ts"]
+		.map((name) => `--- a/${name}\n+++ b/${name}\n@@ -1 +1 @@\n-old\n+new\n`)
+		.join("");
+	const view = render(
+		<ChatPaneActionsProvider>
+			<ChatMarkdown components={{ code: ChatCodeBlock }}>
+				{`\`\`\`diff\n${patch}\`\`\`\n`}
+			</ChatMarkdown>
+		</ChatPaneActionsProvider>,
+	);
+	const diffs = () =>
+		[...view.container.querySelectorAll("*")].filter((element) =>
+			element.shadowRoot?.querySelector("pre[data-diff]"),
+		);
+	await waitFor(() => expect(diffs()).toHaveLength(2));
+	expect(
+		diffs().map(
+			(element) =>
+				element.shadowRoot?.querySelector("[data-title]")?.textContent,
+		),
+	).toEqual(["a.ts", "b.ts"]);
 });

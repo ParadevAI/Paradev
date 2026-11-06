@@ -6,6 +6,7 @@ import {
 	type McpContext,
 	resolveMcpContext,
 } from "@superset/mcp";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { env } from "@/env";
 import { posthog } from "@/lib/analytics";
 import {
@@ -27,23 +28,23 @@ function describeServer(req: Request): Response {
 	return Response.json(
 		{
 			name: "superset",
-			title: "Superset",
+			title: "Paradev",
 			version: MCP_SERVER_VERSION,
 			description:
-				"Superset MCP server (Model Context Protocol over Streamable HTTP). Create Git-worktree workspaces, launch coding-agent sessions, open terminals, schedule automations, and manage tasks on behalf of a Superset user.",
+				"Paradev MCP server (Model Context Protocol over Streamable HTTP). Create Git-worktree workspaces, launch coding-agent sessions, open terminals, schedule automations, and manage tasks on behalf of a Paradev user.",
 			transport: "streamable-http",
 			url: `${origin}/mcp`,
 			usage:
-				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Superset API key). Start with `initialize`, then `tools/list`.",
+				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Paradev API key). Start with `initialize`, then `tools/list`.",
 			serverCard: `${origin}/.well-known/mcp/server-card.json`,
 			openapi: `${origin}/openapi.json`,
-			documentation: "https://docs.superset.sh/mcp-server",
+			documentation: `${CANONICAL_URLS.DOCS}/mcp-server`,
 			authentication: {
 				type: "oauth2",
 				resourceMetadataUrl: mcpProtectedResourceMetadataUrl(req),
-				walkthrough: "https://superset.sh/auth.md",
+				walkthrough: `${CANONICAL_URLS.MARKETING}/auth.md`,
 			},
-			install: "https://superset.sh/mcp-install",
+			install: `${CANONICAL_URLS.MARKETING}/mcp-install`,
 		},
 		{
 			headers: {

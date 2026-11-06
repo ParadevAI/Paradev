@@ -1,5 +1,5 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
-import { organizationBilling } from "@superset/auth/billing";
+import { type CloudUsage, organizationBilling } from "@superset/auth/billing";
 import { stripeClient } from "@superset/auth/stripe";
 import { db } from "@superset/db/client";
 import { members, organizations, subscriptions } from "@superset/db/schema";
@@ -9,7 +9,9 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import type Stripe from "stripe";
 import { z } from "zod";
 import { env } from "../../env";
-import { protectedProcedure, userError } from "../../trpc";
+import { organizationEnvironmentLimit } from "../../lib/billing/plan";
+import { personProcedure, userError } from "../../trpc";
+import { countEnvironments } from "../environment/limit";
 
 function subtractMonthsClamped(date: Date, months: number) {
 	const result = new Date(date);
@@ -68,9 +70,13 @@ async function requireOwnerWithCustomer(ctx: {
 
 const EMPTY_ACTIVE_PLAN = {
 	plan: "free" as const,
+	autumnPlanId: null,
+	planTier: "free",
 	/** @deprecated TODO(2027-01-31): Stripe vocabulary; read `paymentState`. */
 	status: null,
 	cancelAt: null,
+	scheduledPlanId: null,
+	scheduledAt: null,
 	periodStart: null,
 	periodEnd: null,
 	billingInterval: null,
@@ -129,7 +135,7 @@ async function isBillingOwner(userId: string, organizationId: string) {
 }
 
 export const billingRouter = {
-	activePlan: protectedProcedure.query(async ({ ctx }) => {
+	activePlan: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		const billingProvider = billingUsesAutumn
 			? ("autumn" as const)
@@ -144,8 +150,12 @@ export const billingRouter = {
 			return {
 				organizationId: activeOrgId,
 				plan: billing.tier,
+				autumnPlanId: billing.autumnPlanId ?? null,
+				planTier: billing.planTier ?? billing.tier,
 				status: billing.status,
 				cancelAt: date(billing.cancelAt),
+				scheduledPlanId: billing.scheduledPlanId ?? null,
+				scheduledAt: date(billing.scheduledAt ?? null),
 				periodStart: date(billing.periodStart),
 				periodEnd: date(billing.periodEnd),
 				billingInterval: billing.billingInterval,
@@ -186,8 +196,12 @@ export const billingRouter = {
 		return {
 			organizationId: activeOrgId,
 			plan: subscription.plan,
+			autumnPlanId: null,
+			planTier: subscription.plan ?? "free",
 			status: subscription.status,
 			cancelAt: subscription.cancelAt,
+			scheduledPlanId: null,
+			scheduledAt: null,
 			periodStart: subscription.periodStart,
 			periodEnd: subscription.periodEnd,
 			billingInterval: subscription.billingInterval,
@@ -196,7 +210,31 @@ export const billingRouter = {
 		};
 	}),
 
-	invoices: protectedProcedure.query(async ({ ctx }) => {
+	cloudUsage: personProcedure.query(
+		async ({ ctx }): Promise<CloudUsage | null> => {
+			const activeOrgId = ctx.activeOrganizationId;
+			if (!billingUsesAutumn || !activeOrgId) return null;
+			const billing = await organizationBilling(activeOrgId);
+			return billing.cloudUsage ?? null;
+		},
+	),
+
+	environmentUsage: personProcedure.query(
+		async ({ ctx }): Promise<{ used: number; limit: number | null } | null> => {
+			const activeOrgId = ctx.activeOrganizationId;
+			if (!activeOrgId) return null;
+			const [limit, used] = await Promise.all([
+				organizationEnvironmentLimit(activeOrgId),
+				countEnvironments(activeOrgId),
+			]);
+			return {
+				used,
+				limit: limit === Number.POSITIVE_INFINITY ? null : limit,
+			};
+		},
+	),
+
+	invoices: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		if (!activeOrgId) {
 			throw userError({
@@ -234,7 +272,7 @@ export const billingRouter = {
 	 * "Pay now" link on the payment-failure surfaces, which otherwise can only
 	 * say that something failed.
 	 */
-	outstandingInvoice: protectedProcedure.query(async ({ ctx }) => {
+	outstandingInvoice: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		if (!activeOrgId) {
 			throw userError({
@@ -268,7 +306,7 @@ export const billingRouter = {
 		return toInvoiceSummary(unpaid, { includeHostedUrl: isOwner });
 	}),
 
-	details: protectedProcedure.query(async ({ ctx }) => {
+	details: personProcedure.query(async ({ ctx }) => {
 		const stripeCustomerId = await requireOwnerWithCustomer(ctx);
 		if (!stripeCustomerId) return null;
 
@@ -327,7 +365,7 @@ export const billingRouter = {
 		};
 	}),
 
-	portal: protectedProcedure
+	portal: personProcedure
 		.input(
 			z.object({
 				flowType: z

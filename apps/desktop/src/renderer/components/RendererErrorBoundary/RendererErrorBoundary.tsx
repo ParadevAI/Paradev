@@ -58,7 +58,7 @@ export class RendererErrorBoundary extends Component<
 						{i18n._(
 							msg({
 								message:
-									"Superset hit an unexpected error. Reload to try again.",
+									"Paradev hit an unexpected error. Reload to try again.",
 							}),
 						)}
 					</p>

@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, realpathSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
+import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 
 /** Minimal readonly handle satisfied by both better-sqlite3 and bun:sqlite. */
 export interface ReadonlySqlite {
@@ -11,7 +11,7 @@ export interface ReadonlySqlite {
 	close(): void;
 }
 
-export const DEFAULT_HOST_DB_ROOT = join(homedir(), ".superset", "host");
+export const DEFAULT_HOST_DB_ROOT = join(defaultAppHomeDir(), "host");
 
 function canonicalPath(path: string): string | undefined {
 	try {
@@ -23,7 +23,7 @@ function canonicalPath(path: string): string | undefined {
 
 /**
  * Resolve a workspace's display title from the outer (production) host-service
- * DBs at `~/.superset/host/<org>/host.db`. That row's `name` is what AI naming
+ * DBs at `~/.paradev/host/<org>/host.db`. That row's `name` is what AI naming
  * and manual renames update, so reading it when the dev app starts means no
  * name has to be captured at setup time. Only columns every host-service
  * version has are referenced (older ones lack `archived_at`).

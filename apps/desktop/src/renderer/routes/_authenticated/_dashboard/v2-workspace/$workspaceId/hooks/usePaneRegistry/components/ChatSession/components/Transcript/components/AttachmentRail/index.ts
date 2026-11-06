@@ -1,1 +1,1 @@
-export { AttachmentRail } from "./AttachmentRail";
+export { AttachmentRail, type RailImage } from "./AttachmentRail";

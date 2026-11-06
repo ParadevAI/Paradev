@@ -1,0 +1,123 @@
+---
+title: "Paradev vs Capy (2026): Your Agent CLIs on Your Hosts vs a Cloud Agent Fleet"
+description: "Compare Paradev and Capy for parallel coding agents: your installed agent CLIs vs Capy's own agent, local hosts vs cloud VMs, review, team intake, and pricing."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - capy
+keywords:
+  - superset vs capy
+  - paradev vs capy
+  - capy vs paradev
+  - capy alternative
+  - capy.ai alternative
+  - cloud coding agents
+  - parallel coding agents in the cloud
+  - cloud agent ide
+---
+
+Paradev and Capy both run many coding agents in parallel and turn their work into pull requests. The difference is which agent runs and where. Capy is a cloud-first platform: each thread runs Capy's own agent, on many models, in its own cloud VM, with Captains that direct a crew of threads and a review agent that comments on PRs. Its desktop app and Dock CLI can also run threads on your own machines. Paradev is a desktop workspace for the agent CLIs you already use, such as Claude Code, Codex, and Cursor Agent, each in its own terminal and Git worktree, on your machine, on hosts you add, on your own Linux server, or in Paradev cloud workspaces (beta). Choose Capy if you want a managed fleet of cloud agents on one credit balance. Choose Paradev if you want your own agent CLIs, logins, and machines at the center.
+
+This comparison is published by Paradev. Capy details were checked against [capy.ai](https://capy.ai), its [documentation](https://docs.capy.ai/welcome), [models and pricing](https://docs.capy.ai/models-and-pricing), [machines](https://docs.capy.ai/machines), [security](https://docs.capy.ai/admin/security), and [changelog](https://capy.ai/changelog) on November 5, 2026.
+
+## At a Glance
+
+| Requirement | Paradev | Capy |
+|---|---|---|
+| Interface | Desktop app | Web app and desktop app on macOS, Windows, and Linux |
+| Agent | Any CLI agent you install: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Capy's own agent on many models; a Claude Code mode on the Claude Agent SDK for Claude Pro or Max plans |
+| Where agents run | Your Mac, hosts you add with Remote Access (paid plan), your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or [cloud workspaces](/cloud) (beta) | A Capy cloud VM per thread, your computer through the desktop app, or a machine paired with the Dock CLI; your own cloud on Enterprise |
+| Isolation | Git worktree and terminal per workspace | Firecracker microVM per cloud thread; on a device, a new worktree, an existing worktree, or the current checkout |
+| Orchestration | Parallel workspaces; subagents of Claude Code and Codex appear under the parent | Captains direct a crew of threads; subagents on shared or fresh machines |
+| Review | Changes pane (diff, edit, commit, push, open PR); Pull Requests view with CI checks and line comments you send to an agent | Capy opens PRs, follows CI and review feedback; a review agent posts inline GitHub comments |
+| Team intake | Automations with GitHub, Slack, Linear, and more; Tasks synced with Linear and GitHub Issues; Slack bot | Slack mentions, Linear delegation, API; automations on a schedule, webhook, or GitHub or Slack event |
+| Phone | Native iPhone and iPad app (iOS or iPadOS 26+, paid plan) | Any browser, including your phone's |
+| Pricing | Free; Pro {{price:pro}}/user/month ({{price:pro:yearly}} yearly); Team {{price:team}}; Ultra {{price:ultra}}; Enterprise custom | Per organization, unlimited members: Lite $20, Pro $100, Max $200 to $1,000 a month; Enterprise custom |
+| License | Open source, MIT | Proprietary; free program for open-source maintainers |
+
+## What Is Capy?
+
+Capy says it lets you "orchestrate a fleet of cloud coding agents in all of the apps your team already lives in." Its docs add that you can run agents on your laptop or in the cloud with your own subscriptions, and review what they ship in one place. Work happens in **threads**. You start one from the web or desktop app, a Slack mention, a Linear issue, or the API.
+
+Each cloud thread runs on its own Linux VM: a Firecracker microVM with Ubuntu 24.04 in US East, a set of preinstalled tools, Docker, and an XFCE desktop with Chrome streamed into the thread. Sizes range from Small (1 vCPU, 4 GB) to Hyper (16 vCPU, 64 GB), billed per hour while awake. Projects hold setup scripts, snapshots, secrets, and instructions. **Captains**, generally available since Capy 0.7.0 on October 31, 2026, run a crew of threads and keep a digest of what needs you. A review agent checks pull request diffs and posts findings as inline GitHub comments. Capy can also attach iOS and Android cloud phones to a thread to build and test mobile apps.
+
+Since 0.7.0, the Dock CLI pairs a headless Linux, macOS, or Windows machine as a device. Threads on your own devices have no machine-time charge. A thread can move between your computer and the cloud, with its branch, unpushed commits, and uncommitted changes.
+
+## Key Differences
+
+### Whose agent does the work
+
+This is the main split. Capy runs its own agent. You pick a model from a long catalog that covers Anthropic, OpenAI, Google, xAI, and open-weight providers, at each provider's list price with no markup. You can connect Codex, GitHub Copilot, or SuperGrok subscriptions, your own API keys, or gateways such as OpenRouter. A Claude Pro or Max plan runs in a separate Claude Code mode built on the Claude Agent SDK.
+
+Paradev runs the CLI you installed, in a real terminal, with its own login, settings, MCP servers, and skills. Presets cover Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, and Pi, and you can add custom commands. Paradev never proxies model calls. If you want a transcript instead of a terminal, the [chat interface](https://docs.paradev.com/chat) shows Claude Code, Codex, OpenCode, or Pi sessions as messages, tool calls, and file edits, over the Agent Client Protocol. A CLI / Chat toggle switches the same session between views.
+
+### Where agents run and who holds the data
+
+Capy is cloud-first. Cloud threads keep working when you close your laptop. Capy stores threads in its cloud, including threads that run on your own device. Cloud checkpoints of uncommitted work are on by default, and you can turn them off. Capy is SOC 2 Type II. Running in your own cloud and zero data retention for Capy's storage are Enterprise options.
+
+Paradev is local-first. Agents run on your Mac by default. Remote Access (paid plan) adds any macOS or Linux machine as a host through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) (paid plan) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server, and it needs no inbound ports. [Cloud workspaces](/cloud) (beta), included with Team and Ultra, give you a Paradev-run sandbox from an environment of 1 to 20 GitHub repos, with variables, secrets, a region, a machine size, and environment snapshots. Paradev Enterprise has SAML SSO, SCIM, audit logs, and SOC 2 Type II.
+
+### Scale and orchestration
+
+Capy is built for many cloud agents at once. Your plan sets how much memory your awake machines can use together: 128 GB on Lite, 512 GB on Pro, and 1 TB on Max. Captains and subagents split work across machines.
+
+Paradev runs each task as a workspace with its own worktree and terminal, so you can run many agents side by side on one machine or across hosts. Subagents of Claude Code and Codex show under their parent. You can continue a session with another agent, with a structured handoff for Claude Code and Codex. The `superset` CLI, TypeScript SDK (MIT), and MCP server let an agent create workspaces and start other agents.
+
+### Review
+
+Capy opens the pull request, follows CI and review feedback, and guides you through the diff on its pull request page. Its review agent posts structured findings on GitHub. Reviews bill Capy credits for the model and the machine.
+
+Paradev keeps review beside the agent. The Changes pane shows the diff, edits files, commits, pushes, and opens a PR. The Pull Requests view shows CI checks and line comments, and you can send a comment to an agent. The in-app browser detects ports and has Design Mode. The right pane can also show Files, Pages, or a terminal.
+
+## Pricing
+
+The two price different things. Capy bills one organization balance for model tokens on Capy credits, machine time, and generated images. Paradev charges per user and leaves model costs on your own agent subscriptions.
+
+| Plan | Paradev | Capy |
+|---|---|---|
+| Entry | Free tier for local work | Your own keys and subscriptions work on every plan, including free; local threads have no machine-time charge |
+| Paid | Pro {{price:pro}} per user/month, or {{price:pro:yearly}} yearly. Team {{price:team}}. Ultra {{price:ultra}} | Lite $20/month ($16 annual) with $20 of credits. Pro $100/month ($80 annual) with $105 of credits. Max $200 to $1,000/month with 110% in credits |
+| Large teams | Enterprise: custom | Enterprise: custom |
+
+Capy's first 7 days of monthly Lite cost $1 with a verified card. Cloud machine time always bills Capy credits, even when the model runs on your own subscription or key. Every Capy plan has unlimited members. Paradev Pro adds remote hosts, automations, and the iPhone and iPad app, and Team and Ultra add cloud workspaces. Check [Paradev pricing](/pricing) and [Capy pricing](https://docs.capy.ai/models-and-pricing) for current terms.
+
+## Which Should You Choose?
+
+**Choose Capy if you:**
+
+- Want many agents in managed cloud VMs, each with a full Linux desktop and browser.
+- Want Captains to direct a crew of threads and a review agent on every PR.
+- Want to pick from many models on one balance, with no per-seat price.
+- Build mobile apps and want cloud iOS and Android phones in the loop.
+- Need Windows support for local threads today.
+
+**Choose Paradev if you:**
+
+- Want to run the agent CLIs you already use, with their own logins, settings, and MCP servers.
+- Want agents on your own hardware or your own Linux server on a paid plan, not only on Enterprise.
+- Want terminals first, with a chat interface when you want a transcript.
+- Review in one app: diff, commit, push, PR, CI checks, and comments you send to an agent.
+- Want a native iPhone and iPad app, or an open-source tool under the MIT License.
+
+## Verdict
+
+Capy is a strong choice for teams that want to send a lot of work to cloud agents and manage it as a fleet, with its own agent, Captains, and a review agent. Paradev is a better fit when the agent CLIs you already pay for should do the work, on machines you control, with review in the same window. Paradev cloud workspaces (beta) cover the laptop-closed case without leaving your own agents behind. Run one real task in each and compare the pull requests.
+
+## Frequently Asked Questions
+
+### What is the best Capy alternative?
+
+If you want to keep your own agent CLIs and machines, Paradev is a close alternative. It runs Claude Code, Codex, Cursor Agent, and other CLI agents in parallel worktrees, with diff review and pull requests, on your Mac, your hosts, your own Linux server, or cloud workspaces (beta).
+
+### Does Capy run Claude Code?
+
+Capy has a Claude Code mode for Claude Pro or Max plans. It runs on the Claude Agent SDK as its harness, and Capy's tools, machines, and pull requests work inside it. Claude models picked outside that mode run on Capy's own agent. Paradev runs the Claude Code CLI you installed, in a terminal or in the chat interface.
+
+### Can Capy run agents on my own computer?
+
+Yes. The Capy desktop app runs threads in a folder on your computer, and the Dock CLI pairs a headless Linux, macOS, or Windows machine. Capy still stores the thread in its cloud. Paradev runs agents on your Mac by default, and on hosts you add or your own Linux server on a paid plan.
+
+### Is Capy open source?
+
+No open-source license is published for Capy. It offers free access to maintainers of open-source projects. Paradev is open source under the MIT License.

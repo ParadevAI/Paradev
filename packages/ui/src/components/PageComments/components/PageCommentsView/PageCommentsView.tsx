@@ -16,7 +16,7 @@ import {
 	type PageViewportZoom,
 } from "@superset/shared/page-zoom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useJoinPagePresence } from "../../hooks/useJoinPagePresence";
+import { useJoinPresence } from "../../../Presence";
 import { usePageStorageConnect } from "../../hooks/usePageStorageConnect";
 import { type PageToolHost, usePageTools } from "../../hooks/usePageTools";
 import { useComments } from "../../providers/CommentProvider";
@@ -112,7 +112,7 @@ export function PageCommentsView({
 		host: toolHost,
 		pageId,
 	});
-	useJoinPagePresence({ pageId, url: presenceUrl });
+	useJoinPresence({ roomId: pageId, url: presenceUrl });
 
 	const [lastHoverRect, setLastHoverRect] = useState<FrameRect | null>(null);
 	useEffect(() => {

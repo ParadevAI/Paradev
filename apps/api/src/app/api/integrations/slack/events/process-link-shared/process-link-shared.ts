@@ -148,7 +148,7 @@ export async function unfurlLinks({
 				unfurls: {},
 				user_auth_required: true,
 				user_auth_message:
-					"Connect your Superset account to preview the pages you share.",
+					"Connect your Paradev account to preview the pages you share.",
 				user_auth_url: generateConnectUrl({
 					slackUserId,
 					teamId,

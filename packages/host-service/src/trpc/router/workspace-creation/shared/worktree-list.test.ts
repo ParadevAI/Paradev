@@ -27,6 +27,15 @@ describe("parseWorktreeList", () => {
 		]);
 	});
 
+	test("keeps trailing whitespace in a worktree path", () => {
+		const raw = [
+			"worktree /repo ",
+			"HEAD abc123",
+			"branch refs/heads/main",
+		].join("\n");
+		expect(parseWorktreeList(raw)[0]?.path).toBe("/repo ");
+	});
+
 	test("parses a detached worktree", () => {
 		const raw = ["worktree /repo/wt", "HEAD abc123", "detached", ""].join("\n");
 		const [record] = parseWorktreeList(raw);

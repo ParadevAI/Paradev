@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { parseAndroidLine, parseIosEvent } from "./parseLogLine";
+import {
+	parseAndroidBatch,
+	parseAndroidLine,
+	parseIosEvent,
+} from "./parseLogLine";
 
 // Samples captured from expo-device-hub 0.17.0.
 describe("parseIosEvent", () => {
@@ -31,6 +35,45 @@ describe("parseIosEvent", () => {
 		expect(parseIosEvent(JSON.stringify({ messageType: "Info" }), "1")).toBe(
 			null,
 		);
+	});
+
+	test("skips JSON that is not a log event", () => {
+		expect(parseIosEvent("null", "1")).toBe(null);
+		expect(parseIosEvent(JSON.stringify({ eventMessage: { a: 1 } }), "1")).toBe(
+			null,
+		);
+		expect(
+			parseIosEvent(JSON.stringify({ eventMessage: "x", timestamp: 5 }), "1"),
+		).toBe(null);
+	});
+});
+
+describe("parseAndroidBatch", () => {
+	test("reads every line of a batch", () => {
+		let n = 0;
+		const data = JSON.stringify({
+			lines: [{ line: "--------- beginning of main" }, { line: "plain" }],
+		});
+		expect(
+			parseAndroidBatch(data, () => `${++n}`).map(({ id, message }) => ({
+				id,
+				message,
+			})),
+		).toEqual([
+			{ id: "1", message: "--------- beginning of main" },
+			{ id: "2", message: "plain" },
+		]);
+	});
+
+	test("skips a batch that is not the expected shape", () => {
+		const nextId = () => "1";
+		expect(parseAndroidBatch("null", nextId)).toEqual([]);
+		expect(parseAndroidBatch(JSON.stringify({ lines: "x" }), nextId)).toEqual(
+			[],
+		);
+		expect(
+			parseAndroidBatch(JSON.stringify({ lines: [null] }), nextId),
+		).toEqual([]);
 	});
 });
 

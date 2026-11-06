@@ -7,6 +7,7 @@ import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
+	sandboxCredentialWorkspaceId,
 } from "@superset/trpc/lib/sandbox";
 import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
@@ -58,6 +59,9 @@ async function sessionFromOAuthBearer(
 
 	const activeOrganizationId =
 		typeof payload.organizationId === "string" ? payload.organizationId : null;
+	const organizationIds = Array.isArray(payload.organizationIds)
+		? payload.organizationIds
+		: undefined;
 
 	const sessionId = typeof payload.sid === "string" ? payload.sid : userId;
 
@@ -67,6 +71,7 @@ async function sessionFromOAuthBearer(
 			id: sessionId,
 			userId,
 			activeOrganizationId,
+			organizationIds,
 			expiresAt: new Date(((payload.exp as number) ?? 0) * 1000),
 			token: token,
 			ipAddress: null,
@@ -138,6 +143,9 @@ export const createContext = async ({
 		auth,
 		headers: req.headers,
 		sandboxCaller: sandbox?.caller ?? null,
+		sandboxWorkspaceId: await sandboxCredentialWorkspaceId(
+			req.headers.get(SANDBOX_API_CREDENTIAL_HEADER),
+		),
 	});
 
 	if (context.client) {

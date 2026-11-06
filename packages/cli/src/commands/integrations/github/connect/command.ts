@@ -1,4 +1,5 @@
 import { boolean, CLIError } from "@superset/cli-framework";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { command } from "../../../../lib/command";
 import { getApiUrl } from "../../../../lib/config";
 import { canReachDesktop, openUrl } from "../../../../lib/open-url";
@@ -9,7 +10,7 @@ const POLL_TIMEOUT_MS = 10 * 60_000;
 export default command({
 	sandbox: false,
 	description:
-		"Install the Superset GitHub App for the organization in the browser, so its repositories can back cloud environments",
+		"Install the Paradev GitHub App for the organization in the browser, so its repositories can back cloud environments",
 	options: {
 		noWait: boolean().desc("Print the install URL and exit without waiting"),
 	},
@@ -31,7 +32,7 @@ export default command({
 		if (!(await ctx.api.integration.syncAllowed.query({ organizationId }))) {
 			throw new CLIError(
 				"GitHub sync requires the Pro plan",
-				"Upgrade at https://superset.sh/pricing, or in the app under Settings → Billing.",
+				`Upgrade at ${CANONICAL_URLS.MARKETING}/pricing, or in the app under Settings → Billing.`,
 			);
 		}
 
@@ -42,7 +43,7 @@ export default command({
 				() => true,
 				() => false,
 			));
-		const instructions = `${opened ? "If your browser did not open, open" : "Open"} this URL, signed in to Superset in that browser, to install the GitHub App:\n  ${url}`;
+		const instructions = `${opened ? "If your browser did not open, open" : "Open"} this URL, signed in to Paradev in that browser, to install the GitHub App:\n  ${url}`;
 		if (options.noWait) {
 			return { data: { url }, message: instructions };
 		}

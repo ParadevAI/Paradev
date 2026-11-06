@@ -4,7 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev",
+		"dev": "dotenv -e ../../.env -- sh -c 'exec wrangler dev --port ${RELAY_PORT:-8787} --var NEXT_PUBLIC_API_URL:${NEXT_PUBLIC_API_URL:-http://localhost:3001}'",
 		"deploy": "wrangler deploy",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
@@ -15,7 +15,6 @@
 		"@superset/trpc": "workspace:*",
 		"@trpc/client": "11.16.0",
 		"hono": "4.13.7",
-		"lru-cache": "11.2.7",
 		"partyserver": "0.5.9",
 		"superjson": "2.2.6"
 	},

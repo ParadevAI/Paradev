@@ -139,7 +139,8 @@ function runStatusSnapshot(
 		priority?: "foreground" | "background";
 	},
 ) {
-	const requestKey = JSON.stringify({ baseBranch: input.baseBranch ?? null });
+	const baseBranch = input.baseBranch || undefined;
+	const requestKey = JSON.stringify({ baseBranch: baseBranch ?? null });
 	return gitStatusRefreshLimiter.run({
 		workspaceId: input.workspaceId,
 		requestKey,
@@ -153,7 +154,7 @@ function runStatusSnapshot(
 				const snapshotStartedAt = Date.now();
 				const result = await workerPool.run(
 					gitStatusSnapshotTask,
-					{ worktreePath, baseBranch: input.baseBranch, gitEnv },
+					{ worktreePath, baseBranch, gitEnv },
 					{ timeoutMs: 15_000 },
 				);
 				if (result.baseRefFetchTarget) {
@@ -191,7 +192,7 @@ function runStatusSnapshot(
 
 			return gitStatusStore.read({
 				workspaceId: input.workspaceId,
-				baseBranch: input.baseBranch ?? null,
+				baseBranch: baseBranch ?? null,
 				computeFull,
 				computePartial: (paths) =>
 					workerPool.run(
@@ -906,6 +907,13 @@ export const gitRouter = router({
 				)
 				.catch((error: unknown) => {
 					rethrowEnvironmentalGitError(error);
+					if (error instanceof Error && error.name === "BaseRefMissingError") {
+						throw new TRPCError({
+							code: "NOT_FOUND",
+							message: error.message,
+							cause: { kind: "BASE_REF_MISSING" },
+						});
+					}
 					throw error;
 				});
 		}),
@@ -1087,6 +1095,7 @@ export const gitRouter = router({
 			return { logs: typeof data === "string" ? data : String(data) };
 		}),
 
+	/** @deprecated Use the API's `integration.github.getPullRequestThreads`, which acts as the viewer. Kept for released clients. */
 	getPullRequestThreads: queryProcedure
 		.meta({ timeoutMs: 30_000 })
 		.input(z.object({ workspaceId: z.string() }))
@@ -1190,6 +1199,7 @@ export const gitRouter = router({
 			return { reviewThreads, conversationComments };
 		}),
 
+	/** @deprecated Use the API's `integration.github.setPullRequestThreadResolution`, which acts as the viewer. Kept for released clients. */
 	setReviewThreadResolution: protectedProcedure
 		.input(
 			z.object({
@@ -1237,6 +1247,8 @@ export const gitRouter = router({
 	 * Replies into a review thread on the workspace's linked PR. Threads onto
 	 * `commentId` — a REST databaseId from getPullRequestThreads — which
 	 * GitHub accepts for any comment already in the thread.
+	 *
+	 * @deprecated Use the API's `integration.github.replyToPullRequestThread`, which acts as the viewer. Kept for released clients.
 	 */
 	replyToReviewThread: protectedProcedure
 		.input(

@@ -24,6 +24,7 @@ import { WorkspaceCreateErrorState } from "../components/WorkspaceCreateErrorSta
 import { WorkspaceCreatingState } from "../components/WorkspaceCreatingState";
 import { WorkspaceHostIncompatibleState } from "../components/WorkspaceHostIncompatibleState";
 import { useArchivedCloudWorkspace } from "../hooks/useArchivedCloudWorkspace";
+import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useRemoteHostStatus } from "../hooks/useRemoteHostStatus";
 import { useWorkspaceMissVerdict } from "../hooks/useWorkspaceMissVerdict";
 import { WorkspaceProvider } from "../providers/WorkspaceProvider";
@@ -42,6 +43,7 @@ function V2WorkspaceLayout() {
 	// could always reach and this one cannot.
 	const { workspaceId } = Route.useParams();
 	const collections = useCollections();
+	const pendingCloudChat = usePendingCloudChat(workspaceId);
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const pendingTransaction = useWorkspaceTransactionsStore((state) =>
 		workspaceId ? (state.byWorkspaceId[workspaceId] ?? null) : null,
@@ -88,15 +90,18 @@ function V2WorkspaceLayout() {
 	const cloudWorkspace =
 		cloudWorkspaces.find((row) => row.id === workspaceId) ?? null;
 	// A ready cloud workspace opens on its own row; the box's row, when the
-	// fan-out has it, is the same workspace with live fields.
-	const workspace = useMemo(
-		() =>
-			hostWorkspace ??
-			(isCloud && cloudWorkspace?.status === "ready"
-				? hostShapedCloudWorkspace(cloudWorkspace)
-				: null),
-		[hostWorkspace, isCloud, cloudWorkspace],
-	);
+	// fan-out has it, is the same workspace with live fields. The box seeds its
+	// row with a placeholder name: the cloud row owns the real one.
+	const workspace = useMemo(() => {
+		if (hostWorkspace) {
+			return cloudWorkspace
+				? { ...hostWorkspace, name: cloudWorkspace.name }
+				: hostWorkspace;
+		}
+		return isCloud && cloudWorkspace?.status === "ready"
+			? hostShapedCloudWorkspace(cloudWorkspace)
+			: null;
+	}, [hostWorkspace, isCloud, cloudWorkspace]);
 	const archivedCloudWorkspace = useArchivedCloudWorkspace(
 		workspaceId,
 		!workspace && !cloudWorkspace,
@@ -156,7 +161,7 @@ function V2WorkspaceLayout() {
 	// provisioning there is no box to open, and once it has failed there never
 	// will be; a ready one only waits for its address to be minted.
 	if (!workspace && cloudWorkspace) {
-		if (cloudWorkspace.status === "ready") {
+		if (cloudWorkspace.status === "ready" && !pendingCloudChat) {
 			return <StateScreenShell>{null}</StateScreenShell>;
 		}
 		return (

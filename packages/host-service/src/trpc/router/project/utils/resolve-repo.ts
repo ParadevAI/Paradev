@@ -66,7 +66,7 @@ export function validateDirectoryPath(path: string, label: string): void {
  * Ensure the parent directory we're about to create a project under exists,
  * creating it (and any missing ancestors) when it doesn't. Unlike
  * `validateDirectoryPath`, a missing parent is a recoverable condition: the
- * default project location (e.g. `~/.superset/projects`) won't exist on a
+ * default project location (e.g. `~/.paradev/projects`) won't exist on a
  * fresh machine, and the user shouldn't have to pre-create it before their
  * first clone. Still rejects when the path exists but is a file.
  */
@@ -218,12 +218,22 @@ async function commitInitialEmpty(repoPath: string): Promise<void> {
  * repo a caller points us at that already exists but was never committed to.
  */
 async function ensureNotUnborn(repoPath: string): Promise<void> {
+	const git = createUserSimpleGit(repoPath);
 	try {
-		await createUserSimpleGit(repoPath).raw(["rev-parse", "--verify", "HEAD"]);
+		await git.raw(["rev-parse", "--verify", "HEAD"]);
 		return;
-	} catch {
-		// Unborn HEAD — fall through and seed the same scaffold commit a
-		// freshly `git init`'d repo gets.
+	} catch {}
+	// git commits onto a HEAD that names an invalid ref, then cannot read
+	// that ref back, so only an unborn branch gets the scaffold commit.
+	try {
+		await git.raw(["symbolic-ref", "-q", "HEAD"]);
+	} catch (err) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"This repository's HEAD does not point to a valid branch. Run: git symbolic-ref HEAD refs/heads/main",
+			cause: err,
+		});
 	}
 	await commitInitialEmpty(repoPath);
 }
@@ -236,6 +246,15 @@ function findUnreadableRepoAbove(path: string): string | undefined {
 	}
 }
 
+// simple-git's revparse() trims, which drops trailing spaces of a folder name.
+export async function readGitToplevel(path: string): Promise<string> {
+	const stdout = await createUserSimpleGit(path).raw([
+		"rev-parse",
+		"--show-toplevel",
+	]);
+	return stdout.replace(/\n$/, "");
+}
+
 /**
  * Returns the canonical git root for `path`, or `null` when `path` is not
  * inside a git work tree. Callers that want to branch on "is this a git
@@ -246,9 +265,7 @@ function findUnreadableRepoAbove(path: string): string | undefined {
 export async function tryRevParseGitRoot(path: string): Promise<string | null> {
 	let error: unknown;
 	try {
-		return (
-			await createUserSimpleGit(path).revparse(["--show-toplevel"])
-		).trim();
+		return await readGitToplevel(path);
 	} catch (err) {
 		error = err;
 	}

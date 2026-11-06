@@ -3,7 +3,7 @@
 	"name": "Darker",
 	"type": "dark",
 	"author": "0x962",
-	"description": "A near-black theme with cool greys and Superset's ember accent.",
+	"description": "A near-black theme with cool greys and Paradev's ember accent.",
 	"ui": {
 		"background": "#08090a",
 		"foreground": "#f7f8f8",

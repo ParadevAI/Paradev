@@ -9,6 +9,7 @@ const ROUTES = [
 	"cloud",
 	"community",
 	"compare",
+	"conductor",
 	"contact",
 	"download",
 	"enterprise",

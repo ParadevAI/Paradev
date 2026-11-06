@@ -18,10 +18,6 @@ export function reviveCloudWorkspaceRow(
 		updatedAt: asDate(row.updatedAt),
 		deletedAt: asDate(row.deletedAt),
 		agentStatusAt: asDate(row.agentStatusAt),
-		presence: row.presence.map((person) => ({
-			...person,
-			lastSeenAt: asDate(person.lastSeenAt),
-		})),
 	};
 }
 

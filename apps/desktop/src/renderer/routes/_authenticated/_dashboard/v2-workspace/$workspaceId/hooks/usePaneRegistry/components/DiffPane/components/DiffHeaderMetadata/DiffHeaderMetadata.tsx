@@ -21,6 +21,8 @@ interface DiffHeaderMetadataProps {
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
 	onOpenInExternalEditor: (path: string) => void;
 	isEditing: boolean;
+	/** Past the size the pane loads in full: no expanding or editing here. */
+	isTooLarge: boolean;
 	isDirty: boolean;
 	isSaving: boolean;
 	onSaveEditing?: () => void;
@@ -36,6 +38,7 @@ export function DiffHeaderMetadata({
 	onOpenFile,
 	onOpenInExternalEditor,
 	isEditing,
+	isTooLarge,
 	isDirty,
 	isSaving,
 	onSaveEditing,
@@ -119,141 +122,161 @@ export function DiffHeaderMetadata({
 
 	return (
 		<>
-			<div
-				ref={actionsRef}
-				className={cn(
-					"flex shrink-0 items-center gap-1 transition-opacity duration-100",
-					!isEditing && !headerHovered && "pointer-events-none opacity-0",
-				)}
-				data-diff-actions
-				data-editing={isEditing ? "" : undefined}
-			>
-				{isEditing && onSaveEditing && onCancelEditing ? (
-					<>
-						<output
-							className={cn(
-								"size-1.5 rounded-full transition-colors",
-								isDirty ? "bg-amber-500" : "bg-muted-foreground/30",
-							)}
-							aria-label={
-								isDirty
-									? t({
-											message: "Unsaved changes",
-										})
-									: t({
-											message: "All changes saved",
-										})
-							}
-						/>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={onSaveEditing}
-									aria-label={t({
-										message: "Save edits",
-									})}
-									disabled={!isDirty || isSaving}
-									className="rounded bg-accent p-1 text-foreground transition-colors hover:bg-accent/80 disabled:opacity-40"
-								>
-									<LuCheck className="size-3.5" />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<Trans>Save edits (⌘S)</Trans>
-							</TooltipContent>
-						</Tooltip>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={onCancelEditing}
-									aria-label={t({
-										message: "Cancel edits",
-									})}
-									className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-muted-foreground"
-								>
-									<LuX className="size-3.5" />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<Trans>Cancel edits</Trans>
-							</TooltipContent>
-						</Tooltip>
-					</>
-				) : (
-					<>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={() => void copyToClipboard(file.path)}
-									aria-label={t({
-										message: "Copy path",
-									})}
-									className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-muted-foreground"
-								>
-									{copied ? (
-										<LuCheck className="size-3.5" />
-									) : (
-										<LuCopy className="size-3.5" />
-									)}
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								{copied ? <Trans>Copied</Trans> : <Trans>Copy path</Trans>}
-							</TooltipContent>
-						</Tooltip>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={handleOpenClick}
-									aria-label={t({
-										message: "Open in file viewer",
-									})}
-									className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-muted-foreground"
-								>
-									<LuExternalLink className="size-3.5" />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">{policy.hint}</TooltipContent>
-						</Tooltip>
-						{requestDiscard ? (
+			<div className="flex items-center gap-1">
+				{isTooLarge ? (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={handleOpenClick}
+								className="shrink-0 rounded px-1.5 py-1 text-muted-foreground text-xs transition-colors hover:bg-accent hover:text-foreground"
+							>
+								<Trans>Too large to expand</Trans>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<Trans>Open the file to see all of it or edit it.</Trans>
+						</TooltipContent>
+					</Tooltip>
+				) : null}
+				<div
+					ref={actionsRef}
+					className={cn(
+						"flex shrink-0 items-center gap-1 transition-opacity duration-100",
+						!isEditing &&
+							!headerHovered &&
+							"pointer-events-none max-w-0 overflow-hidden opacity-0",
+					)}
+					data-diff-actions
+					data-editing={isEditing ? "" : undefined}
+				>
+					{isEditing && onSaveEditing && onCancelEditing ? (
+						<>
+							<output
+								className={cn(
+									"size-1.5 rounded-full transition-colors",
+									isDirty ? "bg-amber-500" : "bg-muted-foreground/30",
+								)}
+								aria-label={
+									isDirty
+										? t({
+												message: "Unsaved changes",
+											})
+										: t({
+												message: "All changes saved",
+											})
+								}
+							/>
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<button
 										type="button"
-										onClick={requestDiscard}
+										onClick={onSaveEditing}
 										aria-label={t({
-											message: "Discard changes",
+											message: "Save edits",
 										})}
-										data-discard-button
-										className="rounded p-1 text-muted-foreground/60 transition-all hover:bg-accent hover:text-destructive"
+										disabled={!isDirty || isSaving}
+										className="rounded bg-accent p-1 text-foreground transition-colors hover:bg-accent/80 disabled:opacity-40"
 									>
-										<LuUndo2 className="size-3.5" />
+										<LuCheck className="size-3.5" />
 									</button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom">
-									<Trans>Discard changes</Trans>
+									<Trans>Save edits (⌘S)</Trans>
 								</TooltipContent>
 							</Tooltip>
-						) : null}
-						<button
-							type="button"
-							onClick={handleToggleViewed}
-							aria-pressed={viewed}
-							className="flex items-center gap-1.5 rounded px-1.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-						>
-							{viewed ? <LuCheck className="size-3.5" /> : null}
-							{viewed ? (
-								<Trans>Marked as viewed</Trans>
-							) : (
-								<Trans>Mark as viewed</Trans>
-							)}
-						</button>
-					</>
-				)}
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type="button"
+										onClick={onCancelEditing}
+										aria-label={t({
+											message: "Cancel edits",
+										})}
+										className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-muted-foreground"
+									>
+										<LuX className="size-3.5" />
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">
+									<Trans>Cancel edits</Trans>
+								</TooltipContent>
+							</Tooltip>
+						</>
+					) : (
+						<>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type="button"
+										onClick={() => void copyToClipboard(file.path)}
+										aria-label={t({
+											message: "Copy path",
+										})}
+										className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-muted-foreground"
+									>
+										{copied ? (
+											<LuCheck className="size-3.5" />
+										) : (
+											<LuCopy className="size-3.5" />
+										)}
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">
+									{copied ? <Trans>Copied</Trans> : <Trans>Copy path</Trans>}
+								</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type="button"
+										onClick={handleOpenClick}
+										aria-label={t({
+											message: "Open in file viewer",
+										})}
+										className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-muted-foreground"
+									>
+										<LuExternalLink className="size-3.5" />
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">{policy.hint}</TooltipContent>
+							</Tooltip>
+							{requestDiscard ? (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<button
+											type="button"
+											onClick={requestDiscard}
+											aria-label={t({
+												message: "Discard changes",
+											})}
+											data-discard-button
+											className="rounded p-1 text-muted-foreground/60 transition-all hover:bg-accent hover:text-destructive"
+										>
+											<LuUndo2 className="size-3.5" />
+										</button>
+									</TooltipTrigger>
+									<TooltipContent side="bottom">
+										<Trans>Discard changes</Trans>
+									</TooltipContent>
+								</Tooltip>
+							) : null}
+							<button
+								type="button"
+								onClick={handleToggleViewed}
+								aria-pressed={viewed}
+								className="flex items-center gap-1.5 rounded px-1.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+							>
+								{viewed ? <LuCheck className="size-3.5" /> : null}
+								{viewed ? (
+									<Trans>Marked as viewed</Trans>
+								) : (
+									<Trans>Mark as viewed</Trans>
+								)}
+							</button>
+						</>
+					)}
+				</div>
 			</div>
 			{canDiscard ? (
 				<DiscardConfirmDialog

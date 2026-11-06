@@ -6,7 +6,7 @@
  * organization (e.g. a1b2c3d4-…), which has nothing to do with the org your
  * `superset auth login` lands in. So a plain `bun run --cwd packages/cli dev`
  * authenticates as the wrong org and can't find the dev host. This wrapper
- * reads the live host manifest under `<worktree>/superset-dev-data/host/*` and
+ * reads the live host manifest under `<worktree>/paradev-dev-data/host/*` and
  * points the CLI at it:
  *   - SUPERSET_HOME_DIR      → the dev data dir (so it reads the dev manifests)
  *   - SUPERSET_ORGANIZATION_ID → the live host's org (so the local host resolves)
@@ -25,7 +25,7 @@ function repoRoot(): string {
 			encoding: "utf-8",
 		}).trim();
 	} catch {
-		// Fall back to walking up from this file to the first dir with a superset-dev-data.
+		// Fall back to walking up from this file to the first dir with a package.json.
 		let dir = dirname(new URL(import.meta.url).pathname);
 		for (let i = 0; i < 8; i++) {
 			if (existsSync(join(dir, "package.json"))) return dir;
@@ -70,12 +70,13 @@ function findLiveHost(homeDir: string): Manifest | null {
 }
 
 const root = repoRoot();
-const homeDir = join(root, "superset-dev-data");
+const homeDir = join(root, "paradev-dev-data");
 const host = findLiveHost(homeDir);
 if (!host) {
 	console.error(
 		`No live dev host found under ${homeDir}/host/*.\n` +
-			"Start the dev desktop app first (bun run dev:desktop) and open a workspace, then retry.",
+			"Start the dev desktop app first (bun run dev:desktop) and open a workspace, then retry.\n" +
+			"A worktree set up before paradev-dev-data needs ./.paradev/setup.sh re-run and the dev app restarted.",
 	);
 	process.exit(1);
 }

@@ -11,6 +11,7 @@ import {
 	type LexicalNode,
 	type RangeSelection,
 } from "lexical";
+import { $appendDraftSegments, $readPromptText } from "../draftSegments";
 
 function $isCaretAtStart(selection: RangeSelection): boolean {
 	if (selection.anchor.offset !== 0) return false;
@@ -23,15 +24,15 @@ function $isCaretAtStart(selection: RangeSelection): boolean {
 }
 
 function $replaceText(text: string) {
-	const paragraph = $createParagraphNode();
-	$getRoot().clear().append(paragraph);
-	paragraph.select().insertRawText(text);
+	const root = $getRoot().clear();
+	$appendDraftSegments([{ type: "text", text }]);
+	if (root.isEmpty()) root.append($createParagraphNode()).selectEnd();
 }
 
 export function registerHistoryNavigation(
 	editor: LexicalEditor,
 	getHistory: () => readonly string[],
-): { reset: () => void; unregister: () => void } {
+): { recallOlder: () => void; reset: () => void; unregister: () => void } {
 	let index: number | null = null;
 	let recalled = "";
 	let draft: EditorState | null = null;
@@ -46,7 +47,7 @@ export function registerHistoryNavigation(
 			return false;
 		const selection = $getSelection();
 		if (!$isRangeSelection(selection) || !selection.isCollapsed()) return false;
-		const text = $getRoot().getTextContent();
+		const text = $readPromptText();
 
 		let next: number | null;
 		if (index === null) {
@@ -67,8 +68,8 @@ export function registerHistoryNavigation(
 		event?.preventDefault();
 		index = next;
 		if (next !== null) {
-			recalled = history[next] ?? "";
-			$replaceText(recalled);
+			$replaceText(history[next] ?? "");
+			recalled = $readPromptText();
 			return true;
 		}
 		recalled = "";
@@ -94,6 +95,14 @@ export function registerHistoryNavigation(
 	);
 
 	return {
+		recallOlder: () =>
+			editor.update(
+				() => {
+					if (!$isRangeSelection($getSelection())) $getRoot().selectStart();
+					navigate("older", null);
+				},
+				{ discrete: true },
+			),
 		reset: () => {
 			index = null;
 			recalled = "";

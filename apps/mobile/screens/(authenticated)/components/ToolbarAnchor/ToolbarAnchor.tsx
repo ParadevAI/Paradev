@@ -1,5 +1,6 @@
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { type RefObject, useCallback, useEffect, useState } from "react";
+import type { ViewInstance } from "react-native";
 import { findNodeHandle, View } from "react-native";
 
 // Center of the trailing header button: 16pt margin plus half a 44pt button.
@@ -14,7 +15,11 @@ const TRAILING_BUTTON_CENTER = 38;
  * Render it in the screen's root view and pass `anchorOf(ref)` as
  * `Share.share`'s `anchor`.
  */
-export function ToolbarAnchor({ ref }: { ref: RefObject<View | null> }) {
+export function ToolbarAnchor({
+	ref,
+}: {
+	ref: RefObject<ViewInstance | null>;
+}) {
 	const headerHeight = useHeaderHeight();
 	const [top, setTop] = useState(0);
 
@@ -50,6 +55,8 @@ export function ToolbarAnchor({ ref }: { ref: RefObject<View | null> }) {
 }
 
 /** A view's React tag as `Share.share` / `ActionSheetIOS` take an anchor. */
-export function anchorOf(ref: RefObject<View | null>): number | undefined {
+export function anchorOf(
+	ref: RefObject<ViewInstance | null>,
+): number | undefined {
 	return findNodeHandle(ref.current) ?? undefined;
 }

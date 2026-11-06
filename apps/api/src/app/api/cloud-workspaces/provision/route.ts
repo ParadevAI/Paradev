@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	cloudAgentLaunchSchema,
@@ -44,6 +45,13 @@ export async function POST(request: Request): Promise<Response> {
 	// torn down, so answering 200 is right: a redelivery would repeat work that
 	// deliberately gave up. QStash's retries are for the deliveries that never
 	// reach this line.
-	const outcome = await provisionCloudWorkspace(parsed.data);
+	// The start that queued this job forwarded its trace through QStash.
+	const outcome = await Sentry.continueTrace(
+		{
+			sentryTrace: request.headers.get("sentry-trace") ?? undefined,
+			baggage: request.headers.get("baggage") ?? undefined,
+		},
+		() => provisionCloudWorkspace(parsed.data),
+	);
 	return Response.json({ ok: true, outcome });
 }

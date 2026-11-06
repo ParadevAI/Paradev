@@ -10,29 +10,25 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { resolveWriteTarget } from "@superset/agent-setup/write-file-if-changed";
+import type { StoredOAuth } from "@superset/shared/oauth-refresh";
 import { env } from "./env";
-import { getSupersetHomeDir } from "./settings/paths";
 
-/** A token this close to `auth.expiresAt` is treated as expired. */
-export const AUTH_REFRESH_LEEWAY_MS = 5 * 60 * 1000;
+export { AUTH_REFRESH_LEEWAY_MS } from "@superset/shared/oauth-refresh";
 
 export type SupersetConfig = {
-	auth?: {
-		accessToken: string;
-		refreshToken?: string;
-		expiresAt: number;
-	};
+	auth?: StoredOAuth;
 	apiKey?: string;
 	organizationId?: string;
 };
 
 export function getSupersetConfigPath(): string {
-	return join(getSupersetHomeDir(), "config.json");
+	return join(resolveAppHomeDir(), "config.json");
 }
 
 function ensureDir() {
-	const homeDir = getSupersetHomeDir();
+	const homeDir = resolveAppHomeDir();
 	if (!existsSync(homeDir)) {
 		mkdirSync(homeDir, { recursive: true, mode: 0o700 });
 	}

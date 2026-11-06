@@ -5,15 +5,16 @@
 		"@react-email/preview-server": "5.0.7",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
-		"@types/react": "19.2.14",
+		"@types/react": "19.3.0",
 		"@types/tailwindcss": "3.1.0",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"react-email": "5.0.7",
 		"typescript": "7.0.2"
 	},
 	"exports": {
 		"./emails/marketing/DownloadLinkEmail": "./src/emails/marketing/DownloadLinkEmail/index.ts",
-		"./emails/*": "./src/emails/*.tsx"
+		"./emails/*": "./src/emails/*.tsx",
+		"./sender": "./src/lib/sender.ts"
 	},
 	"private": true,
 	"scripts": {
@@ -33,8 +34,8 @@
 		"@t3-oss/env-core": "0.13.11",
 		"date-fns": "4.1.0",
 		"drizzle-orm": "0.45.2",
-		"react": "19.2.3",
-		"react-dom": "19.2.3",
+		"react": "19.3.0",
+		"react-dom": "19.3.0",
 		"resend": "6.18.0",
 		"tailwindcss": "4.2.2",
 		"zod": "4.6.5"

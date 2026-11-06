@@ -23,13 +23,46 @@ const PLAN_BY_PRICE: Record<string, string> = {
 	[env.STRIPE_PRO_MONTHLY_PRICE_ID]: PRO_MONTHLY_PLAN_ID,
 	[env.STRIPE_PRO_YEARLY_PRICE_ID]: PRO_ANNUAL_PLAN_ID,
 };
+// Autumn imports onto a plan's latest version; these Stripe prices are version 1's.
+const LEGACY_PRICE_PLAN_VERSION = 1;
 
 const ENTERPRISE_TEMPLATE_PLAN_ID = "enterprise";
 const SEAT_INTERVALS = new Set(["month", "year"]);
 
 const apply = process.argv.includes("--apply");
 
+/**
+ * Organizations whose Autumn record is deleted (Autumn only; Stripe is never
+ * written) and imaged again from Stripe, for drift that verify reports.
+ * `--reimport a,b` or `--reimport=a,b`, repeatable.
+ */
+const reimport = new Set(
+	process.argv
+		.flatMap((arg, index, argv) => {
+			if (arg === "--reimport") return [argv[index + 1] ?? ""];
+			if (arg.startsWith("--reimport="))
+				return [arg.slice("--reimport=".length)];
+			return [];
+		})
+		.flatMap((value) => value.split(","))
+		.map((id) => id.trim())
+		.filter(Boolean),
+);
+
 type AutumnPlan = Awaited<ReturnType<typeof autumnClient.plans.get>>;
+
+function stripeSnapshot(subscription: Stripe.Subscription) {
+	return JSON.stringify({
+		status: subscription.status,
+		cancelAt: subscription.cancel_at,
+		cancelAtPeriodEnd: subscription.cancel_at_period_end,
+		items: subscription.items.data.map((item) => [
+			item.price.id,
+			item.quantity ?? null,
+		]),
+		discounts: subscription.discounts,
+	});
+}
 
 function dealPlanId(price: Stripe.Price): string {
 	return `enterprise_${price.id.replace(/^price_/, "").toLowerCase()}`;
@@ -159,7 +192,13 @@ async function main() {
 
 	const seen = new Set<string>();
 	const dealPlans = new Map<string, string>();
-	const counts = { imported: 0, alreadyLinked: 0, skipped: 0, drifted: 0 };
+	const counts = {
+		imported: 0,
+		reimported: 0,
+		alreadyLinked: 0,
+		skipped: 0,
+		drifted: 0,
+	};
 	const verify = async (organizationId: string) => {
 		const result = await autumn.billing.verify({ customerId: organizationId });
 		const mismatched = result.subscriptions.filter(
@@ -188,7 +227,8 @@ async function main() {
 			const existing = await autumn.customers
 				.get({ customerId: row.organizationId, expand: ["flags.feature"] })
 				.catch(() => null);
-			if (existing && paidPlanIdFromFlags(existing.flags)) {
+			const reimaging = reimport.has(row.organizationId);
+			if (existing && paidPlanIdFromFlags(existing.flags) && !reimaging) {
 				counts.alreadyLinked += 1;
 				await verify(row.organizationId);
 				continue;
@@ -212,6 +252,19 @@ async function main() {
 				);
 				continue;
 			}
+			if (reimaging && existing) {
+				console.log(
+					`[autumn-import] ${apply ? "delete" : "would delete"} Autumn customer ${label} (Stripe untouched) and re-image it onto ${planId}: price=${seat.price.id} quantity=${seat.quantity ?? 1} cancel_at=${stripeSubscription.cancel_at ?? "-"}`,
+				);
+				if (!apply) {
+					counts.reimported += 1;
+					continue;
+				}
+				await autumn.customers.delete({
+					customerId: row.organizationId,
+					deleteInStripe: false,
+				});
+			}
 			if (!apply && !(await autumn.plans.get({ planId }).catch(() => null))) {
 				counts.imported += 1;
 				console.log(
@@ -229,6 +282,9 @@ async function main() {
 						link: { subscriptionId: row.stripeSubscriptionId },
 						plan: {
 							planId,
+							...(row.plan === "enterprise"
+								? {}
+								: { version: LEGACY_PRICE_PLAN_VERSION }),
 							featureQuantities: [
 								{ featureId: SEATS_FEATURE_ID, quantity: seat.quantity ?? 1 },
 							],
@@ -241,15 +297,32 @@ async function main() {
 				(entry) => entry.mismatch || entry.skipped,
 			);
 			if (problems.length > 0) {
+				if (apply && reimaging) {
+					throw new Error(
+						`re-image of ${label} did not land after its Autumn record was deleted; run the import again without --reimport to restore it: ${JSON.stringify(problems)}`,
+					);
+				}
 				counts.skipped += 1;
 				console.log(
 					`[autumn-import] skip ${label}: ${JSON.stringify(problems)}`,
 				);
 				continue;
 			}
-			counts.imported += 1;
+			if (reimaging) counts.reimported += 1;
+			else counts.imported += 1;
 			if (apply) await verify(row.organizationId);
+			if (apply && reimaging) {
+				const after = await stripeClient.subscriptions.retrieve(
+					row.stripeSubscriptionId,
+				);
+				if (stripeSnapshot(after) !== stripeSnapshot(stripeSubscription)) {
+					throw new Error(
+						`Stripe subscription ${row.stripeSubscriptionId} changed during re-image; stopping. before=${stripeSnapshot(stripeSubscription)} after=${stripeSnapshot(after)}`,
+					);
+				}
+			}
 		} catch (error) {
+			if (apply && reimport.has(row.organizationId)) throw error;
 			counts.skipped += 1;
 			console.error(`[autumn-import] failed ${label}`, error);
 		}
@@ -261,8 +334,15 @@ async function main() {
 		);
 	}
 	console.log(
-		`[autumn-import] ${apply ? "imported" : "would import"} ${counts.imported}, already linked ${counts.alreadyLinked}, skipped ${counts.skipped}, drifted ${counts.drifted}, of ${seen.size} organizations. Flip BILLING_PROVIDER only when skipped and drifted are both 0.`,
+		`[autumn-import] ${apply ? "imported" : "would import"} ${counts.imported}, ${apply ? "re-imaged" : "would re-image"} ${counts.reimported}, already linked ${counts.alreadyLinked}, skipped ${counts.skipped}, drifted ${counts.drifted}, of ${seen.size} organizations. Flip BILLING_PROVIDER only when skipped and drifted are both 0.`,
 	);
+	const unlinked = apply ? 0 : counts.imported + counts.reimported;
+	if (unlinked + counts.skipped + counts.drifted > 0) {
+		console.error(
+			`[autumn-import] Autumn does not match Stripe for ${unlinked + counts.skipped + counts.drifted} organizations; they read wrong in the app until this is clean.`,
+		);
+		process.exitCode = 1;
+	}
 }
 
 await main();

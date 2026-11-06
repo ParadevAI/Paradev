@@ -5,7 +5,7 @@ import { SUPERSET_CHAT_MODELS } from "@superset/shared/agent-models";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 
 // Re-shaped from the canonical catalog in `@superset/shared/agent-models` so
@@ -17,11 +17,11 @@ const AVAILABLE_MODELS = SUPERSET_CHAT_MODELS.map((model) => ({
 }));
 
 export const chatRouter = {
-	getModels: protectedProcedure.query(() => {
+	getModels: personProcedure.query(() => {
 		return { models: AVAILABLE_MODELS };
 	}),
 
-	listSessions: protectedProcedure
+	listSessions: personProcedure
 		.input(
 			z
 				.object({ sessionIds: z.array(z.uuid()).max(100).optional() })
@@ -55,7 +55,7 @@ export const chatRouter = {
 			return sessionIds ? query : query.limit(200);
 		}),
 
-	createSession: protectedProcedure
+	createSession: personProcedure
 		.input(
 			z.object({
 				sessionId: z.uuid(),
@@ -99,7 +99,7 @@ export const chatRouter = {
 			};
 		}),
 
-	updateSession: protectedProcedure
+	updateSession: personProcedure
 		.input(
 			z.object({
 				sessionId: z.uuid(),
@@ -144,7 +144,7 @@ export const chatRouter = {
 			return { updated: !!updated };
 		}),
 
-	deleteSession: protectedProcedure
+	deleteSession: personProcedure
 		.input(z.object({ sessionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = ctx.activeOrganizationId;
@@ -178,7 +178,7 @@ export const chatRouter = {
 			return { deleted: !!deleted, txid };
 		}),
 
-	updateTitle: protectedProcedure
+	updateTitle: personProcedure
 		.input(z.object({ sessionId: z.uuid(), title: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			const [updated] = await db

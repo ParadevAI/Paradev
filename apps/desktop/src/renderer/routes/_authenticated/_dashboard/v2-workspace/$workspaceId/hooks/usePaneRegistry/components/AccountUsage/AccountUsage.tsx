@@ -4,18 +4,12 @@ import { AGENT_IDENTITY_LABELS } from "@superset/shared/agent-catalog";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, CircleHelp, Loader2, Zap } from "lucide-react";
 import { useState } from "react";
-import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
-import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
-import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useNow } from "renderer/hooks/useNow";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { formatResetLabel } from "renderer/utils/usage/formatResetIn";
+import { useAccountUsage } from "../../hooks/useAccountUsage";
 import { UsageProgressRing } from "./components/UsageProgressRing";
-import { getAccountUsageState } from "./utils/getAccountUsageState";
 
 interface AccountUsageProps {
 	workspaceId: string;
@@ -25,58 +19,12 @@ interface AccountUsageProps {
 export function AccountUsage({ workspaceId, terminalId }: AccountUsageProps) {
 	const { t } = useLingui();
 	const [openSession, setOpenSession] = useState<string | null>(null);
-	const binding = useTerminalAgentBinding(workspaceId, terminalId);
-	const hostUrl = useWorkspaceHostUrl(workspaceId);
+	const { account, binding, hostUrl, now, state, status, tightest } =
+		useAccountUsage(workspaceId, terminalId);
 	const sessionKey = `${hostUrl}:${terminalId}:${binding?.startedAt}:${binding?.agentSessionId}`;
 	const open = openSession === sessionKey;
 	const setOpen = (value: boolean) => setOpenSession(value ? sessionKey : null);
-	const supported =
-		binding?.agentId === "claude" || binding?.agentId === "codex";
-	const quota = useHostUsageQuota(binding && supported ? hostUrl : null);
-	const identity = useQuery({
-		queryKey: [
-			"session-usage-account",
-			hostUrl,
-			workspaceId,
-			terminalId,
-			binding?.startedAt,
-			binding?.agentSessionId,
-			binding?.launchId,
-		],
-		enabled: !!hostUrl && !!binding && supported,
-		queryFn: () =>
-			hostUrl && binding
-				? getHostServiceClientByUrl(hostUrl).usage.sessionAccount.query({
-						workspaceId,
-						terminalId,
-						startedAt: binding.startedAt,
-					})
-				: null,
-		staleTime: 30_000,
-		refetchInterval: 30_000,
-	});
-	const now = useNow(30_000);
 	if (!binding) return null;
-	const { account, state, tightest } = getAccountUsageState({
-		supported,
-		identity: identity.isError ? null : identity.data,
-		accounts: quota.data ?? [],
-		loading: supported && (identity.isPending || quota.isPending),
-		failed: quota.isError,
-		now: now.getTime(),
-	});
-	const status =
-		state === "loading"
-			? t({ message: "Reading usage…" })
-			: state === "api"
-				? t({ message: "API billing" })
-				: state === "unverified"
-					? t({ message: "Login unverified" })
-					: state === "stale"
-						? t({ message: "Usage is out of date" })
-						: state === "unavailable"
-							? t({ message: "Usage unavailable." })
-							: null;
 	const percent = tightest ? formatPercent(tightest.usedPercent / 100) : "";
 	const summary = status ?? t({ message: `${percent} used` });
 	const title = t({ message: "Account usage" });

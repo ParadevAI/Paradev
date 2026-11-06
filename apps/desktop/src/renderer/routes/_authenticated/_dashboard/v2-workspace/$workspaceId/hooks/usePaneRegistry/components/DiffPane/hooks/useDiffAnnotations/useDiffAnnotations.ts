@@ -1,8 +1,10 @@
 import type { SelectionSide } from "@pierre/diffs";
 import type { DiffLineAnnotation } from "@pierre/diffs/react";
-import { workspaceTrpc } from "@superset/workspace-client";
+import { useIsTabVisible } from "@superset/panes";
 import { useMemo } from "react";
+import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
 import { useSettings } from "renderer/stores/settings";
+import { useLinkedPullRequest } from "../../../../../useLinkedPullRequest";
 
 export type DeferredDiffReason = "deferred" | "loading" | "error";
 
@@ -63,24 +65,14 @@ export function useDiffAnnotationsByPath({
 	DiffLineAnnotation<DiffAnnotationMetadata>[]
 > {
 	const showDiffComments = useSettings((s) => s.showDiffComments);
-	const prQuery = workspaceTrpc.git.getPullRequest.useQuery(
-		{ workspaceId },
-		{
-			enabled: !!workspaceId && showDiffComments,
-			refetchInterval: 10_000,
-			refetchOnWindowFocus: true,
-			staleTime: 10_000,
-		},
-	);
+	const isTabVisible = useIsTabVisible();
+	const { query: prQuery, target } = useLinkedPullRequest(workspaceId, {
+		enabled: showDiffComments && isTabVisible,
+	});
 	const hasPR = prQuery.isSuccess && prQuery.data != null;
-	const threadsQuery = workspaceTrpc.git.getPullRequestThreads.useQuery(
-		{ workspaceId },
-		{
-			enabled: !!workspaceId && hasPR && showDiffComments,
-			refetchInterval: 30_000,
-			refetchOnWindowFocus: true,
-		},
-	);
+	const threadsQuery = usePullRequestThreads(target, {
+		enabled: hasPR && showDiffComments && isTabVisible,
+	});
 
 	const prUrl = prQuery.data?.url ?? undefined;
 

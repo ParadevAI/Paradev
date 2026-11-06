@@ -1,13 +1,27 @@
 import { hasOmittedBody } from "@superset/chat/core";
+import type { Item } from "@superset/chat/protocol";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TranscriptRow } from "../../utils/transcriptRows";
 
 const NEAR_MARGIN = "800px 0px";
 
+function rowItems(row: TranscriptRow): readonly Item[] {
+	switch (row.kind) {
+		case "tool_run":
+			return row.steps;
+		case "item":
+			return [row.item];
+		case "changed_files":
+			return row.calls;
+		default:
+			return [];
+	}
+}
+
 function omittedBodyIds(row: TranscriptRow): string[] {
-	const items =
-		row.kind === "tool_run" ? row.items : row.kind === "item" ? [row.item] : [];
-	return items.filter(hasOmittedBody).map((item) => item.id);
+	return rowItems(row)
+		.filter(hasOmittedBody)
+		.map((item) => item.id);
 }
 
 export function useNearRows(

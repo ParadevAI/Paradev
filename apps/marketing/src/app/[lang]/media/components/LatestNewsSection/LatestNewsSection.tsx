@@ -1,81 +1,101 @@
 import { Trans } from "@lingui/react/macro";
 import type { SupportedLocale } from "@superset/i18n";
 import { formatDate } from "@superset/i18n/format";
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
+import type { ReactNode } from "react";
+import { PressCoverage } from "@/app/[lang]/components/PressCoverage";
 import { SectionHeading } from "../SectionHeading";
-import { MOBILE_LAUNCH_DATE } from "./constants";
+import { MOBILE_LAUNCH_DATE, RENAME_DATE, RENAME_POST_SLUG } from "./constants";
+
+const productName = BRAND.NAME;
+const formerName = BRAND.FORMER_NAME;
+const isRenamed = BRAND.NAME !== BRAND.FORMER_NAME;
 
 interface LatestNewsSectionProps {
 	lang: SupportedLocale;
 }
 
 export function LatestNewsSection({ lang }: LatestNewsSectionProps) {
-	const launchDate = formatDate(
-		MOBILE_LAUNCH_DATE,
-		{ year: "numeric", month: "long", day: "numeric", timeZone: "UTC" },
-		lang,
-	);
-	const mobilePath = lang === "en" ? "/mobile" : `/${lang}/mobile`;
+	const dateFormat = {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+		timeZone: "UTC",
+	} as const;
+	const localePrefix = lang === "en" ? "" : `/${lang}`;
+
+	const announcements: {
+		id: string;
+		date: Date;
+		title: ReactNode;
+		href: string;
+	}[] = [
+		...(isRenamed
+			? [
+					{
+						id: "rename",
+						date: RENAME_DATE,
+						title: (
+							<Trans>
+								{formerName} is now {productName}
+							</Trans>
+						),
+						href: `${localePrefix}/blog/${RENAME_POST_SLUG}`,
+					},
+				]
+			: []),
+		{
+			id: "mobile",
+			date: MOBILE_LAUNCH_DATE,
+			title: <Trans>Superset Mobile launches on iPhone</Trans>,
+			href: `${localePrefix}/mobile`,
+		},
+	];
 
 	return (
 		<section aria-labelledby="latest-news">
 			<SectionHeading id="latest-news">
 				<Trans>Latest news</Trans>
 			</SectionHeading>
-			<article className="mt-6">
-				<p className="font-mono text-muted-foreground text-xs">
-					<time dateTime="2026-09-21">{launchDate}</time>
-				</p>
-				<h3 className="mt-2 font-medium text-2xl text-foreground tracking-tight">
-					<Trans>Superset Mobile launches on iPhone</Trans>
-				</h3>
-				<p className="mt-4 text-muted-foreground leading-relaxed">
-					<Trans>
-						Superset Mobile lets developers continue the Superset workspaces
-						they already use on their computer from an iPhone.
-					</Trans>
-				</p>
-				<ul className="mt-4 list-disc space-y-1.5 pl-5 text-muted-foreground leading-relaxed">
-					<li>
-						<Trans>Continue the same workspace from your iPhone</Trans>
+			<ul className="divide-y divide-border">
+				{announcements.map((item) => (
+					<li key={item.id}>
+						<Link
+							href={item.href}
+							className="group flex items-baseline gap-6 py-4"
+						>
+							<time
+								dateTime={item.date.toISOString().slice(0, 10)}
+								className="w-40 shrink-0 font-mono text-muted-foreground text-xs"
+							>
+								{formatDate(item.date, dateFormat, lang)}
+							</time>
+							<span className="flex-1 font-medium text-foreground text-lg underline-offset-4 group-hover:underline">
+								{item.title}
+							</span>
+							<ArrowUpRight
+								aria-hidden="true"
+								className="size-4 shrink-0 self-center text-muted-foreground transition-colors group-hover:text-foreground"
+							/>
+						</Link>
 					</li>
-					<li>
-						<Trans>Prompt agents and answer their questions</Trans>
-					</li>
-					<li>
-						<Trans>Follow terminal sessions live</Trans>
-					</li>
-					<li>
-						<Trans>Review syntax-highlighted diffs</Trans>
-					</li>
-				</ul>
-				<p className="mt-4 text-muted-foreground leading-relaxed">
-					<Trans>
-						The app is free to download. It requires iOS 26 or later and
-						Superset Pro. Android is next.
-					</Trans>
-				</p>
-				<div className="mt-6 flex flex-wrap gap-3 text-sm">
-					<TrackedLink
-						href={COMPANY.APP_STORE_URL}
-						event="mobile_store_clicked"
-						properties={{ store: "app_store", source: "media" }}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="bg-foreground px-4 py-2 font-medium text-background transition-colors hover:bg-brand hover:text-white"
-					>
-						<Trans>View on the App Store</Trans>
-					</TrackedLink>
-					<Link
-						href={mobilePath}
-						className="border border-border px-4 py-2 text-foreground transition-colors hover:border-foreground"
-					>
-						<Trans>Superset Mobile page</Trans>
-					</Link>
-				</div>
-			</article>
+				))}
+			</ul>
+
+			<h3 className="mt-12 border-border border-b pb-3 font-mono text-muted-foreground text-xs uppercase tracking-wider">
+				<Trans>Press coverage</Trans>
+			</h3>
+			<PressCoverage lang={lang} variant="featured" />
+			<div className="border-border border-t pt-6">
+				<Link
+					href={`${localePrefix}/press`}
+					className="inline-block border border-border px-4 py-2 text-foreground text-sm transition-colors hover:border-foreground"
+				>
+					<Trans>View all</Trans>
+				</Link>
+			</div>
 		</section>
 	);
 }

@@ -2,6 +2,7 @@ import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { useWorkspaceHostUrl } from "../useWorkspaceHostUrl";
+import { refreshQuery } from "./utils/refreshQuery";
 
 export function useWorkspaceConnectionRefresh(
 	workspaceId: string,
@@ -10,11 +11,10 @@ export function useWorkspaceConnectionRefresh(
 ): () => void {
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const queryClient = useQueryClient();
-	const refresh = useCallback(() => {
-		void queryClient
-			.cancelQueries({ queryKey })
-			.then(() => queryClient.invalidateQueries({ queryKey }));
-	}, [queryClient, queryKey]);
+	const refresh = useCallback(
+		() => refreshQuery(queryClient, queryKey),
+		[queryClient, queryKey],
+	);
 	const onRefresh = useEffectEvent(refresh);
 	const previousTarget = useRef<{
 		workspaceId: string;

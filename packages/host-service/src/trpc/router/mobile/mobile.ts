@@ -1,12 +1,27 @@
 import { type ChildProcess, execFile, spawn } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { createServer } from "node:net";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { TRPCError } from "@trpc/server";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
+import type { HostDb } from "../../../db";
+import {
+	type MobileDevicePlatform,
+	mobileLastDevices,
+	mobileOwnedDevices,
+} from "../../../db/schema";
 import { protectedProcedure, router } from "../../index";
+import { deviceHubCli } from "./device-hub-runtime";
+import {
+	createDeviceLifecycle,
+	type DeviceLifecycle,
+	type DeviceRef,
+	type OwnedDeviceStore,
+} from "./device-lifecycle";
 import {
 	easSimulatorConfigured,
 	listEasSimulatorSessions,
@@ -84,10 +99,6 @@ async function getFreePort(): Promise<number> {
 
 const LOCAL_SERVER_START_TIMEOUT_MS = 120_000;
 
-/** Expo's browser UI over every iOS simulator and Android emulator on this
- * machine (github.com/expo/expo-device-hub). */
-const DEVICE_HUB_PACKAGE = "expo-device-hub@0.17.0";
-
 async function waitForHttp(
 	url: string,
 	timeoutMs: number,
@@ -111,10 +122,11 @@ async function waitForHttp(
 
 /** serve-sim keeps per-simulator state under the temp dir, and any other
  * serve-sim on the machine clears it. A private temp dir keeps ours intact. */
+const HUB_STATE_DIR = join(tmpdir(), `superset-device-hub-${process.pid}`);
+
 function hubStateDir(): string {
-	const dir = join(tmpdir(), `superset-device-hub-${process.pid}`);
-	mkdirSync(dir, { recursive: true });
-	return dir;
+	mkdirSync(HUB_STATE_DIR, { recursive: true });
+	return HUB_STATE_DIR;
 }
 
 interface LocalHub {
@@ -131,7 +143,7 @@ interface LocalServer {
  * Not persisted: a host-service restart starts fresh, like its other processes. */
 let localServer: LocalServer | null = null;
 
-export function stopLocalServer(): void {
+function stopLocalServer(): void {
 	localServer?.stop();
 	localServer = null;
 }
@@ -144,11 +156,12 @@ function startLocalServer(): LocalServer {
 		const port = await getFreePort();
 		abort.signal.throwIfAborted();
 		const androidSdk = findAndroidSdk();
+		const cli = await deviceHubCli(hubStateDir());
+		abort.signal.throwIfAborted();
 		const spawned = spawn(
-			"npx",
+			process.execPath,
 			[
-				"--yes",
-				DEVICE_HUB_PACKAGE,
+				cli,
 				"--port",
 				String(port),
 				// Without it any local process, or a page in a browser pane, can
@@ -162,6 +175,7 @@ function startLocalServer(): LocalServer {
 				stdio: ["ignore", "pipe", "pipe"],
 				env: {
 					...process.env,
+					ELECTRON_RUN_AS_NODE: "1",
 					TMPDIR: hubStateDir(),
 					...(androidSdk
 						? { ANDROID_HOME: androidSdk, ANDROID_SDK_ROOT: androidSdk }
@@ -192,7 +206,7 @@ function startLocalServer(): LocalServer {
 					new TRPCError({
 						code: "INTERNAL_SERVER_ERROR",
 						message: [
-							`${DEVICE_HUB_PACKAGE} exited (${signal ?? `code ${code}`})`,
+							`expo-device-hub exited (${signal ?? `code ${code}`})`,
 							stderr.trim(),
 						]
 							.filter(Boolean)
@@ -281,6 +295,149 @@ async function hubRequest(path: string, body?: unknown): Promise<unknown> {
 	return result;
 }
 
+type HubDevice = z.infer<typeof hubDeviceSchema>;
+type RunningDevice = DeviceRef & { device: HubDevice };
+
+function deviceRef(device: {
+	platform: MobileDevicePlatform;
+	id: string;
+	name: string;
+}): DeviceRef {
+	return {
+		platform: device.platform,
+		key: device.platform === "ios" ? device.id : device.name,
+	};
+}
+
+async function listHubDevices(): Promise<HubDevice[]> {
+	const devices = hubDevicesSchema.parse(await hubRequest("/api/devices"));
+	return [...devices.simulators, ...devices.emulators];
+}
+
+const SWEEP_INTERVAL_MS = 5_000;
+/** With no device of ours left, the hub stops after this long unused. */
+const HUB_IDLE_MS = 5 * 60_000;
+const DISPOSE_SHUTDOWN_TIMEOUT_MS = 5_000;
+
+let lifecycle: DeviceLifecycle<RunningDevice> | null = null;
+let sweeper: ReturnType<typeof setInterval> | null = null;
+let sweeping = false;
+let lastUsedAt = Date.now();
+
+function ownedDeviceStore(db: HostDb): OwnedDeviceStore {
+	return {
+		list: () =>
+			db
+				.select({
+					platform: mobileOwnedDevices.platform,
+					key: mobileOwnedDevices.deviceKey,
+				})
+				.from(mobileOwnedDevices)
+				.all(),
+		add: (device) => {
+			db.insert(mobileOwnedDevices)
+				.values({
+					platform: device.platform,
+					deviceKey: device.key,
+					bootedAt: Date.now(),
+				})
+				.onConflictDoNothing()
+				.run();
+		},
+		remove: (device) => {
+			db.delete(mobileOwnedDevices)
+				.where(
+					and(
+						eq(mobileOwnedDevices.platform, device.platform),
+						eq(mobileOwnedDevices.deviceKey, device.key),
+					),
+				)
+				.run();
+		},
+	};
+}
+
+async function sweep(): Promise<void> {
+	if (!lifecycle || sweeping) return;
+	sweeping = true;
+	try {
+		if (lifecycle.owned().length === 0) {
+			if (localServer && Date.now() - lastUsedAt > HUB_IDLE_MS) {
+				stopLocalServer();
+			}
+			return;
+		}
+		const running = (await listHubDevices())
+			.filter((device) => device.booted)
+			.map((device) => ({ ...deviceRef(device), device }));
+		await lifecycle.sweep(running);
+	} catch {
+		// The hub is unreachable; the next sweep tries again.
+	} finally {
+		sweeping = false;
+	}
+}
+
+function deviceLifecycle(db: HostDb): DeviceLifecycle<RunningDevice> {
+	lastUsedAt = Date.now();
+	if (lifecycle) return lifecycle;
+	lifecycle = createDeviceLifecycle<RunningDevice>({
+		store: ownedDeviceStore(db),
+		now: Date.now,
+		shutdown: async ({ device }) => {
+			await hubRequest("/api/devices/shutdown", {
+				platform: device.platform,
+				id: device.id,
+				name: device.name,
+			});
+		},
+	});
+	sweeper = setInterval(() => void sweep(), SWEEP_INTERVAL_MS);
+	sweeper.unref?.();
+	return lifecycle;
+}
+
+/** Picks up the devices a previous run booted, so they are shut down if no
+ * pane claims them. */
+export function startLocalDeviceCleanup(db: HostDb): void {
+	if (db.select().from(mobileOwnedDevices).limit(1).get()) deviceLifecycle(db);
+}
+
+/** Shuts down the devices this host booted, then the hub. */
+export async function disposeLocalDevices(): Promise<void> {
+	if (sweeper) clearInterval(sweeper);
+	sweeper = null;
+	const current = lifecycle;
+	lifecycle = null;
+	if (current && localServer && current.owned().length > 0) {
+		const owned = new Set(
+			current.owned().map((device) => `${device.platform}:${device.key}`),
+		);
+		const shutdownOwned = async () => {
+			for (const device of await listHubDevices()) {
+				const ref = deviceRef(device);
+				if (!device.booted || !owned.has(`${ref.platform}:${ref.key}`)) {
+					continue;
+				}
+				await hubRequest("/api/devices/shutdown", {
+					platform: device.platform,
+					id: device.id,
+					name: device.name,
+				});
+				current.forget(ref);
+			}
+		};
+		await Promise.race([
+			shutdownOwned(),
+			new Promise((resolve) =>
+				setTimeout(resolve, DISPOSE_SHUTDOWN_TIMEOUT_MS),
+			),
+		]).catch(() => {});
+	}
+	stopLocalServer();
+	await rm(HUB_STATE_DIR, { recursive: true, force: true });
+}
+
 const IOS_ORIENTATION_MESSAGE_TAG = 7;
 const ROTATE_CONNECT_TIMEOUT_MS = 10_000;
 
@@ -354,27 +511,97 @@ export const mobileRouter = router({
 		}),
 
 	/** The hub answers no cross-origin requests for its device API, so the
-	 * renderer reaches it through here. */
-	localDevices: protectedProcedure.query(async () => {
-		const { port, token } = await ensureLocalServer();
-		const devices = hubDevicesSchema.parse(await hubRequest("/api/devices"));
-		return {
-			hubUrl: `http://127.0.0.1:${port}`,
-			hubToken: token,
-			devices: [...devices.simulators, ...devices.emulators],
-		};
-	}),
+	 * renderer reaches it through here. `lastPicked` is the workspace's last
+	 * pick, else the most recent pick on this host. */
+	localDevices: protectedProcedure
+		.input(z.object({ workspaceId: z.string() }).optional())
+		.query(async ({ ctx, input }) => {
+			deviceLifecycle(ctx.db);
+			const { port, token } = await ensureLocalServer();
+			const devices = await listHubDevices();
+			const pick = {
+				platform: mobileLastDevices.platform,
+				key: mobileLastDevices.deviceKey,
+			};
+			const lastPicked =
+				(input &&
+					ctx.db
+						.select(pick)
+						.from(mobileLastDevices)
+						.where(eq(mobileLastDevices.workspaceId, input.workspaceId))
+						.get()) ??
+				ctx.db
+					.select(pick)
+					.from(mobileLastDevices)
+					.orderBy(desc(mobileLastDevices.pickedAt))
+					.limit(1)
+					.get() ??
+				null;
+			return {
+				hubUrl: `http://127.0.0.1:${port}`,
+				hubToken: token,
+				devices,
+				lastPicked,
+			};
+		}),
 
+	/** A device this host boots is shut down once no pane holds it. */
 	bootLocalDevice: protectedProcedure
 		.input(deviceActionSchema)
-		.mutation(async ({ input }) => {
-			await hubRequest("/api/devices/boot", input);
+		.mutation(async ({ ctx, input }) => {
+			const lifecycle = deviceLifecycle(ctx.db);
+			const ref = deviceRef(input);
+			const current = (await listHubDevices()).find(
+				(device) =>
+					device.platform === ref.platform && deviceRef(device).key === ref.key,
+			);
+			const claimed = !current?.booted;
+			if (claimed) lifecycle.claim(ref);
+			try {
+				await hubRequest("/api/devices/boot", input);
+			} catch (error) {
+				if (claimed) lifecycle.forget(ref);
+				throw error;
+			}
 		}),
 
 	shutdownLocalDevice: protectedProcedure
 		.input(deviceActionSchema)
-		.mutation(async ({ input }) => {
+		.mutation(async ({ ctx, input }) => {
+			deviceLifecycle(ctx.db).forget(deviceRef(input));
 			await hubRequest("/api/devices/shutdown", input);
+		}),
+
+	/** Renewed by a pane while it shows the device. */
+	holdLocalDevice: protectedProcedure
+		.input(deviceActionSchema.extend({ holder: z.string() }))
+		.mutation(({ ctx, input }) => {
+			deviceLifecycle(ctx.db).hold(deviceRef(input), input.holder);
+		}),
+
+	releaseLocalDevice: protectedProcedure
+		.input(deviceActionSchema.extend({ holder: z.string() }))
+		.mutation(({ ctx, input }) => {
+			deviceLifecycle(ctx.db).release(deviceRef(input), input.holder);
+		}),
+
+	rememberLocalDevice: protectedProcedure
+		.input(deviceActionSchema.extend({ workspaceId: z.string() }))
+		.mutation(({ ctx, input }) => {
+			const { platform, key } = deviceRef(input);
+			ctx.db
+				.insert(mobileLastDevices)
+				.values({
+					workspaceId: input.workspaceId,
+					platform,
+					deviceKey: key,
+					pickedAt: Date.now(),
+				})
+				.onConflictDoUpdate({
+					target: mobileLastDevices.workspaceId,
+					set: { platform, deviceKey: key, pickedAt: Date.now() },
+				})
+				.run();
 		}),
 
 	restartLocalHub: protectedProcedure.mutation(async () => {

@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+	approvalAsker,
 	deriveQueuedPrompts,
 	displayText,
 	launchConfigSelections,
@@ -14,7 +15,7 @@ import {
 import { randomUUID } from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
-import { GitPullRequest, ListEnd } from "lucide-react-native";
+import { ListEnd } from "lucide-react-native";
 import {
 	forwardRef,
 	useCallback,
@@ -27,6 +28,7 @@ import {
 import { ActionSheetIOS, Alert, Pressable, View } from "react-native";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Text } from "@/components/ui/text";
+import type { ChatAttachmentPart } from "@/lib/attachments/chatParts";
 import {
 	type ChatHost,
 	createChatSessionClient,
@@ -34,6 +36,7 @@ import {
 } from "@/lib/chat";
 import { errorCopy } from "@/lib/errors";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
+import type { PullRequestDiffstat } from "../../hooks/usePullRequestDiffstat";
 import { useActiveChatStore } from "../../stores/activeChatStore";
 import { useChatActivityStore } from "../../stores/chatActivityStore";
 import {
@@ -43,11 +46,17 @@ import {
 	groupPositions,
 	lastReplyKeys,
 } from "../../utils/chatRows";
+import {
+	PULL_REQUEST_STATUS,
+	type PullRequestStatus,
+} from "../../utils/pullRequest";
 import { ChatRowView } from "../ChatRowView";
-import { DockChip } from "./components/DockChip";
+import { Diffstat } from "../Diffstat";
+import { DOCK_CHIP_HEIGHT, DockChip } from "./components/DockChip";
 import { ScrollToBottom } from "./components/ScrollToBottom";
 import { StickToBottom } from "./components/StickToBottom";
 import { useTapHandlers } from "./hooks/useTapHandlers";
+import { type TextRow, withRowText } from "./utils/withRowText";
 
 const CONFIG_OPTIONS_GRACE_MS = 1000;
 const BANNER_SPACE = 36;
@@ -66,11 +75,7 @@ function activityTexts(
 	);
 }
 
-export interface ChatAttachment {
-	attachmentId: string;
-	name: string;
-	mimeType: string;
-}
+export type ChatAttachment = Omit<ChatAttachmentPart, "type">;
 
 export interface ChatSessionViewHandle {
 	send: (text: string, attachments?: ChatAttachment[]) => Promise<void>;
@@ -83,7 +88,12 @@ interface ChatSessionViewProps {
 	hostUrl: string;
 	onOpenSession: (sessionId: string) => void;
 	onTap?: () => void;
-	pullRequestLabel?: string;
+	/** The newest pull request sets the mark and the diffstat. */
+	pullRequestChip?: {
+		label: string;
+		status: PullRequestStatus;
+		diffstat: PullRequestDiffstat | null;
+	};
 	onOpenPullRequests?: () => void;
 }
 
@@ -103,7 +113,7 @@ export const ChatSessionView = forwardRef<
 		hostUrl,
 		onOpenSession,
 		onTap,
-		pullRequestLabel,
+		pullRequestChip,
 		onOpenPullRequests,
 	},
 	ref,
@@ -126,6 +136,20 @@ export const ChatSessionView = forwardRef<
 	const rows = useMemo(
 		() => groupActivity(chatRows(groups, chat.outbox)),
 		[groups, chat.outbox],
+	);
+	const [textRowCache] = useState(() => new WeakMap<ChatRow, TextRow>());
+	const textRows = useMemo(
+		() =>
+			withRowText(
+				rows,
+				(row) =>
+					row.kind === "item" &&
+					(row.item.kind === "agent_message" || row.item.kind === "reasoning")
+						? displayText(chat.snapshot, row.item.id)
+						: "",
+				textRowCache,
+			),
+		[rows, chat.snapshot, textRowCache],
 	);
 	const positions = useMemo(() => groupPositions(rows), [rows]);
 	const replyEnds = useMemo(() => lastReplyKeys(rows), [rows]);
@@ -175,20 +199,23 @@ export const ChatSessionView = forwardRef<
 	);
 
 	const { respondToApproval } = chat;
+	const loaded = chat.status === "ready";
 	const onRespond = useCallback(
 		(approvalId: string, decision: Decision) =>
-			respondToApproval(approvalId, decision).catch(
-				failAlert(t({ message: "Could not answer the agent" })),
-			),
-		[respondToApproval, failAlert, t],
+			loaded
+				? respondToApproval(approvalId, decision).catch(
+						failAlert(t({ message: "Could not answer the agent" })),
+					)
+				: Promise.resolve(),
+		[respondToApproval, loaded, failAlert, t],
 	);
 
 	const stop = useCallback(() => {
-		if (!turnId) return;
+		if (!turnId || !loaded) return;
 		void chat
 			.cancelTurn(turnId, { pauseQueue: true })
 			.catch(failAlert(t({ message: "Could not stop the agent" })));
-	}, [chat, turnId, failAlert, t]);
+	}, [chat, turnId, loaded, failAlert, t]);
 
 	const branchFrom = useCallback(
 		(itemId: string) => {
@@ -316,8 +343,8 @@ export const ChatSessionView = forwardRef<
 				chat.sendPrompt([
 					...(text.trim() ? [{ type: "text" as const, text }] : []),
 					...attachments.map((attachment) => ({
-						type: "attachment" as const,
 						...attachment,
+						type: "attachment" as const,
 					})),
 				]);
 			},
@@ -352,12 +379,20 @@ export const ChatSessionView = forwardRef<
 	}, [openActivityKey, rows, chat.snapshot]);
 
 	const renderRow = useCallback(
-		({ item: row, index }: { item: ChatRow; index: number }) => {
+		({ item: { row, text }, index }: { item: TextRow; index: number }) => {
 			const position = positions[index] ?? "single";
+			const parent =
+				row.kind === "item"
+					? approvalAsker(chat.snapshot.items, row.item)
+					: undefined;
+			const asker = parent
+				? parent.title || t({ message: "Subagent" })
+				: undefined;
 			const endsGroup = position === "single" || position === "last";
 			return (
 				<View className={endsGroup ? "pb-5" : "pb-2.5"}>
 					<ChatRowView
+						asker={asker}
 						harness={harness}
 						hostUrl={hostUrl}
 						onDiscardPrompt={chat.discardPrompt}
@@ -367,13 +402,7 @@ export const ChatSessionView = forwardRef<
 						onRetryPrompt={chat.retryPrompt}
 						isLastReply={replyEnds.has(row.key)}
 						row={row}
-						text={
-							row.kind === "item" &&
-							(row.item.kind === "agent_message" ||
-								row.item.kind === "reasoning")
-								? displayText(chat.snapshot, row.item.id)
-								: ""
-						}
+						text={text}
 					/>
 				</View>
 			);
@@ -387,6 +416,7 @@ export const ChatSessionView = forwardRef<
 			positions,
 			replyEnds,
 			openActivity,
+			t,
 		],
 	);
 
@@ -416,8 +446,8 @@ export const ChatSessionView = forwardRef<
 						contentContainerStyle={{
 							paddingTop: headerHeight + 16 + (banner ? BANNER_SPACE : 0),
 						}}
-						data={rows}
-						keyExtractor={(row) => row.key}
+						data={textRows}
+						keyExtractor={({ row }) => row.key}
 						ListHeaderComponent={
 							chat.hasOlder ? (
 								<Pressable
@@ -445,14 +475,26 @@ export const ChatSessionView = forwardRef<
 				onLayout={(event) => setDockHeight(event.nativeEvent.layout.height)}
 				pointerEvents="box-none"
 			>
-				{pullRequestLabel || queued.length > 0 ? (
-					<View className="flex-row gap-2" pointerEvents="box-none">
-						{pullRequestLabel && onOpenPullRequests ? (
+				{pullRequestChip || queued.length > 0 ? (
+					<View
+						className="flex-row flex-wrap gap-2"
+						pointerEvents="box-none"
+						style={{ paddingRight: DOCK_CHIP_HEIGHT + 8 }}
+					>
+						{pullRequestChip && onOpenPullRequests ? (
 							<DockChip
-								icon={GitPullRequest}
-								label={pullRequestLabel}
+								icon={PULL_REQUEST_STATUS[pullRequestChip.status].icon}
+								iconClassName={PULL_REQUEST_STATUS[pullRequestChip.status].ink}
+								label={pullRequestChip.label}
 								onPress={onOpenPullRequests}
-							/>
+							>
+								{pullRequestChip.diffstat ? (
+									<Diffstat
+										{...pullRequestChip.diffstat}
+										className="text-[15px]"
+									/>
+								) : null}
+							</DockChip>
 						) : null}
 						{queued.length > 0 ? (
 							<DockChip

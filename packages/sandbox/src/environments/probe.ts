@@ -12,7 +12,7 @@ import {
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
 } from "@superset/shared/sandbox-contract";
-import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox";
+import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox/access";
 import { Sandbox } from "@vercel/sandbox";
 
 export interface ProbeArgs {

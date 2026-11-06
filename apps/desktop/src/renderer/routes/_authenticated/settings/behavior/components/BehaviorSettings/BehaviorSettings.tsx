@@ -17,6 +17,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
 
@@ -140,6 +141,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 					visibleItems,
 				) && <AgentSessionPlacementSetting searchQuery={searchQuery} />}
 
+				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
+					<AcpChatSetting />
+				)}
+
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">
 						<div className="space-y-0.5">
@@ -224,7 +229,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 								<Trans>
 									Show a microphone in the chat composer. Speech is transcribed
 									by ChatGPT when Codex is signed in to it, otherwise on your
-									Mac when possible, and otherwise by Superset's servers.
+									Mac when possible, and otherwise by Paradev's servers.
 								</Trans>
 							</p>
 						</div>

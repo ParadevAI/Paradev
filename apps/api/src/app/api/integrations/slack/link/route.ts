@@ -58,7 +58,7 @@ export async function GET(request: Request) {
 
 	if (!connection) {
 		return new Response(
-			"Slack workspace not connected to any Superset organization.",
+			"Slack workspace not connected to any Paradev organization.",
 			{ status: 404 },
 		);
 	}

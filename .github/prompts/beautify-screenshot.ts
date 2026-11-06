@@ -32,6 +32,9 @@
 //                      the frame — points the reader at the feature.
 //   --hl-dim <n>       how much to dim outside the highlight, 0-1 (default
 //                      0.42; use ~0.2 when the dimmed area must stay readable)
+//   --hl-style rails   mark the highlight with a rounded white outline that
+//                      fades down from the top (the homepage headline's rail)
+//                      and a soft white glow instead of the accent ring
 //   --bleed            (card only) anchor the card near the top and let it run
 //                      off the bottom edge under a fade, the way Linear frames
 //                      a tall surface; the crop should be taller than 16:10
@@ -43,12 +46,14 @@ import { rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 const args = process.argv.slice(2);
+const BOOLEAN_FLAGS = new Set(["bleed"]);
 const flags = new Map<string, string>();
 const positional: string[] = [];
 for (let i = 0; i < args.length; i++) {
 	const a = args[i];
 	if (a.startsWith("--")) {
-		flags.set(a.slice(2), args[++i] ?? "");
+		const name = a.slice(2);
+		flags.set(name, BOOLEAN_FLAGS.has(name) ? "" : (args[++i] ?? ""));
 	} else {
 		positional.push(a);
 	}
@@ -169,7 +174,8 @@ if (flags.has("highlight")) {
 	const k = frameW / view[2]; // source px -> frame px
 	const x = (hx - view[0]) * k;
 	const y = (hy - view[1]) * k;
-	highlight = `<div class="hl" style="left:${x.toFixed(1)}px; top:${y.toFixed(1)}px;
+	const hlClass = flags.get("hl-style") === "rails" ? "hl rails" : "hl";
+	highlight = `<div class="${hlClass}" style="left:${x.toFixed(1)}px; top:${y.toFixed(1)}px;
 		width:${(hw * k).toFixed(1)}px; height:${(hh * k).toFixed(1)}px;"></div>`;
 }
 
@@ -286,6 +292,22 @@ const html = `<!doctype html><html><head><meta charset="utf8"><style>
                 0 0 22px 2px ${accent}66,
                 inset 0 0 14px ${accent}22;
   }
+  /* rails: the homepage headline's white rail as a rounded outline, bright
+     along the top and fading down the sides, over a soft white glow */
+  .hl.rails {
+    border:none; border-radius:14px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,${Number(flags.get("hl-dim") ?? "0.42") || 0.42}),
+                0 0 28px 2px rgba(255,255,255,.10),
+                0 0 80px 8px rgba(255,255,255,.05);
+  }
+  .hl.rails::before {
+    content:""; position:absolute; inset:0; pointer-events:none;
+    border-radius:inherit; padding:1.5px;
+    background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.22) 35%, rgba(255,255,255,0) 75%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+
 </style></head><body class="${isCard ? "card" : ""}">
   <div class="stage">
     <div class="sheen"></div>

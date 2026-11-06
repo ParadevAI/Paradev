@@ -1,20 +1,41 @@
+import { rethrowCloudUnreachable } from "@superset/host-service/cloud-api-error";
+import { isOrganizationMarketplace } from "@superset/shared/plugins";
 import { TRPCError } from "@trpc/server";
 import {
 	getBundledSkillContent,
 	getBundledSkillIcons,
 	getBundledSkillPath,
 	getDisabledSkills,
+	installOrganizationPlugin,
 	installPlugin,
+	organizationPluginVersions,
+	setOrganizationPluginEnabled,
 	setPluginEnabled,
 	setSkillEnabled,
+	syncPlugins,
 	uninstallPlugin,
 	writeBundledSkillContent,
 } from "main/lib/plugin-installs";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 
+const pluginRef = z.object({
+	name: z.string().min(1),
+	marketplace: z.string().min(1).optional(),
+});
+
+function isOrganizationPlugin(input: {
+	name: string;
+	marketplace?: string;
+}): input is { name: string; marketplace: string } {
+	return (
+		input.marketplace !== undefined &&
+		isOrganizationMarketplace(input.marketplace)
+	);
+}
+
 /**
- * Materialization only: skills, agent config, and the local install record are
+ * Materialization only: skills, agent config, and installed_plugins.json are
  * written here, never read back for display. Install state is the account's —
  * the UI reads plugins.list — so it is the same on every machine.
  */
@@ -69,29 +90,55 @@ export const createPluginsRouter = () => {
 				return { ok: true };
 			}),
 
-		install: publicProcedure
-			.input(z.object({ name: z.string().min(1) }))
-			.mutation(({ input }) => {
-				const installed = installPlugin(input.name);
-				if (installed === null) {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: `Unknown plugin: ${input.name}`,
-					});
-				}
-				return { installed };
-			}),
+		install: publicProcedure.input(pluginRef).mutation(async ({ input }) => {
+			if (isOrganizationPlugin(input)) {
+				return installOrganizationPlugin(input.name, input.marketplace);
+			}
+			const result = await installPlugin(input.name);
+			if (result === null) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `Unknown plugin: ${input.name}`,
+				});
+			}
+			return result;
+		}),
 
-		uninstall: publicProcedure
-			.input(z.object({ name: z.string().min(1) }))
-			.mutation(({ input }) => {
-				return { installed: uninstallPlugin(input.name) };
-			}),
+		uninstall: publicProcedure.input(pluginRef).mutation(({ input }) => {
+			// The renderer removes the account install, then syncs this machine.
+			if (isOrganizationPlugin(input)) return { mcpError: null };
+			return uninstallPlugin(input.name);
+		}),
 
 		setEnabled: publicProcedure
-			.input(z.object({ name: z.string().min(1), enabled: z.boolean() }))
+			.input(pluginRef.extend({ enabled: z.boolean() }))
 			.mutation(({ input }) => {
-				return { installed: setPluginEnabled(input.name, input.enabled) };
+				if (isOrganizationPlugin(input)) {
+					return setOrganizationPluginEnabled(
+						input.name,
+						input.marketplace,
+						input.enabled,
+					);
+				}
+				return setPluginEnabled(input.name, input.enabled);
+			}),
+
+		organizationVersions: publicProcedure.query(() =>
+			organizationPluginVersions(),
+		),
+
+		sync: publicProcedure
+			.input(
+				z.object({ organizationId: z.string().min(1).optional() }).optional(),
+			)
+			.mutation(async ({ input }) => {
+				try {
+					await syncPlugins(input?.organizationId);
+				} catch (error) {
+					rethrowCloudUnreachable(error);
+					throw error;
+				}
+				return { ok: true };
 			}),
 	});
 };

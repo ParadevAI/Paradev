@@ -22,7 +22,7 @@ export async function GET(request: Request): Promise<Response> {
 		const { login } = await completeGithubUserConnection({ code, state });
 		return page(
 			`Connected as @${login}`,
-			"Your cloud workspaces now commit, push and open pull requests as you. You can close this tab and return to Superset.",
+			"Your cloud workspaces now commit, push and open pull requests as you. You can close this tab and return to Paradev.",
 			200,
 		);
 	} catch (error) {
@@ -32,7 +32,7 @@ export async function GET(request: Request): Promise<Response> {
 		console.error("[github/user/callback]", error);
 		return page(
 			"GitHub was not connected",
-			"Something went wrong; try again from Superset.",
+			"Something went wrong; try again from Paradev.",
 			500,
 		);
 	}

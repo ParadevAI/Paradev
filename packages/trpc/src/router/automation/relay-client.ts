@@ -65,19 +65,74 @@ export function relayMutation<TInput, TOutput>(
 	);
 }
 
-/** {@link relayMutation} against any host-service base URL, such as a sandbox's. */
-export async function hostServiceMutation<TInput, TOutput>(
-	options: {
-		baseUrl: string;
-		headers: Record<string, string>;
-		timeoutMs?: number;
-	},
+/** {@link relayMutation} for a host-service query, which tRPC serves on GET. */
+export function relayQuery<TInput, TOutput>(
+	options: RelayClientOptions,
 	procedure: string,
 	input: TInput,
 ): Promise<TOutput> {
-	const url = `${options.baseUrl}/trpc/${procedure}`;
-	const encoded = SuperJSON.serialize(input);
+	return hostServiceQuery(
+		{
+			baseUrl: `${options.relayUrl}/hosts/${options.hostId}`,
+			headers: { authorization: `Bearer ${options.jwt}` },
+			timeoutMs: options.timeoutMs,
+		},
+		procedure,
+		input,
+	);
+}
 
+export type HostServiceOptions = {
+	baseUrl: string;
+	headers: Record<string, string>;
+	timeoutMs?: number;
+};
+
+/** {@link relayMutation} against any host-service base URL, such as a sandbox's. */
+export function hostServiceMutation<TInput, TOutput>(
+	options: HostServiceOptions,
+	procedure: string,
+	input: TInput,
+): Promise<TOutput> {
+	return hostServiceRequest(options, procedure, {
+		method: "POST",
+		url: `${options.baseUrl}/trpc/${procedure}`,
+		body: JSON.stringify(SuperJSON.serialize(input)),
+	});
+}
+
+/** {@link relayQuery} against any host-service base URL, such as a sandbox's. */
+export function hostServiceQuery<TInput, TOutput>(
+	options: HostServiceOptions,
+	procedure: string,
+	input: TInput,
+): Promise<TOutput> {
+	const encoded = encodeURIComponent(
+		JSON.stringify(SuperJSON.serialize(input)),
+	);
+	return hostServiceRequest(options, procedure, {
+		method: "GET",
+		url: `${options.baseUrl}/trpc/${procedure}?input=${encoded}`,
+	});
+}
+
+/**
+ * True only when the host answered that it has no such procedure: a build that
+ * predates it. Any other failure, a 404 for a missing workspace included, is not.
+ */
+export function isMissingProcedure(err: unknown, procedure: string): boolean {
+	return (
+		err instanceof RelayDispatchError &&
+		err.status === 404 &&
+		err.message === `${procedure}: No procedure found on path "${procedure}"`
+	);
+}
+
+async function hostServiceRequest<TOutput>(
+	options: HostServiceOptions,
+	procedure: string,
+	request: { method: "GET" | "POST"; url: string; body?: string },
+): Promise<TOutput> {
 	const controller = new AbortController();
 	const timer = setTimeout(
 		() => controller.abort(),
@@ -86,10 +141,13 @@ export async function hostServiceMutation<TInput, TOutput>(
 
 	let response: Response;
 	try {
-		response = await fetch(url, {
-			method: "POST",
-			headers: { "content-type": "application/json", ...options.headers },
-			body: JSON.stringify(encoded),
+		response = await fetch(request.url, {
+			method: request.method,
+			headers:
+				request.method === "POST"
+					? { "content-type": "application/json", ...options.headers }
+					: options.headers,
+			body: request.body,
 			signal: controller.signal,
 		});
 	} finally {

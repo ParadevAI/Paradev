@@ -1,8 +1,8 @@
-# Superset Monorepo
+# Paradev Monorepo
 
-Superset is an agent-first development platform, with an Electron desktop IDE, Next.js web apps, and an Expo mobile app as the main customer-facing surfaces. It's a Turborepo monorepo, deployed apps are in apps/ and supporting packages are in packages/, and we use tRPC for the api.
+Paradev is an agent-first development platform, with an Electron desktop IDE, Next.js web apps, and an Expo mobile app as the main customer-facing surfaces. It's a Turborepo monorepo, deployed apps are in apps/ and supporting packages are in packages/, and we use tRPC for the api.
 
-You're working inside a Superset workspace, an isolated checkout of this repo — a git worktree on a
+You're working inside a Paradev workspace, an isolated checkout of this repo — a git worktree on a
 machine someone owns, a plain clone at `/workspace` in a cloud workspace. "Workspace" in a user
 message means that, not an editor workspace.
 
@@ -102,7 +102,7 @@ serves them from `packages/trpc/src/router/plugins/servers/`. A release is the g
 downloads — and `packages/shared/src/plugins/manifests.generated.ts` is the bundle the API resolves
 against, which is generated and must never be hand-edited. Change the source, then
 `superset plugins publish <name> --bump patch`, which rewrites the marketplace entry in
-`.agent-marketplace.json` and the generated manifests; commit and tag to publish it. `bun run check:plugins` is what CI
+`.agent-marketplace.json` and the generated manifests; merging to main tags it. `bun run check:plugins` is what CI
 runs to catch a change that skipped that step; run it before pushing.
 
 Installed plugins are recorded once per machine in
@@ -116,20 +116,35 @@ Details: `docs/plugins.md`.
 
 When work wants a fresh isolated environment, a parallel agent, or a long-running job, reach for the
 `superset` CLI instead of hand-rolling git worktrees or doing it all serially in this one. It's
-already on `PATH` in Superset terminals, and we dogfood it.
+already on `PATH` in Paradev terminals, and we dogfood it. `paradev` is an alias for the same
+binary; write `superset` in code and docs here.
 
 Replace the capitalized placeholders before running these:
 
 ```bash
-superset ws create --local --project PROJECT_ID --branch BRANCH --agent claude --prompt "..."
-superset agents create --workspace WORKSPACE_ID --agent claude --prompt "..."
+superset ws create --local --project PROJECT_ID --name NAME --branch BRANCH --agent claude --prompt "..."
+superset agents create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
 superset ws list --local
-superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID
+superset terminals read --local --workspace WORKSPACE_ID --terminal TERMINAL_ID
 superset ws archive --local WORKSPACE_ID
 ```
 
 In order: an isolated workspace with an agent already working in it, another agent in an existing
 workspace, what's running, what an agent is doing right now, and cleanup when you're done.
+
+Those agents run in terminals. A user who asks for a new *session* or a *chat* means a chat agent
+session, which is a different namespace: use `superset sessions`, not `agents create` or
+`terminals`. `terminals read` and `send` cannot control a chat session.
+
+```bash
+superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
+superset sessions list --local --workspace WORKSPACE_ID
+superset sessions read --local --workspace WORKSPACE_ID --session SESSION_ID
+superset sessions send --local --workspace WORKSPACE_ID --session SESSION_ID --prompt "..."
+superset sessions close --local --workspace WORKSPACE_ID --session SESSION_ID
+```
+
+`resume`, `open`, and `import`, and which agents chat supports: `docs/agent-tooling.md`.
 
 Spawning several related workspaces? Add `--tag SOME_TAG` (repeatable) to `ws create` — tagged
 workspaces group into a sidebar folder of that name automatically, so a batch files itself instead

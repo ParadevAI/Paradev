@@ -80,12 +80,9 @@ export function findSegments(
 	const segments: FindSegment[] = [];
 	for (const row of rows) {
 		if (row.kind === "tool_run") {
-			for (const tool of row.items) {
-				segments.push({
-					rowKey: row.key,
-					itemId: tool.id,
-					text: formatToolTitle(tool),
-				});
+			for (const step of row.steps) {
+				const text = itemText(step, snapshot, harness, formatToolTitle);
+				if (text) segments.push({ rowKey: row.key, itemId: step.id, text });
 			}
 			continue;
 		}

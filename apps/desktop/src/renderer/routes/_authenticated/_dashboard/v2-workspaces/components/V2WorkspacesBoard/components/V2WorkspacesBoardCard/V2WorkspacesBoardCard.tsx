@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { memo } from "react";
@@ -7,11 +8,12 @@ import { CgLaptop } from "react-icons/cg";
 import { LuGitBranch, LuMonitor } from "react-icons/lu";
 import { V2WorkspaceContextMenu } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceContextMenu";
 import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceChecksDot";
+import { WorkspaceOwnerAvatar } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceOwnerAvatar";
 import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceStateGlyph";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
-import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { V2WorkspaceProjectIcon } from "../../../V2WorkspaceProjectIcon";
 
 interface V2WorkspacesBoardCardProps {
@@ -56,6 +58,7 @@ function BoardCardBody({
 	// reach the real <button> or right-click never opens the menu.
 } & React.ComponentPropsWithRef<"button">) {
 	const { t } = useLingui();
+	const { formatCompactRelativeTime } = useFormat();
 	const isArchived = workspace.archivedAt != null;
 	const isDone = isArchived || workspace.pr?.state === "merged";
 	const isLocalWorkspace = workspace.type === "local";
@@ -67,9 +70,8 @@ function BoardCardBody({
 	const hasDiff =
 		workspace.diffStats != null &&
 		(workspace.diffStats.additions > 0 || workspace.diffStats.deletions > 0);
-	const timeLabel = getRelativeTime(
+	const timeLabel = formatCompactRelativeTime(
 		workspace.archivedAt ?? workspaceActivityAt(workspace),
-		{ format: "compact" },
 	);
 
 	return (
@@ -119,14 +121,23 @@ function BoardCardBody({
 						</TooltipContent>
 					</Tooltip>
 				) : null}
-				{workspace.hostType !== "local-device" ? (
+				{workspace.hostType === "cloud" ? (
+					<span
+						className="flex min-w-0 shrink items-center gap-1"
+						title={t({ message: "Cloud workspace" })}
+					>
+						<CloudGlyph className="size-3 shrink-0" />
+						<span className="truncate">{workspace.hostName}</span>
+					</span>
+				) : workspace.hostType === "remote-device" ? (
 					<span className="flex min-w-0 shrink items-center gap-1">
 						<LuMonitor className="size-3 shrink-0" />
 						<span className="truncate">{workspace.hostName}</span>
 					</span>
 				) : null}
-				<span className="ml-auto whitespace-nowrap tabular-nums">
-					{timeLabel}
+				<span className="ml-auto flex shrink-0 items-center gap-1.5">
+					<WorkspaceOwnerAvatar workspace={workspace} />
+					<span className="whitespace-nowrap tabular-nums">{timeLabel}</span>
 				</span>
 			</div>
 

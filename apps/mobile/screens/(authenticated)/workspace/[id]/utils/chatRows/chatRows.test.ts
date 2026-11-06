@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import type { OutboxEntry, TurnGroup } from "@superset/chat/core";
+import {
+	deriveTimeline,
+	type OutboxEntry,
+	type StoredItem,
+	type TurnGroup,
+} from "@superset/chat/core";
+import type { Item } from "@superset/chat/protocol";
 import {
 	chatRows,
 	groupActivity,
@@ -161,5 +167,48 @@ describe("lastReplyKeys", () => {
 			{ kind: "item", key: "a3", item: { id: "a3", kind: "agent_message" } },
 		] as unknown as Parameters<typeof lastReplyKeys>[0];
 		expect([...lastReplyKeys(rows)]).toEqual(["a2", "a3"]);
+	});
+});
+
+describe("subagent approvals", () => {
+	test("a pending approval from a subagent is a top-level row", () => {
+		const items: Item[] = [
+			{
+				id: "subagent:c1",
+				kind: "tool_call",
+				title: "Explore",
+				toolKind: "think",
+				toolName: "subagent",
+				status: "running",
+				content: [],
+				startedAtMs: 1,
+				subagent: true,
+			},
+			{
+				id: "approval:sub:c1:bash-1",
+				kind: "approval_request",
+				targetItemId: "sub:c1:bash-1",
+				title: "Allow Bash?",
+				status: "pending",
+				startedAtMs: 2,
+				parentItemId: "subagent:c1",
+			},
+		];
+		const groups = deriveTimeline(
+			{
+				items: new Map<string, StoredItem>(
+					items.map((item) => [item.id, { item, turnId: "t1" }]),
+				),
+				turns: new Map([["t1", turn("t1", "running")]]),
+			},
+			{ nestChildItems: true },
+		);
+		const rows = groupActivity(chatRows(groups, []));
+		expect(
+			rows.some(
+				(row) =>
+					row.kind === "item" && row.item.id === "approval:sub:c1:bash-1",
+			),
+		).toBe(true);
 	});
 });

@@ -32,7 +32,7 @@
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
 		"@types/uuid": "11.0.0",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"drizzle-kit": "0.31.8",
 		"typescript": "7.0.2"
 	}

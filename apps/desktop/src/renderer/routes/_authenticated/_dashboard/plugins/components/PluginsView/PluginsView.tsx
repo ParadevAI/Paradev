@@ -1,23 +1,33 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { PLUGIN_CATEGORIES } from "@superset/shared/plugins";
 import { Input } from "@superset/ui/input";
 import { Skeleton } from "@superset/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@superset/ui/tabs";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 import {
 	type CatalogPlugin,
 	usePluginCatalog,
 } from "renderer/hooks/usePluginCatalog";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
+import { OrganizationPluginsSection } from "./components/OrganizationPluginsSection";
 import { PluginCard } from "./components/PluginCard";
 import { SkillsList } from "./components/SkillsList";
+import { groupPlugins } from "./utils/groupPlugins";
 
 export function PluginsView() {
 	const { t } = useLingui();
 	const [search, setSearch] = useState("");
 	const navigate = useNavigate();
+	const utils = cloudTrpc.useUtils();
+	const machineUtils = electronTrpc.useUtils();
+
+	useEffect(() => {
+		void utils.plugins.list.invalidate();
+		void machineUtils.plugins.organizationVersions.invalidate();
+	}, [utils, machineUtils]);
 
 	const {
 		plugins: catalog,
@@ -28,7 +38,7 @@ export function PluginsView() {
 	const isConnected = (plugin: CatalogPlugin) =>
 		plugin.installed && (!plugin.connector || plugin.connections.length > 0);
 
-	const { add, uninstall, setEnabled, update, isBusy } = usePluginMutations();
+	const { add, uninstall, update, disable, isBusy } = usePluginMutations();
 
 	const handleOpen = (plugin: CatalogPlugin) => {
 		navigate({
@@ -54,12 +64,7 @@ export function PluginsView() {
 		);
 	}, [query, catalog]);
 
-	const byCategory = PLUGIN_CATEGORIES.map((category) => ({
-		category,
-		plugins: visiblePlugins.filter(
-			(plugin) => plugin.interface.category === category,
-		),
-	})).filter(({ plugins }) => plugins.length > 0);
+	const { organization, categories } = groupPlugins(visiblePlugins);
 
 	const skeletonCards = (
 		<section className="flex flex-col gap-3">
@@ -88,13 +93,22 @@ export function PluginsView() {
 			plugin={plugin}
 			isInstalled={plugin.installed}
 			isConnected={isConnected(plugin)}
-			isDisabled={plugin.installed && !plugin.enabled}
 			isBusy={isBusy}
 			onOpen={handleOpen}
-			onInstall={(target) => void add(target.name)}
-			onUninstall={(target) => uninstall(target.name)}
-			onSetEnabled={setEnabled}
-			onUpdate={(name) => void update(name)}
+			onInstall={(target) => {
+				if (target.connector && target.connections.length === 0) {
+					navigate({
+						to: "/plugins/$pluginName",
+						params: { pluginName: target.name },
+						search: { connect: true },
+					});
+				} else {
+					void add(target.name, target.marketplace);
+				}
+			}}
+			onUninstall={(target) => uninstall(target.name, target.marketplace)}
+			onDisable={(target) => void disable(target.name, target.marketplace)}
+			onUpdate={(target) => void update(target.name, target.marketplace)}
 		/>
 	);
 
@@ -134,7 +148,13 @@ export function PluginsView() {
 
 					{isCatalogLoading && skeletonCards}
 
-					{byCategory.map(({ category, plugins }) => (
+					<OrganizationPluginsSection
+						plugins={organization}
+						renderCard={renderCard}
+						showEmpty={!isCatalogLoading && !catalogError && query === ""}
+					/>
+
+					{categories.map(({ category, plugins }) => (
 						<section key={category} className="flex flex-col gap-3">
 							<h2 className="text-sm font-semibold text-foreground">
 								{category}

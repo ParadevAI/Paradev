@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -22,6 +23,7 @@ const PLAN_POLL_MS = 10_000;
  * normal surfaces. The trpc middleware is the actual wall. */
 export function HomePaywallScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const theme = useTheme();
 	const router = useRouter();
 	const { refetch } = useSession();
@@ -61,16 +63,15 @@ export function HomePaywallScreen() {
 
 				<View className="items-center gap-2">
 					<Text className="text-2xl font-semibold text-foreground">
-						<Trans>Superset Mobile is part of Pro</Trans>
+						<Trans>{appName} Mobile is part of Pro</Trans>
 					</Text>
 					<Text className="text-center text-base text-muted-foreground">
 						{activeOrganization
 							? t({
-									message: `${activeOrganization.name} is on the Free plan. Superset Mobile is available for organizations on Pro.`,
+									message: `${activeOrganization.name} is on the Free plan. ${appName} Mobile is available for organizations on Pro.`,
 								})
 							: t({
-									message:
-										"This organization is on the Free plan. Superset Mobile is available for organizations on Pro.",
+									message: `This organization is on the Free plan. ${appName} Mobile is available for organizations on Pro.`,
 								})}
 					</Text>
 				</View>

@@ -1,0 +1,1 @@
+export { ChatImageGalleryOverlay } from "./ChatImageGalleryOverlay";

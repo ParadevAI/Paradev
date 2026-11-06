@@ -8,7 +8,6 @@ import {
 type TranscriptRowItemProps = TurnGroupSectionProps & {
 	className: string;
 	messageId: string;
-	scrollAnchor: boolean;
 	rendered: boolean;
 	rowRef: (element: HTMLElement | null) => void;
 };
@@ -23,7 +22,6 @@ function sameEmptyRow(
 		previous.row.key === next.row.key &&
 		previous.className === next.className &&
 		previous.messageId === next.messageId &&
-		previous.scrollAnchor === next.scrollAnchor &&
 		previous.rowRef === next.rowRef
 	);
 }
@@ -45,7 +43,6 @@ export const TranscriptRowItem = memo(function TranscriptRowItem({
 	messageId,
 	rendered,
 	rowRef,
-	scrollAnchor,
 	...section
 }: TranscriptRowItemProps) {
 	return (
@@ -53,7 +50,6 @@ export const TranscriptRowItem = memo(function TranscriptRowItem({
 			className={className}
 			messageId={messageId}
 			ref={rowRef}
-			scrollAnchor={scrollAnchor}
 		>
 			{rendered && <TurnGroupSection {...section} />}
 		</MessageScroller.Item>

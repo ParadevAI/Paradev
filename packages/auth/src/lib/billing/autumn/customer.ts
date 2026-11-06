@@ -1,10 +1,10 @@
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
+import { AutumnError } from "autumn-js";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { autumnClient } from "../../../autumn";
 import { stripeClient } from "../../../stripe";
 import { paidPlanIdFromFlags } from "./entitlements";
-import { SEATS_FEATURE_ID } from "./features";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -48,11 +48,17 @@ export async function ensureAutumnCustomer(organizationId: string) {
 	return customer;
 }
 
-export function getAutumnCustomer(organizationId: string) {
-	return autumnClient.customers.get({
-		customerId: organizationId,
-		expand: ["flags.feature", "subscriptions.plan", "invoices"],
-	});
+export function getAutumnCustomer(
+	organizationId: string,
+	options?: { timeoutMs?: number },
+) {
+	return autumnClient.customers.get(
+		{
+			customerId: organizationId,
+			expand: ["flags.feature", "subscriptions.plan", "invoices"],
+		},
+		options,
+	);
 }
 
 export async function paidAutumnPlanId(
@@ -62,31 +68,14 @@ export async function paidAutumnPlanId(
 	return paidPlanIdFromFlags(customer.flags);
 }
 
-export async function setAutumnSeats(
+/** The paid plan, or null when the organization has no Autumn customer yet. */
+export async function heldAutumnPlanId(
 	organizationId: string,
-	quantity: number,
-): Promise<boolean> {
-	const planId = await paidAutumnPlanId(organizationId);
-	if (!planId) {
-		console.error(
-			`[billing/seats] ${organizationId} has no paid Autumn plan; seats not set through Autumn`,
-		);
-		return false;
-	}
-	try {
-		await autumnClient.billing.update({
-			customerId: organizationId,
-			planId,
-			featureQuantities: [{ featureId: SEATS_FEATURE_ID, quantity }],
-		});
-		return true;
-	} catch (error) {
-		console.error(
-			`[billing/seats] ${organizationId} seats not set through Autumn; falling back to Stripe`,
-			error,
-		);
-		return false;
-	}
+): Promise<string | null> {
+	return paidAutumnPlanId(organizationId).catch((error: unknown) => {
+		if (error instanceof AutumnError && error.statusCode === 404) return null;
+		throw error;
+	});
 }
 
 export async function organizationForStripeCustomer(

@@ -32,12 +32,16 @@ import {
 	Hammer,
 	Link2,
 	LoaderCircle,
+	RefreshCw,
 	SquareArrowOutUpRight,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import {
+	linkedContextSeed,
+	linkedPrChip,
+} from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { normalizePRState } from "renderer/screens/main/components/PRIcon";
 import {
 	type LinkedPR,
@@ -61,6 +65,13 @@ import {
 	buildResolveConflictsPrompt,
 } from "../../utils/buildPullRequestRepairPrompts";
 import {
+	canActOnPullRequest,
+	mergePullRequest,
+	type PullRequestMergeMethod,
+	type PullRequestTarget,
+	setPullRequestState,
+} from "../../utils/pullRequestClient";
+import {
 	PullRequestMenuContent,
 	PullRequestMenuItem,
 	PullRequestMenuLabel,
@@ -70,18 +81,19 @@ import {
 import { PullRequestSkeleton as Skeleton } from "../PullRequestSkeleton";
 import { PullRequestStackMergeDialog } from "../PullRequestStackMergeDialog";
 
-type MergeMethod = "merge" | "squash" | "rebase";
+type MergeMethod = PullRequestMergeMethod;
 
 type PendingAction =
 	| { kind: "close" }
 	| { kind: "merge"; method: MergeMethod; force?: boolean };
 
 interface PullRequestActionsProps {
+	/** Null when the route param is malformed. */
+	target: PullRequestTarget | null;
+	/** Where an agent or a new workspace on this pull request would run; GitHub actions never go through it. */
 	projectId: string | null;
 	hostId: string | null;
 	hostUrl: string | null;
-	/** Parsed PR number; null when the route param is malformed. */
-	prNumber: number | null;
 	data: PullRequestDetail | null | undefined;
 	isLoading: boolean;
 	/** The PR's stack; a stacked PR merges as a stack. */
@@ -91,6 +103,8 @@ interface PullRequestActionsProps {
 	 * already the workspace's own and a second one would be a duplicate.
 	 */
 	showStartWorkspace?: boolean;
+	onRefresh?: () => void;
+	isRefreshing?: boolean;
 }
 
 function IconAction({
@@ -125,17 +139,20 @@ function IconAction({
  * confirmation. Identity (title, author, state) lives in PullRequestItemHeader.
  */
 export function PullRequestActions({
+	target,
 	projectId,
 	hostId,
 	hostUrl,
-	prNumber,
 	data,
 	isLoading,
 	stack: stackQuery,
 	showStartWorkspace = true,
+	onRefresh,
+	isRefreshing = false,
 }: PullRequestActionsProps) {
 	const { t } = useLingui();
 	const stackCopy = usePullRequestStackCopy();
+	const prNumber = target?.prNumber ?? null;
 	const mergeMethodLabels: Record<MergeMethod, string> = {
 		squash: t({ message: "Squash and merge" }),
 		merge: t({ message: "Merge commit" }),
@@ -162,35 +179,26 @@ export function PullRequestActions({
 	}>({ open: false, method: "squash" });
 	const { copyToClipboard: copyLink, copied: linkCopied } =
 		useCopyToClipboard();
-	const invalidatePullRequestQueries = useInvalidatePullRequestDetail({
-		projectId,
-		hostUrl,
-		prNumber,
-	});
+	const invalidatePullRequestQueries = useInvalidatePullRequestDetail(target);
 	const handoff = usePullRequestAgentHandoff(
 		projectId && hostId && hostUrl && prNumber !== null
 			? { projectId, hostId, hostUrl, prNumber }
 			: null,
 	);
-	const setDraft = usePullRequestDraftMutation({
-		projectId: projectId ?? "",
-		hostUrl: hostUrl ?? "",
-		prNumber: prNumber ?? 0,
-	});
+	const setDraft = usePullRequestDraftMutation(
+		target ?? { organizationId: null, repoFullName: null, prNumber: 0 },
+	);
 
-	const setPullRequestState = useMutation({
+	const setState = useMutation({
 		mutationFn: async (nextState: "open" | "closed") => {
-			if (!hostUrl || !projectId || prNumber === null) {
+			if (!target || !canActOnPullRequest(target)) {
 				throw new Error(
-					t({ message: "This project isn't linked to a GitHub repository." }),
+					t({
+						message: "This pull request has no GitHub access to act through.",
+					}),
 				);
 			}
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.setState.mutate({
-				projectId,
-				prNumber,
-				state: nextState,
-			});
+			return setPullRequestState(target, nextState);
 		},
 		onSuccess: invalidatePullRequestQueries,
 		onError: (mutationError) => {
@@ -200,26 +208,19 @@ export function PullRequestActions({
 		},
 	});
 
-	const mergePullRequest = useMutation({
-		mutationFn: async ({
-			mergeMethod,
-			commitMessage,
-		}: {
+	const merge = useMutation({
+		mutationFn: async (merge: {
 			mergeMethod: MergeMethod;
 			commitMessage?: string;
 		}) => {
-			if (!hostUrl || !projectId || prNumber === null) {
+			if (!target || !canActOnPullRequest(target)) {
 				throw new Error(
-					t({ message: "This project isn't linked to a GitHub repository." }),
+					t({
+						message: "This pull request has no GitHub access to act through.",
+					}),
 				);
 			}
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.mergePR.mutate({
-				projectId,
-				prNumber,
-				mergeMethod,
-				commitMessage,
-			});
+			return mergePullRequest(target, merge);
 		},
 		onSuccess: invalidatePullRequestQueries,
 		onError: (mutationError) => {
@@ -230,22 +231,21 @@ export function PullRequestActions({
 	});
 
 	const mergeStack = useMergePullRequestStack({
-		projectId,
-		hostUrl,
+		projectId: stackQuery.projectId,
+		hostUrl: stackQuery.hostUrl,
 		prNumber,
 		onMerged: invalidatePullRequestQueries,
 	});
 
-	const isMerging = mergePullRequest.isPending || mergeStack.isPending;
-	const isActionPending =
-		setPullRequestState.isPending || isMerging || setDraft.isPending;
+	const isMerging = merge.isPending || mergeStack.isPending;
+	const isActionPending = setState.isPending || isMerging || setDraft.isPending;
 
 	const handleConfirmAction = () => {
 		if (!pendingAction) return;
 		if (pendingAction.kind === "close") {
-			setPullRequestState.mutate("closed");
+			setState.mutate("closed");
 		} else {
-			mergePullRequest.mutate({
+			merge.mutate({
 				mergeMethod: pendingAction.method,
 				commitMessage: mergeComment.trim() || undefined,
 			});
@@ -264,8 +264,10 @@ export function PullRequestActions({
 		};
 		resetDraft();
 		selectProject(projectId);
-		updateDraft({ hostId, linkedPR });
-		openNewWorkspace(projectId);
+		updateDraft({
+			promptDraft: linkedContextSeed([linkedPrChip(linkedPR)]),
+		});
+		openNewWorkspace(projectId, hostId);
 	};
 
 	const repairItems = data ? (
@@ -305,9 +307,10 @@ export function PullRequestActions({
 	}
 	if (!data) return null;
 
-	const canMerge = data.state === "open" && !data.isDraft;
-	const canAct = !!hostUrl && !!projectId && prNumber !== null;
-	const canToggleDraft = canAct && data.mergeability !== undefined;
+	const canAct = target !== null && canActOnPullRequest(target);
+	const canMerge =
+		data.state === "open" && !data.isDraft && data.capabilities.merge;
+	const canToggleDraft = canAct && data.capabilities.update;
 	const isDraft = data.state === "open" && data.isDraft;
 	const stack = stackQuery.stack;
 	const stackBlocker = resolveStackMergeBlocker({
@@ -331,6 +334,21 @@ export function PullRequestActions({
 
 	return (
 		<div className="flex shrink-0 items-center gap-1">
+			{onRefresh ? (
+				<IconAction
+					label={t({ message: "Refresh pull request" })}
+					onClick={onRefresh}
+					disabled={isRefreshing}
+				>
+					<RefreshCw
+						strokeWidth={1.75}
+						className={cn(
+							"size-4",
+							isRefreshing && "animate-spin motion-reduce:animate-none",
+						)}
+					/>
+				</IconAction>
+			) : null}
 			<IconAction
 				label={copyLinkLabel}
 				onClick={() => {
@@ -413,7 +431,7 @@ export function PullRequestActions({
 									<span className="@max-[23rem]/topbar:sr-only">
 										{mergeStack.isPending ? (
 											<Trans>Merging stack…</Trans>
-										) : mergePullRequest.isPending ? (
+										) : merge.isPending ? (
 											<Trans>Merging…</Trans>
 										) : stack ? (
 											<Trans>Merge stack</Trans>
@@ -580,15 +598,15 @@ export function PullRequestActions({
 						</PullRequestMenuContent>
 					</DropdownMenu>
 				</div>
-			) : data.state === "closed" && canAct ? (
+			) : data.state === "closed" && canAct && data.capabilities.update ? (
 				<Button
 					variant="outline"
 					size="xs"
 					className="ml-1 h-7 rounded-full px-3"
 					disabled={isActionPending}
-					onClick={() => setPullRequestState.mutate("open")}
+					onClick={() => setState.mutate("open")}
 				>
-					{setPullRequestState.isPending ? (
+					{setState.isPending ? (
 						<Trans>Reopening…</Trans>
 					) : (
 						<Trans>Reopen</Trans>

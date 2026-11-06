@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	type LogEntry,
-	parseAndroidLine,
+	parseAndroidBatch,
 	parseIosEvent,
 } from "../../utils/parseLogLine";
 
@@ -29,13 +29,6 @@ export function useDeviceLogs({ url, paused }: UseDeviceLogsOptions) {
 	useEffect(() => {
 		setLogs([]);
 		const source = new EventSource(url);
-		const parse = <T>(data: string): T | null => {
-			try {
-				return JSON.parse(data) as T;
-			} catch {
-				return null;
-			}
-		};
 		const append = (entries: LogEntry[]) => {
 			if (pausedRef.current || entries.length === 0) return;
 			setLogs((current) => [...current, ...entries].slice(-MAX_LINES));
@@ -49,14 +42,7 @@ export function useDeviceLogs({ url, paused }: UseDeviceLogsOptions) {
 			if (entry) append([entry]);
 		};
 		source.addEventListener("logs", (event) => {
-			const batch = parse<{ lines?: Array<{ line: string }> }>(
-				(event as MessageEvent<string>).data,
-			);
-			append(
-				(batch?.lines ?? []).map(({ line }) =>
-					parseAndroidLine(line, nextId()),
-				),
-			);
+			append(parseAndroidBatch((event as MessageEvent<string>).data, nextId));
 		});
 		return () => {
 			source.close();

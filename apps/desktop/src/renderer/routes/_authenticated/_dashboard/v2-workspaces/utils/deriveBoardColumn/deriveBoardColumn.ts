@@ -9,6 +9,7 @@ export type BoardColumnKey =
 	| "idle"
 	| "working"
 	| "attention"
+	| "finished"
 	| "review"
 	| "merged"
 	| "deleted";
@@ -18,6 +19,7 @@ export const BOARD_COLUMN_ORDER: BoardColumnKey[] = [
 	"idle",
 	"working",
 	"attention",
+	"finished",
 	"review",
 	"merged",
 	"deleted",
@@ -31,8 +33,11 @@ export const BOARD_COLUMN_LABELS: Record<BoardColumnKey, MessageDescriptor> = {
 	attention: msg({
 		message: "Needs attention",
 	}),
+	finished: msg({
+		message: "Finished · unread",
+	}),
 	review: msg({
-		message: "Needs review",
+		message: "In review",
 	}),
 	merged: msg({
 		message: "Merged",
@@ -47,6 +52,7 @@ type BoardColumnInputs = Pick<
 	"archivedAt" | "archiveReason" | "agentStatus" | "type"
 > & {
 	pr: { state: V2WorkspacePrState } | null;
+	sandboxStatus?: AccessibleV2Workspace["sandboxStatus"];
 };
 
 /**
@@ -54,18 +60,19 @@ type BoardColumnInputs = Pick<
  *   1. archived "deleted"                → Deleted
  *   2. archived "merged"                 → Merged
  *   3. live PR merged                    → Merged
- *   4. agent permission/failed           → Needs attention
- *   5. agent working                     → Working
- *   6. PR open/draft/queued              → Needs review
- *   7. agent review on a main/worktree   → Needs review
- *   8. otherwise                         → Idle
+ *   4. sandbox failed                    → Needs attention
+ *   5. agent permission/failed           → Needs attention
+ *   6. sandbox provisioning              → Working
+ *   7. agent working                     → Working
+ *   8. agent review on a main/worktree   → Finished · unread
+ *   9. PR open/draft/queued              → In review
+ *  10. otherwise                         → Idle
  *
- * A finished agent alone counts as review-worthy on main and worktree
- * workspaces: both are project checkouts a person is driving, and the
- * sidebar, dock badge and "Ready for review" filter already treat them that
- * way. Only session workspaces (automation and chat runs with no project
- * checkout) are excluded: they arrive in volume, and routing them to
- * "review" buries the real candidates (the bucket answers "what needs me").
+ * A finished agent is unread until the row is opened, which is what makes
+ * "Finished" clearable; the PR then files the row under "In review", which
+ * waits on other people. Only session workspaces (automation and chat runs
+ * with no project checkout) skip Finished: they arrive in volume, and
+ * routing them there buries the real candidates.
  */
 export function deriveBoardColumn(
 	workspace: BoardColumnInputs,
@@ -75,20 +82,26 @@ export function deriveBoardColumn(
 	}
 	if (workspace.pr?.state === "merged") return "merged";
 	if (
+		workspace.sandboxStatus === "failed" ||
 		workspace.agentStatus === "permission" ||
 		workspace.agentStatus === "failed"
 	) {
 		return "attention";
 	}
-	if (workspace.agentStatus === "working") return "working";
+	if (
+		workspace.sandboxStatus === "provisioning" ||
+		workspace.agentStatus === "working"
+	) {
+		return "working";
+	}
+	if (workspace.agentStatus === "review" && workspace.type !== "session") {
+		return "finished";
+	}
 	if (
 		workspace.pr?.state === "open" ||
 		workspace.pr?.state === "draft" ||
 		workspace.pr?.state === "queued"
 	) {
-		return "review";
-	}
-	if (workspace.agentStatus === "review" && workspace.type !== "session") {
 		return "review";
 	}
 	return "idle";

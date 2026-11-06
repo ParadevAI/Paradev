@@ -115,7 +115,7 @@ describe("spawnHostService", () => {
 					port: 54879,
 					daemon: true,
 				}),
-			).rejects.toThrow(/bundled with the Superset desktop app/);
+			).rejects.toThrow(/bundled with the Paradev desktop app/);
 		} finally {
 			process.env.SUPERSET_HOST_BIN = hostBin;
 			delete process.env.SUPERSET_CLI_CHANNEL;

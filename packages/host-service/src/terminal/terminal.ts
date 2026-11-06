@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { basename, isAbsolute, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import type { NodeWebSocket } from "@hono/node-ws";
-import { resolveSupersetHomeDir } from "@superset/agent-setup/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { hasRunningForegroundProcess } from "@superset/pty-daemon/process-tree";
 import {
 	buildFishPromptCommandString,
@@ -13,6 +13,11 @@ import {
 	parsePromptHeredocCommand,
 	sanitizePromptForPty,
 } from "@superset/shared/agent-prompt-launch";
+import {
+	boundTranscriptText,
+	buildBoundedTerminalSessionTranscript,
+	TERMINAL_HANDOFF_MAX_CHARS,
+} from "@superset/shared/session-handoff";
 import {
 	createScanState,
 	type ShellReadyScanState,
@@ -22,11 +27,6 @@ import {
 	type TerminalColors,
 	terminalColorsSchema,
 } from "@superset/shared/terminal-colors";
-import {
-	boundTranscriptText,
-	buildBoundedTerminalSessionTranscript,
-	TERMINAL_HANDOFF_MAX_CHARS,
-} from "@superset/shared/terminal-session-handoff";
 import {
 	createTerminalTitleScanState,
 	scanForTerminalTitle,
@@ -3100,7 +3100,7 @@ async function createTerminalSessionUnlocked({
 	// Fallback matters for hosts not spawned by the desktop (CLI/systemd):
 	// without it the wrapper paths, hook guard env, and shell bootstrap all
 	// silently disable (#6254).
-	const supersetHomeDir = resolveSupersetHomeDir();
+	const supersetHomeDir = resolveAppHomeDir();
 	const shell = resolveLaunchShell(baseEnv);
 	const shellArgs = getShellLaunchArgs({ shell, supersetHomeDir });
 	const ptyEnv = {

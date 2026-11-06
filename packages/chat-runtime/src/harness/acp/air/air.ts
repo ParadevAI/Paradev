@@ -11,6 +11,11 @@ export const AIR_CLIENT_META = {
 	},
 };
 
+/** Asks session/fork to keep the conversation only up to and including `messageId`. */
+export function airForkPointMeta(messageId: string) {
+	return { jetbrains: { air: { fork: { version: 1, messageId } } } };
+}
+
 export const AIR_ASYNC_TASK_STOP_METHOD = "_session/async_task/stop";
 
 export const airAsyncTaskSpawnedSchema = z.looseObject({
@@ -59,6 +64,28 @@ const subagentControlMetaSchema = z.looseObject({
 		claudeCode: z.looseObject({ toolName: z.string().optional() }).optional(),
 	}),
 });
+
+const compactionMetaSchema = z.looseObject({
+	_meta: z.looseObject({
+		jetbrains: z
+			.looseObject({
+				air: z.looseObject({ contextCompaction: z.unknown() }).optional(),
+			})
+			.optional(),
+		claudeCode: z.looseObject({ toolName: z.string().optional() }).optional(),
+	}),
+});
+
+/** claude-agent-acp's synthetic "Compact conversation" tool call. */
+export function isCompactionCall(raw: unknown): boolean {
+	const parsed = compactionMetaSchema.safeParse(raw);
+	if (!parsed.success) return false;
+	const { jetbrains, claudeCode } = parsed.data._meta;
+	return (
+		jetbrains?.air?.contextCompaction !== undefined ||
+		claudeCode?.toolName === "compact"
+	);
+}
 
 export function isSubagentControlCall(raw: unknown): boolean {
 	const parsed = subagentControlMetaSchema.safeParse(raw);

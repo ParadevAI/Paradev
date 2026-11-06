@@ -54,7 +54,7 @@ export function AppResourceSection({
 			<div className="flex items-center justify-between px-3.5 py-1.5">
 				<div className="flex items-center gap-1.5 min-w-0 mr-2">
 					<span className="text-[12px] font-medium text-foreground truncate min-w-0">
-						<Trans>Superset App</Trans>
+						<Trans>Paradev App</Trans>
 					</span>
 					<UsageSeverityBadge severity={appSeverity} />
 				</div>

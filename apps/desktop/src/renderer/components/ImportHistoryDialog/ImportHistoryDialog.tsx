@@ -202,6 +202,7 @@ export function ImportHistoryDialog({
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				// The X button, Escape, and outside-click all funnel through here —
@@ -220,7 +221,7 @@ export function ImportHistoryDialog({
 					<DialogDescription>
 						<Trans>
 							Copy your browsing history and logins from another browser into
-							Superset. Your original browser isn't changed.
+							Paradev. Your original browser isn't changed.
 						</Trans>
 					</DialogDescription>
 				</DialogHeader>
@@ -235,7 +236,7 @@ export function ImportHistoryDialog({
 					<div className="flex flex-col gap-3 py-2 text-sm">
 						<p className="text-muted-foreground">
 							<Trans>
-								Superset needs Full Disk Access to read another browser's data.
+								Paradev needs Full Disk Access to read another browser's data.
 								Grant it in System Settings, then check again.
 							</Trans>
 						</p>

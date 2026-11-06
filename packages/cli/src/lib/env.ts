@@ -1,3 +1,5 @@
+import { CANONICAL_URLS } from "@superset/shared/constants";
+
 /**
  * Where this CLI points. Production is the default; a dev build is pointed
  * elsewhere by setting these when it runs, never by baking them in — a binary
@@ -6,11 +8,15 @@
  * stays baked: it is this build's identity, not an address.
  */
 
+// The superset-cli OAuth client registers its paste redirect on this host only.
+// Keep it until the web/API migration moves the CLI to the new root domain.
+export const LEGACY_WEB_URL = "https://app.superset.sh";
+
 export const env = {
 	RELAY_URL: process.env.RELAY_URL || "https://relay.superset.sh",
 	REALTIME_URL: process.env.REALTIME_URL || "https://realtime.superset.sh",
-	SUPERSET_API_URL: process.env.SUPERSET_API_URL || "https://api.superset.sh",
-	SUPERSET_WEB_URL: process.env.SUPERSET_WEB_URL || "https://app.superset.sh",
+	SUPERSET_API_URL: process.env.SUPERSET_API_URL || CANONICAL_URLS.API,
+	SUPERSET_WEB_URL: process.env.SUPERSET_WEB_URL || LEGACY_WEB_URL,
 	VERSION: process.env.SUPERSET_VERSION || "0.0.0-dev",
 };
 

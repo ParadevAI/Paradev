@@ -1,0 +1,1 @@
+export { StoryPhoto } from "./StoryPhoto";

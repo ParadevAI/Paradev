@@ -21,6 +21,8 @@ export interface CloudWorkspacesValue {
 	organizationId: string | null;
 	/** False until the server has answered; a copy restored from disk is stale. */
 	isFresh: boolean;
+	/** True only while the first fetch is in flight with nothing to show; false once it answered, failed, or never runs. */
+	isLoading: boolean;
 }
 
 /**
@@ -68,5 +70,6 @@ export function useCloudWorkspaces(): CloudWorkspacesValue {
 		workspaces: enabled ? workspaces : [],
 		organizationId,
 		isFresh: query.isSuccess && !query.isStale,
+		isLoading: query.isLoading,
 	};
 }

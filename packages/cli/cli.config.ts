@@ -1,5 +1,6 @@
 import { boolean, defineConfig, string } from "@superset/cli-framework";
 import { linguiMacroPlugin } from "@superset/i18n/bun-plugin";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import pkg from "./package.json" with { type: "json" };
 
 const VERSION = pkg.version;
@@ -15,13 +16,16 @@ export default defineConfig({
 		"process.env.SUPERSET_CLI_CHANNEL": JSON.stringify(
 			process.env.SUPERSET_CLI_CHANNEL ?? "standalone",
 		),
+		"process.env.NEXT_PUBLIC_ROOT_DOMAIN": JSON.stringify(
+			process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh",
+		),
 	},
 	globals: {
 		json: boolean().desc("Output as JSON (auto-on under CI/agent envs)"),
 		quiet: boolean().desc("Output IDs only"),
 		apiKey: string()
 			.env("SUPERSET_API_KEY")
-			.desc("Use a Superset API key (sk_live_…) instead of OAuth login"),
+			.desc("Use a Paradev API key (sk_live_…) instead of OAuth login"),
 	},
 	audiences: () =>
 		process.env.SUPERSET_CLI_AUDIENCE === "internal" ||
@@ -31,13 +35,15 @@ export default defineConfig({
 	sandbox: () => Boolean(process.env.SUPERSET_SANDBOX_WORKSPACE_ID),
 	help: {
 		tagline: "Command your fleet of coding agents from any shell.",
-		docsUrl: "https://docs.superset.sh/cli",
-		tip: "Agents in Superset terminals already have `superset` on PATH — tell them to use it.",
+		docsUrl: `${CANONICAL_URLS.DOCS}/cli/getting-started`,
+		tip: "`paradev` is an alias for `superset`. Agents in Paradev terminals already have both on PATH — tell them to use it.",
 		sections: [
 			{
 				title: "Workspaces & agents",
 				commands: [
 					"workspaces",
+					"environments",
+					"sessions",
 					"agents",
 					"terminals",
 					"panes",

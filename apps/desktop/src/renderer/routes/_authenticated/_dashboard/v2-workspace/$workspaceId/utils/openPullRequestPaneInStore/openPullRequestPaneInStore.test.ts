@@ -7,6 +7,7 @@ import {
 } from "@superset/panes";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, PullRequestPaneData } from "../../types";
+import { getPaneKey } from "../getPaneKey";
 import {
 	findVisiblePullRequestNumber,
 	openPullRequestPaneInStore,
@@ -78,6 +79,7 @@ function paneData(store: StoreApi<WorkspaceStore<PaneViewerData>>) {
 describe("openPullRequestPaneInStore", () => {
 	it("splits the active pane when no pull-request pane exists", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState(),
 		});
 
@@ -94,6 +96,7 @@ describe("openPullRequestPaneInStore", () => {
 
 	it("focuses an existing pane for the same PR without touching its data", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState({
 				tabId: "tab-2",
 				paneId: "pr-pane",
@@ -113,6 +116,7 @@ describe("openPullRequestPaneInStore", () => {
 
 	it("retargets the existing pane when the PR number changes", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState({
 				tabId: "tab-2",
 				paneId: "pr-pane",
@@ -129,6 +133,7 @@ describe("openPullRequestPaneInStore", () => {
 
 	it("retargets when the same number belongs to another repository", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState({
 				tabId: "tab-2",
 				paneId: "pr-pane",

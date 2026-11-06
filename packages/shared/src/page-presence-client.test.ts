@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { PagePresenceViewer } from "./page-presence";
+import type { PagePresenceViewer, PresenceVisitor } from "./page-presence";
 import { openPagePresence } from "./page-presence-client";
 
 type Event = { data?: unknown; code?: number };
@@ -38,6 +38,7 @@ function harness(
 ) {
 	const sockets: FakeSocket[] = [];
 	const states: PagePresenceViewer[][] = [];
+	const visits: PresenceVisitor[][] = [];
 	const urls = [...(options.urls ?? [])];
 	let dialled = 0;
 	const client = openPagePresence({
@@ -46,6 +47,7 @@ function harness(
 			return urls.length ? (urls.shift() ?? null) : `wss://hub/${dialled}`;
 		},
 		onViewers: (viewers) => states.push(viewers),
+		onVisitors: (visitors) => visits.push(visitors),
 		createSocket: (address) => {
 			const socket = new FakeSocket(address);
 			sockets.push(socket);
@@ -60,7 +62,7 @@ function harness(
 		socket.emit("open");
 		return socket;
 	};
-	return { client, sockets, states, opened, dialled: () => dialled };
+	return { client, sockets, states, visits, opened, dialled: () => dialled };
 }
 
 const grace = {
@@ -79,6 +81,27 @@ describe("openPagePresence", () => {
 		const socket = await h.opened();
 		socket.hub({ type: "presence", viewers: [grace, { id: 7 }] });
 		expect(h.states.at(-1)).toEqual([grace]);
+		h.client.stop();
+	});
+
+	test("takes the visitor history from the hub, validated", async () => {
+		const h = harness();
+		const socket = await h.opened();
+		const ada = {
+			userId: "u1",
+			name: "Ada",
+			image: null,
+			lastSeenAt: 5,
+			active: true,
+		};
+		socket.hub({
+			type: "presence",
+			viewers: [],
+			visitors: [ada, { userId: "u2", name: "Bob" }],
+		});
+		expect(h.visits.at(-1)).toEqual([ada]);
+		socket.emit("close", { code: 1006 });
+		expect(h.visits.at(-1)).toEqual([{ ...ada, active: false }]);
 		h.client.stop();
 	});
 

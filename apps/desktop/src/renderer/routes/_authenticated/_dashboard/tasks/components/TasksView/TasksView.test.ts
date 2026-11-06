@@ -91,15 +91,6 @@ describe("Tasks and pull requests navigation", () => {
 	});
 
 	test("renders Tasks and Pull requests as separate left-rail destinations", () => {
-		const sidebarSources = [
-			readComponent(
-				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
-			),
-			readComponent(
-				"../../../../../../screens/main/components/WorkspaceSidebar/WorkspaceSidebarHeader/WorkspaceSidebarHeader.tsx",
-			),
-		];
-
 		// v2's labels go through Lingui (`message: "Tasks"`); v1 still has the
 		// literal aria-label. Accept either so this keeps asserting the routes
 		// stay separate rather than how their labels are authored.
@@ -107,12 +98,42 @@ describe("Tasks and pull requests navigation", () => {
 			source.includes(`aria-label="${label}"`) ||
 			source.includes(`message: "${label}"`);
 
-		for (const source of sidebarSources) {
-			expect(source).toContain('to: "/tasks"');
-			expect(source).toContain('to: "/pull-requests"');
+		const navigationSource = readComponent(
+			"../../../hooks/useDashboardNavigation/useDashboardNavigation.ts",
+		);
+		const handlerBlock = (start: string, end: string) =>
+			navigationSource.slice(
+				navigationSource.indexOf(start),
+				navigationSource.indexOf(end),
+			);
+		expect(handlerBlock("openTasks:", "isPullRequestsOpen:")).toContain(
+			'to: "/tasks"',
+		);
+		expect(handlerBlock("openPullRequests:", "isPagesOpen:")).toContain(
+			'to: "/pull-requests"',
+		);
+
+		const v2Sources = [
+			readComponent(
+				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
+			),
+			readComponent("../../../components/NavigationRail/NavigationRail.tsx"),
+		];
+		for (const source of v2Sources) {
+			expect(source).toContain("onClick={navigation.openTasks}");
+			expect(source).toContain("onClick={navigation.openPullRequests}");
 			expect(labelled(source, "Tasks")).toBe(true);
 			expect(labelled(source, "Pull requests")).toBe(true);
 			expect(source).not.toContain("Tasks & PRs");
 		}
+
+		const v1Source = readComponent(
+			"../../../../../../screens/main/components/WorkspaceSidebar/WorkspaceSidebarHeader/WorkspaceSidebarHeader.tsx",
+		);
+		expect(v1Source).toContain('to: "/tasks"');
+		expect(v1Source).toContain('to: "/pull-requests"');
+		expect(labelled(v1Source, "Tasks")).toBe(true);
+		expect(labelled(v1Source, "Pull requests")).toBe(true);
+		expect(v1Source).not.toContain("Tasks & PRs");
 	});
 });

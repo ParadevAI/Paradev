@@ -1,1 +1,0 @@
-export { FloatingBar } from "./FloatingBar";

@@ -151,3 +151,16 @@ describe("settings search - mobile rollout", () => {
 		).toBe(1);
 	});
 });
+
+describe("settings search - plugins visibility", () => {
+	it("excludes plugin matches unless the plugins section is visible", () => {
+		expect(
+			getVisibleMatchCountBySection("marketplace", true, false, false, false)
+				.plugins,
+		).toBeUndefined();
+		expect(
+			getVisibleMatchCountBySection("marketplace", true, false, false, true)
+				.plugins,
+		).toBeGreaterThan(0);
+	});
+});

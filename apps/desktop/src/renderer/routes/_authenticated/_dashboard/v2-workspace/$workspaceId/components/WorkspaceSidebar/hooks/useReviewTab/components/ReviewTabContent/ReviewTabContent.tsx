@@ -1,21 +1,27 @@
 import { Trans } from "@lingui/react/macro";
 import { memo } from "react";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import type { CommentPaneData, DiffFocusSide } from "../../../../../../types";
-import { CommentsSection } from "../../../../../CommentsSection";
+import {
+	CommentsSection,
+	type CommentsUnavailable,
+} from "../../../../../CommentsSection";
 import type { NormalizedComment, NormalizedPR } from "../../types";
 import { ChecksSection } from "../ChecksSection";
 import { PRHeader } from "../PRHeader";
 
 interface ReviewTabContentProps {
 	workspaceId: string;
+	pullRequest: PullRequestTarget | null;
+	commentsUnavailable: CommentsUnavailable;
 	pr: NormalizedPR | null;
 	comments: NormalizedComment[];
 	isLoading: boolean;
 	isError: boolean;
 	isCommentsLoading: boolean;
 	onOpenComment?: (comment: CommentPaneData) => void;
-	onOpenPullRequest?: (ref: PullRequestRef) => void;
+	onOpenPullRequest?: OpenPullRequestPane;
 	onOpenInDiff?: (
 		path: string,
 		line?: number,
@@ -26,6 +32,8 @@ interface ReviewTabContentProps {
 
 export const ReviewTabContent = memo(function ReviewTabContent({
 	workspaceId,
+	pullRequest,
+	commentsUnavailable,
 	pr,
 	comments,
 	isLoading,
@@ -77,7 +85,8 @@ export const ReviewTabContent = memo(function ReviewTabContent({
 			<div className="my-1 border-b border-border/70" />
 
 			<CommentsSection
-				workspaceId={workspaceId}
+				pullRequest={pullRequest}
+				unavailable={commentsUnavailable}
 				comments={comments}
 				isLoading={isCommentsLoading}
 				onOpenComment={onOpenComment}

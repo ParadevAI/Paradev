@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import { GitCompareArrows } from "lucide-react";
 import { memo, useMemo } from "react";
-import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
 import { changesPillStats } from "../../utils/changesPillStats";
@@ -17,10 +17,9 @@ interface ChangesControlProps {
 	/** Close the visible Changes pane, or open/focus one when none shows. */
 	onToggleChanges: () => void;
 	/** Open or focus the pane showing the linked PR's summary. */
-	onOpenPullRequest: (ref: PullRequestRef) => void;
+	onOpenPullRequest: OpenPullRequestPane;
 	/** The PR the workspace's pull-request pane shows, if one is in view. */
 	viewingPullRequestNumber?: number | null;
-	paneAreaStyle?: boolean;
 }
 
 /**
@@ -44,7 +43,6 @@ export const ChangesControl = memo(function ChangesControl({
 	onToggleChanges,
 	onOpenPullRequest,
 	viewingPullRequestNumber = null,
-	paneAreaStyle = false,
 }: ChangesControlProps) {
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
@@ -67,9 +65,7 @@ export const ChangesControl = memo(function ChangesControl({
 		((flowState.kind === "busy" || flowState.kind === "error") &&
 			flowState.pr != null);
 	const visibleStats =
-		!paneAreaStyle && !hasPr && stats != null && stats.fileCount > 0
-			? stats
-			: null;
+		!hasPr && stats != null && stats.fileCount > 0 ? stats : null;
 
 	return (
 		<div className="flex h-7 items-stretch divide-x divide-border/60 overflow-hidden rounded-md border border-border/60 bg-muted/30 empty:hidden">
@@ -90,14 +86,12 @@ export const ChangesControl = memo(function ChangesControl({
 				</button>
 			)}
 			{flowState.kind === "no-pr" ? (
-				!paneAreaStyle && (
-					<ShipControl
-						workspaceId={workspaceId}
-						sync={flowState.sync}
-						onRefresh={onRetry}
-						compact={visibleStats != null}
-					/>
-				)
+				<ShipControl
+					workspaceId={workspaceId}
+					sync={flowState.sync}
+					onRefresh={onRetry}
+					compact={visibleStats != null}
+				/>
 			) : (
 				<PRStatusGroup
 					state={flowState}
@@ -108,7 +102,6 @@ export const ChangesControl = memo(function ChangesControl({
 					onToggleChanges={onToggleChanges}
 					onOpenPullRequest={onOpenPullRequest}
 					viewingPullRequestNumber={viewingPullRequestNumber}
-					paneAreaStyle={paneAreaStyle}
 				/>
 			)}
 		</div>

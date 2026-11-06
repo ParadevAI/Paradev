@@ -18,7 +18,11 @@ const SESSION_POLL_MS = 10_000;
 
 /** Shows the hosted simulators an agent started for this workspace. The pane
  * only watches: whoever starts a session also stops it. */
-export function CloudSimulator() {
+interface CloudSimulatorProps {
+	workspaceId: string;
+}
+
+export function CloudSimulator({ workspaceId }: CloudSimulatorProps) {
 	const { t } = useLingui();
 	const sessionsQuery = workspaceTrpc.mobile.easSessions.useQuery(undefined, {
 		refetchInterval: SESSION_POLL_MS,
@@ -60,6 +64,7 @@ export function CloudSimulator() {
 	return (
 		<RemoteSimulator
 			key={session.sessionId}
+			workspaceId={workspaceId}
 			session={session}
 			deviceName={deviceName}
 			picker={

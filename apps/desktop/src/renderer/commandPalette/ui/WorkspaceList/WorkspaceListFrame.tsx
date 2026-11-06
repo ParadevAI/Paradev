@@ -17,6 +17,7 @@ import {
 	navigateToWorkspace,
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useAccessibleV2Workspaces } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 import { useFrameStackStore } from "../../core/frames";
 import { useCommandPaletteQuery } from "../CommandPalette/CommandPalette";
@@ -186,8 +187,6 @@ function V2WorkspaceList({ query }: { query: string }) {
 			{projectGroups.map((group) => (
 				<CommandGroup key={group.projectId} heading={group.projectName}>
 					{group.workspaces.map((workspace) => {
-						const HostIcon =
-							workspace.hostType === "local-device" ? LuLaptop : LuMonitor;
 						const displayName = getV2WorkspaceDisplayName(workspace);
 						return (
 							<CommandItem
@@ -207,7 +206,13 @@ function V2WorkspaceList({ query }: { query: string }) {
 									<CgLaptop className="!size-3.5 shrink-0 text-muted-foreground" />
 								</span>
 								<span className="flex min-w-0 max-w-44 items-center gap-1 text-muted-foreground text-xs">
-									<HostIcon className="!size-3 shrink-0" />
+									{workspace.hostType === "cloud" ? (
+										<CloudGlyph className="!size-3 shrink-0" />
+									) : workspace.hostType === "local-device" ? (
+										<LuLaptop className="!size-3 shrink-0" />
+									) : (
+										<LuMonitor className="!size-3 shrink-0" />
+									)}
 									<span className="truncate">{workspace.hostName}</span>
 								</span>
 							</CommandItem>

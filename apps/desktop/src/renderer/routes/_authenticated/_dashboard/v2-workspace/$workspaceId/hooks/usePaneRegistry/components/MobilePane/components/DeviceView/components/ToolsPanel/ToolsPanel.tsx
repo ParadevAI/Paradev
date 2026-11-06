@@ -1,19 +1,28 @@
 import type { DeviceClient } from "@expo/hub-client";
 import { Trans, useLingui } from "@lingui/react/macro";
+import type { SelectScreenshot } from "@superset/local-db";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { LuX } from "react-icons/lu";
 import { ActivitySection } from "./components/ActivitySection";
 import { AppSection } from "./components/AppSection";
 import { EventLogSection } from "./components/EventLogSection";
+import { ScreenshotsSection } from "./components/ScreenshotsSection";
 import { SimulatorSection } from "./components/SimulatorSection";
 
 interface ToolsPanelProps {
 	client: DeviceClient;
 	onClose: () => void;
+	shots: SelectScreenshot[];
+	workspaceId: string;
 }
 
-export function ToolsPanel({ client, onClose }: ToolsPanelProps) {
+export function ToolsPanel({
+	client,
+	onClose,
+	shots,
+	workspaceId,
+}: ToolsPanelProps) {
 	const { t } = useLingui();
 
 	return (
@@ -43,6 +52,7 @@ export function ToolsPanel({ client, onClose }: ToolsPanelProps) {
 						</div>
 					</div>
 				)}
+				<ScreenshotsSection shots={shots} workspaceId={workspaceId} />
 				{client.capabilities.activity && (
 					<ActivitySection activity={client.activity} />
 				)}

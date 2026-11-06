@@ -21,3 +21,4 @@ via CDP" in CONTRIBUTING.md for how to capture them from the dev app.
 - [ ] PR title follows conventional commits (`type(scope): subject`)
 - [ ] `bun run lint` and `bun run typecheck` pass (CI fails on lint warnings too)
 - [ ] "Allow edits from maintainers" is checked on fork PRs
+- [ ] I have signed the [CLA](https://github.com/paradevai/paradev/blob/main/CLA.md) (the bot asks on your first PR)

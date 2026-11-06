@@ -1,6 +1,6 @@
 ---
 title: "Manage Claude Code and Codex from your iPhone"
-description: "Connect an iPhone to your Superset workspaces, unblock Claude Code or Codex, and inspect changes. Includes Pro requirements, host setup, and offline troubleshooting."
+description: "Connect an iPhone to your Paradev workspaces, unblock Claude Code or Codex, and inspect changes. Includes Pro requirements, host setup, and offline troubleshooting."
 author: kiet
 date: 2026-09-22
 lastUpdated: 2026-10-07
@@ -16,15 +16,15 @@ keywords:
   - coding agents from phone
 ---
 
-Your agent asks a question just as you leave your desk. Open Superset on your iPhone, reply in the same terminal, and check the diff when the change is ready.
+Your agent asks a question just as you leave your desk. Open Paradev on your iPhone, reply in the same terminal, and check the diff when the change is ready.
 
-Claude Code and Codex keep running on your computer. Superset Mobile gives you access to those workspaces from your phone.
+Claude Code and Codex keep running on your computer. Paradev Mobile gives you access to those workspaces from your phone.
 
 ## What you need
 
-- An iPhone running **iOS 26 or later** and **Superset Pro**.
+- An iPhone running **iOS 26 or later** and **Paradev Pro**.
 - A host computer with your repository and an authenticated coding agent.
-- The same Superset account and organization on both devices.
+- The same Paradev account and organization on both devices.
 
 The host must stay awake and online. Closing your laptop can put it to sleep and disconnect the session. For work that needs to continue overnight, use a computer that stays on.
 
@@ -34,7 +34,7 @@ Your agent subscription or API usage is billed separately. See [plans](/pricing)
 
 ## Connect your computer
 
-In Superset desktop, open **Settings → Remote Access** and enable **Allow remote access to this device via relay**. Enable it before starting work: changing this setting restarts the host service and interrupts running terminals.
+In Paradev desktop, open **Settings → Remote Access** and enable **Allow remote access to this device via relay**. Enable it before starting work: changing this setting restarts the host service and interrupts running terminals.
 
 On a dedicated host, use the CLI:
 
@@ -61,7 +61,7 @@ Replace the example with a task from your project. Asking for a proposal gives y
 
 ## Reply from your iPhone
 
-Open the connected host in Superset Mobile, then open the workspace. Read the proposal in its terminal and send your approval or a revision.
+Open the connected host in Paradev Mobile, then open the workspace. Read the proposal in its terminal and send your approval or a revision.
 
 You're continuing the session on your computer. You don't need to start a new chat or paste in the conversation. Try sending a message from your phone before leaving your desk to check the connection.
 
@@ -71,7 +71,7 @@ While the app is open, the Lock Screen Live Activity shows which agent needs you
 
 Open **Files changed** to see what the agent edited. Check the message and its test result, then ask for any corrections in the terminal.
 
-<video controls playsInline preload="metadata" poster="/videos/blog/phone-diff-review/poster.jpg" aria-label="Inspect a sample diff and mark the file viewed in Superset Mobile" className="mx-auto max-h-[640px] w-auto rounded-xl">
+<video controls playsInline preload="metadata" poster="/videos/blog/phone-diff-review/poster.jpg" aria-label="Inspect a sample diff and mark the file viewed in Paradev Mobile" className="mx-auto aspect-[600/1304] w-full max-w-[294px] rounded-xl">
   <source src="/videos/blog/phone-diff-review/demo.mp4" type="video/mp4" />
   Your browser can [download the diff-review recording](/videos/blog/phone-diff-review/demo.mp4).
 </video>
@@ -103,6 +103,8 @@ Only if it stays awake and connected. Use another host that stays online if you 
 
 ### Is the mobile app free?
 
-It's free to download. Mobile access requires Superset Pro, and agent usage is billed separately by its provider.
+It's free to download. Mobile access requires Paradev Pro, and agent usage is billed separately by its provider.
+
+## Next steps
 
 For several tasks at once, follow the [parallel coding workflow](/blog/parallel-coding-agents-guide). To run work on a schedule, see the [maintenance automation guide](/blog/scheduled-agent-maintenance).

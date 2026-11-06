@@ -8,7 +8,7 @@ import type { UsageAgent } from "../types";
  * Longest-prefix match on the lowercased model id; unknown models fall back
  * to the agent's cheapest rate and mark the result approximate.
  */
-export const PRICING_TABLE_UPDATED = "2026-09-30";
+export const PRICING_TABLE_UPDATED = "2026-11-03";
 
 export interface ModelRate {
 	inputPerM: number;
@@ -58,6 +58,7 @@ const CODEX_RATES: Record<string, ModelRate> = {
 		longContextThreshold: 272_000,
 		longContext: { inputPerM: 4, outputPerM: 15, cacheReadPerM: 0.2 },
 	},
+	"gpt-6.1-terra": { inputPerM: 1, outputPerM: 5, cacheReadPerM: 0.05 },
 	// GPT-6 Astra (2026-09-03): cached input is $1/M, the usual 0.1x.
 	"gpt-6-astra": { inputPerM: 10, outputPerM: 50 },
 	"gpt-6-sol": { inputPerM: 2, outputPerM: 10 },

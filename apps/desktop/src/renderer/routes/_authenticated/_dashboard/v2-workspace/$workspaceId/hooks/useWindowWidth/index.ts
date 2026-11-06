@@ -1,1 +1,0 @@
-export { useWindowWidth } from "./useWindowWidth";

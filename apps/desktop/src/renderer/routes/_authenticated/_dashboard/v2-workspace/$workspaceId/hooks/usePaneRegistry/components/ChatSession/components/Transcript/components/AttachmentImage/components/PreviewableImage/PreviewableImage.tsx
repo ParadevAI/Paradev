@@ -1,45 +1,37 @@
 import { useLingui } from "@lingui/react/macro";
-import { useState } from "react";
-import { ImagePreviewOverlay } from "renderer/routes/_authenticated/components/ImagePreviewOverlay";
+import type { Ref } from "react";
 
 export function PreviewableImage({
 	alt,
 	src,
 	filename,
+	onClick,
 	onError,
-	onDownload,
+	ref,
 }: {
 	src: string;
 	filename: string;
 	alt?: string | undefined;
+	onClick: () => void;
 	onError: () => void;
-	onDownload: () => Promise<void>;
+	ref?: Ref<HTMLButtonElement>;
 }) {
 	const { t } = useLingui();
-	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	return (
-		<>
-			<button
-				type="button"
-				aria-label={t({ message: `Preview ${filename}` })}
-				className="block size-40 cursor-zoom-in overflow-hidden rounded-2xl"
-				onClick={() => setIsPreviewOpen(true)}
-			>
-				<img
-					alt={alt ?? filename}
-					className="size-full object-cover"
-					draggable={false}
-					onError={onError}
-					src={src}
-				/>
-			</button>
-			<ImagePreviewOverlay
+		<button
+			type="button"
+			aria-label={t({ message: `Preview ${filename}` })}
+			className="block size-40 cursor-zoom-in overflow-hidden rounded-2xl"
+			onClick={onClick}
+			ref={ref}
+		>
+			<img
+				alt={alt ?? filename}
+				className="size-full object-cover"
+				draggable={false}
+				onError={onError}
 				src={src}
-				filename={filename}
-				open={isPreviewOpen}
-				onClose={() => setIsPreviewOpen(false)}
-				onDownload={onDownload}
 			/>
-		</>
+		</button>
 	);
 }

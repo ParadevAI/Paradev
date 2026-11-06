@@ -1,16 +1,25 @@
+import { useLingui } from "@lingui/react/macro";
 import { chatMarkdownComponents } from "@superset/chat-ui/ChatMarkdown";
 import { cn } from "@superset/ui/utils";
 import { type UseNavigateResult, useNavigate } from "@tanstack/react-router";
-import type { ComponentProps, MouseEvent } from "react";
+import type { ComponentProps, MouseEvent, ReactNode } from "react";
 import { env } from "renderer/env.renderer";
+import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ChatLinkProvider } from "../../providers/ChatLinkProvider";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
+import { parseGithubWorkItemUrl } from "../../utils/githubWorkItem";
 import { unfurlLink } from "../../utils/linkUnfurl";
 import { LOCAL_PATH_PREFIX } from "../../utils/remarkLocalPathLinks";
 import {
 	parseSupersetAppLink,
 	type SupersetAppLink,
 } from "../../utils/supersetAppLink";
+import { ChatPreviewHoverCard } from "../ChatPreviewHoverCard";
+import { FileLinkMenu } from "../FileLinkMenu";
+import { GithubWorkItemHoverCard } from "../GithubWorkItemHoverCard";
+import { LinkMenu } from "../LinkMenu";
+import { WebsiteHoverCard } from "../WebsiteHoverCard";
+import { EnvironmentLinkLabel } from "./components/EnvironmentLinkLabel";
 import { LinkUnfurlIcon } from "./components/LinkUnfurlIcon";
 
 const MarkdownLink = chatMarkdownComponents.a;
@@ -37,11 +46,34 @@ function openInApp(
 				params: { pluginName: link.pluginName },
 			});
 			return;
+		case "environment":
+			void navigate({
+				to: "/environments/$environmentId",
+				params: { environmentId: link.environmentId },
+			});
+			return;
 		case "workspace":
 			void navigate({
 				to: "/v2-workspace/$workspaceId",
 				params: { workspaceId: link.workspaceId },
 			});
+			return;
+		case "chat":
+			void navigateToV2Workspace(link.workspaceId, navigate, {
+				search: {
+					sessionId: link.sessionId,
+					focusRequestId: crypto.randomUUID(),
+				},
+			});
+	}
+}
+
+function isWebLink(href: string): boolean {
+	try {
+		const url = new URL(href);
+		return /^https?:$/.test(url.protocol) && !url.username && !url.password;
+	} catch {
+		return false;
 	}
 }
 
@@ -50,7 +82,8 @@ function withModifier(event: MouseEvent): boolean {
 }
 
 export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
-	const { openPage, openLink } = useChatPaneActions();
+	const { t } = useLingui();
+	const { openPage, openLink, workspaceId } = useChatPaneActions();
 	const navigate = useNavigate();
 	const isLocalPath = props.href?.startsWith(LOCAL_PATH_PREFIX) ?? false;
 	const href = isLocalPath
@@ -62,22 +95,37 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 	const webUrl = env.NEXT_PUBLIC_WEB_URL;
 	const appLink = isLocalPath ? null : parseSupersetAppLink(href, webUrl);
 	const unfurl = unfurlLink(href, isLocalPath, webUrl);
+	const workItem = isLocalPath ? null : parseGithubWorkItemUrl(href);
+	const websitePreview = !isLocalPath && !appLink && isWebLink(href);
 	const bare =
 		typeof props.children === "string" &&
 		(props.children === props.href || props.children === href);
+	const bareLabel: ReactNode =
+		appLink?.kind === "chat" ? (
+			t({ message: "Chat" })
+		) : appLink?.kind === "environment" ? (
+			<EnvironmentLinkLabel environmentId={appLink.environmentId} />
+		) : (
+			unfurl?.label
+		);
 	const children = unfurl ? (
 		<>
 			<LinkUnfurlIcon icon={unfurl.icon} />
-			{bare && unfurl.label ? unfurl.label : props.children}
+			{bare && bareLabel ? bareLabel : props.children}
 		</>
 	) : (
 		props.children
 	);
 
-	return (
+	const anchor = (
 		<MarkdownLink
 			{...props}
-			title={href}
+			title={
+				workspaceId && (workItem || websitePreview || appLink?.kind === "chat")
+					? undefined
+					: href
+			}
+			data-source-text={isLocalPath || (bare && bareLabel) ? href : undefined}
 			className={cn(
 				typeof props.className === "string" && props.className,
 				unfurl && UNFURLED_LINK_CLASSNAME,
@@ -99,4 +147,29 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 			<ChatLinkProvider>{children}</ChatLinkProvider>
 		</MarkdownLink>
 	);
+	if (isLocalPath) {
+		return <FileLinkMenu reference={href}>{anchor}</FileLinkMenu>;
+	}
+	const link = <LinkMenu href={href}>{anchor}</LinkMenu>;
+	if (appLink?.kind === "chat") {
+		return (
+			<ChatPreviewHoverCard
+				sessionId={appLink.sessionId}
+				workspaceId={appLink.workspaceId}
+			>
+				{link}
+			</ChatPreviewHoverCard>
+		);
+	}
+	if (workItem) {
+		return (
+			<GithubWorkItemHoverCard link={workItem} url={href}>
+				{link}
+			</GithubWorkItemHoverCard>
+		);
+	}
+	if (websitePreview) {
+		return <WebsiteHoverCard url={href}>{link}</WebsiteHoverCard>;
+	}
+	return link;
 }

@@ -1,14 +1,20 @@
 import { CLIError } from "@superset/cli-framework";
 import { type ApiClient, createApiClient } from "./api-client";
-import { refreshAccessToken } from "./auth";
 import {
-	AUTH_REFRESH_LEEWAY_MS,
 	readConfig,
 	resolveOrganizationId,
 	type SupersetConfig,
-	writeConfig,
 } from "./config";
 import { readHostApiToken } from "./host-api-token";
+import {
+	isAuthFresh,
+	RefreshInProgressError,
+	refreshStoredAuth,
+	ServerUnreachableError,
+	SessionExpiredError,
+} from "./oauth-refresh";
+
+export const NOT_LOGGED_IN = "Not logged in";
 
 export type AuthSource = "override" | "host" | "config" | "oauth" | "sandbox";
 
@@ -45,24 +51,13 @@ export async function resolveAuth(
 		authSource = "config";
 	} else if (config.auth) {
 		const auth = config.auth;
-		if (auth.expiresAt - AUTH_REFRESH_LEEWAY_MS < Date.now()) {
-			if (!auth.refreshToken) {
-				throw new CLIError("Session expired", "Run: superset auth login");
-			}
+		if (!isAuthFresh(auth, Date.now())) {
 			try {
-				const refreshed = await refreshAccessToken(auth.refreshToken);
-				config = {
-					...config,
-					auth: {
-						accessToken: refreshed.accessToken,
-						refreshToken: refreshed.refreshToken,
-						expiresAt: refreshed.expiresAt,
-					},
-				};
-				writeConfig(config);
-				bearer = refreshed.accessToken;
-			} catch {
-				throw new CLIError("Session expired", "Run: superset auth login");
+				const refreshed = await refreshStoredAuth();
+				config = refreshed;
+				bearer = refreshed.auth.accessToken;
+			} catch (error) {
+				throw refreshFailureToCLIError(error);
 			}
 		} else {
 			bearer = auth.accessToken;
@@ -76,7 +71,7 @@ export async function resolveAuth(
 		authSource = "sandbox";
 	} else {
 		throw new CLIError(
-			"Not logged in",
+			NOT_LOGGED_IN,
 			"Run: superset auth login (or set SUPERSET_API_KEY)",
 		);
 	}
@@ -86,4 +81,26 @@ export async function resolveAuth(
 
 	const api = createApiClient({ bearer, organizationId });
 	return { config: resolvedConfig, api, bearer, authSource };
+}
+
+function refreshFailureToCLIError(error: unknown): CLIError {
+	if (error instanceof RefreshInProgressError) {
+		return new CLIError(
+			"Another superset command is renewing the login",
+			"Retry in a few seconds",
+		);
+	}
+	if (error instanceof ServerUnreachableError) {
+		return new CLIError(
+			"Could not reach Paradev to renew the login",
+			"Check your connection and retry",
+		);
+	}
+	if (error instanceof SessionExpiredError) {
+		return new CLIError("Session expired", "Run: superset auth login");
+	}
+	return new CLIError(
+		"Could not renew the login",
+		"Retry in a minute. If it keeps failing, run: superset auth login",
+	);
 }

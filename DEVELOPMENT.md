@@ -1,36 +1,36 @@
-# Developing Superset
+# Developing Paradev
 
-This guide is for contributors building Superset from source. If you just want to use Superset, [download the macOS app](https://github.com/superset-sh/superset/releases/latest) instead.
+This guide is for contributors building Paradev from source. If you just want to use Paradev, [download the macOS app](https://github.com/paradevai/paradev/releases/latest) instead.
 
 ## Prerequisites
 
 | Tool | Install |
 |:-----|:--------|
-| [Bun](https://bun.sh/) v1.4.2+ (pinned in `.bun-version`) | `curl -fsSL https://bun.sh/install \| bash` |
+| [Bun](https://bun.sh/) v1.4.3+ (pinned in `.bun-version`) | `curl -fsSL https://bun.sh/install \| bash` |
 | [Docker](https://docs.docker.com/get-docker/) | Docker Desktop or OrbStack |
 | `jq` | `brew install jq` |
 | Git 2.20+ and [`gh`](https://cli.github.com/) | `brew install gh` |
 
 macOS is the primary supported platform. Windows / Linux are untested.
 
-## Run it from a Superset workspace
+## Run it from a Paradev workspace
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
-Add the clone to the installed Superset app and create a workspace for your
-change. Superset creates that workspace as an isolated git worktree. In the new
+Add the clone to the installed Paradev app and create a workspace for your
+change. Paradev creates that workspace as an isolated git worktree. In the new
 workspace terminal, run:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
 Run `setup.local.sh` separately in every new worktree before `bun run dev`. The
 setup and workspace-specific app identity allow the development desktop app to
-run alongside the installed Superset app and development apps from other
+run alongside the installed Paradev app and development apps from other
 worktrees.
 
 **You do not need a Neon account, Stripe keys, or any other third-party
@@ -44,12 +44,12 @@ validation, and `setup.local.sh` runs everything against a local Docker stack.
 3. Brings up Postgres + neon-proxy + Redis (behind an HTTP shim, for the relay) via `docker compose` (project-scoped to this worktree)
 4. Runs `bun install` and `bun run db:migrate`
 5. Seeds a `Local Admin` dev account via `bun run db:seed-dev`
-6. Writes a gitignored `.superset/config.local.json` overlay so subsequent worktrees automatically use this setup
+6. Writes a gitignored `.paradev/config.local.json` overlay so subsequent worktrees automatically use this setup
 
 Re-run the script any time to refresh the workspace. To tear the local DB stack down:
 
 ```bash
-./.superset/teardown.local.sh
+./.paradev/teardown.local.sh
 ```
 
 ### Signing in
@@ -95,11 +95,11 @@ See [`AGENTS.md`](./AGENTS.md) for repo structure, monorepo conventions, and dat
 ## Troubleshooting
 
 - **Dev desktop exits while the installed app is running**: launch development
-  from a Superset workspace instead of the repository's main checkout, run
-  `./.superset/setup.local.sh` in that worktree, then run `bun run dev` again.
+  from a Paradev workspace instead of the repository's main checkout, run
+  `./.paradev/setup.local.sh` in that worktree, then run `bun run dev` again.
 - **Port collision**: `setup.local.sh` allocates a fresh port window per worktree. If you ran the script before this change landed, re-run it to migrate.
-- **DB connection errors after pulling main**: re-run `./.superset/setup.local.sh`; it's idempotent and will apply any new migrations.
-- **Stuck Docker stack**: `./.superset/teardown.local.sh` then re-run setup.
+- **DB connection errors after pulling main**: re-run `./.paradev/setup.local.sh`; it's idempotent and will apply any new migrations.
+- **Stuck Docker stack**: `./.paradev/teardown.local.sh` then re-run setup.
 
 ## Contributing
 

@@ -76,11 +76,11 @@ export default function supersetAmpLifecyclePlugin(amp: AmpApi) {
 
 	const env = typeof process === "undefined" ? {} : process.env ?? {};
 	if (!env.SUPERSET_TERMINAL_ID && !env.SUPERSET_TAB_ID) {
-		debugLog("disabled: missing Superset terminal env");
+		debugLog("disabled: missing Paradev terminal env");
 		return;
 	}
 
-	const supersetHome = env.SUPERSET_HOME_DIR || join(homedir(), ".superset");
+	const supersetHome = env.SUPERSET_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
 	const notifyPath = join(supersetHome, "hooks", "notify.sh");
 	if (!existsSync(notifyPath)) {
 		debugLog("disabled: notify hook missing at " + notifyPath);

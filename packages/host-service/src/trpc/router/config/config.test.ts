@@ -87,8 +87,115 @@ describe("configRouter", () => {
 		});
 	});
 
+	describe("getConfigFiles and writeConfigFile", () => {
+		const configDir = () => join(sandbox.repoPath, ".paradev");
+
+		it("returns nothing but the paths when no file exists", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			const files = await caller.getConfigFiles({ projectId: PROJECT_ID });
+			expect(files.shared).toBeNull();
+			expect(files.local.content).toBeNull();
+			expect(files.tomlPath).toBe(join(configDir(), "config.toml"));
+		});
+
+		it("prefers config.toml over config.json", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			mkdirSync(configDir(), { recursive: true });
+			writeFileSync(join(configDir(), "config.json"), "{}");
+			expect(
+				(await caller.getConfigFiles({ projectId: PROJECT_ID })).shared?.format,
+			).toBe("json");
+			writeFileSync(join(configDir(), "config.toml"), "# hi\n");
+			expect(
+				(await caller.getConfigFiles({ projectId: PROJECT_ID })).shared,
+			).toMatchObject({ format: "toml", content: "# hi\n" });
+		});
+
+		it("writes the exact text, comments included", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			const content =
+				'# setup for this repo\n[setup]\nrun = "bun install" # deps\n';
+			await caller.writeConfigFile({
+				projectId: PROJECT_ID,
+				file: "shared",
+				format: "toml",
+				content,
+			});
+			expect(readFileSync(join(configDir(), "config.toml"), "utf-8")).toBe(
+				content,
+			);
+			await caller.writeConfigFile({
+				projectId: PROJECT_ID,
+				file: "local",
+				format: "toml",
+				content: '[setup]\nrun = "direnv allow"\n',
+			});
+			expect(
+				readFileSync(join(configDir(), "config.local.toml"), "utf-8"),
+			).toContain("direnv");
+		});
+
+		it("keeps the personal file out of commits through .git/info/exclude", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			mkdirSync(join(sandbox.repoPath, ".git", "info"), { recursive: true });
+			writeFileSync(join(sandbox.repoPath, ".git", "info", "exclude"), "*.log");
+			for (let i = 0; i < 2; i++) {
+				await caller.writeConfigFile({
+					projectId: PROJECT_ID,
+					file: "local",
+					format: "toml",
+					content: "",
+				});
+			}
+			expect(
+				readFileSync(
+					join(sandbox.repoPath, ".git", "info", "exclude"),
+					"utf-8",
+				),
+			).toBe("*.log\n/.paradev/config.local.toml\n");
+		});
+
+		it("keeps editing a repo configured in .superset", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			const legacyDir = join(sandbox.repoPath, ".superset");
+			mkdirSync(legacyDir, { recursive: true });
+			writeFileSync(join(legacyDir, "config.json"), "{}");
+			await caller.writeConfigFile({
+				projectId: PROJECT_ID,
+				file: "shared",
+				format: "toml",
+				content: "# moved to toml\n",
+			});
+			expect(readFileSync(join(legacyDir, "config.toml"), "utf-8")).toBe(
+				"# moved to toml\n",
+			);
+			expect(existsSync(configDir())).toBe(false);
+		});
+
+		it("refuses invalid content and writes nothing", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			await expect(
+				caller.writeConfigFile({
+					projectId: PROJECT_ID,
+					file: "shared",
+					format: "toml",
+					content: "[terminals.dev]\ndefualt = true\n",
+				}),
+			).rejects.toThrow(/defualt/);
+			await expect(
+				caller.writeConfigFile({
+					projectId: PROJECT_ID,
+					file: "shared",
+					format: "json",
+					content: "[1]",
+				}),
+			).rejects.toThrow(/JSON object/);
+			expect(existsSync(join(configDir(), "config.toml"))).toBe(false);
+		});
+	});
+
 	describe("updateConfig", () => {
-		it("creates .superset/config.json on first save", async () => {
+		it("creates .paradev/config.json on first save", async () => {
 			const caller = createCaller(sandbox.repoPath);
 			await caller.updateConfig({
 				projectId: PROJECT_ID,
@@ -96,7 +203,7 @@ describe("configRouter", () => {
 				teardown: [],
 			});
 
-			const configPath = join(sandbox.repoPath, ".superset", "config.json");
+			const configPath = join(sandbox.repoPath, ".paradev", "config.json");
 			expect(existsSync(configPath)).toBe(true);
 			const parsed = JSON.parse(readFileSync(configPath, "utf-8"));
 			expect(parsed).toEqual({ setup: ["bun install"], teardown: [] });

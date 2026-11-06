@@ -4,13 +4,13 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { assertMember } from "../../lib/cloud-guards";
-import { jwtProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 
 export const taskLabelRouter = {
-	list: jwtProcedure
+	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
 			return db
 				.select({
 					id: taskLabels.id,

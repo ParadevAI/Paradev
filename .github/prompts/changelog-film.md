@@ -20,7 +20,7 @@ app state driven over CDP; no mockups. Landscape 1280px wide, 30fps, silent.
 
 ## Production (adapts readme-hero-film.md; read that file for the deep recipes)
 
-1. **Stage** the dev desktop from the worktree: `SUPERSET_HOME_DIR="$PWD/superset-dev-data"
+1. **Stage** the dev desktop from the worktree: `SUPERSET_HOME_DIR="$PWD/paradev-dev-data"
    RENDERER_REMOTE_DEBUG_PORT=9222 bun run dev:desktop`, wait for `localhost:9222/json`.
 2. **Hard rules carried over**: no real data in frame (demo projects only, hide Sessions,
    restore all state after), no PII, quit the dev stack when done.

@@ -5,7 +5,7 @@
 const COMMANDS: readonly { name: string; summary: string }[] = [
 	{ name: "agents", summary: "Manage and run agents" },
 	{ name: "auth", summary: "Manage authentication" },
-	{ name: "automations", summary: "Manage scheduled automations" },
+	{ name: "automations", summary: "Manage automations" },
 	{ name: "hosts", summary: "Manage hosts" },
 	{ name: "projects", summary: "Manage projects" },
 	{ name: "start", summary: "Start the host service" },

@@ -9,7 +9,7 @@ export const pluginConnectorRefSchema = z
 		slug: z
 			.string()
 			.describe(
-				"A connector in the Superset registry. The connections system owns how the connection is obtained; a manifest only names which one it needs.",
+				"A connector in the Paradev registry. The connections system owns how the connection is obtained; a manifest only names which one it needs.",
 			),
 	})
 	.meta({ id: "PluginConnectorRef" });
@@ -30,7 +30,7 @@ const pluginMcpSchema = z
 		headers: z.record(z.string(), z.string()).optional(),
 	})
 	.describe(
-		"The vendor's own MCP server, which Superset dials with the connection's credential attached. Omit it when Superset hosts the plugin's tools itself — absence is the declaration, not a gap. Agents never receive this URL; they are pointed at the Superset endpoint that fronts it. Streamable HTTP only — the legacy HTTP+SSE transport is not supported.",
+		"The vendor's own MCP server, which Paradev dials with the connection's credential attached. Omit it when Paradev hosts the plugin's tools itself — absence is the declaration, not a gap. Agents never receive this URL; they are pointed at the Paradev endpoint that fronts it. Streamable HTTP only — the legacy HTTP+SSE transport is not supported.",
 	);
 
 export const supersetExtensionSchema = z
@@ -74,9 +74,9 @@ export const pluginManifestSchema = z
 	})
 	.meta({
 		id: "PluginManifest",
-		title: "Superset plugin manifest",
+		title: "Paradev plugin manifest",
 		description:
-			"plugin.json for a Superset marketplace plugin. Authoring guide: https://docs.superset.sh",
+			"plugin.json for a Paradev marketplace plugin. Authoring guide: https://docs.superset.sh",
 	});
 
 export type PluginManifestInput = z.input<typeof pluginManifestSchema>;
