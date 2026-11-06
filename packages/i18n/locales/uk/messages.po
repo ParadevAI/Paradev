@@ -2048,6 +2048,9 @@ msgstr "Додати файли, застосунки тощо"
 msgid "Add files, apps, and more (@)"
 msgstr "Додати файли, застосунки тощо (@)"
 
+msgid "Add GitHub organization"
+msgstr "Додати організацію GitHub"
+
 msgid "Add instructions"
 msgstr "Додати інструкції"
 
@@ -7221,6 +7224,9 @@ msgstr "Відкинуто — більше не питатимемо"
 msgid "Disconnect"
 msgstr "Від'єднати"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "Від’єднати {accountLogin}?"
+
 msgid "Disconnect {credential}?"
 msgstr "Від'єднати {credential}?"
 
@@ -10227,8 +10233,8 @@ msgstr "Встановити плагін"
 msgid "Install the desktop app"
 msgstr "Встановити десктопний застосунок"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Встановіть Paradev GitHub App, щоб підключити свої репозиторії."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Установіть GitHub App Paradev у кожну організацію або обліковий запис GitHub, репозиторії яких хочете під’єднати."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Встановлюйте й авторизуйте MCP-сервери та обмежуйте їхній доступ у всіх робочих просторах з одного місця, із централізованим OAuth."
@@ -14595,6 +14601,9 @@ msgstr "Людина"
 msgid "Personal"
 msgstr "Особисте"
 
+msgid "Personal account"
+msgstr "Особистий обліковий запис"
+
 msgid "Personal plan"
 msgstr "Особистий тариф"
 
@@ -16129,8 +16138,11 @@ msgstr "Репозиторії, worktree та гілки"
 msgid "Repositories"
 msgstr "Репозиторії"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "Репозиторії, доступні через установлений GitHub App."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Репозиторії, доступні через під’єднані облікові записи GitHub."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "Репозиторії {accountLogin} більше не синхронізуватимуться. Інші під’єднані облікові записи GitHub це не зачепить. GitHub App залишиться встановленим у {accountLogin}, і його можна під’єднати знову будь-коли."
 
 msgid "Repositories refreshed"
 msgstr "Репозиторії оновлено"
@@ -17694,6 +17706,9 @@ msgstr "Скрипти налаштування, після конвертаці
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Налаштування зупинено. Причину вказано у виводі нижче."
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Під’єднано кілька облікових записів GitHub. Виберіть у вебзастосунку, який від’єднати, або оновіть CLI."
 
 msgid "Sexual content"
 msgstr "Сексуальний контент"
@@ -20218,9 +20233,6 @@ msgstr "Це змінить публічну URL-адресу вашої орг�
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Це видалить команду <0>{0}</0> і прибере всіх її учасників. Цю дію неможливо скасувати."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Це відключить GitHub від вашої організації. GitHub App залишиться встановленим, але більше не синхронізуватиме дані. Ви можете знову підключитися будь-коли."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Це примусово завершить усі активні сеанси й перезапустить демон терміналів. Застосунок перезапустить термінали з новим демоном."

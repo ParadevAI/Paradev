@@ -2054,6 +2054,9 @@ msgstr "Dosya, uygulama ve daha fazlasını ekleyin"
 msgid "Add files, apps, and more (@)"
 msgstr "Dosya, uygulama ve daha fazlasını ekleyin (@)"
 
+msgid "Add GitHub organization"
+msgstr "GitHub organizasyonu ekle"
+
 msgid "Add instructions"
 msgstr "Talimat ekle"
 
@@ -7227,6 +7230,9 @@ msgstr "Atıldı — bir daha sorulmayacak"
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "{accountLogin} bağlantısı kesilsin mi?"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential} bağlantısı kesilsin mi?"
 
@@ -10233,8 +10239,8 @@ msgstr "Eklenti kur"
 msgid "Install the desktop app"
 msgstr "Masaüstü uygulamasını kurun"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Depolarınızı bağlamak için Paradev GitHub App'i kurun."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Depolarını bağlamak istediğiniz her GitHub organizasyonuna veya hesabına Paradev GitHub App'i yükleyin."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "MCP sunucularını tek bir yerden, merkezi OAuth ile tüm çalışma alanlarınıza kurun, yetkilendirin ve kapsamlandırın."
@@ -14601,6 +14607,9 @@ msgstr "Kişi"
 msgid "Personal"
 msgstr "Kişisel"
 
+msgid "Personal account"
+msgstr "Kişisel hesap"
+
 msgid "Personal plan"
 msgstr "Kişisel plan"
 
@@ -16135,8 +16144,11 @@ msgstr "Depolar, worktree'ler ve dallar"
 msgid "Repositories"
 msgstr "Depolar"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "GitHub App kurulumu üzerinden erişilebilen depolar."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Bağlı GitHub hesaplarınız üzerinden erişilebilen depolar."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin} depoları artık senkronize edilmeyecek. Bağlı diğer GitHub hesapları etkilenmez. GitHub App {accountLogin} üzerinde yüklü kalır ve istediğiniz zaman yeniden bağlayabilirsiniz."
 
 msgid "Repositories refreshed"
 msgstr "Depolar yenilendi"
@@ -17700,6 +17712,9 @@ msgstr "Kurulum betikleri, conductor.json'u dönüştürdükten sonra"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Kurulum durdu. Nedeni aşağıdaki çıktıda."
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Birden fazla GitHub hesabı bağlı. Bağlantısını kesmek istediğiniz hesabı web uygulamasında seçin veya CLI'yi güncelleyin."
 
 msgid "Sexual content"
 msgstr "Cinsel içerik"
@@ -20224,9 +20239,6 @@ msgstr "Bu, kuruluşunuzun herkese açık URL'sini değiştirir. Yer imlerinizi 
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Bu işlem <0>{0}</0> takımını siler ve tüm üyelerini kaldırır. Bu geri alınamaz."
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Bu işlem GitHub bağlantısını kuruluşunuzdan kaldırır. GitHub App kurulu kalır ancak artık veri eşitlemez. İstediğiniz zaman yeniden bağlanabilirsiniz."
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Bu işlem çalışan tüm oturumları sonlandırır ve terminal daemon'unu yeniden başlatır. Uygulama, terminalleri yeni bir daemon ile yeniden başlatır."

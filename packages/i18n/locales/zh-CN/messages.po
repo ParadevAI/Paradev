@@ -2054,6 +2054,9 @@ msgstr "添加文件、应用等"
 msgid "Add files, apps, and more (@)"
 msgstr "添加文件、应用等（@）"
 
+msgid "Add GitHub organization"
+msgstr "添加 GitHub 组织"
+
 msgid "Add instructions"
 msgstr "添加指示"
 
@@ -7227,6 +7230,9 @@ msgstr "已放弃——不再询问"
 msgid "Disconnect"
 msgstr "断开连接"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "断开 {accountLogin} 的连接？"
+
 msgid "Disconnect {credential}?"
 msgstr "断开{credential}？"
 
@@ -10233,8 +10239,8 @@ msgstr "安装插件"
 msgid "Install the desktop app"
 msgstr "安装桌面应用"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "安装Paradev GitHub App以连接你的仓库。"
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "在每个你想连接其仓库的 GitHub 组织或账号上安装 Paradev GitHub App。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "在一处为所有工作区安装、授权并划定MCP服务器的权限范围，OAuth集中管理。"
@@ -14601,6 +14607,9 @@ msgstr "人员"
 msgid "Personal"
 msgstr "个人"
 
+msgid "Personal account"
+msgstr "个人账号"
+
 msgid "Personal plan"
 msgstr "个人方案"
 
@@ -16135,8 +16144,11 @@ msgstr "仓库、worktree 和分支"
 msgid "Repositories"
 msgstr "仓库"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "通过GitHub App安装可访问的仓库。"
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "可通过已连接的 GitHub 账号访问的仓库。"
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin} 的仓库将停止同步。其他已连接的 GitHub 账号不受影响。GitHub App 仍安装在 {accountLogin} 上，你可以随时重新连接。"
 
 msgid "Repositories refreshed"
 msgstr "仓库已刷新"
@@ -17700,6 +17712,9 @@ msgstr "设置脚本（转换 conductor.json 之后）"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "设置已停止。原因见下方输出。"
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "已连接多个 GitHub 账号。请在网页应用中选择要断开连接的账号，或更新 CLI。"
 
 msgid "Sexual content"
 msgstr "色情内容"
@@ -20224,9 +20239,6 @@ msgstr "这会更改组织的公开URL。请记得更新书签和已分享的链
 #. placeholder {0}: team?.name
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "这将删除<0>{0}</0>并移除其所有成员。此操作无法撤销。"
-
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "这会断开GitHub与你组织的连接。GitHub App仍会保持安装，但不再同步数据。你可以随时重新连接。"
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "这将终止所有运行中的会话并重启终端守护进程。应用会用全新的守护进程重启终端。"
