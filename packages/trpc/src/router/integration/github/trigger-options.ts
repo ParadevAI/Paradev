@@ -79,6 +79,7 @@ const people: TriggerOptionSource = async ({ organizationId }) => {
 				where: eq(githubRepositories.installationId, installation.id),
 				columns: { owner: true, name: true },
 			});
+			let refusedRepositories = 0;
 			for (const repository of repositories) {
 				if (seen.size >= MAX_PEOPLE) break;
 				try {
@@ -92,11 +93,13 @@ const people: TriggerOptionSource = async ({ organizationId }) => {
 					);
 				} catch (error) {
 					if (!isPermissionError(error)) throw error;
-					console.warn(
-						`[integration.github] collaborators refused for ${repository.owner}/${repository.name}:`,
-						error,
-					);
+					refusedRepositories += 1;
 				}
+			}
+			if (refusedRepositories > 0) {
+				console.warn(
+					`[integration.github] collaborators refused for ${refusedRepositories} of ${repositories.length} repositories of ${installation.accountLogin}`,
+				);
 			}
 		} catch (error) {
 			// The App was installed without the members permission (or the

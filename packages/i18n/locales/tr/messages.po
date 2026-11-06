@@ -17517,7 +17517,7 @@ msgid "Setup stopped. The reason is in the output below."
 msgstr "Kurulum durdu. Nedeni aşağıdaki çıktıda."
 
 msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
-msgstr "Birden fazla GitHub hesabı bağlı. Bağlantısını kesmek istediğiniz hesabı web uygulamasında seçin veya CLI'ı güncelleyin."
+msgstr "Birden fazla GitHub hesabı bağlı. Bağlantısını kesmek istediğiniz hesabı web uygulamasında seçin veya CLI'yi güncelleyin."
 
 msgid "Sexual content"
 msgstr "Cinsel içerik"
