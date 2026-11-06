@@ -155,9 +155,8 @@ function V2WorkspaceLayout() {
 		cache.refetchAll,
 	);
 
-	// A `ready` row only means the box has started booting: its address comes
-	// with the first wake, which waits for host-service, and that can take most
-	// of a minute when the environment's snapshot predates the current bundle.
+	// A `ready` row only means the box has started booting. Its address request
+	// is batched with the wake, which waits for host-service to answer.
 	if (!workspace && cloudWorkspace) {
 		return (
 			<StateScreenShell>
