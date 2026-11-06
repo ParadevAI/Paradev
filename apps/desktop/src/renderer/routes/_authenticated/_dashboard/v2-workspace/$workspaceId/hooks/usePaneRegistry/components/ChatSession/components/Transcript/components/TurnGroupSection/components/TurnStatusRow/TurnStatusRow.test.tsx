@@ -167,3 +167,41 @@ test("an auth failure in manual mode offers no sign-in: Continue or agent settin
 	fireEvent.click(view.getByText("Agent settings"));
 	expect(openAgentSettings).toHaveBeenCalledTimes(1);
 });
+
+test("a turn cut off when Paradev closed is a quiet paused line that resumes", () => {
+	const continueTask = mock(() => {});
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask,
+				dismissed: new Set(),
+				setDismissed: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{ message: "Paradev closed", kind: "host_stopped" }}
+				latest
+				status="interrupted"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+
+	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
+	expect(view.container.textContent).toContain("Paused when Paradev closed");
+	fireEvent.click(view.getByText("Resume"));
+	expect(continueTask).toHaveBeenCalledTimes(1);
+});
+
+test("an older paused turn offers no Resume", () => {
+	const view = render(
+		<TurnStatusRow
+			error={{ message: "Paradev closed", kind: "host_stopped" }}
+			latest={false}
+			status="interrupted"
+			turnId="t1"
+		/>,
+	);
+	expect(view.container.textContent).toBe("Paused when Paradev closed");
+});

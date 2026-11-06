@@ -92,6 +92,52 @@ export function resumeUnfinishedChats(options: {
 	}
 }
 
+const closedChatSchema = sessionSchema
+	.pick({
+		scopeId: true,
+		harness: true,
+		harnessSessionId: true,
+		terminalId: true,
+	})
+	.extend({ sessionId: z.string().min(1) });
+
+/** Notes the chats a quit cut off mid-turn, for the sidebar after the next boot. */
+export function recordClosedChats(runtime: ChatRuntime, path: string): void {
+	const sessions = runtime.live
+		.unfinished()
+		.filter((session) => session.interrupted)
+		.map(({ sessionId, scopeId, harness, harnessSessionId, terminalId }) => ({
+			sessionId,
+			scopeId,
+			harness,
+			harnessSessionId,
+			terminalId,
+		}));
+	if (sessions.length === 0) return;
+	const pending = `${path}.${process.pid}.tmp`;
+	writeFileSync(pending, JSON.stringify({ sessions }));
+	renameSync(pending, path);
+}
+
+export function restoreClosedChats(
+	path: string,
+	closedMidTurn: (chat: z.infer<typeof closedChatSchema>) => void,
+): void {
+	if (!existsSync(path)) return;
+	const marker = readMarker(path);
+	try {
+		unlinkSync(path);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== "ENOENT") return;
+	}
+	const parsed = z.object({ sessions: z.array(z.unknown()) }).safeParse(marker);
+	if (!parsed.success) return;
+	for (const entry of parsed.data.sessions) {
+		const chat = closedChatSchema.safeParse(entry);
+		if (chat.success) closedMidTurn(chat.data);
+	}
+}
+
 function readMarker(markerPath: string): unknown {
 	try {
 		return JSON.parse(readFileSync(markerPath, "utf8"));

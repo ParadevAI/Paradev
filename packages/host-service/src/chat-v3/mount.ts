@@ -36,9 +36,13 @@ import { createGitCheckpoints } from "./gitCheckpoints";
 import { createAttachmentResolver } from "./resolveAttachment";
 import { createResolveCwd } from "./resolveCwd";
 import {
+	recordClosedChats,
 	recordUnfinishedChats,
+	restoreClosedChats,
 	resumeUnfinishedChats,
 } from "./resumeAfterUpdate";
+
+const CLOSED_CHATS_FILE = "chat-closed-mid-turn.json";
 
 export const CHAT_V3_TRPC_PATH = "/chat-v3/trpc";
 export const CHAT_V3_STREAM_PATH = "/chat-v3/sessions/:sessionId/stream";
@@ -139,6 +143,7 @@ export function createChatV3Mount(options: {
 		dirname(options.dbPath),
 		HOST_CHAT_RESUME_MARKER_FILE,
 	);
+	const closedChatsPath = join(dirname(options.dbPath), CLOSED_CHATS_FILE);
 
 	const runtime = (): ChatRuntime => {
 		if (built) return built;
@@ -165,14 +170,25 @@ export function createChatV3Mount(options: {
 		closeScope: async (scopeId) => {
 			await built?.commands.closeScope(scopeId);
 		},
-		resumeAfterUpdate: () =>
+		resumeAfterUpdate: () => {
 			resumeUnfinishedChats({
 				markerPath,
 				runtime,
 				resolveCwd: createResolveCwd(options.db),
-			}),
+			});
+			const agents = options.agents;
+			if (agents) {
+				restoreClosedChats(closedChatsPath, (chat) =>
+					agents.closedMidTurn(chat),
+				);
+			}
+		},
 		recordUnfinished: () => {
-			if (!built || !recordUnfinishedChats(built, markerPath)) return;
+			if (!built) return;
+			if (!recordUnfinishedChats(built, markerPath)) {
+				recordClosedChats(built, closedChatsPath);
+				return;
+			}
 			built.live.disposeAll().catch((error: unknown) => {
 				console.warn("[chat-v3] could not stop chats for the update", error);
 			});

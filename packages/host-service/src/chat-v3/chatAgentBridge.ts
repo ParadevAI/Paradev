@@ -45,6 +45,8 @@ type BoundChat = {
 	pid?: number;
 	established?: true;
 	account?: SessionAccount;
+	/** How the last turn ended when it did not complete. */
+	endedTurn?: "stopped" | "failed";
 };
 
 function sameTasks(
@@ -70,6 +72,16 @@ function sameTasks(
 export type ChatAgentBridge = LiveSessionObserver & {
 	spawned(sessionId: string, pid: number): void;
 	accountCaptured(sessionId: string, account: SessionAccount): void;
+	/** A chat Paradev closed mid-turn, shown as unseen until someone looks. */
+	closedMidTurn(chat: ClosedChat): void;
+};
+
+export type ClosedChat = {
+	sessionId: string;
+	scopeId: string;
+	harness: string;
+	harnessSessionId: string;
+	terminalId?: string;
 };
 
 export function agentIdForHarness(
@@ -159,15 +171,30 @@ export function createChatAgentBridge(
 		if (eventType === "Start") chat.lastReply = undefined;
 	};
 
+	/** A stop the user made needs no review mark and no notification. */
+	const recordQuietStop = (chat: BoundChat) => {
+		const prior = ctx.terminalAgentStore.getChat(chat.terminalId);
+		store(chat, "Stop", prior?.lastEventAt ?? Date.now());
+		chat.lastEventType = "Stop";
+		bindingsChanged(chat.workspaceId);
+	};
+
 	const onStatus = (chat: BoundChat, status: SessionStatus) => {
 		if (status !== "starting" && status !== "dead") chat.established = true;
-		const eventType = LIFECYCLE_BY_STATUS[status];
+		const settled = LIFECYCLE_BY_STATUS[status];
+		const eventType =
+			settled === "Stop" && chat.endedTurn === "failed" ? "Failed" : settled;
 		if (!eventType || eventType === chat.lastEventType) return;
 		const settledWithoutTurn =
-			eventType === "Stop" &&
+			(eventType === "Stop" || eventType === "Failed") &&
+			status !== "dead" &&
 			chat.lastEventType !== "Start" &&
 			chat.lastEventType !== "PermissionRequest";
 		if (settledWithoutTurn) return;
+		if (eventType === "Stop" && chat.endedTurn === "stopped") {
+			recordQuietStop(chat);
+			return;
+		}
 		record(chat, eventType);
 	};
 
@@ -241,6 +268,16 @@ export function createChatAgentBridge(
 			}
 			if (!isDurableEnvelope(envelope)) return;
 			const event = envelope.event;
+			if (event.type === "turn") {
+				const { status, error } = event.turn;
+				chat.endedTurn =
+					status === "failed" && error?.kind !== "usage_limit"
+						? "failed"
+						: status === "interrupted" && error?.kind !== "host_stopped"
+							? "stopped"
+							: undefined;
+				return;
+			}
 			if (event.type === "item") {
 				ctx.terminalAgentStore.noteActivity(chat.workspaceId);
 				const { kind, text, parentItemId } = event.item;
@@ -275,6 +312,21 @@ export function createChatAgentBridge(
 				attach(chat);
 			}
 			onStatus(chat, event.session.status);
+		},
+
+		closedMidTurn(closed) {
+			const agentId = agentIdForHarness(closed.harness);
+			if (!closed.terminalId || !agentId) return;
+			ctx.terminalAgentStore.recordChatEvent({
+				terminalId: closed.terminalId,
+				workspaceId: closed.scopeId,
+				eventType: "Stop",
+				agentId,
+				agentSessionId: closed.harnessSessionId,
+				chatSessionId: closed.sessionId,
+				occurredAt: Date.now(),
+			});
+			bindingsChanged(closed.scopeId);
 		},
 
 		stopped(sessionId) {

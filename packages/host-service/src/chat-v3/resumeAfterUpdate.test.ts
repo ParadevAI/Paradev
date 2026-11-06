@@ -10,7 +10,9 @@ import type {
 import {
 	CONTINUE_AFTER_UPDATE_PROMPT,
 	RESUME_MARKER_MAX_AGE_MS,
+	recordClosedChats,
 	recordUnfinishedChats,
+	restoreClosedChats,
 	resumeUnfinishedChats,
 } from "./resumeAfterUpdate";
 
@@ -116,5 +118,29 @@ describe("resuming chats after an update", () => {
 
 		expect(resumed).toEqual([]);
 		expect(existsSync(markerPath)).toBe(false);
+	});
+});
+
+describe("chats a quit cut off", () => {
+	test("only chats with a turn running come back, once", () => {
+		const path = markerIn();
+		const { runtime } = fakeRuntime([
+			UNFINISHED,
+			{ ...UNFINISHED, sessionId: "chat-queued-only", interrupted: false },
+		]);
+		recordClosedChats(runtime, path);
+
+		const restored: string[] = [];
+		restoreClosedChats(path, (chat) => restored.push(chat.sessionId));
+		restoreClosedChats(path, (chat) => restored.push(chat.sessionId));
+
+		expect(restored).toEqual(["chat-1"]);
+		expect(existsSync(path)).toBe(false);
+	});
+
+	test("writes nothing when no chat was mid-turn", () => {
+		const path = markerIn();
+		recordClosedChats(fakeRuntime([]).runtime, path);
+		expect(existsSync(path)).toBe(false);
 	});
 });

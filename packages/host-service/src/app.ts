@@ -308,7 +308,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isTerminalAlive: (terminalId, workspaceId) => {
 			const chat = terminalAgentStore.getChat(terminalId);
-			if (chat) return chat.lastEventType !== "Failed";
+			if (chat?.chatSessionId) {
+				const live = chatV3.runtime().live.get(chat.chatSessionId);
+				return live !== null && live.state.status !== "dead";
+			}
 			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
 		},
 		isAgentBusy: (terminalId) =>

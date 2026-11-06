@@ -14346,6 +14346,9 @@ msgstr "Wstrzymany"
 msgid "Paused until {0}"
 msgstr "Wstrzymane do {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Wstrzymano przy zamknięciu Paradev"
+
 msgid "Pay {total}"
 msgstr "Zapłać {total}"
 

@@ -3,11 +3,12 @@ import type {
 	DurableEnvelope,
 	DurableEvent,
 	SessionStatus,
+	TurnError,
 } from "@superset/chat/protocol";
 import { durableEventSchema } from "@superset/chat/protocol";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { ChatDb } from "../../db";
-import { chatJournal } from "../../db";
+import { chatJournal, chatSessionsLocal } from "../../db";
 import {
 	readSessionRow,
 	removeSessionRow,
@@ -17,6 +18,11 @@ import {
 import { readSince } from "../../replay";
 import type { ChatSessionInit } from "../epoch";
 import { openEpoch } from "../epoch";
+import {
+	HOST_STOPPED,
+	type StoppedTurn,
+	strandedEvents,
+} from "../strandedEvents";
 
 export type OpenedSession = {
 	sessionId: string;
@@ -127,6 +133,59 @@ export class ChatJournal {
 			ts,
 			event: parsed,
 		};
+	}
+
+	/** Settles what a session's agent left running or pending when it went away. */
+	settleStranded(
+		sessionId: string,
+		options: {
+			atMs: number;
+			error?: TurnError;
+			idle?: boolean;
+			stoppedTurn?: StoppedTurn;
+		},
+	): DurableEnvelope[] {
+		const cache = this.cacheFor(sessionId);
+		const replay = readSince(this.db, sessionId, {
+			epoch: cache.epoch,
+			seq: 0,
+		});
+		if (!replay.ok) return [];
+		return strandedEvents(replay.envelopes, options).map((event) =>
+			this.appendEnvelope(sessionId, event),
+		);
+	}
+
+	/**
+	 * At boot no agent is running, so a session the journal still shows as
+	 * active was cut off without settling: the host was killed or crashed.
+	 */
+	settleAllStranded(atMs: number): string[] {
+		const rows = this.db
+			.select({ sessionId: chatSessionsLocal.sessionId })
+			.from(chatSessionsLocal)
+			.where(
+				inArray(chatSessionsLocal.status, [
+					"starting",
+					"running",
+					"awaiting_input",
+				]),
+			)
+			.all();
+		const settled: string[] = [];
+		for (const { sessionId } of rows) {
+			try {
+				this.settleStranded(sessionId, {
+					atMs,
+					error: HOST_STOPPED,
+					idle: true,
+				});
+				settled.push(sessionId);
+			} catch (error) {
+				console.warn(`[chat-journal] could not settle ${sessionId}`, error);
+			}
+		}
+		return settled;
 	}
 
 	cursor(sessionId: string): Cursor {

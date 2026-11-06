@@ -114,6 +114,7 @@ export const TURN_FAILURE_KINDS = [
 	"refused",
 	"usage_limit",
 	"session_lost",
+	"host_stopped",
 	"unknown",
 ] as const;
 export const turnFailureKindSchema = z.enum(TURN_FAILURE_KINDS);

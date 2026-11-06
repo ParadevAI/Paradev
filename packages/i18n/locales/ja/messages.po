@@ -14346,6 +14346,9 @@ msgstr "一時停止"
 msgid "Paused until {0}"
 msgstr "{0}まで一時停止中"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev の終了時に一時停止しました"
+
 msgid "Pay {total}"
 msgstr "{total} を支払う"
 

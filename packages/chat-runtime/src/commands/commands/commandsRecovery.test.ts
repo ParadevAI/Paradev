@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
+import type { ToolCall } from "@superset/chat/protocol";
 import { eq } from "drizzle-orm";
 import { chatJournal } from "../../db";
 import type { AdapterEvent, HarnessAdapter } from "../../harness";
@@ -285,4 +286,147 @@ describe("replacing a chat whose agent died", () => {
 
 		await runtime.dispose();
 	});
+
+	test("a turn Paradev's shutdown cut off stays in the chat that replaces it", async () => {
+		const runtime = createTestRuntime({ harnesses: hangingRegistry() });
+		const cutOff = await startTurn(runtime);
+
+		await runtime.live.disposeAll();
+		const replacement = createChat(runtime, cutOff.sessionId);
+
+		await waitFor(() =>
+			journalEnvelopes(runtime, replacement.sessionId).some(
+				(envelope) => envelope.event.type === "turn",
+			),
+		);
+		expect(lastTurnOf(runtime, replacement.sessionId)).toMatchObject({
+			id: "t1",
+			status: "interrupted",
+			error: { kind: "host_stopped" },
+		});
+		const replayed = journalEnvelopes(runtime, replacement.sessionId).flatMap(
+			(envelope) =>
+				envelope.event.type === "item" && envelope.event.item.id === "toolu-1"
+					? [envelope.event.item]
+					: [],
+		);
+		expect(replayed.at(-1)).toMatchObject({ status: "canceled" });
+		await runtime.dispose();
+	});
+
+	test("a turn the user stopped is not carried into the replacement", async () => {
+		const runtime = createTestRuntime({ harnesses: hangingRegistry() });
+		const stopped = await startTurn(runtime);
+
+		await runtime.live.dispose(stopped.sessionId);
+		const replacement = createChat(runtime, stopped.sessionId);
+		await waitFor(
+			() => runtime.live.get(replacement.sessionId)?.state.status === "idle",
+		);
+
+		expect(lastTurnOf(runtime, replacement.sessionId)).toBeUndefined();
+		await runtime.dispose();
+	});
 });
+
+const COMMAND: ToolCall = {
+	id: "toolu-1",
+	kind: "tool_call",
+	title: "Run tests",
+	toolKind: "execute",
+	toolName: "Bash",
+	status: "running",
+	content: [],
+	startedAtMs: 2,
+};
+
+function hangingRegistry(): HarnessRegistry {
+	let agents = 0;
+	return new Map([
+		[
+			FAKE_HARNESS,
+			(): HarnessAdapter => {
+				if (agents++ > 0) {
+					return new FakeHarness({
+						start: [
+							{
+								kind: "item",
+								turnId: "history",
+								item: { ...COMMAND, status: "failed" },
+							},
+							{ kind: "session", session: { status: "idle" } },
+						],
+						turns: [],
+					});
+				}
+				let release = () => {};
+				const done = new Promise<void>((resolve) => {
+					release = resolve;
+				});
+				let prompted = () => {};
+				const promptArrived = new Promise<void>((resolve) => {
+					prompted = resolve;
+				});
+				return {
+					start: () => ({
+						async *[Symbol.asyncIterator]() {
+							yield { kind: "session", session: { status: "idle" } };
+							await promptArrived;
+							yield { kind: "turn", turn: turn("t1") };
+							yield { kind: "item", turnId: "t1", item: COMMAND };
+							await done;
+						},
+					}),
+					prompt: () => prompted(),
+					cancelTurn: () => undefined,
+					respondToApproval: () => undefined,
+					setMode: () => undefined,
+					dispose: async () => release(),
+				};
+			},
+		],
+	]);
+}
+
+async function startTurn(runtime: ReturnType<typeof createTestRuntime>) {
+	const chat = createChat(runtime);
+	await waitFor(
+		() => runtime.live.get(chat.sessionId)?.state.status === "idle",
+	);
+	runtime.commands.prompt({
+		commandId: randomUUID(),
+		sessionId: chat.sessionId,
+		clientId: "client-1",
+		content: [{ type: "text", text: "build it" }],
+	});
+	await waitFor(
+		() => runtime.live.get(chat.sessionId)?.turn?.status === "running",
+	);
+	return chat;
+}
+
+function createChat(
+	runtime: ReturnType<typeof createTestRuntime>,
+	replacesSessionId?: string,
+) {
+	return runtime.commands.createSession({
+		commandId: randomUUID(),
+		scopeId: "workspace-1",
+		harness: FAKE_HARNESS,
+		cwd: "/tmp/workspace",
+		...(replacesSessionId
+			? { resume: { harnessSessionId: "agent-1", replacesSessionId } }
+			: {}),
+	});
+}
+
+function lastTurnOf(
+	runtime: ReturnType<typeof createTestRuntime>,
+	sessionId: string,
+) {
+	return journalEnvelopes(runtime, sessionId)
+		.flatMap((envelope) =>
+			envelope.event.type === "turn" ? [envelope.event.turn] : [],
+		)
+		.at(-1);
+}

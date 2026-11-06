@@ -59,6 +59,7 @@ export function createChatRuntime(options: ChatRuntimeOptions): ChatRuntime {
 	const journal = new ChatJournal(db, {
 		onSessionChanged: options.onSessionChanged,
 	});
+	journal.settleAllStranded(Date.now());
 	const sessions = new ChatSessionStore(db);
 	const subagentItems = new SubagentItems(db);
 	const subscriptions = new SubscriptionHub(db, {

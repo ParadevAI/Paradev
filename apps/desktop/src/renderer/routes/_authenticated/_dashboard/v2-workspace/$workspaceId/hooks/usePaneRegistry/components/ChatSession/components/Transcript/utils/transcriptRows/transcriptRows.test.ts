@@ -110,6 +110,44 @@ describe("transcriptRows", () => {
 		});
 	});
 
+	test("a turn cut off when Paradev closed says why once, on its card", () => {
+		const error = {
+			message: "Commands the agent was running were stopped.",
+			kind: "host_stopped" as const,
+		};
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						error,
+						startedAtMs: 3,
+						completedAtMs: 3,
+					},
+					entries: [
+						{
+							kind: "item",
+							item: {
+								id: "notice-1",
+								kind: "notice",
+								noticeKind: "error",
+								text: error.message,
+								startedAtMs: 3,
+							},
+						},
+					],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.some((row) => row.kind === "item")).toBe(false);
+		expect(rows.at(-1)).toMatchObject({ kind: "turn_status", error });
+	});
+
 	test("an approval is after its target only when the target row is right above", () => {
 		const approval: ApprovalRequest = {
 			id: "approval:tool-1",

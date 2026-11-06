@@ -4,9 +4,11 @@ import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
 	type Envelope,
+	type Item,
 	type SessionState,
 	sessionStateSchema,
 	type Turn,
+	type TurnError,
 	type UsageLimit,
 	type UsageLimitAction,
 	type UserContent,
@@ -20,7 +22,7 @@ import type {
 	HarnessAdapter,
 	HarnessStartOptions,
 } from "../../harness";
-import type { ChatJournal } from "../../journal";
+import type { ChatJournal, StoppedTurn } from "../../journal";
 
 export type LiveSessionOptions = {
 	sessionId: string;
@@ -127,6 +129,7 @@ export class LiveSession {
 	private heldPaused: UserContent[][] = [];
 	private onHeldReleased: (() => void) | null = null;
 	private carriedFailure: Turn | null = null;
+	private carriedCanceledToolIds: ReadonlySet<string> = new Set();
 	private carriedAtMs: number | null = null;
 	private readonly turnStarts = new Map<string, number>();
 	/** Replays stamp items ahead of the clock to keep their order. */
@@ -243,8 +246,16 @@ export class LiveSession {
 	 * agent has started: after any history it replays, so it reads as the
 	 * latest turn.
 	 */
-	carryFailedTurn(turn: Turn): void {
+	/**
+	 * `canceledToolIds`: commands the cut-off session settled as canceled. The
+	 * agent's replay reports them failed, which reads as an error the user made.
+	 */
+	carryFailedTurn(
+		turn: Turn,
+		canceledToolIds: ReadonlySet<string> = new Set(),
+	): void {
 		this.carriedFailure = turn;
+		this.carriedCanceledToolIds = canceledToolIds;
 		this.releaseCarriedFailure();
 	}
 
@@ -597,16 +608,16 @@ export class LiveSession {
 		return this.options.adapter.fork(cut);
 	}
 
-	async dispose(): Promise<void> {
+	/** `error` says why the agent went away, when the user did not stop it. */
+	async dispose(error?: TurnError): Promise<void> {
 		this.settleStarted(false);
 		this.stopped = true;
 		this.clearResumeTimer();
-		if (this.currentTurn?.status === "running") {
-			this.settleCheckpoint(this.currentTurn.id);
-		}
+		this.interruptRunningTurn(this.now(), error);
 		this.discardPending();
 		await this.options.adapter.dispose();
 		await this.pump;
+		this.settleStranded();
 	}
 
 	private async run(stream: AsyncIterable<AdapterEvent>): Promise<void> {
@@ -614,6 +625,13 @@ export class LiveSession {
 			for await (const event of stream) {
 				if (this.stopped) return;
 				this.handle(event);
+			}
+			if (!this.stopped) {
+				if (this.sessionState.status !== "dead") {
+					throw new Error("The agent exited");
+				}
+				this.failRunningTurn("The agent exited", this.now());
+				this.settleStranded();
 			}
 		} finally {
 			this.settleStarted(false);
@@ -637,7 +655,7 @@ export class LiveSession {
 				}
 				this.appendDurable({
 					type: "item",
-					item: event.item,
+					item: this.withCarriedCancel(event.item),
 					turnId: event.turnId,
 				});
 				return;
@@ -666,6 +684,16 @@ export class LiveSession {
 						this.options.adapter.cancelTurn();
 					}
 				} else {
+					if (event.turn.status === "interrupted") {
+						this.settleStranded({
+							turnId: event.turn.id,
+							background: new Set(
+								(this.sessionState.backgroundTasks ?? []).map(
+									(task) => task.id,
+								),
+							),
+						});
+					}
 					this.noteSilentTurn(event.turn);
 					this.settleCheckpoint(event.turn.id);
 					this.deliverNextQueued();
@@ -701,6 +729,14 @@ export class LiveSession {
 				});
 				return;
 		}
+	}
+
+	private withCarriedCancel(item: Item): Item {
+		return item.kind === "tool_call" &&
+			item.status === "failed" &&
+			this.carriedCanceledToolIds.has(item.id)
+			? { ...item, status: "canceled" }
+			: item;
 	}
 
 	private releaseCarriedFailure(): void {
@@ -972,29 +1008,58 @@ export class LiveSession {
 		this.clearResumeTimer();
 		const failedAtMs = this.now();
 		const turn = this.currentTurn;
-		if (turn?.status === "running") {
-			this.currentTurn = {
-				...turn,
-				status: "interrupted",
-				completedAtMs: failedAtMs,
-			};
-			this.appendDurable({ type: "turn", turn: this.currentTurn });
-			this.settleCheckpoint(turn.id);
-		}
+		const message = error instanceof Error ? error.message : String(error);
+		this.failRunningTurn(message, failedAtMs);
 		this.discardPending();
+		this.settleStranded();
 		this.appendDurable({
 			type: "item",
 			item: {
 				id: this.mintId(),
 				kind: "notice",
 				noticeKind: "error",
-				text: error instanceof Error ? error.message : String(error),
+				text: message,
 				startedAtMs: failedAtMs,
 				completedAtMs: failedAtMs,
 			},
 			turnId: turn?.id ?? this.mintId(),
 		});
 		this.emitSession({ status: "dead" });
+	}
+
+	private interruptRunningTurn(atMs: number, error?: TurnError): void {
+		const turn = this.currentTurn;
+		if (turn?.status !== "running") return;
+		this.currentTurn = {
+			...turn,
+			status: "interrupted",
+			completedAtMs: atMs,
+			...(error ? { error } : {}),
+		};
+		this.appendDurable({ type: "turn", turn: this.currentTurn });
+		this.settleCheckpoint(turn.id);
+	}
+
+	private failRunningTurn(message: string, atMs: number): void {
+		const turn = this.currentTurn;
+		if (turn?.status !== "running") return;
+		this.currentTurn = {
+			...turn,
+			status: "failed",
+			error: { message, kind: "crashed" },
+			completedAtMs: atMs,
+		};
+		this.appendDurable({ type: "turn", turn: this.currentTurn });
+		this.settleCheckpoint(turn.id);
+	}
+
+	private settleStranded(stoppedTurn?: StoppedTurn): void {
+		for (const envelope of this.options.journal.settleStranded(
+			this.options.sessionId,
+			{ atMs: this.now(), ...(stoppedTurn ? { stoppedTurn } : {}) },
+		)) {
+			this.options.publish(envelope);
+		}
 	}
 
 	private discard(prompt: PendingPrompt): void {

@@ -1,11 +1,16 @@
 import { randomUUID } from "node:crypto";
-import type { DiscoverSessionsResult, Envelope } from "@superset/chat/protocol";
+import type {
+	DiscoverSessionsResult,
+	Envelope,
+	TurnError,
+} from "@superset/chat/protocol";
 import type { ChatCheckpoints, SessionCheckpoints } from "../../checkpoints";
 import type {
 	DiscoverNativeSessionsInput,
 	HarnessAdapter,
 } from "../../harness";
 import type { ChatJournal } from "../../journal";
+import { HOST_STOPPED } from "../../journal";
 import type { UnfinishedSession } from "../liveSession";
 import { LiveSession } from "../liveSession";
 
@@ -219,8 +224,9 @@ export class LiveSessionRegistry {
 		await session.dispose();
 	}
 
+	/** The host is going away, so every running turn ends without the user asking. */
 	async disposeAll(): Promise<void> {
-		await this.disposeWhere(() => true);
+		await this.disposeWhere(() => true, HOST_STOPPED);
 	}
 
 	async disposeScope(scopeId: string): Promise<string[]> {
@@ -229,6 +235,7 @@ export class LiveSessionRegistry {
 
 	private async disposeWhere(
 		matches: (session: LiveSession) => boolean,
+		error?: TurnError,
 	): Promise<string[]> {
 		const sessions = [...this.live.values()].filter(matches);
 		for (const session of sessions) this.live.delete(session.sessionId);
@@ -236,7 +243,7 @@ export class LiveSessionRegistry {
 			this.observe(() => this.options.observer?.stopped(session.sessionId));
 		}
 		const results = await Promise.allSettled(
-			sessions.map((session) => session.dispose()),
+			sessions.map((session) => session.dispose(error)),
 		);
 		const failure = results.find((result) => result.status === "rejected");
 		if (failure?.status === "rejected") throw failure.reason;

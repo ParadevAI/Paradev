@@ -98,7 +98,9 @@ function repeatedTurnFailure(
 	item: Item,
 	turn: Turn | null,
 ): { extra: string } | null {
-	if (turn?.status !== "failed" || item.kind !== "notice") return null;
+	const cardShown =
+		turn?.status === "failed" || turn?.error?.kind === "host_stopped";
+	if (!cardShown || item.kind !== "notice") return null;
 	const notice = item as Notice;
 	if (notice.noticeKind !== "error") return null;
 	const text = notice.text ?? "";

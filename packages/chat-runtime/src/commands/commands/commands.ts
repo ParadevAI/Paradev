@@ -166,9 +166,26 @@ export function sessionsTitled<Row extends { title: string | null }>(
 		: rows;
 }
 
+function canceledTools(snapshot: SessionSnapshot, turnId: string): Set<string> {
+	const ids = new Set<string>();
+	for (const { item, turnId: owner } of snapshot.items.values()) {
+		if (
+			owner === turnId &&
+			item.kind === "tool_call" &&
+			item.status === "canceled"
+		)
+			ids.add(item.id);
+	}
+	return ids;
+}
+
+/** A turn that ended without the user asking stays visible in the session that replaces it. */
 function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
 	const last = deriveTimeline(snapshot).at(-1)?.turn;
-	return last?.status === "failed" ? last : null;
+	if (last?.status === "failed") return last;
+	return last?.status === "interrupted" && last.error?.kind === "host_stopped"
+		? last
+		: null;
 }
 
 export const listSessionsCommandSchema = listSessionsInputSchema
@@ -456,7 +473,14 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					options.journal.discard(sessionId);
 					throw error;
 				}
-				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
+				if (carried && replay?.ok) {
+					options.live
+						.require(sessionId)
+						.carryFailedTurn(
+							carried,
+							canceledTools(replay.snapshot, carried.id),
+						);
+				}
 				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});

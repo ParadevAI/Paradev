@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { TurnError } from "@superset/chat/protocol";
 import { Gauge } from "lucide-react";
+import { PausedOnCloseRow } from "./components/PausedOnCloseRow";
 import { TurnFailureCard } from "./components/TurnFailureCard";
 
 export function TurnStatusRow({
@@ -14,6 +15,8 @@ export function TurnStatusRow({
 	latest: boolean;
 	turnId: string;
 }) {
+	if (error?.kind === "host_stopped")
+		return <PausedOnCloseRow latest={latest} />;
 	if (status === "interrupted") {
 		return (
 			<div className="text-muted-foreground text-xs">

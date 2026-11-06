@@ -14346,6 +14346,9 @@ msgstr "Duraklatıldı"
 msgid "Paused until {0}"
 msgstr "{0} saatine kadar duraklatıldı"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev kapanınca duraklatıldı"
+
 msgid "Pay {total}"
 msgstr "{total} öde"
 

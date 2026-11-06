@@ -14340,6 +14340,9 @@ msgstr "Призупинено"
 msgid "Paused until {0}"
 msgstr "Призупинено до {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Призупинено під час закриття Paradev"
+
 msgid "Pay {total}"
 msgstr "Сплатити {total}"
 

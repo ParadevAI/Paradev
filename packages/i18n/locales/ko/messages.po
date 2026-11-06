@@ -14346,6 +14346,9 @@ msgstr "일시 중지됨"
 msgid "Paused until {0}"
 msgstr "{0}까지 일시 중지됨"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev가 종료되어 일시 중지됨"
+
 msgid "Pay {total}"
 msgstr "{total} 결제"
 

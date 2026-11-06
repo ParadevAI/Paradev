@@ -14346,6 +14346,9 @@ msgstr "Tạm dừng"
 msgid "Paused until {0}"
 msgstr "Tạm dừng đến {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Đã tạm dừng khi Paradev đóng"
+
 msgid "Pay {total}"
 msgstr "Thanh toán {total}"
 

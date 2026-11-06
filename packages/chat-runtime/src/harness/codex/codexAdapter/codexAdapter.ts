@@ -624,10 +624,16 @@ export class CodexAdapter implements HarnessAdapter {
 	private handleExit(code: number | null): void {
 		if (this.disposed) return;
 		this.stalePendingApprovals();
-		this.emitNotice(
-			"error",
-			`codex app-server exited (code ${code ?? "null"})`,
-		);
+		const message = `codex app-server exited (code ${code ?? "null"})`;
+		if (this.currentTurn?.status === "running") {
+			this.emitTurnState({
+				...this.currentTurn,
+				status: "failed",
+				error: { message, kind: "crashed" },
+				completedAtMs: this.now(),
+			});
+		}
+		this.emitNotice("error", message);
 		this.emitSession({ status: "dead" });
 		this.queue.close();
 	}

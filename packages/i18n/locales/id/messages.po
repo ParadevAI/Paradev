@@ -14346,6 +14346,9 @@ msgstr "Dijeda"
 msgid "Paused until {0}"
 msgstr "Dijeda hingga {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Dijeda saat Paradev ditutup"
+
 msgid "Pay {total}"
 msgstr "Bayar {total}"
 
