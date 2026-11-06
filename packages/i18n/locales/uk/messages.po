@@ -515,6 +515,10 @@ msgstr "{0} не в мережі."
 msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "{0} на тарифі Free. {appName} Mobile доступний організаціям на тарифі Pro."
 
+#. placeholder {0}: BRAND.NAME
+msgid "{0} is open source, so you're never locked in. Run parallel agents the way you're used to, with chat, cloud and mobile built in."
+msgstr "{0} має відкритий код, тож ви ні до чого не прив'язані. Запускайте агентів паралельно, як звикли, з вбудованими чатом, хмарою та мобільним застосунком."
+
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
@@ -809,6 +813,9 @@ msgstr "Закрито: {closedCount}"
 
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {# коміт} few {# коміти} many {# комітів} other {# коміту}}"
+
+msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} знаходить ваші worktree з Conductor та імпортує їх на місці, разом із незакоміченими змінами."
 
 msgid "{companyName} makes {productName}."
 msgstr "{productName} розробляє компанія {companyName}."
@@ -1690,6 +1697,9 @@ msgstr "Канал із такою назвою вже існує"
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Чат не можна перемкнути на іншого провайдера посеред розмови. Почніть новий чат {label} або створіть його як форк цієї розмови. Цей чат {currentLabel} залишиться відкритим."
 
+msgid "A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions."
+msgstr "Чат-інтерфейс для Claude Code, Codex, OpenCode і Pi. Підхоплює ваші сеанси Claude Code."
+
 msgid "A chat takes its name from the agent."
 msgstr "Чат отримує назву від агента."
 
@@ -2165,6 +2175,9 @@ msgstr "Додайте свій перший проєкт"
 msgid "Add your own terminal agent to this device."
 msgstr "Додайте власного термінального агента на цей пристрій."
 
+msgid "Add your repos"
+msgstr "Додайте репозиторії"
+
 msgid "Added {added}"
 msgstr "Додано {added}"
 
@@ -2319,6 +2332,9 @@ msgstr "Агенти виконують рутинні тікети без вт�
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."
+
+msgid "Agents keep working when your laptop is closed."
+msgstr "Агенти працюють далі, коли ноутбук закрито."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "Агенти самі відкривають попередній перегляд, керують інтерфейсом і додають скриншоти як доказ, перш ніж позначити роботу готовою до рев'ю."
@@ -3839,6 +3855,9 @@ msgstr "Чи можна використовувати власні ключі A
 msgid "Can merge without conflicts"
 msgstr "Можна злити без конфліктів"
 
+msgid "Can my team share workspaces?"
+msgstr "Чи може команда спільно використовувати робочі простори?"
+
 msgid "Can only be viewed or joined by invitation"
 msgstr "Переглядати чи приєднуватися можна лише за запрошенням"
 
@@ -4102,6 +4121,9 @@ msgstr "Чат закрито"
 msgid "Chat history"
 msgstr "Історія чату"
 
+msgid "Chat interface"
+msgstr "Чат-інтерфейс"
+
 msgid "Chat is being reworked"
 msgstr "Чат зараз переробляють"
 
@@ -4134,6 +4156,9 @@ msgstr "Перевірити оновлення"
 
 msgid "Check for Updates..."
 msgstr "Перевірити оновлення..."
+
+msgid "Check on agents and review their work from iPhone or iPad."
+msgstr "Стежте за агентами й переглядайте їхню роботу з iPhone або iPad."
 
 msgid "Check on running agents and read what they changed from your iPhone or iPad."
 msgstr "Стежте за роботою агентів і переглядайте їхні зміни з iPhone чи iPad."
@@ -4304,8 +4329,17 @@ msgstr "CI не пройдено"
 msgid "Clarify this"
 msgstr "Уточнити це"
 
+msgid "Claude Code sessions, with claude --resume"
+msgstr "Сеанси Claude Code, через claude --resume"
+
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code, Codex і OpenCode — це агенти, а Paradev — місце, де ви запускаєте багато з них одночасно. Кожна задача отримує власний Git worktree і гілку, тож десять агентів можуть працювати в десяти гілках одночасно, поки ви стежите, переглядаєте й зливаєте зміни з одного місця."
+
+msgid "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI"
+msgstr "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, будь-який CLI"
+
+msgid "Claude Code, Codex, Cursor, OpenCode"
+msgstr "Claude Code, Codex, Cursor, OpenCode"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode та інші. Без окремого налаштування для кожного агента."
@@ -4653,6 +4687,15 @@ msgstr "Хмара"
 msgid "Cloud · us-east"
 msgstr "Хмара · us-east"
 
+msgid "Cloud credentials"
+msgstr "Хмарні облікові дані"
+
+msgid "Cloud data gets deleted. Push your branches first."
+msgstr "Дані в хмарі буде видалено. Спершу запуште гілки."
+
+msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
+msgstr "Хмара закривається {shutdownDate}. Застосунок для Mac — на початку 2027"
+
 msgid "Cloud environment setup"
 msgstr "Налаштування хмарного середовища"
 
@@ -4665,8 +4708,14 @@ msgstr "Хмарні середовища клонують ваші репози
 msgid "Cloud GB-hours per seat each month"
 msgstr "Хмарні ГБ-години на місце щомісяця"
 
+msgid "Cloud goes read-only"
+msgstr "Хмара лише для читання"
+
 msgid "Cloud sandboxes"
 msgstr "Хмарні пісочниці"
+
+msgid "Cloud shuts down"
+msgstr "Хмара закривається"
 
 msgid "Cloud usage"
 msgstr "Використання хмари"
@@ -4769,6 +4818,9 @@ msgstr "Об'єднувати послідовності на кшталт => і
 
 msgid "Come build it with us."
 msgstr "Приходьте створювати його разом з нами."
+
+msgid "Comes with you"
+msgstr "Переноситься"
 
 msgid "Coming Soon"
 msgstr "Незабаром"
@@ -4928,6 +4980,39 @@ msgstr "component-showcase"
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "Компонований макет форми — працює в парі з @superset/ui/form для react-hook-form"
 
+msgid "Conductor chat history. Export it in Conductor under Settings → Account"
+msgstr "Історія чатів Conductor. Експортуйте її в Conductor: Settings → Account"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
+msgstr "Conductor Cloud закривається {shutdownDate}. Перейдіть на {0} за кілька хвилин."
+
+msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
+msgstr "Conductor Cloud закривається {shutdownDate}. Переходьте на {companyName}"
+
+msgid "Conductor Cloud guide"
+msgstr "Посібник для Conductor Cloud"
+
+msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Conductor Cloud закривається {shutdownDateLong}. Перенесіть worktree й агентів у {companyName} за кілька хвилин. Безкоштовно й з відкритим кодом."
+
+msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
+msgstr "Conductor видалить їх після {shutdownDate}, а {companyName} не має до них доступу. Запуште гілки й експортуйте чати до цієї дати."
+
+msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
+msgstr "Дані про Conductor взято з його публічної документації. Дивіться <0>повне порівняння</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
+msgstr "Conductor — торговельна марка її власника. {0} не пов'язаний із Conductor чи Meta і не схвалений ними."
+
+msgid "Conductor joins Meta"
+msgstr "Conductor переходить до Meta"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
+msgstr "Робочі простори Conductor — це звичайні Git worktree. {0} використовує їх там, де вони є."
+
 msgid "Config file contents"
 msgstr "Вміст файлу конфігурації"
 
@@ -4982,6 +5067,9 @@ msgstr "Підтвердити перемикання"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Конфлікти з {0}"
+
+msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
+msgstr "Вітаємо команду Conductor із переходом до Meta. Дати взято з <0>їхнього оголошення</0>."
 
 msgid "Connect"
 msgstr "Підключити"
@@ -7223,6 +7311,9 @@ msgstr "Чи потрібні мені власні підписки на код
 msgid "Do nothing"
 msgstr "Нічого не робити"
 
+msgid "Do you proxy my model calls?"
+msgstr "Чи проксіюєте ви мої запити до моделей?"
+
 msgid "Do you sponsor visas?"
 msgstr "Чи надаєте ви візову підтримку?"
 
@@ -7242,6 +7333,9 @@ msgstr "Документація"
 
 msgid "Documentation"
 msgstr "Документація"
+
+msgid "Does it run on Windows?"
+msgstr "Чи працює він на Windows?"
 
 msgid "Don't allow"
 msgstr "Не дозволяти"
@@ -7280,9 +7374,16 @@ msgstr "Перехід на нижчий тариф..."
 msgid "Download"
 msgstr "Завантажити"
 
+#. placeholder {0}: BRAND.NAME
+msgid "Download {0}"
+msgstr "Завантажити {0}"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Download {appName} at <0>{0}/download</0>."
 msgstr "Завантажте {appName} на <0>{0}/download</0>."
+
+msgid "Download {companyName}"
+msgstr "Завантажте {companyName}"
 
 msgid "Download {name}"
 msgstr "Завантажити {name}"
@@ -8521,6 +8622,9 @@ msgstr "Збій"
 msgid "Favorites"
 msgstr "Вибране"
 
+msgid "Feature"
+msgstr "Можливість"
+
 msgid "Featured"
 msgstr "Рекомендовані"
 
@@ -9004,6 +9108,24 @@ msgstr "Безкоштовно"
 msgid "Free for everyone"
 msgstr "Безкоштовно для всіх"
 
+msgid "Free for one user. macOS, with an experimental Linux build."
+msgstr "Безкоштовно для одного користувача. macOS та експериментальна збірка для Linux."
+
+msgid "Free for one user. Open source under MIT."
+msgstr "Безкоштовно для одного користувача. Відкритий код за ліцензією MIT."
+
+msgid "Free for one user. Paid plans per user"
+msgstr "Безкоштовно для одного користувача. Платні тарифи — за користувача"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
+msgstr "Безкоштовно для одного користувача. Pro додає автоматизації й мобільний застосунок. Team додає хмарні робочі простори."
+
+msgid "Free for one user. Pro from {proPrice}/user/mo"
+msgstr "Безкоштовно для одного користувача. Pro від {proPrice}/корист./міс."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
+msgstr "Безкоштовно для одного користувача. Pro коштує {proPrice} за користувача на місяць і додає автоматизації й мобільний застосунок. Team коштує {teamPrice} і додає хмарні робочі простори."
+
 msgid "Frequently Used"
 msgstr "Часто використовувані"
 
@@ -9195,6 +9317,9 @@ msgstr "Git і worktree"
 
 msgid "Git author name"
 msgstr "Ім'я автора Git"
+
+msgid "Git-ignored files in Cloud, like .env. Copy them out"
+msgstr "Файли в хмарі, які ігнорує Git, як-от .env. Скопіюйте їх"
 
 msgid "GitHub"
 msgstr "GitHub"
@@ -9679,6 +9804,9 @@ msgstr "Скільки тригерів може мати одна автома�
 
 msgid "How much agent work engineers are actually running — tokens, cost, models and sessions, published by people who opted in."
 msgstr "Скільки роботи агентів інженери насправді запускають — токени, вартість, моделі та сеанси, опубліковані тими, хто погодився."
+
+msgid "How much does it cost?"
+msgstr "Скільки це коштує?"
 
 msgid "How should the agent's actions be approved?"
 msgstr "Як схвалювати дії агента?"
@@ -10260,6 +10388,9 @@ msgstr "Рахунки й спосіб оплати"
 msgid "iOS app"
 msgstr "Застосунок для iOS"
 
+msgid "iOS app, ending {shutdownDate}"
+msgstr "Застосунок для iOS, до {shutdownDate}"
+
 msgid "iOS Simulator"
 msgstr "Симулятор iOS"
 
@@ -10268,6 +10399,12 @@ msgstr "Панель симулятора iOS"
 
 msgid "IP restrictions"
 msgstr "Обмеження за IP"
+
+msgid "iPhone and iPad"
+msgstr "iPhone та iPad"
+
+msgid "Is {companyName} open source?"
+msgstr "Чи {companyName} має відкритий код?"
 
 msgid "Is my data secure?"
 msgstr "Чи захищені мої дані?"
@@ -10346,6 +10483,9 @@ msgstr "Можливо, він у режимі сну"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Можливо, його видалено або він належить іншій організації."
+
+msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
+msgstr "Це займе кілька хвилин. Користуєтеся Conductor Cloud? Почніть із <0>посібника для хмари</0>."
 
 msgid "It will open once the connection is back."
 msgstr "Відкриється, щойно з'єднання відновиться."
@@ -10521,6 +10661,9 @@ msgstr "Новий файл збережено — він змінився пі�
 
 msgid "Kept the new folder — it is no longer empty"
 msgstr "Нову папку збережено — вона вже не порожня"
+
+msgid "Key dates"
+msgstr "Ключові дати"
 
 msgid "Key name"
 msgstr "Назва ключа"
@@ -11147,11 +11290,17 @@ msgstr "Local-first"
 msgid "Local Network"
 msgstr "Локальна мережа"
 
+msgid "Local work can move at your own pace."
+msgstr "Локальну роботу можна перенести у власному темпі."
+
 msgid "Local workspace"
 msgstr "Локальний робочий простір"
 
 msgid "Local workspaces"
 msgstr "Локальні робочі простори"
+
+msgid "Local, on a host, or in the cloud"
+msgstr "Локально, на хості або в хмарі"
 
 msgid "Location"
 msgstr "Розташування"
@@ -11229,6 +11378,9 @@ msgstr "Низький"
 msgid "Low severity"
 msgstr "Низький рівень серйозності"
 
+msgid "Mac app winds down"
+msgstr "Застосунок для Mac закривається"
+
 msgid "Machine resources"
 msgstr "Ресурси машини"
 
@@ -11240,6 +11392,12 @@ msgstr "Розмір машини: {label}"
 
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Хмарні робочі простори без прив'язки до машини, які запускаються за секунди й якими можна ділитися з колегами."
+
+msgid "macOS"
+msgstr "macOS"
+
+msgid "macOS, Linux (experimental)"
+msgstr "macOS, Linux (експериментально)"
 
 msgid "Magenta"
 msgstr "Пурпуровий"
@@ -11612,6 +11770,9 @@ msgstr "Середина 2026 року"
 msgid "Mid 2027"
 msgstr "Середина 2027 року"
 
+msgid "Migration guide"
+msgstr "Посібник з міграції"
+
 msgid "Min iOS"
 msgstr "Мін. iOS"
 
@@ -11800,6 +11961,9 @@ msgstr "Перемістити {count} до групи"
 msgid "Move {name} to background"
 msgstr "Перевести {name} у фоновий режим"
 
+msgid "Move cloud work"
+msgstr "Перенесіть роботу з хмари"
+
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
 
@@ -11814,6 +11978,9 @@ msgstr "Перемістити праворуч"
 
 msgid "Move to Tab"
 msgstr "Перемістити у вкладку"
+
+msgid "Move your agents before {shutdownDate}."
+msgstr "Перенесіть агентів до {shutdownDate}."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "«{name}» переміщено до {group}"
@@ -12459,6 +12626,9 @@ msgstr "Немає активних сеансів"
 msgid "No local workspaces"
 msgstr "Немає локальних робочих просторів"
 
+msgid "No lock-in"
+msgstr "Без прив'язки"
+
 msgid "No log lines yet"
 msgstr "Рядків логу ще немає"
 
@@ -12467,6 +12637,9 @@ msgstr "немає входів"
 
 msgid "No longer in source"
 msgstr "Більше немає в джерелі"
+
+msgid "No longer on sale"
+msgstr "Більше не продається"
 
 msgid "No match"
 msgstr "Немає збігу"
@@ -12919,6 +13092,9 @@ msgstr "Вас немає в таблиці лідерів. Спершу пог�
 msgid "Not on this version"
 msgstr "Немає в цій версії"
 
+msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
+msgstr "Не на вашому комп'ютері. Агенти звертаються до своїх провайдерів напряму, і оплата йде там. У хмарних робочих просторах ваші ключі ніколи не потрапляють у пісочницю. {companyName} додає ваш вхід до вихідних запитів."
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Події ще не надходять: Microsoft Graph відхилив підписки на сповіщення. Перевірте згоду адміністратора для застосунку та схвалення захищеного API, а потім підключіться знову."
 
@@ -12952,6 +13128,9 @@ msgstr "Ще не синхронізовано"
 msgctxt "agent status"
 msgid "Not updating"
 msgstr "Не оновлюється"
+
+msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgstr "Поки що ні. Він працює на macOS, є експериментальна збірка для Linux. Користувачі Windows можуть приєднатися до списку очікування через кнопку завантаження."
 
 msgid "Note"
 msgstr "Примітка"
@@ -13690,6 +13869,9 @@ msgstr "Відкрити параметри відправлення"
 msgid "Open Source"
 msgstr "Відкритий код"
 
+msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
+msgstr "Відкритий код за ліцензією MIT. Використовуйте будь-якого агента на власних підписках і ключах."
+
 msgid "Open System Settings"
 msgstr "Відкрити Системні параметри"
 
@@ -13806,6 +13988,9 @@ msgstr "Комбінації з клавішею Option можуть заваж�
 
 msgid "Optional"
 msgstr "Необов'язково"
+
+msgid "Optional · Beta"
+msgstr "Необов'язково · Бета"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Необов'язковий контекст, який показано в списку скриптів термінала."
@@ -14422,6 +14607,9 @@ msgstr "Особистий тариф"
 msgid "Phantom Forklift"
 msgstr "Примарний навантажувач"
 
+msgid "Phone"
+msgstr "Телефон"
+
 msgid "Phone number"
 msgstr "Номер телефону"
 
@@ -14497,6 +14685,9 @@ msgstr "Виберіть папку worktree на {hostName}."
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Виберіть свого агента, щоб установити одним рядком, або скопіюйте конфігурацію вручну. Усі клієнти, зокрема налаштування OAuth і ключа API, описано в <0>повній документації MCP-сервера</0>."
 
+msgid "Pick your agents"
+msgstr "Виберіть агентів"
+
 msgid "PID"
 msgstr "PID"
 
@@ -14552,6 +14743,9 @@ msgstr "Директор заводу"
 
 msgid "Platform"
 msgstr "Платформа"
+
+msgid "Platforms"
+msgstr "Платформи"
 
 #. placeholder {0}: ringtone.name
 msgid "Play {0}"
@@ -14797,6 +14991,9 @@ msgstr "Попередня вкладка (друга комбінація)"
 
 msgid "Previous Workspace"
 msgstr "Попередній робочий простір"
+
+msgid "Price"
+msgstr "Ціна"
 
 msgid "Pricing"
 msgstr "Ціни"
@@ -15121,6 +15318,9 @@ msgstr "Запушити"
 msgid "Push failed: {0}"
 msgstr "Не вдалося запушити: {0}"
 
+msgid "Push your branches, then keep going on your Mac or in a {companyName} cloud workspace."
+msgstr "Запуште гілки й продовжуйте на Mac або в хмарному робочому просторі {companyName}."
+
 msgid "Pushed"
 msgstr "Запушено"
 
@@ -15342,6 +15542,9 @@ msgstr "Прочитати посібник"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "Прочитати посібник з паралельних кодинг-агентів"
+
+msgid "Read the migration guide"
+msgstr "Читати посібник з міграції"
 
 msgid "Read the MIT License"
 msgstr "Прочитати ліцензію MIT"
@@ -15920,6 +16123,9 @@ msgstr "Надсилання скарг тимчасово недоступне.
 msgid "Repos"
 msgstr "Репозиторії"
 
+msgid "Repos, worktrees and branches"
+msgstr "Репозиторії, worktree та гілки"
+
 msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
 msgstr "Репозиторії, worktree, вивід термінала й сеанси агентів залишаються на вашому комп'ютері. Хмарна синхронізація охоплює лише метадані облікового запису та організації."
 
@@ -16454,6 +16660,9 @@ msgstr "Рутинні тікети без втручання під час ви
 
 msgid "Routines"
 msgstr "Рутини"
+
+msgid "Routines, ending with Cloud"
+msgstr "Routines, закриваються разом із хмарою"
 
 msgid "Row actions"
 msgstr "Дії з рядком"
@@ -17053,11 +17262,17 @@ msgstr "Порівняйте своє використання агентів з
 msgid "See Less"
 msgstr "Показати менше"
 
+msgid "See migration steps"
+msgstr "Кроки міграції"
+
 msgid "See More"
 msgstr "Показати більше"
 
 msgid "See open roles ↑"
 msgstr "Переглянути вакансії ↑"
+
+msgid "See pricing"
+msgstr "Переглянути ціни"
 
 msgid "See the <0>available tools reference</0> for every tool name and parameter."
 msgstr "Усі назви інструментів і параметри — у <0>довіднику доступних інструментів</0>."
@@ -17477,6 +17692,9 @@ msgstr "Налаштування"
 msgid "Setup script"
 msgstr "Скрипт налаштування"
 
+msgid "Setup scripts, once you convert conductor.json"
+msgstr "Скрипти налаштування, після конвертації conductor.json"
+
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Налаштування зупинено. Причину вказано у виводі нижче."
 
@@ -17753,6 +17971,12 @@ msgstr "Відображається публічно поруч із вашим
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Вимкнути {0}"
+
+msgid "Shuts down {shutdownDate}"
+msgstr "Закривається {shutdownDate}"
+
+msgid "Side by side"
+msgstr "Порівняння"
 
 msgid "Side by Side"
 msgstr "Поруч"
@@ -18470,6 +18694,9 @@ msgstr "Статус: {0}"
 msgid "Stay connected (refresh tokens)"
 msgstr "Залишатися підключеним (токени оновлення)"
 
+msgid "Stays behind"
+msgstr "Не переноситься"
+
 msgid "Steer"
 msgstr "Скерувати"
 
@@ -18677,6 +18904,9 @@ msgstr "Обмеження частоти звернень до підтримк
 msgid "Support the project with a GitHub star"
 msgstr "Підтримайте проєкт зіркою на GitHub"
 
+msgid "Supported agents"
+msgstr "Підтримувані агенти"
+
 msgid "Surprise me"
 msgstr "Здивуй мене"
 
@@ -18697,6 +18927,9 @@ msgstr "Змінюйте агентів. Робочий процес залиш�
 
 msgid "Switch host"
 msgstr "Змінити хост"
+
+msgid "Switch in four steps"
+msgstr "Перехід у чотири кроки"
 
 msgid "Switch organization"
 msgstr "Змінити організацію"
@@ -18973,6 +19206,9 @@ msgstr "Команда"
 
 msgid "Team activity feed"
 msgstr "Стрічка активності команди"
+
+msgid "Team and Ultra plans"
+msgstr "Тарифи Team і Ultra"
 
 msgid "Team collaboration"
 msgstr "Командна співпраця"
@@ -19537,6 +19773,9 @@ msgstr "цільовий хост"
 msgid "The team"
 msgstr "Команда"
 
+msgid "The team announced the news."
+msgstr "Команда оголосила цю новину."
+
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Термін дії запрошення до команди минув, або його не існує. Попросіть нове посилання у власника команди або перевірте, чи правильно введено URL."
 
@@ -19593,6 +19832,9 @@ msgstr "У цих папках досі є ваші файли, але вони 
 
 msgid "These ports are still in use"
 msgstr "Ці порти досі використовуються"
+
+msgid "They run on the subscriptions and keys you already have."
+msgstr "Вони працюють на підписках і ключах, які у вас уже є."
 
 msgid "Thinking"
 msgstr "Міркування"
@@ -20668,6 +20910,9 @@ msgstr "Знято з публікації"
 msgid "Unpushed"
 msgstr "Незапушено"
 
+msgid "Unpushed Cloud work. Push before {shutdownDate}"
+msgstr "Незапушена робота в хмарі. Запуште до {shutdownDate}"
+
 msgid "Unranked"
 msgstr "Без рейтингу"
 
@@ -21404,6 +21649,9 @@ msgstr "Які переваги?"
 msgid "What builders say about Paradev"
 msgstr "Що розробники кажуть про Paradev"
 
+msgid "What comes with you"
+msgstr "Що переноситься"
+
 msgid "What did you see on the page?"
 msgstr "Що ви побачили на сторінці?"
 
@@ -21415,6 +21663,9 @@ msgstr "Що кажуть перші користувачі"
 
 msgid "What general access allows"
 msgstr "Що дозволяє загальний доступ"
+
+msgid "What happens to my Conductor Cloud data?"
+msgstr "Що станеться з моїми даними в Conductor Cloud?"
 
 msgid "What has to become true"
 msgstr "Що має стати правдою"
@@ -21472,6 +21723,9 @@ msgstr "Що ми випустили"
 
 msgid "What would you like to know?"
 msgstr "Що ви хочете дізнатися?"
+
+msgid "What you get"
+msgstr "Що ви отримуєте"
 
 msgid "What your agent can do"
 msgstr "Що вміє ваш агент"
@@ -21753,6 +22007,9 @@ msgstr "Worktree відсутній"
 msgid "Worktree out of sync"
 msgstr "Worktree не синхронізовано"
 
+msgid "Worktree per task"
+msgstr "Worktree на задачу"
+
 msgid "Worktrees"
 msgstr "Worktrees"
 
@@ -21833,6 +22090,15 @@ msgstr "Так"
 
 msgid "Yes, demote me"
 msgstr "Так, понизити мене"
+
+msgid "Yes, on paid plans."
+msgstr "Так, на платних тарифах."
+
+msgid "Yes, resumes Claude Code sessions"
+msgstr "Так, відновлює сеанси Claude Code"
+
+msgid "Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in."
+msgstr "Так, за ліцензією MIT. Ви можете форкнути код і зібрати його самі, тож ви ні до чого не прив'язані."
 
 msgid "Yes. Apply to the role that fits best and tell us what you would build. Include a repo, PR or demo."
 msgstr "Так. Подайте заявку на роль, яка вам найбільше підходить, і розкажіть, що ви створили б. Додайте репозиторій, PR або демо."
@@ -21922,6 +22188,9 @@ msgstr "Ви можете редагувати лише власні повід�
 
 msgid "You can only share with people and teams in this organization"
 msgstr "Ділитися можна лише з людьми й командами цієї організації"
+
+msgid "You can read and export, but not run agents."
+msgstr "Можна читати й експортувати, але не запускати агентів."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Ви можете відновити його в «Налаштування → Проєкти» протягом 30 днів. Папку репозиторію ніколи не буде видалено."
@@ -22039,6 +22308,9 @@ msgstr "Ваш агент публікує дизайни та звіти, що�
 
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "Ваш агент публікує дизайни та звіти. Ваша команда коментує, і він береться до роботи."
+
+msgid "Your agent subscriptions and keys"
+msgstr "Ваші підписки та ключі для агентів"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Ваші агенти, ваші облікові записи"

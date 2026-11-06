@@ -17,7 +17,6 @@ export function hasLocalizedContent(path: string): boolean {
 		/^\/(blog|changelog|compare)\/[^/]+$/.test(path) ||
 		[
 			"/agent-orchestration",
-			"/conductor",
 			"/parallel-coding-agents",
 			"/privacy",
 			"/security",

@@ -10,7 +10,6 @@ describe("indexable locale variants", () => {
 		"/compare/superset-vs-warp",
 		"/parallel-coding-agents",
 		"/agent-orchestration",
-		"/conductor",
 		"/privacy",
 		"/security",
 		"/subprocessors",

@@ -1,3 +1,5 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { COMPANY } from "@superset/shared/constants";
 
 export const CONDUCTOR_ANNOUNCEMENT_URL =
@@ -6,238 +8,303 @@ export const MIGRATE_LOCAL_URL = `${COMPANY.DOCS_URL}/migrate-from-conductor`;
 export const MIGRATE_CLOUD_URL = `${COMPANY.DOCS_URL}/migrate-from-conductor-cloud`;
 export const COMPARE_PATH = "/compare/superset-vs-conductor";
 
+export const ANNOUNCED_DATE = new Date(Date.UTC(2026, 10, 4));
+export const READ_ONLY_DATE = new Date(Date.UTC(2026, 10, 13));
+export const SHUTDOWN_DATE = new Date(Date.UTC(2026, 10, 20));
+
 interface TextLink {
-	label: string;
+	label: MessageDescriptor;
 	href: string;
 }
 
 interface Highlight {
-	title: string;
-	detail: string;
+	title: MessageDescriptor;
+	detail: MessageDescriptor;
 	beta?: boolean;
 }
 
 export const HIGHLIGHTS: Highlight[] = [
 	{
-		title: "No lock-in",
-		detail:
-			"Open source under MIT. Use any agent on your own subscriptions and keys.",
+		title: msg({ message: "No lock-in" }),
+		detail: msg({
+			message:
+				"Open source under MIT. Use any agent on your own subscriptions and keys.",
+		}),
 	},
 	{
-		title: "Chat",
-		detail:
-			"A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions.",
+		title: msg({ message: "Chat" }),
+		detail: msg({
+			message:
+				"A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions.",
+		}),
 	},
 	{
-		title: "Cloud",
-		detail: "Agents keep working when your laptop is closed.",
+		title: msg({ message: "Cloud" }),
+		detail: msg({ message: "Agents keep working when your laptop is closed." }),
 		beta: true,
 	},
 	{
-		title: "Mobile",
-		detail: "Check on agents and review their work from iPhone or iPad.",
+		title: msg({ message: "Mobile" }),
+		detail: msg({
+			message: "Check on agents and review their work from iPhone or iPad.",
+		}),
 	},
 ];
 
 interface TimelineEntry {
-	date: string;
+	date: Date | null;
 	dateTime: string;
-	title: string;
-	detail: string;
+	dateLabel?: MessageDescriptor;
+	title: MessageDescriptor;
+	detail: MessageDescriptor;
 	urgent?: boolean;
 }
 
 export const TIMELINE: TimelineEntry[] = [
 	{
-		date: "Nov 4",
+		date: ANNOUNCED_DATE,
 		dateTime: "2026-11-04",
-		title: "Conductor joins Meta",
-		detail: "The team announced the news.",
+		title: msg({ message: "Conductor joins Meta" }),
+		detail: msg({ message: "The team announced the news." }),
 	},
 	{
-		date: "Nov 13",
+		date: READ_ONLY_DATE,
 		dateTime: "2026-11-13",
-		title: "Cloud goes read-only",
-		detail: "You can read and export, but not run agents.",
+		title: msg({ message: "Cloud goes read-only" }),
+		detail: msg({ message: "You can read and export, but not run agents." }),
 		urgent: true,
 	},
 	{
-		date: "Nov 20",
+		date: SHUTDOWN_DATE,
 		dateTime: "2026-11-20",
-		title: "Cloud shuts down",
-		detail: "Cloud data gets deleted. Push your branches first.",
+		title: msg({ message: "Cloud shuts down" }),
+		detail: msg({
+			message: "Cloud data gets deleted. Push your branches first.",
+		}),
 		urgent: true,
 	},
 	{
-		date: "Early 2027",
+		date: null,
 		dateTime: "2027",
-		title: "Mac app winds down",
-		detail: "Local work can move at your own pace.",
+		dateLabel: msg({ message: "Early 2027" }),
+		title: msg({ message: "Mac app winds down" }),
+		detail: msg({ message: "Local work can move at your own pace." }),
 	},
 ];
 
 interface MigrationStep {
-	title: string;
-	detail: string;
+	title: MessageDescriptor;
+	detail: MessageDescriptor;
 	link?: TextLink;
-	/** Render the tracked download button (source "conductor") under the step. */
 	download?: boolean;
 	optional?: boolean;
 }
 
 export const MIGRATION_STEPS: MigrationStep[] = [
 	{
-		title: "Download Paradev",
-		detail: "Free for one user. macOS, with an experimental Linux build.",
+		title: msg({ message: "Download {companyName}" }),
+		detail: msg({
+			message: "Free for one user. macOS, with an experimental Linux build.",
+		}),
 		download: true,
 	},
 	{
-		title: "Add your repos",
-		detail:
-			"Paradev finds your Conductor worktrees and imports them in place, with uncommitted changes.",
-		link: { label: "Migration guide", href: MIGRATE_LOCAL_URL },
+		title: msg({ message: "Add your repos" }),
+		detail: msg({
+			message:
+				"{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes.",
+		}),
+		link: {
+			label: msg({ message: "Migration guide" }),
+			href: MIGRATE_LOCAL_URL,
+		},
 	},
 	{
-		title: "Pick your agents",
-		detail: "They run on the subscriptions and keys you already have.",
+		title: msg({ message: "Pick your agents" }),
+		detail: msg({
+			message: "They run on the subscriptions and keys you already have.",
+		}),
 		link: {
-			label: "Supported agents",
+			label: msg({ message: "Supported agents" }),
 			href: `${COMPANY.DOCS_URL}/supported-agents`,
 		},
 	},
 	{
-		title: "Move cloud work",
-		detail:
-			"Push your branches, then keep going on your Mac or in a Paradev cloud workspace.",
-		link: { label: "Conductor Cloud guide", href: MIGRATE_CLOUD_URL },
+		title: msg({ message: "Move cloud work" }),
+		detail: msg({
+			message:
+				"Push your branches, then keep going on your Mac or in a {companyName} cloud workspace.",
+		}),
+		link: {
+			label: msg({ message: "Conductor Cloud guide" }),
+			href: MIGRATE_CLOUD_URL,
+		},
 		optional: true,
 	},
 ];
 
 interface ComparisonRow {
-	label: string;
-	paradev: string;
-	conductor: string;
+	id: string;
+	label: MessageDescriptor;
+	paradev: MessageDescriptor;
+	unpricedParadev?: MessageDescriptor;
+	conductor: MessageDescriptor;
 	beta?: boolean;
-	unpricedParadev?: string;
 }
 
 export const COMPARISON_ROWS: ComparisonRow[] = [
 	{
-		label: "Status",
-		paradev: "Available",
-		conductor: "Cloud ends Nov 20. Mac app ends early 2027",
+		id: "status",
+		label: msg({ message: "Status" }),
+		paradev: msg({ message: "Available" }),
+		conductor: msg({
+			message: "Cloud ends {shutdownDate}. Mac app ends early 2027",
+		}),
 	},
 	{
-		label: "Worktree per task",
-		paradev: "Yes",
-		conductor: "Yes",
+		id: "worktrees",
+		label: msg({ message: "Worktree per task" }),
+		paradev: msg({ message: "Yes" }),
+		conductor: msg({ message: "Yes" }),
 	},
 	{
-		label: "Agents",
-		paradev: "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI",
-		conductor: "Claude Code, Codex, Cursor, OpenCode",
+		id: "agents",
+		label: msg({ message: "Agents" }),
+		paradev: msg({
+			message:
+				"Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI",
+		}),
+		conductor: msg({ message: "Claude Code, Codex, Cursor, OpenCode" }),
 	},
 	{
-		label: "Cloud workspaces",
-		paradev: "Team and Ultra plans",
-		conductor: "Shuts down Nov 20",
+		id: "cloud",
+		label: msg({ message: "Cloud workspaces" }),
+		paradev: msg({ message: "Team and Ultra plans" }),
+		conductor: msg({ message: "Shuts down {shutdownDate}" }),
 		beta: true,
 	},
 	{
-		label: "Chat interface",
-		paradev: "Yes, resumes Claude Code sessions",
-		conductor: "Yes",
+		id: "chat",
+		label: msg({ message: "Chat interface" }),
+		paradev: msg({ message: "Yes, resumes Claude Code sessions" }),
+		conductor: msg({ message: "Yes" }),
 	},
 	{
-		label: "Automations",
-		paradev: "Local, on a host, or in the cloud",
-		conductor: "Routines, ending with Cloud",
+		id: "automations",
+		label: msg({ message: "Automations" }),
+		paradev: msg({ message: "Local, on a host, or in the cloud" }),
+		conductor: msg({ message: "Routines, ending with Cloud" }),
 	},
 	{
-		label: "Phone",
-		paradev: "iPhone and iPad",
-		conductor: "iOS app, ending Nov 20",
+		id: "phone",
+		label: msg({ message: "Phone" }),
+		paradev: msg({ message: "iPhone and iPad" }),
+		conductor: msg({ message: "iOS app, ending {shutdownDate}" }),
 	},
 	{
-		label: "Platforms",
-		paradev: "macOS, Linux (experimental)",
-		conductor: "macOS",
+		id: "platforms",
+		label: msg({ message: "Platforms" }),
+		paradev: msg({ message: "macOS, Linux (experimental)" }),
+		conductor: msg({ message: "macOS" }),
 	},
 	{
-		label: "Price",
-		paradev: "Free for one user. Pro from {{price:pro}}/user/mo",
-		unpricedParadev: "Free for one user. Paid plans per user",
-		conductor: "No longer on sale",
+		id: "price",
+		label: msg({ message: "Price" }),
+		paradev: msg({
+			message: "Free for one user. Pro from {proPrice}/user/mo",
+		}),
+		unpricedParadev: msg({ message: "Free for one user. Paid plans per user" }),
+		conductor: msg({ message: "No longer on sale" }),
 	},
 ];
 
-export const TRANSFERS: string[] = [
-	"Repos, worktrees and branches",
-	"Uncommitted changes",
-	"Your agent subscriptions and keys",
-	"Claude Code sessions, with claude --resume",
-	"Setup scripts, once you convert conductor.json",
+export const TRANSFERS: MessageDescriptor[] = [
+	msg({ message: "Repos, worktrees and branches" }),
+	msg({ message: "Uncommitted changes" }),
+	msg({ message: "Your agent subscriptions and keys" }),
+	msg({ message: "Claude Code sessions, with claude --resume" }),
+	msg({ message: "Setup scripts, once you convert conductor.json" }),
 ];
 
-export const DOES_NOT_TRANSFER: string[] = [
-	"Conductor chat history. Export it in Conductor under Settings → Account",
-	"Unpushed Cloud work. Push before Nov 20",
-	"Git-ignored files in Cloud, like .env. Copy them out",
+export const DOES_NOT_TRANSFER: MessageDescriptor[] = [
+	msg({
+		message:
+			"Conductor chat history. Export it in Conductor under Settings → Account",
+	}),
+	msg({ message: "Unpushed Cloud work. Push before {shutdownDate}" }),
+	msg({ message: "Git-ignored files in Cloud, like .env. Copy them out" }),
 ];
 
 interface FaqItem {
 	id: string;
-	question: string;
-	answer: string;
-	unpricedAnswer?: string;
+	question: MessageDescriptor;
+	answer: MessageDescriptor;
+	unpricedAnswer?: MessageDescriptor;
 	link?: TextLink;
 }
 
 export const FAQ_ITEMS: FaqItem[] = [
 	{
 		id: "open-source",
-		question: "Is Paradev open source?",
-		answer:
-			"Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in.",
-		link: { label: "View on GitHub", href: COMPANY.GITHUB_URL },
+		question: msg({ message: "Is {companyName} open source?" }),
+		answer: msg({
+			message:
+				"Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in.",
+		}),
+		link: {
+			label: msg({ message: "View on GitHub" }),
+			href: COMPANY.GITHUB_URL,
+		},
 	},
 	{
 		id: "model-calls",
-		question: "Do you proxy my model calls?",
-		answer:
-			"Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. Paradev adds your sign-in to outgoing requests.",
+		question: msg({ message: "Do you proxy my model calls?" }),
+		answer: msg({
+			message:
+				"Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests.",
+		}),
 		link: {
-			label: "Cloud credentials",
+			label: msg({ message: "Cloud credentials" }),
 			href: `${COMPANY.DOCS_URL}/cloud-workspaces#credentials`,
 		},
 	},
 	{
 		id: "windows",
-		question: "Does it run on Windows?",
-		answer:
-			"Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button.",
+		question: msg({ message: "Does it run on Windows?" }),
+		answer: msg({
+			message:
+				"Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button.",
+		}),
 	},
 	{
 		id: "pricing",
-		question: "How much does it cost?",
-		answer:
-			"Free for one user. Pro is {{price:pro}} per user per month and adds automations and the mobile app. Team is {{price:team}} and adds cloud workspaces.",
-		unpricedAnswer:
-			"Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces.",
-		link: { label: "See pricing", href: "/pricing" },
+		question: msg({ message: "How much does it cost?" }),
+		answer: msg({
+			message:
+				"Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces.",
+		}),
+		unpricedAnswer: msg({
+			message:
+				"Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces.",
+		}),
+		link: { label: msg({ message: "See pricing" }), href: "/pricing" },
 	},
 	{
 		id: "team",
-		question: "Can my team share workspaces?",
-		answer: "Yes, on paid plans.",
-		link: { label: "Cloud workspaces", href: "/cloud" },
+		question: msg({ message: "Can my team share workspaces?" }),
+		answer: msg({ message: "Yes, on paid plans." }),
+		link: { label: msg({ message: "Cloud workspaces" }), href: "/cloud" },
 	},
 	{
 		id: "cloud-data",
-		question: "What happens to my Conductor Cloud data?",
-		answer:
-			"Conductor deletes it after Nov 20, and Paradev can't reach it. Push your branches and export your chats before then.",
-		link: { label: "Conductor Cloud guide", href: MIGRATE_CLOUD_URL },
+		question: msg({ message: "What happens to my Conductor Cloud data?" }),
+		answer: msg({
+			message:
+				"Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then.",
+		}),
+		link: {
+			label: msg({ message: "Conductor Cloud guide" }),
+			href: MIGRATE_CLOUD_URL,
+		},
 	},
 ];

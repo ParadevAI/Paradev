@@ -521,6 +521,10 @@ msgstr "{0}已离线。"
 msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "{0}使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
 
+#. placeholder {0}: BRAND.NAME
+msgid "{0} is open source, so you're never locked in. Run parallel agents the way you're used to, with chat, cloud and mobile built in."
+msgstr "{0} 是开源的，不会被锁定。按你习惯的方式并行运行智能体，并内置聊天、云端和移动端。"
+
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
@@ -815,6 +819,9 @@ msgstr "{closedCount}项未开启"
 
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {#个提交} other {#个提交}}"
+
+msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} 会找到你的 Conductor worktree，并在原位置导入，包括未提交的更改。"
 
 msgid "{companyName} makes {productName}."
 msgstr "{productName} 由 {companyName} 开发。"
@@ -1696,6 +1703,9 @@ msgstr "已存在同名频道"
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "聊天进行中无法切换到其他提供方。请开始一个新的 {label} 聊天，或将此对话分叉到新聊天中。此 {currentLabel} 聊天会保持打开。"
 
+msgid "A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions."
+msgstr "适用于 Claude Code、Codex、OpenCode 和 Pi 的聊天界面。可接续你的 Claude Code 会话。"
+
 msgid "A chat takes its name from the agent."
 msgstr "聊天的名称来自智能体。"
 
@@ -2171,6 +2181,9 @@ msgstr "添加你的第一个项目"
 msgid "Add your own terminal agent to this device."
 msgstr "向此设备添加你自己的终端智能体。"
 
+msgid "Add your repos"
+msgstr "添加你的仓库"
+
 msgid "Added {added}"
 msgstr "已添加 {added}"
 
@@ -2325,6 +2338,9 @@ msgstr "智能体无需中途干预即可完成常规工单。"
 
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "智能体在云端持续工作。可在桌面端、iPhone 或 iPad 上重新打开工作区。"
+
+msgid "Agents keep working when your laptop is closed."
+msgstr "合上笔记本电脑，智能体也会继续工作。"
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "智能体自己加载预览、操作界面，并在标记为待审查之前附上截图证据。"
@@ -3845,6 +3861,9 @@ msgstr "我可以用自己的API密钥吗？"
 msgid "Can merge without conflicts"
 msgstr "可以无冲突合并"
 
+msgid "Can my team share workspaces?"
+msgstr "我的团队可以共享工作区吗？"
+
 msgid "Can only be viewed or joined by invitation"
 msgstr "仅受邀者可查看或加入"
 
@@ -4108,6 +4127,9 @@ msgstr "聊天已关闭"
 msgid "Chat history"
 msgstr "聊天历史"
 
+msgid "Chat interface"
+msgstr "聊天界面"
+
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"
 
@@ -4140,6 +4162,9 @@ msgstr "检查更新"
 
 msgid "Check for Updates..."
 msgstr "检查更新..."
+
+msgid "Check on agents and review their work from iPhone or iPad."
+msgstr "在 iPhone 或 iPad 上查看智能体并审查它们的工作。"
 
 msgid "Check on running agents and read what they changed from your iPhone or iPad."
 msgstr "在 iPhone 或 iPad 上查看运行中的智能体，并阅读它们做出的更改。"
@@ -4310,8 +4335,17 @@ msgstr "CI失败"
 msgid "Clarify this"
 msgstr "阐明这里"
 
+msgid "Claude Code sessions, with claude --resume"
+msgstr "Claude Code 会话（使用 claude --resume）"
+
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code、Codex 和 OpenCode 是智能体；Paradev 是你同时运行多个智能体的地方。每个任务都有自己的 Git worktree 和分支，因此十个智能体可以同时在十个分支上工作，而你在一个地方监控、审查和合并。"
+
+msgid "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI"
+msgstr "Claude Code、Codex、Cursor Agent、OpenCode、Gemini、Amp，以及任何 CLI"
+
+msgid "Claude Code, Codex, Cursor, OpenCode"
+msgstr "Claude Code、Codex、Cursor、OpenCode"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code、Codex、Cursor、OpenCode 等。无需为每个智能体单独设置。"
@@ -4659,6 +4693,15 @@ msgstr "云端"
 msgid "Cloud · us-east"
 msgstr "云端 · us-east"
 
+msgid "Cloud credentials"
+msgstr "云端凭据"
+
+msgid "Cloud data gets deleted. Push your branches first."
+msgstr "云端数据将被删除。请先推送你的分支。"
+
+msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
+msgstr "Cloud 于{shutdownDate}结束。Mac 应用于 2027 年初结束"
+
 msgid "Cloud environment setup"
 msgstr "云环境设置"
 
@@ -4671,8 +4714,14 @@ msgstr "云环境从 GitHub 检出你的仓库。请先连接这些;只需操作
 msgid "Cloud GB-hours per seat each month"
 msgstr "每席位每月云端 GB 小时"
 
+msgid "Cloud goes read-only"
+msgstr "Cloud 变为只读"
+
 msgid "Cloud sandboxes"
 msgstr "云端沙箱"
+
+msgid "Cloud shuts down"
+msgstr "Cloud 关闭"
 
 msgid "Cloud usage"
 msgstr "云端用量"
@@ -4775,6 +4824,9 @@ msgstr "合并显示=>和!==等序列。"
 
 msgid "Come build it with us."
 msgstr "来和我们一起构建吧。"
+
+msgid "Comes with you"
+msgstr "可以带走"
 
 msgid "Coming Soon"
 msgstr "即将推出"
@@ -4934,6 +4986,39 @@ msgstr "component-showcase"
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "可组合的表单布局——搭配@superset/ui/form用于react-hook-form"
 
+msgid "Conductor chat history. Export it in Conductor under Settings → Account"
+msgstr "Conductor 聊天记录。请在 Conductor 的 Settings → Account 中导出"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
+msgstr "Conductor Cloud 将于{shutdownDate}结束。几分钟即可迁移到 {0}。"
+
+msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
+msgstr "Conductor Cloud 将于{shutdownDate}结束。切换到 {companyName}"
+
+msgid "Conductor Cloud guide"
+msgstr "Conductor Cloud 指南"
+
+msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Conductor Cloud 将于{shutdownDateLong}关闭。几分钟即可把你的 worktree 和智能体迁移到 {companyName}。免费且开源。"
+
+msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
+msgstr "Conductor 会在{shutdownDate}之后删除这些数据，{companyName} 无法访问它们。请在此之前推送分支并导出聊天记录。"
+
+msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
+msgstr "Conductor 的信息来自其公开文档。查看<0>完整对比</0>。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
+msgstr "Conductor 是其所有者的商标。{0} 与 Conductor 或 Meta 无关联，也未获得其认可。"
+
+msgid "Conductor joins Meta"
+msgstr "Conductor 加入 Meta"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
+msgstr "Conductor 工作区就是普通的 Git worktree。{0} 会在原位置直接使用它们。"
+
 msgid "Config file contents"
 msgstr "配置文件内容"
 
@@ -4988,6 +5073,9 @@ msgstr "确认切换"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "与 {0} 冲突"
+
+msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
+msgstr "恭喜 Conductor 团队加入 Meta。日期来自<0>他们的公告</0>。"
 
 msgid "Connect"
 msgstr "连接"
@@ -7229,6 +7317,9 @@ msgstr "我需要自备编码智能体的订阅吗？"
 msgid "Do nothing"
 msgstr "不执行任何操作"
 
+msgid "Do you proxy my model calls?"
+msgstr "你们会代理我的模型调用吗？"
+
 msgid "Do you sponsor visas?"
 msgstr "你们提供签证担保吗？"
 
@@ -7248,6 +7339,9 @@ msgstr "文档"
 
 msgid "Documentation"
 msgstr "文档"
+
+msgid "Does it run on Windows?"
+msgstr "支持 Windows 吗？"
 
 msgid "Don't allow"
 msgstr "不允许"
@@ -7286,9 +7380,16 @@ msgstr "正在降级..."
 msgid "Download"
 msgstr "下载"
 
+#. placeholder {0}: BRAND.NAME
+msgid "Download {0}"
+msgstr "下载 {0}"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Download {appName} at <0>{0}/download</0>."
 msgstr "在<0>{0}/download</0>下载{appName}。"
+
+msgid "Download {companyName}"
+msgstr "下载 {companyName}"
 
 msgid "Download {name}"
 msgstr "下载{name}"
@@ -8527,6 +8628,9 @@ msgstr "故障"
 msgid "Favorites"
 msgstr "收藏"
 
+msgid "Feature"
+msgstr "功能"
+
 msgid "Featured"
 msgstr "精选"
 
@@ -9010,6 +9114,24 @@ msgstr "免费版"
 msgid "Free for everyone"
 msgstr "对所有人免费"
 
+msgid "Free for one user. macOS, with an experimental Linux build."
+msgstr "单个用户免费。支持 macOS，另有实验性 Linux 版本。"
+
+msgid "Free for one user. Open source under MIT."
+msgstr "单个用户免费。基于 MIT 许可证开源。"
+
+msgid "Free for one user. Paid plans per user"
+msgstr "单个用户免费。付费方案按用户计费"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
+msgstr "单个用户免费。Pro 增加自动化和移动应用。Team 增加云工作区。"
+
+msgid "Free for one user. Pro from {proPrice}/user/mo"
+msgstr "单个用户免费。Pro {proPrice}/用户/月起"
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
+msgstr "单个用户免费。Pro 为每用户每月 {proPrice}，增加自动化和移动应用。Team 为 {teamPrice}，增加云工作区。"
+
 msgid "Frequently Used"
 msgstr "常用"
 
@@ -9201,6 +9323,9 @@ msgstr "Git与worktree"
 
 msgid "Git author name"
 msgstr "Git作者名"
+
+msgid "Git-ignored files in Cloud, like .env. Copy them out"
+msgstr "Cloud 中被 Git 忽略的文件，例如 .env。请把它们复制出来"
 
 msgid "GitHub"
 msgstr "GitHub"
@@ -9685,6 +9810,9 @@ msgstr "一个自动化可以有多少个触发器？"
 
 msgid "How much agent work engineers are actually running — tokens, cost, models and sessions, published by people who opted in."
 msgstr "工程师实际运行了多少智能体工作量 —— token、成本、模型与会话，由自愿公开的用户提供。"
+
+msgid "How much does it cost?"
+msgstr "价格是多少？"
 
 msgid "How should the agent's actions be approved?"
 msgstr "智能体的操作应如何批准？"
@@ -10266,6 +10394,9 @@ msgstr "发票和支付方式"
 msgid "iOS app"
 msgstr "iOS应用"
 
+msgid "iOS app, ending {shutdownDate}"
+msgstr "iOS 应用，{shutdownDate}结束"
+
 msgid "iOS Simulator"
 msgstr "iOS 模拟器"
 
@@ -10274,6 +10405,12 @@ msgstr "iOS 模拟器窗格"
 
 msgid "IP restrictions"
 msgstr "IP限制"
+
+msgid "iPhone and iPad"
+msgstr "iPhone 和 iPad"
+
+msgid "Is {companyName} open source?"
+msgstr "{companyName} 是开源的吗？"
 
 msgid "Is my data secure?"
 msgstr "我的数据安全吗？"
@@ -10352,6 +10489,9 @@ msgstr "设备可能处于睡眠状态"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "它可能已被删除，或属于另一个组织。"
+
+msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
+msgstr "只需几分钟。在用 Conductor Cloud？请先看<0>云端指南</0>。"
 
 msgid "It will open once the connection is back."
 msgstr "网络恢复后会自动打开。"
@@ -10527,6 +10667,9 @@ msgstr "已保留新文件 — 它在创建后发生了更改"
 
 msgid "Kept the new folder — it is no longer empty"
 msgstr "已保留新文件夹 — 它已不再为空"
+
+msgid "Key dates"
+msgstr "关键日期"
 
 msgid "Key name"
 msgstr "密钥名称"
@@ -11153,11 +11296,17 @@ msgstr "本地优先"
 msgid "Local Network"
 msgstr "本地网络"
 
+msgid "Local work can move at your own pace."
+msgstr "本地工作可以按你自己的节奏迁移。"
+
 msgid "Local workspace"
 msgstr "本地工作区"
 
 msgid "Local workspaces"
 msgstr "本地工作区"
+
+msgid "Local, on a host, or in the cloud"
+msgstr "本地、主机上或云端"
 
 msgid "Location"
 msgstr "位置"
@@ -11235,6 +11384,9 @@ msgstr "低"
 msgid "Low severity"
 msgstr "低严重性"
 
+msgid "Mac app winds down"
+msgstr "Mac 应用逐步停用"
+
 msgid "Machine resources"
 msgstr "机器资源"
 
@@ -11246,6 +11398,12 @@ msgstr "机器规格：{label}"
 
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "不绑定机器的云端工作区，几秒即可启动，还能分享给队友。"
+
+msgid "macOS"
+msgstr "macOS"
+
+msgid "macOS, Linux (experimental)"
+msgstr "macOS、Linux（实验性）"
 
 msgid "Magenta"
 msgstr "品红"
@@ -11618,6 +11776,9 @@ msgstr "2026年中"
 msgid "Mid 2027"
 msgstr "2027年中"
 
+msgid "Migration guide"
+msgstr "迁移指南"
+
 msgid "Min iOS"
 msgstr "最低 iOS"
 
@@ -11806,6 +11967,9 @@ msgstr "将{count}个移动到分组"
 msgid "Move {name} to background"
 msgstr "将 {name} 移到后台"
 
+msgid "Move cloud work"
+msgstr "迁移云端工作"
+
 msgid "Move to background"
 msgstr "移到后台"
 
@@ -11820,6 +11984,9 @@ msgstr "移到右侧"
 
 msgid "Move to Tab"
 msgstr "移动到标签页"
+
+msgid "Move your agents before {shutdownDate}."
+msgstr "请在{shutdownDate}之前迁移你的智能体。"
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "已将“{name}”移动到 {group}"
@@ -12465,6 +12632,9 @@ msgstr "没有活动会话"
 msgid "No local workspaces"
 msgstr "没有本地工作区"
 
+msgid "No lock-in"
+msgstr "不被锁定"
+
 msgid "No log lines yet"
 msgstr "暂无日志"
 
@@ -12473,6 +12643,9 @@ msgstr "无登录信息"
 
 msgid "No longer in source"
 msgstr "已不在来源中"
+
+msgid "No longer on sale"
+msgstr "已停止销售"
 
 msgid "No match"
 msgstr "无匹配项"
@@ -12925,6 +13098,9 @@ msgstr "不在排行榜中。请先加入。"
 msgid "Not on this version"
 msgstr "不在此版本中"
 
+msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
+msgstr "在你的机器上不会。智能体直接调用各自的提供商，并由提供商向你计费。在云工作区中，你的密钥永远不会进入沙箱，{companyName} 会把你的登录凭据添加到发出的请求中。"
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "尚未接收到事件：Microsoft Graph拒绝了通知订阅。请检查应用的管理员同意和受保护API的审批，然后重新连接。"
 
@@ -12958,6 +13134,9 @@ msgstr "尚未同步"
 msgctxt "agent status"
 msgid "Not updating"
 msgstr "未更新"
+
+msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgstr "暂不支持。目前支持 macOS，另有实验性 Linux 版本。Windows 用户可以通过下载按钮加入候补名单。"
 
 msgid "Note"
 msgstr "注意"
@@ -13696,6 +13875,9 @@ msgstr "打开发布选项"
 msgid "Open Source"
 msgstr "开源"
 
+msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
+msgstr "基于 MIT 许可证开源。用你自己的订阅和密钥使用任何智能体。"
+
 msgid "Open System Settings"
 msgstr "打开系统设置"
 
@@ -13812,6 +13994,9 @@ msgstr "Option快捷键可能会影响特殊字符的输入"
 
 msgid "Optional"
 msgstr "可选"
+
+msgid "Optional · Beta"
+msgstr "可选 · 测试版"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "可选说明，显示在终端脚本列表中。"
@@ -14428,6 +14613,9 @@ msgstr "个人方案"
 msgid "Phantom Forklift"
 msgstr "幽灵叉车"
 
+msgid "Phone"
+msgstr "手机"
+
 msgid "Phone number"
 msgstr "电话号码"
 
@@ -14503,6 +14691,9 @@ msgstr "在{hostName}上选择worktree文件夹。"
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "选择你的智能体获取一行安装命令，或者手动复制配置。所有客户端（含OAuth和API密钥设置）都在<0>完整的MCP服务器文档</0>里。"
 
+msgid "Pick your agents"
+msgstr "选择你的智能体"
+
 msgid "PID"
 msgstr "PID"
 
@@ -14557,6 +14748,9 @@ msgid "Plant Manager"
 msgstr "厂长"
 
 msgid "Platform"
+msgstr "平台"
+
+msgid "Platforms"
 msgstr "平台"
 
 #. placeholder {0}: ringtone.name
@@ -14803,6 +14997,9 @@ msgstr "上一个标签页（第二快捷键）"
 
 msgid "Previous Workspace"
 msgstr "上一个工作区"
+
+msgid "Price"
+msgstr "价格"
 
 msgid "Pricing"
 msgstr "定价"
@@ -15127,6 +15324,9 @@ msgstr "推送"
 msgid "Push failed: {0}"
 msgstr "推送失败：{0}"
 
+msgid "Push your branches, then keep going on your Mac or in a {companyName} cloud workspace."
+msgstr "推送你的分支，然后在 Mac 上或 {companyName} 云工作区中继续工作。"
+
 msgid "Pushed"
 msgstr "已推送"
 
@@ -15348,6 +15548,9 @@ msgstr "阅读指南"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "阅读并行编码智能体指南"
+
+msgid "Read the migration guide"
+msgstr "阅读迁移指南"
 
 msgid "Read the MIT License"
 msgstr "阅读 MIT 许可证"
@@ -15926,6 +16129,9 @@ msgstr "举报功能暂时不可用，请稍后再试。"
 msgid "Repos"
 msgstr "仓库"
 
+msgid "Repos, worktrees and branches"
+msgstr "仓库、worktree 和分支"
+
 msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
 msgstr "仓库、worktree、终端输出和智能体会话都留在你的机器上。云端同步只涉及账户和组织的元数据。"
 
@@ -16460,6 +16666,9 @@ msgstr "常规工单无需中途干预"
 
 msgid "Routines"
 msgstr "例行任务"
+
+msgid "Routines, ending with Cloud"
+msgstr "例行任务，随 Cloud 一起结束"
 
 msgid "Row actions"
 msgstr "行操作"
@@ -17059,11 +17268,17 @@ msgstr "比较你与其他开发者的智能体用量，了解每个个人主页
 msgid "See Less"
 msgstr "收起"
 
+msgid "See migration steps"
+msgstr "查看迁移步骤"
+
 msgid "See More"
 msgstr "查看更多"
 
 msgid "See open roles ↑"
 msgstr "查看空缺职位 ↑"
+
+msgid "See pricing"
+msgstr "查看定价"
 
 msgid "See the <0>available tools reference</0> for every tool name and parameter."
 msgstr "所有工具名称和参数见<0>可用工具参考</0>。"
@@ -17483,6 +17698,9 @@ msgstr "初始化"
 msgid "Setup script"
 msgstr "设置脚本"
 
+msgid "Setup scripts, once you convert conductor.json"
+msgstr "设置脚本（转换 conductor.json 之后）"
+
 msgid "Setup stopped. The reason is in the output below."
 msgstr "设置已停止。原因见下方输出。"
 
@@ -17759,6 +17977,12 @@ msgstr "会与你的名字一起公开显示。"
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "关闭 {0}"
+
+msgid "Shuts down {shutdownDate}"
+msgstr "{shutdownDate}关闭"
+
+msgid "Side by side"
+msgstr "并排对比"
 
 msgid "Side by Side"
 msgstr "并排"
@@ -18476,6 +18700,9 @@ msgstr "状态：{0}"
 msgid "Stay connected (refresh tokens)"
 msgstr "保持连接（刷新令牌）"
 
+msgid "Stays behind"
+msgstr "无法带走"
+
 msgid "Steer"
 msgstr "引导"
 
@@ -18683,6 +18910,9 @@ msgstr "未配置支持请求速率限制"
 msgid "Support the project with a GitHub star"
 msgstr "在GitHub上点个star来支持这个项目"
 
+msgid "Supported agents"
+msgstr "支持的智能体"
+
 msgid "Surprise me"
 msgstr "随机一下"
 
@@ -18703,6 +18933,9 @@ msgstr "换智能体，不换工作流"
 
 msgid "Switch host"
 msgstr "切换主机"
+
+msgid "Switch in four steps"
+msgstr "四步完成切换"
 
 msgid "Switch organization"
 msgstr "切换组织"
@@ -18979,6 +19212,9 @@ msgstr "团队"
 
 msgid "Team activity feed"
 msgstr "团队动态"
+
+msgid "Team and Ultra plans"
+msgstr "Team 和 Ultra 方案"
 
 msgid "Team collaboration"
 msgstr "团队协作"
@@ -19543,6 +19779,9 @@ msgstr "目标主机"
 msgid "The team"
 msgstr "团队"
 
+msgid "The team announced the news."
+msgstr "团队宣布了这一消息。"
+
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "该团队邀请已过期或不存在。请向团队所有者索取新链接，或检查URL是否输入正确。"
 
@@ -19599,6 +19838,9 @@ msgstr "这些文件夹中仍有你的文件，但没有自动迁移到新版 Pa
 
 msgid "These ports are still in use"
 msgstr "这些端口仍在使用中"
+
+msgid "They run on the subscriptions and keys you already have."
+msgstr "它们使用你已有的订阅和密钥运行。"
 
 msgid "Thinking"
 msgstr "思考"
@@ -20674,6 +20916,9 @@ msgstr "已取消发布"
 msgid "Unpushed"
 msgstr "未推送"
 
+msgid "Unpushed Cloud work. Push before {shutdownDate}"
+msgstr "未推送的 Cloud 工作。请在{shutdownDate}之前推送"
+
 msgid "Unranked"
 msgstr "未上榜"
 
@@ -21410,6 +21655,9 @@ msgstr "有哪些福利？"
 msgid "What builders say about Paradev"
 msgstr "开发者怎么评价Paradev"
 
+msgid "What comes with you"
+msgstr "哪些可以带走"
+
 msgid "What did you see on the page?"
 msgstr "你在页面上看到了什么？"
 
@@ -21421,6 +21669,9 @@ msgstr "早期用户怎么说"
 
 msgid "What general access allows"
 msgstr "通用访问权限允许的操作"
+
+msgid "What happens to my Conductor Cloud data?"
+msgstr "我的 Conductor Cloud 数据会怎样？"
 
 msgid "What has to become true"
 msgstr "需要成真的条件"
@@ -21478,6 +21729,9 @@ msgstr "我们发布了什么"
 
 msgid "What would you like to know?"
 msgstr "你想了解什么？"
+
+msgid "What you get"
+msgstr "你将获得"
 
 msgid "What your agent can do"
 msgstr "你的智能体能做什么"
@@ -21759,6 +22013,9 @@ msgstr "worktree缺失"
 msgid "Worktree out of sync"
 msgstr "worktree不同步"
 
+msgid "Worktree per task"
+msgstr "每个任务一个 worktree"
+
 msgid "Worktrees"
 msgstr "Worktree"
 
@@ -21839,6 +22096,15 @@ msgstr "是"
 
 msgid "Yes, demote me"
 msgstr "是，降低我的角色"
+
+msgid "Yes, on paid plans."
+msgstr "可以，付费方案支持。"
+
+msgid "Yes, resumes Claude Code sessions"
+msgstr "支持，可恢复 Claude Code 会话"
+
+msgid "Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in."
+msgstr "是的，采用 MIT 许可证。你可以 fork 代码并自行构建，因此永远不会被锁定。"
 
 msgid "Yes. Apply to the role that fits best and tell us what you would build. Include a repo, PR or demo."
 msgstr "可以。申请最合适的职位，并告诉我们你想做什么。附上仓库、PR 或演示。"
@@ -21928,6 +22194,9 @@ msgstr "你只能编辑自己的消息"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "你只能与此组织中的人员和团队分享"
+
+msgid "You can read and export, but not run agents."
+msgstr "你可以查看和导出，但无法运行智能体。"
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "你可以在 30 天内从“设置 → 项目”恢复它。仓库文件夹永远不会被删除。"
@@ -22045,6 +22314,9 @@ msgstr "你的智能体发布设计和报告，供团队审阅。有人评论后
 
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "你的智能体发布设计和报告。团队发表评论，智能体随即开始工作。"
+
+msgid "Your agent subscriptions and keys"
+msgstr "你的智能体订阅和密钥"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的智能体，你的账号"
