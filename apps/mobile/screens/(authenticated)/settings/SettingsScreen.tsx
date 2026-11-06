@@ -362,6 +362,7 @@ export function SettingsScreen() {
 							message:
 								"Open Claude Code, Codex, OpenCode, and Pi sessions as chats",
 						})}
+						subtitleLines={2}
 						trailing={
 							<Switch
 								value={acpChatEnabled}
