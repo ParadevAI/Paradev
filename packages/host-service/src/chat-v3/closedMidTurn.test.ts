@@ -16,13 +16,6 @@ const CHAT = {
 	modelId: "opus",
 };
 
-const PAUSED_TURN = {
-	id: "t1",
-	status: "interrupted",
-	error: { message: "x", kind: "host_stopped" },
-	startedAtMs: 1,
-};
-
 function fakeRuntime(
 	rows: Record<string, { closedAt: number; title: string }>,
 	options: {
@@ -100,7 +93,7 @@ describe("chats a quit cut off", () => {
 				"chat-1": { closedAt: 5, title: "Fix the flaky test" },
 				"chat-2": { closedAt: 0, title: "Fix the flaky test" },
 			},
-			{ live: { sessionId: "chat-2", turn: PAUSED_TURN } as never },
+			{ live: { sessionId: "chat-2", pausedByShutdown: true } as never },
 		);
 		const chats = closedChats(runtime);
 
@@ -114,10 +107,7 @@ describe("chats a quit cut off", () => {
 		const { runtime } = fakeRuntime(
 			{ "chat-1": { closedAt: 5, title: "x" } },
 			{
-				live: {
-					sessionId: "chat-2",
-					turn: { ...PAUSED_TURN, status: "running" },
-				} as never,
+				live: { sessionId: "chat-2", pausedByShutdown: false } as never,
 			},
 		);
 		expect(closedChats(runtime).list()).toEqual([]);

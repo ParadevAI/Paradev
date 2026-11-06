@@ -32,13 +32,7 @@ export function createClosedMidTurn(options: {
 		}
 		if (!chat.terminalId) return null;
 		const live = runtime.live.forTerminal(chat.terminalId);
-		const turn = live?.turn;
-		if (
-			!live ||
-			turn?.status !== "interrupted" ||
-			turn.error?.kind !== "host_stopped"
-		)
-			return null;
+		if (!live?.pausedByShutdown) return null;
 		const replacement = runtime.sessions.get(live.sessionId);
 		return {
 			sessionId: live.sessionId,

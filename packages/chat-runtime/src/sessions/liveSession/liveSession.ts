@@ -146,6 +146,7 @@ export class LiveSession {
 	private carriedFailure: Turn | null = null;
 	private carriedCanceledToolIds: ReadonlySet<string> = new Set();
 	private hiddenStopKeys: ReadonlySet<string> = new Set();
+	private carriedShutdown = false;
 	/** The agent's "stopped by user" note the shutdown wrote, replayed after the last prompt. */
 	private replayedShutdownStop: { item: UserMessage; turnId: string } | null =
 		null;
@@ -209,6 +210,11 @@ export class LiveSession {
 
 	get turn(): Turn | null {
 		return this.currentTurn;
+	}
+
+	/** Its last turn is the one a shutdown cut off in the session it replaced. */
+	get pausedByShutdown(): boolean {
+		return this.carriedShutdown;
 	}
 
 	get queuedCount(): number {
@@ -700,6 +706,7 @@ export class LiveSession {
 					this.limitReached({ hitAtMs: this.now() });
 				}
 				if (event.turn.status === "running") {
+					this.carriedShutdown = false;
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
 					this.steerTarget = null;
@@ -796,6 +803,7 @@ export class LiveSession {
 		}
 		const at = Math.max(this.now(), this.latestStartMs + 1);
 		this.carriedAtMs = at;
+		this.carriedShutdown = turn.error?.kind === "host_stopped";
 		this.appendDurable({
 			type: "turn",
 			turn: { ...turn, startedAtMs: at, completedAtMs: at },

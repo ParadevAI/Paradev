@@ -314,6 +314,9 @@ describe("replacing a chat whose agent died", () => {
 		expect(markerOf(runtime, replacement.sessionId)).toMatchObject({
 			discarded: true,
 		});
+		expect(runtime.live.get(replacement.sessionId)?.pausedByShutdown).toBe(
+			true,
+		);
 
 		runtime.commands.prompt({
 			commandId: randomUUID(),
@@ -324,6 +327,9 @@ describe("replacing a chat whose agent died", () => {
 		await waitFor(
 			() =>
 				runtime.live.get(replacement.sessionId)?.turn?.status === "completed",
+		);
+		expect(runtime.live.get(replacement.sessionId)?.pausedByShutdown).toBe(
+			false,
 		);
 		await runtime.live.dispose(replacement.sessionId);
 		const reopened = createChat(runtime, replacement.sessionId);
