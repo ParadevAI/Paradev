@@ -97,11 +97,8 @@ export async function resolveGithubRepo(
 }
 
 /**
- * The repo a project's issues and pull requests live in, which differs from
- * {@link resolveGithubRepo} when `origin` is the user's fork. Same order as
- * `gh`: the repo `gh repo set-default` chose, else the parent of a fork, else
- * the repo the remote points at. Branches are pushed to the fork, so anything
- * that writes a branch or opens a PR from one keeps using `resolveGithubRepo`.
+ * The repo a project's issues and PRs live in: the `gh repo set-default` repo,
+ * else the parent of a fork, else the remote's repo. Writes keep using `resolveGithubRepo`.
  */
 export async function resolveGithubBaseRepo(
 	ctx: HostServiceContext,

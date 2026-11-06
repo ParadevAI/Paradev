@@ -9,11 +9,7 @@ export interface GithubRepoRef {
 	name: string;
 }
 
-/**
- * The repo `gh repo set-default` chose, read from the
- * `remote.<name>.gh-resolved` key it writes. `base` marks that remote as the
- * base repo; any other value is an `OWNER/REPO` slug.
- */
+/** The repo `gh repo set-default` chose: `remote.<name>.gh-resolved` is `base` or `OWNER/REPO`. */
 export async function getGhDefaultRepo(
 	git: SimpleGit,
 	remotes: Map<string, ParsedGitHubRemote>,
@@ -52,14 +48,10 @@ const repoParentSchema = z.object({
 
 type GithubClients = { execGh: ExecGh; github: () => Promise<Octokit> };
 
-// A repo's fork parent never changes, so a lookup is kept for the process.
-// The promise is cached so concurrent callers share one request.
+// A fork parent never changes. The promise is cached so concurrent callers share one request.
 const forkParentCache = new Map<string, Promise<GithubRepoRef | null>>();
 
-/**
- * The repo `repo` was forked from, or null when it isn't a fork. Tries `gh`,
- * then Octokit; throws when neither can reach GitHub, and that isn't cached.
- */
+/** The repo this one was forked from, or null. Tries `gh`, then Octokit. Failures are not cached. */
 export function getForkParent(
 	repo: GithubRepoRef,
 	clients: GithubClients,
