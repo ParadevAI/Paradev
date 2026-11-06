@@ -1,6 +1,5 @@
 import { cn } from "@superset/ui/utils";
 import type { CSSProperties, ReactNode } from "react";
-import { StatusIndicator } from "renderer/screens/main/components/StatusIndicator";
 import type { ActivePaneStatus } from "shared/tabs-types";
 import {
 	CARD_PEEK_PX,
@@ -8,12 +7,13 @@ import {
 	CARD_WIDTH_PX,
 	MAX_TAB_ICONS,
 } from "../../constants";
+import { StatusBead } from "./components/StatusBead";
 
 interface TabIconCardProps {
 	/** 0 for the front card; each step back sits further right, smaller and lower. */
 	depth: number;
 	color?: string;
-	/** The pane's agent status, drawn as a dot in the card's top-right corner. */
+	/** The pane's agent status, drawn as a glass bead on the card's top-right corner. */
 	status?: ActivePaneStatus | null;
 	children: ReactNode;
 }
@@ -39,8 +39,8 @@ export function TabIconCard({
 	return (
 		<span
 			className={cn(
-				"absolute top-0 flex h-[18px] items-center justify-center overflow-hidden rounded-[6px] backdrop-blur-[6px] backdrop-saturate-[1.3] [&_img]:size-[11px] [&_svg]:size-3",
-				"before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-linear-to-b before:to-transparent before:content-['']",
+				"absolute top-0 flex h-[18px] items-center justify-center rounded-[6px] backdrop-blur-[6px] backdrop-saturate-[1.3] [&_img]:size-[11px] [&_svg]:size-3",
+				"before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:rounded-t-[6px] before:bg-linear-to-b before:to-transparent before:content-['']",
 				color
 					? "text-white before:from-white/12 [&_img]:brightness-0 [&_img]:invert"
 					: "bg-[var(--tab-glass-fill)] bg-[image:linear-gradient(135deg,var(--tab-glass-sheen),rgb(255_255_255/0.03)_60%)] text-[var(--tab-glass-glyph)] shadow-[var(--tab-glass-shadow)] before:from-white/16 [&_svg]:drop-shadow-[var(--tab-glass-glyph-shadow)]",
@@ -56,10 +56,7 @@ export function TabIconCard({
 		>
 			{children}
 			{status ? (
-				<StatusIndicator
-					status={status}
-					className="absolute top-[1.5px] right-[1.5px] size-[5px] rounded-full shadow-[0_0_0_1px_var(--tab-status-ring)]"
-				/>
+				<StatusBead status={status} className="-top-[2px] -right-[2px]" />
 			) : null}
 		</span>
 	);
