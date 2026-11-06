@@ -1801,6 +1801,9 @@ msgstr "Окремий профіль з оплатою за токени. Кл�
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Окремий профіль, який використовує ваші навички, плагіни, MCP-сервери й налаштування."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Спільний знімок локальних логів агентів. Статистику надано користувачем. Орієнтовну вартість розраховано за тарифами API, це не сума рахунку."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Ключ завдань містить від 1 до 5 літер або цифр і починається з літери."
 
@@ -2239,6 +2242,9 @@ msgstr "Порівняно з main"
 msgid "Agent"
 msgstr "Агент"
 
+msgid "Agent breakdown"
+msgstr "Розподіл за агентами"
+
 msgid "Agent commands"
 msgstr "Команди агентів"
 
@@ -2356,6 +2362,9 @@ msgstr "Агенти самі сортують issues, пишуть чернет
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенти використовують цей обліковий запис, коли викликають інструменти Linear."
+
+msgid "Agents used"
+msgstr "Використані агенти"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Сукупне використання агентів усіма розробниками в таблиці лідерів Paradev — токени, вартість, поведінка кешу та моделі, які люди справді обирають."
@@ -6156,6 +6165,9 @@ msgstr "Не вдалося надіслати агенту"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Не вдалося надіслати повідомлення. Його повернуто в поле введення."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Не вдалося поширити картку. Спробуйте завантажити зображення."
+
 msgid "Couldn't stage changes"
 msgstr "Не вдалося проіндексувати зміни"
 
@@ -6528,6 +6540,9 @@ msgstr "Поточний"
 
 msgid "Current access"
 msgstr "Поточний доступ"
+
+msgid "Current leaderboard tier"
+msgstr "Поточний рівень у рейтингу"
 
 msgid "Current level"
 msgstr "Поточний рівень"
@@ -7872,6 +7887,9 @@ msgstr "esc, щоб закрити"
 msgid "esc to exit"
 msgstr "esc, щоб вийти"
 
+msgid "Estimated cost"
+msgstr "Орієнтовна вартість"
+
 msgid "Event"
 msgstr "Подія"
 
@@ -9168,6 +9186,9 @@ msgstr "За знімками worktree до і після цього ходу. �
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "За знімками worktree до і після цього ходу. Одночасно тут працював інший чат, тому в цьому списку лише файли, які цей чат змінив своїми інструментами для файлів. Інші зміни показано окремо."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "З локальних логів цього хоста. Орієнтовну вартість розраховано за тарифами API, а не за рахунком. PR пов’язані з агентами робочої області й можуть враховуватися для кількох агентів."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter приховано — перейдіть у Markdown, щоб його редагувати"
 
@@ -9275,6 +9296,9 @@ msgstr "Використай Paradev на повну"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Отримайте сповіщення, коли Paradev стане доступний для Windows."
+
+msgid "Get Paradev"
+msgstr "Завантажити Paradev"
 
 msgid "Get Paradev on your Mac"
 msgstr "Встановіть Paradev на свій Mac"
@@ -10754,6 +10778,12 @@ msgstr "Останні 3 місяці"
 msgid "last 30 days"
 msgstr "останні 30 днів"
 
+msgid "Last 30 days"
+msgstr "Останні 30 днів"
+
+msgid "Last 365 days"
+msgstr "Останні 365 днів"
+
 msgid "Last 4 weeks"
 msgstr "Останні 4 тижні"
 
@@ -11350,6 +11380,9 @@ msgstr "Надійність на довготривалих завданнях 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Підказка лише з комбінацією клавіш після довгого наведення; її стиль чипа тепер типовий для TooltipContent"
 
+msgid "Longest streak (days)"
+msgstr "Найдовша серія (дні)"
+
 msgid "Looking at {what}"
 msgstr "Переглядаємо {what}"
 
@@ -11717,6 +11750,9 @@ msgstr "Злито"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Злито користувачем {0}"
+
+msgid "Merged PRs"
+msgstr "Об’єднані PR"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Злито, але не вдалося оновити стан PR — спробуйте ще раз за мить"
@@ -13438,6 +13474,9 @@ msgstr "Лише запрошені люди"
 
 msgid "Only people who opted in appear here."
 msgstr "Тут показано лише тих, хто погодився на участь."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "До зображення й публічного посилання потрапить лише вибрана статистика. Назви репозиторіїв і заголовки PR ніколи не включаються."
 
 msgid "Only the author can change a comment"
 msgstr "Лише автор може змінити коментар"
@@ -17365,6 +17404,9 @@ msgstr "Виберіть середовище"
 msgid "Select an organization"
 msgstr "Виберіть організацію"
 
+msgid "Select at least one available stat."
+msgstr "Виберіть хоча б один доступний показник."
+
 msgid "Select base branch…"
 msgstr "Виберіть базову гілку…"
 
@@ -17745,6 +17787,12 @@ msgstr "Діліться плагінами з репозиторію GitHub. З
 
 msgid "Share this page"
 msgstr "Поділитися цією сторінкою"
+
+msgid "Share to X"
+msgstr "Поширити в X"
+
+msgid "Share usage"
+msgstr "Поширити використання"
 
 msgid "Share via…"
 msgstr "Поділитися через…"
@@ -20510,6 +20558,12 @@ msgstr "Підказка з боку"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Провідні агенти за токенами"
+
+msgid "Top model"
+msgstr "Основна модель"
+
 msgid "Top models"
 msgstr "Найпопулярніші моделі"
 
@@ -21145,6 +21199,12 @@ msgstr "Ідентифікатор для URL, унікальний у межа�
 msgid "Usage"
 msgstr "Використання"
 
+msgid "Usage card"
+msgstr "Картка використання"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Картки недоступні на цьому хості. Оновіть хост і спробуйте ще раз."
+
 msgid "Usage is out of date"
 msgstr "Дані про використання застаріли"
 
@@ -21426,6 +21486,9 @@ msgstr "Переглянути релізи на GitHub"
 
 msgid "View usage"
 msgstr "Переглянути використання"
+
+msgid "View usage dashboard"
+msgstr "Переглянути дашборд використання"
 
 msgid "Violence or harassment"
 msgstr "Насильство або цькування"

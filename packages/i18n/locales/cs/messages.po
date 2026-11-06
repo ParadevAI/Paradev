@@ -1807,6 +1807,9 @@ msgstr "Samostatný profil účtovaný za tokeny. Klíč zůstává v CLI {0}."
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Samostatný profil, který sdílí vaše skills, pluginy, MCP servery i nastavení."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Sdílený snímek z místních protokolů agentů. Statistiky uvádí uživatel. Odhadované náklady vycházejí ze sazeb API, nikoli z faktury."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Klíč úkolů má 1 až 5 písmen nebo číslic a začíná písmenem."
 
@@ -2245,6 +2248,9 @@ msgstr "Proti main"
 msgid "Agent"
 msgstr "Agent"
 
+msgid "Agent breakdown"
+msgstr "Rozpis podle agentů"
+
 msgid "Agent commands"
 msgstr "Příkazy agentů"
 
@@ -2362,6 +2368,9 @@ msgstr "Agenti sami třídí issues, píší changelogy a aktualizují závislos
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agenti používají tento účet, když volají nástroje Linear."
+
+msgid "Agents used"
+msgstr "Použití agenti"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Souhrnné využití agentů napříč všemi vývojáři v žebříčku Paradev — tokeny, náklady, chování cache a modely, po kterých lidé skutečně sahají."
@@ -6162,6 +6171,9 @@ msgstr "Nepodařilo se odeslat agentovi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Zprávu se nepodařilo odeslat. Je zpět v poli pro psaní."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Kartu využití se nepodařilo sdílet. Zkuste stáhnout obrázek."
+
 msgid "Couldn't stage changes"
 msgstr "Nepodařilo se připravit změny"
 
@@ -6534,6 +6546,9 @@ msgstr "Aktuální"
 
 msgid "Current access"
 msgstr "Aktuální přístup"
+
+msgid "Current leaderboard tier"
+msgstr "Aktuální úroveň v žebříčku"
 
 msgid "Current level"
 msgstr "Aktuální úroveň"
@@ -7878,6 +7893,9 @@ msgstr "esc zavře"
 msgid "esc to exit"
 msgstr "esc pro ukončení"
 
+msgid "Estimated cost"
+msgstr "Odhadované náklady"
+
 msgid "Event"
 msgstr "Událost"
 
@@ -9174,6 +9192,9 @@ msgstr "Podle snímků worktree před tímto tahem a po něm. Současně tu prac
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Podle snímků worktree před tímto tahem a po něm. Současně tu pracoval jiný chat, takže tento seznam obsahuje jen soubory, které tento chat upravil svými nástroji pro soubory. Ostatní změny jsou uvedeny zvlášť."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "Z místních protokolů tohoto hostitele. Odhadované náklady používají ceníkové sazby API, nikoli vaši fakturu. PR jsou propojeny s agenty pracovního prostoru a mohou se započítat více agentům."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter je skrytý — pro úpravy přepněte na Markdown"
 
@@ -9281,6 +9302,9 @@ msgstr "Využít Paradev naplno"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Dáme vám vědět, až bude Paradev dostupný pro Windows."
+
+msgid "Get Paradev"
+msgstr "Stáhnout Paradev"
 
 msgid "Get Paradev on your Mac"
 msgstr "Získejte Paradev na svůj Mac"
@@ -10760,6 +10784,12 @@ msgstr "Poslední 3 měsíce"
 msgid "last 30 days"
 msgstr "posledních 30 dní"
 
+msgid "Last 30 days"
+msgstr "Posledních 30 dní"
+
+msgid "Last 365 days"
+msgstr "Posledních 365 dní"
+
 msgid "Last 4 weeks"
 msgstr "Poslední 4 týdny"
 
@@ -11356,6 +11386,9 @@ msgstr "Spolehlivost na dlouhém horizontu překročí práh. Práce zadaná v 1
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip jen se zkratkou při dlouhém najetí; jeho styl čipu je nyní výchozí pro TooltipContent"
 
+msgid "Longest streak (days)"
+msgstr "Nejdelší série (dny)"
+
 msgid "Looking at {what}"
 msgstr "Prohlížím {what}"
 
@@ -11723,6 +11756,9 @@ msgstr "Sloučeno"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Sloučil {0}"
+
+msgid "Merged PRs"
+msgstr "Sloučené PR"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Sloučeno, ale nepodařilo se obnovit stav PR — zkuste to za chvíli znovu"
@@ -13444,6 +13480,9 @@ msgstr "Jen pozvaní lidé"
 
 msgid "Only people who opted in appear here."
 msgstr "Objevují se tu jen lidé, kteří se sami přihlásili."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Do obrázku a veřejného odkazu se zahrnou jen vybrané statistiky. Názvy repozitářů ani titulky PR se nikdy nezahrnují."
 
 msgid "Only the author can change a comment"
 msgstr "Komentář může upravit jen jeho autor"
@@ -17371,6 +17410,9 @@ msgstr "Vyberte prostředí"
 msgid "Select an organization"
 msgstr "Vyberte organizaci"
 
+msgid "Select at least one available stat."
+msgstr "Vyberte alespoň jednu dostupnou statistiku."
+
 msgid "Select base branch…"
 msgstr "Vyberte základní větev…"
 
@@ -17751,6 +17793,12 @@ msgstr "Sdílejte pluginy z repozitáře GitHub. Zafixujte vydání pomocí git 
 
 msgid "Share this page"
 msgstr "Sdílet tuto stránku"
+
+msgid "Share to X"
+msgstr "Sdílet na X"
+
+msgid "Share usage"
+msgstr "Sdílet využití"
 
 msgid "Share via…"
 msgstr "Sdílet přes…"
@@ -20516,6 +20564,12 @@ msgstr "Tooltip na"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Nejlepší agenti podle tokenů"
+
+msgid "Top model"
+msgstr "Nejpoužívanější model"
+
 msgid "Top models"
 msgstr "Nejlepší modely"
 
@@ -21151,6 +21205,12 @@ msgstr "Identifikátor vhodný do URL, jedinečný v rámci vaší organizace."
 msgid "Usage"
 msgstr "Využití"
 
+msgid "Usage card"
+msgstr "Karta využití"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Karty využití nejsou na tomto hostiteli dostupné. Aktualizujte hostitele a zkuste to znovu."
+
 msgid "Usage is out of date"
 msgstr "Údaje o využití jsou zastaralé"
 
@@ -21432,6 +21492,9 @@ msgstr "Zobrazit vydání na GitHubu"
 
 msgid "View usage"
 msgstr "Zobrazit využití"
+
+msgid "View usage dashboard"
+msgstr "Zobrazit přehled využití"
 
 msgid "Violence or harassment"
 msgstr "Násilí nebo obtěžování"

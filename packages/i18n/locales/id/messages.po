@@ -1807,6 +1807,9 @@ msgstr "Profil terpisah yang ditagih per token. Kunci tetap berada di CLI {0}."
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Profil terpisah yang berbagi skill, plugin, server MCP, dan pengaturan Anda."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Ringkasan yang dibagikan dari log agen lokal. Statistik dilaporkan sendiri. Estimasi biaya berdasarkan tarif API, bukan tagihan."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Kunci tugas terdiri dari 1 hingga 5 huruf atau angka dan diawali huruf."
 
@@ -2245,6 +2248,9 @@ msgstr "Terhadap Main"
 msgid "Agent"
 msgstr "Agen"
 
+msgid "Agent breakdown"
+msgstr "Rincian agen"
+
 msgid "Agent commands"
 msgstr "Perintah agen"
 
@@ -2362,6 +2368,9 @@ msgstr "Agen memilah issue, menyusun changelog, dan memperbarui dependensi sendi
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agen memakai akun ini saat memanggil tool Linear."
+
+msgid "Agents used"
+msgstr "Agen yang digunakan"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Agregat penggunaan agen dari seluruh developer di papan peringkat Paradev — token, biaya, perilaku cache, dan model yang benar-benar dipakai orang."
@@ -6162,6 +6171,9 @@ msgstr "Tidak bisa mengirim ke agen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Pesan Anda tidak dapat dikirim. Pesan sudah kembali di kolom penulisan."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Tidak dapat membagikan kartu penggunaan. Coba unduh gambarnya."
+
 msgid "Couldn't stage changes"
 msgstr "Tidak bisa men-stage perubahan"
 
@@ -6534,6 +6546,9 @@ msgstr "Saat ini"
 
 msgid "Current access"
 msgstr "Akses saat ini"
+
+msgid "Current leaderboard tier"
+msgstr "Tingkat papan peringkat saat ini"
 
 msgid "Current level"
 msgstr "Level saat ini"
@@ -7878,6 +7893,9 @@ msgstr "esc untuk menutup"
 msgid "esc to exit"
 msgstr "esc untuk keluar"
 
+msgid "Estimated cost"
+msgstr "Estimasi biaya"
+
 msgid "Event"
 msgstr "Peristiwa"
 
@@ -9174,6 +9192,9 @@ msgstr "Dari snapshot worktree sebelum dan sesudah giliran ini. Chat lain bekerj
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Dari snapshot worktree sebelum dan sesudah giliran ini. Chat lain bekerja di sini pada saat yang sama, jadi daftar ini hanya berisi file yang diedit chat ini dengan alat filenya. Perubahan lain dicantumkan terpisah."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "Dari log lokal host ini. Estimasi biaya menggunakan harga API, bukan tagihan Anda. PR dikaitkan dengan agen ruang kerja dan dapat dihitung untuk lebih dari satu agen."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter disembunyikan — beralih ke Markdown untuk mengeditnya"
 
@@ -9281,6 +9302,9 @@ msgstr "Manfaatkan Paradev lebih jauh"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Dapatkan pemberitahuan saat Paradev tersedia di Windows."
+
+msgid "Get Paradev"
+msgstr "Dapatkan Paradev"
 
 msgid "Get Paradev on your Mac"
 msgstr "Dapatkan Paradev di Mac Anda"
@@ -10760,6 +10784,12 @@ msgstr "3 bulan terakhir"
 msgid "last 30 days"
 msgstr "30 hari terakhir"
 
+msgid "Last 30 days"
+msgstr "30 hari terakhir"
+
+msgid "Last 365 days"
+msgstr "365 hari terakhir"
+
 msgid "Last 4 weeks"
 msgstr "4 minggu terakhir"
 
@@ -11356,6 +11386,9 @@ msgstr "Keandalan jangka panjang melewati ambang batas. Pekerjaan yang diberikan
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip khusus pintasan saat hover lama; gaya chip-nya kini menjadi bawaan TooltipContent"
 
+msgid "Longest streak (days)"
+msgstr "Rentetan terpanjang (hari)"
+
 msgid "Looking at {what}"
 msgstr "Melihat {what}"
 
@@ -11723,6 +11756,9 @@ msgstr "Di-merge"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Di-merge oleh {0}"
+
+msgid "Merged PRs"
+msgstr "PR yang digabungkan"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Sudah di-merge, tapi status PR tidak bisa disegarkan — coba lagi sebentar lagi"
@@ -13444,6 +13480,9 @@ msgstr "Hanya orang yang diundang"
 
 msgid "Only people who opted in appear here."
 msgstr "Hanya orang yang memilih ikut serta yang muncul di sini."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Hanya statistik terpilih yang dimasukkan ke gambar dan tautan publik. Nama repositori dan judul PR tidak pernah disertakan."
 
 msgid "Only the author can change a comment"
 msgstr "Hanya penulis yang bisa mengubah komentar"
@@ -17371,6 +17410,9 @@ msgstr "Pilih lingkungan"
 msgid "Select an organization"
 msgstr "Pilih sebuah organisasi"
 
+msgid "Select at least one available stat."
+msgstr "Pilih setidaknya satu statistik yang tersedia."
+
 msgid "Select base branch…"
 msgstr "Pilih branch dasar…"
 
@@ -17751,6 +17793,12 @@ msgstr "Bagikan plugin dari repo GitHub. Sematkan rilis dengan tag git."
 
 msgid "Share this page"
 msgstr "Bagikan halaman ini"
+
+msgid "Share to X"
+msgstr "Bagikan ke X"
+
+msgid "Share usage"
+msgstr "Bagikan penggunaan"
 
 msgid "Share via…"
 msgstr "Bagikan lewat…"
@@ -20516,6 +20564,12 @@ msgstr "Tooltip aktif"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Agen teratas berdasarkan token"
+
+msgid "Top model"
+msgstr "Model teratas"
+
 msgid "Top models"
 msgstr "Model teratas"
 
@@ -21151,6 +21205,12 @@ msgstr "Pengenal ramah URL, unik di dalam organisasi Anda."
 msgid "Usage"
 msgstr "Penggunaan"
 
+msgid "Usage card"
+msgstr "Kartu penggunaan"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Kartu penggunaan tidak tersedia di host ini. Perbarui host lalu coba lagi."
+
 msgid "Usage is out of date"
 msgstr "Data penggunaan sudah tidak mutakhir"
 
@@ -21432,6 +21492,9 @@ msgstr "Lihat rilis di GitHub"
 
 msgid "View usage"
 msgstr "Lihat penggunaan"
+
+msgid "View usage dashboard"
+msgstr "Lihat dasbor penggunaan"
 
 msgid "Violence or harassment"
 msgstr "Kekerasan atau pelecehan"

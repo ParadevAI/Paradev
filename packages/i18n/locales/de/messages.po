@@ -1807,6 +1807,9 @@ msgstr "Ein eigenes Profil mit Abrechnung pro Token. Der Schlüssel bleibt in de
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Ein eigenes Profil, das deine Skills, Plugins, MCP-Server und Einstellungen teilt."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Eine geteilte Momentaufnahme aus lokalen Agentenprotokollen. Die Statistiken sind selbst gemeldet. Die geschätzten Kosten basieren auf API-Tarifen und sind kein Rechnungsbetrag."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Ein Aufgabenschlüssel hat 1 bis 5 Buchstaben oder Ziffern und beginnt mit einem Buchstaben."
 
@@ -2245,6 +2248,9 @@ msgstr "Gegen main"
 msgid "Agent"
 msgstr "Agent"
 
+msgid "Agent breakdown"
+msgstr "Aufschlüsselung nach Agent"
+
 msgid "Agent commands"
 msgstr "Agent-Befehle"
 
@@ -2362,6 +2368,9 @@ msgstr "Agenten sortieren Issues, entwerfen Changelogs und aktualisieren Abhäng
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agenten nutzen dieses Konto, wenn sie Linear-Tools aufrufen."
+
+msgid "Agents used"
+msgstr "Verwendete Agenten"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Aggregierte Agent-Nutzung über alle Entwickler im Paradev-Leaderboard — Tokens, Kosten, Cache-Verhalten und welche Modelle tatsächlich genutzt werden."
@@ -6162,6 +6171,9 @@ msgstr "Senden an den Agenten fehlgeschlagen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Deine Nachricht konnte nicht gesendet werden. Sie ist wieder im Eingabefeld."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Die Nutzungskarte konnte nicht geteilt werden. Lade das Bild herunter."
+
 msgid "Couldn't stage changes"
 msgstr "Änderungen konnten nicht gestaged werden"
 
@@ -6534,6 +6546,9 @@ msgstr "Aktuell"
 
 msgid "Current access"
 msgstr "Aktueller Zugriff"
+
+msgid "Current leaderboard tier"
+msgstr "Aktuelle Ranglistenstufe"
 
 msgid "Current level"
 msgstr "Aktuelle Stufe"
@@ -7878,6 +7893,9 @@ msgstr "esc zum Schließen"
 msgid "esc to exit"
 msgstr "esc zum Beenden"
 
+msgid "Estimated cost"
+msgstr "Geschätzte Kosten"
+
 msgid "Event"
 msgstr "Ereignis"
 
@@ -9174,6 +9192,9 @@ msgstr "Aus Snapshots des Worktrees vor und nach diesem Durchlauf. Ein anderer C
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Aus Snapshots des Worktrees vor und nach diesem Durchlauf. Ein anderer Chat hat gleichzeitig hier gearbeitet, daher enthält diese Liste nur die Dateien, die dieser Chat mit seinen Datei-Tools bearbeitet hat. Andere Änderungen stehen gesondert."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "Aus lokalen Protokollen dieses Hosts. Geschätzte Kosten nutzen API-Listenpreise, nicht deine Rechnung. PRs sind mit Agenten des Arbeitsbereichs verknüpft und können für mehrere Agenten zählen."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front Matter ausgeblendet — wechsle zu Markdown, um es zu bearbeiten"
 
@@ -9281,6 +9302,9 @@ msgstr "Mehr aus Paradev herausholen"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Lass dich benachrichtigen, sobald Paradev für Windows verfügbar ist."
+
+msgid "Get Paradev"
+msgstr "Paradev herunterladen"
 
 msgid "Get Paradev on your Mac"
 msgstr "Paradev auf deinen Mac holen"
@@ -10760,6 +10784,12 @@ msgstr "Letzte 3 Monate"
 msgid "last 30 days"
 msgstr "letzte 30 Tage"
 
+msgid "Last 30 days"
+msgstr "Letzte 30 Tage"
+
+msgid "Last 365 days"
+msgstr "Letzte 365 Tage"
+
 msgid "Last 4 weeks"
 msgstr "Letzte 4 Wochen"
 
@@ -11356,6 +11386,9 @@ msgstr "Die Zuverlässigkeit über lange Zeiträume überschreitet eine Schwelle
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip nur mit Kürzel bei langem Hover; sein Chip-Stil ist jetzt der TooltipContent-Standard"
 
+msgid "Longest streak (days)"
+msgstr "Längste Serie (Tage)"
+
 msgid "Looking at {what}"
 msgstr "{what} wird angesehen"
 
@@ -11723,6 +11756,9 @@ msgstr "Zusammengeführt"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Zusammengeführt von {0}"
+
+msgid "Merged PRs"
+msgstr "Zusammengeführte PRs"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Zusammengeführt, aber der PR-Status konnte nicht aktualisiert werden — versuch es gleich noch einmal"
@@ -13444,6 +13480,9 @@ msgstr "Nur eingeladene Personen"
 
 msgid "Only people who opted in appear here."
 msgstr "Hier erscheinen nur Personen, die sich dafür entschieden haben."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Nur ausgewählte Statistiken erscheinen im Bild und öffentlichen Link. Repository-Namen und PR-Titel werden nie aufgenommen."
 
 msgid "Only the author can change a comment"
 msgstr "Nur die verfassende Person kann einen Kommentar ändern"
@@ -17371,6 +17410,9 @@ msgstr "Umgebung auswählen"
 msgid "Select an organization"
 msgstr "Organisation auswählen"
 
+msgid "Select at least one available stat."
+msgstr "Wähle mindestens eine verfügbare Statistik aus."
+
 msgid "Select base branch…"
 msgstr "Basis-Branch auswählen…"
 
@@ -17751,6 +17793,12 @@ msgstr "Teile Plugins aus einem GitHub-Repo. Pinne Releases mit Git-Tags."
 
 msgid "Share this page"
 msgstr "Diese Seite teilen"
+
+msgid "Share to X"
+msgstr "Auf X teilen"
+
+msgid "Share usage"
+msgstr "Nutzung teilen"
 
 msgid "Share via…"
 msgstr "Teilen über…"
@@ -20516,6 +20564,12 @@ msgstr "Tooltip an"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Top-Agenten nach Tokens"
+
+msgid "Top model"
+msgstr "Meistgenutztes Modell"
+
 msgid "Top models"
 msgstr "Top-Modelle"
 
@@ -21151,6 +21205,12 @@ msgstr "URL-tauglicher Bezeichner, eindeutig innerhalb deiner Organisation."
 msgid "Usage"
 msgstr "Nutzung"
 
+msgid "Usage card"
+msgstr "Nutzungskarte"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Nutzungskarten sind auf diesem Host nicht verfügbar. Aktualisiere den Host und versuche es erneut."
+
 msgid "Usage is out of date"
 msgstr "Die Nutzungsdaten sind veraltet"
 
@@ -21432,6 +21492,9 @@ msgstr "Releases auf GitHub ansehen"
 
 msgid "View usage"
 msgstr "Nutzung ansehen"
+
+msgid "View usage dashboard"
+msgstr "Nutzungsdashboard ansehen"
 
 msgid "Violence or harassment"
 msgstr "Gewalt oder Belästigung"

@@ -1807,6 +1807,9 @@ msgstr "按 token 计费的独立配置文件。密钥保存在 {0} CLI 中。"
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "共享你的技能、插件、MCP服务器和设置的独立配置文件。"
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "从本地智能体日志共享的快照。统计数据由用户自行提供。预估费用基于 API 费率，并非账单金额。"
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "任务键为 1 到 5 个字母或数字，且以字母开头。"
 
@@ -2245,6 +2248,9 @@ msgstr "对比main"
 msgid "Agent"
 msgstr "智能体"
 
+msgid "Agent breakdown"
+msgstr "智能体明细"
+
 msgid "Agent commands"
 msgstr "智能体命令"
 
@@ -2362,6 +2368,9 @@ msgstr "智能体自动分拣 issue、起草 changelog、升级依赖。你只�
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "智能体调用 Linear 工具时会使用此账号。"
+
+msgid "Agents used"
+msgstr "使用的智能体"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Paradev 排行榜上所有开发者的智能体使用汇总 —— token、成本、缓存表现，以及大家实际常用的模型。"
@@ -6162,6 +6171,9 @@ msgstr "无法发送给智能体"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "无法发送你的消息。消息已放回输入框。"
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "无法分享用量卡片。请尝试下载图片。"
+
 msgid "Couldn't stage changes"
 msgstr "无法暂存更改"
 
@@ -6534,6 +6546,9 @@ msgstr "当前"
 
 msgid "Current access"
 msgstr "当前访问权限"
+
+msgid "Current leaderboard tier"
+msgstr "当前排行榜等级"
 
 msgid "Current level"
 msgstr "当前等级"
@@ -7878,6 +7893,9 @@ msgstr "按esc关闭"
 msgid "esc to exit"
 msgstr "esc退出"
 
+msgid "Estimated cost"
+msgstr "预估费用"
+
 msgid "Event"
 msgstr "事件"
 
@@ -9174,6 +9192,9 @@ msgstr "根据本轮前后的 worktree 快照统计。另一个聊天同时在�
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "根据本轮前后的 worktree 快照统计。另一个聊天同时在此工作，因此此列表只包含本聊天用文件工具编辑过的文件，其他更改单独列出。"
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "基于此主机的本地日志。预估费用采用 API 标价，并非实际账单。PR 与工作区智能体关联，同一个 PR 可能计入多个智能体。"
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "已隐藏front matter，切换到Markdown可编辑"
 
@@ -9281,6 +9302,9 @@ msgstr "把Paradev用得更好"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Paradev支持Windows时通知我。"
+
+msgid "Get Paradev"
+msgstr "获取 Paradev"
 
 msgid "Get Paradev on your Mac"
 msgstr "在Mac上获取Paradev"
@@ -10760,6 +10784,12 @@ msgstr "最近3个月"
 msgid "last 30 days"
 msgstr "最近30天"
 
+msgid "Last 30 days"
+msgstr "过去 30 天"
+
+msgid "Last 365 days"
+msgstr "过去 365 天"
+
 msgid "Last 4 weeks"
 msgstr "最近4周"
 
@@ -11356,6 +11386,9 @@ msgstr "长周期可靠性越过了一个门槛。傍晚6点派出去的活儿�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "长时间悬停才出现、只显示快捷键的tooltip；它的chip样式现在是TooltipContent的默认样式"
 
+msgid "Longest streak (days)"
+msgstr "最长连续天数"
+
 msgid "Looking at {what}"
 msgstr "正在查看 {what}"
 
@@ -11723,6 +11756,9 @@ msgstr "已合并"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "由{0}合并"
+
+msgid "Merged PRs"
+msgstr "已合并 PR"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "已合并，但无法刷新PR状态 — 请稍后重试"
@@ -13444,6 +13480,9 @@ msgstr "仅受邀者"
 
 msgid "Only people who opted in appear here."
 msgstr "只有选择加入的人才会出现在这里。"
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "只有选中的统计数据会包含在图片和公开链接中。仓库名称和 PR 标题不会被包含。"
 
 msgid "Only the author can change a comment"
 msgstr "只有作者可以修改评论"
@@ -17371,6 +17410,9 @@ msgstr "选择一个环境"
 msgid "Select an organization"
 msgstr "选择一个组织"
 
+msgid "Select at least one available stat."
+msgstr "请至少选择一项可用的统计数据。"
+
 msgid "Select base branch…"
 msgstr "选择基础分支…"
 
@@ -17751,6 +17793,12 @@ msgstr "从 GitHub 仓库分享插件，用 git 标签固定版本。"
 
 msgid "Share this page"
 msgstr "分享此页面"
+
+msgid "Share to X"
+msgstr "分享到 X"
+
+msgid "Share usage"
+msgstr "分享用量"
 
 msgid "Share via…"
 msgstr "分享方式…"
@@ -20516,6 +20564,12 @@ msgstr "Tooltip显示于"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "按令牌数排名的智能体"
+
+msgid "Top model"
+msgstr "最常用模型"
+
 msgid "Top models"
 msgstr "模型排行"
 
@@ -21151,6 +21205,12 @@ msgstr "URL友好的标识符，在你的组织内唯一。"
 msgid "Usage"
 msgstr "用量"
 
+msgid "Usage card"
+msgstr "用量卡片"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "此主机不支持用量卡片。请更新主机后重试。"
+
 msgid "Usage is out of date"
 msgstr "用量数据已过时"
 
@@ -21432,6 +21492,9 @@ msgstr "在GitHub上查看发布"
 
 msgid "View usage"
 msgstr "查看用量"
+
+msgid "View usage dashboard"
+msgstr "查看用量仪表盘"
 
 msgid "Violence or harassment"
 msgstr "暴力或骚扰"

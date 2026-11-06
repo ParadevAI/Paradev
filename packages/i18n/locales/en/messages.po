@@ -1807,6 +1807,9 @@ msgstr "A separate pay-per-token profile. The key stays in the {0} CLI."
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "A separate profile that shares your skills, plugins, MCP servers, and settings."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "A task key is 1 to 5 letters or numbers and starts with a letter."
 
@@ -2245,6 +2248,9 @@ msgstr "Against Main"
 msgid "Agent"
 msgstr "Agent"
 
+msgid "Agent breakdown"
+msgstr "Agent breakdown"
+
 msgid "Agent commands"
 msgstr "Agent commands"
 
@@ -2362,6 +2368,9 @@ msgstr "Agents triage issues, draft changelogs, and bump dependencies on their o
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents use this account when they call Linear tools."
+
+msgid "Agents used"
+msgstr "Agents used"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
@@ -6162,6 +6171,9 @@ msgstr "Couldn't send to agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Couldn't send your message. It's back in the composer."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Couldn't share usage card. Try downloading the image."
+
 msgid "Couldn't stage changes"
 msgstr "Couldn't stage changes"
 
@@ -6534,6 +6546,9 @@ msgstr "Current"
 
 msgid "Current access"
 msgstr "Current access"
+
+msgid "Current leaderboard tier"
+msgstr "Current leaderboard tier"
 
 msgid "Current level"
 msgstr "Current level"
@@ -7878,6 +7893,9 @@ msgstr "esc to dismiss"
 msgid "esc to exit"
 msgstr "esc to exit"
 
+msgid "Estimated cost"
+msgstr "Estimated cost"
+
 msgid "Event"
 msgstr "Event"
 
@@ -9174,6 +9192,9 @@ msgstr "From snapshots of the worktree before and after this turn. Another chat 
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter hidden — switch to Markdown to edit it"
 
@@ -9281,6 +9302,9 @@ msgstr "Get more out of Paradev"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Get notified when Paradev is available on Windows."
+
+msgid "Get Paradev"
+msgstr "Get Paradev"
 
 msgid "Get Paradev on your Mac"
 msgstr "Get Paradev on your Mac"
@@ -10760,6 +10784,12 @@ msgstr "Last 3 months"
 msgid "last 30 days"
 msgstr "last 30 days"
 
+msgid "Last 30 days"
+msgstr "Last 30 days"
+
+msgid "Last 365 days"
+msgstr "Last 365 days"
+
 msgid "Last 4 weeks"
 msgstr "Last 4 weeks"
 
@@ -11356,6 +11386,9 @@ msgstr "Long-horizon reliability crosses a threshold. Work assigned at 6pm is me
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 
+msgid "Longest streak (days)"
+msgstr "Longest streak (days)"
+
 msgid "Looking at {what}"
 msgstr "Looking at {what}"
 
@@ -11723,6 +11756,9 @@ msgstr "Merged"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "Merged by {0}"
+
+msgid "Merged PRs"
+msgstr "Merged PRs"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Merged, but couldn't refresh PR state — try again in a moment"
@@ -13444,6 +13480,9 @@ msgstr "Only people invited"
 
 msgid "Only people who opted in appear here."
 msgstr "Only people who opted in appear here."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Only selected stats go into your image and public link. Repository names and PR titles are never included."
 
 msgid "Only the author can change a comment"
 msgstr "Only the author can change a comment"
@@ -17371,6 +17410,9 @@ msgstr "Select an environment"
 msgid "Select an organization"
 msgstr "Select an organization"
 
+msgid "Select at least one available stat."
+msgstr "Select at least one available stat."
+
 msgid "Select base branch…"
 msgstr "Select base branch…"
 
@@ -17751,6 +17793,12 @@ msgstr "Share plugins from a GitHub repo. Pin releases with git tags."
 
 msgid "Share this page"
 msgstr "Share this page"
+
+msgid "Share to X"
+msgstr "Share to X"
+
+msgid "Share usage"
+msgstr "Share usage"
 
 msgid "Share via…"
 msgstr "Share via…"
@@ -20516,6 +20564,12 @@ msgstr "Tooltip on"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Top agents by tokens"
+
+msgid "Top model"
+msgstr "Top model"
+
 msgid "Top models"
 msgstr "Top models"
 
@@ -21151,6 +21205,12 @@ msgstr "URL-friendly identifier, unique within your organization."
 msgid "Usage"
 msgstr "Usage"
 
+msgid "Usage card"
+msgstr "Usage card"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Usage cards are unavailable on this host. Update the host and try again."
+
 msgid "Usage is out of date"
 msgstr "Usage is out of date"
 
@@ -21432,6 +21492,9 @@ msgstr "View releases on GitHub"
 
 msgid "View usage"
 msgstr "View usage"
+
+msgid "View usage dashboard"
+msgstr "View usage dashboard"
 
 msgid "Violence or harassment"
 msgstr "Violence or harassment"
