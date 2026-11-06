@@ -22,11 +22,15 @@ import {
 
 export type ConnectionConflict = { ownerEmail: string | null };
 
-// Their inbound events resolve to one org through `accountConnection`, so a
-// second org on the same account would take over the first org's events.
+// A second org on the same account would break the first: Slack, Teams and
+// Sentry route inbound events to one org; a Google disconnect revokes the
+// shared grant and stops the mailbox watch; Linear suspension revokes tokens.
 const SINGLE_ORG_CONNECTORS: ReadonlySet<string> = new Set([
 	"slack",
 	"microsoft_teams",
+	"sentry",
+	"google",
+	"linear",
 ]);
 
 export async function connectionConflict(
