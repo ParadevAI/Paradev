@@ -21985,7 +21985,7 @@ msgid "You stopped this response"
 msgstr "Detuviste esta respuesta"
 
 msgid "You stopped this response at a tool call"
-msgstr "Detuviste esta respuesta en una llamada a herramienta"
+msgstr "Detuviste esta respuesta en una llamada a una herramienta"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
