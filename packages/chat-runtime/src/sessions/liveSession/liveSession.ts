@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { CONTINUE_PROMPT } from "@superset/chat/core";
+import { CONTINUE_PROMPT, userStopMarker } from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
@@ -130,6 +130,9 @@ export class LiveSession {
 	private onHeldReleased: (() => void) | null = null;
 	private carriedFailure: Turn | null = null;
 	private carriedCanceledToolIds: ReadonlySet<string> = new Set();
+	/** The agent's "stopped by user" note the shutdown wrote, replayed after the last prompt. */
+	private replayedShutdownStop: { item: UserMessage; turnId: string } | null =
+		null;
 	private carriedAtMs: number | null = null;
 	private readonly turnStarts = new Map<string, number>();
 	/** Replays stamp items ahead of the clock to keep their order. */
@@ -653,6 +656,7 @@ export class LiveSession {
 				) {
 					this.turnAnchors.set(event.turnId, event.item.id);
 				}
+				this.noteReplayedStop(event.item, event.turnId);
 				this.appendDurable({
 					type: "item",
 					item: this.withCarriedCancel(event.item),
@@ -731,6 +735,18 @@ export class LiveSession {
 		}
 	}
 
+	private noteReplayedStop(item: Item, turnId: string): void {
+		if (this.carriedFailure?.error?.kind !== "host_stopped") return;
+		if (item.kind !== "user_message") return;
+		const message = item as UserMessage;
+		const text =
+			message.content[0]?.type === "text" ? message.content[0].text : "";
+		this.replayedShutdownStop =
+			message.content.length === 1 && userStopMarker(text)
+				? { item: message, turnId }
+				: null;
+	}
+
 	private withCarriedCancel(item: Item): Item {
 		return item.kind === "tool_call" &&
 			item.status === "failed" &&
@@ -743,6 +759,15 @@ export class LiveSession {
 		const turn = this.carriedFailure;
 		if (!turn || this.sessionState.status === "starting") return;
 		this.carriedFailure = null;
+		const shutdownStop = this.replayedShutdownStop;
+		this.replayedShutdownStop = null;
+		if (shutdownStop) {
+			this.appendDurable({
+				type: "item",
+				item: { ...shutdownStop.item, discarded: true },
+				turnId: shutdownStop.turnId,
+			});
+		}
 		const at = Math.max(this.now(), this.latestStartMs + 1);
 		this.carriedAtMs = at;
 		this.appendDurable({

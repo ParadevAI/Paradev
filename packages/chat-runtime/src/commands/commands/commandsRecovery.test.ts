@@ -311,6 +311,13 @@ describe("replacing a chat whose agent died", () => {
 					: [],
 		);
 		expect(replayed.at(-1)).toMatchObject({ status: "canceled" });
+		const marker = journalEnvelopes(runtime, replacement.sessionId).flatMap(
+			(envelope) =>
+				envelope.event.type === "item" && envelope.event.item.id === "marker-1"
+					? [envelope.event.item]
+					: [],
+		);
+		expect(marker.at(-1)).toMatchObject({ discarded: true });
 		await runtime.dispose();
 	});
 
@@ -353,6 +360,21 @@ function hangingRegistry(): HarnessRegistry {
 								kind: "item",
 								turnId: "history",
 								item: { ...COMMAND, status: "failed" },
+							},
+							{
+								kind: "item",
+								turnId: "history",
+								item: {
+									id: "marker-1",
+									kind: "user_message",
+									startedAtMs: 3,
+									content: [
+										{
+											type: "text",
+											text: "[Request interrupted by user for tool use]",
+										},
+									],
+								},
 							},
 							{ kind: "session", session: { status: "idle" } },
 						],
