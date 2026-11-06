@@ -19872,11 +19872,11 @@ msgstr "Düşünülüyor..."
 msgid "Thirty"
 msgstr "Otuz"
 
-msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
-msgstr "Bu {plugin} hesabını zaten {owner} bağlamış. Önce bağlantıyı kesmesini isteyin."
-
 msgid "This {plugin} account is already connected by another Paradev organization."
 msgstr "Bu {plugin} hesabı zaten başka bir Paradev kuruluşuna bağlı."
+
+msgid "This {plugin} account is already connected to another Paradev organization by {owner}. Ask them to disconnect it there first."
+msgstr "Bu {plugin} hesabını {owner} zaten başka bir Paradev kuruluşuna bağlamış. Önce oradaki bağlantıyı kesmesini isteyin."
 
 msgid "This action is irreversible."
 msgstr "Bu işlem geri alınamaz."

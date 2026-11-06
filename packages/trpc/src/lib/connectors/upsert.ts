@@ -22,6 +22,13 @@ import {
 
 export type ConnectionConflict = { ownerEmail: string | null };
 
+// Their inbound events resolve to one org through `accountConnection`, so a
+// second org on the same account would take over the first org's events.
+const SINGLE_ORG_CONNECTORS: ReadonlySet<string> = new Set([
+	"slack",
+	"microsoft_teams",
+]);
+
 export async function connectionConflict(
 	connector: string,
 	externalAccountId: string,
@@ -62,12 +69,14 @@ export async function upsertConnection(input: {
 }): Promise<UpsertConnectionResult> {
 	const { connector, slug, organizationId, userId, tokens, identity } = input;
 
-	const conflict = await connectionConflict(
-		slug,
-		identity.account.id,
-		organizationId,
-	);
-	if (conflict) return { conflict };
+	if (SINGLE_ORG_CONNECTORS.has(slug)) {
+		const conflict = await connectionConflict(
+			slug,
+			identity.account.id,
+			organizationId,
+		);
+		if (conflict) return { conflict };
+	}
 
 	const ownerKind = connector.scope;
 	const target =
