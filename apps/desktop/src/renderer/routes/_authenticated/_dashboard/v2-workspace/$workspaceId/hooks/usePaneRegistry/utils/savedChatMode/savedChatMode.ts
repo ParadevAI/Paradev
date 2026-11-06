@@ -1,5 +1,10 @@
+import { isStartingMode } from "@superset/chat/core";
+
+/**
+ * Modes saved here before the host remembered them. Nothing writes this key
+ * now: each agent's entry moves to the host on its next new chat, then goes.
+ */
 const STORAGE_KEY = "chatModeByAgent";
-const MAX_AGENTS = 32;
 
 type SavedModes = Record<string, string>;
 
@@ -20,38 +25,29 @@ function readSavedModes(): SavedModes {
 	}
 }
 
-const NEVER_STARTING_MODES = new Set(["plan"]);
-
-export function withSavedMode(
+export function withoutSavedMode(
 	saved: SavedModes,
 	presetId: string,
-	modeId: string,
-): SavedModes {
-	if (NEVER_STARTING_MODES.has(modeId)) return saved;
-	const { [presetId]: _previous, ...rest } = saved;
-	return Object.fromEntries(
-		Object.entries({ ...rest, [presetId]: modeId }).slice(-MAX_AGENTS),
-	);
+): SavedModes | null {
+	const { [presetId]: _forgotten, ...rest } = saved;
+	return Object.keys(rest).length > 0 ? rest : null;
 }
 
 export function freshStartMode(
 	paneModeId: string | undefined,
 	savedModeId: string | undefined,
 ): string | undefined {
-	return paneModeId && !NEVER_STARTING_MODES.has(paneModeId)
-		? paneModeId
-		: savedModeId;
+	return paneModeId && isStartingMode(paneModeId) ? paneModeId : savedModeId;
 }
 
 export function readSavedChatMode(presetId: string): string | undefined {
 	return readSavedModes()[presetId];
 }
 
-export function saveChatMode(presetId: string, modeId: string): void {
+export function forgetSavedChatMode(presetId: string): void {
 	try {
-		window.localStorage.setItem(
-			STORAGE_KEY,
-			JSON.stringify(withSavedMode(readSavedModes(), presetId, modeId)),
-		);
+		const rest = withoutSavedMode(readSavedModes(), presetId);
+		if (rest) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rest));
+		else window.localStorage.removeItem(STORAGE_KEY);
 	} catch {}
 }

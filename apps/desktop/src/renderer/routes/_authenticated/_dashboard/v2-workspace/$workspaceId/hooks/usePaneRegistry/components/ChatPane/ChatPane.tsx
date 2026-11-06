@@ -10,7 +10,6 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
-import { saveChatMode } from "../../utils/savedChatMode";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -155,7 +154,7 @@ export function ChatPane({
 				pendingPrompts={pendingPrompts}
 				launchPrompt={data.launchPrompt}
 				modelId={data.chatModelId}
-				modelLabel={data.chatModelLabel}
+				effortId={data.chatEffortId}
 				modeId={data.chatModeId}
 				onSessionInfo={(info) => {
 					const next = sessionInfoPaneData(latest.current, info);
@@ -168,9 +167,7 @@ export function ChatPane({
 					ctx.actions.updateData(
 						restartedChatPaneData(data, {
 							agent: { id: presetId },
-							...(model
-								? { chatModelId: model.id, chatModelLabel: model.label }
-								: {}),
+							...(model ? { chatModelId: model.id } : {}),
 							...(modeId ? { chatModeId: modeId } : {}),
 							...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
 						}),
@@ -186,9 +183,7 @@ export function ChatPane({
 									terminalId: crypto.randomUUID(),
 									sessionId: null,
 									agent: { id: presetId },
-									...(model
-										? { chatModelId: model.id, chatModelLabel: model.label }
-										: {}),
+									...(model ? { chatModelId: model.id } : {}),
 									...(modeId ? { chatModeId: modeId } : {}),
 									...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
 								} satisfies ChatPaneData,
@@ -197,7 +192,7 @@ export function ChatPane({
 					})
 				}
 				onOpenForkedChat={({ sessionId, terminalId }) => {
-					const { agent, chatModelId, chatModelLabel, chatModeId, chatTitle } =
+					const { agent, chatModelId, chatEffortId, chatModeId, chatTitle } =
 						latest.current;
 					ctx.store.getState().addTab({
 						panes: [
@@ -208,7 +203,7 @@ export function ChatPane({
 									sessionId,
 									...(agent ? { agent: { id: agent.id } } : {}),
 									...(chatModelId ? { chatModelId } : {}),
-									...(chatModelLabel ? { chatModelLabel } : {}),
+									...(chatEffortId ? { chatEffortId } : {}),
 									...(chatModeId ? { chatModeId } : {}),
 									...(chatTitle ? { chatTitle } : {}),
 								} satisfies ChatPaneData,
@@ -217,20 +212,19 @@ export function ChatPane({
 					});
 				}}
 				onRewound={(prompt) => {
-					const { agent, chatModelId, chatModelLabel, chatModeId } =
+					const { agent, chatModelId, chatEffortId, chatModeId } =
 						latest.current;
 					ctx.actions.updateData(
 						restartedChatPaneData(latest.current, {
 							...(agent ? { agent: { id: agent.id } } : {}),
 							...(chatModelId ? { chatModelId } : {}),
-							...(chatModelLabel ? { chatModelLabel } : {}),
+							...(chatEffortId ? { chatEffortId } : {}),
 							...(chatModeId ? { chatModeId } : {}),
 							pendingPrompt: prompt,
 						}),
 					);
 				}}
 				onModeChange={(chatModeId) => {
-					if (data.agent) saveChatMode(data.agent.id, chatModeId);
 					latest.current = { ...latest.current, chatModeId };
 					ctx.actions.updateData(latest.current);
 				}}

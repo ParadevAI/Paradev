@@ -120,3 +120,16 @@ export function hostReadsAttachmentParts(
 		version !== null && semver.gte(version, ATTACHMENT_PARTS_MIN_HOST_VERSION)
 	);
 }
+
+/** The first host that remembers the model, effort and mode a user picks in a chat. */
+export const CHAT_SELECTIONS_MIN_HOST_VERSION = "2.0.6";
+
+/** Whether a host keeps chat picks itself, so a client can drop its own copy. */
+export function hostRemembersChatSelections(
+	hostVersion: string | null | undefined,
+): boolean {
+	const version = semver.coerce(hostVersion ?? "");
+	return (
+		version !== null && semver.gte(version, CHAT_SELECTIONS_MIN_HOST_VERSION)
+	);
+}

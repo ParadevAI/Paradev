@@ -96,6 +96,7 @@ export const hostManagementRouter = {
 					version: v2Hosts.version,
 					platform: v2Hosts.platform,
 					installSource: v2Hosts.installSource,
+					allowCloudWorkspaces: v2Hosts.allowCloudWorkspaces,
 				})
 				.from(v2Hosts)
 				.innerJoin(

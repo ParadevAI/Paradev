@@ -1,13 +1,22 @@
 import { expect, test } from "bun:test";
 import { sessionInfoPaneData } from "./sessionInfoPaneData";
 
-test("records the mode the session runs in, so a resume restarts in it", () => {
+test("records the model, effort and mode the session runs on, so a resume restarts on them", () => {
 	expect(
 		sessionInfoPaneData(
-			{ terminalId: "t", sessionId: "s", agent: { id: "claude" } },
-			{ modeId: "bypassPermissions" },
+			{
+				terminalId: "t",
+				sessionId: "s",
+				agent: { id: "claude" },
+				chatModelId: "launched-with",
+			},
+			{ modelId: "switched-to", effortId: "high", modeId: "bypassPermissions" },
 		),
-	).toMatchObject({ chatModeId: "bypassPermissions" });
+	).toMatchObject({
+		chatModelId: "switched-to",
+		chatEffortId: "high",
+		chatModeId: "bypassPermissions",
+	});
 });
 
 test("returns null when nothing changed", () => {

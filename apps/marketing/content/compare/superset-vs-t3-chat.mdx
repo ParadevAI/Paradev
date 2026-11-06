@@ -2,7 +2,7 @@
 title: "Paradev vs T3 Chat (2026): Agent Orchestration vs Multi-Model AI Chat"
 description: "Compare Paradev and T3 Chat for AI-assisted development. See how local coding-agent orchestration differs from a hosted multi-model chat app."
 date: 2026-03-21
-lastUpdated: 2026-09-24
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - t3-chat
@@ -14,7 +14,7 @@ keywords:
   - multi model chat for developers
 ---
 
-T3 Chat and Paradev both help developers work with AI, but they sit at different layers of the stack. T3 Chat is a hosted multi-model chat product. Paradev is a local-first agent workspace with built-in chat, in-app browser, diff/file review, and Git worktree orchestration. They overlap more than a pure terminal-vs-chat comparison would suggest, but they are still complementary much more often than direct substitutes.
+T3 Chat and Paradev both help developers work with AI, but they sit at different layers of the stack. T3 Chat is a hosted multi-model chat product. Paradev is a local-first agent workspace with a chat interface, in-app browser, diff/file review, and Git worktree orchestration. They overlap more than a pure terminal-vs-chat comparison would suggest, but they are still complementary much more often than direct substitutes.
 
 ---
 
@@ -23,18 +23,18 @@ T3 Chat and Paradev both help developers work with AI, but they sit at different
 | | **Paradev** | **T3 Chat** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Multi-model AI chat app |
-| **What it does** | Runs multiple coding agents in parallel with Git worktrees, built-in chat, diff/file review, and browser preview | Lets you chat with multiple frontier models from one hosted interface |
-| **AI approach** | Agent-agnostic orchestration plus Paradev Chat and MCP tools | Hosted chat surface with model switching, search, attachments, and profiles |
+| **What it does** | Runs multiple coding agents in parallel with Git worktrees, a chat interface, diff/file review, and browser preview | Lets you chat with multiple frontier models from one hosted interface |
+| **AI approach** | Agent-agnostic orchestration plus a chat interface and MCP tools | Hosted chat surface with model switching, search, attachments, and profiles |
 | **Execution model** | Local agents can read, edit, and run code in your repo | Chat-first workflow; useful for questions, planning, and pasted context |
 | **Parallelism** | Core feature: many agents across separate worktrees | Conversation-based, not agent orchestration |
 | **Isolation** | Git worktrees for local branch-based workspaces | No Git worktree or branch isolation |
-| **Pricing model** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free up to usage limits, with paid usage beyond those limits |
+| **Pricing model** | Open source (MIT); free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free up to usage limits, with paid usage beyond those limits |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It is strongest when the real problem is coordination: multiple tasks, multiple branches, and multiple autonomous coding sessions that all need review.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a [chat interface](https://docs.paradev.com/chat), an in-app browser for docs and dev servers, port management, and MCP tooling. Paradev is open source under the MIT License. It is strongest when the real problem is coordination: multiple tasks, multiple branches, and multiple autonomous coding sessions that all need review.
 
 ---
 
@@ -48,7 +48,7 @@ T3 Chat is a hosted AI chat app built around fast access to many models from one
 
 ### Repo-Execution Workspace vs Chat Front End
 
-Paradev now has its own built-in chat panel and Paradev Chat agent, but the center of gravity is still repo execution. Tasks turn into worktrees, agents can edit files and run commands, and you review concrete diffs. T3 Chat is the opposite: it is a hosted conversation product first. That makes it good for reasoning, brainstorming, and one-off coding help, but not a substitute for local multi-agent execution.
+Paradev now has a chat interface. It shows a Claude Code, Codex, OpenCode, or Pi session as a chat, and a CLI/Chat toggle keeps the same session. It runs the coding agent, not a bare model, so the center of gravity is still repo execution. Tasks turn into worktrees, agents can edit files and run commands, and you review concrete diffs. T3 Chat is the opposite: it is a hosted conversation product first. That makes it good for reasoning, brainstorming, and one-off coding help, but not a substitute for local multi-agent execution.
 
 ### Local Repo Execution vs Hosted Conversations
 
@@ -104,7 +104,7 @@ Not in the same sense as Claude Code or Codex. T3 Chat is a hosted multi-model c
 
 ### Can T3 Chat replace Paradev?
 
-Not if you need actual repo execution. Paradev now includes chat as well, but its core primitives are still worktrees, agents, diffs, browser preview, and MCP-connected workflow. T3 Chat is better understood as a hosted chat layer, not an orchestration layer.
+Not if you need actual repo execution. Paradev now includes a chat interface as well, but its core primitives are still worktrees, agents, diffs, browser preview, and MCP-connected workflow. T3 Chat is better understood as a hosted chat layer, not an orchestration layer.
 
 ### Can I use T3 Chat alongside Paradev?
 
@@ -112,4 +112,4 @@ Yes. A practical pattern is to use T3 Chat for quick model comparisons, debuggin
 
 ### Does T3 Chat run inside my repository?
 
-Not the way Paradev-orchestrated agents do. T3 Chat is a hosted service with conversation state, while Paradev's agents run locally in Git worktrees on your machine.
+Not the way Paradev-orchestrated agents do. T3 Chat is a hosted service with conversation state, while Paradev's agents run in Git worktrees on your machine, on your own hosts, or in [cloud workspaces](/cloud) (beta).

@@ -2336,6 +2336,9 @@ msgstr "代理程式無法存取 {0} 的工具"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "代理程式無需中途干預即可完成常規工單。"
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "之後，你的雲端工作區中的代理程式就能使用 <0>--host</0> 參數在此主機上執行指令。此主機必須能透過中繼存取。"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "代理程式會在雲端持續工作。可在桌面版、iPhone 或 iPad 上重新開啟工作區。"
 
@@ -2581,6 +2584,9 @@ msgstr "本次會話內允許"
 
 msgid "Allow microphone access to use dictation"
 msgstr "請允許麥克風存取以使用語音輸入"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "允許我的雲端工作區存取此主機"
 
 msgid "Allow remote access to this device via relay"
 msgstr "允許透過中繼遠端存取此裝置"
@@ -2840,6 +2846,9 @@ msgstr "任意內容"
 
 msgid "Anything else? (optional)"
 msgstr "還有其他嗎？（選填）"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "你建立的雲端工作區中執行的任何程式都將能在此主機上建立工作區、啟動代理程式並執行指令，包括依照網頁或儲存庫中的指示行事的代理程式。請只在需要時開啟。"
 
 msgid "Anywhere"
 msgstr "所有位置"
@@ -10973,6 +10982,9 @@ msgstr "允許代理程式使用你的 {browserName} 登入資訊嗎？"
 msgid "Let the agent drive."
 msgstr "讓代理程式來操作。"
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "允許你的雲端工作區存取此主機？"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "讓你的組織能列出並複製儲存庫"
 
@@ -13444,6 +13456,9 @@ msgstr "只有作者可以修改留言"
 
 msgid "Only the author can edit a comment"
 msgstr "只有作者才能編輯評論"
+
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "只有主機擁有者可以允許雲端工作區存取它"
 
 msgid "Only the host owner can set its wake command"
 msgstr "只有主機擁有者才能設定其喚醒命令"
@@ -18769,6 +18784,9 @@ msgstr "停止關注"
 msgid "Stop workspace run command"
 msgstr "停止工作區執行命令"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "停止你的雲端工作區存取此主機？"
+
 msgid "stopped"
 msgstr "已停止"
 
@@ -20639,6 +20657,9 @@ msgstr "把例行雜務交給依排程或在事件發生時執行的代理程式
 msgid "Turn Fast mode on or off"
 msgstr "開啟或關閉快速模式"
 
+msgid "Turn off"
+msgstr "關閉"
+
 msgid "Turn off manual mode"
 msgstr "關閉手動模式"
 
@@ -22326,6 +22347,9 @@ msgstr "你的變更"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "如果不儲存，你的更改將會丟失。"
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "你的雲端工作區將無法再存取此主機。"
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的程式碼預設留在本地，連線哪些服務由你明確決定。"

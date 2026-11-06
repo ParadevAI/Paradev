@@ -1,0 +1,133 @@
+---
+title: "Paradev vs Omnara (2026): Coding Agent Workspace vs Open-Source Managed Agent Platform"
+description: "Compare Paradev and Omnara. Omnara is now an open-source managed agent platform and API, not a mobile app for Claude Code. See how it differs from a workspace that runs your agent CLIs on your machine, your hosts, your own Linux server, or cloud workspaces (beta)."
+date: 2026-11-05
+lastUpdated: 2026-11-05
+type: "1v1"
+competitors:
+  - omnara
+keywords:
+  - superset vs omnara
+  - paradev vs omnara
+  - omnara alternative
+  - omnara claude code alternative
+  - claude managed agents alternative
+  - control claude code from phone
+  - background coding agents
+---
+
+Omnara changed shape in 2026. It started as a mobile and web app for watching and steering Claude Code on your own machine. Today it calls itself "the open-source managed agent platform": an API for running agents on any model and any machine, with tools, secrets, permissions, and streaming built in. Paradev is a workspace for the coding agent CLIs you already use, such as Claude Code and Codex. Each task gets its own Git worktree and terminal, on your Mac, on hosts you add, on your own Linux server, or in a Paradev cloud workspace (beta), with review and pull requests in the app. Choose Omnara when you want to build and run your own agents, in your product or for your team, on a platform you can self-host. Choose Paradev when you want to run, watch, and review existing coding agents.
+
+This comparison is published by Paradev. Omnara details were checked against [omnara.com](https://www.omnara.com), the [docs](https://docs.omnara.com/introduction), the [changelog](https://docs.omnara.com/changelog), the [machines docs](https://docs.omnara.com/machines/overview), and the [omnara-ai/omnara](https://github.com/omnara-ai/omnara) repository, README, and README history on November 5, 2026.
+
+## At a Glance
+
+| Requirement | Paradev | Omnara |
+|---|---|---|
+| What it is | A workspace that runs any CLI coding agent, one Git worktree per task | A managed agent platform: API, SDK, CLI, and dashboard to deploy and run agents |
+| Main user | Developers and teams who code with agents | Developers who build agents for their product or team |
+| Agent | Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Omnara's own agent loop, set by a YAML or API config |
+| Models | Whatever your agent uses, on your own subscriptions or keys | Any compatible model: OpenAI, Anthropic, OpenRouter, Amazon Bedrock, LiteLLM, Ollama, or self-hosted |
+| Where agents run | Your Mac; hosts you add with Remote Access; your own x64 or arm64 Linux server (Bring Your Own Cloud); [cloud workspaces](/cloud) (beta) | No machine; a sandbox from one of twelve providers; or your own macOS or Linux machine with the `omnarad` daemon |
+| Start a task from | Desktop app, iPhone and iPad app, CLI, SDK, MCP server, Slack bot, Automations | REST API, TypeScript SDK, CLI, dashboard, MCP server, Slack, Discord, GitHub, webhooks, cron |
+| Approvals | The agent CLI's own prompts in the terminal; approve or decline in the chat interface | Per-tool rule: run, ask a person first, or block |
+| Review | Changes pane with live diff, commit, push, and open PR; Pull Requests view with CI checks and line comments | Event timeline in the dashboard; GitHub agents read diffs and submit reviews |
+| Phone | iPhone and iPad app (iOS or iPadOS 26+, paid plan) | No current mobile app described |
+| Pricing | Free; Pro {{price:pro}}/user/month; Team {{price:team}}; Ultra {{price:ultra}}; Enterprise custom | $0 platform fee; pay as you go for Omnara models and machines; free to self-host |
+| License | Open source, MIT | Open source, Apache 2.0 |
+
+## What Is Omnara?
+
+The Omnara site headline is "The open-source alternative to Claude Managed Agents." Its tagline: "One API to deploy and run agents for your users and team, on any model, any machine, and any cloud." The changelog dates the relaunch to September 9, 2026.
+
+You describe an agent in a config with an instruction, a model, tools, and machine sources, and launch it with the API, the TypeScript SDK (`@omnara/sdk`), or `npx omnara agents launch`. Every step goes into an event log in Postgres. That log is the agent's state, so an agent picks up where it stopped after a crash, a restart, or a machine disconnect. Workers run the agent loop only while the agent takes a turn, so idle agents use no compute.
+
+Machines are tools the agent uses. An agent can run with no machine, on a sandbox from providers such as Daytona, E2B, Modal, or Unikraft Cloud, or on your own laptop, VM, or container through the `omnarad` daemon, which connects out and needs no inbound ports. The README says that if your laptop goes offline, the agent can continue in a sandbox and sync its work back with git. Agents also get built-in tools, MCP servers, custom tools, skills, memory stores, and subagents. Each tool can run, ask a person, or be blocked. Slack, Discord, and GitHub integrations start agents in threads or on pull requests, and cron triggers run them on a schedule. The changelog lists, as an example, a coding agent you mention in Slack that opens pull requests.
+
+### Omnara's earlier product
+
+Older versions of the repository README describe Omnara as a wrapper around the Claude Code CLI with web and mobile access to your machine. A later notice in that README says the wrapper was no longer maintained, because Claude Code's frequent updates made it hard to keep up, and that Omnara had moved to a new platform built on the Claude Agent SDK. The September 2026 relaunch replaced that with the managed agent platform. If you came to Omnara to control Claude Code from your phone, the current product does a different job.
+
+## What Is Paradev?
+
+Paradev is a workspace for the coding agents you already use. It runs each agent CLI in its own Git worktree and persistent terminal, with presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, and Pi, plus custom commands. The Changes pane shows the diff and lets you commit, push, and open a pull request. The Pull Requests view shows CI checks and line comments you can send to an agent. An in-app browser with port detection and Design Mode, Automations, Tasks synced with Linear and GitHub Issues, a Slack bot, a CLI, a TypeScript SDK, and an MCP server sit around that. A [chat interface](https://docs.paradev.com/chat) shows a Claude Code, Codex, OpenCode, or Pi session as a chat over the Agent Client Protocol, with the same login, settings, and MCP servers, and a CLI / Chat toggle switches the same session back to the terminal. Paradev is open source under the MIT License.
+
+## Key Differences
+
+### A platform for building agents vs a workspace for using them
+
+Omnara is a building block. You write the agent's config, choose its model and tools, and connect it to your app or your team's chat. It is not only for code: its examples include an SRE agent, a browser agent, and a social signal digest. That is a good fit when the agent is part of your product.
+
+Paradev does not ask you to build an agent. It runs Claude Code, Codex, and other CLIs as their makers ship them. You open a workspace, start an agent, and work with it. When a new agent CLI comes out, you can run it as a custom command.
+
+### Where the agent runs
+
+Both tools let the work happen away from your laptop, with no inbound ports. Omnara keeps the agent itself in its control plane and treats machines as tools. A machine can be a managed sandbox from one of twelve providers or your own computer with the daemon, and an agent can use several machines at once.
+
+Paradev runs the agent CLI on a host. The default host is your Mac. Remote Access adds any macOS or Linux machine through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account, and repos and agent sign-ins stay on that server. [Cloud workspaces](/cloud) (beta) are hosted by Paradev: you start from an environment with 1 to 20 GitHub repos, variables, secrets, and a region, pick a machine size, and agents keep working when your laptop is closed.
+
+### Models and subscriptions
+
+Omnara is model-agnostic. You bring keys for OpenAI, Anthropic, OpenRouter, Bedrock, and others, point it at a self-hosted model, or pay for models through Omnara credits.
+
+Paradev uses whatever your agent CLI uses. If you pay for a Claude or ChatGPT plan, Claude Code or Codex use it as they do in your own terminal. Paradev never proxies model calls.
+
+### Review and control
+
+Omnara shows each agent's work as a streamed event timeline, and you can send new messages while it works. Approvals are set per tool and enforced by the platform. GitHub agents can read a diff, comment, and submit reviews, and pushing code needs an explicit setting.
+
+Paradev is built around the code review loop. You watch the terminal, answer the agent's prompts, run your own commands in the worktree, and review a live diff. You commit, push, and open the PR from the Changes pane, then follow checks and review threads in the Pull Requests view.
+
+### Self-hosting
+
+Both are open source. Omnara is Apache 2.0, multi-tenant, and self-hosts with Docker Compose; the README warns that the local defaults are insecure and points to its deployment guide for real use. Paradev is MIT. You install the desktop app, and Bring Your Own Cloud puts the Paradev host on your own Linux server.
+
+## Pricing
+
+| Plan | Paradev | Omnara |
+|---|---|---|
+| Free | $0: desktop app, local workspaces, CLI | $0 platform fee on Omnara Cloud with your own model keys and machines; free to self-host |
+| Paid | Pro {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly; Team {{price:team}}; Ultra {{price:ultra}} | Pay as you go with Omnara credits: models at provider token rates, machines by active time |
+| Large teams | Enterprise: custom, with SAML SSO, SCIM, audit logs, SOC 2 Type II | Talk to a founder; startup credits program |
+| Cloud compute | Cloud workspaces included with Team and Ultra (beta); BYOC uses your own server | Omnara-managed machines billed by active time, or your own sandbox provider account |
+
+Paradev paid plans add Remote Access, Bring Your Own Cloud, and the iPhone and iPad app. Team and Ultra add cloud workspaces. Omnara does not publish a separate pricing page. Check [Paradev pricing](/pricing) and [omnara.com](https://www.omnara.com) for current terms.
+
+## Which Should You Choose?
+
+**Choose Omnara if you:**
+
+- Want to build your own agents and run them through an API, inside your product or for your team.
+- Want any model, including self-hosted ones, and per-tool approvals enforced by the platform.
+- Want durable agents that survive crashes and machine disconnects.
+- Want to self-host a multi-tenant agent platform under Apache 2.0.
+
+**Choose Paradev if you:**
+
+- Want to run Claude Code, Codex, or another CLI agent as it ships, on your own subscriptions.
+- Want to choose per task between your Mac, your own hosts, your own Linux server, and cloud workspaces (beta).
+- Want a live terminal, diff, commits, and pull request review next to the agent.
+- Want an iPhone and iPad app to check on workspaces.
+
+## Verdict
+
+Omnara and Paradev now solve different problems. Omnara is infrastructure for teams that build agents: an API, durable state, any model, and machines on demand. Paradev is where developers do the work with the coding agents they already use, then review and ship it. If you used Omnara's earlier app to control Claude Code from your phone, Paradev's iPhone and iPad app and its cloud options are closer to that job today.
+
+## Frequently Asked Questions
+
+### Is Omnara still a mobile app for Claude Code?
+
+No. The original Claude Code wrapper is no longer maintained, according to the notice in its repository README. Since September 2026 Omnara is an open-source managed agent platform with an API, SDK, CLI, and dashboard.
+
+### Is Omnara open source?
+
+Yes. The omnara-ai/omnara repository is under Apache 2.0. Paradev is open source under the MIT License.
+
+### Can Omnara run Claude Code or Codex?
+
+Omnara runs its own agent loop with any compatible model. It offers an MCP server and setup prompts so Claude Code, Codex, or Cursor can launch and manage Omnara agents. Paradev runs Claude Code and Codex themselves, each in its own worktree and terminal.
+
+### What is a good Omnara alternative for controlling coding agents from a phone?
+
+Paradev's iPhone and iPad app (iOS or iPadOS 26+, paid plan) opens workspaces on local hosts that are awake and online, on Bring Your Own Cloud servers, and in [cloud workspaces](/cloud) (beta). See [coding agent mobile apps](/compare/coding-agent-mobile-apps) for more options.
+

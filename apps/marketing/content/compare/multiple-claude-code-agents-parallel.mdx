@@ -2,7 +2,7 @@
 title: "How to Run Multiple Claude Code Agents in Parallel"
 description: "Learn how to run multiple Claude Code sessions at once in separate worktrees. Compare terminal tabs, tmux, manual Git worktrees, and Paradev's orchestration workflow."
 date: 2026-03-20
-lastUpdated: 2026-10-14
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - claude-code
@@ -154,10 +154,12 @@ Paradev is useful here because it removes the boring parts of manual parallelism
 - a Workspaces page that groups sessions into Needs attention, Working, Needs review, Idle, and Merged
 - Claude Code subagents listed under their parent session
 - one interface for reviewing outputs, committing, pushing, and opening pull requests
+- a [chat interface](https://docs.paradev.com/chat) that shows a Claude Code session as a chat, with a CLI / Chat toggle that keeps the same session
+- sessions that keep running on a remote host, on your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or in a [cloud workspace](/cloud) (beta)
 - an iPhone and iPad app for checking on sessions and reviewing diffs away from your desk
 - cleanup that previews dirty or unpushed work before a bulk delete
 
-If you already like Claude Code, Paradev is not a replacement. It is the layer that makes multiple Claude Code sessions manageable.
+If you already like Claude Code, Paradev is not a replacement. It is open source under the MIT License, and it is the layer that makes multiple Claude Code sessions manageable.
 
 For a product comparison, see [Paradev vs Claude Code](/compare/superset-vs-claude-code).
 

@@ -2336,6 +2336,9 @@ msgstr "エージェントは {0} のツールにアクセスできません"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "エージェントが定型チケットを途中の介入なしに完了する。"
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "クラウドワークスペースのエージェントが <0>--host</0> を使って、このホストでコマンドを実行できるようになります。ホストにリレー経由で接続できる必要があります。"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "エージェントはクラウドで動き続けます。デスクトップ、iPhone、iPad からワークスペースをもう一度開けます。"
 
@@ -2581,6 +2584,9 @@ msgstr "セッション中は許可"
 
 msgid "Allow microphone access to use dictation"
 msgstr "音声入力を使うにはマイクへのアクセスを許可してください"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "クラウドワークスペースからこのホストへのアクセスを許可"
 
 msgid "Allow remote access to this device via relay"
 msgstr "リレー経由でこのデバイスへのリモートアクセスを許可"
@@ -2840,6 +2846,9 @@ msgstr "何でも"
 
 msgid "Anything else? (optional)"
 msgstr "他にありますか？（任意）"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "あなたが作成したクラウドワークスペースで動くものはすべて、このホストでワークスペースの作成、エージェントの起動、コマンドの実行ができるようになります。Web ページやリポジトリで見つけた指示に従うエージェントも含まれます。必要な場合にのみオンにしてください。"
 
 msgid "Anywhere"
 msgstr "すべての場所"
@@ -4128,7 +4137,7 @@ msgid "Chat history"
 msgstr "チャット履歴"
 
 msgid "Chat interface"
-msgstr "チャットインターフェース"
+msgstr "チャット画面"
 
 msgid "Chat is being reworked"
 msgstr "チャットは再構築中です"
@@ -10973,6 +10982,9 @@ msgstr "エージェントに {browserName} のログインを使わせますか
 msgid "Let the agent drive."
 msgstr "エージェントに操作させる。"
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "クラウドワークスペースからこのホストへのアクセスを許可しますか？"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "組織がリポジトリを一覧表示してクローンできるようにします"
 
@@ -13444,6 +13456,9 @@ msgstr "コメントを変更できるのは作成者だけです"
 
 msgid "Only the author can edit a comment"
 msgstr "コメントを編集できるのは投稿者のみです"
+
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "クラウドワークスペースからのアクセスを許可できるのはホストのオーナーだけです"
 
 msgid "Only the host owner can set its wake command"
 msgstr "ウェイクコマンドを設定できるのはホストのオーナーのみです"
@@ -18769,6 +18784,9 @@ msgstr "監視を停止"
 msgid "Stop workspace run command"
 msgstr "ワークスペースの実行コマンドを停止"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "クラウドワークスペースからこのホストへのアクセスを停止しますか？"
+
 msgid "stopped"
 msgstr "停止"
 
@@ -20639,6 +20657,9 @@ msgstr "定型作業を、スケジュールやイベントの発生で動くエ
 msgid "Turn Fast mode on or off"
 msgstr "高速モードのオン/オフを切り替え"
 
+msgid "Turn off"
+msgstr "オフにする"
+
 msgid "Turn off manual mode"
 msgstr "手動モードをオフにする"
 
@@ -22326,6 +22347,9 @@ msgstr "編集中の内容"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "保存しないと変更は失われます。"
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "クラウドワークスペースからこのホストにアクセスできなくなります。"
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "コードは既定でローカルに留まり、連携するサービスは明示的に制御できます。"

@@ -7,7 +7,15 @@ import type {
 import { useEffect } from "react";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import type {
+	ChatPaneData,
+	PaneViewerData,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import {
+	ignoreChatTerminal,
+	markChatSessionClosed,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/closedChatSessions";
+import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
@@ -56,6 +64,26 @@ function backgroundClosedTerminal(
 			markTerminalForBackground(terminalId, workspaceId);
 			return;
 		}
+	}
+}
+
+/** Keeps a chat closed with `superset panes close` from being adopted back into a new tab. */
+function forgetClosedChat(
+	areas: PaneAreas,
+	workspaceId: string,
+	op: PaneLayoutOp,
+): void {
+	if (op.type !== "close") return;
+	for (const tab of [...areas.main.tabs, ...areas.sidebar.tabs]) {
+		const pane = tab.panes[op.paneId];
+		if (pane?.kind !== "chat-v3") continue;
+		const { sessionId, terminalId } = pane.data as ChatPaneData;
+		ignoreChatTerminal(terminalId);
+		if (sessionId && !op.keepTerminal) {
+			markChatSessionClosed(sessionId);
+			addPendingChatStop(workspaceId, sessionId, terminalId);
+		}
+		return;
 	}
 }
 
@@ -115,6 +143,7 @@ function runPaneLayoutOp(
 	};
 	const outcome = applyPaneLayoutOp(previous, op);
 	backgroundClosedTerminal(previous, workspaceId, op);
+	forgetClosedChat(previous, workspaceId, op);
 
 	if (op.type !== "list") {
 		// Sidebar first: a non-terminal pane landing in the main area is moved to

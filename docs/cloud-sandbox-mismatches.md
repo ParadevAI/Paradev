@@ -72,6 +72,19 @@ the filesystem snapshot with no processes, so host-service is started again)
 and extends a running one so it never hits the idle stop while someone is in
 it. `resolveSandboxAddress` is the one place that knows the difference.
 
+**A box reaches other hosts only through the relay, and only if they allow
+it.** The CLI assumed its bearer is a user token the relay accepts. A box has
+no bearer: its credential is a header the firewall adds, so `--host` calls
+used to fail as "Session expired" while `auth whoami` worked, and `host.list`
+showed every host offline because it forwarded the caller's absent bearer for
+presence. Now `host.list` mints a server presence token when the caller has no
+bearer, the firewall adds the workspace credential for the relay host too, and
+the relay checks it with the API per call. A host is reachable only when its
+owner allowed cloud workspaces on the host's settings page; otherwise the call
+fails with a message that says so. Only HTTP calls work: the firewall refuses
+WebSocket upgrades on a host whose headers it rewrites, so live terminal
+streams from a box to a host do not.
+
 **A box's agent status doesn't come from the box.** A host row's dot is a
 live subscription to that host's terminal bindings; the sidebar deliberately
 opens no such socket to a sandbox, since holding one keeps the VM awake all

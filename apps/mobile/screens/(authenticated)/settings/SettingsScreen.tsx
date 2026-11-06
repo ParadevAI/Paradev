@@ -62,7 +62,7 @@ export function SettingsScreen() {
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
 	const savedAcpChatEnabled = useAcpChatEnabled();
-	const updateExperimentalChat = useMutation({
+	const updateChatSetting = useMutation({
 		mutationFn: (enabled: boolean) =>
 			apiClient.userSettings.update.mutate({ experimentalChat: enabled }),
 		onSuccess: (settings) =>
@@ -70,8 +70,8 @@ export function SettingsScreen() {
 		onError: () =>
 			Alert.alert(t({ message: "Couldn't update the Chat setting" })),
 	});
-	const acpChatEnabled = updateExperimentalChat.isPending
-		? updateExperimentalChat.variables
+	const acpChatEnabled = updateChatSetting.isPending
+		? updateChatSetting.variables
 		: savedAcpChatEnabled;
 
 	const user = session?.user;
@@ -348,7 +348,7 @@ export function SettingsScreen() {
 					/>
 				</SettingsSection>
 
-				<SettingsSection label={t({ message: "Experimental" })}>
+				<SettingsSection label={t({ message: "Agents" })}>
 					<ListRow
 						icon={
 							<Ionicons
@@ -357,18 +357,16 @@ export function SettingsScreen() {
 								color={theme.mutedForeground}
 							/>
 						}
-						label={t({ message: "Chat" })}
+						label={t({ message: "Chat interface" })}
 						subtitle={t({
 							message: "Open Claude and Codex sessions as chats",
 						})}
 						trailing={
 							<Switch
 								value={acpChatEnabled}
-								disabled={updateExperimentalChat.isPending}
-								onValueChange={(enabled) =>
-									updateExperimentalChat.mutate(enabled)
-								}
-								accessibilityLabel={t({ message: "Chat" })}
+								disabled={updateChatSetting.isPending}
+								onValueChange={(enabled) => updateChatSetting.mutate(enabled)}
+								accessibilityLabel={t({ message: "Chat interface" })}
 							/>
 						}
 						isLast

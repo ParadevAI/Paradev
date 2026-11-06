@@ -1316,12 +1316,12 @@ export function ComposerBody({
 				<button
 					type="button"
 					aria-label={
-						status === "streaming"
-							? t({ message: "Queue message" })
-							: t({ message: "Send message" })
+						status === "ready"
+							? t({ message: "Send message" })
+							: t({ message: "Queue message" })
 					}
 					title={
-						status === "streaming" && onStop
+						(status === "streaming" && onStop) || status === "background"
 							? t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}

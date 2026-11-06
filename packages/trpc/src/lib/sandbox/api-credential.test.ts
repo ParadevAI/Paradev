@@ -10,4 +10,11 @@ describe("SANDBOX_ALLOWED_PROCEDURES", () => {
 		);
 		expect(unknown).toEqual([]);
 	});
+
+	test("never lets a box open a host to itself", () => {
+		expect(SANDBOX_ALLOWED_PROCEDURES.has("host.setCloudWorkspaceAccess")).toBe(
+			false,
+		);
+		expect(SANDBOX_ALLOWED_PROCEDURES.has("host.ensure")).toBe(false);
+	});
 });

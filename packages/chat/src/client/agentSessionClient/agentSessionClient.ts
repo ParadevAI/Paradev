@@ -149,6 +149,7 @@ export function createAgentSessionClient(
 					queuedCount: 0,
 					updatedAt: head.updatedAt ?? now(),
 					closedAt: null,
+					closedByUser: false,
 				},
 				cursor: head.cursor,
 				live: true,

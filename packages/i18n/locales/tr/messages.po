@@ -2336,6 +2336,9 @@ msgstr "Ajanlar {0} araçlarına erişemiyor"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Bulut çalışma alanlarındaki ajanlar <0>--host</0> ile bu host üzerinde komut çalıştırabilir. Host'a röle üzerinden erişilebilmesi gerekir."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Ajanlar bulutta çalışmaya devam eder. Çalışma alanını masaüstünden, iPhone'dan veya iPad'den yeniden açın."
 
@@ -2581,6 +2584,9 @@ msgstr "Oturum boyunca izin ver"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Sesle yazmak için mikrofon erişimine izin verin"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Bulut çalışma alanlarımın bu host'a erişmesine izin ver"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Bu cihaza röle üzerinden uzaktan erişime izin ver"
@@ -2840,6 +2846,9 @@ msgstr "herhangi bir şey"
 
 msgid "Anything else? (optional)"
 msgstr "Başka bir şey var mı? (isteğe bağlı)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Oluşturduğunuz bir bulut çalışma alanında çalışan her şey bu host üzerinde çalışma alanı oluşturabilir, ajan başlatabilir ve komut çalıştırabilir; bir web sayfasında veya depoda bulduğu talimatları izleyen bir ajan da buna dahildir. Yalnızca ihtiyacınız varsa açın."
 
 msgid "Anywhere"
 msgstr "Her yerde"
@@ -10973,6 +10982,9 @@ msgstr "Bir ajanın {browserName} oturumlarınızı kullanmasına izin verilsin 
 msgid "Let the agent drive."
 msgstr "Ajan kullansın."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Bulut çalışma alanlarınızın bu host'a erişmesine izin verilsin mi?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Kuruluşunuzun depoları listelemesine ve klonlamasına izin verir"
 
@@ -13444,6 +13456,9 @@ msgstr "Yorumu yalnızca yazarı değiştirebilir"
 
 msgid "Only the author can edit a comment"
 msgstr "Bir yorumu yalnızca yazarı düzenleyebilir"
+
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Bulut çalışma alanlarının erişimine yalnızca host'un sahibi izin verebilir"
 
 msgid "Only the host owner can set its wake command"
 msgstr "Uyandırma komutunu yalnızca host sahibi ayarlayabilir"
@@ -18769,6 +18784,9 @@ msgstr "İzlemeyi durdur"
 msgid "Stop workspace run command"
 msgstr "Çalışma alanı çalıştırma komutunu durdur"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "Bulut çalışma alanlarınızın bu host'a erişimi durdurulsun mu?"
+
 msgid "stopped"
 msgstr "durduruldu"
 
@@ -20639,6 +20657,9 @@ msgstr "Rutin işleri zamanlamayla veya bir olay geldiğinde çalışan ajanlara
 msgid "Turn Fast mode on or off"
 msgstr "Hızlı modu aç veya kapat"
 
+msgid "Turn off"
+msgstr "Kapat"
+
 msgid "Turn off manual mode"
 msgstr "Manuel modu kapat"
 
@@ -22326,6 +22347,9 @@ msgstr "Değişiklikleriniz"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Bulut çalışma alanlarınız artık bu host'a erişemeyecek."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
