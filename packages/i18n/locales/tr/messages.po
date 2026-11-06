@@ -13269,6 +13269,9 @@ msgstr "Yorumu yalnızca yazarı değiştirebilir"
 msgid "Only the author can edit a comment"
 msgstr "Bir yorumu yalnızca yazarı düzenleyebilir"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Bulut çalışma alanlarının erişimine yalnızca host'un sahibi izin verebilir"
+
 msgid "Only the host owner can set its wake command"
 msgstr "Uyandırma komutunu yalnızca host sahibi ayarlayabilir"
 

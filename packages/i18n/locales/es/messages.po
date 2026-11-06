@@ -13269,6 +13269,9 @@ msgstr "Solo el autor puede cambiar un comentario"
 msgid "Only the author can edit a comment"
 msgstr "Solo el autor puede editar un comentario"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Solo el propietario del host puede permitir que los espacios de trabajo en la nube accedan a él"
+
 msgid "Only the host owner can set its wake command"
 msgstr "Solo el propietario del host puede definir su comando de arranque"
 

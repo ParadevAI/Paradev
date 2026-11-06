@@ -13269,6 +13269,9 @@ msgstr "只有作者可以修改留言"
 msgid "Only the author can edit a comment"
 msgstr "只有作者才能編輯評論"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "只有主機擁有者可以允許雲端工作區存取它"
+
 msgid "Only the host owner can set its wake command"
 msgstr "只有主機擁有者才能設定其喚醒命令"
 

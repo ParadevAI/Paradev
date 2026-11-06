@@ -13263,6 +13263,9 @@ msgstr "Лише автор може змінити коментар"
 msgid "Only the author can edit a comment"
 msgstr "Лише автор може редагувати коментар"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "Дозволити хмарним робочим просторам доступ до хоста може лише його власник"
+
 msgid "Only the host owner can set its wake command"
 msgstr "Лише власник хоста може задати для нього команду пробудження"
 
