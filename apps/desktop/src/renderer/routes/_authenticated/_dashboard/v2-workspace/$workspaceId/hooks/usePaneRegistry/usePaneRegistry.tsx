@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
 import type {
 	ContextMenuActionConfig,
@@ -32,11 +33,12 @@ import {
 	LuClipboardCopy,
 	LuEraser,
 	LuExternalLink,
+	LuFolderOpen,
 	LuLink,
 	LuPower,
 } from "react-icons/lu";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useHotkeyDisplay } from "renderer/hotkeys";
+import { PLATFORM, useHotkeyDisplay } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { getBaseName } from "renderer/lib/pathBasename";
 import {
@@ -82,6 +84,10 @@ import {
 } from "../../utils/focusTerminalPane";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
 import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
+import {
+	revealInFileManagerLabel,
+	revealTarget,
+} from "../../utils/revealInFileManager";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
@@ -209,6 +215,9 @@ export function usePaneRegistry({
 	const host = useWorkspaceHostTarget(workspaceId);
 	const desktopUrl =
 		host.status === "ready" && host.kind === "sandbox" ? host.desktopUrl : null;
+	const isLocalWorkspace =
+		host.status === "local-starting" ||
+		(host.status === "ready" && host.kind === "local");
 	const collections = useCollections();
 	const clearShortcut = useHotkeyDisplay("CLEAR_TERMINAL").text;
 	const scrollToBottomShortcut = useHotkeyDisplay("SCROLL_TO_BOTTOM").text;
@@ -710,6 +719,20 @@ export function usePaneRegistry({
 							onSelect: copyLinkText,
 						},
 						{
+							key: "reveal-in-file-manager",
+							label: i18n._(revealInFileManagerLabel(PLATFORM)),
+							icon: <LuFolderOpen />,
+							hidden: (ctx) => !isLocalWorkspace || !revealTarget(linkAt(ctx)),
+							onSelect: (ctx) => {
+								const entry = terminalContextMenuLinkStore.get(ctx.pane.id);
+								const target = revealTarget(entry?.link);
+								if (!entry || !target) return;
+								entry.deps.revealInFinder(target.path, {
+									isDirectory: target.isDirectory,
+								});
+							},
+						},
+						{
 							key: "sep-open-link-in",
 							type: "separator",
 							hidden: (ctx) => !copyableLinkText(ctx),
@@ -1152,6 +1175,7 @@ export function usePaneRegistry({
 			workspaceTrpcUtils,
 			t,
 			desktopUrl,
+			isLocalWorkspace,
 			chatPaneIcon,
 			onOpenSubagent,
 			rightStore,

@@ -8474,6 +8474,12 @@ msgstr "Standardwerte konnten nicht wiederhergestellt werden"
 msgid "Failed to resume {0}"
 msgstr "{0} konnte nicht fortgesetzt werden"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Anzeigen im Datei-Explorer fehlgeschlagen"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Anzeigen im Dateimanager fehlgeschlagen"
+
 msgid "Failed to reveal in Finder"
 msgstr "Anzeigen im Finder fehlgeschlagen"
 
@@ -16532,6 +16538,12 @@ msgstr "Wiederverwendbare Terminal-Starts. Klicke ein Skript zum Bearbeiten an o
 
 msgid "Reusing {keptName}"
 msgstr "Verwendet {keptName}"
+
+msgid "Reveal in File Explorer"
+msgstr "Im Datei-Explorer anzeigen"
+
+msgid "Reveal in File Manager"
+msgstr "Im Dateimanager anzeigen"
 
 msgid "Reveal in Finder"
 msgstr "Im Finder anzeigen"
