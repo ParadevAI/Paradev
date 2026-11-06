@@ -40,6 +40,7 @@ describe("connector connect route", () => {
 			{ params: Promise.resolve({ connector: "vercel_mcp" }) },
 		);
 
+		expect(response.status).toBe(302);
 		const location = new URL(response.headers.get("location") ?? "");
 		expect(location.pathname).toBe("/plugins/vercel");
 		expect(location.searchParams.get("error")).toBe("connect_failed");
