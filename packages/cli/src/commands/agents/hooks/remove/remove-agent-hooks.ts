@@ -16,8 +16,11 @@ export function resolveAgentIds(options: {
 	agent?: readonly string[];
 }): AgentSetupTargetId[] {
 	const validIds = AGENT_SETUP_TARGETS.map((target) => target.id);
-	if (options.all) return validIds;
 	const requested = options.agent ?? [];
+	if (options.all && requested.length > 0) {
+		throw new CLIError("Pass --all or --agent, not both");
+	}
+	if (options.all) return validIds;
 	if (requested.length === 0) {
 		throw new CLIError(
 			"Pass --all or at least one --agent",

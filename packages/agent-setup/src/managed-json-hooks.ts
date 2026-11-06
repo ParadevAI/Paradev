@@ -18,6 +18,8 @@ export interface ManagedJsonHooksSpec<Entry> {
 	getFilePath(): string;
 	/** With no config dir and none of these on PATH, setup writes nothing. */
 	binaryNames: readonly string[];
+	/** Path whose existence marks the agent installed; defaults to the config's dir. */
+	installMarkerPath?(): string;
 	/**
 	 * Key of the event→entries map on the root object, or null when the root
 	 * object itself is the event map (Mastra).
@@ -131,8 +133,9 @@ export function getManagedJsonHooksContent<Entry>(
 
 function isAgentInstalled<Entry>(spec: ManagedJsonHooksSpec<Entry>): boolean {
 	return (
-		fs.existsSync(path.dirname(spec.getFilePath())) ||
-		isRealBinaryOnPath(spec.binaryNames)
+		fs.existsSync(
+			spec.installMarkerPath?.() ?? path.dirname(spec.getFilePath()),
+		) || isRealBinaryOnPath(spec.binaryNames)
 	);
 }
 

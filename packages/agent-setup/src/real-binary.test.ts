@@ -33,7 +33,9 @@ describe("isRealBinaryOnPath", () => {
 		const bin = path.join(root, "usr-bin");
 		writeExecutable(bin, "devin");
 
-		expect(isRealBinaryOnPath(["devin"], `/nonexistent:${bin}`)).toBe(true);
+		expect(
+			isRealBinaryOnPath(["devin"], ["/nonexistent", bin].join(path.delimiter)),
+		).toBe(true);
 		expect(isRealBinaryOnPath(["claude"], bin)).toBe(false);
 	});
 
@@ -46,7 +48,10 @@ describe("isRealBinaryOnPath", () => {
 		writeExecutable(plain, "devin", 0o644);
 
 		expect(
-			isRealBinaryOnPath(["devin"], [appBin, `${legacyBin}/`, plain].join(":")),
+			isRealBinaryOnPath(
+				["devin"],
+				[appBin, `${legacyBin}/`, plain].join(path.delimiter),
+			),
 		).toBe(false);
 	});
 });

@@ -10,6 +10,10 @@ import {
 	createDevinConfigJson,
 	getDevinConfigJsonPath,
 } from "./agent-wrappers-devin";
+import {
+	createGeminiSettingsJson,
+	getGeminiSettingsJsonPath,
+} from "./agent-wrappers-gemini";
 
 const ORIGINAL_ENV = {
 	HOME: process.env.HOME,
@@ -54,6 +58,16 @@ describe("ensureManagedJsonHooks", () => {
 		createDevinConfigJson();
 
 		expect(fs.existsSync(path.dirname(getDevinConfigJsonPath()))).toBe(false);
+	});
+
+	it("does not take a directory another agent shares as proof of install", () => {
+		fs.mkdirSync(path.join(root, "home", ".gemini", "config"), {
+			recursive: true,
+		});
+
+		createGeminiSettingsJson();
+
+		expect(fs.existsSync(getGeminiSettingsJsonPath())).toBe(false);
 	});
 
 	it("writes the config when the agent binary is on PATH", () => {

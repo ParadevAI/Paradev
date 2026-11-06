@@ -67,6 +67,8 @@ function geminiHooksSpec(
 		agentLabel: "Gemini",
 		getFilePath: getGeminiSettingsJsonPath,
 		binaryNames: ["gemini"],
+		// Antigravity also creates ~/.gemini, so the directory proves nothing.
+		installMarkerPath: getGeminiSettingsJsonPath,
 		eventsContainerKey: "hooks",
 		desiredEntriesByEvent: Object.fromEntries(
 			GEMINI_MANAGED_EVENTS.map((eventName) => [

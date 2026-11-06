@@ -25,7 +25,7 @@ export default command({
 		}
 		return {
 			data: { agents },
-			message: `Removed Paradev hooks for ${agents.join(", ")}. The Paradev app adds them again when it starts; turn an agent off in Settings → Agents → Paradev hooks to keep them out.`,
+			message: `Removed any Paradev hooks for: ${agents.join(", ")}. The Paradev app adds them again at start for agents that are installed; turn an agent off in Settings → Agents → Paradev hooks to keep them out.`,
 		};
 	},
 });

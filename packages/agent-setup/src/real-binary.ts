@@ -25,15 +25,25 @@ function isExecutableFile(filePath: string): boolean {
 	}
 }
 
+const WINDOWS_EXECUTABLE_SUFFIXES = ["", ".exe", ".cmd", ".com"];
+
+function candidateNames(binaryNames: readonly string[]): string[] {
+	if (process.platform !== "win32") return [...binaryNames];
+	return binaryNames.flatMap((name) =>
+		WINDOWS_EXECUTABLE_SUFFIXES.map((suffix) => `${name}${suffix}`),
+	);
+}
+
 export function isRealBinaryOnPath(
 	binaryNames: readonly string[],
 	searchPath: string = process.env.PATH ?? "",
 ): boolean {
+	const names = candidateNames(binaryNames);
 	for (const entry of searchPath.split(path.delimiter)) {
 		if (!entry) continue;
 		const dir = path.resolve(entry);
 		if (isAppBinDir(dir)) continue;
-		if (binaryNames.some((name) => isExecutableFile(path.join(dir, name)))) {
+		if (names.some((name) => isExecutableFile(path.join(dir, name)))) {
 			return true;
 		}
 	}

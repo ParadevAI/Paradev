@@ -16,11 +16,14 @@ describe("resolveAgentIds", () => {
 		]);
 	});
 
-	test("rejects an unknown agent and a call with no selection", () => {
+	test("rejects an unknown agent, no selection, and --all with --agent", () => {
 		expect(() => resolveAgentIds({ agent: ["nope"] })).toThrow(
 			"Unknown agent: nope",
 		);
 		expect(() => resolveAgentIds({})).toThrow("Pass --all");
+		expect(() => resolveAgentIds({ all: true, agent: ["devni"] })).toThrow(
+			"not both",
+		);
 	});
 });
 

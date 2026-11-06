@@ -48,13 +48,15 @@ installed:
 superset agents hooks remove --all
 ```
 
-The command keeps your own hooks and settings. Paradev adds its hooks again the next time it
+The command keeps your own hooks and settings. One exception: in Muse's `managed_hooks_env_vars`,
+it removes the variable names Paradev adds, even if you also listed them yourself. Paradev adds its hooks again the next time it
 starts, so quit the app before you delete it. To keep one agent's hooks out while you still use
 Paradev, turn off **Settings → Agents → Paradev hooks** for that agent.
 
 If the CLI is already gone, edit these files by hand. Files named `superset-*` belong to Paradev;
 delete them. In the other files, delete the hook entries whose command contains `paradev-notify`,
-`paradev-artifact-guard`, or `hooks/notify.sh`, and the blocks marked `superset-managed`:
+`paradev-artifact-guard`, `hooks/notify.sh`, `hooks/cursor-hook.sh`, or `hooks/gemini-hook.sh`, and
+the blocks marked `superset-managed`:
 
 | Agent | File |
 | --- | --- |
@@ -72,6 +74,10 @@ delete them. In the other files, delete the hook entries whose command contains 
 | Muse | `~/.config/muse/settings.json` |
 | Amp | `~/.config/amp/plugins/superset-lifecycle.ts` |
 | Oh My Pi, Pi | `~/.omp/agent/extensions/superset-hooks.ts`, `~/.pi/agent/extensions/superset-hooks.ts` |
+
+GitHub Copilot reads hooks only from the project, so Paradev writes `.github/hooks/superset-notify.json`
+in each repository where you start Copilot from Paradev (and lists it in `.git/info/exclude`).
+Delete that file from those repositories.
 
 Then delete `~/.paradev/` (wrappers, hook scripts, and local state) and the Paradev skills in
 `~/.claude/skills/superset/`, `~/.agents/skills/superset-*/`, and `~/.agents/commands/superset/`.

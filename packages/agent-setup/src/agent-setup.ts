@@ -286,7 +286,7 @@ export function setupSingleAgent(agentId: string): boolean {
 }
 
 export function isAgentSetupTargetId(id: string): id is AgentSetupTargetId {
-	return id in AGENT_SETUP_DEFINITIONS;
+	return Object.hasOwn(AGENT_SETUP_DEFINITIONS, id);
 }
 
 /** Runs each agent's teardown and returns the labels of the actions that failed. */

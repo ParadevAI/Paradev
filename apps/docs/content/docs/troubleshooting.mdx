@@ -68,7 +68,9 @@ example, a workspace another tool archived), the agent cannot start any hook, an
 `Failed to spawn command: No such file or directory`.
 
 **Fix:** start the agent in a directory that exists. To remove Paradev's hooks, run
-`superset agents hooks remove --all` (see [Uninstall](/install#uninstall)).
+`superset agents hooks remove --all` (see [Uninstall](/install#uninstall)). The Paradev app adds
+them again when it starts, so also turn the agent off in **Settings → Agents → Paradev hooks** to
+keep them out.
 
 ## Remote Host Won't Connect
 
