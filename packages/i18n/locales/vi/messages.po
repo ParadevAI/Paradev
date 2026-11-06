@@ -7947,6 +7947,12 @@ msgstr "Mỗi ngày trong tuần lúc 9h sáng, đọc issue GitHub mới, gán 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Ai cũng tranh cãi liệu điều này có khái quát được không. Chính cuộc tranh cãi đó là dấu hiệu mức này đã đạt được."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Mọi người trong tổ chức này dùng tài khoản này."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Mọi người trong tổ chức này dùng kết nối này."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Mọi người thấy phiên bản mới ngay khi được xuất bản"
 
@@ -13505,6 +13511,12 @@ msgstr "Chỉ mình bạn"
 msgid "Only you can see this page"
 msgstr "Chỉ bạn mới xem được trang này"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Chỉ bạn có thể dùng các tài khoản này. Đồng đội kết nối tài khoản của riêng họ."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Chỉ bạn có thể dùng kết nối này. Đồng đội kết nối tài khoản {name} của riêng họ."
+
 msgid "open"
 msgstr "mở"
 
@@ -14624,6 +14636,9 @@ msgstr "Cá nhân"
 
 msgid "Personal plan"
 msgstr "Gói cá nhân"
+
+msgid "Personal to you"
+msgstr "Riêng cho bạn"
 
 msgid "Phantom Forklift"
 msgstr "Xe nâng bóng ma"
@@ -17787,6 +17802,9 @@ msgstr "Đã chia sẻ với mọi người"
 
 msgid "Shared with me"
 msgstr "Được chia sẻ với tôi"
+
+msgid "Shared with your organization"
+msgstr "Chia sẻ với tổ chức của bạn"
 
 msgid "Sheet"
 msgstr "Sheet"

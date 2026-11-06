@@ -7947,6 +7947,12 @@ msgstr "平日午前9時に、新しいGitHub issueを読み、ラベルを付�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "これが一般化するかどうかで議論が起きます。その議論こそ、このレベルに到達した証拠です。"
 
+msgid "Everyone in this organization uses this account."
+msgstr "この組織の全員がこのアカウントを使用します。"
+
+msgid "Everyone in this organization uses this connection."
+msgstr "この組織の全員がこの接続を使用します。"
+
 msgid "Everyone sees new versions as they are published"
 msgstr "公開された新しいバージョンが全員に表示されます"
 
@@ -13505,6 +13511,12 @@ msgstr "自分のみ"
 msgid "Only you can see this page"
 msgstr "このページはあなただけが閲覧できます"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "これらのアカウントを使えるのはあなただけです。チームメンバーは各自のアカウントを接続します。"
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "この接続を使えるのはあなただけです。チームメンバーは各自の {name} アカウントを接続します。"
+
 msgid "open"
 msgstr "開く"
 
@@ -14624,6 +14636,9 @@ msgstr "個人"
 
 msgid "Personal plan"
 msgstr "個人プラン"
+
+msgid "Personal to you"
+msgstr "あなた専用"
 
 msgid "Phantom Forklift"
 msgstr "幻のフォークリフト"
@@ -17787,6 +17802,9 @@ msgstr "全員と共有中"
 
 msgid "Shared with me"
 msgstr "共有アイテム"
+
+msgid "Shared with your organization"
+msgstr "組織で共有"
 
 msgid "Sheet"
 msgstr "Sheet"

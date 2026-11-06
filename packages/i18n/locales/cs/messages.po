@@ -7947,6 +7947,12 @@ msgstr "Každý všední den v 9:00 přečti nové GitHub issues, přiřaď št�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Všichni se dohadují, jestli se to dá zobecnit. Právě ten spor je známkou toho, že úroveň byla dosažena."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Všichni v této organizaci používají tento účet."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Všichni v této organizaci používají toto připojení."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Všichni uvidí nové verze hned po zveřejnění"
 
@@ -13505,6 +13511,12 @@ msgstr "Jen vy"
 msgid "Only you can see this page"
 msgstr "Tuto stránku vidíte jen vy"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Tyto účty můžete používat jen vy. Kolegové si připojí vlastní."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Toto připojení můžete používat jen vy. Kolegové si připojí vlastní účty {name}."
+
 msgid "open"
 msgstr "otevřít"
 
@@ -14624,6 +14636,9 @@ msgstr "Osobní"
 
 msgid "Personal plan"
 msgstr "Osobní plán"
+
+msgid "Personal to you"
+msgstr "Jen pro vás"
 
 msgid "Phantom Forklift"
 msgstr "Fantomový vysokozdvih"
@@ -17787,6 +17802,9 @@ msgstr "Sdíleno se všemi"
 
 msgid "Shared with me"
 msgstr "Sdíleno se mnou"
+
+msgid "Shared with your organization"
+msgstr "Sdíleno s vaší organizací"
 
 msgid "Sheet"
 msgstr "Sheet"

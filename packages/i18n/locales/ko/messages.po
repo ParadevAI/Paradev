@@ -7947,6 +7947,12 @@ msgstr "평일 오전 9시마다 새 GitHub 이슈를 읽고, 라벨을 적용�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "이것이 일반화될 수 있는지를 두고 모두가 논쟁합니다. 그 논쟁 자체가 해당 단계에 도달했다는 신호입니다."
 
+msgid "Everyone in this organization uses this account."
+msgstr "이 조직의 모든 사람이 이 계정을 사용합니다."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "이 조직의 모든 사람이 이 연결을 사용합니다."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "새 버전이 게시되는 대로 모두가 볼 수 있습니다"
 
@@ -13505,6 +13511,12 @@ msgstr "나만"
 msgid "Only you can see this page"
 msgstr "이 페이지는 나만 볼 수 있습니다"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "이 계정은 나만 사용할 수 있습니다. 팀원은 각자의 계정을 연결합니다."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "이 연결은 나만 사용할 수 있습니다. 팀원은 각자의 {name} 계정을 연결합니다."
+
 msgid "open"
 msgstr "열기"
 
@@ -14624,6 +14636,9 @@ msgstr "개인"
 
 msgid "Personal plan"
 msgstr "개인 플랜"
+
+msgid "Personal to you"
+msgstr "나만 사용"
 
 msgid "Phantom Forklift"
 msgstr "유령 지게차"
@@ -17787,6 +17802,9 @@ msgstr "전체 공개로 공유됨"
 
 msgid "Shared with me"
 msgstr "나와 공유됨"
+
+msgid "Shared with your organization"
+msgstr "조직과 공유됨"
 
 msgid "Sheet"
 msgstr "시트"
