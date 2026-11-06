@@ -63,9 +63,9 @@ Each cloud workspace runs on a machine size you pick when you create it. Every s
 
 | Size | Name in CLI | vCPU | Memory | Available on |
 | --- | --- | --- | --- | --- |
-| Small | `small` | 2 | 4 GB | All paid plans |
-| Medium | `medium` | 4 | 8 GB | All paid plans (default) |
-| Large | `large` | 8 | 16 GB | All paid plans |
+| Small | `small` | 2 | 4 GB | Team and Ultra |
+| Medium | `medium` | 4 | 8 GB | Team and Ultra (default) |
+| Large | `large` | 8 | 16 GB | Team and Ultra |
 | X-Large | `xlarge` | 16 | 32 GB | On request |
 | 2X-Large | `2xlarge` | 32 | 64 GB | On request |
 
@@ -111,7 +111,7 @@ Cloud usage is metered in **GB-hours**: the machine's memory multiplied by the t
 
 **Settings → Billing** shows the GB-hours used this period, when it resets, and any usage over the plan. Paradev checks the limit each time a workspace starts or wakes, and while it runs. A running workspace that reaches the limit stops about 10 minutes later.
 
-- Without a paid plan: "Cloud workspaces need a paid plan."
+- Without Team or Ultra: "Cloud workspaces need the Team or Ultra plan." Upgrade in **Settings → Billing**.
 - At the limit: "Your organization has reached its cloud usage limit." Raise the limit or upgrade in **Settings → Billing**.
 
 Each plan limits how many environments an organization can hold. When you reach the limit, archive one or upgrade in **Settings → Billing**.
