@@ -52,7 +52,7 @@ export function useReleaseNotesCard(): SidebarCardEntry | null {
 			<img
 				src={release.image}
 				alt=""
-				className="aspect-[16/9] w-full object-cover"
+				className="aspect-[5/4] w-full object-cover object-top"
 			/>
 		) : undefined,
 		onClick: () => {
