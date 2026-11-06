@@ -1338,6 +1338,13 @@
       "when": 1793918434220,
       "tag": "0190_v2_hosts_allow_cloud_workspaces",
       "breakpoints": true
+    },
+    {
+      "idx": 191,
+      "version": "7",
+      "when": 1793957784681,
+      "tag": "0191_user_settings_naming_instructions",
+      "breakpoints": true
     }
   ]
 }
