@@ -21984,8 +21984,8 @@ msgstr "Du musst Teil einer Organisation sein, um Integrationen zu nutzen."
 msgid "You stopped this response"
 msgstr "Du hast diese Antwort gestoppt"
 
-msgid "You stopped this response before a tool ran"
-msgstr "Du hast diese Antwort gestoppt, bevor ein Werkzeug ausgeführt wurde"
+msgid "You stopped this response at a tool call"
+msgstr "Du hast diese Antwort bei einem Tool-Aufruf gestoppt"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

@@ -21984,8 +21984,8 @@ msgstr "Aby korzystać z integracji, trzeba należeć do organizacji."
 msgid "You stopped this response"
 msgstr "Zatrzymano tę odpowiedź"
 
-msgid "You stopped this response before a tool ran"
-msgstr "Zatrzymano tę odpowiedź przed uruchomieniem narzędzia"
+msgid "You stopped this response at a tool call"
+msgstr "Zatrzymano tę odpowiedź przy wywołaniu narzędzia"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

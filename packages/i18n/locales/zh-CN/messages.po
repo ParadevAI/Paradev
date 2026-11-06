@@ -21984,8 +21984,8 @@ msgstr "你需要加入一个组织才能使用集成。"
 msgid "You stopped this response"
 msgstr "你停止了这条回复"
 
-msgid "You stopped this response before a tool ran"
-msgstr "你在工具运行前停止了这条回复"
+msgid "You stopped this response at a tool call"
+msgstr "你在工具调用时停止了这条回复"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

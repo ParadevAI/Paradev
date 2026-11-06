@@ -21984,8 +21984,8 @@ msgstr "連携を使うには組織に所属している必要があります。
 msgid "You stopped this response"
 msgstr "この応答を停止しました"
 
-msgid "You stopped this response before a tool ran"
-msgstr "ツールの実行前にこの応答を停止しました"
+msgid "You stopped this response at a tool call"
+msgstr "ツール呼び出しの時点でこの応答を停止しました"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

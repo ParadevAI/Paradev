@@ -21984,8 +21984,8 @@ msgstr "Vous devez faire partie d'une organisation pour utiliser les intégratio
 msgid "You stopped this response"
 msgstr "Vous avez arrêté cette réponse"
 
-msgid "You stopped this response before a tool ran"
-msgstr "Vous avez arrêté cette réponse avant l'exécution d'un outil"
+msgid "You stopped this response at a tool call"
+msgstr "Vous avez arrêté cette réponse lors d'un appel d'outil"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

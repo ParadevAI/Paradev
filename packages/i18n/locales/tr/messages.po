@@ -21984,8 +21984,8 @@ msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerek
 msgid "You stopped this response"
 msgstr "Bu yanıtı durdurdunuz"
 
-msgid "You stopped this response before a tool ran"
-msgstr "Bu yanıtı bir araç çalışmadan önce durdurdunuz"
+msgid "You stopped this response at a tool call"
+msgstr "Bu yanıtı bir araç çağrısında durdurdunuz"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

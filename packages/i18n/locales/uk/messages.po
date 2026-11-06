@@ -21978,8 +21978,8 @@ msgstr "Щоб використовувати інтеграції, потріб
 msgid "You stopped this response"
 msgstr "Ви зупинили цю відповідь"
 
-msgid "You stopped this response before a tool ran"
-msgstr "Ви зупинили цю відповідь до запуску інструмента"
+msgid "You stopped this response at a tool call"
+msgstr "Ви зупинили цю відповідь на виклику інструмента"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

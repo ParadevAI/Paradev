@@ -15,7 +15,7 @@ export function StoppedDivider({
 			<SquareIcon aria-hidden className="size-2.5 shrink-0 fill-current" />
 			<span className="min-w-0 truncate">
 				{userStop === "tool_use" ? (
-					<Trans>You stopped this response before a tool ran</Trans>
+					<Trans>You stopped this response at a tool call</Trans>
 				) : userStop === "response" ? (
 					<Trans>You stopped this response</Trans>
 				) : (

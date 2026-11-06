@@ -21984,8 +21984,8 @@ msgstr "Pro používání integrací musíte být součástí organizace."
 msgid "You stopped this response"
 msgstr "Tuto odpověď jste zastavili"
 
-msgid "You stopped this response before a tool ran"
-msgstr "Tuto odpověď jste zastavili před spuštěním nástroje"
+msgid "You stopped this response at a tool call"
+msgstr "Tuto odpověď jste zastavili při volání nástroje"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
