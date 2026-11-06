@@ -5745,6 +5745,9 @@ msgstr "無法載入這個檔案。"
 msgid "Could not load this pull request."
 msgstr "無法載入此拉取請求。"
 
+msgid "Could not load this workspace's sessions"
+msgstr "無法載入此工作區的會話"
+
 msgid "Could not load your machines"
 msgstr "無法載入你的機器"
 
@@ -16491,6 +16494,9 @@ msgstr "將在重設後繼續"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒後繼續"
 
+msgid "Resuming the chat…"
+msgstr "正在繼續聊天…"
+
 msgid "Retry"
 msgstr "重試"
 
@@ -19487,6 +19493,9 @@ msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "變更立即生效。您只需支付本期剩餘時間的差額。"
 
+msgid "The chat is still resuming"
+msgstr "聊天仍在繼續中"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保持不動並列出。"
 
@@ -19658,6 +19667,9 @@ msgstr "本地主機服務未執行，因此此裝置上沒有任何服務能提
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "本地主機服務剛剛啟動。正在重新連線。"
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "機器沒有回應。下拉可再次檢查。"
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "多數已合併的代理程式PR只需審查，無需任何人工修改。"

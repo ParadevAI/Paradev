@@ -5745,6 +5745,9 @@ msgstr "Não foi possível carregar este arquivo."
 msgid "Could not load this pull request."
 msgstr "Não foi possível carregar este pull request."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Não foi possível carregar as sessões desta área de trabalho"
+
 msgid "Could not load your machines"
 msgstr "Não foi possível carregar suas máquinas"
 
@@ -16491,6 +16494,9 @@ msgstr "Retomando na redefinição"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Retomando em {resumeSeconds} s"
 
+msgid "Resuming the chat…"
+msgstr "Retomando o chat…"
+
 msgid "Retry"
 msgstr "Tentar de novo"
 
@@ -19487,6 +19493,9 @@ msgstr "O botão agora se destaca. Conferi no seu painel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "A mudança começa agora. Você paga só a diferença pelo resto do período."
 
+msgid "The chat is still resuming"
+msgstr "O chat ainda está sendo retomado"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "O chat continua como está. Arquivos editados desde este turno, por qualquer pessoa, não são tocados e aparecem na lista."
 
@@ -19658,6 +19667,9 @@ msgstr "O serviço do host local não está rodando, então nada neste dispositi
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "O serviço do host local acabou de subir. Reconectando a ele agora."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "A máquina não respondeu. Puxe para verificar de novo."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "A maioria dos PRs de agentes mesclados precisa só de revisão, sem nenhuma edição humana."

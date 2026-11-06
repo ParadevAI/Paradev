@@ -5739,6 +5739,9 @@ msgstr "Не вдалося завантажити цей файл."
 msgid "Could not load this pull request."
 msgstr "Не вдалося завантажити цей пул-реквест."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Не вдалося завантажити сеанси цього робочого простору"
+
 msgid "Could not load your machines"
 msgstr "Не вдалося завантажити ваші комп'ютери"
 
@@ -16485,6 +16488,9 @@ msgstr "Відновлення після скидання ліміту"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Відновлення через {resumeSeconds} с"
 
+msgid "Resuming the chat…"
+msgstr "Чат відновлюється…"
+
 msgid "Retry"
 msgstr "Повторити"
 
@@ -19481,6 +19487,9 @@ msgstr "Тепер кнопка помітніша. Я перевірив її �
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Зміна діє вже зараз. За решту цього періоду ви сплачуєте лише різницю."
 
+msgid "The chat is still resuming"
+msgstr "Чат ще відновлюється"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Чат залишиться без змін. Файли, які будь-хто змінив після цього ходу, не зачіпаються й показуються в списку."
 
@@ -19652,6 +19661,9 @@ msgstr "Локальна служба хоста не працює, тож ні�
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Локальна служба хоста щойно запустилася. Під'єднуємося до неї."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Машина не відповіла. Потягніть, щоб перевірити ще раз."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Більшість злитих PR від агентів потребують лише рев'ю, без жодної правки людиною."

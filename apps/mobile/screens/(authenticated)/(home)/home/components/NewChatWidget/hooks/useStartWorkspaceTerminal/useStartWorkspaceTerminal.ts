@@ -11,7 +11,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
-import { getHostTerminalsQueryKey } from "../../../../hooks/useHostTerminals";
+import { invalidateHostSessions } from "@/screens/(authenticated)/hooks/useHostSessions";
 
 export interface WorkspaceTerminalTarget {
 	workspaceId: string;
@@ -83,9 +83,7 @@ export function useStartWorkspaceTerminal(workspaces: HostWorkspaceItem[]) {
 				workspace_id: workspaceId,
 				result: "launched",
 			});
-			void queryClient.invalidateQueries({
-				queryKey: getHostTerminalsQueryKey(hostId),
-			});
+			void invalidateHostSessions(queryClient, hostId);
 			router.push(
 				`/(authenticated)/workspace/${workspaceId}?tab=${terminalId}`,
 			);

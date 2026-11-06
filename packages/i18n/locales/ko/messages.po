@@ -5745,6 +5745,9 @@ msgstr "이 파일을 불러올 수 없습니다."
 msgid "Could not load this pull request."
 msgstr "이 풀 리퀘스트를 불러오지 못했습니다."
 
+msgid "Could not load this workspace's sessions"
+msgstr "이 워크스페이스의 세션을 불러오지 못했습니다"
+
 msgid "Could not load your machines"
 msgstr "머신을 불러오지 못했습니다"
 
@@ -16491,6 +16494,9 @@ msgstr "초기화 시 재개 예정"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds}초 후 재개"
 
+msgid "Resuming the chat…"
+msgstr "채팅을 재개하는 중…"
+
 msgid "Retry"
 msgstr "다시 시도"
 
@@ -19487,6 +19493,9 @@ msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "변경은 바로 적용됩니다. 남은 기간에 대한 차액만 결제합니다."
 
+msgid "The chat is still resuming"
+msgstr "채팅을 아직 재개하는 중입니다"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "채팅은 그대로 유지됩니다. 이 턴 이후 누군가 편집한 파일은 그대로 두고 목록에 표시합니다."
 
@@ -19658,6 +19667,9 @@ msgstr "로컬 호스트 서비스가 실행 중이 아니어서 이 기기에�
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "로컬 호스트 서비스가 방금 올라왔습니다. 지금 다시 연결하는 중입니다."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "컴퓨터가 응답하지 않았습니다. 당겨서 다시 확인하세요."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "머지된 에이전트 PR의 대부분이 사람의 수정 없이 리뷰만으로 끝납니다."

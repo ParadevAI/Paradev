@@ -5745,6 +5745,9 @@ msgstr "このファイルを読み込めませんでした。"
 msgid "Could not load this pull request."
 msgstr "このプルリクエストを読み込めませんでした。"
 
+msgid "Could not load this workspace's sessions"
+msgstr "このワークスペースのセッションを読み込めませんでした"
+
 msgid "Could not load your machines"
 msgstr "マシンを読み込めませんでした"
 
@@ -16491,6 +16494,9 @@ msgstr "リセット時に再開します"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds}秒後に再開します"
 
+msgid "Resuming the chat…"
+msgstr "チャットを再開しています…"
+
 msgid "Retry"
 msgstr "再試行"
 
@@ -19487,6 +19493,9 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "変更はすぐに適用されます。期間の残りについて差額のみをお支払いいただきます。"
 
+msgid "The chat is still resuming"
+msgstr "チャットはまだ再開中です"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "チャットはそのまま残ります。このターンの後に誰かが編集したファイルはそのままにし、一覧に表示します。"
 
@@ -19658,6 +19667,9 @@ msgstr "ローカルのホストサービスが実行されていないため、
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "ローカルのホストサービスが起動しました。今すぐ再接続します。"
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "マシンから応答がありませんでした。引っ張って再確認できます。"
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "マージされたエージェントのPRの過半数が、レビューのみで済み、人間の編集がゼロである。"

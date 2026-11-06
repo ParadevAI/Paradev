@@ -59,10 +59,6 @@ import {
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
-import {
-	getHostTerminalsQueryKey,
-	useHostTerminals,
-} from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
 import {
 	anchorOf,
@@ -70,6 +66,10 @@ import {
 } from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { useAgentIconUris } from "@/screens/(authenticated)/hooks/useAgentIconUris";
 import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useCreateTerminalWorkspace";
+import {
+	invalidateHostSessions,
+	useHostSessions,
+} from "@/screens/(authenticated)/hooks/useHostSessions";
 import { useSlashCommands } from "@/screens/(authenticated)/hooks/useSlashCommands";
 import { workspaceDraftKey } from "@/screens/(authenticated)/stores/composerDraftsStore";
 import { useLastSessionTabStore } from "@/screens/(authenticated)/stores/lastSessionTabStore";
@@ -99,6 +99,7 @@ import {
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
 import { usePullRequestDiffstat } from "../hooks/usePullRequestDiffstat";
 import { usePullRequestIconUri } from "../hooks/usePullRequestIconUri";
+import { useResumeStoppedChat } from "../hooks/useResumeStoppedChat";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
 import { useActiveChat } from "../stores/activeChatStore";
@@ -191,7 +192,7 @@ export function WorkspaceScreen() {
 		terminalsByWorkspace,
 		isReady: terminalsReady,
 		isError: terminalsFailed,
-	} = useHostTerminals(host);
+	} = useHostSessions(host);
 	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	// Tabs hold the arrangement the user dragged in the sessions sheet, falling
@@ -302,9 +303,7 @@ export function WorkspaceScreen() {
 					pendingCreate.hostUrl,
 				),
 			});
-			void queryClient.invalidateQueries({
-				queryKey: getHostTerminalsQueryKey(pendingCreate.hostId),
-			});
+			void invalidateHostSessions(queryClient, pendingCreate.hostId);
 		}, PENDING_CREATE_POLL_MS);
 		return () => clearInterval(interval);
 	}, [pollingActive, pendingCreate, queryClient]);
@@ -542,9 +541,7 @@ export function WorkspaceScreen() {
 
 	const invalidateTerminals = useCallback(() => {
 		if (!host) return;
-		void queryClient.invalidateQueries({
-			queryKey: getHostTerminalsQueryKey(host.machineId),
-		});
+		void invalidateHostSessions(queryClient, host.machineId);
 	}, [host, queryClient]);
 
 	const openSession = useCallback(
@@ -554,6 +551,20 @@ export function WorkspaceScreen() {
 		},
 		[router, invalidateTerminals],
 	);
+	const resume = useResumeStoppedChat({
+		row: activeRow,
+		hostUrl,
+		workspaceId: id,
+		onResumed: openSession,
+	});
+	const chatNotice = resume.failure
+		? {
+				text: t({ message: "Could not resume the chat" }),
+				action: { label: t({ message: "Retry" }), onPress: resume.retry },
+			}
+		: activeRow?.stopped
+			? { text: t({ message: "Resuming the chat…" }) }
+			: null;
 
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(async () => {
@@ -792,6 +803,9 @@ export function WorkspaceScreen() {
 				throw new Error("Terminal is not connected");
 			}
 			if (activeIsChat) {
+				if (activeRow?.stopped) {
+					throw new Error(t({ message: "The chat is still resuming" }));
+				}
 				if (!chatRef.current) throw new Error("Chat is not connected");
 				const host = getHostServiceClientByUrl(hostUrl);
 				const home = cloud ? "cloud" : "host";
@@ -833,7 +847,16 @@ export function WorkspaceScreen() {
 				text,
 			});
 		},
-		[hostUrl, activeTerminalId, id, activeIsChat, cloud, hostVersion],
+		[
+			hostUrl,
+			activeTerminalId,
+			id,
+			activeIsChat,
+			activeRow?.stopped,
+			cloud,
+			hostVersion,
+			t,
+		],
 	);
 
 	const handleQuickKey = useCallback(
@@ -1181,6 +1204,7 @@ export function WorkspaceScreen() {
 						key={activeTerminalId}
 						onOpenSession={openSession}
 						onOpenPullRequests={openPullRequests}
+						notice={chatNotice}
 						onTap={dismissComposer}
 						pullRequestChip={chatPullRequestChip}
 						ref={chatRef}
@@ -1273,6 +1297,18 @@ export function WorkspaceScreen() {
 						refreshing={refreshing}
 						title={t({
 							message: "This workspace's host is offline",
+						})}
+					/>
+				) : terminalsFailed && rows.length === 0 ? (
+					<WorkspacePlaceholder
+						body={t({
+							message: "The machine did not answer. Pull to check again.",
+						})}
+						icon={TriangleAlert}
+						onRefresh={onRefresh}
+						refreshing={refreshing}
+						title={t({
+							message: "Could not load this workspace's sessions",
 						})}
 					/>
 				) : (

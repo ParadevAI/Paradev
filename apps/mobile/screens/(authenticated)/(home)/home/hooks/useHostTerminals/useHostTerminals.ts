@@ -1,13 +1,10 @@
-import { presetForAnyHarness } from "@superset/chat/core";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { getChatTransport } from "@/lib/chat";
 import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
-import { type LiveChat, listLiveChats } from "./utils/listLiveChats";
 
 export interface TerminalsHost {
 	organizationId: string;
@@ -24,14 +21,11 @@ export interface TerminalsHost {
 
 export type TerminalAttention = "working" | "permission" | "failed" | "review";
 
-// Desktop's STATUS_PRIORITY: a live permission prompt is actionable right
-// now; a failure is terminal; review is the least urgent.
-const ATTENTION_PRIORITY: Record<TerminalAttention, number> = {
-	review: 1,
-	working: 2,
-	failed: 3,
-	permission: 4,
-};
+/** A chat whose agent stopped without being closed; opening it resumes the agent session. */
+export interface StoppedChat {
+	harness: string;
+	harnessSessionId: string;
+}
 
 export interface TerminalRowData {
 	/** A chat has no PTY: `terminalId` is its chat session id. */
@@ -52,9 +46,10 @@ export interface TerminalRowData {
 	/** Specific agent definition (a custom config id, or the preset id). */
 	definitionId: string | null;
 	attention: TerminalAttention | null;
+	stopped: StoppedChat | null;
 }
 
-const TERMINALS_REFETCH_INTERVAL_MS = 5_000;
+export const SESSIONS_REFETCH_INTERVAL_MS = 5_000;
 
 export function getHostTerminalsQueryKey(machineId: string | null) {
 	return ["host-terminals", "list", machineId] as const;
@@ -65,28 +60,6 @@ export function getHostTerminalsQueryKey(machineId: string | null) {
  * blocking state, never seen-gated; `review` is an unseen Stop — it clears
  * when the seen mark catches up to the binding's lastEventAt.
  */
-function chatAttention(
-	chat: LiveChat,
-	lastSeenAt: number | undefined,
-): TerminalAttention | null {
-	switch (chat.status) {
-		case "awaiting_input":
-			return "permission";
-		case "starting":
-		case "running":
-			return "working";
-		case "dead":
-			return "failed";
-		case "idle":
-			return chat.updatedAt > (lastSeenAt ?? 0) ? "review" : null;
-		default:
-			return null;
-	}
-}
-
-// The host keeps no creation time for a chat; first sight keeps tabs still.
-const chatFirstSeenAt = new Map<string, number>();
-
 function attentionFromEvent(
 	lastEventType: string,
 	lastEventAt: number,
@@ -108,8 +81,6 @@ function attentionFromEvent(
 
 export interface UseHostTerminalsResult {
 	terminalsByWorkspace: Map<string, TerminalRowData[]>;
-	/** Per-workspace attention rollup by desktop's status priority. */
-	attentionByWorkspace: Map<string, TerminalAttention>;
 	/**
 	 * True once the host answered or failed (or is offline). Gates empty
 	 * states only — existing rows always render (cache-first rule).
@@ -124,8 +95,7 @@ export interface UseHostTerminalsResult {
  * joined with `terminalAgents.list` by terminalId, merged across hosts.
  * Terminals are the rows (they're the attachable unit and outlive their
  * agent); bindings supply what terminals can't: agent identity and attention.
- * Home passes the selected machine plus every addressed sandbox, so cloud
- * rows carry session marks the same way.
+ * Chats come from `useHostsChats`; `useHostsSessions` merges the two.
  */
 export function useHostsTerminals(
 	hosts: TerminalsHost[],
@@ -140,7 +110,7 @@ export function useHostsTerminals(
 					machineId: host.machineId,
 					hostUrl: hostServiceUrl(host.organizationId, host.machineId),
 					refetchIntervalMs:
-						host.refetchIntervalMs ?? TERMINALS_REFETCH_INTERVAL_MS,
+						host.refetchIntervalMs ?? SESSIONS_REFETCH_INTERVAL_MS,
 				})),
 		[hosts],
 	);
@@ -155,22 +125,17 @@ export function useHostsTerminals(
 			networkMode: "always" as const,
 			queryFn: async () => {
 				const client = getHostServiceClientByUrl(host.hostUrl);
-				const [listed, bindings, chats] = await Promise.all([
+				const [listed, bindings] = await Promise.all([
 					client.terminal.list.query({}),
 					client.terminalAgents.list.query(),
-					// A host without chat, or one too old to serve it, has no chats.
-					listLiveChats(getChatTransport(host.hostUrl)).catch(
-						(): LiveChat[] => [],
-					),
 				]);
-				return { sessions: listed.sessions, bindings, chats };
+				return { sessions: listed.sessions, bindings };
 			},
 		})),
 	});
 
 	return useMemo(() => {
 		const terminalsByWorkspace = new Map<string, TerminalRowData[]>();
-		const attentionByWorkspace = new Map<string, TerminalAttention>();
 
 		for (const query of queries) {
 			const bindingsByTerminal = new Map(
@@ -182,13 +147,6 @@ export function useHostsTerminals(
 			for (const session of query.data?.sessions ?? []) {
 				if (session.exited) continue;
 				const binding = bindingsByTerminal.get(session.terminalId);
-				const attention = binding
-					? attentionFromEvent(
-							binding.lastEventType,
-							binding.lastEventAt,
-							terminalSeenAt[session.terminalId],
-						)
-					: null;
 				const row: TerminalRowData = {
 					kind: "terminal",
 					terminalId: session.terminalId,
@@ -200,74 +158,24 @@ export function useHostsTerminals(
 					lastEventAt: binding?.lastEventAt ?? null,
 					agentId: binding?.agentId ?? null,
 					definitionId: binding?.definitionId ?? binding?.agentId ?? null,
-					attention,
+					attention: binding
+						? attentionFromEvent(
+								binding.lastEventType,
+								binding.lastEventAt,
+								terminalSeenAt[session.terminalId],
+							)
+						: null,
+					stopped: null,
 				};
 				const group = terminalsByWorkspace.get(session.workspaceId);
 				if (group) group.push(row);
 				else terminalsByWorkspace.set(session.workspaceId, [row]);
-
-				// Stale statuses are worse than none: attention only from live data.
-				if (attention) {
-					const existing = attentionByWorkspace.get(session.workspaceId);
-					if (
-						!existing ||
-						ATTENTION_PRIORITY[attention] > ATTENTION_PRIORITY[existing]
-					) {
-						attentionByWorkspace.set(session.workspaceId, attention);
-					}
-				}
 			}
-			for (const chat of query.data?.chats ?? []) {
-				const agentId = presetForAnyHarness(chat.harness) ?? null;
-				const attention = chatAttention(chat, terminalSeenAt[chat.sessionId]);
-				let firstSeenAt = chatFirstSeenAt.get(chat.sessionId);
-				if (firstSeenAt === undefined) {
-					firstSeenAt = Date.now();
-					chatFirstSeenAt.set(chat.sessionId, firstSeenAt);
-				}
-				const row: TerminalRowData = {
-					kind: "chat",
-					terminalId: chat.sessionId,
-					workspaceId: chat.workspaceId,
-					title: chat.title ?? agentId ?? chat.harness,
-					customTitle: null,
-					ts: chat.updatedAt,
-					createdAt: firstSeenAt,
-					lastEventAt: chat.updatedAt,
-					agentId,
-					definitionId: agentId,
-					attention,
-				};
-				const group = terminalsByWorkspace.get(chat.workspaceId);
-				if (group) group.push(row);
-				else terminalsByWorkspace.set(chat.workspaceId, [row]);
-				if (attention) {
-					const existing = attentionByWorkspace.get(chat.workspaceId);
-					if (
-						!existing ||
-						ATTENTION_PRIORITY[attention] > ATTENTION_PRIORITY[existing]
-					) {
-						attentionByWorkspace.set(chat.workspaceId, attention);
-					}
-				}
-			}
-		}
-		for (const group of terminalsByWorkspace.values()) {
-			group.sort((a, b) => b.ts - a.ts);
 		}
 		return {
 			terminalsByWorkspace,
-			attentionByWorkspace,
 			isReady: queries.every((query) => query.isSuccess || query.isError),
 			isError: queries.some((query) => query.isError),
 		};
 	}, [queries, terminalSeenAt]);
-}
-
-/** One host's terminals — see `useHostsTerminals`. */
-export function useHostTerminals(
-	host: TerminalsHost | null,
-): UseHostTerminalsResult {
-	const hosts = useMemo(() => (host ? [host] : []), [host]);
-	return useHostsTerminals(hosts);
 }

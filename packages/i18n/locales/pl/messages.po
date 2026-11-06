@@ -5745,6 +5745,9 @@ msgstr "Nie udało się wczytać tego pliku."
 msgid "Could not load this pull request."
 msgstr "Nie udało się wczytać tego pull requesta."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Nie udało się wczytać sesji tego obszaru roboczego"
+
 msgid "Could not load your machines"
 msgstr "Nie udało się wczytać Twoich maszyn"
 
@@ -16491,6 +16494,9 @@ msgstr "Wznowienie po resecie"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wznowienie za {resumeSeconds} s"
 
+msgid "Resuming the chat…"
+msgstr "Wznawianie czatu…"
+
 msgid "Retry"
 msgstr "Ponów"
 
@@ -19487,6 +19493,9 @@ msgstr "Przycisk teraz się wyróżnia. Sprawdziłem to w Twoim panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Zmiana działa od razu. Płacisz tylko różnicę za resztę okresu."
 
+msgid "The chat is still resuming"
+msgstr "Czat jest jeszcze wznawiany"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Czat zostaje bez zmian. Pliki edytowane od tej tury przez kogokolwiek pozostają nietknięte i są wymienione."
 
@@ -19658,6 +19667,9 @@ msgstr "Lokalna usługa hosta nie działa, więc nic na tym urządzeniu nie obs�
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Lokalna usługa hosta właśnie wstała. Trwa ponowne łączenie."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Maszyna nie odpowiedziała. Pociągnij, aby sprawdzić ponownie."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Większość scalonych PR-ów od agentów wymaga tylko przeglądu, bez żadnych poprawek człowieka."

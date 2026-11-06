@@ -77,6 +77,11 @@ function activityTexts(
 
 export type ChatAttachment = Omit<ChatAttachmentPart, "type">;
 
+export interface ChatNotice {
+	text: string;
+	action?: { label: string; onPress: () => void };
+}
+
 export interface ChatSessionViewHandle {
 	send: (text: string, attachments?: ChatAttachment[]) => Promise<void>;
 }
@@ -95,6 +100,8 @@ interface ChatSessionViewProps {
 		diffstat: PullRequestDiffstat | null;
 	};
 	onOpenPullRequests?: () => void;
+	/** Shown in place of the chat's own banner. */
+	notice?: ChatNotice | null;
 }
 
 /**
@@ -115,6 +122,7 @@ export const ChatSessionView = forwardRef<
 		onTap,
 		pullRequestChip,
 		onOpenPullRequests,
+		notice,
 	},
 	ref,
 ) {
@@ -423,20 +431,31 @@ export const ChatSessionView = forwardRef<
 	const tapHandlers = useTapHandlers(onTap);
 
 	const banner =
-		session?.status === "dead"
+		notice?.text ??
+		(session?.status === "dead"
 			? t({ message: "This chat has ended." })
 			: chat.connection !== "open" && chat.status === "ready"
 				? t({ message: "Reconnecting…" })
-				: null;
+				: null);
 
 	return (
 		<View className="flex-1">
 			{banner ? (
 				<View
-					className="bg-secondary absolute z-10 self-center rounded-full px-3.5 py-1.5"
+					className="bg-secondary absolute z-10 flex-row items-center gap-3 self-center rounded-full px-3.5 py-1.5"
 					style={{ top: headerHeight + 8 }}
 				>
 					<Text className="text-foreground text-xs font-medium">{banner}</Text>
+					{notice?.action ? (
+						<Pressable
+							accessibilityRole="button"
+							onPress={notice.action.onPress}
+						>
+							<Text className="text-primary text-xs font-semibold">
+								{notice.action.label}
+							</Text>
+						</Pressable>
+					) : null}
 				</View>
 			) : null}
 			<ItemBodiesProvider requestItemBodies={chat.requestItemBodies}>

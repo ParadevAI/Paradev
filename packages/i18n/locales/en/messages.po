@@ -5745,6 +5745,9 @@ msgstr "Could not load this file."
 msgid "Could not load this pull request."
 msgstr "Could not load this pull request."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Could not load this workspace's sessions"
+
 msgid "Could not load your machines"
 msgstr "Could not load your machines"
 
@@ -16491,6 +16494,9 @@ msgstr "Resuming at reset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Resuming in {resumeSeconds}s"
 
+msgid "Resuming the chat…"
+msgstr "Resuming the chat…"
+
 msgid "Retry"
 msgstr "Retry"
 
@@ -19487,6 +19493,9 @@ msgstr "The button now stands out. I checked it in your pane."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "The change starts now. You pay only the difference for the rest of this period."
 
+msgid "The chat is still resuming"
+msgstr "The chat is still resuming"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 
@@ -19658,6 +19667,9 @@ msgstr "The local host service isn't running, so nothing on this device can serv
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "The local host service just came up. Reconnecting to it now."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "The machine did not answer. Pull to check again."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "The majority of merged agent PRs need review only, with zero human edits."

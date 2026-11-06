@@ -5745,6 +5745,9 @@ msgstr "Tento soubor se nepodařilo načíst."
 msgid "Could not load this pull request."
 msgstr "Tento pull request se nepodařilo načíst."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Nepodařilo se načíst relace tohoto pracovního prostoru"
+
 msgid "Could not load your machines"
 msgstr "Nepodařilo se načíst vaše počítače"
 
@@ -16491,6 +16494,9 @@ msgstr "Pokračuje po obnovení"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Pokračování za {resumeSeconds} s"
 
+msgid "Resuming the chat…"
+msgstr "Pokračuje se v chatu…"
+
 msgid "Retry"
 msgstr "Zkusit znovu"
 
@@ -19487,6 +19493,9 @@ msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Změna platí hned. Platíte jen rozdíl za zbytek období."
 
+msgid "The chat is still resuming"
+msgstr "Chat se stále obnovuje"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, zůstanou beze změny a budou vypsány."
 
@@ -19658,6 +19667,9 @@ msgstr "Místní host service neběží, takže pracovní prostor nemá na tomto
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Místní host service právě naběhla. Připojuji se k ní."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Počítač neodpověděl. Zkontrolujte znovu stažením dolů."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Většina sloučených PR od agentů potřebuje jen revizi, bez jediné lidské úpravy."

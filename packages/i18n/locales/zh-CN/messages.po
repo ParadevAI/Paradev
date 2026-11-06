@@ -5745,6 +5745,9 @@ msgstr "无法加载这个文件。"
 msgid "Could not load this pull request."
 msgstr "无法加载此拉取请求。"
 
+msgid "Could not load this workspace's sessions"
+msgstr "无法加载此工作区的会话"
+
 msgid "Could not load your machines"
 msgstr "无法加载你的机器"
 
@@ -16491,6 +16494,9 @@ msgstr "将在重置后继续"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒后继续"
 
+msgid "Resuming the chat…"
+msgstr "正在继续聊天…"
+
 msgid "Retry"
 msgstr "重试"
 
@@ -19487,6 +19493,9 @@ msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "变更立即生效。您只需支付本期剩余时间的差价。"
 
+msgid "The chat is still resuming"
+msgstr "聊天仍在继续中"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "聊天保持不变。自本轮以来被任何人编辑过的文件将保持不动并列出。"
 
@@ -19658,6 +19667,9 @@ msgstr "本地主机服务未运行，因此此设备上没有任何服务能提
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "本地主机服务刚刚启动。正在重新连接。"
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "机器没有响应。下拉可再次检查。"
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "多数已合并的智能体PR只需审查，无需任何人工修改。"

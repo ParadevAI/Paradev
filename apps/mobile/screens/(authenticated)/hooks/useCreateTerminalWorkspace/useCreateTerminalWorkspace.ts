@@ -16,8 +16,8 @@ import { errorCopy, transportFailureKind } from "@/lib/errors";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { isMissingProcedureError } from "@/lib/host-service/errors";
 import { posthog } from "@/lib/posthog";
-import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useResolveAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
+import { invalidateHostSessions } from "@/screens/(authenticated)/hooks/useHostSessions";
 import { useAppReviewStore } from "@/screens/(authenticated)/stores/appReviewStore";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import {
@@ -168,9 +168,7 @@ export function useCreateTerminalWorkspace() {
 							target.hostUrl,
 						),
 					});
-					void queryClient.invalidateQueries({
-						queryKey: getHostTerminalsQueryKey(target.machineId),
-					});
+					void invalidateHostSessions(queryClient, target.machineId);
 				};
 
 				startChatOnPhone = () => {

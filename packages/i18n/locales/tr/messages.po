@@ -5745,6 +5745,9 @@ msgstr "Bu dosya yüklenemedi."
 msgid "Could not load this pull request."
 msgstr "Bu pull request yüklenemedi."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Bu çalışma alanının oturumları yüklenemedi"
+
 msgid "Could not load your machines"
 msgstr "Makineleriniz yüklenemedi"
 
@@ -16491,6 +16494,9 @@ msgstr "Sıfırlanınca devam edilecek"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} sn içinde devam edilecek"
 
+msgid "Resuming the chat…"
+msgstr "Sohbete devam ediliyor…"
+
 msgid "Retry"
 msgstr "Yeniden dene"
 
@@ -19487,6 +19493,9 @@ msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı ödersiniz."
 
+msgid "The chat is still resuming"
+msgstr "Sohbete hâlâ devam ediliyor"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
 
@@ -19658,6 +19667,9 @@ msgstr "Yerel host hizmeti çalışmıyor, bu yüzden bu cihazda hiçbir şey ç
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Yerel host hizmeti yeni açıldı. Şimdi ona yeniden bağlanılıyor."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Makine yanıt vermedi. Yeniden denetlemek için aşağı çekin."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Birleştirilen ajan PR'larının çoğu yalnızca inceleme gerektirir, hiç insan düzenlemesi olmaz."

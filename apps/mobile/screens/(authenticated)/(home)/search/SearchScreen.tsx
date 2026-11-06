@@ -23,14 +23,12 @@ import {
 	useHostWorkspaces,
 } from "@/hooks/useHostWorkspaces";
 import { useTheme } from "@/hooks/useTheme";
-import {
-	type TerminalsHost,
-	useHostsTerminals,
-} from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
+import type { TerminalsHost } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useHostsSessions } from "@/screens/(authenticated)/hooks/useHostSessions";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 
 /**
@@ -72,7 +70,7 @@ export function SearchScreen() {
 		() => (cloudScope || !selectedHost ? [] : [selectedHost]),
 		[selectedHost, cloudScope],
 	);
-	const { terminalsByWorkspace } = useHostsTerminals(terminalHosts);
+	const { terminalsByWorkspace } = useHostsSessions(terminalHosts);
 
 	const projectNamesById = useMemo(
 		() => new Map(projects.map((project) => [project.id, project.name])),

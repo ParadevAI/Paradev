@@ -10,11 +10,11 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
+import type { TerminalRowData } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import {
-	getHostTerminalsQueryKey,
-	type TerminalRowData,
-	useHostTerminals,
-} from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
+	invalidateHostSessions,
+	useHostSessions,
+} from "@/screens/(authenticated)/hooks/useHostSessions";
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { SessionList } from "./components/SessionList";
@@ -32,7 +32,7 @@ export function SessionsSheet() {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { workspace, host } = useWorkspaceHost(id ?? null);
-	const { terminalsByWorkspace } = useHostTerminals(host);
+	const { terminalsByWorkspace } = useHostSessions(host);
 	const hostUrl = host
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
@@ -111,9 +111,7 @@ export function SessionsSheet() {
 								)
 								.finally(() => {
 									if (!host) return;
-									void queryClient.invalidateQueries({
-										queryKey: getHostTerminalsQueryKey(host.machineId),
-									});
+									void invalidateHostSessions(queryClient, host.machineId);
 								});
 						},
 					},

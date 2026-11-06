@@ -11,12 +11,12 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
-import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import {
 	agentLaunchPresetId,
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { invalidateHostSessions } from "@/screens/(authenticated)/hooks/useHostSessions";
 import type { PullRequestDetail } from "../../../../utils/pullRequest";
 import { agentPrompt } from "../../utils/agentPrompt";
 import type { AgentActionId } from "../../utils/pullRequestState";
@@ -65,9 +65,7 @@ export function useAskAgent({ workspaceId }: { workspaceId: string | null }) {
 			return { terminalId: result.sessionId, machineId: host.machineId };
 		},
 		onSuccess: ({ terminalId, machineId }) => {
-			void queryClient.invalidateQueries({
-				queryKey: getHostTerminalsQueryKey(machineId),
-			});
+			void invalidateHostSessions(queryClient, machineId);
 			router.dismissTo(
 				`/(authenticated)/workspace/${workspaceId}?tab=${terminalId}`,
 			);

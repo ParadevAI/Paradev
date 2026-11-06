@@ -5745,6 +5745,9 @@ msgstr "Не удалось загрузить этот файл."
 msgid "Could not load this pull request."
 msgstr "Не удалось загрузить этот пул-реквест."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Не удалось загрузить сессии этой рабочей области"
+
 msgid "Could not load your machines"
 msgstr "Не удалось загрузить ваши машины"
 
@@ -16491,6 +16494,9 @@ msgstr "Продолжится после сброса"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Продолжение через {resumeSeconds} с"
 
+msgid "Resuming the chat…"
+msgstr "Чат продолжается…"
+
 msgid "Retry"
 msgstr "Повторить"
 
@@ -19487,6 +19493,9 @@ msgstr "Теперь кнопка выделяется. Я проверил эт
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Изменение вступает в силу сразу. Вы платите только разницу за остаток периода."
 
+msgid "The chat is still resuming"
+msgstr "Чат ещё продолжается"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Чат остаётся как есть. Файлы, которые кто-либо изменил после этого хода, не трогаются и перечисляются."
 
@@ -19658,6 +19667,9 @@ msgstr "Локальная служба хоста не запущена, поэ
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Локальная служба хоста только что поднялась. Подключаемся к ней."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Машина не ответила. Потяните, чтобы проверить снова."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Большинству объединённых агентских PR нужно только ревью, без правок человека."

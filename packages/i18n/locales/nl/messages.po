@@ -5745,6 +5745,9 @@ msgstr "Kan dit bestand niet laden."
 msgid "Could not load this pull request."
 msgstr "Kan deze pull request niet laden."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Kan de sessies van deze werkruimte niet laden"
+
 msgid "Could not load your machines"
 msgstr "Kan je machines niet laden"
 
@@ -16491,6 +16494,9 @@ msgstr "Wordt hervat bij reset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Wordt hervat over {resumeSeconds} s"
 
+msgid "Resuming the chat…"
+msgstr "Chat wordt hervat…"
+
 msgid "Retry"
 msgstr "Opnieuw"
 
@@ -19487,6 +19493,9 @@ msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van deze periode."
 
+msgid "The chat is still resuming"
+msgstr "De chat wordt nog hervat"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan ook zijn bewerkt, blijven ongemoeid en worden vermeld."
 
@@ -19658,6 +19667,9 @@ msgstr "De lokale hostservice draait niet, dus niets op dit apparaat kan de werk
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "De lokale hostservice is net gestart. Er wordt nu opnieuw verbinding mee gemaakt."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "De machine heeft niet geantwoord. Trek omlaag om opnieuw te controleren."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "De meeste gemergede agent-PR's hoeven alleen gereviewd te worden, zonder menselijke bewerkingen."

@@ -1,5 +1,6 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
+import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { Alert, ScrollView, TextInput, View } from "react-native";
@@ -7,6 +8,7 @@ import { Text } from "@/components/ui/text";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import { useTheme } from "@/hooks/useTheme";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { getChatTransport } from "@/lib/chat";
 import { errorCopy } from "@/lib/errors";
 import {
 	getHostServiceClientByUrl,
@@ -15,16 +17,16 @@ import {
 import { posthog } from "@/lib/posthog";
 import { useStartWorkspaceTerminal } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useStartWorkspaceTerminal";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
-import {
-	getHostTerminalsQueryKey,
-	useHostTerminals,
-} from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import {
 	agentLaunchPresetId,
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import {
+	invalidateHostSessions,
+	useHostSessions,
+} from "@/screens/(authenticated)/hooks/useHostSessions";
 import {
 	type DraftComment,
 	NO_COMMENTS,
@@ -58,7 +60,7 @@ export function FinishReviewSheet() {
 	const workspaceId = id ?? "";
 
 	const { workspace, host } = useWorkspaceHost(workspaceId || null);
-	const { terminalsByWorkspace } = useHostTerminals(host);
+	const { terminalsByWorkspace } = useHostSessions(host);
 	const comments = useDraftCommentsStore(
 		(state) => state.commentsByWorkspace[workspaceId] ?? NO_COMMENTS,
 	);
@@ -83,7 +85,12 @@ export function FinishReviewSheet() {
 	);
 
 	const terminalRows = useMemo(
-		() => (workspaceId ? (terminalsByWorkspace.get(workspaceId) ?? []) : []),
+		() =>
+			workspaceId
+				? (terminalsByWorkspace.get(workspaceId) ?? []).filter(
+						(row) => !row.stopped,
+					)
+				: [],
 		[terminalsByWorkspace, workspaceId],
 	);
 
@@ -125,16 +132,24 @@ export function FinishReviewSheet() {
 				return;
 			}
 			const hostUrl = hostServiceUrl(host.organizationId, host.machineId);
-			await getHostServiceClientByUrl(hostUrl).terminal.send.mutate({
-				terminalId: target,
-				workspaceId,
-				text: prompt,
-			});
+			const targetRow = terminalRows.find((row) => row.terminalId === target);
+			if (targetRow?.kind === "chat") {
+				await getChatTransport(hostUrl).prompt({
+					commandId: randomUUID(),
+					sessionId: target,
+					clientId: randomUUID(),
+					content: [{ type: "text", text: prompt }],
+				});
+			} else {
+				await getHostServiceClientByUrl(hostUrl).terminal.send.mutate({
+					terminalId: target,
+					workspaceId,
+					text: prompt,
+				});
+			}
 			posthog.capture("review_submitted", submitted);
 			clearWorkspace(workspaceId);
-			void queryClient.invalidateQueries({
-				queryKey: getHostTerminalsQueryKey(host.machineId),
-			});
+			void invalidateHostSessions(queryClient, host.machineId);
 			router.back();
 			router.push(`/(authenticated)/workspace/${workspaceId}?tab=${target}`);
 		} catch (cause) {

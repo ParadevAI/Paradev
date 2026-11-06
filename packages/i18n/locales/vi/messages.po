@@ -5745,6 +5745,9 @@ msgstr "Không thể tải tệp này."
 msgid "Could not load this pull request."
 msgstr "Không thể tải pull request này."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Không thể tải các phiên của workspace này"
+
 msgid "Could not load your machines"
 msgstr "Không thể tải danh sách máy của bạn"
 
@@ -16491,6 +16494,9 @@ msgstr "Sẽ tiếp tục khi đặt lại"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Tiếp tục sau {resumeSeconds} giây"
 
+msgid "Resuming the chat…"
+msgstr "Đang tiếp tục cuộc trò chuyện…"
+
 msgid "Retry"
 msgstr "Thử lại"
 
@@ -19487,6 +19493,9 @@ msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạ
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Thay đổi có hiệu lực ngay. Bạn chỉ trả phần chênh lệch cho thời gian còn lại của kỳ này."
 
+msgid "The chat is still resuming"
+msgstr "Cuộc trò chuyện vẫn đang được tiếp tục"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat vẫn giữ nguyên. Các tệp đã được bất kỳ ai sửa kể từ lượt này sẽ được giữ nguyên và liệt kê."
 
@@ -19658,6 +19667,9 @@ msgstr "Dịch vụ host cục bộ không chạy nên không có gì trên thi�
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Dịch vụ host cục bộ vừa khởi động. Đang kết nối lại tới nó."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Máy không phản hồi. Kéo để kiểm tra lại."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Phần lớn PR của agent được merge chỉ cần review, không có chỉnh sửa của con người."

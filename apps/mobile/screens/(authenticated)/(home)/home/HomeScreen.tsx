@@ -46,6 +46,7 @@ import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloud
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
 import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
+import { useHostsSessions } from "@/screens/(authenticated)/hooks/useHostSessions";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import {
 	type OrgPullRequest,
@@ -70,10 +71,7 @@ import { useCloudPullRequests } from "./hooks/useCloudPullRequests";
 import { useCloudRepos } from "./hooks/useCloudRepos";
 import { useFirstPaint } from "./hooks/useFirstPaint";
 import { GRID_GAP, useHomeGrid } from "./hooks/useHomeGrid";
-import {
-	type TerminalsHost,
-	useHostsTerminals,
-} from "./hooks/useHostTerminals";
+import type { TerminalsHost } from "./hooks/useHostTerminals";
 import { useNow } from "./hooks/useNow";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
 import {
@@ -232,7 +230,7 @@ export function HomeScreen() {
 		[selectedHost, cloudScope],
 	);
 	const { terminalsByWorkspace, attentionByWorkspace } =
-		useHostsTerminals(terminalHosts);
+		useHostsSessions(terminalHosts);
 
 	// Projects are fully local — served by the selected host, not the cloud.
 	const { projects, isReady: projectsReady } = useHostProjects(selectedHost);

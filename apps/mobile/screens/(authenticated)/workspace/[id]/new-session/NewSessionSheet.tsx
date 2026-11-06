@@ -17,7 +17,6 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
-import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { useResolveAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
@@ -27,9 +26,11 @@ import {
 	resolveAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { invalidateHostSessions } from "@/screens/(authenticated)/hooks/useHostSessions";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { resumeChat } from "../utils/resumeChat";
 import { openDesktopChatTab } from "./utils/openDesktopChatTab";
 
 /**
@@ -74,6 +75,7 @@ export function NewSessionSheet() {
 				.filter(
 					(row) =>
 						row.live === false &&
+						!!row.closedAt &&
 						row.harnessSessionId &&
 						!running.has(row.harnessSessionId),
 				)
@@ -180,9 +182,7 @@ export function NewSessionSheet() {
 				terminalId = result.sessionId;
 			}
 			if (host) {
-				void queryClient.invalidateQueries({
-					queryKey: getHostTerminalsQueryKey(host.machineId),
-				});
+				void invalidateHostSessions(queryClient, host.machineId);
 			}
 			router.dismissTo(
 				`/(authenticated)/workspace/${workspace.id}?tab=${terminalId}`,
@@ -203,31 +203,23 @@ export function NewSessionSheet() {
 		if (launchingKey !== null) return;
 		setLaunchingKey(chat.sessionId);
 		try {
-			const transport = getChatTransport(hostUrl);
-			await transport
-				.closeSession({ sessionId: chat.sessionId })
-				.catch(() => {});
-			const created = await transport.createSession({
+			const resumedId = await resumeChat(getChatTransport(hostUrl), {
 				commandId: randomUUID(),
 				workspaceId: workspace.id,
+				sessionId: chat.sessionId,
 				harness: chat.harness,
-				resume: {
-					harnessSessionId: chat.harnessSessionId,
-					replacesSessionId: chat.sessionId,
-				},
+				harnessSessionId: chat.harnessSessionId,
 			});
 			openDesktopChatTab(
 				getHostServiceClientByUrl(hostUrl),
 				workspace.id,
-				created.sessionId,
+				resumedId,
 			);
 			if (host) {
-				void queryClient.invalidateQueries({
-					queryKey: getHostTerminalsQueryKey(host.machineId),
-				});
+				void invalidateHostSessions(queryClient, host.machineId);
 			}
 			router.dismissTo(
-				`/(authenticated)/workspace/${workspace.id}?tab=${created.sessionId}`,
+				`/(authenticated)/workspace/${workspace.id}?tab=${resumedId}`,
 			);
 		} catch (error) {
 			setLaunchingKey(null);

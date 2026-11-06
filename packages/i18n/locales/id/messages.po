@@ -5745,6 +5745,9 @@ msgstr "Tidak bisa memuat file ini."
 msgid "Could not load this pull request."
 msgstr "Tidak bisa memuat pull request ini."
 
+msgid "Could not load this workspace's sessions"
+msgstr "Tidak bisa memuat sesi workspace ini"
+
 msgid "Could not load your machines"
 msgstr "Tidak bisa memuat mesin Anda"
 
@@ -16491,6 +16494,9 @@ msgstr "Akan dilanjutkan saat direset"
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
 
+msgid "Resuming the chat…"
+msgstr "Melanjutkan obrolan…"
+
 msgid "Retry"
 msgstr "Coba lagi"
 
@@ -19487,6 +19493,9 @@ msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa periode ini."
 
+msgid "The chat is still resuming"
+msgstr "Obrolan masih dilanjutkan"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siapa pun, dibiarkan dan dicantumkan."
 
@@ -19658,6 +19667,9 @@ msgstr "Layanan host lokal tidak berjalan, jadi tidak ada yang bisa melayani wor
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Layanan host lokal baru saja aktif. Menyambungkan kembali sekarang."
+
+msgid "The machine did not answer. Pull to check again."
+msgstr "Mesin tidak merespons. Tarik untuk memeriksa lagi."
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Mayoritas PR agen yang di-merge hanya perlu direview, tanpa suntingan manusia."
