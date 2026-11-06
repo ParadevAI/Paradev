@@ -16233,6 +16233,9 @@ msgstr "Replied to your DM"
 msgid "Reply"
 msgstr "Reply"
 
+msgid "Reply from {peerName}"
+msgstr "Reply from {peerName}"
+
 msgid "Reply in thread"
 msgstr "Reply in thread"
 

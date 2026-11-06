@@ -16233,6 +16233,9 @@ msgstr "あなたのダイレクトメッセージに返信しました"
 msgid "Reply"
 msgstr "返信"
 
+msgid "Reply from {peerName}"
+msgstr "{peerName} からの返信"
+
 msgid "Reply in thread"
 msgstr "スレッドで返信"
 

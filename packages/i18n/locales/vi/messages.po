@@ -16233,6 +16233,9 @@ msgstr "Đã trả lời tin nhắn trực tiếp của bạn"
 msgid "Reply"
 msgstr "Trả lời"
 
+msgid "Reply from {peerName}"
+msgstr "Trả lời từ {peerName}"
+
 msgid "Reply in thread"
 msgstr "Trả lời trong chuỗi"
 

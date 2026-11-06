@@ -387,6 +387,7 @@ export function transcriptRows(
 	}
 
 	attachAsked(rows, groups, outbox, findMessageCards);
+	if (combineCards) joinExchanges(rows, isHarnessNote);
 	if (collapseLoneTools) foldWork(rows, isHarnessNote);
 
 	const newestCard = rows.findLast((row) => row.kind === "changed_files");
@@ -404,19 +405,67 @@ export function transcriptRows(
 	return rows;
 }
 
+/** A user message the harness wrote to itself, such as a background result, rather than the person. */
+export type HarnessNoteTest = (item: UserMessage) => boolean;
+
+type Exchange = Extract<TranscriptCardRef, { kind: "exchange" }>;
+
 /**
- * In a quiet transcript a settled turn shows its clock and its last reply;
- * the work between them (narration, folded tool runs, notices) waits
- * behind the clock. A running turn stays open so progress shows.
+ * A talk with one agent that runs over several turns, such as a prompt sent
+ * in one and its answer read after a background result woke the next, stays
+ * one exchange until the person speaks. Reading the same chat twice in a row
+ * keeps the newer answer.
  */
+function joinExchanges(
+	rows: TranscriptRow[],
+	isHarnessNote: HarnessNoteTest,
+): void {
+	let open = new Map<string, Exchange>();
+	rows.forEach((row, index) => {
+		if (
+			row.kind === "item" &&
+			row.item.kind === "user_message" &&
+			!isHarnessNote(row.item as UserMessage)
+		) {
+			open = new Map();
+			return;
+		}
+		if ((row.kind !== "item" && row.kind !== "tool_run") || !row.cards) return;
+		const kept: TranscriptCardRef[] = [];
+		let changed = false;
+		for (const card of row.cards) {
+			if (card.kind !== "exchange") {
+				kept.push(card);
+				continue;
+			}
+			changed = true;
+			const earlier = open.get(card.workspaceId);
+			if (!earlier) {
+				const own = { ...card, messages: [...card.messages] };
+				open.set(card.workspaceId, own);
+				kept.push(own);
+				continue;
+			}
+			for (const message of card.messages) {
+				const last = earlier.messages.at(-1);
+				if (last?.from === "peer" && message.from === "peer") {
+					if (message.text)
+						earlier.messages[earlier.messages.length - 1] = message;
+				} else {
+					earlier.messages.push(message);
+				}
+			}
+			if (!earlier.title) earlier.title = card.title;
+		}
+		if (changed) rows[index] = { ...row, cards: kept };
+	});
+}
+
 /**
  * Everything between a settled turn's clock and its last reply folds behind
  * the clock, as does what trails the reply before the next turn: a notice or
  * a background result is work, not an answer.
  */
-/** A user message the harness wrote to itself, such as a background result, rather than the person. */
-export type HarnessNoteTest = (item: UserMessage) => boolean;
-
 function foldWork(rows: TranscriptRow[], isHarnessNote: HarnessNoteTest): void {
 	let clockAt = -1;
 	let replyAt = -1;

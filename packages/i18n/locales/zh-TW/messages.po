@@ -16233,6 +16233,9 @@ msgstr "回覆了你的私訊"
 msgid "Reply"
 msgstr "回覆"
 
+msgid "Reply from {peerName}"
+msgstr "來自 {peerName} 的回覆"
+
 msgid "Reply in thread"
 msgstr "在討論串中回覆"
 

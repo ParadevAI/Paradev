@@ -16233,6 +16233,9 @@ msgstr "Doğrudan mesajınızı yanıtladı"
 msgid "Reply"
 msgstr "Yanıtla"
 
+msgid "Reply from {peerName}"
+msgstr "{peerName} yanıtı"
+
 msgid "Reply in thread"
 msgstr "Konuda yanıtla"
 

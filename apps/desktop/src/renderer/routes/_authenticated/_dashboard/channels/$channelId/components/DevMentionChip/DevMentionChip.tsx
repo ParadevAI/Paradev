@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { MemberMention } from "../MemberMention";
 
 interface DevMentionChipProps {
 	agentId: string;
@@ -9,14 +10,12 @@ interface DevMentionChipProps {
 export function DevMentionChip({ agentId, children }: DevMentionChipProps) {
 	const navigate = useNavigate();
 	return (
-		<button
-			type="button"
+		<MemberMention
 			onClick={() =>
 				void navigate({ to: "/devs/$devId", params: { devId: agentId } })
 			}
-			className="rounded-[4px] bg-link/14 px-[3px] font-medium text-link hover:bg-link/24"
 		>
 			{children}
-		</button>
+		</MemberMention>
 	);
 }

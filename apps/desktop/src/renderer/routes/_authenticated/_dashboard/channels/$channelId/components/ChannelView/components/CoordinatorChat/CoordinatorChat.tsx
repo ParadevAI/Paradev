@@ -9,13 +9,19 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/providers/TranscriptCardsProvider";
 import { WorkspaceProvider } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useChannelAgents } from "../../../../hooks/useChannelAgents";
 import { useChannelSpeakers } from "../../../../hooks/useChannelSpeakers";
 import {
 	type ChannelCoordinator,
 	useChannelCoordinatorStore,
 } from "../../../../stores/channelCoordinatorStore";
 import { useChannelPaneStore } from "../../../../stores/channelPaneStore";
+import {
+	MENTION_HREF_PREFIX,
+	remarkMentions,
+} from "../../../../utils/remarkMentions";
 import { useChannelDevs } from "../../../ChannelPane/hooks/useChannelDevs";
+import { MemberMention } from "../../../MemberMention";
 import { useChannelComposerExtras } from "../../hooks/useChannelComposerExtras";
 import {
 	channelCardsFromMessage,
@@ -30,6 +36,9 @@ import {
 } from "../../utils/memberChips";
 import { ChannelCard } from "../ChannelCard";
 import { DevReplies } from "./components/DevReplies";
+
+const AGENT_MENTION = "agent:";
+const DEV_MENTION = "dev:";
 
 interface CoordinatorChatProps {
 	channelId: string;
@@ -50,6 +59,20 @@ export function CoordinatorChat({
 	const composerExtras = useChannelComposerExtras(channelId, channelName);
 	const speakers = useChannelSpeakers();
 	const devs = useChannelDevs(channelId);
+	const { agents } = useChannelAgents(channelName);
+	const mentionNames = useMemo(
+		() => [
+			...agents.map(({ workspace }) => ({
+				id: `${AGENT_MENTION}${workspace.id}`,
+				name: workspace.name,
+			})),
+			...devs.map((dev) => ({
+				id: `${DEV_MENTION}${dev.actorId}`,
+				name: dev.name,
+			})),
+		],
+		[agents, devs],
+	);
 	const { workspaces, isReady } = useHostWorkspaces();
 	const setSessionId = useChannelCoordinatorStore(
 		(state) => state.setSessionId,
@@ -60,8 +83,12 @@ export function CoordinatorChat({
 	const unlink = useChannelCoordinatorStore((state) => state.unlink);
 	const pushPage = useChannelPaneStore((state) => state.push);
 	const navigate = useNavigate();
-	const cards = useMemo<TranscriptCards>(
-		() => ({
+	const cards = useMemo<TranscriptCards>(() => {
+		const openAgent = (id: string) =>
+			pushPage(channelId, { kind: "agent", id });
+		const openDev = (devId: string) =>
+			void navigate({ to: "/devs/$devId", params: { devId } });
+		return {
 			findCards: channelCardsFromTool,
 			wantsBody: channelWantsBody,
 			findMessageCards: channelCardsFromMessage,
@@ -102,19 +129,31 @@ export function CoordinatorChat({
 					<button
 						type="button"
 						onClick={() => {
-							if (agentId) pushPage(channelId, { kind: "agent", id: agentId });
-							else if (devId) {
-								void navigate({ to: "/devs/$devId", params: { devId } });
-							}
+							if (agentId) openAgent(agentId);
+							else if (devId) openDev(devId);
 						}}
 					>
 						{rendered}
 					</button>
 				);
 			},
-		}),
-		[channelId, speakers, devs, pushPage, navigate],
-	);
+			markdown: {
+				remarkPlugins: [[remarkMentions, { people: mentionNames }]],
+				renderLink: (href, children) => {
+					if (!href.startsWith(MENTION_HREF_PREFIX)) return null;
+					const id = href.slice(MENTION_HREF_PREFIX.length);
+					const open = id.startsWith(AGENT_MENTION)
+						? () => openAgent(id.slice(AGENT_MENTION.length))
+						: id.startsWith(DEV_MENTION)
+							? () => openDev(id.slice(DEV_MENTION.length))
+							: null;
+					return (
+						open && <MemberMention onClick={open}>{children}</MemberMention>
+					);
+				},
+			},
+		};
+	}, [channelId, speakers, devs, mentionNames, pushPage, navigate]);
 	const workspace = workspaces.find(
 		(row) => row.id === coordinator.workspaceId,
 	);

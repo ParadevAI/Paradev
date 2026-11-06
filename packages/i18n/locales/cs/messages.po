@@ -16233,6 +16233,9 @@ msgstr "Odpověděl(a) na vaši přímou zprávu"
 msgid "Reply"
 msgstr "Odpovědět"
 
+msgid "Reply from {peerName}"
+msgstr "Odpověď od {peerName}"
+
 msgid "Reply in thread"
 msgstr "Odpovědět ve vlákně"
 

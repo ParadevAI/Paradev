@@ -16233,6 +16233,9 @@ msgstr "내 다이렉트 메시지에 답장함"
 msgid "Reply"
 msgstr "답글"
 
+msgid "Reply from {peerName}"
+msgstr "{peerName}의 답글"
+
 msgid "Reply in thread"
 msgstr "스레드에서 답글"
 

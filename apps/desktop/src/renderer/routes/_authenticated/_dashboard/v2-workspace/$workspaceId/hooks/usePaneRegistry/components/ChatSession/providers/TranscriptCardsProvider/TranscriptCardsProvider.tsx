@@ -3,6 +3,7 @@ import type {
 	ToolCall,
 	UserMessage,
 } from "@superset/chat/protocol";
+import type { ChatMarkdownProps } from "@superset/chat-ui/ChatMarkdown";
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
 import { createContext, type ReactNode, useContext } from "react";
 
@@ -121,6 +122,15 @@ export interface TranscriptCards {
 	renderCard: (card: TranscriptCardRef, className: string) => ReactNode;
 	/** Drawn under a person's message, such as the answers of the Devs it named; `text` is its words as shown. */
 	afterUserMessage?: (message: UserMessage, text: string) => ReactNode;
+	/**
+	 * What the screen adds to every message's markdown, such as "@name" for
+	 * its members drawn as mentions: plugins that turn words into links, and
+	 * how such a link draws (null for any link that is not its own).
+	 */
+	markdown?: {
+		remarkPlugins: NonNullable<ChatMarkdownProps["remarkPlugins"]>;
+		renderLink: (href: string, children: ReactNode) => ReactNode | null;
+	};
 	/** Wraps a chip in a sent message, such as an agent it names, so a click opens it; null keeps the chip as drawn. */
 	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
 }

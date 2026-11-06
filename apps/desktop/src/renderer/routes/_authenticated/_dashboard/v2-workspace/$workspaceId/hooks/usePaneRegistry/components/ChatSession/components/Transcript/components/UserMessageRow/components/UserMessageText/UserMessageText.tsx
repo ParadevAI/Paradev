@@ -17,6 +17,7 @@ import {
 	CHAT_MARKDOWN_COMPONENTS,
 	CHAT_REMARK_PLUGINS,
 } from "../../../../../../constants";
+import { useTranscriptMarkdown } from "../../../../../../hooks/useTranscriptMarkdown";
 import { useTranscriptCards } from "../../../../../../providers/TranscriptCardsProvider";
 import { commandChip } from "../../../../../../utils/commandChip";
 import { fileMentionChip } from "../../../../../../utils/fileMentions";
@@ -81,6 +82,7 @@ export function UserMessageText({
 	const { t } = useLingui();
 	const isDark = useIsDarkTheme();
 	const { renderChip } = useTranscriptCards();
+	const { remarkPlugins, renderLink } = useTranscriptMarkdown(REMARK_PLUGINS);
 	const chatLabel = t({ message: "Chat" });
 	const chips = useMemo(
 		() => segments.map((segment) => segmentChip(segment, commands, isDark)),
@@ -125,17 +127,19 @@ export function UserMessageText({
 						);
 					}
 				}
-				return <ChatLink {...props} />;
+				return (
+					(href && renderLink?.(href, children)) || <ChatLink {...props} />
+				);
 			},
 		}),
-		[chips, segments, isDark, chatLabel, renderChip],
+		[chips, segments, isDark, chatLabel, renderChip, renderLink],
 	);
 	return (
 		<ChatMarkdown
 			className={chatMarkdownFirstBlock}
 			complete
 			components={components}
-			remarkPlugins={REMARK_PLUGINS}
+			remarkPlugins={remarkPlugins}
 		>
 			{markdown}
 		</ChatMarkdown>

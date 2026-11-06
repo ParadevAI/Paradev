@@ -18,7 +18,12 @@ import {
 } from "@testing-library/react";
 import type { TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
+import type { ReactNode } from "react";
 import { env } from "renderer/env.renderer";
+import {
+	MENTION_HREF_PREFIX,
+	remarkMentions,
+} from "renderer/routes/_authenticated/_dashboard/channels/$channelId/utils/remarkMentions";
 import {
 	linkedPrChip,
 	linkedPrIconUrl,
@@ -27,6 +32,7 @@ import {
 	ChatPaneActionsProvider,
 	type OpenLink,
 } from "../../../../../../providers/ChatPaneActionsProvider";
+import { TranscriptCardsProvider } from "../../../../../../providers/TranscriptCardsProvider";
 import { linkChip } from "../../../../../../utils/linkChip";
 import {
 	elementsForChips,
@@ -255,6 +261,7 @@ test("a pull request picked in the composer is drawn as the composer drew it", (
 
 function renderSegments(
 	segments: Parameters<typeof UserMessageText>[0]["segments"],
+	wrap: (children: ReactNode) => ReactNode = (children) => children,
 ) {
 	const link: TRPCLink<AppRouter> = () => () => observable(() => {});
 	return render(
@@ -263,7 +270,7 @@ function renderSegments(
 			queryClient={new QueryClient()}
 		>
 			<ChatPaneActionsProvider openLink={() => true} workspaceId="workspace-1">
-				<UserMessageText segments={segments} />
+				{wrap(<UserMessageText segments={segments} />)}
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
@@ -307,4 +314,35 @@ test("typed text that only looks like markdown stays as typed", () => {
 		`${typed}edit ~/src/a_b.py and ~/src/c.py`,
 	);
 	expect(view.container.querySelector("[data-streamdown], em, del")).toBeNull();
+});
+
+test("a screen's names reach a sent message as its mentions, with other links untouched", () => {
+	const view = renderSegments(
+		[{ text: `@Ticket can you look at ${DOCS}` }],
+		(children) => (
+			<TranscriptCardsProvider
+				value={{
+					findCards: () => [],
+					renderCard: () => null,
+					markdown: {
+						remarkPlugins: [
+							[remarkMentions, { people: [{ id: "dev-1", name: "Ticket" }] }],
+						],
+						renderLink: (href, label) =>
+							href.startsWith(MENTION_HREF_PREFIX) ? (
+								<mark data-member={href.slice(MENTION_HREF_PREFIX.length)}>
+									{label}
+								</mark>
+							) : null,
+					},
+				}}
+			>
+				{children}
+			</TranscriptCardsProvider>
+		),
+	);
+	const mention = view.container.querySelector("mark");
+	expect(mention?.getAttribute("data-member")).toBe("dev-1");
+	expect(mention?.textContent).toBe("@Ticket");
+	expect(view.container.querySelectorAll("mark")).toHaveLength(1);
 });

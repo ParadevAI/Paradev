@@ -16233,6 +16233,9 @@ msgstr "Membalas pesan langsung Anda"
 msgid "Reply"
 msgstr "Balas"
 
+msgid "Reply from {peerName}"
+msgstr "Balasan dari {peerName}"
+
 msgid "Reply in thread"
 msgstr "Balas di utas"
 

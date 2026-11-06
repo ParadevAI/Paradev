@@ -16233,6 +16233,9 @@ msgstr "Ответил(а) на ваше личное сообщение"
 msgid "Reply"
 msgstr "Ответить"
 
+msgid "Reply from {peerName}"
+msgstr "Ответ от {peerName}"
+
 msgid "Reply in thread"
 msgstr "Ответить в ветке"
 

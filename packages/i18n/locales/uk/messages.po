@@ -16227,6 +16227,9 @@ msgstr "Відповів(-ла) на ваше особисте повідомл�
 msgid "Reply"
 msgstr "Відповісти"
 
+msgid "Reply from {peerName}"
+msgstr "Відповідь від {peerName}"
+
 msgid "Reply in thread"
 msgstr "Відповісти в треді"
 

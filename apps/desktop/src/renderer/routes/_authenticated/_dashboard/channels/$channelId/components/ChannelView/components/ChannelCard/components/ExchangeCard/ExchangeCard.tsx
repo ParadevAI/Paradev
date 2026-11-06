@@ -65,7 +65,7 @@ export function ExchangeCard({
 					</span>
 				</span>
 				<span className="min-w-0 flex-1 truncate text-[13px] font-medium">
-					{exchange.title || peerName}
+					{exchange.title || t({ message: `Reply from ${peerName}` })}
 				</span>
 				<span className="shrink-0 truncate text-[12px] text-muted-foreground">
 					{t({ message: `${self.name} and ${peerName}` })} ·{" "}

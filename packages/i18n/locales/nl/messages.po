@@ -16233,6 +16233,9 @@ msgstr "Heeft gereageerd op je direct bericht"
 msgid "Reply"
 msgstr "Antwoorden"
 
+msgid "Reply from {peerName}"
+msgstr "Antwoord van {peerName}"
+
 msgid "Reply in thread"
 msgstr "Antwoorden in thread"
 

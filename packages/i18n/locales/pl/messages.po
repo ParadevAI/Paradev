@@ -16233,6 +16233,9 @@ msgstr "Odpowiedział(a) na Twoją wiadomość bezpośrednią"
 msgid "Reply"
 msgstr "Odpowiedz"
 
+msgid "Reply from {peerName}"
+msgstr "Odpowiedź od {peerName}"
+
 msgid "Reply in thread"
 msgstr "Odpowiedz w wątku"
 
