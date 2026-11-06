@@ -178,6 +178,18 @@ describe("deriveTimeline", () => {
 			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
 		]);
 
+		const hiddenStop = deriveTimeline(
+			reduceMany(emptySnapshot(), [
+				env(toolCall("sleep", "canceled", 11), "h1"),
+				env({ ...stop, discarded: true } as Item, "h1"),
+				env(cannedReply, "h1"),
+			]),
+			{ harness: "claude-acp" },
+		);
+		expect(hiddenStop[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+		]);
+
 		const elsewhere = deriveTimeline(snapshot, { harness: "codex" });
 		expect(elsewhere[0]?.entries.map((entry) => entry.kind)).toEqual([
 			"item",

@@ -5,6 +5,7 @@ import type {
 	ToolCall,
 	UserMessage,
 } from "../../protocol/items";
+import { claudeBookkeeping } from "../bookkeeping/claude";
 import type { SessionSnapshot, StoredItem } from "../reducer/reducer";
 import { type UserStop, userStopOf, userStopReply } from "../userStop/userStop";
 
@@ -50,8 +51,10 @@ function stopTrailingCalls(entries: TimelineEntry[]): void {
 	}
 }
 
-function isStopReply(item: Item): boolean {
+function isStopReply(item: Item, harness: string | undefined): boolean {
 	return (
+		harness !== undefined &&
+		claudeBookkeeping.harnesses.includes(harness) &&
 		item.kind === "agent_message" &&
 		userStopReply((item as { text?: string }).text ?? "")
 	);
@@ -72,18 +75,15 @@ export function collapseWorkLog(
 		run = [];
 	};
 
-	let afterStop = false;
 	for (const item of items) {
 		if (isToolCall(item)) {
-			afterStop = false;
 			run.push(item);
 			continue;
 		}
 		const stop = userStopOf(item, harness);
 		if (stop) run = run.map(stoppedCall);
 		flush();
-		if (afterStop && isStopReply(item)) continue;
-		afterStop = stop !== null;
+		if (isStopReply(item, harness)) continue;
 		entries.push(
 			stop
 				? { kind: "user_stop", item: item as UserMessage, stop }
