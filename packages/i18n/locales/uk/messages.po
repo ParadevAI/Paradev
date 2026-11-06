@@ -2317,6 +2317,9 @@ msgstr "Агенти не мають доступу до інструменті�
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Агенти виконують рутинні тікети без втручання під час роботи."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Агенти у ваших хмарних робочих просторах зможуть за допомогою <0>--host</0> запускати команди на цьому хості. Хост має бути доступним через релей."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."
 
@@ -2559,6 +2562,9 @@ msgstr "Дозволити на сеанс"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Дозвольте доступ до мікрофона, щоб використовувати диктування"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Дозволити моїм хмарним робочим просторам доступ до цього хоста"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Дозволити віддалений доступ до цього пристрою через релей"
@@ -2818,6 +2824,9 @@ msgstr "будь-що"
 
 msgid "Anything else? (optional)"
 msgstr "Щось іще? (необов'язково)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Усе, що працює у створеному вами хмарному робочому просторі, зможе створювати робочі простори, запускати агентів і виконувати команди на цьому хості — зокрема агент, що виконує інструкції, знайдені на вебсторінці чи в репозиторії. Вмикайте, лише якщо це потрібно."
 
 msgid "Anywhere"
 msgstr "Будь-де"
@@ -10827,6 +10836,9 @@ msgstr "Дозволити агенту використовувати сеан�
 msgid "Let the agent drive."
 msgstr "Віддайте кермо агенту."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Дозволити вашим хмарним робочим просторам доступ до цього хоста?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Дає вашій організації змогу переглядати й клонувати репозиторії"
 
@@ -18542,6 +18554,9 @@ msgstr "Припинити стеження"
 msgid "Stop workspace run command"
 msgstr "Зупинити команду запуску робочого простору"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "Закрити вашим хмарним робочим просторам доступ до цього хоста?"
+
 msgid "stopped"
 msgstr "зупинено"
 
@@ -20397,6 +20412,9 @@ msgstr "Перетворіть рутинні справи на агентів, 
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
 
+msgid "Turn off"
+msgstr "Вимкнути"
+
 msgid "Turn off manual mode"
 msgstr "Вимкнути ручний режим"
 
@@ -22054,6 +22072,9 @@ msgstr "Ваші зміни"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Якщо не зберегти зміни, їх буде втрачено."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "Ваші хмарні робочі простори більше не матимуть доступу до цього хоста."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "За замовчуванням ваш код залишається локально, а підключеними сервісами ви керуєте явно."

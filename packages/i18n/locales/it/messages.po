@@ -2323,6 +2323,9 @@ msgstr "Gli agenti non possono raggiungere gli strumenti di {0}"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Gli agenti completano i ticket di routine senza interventi a metà task."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "Gli agenti nei tuoi workspace cloud potranno usare <0>--host</0> per eseguire comandi su questo host. L'host deve essere raggiungibile tramite il relay."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Gli agenti continuano a lavorare nel cloud. Riapri lo spazio di lavoro da desktop, iPhone o iPad."
 
@@ -2565,6 +2568,9 @@ msgstr "Consenti per la sessione"
 
 msgid "Allow microphone access to use dictation"
 msgstr "Consenti l'accesso al microfono per usare la dettatura"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "Consenti ai miei workspace cloud di raggiungere questo host"
 
 msgid "Allow remote access to this device via relay"
 msgstr "Consenti l'accesso remoto a questo dispositivo tramite relay"
@@ -2824,6 +2830,9 @@ msgstr "qualsiasi cosa"
 
 msgid "Anything else? (optional)"
 msgstr "Altro? (facoltativo)"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "Qualsiasi cosa in esecuzione in un workspace cloud che hai creato potrà creare workspace, avviare agenti ed eseguire comandi su questo host, incluso un agente che segue istruzioni trovate in una pagina web o in un repository. Attivalo solo se ti serve."
 
 msgid "Anywhere"
 msgstr "Ovunque"
@@ -10833,6 +10842,9 @@ msgstr "Consentire a un agente di usare i tuoi accessi di {browserName}?"
 msgid "Let the agent drive."
 msgstr "Lascia guidare l'agente."
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "Consentire ai tuoi workspace cloud di raggiungere questo host?"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "Consente alla tua organizzazione di elencare e clonare i repository"
 
@@ -18548,6 +18560,9 @@ msgstr "Smetti di osservare"
 msgid "Stop workspace run command"
 msgstr "Arresta il comando di esecuzione del workspace"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "Impedire ai tuoi workspace cloud di raggiungere questo host?"
+
 msgid "stopped"
 msgstr "arrestato"
 
@@ -20403,6 +20418,9 @@ msgstr "Trasforma le attività ripetitive in agenti che girano secondo una piani
 msgid "Turn Fast mode on or off"
 msgstr "Attiva o disattiva la modalità veloce"
 
+msgid "Turn off"
+msgstr "Disattiva"
+
 msgid "Turn off manual mode"
 msgstr "Disattiva la modalità manuale"
 
@@ -22060,6 +22078,9 @@ msgstr "Le tue modifiche"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Le tue modifiche andranno perse se non le salvi."
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "I tuoi workspace cloud non potranno più raggiungere questo host."
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Il tuo codice resta locale per impostazione predefinita, con controllo esplicito sui servizi collegati."

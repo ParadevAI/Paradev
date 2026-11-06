@@ -2323,6 +2323,9 @@ msgstr "智能体无法访问 {0} 的工具"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "智能体无需中途干预即可完成常规工单。"
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "之后，你的云端工作区中的智能体就可以使用 <0>--host</0> 参数在此主机上运行命令。该主机必须能通过中继访问。"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "智能体在云端持续工作。可在桌面端、iPhone 或 iPad 上重新打开工作区。"
 
@@ -2565,6 +2568,9 @@ msgstr "本次会话内允许"
 
 msgid "Allow microphone access to use dictation"
 msgstr "请允许麦克风访问以使用语音输入"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "允许我的云端工作区访问此主机"
 
 msgid "Allow remote access to this device via relay"
 msgstr "允许通过中继远程访问本设备"
@@ -2824,6 +2830,9 @@ msgstr "任意内容"
 
 msgid "Anything else? (optional)"
 msgstr "还有别的吗？（选填）"
+
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "你创建的云端工作区中运行的任何程序都将可以在此主机上创建工作区、启动智能体和运行命令，包括按照网页或代码仓库中的指令行事的智能体。请仅在需要时开启。"
 
 msgid "Anywhere"
 msgstr "所有位置"
@@ -10833,6 +10842,9 @@ msgstr "允许智能体使用你的 {browserName} 登录信息吗？"
 msgid "Let the agent drive."
 msgstr "让智能体来操作。"
 
+msgid "Let your cloud workspaces reach this host?"
+msgstr "允许你的云端工作区访问此主机？"
+
 msgid "Lets your organization list and clone repositories"
 msgstr "允许你的组织列出并克隆仓库"
 
@@ -18548,6 +18560,9 @@ msgstr "停止关注"
 msgid "Stop workspace run command"
 msgstr "停止工作区运行命令"
 
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "停止你的云端工作区访问此主机？"
+
 msgid "stopped"
 msgstr "已停止"
 
@@ -20403,6 +20418,9 @@ msgstr "把日常杂务交给按计划或在事件到来时运行的智能体：
 msgid "Turn Fast mode on or off"
 msgstr "开启或关闭快速模式"
 
+msgid "Turn off"
+msgstr "关闭"
+
 msgid "Turn off manual mode"
 msgstr "关闭手动模式"
 
@@ -22060,6 +22078,9 @@ msgstr "你的更改"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "如果不保存，你的更改将会丢失。"
+
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "你的云端工作区将无法再访问此主机。"
 
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的代码默认留在本地，连接哪些服务由你明确决定。"

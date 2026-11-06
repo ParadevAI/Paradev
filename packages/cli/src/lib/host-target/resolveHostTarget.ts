@@ -101,8 +101,11 @@ export async function resolveHostTarget(
 				httpBatchLink({
 					url: `${relayUrl}/hosts/${routingKey}/trpc`,
 					transformer: SuperJSON,
+					// A cloud workspace has no bearer; its firewall adds its credential.
 					headers: {
-						Authorization: `Bearer ${options.userJwt}`,
+						...(options.userJwt
+							? { Authorization: `Bearer ${options.userJwt}` }
+							: {}),
 						"x-superset-client-machine-id": localHostId,
 					},
 				}),
