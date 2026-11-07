@@ -125,7 +125,9 @@ describe("resuming chats after an update", () => {
 	test("a resume that fails hands its chat to the launch prompt", () => {
 		const markerPath = markerIn({ requestedAt: 1_000, sessions: [UNFINISHED] });
 		const { runtime } = fakeRuntime([]);
-		(runtime.commands as unknown as { resumeSession: () => never }).resumeSession = () => {
+		(
+			runtime.commands as unknown as { resumeSession: () => never }
+		).resumeSession = () => {
 			throw new Error("agent missing");
 		};
 
