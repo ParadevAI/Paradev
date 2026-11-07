@@ -10,31 +10,34 @@ import {
 import { MAX_HISTORY_SCROLLBACK_BYTES } from "./constants";
 import type { SessionInfo } from "./types";
 
+type HistoryWriterParams = {
+	paneId: string;
+	workspaceId: string;
+	cwd: string;
+	cols: number;
+	rows: number;
+	initialScrollback?: string;
+};
+
 export class HistoryManager {
 	private historyWriters = new Map<string, HistoryWriter>();
 	private pendingHistoryData = new Map<string, string[]>();
 	private historyInitializing = new Set<string>();
 
-	async initHistoryWriter({
+	async initHistoryWriter(params: HistoryWriterParams): Promise<void> {
+		this.historyInitializing.add(params.paneId);
+		this.pendingHistoryData.set(params.paneId, []);
+		await this.openHistoryWriter(params);
+	}
+
+	private async openHistoryWriter({
 		paneId,
 		workspaceId,
 		cwd,
 		cols,
 		rows,
 		initialScrollback,
-	}: {
-		paneId: string;
-		workspaceId: string;
-		cwd: string;
-		cols: number;
-		rows: number;
-		initialScrollback?: string;
-	}): Promise<void> {
-		this.historyInitializing.add(paneId);
-		if (!this.pendingHistoryData.has(paneId)) {
-			this.pendingHistoryData.set(paneId, []);
-		}
-
+	}: HistoryWriterParams): Promise<void> {
 		let safeScrollback = initialScrollback;
 		if (initialScrollback !== undefined) {
 			if (typeof initialScrollback !== "string") {
@@ -104,7 +107,8 @@ export class HistoryManager {
 			if (session) {
 				this.historyWriters.delete(paneId);
 				this.historyInitializing.add(paneId);
-				this.pendingHistoryData.set(paneId, []);
+				const pending: string[] = [];
+				this.pendingHistoryData.set(paneId, pending);
 
 				const contentAfterClear = extractContentAfterClear(data);
 				writer
@@ -116,8 +120,8 @@ export class HistoryManager {
 						);
 					})
 					.then(() => {
-						if (!this.historyInitializing.has(paneId)) return;
-						return this.initHistoryWriter({
+						if (this.pendingHistoryData.get(paneId) !== pending) return;
+						return this.openHistoryWriter({
 							paneId,
 							workspaceId: session.workspaceId,
 							cwd: session.cwd,
