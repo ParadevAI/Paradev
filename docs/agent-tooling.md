@@ -52,6 +52,15 @@ and agent launch by `packages/host-service/src/trpc/router/usage/default-account
 publishes the selection to `$SUPERSET_HOME_DIR/state/default-*` pointer files. The agent wrappers
 re-read those at every launch (`buildDefaultAccountResolver` in agent-setup), so a switch reaches
 existing terminals the next time the agent starts; a value the user exported by hand always wins.
+Sign-in commands (`codex login`/`logout`, `claude auth login`/`logout`, root options before the
+subcommand included) keep an unset value unset. Before one changes the login of the selected
+account, the wrapper names that account and asks for confirmation on the terminal, because current
+Codex releases log the old login out before they sign in. The answer comes from `/dev/tty` when
+stdin carries the CLI's input (`printf '%s' "$KEY" | codex login --with-api-key`). With no terminal
+to ask on, the wrapper exits 2 and runs nothing. A script that means to change the selected
+account's login empties the `SUPERSET_DEFAULT_*` marker for that one command, e.g.
+`SUPERSET_DEFAULT_CODEX_HOME= CODEX_HOME=<home> codex login`. Only launches through the wrappers are
+asked about; the real binary run by path, or a sign-in from inside a running session, is not.
 Paradev never touches the credential stores; the provider CLIs own every login end to end.
 
 Because those CLIs read *everything* from their active config dir, a second dir would otherwise
