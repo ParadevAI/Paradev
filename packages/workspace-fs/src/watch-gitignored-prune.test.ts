@@ -277,4 +277,53 @@ describe("FsWatcherManager.refreshIgnores", () => {
 		// No shrink → no swap.
 		expect(await manager.refreshIgnores(rootPath)).toBe(false);
 	}, 30_000);
+
+	it("closes the re-attached subscription when the last listener leaves mid-swap", async () => {
+		const rootPath = await createTempRoot();
+		const live = new Set<number>();
+		let subscribeCalls = 0;
+		let reattachStarted!: () => void;
+		const reattaching = new Promise<void>((resolve) => {
+			reattachStarted = resolve;
+		});
+		let finishReattach!: () => void;
+		const reattachGate = new Promise<void>((resolve) => {
+			finishReattach = resolve;
+		});
+		let ignored = ["buildout"];
+		const manager = new FsWatcherManager({
+			listGitIgnoredDirs: async () => ignored,
+			backend: {
+				name: "fake",
+				async subscribe() {
+					const id = ++subscribeCalls;
+					if (id === 2) {
+						reattachStarted();
+						await reattachGate;
+					}
+					live.add(id);
+					return {
+						unsubscribe: async () => {
+							live.delete(id);
+						},
+					};
+				},
+			},
+		});
+		managers.push(manager);
+
+		const release = await manager.subscribe(
+			{ absolutePath: rootPath },
+			() => {},
+		);
+		ignored = [];
+		const refreshing = manager.refreshIgnores(rootPath);
+		await reattaching;
+		await release();
+		finishReattach();
+
+		const swapped = await refreshing;
+		expect([...live]).toEqual([]);
+		expect(swapped).toBe(false);
+	});
 });
