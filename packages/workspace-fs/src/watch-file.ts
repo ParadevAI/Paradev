@@ -1,4 +1,4 @@
-import { type FSWatcher, watch } from "node:fs";
+import { type FSWatcher, type Stats, watch } from "node:fs";
 import { stat } from "node:fs/promises";
 import {
 	clearInterval,
@@ -10,6 +10,9 @@ import type { FsWatchEvent } from "./types";
 
 const DEBOUNCE_MS = 75;
 const RECREATION_POLL_MS = 2_000;
+
+const fileSignature = (stats: Stats) =>
+	`${stats.ino}:${stats.mtimeMs}:${stats.size}`;
 
 export interface WatchSingleFileOptions {
 	debounceMs?: number;
@@ -44,6 +47,7 @@ export function watchSingleFile(
 	let watchedIno: bigint | number | null = null;
 	/** mtime last observed while the path is a directory (poll dedupe). */
 	let dirMtimeMs: number | null = null;
+	let fileSig: string | null = null;
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 	let pollTimer: ReturnType<typeof setInterval> | null = null;
 	let settling = false;
@@ -124,6 +128,7 @@ export function watchSingleFile(
 					// deaf. Poll instead until the path is a plain file again.
 					// Emit only on transition or mtime change; a poll tick with
 					// nothing new must stay silent or consumers reload forever.
+					fileSig = null;
 					closeWatcher();
 					startPolling();
 					if (!existed) {
@@ -136,6 +141,9 @@ export function watchSingleFile(
 					return;
 				}
 				dirMtimeMs = null;
+				const sig = fileSignature(stats);
+				const changed = sig !== fileSig;
+				fileSig = sig;
 				stopPolling();
 				// Re-install only when the inode behind the path changed (atomic
 				// save replaced it — the old watch follows the dead inode). A
@@ -147,10 +155,11 @@ export function watchSingleFile(
 						startPolling();
 					}
 				}
-				emit(existed ? "update" : "create", false);
+				if (changed) emit(existed ? "update" : "create", false);
 			} else {
 				const existed = exists;
 				exists = false;
+				fileSig = null;
 				closeWatcher();
 				startPolling();
 				if (existed) {
@@ -172,6 +181,7 @@ export function watchSingleFile(
 		const stats = await stat(absolutePath).catch(() => null);
 		if (disposed) return;
 		exists = stats !== null;
+		if (stats?.isFile()) fileSig = fileSignature(stats);
 		if (!stats || !installWatcher(stats.ino)) {
 			startPolling();
 		}
