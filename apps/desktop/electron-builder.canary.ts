@@ -33,6 +33,11 @@ const config: Configuration = {
 		releaseType: "prerelease",
 	},
 
+	dmg: {
+		...baseConfig.dmg,
+		title: `${displayName} \${version}`,
+	},
+
 	mac: {
 		...baseConfig.mac,
 		...(existsSync(canaryMacIconPath) ? { icon: canaryMacIconPath } : {}),
