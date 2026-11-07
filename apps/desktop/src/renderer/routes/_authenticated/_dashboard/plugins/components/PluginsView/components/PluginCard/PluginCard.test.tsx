@@ -29,30 +29,35 @@ function markupOf(element: React.ReactElement): string | undefined {
 	return render(element).container.querySelector("svg")?.outerHTML;
 }
 
-test("a plugin whose manifest names an icon renders that icon, not the puzzle", () => {
-	const acme: CatalogPlugin = {
-		name: "acme",
-		version: "1.0.0",
-		description: "",
-		interface: { displayName: "Acme", category: "Developer tools" },
-		icon: "linear",
-		mcpServers: {},
-		skills: [],
-		connector: null,
-		marketplace: "acme-marketplace",
-		installed: false,
-		managed: false,
-		latestVersion: null,
-		updateAvailable: false,
-		accounts: [],
-		connections: [],
-		pluginSkills: [],
-		homepage: null,
-		author: null,
-		license: null,
-	};
+const acme: CatalogPlugin = {
+	name: "acme",
+	version: "1.0.0",
+	description: "",
+	interface: { displayName: "Acme", category: "Developer tools" },
+	icon: "linear",
+	mcpServers: {},
+	skills: [],
+	connector: null,
+	marketplace: "acme-marketplace",
+	installed: false,
+	managed: false,
+	latestVersion: null,
+	updateAvailable: false,
+	accounts: [],
+	connections: [],
+	pluginSkills: [],
+	homepage: null,
+	author: null,
+	license: null,
+};
 
+test("a plugin whose manifest names an icon renders that icon, not the puzzle", () => {
 	const rendered = iconMarkup(acme);
 	expect(rendered).toBe(markupOf(<PluginIcon pluginName="linear" />));
 	expect(rendered).not.toBe(markupOf(<PluginIcon pluginName="acme" />));
+});
+
+test("an icon value that is not a built-in key never hides the plugin's own icon", () => {
+	const linear = { ...acme, name: "linear", icon: "./artwork.svg" };
+	expect(iconMarkup(linear)).toBe(markupOf(<PluginIcon pluginName="linear" />));
 });
