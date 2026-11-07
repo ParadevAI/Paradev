@@ -22,11 +22,31 @@ type HistoryWriterParams = {
 export class HistoryManager {
 	private historyWriters = new Map<string, HistoryWriter>();
 	private pendingHistoryData = new Map<string, string[]>();
+	// A pane's writers share one meta.json and scrollback.bin, so its disk steps run in call order.
+	private diskQueues = new Map<string, Promise<void>>();
 
-	async initHistoryWriter(params: HistoryWriterParams): Promise<void> {
+	private queueDiskStep(
+		paneId: string,
+		step: () => Promise<void>,
+	): Promise<void> {
+		const next = (this.diskQueues.get(paneId) ?? Promise.resolve()).then(step);
+		const settled = next.catch(() => {});
+		this.diskQueues.set(paneId, settled);
+		settled.then(() => {
+			if (this.diskQueues.get(paneId) === settled) {
+				this.diskQueues.delete(paneId);
+			}
+		});
+		return next;
+	}
+
+	initHistoryWriter(params: HistoryWriterParams): Promise<void> {
+		this.closeHistoryWriter(params.paneId);
 		const pending: string[] = [];
 		this.pendingHistoryData.set(params.paneId, pending);
-		await this.openHistoryWriter(params, pending);
+		return this.queueDiskStep(params.paneId, () =>
+			this.openHistoryWriter(params, pending),
+		);
 	}
 
 	private async openHistoryWriter(
@@ -107,39 +127,20 @@ export class HistoryManager {
 		if (containsClearScrollbackSequence(data)) {
 			const session = getSession();
 			if (session) {
-				this.historyWriters.delete(paneId);
-				const pending: string[] = [];
-				this.pendingHistoryData.set(paneId, pending);
-
 				const contentAfterClear = extractContentAfterClear(data);
-				writer
-					.close()
-					.catch((error) => {
-						console.warn(
-							`[HistoryManager] Failed to close history writer for ${paneId}:`,
-							error,
-						);
-					})
-					.then(() => {
-						if (this.pendingHistoryData.get(paneId) !== pending) return;
-						return this.openHistoryWriter(
-							{
-								paneId,
-								workspaceId: session.workspaceId,
-								cwd: session.cwd,
-								cols: session.cols,
-								rows: session.rows,
-								initialScrollback: contentAfterClear || undefined,
-							},
-							pending,
-						);
-					})
-					.catch((error) => {
-						console.warn(
-							`[HistoryManager] Failed to reinitialize history writer for ${paneId}:`,
-							error,
-						);
-					});
+				this.initHistoryWriter({
+					paneId,
+					workspaceId: session.workspaceId,
+					cwd: session.cwd,
+					cols: session.cols,
+					rows: session.rows,
+					initialScrollback: contentAfterClear || undefined,
+				}).catch((error) => {
+					console.warn(
+						`[HistoryManager] Failed to reinitialize history writer for ${paneId}:`,
+						error,
+					);
+				});
 			}
 			return;
 		}
@@ -150,13 +151,15 @@ export class HistoryManager {
 	closeHistoryWriter(paneId: string, exitCode?: number): void {
 		const writer = this.historyWriters.get(paneId);
 		if (writer) {
-			writer.close(exitCode).catch((error) => {
-				console.error(
-					`[HistoryManager] Failed to close history writer for ${paneId}:`,
-					error,
-				);
-			});
 			this.historyWriters.delete(paneId);
+			this.queueDiskStep(paneId, () => writer.close(exitCode)).catch(
+				(error) => {
+					console.error(
+						`[HistoryManager] Failed to close history writer for ${paneId}:`,
+						error,
+					);
+				},
+			);
 		}
 
 		this.pendingHistoryData.delete(paneId);
@@ -167,7 +170,7 @@ export class HistoryManager {
 
 		try {
 			const reader = new HistoryReader(workspaceId, paneId);
-			await reader.cleanup();
+			await this.queueDiskStep(paneId, () => reader.cleanup());
 		} catch (error) {
 			console.error(
 				`[HistoryManager] Failed to cleanup history for ${paneId}:`,
@@ -176,83 +179,50 @@ export class HistoryManager {
 		}
 	}
 
-	getHistoryWriter(paneId: string): HistoryWriter | undefined {
-		return this.historyWriters.get(paneId);
+	isRecording(paneId: string): boolean {
+		return (
+			this.historyWriters.has(paneId) || this.pendingHistoryData.has(paneId)
+		);
 	}
 
 	async resetAll(sessions: Map<string, SessionInfo>): Promise<void> {
-		const closePromises: Promise<void>[] = [];
-		for (const [paneId, writer] of this.historyWriters.entries()) {
-			closePromises.push(
-				writer.close().catch((error) => {
-					console.warn(
-						`[HistoryManager] Failed to close history for ${paneId}:`,
-						error,
-					);
-				}),
-			);
+		for (const paneId of [
+			...this.historyWriters.keys(),
+			...this.pendingHistoryData.keys(),
+		]) {
+			if (!sessions.get(paneId)?.isAlive) this.closeHistoryWriter(paneId);
 		}
-		await Promise.all(closePromises);
-		this.historyWriters.clear();
-		this.pendingHistoryData.clear();
-
-		const initPromises: Promise<void>[] = [];
-		for (const [paneId, session] of sessions.entries()) {
+		for (const [paneId, session] of sessions) {
 			if (!session.isAlive) continue;
-			initPromises.push(
-				this.initHistoryWriter({
-					paneId,
-					workspaceId: session.workspaceId,
-					cwd: session.cwd,
-					cols: session.cols,
-					rows: session.rows,
-					initialScrollback: undefined,
-				}).catch((error) => {
-					console.warn(
-						`[HistoryManager] Failed to reinitialize history for ${paneId}:`,
-						error,
-					);
-				}),
-			);
-		}
-		await Promise.all(initPromises);
-	}
-
-	async cleanup(): Promise<void> {
-		const closePromises: Promise<void>[] = [];
-		for (const [paneId, writer] of this.historyWriters.entries()) {
-			closePromises.push(
-				writer.close().catch((error) => {
-					console.error(
-						`[HistoryManager] Failed to close history for ${paneId}:`,
-						error,
-					);
-				}),
-			);
-		}
-		await Promise.all(closePromises);
-		this.historyWriters.clear();
-		this.pendingHistoryData.clear();
-	}
-
-	async forceCloseAll(): Promise<void> {
-		for (const writer of this.historyWriters.values()) {
-			await writer.close().catch((error) => {
+			this.initHistoryWriter({
+				paneId,
+				workspaceId: session.workspaceId,
+				cwd: session.cwd,
+				cols: session.cols,
+				rows: session.rows,
+			}).catch((error) => {
 				console.warn(
-					"[HistoryManager] Failed to close history writer during forceKillAll:",
+					`[HistoryManager] Failed to reinitialize history for ${paneId}:`,
 					error,
 				);
 			});
 		}
-		this.historyWriters.clear();
-		this.pendingHistoryData.clear();
+		await Promise.all(this.diskQueues.values());
+	}
+
+	async cleanup(): Promise<void> {
+		this.closeAllSync();
+		await Promise.all(this.diskQueues.values());
+	}
+
+	forceCloseAll(): Promise<void> {
+		return this.cleanup();
 	}
 
 	closeAllSync(): void {
-		for (const writer of this.historyWriters.values()) {
-			writer.close().catch(() => {});
+		for (const paneId of [...this.historyWriters.keys()]) {
+			this.closeHistoryWriter(paneId);
 		}
-		this.historyWriters.clear();
 		this.pendingHistoryData.clear();
 	}
 }

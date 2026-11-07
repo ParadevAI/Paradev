@@ -11,10 +11,8 @@ afterEach(() => {
 });
 
 const harness = `
-	import { readFileSync } from "node:fs";
-	import { join } from "node:path";
 	import { HistoryManager } from ${JSON.stringify(join(import.meta.dir, "history-manager.ts"))};
-	import { HistoryWriter } from ${JSON.stringify(join(import.meta.dir, "../../terminal-history.ts"))};
+	import { HistoryReader, HistoryWriter } from ${JSON.stringify(join(import.meta.dir, "../../terminal-history.ts"))};
 
 	const gate = () => {
 		let release;
@@ -26,9 +24,11 @@ const harness = `
 	let initGate;
 	const closes = [];
 	const inits = [];
+	const open = new Set();
 	const originalClose = HistoryWriter.prototype.close;
 	const originalInit = HistoryWriter.prototype.init;
 	HistoryWriter.prototype.close = function (...args) {
+		open.delete(this);
 		const held = closeGate?.promise ?? Promise.resolve();
 		const closing = held.then(() => originalClose.apply(this, args));
 		closes.push(closing);
@@ -36,12 +36,13 @@ const harness = `
 	};
 	HistoryWriter.prototype.init = function (...args) {
 		const held = initGate?.promise ?? Promise.resolve();
-		const initializing = held.then(() => originalInit.apply(this, args));
+		const initializing = held
+			.then(() => originalInit.apply(this, args))
+			.then(() => { open.add(this); });
 		inits.push(initializing);
 		return initializing;
 	};
 	const tick = () => new Promise((resolve) => setImmediate(resolve));
-	const result = {};
 
 	const manager = new HistoryManager();
 	const session = { workspaceId: "ws", cwd: "/tmp", cols: 80, rows: 24 };
@@ -56,12 +57,11 @@ const report = `
 		await tick();
 		if (count === closes.length + inits.length) break;
 	}
+	const reader = new HistoryReader("ws", "pane");
+	const meta = await reader.readMetadata();
 	await manager.cleanup();
-	const history = readFileSync(
-		join(process.env.SUPERSET_HOME_DIR, "terminal-history", "ws", "pane", "scrollback.bin"),
-		"utf8",
-	);
-	console.log(JSON.stringify({ history, inits: inits.length, ...result }));
+	const history = await reader.readScrollback();
+	console.log(JSON.stringify({ history, restorable: !!meta && !meta.endedAt, open: open.size }));
 	process.exit(0);
 `;
 
@@ -73,24 +73,22 @@ function runScenario(body: string) {
 	);
 	expect(result.stderr.toString()).toBe("");
 	expect(result.exitCode).toBe(0);
-	return JSON.parse(result.stdout.toString());
+	const { open, ...outcome } = JSON.parse(result.stdout.toString());
+	expect(open).toBe(0);
+	return outcome;
 }
 
-test("clear scrollback keeps the old backlog out and output during the close in the new history", () => {
+test("clear scrollback replaces the history once the old writer closes and keeps output from during the close", () => {
 	expect(
 		runScenario(`
-			const old = manager.getHistoryWriter("pane");
-			old.isBackpressured = true;
-			manager.writeToHistory("pane", "backlog", getSession);
 			closeGate = gate();
-			manager.writeToHistory("pane", "\\x1b[3Jafter", getSession);
+			manager.writeToHistory("pane", "x\\x1b[3Jafter", getSession);
 			await tick();
 			await Promise.all(inits);
 			manager.writeToHistory("pane", "-during", getSession);
-			old.isBackpressured = false;
 			closeGate.release();
 		`),
-	).toEqual({ history: "after-during", inits: 2 });
+	).toEqual({ history: "after-during", restorable: true });
 });
 
 test("a pane recreated while a clear waits for its close keeps the new history", () => {
@@ -107,7 +105,7 @@ test("a pane recreated while a clear waits for its close keeps the new history",
 			await tick();
 			initGate.release();
 		`),
-	).toEqual({ history: "fresh-next", inits: 2 });
+	).toEqual({ history: "fresh-next", restorable: true });
 });
 
 test("a history reset while a clear waits for its close keeps the reset history", () => {
@@ -125,45 +123,66 @@ test("a history reset while a clear waits for its close keeps the reset history"
 			initGate.release();
 			await reset;
 		`),
-	).toEqual({ history: "next", inits: 2 });
+	).toEqual({ history: "next", restorable: true });
 });
 
-test("a failed stale init does not cancel a clear that started after it", () => {
+test("a superseded init that fails leaves the newer init's history", () => {
 	expect(
 		runScenario(`
 			console.error = () => {};
-			initGate = gate();
-			const staleInit = initGate;
-			const stale = manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "stale" });
-			manager.closeHistoryWriter("pane");
+			const stale = gate();
+			initGate = stale;
+			manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "stale" });
+			while (inits.length < 2) await tick();
 			initGate = undefined;
-			await manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "fresh" });
-			closeGate = gate();
-			manager.writeToHistory("pane", "\\x1b[3Jafter", getSession);
-			staleInit.fail(new Error("disk"));
-			await stale;
-			closeGate.release();
-			await Promise.all(closes);
-			await tick();
-			await Promise.allSettled(inits);
+			const fresh = manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "fresh" });
 			manager.writeToHistory("pane", "-next", getSession);
+			stale.fail(new Error("disk"));
+			await fresh;
 		`),
-	).toEqual({ history: "after-next", inits: 4 });
+	).toEqual({ history: "fresh-next", restorable: true });
 });
 
-test("a stale init that succeeds late does not replace the current writer", () => {
+test("a superseded init that finishes last leaves the newer init's history", () => {
 	expect(
 		runScenario(`
-			initGate = gate();
-			const staleInit = initGate;
-			const stale = manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "stale" });
-			manager.closeHistoryWriter("pane");
+			const stale = gate();
+			initGate = stale;
+			manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "stale" });
+			while (inits.length < 2) await tick();
 			initGate = undefined;
-			await manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "fresh" });
-			const current = manager.getHistoryWriter("pane");
-			staleInit.release();
-			await stale;
-			result.keptCurrent = manager.getHistoryWriter("pane") === current;
-		`).keptCurrent,
-	).toBe(true);
+			const fresh = manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "fresh" });
+			await Promise.all(inits.slice(2));
+			stale.release();
+			await fresh;
+			manager.writeToHistory("pane", "-next", getSession);
+		`),
+	).toEqual({ history: "fresh-next", restorable: true });
+});
+
+test("a pane that exits while its history initializes is not restorable", () => {
+	expect(
+		runScenario(`
+			const held = gate();
+			initGate = held;
+			manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "snap" });
+			while (inits.length < 2) await tick();
+			manager.closeHistoryWriter("pane", 0);
+			held.release();
+		`),
+	).toEqual({ history: "snap", restorable: false });
+});
+
+test("history deleted while it initializes stays deleted", () => {
+	expect(
+		runScenario(`
+			const held = gate();
+			initGate = held;
+			manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "snap" });
+			while (inits.length < 2) await tick();
+			const deleting = manager.cleanupHistory("pane", "ws");
+			held.release();
+			await deleting;
+		`),
+	).toEqual({ history: null, restorable: false });
 });
