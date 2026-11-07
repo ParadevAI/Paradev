@@ -163,11 +163,22 @@ async function liveWebContents(
 			type: "wakeBrowser",
 			paneId,
 		});
-	} catch {
+	} catch (err) {
 		registered.cancel();
-		return null;
+		// Only the renderer's "no such pane" means the pane is gone; a window that
+		// is not ready yet must not read as a missing pane.
+		if (err instanceof PaneLayoutRequestError && err.status === 404)
+			return null;
+		throw err;
 	}
-	return registered.ready;
+	const wc = await registered.ready;
+	if (!wc) {
+		throw new PaneLayoutRequestError(
+			504,
+			`Browser pane ${paneId} did not finish loading in time.`,
+		);
+	}
+	return wc;
 }
 
 /**
@@ -190,7 +201,15 @@ async function resolvePane(
 		res.status(400).json({ error: "workspaceId is required" });
 		return null;
 	}
-	const wc = await liveWebContents(paneId, workspaceId, wakeTimeoutMs);
+	let wc: Electron.WebContents | null;
+	try {
+		wc = await liveWebContents(paneId, workspaceId, wakeTimeoutMs);
+	} catch (err) {
+		res
+			.status(err instanceof PaneLayoutRequestError ? err.status : 500)
+			.json({ error: errorMessage(err) });
+		return null;
+	}
 	if (!wc) {
 		res
 			.status(404)
@@ -670,7 +689,14 @@ function handleCdpSocket(
 	const early: string[] = [];
 	const queue = (data: unknown) => early.push(String(data));
 	ws.on("message", queue);
-	void liveWebContents(paneId, workspaceId, wakeTimeoutMs).then((wc) => {
+	void liveWebContents(paneId, workspaceId, wakeTimeoutMs).then(
+		onPane,
+		(err) => {
+			const retry = err instanceof PaneLayoutRequestError && err.status >= 500;
+			ws.close(retry ? 1013 : 1011, errorMessage(err).slice(0, 100));
+		},
+	);
+	function onPane(wc: Electron.WebContents | null) {
 		if (ws.readyState !== ws.OPEN) return;
 		if (!wc) {
 			ws.close(
@@ -714,7 +740,7 @@ function handleCdpSocket(
 		ws.on("error", () => {
 			cdp.detach();
 		});
-	});
+	}
 }
 
 function errorMessage(err: unknown): string {

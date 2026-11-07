@@ -303,6 +303,20 @@ test("an agent lists and uses its panes after hidden-pane eviction unloaded them
 	}
 });
 
+test("before a desktop window is ready, an agent is told to retry, not that its pane is gone", async () => {
+	const bridge = getBrowserBridgeInfo();
+	if (!bridge) throw new Error("the bridge did not start");
+	const response = await fetch(`${bridge.endpoint}/panes/unloaded-pane/eval`, {
+		method: "POST",
+		headers: {
+			authorization: `Bearer ${bridge.secret}`,
+			"content-type": "application/json",
+		},
+		body: JSON.stringify({ workspaceId: "ws-bridge", code: "1" }),
+	});
+	expect(response.status).toBe(503);
+});
+
 test("the CLI manages the user's extensions only with the user's yes, and never opens one", async () => {
 	const bridge = getBrowserBridgeInfo();
 	if (!bridge) throw new Error("the bridge did not start");
