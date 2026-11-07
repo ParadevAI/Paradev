@@ -128,6 +128,12 @@ function buildRealBinaryResolver(): string {
       "${getBinDir()}"|"$HOME"/.paradev/bin|"$HOME"/.paradev-*/bin|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
     esac
     if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
+      # The dir patterns above depend on $HOME, which test runners and sandboxes
+      # change, and miss other spellings of the bin dir (a ~/.superset symlink to
+      # ~/.paradev). Skip this wrapper itself and any other managed wrapper, or
+      # the wrapper resolves to itself and recurses until the process table fills.
+      [ "$dir/$name" -ef "\${BASH_SOURCE[0]}" ] && continue
+      head -n 3 "$dir/$name" 2>/dev/null | grep -qF "${WRAPPER_MARKER}" && continue
       printf "%s\\n" "$dir/$name"
       return 0
     fi
