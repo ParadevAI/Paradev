@@ -3,8 +3,11 @@ import {
 	createLeakedInputModeReclaimer,
 	KITTY_KEYBOARD_DISARM_SEQUENCE,
 } from "@superset/shared/leaked-input-mode-reclaim";
+import { Terminal as HeadlessTerminal } from "@xterm/headless";
 import type { Terminal as XTerm } from "@xterm/xterm";
 import { installInputModeReclaimer } from "./terminalInputModeReclaimer";
+
+const BULK_BYTES = 1024 * 1024;
 
 // The transport-agnostic decision core (shared). The renderer, and any future
 // host-side surface, feed it the same arm/marker events.
@@ -90,8 +93,9 @@ describe("installInputModeReclaimer (xterm adapter)", () => {
 					return { dispose() {} };
 				},
 			},
-			write(data: string) {
-				writes.push(data);
+			write(data: string, callback?: () => void) {
+				if (data) writes.push(data);
+				if (callback) queueMicrotask(callback);
 			},
 		} as unknown as XTerm;
 		return {
@@ -113,6 +117,34 @@ describe("installInputModeReclaimer (xterm adapter)", () => {
 		t.marker(); // reprompt after kill
 		await flush();
 		expect(t.writes.join("")).toContain(KITTY_KEYBOARD_DISARM_SEQUENCE);
+	});
+
+	it("keeps kitty armed by a TUI whose output is queued behind a large chunk", async () => {
+		const terminal = new HeadlessTerminal({ allowProposedApi: true });
+		installInputModeReclaimer(terminal as unknown as XTerm);
+		const kitty: string[] = [];
+		terminal.parser.registerCsiHandler({ prefix: ">", final: "u" }, () => {
+			kitty.push("arm");
+			return false;
+		});
+		terminal.parser.registerCsiHandler({ prefix: "<", final: "u" }, () => {
+			kitty.push("disarm");
+			return false;
+		});
+		const write = (data: string) =>
+			new Promise<void>((resolve) => terminal.write(data, resolve));
+		const marker = "\x1b]777;superset-shell-ready\x07";
+
+		await write(marker);
+		await write("\x1b[>1u");
+		await Promise.all([
+			write(`${"x".repeat(BULK_BYTES)}${marker}`),
+			write("\x1b[>1u"),
+		]);
+		await write("");
+		terminal.dispose();
+
+		expect(kitty.at(-1)).toBe("arm");
 	});
 
 	it("ignores OSC 777 payloads that are not the shell-ready marker", async () => {
