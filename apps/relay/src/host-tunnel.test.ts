@@ -10,9 +10,18 @@ function socket(id: string, kind: "host" | "client" | "dial") {
 		tags: kind === "host" ? ["host"] : [],
 		state: { kind, hostId: "org:host", ticket: "ticket" },
 		readyState: WebSocket.OPEN,
+		send: () => {},
 		close: mock(() => {}),
 	} as unknown as Connection;
 }
+
+const caller = {
+	userId: "user-1",
+	token: "token",
+	preAuthorized: true as const,
+};
+const answerWithin = <T>(answer: Promise<T>, ms: number) =>
+	Promise.race([answer, Bun.sleep(ms).then(() => "no answer yet")]);
 
 function tunnelWith(connections: Connection[]) {
 	const tunnel = new HostTunnel({} as never, {} as never);
@@ -47,4 +56,17 @@ test("losing the current control connection still closes its streams", async () 
 
 	expect(client.close).toHaveBeenCalledTimes(1);
 	expect(dial.close).toHaveBeenCalledTimes(1);
+});
+
+test("losing the control connection answers a stream dial in flight at once", async () => {
+	const host = socket("current", "host");
+	const connections = [host];
+	const tunnel = tunnelWith(connections);
+
+	const prepared = tunnel.prepareStream(caller, "ticket", "/terminal", "");
+	await Bun.sleep(0);
+	connections.length = 0;
+	await tunnel.onClose(host);
+
+	expect(await answerWithin(prepared, 20)).toBe("no-host");
 });
