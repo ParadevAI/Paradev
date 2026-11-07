@@ -390,6 +390,35 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		],
 	},
 	{
+		// Wally reads `--model` itself and wants the bare hosted id; ids follow
+		// GET https://inference.runanywhere.ai/v1/models (2026-11-06).
+		presetId: "wally",
+		modelFlag: "--model",
+		models: [
+			{ id: "glm-5.3-flash", label: "GLM-5.3 Flash" },
+			{ id: "deepseek-v4.1-flash", label: "DeepSeek V4.1 Flash" },
+			{ id: "kimi-k3", label: "Kimi K3" },
+			{
+				id: "deepseek-v4.1-flash-fast",
+				label: "DeepSeek V4.1 Flash (Fast)",
+			},
+			{ id: "glm-5.3-fast", label: "GLM-5.3 (Fast)" },
+			{
+				id: "deepseek-v4-pro-fast",
+				label: "DeepSeek V4 Pro (Fast)",
+			},
+			{
+				id: "deepseek-v4-flash-0731",
+				label: "DeepSeek V4 Flash 0731",
+			},
+			{ id: "minimax-m3", label: "MiniMax M3" },
+			{
+				id: "deepseek-v4.1-flash-1017",
+				label: "DeepSeek V4.1 Flash 1017",
+			},
+		],
+	},
+	{
 		// Polygraph's picker selects the harness it launches, not a model: the
 		// selection rides `polygraph session start --agent <id>`. The launch
 		// plumbing is flag-agnostic, so it reuses this catalog. Unset
