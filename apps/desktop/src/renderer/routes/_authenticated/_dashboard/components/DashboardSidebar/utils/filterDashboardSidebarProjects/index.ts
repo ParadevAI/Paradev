@@ -1,1 +1,4 @@
-export { filterDashboardSidebarProjects } from "./filterDashboardSidebarProjects";
+export {
+	filterDashboardSidebarHiddenProjects,
+	filterDashboardSidebarProjects,
+} from "./filterDashboardSidebarProjects";
