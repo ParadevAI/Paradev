@@ -11,7 +11,6 @@ import type {
 	BrowserPaneData,
 	CommentPaneData,
 	DiffFocusSide,
-	DiffPaneData,
 	DiffPaneFilter,
 	PagePaneData,
 	PaneTarget,
@@ -22,6 +21,7 @@ import {
 	closeVisibleChangesPane,
 	openChangesPaneInStore,
 } from "../../utils/openChangesPaneInStore";
+import { openDiffPaneInStore } from "../../utils/openDiffPaneInStore";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
 import { openPullRequestPaneInStore } from "../../utils/openPullRequestPaneInStore";
 import {
@@ -77,64 +77,11 @@ export function useWorkspacePaneOpeners({
 			filter?: DiffPaneFilter,
 		) => {
 			viewer.reveal();
-			const state = viewer.store.getState();
-			// Bump the tick on every request so repeat clicks re-scroll and a
-			// navigation into an unmounted pane wins over its older cached position.
-			const focusFields = {
-				focusLine: line,
-				focusSide: line != null ? side : undefined,
-				focusTick: Date.now(),
-				filter,
-			};
-			if (openInNewTab) {
-				state.addTab({
-					panes: [
-						{
-							kind: "diff",
-							data: {
-								path: filePath,
-								changeKey,
-								collapsedFiles: [],
-								...focusFields,
-							} as DiffPaneData,
-						},
-					],
-				});
-				return;
-			}
-			for (const tab of state.tabs) {
-				for (const pane of Object.values(tab.panes)) {
-					if (pane.kind !== "diff") continue;
-					const prev = pane.data as DiffPaneData;
-					state.setPaneData({
-						paneId: pane.id,
-						data: {
-							...prev,
-							path: filePath,
-							changeKey,
-							// Only the navigated file's key can be pruned; without a
-							// change key we can't identify it, so leave the set intact.
-							collapsedFiles: changeKey
-								? (prev.collapsedFiles ?? []).filter((key) => key !== changeKey)
-								: (prev.collapsedFiles ?? []),
-							...focusFields,
-						} as PaneViewerData,
-					});
-					state.focusPane(pane.id);
-					return;
-				}
-			}
-			state.openPane({
-				pane: {
-					kind: "diff",
-					data: {
-						path: filePath,
-						changeKey,
-						collapsedFiles: [],
-						...focusFields,
-					} as DiffPaneData,
-				},
-			});
+			openDiffPaneInStore(
+				viewer.store,
+				{ filePath, openInNewTab, line, side, changeKey, filter },
+				useSettings.getState().changesOpenTarget,
+			);
 		},
 		[viewer],
 	);
