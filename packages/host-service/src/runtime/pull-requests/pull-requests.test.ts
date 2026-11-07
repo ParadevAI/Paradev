@@ -155,6 +155,7 @@ function createManager(
 			worktreePath: string,
 		) => Promise<WorkspaceRefsSnapshot>;
 		worktreeExists?: (worktreePath: string) => boolean;
+		octokitTimeoutMs?: number;
 	} = {},
 ) {
 	return new PullRequestRuntimeManager({
@@ -179,6 +180,7 @@ function createManager(
 		// Seeded worktree paths are fabricated; default the disk gate open so
 		// sync-path tests exercise the git read, not the missing-dir skip.
 		worktreeExists: overrides.worktreeExists ?? (() => true),
+		octokitTimeoutMs: overrides.octokitTimeoutMs,
 	});
 }
 
@@ -2609,6 +2611,52 @@ describe("PullRequestRuntimeManager fleet sweep under load", () => {
 		} finally {
 			manager.stop();
 			console.warn = originalWarn;
+		}
+	});
+
+	test("an Octokit fallback that never answers frees its slot for an explicit refresh", async () => {
+		const db = createRealDb();
+		const prsByHeadRef = seedFleet(db);
+		const answer = routeGh(prsByHeadRef);
+		let ghAnswers = false;
+		let hungOctokitCalls = 0;
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				await new Promise((resolve) => setImmediate(resolve));
+				if (ghAnswers) return answer(args);
+				throw new Error("gh: Not Found (HTTP 404)");
+			},
+			github: () => {
+				hungOctokitCalls += 1;
+				return new Promise<never>(() => {});
+			},
+			octokitTimeoutMs: 5,
+		});
+		let stuckTimer: ReturnType<typeof setTimeout> | undefined;
+		try {
+			await withSilencedWarnings(async () => {
+				const sweep = fleetSweep(manager)();
+				while (hungOctokitCalls < 8) {
+					await new Promise((resolve) => setImmediate(resolve));
+				}
+				ghAnswers = true;
+
+				const outcome = await Promise.race([
+					manager
+						.refreshPullRequestsByWorkspaces(["ws-p95-w1"])
+						.then(() => "refreshed"),
+					new Promise((resolve) => {
+						stuckTimer = setTimeout(resolve, 1_000, "stuck");
+					}),
+				]);
+
+				expect(outcome).toBe("refreshed");
+				expect(getWorkspace(db, "ws-p95-w1")?.pullRequestId).not.toBeNull();
+				await sweep;
+			});
+		} finally {
+			clearTimeout(stuckTimer);
+			manager.stop();
 		}
 	});
 
