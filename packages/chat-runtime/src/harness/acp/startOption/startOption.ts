@@ -4,7 +4,7 @@ function words(value: string): string[] {
 	return value
 		.toLowerCase()
 		.replace(/\[[^\]]*\]/g, "")
-		.replace(/(\d)-(\d)\b/g, "$1.$2")
+		.replace(/(\d)-(\d{1,2})\b/g, "$1.$2")
 		.split(/[^a-z0-9.]+/)
 		.filter(Boolean);
 }

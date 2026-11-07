@@ -71,4 +71,20 @@ describe("startOptionId against claude-agent-acp 0.85 options", () => {
 		];
 		expect(startOptionId(unversioned, "claude-opus-5-5")).toBeUndefined();
 	});
+
+	test("a two-digit minor version is one version, not two numbers", () => {
+		const opus = [
+			{ id: "claude-opus-4", label: "Opus 4" },
+			{ id: "opus", label: "Opus 4.10" },
+		];
+		expect(startOptionId(opus, "claude-opus-4-10")).toBe("opus");
+	});
+
+	test("a short label never takes a pinned id that names another version", () => {
+		const longContext = [
+			{ id: "default", label: "Default (recommended)" },
+			{ id: "claude-opus-5-5[1m]", label: "Opus" },
+		];
+		expect(startOptionId(longContext, "claude-opus-5")).toBeUndefined();
+	});
 });
