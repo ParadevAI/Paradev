@@ -12,22 +12,19 @@ import {
 	createTestRuntime,
 	FAKE_HARNESS,
 	fakeHarnessRegistry,
+	toolCall,
 	turn,
 	waitFor,
 } from "@superset/chat-runtime/testing";
 import type { ChatTransport, SessionClient } from "../../client";
 import { createSessionClient } from "../../client";
-import { emptySnapshot, reduceMany } from "../../core";
+import { displayText, emptySnapshot, reduceMany } from "../../core";
 import type { ToolCall } from "../../protocol/items";
 import { createManualWait } from "../../testing/manualWait";
 import { createMemoryStreamServer } from "../../testing/memoryStream";
 import { registerDom } from "../../testing/registerDom";
 import type { ChatSession, FrameScheduler } from "./useChatSession";
-import {
-	DEFAULT_DELTAS,
-	prefetchChatSession,
-	useChatSession,
-} from "./useChatSession";
+import { prefetchChatSession, useChatSession } from "./useChatSession";
 import { forgetSnapshot } from "./utils/snapshotCache";
 
 registerDom();
@@ -67,8 +64,8 @@ type Stack = {
 	}): SessionClient;
 };
 
-async function startStack(): Promise<Stack> {
-	const { harnesses } = fakeHarnessRegistry(SCRIPT);
+async function startStack(script = SCRIPT): Promise<Stack> {
+	const { harnesses } = fakeHarnessRegistry(script);
 	const runtime = createTestRuntime({ harnesses });
 	const router = createChatRouter(runtime, {
 		resolveCwd: () => "/tmp/workspace",
@@ -164,13 +161,14 @@ function Probe(props: {
 	scheduler?: FrameScheduler;
 	pageSize?: number;
 	wait?: ReturnType<typeof createManualWait>["wait"];
+	defaultDeltas?: boolean;
 }) {
 	renders += 1;
 	latest = useChatSession({
 		client: props.client,
 		sendEnabled: props.sendEnabled,
 		snapshotWorktree: props.snapshotWorktree,
-		deltas: [],
+		...(props.defaultDeltas ? {} : { deltas: [] }),
 		scheduler: props.scheduler,
 		pageSize: props.pageSize,
 		wait: props.wait,
@@ -1009,6 +1007,45 @@ describe("useChatSession", () => {
 	});
 });
 
-test("a chat subscribes to background steps by default", () => {
-	expect(DEFAULT_DELTAS).toContain("background");
+test("a chat streams only the text deltas it shows by default", async () => {
+	const stack = await startStack({
+		turns: [
+			[
+				{ kind: "turn", turn: turn("t1") },
+				{ kind: "item", item: toolCall("tool-1"), turnId: "t1" },
+				{
+					kind: "delta",
+					delta: { type: "tool_input", itemId: "tool-1", append: '{"path":' },
+				},
+				{
+					kind: "delta",
+					delta: { type: "terminal", itemId: "tool-1", append: "a.ts\n" },
+				},
+				{
+					kind: "delta",
+					delta: { type: "background", itemId: "tool-1", append: "ls" },
+				},
+				{ kind: "item", item: agentMessage("a1", ""), turnId: "t1" },
+				{
+					kind: "delta",
+					delta: { type: "text", itemId: "a1", append: "Done" },
+				},
+			],
+		],
+	});
+	const client = stack.makeClient();
+	const view = render(<Probe client={client} defaultDeltas />);
+	await domWaitFor(() => expect(session().connection).toBe("open"));
+
+	act(() => {
+		session().sendPrompt([{ type: "text", text: "go" }]);
+	});
+	await domWaitFor(() =>
+		expect(displayText(session().snapshot, "a1")).toBe("Done"),
+	);
+
+	expect([...session().snapshot.liveStreams.keys()]).toEqual(["text:a1"]);
+	view.unmount();
+	client.close();
+	await stack.runtime.dispose();
 });

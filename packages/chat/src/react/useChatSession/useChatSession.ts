@@ -147,12 +147,8 @@ function withCachedBodies(seed: Seed, cached: SessionSnapshot): Seed {
 	};
 }
 
-export const DEFAULT_DELTAS: readonly DeltaChannel[] = [
-	"text",
-	"tool_input",
-	"terminal",
-	"background",
-];
+// Each subscribed channel commits a render per frame while it streams, so subscribe only to channels a view reads.
+export const DEFAULT_DELTAS: readonly DeltaChannel[] = ["text"];
 
 export type UseChatSessionOptions = {
 	client: SessionClient;
