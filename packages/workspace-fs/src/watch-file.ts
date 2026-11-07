@@ -12,7 +12,7 @@ const DEBOUNCE_MS = 75;
 const RECREATION_POLL_MS = 2_000;
 
 const fileSignature = (stats: Stats) =>
-	`${stats.ino}:${stats.mtimeMs}:${stats.size}`;
+	`${stats.ino}:${stats.mtimeMs}:${stats.ctimeMs}:${stats.size}`;
 
 export interface WatchSingleFileOptions {
 	debounceMs?: number;

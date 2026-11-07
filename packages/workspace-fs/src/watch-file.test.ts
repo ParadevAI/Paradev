@@ -54,6 +54,20 @@ describe("watchSingleFile", () => {
 		await waitFor(events, (e) => e.kind === "update");
 	}, 15_000);
 
+	it("emits update on a same-size rewrite that restores the mtime", async () => {
+		const file = await createTempFile();
+		const before = await fs.stat(file);
+		const events: FsWatchEvent[] = [];
+		disposers.push(
+			watchSingleFile(file, (e) => events.push(e), { debounceMs: 25 }),
+		);
+		await new Promise((r) => setTimeout(r, 150));
+
+		await fs.writeFile(file, "changed");
+		await fs.utimes(file, before.atimeMs / 1000, before.mtimeMs / 1000);
+		await waitFor(events, (e) => e.kind === "update", 1_000);
+	});
+
 	it("survives an atomic save (write-temp + rename over the path)", async () => {
 		const file = await createTempFile();
 		const events: FsWatchEvent[] = [];
@@ -167,6 +181,25 @@ describe("watchSingleFile", () => {
 
 			await fs.utimes(file, new Date(), new Date(Date.now() + 60_000));
 			await waitFor(events, (e) => e.kind === "update");
+		},
+	);
+
+	it.skipIf(process.platform === "win32" || process.getuid?.() === 0)(
+		"emits update on a permission change while polling",
+		async () => {
+			const file = await createTempFile();
+			await fs.chmod(file, 0o000);
+			const events: FsWatchEvent[] = [];
+			disposers.push(
+				watchSingleFile(file, (e) => events.push(e), {
+					debounceMs: 5,
+					pollMs: 20,
+				}),
+			);
+			await new Promise((r) => setTimeout(r, 150));
+
+			await fs.chmod(file, 0o200);
+			await waitFor(events, (e) => e.kind === "update", 1_000);
 		},
 	);
 });
