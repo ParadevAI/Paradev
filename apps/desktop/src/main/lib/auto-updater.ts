@@ -9,6 +9,7 @@ import { autoUpdater, type UpdateCheckResult } from "electron-updater";
 import { env } from "main/env.main";
 import { setSkipQuitConfirmation } from "main/index";
 import { appState } from "main/lib/app-state";
+import { createDownloadProgressMilestones } from "main/lib/download-progress-milestones";
 import {
 	isEnvironmentUpdateError,
 	isUpstreamServerError,
@@ -508,7 +509,10 @@ export function setupAutoUpdater(): void {
 		emitStatus(AUTO_UPDATE_STATUS.CHECKING);
 	});
 
+	const progressLogMilestones = createDownloadProgressMilestones();
+
 	autoUpdater.on("update-available", (info) => {
+		progressLogMilestones.reset();
 		log.info(
 			`[auto-updater] Update available: ${app.getVersion()} → ${info.version} (files: ${info.files?.map((f: { url: string }) => f.url).join(", ")})`,
 		);
@@ -526,9 +530,11 @@ export function setupAutoUpdater(): void {
 	const PROGRESS_EMIT_INTERVAL_MS = 500;
 	let lastProgressEmitAt = 0;
 	autoUpdater.on("download-progress", (progress) => {
-		log.info(
-			`[auto-updater] Download progress: ${progress.percent.toFixed(1)}% (${(progress.transferred / 1024 / 1024).toFixed(1)}MB / ${(progress.total / 1024 / 1024).toFixed(1)}MB)`,
-		);
+		if (progressLogMilestones.shouldLog(progress.percent)) {
+			log.info(
+				`[auto-updater] Download progress: ${progress.percent.toFixed(1)}% (${(progress.transferred / 1024 / 1024).toFixed(1)}MB / ${(progress.total / 1024 / 1024).toFixed(1)}MB)`,
+			);
+		}
 		const now = Date.now();
 		if (now - lastProgressEmitAt < PROGRESS_EMIT_INTERVAL_MS) return;
 		lastProgressEmitAt = now;

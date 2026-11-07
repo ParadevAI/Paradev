@@ -26,6 +26,7 @@ export function createChatDb(options: ChatDbOptions) {
 
 	const sqlite = new Database(join(options.dataDir, CHAT_DB_FILENAME));
 	sqlite.pragma("journal_mode = WAL");
+	sqlite.pragma("synchronous = NORMAL");
 	sqlite.pragma("busy_timeout = 5000");
 	sqlite.pragma("foreign_keys = ON");
 

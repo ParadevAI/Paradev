@@ -42,7 +42,9 @@ export function loadAddons(
 	terminal.loadAddon(unicode11);
 	terminal.unicode.activeVersion = "11";
 
-	terminal.loadAddon(new ImageAddon());
+	terminal.loadAddon(
+		new ImageAddon({ storageLimit: 16, pixelLimit: 2048 * 2048 }),
+	);
 
 	const searchAddon = new SearchAddon();
 	terminal.loadAddon(searchAddon);
