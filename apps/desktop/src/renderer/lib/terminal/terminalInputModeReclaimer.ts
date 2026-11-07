@@ -19,10 +19,10 @@ import type { IDisposable, Terminal } from "@xterm/xterm";
  *
  * This observes mode arming and the OSC 777 shell-ready marker via xterm parser
  * handlers (chunk-safe, exact) and feeds them to the shared reclaimer, which
- * decides what to disarm. The disarm is written back on a microtask so a TUI that
- * re-arms right after the marker (fg after ^Z, or a new TUI racing the prompt)
- * keeps its modes. The decision logic lives in the shared module so a host-side
- * surface can reuse it later.
+ * decides what to disarm. The disarm is decided once xterm has parsed the output
+ * already queued behind the marker, so a TUI that re-arms right after it (fg
+ * after ^Z, or a new TUI racing the prompt) keeps its modes. The decision logic
+ * lives in the shared module so a host-side surface can reuse it later.
  */
 export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 	const reclaimer = createLeakedInputModeReclaimer();
@@ -30,7 +30,7 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 	const disposables: IDisposable[] = [];
 	let scheduled = false;
 	// The deferred flush must not write into a terminal whose lifecycle ended
-	// between the marker and the microtask.
+	// between the marker and the flush.
 	let disposed = false;
 
 	// Kitty keyboard protocol: `CSI > flags u` push/arm, `CSI = flags ; mode u`
@@ -90,7 +90,7 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 			reclaimer.noteShellReady();
 			if (!scheduled) {
 				scheduled = true;
-				queueMicrotask(() => {
+				terminal.write("", () => {
 					scheduled = false;
 					if (disposed) return;
 					const disarm = reclaimer.collectDisarm();
