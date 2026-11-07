@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bot, LoaderCircle } from "lucide-react";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
+import { AgentIcon } from "renderer/components/AgentIcon";
 import type { PageWatcherRow } from "renderer/hooks/host-service/usePageWatchersForPage";
 import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -17,7 +18,6 @@ import {
 	type AgentTarget,
 	useAgentSessionTarget,
 } from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
-import { AgentIcon } from "renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentIcon";
 import type { CreateNewAgentSession } from "../../../../../../../useAgentSessionLauncher";
 import { waitForPageAgent } from "../../utils/waitForPageAgent";
 
@@ -151,7 +151,7 @@ export function PageWatcherPopover({
 			const result = await onCreateNewAgentSession({
 				configId,
 				placement,
-				prompt: `Watch the Superset Page with ID ${page.id} for reader comments. Read it with superset pages get ${page.id}. Load the Superset Pages skill (superset-page or superset:page) and follow it when handling comments. The app will register this terminal as the page watcher. Do not republish or change the page until a reader requests a change. After reading, wait for comments to be delivered to this session.`,
+				prompt: `Watch the Paradev Page with ID ${page.id} for reader comments. Read it with superset pages get ${page.id}. Load the Paradev Pages skill (superset-page or superset:page) and follow it when handling comments. The app will register this terminal as the page watcher. Do not republish or change the page until a reader requests a change. After reading, wait for comments to be delivered to this session.`,
 			});
 			if (!result) return;
 			const binding = await waitForPageAgent({

@@ -152,14 +152,15 @@ describe("settings search - mobile rollout", () => {
 	});
 });
 
-describe("settings search - right pane area", () => {
-	it("counts the Right pane area switch only when its flag is on", () => {
+describe("settings search - plugins visibility", () => {
+	it("excludes plugin matches unless the plugins section is visible", () => {
 		expect(
-			getVisibleMatchCountBySection("right pane", true, false).experimental,
+			getVisibleMatchCountBySection("marketplace", true, false, false, false)
+				.plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("right pane", true, false, false, true)
-				.experimental,
-		).toBe(1);
+			getVisibleMatchCountBySection("marketplace", true, false, false, true)
+				.plugins,
+		).toBeGreaterThan(0);
 	});
 });

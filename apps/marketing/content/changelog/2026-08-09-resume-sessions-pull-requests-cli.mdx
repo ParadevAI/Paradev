@@ -18,7 +18,7 @@ A dead terminal no longer means a lost conversation. When an agent session ends 
 Tasks and pull requests each get their own sidebar destination, and the new PR view goes a lot deeper, contributed by [@Roshvan](https://github.com/Roshvan):
 
 - Filter across several repositories at once, plus by author, review state, and open/all
-- CI check summaries in the list and a full checks section in PR detail, so you don't leave Superset to see what's red
+- CI check summaries in the list and a full checks section in PR detail, so you don't leave Paradev to see what's red
 - One click adds any PR to a workspace; Linear and GitHub Issues stay as sources inside Tasks
 
 Open it from **Pull requests** in the sidebar.
@@ -39,19 +39,19 @@ Project settings picked up three new controls, all under **Settings → Projects
 
 ## A CLI That Shows You Around <PRBadge url="https://github.com/superset-sh/superset/pull/6273" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6270" />
 
-Run `superset` with no arguments in any terminal and you get an interactive command browser: arrow through the whole command tree, read each command's flags, and commands with required inputs walk you through a guided form that shows the exact command before running it. `superset --help` got the same treatment with grouped commands and copy-paste examples. There's also a built-in **Superset CLI** preset in the workspace preset bar for a one-click tour.
+Run `superset` with no arguments in any terminal and you get an interactive command browser: arrow through the whole command tree, read each command's flags, and commands with required inputs walk you through a guided form that shows the exact command before running it. `superset --help` got the same treatment with grouped commands and copy-paste examples. There's also a built-in **Paradev CLI** preset in the workspace preset bar for a one-click tour.
 
 ![The interactive command browser after running superset with no arguments](/changelog/2026-08-09-cli-browser.png)
 
 ## Improvements
 
-- **Superset skills for every agent** - `superset:*` skills (orchestrate, setup, doctor, standup, 10x, and more) now provision automatically for Claude Code, Codex, Kimi, Vibe, and Grok, including `superset:feedback` for sending feedback straight to the team <PRBadge url="https://github.com/superset-sh/superset/pull/6181" />
+- **Paradev skills for every agent** - `superset:*` skills (orchestrate, setup, doctor, standup, 10x, and more) now provision automatically for Claude Code, Codex, Kimi, Vibe, and Grok, including `superset:feedback` for sending feedback straight to the team <PRBadge url="https://github.com/superset-sh/superset/pull/6181" />
 - **Claude Opus 5 and GPT-5.6 Terra/Luna** - the newest models joined the model pickers across chat, Codex, Cursor, and OpenCode <PRBadge url="https://github.com/superset-sh/superset/pull/6219" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6213" />
 - **Retry failed automations** - failed runs get an inline retry button, plus a retry-all button when several fail at once <PRBadge url="https://github.com/superset-sh/superset/pull/6139" />
 - **The public roadmap is back** - refreshed and synced from our internal roadmap at [superset.sh/roadmap](https://superset.sh/roadmap) <PRBadge url="https://github.com/superset-sh/superset/pull/6179" />
 - **Settings search highlights matches** - the matched text lights up on every settings page <PRBadge url="https://github.com/superset-sh/superset/pull/6169" />
 - **Resources menu** - per-workspace CPU and memory now sits in a top-level menu, or press ⌘⇧U <PRBadge url="https://github.com/superset-sh/superset/pull/6267" />
-- **Agent hooks stay in their lane** - hooks only fire in Superset terminals, and each agent gets a hooks toggle in **Settings → Agents** <PRBadge url="https://github.com/superset-sh/superset/pull/6072" />
+- **Agent hooks stay in their lane** - hooks only fire in Paradev terminals, and each agent gets a hooks toggle in **Settings → Agents** <PRBadge url="https://github.com/superset-sh/superset/pull/6072" />
 - **Polygraph harness picker** - choose whether polygraph drives Claude, Codex, or OpenCode, contributed by [@MaxKless](https://github.com/MaxKless) <PRBadge url="https://github.com/superset-sh/superset/pull/6068" />
 - **Sign out from onboarding** - switch accounts without finishing setup first <PRBadge url="https://github.com/superset-sh/superset/pull/6162" />
 - **Docs overhaul** - a new onboarding funnel, six workflow recipes with copyable prompts, CLI terminal command docs, and a demo video on getting started <PRBadge url="https://github.com/superset-sh/superset/pull/6175" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6251" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6178" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6261" />

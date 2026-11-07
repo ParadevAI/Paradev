@@ -92,6 +92,15 @@ export const serverErrorMessages: Record<
 				message: `${params?.agent} cannot be signed in this way yet.`,
 			}),
 		),
+	"serverError.agent.notFound": () =>
+		i18n._(msg({ message: "Agent not found" })),
+	"serverError.agent.adminRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
+			}),
+		),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({
@@ -128,11 +137,23 @@ export const serverErrorMessages: Record<
 				message: `This automation belongs to ${params?.organizationName}. Switch to that organization to open it.`,
 			}),
 		),
-	"serverError.automation.onlyTheOwnerOrAnOrganizationOwner": () =>
+	"serverError.automation.archiveBeforeDelete": () =>
+		i18n._(
+			msg({
+				message: "Archive this automation before you delete it.",
+			}),
+		),
+	"serverError.automation.automationIsArchived": () =>
+		i18n._(
+			msg({
+				message: "This automation is archived. Restore it first.",
+			}),
+		),
+	"serverError.automation.onlyTheOwnerOrAnOrganizationOwnerCanArchive": () =>
 		i18n._(
 			msg({
 				message:
-					"Only the owner or an organization owner can delete this automation",
+					"Only the owner or an organization owner can archive this automation",
 			}),
 		),
 	"serverError.automation.automationsRequireThePro": () =>
@@ -264,6 +285,102 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.channel.notFound": () =>
+		i18n._(
+			msg({
+				message: "Channel not found",
+			}),
+		),
+	"serverError.channel.nameTaken": () =>
+		i18n._(
+			msg({
+				message: "A channel with this name already exists",
+			}),
+		),
+	"serverError.channel.invalidName": () =>
+		i18n._(
+			msg({
+				message: "Use lowercase letters, numbers, dashes and underscores",
+			}),
+		),
+	"serverError.channel.joinFirst": () =>
+		i18n._(
+			msg({
+				message: "Join the channel first",
+			}),
+		),
+	"serverError.channel.adminRequired": () =>
+		i18n._(
+			msg({
+				message: "Only channel admins can do that",
+			}),
+		),
+	"serverError.channel.archived": () =>
+		i18n._(
+			msg({
+				message: "This channel is archived",
+			}),
+		),
+	"serverError.channel.lastAdmin": () =>
+		i18n._(
+			msg({
+				message: "A channel needs at least one admin",
+			}),
+		),
+	"serverError.channel.cannotJoinPrivate": () =>
+		i18n._(
+			msg({
+				message: "Ask a member to add you to this channel",
+			}),
+		),
+	"serverError.channel.projectNotFound": () =>
+		i18n._(
+			msg({
+				message: "Project not found",
+			}),
+		),
+	"serverError.channel.notInOrganization": () =>
+		i18n._(
+			msg({
+				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
+			}),
+		),
+	"serverError.channelMessage.notFound": () =>
+		i18n._(
+			msg({
+				message: "Message not found",
+			}),
+		),
+	"serverError.channelMessage.notAuthor": () =>
+		i18n._(
+			msg({
+				message: "You can only edit your own messages",
+			}),
+		),
+	"serverError.channelMessage.cannotDelete": () =>
+		i18n._(
+			msg({
+				message: "You can only delete your own messages",
+			}),
+		),
+	"serverError.channelMessage.empty": () =>
+		i18n._(
+			msg({
+				message: "Write a message first",
+			}),
+		),
+	"serverError.channelMessage.tooLong": () =>
+		i18n._(
+			msg({
+				message: "This message is too long",
+			}),
+		),
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
@@ -330,6 +447,13 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Connecting GitHub is not configured on this server",
+			}),
+		),
+	"serverError.githubUser.notConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Connect GitHub in Settings to act on pull requests as yourself",
 			}),
 		),
 	"serverError.cloudWorkspace.githubRepositoryOutOfReach": () =>
@@ -450,6 +574,12 @@ export const serverErrorMessages: Record<
 				message: "Not a member of this organization",
 			}),
 		),
+	"serverError.host.onlyTheHostOwnerCanAllowCloudWorkspaces": () =>
+		i18n._(
+			msg({
+				message: "Only the host owner can let cloud workspaces reach it",
+			}),
+		),
 	"serverError.host.onlyTheHostOwnerCanSet": () =>
 		i18n._(
 			msg({
@@ -466,6 +596,13 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "GitHub installation not found",
+			}),
+		),
+	"serverError.integration.severalGithubAccountsConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
 			}),
 		),
 	"serverError.integration.githubSyncRequiresThePro": () =>
@@ -496,6 +633,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.integration.pullRequestNotFound": () =>
+		i18n._(
+			msg({
+				message: "Pull request not found",
 			}),
 		),
 	"serverError.integration.onlyOwnersCanDeleteProjects": () =>
@@ -655,6 +798,12 @@ export const serverErrorMessages: Record<
 				message: "You don't have permission to remove this member",
 			}),
 		),
+	"serverError.page.cannotEdit": () =>
+		i18n._(
+			msg({
+				message: "You can view this page but not change it",
+			}),
+		),
 	"serverError.page.cannotComment": () =>
 		i18n._(
 			msg({
@@ -757,6 +906,42 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Workspace not found",
+			}),
+		),
+	"serverError.routine.roomNotAllowed": () =>
+		i18n._(
+			msg({
+				message: "The Dev can't post there.",
+			}),
+		),
+	"serverError.routine.notFound": () =>
+		i18n._(
+			msg({
+				message: "Routine not found",
+			}),
+		),
+	"serverError.routine.nothingToDo": () =>
+		i18n._(
+			msg({
+				message: "A routine needs a schedule or something to watch.",
+			}),
+		),
+	"serverError.routine.invalidSchedule": () =>
+		i18n._(
+			msg({
+				message: "This schedule isn't valid.",
+			}),
+		),
+	"serverError.routine.tooFrequent": () =>
+		i18n._(
+			msg({
+				message: "A routine can run at most once an hour.",
+			}),
+		),
+	"serverError.routine.inThePast": () =>
+		i18n._(
+			msg({
+				message: "This schedule has no runs left.",
 			}),
 		),
 	"serverError.pageComment.commentNotFound": () =>
@@ -906,6 +1091,35 @@ export const serverErrorMessages: Record<
 			message: "Plugin {plugin} is not installed",
 			values: params,
 		}),
+	"serverError.plugins.managedByOrganization": (params) =>
+		i18n._({
+			id: "serverError.plugins.managedByOrganization",
+			message:
+				"Your organization installs {plugin} for you, so it cannot be uninstalled. You can disable it.",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourceNeedsGithub": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceNeedsGithub",
+			message:
+				"Connect your GitHub account to add a repository; syncs read it with your account",
+		}),
+	"serverError.plugins.pluginSourceOutOfReach": (params) =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceOutOfReach",
+			message: "Your GitHub account cannot read {repo}",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourcePathOutside": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourcePathOutside",
+			message: "The path must stay inside the repository",
+		}),
+	"serverError.plugins.unknownPluginSource": () =>
+		i18n._({
+			id: "serverError.plugins.unknownPluginSource",
+			message: "That plugin source does not exist",
+		}),
 	"serverError.plugins.unknownPlugin": (params) =>
 		i18n._({
 			id: "serverError.plugins.unknownPlugin",
@@ -1019,7 +1233,7 @@ export const serverErrorMessages: Record<
 	"serverError.user.theRecoveryPeriodHasEndedContact": () =>
 		i18n._(
 			msg({
-				message: "The recovery period has ended. Contact support@superset.sh.",
+				message: "The recovery period has ended. Contact support@paradev.com.",
 			}),
 		),
 	"serverError.user.userNotFound": () =>

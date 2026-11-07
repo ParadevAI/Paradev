@@ -7,9 +7,15 @@ import type {
 	UserContent,
 	UserMessage,
 } from "@superset/chat/protocol";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { useComposerDraft } from "../../../Composer/hooks/useComposerDraft";
 import { useSubagentTarget } from "./useSubagentTarget";
+
+const textDraft = (text: string): ComposerDraft => ({
+	segments: [{ type: "text", text }],
+	attachments: [],
+});
 
 beforeEach(() => window.localStorage.clear());
 afterEach(cleanup);
@@ -66,7 +72,10 @@ test("typing while focused messages the subagent", async () => {
 	expect(hook.result.current.target?.name).toBe("Explore");
 	expect(hook.result.current.target?.disabledReason).toBeUndefined();
 	await act(async () => {
-		await hook.result.current.onSend(typed, { steer: false });
+		await hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
 	});
 	expect(steerSubagent).toHaveBeenCalledWith("subagent:c1", typed);
 	expect(sendPrompt).not.toHaveBeenCalled();
@@ -138,7 +147,10 @@ test("stop reads the item and stops its task", () => {
 test("a host too old to message subagents gives the text back and says so", async () => {
 	const { hook, onUnsent } = renderTarget(explore, "unsupported");
 	await act(async () => {
-		await hook.result.current.onSend(typed, { steer: false });
+		await hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
 	});
 	expect(onUnsent).toHaveBeenCalledWith(
 		typed,
@@ -165,17 +177,19 @@ test("drafts are kept per target", () => {
 		},
 		{ initialProps: { focusedId: null as string | null } },
 	);
-	act(() => hook.result.current.onChange("for the main agent"));
+	act(() => hook.result.current.onDraftChange(textDraft("for the main agent")));
 
 	hook.rerender({ focusedId: "subagent:c1" });
 	expect(hook.result.current.storedDraft).toBeUndefined();
-	act(() => hook.result.current.onChange("for Explore"));
+	act(() => hook.result.current.onDraftChange(textDraft("for Explore")));
 
 	hook.rerender({ focusedId: null });
-	expect(hook.result.current.storedDraft).toBe("for the main agent");
+	expect(hook.result.current.storedDraft).toEqual(
+		textDraft("for the main agent"),
+	);
 
 	hook.rerender({ focusedId: "subagent:c1" });
-	expect(hook.result.current.storedDraft).toBe("for Explore");
+	expect(hook.result.current.storedDraft).toEqual(textDraft("for Explore"));
 	expect(
 		Object.keys(window.localStorage).filter((key) => key.includes("subagent")),
 	).toEqual([]);
@@ -211,7 +225,9 @@ test("a message shows as queued until the subagent's echo of it arrives", async 
 	);
 	let sent: Promise<unknown> = Promise.resolve();
 	act(() => {
-		sent = Promise.resolve(hook.result.current.onSend(typed, { steer: false }));
+		sent = Promise.resolve(
+			hook.result.current.onSend(typed, { steer: false, draft: textDraft("") }),
+		);
 	});
 	expect(hook.result.current.queued.map((entry) => entry.content)).toEqual([
 		typed,
@@ -253,8 +269,14 @@ test("one echo that carries two queued messages clears both", async () => {
 		{ initialProps: { items: withItems(explore) } },
 	);
 	await act(async () => {
-		await hook.result.current.onSend(first, { steer: false });
-		await hook.result.current.onSend(second, { steer: false });
+		await hook.result.current.onSend(first, {
+			steer: false,
+			draft: textDraft(""),
+		});
+		await hook.result.current.onSend(second, {
+			steer: false,
+			draft: textDraft(""),
+		});
 	});
 	expect(hook.result.current.queued).toHaveLength(2);
 
@@ -289,7 +311,10 @@ test("a message the subagent did not take leaves the queue", async () => {
 		}),
 	);
 	await act(async () => {
-		await hook.result.current.onSend(typed, { steer: false });
+		await hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
 	});
 	expect(hook.result.current.queued).toEqual([]);
 	expect(onUnsent).toHaveBeenCalledTimes(1);

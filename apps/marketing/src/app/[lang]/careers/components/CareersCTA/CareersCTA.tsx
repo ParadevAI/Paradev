@@ -12,7 +12,7 @@ export function CareersCTA() {
 				<Trans>Come build it with us.</Trans>
 			</h2>
 			<p className="mx-auto mb-8 max-w-[34rem] text-muted-foreground">
-				<Trans>See the open roles, or try Superset first.</Trans>
+				<Trans>See the open roles, or try Paradev first.</Trans>
 			</p>
 			<div className="flex flex-wrap justify-center gap-3">
 				<Link
@@ -25,7 +25,7 @@ export function CareersCTA() {
 					source="careers"
 					className={`${buttonClassName} border border-border text-foreground hover:bg-muted`}
 				>
-					<Trans>Download Superset</Trans>
+					<Trans>Download Paradev</Trans>
 				</DownloadLink>
 			</div>
 		</section>

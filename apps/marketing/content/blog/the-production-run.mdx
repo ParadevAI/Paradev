@@ -19,7 +19,7 @@ This post is that prediction, the instrument we're measuring it with, and the fi
 
 ---
 
-# What a production run is
+## What a production run is
 
 A production run is a fixed window where we all push one number and see what actually moves.
 
@@ -27,7 +27,7 @@ For one month, everyone on the board works toward the same target. We measure th
 
 Predictions that can't be checked are marketing. This one has a date, a metric, and a public scoreboard. If we're wrong, the [leaderboard](/leaderboard) will say so in front of everybody, which is the point.
 
-# What we measure
+## What we measure
 
 Six variables come off your machine. Five are recorded per day, one is measured across the trailing 30.
 
@@ -36,7 +36,7 @@ Six variables come off your machine. Five are recorded per day, one is measured 
 | `tokens` | per day | All tokens across every session |
 | `sessions` | per day | Distinct sessions with activity |
 | `parallelSessions` | per day | Median distinct sessions active in the same 15-minute bucket |
-| `agentPrsMerged` | per day | PRs merged from a Superset workspace that ran an agent |
+| `agentPrsMerged` | per day | PRs merged from a Paradev workspace that ran an agent |
 | `activeDays` | window | Days in the trailing 30 with any activity |
 | `usd` | per day | API-equivalent cost of those tokens |
 
@@ -46,7 +46,7 @@ Five of them get graded, as five axes:
 
 **Depth**, from `tokens / sessions`, never tokens on their own. A supervised back-and-forth burns a fraction of what a session that runs a whole task alone does. Because it's a ratio, spending more inside one session raises Depth but not Width, and opening more sessions raises Width but dilutes Depth. You have to change how you work to move either one.
 
-**Output**, from `agentPrsMerged`. Whether the work lands, counted from PRs merged out of a Superset workspace that ran an agent. Hard to reach by accident; possible to fake on purpose, which is what the flag button is for.
+**Output**, from `agentPrsMerged`. Whether the work lands, counted from PRs merged out of a Paradev workspace that ran an agent. Hard to reach by accident; possible to fake on purpose, which is what the flag button is for.
 
 **Sustain**, from `activeDays`. Whether it's your normal mode or a good week.
 
@@ -58,15 +58,15 @@ Cost is graded on dollars per merged PR rather than on spend, because spend is a
 
 The leaderboard payload contains five aggregate numbers a day and your chosen handle. It does not include prompts, file paths, repo or branch names, or PR titles or numbers.
 
-> **A note on this being wrong.** These thresholds are calibration guesses. The parallelism numbers are quoted from Factory 2026, but the token and PR floors are our best estimates and they will move as we see real data. The Output axis is the weakest of them today: PR sync is GitHub-only, it sees work inside Superset workspaces and nothing outside them, and a merge observed while the app is closed can go unrecorded. We'd rather ship an instrument that undercounts and fix it in public than wait for a perfect one. Expect this to change. We'll say so when it does.
+> **A note on this being wrong.** These thresholds are calibration guesses. The parallelism numbers are quoted from Factory 2026, but the token and PR floors are our best estimates and they will move as we see real data. The Output axis is the weakest of them today: PR sync is GitHub-only, it sees work inside Paradev workspaces and nothing outside them, and a merge observed while the app is closed can go unrecorded. We'd rather ship an instrument that undercounts and fix it in public than wait for a perfect one. Expect this to change. We'll say so when it does.
 
-# The four tiers
+## The four tiers
 
 Factory 2026 grades *teams*. Two of its five top-level gates are team properties no individual can clear, so nobody is ever assigned an F-level personally. These four are the individual projection of that ladder.
 
 There's one idea underneath all of them: **each tier moves the unit of your attention up one level.** Line, task, queue, direction.
 
-## Tier 1: Button pusher
+### Tier 1: Button pusher
 
 *One session at a time, shallow. The unit of your attention is the line.*
 
@@ -76,7 +76,7 @@ You're in the loop for every step. The agent writes, you read every line before 
 
 **How you know you're here:** close the laptop and nothing continues.
 
-## Tier 2: Operator
+### Tier 2: Operator
 
 *A couple running at once, sessions going deeper than a chat, and something merges each week. The unit of your attention is the task.*
 
@@ -88,7 +88,7 @@ This is the real break, and it's psychological before it's technical. Starting a
 
 **When we expect it to be the board's median tier: mid 2027.**
 
-## Tier 3: Plant Manager
+### Tier 3: Plant Manager
 
 *Three or more in parallel through a workday, sessions doing real work, and the work lands. The unit of your attention is the queue.*
 
@@ -100,7 +100,7 @@ Three streams through a workday means you're scheduling rather than executing. Y
 
 **When we expect it to be the board's median tier: mid 2028.**
 
-## Tier 4: Henry Ford
+### Tier 4: Henry Ford
 
 *Ten or more at once, every session a substantial run, ten agent PRs a week merging, nearly every day. The unit of your attention is the decision.*
 
@@ -112,7 +112,7 @@ Ten concurrent streams is past what a person can hold in working memory. So reac
 
 **When we expect it to be the board's median tier: 2029. Getting one in five there by August 2028 is the claim in this post.**
 
-# The shape of the growth
+## The shape of the growth
 
 The rungs span 1 to 10 parallel sessions. That's 10x. Put the top at August 2028 and the growth rate falls out of the ladder itself:
 
@@ -145,7 +145,7 @@ One rule holds this together: **the floors never move to chase that curve.** If 
 
 Which is also what makes the prediction falsifiable. If eighteen months from now the observed doubling time is twenty months instead of seven, we were wrong, and the same scoreboard that made the claim will be the thing that disproves it.
 
-# The first run: September
+## The first run: September
 
 The table above says Operator becomes the board's median tier sometime in mid 2027. We're going to try to get there in a month.
 

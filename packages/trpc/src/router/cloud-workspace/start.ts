@@ -1,8 +1,19 @@
+import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
-import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
+import {
+	cloudWorkspaces,
+	cloudWorkspaceTags,
+	environments,
+	tasks,
+} from "@superset/db/schema";
+import {
+	type CloudAgentLaunch,
+	describeCloudAgentLaunch,
+	supportsCloudAgentChat,
+} from "@superset/shared/cloud-agent-launch";
+import { CLOUD_WORKSPACE_START_TRANSACTION } from "@superset/shared/constants";
+import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import {
@@ -87,7 +98,26 @@ export async function assertMachineSizeOffered(
  * mid-provision leaves a `provisioning` row we can reconcile, rather than
  * an orphaned sandbox nothing references.
  */
-export async function startCloudWorkspace(args: {
+export async function startCloudWorkspace(args: StartCloudWorkspaceInput) {
+	try {
+		return await Sentry.startSpan(
+			{
+				name: CLOUD_WORKSPACE_START_TRANSACTION,
+				op: "function",
+				forceTransaction: true,
+			},
+			async (span) => {
+				const row = await start(args);
+				span.setAttribute("cloud_workspace.id", row.id);
+				return row;
+			},
+		);
+	} finally {
+		waitUntil(Sentry.flush(2_000).catch(() => false));
+	}
+}
+
+export interface StartCloudWorkspaceInput {
 	organizationId: string;
 	userId: string;
 	environmentId: string;
@@ -99,16 +129,19 @@ export async function startCloudWorkspace(args: {
 	/** Omitted = the repo's default branch. */
 	branch?: string;
 	launch?: CloudAgentLaunch;
+	/** Opens `launch` as a chat when its agent supports one. */
+	chat?: boolean;
 	taskIds?: string[];
 	attachmentFileIds?: string[];
 	machineSize?: string;
+	/** Normalized workspace tags, filed under `userId`. */
+	tags?: string[];
 	beforeProvision?: (workspaceId: string) => Promise<void>;
-}) {
-	// The sandbox's Codex is older than the codex-acp floor, so only Claude chats.
+}
+
+async function start(args: StartCloudWorkspaceInput) {
 	const openAsChat =
-		args.launch?.agent === "claude"
-			? acpChatEnabled(args.userId)
-			: Promise.resolve(false);
+		args.chat === true && supportsCloudAgentChat(args.launch?.agent);
 	const environment = await loadUsableEnvironment(args);
 	const size = await resolveMachineSize(args.organizationId, args.machineSize);
 	if (!size) throw machineSizeNotAvailable(args.machineSize);
@@ -183,6 +216,15 @@ export async function startCloudWorkspace(args: {
 		cloudWorkspaceId: row.id,
 		repositories,
 	});
+	if (args.tags?.length) {
+		await db.insert(cloudWorkspaceTags).values(
+			args.tags.map((tag) => ({
+				cloudWorkspaceId: row.id,
+				tag,
+				createdByUserId: args.userId,
+			})),
+		);
+	}
 	const actor = { kind: "user" as const, userId: args.userId };
 	await recordCloudWorkspaceActivity(db, row.id, actor, { event: "created" });
 	if (args.taskIds?.length) {
@@ -220,7 +262,7 @@ export async function startCloudWorkspace(args: {
 			? {
 					launch: {
 						...args.launch,
-						surface: (await openAsChat) ? ("chat" as const) : undefined,
+						surface: openAsChat ? ("chat" as const) : undefined,
 					},
 				}
 			: {}),
@@ -239,7 +281,10 @@ export async function startCloudWorkspace(args: {
 	}
 	nudge(row.organizationId, "cloud_workspaces");
 	await queueProvision(job);
-	return row;
+	return {
+		...row,
+		initialLaunch: await describeCloudAgentLaunch(job.launch),
+	};
 }
 
 /**

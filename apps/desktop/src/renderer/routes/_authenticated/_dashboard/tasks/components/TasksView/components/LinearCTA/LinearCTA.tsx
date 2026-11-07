@@ -31,7 +31,7 @@ export function LinearCTA({ needsReconnect = false }: LinearCTAProps) {
 					<p className="text-sm text-muted-foreground">
 						<Trans>
 							Connect your Linear account to browse, update and start work on
-							Linear issues from Superset.
+							Linear issues from Paradev.
 						</Trans>
 					</p>
 				</div>

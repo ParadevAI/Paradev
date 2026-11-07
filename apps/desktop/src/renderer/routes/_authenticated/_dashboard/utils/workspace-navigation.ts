@@ -79,11 +79,13 @@ export function parseSubagentSearch(
 }
 
 export interface V2WorkspaceSearchParams extends SubagentLinkSearchParams {
+	sessionId?: string;
 	terminalId?: string;
 	focusRequestId?: string;
 	openUrl?: string;
 	openUrlTarget?: "current-tab" | "new-tab";
 	openUrlRequestId?: string;
+	openUrlAgent?: true;
 }
 
 /**

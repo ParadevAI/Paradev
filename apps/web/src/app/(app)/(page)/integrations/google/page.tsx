@@ -47,7 +47,7 @@ export default async function GoogleIntegrationPage() {
 		no_refresh_token: i18n._(
 			msg({
 				message:
-					"Google did not grant lasting access. Remove Superset from your Google account's third-party access and try again.",
+					"Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again.",
 			}),
 		),
 		userinfo_failed: i18n._(

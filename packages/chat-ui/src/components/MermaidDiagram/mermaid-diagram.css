@@ -1,0 +1,20 @@
+/* A drawn diagram reads the app theme live, so a theme change needs no redraw. */
+.pele {
+	--pele-bg: var(--background);
+	--pele-fg: var(--foreground);
+	--pele-muted: var(--muted-foreground);
+	--pele-line: var(--muted-foreground);
+	--pele-surface: var(--secondary);
+	--pele-surface-alt: var(--accent);
+	--pele-border: color-mix(in srgb, var(--foreground) 28%, transparent);
+	--pele-accent: var(--primary);
+	--pele-critical: var(--destructive);
+	--pele-series-1: var(--chart-1);
+	--pele-series-2: var(--chart-2);
+	--pele-series-3: var(--chart-3);
+	--pele-series-4: var(--chart-4);
+	--pele-series-5: var(--chart-5);
+	--pele-series-6: color-mix(in oklab, var(--chart-1) 55%, var(--foreground));
+	--pele-series-7: color-mix(in oklab, var(--chart-2) 55%, var(--foreground));
+	--pele-series-8: color-mix(in oklab, var(--chart-4) 55%, var(--foreground));
+}

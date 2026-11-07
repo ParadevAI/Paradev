@@ -149,7 +149,7 @@ export function formatError(
 			const tier = requiredPlan === "enterprise" ? "Enterprise" : "Pro";
 			return {
 				message: error.message,
-				hint: `Needs the ${tier} plan. Upgrade at https://superset.sh/pricing, or in the app under Settings → Billing.`,
+				hint: `Needs the ${tier} plan. Upgrade at https://paradev.com/pricing, or in the app under Settings → Billing.`,
 			};
 		}
 		if (code === "NOT_FOUND") {

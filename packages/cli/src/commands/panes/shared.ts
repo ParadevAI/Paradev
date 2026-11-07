@@ -1,5 +1,8 @@
 import { CLIError, string } from "@superset/cli-framework";
-import type { PaneLayoutOpResult } from "@superset/shared/pane-layout-ops";
+import type {
+	PaneLayoutOpResult,
+	PaneLayoutSnapshot,
+} from "@superset/shared/pane-layout-ops";
 import { PANE_SPLIT_DIRECTIONS } from "@superset/shared/pane-layout-ops";
 import type { HostServiceClient } from "../../lib/host-target";
 import { formatLayout } from "../../lib/pane-layout-format";
@@ -31,7 +34,7 @@ export async function callPanes<T>(call: () => Promise<T>): Promise<T> {
 		if (isOldPanesHost(error)) {
 			throw new CLIError(
 				OLD_HOST_MESSAGE,
-				"Update the Superset desktop app on that host",
+				"Update the Paradev desktop app on that host",
 			);
 		}
 		throw error;
@@ -116,4 +119,13 @@ export function layoutResult<T extends PaneLayoutOpResult>(
 		data: result,
 		message: `${summary}\n${formatLayout(result.layout)}`,
 	};
+}
+
+/** A desktop app older than the sidebar ops reports no sidebar. */
+export function requireSidebar(layout: PaneLayoutSnapshot, done: string): void {
+	if (layout.sidebar) return;
+	throw new CLIError(
+		`The desktop app on this host has no sidebar support; ${done}`,
+		"Update the Paradev desktop app on that host",
+	);
 }

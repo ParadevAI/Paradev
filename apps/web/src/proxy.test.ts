@@ -115,3 +115,37 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 		expect(res.status).toBe(200);
 	});
 });
+
+describe("proxy: signed-in visits to auth pages", () => {
+	const signedIn = { auth: "Bearer valid-token" };
+
+	it("follows a same-origin redirect param instead of dropping it", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2Fsettings%3Ftab%3Dbilling",
+			signedIn,
+		);
+
+		expect(res.status).toBe(307);
+		expect(res.headers.get("location")).toBe(
+			"https://app.superset.sh/settings?tab=billing",
+		);
+	});
+
+	it("ignores a redirect param that points at another origin", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2F%2Fevil.example",
+			signedIn,
+		);
+
+		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
+	});
+
+	it("ignores a redirect that a tab turns into another origin", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2F%09%2Fevil.example",
+			signedIn,
+		);
+
+		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
+	});
+});

@@ -53,7 +53,7 @@ describe("openBackgroundBrowser", () => {
 				.flatMap((tab) => Object.values(tab.panes))
 				.find((pane) => pane.id === paneId);
 			expect(pane?.kind).toBe("browser");
-			expect(pane?.data).toEqual({ url: "https://example.com" });
+			expect(pane?.data).toEqual({ url: "https://example.com", agent: true });
 			expect(layout.tabs.length).toBe(target === "new-tab" ? 2 : 1);
 		});
 	}

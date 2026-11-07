@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { autumnClient } from "@superset/auth/autumn";
 import * as billing from "@superset/auth/billing";
 import { db } from "@superset/db/client";
-import { cloudWorkspaceBoots } from "@superset/db/schema";
+import { cloudWorkspaceBoots, users } from "@superset/db/schema";
 import { AutumnError } from "autumn-js";
 import { stub } from "../../../test/stub";
 import * as realtime from "../../lib/realtime";
@@ -53,6 +53,7 @@ function chain(rows: () => unknown[], onFrom?: (table: unknown) => void) {
 			onFrom?.(table);
 			return link;
 		},
+		leftJoin: () => link,
 		where: () =>
 			Object.assign(Promise.resolve().then(rows), {
 				returning: async () => rows(),
@@ -72,18 +73,21 @@ stub(db, {
 	select: () => {
 		let source: unknown;
 		return chain(
-			() =>
-				source === cloudWorkspaceBoots
-					? boot
-						? [boot]
-						: []
-					: [
-							{
-								providerSandboxId: "ws-box",
-								createdByUserId: "user_1",
-								usageStopAt,
-							},
-						],
+			() => {
+				if (source === cloudWorkspaceBoots) return boot ? [boot] : [];
+				if (source === users) {
+					return [{ name: "Ada Lovelace", email: "ada@example.com" }];
+				}
+				return [
+					{
+						providerSandboxId: "ws-box",
+						createdByUserId: "user_1",
+						usageStopAt,
+						userName: "Ada Lovelace",
+						userEmail: "ada@example.com",
+					},
+				];
+			},
 			(table) => {
 				source = table;
 			},
@@ -234,7 +238,12 @@ describe("settleBoot", () => {
 		).toMatchObject({
 			featureId: "active_cpu_minutes",
 			value: 3,
-			properties: { userId: "user_1", bootId: "boot_1" },
+			properties: {
+				userId: "user_1",
+				userName: "Ada Lovelace",
+				userEmail: "ada@example.com",
+				bootId: "boot_1",
+			},
 		});
 		expect(autumnCalls.some((call) => call.method === "check")).toBe(false);
 		expect(writes).toContainEqual(expect.objectContaining({ lockOpen: false }));
@@ -446,9 +455,19 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 		expect(reservations.size).toBe(0);
 	});
 
+	test("a reservation names its user so the usage chart can group by name or email", async () => {
+		await reserve();
+		expect(usageEvents?.[0]?.properties).toMatchObject({
+			userId: "user_1",
+			userName: "Ada Lovelace",
+			userEmail: "ada@example.com",
+		});
+	});
+
 	test("a workspace without a creator has an explicit unattributed bucket", async () => {
 		await reserve(null);
 		expect(userTotal("box_gb_minutes", "unattributed")).toBe(480);
+		expect(usageEvents?.[0]?.properties).not.toHaveProperty("userEmail");
 	});
 });
 

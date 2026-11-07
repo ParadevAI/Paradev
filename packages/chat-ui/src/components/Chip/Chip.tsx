@@ -7,6 +7,7 @@ export function Chip({
 	chip,
 	selected,
 	mention,
+	tooltip = true,
 }: {
 	chip: Pick<
 		ComposerChip,
@@ -14,6 +15,8 @@ export function Chip({
 	>;
 	selected?: boolean;
 	mention?: boolean;
+	/** Off where something else, such as a hover card, explains the chip. */
+	tooltip?: boolean;
 }) {
 	const body = (
 		<span
@@ -34,7 +37,9 @@ export function Chip({
 			<span className="prompt-input-chip-label">{chip.label}</span>
 		</span>
 	);
-	if (!chip.description && chip.serialized === chip.label) return body;
+	if (!tooltip || (!chip.description && chip.serialized === chip.label)) {
+		return body;
+	}
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>{body}</TooltipTrigger>

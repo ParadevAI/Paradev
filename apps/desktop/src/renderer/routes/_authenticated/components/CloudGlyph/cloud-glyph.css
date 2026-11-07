@@ -1,0 +1,28 @@
+.cloud-glyph-outline {
+	transition: opacity 300ms ease-out;
+}
+
+.cloud-glyph-arc {
+	stroke-dasharray: 26 74;
+	animation:
+		cloud-glyph-arc-travel 2s linear infinite,
+		cloud-glyph-arc-fade-in 300ms ease-out both;
+}
+
+@keyframes cloud-glyph-arc-travel {
+	to {
+		stroke-dashoffset: -100;
+	}
+}
+
+@keyframes cloud-glyph-arc-fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cloud-glyph-arc {
+		animation: cloud-glyph-arc-fade-in 300ms ease-out both;
+	}
+}

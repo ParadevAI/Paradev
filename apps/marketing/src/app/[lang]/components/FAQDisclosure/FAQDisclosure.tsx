@@ -2,11 +2,13 @@ import type { ReactNode } from "react";
 import { HiPlus } from "react-icons/hi2";
 
 export function FAQDisclosure({
+	id,
 	question,
 	children,
 	name,
 	compact = false,
 }: {
+	id?: string;
 	question: ReactNode;
 	children: ReactNode;
 	name: string;
@@ -14,8 +16,9 @@ export function FAQDisclosure({
 }) {
 	return (
 		<details
+			id={id}
 			name={name}
-			className={`group border-b border-border ${compact ? "last:border-b-0" : ""}`}
+			className={`group scroll-mt-24 border-b border-border ${compact ? "last:border-b-0" : ""}`}
 		>
 			<summary
 				className={`flex w-full cursor-pointer list-none items-center justify-between text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&::-webkit-details-marker]:hidden ${compact ? "py-5" : "py-6"}`}

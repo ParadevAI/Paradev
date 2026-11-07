@@ -15,7 +15,7 @@ import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { env } from "../../env";
 import {
 	createTRPCRouter,
-	protectedProcedure,
+	personProcedure,
 	publicProcedure,
 	userError,
 } from "../../trpc";
@@ -579,101 +579,95 @@ async function rankFor(
 }
 
 export const leaderboardRouter = createTRPCRouter({
-	join: protectedProcedure
-		.input(joinSchema)
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
+	join: personProcedure.input(joinSchema).mutation(async ({ ctx, input }) => {
+		const userId = ctx.session.user.id;
 
-			await enforce(
-				joinRateLimit,
-				userId,
-				"Too many attempts. Try again later.",
-			);
+		await enforce(joinRateLimit, userId, "Too many attempts. Try again later.");
 
-			const [taken] = await db
-				.select({ userId: handles.userId })
-				.from(handles)
-				.where(eq(handles.handle, input.handle))
-				.limit(1);
+		const [taken] = await db
+			.select({ userId: handles.userId })
+			.from(handles)
+			.where(eq(handles.handle, input.handle))
+			.limit(1);
 
-			if (taken && taken.userId !== userId) {
+		if (taken && taken.userId !== userId) {
+			throw userError({
+				code: "CONFLICT",
+				message: "That handle is taken.",
+				i18nKey: "serverError.leaderboard.thatHandleIsTaken",
+			});
+		}
+
+		const organizationId = await requireActiveOrgMembership(ctx);
+
+		const [github] = await db
+			.select({ handle: userIdentities.handle })
+			.from(userIdentities)
+			.where(
+				and(
+					eq(userIdentities.userId, userId),
+					eq(userIdentities.provider, "github"),
+				),
+			)
+			.limit(1);
+
+		try {
+			return await dbWs.transaction(async (tx) => {
+				const [owned] = await tx
+					.select({ handle: handles.handle })
+					.from(handles)
+					.where(eq(handles.userId, userId))
+					.limit(1);
+
+				if (!owned) {
+					await tx.insert(handles).values({
+						handle: input.handle,
+						ownerType: "user",
+						userId,
+					});
+				} else if (owned.handle !== input.handle) {
+					await tx
+						.update(handles)
+						.set({ handle: input.handle })
+						.where(eq(handles.userId, userId));
+				}
+
+				const [row] = await tx
+					.insert(publicProfiles)
+					.values({
+						userId,
+						handle: input.handle,
+						visibility: input.visibility,
+						organizationId,
+						githubHandle: github?.handle ?? null,
+					})
+					.onConflictDoUpdate({
+						target: publicProfiles.userId,
+						set: {
+							handle: input.handle,
+							visibility: input.visibility,
+							organizationId,
+							githubHandle: github?.handle ?? null,
+							optedInAt: new Date(),
+						},
+					})
+					.returning();
+
+				return row;
+			});
+		} catch (error) {
+			if (isUniqueViolation(error, HANDLE_CONSTRAINT)) {
 				throw userError({
 					code: "CONFLICT",
 					message: "That handle is taken.",
 					i18nKey: "serverError.leaderboard.thatHandleIsTaken",
 				});
 			}
+			throw error;
+		}
+	}),
 
-			const organizationId = await requireActiveOrgMembership(ctx);
-
-			const [github] = await db
-				.select({ handle: userIdentities.handle })
-				.from(userIdentities)
-				.where(
-					and(
-						eq(userIdentities.userId, userId),
-						eq(userIdentities.provider, "github"),
-					),
-				)
-				.limit(1);
-
-			try {
-				return await dbWs.transaction(async (tx) => {
-					const [owned] = await tx
-						.select({ handle: handles.handle })
-						.from(handles)
-						.where(eq(handles.userId, userId))
-						.limit(1);
-
-					if (!owned) {
-						await tx.insert(handles).values({
-							handle: input.handle,
-							ownerType: "user",
-							userId,
-						});
-					} else if (owned.handle !== input.handle) {
-						await tx
-							.update(handles)
-							.set({ handle: input.handle })
-							.where(eq(handles.userId, userId));
-					}
-
-					const [row] = await tx
-						.insert(publicProfiles)
-						.values({
-							userId,
-							handle: input.handle,
-							visibility: input.visibility,
-							organizationId,
-							githubHandle: github?.handle ?? null,
-						})
-						.onConflictDoUpdate({
-							target: publicProfiles.userId,
-							set: {
-								handle: input.handle,
-								visibility: input.visibility,
-								organizationId,
-								githubHandle: github?.handle ?? null,
-								optedInAt: new Date(),
-							},
-						})
-						.returning();
-
-					return row;
-				});
-			} catch (error) {
-				if (isUniqueViolation(error, HANDLE_CONSTRAINT)) {
-					throw userError({
-						code: "CONFLICT",
-						message: "That handle is taken.",
-						i18nKey: "serverError.leaderboard.thatHandleIsTaken",
-					});
-				}
-				throw error;
-			}
-		}),
-
-	suggestedHandle: protectedProcedure.query(async ({ ctx }) => {
+	suggestedHandle: personProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
 		const [identity] = await db
@@ -714,7 +708,7 @@ export const leaderboardRouter = createTRPCRouter({
 		};
 	}),
 
-	updateProfile: protectedProcedure
+	updateProfile: personProcedure
 		.input(profileSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -737,7 +731,7 @@ export const leaderboardRouter = createTRPCRouter({
 			return row ?? null;
 		}),
 
-	setVisibility: protectedProcedure
+	setVisibility: personProcedure
 		.input(joinSchema.pick({ visibility: true }))
 		.mutation(async ({ ctx, input }) => {
 			await requireParticipant(ctx.session.user.id);
@@ -748,7 +742,7 @@ export const leaderboardRouter = createTRPCRouter({
 			return { success: true };
 		}),
 
-	leave: protectedProcedure.mutation(async ({ ctx }) => {
+	leave: personProcedure.mutation(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 		await dbWs.transaction(async (tx) => {
 			await tx
@@ -762,7 +756,7 @@ export const leaderboardRouter = createTRPCRouter({
 		return { success: true };
 	}),
 
-	publish: protectedProcedure
+	publish: personProcedure
 		.input(publishSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -876,7 +870,7 @@ export const leaderboardRouter = createTRPCRouter({
 			return { written: rows.length, days: distinctDays, awarded };
 		}),
 
-	standings: protectedProcedure
+	standings: personProcedure
 		.input(standingsSchema)
 		.query(async ({ input }) => await getStandings(input)),
 
@@ -930,7 +924,7 @@ export const leaderboardRouter = createTRPCRouter({
 			}),
 	}),
 
-	previewRank: protectedProcedure
+	previewRank: personProcedure
 		.input(previewRankSchema)
 		.query(async ({ ctx, input }) => {
 			await enforce(
@@ -955,11 +949,11 @@ export const leaderboardRouter = createTRPCRouter({
 			};
 		}),
 
-	viewer: protectedProcedure.query(({ ctx }) =>
+	viewer: personProcedure.query(({ ctx }) =>
 		getViewerProfile(ctx.session.user.id),
 	),
 
-	me: protectedProcedure.input(meSchema).query(async ({ ctx, input }) => {
+	me: personProcedure.input(meSchema).query(async ({ ctx, input }) => {
 		const userId = ctx.session.user.id;
 		const [row] = await db
 			.select({

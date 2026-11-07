@@ -10,6 +10,7 @@ interface UseConsumeOpenUrlRequestArgs {
 	url: string | undefined;
 	target: V2WorkspaceUrlOpenTarget | undefined;
 	requestId: string | undefined;
+	agent?: true;
 	consumeSearch: ConsumeSearch;
 }
 
@@ -18,6 +19,7 @@ export function useConsumeOpenUrlRequest({
 	url,
 	target,
 	requestId,
+	agent,
 	consumeSearch,
 }: UseConsumeOpenUrlRequestArgs): void {
 	const consumedRef = useRef<Set<string>>(new Set());
@@ -33,9 +35,19 @@ export function useConsumeOpenUrlRequest({
 		if (consumedRef.current.has(key)) return;
 		consumedRef.current.add(key);
 		viewer.reveal();
-		openUrlInV2Workspace({ store: viewer.store, target: resolvedTarget, url });
-		consumeSearch(["openUrl", "openUrlTarget", "openUrlRequestId"]);
-	}, [viewer, target, url, requestId, consumeSearch]);
+		openUrlInV2Workspace({
+			store: viewer.store,
+			target: resolvedTarget,
+			url,
+			agent,
+		});
+		consumeSearch([
+			"openUrl",
+			"openUrlTarget",
+			"openUrlRequestId",
+			"openUrlAgent",
+		]);
+	}, [viewer, target, url, requestId, agent, consumeSearch]);
 }
 
 export function getOpenUrlRequestConsumeKey({

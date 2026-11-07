@@ -9,6 +9,7 @@ import {
 	readCloudAgentLaunch,
 } from "@superset/shared/cloud-agent-launch";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { getDefaultTerminal } from "@superset/shared/project-config";
 import {
 	SANDBOX_PATHS,
 	type SandboxRepository,
@@ -24,13 +25,19 @@ import {
 } from "../../trpc/router/agents/agents";
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
-import { seedDefaultsIfEmpty } from "../../trpc/router/settings/agent-configs";
+import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
 import {
 	getManagedEnv,
 	waitForManagedEnv,
 } from "../sandbox-managed-env/sandbox-managed-env.ts";
-import { resolveScript, shellSingleQuote } from "../setup/config";
+import {
+	chainPhases,
+	invalidConfigCommand,
+	loadProjectConfig,
+	type PhaseCommand,
+	shellSingleQuote,
+} from "../setup/config";
 import {
 	type PendingCloudLaunchReport,
 	readPendingLaunchReport,
@@ -38,6 +45,7 @@ import {
 	withPendingLaunchReport,
 } from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
+import { seedSandboxAgents } from "./utils/seedSandboxAgents";
 
 /**
  * Makes a sandbox describe its own workspace, instead of being described from
@@ -63,7 +71,7 @@ export interface SandboxIdentity {
 	workspaceRoot: string;
 	/**
 	 * The primary repository's checkout: the one the workspace opens on and
-	 * whose `.superset/config.json` the box acts on.
+	 * whose Paradev config the box acts on.
 	 */
 	worktreePath: string;
 	/** Every checkout on the box, the primary first. */
@@ -164,6 +172,33 @@ function readTail(path: string): string {
 }
 
 /**
+ * Cloud boot: `[setup]`, then the default terminal, as two separate steps.
+ * Exported for tests.
+ */
+export function startHookCommands(identity: SandboxIdentity): string[] {
+	const root = identity.worktreePath;
+	const config = loadProjectConfig({
+		repoPath: root,
+		projectId: identity.workspaceId,
+	});
+	if (!config) return [];
+	if (config.kind === "invalid") return [invalidConfigCommand(config)];
+	const terminal = getDefaultTerminal(config.resolved);
+	const inDirectory = (step: PhaseCommand) => {
+		const dir = step.cwd ? resolve(root, step.cwd) : root;
+		return dir !== root && existsSync(dir)
+			? `(cd ${shellSingleQuote(dir)} && ${step.command})`
+			: step.command;
+	};
+	return [
+		chainPhases([config.resolved.setup], root),
+		terminal ? chainPhases([terminal], root) : null,
+	]
+		.filter((step): step is PhaseCommand => step !== null)
+		.map(inDirectory);
+}
+
+/**
  * Runs the repository's `start` hook: the services a workspace needs on
  * every boot. The boot runner asks for it once host-service answers, the
  * managed environment has been pushed and the checkout is in; it runs here
@@ -173,32 +208,21 @@ function readTail(path: string): string {
  */
 export async function runSandboxStartHook(
 	identity: SandboxIdentity,
+	options: { force?: boolean } = {},
 ): Promise<StartHookOutcome> {
-	if (existsSync(START_HOOK_MARKER))
+	// `force` re-runs setup after an archive hook raced an undo on this boot.
+	if (!options.force && existsSync(START_HOOK_MARKER))
 		return { started: false, reason: "already-started" };
-	const resolved = resolveScript("start", {
-		repoPath: identity.worktreePath,
-		projectId: identity.workspaceId,
-	});
-	const commands = !resolved
-		? null
-		: resolved.kind === "commands"
-			? resolved.commands
-			: [`bash ${shellSingleQuote(resolved.scriptPath)}`];
-	if (!commands?.length) return { started: false, reason: "no-hook" };
-	// A repository lists steps; running them as one `&&` chain made a step that
-	// failed take the rest with it. Each is its own process, and the services
-	// still come up when something earlier had nothing to do.
-	const configured = resolved?.cwd
-		? resolve(identity.worktreePath, resolved.cwd)
-		: identity.worktreePath;
+	const commands = startHookCommands(identity);
+	if (commands.length === 0) return { started: false, reason: "no-hook" };
 	const log = openSync(START_HOOK_LOG, "a");
 	const command = commands.join("; ");
+	// Setup stops at its first failure; the terminal still starts after it.
 	const child = spawn(
 		"bash",
 		["-lc", commands.map((one) => `{ ${one}; }`).join("\n")],
 		{
-			cwd: existsSync(configured) ? configured : identity.worktreePath,
+			cwd: identity.worktreePath,
 			env: buildStartHookEnv(process.env, getManagedEnv()),
 			stdio: ["ignore", log, log],
 			detached: true,
@@ -308,6 +332,9 @@ export async function launchSandboxAgentOnce(
 	if (!identity.launch) return;
 	const { agent, prompt, model, effort, mode, attachmentFileIds, surface } =
 		identity.launch;
+	const launchedAs = identity.launch.terminalId
+		? { terminalId: identity.launch.terminalId }
+		: {};
 	// The agent needs the environment the control plane pushes after boot and
 	// the branch the boot runner is checking out beside us; both are seconds.
 	const [pushed, checkedOut] = await Promise.all([
@@ -326,9 +353,7 @@ export async function launchSandboxAgentOnce(
 		`${agent} ${new Date().toISOString()}\n`,
 	);
 	try {
-		// Nothing has listed this host's agents yet, so the built-in presets are
-		// not in its table; the launch resolves the agent through that table.
-		seedDefaultsIfEmpty(ctx.db);
+		ensurePresetRow(ctx.db, agent);
 		if (agent === "claude") approveClaudeApiKey();
 		// Images the composer sent with the prompt: the bytes live in cloud
 		// storage because this box did not exist when they were uploaded.
@@ -356,27 +381,35 @@ export async function launchSandboxAgentOnce(
 		const useChat =
 			chatTarget && ctx.runtime.chat?.()?.live.supports(chatTarget.harness);
 		const report = useChat
-			? await createChatSessionInWorkspace(ctx, {
-					workspaceId: identity.workspaceId,
-					agent,
-					prompt,
-					model,
-					mode,
-					...(attachmentIds?.length ? { attachmentIds } : {}),
-				}).then((session) => ({
+			? await createChatSessionInWorkspace(
+					ctx,
+					{
+						workspaceId: identity.workspaceId,
+						agent,
+						prompt,
+						model,
+						mode,
+						...(attachmentIds?.length ? { attachmentIds } : {}),
+					},
+					launchedAs,
+				).then((session) => ({
 					kind: "chat" as const,
 					sessionId: session.sessionId,
 					terminalId: session.terminalId,
 				}))
-			: await runAgentInWorkspace(ctx, {
-					workspaceId: identity.workspaceId,
-					agent,
-					prompt,
-					model,
-					effort,
-					mode,
-					...(attachmentIds?.length ? { attachmentIds } : {}),
-				}).then((run) => ({
+			: await runAgentInWorkspace(
+					ctx,
+					{
+						workspaceId: identity.workspaceId,
+						agent,
+						prompt,
+						model,
+						effort,
+						mode,
+						...(attachmentIds?.length ? { attachmentIds } : {}),
+					},
+					launchedAs,
+				).then((run) => ({
 					kind: "terminal" as const,
 					terminalId: run.sessionId,
 				}));
@@ -483,7 +516,9 @@ export function sandboxRepositoryWorkspaceId(
 export function runSandboxSelfSeed(
 	db: HostDb,
 	identity: SandboxIdentity,
+	agentDir?: string,
 ): void {
+	seedSandboxAgents(db, identity.workspaceRoot, agentDir);
 	const root = identity.workspaceRoot;
 	const now = Date.now();
 	identity.repositories.forEach((repo, index) => {

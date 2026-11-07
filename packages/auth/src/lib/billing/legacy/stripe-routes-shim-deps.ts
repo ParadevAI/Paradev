@@ -1,6 +1,5 @@
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
-import { planCatalogFromAutumn } from "@superset/shared/billing";
 import { APIError } from "better-auth/api";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { autumnClient } from "../../../autumn";
@@ -8,16 +7,21 @@ import { env } from "../../../env";
 import { stripeClient } from "../../../stripe";
 import { countBillableSeats } from "../../../utils/billing";
 import { catalogAutumnPlans } from "../autumn/catalog";
-import { ensureAutumnCustomer, paidAutumnPlanId } from "../autumn/customer";
+import {
+	ensureAutumnCustomer,
+	heldAutumnPlanId,
+	paidAutumnPlanId,
+} from "../autumn/customer";
 import { SEATS_FEATURE_ID } from "../autumn/features";
 import {
 	completeCheckout,
 	syncFromStripeEvent,
 	syncOrganizationSubscription,
 } from "../autumn/projection";
+import { yearlyRenewalStart } from "../autumn/routes";
 import { seatPurchase } from "../autumn/seats";
 import { handleStripeBillingEvent } from "../stripe-billing-events";
-import { PRO_ANNUAL_PLAN_ID } from "./plan-ids";
+import { currentPlanIdForLegacy, isProFamilyPlan } from "./plan-ids";
 import { stripeFallback } from "./stripe-fallback";
 import type { AutumnBillingDeps } from "./stripe-routes-shim";
 
@@ -41,14 +45,24 @@ export function autumnBillingDeps(): AutumnBillingDeps {
 			)?.quantity;
 			if (quantity === undefined)
 				throw new Error("Missing checkout seat quantity");
-			const pro = planCatalogFromAutumn(await catalogAutumnPlans()).find(
-				(family) => family.family === "pro",
+			const planId = currentPlanIdForLegacy(
+				params.planId,
+				await catalogAutumnPlans(),
 			);
-			const planId =
-				(params.planId === PRO_ANNUAL_PLAN_ID ? pro?.yearly : pro?.monthly)
-					?.id ?? params.planId;
 			const { quantities } = await seatPurchase(planId, quantity);
-			return autumn.billing.attach({ ...params, planId, ...quantities });
+			const startsAt = await yearlyRenewalStart(params.customerId, planId, () =>
+				autumn.billing.previewAttach({
+					customerId: params.customerId,
+					planId,
+					...quantities,
+				}),
+			);
+			return autumn.billing.attach({
+				...params,
+				planId,
+				...quantities,
+				...(startsAt && { startsAt }),
+			});
 		},
 		update: (params) => autumn.billing.update(params),
 		managedByAutumn: async (organizationId) =>
@@ -58,7 +72,9 @@ export function autumnBillingDeps(): AutumnBillingDeps {
 			yearly: env.STRIPE_PRO_YEARLY_PRICE_ID,
 		}),
 		ensureCustomer: ensureAutumnCustomer,
-		currentPlanId: paidAutumnPlanId,
+		currentPlanId: heldAutumnPlanId,
+		isProFamilyPlan: async (planId) =>
+			isProFamilyPlan(planId, await catalogAutumnPlans()),
 		findLiveSubscription: async (organizationId) =>
 			(await db.query.subscriptions.findFirst({
 				where: and(

@@ -88,15 +88,18 @@ function V2WorkspaceLayout() {
 	const cloudWorkspace =
 		cloudWorkspaces.find((row) => row.id === workspaceId) ?? null;
 	// A ready cloud workspace opens on its own row; the box's row, when the
-	// fan-out has it, is the same workspace with live fields.
-	const workspace = useMemo(
-		() =>
-			hostWorkspace ??
-			(isCloud && cloudWorkspace?.status === "ready"
-				? hostShapedCloudWorkspace(cloudWorkspace)
-				: null),
-		[hostWorkspace, isCloud, cloudWorkspace],
-	);
+	// fan-out has it, is the same workspace with live fields. The box seeds its
+	// row with a placeholder name: the cloud row owns the real one.
+	const workspace = useMemo(() => {
+		if (hostWorkspace) {
+			return cloudWorkspace
+				? { ...hostWorkspace, name: cloudWorkspace.name }
+				: hostWorkspace;
+		}
+		return isCloud && cloudWorkspace?.status === "ready"
+			? hostShapedCloudWorkspace(cloudWorkspace)
+			: null;
+	}, [hostWorkspace, isCloud, cloudWorkspace]);
 	const archivedCloudWorkspace = useArchivedCloudWorkspace(
 		workspaceId,
 		!workspace && !cloudWorkspace,
@@ -152,13 +155,9 @@ function V2WorkspaceLayout() {
 		cache.refetchAll,
 	);
 
-	// A cloud workspace is navigated to as soon as its row exists. While it is
-	// provisioning there is no box to open, and once it has failed there never
-	// will be; a ready one only waits for its address to be minted.
+	// A `ready` row only means the box has started booting. Its address request
+	// is batched with the wake, which waits for host-service to answer.
 	if (!workspace && cloudWorkspace) {
-		if (cloudWorkspace.status === "ready") {
-			return <StateScreenShell>{null}</StateScreenShell>;
-		}
 		return (
 			<StateScreenShell>
 				<CloudWorkspaceProvisioningState

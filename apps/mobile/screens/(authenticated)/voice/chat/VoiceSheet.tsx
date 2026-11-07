@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
+import type { ScrollViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,7 @@ export function VoiceSheet() {
 	const transcript = useVoiceStore((state) => state.transcript);
 	const error = useVoiceStore((state) => state.error);
 	const statusLabel = useVoiceStatusLabel(status, muted);
-	const scrollRef = useRef<ScrollView>(null);
+	const scrollRef = useRef<ScrollViewInstance>(null);
 	const active = isVoiceActive(status);
 	const reconnecting = status === "reconnecting";
 

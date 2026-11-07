@@ -34,9 +34,11 @@ export interface PageHeaderPage {
 	sharedVersion: number | null;
 	latestVersion: number | null;
 	servedVersion: number | null;
+	/** Whether the viewer may publish, rename and share it; without it, only its creator. */
+	canEdit?: boolean;
 }
 
-export type PageShareRole = "view" | "comment";
+export type PageShareRole = "view" | "comment" | "edit";
 
 /** Who the page is shared with beyond its general access, and how to change that. */
 export interface PageHeaderSharing {

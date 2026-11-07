@@ -34,14 +34,14 @@ export const metadata: Metadata = {
 		canonical: "/the-production-run",
 	},
 	openGraph: {
-		title: "The Production Run | Superset",
+		title: "The Production Run | Paradev",
 		description: DESCRIPTION,
 		url: "/the-production-run",
 		images: ["/og-image.png"],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "The Production Run | Superset",
+		title: "The Production Run | Paradev",
 		description: DESCRIPTION,
 		images: ["/og-image.png"],
 	},
@@ -217,7 +217,7 @@ export default async function ProductionRunPage({
 										<strong className="text-foreground">On being wrong.</strong>{" "}
 										These floors are calibration guesses and will move as real
 										data arrives. Output is the weakest today: PR sync is
-										GitHub-only, sees only work inside Superset workspaces, and
+										GitHub-only, sees only work inside Paradev workspaces, and
 										can miss a merge observed while the app is closed. We would
 										rather ship an instrument that undercounts and fix it in
 										public.
@@ -474,7 +474,7 @@ export default async function ProductionRunPage({
 							source="production_run"
 							className="bg-foreground text-background px-6 py-3 text-sm font-normal transition-colors hover:bg-brand hover:text-white"
 						>
-							Download Superset
+							Download Paradev
 						</DownloadLink>
 						<Link
 							href="/leaderboard"

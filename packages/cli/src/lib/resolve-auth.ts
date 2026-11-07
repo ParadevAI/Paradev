@@ -14,6 +14,8 @@ import {
 	SessionExpiredError,
 } from "./oauth-refresh";
 
+export const NOT_LOGGED_IN = "Not logged in";
+
 export type AuthSource = "override" | "host" | "config" | "oauth" | "sandbox";
 
 export type ResolvedAuth = {
@@ -69,7 +71,7 @@ export async function resolveAuth(
 		authSource = "sandbox";
 	} else {
 		throw new CLIError(
-			"Not logged in",
+			NOT_LOGGED_IN,
 			"Run: superset auth login (or set SUPERSET_API_KEY)",
 		);
 	}
@@ -90,7 +92,7 @@ function refreshFailureToCLIError(error: unknown): CLIError {
 	}
 	if (error instanceof ServerUnreachableError) {
 		return new CLIError(
-			"Could not reach Superset to renew the login",
+			"Could not reach Paradev to renew the login",
 			"Check your connection and retry",
 		);
 	}

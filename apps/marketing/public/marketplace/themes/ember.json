@@ -2,7 +2,7 @@
 	"id": "ember",
 	"name": "Ember",
 	"type": "dark",
-	"author": "Superset",
+	"author": "Paradev",
 	"description": "Warm dark theme inspired by the Figma start screen design",
 	"ui": {
 		"background": "#151110",

@@ -7,21 +7,16 @@ import {
 	rmSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PROJECTS_DIR_NAME, SUPERSET_DIR_NAME } from "shared/constants";
+import { PROJECTS_DIR_NAME } from "shared/constants";
 
 const TEST_DIR = join(tmpdir(), `superset-test-teardown-${process.pid}`);
 const TEST_SUPERSET_HOME = join(TEST_DIR, "superset-home");
 const MAIN_REPO = join(TEST_DIR, "main-repo");
 const WORKTREE = join(TEST_DIR, "worktree");
 const PROJECT_ID = "test-teardown-project";
-const USER_CONFIG_DIR = join(
-	homedir(),
-	SUPERSET_DIR_NAME,
-	PROJECTS_DIR_NAME,
-	PROJECT_ID,
-);
+const USER_CONFIG_DIR = join(TEST_SUPERSET_HOME, PROJECTS_DIR_NAME, PROJECT_ID);
 const ORIGINAL_SUPERSET_HOME_DIR = process.env.SUPERSET_HOME_DIR;
 const ORIGINAL_SHELL = process.env.SHELL;
 const ORIGINAL_PATH = process.env.PATH;

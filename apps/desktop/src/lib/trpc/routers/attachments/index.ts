@@ -1,0 +1,1 @@
+export { createAttachmentsRouter } from "./attachments";

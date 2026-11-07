@@ -3,7 +3,6 @@ export {
 	coerceChecksStatus,
 	coercePullRequestState,
 	coerceReviewDecision,
-	computeChecksStatus,
 	mapPullRequestState,
 	mapReviewDecision,
 	type PullRequestCheck,

@@ -8,7 +8,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
-import { claudeProjectDirName } from "../../terminal-agents/harness-sessions/claude.ts";
+import { claudeProjectDirName } from "@superset/agent-setup/claude-project-links";
 import { HostWorkerPool } from "../host-worker-pool.ts";
 import { harnessTasks, harnessTranscriptTask } from "./harness.ts";
 

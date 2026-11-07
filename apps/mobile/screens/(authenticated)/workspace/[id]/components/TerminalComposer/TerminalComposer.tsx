@@ -11,8 +11,10 @@ import {
 import type { SlashCommand } from "@superset/shared/slash-commands";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Alert, View } from "react-native";
-import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
-import { awaitAttachmentUploads } from "@/lib/attachments/upload";
+import type {
+	PromptInputAttachmentItem,
+	PromptInputMessage,
+} from "@/components/ai-elements/prompt-input";
 import { errorCopy } from "@/lib/errors";
 import { posthog } from "@/lib/posthog";
 import { useAttachmentsSheet } from "@/screens/(authenticated)/hooks/useAttachmentsSheet";
@@ -40,7 +42,10 @@ interface TerminalComposerProps {
 	workspaceId: string;
 	placeholder?: string;
 	/** Submit the current draft to the PTY. Rejects if it never got there. */
-	onSubmit: (text: string, attachmentFileIds?: string[]) => Promise<void>;
+	onSubmit: (
+		text: string,
+		attachments?: PromptInputAttachmentItem[],
+	) => Promise<void>;
 	onQuickKey: (key: TerminalQuickKey) => void;
 	/** Where attachments land; null while the workspace or host is unresolved. */
 	attachmentTarget: TerminalAttachmentTarget | null;
@@ -95,7 +100,7 @@ interface TerminalComposerProps {
 	onModeSelect?: (modeId: string) => void;
 	canStop?: boolean;
 	onStop?: () => void;
-	/** Hand attachments over as uploaded file ids, not as worktree paths. */
+	/** Hand attachments over as they are, not as worktree paths. */
 	sendsAttachments?: boolean;
 }
 
@@ -191,7 +196,7 @@ export const TerminalComposer = forwardRef<
 
 	const submit = async ({ text, attachments: files }: PromptInputMessage) => {
 		let body = text;
-		let attachmentFileIds: string[] | undefined;
+		let sent: PromptInputAttachmentItem[] | undefined;
 		// The tray is shared across tabs, so files attached in an agent session
 		// are still there after switching to a plain shell — which would execute
 		// the paths rather than read them. `allowAttachments` has to gate the
@@ -206,16 +211,7 @@ export const TerminalComposer = forwardRef<
 				return;
 			}
 			if (sendsAttachments) {
-				attachmentFileIds = await awaitAttachmentUploads(draftKey, files).catch(
-					(cause: unknown) => {
-						Alert.alert(
-							t({ message: "Could not attach files" }),
-							errorCopy(cause),
-						);
-						return undefined;
-					},
-				);
-				if (!attachmentFileIds) return;
+				sent = files;
 			} else {
 				// A PTY takes bytes, not files: the agent gets the attachments as
 				// worktree-relative paths appended to the message. The hook alerts
@@ -229,7 +225,7 @@ export const TerminalComposer = forwardRef<
 		}
 		setIsSubmitting(true);
 		try {
-			await onSubmit(body, attachmentFileIds);
+			await onSubmit(body, sent);
 			posthog.capture("terminal_rich_input_submitted", {
 				workspace_id: workspaceId,
 				message_length: text.trim().length,

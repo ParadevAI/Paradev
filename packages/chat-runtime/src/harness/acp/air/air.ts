@@ -65,6 +65,28 @@ const subagentControlMetaSchema = z.looseObject({
 	}),
 });
 
+const compactionMetaSchema = z.looseObject({
+	_meta: z.looseObject({
+		jetbrains: z
+			.looseObject({
+				air: z.looseObject({ contextCompaction: z.unknown() }).optional(),
+			})
+			.optional(),
+		claudeCode: z.looseObject({ toolName: z.string().optional() }).optional(),
+	}),
+});
+
+/** claude-agent-acp's synthetic "Compact conversation" tool call. */
+export function isCompactionCall(raw: unknown): boolean {
+	const parsed = compactionMetaSchema.safeParse(raw);
+	if (!parsed.success) return false;
+	const { jetbrains, claudeCode } = parsed.data._meta;
+	return (
+		jetbrains?.air?.contextCompaction !== undefined ||
+		claudeCode?.toolName === "compact"
+	);
+}
+
 export function isSubagentControlCall(raw: unknown): boolean {
 	const parsed = subagentControlMetaSchema.safeParse(raw);
 	if (!parsed.success) return false;

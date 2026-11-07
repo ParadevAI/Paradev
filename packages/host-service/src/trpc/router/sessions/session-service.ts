@@ -90,9 +90,11 @@ export function requireChatSession(
 	return { chat, ...result, session: result.session };
 }
 
+/** `launch.terminalId` is host-internal: the id a cloud launch was promised. */
 export async function createChatSessionInWorkspace(
 	ctx: SessionContext,
 	rawInput: CreateChatSessionInput,
+	launch: { terminalId?: string } = {},
 ): Promise<ChatSessionResult> {
 	const input = createChatSessionSchema.parse(rawInput);
 	const workspace = requireSessionWorkspace(ctx, input.workspaceId);
@@ -169,5 +171,6 @@ export async function createChatSessionInWorkspace(
 		target,
 		{ ...input, commandId },
 		workspace.worktreePath,
+		launch.terminalId,
 	);
 }

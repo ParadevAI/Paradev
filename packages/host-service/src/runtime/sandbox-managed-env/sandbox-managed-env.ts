@@ -74,12 +74,20 @@ export function hasManagedEnv(): boolean {
 
 /** Resolves once the control plane has pushed at least once this process. */
 export function waitForManagedEnv(timeoutMs: number): Promise<boolean> {
-	return Promise.race([
-		firstPush.then(() => true),
-		new Promise<boolean>((resolve) =>
-			setTimeout(() => resolve(false), timeoutMs),
-		),
-	]);
+	return new Promise<boolean>((resolve) => {
+		const timer = setTimeout(() => resolve(false), timeoutMs);
+		void firstPush.then(() => {
+			clearTimeout(timer);
+			resolve(true);
+		});
+	});
+}
+
+export async function waitForSandboxManagedEnv(
+	timeoutMs = 120_000,
+	runMode = process.env.SUPERSET_HOST_RUN_MODE,
+): Promise<boolean> {
+	return runMode !== "sandbox" || waitForManagedEnv(timeoutMs);
 }
 
 export function resetManagedEnvForTests(): void {

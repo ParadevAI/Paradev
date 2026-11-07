@@ -3,7 +3,7 @@
 	"name": "Catppuccin Macchiato",
 	"type": "dark",
 	"author": "Catppuccin",
-	"description": "Catppuccin Macchiato theme for Superset",
+	"description": "Catppuccin Macchiato theme for Paradev",
 	"ui": {
 		"background": "#24273a",
 		"foreground": "#cad3f5",

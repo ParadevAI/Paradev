@@ -1,1 +1,0 @@
-export { GithubWorkItemChip } from "./GithubWorkItemChip";

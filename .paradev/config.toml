@@ -1,0 +1,22 @@
+# How Paradev sets up, runs and archives this repository's workspaces.
+# Reference: apps/docs/content/docs/setup-teardown-scripts.mdx
+# config.json stays until every sandbox runs a host-service that reads this file.
+
+[setup]
+run = ["./.paradev/setup.sh"]
+
+[setup.cloud]
+run = ["./.paradev/setup.cloud.sh"]
+
+[terminals.dev]
+run = "bun dev"
+default = true
+
+[terminals.dev.cloud]
+run = "./.paradev/dev-stack.cloud.sh"
+
+[archive]
+run = ["./.paradev/teardown.sh"]
+
+[archive.cloud]
+run = ["./.paradev/archive.cloud.sh"]

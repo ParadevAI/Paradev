@@ -81,7 +81,7 @@ function readState(state: string): string {
 	}
 	if (payload.expiresAt < Date.now()) {
 		throw new GithubUserConnectionError(
-			"The GitHub sign-in link expired; connect again from Superset",
+			"The GitHub sign-in link expired; connect again from Paradev",
 		);
 	}
 	return payload.userId;

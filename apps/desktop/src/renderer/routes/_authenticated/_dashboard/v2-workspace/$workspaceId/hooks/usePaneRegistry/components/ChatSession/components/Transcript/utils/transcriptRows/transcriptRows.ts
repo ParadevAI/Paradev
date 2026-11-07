@@ -1,4 +1,5 @@
 import {
+	isPendingApproval,
 	type OutboxEntry,
 	type TurnGroup,
 	toolRunKey,
@@ -8,10 +9,18 @@ import type {
 	AgentMessage,
 	ApprovalRequest,
 	Item,
+	Notice,
 	ToolCall,
+	Turn,
+	TurnError,
 	UserMessage,
 } from "@superset/chat/protocol";
 import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
+import {
+	changesFiles,
+	type TurnFileChange,
+	turnChangedFiles,
+} from "../turnChangedFiles";
 import { turnPageLinks } from "../turnPageLinks";
 
 export type TranscriptRow =
@@ -22,6 +31,8 @@ export type TranscriptRow =
 			startedAtMs: number;
 			completedAtMs: number | undefined;
 			running: boolean;
+			/** The turn is held on a question or approval only the user can answer. */
+			waiting: boolean;
 	  }
 	| {
 			kind: "item";
@@ -52,15 +63,70 @@ export type TranscriptRow =
 			kind: "turn_status";
 			key: string;
 			groupStart: boolean;
+			turnId: string;
 			status: "failed" | "interrupted";
-			message: string | undefined;
+			error: TurnError | undefined;
+			/** No turn came after it, so its failure can still be acted on. */
+			latest: boolean;
 	  }
 	| {
 			kind: "reply_footer";
 			key: string;
 			groupStart: false;
 			item: AgentMessage;
+	  }
+	| {
+			kind: "changed_files";
+			key: string;
+			groupStart: false;
+			turnId: string;
+			files: TurnFileChange[];
+			/** The calls behind the files, so a reopened chat can load their bodies. */
+			calls: ToolCall[];
+			/** Every tool call of the turn; their ids find its snapshots after a resume. */
+			toolCallIds: string[];
+			/** The chat's latest card while no turn runs: the only one that offers Undo. */
+			newest?: boolean;
 	  };
+
+/**
+ * The agent reports a failure both as an error notice and on the turn; the
+ * turn's row says it once. What the notice adds past the turn's message is the
+ * stderr an older host kept only there, so the row keeps it.
+ */
+function repeatedTurnFailure(
+	item: Item,
+	turn: Turn | null,
+): { extra: string } | null {
+	if (turn?.status !== "failed" || item.kind !== "notice") return null;
+	const notice = item as Notice;
+	if (notice.noticeKind !== "error") return null;
+	const text = notice.text ?? "";
+	const message = turn.error?.message ?? "";
+	if (text === message) return { extra: "" };
+	if (message === "" || !text.startsWith(`${message}\n`)) return null;
+	return { extra: text.slice(message.length).trim() };
+}
+
+function asksTheUser(entry: TurnGroup["entries"][number]): boolean {
+	return entry.kind === "item" && isPendingApproval(entry.item);
+}
+
+function withNoticeDetail(
+	error: TurnError | undefined,
+	noticeDetail: string,
+): TurnError | undefined {
+	if (!error || error.kind || error.detail || !noticeDetail) return error;
+	return { ...error, detail: noticeDetail };
+}
+
+const MAX_ANCHOR_IDS = 100;
+
+/** A shell command or a subagent can change files no diff shows; only a snapshot sees them. */
+function editsUnseen(call: ToolCall): boolean {
+	if (call.status === "running" || call.status === "declined") return false;
+	return call.toolKind === "execute" || call.subagent === true;
+}
 
 export function transcriptRows(
 	groups: readonly TurnGroup[],
@@ -91,6 +157,7 @@ export function transcriptRows(
 				startedAtMs: turn.startedAtMs,
 				completedAtMs: turn.completedAtMs,
 				running: turn.status === "running",
+				waiting: turn.status === "running" && group.entries.some(asksTheUser),
 			});
 		};
 		const turnSettled = turn !== null && turn.status !== "running";
@@ -98,8 +165,11 @@ export function transcriptRows(
 		const lastPrompt = group.entries.findLastIndex(
 			(entry) => entry.kind === "item" && entry.item.kind === "user_message",
 		);
+		let noticeDetail = "";
 		let run = null as Extract<TranscriptRow, { kind: "tool_run" }> | null;
 		let runAt = -1;
+		let lastReplyAt = -1;
+		const calls: ToolCall[] = [];
 		const unwrapLoneCall = () => {
 			const only = run?.steps.length === 1 ? run.items[0] : undefined;
 			if (!run || !only) return;
@@ -139,6 +209,7 @@ export function transcriptRows(
 				...(pagesShownEarlier ? { pagesShownEarlier } : {}),
 				...(afterTarget ? { afterTarget } : {}),
 			});
+			if (item.kind === "agent_message") lastReplyAt = rows.length - 1;
 		};
 		const addTools = (
 			items: ToolCall[],
@@ -175,8 +246,14 @@ export function transcriptRows(
 					: entry.item.kind === "tool_call"
 						? [entry.item as ToolCall]
 						: null;
+			if (tools) calls.push(...tools);
 			if (entry.kind === "item" && !tools) {
 				if (hiddenToolIds.has(entry.item.id)) continue;
+				const repeated = repeatedTurnFailure(entry.item, turn);
+				if (repeated) {
+					noticeDetail ||= repeated.extra;
+					continue;
+				}
 				if (run && entry.item.kind === "reasoning") {
 					run.steps.push(entry.item);
 					continue;
@@ -207,15 +284,39 @@ export function transcriptRows(
 		placeClock();
 		if (turn?.status === "running" && run && rows.at(-1) === run)
 			run.active = true;
+		const files = turnSettled ? turnChangedFiles(calls) : [];
+		if (files.length > 0 || (turnSettled && calls.some(editsUnseen))) {
+			const card: TranscriptRow = {
+				kind: "changed_files",
+				key: `changed_files:${group.turnId}`,
+				groupStart: false,
+				turnId: group.turnId,
+				files,
+				calls: calls.filter(changesFiles),
+				toolCallIds: calls.slice(0, MAX_ANCHOR_IDS).map((call) => call.id),
+			};
+			if (lastReplyAt === -1) push(card);
+			else rows.splice(lastReplyAt + 1, 0, card);
+		}
 		if (turn?.status === "failed" || turn?.status === "interrupted") {
 			push({
 				kind: "turn_status",
 				key: `status:${group.turnId}`,
 				groupStart,
+				turnId: group.turnId,
 				status: turn.status,
-				message: turn.error?.message,
+				error: withNoticeDetail(turn.error, noticeDetail),
+				latest: group === groups.at(-1),
 			});
 		}
+	}
+
+	const newestCard = rows.findLast((row) => row.kind === "changed_files");
+	if (
+		newestCard?.kind === "changed_files" &&
+		groups.at(-1)?.turn?.status !== "running"
+	) {
+		newestCard.newest = true;
 	}
 
 	for (const entry of outbox) {

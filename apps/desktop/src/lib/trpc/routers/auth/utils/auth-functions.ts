@@ -336,10 +336,17 @@ export async function handleAuthCallback(params: {
 	token: string;
 	expiresAt: string;
 	state: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<
+	| { success: true }
+	| { success: false; reason: "invalid-state" | "save-failed"; error: string }
+> {
 	const stateIssuedAt = stateStore.get(params.state);
 	if (stateIssuedAt === undefined) {
-		return { success: false, error: "Invalid or expired auth session" };
+		return {
+			success: false,
+			reason: "invalid-state",
+			error: "Invalid or expired auth session",
+		};
 	}
 	stateStore.delete(params.state);
 
@@ -351,7 +358,8 @@ export async function handleAuthCallback(params: {
 		console.error("[auth] Failed to persist desktop auth token", error);
 		return {
 			success: false,
-			error: `Superset could not save your sign-in to ${getTokenFile()}. Your existing data was left untouched. Check the path and try again.`,
+			reason: "save-failed",
+			error: `Paradev could not save your sign-in to ${getTokenFile()}. Your existing data was left untouched. Check the path and try again.`,
 		};
 	}
 

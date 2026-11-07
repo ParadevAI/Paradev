@@ -8,14 +8,16 @@ export function openUrlInV2Workspace({
 	store,
 	target,
 	url,
+	agent,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	target: V2WorkspaceUrlOpenTarget;
 	url: string;
+	agent?: true;
 }): void {
 	const pane = {
 		kind: "browser",
-		data: { url } satisfies BrowserPaneData,
+		data: { url, ...(agent && { agent }) } satisfies BrowserPaneData,
 	};
 	const state = store.getState();
 

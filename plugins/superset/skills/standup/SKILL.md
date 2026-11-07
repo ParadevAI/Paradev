@@ -1,11 +1,13 @@
 ---
 name: standup
-description: Digest of what the user's Superset agents did while they were away, sweeping workspaces, tasks, and agent terminals to report what finished, what needs review, and what's blocked. Use when the user asks "what did my agents do", "what happened while I was away", wants a standup or summary of agent work, or returns after a break.
+description: Digest of what the user's Paradev (formerly Superset) agents did while they were away, sweeping workspaces, tasks, and agent terminals to report what finished, what needs review, and what's blocked. Use when the user asks "what did my agents do", "what happened while I was away", wants a standup or summary of agent work, or returns after a break.
 argument-hint: optional timeframe or project
-allowed-tools: Bash(superset:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh *)
+allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh *)
 ---
 
-# Superset Standup
+# Paradev Standup
+
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 Answer "what happened while I was away?" from real state, not guesses. Entirely read-only.
 
@@ -13,9 +15,11 @@ Answer "what happened while I was away?" from real state, not guesses. Entirely 
 
 Run `bash scripts/sweep.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh` in Claude Code). It lists workspaces and tasks, then for each workspace lists its terminals and reads the last screen of every agent terminal, tolerating individual failures. Pass `--host <id>` to sweep a remote host, `--max-lines <n>` to change the per-terminal tail (default 60).
 
-If the script can't run (no bash, no `jq`), do the same by hand: `superset workspaces list --local --json`, `superset tasks list --json`, then per workspace `superset terminals list --workspace <id> --json` and `superset terminals read --workspace <id> --terminal <terminalId> --max-lines 60`.
+If the script can't run (no bash, no `jq`), do the same by hand: `superset workspaces list --local --json`, `superset tasks list --json`, then per workspace `superset terminals list --local --workspace <id> --json` and `superset terminals read --local --workspace <id> --terminal <terminalId> --max-lines 60`.
 
 The last screen of a terminal shows whether the agent finished, asked a question, or errored.
+
+Cloud workspaces: `superset workspaces list --json` gives each one's `status` and `agentStatus`, `superset workspaces pull-requests --all --json` shows the pull requests they opened, and `superset workspaces activity <id>` gives one's timeline. These read the API and do not wake a sleeping sandbox.
 
 ## 2. Classify each workspace
 

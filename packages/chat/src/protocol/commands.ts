@@ -16,7 +16,18 @@ export const createSessionInputSchema = z.object({
 	harness: z.string().min(1),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
-	resume: z.object({ harnessSessionId: z.string().min(1) }).optional(),
+	effortId: z.string().optional(),
+	/** The model, effort and mode sent here are the user's own picks, so later chats start on them too. */
+	rememberSelections: z.boolean().optional(),
+	/** The mode to start in when neither the request nor the user's remembered picks name one. */
+	fallbackModeId: z.string().optional(),
+	resume: z
+		.object({
+			harnessSessionId: z.string().min(1),
+			/** The stopped chat this one takes over; a failed last turn carries over. */
+			replacesSessionId: z.string().min(1).optional(),
+		})
+		.optional(),
 	terminalId: z.string().min(1).optional(),
 });
 export type CreateSessionInput = z.infer<typeof createSessionInputSchema>;
@@ -26,6 +37,7 @@ export const promptInputSchema = z.object({
 	clientId: z.string().min(1),
 	content: z.array(userContentSchema).min(1),
 	steer: z.object({ expectedTurnId: z.string().min(1) }).optional(),
+	snapshotWorktree: z.boolean().optional(),
 });
 export type PromptInput = z.infer<typeof promptInputSchema>;
 
@@ -42,8 +54,38 @@ export const queuedPromptInputSchema = z.object({
 });
 export type QueuedPromptInput = z.infer<typeof queuedPromptInputSchema>;
 
+export const updateQueuedPromptInputSchema = z.object({
+	...commandBaseFields,
+	itemId: z.string().min(1),
+	content: z.array(userContentSchema).min(1),
+});
+export type UpdateQueuedPromptInput = z.infer<
+	typeof updateQueuedPromptInputSchema
+>;
+
 export const resumeQueueInputSchema = z.object(commandBaseFields);
 export type ResumeQueueInput = z.infer<typeof resumeQueueInputSchema>;
+
+/**
+ * What to do about a usage limit: `resume` continues now, `dismiss` drops the
+ * notice and leaves the queue as it is, and the two scheduling actions arm or
+ * disarm the host continuing the session once the limit resets.
+ */
+export const usageLimitActionSchema = z.enum([
+	"resume",
+	"dismiss",
+	"resume_at_reset",
+	"cancel_resume_at_reset",
+]);
+export type UsageLimitAction = z.infer<typeof usageLimitActionSchema>;
+
+export const respondToUsageLimitInputSchema = z.object({
+	...commandBaseFields,
+	action: usageLimitActionSchema,
+});
+export type RespondToUsageLimitInput = z.infer<
+	typeof respondToUsageLimitInputSchema
+>;
 
 export const cancelTurnInputSchema = z.object({
 	...commandBaseFields,
@@ -100,6 +142,8 @@ export const setConfigOptionInputSchema = z.object({
 	...commandBaseFields,
 	configId: z.string().min(1),
 	value: z.string().min(1),
+	/** Resolve once the agent has taken the change, and fail if it refused it. */
+	confirm: z.boolean().optional(),
 });
 export type SetConfigOptionInput = z.infer<typeof setConfigOptionInputSchema>;
 
@@ -123,6 +167,8 @@ export const rewindSessionInputSchema = z.object({
 	handoffPrompt: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	effortId: z.string().optional(),
+	snapshotWorktree: z.boolean().optional(),
 });
 export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
 
@@ -133,15 +179,38 @@ export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
  */
 export const closeSessionInputSchema = z.object({
 	sessionId: z.string().min(1),
+	/** A person closed the chat, not a restart or cleanup: other clients drop its tabs instead of restarting it. */
+	userClosed: z.boolean().optional(),
 });
 export type CloseSessionInput = z.infer<typeof closeSessionInputSchema>;
 
 export const getSessionInputSchema = z.object({ sessionId: z.string().min(1) });
 export type GetSessionInput = z.infer<typeof getSessionInputSchema>;
 
+/** What a turn changed in the worktree; `live` compares a running turn with the files now. */
+export const getTurnChangesInputSchema = z.object({
+	sessionId: z.string().min(1),
+	turnId: z.string().min(1),
+	live: z.boolean().optional(),
+	/** The turn's tool call ids, which find it again after the chat resumed. */
+	anchorItemIds: z.array(z.string().min(1)).max(100).optional(),
+});
+export type GetTurnChangesInput = z.infer<typeof getTurnChangesInputSchema>;
+
+/** Puts files a turn changed back as the turn found them; the chat stays as it is. */
+export const undoTurnFilesInputSchema = z.object({
+	...commandBaseFields,
+	turnId: z.string().min(1),
+	paths: z.array(z.string().min(1)).min(1),
+	anchorItemIds: z.array(z.string().min(1)).max(100).optional(),
+});
+export type UndoTurnFilesInput = z.infer<typeof undoTurnFilesInputSchema>;
+
 export const listSessionsInputSchema = z.object({
 	workspaceId: z.string().min(1).optional(),
 	limit: z.number().int().positive().max(200).default(50),
+	/** Keeps sessions whose title contains this, case-insensitively, before the limit. */
+	query: z.string().max(200).optional(),
 });
 export type ListSessionsInput = z.infer<typeof listSessionsInputSchema>;
 

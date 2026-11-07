@@ -1,7 +1,8 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
-import type { RendererContext } from "@superset/panes";
+import { formatCompactRelativeTime } from "@superset/i18n/format";
+import { type RendererContext, usePaneAppearance } from "@superset/panes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,6 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
@@ -25,7 +27,6 @@ import type {
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { TerminalPaneIcon } from "../TerminalPaneIcon";
 import { RenameSessionDialog } from "./components/RenameSessionDialog";
 import {
@@ -75,7 +76,7 @@ function formatCreatedAt(createdAt: number | undefined): string {
 			}),
 		);
 
-	return getRelativeTime(createdAt, { format: "compact" });
+	return formatCompactRelativeTime(createdAt);
 }
 
 function getTerminalPaneLocations(
@@ -107,6 +108,7 @@ export function TerminalSessionDropdown({
 	onSessionRemoved,
 }: TerminalSessionDropdownProps) {
 	const { t } = useLingui();
+	const isCards = usePaneAppearance() === "cards";
 	const [isOpen, setIsOpen] = useState(false);
 	const collections = useCollections();
 	const { terminalId } = context.pane.data as TerminalPaneData;
@@ -369,7 +371,10 @@ export function TerminalSessionDropdown({
 							message: "Terminal sessions",
 						})}
 						title={triggerTitle}
-						className="flex min-w-0 max-w-96 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+						className={cn(
+							"flex min-w-0 max-w-96 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+							isCards && "-ml-1.5",
+						)}
 						onClick={(event) => event.stopPropagation()}
 					>
 						<TerminalPaneIcon

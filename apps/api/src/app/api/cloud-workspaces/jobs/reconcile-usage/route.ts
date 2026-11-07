@@ -23,5 +23,7 @@ export async function POST(request: Request): Promise<Response> {
 		reconcileCloudWorkspaceUsage,
 		{ schedule: { type: "crontab", value: "*/30 * * * *" } },
 	);
+	// Turbopack builds do not wrap route handlers, so nothing else flushes the closing check-in.
+	await Sentry.flush(2_000).catch(() => false);
 	return Response.json({ ok: true, ...outcome });
 }

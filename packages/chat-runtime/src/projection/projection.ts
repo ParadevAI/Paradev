@@ -3,7 +3,9 @@ import { desc, eq } from "drizzle-orm";
 import type { ChatDb, ChatSessionRow } from "../db";
 import { chatSessionsLocal } from "../db";
 
-export type SessionRowInsert = typeof chatSessionsLocal.$inferInsert;
+export type SessionRowInsert = typeof chatSessionsLocal.$inferInsert & {
+	closedAt: number | null;
+};
 
 export type SessionProjection = {
 	status: SessionStatus;
@@ -50,7 +52,15 @@ export function resetSessionForEpoch(
 	updatedAt: number,
 ): void {
 	db.update(chatSessionsLocal)
-		.set({ epoch, status, title: null, queuedCount: 0, updatedAt })
+		.set({
+			epoch,
+			status,
+			title: null,
+			queuedCount: 0,
+			updatedAt,
+			closedAt: null,
+			closedByUser: false,
+		})
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
 }
@@ -72,6 +82,18 @@ export function removeSessionRow(db: ChatDb, sessionId: string): void {
 		.run();
 }
 
+export function markSessionClosed(
+	db: ChatDb,
+	sessionId: string,
+	closedAt: number,
+	byUser = false,
+): void {
+	db.update(chatSessionsLocal)
+		.set({ closedAt, ...(byUser ? { closedByUser: true } : {}) })
+		.where(eq(chatSessionsLocal.sessionId, sessionId))
+		.run();
+}
+
 export function writeSessionProjection(
 	db: ChatDb,
 	sessionId: string,
@@ -88,6 +110,13 @@ export class ChatSessionStore {
 
 	get(sessionId: string): ChatSessionRow | null {
 		return readSessionRow(this.db, sessionId);
+	}
+
+	markClosed(
+		sessionId: string,
+		{ byUser = false, closedAt = Date.now() } = {},
+	): void {
+		markSessionClosed(this.db, sessionId, closedAt, byUser);
 	}
 
 	list(): ChatSessionRow[] {

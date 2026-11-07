@@ -4,8 +4,8 @@ import {
 	fenceLanguage,
 	fenceText,
 	isDiffLanguage,
-	isSingleFilePatch,
 	parseFence,
+	parsePatchFileDiffs,
 } from "./fencedCode";
 
 describe("fenceLanguage", () => {
@@ -110,15 +110,36 @@ const TWO_FILE_PATCH = `${ONE_FILE_PATCH}--- a/b.ts
 +new
 `;
 
-describe("isSingleFilePatch", () => {
-	test("accepts a patch for one file with hunks", () => {
-		expect(isSingleFilePatch(ONE_FILE_PATCH)).toBe(true);
+describe("parsePatchFileDiffs", () => {
+	test("returns each file of a patch", () => {
+		expect(parsePatchFileDiffs(ONE_FILE_PATCH)).toHaveLength(1);
+		expect(parsePatchFileDiffs(TWO_FILE_PATCH)).toHaveLength(2);
 	});
-	test("rejects a patch spanning several files", () => {
-		expect(isSingleFilePatch(TWO_FILE_PATCH)).toBe(false);
+	test("drops the a/ and b/ prefixes of a headerless patch", () => {
+		const [file] = parsePatchFileDiffs(ONE_FILE_PATCH);
+		expect(file?.name).toBe("a.ts");
+		expect(file?.prevName).toBeUndefined();
+		expect(file?.type).toBe("change");
 	});
-	test("rejects text that is not a patch", () => {
-		expect(isSingleFilePatch("const x = 1;")).toBe(false);
-		expect(isSingleFilePatch("")).toBe(false);
+	test("keeps a pure rename next to a changed file", () => {
+		const patch = `diff --git a/x.ts b/x.ts\n--- a/x.ts\n+++ b/x.ts\n@@ -1 +1 @@\n-a\n+b\ndiff --git a/old.ts b/new.ts\nsimilarity index 100%\nrename from old.ts\nrename to new.ts\n`;
+		expect(parsePatchFileDiffs(patch).map((file) => file.name)).toEqual([
+			"x.ts",
+			"new.ts",
+		]);
+	});
+	test("keeps a real a/ directory in a headerless patch", () => {
+		const patch = "--- a/foo.ts\n+++ a/foo.ts\n@@ -1 +1 @@\n-a\n+b\n";
+		expect(parsePatchFileDiffs(patch).map((file) => file.name)).toEqual([
+			"a/foo.ts",
+		]);
+	});
+	test("shows a patch with a binary change as code", () => {
+		const patch = `diff --git a/x.ts b/x.ts\n--- a/x.ts\n+++ b/x.ts\n@@ -1 +1 @@\n-a\n+b\ndiff --git a/logo.png b/logo.png\nindex 1111111..2222222 100644\nBinary files a/logo.png and b/logo.png differ\n`;
+		expect(parsePatchFileDiffs(patch)).toEqual([]);
+	});
+	test("returns nothing for text that is not a patch", () => {
+		expect(parsePatchFileDiffs("const x = 1;")).toEqual([]);
+		expect(parsePatchFileDiffs("")).toEqual([]);
 	});
 });

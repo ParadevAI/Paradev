@@ -48,6 +48,7 @@ export function PageHeader({
 
 	const isOwner =
 		currentUserId !== undefined && currentUserId === page.createdByUserId;
+	const editable = page.canEdit ?? isOwner;
 
 	return (
 		<>
@@ -62,7 +63,7 @@ export function PageHeader({
 					<PageTitleMenu
 						page={page}
 						versions={versions}
-						editable={isOwner}
+						editable={editable}
 						isOwner={isOwner}
 						open={menuOpen}
 						onOpenChange={setMenuOpen}
@@ -91,7 +92,7 @@ export function PageHeader({
 					<PageShareButton
 						page={page}
 						versions={versions}
-						editable={isOwner}
+						editable={editable}
 						open={shareOpen}
 						onOpenChange={setShareOpen}
 						onSetVisibility={onSetVisibility}

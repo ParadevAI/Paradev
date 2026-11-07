@@ -3,6 +3,7 @@ import {
 	buildUpstreamHeaders,
 	parseHostRoutingKey,
 } from "@superset/shared/host-routing";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
 import { RELAY_CLOSE } from "@superset/shared/tunnel-protocol";
 import { type AuthContext, verifyJWT } from "@superset/shared/verify-jwt";
 import type { Context, MiddlewareHandler } from "hono";
@@ -14,6 +15,7 @@ import {
 	accessDenialMessage,
 	type Caller,
 	callerOf,
+	checkCloudWorkspaceAccess,
 	checkHostAccessForRegister,
 	checkOrgAccess,
 	isServerPresenceScope,
@@ -81,12 +83,29 @@ type Denial = { status: 401 | 403 | 500; message: string };
 // host's object's decision, made inside each call it serves; a host's own
 // control connect is the exception, checked against the API here because its
 // object may not exist yet.
+type Authenticated = {
+	auth: AuthContext;
+	token: string;
+	cloudWorkspaceId?: string;
+};
+
 async function authenticate(
 	c: Context<AppContext>,
 	hostId: string,
 	purpose: "register" | "reach",
-): Promise<{ auth: AuthContext; token: string } | Denial> {
+): Promise<Authenticated | Denial> {
 	const token = extractToken(c);
+	const boxCredential = c.req.header(SANDBOX_API_CREDENTIAL_HEADER);
+	if (!token && boxCredential && purpose === "reach") {
+		// A stream would outlive the per-call access check.
+		if (isWsUpgrade(c)) {
+			return {
+				status: 403,
+				message: "Forbidden: a cloud workspace can only make HTTP calls",
+			};
+		}
+		return authenticateCloudWorkspace(c, hostId, boxCredential);
+	}
 	if (!token) return { status: 401, message: "Unauthorized" };
 	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
 	if (!auth) return { status: 401, message: "Unauthorized" };
@@ -101,6 +120,34 @@ async function authenticate(
 			: checkOrgAccess(auth, hostId);
 	if (!access.ok) return denial(access.reason);
 	return { auth, token };
+}
+
+// A box holds no token; its firewall adds the workspace credential.
+async function authenticateCloudWorkspace(
+	c: Context<AppContext>,
+	hostId: string,
+	credential: string,
+): Promise<Authenticated | Denial> {
+	const access = await checkCloudWorkspaceAccess(
+		credential,
+		hostId,
+		c.env.NEXT_PUBLIC_API_URL,
+	);
+	if (!access.ok) {
+		return access.reason === "unauthorized"
+			? { status: 401, message: "Unauthorized" }
+			: denial(access.reason);
+	}
+	const organizationId = parseHostRoutingKey(hostId)?.organizationId ?? "";
+	return {
+		auth: {
+			sub: access.userId,
+			organizationIds: [organizationId],
+			teamIds: [],
+		},
+		token: "",
+		cloudWorkspaceId: access.workspaceId,
+	};
 }
 
 function denial(reason: AccessDenial): Denial {
@@ -231,7 +278,7 @@ app.get("/hosts/:hostId/_whoowns", async (c) => {
 	}
 	const stub = await tunnelStub(c, hostId);
 	if (!stub) return c.json({ error: "Host not connected" }, 503);
-	const connected = await stub.isConnected(callerOf(result.auth, result.token));
+	const connected = await stub.isConnected(callerFor(result));
 	if (connected.access !== "allowed") {
 		const refused = accessDenial(connected.access);
 		return c.json({ error: refused.message }, refused.status);
@@ -256,17 +303,27 @@ const authMiddleware: MiddlewareHandler<AppContext> = async (c, next) => {
 			return trpcErrorResponse(
 				c,
 				router,
-				result.status === 403 ? "FORBIDDEN" : "UNAUTHORIZED",
+				result.status === 403
+					? "FORBIDDEN"
+					: result.status === 500
+						? "INTERNAL_SERVER_ERROR"
+						: "UNAUTHORIZED",
 				result.message,
 			);
 		}
 		return c.json({ error: result.message }, result.status);
 	}
 	c.set("auth", result.auth);
-	c.set("caller", callerOf(result.auth, result.token));
+	c.set("caller", callerFor(result));
 	c.set("hostId", hostId);
 	return next();
 };
+
+function callerFor(result: Authenticated): Caller {
+	return result.cloudWorkspaceId
+		? { userId: result.auth.sub, token: "", preAuthorized: true }
+		: callerOf(result.auth, result.token);
+}
 
 app.use("/hosts/:hostId/*", authMiddleware);
 

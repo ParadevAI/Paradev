@@ -22,7 +22,7 @@ export default function PluginDeepLinkPage() {
 			<div className="flex flex-col items-center gap-6">
 				<Image
 					src="/title.svg"
-					alt="Superset"
+					alt="Paradev"
 					width={280}
 					height={86}
 					priority

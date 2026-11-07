@@ -1,21 +1,18 @@
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { EnvironmentEditorDialog } from "renderer/routes/_authenticated/components/EnvironmentEditorDialog";
 import { useSaveAsEnvironmentIntent } from "renderer/stores/save-as-environment-intent";
+import { SaveAsEnvironmentDialog } from "./components/SaveAsEnvironmentDialog";
 
 export function SaveAsEnvironmentMount() {
-	const organizationId = useActiveOrganizationId();
 	const workspaceId = useSaveAsEnvironmentIntent((state) => state.workspaceId);
 	const close = useSaveAsEnvironmentIntent((state) => state.close);
-	if (!workspaceId || !organizationId) return null;
+	if (!workspaceId) return null;
 	return (
-		<EnvironmentEditorDialog
+		<SaveAsEnvironmentDialog
+			cloudWorkspaceId={workspaceId}
 			key={workspaceId}
-			organizationId={organizationId}
-			fromWorkspaceId={workspaceId}
-			open
 			onOpenChange={(open) => {
 				if (!open) close();
 			}}
+			open
 		/>
 	);
 }

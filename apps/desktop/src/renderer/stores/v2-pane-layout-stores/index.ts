@@ -1,1 +1,5 @@
-export { getV2PaneLayoutStore, registerV2PaneLayoutStore } from "./store";
+export {
+	getV2PaneLayoutStore,
+	type PaneLayoutSlot,
+	registerV2PaneLayoutStore,
+} from "./store";

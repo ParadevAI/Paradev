@@ -1,0 +1,1 @@
+export { ChatTabStrip } from "./ChatTabStrip";

@@ -1,12 +1,12 @@
 import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { CLIError } from "@superset/cli-framework";
 import type { AppRouter as HostServiceRouter } from "@superset/host-service/trpc";
 import { getHostId } from "@superset/shared/host-info";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import SuperJSON from "superjson";
 import type { ApiClient } from "../api-client";
-import { getSupersetHomeDir } from "../settings/paths";
 import type {
 	HostServiceClient,
 	ResolvedHostTarget,
@@ -27,7 +27,7 @@ const TICKET_MARGIN_MS = 60_000;
 const REACH_TIMEOUT_MS = 8_000;
 
 function ticketsPath(): string {
-	return join(getSupersetHomeDir(), "cloud-workspace-tickets.json");
+	return join(resolveAppHomeDir(), "cloud-workspace-tickets.json");
 }
 
 /**

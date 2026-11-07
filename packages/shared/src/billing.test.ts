@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type AutumnCatalogPlan,
+	advertisedGbMinutesPerSeat,
 	catalogPlansFrom,
 	defaultMachineSize,
 	familyForPlan,
@@ -19,6 +20,7 @@ import {
 	planTierFromSubscription,
 	requiredPlanForTriggerKind,
 	resolveCurrentPlan,
+	seatPriceOf,
 	seatPricePerMonth,
 } from "./billing";
 import { LAUNCHED_TRIGGER_KINDS } from "./constants";
@@ -256,6 +258,14 @@ describe("planCatalogFromAutumn", () => {
 		expect(pro?.pack).toEqual({ gbMinutes: 1000, price: 1 });
 	});
 
+	test("Pro keeps its GB-minute grant but does not advertise cloud", () => {
+		const [pro, ultra] = lineup;
+		if (!pro || !ultra) throw new Error("lineup");
+		expect(pro.gbMinutesPerSeat).toBe(19200);
+		expect(advertisedGbMinutesPerSeat(pro)).toBeNull();
+		expect(advertisedGbMinutesPerSeat(ultra)).toBe(ultra.gbMinutesPerSeat);
+	});
+
 	test("a GB-hour purchase rounds up to whole pack units, never past the maximum", () => {
 		const perGbHour = { gbMinutes: 60, price: 0.06 };
 		expect(gbHourPurchase(perGbHour, 500)).toEqual({
@@ -382,5 +392,21 @@ describe("machine sizes", () => {
 	test("memory scales with vCPUs", () => {
 		expect(machineSpec("small")).toEqual({ vcpus: 2, memoryGb: 4 });
 		expect(machineSpec("2xlarge")).toEqual({ vcpus: 32, memoryGb: 64 });
+	});
+});
+
+describe("seatPriceOf", () => {
+	test("reads the seat interval from a license or from the seats feature of a retired plan", () => {
+		const license = seatLicense("pro_seat_annual", 192, "year", 19200);
+		const current = parentPlan("pro_v2_annual", "pro_seat_annual", {});
+		const retired: AutumnCatalogPlan = {
+			id: "pro_annual",
+			name: "Pro (annual)",
+			metadata: { family: "pro" },
+			items: [{ featureId: "seats", price: { amount: 180, interval: "year" } }],
+		};
+		const plans = [license, current, retired];
+		expect(seatPriceOf(current, plans)?.interval).toBe("year");
+		expect(seatPriceOf(retired, plans)?.interval).toBe("year");
 	});
 });
