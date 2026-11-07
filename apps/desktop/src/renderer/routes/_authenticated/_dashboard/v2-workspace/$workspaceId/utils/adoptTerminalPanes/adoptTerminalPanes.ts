@@ -1,7 +1,10 @@
 import type { WorkspaceStore } from "@superset/panes";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../types";
-import { focusOrAddTerminalPane } from "../focusTerminalPane";
+import {
+	findTerminalPaneLocation,
+	focusOrAddTerminalPane,
+} from "../focusTerminalPane";
 
 /**
  * Give each terminal a tab, oldest first, without moving the selection off a
@@ -23,11 +26,6 @@ export function adoptTerminalPanes(
 	const state = store.getState();
 	const selectedTabId =
 		previousActiveTabId ??
-		state.tabs.find((tab) =>
-			Object.values(tab.panes).some(
-				(pane) =>
-					(pane.data as { terminalId?: string }).terminalId === firstTerminalId,
-			),
-		)?.id;
+		findTerminalPaneLocation(state, firstTerminalId)?.tabId;
 	if (selectedTabId) state.setActiveTab(selectedTabId);
 }
