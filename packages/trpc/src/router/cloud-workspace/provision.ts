@@ -125,6 +125,7 @@ async function provision(
 			id: row.id,
 			from: ["provisioning"],
 			to: "ready",
+			providerSandboxId,
 			set: {
 				providerSandboxId: sandbox.providerSandboxId,
 				sandboxUrl: sandbox.sandboxUrl,
@@ -132,15 +133,18 @@ async function provision(
 			},
 		});
 		if (!ready) {
-			// Deleted while the box was being made: the delete won the row, so
-			// the box it never knew about goes with it. A duplicate delivery of
-			// this job loses the row to the first one and must leave the box be:
-			// the name is per workspace, so it is the same box.
+			// Deleted while the box was being made, or restored with a new box
+			// since: either way the row moved on without this one. A duplicate
+			// delivery of this job loses the row to the first one and must leave
+			// the box be: it read the same name, so it is the same box.
 			const current = await db.query.cloudWorkspaces.findFirst({
 				where: eq(cloudWorkspaces.id, row.id),
-				columns: { status: true },
+				columns: { status: true, providerSandboxId: true },
 			});
-			if (current?.status === "deleted") {
+			if (
+				current?.status === "deleted" ||
+				current?.providerSandboxId !== providerSandboxId
+			) {
 				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId);
 			}
@@ -205,7 +209,7 @@ async function provision(
 			id: row.id,
 			from: ["provisioning", "ready"],
 			to: "failed",
-			set: keepForDiagnosis ? { providerSandboxId } : {},
+			providerSandboxId,
 		});
 		nudge(row.organizationId, "cloud_workspaces");
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
