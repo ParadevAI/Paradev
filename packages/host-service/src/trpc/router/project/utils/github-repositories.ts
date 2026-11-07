@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { type ExecGh, execGh } from "../../workspace-creation/utils/exec-gh";
+import {
+	type ExecGh,
+	execGh,
+	GH_TIMEOUT_MS,
+} from "../../workspace-creation/utils/exec-gh";
 
 const githubRepositorySchema = z.object({
 	full_name: z.string(),
@@ -15,7 +19,6 @@ export function parseGitHubRepositories(raw: unknown) {
 	}));
 }
 
-const PAGE_TIMEOUT_MS = 10_000;
 const TIMEOUT_MESSAGE =
 	"Listing GitHub repositories timed out. Check the `gh` connection on this host and try again.";
 
@@ -46,7 +49,7 @@ export async function listGitHubRepositories(
 					"--jq",
 					"map({full_name, clone_url})",
 				],
-				{ timeout: Math.min(PAGE_TIMEOUT_MS, remainingMs) },
+				{ timeout: Math.min(GH_TIMEOUT_MS, remainingMs) },
 			);
 			const entries = parseGitHubRepositories([raw]);
 			repositories.push(...entries);
