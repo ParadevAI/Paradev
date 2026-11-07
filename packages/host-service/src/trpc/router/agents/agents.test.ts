@@ -23,7 +23,7 @@ import {
 import { resumeTerminalAgentSession } from "../terminal-agents/terminal-agents";
 import { setDefaultAccountSelection } from "../usage/default-account";
 import {
-	bindResumedSession,
+	bindLaunchedSession,
 	buildAgentCommandString,
 	buildTerminalAgentLaunch,
 	chatContinuationTarget,
@@ -884,7 +884,7 @@ describe("validateAgentLaunchOptions", () => {
 	});
 });
 
-describe("bindResumedSession", () => {
+describe("bindLaunchedSession", () => {
 	function seedCodexConfig(db: HostDb) {
 		db.insert(schema.hostAgentConfigs)
 			.values({
@@ -911,7 +911,7 @@ describe("bindResumedSession", () => {
 		seedCodexConfig(db);
 		const store = new TerminalAgentStore();
 
-		bindResumedSession(
+		bindLaunchedSession(
 			{ db, terminalAgentStore: store },
 			{
 				workspaceId: WORKSPACE_ID,
@@ -937,7 +937,7 @@ describe("bindResumedSession", () => {
 		seedCodexConfig(db);
 		const store = new TerminalAgentStore();
 
-		bindResumedSession(
+		bindLaunchedSession(
 			{ db, terminalAgentStore: store },
 			{ workspaceId: WORKSPACE_ID, agent: "codex", prompt: "go" },
 			TERMINAL_ID,
@@ -951,7 +951,7 @@ describe("bindResumedSession", () => {
 		seedCodexConfig(db);
 		const store = new TerminalAgentStore();
 
-		bindResumedSession(
+		bindLaunchedSession(
 			{ db, terminalAgentStore: store },
 			{
 				workspaceId: WORKSPACE_ID,
@@ -1004,7 +1004,7 @@ describe("bindResumedSession", () => {
 			new SqliteTerminalAgentBindingPersistence(db),
 		);
 
-		bindResumedSession(
+		bindLaunchedSession(
 			{ db, terminalAgentStore: store },
 			{ workspaceId: WORKSPACE_ID, agent: customConfigId, prompt: "" },
 			TERMINAL_ID,

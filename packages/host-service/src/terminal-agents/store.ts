@@ -134,6 +134,7 @@ export interface TerminalAgentBindingPersistence {
  */
 export class TerminalAgentStore extends EventEmitter {
 	private readonly byTerminal = new Map<string, TerminalAgentBinding>();
+	private readonly launchDefinitions = new Map<string, AgentDefinitionId>();
 	private readonly chatByTerminal = new Map<string, TerminalAgentBinding>();
 	private readonly subagentsByTerminal = new Map<
 		string,
@@ -188,6 +189,11 @@ export class TerminalAgentStore extends EventEmitter {
 		const nextAgentId = agentId ?? existing?.agentId;
 		if (!nextAgentId) return;
 
+		const launchDefinitionId = existing
+			? undefined
+			: this.launchDefinitions.get(terminalId);
+		this.launchDefinitions.delete(terminalId);
+
 		// Only inherit identity metadata when agentId hasn't changed; otherwise
 		// a swap event that omits agentSessionId/definitionId would inherit the
 		// prior agent's values and corrupt definitionId-filtered reads.
@@ -225,7 +231,7 @@ export class TerminalAgentStore extends EventEmitter {
 			workspaceId,
 			agentId: nextAgentId,
 			agentSessionId: agentSessionId ?? prior?.agentSessionId,
-			definitionId: definitionId ?? prior?.definitionId,
+			definitionId: definitionId ?? prior?.definitionId ?? launchDefinitionId,
 			launchId: input.launchId ?? prior?.launchId,
 			account:
 				input.account ??
@@ -242,6 +248,24 @@ export class TerminalAgentStore extends EventEmitter {
 		this.persistence?.upsert(next);
 		this.emit("change", workspaceId);
 		this.noteActivity(workspaceId);
+	}
+
+	/**
+	 * The agent config a terminal was launched with. Hooks report only the
+	 * harness binary, so a custom agent wrapping `claude` would otherwise bind
+	 * as the preset and resume as it.
+	 */
+	recordLaunch(terminalId: string, definitionId: AgentDefinitionId): void {
+		const existing = this.byTerminal.get(terminalId);
+		if (!existing) {
+			this.launchDefinitions.set(terminalId, definitionId);
+			return;
+		}
+		if (existing.definitionId) return;
+		const next: TerminalAgentBinding = { ...existing, definitionId };
+		this.byTerminal.set(terminalId, next);
+		this.persistence?.upsert(next);
+		this.emit("change", existing.workspaceId);
 	}
 
 	/** An agent did something; the sandbox keepalive listens for this. */
@@ -650,6 +674,7 @@ export class TerminalAgentStore extends EventEmitter {
 	): void {
 		const existing = this.byTerminal.get(terminalId);
 		this.byTerminal.delete(terminalId);
+		this.launchDefinitions.delete(terminalId);
 		this.subagentsByTerminal.delete(terminalId);
 
 		let marked: { workspaceId: string } | undefined;

@@ -1,6 +1,9 @@
 import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
 import { attachedFilesBlock } from "@superset/chat-runtime";
-import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
+import {
+	type AgentDefinitionId,
+	isBuiltinAgentId,
+} from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
 	buildAgentEffortArgs,
@@ -480,8 +483,9 @@ export function buildTerminalAgentLaunch(
 }
 
 /**
- * Bind a resumed session's id to its fresh terminal at launch instead of
- * waiting for a hook. Harnesses differ on when they first report a session
+ * Bind what the hook cannot report to the fresh terminal at launch: the
+ * config that launched it, and a resumed session's id. Harnesses differ on
+ * when they first report a session
  * id: Claude's SessionStart fires at launch, but Codex's TUI fires nothing
  * until the first turn (verified on codex-cli 0.151), so a resumed pane the
  * user has not prompted yet would carry no id — and dying again would leave
@@ -489,20 +493,24 @@ export function buildTerminalAgentLaunch(
  * keeps the same rollout id, so the id we launched with is the id to bind.
  * Forks are excluded: they mint a new session id we cannot know here.
  */
-export function bindResumedSession(
+export function bindLaunchedSession(
 	ctx: Pick<HostServiceContext, "db" | "terminalAgentStore">,
 	input: AgentRunInput,
 	terminalId: string,
 ): void {
-	if (!input.resumeSessionId) return;
-	const presetId = resolveHostAgentConfig(ctx.db, input.agent)?.presetId;
-	if (!presetId || !isBuiltinAgentId(presetId)) return;
+	const config = resolveHostAgentConfig(ctx.db, input.agent);
+	if (!config) return;
+	ctx.terminalAgentStore.recordLaunch(
+		terminalId,
+		config.id as AgentDefinitionId,
+	);
+	if (!input.resumeSessionId || !isBuiltinAgentId(config.presetId)) return;
 
 	ctx.terminalAgentStore.recordEvent({
 		terminalId,
 		workspaceId: input.workspaceId,
 		eventType: "Attached",
-		agentId: presetId,
+		agentId: config.presetId,
 		agentSessionId: input.resumeSessionId,
 		occurredAt: Date.now(),
 	});
@@ -528,7 +536,7 @@ async function runTerminalAgent(
 		throw toTerminalSessionError(result);
 	}
 
-	bindResumedSession(ctx, input, result.terminalId);
+	bindLaunchedSession(ctx, input, result.terminalId);
 
 	return {
 		kind: "terminal",
