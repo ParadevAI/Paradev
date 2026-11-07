@@ -64,10 +64,17 @@ async function ptyDaemonSocketPath(): Promise<string> {
 
 export async function getDaemonClient(): Promise<DaemonClient> {
 	if (cached?.isConnected) return cached;
-	connecting ??= connectDaemonClient().finally(() => {
-		connecting = null;
-	});
-	return connecting;
+	if (connecting) return connecting;
+	const attempt: Promise<DaemonClient> = connectDaemonClient()
+		.then((client) => {
+			if (connecting === attempt) cached = client;
+			return client;
+		})
+		.finally(() => {
+			if (connecting === attempt) connecting = null;
+		});
+	connecting = attempt;
+	return attempt;
 }
 
 async function connectDaemonClient(): Promise<DaemonClient> {
@@ -96,7 +103,6 @@ async function connectDaemonClient(): Promise<DaemonClient> {
 		await client.dispose().catch(() => {});
 		throw error;
 	}
-	cached = client;
 	return client;
 }
 

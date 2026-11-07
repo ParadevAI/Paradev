@@ -18,13 +18,17 @@ const sockPath = path.join(
 );
 const previousSocket = process.env.SUPERSET_PTY_DAEMON_SOCKET;
 const sockets: net.Socket[] = [];
+let holdAcks = false;
+const heldAcks: (() => void)[] = [];
+let onAckHeld: (() => void) | null = null;
 const server = net.createServer((socket) => {
 	sockets.push(socket);
 	const decoder = new FrameDecoder();
 	socket.on("data", (chunk) => {
 		decoder.push(chunk);
 		for (const { message } of decoder.drain()) {
-			if ((message as { type: string }).type === "hello")
+			if ((message as { type: string }).type !== "hello") continue;
+			const ack = () =>
 				socket.write(
 					encodeFrame({
 						type: "hello-ack",
@@ -32,6 +36,12 @@ const server = net.createServer((socket) => {
 						daemonVersion: "test",
 					}),
 				);
+			if (!holdAcks) {
+				ack();
+				continue;
+			}
+			heldAcks.push(ack);
+			onAckHeld?.();
 		}
 	});
 });
@@ -55,4 +65,21 @@ test("concurrent first callers share one daemon connection", async () => {
 
 	expect(sockets).toHaveLength(1);
 	expect(a).toBe(b);
+});
+
+test("a connect that outlives dispose does not replace the newer client", async () => {
+	await disposeDaemonClient();
+	holdAcks = true;
+	const staleHeld = new Promise<void>((resolve) => {
+		onAckHeld = resolve;
+	});
+	const stale = getDaemonClient();
+	await staleHeld;
+	holdAcks = false;
+	const disposing = disposeDaemonClient();
+	const fresh = await getDaemonClient();
+	heldAcks.shift()?.();
+	await Promise.all([stale, disposing]);
+
+	expect(await getDaemonClient()).toBe(fresh);
 });
