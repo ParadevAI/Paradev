@@ -43,7 +43,8 @@ const reviewNotes = [
 module.exports = {
 	configVersion: 0,
 	apple: {
-		version: "1.2.1",
+		// submit-review.ts sets this to the version of the build it submits.
+		version: process.env.APP_STORE_VERSION ?? "1.2.1",
 		copyright: "2026 Superset Inc.",
 		categories: ["DEVELOPER_TOOLS", "PRODUCTIVITY"],
 		info: {
