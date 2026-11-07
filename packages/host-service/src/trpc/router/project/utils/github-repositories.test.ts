@@ -71,6 +71,40 @@ test("rejects invalid clone URLs on later pages instead of returning partial res
 	expect(page).toBe(2);
 });
 
+test("bounds the whole walk with one budget and stops before a page with no time left", async () => {
+	let clock = 0;
+	const timeouts: (number | undefined)[] = [];
+	const walk = listGitHubRepositories(
+		async (_args, options) => {
+			timeouts.push(options?.timeout);
+			clock += 5_000;
+			if (timeouts.length > 10) return [];
+			return Array.from({ length: 100 }, (_, index) => ({
+				full_name: `owner/repo-${index}`,
+				clone_url: `https://github.com/owner/repo-${index}.git`,
+			}));
+		},
+		{ deadlineMs: 15_000, now: () => clock },
+	);
+	await expect(walk).rejects.toMatchObject({
+		code: "TIMEOUT",
+		message: expect.stringContaining("timed out"),
+	});
+	expect(timeouts).toEqual([10_000, 10_000, 5_000]);
+});
+
+test("explains a page that timed out instead of showing the gh command", async () => {
+	const failure = Object.assign(
+		new Error("Command failed: gh api --method GET user/repos"),
+		{ killed: true, signal: "SIGTERM", code: null },
+	);
+	const walk = listGitHubRepositories(async () => {
+		throw failure;
+	});
+	await expect(walk).rejects.toMatchObject({ code: "TIMEOUT", cause: failure });
+	await expect(walk).rejects.not.toThrow("Command failed");
+});
+
 test("returns an empty catalog", async () => {
 	expect(await listGitHubRepositories(async () => [])).toEqual([]);
 });

@@ -15,26 +15,39 @@ export function parseGitHubRepositories(raw: unknown) {
 	}));
 }
 
-export async function listGitHubRepositories(runGh: ExecGh = execGh) {
+const PAGE_TIMEOUT_MS = 10_000;
+const TIMEOUT_MESSAGE =
+	"Listing GitHub repositories timed out. Check the `gh` connection on this host and try again.";
+
+export async function listGitHubRepositories(
+	runGh: ExecGh = execGh,
+	{ deadlineMs = 30_000, now = Date.now } = {},
+) {
+	const deadline = now() + deadlineMs;
 	const repositories: ReturnType<typeof parseGitHubRepositories> = [];
 	try {
 		for (let page = 1; ; page++) {
-			const raw = await runGh([
-				"api",
-				"--method",
-				"GET",
-				"user/repos",
-				"-f",
-				"affiliation=owner,collaborator,organization_member",
-				"-f",
-				"sort=updated",
-				"-f",
-				"per_page=100",
-				"-f",
-				`page=${page}`,
-				"--jq",
-				"map({full_name, clone_url})",
-			]);
+			const remainingMs = deadline - now();
+			if (remainingMs <= 0) break;
+			const raw = await runGh(
+				[
+					"api",
+					"--method",
+					"GET",
+					"user/repos",
+					"-f",
+					"affiliation=owner,collaborator,organization_member",
+					"-f",
+					"sort=updated",
+					"-f",
+					"per_page=100",
+					"-f",
+					`page=${page}`,
+					"--jq",
+					"map({full_name, clone_url})",
+				],
+				{ timeout: Math.min(PAGE_TIMEOUT_MS, remainingMs) },
+			);
 			const entries = parseGitHubRepositories([raw]);
 			repositories.push(...entries);
 			if (entries.length < 100) return repositories;
@@ -49,16 +62,20 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 		};
 		const authenticationRequired =
 			code === 4 || /\(HTTP 401\)/.test(stderr ?? failure.message);
+		const timedOut = killed && signal === "SIGTERM" && code == null;
 		throw new TRPCError({
 			code: authenticationRequired
 				? "PRECONDITION_FAILED"
-				: killed && signal === "SIGTERM" && code == null
+				: timedOut
 					? "TIMEOUT"
 					: "BAD_GATEWAY",
 			message: authenticationRequired
 				? `Could not list GitHub repositories. Run \`gh auth login\` on this host and try again. ${failure.message}`
-				: failure.message,
+				: timedOut
+					? TIMEOUT_MESSAGE
+					: failure.message,
 			cause: error,
 		});
 	}
+	throw new TRPCError({ code: "TIMEOUT", message: TIMEOUT_MESSAGE });
 }
