@@ -372,6 +372,7 @@ export class HostTunnel extends Server<RelayEnv> {
 		}
 
 		this.earlyFrames.delete(conn.id);
+		if (state.kind === "dial") this.httpExchanges.fail(state.ticket);
 		const dialTimer = this.unpairedDialTimers.get(state.ticket);
 		if (dialTimer) {
 			clearTimeout(dialTimer);
