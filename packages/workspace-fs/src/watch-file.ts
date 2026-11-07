@@ -52,6 +52,8 @@ export function watchSingleFile(
 	let pollTimer: ReturnType<typeof setInterval> | null = null;
 	let settling = false;
 	let settleQueued = false;
+	/** A watch event arrived that no settle has handled yet. */
+	let watchEventPending = false;
 
 	const emit = (kind: "create" | "update" | "delete", isDirectory: boolean) => {
 		onEvent({ kind, absolutePath, isDirectory });
@@ -80,11 +82,11 @@ export function watchSingleFile(
 	const installWatcher = (ino: bigint | number): boolean => {
 		closeWatcher();
 		try {
-			const installed = watch(absolutePath, () => scheduleSettle());
+			const installed = watch(absolutePath, onWatchEvent);
 			installed.on("error", () => {
 				// A dead watch must not be mistaken for a live same-inode one.
 				if (watcher === installed) closeWatcher();
-				scheduleSettle();
+				onWatchEvent();
 			});
 			watcher = installed;
 			watchedIno = ino;
@@ -94,6 +96,11 @@ export function watchSingleFile(
 			watchedIno = null;
 			return false;
 		}
+	};
+
+	const onWatchEvent = () => {
+		watchEventPending = true;
+		scheduleSettle();
 	};
 
 	const scheduleSettle = () => {
@@ -115,6 +122,8 @@ export function watchSingleFile(
 			return;
 		}
 		settling = true;
+		const fromWatch = watchEventPending;
+		watchEventPending = false;
 		try {
 			const stats = await stat(absolutePath).catch(() => null);
 			if (disposed) return;
@@ -155,7 +164,9 @@ export function watchSingleFile(
 						startPolling();
 					}
 				}
-				if (changed) emit(existed ? "update" : "create", false);
+				// Coarse-timestamp filesystems (HFS+) can leave the signature
+				// unchanged across a real write, so only poll ticks dedupe.
+				if (changed || fromWatch) emit(existed ? "update" : "create", false);
 			} else {
 				const existed = exists;
 				exists = false;
