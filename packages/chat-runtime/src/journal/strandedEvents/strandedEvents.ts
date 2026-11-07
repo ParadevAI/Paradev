@@ -15,7 +15,7 @@ export const HOST_STOPPED: TurnError = {
 /** Settles only one stopped turn's own tool calls, leaving what went to the background. */
 export type StoppedTurn = { turnId: string; background: ReadonlySet<string> };
 
-const ACTIVE_STATUSES = new Set<SessionState["status"]>([
+export const ACTIVE_STATUSES = new Set<SessionState["status"]>([
 	"starting",
 	"running",
 	"awaiting_input",

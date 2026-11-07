@@ -7,4 +7,4 @@ export type {
 } from "./journal";
 export { ChatJournal } from "./journal";
 export type { StoppedTurn } from "./strandedEvents";
-export { HOST_STOPPED, strandedEvents } from "./strandedEvents";
+export { HOST_STOPPED } from "./strandedEvents";

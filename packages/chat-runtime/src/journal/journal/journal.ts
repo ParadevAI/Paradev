@@ -6,7 +6,7 @@ import type {
 	TurnError,
 } from "@superset/chat/protocol";
 import { durableEventSchema } from "@superset/chat/protocol";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { ChatDb } from "../../db";
 import { chatJournal, chatSessionsLocal } from "../../db";
 import {
@@ -19,6 +19,7 @@ import { readSince } from "../../replay";
 import type { ChatSessionInit } from "../epoch";
 import { openEpoch } from "../epoch";
 import {
+	ACTIVE_STATUSES,
 	HOST_STOPPED,
 	type StoppedTurn,
 	strandedEvents,
@@ -163,13 +164,7 @@ export class ChatJournal {
 		const rows = this.db
 			.select({ sessionId: chatSessionsLocal.sessionId })
 			.from(chatSessionsLocal)
-			.where(
-				inArray(chatSessionsLocal.status, [
-					"starting",
-					"running",
-					"awaiting_input",
-				]),
-			)
+			.where(inArray(chatSessionsLocal.status, [...ACTIVE_STATUSES]))
 			.all();
 		const settled: string[] = [];
 		for (const { sessionId } of rows) {
@@ -179,6 +174,16 @@ export class ChatJournal {
 					error: HOST_STOPPED,
 					idle: true,
 				});
+				this.db
+					.update(chatSessionsLocal)
+					.set({ status: "idle" })
+					.where(
+						and(
+							eq(chatSessionsLocal.sessionId, sessionId),
+							inArray(chatSessionsLocal.status, [...ACTIVE_STATUSES]),
+						),
+					)
+					.run();
 				settled.push(sessionId);
 			} catch (error) {
 				console.warn(`[chat-journal] could not settle ${sessionId}`, error);

@@ -296,7 +296,23 @@ describe("live session adapter failures", () => {
 		await runtime.dispose();
 	});
 
-	test("a host killed mid-turn has the turn settled at its next boot", async () => {
+	test("a session cut off before its agent said anything is settled at boot only once", async () => {
+		const runtime = createTestRuntime();
+		runtime.journal.open({
+			sessionId: "never-started",
+			scopeId: "workspace-1",
+			harness: "fake",
+		});
+
+		expect(runtime.journal.settleAllStranded(Date.now())).toEqual([
+			"never-started",
+		]);
+		expect(runtime.sessions.get("never-started")?.status).toBe("idle");
+		expect(runtime.journal.settleAllStranded(Date.now())).toEqual([]);
+		await runtime.dispose();
+	});
+
+	test("the boot sweep settles a turn the journal still shows running", async () => {
 		const { runtime, sessionId } = startSession(
 			hangingStream([RUNNING_TURN, RUNNING_TOOL, PENDING_APPROVAL]),
 		);
