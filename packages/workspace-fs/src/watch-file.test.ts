@@ -149,4 +149,24 @@ describe("watchSingleFile", () => {
 		await fs.writeFile(file, "born");
 		await waitFor(events, (e) => e.kind === "create");
 	}, 15_000);
+
+	it.skipIf(process.getuid?.() === 0)(
+		"stays silent while polling an unchanged file it cannot watch",
+		async () => {
+			const file = await createTempFile();
+			await fs.chmod(file, 0o000);
+			const events: FsWatchEvent[] = [];
+			disposers.push(
+				watchSingleFile(file, (e) => events.push(e), {
+					debounceMs: 5,
+					pollMs: 20,
+				}),
+			);
+			await new Promise((r) => setTimeout(r, 150));
+			expect(events).toEqual([]);
+
+			await fs.utimes(file, new Date(), new Date(Date.now() + 60_000));
+			await waitFor(events, (e) => e.kind === "update");
+		},
+	);
 });
