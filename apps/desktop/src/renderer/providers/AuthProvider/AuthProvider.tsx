@@ -7,6 +7,7 @@ import {
 	setJwt,
 } from "renderer/lib/auth-client";
 import { electronTrpc } from "../../lib/electron-trpc";
+import { storedTokenToRestore } from "./utils/storedTokenToRestore";
 
 const HYDRATION_TIMEOUT_MS = 15_000;
 
@@ -47,19 +48,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		}
 
 		async function hydrate() {
-			if (storedToken?.token && storedToken?.expiresAt) {
-				const isExpired = new Date(storedToken.expiresAt) < new Date();
-				if (!isExpired) {
-					setAuthToken(storedToken.token);
-					// A hung session fetch must not hold boot on the splash forever —
-					// proceed after a bound; the routes show session-pending UI (#5729).
-					await Promise.race([
-						fetchSessionAndJwt(storedToken.token),
-						new Promise((resolve) =>
-							window.setTimeout(resolve, HYDRATION_TIMEOUT_MS),
-						),
-					]);
-				}
+			const token = storedTokenToRestore(storedToken);
+			if (token) {
+				setAuthToken(token);
+				// A hung session fetch must not hold boot on the splash forever —
+				// proceed after a bound; the routes show session-pending UI (#5729).
+				await Promise.race([
+					fetchSessionAndJwt(token),
+					new Promise((resolve) =>
+						window.setTimeout(resolve, HYDRATION_TIMEOUT_MS),
+					),
+				]);
 			}
 			if (!cancelled) {
 				setIsHydrated(true);
