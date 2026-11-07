@@ -4,6 +4,7 @@ import { attachedFilesBlock } from "../../attachedFiles";
 import type { AdapterEvent, ResolveAttachment } from "../../types";
 import {
 	ClaudeAdapter,
+	type ClaudeAdapterOptions,
 	type ClaudeQuery,
 	type ClaudeQueryOptions,
 	type ClaudeSession,
@@ -35,7 +36,9 @@ function result(): unknown {
 	};
 }
 
-function createHarness(): Harness {
+function createHarness(
+	options: Pick<ClaudeAdapterOptions, "launch"> = {},
+): Harness {
 	const pending: unknown[] = [];
 	let notify: (() => void) | null = null;
 	let aborted = false;
@@ -70,7 +73,7 @@ function createHarness(): Harness {
 		return stream;
 	};
 
-	const adapter = new ClaudeAdapter({ query });
+	const adapter = new ClaudeAdapter({ ...options, query });
 	const iterator = adapter.start({ cwd: "/workspace" })[Symbol.asyncIterator]();
 
 	return {
@@ -151,6 +154,63 @@ describe("ClaudeAdapter", () => {
 				? secondTurn.turn.id !== firstTurn.turn.id
 				: false,
 		).toBe(true);
+	});
+
+	test("a Stop after the turn ended does not interrupt the next turn", async () => {
+		const harness = createHarness();
+
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "completed" },
+		});
+
+		harness.adapter.cancelTurn();
+		harness.adapter.prompt([{ type: "text", text: "second" }]);
+		harness.emit(messageStart("msg_2"));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "completed" },
+		});
+	});
+
+	test("a Stop before the first token still ends the turn", async () => {
+		const harness = createHarness();
+
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.adapter.cancelTurn();
+		harness.emit(result());
+
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "running" },
+		});
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
+	});
+
+	test("a Stop while Claude launches interrupts the turn without killing the session", async () => {
+		let launched: (() => void) | undefined;
+		const harness = createHarness({
+			launch: () =>
+				new Promise((resolve) => {
+					launched = () => resolve({});
+				}),
+		});
+
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.adapter.cancelTurn();
+		launched?.();
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
+		expect(harness.aborted()).toBe(false);
+		expect(harness.interrupts).toBe(1);
 	});
 
 	test("reports the session id the stream carries, once", async () => {
