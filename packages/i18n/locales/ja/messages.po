@@ -609,6 +609,10 @@ msgstr "{0} 対 {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0}はこの変更で削除されました。"
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "{0} はこのコンピューターで使用中だったため、{localPort} に移動しました。"
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -5794,6 +5798,9 @@ msgstr "ワークスペースの削除を完了できませんでした"
 msgid "Couldn't fork into a chat"
 msgstr "チャットにフォークできませんでした"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "ポート {portNumber} を転送できませんでした"
+
 msgid "Couldn't hand this to an agent"
 msgstr "エージェントに引き渡せませんでした"
 
@@ -5975,6 +5982,9 @@ msgstr "音声モードを開始できませんでした"
 
 msgid "Couldn't start workspace"
 msgstr "ワークスペースを開始できませんでした"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "ポート {portNumber} の転送を停止できませんでした"
 
 msgid "Couldn't stop the background task"
 msgstr "バックグラウンドタスクを停止できませんでした"
@@ -8838,6 +8848,10 @@ msgstr "フォームコントロールとフィールドの組み立て"
 msgid "Forward"
 msgstr "進む"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "転送"
+
 msgid "Found 12 tooltip call sites"
 msgstr "tooltipの呼び出し元を12か所検出"
 
@@ -10962,6 +10976,10 @@ msgstr "ローカルワークスペース"
 msgid "Local workspaces"
 msgstr "ローカルワークスペース"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} はこのコンピューターで使用中です。"
+
 msgid "Location"
 msgstr "場所"
 
@@ -12362,6 +12380,9 @@ msgstr "「{0}」に一致するプラグインがありません"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "プラグインはまだありません。リポジトリを追加して同期してください。"
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "まだポートはありません。ターミナルで開発サーバーを起動するとここに表示されます。"
+
 msgid "No posts yet."
 msgstr "投稿はまだありません。"
 
@@ -12673,6 +12694,9 @@ msgstr "未接続 · クラウドワークスペースは組織の GitHub App �
 
 msgid "Not demoed here"
 msgstr "ここではデモしていません"
+
+msgid "Not detected in the workspace right now"
+msgstr "現在ワークスペースで検出されていません"
 
 msgid "Not found"
 msgstr "見つかりません"
@@ -13087,6 +13111,9 @@ msgstr "自分のみ"
 msgid "Only you can see this page"
 msgstr "このページはあなただけが閲覧できます"
 
+msgid "Only you. Teammates forward their own."
+msgstr "あなただけです。チームメイトはそれぞれ自分で転送します。"
+
 msgid "open"
 msgstr "開く"
 
@@ -13396,6 +13423,9 @@ msgstr "アプリ内ブラウザでリンクを開く"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "localhost:{0}を外部ブラウザで開く"
+
+msgid "Open localhost:{localPort}"
+msgstr "localhost:{localPort} を開く"
 
 msgid "Open menu"
 msgstr "メニューを開く"
@@ -14401,6 +14431,9 @@ msgstr "トップバーのドロップダウンにポートを表示"
 
 msgid "Ports on remote hosts"
 msgstr "リモートホストのポート"
+
+msgid "Ports on this computer"
+msgstr "このコンピューターのポート"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "調子の良い日には可能です。監督コストの増え方がまだ速すぎます。"

@@ -28,6 +28,10 @@ export interface PortForward {
 	status: PortForwardStatus;
 	transport: ForwardTransportKind;
 	connections: number;
+	/** Asked for with Forward, and kept until Stop instead of following the selected workspace. */
+	explicit: boolean;
+	/** The port bound on this machine, whatever the status; null while nothing is bound. */
+	localPort: number | null;
 }
 
 export function portForwardId({

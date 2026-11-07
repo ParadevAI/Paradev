@@ -609,6 +609,10 @@ msgstr "{0} 대 {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0}은(는) 이 변경에서 삭제되었습니다."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "이 컴퓨터에서 {0}을(를) 사용 중이어서 {localPort}(으)로 옮겼습니다."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -5794,6 +5798,9 @@ msgstr "워크스페이스 삭제를 끝내지 못했습니다"
 msgid "Couldn't fork into a chat"
 msgstr "채팅으로 포크할 수 없습니다"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "포트 {portNumber}을(를) 전달하지 못했습니다"
+
 msgid "Couldn't hand this to an agent"
 msgstr "에이전트에게 넘길 수 없습니다"
 
@@ -5975,6 +5982,9 @@ msgstr "음성 모드를 시작할 수 없습니다"
 
 msgid "Couldn't start workspace"
 msgstr "워크스페이스를 시작하지 못했습니다"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "포트 {portNumber} 전달을 중지하지 못했습니다"
 
 msgid "Couldn't stop the background task"
 msgstr "백그라운드 작업을 중지할 수 없습니다"
@@ -8838,6 +8848,10 @@ msgstr "폼 컨트롤과 필드 구성"
 msgid "Forward"
 msgstr "앞으로"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "전달"
+
 msgid "Found 12 tooltip call sites"
 msgstr "툴팁 호출 지점 12곳 발견"
 
@@ -10962,6 +10976,10 @@ msgstr "로컬 워크스페이스"
 msgid "Local workspaces"
 msgstr "로컬 워크스페이스"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "이 컴퓨터에서 localhost:{0}을(를) 이미 사용 중입니다."
+
 msgid "Location"
 msgstr "위치"
 
@@ -12362,6 +12380,9 @@ msgstr "\"{0}\"과(와) 일치하는 플러그인이 없습니다"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "아직 플러그인이 없습니다. 리포지토리를 추가해 동기화하세요."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "아직 포트가 없습니다. 터미널에서 개발 서버를 시작하면 여기에 표시됩니다."
+
 msgid "No posts yet."
 msgstr "아직 게시물이 없습니다."
 
@@ -12673,6 +12694,9 @@ msgstr "연결되지 않음 · 클라우드 워크스페이스가 조직의 GitH
 
 msgid "Not demoed here"
 msgstr "여기서는 시연하지 않음"
+
+msgid "Not detected in the workspace right now"
+msgstr "지금은 워크스페이스에서 감지되지 않음"
 
 msgid "Not found"
 msgstr "찾을 수 없습니다"
@@ -13087,6 +13111,9 @@ msgstr "나만"
 msgid "Only you can see this page"
 msgstr "이 페이지는 나만 볼 수 있습니다"
 
+msgid "Only you. Teammates forward their own."
+msgstr "나만 사용합니다. 팀원은 각자 전달합니다."
+
 msgid "open"
 msgstr "열기"
 
@@ -13396,6 +13423,9 @@ msgstr "앱 내 브라우저에서 링크 열기"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "외부 브라우저에서 localhost:{0} 열기"
+
+msgid "Open localhost:{localPort}"
+msgstr "localhost:{localPort} 열기"
 
 msgid "Open menu"
 msgstr "메뉴 열기"
@@ -14401,6 +14431,9 @@ msgstr "상단 바 드롭다운에 포트 표시"
 
 msgid "Ports on remote hosts"
 msgstr "원격 호스트의 포트"
+
+msgid "Ports on this computer"
+msgstr "이 컴퓨터의 포트"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "운이 좋은 날에는 가능합니다. 감독 비용이 여전히 너무 빠르게 늘어납니다."

@@ -609,6 +609,10 @@ msgstr "{0} gegen {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} wurde in dieser Änderung gelöscht."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "{0} war auf diesem Computer belegt, daher wurde auf {localPort} ausgewichen."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -5794,6 +5798,9 @@ msgstr "Das Löschen der Arbeitsbereiche konnte nicht abgeschlossen werden"
 msgid "Couldn't fork into a chat"
 msgstr "Sitzung konnte nicht in einen Chat geforkt werden"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Port {portNumber} konnte nicht weitergeleitet werden"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Konnte nicht an einen Agenten übergeben werden"
 
@@ -5975,6 +5982,9 @@ msgstr "Sprachmodus konnte nicht gestartet werden"
 
 msgid "Couldn't start workspace"
 msgstr "Arbeitsbereich konnte nicht gestartet werden"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Weiterleitung von Port {portNumber} konnte nicht gestoppt werden"
 
 msgid "Couldn't stop the background task"
 msgstr "Die Hintergrundaufgabe konnte nicht gestoppt werden"
@@ -8838,6 +8848,10 @@ msgstr "Formularelemente und Feldaufbau"
 msgid "Forward"
 msgstr "Vorwärts"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Weiterleiten"
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 Tooltip-Aufrufstellen gefunden"
 
@@ -10962,6 +10976,10 @@ msgstr "Lokaler Arbeitsbereich"
 msgid "Local workspaces"
 msgstr "Lokale Arbeitsbereiche"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} wird auf diesem Computer bereits verwendet."
+
 msgid "Location"
 msgstr "Ort"
 
@@ -12362,6 +12380,9 @@ msgstr "Keine Plugins passen zu \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Noch keine Plugins. Fügen Sie ein Repository hinzu, um sie zu synchronisieren."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Noch keine Ports. Starte einen Dev-Server in einem Terminal, dann erscheint er hier."
+
 msgid "No posts yet."
 msgstr "Noch keine Beiträge."
 
@@ -12673,6 +12694,9 @@ msgstr "Nicht verbunden · Cloud-Arbeitsbereiche pushen als GitHub-App deiner Or
 
 msgid "Not demoed here"
 msgstr "Hier nicht gezeigt"
+
+msgid "Not detected in the workspace right now"
+msgstr "Im Workspace gerade nicht erkannt"
 
 msgid "Not found"
 msgstr "Nicht gefunden"
@@ -13087,6 +13111,9 @@ msgstr "Nur du"
 msgid "Only you can see this page"
 msgstr "Nur du kannst diese Seite sehen"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Nur du. Teammitglieder leiten ihre eigenen weiter."
+
 msgid "open"
 msgstr "öffnen"
 
@@ -13396,6 +13423,9 @@ msgstr "Links im In-App-Browser öffnen"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "localhost:{0} im externen Browser öffnen"
+
+msgid "Open localhost:{localPort}"
+msgstr "localhost:{localPort} öffnen"
 
 msgid "Open menu"
 msgstr "Menü öffnen"
@@ -14401,6 +14431,9 @@ msgstr "Ports im Dropdown der oberen Leiste"
 
 msgid "Ports on remote hosts"
 msgstr "Ports auf Remote-Hosts"
+
+msgid "Ports on this computer"
+msgstr "Ports auf diesem Computer"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "An guten Tagen möglich. Der Aufwand für Aufsicht wächst noch zu schnell."

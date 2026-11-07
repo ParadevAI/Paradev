@@ -609,6 +609,10 @@ msgstr "{0} contre {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} a été supprimé dans cette modification."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "{0} était déjà utilisé sur cet ordinateur, il a donc été déplacé vers {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -5794,6 +5798,9 @@ msgstr "Impossible de terminer la suppression des espaces de travail"
 msgid "Couldn't fork into a chat"
 msgstr "Impossible de forker dans un chat"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Impossible de rediriger le port {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Impossible de confier ceci à un agent"
 
@@ -5975,6 +5982,9 @@ msgstr "Impossible de démarrer le mode vocal"
 
 msgid "Couldn't start workspace"
 msgstr "Impossible de démarrer l'espace de travail"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Impossible d’arrêter la redirection du port {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "Impossible d'arrêter la tâche en arrière-plan"
@@ -8838,6 +8848,10 @@ msgstr "Contrôles de formulaire et composition des champs"
 msgid "Forward"
 msgstr "Suivant"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Rediriger"
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 sites d'appel de tooltip trouvés"
 
@@ -10962,6 +10976,10 @@ msgstr "Espace de travail local"
 msgid "Local workspaces"
 msgstr "Espaces de travail locaux"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} est déjà utilisé sur cet ordinateur."
+
 msgid "Location"
 msgstr "Emplacement"
 
@@ -12362,6 +12380,9 @@ msgstr "Aucun plugin ne correspond à \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Aucun plugin pour l'instant. Ajoutez un dépôt pour les synchroniser."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Aucun port pour l’instant. Lancez un serveur de développement dans un terminal et il apparaîtra ici."
+
 msgid "No posts yet."
 msgstr "Aucun article pour l'instant."
 
@@ -12673,6 +12694,9 @@ msgstr "Non connecté · les espaces de travail cloud poussent en tant que GitHu
 
 msgid "Not demoed here"
 msgstr "Non démontré ici"
+
+msgid "Not detected in the workspace right now"
+msgstr "Non détecté dans l’espace de travail pour le moment"
 
 msgid "Not found"
 msgstr "Introuvable"
@@ -13087,6 +13111,9 @@ msgstr "Vous seul"
 msgid "Only you can see this page"
 msgstr "Vous seul pouvez voir cette page"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Vous seul. Chaque coéquipier redirige les siens."
+
 msgid "open"
 msgstr "ouvrir"
 
@@ -13396,6 +13423,9 @@ msgstr "Ouvrir les liens dans le navigateur intégré"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Ouvrir localhost:{0} dans un navigateur externe"
+
+msgid "Open localhost:{localPort}"
+msgstr "Ouvrir localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "Ouvrir le menu"
@@ -14401,6 +14431,9 @@ msgstr "Ports dans le menu de la barre supérieure"
 
 msgid "Ports on remote hosts"
 msgstr "Ports sur les hôtes distants"
+
+msgid "Ports on this computer"
+msgstr "Ports sur cet ordinateur"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Possible les bons jours. Le coût de supervision croît encore trop vite."

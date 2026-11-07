@@ -1,5 +1,10 @@
 import { observable } from "@trpc/server/observable";
-import { portForwardManager, setRelayToken } from "main/lib/port-forward";
+import {
+	forwardReporter,
+	portForwardManager,
+	setHostToken,
+	setRelayToken,
+} from "main/lib/port-forward";
 import type { PortForward } from "shared/types";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -11,6 +16,36 @@ export const createPortForwardsRouter = () => {
 			.mutation(({ input }) => {
 				setRelayToken(input.token);
 			}),
+
+		setHostToken: publicProcedure
+			.input(z.object({ hostUrl: z.string(), token: z.string().nullable() }))
+			.mutation(({ input }) => {
+				setHostToken(input.hostUrl, input.token);
+			}),
+
+		forward: publicProcedure
+			.input(
+				z.object({
+					hostUrl: z.string(),
+					workspaceId: z.string(),
+					remotePort: z.number().int().positive(),
+					reportUrl: z.string().url().optional(),
+				}),
+			)
+			.mutation(({ input }): Promise<PortForward[]> => {
+				const { reportUrl, ...target } = input;
+				if (reportUrl) {
+					forwardReporter.setReportUrl(target.workspaceId, reportUrl);
+				}
+				return portForwardManager.forward(target);
+			}),
+
+		stopForward: publicProcedure
+			.input(z.object({ id: z.string() }))
+			.mutation(
+				({ input }): Promise<PortForward[]> =>
+					portForwardManager.stopForward(input.id),
+			),
 
 		list: publicProcedure.query((): PortForward[] => portForwardManager.list()),
 

@@ -15,7 +15,11 @@ export function formatPortRowLabel({
 	if (port.hostType === "local-device") {
 		return { text: `localhost:${port.port}` };
 	}
-	if (!forward) return { text: `${port.port} · remote` };
+	if (!forward) {
+		return {
+			text: `${port.port} · ${port.hostType === "cloud" ? "cloud" : "remote"}`,
+		};
+	}
 	switch (forward.status.state) {
 		case "active":
 			return forward.status.localPort === port.port

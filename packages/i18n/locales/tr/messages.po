@@ -609,6 +609,10 @@ msgstr "{0} - {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} bu değişiklikte silindi."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "{0} bu bilgisayarda kullanımdaydı, bu yüzden {localPort} kullanıldı."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -5794,6 +5798,9 @@ msgstr "Çalışma alanlarını silme işlemi tamamlanamadı"
 msgid "Couldn't fork into a chat"
 msgstr "Sohbete forklanamadı"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "{portNumber} numaralı bağlantı noktası yönlendirilemedi"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Bu bir ajana devredilemedi"
 
@@ -5975,6 +5982,9 @@ msgstr "Sesli mod başlatılamadı"
 
 msgid "Couldn't start workspace"
 msgstr "Çalışma alanı başlatılamadı"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "{portNumber} numaralı bağlantı noktasının yönlendirmesi durdurulamadı"
 
 msgid "Couldn't stop the background task"
 msgstr "Arka plan görevi durdurulamadı"
@@ -8838,6 +8848,10 @@ msgstr "Form denetimleri ve alan kompozisyonu"
 msgid "Forward"
 msgstr "İleri"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Yönlendir"
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 tooltip çağrı noktası bulundu"
 
@@ -10962,6 +10976,10 @@ msgstr "Yerel çalışma alanı"
 msgid "Local workspaces"
 msgstr "Yerel çalışma alanları"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} bu bilgisayarda kullanımda."
+
 msgid "Location"
 msgstr "Konum"
 
@@ -12362,6 +12380,9 @@ msgstr "\"{0}\" ile eşleşen eklenti yok"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Henüz eklenti yok. Eşitlemek için bir depo ekleyin."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Henüz bağlantı noktası yok. Bir terminalde geliştirme sunucusu başlatın, burada görünür."
+
 msgid "No posts yet."
 msgstr "Henüz yazı yok."
 
@@ -12673,6 +12694,9 @@ msgstr "Bağlı değil · bulut çalışma alanları organizasyonunun GitHub App
 
 msgid "Not demoed here"
 msgstr "Burada gösterilmiyor"
+
+msgid "Not detected in the workspace right now"
+msgstr "Şu anda çalışma alanında algılanmıyor"
 
 msgid "Not found"
 msgstr "Bulunamadı"
@@ -13087,6 +13111,9 @@ msgstr "Yalnızca siz"
 msgid "Only you can see this page"
 msgstr "Bu sayfayı yalnızca siz görebilirsiniz"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Yalnızca siz. Ekip arkadaşları kendilerininkini yönlendirir."
+
 msgid "open"
 msgstr "aç"
 
@@ -13396,6 +13423,9 @@ msgstr "Bağlantıları uygulama içi tarayıcıda aç"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "localhost:{0} adresini harici tarayıcıda aç"
+
+msgid "Open localhost:{localPort}"
+msgstr "localhost:{localPort} adresini aç"
 
 msgid "Open menu"
 msgstr "Menüyü aç"
@@ -14401,6 +14431,9 @@ msgstr "Üst çubuk açılır menüsünde portlar"
 
 msgid "Ports on remote hosts"
 msgstr "Uzak host'lardaki portlar"
+
+msgid "Ports on this computer"
+msgstr "Bu bilgisayardaki bağlantı noktaları"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "İyi günlerde mümkün. Denetim maliyeti hâlâ çok hızlı büyüyor."

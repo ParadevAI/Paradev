@@ -32,6 +32,7 @@ export function CloudWorkspaceTabBarControls({
 		<div className="flex items-center gap-1">
 			<CloudWorkspaceShareButton
 				workspaceId={workspace.id}
+				showPorts
 				owner={workspace.createdBy}
 				visibility={workspace.visibility}
 				canEdit={

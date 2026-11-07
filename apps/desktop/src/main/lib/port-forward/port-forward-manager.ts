@@ -31,13 +31,15 @@ const MAX_PENDING_FRAMES = 64;
 const MAX_PENDING_BYTES = 4 * 1024 * 1024;
 const KILL_WAIT_MS = 3_000;
 const KILL_POLL_MS = 250;
+const NEARBY_PORT_TRIES = 20;
 
 /**
  * Owns every local listener that forwards to a remote workspace port. Each
  * window is a client with its own wanted set (its selected workspace's remote
  * ports); the manager keeps exactly the union running, so two windows on
  * different workspaces don't tear each other's forwards down. A client's set
- * is dropped when its window's subscription goes away.
+ * is dropped when its window's subscription goes away. Forwards asked for
+ * with Forward belong to no window and run until Stop.
  */
 export class PortForwardManager extends EventEmitter<{
 	change: [PortForward[]];
@@ -47,13 +49,36 @@ export class PortForwardManager extends EventEmitter<{
 		string,
 		Map<string, ForwardTarget>
 	>();
+	private readonly explicit = new Map<string, ForwardTarget>();
 
 	constructor(private readonly options: PortForwardManagerOptions) {
 		super();
 	}
 
 	list(): PortForward[] {
-		return Array.from(this.entries.values(), (e) => ({ ...e.forward }));
+		return Array.from(this.entries.values(), (e) => {
+			const address = e.server?.address();
+			return {
+				...e.forward,
+				explicit: this.explicit.has(e.forward.id),
+				localPort: address && typeof address === "object" ? address.port : null,
+			};
+		});
+	}
+
+	forward(target: ForwardTarget): Promise<PortForward[]> {
+		this.explicit.set(portForwardId(target), target);
+		return this.reconcile();
+	}
+
+	stopExplicit(): Promise<PortForward[]> {
+		this.explicit.clear();
+		return this.reconcile();
+	}
+
+	stopForward(id: string): Promise<PortForward[]> {
+		this.explicit.delete(id);
+		return this.reconcile();
 	}
 
 	async sync({
@@ -87,7 +112,7 @@ export class PortForwardManager extends EventEmitter<{
 	}
 
 	private async reconcile(): Promise<PortForward[]> {
-		const union = new Map<string, ForwardTarget>();
+		const union = new Map<string, ForwardTarget>(this.explicit);
 		for (const wanted of this.wantedByClient.values()) {
 			for (const [id, target] of wanted) union.set(id, target);
 		}
@@ -157,24 +182,59 @@ export class PortForwardManager extends EventEmitter<{
 				status: { state: "error", message: "Starting" },
 				transport: this.options.transport.kind,
 				connections: 0,
+				explicit: false,
+				localPort: null,
 			},
 			server: null,
 			sockets: new Set(),
 		};
 		this.entries.set(id, entry);
+		let probeError: unknown = null;
 		try {
 			await this.options.transport.probe(target);
 		} catch (err) {
-			this.setStatus({
-				entry,
-				status: { state: "error", message: messageOf(err) },
-			});
-			return;
+			probeError = err;
 		}
 		// A sync during the probe may have stopped this forward; binding now
 		// would orphan a listener nothing owns.
 		if (this.entries.get(id) !== entry) return;
-		await this.listen({ entry, localPort: target.remotePort });
+		if (!this.explicit.has(id)) {
+			if (probeError) {
+				this.setStatus({
+					entry,
+					status: { state: "error", message: messageOf(probeError) },
+				});
+				return;
+			}
+			await this.listen({ entry, localPort: target.remotePort });
+			return;
+		}
+		// Nothing retries an explicit forward until Stop, so it binds even when
+		// the host is unreachable; the first connection that gets through heals it.
+		await this.listenNearby(entry, target.remotePort);
+		if (
+			probeError &&
+			this.entries.get(id) === entry &&
+			entry.forward.status.state === "active"
+		) {
+			this.setStatus({
+				entry,
+				status: { state: "error", message: messageOf(probeError) },
+			});
+		}
+	}
+
+	private async listenNearby(
+		entry: ForwardEntry,
+		preferred: number,
+	): Promise<void> {
+		const last = Math.min(preferred + NEARBY_PORT_TRIES, 65535);
+		for (let port = preferred; port <= last; port++) {
+			await this.listen({ entry, localPort: port });
+			if (this.entries.get(entry.forward.id) !== entry) return;
+			if (entry.server) return;
+		}
+		await this.listen({ entry, localPort: 0 });
 	}
 
 	private listen({
