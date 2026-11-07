@@ -290,6 +290,10 @@ msgstr "{0, plural, one {Поставлено # запитання} few {Пос�
 msgid "{0, plural, one {Comments go to this agent} other {Comments go to these agents}}"
 msgstr "{0, plural, =1 {Коментарі надходять цьому агентові} one {Коментарі надходять цим агентам} few {Коментарі надходять цим агентам} many {Коментарі надходять цим агентам} other {Коментарі надходять цим агентам}}"
 
+#. placeholder {0}: failed.length
+msgid "{0, plural, one {Could not remove # folder} other {Could not remove # folders}}"
+msgstr "{0, plural, one {Не вдалося видалити # папку} few {Не вдалося видалити # папки} many {Не вдалося видалити # папок} other {Не вдалося видалити # папки}}"
+
 #. placeholder {0}: failures.length
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
@@ -355,6 +359,10 @@ msgstr "{0, plural, one {Призупинено # автоматизацію.} f
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Pauses # automation} other {Pauses # automations}}"
 msgstr "{0, plural, one {Призупиняє # автоматизацію} few {Призупиняє # автоматизації} many {Призупиняє # автоматизацій} other {Призупиняє # автоматизації}}"
+
+#. placeholder {0}: removed.length
+msgid "{0, plural, one {Removed # empty folder} other {Removed # empty folders}}"
+msgstr "{0, plural, one {Видалено # порожню папку} few {Видалено # порожні папки} many {Видалено # порожніх папок} other {Видалено # порожньої папки}}"
 
 #. placeholder {0}: targets.length
 msgid "{0, plural, one {Restored # automation. Paused ones stay paused.} other {Restored # automations. Paused ones stay paused.}}"
@@ -968,6 +976,9 @@ msgstr "{distance} тому"
 msgid "{duration, plural, one {Thought for # second} other {Thought for # seconds}}"
 msgstr "{duration, plural, one {Думав # секунду} few {Думав # секунди} many {Думав # секунд} other {Думав # секунди}}"
 
+msgid "{emptyCount, plural, one {Remove # empty folder} other {Remove # empty folders}}"
+msgstr "{emptyCount, plural, one {Видалити # порожню папку} few {Видалити # порожні папки} many {Видалити # порожніх папок} other {Видалити # порожньої папки}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} у цьому робочому просторі вже опубліковано як сторінку в іншій організації. Перемістіть файл або опублікуйте його з ідентифікатором тієї сторінки."
@@ -1310,6 +1321,18 @@ msgstr "Показано: {shownCount} · {0} · {1} токенів"
 
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {# пропущено} few {# пропущено} many {# пропущено} other {# пропущено}}"
+
+msgid "{skipped, plural, one {Skipped # folder: a host or the cloud has not answered yet.} other {Skipped # folders: a host or the cloud has not answered yet.}}"
+msgstr "{skipped, plural, one {Пропущено # папку: хост або хмара ще не відповіли.} few {Пропущено # папки: хост або хмара ще не відповіли.} many {Пропущено # папок: хост або хмара ще не відповіли.} other {Пропущено # папки: хост або хмара ще не відповіли.}}"
+
+msgid "{skipped, plural, one {Skipped # folder: it changed while it was being removed.} other {Skipped # folders: they changed while they were being removed.}}"
+msgstr "{skipped, plural, one {Пропущено # папку: вона змінилася під час видалення.} few {Пропущено # папки: вони змінилися під час видалення.} many {Пропущено # папок: вони змінилися під час видалення.} other {Пропущено # папки: вони змінилися під час видалення.}}"
+
+msgid "{skipped, plural, one {Skipped # folder: not every host that keeps its settings is known yet.} other {Skipped # folders: not every host that keeps their settings is known yet.}}"
+msgstr "{skipped, plural, one {Пропущено # папку: ще не відомі всі хости, що зберігають її налаштування.} few {Пропущено # папки: ще не відомі всі хости, що зберігають їхні налаштування.} many {Пропущено # папок: ще не відомі всі хости, що зберігають їхні налаштування.} other {Пропущено # папки: ще не відомі всі хости, що зберігають їхні налаштування.}}"
+
+msgid "{skipped, plural, one {Skipped # folder: this window switched organization.} other {Skipped # folders: this window switched organization.}}"
+msgstr "{skipped, plural, one {Пропущено # папку: це вікно перейшло до іншої організації.} few {Пропущено # папки: це вікно перейшло до іншої організації.} many {Пропущено # папок: це вікно перейшло до іншої організації.} other {Пропущено # папки: це вікно перейшло до іншої організації.}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} зірок, і це не межа"
@@ -5819,6 +5842,9 @@ msgstr "Не вдалося видалити {name}"
 
 msgid "Could not remove access"
 msgstr "Не вдалося скасувати доступ"
+
+msgid "Could not remove empty folders"
+msgstr "Не вдалося видалити порожні папки"
 
 msgid "Could not remove repository"
 msgstr "Не вдалося прибрати репозиторій"
@@ -12521,6 +12547,9 @@ msgstr "Завантажень ще немає"
 msgid "No emoji found"
 msgstr "Емодзі не знайдено"
 
+msgid "No empty folders"
+msgstr "Немає порожніх папок"
+
 msgid "No environments available"
 msgstr "Немає доступних середовищ"
 
@@ -12553,6 +12582,9 @@ msgstr "Немає файлів допустимих типів."
 
 msgid "No files match your search"
 msgstr "Немає файлів, що відповідають пошуку"
+
+msgid "No folders removed"
+msgstr "Жодну папку не видалено"
 
 msgid "No fonts found."
 msgstr "Шрифтів не знайдено."
@@ -15876,6 +15908,9 @@ msgstr "Прибрати {repo}? Усі плагіни, синхронізова
 
 msgid "Remove attachment"
 msgstr "Прибрати вкладення"
+
+msgid "Remove empty folders"
+msgstr "Видалити порожні папки"
 
 msgid "Remove filter"
 msgstr "Прибрати фільтр"

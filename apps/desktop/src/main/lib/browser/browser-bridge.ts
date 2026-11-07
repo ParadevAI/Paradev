@@ -14,6 +14,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { desktopNotificationSchema } from "@superset/shared/desktop-notification";
 import { paneLayoutRequestSchema } from "@superset/shared/pane-layout-ops";
+import { sidebarFolderPruneRequestSchema } from "@superset/shared/sidebar-folders";
 import { BrowserWindow, dialog, session } from "electron";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
@@ -25,6 +26,10 @@ import {
 	PaneLayoutRequestError,
 	paneLayoutRequests,
 } from "../pane-layout/pane-layout-requests";
+import {
+	SidebarRequestError,
+	sidebarRequests,
+} from "../sidebar/sidebar-requests";
 import { setBrowserBridgeInfo } from "./browser-bridge-info";
 import {
 	type BrowserOpenRequest,
@@ -405,6 +410,22 @@ export async function startBrowserBridge({
 			.catch((err) =>
 				res
 					.status(err instanceof PaneLayoutRequestError ? err.status : 500)
+					.json({ error: errorMessage(err) }),
+			);
+	});
+
+	app.post("/sidebar/prune-empty-folders", (req, res) => {
+		const parsed = sidebarFolderPruneRequestSchema.safeParse(req.body);
+		if (!parsed.success) {
+			res.status(400).json({ error: z.prettifyError(parsed.error) });
+			return;
+		}
+		sidebarRequests
+			.pruneEmptyFolders(parsed.data)
+			.then((result) => res.json(result))
+			.catch((err) =>
+				res
+					.status(err instanceof SidebarRequestError ? err.status : 500)
 					.json({ error: errorMessage(err) }),
 			);
 	});

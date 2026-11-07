@@ -9,6 +9,7 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
+import { isFromThisWindow } from "renderer/lib/query-freshness";
 import { hostPresence } from "./utils/hostPresence";
 
 type HostRow = RouterOutputs["host"]["roster"][number];
@@ -45,6 +46,8 @@ export function useKnownHosts(): {
 	 * this, never row rendering.
 	 */
 	settled: boolean;
+	/** The roster came from the cloud in this window, not from the persisted cache. */
+	rosterLive: boolean;
 } {
 	const organizationId = useActiveOrganizationId();
 	const relayUrl = useRelayUrl();
@@ -66,7 +69,13 @@ export function useKnownHosts(): {
 			})),
 		[rows, presence],
 	);
-	return { hosts, organizationId, settled: hostsQuery.data !== undefined };
+	return {
+		hosts,
+		organizationId,
+		settled: hostsQuery.data !== undefined,
+		rosterLive:
+			hostsQuery.isSuccess && isFromThisWindow(hostsQuery.dataUpdatedAt),
+	};
 }
 
 function useRelayPresence(

@@ -29,6 +29,7 @@ import { createResourceMetricsRouter } from "./resource-metrics";
 import { createRingtoneRouter } from "./ringtone";
 import { createScreenshotsRouter } from "./screenshots";
 import { createSettingsRouter } from "./settings";
+import { createSidebarRouter } from "./sidebar/sidebar";
 import { createSystemRouter } from "./system";
 import { createTerminalRouter } from "./terminal";
 import { createUiStateRouter } from "./ui-state";
@@ -55,6 +56,7 @@ export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 		filesystem: createFilesystemRouter(),
 		notifications: createNotificationsRouter(getWindow),
 		paneLayout: createPaneLayoutRouter(),
+		sidebar: createSidebarRouter(),
 		permissions: createPermissionsRouter(),
 		plugins: createPluginsRouter(),
 		ports: createPortsRouter(),

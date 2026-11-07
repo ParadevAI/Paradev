@@ -20,7 +20,9 @@ import {
 	type HostWorkspaceItem,
 	type HostWorkspaceRow,
 	isEventBusReopen,
+	isHostWorkspacesListLive,
 	loadHostWorkspacesSnapshot,
+	markHostWorkspacesListRead,
 	mergeHostWorkspaces,
 	normalizeServedWorkspaceRow,
 	saveHostWorkspacesSnapshot,
@@ -63,6 +65,14 @@ export interface HostWorkspacesCacheOps {
 	refetchAll: () => Promise<void>;
 }
 
+/** One host's live-list state, for callers that must not read a silent host as empty. */
+export interface HostWorkspacesRead {
+	machineId: string;
+	isLocal: boolean;
+	/** The host answered `workspace.list` in this window; false for an error, a snapshot, or offline. */
+	live: boolean;
+}
+
 export interface UseHostWorkspacesResult {
 	workspaces: HostWorkspaceItem[];
 	/**
@@ -77,6 +87,10 @@ export interface UseHostWorkspacesResult {
 	 * cover only the local host.
 	 */
 	hostsSettled: boolean;
+	/** Per real host (never a sandbox): whether its list is live. */
+	hostReads: HostWorkspacesRead[];
+	/** The host list came from the cloud in this window, not from the persisted cache. */
+	rosterLive: boolean;
 	cache: HostWorkspacesCacheOps;
 }
 
@@ -124,6 +138,7 @@ export function useHostWorkspacesSource(
 		hosts,
 		organizationId: knownHostsOrgId,
 		settled: knownHostsSettled,
+		rosterLive,
 	} = useKnownHosts();
 	const { targets: sandboxes, isReady: sandboxesReady } = useSandboxAccess();
 
@@ -220,6 +235,7 @@ export function useHostWorkspacesSource(
 					target.machineId,
 					rows,
 				);
+				markHostWorkspacesListRead(queryClient, target);
 				return rows;
 			}),
 		})),
@@ -420,6 +436,24 @@ export function useHostWorkspacesSource(
 					query.isSuccess || query.isError || targets[index]?.hostUrl === null,
 			));
 
+	const hostReads = useMemo<HostWorkspacesRead[]>(
+		() =>
+			targets.flatMap((target, index) =>
+				target.isSandbox
+					? []
+					: [
+							{
+								machineId: target.machineId,
+								isLocal: target.isLocal,
+								live:
+									queries[index]?.isSuccess === true &&
+									isHostWorkspacesListLive(queryClient, target),
+							},
+						],
+			),
+		[targets, queries, queryClient],
+	);
+
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
 		const targetFor = (hostId: string) =>
 			targets.find((target) => target.machineId === hostId);
@@ -473,7 +507,14 @@ export function useHostWorkspacesSource(
 	}, [targets, queryClient]);
 
 	return useMemo(
-		() => ({ workspaces, isReady, hostsSettled: knownHostsSettled, cache }),
-		[workspaces, isReady, knownHostsSettled, cache],
+		() => ({
+			workspaces,
+			isReady,
+			hostsSettled: knownHostsSettled,
+			hostReads,
+			rosterLive,
+			cache,
+		}),
+		[workspaces, isReady, knownHostsSettled, hostReads, rosterLive, cache],
 	);
 }

@@ -67,6 +67,7 @@ import { FileMenuListener } from "./components/FileMenuListener";
 import { GitInitConfirmDialog } from "./components/GitInitConfirmDialog";
 import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
 import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
+import { GlobalSidebarRequests } from "./components/GlobalSidebarRequests";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
 import { TeardownLogsDialog } from "./components/TeardownLogsDialog";
 import { V2NotificationController } from "./components/V2NotificationController";
@@ -344,6 +345,7 @@ function AuthenticatedLayout() {
 								>
 									<DiffThemeSync />
 									<AgentHooks />
+									<GlobalSidebarRequests />
 									<FileMenuListener />
 									<V2NotificationController />
 									<DockBadgeController />
