@@ -3,6 +3,7 @@ import { actors, agents, channelMessages, users } from "@superset/db/schema";
 import { getVercelOidcToken } from "@vercel/functions/oidc";
 import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
 import { env } from "../../env";
+import { posthog } from "../../lib/analytics";
 import {
 	type RouterMessage,
 	routeChannelMessage,
@@ -31,6 +32,17 @@ export const jevChannelRouter: ChannelRouter = async ({
 		messageId: message.id,
 		picked: decision?.devIds ?? "no answer",
 		scores: decision?.scores,
+	});
+	posthog.capture({
+		distinctId: "devs-channel-router",
+		event: "dev_channel_routed",
+		properties: {
+			channelId: channel.id,
+			messageId: message.id,
+			answered: decision !== null,
+			picked: decision?.devIds ?? [],
+			scores: decision?.scores ?? {},
+		},
 	});
 	return decision?.devIds ?? null;
 };
