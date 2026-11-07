@@ -62,6 +62,7 @@ import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { PlanToggle } from "./components/PlanToggle";
 import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
@@ -72,6 +73,7 @@ import {
 import { useDrawerEntry } from "./hooks/useDrawerEntry";
 import { useLinkChips } from "./hooks/useLinkChips";
 import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
+import { usePlanControl } from "./hooks/usePlanControl";
 import { useStatusDialog } from "./hooks/useStatusDialog";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
 
@@ -482,15 +484,20 @@ export const Composer = memo(function Composer({
 		(ctx: ComposerActionContext) => mcpPicker.open.current(ctx),
 		[mcpPicker.open],
 	);
+	const plan = usePlanControl({
+		configOptions,
+		modes,
+		currentModeId,
+		onSetMode,
+		onSetConfigOption,
+	});
 	const appCommands = useAppCommands({
 		inputRef: promptInputRef,
 		availableCommands,
 		...(presetId ? { presetId } : {}),
 		...(configOptions ? { configOptions } : {}),
 		...(onSetConfigOption ? { onSetConfigOption } : {}),
-		...(modes ? { modes } : {}),
-		...(currentModeId ? { currentModeId } : {}),
-		...(onSetMode ? { onSetMode } : {}),
+		plan,
 		...(hasModelPicker ? { openModelPicker } : {}),
 		...(onNewChat ? { onNewChat } : {}),
 		...(onFork ? { onFork } : {}),
@@ -657,14 +664,23 @@ export const Composer = memo(function Composer({
 								<Trans>to {name}</Trans>
 							</span>
 						</span>
-					) : modes && onSetMode ? (
-						<ModePicker
-							currentModeId={currentModeId}
-							iconOnly={footerTier >= 2}
-							modes={modes}
-							onSelect={onSetMode}
-						/>
-					) : undefined
+					) : (
+						<>
+							{modes && onSetMode && (
+								<ModePicker
+									currentModeId={
+										plan?.active
+											? (plan.returnModeId ?? currentModeId)
+											: currentModeId
+									}
+									iconOnly={footerTier >= 2}
+									modes={modes}
+									onSelect={onSetMode}
+								/>
+							)}
+							{plan && <PlanToggle iconOnly={footerTier >= 2} plan={plan} />}
+						</>
+					)
 				}
 				toolbarEnd={
 					target ? undefined : (
