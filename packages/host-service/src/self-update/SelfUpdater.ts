@@ -156,7 +156,12 @@ export class SelfUpdater {
 		this.error = null;
 		void this.run(root, input)
 			.catch((error) => {
+				const stoppedServing = this.phase === "restarting";
 				this.fail(error instanceof Error ? error.message : String(error));
+				if (stoppedServing) {
+					this.unlock();
+					this.deps.exit(1);
+				}
 			})
 			.finally(() => this.unlock());
 		return this.status();
@@ -282,7 +287,11 @@ export class SelfUpdater {
 			(health.pid === undefined || health.pid === successor.pid)
 		) {
 			this.writeManifestPid(successor.pid);
-			await rm(`${root}.bak`, { recursive: true, force: true });
+			await rm(`${root}.bak`, { recursive: true, force: true }).catch((error) =>
+				this.deps.log(
+					`[self-update] could not remove backup: ${String(error)}`,
+				),
+			);
 			this.writeMarker({
 				outcome: "updated",
 				from,
