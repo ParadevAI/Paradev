@@ -35,11 +35,13 @@ A renderer reclaimer installed on every xterm in `createTerminal`:
   first prompt marker belong to shell init and are never reclaimed) and a
   **mark-then-recheck flush** (a mode re-armed before the flush keeps its state).
   Reusable by any surface that observes the stream (a host-side VT scanner later).
-- `renderer/lib/terminal/terminalInputModeReclaimer.ts` — a thin xterm-parser
+- `renderer/lib/terminal/terminalInputModeReclaimer.ts` — the xterm-parser
   adapter: handlers for kitty (`CSI >/=/< u`), mouse (`?1000/1002/1003`), focus
-  (`?1004`), and the `OSC 777;superset-shell-ready` marker feed the core; the
-  marker writes the candidate disarm between two sentinel OSCs, and the core
-  decides at the opening sentinel, in parse order, which of them to apply.
+  (`?1004`), and the `OSC 777;superset-shell-ready` marker feed the core. The
+  marker writes every pending mode's disarm between two sentinel OSCs. When xterm
+  parses the opening sentinel, the adapter asks the core (`collectDisarm`) which
+  modes are still leaked; until the closing sentinel, the adapter's disarm
+  handlers swallow the disarm of any mode re-armed since the marker.
 
 **Marker choice:** reclaim keys on `OSC 777;superset-shell-ready` (emitted only by
 Superset's shell wrappers), **not** the co-emitted FinalTerm `OSC 133;A` — `133;A`

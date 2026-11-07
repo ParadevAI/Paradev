@@ -129,8 +129,8 @@ describe("installInputModeReclaimer (xterm adapter)", () => {
 			return false;
 		});
 		let writeOnMarker = "";
-		// Runs after the reclaimer's handler. The returned promise pauses the parser,
-		// like a parse slice that ends at the marker.
+		// Runs after the reclaimer's handler, so the TUI's arm is queued after the
+		// marker was parsed. The returned promise pauses the parser at the marker.
 		terminal.parser.registerOscHandler(777, () => {
 			if (writeOnMarker) terminal.write(writeOnMarker);
 			return Promise.resolve(false) as unknown as boolean;
