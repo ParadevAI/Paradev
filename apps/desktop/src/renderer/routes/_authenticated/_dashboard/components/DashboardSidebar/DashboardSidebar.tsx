@@ -288,11 +288,14 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	);
 	const trimmedFilterQuery = projectFilterQuery.trim();
 	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
-	// A matching hidden project is a match too, and its row renders above the
-	// empty state. Only the query narrows that row, never the host filter.
+	// A matching hidden project is a match too, so the empty state would
+	// contradict the row above it — but only while that row is on screen, and
+	// only the query narrows it, never the host filter.
 	const hasNoMatches =
 		displayedGroups.length === 0 &&
-		(trimmedFilterQuery === "" || displayedHiddenProjects.length === 0);
+		(trimmedFilterQuery === "" ||
+			workspacesListCollapsed ||
+			displayedHiddenProjects.length === 0);
 	// The sort modes only reorder rows inside a project, so the project list
 	// is still the manual order and stays draggable; only a filter, which
 	// hides projects outright, makes a project drop unsafe to commit.
