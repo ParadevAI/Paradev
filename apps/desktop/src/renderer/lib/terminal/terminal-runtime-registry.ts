@@ -204,6 +204,10 @@ class TerminalRuntimeRegistryImpl {
 					this.serializeExistingRuntime(terminalId, instanceId),
 			});
 			entry.initialBuffer = undefined;
+			entry.transport._lastRequestedDims = {
+				cols: entry.runtime.terminal.cols,
+				rows: entry.runtime.terminal.rows,
+			};
 			// Pair the transport's stream position with what the fresh xterm
 			// actually contains: the persisted anchor belongs to the persisted
 			// snapshot only; sibling-seeded content has no known position.

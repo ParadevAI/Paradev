@@ -218,6 +218,16 @@ export interface TerminalTransport {
 	 * on every attach: a reconnecting socket starts out assumed visible.
 	 */
 	_visible: boolean;
+	/** Dims of the last `sendResize` call, delivered or not. */
+	_lastRequestedDims: { cols: number; rows: number } | null;
+	/**
+	 * The xterm changed size while no socket could tell the host. A shrink
+	 * deletes the rows below the cursor and a grow pulls rows back from
+	 * scrollback, so the screen no longer lines up with where the program
+	 * thinks its cursor is. When the PTY ends up the same size, nothing sends
+	 * SIGWINCH, and the program's next relative redraw lands on the wrong rows.
+	 */
+	_repaintOnAttach: boolean;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -454,6 +464,8 @@ export function createTransport(
 		_resumeListener: null,
 		_disposeFocusListeners: null,
 		_visible: true,
+		_lastRequestedDims: null,
+		_repaintOnAttach: false,
 	};
 }
 
@@ -830,6 +842,7 @@ function attachSocketListeners(
 			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
 			sendResize(transport, terminal.cols, terminal.rows);
+			requestRepaintIfResizedOffline(transport);
 			flushPendingInput(transport);
 			return;
 		}
@@ -1171,10 +1184,28 @@ export function sendResize(
 	cols: number,
 	rows: number,
 ) {
+	const previous = transport._lastRequestedDims;
+	transport._lastRequestedDims = { cols, rows };
 	const socket = transport._socket;
-	if (!socket || socket.readyState !== WebSocket.OPEN) return;
-	if (transport.connectionState !== "open") return;
+	if (
+		!socket ||
+		socket.readyState !== WebSocket.OPEN ||
+		transport.connectionState !== "open"
+	) {
+		const resized =
+			previous !== null && (previous.cols !== cols || previous.rows !== rows);
+		const hasContent =
+			transport._hasReceivedBytes || transport._xtermHadContent;
+		if (resized && hasContent) transport._repaintOnAttach = true;
+		return;
+	}
 	socket.send(JSON.stringify({ type: "resize", cols, rows }));
+}
+
+function requestRepaintIfResizedOffline(transport: TerminalTransport) {
+	if (!transport._repaintOnAttach) return;
+	transport._repaintOnAttach = false;
+	transport._socket?.send(JSON.stringify({ type: "repaint" }));
 }
 
 export function sendDispose(transport: TerminalTransport) {
