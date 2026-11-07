@@ -93,7 +93,11 @@ export function PluginDetail({
 
 			<div className="flex flex-col gap-4">
 				<div className="w-fit rounded-xl border border-border/60 p-2">
-					<PluginIcon pluginName={plugin.name} className="size-12" />
+					<PluginIcon
+						pluginName={plugin.name}
+						icon={plugin.icon}
+						className="size-12"
+					/>
 				</div>
 
 				<div>
@@ -189,7 +193,11 @@ export function PluginDetail({
 								slug={plugin.connector}
 								description={plugin.description}
 								icon={
-									<PluginIcon pluginName={plugin.name} className="size-7" />
+									<PluginIcon
+										pluginName={plugin.name}
+										icon={plugin.icon}
+										className="size-7"
+									/>
 								}
 							/>
 						</div>
@@ -284,7 +292,13 @@ export function PluginDetail({
 				connectOnly
 				plugin={plugin.name}
 				onConnected={onConnected}
-				icon={<PluginIcon pluginName={plugin.name} className="size-12" />}
+				icon={
+					<PluginIcon
+						pluginName={plugin.name}
+						icon={plugin.icon}
+						className="size-12"
+					/>
+				}
 				author={plugin.author}
 				onOpenChange={(open) => !open && setIsConnectOpen(false)}
 			/>

@@ -15,6 +15,7 @@ type CatalogRow = RouterOutputs["plugins"]["list"][number];
 export type PluginSkill = CatalogRow["skills"][number];
 
 export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
+	icon: string | null;
 	connector: string | null;
 	marketplace: string;
 	installed: boolean;
@@ -41,6 +42,7 @@ function toCatalogPlugin(
 			displayName: plugin.displayName,
 			category: plugin.category as PluginCategory,
 		},
+		icon: plugin.icon ?? null,
 		mcpServers: plugin.mcpUrl
 			? { [plugin.name]: { type: "http" as const, url: plugin.mcpUrl } }
 			: {},
