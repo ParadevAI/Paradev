@@ -37,7 +37,7 @@ function result(): unknown {
 }
 
 function createHarness(
-	options: Pick<ClaudeAdapterOptions, "launch"> = {},
+	options: Pick<ClaudeAdapterOptions, "launch" | "resolveAttachment"> = {},
 ): Harness {
 	const pending: unknown[] = [];
 	let notify: (() => void) | null = null;
@@ -210,6 +210,36 @@ describe("ClaudeAdapter", () => {
 			turn: { status: "interrupted" },
 		});
 		expect(harness.aborted()).toBe(false);
+		expect(harness.interrupts).toBe(1);
+	});
+
+	test("a Stop while an attachment resolves interrupts the turn it starts", async () => {
+		let finishRead: (() => void) | undefined;
+		const harness = createHarness({
+			resolveAttachment: () =>
+				new Promise((resolve) => {
+					finishRead = () => resolve(null);
+				}),
+		});
+
+		harness.adapter.prompt([
+			{
+				type: "attachment",
+				attachmentId: "a",
+				name: "a.png",
+				mimeType: "image/png",
+			},
+		]);
+		harness.adapter.cancelTurn();
+		finishRead?.();
+		await Promise.resolve();
+		await Promise.resolve();
+		await Promise.resolve();
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
 		expect(harness.interrupts).toBe(1);
 	});
 

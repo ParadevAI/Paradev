@@ -217,7 +217,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private pump: Promise<void> | null = null;
 	private resolvingPrompt: Promise<void> | null = null;
 	private unansweredPrompts = 0;
-	private cancelOnStart = false;
+	private cancelRequested = false;
 	private disposed = false;
 
 	constructor(private readonly options: ClaudeAdapterOptions) {}
@@ -287,10 +287,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 
 		this.session = stream;
 		this.pump = this.run(stream, translator);
-		if (this.cancelOnStart) {
-			this.cancelOnStart = false;
-			this.cancelTurn();
-		}
+		this.honourHeldCancel();
 	}
 
 	prompt(content: UserContent[]): void {
@@ -350,12 +347,22 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private send(message: SDKUserMessage): void {
 		this.unansweredPrompts += 1;
 		this.prompts.push(message);
+		this.honourHeldCancel();
+	}
+
+	private honourHeldCancel(): void {
+		if (!this.cancelRequested) return;
+		this.cancelRequested = false;
+		this.cancelTurn();
 	}
 
 	cancelTurn(): void {
-		if (this.unansweredPrompts === 0) return;
+		if (this.unansweredPrompts === 0) {
+			if (this.resolvingPrompt) this.cancelRequested = true;
+			return;
+		}
 		if (!this.session) {
-			this.cancelOnStart = true;
+			this.cancelRequested = true;
 			return;
 		}
 		const interrupt = this.session.interrupt;
