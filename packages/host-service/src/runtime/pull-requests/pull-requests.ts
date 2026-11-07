@@ -61,6 +61,8 @@ import {
 
 // gh's timeout runs from spawn, so an unbounded burst times out healthy calls.
 const MAX_CONCURRENT_GITHUB_LOOKUPS = 8;
+// Octokit has no request timeout; this matches gh's so a hung fallback frees its slot.
+const OCTOKIT_TIMEOUT_MS = 10_000;
 // Long-cadence sweep that catches anything `GitWatcher` might miss
 // (overflow, fs.watch errors, transient watcher failures). Steady-state
 // branch syncs are event-driven via `GitWatcher.onChanged`; this is a
@@ -153,6 +155,7 @@ export interface PullRequestRuntimeManagerOptions {
 	readWorkspaceRefs?: (worktreePath: string) => Promise<WorkspaceRefsSnapshot>;
 	/** Test seam for the missing-worktree gate. Defaults to `existsSync`. */
 	worktreeExists?: (worktreePath: string) => boolean;
+	octokitTimeoutMs?: number;
 }
 
 interface NormalizedRepoIdentity {
@@ -180,6 +183,33 @@ export interface CheckoutPullRequestMetadata {
 	headRepositoryOwner?: string | null;
 	headRepositoryName?: string | null;
 	isCrossRepository: boolean;
+}
+
+// ponytail: the request is not aborted, only abandoned. The ETIMEDOUT trips the
+// unreachable hold, so no new requests start; thread an AbortSignal into the
+// github-query helpers if abandoned sockets ever matter.
+async function rejectAfter<T>(
+	work: Promise<T>,
+	ms: number,
+	what: string,
+): Promise<T> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const deadline = new Promise<never>((_, reject) => {
+		timer = setTimeout(
+			() =>
+				reject(
+					Object.assign(new Error(`${what} timed out after ${ms}ms`), {
+						code: "ETIMEDOUT",
+					}),
+				),
+			ms,
+		);
+	});
+	try {
+		return await Promise.race([work, deadline]);
+	} finally {
+		clearTimeout(timer);
+	}
 }
 
 function mapCheckoutPullRequestState(
@@ -238,6 +268,7 @@ export class PullRequestRuntimeManager {
 	// appear once the limit resets" is true within seconds rather than at
 	// the next 5-minute sweep.
 	private holdRecoveryTimer: ReturnType<typeof setTimeout> | null = null;
+	private readonly octokitTimeoutMs: number;
 	private githubLookupsRunning = 0;
 	private readonly githubLookupQueue: (() => void)[] = [];
 	private readonly workspaceSyncState = new Map<
@@ -297,6 +328,7 @@ export class PullRequestRuntimeManager {
 			options.readWorkspaceRefs ??
 			(async (worktreePath) => readWorkspaceRefs(await this.git(worktreePath)));
 		this.worktreeExists = options.worktreeExists ?? existsSync;
+		this.octokitTimeoutMs = options.octokitTimeoutMs ?? OCTOKIT_TIMEOUT_MS;
 	}
 
 	start() {
@@ -1310,7 +1342,11 @@ export class PullRequestRuntimeManager {
 				);
 			}
 			try {
-				const result = await viaOctokit();
+				const result = await rejectAfter(
+					viaOctokit(),
+					this.octokitTimeoutMs,
+					`Octokit ${what}`,
+				);
 				this.githubGate.recordSuccess();
 				return result;
 			} catch (octokitError) {
