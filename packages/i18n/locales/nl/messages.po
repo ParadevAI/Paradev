@@ -6132,6 +6132,9 @@ msgstr "Kan bewerkingen niet opslaan"
 msgid "Couldn't save the change"
 msgstr "Kon de wijziging niet opslaan"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Kan de standaard voor nieuwe chats niet opslaan"
+
 msgid "Couldn't save the Dev"
 msgstr "Kan de Dev niet opslaan"
 
@@ -21196,6 +21199,9 @@ msgstr "Gebruik Claude Code, Codex of welke coding agent dan ook. Kies per taak 
 
 msgid "Use for new agents"
 msgstr "Gebruiken voor nieuwe agents"
+
+msgid "Use for new chats"
+msgstr "Gebruiken voor nieuwe chats"
 
 msgid "Use global default"
 msgstr "Globale standaard gebruiken"

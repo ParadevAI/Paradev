@@ -6132,6 +6132,9 @@ msgstr "无法保存编辑"
 msgid "Couldn't save the change"
 msgstr "无法保存更改"
 
+msgid "Couldn't save the default for new chats"
+msgstr "无法保存新聊天的默认设置"
+
 msgid "Couldn't save the Dev"
 msgstr "无法保存 Dev"
 
@@ -21196,6 +21199,9 @@ msgstr "使用Claude Code、Codex或任何编码智能体。按任务选择，�
 
 msgid "Use for new agents"
 msgstr "用于新智能体"
+
+msgid "Use for new chats"
+msgstr "用于新聊天"
 
 msgid "Use global default"
 msgstr "使用全局默认值"

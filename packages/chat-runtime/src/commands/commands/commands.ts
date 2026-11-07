@@ -26,6 +26,7 @@ import type {
 	Cursor,
 	DiscoverSessionsResult,
 	DurableEvent,
+	GetDefaultSelectionsInput,
 	GetItemsInput,
 	GetSessionInput,
 	GetTurnChangesInput,
@@ -35,6 +36,7 @@ import type {
 	RespondToUsageLimitInput,
 	ResumeQueueInput,
 	SetConfigOptionInput,
+	SetDefaultSelectionsInput,
 	SetModeInput,
 	SteerSubagentInput,
 	StopBackgroundTaskInput,
@@ -48,6 +50,7 @@ import {
 	createSessionInputSchema,
 	discoverSessionsInputSchema,
 	forkSessionInputSchema,
+	getDefaultSelectionsInputSchema,
 	getItemBodiesInputSchema,
 	getItemsInputSchema,
 	getOutlineInputSchema,
@@ -61,6 +64,7 @@ import {
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
+	setDefaultSelectionsInputSchema,
 	setModeInputSchema,
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
@@ -81,7 +85,7 @@ import type { ChatJournal } from "../../journal";
 import type { ChatSessionStore } from "../../projection";
 import type { ChatResetReason, PageResult } from "../../replay";
 import { latestSeq, readPage, readSince } from "../../replay";
-import type { SelectionMemory } from "../../selections";
+import type { DefaultSelections, SelectionMemory } from "../../selections";
 import type {
 	LiveSessionRegistry,
 	PromptResult,
@@ -253,6 +257,8 @@ export type ChatCommands = {
 	respondToApproval(input: RespondToApprovalInput): void;
 	setMode(input: SetModeInput): void;
 	setConfigOption(input: SetConfigOptionInput): void | Promise<void>;
+	getDefaultSelections(input: GetDefaultSelectionsInput): DefaultSelections;
+	setDefaultSelections(input: SetDefaultSelectionsInput): DefaultSelections;
 	closeSession(input: CloseSessionInput): Promise<void>;
 	closeScope(scopeId: string): Promise<void>;
 	forkSession(
@@ -483,8 +489,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						: null;
 				const { modeId: rememberedModeId, ...remembered } =
 					options.selections?.get(parsed.harness) ?? {};
+				const defaults = options.selections?.defaults(parsed.harness);
 				const selections: ChatSelections = {
-					...(parsed.resume ? {} : remembered),
+					...(parsed.resume ? {} : { ...remembered, ...defaults }),
 					...(parsed.interactive && !continued && rememberedModeId
 						? { modeId: rememberedModeId }
 						: {}),
@@ -699,6 +706,21 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					}
 				});
 			});
+		},
+
+		getDefaultSelections(input) {
+			const { harness } = getDefaultSelectionsInputSchema.parse(input);
+			return options.selections?.defaults(harness) ?? {};
+		},
+
+		setDefaultSelections(input) {
+			const { harness, ...defaults } =
+				setDefaultSelectionsInputSchema.parse(input);
+			if (!options.selections) {
+				throw new Error("this host cannot keep chat defaults");
+			}
+			options.selections.setDefaults(harness, defaults);
+			return options.selections.defaults(harness);
 		},
 
 		/**

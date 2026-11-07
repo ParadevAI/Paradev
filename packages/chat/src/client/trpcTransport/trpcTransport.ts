@@ -15,6 +15,7 @@ type Mutation =
 	| "respondToApproval"
 	| "setMode"
 	| "setConfigOption"
+	| "setDefaultSelections"
 	| "closeSession"
 	| "forkSession"
 	| "rewindSession"
@@ -28,7 +29,8 @@ type Query =
 	| "getItems"
 	| "getOutline"
 	| "getItemBodies"
-	| "getTurnChanges";
+	| "getTurnChanges"
+	| "getDefaultSelections";
 
 /** A tRPC client for the chat router, by shape rather than by router type. */
 export type ChatTrpcClient = {
@@ -54,6 +56,7 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		respondToApproval: (input) => client.respondToApproval.mutate(input),
 		setMode: (input) => client.setMode.mutate(input),
 		setConfigOption: (input) => client.setConfigOption.mutate(input),
+		setDefaultSelections: (input) => client.setDefaultSelections.mutate(input),
 		closeSession: (input) => client.closeSession.mutate(input),
 		forkSession: (input) => client.forkSession.mutate(input),
 		rewindSession: (input) => client.rewindSession.mutate(input),
@@ -66,5 +69,6 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		getOutline: (input) => client.getOutline.query(input),
 		getItemBodies: (input) => client.getItemBodies.query(input),
 		getTurnChanges: (input) => client.getTurnChanges.query(input),
+		getDefaultSelections: (input) => client.getDefaultSelections.query(input),
 	};
 }

@@ -6132,6 +6132,9 @@ msgstr "Nie udało się zapisać zmian"
 msgid "Couldn't save the change"
 msgstr "Nie udało się zapisać zmiany"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Nie udało się zapisać domyślnych ustawień dla nowych czatów"
+
 msgid "Couldn't save the Dev"
 msgstr "Nie udało się zapisać Deva"
 
@@ -21196,6 +21199,9 @@ msgstr "Używaj Claude Code, Codex albo dowolnego agenta kodującego. Wybieraj p
 
 msgid "Use for new agents"
 msgstr "Używaj dla nowych agentów"
+
+msgid "Use for new chats"
+msgstr "Używaj dla nowych czatów"
 
 msgid "Use global default"
 msgstr "Użyj domyślnego globalnego"

@@ -6132,6 +6132,9 @@ msgstr "Не удалось сохранить правки"
 msgid "Couldn't save the change"
 msgstr "Не удалось сохранить изменение"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Не удалось сохранить настройки по умолчанию для новых чатов"
+
 msgid "Couldn't save the Dev"
 msgstr "Не удалось сохранить Dev"
 
@@ -21196,6 +21199,9 @@ msgstr "Используйте Claude Code, Codex или любого кодов
 
 msgid "Use for new agents"
 msgstr "Использовать для новых агентов"
+
+msgid "Use for new chats"
+msgstr "Использовать для новых чатов"
 
 msgid "Use global default"
 msgstr "Использовать общий по умолчанию"
