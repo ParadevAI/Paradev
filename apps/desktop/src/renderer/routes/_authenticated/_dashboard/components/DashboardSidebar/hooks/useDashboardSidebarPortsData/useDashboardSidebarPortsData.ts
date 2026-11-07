@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import type { PortChangedPayload } from "@superset/workspace-client";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
@@ -43,7 +43,11 @@ export function useDashboardSidebarPortsData(enabled = true): {
 	const { hosts, organizationId: knownHostsOrgId } = useKnownHosts();
 
 	const { targets: sandboxes } = useSandboxAccess();
-	const { workspaceId: openWorkspaceId } = useParams({ strict: false });
+	const openMatch = useMatchRoute()({
+		to: "/v2-workspace/$workspaceId",
+		fuzzy: true,
+	});
+	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;
 	const openSandbox = useMemo(
 		() =>
 			sandboxes.find((sandbox) => sandbox.workspaceId === openWorkspaceId) ??

@@ -24,9 +24,22 @@ export async function listForwards(
 	api: ApiClient,
 	workspaceId: string,
 ): Promise<ForwardRow[]> {
-	const { forwards } = await api.cloudWorkspace.forwards.query({
-		id: workspaceId,
-	});
+	let forwards: Awaited<
+		ReturnType<ApiClient["cloudWorkspace"]["forwards"]["query"]>
+	>["forwards"];
+	try {
+		({ forwards } = await api.cloudWorkspace.forwards.query({
+			id: workspaceId,
+		}));
+	} catch (error) {
+		if ((error as { data?: { code?: string } }).data?.code === "NOT_FOUND") {
+			throw new CLIError(
+				`No cloud workspace ${workspaceId} that you can open`,
+				"Forwarded ports exist for cloud workspaces only; pass --workspace <cloud workspace id>",
+			);
+		}
+		throw error;
+	}
 	return forwards.map((forward) => ({
 		port: forward.port,
 		localUrl: `http://localhost:${forward.localPort}`,

@@ -98,7 +98,7 @@ export function PortRow({ port, onNavigate }: PortRowProps) {
 					<PortForwardBusyActions forward={forward} />
 				</div>
 			)}
-			{port.hostType === "cloud" && (
+			{port.hostType === "cloud" && (!forward || forward.explicit) && (
 				<div className="flex px-2 pb-1.5">
 					<CloudPortForwardActions port={port} forward={forward} />
 				</div>

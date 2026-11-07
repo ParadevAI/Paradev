@@ -1,3 +1,4 @@
+import { MAX_WORKSPACE_FORWARDS } from "@superset/shared/realtime";
 import type { PortForward } from "shared/types";
 import { WebSocket } from "ws";
 
@@ -66,7 +67,9 @@ export class ForwardReporter {
 			const url = this.reportUrls.get(workspaceId) as string;
 			const payload = JSON.stringify({
 				type: "forwards",
-				forwards: list.sort((a, b) => a.port - b.port),
+				forwards: list
+					.sort((a, b) => a.port - b.port)
+					.slice(0, MAX_WORKSPACE_FORWARDS),
 			});
 			const channel =
 				this.channels.get(workspaceId) ?? this.open(workspaceId, url);
@@ -106,16 +109,28 @@ export class ForwardReporter {
 			return;
 		}
 		const address = new URL(channel.url);
-		address.protocol = address.protocol === "https:" ? "wss:" : "ws:";
+		if (address.protocol === "https:") address.protocol = "wss:";
+		if (address.protocol === "http:") address.protocol = "ws:";
 		const socket = new WebSocket(address.toString(), {
 			headers: { authorization: `Bearer ${token}` },
 		});
 		channel.socket = socket;
 		channel.sent = null;
 		channel.openedAt = null;
+		let heardAt = Date.now();
+		socket.on("message", (data) => {
+			if (String(data) === "pong") heardAt = Date.now();
+		});
 		socket.on("open", () => {
 			channel.openedAt = Date.now();
+			heardAt = Date.now();
 			channel.pingTimer = setInterval(() => {
+				// A half-open socket never closes by itself; the hub would drop
+				// this report while it looks connected from here.
+				if (Date.now() - heardAt > this.timing.pingMs * 2) {
+					socket.terminate();
+					return;
+				}
 				if (socket.readyState === WebSocket.OPEN) socket.send("ping");
 			}, this.timing.pingMs);
 			this.flush(channel);

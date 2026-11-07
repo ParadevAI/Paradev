@@ -56,29 +56,42 @@ export class PortForwardManager extends EventEmitter<{
 	}
 
 	list(): PortForward[] {
-		return Array.from(this.entries.values(), (e) => {
-			const address = e.server?.address();
-			return {
-				...e.forward,
-				explicit: this.explicit.has(e.forward.id),
-				localPort: address && typeof address === "object" ? address.port : null,
-			};
-		});
+		return Array.from(this.entries.values(), (e) => this.snapshot(e));
 	}
 
-	forward(target: ForwardTarget): Promise<PortForward[]> {
-		this.explicit.set(portForwardId(target), target);
-		return this.reconcile();
+	private snapshot(entry: ForwardEntry): PortForward {
+		const address = entry.server?.address();
+		return {
+			...entry.forward,
+			explicit: this.explicit.has(entry.forward.id),
+			localPort: address && typeof address === "object" ? address.port : null,
+		};
 	}
 
-	stopExplicit(): Promise<PortForward[]> {
+	async forward(target: ForwardTarget): Promise<PortForward[]> {
+		const id = portForwardId(target);
+		this.explicit.set(id, target);
+		// A window's unbound entry (busy or unreachable) restarts so it gets
+		// the explicit behaviour: a nearby free port, bound for recovery.
+		const existing = this.entries.get(id);
+		if (existing && !existing.server) this.stop(id);
+		const forwards = await this.reconcile();
+		this.emitChange();
+		return forwards;
+	}
+
+	async stopExplicit(): Promise<PortForward[]> {
 		this.explicit.clear();
-		return this.reconcile();
+		const forwards = await this.reconcile();
+		this.emitChange();
+		return forwards;
 	}
 
-	stopForward(id: string): Promise<PortForward[]> {
+	async stopForward(id: string): Promise<PortForward[]> {
 		this.explicit.delete(id);
-		return this.reconcile();
+		const forwards = await this.reconcile();
+		this.emitChange();
+		return forwards;
 	}
 
 	async sync({
@@ -130,13 +143,13 @@ export class PortForwardManager extends EventEmitter<{
 	async retryEphemeral(id: string): Promise<PortForward | null> {
 		const entry = this.entries.get(id);
 		if (!entry) return null;
-		if (entry.forward.status.state !== "busy") return { ...entry.forward };
+		if (entry.forward.status.state !== "busy") return this.snapshot(entry);
 		await this.listen({ entry, localPort: 0 });
 		if (this.entries.get(id) !== entry) {
 			this.closeServer(entry);
 			return null;
 		}
-		return { ...entry.forward };
+		return this.snapshot(entry);
 	}
 
 	async killLocalOwner(

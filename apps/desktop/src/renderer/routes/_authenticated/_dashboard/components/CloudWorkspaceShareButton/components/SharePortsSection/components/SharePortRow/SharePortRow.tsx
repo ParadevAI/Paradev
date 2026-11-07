@@ -3,7 +3,7 @@ import { cn } from "@superset/ui/utils";
 import { LuExternalLink } from "react-icons/lu";
 import { CloudPortForwardActions } from "renderer/routes/_authenticated/_dashboard/components/CloudPortForwardActions";
 import type { DashboardSidebarPort } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortsData";
-import { usePortOpenActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/usePortOpenActions";
+import { usePortOpener } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/usePortOpenActions";
 import { usePortForward } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { PortForwardBusyActions } from "renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
@@ -15,7 +15,7 @@ interface SharePortRowProps {
 export function SharePortRow({ port }: SharePortRowProps) {
 	const { t } = useLingui();
 	const forward = usePortForward(port);
-	const { openExternal } = usePortOpenActions(port);
+	const { openExternal } = usePortOpener();
 	const status = forward?.status;
 	const localPort = forward?.localPort ?? null;
 	const name = port.label ?? port.processName;
@@ -41,7 +41,7 @@ export function SharePortRow({ port }: SharePortRowProps) {
 				{localPort !== null && (
 					<button
 						type="button"
-						onClick={openExternal}
+						onClick={() => openExternal(`http://localhost:${localPort}`)}
 						aria-label={t({ message: `Open localhost:${localPort}` })}
 						className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 					>

@@ -566,6 +566,10 @@ export const cloudWorkspaceRouter = {
 	forwards: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
+			// A box reads its own workspace's forwards, not every one its creator can open.
+			if (ctx.sandboxCaller && ctx.sandboxCaller.workspaceId !== input.id) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Not found" });
+			}
 			const row = await loadVisibleWorkspace(ctx, input.id);
 			try {
 				return {

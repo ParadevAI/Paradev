@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { useExplicitForwards } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
+import { portForwardId } from "shared/types";
 import { SharePortRow } from "./components/SharePortRow";
 import { ShareStaleForwardRow } from "./components/ShareStaleForwardRow";
 
@@ -10,9 +11,17 @@ interface SharePortsSectionProps {
 
 export function SharePortsSection({ workspaceId }: SharePortsSectionProps) {
 	const ports = useDashboardSidebarWorkspacePorts(workspaceId)?.ports ?? [];
-	const detected = new Set(ports.map((port) => port.port));
+	const detected = new Set(
+		ports.map((port) =>
+			portForwardId({
+				hostUrl: port.hostUrl,
+				workspaceId: port.workspaceId,
+				remotePort: port.port,
+			}),
+		),
+	);
 	const stale = useExplicitForwards(workspaceId).filter(
-		(forward) => !detected.has(forward.target.remotePort),
+		(forward) => !detected.has(forward.id),
 	);
 
 	return (

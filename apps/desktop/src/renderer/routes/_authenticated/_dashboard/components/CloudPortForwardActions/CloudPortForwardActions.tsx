@@ -1,8 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import { realtimeWorkspaceForwardsPath } from "@superset/shared/realtime";
 import { toast } from "@superset/ui/sonner";
-import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import type { DashboardSidebarPort } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortsData";
@@ -63,12 +61,7 @@ export function CloudPortForwardActions({
 					hostUrl: port.hostUrl,
 					workspaceId: port.workspaceId,
 					remotePort: port.port,
-					reportUrl: organizationId
-						? new URL(
-								realtimeWorkspaceForwardsPath(organizationId, port.workspaceId),
-								env.REALTIME_URL,
-							).toString()
-						: undefined,
+					organizationId: organizationId ?? undefined,
 				});
 			}}
 			className={BUTTON_CLASS}

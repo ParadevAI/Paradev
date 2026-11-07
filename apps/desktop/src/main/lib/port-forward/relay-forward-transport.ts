@@ -4,6 +4,8 @@ import { MuxSession } from "./mux-session";
 import type { ForwardTransport } from "./types";
 
 export interface RelayForwardTransportOptions {
+	/** Dev only: the local gate answers on `*.localhost`, which Node does not resolve. */
+	resolveLocalhostSubdomains?: boolean;
 	getToken: (target: ForwardTarget) => string | null;
 }
 
@@ -45,11 +47,11 @@ export class RelayForwardTransport implements ForwardTransport {
 		if (url.protocol === "https:") url.protocol = "wss:";
 		url.searchParams.set("workspaceId", target.workspaceId);
 		url.searchParams.set("token", token);
-		// A dev gate answers on `*.localhost`, which Chromium resolves to
-		// loopback and Node's resolver does not.
-		const headers = url.hostname.endsWith(".localhost")
-			? { host: url.host }
-			: undefined;
+		const headers =
+			this.options.resolveLocalhostSubdomains &&
+			url.hostname.endsWith(".localhost")
+				? { host: url.host }
+				: undefined;
 		if (headers) url.hostname = "127.0.0.1";
 
 		const session = new MuxSession(url.toString(), {

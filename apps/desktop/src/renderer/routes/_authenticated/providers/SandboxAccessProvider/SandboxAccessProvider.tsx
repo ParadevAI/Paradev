@@ -73,7 +73,7 @@ async function requestAccess(
 	});
 	setHostServiceSecret(granted.url, granted.token);
 	setHostServiceSecret(granted.desktop.url, granted.desktop.token);
-	electronTrpcClient.portForwards.setHostToken
+	await electronTrpcClient.portForwards.setHostToken
 		.mutate({ hostUrl: granted.url, token: granted.token })
 		.catch((err) => {
 			console.warn("[sandbox] failed to hand gate ticket to main:", err);

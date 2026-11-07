@@ -1,3 +1,5 @@
+import { realtimeWorkspaceForwardsPath } from "@superset/shared/realtime";
+import { env } from "main/env.main";
 import { canBindPort } from "../host-service-utils";
 import { portManager } from "../terminal/port-manager";
 import { ForwardReporter } from "./forward-reporter";
@@ -25,6 +27,7 @@ export function setHostToken(hostUrl: string, token: string | null): void {
 
 export const portForwardManager = new PortForwardManager({
 	transport: new RelayForwardTransport({
+		resolveLocalhostSubdomains: env.NODE_ENV === "development",
 		getToken: (target) =>
 			gateHosts.has(target.hostUrl)
 				? (hostTokens.get(target.hostUrl) ?? null)
@@ -47,4 +50,18 @@ export function endForwardingSession(): void {
 	void portForwardManager.stopExplicit();
 	hostTokens.clear();
 	gateHosts.clear();
+}
+
+/** Built here, not taken from the renderer: this address receives the user's token. */
+export function setForwardReportOrganization(
+	workspaceId: string,
+	organizationId: string,
+): void {
+	forwardReporter.setReportUrl(
+		workspaceId,
+		new URL(
+			realtimeWorkspaceForwardsPath(organizationId, workspaceId),
+			env.REALTIME_URL,
+		).toString(),
+	);
 }

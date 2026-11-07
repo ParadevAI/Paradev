@@ -1,7 +1,7 @@
 import { observable } from "@trpc/server/observable";
 import {
-	forwardReporter,
 	portForwardManager,
+	setForwardReportOrganization,
 	setHostToken,
 	setRelayToken,
 } from "main/lib/port-forward";
@@ -28,14 +28,14 @@ export const createPortForwardsRouter = () => {
 				z.object({
 					hostUrl: z.string(),
 					workspaceId: z.string(),
-					remotePort: z.number().int().positive(),
-					reportUrl: z.string().url().optional(),
+					remotePort: z.number().int().min(1).max(65535),
+					organizationId: z.string().optional(),
 				}),
 			)
 			.mutation(({ input }): Promise<PortForward[]> => {
-				const { reportUrl, ...target } = input;
-				if (reportUrl) {
-					forwardReporter.setReportUrl(target.workspaceId, reportUrl);
+				const { organizationId, ...target } = input;
+				if (organizationId) {
+					setForwardReportOrganization(target.workspaceId, organizationId);
 				}
 				return portForwardManager.forward(target);
 			}),

@@ -74,6 +74,15 @@ test("a new report keeps since for unchanged ports and drops stopped ones", () =
 	expect(forwards.list(new Set(["c1"]))).toEqual([]);
 });
 
+test("a port that moves in the same millisecond is still recorded", () => {
+	const forwards = forwardsIn(new Database(":memory:"));
+	forwards.report("c1", ana, [{ port: 5173, localPort: 5173 }], 5);
+	forwards.report("c1", ana, [{ port: 5173, localPort: 5174 }], 5);
+	expect(forwards.list(new Set(["c1"])).map((f) => f.localPort)).toEqual([
+		5174,
+	]);
+});
+
 test("only well-formed reports are accepted", () => {
 	expect(
 		parseForwardsReport(

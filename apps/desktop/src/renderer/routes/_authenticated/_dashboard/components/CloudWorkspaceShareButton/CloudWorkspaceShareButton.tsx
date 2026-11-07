@@ -174,8 +174,9 @@ export function CloudWorkspaceShareButton({
 							onChange: async () => {},
 						},
 					}}
-				/>
-				{showPorts && <SharePortsSection workspaceId={workspaceId} />}
+				>
+					{showPorts && <SharePortsSection workspaceId={workspaceId} />}
+				</ShareAccess>
 			</PopoverContent>
 		</Popover>
 	);

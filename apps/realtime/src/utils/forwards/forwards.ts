@@ -74,9 +74,12 @@ export class WorkspaceForwards {
 		});
 		const unchanged =
 			previous.size === forwards.length &&
-			forwards.every(
-				(entry) => previous.get(entry.port)?.since === entry.since,
-			);
+			forwards.every((entry) => {
+				const kept = previous.get(entry.port);
+				return (
+					kept?.localPort === entry.localPort && kept.since === entry.since
+				);
+			});
 		if (unchanged) return;
 		this.sql.exec(
 			`INSERT INTO forwards (connection_id, user_id, name, image, forwards)
