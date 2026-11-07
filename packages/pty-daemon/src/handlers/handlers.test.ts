@@ -209,6 +209,24 @@ describe("handlers", () => {
 		expect(states[0]?.rows).toBe(30);
 	});
 
+	test("resize after close leaves the disposed pty alone", () => {
+		const ctx = makeCtx();
+		handleOpen(ctx, {
+			type: "open",
+			id: "s0",
+			meta: { shell: "/bin/sh", argv: [], cols: 80, rows: 24 },
+		});
+		handleClose(ctx, { type: "close", id: "s0" });
+		const result = handleResize(ctx, {
+			type: "resize",
+			id: "s0",
+			cols: 100,
+			rows: 30,
+		});
+		expect(result).toMatchObject({ type: "error", code: "EEXITED" });
+		expect(states[0]?.cols).toBe(80);
+	});
+
 	test("close kills and disposes the pty before replying closed", () => {
 		const ctx = makeCtx();
 		handleOpen(ctx, {
