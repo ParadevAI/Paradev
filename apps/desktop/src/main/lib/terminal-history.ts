@@ -279,7 +279,7 @@ export class HistoryWriter {
 	}
 
 	private flushPendingWrites(): void {
-		if (this.closed || this.streamErrored || !this.stream) {
+		if (this.streamErrored || !this.stream) {
 			return;
 		}
 		if (this.isBackpressured) {
