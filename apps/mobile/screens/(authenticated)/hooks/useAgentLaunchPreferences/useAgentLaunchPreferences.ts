@@ -60,6 +60,20 @@ export function resolveAgentLaunchPreferences(
 	return { models, efforts, model, effort };
 }
 
+/** The preferences for the row a send resolved, read at send time: the row can differ from the one the render saw. */
+export function agentLaunchPreferencesFor(
+	config: { presetId: string; command?: string } | undefined,
+	fallbackPresetId: string,
+): AgentLaunchPreferences {
+	const { modelByAgent, effortByAgent } =
+		useNewSessionPreferencesStore.getState();
+	return resolveAgentLaunchPreferences(
+		config ? agentLaunchPresetId(config) : fallbackPresetId,
+		modelByAgent,
+		effortByAgent,
+	);
+}
+
 /** "Opus · High" — what a launch adds to the agent's default; null for nothing. */
 export function describeAgentLaunchPreferences({
 	model,

@@ -18,6 +18,7 @@ import { useCloudCreateSelection } from "@/screens/(authenticated)/(home)/hooks/
 import { useIsCloudAgentEnabled } from "@/screens/(authenticated)/(home)/hooks/useIsCloudAgentEnabled";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
 import {
+	agentLaunchPreferencesFor,
 	agentLaunchPresetId,
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
@@ -280,6 +281,7 @@ export function NewChatWidget({
 			agentId,
 			pickedConfigId,
 		);
+		const hostLaunch = agentLaunchPreferencesFor(hostAgent, agentId);
 		await createTerminalWorkspace
 			.mutateAsync({
 				target: selectedTarget,
@@ -288,8 +290,8 @@ export function NewChatWidget({
 				agentId,
 				agentConfigId: hostAgent?.id,
 				agentLabel: hostAgent?.label ?? "Claude",
-				model,
-				effort,
+				model: hostLaunch.model?.id ?? null,
+				effort: hostLaunch.effort?.id ?? null,
 				message,
 				attachmentFileIds,
 				onOpened: resetComposer,
