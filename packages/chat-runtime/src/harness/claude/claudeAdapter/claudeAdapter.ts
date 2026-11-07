@@ -189,6 +189,14 @@ function promptText(content: UserContent[]): string {
 		.join("\n");
 }
 
+function isResult(message: unknown): boolean {
+	return (
+		typeof message === "object" &&
+		message !== null &&
+		(message as { type?: unknown }).type === "result"
+	);
+}
+
 function userMessage(content: SdkUserContent): SDKUserMessage {
 	return {
 		type: "user",
@@ -208,6 +216,8 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private modeId: ClaudePermissionMode = "default";
 	private pump: Promise<void> | null = null;
 	private resolvingPrompt: Promise<void> | null = null;
+	private unansweredPrompts = 0;
+	private cancelOnStart = false;
 	private disposed = false;
 
 	constructor(private readonly options: ClaudeAdapterOptions) {}
@@ -277,18 +287,22 @@ export class ClaudeAdapter implements HarnessAdapter {
 
 		this.session = stream;
 		this.pump = this.run(stream, translator);
+		if (this.cancelOnStart) {
+			this.cancelOnStart = false;
+			this.cancelTurn();
+		}
 	}
 
 	prompt(content: UserContent[]): void {
 		const hasAttachment = content.some((part) => part.type === "attachment");
 		if (!hasAttachment && !this.resolvingPrompt) {
-			this.prompts.push(userMessage(promptText(content)));
+			this.send(userMessage(promptText(content)));
 			return;
 		}
 		const blocks = this.contentBlocks(content);
 		const queued = (this.resolvingPrompt ?? Promise.resolve())
 			.then(() => blocks)
-			.then((resolved) => this.prompts.push(userMessage(resolved)));
+			.then((resolved) => this.send(userMessage(resolved)));
 		this.resolvingPrompt = queued;
 		void queued.finally(() => {
 			if (this.resolvingPrompt === queued) this.resolvingPrompt = null;
@@ -333,8 +347,18 @@ export class ClaudeAdapter implements HarnessAdapter {
 		return blocks;
 	}
 
+	private send(message: SDKUserMessage): void {
+		this.unansweredPrompts += 1;
+		this.prompts.push(message);
+	}
+
 	cancelTurn(): void {
-		const interrupt = this.session?.interrupt;
+		if (this.unansweredPrompts === 0) return;
+		if (!this.session) {
+			this.cancelOnStart = true;
+			return;
+		}
+		const interrupt = this.session.interrupt;
 		if (!interrupt) {
 			this.abortController.abort();
 			return;
@@ -408,6 +432,9 @@ export class ClaudeAdapter implements HarnessAdapter {
 			for await (const message of stream) {
 				if (this.disposed) return;
 				this.reportSessionId(message);
+				if (isResult(message)) {
+					this.unansweredPrompts = Math.max(0, this.unansweredPrompts - 1);
+				}
 				this.pushAll(translator.translate(message));
 			}
 		} catch (error) {
