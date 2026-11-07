@@ -82,9 +82,15 @@ test("clear scrollback replaces the history once the old writer closes and keeps
 	expect(
 		runScenario(`
 			closeGate = gate();
+			manager.writeToHistory("pane", "a".repeat(100_000), getSession);
+			manager.writeToHistory("pane", "backlog", getSession);
 			manager.writeToHistory("pane", "x\\x1b[3Jafter", getSession);
 			await tick();
 			await Promise.all(inits);
+			const whileClosing = await new HistoryReader("ws", "pane").readScrollback();
+			if (!whileClosing?.startsWith("old")) {
+				throw new Error("truncated before the old writer closed: " + whileClosing?.slice(0, 20));
+			}
 			manager.writeToHistory("pane", "-during", getSession);
 			closeGate.release();
 		`),
