@@ -297,6 +297,17 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		command: "ufo",
 		resumeCommand: "ufo --resume",
 	}),
+	createBuiltinTerminalAgent({
+		id: "wally",
+		label: "Wally",
+		description:
+			"RunAnywhere's CLI that runs OpenCode on open-weight models hosted by Wally.",
+		command: "wally opencode --cloud",
+		promptCommand: "wally opencode --cloud --prompt",
+		resumeCommand: "wally opencode --cloud --session",
+		forkCommand: "wally opencode --cloud --session {sessionId} --fork",
+		nonInteractiveCommand: "wally opencode --cloud run --agent plan",
+	}),
 ] as const;
 
 export type BuiltinTerminalAgentType =

@@ -1124,6 +1124,8 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"google",
 			"kiro",
 			"aws",
+			"wally",
+			"runanywhere",
 		],
 	},
 	{
@@ -1201,6 +1203,8 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"google",
 			"kiro",
 			"aws",
+			"wally",
+			"runanywhere",
 		],
 	},
 	{

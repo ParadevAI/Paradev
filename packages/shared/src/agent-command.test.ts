@@ -364,3 +364,36 @@ describe("pdev agent registration", () => {
 		expect(isAgentPresetEnabled("custom:pdev", [])).toBe(true);
 	});
 });
+
+describe("wally agent registration", () => {
+	it("is a registered terminal agent with the right label", () => {
+		expect(AGENT_TYPES).toContain("wally");
+		expect(AGENT_LABELS.wally).toBe("Wally");
+	});
+
+	it("seeds prompt launches into OpenCode on the hosted catalog", () => {
+		const command = buildAgentPromptCommand({
+			prompt: "hello",
+			randomId: "wally-1234",
+			agent: "wally",
+		});
+
+		expect(command).toStartWith(
+			"wally opencode --cloud --prompt \"$(cat <<'SUPERSET_PROMPT_wally1234'",
+		);
+		expect(command).toEndWith('\n)"');
+	});
+
+	it("derives host preset prompt, resume and fork args from the base command", () => {
+		const preset = getPresetById("wally");
+		expect(preset?.command).toBe("wally");
+		expect(preset?.args).toEqual(["opencode", "--cloud"]);
+		expect(preset?.promptArgs).toEqual(["--prompt"]);
+		expect(preset?.resumeArgs).toEqual(["--session"]);
+		expect(preset?.forkArgs).toEqual(["--session", "{sessionId}", "--fork"]);
+	});
+
+	it("is not a default terminal preset", () => {
+		expect(DEFAULT_TERMINAL_PRESET_AGENT_TYPES).not.toContain("wally");
+	});
+});
