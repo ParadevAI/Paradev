@@ -12,6 +12,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { createBrowserExtensionsRouter } from "./extensions";
 
+/** Creates the tRPC router for browser pane management. */
 export const createBrowserRouter = () => {
 	return router({
 		extensions: createBrowserExtensionsRouter(),
@@ -47,6 +48,30 @@ export const createBrowserRouter = () => {
 			.mutation(({ input }) => {
 				browserManager.navigate(input.paneId, input.url);
 				return { success: true };
+			}),
+
+		/** Sets whether audio is muted for the given browser pane. */
+		setAudioMuted: publicProcedure
+			.input(
+				z.object({
+					paneId: z.string(),
+					muted: z.boolean(),
+				}),
+			)
+			.mutation(({ input }) => {
+				browserManager.setAudioMuted(input.paneId, input.muted);
+				return { success: true };
+			}),
+
+		/** Queries whether audio is muted for the given browser pane. */
+		isAudioMuted: publicProcedure
+			.input(
+				z.object({
+					paneId: z.string(),
+				}),
+			)
+			.query(({ input }) => {
+				return browserManager.isAudioMuted(input.paneId);
 			}),
 
 		goBack: publicProcedure

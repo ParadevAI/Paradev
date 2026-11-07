@@ -8,7 +8,14 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { CheckIcon, MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
+import {
+	CheckIcon,
+	MinusIcon,
+	PlusIcon,
+	RotateCcwIcon,
+	Volume2Icon,
+	VolumeXIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { TbDots } from "react-icons/tb";
 import { ImportHistoryDialog } from "renderer/components/ImportHistoryDialog";
@@ -53,6 +60,10 @@ function openAfterClose(setOpen: (open: boolean) => void) {
 	};
 }
 
+/**
+ * Renders the overflow dropdown menu for browser pane actions, including
+ * zoom controls, developer tools, audio muting, navigation history, and clear data.
+ */
 export function BrowserOverflowMenu({
 	paneId,
 	currentUrl,
@@ -72,6 +83,49 @@ export function BrowserOverflowMenu({
 	const [isScreenshotsOpen, setIsScreenshotsOpen] = useState(false);
 	const [isClearDataOpen, setIsClearDataOpen] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [audioMuteState, setAudioMuteState] = useState<{
+		paneId: string;
+		muted: boolean;
+	} | null>(null);
+
+	const isAudioMuteLoaded = audioMuteState?.paneId === paneId;
+	const isAudioMuted = isAudioMuteLoaded ? audioMuteState.muted : false;
+
+	useEffect(() => {
+		if (!paneId) return;
+		let cancelled = false;
+		electronTrpcClient.browser.isAudioMuted
+			.query({ paneId })
+			.then((muted) => {
+				if (!cancelled) {
+					setAudioMuteState({ paneId, muted });
+				}
+			})
+			.catch((error) => {
+				console.warn("[BrowserOverflowMenu] could not read audio mute state", {
+					paneId,
+					error,
+				});
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [paneId]);
+
+	/** Toggles the audio mute state for the active browser pane. */
+	const handleToggleMute = () => {
+		if (!paneId || !isAudioMuteLoaded) return;
+		const next = !isAudioMuted;
+		electronTrpcClient.browser.setAudioMuted
+			.mutate({ paneId, muted: next })
+			.then(() => setAudioMuteState({ paneId, muted: next }))
+			.catch((error) => {
+				console.warn("[BrowserOverflowMenu] could not set audio mute state", {
+					paneId,
+					error,
+				});
+			});
+	};
 
 	// The webview swallows pointer events, so a click on the page would never
 	// reach the document listener Radix dismisses on; passing the click
@@ -257,6 +311,18 @@ export function BrowserOverflowMenu({
 						<Trans>Take a screenshot</Trans>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
+					<DropdownMenuItem
+						onClick={handleToggleMute}
+						disabled={!hasPage || !isAudioMuteLoaded}
+						className="justify-between"
+					>
+						{isAudioMuted ? <Trans>Unmute</Trans> : <Trans>Mute</Trans>}
+						{isAudioMuted ? (
+							<VolumeXIcon className="size-3.5" />
+						) : (
+							<Volume2Icon className="size-3.5" />
+						)}
+					</DropdownMenuItem>
 					<DropdownMenuItem onClick={handleHardReload} disabled={!hasPage}>
 						<Trans>Hard reload</Trans>
 					</DropdownMenuItem>

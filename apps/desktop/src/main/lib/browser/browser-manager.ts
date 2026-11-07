@@ -260,6 +260,8 @@ class BrowserManager extends EventEmitter {
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	private mutedPanes = new Map<string, boolean>();
+	private popupWebContents = new Map<string, Set<Electron.WebContents>>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
 	// un-throttled — see acquireAgentWake. The entry object's identity ties
@@ -269,6 +271,35 @@ class BrowserManager extends EventEmitter {
 	// renderer to replay. Kept override/layout-aware by the renderer.
 	private forwardableChords = new Set<string>();
 	private designMode = new DesignModeController();
+
+	/** Sets audio muted state for the given pane and its child popups. */
+	setAudioMuted(paneId: string, muted: boolean): void {
+		this.mutedPanes.set(paneId, muted);
+		const entry = this.panes.get(paneId);
+		if (entry) {
+			const guest = webContents.fromId(entry.webContentsId);
+			if (
+				guest &&
+				!guest.isDestroyed() &&
+				typeof guest.setAudioMuted === "function"
+			) {
+				guest.setAudioMuted(muted);
+			}
+		}
+		const popups = this.popupWebContents.get(paneId);
+		if (popups) {
+			for (const popup of popups) {
+				if (!popup.isDestroyed() && typeof popup.setAudioMuted === "function") {
+					popup.setAudioMuted(muted);
+				}
+			}
+		}
+	}
+
+	/** Returns true if the pane is currently set to mute audio. */
+	isAudioMuted(paneId: string): boolean {
+		return this.mutedPanes.get(paneId) ?? false;
+	}
 
 	setForwardableChords(chords: string[]): void {
 		this.forwardableChords = new Set(chords);
@@ -300,6 +331,12 @@ class BrowserManager extends EventEmitter {
 		});
 		const wc = webContents.fromId(webContentsId);
 		if (wc) {
+			// Apply persisted or default audio mute state
+			const isMuted = this.isAudioMuted(paneId);
+			if (typeof wc.setAudioMuted === "function") {
+				wc.setAudioMuted(isMuted);
+			}
+
 			// Throttling stays enabled by default so parked/offscreen persistent
 			// webviews don't run at full speed in the background — except while
 			// agent work is in flight on the pane (see acquireAgentWake), where a
@@ -338,6 +375,8 @@ class BrowserManager extends EventEmitter {
 		this.designMode.cancel(paneId, "destroyed");
 		this.panes.delete(paneId);
 		this.consoleLogs.delete(paneId);
+		this.mutedPanes.delete(paneId);
+		this.popupWebContents.delete(paneId);
 		// Tell subscribers when a live wake dies with the pane, so the renderer
 		// doesn't keep a stale pane id in its exemption set.
 		if (this.agentWakes.delete(paneId)) this.emitAgentActive();
@@ -1081,6 +1120,16 @@ class BrowserManager extends EventEmitter {
 	): void {
 		const wc = window.webContents;
 		markBrowserPanePopup(wc);
+		if (typeof wc.setAudioMuted === "function") {
+			wc.setAudioMuted(this.isAudioMuted(paneId));
+		}
+		let popups = this.popupWebContents.get(paneId);
+		if (!popups) {
+			popups = new Set();
+			this.popupWebContents.set(paneId, popups);
+		}
+		popups.add(wc);
+
 		const detachGuard = attachNavigationGuard(wc, (url) =>
 			this.emit("deep-link", url),
 		);
@@ -1090,7 +1139,13 @@ class BrowserManager extends EventEmitter {
 		wc.on("did-create-window", (child) => {
 			this.configurePopupWindow(paneId, child);
 		});
-		window.on("closed", detachGuard);
+		window.once("closed", () => {
+			popups?.delete(wc);
+			if (popups?.size === 0) {
+				this.popupWebContents.delete(paneId);
+			}
+			detachGuard();
+		});
 	}
 
 	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
