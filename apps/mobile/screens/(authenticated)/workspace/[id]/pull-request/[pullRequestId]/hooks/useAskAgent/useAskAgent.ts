@@ -17,6 +17,7 @@ import {
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import type { PullRequestDetail } from "../../../../utils/pullRequest";
 import { agentPrompt } from "../../utils/agentPrompt";
 import type { AgentActionId } from "../../utils/pullRequestState";
@@ -36,8 +37,13 @@ export function useAskAgent({ workspaceId }: { workspaceId: string | null }) {
 		machineId: host?.machineId ?? null,
 		hostUrl: host ? hostServiceUrl(host.organizationId, host.machineId) : null,
 	});
-	const agentConfig = agentConfigs.data?.find(
-		(config) => config.presetId === agentId,
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		host ? state.agentConfigIdByHost[host.machineId] : undefined,
+	);
+	const agentConfig = selectAgentConfig(
+		agentConfigs.data ?? [],
+		agentId,
+		pickedConfigId,
 	);
 	// The preset id stands in until the configs answer (see NewChatWidget).
 	const launch = useAgentLaunchPreferences(
@@ -53,7 +59,7 @@ export function useAskAgent({ workspaceId }: { workspaceId: string | null }) {
 			const result = await getHostServiceClientByUrl(hostUrl).agents.run.mutate(
 				{
 					workspaceId: workspace.id,
-					agent: agentId,
+					agent: agentConfig?.id ?? agentId,
 					prompt,
 					model: launch.model?.id ?? undefined,
 					effort: launch.effort?.id ?? undefined,

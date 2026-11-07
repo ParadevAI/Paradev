@@ -99,7 +99,15 @@ export function useCreateTerminalWorkspace() {
 			onOpened,
 			...input
 		}: CreateTerminalWorkspaceArgs) => {
-			const { target, baseBranch, agentId, model, effort, message } = input;
+			const {
+				target,
+				baseBranch,
+				agentId,
+				agentConfigId,
+				model,
+				effort,
+				message,
+			} = input;
 			const chatHarness = (await resolveAcpChatEnabled())
 				? acpHarnessForPreset(agentId)
 				: undefined;
@@ -143,7 +151,7 @@ export function useCreateTerminalWorkspace() {
 					? undefined
 					: [
 							{
-								agent: agentId,
+								agent: agentConfigId ?? agentId,
 								prompt,
 								attachmentIds:
 									attachmentIds.length > 0 ? attachmentIds : undefined,

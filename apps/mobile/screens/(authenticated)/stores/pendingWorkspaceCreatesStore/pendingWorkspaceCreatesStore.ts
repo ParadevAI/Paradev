@@ -22,6 +22,8 @@ export interface PendingWorkspaceCreateInput {
 	 */
 	branchLabel: string | null;
 	agentId: string;
+	/** The host row to launch; absent until the host's configs answer. */
+	agentConfigId?: string;
 	agentLabel: string;
 	/** Null launches the agent's own default. */
 	model: string | null;

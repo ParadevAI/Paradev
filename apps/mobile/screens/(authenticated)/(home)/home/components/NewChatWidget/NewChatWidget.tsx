@@ -28,6 +28,7 @@ import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useC
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
 import { usePasteAttachments } from "@/screens/(authenticated)/hooks/usePasteAttachments";
 import { HOME_DRAFT_KEY } from "@/screens/(authenticated)/stores/composerDraftsStore";
+import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import { useComposerFocusStore } from "../../stores/composerFocusStore";
 import { useAgentIconUri } from "./hooks/useAgentIconUri";
 import { useCreateCloudWorkspace } from "./hooks/useCreateCloudWorkspace";
@@ -83,6 +84,11 @@ export function NewChatWidget({
 	const { targets, defaultTarget } = useNewChatTargets(workspaces);
 	const selectedTarget =
 		targets.find((target) => target.key === targetKey) ?? defaultTarget;
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		selectedTarget
+			? state.agentConfigIdByHost[selectedTarget.machineId]
+			: undefined,
+	);
 	const isCloudTarget = selectedTarget?.kind === "cloud";
 	const isSessionTarget = selectedTarget?.projectId === null;
 	const cloudScope = useWorkspaceScope() === "cloud";
@@ -134,9 +140,12 @@ export function NewChatWidget({
 		// built-in presets instead (SUPER-2127 for custom ones).
 		enabled: !isCloudTarget,
 	});
+	const hostAgent = isCloudTarget
+		? undefined
+		: selectAgentConfig(agentConfigs ?? [], agentId, pickedConfigId);
 	const selectedAgent = isCloudTarget
 		? cloudAgentConfig(agentId, isCloudAgentEnabled)
-		: agentConfigs?.find((config) => config.presetId === agentId);
+		: hostAgent;
 	// A preset picked for a laptop may not exist in the sandbox; under Cloud
 	// the effective agent is the one that will actually launch.
 	const effectiveAgentId = isCloudTarget
@@ -274,6 +283,7 @@ export function NewChatWidget({
 				baseBranch,
 				branchLabel,
 				agentId,
+				agentConfigId: hostAgent?.id,
 				agentLabel: selectedAgent?.label ?? "Claude",
 				model,
 				effort,

@@ -33,12 +33,15 @@ export function useStartWorkspaceTerminal(workspaces: HostWorkspaceItem[]) {
 			target,
 			message,
 			agentId,
+			agentConfigId,
 			model,
 			effort,
 		}: {
 			target: WorkspaceTerminalTarget;
 			message: PromptInputMessage;
 			agentId: string;
+			/** The host row to launch; the preset's first row when absent. */
+			agentConfigId?: string;
 			/** Null launches the agent's own default. */
 			model: string | null;
 			effort: string | null;
@@ -58,7 +61,7 @@ export function useStartWorkspaceTerminal(workspaces: HostWorkspaceItem[]) {
 
 			const result = await client.agents.run.mutate({
 				workspaceId: target.workspaceId,
-				agent: agentId,
+				agent: agentConfigId ?? agentId,
 				prompt: text,
 				model: model ?? undefined,
 				effort: effort ?? undefined,

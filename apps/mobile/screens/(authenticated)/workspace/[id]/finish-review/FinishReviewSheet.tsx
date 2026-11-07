@@ -25,6 +25,7 @@ import {
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import {
 	type DraftComment,
 	NO_COMMENTS,
@@ -74,8 +75,13 @@ export function FinishReviewSheet() {
 		machineId: host?.machineId ?? null,
 		hostUrl: host ? hostServiceUrl(host.organizationId, host.machineId) : null,
 	});
-	const agentConfig = agentConfigs.data?.find(
-		(config) => config.presetId === agentId,
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		host ? state.agentConfigIdByHost[host.machineId] : undefined,
+	);
+	const agentConfig = selectAgentConfig(
+		agentConfigs.data ?? [],
+		agentId,
+		pickedConfigId,
 	);
 	// The preset id stands in until the configs answer (see NewChatWidget).
 	const launch = useAgentLaunchPreferences(
@@ -111,6 +117,7 @@ export function FinishReviewSheet() {
 						},
 						message: { text: prompt, attachments: [] },
 						agentId,
+						agentConfigId: agentConfig?.id,
 						model: launch.model?.id ?? null,
 						effort: launch.effort?.id ?? null,
 					},
