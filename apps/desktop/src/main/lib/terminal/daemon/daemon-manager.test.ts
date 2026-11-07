@@ -187,7 +187,7 @@ const createManager = () =>
 			writeToHistory: noop,
 			closeHistoryWriter: noop,
 			cleanupHistory: resolved,
-			getHistoryWriter: () => undefined,
+			isRecording: () => false,
 			resetAll: resolved,
 			cleanup: resolved,
 			forceCloseAll: resolved,
