@@ -1317,6 +1317,7 @@ export class PullRequestRuntimeManager {
 		viaOctokit: () => Promise<T>,
 		options: { probe?: boolean } = {},
 	): Promise<T> {
+		if (!options.probe) this.githubGate.assertReachable();
 		if (this.githubLookupsRunning < MAX_CONCURRENT_GITHUB_LOOKUPS) {
 			this.githubLookupsRunning += 1;
 		} else {
