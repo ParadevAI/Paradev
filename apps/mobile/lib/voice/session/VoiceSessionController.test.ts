@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
 
 const memory = new Map<string, string>();
 mock.module("@react-native-async-storage/async-storage", () => ({
@@ -307,6 +307,42 @@ describe("VoiceSessionController", () => {
 		} finally {
 			data.listSessions = original;
 			controller.end();
+		}
+	});
+
+	test("an agent that launches after End neither moves the app nor starts polling", async () => {
+		const { controller, transports, routes } = build();
+		await controller.start();
+		const original = data.startAgent;
+		let launch!: (started: { terminalId: string; label: string }) => void;
+		data.startAgent = () =>
+			new Promise((resolve) => {
+				launch = resolve;
+			});
+		const timers = spyOn(globalThis, "setInterval");
+		try {
+			const transport = transports[0] as FakeTransport;
+			transport.emit({ type: "response.created", response: { id: "r1" } });
+			transport.emit({
+				type: "response.function_call_arguments.done",
+				response_id: "r1",
+				item_id: "i1",
+				call_id: "c1",
+				name: "start_agent",
+				arguments: JSON.stringify({ workspace: "auth", prompt: "Add tests" }),
+			});
+			await flush();
+			controller.end();
+			launch({ terminalId: "t-new", label: "claude" });
+			await flush();
+			await flush();
+
+			expect(timers).not.toHaveBeenCalled();
+			expect(routes).toEqual([]);
+		} finally {
+			for (const result of timers.mock.results) clearInterval(result.value);
+			timers.mockRestore();
+			data.startAgent = original;
 		}
 	});
 

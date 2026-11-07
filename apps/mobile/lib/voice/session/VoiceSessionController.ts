@@ -295,6 +295,7 @@ export class VoiceSessionController {
 	}
 
 	private watchSession(workspace: VoiceWorkspace, terminalId: string): void {
+		if (this.ended) return;
 		this.knownWorkspaces.set(workspace.id, workspace);
 		this.watched.set(terminalId, {
 			workspace,
@@ -371,7 +372,7 @@ export class VoiceSessionController {
 	}
 
 	private applyDirective(directive: VoiceUiDirective | undefined) {
-		if (!directive?.navigate) return;
+		if (this.ended || !directive?.navigate) return;
 		const state = this.deps.store.getState();
 		const target = directive.navigate;
 		if ("workspaceId" in target) {
