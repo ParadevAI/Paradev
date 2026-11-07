@@ -70,3 +70,30 @@ test("losing the control connection answers a stream dial in flight at once", as
 
 	expect(await answerWithin(prepared, 20)).toBe("no-host");
 });
+
+test("a dial socket that closes before the response ends fails the HTTP exchange at once", async () => {
+	const tickets: string[] = [];
+	const host = {
+		...socket("current", "host"),
+		send: (frame: string) => tickets.push(JSON.parse(frame).ticket),
+	} as unknown as Connection;
+	const tunnel = tunnelWith([host]);
+
+	const response = tunnel.proxyHttp(caller, {
+		method: "GET",
+		pathWithQuery: "/trpc/workspace.list",
+		headers: {},
+		body: new Uint8Array(),
+	});
+	await Bun.sleep(0);
+	const dial = {
+		...socket("dial", "dial"),
+		state: { kind: "dial", ticket: tickets[0] },
+	} as unknown as Connection;
+	await tunnel.onClose(dial);
+
+	expect(await answerWithin(response, 20)).toEqual({
+		ok: false,
+		reason: "dial-failed",
+	});
+});
