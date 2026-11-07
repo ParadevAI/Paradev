@@ -23,7 +23,7 @@ import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { organizationMachineSizes } from "../../lib/billing/plan";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
-import { nudge } from "../../lib/realtime";
+import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
 	deleteSandbox,
 	describeSandbox,
@@ -532,6 +532,24 @@ export const cloudWorkspaceRouter = {
 				// ticket. The sandbox's own desktop port is not published.
 				desktop: { url: host.url, token: host.token },
 			};
+		}),
+
+	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */
+	forwards: jwtProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			try {
+				return {
+					forwards: await readWorkspaceForwards(row.organizationId, row.id),
+				};
+			} catch (error) {
+				throw new TRPCError({
+					code: "SERVICE_UNAVAILABLE",
+					message: "Forwarded ports can't be read right now",
+					cause: error,
+				});
+			}
 		}),
 
 	/** Ends every terminal and agent on the box so they start again with the current agent sign-ins. */
