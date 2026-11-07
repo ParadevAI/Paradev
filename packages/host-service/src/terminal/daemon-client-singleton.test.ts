@@ -79,7 +79,32 @@ test("a connect that outlives dispose does not replace the newer client", async 
 	const disposing = disposeDaemonClient();
 	const fresh = await getDaemonClient();
 	heldAcks.shift()?.();
-	await Promise.all([stale, disposing]);
+	const [staleClient] = await Promise.all([stale, disposing]);
 
 	expect(await getDaemonClient()).toBe(fresh);
+	expect(staleClient.isConnected).toBe(false);
+});
+
+test("a connect that fails after dispose does not start a duplicate of the newer one", async () => {
+	await disposeDaemonClient();
+	const before = sockets.length;
+	holdAcks = true;
+	let held = 0;
+	const bothHeld = new Promise<void>((resolve) => {
+		onAckHeld = () => {
+			if (++held === 2) resolve();
+		};
+	});
+	const stale = getDaemonClient().catch(() => null);
+	const disposing = disposeDaemonClient();
+	const fresh = getDaemonClient();
+	await bothHeld;
+	sockets[before]?.write(encodeFrame({ type: "error", message: "refused" }));
+	await Promise.all([stale, disposing]);
+	const third = getDaemonClient();
+	holdAcks = false;
+	heldAcks.splice(0).pop()?.();
+
+	expect(await third).toBe(await fresh);
+	expect(sockets).toHaveLength(before + 2);
 });
