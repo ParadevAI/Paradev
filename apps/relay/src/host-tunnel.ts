@@ -361,6 +361,8 @@ export class HostTunnel extends Server<RelayEnv> {
 			}
 			for (const [, timer] of this.unpairedDialTimers) clearTimeout(timer);
 			this.unpairedDialTimers.clear();
+			for (const [, waiting] of this.pendingDials) waiting("no-host");
+			this.pendingDials.clear();
 			this.httpExchanges.abortAll();
 			// A replaced socket's close lands after the new one registered.
 			if (!this.hostConn()) {
