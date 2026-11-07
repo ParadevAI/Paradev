@@ -458,11 +458,46 @@ class BrowserManager extends EventEmitter {
 
 	/**
 	 * Ask the renderer to open a URL in a workspace's browser pane. Consumed by
-	 * the `browser.onOpenRequest` subscription; the resulting pane announces
-	 * itself back through a `pane-registered` event.
+	 * the `browser.onOpenRequest` subscription; the renderer names the pane it
+	 * made through `resolveOpenRequest`.
 	 */
 	requestOpen(request: BrowserOpenRequest): void {
 		this.emit("open-request", request);
+	}
+
+	resolveOpenRequest(requestId: string, paneId: string): void {
+		this.emit(`open-resolved:${requestId}`, paneId);
+	}
+
+	markAgentUse(paneId: string): void {
+		this.emit("agent-use", { paneId });
+	}
+
+	whenRegistered(
+		paneId: string,
+		workspaceId: string,
+		timeoutMs: number,
+	): { ready: Promise<Electron.WebContents | null>; cancel: () => void } {
+		let cancel = () => {};
+		const ready = new Promise<Electron.WebContents | null>((resolve) => {
+			const check = () => {
+				const wc = this.getWebContents(paneId, workspaceId);
+				if (!wc) return;
+				cancel();
+				resolve(wc);
+			};
+			const timer = setTimeout(() => {
+				cancel();
+				resolve(null);
+			}, timeoutMs);
+			cancel = () => {
+				clearTimeout(timer);
+				this.off("pane-registered", check);
+			};
+			this.on("pane-registered", check);
+			check();
+		});
+		return { ready, cancel };
 	}
 
 	/** Open `url` in a new pane beside `paneId`, as a `target="_blank"` link in it does. */

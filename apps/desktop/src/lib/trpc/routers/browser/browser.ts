@@ -309,6 +309,25 @@ export const createBrowserRouter = () => {
 			});
 		}),
 
+		resolveOpenRequest: publicProcedure
+			.input(z.object({ requestId: z.string(), paneId: z.string() }))
+			.mutation(({ input }) => {
+				browserManager.resolveOpenRequest(input.requestId, input.paneId);
+				return { success: true };
+			}),
+
+		onAgentUse: publicProcedure.subscription(() => {
+			return observable<{ paneId: string }>((emit) => {
+				const handler = (event: { paneId: string }) => {
+					emit.next(event);
+				};
+				browserManager.on("agent-use", handler);
+				return () => {
+					browserManager.off("agent-use", handler);
+				};
+			});
+		}),
+
 		// Panes with agent work in flight (a live CDP session or an in-flight
 		// capture). The renderer registry parks these presentable — a
 		// visibility-hidden webview gets no compositor frames, so screenshots

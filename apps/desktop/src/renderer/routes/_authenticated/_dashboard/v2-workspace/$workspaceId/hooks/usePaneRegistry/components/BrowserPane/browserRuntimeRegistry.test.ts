@@ -10,11 +10,26 @@ const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
 		register: { mutate: register },
 		unregister: { mutate: unregister },
 		onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
+		onAgentUse: { subscribe: () => ({ unsubscribe: () => {} }) },
 	},
 	browserHistory: {
 		upsert: { mutate: async () => ({ success: true }) },
 	},
 } as unknown as ConstructorParameters<typeof BrowserRuntimeRegistryImpl>[0]);
+
+const hiddenEntry = (lastUsedAt: number, agent: boolean) => ({
+	webview: { remove: () => {}, style: { visibility: "hidden" } },
+	overlay: { remove: () => {}, style: { visibility: "hidden" } },
+	state: {},
+	onPersist: null,
+	webContentsId: null,
+	detachHandlers: () => {},
+	placeholder: null,
+	resizeObserver: null,
+	visible: false,
+	lastUsedAt,
+	agent,
+});
 
 describe("browserRuntimeRegistry detached persistence", () => {
 	test("retains its persistence callback for navigation completion after detach", async () => {
@@ -50,18 +65,7 @@ describe("browserRuntimeRegistry detached persistence", () => {
 	});
 
 	test("hidden-webview eviction spares panes with a live CDP session", async () => {
-		const makeEntry = (lastUsedAt: number) => ({
-			webview: { remove: () => {}, style: { visibility: "hidden" } },
-			overlay: { remove: () => {}, style: { visibility: "hidden" } },
-			state: {},
-			onPersist: null,
-			webContentsId: null,
-			detachHandlers: () => {},
-			placeholder: null,
-			resizeObserver: null,
-			visible: false,
-			lastUsedAt,
-		});
+		const makeEntry = (lastUsedAt: number) => hiddenEntry(lastUsedAt, false);
 		const registryInternals = browserRuntimeRegistry as unknown as {
 			entries: Map<string, ReturnType<typeof makeEntry>>;
 			agentActivePaneIds: Set<string>;
@@ -90,6 +94,36 @@ describe("browserRuntimeRegistry detached persistence", () => {
 			for (let i = 1; i <= 5; i++) {
 				registryInternals.entries.delete(`evict-pane-${i}`);
 			}
+		}
+	});
+
+	test("agents' hidden panes have their own cap, and agent use keeps a pane loaded", () => {
+		const registryInternals = browserRuntimeRegistry as unknown as {
+			entries: Map<string, ReturnType<typeof hiddenEntry>>;
+			useSeq: number;
+			evictExcessHiddenWebviews: () => void;
+			touch: (paneId: string) => void;
+		};
+		const ids: string[] = [];
+		const add = (id: string, agent: boolean) => {
+			ids.push(id);
+			registryInternals.entries.set(
+				id,
+				hiddenEntry(++registryInternals.useSeq, agent),
+			);
+		};
+		for (let i = 1; i <= 3; i++) add(`user-${i}`, false);
+		for (let i = 1; i <= 7; i++) add(`agent-${i}`, true);
+		registryInternals.touch("agent-1");
+
+		try {
+			registryInternals.evictExcessHiddenWebviews();
+
+			expect(ids.filter((id) => !registryInternals.entries.has(id))).toEqual([
+				"agent-2",
+			]);
+		} finally {
+			for (const id of ids) registryInternals.entries.delete(id);
 		}
 	});
 
