@@ -49,31 +49,40 @@ export function recordUnfinishedChats(
 	return true;
 }
 
+/**
+ * Resumes the chats an update restart stopped. Ones it cannot resume here (the
+ * marker is too old, or the resume failed) come back to be offered instead.
+ */
 export function resumeUnfinishedChats(options: {
 	markerPath: string;
 	runtime: () => ChatRuntime;
 	resolveCwd: (scopeId: string) => string;
 	now?: number;
-}): void {
-	if (!existsSync(options.markerPath)) return;
+}): { resumed: number; offer: ClosedChat[] } {
+	const none = { resumed: 0, offer: [] };
+	if (!existsSync(options.markerPath)) return none;
 	const marker = markerSchema.safeParse(readMarker(options.markerPath));
 	try {
 		unlinkSync(options.markerPath);
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
 			console.warn("[chat-v3] could not remove the resume marker", error);
-			return;
+			return none;
 		}
 	}
-	if (!marker.success || !marker.data.sessions?.length) return;
+	if (!marker.success || !marker.data.sessions?.length) return none;
+	const sessions = marker.data.sessions.flatMap((entry) => {
+		const parsed = closedChatSchema.safeParse(entry);
+		return parsed.success ? [parsed.data] : [];
+	});
 	const age = (options.now ?? Date.now()) - marker.data.requestedAt;
-	if (age > RESUME_MARKER_MAX_AGE_MS) return;
+	if (age > RESUME_MARKER_MAX_AGE_MS) return { resumed: 0, offer: sessions };
 
 	const runtime = options.runtime();
-	for (const entry of marker.data.sessions) {
-		const parsed = sessionSchema.safeParse(entry);
-		if (!parsed.success) continue;
-		const { interrupted, prompts, ...session } = parsed.data;
+	const offer: ClosedChat[] = [];
+	let resumed = 0;
+	for (const chat of sessions) {
+		const { sessionId: _sessionId, interrupted, prompts, ...session } = chat;
 		if (!runtime.live.supports(session.harness)) continue;
 		try {
 			runtime.commands.resumeSession({
@@ -86,10 +95,13 @@ export function resumeUnfinishedChats(options: {
 					...prompts,
 				],
 			});
+			resumed++;
 		} catch (error) {
 			console.warn("[chat-v3] could not resume a chat after the update", error);
+			offer.push(chat);
 		}
 	}
+	return { resumed, offer };
 }
 
 const closedChatSchema = sessionSchema
@@ -100,56 +112,57 @@ const closedChatSchema = sessionSchema
 		terminalId: true,
 		modeId: true,
 		modelId: true,
+		pausedPrompts: true,
 	})
-	.extend({ sessionId: z.string().min(1) });
+	.extend({
+		sessionId: z.string().min(1),
+		interrupted: z.boolean().default(true),
+		prompts: z.array(z.array(userContentSchema).min(1)).default([]),
+	});
 
-/** Notes the chats a quit cut off mid-turn, for the sidebar after the next boot. */
-export function recordClosedChats(runtime: ChatRuntime, path: string): void {
-	const sessions = runtime.live
-		.unfinished()
-		.filter((session) => session.interrupted)
-		.map(
-			({
-				sessionId,
-				scopeId,
-				harness,
-				harnessSessionId,
-				terminalId,
-				modeId,
-				modelId,
-			}) => ({
-				sessionId,
-				scopeId,
-				harness,
-				harnessSessionId,
-				terminalId,
-				modeId,
-				modelId,
-			}),
-		);
-	if (sessions.length === 0) return;
+export type ClosedChat = z.infer<typeof closedChatSchema>;
+
+/** Every chat with work left: a turn or background task running, or prompts queued. */
+export function closedChatsOf(runtime: ChatRuntime): ClosedChat[] {
+	return runtime.live.unfinished().map((session) => ({
+		sessionId: session.sessionId,
+		scopeId: session.scopeId,
+		harness: session.harness,
+		harnessSessionId: session.harnessSessionId,
+		terminalId: session.terminalId,
+		modeId: session.modeId,
+		modelId: session.modelId,
+		interrupted: session.interrupted,
+		prompts: session.prompts,
+		pausedPrompts: session.pausedPrompts,
+	}));
+}
+
+/** Writes the chats the next launch offers to resume, or removes the file when there are none. */
+export function writeClosedChats(path: string, chats: ClosedChat[]): void {
+	if (chats.length === 0) {
+		try {
+			unlinkSync(path);
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+		}
+		return;
+	}
 	const pending = `${path}.${process.pid}.tmp`;
-	writeFileSync(pending, JSON.stringify({ sessions }));
+	writeFileSync(pending, JSON.stringify({ sessions: chats }));
 	renameSync(pending, path);
 }
 
-export function restoreClosedChats(
-	path: string,
-	closedMidTurn: (chat: z.infer<typeof closedChatSchema>) => void,
-): void {
-	if (!existsSync(path)) return;
-	const marker = readMarker(path);
-	try {
-		unlinkSync(path);
-	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code !== "ENOENT") return;
-	}
-	const parsed = z.object({ sessions: z.array(z.unknown()) }).safeParse(marker);
-	if (!parsed.success) return;
-	for (const entry of parsed.data.sessions) {
+export function restoreClosedChats(path: string): ClosedChat[] {
+	if (!existsSync(path)) return [];
+	const parsed = z
+		.object({ sessions: z.array(z.unknown()) })
+		.safeParse(readMarker(path));
+	if (!parsed.success) return [];
+	return parsed.data.sessions.flatMap((entry) => {
 		const chat = closedChatSchema.safeParse(entry);
-		if (chat.success) closedMidTurn(chat.data);
-	}
+		return chat.success ? [chat.data] : [];
+	});
 }
 
 function readMarker(markerPath: string): unknown {

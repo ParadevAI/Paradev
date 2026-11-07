@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { CONTINUE_PROMPT, userStopMarker } from "@superset/chat/core";
+import { CONTINUE_PROMPT, userStopOf } from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
@@ -146,7 +146,6 @@ export class LiveSession {
 	private carriedFailure: Turn | null = null;
 	private carriedCanceledToolIds: ReadonlySet<string> = new Set();
 	private hiddenStopKeys: ReadonlySet<string> = new Set();
-	private carriedShutdown = false;
 	/** The agent's "stopped by user" note the shutdown wrote, replayed after the last prompt. */
 	private replayedShutdownStop: { item: UserMessage; turnId: string } | null =
 		null;
@@ -212,9 +211,9 @@ export class LiveSession {
 		return this.currentTurn;
 	}
 
-	/** Its last turn is the one a shutdown cut off in the session it replaced. */
-	get pausedByShutdown(): boolean {
-		return this.carriedShutdown;
+	/** Prompts this session has taken, typed or resumed; replays of history do not count. */
+	get promptsSent(): number {
+		return this.sent;
 	}
 
 	get queuedCount(): number {
@@ -654,13 +653,7 @@ export class LiveSession {
 				if (this.stopped) return;
 				this.handle(event);
 			}
-			if (!this.stopped) {
-				if (this.sessionState.status !== "dead") {
-					throw new Error("The agent exited");
-				}
-				this.failRunningTurn("The agent exited", this.now());
-				this.settleStranded();
-			}
+			if (!this.stopped) throw new Error("The agent exited");
 		} finally {
 			this.settleStarted(false);
 			this.stopped = true;
@@ -706,7 +699,6 @@ export class LiveSession {
 					this.limitReached({ hitAtMs: this.now() });
 				}
 				if (event.turn.status === "running") {
-					this.carriedShutdown = false;
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
 					this.steerTarget = null;
@@ -764,13 +756,9 @@ export class LiveSession {
 	private noteReplayedStop(item: Item, turnId: string): void {
 		if (this.carriedFailure?.error?.kind !== "host_stopped") return;
 		if (item.kind !== "user_message") return;
-		const message = item as UserMessage;
-		const text =
-			message.content[0]?.type === "text" ? message.content[0].text : "";
-		this.replayedShutdownStop =
-			message.content.length === 1 && userStopMarker(text)
-				? { item: message, turnId }
-				: null;
+		this.replayedShutdownStop = userStopOf(item, this.options.harness)
+			? { item: item as UserMessage, turnId }
+			: null;
 	}
 
 	private withCarriedCancel(item: Item): Item {
@@ -803,7 +791,6 @@ export class LiveSession {
 		}
 		const at = Math.max(this.now(), this.latestStartMs + 1);
 		this.carriedAtMs = at;
-		this.carriedShutdown = turn.error?.kind === "host_stopped";
 		this.appendDurable({
 			type: "turn",
 			turn: { ...turn, startedAtMs: at, completedAtMs: at },

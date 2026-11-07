@@ -4,12 +4,13 @@ import { fileURLToPath } from "node:url";
 import type { NodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import type { DeltaChannel } from "@superset/chat/protocol";
-import { parseCursor } from "@superset/chat/protocol";
+import { isDurableEnvelope, parseCursor } from "@superset/chat/protocol";
 import type {
 	ChatRuntime,
 	ChatSessionChange,
 	HarnessFactory,
 	HarnessRegistry,
+	LiveSessionObserver,
 	ResolveAttachment,
 	WsSinkSocket,
 } from "@superset/chat-runtime";
@@ -37,11 +38,15 @@ import { createGitCheckpoints } from "./gitCheckpoints";
 import { createAttachmentResolver } from "./resolveAttachment";
 import { createResolveCwd } from "./resolveCwd";
 import {
-	recordClosedChats,
+	type ClosedChat,
+	closedChatsOf,
 	recordUnfinishedChats,
 	restoreClosedChats,
 	resumeUnfinishedChats,
+	writeClosedChats,
 } from "./resumeAfterUpdate";
+
+const RECORD_DEBOUNCE_MS = 300;
 
 const CLOSED_CHATS_FILE = "chat-closed-mid-turn.json";
 
@@ -149,6 +154,47 @@ export function createChatV3Mount(options: {
 	);
 	const closedChatsPath = join(dirname(options.dbPath), CLOSED_CHATS_FILE);
 
+	let recordTimer: ReturnType<typeof setTimeout> | null = null;
+	/**
+	 * The chats the next launch offers to resume: the ones still waiting from
+	 * the last launch, and every live one with work left. Kept current as turns
+	 * start and end, so a crash or a reboot leaves it behind too.
+	 */
+	const recordClosed = () => {
+		if (recordTimer) clearTimeout(recordTimer);
+		recordTimer = null;
+		const chats = new Map<string, ClosedChat>();
+		for (const chat of closedChats.pending()) chats.set(chat.sessionId, chat);
+		for (const chat of built ? closedChatsOf(built) : [])
+			chats.set(chat.sessionId, chat);
+		try {
+			writeClosedChats(closedChatsPath, [...chats.values()]);
+		} catch (error) {
+			console.warn("[chat-v3] could not record the chats to resume", error);
+		}
+		return chats.size;
+	};
+	const recordSoon = () => {
+		if (recordTimer) return;
+		recordTimer = setTimeout(recordClosed, RECORD_DEBOUNCE_MS);
+		recordTimer.unref?.();
+	};
+	const observer: LiveSessionObserver = {
+		started: (session) => options.agents?.started(session),
+		published: (envelope, session) => {
+			options.agents?.published(envelope, session);
+			if (!isDurableEnvelope(envelope)) return;
+			const { event } = envelope;
+			if (event.type !== "item" || event.item.kind === "user_message") {
+				recordSoon();
+			}
+		},
+		stopped: (sessionId) => {
+			options.agents?.stopped(sessionId);
+			recordSoon();
+		},
+	};
+
 	const runtime = (): ChatRuntime => {
 		if (built) return built;
 		built = createChatRuntime({
@@ -162,7 +208,7 @@ export function createChatV3Mount(options: {
 					report: reportAttachmentResolveFailure,
 				}),
 			),
-			observer: options.agents,
+			observer,
 			checkpoints: createGitCheckpoints(),
 			onSessionChanged: options.onSessionChanged,
 		});
@@ -172,6 +218,7 @@ export function createChatV3Mount(options: {
 	const closedChats = createClosedMidTurn({
 		runtime,
 		resolveCwd: createResolveCwd(options.db),
+		onChange: recordSoon,
 	});
 
 	return {
@@ -180,30 +227,52 @@ export function createChatV3Mount(options: {
 			await built?.commands.closeScope(scopeId);
 		},
 		resumeAfterUpdate: () => {
-			resumeUnfinishedChats({
+			const update = resumeUnfinishedChats({
 				markerPath,
 				runtime,
 				resolveCwd: createResolveCwd(options.db),
 			});
-			restoreClosedChats(closedChatsPath, (chat) => {
+			if (update.resumed > 0) {
+				console.log(
+					`[chat-v3] resumed ${update.resumed} chat(s) after the update`,
+				);
+			}
+			const waiting = [...restoreClosedChats(closedChatsPath), ...update.offer];
+			for (const chat of waiting) {
 				closedChats.add(chat);
 				options.agents?.closedMidTurn(chat);
-			});
+			}
+			if (waiting.length > 0) {
+				console.log(
+					`[chat-v3] ${waiting.length} chat(s) the last shutdown cut off wait for the launch prompt`,
+				);
+			}
+			recordClosed();
 		},
 		closedMidTurn: () => closedChats.list(),
 		resumeClosedMidTurn: () => closedChats.resume(),
 		keepClosedMidTurnPaused: () => closedChats.keepPaused(),
 		recordUnfinished: () => {
-			if (!built) return;
-			if (!recordUnfinishedChats(built, markerPath)) {
-				recordClosedChats(built, closedChatsPath);
+			if (!built || !recordUnfinishedChats(built, markerPath)) {
+				const recorded = recordClosed();
+				console.log(
+					`[chat-v3] shutdown: ${recorded} chat(s) to offer on the next launch`,
+				);
 				return;
 			}
+			if (recordTimer) clearTimeout(recordTimer);
+			recordTimer = null;
+			writeClosedChats(closedChatsPath, closedChats.pending());
+			console.log(
+				`[chat-v3] update restart: ${built.live.unfinished().length} chat(s) to resume`,
+			);
 			built.live.disposeAll().catch((error: unknown) => {
 				console.warn("[chat-v3] could not stop chats for the update", error);
 			});
 		},
 		dispose: async () => {
+			if (recordTimer) clearTimeout(recordTimer);
+			recordTimer = null;
 			const current = built;
 			built = null;
 			await current?.dispose();

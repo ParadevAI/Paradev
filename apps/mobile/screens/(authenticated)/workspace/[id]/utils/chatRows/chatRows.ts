@@ -75,7 +75,13 @@ export function chatRows(
 			});
 		});
 		const turn = group.turn;
-		if (turn?.status === "failed" || turn?.status === "interrupted") {
+		const stopShown =
+			turn?.status === "interrupted" &&
+			group.entries.some((entry) => entry.kind === "user_stop");
+		if (
+			(turn?.status === "failed" || turn?.status === "interrupted") &&
+			!stopShown
+		) {
 			rows.push({
 				kind: "turn_status",
 				key: `status:${group.turnId}`,

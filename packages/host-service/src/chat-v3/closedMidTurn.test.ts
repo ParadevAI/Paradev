@@ -14,6 +14,9 @@ const CHAT = {
 	terminalId: "terminal-1",
 	modeId: "plan",
 	modelId: "opus",
+	interrupted: true,
+	prompts: [],
+	pausedPrompts: [],
 };
 
 function fakeRuntime(
@@ -24,23 +27,23 @@ function fakeRuntime(
 	} = {},
 ) {
 	const resumed: ResumeSessionInput[] = [];
-	const prompted: string[] = [];
+	const prompted: { sessionId: string; prompts: unknown[] }[] = [];
 	const closed: string[] = [];
 	const runtime = {
 		sessions: { get: (id: string) => rows[id] ?? null },
 		live: {
 			supports: () => true,
 			forTerminal: () => options.live ?? null,
+			require: (sessionId: string) => ({
+				promptOnceStarted: (prompts: unknown[]) =>
+					prompted.push({ sessionId, prompts }),
+			}),
 		},
 		commands: {
 			resumeSession: (input: ResumeSessionInput) => {
 				if (options.resumeThrows) throw new Error("agent missing");
 				resumed.push(input);
 				return { sessionId: "chat-2", epoch: "e" };
-			},
-			prompt: ({ sessionId }: { sessionId: string }) => {
-				prompted.push(sessionId);
-				return { itemId: "i", queued: false };
 			},
 			closeSession: async ({ sessionId }: { sessionId: string }) => {
 				closed.push(sessionId);
@@ -93,13 +96,13 @@ describe("chats a quit cut off", () => {
 				"chat-1": { closedAt: 5, title: "Fix the flaky test" },
 				"chat-2": { closedAt: 0, title: "Fix the flaky test" },
 			},
-			{ live: { sessionId: "chat-2", pausedByShutdown: true } as never },
+			{ live: { sessionId: "chat-2", promptsSent: 0 } as never },
 		);
 		const chats = closedChats(runtime);
 
 		expect(chats.list().map((chat) => chat.sessionId)).toEqual(["chat-2"]);
 		expect(await chats.resume()).toBe(1);
-		expect(prompted).toEqual(["chat-2"]);
+		expect(prompted.map((p) => p.sessionId)).toEqual(["chat-2"]);
 		expect(resumed).toEqual([]);
 	});
 
@@ -107,10 +110,30 @@ describe("chats a quit cut off", () => {
 		const { runtime } = fakeRuntime(
 			{ "chat-1": { closedAt: 5, title: "x" } },
 			{
-				live: { sessionId: "chat-2", pausedByShutdown: false } as never,
+				live: { sessionId: "chat-2", promptsSent: 1 } as never,
 			},
 		);
 		expect(closedChats(runtime).list()).toEqual([]);
+	});
+
+	test("a chat with only queued prompts resumes with them, without being told to continue", async () => {
+		const { runtime, resumed } = fakeRuntime({
+			"chat-1": { closedAt: 0, title: "x" },
+		});
+		const chats = createClosedMidTurn({
+			runtime: () => runtime,
+			resolveCwd: () => "/work",
+		});
+		const queued = [{ type: "text" as const, text: "then the docs" }];
+		chats.add({
+			...CHAT,
+			interrupted: false,
+			prompts: [queued],
+			pausedPrompts: [],
+		});
+
+		expect(await chats.resume()).toBe(1);
+		expect(resumed[0]?.prompts).toEqual([queued]);
 	});
 
 	test("a resume that fails keeps the chat to try again", async () => {

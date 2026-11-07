@@ -9,7 +9,7 @@ import {
 	type SessionOutline,
 	type SessionSnapshot,
 	type StoredItem,
-	userStopMarker,
+	userStopOf,
 } from "@superset/chat/core";
 import type {
 	AgentMessage,
@@ -170,7 +170,10 @@ export function sessionsTitled<Row extends { title: string | null }>(
 		: rows;
 }
 
-function carriedFrom(snapshot: SessionSnapshot): CarriedSession {
+function carriedFrom(
+	snapshot: SessionSnapshot,
+	harness: string,
+): CarriedSession {
 	const canceledToolIds = new Set<string>();
 	const hiddenStopKeys = new Set<string>();
 	for (const { item } of snapshot.items.values()) {
@@ -178,16 +181,12 @@ function carriedFrom(snapshot: SessionSnapshot): CarriedSession {
 			canceledToolIds.add(item.id);
 			continue;
 		}
-		if (item.kind !== "user_message") continue;
-		const message = item as UserMessage;
-		const [part] = message.content;
 		if (
-			message.discarded &&
-			message.content.length === 1 &&
-			part?.type === "text" &&
-			userStopMarker(part.text)
+			item.kind === "user_message" &&
+			(item as UserMessage).discarded &&
+			userStopOf(item, harness)
 		)
-			hiddenStopKeys.add(replayKey(message.id));
+			hiddenStopKeys.add(replayKey(item.id));
 	}
 	return { turn: failedLastTurn(snapshot), canceledToolIds, hiddenStopKeys };
 }
@@ -492,7 +491,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				if (replay?.ok) {
 					options.live
 						.require(sessionId)
-						.carryFrom(carriedFrom(replay.snapshot));
+						.carryFrom(carriedFrom(replay.snapshot, parsed.harness));
 				}
 				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };

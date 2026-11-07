@@ -19,6 +19,7 @@ import { fanOutAgentLifecycle } from "../trpc/router/notifications/fan-out-agent
 import type { SessionAccount } from "../trpc/router/usage/session-account/session-account";
 import type { HostServiceContext } from "../types";
 import { ACP_HARNESSES } from "./acpCatalogue";
+import type { ClosedChat } from "./resumeAfterUpdate";
 
 const LIFECYCLE_BY_STATUS: Partial<
 	Record<SessionStatus, AgentLifecycleEventType>
@@ -74,16 +75,6 @@ export type ChatAgentBridge = LiveSessionObserver & {
 	accountCaptured(sessionId: string, account: SessionAccount): void;
 	/** A chat Paradev closed mid-turn, shown as unseen until someone looks. */
 	closedMidTurn(chat: ClosedChat): void;
-};
-
-export type ClosedChat = {
-	sessionId: string;
-	scopeId: string;
-	harness: string;
-	harnessSessionId: string;
-	terminalId?: string;
-	modeId?: string;
-	modelId?: string;
 };
 
 export function agentIdForHarness(

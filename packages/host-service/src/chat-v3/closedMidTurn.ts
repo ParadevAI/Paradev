@@ -1,7 +1,6 @@
-import { randomUUID } from "node:crypto";
 import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type { ChatRuntime } from "@superset/chat-runtime";
-import type { ClosedChat } from "./chatAgentBridge";
+import type { ClosedChat } from "./resumeAfterUpdate";
 
 const CONTINUE = [{ type: "text" as const, text: CONTINUE_PROMPT }];
 
@@ -16,8 +15,13 @@ type Paused = { sessionId: string; title: string | null; replaced: boolean };
 export function createClosedMidTurn(options: {
 	runtime: () => ChatRuntime;
 	resolveCwd: (scopeId: string) => string;
+	/** The set of chats waiting for an answer changed. */
+	onChange?: () => void;
 }) {
 	const chats = new Map<string, ClosedChat>();
+	const forget = (sessionId: string) => {
+		if (chats.delete(sessionId)) options.onChange?.();
+	};
 
 	/**
 	 * Where a paused chat lives now: its own session, or the one a reopened pane
@@ -32,7 +36,7 @@ export function createClosedMidTurn(options: {
 		}
 		if (!chat.terminalId) return null;
 		const live = runtime.live.forTerminal(chat.terminalId);
-		if (!live?.pausedByShutdown) return null;
+		if (!live || live.promptsSent > 0) return null;
 		const replacement = runtime.sessions.get(live.sessionId);
 		return {
 			sessionId: live.sessionId,
@@ -43,13 +47,11 @@ export function createClosedMidTurn(options: {
 
 	const resumeOne = async (chat: ClosedChat, paused: Paused) => {
 		const runtime = options.runtime();
+		const prompts = [...(chat.interrupted ? [CONTINUE] : []), ...chat.prompts];
 		if (paused.replaced) {
-			runtime.commands.prompt({
-				commandId: randomUUID(),
-				sessionId: paused.sessionId,
-				clientId: randomUUID(),
-				content: CONTINUE,
-			});
+			runtime.live
+				.require(paused.sessionId)
+				.promptOnceStarted(prompts, chat.pausedPrompts);
 			return;
 		}
 		runtime.commands.resumeSession({
@@ -60,8 +62,8 @@ export function createClosedMidTurn(options: {
 			modeId: chat.modeId,
 			modelId: chat.modelId,
 			cwd: options.resolveCwd(chat.scopeId),
-			prompts: [CONTINUE],
-			pausedPrompts: [],
+			prompts,
+			pausedPrompts: chat.pausedPrompts,
 			replacesSessionId: chat.sessionId,
 		});
 		await runtime.commands.closeSession({ sessionId: chat.sessionId });
@@ -70,6 +72,12 @@ export function createClosedMidTurn(options: {
 	return {
 		add(chat: ClosedChat): void {
 			chats.set(chat.sessionId, chat);
+			options.onChange?.();
+		},
+
+		/** The chats still waiting, as last recorded. */
+		pending(): ClosedChat[] {
+			return [...chats.values()];
 		},
 
 		list(): ClosedMidTurnChat[] {
@@ -77,7 +85,7 @@ export function createClosedMidTurn(options: {
 			for (const chat of chats.values()) {
 				const paused = pausedIn(chat);
 				if (!paused) {
-					chats.delete(chat.sessionId);
+					forget(chat.sessionId);
 					continue;
 				}
 				open.push({
@@ -94,12 +102,12 @@ export function createClosedMidTurn(options: {
 			for (const chat of [...chats.values()]) {
 				const paused = pausedIn(chat);
 				if (!paused) {
-					chats.delete(chat.sessionId);
+					forget(chat.sessionId);
 					continue;
 				}
 				try {
 					await resumeOne(chat, paused);
-					chats.delete(chat.sessionId);
+					forget(chat.sessionId);
 					resumed++;
 				} catch (error) {
 					console.warn(
@@ -113,6 +121,7 @@ export function createClosedMidTurn(options: {
 
 		keepPaused(): void {
 			chats.clear();
+			options.onChange?.();
 		},
 	};
 }

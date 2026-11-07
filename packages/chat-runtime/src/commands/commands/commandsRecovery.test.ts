@@ -314,9 +314,7 @@ describe("replacing a chat whose agent died", () => {
 		expect(markerOf(runtime, replacement.sessionId)).toMatchObject({
 			discarded: true,
 		});
-		expect(runtime.live.get(replacement.sessionId)?.pausedByShutdown).toBe(
-			true,
-		);
+		expect(runtime.live.get(replacement.sessionId)?.promptsSent).toBe(0);
 
 		runtime.commands.prompt({
 			commandId: randomUUID(),
@@ -328,9 +326,7 @@ describe("replacing a chat whose agent died", () => {
 			() =>
 				runtime.live.get(replacement.sessionId)?.turn?.status === "completed",
 		);
-		expect(runtime.live.get(replacement.sessionId)?.pausedByShutdown).toBe(
-			false,
-		);
+		expect(runtime.live.get(replacement.sessionId)?.promptsSent).toBe(1);
 		await runtime.live.dispose(replacement.sessionId);
 		const reopened = createChat(runtime, replacement.sessionId);
 		await waitFor(
@@ -371,11 +367,14 @@ const COMMAND: ToolCall = {
 	startedAtMs: 2,
 };
 
+/** Stop notes count only in a harness that writes them. */
+const CLAUDE_HARNESS = "claude-acp";
+
 function hangingRegistry(): HarnessRegistry {
 	let agents = 0;
 	return new Map([
 		[
-			FAKE_HARNESS,
+			CLAUDE_HARNESS,
 			(): HarnessAdapter => {
 				const generation = agents++;
 				if (generation > 0) {
@@ -467,7 +466,7 @@ function createChat(
 	return runtime.commands.createSession({
 		commandId: randomUUID(),
 		scopeId: "workspace-1",
-		harness: FAKE_HARNESS,
+		harness: CLAUDE_HARNESS,
 		cwd: "/tmp/workspace",
 		...(replacesSessionId
 			? { resume: { harnessSessionId: "agent-1", replacesSessionId } }

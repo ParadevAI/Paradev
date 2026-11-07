@@ -326,13 +326,14 @@ export function transcriptRows(
 			if (lastReplyAt === -1) push(card);
 			else rows.splice(lastReplyAt + 1, 0, card);
 		}
-		const clockSaysStopped =
+		const stopShown =
 			turn !== null &&
 			stoppedByUser(turn) &&
-			(turn.completedAtMs ?? turn.startedAtMs) - turn.startedAtMs >= 1000;
+			((turn.completedAtMs ?? turn.startedAtMs) - turn.startedAtMs >= 1000 ||
+				group.entries.some((entry) => entry.kind === "user_stop"));
 		if (
 			(turn?.status === "failed" || turn?.status === "interrupted") &&
-			!clockSaysStopped
+			!stopShown
 		) {
 			push({
 				kind: "turn_status",

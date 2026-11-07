@@ -268,6 +268,10 @@ describe("ClaudeAdapter", () => {
 				},
 			},
 		});
+		for (let index = 0; index < 20; index++) {
+			if ((await harness.iterator.next()).done) return;
+		}
+		throw new Error("the adapter kept its stream open after the agent died");
 	});
 
 	test("a stream the user aborted still reads as a stop", async () => {

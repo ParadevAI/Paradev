@@ -917,10 +917,10 @@ msgid "{count, plural, one {Removed # automation from its group} other {Removed 
 msgstr "{count, plural, one {已将 # 个自动化移出分组} other {已将 # 个自动化移出分组}}"
 
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
-msgstr "{count, plural, other {要继续 # 个聊天吗?}}"
+msgstr "{count, plural, one {要继续 # 个聊天吗？} other {要继续 # 个聊天吗？}}"
 
 msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, other {Paradev 关闭时这些聊天正在运行}}"
+msgstr "{count, plural, one {Paradev 关闭时这个聊天正在运行} other {Paradev 关闭时这些聊天正在运行}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"

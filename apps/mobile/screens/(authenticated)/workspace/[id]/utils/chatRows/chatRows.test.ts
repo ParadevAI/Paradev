@@ -90,6 +90,33 @@ describe("chatRows", () => {
 			["item", "client-1"],
 		]);
 	});
+
+	test("a stopped turn whose stop the agent recorded says so once", () => {
+		const groups: TurnGroup[] = [
+			{
+				turn: { id: "t1", status: "interrupted", startedAtMs: 1 },
+				turnId: "t1",
+				entries: [
+					{ kind: "item", item: user("u1", "client-1") },
+					{
+						kind: "user_stop",
+						item: {
+							id: "s1",
+							kind: "user_message",
+							startedAtMs: 2,
+							content: [
+								{ type: "text", text: "[Request interrupted by user]" },
+							],
+						},
+						stop: "response",
+					},
+				],
+			},
+		];
+		expect(
+			chatRows(groups, []).filter((row) => row.kind === "turn_status"),
+		).toHaveLength(1);
+	});
 });
 
 describe("groupPositions", () => {

@@ -397,7 +397,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 		stream: AsyncIterable<unknown>,
 		translator: ClaudeTranslator,
 	): Promise<void> {
-		let stoppedByError = false;
 		try {
 			for await (const message of stream) {
 				if (this.disposed) return;
@@ -405,7 +404,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 				this.pushAll(translator.translate(message));
 			}
 		} catch (error) {
-			stoppedByError = true;
 			const waiting = this.approvals.size > 0;
 			const message = error instanceof Error ? error.message : String(error);
 			const canceled =
@@ -421,7 +419,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (this.staleApprovals()) {
 			this.events.push({ kind: "session", session: { status: "idle" } });
 		}
-		if (!this.disposed && !stoppedByError) this.events.close();
+		if (!this.disposed) this.events.close();
 	}
 
 	private pushAll(events: AdapterEvent[]): void {

@@ -154,6 +154,9 @@ describe("createChatAgentBridge", () => {
 			harness: "claude-acp",
 			harnessSessionId: "agent-1",
 			terminalId: TERMINAL,
+			interrupted: true,
+			prompts: [],
+			pausedPrompts: [],
 		});
 
 		expect(terminalAgentStore.getChat(TERMINAL)).toMatchObject({

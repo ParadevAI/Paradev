@@ -176,6 +176,36 @@ describe("transcriptRows", () => {
 		expect(rows.some((row) => row.kind === "turn_status")).toBe(false);
 	});
 
+	test("a quick stop the agent recorded says so once", () => {
+		const stop = {
+			id: "stop",
+			kind: "user_message",
+			startedAtMs: 100,
+			content: [{ type: "text", text: "[Request interrupted by user]" }],
+		} as UserMessage;
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 200,
+					},
+					entries: [
+						{ kind: "item", item: prompt },
+						{ kind: "user_stop", item: stop, stop: "response" },
+					],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.filter((row) => row.kind === "turn_status")).toHaveLength(1);
+	});
+
 	test("a stop too quick for a clock still gets its line", () => {
 		const rows = transcriptRows(
 			[
