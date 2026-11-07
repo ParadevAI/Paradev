@@ -24,7 +24,9 @@ if [ ! -f "${target}/host-service.js" ]; then
 	tar -xzf "$archive" -C "$target"
 fi
 built_for="$(sed -n 's/^node=\(.*\)$/\1/p' "${target}/RUNTIME")"
-have="$(node -p 'process.versions.node.split(".")[0]')"
+runner="${target}/node"
+[ -x "$runner" ] || runner=node
+have="$("$runner" -p 'process.versions.node.split(".")[0]')"
 if [ "$built_for" != "$have" ]; then
 	echo "host-service ${sha:0:12} was built for Node ${built_for}; this image runs Node ${have}" >&2
 	rm -rf "$target"
