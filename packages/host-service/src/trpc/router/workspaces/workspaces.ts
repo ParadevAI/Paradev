@@ -39,7 +39,6 @@ import {
 	router,
 } from "../../index";
 import {
-	bindLaunchedSession,
 	buildTerminalAgentLaunch,
 	validateAgentLaunchOptions,
 } from "../agents";
@@ -1366,16 +1365,7 @@ export const workspacesRouter = router({
 						label: terminal.label,
 					});
 				}
-				if (chained && chainAgent && terminal && soleLaunch) {
-					bindLaunchedSession(
-						ctx,
-						{
-							workspaceId: workspaceRow.id,
-							agent: soleLaunch.agent,
-							prompt: soleLaunch.prompt,
-						},
-						terminal.id,
-					);
+				if (chained && chainAgent && terminal) {
 					chainedAgentResult = {
 						ok: true,
 						kind: "terminal",
