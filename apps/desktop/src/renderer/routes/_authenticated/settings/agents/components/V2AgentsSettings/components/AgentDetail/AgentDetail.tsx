@@ -22,7 +22,7 @@ import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useMutation } from "@tanstack/react-query";
 import { Info, RotateCcw, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	getAgentCommandText,
 	isAgentCommandPatchChanged,
@@ -33,6 +33,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { AgentEnvEditor, type AgentEnvEditorHandle } from "../AgentEnvEditor";
 import {
 	AgentDetailHeader,
 	AgentLaunchFields,
@@ -84,8 +85,12 @@ export function AgentDetail({
 				),
 		});
 
+	const envEditorRef = useRef<AgentEnvEditorHandle>(null);
+	const [envEditorKey, setEnvEditorKey] = useState(0);
 	const [label, setLabel] = useState(config.label);
-	const [commandText, setCommandText] = useState(getAgentCommandText(config));
+	const [commandText, setCommandText] = useState(
+		getAgentCommandText({ command: config.command, args: config.args }),
+	);
 	const [promptArgsText, setPromptArgsText] = useState(
 		joinArgs(config.promptArgs),
 	);
@@ -102,11 +107,7 @@ export function AgentDetail({
 	useEffect(() => {
 		setLabel(config.label);
 		setCommandText(
-			getAgentCommandText({
-				command: config.command,
-				args: config.args,
-				env: config.env,
-			}),
+			getAgentCommandText({ command: config.command, args: config.args }),
 		);
 		setPromptArgsText(joinArgs(config.promptArgs));
 		setResumeArgsText(joinArgs(config.resumeArgs ?? []));
@@ -116,7 +117,6 @@ export function AgentDetail({
 		config.label,
 		config.command,
 		config.args,
-		config.env,
 		config.promptArgs,
 		config.resumeArgs,
 		config.forkArgs,
@@ -194,6 +194,7 @@ export function AgentDetail({
 		},
 		onSuccess: (updated) => {
 			onChanged(updated);
+			setEnvEditorKey((key) => key + 1);
 			const updatedLabel = updated.label;
 			toast.success(
 				t({
@@ -219,21 +220,35 @@ export function AgentDetail({
 	};
 
 	const handleCommandBlur = () => {
-		const patch = parseAgentCommandText(commandText);
-		const { command } = patch;
+		const {
+			command,
+			args,
+			env: inlineEnv,
+		} = parseAgentCommandText(commandText);
 		if (command.length === 0) {
 			toast.error(
 				t({
 					message: "Command cannot be empty",
 				}),
 			);
-			setCommandText(getAgentCommandText(config));
+			setCommandText(
+				getAgentCommandText({ command: config.command, args: config.args }),
+			);
 			return;
 		}
-		if (isAgentCommandPatchChanged(config, patch)) {
-			updateMutation.mutate(patch);
+		if (Object.keys(inlineEnv).length > 0) {
+			envEditorRef.current?.assign(inlineEnv);
+			setCommandText(getAgentCommandText({ command, args }));
+		}
+		if (
+			isAgentCommandPatchChanged(config, { command, args, env: config.env })
+		) {
+			updateMutation.mutate({ command, args });
 		}
 	};
+
+	const handleEnvCommit = (env: Record<string, string>) =>
+		updateMutation.mutateAsync({ env });
 
 	const handlePromptArgsBlur = () => {
 		const args = parseArgs(promptArgsText);
@@ -323,6 +338,20 @@ export function AgentDetail({
 					promptTransport={promptTransport}
 					onPromptTransportChange={handleTransportChange}
 				/>
+
+				<Section
+					title={t({
+						message: "Environment Variables",
+					})}
+				>
+					<AgentEnvEditor
+						key={envEditorKey}
+						ref={envEditorRef}
+						idPrefix={config.id}
+						env={config.env}
+						onCommit={handleEnvCommit}
+					/>
+				</Section>
 
 				{isHooksSetupTarget ? (
 					<div className="pt-2">

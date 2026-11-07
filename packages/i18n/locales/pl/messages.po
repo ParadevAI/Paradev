@@ -2163,6 +2163,9 @@ msgstr "Dodaj do paska bocznego"
 msgid "Add to workspace"
 msgstr "Dodaj do obszaru roboczego"
 
+msgid "Add variable"
+msgstr "Dodaj zmienną"
+
 msgid "Add what it does"
 msgstr "Dodaj, co robi"
 
@@ -15958,6 +15961,9 @@ msgstr "usunąć powiązania z PR"
 msgid "Remove trigger"
 msgstr "Usuń wyzwalacz"
 
+msgid "Remove variable"
+msgstr "Usuń zmienną"
+
 msgid "Remove workspace"
 msgstr "Usuń obszar roboczy"
 
@@ -17676,6 +17682,9 @@ msgstr "Skonfiguruj ten projekt pod Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Skonfiguruj organizację, aby zacząć"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "Ustawiana przy uruchomieniu tego agenta, np. <0>CLAUDE_CONFIG_DIR</0>, aby użyć innego logowania Claude."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Przywrócenie zainstalowanej wtyczki do stanu Dostępna zostawia wszystkim ich kopię; mogą ją potem usunąć. Niedostępna ją usuwa."
@@ -21287,6 +21296,12 @@ msgstr "użytkownik@host, ssh://użytkownik@host:2222 lub alias z konfiguracji s
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId nie pasuje do projektu obszaru roboczego"
+
+msgid "Variable name"
+msgstr "Nazwa zmiennej"
+
+msgid "Variable value"
+msgstr "Wartość zmiennej"
 
 msgid "Variables"
 msgstr "Zmienne"

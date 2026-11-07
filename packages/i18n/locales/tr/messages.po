@@ -2163,6 +2163,9 @@ msgstr "Kenar çubuğuna ekle"
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
 
+msgid "Add variable"
+msgstr "Değişken ekle"
+
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
 
@@ -15958,6 +15961,9 @@ msgstr "PR bağlantısını kaldırma"
 msgid "Remove trigger"
 msgstr "Tetikleyiciyi kaldır"
 
+msgid "Remove variable"
+msgstr "Değişkeni kaldır"
+
 msgid "Remove workspace"
 msgstr "Çalışma alanını kaldır"
 
@@ -17676,6 +17682,9 @@ msgstr "Bu projeyi Paradev için kur"
 
 msgid "Set up your organization to get started"
 msgstr "Başlamak için kuruluşunuzu kurun"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "Bu ajan başlatıldığında ayarlanır; ör. başka bir Claude girişi kullanmak için <0>CLAUDE_CONFIG_DIR</0>."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Yüklü bir eklentiyi yeniden Kullanılabilir yapmak herkesin kopyasını korur; sonra kaldırabilirler. Kullanılamaz yapmak onu kaldırır."
@@ -21287,6 +21296,12 @@ msgstr "kullanıcı@host, ssh://kullanıcı@host:2222 veya bir ssh yapılandırm
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId, çalışma alanının projesiyle eşleşmiyor"
+
+msgid "Variable name"
+msgstr "Değişken adı"
+
+msgid "Variable value"
+msgstr "Değişken değeri"
 
 msgid "Variables"
 msgstr "Değişkenler"

@@ -2163,6 +2163,9 @@ msgstr "Tambahkan ke sidebar"
 msgid "Add to workspace"
 msgstr "Tambahkan ke workspace"
 
+msgid "Add variable"
+msgstr "Tambah variabel"
+
 msgid "Add what it does"
 msgstr "Tambahkan apa yang dilakukannya"
 
@@ -15958,6 +15961,9 @@ msgstr "menghapus tautan PR"
 msgid "Remove trigger"
 msgstr "Hapus pemicu"
 
+msgid "Remove variable"
+msgstr "Hapus variabel"
+
 msgid "Remove workspace"
 msgstr "Hapus workspace"
 
@@ -17676,6 +17682,9 @@ msgstr "Siapkan proyek ini untuk Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Siapkan organisasi Anda untuk memulai"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "Diatur saat agen ini dijalankan, mis. <0>CLAUDE_CONFIG_DIR</0> untuk memakai login Claude lain."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Mengembalikan plugin terpasang ke Tersedia membuat semua orang tetap memiliki salinannya; mereka lalu bisa menghapusnya. Tidak tersedia akan menghapusnya."
@@ -21287,6 +21296,12 @@ msgstr "user@host, ssh://user@host:2222, atau alias dari konfigurasi ssh"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId tidak cocok dengan proyek workspace"
+
+msgid "Variable name"
+msgstr "Nama variabel"
+
+msgid "Variable value"
+msgstr "Nilai variabel"
 
 msgid "Variables"
 msgstr "Variabel"

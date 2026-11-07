@@ -2163,6 +2163,9 @@ msgstr "新增到側邊欄"
 msgid "Add to workspace"
 msgstr "新增到工作區"
 
+msgid "Add variable"
+msgstr "新增變數"
+
 msgid "Add what it does"
 msgstr "新增它的用途"
 
@@ -15958,6 +15961,9 @@ msgstr "移除PR連結"
 msgid "Remove trigger"
 msgstr "移除觸發條件"
 
+msgid "Remove variable"
+msgstr "移除變數"
+
 msgid "Remove workspace"
 msgstr "移除工作區"
 
@@ -17676,6 +17682,9 @@ msgstr "為Paradev配置這個專案"
 
 msgid "Set up your organization to get started"
 msgstr "設定你的組織即可開始"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "在此代理程式啟動時設定，例如用 <0>CLAUDE_CONFIG_DIR</0> 來使用另一個 Claude 登入。"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "把已安裝的外掛改回「可用」後，每個人的副本仍會保留，之後可以自行移除。改為「不可用」會將其移除。"
@@ -21287,6 +21296,12 @@ msgstr "user@host、ssh://user@host:2222 或 ssh 設定中的別名"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId與該工作區的專案不匹配"
+
+msgid "Variable name"
+msgstr "變數名稱"
+
+msgid "Variable value"
+msgstr "變數值"
 
 msgid "Variables"
 msgstr "變數"

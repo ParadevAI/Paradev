@@ -2163,6 +2163,9 @@ msgstr "サイドバーに追加"
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
 
+msgid "Add variable"
+msgstr "変数を追加"
+
 msgid "Add what it does"
 msgstr "役割を追加"
 
@@ -15958,6 +15961,9 @@ msgstr "PRリンクを削除する"
 msgid "Remove trigger"
 msgstr "トリガーを削除"
 
+msgid "Remove variable"
+msgstr "変数を削除"
+
 msgid "Remove workspace"
 msgstr "ワークスペースを削除"
 
@@ -17676,6 +17682,9 @@ msgstr "このプロジェクトをParadev向けにセットアップ"
 
 msgid "Set up your organization to get started"
 msgstr "組織をセットアップして始めましょう"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "このエージェントの起動時に設定されます。例: 別の Claude ログインを使うには <0>CLAUDE_CONFIG_DIR</0>。"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "インストール済みのプラグインを「利用可能」に戻しても、全員のコピーは残り、各自で削除できるようになります。「利用不可」にすると削除されます。"
@@ -21287,6 +21296,12 @@ msgstr "user@host、ssh://user@host:2222、または ssh config のエイリア�
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectIdがワークスペースのプロジェクトと一致しません"
+
+msgid "Variable name"
+msgstr "変数名"
+
+msgid "Variable value"
+msgstr "変数の値"
 
 msgid "Variables"
 msgstr "変数"

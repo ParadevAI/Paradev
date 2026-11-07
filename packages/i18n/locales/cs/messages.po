@@ -2163,6 +2163,9 @@ msgstr "Přidat do postranního panelu"
 msgid "Add to workspace"
 msgstr "Přidat do pracovního prostoru"
 
+msgid "Add variable"
+msgstr "Přidat proměnnou"
+
 msgid "Add what it does"
 msgstr "Přidat, co dělá"
 
@@ -15958,6 +15961,9 @@ msgstr "odebrat propojení s PR"
 msgid "Remove trigger"
 msgstr "Odebrat spouštěč"
 
+msgid "Remove variable"
+msgstr "Odebrat proměnnou"
+
 msgid "Remove workspace"
 msgstr "Odebrat pracovní prostor"
 
@@ -17676,6 +17682,9 @@ msgstr "Připravit tento projekt pro Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Nastavte si organizaci a můžete začít"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "Nastaví se při spuštění tohoto agenta, např. <0>CLAUDE_CONFIG_DIR</0> pro použití jiného přihlášení Claude."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Když nainstalovaný plugin vrátíte na Dostupné, všem zůstane jejich kopie; pak ji mohou odebrat. Nedostupné ho odebere."
@@ -21287,6 +21296,12 @@ msgstr "uživatel@host, ssh://uživatel@host:2222 nebo alias z konfigurace ssh"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId neodpovídá projektu pracovního prostoru"
+
+msgid "Variable name"
+msgstr "Název proměnné"
+
+msgid "Variable value"
+msgstr "Hodnota proměnné"
 
 msgid "Variables"
 msgstr "Proměnné"
