@@ -71,8 +71,14 @@ async function createPrScenario(prNumber: number): Promise<{
 	};
 }
 
-function installDirtyPostCheckoutHook(repoPath: string): void {
-	const hookPath = join(repoPath, ".git", "hooks", "post-checkout");
+async function installDirtyPostCheckoutHook(
+	git: SimpleGit,
+	repoPath: string,
+): Promise<void> {
+	const hooksDir = join(repoPath, ".git", "hooks");
+	const hookPath = join(hooksDir, "post-checkout");
+	// A machine-wide core.hooksPath would otherwise skip this repo's hooks.
+	await git.addConfig("core.hooksPath", hooksDir);
 	writeFileSync(
 		hookPath,
 		[
@@ -96,7 +102,10 @@ describe("materializePrBranch (real git)", () => {
 	});
 
 	test("materialize-first worktree creation survives hooks that dirty tracked files during checkout", async () => {
-		installDirtyPostCheckoutHook(scenario.local.repoPath);
+		await installDirtyPostCheckoutHook(
+			scenario.local.git,
+			scenario.local.repoPath,
+		);
 
 		const materialized = await materializePrBranch({
 			git: scenario.local.git,
