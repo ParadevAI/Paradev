@@ -371,6 +371,11 @@ describe("SelfUpdater", () => {
 		expect(h.calls).toContain("stop");
 		expect(h.exitCode).toBe(1);
 		expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("new");
+		expect(h.updater.status().lastResult).toMatchObject({
+			outcome: "failed",
+			to: "1.27.0",
+			error: "Failed successor did not exit",
+		});
 	});
 
 	test.skipIf(process.getuid?.() === 0)(

@@ -157,8 +157,16 @@ export class SelfUpdater {
 		void this.run(root, input)
 			.catch((error) => {
 				const stoppedServing = this.phase === "restarting";
-				this.fail(error instanceof Error ? error.message : String(error));
+				const message = error instanceof Error ? error.message : String(error);
+				this.fail(message);
 				if (stoppedServing) {
+					this.writeMarker({
+						outcome: "failed",
+						from: this.deps.currentVersion,
+						to: this.target ?? "",
+						at: Date.now(),
+						error: message,
+					});
 					this.unlock();
 					this.deps.exit(1);
 				}
