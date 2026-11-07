@@ -17,6 +17,7 @@ import {
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { resolveAgentConfig } from "@/screens/(authenticated)/utils/resolveAgentConfig";
 import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import type { PullRequestDetail } from "../../../../utils/pullRequest";
 import { agentPrompt } from "../../utils/agentPrompt";
@@ -56,10 +57,15 @@ export function useAskAgent({ workspaceId }: { workspaceId: string | null }) {
 		mutationFn: async (prompt: string) => {
 			if (!workspace || !host) throw new Error("Workspace is not available");
 			const hostUrl = hostServiceUrl(host.organizationId, host.machineId);
+			const launched = await resolveAgentConfig(
+				agentConfigs,
+				agentId,
+				pickedConfigId,
+			);
 			const result = await getHostServiceClientByUrl(hostUrl).agents.run.mutate(
 				{
 					workspaceId: workspace.id,
-					agent: agentConfig?.id ?? agentId,
+					agent: launched?.id ?? agentId,
 					prompt,
 					model: launch.model?.id ?? undefined,
 					effort: launch.effort?.id ?? undefined,

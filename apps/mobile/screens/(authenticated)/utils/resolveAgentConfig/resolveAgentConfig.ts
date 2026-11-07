@@ -8,6 +8,7 @@ interface AgentConfigsQuery<T> {
 	}) => Promise<{ data?: readonly T[] }>;
 }
 
+/** Pending configs are not an answer: a row picked on this host waits for them rather than launching the preset's first row. */
 export async function resolveAgentConfig<
 	T extends { id: string; presetId: string },
 >(
@@ -15,5 +16,9 @@ export async function resolveAgentConfig<
 	presetId: string,
 	pickedConfigId: string | undefined,
 ): Promise<T | undefined> {
-	return selectAgentConfig(query.data ?? [], presetId, pickedConfigId);
+	const configs =
+		query.isPending && pickedConfigId
+			? (await query.refetch({ cancelRefetch: false })).data
+			: query.data;
+	return selectAgentConfig(configs ?? [], presetId, pickedConfigId);
 }

@@ -25,6 +25,7 @@ import {
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { resolveAgentConfig } from "@/screens/(authenticated)/utils/resolveAgentConfig";
 import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import {
 	type DraftComment,
@@ -109,6 +110,11 @@ export function FinishReviewSheet() {
 		setSending(true);
 		try {
 			if (target === "new") {
+				const launched = await resolveAgentConfig(
+					agentConfigs,
+					agentId,
+					pickedConfigId,
+				);
 				startWorkspaceTerminal.mutate(
 					{
 						target: {
@@ -117,7 +123,7 @@ export function FinishReviewSheet() {
 						},
 						message: { text: prompt, attachments: [] },
 						agentId,
-						agentConfigId: agentConfig?.id,
+						agentConfigId: launched?.id,
 						model: launch.model?.id ?? null,
 						effort: launch.effort?.id ?? null,
 					},

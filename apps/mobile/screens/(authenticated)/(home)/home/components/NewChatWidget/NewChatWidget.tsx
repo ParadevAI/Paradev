@@ -28,6 +28,7 @@ import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useC
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
 import { usePasteAttachments } from "@/screens/(authenticated)/hooks/usePasteAttachments";
 import { HOME_DRAFT_KEY } from "@/screens/(authenticated)/stores/composerDraftsStore";
+import { resolveAgentConfig } from "@/screens/(authenticated)/utils/resolveAgentConfig";
 import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import { useComposerFocusStore } from "../../stores/composerFocusStore";
 import { useAgentIconUri } from "./hooks/useAgentIconUri";
@@ -133,19 +134,16 @@ export function NewChatWidget({
 	const createTerminalWorkspace = useCreateTerminalWorkspace();
 	const isCloudAgentEnabled = useIsCloudAgentEnabled();
 	const createCloudWorkspace = useCreateCloudWorkspace();
-	const { data: agentConfigs } = useHostAgentConfigs({
+	const agentConfigs = useHostAgentConfigs({
 		machineId: selectedTarget?.machineId ?? null,
 		hostUrl: selectedTarget?.hostUrl ?? null,
 		// A cloud target has no host to list agents from; it offers the
 		// built-in presets instead (SUPER-2127 for custom ones).
 		enabled: !isCloudTarget,
 	});
-	const hostAgent = isCloudTarget
-		? undefined
-		: selectAgentConfig(agentConfigs ?? [], agentId, pickedConfigId);
 	const selectedAgent = isCloudTarget
 		? cloudAgentConfig(agentId, isCloudAgentEnabled)
-		: hostAgent;
+		: selectAgentConfig(agentConfigs.data ?? [], agentId, pickedConfigId);
 	// A preset picked for a laptop may not exist in the sandbox; under Cloud
 	// the effective agent is the one that will actually launch.
 	const effectiveAgentId = isCloudTarget
@@ -277,6 +275,11 @@ export function NewChatWidget({
 				.catch(() => {});
 			return;
 		}
+		const hostAgent = await resolveAgentConfig(
+			agentConfigs,
+			agentId,
+			pickedConfigId,
+		);
 		await createTerminalWorkspace
 			.mutateAsync({
 				target: selectedTarget,
@@ -284,7 +287,7 @@ export function NewChatWidget({
 				branchLabel,
 				agentId,
 				agentConfigId: hostAgent?.id,
-				agentLabel: selectedAgent?.label ?? "Claude",
+				agentLabel: hostAgent?.label ?? "Claude",
 				model,
 				effort,
 				message,
