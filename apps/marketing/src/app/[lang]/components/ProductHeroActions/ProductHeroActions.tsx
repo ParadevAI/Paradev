@@ -19,7 +19,10 @@ export function ProductHeroActions({
 
 	return (
 		<>
-			<div className="mt-8 flex flex-wrap items-center gap-3">
+			<div
+				data-cookie-banner-keep-clear
+				className="mt-8 flex flex-wrap items-center gap-3"
+			>
 				<DownloadButton
 					source={source}
 					onJoinWaitlist={() => setIsWaitlistOpen(true)}
