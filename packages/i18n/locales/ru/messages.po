@@ -947,6 +947,9 @@ msgstr "{credit} кредита пойдёт в счёт следующих сч
 msgid "{current} of {total}"
 msgstr "{current} из {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} из {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} из {totalBranches}"
 
@@ -8817,11 +8820,17 @@ msgstr "Найти в просмотрщике файлов"
 msgid "Find in page"
 msgstr "Найти на странице"
 
+msgid "Find in Page"
+msgstr "Найти на странице"
+
 msgid "Find in Terminal"
 msgstr "Найти в терминале"
 
 msgid "Find in this chat"
 msgstr "Найти в этом чате"
+
+msgid "Find is not available for this page"
+msgstr "Поиск недоступен для этой страницы"
 
 msgid "Find people and Devs"
 msgstr "Найти людей и Dev"
@@ -17184,6 +17193,9 @@ msgstr "Поиск задач…"
 
 msgid "Search text in the active chat"
 msgstr "Искать текст в активном чате"
+
+msgid "Search text in the active page"
+msgstr "Искать текст на активной странице"
 
 msgid "Search text in the active terminal"
 msgstr "Искать текст в активном терминале"

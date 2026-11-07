@@ -947,6 +947,9 @@ msgstr "{credit} kredi sonraki faturalarınızdan düşülür."
 msgid "{current} of {total}"
 msgstr "{current} / {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} / {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{totalBranches} içinden {currentPage}"
 
@@ -8817,11 +8820,17 @@ msgstr "Dosya görüntüleyicide bul"
 msgid "Find in page"
 msgstr "Sayfada bul"
 
+msgid "Find in Page"
+msgstr "Sayfada bul"
+
 msgid "Find in Terminal"
 msgstr "Terminalde bul"
 
 msgid "Find in this chat"
 msgstr "Bu sohbette bul"
+
+msgid "Find is not available for this page"
+msgstr "Bu sayfada arama kullanılamıyor"
 
 msgid "Find people and Devs"
 msgstr "Kişileri ve Dev'leri bul"
@@ -17184,6 +17193,9 @@ msgstr "Görevlerde ara…"
 
 msgid "Search text in the active chat"
 msgstr "Etkin sohbette metin ara"
+
+msgid "Search text in the active page"
+msgstr "Etkin sayfada metin ara"
 
 msgid "Search text in the active terminal"
 msgstr "Etkin terminalde metin ara"

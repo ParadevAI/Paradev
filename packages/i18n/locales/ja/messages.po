@@ -947,6 +947,9 @@ msgstr "{credit} のクレジットは次回以降の請求に充当されます
 msgid "{current} of {total}"
 msgstr "{total} 件中 {current} 件目"
 
+msgid "{current} of {total}+"
+msgstr "{total}+ 件中 {current} 件目"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage}/{totalBranches}"
 
@@ -8817,11 +8820,17 @@ msgstr "ファイルビューア内を検索"
 msgid "Find in page"
 msgstr "ページ内検索"
 
+msgid "Find in Page"
+msgstr "ページ内検索"
+
 msgid "Find in Terminal"
 msgstr "ターミナル内を検索"
 
 msgid "Find in this chat"
 msgstr "このチャット内を検索"
+
+msgid "Find is not available for this page"
+msgstr "このページでは検索を使用できません"
 
 msgid "Find people and Devs"
 msgstr "メンバーと Dev を検索"
@@ -17184,6 +17193,9 @@ msgstr "タスクを検索…"
 
 msgid "Search text in the active chat"
 msgstr "アクティブなチャット内でテキストを検索する"
+
+msgid "Search text in the active page"
+msgstr "アクティブなページ内でテキストを検索する"
 
 msgid "Search text in the active terminal"
 msgstr "アクティブなターミナル内でテキストを検索する"

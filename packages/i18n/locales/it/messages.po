@@ -947,6 +947,9 @@ msgstr "{credit} di credito verrà scalato dalle prossime fatture."
 msgid "{current} of {total}"
 msgstr "{current} di {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} di {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} di {totalBranches}"
 
@@ -8817,11 +8820,17 @@ msgstr "Cerca nel visualizzatore di file"
 msgid "Find in page"
 msgstr "Trova nella pagina"
 
+msgid "Find in Page"
+msgstr "Trova nella pagina"
+
 msgid "Find in Terminal"
 msgstr "Cerca nel terminale"
 
 msgid "Find in this chat"
 msgstr "Cerca in questa chat"
+
+msgid "Find is not available for this page"
+msgstr "La ricerca non è disponibile per questa pagina"
 
 msgid "Find people and Devs"
 msgstr "Trova persone e Dev"
@@ -17184,6 +17193,9 @@ msgstr "Cerca nei task…"
 
 msgid "Search text in the active chat"
 msgstr "Cerca testo nella chat attiva"
+
+msgid "Search text in the active page"
+msgstr "Cerca testo nella pagina attiva"
 
 msgid "Search text in the active terminal"
 msgstr "Cerca testo nel terminale attivo"

@@ -123,6 +123,7 @@ export function PageDetailView({
 					onCommentsEnabledChange={setCommentsEnabled}
 					initialThreadId={initialThreadId}
 					initialPanelOpen={initialPanelOpen}
+					findActive
 				/>
 			</div>
 		</div>

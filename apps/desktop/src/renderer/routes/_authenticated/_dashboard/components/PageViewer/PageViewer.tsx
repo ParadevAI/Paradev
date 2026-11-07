@@ -16,12 +16,14 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Spinner } from "@superset/ui/spinner";
 import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
+import { useDispatchChord, useHotkey } from "renderer/hotkeys";
 import { authClient, ensureFreshJwt, getJwt } from "renderer/lib/auth-client";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
+import { canonicalizeChord } from "shared/hotkey-chord";
 import { CommentDeepLink } from "./components/CommentDeepLink";
 import { MarkCommentsRead } from "./components/MarkCommentsRead";
 import { PageViewerMessage } from "./components/PageViewerMessage";
@@ -47,6 +49,8 @@ interface PageViewerProps {
 	onLinkClick?: (click: PageLinkClick) => void;
 	version?: number | null;
 	onExitPreview?: () => void;
+	/** Whether the find shortcut belongs to this viewer: its pane is focused. */
+	findActive?: boolean;
 }
 
 export function PageViewer({
@@ -66,8 +70,21 @@ export function PageViewer({
 	},
 	version,
 	onExitPreview,
+	findActive = false,
 }: PageViewerProps) {
 	const { t } = useLingui();
+	const [findRequest, setFindRequest] = useState(0);
+	useHotkey("FIND_IN_PAGE", () => setFindRequest((count) => count + 1), {
+		enabled: findActive,
+	});
+	const findChord = useDispatchChord("FIND_IN_PAGE");
+	const find = useMemo(
+		() => ({
+			request: findRequest,
+			chords: findActive && findChord ? [canonicalizeChord(findChord)] : [],
+		}),
+		[findActive, findChord, findRequest],
+	);
 	const { data: session } = authClient.useSession();
 	const pull = cloudTrpc.page.pull.useQuery({
 		...(pageId ? { id: pageId } : { slug }),
@@ -219,6 +236,7 @@ export function PageViewer({
 							onScrollYChange={(y) => scrollPositions.set(scrollKey, y)}
 							onFramePointerDown={onFramePointerDown}
 							onLinkClick={onLinkClick}
+							find={find}
 							{...(resolvedPageId && !previewing
 								? { storageTicket, presenceUrl, toolHost }
 								: {})}

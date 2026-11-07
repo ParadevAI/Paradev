@@ -947,6 +947,9 @@ msgstr "{credit} kreditu se odečte z dalších faktur."
 msgid "{current} of {total}"
 msgstr "{current} z {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} z {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} z {totalBranches}"
 
@@ -8817,11 +8820,17 @@ msgstr "Najít v prohlížeči souborů"
 msgid "Find in page"
 msgstr "Najít na stránce"
 
+msgid "Find in Page"
+msgstr "Najít na stránce"
+
 msgid "Find in Terminal"
 msgstr "Najít v terminálu"
 
 msgid "Find in this chat"
 msgstr "Najít v tomto chatu"
+
+msgid "Find is not available for this page"
+msgstr "Hledání není pro tuto stránku k dispozici"
 
 msgid "Find people and Devs"
 msgstr "Najít lidi a Devy"
@@ -17184,6 +17193,9 @@ msgstr "Hledat úkoly…"
 
 msgid "Search text in the active chat"
 msgstr "Hledat text v aktivním chatu"
+
+msgid "Search text in the active page"
+msgstr "Hledat text na aktivní stránce"
 
 msgid "Search text in the active terminal"
 msgstr "Hledat text v aktivním terminálu"

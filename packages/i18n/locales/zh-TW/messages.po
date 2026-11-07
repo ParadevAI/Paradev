@@ -947,6 +947,9 @@ msgstr "{credit} 的抵扣額將用於後續帳單。"
 msgid "{current} of {total}"
 msgstr "第 {current} 項，共 {total} 項"
 
+msgid "{current} of {total}+"
+msgstr "第 {current} 項，共 {total}+ 項"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage}/{totalBranches}"
 
@@ -8817,11 +8820,17 @@ msgstr "在檔案檢視器中查詢"
 msgid "Find in page"
 msgstr "在頁面中查詢"
 
+msgid "Find in Page"
+msgstr "在頁面中查詢"
+
 msgid "Find in Terminal"
 msgstr "在終端中查詢"
 
 msgid "Find in this chat"
 msgstr "在此聊天中查詢"
+
+msgid "Find is not available for this page"
+msgstr "此頁面無法使用查詢"
 
 msgid "Find people and Devs"
 msgstr "尋找成員和 Dev"
@@ -17184,6 +17193,9 @@ msgstr "搜尋任務…"
 
 msgid "Search text in the active chat"
 msgstr "在目前聊天中搜尋文字"
+
+msgid "Search text in the active page"
+msgstr "在目前頁面中搜尋文字"
 
 msgid "Search text in the active terminal"
 msgstr "在目前終端中搜尋文字"

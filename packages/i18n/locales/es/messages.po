@@ -947,6 +947,9 @@ msgstr "{credit} de crédito se aplicará a tus próximas facturas."
 msgid "{current} of {total}"
 msgstr "{current} de {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} de {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} de {totalBranches}"
 
@@ -8817,11 +8820,17 @@ msgstr "Buscar en el visor de archivos"
 msgid "Find in page"
 msgstr "Buscar en la página"
 
+msgid "Find in Page"
+msgstr "Buscar en la página"
+
 msgid "Find in Terminal"
 msgstr "Buscar en la terminal"
 
 msgid "Find in this chat"
 msgstr "Buscar en este chat"
+
+msgid "Find is not available for this page"
+msgstr "La búsqueda no está disponible para esta página"
 
 msgid "Find people and Devs"
 msgstr "Buscar personas y Devs"
@@ -17184,6 +17193,9 @@ msgstr "Buscar tareas…"
 
 msgid "Search text in the active chat"
 msgstr "Buscar texto en el chat activo"
+
+msgid "Search text in the active page"
+msgstr "Buscar texto en la página activa"
 
 msgid "Search text in the active terminal"
 msgstr "Buscar texto en la terminal activa"
