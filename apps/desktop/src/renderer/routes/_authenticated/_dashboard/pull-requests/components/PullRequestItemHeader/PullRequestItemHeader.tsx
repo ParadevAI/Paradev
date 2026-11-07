@@ -7,6 +7,7 @@ import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
 import type { PullRequestActionTarget } from "../../hooks/usePullRequestDraftMutation";
 import { PullRequestDraftStateMenu } from "../PullRequestDraftStateMenu";
 import { PullRequestStatePill } from "../PullRequestStatePill";
+import { PullRequestCopyText } from "./components/PullRequestCopyText";
 
 interface PullRequestItemHeaderProps {
 	data: PullRequestDetail;
@@ -38,21 +39,23 @@ export function PullRequestItemHeader({
 				) : (
 					<PullRequestStatePill data={data} />
 				)}
-				<span
-					className="min-w-0 truncate text-xs text-muted-foreground"
-					title={data.repoFullName}
+				<PullRequestCopyText
+					value={data.url}
+					label={t({ message: "Copy link to pull request" })}
+					className="truncate text-xs text-muted-foreground"
 				>
 					{repositoryName} #{data.number}
-				</span>
+				</PullRequestCopyText>
 			</div>
 			<h1 className="mt-3 select-text break-words text-[1.75rem] font-semibold leading-tight tracking-tight @max-[48rem]/detail:text-2xl @max-[36rem]/detail:mt-2 @max-[36rem]/detail:text-xl">
 				{data.title}
 			</h1>
 			<div className="mt-3 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
 				{data.author ? (
-					<span
-						className="flex min-w-0 items-center gap-1.5 font-medium text-foreground"
-						title={data.author.login}
+					<PullRequestCopyText
+						value={data.author.login}
+						label={t({ message: "Copy username" })}
+						className="flex items-center gap-1.5 font-medium text-foreground"
 					>
 						<Avatar className="size-4 rounded-full ring-1 ring-border/50">
 							<AvatarImage
@@ -67,36 +70,43 @@ export function PullRequestItemHeader({
 							</AvatarFallback>
 						</Avatar>
 						<span className="truncate">{data.author.login}</span>
-					</span>
+					</PullRequestCopyText>
 				) : null}
 				{createdAtValid ? (
 					<>
 						<span aria-hidden>·</span>
-						<time
-							dateTime={data.createdAt}
-							title={formatDateTime(createdAt)}
+						<PullRequestCopyText
+							value={formatDateTime(createdAt)}
+							label={formatDateTime(createdAt)}
 							className="shrink-0"
 						>
-							{formatRelativeTime(createdAt)}
-						</time>
+							<time dateTime={data.createdAt}>
+								{formatRelativeTime(createdAt)}
+							</time>
+						</PullRequestCopyText>
 					</>
 				) : null}
 				<span aria-hidden>·</span>
-				<span
-					className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground/80"
-					title={t({
-						message: `${data.head.ref} into ${data.base.ref}`,
-					})}
-				>
-					<span className="min-w-0 truncate" title={data.head.ref}>
+				<span className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground/80">
+					<PullRequestCopyText
+						value={data.head.ref}
+						label={t({ message: "Copy branch name" })}
+						className="truncate"
+					>
 						{data.head.ref}
-					</span>
+					</PullRequestCopyText>
 					<ArrowRight
 						aria-hidden
 						strokeWidth={1.75}
 						className="size-3.5 shrink-0"
 					/>
-					<span className="shrink-0">{data.base.ref}</span>
+					<PullRequestCopyText
+						value={data.base.ref}
+						label={t({ message: "Copy branch name" })}
+						className="shrink-0"
+					>
+						{data.base.ref}
+					</PullRequestCopyText>
 				</span>
 			</div>
 			{data.labels && data.labels.length > 0 ? (

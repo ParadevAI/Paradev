@@ -188,14 +188,14 @@ for Claude Code / Codex" apps in the category; it says nothing about the
 build's quality and it is not resolved by resubmitting the same metadata.
 
 1. Reply in the submission's message thread before resubmitting, and make the
-   reply about *identity*, not features: Superset is our own product, the
+   reply about *identity*, not features: Paradev is our own product, the
    mobile app is its official client, the source is public in this repository
    (`apps/mobile`), the bundle id is our domain, and the app only works with
-   Superset accounts and hosts. Link the GitHub repository, the desktop app
+   Paradev accounts and hosts. Link the GitHub repository, the desktop app
    download, and a screen recording that shows the desktop app and the phone
    app driving the same session.
 2. Make the product page say the same thing. Title keeps the brand; the
-   subtitle and the first sentence of the description should name Superset as
+   subtitle and the first sentence of the description should name Paradev as
    the product the app pairs with, not a generic "run AI agents from
    anywhere". Generic metadata is what the reviewer matched on.
 3. Ask for a call in the same thread. 4.3(a) is a judgment call, and the
@@ -225,6 +225,6 @@ build's quality and it is not resolved by resubmitting the same metadata.
   recording.
 - Bumping the major version or going months between submissions right before
   a launch.
-- Any copy that reads as "build and run apps on your phone". Superset Mobile
+- Any copy that reads as "build and run apps on your phone". Paradev Mobile
   operates agents that run elsewhere; the wording in `store.config.js` and in
   the app should always say so.

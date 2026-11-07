@@ -10,6 +10,7 @@ import {
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
+	recordBootSpans,
 	SandboxNotReadyError,
 	settleSandbox,
 	stopSandbox,
@@ -155,13 +156,23 @@ async function provision(
 		// The box is booting; the environment it needs arrives once host-service
 		// answers. The client's own wake pushes it again, so a workspace nobody
 		// opens still gets it (an agent launched at boot waits for this).
-		await Sentry.startSpan({ name: "settle", op: "sandbox" }, () =>
-			settleSandbox({
-				providerSandboxId,
-				hostTarget: sandbox.hostTarget,
-				claim,
-			}),
+		const answer = await Sentry.startSpan(
+			{ name: "settle", op: "sandbox" },
+			() =>
+				settleSandbox({
+					providerSandboxId,
+					hostTarget: sandbox.hostTarget,
+					claim,
+				}),
 		);
+		try {
+			recordBootSpans(answer);
+		} catch (error) {
+			console.error(
+				`[cloud-workspace] could not trace the boot of ${row.id}`,
+				error,
+			);
+		}
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);

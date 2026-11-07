@@ -4,8 +4,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { SquareDashedMousePointer } from "lucide-react";
 import { useCallback } from "react";
+import {
+	ExtensionsMenu,
+	PinnedExtensionButtons,
+	useBrowserExtensions,
+} from "renderer/components/BrowserExtensions";
 import { OpenBrowserPageInAppButton } from "renderer/components/OpenBrowserPageInAppButton";
-import type { PaneViewerData } from "../../../../../../types";
+import type { BrowserPaneData, PaneViewerData } from "../../../../../../types";
 import { browserRuntimeRegistry } from "../../browserRuntimeRegistry";
 import { designModeStore, useDesignModeState } from "../../designModeStore";
 import {
@@ -27,6 +32,8 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 	const state = useBrowserState(paneId);
 	const designMode = useDesignModeState(paneId);
 	const deviceToolbar = useDeviceToolbarState(paneId);
+	const extensions = useBrowserExtensions(paneId);
+	const isAgentPane = (ctx.pane.data as BrowserPaneData).agent === true;
 
 	const handleToggleDesignMode = useCallback(() => {
 		designModeStore.toggle(paneId);
@@ -68,6 +75,17 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 				onNavigate={handleNavigate}
 			/>
 			<div className="flex shrink-0 items-center gap-1 pr-1.5">
+				{!isAgentPane && (
+					<>
+						<PinnedExtensionButtons paneId={paneId} extensions={extensions} />
+						<ExtensionsMenu
+							paneId={paneId}
+							extensions={extensions}
+							onOpenUrl={handleNavigate}
+							triggerClassName="rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+						/>
+					</>
+				)}
 				<OpenBrowserPageInAppButton
 					currentUrl={state.currentUrl}
 					onOpenInPane={(newPane) =>

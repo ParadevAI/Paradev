@@ -1,4 +1,4 @@
-import { parsePatchFiles } from "@pierre/diffs";
+import { type FileDiffMetadata, parsePatchFiles } from "@pierre/diffs";
 import type { ReactNode } from "react";
 import {
 	isLocalPathText,
@@ -86,18 +86,54 @@ export function isDiffLanguage(language: string | null): boolean {
 	return language !== null && DIFF_LANGUAGES.has(language);
 }
 
+const GIT_DIFF_HEADER = /^diff --git /m;
+const UNIFIED_HEADERS = /^--- (\S+).*\n\+\+\+ (\S+)/gm;
+const UNIFIED_SIDE_PREFIX = /^[ab]\//;
+
 /**
- * Whether the text is a patch the patch view can show: it renders exactly one
- * file and throws on any other count, so a fence holding a whole `git diff`
- * goes to the plain code view instead.
+ * Whether every `---`/`+++` pair names its sides git's way (`a/` then `b/`,
+ * or `/dev/null`), so the prefixes are markers and not real directories.
  */
-export function isSingleFilePatch(text: string): boolean {
+function usesSidePrefixes(text: string): boolean {
+	const pairs = [...text.matchAll(UNIFIED_HEADERS)];
+	return (
+		pairs.length > 0 &&
+		pairs.every(
+			([, oldPath, newPath]) =>
+				(oldPath === "/dev/null" || oldPath?.startsWith("a/")) &&
+				(newPath === "/dev/null" || newPath?.startsWith("b/")),
+		)
+	);
+}
+
+function withoutSidePrefixes(file: FileDiffMetadata): FileDiffMetadata {
+	const name = file.name.replace(UNIFIED_SIDE_PREFIX, "");
+	const prevName = file.prevName?.replace(UNIFIED_SIDE_PREFIX, "");
+	if (prevName === undefined || prevName !== name) {
+		return { ...file, name, prevName };
+	}
+	return { ...file, name, prevName: undefined, type: "change" };
+}
+
+/**
+ * The files of a patch the diff view can show in full, or none so the fence
+ * shows as code. A file without hunks is only kept when it is a pure rename:
+ * Pierre drops the `Binary files … differ` line, which would leave an empty
+ * diff.
+ */
+export function parsePatchFileDiffs(text: string): FileDiffMetadata[] {
 	try {
-		const patches = parsePatchFiles(text);
-		if (patches.length !== 1) return false;
-		const files = patches[0]?.files ?? [];
-		return files.length === 1 && (files[0]?.hunks.length ?? 0) > 0;
+		const files = parsePatchFiles(text).flatMap((patch) => patch.files);
+		if (!files.some((file) => file.hunks.length > 0)) return [];
+		if (
+			files.some(
+				(file) => file.hunks.length === 0 && file.type !== "rename-pure",
+			)
+		)
+			return [];
+		if (GIT_DIFF_HEADER.test(text) || !usesSidePrefixes(text)) return files;
+		return files.map(withoutSidePrefixes);
 	} catch {
-		return false;
+		return [];
 	}
 }

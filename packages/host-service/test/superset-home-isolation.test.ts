@@ -18,7 +18,7 @@ function canonical(target: string): string {
  * real ~/.superset — which is how the default agent-account pointers got
  * clobbered before (see scripts/test-preload.ts).
  */
-describe("Superset home isolation", () => {
+describe("Paradev home isolation", () => {
 	function requireIsolatedHome(): string {
 		const isolated = process.env.SUPERSET_HOME_DIR;
 		const preloadHome = Reflect.get(
@@ -31,7 +31,9 @@ describe("Superset home isolation", () => {
 		const canonicalHome = canonical(isolated);
 		if (
 			canonicalHome !== canonical(preloadHome) ||
-			canonicalHome === canonical(join(homedir(), ".superset"))
+			[".paradev", ".superset"].some(
+				(dir) => canonicalHome === canonical(join(homedir(), dir)),
+			)
 		) {
 			throw new Error("SUPERSET_HOME_DIR is not isolated for tests");
 		}

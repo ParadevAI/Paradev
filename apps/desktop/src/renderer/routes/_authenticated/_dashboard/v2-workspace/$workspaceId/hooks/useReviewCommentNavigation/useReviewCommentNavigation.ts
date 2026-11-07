@@ -1,6 +1,6 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useSettings } from "renderer/stores/settings";
-import type { DiffFocusSide } from "../../types";
+import type { DiffFocusSide, DiffPaneFilter } from "../../types";
 import { getChangesetFileKey } from "../useChangeset";
 
 export type OpenReviewDiff = (
@@ -9,6 +9,7 @@ export type OpenReviewDiff = (
 	line?: number,
 	side?: DiffFocusSide,
 	changeKey?: string,
+	filter?: DiffPaneFilter,
 ) => void;
 
 export function useReviewCommentNavigation(

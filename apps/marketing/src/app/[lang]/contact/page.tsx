@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { localizedAlternates } from "@/app/[lang]/metadata";
@@ -11,6 +11,8 @@ import { ContactForm } from "../components/ContactForm";
 
 const statusHost = new URL(COMPANY.STATUS_URL).host;
 const trustHost = new URL(COMPANY.TRUST_URL).host;
+const githubHandle = SOCIAL.GITHUB.handle;
+const xHandle = SOCIAL.X.handle;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -32,11 +34,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
+	"use no memo";
 	await initServerI18n();
 
 	// Named locals so the paragraph extracts with `{supportEmail}` /
 	// `{teamEmail}` instead of positional `{0}` / `{1}`.
-	const supportEmail = `support${COMPANY.EMAIL_DOMAIN}`;
+	const supportEmail = COMPANY.SUPPORT_EMAIL;
 	const teamEmail = COMPANY.TEAM_EMAIL;
 
 	return (
@@ -59,7 +62,7 @@ export default async function ContactPage() {
 						<Trans>Contact</Trans>
 					</span>
 					<h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mt-4">
-						<Trans>Talk to Superset</Trans>
+						<Trans>Talk to Paradev</Trans>
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-lg">
 						<Trans>
@@ -82,8 +85,8 @@ export default async function ContactPage() {
 					</h2>
 					<p className="text-muted-foreground mt-3">
 						<Trans>
-							Superset is built by a team based in San Francisco, California.
-							For product support or account questions, email{" "}
+							Paradev is built by a team based in San Francisco, California. For
+							product support or account questions, email{" "}
 							<a className="text-foreground underline" href={COMPANY.MAIL_TO}>
 								{supportEmail}
 							</a>{" "}
@@ -106,7 +109,7 @@ export default async function ContactPage() {
 								className="text-foreground underline"
 								href={COMPANY.REPORT_ISSUE_URL}
 							>
-								github.com/superset-sh/superset
+								{githubHandle}
 							</a>
 							. Our community lives on{" "}
 							<a
@@ -117,7 +120,7 @@ export default async function ContactPage() {
 							</a>
 							, and we post updates on{" "}
 							<a className="text-foreground underline" href={COMPANY.X_URL}>
-								X (@superset_sh)
+								X ({xHandle})
 							</a>{" "}
 							and{" "}
 							<a

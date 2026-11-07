@@ -400,50 +400,16 @@ port-clearing exec trampoline; keep the patched helper (or ship our own) for it.
 
 ## react-native-screens (`react-native-screens@<version>.patch`)
 
-**Why:** on iOS, a form sheet screen (`presentation: "formSheet"`) finds the
-`ScrollView` in its content on every layout pass and sizes it to the sheet's
-frame. When a sheet is replaced by a pushed screen (`router.replace` from the
-pull-requests sheet), Fabric recycles the sheet's `UIScrollView` into the new
-screen, and the dismissed sheet still gets one more layout pass *after* it has
-been invalidated: it finds that recycled scroll view down its old subview chain
-and sizes it to the sheet again. The PR screen came up with its scroll view at
-464pt (the `[0.5]` detent), everything below the fold unpainted and untappable,
-and every later screen that reused that scroll view instance did the same.
-Upstream #4091 (in 4.26.0) only removes the KVO observer in `invalidate`; the
-layout-pass path is untouched and still present on `4.28-stable` as of
-2026-09-12. Diagnosed with `NSLog` in `correctScrollViewFrame:` and
-`invalidateImpl`: the correction to 464pt logs 4ms after the sheet's
-invalidate, on the same scroll view pointer the new screen had just laid out at
-956pt.
+The form sheet scroll view fix this patch used to carry (a dismissed sheet
+resizing a recycled `UIScrollView` in the screen that replaced it) is upstream
+since 4.30 (#4651). `apps/mobile/react-native-screens-sheet-patch.test.ts` now
+checks that the installed package still has it; if a bump loses it, restore the
+early return on `_invalidated` in `applyFrameCorrectionForDescendantScrollView`
+(`ios/RNSScreen.mm`). Verify in the simulator: open a workspace with two PRs,
+tap the PR chip, tap a row, go back, reopen the sheet, tap the other row. The
+second PR must show its description and the Files row without scrolling.
 
-**What it changes** (`ios/RNSScreen.mm`): an `_invalidated` flag set in
-`invalidateImpl`; `applyFrameCorrectionForDescendantScrollView` returns early
-once it is set. Reproduced unpatched on 4.27.0 (latest stable, 2026-09-12) in
-the same flow, so bumping alone does not fix it. 4.27.0 already declares an
-`invalidated` property on `RNSScreenView` (set in `invalidateImpl`, used only
-for transition progress and header config), so a regenerated patch for 4.27+
-must not add the ivar again — only the early return is needed.
-
-**Guard test:** `apps/mobile/react-native-screens-sheet-patch.test.ts`.
-
-**Regenerating after a version bump** (~2 min, plus a native rebuild to verify):
-
-```bash
-bun patch react-native-screens@<new-version>
-# in node_modules/react-native-screens/ios/RNSScreen.mm, return early from
-# applyFrameCorrectionForDescendantScrollView when `_invalidated` is set.
-# Before 4.27.0 only: also add `BOOL _invalidated;` to the RNSScreenView ivar
-# block and set `_invalidated = YES;` first thing in invalidateImpl (4.27.0+
-# already has both; adding the ivar again fails to compile).
-bun patch --commit 'node_modules/react-native-screens'
-bun test apps/mobile/react-native-screens-sheet-patch.test.ts
-```
-
-Verify in the simulator: open a workspace with two PRs, tap the PR chip, tap a
-row, go back, reopen the sheet, tap the other row. The second PR must show its
-description and the Files row without scrolling.
-
-### Interactive push (same patch)
+### Interactive push
 
 **Why:** Home's right-edge swipe returns to the last workspace, and the pushed
 screen follows the finger like the back swipe does. react-native-screens can
@@ -489,8 +455,8 @@ exactly that shape whenever a loaded directory comes back from the host as a
 non-directory (a dangling symlink, or a directory replaced by a file between
 listings) while a row beneath it is still selected; the throw leaves the
 controller half-reset (store swapped, subscription dropped, projection stale)
-until the next refresh. Reproduced against 1.0.0-beta.5; 1.0.0-beta.6 carries
-the same code.
+until the next refresh. Reproduced against 1.0.0-beta.5; 1.0.0-beta.6 still
+carries the same code.
 
 **What it changes** (`dist/path-store/src/canonical.js`): one line in
 `findNodeIdBySegments` — return null when the node reached so far is not a
@@ -513,6 +479,42 @@ bun test apps/desktop/src/pierre-trees-lookup-patch.test.ts
 **Removing:** delete the patch, the `patchedDependencies` entry and the guard
 test once @pierre/trees ships a release whose segment walk stops at a file
 node.
+
+## @pierre/diffs (`@pierre%2Fdiffs@<version>.patch`)
+
+**Why:** GH #9136 stress testing. The Changes pane showed `VirtualizedFile.render:
+rendered a different file than its prepared layout` in place of every visible
+diff whenever its patch request failed (reproduced with 3,000 untracked files:
+7 errors per load, every load). `VirtualizedFile.finalizeRender` compares the
+rendered file with the prepared one by object identity. The renderer can hand
+back the result it cached for an earlier, equal file object, so an equal file
+throws. `VirtualizedFileDiff.finalizeRender` already compares by target
+(`areDiffTargetsEqual`). 1.6.2 is the latest release.
+
+**What it changes** (`dist/components/VirtualizedFile.js`): one line in
+`finalizeRender` — compare with `areFileTargetsEqual` (cache key, or name,
+contents and language), which the same file already uses everywhere else.
+
+**Guard test:** `apps/desktop/src/pierre-diffs-finalize-render-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch @pierre/diffs@<new-version>
+# in node_modules/@pierre/diffs/dist/components/VirtualizedFile.js, in
+# finalizeRender, replace `this.getRenderedFile() !== this.pendingRender?.file`
+# with `!areFileTargetsEqual(this.getRenderedFile(), this.pendingRender?.file)`
+bun patch --commit 'node_modules/@pierre/diffs'
+bun test apps/desktop/src/pierre-diffs-finalize-render-patch.test.ts
+```
+
+`bun patch --commit` can also record deletions of the bundled
+`dist/node_modules/.pnpm/@types_*` files. Keep only the `VirtualizedFile.js`
+hunk.
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test once @pierre/diffs ships a release whose `VirtualizedFile.finalizeRender`
+compares by target.
 
 ## expo-observe (`expo-observe@<version>.patch`)
 
@@ -579,3 +581,196 @@ make the same change in `handleRefreshTokenGrant` (keep the
 `superset-patch: refresh-reuse-grace` comment), `bun patch --commit
 'node_modules/@better-auth/oauth-provider'`, then
 `bun test packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+
+## react-native (`react-native@<version>.patch`)
+
+**Why:** On iPhone Duo the status bar and navigation buttons sit in a column on
+one side of the window. UIKit reports it as a side safe area, but
+`ScrollView`'s `contentInsetAdjustmentBehavior` only clears the safe area along
+the scrolling axis, so list rows run under the column. The upstream fix is
+facebook/react-native#59194 (open), built on #58109
+(`experimental_onSafeAreaInsetsChange`, on `main` since 2026-10-09). Neither is
+in 0.88.
+
+**What it changes:** the iOS and shared parts of both PRs. A `View` reports its
+native safe-area insets; a `ScrollView` whose `contentInsetAdjustmentBehavior`
+is not `never` pads its content container by the insets across its scrolling
+axis, and `RCTEnhancedScrollView` stops UIKit adding the same inset again. bun
+cannot apply a patch that creates files, so the two new modules of the PRs
+(`getSafeAreaContentPadding`, `warnOnRepeatedSafeAreaInsetsChanges`) are
+inlined at the end of `ScrollView.js` and `View.js`. The native half is in
+React Native's core, so `app.config.ts` sets `buildReactNativeFromSource`.
+
+**Guard test:** `apps/mobile/react-native-safe-area-scroll-patch.test.ts`.
+
+**Removing:** delete the patch, its `patchedDependencies` entry and
+`buildReactNativeFromSource` once the React Native in use ships #59194.
+
+**Regenerating:** apply `gh pr diff 58109` and `gh pr diff 59194` (React Native
+repo, without Android, tests, rn-tester and API snapshots) to a copy of the
+package with `patch -p3`, inline the two new files as above, and write
+`git diff` as the patch. Verify on the folded iPhone Duo: Settings rows end
+before the button column.
+
+## electron-chrome-web-store (`electron-chrome-web-store@<version>.patch`)
+
+**Why:** the package reads the CRX3 header and checks that the declared
+extension ID matches a public key, but never verifies a signature, and it
+unpacks CRX2 files with no check at all. HTTPS to Google is then the only guard
+on code that runs in every page of the browser pane. Installs and updates
+download, parse and unpack in one internal call chain (`downloadExtensionFromURL`
+→ `parseCrx` → `unpackCrx`), so no option or hook of the package can see the
+bytes in between.
+
+**What it changes** (`dist/cjs/browser/index.js`, `dist/esm/browser/index.mjs`
+and the types): `parseCrx`, the one function every install and update passes
+through, first calls a verifier set with the new `setCrxVerifier` export, and
+refuses every CRX while none is set. It also exports the existing
+`downloadExtensionFromURL`, so a test can serve a CRX from a local server. The
+verifier is `apps/desktop/src/main/lib/browser/extension-host/crx3.ts`.
+
+Two more changes. The store page's preload swaps "Chrome" for the app name in
+every label on every pass, so a name that contains "Chrome" (a dev build's
+does) grew without end; `updateBranding` now skips a label that already holds
+the name. And the store's Remove ignored `showConfirmDialog` and deleted the
+extension at once; a new `onUninstall` option hands the removal to the app,
+which asks first and removes through its own path.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/web-store.test.ts`.
+It downloads a real Web Store CRX, the same bytes with one flipped byte, and an
+unsigned CRX2 through the installed package, and checks that only the first
+reaches disk. Without the patch its imports do not exist and typecheck fails.
+Its second test runs the installed `updateBranding` five times with an app name
+that contains "Chrome" and expects the name once.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-web-store`
+(without `CI=1` it runs the native rebuild), make the same change in `parseCrx`
+and both export lists of both bundles, `CI=1 bun patch --commit
+'node_modules/electron-chrome-web-store'`, then run the guard test.
+
+## electron-chrome-extensions (`electron-chrome-extensions@<version>.patch`)
+
+**Why:** the package checks almost no extension permissions at its API
+boundary.
+
+1. The router takes the extension ID from the IPC message and runs the handler
+   as that extension. A renderer that reaches raw IPC could then act as another
+   extension, for example LastPass, for tabs, windows, menus and toolbar
+   actions.
+2. Every extension gets each tab's `url`, `pendingUrl`, `title` and
+   `favIconUrl` from `tabs.*`, and again inside each window's `tabs` from
+   `windows.*`, whatever its permissions. The install dialog warns about
+   browsing history only for `tabs`.
+3. The preload gives every extension `chrome.cookies`. With no permission, an
+   extension could read, set and remove any site's cookies, session cookies
+   included, and `cookies.onChanged` went to all of them.
+4. Every frame navigation, with its URL, went to every extension through
+   `webNavigation.*` events, and `getFrame`/`getAllFrames` had no check.
+5. `notifications.*` and `contextMenus.*` had no permission check.
+   `permissions.request` granted without asking when the app had no prompt,
+   and its grants were never read.
+
+**What it changes** (`dist/cjs/index.js`, `dist/esm/index.mjs`):
+
+1. The router's `crx-msg`, `crx-add-listener` and `crx-remove-listener`
+   handlers derive the ID from the sender (the frame's URL, or the service
+   worker's scope) and refuse a message whose ID differs. A message with no ID
+   (the app's own UI) still passes; handlers that need an extension already
+   refuse it.
+2. One table, `extensionApiRules`, keyed by handler and event name, holds
+   Chrome's rule for the `tabs`, `windows`, `cookies`, `webNavigation`,
+   `notifications` and `contextMenus` namespaces (`ruledApiNamespaces`). A rule names the API permission it needs (`permission`), a
+   check on the call's arguments (`allowed`), and a filter for the result
+   (`result`) or for an event's arguments (`args`), run for the extension that
+   calls or listens. `onExtensionMessage` refuses the call before the handler
+   runs and filters what it returns. `sendEvent` skips a listener without the
+   permission, filters the arguments per listener, and skips it when the filter
+   returns nothing. A name in those namespaces with no rule fails closed:
+   the call throws, and the event goes to nobody.
+3. Tabs: an extension sees the four fields with `tabs`, a host permission
+   (`permissions` or `host_permissions`) that matches the tab's URL, or
+   `activeTab` on the active tab (`canSeeTabUrl`). Otherwise it gets a copy
+   without them (`tabDetailsForExtension`); the `tabDetailsCache` entry stays
+   whole. `tabs.query` matches no hidden tab on `url` or `title`, and an
+   `onUpdated` whose only changes were hidden fields is dropped.
+   `browserAction.onClicked` and `tabs.onCreated` carry the tab through the
+   same filter. `tabs.insertCSS` needs a host permission or `activeTab` for the
+   tab. Windows: each embedded tab goes through the same filter, in a copy of
+   the cached window.
+4. Cookies: every call and `onChanged` needs `cookies`. A cookie is visible
+   only with a host permission for its URL (`https` or `http` by `secure`, its
+   domain, its path), as Chrome builds it. `get` returns `null` and `getAll`
+   leaves out the others; `set` and `remove` throw without a host permission
+   for `details.url`.
+5. webNavigation: every call and event needs `webNavigation`. Notifications
+   and context menus: every call and event needs `notifications` or
+   `contextMenus`.
+6. Grants: an extension holds its manifest's `permissions` and
+   `host_permissions`, plus what `permissions.request` granted
+   (`grantedPermissions`, kept in `runtimeGrants` until the extension
+   unloads). `request` takes only what the manifest declares as required or
+   optional; a host pattern covers origins, never an API permission
+   (`originCovered`). It asks the app, refuses when the app has no prompt, and
+   sends `permissions.onAdded`. `remove` refuses a required entry. `getAll`
+   and `contains` read the same grants.
+7. `activeTab`: a click on the extension's toolbar button or one of its
+   context-menu items grants it for that tab's origin (`grantActiveTab`). It
+   ends when the tab moves to another origin or closes, and a return to the
+   origin does not bring it back.
+8. `browserAction.getState` and `browserAction.activate` are no longer IPC
+   handlers; the app calls them in the main process. `windows.create`,
+   `tabs.create` and `tabs.update` refuse `file:` and `data:` URLs, as they
+   already refused `chrome:` and `javascript:`. With no window focused,
+   `windows.getCurrent` and `windows.getLastFocused` answer the newest open
+   window, and throw as in Chrome when none is open.
+
+9. Context menus: `create`, `update`, `remove` and `removeAll` emit
+   `context-menus-changed` with the extension's items, and
+   `restoreContextMenuItems` puts saved items back without an event. The app
+   keeps them across restarts, as Chrome does (`extension-lifecycle.ts`).
+   `contextMenus.update` is a real handler, with a rule, instead of a no-op.
+10. Native messaging: the package's `runtime.connectNative` and
+   `runtime.sendNativeMessage` handlers are removed. They read one message per
+   chunk of host output, counted characters instead of bytes, and left hosts
+   running. The app's `extension-host/native-messaging/` is the only path.
+
+**What it changes** (`dist/chrome-extension-api.preload.js`): `chrome.storage`
+is no longer replaced. The package made `sync` and `managed` the same object
+as `local`; the app's `shimChromeStorage` gives each its own area instead.
+`contextMenus.update` calls the handler. The `runtime.connectNative` and
+`runtime.sendNativeMessage` entries are removed; the app's shim adds its own.
+
+Host patterns are matched by scheme, host and path, not by the package's
+`matchesPattern` glob, which lets `*://*.example.com/*` match any URL that
+contains `.example.com/`.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/electron-chrome-extensions-patch.test.ts`.
+It loads the router, `TabsAPI`, `WindowsAPI`, `CookiesAPI` and
+`WebNavigationAPI` from both installed bundles, with fake Electron objects. It
+runs `assertSenderIsExtension` against a popup that claims another extension's
+ID and a website that claims one. It calls handlers through
+`onExtensionMessage` and fires events through `sendEvent`, as extensions with
+no permission, `tabs`, a host permission, `activeTab`, `cookies` with and
+without a host, `webNavigation`, `notifications` and `contextMenus`, and
+through `permissions.request`. Two tests list every handler the API classes
+register and every event name their code sends, and fail when one has no rule
+in `extensionApiRules`. One drives `ContextMenusAPI` through each handler and
+`restoreContextMenuItems`, and one reads the preload for the two changes there.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-extensions`.
+In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
+`RoutingDelegate` and call it first in the three handlers; add the helpers and
+the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
+add the `canSeeTabUrl` line to the `TabsAPI.query` filter; add `update` and
+`emitChanged` to `ContextMenusAPI` and `restoreContextMenuItems` after
+`addWindow`; remove the `runtime.connectNative`, `runtime.disconnectNative`
+and `runtime.sendNativeMessage` handlers from `RuntimeAPI`. In the preload,
+delete the `storage` entry, the `connectNative` and `sendNativeMessage` entries,
+and the `noop` option of `contextMenus.update`. In
+`ExtensionRouter.onExtensionMessage`, look up `extensionApiRule(handlerName)`
+before the handler runs and pass the result through `apiRule.result`; in
+`sendEvent`, look up `extensionApiRule(eventName)` and check and filter per
+listener. Then `CI=1 bun patch --commit
+'node_modules/electron-chrome-extensions'`, drop the empty `.bun-tag-*` entry
+it adds, run `bun install`, and run the guard test. A new handler or event in
+a ruled namespace fails that test until it has a rule.

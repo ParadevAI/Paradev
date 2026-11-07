@@ -88,7 +88,7 @@ export function explainAgent({
 			agentId: null,
 			headline: "No agent hook from this terminal yet.",
 			because:
-				"something may be running in the terminal, but no agent hook has reached Superset. It is a program that is not an agent, an agent still starting, or an agent whose hooks are not installed",
+				"something may be running in the terminal, but no agent hook has reached Paradev. It is a program that is not an agent, an agent still starting, or an agent whose hooks are not installed",
 			details: unchecked,
 		};
 	}
@@ -131,7 +131,7 @@ export function explainAgent({
 	}
 	if (state === "working") {
 		details.push(
-			"Agents send no hook for an interrupt. Superset clears this state when the interrupt comes through Superset; one typed elsewhere can leave it working.",
+			"Agents send no hook for an interrupt. Paradev clears this state when the interrupt comes through Paradev; one typed elsewhere can leave it working.",
 		);
 	}
 	return {

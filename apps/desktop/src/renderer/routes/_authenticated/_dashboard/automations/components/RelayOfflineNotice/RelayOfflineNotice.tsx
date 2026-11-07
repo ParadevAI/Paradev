@@ -46,7 +46,7 @@ export function RelayOfflineNotice({
 					{ICON}
 					<span>
 						<Trans>
-							This device isn't connected to the Superset relay, so automation
+							This device isn't connected to the Paradev relay, so automation
 							runs will be skipped.
 						</Trans>
 					</span>
@@ -85,7 +85,7 @@ export function RelayOfflineNotice({
 				<span>
 					<Trans>
 						<span className="font-medium">{remoteHost.name}</span> isn't
-						connected to the Superset relay, so its runs will be skipped. Check
+						connected to the Paradev relay, so its runs will be skipped. Check
 						its{" "}
 						<Link
 							to="/settings/hosts/$hostId"

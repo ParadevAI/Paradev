@@ -5,6 +5,7 @@ import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { useChangesTab } from "../../../../../../components/WorkspaceSidebar/hooks/useChangesTab";
 import type { DiffPaneData, PaneViewerData } from "../../../../../../types";
+import { useHeldWhileTabHidden } from "../../hooks/useHeldWhileTabHidden";
 import {
 	FILE_LIST_MIN_WIDTH,
 	MIN_DIFF_WIDTH,
@@ -67,6 +68,10 @@ export function DiffPaneFileList({
 					focusLine: undefined,
 					focusSide: undefined,
 					focusTick: Date.now(),
+					filter:
+						data.filter && (data.filter.paths?.includes(path) ?? true)
+							? data.filter
+							: undefined,
 				} as DiffPaneData);
 			}
 			if (layout === "overlay") onClose();
@@ -89,9 +94,12 @@ export function DiffPaneFileList({
 		compact: true,
 	});
 
+	// Every git change re-renders each file row; a hidden tab catches up when shown.
+	const content = useHeldWhileTabHidden(changesTab.content);
+
 	const list = (
 		<div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
-			{changesTab.content}
+			{content}
 		</div>
 	);
 

@@ -5,6 +5,7 @@ import {
 	fromAutumnRest,
 	isSelfServeAutumnPlan,
 	seatLicensePlan,
+	seatPriceOf,
 } from "@superset/shared/billing";
 import { autumnRest } from "../../../autumn";
 import { LEGACY_CLIENT_PLAN_IDS } from "../legacy/plan-ids";
@@ -82,4 +83,11 @@ export async function seatLicenseFor(
 	const plans = await catalogAutumnPlans();
 	const plan = plans.find((candidate) => candidate.id === planId);
 	return plan ? seatLicensePlan(plan, plans) : null;
+}
+
+/** How often a plan bills its seats, whether they are licenses or a feature quantity. */
+export async function seatIntervalFor(planId: string): Promise<string | null> {
+	const plans = await catalogAutumnPlans();
+	const plan = plans.find((candidate) => candidate.id === planId);
+	return (plan && seatPriceOf(plan, plans)?.interval) ?? null;
 }

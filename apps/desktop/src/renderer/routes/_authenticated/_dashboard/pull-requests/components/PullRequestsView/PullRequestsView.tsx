@@ -13,6 +13,7 @@ import {
 } from "../../stores/pullRequestsFilterStore";
 import { PullRequestsContent } from "./components/PullRequestsContent";
 import { PullRequestsTopBar } from "./components/PullRequestsTopBar";
+import { usePullRequestsList } from "./hooks/usePullRequestsList";
 
 interface PullRequestsViewProps {
 	initialSearch?: string;
@@ -247,6 +248,21 @@ export function PullRequestsView({
 		navigateTo(buildSearch({ review: nextReview }));
 	};
 
+	const list = usePullRequestsList({
+		projectTargets,
+		searchQuery,
+		authorFilter,
+		reviewFilter,
+		includeClosed,
+		mergedOnly,
+	});
+	const canRefresh = projectTargets.some((target) => target.hostUrl);
+	const hasRows = list.rows.length > 0;
+	const resultCount =
+		canRefresh && (hasRows || (!list.isFetching && !list.error))
+			? list.totalCount
+			: null;
+
 	const stateFilter: "open" | "all" | "merged" = mergedOnly
 		? "merged"
 		: includeClosed
@@ -270,9 +286,13 @@ export function PullRequestsView({
 				onReviewFilterChange={handleReviewFilterChange}
 				stateFilter={stateFilter}
 				onStateFilterChange={handleStateFilterChange}
+				resultCount={resultCount}
+				isRefreshing={list.isFetching}
+				onRefresh={canRefresh ? () => void list.refetch() : undefined}
 			/>
 			<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
 				<PullRequestsContent
+					list={list}
 					projectFilters={projectFilters}
 					projectTargets={projectTargets}
 					areProjectsReady={areProjectsReady}

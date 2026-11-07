@@ -20,7 +20,7 @@ describe("update", () => {
 	test("refuses to run from the desktop-bundled CLI", async () => {
 		process.env.SUPERSET_CLI_CHANNEL = "desktop-bundled";
 		await expect(invoke()).rejects.toThrow(
-			/bundled with the Superset desktop app/,
+			/bundled with the Paradev desktop app/,
 		);
 	});
 

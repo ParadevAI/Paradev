@@ -270,7 +270,7 @@ export function OverlaysSection() {
 							<RocketIcon className="mt-1 size-4 shrink-0" />
 							<div className="space-y-1">
 								<p className="text-sm font-medium">
-									<Trans>Superset</Trans>
+									<Trans>Paradev</Trans>
 								</p>
 								<p className="text-sm text-muted-foreground">
 									<Trans>Run 10+ parallel coding agents on your machine.</Trans>

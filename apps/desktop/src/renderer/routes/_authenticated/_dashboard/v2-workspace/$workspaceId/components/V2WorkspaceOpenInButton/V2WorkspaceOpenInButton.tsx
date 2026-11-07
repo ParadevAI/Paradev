@@ -14,7 +14,7 @@ export function V2WorkspaceOpenInButton({
 	return (
 		<V2OpenInMenuButton
 			branch={target.branch}
-			worktreePath={target.worktreePath}
+			path={target.worktreePath}
 			projectId={target.projectId}
 		/>
 	);

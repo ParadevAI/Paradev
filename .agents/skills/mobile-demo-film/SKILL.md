@@ -67,7 +67,7 @@ its paths, cut points, and text for the feature being demonstrated.
     { "type": "card", "eyebrow": "Meanwhile", "title": "The agent works on your Mac.",
       "image": "shots/desktop.png", "duration": 4 },
     { "type": "phone", "src": "cfr/02.mp4", "start": 0, "end": 10 },
-    { "type": "end", "wordmark": "Superset", "caption": "Review the result anywhere", "duration": 2.2 }
+    { "type": "end", "wordmark": "Paradev", "caption": "Review the result anywhere", "duration": 2.2 }
   ]
 }
 ```

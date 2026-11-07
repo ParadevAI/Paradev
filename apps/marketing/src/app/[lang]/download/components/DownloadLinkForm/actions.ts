@@ -80,7 +80,7 @@ export async function sendDownloadLink(
 		const { error } = await resend.emails.send({
 			from: NOREPLY_FROM,
 			to: sanitizedEmail,
-			subject: "Your Superset download link",
+			subject: "Your Paradev download link",
 			react: DownloadLinkEmail({ recipientEmail: sanitizedEmail }),
 		});
 

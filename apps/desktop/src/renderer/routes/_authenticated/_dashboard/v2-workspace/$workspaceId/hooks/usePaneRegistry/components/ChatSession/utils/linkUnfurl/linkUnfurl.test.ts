@@ -42,6 +42,10 @@ describe("unfurlLink", () => {
 				label: "plugin-page-xy56xt",
 			},
 		],
+		[
+			"https://app.superset.sh/environments/e1",
+			{ icon: { kind: "environment" } },
+		],
 	])("%s", (href, expected) => {
 		expect(unfurlLink(href, false, WEB)).toEqual(expected as never);
 	});

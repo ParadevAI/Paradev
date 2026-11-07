@@ -7,6 +7,7 @@ export function ListRow({
 	icon,
 	label,
 	subtitle,
+	subtitleLines = 1,
 	trailing,
 	onPress,
 	isLast,
@@ -15,6 +16,7 @@ export function ListRow({
 	icon?: ReactNode;
 	label: string;
 	subtitle?: string;
+	subtitleLines?: number;
 	trailing?: ReactNode;
 	onPress?: () => void;
 	isLast?: boolean;
@@ -38,7 +40,7 @@ export function ListRow({
 			}
 		>
 			{icon ? <View className="w-7 items-center">{icon}</View> : null}
-			<View className="flex-shrink">
+			<View className="flex-1">
 				<Text
 					className="text-base"
 					style={{
@@ -51,13 +53,13 @@ export function ListRow({
 					<Text
 						className="text-sm"
 						style={{ color: theme.mutedForeground }}
-						numberOfLines={1}
+						numberOfLines={subtitleLines}
 					>
 						{subtitle}
 					</Text>
 				) : null}
 			</View>
-			<View className="flex-1 flex-row items-center justify-end gap-2">
+			<View className="max-w-[60%] flex-row items-center justify-end gap-2">
 				{trailing}
 			</View>
 		</Pressable>

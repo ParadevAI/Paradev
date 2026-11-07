@@ -1,0 +1,13 @@
+diff --git a/dist/components/VirtualizedFile.js b/dist/components/VirtualizedFile.js
+index 95d4ca8fdf9e176e23d354094a11022eefdb2321..d6857b467dc6b42f663b4535f9eb796b902c86d8 100644
+--- a/dist/components/VirtualizedFile.js
++++ b/dist/components/VirtualizedFile.js
+@@ -433,7 +433,7 @@ var VirtualizedFile = class extends File {
+ 		});
+ 	}
+ 	finalizeRender() {
+-		if (this.getRenderedFile() !== this.pendingRender?.file) throw new Error("VirtualizedFile.render: rendered a different file than its prepared layout");
++		if (!areFileTargetsEqual(this.getRenderedFile(), this.pendingRender?.file)) throw new Error("VirtualizedFile.render: rendered a different file than its prepared layout");
+ 		this.pendingRender = void 0;
+ 		if (this.isSimpleMode()) this.getSimpleVirtualizer()?.requestHeightReconcile(this);
+ 	}

@@ -1,5 +1,5 @@
 import { COMPANY } from "@superset/shared/constants";
-import { getChangelogEntries } from "@/lib/changelog";
+import { getChangelogEntries, summarizeChangelogEntry } from "@/lib/changelog";
 
 export async function GET() {
 	const entries = getChangelogEntries();
@@ -16,9 +16,9 @@ export async function GET() {
 	const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Superset Changelog</title>
+    <title>Paradev Changelog</title>
     <link>${baseUrl}/changelog</link>
-    <description>The latest updates, improvements, and new features in Superset.</description>
+    <description>The latest updates, improvements, and new features in Paradev.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${baseUrl}/changelog.xml" rel="self" type="application/rss+xml"/>
@@ -28,7 +28,7 @@ export async function GET() {
     <item>
       <title>${escapeXml(entry.title)}</title>
       <link>${baseUrl}/changelog/${entry.slug}</link>
-      <description>${escapeXml(entry.description || "")}</description>
+      <description>${escapeXml(summarizeChangelogEntry(entry) ?? "")}</description>
       <pubDate>${new Date(entry.date).toUTCString()}</pubDate>
       <guid isPermaLink="true">${baseUrl}/changelog/${entry.slug}</guid>
     </item>`,

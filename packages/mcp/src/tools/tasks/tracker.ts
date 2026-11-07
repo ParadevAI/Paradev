@@ -6,7 +6,7 @@ export const trackerInput = z
 	.enum(["superset", "linear"])
 	.nullish()
 	.describe(
-		"Work on Superset tasks or Linear issues. Omit to use the organization's task tracker setting. A call reaches one tracker only.",
+		"Work on Paradev tasks or Linear issues. Omit to use the organization's task tracker setting. A call reaches one tracker only.",
 	);
 
 export type TaskTracker = "superset" | "linear";
@@ -46,7 +46,7 @@ export function rejectUnsupported(fields: Record<string, unknown>) {
 		.map(([name]) => name);
 	if (passed.length > 0) {
 		throw new Error(
-			`Not supported for Linear issues: ${passed.join(", ")}. Pass tracker: "superset" to work on Superset tasks.`,
+			`Not supported for Linear issues: ${passed.join(", ")}. Pass tracker: "superset" to work on Paradev tasks.`,
 		);
 	}
 }

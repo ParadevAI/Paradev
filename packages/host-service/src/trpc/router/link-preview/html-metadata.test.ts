@@ -1,5 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import { documentIconHrefs, documentTitle } from "./html-metadata";
+import {
+	documentDescription,
+	documentIconHrefs,
+	documentImageHref,
+	documentTitle,
+} from "./html-metadata";
 
 describe("documentTitle", () => {
 	it("prefers og:title, then twitter:title, then the title element", () => {
@@ -61,5 +66,30 @@ describe("documentIconHrefs", () => {
 			"/icon-32.png?v=2&s=1",
 			"/favicon.ico",
 		]);
+	});
+});
+
+describe("documentDescription", () => {
+	it("prefers og:description, then twitter:description, then description", () => {
+		const plain = `<meta name="description" content="Plain">`;
+		const twitter = `<meta name="twitter:description" content="Twitter">`;
+		const og = `<meta property="og:description" content="Social &amp; more">`;
+		expect(documentDescription(plain + twitter + og)).toBe("Social & more");
+		expect(documentDescription(plain + twitter)).toBe("Twitter");
+		expect(documentDescription(plain)).toBe("Plain");
+		expect(documentDescription("<title>Only a title</title>")).toBeNull();
+	});
+});
+
+describe("documentImageHref", () => {
+	it("prefers the secure og:image URL and decodes the attribute", () => {
+		const og = `<meta property="og:image" content="http://cdn.example.com/a.png">`;
+		const secure = `<meta property="og:image:secure_url" content="https://cdn.example.com/a.png?w=1&amp;h=2">`;
+		const twitter = `<meta name="twitter:image" content="/t.png">`;
+		expect(documentImageHref(twitter + og + secure)).toBe(
+			"https://cdn.example.com/a.png?w=1&h=2",
+		);
+		expect(documentImageHref(twitter)).toBe("/t.png");
+		expect(documentImageHref("<title>x</title>")).toBeNull();
 	});
 });

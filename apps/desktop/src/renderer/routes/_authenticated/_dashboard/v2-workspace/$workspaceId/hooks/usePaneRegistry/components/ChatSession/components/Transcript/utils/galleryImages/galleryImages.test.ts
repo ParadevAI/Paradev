@@ -145,6 +145,7 @@ describe("galleryImages", () => {
 				startedAtMs: 0,
 				completedAtMs: 1,
 				running: false,
+				waiting: false,
 			},
 			userRow(
 				"u1",
@@ -155,8 +156,10 @@ describe("galleryImages", () => {
 				kind: "turn_status",
 				key: "status:t1",
 				groupStart: false,
+				turnId: "t1",
 				status: "failed",
-				message: undefined,
+				error: undefined,
+				latest: true,
 			},
 		];
 		expect(galleryImages(rows)).toEqual([]);

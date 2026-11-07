@@ -15,7 +15,7 @@ const PullRequestActivityReplyContext =
 export const PullRequestActivityReplyProvider =
 	PullRequestActivityReplyContext.Provider;
 
-/** Null where no composer can take a reply: the cloud route, an older host. */
+/** Null where no composer can take a reply, as when the pull request's repository is unknown. */
 export function usePullRequestActivityReply(): RequestPullRequestReply | null {
 	return useContext(PullRequestActivityReplyContext);
 }

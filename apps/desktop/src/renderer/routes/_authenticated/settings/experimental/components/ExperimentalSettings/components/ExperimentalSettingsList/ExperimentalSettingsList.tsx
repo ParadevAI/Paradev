@@ -1,18 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import {
 	useInlineWorkspacePortsStore,
 	usePortsDisplayMode,
 } from "renderer/stores/inline-workspace-ports";
-import {
-	useRightPaneAreaEnabled,
-	useRightPaneAreaStore,
-} from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { useOpenV1ImportModal } from "renderer/stores/v1-import-modal";
 import {
@@ -24,6 +18,8 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
+import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
+import { RestartOnboardingSetting } from "../RestartOnboardingSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -49,17 +45,16 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const rightPaneAreaFlag =
-		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
-	const showRightPaneArea =
-		rightPaneAreaFlag &&
-		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_RIGHT_PANE_AREA, visibleItems);
-	const rightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
-	const setRightPaneAreaEnabled = useRightPaneAreaStore(
-		(state) => state.setEnabled,
+	const showChatTurnSnapshots = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
+		visibleItems,
 	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
+		visibleItems,
+	);
+	const showRestartOnboarding = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
 		visibleItems,
 	);
 	const openV1ImportModal = useOpenV1ImportModal();
@@ -177,35 +172,9 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showRightPaneArea && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label htmlFor="right-pane-area" className="text-sm font-medium">
-								<HighlightText
-									text={t({
-										message: "Right pane area",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="right-pane-area"
-							checked={rightPaneAreaEnabled}
-							onCheckedChange={setRightPaneAreaEnabled}
-						/>
-					</div>
-				)}
+				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
+				{showRestartOnboarding && <RestartOnboardingSetting />}
 			</div>
 		</div>
 	);

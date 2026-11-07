@@ -7,7 +7,6 @@ export function DrawerSection({
 	tabbable,
 	title,
 	count,
-	summary,
 	expanded,
 	onToggle,
 	banner,
@@ -18,7 +17,6 @@ export function DrawerSection({
 	tabbable: boolean;
 	title: string;
 	count: number;
-	summary?: ReactNode;
 	expanded: boolean;
 	onToggle: () => void;
 	banner?: ReactNode;
@@ -48,11 +46,6 @@ export function DrawerSection({
 					<span className="rounded-full bg-muted-foreground/10 px-1.5 text-[11px] text-muted-foreground tabular-nums leading-4">
 						{count}
 					</span>
-					{!expanded && summary && (
-						<span className="ml-auto flex min-w-0 items-center gap-1.5 truncate text-muted-foreground/70 text-xs">
-							{summary}
-						</span>
-					)}
 				</button>
 			)}
 			{(expanded || !showHeader) && (

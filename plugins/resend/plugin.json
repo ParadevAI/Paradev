@@ -1,0 +1,35 @@
+{
+	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+	"name": "resend",
+	"version": "1.0.0",
+	"description": "Send and debug email with Resend: emails, domains, contacts, broadcasts, and inboxes.",
+	"author": {
+		"name": "Paradev",
+		"url": "https://paradev.com"
+	},
+	"homepage": "https://docs.paradev.com",
+	"repository": "https://github.com/paradevai/paradev",
+	"license": "MIT",
+	"keywords": ["resend", "email", "transactional", "domains", "broadcasts"],
+	"extensions": {
+		"superset": {
+			"interface": {
+				"displayName": "Resend",
+				"category": "Developer tools",
+				"icon": "resend"
+			},
+			"connector": {
+				"slug": "resend_mcp"
+			},
+			"bind": {
+				"headers": {
+					"Authorization": "Bearer ${config.access_token}"
+				}
+			},
+			"mcp": {
+				"type": "streamable-http",
+				"url": "https://mcp.resend.com/mcp"
+			}
+		}
+	}
+}

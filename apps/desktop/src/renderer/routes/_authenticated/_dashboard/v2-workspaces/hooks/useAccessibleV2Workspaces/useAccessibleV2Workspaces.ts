@@ -15,6 +15,7 @@ import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { derivePullRequestQueryTargets } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
 import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
@@ -396,13 +397,11 @@ export function useAccessibleV2Workspaces(
 			] as const,
 			refetchInterval: 10_000,
 			enabled: target.hostUrl !== null,
-			queryFn: async () => {
-				if (!target.hostUrl) return { workspaces: [] };
-				const client = getHostServiceClientByUrl(target.hostUrl);
-				return client.pullRequests.getByWorkspaces.query({
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).pullRequests.getByWorkspaces.query({
 					workspaceIds: target.workspaceIds,
-				});
-			},
+				}),
+			),
 		})),
 	});
 
@@ -453,11 +452,9 @@ export function useAccessibleV2Workspaces(
 			] as const,
 			refetchInterval: 10_000,
 			enabled: target.hostUrl !== null,
-			queryFn: async () => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
-				return client.terminalAgents.list.query();
-			},
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).terminalAgents.list.query(),
+			),
 		})),
 	});
 	// Batched totals, one query per host (mirrors the PR/agent queries above).
@@ -472,15 +469,13 @@ export function useAccessibleV2Workspaces(
 			] as const,
 			refetchInterval: 30_000,
 			enabled: target.hostUrl !== null,
-			queryFn: async () => {
-				if (!target.hostUrl) return { workspaces: [] };
-				const client = getHostServiceClientByUrl(target.hostUrl);
-				return client.git.getDiffStatsByWorkspaces.query({
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).git.getDiffStatsByWorkspaces.query({
 					// Server caps the batch at 500 (MAX_DIFF_STATS_BATCH); rows
 					// beyond it simply show no stats rather than failing the call.
 					workspaceIds: target.workspaceIds.slice(0, 500),
-				});
-			},
+				}),
+			),
 		})),
 	});
 	const diffStatsEntries = useMemo<[string, V2WorkspaceDiffStats][]>(() => {

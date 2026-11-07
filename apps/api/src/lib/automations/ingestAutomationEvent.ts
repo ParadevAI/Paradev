@@ -1,4 +1,5 @@
 import type { AutomationEventDispatchInput } from "@superset/db/schema";
+import { notifyRoutinesOfEvent } from "@superset/trpc/agent-routines";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { dispatchMatchingTriggers } from "./dispatchMatchingTriggers";
 import {
@@ -55,6 +56,11 @@ export async function ingestAutomationEvent(
 	});
 	if (!inserted) return { status: "duplicate" };
 	if (!delivery.dispatch) return { status: "recorded", eventId: inserted.id };
+	await notifyRoutinesOfEvent({
+		eventId: inserted.id,
+		event: delivery.event,
+		dispatch: delivery.dispatch,
+	});
 
 	try {
 		const result = await dispatchMatchingTriggers({

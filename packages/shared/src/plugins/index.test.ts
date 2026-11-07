@@ -32,7 +32,7 @@ describe("isServerSatisfiedExternally", () => {
 	const proxy = "https://api.superset.sh/mcp/plugins/superset/linear";
 	const linear = { type: "http", url: proxy } as const;
 
-	test("a user's Superset MCP entry does not satisfy a proxied plugin", () => {
+	test("a user's Paradev MCP entry does not satisfy a proxied plugin", () => {
 		expect(
 			isServerSatisfiedExternally("linear", linear, [
 				{ name: "superset", url: "https://api.superset.sh/mcp" },
@@ -62,7 +62,7 @@ describe("isServerSatisfiedExternally", () => {
 		).toBe(false);
 	});
 
-	test("a legacy Superset MCP URL still satisfies the superset server", () => {
+	test("a legacy Paradev MCP URL still satisfies the superset server", () => {
 		expect(
 			isServerSatisfiedExternally(
 				"superset",

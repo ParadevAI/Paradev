@@ -15,6 +15,8 @@ export type CommandNode = {
 /** A whole CLI, every node populated; the root node's options are the globals. */
 export interface CliDescription {
 	name: string;
+	/** Other executable names that run this CLI; completion registers them too. */
+	binAliases?: string[];
 	version: string;
 	root: CommandNode;
 }

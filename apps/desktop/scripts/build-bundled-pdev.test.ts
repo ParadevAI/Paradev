@@ -112,7 +112,7 @@ describe("build-bundled-pdev", () => {
 		);
 
 		expect(requested).toEqual([
-			`https://github.com/superset-sh/pdev/releases/download/v${PDEV_VERSION}/${assetName}`,
+			`https://github.com/paradevai/pdev/releases/download/v${PDEV_VERSION}/${assetName}`,
 		]);
 		expect(isBundled(destDir, `${assetName} sha256:${sha256}`)).toBe(true);
 	});

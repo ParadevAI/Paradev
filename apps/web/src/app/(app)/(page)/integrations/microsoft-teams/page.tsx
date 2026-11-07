@@ -72,7 +72,7 @@ export default async function MicrosoftTeamsIntegrationPage() {
 			withoutParam: i18n._(
 				msg({
 					message:
-						"This Microsoft tenant is already connected by another Superset organization.",
+						"This Microsoft tenant is already connected by another Paradev organization.",
 				}),
 			),
 		},

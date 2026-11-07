@@ -14,6 +14,8 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
+import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
+import { usePaneAside } from "../../../../../../hooks/usePaneAside";
 import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
 	ContextMenuActionConfig,
@@ -93,6 +95,7 @@ export function Pane<TData>({
 	onPaneError,
 }: PaneComponentProps<TData>) {
 	const { t } = useLingui();
+	const isCards = usePaneAppearance() === "cards";
 	const definition = registry[pane.kind];
 
 	const tabs = store.getState().tabs;
@@ -298,6 +301,7 @@ export function Pane<TData>({
 	const icon = definition?.getIcon?.(context);
 	const titleContent = definition?.renderTitle?.(context);
 	const headerExtras = definition?.renderHeaderExtras?.(context);
+	const aside = usePaneAside(pane.id);
 	const toolbar = definition?.renderToolbar?.(context);
 
 	const isDropTarget = isOver && canDrop;
@@ -312,36 +316,45 @@ export function Pane<TData>({
 					// width (panes resize independently of the viewport). Lives here,
 					// not on the header, so the containment's stacking context still
 					// holds both the header's absolute popovers and the pane's banners.
-					className={`@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
-						isActive && parentDirection !== null
-							? "border-primary/15"
-							: "border-transparent"
-					}`}
+					className={
+						isCards
+							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none`
+							: `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
+									isActive && parentDirection !== null
+										? "border-primary/15"
+										: "border-transparent"
+								}`
+					}
 					onPointerDownCapture={context.actions.focus}
 				>
-					<PaneHeader
-						title={title}
-						icon={icon}
-						isActive={isActive}
-						titleContent={titleContent}
-						headerExtras={headerExtras}
-						toolbar={toolbar}
-						actionsContent={context.headerActions}
-						paneId={pane.id}
-						store={store}
-						onClick={
-							definition?.onHeaderClick
-								? () => definition.onHeaderClick?.(context)
-								: context.actions.pin
-						}
-						onMiddleClick={context.actions.close}
-					/>
+					{!definition?.hideHeader?.(context) && (
+						<PaneHeader
+							title={title}
+							icon={icon}
+							isActive={isActive}
+							titleContent={titleContent}
+							headerExtras={headerExtras}
+							toolbar={toolbar}
+							actionsContent={context.headerActions}
+							paneId={pane.id}
+							store={store}
+							onClick={
+								definition?.onHeaderClick
+									? () => definition.onHeaderClick?.(context)
+									: context.actions.pin
+							}
+							onMiddleClick={context.actions.close}
+						/>
+					)}
 					<PaneErrorBoundary
 						resetKey={pane.data}
 						onClose={context.actions.close}
 						onError={onPaneError}
 					>
 						<PaneContent
+							aside={aside}
+							insetsAside={definition?.insetsAside === true}
+							dimmed={isCards && !isActive && parentDirection !== null}
 							render={() =>
 								definition ? (
 									definition.renderPane(context)

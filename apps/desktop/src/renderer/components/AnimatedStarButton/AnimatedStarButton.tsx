@@ -53,8 +53,8 @@ interface AnimatedStarButtonProps {
 }
 
 /**
- * Shared "Star on GitHub" button for the empty-state pill, sidebar card, and
- * onboarding toast. Chrome (padding, monospace uppercase label, color-mix
+ * Shared "Star on GitHub" button for the empty-state pill and the onboarding
+ * toast. Chrome (padding, monospace uppercase label, color-mix
  * background, sharp corners, four plus marks relaying around the border on
  * hover) is a direct port of a reference design — see AnimatedStarButton.css
  * for the full port and the one deliberate deviation (transition placement,

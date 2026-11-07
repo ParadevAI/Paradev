@@ -14,6 +14,7 @@ export {
 	type PortChangedPayload,
 	type ProjectChangedPayload,
 	type ProjectSnapshotPayload,
+	peekEventBusConnectionStatus,
 	reconnectEventBusIfDown,
 	type TagFoldersChangedPayload,
 	type TerminalLifecyclePayload,

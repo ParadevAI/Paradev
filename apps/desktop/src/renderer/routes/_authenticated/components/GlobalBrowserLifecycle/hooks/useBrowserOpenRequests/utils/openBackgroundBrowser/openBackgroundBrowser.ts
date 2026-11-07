@@ -29,7 +29,7 @@ export function openBackgroundBrowser({
 	const store = createWorkspaceStore<PaneViewerData>({
 		initialState: previous,
 	});
-	openUrlInV2Workspace({ store, url, target });
+	openUrlInV2Workspace({ store, url, target, agent: true });
 	const next = store.getState();
 	const tab = next.tabs.find((tab) => tab.id === next.activeTabId);
 	const paneId = tab?.activePaneId;

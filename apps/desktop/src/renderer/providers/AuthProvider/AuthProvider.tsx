@@ -1,11 +1,11 @@
 import { type ReactNode, useEffect, useState } from "react";
+import { SupersetLogo } from "renderer/components/SupersetLogo";
 import {
 	authClient,
 	getAuthToken,
 	setAuthToken,
 	setJwt,
 } from "renderer/lib/auth-client";
-import { SupersetLogo } from "renderer/routes/sign-in/components/SupersetLogo/SupersetLogo";
 import { electronTrpc } from "../../lib/electron-trpc";
 
 const HYDRATION_TIMEOUT_MS = 15_000;

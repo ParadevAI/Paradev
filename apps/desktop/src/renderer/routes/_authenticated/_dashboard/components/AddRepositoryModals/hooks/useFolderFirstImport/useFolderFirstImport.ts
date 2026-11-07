@@ -12,7 +12,7 @@ import { useRequestGitInitConfirm } from "renderer/stores/git-init-confirm";
 import { importFolderFirst, type MatchingProject } from "./importFolderFirst";
 
 export interface UseFolderFirstImportResult {
-	start: () => Promise<ProjectSetupResult | null>;
+	start: (repoPath?: string) => Promise<ProjectSetupResult | null>;
 }
 
 export function useFolderFirstImport(options?: {
@@ -28,14 +28,16 @@ export function useFolderFirstImport(options?: {
 	const { onError, onMultipleProjects } = options ?? {};
 
 	const start = useCallback(
-		() =>
+		(repoPath?: string) =>
 			importFolderFirst({
-				pickDirectory: () =>
-					selectDirectory.mutateAsync({
-						title: t({
-							message: "Import existing folder",
-						}),
-					}),
+				pickDirectory: async () =>
+					repoPath
+						? { canceled: false, path: repoPath }
+						: selectDirectory.mutateAsync({
+								title: t({
+									message: "Import existing folder",
+								}),
+							}),
 				waitForHostReady: () => waitForHostReady(),
 				getClient: getHostServiceClientByUrl,
 				requestGitInit,

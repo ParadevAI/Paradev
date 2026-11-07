@@ -1,4 +1,4 @@
-# Superset CLI Current-State Reference
+# Paradev CLI Current-State Reference
 
 This document records the CLI surface implemented in `packages/cli` as of
 2026-05-12. Public user-facing docs live in
@@ -157,7 +157,7 @@ CLI runtime state is under `SUPERSET_HOME_DIR`, defaulting to
 
 The desktop app installs an app-managed shim at
 `<SUPERSET_HOME_DIR>/bin/superset` (`~/.superset/bin/superset` by default)
-when the app starts. Superset desktop terminals prepend that directory to
+when the app starts. Paradev desktop terminals prepend that directory to
 `PATH`, so the bundled CLI is available in app-launched terminals without a
 standalone install.
 

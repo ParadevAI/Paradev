@@ -1,0 +1,68 @@
+name: Tag Plugin Releases
+
+# A plugin release is the tag <name>@<version>. Hosts install the version that
+# .agent-marketplace.json names on main, and fall back to main's working tree
+# when that tag is missing. Tags every untagged version once it lands on main.
+# Never moves an existing tag: an account pinned to it must not change.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .agent-marketplace.json
+      - plugins/**
+  workflow_dispatch:
+
+concurrency:
+  group: tag-plugin-releases
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen --ignore-scripts
+
+      - name: Audit plugin marketplace
+        run: bun run check:plugins
+
+      - name: Tag untagged versions
+        run: |
+          set -euo pipefail
+          existing=$(git ls-remote --tags --refs origin | awk '{print $2}' | sed 's#^refs/tags/##')
+          tags=()
+          while IFS= read -r tag; do
+            if ! printf '%s' "$tag" | grep -Eq '^[a-z0-9][a-z0-9-]*@[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$'; then
+              echo "::error::Invalid release tag: $tag"
+              exit 1
+            fi
+            if ! grep -qxF "$tag" <<<"$existing"; then
+              tags+=("$tag")
+            fi
+          done < <(jq -r '.plugins[] | "\(.name)@\(.version)"' .agent-marketplace.json)
+
+          if [ ${#tags[@]} -eq 0 ]; then
+            echo "Every plugin version is already tagged."
+            exit 0
+          fi
+
+          refs=()
+          for tag in "${tags[@]}"; do
+            git tag "$tag" "$GITHUB_SHA"
+            refs+=("refs/tags/$tag")
+          done
+          git push origin "${refs[@]}"
+          echo "Tagged ${tags[*]} at $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

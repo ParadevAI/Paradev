@@ -686,7 +686,7 @@ describe("env", () => {
 				expect(result.COLORTERM).toBe("truecolor");
 			});
 
-			it("should set Superset-specific env vars", () => {
+			it("should set Paradev-specific env vars", () => {
 				const result = buildTerminalEnv(baseParams);
 
 				expect(result.SUPERSET_PANE_ID).toBe("pane-1");

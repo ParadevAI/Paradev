@@ -4,7 +4,7 @@ import { pluginMcpHeaders } from "../../../lib/plugins/mcp-client";
 
 export default command({
 	description:
-		"Print the auth headers for Superset's plugin MCP endpoints (for an agent's headers helper)",
+		"Print the auth headers for Paradev's plugin MCP endpoints (for an agent's headers helper)",
 	// Under `auth` because it has to be publicly reachable and `plugins` is
 	// not: an audience-gated group is absent, not hidden, and a command marked
 	// public inside it is pruned with its parent. An agent runs this itself and

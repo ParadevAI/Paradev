@@ -126,6 +126,19 @@ itself and the workspaces its organization shares, in `loadReadyWorkspace`,
 `loadVisibleWorkspace` and `delete` together; a check on one of them is
 bypassed through the others.
 
+**A box reaches its creator's own hosts, when a host allows it. Accepted
+(opt-in).** The firewall adds the workspace credential on requests to the
+relay as well as the API, and the relay asks `host.cloudWorkspaceAccess` on
+every call. A host is reachable only if the creator owns it (a member's box is
+refused) and turned on "Allow my cloud workspaces to reach this host"
+(`v2_hosts.allow_cloud_workspaces`, set by `host.setCloudWorkspaceAccess`,
+which a box cannot call). The API is the only lock: host-service does not know
+the call came from a box, so a wrong value in that column opens the host. Once
+on, anything in any box the creator made can drive that host as them,
+including a prompt-injected agent. Off by default; turning it off stops the
+next call. Only HTTP gets through: the firewall refuses WebSocket upgrades on a
+host it rewrites, and the relay refuses them from a box.
+
 **A sandbox has exactly one gate, and it is ours.** A sandbox's own port is
 a public URL that clients never see; they reach a workspace through the
 sandbox gate (`apps/gate`), which verifies a ticket the API signed
@@ -236,8 +249,8 @@ older than a few minutes and tears down any sandbox they name, plus the same
 teardown on the paths that can't currently reach it. One row from that incident
 had to be cleared by hand.
 
-**The Superset CLI is offered but not installed. Open.** A cloud workspace's
-agent row includes "Superset CLI" alongside Claude, Codex and Copilot, and
+**The Paradev CLI is offered but not installed. Open.** A cloud workspace's
+agent row includes "Paradev CLI" alongside Claude, Codex and Copilot, and
 picking it fails with command-not-found: the image installs the agent CLIs but
 not ours. It also matters beyond the picker — the CLI is how an agent spawns
 workspaces and other agents, so a sandbox without it can't orchestrate. Install

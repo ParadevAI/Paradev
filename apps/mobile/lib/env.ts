@@ -14,7 +14,7 @@ const envSchema = z.object({
 	EXPO_PUBLIC_SENTRY_DSN_MOBILE: z.url().optional(),
 	EXPO_PUBLIC_SENTRY_ENVIRONMENT: z.string().default("production"),
 	EXPO_PUBLIC_E2E: z.string().optional(),
-	/** Set by .superset/setup.sh or setup.cloud.sh (seed-local-mobile-token.ts,
+	/** Set by .paradev/setup.sh or setup.cloud.sh (seed-local-mobile-token.ts,
 	 * seed-cloud-mobile-token.ts): a one-time token redeemable for a real
 	 * session as the real developer/workspace creator, via the dev-only
 	 * `oneTimeToken` better-auth plugin. */

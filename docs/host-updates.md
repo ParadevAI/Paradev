@@ -39,7 +39,7 @@ The CLI child borrows its parent host's lock, and all organizations sharing an
 install must use the same lock.
 
 `EACCES` can mean the host user cannot search or write `/opt/kinro`, for example
-when root installed Superset but an unprivileged service runs the host. An
+when root installed Paradev but an unprivileged service runs the host. An
 existing lock owned by another user can also prevent access. On the machine
 used to investigate this report, `/opt` was `root:wheel` with mode `0755`, but
 `/opt/kinro` did not exist; the reporter's exact permissions remain unverified.

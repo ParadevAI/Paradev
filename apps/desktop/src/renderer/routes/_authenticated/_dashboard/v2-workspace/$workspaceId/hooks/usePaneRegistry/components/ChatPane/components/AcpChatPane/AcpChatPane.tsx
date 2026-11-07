@@ -3,6 +3,7 @@ import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
 import { errorMessage } from "@superset/i18n/errors";
 import { getAgentModelSupport } from "@superset/shared/agent-models";
+import { hostRemembersChatSelections } from "@superset/shared/host-version";
 import {
 	buildChatRewindPrompt,
 	buildChatSessionHandoffPrompt,
@@ -12,16 +13,28 @@ import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
-import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
+import {
+	ignoreChatTerminal,
+	isChatSessionReopened,
+} from "../../../../../../utils/closedChatSessions";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
+import {
+	forgetSavedChatMode,
+	freshStartMode,
+	readSavedChatMode,
+} from "../../../../utils/savedChatMode";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
+	OpenDiff,
 	OpenLink,
 	OpenPage,
 } from "../../../ChatSession/providers/ChatPaneActionsProvider";
@@ -29,17 +42,24 @@ import type {
 	ChatEditRequest,
 	ChatForkTarget,
 } from "../../../ChatSession/types";
-import { isUnrestrictedMode } from "../../../ChatSession/utils/isUnrestrictedMode";
+import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPosition";
 import { useForkChat } from "../../hooks/useForkChat";
-import { readSavedChatMode } from "../../utils/savedChatMode";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
+import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
+import { useReplacementSession } from "./hooks/useReplacementSession";
+import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
+import {
+	type SessionInfo,
+	sessionInfoFromState,
+} from "./utils/sessionInfoFromState";
 import {
 	isChatCreateWatched,
 	sharedChatCreate,
 	watchChatCreate,
 } from "./utils/sharedChatCreate";
+import { warmTranscript } from "./utils/warmTranscript";
 
 /**
  * A chat bridged to an agent session, resumed by its session id. `agent` comes
@@ -58,13 +78,20 @@ export interface AgentSwitchTarget {
 
 export function AcpChatPane({
 	agent,
+	draftId,
 	isActive,
 	onSessionInfo,
 	onPendingPromptsSent,
+	onLaunchPromptDelivered,
 	onQueuePrompt,
+	onOpenDiff,
+	onRestoreQueuedPrompts,
 	onOpenFile,
 	onOpenPage,
 	onOpenLink,
+	getOpenFilePaths,
+	onOpenHistory,
+	onNewChat,
 	onModeChange,
 	onSessionCreated,
 	onSwitchAgent,
@@ -72,58 +99,76 @@ export function AcpChatPane({
 	onOpenForkedChat,
 	onRewound,
 	pendingPrompts,
+	launchPrompt,
 	sessionId,
 	terminalId,
 	workspaceId,
 	modelId,
-	modelLabel,
+	effortId,
 	modeId,
 }: {
 	workspaceId: string;
 	terminalId: string;
+	draftId?: string;
 	/** `sessionId` is absent until the agent has run a turn to report one. */
 	agent: { id: string; sessionId?: string } | undefined;
 	isActive: boolean;
 	sessionId: string | null;
 	pendingPrompts: UserContent[][];
+	/** A cloud launch's first prompt, which the agent got before this pane. */
+	launchPrompt?: string;
 	onPendingPromptsSent: () => void;
+	onLaunchPromptDelivered?: () => void;
 	onQueuePrompt: (content: UserContent[]) => void;
+	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
-	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
+	onSessionInfo: (info: SessionInfo) => void;
 	onOpenFile?: OpenFile;
+	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
 	onOpenLink?: OpenLink;
+	getOpenFilePaths?: () => ReadonlySet<string>;
+	/** Opens the pane header's chat history picker, as `/resume` does. */
+	onOpenHistory?: () => void;
+	/** Opens a fresh chat with this pane's agent, titled with its label. */
+	onNewChat?: (label: string | undefined) => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
 	onRewound?: (prompt: string) => void;
 	modelId?: string;
-	modelLabel?: string;
+	effortId?: string;
 	modeId?: string;
 }) {
 	const { t } = useLingui();
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
 	const { client, wiring } = useSessionClient(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
+	const hostInfo = useHostServiceInfo(hostUrl);
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const agentLabel = agentConfigs?.find(
 		(config) => config.id === agent?.id,
 	)?.label;
 	const harness = acpHarnessForPreset(agent?.id);
 	const [failure, setFailure] = useState<string | null>(null);
-	const [replacement, setReplacement] = useState<string | null>(null);
+	const [switchingAccount, setSwitchingAccount] = useState(false);
+	const [transferredFrom, setTransferredFrom] = useState<string | null>(null);
+	const {
+		replacement,
+		hold: holdReplacement,
+		release: releaseReplacement,
+	} = useReplacementSession((orphan) => {
+		void wiring.transport
+			.closeSession({ sessionId: orphan })
+			.catch(() => undefined);
+	});
 
-	// The stored session outlives its process — after a host restart the row
-	// still reads "idle" and only the send fails. Ask who is actually running.
-	const { data: stored } = useQuery({
-		enabled: sessionId !== null,
-		queryKey: ["acp-chat-session", sessionId],
-		queryFn: () =>
-			sessionId
-				? wiring.transport.getSession({ sessionId })
-				: Promise.resolve(null),
-		staleTime: 5_000,
+	const { stored, checking } = useChatSessionLiveness({
+		hostUrl,
+		sessionId,
+		transport: wiring.transport,
 	});
 	const queryClient = useQueryClient();
 	useWorkspaceEvent(
@@ -154,13 +199,19 @@ export function AcpChatPane({
 		};
 	}, []);
 	const start = useCallback(
-		async (resumeHarness: string, resume?: string, replacing = false) => {
+		async (
+			resumeHarness: string,
+			resume?: string,
+			replacing = false,
+		): Promise<boolean> => {
 			attaching.current = true;
 			setFailure(null);
 			try {
-				const startModeId =
-					modeId ??
-					(resume || !agent ? undefined : readSavedChatMode(agent.id));
+				const savedModeId =
+					resume || !agent ? undefined : readSavedChatMode(agent.id);
+				const startModeId = resume
+					? modeId
+					: freshStartMode(modeId, savedModeId);
 				const commandId = crypto.randomUUID();
 				const createdId = await sharedChatCreate(
 					createKey,
@@ -174,8 +225,19 @@ export function AcpChatPane({
 										harness: resumeHarness,
 										terminalId,
 										...(modelId ? { modelId } : {}),
+										...(effortId ? { effortId } : {}),
 										...(startModeId ? { modeId: startModeId } : {}),
-										...(resume ? { resume: { harnessSessionId: resume } } : {}),
+										...(resume ? {} : { rememberSelections: true }),
+										...(resume
+											? {
+													resume: {
+														harnessSessionId: resume,
+														...(replacing && sessionId
+															? { replacesSessionId: sessionId }
+															: {}),
+													},
+												}
+											: {}),
 									})
 									.then((created) => created.sessionId),
 							isReachableFailure: (error) =>
@@ -188,13 +250,23 @@ export function AcpChatPane({
 							.catch(() => undefined);
 					},
 				);
-				if (!mounted.current) return;
-				if (replacing) setReplacement(createdId);
+				if (
+					agent &&
+					savedModeId &&
+					startModeId === savedModeId &&
+					hostRemembersChatSelections(hostInfo.data?.version)
+				) {
+					forgetSavedChatMode(agent.id);
+				}
+				if (!mounted.current) return false;
+				if (replacing) holdReplacement(createdId);
 				else onSessionCreated(createdId);
+				return true;
 			} catch (error) {
 				attaching.current = false;
 				if (replacing) recoveryInFlight.current = false;
 				setFailure(error instanceof Error ? error.message : String(error));
+				return false;
 			}
 		},
 		[
@@ -203,9 +275,13 @@ export function AcpChatPane({
 			workspaceId,
 			terminalId,
 			onSessionCreated,
+			holdReplacement,
 			modelId,
+			effortId,
 			modeId,
 			agent,
+			sessionId,
+			hostInfo.data?.version,
 		],
 	);
 
@@ -225,6 +301,7 @@ export function AcpChatPane({
 	const forkHere = useCallback(() => {
 		if (!sessionId) return;
 		const terminalId = crypto.randomUUID();
+		ignoreChatTerminal(terminalId);
 		void wiring.transport
 			.forkSession({
 				commandId: crypto.randomUUID(),
@@ -274,11 +351,34 @@ export function AcpChatPane({
 		[forkHere, forkToWorktree, agent, agentLabel],
 	);
 
+	const presetLabel =
+		agentLabel ??
+		agentConfigs?.find((config) => config.presetId === agent?.id)?.label;
+	const newChat = useMemo(
+		() => (onNewChat ? () => onNewChat(presetLabel) : undefined),
+		[onNewChat, presetLabel],
+	);
+
 	const startFresh = useCallback(() => {
 		if (!harness) return;
 		attaching.current = false;
 		void start(harness);
 	}, [harness, start]);
+
+	const startNewChat = useCallback(async () => {
+		if (!harness) return false;
+		const previous = sessionId;
+		attaching.current = false;
+		const started = await start(harness);
+		if (started && previous) {
+			void wiring.transport
+				.closeSession({ sessionId: previous })
+				.catch((error: unknown) =>
+					console.warn("[acp-chat] could not close the earlier chat", error),
+				);
+		}
+		return started;
+	}, [harness, sessionId, start, wiring.transport]);
 
 	const agentSwitch = useMemo(() => {
 		if (!agent || !onSwitchAgent) return undefined;
@@ -313,13 +413,10 @@ export function AcpChatPane({
 					presetId,
 					label,
 					model: nextModel,
-					// Never more access than the chat being left, unless the user
-					// already chose otherwise for the agent being switched to.
-					modeId:
-						readSavedChatMode(presetId) ??
-						(isUnrestrictedMode(currentModeId)
-							? undefined
-							: AGENT_DEFAULT_MODE),
+					// Never more access than the chat being left.
+					modeId: isUnrestrictedMode(currentModeId)
+						? undefined
+						: AGENT_DEFAULT_MODE,
 					handoffPrompt: transcript.trim()
 						? buildChatSessionHandoffPrompt({
 								transcript,
@@ -382,6 +479,9 @@ export function AcpChatPane({
 	// start, and a later attempt may get past either. Reopening a pane should
 	// just work, so do it.
 	const bindings = useTerminalAgentBindings(workspaceId);
+	const binding = bindings.get(terminalId);
+	const sessionAccount =
+		binding?.chatSessionId === sessionId ? binding.account : undefined;
 	const continuedInTerminal =
 		agentSessionId !== undefined &&
 		[...bindings.values()].some(
@@ -390,8 +490,15 @@ export function AcpChatPane({
 				!binding.chatSessionId &&
 				binding.endedAt === undefined,
 		);
+	const closedElsewhere =
+		stored?.session?.closedByUser === true &&
+		!!sessionId &&
+		!isChatSessionReopened(sessionId);
 	const recoverable = Boolean(
-		(sessionStopped || sessionDead) && harness && !continuedInTerminal,
+		(sessionStopped || sessionDead) &&
+			harness &&
+			!continuedInTerminal &&
+			!closedElsewhere,
 	);
 	const recoveries = useRef(0);
 	if (stored?.live && !sessionDead) recoveries.current = 0;
@@ -403,6 +510,60 @@ export function AcpChatPane({
 			.catch(() => undefined)
 			.then(() => start(harness, agentSessionId, true));
 	}, [harness, agentSessionId, sessionId, start, wiring.transport]);
+	const switchAccount = useCallback(
+		async (setAccount: () => Promise<unknown>) => {
+			if (!harness || !sessionId || recoveryInFlight.current) return;
+			recoveryInFlight.current = true;
+			setSwitchingAccount(true);
+			try {
+				const queued = await closeChatForAccountSwitch({
+					transport: wiring.transport,
+					sessionId,
+					setAccount,
+				});
+				if (!mounted.current) return;
+				setTransferredFrom(sessionId);
+				onRestoreQueuedPrompts(queued);
+				const restarted = await start(harness, agentSessionId, true);
+				if (!restarted && mounted.current) setTransferredFrom(null);
+			} catch (error) {
+				recoveryInFlight.current = false;
+				console.error("[acp-chat] account switch failed", error);
+				toast.error(t({ message: "Couldn't stop the chat" }));
+			} finally {
+				if (mounted.current) setSwitchingAccount(false);
+			}
+		},
+		[
+			harness,
+			sessionId,
+			wiring.transport,
+			onRestoreQueuedPrompts,
+			start,
+			agentSessionId,
+			t,
+		],
+	);
+	const continueAfterRestart = useRef<string | null>(null);
+	useEffect(() => {
+		if (continuedInTerminal) continueAfterRestart.current = null;
+	}, [continuedInTerminal]);
+	const restartAndContinue = useCallback(
+		async (prompt: string) => {
+			if (!sessionId) return false;
+			continueAfterRestart.current = prompt;
+			try {
+				await wiring.transport.closeSession({ sessionId });
+				return true;
+			} catch (error) {
+				continueAfterRestart.current = null;
+				console.warn("[acp-chat] could not restart the agent", error);
+				toast.error(t({ message: "Couldn't stop the chat" }));
+				return false;
+			}
+		},
+		[sessionId, wiring.transport, t],
+	);
 	const { data: replacementState } = useQuery({
 		enabled: replacement !== null,
 		queryKey: ["acp-chat-replacement", replacement],
@@ -413,17 +574,24 @@ export function AcpChatPane({
 		refetchInterval: 500,
 		refetchIntervalInBackground: true,
 	});
+	const warmed = useRef<{ sessionId: string; done: Promise<void> } | null>(
+		null,
+	);
 	useEffect(() => {
 		if (!replacement) return;
 		const commit = () => {
 			recoveryInFlight.current = false;
-			onSessionCreated(replacement);
-			setReplacement(null);
+			const prompt = continueAfterRestart.current ?? undefined;
+			continueAfterRestart.current = null;
+			if (sessionId) carryReaderPosition(sessionId, replacement);
+			onSessionCreated(replacement, prompt);
+			releaseReplacement();
 		};
 		const status = replacementState?.session?.status;
 		if (status === "dead") {
 			recoveryInFlight.current = false;
-			setReplacement(null);
+			continueAfterRestart.current = null;
+			releaseReplacement();
 			setFailure(
 				replacementState?.lastError ??
 					t({ message: "The agent stopped while resuming the conversation." }),
@@ -431,13 +599,33 @@ export function AcpChatPane({
 			return;
 		}
 		if (replacementState?.live && status !== "starting") {
-			commit();
-			return;
+			if (warmed.current?.sessionId !== replacement) {
+				warmed.current = {
+					sessionId: replacement,
+					done: warmTranscript(replacement, wiring).catch(() => undefined),
+				};
+			}
+			let current = true;
+			void warmed.current.done.then(() => {
+				if (current) commit();
+			});
+			return () => {
+				current = false;
+			};
 		}
 		const timer = setTimeout(commit, REPLACEMENT_TIMEOUT_MS);
 		return () => clearTimeout(timer);
-	}, [replacement, replacementState, onSessionCreated, t]);
+	}, [
+		replacement,
+		replacementState,
+		sessionId,
+		wiring,
+		onSessionCreated,
+		releaseReplacement,
+		t,
+	]);
 	const recovering =
+		switchingAccount ||
 		replacement !== null ||
 		(recoverable && recoveries.current < MAX_RECOVERIES);
 	useEffect(() => {
@@ -458,7 +646,7 @@ export function AcpChatPane({
 		recover();
 	}, [recover]);
 
-	const draftKey = `chat-v3-draft:${terminalId}`;
+	const draftKey = `chat-v3-draft:${draftId ?? terminalId}`;
 
 	const editMessage = useCallback(
 		async (request: ChatEditRequest) => {
@@ -479,7 +667,9 @@ export function AcpChatPane({
 					prompt: request.messageText,
 					...(handoffPrompt ? { handoffPrompt } : {}),
 					...(modelId ? { modelId } : {}),
+					...(effortId ? { effortId } : {}),
 					...(modeId ? { modeId } : {}),
+					...(snapshotWorktree ? { snapshotWorktree: true } : {}),
 				});
 			} catch (error) {
 				// A host from before rewindSession: fall back to a fresh session
@@ -524,7 +714,9 @@ export function AcpChatPane({
 			t,
 			agentLabel,
 			modelId,
+			effortId,
 			modeId,
+			snapshotWorktree,
 		],
 	);
 	const onEditMessage = useCallback(
@@ -532,18 +724,33 @@ export function AcpChatPane({
 		[editMessage],
 	);
 
-	const draft = (notice: ReactNode) => (
+	const launched = useMemo(
+		() =>
+			launchPrompt
+				? [{ type: "text" as const, text: launchPrompt }]
+				: undefined,
+		[launchPrompt],
+	);
+	const draft = () => (
 		<DraftChat
 			draftKey={draftKey}
+			getOpenFilePaths={getOpenFilePaths}
 			isActive={isActive}
-			notice={notice}
+			launched={launched}
+			onOpenHistory={onOpenHistory}
 			onQueue={onQueuePrompt}
 			queued={pendingPrompts}
 			workspaceId={workspaceId}
 		/>
 	);
 
-	if (harness && sessionId && (sessionDead || sessionStopped) && !recovering) {
+	const lost = failure !== null && stored === null;
+	if (
+		harness &&
+		sessionId &&
+		(sessionDead || sessionStopped || lost) &&
+		!recovering
+	) {
 		return (
 			<AcpRecovery
 				detail={failure ?? stored?.lastError ?? undefined}
@@ -571,13 +778,7 @@ export function AcpChatPane({
 				</div>
 			);
 		}
-		return draft(
-			agentSessionId ? (
-				<Trans>Attaching to the running session…</Trans>
-			) : (
-				<Trans>Starting the agent…</Trans>
-			),
-		);
+		return draft();
 	}
 
 	return (
@@ -586,17 +787,20 @@ export function AcpChatPane({
 			presetId={agent?.id}
 			client={client}
 			draftKey={draftKey}
-			{...(recovering
+			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
-							notice: <Trans>Resuming the conversation…</Trans>,
 							queued: pendingPrompts,
 							onQueue: onQueuePrompt,
+							...(launched ? { launched } : {}),
 						},
 					}
 				: {})}
 			key={sessionId}
 			onPendingPromptsSent={onPendingPromptsSent}
+			onLaunchPromptDelivered={
+				launchPrompt ? onLaunchPromptDelivered : undefined
+			}
 			agentLabel={agentLabel}
 			agentSwitch={agentSwitch}
 			onModeChange={onModeChange}
@@ -604,25 +808,24 @@ export function AcpChatPane({
 			isActive={isActive}
 			onFork={fork}
 			onEditMessage={onRewound ? onEditMessage : undefined}
+			onRestartAndContinue={harness ? restartAndContinue : undefined}
+			onStartNewChat={harness ? startNewChat : undefined}
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
+			onSwitchAccount={switchAccount}
+			sessionAccount={sessionAccount}
+			openDiff={onOpenDiff}
 			openFile={onOpenFile}
 			openPage={onOpenPage}
 			openLink={onOpenLink}
+			getOpenFilePaths={getOpenFilePaths}
+			onOpenHistory={onOpenHistory}
+			onNewChat={newChat}
 			onSessionState={(state) => {
-				// A resume that found no transcript lands on a different agent
-				// session. Keep the pane pointed at the live one, or the trip back
-				// to the CLI resumes an id that no longer exists.
-				const bound = state?.harnessSessionId;
 				if (!mounted.current) return;
-				onSessionInfo({
-					...(bound && bound !== agent?.sessionId
-						? { harnessSessionId: bound }
-						: {}),
-					...(state?.title ? { title: state.title } : {}),
-				});
+				onSessionInfo(sessionInfoFromState(state, agent?.sessionId));
 			}}
 			pendingPrompts={pendingPrompts}
-			preferredModelLabel={modelLabel}
+			terminalId={terminalId}
 			workspaceId={workspaceId}
 		/>
 	);
