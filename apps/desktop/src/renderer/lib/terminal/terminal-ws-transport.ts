@@ -474,12 +474,13 @@ function forceReconnect(transport: TerminalTransport) {
 	if (transport._terminated) return;
 	const socket = transport._socket;
 	if (!socket) return;
-	transport._diagnosisLogged = false;
-	transport.lastDiagnosis = null;
-	resetAttachRetryState(transport._attachRetry);
+	// Failures counted while suspended may be artifacts; an outage already
+	// surfaced in a visible window keeps its diagnosis and telemetry latch.
+	if (!transport._diagnosisLogged) {
+		transport.lastDiagnosis = null;
+		resetAttachRetryState(transport._attachRetry);
+	}
 	setConnectionState(transport, "connecting");
-	// reconnect() also resets partysocket's retryCount, so the diagnosis budget
-	// starts fresh.
 	socket.reconnect();
 }
 
@@ -633,6 +634,13 @@ export function connect(
 	if (transport.currentUrl && stripToken(transport.currentUrl) !== base) {
 		transport._seqEverSynced = false;
 	}
+	// A remount after park re-dials the same endpoint: an outage it already
+	// surfaced continues, like a resume in forceReconnect.
+	const continuesOutage =
+		transport._diagnosisLogged &&
+		!transport._terminated &&
+		transport.currentUrl !== null &&
+		stripToken(transport.currentUrl) === base;
 	transport.currentUrl = wsUrl;
 	transport._localToken = extractToken(wsUrl);
 	transport._terminal = terminal;
@@ -651,9 +659,11 @@ export function connect(
 		};
 	}
 	transport._terminated = false;
-	transport._diagnosisLogged = false;
-	transport.lastDiagnosis = null;
-	resetAttachRetryState(transport._attachRetry);
+	if (!continuesOutage) {
+		transport._diagnosisLogged = false;
+		transport.lastDiagnosis = null;
+		resetAttachRetryState(transport._attachRetry);
+	}
 	// Recreate per connect so the coalescer always targets the current terminal;
 	// dispose flushes anything the previous socket left pending.
 	transport._writeCoalescer?.dispose();

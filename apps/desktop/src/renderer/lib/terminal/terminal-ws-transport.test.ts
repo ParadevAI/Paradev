@@ -573,6 +573,42 @@ describe("terminal-ws-transport", () => {
 		expect(socket.reconnectCount).toBe(1);
 	});
 
+	test("a resume before any diagnosis restarts the attempt budget", () => {
+		jest.useFakeTimers();
+		setSystemTime(new Date("2026-01-01T00:00:00Z"));
+		const { transport, socket } = connectAttached();
+
+		for (let i = 0; i < 9; i++) socket.drop(1006, "suspended");
+		setSystemTime(new Date("2026-01-01T00:02:00Z"));
+		jest.advanceTimersByTime(120_000);
+		expect(socket.reconnectCount).toBe(1);
+
+		socket.drop(1006, "offline");
+		expect(transport.lastDiagnosis).toBeNull();
+	});
+
+	test("a resume during a surfaced outage keeps the diagnosis and reports it once", () => {
+		jest.useFakeTimers();
+		setSystemTime(new Date("2026-01-01T00:00:00Z"));
+		const { transport, socket } = connectAttached();
+		const stillRetryingLogs = () =>
+			transport.logs.filter((l) => l.message.includes("Still retrying"));
+
+		for (let i = 0; i < 10; i++) socket.drop(1006, "offline");
+		expect(transport.lastDiagnosis).not.toBeNull();
+		expect(stillRetryingLogs()).toHaveLength(1);
+
+		setSystemTime(new Date("2026-01-01T00:02:00Z"));
+		jest.advanceTimersByTime(120_000);
+		expect(socket.reconnectCount).toBe(1);
+		expect(transport.connectionState).toBe("connecting");
+		expect(transport.lastDiagnosis).not.toBeNull();
+
+		socket.drop(1006, "offline");
+		expect(transport.lastDiagnosis).not.toBeNull();
+		expect(stillRetryingLogs()).toHaveLength(1);
+	});
+
 	test("disconnect closes the socket and goes disconnected", () => {
 		const { transport, socket } = connectAttached();
 
@@ -829,6 +865,36 @@ describe("terminal-ws-transport", () => {
 		redial.drop(1006, "host went away before attach");
 
 		expect(transport._attachRetry.consecutiveFailures).toBe(1);
+	});
+
+	test("a remount after park continues a surfaced outage on the same endpoint", () => {
+		const { transport, terminal, socket } = connectAttached();
+		for (let i = 0; i < 10; i++) socket.drop(1006, "offline");
+		park(transport);
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const redial = FakeRelaySocket.instances.at(-1);
+		if (!redial) throw new Error("expected relay socket instance");
+		redial.dialFail();
+
+		expect(transport.lastDiagnosis).not.toBeNull();
+		expect(
+			transport.logs.filter((l) => l.message.includes("Still retrying")),
+		).toHaveLength(1);
+	});
+
+	test("a surfaced outage does not carry over to a different endpoint", () => {
+		const { transport, terminal, socket } = connectAttached();
+		for (let i = 0; i < 10; i++) socket.drop(1006, "offline");
+		park(transport);
+
+		connect(transport, terminal, "ws://host/terminal/t2");
+		expect(transport.lastDiagnosis).toBeNull();
+		const redial = FakeRelaySocket.instances.at(-1);
+		if (!redial) throw new Error("expected relay socket instance");
+		redial.dialFail();
+
+		expect(transport.lastDiagnosis).toBeNull();
 	});
 
 	test("ignores late events from a socket detached during teardown", () => {
