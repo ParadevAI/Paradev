@@ -62,7 +62,20 @@ export const cleanupGitOps = {
 		worktreePath: string;
 		gitEnv: GitTaskEnv;
 		force?: boolean;
-	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
+		/** The caller has proved the path sits inside the managed worktrees
+		 * root. The worker still only deletes natively when `force` is set and
+		 * git lists the path as a worktree of `repoPath`; otherwise it leaves
+		 * the directory alone and lets git have the only say (see
+		 * `gitWorktreeRemoveTask`). */
+		nativeRm?: boolean;
+	}): Promise<{
+		stillRegistered: boolean;
+		removeError?: string;
+		/** Whether git listed the path as a worktree of `repoPath` before the
+		 * worker touched it. False means the row pointed at a directory git
+		 * never owned, and the caller must not delete it. */
+		wasRegistered: boolean;
+	}> {
 		// Generous timeout: removal recursively deletes the worktree
 		// directory, which can take a while for large trees (node_modules
 		// etc.).
