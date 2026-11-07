@@ -10,13 +10,17 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
-import { TerminalAgentStore } from "../../../terminal-agents";
+import {
+	SqliteTerminalAgentBindingPersistence,
+	TerminalAgentStore,
+} from "../../../terminal-agents";
 import { importCloudAttachments } from "../attachments/attachments";
 import {
 	type AttachmentMetadata,
 	readAttachmentMetadata,
 	writeAttachment,
 } from "../attachments/storage";
+import { resumeTerminalAgentSession } from "../terminal-agents/terminal-agents";
 import { setDefaultAccountSelection } from "../usage/default-account";
 import {
 	bindResumedSession,
@@ -968,6 +972,71 @@ describe("bindResumedSession", () => {
 		expect(store.list()[0]?.agentSessionId).toBe(
 			"01a058a7-3990-7921-bb87-66c7370b999e",
 		);
+	});
+
+	it("resumes a custom agent's session with that custom agent", async () => {
+		const db = createTestDb();
+		const customConfigId = "00000000-0000-0000-0000-0000000000aa";
+		for (const [id, presetId, command, displayOrder] of [
+			["00000000-0000-0000-0000-000000000001", "claude", "claude", 0],
+			[customConfigId, "custom", "/Users/me/bin/claude-pool.sh", 1],
+		] as const) {
+			db.insert(schema.hostAgentConfigs)
+				.values({
+					id,
+					presetId,
+					label: id === customConfigId ? "Claude Pool" : "Claude",
+					command,
+					argsJson: "[]",
+					promptTransport: "argv",
+					promptArgsJson: "[]",
+					resumeArgsJson: JSON.stringify(["--resume"]),
+					forkArgsJson: "[]",
+					envJson: "{}",
+					displayOrder,
+				})
+				.run();
+		}
+		db.insert(schema.terminalSessions)
+			.values({ id: TERMINAL_ID, originWorkspaceId: null })
+			.run();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+
+		bindResumedSession(
+			{ db, terminalAgentStore: store },
+			{ workspaceId: WORKSPACE_ID, agent: customConfigId, prompt: "" },
+			TERMINAL_ID,
+		);
+		// The wrapper runs `exec claude`, so the hook reports the claude harness.
+		store.recordEvent({
+			terminalId: TERMINAL_ID,
+			workspaceId: WORKSPACE_ID,
+			eventType: "Stop",
+			agentId: "claude",
+			agentSessionId: "sess-1",
+			occurredAt: Date.now(),
+		});
+		store.markTerminalExited(TERMINAL_ID);
+
+		const runCalls: Array<{ agent: string }> = [];
+		await resumeTerminalAgentSession(
+			{
+				db,
+				terminalAgentStore: store,
+				runAgent: async (input) => {
+					runCalls.push(input);
+					return { kind: "terminal", sessionId: "t-new", label: "" };
+				},
+				disposeSession: async () => ({ daemonCloseSucceeded: true }),
+				hasSession: () => null,
+				eventBus: { broadcastTerminalLifecycle: () => {} },
+			},
+			{ workspaceId: WORKSPACE_ID, terminalId: TERMINAL_ID },
+		);
+
+		expect(runCalls.map((call) => call.agent)).toEqual([customConfigId]);
 	});
 });
 
