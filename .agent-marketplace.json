@@ -238,6 +238,16 @@
 			"version": "1.0.0"
 		},
 		{
+			"name": "keenable",
+			"description": "Search the web and fetch pages as clean markdown with Keenable, built for AI agents.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/keenable",
+			"version": "1.0.1"
+		},
+		{
 			"name": "wispr",
 			"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
 			"author": {
@@ -248,6 +258,9 @@
 			"version": "1.0.0"
 		}
 	],
-	"featured": ["github", "linear"],
+	"featured": [
+		"github",
+		"linear"
+	],
 	"renames": {}
 }
