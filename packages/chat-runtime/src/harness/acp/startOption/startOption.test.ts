@@ -34,3 +34,32 @@ describe("startOptionId", () => {
 		expect(startOptionId(claude, "gpt-6-sol")).toBeUndefined();
 	});
 });
+
+describe("startOptionId against claude-agent-acp 0.85 options", () => {
+	const acp = [
+		{ id: "default", label: "Default (recommended)" },
+		{ id: "opus", label: "Opus 5.5" },
+		{ id: "claude-fable-5-1", label: "Fable 5.1" },
+		{ id: "sonnet", label: "Sonnet 5.5" },
+		{ id: "haiku", label: "Haiku 4.5" },
+		{ id: "claude-sonnet-5", label: "Sonnet 5" },
+		{ id: "claude-opus-5", label: "Opus 5" },
+		{ id: "claude-fable-5", label: "Fable 5" },
+		{ id: "claude-opus-4-8", label: "Opus 4.8" },
+		{ id: "claude-opus-4-7", label: "Opus 4.7" },
+		{ id: "claude-opus-4-6", label: "Opus 4.6" },
+		{ id: "claude-sonnet-4-6", label: "Sonnet 4.6" },
+	];
+
+	test("a pinned dotted version is not taken for its major version", () => {
+		expect(startOptionId(acp, "claude-opus-5-5")).toBe("opus");
+		expect(startOptionId(acp, "claude-sonnet-5-5")).toBe("sonnet");
+		expect(startOptionId(acp, "claude-haiku-4-5")).toBe("haiku");
+	});
+
+	test("pinned ids the agent lists keep their exact option", () => {
+		expect(startOptionId(acp, "claude-opus-5")).toBe("claude-opus-5");
+		expect(startOptionId(acp, "claude-opus-4-8")).toBe("claude-opus-4-8");
+		expect(startOptionId(acp, "opus")).toBe("opus");
+	});
+});
