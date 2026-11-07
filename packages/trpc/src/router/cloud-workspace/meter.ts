@@ -415,9 +415,15 @@ export async function settleBoot(
 			amount: gbMinutes({ ms: end - from, memoryMb: session.memoryMb }),
 			user,
 		});
+		const nextSeq = boot.lockSeq + 1;
+		// Autumn answers a repeated lock id with 409, so a retry after a failed renewal needs a fresh one.
 		await db
 			.update(cloudWorkspaceBoots)
-			.set({ finalizedThrough: new Date(end), lockOpen: false })
+			.set({
+				finalizedThrough: new Date(end),
+				lockOpen: false,
+				lockSeq: nextSeq,
+			})
 			.where(eq(cloudWorkspaceBoots.id, bootId));
 
 		if (session.endedAt !== null) {
@@ -434,7 +440,6 @@ export async function settleBoot(
 			return "closed";
 		}
 
-		const nextSeq = boot.lockSeq + 1;
 		const renewal = await autumnClient.check({
 			customerId: boot.organizationId,
 			featureId: BOX_GB_MINUTES_FEATURE_ID,
