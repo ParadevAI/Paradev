@@ -84,10 +84,18 @@ test("times out while a page is still running once the walk's budget ends", asyn
 				}));
 			}
 			budget.abort();
-			return new Promise((resolve) => setTimeout(() => resolve([]), 0));
+			return new Promise(() => {});
 		},
 		{ signal: budget.signal },
 	);
+	let settled = false;
+	walk
+		.catch(() => {})
+		.finally(() => {
+			settled = true;
+		});
+	await new Promise((resolve) => setTimeout(resolve, 0));
+	expect(settled).toBe(true);
 	await expect(walk).rejects.toMatchObject({
 		code: "TIMEOUT",
 		message: expect.stringContaining("timed out"),
