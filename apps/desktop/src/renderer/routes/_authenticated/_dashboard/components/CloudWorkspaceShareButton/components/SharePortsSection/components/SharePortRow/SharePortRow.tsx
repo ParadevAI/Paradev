@@ -45,7 +45,7 @@ export function SharePortRow({ port }: SharePortRowProps) {
 						aria-label={t({ message: `Open localhost:${localPort}` })}
 						className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 					>
-						localhost:{localPort}
+						{`localhost:${localPort}`}
 						<LuExternalLink className="size-3" strokeWidth={STROKE_WIDTH} />
 					</button>
 				)}
