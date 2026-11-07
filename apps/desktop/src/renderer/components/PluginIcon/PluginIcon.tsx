@@ -106,16 +106,28 @@ export function getPluginIconUrl(
 	return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+function iconKey(pluginName: string, icon: string | null | undefined): string {
+	if (
+		icon != null &&
+		(Object.hasOwn(IMAGE_ICONS, icon) || Object.hasOwn(PLUGIN_ICONS, icon))
+	) {
+		return icon;
+	}
+	return pluginName;
+}
+
 interface PluginIconProps {
 	pluginName: string;
+	icon?: string | null;
 	className?: string;
 }
 
-export function PluginIcon({ pluginName, className }: PluginIconProps) {
+export function PluginIcon({ pluginName, icon, className }: PluginIconProps) {
 	const supersetIcon = usePresetIcon("superset");
 	const size = className ?? "size-9";
+	const key = iconKey(pluginName, icon);
 
-	if (pluginName === "superset") {
+	if (key === "superset") {
 		return (
 			<img
 				src={supersetIcon}
@@ -125,8 +137,8 @@ export function PluginIcon({ pluginName, className }: PluginIconProps) {
 		);
 	}
 
-	const imageIcon = ownEntry(IMAGE_ICONS, pluginName);
-	const entry = ownEntry(PLUGIN_ICONS, pluginName);
+	const imageIcon = ownEntry(IMAGE_ICONS, key);
+	const entry = ownEntry(PLUGIN_ICONS, key);
 	const Icon = entry?.icon ?? LuPuzzle;
 	return (
 		<div

@@ -1,20 +1,16 @@
-import type {
-	PluginCatalogEntry,
-	PluginCategory,
-} from "@superset/shared/plugins";
-import type { RouterOutputs } from "@superset/trpc";
+import type { PluginCatalogEntry } from "@superset/shared/plugins";
 import { useMemo } from "react";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { isUpdateAvailable, localVersionKey } from "./utils/isUpdateAvailable";
+import { localVersionKey } from "./utils/isUpdateAvailable";
 import { onePerName } from "./utils/onePerName";
-
-type CatalogRow = RouterOutputs["plugins"]["list"][number];
+import { type CatalogRow, toCatalogPlugin } from "./utils/toCatalogPlugin";
 
 export type PluginSkill = CatalogRow["skills"][number];
 
 export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
+	icon: string | null;
 	connector: string | null;
 	marketplace: string;
 	installed: boolean;
@@ -27,37 +23,6 @@ export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
 	homepage: string | null;
 	author: string | null;
 	license: string | null;
-}
-
-function toCatalogPlugin(
-	plugin: CatalogRow,
-	localVersions: ReadonlyMap<string, string> | undefined,
-): CatalogPlugin {
-	return {
-		name: plugin.name,
-		version: plugin.version,
-		description: plugin.description,
-		interface: {
-			displayName: plugin.displayName,
-			category: plugin.category as PluginCategory,
-		},
-		mcpServers: plugin.mcpUrl
-			? { [plugin.name]: { type: "http" as const, url: plugin.mcpUrl } }
-			: {},
-		connector: plugin.connector,
-		skills: plugin.skills.map((skill) => skill.name),
-		marketplace: plugin.marketplace,
-		installed: plugin.installed && plugin.enabled,
-		managed: plugin.managed,
-		latestVersion: plugin.latestVersion,
-		updateAvailable: isUpdateAvailable(plugin, localVersions),
-		accounts: plugin.accounts,
-		connections: plugin.connections,
-		pluginSkills: plugin.skills,
-		homepage: plugin.homepage,
-		author: plugin.author,
-		license: plugin.license,
-	};
 }
 
 /** Changes arrive as realtime nudges; a window focus after this long also refetches, in case one was missed. */
