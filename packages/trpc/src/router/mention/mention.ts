@@ -12,13 +12,13 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, ilike, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { assertMember } from "../../lib/cloud-guards";
-import { jwtProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 
 const PER_GROUP = 5;
 
 export const mentionRouter = {
 	/** People, tasks, and pull requests in the organization that match, for an @ menu. */
-	search: jwtProcedure
+	search: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -26,7 +26,7 @@ export const mentionRouter = {
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
 			const pattern = `%${escapeLikePattern(input.query)}%`;
 			const number = /^#?(\d+)$/.exec(input.query)?.[1];
 

@@ -85,7 +85,7 @@ export async function generateMetadata({
 			itunes: { appId: COMPANY.APP_STORE_ID, appArgument: shared.url },
 			openGraph: {
 				type: "website",
-				siteName: "Superset",
+				siteName: "Paradev",
 				url: shared.url,
 				title: shared.title,
 				description,
@@ -113,7 +113,7 @@ export async function generateMetadata({
 	}
 
 	return {
-		title: "Superset",
+		title: "Paradev",
 		description: i18n._(msg({ message: "Sign in to view this page" })),
 		robots: ROBOTS,
 		itunes: { appId: COMPANY.APP_STORE_ID },
@@ -190,6 +190,7 @@ export default async function PublishedPage({
 						sharedVersion: page.sharedVersion,
 						latestVersion: page.latestVersion,
 						servedVersion: page.servedVersion,
+						canEdit: access.canEdit,
 					}}
 					versions={versions}
 					currentUserId={session.user.id}

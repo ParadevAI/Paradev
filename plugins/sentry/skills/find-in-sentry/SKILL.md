@@ -1,8 +1,8 @@
 ---
 name: find-in-sentry
-description: Answer "what's breaking" questions from Sentry — find the right org and project, search issues and events with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service.
+description: Answer "what's breaking" questions from Sentry — find the right org and project, search issues and errors with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service.
 argument-hint: the service, error, release, or question to look up
-allowed-tools: mcp__sentry__whoami, mcp__sentry__find_organizations, mcp__sentry__find_projects, mcp__sentry__find_releases, mcp__sentry__search_issues, mcp__sentry__search_events, mcp__sentry__get_issue_details
+allowed-tools: mcp__sentry__find_organizations, mcp__sentry__find_projects, mcp__sentry__search_issues, mcp__sentry__search_errors, mcp__sentry__get_sentry_resource, mcp__sentry__search_sentry_tools, mcp__sentry__execute_sentry_tool
 ---
 
 # Find what is actually firing
@@ -22,7 +22,7 @@ confident, empty answer. Say which project you searched.
 
 "Is checkout broken?" becomes queries on what Sentry actually stores: the
 error type, the transaction or URL, the release. Prefer `search_issues` for
-"what problems exist" and `search_events` for "how often / for whom / since
+"what problems exist" and `search_errors` for "how often / for whom / since
 when". Run two or three narrow queries over one broad one, and time-bound
 them — `is:unresolved` over the last 24h answers a different question than
 all-time.
@@ -33,7 +33,7 @@ The issues worth reporting are the ones with high event counts, many affected
 users, or a first-seen that matches a recent release. A brand-new issue with
 three events can matter more than a year-old one with thousands — say why the
 ones you picked matter. When a number is load-bearing (error rate, affected
-users), take it from `search_events` rather than eyeballing the issue list.
+users), take it from `search_errors` rather than eyeballing the issue list.
 
 ## 4. Answer with links and the time window
 

@@ -1,4 +1,8 @@
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import {
+	type UseQueryResult,
+	useQueries,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -6,6 +10,7 @@ import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 import {
@@ -87,6 +92,16 @@ export interface UseHostWorkspacesResult {
 	/** The host list came from the cloud in this window, not from the persisted cache. */
 	rosterLive: boolean;
 	cache: HostWorkspacesCacheOps;
+}
+
+// Module-level so useQueries keeps these arrays stable across renders; a
+// new array would rebuild `workspaces` and re-render every consumer.
+function pickQueryState<TData>(results: UseQueryResult<TData>[]) {
+	return results.map(({ data, isError, isSuccess }) => ({
+		data,
+		isError,
+		isSuccess,
+	}));
 }
 
 /**
@@ -203,9 +218,8 @@ export function useHostWorkspacesSource(
 			// Bounded retries so an online-per-cloud but tunnel-less relay
 			// target settles into isError quickly instead of holding isReady.
 			retry: 1,
-			queryFn: async (): Promise<HostWorkspaceRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				const served = (
 					(await client.workspace.list.query()) as HostWorkspaceRow[]
 				).map(normalizeServedWorkspaceRow);
@@ -223,8 +237,9 @@ export function useHostWorkspacesSource(
 				);
 				markHostWorkspacesListRead(queryClient, target);
 				return rows;
-			},
+			}),
 		})),
+		combine: pickQueryState,
 	});
 
 	// Archived tombstones, opt-in, own query key: the shared live list (and
@@ -241,17 +256,17 @@ export function useHostWorkspacesSource(
 			enabled: includeArchived && target.hostUrl !== null,
 			refetchInterval: WORKSPACES_FALLBACK_REFETCH_INTERVAL_MS,
 			networkMode: "always" as const,
-			queryFn: async (): Promise<HostWorkspaceRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				const rows = (await client.workspace.list.query({
 					includeArchived: true,
 				})) as HostWorkspaceRow[];
 				return rows
 					.filter((row) => row.archivedAt != null)
 					.map(normalizeServedWorkspaceRow);
-			},
+			}),
 		})),
+		combine: pickQueryState,
 	});
 
 	const busEverOpenedRef = useRef<Set<string>>(new Set());
@@ -491,12 +506,15 @@ export function useHostWorkspacesSource(
 		};
 	}, [targets, queryClient]);
 
-	return {
-		workspaces,
-		isReady,
-		hostsSettled: knownHostsSettled,
-		hostReads,
-		rosterLive,
-		cache,
-	};
+	return useMemo(
+		() => ({
+			workspaces,
+			isReady,
+			hostsSettled: knownHostsSettled,
+			hostReads,
+			rosterLive,
+			cache,
+		}),
+		[workspaces, isReady, knownHostsSettled, hostReads, rosterLive, cache],
+	);
 }

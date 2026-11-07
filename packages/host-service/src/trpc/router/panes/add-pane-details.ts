@@ -1,5 +1,8 @@
 import { agentRunState } from "@superset/shared/agent-status";
-import type { PaneLayoutOpResult } from "@superset/shared/pane-layout-ops";
+import type {
+	PaneLayoutOpResult,
+	PaneLayoutTab,
+} from "@superset/shared/pane-layout-ops";
 
 // Agents put a spinner or status glyph in front of their title ("◑ Fix login");
 // the agent's state is reported on its own, so the glyph is noise here.
@@ -20,27 +23,32 @@ export function addPaneDetails(
 	result: PaneLayoutOpResult,
 	{ titles, agents }: TerminalDetails,
 ): PaneLayoutOpResult {
+	const withDetails = (tab: PaneLayoutTab): PaneLayoutTab => ({
+		...tab,
+		panes: tab.panes.map((pane) => {
+			if (!pane.terminalId) return pane;
+			const binding = agents.get(pane.terminalId);
+			return {
+				...pane,
+				terminalTitle: cleanTitle(titles.get(pane.terminalId)),
+				agent: binding
+					? {
+							id: binding.agentId,
+							state: agentRunState(binding.lastEventType),
+						}
+					: null,
+			};
+		}),
+	});
+	const { sidebar } = result.layout;
 	return {
 		...result,
 		layout: {
 			...result.layout,
-			tabs: result.layout.tabs.map((tab) => ({
-				...tab,
-				panes: tab.panes.map((pane) => {
-					if (!pane.terminalId) return pane;
-					const binding = agents.get(pane.terminalId);
-					return {
-						...pane,
-						terminalTitle: cleanTitle(titles.get(pane.terminalId)),
-						agent: binding
-							? {
-									id: binding.agentId,
-									state: agentRunState(binding.lastEventType),
-								}
-							: null,
-					};
-				}),
-			})),
+			tabs: result.layout.tabs.map(withDetails),
+			...(sidebar
+				? { sidebar: { ...sidebar, tabs: sidebar.tabs.map(withDetails) } }
+				: {}),
 		},
 	};
 }

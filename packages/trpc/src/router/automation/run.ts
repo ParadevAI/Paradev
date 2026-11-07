@@ -2,7 +2,7 @@ import { db } from "@superset/db/client";
 import type { AutomationRunErrorCode } from "@superset/db/enums";
 import { automationRuns, automations } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, inArray, isNotNull } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 import { isI18nErrorCause } from "../../i18n-error";
 import { SandboxNotReadyError } from "../../lib/sandbox";
 import { RelayDispatchError } from "./relay-client";
@@ -43,8 +43,8 @@ export class RunFailure extends Error {
  *
  * Deliberately the automation's own previous run rather than any live agent in
  * the workspace: a person may be working in there too, and a scheduled prompt
- * must never land in a session they started. An unpinned automation branches a
- * fresh workspace per run and so has nothing to continue.
+ * must never land in a session they started. An automation that reuses its
+ * workspace pins the first one a run creates (`pinCreatedWorkspace`).
  *
  * The host decides in the end — this only nominates, and a stale nomination
  * costs a launch, which is the old behaviour.
@@ -88,7 +88,6 @@ export async function replacePin(
 			...("cloudWorkspaceId" in stale
 				? { cloudWorkspaceId: next }
 				: { v2WorkspaceId: next }),
-			continueAgentSession: false,
 		})
 		.where(
 			and(
@@ -96,6 +95,38 @@ export async function replacePin(
 				"cloudWorkspaceId" in stale
 					? eq(automations.cloudWorkspaceId, stale.cloudWorkspaceId)
 					: eq(automations.v2WorkspaceId, stale.v2WorkspaceId),
+			),
+		);
+}
+
+/**
+ * Keeps the workspace a run created as the pin of an automation that reuses
+ * its workspace, unless someone pinned one meanwhile.
+ */
+export async function pinCreatedWorkspace(
+	automationId: string,
+	workspace: RunWorkspace | { v2WorkspaceId: string; targetHostId: string },
+): Promise<void> {
+	const cloud = "cloudWorkspaceId" in workspace;
+	await db
+		.update(automations)
+		.set(
+			cloud
+				? { cloudWorkspaceId: workspace.cloudWorkspaceId }
+				: "targetHostId" in workspace
+					? {
+							v2WorkspaceId: workspace.v2WorkspaceId,
+							targetHostId: workspace.targetHostId,
+						}
+					: { v2WorkspaceId: workspace.v2WorkspaceId },
+		)
+		.where(
+			and(
+				eq(automations.id, automationId),
+				eq(automations.reuseWorkspace, true),
+				cloud
+					? isNull(automations.cloudWorkspaceId)
+					: isNull(automations.v2WorkspaceId),
 			),
 		);
 }

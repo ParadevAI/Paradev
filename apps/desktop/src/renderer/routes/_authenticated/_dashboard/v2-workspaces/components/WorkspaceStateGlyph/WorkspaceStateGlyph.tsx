@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { LuInfo } from "react-icons/lu";
 import { BoardColumnIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/BoardColumnIcon";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import {
@@ -17,12 +18,6 @@ interface WorkspaceStateGlyphProps {
 	workspace: AccessibleV2Workspace;
 }
 
-/**
- * Row state glyph, by precedence: the sandbox's own state (nothing runs in a
- * dead or unborn box), then live agent states (pulse), then the finished
- * dot the sidebar rows and tab accessories use, then the section headers'
- * icon set so the vocabulary matches at both levels.
- */
 export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	const { t } = useLingui();
 	const { agentStatus, sandboxStatus } = workspace;
@@ -30,16 +25,18 @@ export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	let glyph: React.ReactNode;
 	let label: string;
 	if (sandboxStatus === "failed") {
-		glyph = <StatusIndicator status="failed" />;
+		glyph = <LuInfo className="size-3.5 text-red-400" />;
 		label = t({ message: "Sandbox stopped responding" });
 	} else if (sandboxStatus === "provisioning") {
 		glyph = <WaveSpinner className="text-muted-foreground/60" />;
 		label = t({ message: "Creating the sandbox" });
-	} else if (
-		agentStatus === "working" ||
-		agentStatus === "permission" ||
-		agentStatus === "failed"
-	) {
+	} else if (agentStatus === "working") {
+		glyph = <WaveSpinner className="text-amber-500" />;
+		label = getStatusTooltip(agentStatus);
+	} else if (agentStatus === "failed") {
+		glyph = <LuInfo className="size-3.5 text-red-400" />;
+		label = getStatusTooltip(agentStatus);
+	} else if (agentStatus === "permission") {
 		glyph = <StatusIndicator status={agentStatus} />;
 		label = getStatusTooltip(agentStatus);
 	} else {

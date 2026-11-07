@@ -159,3 +159,57 @@ test("timer rounding cannot start a retry with a fractional budget", () => {
 	expect(failed).toHaveBeenCalledTimes(1);
 	expect(FakeSocket.instances).toHaveLength(1);
 });
+
+test("failed connects ask the API for the relay URL at most once per interval", async () => {
+	const resolveRelayUrl = mock(async () => "https://relay.example");
+	const client = new TunnelClient({
+		relayUrl: "https://relay.example",
+		hostId: "org:host",
+		getAuthToken: async () => "token",
+		localPort: 1234,
+		hostServiceSecret: "test",
+		resolveRelayUrl,
+	});
+	const buildControlUrl = () =>
+		// biome-ignore lint/complexity/useLiteralKeys: Bracket access permits testing the private url provider without a relay.
+		client["buildControlUrl"]();
+
+	await buildControlUrl();
+	expect(resolveRelayUrl).not.toHaveBeenCalled();
+	for (let attempt = 0; attempt < 60; attempt++) {
+		advance(5_000);
+		await buildControlUrl();
+	}
+	expect(resolveRelayUrl).toHaveBeenCalledTimes(1);
+	advance(5 * 60_000);
+	await buildControlUrl();
+	expect(resolveRelayUrl).toHaveBeenCalledTimes(2);
+});
+
+test("a failure after an opened connection looks the relay up again right away", async () => {
+	const resolveRelayUrl = mock(async () => "https://relay.example");
+	const client = new TunnelClient({
+		relayUrl: "https://relay.example",
+		hostId: "org:host",
+		getAuthToken: async () => "token",
+		localPort: 1234,
+		hostServiceSecret: "test",
+		resolveRelayUrl,
+	});
+	// biome-ignore lint/complexity/useLiteralKeys: Bracket access permits testing the private url provider without a relay.
+	const buildControlUrl = () => client["buildControlUrl"]();
+	// biome-ignore lint/complexity/useLiteralKeys: Bracket access stands in for the socket's open event.
+	const markOpened = () => client["markOpened"]();
+
+	await buildControlUrl();
+	advance(5_000);
+	await buildControlUrl();
+	expect(resolveRelayUrl).toHaveBeenCalledTimes(1);
+
+	markOpened();
+	advance(5_000);
+	await buildControlUrl();
+	advance(5_000);
+	await buildControlUrl();
+	expect(resolveRelayUrl).toHaveBeenCalledTimes(2);
+});

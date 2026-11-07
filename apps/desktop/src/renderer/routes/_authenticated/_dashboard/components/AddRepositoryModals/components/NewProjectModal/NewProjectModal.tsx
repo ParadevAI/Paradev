@@ -69,7 +69,7 @@ export function NewProjectModal({
 
 	useEffect(() => {
 		if (parentDir || !homeDir) return;
-		setParentDir(`${homeDir}/.superset/projects`);
+		setParentDir(`${homeDir}/.paradev/projects`);
 	}, [homeDir, parentDir]);
 
 	useEffect(() => {

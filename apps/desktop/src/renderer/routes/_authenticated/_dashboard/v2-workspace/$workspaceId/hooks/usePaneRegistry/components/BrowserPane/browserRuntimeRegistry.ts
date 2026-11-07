@@ -2,6 +2,7 @@ import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-eviction";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
 import {
@@ -81,6 +82,16 @@ const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 });
 
 const ROOT_CONTAINER_ID = "browser-runtime-root";
+
+function withoutHash(url: string): string | null {
+	try {
+		const parsed = new URL(url);
+		parsed.hash = "";
+		return parsed.href;
+	} catch {
+		return null;
+	}
+}
 
 /** Page-zoom bounds and step for a browser pane (1 = 100%). */
 export const BROWSER_ZOOM = Object.freeze({ min: 0.25, max: 5, step: 0.1 });
@@ -313,10 +324,11 @@ export class BrowserRuntimeRegistryImpl {
 		paneId: string,
 		initialUrl: string,
 		workspaceId: string,
+		partition: string,
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
 		const detachViewportZoom = attachBrowserViewportZoom(webview);
-		webview.setAttribute("partition", "persist:superset");
+		webview.setAttribute("partition", partition);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
 		webview.style.top = "0";
@@ -547,11 +559,12 @@ export class BrowserRuntimeRegistryImpl {
 		url: string,
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
+		partition = BROWSER_PARTITION,
 	): RegistryEntry {
 		const existing = this.entries.get(paneId);
 		if (existing) return existing;
 		const root = this.ensureRootContainer();
-		const entry = this.createEntry(paneId, url, workspaceId);
+		const entry = this.createEntry(paneId, url, workspaceId, partition);
 		entry.onPersist = onPersist;
 		entry.lastUsedAt = ++this.useSeq;
 		// Give automation a usable viewport before this pane has ever been shown.
@@ -572,12 +585,14 @@ export class BrowserRuntimeRegistryImpl {
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
 		onClose: () => void,
+		partition = BROWSER_PARTITION,
 	): void {
 		const entry = this.openBackground(
 			paneId,
 			initialUrl,
 			workspaceId,
 			onPersist,
+			partition,
 		);
 		// A reused pane can move between workspaces (the attach effect keys on
 		// workspaceId). Keep the registration's workspace current so main-side
@@ -702,6 +717,25 @@ export class BrowserRuntimeRegistryImpl {
 	reload(paneId: string): void {
 		const entry = this.entries.get(paneId);
 		entry?.webview.reload();
+	}
+
+	/** A visible pane that finished loading `url`, for a link preview to reuse. */
+	findOpenPage(url: string): { paneId: string; title: string } | null {
+		const target = withoutHash(url);
+		if (!target) return null;
+		for (const [paneId, entry] of this.entries) {
+			const { currentUrl, isLoading, error, pageTitle } = entry.state;
+			if (
+				entry.visible &&
+				entry.webContentsId !== null &&
+				!isLoading &&
+				!error &&
+				withoutHash(currentUrl) === target
+			) {
+				return { paneId, title: pageTitle };
+			}
+		}
+		return null;
 	}
 
 	getState(paneId: string): BrowserRuntimeState {

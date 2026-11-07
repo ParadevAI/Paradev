@@ -24,7 +24,7 @@ export function WelcomePage() {
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.14),transparent_34%),linear-gradient(to_bottom,rgba(0,0,0,0.04),rgba(0,0,0,0.5))]" />
 			<div className="absolute inset-0 flex flex-col items-center justify-center px-14 text-center">
 				<div className="text-3xl font-semibold text-white">
-					Welcome to Superset v2
+					Welcome to Paradev v2
 				</div>
 			</div>
 		</div>

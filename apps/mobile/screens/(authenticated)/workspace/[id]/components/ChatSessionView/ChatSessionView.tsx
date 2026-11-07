@@ -28,6 +28,7 @@ import {
 import { ActionSheetIOS, Alert, Pressable, View } from "react-native";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Text } from "@/components/ui/text";
+import type { ChatAttachmentPart } from "@/lib/attachments/chatParts";
 import {
 	type ChatHost,
 	createChatSessionClient,
@@ -55,6 +56,7 @@ import { DOCK_CHIP_HEIGHT, DockChip } from "./components/DockChip";
 import { ScrollToBottom } from "./components/ScrollToBottom";
 import { StickToBottom } from "./components/StickToBottom";
 import { useTapHandlers } from "./hooks/useTapHandlers";
+import { type TextRow, withRowText } from "./utils/withRowText";
 
 const CONFIG_OPTIONS_GRACE_MS = 1000;
 const BANNER_SPACE = 36;
@@ -73,11 +75,7 @@ function activityTexts(
 	);
 }
 
-export interface ChatAttachment {
-	attachmentId: string;
-	name: string;
-	mimeType: string;
-}
+export type ChatAttachment = Omit<ChatAttachmentPart, "type">;
 
 export interface ChatSessionViewHandle {
 	send: (text: string, attachments?: ChatAttachment[]) => Promise<void>;
@@ -138,6 +136,20 @@ export const ChatSessionView = forwardRef<
 	const rows = useMemo(
 		() => groupActivity(chatRows(groups, chat.outbox)),
 		[groups, chat.outbox],
+	);
+	const [textRowCache] = useState(() => new WeakMap<ChatRow, TextRow>());
+	const textRows = useMemo(
+		() =>
+			withRowText(
+				rows,
+				(row) =>
+					row.kind === "item" &&
+					(row.item.kind === "agent_message" || row.item.kind === "reasoning")
+						? displayText(chat.snapshot, row.item.id)
+						: "",
+				textRowCache,
+			),
+		[rows, chat.snapshot, textRowCache],
 	);
 	const positions = useMemo(() => groupPositions(rows), [rows]);
 	const replyEnds = useMemo(() => lastReplyKeys(rows), [rows]);
@@ -331,8 +343,8 @@ export const ChatSessionView = forwardRef<
 				chat.sendPrompt([
 					...(text.trim() ? [{ type: "text" as const, text }] : []),
 					...attachments.map((attachment) => ({
-						type: "attachment" as const,
 						...attachment,
+						type: "attachment" as const,
 					})),
 				]);
 			},
@@ -367,7 +379,7 @@ export const ChatSessionView = forwardRef<
 	}, [openActivityKey, rows, chat.snapshot]);
 
 	const renderRow = useCallback(
-		({ item: row, index }: { item: ChatRow; index: number }) => {
+		({ item: { row, text }, index }: { item: TextRow; index: number }) => {
 			const position = positions[index] ?? "single";
 			const parent =
 				row.kind === "item"
@@ -390,13 +402,7 @@ export const ChatSessionView = forwardRef<
 						onRetryPrompt={chat.retryPrompt}
 						isLastReply={replyEnds.has(row.key)}
 						row={row}
-						text={
-							row.kind === "item" &&
-							(row.item.kind === "agent_message" ||
-								row.item.kind === "reasoning")
-								? displayText(chat.snapshot, row.item.id)
-								: ""
-						}
+						text={text}
 					/>
 				</View>
 			);
@@ -440,8 +446,8 @@ export const ChatSessionView = forwardRef<
 						contentContainerStyle={{
 							paddingTop: headerHeight + 16 + (banner ? BANNER_SPACE : 0),
 						}}
-						data={rows}
-						keyExtractor={(row) => row.key}
+						data={textRows}
+						keyExtractor={({ row }) => row.key}
 						ListHeaderComponent={
 							chat.hasOlder ? (
 								<Pressable

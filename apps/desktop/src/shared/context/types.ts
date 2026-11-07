@@ -133,7 +133,7 @@ export interface LaunchContext {
  *   - Anthropic Messages API: system blocks + user content parts.
  *   - AI SDK v3: ModelMessage with ContentPart[].
  *   - Terminal adapters: flatten system+user to prompt text, write
- *     attachments to .superset/attachments/, reference by path.
+ *     attachments to .paradev/attachments/, reference by path.
  */
 export interface AgentLaunchSpec {
 	agentId: AgentDefinitionId;

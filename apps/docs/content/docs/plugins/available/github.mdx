@@ -16,12 +16,12 @@ Skills are named `github-<skill>`. In Claude Code they appear as `superset:githu
 
 ## MCP Server
 
-Tools come from GitHub's own MCP server at `https://api.githubcopilot.com/mcp/`. Superset proxies each call and adds your credentials. GitHub decides which tools the server offers, so see GitHub's documentation for the current list.
+Tools come from GitHub's own MCP server at `https://api.githubcopilot.com/mcp/`. Paradev proxies each call and adds your credentials. GitHub decides which tools the server offers, so see GitHub's documentation for the current list.
 
 ## Authentication
 
 | Method | Details |
 |:-------|:--------|
-| OAuth 2.0 | Sign in to GitHub. Superset asks for the `repo`, `read:org`, and `workflow` scopes. |
+| OAuth 2.0 | Sign in to GitHub. Paradev asks for the `repo`, `read:org`, and `workflow` scopes. |
 
-Connect from the plugin's page in **Plugins**. Superset keeps the credentials. The agent and your machine never see them.
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

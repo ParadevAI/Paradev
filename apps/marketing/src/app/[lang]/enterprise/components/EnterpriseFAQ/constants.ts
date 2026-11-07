@@ -1,5 +1,8 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import { COMPANY } from "@superset/shared/constants";
+
+const trustHost = new URL(COMPANY.TRUST_URL).host;
 
 export interface EnterpriseFAQItem {
 	id: string;
@@ -11,11 +14,11 @@ export const ENTERPRISE_FAQ_ITEMS: EnterpriseFAQItem[] = [
 	{
 		id: "whatIsEnterprise",
 		question: msg({
-			message: "What is Superset Enterprise?",
+			message: "What is Paradev Enterprise?",
 		}),
 		answer: msg({
 			message:
-				"Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization.",
+				"Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization.",
 		}),
 	},
 	{
@@ -44,8 +47,7 @@ export const ENTERPRISE_FAQ_ITEMS: EnterpriseFAQItem[] = [
 			message: "Is my data secure?",
 		}),
 		answer: msg({
-			message:
-				"Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh.",
+			message: `Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at ${trustHost}.`,
 		}),
 	},
 ];

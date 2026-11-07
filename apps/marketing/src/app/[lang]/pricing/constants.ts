@@ -6,11 +6,10 @@ import { COMPANY } from "@superset/shared/constants";
 export interface PricingFeature {
 	id: string;
 	label: MessageDescriptor;
-	needs?: "gbHours" | "multiple";
-	beta?: boolean;
+	needs?: "gbHours";
+	detail?: MessageDescriptor;
+	info?: { body: MessageDescriptor; faqId: string };
 }
-
-export const BETA = msg({ message: "Beta" });
 
 export interface PricingTier {
 	id: string;
@@ -173,6 +172,22 @@ const GENERIC_DESCRIPTION = msg({
 	message: "For teams that run more agents in the cloud",
 });
 
+const CLOUD_WORKSPACES = msg({ message: "Cloud workspaces" });
+
+const CLOUD_WORKSPACES_FEATURE: PricingFeature = {
+	id: "cloudWorkspaces",
+	label: CLOUD_WORKSPACES,
+	needs: "gbHours",
+	detail: msg({ message: "{hours} hours per seat each month" }),
+	info: {
+		body: msg({
+			message:
+				"Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster.",
+		}),
+		faqId: "cloudHours",
+	},
+};
+
 const BASE_FEATURES: PricingFeature[] = [
 	{
 		id: "everythingInFree",
@@ -180,14 +195,7 @@ const BASE_FEATURES: PricingFeature[] = [
 			message: "Everything in Free",
 		}),
 	},
-	{
-		id: "cloudHours",
-		label: msg({
-			message: "{gbHours} cloud GB-hours per seat each month",
-		}),
-		needs: "gbHours",
-		beta: true,
-	},
+	CLOUD_WORKSPACES_FEATURE,
 	{
 		id: "remoteAccess",
 		label: msg({
@@ -225,22 +233,7 @@ const STEP_UP_FEATURES: PricingFeature[] = [
 		id: "everythingInPrevious",
 		label: msg({ message: "Everything in {previousPlan}" }),
 	},
-	{
-		id: "cloudHours",
-		label: msg({ message: "{gbHours} cloud GB-hours per seat each month" }),
-		needs: "gbHours",
-		beta: true,
-	},
-	{
-		id: "cloudMultiple",
-		label: msg({ message: "{multiple}x the cloud GB-hours of {basePlan}" }),
-		needs: "multiple",
-	},
-	{
-		id: "sharedCloudPool",
-		label: msg({ message: "One shared GB-hour pool for the team" }),
-		needs: "gbHours",
-	},
+	CLOUD_WORKSPACES_FEATURE,
 ];
 
 const SEAT_PRICE = {
@@ -289,7 +282,6 @@ export interface ComparisonRow {
 export interface ComparisonSection {
 	id: string;
 	title: MessageDescriptor;
-	badge?: MessageDescriptor;
 	rows: ComparisonRow[];
 }
 
@@ -331,8 +323,7 @@ export const COMPARISON_SECTIONS: ComparisonSection[] = [
 	},
 	{
 		id: "cloud",
-		title: msg({ message: "Cloud workspaces" }),
-		badge: BETA,
+		title: CLOUD_WORKSPACES,
 		rows: [
 			{
 				id: "cloudGbHours",
@@ -506,6 +497,8 @@ export interface PricingFAQItem {
 	id: string;
 	question: MessageDescriptor;
 	answer: MessageDescriptor;
+	list?: "allowances";
+	more?: MessageDescriptor[];
 	needs?: "prices" | "gbHours" | "pack";
 }
 
@@ -532,14 +525,24 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 		needs: "prices",
 	},
 	{
-		id: "cloudGbHours",
+		id: "cloudHours",
 		question: msg({
-			message: "What are cloud GB-hours?",
+			message: "How do cloud hours work?",
 		}),
 		answer: msg({
-			message:
-				"Cloud workspaces are metered in GB-hours: the memory of the box times the hours it runs. An 8 GB box uses 8 GB-hours per hour. Each seat adds its plan's GB-hours to one pool your team shares: {allowances}. The pool resets every month, and usage past it is billed per GB-hour at the rate shown on each plan.",
+			message: "Each seat adds its plan's hours to one pool your team shares:",
 		}),
+		list: "allowances",
+		more: [
+			msg({
+				message:
+					"Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast.",
+			}),
+			msg({
+				message:
+					"The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan.",
+			}),
+		],
 		needs: "gbHours",
 	},
 	{
@@ -576,11 +579,11 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 	{
 		id: "soc2",
 		question: msg({
-			message: "Is Superset SOC 2 compliant?",
+			message: "Is Paradev SOC 2 compliant?",
 		}),
 		answer: msg({
 			message:
-				"Yes. Superset has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh.",
+				"Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}.",
 		}),
 	},
 	{
@@ -590,7 +593,7 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset doesn't proxy any API calls.",
+				"On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Paradev doesn't proxy any API calls.",
 		}),
 	},
 	{
@@ -600,7 +603,7 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Yes. Superset is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan.",
+				"Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan.",
 		}),
 	},
 ];

@@ -77,18 +77,22 @@ export function BrowserToolbar({
 		}
 	}, [isEditing]);
 
-	const enterEditMode = useCallback(() => {
+	const startEditing = useCallback(() => {
 		setUrlInputValue(url);
 		setIsEditing(true);
-		autocomplete.open();
 		autocomplete.updateQuery(url);
 	}, [url, autocomplete]);
+
+	const enterEditMode = useCallback(() => {
+		startEditing();
+		autocomplete.open();
+	}, [startEditing, autocomplete]);
 
 	usePaneFocus(() => {
 		if (displayUrl(browserRuntimeRegistry.getState(paneId).currentUrl)) {
 			browserRuntimeRegistry.focus(paneId);
 		} else {
-			enterEditMode();
+			startEditing();
 		}
 	});
 
@@ -197,7 +201,7 @@ export function BrowserToolbar({
 				<button
 					type="button"
 					onClick={onReload}
-					className="rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+					className="hidden rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground @min-[300px]/browser-toolbar:block"
 				>
 					{isLoading ? (
 						<TbLoader2 className="size-3.5 animate-spin" />
@@ -221,6 +225,9 @@ export function BrowserToolbar({
 							value={urlInputValue}
 							onChange={handleInputChange}
 							onBlur={exitEditMode}
+							onClick={() => {
+								if (!autocomplete.isOpen) autocomplete.open();
+							}}
 							onKeyDown={handleKeyDown}
 							placeholder={t({
 								message: "Enter URL or search...",

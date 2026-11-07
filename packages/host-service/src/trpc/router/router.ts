@@ -1,4 +1,5 @@
 import { router } from "../index";
+import { agentJobsRouter } from "./agent-jobs";
 import { agentToolingRouter } from "./agent-tooling";
 import { agentsRouter } from "./agents";
 import { attachmentsRouter } from "./attachments";
@@ -34,6 +35,7 @@ import { workspacesRouter } from "./workspaces";
 
 export const appRouter = router({
 	agents: agentsRouter,
+	agentJobs: agentJobsRouter,
 	sessions: sessionsRouter,
 	agentTooling: agentToolingRouter,
 	attachments: attachmentsRouter,

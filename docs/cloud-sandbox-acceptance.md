@@ -12,7 +12,7 @@ or mechanism v2 replaced, section 11 says what the check is now.
 
 Status legend: `[ ]` not run · `[x]` pass · `[!]` fail (note why).
 
-## 1. Provider primitives (SDK, no Superset code)
+## 1. Provider primitives (SDK, no Paradev code)
 
 Run from a throwaway script against the `sandboxes` project in the
 `superset-sh` team. These are the facts the design rests on.

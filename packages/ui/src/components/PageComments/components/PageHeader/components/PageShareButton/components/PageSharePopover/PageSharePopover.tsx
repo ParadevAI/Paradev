@@ -87,6 +87,11 @@ export function PageSharePopover({
 			label: t({ message: "Can comment" }),
 			description: t({ message: "Read the page and leave comments" }),
 		},
+		{
+			id: "edit",
+			label: t({ message: "Can edit" }),
+			description: t({ message: "Publish new versions, rename and share" }),
+		},
 	];
 
 	const confirm = (from: string, to: string): ShareConfirmation | null => {

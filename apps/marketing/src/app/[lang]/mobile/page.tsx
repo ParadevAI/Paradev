@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
 	return {
-		title: i18n._(msg({ message: "Superset for iPhone and iPad" })),
+		title: i18n._(msg({ message: "Paradev for iPhone and iPad" })),
 		description: i18n._(
 			msg({
 				message:
@@ -36,7 +36,7 @@ export default async function MobilePage() {
 				<section className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-8">
 					<div>
 						<p className="font-mono text-brand text-xs uppercase tracking-wider">
-							<Trans>Superset for iPhone and iPad</Trans>
+							<Trans>Paradev for iPhone and iPad</Trans>
 						</p>
 						<h1 className="mt-4 font-medium text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>
@@ -58,7 +58,7 @@ export default async function MobilePage() {
 							<AppStoreQr />
 							<p className="max-w-[15rem] text-muted-foreground text-xs leading-relaxed">
 								<Trans>
-									Requires iOS 26 or iPadOS 26 or later. Included with Superset
+									Requires iOS 26 or iPadOS 26 or later. Included with Paradev
 									Pro.
 								</Trans>
 							</p>
@@ -94,7 +94,7 @@ export default async function MobilePage() {
 						alt={i18n._(
 							msg({
 								message:
-									"Superset on iPad, showing a pull request and a workspace list",
+									"Paradev on iPad, showing a pull request and a workspace list",
 							}),
 						)}
 						width={1920}

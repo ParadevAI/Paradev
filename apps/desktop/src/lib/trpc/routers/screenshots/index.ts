@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
-import { clipboard, nativeImage } from "electron";
+import { nativeImage } from "electron";
+import { writeClipboardImage } from "main/lib/clipboard-image";
 import { screenshotManager } from "main/lib/screenshot-manager";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -39,7 +40,7 @@ export const createScreenshotsRouter = () => {
 					deviceName: z.string().min(1),
 				}),
 			)
-			.mutation(({ input }) => {
+			.mutation(async ({ input }) => {
 				const image = nativeImage.createFromBuffer(
 					Buffer.from(input.pngBase64, "base64"),
 				);
@@ -49,7 +50,7 @@ export const createScreenshotsRouter = () => {
 						message: "Not a decodable image",
 					});
 				}
-				clipboard.writeImage(image);
+				await writeClipboardImage(image);
 				const { id } = screenshotManager.save(image, {
 					deviceKey: input.deviceKey,
 					deviceName: input.deviceName,
@@ -75,10 +76,10 @@ export const createScreenshotsRouter = () => {
 
 		copy: publicProcedure
 			.input(z.object({ id: z.string() }))
-			.mutation(({ input }) => {
+			.mutation(async ({ input }) => {
 				const image = nativeImage.createFromPath(requireRow(input.id).savePath);
 				if (image.isEmpty()) throw new TRPCError({ code: "NOT_FOUND" });
-				clipboard.writeImage(image);
+				await writeClipboardImage(image);
 			}),
 
 		readPng: publicProcedure

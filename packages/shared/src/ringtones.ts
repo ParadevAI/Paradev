@@ -120,6 +120,15 @@ export const RINGTONES: RingtoneData[] = [
 		color: "from-indigo-400 to-purple-600",
 		duration: 7,
 	},
+	{
+		id: "tribute",
+		name: "Tribute",
+		description: "Choo choo",
+		filename: "tribute.mp3",
+		emoji: "🚂",
+		color: "from-stone-500 to-amber-600",
+		duration: 1,
+	},
 ];
 
 export const DEFAULT_RINGTONE_ID = "arcade";

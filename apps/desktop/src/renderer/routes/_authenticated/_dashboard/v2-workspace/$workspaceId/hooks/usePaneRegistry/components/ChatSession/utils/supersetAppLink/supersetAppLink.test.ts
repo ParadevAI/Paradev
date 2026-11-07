@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseSupersetAppLink } from "./supersetAppLink";
+import { chatReferenceUrl, parseSupersetAppLink } from "./supersetAppLink";
 
 const WEB = "https://app.superset.sh";
 
@@ -19,6 +19,10 @@ describe("parseSupersetAppLink", () => {
 			{ kind: "plugin", pluginName: "linear" },
 		],
 		[
+			"https://app.superset.sh/environments/e1",
+			{ kind: "environment", environmentId: "e1" },
+		],
+		[
 			"https://app.superset.sh/workspaces/w1?tab=chat",
 			{ kind: "workspace", workspaceId: "w1" },
 		],
@@ -36,5 +40,27 @@ describe("parseSupersetAppLink", () => {
 		expect(parseSupersetAppLink("https://app.superset.sh/tasks/a/b", WEB)).toBe(
 			null,
 		);
+	});
+
+	test("a workspace link with a session is a chat reference, and round-trips", () => {
+		const url = chatReferenceUrl("ws-1", "session-9", WEB);
+		expect(url).toBe(
+			"https://app.superset.sh/workspaces/ws-1?sessionId=session-9",
+		);
+		expect(parseSupersetAppLink(url, WEB)).toEqual({
+			kind: "chat",
+			workspaceId: "ws-1",
+			sessionId: "session-9",
+		});
+	});
+
+	test("a session or workspace id that is not a plain id is not a chat reference", () => {
+		for (const href of [
+			"https://app.superset.sh/workspaces/abc?sessionId=x%3B%20curl%20https%3A%2F%2Fevil.sh%7Csh",
+			"https://app.superset.sh/workspaces/a%3Bb?sessionId=s9",
+			"https://app.superset.sh/workspaces/abc?sessionId=$(id)",
+		]) {
+			expect(parseSupersetAppLink(href, WEB)?.kind).not.toBe("chat");
+		}
 	});
 });

@@ -165,7 +165,7 @@ export const slackProvider: TriggerProvider<SlackConfig> = {
 		if (outside.length === 0) return [];
 		const list = outside.join(", ");
 		return [
-			`This trigger will not run for messages in ${list} until @Superset is invited.`,
+			`This trigger will not run for messages in ${list} until @Paradev is invited.`,
 		];
 	},
 };

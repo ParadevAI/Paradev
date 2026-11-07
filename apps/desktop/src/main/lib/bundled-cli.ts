@@ -14,6 +14,8 @@ import { app } from "electron";
 
 export const BUNDLED_CLI_SHIM_MARKER = "# Superset bundled CLI shim v1";
 const SHIM_HEADER_BYTES = 2048;
+/** `paradev` is an alias of `superset`; both shims exec the same binary. */
+const BUNDLED_CLI_COMMANDS = ["superset", "paradev"] as const;
 
 export type BundledCliInstallStatus = "installed" | "missing" | "skipped";
 
@@ -183,14 +185,16 @@ export function installBundledCliShim(
 		console.debug("[bundled-cli] No bundled CLI binary found");
 		return "missing";
 	}
-	return installShim({
-		shimPath: path.join(
-			options.binDir ?? getBinDir(),
-			shimName("superset", platform),
-		),
-		contents: buildBundledCliShim(bundledCliPath, platform),
-		platform,
-	});
+	const binDir = options.binDir ?? getBinDir();
+	const contents = buildBundledCliShim(bundledCliPath, platform);
+	const [status] = BUNDLED_CLI_COMMANDS.map((command) =>
+		installShim({
+			shimPath: path.join(binDir, shimName(command, platform)),
+			contents,
+			platform,
+		}),
+	);
+	return status ?? "missing";
 }
 
 export function installBundledPdevShim(

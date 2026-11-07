@@ -258,6 +258,26 @@ describe("resolveTarget", () => {
 		);
 	});
 
+	test("a plugin of another organization the member is in resolves while this one is active", async () => {
+		install = {
+			...installed("organization-org-2", {
+				mcpUrl: "https://tools.acme.test/mcp",
+			}),
+			organizationId: "org-2",
+		};
+
+		const target = await resolveTarget({
+			...request,
+			marketplace: "organization-org-2",
+		});
+
+		expect(target).toMatchObject({
+			kind: "remote",
+			url: "https://tools.acme.test/mcp",
+			publicOnly: true,
+		});
+	});
+
 	test("a plugin from another marketplace cannot redirect a connector's credential", async () => {
 		install = installed("community", {
 			connector: "neon_mcp",

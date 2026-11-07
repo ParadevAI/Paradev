@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { i18n, initI18n } from "../index";
 import {
 	formatAge,
+	formatClockTime,
 	formatCompactNumber,
 	formatCompactRelativeTime,
 	formatCurrency,
@@ -20,6 +21,12 @@ initI18n();
 describe("format helpers (en)", () => {
 	test("active locale defaults to en", () => {
 		expect(getActiveLocale()).toBe("en");
+	});
+
+	test("formatClockTime drops the day period", () => {
+		const time = new Date(2026, 9, 26, 23, 11);
+		expect(formatClockTime(time)).toBe("11:11");
+		expect(formatClockTime(time, "de")).toBe("23:11");
 	});
 
 	test("formatNumber groups digits", () => {

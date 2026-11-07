@@ -82,8 +82,8 @@ On **Discard**, confirm in one short sentence that nothing was created, and stop
 
 After — and only after — the user picks **Accept**:
 
-1. Resolve the team. Call `mcp__linear-server__list_teams`. If exactly one team is returned, use it. If multiple teams exist, call `ask_user` with the team names as options and use the chosen team's id.
-2. Call `mcp__linear-server__save_issue` with:
+1. Resolve the team. Call the Linear MCP `list_teams` tool (whatever the server is named here). If exactly one team is returned, use it. If multiple teams exist, call `ask_user` with the team names as options and use the chosen team's id.
+2. Call the Linear MCP `save_issue` tool with:
    - `team`: the resolved team id
    - `title`: the accepted title (without the `**Title:**` prefix)
    - `description`: the accepted markdown description body (the contents of the fenced block, not the fence itself; use real newlines, not literal `\n`)
@@ -91,7 +91,7 @@ After — and only after — the user picks **Accept**:
 
 ## Rules
 
-- **No silent writes.** Never call `mcp__linear-server__save_issue` or any other Linear write tool until the user has explicitly chosen **Accept** in step 5.
+- **No silent writes.** Never call Linear's `save_issue` or any other Linear write tool until the user has explicitly chosen **Accept** in step 5.
 - **No extra mutations.** Don't assign, label, set status, add to a project, or otherwise mutate Linear state beyond creating the issue with the accepted title and description.
 - Read-only Linear lookups (`list_teams`, optionally `list_issues` for duplicate check) are fine, but skip them unless directly useful.
 - Don't guess at file paths — verify with Glob/Grep/Read before citing them in the draft.

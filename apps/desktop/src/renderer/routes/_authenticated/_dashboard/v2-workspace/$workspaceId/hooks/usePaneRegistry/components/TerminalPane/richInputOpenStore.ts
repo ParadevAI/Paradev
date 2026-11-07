@@ -1,13 +1,13 @@
 import { useSyncExternalStore } from "react";
 import { track } from "renderer/lib/analytics";
 
-export type RichInputToggleSource = "hotkey" | "header_button" | "escape";
+export type RichInputToggleSource = "hotkey" | "escape";
 
 /**
  * Whether the rich-input overlay is open. Global (universal on/off for every
- * terminal pane) rather than per-terminal, so the header button and the ⌘I
- * hotkey flip one shared switch that all panes reflect. Persisted to
- * localStorage so the preference survives reloads.
+ * terminal pane) rather than per-terminal, so the ⌘I hotkey flips one shared
+ * switch that all panes reflect. Persisted to localStorage so the preference
+ * survives reloads.
  */
 const STORAGE_KEY = "superset.terminalRichInputOpen";
 

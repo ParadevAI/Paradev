@@ -37,12 +37,12 @@ export function register(server: McpServer): void {
 				.string()
 				.nullish()
 				.describe(
-					"Assignee: a Superset user ID, or for Linear a Linear user id or email. Null unassigns.",
+					"Assignee: a Paradev user ID, or for Linear a Linear user id or email. Null unassigns.",
 				),
-			prUrl: z.string().url().nullish().describe("Superset only."),
+			prUrl: z.string().url().nullish().describe("Paradev only."),
 			estimate: z.number().int().positive().nullish(),
 			dueDate: z.string().datetime().nullish().describe("ISO 8601 due date."),
-			labels: z.array(z.string()).nullish().describe("Superset only."),
+			labels: z.array(z.string()).nullish().describe("Paradev only."),
 		},
 		handler: async (input, ctx) => {
 			const caller = createMcpCaller(ctx);

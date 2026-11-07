@@ -20,6 +20,11 @@ const rules = (
 	policy: Awaited<ReturnType<typeof deriveSandboxCredentials>>["networkPolicy"],
 ) => (policy as Policy).allow;
 
+function restore(key: string, value: string | undefined): void {
+	if (value === undefined) delete process.env[key];
+	else process.env[key] = value;
+}
+
 const WORKSPACE_ID = "11111111-2222-4333-8444-555555555555";
 
 const author = { name: "Ada", email: "ada@example.com" };
@@ -132,6 +137,34 @@ describe("deriveSandboxCredentials", () => {
 		expect(JSON.stringify(managedEnv)).not.toContain("ghs_token");
 	});
 
+	test("the relay gets the same workspace credential as the API", async () => {
+		const saved = {
+			api: process.env.NEXT_PUBLIC_API_URL,
+			relay: process.env.RELAY_URL,
+		};
+		process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
+		process.env.RELAY_URL = "https://relay.example.com";
+		try {
+			const { networkPolicy } = await deriveSandboxCredentials({
+				workspaceId: WORKSPACE_ID,
+				environmentEnv: {},
+				userAgentEnv: {},
+				githubToken: null,
+				gitAuthor: author,
+			});
+			const allow = rules(networkPolicy);
+			expect(allow["relay.example.com"]).toEqual(allow["api.example.com"]);
+			expect(
+				allow["relay.example.com"]?.[0]?.transform[0]?.headers[
+					"x-superset-sandbox-credential"
+				],
+			).toStartWith(`${WORKSPACE_ID}.`);
+		} finally {
+			restore("NEXT_PUBLIC_API_URL", saved.api);
+			restore("RELAY_URL", saved.relay);
+		}
+	});
+
 	test("brokered names in the environment's variables never reach the box", async () => {
 		const { managedEnv } = await deriveSandboxCredentials({
 			workspaceId: WORKSPACE_ID,
@@ -184,7 +217,7 @@ describe("gitAuthorFor", () => {
 		).toBe("octocat");
 	});
 
-	test("without a connected account, the Superset account's name and email", () => {
+	test("without a connected account, the Paradev account's name and email", () => {
 		expect(
 			gitAuthorFor({
 				github: null,

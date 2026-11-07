@@ -49,7 +49,7 @@ superset pages storage <page> --key data --scope shared --remove
 ## Live data: `window.superset.tools`
 
 A page can call a plugin's tool as the person viewing it, through their own
-connected account. Superset makes the call; the page makes no network request.
+connected account. Paradev makes the call; the page makes no network request.
 
 ```js
 const tools = window.superset?.tools;

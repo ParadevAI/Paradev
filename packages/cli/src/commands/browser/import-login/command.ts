@@ -27,7 +27,7 @@ export default command({
 		if (sources.length === 0) {
 			throw new CLIError(
 				"No Chromium browsers found to import from",
-				"Superset can import from Chromium-based browsers such as Chrome, Edge, Brave, Arc, Dia, Comet, Aside, Helium, Vivaldi, and Opera.",
+				"Paradev can import from Chromium-based browsers such as Chrome, Edge, Brave, Arc, Dia, Comet, Aside, Helium, Vivaldi, and Opera.",
 			);
 		}
 

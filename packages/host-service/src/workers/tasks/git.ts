@@ -6,6 +6,11 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import {
+	detectExternalWorktrees,
+	EXTERNAL_WORKTREE_SOURCES,
+	type ExternalWorktreeRepo,
+} from "../../projects/external-worktrees/index.ts";
+import {
 	getGitAuthorName,
 	type ResolvedGitInfo,
 	readGitIdentity,
@@ -724,6 +729,27 @@ export const gitRestoreWorktreeTask = defineWorkerTask<
 	},
 });
 
+export const gitDetectExternalWorktreesTask = defineWorkerTask<
+	{ homeDir: string; trackedWorktreePaths: string[]; gitEnv: GitTaskEnv },
+	ExternalWorktreeRepo[]
+>({
+	type: "git/detectExternalWorktrees",
+	handler: ({ homeDir, trackedWorktreePaths, gitEnv }) =>
+		detectExternalWorktrees({
+			homeDir,
+			sources: EXTERNAL_WORKTREE_SOURCES,
+			trackedWorktreePaths: new Set(trackedWorktreePaths),
+			listWorktrees: async (repoPath) =>
+				parseWorktreeList(
+					await createUserSimpleGit(repoPath, { env: gitEnv }).raw([
+						"worktree",
+						"list",
+						"--porcelain",
+					]),
+				),
+		}),
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitStatusPartialTask,
@@ -745,4 +771,5 @@ export const gitTasks = [
 	gitPushTask,
 	gitPrHeadBaseTask,
 	gitRestoreWorktreeTask,
+	gitDetectExternalWorktreesTask,
 ];

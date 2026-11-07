@@ -4,7 +4,7 @@ import { getConnector } from "@superset/shared/connectors";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { NEEDS_REAUTH } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgMembership } from "./utils";
 
 /**
@@ -38,13 +38,13 @@ export interface ProviderConnection {
 	accounts: ProviderAccount[];
 }
 
-export const connectionStatusProcedure = protectedProcedure
+export const connectionStatusProcedure = personProcedure
 	.input(z.object({ organizationId: z.uuid() }))
 	.query(
 		async ({ ctx, input }): Promise<Record<string, ProviderConnection>> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const [connectorRows, installation] = await Promise.all([
+			const [connectorRows, activeInstallation] = await Promise.all([
 				db.query.connections.findMany({
 					// Oldest first, and stable: the editor pins a new trigger to the
 					// first account, and an unordered read returns heap order, which
@@ -68,8 +68,11 @@ export const connectionStatusProcedure = protectedProcedure
 					},
 				}),
 				db.query.githubInstallations.findFirst({
-					where: eq(githubInstallations.organizationId, input.organizationId),
-					columns: { suspended: true },
+					where: and(
+						eq(githubInstallations.organizationId, input.organizationId),
+						eq(githubInstallations.suspended, false),
+					),
+					columns: { id: true },
 				}),
 			]);
 
@@ -101,9 +104,8 @@ export const connectionStatusProcedure = protectedProcedure
 				entry.needsReauth = needsReauth;
 			}
 
-			// A suspended installation still has a row, and delivers nothing.
 			connected.github = {
-				connected: installation !== undefined && !installation.suspended,
+				connected: activeInstallation !== undefined,
 				needsReauth: false,
 				accounts: [],
 			};

@@ -17,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 		),
 		description: i18n._(
 			msg({
-				message: "Browse shared themes and future agent configs for Superset.",
+				message:
+					"Browse Paradev plugins, shared themes, and future agent configs.",
 			}),
 		),
 		alternates: localizedAlternates(lang, "/marketplace"),
@@ -26,10 +27,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const marketplaceLinks = [
 	{
+		href: "/marketplace/plugins",
+		label: msg({ message: "Plugins" }),
+		description: msg({
+			message: "Skills and MCP tools for your agents. Submit your own.",
+		}),
+	},
+	{
 		href: "/marketplace/themes",
 		label: msg({ message: "Themes" }),
 		description: msg({
-			message: "Shared theme JSON files you can import into Superset.",
+			message: "Shared theme JSON files you can import into Paradev.",
 		}),
 	},
 	{

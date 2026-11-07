@@ -7,12 +7,14 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
+	DropdownMenuShortcut,
 	DropdownMenuSub,
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { FiUsers } from "react-icons/fi";
@@ -21,25 +23,31 @@ import {
 	HiChevronUpDown,
 	HiOutlineArrowRightOnRectangle,
 	HiOutlineArrowsRightLeft,
+	HiOutlineCog6Tooth,
 	HiOutlinePlus,
 	HiOutlineWindow,
 } from "react-icons/hi2";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
+import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { useSignOut } from "renderer/hooks/useSignOut";
+import { useHotkeyDisplay } from "renderer/hotkeys";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { HelpSubMenu } from "./components/HelpSubMenu";
+import { PauseNotificationsSubMenu } from "./components/PauseNotificationsSubMenu";
 import { SubmitPromptDialog } from "./components/SubmitPromptDialog";
 
 export function OrganizationDropdown({
 	variant = "topbar",
 }: {
-	variant?: "topbar" | "expanded" | "collapsed";
+	variant?: "topbar" | "expanded" | "collapsed" | "rail";
 }) {
 	const { t } = useLingui();
 	const { data: session } = authClient.useSession();
+	const isOnline = useOnlineStatus();
+	const settingsShortcut = useHotkeyDisplay("OPEN_SETTINGS").text;
 	const collections = useCollections();
 	const signOut = useSignOut();
 	const navigate = useNavigate();
@@ -78,9 +86,10 @@ export function OrganizationDropdown({
 			message: "Organization",
 		});
 
-	const { plan: currentPlan } = useCurrentPlan();
+	const { plan: currentPlan, activePlan } = useCurrentPlan();
 	const isPaid = currentPlan !== "free";
-	const planLabel = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+	const planName = activePlan?.planTier ?? currentPlan;
+	const planLabel = planName.charAt(0).toUpperCase() + planName.slice(1);
 	const planBadge = isPaid ? (
 		<Badge
 			variant="default"
@@ -91,7 +100,25 @@ export function OrganizationDropdown({
 	) : null;
 
 	const triggerButton =
-		variant === "collapsed" ? (
+		variant === "rail" ? (
+			<button
+				type="button"
+				className={cn(
+					"flex size-[30px] items-center justify-center rounded-full ring-2 transition-colors hover:bg-fill-hover",
+					isOnline ? "ring-emerald-500/70" : "ring-border",
+				)}
+				aria-label={t({
+					message: "Organization menu",
+				})}
+			>
+				<Avatar
+					size="sm"
+					fullName={userName ?? activeOrganization?.name}
+					image={session?.user?.image ?? undefined}
+					className="size-[22px] rounded-full"
+				/>
+			</button>
+		) : variant === "collapsed" ? (
 			<button
 				type="button"
 				className="flex size-8 items-center justify-center rounded-md transition-colors text-muted-foreground hover:bg-fill-hover"
@@ -145,7 +172,8 @@ export function OrganizationDropdown({
 			</button>
 		);
 
-	const contentAlign = variant === "topbar" ? "end" : "start";
+	const contentAlign =
+		variant === "topbar" || variant === "rail" ? "end" : "start";
 
 	return (
 		<>
@@ -153,12 +181,32 @@ export function OrganizationDropdown({
 				<DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align={contentAlign}
+					side={variant === "rail" ? "right" : undefined}
 					className={
 						variant === "expanded"
 							? "w-[var(--radix-dropdown-menu-trigger-width)] min-w-56"
 							: "w-56"
 					}
 				>
+					{variant === "rail" && (
+						<>
+							<DropdownMenuItem
+								onSelect={() => navigate({ to: "/settings/account" })}
+							>
+								<HiOutlineCog6Tooth className="h-4 w-4" />
+								<span>
+									<Trans>Settings</Trans>
+								</span>
+								{settingsShortcut !== "Unassigned" && (
+									<DropdownMenuShortcut>
+										{settingsShortcut}
+									</DropdownMenuShortcut>
+								)}
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+						</>
+					)}
+
 					{/* Organization */}
 					<DropdownMenuItem
 						onSelect={() => navigate({ to: "/settings/organization" })}
@@ -221,6 +269,8 @@ export function OrganizationDropdown({
 							<Trans>New window</Trans>
 						</span>
 					</DropdownMenuItem>
+
+					<PauseNotificationsSubMenu />
 
 					<HelpSubMenu onSubmitPrompt={() => setSubmitPromptOpen(true)} />
 

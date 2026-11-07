@@ -9,12 +9,13 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { settings } from "@superset/local-db";
+import { browserHistory, settings } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
 	workspaceDevAppProfileDirName,
 } from "@superset/shared/dev-app-profile";
+import { HTML_PREVIEW_SCHEME } from "@superset/shared/html-preview";
 import {
 	app,
 	BrowserWindow,
@@ -34,6 +35,8 @@ import {
 import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
+	APP_PARTITION,
+	BROWSER_PARTITION,
 	DEFAULT_CONFIRM_ON_QUIT,
 	PLATFORM,
 	PROTOCOL_SCHEME,
@@ -51,6 +54,12 @@ import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
 import {
+	initBrowserExtensionHost,
+	userExtensions,
+} from "./lib/browser/extension-host";
+import { movePaneSitesOnce } from "./lib/browser/move-pane-sites";
+import { preparePaneSessions } from "./lib/browser/pane-session";
+import {
 	installBundledCliShim,
 	installBundledPdevShim,
 } from "./lib/bundled-cli";
@@ -59,13 +68,18 @@ import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
 import { loadWebviewBrowserExtension } from "./lib/extensions";
 import { getHostServiceCoordinator } from "./lib/host-service-coordinator";
+import { htmlPreviewProtocolHandler } from "./lib/html-preview-protocol";
 import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
 import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
 
-import { syncInstalledPluginMcpServers } from "./lib/plugin-installs";
+import {
+	adoptDesktopInstalls,
+	finishPendingOrganizationForget,
+	syncInstalledPluginMcpServers,
+} from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
 import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
 import { runQuitCleanup } from "./lib/quit-sequence";
@@ -160,7 +174,7 @@ async function processDeepLink(url: string): Promise<void> {
 							i18n._(
 								msg({
 									message:
-										"Superset could not complete sign-in. Please try again.",
+										"Paradev could not complete sign-in. Please try again.",
 								}),
 							))
 					: i18n._(
@@ -452,6 +466,13 @@ protocol.registerSchemesAsPrivileged([
 			supportFetchAPI: true,
 		},
 	},
+	{
+		scheme: HTML_PREVIEW_SCHEME,
+		privileges: {
+			standard: true,
+			secure: true,
+		},
+	},
 ]);
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -514,7 +535,7 @@ if (!gotTheLock) {
 		};
 		protocol.handle("superset-icon", iconProtocolHandler);
 		session
-			.fromPartition("persist:superset")
+			.fromPartition(APP_PARTITION)
 			.protocol.handle("superset-icon", iconProtocolHandler);
 
 		// Serve system fonts (e.g. SF Mono on macOS) via custom protocol
@@ -543,9 +564,14 @@ if (!gotTheLock) {
 			};
 			protocol.handle("superset-font", fontProtocolHandler);
 			session
-				.fromPartition("persist:superset")
+				.fromPartition(APP_PARTITION)
 				.protocol.handle("superset-font", fontProtocolHandler);
 		}
+
+		protocol.handle(HTML_PREVIEW_SCHEME, htmlPreviewProtocolHandler);
+		session
+			.fromPartition("persist:superset")
+			.protocol.handle(HTML_PREVIEW_SCHEME, htmlPreviewProtocolHandler);
 
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();
@@ -555,7 +581,9 @@ if (!gotTheLock) {
 		sweepNetworkLogs();
 		sweepDevAppProfiles();
 
+		preparePaneSessions();
 		await loadWebviewBrowserExtension();
+		initBrowserExtensionHost();
 
 		await stopMigratedV1SessionsOnBoot(readMigratedV1WorkspaceIds());
 
@@ -563,12 +591,29 @@ if (!gotTheLock) {
 		// bridge endpoint/secret from its env, so a late bridge means browser
 		// control stays dark until the next respawn.
 		try {
-			await startBrowserBridge();
+			await startBrowserBridge({ extensions: userExtensions });
 		} catch (error) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
+		try {
+			const appSession = session.fromPartition(APP_PARTITION);
+			await movePaneSitesOnce({
+				from: appSession.cookies,
+				to: session.fromPartition(BROWSER_PARTITION).cookies,
+				markerPath: path.join(app.getPath("userData"), "pane-cookies-copied"),
+				readVisitedUrls: () =>
+					localDb
+						.select({ url: browserHistory.url })
+						.from(browserHistory)
+						.all()
+						.map((row) => row.url),
+				clearOldSites: (origins) => appSession.clearData({ origins }),
+			});
+		} catch (error) {
+			console.error("[main] Failed to copy browser pane cookies:", error);
+		}
 		downloadManager.start();
-		allowRendererToReachDeviceHub("persist:superset");
+		allowRendererToReachDeviceHub(APP_PARTITION);
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
@@ -640,6 +685,12 @@ if (!gotTheLock) {
 		} catch (error) {
 			console.error("[main] Failed to sync plugin MCP servers:", error);
 		}
+		void finishPendingOrganizationForget().catch((error) =>
+			console.error("[main] Failed to remove organization plugins:", error),
+		);
+		void adoptDesktopInstalls().catch((error) =>
+			console.error("[main] Failed to move the desktop's plugin list:", error),
+		);
 		try {
 			installBundledCliShim();
 		} catch (error) {

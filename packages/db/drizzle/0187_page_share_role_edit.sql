@@ -1,0 +1,1 @@
+ALTER TYPE "public"."page_share_role" ADD VALUE 'edit';

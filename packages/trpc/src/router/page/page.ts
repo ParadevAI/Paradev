@@ -39,11 +39,17 @@ import { env } from "../../env";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { deletePageStorage } from "../../lib/page-store";
 import { deleteObjects, objectExists, presignedGetUrl } from "../../lib/r2";
-import { protectedProcedure, publicProcedure, userError } from "../../trpc";
+import {
+	actorProcedure,
+	personProcedure,
+	publicProcedure,
+	userError,
+} from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
+	assertPageEditable,
+	assertPageOwned,
 	assertPageReadable,
-	assertPageWritable,
 	loadPageShareRole,
 	pageAccess,
 	pageReadableBy,
@@ -52,6 +58,7 @@ import {
 import { pageAssetRouter } from "./assets";
 import { withCommentSummaries } from "./comment-summary";
 import { decodePageCursor, encodePageCursor } from "./cursor";
+import { noPageAccess, pageCaller, pageReader } from "./page-caller";
 import { pageUrl } from "./page-url";
 import { pagePreview } from "./preview";
 import { publishPage } from "./publish";
@@ -425,7 +432,7 @@ export const pageRouter = {
 	 * publish that carries them creates the page here and publishes into it.
 	 * A publish with no assets still mints its own page and never needs this.
 	 */
-	create: protectedProcedure
+	create: personProcedure
 		.input(createPageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -490,18 +497,21 @@ export const pageRouter = {
 			});
 		}),
 
-	publish: protectedProcedure
+	publish: actorProcedure
 		.input(publishPageSchema)
 		.mutation(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
+			const caller = await pageCaller(ctx);
+			if (!caller.reader && (input.pageId || input.workspaceId)) {
+				throw noPageAccess();
+			}
 			return await publishPage({
 				input,
-				organizationId,
-				userId: ctx.session.user.id,
+				organizationId: caller.organizationId,
+				userId: caller.userId,
 			});
 		}),
 
-	list: protectedProcedure
+	list: personProcedure
 		.input(legacyListPagesSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -525,12 +535,14 @@ export const pageRouter = {
 			return all;
 		}),
 
-	listPaginated: protectedProcedure
+	listPaginated: actorProcedure
 		.input(listPagesSchema)
 		.query(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
+			const caller = await pageCaller(ctx);
+			const userId = caller.reader;
+			if (!userId) return { items: [], nextCursor: null };
 			const batch = await listPageBatch({
-				organizationId: await requireActiveOrgMembership(ctx),
+				organizationId: caller.organizationId,
 				userId,
 				input,
 			});
@@ -540,7 +552,7 @@ export const pageRouter = {
 			};
 		}),
 
-	counts: protectedProcedure
+	counts: personProcedure
 		.input(pageCountsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -642,14 +654,20 @@ export const pageRouter = {
 			};
 		}),
 
-	get: protectedProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
-		const organizationId = await requireActiveOrgMembership(ctx);
+	get: actorProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
+		const caller = await pageCaller(ctx);
+		const reader = pageReader(caller);
 		const page = await loadPage({
 			id: input.id,
 			slug: input.slug,
-			organizationId,
-			userId: ctx.session.user.id,
+			organizationId: caller.organizationId,
+			userId: reader,
 		});
+		const { canEdit } = pageAccess(
+			page,
+			reader,
+			await loadPageShareRole(page, reader),
+		);
 
 		const latestVersion = await latestVersionNumber(page.id);
 		const served = servedVersion(page.sharedVersion, latestVersion);
@@ -677,10 +695,11 @@ export const pageRouter = {
 			servedVersion: served,
 			workspaceLinks,
 			watch: watchState(page, Date.now()),
+			canEdit,
 		};
 	}),
 
-	preview: protectedProcedure
+	preview: personProcedure
 		.input(pagePreviewSchema)
 		.query(async ({ ctx, input }) =>
 			pagePreview({
@@ -696,7 +715,7 @@ export const pageRouter = {
 	 * unchanged files instead of re-uploading. Mirrors the republish lookup —
 	 * only the caller's own pages match.
 	 */
-	resolveByEntryPath: protectedProcedure
+	resolveByEntryPath: personProcedure
 		.input(
 			z
 				.object({
@@ -754,13 +773,13 @@ export const pageRouter = {
 			};
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updatePageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			const [updated] = await db
 				.update(pages)
@@ -788,13 +807,13 @@ export const pageRouter = {
 			};
 		}),
 
-	setVisibility: protectedProcedure
+	setVisibility: personProcedure
 		.input(setPageVisibilitySchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			const [updated] = await db
 				.update(pages)
@@ -821,13 +840,13 @@ export const pageRouter = {
 			return { id: updated.id, visibility: updated.visibility };
 		}),
 
-	setOrganizationRole: protectedProcedure
+	setOrganizationRole: personProcedure
 		.input(setPageOrganizationRoleSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 			await db
 				.update(pages)
 				.set({ organizationRole: input.role })
@@ -835,7 +854,7 @@ export const pageRouter = {
 			return { id: page.id, organizationRole: input.role };
 		}),
 
-	claimWatch: protectedProcedure
+	claimWatch: personProcedure
 		.input(
 			z.object({
 				id: pageFields.id,
@@ -850,10 +869,10 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return claimPageWatch(input);
 		}),
-	renewWatch: protectedProcedure
+	renewWatch: personProcedure
 		.input(z.object({ id: pageFields.id, token: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -862,10 +881,10 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return renewPageWatch(input);
 		}),
-	releaseWatch: protectedProcedure
+	releaseWatch: personProcedure
 		.input(z.object({ id: pageFields.id, token: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -874,10 +893,10 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return releasePageWatch(input);
 		}),
-	reserveWatchDelivery: protectedProcedure
+	reserveWatchDelivery: personProcedure
 		.input(
 			z.object({
 				id: pageFields.id,
@@ -895,10 +914,10 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return reservePageWatchDelivery(input);
 		}),
-	finishWatchDelivery: protectedProcedure
+	finishWatchDelivery: personProcedure
 		.input(
 			z.object({
 				id: pageFields.id,
@@ -914,17 +933,17 @@ export const pageRouter = {
 				organizationId,
 				userId: ctx.session.user.id,
 			});
-			assertPageWritable(page, ctx.session.user.id);
+			await assertPageEditable(page, ctx.session.user.id);
 			return finishPageWatchDelivery(input);
 		}),
 
-	setWatch: protectedProcedure
+	setWatch: personProcedure
 		.input(setPageWatchSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			await db
 				.update(pages)
@@ -937,13 +956,13 @@ export const pageRouter = {
 			return { id: page.id };
 		}),
 
-	clearWatch: protectedProcedure
+	clearWatch: personProcedure
 		.input(clearPageWatchSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			await db
 				.update(pages)
@@ -953,37 +972,36 @@ export const pageRouter = {
 			return { id: page.id };
 		}),
 
-	access: protectedProcedure
-		.input(pageRefSchema)
-		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-			const page = await loadPage({
-				id: input.id,
-				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
-			});
+	access: personProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
+		const organizationId = await requireActiveOrgMembership(ctx);
+		const page = await loadPage({
+			id: input.id,
+			slug: input.slug,
+			organizationId,
+			userId: ctx.session.user.id,
+		});
 
-			const userId = ctx.session.user.id;
-			const { canComment, canManage } = pageAccess(
-				page,
-				userId,
-				await loadPageShareRole(page, userId),
-			);
-			return {
-				owner: await loadOwner(page.createdByUserId),
-				canComment,
-				canManage,
-			};
-		}),
+		const userId = ctx.session.user.id;
+		const { canComment, canEdit, canManage } = pageAccess(
+			page,
+			userId,
+			await loadPageShareRole(page, userId),
+		);
+		return {
+			owner: await loadOwner(page.createdByUserId),
+			canComment,
+			canEdit,
+			canManage,
+		};
+	}),
 
-	setSharedVersion: protectedProcedure
+	setSharedVersion: personProcedure
 		.input(setSharedVersionSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			await assertPageEditable(page, userId);
 
 			if (input.version !== null) {
 				const [row] = await db
@@ -1030,13 +1048,13 @@ export const pageRouter = {
 			return { id: updated.id, sharedVersion: updated.sharedVersion };
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(deletePageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const page = await loadPage({ id: input.id, organizationId, userId });
-			assertPageWritable(page, userId);
+			assertPageOwned(page, userId);
 
 			if (input.onlyIfEmpty) {
 				const [discarded] = await db
@@ -1142,15 +1160,15 @@ export const pageRouter = {
 			return { id: page.id, deleted: true };
 		}),
 
-	versions: protectedProcedure
+	versions: actorProcedure
 		.input(pageRefSchema)
 		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
+			const caller = await pageCaller(ctx);
 			const page = await loadPage({
 				id: input.id,
 				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
+				organizationId: caller.organizationId,
+				userId: pageReader(caller),
 			});
 
 			const rows = await db
@@ -1181,93 +1199,91 @@ export const pageRouter = {
 			);
 		}),
 
-	pull: protectedProcedure
-		.input(pullPageSchema)
-		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-			const page = await loadPage({
-				id: input.id,
-				slug: input.slug,
-				organizationId,
-				userId: ctx.session.user.id,
+	pull: actorProcedure.input(pullPageSchema).query(async ({ ctx, input }) => {
+		const caller = await pageCaller(ctx);
+		const page = await loadPage({
+			id: input.id,
+			slug: input.slug,
+			organizationId: caller.organizationId,
+			userId: pageReader(caller),
+		});
+
+		const latestVersion = await latestVersionNumber(page.id);
+		const version =
+			input.version ?? servedVersion(page.sharedVersion, latestVersion);
+		if (version === null) {
+			throw userError({
+				code: "NOT_FOUND",
+				message: "Page has no versions",
+				i18nKey: "serverError.page.pageHasNoVersions",
 			});
+		}
 
-			const latestVersion = await latestVersionNumber(page.id);
-			const version =
-				input.version ?? servedVersion(page.sharedVersion, latestVersion);
-			if (version === null) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Page has no versions",
-					i18nKey: "serverError.page.pageHasNoVersions",
-				});
-			}
+		const [row] = await db
+			.select()
+			.from(pageVersions)
+			.where(
+				and(
+					eq(pageVersions.pageId, page.id),
+					eq(pageVersions.version, version),
+				),
+			)
+			.limit(1);
 
-			const [row] = await db
-				.select()
-				.from(pageVersions)
-				.where(
-					and(
-						eq(pageVersions.pageId, page.id),
-						eq(pageVersions.version, version),
-					),
-				)
-				.limit(1);
+		if (!row) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: `Version ${version} not found`,
+			});
+		}
 
-			if (!row) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: `Version ${version} not found`,
-				});
-			}
-
-			let downloadUrl: string;
-			try {
-				downloadUrl = await presignedGetUrl(row.storageKey);
-			} catch (error) {
-				console.error("[pages] presign failed", {
-					pageId: page.id,
-					version,
-					error,
-				});
-				throw userError({
-					code: "NOT_FOUND",
-					message: "Page content is not available",
-					i18nKey: "serverError.page.pageContentIsNotAvailable",
-				});
-			}
-
-			const viewUrl = pageViewUrl({
-				baseUrl: env.USERCONTENT_URL,
+		let downloadUrl: string;
+		try {
+			downloadUrl = await presignedGetUrl(row.storageKey);
+		} catch (error) {
+			console.error("[pages] presign failed", {
 				pageId: page.id,
-				version: row.version,
-				ticket: await mintPageTicket(page, { version: row.version }),
+				version,
+				error,
 			});
+			throw userError({
+				code: "NOT_FOUND",
+				message: "Page content is not available",
+				i18nKey: "serverError.page.pageContentIsNotAvailable",
+			});
+		}
 
-			return {
-				id: page.id,
-				slug: page.slug,
-				url: pageUrl(page.slug),
-				title: page.title,
-				description: page.description,
-				visibility: page.visibility,
-				createdByUserId: page.createdByUserId,
-				updatedAt: page.updatedAt,
-				sharedVersion: page.sharedVersion,
-				latestVersion,
-				servedVersion: servedVersion(page.sharedVersion, latestVersion),
-				watch: watchState(page, Date.now()),
-				version: row.version,
-				label: row.label,
-				contentType: row.contentType,
-				sizeBytes: row.sizeBytes,
-				sha256: row.sha256,
-				createdAt: row.createdAt,
-				storageKey: row.storageKey,
-				downloadUrl,
-				viewUrl,
-			};
-		}),
+		const viewUrl = pageViewUrl({
+			baseUrl: env.USERCONTENT_URL,
+			pageId: page.id,
+			version: row.version,
+			ticket: await mintPageTicket(page, { version: row.version }),
+		});
+
+		return {
+			id: page.id,
+			slug: page.slug,
+			url: pageUrl(page.slug),
+			title: page.title,
+			description: page.description,
+			visibility: page.visibility,
+			createdByUserId: page.createdByUserId,
+			updatedAt: page.updatedAt,
+			sharedVersion: page.sharedVersion,
+			latestVersion,
+			servedVersion: servedVersion(page.sharedVersion, latestVersion),
+			watch: watchState(page, Date.now()),
+			version: row.version,
+			label: row.label,
+			contentType: row.contentType,
+			sizeBytes: row.sizeBytes,
+			sha256: row.sha256,
+			createdAt: row.createdAt,
+			storageKey: row.storageKey,
+			downloadUrl,
+			viewUrl,
+		};
+	}),
 
 	publicView: publicProcedure
 		.input(publicPageSchema)

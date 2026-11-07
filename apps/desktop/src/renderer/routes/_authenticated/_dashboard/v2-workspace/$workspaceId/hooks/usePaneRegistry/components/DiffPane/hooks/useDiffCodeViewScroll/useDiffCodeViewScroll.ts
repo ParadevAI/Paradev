@@ -14,7 +14,10 @@ import {
 import { shouldRestoreCachedScrollState } from "./shouldRestoreCachedScrollState";
 
 interface UseDiffCodeViewScrollOptions {
-	codeViewRef: RefObject<CodeViewHandle<DiffAnnotationMetadata> | null>;
+	codeViewRef: RefObject<CodeViewHandle<
+		DiffAnnotationMetadata,
+		undefined
+	> | null>;
 	data: DiffPaneData;
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	items: CodeViewItem<DiffAnnotationMetadata>[];
@@ -155,6 +158,16 @@ export function useDiffCodeViewScroll({
 		if (!shouldReassertScroll(lastAssertedRef.current, scrollKey, targetTop))
 			return;
 
+		// Pierre drops a line it cannot place (an outdated comment's line, or
+		// one in folded context); the file scroll queued first then stands.
+		if (target.type === "line") {
+			codeViewRef.current?.scrollTo({
+				type: "item",
+				id: targetItemId,
+				align: "start",
+				behavior: "smooth-auto",
+			});
+		}
 		codeViewRef.current?.scrollTo(target);
 		lastAssertedRef.current = { scrollKey, targetTop };
 		lastProgrammaticScrollAtRef.current = Date.now();

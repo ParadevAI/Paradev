@@ -1,1 +1,6 @@
-export { parseSupersetAppLink, type SupersetAppLink } from "./supersetAppLink";
+export {
+	chatReferenceUrl,
+	isPlainId,
+	parseSupersetAppLink,
+	type SupersetAppLink,
+} from "./supersetAppLink";

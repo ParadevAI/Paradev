@@ -29,7 +29,7 @@ export function DashboardSidebarWorkspaceQueuedBadge({
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<span className="flex h-5 shrink-0 items-center gap-0.5 font-mono text-[10px] tabular-nums text-amber-500/90 group-hover:hidden group-focus-within:hidden">
+				<span className="flex h-5 shrink-0 items-center gap-0.5 font-mono text-[10px] tabular-nums text-amber-500/90 group-hover:hidden group-[:focus-within:not(:focus:not(:focus-visible))]:hidden">
 					<ListEnd aria-hidden="true" className="size-3" />
 					<span aria-hidden="true">{queued}</span>
 					<span className="sr-only">{label}</span>

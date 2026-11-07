@@ -1,1 +1,1 @@
-export { ActivityMenuHeader, type ShipView } from "./ActivityMenuHeader";
+export { ActivityMenuHeader } from "./ActivityMenuHeader";

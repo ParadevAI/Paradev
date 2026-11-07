@@ -69,6 +69,9 @@ describe("bundled CLI", () => {
 		expect(existsSync(shimPath)).toBe(true);
 		expect(readFileSync(shimPath, "utf-8")).toContain(BUNDLED_CLI_SHIM_MARKER);
 		expect(statSync(shimPath).mode & 0o111).not.toBe(0);
+		expect(readFileSync(path.join(binDir, "paradev"), "utf-8")).toBe(
+			readFileSync(shimPath, "utf-8"),
+		);
 	});
 
 	it("updates an existing managed shim", () => {

@@ -1,4 +1,5 @@
 import type { RendererContext } from "@superset/panes";
+import { cn } from "@superset/ui/utils";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect } from "react";
 import { FileSaveConflictDialog } from "renderer/components/FileSaveConflictDialog";
@@ -24,9 +25,15 @@ import { resolveActivePaneView } from "./registry";
 interface FilePaneProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
+	/** Right pane file view: room for the breadcrumb, and a click inside pins the preview. */
+	inRightPane?: boolean;
 }
 
-export function FilePane({ context, workspaceId }: FilePaneProps) {
+export function FilePane({
+	context,
+	workspaceId,
+	inRightPane = false,
+}: FilePaneProps) {
 	const data = context.pane.data as FilePaneData;
 	const { filePath } = data;
 	const isActiveTab = useStore(
@@ -160,6 +167,9 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 	return (
 		<div
 			className="flex h-full w-full flex-col"
+			onPointerDownCapture={() => {
+				if (inRightPane && !context.pane.pinned) context.actions.pin();
+			}}
 			onBlurCapture={(event) => {
 				if (!event.currentTarget.contains(event.relatedTarget as Node)) {
 					fileAutoSave.onFocusChange(document);
@@ -199,7 +209,13 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 					onDismiss={() => document.clearSaveError()}
 				/>
 			)}
-			<div className="min-h-0 min-w-0 flex-1">
+			<div
+				className={cn(
+					"relative min-h-0 min-w-0 flex-1",
+					inRightPane &&
+						(activeView.id === "code" ? "[&_.cm-scroller]:pt-10" : "pt-10"),
+				)}
+			>
 				<MarkdownResourceProvider
 					documentDirectory={getPathDirectory(document.absolutePath)}
 					rootPath={workspaceQuery.data?.worktreePath ?? undefined}

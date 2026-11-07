@@ -24,7 +24,7 @@ export function SkillsList() {
 		<div className="flex flex-col gap-4">
 			<p className="text-sm text-muted-foreground">
 				<Trans>
-					Skills ship with the Superset plugin and are kept up to date
+					Skills ship with the Paradev plugin and are kept up to date
 					automatically in every agent you use. Click one to preview it.
 				</Trans>
 			</p>

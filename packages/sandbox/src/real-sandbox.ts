@@ -69,7 +69,7 @@ const identity: SandboxIdentity = {
 	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
-			url: "https://github.com/superset-sh/superset.git",
+			url: "https://github.com/paradevai/paradev.git",
 			branch: workingBranch,
 			baseBranch: "main",
 			path: ".",

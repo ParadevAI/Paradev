@@ -19,6 +19,12 @@ describe("pageSlugFromUrl", () => {
 		);
 	});
 
+	test("reads the slug from the web origin's twin on the other root domain", () => {
+		expect(
+			pageSlugFromUrl("https://app.paradev.com/page/deploy-notes", WEB),
+		).toBe("deploy-notes");
+	});
+
 	test("tolerates a configured web url with a trailing slash", () => {
 		expect(pageSlugFromUrl(`${WEB}/page/deploy-notes`, `${WEB}/`)).toBe(
 			"deploy-notes",

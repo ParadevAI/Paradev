@@ -2,7 +2,6 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import type { Metadata } from "next";
-import { CTASection } from "@/app/[lang]/components/CTASection";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
@@ -15,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
 	return {
-		title: i18n._(msg({ message: "Superset Pages" })),
+		title: i18n._(msg({ message: "Paradev Pages" })),
 		description: i18n._(
 			msg({
 				message:
@@ -36,7 +35,7 @@ export default async function PagesPage() {
 				<section>
 					<div className="max-w-3xl">
 						<p className="font-mono text-brand text-xs uppercase tracking-wider">
-							<Trans>Superset Pages</Trans>
+							<Trans>Paradev Pages</Trans>
 						</p>
 						<h1 className="mt-4 font-medium text-balance text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>Your teammates can talk directly to your agent.</Trans>
@@ -87,7 +86,6 @@ export default async function PagesPage() {
 					</div>
 				</section>
 			</main>
-			<CTASection />
 		</div>
 	);
 }

@@ -2,7 +2,7 @@ import { COMPANY } from "@superset/shared/constants";
 import type { Autumn } from "autumn-js";
 import { APIError, createAuthEndpoint } from "better-auth/api";
 import { SEATS_FEATURE_ID } from "../autumn/features";
-import { autumnPlanIdFor, LEGACY_CLIENT_PLAN_IDS } from "./plan-ids";
+import { autumnPlanIdFor } from "./plan-ids";
 
 export const BILLING_ERROR_CODES = {
 	SUBSCRIPTION_NOT_FOUND: "Subscription not found",
@@ -59,6 +59,7 @@ export interface AutumnBillingDeps {
 	restoreInStripe(subscription: StripeSubscriptionRef): Promise<void>;
 	ensureCustomer(organizationId: string): Promise<unknown>;
 	currentPlanId(organizationId: string): Promise<string | null>;
+	isProFamilyPlan(planId: string): Promise<boolean>;
 	findLiveSubscription(
 		organizationId: string,
 	): Promise<LiveSubscription | null>;
@@ -103,7 +104,7 @@ export async function upgradeWithAutumn(
 	}
 	if (body.plan !== "pro") throw billingError("SUBSCRIPTION_PLAN_NOT_FOUND");
 	const currentPlanId = await deps.currentPlanId(referenceId);
-	if (currentPlanId && !LEGACY_CLIENT_PLAN_IDS.includes(currentPlanId)) {
+	if (currentPlanId && !(await deps.isProFamilyPlan(currentPlanId))) {
 		throw new APIError("BAD_REQUEST", {
 			message: "Update the app to change this plan.",
 		});

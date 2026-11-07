@@ -11,8 +11,9 @@ import { PricingHero } from "./components/PricingHero";
 import { PricingTiers } from "./components/PricingTiers";
 import { TrustStrip } from "./components/TrustStrip";
 import { PRICING_FAQ_ITEMS } from "./constants";
+import { faqAnswer, faqAnswerText } from "./utils/faqAnswer";
 import { fetchPlanCatalog } from "./utils/fetchPlanCatalog";
-import { faqShown, faqValues, planPriceValues } from "./utils/planPriceValues";
+import { faqShown, planPriceValues } from "./utils/planPriceValues";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -55,7 +56,7 @@ export default async function PricingPage() {
 		faqShown(item, priceValues),
 	).map((item) => ({
 		question: i18n._(item.question),
-		answer: i18n._({ ...item.answer, values: faqValues(priceValues) }),
+		answer: faqAnswerText(faqAnswer(item, priceValues, i18n)),
 	}));
 
 	return (

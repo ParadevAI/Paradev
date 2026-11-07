@@ -1,0 +1,152 @@
+# Chrome extensions and passkeys in the browser pane
+
+Spec, 2026-10-30. The desktop browser pane installs and runs Chrome extensions the way Chrome
+does: install from the Chrome Web Store, click the extension's toolbar button, use its popup.
+Password-manager extensions then bring passkeys to the pane. This spec covers why passkeys fail
+today, the options, the security work the extension host needs, and the build phases.
+
+## Problem
+
+A site in the browser pane that asks for a passkey never finishes.
+
+Measured in Electron 44.9.3 (the version `apps/desktop` ships) on `https://webauthn.io`:
+
+- `navigator.credentials.create()` for a passkey does not settle after 12 s. The page's own
+  4 s `timeout` does not end it. A second call then fails with
+  `OperationError: A request is already pending.`
+- `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()` is `false`.
+- `PublicKeyCredential.getClientCapabilities()` reports `hybridTransport: true` and
+  `passkeyPlatformAuthenticator: true`, so sites offer passkey sign-in that cannot finish.
+
+Chrome shows its own dialog for a passkey request: the saved passkey, a phone (QR code), or a
+security key. Electron has no such dialog. The request waits for a USB security key, and
+nothing on screen says so.
+
+Users keep passkeys in iCloud Keychain, Google Password Manager (in Chrome), and
+password-manager extensions (1Password, Bitwarden, Dashlane, Proton Pass). The pane can reach
+none of them today, and it runs no third-party Chrome extensions at all.
+
+## Options
+
+| | A. Chrome extensions | B. Native Touch ID | C. System passkey sheet | D. Sign in with Chrome, import session |
+|---|---|---|---|---|
+| What the user gets | Any Chrome extension, installed from the Web Store. Passkeys already saved in 1Password, Bitwarden and others work on any site. | New passkeys made inside the pane, stored in this Mac's Secure Enclave. Not synced, not shared with Chrome or iCloud. | The macOS passkey sheet: iCloud Keychain, phone, 1Password provider, security keys. | Any passkey works, because Chrome does the sign-in. The pane gets the cookies after. |
+| Mechanism | `electron-chrome-extensions@4.10.0` (MIT, 1 dependency) adds the `chrome.action`, `chrome.windows` and tab APIs that Electron's own extension support lacks. `electron-chrome-web-store@0.13.0` (MIT) installs and updates from the Chrome Web Store. | `app.configureWebAuthn({ touchID: { keychainAccessGroup } })`, Electron 41.5+, plus the `select-webauthn-account` session event to pick an account. | `ASAuthorizationWebBrowserPublicKeyCredentialManager` in a native module, and a WebAuthn shim in the page. | `chrome-cookie-import.ts`, which exists today. |
+| Blocker | Security work below. | Needs the `keychain-access-groups` entitlement and an embedded provisioning profile in the signed build. An unsigned build logs `Touch ID authenticator unavailable because keychain-access-group entitlement is missing or incorrect`. The entitlement without the profile stops the app from launching. | Needs Apple's managed `com.apple.developer.web-browser.public-key-credential` entitlement. Apple says to add it only if the app acts as the user's web browser, and only the Account Holder can request it ([Apple docs](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.web-browser.public-key-credential)). Electron has no hook to hand a request to it. | Manual. Sessions bound to the device (Chrome DBSC) do not carry over. |
+| Platforms | macOS, Windows, Linux | macOS only | macOS only | Every platform with Chrome |
+
+## Decision
+
+1. **A, Chrome extensions, with both packages pinned to the exact versions above.** It reaches
+   the passkeys users already have, on every platform, with no Apple gate, and it gives the pane
+   the Chrome extension flow users expect.
+2. **D, as the fallback, after A.** When a passkey request in the pane has no extension to
+   answer it, the pane says so and offers to sign in with Chrome and import the session.
+3. **B, when the release build has a provisioning profile.** It changes nothing for users until
+   the signed build carries the entitlement, so it waits on the release setup, not on code.
+4. **C is out of scope.** Apple limits its entitlement to apps that act as the user's web
+   browser, and Electron gives no place to plug it in.
+
+## 1Password under Electron 44
+
+A prototype loaded 1Password 8.12.37 into Electron 44.9.3 three ways:
+
+| | Electron alone | `electron-chrome-extensions` as shipped | Plus a `browser` alias |
+|---|---|---|---|
+| Service worker starts | No: `reading 'onClicked'` | No: `reading 'WINDOW_ID_NONE'` | Yes: `Finished initializing 1Password` |
+| Content script hooks WebAuthn | Yes | Yes | Yes |
+| Toolbar popup | None | Opens, blank spinner | Opens, signed-out click opens the welcome tab |
+
+Chromium 152 gives extension contexts their own `browser` namespace, separate from `chrome`.
+1Password's webextension polyfill uses `browser`; `electron-chrome-extensions` patches only
+`chrome`. So the extension host sets `browser` to the patched `chrome` in extension contexts.
+With that alias, 1Password still lacks `chrome.offscreen` and `chrome.webRequestAuthProvider`.
+A signed-in passkey ceremony is unproven until a user signs in to 1Password in the pane.
+
+## Security
+
+Extensions can read and change every page in the pane, as in Chrome. The host must not widen
+that to the app itself, and must not trust an extension it did not verify.
+
+| Risk | Finding | Handling |
+|---|---|---|
+| Extensions see the app | The app UI and the pane share the session `persist:superset` (`apps/desktop/src/main/windows/main.ts`, both `<webview>` creators). An extension with `webRequest` would see the app's own API calls and auth headers. | The pane moves to its own session, `persist:browser`. Third-party extensions load only there. |
+| Websites reach extension APIs | The `chrome.*` bridge loads only into `chrome-extension://` pages and service workers (`electron-chrome-extensions` `chrome-extension-api.preload.js`). | None needed. |
+| Tampered download | `electron-chrome-web-store` reads the CRX3 header and checks that the declared ID matches the public key, but never verifies the signature. HTTPS to Google is the only guard. | The host verifies the CRX3 `sha256_with_rsa` signature before it unpacks, and refuses CRX2. |
+| No malware kill switch | Chrome turns off extensions that Google flags as malware. The package only checks for updates every 5 h. | A visible list of installed extensions with remove. The package's `allowlist` and `denylist` stay available. |
+| Main process trusts the sender | The IPC router takes the extension ID from the message, not from the sender frame, and the package's bridge object is reachable in every extension context. One installed extension can call the polyfilled APIs (tabs, windows, context menus, toolbar actions) as another extension. Chromium-enforced APIs (`cookies`, `webRequest`, `scripting`) are not affected. | A patch (`patches/electron-chrome-extensions@4.10.0.patch`) takes the extension ID from the sender (frame origin or service-worker scope) and refuses a message that names another extension. Report upstream. |
+| Update while loading | The package's updater checks at start, removes the old version and deletes its files while the old service worker may still be loading them (1Password failed with `SyntaxError: Unexpected end of input`). | The first update check runs 5 minutes after start, then every 5 hours. |
+| Supply chain | One maintainer. `electron-chrome-extensions@4.10.0` shipped 2026-10-25. | Exact versions, lockfile hashes, diff review on every bump. |
+| One click installs | The package installs on one click, with every permission the extension asks for. Chrome first asks "Add {name}?" and lists what the extension can reach. | `beforeInstall` shows the same question, with Chrome's wording (`extension-host/install-warnings.ts`). Cancel denies the install. |
+| Agents reach extension worlds | Agents drive panes through the browser bridge (eval, screenshot, raw CDP). A pane cannot open `chrome-extension://` pages, so the vault page is out of reach. Raw CDP can still list a content script's world (`Runtime.executionContextCreated` with a `chrome-extension://` origin) and run code in it, and that world can message its extension. `Debugger` and `HeapProfiler` reach the same JS heap. | The CDP session passes on only the execution contexts it saw created outside an extension, refuses commands that name any other context, and refuses the `Debugger` and `HeapProfiler` domains (`browser/cdp-extension-worlds.ts`). |
+| Agents read autofill | If an agent drove a pane in the user's session, a password manager could fill a field there and the agent's eval could read it. | Fixed. Panes an agent opens use `persist:browser-agent`: no Web Store extensions and none of the user's cookies. The bridge lists, evaluates and attaches CDP only to panes in that session, and answers 403 (CDP close 1008) for the user's own panes. A link an agent pane opens in a new pane stays in the agent session. Trade-off: agent panes start signed out; `superset browser` cookie import still copies the user's Chrome logins into the agent session on request. |
+| Debug flags | Electron honors `--remote-debugging-port` and `--remote-debugging-pipe` from the command line. Any local program could relaunch the app with one and drive every pane. | The switches are removed before `ready` unless a dev build was started with `RENDERER_REMOTE_DEBUG_PORT`. |
+| Lookalike store origin | The package served the store API to any page whose origin starts with `https://chromewebstore.google.com`, so `https://chromewebstore.google.com.attacker.example` could list extensions and remove them with no dialog (`showConfirmDialog: false`). | Patched to the exact origin in the preload and the main process. Remove always asks, whatever the page passes. Guard: `web-store.test.ts`. |
+| Updates widen access | The updater loaded a new version with more permissions than the user approved, with no question. The install question also showed the store page's manifest, not the downloaded one. | An update or a new install downloads into `browser-extensions.staging`, which the app never loads at start. It moves into place only after the user agrees and its manifest asks for no more than the user approved, so a stop half way cannot load an unapproved version. An update that adds access asks "{name} wants more access" and keeps the old version on no. A download whose manifest reaches further than the approved one is removed. Rule: `addedAccess` in `install-warnings.ts` compares hosts by scheme (`http://*/*` does not cover `https`), and any new API permission asks, even one Chrome shows no warning for (`cookies`). |
+| Offscreen URL | `URL.origin` is `"null"` for every `chrome-extension:`, `file:` and `data:` URL, so the offscreen check let an extension open another extension's page or a file. | `offscreenDocumentUrl` compares scheme and host with the caller's ID. Test: `offscreen-documents.test.ts`. |
+| Tab URLs without permission | The tabs API and its events gave every extension each tab's URL, title and icon, whatever it declared. | Patched to Chrome's rule: `tabs`, a matching host permission, or `activeTab` after a click on the extension's toolbar button or menu (not `openPopup`, and not the `browserAction.activate` IPC message, which the patch removes so only the app's own button can click), for the site open at that click; it ends when the tab leaves that site or closes, and a return does not bring it back. Others get the tab without those fields, in calls and in events (the toolbar's `onClicked` too), and URL or title queries do not match. `openPopup` on an extension with no popup does nothing, as in Chrome, so it cannot send itself a click event. Guard: `electron-chrome-extensions-patch.test.ts`. |
+| Other extension APIs | Any extension could show desktop notices, add right-click menu items, read and change every site's cookies, see every navigation, read tab URLs through `windows.getAll`, inject CSS into any page, and open `file:` and `data:` URLs. | One rule table in the patched router, per extension: `cookies` needs the permission and a matching host; `webNavigation`, `notifications` and `contextMenus` need their permission (the install question says "Display notifications", as Chrome does); window tabs pass the tab rule; `insertCSS` needs a host permission or a clicked `activeTab`; `<all_urls>` matches `http:` and `https:` only, so never another extension's page; `file:` and `data:` are refused. An unknown name in these namespaces fails closed, and a test fails when a handler in these namespaces, or any event sent to an extension, has no rule. |
+| Agents import logins | `superset browser` could copy every cookie from a Chrome profile into an agent pane with no question (on `main` before this work). | Each import asks the user "Let an agent use your {browser} logins?" first; no means 403. Test: `browser-bridge.test.ts`. |
+| New pane races | An agent's `/open` and an extension's `tabs.create` each took the first new pane in the workspace. A user pane that registered first went to the agent, with its URL and title; an agent pane went to the extension as a tab. | Each wait takes only a pane from its own session: `/open` an agent pane, `tabs.create` a user pane (`wait-for-new-pane.ts`). A race inside one session can still swap two panes, but that side can already see both. Guards: `browser-bridge.test.ts`, `wait-for-new-pane.test.ts`. |
+| Native app name | An extension with `nativeMessaging` could pass a name like `../browser-extensions/<id>/<version>/host`. The lookup left the native host folders and ran the program named in a config file the extension shipped. | The name must follow Chrome's rule (lowercase letters, digits, `_`, single dots) before any file or registry lookup, and the config's `name` must equal it. The real 1Password host `com.1password.1password` passes. Guard: `electron-chrome-extensions-patch.test.ts`. |
+| Optional permissions | `permissions.request` said yes to everything with no question, because the package grants when the app gives no hook. The grant did not unlock any API, it was written into the manifest's own list, requested sites were not checked, and `permissions.remove` did nothing. | One grant list feeds the rule table and the permissions API, so an allowed permission works and a removed one stops. A request may ask only for what the manifest lists; the app asks "{name} wants more access" with Chrome's warning lines (`permission-request.ts`), and no hook means no. Required permissions cannot be removed. Grants last until the app quits; an extension asks again after a restart (Chrome keeps them on disk). Guards: `electron-chrome-extensions-patch.test.ts`, `permission-request.test.ts`. |
+| No current window | `windows.getCurrent` returned `null` before the first pane opened and after the focused window closed, and 1Password read `null.id` at start. | Each app window goes to the extensions package when it opens (`watchWindows` in the window registry), the current window moves to an open one when the focused one closes, and with no window at all the call fails with Chrome's "No current window". Guards: `electron-chrome-extensions-patch.test.ts`, `window-registry.test.ts`. |
+| Store button names | The store package replaced "Chrome" with the app name in every span, so Google's "Install Chrome" button read "Install <app>" and still downloaded Chrome. | Only "Add to Chrome" and "Remove from Chrome" are renamed. Guard: `web-store.test.ts` runs the real preload code on those three labels. |
+| Agents read local files over CDP | An agent can set a file input in its own pane with `DOM.setFileInputFiles` and read the file back. | Accepted: agents run in the user's shell with the same file access, so this gives them nothing new, and Playwright uploads need the command. The bridge secret goes only to the host-service, whose callers (local agents, relay clients) can already run shell commands (`terminal.ts` `initialCommand`). Revisit before any browser-only or restricted caller gets bridge access. |
+| Chromium fixes | The pane's Chromium gets security fixes only with an Electron update. Dependabot checks npm once a month. | Take each Electron patch release. The app runs 44.10.0: Chromium 152.0.7977.169, and MV3 events reach extension service workers. |
+
+## Session move
+
+`APP_PARTITION` (`persist:superset`) and `BROWSER_PARTITION` (`persist:browser`) live in
+`apps/desktop/src/shared/constants.ts`. Every caller uses the constants; no raw partition string
+stays in the code.
+
+On first start after the move, pane cookies copy once from `persist:superset` to
+`persist:browser`, so users stay signed in to sites. Site `localStorage` and IndexedDB do not
+move; a site that keeps its login there asks for sign-in once. When every cookie copied, the
+same step clears those sites (cookie domains and pane history origins, never Paradev's own
+domains) from `persist:superset`, so "Clear browsing data" reaches all pane data again. The step
+runs once and is safe to run again.
+
+## Phases
+
+1. **Session move.** Constants, every caller moved, the one-time cookie copy.
+2. **Extension host.** `electron-chrome-extensions` on `persist:browser` with the `browser`
+   alias, pane web contents registered as tabs, extension popups and new tabs mapped to pane
+   operations. `electron-chrome-web-store` with the signature check, extensions stored under the
+   app's user data, loaded at start, updated in the background.
+3. **Toolbar and management UI.** Extensions live in the pane's More menu, in an "Extensions"
+   submenu beside "Signed-in sites" and "Downloads": each installed extension with its icon, a pin
+   toggle and a remove button, then "Get extensions" (opens the Chrome Web Store in the pane).
+   Pinned extensions show as toolbar icons left of More when the toolbar is 480 px or wider (the
+   existing `@min-[480px]/browser-toolbar` breakpoint); below that they are the first rows of More,
+   with their badge as an outline `Badge`. Toolbar icons carry the extension's badge as a
+   `CountBadge`, in the extension's own badge color when it sets one. Remove asks first in an
+   `AlertDialog` that names the extension and says its local data goes. An open toolbar button
+   uses `bg-accent text-accent-foreground`; `muted` at 50% is invisible on the light header.
+   Chosen over pinned icons always inline (at the 260 px pane minimum the URL bar shrinks to 0 px
+   and the buttons overlap by 8 px) and over a single Extensions button (badges hidden in a menu,
+   two clicks per use). The puzzle icon stays with agent plugins.
+4. **Passkey fallback (D).**
+5. **Touch ID (B)**, when the release build has a provisioning profile.
+
+## Done means
+
+- The pane installs an extension from the Chrome Web Store, shows its toolbar button, and opens
+  its popup.
+- 1Password, installed and signed in, completes a passkey sign-in on `https://webauthn.io` in
+  the pane.
+- The app UI session has no third-party extension loaded.
+- A tampered CRX is refused.
+- Users signed in to a site by cookie in the pane before the session move are still signed in
+  after it. A site that keeps its sign-in in `localStorage` or IndexedDB asks once.
+- With no extension that handles passkeys, a passkey request ends with a message in the pane,
+  not a hang.
+
+## Test seams
+
+- The cookie copy: one test that a cookie in `persist:superset` is in `persist:browser` after
+  the copy, and a second run adds nothing.
+- The signature check: one test that a CRX with a flipped byte is refused and the real one is
+  accepted.
+- Extensions and passkeys: end to end in the running app (`cdp-verification` skill).

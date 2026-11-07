@@ -3,6 +3,7 @@ import type { SelectPage } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import {
 	assertPageCommentable,
+	assertPageOwned,
 	assertPageReadable,
 	assertPageWritable,
 	pageAccess,
@@ -128,6 +129,41 @@ describe("assertPageWritable with a share", () => {
 	test("someone a private page is shared with is told they can't change it", () => {
 		const row = page({ visibility: "just_me" });
 		expect(codeOf(() => assertPageWritable(row, OTHER, "comment"))).toBe(
+			"FORBIDDEN",
+		);
+	});
+});
+
+describe("editors", () => {
+	test("an edit share lets someone change a private page, comment, but not delete it", () => {
+		const row = page({ visibility: "just_me" });
+		expect(
+			codeOf(() => assertPageWritable(row, OTHER, "edit")),
+		).toBeUndefined();
+		expect(pageAccess(row, OTHER, "edit")).toMatchObject({
+			canComment: true,
+			canEdit: true,
+			canManage: false,
+		});
+		expect(codeOf(() => assertPageOwned(row, OTHER))).toBe("FORBIDDEN");
+	});
+
+	test("an org-wide edit role makes every member an editor of an org page", () => {
+		const row = page({ organizationRole: "edit" });
+		expect(codeOf(() => assertPageWritable(row, OTHER))).toBeUndefined();
+		expect(
+			codeOf(() =>
+				assertPageWritable(
+					page({ organizationRole: "edit", visibility: "just_me" }),
+					OTHER,
+				),
+			),
+		).toBe("NOT_FOUND");
+	});
+
+	test("nobody edits a page that was taken down", () => {
+		const row = page({ takenDownAt: new Date() });
+		expect(codeOf(() => assertPageWritable(row, OTHER, "edit"))).toBe(
 			"FORBIDDEN",
 		);
 	});

@@ -57,6 +57,15 @@ describe("matchModelRate", () => {
 		});
 	});
 
+	test("prices GPT-6.1 Terra at its own rate, not the cheapest fallback", () => {
+		expect(matchModelRate("codex", "gpt-6.1-terra")).toMatchObject({
+			inputPerM: 1,
+			outputPerM: 5,
+			cacheReadPerM: 0.05,
+			approximate: false,
+		});
+	});
+
 	test("prices GPT-6.1 Sol including cached input and vendor-qualified ids", () => {
 		const rate = matchModelRate("codex", "gpt-6.1-sol");
 		expect(rate).toMatchObject({

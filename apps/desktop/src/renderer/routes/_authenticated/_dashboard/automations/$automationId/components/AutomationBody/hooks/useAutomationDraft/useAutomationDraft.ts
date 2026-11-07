@@ -18,6 +18,7 @@ export interface AutomationDraft {
 	machineSize: MachineSize | null;
 	tags: string[];
 	continueAgentSession: boolean;
+	reuseWorkspace: boolean;
 	triggers: DraftTrigger[];
 }
 

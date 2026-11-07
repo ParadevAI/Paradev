@@ -4,10 +4,11 @@ import { parseGitHubRemote } from "@superset/shared/github-remote";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { jwtProcedure, userError } from "../../trpc";
+import { isMember } from "../../lib/cloud-guards";
+import { personProcedure, userError } from "../../trpc";
 
 export const v2ProjectRouter = {
-	findByGitHubRemote: jwtProcedure
+	findByGitHubRemote: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -15,7 +16,7 @@ export const v2ProjectRouter = {
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.organizationId)) {
+			if (!(await isMember(ctx, input.organizationId))) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "Not a member of this organization",

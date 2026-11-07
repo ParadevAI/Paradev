@@ -164,7 +164,7 @@ The router entrypoint is `packages/host-service/src/trpc/router/workspace-creati
 4. `git worktree add --no-track -b <newBranch> <path> <startPoint>` — `--no-track` since the new branch is intentionally untethered.
 5. `ensureV2Host` → cloud `v2Workspace.create` → rollback worktree on cloud failure.
 6. Insert local `workspaces` row.
-7. Optionally spawn setup terminal (`.superset/setup.sh`).
+7. Optionally spawn setup terminal (`.paradev/setup.sh`).
 
 **`checkout`** (reuse an existing branch):
 1. Same project-ensure prelude.
@@ -236,7 +236,7 @@ workspaceCleanup.destroy: protectedProcedure
   }))
   .mutation(async ({ ctx, input }) => {
     // 1. Kill PTYs for this workspaceId.
-    // 2. Run .superset/teardown.sh if it exists, 60s timeout, SIGKILL on timeout,
+    // 2. Run .paradev/teardown.sh if it exists, 60s timeout, SIGKILL on timeout,
     //    capture stdout/stderr tail. On failure (and no `force`), throw TEARDOWN_FAILED
     //    typed so renderer can prompt "delete anyway" → re-call with force: true.
     // 3. `git worktree remove <path>` (add --force if input.force). Throws CONFLICT

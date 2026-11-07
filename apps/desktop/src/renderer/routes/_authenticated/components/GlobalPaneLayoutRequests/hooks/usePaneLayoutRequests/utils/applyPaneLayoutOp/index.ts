@@ -1,1 +1,5 @@
-export { applyPaneLayoutOp, PaneLayoutOpError } from "./applyPaneLayoutOp";
+export {
+	applyPaneLayoutOp,
+	type PaneAreas,
+	PaneLayoutOpError,
+} from "./applyPaneLayoutOp";

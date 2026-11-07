@@ -5,6 +5,13 @@ agent settings, workspace creation, and host-side CLI validation.
 `SUPERSET_CHAT_MODELS` in the same file supplies the cloud chat model list.
 Model names are provider identifiers and are not translated.
 
+## Codex refresh: October 30, 2026
+
+Live `codex app-server` → `model/list` (codex 0.162.1) lists GPT-6.1 Sol,
+GPT-6 Astra, GPT-6.1 Terra, GPT-6 Sol, GPT-6 Luna, and GPT-5.6 Sol, Terra, and
+Luna. Added GPT-6.1 Terra and removed the retired GPT-5.5. Every model takes
+`max`; all but the two Luna models take `ultra`.
+
 ## Verification: September 26, 2026
 
 | Agent | Result | Evidence |
@@ -18,7 +25,7 @@ Model names are provider identifiers and are not translated.
 | OMP | Added Opus 5.5 and Sonnet 5; GPT-6 already present | Published `@oh-my-pi/pi-catalog` 18.3.4 `src/models.json` |
 | Vibe | Existing Medium 3.5 and Devstral Small choices remain current | [Mistral Vibe configuration](https://docs.mistral.ai/vibe/code/cli/configuration) |
 | Polygraph | Harness choices remain Claude, Codex, and OpenCode | This picker chooses a harness, not an underlying model |
-| Superset chat | Added Sonnet 5; Opus 5.5 and GPT-6 already present | Anthropic model IDs above |
+| Paradev chat | Added Sonnet 5; Opus 5.5 and GPT-6 already present | Anthropic model IDs above |
 
 Agents without a curated model picker continue to use their own configured
 model selection. This audit does not add launch flags to those agents.
@@ -56,5 +63,5 @@ Each subprocess had a 75-second timeout. No project files were supplied.
 Five configurations passed inference; 26 failed before a successful response;
 two could not run. Account policy, subscriptions, credentials, and installed
 agents were not changed. Sonnet 5 passed through Claude's CLI; this does not
-constitute an end-to-end Superset chat UI test. No model is marked working
+constitute an end-to-end Paradev chat UI test. No model is marked working
 solely because it appears in a provider catalog or passes a unit test.
