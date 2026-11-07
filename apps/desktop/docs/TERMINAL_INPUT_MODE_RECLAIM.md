@@ -38,7 +38,8 @@ A renderer reclaimer installed on every xterm in `createTerminal`:
 - `renderer/lib/terminal/terminalInputModeReclaimer.ts` — a thin xterm-parser
   adapter: handlers for kitty (`CSI >/=/< u`), mouse (`?1000/1002/1003`), focus
   (`?1004`), and the `OSC 777;superset-shell-ready` marker feed the core; the
-  disarm is written back on a microtask.
+  marker writes the candidate disarm between two sentinel OSCs, and the core
+  decides at the opening sentinel, in parse order, which of them to apply.
 
 **Marker choice:** reclaim keys on `OSC 777;superset-shell-ready` (emitted only by
 Superset's shell wrappers), **not** the co-emitted FinalTerm `OSC 133;A` — `133;A`

@@ -7,8 +7,6 @@ import { Terminal as HeadlessTerminal } from "@xterm/headless";
 import type { Terminal as XTerm } from "@xterm/xterm";
 import { installInputModeReclaimer } from "./terminalInputModeReclaimer";
 
-const BULK_BYTES = 1024 * 1024;
-
 // The transport-agnostic decision core (shared). The renderer, and any future
 // host-side surface, feed it the same arm/marker events.
 describe("createLeakedInputModeReclaimer", () => {
@@ -109,7 +107,7 @@ describe("installInputModeReclaimer (xterm adapter)", () => {
 
 	const flush = () => new Promise<void>((r) => queueMicrotask(r));
 
-	it("disarms kitty on the marker via a deferred write", async () => {
+	it("queues the kitty disarm on the marker", async () => {
 		const t = makeFakeTerminal();
 		installInputModeReclaimer(t.terminal);
 		t.marker(); // first prompt
@@ -119,9 +117,8 @@ describe("installInputModeReclaimer (xterm adapter)", () => {
 		expect(t.writes.join("")).toContain(KITTY_KEYBOARD_DISARM_SEQUENCE);
 	});
 
-	it("keeps kitty armed by a TUI whose output is queued behind a large chunk", async () => {
+	it("keeps kitty a TUI re-arms after the marker, wherever its arm is queued", async () => {
 		const terminal = new HeadlessTerminal({ allowProposedApi: true });
-		installInputModeReclaimer(terminal as unknown as XTerm);
 		const kitty: string[] = [];
 		terminal.parser.registerCsiHandler({ prefix: ">", final: "u" }, () => {
 			kitty.push("arm");
@@ -131,19 +128,29 @@ describe("installInputModeReclaimer (xterm adapter)", () => {
 			kitty.push("disarm");
 			return false;
 		});
+		let writeOnMarker = "";
+		// Runs after the reclaimer's handler. The returned promise pauses the parser,
+		// like a parse slice that ends at the marker.
+		terminal.parser.registerOscHandler(777, () => {
+			if (writeOnMarker) terminal.write(writeOnMarker);
+			return Promise.resolve(false) as unknown as boolean;
+		});
+		installInputModeReclaimer(terminal as unknown as XTerm);
 		const write = (data: string) =>
 			new Promise<void>((resolve) => terminal.write(data, resolve));
 		const marker = "\x1b]777;superset-shell-ready\x07";
+		const arm = "\x1b[>1u";
 
 		await write(marker);
-		await write("\x1b[>1u");
-		await Promise.all([
-			write(`${"x".repeat(BULK_BYTES)}${marker}`),
-			write("\x1b[>1u"),
-		]);
+		await write(arm);
+		await Promise.all([write(marker), write(arm)]);
+		await write("");
+		expect(kitty.at(-1)).toBe("arm");
+
+		writeOnMarker = arm;
+		await write(marker);
 		await write("");
 		terminal.dispose();
-
 		expect(kitty.at(-1)).toBe("arm");
 	});
 
