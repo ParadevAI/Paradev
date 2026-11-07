@@ -74,6 +74,10 @@ test("rejects invalid clone URLs on later pages instead of returning partial res
 test("times out while a page is still running once the walk's budget ends", async () => {
 	const budget = new AbortController();
 	const signals: (AbortSignal | undefined)[] = [];
+	let secondPageStarted = () => {};
+	const secondPageRunning = new Promise<void>((resolve) => {
+		secondPageStarted = resolve;
+	});
 	const walk = listGitHubRepositories(
 		async (_args, options) => {
 			signals.push(options?.signal);
@@ -83,7 +87,7 @@ test("times out while a page is still running once the walk's budget ends", asyn
 					clone_url: `https://github.com/owner/repo-${index}.git`,
 				}));
 			}
-			budget.abort();
+			secondPageStarted();
 			return new Promise(() => {});
 		},
 		{ signal: budget.signal },
@@ -94,6 +98,8 @@ test("times out while a page is still running once the walk's budget ends", asyn
 		.finally(() => {
 			settled = true;
 		});
+	await secondPageRunning;
+	budget.abort();
 	await new Promise((resolve) => setTimeout(resolve, 0));
 	expect(settled).toBe(true);
 	await expect(walk).rejects.toMatchObject({
