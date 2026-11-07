@@ -32,7 +32,8 @@ export function startOptionId(
 		const label = words(choice.label);
 		const named =
 			want.every((word) => have.has(word)) ||
-			(label.length > 0 && label.every((word) => wantSet.has(word)));
+			(label.some((word) => /\d/.test(word)) &&
+				label.every((word) => wantSet.has(word)));
 		if (!named) continue;
 		const model = words(choice.id).join("-");
 		const known = family.get(model);

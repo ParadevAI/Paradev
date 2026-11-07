@@ -62,4 +62,13 @@ describe("startOptionId against claude-agent-acp 0.85 options", () => {
 		expect(startOptionId(acp, "claude-opus-4-8")).toBe("claude-opus-4-8");
 		expect(startOptionId(acp, "opus")).toBe("opus");
 	});
+
+	test("a label without the version never stands in for a pinned one", () => {
+		const unversioned = [
+			{ id: "default", label: "Default (recommended)" },
+			{ id: "opus", label: "Opus" },
+			{ id: "claude-opus-5", label: "Opus 5" },
+		];
+		expect(startOptionId(unversioned, "claude-opus-5-5")).toBeUndefined();
+	});
 });
