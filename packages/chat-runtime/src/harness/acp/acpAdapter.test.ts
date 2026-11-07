@@ -3284,6 +3284,79 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("drops a prompt whose attachment is still resolving when the turn is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		let finishRead: (() => void) | undefined;
+		let counter = 0;
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => agent.transport(handlers),
+			resolveAttachment: () =>
+				new Promise((resolve) => {
+					finishRead = () =>
+						resolve({ path: "/tmp/shot.png", mimeType: "image/png", data: "" });
+				}),
+			now: () => 1,
+			mintId: () => `id-${++counter}`,
+		});
+		const events: AdapterEvent[] = [];
+		void collect(adapter.start({ cwd: "/work" }), events);
+		await flush(16);
+		adapter.prompt([
+			{ type: "text", text: "look" },
+			{
+				type: "attachment",
+				attachmentId: "a",
+				name: "shot.png",
+				mimeType: "image/png",
+			},
+		]);
+		await flush(16);
+
+		adapter.cancelTurn();
+		finishRead?.();
+		await flush(16);
+
+		const turns = events.flatMap((event) =>
+			event.kind === "turn" ? [event.turn] : [],
+		);
+		expect(agent.sent.map((f) => f.method)).not.toContain("session/prompt");
+		expect(turns.pop()?.status).toBe("interrupted");
+
+		await adapter.dispose();
+	});
+
+	it("drops a prompt queued while the agent starts when the turn is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		let launched: (() => void) | undefined;
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{
+				launch: () =>
+					new Promise((resolve) => {
+						launched = () => resolve({ command: "fake" });
+					}),
+			},
+		);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		launched?.();
+		await flush(32);
+
+		const turns = events.flatMap((event) =>
+			event.kind === "turn" ? [event.turn] : [],
+		);
+		expect(agent.sent.map((f) => f.method)).not.toContain("session/prompt");
+		expect(turns.map((turn) => turn.status)).toEqual([
+			"running",
+			"interrupted",
+		]);
+
+		await adapter.dispose();
+	});
+
 	it("lets a requested start mode win over the harness default", async () => {
 		const agent = new FakeAcpAgent();
 		agent.newSessionConfigOptions = [

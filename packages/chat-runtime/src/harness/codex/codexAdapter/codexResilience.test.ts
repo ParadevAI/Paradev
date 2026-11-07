@@ -4,7 +4,7 @@ import type { AdapterEvent } from "../../types";
 import { FixturePlayer } from "../fixturePlayer";
 import { fixtureCwd, loadCodexFixture } from "../fixtures";
 import type { CodexTransportHandlers } from "../rpcClient";
-import { CodexAdapter } from "./codexAdapter";
+import { CodexAdapter, type CodexAdapterOptions } from "./codexAdapter";
 
 const THREAD_ID = "thread-1";
 const TURN_ID = "turn-1";
@@ -17,12 +17,15 @@ type Harness = {
 	settle(): Promise<void>;
 };
 
-function startAdapter(): Harness {
+function startAdapter(
+	options: Pick<CodexAdapterOptions, "launch" | "resolveAttachment"> = {},
+): Harness {
 	const sent: Record<string, unknown>[] = [];
 	const events: AdapterEvent[] = [];
 	let handlers: CodexTransportHandlers | null = null;
 
 	const adapter = new CodexAdapter({
+		...options,
 		now: () => 1_785_000_000_000,
 		mintId: () => "minted",
 		createTransport: (_options, transportHandlers) => {
@@ -184,6 +187,74 @@ describe("codex cancel before the turn is running", () => {
 		expect(interrupt).toMatchObject({
 			params: { threadId: THREAD_ID, turnId: TURN_ID },
 		});
+
+		await harness.adapter.dispose();
+	});
+
+	test("a cancel while an attachment resolves interrupts the turn it starts", async () => {
+		let finishRead: (() => void) | undefined;
+		const harness = startAdapter({
+			resolveAttachment: () =>
+				new Promise((resolve) => {
+					finishRead = () =>
+						resolve({ path: "/tmp/shot.png", mimeType: "image/png", data: "" });
+				}),
+		});
+		await harness.settle();
+
+		harness.adapter.prompt([
+			{ type: "text", text: "look" },
+			{
+				type: "attachment",
+				attachmentId: "a",
+				name: "shot.png",
+				mimeType: "image/png",
+			},
+		]);
+		await harness.settle();
+		harness.adapter.cancelTurn();
+		finishRead?.();
+		await harness.settle();
+		harness.receive({
+			method: "turn/started",
+			params: {
+				threadId: THREAD_ID,
+				turn: { id: TURN_ID, status: "inProgress", startedAt: 1 },
+			},
+		});
+
+		expect(
+			harness.sent.find((frame) => frame.method === "turn/interrupt"),
+		).toMatchObject({ params: { threadId: THREAD_ID, turnId: TURN_ID } });
+
+		await harness.adapter.dispose();
+	});
+
+	test("a cancel while app-server is still starting interrupts the queued turn", async () => {
+		let launched: (() => void) | undefined;
+		const harness = startAdapter({
+			launch: () =>
+				new Promise((resolve) => {
+					launched = () => resolve({});
+				}),
+		});
+		await harness.settle();
+
+		harness.adapter.prompt([{ type: "text", text: "go" }]);
+		harness.adapter.cancelTurn();
+		launched?.();
+		await harness.settle();
+		harness.receive({
+			method: "turn/started",
+			params: {
+				threadId: THREAD_ID,
+				turn: { id: TURN_ID, status: "inProgress", startedAt: 1 },
+			},
+		});
+
+		expect(
+			harness.sent.find((frame) => frame.method === "turn/interrupt"),
+		).toMatchObject({ params: { threadId: THREAD_ID, turnId: TURN_ID } });
 
 		await harness.adapter.dispose();
 	});
