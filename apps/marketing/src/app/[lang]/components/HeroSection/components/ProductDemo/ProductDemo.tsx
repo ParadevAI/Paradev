@@ -19,9 +19,8 @@ const HERO_SCALE = 1.08;
 const HERO_Y = 56;
 
 export function ProductDemo() {
-	const [activeOption, setActiveOption] = useState<ActiveDemo>(
-		"Orchestrate Parallel Agents",
-	);
+	const [activeOption, setActiveOption] =
+		useState<ActiveDemo>("Cloud Workspaces");
 	const { t } = useLingui();
 
 	// Scroll-scrubbed progress, tied 1:1 to scroll so it never drifts

@@ -30,6 +30,7 @@ export {
 export type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
+	PaneAppearance,
 	PaneContext,
 	PaneDefinition,
 	PaneRegistry,
@@ -43,6 +44,7 @@ export {
 	resolveTabTitle,
 	TabVisibilityContext,
 	useIsTabVisible,
+	usePaneAppearance,
 	usePaneFocus,
 	useTabTitle,
 	Workspace,

@@ -7,9 +7,9 @@ import type { StoreApi } from "zustand/vanilla";
 import { useChatWiring } from "../../../../hooks/usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { useChatSubagentStore } from "../../../../hooks/usePaneRegistry/stores/chatSubagentStore";
 import type { PaneViewerData } from "../../../../types";
+import type { AgentWork } from "../../../../utils/collectAgentWork";
 import { focusTerminalPane } from "../../../../utils/focusTerminalPane";
 import { useActivityPanelStore } from "../../stores/activityPanelStore";
-import type { AgentWork } from "../../utils/collectAgentWork";
 
 export function useAgentWorkActions(
 	stores: readonly StoreApi<WorkspaceStore<PaneViewerData>>[],

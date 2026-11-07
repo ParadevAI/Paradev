@@ -5,6 +5,7 @@ import {
 	userMessageText,
 } from "@superset/chat/core";
 import type { AvailableCommand, UserMessage } from "@superset/chat/protocol";
+import { AttachmentFileCard } from "@superset/chat-ui/AttachmentFileCard";
 import { Message, MessageContent } from "@superset/ui/ai-elements/message";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
@@ -13,7 +14,10 @@ import { cn } from "@superset/ui/utils";
 import { Pencil } from "lucide-react";
 import { useRef, useState } from "react";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
-import { parseAttachmentTags } from "../../../../utils/attachmentTags";
+import {
+	attachmentDisplayName,
+	parseAttachmentTags,
+} from "../../../../utils/attachmentTags";
 import {
 	type MessageSegment,
 	splitByElements,
@@ -21,6 +25,7 @@ import {
 import { CopyButton } from "../../../CopyButton";
 import { AttachmentImage } from "../AttachmentImage";
 import { MessageTime } from "../MessageTime";
+import { AttachmentPartImage } from "./components/AttachmentPartImage";
 import { PastedTextBlock } from "./components/PastedTextBlock";
 import { UserMessageEditor } from "./components/UserMessageEditor";
 import { UserMessageText } from "./components/UserMessageText";
@@ -73,18 +78,27 @@ export function UserMessageRow({
 	const images = attachments.filter((attachment) =>
 		attachment.type.startsWith("image/"),
 	);
+	const parts = item.content.flatMap((content) =>
+		content.type === "attachment" ? [content] : [],
+	);
+	const partKey = (part: (typeof parts)[number], index: number) =>
+		part.fileId ?? part.attachmentId ?? `${part.name}-${index}`;
+	const imageParts = parts.filter((part) => part.mimeType.startsWith("image/"));
 	const files = [
 		...attachments
 			.filter((attachment) => !attachment.type.startsWith("image/"))
 			.map((attachment) => ({
 				key: attachment.path,
-				name: attachment.path.split("/").pop() ?? attachment.path,
+				name: attachmentDisplayName(attachment),
+				mediaType: attachment.type,
 			})),
-		...item.content.flatMap((content) =>
-			content.type === "attachment"
-				? [{ key: content.attachmentId, name: content.name }]
-				: [],
-		),
+		...parts
+			.filter((part) => !part.mimeType.startsWith("image/"))
+			.map((part, index) => ({
+				key: partKey(part, index),
+				name: part.name,
+				mediaType: part.mimeType,
+			})),
 	];
 	const copyable = (text.length > 0 || pastedTexts.length > 0) && !pending;
 	const copyText = [text, ...pastedTexts].filter(Boolean).join("\n\n");
@@ -94,7 +108,8 @@ export function UserMessageRow({
 		editableMessageIds?.has(item.id) === true &&
 		attachments.length === 0 &&
 		pastedTexts.length === 0 &&
-		files.length === 0;
+		files.length === 0 &&
+		imageParts.length === 0;
 	if (editing && editable) {
 		return (
 			<Message className="pt-1.5 pb-5 pl-10" from="user">
@@ -119,7 +134,7 @@ export function UserMessageRow({
 					{sender}
 				</span>
 			)}
-			{images.length > 0 && (
+			{(images.length > 0 || imageParts.length > 0) && (
 				<div
 					className={cn(
 						"ml-auto flex max-w-[min(100%,36rem)] flex-wrap justify-end gap-2 transition-opacity",
@@ -130,8 +145,29 @@ export function UserMessageRow({
 						<AttachmentImage
 							key={image.path}
 							owner={transcriptItemKey(item)}
+							name={attachmentDisplayName(image)}
 							path={image.path}
 							type={image.type}
+						/>
+					))}
+					{imageParts.map((part, index) => (
+						<AttachmentPartImage key={partKey(part, index)} part={part} />
+					))}
+				</div>
+			)}
+			{files.length > 0 && (
+				<div
+					className={cn(
+						"ml-auto flex max-w-[min(100%,36rem)] flex-wrap justify-end gap-2 transition-opacity",
+						pending && !pending.failed && "opacity-60",
+					)}
+				>
+					{files.map((file) => (
+						<AttachmentFileCard
+							className="w-auto min-w-40 max-w-72"
+							key={file.key}
+							name={file.name}
+							mediaType={file.mediaType}
 						/>
 					))}
 				</div>
@@ -149,11 +185,11 @@ export function UserMessageRow({
 					))}
 				</div>
 			)}
-			{(text || files.length > 0) && (
+			{text && (
 				<MessageContent
 					className={cn(
 						"max-w-[min(100%,36rem)] font-sans transition-opacity group-[.is-user]:bg-foreground/10 group-[.is-user]:px-3 group-[.is-user]:py-2",
-						oneLine && files.length === 0
+						oneLine
 							? "group-[.is-user]:rounded-full"
 							: "group-[.is-user]:rounded-xl",
 						pending && !pending.failed && "opacity-60",
@@ -166,15 +202,6 @@ export function UserMessageRow({
 					>
 						<UserMessageText commands={commands} segments={segments} />
 					</div>
-					{files.length > 0 && (
-						<div className="mt-1 flex flex-wrap gap-1">
-							{files.map((file) => (
-								<Badge key={file.key} variant="secondary">
-									{file.name}
-								</Badge>
-							))}
-						</div>
-					)}
 				</MessageContent>
 			)}
 			{copyable && (

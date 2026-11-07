@@ -6,14 +6,14 @@ import {
 	DEFAULT_USER_SETTINGS,
 	loadUserSettings,
 } from "../../lib/user-settings";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 
 export const userSettingsRouter = {
-	get: protectedProcedure.query(({ ctx }) =>
+	get: personProcedure.query(({ ctx }) =>
 		loadUserSettings(ctx.session.user.id),
 	),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(z.object({ experimentalChat: z.boolean().optional() }))
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;

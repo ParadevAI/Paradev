@@ -490,6 +490,10 @@ export async function readPullRequestDetail(
 	options: { activity?: boolean } = {},
 ): Promise<PullRequestDetailRead> {
 	const activity = options.activity ?? false;
+	const requestedReviewers = client.requestedReviewers(input);
+	// Awaited below; this only stops an unhandled rejection when the read
+	// above fails first.
+	requestedReviewers.catch(() => {});
 	const data = await client.graphql<PullRequestDetailQuery>(
 		PULL_REQUEST_DETAIL_QUERY,
 		{ ...variables(input), activity },
@@ -538,7 +542,7 @@ export async function readPullRequestDetail(
 					}>(CHECK_CONTEXTS_PAGE_QUERY, variables(input, cursor))
 				).repository?.pullRequest?.statusCheckRollup?.contexts,
 		),
-		client.requestedReviewers(input),
+		requestedReviewers,
 	]);
 
 	const reviewers = new Map<string, PullRequestDetailReviewer>();

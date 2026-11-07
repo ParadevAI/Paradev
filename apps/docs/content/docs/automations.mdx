@@ -6,7 +6,7 @@ pro: true
 
 ## Overview
 
-Automations run an agent session against a project when something happens (a review is requested, an issue is filed, a message lands in a channel) or on a schedule, like a cron job. Either way the output is a live workspace you (or a teammate) can open, review, and continue interactively.
+Automations run an agent session against a project when something happens (a review is requested, an issue is filed, a message lands in a channel) or on a schedule. A run that reaches a device produces a live workspace you or a teammate can open, review, and continue.
 
 ![The Automations list with scheduled agent sessions](/images/automations.png)
 
@@ -19,13 +19,13 @@ Typical uses:
 - **PR reviews**: review a pull request as soon as you're requested as a reviewer
 - **Bug triage**: reproduce a new Sentry issue or a report posted in #bugs
 
-The list shows 7-day run health (successful, failed, and missed runs) and splits into **Mine** and **Team** tabs. Team automations are read-only; only the owner can edit, pause, run, group, or delete one.
+The list shows 7-day run health (successful, failed, and missed runs) and splits into **Mine** and **Team** tabs, plus an **Archived** tab once something is archived. Team automations are read-only; only the owner can edit, pause, run, group, or archive one.
 
 ## Requirements
 
-- **A Pro plan**: Automations are a [Pro feature](https://paradev.com/pricing). Creating, running, and resuming an automation needs a Pro or Enterprise subscription on the organization, from the app, the CLI, or the SDK alike. An organization that downgrades keeps its automations and can still edit, pause, or delete them, but they stop firing until it upgrades again.
+- **A Pro plan**: Automations are a [Pro feature](https://paradev.com/pricing). Creating, running, and resuming one needs a Pro or Enterprise subscription on the organization, from the app, CLI, or SDK. After a downgrade, automations stay and can be edited, paused, or archived, but they stop firing until the organization upgrades.
 - **A project, or session mode**: automations usually run against a v2 project linked to a GitHub repo. Pick **No project** and each run creates a [session workspace](/workspaces#sessions) instead.
-- **A target device**: The run fires on the device you pick when creating the automation.
+- **A target device**: the device you pick when creating the automation.
 - **A connected integration, for event triggers**: connect GitHub, Slack, Linear, Sentry, Notion, or Microsoft Teams from **Integrations** before you add one of its triggers. Microsoft Teams triggers need an Enterprise plan; every other trigger works on Pro.
 
 ## Create an Automation
@@ -33,7 +33,7 @@ The list shows 7-day run health (successful, failed, and missed runs) and splits
 Click **Automations → New automation** and fill in:
 
 - **Title**: how the automation appears in the list
-- **Prompt**: the instructions the agent will receive at dispatch time. Supports markdown, `@file/path` mentions (scoped to the selected project), `:emoji:` shortcodes, and `/` slash commands.
+- **Prompt**: the instructions the agent receives. Supports markdown, `@file/path` mentions (scoped to the selected project), `:emoji:` shortcodes, and `/` slash commands.
 - **Device**: which host runs the session. Defaults to this device. Pick **Cloud** to run each session in a new [cloud workspace](/cloud-workspaces) at the [machine size](/cloud-workspaces#machine-sizes) you choose, or in an existing cloud workspace.
 - **Project**: the v2 project the session runs against, or **No project** for a session per run.
 - **Trigger**: an event from a connected integration, a webhook, or a schedule. See [Triggers](#triggers).
@@ -45,7 +45,7 @@ Triggers decide when an automation runs. They live in the **Triggers** card on t
 
 ### Event triggers
 
-An event trigger starts a run when the event comes in, without waiting for a schedule. Pick the provider, the event, and the scope it watches:
+An event trigger starts a run when the event arrives. Pick the provider, the event, and the scope it watches:
 
 | Provider | Events | Scope and filters |
 | --- | --- | --- |
@@ -69,7 +69,7 @@ If the provider isn't connected, the trigger shows **Requires connection** with 
 
 ### Webhook triggers
 
-A webhook trigger runs the automation whenever something sends a POST to its URL, so any service that can call a URL can start a run.
+A webhook trigger runs the automation when something sends a POST to its URL.
 
 1. Add a **Webhook triggered** trigger and save.
 2. Click **Generate token**, then **Copy URL with token** (or **Copy auth header**). The token starts with `sset_wh_` and is shown once. **Regenerate token** asks you to confirm, then replaces it, and the old token stops working immediately.
@@ -86,7 +86,7 @@ The body must be a JSON object or array of at most 1 MiB; an empty body counts a
 
 ### What the agent receives
 
-The agent gets your prompt with the event that started the run in front of it: the provider, the event type, its title, URL, and who did it, plus the event payload (capped at 24,000 characters). For a webhook it's the JSON body you sent. So a prompt like "Review this pull request and leave comments" knows which pull request to look at. When a pull request event runs in a project linked to that repository, the run's workspace checks out the pull request's branch, and reuses that pull request's workspace if one exists. If the device can't fetch the pull request, the run starts on a fresh branch.
+The event's details come before your prompt: the provider, event type, title, URL, and actor, plus the event payload (capped at 24,000 characters). For a webhook it is the JSON body you sent. So a prompt like "Review this pull request and leave comments" knows which pull request to use. When a pull request event runs in a project linked to that repository, the run's workspace checks out the pull request's branch, and reuses that pull request's workspace if one exists. If the device can't fetch the pull request, the run starts on a fresh branch.
 
 ### Guides
 
@@ -97,7 +97,7 @@ The agent gets your prompt with the event that started the run in front of it: t
 
 ### Schedules
 
-Schedules are stored as [RFC 5545 RRules](https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5). The picker has presets for Hourly, Daily, and Weekly. **Custom** opens with a weekdays rule you can edit, for anything else. Times use your timezone at creation, and each schedule shows its next run inline. Custom rules are validated inline: invalid rules, rules with no upcoming runs, and one-shot rules (`COUNT`/`UNTIL`) are rejected before saving.
+Schedules are [RFC 5545 RRules](https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5). The picker has presets for Hourly, Daily, and Weekly. **Custom** opens with an editable weekdays rule. Times use your timezone at creation, and each schedule shows its next run. Invalid rules, rules with no upcoming runs, and one-shot rules (`COUNT`/`UNTIL`) are rejected before saving.
 
 Examples:
 
@@ -107,7 +107,7 @@ Examples:
 
 ## Runs
 
-Each time an automation fires, from an event or a schedule, a **run** is recorded. Runs show up on the automation detail page's **Run History** tab with a status:
+Each time an automation fires, a **run** is recorded on the detail page's **Run History** tab with a status:
 
 - **created**: the workspace was created on the target device (a run's success state)
 - **creating**: the handoff is in flight
@@ -116,19 +116,20 @@ Each time an automation fires, from an event or a schedule, a **run** is recorde
 
 The schedule advances to the next occurrence either way.
 
-When a run dispatches in "new workspace" mode, a fresh workspace is created from the project's repo for that run (or a fresh session workspace when the automation has no project). Open it from the run row to see the agent's work.
+In "new workspace" mode, each run that starts gets a fresh workspace from the project's repo (or a session workspace when the automation has no project). Pull request events can reuse that pull request's workspace; see [What the agent receives](#what-the-agent-receives). Open it from the run row.
 
-## Pause, Run Now, Delete
+## Pause, Run Now, Archive
 
 From the automation's detail page (**Settings** tab):
 
 - **Pause**: flip the Active switch. Runs are kept, and each schedule row on a paused automation still shows when it *would* next run, so schedule edits are previewable.
 - **Run now**: dispatches immediately. The run appears under **Run History** within seconds.
-- **Delete**: in the ⋯ overflow menu; removes the automation and its run history.
+- **Archive**: in the ⋯ overflow menu. The automation stops firing and moves to the **Archived** tab; its run history is kept. Click **Undo** in the notification, or **Restore** on the Archived tab, to bring it back. A restored automation comes back paused, except through Undo, which also resumes it.
+- **Delete permanently**: only for an archived automation, from its ⋯ menu on the **Archived** tab or its detail page. This removes the automation and its run history and can't be undone.
 
 ## Groups
 
-Put related automations in a group to keep a long list in order. Right-click a row (or open its ⋯ menu) and pick **Move to group**. Pick a group, or choose **New group…** to name a new one. You can also just type: it filters the groups, and a name that matches none becomes **Create group**. The detail page's ⋯ menu has the same submenu, and its breadcrumb shows the group.
+Groups keep a long list in order. Right-click a row (or open its ⋯ menu) and pick **Move to group**. Pick a group, or choose **New group…** to name a new one. You can also just type: it filters the groups, and a name that matches none becomes **Create group**. The detail page's ⋯ menu has the same submenu, and its breadcrumb shows the group.
 
 Once any of your automations has a group, the list shows a section for each group, sorted by name, with **No group** last. Click a section header to collapse it, or hover it and click **+** to create an automation already in that group. Search and sorting apply inside each section.
 
@@ -140,7 +141,7 @@ A group only organizes the list. It does not change where runs go: the workspace
 
 ## Select Several
 
-On the **Mine** tab, **⌘-click** a row (Ctrl-click on Windows and Linux) to start selecting. Every row then shows a checkbox, and a bar at the bottom of the list can **Move to group**, **Pause**, **Resume**, or **Delete** everything selected.
+On the **Mine** tab, **⌘-click** a row (Ctrl-click on Windows and Linux) to start selecting. Every row then shows a checkbox, and a bar at the bottom of the list can **Move to group**, **Pause**, **Resume**, or **Archive** everything selected. On the **Archived** tab, the same selection can **Restore** or **Delete permanently**.
 
 - **⌘-click** adds or removes one row. With a row focused, **X** does the same.
 - **Shift-click** selects every row between the last one you picked and this one.
@@ -153,11 +154,11 @@ On the **Mine** tab, **Retry all** appears in the header when any of your automa
 
 ## Limits
 
-- **At-least-once delivery**: Automations may dispatch more than once in rare cases (e.g. dispatcher retries). Design prompts that are safe to re-run.
+- **At-least-once delivery**: a run may dispatch more than once in rare cases. Write prompts that are safe to re-run.
 - **No agent-outcome tracking**: a successful run means its workspace was created; the detail page doesn't show whether the agent's work succeeded. Open the workspace to see what happened.
-- **Offline hosts miss the run**: if the target device is offline when the automation fires, the run is recorded as missed and the next occurrence or event is handled normally. Keep the target device online for automations that should catch every event.
-- **Watch for loops**: an agent's own activity can match its trigger, for example a review comment on a PR that a "Comment added" trigger watches. Narrow the trigger with its people filter (for example, comments by specific teammates) so the agent's own activity doesn't start new runs. Slack triggers already ignore the Paradev bot's own messages and reactions.
-- **One prompt per automation**: Each automation has one prompt (though it can have up to 25 triggers). To run different prompts, create multiple automations.
+- **Offline hosts miss the run**: if the target device is offline, the run is recorded as missed. Keep the device online to catch every event.
+- **Watch for loops**: an agent's own activity can match its trigger, for example a review comment on a PR that a "Comment added" trigger watches. Use the trigger's people filter so the agent's own activity doesn't start new runs. Slack triggers already ignore the Paradev bot's own messages and reactions.
+- **One prompt per automation**: for different prompts, create more automations.
 
 ## CLI
 
@@ -169,7 +170,7 @@ superset automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;
 superset automations create --name "Scratch triage" --rrule "FREQ=DAILY;BYHOUR=8;BYMINUTE=0" --prompt "…"
 
 # Each run's workspace carries the automation's tags and groups into the matching
-# sidebar folders. Default tag: "automation" — runs collect in an "automation"
+# sidebar folders. Default tag: "automation". Runs collect in an "automation"
 # folder per project. --tag (repeatable) files them elsewhere; clearing the tags
 # in the editor opts out of grouping.
 superset automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" --project <projectId> --prompt "…" --tag audits
@@ -192,5 +193,8 @@ superset automations get <id>
 superset automations run <id>
 superset automations pause <id>
 superset automations resume <id>
-superset automations delete <id>
+superset automations archive <id>     # stops it and hides it; runs stay
+superset automations list --archived
+superset automations unarchive <id>   # restores it, paused
+superset automations delete <id>      # permanently deletes an archived automation
 ```

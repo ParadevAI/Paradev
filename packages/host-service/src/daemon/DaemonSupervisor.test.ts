@@ -1530,7 +1530,7 @@ describe("ptyDaemonSocketPath", () => {
 		const socket = ptyDaemonSocketPath("a1b2c3d4-e5f6-7890-abcd-ef1234567890", {
 			NODE_ENV: "development",
 			SUPERSET_HOME_DIR:
-				"/Users/someone/.superset/worktrees/0123456789abcdef-0123/very-long-branch-name-for-a-feature/superset-dev-data",
+				"/Users/someone/.superset/worktrees/0123456789abcdef-0123/very-long-branch-name-for-a-feature/paradev-dev-data",
 		});
 		expect(Buffer.byteLength(socket)).toBeLessThan(104);
 	});

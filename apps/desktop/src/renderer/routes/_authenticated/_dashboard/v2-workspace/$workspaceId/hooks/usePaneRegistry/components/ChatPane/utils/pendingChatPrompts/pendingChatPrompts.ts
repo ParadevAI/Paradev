@@ -1,7 +1,12 @@
 import type { UserContent } from "@superset/chat/protocol";
 import type { ChatPaneData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 
-export function pendingChatPrompts(data: ChatPaneData): UserContent[][] {
+export function pendingChatPrompts(
+	data: Pick<
+		ChatPaneData,
+		"pendingPrompt" | "pendingAttachments" | "queuedPrompts"
+	>,
+): UserContent[][] {
 	const firstPrompt: UserContent[] =
 		data.pendingPrompt || data.pendingAttachments?.length
 			? [

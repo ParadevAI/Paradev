@@ -101,7 +101,7 @@ function parseArgs(argv: string[]): Options {
 		cdpPort: Number(process.env.RENDERER_REMOTE_DEBUG_PORT ?? 9222),
 		apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
 		desktopVitePort: Number(process.env.DESKTOP_VITE_PORT ?? 5173),
-		homeDir: process.env.SUPERSET_HOME_DIR ?? resolve("superset-dev-data"),
+		homeDir: process.env.SUPERSET_HOME_DIR ?? resolve("paradev-dev-data"),
 		samples: 60,
 		intervalMs: 150,
 		repairLocalAuth: false,

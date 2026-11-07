@@ -120,11 +120,12 @@ export function IntegrationsSettings({
 			{ enabled: !!activeOrganizationId },
 		);
 
-	const [githubInstallation, setGithubInstallation] =
-		useState<GithubInstallation | null>(null);
+	const [githubInstallations, setGithubInstallations] = useState<
+		GithubInstallation[]
+	>([]);
 	const [isLoadingGithub, setIsLoadingGithub] = useState(true);
 
-	const fetchGithubInstallation = useCallback(async () => {
+	const fetchGithubInstallations = useCallback(async () => {
 		if (!activeOrganizationId) {
 			setIsLoadingGithub(false);
 			return;
@@ -132,20 +133,27 @@ export function IntegrationsSettings({
 
 		try {
 			const result =
-				await apiTrpcClient.integration.github.getInstallation.query({
+				await apiTrpcClient.integration.github.listInstallations.query({
 					organizationId: activeOrganizationId,
 				});
-			setGithubInstallation(result);
+			setGithubInstallations(result);
 		} catch (err) {
-			console.error("[integrations] Failed to fetch GitHub installation:", err);
+			console.error(
+				"[integrations] Failed to fetch GitHub installations:",
+				err,
+			);
 		} finally {
 			setIsLoadingGithub(false);
 		}
 	}, [activeOrganizationId]);
 
 	useEffect(() => {
-		fetchGithubInstallation();
-	}, [fetchGithubInstallation]);
+		fetchGithubInstallations();
+	}, [fetchGithubInstallations]);
+
+	const activeGithubInstallations = githubInstallations.filter(
+		(installation) => !installation.suspended,
+	);
 
 	const slackConnection = integrations?.find((i) => i.provider === "slack");
 
@@ -156,8 +164,11 @@ export function IntegrationsSettings({
 			isLoading: isLinearPending,
 		},
 		github: {
-			isConnected: !!githubInstallation && !githubInstallation.suspended,
-			connectedOrgName: githubInstallation?.accountLogin,
+			isConnected: activeGithubInstallations.length > 0,
+			connectedOrgName:
+				activeGithubInstallations
+					.map((installation) => installation.accountLogin)
+					.join(", ") || null,
 			isLoading: isLoadingGithub,
 		},
 		slack: {

@@ -151,6 +151,11 @@ returns the live chat session ID, which is a new one when the chat had stopped. 
 the session ID the prompt went to. `sessions list` lists Paradev-saved sessions for the workspace;
 native provider discovery remains available in the chat header's history menu.
 
+`sessions create`, `import` and `resume` also open the chat in a background tab of the host's
+desktop app when one is attached; a desktop never opens a chat by finding it. To show an existing
+session, run `superset panes new-tab --workspace WORKSPACE_ID --session CHAT_SESSION_ID`, with
+`--focus` to select it.
+
 Automations check the owner's `acp-chat` flag in the API, then the host's `sessions.capabilities`. Eligible runs use
 `sessions.create`; unsupported agents retain terminal launches. Hosts without the sessions router
 keep the previous `agents.run` chat request, but only an exact missing-procedure response triggers
@@ -193,7 +198,7 @@ exposing them as `/superset-dev:<skill>`. Re-run after editing a skill, then
 `/reload-plugins`. In production the skills ship inside the real `superset`
 plugin, so there's no collision — this is dev-only.
 
-`bun scripts/dev-cli.ts` finds the live host manifest under `<worktree>/superset-dev-data/host/*`,
+`bun scripts/dev-cli.ts` finds the live host manifest under `<worktree>/paradev-dev-data/host/*`,
 then runs the dev CLI with `SUPERSET_HOME_DIR` (the dev data dir),
 `SUPERSET_ORGANIZATION_ID` (the live host's org), and a placeholder
 `SUPERSET_API_KEY` (local host commands use the manifest token, not this). Start

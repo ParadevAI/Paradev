@@ -9,7 +9,7 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { settings } from "@superset/local-db";
+import { browserHistory, settings } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
@@ -35,6 +35,8 @@ import {
 import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
+	APP_PARTITION,
+	BROWSER_PARTITION,
 	DEFAULT_CONFIRM_ON_QUIT,
 	PLATFORM,
 	PROTOCOL_SCHEME,
@@ -52,6 +54,12 @@ import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
 import {
+	initBrowserExtensionHost,
+	userExtensions,
+} from "./lib/browser/extension-host";
+import { movePaneSitesOnce } from "./lib/browser/move-pane-sites";
+import { preparePaneSessions } from "./lib/browser/pane-session";
+import {
 	installBundledCliShim,
 	installBundledPdevShim,
 } from "./lib/bundled-cli";
@@ -68,6 +76,7 @@ import { menuEmitter } from "./lib/menu-events";
 import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
 
 import {
+	adoptDesktopInstalls,
 	finishPendingOrganizationForget,
 	syncInstalledPluginMcpServers,
 } from "./lib/plugin-installs";
@@ -526,7 +535,7 @@ if (!gotTheLock) {
 		};
 		protocol.handle("superset-icon", iconProtocolHandler);
 		session
-			.fromPartition("persist:superset")
+			.fromPartition(APP_PARTITION)
 			.protocol.handle("superset-icon", iconProtocolHandler);
 
 		// Serve system fonts (e.g. SF Mono on macOS) via custom protocol
@@ -555,7 +564,7 @@ if (!gotTheLock) {
 			};
 			protocol.handle("superset-font", fontProtocolHandler);
 			session
-				.fromPartition("persist:superset")
+				.fromPartition(APP_PARTITION)
 				.protocol.handle("superset-font", fontProtocolHandler);
 		}
 
@@ -572,7 +581,9 @@ if (!gotTheLock) {
 		sweepNetworkLogs();
 		sweepDevAppProfiles();
 
+		preparePaneSessions();
 		await loadWebviewBrowserExtension();
+		initBrowserExtensionHost();
 
 		await stopMigratedV1SessionsOnBoot(readMigratedV1WorkspaceIds());
 
@@ -580,12 +591,29 @@ if (!gotTheLock) {
 		// bridge endpoint/secret from its env, so a late bridge means browser
 		// control stays dark until the next respawn.
 		try {
-			await startBrowserBridge();
+			await startBrowserBridge({ extensions: userExtensions });
 		} catch (error) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
+		try {
+			const appSession = session.fromPartition(APP_PARTITION);
+			await movePaneSitesOnce({
+				from: appSession.cookies,
+				to: session.fromPartition(BROWSER_PARTITION).cookies,
+				markerPath: path.join(app.getPath("userData"), "pane-cookies-copied"),
+				readVisitedUrls: () =>
+					localDb
+						.select({ url: browserHistory.url })
+						.from(browserHistory)
+						.all()
+						.map((row) => row.url),
+				clearOldSites: (origins) => appSession.clearData({ origins }),
+			});
+		} catch (error) {
+			console.error("[main] Failed to copy browser pane cookies:", error);
+		}
 		downloadManager.start();
-		allowRendererToReachDeviceHub("persist:superset");
+		allowRendererToReachDeviceHub(APP_PARTITION);
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
@@ -659,6 +687,9 @@ if (!gotTheLock) {
 		}
 		void finishPendingOrganizationForget().catch((error) =>
 			console.error("[main] Failed to remove organization plugins:", error),
+		);
+		void adoptDesktopInstalls().catch((error) =>
+			console.error("[main] Failed to move the desktop's plugin list:", error),
 		);
 		try {
 			installBundledCliShim();

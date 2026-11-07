@@ -20,7 +20,7 @@ Paradev works with monorepos. Workspaces are created at the repo root with acces
 
 ## Running Services
 
-Run multiple services from terminal:
+Run several services from the terminal:
 
 ```bash
 bun run dev                          # All services
@@ -32,13 +32,13 @@ bun run --filter @myapp/api dev
 
 List the folders your worktrees actually need in the project's **Sparse checkout** setting. New worktrees for that project then materialize only those folders plus the repo-root files (git cone mode).
 
-- Applies only to worktrees created after the setting changes; existing worktrees and the main repo are untouched
-- Leave the list empty for a full checkout
-- If git rejects the sparse cone, workspace creation falls back to a full checkout instead of failing
+- Applies only to worktrees created after the setting changes. Existing worktrees and the main repo are untouched.
+- Leave the list empty for a full checkout.
+- If git rejects the sparse cone, workspace creation falls back to a full checkout.
 
 ## Git Submodules
 
-Add to setup script:
+Add to the setup script:
 
 ```json
 {

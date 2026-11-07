@@ -3,8 +3,8 @@ import { agentRoutines, channels } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import { devProcedure } from "../../trpc";
 import { loadChannelAccess } from "../channel/access";
-import { mainProcedure } from "./main-procedure";
 import {
 	assertChannelTriggersReadable,
 	assertRoutineValid,
@@ -33,31 +33,24 @@ const noSuchRoutine = () =>
 
 /** The routine_update tool: a Dev's own routines. It can pause one but not delete it. */
 export const devRoutineTools = {
-	listRoutines: mainProcedure.query(async ({ ctx }) => {
+	listRoutines: devProcedure.query(async ({ ctx }) => {
 		const rows = await db
 			.select()
 			.from(agentRoutines)
-			.where(eq(agentRoutines.agentId, ctx.agentTurn.agentId))
+			.where(eq(agentRoutines.agentId, ctx.principal.agentId))
 			.orderBy(desc(agentRoutines.createdAt));
 		return rows.map(routineView);
 	}),
 
 	/** Made for the person this turn works for; it answers at `replyTo`. */
-	createRoutine: mainProcedure
+	createRoutine: devProcedure
 		.input(
 			devRoutineChangesSchema.extend({
 				replyTo: z.string().regex(REPLY_TARGET),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { agentId, organizationId, actingUserId } = ctx.agentTurn;
-			if (!actingUserId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message:
-						"Make routines while answering a person; this turn has none.",
-				});
-			}
+			const { agentId, organizationId, askerId } = ctx.principal;
 			if (!input.title || !input.prompt) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
@@ -77,7 +70,7 @@ export const devRoutineTools = {
 			if (
 				rows[0]?.allowed !== 1 ||
 				room?.organizationId !== organizationId ||
-				!(await personCanRead(actingUserId)(target.channelId))
+				!(await personCanRead(askerId)(target.channelId))
 			) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
@@ -100,12 +93,12 @@ export const devRoutineTools = {
 			await assertChannelTriggersReadable(
 				agentId,
 				triggers,
-				personCanRead(actingUserId),
+				personCanRead(askerId),
 			);
 			const routine = await insertRoutine({
 				organizationId,
 				agentId,
-				createdByUserId: actingUserId,
+				createdByUserId: askerId,
 				channelId: target.channelId,
 				threadRootId: target.threadRootId,
 				fields: {
@@ -118,10 +111,10 @@ export const devRoutineTools = {
 			return routineView(routine);
 		}),
 
-	updateRoutine: mainProcedure
+	updateRoutine: devProcedure
 		.input(devRoutineChangesSchema.extend({ routineId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const { agentId, organizationId } = ctx.agentTurn;
+			const { agentId, organizationId } = ctx.principal;
 			const [routine] = await db
 				.select()
 				.from(agentRoutines)

@@ -158,7 +158,7 @@ async function downloadAndExtractNode(
 	target: Target,
 	destDir: string,
 ): Promise<string> {
-	const cacheDir = join(homedir(), ".superset-build-cache");
+	const cacheDir = join(homedir(), ".paradev-build-cache");
 	if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
 
 	const archiveName = nodeArchiveName(target);
@@ -313,7 +313,7 @@ async function fixNativeBinariesForNode(
 	const bsqUrl =
 		`https://github.com/WiseLibs/better-sqlite3/releases/download/` +
 		`v${bsqVersion}/better-sqlite3-v${bsqVersion}-node-v${NODE_ABI}-${target}.tar.gz`;
-	const cacheDir = join(homedir(), ".superset-build-cache");
+	const cacheDir = join(homedir(), ".paradev-build-cache");
 	if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
 	const cachedTarball = join(
 		cacheDir,

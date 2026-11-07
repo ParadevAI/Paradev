@@ -11,16 +11,18 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
-import { HiCheck, HiChevronUpDown, HiMiniPlus } from "react-icons/hi2";
+import { HiCheck, HiMiniPlus } from "react-icons/hi2";
 import {
 	LuBox,
 	LuFolderInput,
 	LuFolderPlus,
 	LuTriangleAlert,
 } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
@@ -28,6 +30,7 @@ import {
 	useOpenEmptyProjectModal,
 	useOpenNewProjectModal,
 } from "renderer/stores/add-repository-modal";
+import { PickerChevron } from "../../../components/PickerChevron";
 import type {
 	GitHubConnectionAction,
 	GitHubRepositoryOption,
@@ -65,6 +68,7 @@ export function ProjectPickerPill({
 	isLoading = false,
 }: ProjectPickerPillProps) {
 	const { t } = useLingui();
+	const isParadevShell = useParadevShell();
 	const [open, setOpen] = useState(false);
 	const openEmptyProject = useOpenEmptyProjectModal();
 	const openNewProject = useOpenNewProjectModal();
@@ -139,11 +143,16 @@ export function ProjectPickerPill({
 						<ProjectThumbnail
 							projectName={selectedProject.name}
 							iconUrl={selectedProject.iconUrl}
-							className="size-4"
+							className={isParadevShell ? "size-3.5" : "size-4"}
 						/>
 					)}
 					{isSessionSelected && !selectedProject && (
-						<LuBox className="size-4 shrink-0 text-muted-foreground" />
+						<LuBox
+							className={cn(
+								"shrink-0 text-muted-foreground",
+								isParadevShell ? "size-3.5" : "size-4",
+							)}
+						/>
 					)}
 					<span className="truncate">
 						{selectedProject?.name ??
@@ -155,7 +164,7 @@ export function ProjectPickerPill({
 								t({ message: "Select project" })
 							))}
 					</span>
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<PickerChevron />
 				</FormPickerTrigger>
 			</PopoverTrigger>
 			<PopoverContent

@@ -1,38 +1,42 @@
 import type { UserContent } from "@superset/chat/protocol";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
-import type { ReactNode } from "react";
 import { useCallback, useMemo, useRef } from "react";
 import {
 	Composer,
 	type ComposerHandle,
 } from "../../../../../ChatSession/components/Composer";
-import { ConnectionNotice } from "../../../../../ChatSession/components/ConnectionNotice";
+import { PendingPromptsView } from "../../../../../ChatSession/components/PendingPromptsView";
 import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../../../../../ChatSession/components/WorkDrawer";
-import { heldPromptQueue } from "../../../../../ChatSession/utils/heldPromptQueue";
+import { ChatPaneActionsProvider } from "../../../../../ChatSession/providers/ChatPaneActionsProvider";
 
 const NO_COMMANDS: never[] = [];
 
 export function DraftChat({
 	draftKey,
+	getOpenFilePaths,
 	isActive,
-	notice,
+	launched,
 	onOpenHistory,
 	onQueue,
 	queued,
 	workspaceId,
 }: {
 	draftKey: string;
+	getOpenFilePaths?: () => ReadonlySet<string>;
 	isActive: boolean;
-	notice: ReactNode;
+	launched?: UserContent[];
 	onOpenHistory?: () => void;
 	onQueue: (content: UserContent[]) => void;
 	queued: UserContent[][];
 	workspaceId: string;
 }) {
-	const promptQueue = useMemo(() => heldPromptQueue(queued), [queued]);
+	const prompts = useMemo(
+		() => (launched ? [launched, ...queued] : queued),
+		[launched, queued],
+	);
 	const composerRef = useRef<ComposerHandle>(null);
 	const drawerRef = useRef<WorkDrawerHandle>(null);
 	const paneRef = useRef<HTMLDivElement>(null);
@@ -47,24 +51,32 @@ export function DraftChat({
 			className="flex h-full min-h-0 w-full min-w-0 flex-col"
 			ref={paneRef}
 		>
-			<div className="min-h-0 flex-1" />
-			<ConnectionNotice>{notice}</ConnectionNotice>
+			{prompts.length > 0 ? (
+				<PendingPromptsView prompts={prompts} />
+			) : (
+				<div className="min-h-0 flex-1" />
+			)}
 			<WorkDrawer
 				onExit={(exit) => composerRef.current?.returnFocus(exit === "history")}
 				paneRef={paneRef}
-				queue={promptQueue}
 				ref={drawerRef}
 			/>
-			<Composer
-				availableCommands={NO_COMMANDS}
-				draftKey={draftKey}
-				inputRef={composerRef}
-				isActive={isActive}
-				onEnterDrawer={enterDrawer}
-				onOpenHistory={onOpenHistory}
-				onSend={(content) => onQueue(content)}
+			<ChatPaneActionsProvider
+				getOpenFilePaths={getOpenFilePaths}
 				workspaceId={workspaceId}
-			/>
+			>
+				<Composer
+					availableCommands={NO_COMMANDS}
+					draftKey={draftKey}
+					inputRef={composerRef}
+					isActive={isActive}
+					promptPending={prompts.length > 0}
+					onEnterDrawer={enterDrawer}
+					onOpenHistory={onOpenHistory}
+					onSend={(content) => onQueue(content)}
+					workspaceId={workspaceId}
+				/>
+			</ChatPaneActionsProvider>
 		</ComposerDropZone>
 	);
 }

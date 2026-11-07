@@ -1,1 +1,1 @@
-export { useAttachmentFile } from "./useAttachmentFile";
+export { type AttachmentSource, useAttachmentFile } from "./useAttachmentFile";

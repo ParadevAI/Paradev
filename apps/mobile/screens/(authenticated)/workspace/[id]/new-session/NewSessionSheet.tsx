@@ -30,6 +30,7 @@ import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgen
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { openDesktopChatTab } from "./utils/openDesktopChatTab";
 
 /**
  * Bottom sheet for the tab strip's + — the host's agent presets plus a plain
@@ -145,6 +146,9 @@ export function NewSessionSheet() {
 					model: model?.id,
 					surface: "chat",
 				});
+				if (result.chatSessionId) {
+					openDesktopChatTab(client, workspace.id, result.chatSessionId);
+				}
 				terminalId = result.chatSessionId ?? result.sessionId;
 			} else if (chatHarness) {
 				const { model, effort } = launchFor(preset);
@@ -159,6 +163,7 @@ export function NewSessionSheet() {
 					modelLabel: model?.label ?? null,
 					effortLabel: effort?.label ?? null,
 				});
+				openDesktopChatTab(client, workspace.id, created.sessionId);
 				terminalId = created.sessionId;
 			} else {
 				const { model, effort } = launchFor(preset);
@@ -206,8 +211,16 @@ export function NewSessionSheet() {
 				commandId: randomUUID(),
 				workspaceId: workspace.id,
 				harness: chat.harness,
-				resume: { harnessSessionId: chat.harnessSessionId },
+				resume: {
+					harnessSessionId: chat.harnessSessionId,
+					replacesSessionId: chat.sessionId,
+				},
 			});
+			openDesktopChatTab(
+				getHostServiceClientByUrl(hostUrl),
+				workspace.id,
+				created.sessionId,
+			);
 			if (host) {
 				void queryClient.invalidateQueries({
 					queryKey: getHostTerminalsQueryKey(host.machineId),

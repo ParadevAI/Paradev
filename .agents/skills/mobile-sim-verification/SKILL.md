@@ -46,7 +46,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
 ```
 
 - **API:** `cd apps/api && bun run dev`. A 500 with `password authentication failed` means this
-  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.superset/lib/setup/steps.sh`
+  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.paradev/lib/setup/steps.sh`
   does and rewrite the three lines under `# Workspace Database` in `.env`.
 - **Relay:** run it in a loop. `wrangler dev` exits with an empty `✘ [ERROR]` when a client aborts a
   request, which every app relaunch does. Durable Object state survives the restart.

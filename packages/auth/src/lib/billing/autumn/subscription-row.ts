@@ -5,7 +5,7 @@ function toDate(seconds: number | null | undefined): Date | null {
 }
 
 export function seatItem(
-	stripeSubscription: Stripe.Subscription,
+	stripeSubscription: Pick<Stripe.Subscription, "items">,
 ): Stripe.SubscriptionItem | undefined {
 	const items = stripeSubscription.items.data;
 	return (

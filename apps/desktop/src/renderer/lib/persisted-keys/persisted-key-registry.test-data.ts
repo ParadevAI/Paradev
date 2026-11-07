@@ -95,6 +95,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["cloud-sidebar"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/stores/chatTabsStore/chatTabsStore.ts",
+		["chat-tabs"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/listDisplayStore/listDisplayStore.ts",
 		["list-display"],
 	],
@@ -187,7 +191,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["chatFavoriteModels"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatPane/utils/savedChatMode/savedChatMode.ts",
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/utils/savedChatMode/savedChatMode.ts",
 		["chatModeByAgent"],
 	],
 	[

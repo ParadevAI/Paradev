@@ -1,4 +1,12 @@
+import { PENDING_CLOUD_CHAT_PANE_KIND } from "../../types";
+
 export const BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS = 250;
+
+/** A pending cloud chat holds the terminal id its launch was promised. */
+const TERMINAL_CLAIMING_KINDS = new Set([
+	"terminal",
+	PENDING_CLOUD_CHAT_PANE_KIND,
+]);
 export const BACKGROUND_TERMINAL_CLOSED_REFETCH_INTERVAL_MS = 10_000;
 export const BACKGROUND_TERMINAL_OPEN_REFETCH_INTERVAL_MS = 2_000;
 
@@ -30,7 +38,7 @@ export function getAttachedTerminalIdsKey(
 	const ids = new Set<string>();
 	for (const tab of tabs) {
 		for (const pane of Object.values(tab.panes)) {
-			if (pane.kind !== "terminal") continue;
+			if (!TERMINAL_CLAIMING_KINDS.has(pane.kind)) continue;
 			const terminalId = getTerminalIdFromPaneData(pane.data);
 			if (terminalId) ids.add(terminalId);
 		}

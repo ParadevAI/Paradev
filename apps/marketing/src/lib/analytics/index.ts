@@ -13,7 +13,8 @@ export type DownloadSource =
 	| "compare"
 	| "careers"
 	| "factory_2026"
-	| "production_run";
+	| "production_run"
+	| "conductor";
 
 /** PostHog event name → Reddit Pixel standard event. */
 const REDDIT_EVENT_MAP: Record<string, string> = {

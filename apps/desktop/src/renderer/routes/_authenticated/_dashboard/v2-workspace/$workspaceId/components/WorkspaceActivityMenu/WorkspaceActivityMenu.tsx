@@ -33,6 +33,7 @@ import {
 } from "renderer/lib/github/openPullRequestLink";
 import { clearTerminalBackgroundMarker } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hooks/usePageFavorites";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
@@ -54,17 +55,18 @@ import {
 	parseAttachedTerminalIdsKey,
 } from "../../utils/backgroundTerminals";
 import { changesPillStats } from "../../utils/changesPillStats";
+import type { AgentWork } from "../../utils/collectAgentWork";
 import { computeChecksRollup } from "../../utils/computeChecksStatus";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 import { getShipMenuActions } from "../../utils/getShipMenuActions";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
+import { AgentWorkRow } from "../AgentWorkRow";
 import { ChangesStats } from "../ChangesStats";
 import { CommitForm } from "../CommitForm";
 import { CreatePrForm } from "../CreatePrForm";
 import { NewPageComposer } from "../NewPageComposer";
 import { PRStatusIndicators } from "../PRStatusIndicators";
 import { ActivityMenuHeader } from "./components/ActivityMenuHeader";
-import { AgentWorkRow } from "./components/AgentWorkRow";
 import { AnimatedHeight } from "./components/AnimatedHeight";
 import { BackgroundWorkRow } from "./components/BackgroundWorkRow";
 import { ChangesMenuRow } from "./components/ChangesMenuRow";
@@ -89,7 +91,6 @@ import {
 	usePagesMenuSeenAt,
 	usePagesMenuSeenStore,
 } from "./stores/pagesMenuSeenStore";
-import type { AgentWork } from "./utils/collectAgentWork";
 import {
 	type BackgroundWork,
 	collectBackgroundWork,
@@ -141,7 +142,6 @@ export function WorkspaceActivityMenu({
 			: null;
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
-	const [popoverOpen, setPopoverOpen] = useState(false);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const anchorNode = useActivityPanelStore(
 		(state) => state.anchorNodes[workspaceId],
@@ -156,6 +156,12 @@ export function WorkspaceActivityMenu({
 		(state) => state.hidden[workspaceId] === true,
 	);
 	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const popoverOpen = useActivityPanelStore(
+		(state) => state.floatingOpen[workspaceId] === true,
+	);
+	const setFloatingOpen = useActivityPanelStore(
+		(state) => state.setFloatingOpen,
+	);
 	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
 	const open = docked || floating;
@@ -441,11 +447,11 @@ export function WorkspaceActivityMenu({
 	}, [open, workspaceId, newestPublishedAt, markSeen]);
 
 	useEffect(() => {
-		if (fits) setPopoverOpen(false);
-	}, [fits]);
+		if (fits) setFloatingOpen(workspaceId, false);
+	}, [fits, workspaceId, setFloatingOpen]);
 
 	const setFloating = (next: boolean) => {
-		setPopoverOpen(next);
+		setFloatingOpen(workspaceId, next);
 		if (next) {
 			void utils.page.listPaginated.invalidate(workspaceListInput);
 			return;
@@ -757,7 +763,7 @@ export function WorkspaceActivityMenu({
 						className={cn(
 							"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
 							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-							floating
+							open
 								? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
 								: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
 						)}
@@ -825,7 +831,11 @@ export function WorkspaceActivityMenu({
 					if (shipView || composing) event.preventDefault();
 				}}
 				onInteractOutside={(event) => {
-					if (triggerRef.current?.contains(event.target as Node))
+					const target = event.target as Element;
+					if (
+						triggerRef.current?.contains(target) ||
+						target.closest?.(`[${WORKSPACE_SIDEBAR_ATTRIBUTE}]`)
+					)
 						event.preventDefault();
 				}}
 			>

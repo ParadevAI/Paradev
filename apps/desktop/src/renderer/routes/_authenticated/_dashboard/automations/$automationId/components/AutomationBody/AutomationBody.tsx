@@ -11,7 +11,7 @@ import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { LuTriangleAlert } from "react-icons/lu";
+import { LuArchive, LuTriangleAlert } from "react-icons/lu";
 import { EmojiTextInput } from "renderer/components/EmojiTextInput";
 import { RichText } from "renderer/components/RichText";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
@@ -40,9 +40,12 @@ export function AutomationBody({
 	isLoadingMoreRuns,
 	onLoadMoreRuns,
 	ownerName,
-	readOnly,
+	readOnly: notOwner,
 	onToggleEnabled,
 	toggleDisabled,
+	onRestore,
+	onDelete,
+	restoreDisabled,
 }: {
 	/** `get` output plus the prompt body, which rides its own procedure. */
 	automation: RouterOutputs["automation"]["get"] & { prompt: string };
@@ -54,8 +57,14 @@ export function AutomationBody({
 	readOnly?: boolean;
 	onToggleEnabled: (enabled: boolean) => void;
 	toggleDisabled?: boolean;
+	/** Omitted when the viewer may not restore an archived automation. */
+	onRestore?: () => void;
+	onDelete?: () => void;
+	restoreDisabled?: boolean;
 }) {
 	const { t } = useLingui();
+	const archived = automation.archivedAt !== null;
+	const readOnly = notOwner || archived;
 	const [tab, setTab] = useState<DetailTab>("settings");
 	const queryClient = useQueryClient();
 
@@ -92,6 +101,7 @@ export function AutomationBody({
 				: null,
 			tags: automation.tags,
 			continueAgentSession: automation.continueAgentSession,
+			reuseWorkspace: automation.reuseWorkspace,
 			triggers: automation.triggers.map((trigger) => ({
 				id: trigger.id,
 				connectionId: trigger.connectionId,
@@ -126,8 +136,16 @@ export function AutomationBody({
 		discard,
 	} = useAutomationDraft(
 		saved,
-		async (next) => {
-			await updateMutation.mutateAsync(next);
+		async ({ v2WorkspaceId, cloudWorkspaceId, ...next }) => {
+			// A run may have kept a workspace since this page loaded; resending
+			// the stale pin would drop it.
+			await updateMutation.mutateAsync({
+				...next,
+				...(v2WorkspaceId !== saved.v2WorkspaceId ? { v2WorkspaceId } : {}),
+				...(cloudWorkspaceId !== saved.cloudWorkspaceId
+					? { cloudWorkspaceId }
+					: {}),
+			});
 			toast.success(
 				t({
 					message: "Automation saved",
@@ -238,17 +256,48 @@ export function AutomationBody({
 						</p>
 					)}
 				</div>
-				{readOnly && (
-					<p className="select-text cursor-text mt-2 text-xs text-muted-foreground">
-						<Trans>
-							Owned by{" "}
-							{ownerName ??
-								t({
-									message: "a teammate",
-								})}{" "}
-							— only they can edit this automation.
-						</Trans>
-					</p>
+				{archived ? (
+					<div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+						<LuArchive className="size-3.5 shrink-0" />
+						<span className="select-text cursor-text">
+							<Trans>This automation is archived. It does not run.</Trans>
+						</span>
+						{onRestore && (
+							<Button
+								variant="outline"
+								size="sm"
+								className="h-6 px-2 text-xs"
+								disabled={restoreDisabled}
+								onClick={onRestore}
+							>
+								<Trans>Restore</Trans>
+							</Button>
+						)}
+						{onDelete && (
+							<Button
+								variant="ghost"
+								size="sm"
+								className="h-6 px-2 text-xs text-destructive hover:text-destructive"
+								disabled={restoreDisabled}
+								onClick={onDelete}
+							>
+								<Trans>Delete permanently</Trans>
+							</Button>
+						)}
+					</div>
+				) : (
+					notOwner && (
+						<p className="select-text cursor-text mt-2 text-xs text-muted-foreground">
+							<Trans>
+								Owned by{" "}
+								{ownerName ??
+									t({
+										message: "a teammate",
+									})}{" "}
+								— only they can edit this automation.
+							</Trans>
+						</p>
+					)
 				)}
 
 				<div className="mt-6 mb-6 flex items-center gap-1">
@@ -299,6 +348,7 @@ export function AutomationBody({
 								machineSize: draft.machineSize,
 								tags: draft.tags,
 								continueAgentSession: draft.continueAgentSession,
+								reuseWorkspace: draft.reuseWorkspace,
 							}}
 							onScopeChange={(patch: Partial<ScopeDraft>) =>
 								edit({

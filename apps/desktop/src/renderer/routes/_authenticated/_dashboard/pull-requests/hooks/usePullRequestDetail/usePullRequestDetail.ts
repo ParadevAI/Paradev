@@ -8,7 +8,7 @@ import type {
 	PullRequestMergeability,
 } from "@superset/shared/pull-request";
 import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -46,6 +46,29 @@ export function pullRequestDetailQueryKey(
 		repoFullName?.toLowerCase() ?? null,
 		prNumber,
 	] as const;
+}
+
+export function pullRequestDetailQueryOptions({
+	organizationId,
+	repoFullName,
+	prNumber,
+}: {
+	organizationId: string | null;
+	repoFullName: string | null;
+	prNumber: number | null;
+}) {
+	return queryOptions<PullRequestDetail>({
+		queryKey: [
+			...pullRequestDetailQueryKey(repoFullName, prNumber),
+			organizationId,
+		],
+		queryFn: () => {
+			if (prNumber === null) throw new Error("Invalid pull request number");
+			return readPullRequestDetail({ organizationId, repoFullName, prNumber });
+		},
+		staleTime: 30_000,
+		gcTime: 10 * 60_000,
+	});
 }
 
 /**
@@ -89,26 +112,17 @@ export function usePullRequestDetail({
 		!availableProjects.some(
 			(project) => project.id === projectId || project.projectKey === projectId,
 		);
-	const query = useQuery<PullRequestDetail>({
-		queryKey: [
-			...pullRequestDetailQueryKey(target.repoFullName, prNumber),
+	const query = useQuery({
+		...pullRequestDetailQueryOptions({
 			organizationId,
-		],
-		queryFn: () => {
-			if (prNumber === null) throw new Error("Invalid pull request number");
-			return readPullRequestDetail({
-				organizationId,
-				repoFullName: target.repoFullName,
-				prNumber,
-			});
-		},
+			repoFullName: target.repoFullName,
+			prNumber,
+		}),
 		enabled:
 			enabled &&
 			!isResolvingProject &&
 			!!target.repoFullName &&
 			prNumber !== null,
-		staleTime: 30_000,
-		gcTime: 10 * 60_000,
 	});
 	return {
 		data: query.data,

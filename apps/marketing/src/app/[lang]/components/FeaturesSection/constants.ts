@@ -19,7 +19,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same.",
+				"Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same.",
 		}),
 	},
 	{
@@ -32,7 +32,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you.",
+				"Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud.",
 		}),
 	},
 	{
@@ -45,33 +45,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
-		}),
-	},
-	{
-		id: "isolation",
-		tag: msg({
-			message: "Worktrees",
-		}),
-		title: msg({
-			message: "Each task on its own branch",
-		}),
-		description: msg({
-			message:
-				"Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready.",
-		}),
-	},
-	{
-		id: "remote-access",
-		tag: msg({
-			message: "Remote Access",
-		}),
-		title: msg({
-			message: "Run workspaces anywhere",
-		}),
-		description: msg({
-			message:
-				"Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are.",
+				"Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs.",
 		}),
 	},
 	{
@@ -84,20 +58,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP.",
-		}),
-	},
-	{
-		id: "open-anywhere",
-		tag: msg({
-			message: "Open Anywhere",
-		}),
-		title: msg({
-			message: "Open in any IDE",
-		}),
-		description: msg({
-			message:
-				"Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them.",
+				"Create workspaces and start agents from the CLI, the SDK, or over MCP.",
 		}),
 	},
 ];

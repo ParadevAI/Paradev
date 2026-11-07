@@ -155,13 +155,19 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LAUNCH: "mobile-launch",
 	/**
-	 * Shows the `.superset/config.toml` editor in project settings in place of
+	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one
 	 * exists; this gates only where people are led to write one.
 	 */
 	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
 	/** In-app channels in the desktop sidebar. */
 	CHANNELS: "channels",
+	/**
+	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
+	 * card, pane cards and the inline home composer. Read once per launch, so
+	 * a change in PostHog applies on the next start.
+	 */
+	PARADEV_SHELL: "paradev-shell",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**
@@ -225,16 +231,9 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
-	 * Legacy gate for the ACP chat pane, replaced by the account's Chat
-	 * experimental setting (`user_settings.experimental_chat`). Read only by released
-	 * desktop and mobile builds; remove it once no live build reads it.
-	 */
-	ACP_CHAT: "acp-chat",
-	/**
-	 * Shows Fork into chat on agent terminal headers and Fork into CLI on chat
-	 * headers: a native fork of the session, opened in the other surface beside
-	 * it. Off, unloaded or offline hide them. Audience is a release condition on
-	 * the flag, in both the Production and Local Development projects.
+	 * Legacy gate for the CLI mode / Chat mode fork menus, replaced by the account's
+	 * Chat experimental setting. Read only by released desktop builds 2.0.2 and 2.0.3;
+	 * remove it once no live build reads it.
 	 */
 	AGENT_SURFACE_FORK: "agent-surface-fork",
 	MOBILE_PANE: "mobile-pane",
@@ -301,9 +300,13 @@ export const SANDBOX_WORKSPACE_PATH = "/workspace";
 
 export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 
-/** The one transaction the API traces: the cloud workspace provision job. */
+/** The transactions the API traces: a cloud workspace's start and the provision job it queues, one trace. */
+export const CLOUD_WORKSPACE_START_TRANSACTION = "cloud-workspace.start";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
+/** Every wake records one; only those that ran the boot command are sent (`CLOUD_WORKSPACE_BOOTED_ATTRIBUTE`). */
+export const CLOUD_WORKSPACE_WAKE_TRANSACTION = "cloud-workspace.wake";
+export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code

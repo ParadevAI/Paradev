@@ -1,7 +1,6 @@
+import { listSkills, skillsRoot } from "@superset/agent-setup";
 import { boolean, table } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
-import { skillsRoot } from "../../../lib/plugins/host";
-import { listSkills } from "../../../lib/plugins/install";
 
 export default command({
 	description: "List skills installed from plugins, with the path of each",

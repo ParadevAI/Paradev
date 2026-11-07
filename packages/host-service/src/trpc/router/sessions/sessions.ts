@@ -112,7 +112,10 @@ export const sessionsRouter = router({
 			input.workspaceId,
 			input.sessionId,
 		);
-		return chat.commands.closeSession({ sessionId: input.sessionId });
+		return chat.commands.closeSession({
+			sessionId: input.sessionId,
+			userClosed: true,
+		});
 	}),
 	resume: protectedProcedure
 		.input(sessionInput.extend({ commandId: z.string().uuid().optional() }))

@@ -54,8 +54,17 @@ export const paneLayoutOpSchema = z.discriminatedUnion("type", [
 	}),
 	z.object({
 		type: z.literal("newTab"),
-		terminalId: z.string().min(1),
+		/** Exactly one of `terminalId` and `chat`. Chat details sit apart so a desktop that predates them rejects the op instead of opening a terminal pane. */
+		terminalId: z.string().min(1).optional(),
+		chat: z
+			.object({
+				sessionId: z.string().min(1),
+				terminalId: z.string().min(1),
+				agentId: z.string().min(1),
+			})
+			.optional(),
 		area: area.optional(),
+		focus: z.boolean().optional(),
 	}),
 	z.object({ type: z.literal("swap"), paneId, withPaneId: paneId }),
 	z.object({

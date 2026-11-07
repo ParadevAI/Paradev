@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { SidebarSlideMode } from "../SidebarSlide";
+import type { SidebarSlideMode } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
 import type { PaneArea } from "./WorkspaceSplitLayout";
 
 (

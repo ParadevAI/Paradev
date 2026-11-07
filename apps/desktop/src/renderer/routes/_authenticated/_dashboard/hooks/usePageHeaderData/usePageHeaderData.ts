@@ -10,6 +10,7 @@ import type { ShareGranteeRef } from "@superset/ui/share-access";
 import { useCallback } from "react";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { usePageFavorites } from "../usePageFavorites";
 import { useShareDirectory } from "../useShareDirectory";
 
 export interface PageHeaderTarget {
@@ -56,6 +57,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 	const setSharedVersion = cloudTrpc.page.setSharedVersion.useMutation();
 	const updatePage = cloudTrpc.page.update.useMutation();
 	const deletePage = cloudTrpc.page.delete.useMutation();
+	const { setFavorite } = usePageFavorites();
 
 	const share = useShareDirectory();
 	const sharingQuery = cloudTrpc.page.sharing.get.useQuery(
@@ -138,6 +140,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 					sharedVersion: resolved.sharedVersion,
 					latestVersion: resolved.latestVersion,
 					servedVersion: resolved.servedVersion,
+					canEdit: access.data?.canEdit,
 				}
 			: null;
 
@@ -178,6 +181,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 		onDelete: async () => {
 			if (!pageId) return;
 			await deletePage.mutateAsync({ id: pageId });
+			setFavorite(pageId, false);
 		},
 		sharing,
 		canComment: access.data?.canComment ?? true,

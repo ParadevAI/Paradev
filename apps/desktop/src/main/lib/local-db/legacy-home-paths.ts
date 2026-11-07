@@ -30,14 +30,14 @@ export async function applyLegacyHomeMove(
 	const move = readLegacyHomeMove(appHomeDir);
 	if (!move) return;
 	try {
-		if (rewriteLegacyHomePaths(sqlite, PATH_COLUMNS, move) === 0) return;
+		rewriteLegacyHomePaths(sqlite, PATH_COLUMNS, move);
 		const moved = db
 			.select({ repoPath: projects.mainRepoPath, worktreePath: worktrees.path })
 			.from(worktrees)
 			.innerJoin(projects, eq(worktrees.projectId, projects.id))
 			.all()
 			.filter(({ worktreePath }) => worktreePath.startsWith(`${move.to}/`));
-		await repairGitWorktrees(moved);
+		await repairGitWorktrees(moved, move.from);
 	} catch (error) {
 		console.error("[local-db] Could not rewrite moved paths:", error);
 	}

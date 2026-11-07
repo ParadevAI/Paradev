@@ -80,7 +80,7 @@ export function createMuseManagedHooksFile(): void {
 }
 
 const SUPERSET_OWNED_MUSE_HOOKS_PATTERN =
-	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\/hooks\/muse\/hooks\.json$/;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|(?:paradev|superset)-dev-data)\/hooks\/muse\/hooks\.json$/;
 
 function isSupersetOwnedMuseHooksPath(value: unknown): value is string {
 	return (

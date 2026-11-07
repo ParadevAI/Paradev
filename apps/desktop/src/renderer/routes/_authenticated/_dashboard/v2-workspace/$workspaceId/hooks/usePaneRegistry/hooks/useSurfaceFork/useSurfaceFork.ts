@@ -1,13 +1,17 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
+import { acpHarnessForPreset, acpStartModes } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
 import type { CreatePaneInput, RendererContext } from "@superset/panes";
+import { hostRemembersChatSelections } from "@superset/shared/host-version";
 import { toast } from "@superset/ui/sonner";
+import { useWorkspaceClient } from "@superset/workspace-client";
 import { useCallback } from "react";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
-import { markChatTerminalClosed } from "../../../../utils/closedChatSessions";
+import { ignoreChatTerminal } from "../../../../utils/closedChatSessions";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
+import { readSavedChatMode } from "../../utils/savedChatMode";
 
 export type SurfaceForkSource =
 	| { into: "chat"; presetId: string; harnessSessionId: string }
@@ -32,6 +36,8 @@ export function useSurfaceFork(
 ): ForkIntoOtherSurface {
 	const { t } = useLingui();
 	const { transport } = useChatWiring();
+	const { hostUrl } = useWorkspaceClient();
+	const hostInfo = useHostServiceInfo(hostUrl);
 
 	const hasMessages = useCallback(
 		async (sessionId: string) => {
@@ -58,16 +64,23 @@ export function useSurfaceFork(
 			const harness = acpHarnessForPreset(presetId);
 			if (!harness) return { status: "unsupported" };
 			// The host forks only a live chat, so the terminal's session is first
-			// loaded into a hidden one. It needs its own terminal id (the CLI's would
-			// rebind that terminal's agent), closed before the request so auto-adopt
-			// never opens it.
+			// loaded into a hidden one. It needs its own terminal id: the CLI's would
+			// rebind that terminal's agent.
 			const loaderTerminalId = crypto.randomUUID();
-			markChatTerminalClosed(loaderTerminalId);
+			ignoreChatTerminal(loaderTerminalId);
+			const defaultModeId = acpStartModes(presetId)?.defaultModeId;
+			const modeId =
+				readSavedChatMode(presetId) ??
+				(hostRemembersChatSelections(hostInfo.data?.version)
+					? undefined
+					: defaultModeId);
 			const loader = await transport.createSession({
 				commandId: crypto.randomUUID(),
 				workspaceId,
 				harness,
 				terminalId: loaderTerminalId,
+				...(modeId ? { modeId } : {}),
+				...(defaultModeId ? { fallbackModeId: defaultModeId } : {}),
 				resume: { harnessSessionId },
 			});
 			try {
@@ -94,7 +107,7 @@ export function useSurfaceFork(
 					.catch(() => undefined);
 			}
 		},
-		[transport, workspaceId, hasMessages],
+		[transport, workspaceId, hasMessages, hostInfo.data?.version],
 	);
 
 	return useCallback<ForkIntoOtherSurface>(
@@ -134,8 +147,7 @@ export function useSurfaceFork(
 			}
 
 			const terminalId = crypto.randomUUID();
-			// Kept from auto-adopt until its pane exists, or it opens twice.
-			const releaseTerminal = markChatTerminalClosed(terminalId);
+			ignoreChatTerminal(terminalId);
 			const toastId = toast.loading(t({ message: "Forking into a chat…" }));
 			try {
 				const forked = await forkIntoChat(
@@ -169,8 +181,6 @@ export function useSurfaceFork(
 					id: toastId,
 					description: errorMessage(error, t({ message: "Unknown error" })),
 				});
-			} finally {
-				releaseTerminal();
 			}
 		},
 		[forkIntoChat, hasMessages, createNewAgentSession, t],

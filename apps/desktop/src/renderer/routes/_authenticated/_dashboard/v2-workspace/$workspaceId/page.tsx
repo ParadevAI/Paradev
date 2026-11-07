@@ -8,6 +8,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -16,6 +17,10 @@ import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/co
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
+import {
+	titleBarTabBarProps,
+	useTitleBarMainSlot,
+} from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
 import {
 	parseSubagentSearch,
 	readSubagentSearch,
@@ -76,6 +81,7 @@ import { useRightPaneAreaLifecycle } from "./hooks/useRightPaneAreaLifecycle";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
+import { useSyncChatSessionTabs } from "./hooks/useSyncChatSessionTabs";
 import { useTabCloseGuard } from "./hooks/useTabCloseGuard";
 import { useV2PresetExecution } from "./hooks/useV2PresetExecution";
 import { useV2TerminalLauncher } from "./hooks/useV2TerminalLauncher";
@@ -121,6 +127,7 @@ interface WorkspaceSearch {
 	openUrl?: string;
 	openUrlTarget?: V2WorkspaceUrlOpenTarget;
 	openUrlRequestId?: string;
+	openUrlAgent?: true;
 }
 
 function parseOpenUrlTarget(
@@ -146,6 +153,7 @@ export const Route = createFileRoute(
 		openUrl: parseNonEmptyString(raw.openUrl),
 		openUrlTarget: parseOpenUrlTarget(raw.openUrlTarget),
 		openUrlRequestId: parseNonEmptyString(raw.openUrlRequestId),
+		openUrlAgent: raw.openUrlAgent === true ? true : undefined,
 	}),
 });
 
@@ -193,10 +201,13 @@ function V2WorkspaceContent() {
 		openUrl,
 		openUrlTarget,
 		openUrlRequestId,
+		openUrlAgent,
 	} = Route.useSearch();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
 	const navigate = Route.useNavigate();
+	const titleBarMainSlot = useTitleBarMainSlot();
+	const isParadevShell = useParadevShell();
 	const consumeSearch = useCallback<ConsumeSearch>(
 		(keys) => {
 			void navigate({
@@ -356,11 +367,18 @@ function V2WorkspaceContent() {
 		workspaceId,
 		isLayoutReady: isLayoutReady && isRightLayoutReady,
 	});
+	useSyncChatSessionTabs({
+		store,
+		linkedStores: linkedPaneStores,
+		workspaceId,
+		isLayoutReady: isLayoutReady && isRightLayoutReady,
+	});
 	useConsumeOpenUrlRequest({
 		viewer: viewerTarget,
 		url: openUrl,
 		target: openUrlTarget,
 		requestId: openUrlRequestId,
+		agent: openUrlAgent,
 		consumeSearch,
 	});
 
@@ -625,13 +643,7 @@ function V2WorkspaceContent() {
 
 	return (
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
-			<WorkspaceAgentEffects
-				workspaceId={workspaceId}
-				store={store}
-				rightStore={rightStore}
-				linkedStores={linkedPaneStores}
-				isLayoutReady={isLayoutReady && isRightLayoutReady}
-			/>
+			<WorkspaceAgentEffects store={store} rightStore={rightStore} />
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
 				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 					<WorkspaceSplitLayout
@@ -686,6 +698,11 @@ function V2WorkspaceContent() {
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}
+									{...titleBarTabBarProps(titleBarMainSlot, {
+										paneArea: "center",
+										inert: rightPaneMode === "expanded",
+									})}
+									appearance={isParadevShell ? "cards" : "default"}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}

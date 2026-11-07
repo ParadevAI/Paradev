@@ -1,1 +1,1 @@
-export { useMentionTrigger } from "./useMentionTrigger";
+export { DEFAULT_TRIGGER, useMentionTrigger } from "./useMentionTrigger";

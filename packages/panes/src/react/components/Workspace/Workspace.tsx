@@ -4,6 +4,7 @@ import { useDragLayer } from "react-dnd";
 import { useStore } from "zustand";
 import { isPaneInLinkedStore } from "../../../core/transfer";
 import type { Pane, Tab as TabType } from "../../../types";
+import { PaneAppearanceContext } from "../../hooks/usePaneAppearance";
 import { PaneAsideRenderContext } from "../../hooks/usePaneAside";
 import type { WorkspaceProps } from "../../types";
 import { KeptTab } from "./components/KeptTab";
@@ -17,6 +18,7 @@ import { notifyClosedPanes } from "./utils/notifyClosedPanes";
 const NO_KEPT_TABS: readonly KeptTabEntry[] = [];
 
 export function Workspace<TData>({
+	appearance = "default",
 	store,
 	registry,
 	className,
@@ -31,6 +33,8 @@ export function Workspace<TData>({
 	renderTabBarLeading,
 	renderTabBarTrailing,
 	renderBelowTabBar,
+	tabBarClassName,
+	renderTabBar,
 	renderPaneAside,
 	onBeforeCloseTab,
 	onAfterCloseTab,
@@ -146,92 +150,100 @@ export function Workspace<TData>({
 		}
 	};
 
+	const tabBar = (
+		<TabBar
+			className={tabBarClassName}
+			store={store}
+			tabs={tabs}
+			registry={registry}
+			activeTabId={activeTabId}
+			onSelectTab={(tabId) => store.getState().setActiveTab(tabId)}
+			onCloseTab={closeTab}
+			onCloseOtherTabs={async (tabId) => {
+				for (const tab of tabs) {
+					if (tab.id !== tabId) await closeTab(tab.id);
+				}
+			}}
+			onCloseAllTabs={async () => {
+				for (const tab of tabs) {
+					await closeTab(tab.id);
+				}
+			}}
+			onRenameTab={
+				renameTabs
+					? (tabId, title) =>
+							store
+								.getState()
+								.setTabTitleOverride({ tabId, titleOverride: title })
+					: undefined
+			}
+			onTabClick={onTabClick}
+			isPreviewTab={isPreviewTab}
+			onReorderTab={(tabId, toIndex) =>
+				store.getState().reorderTab({ tabId, toIndex })
+			}
+			onMovePaneToNewTab={(paneId, toIndex) =>
+				store.getState().movePaneToNewTab({ paneId, toIndex })
+			}
+			renderTabIcon={renderTabIcon}
+			renderAddTabMenu={renderAddTabMenu}
+			onAddTab={onAddTab}
+			renderTabBarLeading={renderTabBarLeading}
+			renderTabBarTrailing={renderTabBarTrailing}
+			renderTabAccessory={renderTabAccessory}
+		/>
+	);
+
 	return (
-		<PaneAsideRenderContext.Provider value={renderPaneAside}>
-			<div
-				className={cn(
-					"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden bg-background text-foreground",
-					className,
-				)}
-			>
-				<TabBar
-					store={store}
-					tabs={tabs}
-					registry={registry}
-					activeTabId={activeTabId}
-					onSelectTab={(tabId) => store.getState().setActiveTab(tabId)}
-					onCloseTab={closeTab}
-					onCloseOtherTabs={async (tabId) => {
-						for (const tab of tabs) {
-							if (tab.id !== tabId) await closeTab(tab.id);
-						}
-					}}
-					onCloseAllTabs={async () => {
-						for (const tab of tabs) {
-							await closeTab(tab.id);
-						}
-					}}
-					onRenameTab={
-						renameTabs
-							? (tabId, title) =>
-									store
-										.getState()
-										.setTabTitleOverride({ tabId, titleOverride: title })
-							: undefined
-					}
-					onTabClick={onTabClick}
-					isPreviewTab={isPreviewTab}
-					onReorderTab={(tabId, toIndex) =>
-						store.getState().reorderTab({ tabId, toIndex })
-					}
-					onMovePaneToNewTab={(paneId, toIndex) =>
-						store.getState().movePaneToNewTab({ paneId, toIndex })
-					}
-					renderTabIcon={renderTabIcon}
-					renderAddTabMenu={renderAddTabMenu}
-					onAddTab={onAddTab}
-					renderTabBarLeading={renderTabBarLeading}
-					renderTabBarTrailing={renderTabBarTrailing}
-					renderTabAccessory={renderTabAccessory}
-				/>
-				{renderBelowTabBar?.()}
-				{keepAliveTabs > 0 ? (
-					<div className="relative min-h-0 min-w-0 flex-1">
-						{mountedTabs.map((tab) => (
-							<KeptTab
-								key={tab.id}
-								isVisible={tab.id === displayedTab?.id}
-								store={store}
-								tab={tab}
-								registry={registry}
-								paneActions={paneActions}
-								contextMenuActions={contextMenuActions}
-								onPaneError={onPaneError}
-								onSplitResizeDragging={onSplitResizeDragging}
-							/>
-						))}
-						{!displayedTab && (
-							<div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-								{renderEmptyState?.() ?? "No tabs open"}
-							</div>
-						)}
-					</div>
-				) : displayedTab ? (
-					<Tab
-						store={store}
-						tab={displayedTab}
-						registry={registry}
-						paneActions={paneActions}
-						contextMenuActions={contextMenuActions}
-						onPaneError={onPaneError}
-						onSplitResizeDragging={onSplitResizeDragging}
-					/>
-				) : (
-					<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
-						{renderEmptyState?.() ?? "No tabs open"}
-					</div>
-				)}
-			</div>
-		</PaneAsideRenderContext.Provider>
+		<PaneAppearanceContext.Provider value={appearance}>
+			<PaneAsideRenderContext.Provider value={renderPaneAside}>
+				<div
+					className={cn(
+						"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground",
+						appearance !== "cards" && "bg-background",
+						className,
+					)}
+				>
+					{renderTabBar ? renderTabBar(tabBar) : tabBar}
+					{renderBelowTabBar?.()}
+					{keepAliveTabs > 0 ? (
+						<div className="relative min-h-0 min-w-0 flex-1">
+							{mountedTabs.map((tab) => (
+								<KeptTab
+									key={tab.id}
+									isVisible={tab.id === displayedTab?.id}
+									store={store}
+									tab={tab}
+									registry={registry}
+									paneActions={paneActions}
+									contextMenuActions={contextMenuActions}
+									onPaneError={onPaneError}
+									onSplitResizeDragging={onSplitResizeDragging}
+								/>
+							))}
+							{!displayedTab && (
+								<div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+									{renderEmptyState?.() ?? "No tabs open"}
+								</div>
+							)}
+						</div>
+					) : displayedTab ? (
+						<Tab
+							store={store}
+							tab={displayedTab}
+							registry={registry}
+							paneActions={paneActions}
+							contextMenuActions={contextMenuActions}
+							onPaneError={onPaneError}
+							onSplitResizeDragging={onSplitResizeDragging}
+						/>
+					) : (
+						<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
+							{renderEmptyState?.() ?? "No tabs open"}
+						</div>
+					)}
+				</div>
+			</PaneAsideRenderContext.Provider>
+		</PaneAppearanceContext.Provider>
 	);
 }

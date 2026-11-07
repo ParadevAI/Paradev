@@ -85,4 +85,4 @@ agent-device help                               # the rest
   `eas simulator:stop` from `apps/mobile`.
 - The Expo account runs two builds at a time; a build can wait in the queue behind the team's.
 
-Needs `EXPO_TOKEN` and this repo's `.env` (`.superset/setup.sh` or `.superset/setup.cloud.sh`).
+Needs `EXPO_TOKEN` and this repo's `.env` (`.paradev/setup.sh` or `.paradev/setup.cloud.sh`).

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { Client } from "@upstash/qstash";
 import { env } from "../../env";
 
@@ -37,7 +38,17 @@ export async function publishCloudWorkspaceJob<Body>(args: {
 	await qstash.publishJSON({
 		url: `${env.NEXT_PUBLIC_API_URL}${args.path}`,
 		body: args.body,
+		headers: traceHeaders(),
 		retries: 2,
 		...(args.delaySeconds ? { delay: args.delaySeconds } : {}),
 	});
+}
+
+/** The queuing span's `sentry-trace` and `baggage`, which QStash forwards so the job can continue its trace. */
+function traceHeaders(): Record<string, string> {
+	return Object.fromEntries(
+		Object.entries(Sentry.getTraceData()).filter(
+			(entry): entry is [string, string] => entry[1] !== undefined,
+		),
+	);
 }

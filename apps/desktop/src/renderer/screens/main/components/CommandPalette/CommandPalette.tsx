@@ -6,7 +6,7 @@ import { SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuChevronDown, LuChevronRight } from "react-icons/lu";
 import type { RecentFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
-import { RECENT_DISPLAY_LIMIT } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
+import { matchRecentFiles } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
 import { useFileSearch } from "renderer/screens/main/components/WorkspaceView/RightSidebar/FilesView/hooks/useFileSearch/useFileSearch";
 import { FileResultItem } from "./components/FileResultItem";
 import { useV2FileSearch } from "./hooks/useV2FileSearch";
@@ -63,32 +63,19 @@ export function CommandPalette({
 	const rawResults =
 		variant === "v2" ? v2Search.results : v1Search.searchResults;
 	const trimmedQuery = query.trim();
-	const hasQuery = trimmedQuery.length > 0;
 	const showRecentSection = variant === "v2" && Boolean(recentlyViewedFiles);
 
-	const orderedRecent = useMemo<RecentFile[]>(() => {
-		if (!showRecentSection || !recentlyViewedFiles) return [];
-		const openSet = openFilePaths ?? new Set<string>();
-		const openFiles: RecentFile[] = [];
-		const rest: RecentFile[] = [];
-		for (const file of recentlyViewedFiles) {
-			if (openSet.has(file.absolutePath)) {
-				openFiles.push(file);
-			} else {
-				rest.push(file);
-			}
-		}
-		return [...openFiles, ...rest].slice(0, RECENT_DISPLAY_LIMIT);
-	}, [showRecentSection, recentlyViewedFiles, openFilePaths]);
-
-	const filteredRecent = useMemo<RecentFile[]>(() => {
-		if (!showRecentSection) return [];
-		if (!hasQuery) return orderedRecent;
-		const needle = trimmedQuery.toLowerCase();
-		return orderedRecent.filter((file) =>
-			file.relativePath.toLowerCase().includes(needle),
-		);
-	}, [showRecentSection, hasQuery, trimmedQuery, orderedRecent]);
+	const filteredRecent = useMemo<RecentFile[]>(
+		() =>
+			showRecentSection && recentlyViewedFiles
+				? matchRecentFiles(
+						recentlyViewedFiles,
+						trimmedQuery,
+						openFilePaths ?? new Set(),
+					)
+				: [],
+		[showRecentSection, recentlyViewedFiles, trimmedQuery, openFilePaths],
+	);
 
 	const recentAbsSet = useMemo(
 		() => new Set(filteredRecent.map((f) => f.absolutePath)),

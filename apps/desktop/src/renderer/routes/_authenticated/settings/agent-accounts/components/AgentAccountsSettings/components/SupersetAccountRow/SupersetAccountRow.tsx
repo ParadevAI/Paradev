@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Check } from "lucide-react";
-import { AgentIcon } from "renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentIcon";
+import { AgentIcon } from "renderer/components/AgentIcon";
 
 /** An agent that signs in with the person's Superset account, so there is nothing to set up. */
 export function SupersetAccountRow({

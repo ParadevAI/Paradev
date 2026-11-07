@@ -13,6 +13,7 @@ import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import { TerminalAgentStore } from "../../../terminal-agents";
 import type { HostServiceContext } from "../../../types";
+import { createChatSessionInWorkspace } from "./session-service";
 import { sessionsRouter } from "./sessions";
 
 const WORKSPACE = "11111111-1111-4111-8111-111111111111";
@@ -22,6 +23,7 @@ let db: HostDb;
 let startDead: boolean;
 let launches: HarnessFactoryOptions[];
 let caller: ReturnType<typeof sessionsRouter.createCaller>;
+let ctx: HostServiceContext;
 
 beforeEach(() => {
 	startDead = false;
@@ -92,7 +94,7 @@ beforeEach(() => {
 			],
 		]),
 	});
-	const ctx = {
+	ctx = {
 		db,
 		runtime: { chat: () => runtime },
 		terminalAgentStore,
@@ -202,6 +204,17 @@ describe("sessions router", () => {
 						entry.event.item.kind === "user_message",
 				),
 		).toHaveLength(1);
+	});
+
+	test("launches under the terminal id a cloud launch was promised", async () => {
+		const terminalId = crypto.randomUUID();
+		const created = await createChatSessionInWorkspace(
+			ctx,
+			{ workspaceId: WORKSPACE, agent: "claude", prompt: "go" },
+			{ terminalId },
+		);
+		expect(created.terminalId).toBe(terminalId);
+		expect(runtime.live.get(created.sessionId)?.terminalId).toBe(terminalId);
 	});
 
 	test("pages read with the before cursor without duplicate or lost events", async () => {

@@ -166,7 +166,7 @@
 		"@notionhq/client": "5.25.2",
 		"@octokit/app": "16.1.2",
 		"@octokit/core": "7.0.8",
-		"@sentry/core": "10.68.0",
+		"@sentry/core": "10.75.2",
 		"@slack/web-api": "7.15.0",
 		"@superset/agent-harness": "workspace:*",
 		"@superset/auth": "workspace:*",

@@ -91,6 +91,7 @@ export {
 	writeSharedDisabledSkillIds,
 } from "./disabled-skills";
 export {
+	adoptInstalledPlugins,
 	type EnabledPlugin,
 	findInstalledTree,
 	type InstalledPluginEntry,
@@ -118,7 +119,60 @@ export {
 	pluginCachePath,
 	writePluginTree,
 } from "./plugin-cache";
+export { serializePluginChange } from "./plugin-changes";
 export { mcpHeadersHelperCommand } from "./plugin-connections";
+export { PluginError, type PluginErrorCode } from "./plugin-error";
+export {
+	type AvailablePlugin,
+	availablePlugins,
+	type ChangedPlugin,
+	ensureDefaultMarketplace,
+	findAvailablePlugin,
+	type InstallMarketplaceResult,
+	type InstallPluginOptions,
+	type InstallPluginResult,
+	installMarketplace,
+	installPlugin,
+	ledgerWithPlugin,
+	listAvailable,
+	listSkills,
+	type PluginRecord,
+	parseMarketplaceSource,
+	recordPlugin,
+	refreshMarketplaces,
+	removePlugin,
+	restorePluginTrees,
+	type SkillEntry,
+	type SyncResult,
+	setPluginEnabled,
+	syncPlugins,
+} from "./plugin-install";
+export {
+	assertSafeSegment,
+	MARKETPLACE_FILE,
+	type Marketplace,
+	type MarketplaceEntry,
+	releaseTag,
+} from "./plugin-marketplace";
+export { syncPluginMcpServers } from "./plugin-mcp-servers";
+export {
+	forgetOrganizationPlugins,
+	installOrganizationPlugin,
+	type OrganizationPluginApi,
+	reconcileOrganizationPlugins,
+} from "./plugin-organization";
+export {
+	findInstalled,
+	type KnownMarketplace,
+	type MarketplaceSource,
+	marketplaceManifest,
+	marketplacesDir,
+	pluginsRoot,
+	readInstalledPlugins,
+	readKnownMarketplaces,
+	skillsRoot,
+	writeKnownMarketplaces,
+} from "./plugin-state";
 export {
 	type McpReconcileReport,
 	reconcileMcpServers,

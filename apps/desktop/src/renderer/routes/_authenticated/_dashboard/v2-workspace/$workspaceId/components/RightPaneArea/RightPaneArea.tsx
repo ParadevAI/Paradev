@@ -8,11 +8,22 @@ import {
 	type WorkspaceInteractionState,
 	type WorkspaceStore,
 } from "@superset/panes";
-import { type ReactNode, useEffect, useMemo } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
+import {
+	titleBarTabBarProps,
+	useTitleBarSideSlot,
+} from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import type { StoreApi } from "zustand/vanilla";
@@ -74,13 +85,23 @@ export function RightPaneArea({
 		const active = store.getState().getActivePane();
 		if (active) store.getState().focusPane(active.pane.id);
 	}, [isFullScreen, store]);
+	// The slide's outer box is the one that shrinks to nothing when the pane
+	// closes; the pane inside keeps its width and only turns invisible.
+	const [paneBox, setPaneBox] = useState<HTMLElement | null>(null);
+	const measurePaneBox = useCallback((node: HTMLDivElement | null) => {
+		setPaneBox(node?.closest<HTMLElement>("[data-sidebar-slide]") ?? null);
+	}, []);
+	const titleBarSideSlot = useTitleBarSideSlot(paneBox);
+	const isParadevShell = useParadevShell();
 
 	return (
-		<div className="contents" data-pane-area="right">
+		<div className="contents" data-pane-area="right" ref={measurePaneBox}>
 			{pullRequests.map((pr) => (
 				<PullRequestCountsPrefetch key={pr.url} pullRequest={pr.ref} />
 			))}
 			<Workspace<PaneViewerData>
+				{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
+				appearance={isParadevShell ? "cards" : "default"}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
 				paneActions={rightPaneActions}

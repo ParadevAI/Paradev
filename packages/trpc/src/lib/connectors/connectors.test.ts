@@ -465,6 +465,62 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "org_01", label: "paradev" });
 	});
 
+	test("inngest_mcp reads the account under data", async () => {
+		const calls = respond({
+			data: { id: "acct_01", email: "h@tegon.ai", name: "Tegon" },
+			metadata: {},
+		});
+
+		const identity = await probeIdentity(
+			"inngest_mcp",
+			connectorMethod(requireConnector("inngest_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.inngest.com/v2/account",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "acct_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "acct_01", label: "h@tegon.ai" });
+	});
+
+	test("supabase_mcp reads the authorized organization", async () => {
+		const calls = respond([{ id: "org_01", name: "Tegon" }]);
+
+		const identity = await probeIdentity(
+			"supabase_mcp",
+			connectorMethod(requireConnector("supabase_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.supabase.com/v1/organizations",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "org_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "org_01", label: "Tegon" });
+	});
+
+	test("firecrawl_mcp takes the team and user from the token response", async () => {
+		const identity = await probeIdentity(
+			"firecrawl_mcp",
+			connectorMethod(requireConnector("firecrawl_mcp")),
+			"fco_test",
+			undefined,
+			{ access_token: "fco_test", team_id: "team_01", user_id: "user_01" },
+		);
+
+		expect(identity.account).toEqual({ id: "team_01", label: null });
+		expect(identity.user).toEqual({ id: "user_01", label: null });
+	});
+
 	test("stripe survives an account with no name", async () => {
 		globalThis.fetch = (async (_url: string, init: RequestInit) => {
 			const body = init.body

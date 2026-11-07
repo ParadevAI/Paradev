@@ -72,6 +72,19 @@ the filesystem snapshot with no processes, so host-service is started again)
 and extends a running one so it never hits the idle stop while someone is in
 it. `resolveSandboxAddress` is the one place that knows the difference.
 
+**A box reaches other hosts only through the relay, and only if they allow
+it.** The CLI assumed its bearer is a user token the relay accepts. A box has
+no bearer: its credential is a header the firewall adds, so `--host` calls
+used to fail as "Session expired" while `auth whoami` worked, and `host.list`
+showed every host offline because it forwarded the caller's absent bearer for
+presence. Now `host.list` mints a server presence token when the caller has no
+bearer, the firewall adds the workspace credential for the relay host too, and
+the relay checks it with the API per call. A host is reachable only when its
+owner allowed cloud workspaces on the host's settings page; otherwise the call
+fails with a message that says so. Only HTTP calls work: the firewall refuses
+WebSocket upgrades on a host whose headers it rewrites, so live terminal
+streams from a box to a host do not.
+
 **A box's agent status doesn't come from the box.** A host row's dot is a
 live subscription to that host's terminal bindings; the sidebar deliberately
 opens no such socket to a sandbox, since holding one keeps the VM awake all
@@ -203,6 +216,16 @@ never tries to renew) written with the identity on every create and wake; the
 firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
 including a forced rotation while it ran.
 
+**Some people keep the agent signed in themselves.** The brokering above assumes Paradev owns the
+model credential. Some teams run their own script that rotates Claude or Codex logins, and our
+placeholder overrides it: `CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY` take precedence over
+`~/.claude/.credentials.json` in Claude Code. A Manual row (`agent_credentials.provider =
+"manual"`, no secret) makes `resolveAgentSignIns` skip that agent, so create, wake and the
+credential-refresh timer hand the box no variable, firewall rule or login file for it. The box
+reaches the provider through the `"*"` catch-all with whatever the script wrote. **Open:** a
+`~/.codex/auth.json` of placeholders written by an earlier ChatGPT sign-in stays on the box until
+the script replaces it; the auth-failure card knows about Manual only in the viewer's own box.
+
 **The firewall refuses a WebSocket upgrade on a host whose headers it
 rewrites.** Codex's built-in provider opens `wss://chatgpt.com/...` first; with
 the bearer swap in place the upgrade fails ("Attack attempt detected") and
@@ -231,12 +254,14 @@ rule applies to every process in the box, so that list is the boundary —
 widen it deliberately, and never to a procedure that can grant more access.
 A box acts in its own organization only. In `packages/trpc/src/trpc.ts`,
 `jwtProcedure` drops the creator's other memberships, both builders refuse an
-organization header that names one, and `protectedProcedure` keeps the box's
+organization header that names one, and `personProcedure` keeps the box's
 organization as the active one; `user.myOrganizations` lists only the box's.
 Archiving the box from inside it
 (`workspaces archive`) cuts off the box's API access at once and stops the box
 about a minute later: put the box's own id last when archiving several, and
-unarchive from a signed-in client.
+unarchive from a signed-in client. Resizing the box's own workspace
+(`workspaces update --machine-size`) restarts it, which ends the agent that
+asked, usually before the answer comes back; resize it last, as with archive.
 
 **pdev signs in to its router with the box's credential.** On a laptop pdev
 gets a token from `superset auth mcp-headers`, which a box refuses because it
@@ -371,13 +396,36 @@ forwards Ctrl+V and lets the TUI (Claude Code, Codex) read the image from the
 OS clipboard — of the machine the PTY runs on. A sandbox (or any
 relay-reached host) never holds the user's local screenshot, so the paste
 silently did nothing or surfaced "Failed to paste image". Fixed renderer-side:
-for non-local hosts the desktop ships the clipboard bytes over
-`filesystem.writeFile` into the shared `.superset/attachments/` worktree dir
-(the same convention the agent-launch terminal adapter and the mobile
-composer use — mobile proved the pattern) and pastes the worktree-relative
-path instead (`setImagePasteOverride` in the terminal runtime registry).
-Chosen over a new host endpoint because deployed sandboxes never update
-their baked host-service.
+for non-local hosts the desktop writes the clipboard files into the worktree
+and pastes their worktree-relative paths instead (`setImagePasteOverride` in
+the terminal runtime registry, `useSendAttachments` in the pane registry).
+The bytes go where the workspace lives. A box gets them through storage:
+`attachment.createUpload`, a presigned PUT, `cloudWorkspace.attachFiles`,
+then `attachments.materializeIntoWorkspace` on the box. A relay-reached
+machine gets them as base64 `filesystem.writeFile`, capped at
+`MAX_INLINE_ATTACHMENT_BYTES`, so they never reach our servers. A workspace
+on the same machine as the desktop gets them from the desktop's main process
+(`attachments.writeIntoWorktree`), which copies a file from disk with no cap.
+Chat attachments follow the same rule as parts: a `fileId` for a box, an
+`attachmentId` in the host's store otherwise. A file on this machine too big
+for a part goes as a copied path instead.
+
+**The ingress drops an upload the host answers early.** tRPC's streamed batch
+(`httpBatchStreamLink`, `trpc-accept: application/jsonl`) returns its response
+head before it has read the request body. Behind a Vercel sandbox's ingress
+(`sb-*.vercel.run`, which the gate forwards to) that early response ends the
+exchange: the rest of the upload is dropped, the procedure never runs, and the
+client sees a stream that ends after the head line — "value$1 is not iterable"
+in tRPC's consumer. It is a race, not a size limit: a 500 KB body on a home
+uplink loses it about half the time, a 1 MB body on a datacenter link wins
+it. This is why shipping file bytes through `filesystem.writeFile` broke
+(SUPER-2658) and why attachments go through storage instead. host-service now
+buffers every `/trpc/*` body before handing it to tRPC, so no response starts
+before the request is complete. A box runs that host-service from its next
+boot (see "A box's host-service is as new as its last boot"); one that never
+sleeps keeps the race until it restarts. Reproducing with curl: pass
+`-H "Expect:"` — curl's automatic `Expect: 100-continue` on bodies ≥1 MB
+masks the bug, and browsers never send it.
 
 **A URL launcher succeeds and reaches nobody.** The image ships `xdg-utils`
 (`packages/sandbox/bundle/rootfs/usr/local/share/superset/desktop.Aptfile`)
@@ -392,6 +440,16 @@ host-service in sandbox-mode PTY env), `SSH_CONNECTION` or `SSH_TTY`. It is
 deliberately not `shouldOpenBrowser()` from `lib/auth.ts`, whose extra TTY
 test is right for an interactive login prompt and wrong for an agent running
 the CLI with piped stdout.
+
+**A copy lands on the box's clipboard.** The same `DISPLAY` makes the box's
+X clipboard reachable, so a TUI that prefers the native clipboard writes there
+and reports success. Codex sends OSC 52 to the user's terminal only under SSH
+or tmux, so select-and-copy in a cloud terminal reached nobody (SUPER-3146).
+Claude Code sends OSC 52 either way, which hid it. A box terminal sets
+`SSH_CONNECTION` (`buildV2TerminalEnv`), so agents treat it as the remote
+session it is and copy through the desktop's xterm. A tool that checks only
+for a display, such as Neovim with `clipboard=unnamedplus`, still writes the
+box's clipboard.
 
 **A box has no agents until something lists them. Worked around, Open.**
 `agents.run` finds its agent in host-service's `host_agent_configs` table, and
@@ -425,6 +483,19 @@ missing. The CLI bundle has the same gap.
 
 ## Lifecycle
 
+**A box's host-service is as new as its last boot.** A sandbox bundle release
+repins every live environment (`environments.bundleSha`, set by
+`packages/sandbox/src/environments/release.ts`), and every wake builds the
+box's claim from its environment (`wakeCloudWorkspace` → `buildSandboxClaim`).
+When the box boots, `superset-boot` installs the pinned bundle if its hash
+differs from the one installed. So a cold wake, a restart or a new box runs
+the current host-service. A warm resume does not boot, and a box that never
+sleeps keeps the host-service it last booted with. Do not assume a box is
+frozen at the bundle it was provisioned with, and do not assume it is current
+either: gate a new host feature on the version the box reports
+(`health.check`), the same way as a remote host. The chat attachment parts
+floor (`ATTACHMENT_PARTS_MIN_HOST_VERSION`) works like this.
+
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
 session length. Vercel's server-side tag filter uses creation-order pagination
@@ -446,7 +517,7 @@ leaked: this repository's per-workspace Neon branches piled up until 383 were
 deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
 calls `sandbox.runArchiveHook` on the still-running box (direct with the host
 secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
-`.superset/config.toml` resolved for the cloud. A failing hook never blocks the
+`.paradev/config.toml` resolved for the cloud. A failing hook never blocks the
 stop, and an undo that lands during the hook re-runs setup (`runStartHook`
 with `force`) instead of stopping the box. A box whose host-service predates
 the procedure answers 404 and is stopped as before, so the fix reaches a box
@@ -560,6 +631,16 @@ wedged every exec — the reason goldens ran at 32 GB. The internal golden runs
 8 vCPU for the dev stack's RAM, forks inherit it, and image workspaces get
 the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
+
+**A resize does not reach a running session.** `sandbox.update({ resources })`
+changes the sandbox's configured size at once, but a running session keeps the
+vCPUs and memory it booted with; only the next session gets the new size. So
+`sandbox.vcpus` is the configured size, and what a running box has is
+`sandbox.currentSession().vcpus`. Checked on a probe box (2026-11-04): after a
+2 → 4 vCPU update the session still had `nproc` 2 and 4 GB; after stop and
+resume it had 4 and 8 GB, with its files kept and its processes gone. That is
+why `cloudWorkspace.setMachineSize` restarts a running box, and why
+`describeSandbox` reports the session's vCPUs.
 
 **A session ends; the sandbox does not.** A session stops at its timeout
 (`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
@@ -746,7 +827,7 @@ Reproducing an app bug end to end from a cloud workspace means bringing up
 `apps/web` + `apps/api` inside the sandbox. Three of the documented ways to do
 that do not exist there (found driving GHSA-2cp5-f6gg-w5fp, 2026-09-24).
 
-**The app assumes:** `./.superset/setup.local.sh` can stand up Postgres,
+**The app assumes:** `./.paradev/setup.local.sh` can stand up Postgres,
 neon-proxy and Redis with `docker compose`, which is the whole point of the
 zero-credential local path in `DEVELOPMENT.md`.
 
@@ -791,7 +872,7 @@ from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1` and dies at
 
 **What we did:** started the desktop window with
 `unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID IS_SANDBOX`, after
-which plugin installs reached `superset-dev-data/plugins`. Nothing in
+which plugin installs reached `paradev-dev-data/plugins`. Nothing in
 `dev-stack.cloud.sh` does that yet. The box also has no object store for
 `R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses `minio/minio` and
 MinIO's binary download answers 410, so an in-memory S3 stand-in on that port

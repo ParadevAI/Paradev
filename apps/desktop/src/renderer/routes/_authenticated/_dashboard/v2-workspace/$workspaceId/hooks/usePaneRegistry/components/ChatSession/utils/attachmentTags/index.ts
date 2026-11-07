@@ -1,5 +1,6 @@
 export {
 	type AttachmentTag,
+	attachmentDisplayName,
 	formatAttachmentTag,
 	parseAttachmentTags,
-} from "./attachmentTags";
+} from "@superset/chat/core";

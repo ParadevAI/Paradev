@@ -226,14 +226,18 @@ export function rewriteLegacyHomePaths(
 
 /**
  * Points each repository's worktree records at the moved checkouts, so
- * `git worktree list` agrees with the rewritten paths. Failures are logged:
- * git still reaches the old paths through the `~/.superset` symlink.
+ * `git worktree list` agrees with the rewritten paths. Only checkouts whose
+ * git records still name the legacy home are repaired, so this is cheap to
+ * run on every boot. Failures are logged: git still reaches the old paths
+ * through the `~/.superset` symlink.
  */
 export async function repairGitWorktrees(
 	worktrees: ReadonlyArray<{ repoPath: string; worktreePath: string }>,
+	legacyHomeDir: string,
 ): Promise<void> {
 	const byRepo = new Map<string, string[]>();
 	for (const { repoPath, worktreePath } of worktrees) {
+		if (!gitRecordsNameLegacyHome(worktreePath, legacyHomeDir)) continue;
 		byRepo.set(repoPath, [...(byRepo.get(repoPath) ?? []), worktreePath]);
 	}
 	for (const [repoPath, paths] of byRepo) {
@@ -252,5 +256,33 @@ export async function repairGitWorktrees(
 				},
 			);
 		});
+	}
+}
+
+function gitRecordsNameLegacyHome(
+	worktreePath: string,
+	legacyHomeDir: string,
+): boolean {
+	try {
+		const legacyPrefixes = [
+			legacyHomeDir,
+			path.join(
+				fs.realpathSync(path.dirname(legacyHomeDir)),
+				path.basename(legacyHomeDir),
+			),
+		].map((dir) => `${dir}/`);
+		const namesLegacyHome = (recorded: string) =>
+			legacyPrefixes.some((prefix) => recorded.startsWith(prefix));
+		const dotGit = fs.readFileSync(path.join(worktreePath, ".git"), "utf8");
+		const adminDir = /^gitdir: (.+)$/m.exec(dotGit)?.[1]?.trim();
+		if (!adminDir) return false;
+		const resolvedAdminDir = path.resolve(worktreePath, adminDir);
+		if (namesLegacyHome(resolvedAdminDir)) return true;
+		const backlink = fs
+			.readFileSync(path.join(resolvedAdminDir, "gitdir"), "utf8")
+			.trim();
+		return namesLegacyHome(path.resolve(resolvedAdminDir, backlink));
+	} catch {
+		return false;
 	}
 }

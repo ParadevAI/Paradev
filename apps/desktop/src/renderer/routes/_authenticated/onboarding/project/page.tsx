@@ -29,9 +29,14 @@ import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/
 import { EmptyProjectModal } from "renderer/routes/_authenticated/components/EmptyProjectModal";
 import { TemplateGalleryModal } from "renderer/routes/_authenticated/components/TemplateGalleryModal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useOnboardingRestartStore } from "renderer/routes/_authenticated/stores/onboardingRestartStore";
 import { GhAuthDialog } from "../components/GhAuthDialog";
 import { OnboardingTile } from "../components/OnboardingTile";
 import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
+import {
+	ImportOfferLine,
+	useImportFromOtherTools,
+} from "./components/ImportFromOtherTools";
 import {
 	ACQUISITION_SOURCE_EVENT,
 	type AcquisitionSourceAnswer,
@@ -101,16 +106,24 @@ function OnboardingProjectPage() {
 	const createV1Project = useCreateV1Project();
 	const openMainRepoWorkspace = useOpenMainRepoWorkspace();
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
+	const restarting = useOnboardingRestartStore((s) => s.restarting);
 
 	// Adding a project finishes onboarding: mark onboarded, then hand off to the
 	// new-workspace screen with the project just added selected.
 	const finish = async (projectId: string) => {
+		track("onboarding_finished", {
+			outcome: "completed",
+			restarted: restarting,
+		});
+		if (restarting) {
+			openNewWorkspace(projectId);
+			return;
+		}
 		const acquisitionProperties =
 			buildAcquisitionSourceProperties(acquisitionSource);
 		if (acquisitionProperties) {
 			track(ACQUISITION_SOURCE_EVENT, acquisitionProperties);
 		}
-		track("onboarding_finished", { outcome: "completed" });
 		try {
 			await apiTrpcClient.user.completeOnboarding.mutate();
 			// Reactive refetch (not imperative getSession) so the layout guards'
@@ -223,6 +236,11 @@ function OnboardingProjectPage() {
 		}
 	};
 
+	const importOffer = useImportFromOtherTools({
+		enabled: isV2CloudEnabled,
+		onImported: finish,
+	});
+
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -252,6 +270,13 @@ function OnboardingProjectPage() {
 					disabled={busy}
 				/>
 			</div>
+			{importOffer.shown && (
+				<ImportOfferLine
+					offer={importOffer.offer}
+					disabled={busy}
+					onOpen={importOffer.openDialog}
+				/>
+			)}
 
 			{cloneOpen && (
 				<div className="flex flex-col gap-2">
@@ -295,13 +320,15 @@ function OnboardingProjectPage() {
 				</div>
 			)}
 
-			<div className="mt-6">
-				<AcquisitionSourceRow
-					value={acquisitionSource}
-					onChange={setAcquisitionSource}
-					disabled={busy}
-				/>
-			</div>
+			{!restarting && (
+				<div className="mt-6">
+					<AcquisitionSourceRow
+						value={acquisitionSource}
+						onChange={setAcquisitionSource}
+						disabled={busy}
+					/>
+				</div>
+			)}
 
 			<TemplateGalleryModal
 				open={templateOpen}
@@ -325,6 +352,7 @@ function OnboardingProjectPage() {
 				onOpenChange={setGhAuthOpen}
 				onExit={() => setGhAuthOpen(false)}
 			/>
+			{importOffer.dialog}
 		</div>
 	);
 }
