@@ -78,7 +78,10 @@ import type {
 	DashboardSidebarProject,
 	DashboardSidebarWorkspace,
 } from "./types";
-import { filterDashboardSidebarProjects } from "./utils/filterDashboardSidebarProjects";
+import {
+	filterDashboardSidebarHiddenProjects,
+	filterDashboardSidebarProjects,
+} from "./utils/filterDashboardSidebarProjects";
 import {
 	filterDashboardSidebarProjectsByHost,
 	matchesHostFilter,
@@ -278,8 +281,18 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		() => displayedGroups.map((project) => project.id),
 		[displayedGroups],
 	);
+	const displayedHiddenProjects = useMemo(
+		() =>
+			filterDashboardSidebarHiddenProjects(hiddenProjects, projectFilterQuery),
+		[hiddenProjects, projectFilterQuery],
+	);
 	const trimmedFilterQuery = projectFilterQuery.trim();
 	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
+	// A matching hidden project is a match too, and its row renders above the
+	// empty state. Only the query narrows that row, never the host filter.
+	const hasNoMatches =
+		displayedGroups.length === 0 &&
+		(trimmedFilterQuery === "" || displayedHiddenProjects.length === 0);
 	// The sort modes only reorder rows inside a project, so the project list
 	// is still the manual order and stays draggable; only a filter, which
 	// hides projects outright, makes a project drop unsafe to commit.
@@ -527,11 +540,11 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 			)}
 			{!isCollapsed && !workspacesListCollapsed && (
 				<DashboardSidebarHiddenProjects
-					projects={hiddenProjects}
+					projects={displayedHiddenProjects}
 					onShow={showHiddenProject}
 				/>
 			)}
-			{!isCollapsed && isFilterActive && displayedGroups.length === 0 && (
+			{!isCollapsed && isFilterActive && hasNoMatches && (
 				<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
 					{trimmedFilterQuery !== ""
 						? t({
