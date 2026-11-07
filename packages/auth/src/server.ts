@@ -15,7 +15,7 @@ import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
 import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, isTestAccountEmail } from "@superset/shared/constants";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
@@ -313,6 +313,8 @@ export const auth = betterAuth({
 							.where(eq(authSchema.sessions.userId, user.id));
 					}
 
+					if (isTestAccountEmail(user.email)) return;
+
 					// The `welcome` automation sends this, because only automation
 					// sends get Resend's unsubscribe link and List-Unsubscribe headers.
 					try {
@@ -554,7 +556,10 @@ export const auth = betterAuth({
 				},
 
 				afterCreateOrganization: async ({ organization, user }) => {
-					if (process.env.NODE_ENV !== "development") {
+					if (
+						process.env.NODE_ENV !== "development" &&
+						!isTestAccountEmail(user.email)
+					) {
 						const customer = await stripeClient.customers.create({
 							name: organization.name,
 							email: user.email,

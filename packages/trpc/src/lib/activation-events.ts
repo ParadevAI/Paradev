@@ -1,3 +1,4 @@
+import { isTestAccountEmail } from "@superset/shared/constants";
 import { Resend } from "resend";
 import { env } from "../env";
 
@@ -15,6 +16,7 @@ export async function emitAppFirstOpened(
 ) {
 	try {
 		if (Date.now() - user.createdAt.getTime() >= EVENT_WINDOW_MS) return;
+		if (isTestAccountEmail(user.email)) return;
 		const { error } = await resend.events.send({
 			event: "app.first_opened",
 			email: user.email,
