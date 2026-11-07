@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import {
+	chmodSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
@@ -353,6 +354,43 @@ describe("SelfUpdater", () => {
 		expect(h.exitCode).toBe(1);
 		expect(h.updater.status().lastResult?.outcome).toBe("failed");
 	});
+
+	test("exits when a successor that will not die stops the rollback", async () => {
+		const h = harness({
+			spawnHost: () => ({
+				pid: 222,
+				isRunning: () => true,
+				kill: async () => {
+					throw new Error("Failed successor did not exit");
+				},
+			}),
+			pollHealth: async () => null,
+		});
+		h.updater.start({ version: "1.27.0" });
+		await settle(h);
+		expect(h.calls).toContain("stop");
+		expect(h.exitCode).toBe(1);
+		expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("new");
+	});
+
+	test.skipIf(process.getuid?.() === 0)(
+		"a backup that cannot be removed does not fail a healthy handoff",
+		async () => {
+			const h = harness();
+			const locked = join(`${h.root}.bak`, "locked");
+			mkdirSync(locked, { recursive: true });
+			writeFileSync(join(locked, "f"), "");
+			chmodSync(locked, 0o500);
+			try {
+				h.updater.start({ version: "1.27.0" });
+				await settle(h);
+			} finally {
+				chmodSync(locked, 0o700);
+			}
+			expect(h.exitCode).toBe(0);
+			expect(h.updater.status().lastResult?.outcome).toBe("updated");
+		},
+	);
 
 	test("releases the install lock after a failed download", async () => {
 		const h = harness({
