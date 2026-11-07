@@ -6,6 +6,13 @@ import type {
 
 export type TerminalAgentId = AgentIdentityId;
 
+export type HostAgentConfigId = string & {
+	readonly __brand: "HostAgentConfigId";
+};
+
+/** A binding names the launching host config, or a legacy definition id. */
+export type BindingDefinitionId = AgentDefinitionId | HostAgentConfigId;
+
 /**
  * Why the agent session ended. "detached" means the agent reported its own
  * end (SessionEnd hook / wrapper exit report) — the user closed it, so it is
@@ -55,7 +62,7 @@ export interface TerminalAgentBinding {
 	workspaceId: string;
 	agentId: TerminalAgentId;
 	agentSessionId?: string;
-	definitionId?: AgentDefinitionId;
+	definitionId?: BindingDefinitionId;
 	startedAt: number;
 	lastEventAt: number;
 	lastEventType: string;
