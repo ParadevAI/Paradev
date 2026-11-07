@@ -16,6 +16,12 @@ describe("pull-request-url", () => {
 		expect(
 			normalizeGitHubRepoUrl("ssh://git@github.com/Kitenite/superset.git"),
 		).toBe("https://github.com/Kitenite/superset");
+		expect(
+			normalizeGitHubRepoUrl("https://someone:ghp_x@github.com/acme/foo.git"),
+		).toBe("https://github.com/acme/foo");
+		expect(
+			normalizeGitHubRepoUrl("https://example.com?next=@github.com/acme/foo"),
+		).toBeNull();
 	});
 
 	test("parses upstream refs with slashes in branch names", () => {
