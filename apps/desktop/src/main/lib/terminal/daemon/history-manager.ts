@@ -31,7 +31,9 @@ export class HistoryManager {
 		initialScrollback?: string;
 	}): Promise<void> {
 		this.historyInitializing.add(paneId);
-		this.pendingHistoryData.set(paneId, []);
+		if (!this.pendingHistoryData.has(paneId)) {
+			this.pendingHistoryData.set(paneId, []);
+		}
 
 		let safeScrollback = initialScrollback;
 		if (initialScrollback !== undefined) {
@@ -100,28 +102,36 @@ export class HistoryManager {
 		if (containsClearScrollbackSequence(data)) {
 			const session = getSession();
 			if (session) {
-				writer.close().catch((error) => {
-					console.warn(
-						`[HistoryManager] Failed to close history writer for ${paneId}:`,
-						error,
-					);
-				});
 				this.historyWriters.delete(paneId);
+				this.historyInitializing.add(paneId);
+				this.pendingHistoryData.set(paneId, []);
 
 				const contentAfterClear = extractContentAfterClear(data);
-				this.initHistoryWriter({
-					paneId,
-					workspaceId: session.workspaceId,
-					cwd: session.cwd,
-					cols: session.cols,
-					rows: session.rows,
-					initialScrollback: contentAfterClear || undefined,
-				}).catch((error) => {
-					console.warn(
-						`[HistoryManager] Failed to reinitialize history writer for ${paneId}:`,
-						error,
-					);
-				});
+				writer
+					.close()
+					.catch((error) => {
+						console.warn(
+							`[HistoryManager] Failed to close history writer for ${paneId}:`,
+							error,
+						);
+					})
+					.then(() => {
+						if (!this.historyInitializing.has(paneId)) return;
+						return this.initHistoryWriter({
+							paneId,
+							workspaceId: session.workspaceId,
+							cwd: session.cwd,
+							cols: session.cols,
+							rows: session.rows,
+							initialScrollback: contentAfterClear || undefined,
+						});
+					})
+					.catch((error) => {
+						console.warn(
+							`[HistoryManager] Failed to reinitialize history writer for ${paneId}:`,
+							error,
+						);
+					});
 			}
 			return;
 		}

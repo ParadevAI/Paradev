@@ -28,7 +28,9 @@ test("close() writes the backlog queued behind backpressure, then returns", () =
 
 	expect(result.exitCode).toBe(0);
 	const dir = join(home, "terminal-history", "ws", "pane");
-	expect(readFileSync(join(dir, "scrollback.bin"), "utf8")).toEndWith("tail");
+	expect(readFileSync(join(dir, "scrollback.bin"), "utf8")).toBe(
+		`${"a".repeat(100_000)}tail`,
+	);
 	expect(
 		JSON.parse(readFileSync(join(dir, "meta.json"), "utf8")).endedAt,
 	).toBeString();
