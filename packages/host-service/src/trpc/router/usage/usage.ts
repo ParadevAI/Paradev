@@ -1,7 +1,4 @@
-import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import { homedir } from "node:os";
-import { basename, join } from "node:path";
+import { basename } from "node:path";
 import { MAX_BACKFILL_DAYS } from "@superset/trpc/leaderboard-periods";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -17,11 +14,7 @@ import {
 	provisionCodexAccount,
 } from "./account-provisioning";
 import { fetchAgyAccounts } from "./agy-quota";
-import {
-	fetchClaudeAccounts,
-	readClaudeLoginFingerprint,
-	readDefaultLoginEmail,
-} from "./claude";
+import { fetchClaudeAccounts } from "./claude";
 import { fetchCodexAccounts } from "./codex";
 import {
 	getDefaultAccountSelections,
@@ -29,13 +22,10 @@ import {
 } from "./default-account";
 import { fetchGrokAccounts } from "./grok-quota";
 import { countAgentPrsByDay } from "./history/agent-prs";
+import { readLogins } from "./logins";
 import { fetchOpencodeAccounts } from "./opencode-quota";
 import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
-import {
-	discoverClaudeProfiles,
-	discoverCodexHomes,
-	readCodexProfileKind,
-} from "./profiles";
+import { discoverClaudeProfiles, discoverCodexHomes } from "./profiles";
 import { validateSessionAccount } from "./session-account/session-account";
 import type { UsageAccount } from "./types";
 
@@ -140,55 +130,7 @@ export const usageRouter = router({
 	 * system-default login by its credential fingerprint, including re-login
 	 * to the same account.
 	 */
-	logins: queryProcedure.query(async () => {
-		const [profiles, codexHomes, claudeDefaultEmail, claudeDefaultFingerprint] =
-			await Promise.all([
-				discoverClaudeProfiles(),
-				discoverCodexHomes(),
-				readDefaultLoginEmail(),
-				readClaudeLoginFingerprint(null),
-			]);
-		// auth.json fingerprints let the UI notice a re-login on any Codex home
-		// (its email is only knowable via the network). The first home is the
-		// system default.
-		const codex = await Promise.all(
-			codexHomes.map(async ({ home, credentialKind, loginFingerprint }) => {
-				// An API-billed home's auth.json holds the raw key and is never
-				// opened; its marker mtime is the fingerprint instead.
-				let fingerprint = loginFingerprint;
-				if (
-					credentialKind === "subscription" &&
-					(await readCodexProfileKind(home))?.credentialKind === "subscription"
-				) {
-					try {
-						fingerprint = createHash("sha256")
-							.update(await readFile(join(home, "auth.json")))
-							.digest("hex");
-					} catch {
-						// No readable auth.json — fingerprint stays null.
-					}
-				}
-				return { home, fingerprint, credentialKind };
-			}),
-		);
-		return {
-			homeDir: homedir(),
-			claudeDefaultFingerprint,
-			claude: await Promise.all(
-				profiles.map(async (profile) => ({
-					configDir: profile.configDir,
-					email: profile.email,
-					credentialKind: profile.credentialKind,
-					fingerprint:
-						profile.credentialKind === "api_key"
-							? profile.loginFingerprint
-							: await readClaudeLoginFingerprint(profile.configDir),
-				})),
-			),
-			codex,
-			claudeDefaultEmail,
-		};
-	}),
+	logins: queryProcedure.meta({ timeoutMs: 15_000 }).query(() => readLogins()),
 
 	/**
 	 * Point new agent launches at one of the discovered logins (null = the
