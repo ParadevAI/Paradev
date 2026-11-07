@@ -13,7 +13,10 @@ import {
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
-import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
+import {
+	type ExecGh,
+	GH_TIMEOUT_MS,
+} from "../../trpc/router/workspace-creation/utils/exec-gh";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
 import {
@@ -59,6 +62,8 @@ import {
 	type WorkspaceRefsSnapshot,
 } from "./utils/workspace-refs";
 
+// gh's timeout runs from spawn, so an unbounded burst times out healthy calls.
+const MAX_CONCURRENT_GITHUB_LOOKUPS = 8;
 // Long-cadence sweep that catches anything `GitWatcher` might miss
 // (overflow, fs.watch errors, transient watcher failures). Steady-state
 // branch syncs are event-driven via `GitWatcher.onChanged`; this is a
@@ -151,6 +156,7 @@ export interface PullRequestRuntimeManagerOptions {
 	readWorkspaceRefs?: (worktreePath: string) => Promise<WorkspaceRefsSnapshot>;
 	/** Test seam for the missing-worktree gate. Defaults to `existsSync`. */
 	worktreeExists?: (worktreePath: string) => boolean;
+	octokitTimeoutMs?: number;
 }
 
 interface NormalizedRepoIdentity {
@@ -178,6 +184,33 @@ export interface CheckoutPullRequestMetadata {
 	headRepositoryOwner?: string | null;
 	headRepositoryName?: string | null;
 	isCrossRepository: boolean;
+}
+
+// ponytail: the request is not aborted, only abandoned. The ETIMEDOUT trips the
+// unreachable hold, so no new requests start; thread an AbortSignal into the
+// github-query helpers if abandoned sockets ever matter.
+async function rejectAfter<T>(
+	work: Promise<T>,
+	ms: number,
+	what: string,
+): Promise<T> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const deadline = new Promise<never>((_, reject) => {
+		timer = setTimeout(
+			() =>
+				reject(
+					Object.assign(new Error(`${what} timed out after ${ms}ms`), {
+						code: "ETIMEDOUT",
+					}),
+				),
+			ms,
+		);
+	});
+	try {
+		return await Promise.race([work, deadline]);
+	} finally {
+		clearTimeout(timer);
+	}
 }
 
 function mapCheckoutPullRequestState(
@@ -236,6 +269,9 @@ export class PullRequestRuntimeManager {
 	// appear once the limit resets" is true within seconds rather than at
 	// the next 5-minute sweep.
 	private holdRecoveryTimer: ReturnType<typeof setTimeout> | null = null;
+	private readonly octokitTimeoutMs: number;
+	private githubLookupsRunning = 0;
+	private readonly githubLookupQueue: (() => void)[] = [];
 	private readonly workspaceSyncState = new Map<
 		string,
 		{ running: Promise<void>; rerunPending: boolean; bypassCache: boolean }
@@ -293,6 +329,7 @@ export class PullRequestRuntimeManager {
 			options.readWorkspaceRefs ??
 			(async (worktreePath) => readWorkspaceRefs(await this.git(worktreePath)));
 		this.worktreeExists = options.worktreeExists ?? existsSync;
+		this.octokitTimeoutMs = options.octokitTimeoutMs ?? GH_TIMEOUT_MS;
 	}
 
 	start() {
@@ -1281,32 +1318,59 @@ export class PullRequestRuntimeManager {
 		viaOctokit: () => Promise<T>,
 		options: { probe?: boolean } = {},
 	): Promise<T> {
-		// An explicit refresh (PR just created, user asked) is allowed through a
-		// hold: it is one call, and its success is what reopens the gate early
-		// once the network is back.
 		if (!options.probe) this.githubGate.assertReachable();
+		if (this.githubLookupsRunning < MAX_CONCURRENT_GITHUB_LOOKUPS) {
+			this.githubLookupsRunning += 1;
+		} else {
+			await this.waitForGitHubSlot(options.probe === true);
+		}
 		try {
-			const result = await viaGh();
-			this.githubGate.recordSuccess();
-			return result;
-		} catch (ghError) {
-			if (isGitHubUnreachableError(ghError)) {
-				this.noteGitHubFailure(ghError);
-				throw ghError;
+			// An explicit refresh (PR just created, user asked) is allowed through a
+			// hold: it is one call, and its success is what reopens the gate early
+			// once the network is back.
+			if (!options.probe) this.githubGate.assertReachable();
+			try {
+				const result = await viaGh();
+				this.githubGate.recordSuccess();
+				return result;
+			} catch (ghError) {
+				if (isGitHubUnreachableError(ghError)) {
+					this.noteGitHubFailure(ghError);
+					throw ghError;
+				}
+				console.warn(
+					`[host-service:pull-request-runtime] gh ${what} failed; falling back to Octokit`,
+					{ ...context, error: ghError },
+				);
 			}
-			console.warn(
-				`[host-service:pull-request-runtime] gh ${what} failed; falling back to Octokit`,
-				{ ...context, error: ghError },
-			);
+			try {
+				const result = await rejectAfter(
+					viaOctokit(),
+					this.octokitTimeoutMs,
+					`Octokit ${what}`,
+				);
+				this.githubGate.recordSuccess();
+				return result;
+			} catch (octokitError) {
+				this.noteGitHubFailure(octokitError);
+				throw octokitError;
+			}
+		} finally {
+			this.releaseGitHubSlot();
 		}
-		try {
-			const result = await viaOctokit();
-			this.githubGate.recordSuccess();
-			return result;
-		} catch (octokitError) {
-			this.noteGitHubFailure(octokitError);
-			throw octokitError;
-		}
+	}
+
+	private waitForGitHubSlot(urgent: boolean): Promise<void> {
+		return new Promise((resolve) => {
+			if (urgent) this.githubLookupQueue.unshift(resolve);
+			else this.githubLookupQueue.push(resolve);
+		});
+	}
+
+	private releaseGitHubSlot(): void {
+		const next = this.githubLookupQueue.shift();
+		if (next) next();
+		else this.githubLookupsRunning -= 1;
 	}
 
 	/** Trips the gate on a host-wide failure and says so once per hold. */

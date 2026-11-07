@@ -155,6 +155,7 @@ function createManager(
 			worktreePath: string,
 		) => Promise<WorkspaceRefsSnapshot>;
 		worktreeExists?: (worktreePath: string) => boolean;
+		octokitTimeoutMs?: number;
 	} = {},
 ) {
 	return new PullRequestRuntimeManager({
@@ -179,6 +180,7 @@ function createManager(
 		// Seeded worktree paths are fabricated; default the disk gate open so
 		// sync-path tests exercise the git read, not the missing-dir skip.
 		worktreeExists: overrides.worktreeExists ?? (() => true),
+		octokitTimeoutMs: overrides.octokitTimeoutMs,
 	});
 }
 
@@ -2488,5 +2490,198 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		);
 		expect(manager.getGithubStatus()?.reason).toBe("auth");
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+	});
+});
+
+describe("PullRequestRuntimeManager fleet sweep under load", () => {
+	const PROJECTS = 96;
+	const WORKSPACES_PER_PROJECT = 2;
+
+	function seedFleet(db: HostDb) {
+		const prsByHeadRef: Record<string, ReturnType<typeof makePrNode>> = {};
+		for (let p = 0; p < PROJECTS; p++) {
+			const projectId = `project-${p}`;
+			db.insert(schema.projects)
+				.values({
+					id: projectId,
+					repoPath: `/repo-${p}`,
+					createdAt: Date.now(),
+					repoProvider: "github",
+					repoOwner: REPO.owner,
+					repoName: REPO.name,
+					repoUrl: `https://github.com/${REPO.owner}/${REPO.name}.git`,
+					remoteName: "origin",
+				})
+				.run();
+			for (let w = 0; w < WORKSPACES_PER_PROJECT; w++) {
+				const branch = `p${p}-w${w}`;
+				db.insert(schema.workspaces)
+					.values({
+						id: `ws-${branch}`,
+						projectId,
+						worktreePath: `/repo-${p}/.worktrees/${branch}`,
+						branch,
+						createdAt: Date.now(),
+						headSha: `sha-${branch}`,
+						upstreamOwner: REPO.owner,
+						upstreamRepo: REPO.name,
+						upstreamBranch: branch,
+					})
+					.run();
+				prsByHeadRef[branch] = makePrNode({
+					number: Object.keys(prsByHeadRef).length + 1,
+					headRef: branch,
+					headSha: `sha-${branch}`,
+				});
+			}
+		}
+		return prsByHeadRef;
+	}
+
+	function killedByTimeout(args: string[]) {
+		return Object.assign(new Error(`Command failed: gh ${args.join(" ")}`), {
+			killed: true,
+			signal: "SIGTERM",
+			code: null,
+		});
+	}
+
+	// A machine that runs `slots` gh processes at once, each needing `callMs`.
+	// Like execFile, the timeout starts at spawn, so time spent waiting behind
+	// other spawns counts against it. Virtual time: nothing really waits.
+	function contendedGh(
+		answer: (args: string[]) => Promise<unknown>,
+		machine: { slots: number; callMs: number; timeoutMs: number },
+	) {
+		const stats = { spawns: 0, killed: 0 };
+		let inFlight = 0;
+		const execGh = async (args: string[]) => {
+			stats.spawns += 1;
+			const ahead = inFlight++;
+			try {
+				await new Promise((resolve) => setImmediate(resolve));
+				const elapsedMs =
+					(Math.floor(ahead / machine.slots) + 1) * machine.callMs;
+				if (elapsedMs > machine.timeoutMs) {
+					stats.killed += 1;
+					throw killedByTimeout(args);
+				}
+				return await answer(args);
+			} finally {
+				inFlight--;
+			}
+		};
+		return { execGh, stats };
+	}
+
+	function fleetSweep(manager: PullRequestRuntimeManager) {
+		const accessible = manager as unknown as {
+			refreshEligibleProjects(): Promise<void>;
+		};
+		return accessible.refreshEligibleProjects.bind(accessible);
+	}
+
+	test("a healthy GitHub stays reachable when the sweep covers many projects", async () => {
+		const db = createRealDb();
+		const prsByHeadRef = seedFleet(db);
+		const warns: string[] = [];
+		const originalWarn = console.warn;
+		console.warn = (...args: unknown[]) => {
+			warns.push(String(args[0]));
+		};
+		// The reporter's numbers: one PR call takes 0.4 s, gh times out at 10 s.
+		const gh = contendedGh(routeGh(prsByHeadRef), {
+			slots: 4,
+			callMs: 400,
+			timeoutMs: 10_000,
+		});
+		const manager = createManager(db, {
+			execGh: gh.execGh,
+			github: (async () => {
+				throw new Error("octokit must not run");
+			}) as never,
+		});
+		try {
+			await fleetSweep(manager)();
+
+			expect(manager.getGithubStatus()).toBeNull();
+			expect(warns.filter((w) => w.includes("GitHub unreachable"))).toEqual([]);
+			expect(gh.stats.killed).toBe(0);
+			expect(getWorkspace(db, "ws-p95-w1")?.pullRequestId).not.toBeNull();
+		} finally {
+			manager.stop();
+			console.warn = originalWarn;
+		}
+	});
+
+	test("an Octokit fallback that never answers frees its slot for an explicit refresh", async () => {
+		const db = createRealDb();
+		const prsByHeadRef = seedFleet(db);
+		const answer = routeGh(prsByHeadRef);
+		let ghAnswers = false;
+		let hungOctokitCalls = 0;
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				await new Promise((resolve) => setImmediate(resolve));
+				if (ghAnswers) return answer(args);
+				throw new Error("gh: Not Found (HTTP 404)");
+			},
+			github: () => {
+				hungOctokitCalls += 1;
+				return new Promise<never>(() => {});
+			},
+			octokitTimeoutMs: 5,
+		});
+		let stuckTimer: ReturnType<typeof setTimeout> | undefined;
+		try {
+			await withSilencedWarnings(async () => {
+				const sweep = fleetSweep(manager)();
+				while (hungOctokitCalls < 8) {
+					await new Promise((resolve) => setImmediate(resolve));
+				}
+				ghAnswers = true;
+
+				const outcome = await Promise.race([
+					manager
+						.refreshPullRequestsByWorkspaces(["ws-p95-w1"])
+						.then(() => "refreshed"),
+					new Promise((resolve) => {
+						stuckTimer = setTimeout(resolve, 1_000, "stuck");
+					}),
+				]);
+
+				expect(outcome).toBe("refreshed");
+				expect(getWorkspace(db, "ws-p95-w1")?.pullRequestId).not.toBeNull();
+				await sweep;
+			});
+		} finally {
+			clearTimeout(stuckTimer);
+			manager.stop();
+		}
+	});
+
+	test("a GitHub that hangs on every call trips the gate without a spawn per project", async () => {
+		const db = createRealDb();
+		seedFleet(db);
+		let spawns = 0;
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				spawns += 1;
+				await new Promise((resolve) => setImmediate(resolve));
+				throw killedByTimeout(args);
+			},
+			github: (async () => {
+				throw new Error("octokit must not run on a dead network");
+			}) as never,
+		});
+		try {
+			await withSilencedWarnings(() => fleetSweep(manager)());
+
+			expect(manager.getGithubStatus()?.reason).toBe("unreachable");
+			expect(spawns).toBeGreaterThan(0);
+			expect(spawns).toBeLessThan(PROJECTS);
+		} finally {
+			manager.stop();
+		}
 	});
 });
