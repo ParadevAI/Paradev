@@ -919,8 +919,8 @@ msgstr "{count, plural, one {#件のオートメーションをグループか�
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, other {# 件のチャットを再開しますか?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, other {Paradev の終了時に実行中だったチャットです}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, other {Paradev の終了時に完了していなかったチャットです}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {#件のソースを使用} other {#件のソースを使用}}"
@@ -15177,6 +15177,9 @@ msgstr "中断したためキューを一時停止しました"
 
 msgid "Queue paused by the usage limit"
 msgstr "使用量の上限によりキューを一時停止しました"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Paradev の終了によりキューを一時停止しました"
 
 msgid "Queue work for agents"
 msgstr "エージェントの作業をキューに入れる"

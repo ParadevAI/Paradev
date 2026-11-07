@@ -1,14 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { ToolCall } from "@superset/chat/protocol";
 import { eq } from "drizzle-orm";
 import { chatJournal } from "../../db";
 import type { AdapterEvent, HarnessAdapter } from "../../harness";
 import { FakeHarness, type ScriptedEvent } from "../../harness/fake";
+import type { ChatRuntime } from "../../index";
+import { createChatRuntime } from "../../index";
 import type { HarnessRegistry } from "../../sessions";
 import { agentMessage, turn } from "../../testing/fixtures";
-import { createTestRuntime } from "../../testing/testRuntime";
+import { createBunChatDb, createTestRuntime } from "../../testing/testRuntime";
 import {
 	FAKE_HARNESS,
 	fakeHarnessRegistry,
@@ -341,7 +346,7 @@ describe("replacing a chat whose agent died", () => {
 		await runtime.dispose();
 	});
 
-	test("a turn the user stopped is not carried into the replacement", async () => {
+	test("a turn cut off by closing the chat is not carried into the replacement", async () => {
 		const runtime = createTestRuntime({ harnesses: hangingRegistry() });
 		const stopped = await startTurn(runtime);
 
@@ -353,6 +358,87 @@ describe("replacing a chat whose agent died", () => {
 
 		expect(lastTurnOf(runtime, replacement.sessionId)).toBeUndefined();
 		await runtime.dispose();
+	});
+});
+
+describe("a queue a quit cut off", () => {
+	const FOLLOW_UP = [{ type: "text" as const, text: "and the docs" }];
+
+	async function quitWithQueue() {
+		const dataDir = mkdtempSync(join(tmpdir(), "chat-runtime-"));
+		const replays: FakeHarness[] = [];
+		const harnesses = hangingRegistry(replays);
+		const quit = createChatRuntime({
+			dataDir,
+			openDatabase: createBunChatDb,
+			harnesses,
+		});
+		const cutOff = await startTurn(quit);
+		quit.commands.prompt({
+			commandId: randomUUID(),
+			sessionId: cutOff.sessionId,
+			clientId: "client-2",
+			content: FOLLOW_UP,
+		});
+		expect(quit.live.get(cutOff.sessionId)?.queuedCount).toBe(1);
+		const relaunched = createChatRuntime({
+			dataDir,
+			openDatabase: createBunChatDb,
+			harnesses,
+		});
+		const replacement = createChat(relaunched, cutOff.sessionId);
+		await waitFor(
+			() => relaunched.live.get(replacement.sessionId)?.state.status === "idle",
+		);
+		const live = relaunched.live.require(replacement.sessionId);
+		const followUps = () =>
+			journalEnvelopes(relaunched, replacement.sessionId).filter(
+				(envelope) =>
+					envelope.event.type === "item" &&
+					envelope.event.item.kind === "user_message" &&
+					JSON.stringify(envelope.event.item.content) ===
+						JSON.stringify(FOLLOW_UP),
+			);
+		const close = async () => {
+			await relaunched.dispose();
+			await quit.dispose();
+		};
+		return { live, replays, followUps, close };
+	}
+
+	test("waits, paused, in the chat that replaces it", async () => {
+		const { live, close } = await quitWithQueue();
+
+		expect(live.queueState).toMatchObject({
+			paused: true,
+			prompts: [{ content: FOLLOW_UP }],
+		});
+		expect(live.state.queuePausedByShutdown).toBe(true);
+		expect(live.promptsSent).toBe(0);
+		await close();
+	});
+
+	test("runs once after the continue when the chat is resumed", async () => {
+		const { live, replays, followUps, close } = await quitWithQueue();
+
+		live.promptOnceStarted(
+			[[{ type: "text", text: "Continue" }], FOLLOW_UP],
+			[],
+		);
+
+		expect(live.queueState.paused).toBe(false);
+		expect(live.queueState.prompts.map((prompt) => prompt.content)).toEqual([
+			FOLLOW_UP,
+		]);
+		expect(replays.at(-1)?.prompted).toEqual([
+			[{ type: "text", text: "Continue" }],
+		]);
+		expect(
+			new Set(
+				followUps().map((e) => e.event.type === "item" && e.event.item.id),
+			).size,
+		).toBe(1);
+		await close();
 	});
 });
 
@@ -370,7 +456,7 @@ const COMMAND: ToolCall = {
 /** Stop notes count only in a harness that writes them. */
 const CLAUDE_HARNESS = "claude-acp";
 
-function hangingRegistry(): HarnessRegistry {
+function hangingRegistry(replays: FakeHarness[] = []): HarnessRegistry {
 	let agents = 0;
 	return new Map([
 		[
@@ -378,7 +464,7 @@ function hangingRegistry(): HarnessRegistry {
 			(): HarnessAdapter => {
 				const generation = agents++;
 				if (generation > 0) {
-					return new FakeHarness({
+					const replay = new FakeHarness({
 						start: [
 							{
 								kind: "item",
@@ -412,6 +498,8 @@ function hangingRegistry(): HarnessRegistry {
 							],
 						],
 					});
+					replays.push(replay);
+					return replay;
 				}
 				let release = () => {};
 				const done = new Promise<void>((resolve) => {
@@ -442,7 +530,7 @@ function hangingRegistry(): HarnessRegistry {
 	]);
 }
 
-async function startTurn(runtime: ReturnType<typeof createTestRuntime>) {
+async function startTurn(runtime: ChatRuntime) {
 	const chat = createChat(runtime);
 	await waitFor(
 		() => runtime.live.get(chat.sessionId)?.state.status === "idle",
@@ -459,10 +547,7 @@ async function startTurn(runtime: ReturnType<typeof createTestRuntime>) {
 	return chat;
 }
 
-function createChat(
-	runtime: ReturnType<typeof createTestRuntime>,
-	replacesSessionId?: string,
-) {
+function createChat(runtime: ChatRuntime, replacesSessionId?: string) {
 	return runtime.commands.createSession({
 		commandId: randomUUID(),
 		scopeId: "workspace-1",

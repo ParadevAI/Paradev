@@ -919,8 +919,8 @@ msgstr "{count, plural, one {Usunięto # automatyzację z grupy} few {Usunięto 
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Wznowić # czat?} few {Wznowić # czaty?} many {Wznowić # czatów?} other {Wznowić # czatu?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Ten czat działał, gdy zamknięto Paradev} few {Te czaty działały, gdy zamknięto Paradev} many {Te czaty działały, gdy zamknięto Paradev} other {Te czaty działały, gdy zamknięto Paradev}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Ten czat nie był ukończony, gdy zamknięto Paradev} few {Te czaty nie były ukończone, gdy zamknięto Paradev} many {Te czaty nie były ukończone, gdy zamknięto Paradev} other {Te czaty nie były ukończone, gdy zamknięto Paradev}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Użyto # źródła} few {Użyto # źródeł} many {Użyto # źródeł} other {Użyto # źródła}}"
@@ -15177,6 +15177,9 @@ msgstr "Kolejka wstrzymana, bo przerwano agenta"
 
 msgid "Queue paused by the usage limit"
 msgstr "Kolejka wstrzymana przez limit użycia"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Kolejka wstrzymana, gdy zamknięto Paradev"
 
 msgid "Queue work for agents"
 msgstr "Kolejkuj pracę dla agentów"

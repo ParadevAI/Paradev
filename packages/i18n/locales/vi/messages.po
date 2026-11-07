@@ -919,8 +919,8 @@ msgstr "{count, plural, one {Đã xóa # tự động hóa khỏi nhóm} other {
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Tiếp tục # cuộc trò chuyện?} other {Tiếp tục # cuộc trò chuyện?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Cuộc trò chuyện này đang chạy khi Paradev đóng} other {Các cuộc trò chuyện này đang chạy khi Paradev đóng}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Cuộc trò chuyện này chưa xong khi Paradev đóng} other {Các cuộc trò chuyện này chưa xong khi Paradev đóng}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Đã dùng # nguồn} other {Đã dùng # nguồn}}"
@@ -15177,6 +15177,9 @@ msgstr "Hàng đợi đã tạm dừng vì bạn đã ngắt"
 
 msgid "Queue paused by the usage limit"
 msgstr "Hàng đợi đã tạm dừng do giới hạn sử dụng"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Hàng đợi đã tạm dừng khi Paradev đóng"
 
 msgid "Queue work for agents"
 msgstr "Xếp việc cho agent"

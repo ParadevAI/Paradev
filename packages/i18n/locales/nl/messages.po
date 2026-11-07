@@ -919,8 +919,8 @@ msgstr "{count, plural, one {# automatisering uit de groep verwijderd} other {# 
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {# chat hervatten?} other {# chats hervatten?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Deze chat liep toen Paradev werd gesloten} other {Deze chats liepen toen Paradev werd gesloten}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Deze chat was nog niet klaar toen Paradev werd gesloten} other {Deze chats waren nog niet klaar toen Paradev werd gesloten}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# bron gebruikt} other {# bronnen gebruikt}}"
@@ -15177,6 +15177,9 @@ msgstr "Wachtrij gepauzeerd omdat je hebt onderbroken"
 
 msgid "Queue paused by the usage limit"
 msgstr "Wachtrij gepauzeerd door de gebruikslimiet"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Wachtrij gepauzeerd toen Paradev werd gesloten"
 
 msgid "Queue work for agents"
 msgstr "Werk in de wachtrij zetten voor agents"

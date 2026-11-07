@@ -919,8 +919,8 @@ msgstr "{count, plural, one {已将 # 个自动化移出分组} other {已将 # 
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {要继续 # 个聊天吗？} other {要继续 # 个聊天吗？}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Paradev 关闭时这个聊天正在运行} other {Paradev 关闭时这些聊天正在运行}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Paradev 关闭时这个聊天还没完成} other {Paradev 关闭时这些聊天还没完成}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
@@ -15177,6 +15177,9 @@ msgstr "由于你中断了操作，队列已暂停"
 
 msgid "Queue paused by the usage limit"
 msgstr "队列因使用上限已暂停"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Paradev 关闭时队列已暂停"
 
 msgid "Queue work for agents"
 msgstr "为智能体排队安排工作"

@@ -99,6 +99,8 @@ export const sessionStateSchema = z.looseObject({
 	usageLimit: usageLimitSchema.optional(),
 	/** The queue paused for a usage limit, which stays the reason after its notice is dismissed. */
 	queuePausedByLimit: z.boolean().optional(),
+	/** The queue was waiting when Paradev closed, and stays paused until someone resumes it. */
+	queuePausedByShutdown: z.boolean().optional(),
 	backgroundTasks: z.array(backgroundTaskSchema).optional(),
 	awaitingBackground: z.boolean().optional(),
 });

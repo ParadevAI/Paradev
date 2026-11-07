@@ -460,6 +460,84 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("rewindSession copies what the chat showed, not Claude's reply to a stop", async () => {
+		const later = Date.now() + 60_000;
+		const reply = (turnId: string, text: string) => [
+			{ kind: "turn" as const, turn: turn(turnId, { startedAtMs: later }) },
+			{
+				kind: "item" as const,
+				item: { ...agentMessage(`${turnId}-reply`, text), startedAtMs: later },
+				turnId,
+			},
+			{
+				kind: "turn" as const,
+				turn: turn(turnId, {
+					status: "completed",
+					startedAtMs: later,
+					completedAtMs: later,
+				}),
+			},
+			{ kind: "session" as const, session: { status: "idle" as const } },
+		];
+		const scripts: FakeHarnessScript[] = [
+			{
+				turns: [reply("t1", "No response requested."), reply("t2", "two")],
+			},
+			{ turns: [reply("t3", "got it")] },
+		];
+		let created = 0;
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					"claude-acp",
+					() => new FakeHarness(scripts[created++] ?? { turns: [] }),
+				],
+			]),
+		});
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: "claude-acp",
+			cwd: "/tmp/workspace",
+		});
+		const send = (text: string) =>
+			runtime.commands.prompt({
+				commandId: randomUUID(),
+				sessionId,
+				clientId: text,
+				content: [{ type: "text", text }],
+			});
+		send("first");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+		const second = send("second");
+		await waitFor(
+			() =>
+				runtime.live.require(sessionId).turn?.id === "t2" &&
+				runtime.live.require(sessionId).turn?.status === "completed",
+		);
+
+		const rewound = await runtime.commands.rewindSession({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: second.itemId,
+			prompt: "second, edited",
+			handoffPrompt: "earlier conversation",
+			cwd: "/tmp/workspace",
+		});
+
+		await waitFor(
+			() =>
+				runtime.live.require(rewound.sessionId).turn?.status === "completed",
+		);
+		const copied = journalEnvelopes(runtime, rewound.sessionId).flatMap(
+			(envelope) =>
+				envelope.event.type === "item" ? [envelope.event.item.id] : [],
+		);
+		expect(copied).toHaveLength(4);
+		expect(copied).not.toContain("t1-reply");
+		await runtime.dispose();
+	});
+
 	test("rewindSession resumes an agent that can fork at a message, cut there, without a handoff", async () => {
 		const later = Date.now() + 60_000;
 		const reply = (turnId: string, messageId: string) => [

@@ -919,8 +919,8 @@ msgstr "{count, plural, one {# automatizace odebrána ze skupiny} few {# automat
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Obnovit # chat?} few {Obnovit # chaty?} many {Obnovit # chatu?} other {Obnovit # chatů?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Tento chat běžel, když se Paradev zavřel} few {Tyto chaty běžely, když se Paradev zavřel} many {Tyto chaty běžely, když se Paradev zavřel} other {Tyto chaty běžely, když se Paradev zavřel}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Tento chat nebyl dokončen, když se Paradev zavřel} few {Tyto chaty nebyly dokončeny, když se Paradev zavřel} many {Tyto chaty nebyly dokončeny, když se Paradev zavřel} other {Tyto chaty nebyly dokončeny, když se Paradev zavřel}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Použit # zdroj} few {Použity # zdroje} many {Použito # zdroje} other {Použito # zdrojů}}"
@@ -15177,6 +15177,9 @@ msgstr "Fronta pozastavena, protože jste přerušili agenta"
 
 msgid "Queue paused by the usage limit"
 msgstr "Fronta pozastavena limitem využití"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Fronta pozastavena, když se Paradev zavřel"
 
 msgid "Queue work for agents"
 msgstr "Fronta práce pro agenty"

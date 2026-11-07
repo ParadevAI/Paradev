@@ -919,8 +919,8 @@ msgstr "{count, plural, one {Removed # automation from its group} other {Removed
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Used # source} other {Used # sources}}"
@@ -15177,6 +15177,9 @@ msgstr "Queue paused because you interrupted"
 
 msgid "Queue paused by the usage limit"
 msgstr "Queue paused by the usage limit"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Queue paused when Paradev closed"
 
 msgid "Queue work for agents"
 msgstr "Queue work for agents"

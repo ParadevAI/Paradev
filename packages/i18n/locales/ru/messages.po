@@ -919,8 +919,8 @@ msgstr "{count, plural, one {# автоматизация убрана из гр
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Возобновить # чат?} few {Возобновить # чата?} many {Возобновить # чатов?} other {Возобновить # чата?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Этот чат работал, когда Paradev закрылся} few {Эти чаты работали, когда Paradev закрылся} many {Эти чаты работали, когда Paradev закрылся} other {Эти чаты работали, когда Paradev закрылся}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Этот чат не был завершён, когда Paradev закрылся} few {Эти чаты не были завершены, когда Paradev закрылся} many {Эти чаты не были завершены, когда Paradev закрылся} other {Эти чаты не были завершены, когда Paradev закрылся}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Использован # источник} few {Использовано # источника} many {Использовано # источников} other {Использовано # источника}}"
@@ -15177,6 +15177,9 @@ msgstr "Очередь приостановлена, потому что вы п
 
 msgid "Queue paused by the usage limit"
 msgstr "Очередь приостановлена лимитом использования"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Очередь приостановлена, когда Paradev закрылся"
 
 msgid "Queue work for agents"
 msgstr "Ставьте работу агентам в очередь"

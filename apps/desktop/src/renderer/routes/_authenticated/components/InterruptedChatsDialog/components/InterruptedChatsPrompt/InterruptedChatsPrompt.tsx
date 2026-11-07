@@ -25,23 +25,25 @@ export function InterruptedChatsPrompt() {
 	const count = closed.data?.length ?? 0;
 	if (answered || count === 0) return null;
 
-	const close = (action: () => void) => {
-		setAnswered(true);
-		action();
+	const pending = resume.isPending || keepPaused.isPending;
+	const failed = resume.isError || keepPaused.isError;
+	const answer = (action: typeof resume | typeof keepPaused) => {
+		if (pending) return;
+		action.mutate(undefined, { onSuccess: () => setAnswered(true) });
 	};
 
 	return (
 		<AlertDialog
 			open
 			onOpenChange={(open) => {
-				if (!open) close(() => keepPaused.mutate());
+				if (!open) answer(keepPaused);
 			}}
 		>
 			<AlertDialogContent className="sm:max-w-[360px]">
 				<form
 					onSubmit={(event) => {
 						event.preventDefault();
-						close(() => resume.mutate());
+						answer(resume);
 					}}
 				>
 					<AlertDialogHeader>
@@ -55,21 +57,27 @@ export function InterruptedChatsPrompt() {
 						<AlertDialogDescription>
 							<Plural
 								value={count}
-								one="This chat was running when Paradev closed"
-								other="These chats were running when Paradev closed"
+								one="This chat hadn't finished when Paradev closed"
+								other="These chats hadn't finished when Paradev closed"
 							/>
 						</AlertDialogDescription>
+						{failed && (
+							<p className="text-destructive text-sm">
+								<Trans>Something went wrong. Please try again.</Trans>
+							</p>
+						)}
 					</AlertDialogHeader>
 					<AlertDialogFooter className="mt-4">
 						<Button
 							type="button"
 							variant="ghost"
 							size="sm"
-							onClick={() => close(() => keepPaused.mutate())}
+							disabled={pending}
+							onClick={() => answer(keepPaused)}
 						>
 							<Trans>Keep paused</Trans>
 						</Button>
-						<Button type="submit" size="sm" autoFocus>
+						<Button type="submit" size="sm" autoFocus disabled={pending}>
 							<Trans>Resume</Trans>
 						</Button>
 					</AlertDialogFooter>

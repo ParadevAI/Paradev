@@ -136,6 +136,26 @@ describe("chats a quit cut off", () => {
 		expect(resumed[0]?.prompts).toEqual([queued]);
 	});
 
+	test("a chat with only a paused queue runs it when resumed", async () => {
+		const { runtime, resumed } = fakeRuntime({
+			"chat-1": { closedAt: 0, title: "x" },
+		});
+		const chats = createClosedMidTurn({
+			runtime: () => runtime,
+			resolveCwd: () => "/work",
+		});
+		const queued = [{ type: "text" as const, text: "then the docs" }];
+		chats.add({
+			...CHAT,
+			interrupted: false,
+			prompts: [],
+			pausedPrompts: [queued],
+		});
+
+		expect(await chats.resume()).toBe(1);
+		expect(resumed[0]).toMatchObject({ prompts: [queued], pausedPrompts: [] });
+	});
+
 	test("a resume that fails keeps the chat to try again", async () => {
 		const { runtime } = fakeRuntime(
 			{ "chat-1": { closedAt: 0, title: "x" } },

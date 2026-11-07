@@ -47,11 +47,17 @@ export function createClosedMidTurn(options: {
 
 	const resumeOne = async (chat: ClosedChat, paused: Paused) => {
 		const runtime = options.runtime();
-		const prompts = [...(chat.interrupted ? [CONTINUE] : []), ...chat.prompts];
+		const continued = [
+			...(chat.interrupted ? [CONTINUE] : []),
+			...chat.prompts,
+		];
+		const onlyQueue = continued.length === 0;
+		const prompts = onlyQueue ? chat.pausedPrompts : continued;
+		const pausedPrompts = onlyQueue ? [] : chat.pausedPrompts;
 		if (paused.replaced) {
 			runtime.live
 				.require(paused.sessionId)
-				.promptOnceStarted(prompts, chat.pausedPrompts);
+				.promptOnceStarted(prompts, pausedPrompts);
 			return;
 		}
 		runtime.commands.resumeSession({
@@ -63,7 +69,7 @@ export function createClosedMidTurn(options: {
 			modelId: chat.modelId,
 			cwd: options.resolveCwd(chat.scopeId),
 			prompts,
-			pausedPrompts: chat.pausedPrompts,
+			pausedPrompts,
 			replacesSessionId: chat.sessionId,
 		});
 		await runtime.commands.closeSession({ sessionId: chat.sessionId });

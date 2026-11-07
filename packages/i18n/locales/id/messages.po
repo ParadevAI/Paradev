@@ -919,8 +919,8 @@ msgstr "{count, plural, one {# otomatisasi dikeluarkan dari grupnya} other {# ot
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Lanjutkan # chat?} other {Lanjutkan # chat?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Chat ini sedang berjalan saat Paradev ditutup} other {Chat-chat ini sedang berjalan saat Paradev ditutup}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Chat ini belum selesai saat Paradev ditutup} other {Chat-chat ini belum selesai saat Paradev ditutup}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Memakai # sumber} other {Memakai # sumber}}"
@@ -15177,6 +15177,9 @@ msgstr "Antrean dijeda karena Anda menginterupsi"
 
 msgid "Queue paused by the usage limit"
 msgstr "Antrean dijeda oleh batas penggunaan"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Antrean dijeda saat Paradev ditutup"
 
 msgid "Queue work for agents"
 msgstr "Antrekan pekerjaan untuk agen"

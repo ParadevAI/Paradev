@@ -919,8 +919,8 @@ msgstr "{count, plural, one {# automatisation retirée de son groupe} other {# a
 msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
 msgstr "{count, plural, one {Reprendre # chat ?} other {Reprendre # chats ?}}"
 
-msgid "{count, plural, one {This chat was running when Paradev closed} other {These chats were running when Paradev closed}}"
-msgstr "{count, plural, one {Ce chat était en cours à la fermeture de Paradev} other {Ces chats étaient en cours à la fermeture de Paradev}}"
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Ce chat n’était pas terminé à la fermeture de Paradev} other {Ces chats n’étaient pas terminés à la fermeture de Paradev}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# source utilisée} other {# sources utilisées}}"
@@ -15177,6 +15177,9 @@ msgstr "File en pause car vous avez interrompu"
 
 msgid "Queue paused by the usage limit"
 msgstr "File en pause à cause de la limite d'utilisation"
+
+msgid "Queue paused when Paradev closed"
+msgstr "File en pause à la fermeture de Paradev"
 
 msgid "Queue work for agents"
 msgstr "Mettre du travail en file d'attente pour les agents"

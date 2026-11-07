@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { realpath } from "node:fs/promises";
 import { resolve, win32 } from "node:path";
 import {
+	deriveQueuedPrompts,
 	deriveTimeline,
 	emptySnapshot,
 	outlineSnapshot,
@@ -136,9 +137,10 @@ function lastAgentMessageId(events: DurableEvent[]): string | null {
 function transcriptBefore(
 	snapshot: SessionSnapshot,
 	itemId: string,
+	harness: string,
 ): { events: DurableEvent[]; midTurn: boolean } | null {
 	const events: DurableEvent[] = [];
-	for (const group of deriveTimeline(snapshot)) {
+	for (const group of deriveTimeline(snapshot, { harness })) {
 		const items = group.entries.flatMap((entry) =>
 			entry.kind === "tool_run" ? entry.items : [entry.item],
 		);
@@ -188,7 +190,15 @@ function carriedFrom(
 		)
 			hiddenStopKeys.add(replayKey(item.id));
 	}
-	return { turn: failedLastTurn(snapshot), canceledToolIds, hiddenStopKeys };
+	const queued = deriveQueuedPrompts(snapshot)
+		.sort((a, b) => a.startedAtMs - b.startedAtMs)
+		.map((message) => message.content);
+	return {
+		turn: failedLastTurn(snapshot),
+		canceledToolIds,
+		hiddenStopKeys,
+		queued,
+	};
 }
 
 /** A turn that ended without the user asking stays visible in the session that replaces it. */
@@ -698,7 +708,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					if (!source || !replay.ok) {
 						throw new Error(`chat session ${parsed.sessionId} is not running`);
 					}
-					const before = transcriptBefore(replay.snapshot, parsed.itemId);
+					const before = transcriptBefore(
+						replay.snapshot,
+						parsed.itemId,
+						source.harness,
+					);
 					if (!before) {
 						throw new Error(
 							`message ${parsed.itemId} is not in chat session ${parsed.sessionId}`,
