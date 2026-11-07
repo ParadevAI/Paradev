@@ -150,7 +150,7 @@ describe("watchSingleFile", () => {
 		await waitFor(events, (e) => e.kind === "create");
 	}, 15_000);
 
-	it.skipIf(process.getuid?.() === 0)(
+	it.skipIf(process.platform === "win32" || process.getuid?.() === 0)(
 		"stays silent while polling an unchanged file it cannot watch",
 		async () => {
 			const file = await createTempFile();
