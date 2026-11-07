@@ -4,7 +4,6 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { claudeProjectDirName } from "@superset/agent-setup/claude-project-links";
-import type { AgentDefinitionId } from "@superset/shared/agent-catalog";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
@@ -15,6 +14,7 @@ import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "../../../terminal-agents";
+import type { HostAgentConfigId } from "../../../terminal-agents/types";
 import { importCloudAttachments } from "../attachments/attachments";
 import {
 	type AttachmentMetadata,
@@ -40,7 +40,7 @@ import {
 } from "./agents";
 
 const argvConfig = {
-	id: "00000000-0000-0000-0000-000000000001",
+	id: "00000000-0000-0000-0000-000000000001" as HostAgentConfigId,
 	presetId: "claude",
 	label: "Claude",
 	command: "claude",
@@ -53,7 +53,7 @@ const argvConfig = {
 };
 
 const stdinConfig = {
-	id: "00000000-0000-0000-0000-000000000002",
+	id: "00000000-0000-0000-0000-000000000002" as HostAgentConfigId,
 	presetId: "amp",
 	label: "Amp",
 	command: "amp",
@@ -1042,7 +1042,7 @@ describe("custom agent resume", () => {
 			eventType: "Stop",
 			agentId: "claude",
 			agentSessionId: "sess-1",
-			definitionId: CUSTOM_ID as AgentDefinitionId,
+			definitionId: CUSTOM_ID as HostAgentConfigId,
 			occurredAt: Date.now(),
 		});
 		store.markTerminalExited(TERMINAL_ID);
@@ -1064,7 +1064,34 @@ describe("custom agent resume", () => {
 		);
 
 		expect(runCalls).toMatchObject([
-			{ agent: CUSTOM_ID, resumeSessionId: "sess-1" },
+			{ agent: CUSTOM_ID, resumeSessionId: "sess-1", resumeAgentId: "claude" },
+		]);
+	});
+
+	it("binds a resumed custom session at launch under the harness that reported it", () => {
+		const db = createTestDb();
+		seedClaudeAndWrapper(db);
+		const store = new TerminalAgentStore();
+
+		bindResumedSession(
+			{ db, terminalAgentStore: store },
+			{
+				workspaceId: WORKSPACE_ID,
+				agent: CUSTOM_ID,
+				prompt: "",
+				resumeSessionId: "sess-1",
+				resumeAgentId: "claude",
+			},
+			TERMINAL_ID,
+		);
+
+		expect(store.list()).toMatchObject([
+			{
+				terminalId: TERMINAL_ID,
+				agentId: "claude",
+				agentSessionId: "sess-1",
+				definitionId: CUSTOM_ID,
+			},
 		]);
 	});
 });

@@ -1,9 +1,6 @@
 import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
 import { attachedFilesBlock } from "@superset/chat-runtime";
-import {
-	type AgentDefinitionId,
-	isBuiltinAgentId,
-} from "@superset/shared/agent-catalog";
+import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
 	buildAgentEffortArgs,
@@ -39,6 +36,7 @@ import {
 } from "../../../terminal/terminal";
 import type {
 	TerminalAgentBinding,
+	TerminalAgentId,
 	TerminalAgentStore,
 } from "../../../terminal-agents";
 import {
@@ -150,6 +148,8 @@ export interface AgentRunInput {
 	/** Session id of a previous run of this agent to restore (e.g. a killed
 	 * session's `agentSessionId`). The prompt may be empty when resuming. */
 	resumeSessionId?: string;
+	/** The harness the resumed session ran under, which a custom config cannot name. */
+	resumeAgentId?: TerminalAgentId;
 	/** Session id to clone into a new provider-owned session. */
 	forkSessionId?: string;
 	/**
@@ -503,15 +503,19 @@ export function bindResumedSession(
 ): void {
 	if (!input.resumeSessionId) return;
 	const config = resolveHostAgentConfig(ctx.db, input.agent);
-	if (!config || !isBuiltinAgentId(config.presetId)) return;
+	if (!config) return;
+	const agentId = isBuiltinAgentId(config.presetId)
+		? config.presetId
+		: input.resumeAgentId;
+	if (!agentId) return;
 
 	ctx.terminalAgentStore.recordEvent({
 		terminalId,
 		workspaceId: input.workspaceId,
 		eventType: "Attached",
-		agentId: config.presetId,
+		agentId,
 		agentSessionId: input.resumeSessionId,
-		definitionId: config.id as AgentDefinitionId,
+		definitionId: config.id,
 		occurredAt: Date.now(),
 	});
 }
@@ -548,11 +552,11 @@ async function runTerminalAgent(
 /**
  * The agent identity a terminal reports once this config launches in it.
  *
- * A binding recorded by the lifecycle hook carries no instance: the wrapper
- * Superset installs for a binary exports that binary's builtin id as
- * `SUPERSET_AGENT_ID` and the session hook never reports a definition, so a
- * custom agent running `claude` arrives looking exactly like a preset one.
- * That is the granularity such a binding has, which is what this returns.
+ * A binding with no `definitionId` (an agent started by hand, or a host whose
+ * notify.sh predates `SUPERSET_AGENT_DEFINITION_ID`) carries no instance: the
+ * wrapper exports the binary's builtin id as `SUPERSET_AGENT_ID`, so a custom
+ * agent running `claude` arrives looking exactly like a preset one. That is
+ * the granularity such a binding has, which is what this returns.
  */
 function launchIdentity(config: ResolvedHostAgentConfig): string {
 	if (isBuiltinAgentId(config.presetId)) return config.presetId;

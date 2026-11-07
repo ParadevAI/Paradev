@@ -1,6 +1,5 @@
 import { EventEmitter } from "node:events";
 import type { BackgroundTask } from "@superset/chat/protocol";
-import type { AgentDefinitionId } from "@superset/shared/agent-catalog";
 import {
 	getSubagentHarness,
 	readSubagentTranscript,
@@ -9,6 +8,7 @@ import {
 import type { SubagentTranscript } from "./subagent-transcript";
 import { isTrustedTranscriptPath } from "./transcript-path";
 import type {
+	BindingDefinitionId,
 	TerminalAgentBinding,
 	TerminalAgentEndReason,
 	TerminalAgentId,
@@ -23,7 +23,7 @@ interface RecordEventInput {
 	eventType: string;
 	agentId?: TerminalAgentId;
 	agentSessionId?: string;
-	definitionId?: AgentDefinitionId;
+	definitionId?: BindingDefinitionId;
 	occurredAt: number;
 }
 
@@ -51,7 +51,7 @@ interface RecordSubagentHookInput {
 
 export interface TerminalAgentBindingListFilter {
 	agentId?: TerminalAgentId;
-	definitionId?: AgentDefinitionId;
+	definitionId?: BindingDefinitionId;
 }
 
 // "Detached" is the agent's own goodbye (SessionEnd hooks, the codex wrapper
@@ -121,7 +121,7 @@ export interface TerminalAgentBindingPersistence {
 	findLiveActive?(
 		workspaceId: string,
 		agentId: TerminalAgentId,
-		definitionId?: AgentDefinitionId,
+		definitionId?: BindingDefinitionId,
 	): TerminalAgentBinding | undefined;
 }
 
@@ -616,7 +616,7 @@ export class TerminalAgentStore extends EventEmitter {
 	findActive(
 		workspaceId: string,
 		agentId: TerminalAgentId,
-		definitionId?: AgentDefinitionId,
+		definitionId?: BindingDefinitionId,
 	): TerminalAgentBinding | undefined {
 		if (this.persistence?.findLiveActive) {
 			return this.persistence.findLiveActive(

@@ -2,9 +2,10 @@ import { asc, eq } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { hostAgentConfigs } from "../db/schema";
 import { resolveDefaultAccountEnv } from "../trpc/router/usage/default-account";
+import type { HostAgentConfigId } from "./types";
 
 export interface ResolvedHostAgentConfig {
-	id: string;
+	id: HostAgentConfigId;
 	presetId: string;
 	label: string;
 	command: string;
@@ -52,7 +53,7 @@ function rowToConfig(
 	row: typeof hostAgentConfigs.$inferSelect,
 ): ResolvedHostAgentConfig {
 	return {
-		id: row.id,
+		id: row.id as HostAgentConfigId,
 		presetId: row.presetId,
 		label: row.label,
 		command: row.command,
