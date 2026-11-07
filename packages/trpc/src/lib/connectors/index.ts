@@ -687,6 +687,7 @@ export {
 	connectorConnections,
 	orgConnection,
 	userConnection,
+	userConnections,
 } from "./lookup";
 export {
 	ConnectorUnavailableError,
