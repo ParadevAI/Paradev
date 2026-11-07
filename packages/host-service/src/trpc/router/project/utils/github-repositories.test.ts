@@ -71,26 +71,44 @@ test("rejects invalid clone URLs on later pages instead of returning partial res
 	expect(page).toBe(2);
 });
 
-test("bounds the whole walk with one budget and stops before a page with no time left", async () => {
-	let clock = 0;
-	const timeouts: (number | undefined)[] = [];
+test("times out while a page is still running once the walk's budget ends", async () => {
+	const budget = new AbortController();
+	const signals: (AbortSignal | undefined)[] = [];
 	const walk = listGitHubRepositories(
 		async (_args, options) => {
-			timeouts.push(options?.timeout);
-			clock += 5_000;
-			if (timeouts.length > 10) return [];
-			return Array.from({ length: 100 }, (_, index) => ({
-				full_name: `owner/repo-${index}`,
-				clone_url: `https://github.com/owner/repo-${index}.git`,
-			}));
+			signals.push(options?.signal);
+			if (signals.length === 1) {
+				return Array.from({ length: 100 }, (_, index) => ({
+					full_name: `owner/repo-${index}`,
+					clone_url: `https://github.com/owner/repo-${index}.git`,
+				}));
+			}
+			budget.abort();
+			return new Promise((resolve) => setTimeout(() => resolve([]), 0));
 		},
-		{ deadlineMs: 15_000, now: () => clock },
+		{ signal: budget.signal },
 	);
 	await expect(walk).rejects.toMatchObject({
 		code: "TIMEOUT",
 		message: expect.stringContaining("timed out"),
 	});
-	expect(timeouts).toEqual([10_000, 10_000, 5_000]);
+	expect(signals).toEqual([budget.signal, budget.signal]);
+});
+
+test("does not start a page after the walk's budget ends", async () => {
+	const budget = new AbortController();
+	budget.abort();
+	let calls = 0;
+	await expect(
+		listGitHubRepositories(
+			async () => {
+				calls++;
+				return [];
+			},
+			{ signal: budget.signal },
+		),
+	).rejects.toMatchObject({ code: "TIMEOUT" });
+	expect(calls).toBe(0);
 });
 
 test("explains a page that timed out instead of showing the gh command", async () => {

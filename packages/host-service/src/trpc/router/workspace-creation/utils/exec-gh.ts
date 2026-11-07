@@ -4,8 +4,6 @@ import { getToolEnvironment } from "../../../../terminal/clean-shell-env";
 
 const execFileAsync = promisify(execFile);
 
-export const GH_TIMEOUT_MS = 10_000;
-
 export interface ExecGhOptions {
 	cwd?: string;
 	timeout?: number;
@@ -13,6 +11,7 @@ export interface ExecGhOptions {
 	maxBuffer?: number;
 	/** Written to stdin, for bodies too long for one argv element. */
 	input?: string;
+	signal?: AbortSignal;
 }
 
 /**
@@ -28,14 +27,16 @@ export type ExecGh = (
 
 export const execGh: ExecGh = async (args, options) => {
 	const env = await getToolEnvironment();
+	options?.signal?.throwIfAborted();
 	const child = execFileAsync("gh", args, {
 		encoding: "utf8",
-		timeout: options?.timeout ?? GH_TIMEOUT_MS,
+		timeout: options?.timeout ?? 10_000,
 		// Node's 1MB default dies on large REST payloads (open-PR sweeps of
 		// busy repos exceed it even paginated).
 		maxBuffer: options?.maxBuffer ?? 10 * 1024 * 1024,
 		cwd: options?.cwd,
 		env,
+		signal: options?.signal,
 	});
 	if (options?.input !== undefined) child.child.stdin?.end(options.input);
 	const { stdout } = await child;
