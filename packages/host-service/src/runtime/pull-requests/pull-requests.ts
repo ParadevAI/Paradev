@@ -13,7 +13,10 @@ import {
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
-import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
+import {
+	type ExecGh,
+	GH_TIMEOUT_MS,
+} from "../../trpc/router/workspace-creation/utils/exec-gh";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
 import {
@@ -61,8 +64,6 @@ import {
 
 // gh's timeout runs from spawn, so an unbounded burst times out healthy calls.
 const MAX_CONCURRENT_GITHUB_LOOKUPS = 8;
-// Octokit has no request timeout; this matches gh's so a hung fallback frees its slot.
-const OCTOKIT_TIMEOUT_MS = 10_000;
 // Long-cadence sweep that catches anything `GitWatcher` might miss
 // (overflow, fs.watch errors, transient watcher failures). Steady-state
 // branch syncs are event-driven via `GitWatcher.onChanged`; this is a
@@ -328,7 +329,7 @@ export class PullRequestRuntimeManager {
 			options.readWorkspaceRefs ??
 			(async (worktreePath) => readWorkspaceRefs(await this.git(worktreePath)));
 		this.worktreeExists = options.worktreeExists ?? existsSync;
-		this.octokitTimeoutMs = options.octokitTimeoutMs ?? OCTOKIT_TIMEOUT_MS;
+		this.octokitTimeoutMs = options.octokitTimeoutMs ?? GH_TIMEOUT_MS;
 	}
 
 	start() {
