@@ -7938,6 +7938,12 @@ msgstr "Кожного буднього дня о 9:00 читай нові issue
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Усі сперечаються, чи це узагальнюється. Саме ця суперечка свідчить, що рівня досягнуто."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Усі в цій організації використовують цей обліковий запис."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Усі в цій організації використовують це підключення."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Усі бачать нові версії одразу після публікації"
 
@@ -13493,6 +13499,12 @@ msgstr "Лише ви"
 msgid "Only you can see this page"
 msgstr "Цю сторінку бачите лише ви"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Лише ви можете використовувати ці облікові записи. Колеги підключають власні."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Лише ви можете використовувати це підключення. Колеги підключають власні облікові записи {name}."
+
 msgid "open"
 msgstr "відкрити"
 
@@ -14609,6 +14621,9 @@ msgstr "Особистий обліковий запис"
 
 msgid "Personal plan"
 msgstr "Особистий тариф"
+
+msgid "Personal to you"
+msgstr "Лише для вас"
 
 msgid "Phantom Forklift"
 msgstr "Примарний навантажувач"
@@ -17781,6 +17796,9 @@ msgstr "Доступно всім"
 
 msgid "Shared with me"
 msgstr "Доступні мені"
+
+msgid "Shared with your organization"
+msgstr "Спільне з вашою організацією"
 
 msgid "Sheet"
 msgstr "Висувна панель"

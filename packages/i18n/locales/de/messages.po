@@ -7944,6 +7944,12 @@ msgstr "Jeden Werktag um 9 Uhr neue GitHub-Issues lesen, Labels vergeben und ein
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Alle streiten darüber, ob sich das verallgemeinern lässt. Genau dieser Streit ist das Zeichen, dass die Stufe erreicht wurde."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Alle in dieser Organisation nutzen dieses Konto."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Alle in dieser Organisation nutzen diese Verbindung."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Alle sehen neue Versionen, sobald sie veröffentlicht werden"
 
@@ -13499,6 +13505,12 @@ msgstr "Nur du"
 msgid "Only you can see this page"
 msgstr "Nur du kannst diese Seite sehen"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Nur du kannst diese Konten nutzen. Teammitglieder verbinden ihre eigenen."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Nur du kannst diese Verbindung nutzen. Teammitglieder verbinden ihre eigenen {name}-Konten."
+
 msgid "open"
 msgstr "öffnen"
 
@@ -14615,6 +14627,9 @@ msgstr "Persönliches Konto"
 
 msgid "Personal plan"
 msgstr "Privat-Abo"
+
+msgid "Personal to you"
+msgstr "Nur für dich"
 
 msgid "Phantom Forklift"
 msgstr "Phantom-Gabelstapler"
@@ -17787,6 +17802,9 @@ msgstr "Mit allen geteilt"
 
 msgid "Shared with me"
 msgstr "Mit mir geteilt"
+
+msgid "Shared with your organization"
+msgstr "Mit deiner Organisation geteilt"
 
 msgid "Sheet"
 msgstr "Sheet"

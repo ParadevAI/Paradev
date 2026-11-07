@@ -13,6 +13,7 @@ import {
 	encryptOptional,
 	encryptSecret,
 } from "../../router/plugins/crypto";
+import { isOneOrganizationPerAccount } from "./account-routing";
 import type { ConnectorIdentity, ConnectorTokens } from "./index";
 import { userConnection } from "./lookup";
 import {
@@ -20,7 +21,10 @@ import {
 	pinTriggersToExistingAccount,
 } from "./trigger-pins";
 
-export type ConnectionConflict = { ownerEmail: string | null };
+export type ConnectionConflict = {
+	ownerEmail: string | null;
+	ownerOrganizationId: string | null;
+};
 
 export async function connectionConflict(
 	connector: string,
@@ -28,7 +32,10 @@ export async function connectionConflict(
 	organizationId: string,
 ): Promise<ConnectionConflict | null> {
 	const [conflict] = await db
-		.select({ email: users.email })
+		.select({
+			email: users.email,
+			organizationId: connections.organizationId,
+		})
 		.from(connections)
 		.innerJoin(users, eq(users.id, connections.connectedByUserId))
 		.where(
@@ -40,7 +47,12 @@ export async function connectionConflict(
 			),
 		)
 		.limit(1);
-	return conflict ? { ownerEmail: conflict.email } : null;
+	return conflict
+		? {
+				ownerEmail: conflict.email,
+				ownerOrganizationId: conflict.organizationId,
+			}
+		: null;
 }
 
 export type UpsertConnectionResult =
@@ -62,12 +74,18 @@ export async function upsertConnection(input: {
 }): Promise<UpsertConnectionResult> {
 	const { connector, slug, organizationId, userId, tokens, identity } = input;
 
-	const conflict = await connectionConflict(
-		slug,
-		identity.account.id,
-		organizationId,
-	);
-	if (conflict) return { conflict };
+	const conflict = isOneOrganizationPerAccount(slug, connector)
+		? await connectionConflict(slug, identity.account.id, organizationId)
+		: null;
+	if (conflict) {
+		console.warn(`[connectors/${slug}] account already linked`, {
+			organizationId,
+			userId,
+			externalAccountId: identity.account.id,
+			ownerOrganizationId: conflict.ownerOrganizationId,
+		});
+		return { conflict };
+	}
 
 	const ownerKind = connector.scope;
 	const target =
@@ -148,7 +166,8 @@ export async function upsertConnection(input: {
 			})
 			.returning({ id: connections.id });
 
-		if (!row) return { conflict: { ownerEmail: null } };
+		if (!row)
+			return { conflict: { ownerEmail: null, ownerOrganizationId: null } };
 
 		if (ownerKind === "user") {
 			await pinTriggersToExistingAccount({

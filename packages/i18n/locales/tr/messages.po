@@ -7944,6 +7944,12 @@ msgstr "Her hafta içi 09.00'da yeni GitHub issue'larını oku, etiket uygula ve
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Herkes bunun genellenebilir olup olmadığını tartışır. Bu tartışma, düzeye ulaşıldığının işaretidir."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Bu kuruluştaki herkes bu hesabı kullanır."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Bu kuruluştaki herkes bu bağlantıyı kullanır."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Herkes yeni sürümleri yayımlandıkça görür"
 
@@ -13499,6 +13505,12 @@ msgstr "Yalnızca siz"
 msgid "Only you can see this page"
 msgstr "Bu sayfayı yalnızca siz görebilirsiniz"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Bu hesapları yalnızca siz kullanabilirsiniz. Ekip arkadaşlarınız kendi hesaplarını bağlar."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Bu bağlantıyı yalnızca siz kullanabilirsiniz. Ekip arkadaşlarınız kendi {name} hesaplarını bağlar."
+
 msgid "open"
 msgstr "aç"
 
@@ -14615,6 +14627,9 @@ msgstr "Kişisel hesap"
 
 msgid "Personal plan"
 msgstr "Kişisel plan"
+
+msgid "Personal to you"
+msgstr "Yalnızca size özel"
 
 msgid "Phantom Forklift"
 msgstr "Hayalet Forklift"
@@ -17787,6 +17802,9 @@ msgstr "Herkesle paylaşıldı"
 
 msgid "Shared with me"
 msgstr "Benimle paylaşılanlar"
+
+msgid "Shared with your organization"
+msgstr "Kuruluşunuzla paylaşılır"
 
 msgid "Sheet"
 msgstr "Sayfa"
