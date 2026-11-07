@@ -477,13 +477,11 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 
 	const workspaceList = (
 		<>
-			{(isCollapsed || !workspacesListCollapsed) && (
-				<DashboardSidebarPinnedSection
-					pinnedWorkspaces={displayedPinnedWorkspaces}
-					isCollapsed={isCollapsed}
-					onWorkspaceHover={refreshWorkspacePullRequest}
-				/>
-			)}
+			<DashboardSidebarPinnedSection
+				pinnedWorkspaces={displayedPinnedWorkspaces}
+				isCollapsed={isCollapsed}
+				onWorkspaceHover={refreshWorkspacePullRequest}
+			/>
 			<DashboardSidebarSessionsSection
 				sessionWorkspaces={displayedSessionWorkspaces}
 				isCollapsed={isCollapsed}
