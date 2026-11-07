@@ -119,7 +119,7 @@ describe("AttachmentImage", () => {
 				throw new Error("no workspace");
 			},
 		);
-		await waitFor(() => view.getByText("big.png"));
+		await waitFor(() => view.getByTitle("big.png"));
 		expect(view.queryByRole("button", tile)).toBeNull();
 	});
 
@@ -128,7 +128,7 @@ describe("AttachmentImage", () => {
 			() => read(false),
 			() => ({ worktreePath: null }),
 		);
-		await waitFor(() => view.getByText("big.png"));
+		await waitFor(() => view.getByTitle("big.png"));
 	});
 
 	test("a failed read of a file over the cap says so in the overlay", async () => {

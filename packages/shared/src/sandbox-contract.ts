@@ -88,7 +88,7 @@ export const sandboxIdentitySchema = z.object({
 	 * The repositories this workspace checks out, as JSON
 	 * (`sandboxRepositoriesSchema`): each at `<workspace>/<path>` on its
 	 * branch. The first is the primary: the one the workspace opens on and
-	 * whose `.superset` config the box runs.
+	 * whose Paradev config the box runs.
 	 */
 	SUPERSET_SANDBOX_REPOSITORIES: z.string().min(2),
 	SUPERSET_SANDBOX_PLUGINS: z.string().min(2).optional(),
@@ -108,6 +108,8 @@ export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_AGENT_SURFACE: z.enum(["terminal", "chat"]).optional(),
 	/** Automation run that created this box; absent for a manual launch. */
 	SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID: z.string().uuid().optional(),
+	/** The terminal id the creator promised; the agent launches under it. */
+	SUPERSET_SANDBOX_AGENT_TERMINAL_ID: z.string().uuid().optional(),
 });
 
 export type SandboxIdentity = z.infer<typeof sandboxIdentitySchema>;

@@ -11,9 +11,9 @@ import { SharedComponentsSection } from "./components/SharedComponentsSection";
 import { SupersetSection } from "./components/SupersetSection";
 
 export const metadata: Metadata = {
-	title: "Design · Superset components",
+	title: "Design · Paradev components",
 	description:
-		"Superset's custom components: originals, AI elements, shared app components",
+		"Paradev's custom components: originals, AI elements, shared app components",
 };
 
 export default async function DesignSupersetPage() {
@@ -81,7 +81,7 @@ export default async function DesignSupersetPage() {
 				active="superset"
 				title={i18n._(
 					msg({
-						message: "Superset Components",
+						message: "Paradev Components",
 					}),
 				)}
 				description={
@@ -89,7 +89,7 @@ export default async function DesignSupersetPage() {
 						{i18n._(
 							msg({
 								message:
-									"Everything we built on top of the primitives — Superset originals, the",
+									"Everything we built on top of the primitives — Paradev originals, the",
 							}),
 						)}{" "}
 						<code className="font-mono text-foreground">ai-elements</code>{" "}

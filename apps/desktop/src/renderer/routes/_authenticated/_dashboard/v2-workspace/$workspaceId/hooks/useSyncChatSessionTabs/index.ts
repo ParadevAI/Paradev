@@ -1,0 +1,1 @@
+export { useSyncChatSessionTabs } from "./useSyncChatSessionTabs";

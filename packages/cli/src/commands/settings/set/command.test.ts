@@ -145,7 +145,7 @@ describe("hideEmptySidebarProjects", () => {
 		await expect(
 			invoke(setCommand, { key: "hideEmptySidebarProjects", value: "true" }),
 		).rejects.toMatchObject({
-			suggestion: expect.stringMatching(/Update the Superset desktop app/),
+			suggestion: expect.stringMatching(/Update the Paradev desktop app/),
 		});
 		await invoke(setCommand, { key: "confirmOnQuit", value: "false" });
 		const confirm = (await invoke(getCommand, { key: "confirmOnQuit" })) as {

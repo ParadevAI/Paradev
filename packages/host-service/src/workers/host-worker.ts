@@ -5,6 +5,7 @@
 import { parentPort, workerData } from "node:worker_threads";
 import type { WorkerTaskDefinition } from "./define-worker-task.ts";
 import { startGitDirectoryWorker } from "./git-directory-worker.ts";
+import { checkpointTasks } from "./tasks/checkpoints.ts";
 import { gitTasks } from "./tasks/git.ts";
 import { harnessTasks } from "./tasks/harness.ts";
 import { usageTasks } from "./tasks/usage.ts";
@@ -24,6 +25,7 @@ if (!parentPort) {
 // biome-ignore lint/suspicious/noExplicitAny: heterogenous task registry; typing is enforced at the defineWorkerTask/run() boundary
 const registry = new Map<string, WorkerTaskDefinition<any, unknown>>();
 for (const def of [
+	...checkpointTasks,
 	...gitTasks,
 	...harnessTasks,
 	...usageTasks,

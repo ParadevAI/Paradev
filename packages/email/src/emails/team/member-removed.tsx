@@ -1,4 +1,4 @@
-import { Heading, Text } from "@react-email/components";
+import { Text } from "@react-email/components";
 import { EmailLayout } from "../../components";
 
 interface MemberRemovedEmailProps {
@@ -14,17 +14,13 @@ export function MemberRemovedEmail({
 }: MemberRemovedEmailProps) {
 	return (
 		<EmailLayout preview={`You've been removed from ${organizationName}`}>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				You've been removed from {organizationName}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {memberName ?? "there"},
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				{removedByName} has removed you from <strong>{organizationName}</strong>{" "}
-				on Superset.
+				on Paradev.
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
@@ -32,8 +28,8 @@ export function MemberRemovedEmail({
 			</Text>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
-				If you believe this was a mistake, please contact {removedByName} or
-				your team administrator.
+				If this was a mistake, please contact {removedByName} or your team
+				administrator.
 			</Text>
 		</EmailLayout>
 	);

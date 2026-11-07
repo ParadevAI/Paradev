@@ -1,1 +1,5 @@
-export { compareWorkspaces, workspaceActivityAt } from "./sortWorkspaces";
+export {
+	compareWorkspaces,
+	compareWorkspacesBy,
+	workspaceActivityAt,
+} from "./sortWorkspaces";

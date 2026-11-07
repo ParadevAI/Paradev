@@ -4,6 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import {
+	advertisedGbMinutesPerSeat,
 	familyForPlan,
 	gbHourPackPricePerGbHour,
 	offersYearlyDiscount,
@@ -13,7 +14,6 @@ import {
 	seatPricePerMonth,
 } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
-import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
@@ -74,7 +74,6 @@ type ComparisonRow = {
 	values: [free: ComparisonValue, paid: ComparisonValue, enterprise: ComparisonValue];
 	cloudGbHours?: boolean;
 	cloudPack?: boolean;
-	badge?: { label: MessageDescriptor; variant: "default" | "secondary" };
 };
 
 type ComparisonSection = {
@@ -198,7 +197,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 				}),
 				values: [null, null, msg({ message: "Custom" })],
 				cloudGbHours: true,
-				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 			{
 				label: msg({
@@ -206,7 +204,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 				}),
 				values: [null, null, msg({ message: "Custom" })],
 				cloudPack: true,
-				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 		],
 	},
@@ -435,11 +432,13 @@ function PlansPage() {
 		plan: PlanCardData,
 	): ComparisonValue | string => {
 		if (row.cloudGbHours && plan.family) {
-			const gbMinutes = plan.family.gbMinutesPerSeat;
+			const gbMinutes = advertisedGbMinutesPerSeat(plan.family);
 			return gbMinutes ? formatNumber(gbMinutes / 60) : null;
 		}
 		if (row.cloudPack && plan.family) {
-			const pack = plan.family.pack;
+			const pack = advertisedGbMinutesPerSeat(plan.family)
+				? plan.family.pack
+				: null;
 			return pack
 				? t({
 						message: `${formatCurrency(gbHourPackPricePerGbHour(pack), PLAN_PRICE_CURRENCY, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} per GB-hour`,
@@ -844,14 +843,6 @@ function PlansPage() {
 													</a>
 												) : (
 													i18n._(row.label)
-												)}
-												{row.badge && (
-													<Badge
-														variant={row.badge.variant}
-														className="px-1.5 py-0 text-[10px] font-medium"
-													>
-														{i18n._(row.badge.label)}
-													</Badge>
 												)}
 											</div>
 											{planCards.map((plan) => (

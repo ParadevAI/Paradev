@@ -35,9 +35,25 @@ export const chatSessionsLocal = sqliteTable(
 		title: text(),
 		queuedCount: integer("queued_count").notNull().default(0),
 		updatedAt: integer("updated_at").notNull(),
+		closedAt: integer("closed_at").default(0),
+		closedByUser: integer("closed_by_user", { mode: "boolean" })
+			.notNull()
+			.default(false),
 	},
 	(table) => [index("chat_sessions_local_scope_id_idx").on(table.scopeId)],
 );
 
 export type JournalRow = typeof chatJournal.$inferSelect;
 export type ChatSessionRow = typeof chatSessionsLocal.$inferSelect;
+
+/** The model, effort and mode the user last picked for each harness. */
+export const chatSelections = sqliteTable(
+	"chat_selections",
+	{
+		harness: text().notNull(),
+		category: text().notNull(),
+		value: text().notNull(),
+		updatedAt: integer("updated_at").notNull(),
+	},
+	(table) => [primaryKey({ columns: [table.harness, table.category] })],
+);

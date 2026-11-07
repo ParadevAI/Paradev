@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
 import { type ReactNode, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { View } from "react-native";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
 
@@ -34,7 +35,7 @@ export function WorkspaceRowMenu({
 	children: ReactNode;
 }) {
 	const { t } = useLingui();
-	const rowRef = useRef<View>(null);
+	const rowRef = useRef<ViewInstance>(null);
 	// Tap navigation lives on the row itself; the Link exists solely because
 	// Link.Menu must be a direct child of Link, so tap is a no-op here.
 	return (

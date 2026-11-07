@@ -19,9 +19,8 @@ const HERO_SCALE = 1.08;
 const HERO_Y = 56;
 
 export function ProductDemo() {
-	const [activeOption, setActiveOption] = useState<ActiveDemo>(
-		"Orchestrate Parallel Agents",
-	);
+	const [activeOption, setActiveOption] =
+		useState<ActiveDemo>("Cloud Workspaces");
 	const { t } = useLingui();
 
 	// Scroll-scrubbed progress, tied 1:1 to scroll so it never drifts
@@ -112,7 +111,7 @@ export function ProductDemo() {
 							}}
 						/>
 						<div className="relative overflow-x-auto scrollbar-hide max-md:[mask-image:linear-gradient(to_right,black_88%,transparent)]">
-							<AppMockup activeDemo={activeOption} />
+							<AppMockup activeDemo={activeOption} edgeGlare />
 						</div>
 					</m.div>
 				</m.div>

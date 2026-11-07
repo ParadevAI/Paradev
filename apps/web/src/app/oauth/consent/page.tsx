@@ -35,7 +35,7 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 					<a href={env.NEXT_PUBLIC_MARKETING_URL}>
 						<Image
 							src="/title.svg"
-							alt="Superset"
+							alt="Paradev"
 							width={140}
 							height={24}
 							priority
@@ -88,7 +88,7 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 				<a href={env.NEXT_PUBLIC_MARKETING_URL}>
 					<Image
 						src="/title.svg"
-						alt="Superset"
+						alt="Paradev"
 						width={140}
 						height={24}
 						priority

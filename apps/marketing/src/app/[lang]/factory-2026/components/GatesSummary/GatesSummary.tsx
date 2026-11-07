@@ -40,15 +40,9 @@ export function GatesSummary({ scores }: GatesSummaryProps) {
 	const closedCount = counts.closed;
 	const total = scores.length;
 	const countLabels: Record<GateStatus, string> = {
-		open: t({
-			message: `${openCount} open`,
-		}),
-		partial: t({
-			message: `${partialCount} partial`,
-		}),
-		closed: t({
-			message: `${closedCount} closed`,
-		}),
+		open: t`${openCount} open`,
+		partial: t`${partialCount} partial`,
+		closed: t`${closedCount} closed`,
 	};
 
 	return (
@@ -62,9 +56,7 @@ export function GatesSummary({ scores }: GatesSummaryProps) {
 						<GateJumpLink
 							key={score.gateId}
 							targetId={`gate-${score.gateId}`}
-							title={t({
-								message: `${level} · ${gate} · ${statusLabel}`,
-							})}
+							title={t`${level} · ${gate} · ${statusLabel}`}
 							className={`h-3 flex-1 hover:outline hover:outline-1 hover:outline-brand ${SEGMENT_CLASSES[score.status]}`}
 						>
 							<span className="sr-only">

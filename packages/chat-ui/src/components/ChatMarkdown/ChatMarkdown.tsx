@@ -1,8 +1,11 @@
+import { fenceState } from "@superset/chat/core";
 import { cn } from "@superset/ui/utils";
 import type { ComponentProps, FunctionComponent, JSX, ReactNode } from "react";
 import { createElement, memo, useMemo } from "react";
 import type { Components, ExtraProps, StreamdownProps } from "streamdown";
 import { defaultRemarkPlugins, Streamdown } from "streamdown";
+import { TABLE_CLASSNAME, TABLE_SCROLLER_CLASSNAME } from "./constants";
+import { separateOrderedLists } from "./utils/separateOrderedLists";
 
 /**
  * Streamdown's `Components` is an intersection — per-tag props on one side, an
@@ -11,7 +14,10 @@ import { defaultRemarkPlugins, Streamdown } from "streamdown";
  * to the tag. `node` is the markdown AST node, which belongs to the renderer
  * rather than to the DOM.
  */
-type RendererProps = ExtraProps & { className?: unknown; children?: ReactNode };
+export type RendererProps = ExtraProps & {
+	className?: unknown;
+	children?: ReactNode;
+};
 type MarkdownRenderer = FunctionComponent<RendererProps>;
 
 function ownClassName(className: unknown): string | null {
@@ -56,11 +62,8 @@ function Link({
 
 function Table({ node: _node, className, children, ...rest }: RendererProps) {
 	return (
-		<div className="mb-2 max-w-full overflow-x-auto">
-			<table
-				{...rest}
-				className={cn("border border-border", ownClassName(className))}
-			>
+		<div className={cn("mb-2", TABLE_SCROLLER_CLASSNAME)}>
+			<table {...rest} className={cn(TABLE_CLASSNAME, ownClassName(className))}>
 				{children}
 			</table>
 		</div>
@@ -117,6 +120,10 @@ export const chatMarkdownComponents = {
 	hr: Rule,
 } satisfies Components;
 
+// The default placeholder href is blocked by Streamdown's URL filter, which
+// shows a half-written link as "label [blocked]" until its URL closes.
+const REMEND_OPTIONS = { linkMode: "text-only" } as const;
+
 /** For the root that opens a message: nothing above it to make room for. */
 export const chatMarkdownFirstBlock = "[&>:first-child]:pt-0";
 
@@ -127,6 +134,8 @@ export type ChatMarkdownProps = {
 	components?: Components;
 	/** Remark plugins a surface runs after Streamdown's own. */
 	remarkPlugins?: NonNullable<StreamdownProps["remarkPlugins"]>;
+	/** The text is finished, so an unclosed `*` or `**` is literal, not formatting still arriving. */
+	complete?: boolean;
 };
 
 /** One block of agent markdown, rendered the way every chat surface does. */
@@ -135,6 +144,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 	className,
 	components,
 	remarkPlugins,
+	complete = false,
 }: ChatMarkdownProps): ReactNode {
 	const merged = useMemo(
 		() =>
@@ -143,6 +153,10 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 				: chatMarkdownComponents,
 		[components],
 	);
+	// Streamdown tells a code renderer its fence is still open only while
+	// the text is animating; a block that ends inside a fence is exactly that.
+	const fenceOpen = useMemo(() => fenceState(children).open, [children]);
+	const markdown = useMemo(() => separateOrderedLists(children), [children]);
 	const mergedRemarkPlugins = useMemo(
 		() =>
 			remarkPlugins
@@ -156,11 +170,14 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 		<Streamdown
 			className={cn("space-y-0 break-words", className)}
 			components={merged}
+			isAnimating={fenceOpen}
 			linkSafety={{ enabled: false }}
 			mode="streaming"
+			parseIncompleteMarkdown={!complete}
 			remarkPlugins={mergedRemarkPlugins}
+			remend={REMEND_OPTIONS}
 		>
-			{children}
+			{markdown}
 		</Streamdown>
 	);
 });

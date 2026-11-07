@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/cloudflare";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { PAGE_COMMENTS_RUNTIME_SOURCE } from "@superset/shared/page-comments-runtime";
 import { PAGE_STORAGE_RUNTIME_SOURCE } from "@superset/shared/page-storage-runtime";
 import { PAGE_TOOLS_RUNTIME_SOURCE } from "@superset/shared/page-tools-runtime";
@@ -199,7 +200,7 @@ async function servePage(c: Context<AppContext>): Promise<Response> {
 				? `private, max-age=${ticketSeconds(auth)}, immutable`
 				: "private, no-cache";
 	const policy = pageContentSecurityPolicy(
-		c.env.FRAME_ANCESTORS.split(/\s+/).filter(Boolean),
+		withOwnDomainTwins(c.env.FRAME_ANCESTORS.split(/\s+/)),
 		new URL(c.env.REALTIME_URL).origin,
 	);
 	// The policy and render revision are in the tag because a 304 has no
@@ -478,7 +479,7 @@ async function serveAsset(c: Context<AppContext>): Promise<Response> {
 		headers.set(
 			"Content-Security-Policy",
 			pageContentSecurityPolicy(
-				c.env.FRAME_ANCESTORS.split(/\s+/).filter(Boolean),
+				withOwnDomainTwins(c.env.FRAME_ANCESTORS.split(/\s+/)),
 				new URL(c.env.REALTIME_URL).origin,
 			),
 		);

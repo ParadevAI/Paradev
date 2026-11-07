@@ -1,0 +1,6 @@
+{
+	"setup": ["./.paradev/setup.sh"],
+	"teardown": ["./.paradev/teardown.sh"],
+	"run": ["bun dev"],
+	"start": ["./.paradev/setup.cloud.sh", "./.paradev/dev-stack.cloud.sh"]
+}

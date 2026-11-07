@@ -46,6 +46,14 @@ export interface SandboxCredentialInputs {
 	gitAuthor: GitAuthor;
 }
 
+function relayHost(): string | null {
+	try {
+		return new URL(env.RELAY_URL).host;
+	} catch {
+		return null;
+	}
+}
+
 export interface GitAuthor {
 	name: string;
 	email: string;
@@ -92,6 +100,8 @@ export interface SandboxCredentials {
 	/** Written into the box before every boot. */
 	files: SandboxFile[];
 }
+
+const PDEV_ROUTER_HOST = "router.superset.sh";
 
 export const CODEX_AUTH_PATH = `${SANDBOX_PATHS.home}/.codex/auth.json`;
 /** Codex's system config layer: below the person's own `~/.codex/config.toml`. */
@@ -296,12 +306,22 @@ export async function deriveSandboxCredentials(
 	// What it may do is narrowed on the API side, in sandboxCredentialProcedures.
 	const api = apiHost();
 	if (api) {
-		allow[api] = rule({
+		const boxCredential = rule({
 			[SANDBOX_API_CREDENTIAL_HEADER]: `${inputs.workspaceId}.${await sandboxApiCredential(
 				env.SANDBOX_GATE_SECRET,
 				inputs.workspaceId,
 			)}`,
 		});
+		allow[api] = boxCredential;
+		// pdev's router checks a caller by passing its headers to the API, so
+		// the box's credential signs pdev in as the workspace's creator. A set
+		// PDEV_TOKEN keeps pdev from asking `superset auth`, which a box refuses.
+		allow[PDEV_ROUTER_HOST] = boxCredential;
+		managedEnv.PDEV_TOKEN = SANDBOX_CREDENTIAL_PLACEHOLDER;
+		// The firewall refuses WebSocket upgrades on a host it rewrites, so a
+		// box reaches hosts over HTTP only.
+		const relay = relayHost();
+		if (relay) allow[relay] = boxCredential;
 	}
 
 	// The catch-all keeps the rest of the internet reachable; without it a

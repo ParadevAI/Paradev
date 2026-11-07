@@ -16,6 +16,7 @@ import {
 	LuArrowRightLeft,
 	LuArrowUp,
 	LuBellOff,
+	LuClipboard,
 	LuCopy,
 	LuEye,
 	LuEyeOff,
@@ -23,6 +24,7 @@ import {
 	LuFolderPlus,
 	LuGitBranch,
 	LuHash,
+	LuLink,
 	LuPencil,
 	LuPin,
 	LuPinOff,
@@ -32,10 +34,11 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
-import { useProjectTagFolderSections } from "../../../../hooks/useProjectTagFolderSections";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
+import { MoveToGroupItems } from "./components/MoveToGroupItems";
 
 interface DashboardSidebarWorkspaceContextMenuProps {
 	workspaceId: string;
@@ -102,6 +105,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 }: DashboardSidebarWorkspaceContextMenuProps) {
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const { setContextMenuOpen } = useDashboardSidebarHoverActions();
+	const copyShareLink = useCopyShareLink();
 	const portGroup = useDashboardSidebarWorkspacePorts(workspaceId);
 	const { isPending: isKillingPorts, killPorts } =
 		useDashboardSidebarPortKill();
@@ -109,9 +113,6 @@ export function DashboardSidebarWorkspaceContextMenu({
 	const deleteHotkeyText = useHotkeyDisplay("CLOSE_WORKSPACE").text;
 	const showDeleteShortcut =
 		showDeleteHotkey && deleteHotkeyText !== "Unassigned";
-	// The derived union — a tag-only folder with no stored row is a valid
-	// move target.
-	const { sections } = useProjectTagFolderSections(projectId);
 	const canJoinGroup = projectId !== null || isSessionWorkspace;
 	const handleCloseAllPorts = () => {
 		if (isKillingPorts) return;
@@ -141,28 +142,41 @@ export function DashboardSidebarWorkspaceContextMenu({
 						<Trans>Rename</Trans>
 					</ContextMenuItem>
 				)}
+				{onRename && <ContextMenuSeparator />}
 				{isLocalWorkspace && (
-					<>
-						{onRename && <ContextMenuSeparator />}
-						<ContextMenuItem onSelect={onOpenInFinder}>
-							<LuFolderOpen className="size-4 mr-2" />
-							<Trans>Open in Finder</Trans>
-						</ContextMenuItem>
-						<ContextMenuItem onSelect={onCopyPath}>
-							<LuCopy className="size-4 mr-2" />
-							<Trans>Copy Path</Trans>
-						</ContextMenuItem>
-					</>
+					<ContextMenuItem onSelect={onOpenInFinder}>
+						<LuFolderOpen className="size-4 mr-2" />
+						<Trans>Open in Finder</Trans>
+					</ContextMenuItem>
 				)}
-				{!isLocalWorkspace && onRename && <ContextMenuSeparator />}
-				<ContextMenuItem onSelect={onCopyBranchName}>
-					<LuGitBranch className="size-4 mr-2" />
-					<Trans>Copy Branch Name</Trans>
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={onCopyWorkspaceId}>
-					<LuHash className="size-4 mr-2" />
-					<Trans>Copy Workspace ID</Trans>
-				</ContextMenuItem>
+				<ContextMenuSub>
+					<ContextMenuSubTrigger>
+						<LuCopy className="size-4 mr-2" />
+						<Trans>Copy</Trans>
+					</ContextMenuSubTrigger>
+					<ContextMenuSubContent>
+						<ContextMenuItem
+							onSelect={() => copyShareLink(`workspaces/${workspaceId}`)}
+						>
+							<LuLink className="size-4 mr-2" />
+							<Trans>Copy link</Trans>
+						</ContextMenuItem>
+						<ContextMenuItem onSelect={onCopyBranchName}>
+							<LuGitBranch className="size-4 mr-2" />
+							<Trans>Copy Branch Name</Trans>
+						</ContextMenuItem>
+						{isLocalWorkspace && (
+							<ContextMenuItem onSelect={onCopyPath}>
+								<LuClipboard className="size-4 mr-2" />
+								<Trans>Copy Path</Trans>
+							</ContextMenuItem>
+						)}
+						<ContextMenuItem onSelect={onCopyWorkspaceId}>
+							<LuHash className="size-4 mr-2" />
+							<Trans>Copy Workspace ID</Trans>
+						</ContextMenuItem>
+					</ContextMenuSubContent>
+				</ContextMenuSub>
 				<ContextMenuSeparator />
 				<ContextMenuItem onSelect={onToggleUnread}>
 					{isUnread ? (
@@ -204,21 +218,10 @@ export function DashboardSidebarWorkspaceContextMenu({
 								<Trans>Move to group</Trans>
 							</ContextMenuSubTrigger>
 							<ContextMenuSubContent>
-								{sections.map((section) => (
-									<ContextMenuItem
-										key={section.id}
-										onSelect={() => onMoveToSection(section.id)}
-									>
-										{section.color && (
-											<span
-												className="size-2 shrink-0 rounded-full mr-2"
-												style={{ backgroundColor: section.color }}
-											/>
-										)}
-										{section.name}
-									</ContextMenuItem>
-								))}
-								{sections.length > 0 && <ContextMenuSeparator />}
+								<MoveToGroupItems
+									projectId={projectId}
+									onMoveToSection={onMoveToSection}
+								/>
 								<ContextMenuItem onSelect={onCreateSection}>
 									<LuFolderPlus className="size-4 mr-2" />
 									<Trans>Create new group</Trans>

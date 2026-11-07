@@ -1,12 +1,8 @@
-import type { AppRouter } from "@superset/host-service";
-import type { inferRouterOutputs } from "@trpc/server";
+import type { PullRequestThreads } from "@superset/shared/pull-request-github";
 import type { NormalizedComment } from "../../types";
 
-type V2ThreadsData =
-	inferRouterOutputs<AppRouter>["git"]["getPullRequestThreads"];
-
 export function normalizeThreadsToComments(
-	data: V2ThreadsData,
+	data: Pick<PullRequestThreads, "reviewThreads" | "conversationComments">,
 	prUrl?: string,
 ): NormalizedComment[] {
 	const comments: NormalizedComment[] = [];

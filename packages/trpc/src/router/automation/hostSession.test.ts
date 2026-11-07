@@ -177,4 +177,28 @@ describe("launchAgentSession", () => {
 			},
 		]);
 	});
+
+	test("opens a started chat in a desktop tab when asked, and ignores a host that cannot", async () => {
+		const { host, calls } = fakeHost({
+			"sessions.capabilities": { supported: true },
+			"sessions.create": chatCreated,
+		});
+		const result = await launchAgentSession(host, {
+			...base,
+			chat: true,
+			openTab: true,
+		});
+		expect(result).toEqual(chatCreated as never);
+		expect(calls.at(-1)).toEqual({
+			kind: "mutation",
+			procedure: "panes.newTab",
+			input: { workspaceId: "ws-1", sessionId: chatCreated.sessionId },
+		});
+	});
+
+	test("does not ask for a tab for a terminal run", async () => {
+		const { host, calls } = fakeHost({ "agents.run": terminalRun });
+		await launchAgentSession(host, { ...base, chat: false, openTab: true });
+		expect(calls.map((call) => call.procedure)).toEqual(["agents.run"]);
+	});
 });

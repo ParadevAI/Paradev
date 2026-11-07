@@ -28,4 +28,13 @@ describe("buildUpstreamHeaders", () => {
 
 		expect(headers["x-superset-user-id"]).toBe("user-1");
 	});
+
+	test("a cloud workspace's credential never reaches the host", () => {
+		const headers = buildUpstreamHeaders(
+			new Headers({ "x-superset-sandbox-credential": "ws-1.secret" }),
+			"user-1",
+		);
+
+		expect(headers).toEqual({ "x-superset-user-id": "user-1" });
+	});
 });

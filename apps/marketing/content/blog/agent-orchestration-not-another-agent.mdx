@@ -12,7 +12,7 @@ relatedSlugs:
 
 One coding agent is easy to follow. With several running at once, you need to know which task each one owns, which agent needs an answer, and which changes are ready to review.
 
-That's the problem we built Superset to help with. It runs the agents you already use in separate workspaces and gives you a place to manage their output.
+That's the problem we built Paradev to help with. It runs the agents you already use in separate workspaces and gives you a place to manage their output.
 
 ## Start with independent tasks
 
@@ -26,19 +26,19 @@ The [parallel coding guide](/blog/parallel-coding-agents-guide) walks through th
 
 Agents editing the same working directory can overwrite each other's changes or mix them in the staging area. A Git worktree gives each task a separate checkout and index while sharing the repository's history.
 
-In Superset, create a workspace and branch for each independent task. The agent works there while you keep using your main checkout. When it's ready, review its diff before merging.
+In Paradev, create a workspace and branch for each independent task. The agent works there while you keep using your main checkout. When it's ready, review its diff before merging.
 
 Worktrees separate files. They don't isolate ports, databases, credentials, or machine resources. Two branches can also make incompatible changes, so test the combined result after merging.
 
 ## Keep sessions separate from the app window
 
-Closing the interface shouldn't end the work running inside it. Superset's terminal daemon owns terminal sessions separately from the desktop UI, so you can reconnect after an app restart.
+Closing the interface shouldn't end the work running inside it. Paradev's terminal daemon owns terminal sessions separately from the desktop UI, so you can reconnect after an app restart.
 
-The host and daemon still need to be running. A machine reboot stops the processes; saved terminal history helps you recover context, but it doesn't keep an agent executing through a reboot. After the reboot, Superset relaunches an interrupted agent with its own resume command, if the agent has an ID-based one set under **Settings → Agents**, such as `claude --resume` or `codex resume`, in the same pane, so the conversation comes back. The [terminal daemon deep dive](/blog/terminal-daemon-deep-dive) explains the design.
+The host and daemon still need to be running. A machine reboot stops the processes; saved terminal history helps you recover context, but it doesn't keep an agent executing through a reboot. After the reboot, Paradev relaunches an interrupted agent with its own resume command, if the agent has an ID-based one set under **Settings → Agents**, such as `claude --resume` or `codex resume`, in the same pane, so the conversation comes back. The [terminal daemon deep dive](/blog/terminal-daemon-deep-dive) explains the design.
 
 ## See what needs your attention
 
-![Superset's workspace board showing tasks that are working, need attention, or are ready for review.](/changelog/2026-08-16-workspaces-board.png)
+![Paradev's workspace board showing tasks that are working, need attention, or are ready for review.](/changelog/2026-08-16-workspaces-board.png)
 
 A useful workspace view tells you where to act next. Answer the agent waiting for a decision, then review a completed task while the others keep running.
 
@@ -48,7 +48,7 @@ For each change, check what the agent edited and whether it ran the right tests.
 
 Use the agent and model that work for your repository. Keep the task description and acceptance checks consistent when trying another tool so you can compare the results.
 
-Superset runs CLI agents in workspace terminals. You can use Claude Code for one task and Codex for another, then review both through the same workspace workflow. Your editor stays part of the process: open the worktree in VS Code, Cursor, JetBrains, Xcode, or the editor you prefer.
+Paradev runs CLI agents in workspace terminals. You can use Claude Code for one task and Codex for another, then review both through the same workspace workflow. Your editor stays part of the process: open the worktree in VS Code, Cursor, JetBrains, Xcode, or the editor you prefer.
 
 ## Start with two tasks
 
@@ -56,4 +56,4 @@ Give each agent a clear scope and a check it must run. When one finishes, review
 
 The point is to finish useful work with less waiting. The number of open terminals is only part of that.
 
-**Related:** [Working with Git Worktrees in Superset](/blog/working-with-worktrees-in-superset) · [Best Agentic IDE in 2026](/compare/best-agentic-ide)
+**Related:** [Working with Git Worktrees in Paradev](/blog/working-with-worktrees-in-superset) · [Best Agentic IDE in 2026](/compare/best-agentic-ide)

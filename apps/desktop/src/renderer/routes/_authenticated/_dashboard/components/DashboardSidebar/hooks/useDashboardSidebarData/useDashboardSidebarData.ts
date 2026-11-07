@@ -1,7 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useReducer,
+	useRef,
+} from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -10,6 +17,7 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
 import {
@@ -54,6 +62,11 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { sidebarHostIsOnline } from "./sidebarHostIsOnline";
+import {
+	type StableDashboardSidebarProjects,
+	stabilizeDashboardSidebarProjects,
+} from "./stabilizeDashboardSidebarProjects";
 
 // Module-level so remounting the sidebar doesn't reset the cool-down.
 const pullRequestRefreshGate = createPullRequestRefreshGate();
@@ -63,16 +76,6 @@ type PullRequestWorkspaceRow = {
 	workspaceId: string;
 	pullRequest: SidebarPullRequest;
 };
-
-function haveSameProjects(
-	left: DashboardSidebarProject[],
-	right: DashboardSidebarProject[],
-): boolean {
-	return (
-		left.length === right.length &&
-		left.every((project, index) => project === right[index])
-	);
-}
 
 function getPullRequestRowsFingerprint(
 	rows: PullRequestWorkspaceRow[],
@@ -84,12 +87,6 @@ function getPullRequestRowsFingerprint(
 				leftWorkspaceId.localeCompare(rightWorkspaceId),
 			),
 	);
-}
-
-function getDashboardSidebarProjectFingerprint(
-	project: DashboardSidebarProject,
-): string {
-	return JSON.stringify(project);
 }
 
 function useStablePullRequestsByWorkspaceId(
@@ -142,39 +139,13 @@ function useJsonStable<Value>(value: Value): Value {
 function useStableDashboardSidebarProjects(
 	projects: DashboardSidebarProject[],
 ): DashboardSidebarProject[] {
-	const previousRef = useRef<{
-		projects: DashboardSidebarProject[];
-		byId: Map<
-			string,
-			{ fingerprint: string; project: DashboardSidebarProject }
-		>;
-	} | null>(null);
-
+	const previousRef = useRef<StableDashboardSidebarProjects | null>(null);
 	return useMemo(() => {
-		const previous = previousRef.current;
-		const nextById = new Map<
-			string,
-			{ fingerprint: string; project: DashboardSidebarProject }
-		>();
-		const nextProjects = projects.map((project) => {
-			const fingerprint = getDashboardSidebarProjectFingerprint(project);
-			const previousProject = previous?.byId.get(project.id);
-			const stableProject =
-				previousProject?.fingerprint === fingerprint
-					? previousProject.project
-					: project;
-
-			nextById.set(project.id, { fingerprint, project: stableProject });
-			return stableProject;
-		});
-
-		if (previous && haveSameProjects(previous.projects, nextProjects)) {
-			previousRef.current = { projects: previous.projects, byId: nextById };
-			return previous.projects;
-		}
-
-		previousRef.current = { projects: nextProjects, byId: nextById };
-		return nextProjects;
+		previousRef.current = stabilizeDashboardSidebarProjects(
+			projects,
+			previousRef.current,
+		);
+		return previousRef.current.projects;
 	}, [projects]);
 }
 
@@ -613,7 +584,9 @@ export function useDashboardSidebarData() {
 		() =>
 			rawSidebarWorkspaces.map((workspace) => ({
 				...workspace,
-				hostIsOnline: hostsByMachineId.get(workspace.hostId)?.isOnline ?? false,
+				hostIsOnline: sidebarHostIsOnline(
+					hostsByMachineId.get(workspace.hostId),
+				),
 				pendingTransaction: workspaceTransactionsById[workspace.id] ?? null,
 			})),
 		[hostsByMachineId, rawSidebarWorkspaces, workspaceTransactionsById],
@@ -677,13 +650,11 @@ export function useDashboardSidebarData() {
 			// Unreachable host: keep the query mounted so cached chips stay
 			// rendered through the outage; fetches resume when the URL returns.
 			enabled: target.hostUrl !== null,
-			queryFn: async () => {
-				if (!target.hostUrl) return { workspaces: [], github: null };
-				const client = getHostServiceClientByUrl(target.hostUrl);
-				return client.pullRequests.getByWorkspaces.query({
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).pullRequests.getByWorkspaces.query({
 					workspaceIds: target.workspaceIds,
-				});
-			},
+				}),
+			),
 		})),
 	});
 
@@ -744,13 +715,26 @@ export function useDashboardSidebarData() {
 		return () => clearTimeout(timer);
 	}, [githubHoldUntil]);
 
+	// Every row receives this as a prop; a new identity on each data change
+	// re-rendered the whole sidebar.
+	const pullRequestRefreshInputs = useRef({
+		visibleSidebarWorkspaces,
+		pullRequestQueryTargets,
+	});
+	useLayoutEffect(() => {
+		pullRequestRefreshInputs.current = {
+			visibleSidebarWorkspaces,
+			pullRequestQueryTargets,
+		};
+	});
 	const refreshWorkspacePullRequest = useCallback(
 		async (workspaceId: string) => {
-			const workspace = visibleSidebarWorkspaces.find(
+			const inputs = pullRequestRefreshInputs.current;
+			const workspace = inputs.visibleSidebarWorkspaces.find(
 				(candidate) => candidate.id === workspaceId,
 			);
 			if (!workspace) return;
-			const target = pullRequestQueryTargets.find(
+			const target = inputs.pullRequestQueryTargets.find(
 				(candidate) => candidate.machineId === workspace.hostId,
 			);
 			if (!target?.hostUrl) return;
@@ -766,7 +750,7 @@ export function useDashboardSidebarData() {
 				queryKey: getDashboardSidebarPullRequestQueryKey(target),
 			});
 		},
-		[pullRequestQueryTargets, queryClient, visibleSidebarWorkspaces],
+		[queryClient],
 	);
 
 	const pullRequestsByWorkspaceId =

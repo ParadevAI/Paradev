@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
 import { type ReactNode, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { Alert, View } from "react-native";
 import { useCloudWorkspaceActions } from "@/hooks/useCloudWorkspaceActions";
 import { itemFromCloudRow } from "@/hooks/useCloudWorkspaceItems";
@@ -22,7 +23,7 @@ export function ArchivedCloudRowMenu({
 }) {
 	const { t } = useLingui();
 	const { unarchive } = useCloudWorkspaceActions();
-	const rowRef = useRef<View>(null);
+	const rowRef = useRef<ViewInstance>(null);
 	const { copyId, shareWorkspace } = useWorkspaceRowActions(
 		itemFromCloudRow(row),
 		cache,

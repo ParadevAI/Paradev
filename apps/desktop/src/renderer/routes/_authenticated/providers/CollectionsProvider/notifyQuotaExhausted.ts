@@ -72,7 +72,7 @@ export function notifyQuotaExhausted(
 	toast.warning("Storage is full", {
 		id: TOAST_ID,
 		description:
-			"Layout and sidebar changes are kept for this session but revert when Superset restarts.",
+			"Layout and sidebar changes are kept for this session but revert when Paradev restarts.",
 		action:
 			mode === "offer-reclaim"
 				? { label: "Free up space", onClick: reclaimFromToast }

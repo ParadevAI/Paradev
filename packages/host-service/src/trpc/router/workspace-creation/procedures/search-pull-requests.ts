@@ -36,6 +36,11 @@ import {
 	type ResolvedGithubRepo,
 	resolveGithubRepo,
 } from "../shared/project-helpers";
+import {
+	fetchPullRequestRowDetails,
+	ghFetchPullRequestRowDetails,
+	type PullRequestRowDetails,
+} from "../shared/pull-request-row-details";
 import type { ExecGh } from "../utils/exec-gh";
 
 interface PullRequestResult {
@@ -62,6 +67,8 @@ export interface PullRequestsPage {
 	hasNextPage: boolean;
 	page: number;
 	repoMismatch?: string;
+	/** Rows carry no checks, diff stat or branch yet; `getPullRequestRowDetails` fills them. */
+	checksDeferred?: true;
 }
 
 const githubAuthorSchema = z
@@ -143,6 +150,7 @@ const searchPullRequestsInputSchema = githubSearchInputSchema
 		mergedOnly: z.boolean().optional(),
 		// Mutually exclusive with author/review — see VIEWER_RELATIONSHIP_QUALIFIERS.
 		viewerRelationship: viewerRelationshipSchema.optional(),
+		deferChecks: z.boolean().optional(),
 	})
 	.refine(
 		(input) => !input.viewerRelationship || (!input.author && !input.review),
@@ -753,199 +761,6 @@ async function octokitSearchPullRequests(
 	return { items, totalCount: data.total_count, hasNextPage };
 }
 
-const checksGraphqlDataSchema = z.object({
-	repository: z
-		.record(
-			z.string(),
-			z
-				.object({
-					number: z.number(),
-					additions: z.number().optional(),
-					deletions: z.number().optional(),
-					headRefName: z.string().optional(),
-					statusCheckRollup: z
-						.object({
-							contexts: z.object({
-								nodes: z.array(pullRequestCheckContextSchema.nullable()),
-								pageInfo: z.object({
-									hasNextPage: z.boolean(),
-									endCursor: z.string().nullable(),
-								}),
-							}),
-						})
-						.nullable()
-						.optional(),
-				})
-				.nullable(),
-		)
-		.nullable(),
-});
-
-type RunChecksGraphqlQuery = (
-	query: string,
-	variables: Record<string, string>,
-) => Promise<unknown>;
-
-type PullRequestGraphqlDetails = Pick<
-	PullRequestResult,
-	"additions" | "deletions" | "headRefName"
->;
-
-async function getPullRequestChecksViaGraphql(
-	runQuery: RunChecksGraphqlQuery,
-	repo: { owner: string; name: string },
-	pullRequestNumbers: number[],
-): Promise<
-	Map<
-		number,
-		Pick<PullRequestResult, "checks" | "checksStatus"> &
-			PullRequestGraphqlDetails
-	>
-> {
-	if (pullRequestNumbers.length === 0) return new Map();
-	const contextsByPullRequest = new Map<
-		number,
-		z.infer<typeof pullRequestCheckContextSchema>[]
-	>();
-	const detailsByPullRequest = new Map<number, PullRequestGraphqlDetails>();
-	let cursors = new Map<number, string | null>(
-		pullRequestNumbers.map((number) => [number, null]),
-	);
-
-	while (cursors.size > 0) {
-		const cursorDefinitions = [...cursors]
-			.flatMap(([number, cursor]) =>
-				cursor ? [`$cursor${number}: String!`] : [],
-			)
-			.join(", ");
-		const selections = [...cursors]
-			.map(
-				([number, cursor]) => `pr${number}:pullRequest(number:${number}) {
-				number
-				additions
-				deletions
-				headRefName
-				statusCheckRollup {
-					contexts(first: 100${cursor ? `, after: $cursor${number}` : ""}) {
-						pageInfo { hasNextPage endCursor }
-						nodes {
-							__typename
-							... on CheckRun {
-								name
-								status
-								conclusion
-								detailsUrl
-								startedAt
-								completedAt
-							}
-							... on StatusContext {
-								context
-								state
-								targetUrl
-								createdAt
-							}
-						}
-					}
-				}
-			}`,
-			)
-			.join("\n");
-		const query = `query($owner: String!, $name: String!${cursorDefinitions ? `, ${cursorDefinitions}` : ""}) {
-		repository(owner: $owner, name: $name) {
-			${selections}
-		}
-	}`;
-		const variables: Record<string, string> = {
-			owner: repo.owner,
-			name: repo.name,
-		};
-		for (const [number, cursor] of cursors) {
-			if (cursor) variables[`cursor${number}`] = cursor;
-		}
-		const raw = await runQuery(query, variables);
-		// `gh api graphql` returns the full `{ data: ... }` envelope;
-		// octokit.graphql resolves to the inner data object.
-		const data = isRecord(raw) && isRecord(raw.data) ? raw.data : raw;
-		const repository = checksGraphqlDataSchema.parse(data).repository;
-		if (!repository) return new Map();
-
-		const nextCursors = new Map<number, string | null>();
-		for (const pullRequest of Object.values(repository)) {
-			if (!pullRequest) continue;
-			const contexts =
-				pullRequest.statusCheckRollup?.contexts.nodes.filter(
-					(context): context is z.infer<typeof pullRequestCheckContextSchema> =>
-						context !== null,
-				) ?? [];
-			const existing = contextsByPullRequest.get(pullRequest.number) ?? [];
-			contextsByPullRequest.set(pullRequest.number, [...existing, ...contexts]);
-			detailsByPullRequest.set(pullRequest.number, {
-				additions: pullRequest.additions ?? null,
-				deletions: pullRequest.deletions ?? null,
-				headRefName: pullRequest.headRefName ?? null,
-			});
-			const pageInfo = pullRequest.statusCheckRollup?.contexts.pageInfo;
-			if (pageInfo?.hasNextPage) {
-				if (!pageInfo.endCursor) {
-					throw new Error(
-						`Missing check-rollup cursor for PR #${pullRequest.number}`,
-					);
-				}
-				if (pageInfo.endCursor === cursors.get(pullRequest.number)) {
-					throw new Error(
-						`Check-rollup cursor did not advance for PR #${pullRequest.number}`,
-					);
-				}
-				nextCursors.set(pullRequest.number, pageInfo.endCursor);
-			}
-		}
-		cursors = nextCursors;
-	}
-
-	return new Map(
-		pullRequestNumbers.map((pullRequestNumber) => {
-			const contexts = contextsByPullRequest.get(pullRequestNumber) ?? [];
-			const { checks, checksStatus } = normalizePullRequestChecks(contexts);
-			const details = detailsByPullRequest.get(pullRequestNumber) ?? {
-				additions: null,
-				deletions: null,
-				headRefName: null,
-			};
-			return [pullRequestNumber, { checks, checksStatus, ...details }] as const;
-		}),
-	);
-}
-
-async function ghGetPullRequestChecks(
-	execGh: ExecGh,
-	repo: ResolvedGithubRepo,
-	pullRequestNumbers: number[],
-): Promise<Map<number, PullRequestChecksInfo>> {
-	return getPullRequestChecksViaGraphql(
-		(query, variables) =>
-			execGh(
-				[
-					"api",
-					"graphql",
-					"-f",
-					`query=${query}`,
-					...Object.entries(variables).flatMap(([key, value]) => [
-						"-f",
-						`${key}=${value}`,
-					]),
-				],
-				{ cwd: repo.repoPath ?? undefined },
-			),
-		repo,
-		pullRequestNumbers,
-	);
-}
-
-type PullRequestChecksInfo = Pick<
-	PullRequestResult,
-	"checks" | "checksStatus" | "additions" | "deletions" | "headRefName"
->;
-
 /**
  * Enrich a merged page with checks: one GraphQL batch per repo that has
  * rows on the page. Keyed by (projectId, prNumber) — PR numbers can
@@ -957,7 +772,7 @@ async function enrichPageWithChecks(
 	getChecks: (
 		repo: ResolvedGithubRepo,
 		pullRequestNumbers: number[],
-	) => Promise<Map<number, PullRequestChecksInfo>>,
+	) => Promise<Map<number, PullRequestRowDetails>>,
 ): Promise<PullRequestResult[]> {
 	const numbersByProject = new Map<string, number[]>();
 	for (const pullRequest of pullRequests) {
@@ -968,7 +783,7 @@ async function enrichPageWithChecks(
 	const repoByProject = new Map(
 		projectRepos.map(({ projectId, repo }) => [projectId, repo]),
 	);
-	const checksByProject = new Map<string, Map<number, PullRequestChecksInfo>>();
+	const checksByProject = new Map<string, Map<number, PullRequestRowDetails>>();
 	await Promise.all(
 		[...numbersByProject].map(async ([projectId, numbers]) => {
 			const repo = repoByProject.get(projectId);
@@ -1107,12 +922,27 @@ export const searchPullRequests = protectedProcedure
 			const merged = mergeByUpdatedAtDesc(
 				chunkResults.map((result) => result.items),
 			);
+			const totalCount = chunkResults.reduce(
+				(sum, result) => sum + result.totalCount,
+				0,
+			);
+			const hasNextPage = chunkResults.some((result) => result.hasNextPage);
+			if (input.deferChecks) {
+				return {
+					pullRequests: merged,
+					totalCount,
+					hasNextPage,
+					page,
+					checksDeferred: true,
+				};
+			}
 			let pullRequests = merged;
 			try {
 				pullRequests = await enrichPageWithChecks(
 					merged,
 					projectRepos,
-					(repo, numbers) => ghGetPullRequestChecks(ctx.execGh, repo, numbers),
+					(repo, numbers) =>
+						ghFetchPullRequestRowDetails(ctx.execGh, repo, numbers),
 				);
 			} catch (checksError) {
 				console.warn(
@@ -1120,15 +950,7 @@ export const searchPullRequests = protectedProcedure
 					checksError,
 				);
 			}
-			return {
-				pullRequests,
-				totalCount: chunkResults.reduce(
-					(sum, result) => sum + result.totalCount,
-					0,
-				),
-				hasNextPage: chunkResults.some((result) => result.hasNextPage),
-				page,
-			};
+			return { pullRequests, totalCount, hasNextPage, page };
 		} catch (ghErr) {
 			// A rate-limited gh call surfaces as-is — falling back to Octokit
 			// would retry against the same user's quota.
@@ -1211,13 +1033,27 @@ export const searchPullRequests = protectedProcedure
 			const merged = mergeByUpdatedAtDesc(
 				chunkResults.map((result) => result.items),
 			);
+			const totalCount = chunkResults.reduce(
+				(sum, result) => sum + result.totalCount,
+				0,
+			);
+			const hasNextPage = chunkResults.some((result) => result.hasNextPage);
+			if (input.deferChecks) {
+				return {
+					pullRequests: merged,
+					totalCount,
+					hasNextPage,
+					page,
+					checksDeferred: true,
+				};
+			}
 			let pullRequests = merged;
 			try {
 				pullRequests = await enrichPageWithChecks(
 					merged,
 					projectRepos,
 					(repo, numbers) =>
-						getPullRequestChecksViaGraphql(
+						fetchPullRequestRowDetails(
 							(checksQuery, variables) =>
 								octokit.graphql(checksQuery, variables),
 							repo,
@@ -1230,15 +1066,7 @@ export const searchPullRequests = protectedProcedure
 					checksError,
 				);
 			}
-			return {
-				pullRequests,
-				totalCount: chunkResults.reduce(
-					(sum, result) => sum + result.totalCount,
-					0,
-				),
-				hasNextPage: chunkResults.some((result) => result.hasNextPage),
-				page,
-			};
+			return { pullRequests, totalCount, hasNextPage, page };
 		} catch (err) {
 			// Both gh and Octokit failed — rethrow so the renderer's toast
 			// fires instead of the dropdown silently rendering "no results".

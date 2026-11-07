@@ -3,6 +3,7 @@ import type {
 	Decision,
 	UserContent,
 } from "@superset/chat/protocol";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { useCallback } from "react";
 import { composerAnswer } from "../../utils/composerAnswer";
 
@@ -19,7 +20,7 @@ export function useMainSend({
 	approvals: readonly ApprovalRequest[];
 	holdPrompt: ((content: UserContent[]) => void) | undefined;
 	loaded: boolean;
-	onAnswerFailed: (content: UserContent[]) => void;
+	onAnswerFailed: (draft: ComposerDraft) => void;
 	onUserPrompt?: () => void;
 	respondToApproval: (
 		approvalId: string,
@@ -28,11 +29,15 @@ export function useMainSend({
 	runningTurnId: string | null;
 	sendPrompt: (
 		content: UserContent[],
-		options?: { expectedTurnId: string },
+		options: { expectedTurnId: string } | undefined,
+		draft: ComposerDraft,
 	) => unknown;
 }) {
 	return useCallback(
-		(content: UserContent[], { steer }: { steer: boolean }) => {
+		(
+			content: UserContent[],
+			{ steer, draft }: { steer: boolean; draft: ComposerDraft },
+		) => {
 			onUserPrompt?.();
 			if (holdPrompt) return holdPrompt(content);
 			const pending = loaded
@@ -45,7 +50,7 @@ export function useMainSend({
 					: null;
 			if (question && answer) {
 				return respondToApproval(question.id, answer).catch(() =>
-					onAnswerFailed(content),
+					onAnswerFailed(draft),
 				);
 			}
 			for (const approval of pending) {
@@ -57,6 +62,7 @@ export function useMainSend({
 				steerTurn && runningTurnId
 					? { expectedTurnId: runningTurnId }
 					: undefined,
+				draft,
 			);
 		},
 		[

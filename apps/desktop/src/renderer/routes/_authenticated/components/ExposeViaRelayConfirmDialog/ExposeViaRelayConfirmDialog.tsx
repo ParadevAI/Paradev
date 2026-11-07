@@ -52,12 +52,12 @@ export function ExposeViaRelayConfirmDialog({
 							{targetEnabled ? (
 								<p>
 									Devices and workspaces you grant access to will be able to
-									reach this device through Superset Relay.
+									reach this device through Paradev Relay.
 								</p>
 							) : (
 								<p>
-									Nothing else will be able to reach this device through
-									Superset Relay.
+									Nothing else will be able to reach this device through Paradev
+									Relay.
 								</p>
 							)}
 						</div>

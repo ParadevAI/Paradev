@@ -106,7 +106,7 @@ function fakeData(overrides: Partial<VoiceData> = {}): VoiceData & {
 		restartWorkspace: async () => {},
 		readPage: async () => "Usage is up 12% this week.",
 		listEnvironments: async () => [
-			{ id: "env-1", name: "Superset" },
+			{ id: "env-1", name: "Paradev" },
 			{ id: "env-2", name: "Docs site" },
 		],
 		createWorkspace: async () => ({ id: "ws-new", name: "Fix login" }),
@@ -325,7 +325,7 @@ describe("executeTool", () => {
 			ctx,
 		);
 		expect(result.output).toMatchObject({
-			error: { kind: "ambiguous", environments: ["Superset", "Docs site"] },
+			error: { kind: "ambiguous", environments: ["Paradev", "Docs site"] },
 		});
 		expect(result.ui).toBeUndefined();
 	});

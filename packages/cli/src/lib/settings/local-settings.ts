@@ -21,8 +21,8 @@ function openLocalDb() {
 	const path = getLocalDbPath();
 	if (!existsSync(path)) {
 		throw new CLIError(
-			`Superset local database not found at ${path}`,
-			"Launch the Superset desktop app once on this machine first.",
+			`Paradev local database not found at ${path}`,
+			"Launch the Paradev desktop app once on this machine first.",
 		);
 	}
 	let sqlite: Database;
@@ -130,8 +130,8 @@ export function updateSettingsAtomically<Result>(
 			const columns = getPresentColumns(sqlite);
 			if (!columns) {
 				throw new CLIError(
-					"The Superset local database has no settings table",
-					"Launch the Superset desktop app once to run its migrations, then retry.",
+					"The Paradev local database has no settings table",
+					"Launch the Paradev desktop app once to run its migrations, then retry.",
 				);
 			}
 			const row = selectSettingsRow(db, columns);
@@ -139,8 +139,8 @@ export function updateSettingsAtomically<Result>(
 			const absent = Object.keys(patch).filter((key) => !(key in columns));
 			if (absent.length > 0) {
 				throw new CLIError(
-					`This Superset local database predates the ${absent.join(", ")} setting`,
-					"Update the Superset desktop app and launch it once to run its migrations, then retry.",
+					`This Paradev local database predates the ${absent.join(", ")} setting`,
+					"Update the Paradev desktop app and launch it once to run its migrations, then retry.",
 				);
 			}
 			// Target the row that was read: legacy DBs can hold a non-1 row id

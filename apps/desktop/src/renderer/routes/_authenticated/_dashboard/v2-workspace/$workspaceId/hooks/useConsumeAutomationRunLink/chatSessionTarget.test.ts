@@ -13,6 +13,8 @@ const session: NonNullable<SessionResult["session"]> = {
 	title: "Automation run",
 	queuedCount: 0,
 	updatedAt: 1,
+	closedAt: null,
+	closedByUser: false,
 };
 const result: SessionResult = { session, cursor: null, live: true };
 const liveSession: Awaited<ReturnType<ChatTransport["listSessions"]>>[number] =

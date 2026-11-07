@@ -596,6 +596,19 @@ describe("rethrowEnvironmentalGitError", () => {
 		).toBe("GIT_ENVIRONMENT");
 	});
 
+	test("object or worktree file its storage cannot deliver → PRECONDITION_FAILED / GIT_ENVIRONMENT", () => {
+		const canceled = "fatal: mmap failed: Operation canceled\n";
+		const thrown = capture(new Error(canceled));
+		expect(thrown?.code).toBe("PRECONDITION_FAILED");
+		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
+		expect(thrown?.message).toBe(canceled);
+		expect(
+			causeKind(
+				capture(new Error("fatal: mmap failed: Operation timed out\n")),
+			),
+		).toBe("GIT_ENVIRONMENT");
+	});
+
 	test("does not claim other index mapping failures or network timeouts", () => {
 		expect(
 			capture(
@@ -603,6 +616,9 @@ describe("rethrowEnvironmentalGitError", () => {
 					"fatal: .git/index: unable to map index file: Cannot allocate memory\n",
 				),
 			),
+		).toBeNull();
+		expect(
+			capture(new Error("fatal: mmap failed: Cannot allocate memory\n")),
 		).toBeNull();
 		expect(
 			capture(

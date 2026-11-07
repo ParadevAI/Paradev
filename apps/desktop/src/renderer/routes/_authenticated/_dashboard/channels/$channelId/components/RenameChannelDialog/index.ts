@@ -1,0 +1,1 @@
+export { RenameChannelDialog } from "./RenameChannelDialog";

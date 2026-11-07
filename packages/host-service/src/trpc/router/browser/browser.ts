@@ -16,7 +16,35 @@ function requireBridge(ctx: HostServiceContext): BrowserBridgeClient {
 	return new BrowserBridgeClient(ctx.browserBridge);
 }
 
+const extensionId = z.string().regex(/^[a-p]{32}$/);
+
+const extensionsRouter = router({
+	list: protectedProcedure.query(({ ctx }) =>
+		requireBridge(ctx).listExtensions(),
+	),
+
+	install: protectedProcedure
+		.input(z.object({ extensionId }))
+		.mutation(({ ctx, input }) =>
+			requireBridge(ctx).installExtension(input.extensionId),
+		),
+
+	remove: protectedProcedure
+		.input(z.object({ extensionId }))
+		.mutation(({ ctx, input }) =>
+			requireBridge(ctx).removeExtension(input.extensionId),
+		),
+
+	setPinned: protectedProcedure
+		.input(z.object({ extensionId, pinned: z.boolean() }))
+		.mutation(({ ctx, input }) =>
+			requireBridge(ctx).setExtensionPinned(input.extensionId, input.pinned),
+		),
+});
+
 export const browserRouter = router({
+	extensions: extensionsRouter,
+
 	list: protectedProcedure
 		.input(z.object({ workspaceId: z.string() }))
 		.query(({ ctx, input }) => requireBridge(ctx).listPanes(input.workspaceId)),

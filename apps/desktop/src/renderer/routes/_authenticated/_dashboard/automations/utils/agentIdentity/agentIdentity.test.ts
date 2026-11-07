@@ -24,7 +24,7 @@ const custom: AgentSelectAgent = {
 };
 const superset: AgentSelectAgent = {
 	id: "superset",
-	label: "Superset",
+	label: "Paradev",
 	iconId: "superset",
 };
 

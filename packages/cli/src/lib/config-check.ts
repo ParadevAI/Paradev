@@ -132,7 +132,7 @@ function checkApiKey(value: unknown): FieldCheck {
 			? []
 			: [
 					warning(
-						"`apiKey` does not look like a Superset API key (expected an sk_ prefix)",
+						"`apiKey` does not look like a Paradev API key (expected an sk_ prefix)",
 					),
 				],
 		credential: true,

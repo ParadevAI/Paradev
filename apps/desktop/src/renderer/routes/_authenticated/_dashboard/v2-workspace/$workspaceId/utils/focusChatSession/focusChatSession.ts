@@ -44,7 +44,21 @@ export function focusChatSession({
 			}
 		}
 	}
+	addChatTab({ store, session });
+	return "added";
+}
+
+export function addChatTab({
+	store,
+	session,
+	focus = true,
+}: {
+	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	session: ChatSessionTarget;
+	focus?: boolean;
+}): void {
 	store.getState().addTab({
+		focus,
 		panes: [
 			{
 				kind: "chat-v3",
@@ -62,5 +76,4 @@ export function focusChatSession({
 			},
 		],
 	});
-	return "added";
 }

@@ -8,19 +8,24 @@ export const PLATFORM = {
 };
 
 const workspace = getWorkspaceName();
-export const SUPERSET_DIR_NAME = workspace
-	? `.superset-${workspace}`
-	: ".superset";
 export const PROTOCOL_SCHEME = workspace
 	? `superset-${workspace}`
 	: PROTOCOL_SCHEMES.PROD;
-// Project-level directory name (always .superset, not conditional)
-export const PROJECT_SUPERSET_DIR_NAME = ".superset";
+/** Height of the Windows/Linux window-controls overlay the window opens with. */
+export const TITLE_BAR_OVERLAY_HEIGHT = 40;
+
 export const WORKTREES_DIR_NAME = "worktrees";
 export const PROJECTS_DIR_NAME = "projects";
 export const CONFIG_FILE_NAME = "config.json";
 export const LOCAL_CONFIG_FILE_NAME = "config.local.json";
 export const PORTS_FILE_NAME = "ports.json";
+
+// Separate sessions keep browser-pane extensions away from the app's own requests.
+export const APP_PARTITION = "persist:superset";
+export const BROWSER_PARTITION = "persist:browser";
+// Panes agents open: no Web Store extensions, so no password manager an agent can read.
+export const AGENT_BROWSER_PARTITION = "persist:browser-agent";
+export const PANE_PARTITIONS = [BROWSER_PARTITION, AGENT_BROWSER_PARTITION];
 
 export const CONFIG_TEMPLATE = `{
   "setup": [],
@@ -34,6 +39,8 @@ export const NOTIFICATION_EVENTS = {
 	FOCUS_V2_NOTIFICATION_SOURCE: "focus-v2-notification-source",
 	TERMINAL_EXIT: "terminal-exit",
 	SETTINGS_EXTERNAL_CHANGE: "settings-external-change",
+	OPEN_ROUTE: "open-route",
+	NOTIFICATION_REPLY: "notification-reply",
 } as const;
 
 // Development/testing mock values (used when SKIP_ENV_VALIDATION is set)

@@ -1,0 +1,1 @@
+export { InngestIcon } from "./InngestIcon";

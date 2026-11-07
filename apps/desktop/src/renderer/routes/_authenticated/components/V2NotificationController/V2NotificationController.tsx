@@ -225,7 +225,7 @@ function getNotificationWorkspaceStatesById({
 		localWorkspaceRows
 			.filter((row) =>
 				isPerWorkspaceRightArea
-					? (row.rightSidebarOpen ?? isRightAreaOpen)
+					? (row.rightSidebarOpen ?? false)
 					: isRightAreaOpen,
 			)
 			.map((row) => [

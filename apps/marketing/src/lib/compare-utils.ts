@@ -41,6 +41,23 @@ export function getComparisonPageTypeLabel(type: ComparisonPageType): string {
 	}
 }
 
+const FAQ_HEADING = /^##\s+(Frequently Asked Questions|FAQ)\s*$/i;
+
+export function splitComparisonFaq(content: string): {
+	body: string;
+	faq: string | null;
+} {
+	const lines = content.split("\n");
+	const faqStart = lines.findIndex((line) => FAQ_HEADING.test(line.trim()));
+	if (faqStart === -1) {
+		return { body: content, faq: null };
+	}
+	return {
+		body: lines.slice(0, faqStart).join("\n"),
+		faq: lines.slice(faqStart).join("\n"),
+	};
+}
+
 function stripMarkdownFormatting(value: string): string {
 	return value
 		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
@@ -85,7 +102,7 @@ export function extractComparisonFaqItems(
 	for (const line of lines) {
 		const trimmedLine = line.trim();
 
-		if (/^##\s+(Frequently Asked Questions|FAQ)\s*$/i.test(trimmedLine)) {
+		if (FAQ_HEADING.test(trimmedLine)) {
 			inFaqSection = true;
 			continue;
 		}

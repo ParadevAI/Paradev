@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
 
@@ -39,16 +40,18 @@ const contentSecurityPolicy = [
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		apiOrigin,
-		...httpAndWsOrigins(process.env.RELAY_URL, "https://relay.superset.sh"),
-		...httpAndWsOrigins(
-			process.env.RELAY_BACKUP_URL,
-			"https://relay-backup.superset.sh",
-		),
-		...httpAndWsOrigins(
-			process.env.NEXT_PUBLIC_REALTIME_URL,
-			"https://realtime.superset.sh",
-		),
+		...withOwnDomainTwins([
+			apiOrigin,
+			...httpAndWsOrigins(process.env.RELAY_URL, "https://relay.superset.sh"),
+			...httpAndWsOrigins(
+				process.env.RELAY_BACKUP_URL,
+				"https://relay-backup.superset.sh",
+			),
+			...httpAndWsOrigins(
+				process.env.NEXT_PUBLIC_REALTIME_URL,
+				"https://realtime.superset.sh",
+			),
+		]),
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.i.posthog.com",

@@ -161,6 +161,7 @@ export class HostTunnel extends Server<RelayEnv> {
 	}
 
 	private async authorize(caller: Caller): Promise<AccessDecision> {
+		if (caller.preAuthorized) return "allowed";
 		const key = `access:${caller.userId}`;
 		const cached = await this.ctx.storage.get<AccessEntry>(key);
 		if (cached && cached.expiresAt > Date.now()) {

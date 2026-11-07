@@ -6,12 +6,12 @@ import {
 	githubUserConnectionConfigured,
 	githubUserConnectionFor,
 } from "../../lib/github-user";
-import { jwtProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 
 /** The caller's own GitHub connection: what it is, how to start one, how to end it. */
 export const githubUserRouter = {
-	get: jwtProcedure.query(async ({ ctx }) => {
-		const connection = await githubUserConnectionFor(ctx.userId);
+	get: personProcedure.query(async ({ ctx }) => {
+		const connection = await githubUserConnectionFor(ctx.principal.userId);
 		return {
 			available: githubUserConnectionConfigured(),
 			connection: connection
@@ -20,9 +20,9 @@ export const githubUserRouter = {
 		};
 	}),
 
-	connect: jwtProcedure.mutation(({ ctx }) => {
+	connect: personProcedure.mutation(({ ctx }) => {
 		try {
-			return { url: githubUserAuthorizeUrl(ctx.userId) };
+			return { url: githubUserAuthorizeUrl(ctx.principal.userId) };
 		} catch (error) {
 			if (!(error instanceof GithubUserConnectionError)) throw error;
 			throw userError({
@@ -33,8 +33,8 @@ export const githubUserRouter = {
 		}
 	}),
 
-	disconnect: jwtProcedure.mutation(async ({ ctx }) => {
-		await disconnectGithubUser(ctx.userId);
+	disconnect: personProcedure.mutation(async ({ ctx }) => {
+		await disconnectGithubUser(ctx.principal.userId);
 		return { disconnected: true };
 	}),
 } satisfies TRPCRouterRecord;

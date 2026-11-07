@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "eb95080c-c85d-4dab-8c08-6292087185e1",
+  "id": "000b5cd1-70ac-4d24-8568-f873e0ca971b",
   "prevId": "dcec780e-d92e-4db2-8686-9d3276a7c6ca",
   "tables": {
     "browser_history": {
@@ -876,13 +876,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "hide_empty_sidebar_projects": {
-          "name": "hide_empty_sidebar_projects",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "worktree_base_dir": {
           "name": "worktree_base_dir",
           "type": "text",
@@ -934,6 +927,13 @@
         },
         "disabled_skills": {
           "name": "disabled_skills",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "browser_pinned_extensions": {
+          "name": "browser_pinned_extensions",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

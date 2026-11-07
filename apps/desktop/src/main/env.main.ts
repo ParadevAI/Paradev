@@ -20,7 +20,7 @@ export const env = createEnv({
 			.default("development"),
 		NEXT_PUBLIC_API_URL: z.url().default("https://api.superset.sh"),
 		NEXT_PUBLIC_STREAMS_URL: z.url().default(`https://streams.${rootDomain}`),
-		NEXT_PUBLIC_WEB_URL: z.url().default(`https://app.${rootDomain}`),
+		NEXT_PUBLIC_WEB_URL: z.url().default("https://app.superset.sh"),
 		NEXT_PUBLIC_MARKETING_URL: z.url().default(`https://${rootDomain}`),
 		NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
 		NEXT_PUBLIC_POSTHOG_HOST: z.string().default("https://us.i.posthog.com"),

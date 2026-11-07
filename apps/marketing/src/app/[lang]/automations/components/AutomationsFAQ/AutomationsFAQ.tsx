@@ -41,7 +41,7 @@ export function AutomationsFAQ() {
 				>
 					<p>
 						<Trans>
-							Any agent you've set up in Superset, such as Claude Code or Codex.
+							Any agent you've set up in Paradev, such as Claude Code or Codex.
 						</Trans>
 					</p>
 				</FAQDisclosure>

@@ -28,5 +28,16 @@ if [ -n "$CI" ]; then
   exit 0
 fi
 
+# Electron 43+ no longer downloads its binary in a postinstall script. The dev
+# scripts (patch-dev-protocol, clean-launch-services) and the host-service e2e
+# runner expect node_modules/electron/dist to exist, so fetch it here.
+bun run --filter=@superset/desktop install:electron
+
+# Electron 44's V8 headers need a newer compiler than Debian bookworm's
+# default gcc 12 and clang 14, so cloud sandboxes build with clang-16.
+if [ -z "${CC:-}" ] && command -v clang++-16 >/dev/null; then
+  export CC=clang-16 CXX=clang++-16
+fi
+
 # Install native dependencies for desktop app
 bun run --filter=@superset/desktop install:deps

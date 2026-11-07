@@ -343,11 +343,23 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({ message: "Toggle Right Sidebar" }),
 		category: "Layout",
 	},
-	OPEN_DIFF_VIEWER: {
+	TOGGLE_RIGHT_PANE_FULL_SCREEN: {
 		key: {
 			mac: L("meta+shift+l"),
 			windows: L("ctrl+shift+alt+l"),
 			linux: L("ctrl+shift+alt+l"),
+		},
+		label: msg({ message: "Toggle Right Pane Full Screen" }),
+		category: "Layout",
+		description: msg({
+			message: "Expand the right pane to fill the window, or restore it",
+		}),
+	},
+	OPEN_DIFF_VIEWER: {
+		key: {
+			mac: L("meta+shift+g"),
+			windows: L("ctrl+shift+alt+g"),
+			linux: L("ctrl+shift+alt+g"),
 		},
 		label: msg({
 			message: "Open Changes",

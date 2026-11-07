@@ -17,11 +17,9 @@
  *   230 people on 2026-08-21. Repeating events belong in `wait_for_event`,
  *   which absorbs duplicates. Events fan out to every matching consumer, so
  *   any number of automations can wait on the same one.
- * - GATING an emitter is the mirror of that rule: it hits every consumer. The
- *   signup hook withholds `user.signed_up` from the activation A/B's control
- *   arm, so a second automation triggering on it would silently lose that arm
- *   too. Only activation-drip uses that trigger here. Before adding
- *   another `user.signed_up` trigger, split enrolment into its own event.
+ * - GATING an emitter is the mirror of that rule: it hits every consumer. To
+ *   withhold a campaign from some users, gate an event of its own rather than
+ *   one other automations trigger on.
  * - NEVER update an enabled automation's steps: despite the API's wording,
  *   doing so cancelled every in-flight run (2026-08-20, ~324 users dropped
  *   mid-drip). Migration is create-new-enabled, then stop (not edit) the old
@@ -71,8 +69,7 @@ function template(alias: string, variables?: Record<string, unknown>) {
 
 const desired: DesiredAutomation[] = [
 	{
-		// Every signup's welcome email; stopping this stops them all. It has its
-		// own event because `user.signed_up` is withheld from the A/B control arm.
+		// Every signup's welcome email; stopping this stops them all.
 		name: "welcome",
 		steps: [
 			{

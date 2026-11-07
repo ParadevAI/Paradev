@@ -111,6 +111,20 @@ export function formatDateTime(
 	return new Intl.DateTimeFormat(locale, options).format(date);
 }
 
+// A clock time without AM/PM, "11:11", for where the period is obvious from
+// the message above it. 24-hour locales come out unchanged.
+export function formatClockTime(
+	date: Date | number,
+	locale = getActiveLocale(),
+): string {
+	return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" })
+		.formatToParts(date)
+		.filter((part) => part.type !== "dayPeriod")
+		.map((part) => part.value)
+		.join("")
+		.trim();
+}
+
 // Relative time: -3600_000 -> "1 hour ago", 86_400_000 -> "tomorrow".
 // `numeric: "auto"` lets the locale use idiomatic wording ("yesterday")
 // where it has one.

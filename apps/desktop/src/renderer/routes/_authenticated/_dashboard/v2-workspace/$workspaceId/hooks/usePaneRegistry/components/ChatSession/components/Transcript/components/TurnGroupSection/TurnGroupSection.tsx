@@ -19,6 +19,7 @@ import { AttachmentRail, type RailImage } from "../AttachmentRail";
 import { ReplyFooter } from "../ReplyFooter";
 import { ItemRow } from "./components/ItemRow";
 import { ToolRunRow } from "./components/ToolRunRow";
+import { TurnChangesCard } from "./components/TurnChangesCard";
 import { TurnStatusRow } from "./components/TurnStatusRow";
 import { WorkingFor } from "./components/WorkingFor";
 
@@ -110,6 +111,7 @@ export function TurnGroupSection({
 				<WorkingFor
 					completedAtMs={row.completedAtMs}
 					startedAtMs={row.startedAtMs}
+					waiting={row.waiting}
 				/>
 			);
 		case "item": {
@@ -173,7 +175,23 @@ export function TurnGroupSection({
 				</>
 			);
 		case "turn_status":
-			return <TurnStatusRow message={row.message} status={row.status} />;
+			return (
+				<TurnStatusRow
+					error={row.error}
+					latest={row.latest}
+					status={row.status}
+					turnId={row.turnId}
+				/>
+			);
+		case "changed_files":
+			return (
+				<TurnChangesCard
+					files={row.files}
+					newest={row.newest}
+					toolCallIds={row.toolCallIds}
+					turnId={row.turnId}
+				/>
+			);
 		case "reply_footer":
 			return (
 				<ReplyFooter
