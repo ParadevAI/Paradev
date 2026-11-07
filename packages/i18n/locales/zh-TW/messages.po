@@ -7492,6 +7492,9 @@ msgstr "起草了3條支援回覆"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "將 <0>Paradev</0> 拖曳到<1>應用程式</1>資料夾"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "在手動排序中拖曳專案以重新排列"
+
 msgid "Drag to reorder"
 msgstr "拖曳以重新排序"
 
@@ -12035,6 +12038,9 @@ msgstr "神秘機械師"
 msgid "Name"
 msgstr "名稱"
 
+msgid "Name A–Z"
+msgstr "名稱 (A–Z)"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "名稱和一個URL友好的slug。兩者稍後都可以更改。"
 
@@ -12046,6 +12052,9 @@ msgstr "域名無法解析"
 
 msgid "Name updated!"
 msgstr "姓名已更新！"
+
+msgid "Name Z–A"
+msgstr "名稱 (Z–A)"
 
 msgid "Name, email, or team"
 msgstr "姓名、電子郵件或團隊"
@@ -15185,6 +15194,9 @@ msgstr "專案所在主機不可達，暫時無法重新命名"
 
 msgid "Projects"
 msgstr "專案"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "專案：{projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "提示詞"
@@ -18381,6 +18393,9 @@ msgstr "排序方式"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "按{label}排序，目前為{sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "排序專案和工作區"
 
 msgid "Sort workspaces"
 msgstr "排序工作區"

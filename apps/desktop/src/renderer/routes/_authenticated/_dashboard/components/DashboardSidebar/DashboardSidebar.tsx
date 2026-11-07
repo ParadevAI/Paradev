@@ -58,10 +58,7 @@ import { DashboardSidebarShellHeader } from "./components/DashboardSidebarShellH
 import { DashboardSidebarWorkspacesHeader } from "./components/DashboardSidebarWorkspacesHeader";
 import { useGettingStartedCard } from "./components/GettingStartedCard";
 import { useV2SetupScriptCard } from "./components/V2SetupScriptCard";
-import {
-	getBlockedDragProps,
-	useBlockedDragNotice,
-} from "./hooks/useBlockedDragNotice";
+import { useBlockedDragNotice } from "./hooks/useBlockedDragNotice";
 import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
 import { useMigrateLegacySidebarFolders } from "./hooks/useMigrateLegacySidebarFolders";
@@ -83,6 +80,10 @@ import {
 	filterDashboardSidebarProjectsByHost,
 	matchesHostFilter,
 } from "./utils/filterDashboardSidebarProjectsByHost";
+import {
+	createProjectNameCollator,
+	orderDashboardSidebarProjects,
+} from "./utils/orderDashboardSidebarProjects";
 import { getProjectChildrenWorkspaces } from "./utils/projectChildren";
 import { sortDashboardSidebarProjects } from "./utils/sortDashboardSidebarProjects";
 
@@ -127,6 +128,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				project={project}
 				isSidebarCollapsed={isCollapsed}
 				isDraggingProject={isDraggingProject}
+				isDragBlocked={isDragDisabled}
 				workspaceShortcutLabels={workspaceShortcutLabels}
 				onWorkspaceHover={onWorkspaceHover}
 				onToggleCollapse={onToggleCollapse}
@@ -138,6 +140,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 			project,
 			isCollapsed,
 			isDraggingProject,
+			isDragDisabled,
 			workspaceShortcutLabels,
 			onWorkspaceHover,
 			onToggleCollapse,
@@ -154,7 +157,6 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				transition,
 				opacity: isDragging ? 0.5 : undefined,
 			}}
-			{...getBlockedDragProps(isDragDisabled)}
 		>
 			{section}
 		</div>
@@ -164,7 +166,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	isCollapsed = false,
 }: DashboardSidebarProps) {
-	const { t } = useLingui();
+	const { t, i18n } = useLingui();
 	const isCloudEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const isChannelsEnabled =
@@ -209,8 +211,14 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		preferences,
 		setSidebarProjectSortMode,
 		setSidebarProjectHostFilter,
+		setSidebarProjectOrder,
 	} = useV2UserPreferences();
 	const sortMode = preferences.sidebarProjectSortMode;
+	const projectOrderMode = preferences.sidebarProjectOrder;
+	const projectNameCollator = useMemo(
+		() => createProjectNameCollator(i18n.locale),
+		[i18n.locale],
+	);
 	// The icon rail has no control for the filter, so it rests there.
 	const hostFilter =
 		isCloudEnabled && !isCollapsed
@@ -238,14 +246,24 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 			.filter((g): g is DashboardSidebarProject => g != null);
 	}, [groups, projectOrder]);
 
-	// Sort, then filter, as derived views: `orderedGroups` and the persisted
-	// tabOrder stay untouched, so Manual restores the drag order exactly.
+	// Order, sort, then filter, as derived views: `orderedGroups` and the
+	// persisted tabOrder stay untouched, so Manual restores the drag order
+	// exactly.
+	const nameOrderedGroups = useMemo(
+		() =>
+			orderDashboardSidebarProjects(
+				orderedGroups,
+				projectOrderMode,
+				projectNameCollator,
+			),
+		[orderedGroups, projectOrderMode, projectNameCollator],
+	);
 	const sortedGroups = useMemo(
 		() =>
 			sortMode === "manual"
-				? orderedGroups
-				: sortDashboardSidebarProjects(orderedGroups, sortMode),
-		[sortMode, orderedGroups],
+				? nameOrderedGroups
+				: sortDashboardSidebarProjects(nameOrderedGroups, sortMode),
+		[sortMode, nameOrderedGroups],
 	);
 	const hostFilteredGroups = useMemo(
 		() => filterDashboardSidebarProjectsByHost(sortedGroups, hostFilter),
@@ -280,14 +298,21 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	);
 	const trimmedFilterQuery = projectFilterQuery.trim();
 	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
-	// The sort modes only reorder rows inside a project, so the project list
-	// is still the manual order and stays draggable; only a filter, which
-	// hides projects outright, makes a project drop unsafe to commit.
-	const isProjectDragDisabled = isFilterActive;
+	// The sort modes only reorder rows inside a project, so they leave the
+	// project list draggable; a name order or a filter changes the list
+	// itself, which makes a project drop unsafe to commit.
+	const isProjectDragDisabled = projectOrderMode !== "manual" || isFilterActive;
 	const isChildDragDisabled = sortMode !== "manual" || isFilterActive;
 	useBlockedDragNotice({
-		reason: isFilterActive ? "filter" : sortMode !== "manual" ? "sort" : null,
-		onSwitchToManualOrder: () => setSidebarProjectSortMode("manual"),
+		reason: isFilterActive
+			? "filter"
+			: sortMode !== "manual" || projectOrderMode !== "manual"
+				? "sort"
+				: null,
+		onSwitchToManualOrder: () => {
+			setSidebarProjectSortMode("manual");
+			setSidebarProjectOrder("manual");
+		},
 		onClearFilter: () => {
 			setProjectFilterQuery("");
 			setSidebarProjectHostFilter("all");
@@ -499,6 +524,8 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 						<DashboardSidebarWorkspacesHeader
 							sortMode={sortMode}
 							onSortModeChange={setSidebarProjectSortMode}
+							projectOrder={projectOrderMode}
+							onProjectOrderChange={setSidebarProjectOrder}
 							hostFilter={isCloudEnabled ? hostFilter : null}
 							onHostFilterChange={setSidebarProjectHostFilter}
 							filterQuery={projectFilterQuery}

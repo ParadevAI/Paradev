@@ -7492,6 +7492,9 @@ msgstr "지원 답변 3건 초안 작성"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "<0>Paradev</0>를 <1>응용 프로그램</1> 폴더로 드래그하세요"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "수동 정렬에서 프로젝트를 드래그하여 순서 변경"
+
 msgid "Drag to reorder"
 msgstr "끌어서 순서 변경"
 
@@ -12035,6 +12038,9 @@ msgstr "수수께끼의 기계공"
 msgid "Name"
 msgstr "이름"
 
+msgid "Name A–Z"
+msgstr "이름 (A–Z)"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "이름과 URL에 쓰기 좋은 슬러그를 정하세요. 둘 다 나중에 바꿀 수 있습니다."
 
@@ -12046,6 +12052,9 @@ msgstr "이름을 확인할 수 없음"
 
 msgid "Name updated!"
 msgstr "이름이 업데이트되었습니다!"
+
+msgid "Name Z–A"
+msgstr "이름 (Z–A)"
 
 msgid "Name, email, or team"
 msgstr "이름, 이메일 또는 팀"
@@ -15185,6 +15194,9 @@ msgstr "프로젝트 호스트에 연결할 수 없습니다 — 지금은 이�
 
 msgid "Projects"
 msgstr "프로젝트"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "프로젝트: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "프롬프트"
@@ -18381,6 +18393,9 @@ msgstr "정렬 기준"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label} 기준 정렬, 현재 {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "프로젝트 및 워크스페이스 정렬"
 
 msgid "Sort workspaces"
 msgstr "워크스페이스 정렬"

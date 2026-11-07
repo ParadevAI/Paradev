@@ -7492,6 +7492,9 @@ msgstr "menyusun 3 draf balasan dukungan"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Seret <0>Paradev</0> ke folder <1>Aplikasi</1>"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "Seret proyek untuk mengatur ulang dalam Urutan manual"
+
 msgid "Drag to reorder"
 msgstr "Seret untuk mengurutkan ulang"
 
@@ -12035,6 +12038,9 @@ msgstr "Masinis Misterius"
 msgid "Name"
 msgstr "Nama"
 
+msgid "Name A–Z"
+msgstr "Nama A–Z"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Nama dan slug yang ramah URL. Keduanya bisa diubah nanti."
 
@@ -12046,6 +12052,9 @@ msgstr "Nama Tidak Ditemukan"
 
 msgid "Name updated!"
 msgstr "Nama diperbarui!"
+
+msgid "Name Z–A"
+msgstr "Nama Z–A"
 
 msgid "Name, email, or team"
 msgstr "Nama, email, atau tim"
@@ -15185,6 +15194,9 @@ msgstr "Host proyek tidak bisa dijangkau — tidak bisa ganti nama sekarang"
 
 msgid "Projects"
 msgstr "Proyek"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "Proyek: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "Prompt"
@@ -18381,6 +18393,9 @@ msgstr "Urutkan menurut"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Urutkan menurut {label}, saat ini {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "Urutkan proyek dan workspace"
 
 msgid "Sort workspaces"
 msgstr "Urutkan workspace"
