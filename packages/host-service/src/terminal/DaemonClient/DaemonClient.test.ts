@@ -99,7 +99,9 @@ test("an open error does not count as the answer to a dropped subscribe", async 
 	await client.connect();
 	const callbacks = { onOutput() {}, onReplayComplete() {}, onExit() {} };
 
-	const opened = client.open("taken", {} as never).catch(() => {});
+	const opened = expect(client.open("taken", {} as never)).rejects.toThrow(
+		"exists",
+	);
 	const unsubscribeFirst = client.subscribe(
 		"taken",
 		{ replay: true },
