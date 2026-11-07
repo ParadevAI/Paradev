@@ -22,22 +22,24 @@ type HistoryWriterParams = {
 export class HistoryManager {
 	private historyWriters = new Map<string, HistoryWriter>();
 	private pendingHistoryData = new Map<string, string[]>();
-	private historyInitializing = new Set<string>();
 
 	async initHistoryWriter(params: HistoryWriterParams): Promise<void> {
-		this.historyInitializing.add(params.paneId);
-		this.pendingHistoryData.set(params.paneId, []);
-		await this.openHistoryWriter(params);
+		const pending: string[] = [];
+		this.pendingHistoryData.set(params.paneId, pending);
+		await this.openHistoryWriter(params, pending);
 	}
 
-	private async openHistoryWriter({
-		paneId,
-		workspaceId,
-		cwd,
-		cols,
-		rows,
-		initialScrollback,
-	}: HistoryWriterParams): Promise<void> {
+	private async openHistoryWriter(
+		{
+			paneId,
+			workspaceId,
+			cwd,
+			cols,
+			rows,
+			initialScrollback,
+		}: HistoryWriterParams,
+		pending: string[],
+	): Promise<void> {
 		let safeScrollback = initialScrollback;
 		if (initialScrollback !== undefined) {
 			if (typeof initialScrollback !== "string") {
@@ -65,12 +67,13 @@ export class HistoryManager {
 		try {
 			const writer = new HistoryWriter(workspaceId, paneId, cwd, cols, rows);
 			await writer.init(safeScrollback);
+			if (this.pendingHistoryData.get(paneId) !== pending) {
+				await writer.close();
+				return;
+			}
 			this.historyWriters.set(paneId, writer);
-
-			const buffered = this.pendingHistoryData.get(paneId) || [];
-			this.historyInitializing.delete(paneId);
 			this.pendingHistoryData.delete(paneId);
-			for (const data of buffered) {
+			for (const data of pending) {
 				writer.write(data);
 			}
 		} catch (error) {
@@ -79,8 +82,9 @@ export class HistoryManager {
 				error,
 			);
 		} finally {
-			this.historyInitializing.delete(paneId);
-			this.pendingHistoryData.delete(paneId);
+			if (this.pendingHistoryData.get(paneId) === pending) {
+				this.pendingHistoryData.delete(paneId);
+			}
 		}
 	}
 
@@ -89,11 +93,9 @@ export class HistoryManager {
 		data: string,
 		getSession: () => SessionInfo | undefined,
 	): void {
-		if (this.historyInitializing.has(paneId)) {
-			const buffer = this.pendingHistoryData.get(paneId);
-			if (buffer) {
-				buffer.push(data);
-			}
+		const buffer = this.pendingHistoryData.get(paneId);
+		if (buffer) {
+			buffer.push(data);
 			return;
 		}
 
@@ -106,7 +108,6 @@ export class HistoryManager {
 			const session = getSession();
 			if (session) {
 				this.historyWriters.delete(paneId);
-				this.historyInitializing.add(paneId);
 				const pending: string[] = [];
 				this.pendingHistoryData.set(paneId, pending);
 
@@ -121,14 +122,17 @@ export class HistoryManager {
 					})
 					.then(() => {
 						if (this.pendingHistoryData.get(paneId) !== pending) return;
-						return this.openHistoryWriter({
-							paneId,
-							workspaceId: session.workspaceId,
-							cwd: session.cwd,
-							cols: session.cols,
-							rows: session.rows,
-							initialScrollback: contentAfterClear || undefined,
-						});
+						return this.openHistoryWriter(
+							{
+								paneId,
+								workspaceId: session.workspaceId,
+								cwd: session.cwd,
+								cols: session.cols,
+								rows: session.rows,
+								initialScrollback: contentAfterClear || undefined,
+							},
+							pending,
+						);
 					})
 					.catch((error) => {
 						console.warn(
@@ -155,7 +159,6 @@ export class HistoryManager {
 			this.historyWriters.delete(paneId);
 		}
 
-		this.historyInitializing.delete(paneId);
 		this.pendingHistoryData.delete(paneId);
 	}
 
@@ -191,7 +194,6 @@ export class HistoryManager {
 		}
 		await Promise.all(closePromises);
 		this.historyWriters.clear();
-		this.historyInitializing.clear();
 		this.pendingHistoryData.clear();
 
 		const initPromises: Promise<void>[] = [];
@@ -230,7 +232,6 @@ export class HistoryManager {
 		}
 		await Promise.all(closePromises);
 		this.historyWriters.clear();
-		this.historyInitializing.clear();
 		this.pendingHistoryData.clear();
 	}
 
@@ -244,7 +245,6 @@ export class HistoryManager {
 			});
 		}
 		this.historyWriters.clear();
-		this.historyInitializing.clear();
 		this.pendingHistoryData.clear();
 	}
 
@@ -253,7 +253,6 @@ export class HistoryManager {
 			writer.close().catch(() => {});
 		}
 		this.historyWriters.clear();
-		this.historyInitializing.clear();
 		this.pendingHistoryData.clear();
 	}
 }

@@ -18,8 +18,9 @@ const harness = `
 
 	const gate = () => {
 		let release;
-		const promise = new Promise((resolve) => { release = resolve; });
-		return { promise, release };
+		let fail;
+		const promise = new Promise((resolve, reject) => { release = resolve; fail = reject; });
+		return { promise, release, fail };
 	};
 	let closeGate;
 	let initGate;
@@ -40,6 +41,7 @@ const harness = `
 		return initializing;
 	};
 	const tick = () => new Promise((resolve) => setImmediate(resolve));
+	const result = {};
 
 	const manager = new HistoryManager();
 	const session = { workspaceId: "ws", cwd: "/tmp", cols: 80, rows: 24 };
@@ -50,7 +52,7 @@ const harness = `
 const report = `
 	for (;;) {
 		const count = closes.length + inits.length;
-		await Promise.all([...closes, ...inits]);
+		await Promise.allSettled([...closes, ...inits]);
 		await tick();
 		if (count === closes.length + inits.length) break;
 	}
@@ -59,7 +61,7 @@ const report = `
 		join(process.env.SUPERSET_HOME_DIR, "terminal-history", "ws", "pane", "scrollback.bin"),
 		"utf8",
 	);
-	console.log(JSON.stringify({ history, inits: inits.length }));
+	console.log(JSON.stringify({ history, inits: inits.length, ...result }));
 	process.exit(0);
 `;
 
@@ -124,4 +126,44 @@ test("a history reset while a clear waits for its close keeps the reset history"
 			await reset;
 		`),
 	).toEqual({ history: "next", inits: 2 });
+});
+
+test("a failed stale init does not cancel a clear that started after it", () => {
+	expect(
+		runScenario(`
+			console.error = () => {};
+			initGate = gate();
+			const staleInit = initGate;
+			const stale = manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "stale" });
+			manager.closeHistoryWriter("pane");
+			initGate = undefined;
+			await manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "fresh" });
+			closeGate = gate();
+			manager.writeToHistory("pane", "\\x1b[3Jafter", getSession);
+			staleInit.fail(new Error("disk"));
+			await stale;
+			closeGate.release();
+			await Promise.all(closes);
+			await tick();
+			await Promise.allSettled(inits);
+			manager.writeToHistory("pane", "-next", getSession);
+		`),
+	).toEqual({ history: "after-next", inits: 4 });
+});
+
+test("a stale init that succeeds late does not replace the current writer", () => {
+	expect(
+		runScenario(`
+			initGate = gate();
+			const staleInit = initGate;
+			const stale = manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "stale" });
+			manager.closeHistoryWriter("pane");
+			initGate = undefined;
+			await manager.initHistoryWriter({ paneId: "pane", ...session, initialScrollback: "fresh" });
+			const current = manager.getHistoryWriter("pane");
+			staleInit.release();
+			await stale;
+			result.keptCurrent = manager.getHistoryWriter("pane") === current;
+		`).keptCurrent,
+	).toBe(true);
 });
