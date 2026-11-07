@@ -101,7 +101,11 @@ test("explains a page that timed out instead of showing the gh command", async (
 	const walk = listGitHubRepositories(async () => {
 		throw failure;
 	});
-	await expect(walk).rejects.toMatchObject({ code: "TIMEOUT", cause: failure });
+	await expect(walk).rejects.toMatchObject({
+		code: "TIMEOUT",
+		cause: failure,
+		message: expect.stringContaining("timed out"),
+	});
 	await expect(walk).rejects.not.toThrow("Command failed");
 });
 
