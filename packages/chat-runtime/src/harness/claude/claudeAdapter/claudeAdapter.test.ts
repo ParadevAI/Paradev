@@ -243,6 +243,42 @@ describe("ClaudeAdapter", () => {
 		expect(harness.interrupts).toBe(1);
 	});
 
+	test("a Stop held through a failed attachment read does not interrupt the next turn", async () => {
+		let failRead: (() => void) | undefined;
+		const harness = createHarness({
+			resolveAttachment: () =>
+				new Promise((_, reject) => {
+					failRead = () => reject(new Error("unreadable"));
+				}),
+		});
+
+		harness.adapter.prompt([
+			{
+				type: "attachment",
+				attachmentId: "a",
+				name: "a.png",
+				mimeType: "image/png",
+			},
+		]);
+		harness.adapter.cancelTurn();
+		failRead?.();
+		await new Promise((resolve) => setImmediate(resolve));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
+
+		harness.adapter.prompt([{ type: "text", text: "second" }]);
+		harness.emit(messageStart("msg_2"));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "completed" },
+		});
+		expect(harness.interrupts).toBe(1);
+	});
+
 	test("reports the session id the stream carries, once", async () => {
 		const harness = createHarness();
 		const reported: string[] = [];
