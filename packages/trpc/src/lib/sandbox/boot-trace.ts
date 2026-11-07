@@ -87,3 +87,90 @@ export function recordBootSpans(answer: HostAnswer): void {
 	}
 	boot.end(last.end);
 }
+
+/** One line of the box's boot log: `<epoch ms> <phase> [detail]`. */
+interface BootLogLine {
+	at: number;
+	phase: string;
+	detail: string;
+}
+
+/**
+ * Where the box's latest boot stands, read from its boot log when
+ * host-service does not answer and so cannot report it.
+ *
+ * - `booting`: a boot started and has not yet reached a phase after which
+ *   waiting cannot help; host-service is still to come.
+ * - `ended`: the latest boot refused, found no runtime, or saw host-service
+ *   start (or give up) and the control plane still got no answer.
+ * - `stale`: a boot started long ago and never finished; its runner is gone.
+ * - `none`: no boot in the log at all.
+ */
+export interface BootProgress {
+	state: "none" | "booting" | "ended" | "stale";
+	startedAt?: number;
+	last?: BootLogLine;
+}
+
+/** After one of these, the boot has nothing left to do that host-service waits on. */
+const BOOT_ENDED_PHASES = new Set([
+	"boot.refused",
+	"host.missing",
+	"host.ready",
+	"host.timeout",
+]);
+
+/**
+ * A boot this old with no end phase was cut off (its session stopped under
+ * it) rather than slow: a box one bundle behind takes under a minute.
+ */
+export const BOOT_STALE_MS = 10 * 60 * 1000;
+
+const BOOT_LOG_LINE = /^(\d{10,16}) (\S+)(?: (.*))?$/;
+
+/** The latest boot's lines; everything before its `boot.start` belongs to earlier boots. */
+function latestBootLines(log: string): BootLogLine[] {
+	let lines: BootLogLine[] = [];
+	for (const raw of log.split("\n")) {
+		const match = BOOT_LOG_LINE.exec(raw.trimEnd());
+		if (!match) continue;
+		const line = {
+			at: Number(match[1]),
+			phase: match[2] ?? "",
+			detail: match[3] ?? "",
+		};
+		if (line.phase === "boot.start") lines = [];
+		lines.push(line);
+	}
+	return lines[0]?.phase === "boot.start" ? lines : [];
+}
+
+export function bootProgressFrom(log: string, now: number): BootProgress {
+	const lines = latestBootLines(log);
+	const first = lines[0];
+	const last = lines.at(-1);
+	if (!first || !last) return { state: "none" };
+	const startedAt = first.at;
+	if (lines.some((line) => BOOT_ENDED_PHASES.has(line.phase))) {
+		return { state: "ended", startedAt, last };
+	}
+	if (now - startedAt > BOOT_STALE_MS + CLOCK_SKEW_MS) {
+		return { state: "stale", startedAt, last };
+	}
+	return { state: "booting", startedAt, last };
+}
+
+/** One line for an error message: where the boot was and for how long. */
+export function describeBootProgress(
+	progress: BootProgress | null,
+	now: number,
+): string {
+	if (!progress) return "boot log unreadable";
+	if (progress.state === "none" || !progress.last) return "no boot in the log";
+	const last = `${progress.last.phase}${progress.last.detail ? ` ${progress.last.detail}` : ""}`;
+	const age =
+		progress.startedAt === undefined
+			? ""
+			: `, started ${Math.round((now - progress.startedAt) / 1000)}s ago`;
+	return `boot ${progress.state} at "${last.slice(0, 160)}"${age}`;
+}
