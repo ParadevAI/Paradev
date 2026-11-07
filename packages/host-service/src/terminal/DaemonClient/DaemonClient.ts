@@ -505,8 +505,13 @@ export class DaemonClient {
 		}
 		for (const frame of frames) {
 			const msg = frame.message as ServerMessage;
-			if (msg.type === "error" && msg.id && !this.answerSubscribe(msg.id)) {
-				this.callbacks.get(msg.id)?.replay?.reject(new Error(msg.message));
+			if (msg.type === "error" && msg.id) {
+				// The daemon fails a subscribe only with ENOENT.
+				if (msg.code === "ENOENT" && this.unansweredSubscribes.has(msg.id)) {
+					if (!this.answerSubscribe(msg.id))
+						this.callbacks.get(msg.id)?.replay?.reject(new Error(msg.message));
+					continue;
+				}
 			}
 			if (msg.type === "replay-complete") {
 				if (this.answerSubscribe(msg.id)) continue;
