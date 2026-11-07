@@ -64,7 +64,7 @@ interface UseDiffCodeViewItemsResult {
 }
 
 /** A patch request: every file sharing a (category, baseBranch, commitHash,
- * fromHash) resolves to one `git diff`. A DiffPane's file list can mix
+ * fromHash, includeFrom) resolves to one `git diff`. A DiffPane's file list can mix
  * categories (staged + unstaged + against-base in one "changes" view), so
  * this is usually 1-3 groups, never one per file. */
 interface PatchGroup {
@@ -160,6 +160,7 @@ function groupKeyFor(input: DiffPatchScope): string {
 		input.baseBranch ?? "",
 		input.commitHash ?? "",
 		input.fromHash ?? "",
+		input.includeFrom ?? false,
 	].join("\0");
 }
 
@@ -629,6 +630,7 @@ function createGetDiffPatchInput(
 			category: "commit",
 			commitHash: source.commitHash,
 			fromHash: source.fromHash,
+			includeFrom: source.includeFrom,
 		};
 	}
 	return { workspaceId, category: source.kind };

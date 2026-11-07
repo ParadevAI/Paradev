@@ -553,10 +553,31 @@ export interface DiffCategoryRefs {
 	toRef?: string;
 }
 
+const EMPTY_TREE_HASH = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+
+async function resolveCommitBaseRef(
+	git: SimpleGit,
+	commitHash: string,
+	fromHash: string | undefined,
+	includeFrom: boolean | undefined,
+): Promise<string> {
+	if (!includeFrom || !fromHash) return fromHash ?? `${commitHash}^`;
+
+	const parents = await git.raw(["rev-list", "--parents", "-n", "1", fromHash]);
+	const refs = parents.trim().split(/\s+/);
+	if (!refs[0]) throw new Error(`Could not resolve commit ${fromHash}`);
+	return refs[1] ?? EMPTY_TREE_HASH;
+}
+
 export async function resolveDiffCategoryRefs(
 	git: SimpleGit,
 	category: DiffCategory,
-	opts: { baseBranch?: string; commitHash?: string; fromHash?: string },
+	opts: {
+		baseBranch?: string;
+		commitHash?: string;
+		fromHash?: string;
+		includeFrom?: boolean;
+	},
 ): Promise<DiffCategoryRefs> {
 	if (category === "against-base") {
 		const base = await resolveBaseComparison(git, opts.baseBranch);
@@ -578,7 +599,12 @@ export async function resolveDiffCategoryRefs(
 			});
 		}
 		return {
-			fromRef: opts.fromHash ?? `${opts.commitHash}^`,
+			fromRef: await resolveCommitBaseRef(
+				git,
+				opts.commitHash,
+				opts.fromHash,
+				opts.includeFrom,
+			),
 			toRef: opts.commitHash,
 		};
 	}
