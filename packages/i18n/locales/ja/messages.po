@@ -6132,6 +6132,9 @@ msgstr "編集を保存できませんでした"
 msgid "Couldn't save the change"
 msgstr "変更を保存できませんでした"
 
+msgid "Couldn't save the default for new chats"
+msgstr "新規チャットのデフォルトを保存できませんでした"
+
 msgid "Couldn't save the Dev"
 msgstr "Devを保存できませんでした"
 
@@ -21196,6 +21199,9 @@ msgstr "Claude Code、Codex、その他どのコーディングエージェン�
 
 msgid "Use for new agents"
 msgstr "新規エージェントに使用"
+
+msgid "Use for new chats"
+msgstr "新規チャットに使用"
 
 msgid "Use global default"
 msgstr "グローバルのデフォルトを使用"

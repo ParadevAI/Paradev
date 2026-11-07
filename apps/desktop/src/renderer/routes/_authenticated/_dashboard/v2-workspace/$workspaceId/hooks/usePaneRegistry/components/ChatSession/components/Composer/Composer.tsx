@@ -72,6 +72,7 @@ import {
 import { useDrawerEntry } from "./hooks/useDrawerEntry";
 import { useLinkChips } from "./hooks/useLinkChips";
 import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
+import { useNewChatDefaults } from "./hooks/useNewChatDefaults";
 import { useStatusDialog } from "./hooks/useStatusDialog";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
 
@@ -354,6 +355,7 @@ export const Composer = memo(function Composer({
 	);
 
 	const { transport } = useChatWiring();
+	const newChatDefaults = useNewChatDefaults(presetId);
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const otherHostOf = useCallback(
 		(chatWorkspaceId: string) => {
@@ -682,6 +684,7 @@ export const Composer = memo(function Composer({
 									configOptions={configOptions}
 									hideEffortLabel={footerTier >= 1}
 									hideModelLabel={footerTier >= 3}
+									newChatDefaults={newChatDefaults}
 									onOpenChange={changeModelPickerOpen}
 									onSelect={onSetConfigOption}
 									open={modelPickerOpen}

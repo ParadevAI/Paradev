@@ -6132,6 +6132,9 @@ msgstr "Tidak bisa menyimpan suntingan"
 msgid "Couldn't save the change"
 msgstr "Tidak dapat menyimpan perubahan"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Tidak dapat menyimpan default untuk chat baru"
+
 msgid "Couldn't save the Dev"
 msgstr "Tidak dapat menyimpan Dev"
 
@@ -21196,6 +21199,9 @@ msgstr "Pakai Claude Code, Codex, atau agen coding apa pun. Pilih per tugas atau
 
 msgid "Use for new agents"
 msgstr "Pakai untuk agen baru"
+
+msgid "Use for new chats"
+msgstr "Pakai untuk chat baru"
 
 msgid "Use global default"
 msgstr "Pakai bawaan global"

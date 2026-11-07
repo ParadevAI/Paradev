@@ -3,6 +3,7 @@ export { createChatDb, DEFAULT_MIGRATIONS_FOLDER } from "./createChatDb";
 export type { ChatSessionRow, JournalRow } from "./schema";
 export {
 	CHAT_DB_FILENAME,
+	chatDefaultSelections,
 	chatJournal,
 	chatSelections,
 	chatSessionsLocal,

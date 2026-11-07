@@ -6132,6 +6132,9 @@ msgstr "편집을 저장하지 못했습니다"
 msgid "Couldn't save the change"
 msgstr "변경 사항을 저장하지 못했습니다"
 
+msgid "Couldn't save the default for new chats"
+msgstr "새 채팅의 기본값을 저장하지 못했습니다"
+
 msgid "Couldn't save the Dev"
 msgstr "Dev를 저장할 수 없습니다"
 
@@ -21196,6 +21199,9 @@ msgstr "Claude Code, Codex 등 어떤 코딩 에이전트든 사용하세요. �
 
 msgid "Use for new agents"
 msgstr "새 에이전트에 사용"
+
+msgid "Use for new chats"
+msgstr "새 채팅에 사용"
 
 msgid "Use global default"
 msgstr "전역 기본값 사용"

@@ -6132,6 +6132,9 @@ msgstr "Không thể lưu chỉnh sửa"
 msgid "Couldn't save the change"
 msgstr "Không thể lưu thay đổi"
 
+msgid "Couldn't save the default for new chats"
+msgstr "Không thể lưu mặc định cho chat mới"
+
 msgid "Couldn't save the Dev"
 msgstr "Không thể lưu Dev"
 
@@ -21196,6 +21199,9 @@ msgstr "Dùng Claude Code, Codex hay bất kỳ coding agent nào. Chọn theo t
 
 msgid "Use for new agents"
 msgstr "Dùng cho agent mới"
+
+msgid "Use for new chats"
+msgstr "Dùng cho chat mới"
 
 msgid "Use global default"
 msgstr "Dùng mặc định toàn cục"

@@ -28,12 +28,14 @@ import { currentLabel } from "../../utils/configOptionLabels";
 import { fastOption } from "../../utils/toggleOption";
 import { EffortSliderCard } from "./components/EffortSliderCard";
 import { ModelPanel } from "./components/ModelPanel";
-import type { AgentSwitcher } from "./types";
+import { NewChatDefaultRow } from "./components/NewChatDefaultRow";
+import type { AgentSwitcher, NewChatDefaults } from "./types";
 
 export type ModelPickerProps = {
 	configOptions: SessionConfigOption[];
 	onSelect: (configId: string, value: string) => void;
 	agentSwitcher?: AgentSwitcher;
+	newChatDefaults?: NewChatDefaults;
 	hideEffortLabel?: boolean;
 	hideModelLabel?: boolean;
 	open: boolean;
@@ -50,6 +52,7 @@ export function ModelPicker({
 	configOptions,
 	hideEffortLabel,
 	hideModelLabel,
+	newChatDefaults,
 	onOpenChange,
 	onSelect,
 	open,
@@ -104,6 +107,8 @@ export function ModelPicker({
 		(option) => option !== effort && (effort ? option !== fast : true),
 	);
 	if (!model && settings.length === 0 && !canSwitchAgent) return null;
+	const showsDefaultRow = Boolean(newChatDefaults && (model || effort));
+	const showsFooter = settings.length > 0 || showsDefaultRow;
 	const showsModels = Boolean(model) || canSwitchAgent;
 	const currentAgentLabel = currentAgent?.label;
 	const pillLabel =
@@ -211,14 +216,14 @@ export function ModelPicker({
 							}
 						}
 						model={model}
-						onLeave={settings.length > 0 ? leavePanel : undefined}
+						onLeave={showsFooter ? leavePanel : undefined}
 						onPick={(modelId) => {
 							if (model) pick(model, modelId);
 						}}
 						searchRef={searchRef}
 					/>
 				) : null}
-				{settings.length > 0 ? (
+				{showsFooter ? (
 					<div
 						className={cn(
 							"flex flex-col gap-px p-1",
@@ -264,6 +269,13 @@ export function ModelPicker({
 								</DropdownMenuPortal>
 							</DropdownMenuSub>
 						))}
+						{newChatDefaults && showsDefaultRow ? (
+							<NewChatDefaultRow
+								defaults={newChatDefaults}
+								effort={effort}
+								model={model}
+							/>
+						) : null}
 					</div>
 				) : null}
 			</DropdownMenuContent>

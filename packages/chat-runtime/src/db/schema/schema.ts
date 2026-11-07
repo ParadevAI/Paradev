@@ -57,3 +57,15 @@ export const chatSelections = sqliteTable(
 	},
 	(table) => [primaryKey({ columns: [table.harness, table.category] })],
 );
+
+/** The model and effort the user chose for every new chat of a harness, over what they last picked. */
+export const chatDefaultSelections = sqliteTable(
+	"chat_default_selections",
+	{
+		harness: text().notNull(),
+		category: text().notNull(),
+		value: text().notNull(),
+		updatedAt: integer("updated_at").notNull(),
+	},
+	(table) => [primaryKey({ columns: [table.harness, table.category] })],
+);
