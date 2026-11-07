@@ -1,8 +1,9 @@
 import { EventEmitter } from "node:events";
+import { totalmem } from "node:os";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
-import { clipboard, Menu, webContents } from "electron";
+import { app, clipboard, Menu, webContents } from "electron";
 import { writeClipboardImage } from "main/lib/clipboard-image";
 import { safeOpenExternal } from "main/lib/safe-url";
 import type {
@@ -43,6 +44,24 @@ export interface BrowserPaneInfo {
 	title: string;
 	isLoading: boolean;
 }
+
+export interface PaneUnloadInfo {
+	totalMemoryKb: number;
+	panes: Record<
+		string,
+		{ memoryKb: number; audible: boolean; unsavedInput: boolean }
+	>;
+}
+
+const UNLOAD_CHECK_WORLD_ID = 1999;
+const UNLOAD_CHECK_TIMEOUT_MS = 500;
+// Form fields the user changed and did not submit; a reload would lose them.
+const HAS_UNSAVED_INPUT_SCRIPT = `[...document.querySelectorAll("input, textarea, select")].some((field) => {
+	if (field.type === "hidden" || field.disabled) return false;
+	if (field.tagName === "SELECT") return [...field.options].some((option) => option.selected !== option.defaultSelected);
+	if (field.type === "checkbox" || field.type === "radio") return field.checked !== field.defaultChecked;
+	return field.value !== field.defaultValue;
+})`;
 
 export interface BrowserOpenRequest {
 	workspaceId: string;
@@ -825,6 +844,43 @@ class BrowserManager extends EventEmitter {
 	 * Panes with agent work in flight (live CDP session or capture). The
 	 * renderer parks these presentable and exempts them from LRU eviction.
 	 */
+	async getUnloadInfo(paneIds: string[]): Promise<PaneUnloadInfo> {
+		const memoryByPid = new Map(
+			app
+				.getAppMetrics()
+				.map((metric) => [metric.pid, metric.memory.workingSetSize]),
+		);
+		const panesByPid = new Map<number, number>();
+		for (const paneId of this.panes.keys()) {
+			const pid = this.getWebContents(paneId)?.getOSProcessId();
+			if (pid) panesByPid.set(pid, (panesByPid.get(pid) ?? 0) + 1);
+		}
+		const panes: PaneUnloadInfo["panes"] = {};
+		await Promise.all(
+			paneIds.map(async (paneId) => {
+				const wc = this.getWebContents(paneId);
+				if (!wc) return;
+				const pid = wc.getOSProcessId();
+				panes[paneId] = {
+					// A process can serve several panes; split its memory between them.
+					memoryKb: (memoryByPid.get(pid) ?? 0) / (panesByPid.get(pid) ?? 1),
+					audible: wc.isCurrentlyAudible(),
+					unsavedInput: await withTimeout(
+						wc.executeJavaScriptInIsolatedWorld(UNLOAD_CHECK_WORLD_ID, [
+							{ code: HAS_UNSAVED_INPUT_SCRIPT },
+						]),
+						UNLOAD_CHECK_TIMEOUT_MS,
+						"unsaved input check timed out",
+					).then(
+						(result) => result === true,
+						() => false,
+					),
+				};
+			}),
+		);
+		return { totalMemoryKb: Math.round(totalmem() / 1024), panes };
+	}
+
 	getAgentActivePaneIds(): string[] {
 		return [...this.agentWakes.keys()];
 	}
