@@ -41,4 +41,40 @@ describe("track", () => {
 
 		expect(rdt).not.toHaveBeenCalled();
 	});
+
+	test("sends a download click to Google Ads as a conversion", () => {
+		const gtag = mock();
+		globalWithWindow.window = { gtag };
+
+		track("download_clicked", { source: "conductor" });
+
+		expect(gtag).toHaveBeenCalledTimes(1);
+		const [command, action, params] = gtag.mock.calls[0] ?? [];
+		expect(command).toBe("event");
+		expect(action).toBe("conversion");
+		expect(params).toMatchObject({
+			send_to: "AW-18209336001/XAEwCNPrxrQdEMHV8epD",
+		});
+	});
+
+	test("does not send a download click to Google Ads after the visitor declines analytics", () => {
+		const gtag = mock();
+		globalWithWindow.window = {
+			gtag,
+			localStorage: { getItem: () => "declined" },
+		};
+
+		track("download_clicked", { source: "conductor" });
+
+		expect(gtag).not.toHaveBeenCalled();
+	});
+
+	test("does not send other CTA events to Google Ads", () => {
+		const gtag = mock();
+		globalWithWindow.window = { gtag };
+
+		track("github_clicked", { source: "hero" });
+
+		expect(gtag).not.toHaveBeenCalled();
+	});
 });

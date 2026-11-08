@@ -1,3 +1,7 @@
+import {
+	GOOGLE_ADS_DOWNLOAD_CONVERSION,
+	trackGoogleAdsConversion,
+} from "./google-ads";
 import { withPosthog } from "./lazy";
 import { trackReddit } from "./reddit";
 
@@ -16,6 +20,11 @@ export type DownloadSource =
 	| "production_run"
 	| "conductor";
 
+/** PostHog event name → Google Ads conversion action (send_to). */
+const GOOGLE_ADS_EVENT_MAP: Record<string, string> = {
+	download_clicked: GOOGLE_ADS_DOWNLOAD_CONVERSION,
+};
+
 /** PostHog event name → Reddit Pixel standard event. */
 const REDDIT_EVENT_MAP: Record<string, string> = {
 	download_clicked: "Lead",
@@ -26,6 +35,11 @@ export function track(
 	properties?: Record<string, unknown>,
 ): void {
 	withPosthog((posthog) => posthog.capture(event, properties));
+
+	const googleAdsConversion = GOOGLE_ADS_EVENT_MAP[event];
+	if (googleAdsConversion) {
+		trackGoogleAdsConversion(googleAdsConversion);
+	}
 
 	const redditEvent = REDDIT_EVENT_MAP[event];
 	if (redditEvent) {
