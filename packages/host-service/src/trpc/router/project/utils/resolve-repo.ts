@@ -14,6 +14,7 @@ import {
 	isPermissionDenied,
 	isUnreadable,
 } from "../../../../runtime/path-state";
+import { rethrowEnvironmentalGitError } from "../../git/utils/classify-git-error";
 import {
 	findMatchingRemote,
 	getGitHubRemotes,
@@ -548,6 +549,7 @@ export async function cloneRepoInto(
 		signal?.throwIfAborted();
 	} catch (err) {
 		await rollbackTargetDir(targetPath);
+		rethrowEnvironmentalGitError(err);
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `Failed to clone repository: ${

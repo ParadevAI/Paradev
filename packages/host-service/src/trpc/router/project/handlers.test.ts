@@ -10,7 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { TRPCError } from "@trpc/server";
 import type { HostServiceContext } from "../../../types";
-import { createFromEmpty } from "./handlers";
+import { createFromClone, createFromEmpty } from "./handlers";
 
 const COMMAND_LINE_TOOLS_STUB_OUTPUT =
 	"xcode-select: note: No developer tools were found, requesting install.\n" +
@@ -56,5 +56,26 @@ describe("createFromEmpty", () => {
 			reason: "COMMAND_LINE_TOOLS_MISSING",
 		});
 		expect(existsSync(join(parentDir, "hello"))).toBe(false);
+	});
+});
+
+describe("createFromClone", () => {
+	it("reports missing Command Line Tools as a classified git error", async () => {
+		const parentDir = mkdtempSync(join(tmpdir(), "clone-project-"));
+		tempDirs.push(parentDir);
+		useGitWithoutCommandLineTools();
+
+		const error = (await createFromClone({} as HostServiceContext, {
+			name: "Hello-World",
+			parentDir,
+			url: "https://github.com/octocat/Hello-World",
+		}).catch((err: unknown) => err)) as TRPCError;
+
+		expect(error.code).toBe("PRECONDITION_FAILED");
+		expect(error.cause).toMatchObject({
+			kind: "GIT_ENVIRONMENT",
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		});
+		expect(existsSync(join(parentDir, "Hello-World"))).toBe(false);
 	});
 });
