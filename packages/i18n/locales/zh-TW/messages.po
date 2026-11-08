@@ -13449,6 +13449,9 @@ msgstr "只有建立者或組織管理員可以變更此代理程式"
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "僅限本機：會被 git 忽略，並套用至此儲存庫的每個 worktree。在此設定的任何鍵都會取代共享的值。"
 
+msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
+msgstr "只有組織管理員可以連結 GitHub 帳號。請聯絡管理員進行連結。"
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "只有組織擁有者和管理員可以管理外掛。"
 

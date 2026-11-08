@@ -13449,6 +13449,9 @@ msgstr "このエージェントを変更できるのは、作成者または組
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "このマシンのみ: git で無視され、このリポジトリのすべてのワークツリーに適用されます。ここで設定したキーは共有の値を置き換えます。"
 
+msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
+msgstr "GitHub アカウントを接続できるのは組織の管理者だけです。管理者に接続を依頼してください。"
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "プラグインを管理できるのは組織のオーナーと管理者だけです。"
 

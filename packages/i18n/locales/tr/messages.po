@@ -13449,6 +13449,9 @@ msgstr "Bu ajanı yalnızca oluşturan kişi veya bir kuruluş yöneticisi deği
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Yalnızca bu makinede: git tarafından yok sayılır ve bu deponun her worktree'sine uygulanır. Burada ayarlanan her anahtar paylaşılanın yerini alır."
 
+msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
+msgstr "GitHub hesaplarını yalnızca kuruluş yöneticileri bağlayabilir. Bağlaması için bir yöneticiye başvurun."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Eklentileri yalnızca kuruluş sahipleri ve yöneticileri yönetebilir."
 

@@ -13449,6 +13449,9 @@ msgstr "Tohoto agenta může změnit jen jeho tvůrce nebo správce organizace"
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Jen na tomto počítači: ignorováno gitem a použito pro každý worktree tohoto repozitáře. Každý zde nastavený klíč nahradí sdílený."
 
+msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
+msgstr "GitHub účty mohou připojovat jen správci organizace. Požádejte správce, aby účet připojil."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Pluginy mohou spravovat jen vlastníci a správci organizace."
 

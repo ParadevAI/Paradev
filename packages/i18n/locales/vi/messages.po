@@ -13449,6 +13449,9 @@ msgstr "Chỉ người tạo hoặc quản trị viên tổ chức mới có th�
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Chỉ trên máy này: được git bỏ qua và áp dụng cho mọi worktree của repository này. Mọi khóa đặt ở đây sẽ thay thế khóa dùng chung."
 
+msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
+msgstr "Chỉ quản trị viên tổ chức mới có thể kết nối tài khoản GitHub. Hãy nhờ quản trị viên kết nối."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Chỉ chủ sở hữu và admin của tổ chức mới có thể quản lý plugin."
 
