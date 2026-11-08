@@ -110,7 +110,7 @@
 		"drizzle-orm": "0.45.2",
 		"entities": "7.0.1",
 		"expo-device-hub": "0.18.0",
-		"hono": "4.13.7",
+		"hono": "4.13.11",
 		"mime-types": "3.0.2",
 		"node-pty": "1.2.0-beta.14",
 		"partysocket": "1.3.0",
@@ -119,7 +119,7 @@
 		"simple-git": "4.0.2",
 		"superjson": "2.2.6",
 		"tree-kill": "1.2.2",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/host-client": "workspace:*",
