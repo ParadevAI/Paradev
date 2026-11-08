@@ -624,6 +624,10 @@ msgstr "{0} 对战 {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0}已在此更改中被删除。"
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "此计算机上的 {0} 已被占用，因此改用 {localPort}。"
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "关闭此标签页将结束正在运行的进程。"
 msgid "Closing this terminal will end the running process."
 msgstr "关闭此终端将结束正在运行的进程。"
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "云端"
+
 msgid "Cloud"
 msgstr "云端"
 
@@ -6010,6 +6018,9 @@ msgstr "没能完成工作区的删除"
 msgid "Couldn't fork into a chat"
 msgstr "无法分叉到聊天"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "无法转发端口 {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "无法交给智能体处理"
 
@@ -6197,6 +6208,9 @@ msgstr "无法启动语音模式"
 
 msgid "Couldn't start workspace"
 msgstr "无法启动工作区"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "无法停止转发端口 {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "无法停止后台任务"
@@ -9105,6 +9119,10 @@ msgstr "表单控件与字段组合"
 msgid "Forward"
 msgstr "前进"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "转发"
+
 msgid "Found 12 tooltip call sites"
 msgstr "找到12处tooltip调用"
 
@@ -11320,6 +11338,10 @@ msgstr "本地工作区运行在你的电脑上。连接什么由你决定。"
 msgid "Local, on a host, or in the cloud"
 msgstr "本地、主机上或云端"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "此计算机上的 localhost:{0} 已被占用。"
+
 msgid "Location"
 msgstr "位置"
 
@@ -12774,6 +12796,9 @@ msgstr "没有匹配“{0}”的插件"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "暂无插件。添加一个仓库来同步插件。"
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "还没有端口。在终端中启动开发服务器后会显示在这里。"
+
 msgid "No posts yet."
 msgstr "暂无文章。"
 
@@ -13085,6 +13110,9 @@ msgstr "未连接 · 云端工作区以组织的 GitHub App 身份推送"
 
 msgid "Not demoed here"
 msgstr "此处未做演示"
+
+msgid "Not detected in the workspace right now"
+msgstr "目前未在工作区中检测到"
 
 msgid "Not found"
 msgstr "未找到"
@@ -13508,6 +13536,9 @@ msgstr "仅你自己"
 msgid "Only you can see this page"
 msgstr "仅你可见此页面"
 
+msgid "Only you. Teammates forward their own."
+msgstr "仅你自己。队友各自转发。"
+
 msgid "open"
 msgstr "打开"
 
@@ -13814,6 +13845,9 @@ msgstr "在应用内浏览器中打开链接"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "在外部浏览器中打开localhost:{0}"
+
+msgid "Open localhost:{localPort}"
+msgstr "打开 localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "打开菜单"
@@ -14852,6 +14886,9 @@ msgstr "顶栏下拉菜单中的端口"
 msgid "Ports on remote hosts"
 msgstr "远程主机上的端口"
 
+msgid "Ports on this computer"
+msgstr "此计算机上的端口"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "状态好的时候能做到。监督成本增长仍然太快。"
 
@@ -15848,6 +15885,10 @@ msgstr "剩余"
 msgid "rematch"
 msgstr "再来一局"
 
+msgid "remote"
+msgstr "远程"
+
+msgctxt "port location"
 msgid "remote"
 msgstr "远程"
 

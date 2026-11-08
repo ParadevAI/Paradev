@@ -618,6 +618,10 @@ msgstr "{0} проти {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} видалено в цій зміні."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "Порт {0} був зайнятий на цьому комп’ютері, тому вибрано {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4684,6 +4688,10 @@ msgstr "Закриття цієї вкладки завершить запуще
 msgid "Closing this terminal will end the running process."
 msgstr "Закриття цього термінала завершить запущений процес."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "хмара"
+
 msgid "Cloud"
 msgstr "Хмара"
 
@@ -6004,6 +6012,9 @@ msgstr "Не вдалося завершити видалення робочих
 msgid "Couldn't fork into a chat"
 msgstr "Не вдалося створити форк у чаті"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Не вдалося переадресувати порт {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Не вдалося передати це агенту"
 
@@ -6191,6 +6202,9 @@ msgstr "Не вдалося запустити голосовий режим"
 
 msgid "Couldn't start workspace"
 msgstr "Не вдалося запустити робочий простір"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Не вдалося зупинити переадресацію порту {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "Не вдалося зупинити фонове завдання"
@@ -9099,6 +9113,10 @@ msgstr "Елементи форм і компонування полів"
 msgid "Forward"
 msgstr "Уперед"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Переадресувати"
+
 msgid "Found 12 tooltip call sites"
 msgstr "Знайдено 12 місць виклику підказок"
 
@@ -11314,6 +11332,10 @@ msgstr "Локальні робочі простори працюють на в�
 msgid "Local, on a host, or in the cloud"
 msgstr "Локально, на хості або в хмарі"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} уже використовується на цьому комп’ютері."
+
 msgid "Location"
 msgstr "Розташування"
 
@@ -12768,6 +12790,9 @@ msgstr "Немає плагінів, що відповідають «{0}»"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Плагінів ще немає. Додайте репозиторій, щоб синхронізувати їх."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Портів ще немає. Запустіть сервер розробки в терміналі, і він з’явиться тут."
+
 msgid "No posts yet."
 msgstr "Публікацій ще немає."
 
@@ -13079,6 +13104,9 @@ msgstr "Не підключено · хмарні робочі простори 
 
 msgid "Not demoed here"
 msgstr "Тут не демонструється"
+
+msgid "Not detected in the workspace right now"
+msgstr "Зараз не виявлено в робочому просторі"
 
 msgid "Not found"
 msgstr "Не знайдено"
@@ -13502,6 +13530,9 @@ msgstr "Лише ви"
 msgid "Only you can see this page"
 msgstr "Цю сторінку бачите лише ви"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Лише ви. Колеги переадресовують власні."
+
 msgid "open"
 msgstr "відкрити"
 
@@ -13808,6 +13839,9 @@ msgstr "Відкривати посилання у вбудованому бра
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Відкрити localhost:{0} у зовнішньому браузері"
+
+msgid "Open localhost:{localPort}"
+msgstr "Відкрити localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "Відкрити меню"
@@ -14846,6 +14880,9 @@ msgstr "Порти у спадному меню верхньої панелі"
 msgid "Ports on remote hosts"
 msgstr "Порти на віддалених хостах"
 
+msgid "Ports on this computer"
+msgstr "Порти на цьому комп’ютері"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Можливо в хороші дні. Витрати на нагляд досі зростають надто швидко."
 
@@ -15842,6 +15879,10 @@ msgstr "Залишилося"
 msgid "rematch"
 msgstr "реванш"
 
+msgid "remote"
+msgstr "віддалений"
+
+msgctxt "port location"
 msgid "remote"
 msgstr "віддалений"
 

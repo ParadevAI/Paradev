@@ -6,6 +6,7 @@ import { shell } from "electron";
 import { env } from "main/env.main";
 import { getHostServiceCoordinator } from "main/lib/host-service-coordinator";
 import { forgetOrganizationPlugins } from "main/lib/plugin-installs";
+import { endForwardingSession } from "main/lib/port-forward";
 import { PLATFORM, PROTOCOL_SCHEME } from "shared/constants";
 import { env as sharedEnv } from "shared/env.shared";
 import { z } from "zod";
@@ -124,6 +125,7 @@ export const createAuthRouter = () => {
 
 		signOut: publicProcedure.mutation(async () => {
 			getHostServiceCoordinator().stopAll();
+			endForwardingSession();
 			await writeAuth(() => clearToken());
 			const pluginsRemoved = await forgetOrganizationPlugins().then(
 				() => true,

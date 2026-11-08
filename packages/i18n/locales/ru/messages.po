@@ -624,6 +624,10 @@ msgstr "{0} против {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} был удалён в этом изменении."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "Порт {0} был занят на этом компьютере, поэтому выбран {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "Закрытие этой вкладки завершит работаю
 msgid "Closing this terminal will end the running process."
 msgstr "Закрытие этого терминала завершит работающий процесс."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "облако"
+
 msgid "Cloud"
 msgstr "Облако"
 
@@ -6010,6 +6018,9 @@ msgstr "Не удалось завершить удаление рабочих �
 msgid "Couldn't fork into a chat"
 msgstr "Не удалось форкнуть в чат"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Не удалось перенаправить порт {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Не удалось передать агенту"
 
@@ -6197,6 +6208,9 @@ msgstr "Не удалось запустить голосовой режим"
 
 msgid "Couldn't start workspace"
 msgstr "Не удалось запустить рабочую область"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Не удалось остановить перенаправление порта {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "Не удалось остановить фоновую задачу"
@@ -9105,6 +9119,10 @@ msgstr "Элементы формы и композиция полей"
 msgid "Forward"
 msgstr "Вперёд"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Перенаправить"
+
 msgid "Found 12 tooltip call sites"
 msgstr "Найдено 12 мест вызова tooltip"
 
@@ -11320,6 +11338,10 @@ msgstr "Локальные рабочие области работают на �
 msgid "Local, on a host, or in the cloud"
 msgstr "Локально, на хосте или в облаке"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} уже занят на этом компьютере."
+
 msgid "Location"
 msgstr "Расположение"
 
@@ -12774,6 +12796,9 @@ msgstr "Нет плагинов по запросу «{0}»"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Плагинов пока нет. Добавьте репозиторий, чтобы синхронизировать их."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Портов пока нет. Запустите сервер разработки в терминале, и он появится здесь."
+
 msgid "No posts yet."
 msgstr "Постов пока нет."
 
@@ -13085,6 +13110,9 @@ msgstr "Не подключено · облачные рабочие облас�
 
 msgid "Not demoed here"
 msgstr "Здесь не показано"
+
+msgid "Not detected in the workspace right now"
+msgstr "Сейчас не обнаружен в рабочем пространстве"
 
 msgid "Not found"
 msgstr "Не найдено"
@@ -13508,6 +13536,9 @@ msgstr "Только вы"
 msgid "Only you can see this page"
 msgstr "Эту страницу видите только вы"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Только для вас. Коллеги перенаправляют свои сами."
+
 msgid "open"
 msgstr "открыть"
 
@@ -13814,6 +13845,9 @@ msgstr "Открывать ссылки во встроенном браузер
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Открыть localhost:{0} во внешнем браузере"
+
+msgid "Open localhost:{localPort}"
+msgstr "Открыть localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "Открыть меню"
@@ -14852,6 +14886,9 @@ msgstr "Порты в списке верхней панели"
 msgid "Ports on remote hosts"
 msgstr "Порты на удалённых хостах"
 
+msgid "Ports on this computer"
+msgstr "Порты на этом компьютере"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "В хорошие дни возможно. Стоимость надзора пока растёт слишком быстро."
 
@@ -15850,6 +15887,10 @@ msgstr "реванш"
 
 msgid "remote"
 msgstr "удалённая"
+
+msgctxt "port location"
+msgid "remote"
+msgstr "удалённый"
 
 msgid "Remote"
 msgstr "Удалённый"

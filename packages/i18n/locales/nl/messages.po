@@ -624,6 +624,10 @@ msgstr "{0} tegen {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} is verwijderd in deze wijziging."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "{0} was al in gebruik op deze computer, dus is verplaatst naar {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "Als je dit tabblad sluit, wordt het draaiende proces beëindigd."
 msgid "Closing this terminal will end the running process."
 msgstr "Als je deze terminal sluit, wordt het draaiende proces beëindigd."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "cloud"
+
 msgid "Cloud"
 msgstr "Cloud"
 
@@ -6010,6 +6018,9 @@ msgstr "Kon het verwijderen van werkruimtes niet afronden"
 msgid "Couldn't fork into a chat"
 msgstr "Kon niet forken naar een chat"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Kan poort {portNumber} niet doorsturen"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Kon dit niet aan een agent overdragen"
 
@@ -6197,6 +6208,9 @@ msgstr "Spraakmodus kon niet worden gestart"
 
 msgid "Couldn't start workspace"
 msgstr "Kan werkruimte niet starten"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Doorsturen van poort {portNumber} kon niet worden gestopt"
 
 msgid "Couldn't stop the background task"
 msgstr "Kan de achtergrondtaak niet stoppen"
@@ -9105,6 +9119,10 @@ msgstr "Formulierbesturing en veldsamenstelling"
 msgid "Forward"
 msgstr "Vooruit"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Doorsturen"
+
 msgid "Found 12 tooltip call sites"
 msgstr "12 tooltip-aanroepplekken gevonden"
 
@@ -11320,6 +11338,10 @@ msgstr "Lokale werkruimtes draaien op je machine. Jij bepaalt wat er verbinding 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokaal, op een host of in de cloud"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} is al in gebruik op deze computer."
+
 msgid "Location"
 msgstr "Locatie"
 
@@ -12774,6 +12796,9 @@ msgstr "Geen plugins gevonden voor \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Nog geen plugins. Voeg een repository toe om ze te synchroniseren."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Nog geen poorten. Start een devserver in een terminal en de poort verschijnt hier."
+
 msgid "No posts yet."
 msgstr "Nog geen berichten."
 
@@ -13085,6 +13110,9 @@ msgstr "Niet gekoppeld · cloudwerkruimtes pushen als de GitHub App van je organ
 
 msgid "Not demoed here"
 msgstr "Hier niet gedemonstreerd"
+
+msgid "Not detected in the workspace right now"
+msgstr "Momenteel niet gedetecteerd in de workspace"
 
 msgid "Not found"
 msgstr "Niet gevonden"
@@ -13508,6 +13536,9 @@ msgstr "Alleen jij"
 msgid "Only you can see this page"
 msgstr "Alleen jij kunt deze pagina zien"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Alleen jij. Teamgenoten sturen hun eigen poorten door."
+
 msgid "open"
 msgstr "openen"
 
@@ -13814,6 +13845,9 @@ msgstr "Links openen in de ingebouwde browser"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "localhost:{0} openen in externe browser"
+
+msgid "Open localhost:{localPort}"
+msgstr "localhost:{localPort} openen"
 
 msgid "Open menu"
 msgstr "Menu openen"
@@ -14852,6 +14886,9 @@ msgstr "Poorten in dropdown in de bovenbalk"
 msgid "Ports on remote hosts"
 msgstr "Poorten op externe hosts"
 
+msgid "Ports on this computer"
+msgstr "Poorten op deze computer"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Mogelijk op goede dagen. De kosten van toezicht groeien nog te snel."
 
@@ -15850,6 +15887,10 @@ msgstr "revanche"
 
 msgid "remote"
 msgstr "remote"
+
+msgctxt "port location"
+msgid "remote"
+msgstr "extern"
 
 msgid "Remote"
 msgstr "Extern"

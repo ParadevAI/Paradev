@@ -624,6 +624,10 @@ msgstr "{0} kontra {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} został usunięty w tej zmianie."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "Port {0} był zajęty na tym komputerze, więc przeniesiono go na {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "Zamknięcie tej karty zakończy działający proces."
 msgid "Closing this terminal will end the running process."
 msgstr "Zamknięcie tego terminala zakończy działający proces."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "chmura"
+
 msgid "Cloud"
 msgstr "Chmura"
 
@@ -6010,6 +6018,9 @@ msgstr "Nie udało się dokończyć usuwania obszarów roboczych"
 msgid "Couldn't fork into a chat"
 msgstr "Nie udało się sforkować do czatu"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Nie udało się przekierować portu {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Nie udało się przekazać tego agentowi"
 
@@ -6197,6 +6208,9 @@ msgstr "Nie udało się uruchomić trybu głosowego"
 
 msgid "Couldn't start workspace"
 msgstr "Nie udało się uruchomić obszaru roboczego"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Nie udało się zatrzymać przekierowania portu {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "Nie udało się zatrzymać zadania w tle"
@@ -9105,6 +9119,10 @@ msgstr "Kontrolki formularza i kompozycja pól"
 msgid "Forward"
 msgstr "Dalej"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Przekieruj"
+
 msgid "Found 12 tooltip call sites"
 msgstr "Znaleziono 12 miejsc wywołania tooltipa"
 
@@ -11320,6 +11338,10 @@ msgstr "Lokalne obszary robocze działają na twoim komputerze. Ty decydujesz, c
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokalnie, na hoście lub w chmurze"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} jest już używany na tym komputerze."
+
 msgid "Location"
 msgstr "Lokalizacja"
 
@@ -12774,6 +12796,9 @@ msgstr "Brak wtyczek pasujących do „{0}”"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Brak wtyczek. Dodaj repozytorium, aby je zsynchronizować."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Brak portów. Uruchom serwer deweloperski w terminalu, a pojawi się tutaj."
+
 msgid "No posts yet."
 msgstr "Brak wpisów."
 
@@ -13085,6 +13110,9 @@ msgstr "Niepołączone · obszary robocze w chmurze pushują jako GitHub App two
 
 msgid "Not demoed here"
 msgstr "Nie pokazano tutaj"
+
+msgid "Not detected in the workspace right now"
+msgstr "Obecnie niewykryty w obszarze roboczym"
 
 msgid "Not found"
 msgstr "Nie znaleziono"
@@ -13508,6 +13536,9 @@ msgstr "Tylko Ty"
 msgid "Only you can see this page"
 msgstr "Tylko Ty widzisz tę stronę"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Tylko ty. Członkowie zespołu przekierowują własne."
+
 msgid "open"
 msgstr "otwórz"
 
@@ -13814,6 +13845,9 @@ msgstr "Otwieraj linki w przeglądarce w aplikacji"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Otwórz localhost:{0} w zewnętrznej przeglądarce"
+
+msgid "Open localhost:{localPort}"
+msgstr "Otwórz localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "Otwórz menu"
@@ -14852,6 +14886,9 @@ msgstr "Porty na liście górnego paska"
 msgid "Ports on remote hosts"
 msgstr "Porty na zdalnych hostach"
 
+msgid "Ports on this computer"
+msgstr "Porty na tym komputerze"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Możliwe w dobre dni. Koszt nadzoru wciąż rośnie zbyt szybko."
 
@@ -15850,6 +15887,10 @@ msgstr "rewanż"
 
 msgid "remote"
 msgstr "zdalna"
+
+msgctxt "port location"
+msgid "remote"
+msgstr "zdalny"
 
 msgid "Remote"
 msgstr "Zdalny"

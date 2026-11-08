@@ -384,6 +384,50 @@ app.get("/organization/:organizationId/workspace/:workspaceId", async (c) => {
 	return stub.fetch("https://realtime/presence", { headers });
 });
 
+app.get(
+	"/organization/:organizationId/workspace/:workspaceId/forwards",
+	async (c) => {
+		const organizationId = c.req.param("organizationId");
+		const workspaceId = c.req.param("workspaceId");
+		if (!UUID.test(workspaceId)) return c.json({ error: "Not found" }, 404);
+		const token = extractToken(c);
+		const stubName = `${organizationId}:${workspaceId}`;
+
+		if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+			if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
+				return c.json({ error: "Unauthorized" }, 401);
+			}
+			const stub = await getServerByName(c.env.WorkspaceHub, stubName);
+			return c.json({ forwards: await stub.listForwards() });
+		}
+
+		if (!token) return acceptAndClose(4401, "Unauthorized");
+		const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+		if (!auth) return acceptAndClose(4401, "Unauthorized");
+		if (!auth.organizationIds.includes(organizationId)) {
+			return acceptAndClose(4403, "Not a member of this organization");
+		}
+		const { success } = await c.env.WORKSPACE_PRESENCE_BY_USER.limit({
+			key: auth.sub,
+		});
+		if (!success) return acceptAndClose(4429, "Too many requests");
+		const stub = await getServerByName(c.env.WorkspaceHub, stubName);
+		const headers = new Headers({ Upgrade: "websocket" });
+		headers.set(
+			WORKSPACE_CLAIMS_HEADER,
+			JSON.stringify({
+				userId: auth.sub,
+				name: auth.name ?? "Someone",
+				image: auth.image ?? null,
+				organizationIds: auth.organizationIds,
+				teamIds: auth.teamIds,
+				forwarder: true,
+			}),
+		);
+		return stub.fetch("https://realtime/forwards", { headers });
+	},
+);
+
 app.post(
 	"/organization/:organizationId/workspace/:workspaceId/access",
 	async (c) => {

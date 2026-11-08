@@ -40,7 +40,16 @@ stub(plan, {
 		name === "xlarge" ? { name, vcpus: 16 } : null,
 });
 stub(meter, { assertMayBoot: async () => {} });
-stub(realtime, { nudge: () => {} });
+const FORWARD = {
+	port: 5173,
+	localPort: 5174,
+	since: 1,
+	user: { id: "user-1", name: "Ana", image: null },
+};
+stub(realtime, {
+	nudge: () => {},
+	readWorkspaceForwards: async () => [FORWARD],
+});
 stub(sandbox, {
 	describeSandbox: async () => ({
 		hostTarget: "https://box-1.example",
@@ -112,5 +121,39 @@ describe("cloudWorkspace.setMachineSize", () => {
 				machineSize: "2xlarge",
 			}),
 		).rejects.toThrow('Machine size "2xlarge" is not available');
+	});
+});
+
+describe("cloudWorkspace.forwards", () => {
+	const boxCaller = createCallerFactory(
+		createTRPCRouter({ cloudWorkspace: cloudWorkspaceRouter }),
+	)(
+		createTRPCContext({
+			session: {
+				user: { id: "user-1", email: "user@example.com" },
+				session: { activeOrganizationId: "org-1" },
+			} as never,
+			auth: {} as never,
+			headers: new Headers(),
+			sandboxCaller: {
+				workspaceId: WORKSPACE_ID,
+				organizationId: "org-1",
+				userId: "user-1",
+			},
+		}),
+	);
+
+	test("a box reads its own workspace's forwards", async () => {
+		expect(
+			await boxCaller.cloudWorkspace.forwards({ id: WORKSPACE_ID }),
+		).toEqual({ forwards: [FORWARD] });
+	});
+
+	test("a box cannot read another workspace's forwards", async () => {
+		expect(
+			boxCaller.cloudWorkspace.forwards({
+				id: "9c1d2e3f-4a5b-4c6d-8e7f-0a1b2c3d4e5f",
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
 	});
 });

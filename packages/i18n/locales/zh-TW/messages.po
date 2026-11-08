@@ -624,6 +624,10 @@ msgstr "{0} 對戰 {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0}已在此更改中被刪除。"
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "此電腦上的 {0} 已被使用，因此改用 {localPort}。"
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "關閉此分頁將結束正在執行的處理程序。"
 msgid "Closing this terminal will end the running process."
 msgstr "關閉此終端將結束正在執行的處理程序。"
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "雲端"
+
 msgid "Cloud"
 msgstr "雲端"
 
@@ -6010,6 +6018,9 @@ msgstr "沒能完成工作區的刪除"
 msgid "Couldn't fork into a chat"
 msgstr "無法分叉到聊天"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "無法轉送連接埠 {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "無法交給代理程式處理"
 
@@ -6197,6 +6208,9 @@ msgstr "無法啟動語音模式"
 
 msgid "Couldn't start workspace"
 msgstr "無法啟動工作區"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "無法停止轉送連接埠 {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "無法停止背景工作"
@@ -9105,6 +9119,10 @@ msgstr "表單控制項與欄位組合"
 msgid "Forward"
 msgstr "前進"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "轉送"
+
 msgid "Found 12 tooltip call sites"
 msgstr "找到12處tooltip呼叫"
 
@@ -11320,6 +11338,10 @@ msgstr "本機工作區在你的電腦上執行。連接什麼由你決定。"
 msgid "Local, on a host, or in the cloud"
 msgstr "本機、主機上或雲端"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "此電腦上的 localhost:{0} 已被使用。"
+
 msgid "Location"
 msgstr "位置"
 
@@ -12774,6 +12796,9 @@ msgstr "沒有匹配「{0}」的外掛"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "尚無外掛。新增一個儲存庫來同步外掛。"
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "尚無連接埠。在終端機中啟動開發伺服器後會顯示在這裡。"
+
 msgid "No posts yet."
 msgstr "暫無文章。"
 
@@ -13085,6 +13110,9 @@ msgstr "未連結 · 雲端工作區以組織的 GitHub App 身分推送"
 
 msgid "Not demoed here"
 msgstr "此處未做演示"
+
+msgid "Not detected in the workspace right now"
+msgstr "目前未在工作區中偵測到"
 
 msgid "Not found"
 msgstr "未找到"
@@ -13508,6 +13536,9 @@ msgstr "僅你自己"
 msgid "Only you can see this page"
 msgstr "僅你可見此頁面"
 
+msgid "Only you. Teammates forward their own."
+msgstr "僅限你自己。隊友各自轉送。"
+
 msgid "open"
 msgstr "開啟"
 
@@ -13814,6 +13845,9 @@ msgstr "在應用程式內瀏覽器中開啟連結"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "在外部瀏覽器中開啟localhost:{0}"
+
+msgid "Open localhost:{localPort}"
+msgstr "開啟 localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "開啟選單"
@@ -14852,6 +14886,9 @@ msgstr "頂欄下拉選單中的埠"
 msgid "Ports on remote hosts"
 msgstr "遠端主機上的連接埠"
 
+msgid "Ports on this computer"
+msgstr "此電腦上的連接埠"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "狀態好的時候能做到。監督成本成長仍然太快。"
 
@@ -15848,6 +15885,10 @@ msgstr "剩餘"
 msgid "rematch"
 msgstr "再來一局"
 
+msgid "remote"
+msgstr "遠端"
+
+msgctxt "port location"
 msgid "remote"
 msgstr "遠端"
 

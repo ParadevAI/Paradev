@@ -16,6 +16,7 @@ import {
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { setHostServiceSecret } from "renderer/lib/host-service-auth";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import {
 	accessRefetchInterval,
 	createFailureStreak,
@@ -72,6 +73,11 @@ async function requestAccess(
 	});
 	setHostServiceSecret(granted.url, granted.token);
 	setHostServiceSecret(granted.desktop.url, granted.desktop.token);
+	await electronTrpcClient.portForwards.setHostToken
+		.mutate({ hostUrl: granted.url, token: granted.token })
+		.catch((err) => {
+			console.warn("[sandbox] failed to hand gate ticket to main:", err);
+		});
 	return {
 		url: granted.url,
 		desktopUrl: granted.desktop.url,

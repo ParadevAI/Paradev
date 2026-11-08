@@ -624,6 +624,10 @@ msgstr "{0} đấu {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} đã bị xóa trong thay đổi này."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "Cổng {0} đang được dùng trên máy tính này nên đã chuyển sang {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "Đóng tab này sẽ kết thúc tiến trình đang chạy."
 msgid "Closing this terminal will end the running process."
 msgstr "Đóng terminal này sẽ kết thúc tiến trình đang chạy."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "đám mây"
+
 msgid "Cloud"
 msgstr "Cloud"
 
@@ -6010,6 +6018,9 @@ msgstr "Không xóa xong các workspace"
 msgid "Couldn't fork into a chat"
 msgstr "Không thể fork sang chat"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Không chuyển tiếp được cổng {portNumber}"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Không thể giao việc này cho agent"
 
@@ -6197,6 +6208,9 @@ msgstr "Không thể bắt đầu chế độ giọng nói"
 
 msgid "Couldn't start workspace"
 msgstr "Không khởi động được workspace"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Không dừng được chuyển tiếp cổng {portNumber}"
 
 msgid "Couldn't stop the background task"
 msgstr "Không thể dừng tác vụ nền"
@@ -9105,6 +9119,10 @@ msgstr "Các điều khiển form và cách ghép trường"
 msgid "Forward"
 msgstr "Tiến"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Chuyển tiếp"
+
 msgid "Found 12 tooltip call sites"
 msgstr "Tìm thấy 12 chỗ gọi tooltip"
 
@@ -11320,6 +11338,10 @@ msgstr "Workspace cục bộ chạy trên máy của bạn. Bạn quyết địn
 msgid "Local, on a host, or in the cloud"
 msgstr "Trên máy, trên host, hoặc trên cloud"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} đang được dùng trên máy tính này."
+
 msgid "Location"
 msgstr "Vị trí"
 
@@ -12774,6 +12796,9 @@ msgstr "Không có plugin nào khớp \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Chưa có plugin nào. Thêm một repository để đồng bộ."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Chưa có cổng nào. Hãy chạy máy chủ phát triển trong terminal và cổng sẽ hiện ở đây."
+
 msgid "No posts yet."
 msgstr "Chưa có bài viết nào."
 
@@ -13085,6 +13110,9 @@ msgstr "Chưa kết nối · workspace cloud push dưới danh nghĩa GitHub App
 
 msgid "Not demoed here"
 msgstr "Không demo ở đây"
+
+msgid "Not detected in the workspace right now"
+msgstr "Hiện không phát hiện trong workspace"
 
 msgid "Not found"
 msgstr "Không tìm thấy"
@@ -13508,6 +13536,9 @@ msgstr "Chỉ mình bạn"
 msgid "Only you can see this page"
 msgstr "Chỉ bạn mới xem được trang này"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Chỉ bạn. Đồng đội tự chuyển tiếp cổng của họ."
+
 msgid "open"
 msgstr "mở"
 
@@ -13814,6 +13845,9 @@ msgstr "Mở liên kết trong trình duyệt của ứng dụng"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Mở localhost:{0} trong trình duyệt ngoài"
+
+msgid "Open localhost:{localPort}"
+msgstr "Mở localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "Mở menu"
@@ -14852,6 +14886,9 @@ msgstr "Cổng trong menu thả xuống trên thanh trên cùng"
 msgid "Ports on remote hosts"
 msgstr "Cổng trên host từ xa"
 
+msgid "Ports on this computer"
+msgstr "Cổng trên máy tính này"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Khả thi vào những ngày đẹp trời. Chi phí giám sát vẫn tăng quá nhanh."
 
@@ -15850,6 +15887,10 @@ msgstr "tái đấu"
 
 msgid "remote"
 msgstr "remote"
+
+msgctxt "port location"
+msgid "remote"
+msgstr "từ xa"
 
 msgid "Remote"
 msgstr "Từ xa"

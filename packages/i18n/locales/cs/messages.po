@@ -624,6 +624,10 @@ msgstr "{0} proti {1}"
 msgid "{0} was deleted in this change."
 msgstr "{0} byl v této změně smazán."
 
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "Port {0} byl na tomto počítači obsazený, proto se přesunul na {localPort}."
+
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
 msgid "{0} wins in {1} turns"
@@ -4690,6 +4694,10 @@ msgstr "Zavřením této karty ukončíte běžící proces."
 msgid "Closing this terminal will end the running process."
 msgstr "Zavřením tohoto terminálu ukončíte běžící proces."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "cloud"
+
 msgid "Cloud"
 msgstr "Cloud"
 
@@ -6010,6 +6018,9 @@ msgstr "Mazání pracovních prostorů se nepodařilo dokončit"
 msgid "Couldn't fork into a chat"
 msgstr "Do chatu se nepodařilo forkovat"
 
+msgid "Couldn't forward port {portNumber}"
+msgstr "Port {portNumber} se nepodařilo přesměrovat"
+
 msgid "Couldn't hand this to an agent"
 msgstr "Nepodařilo se předat agentovi"
 
@@ -6197,6 +6208,9 @@ msgstr "Hlasový režim se nepodařilo spustit"
 
 msgid "Couldn't start workspace"
 msgstr "Pracovní prostor se nepodařilo spustit"
+
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "Přesměrování portu {portNumber} se nepodařilo zastavit"
 
 msgid "Couldn't stop the background task"
 msgstr "Úlohu na pozadí se nepodařilo zastavit"
@@ -9105,6 +9119,10 @@ msgstr "Prvky formuláře a skládání polí"
 msgid "Forward"
 msgstr "Vpřed"
 
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Přesměrovat"
+
 msgid "Found 12 tooltip call sites"
 msgstr "Nalezeno 12 volání tooltipu"
 
@@ -11320,6 +11338,10 @@ msgstr "Lokální pracovní prostory běží na vašem počítači. Co se k nim 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokálně, na hostiteli nebo v cloudu"
 
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} se na tomto počítači už používá."
+
 msgid "Location"
 msgstr "Umístění"
 
@@ -12774,6 +12796,9 @@ msgstr "Žádný plugin neodpovídá „{0}“"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Zatím žádné pluginy. Přidejte repozitář a synchronizujte je."
 
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Zatím žádné porty. Spusťte vývojový server v terminálu a objeví se tady."
+
 msgid "No posts yet."
 msgstr "Zatím žádné články."
 
@@ -13085,6 +13110,9 @@ msgstr "Nepřipojeno · cloudové pracovní prostory pushují jako GitHub App va
 
 msgid "Not demoed here"
 msgstr "Tady se neukazuje"
+
+msgid "Not detected in the workspace right now"
+msgstr "V pracovním prostoru teď není vidět"
 
 msgid "Not found"
 msgstr "Nenalezeno"
@@ -13508,6 +13536,9 @@ msgstr "Jen vy"
 msgid "Only you can see this page"
 msgstr "Tuto stránku vidíte jen vy"
 
+msgid "Only you. Teammates forward their own."
+msgstr "Jen vy. Kolegové si přesměrují vlastní."
+
 msgid "open"
 msgstr "otevřít"
 
@@ -13814,6 +13845,9 @@ msgstr "Otevírat odkazy ve vestavěném prohlížeči"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Otevřít localhost:{0} v externím prohlížeči"
+
+msgid "Open localhost:{localPort}"
+msgstr "Otevřít localhost:{localPort}"
 
 msgid "Open menu"
 msgstr "Otevřít nabídku"
@@ -14852,6 +14886,9 @@ msgstr "Porty v nabídce horní lišty"
 msgid "Ports on remote hosts"
 msgstr "Porty na vzdálených hostech"
 
+msgid "Ports on this computer"
+msgstr "Porty na tomto počítači"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "V dobrých dnech možné. Náklady na dohled pořád rostou moc rychle."
 
@@ -15850,6 +15887,10 @@ msgstr "odveta"
 
 msgid "remote"
 msgstr "vzdálená"
+
+msgctxt "port location"
+msgid "remote"
+msgstr "vzdálený"
 
 msgid "Remote"
 msgstr "Vzdálený"
