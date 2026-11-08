@@ -696,7 +696,6 @@ class TerminalRuntimeRegistryImpl {
 		});
 	}
 
-	/** Exited with code 0 and no signal, as after `exit` or Ctrl-D. */
 	endedCleanly(terminalId: string, instanceId?: string): boolean {
 		const exitStatus = this.getEntry(terminalId, instanceId)?.transport
 			.exitStatus;
