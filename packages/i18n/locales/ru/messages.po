@@ -1168,11 +1168,8 @@ msgstr "{name}: {monthly} за пользователя в месяц"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за пользователя в месяц или {yearly} при оплате за год"
 
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
-msgstr "{newPeople, plural, one {Новый человек получит приглашение в {organizationName} по email и увидит это, когда присоединится. Это добавит # платное место ({total}/мес.).} few {Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Это добавит # платных места ({total}/мес.).} many {Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Это добавит # платных мест ({total}/мес.).} other {Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Это добавит # платного места ({total}/мес.).}}"
-
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
-msgstr "{newPeople, plural, one {Новый человек получит приглашение в {organizationName} по email и увидит это, когда присоединится. Это добавит # платное место ({total}/год).} few {Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Это добавит # платных места ({total}/год).} many {Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Это добавит # платных мест ({total}/год).} other {Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Это добавит # платного места ({total}/год).}}"
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {Это добавит # платное место ({price}).} few {Это добавит # платных места ({price}).} many {Это добавит # платных мест ({price}).} other {Это добавит # платного места ({price}).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
@@ -1365,6 +1362,12 @@ msgstr "{toolName} прерван"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Проверка пройдена} few {Все # проверки пройдены} many {Все # проверок пройдены} other {Все # проверки пройдены}}"
+
+msgid "{total}/month"
+msgstr "{total}/мес."
+
+msgid "{total}/year"
+msgstr "{total}/год"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {задача GitHub} few {задачи GitHub} many {задач GitHub} other {задачи GitHub}}"
@@ -7596,6 +7599,9 @@ msgstr "напр. Мои облачные ревью"
 msgid "e.g. plan-budget"
 msgstr "например, plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "Каждый добавит платное место."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Каждое вложение — не более {0} МБ."
@@ -12249,8 +12255,8 @@ msgstr "Новые сообщения"
 msgid "New page"
 msgstr "Новая страница"
 
-msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
-msgstr "Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся. Каждый добавит платное место."
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "Новые люди получат приглашение в {organizationName} по email и увидят это, когда присоединятся."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Новые люди получат приглашение в {organizationName} по email. Они увидят это после того, как присоединятся."

@@ -1168,11 +1168,8 @@ msgstr "{name} : {monthly} par utilisateur/mois"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name} : {monthly} par utilisateur/mois, ou {yearly} en facturation annuelle"
 
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
-msgstr "{newPeople, plural, one {La nouvelle personne reçoit une invitation par e-mail à rejoindre {organizationName} et y aura accès une fois inscrite, ce qui ajoute un siège payant ({total}/mois).} other {Les nouvelles personnes reçoivent une invitation par e-mail à rejoindre {organizationName} et y auront accès une fois inscrites, ce qui ajoute # sièges payants ({total}/mois).}}"
-
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
-msgstr "{newPeople, plural, one {La nouvelle personne reçoit une invitation par e-mail à rejoindre {organizationName} et y aura accès une fois inscrite, ce qui ajoute un siège payant ({total}/an).} other {Les nouvelles personnes reçoivent une invitation par e-mail à rejoindre {organizationName} et y auront accès une fois inscrites, ce qui ajoute # sièges payants ({total}/an).}}"
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {Cela ajoute un siège payant ({price}).} other {Cela ajoute # sièges payants ({price}).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Indiquez au moins une personne, ou choisissez {choice}.} sender {Indiquez au moins un expéditeur, ou choisissez {choice}.} other {Indiquez au moins un élément, ou choisissez {choice}.}}"
@@ -1365,6 +1362,12 @@ msgstr "{toolName} interrompu"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {La vérification a réussi} other {Les # vérifications ont toutes réussi}}"
+
+msgid "{total}/month"
+msgstr "{total}/mois"
+
+msgid "{total}/year"
+msgstr "{total}/an"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issues GitHub}}"
@@ -7596,6 +7599,9 @@ msgstr "p. ex. Mes revues cloud"
 msgid "e.g. plan-budget"
 msgstr "p. ex. plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "Chacune ajoute un siège payant."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Chaque pièce jointe fait au maximum {0} Mo."
@@ -12249,8 +12255,8 @@ msgstr "Nouveaux messages"
 msgid "New page"
 msgstr "Nouvelle page"
 
-msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
-msgstr "Les nouvelles personnes reçoivent une invitation par e-mail à rejoindre {organizationName} et y auront accès une fois inscrites, ce qui ajoute un siège payant par personne."
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "Les nouvelles personnes reçoivent une invitation par e-mail à rejoindre {organizationName} et y auront accès une fois inscrites."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Les nouvelles personnes reçoivent une invitation par e-mail à rejoindre {organizationName}. Elles y auront accès une fois inscrites."

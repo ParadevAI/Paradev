@@ -1168,11 +1168,8 @@ msgstr "{name}: {monthly} za użytkownika/miesiąc"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za użytkownika/miesiąc lub {yearly} przy rozliczeniu rocznym"
 
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
-msgstr "{newPeople, plural, one {Nowa osoba otrzyma e-mailem zaproszenie do {organizationName} i zobaczy to po dołączeniu. To doda # płatne miejsce ({total}/mies.).} few {Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. To doda # płatne miejsca ({total}/mies.).} many {Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. To doda # płatnych miejsc ({total}/mies.).} other {Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. To doda # płatnego miejsca ({total}/mies.).}}"
-
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
-msgstr "{newPeople, plural, one {Nowa osoba otrzyma e-mailem zaproszenie do {organizationName} i zobaczy to po dołączeniu. To doda # płatne miejsce ({total}/rok).} few {Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. To doda # płatne miejsca ({total}/rok).} many {Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. To doda # płatnych miejsc ({total}/rok).} other {Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. To doda # płatnego miejsca ({total}/rok).}}"
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {To doda # płatne miejsce ({price}).} few {To doda # płatne miejsca ({price}).} many {To doda # płatnych miejsc ({price}).} other {To doda # płatnego miejsca ({price}).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Podaj co najmniej jedną osobę lub wybierz {choice}.} sender {Podaj co najmniej jednego nadawcę lub wybierz {choice}.} other {Podaj co najmniej jedną pozycję lub wybierz {choice}.}}"
@@ -1365,6 +1362,12 @@ msgstr "{toolName} przerwane"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola przeszła} few {Wszystkie # kontrole przeszły} many {Wszystkie # kontroli przeszło} other {Wszystkie # kontroli przeszło}}"
+
+msgid "{total}/month"
+msgstr "{total}/mies."
+
+msgid "{total}/year"
+msgstr "{total}/rok"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {zgłoszenie GitHub} few {zgłoszenia GitHub} many {zgłoszeń GitHub} other {zgłoszenia GitHub}}"
@@ -7596,6 +7599,9 @@ msgstr "np. Moje recenzje w chmurze"
 msgid "e.g. plan-budget"
 msgstr "np. plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "Każda z nich doda płatne miejsce."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Każdy załącznik może mieć maksymalnie {0} MB."
@@ -12249,8 +12255,8 @@ msgstr "Nowe wiadomości"
 msgid "New page"
 msgstr "Nowa strona"
 
-msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
-msgstr "Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu. Każda z nich doda płatne miejsce."
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "Nowe osoby otrzymają e-mailem zaproszenie do {organizationName} i zobaczą to po dołączeniu."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Nowe osoby otrzymają e-mailem zaproszenie do {organizationName}. Zobaczą to po dołączeniu."

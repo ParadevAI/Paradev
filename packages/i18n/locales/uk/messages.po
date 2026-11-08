@@ -1162,11 +1162,8 @@ msgstr "{name}: {monthly} за користувача на місяць"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за користувача на місяць або {yearly} у разі річної оплати"
 
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
-msgstr "{newPeople, plural, one {Нова людина отримає запрошення до {organizationName} електронною поштою і побачить це після приєднання. Це додасть # платне місце ({total}/міс.).} few {Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Це додасть # платні місця ({total}/міс.).} many {Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Це додасть # платних місць ({total}/міс.).} other {Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Це додасть # платного місця ({total}/міс.).}}"
-
-msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
-msgstr "{newPeople, plural, one {Нова людина отримає запрошення до {organizationName} електронною поштою і побачить це після приєднання. Це додасть # платне місце ({total}/рік).} few {Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Це додасть # платні місця ({total}/рік).} many {Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Це додасть # платних місць ({total}/рік).} other {Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Це додасть # платного місця ({total}/рік).}}"
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {Це додасть # платне місце ({price}).} few {Це додасть # платні місця ({price}).} many {Це додасть # платних місць ({price}).} other {Це додасть # платного місця ({price}).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажіть принаймні одну людину або виберіть {choice}.} sender {Укажіть принаймні одного відправника або виберіть {choice}.} other {Укажіть принаймні одне значення або виберіть {choice}.}}"
@@ -1359,6 +1356,12 @@ msgstr "{toolName}: перервано"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, =1 {Перевірку пройдено} one {Пройдено всі перевірки: #} few {Пройдено всі перевірки: #} many {Пройдено всі перевірки: #} other {Пройдено всі перевірки: #}}"
+
+msgid "{total}/month"
+msgstr "{total}/міс."
+
+msgid "{total}/year"
+msgstr "{total}/рік"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue з GitHub} few {issues з GitHub} many {issues з GitHub} other {issues з GitHub}}"
@@ -7590,6 +7593,9 @@ msgstr "наприклад, Мої хмарні рев'ю"
 msgid "e.g. plan-budget"
 msgstr "наприклад, plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "Кожна людина додасть платне місце."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Розмір кожного вкладення не перевищує {0} МБ."
@@ -12243,8 +12249,8 @@ msgstr "Нові повідомлення"
 msgid "New page"
 msgstr "Нова сторінка"
 
-msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
-msgstr "Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання. Кожна людина додасть платне місце."
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "Нові люди отримають запрошення до {organizationName} електронною поштою і побачать це після приєднання."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Нові люди отримають запрошення до {organizationName} електронною поштою. Вони побачать це після приєднання."
