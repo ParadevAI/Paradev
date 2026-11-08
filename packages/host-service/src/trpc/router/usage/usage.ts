@@ -12,7 +12,11 @@ import {
 } from "../../../workers/tasks/usage";
 import { getUsageWorkerPool } from "../../../workers/usage-worker-pool";
 import { protectedProcedure, queryProcedure, router } from "../../index";
-import { createOffLoop } from "../../off-loop";
+import {
+	createOffLoop,
+	type OffLoopArgs,
+	type OffLoopSpec,
+} from "../../off-loop";
 import {
 	provisionClaudeAccount,
 	provisionCodexAccount,
@@ -30,6 +34,7 @@ import {
 } from "./default-account";
 import { fetchGrokAccounts } from "./grok-quota";
 import { countAgentPrsByDay } from "./history/agent-prs";
+import { USAGE_INDEXING_ERROR } from "./history/usage-index";
 import { fetchOpencodeAccounts } from "./opencode-quota";
 import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
 import {
@@ -81,7 +86,29 @@ function getQuota(forceRefresh: boolean): Promise<UsageAccount[]> {
 	return promise;
 }
 
-const usageOffLoop = createOffLoop(getUsageWorkerPool);
+const offUsageWorker = createOffLoop(getUsageWorkerPool);
+
+/** offLoop on the usage worker. A request that outwaits a cold index reaches
+ * the client as a retryable TIMEOUT, not an internal error. */
+function usageOffLoop<TInput, TTaskInput, TResult>(
+	spec: OffLoopSpec<TInput, TTaskInput, TResult>,
+) {
+	const resolve = offUsageWorker(spec);
+	return async (args: OffLoopArgs<TInput>): Promise<TResult> => {
+		try {
+			return await resolve(args);
+		} catch (error) {
+			if (error instanceof Error && error.name === USAGE_INDEXING_ERROR) {
+				throw new TRPCError({
+					code: "TIMEOUT",
+					message: error.message,
+					cause: error,
+				});
+			}
+			throw error;
+		}
+	};
+}
 
 export const leaderboardPayloadInput = z.object({
 	days: z.number().int().min(1).max(MAX_BACKFILL_DAYS),
@@ -324,7 +351,7 @@ export const usageRouter = router({
 	 * Token/cost history estimated from the agents' own transcript logs,
 	 * priced at API list rates. Served by the usage worker's index, which
 	 * reads only what changed since its last scan. Coalesced per window so
-	 * concurrent callers (and the renderer's poll) share one read.
+	 * concurrent callers for one window share one read.
 	 */
 	history: queryProcedure
 		.meta({ timeoutMs: 120_000 })
@@ -383,6 +410,7 @@ export const usageRouter = router({
 				},
 				options: ({ input }) => ({
 					dedupeKey: `usage-history:${input.days}`,
+					strategy: "coalesce",
 					timeoutMs: 110_000,
 				}),
 			}),
@@ -408,6 +436,7 @@ export const usageRouter = router({
 				},
 				options: ({ input }) => ({
 					dedupeKey: `usage-leaderboard-payload:${input.days}`,
+					strategy: "coalesce",
 					timeoutMs: 110_000,
 				}),
 			}),

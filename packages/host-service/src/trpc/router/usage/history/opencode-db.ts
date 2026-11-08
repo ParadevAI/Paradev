@@ -11,7 +11,7 @@ import {
 	type OpencodeMessageRow,
 	opencodeRowsToEntries,
 } from "./opencode-rows";
-import { MAX_SQL_TEXT_LENGTH, type UsageLogEntry } from "./parse";
+import type { UsageLogEntry } from "./parse";
 import { type SqliteStates, setSessionLabels } from "./sqlite-tail";
 
 interface OpencodeTail {
@@ -127,16 +127,7 @@ export function collectOpencodeDbEntries(
 		for (const entry of entries) {
 			if (entry.timestampMs >= cutoffMs) out.push(entry);
 		}
-		setSessionLabels(
-			() =>
-				conn
-					.prepare(
-						`SELECT id, substr(title, 1, ${MAX_SQL_TEXT_LENGTH}) AS title FROM session`,
-					)
-					.all() as Array<{ id: string; title: string | null }>,
-			entries,
-			sessionLabels,
-		);
+		setSessionLabels(conn, "session", "title", entries, sessionLabels);
 		return read;
 	} finally {
 		db?.close();

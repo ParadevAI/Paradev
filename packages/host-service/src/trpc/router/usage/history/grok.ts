@@ -182,7 +182,7 @@ export async function collectGrokEntries(
 			continue;
 		}
 		if (meta.label) sessionLabels?.set(sid, meta.label);
-		out.push({ ...entry, model: meta.model ?? entry.model, cwd: meta.cwd });
+		out.push({ ...entry, model: meta.model || entry.model, cwd: meta.cwd });
 	}
 	return 1;
 }

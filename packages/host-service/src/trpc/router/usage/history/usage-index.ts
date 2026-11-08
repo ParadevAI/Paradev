@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { resolveSupersetHomeDir } from "@superset/agent-setup/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { HOST_SERVICE_VERSION } from "../../../../install-source";
 import { collectCursorEntries } from "./cursor";
 import {
@@ -28,10 +28,14 @@ const WAIT_MS = 60_000;
 const USAGE_CACHE_FORMAT = 1;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Kept as a string: the name crosses the worker boundary, and a minifier
+ * may rename the class. */
+export const USAGE_INDEXING_ERROR = "UsageIndexingError";
+
 export class UsageIndexingError extends Error {
 	constructor() {
 		super("Usage history is still being read. Try again in a minute.");
-		this.name = "UsageIndexingError";
+		this.name = USAGE_INDEXING_ERROR;
 	}
 }
 
@@ -125,7 +129,7 @@ async function waitAtMost(promise: Promise<void>, ms: number): Promise<void> {
 function openStore(): UsageStateStore {
 	try {
 		return SqliteStateStore.open(
-			join(resolveSupersetHomeDir(), "usage", "usage-cache.db"),
+			join(resolveAppHomeDir(), "usage", "usage-cache.db"),
 			`${USAGE_CACHE_FORMAT}:${HOST_SERVICE_VERSION}`,
 		);
 	} catch (error) {

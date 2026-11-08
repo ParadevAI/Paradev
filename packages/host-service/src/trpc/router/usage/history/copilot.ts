@@ -9,7 +9,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import { type CopilotUsageRow, copilotRowsToEntries } from "./copilot-rows";
-import { MAX_SQL_TEXT_LENGTH, type UsageLogEntry } from "./parse";
+import type { UsageLogEntry } from "./parse";
 import {
 	readAppendOnly,
 	type SqliteStates,
@@ -62,16 +62,7 @@ export function collectCopilotEntries(
 				),
 		});
 		for (const entry of entries) out.push(entry);
-		setSessionLabels(
-			() =>
-				conn
-					.prepare(
-						`SELECT id, substr(summary, 1, ${MAX_SQL_TEXT_LENGTH}) AS title FROM sessions`,
-					)
-					.all() as Array<{ id: string; title: string | null }>,
-			entries,
-			sessionLabels,
-		);
+		setSessionLabels(conn, "sessions", "summary", entries, sessionLabels);
 		return 1;
 	} catch {
 		return 0;

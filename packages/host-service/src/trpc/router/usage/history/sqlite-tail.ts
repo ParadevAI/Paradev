@@ -1,6 +1,10 @@
 import { statSync } from "node:fs";
 import type Database from "better-sqlite3";
-import { rememberLabel, type UsageLogEntry } from "./parse";
+import {
+	MAX_SQL_TEXT_LENGTH,
+	rememberLabel,
+	type UsageLogEntry,
+} from "./parse";
 import type { UsageStateStore } from "./usage-store";
 
 /** Scan state per agent database, kept between scans by the usage index.
@@ -18,8 +22,8 @@ interface AppendOnlyTail {
 	lastRowId: number;
 	/** Rows with rowid <= lastRowId; a drop means rows were deleted. */
 	rowCount: number;
-	/** Dedupe keys of every entry read, so a later read skips repeats. */
-	seen: Record<string, true>;
+	/** Dedupe key → when it was first read, so a later read skips repeats. */
+	seen: Record<string, number>;
 	entries: UsageLogEntry[];
 }
 
@@ -81,13 +85,20 @@ export function readAppendOnly({
 			entries: [],
 		};
 		if (top > tail.lastRowId) {
+			// Applied only once the read succeeds: a read that throws halfway
+			// must not leave rows in the state that the retry reads again.
 			const seen = tail.seen;
-			readRows(tail.lastRowId, top, tail.entries, {
-				has: (key) => Object.hasOwn(seen, key),
+			const added = new Map<string, number>();
+			const entries: UsageLogEntry[] = [];
+			const now = Date.now();
+			readRows(tail.lastRowId, top, entries, {
+				has: (key) => added.has(key) || Object.hasOwn(seen, key),
 				add: (key) => {
-					seen[key] = true;
+					added.set(key, now);
 				},
 			});
+			for (const entry of entries) tail.entries.push(entry);
+			for (const [key, at] of added) seen[key] = at;
 			tail.lastRowId = top;
 			tail.rowCount = (countUpTo.get(top) as { n: number }).n;
 			changed = true;
@@ -96,6 +107,9 @@ export function readAppendOnly({
 			tail.entries = tail.entries.filter(
 				(entry) => entry.timestampMs >= cutoffMs,
 			);
+			for (const key in tail.seen) {
+				if ((tail.seen[key] ?? 0) < cutoffMs) delete tail.seen[key];
+			}
 			tail.fromMs = cutoffMs;
 			changed = true;
 		}
@@ -104,15 +118,25 @@ export function readAppendOnly({
 	})();
 }
 
-/** Titles change after the first message, so they are read on every scan. */
+/** Titles change after the first message, so they are read on every scan,
+ * and only for the sessions that have entries. */
 export function setSessionLabels(
-	readTitles: () => Array<{ id: string; title: string | null }>,
+	db: InstanceType<typeof Database>,
+	table: "session" | "sessions",
+	titleColumn: "summary" | "title",
 	entries: readonly UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 ): void {
-	if (!sessionLabels || entries.length === 0) return;
-	const withEntries = new Set(entries.map((entry) => entry.sessionId));
-	for (const { id, title } of readTitles()) {
-		if (withEntries.has(id)) rememberLabel(sessionLabels, id, title);
-	}
+	if (!sessionLabels) return;
+	const ids = [...new Set(entries.map((entry) => entry.sessionId))].filter(
+		(id) => !sessionLabels.has(id),
+	);
+	if (ids.length === 0) return;
+	const rows = db
+		.prepare(
+			`SELECT id, substr(${titleColumn}, 1, ${MAX_SQL_TEXT_LENGTH}) AS title
+			 FROM ${table} WHERE id IN (SELECT value FROM json_each(?))`,
+		)
+		.all(JSON.stringify(ids)) as Array<{ id: string; title: string | null }>;
+	for (const { id, title } of rows) rememberLabel(sessionLabels, id, title);
 }

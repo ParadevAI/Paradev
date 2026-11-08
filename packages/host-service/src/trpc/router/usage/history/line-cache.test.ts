@@ -19,6 +19,7 @@ function recorder() {
 	const fed: string[] = [];
 	let created = 0;
 	const create = (state: string[] = []): LineParser<string[], string[]> => {
+		if (!Array.isArray(state)) throw new Error("unusable saved state");
 		created++;
 		return {
 			state,
@@ -108,5 +109,39 @@ describe("LineFileCache", () => {
 		store.beginScan();
 		store.endScan();
 		expect(store.get(fileKey(path))).toBeUndefined();
+	});
+
+	test("parses again when a file is rewritten in place past the saved offset", async () => {
+		const path = join(root, "rewrite-in-place.jsonl");
+		writeFileSync(path, "a\nb\n");
+		const cache = new LineFileCache();
+		await cache.parse("k", path, recorder().create);
+
+		writeFileSync(path, "x\ny\nz\n");
+		const { fed, create } = recorder();
+		expect(await cache.parse("k", path, create)).toEqual(["x", "y", "z"]);
+		expect(fed).toEqual(["x", "y", "z"]);
+	});
+
+	test("parses again when the saved state cannot be used", async () => {
+		const path = join(root, "bad-state.jsonl");
+		writeFileSync(path, "a\n");
+		const store = new MemoryStateStore();
+		const cache = new LineFileCache(store);
+		await cache.parse("k", path, recorder().create);
+		const cursor = store.get(fileKey(path)) as { state: unknown };
+		store.set(fileKey(path), { ...cursor, state: "not an array" });
+
+		expect(await cache.parse("k", path, recorder().create)).toEqual(["a"]);
+	});
+
+	test("does not read an unchanged file with an unterminated last line again", async () => {
+		const path = join(root, "partial-unchanged.jsonl");
+		writeFileSync(path, "a\n{par");
+		const cache = new LineFileCache();
+		const { fed, create } = recorder();
+		await cache.parse("k", path, create);
+		expect(await cache.parse("k", path, create)).toEqual(["a", "{par"]);
+		expect(fed).toEqual(["a", "{par"]);
 	});
 });

@@ -81,6 +81,8 @@ interface LineReadResult {
 	/** An unterminated last line was handed to `onLine`; a later append may
 	 * extend it, so resuming from `end` would read it twice. */
 	partialTail: boolean;
+	/** Byte offset just past everything read, the partial last line included. */
+	size: number;
 }
 
 /** Calls `onLine` for each line from byte `start` on, skipping lines past
@@ -138,7 +140,7 @@ export async function readLinesFrom(
 	}
 	const partialTail = !skipping && pendingLength > 0;
 	if (partialTail) emit(Buffer.concat(pending));
-	return { end, partialTail };
+	return { end, partialTail, size: chunkBase };
 }
 
 /** Parses a whole-file JSON document, or returns null when the file is

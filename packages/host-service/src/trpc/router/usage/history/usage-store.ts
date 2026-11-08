@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, unlinkSync } from "node:fs";
 import { dirname } from "node:path";
 import Database from "better-sqlite3";
 
@@ -51,6 +51,8 @@ export class MemoryStateStore implements UsageStateStore {
  * to resume from. A new `version` or an unreadable file starts it empty. */
 export class SqliteStateStore extends MemoryStateStore {
 	private readonly unsaved = new Set<string>();
+	/** Deleted since the last save; their saved rows must not load back. */
+	private removed = new Set<string>();
 	private savedAt = 0;
 	private readonly selectValue;
 
@@ -65,25 +67,48 @@ export class SqliteStateStore extends MemoryStateStore {
 	static open(
 		path: string,
 		version: string,
-		saveEveryMs = 5 * 60 * 1000,
+		{ saveEveryMs = 5 * 60 * 1000, busyTimeoutMs = 2000 } = {},
 	): SqliteStateStore {
 		mkdirSync(dirname(path), { recursive: true });
 		try {
-			return new SqliteStateStore(openStateDb(path, version), saveEveryMs);
-		} catch {
+			return new SqliteStateStore(
+				openStateDb(path, version, busyTimeoutMs),
+				saveEveryMs,
+			);
+		} catch (error) {
+			// Only a damaged file is replaced: a lock or permission error may
+			// come from another host-service using the same cache.
+			if (!isCorrupt(error)) throw error;
 			for (const suffix of ["", "-wal", "-shm"]) {
-				rmSync(`${path}${suffix}`, { force: true });
+				try {
+					unlinkSync(`${path}${suffix}`);
+				} catch {
+					// Absent already.
+				}
 			}
-			return new SqliteStateStore(openStateDb(path, version), saveEveryMs);
+			return new SqliteStateStore(
+				openStateDb(path, version, busyTimeoutMs),
+				saveEveryMs,
+			);
 		}
+	}
+
+	override set(key: string, value: unknown): void {
+		this.removed.delete(key);
+		super.set(key, value);
+	}
+
+	override delete(key: string): void {
+		this.removed.add(key);
+		super.delete(key);
 	}
 
 	override get(key: string): unknown {
 		const value = super.get(key);
-		if (value !== undefined) return value;
-		const row = this.selectValue.get(key) as { value: string } | undefined;
-		if (!row) return undefined;
+		if (value !== undefined || this.removed.has(key)) return value;
 		try {
+			const row = this.selectValue.get(key) as { value: string } | undefined;
+			if (!row) return undefined;
 			const parsed: unknown = JSON.parse(row.value);
 			this.values.set(key, parsed);
 			return parsed;
@@ -109,12 +134,12 @@ export class SqliteStateStore extends MemoryStateStore {
 	}
 
 	private save(): void {
-		const upsert = this.db.prepare(
-			"INSERT INTO state (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-		);
-		const remove = this.db.prepare("DELETE FROM state WHERE key = ?");
-		const saved = this.db.prepare("SELECT key FROM state").pluck().all();
 		try {
+			const upsert = this.db.prepare(
+				"INSERT INTO state (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+			);
+			const remove = this.db.prepare("DELETE FROM state WHERE key = ?");
+			const saved = this.db.prepare("SELECT key FROM state").pluck().all();
 			this.db.transaction(() => {
 				for (const key of this.unsaved) {
 					const value = this.values.get(key);
@@ -127,6 +152,7 @@ export class SqliteStateStore extends MemoryStateStore {
 				}
 			})();
 			this.unsaved.clear();
+			this.removed = new Set();
 		} catch (error) {
 			// The in-memory state stays valid; the next save writes it again.
 			console.warn("[usage-store] write failed", error);
@@ -137,11 +163,11 @@ export class SqliteStateStore extends MemoryStateStore {
 function openStateDb(
 	path: string,
 	version: string,
+	busyTimeoutMs: number,
 ): InstanceType<typeof Database> {
-	const db = new Database(path);
+	const db = new Database(path, { timeout: busyTimeoutMs });
 	try {
 		db.pragma("journal_mode = WAL");
-		db.pragma("busy_timeout = 2000");
 		db.exec(`CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 			CREATE TABLE IF NOT EXISTS state (key TEXT PRIMARY KEY, value TEXT NOT NULL);`);
 		const stored = db
@@ -161,4 +187,9 @@ function openStateDb(
 		db.close();
 		throw error;
 	}
+}
+
+function isCorrupt(error: unknown): boolean {
+	const code = (error as { code?: unknown } | null)?.code;
+	return code === "SQLITE_CORRUPT" || code === "SQLITE_NOTADB";
 }

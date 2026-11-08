@@ -1,4 +1,4 @@
-import { stat } from "node:fs/promises";
+import { open, stat } from "node:fs/promises";
 import { readLinesFrom } from "./parse";
 import { MemoryStateStore, type UsageStateStore } from "./usage-store";
 
@@ -26,16 +26,24 @@ export const parseWholeFile: ParseLines = async (_kind, path, create) => {
 	return parser.result();
 };
 
+/** Bytes compared to tell an append from a rewrite of the same file. */
+const HEAD_BYTES = 64;
+
 interface FileCursor {
 	ino: number;
 	mtimeMs: number;
+	/** Bytes read, an unterminated last line included. */
+	size: number;
+	/** Offset just past the last complete line. */
 	end: number;
 	partialTail: boolean;
+	/** Hex of the first HEAD_BYTES bytes when the cursor was saved. */
+	head: string;
 	state: unknown;
 }
 
-/** Saves where each file's parse stopped. A file that grew is read from
- * there; one that shrank, was replaced, or changed in place is read again. */
+/** Saves where each file's parse stopped. A file that only grew is read from
+ * there; any other change, or a saved state that fails, reads it again. */
 export class LineFileCache {
 	constructor(
 		private readonly store: UsageStateStore = new MemoryStateStore(),
@@ -55,24 +63,12 @@ export class LineFileCache {
 			return create().result();
 		}
 		const cursor = this.store.get(key) as FileCursor | undefined;
-		if (
-			cursor &&
-			cursor.ino === info.ino &&
-			!cursor.partialTail &&
-			info.size >= cursor.end
-		) {
-			const parser = create(cursor.state as S);
-			if (info.size === cursor.end && info.mtimeMs === cursor.mtimeMs) {
-				return parser.result();
-			}
-			if (info.size > cursor.end) {
-				const read = await readLinesFrom(path, cursor.end, (line) =>
-					parser.onLine(line),
-				);
-				// A failed read leaves the state ahead of the saved offset.
-				if (read) await this.save(key, path, read, parser);
-				else this.store.delete(key);
-				return parser.result();
+		if (cursor?.ino === info.ino) {
+			try {
+				const cached = await this.fromCursor(key, path, info, cursor, create);
+				if (cached) return cached.value;
+			} catch {
+				// A saved state the parser cannot take; read the file again.
 			}
 		}
 		const parser = create();
@@ -82,25 +78,71 @@ export class LineFileCache {
 		return parser.result();
 	};
 
+	/** The result from the saved cursor, or null when the file must be read
+	 * again from the start. */
+	private async fromCursor<R, S>(
+		key: string,
+		path: string,
+		info: { size: number; mtimeMs: number },
+		cursor: FileCursor,
+		create: CreateLineParser<R, S>,
+	): Promise<{ value: R } | null> {
+		if (info.size === cursor.size && info.mtimeMs === cursor.mtimeMs) {
+			return { value: create(cursor.state as S).result() };
+		}
+		if (
+			cursor.partialTail ||
+			info.size <= cursor.end ||
+			(await readHead(path, cursor.head.length / 2)) !== cursor.head
+		) {
+			return null;
+		}
+		const parser = create(cursor.state as S);
+		const read = await readLinesFrom(path, cursor.end, (line) =>
+			parser.onLine(line),
+		);
+		// A failed read leaves the state ahead of the saved offset.
+		if (read) await this.save(key, path, read, parser);
+		else this.store.delete(key);
+		return { value: parser.result() };
+	}
+
 	private async save(
 		key: string,
 		path: string,
-		read: { end: number; partialTail: boolean },
+		read: { end: number; partialTail: boolean; size: number },
 		parser: LineParser<unknown>,
 	): Promise<void> {
 		try {
-			// Stat after the read, so growth during the read resumes next time.
-			const { ino, mtimeMs } = await stat(path);
+			const [{ ino, mtimeMs, size }, head] = await Promise.all([
+				stat(path),
+				readHead(path, HEAD_BYTES),
+			]);
 			const cursor: FileCursor = {
 				ino,
-				mtimeMs,
+				// Growth during the read leaves the file larger than what was
+				// read; record that so the next scan does not take it as unchanged.
+				mtimeMs: size === read.size ? mtimeMs : -1,
+				size: read.size,
 				end: read.end,
 				partialTail: read.partialTail,
+				head,
 				state: parser.state,
 			};
 			this.store.set(key, cursor);
 		} catch {
 			this.store.delete(key);
 		}
+	}
+}
+
+async function readHead(path: string, bytes: number): Promise<string> {
+	const file = await open(path, "r");
+	try {
+		const buffer = Buffer.alloc(bytes);
+		const { bytesRead } = await file.read(buffer, 0, bytes, 0);
+		return buffer.subarray(0, bytesRead).toString("hex");
+	} finally {
+		await file.close();
 	}
 }

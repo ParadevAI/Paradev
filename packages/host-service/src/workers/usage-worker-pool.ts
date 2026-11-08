@@ -2,8 +2,9 @@ import { HostWorkerPool } from "./host-worker-pool.ts";
 
 let pool: HostWorkerPool | null = null;
 
-/** Usage scans read many GB of agent logs: a capped heap and no main-thread
- * fallback make running out of memory fail the request, not the host. */
+/** Usage scans read many GB of agent logs. The cap bounds the worker's V8
+ * heap (not off-heap buffers); with no main-thread fallback, a scan that
+ * exhausts it fails its request, not the host. */
 export function getUsageWorkerPool(): HostWorkerPool {
 	pool ??= new HostWorkerPool({
 		name: "usage-worker",
