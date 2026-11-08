@@ -1,5 +1,6 @@
 import { observable } from "@trpc/server/observable";
 import {
+	markGateHost,
 	portForwardManager,
 	setForwardReportOrganization,
 	setHostToken,
@@ -30,10 +31,12 @@ export const createPortForwardsRouter = () => {
 					workspaceId: z.string(),
 					remotePort: z.number().int().min(1).max(65535),
 					organizationId: z.string().optional(),
+					viaGate: z.boolean().optional(),
 				}),
 			)
 			.mutation(({ input }): Promise<PortForward[]> => {
-				const { organizationId, ...target } = input;
+				const { organizationId, viaGate, ...target } = input;
+				if (viaGate) markGateHost(target.hostUrl);
 				if (organizationId) {
 					setForwardReportOrganization(target.workspaceId, organizationId);
 				}

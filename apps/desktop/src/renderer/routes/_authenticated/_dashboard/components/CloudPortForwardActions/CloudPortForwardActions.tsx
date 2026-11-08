@@ -62,6 +62,7 @@ export function CloudPortForwardActions({
 					workspaceId: port.workspaceId,
 					remotePort: port.port,
 					organizationId: organizationId ?? undefined,
+					viaGate: true,
 				});
 			}}
 			className={BUTTON_CLASS}
