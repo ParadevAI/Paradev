@@ -39,8 +39,6 @@ export function usePersistentWebview({
 	// at first mount.
 	const attachUrlRef = useRef(paneData.url || DEFAULT_BROWSER_URL);
 	attachUrlRef.current = paneData.url || DEFAULT_BROWSER_URL;
-	const agentRef = useRef(paneData.agent);
-	agentRef.current = paneData.agent;
 
 	useEffect(() => {
 		const placeholder = placeholderRef.current;
@@ -69,7 +67,6 @@ export function usePersistentWebview({
 			() => {
 				void ctxRef.current.actions.close();
 			},
-			agentRef.current,
 		);
 		setOverlayContainer(browserRuntimeRegistry.getOverlayContainer(paneId));
 
@@ -86,10 +83,7 @@ export function usePersistentWebview({
 				onData: ({ url }: { url: string }) => {
 					ctxRef.current.actions.split("right", {
 						kind: "browser",
-						data: {
-							url,
-							...(agentRef.current && { agent: true }),
-						} as BrowserPaneData,
+						data: { url } as BrowserPaneData,
 					});
 				},
 			},
@@ -102,10 +96,7 @@ export function usePersistentWebview({
 						if (action === "open-in-split") {
 							ctxRef.current.actions.split("right", {
 								kind: "browser",
-								data: {
-									url,
-									...(agentRef.current && { agent: true }),
-								} as BrowserPaneData,
+								data: { url } as BrowserPaneData,
 							});
 						}
 					},

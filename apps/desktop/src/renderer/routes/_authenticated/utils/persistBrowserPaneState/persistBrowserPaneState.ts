@@ -13,10 +13,10 @@ import {
 const SLOTS: PaneLayoutSlot[] = ["paneLayout", "rightPaneLayout"];
 
 /**
- * Persists a page an agent's background browser pane navigated to, into the
+ * Persists a page a background browser pane navigated to, into the
  * workspace's mounted layout when it is shown, else into its saved layout.
  */
-export function persistAgentBrowserState(
+export function persistBrowserPaneState(
 	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
 	workspaceId: string,
 	paneId: string,

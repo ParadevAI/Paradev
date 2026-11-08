@@ -499,7 +499,7 @@ class BrowserManager extends EventEmitter {
 		this.emit(`open-resolved:${requestId}`, paneId);
 	}
 
-	markAgentUse(paneId: string): void {
+	markUse(paneId: string): void {
 		this.emit("agent-use", { paneId });
 	}
 

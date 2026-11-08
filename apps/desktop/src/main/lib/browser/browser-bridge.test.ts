@@ -93,21 +93,21 @@ beforeAll(async () => {
 	fromIdMock.mockImplementation((id: number) => panes.get(id) ?? null);
 	fakePane(901, BROWSER_PARTITION);
 	fakePane(902, BROWSER_PARTITION);
-	browserManager.register("user-pane", 901, "ws-bridge");
-	browserManager.register("agent-pane", 902, "ws-bridge");
+	browserManager.register("pane-b", 901, "ws-bridge");
+	browserManager.register("pane-a", 902, "ws-bridge");
 	await startBrowserBridge({ homeDir: home, extensions, answerDeadlineMs: 50 });
 });
 
 afterAll(async () => {
 	await stopBrowserBridge();
 	rmSync(home, { recursive: true, force: true });
-	browserManager.unregister("user-pane");
-	browserManager.unregister("agent-pane");
+	browserManager.unregister("pane-b");
+	browserManager.unregister("pane-a");
 	fromIdMock.mockImplementation(preloadFromId ?? (() => null));
 	fromPartitionMock.mockImplementation(preloadFromPartition ?? (() => ({})));
 });
 
-test("agents reach every browser pane, the user's own included", async () => {
+test("agents reach every browser pane", async () => {
 	const bridge = getBrowserBridgeInfo();
 	if (!bridge) throw new Error("the bridge did not start");
 	const call = (path: string, init?: RequestInit) =>
@@ -122,16 +122,16 @@ test("agents reach every browser pane, the user's own included", async () => {
 	const listed = await (await call("/panes?workspaceId=ws-bridge")).json();
 	expect(
 		listed.panes.map((pane: { paneId: string }) => pane.paneId).sort(),
-	).toEqual(["agent-pane", "user-pane"]);
+	).toEqual(["pane-a", "pane-b"]);
 
-	const userEval = await call("/panes/user-pane/eval", {
+	const userEval = await call("/panes/pane-b/eval", {
 		method: "POST",
 		body: JSON.stringify({ workspaceId: "ws-bridge", code: "document.title" }),
 	});
 	expect(await userEval.json()).toEqual({ result: "page data" });
 
 	const cdpClose = await new Promise<number>((resolve) => {
-		const url = new URL("/panes/user-pane/cdp", bridge.endpoint);
+		const url = new URL("/panes/pane-b/cdp", bridge.endpoint);
 		url.protocol = "ws:";
 		url.searchParams.set("workspaceId", "ws-bridge");
 		url.searchParams.set("token", bridge.secret);
@@ -150,7 +150,7 @@ test("an agent copies the user's Chrome logins only after the user allows it", a
 		typeof mock
 	>;
 	const importLogins = () =>
-		fetch(`${bridge.endpoint}/panes/agent-pane/import-cookies`, {
+		fetch(`${bridge.endpoint}/panes/pane-a/import-cookies`, {
 			method: "POST",
 			headers: {
 				authorization: `Bearer ${bridge.secret}`,
@@ -207,13 +207,13 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 	const bridge = getBrowserBridgeInfo();
 	if (!bridge) throw new Error("the bridge did not start");
 	const RENDERER = 990;
-	const layoutPane = (id: string, agent: boolean) => ({
+	const layoutPane = (id: string) => ({
 		id,
 		kind: "browser",
 		title: id,
 		terminalId: null,
 		active: false,
-		browser: { url: `https://example.com/${id}`, agent },
+		browser: { url: `https://example.com/${id}` },
 	});
 	const layout: PaneLayoutSnapshot = {
 		activeTabId: "tab",
@@ -222,19 +222,19 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 				id: "tab",
 				title: null,
 				active: true,
-				activePaneId: "agent-pane",
-				layout: { type: "pane", paneId: "agent-pane" },
+				activePaneId: "pane-a",
+				layout: { type: "pane", paneId: "pane-a" },
 				panes: [
-					layoutPane("agent-pane", true),
-					layoutPane("unloaded-agent-pane", true),
-					layoutPane("unloaded-user-pane", false),
+					layoutPane("pane-a"),
+					layoutPane("unloaded-pane-a"),
+					layoutPane("unloaded-pane-b"),
 				],
 			},
 		],
 	};
 	const renderer = (request: PaneLayoutRendererRequest) => {
 		if (request.op.type === "wakeBrowser") {
-			const woken = { "unloaded-agent-pane": 905, "unloaded-user-pane": 906 }[
+			const woken = { "unloaded-pane-a": 905, "unloaded-pane-b": 906 }[
 				request.op.paneId
 			];
 			if (!woken) {
@@ -284,12 +284,12 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 				pane.loaded,
 			]),
 		).toEqual([
-			["agent-pane", true],
-			["unloaded-agent-pane", false],
-			["unloaded-user-pane", false],
-			["user-pane", true],
+			["pane-a", true],
+			["unloaded-pane-a", false],
+			["unloaded-pane-b", false],
+			["pane-b", true],
 		]);
-		for (const paneId of ["unloaded-agent-pane", "unloaded-user-pane"]) {
+		for (const paneId of ["unloaded-pane-a", "unloaded-pane-b"]) {
 			expect(await (await evaluate(paneId)).json()).toEqual({
 				result: "page data",
 			});
@@ -297,8 +297,8 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 	} finally {
 		paneLayoutRequests.off("request", renderer);
 		paneLayoutRequests.removeSubscriber(RENDERER);
-		browserManager.unregister("unloaded-agent-pane");
-		browserManager.unregister("unloaded-user-pane");
+		browserManager.unregister("unloaded-pane-a");
+		browserManager.unregister("unloaded-pane-b");
 	}
 });
 

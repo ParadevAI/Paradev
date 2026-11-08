@@ -20,7 +20,7 @@ import {
 import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
-import { persistAgentBrowserState } from "renderer/routes/_authenticated/utils/persistAgentBrowserState";
+import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
 import {
 	getV2PaneLayoutStore,
@@ -214,8 +214,7 @@ function wakeBrowser(
 		paneId,
 		pane.browser.url || "about:blank",
 		workspaceId,
-		persistAgentBrowserState(collections, workspaceId, paneId),
-		pane.browser.agent === true,
+		persistBrowserPaneState(collections, workspaceId, paneId),
 	);
 	return { ...listed, paneId, tabId: tab.id };
 }

@@ -56,10 +56,9 @@ the pane verbs already cover those.
 
 ## Find or open a pane
 
-Every browser pane, whether you or the user opened it, shares one browser:
-the same logins and the same extensions. `list` shows them all. Prefer a pane you
-opened; drive a pane the user opened only when the task is about that page, as
-it may be what they are looking at.
+All browser panes are the same: one browser with the same logins and
+extensions, no matter who opened the pane. `list` shows them all, and every verb
+works on any of them.
 
 Every pane has a stable `paneId`, scoped to its workspace: pass the same
 `--workspace` you opened it under or the operation is rejected.

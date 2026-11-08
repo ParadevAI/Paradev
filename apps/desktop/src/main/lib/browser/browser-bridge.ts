@@ -206,7 +206,7 @@ async function resolvePane(
 			.json({ error: `No browser pane ${paneId} in this workspace` });
 		return null;
 	}
-	browserManager.markAgentUse(paneId);
+	browserManager.markUse(paneId);
 	return { wc, paneId, workspaceId };
 }
 
@@ -705,7 +705,7 @@ function handleCdpSocket(
 			);
 			return;
 		}
-		browserManager.markAgentUse(paneId);
+		browserManager.markUse(paneId);
 		let cdp: ReturnType<typeof browserManager.attachCdp>;
 		try {
 			cdp = browserManager.attachCdp(
