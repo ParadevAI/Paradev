@@ -711,6 +711,16 @@ export function chatLaunchTarget(
 	};
 }
 
+/**
+ * A chat takes only the config's env: its args and executable path apply to
+ * terminal launches, and the chat runs the CLI the ACP harness resolves.
+ */
+export function chatLaunchPresetId(
+	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
+): string {
+	return resolveChatLaunchPresetId(config.presetId, config.command);
+}
+
 function continueChatAgent(
 	ctx: Pick<HostServiceContext, "db" | "runtime" | "terminalAgentStore">,
 	input: AgentRunInput,

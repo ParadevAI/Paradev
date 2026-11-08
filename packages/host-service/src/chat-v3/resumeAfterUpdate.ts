@@ -88,6 +88,7 @@ export function resumeUnfinishedChats(options: {
 		try {
 			runtime.commands.resumeSession({
 				...session,
+				sourceSessionId: chat.sessionId,
 				cwd: options.resolveCwd(session.scopeId),
 				prompts: [
 					...(interrupted

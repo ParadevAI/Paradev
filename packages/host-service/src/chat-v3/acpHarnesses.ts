@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import { presetForAcpHarness } from "@superset/chat/core";
 import type { HarnessFactory, ResolveAttachment } from "@superset/chat-runtime";
 import { createAcpAdapter } from "@superset/chat-runtime";
 import type { HostDb } from "../db";
@@ -59,6 +60,7 @@ export function acpHarnessFactory(
 							workspaceId: options.scopeId,
 							terminalId: options.terminalId,
 							agentConfigId: options.agentConfigId,
+							presetId: presetForAcpHarness(options.harness) ?? entry.binary,
 						}),
 				});
 				const env = cli.env;

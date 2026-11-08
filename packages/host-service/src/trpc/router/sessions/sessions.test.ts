@@ -7,6 +7,7 @@ import {
 	type HarnessFactoryOptions,
 } from "@superset/chat-runtime";
 import { createTestRuntime, waitFor } from "@superset/chat-runtime/testing";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
@@ -319,5 +320,45 @@ describe("sessions router", () => {
 		expect(launches[1]?.resume?.harnessSessionId).toBe(
 			`native-${created.sessionId}`,
 		);
+	});
+	test("resumes on the stored config, else on the default account with a notice", async () => {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "personal-config",
+				presetId: "custom",
+				command: "claude",
+				promptTransport: "argv",
+				label: "Claude (personal)",
+				displayOrder: 1,
+			})
+			.run();
+		const stopAndResume = async (sessionId: string) => {
+			await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+			await caller.close({ workspaceId: WORKSPACE, sessionId });
+			return caller.resume({ workspaceId: WORKSPACE, sessionId });
+		};
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "personal-config",
+		});
+		const kept = await stopAndResume(created.sessionId);
+		expect(launches.at(-1)?.agentConfigId).toBe("personal-config");
+		expect("notice" in kept).toBe(false);
+
+		db.update(schema.hostAgentConfigs)
+			.set({ command: "codex" })
+			.where(eq(schema.hostAgentConfigs.id, "personal-config"))
+			.run();
+		const moved = await stopAndResume(kept.sessionId);
+		expect("notice" in moved && moved.notice).toContain("no longer runs");
+		expect(launches.at(-1)?.resume?.harnessSessionId).toBe(
+			`native-${created.sessionId}`,
+		);
+
+		db.delete(schema.hostAgentConfigs)
+			.where(eq(schema.hostAgentConfigs.id, "personal-config"))
+			.run();
+		const deleted = await stopAndResume(moved.sessionId);
+		expect("notice" in deleted && deleted.notice).toContain("was deleted");
 	});
 });

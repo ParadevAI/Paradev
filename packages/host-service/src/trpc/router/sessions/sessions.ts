@@ -1,10 +1,10 @@
-import { presetForAcpHarness } from "@superset/chat/core";
+import { acpHarnessForPreset, presetForAcpHarness } from "@superset/chat/core";
 import { cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { protectedProcedure, queryProcedure, router } from "../../index";
-import { chatLaunchTarget } from "../agents/agents";
+import { chatLaunchPresetId, chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import {
 	createChatSessionInWorkspace,
@@ -156,16 +156,30 @@ export const sessionsRouter = router({
 					message: "This chat has no saved provider session to resume.",
 				});
 			// Reopen on the agent config it ran under, so it keeps that account.
-			const agent =
-				session.agentConfigId &&
-				resolveHostAgentConfig(ctx.db, session.agentConfigId)
-					? session.agentConfigId
-					: presetId;
-			return createChatSessionInWorkspace(ctx, {
-				workspaceId: input.workspaceId,
-				agent,
-				resumeSessionId: session.harnessSessionId,
-				commandId: input.commandId,
-			});
+			// A config deleted or moved to another CLI since then falls back to
+			// the default account, and the reply says so.
+			const stored = session.agentConfigId
+				? resolveHostAgentConfig(ctx.db, session.agentConfigId)
+				: null;
+			const keepsConfig =
+				stored !== null &&
+				acpHarnessForPreset(chatLaunchPresetId(stored)) === session.harness;
+			const created = await createChatSessionInWorkspace(
+				ctx,
+				{
+					workspaceId: input.workspaceId,
+					agent: keepsConfig && stored ? stored.id : presetId,
+					resumeSessionId: session.harnessSessionId,
+					commandId: input.commandId,
+				},
+				{ withoutAgentConfig: !keepsConfig },
+			);
+			if (!session.agentConfigId || keepsConfig) return created;
+			return {
+				...created,
+				notice: stored
+					? `Agent "${stored.label}" no longer runs this chat's CLI, so the chat resumed on the default ${presetId} account.`
+					: `The agent this chat ran under was deleted, so the chat resumed on the default ${presetId} account.`,
+			};
 		}),
 });

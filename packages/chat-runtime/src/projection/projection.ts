@@ -50,11 +50,13 @@ export function resetSessionForEpoch(
 	epoch: string,
 	status: SessionStatus,
 	updatedAt: number,
+	agentConfigId: string | null,
 ): void {
 	db.update(chatSessionsLocal)
 		.set({
 			epoch,
 			status,
+			agentConfigId,
 			title: null,
 			queuedCount: 0,
 			updatedAt,
