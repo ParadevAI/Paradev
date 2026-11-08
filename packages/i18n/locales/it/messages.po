@@ -19934,11 +19934,11 @@ msgstr "Sto pensando..."
 msgid "Thirty"
 msgstr "Trenta"
 
-msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
-msgstr "Questo account {plugin} è già collegato da {owner}. Chiedi di scollegarlo prima."
-
 msgid "This {plugin} account is already connected by another Paradev organization."
 msgstr "Questo account {plugin} è già collegato da un'altra organizzazione Paradev."
+
+msgid "This {plugin} account is already connected to another Paradev organization by {owner}. Ask them to disconnect it there first."
+msgstr "Questo account {plugin} è già collegato a un'altra organizzazione Paradev da {owner}. Chiedi di scollegarlo lì prima."
 
 msgid "This action is irreversible."
 msgstr "L'operazione è irreversibile."
