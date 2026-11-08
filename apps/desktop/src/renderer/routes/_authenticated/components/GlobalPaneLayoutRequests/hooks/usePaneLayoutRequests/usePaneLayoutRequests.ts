@@ -30,7 +30,6 @@ import {
 	applyRememberedV2PaneSelection,
 	rememberV2PaneSelection,
 } from "renderer/stores/v2-pane-selection";
-import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import {
 	applyPaneLayoutOp,
 	type PaneAreas,
@@ -195,7 +194,7 @@ function runPaneLayoutOp(
 	};
 }
 
-function wakeAgentBrowser(
+function wakeBrowser(
 	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
 	workspaceId: string,
 	paneId: string,
@@ -205,10 +204,10 @@ function wakeAgentBrowser(
 		tab.panes.some((pane) => pane.id === paneId),
 	);
 	const pane = tab?.panes.find((pane) => pane.id === paneId);
-	if (!tab || !pane?.browser?.agent) {
+	if (!tab || !pane?.browser) {
 		throw new PaneLayoutOpError(
 			"NOT_FOUND",
-			`No agent browser pane ${paneId} in this workspace`,
+			`No browser pane ${paneId} in this workspace`,
 		);
 	}
 	browserRuntimeRegistry.openBackground(
@@ -216,7 +215,7 @@ function wakeAgentBrowser(
 		pane.browser.url || "about:blank",
 		workspaceId,
 		persistAgentBrowserState(collections, workspaceId, paneId),
-		AGENT_BROWSER_PARTITION,
+		pane.browser.agent === true,
 	);
 	return { ...listed, paneId, tabId: tab.id };
 }
@@ -236,7 +235,7 @@ export function usePaneLayoutRequests() {
 					try {
 						const { paneId, tabId, layout } =
 							op.type === "wakeBrowser"
-								? wakeAgentBrowser(collections, workspaceId, op.paneId)
+								? wakeBrowser(collections, workspaceId, op.paneId)
 								: runPaneLayoutOp(collections, workspaceId, op);
 						reply = { requestId, result: { paneId, tabId, layout } };
 					} catch (error) {

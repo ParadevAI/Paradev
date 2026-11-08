@@ -10502,8 +10502,8 @@ msgstr "它可以："
 msgid "It can't be brought back."
 msgstr "删除后无法恢复。"
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到智能体打开的浏览器窗格中。之后智能体可以在你已登录的网站上执行操作。"
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到应用内浏览器中。之后智能体可以在你已登录的网站上执行操作。"
 
 msgid "It keeps the title from your prompt."
 msgstr "将保留根据你的提示生成的标题。"

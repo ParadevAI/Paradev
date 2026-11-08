@@ -7,7 +7,6 @@ import type {
 	BrowserPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
 import { browserRuntimeRegistry } from "../../browserRuntimeRegistry";
 import { DEFAULT_BROWSER_URL } from "../../constants";
 
@@ -70,7 +69,7 @@ export function usePersistentWebview({
 			() => {
 				void ctxRef.current.actions.close();
 			},
-			agentRef.current ? AGENT_BROWSER_PARTITION : BROWSER_PARTITION,
+			agentRef.current,
 		);
 		setOverlayContainer(browserRuntimeRegistry.getOverlayContainer(paneId));
 

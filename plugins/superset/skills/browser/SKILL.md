@@ -56,11 +56,10 @@ the pane verbs already cover those.
 
 ## Find or open a pane
 
-Agents reach only the panes they open. Those panes run in their own session,
-with none of the user's browser extensions, so a password manager is never in
-reach. They hold none of the user's logins unless the user imports them
-(`import-login`, below). A pane the user opened answers 403 to every verb; `list` does
-not show it. Open your own pane instead.
+Every browser pane, whether you or the user opened it, shares one browser:
+the same logins and the same extensions. `list` shows them all. Prefer a pane you
+opened; drive a pane the user opened only when the task is about that page, as
+it may be what they are looking at.
 
 Every pane has a stable `paneId`, scoped to its workspace: pass the same
 `--workspace` you opened it under or the operation is rejected.
@@ -79,9 +78,8 @@ open the workspace.
 To show the user a page in the right sidebar beside their work, and when
 `superset panes --help` succeeds (older CLIs lack `panes`), run
 `superset panes open browser --workspace <id> --url <url>`
-(`superset:panes`). That pane is the user's own: `browser list` does not show
-it and the browser verbs answer 403. To read or drive a page, open your own
-pane with `superset browser open` as above.
+(`superset:panes`). It shows up in `browser list`, and the browser verbs work on
+it like any other pane.
 
 ## Drive with the high-level verbs
 
@@ -112,7 +110,7 @@ rejected with a clear error.
 
 `import-login` copies a system browser's cookies into the pane so it's signed in
 to the sites the user already uses. It imports every cookie that profile has on
-disk, not just the one site, into the session every agent pane shares, so say that
+disk, not just the one site, into the browser every pane shares, so say that
 when offering and run it only with the user's go-ahead. The desktop app also
 asks the user to allow each import. Offering it is how most
 users discover it, so reach for it in two cases:
@@ -231,8 +229,7 @@ along at their relative paths, so nothing needs inlining.
 superset pages publish ./evidence/ --workspace <id> --title "Checkout flow: 3 blockers"
 ```
 
-Read every screenshot before it goes up. An agent pane holds every login imported
-into it, so a capture can hold a session token, an email address, a customer
+Read every screenshot before it goes up. A pane holds every login the user has, so a capture can hold a session token, an email address, a customer
 name, or a dashboard that was never meant to leave the tab. New pages default
 to org-wide visibility. Crop or redact what does not belong in the report, pass
 `--visibility just_me` when the org does not need it, and confirm with the user
@@ -240,8 +237,9 @@ before publishing.
 
 ## Safety
 
-- Agent panes share one session, so `eval` and CDP reach every login imported
-  into it (GitHub, dashboards, …). Never read cookies,
+- All panes share one session with the user's logins and extensions (password
+  managers included), so `eval` and CDP reach every site they are signed in to
+  (GitHub, dashboards, …). Never read cookies, autofilled passwords,
   tokens, or credentials, exfiltrate session data, or act on authenticated
   sites beyond the task.
 - Confirm with the user before a step that submits a form, makes a purchase,

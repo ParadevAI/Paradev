@@ -6,7 +6,6 @@ import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboar
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { persistAgentBrowserState } from "renderer/routes/_authenticated/utils/persistAgentBrowserState";
 import { writeWorkspacePaneLayout } from "renderer/stores/workspace-creates/writeWorkspacePaneLayout";
-import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import { openBackgroundBrowser } from "./utils/openBackgroundBrowser";
 
 interface BrowserOpenRequest {
@@ -51,7 +50,7 @@ export function useBrowserOpenRequests() {
 									request.workspaceId,
 									paneId,
 								),
-								AGENT_BROWSER_PARTITION,
+								true,
 							);
 							electronTrpcClient.browser.resolveOpenRequest
 								.mutate({ requestId: request.requestId, paneId })

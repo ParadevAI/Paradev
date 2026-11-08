@@ -17,10 +17,9 @@ import {
 	allLayoutTabs,
 	paneLayoutRequestSchema,
 } from "@superset/shared/pane-layout-ops";
-import { BrowserWindow, dialog, session } from "electron";
+import { BrowserWindow, dialog } from "electron";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
-import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import { type WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
 import { showCliNotification } from "../notifications/show-cli-notification";
@@ -50,9 +49,6 @@ const WAKE_PANE_TIMEOUT_MS = 10_000;
 const MAX_CDP_MESSAGE_BYTES = 4 * 1024 * 1024;
 const MAX_EARLY_CDP_FRAMES = 64;
 const CDP_PATH = /^\/panes\/([^/]+)\/cdp$/;
-const USER_PANE_ERROR =
-	"This pane is the user's own browser, with their logins and extensions. Agents can use only the panes they open.";
-
 const LOGIN_IMPORT_REFUSED = "The user did not allow this login import.";
 const EXTENSION_ID = /^[a-p]{32}$/;
 const EXTENSION_INSTALL_REFUSED = "The user did not allow this extension.";
@@ -75,10 +71,7 @@ export type UserExtensionInstall =
 	  }
 	| { status: "declined" };
 
-/**
- * The extensions in the user's own browser. The CLI can manage them but never
- * open, click or read them: an agent there could reach a password manager.
- */
+/** The browser panes' extensions. The CLI can manage them but never open, click or read them. */
 export interface UserExtensions {
 	list(): (UserExtensionSummary & { pinned: boolean })[];
 	/** The question closes, as a no, when `signal` aborts. */
@@ -91,7 +84,7 @@ export interface UserExtensions {
 	setPinned(extensionId: string, pinned: boolean): void;
 }
 
-// Cookies are live sign-ins, so the user says yes to each copy into an agent's pane.
+// Cookies are live sign-ins, so the user says yes to each copy.
 async function confirmLoginImport(
 	browserName: string,
 	profileName: string,
@@ -109,7 +102,7 @@ async function confirmLoginImport(
 		),
 		detail: i18n._(
 			msg({
-				message: `It copies the cookies from your "${profileName}" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to.`,
+				message: `It copies the cookies from your "${profileName}" profile into the in-app browser. Agents can then act on the sites you are signed in to.`,
 			}),
 		),
 	};
@@ -119,10 +112,6 @@ async function confirmLoginImport(
 		? await dialog.showMessageBox(window, box)
 		: await dialog.showMessageBox(box);
 	return response === 0;
-}
-
-function isAgentPane(wc: Electron.WebContents): boolean {
-	return wc.session === session.fromPartition(AGENT_BROWSER_PARTITION);
 }
 
 let server: Server | null = null;
@@ -145,7 +134,7 @@ function isAuthorized(secret: string, req: IncomingMessage): boolean {
 
 /**
  * The pane's live webContents, rebuilding it first when hidden-pane eviction
- * unloaded it. Only an agent's pane is rebuilt; the renderer refuses others.
+ * unloaded it.
  */
 async function liveWebContents(
 	paneId: string,
@@ -183,7 +172,7 @@ async function liveWebContents(
 }
 
 /**
- * Resolve the workspace-scoped agent pane every pane op must name, or answer
+ * Resolve the workspace-scoped pane every pane op must name, or answer
  * the request with an error. The workspaceId is required (body for POST,
  * query for GET): the bridge never operates unscoped.
  */
@@ -217,16 +206,12 @@ async function resolvePane(
 			.json({ error: `No browser pane ${paneId} in this workspace` });
 		return null;
 	}
-	if (!isAgentPane(wc)) {
-		res.status(403).json({ error: USER_PANE_ERROR });
-		return null;
-	}
 	browserManager.markAgentUse(paneId);
 	return { wc, paneId, workspaceId };
 }
 
 /** Runs `fn` on the resolved pane; a throw anywhere answers 500 instead of leaving the request open. */
-function withAgentPane(
+function withPane(
 	req: Request,
 	res: Response,
 	wakeTimeoutMs: number,
@@ -245,16 +230,10 @@ function withAgentPane(
 		});
 }
 
-async function listAgentPanes(
-	workspaceId: string,
-): Promise<BrowserPaneListing[]> {
+async function listPanes(workspaceId: string): Promise<BrowserPaneListing[]> {
 	const live = new Map(
 		browserManager
 			.listPanes(workspaceId)
-			.filter((pane) => {
-				const wc = browserManager.getWebContents(pane.paneId);
-				return wc !== null && isAgentPane(wc);
-			})
 			.map((pane) => [pane.paneId, { ...pane, loaded: true }]),
 	);
 	const layout = await paneLayoutRequests
@@ -268,7 +247,7 @@ async function listAgentPanes(
 		if (listed) {
 			panes.push(listed);
 			live.delete(pane.id);
-		} else if (pane.browser?.agent) {
+		} else if (pane.browser) {
 			panes.push({
 				paneId: pane.id,
 				workspaceId,
@@ -312,16 +291,12 @@ export async function startBrowserBridge({
 				? req.query.workspaceId
 				: undefined;
 		if (workspaceId) {
-			listAgentPanes(workspaceId)
+			listPanes(workspaceId)
 				.then((panes) => res.json({ panes }))
 				.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 			return;
 		}
-		const panes = browserManager.listPanes().filter((pane) => {
-			const wc = browserManager.getWebContents(pane.paneId);
-			return wc !== null && isAgentPane(wc);
-		});
-		res.json({ panes });
+		res.json({ panes: browserManager.listPanes() });
 	});
 
 	app.post("/open", (req, res) => {
@@ -382,14 +357,6 @@ export async function startBrowserBridge({
 			);
 			void registered.ready.then((wc) => {
 				if (!wc) return;
-				if (!isAgentPane(wc)) {
-					finish(() =>
-						res
-							.status(500)
-							.json({ error: "The opened pane is not an agent pane" }),
-					);
-					return;
-				}
 				const info = browserManager
 					.listPanes(workspaceId)
 					.find((pane) => pane.paneId === paneId);
@@ -428,7 +395,7 @@ export async function startBrowserBridge({
 			res.status(400).json({ error: errorMessage(err) });
 			return;
 		}
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			try {
 				browserManager.navigate(pane.paneId, resolvedUrl, pane.workspaceId);
 				res.json({ ok: true });
@@ -439,21 +406,21 @@ export async function startBrowserBridge({
 	});
 
 	app.post("/panes/:paneId/back", (req, res) => {
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			if (pane.wc.canGoBack()) pane.wc.goBack();
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/forward", (req, res) => {
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			if (pane.wc.canGoForward()) pane.wc.goForward();
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/reload", (req, res) => {
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			if (req.body?.hard) {
 				pane.wc.reloadIgnoringCache();
 			} else {
@@ -464,7 +431,7 @@ export async function startBrowserBridge({
 	});
 
 	app.post("/panes/:paneId/screenshot", (req, res) => {
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			browserManager
 				.capturePng(pane.paneId, pane.workspaceId)
 				.then((base64) => res.json({ base64 }))
@@ -478,7 +445,7 @@ export async function startBrowserBridge({
 			res.status(400).json({ error: "code is required" });
 			return;
 		}
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			browserManager
 				.evaluateJS(pane.paneId, code, pane.workspaceId)
 				.then((result) => res.json({ result: result ?? null }))
@@ -487,7 +454,7 @@ export async function startBrowserBridge({
 	});
 
 	app.get("/panes/:paneId/console", (req, res) => {
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			res.json({
 				entries: browserManager.getConsoleLogs(pane.paneId, pane.workspaceId),
 			});
@@ -538,7 +505,7 @@ export async function startBrowserBridge({
 			res.status(404).json({ error: "Unknown import source" });
 			return;
 		}
-		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			confirmLoginImport(profile.browserName, profile.profileName)
 				.then(async (allowed) => {
 					if (!allowed) {
@@ -739,10 +706,6 @@ function handleCdpSocket(
 				1011,
 				`No browser pane ${paneId} in this workspace`.slice(0, 100),
 			);
-			return;
-		}
-		if (!isAgentPane(wc)) {
-			ws.close(1008, "This pane is the user's own browser.");
 			return;
 		}
 		browserManager.markAgentUse(paneId);

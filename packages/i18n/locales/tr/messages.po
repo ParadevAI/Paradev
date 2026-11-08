@@ -10502,8 +10502,8 @@ msgstr "Şunları yapabilir:"
 msgid "It can't be brought back."
 msgstr "Geri getirilemez."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "\"{profileName}\" profilinizdeki çerezleri, ajanın açtığı bir tarayıcı bölmesine kopyalar. Ajan böylece oturum açtığınız sitelerde işlem yapabilir."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "\"{profileName}\" profilinizdeki çerezleri uygulama içi tarayıcıya kopyalar. Ajanlar böylece oturum açtığınız sitelerde işlem yapabilir."
 
 msgid "It keeps the title from your prompt."
 msgstr "İsteminizdeki başlık korunur."

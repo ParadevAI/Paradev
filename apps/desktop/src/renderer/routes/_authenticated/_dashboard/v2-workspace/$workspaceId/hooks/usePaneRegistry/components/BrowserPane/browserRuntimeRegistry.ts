@@ -1,7 +1,7 @@
 import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
 import { selectWebviewsToUnload } from "./utils/selectWebviewsToUnload";
@@ -352,11 +352,11 @@ export class BrowserRuntimeRegistryImpl {
 		paneId: string,
 		initialUrl: string,
 		workspaceId: string,
-		partition: string,
+		agent: boolean,
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
 		const detachViewportZoom = attachBrowserViewportZoom(webview);
-		webview.setAttribute("partition", partition);
+		webview.setAttribute("partition", BROWSER_PARTITION);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
 		webview.style.top = "0";
@@ -396,7 +396,7 @@ export class BrowserRuntimeRegistryImpl {
 			resizeObserver: null,
 			visible: false,
 			lastUsedAt: 0,
-			agent: partition === AGENT_BROWSER_PARTITION,
+			agent,
 		};
 
 		const firePersist = () => {
@@ -588,12 +588,12 @@ export class BrowserRuntimeRegistryImpl {
 		url: string,
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
-		partition = BROWSER_PARTITION,
+		agent = false,
 	): RegistryEntry {
 		const existing = this.entries.get(paneId);
 		if (existing) return existing;
 		const root = this.ensureRootContainer();
-		const entry = this.createEntry(paneId, url, workspaceId, partition);
+		const entry = this.createEntry(paneId, url, workspaceId, agent);
 		entry.onPersist = onPersist;
 		entry.lastUsedAt = this.stamp();
 		// Give automation a usable viewport before this pane has ever been shown.
@@ -614,14 +614,14 @@ export class BrowserRuntimeRegistryImpl {
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
 		onClose: () => void,
-		partition = BROWSER_PARTITION,
+		agent = false,
 	): void {
 		const entry = this.openBackground(
 			paneId,
 			initialUrl,
 			workspaceId,
 			onPersist,
-			partition,
+			agent,
 		);
 		// A reused pane can move between workspaces (the attach effect keys on
 		// workspaceId). Keep the registration's workspace current so main-side
