@@ -168,6 +168,9 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(thrown?.code).toBe("PRECONDITION_FAILED");
 		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
 		expect(thrown?.message).toBe(message);
+		expect(thrown?.cause).toMatchObject({
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		});
 	});
 
 	test("unreadable tree object → PRECONDITION_FAILED / GIT_REPO_DAMAGED", () => {
@@ -425,6 +428,9 @@ describe("rethrowEnvironmentalGitError", () => {
 		const thrown = capture(new Error(message));
 		expect(thrown?.code).toBe("PRECONDITION_FAILED");
 		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
+		expect(thrown?.cause).toMatchObject({
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		});
 		expect(thrown?.message).toBe(message);
 	});
 
@@ -458,6 +464,9 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(thrown?.code).toBe("PRECONDITION_FAILED");
 		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
 		expect(thrown?.message).toBe(message);
+		expect(thrown?.cause).toMatchObject({
+			reason: "XCODE_LICENSE_NOT_ACCEPTED",
+		});
 	});
 
 	test("does not claim the license refusal alongside a failure of git's own", () => {

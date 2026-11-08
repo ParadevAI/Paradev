@@ -5695,6 +5695,9 @@ msgstr "プロジェクトを作成できませんでした"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "プロジェクトを作成できませんでした。別の名前を試すか、ログを確認してください。"
 
+msgid "Could not create the project. Please try again."
+msgstr "プロジェクトを作成できませんでした。もう一度お試しください。"
+
 msgid "Could not delete"
 msgstr "削除できませんでした"
 
@@ -5715,6 +5718,9 @@ msgstr "接続を解除できませんでした。"
 
 msgid "Could not download {names}."
 msgstr "{names} をダウンロードできませんでした。"
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "テンプレートをダウンロードできませんでした。インターネット接続を確認して、もう一度お試しください。"
 
 msgid "Could not forget {domain}"
 msgstr "{domain}を削除できませんでした"
@@ -9347,6 +9353,15 @@ msgstr "Gitとワークツリー"
 
 msgid "Git author name"
 msgstr "Gitの作成者名"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "この場所では Git を実行できません。別の場所を選んで、もう一度お試しください。"
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "Xcode のライセンスに同意するまで Git を実行できません。ターミナルで sudo xcodebuild -license を実行してから、もう一度お試しください。"
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "この Mac にはまだ Git がインストールされていません。Apple の Command Line Tools をインストールしてから、もう一度お試しください。"
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Cloud 上の Git で無視されたファイル（.env など）。コピーして持ち出してください"

@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import type { GitEnvironmentCause } from "../../../error-types";
 
 // Git's own text for environmental failures: the worktree was deleted out
 // from under a running git process, macOS denies reading it, or the
@@ -133,7 +134,10 @@ export function rethrowGitToolsMissing(error: unknown): void {
 	throw new TRPCError({
 		code: "PRECONDITION_FAILED",
 		message: GIT_TOOLS_MISSING_MESSAGE,
-		cause: { kind: "GIT_ENVIRONMENT" },
+		cause: {
+			kind: "GIT_ENVIRONMENT",
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		} satisfies GitEnvironmentCause,
 	});
 }
 
@@ -187,13 +191,25 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 	}
 	if (
 		XCODE_SELECT_NO_TOOLS_PATTERN.test(error.message) ||
-		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(error.message) ||
-		XCODE_LICENSE_NOT_ACCEPTED_PATTERN.test(error.message)
+		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(error.message)
 	) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: error.message,
-			cause: { kind: "GIT_ENVIRONMENT" },
+			cause: {
+				kind: "GIT_ENVIRONMENT",
+				reason: "COMMAND_LINE_TOOLS_MISSING",
+			} satisfies GitEnvironmentCause,
+		});
+	}
+	if (XCODE_LICENSE_NOT_ACCEPTED_PATTERN.test(error.message)) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: error.message,
+			cause: {
+				kind: "GIT_ENVIRONMENT",
+				reason: "XCODE_LICENSE_NOT_ACCEPTED",
+			} satisfies GitEnvironmentCause,
 		});
 	}
 	if (FILTER_HELPER_MISSING_PATTERN.test(error.message)) {
