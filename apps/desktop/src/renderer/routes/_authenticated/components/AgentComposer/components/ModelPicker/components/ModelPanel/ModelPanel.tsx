@@ -336,6 +336,7 @@ export function ModelPanel({
 						</div>
 						{accounts.map((account) => {
 							const selected = isCurrentAccount(account.configId);
+							const icon = getPresetIcon(account.iconId, isDark);
 							return (
 								<DropdownMenuItem
 									aria-current={selected ? "true" : undefined}
@@ -343,6 +344,13 @@ export function ModelPanel({
 									key={account.configId}
 									onSelect={() => pickAccount(account.configId)}
 								>
+									{icon ? (
+										<img
+											alt=""
+											className="size-4 shrink-0 object-contain"
+											src={icon}
+										/>
+									) : null}
 									<span className="min-w-0 flex-1 truncate">
 										{account.label}
 									</span>

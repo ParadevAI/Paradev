@@ -6,6 +6,7 @@ const config = (id: string, presetId: string, command: string) => ({
 	presetId,
 	command,
 	label: id,
+	iconId: id === "personal" ? "data:image/png;base64,AA==" : null,
 });
 
 describe("chatAgentChoices", () => {
@@ -18,8 +19,12 @@ describe("chatAgentChoices", () => {
 		]);
 		expect(agents.map((agent) => agent.presetId)).toEqual(["claude", "codex"]);
 		expect(agents[0]?.accounts).toEqual([
-			{ configId: "work", label: "work" },
-			{ configId: "personal", label: "personal" },
+			{ configId: "work", label: "work", iconId: "claude" },
+			{
+				configId: "personal",
+				label: "personal",
+				iconId: "data:image/png;base64,AA==",
+			},
 		]);
 		expect(agents[1]?.accounts).toBeUndefined();
 		expect(configsFor("claude").map((entry) => entry.id)).toEqual([

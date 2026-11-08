@@ -3,7 +3,10 @@ import { getAgentModelSupport } from "@superset/shared/agent-models";
 import type { AgentChoice } from "renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker";
 import { chatPresetIdForConfig } from "../../../../../../../../utils/chatPresetIdForConfig";
 
-type Config = Pick<HostAgentConfig, "id" | "presetId" | "command" | "label">;
+type Config = Pick<
+	HostAgentConfig,
+	"id" | "presetId" | "command" | "label" | "iconId"
+>;
 
 /** One choice per chat preset; a preset that several configs chat as lists them as accounts. */
 export function chatAgentChoices<T extends Config>(
@@ -26,6 +29,7 @@ export function chatAgentChoices<T extends Config>(
 					accounts: presetConfigs.map((config) => ({
 						configId: config.id,
 						label: config.label,
+						iconId: config.iconId ?? config.presetId,
 					})),
 				}
 			: {}),

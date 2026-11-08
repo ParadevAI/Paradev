@@ -80,9 +80,14 @@ export function ModelPicker({
 	const currentAgent = agentSwitcher?.agents.find(
 		(agent) => agent.presetId === agentSwitcher.currentPresetId,
 	);
+	const currentAccount = currentAgent?.accounts?.find(
+		(account) => account.configId === agentSwitcher?.currentConfigId,
+	);
 	const agentIcon = agentSwitcher
 		? getPresetIcon(
-				currentAgent?.iconId ?? agentSwitcher.currentPresetId,
+				currentAccount?.iconId ??
+					currentAgent?.iconId ??
+					agentSwitcher.currentPresetId,
 				isDark,
 			)
 		: undefined;

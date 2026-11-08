@@ -19,18 +19,21 @@ import { resizeImageDataUrl } from "./resize-image";
 interface AgentIconPickerProps {
 	/**
 	 * Current icon: a built-in icon key, an uploaded `data:` image URI, or null
-	 * for the neutral fallback glyph.
+	 * for the preset's own icon (the neutral glyph for a custom agent).
 	 */
 	value: string | null;
 	onChange: (iconId: string | null) => void;
 	disabled?: boolean;
+	presetId?: string;
 }
 
 export function AgentIconPicker({
 	value,
 	onChange,
 	disabled,
+	presetId = "custom",
 }: AgentIconPickerProps) {
+	const hasPresetIcon = presetId !== "custom";
 	const { t } = useLingui();
 	const selectImageMutation = electronTrpc.window.selectImageFile.useMutation();
 	// Covers the whole flow (native dialog → mutate → resize), not just the
@@ -61,7 +64,8 @@ export function AgentIconPicker({
 	const triggerLabel = uploaded ? (
 		<Trans>Custom image</Trans>
 	) : (
-		(selected?.label ?? <Trans>No icon</Trans>)
+		(selected?.label ??
+		(hasPresetIcon ? <Trans>Default</Trans> : <Trans>No icon</Trans>))
 	);
 
 	return (
@@ -75,7 +79,7 @@ export function AgentIconPicker({
 						"bg-transparent hover:bg-accent/50 transition-colors disabled:opacity-50",
 					)}
 				>
-					<AgentIcon iconId={value} presetId="custom" className="size-5" />
+					<AgentIcon iconId={value} presetId={presetId} className="size-5" />
 					<span className="flex-1 text-left">{triggerLabel}</span>
 					<ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
 				</button>
@@ -97,9 +101,9 @@ export function AgentIconPicker({
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="gap-2" onSelect={() => onChange(null)}>
-					<AgentIcon iconId={null} presetId="custom" className="size-4" />
+					<AgentIcon iconId={null} presetId={presetId} className="size-4" />
 					<span className="flex-1">
-						<Trans>No icon</Trans>
+						{hasPresetIcon ? <Trans>Default</Trans> : <Trans>No icon</Trans>}
 					</span>
 					{value === null ? <Check className="size-3.5 shrink-0" /> : null}
 				</DropdownMenuItem>
