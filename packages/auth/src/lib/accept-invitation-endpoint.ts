@@ -1,4 +1,5 @@
 import { db, dbWs } from "@superset/db/client";
+import { cloudWorkspaceShares, pageShares } from "@superset/db/schema";
 import {
 	invitations,
 	members,
@@ -9,6 +10,7 @@ import type { BetterAuthPlugin } from "better-auth";
 import { createAuthEndpoint } from "better-auth/api";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import { captureInvitationEvent } from "./invitation-analytics";
 
 function verificationMatchesInvitation({
 	verificationIdentifier,
@@ -23,6 +25,23 @@ function verificationMatchesInvitation({
 		verificationIdentifier === invitationId ||
 		verificationIdentifier.toLowerCase() === invitationEmail.toLowerCase()
 	);
+}
+
+/** Whether a page or cloud workspace was shared through this invitation. */
+async function invitationHasShares(invitationId: string): Promise<boolean> {
+	const [pageShare, workspaceShare] = await Promise.all([
+		db
+			.select({ id: pageShares.id })
+			.from(pageShares)
+			.where(eq(pageShares.invitationId, invitationId))
+			.limit(1),
+		db
+			.select({ id: cloudWorkspaceShares.id })
+			.from(cloudWorkspaceShares)
+			.where(eq(cloudWorkspaceShares.invitationId, invitationId))
+			.limit(1),
+	]);
+	return pageShare.length > 0 || workspaceShare.length > 0;
 }
 
 function getInvitationAcceptError(error: unknown) {
@@ -130,10 +149,15 @@ export const acceptInvitationEndpoint = {
 					return ctx.json({ error: processedError.error }, { status: 409 });
 				}
 
+				// Read before membership is created: adding the member converts these
+				// shares into shares to the user and clears the invitation id.
+				const viaShare = await invitationHasShares(invitationId);
+
 				// 3. Create or get user
 				let user = await db.query.users.findFirst({
 					where: eq(users.email, invitation.email),
 				});
+				const inviteeIsNewUser = !user;
 
 				if (!user) {
 					const userName = invitation.email;
@@ -245,6 +269,21 @@ export const acceptInvitationEndpoint = {
 						{ status: acceptanceResult.status },
 					);
 				}
+
+				await captureInvitationEvent({
+					event: "invitation_accepted",
+					inviterId: invitation.inviterId,
+					organizationId: invitation.organization.id,
+					invitationId: invitation.id,
+					properties: {
+						invitee_user_id: user.id,
+						invitee_is_new_user: inviteeIsNewUser,
+						source: viaShare ? "share" : "invite",
+						hours_to_accept:
+							(Date.now() - new Date(invitation.createdAt).getTime()) /
+							3_600_000,
+					},
+				});
 
 				// 5. Create session using Better Auth's proper API
 				const session = await ctx.context.internalAdapter.createSession(

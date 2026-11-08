@@ -53,6 +53,7 @@ import {
 } from "./lib/billing/subscription-events";
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
+import { captureInvitationEvent } from "./lib/invitation-analytics";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import {
 	convertPendingShares,
@@ -506,6 +507,17 @@ export const auth = betterAuth({
 						inviterEmail: data.inviter.user.email,
 						expiresAt: data.invitation.expiresAt,
 					}),
+				});
+
+				await captureInvitationEvent({
+					event: "invitation_sent",
+					inviterId: data.inviter.user.id,
+					organizationId: data.organization.id,
+					invitationId: data.id,
+					properties: {
+						role: data.role,
+						invitee_has_account: Boolean(existingUser),
+					},
 				});
 			},
 			organizationHooks: {

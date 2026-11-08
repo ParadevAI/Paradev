@@ -7,6 +7,7 @@ import {
 	activityTargets,
 	addShares,
 	addSharesSchema,
+	captureResourceShared,
 	type GranteeRef,
 	listGrantees,
 	removeShare,
@@ -87,6 +88,12 @@ export const cloudWorkspaceSharingRouter = {
 				target: { kind: "cloudWorkspace", id: row.id },
 				grantees,
 				sharedByUserId: ctx.principal.userId,
+			});
+			captureResourceShared({
+				target: { kind: "cloudWorkspace", id: row.id },
+				organizationId: row.organizationId,
+				sharedByUserId: ctx.principal.userId,
+				added,
 			});
 			if (added.length) {
 				await recordShareActivity(
