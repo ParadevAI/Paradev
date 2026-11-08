@@ -1,10 +1,9 @@
-import { acpHarnessForPreset, presetForAcpHarness } from "@superset/chat/core";
+import { presetForAcpHarness } from "@superset/chat/core";
 import { cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { protectedProcedure, queryProcedure, router } from "../../index";
-import { chatLaunchPresetId, chatLaunchTarget } from "../agents/agents";
+import { chatLaunchTarget, storedChatConfig } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import {
 	createChatSessionInWorkspace,
@@ -158,12 +157,7 @@ export const sessionsRouter = router({
 			// Reopen on the agent config it ran under, so it keeps that account.
 			// A config deleted or moved to another CLI since then falls back to
 			// the default account, and the reply says so.
-			const stored = session.agentConfigId
-				? resolveHostAgentConfig(ctx.db, session.agentConfigId)
-				: null;
-			const keepsConfig =
-				stored !== null &&
-				acpHarnessForPreset(chatLaunchPresetId(stored)) === session.harness;
+			const { stored, keeps: keepsConfig } = storedChatConfig(ctx.db, session);
 			const created = await createChatSessionInWorkspace(
 				ctx,
 				{

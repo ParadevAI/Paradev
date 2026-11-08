@@ -730,6 +730,24 @@ export function chatLaunchPresetId(
 		: launchPresetId;
 }
 
+/**
+ * The agent config a stored chat ran under, and whether it still runs that
+ * chat's CLI. A deleted config, or one moved to another CLI, cannot carry the
+ * chat on, and the chat falls back to the default account.
+ */
+export function storedChatConfig(
+	db: HostDb,
+	session: { harness: string; agentConfigId: string | null },
+): { stored: ResolvedHostAgentConfig | null; keeps: boolean } {
+	const stored = session.agentConfigId
+		? resolveHostAgentConfig(db, session.agentConfigId)
+		: null;
+	const keeps =
+		stored !== null &&
+		acpHarnessForPreset(chatLaunchPresetId(stored)) === session.harness;
+	return { stored, keeps };
+}
+
 function continueChatAgent(
 	ctx: Pick<HostServiceContext, "db" | "runtime" | "terminalAgentStore">,
 	input: AgentRunInput,

@@ -58,6 +58,8 @@ export function resumeUnfinishedChats(options: {
 	markerPath: string;
 	runtime: () => ChatRuntime;
 	resolveCwd: (scopeId: string) => string;
+	/** False for a chat whose agent config can no longer carry it: it is offered, not continued on another account. */
+	keepsAccount?: (sessionId: string) => boolean;
 	now?: number;
 }): { resumed: number; offer: ClosedChat[] } {
 	const none = { resumed: 0, offer: [] };
@@ -85,6 +87,10 @@ export function resumeUnfinishedChats(options: {
 	for (const chat of sessions) {
 		const { sessionId: _sessionId, interrupted, prompts, ...session } = chat;
 		if (!runtime.live.supports(session.harness)) continue;
+		if (options.keepsAccount && !options.keepsAccount(chat.sessionId)) {
+			offer.push(chat);
+			continue;
+		}
 		try {
 			runtime.commands.resumeSession({
 				...session,

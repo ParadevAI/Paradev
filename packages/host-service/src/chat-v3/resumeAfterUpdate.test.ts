@@ -84,6 +84,23 @@ describe("resuming chats after an update", () => {
 		expect(existsSync(markerPath)).toBe(false);
 	});
 
+	test("a chat whose agent config can no longer carry it is offered, not continued", () => {
+		const markerPath = markerIn({ requestedAt: 1_000 });
+		const { runtime, resumed } = fakeRuntime([UNFINISHED]);
+
+		recordUnfinishedChats(runtime, markerPath);
+		const result = resumeUnfinishedChats({
+			markerPath,
+			runtime: () => runtime,
+			resolveCwd: (scopeId) => `/worktrees/${scopeId}`,
+			keepsAccount: () => false,
+			now: 2_000,
+		});
+
+		expect(resumed).toEqual([]);
+		expect(result.offer.map((chat) => chat.sessionId)).toEqual(["chat-1"]);
+	});
+
 	test("an entry that no longer parses does not stop the others", () => {
 		const markerPath = markerIn({
 			requestedAt: 1_000,
