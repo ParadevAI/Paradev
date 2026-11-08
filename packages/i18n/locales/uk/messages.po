@@ -2906,6 +2906,13 @@ msgstr "Вигляд"
 msgid "Apple logo"
 msgstr "Логотип Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Інсталятор Apple закрився до того, як Git було встановлено."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Інсталятор Apple не відкрився: {0}"
+
 msgid "Application menu"
 msgstr "Меню застосунку"
 
@@ -9294,6 +9301,9 @@ msgstr "Переглянути відомості про канал"
 msgid "Get extensions"
 msgstr "Знайти розширення"
 
+msgid "Get Git"
+msgstr "Завантажити Git"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Зв'яжіться з командою {companyName}."
 
@@ -10099,6 +10109,9 @@ msgstr "у {0}"
 msgid "in a terminal on this host."
 msgstr "у терміналі на цьому хості."
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "У вікні Apple натисніть «Встановити». Це займе кілька хвилин, а сторінка оновиться, коли все буде готово."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Лише за кілька місяців <0>десятки тисяч інженерів</0> у таких компаніях, як Wix, DoorDash і Netflix, почали використовувати Paradev як основну IDE."
 
@@ -10248,8 +10261,14 @@ msgstr "Встановити й перезапустити"
 msgid "Install a plugin in the Paradev app and every agent can use it."
 msgstr "Установіть плагін у застосунку Paradev, і його зможе використовувати будь-який агент."
 
+msgid "Install Command Line Tools"
+msgstr "Встановити Command Line Tools"
+
 msgid "Install failed"
 msgstr "Не вдалося встановити"
+
+msgid "Install Git, then come back."
+msgstr "Встановіть Git і поверніться сюди."
 
 msgid "Install GitHub App"
 msgstr "Встановити GitHub App"
@@ -13338,6 +13357,9 @@ msgstr "на {offScopeHostName} — тут не запуститься"
 msgid "On a date"
 msgstr "У певну дату"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "На Mac Git входить до складу Command Line Tools від Apple."
+
 msgid "On focus change"
 msgstr "Під час зміни фокуса"
 
@@ -14156,6 +14178,9 @@ msgstr "Цей проєкт використовують інші люди. Вв
 msgid "Other Team Members"
 msgstr "Інші учасники команди"
 
+msgid "Other ways to get Git"
+msgstr "Інші способи отримати Git"
+
 msgid "Other ways to reach us"
 msgstr "Інші способи зв'язатися з нами"
 
@@ -14438,6 +14463,9 @@ msgstr "Термінал Paradev Mobile на iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev потребує повного доступу до диска, щоб читати дані іншого браузера. Надайте його в Системних параметрах і перевірте знову."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev потрібен Git, щоб додати проєкт."
 
 msgid "Paradev next to others"
 msgstr "Paradev порівняно з іншими"
@@ -17909,6 +17937,9 @@ msgstr "Показати всі коментарі"
 
 msgid "Show all lines"
 msgstr "Показати всі рядки"
+
+msgid "Show Apple's installer"
+msgstr "Показати інсталятор Apple"
 
 msgid "Show archived"
 msgstr "Показати архівні"

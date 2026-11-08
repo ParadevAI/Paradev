@@ -134,7 +134,10 @@ export function rethrowGitToolsMissing(error: unknown): void {
 	throw new TRPCError({
 		code: "PRECONDITION_FAILED",
 		message: GIT_TOOLS_MISSING_MESSAGE,
-		cause: { kind: "GIT_ENVIRONMENT" },
+		cause: {
+			kind: "GIT_ENVIRONMENT",
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		} satisfies GitEnvironmentCause,
 	});
 }
 

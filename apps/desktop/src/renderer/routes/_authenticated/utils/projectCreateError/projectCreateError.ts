@@ -33,6 +33,12 @@ function readGitEnvironmentReason(
 		: null;
 }
 
+export function gitEnvironmentReasonOf(
+	error: unknown,
+): GitEnvironmentReason | null {
+	return readGitEnvironmentReason(readData(error));
+}
+
 function gitEnvironmentMessage(reason: GitEnvironmentReason | null): string {
 	switch (reason) {
 		case "COMMAND_LINE_TOOLS_MISSING":
