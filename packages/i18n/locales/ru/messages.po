@@ -13449,6 +13449,9 @@ msgstr "Изменить этого агента может только его 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Только на этом компьютере: игнорируется git и применяется к каждому worktree этого репозитория. Любой заданный здесь ключ заменяет общий."
 
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "Подключать аккаунты GitHub могут только владельцы и администраторы организации. Попросите одного из них подключить аккаунт."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Управлять плагинами могут только владельцы и администраторы организации."
 

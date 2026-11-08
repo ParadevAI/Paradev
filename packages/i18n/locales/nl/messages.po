@@ -13449,6 +13449,9 @@ msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Alleen op deze machine: genegeerd door git en toegepast op elke worktree van deze repository. Elke sleutel die je hier instelt, vervangt de gedeelde."
 
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "Alleen eigenaren en beheerders van de organisatie kunnen GitHub-accounts koppelen. Vraag een van hen om het account te koppelen."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Alleen eigenaren en beheerders van de organisatie kunnen plugins beheren."
 

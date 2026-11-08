@@ -13443,6 +13443,9 @@ msgstr "Змінити цього агента може лише його авт
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Лише на цьому комп'ютері: додано до gitignore й застосовується до кожного worktree цього репозиторію. Будь-який ключ, заданий тут, замінює спільний."
 
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "Лише власники й адміністратори організації можуть підключати облікові записи GitHub. Попросіть одного з них підключити обліковий запис."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Лише власники й адміністратори організації можуть керувати плагінами."
 
