@@ -1063,6 +1063,48 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"caspian": {
+		"$schema": "https://paradev.com/schemas/plugin/1.0.0.json",
+		"name": "caspian",
+		"version": "1.0.0",
+		"description": "IT and security system of record: SaaS apps, access, people, devices, spend, policy violations.",
+		"author": {
+			"name": "Caspian",
+			"url": "https://getcaspian.io"
+		},
+		"homepage": "https://getcaspian.io",
+		"license": "MIT",
+		"keywords": [
+			"caspian",
+			"it",
+			"security",
+			"saas",
+			"access",
+			"devices",
+			"compliance"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Caspian",
+					"category": "Data & APIs"
+				},
+				"connector": {
+					"slug": "caspian_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://app.getcaspian.io/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "caspian-it-data",
+				"description": "Answer questions about a company's SaaS apps, who has access to what, people, devices, vendor spend, and policy violations from Caspian. Use when the user asks which apps the company uses, who can access an app, what a person has access to, which devices or vendors are at risk, or what policy violations are open."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

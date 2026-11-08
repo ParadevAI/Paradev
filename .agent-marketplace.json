@@ -246,6 +246,16 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "caspian",
+			"description": "IT and security system of record: SaaS apps, access, people, devices, spend, policy violations.",
+			"author": {
+				"name": "Caspian"
+			},
+			"category": "data & apis",
+			"source": "./plugins/caspian",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

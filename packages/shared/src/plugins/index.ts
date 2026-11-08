@@ -415,6 +415,16 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "caspian",
+		version: "1.0.0",
+		description: "IT and security system of record",
+		interface: { displayName: "Caspian", category: "Data & APIs" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			caspian: { type: "http", url: "https://app.getcaspian.io/mcp" },
+		},
+	},
+	{
 		name: "exa",
 		version: "1.0.1",
 		description: "Search the web, companies, and people",
