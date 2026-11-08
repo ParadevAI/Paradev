@@ -20,6 +20,8 @@ const productName = pkg.productName;
 // productName names the bundle, userData, logs and the keychain entry, so it
 // never changes; the menu bar, Dock and launchers show displayName.
 export const displayName = process.env.DESKTOP_DISPLAY_NAME || productName;
+export const toInstallerFileName = (name: string) =>
+	name.trim().replace(/\s+/g, "-");
 const macIconPath = join(pkg.resources, "build/icons/icon.icns");
 const linuxIconPath = join(pkg.resources, "build/icons");
 const winIconPath = join(pkg.resources, "build/icons/icon.ico");
@@ -127,6 +129,8 @@ const config: Configuration = {
 		// the last large file above ~1.7GB of contents. `shrink: true` (default) keeps
 		// the final artifact compact.
 		size: "4g",
+		title: displayName,
+		artifactName: `${toInstallerFileName(displayName)}-\${version}-\${arch}.\${ext}`,
 	},
 
 	// macOS
