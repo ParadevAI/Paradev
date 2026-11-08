@@ -80,3 +80,28 @@ export function isDeleteInProgressCause(
 		(value as { kind: unknown }).kind === "DELETE_IN_PROGRESS"
 	);
 }
+
+/**
+ * Git cannot run on this machine or in this folder. `reason` names the cases a
+ * client can fix with one action: install Apple's Command Line Tools, or accept
+ * the Xcode license.
+ */
+export type GitEnvironmentReason =
+	| "COMMAND_LINE_TOOLS_MISSING"
+	| "XCODE_LICENSE_NOT_ACCEPTED";
+
+export interface GitEnvironmentCause {
+	kind: "GIT_ENVIRONMENT";
+	reason?: GitEnvironmentReason;
+}
+
+export function isGitEnvironmentCause(
+	value: unknown,
+): value is GitEnvironmentCause {
+	return (
+		!!value &&
+		typeof value === "object" &&
+		"kind" in value &&
+		(value as { kind: unknown }).kind === "GIT_ENVIRONMENT"
+	);
+}

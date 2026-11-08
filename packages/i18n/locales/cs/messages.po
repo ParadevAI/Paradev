@@ -5695,6 +5695,9 @@ msgstr "Projekt se nepodařilo vytvořit"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "Projekt se nepodařilo vytvořit. Zkuste jiný název nebo se podívejte do logů."
 
+msgid "Could not create the project. Please try again."
+msgstr "Projekt se nepodařilo vytvořit. Zkuste to znovu."
+
 msgid "Could not delete"
 msgstr "Smazání se nezdařilo"
 
@@ -5715,6 +5718,9 @@ msgstr "Odpojení se nezdařilo."
 
 msgid "Could not download {names}."
 msgstr "Nepodařilo se stáhnout {names}."
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "Šablonu se nepodařilo stáhnout. Zkontrolujte připojení k internetu a zkuste to znovu."
 
 msgid "Could not forget {domain}"
 msgstr "Nepodařilo se zapomenout {domain}"
@@ -9347,6 +9353,15 @@ msgstr "Git a worktree"
 
 msgid "Git author name"
 msgstr "Jméno autora v Gitu"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "Git v tomto umístění nemůže běžet. Vyberte jiné umístění a zkuste to znovu."
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "Git nepoběží, dokud nepřijmete licenci Xcode. Spusťte v Terminálu sudo xcodebuild -license a zkuste to znovu."
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "Git na tomto Macu zatím není nainstalovaný. Nainstalujte Command Line Tools od Applu a zkuste to znovu."
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Soubory v cloudu, které Git ignoruje, třeba .env. Zkopírujte si je"

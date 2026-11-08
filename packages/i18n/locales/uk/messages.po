@@ -5689,6 +5689,9 @@ msgstr "Не вдалося створити проєкт"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "Не вдалося створити проєкт. Спробуйте іншу назву або перегляньте логи."
 
+msgid "Could not create the project. Please try again."
+msgstr "Не вдалося створити проєкт. Спробуйте ще раз."
+
 msgid "Could not delete"
 msgstr "Не вдалося видалити"
 
@@ -5709,6 +5712,9 @@ msgstr "Не вдалося від'єднати."
 
 msgid "Could not download {names}."
 msgstr "Не вдалося завантажити: {names}."
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "Не вдалося завантажити шаблон. Перевірте підключення до інтернету й спробуйте ще раз."
 
 msgid "Could not forget {domain}"
 msgstr "Не вдалося забути {domain}"
@@ -9341,6 +9347,15 @@ msgstr "Git і worktree"
 
 msgid "Git author name"
 msgstr "Ім'я автора Git"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "Git не може працювати в цьому розташуванні. Виберіть інше розташування й спробуйте ще раз."
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "Git не працюватиме, доки ви не приймете ліцензію Xcode. Виконайте sudo xcodebuild -license у Терміналі, а потім спробуйте ще раз."
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "Git ще не встановлено на цьому Mac. Установіть Command Line Tools від Apple, а потім спробуйте ще раз."
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Файли в хмарі, які ігнорує Git, як-от .env. Скопіюйте їх"

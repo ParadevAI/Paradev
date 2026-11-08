@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui as useTranslation } from "@lingui/react";
-import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
+import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import {
 	Dialog,
@@ -24,12 +24,16 @@ import {
 	useFinalizeProjectSetup,
 } from "renderer/react-query/projects";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import {
+	type ProjectCreateError,
+	toProjectCreateError,
+} from "renderer/routes/_authenticated/utils/projectCreateError";
 
 interface EmptyProjectModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSuccess?: (result: { projectId: string }) => void;
-	onError?: (message: string) => void;
+	onError?: (error: ProjectCreateError) => void;
 }
 
 export function EmptyProjectModal({
@@ -50,6 +54,7 @@ export function EmptyProjectModal({
 	const [parentDir, setParentDir] = useState("");
 	const [name, setName] = useState("");
 	const [working, setWorking] = useState(false);
+	const [createError, setCreateError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (parentDir || !homeDir) return;
@@ -59,6 +64,7 @@ export function EmptyProjectModal({
 	const reset = () => {
 		setName("");
 		setWorking(false);
+		setCreateError(null);
 	};
 
 	const handleOpenChange = (next: boolean) => {
@@ -75,6 +81,7 @@ export function EmptyProjectModal({
 			});
 			if (!result.canceled && result.path) {
 				setParentDir(result.path);
+				setCreateError(null);
 			}
 		} catch (err) {
 			toast.error(errorMessage(err));
@@ -93,13 +100,20 @@ export function EmptyProjectModal({
 			return;
 		}
 
+		const reportError = (error: ProjectCreateError) => {
+			setCreateError(error.message);
+			onError?.(error);
+		};
+
 		setWorking(true);
+		setCreateError(null);
 		try {
 			if (!isV2CloudEnabled) {
 				const projectId = await createV1Project.createEmpty({
 					name: trimmedName,
 					parentDir: trimmedParent,
-					onError,
+					onError: (message) =>
+						reportError({ message, gitEnvironmentReason: null }),
 				});
 				if (!projectId) return;
 				onSuccess?.({ projectId });
@@ -126,17 +140,14 @@ export function EmptyProjectModal({
 			reset();
 			onOpenChange(false);
 		} catch (err) {
-			const raw = rawErrorMessage(err);
-			const isLeakedSql = raw.startsWith("Failed query:");
-			if (isLeakedSql) console.error("[EmptyProjectModal] create failed", err);
-			const message = isLeakedSql
-				? "Could not create project. Please try a different name or check the logs."
-				: errorMessage(err);
-			if (onError) {
-				onError(message);
-			} else {
-				toast.error("Could not create project", { description: message });
-			}
+			reportError(
+				toProjectCreateError(
+					err,
+					translate(
+						msg({ message: "Could not create the project. Please try again." }),
+					),
+				),
+			);
 		} finally {
 			setWorking(false);
 		}
@@ -160,7 +171,10 @@ export function EmptyProjectModal({
 						<Input
 							id="empty-project-name"
 							value={name}
-							onChange={(event) => setName(event.target.value)}
+							onChange={(event) => {
+								setName(event.target.value);
+								setCreateError(null);
+							}}
 							placeholder="my-project"
 							disabled={working}
 							onKeyDown={(event) => {
@@ -180,7 +194,10 @@ export function EmptyProjectModal({
 							<Input
 								id="empty-project-path"
 								value={parentDir}
-								onChange={(event) => setParentDir(event.target.value)}
+								onChange={(event) => {
+									setParentDir(event.target.value);
+									setCreateError(null);
+								}}
 								disabled={working}
 								className="flex-1 font-mono text-xs"
 							/>
@@ -197,6 +214,14 @@ export function EmptyProjectModal({
 							</Button>
 						</div>
 					</div>
+					{createError && (
+						<p
+							role="alert"
+							className="select-text cursor-text break-words text-xs text-destructive"
+						>
+							{createError}
+						</p>
+					)}
 				</div>
 
 				<DialogFooter>
