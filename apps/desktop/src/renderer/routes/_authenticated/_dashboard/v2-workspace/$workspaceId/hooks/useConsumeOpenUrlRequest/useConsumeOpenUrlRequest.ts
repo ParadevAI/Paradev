@@ -42,7 +42,7 @@ export function useConsumeOpenUrlRequest({
 			url,
 			agent,
 		});
-		if (requestId && paneId) {
+		if (agent && requestId && paneId) {
 			electronTrpcClient.browser.resolveOpenRequest
 				.mutate({ requestId, paneId })
 				.catch((err) => {

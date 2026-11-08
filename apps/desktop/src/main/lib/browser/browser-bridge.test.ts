@@ -317,6 +317,45 @@ test("before a desktop window is ready, an agent is told to retry, not that its 
 	expect(response.status).toBe(503);
 });
 
+test("a CDP client cannot queue unbounded messages while its pane is rebuilt", async () => {
+	const bridge = getBrowserBridgeInfo();
+	if (!bridge) throw new Error("the bridge did not start");
+	const RENDERER = 991;
+	let releaseWake = () => {};
+	const renderer = (request: PaneLayoutRendererRequest) => {
+		releaseWake = () =>
+			paneLayoutRequests.respond(
+				{
+					requestId: request.requestId,
+					error: { code: "NOT_FOUND", message: "gone" },
+				},
+				RENDERER,
+			);
+	};
+	paneLayoutRequests.addSubscriber(RENDERER);
+	paneLayoutRequests.on("request", renderer);
+	try {
+		const url = new URL("/panes/slow-pane/cdp", bridge.endpoint);
+		url.protocol = "ws:";
+		url.searchParams.set("workspaceId", "ws-bridge");
+		url.searchParams.set("token", bridge.secret);
+		const socket = new WebSocket(url);
+		await new Promise((resolve) => {
+			socket.onopen = resolve;
+		});
+		const closed = new Promise<number>((resolve) => {
+			socket.onclose = (event) => resolve(event.code);
+		});
+		for (let i = 0; i < 65; i++)
+			socket.send(JSON.stringify({ id: i, method: "Runtime.enable" }));
+		expect(await closed).toBe(1009);
+	} finally {
+		releaseWake();
+		paneLayoutRequests.off("request", renderer);
+		paneLayoutRequests.removeSubscriber(RENDERER);
+	}
+});
+
 test("the CLI manages the user's extensions only with the user's yes, and never opens one", async () => {
 	const bridge = getBrowserBridgeInfo();
 	if (!bridge) throw new Error("the bridge did not start");

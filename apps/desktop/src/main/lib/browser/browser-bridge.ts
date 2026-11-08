@@ -48,6 +48,7 @@ import {
 const OPEN_PANE_TIMEOUT_MS = 15_000;
 const WAKE_PANE_TIMEOUT_MS = 10_000;
 const MAX_CDP_MESSAGE_BYTES = 4 * 1024 * 1024;
+const MAX_EARLY_CDP_FRAMES = 64;
 const CDP_PATH = /^\/panes\/([^/]+)\/cdp$/;
 const USER_PANE_ERROR =
 	"This pane is the user's own browser, with their logins and extensions. Agents can use only the panes they open.";
@@ -224,6 +225,26 @@ async function resolvePane(
 	return { wc, paneId, workspaceId };
 }
 
+/** Runs `fn` on the resolved pane; a throw anywhere answers 500 instead of leaving the request open. */
+function withAgentPane(
+	req: Request,
+	res: Response,
+	wakeTimeoutMs: number,
+	fn: (pane: {
+		wc: Electron.WebContents;
+		paneId: string;
+		workspaceId: string;
+	}) => void,
+): void {
+	resolvePane(req, res, wakeTimeoutMs)
+		.then((pane) => {
+			if (pane) fn(pane);
+		})
+		.catch((err) => {
+			if (!res.headersSent) res.status(500).json({ error: errorMessage(err) });
+		});
+}
+
 async function listAgentPanes(
 	workspaceId: string,
 ): Promise<BrowserPaneListing[]> {
@@ -361,6 +382,14 @@ export async function startBrowserBridge({
 			);
 			void registered.ready.then((wc) => {
 				if (!wc) return;
+				if (!isAgentPane(wc)) {
+					finish(() =>
+						res
+							.status(500)
+							.json({ error: "The opened pane is not an agent pane" }),
+					);
+					return;
+				}
 				const info = browserManager
 					.listPanes(workspaceId)
 					.find((pane) => pane.paneId === paneId);
@@ -399,8 +428,7 @@ export async function startBrowserBridge({
 			res.status(400).json({ error: errorMessage(err) });
 			return;
 		}
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			try {
 				browserManager.navigate(pane.paneId, resolvedUrl, pane.workspaceId);
 				res.json({ ok: true });
@@ -411,24 +439,21 @@ export async function startBrowserBridge({
 	});
 
 	app.post("/panes/:paneId/back", (req, res) => {
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			if (pane.wc.canGoBack()) pane.wc.goBack();
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/forward", (req, res) => {
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			if (pane.wc.canGoForward()) pane.wc.goForward();
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/reload", (req, res) => {
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			if (req.body?.hard) {
 				pane.wc.reloadIgnoringCache();
 			} else {
@@ -439,8 +464,7 @@ export async function startBrowserBridge({
 	});
 
 	app.post("/panes/:paneId/screenshot", (req, res) => {
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			browserManager
 				.capturePng(pane.paneId, pane.workspaceId)
 				.then((base64) => res.json({ base64 }))
@@ -454,8 +478,7 @@ export async function startBrowserBridge({
 			res.status(400).json({ error: "code is required" });
 			return;
 		}
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			browserManager
 				.evaluateJS(pane.paneId, code, pane.workspaceId)
 				.then((result) => res.json({ result: result ?? null }))
@@ -464,8 +487,7 @@ export async function startBrowserBridge({
 	});
 
 	app.get("/panes/:paneId/console", (req, res) => {
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			res.json({
 				entries: browserManager.getConsoleLogs(pane.paneId, pane.workspaceId),
 			});
@@ -516,8 +538,7 @@ export async function startBrowserBridge({
 			res.status(404).json({ error: "Unknown import source" });
 			return;
 		}
-		void resolvePane(req, res, wakeTimeoutMs).then((pane) => {
-			if (!pane) return;
+		withAgentPane(req, res, wakeTimeoutMs, (pane) => {
 			confirmLoginImport(profile.browserName, profile.profileName)
 				.then(async (allowed) => {
 					if (!allowed) {
@@ -687,12 +708,27 @@ function handleCdpSocket(
 ): void {
 	// Messages that arrive while an unloaded pane is rebuilt go out once attached.
 	const early: string[] = [];
-	const queue = (data: unknown) => early.push(String(data));
+	let earlyBytes = 0;
+	const queue = (data: unknown) => {
+		const message = String(data);
+		earlyBytes += message.length;
+		if (
+			early.length >= MAX_EARLY_CDP_FRAMES ||
+			earlyBytes > MAX_CDP_MESSAGE_BYTES
+		) {
+			early.length = 0;
+			ws.close(1009, "CDP frame backlog exceeded");
+			return;
+		}
+		early.push(message);
+	};
 	ws.on("message", queue);
 	void liveWebContents(paneId, workspaceId, wakeTimeoutMs).then(
 		onPane,
 		(err) => {
-			const retry = err instanceof PaneLayoutRequestError && err.status >= 500;
+			const retry =
+				err instanceof PaneLayoutRequestError &&
+				(err.status === 503 || err.status === 504);
 			ws.close(retry ? 1013 : 1011, errorMessage(err).slice(0, 100));
 		},
 	);
