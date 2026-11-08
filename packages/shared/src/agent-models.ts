@@ -747,7 +747,7 @@ export function resolveChatLaunchPresetId(
 	const [commandToken = ""] = command.trim().split(/\s+/);
 	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
 		.toLowerCase()
-		.replace(/\.exe$/, "");
+		.replace(/\.(exe|cmd|bat)$/, "");
 	return executable === "claude" || executable === "codex"
 		? executable
 		: launchPresetId;

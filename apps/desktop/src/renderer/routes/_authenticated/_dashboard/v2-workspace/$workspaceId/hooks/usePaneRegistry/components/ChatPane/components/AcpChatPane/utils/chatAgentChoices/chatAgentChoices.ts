@@ -20,6 +20,9 @@ export function chatAgentChoices<T extends Config>(
 	}
 	const agents = [...byPreset].map(([presetId, presetConfigs]) => ({
 		presetId,
+		...(presetConfigs.length === 1
+			? { iconId: presetConfigs[0]?.iconId ?? presetId }
+			: {}),
 		label: presetConfigs[0]?.label ?? presetId,
 		models: (getAgentModelSupport(presetId)?.models ?? []).map(
 			({ id, label }) => ({ id, label }),
@@ -29,7 +32,7 @@ export function chatAgentChoices<T extends Config>(
 					accounts: presetConfigs.map((config) => ({
 						configId: config.id,
 						label: config.label,
-						iconId: config.iconId ?? config.presetId,
+						iconId: config.iconId ?? presetId,
 					})),
 				}
 			: {}),

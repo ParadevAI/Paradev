@@ -133,7 +133,7 @@ export function AcpChatPane({
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
-	onNewChat?: (label: string | undefined) => void;
+	onNewChat?: (label: string | undefined, configId?: string) => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
@@ -229,9 +229,7 @@ export function AcpChatPane({
 										commandId,
 										workspaceId,
 										harness: resumeHarness,
-										...(agent?.configId
-											? { agentConfigId: agent.configId }
-											: {}),
+										...(agentConfigId ? { agentConfigId } : {}),
 										terminalId,
 										...(modelId ? { modelId } : {}),
 										...(effortId ? { effortId } : {}),
@@ -289,6 +287,7 @@ export function AcpChatPane({
 			effortId,
 			modeId,
 			agent,
+			agentConfigId,
 			sessionId,
 			hostInfo.data?.version,
 		],
@@ -352,20 +351,20 @@ export function AcpChatPane({
 			}
 			if (!agent) return;
 			void forkToWorktree({
-				agentId: agent.id,
+				agentId: agentConfigId ?? agent.id,
 				agentLabel: agentLabel ?? agent.id,
 				transcript,
 			});
 		},
-		[forkHere, forkToWorktree, agent, agentLabel],
+		[forkHere, forkToWorktree, agent, agentConfigId, agentLabel],
 	);
 
 	const presetLabel =
 		agentLabel ??
 		agentConfigs?.find((config) => config.presetId === agent?.id)?.label;
 	const newChat = useMemo(
-		() => (onNewChat ? () => onNewChat(presetLabel) : undefined),
-		[onNewChat, presetLabel],
+		() => (onNewChat ? () => onNewChat(presetLabel, agentConfigId) : undefined),
+		[onNewChat, presetLabel, agentConfigId],
 	);
 
 	const startFresh = useCallback(() => {
@@ -822,7 +821,7 @@ export function AcpChatPane({
 			onRestartAndContinue={harness ? restartAndContinue : undefined}
 			onStartNewChat={harness ? startNewChat : undefined}
 			onUserPrompt={
-				agent ? () => saveLastChatAgent(agent.configId ?? agent.id) : undefined
+				agent ? () => saveLastChatAgent(agentConfigId ?? agent.id) : undefined
 			}
 			onSwitchAccount={switchAccount}
 			sessionAccount={sessionAccount}

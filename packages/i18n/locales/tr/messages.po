@@ -1702,7 +1702,7 @@ msgid "A channel with this name already exists"
 msgstr "Bu adda bir kanal zaten var"
 
 msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
-msgstr "Bir sohbet konuşmanın ortasında başka bir hesaba geçemez. Yeni bir {label} sohbeti başlatın veya bu konuşmayı yeni bir sohbete ayırın. Bu {currentLabel} sohbeti açık kalır."
+msgstr "Bir sohbetin ortasında başka bir hesaba geçilemez. Yeni bir {label} sohbeti başlatın veya bu konuşmayı yeni bir sohbete ayırın. Bu {currentLabel} sohbeti açık kalır."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Bir sohbet konuşmanın ortasında başka bir sağlayıcıya geçemez. Yeni bir {label} sohbeti başlatın veya bu konuşmayı yeni bir sohbete ayırın. Bu {currentLabel} sohbeti açık kalır."

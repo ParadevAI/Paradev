@@ -14,8 +14,8 @@ export function newChatConfig<T extends Config>(
 	const chatConfigs = configs.filter((config) => chatPresetIdForConfig(config));
 	return (
 		chatConfigs.find((config) => config.id === last) ??
-		chatConfigs.find((config) => config.presetId === last) ??
-		chatConfigs.find((config) => config.presetId === "claude") ??
+		chatConfigs.find((config) => chatPresetIdForConfig(config) === last) ??
+		chatConfigs.find((config) => chatPresetIdForConfig(config) === "claude") ??
 		chatConfigs[0]
 	);
 }

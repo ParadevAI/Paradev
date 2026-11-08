@@ -10,7 +10,10 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { Check, ChevronDown, ImagePlus } from "lucide-react";
 import { useState } from "react";
-import { isDataImageUri } from "renderer/assets/app-icons/preset-icons";
+import {
+	getPresetIcon,
+	isDataImageUri,
+} from "renderer/assets/app-icons/preset-icons";
 import { AgentIcon } from "renderer/components/AgentIcon";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AGENT_ICON_OPTIONS } from "./agent-icon-options";
@@ -33,7 +36,7 @@ export function AgentIconPicker({
 	disabled,
 	presetId = "custom",
 }: AgentIconPickerProps) {
-	const hasPresetIcon = presetId !== "custom";
+	const hasPresetIcon = getPresetIcon(presetId, false) !== undefined;
 	const { t } = useLingui();
 	const selectImageMutation = electronTrpc.window.selectImageFile.useMutation();
 	// Covers the whole flow (native dialog → mutate → resize), not just the

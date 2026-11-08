@@ -343,6 +343,11 @@ describe("resolveChatLaunchPresetId", () => {
 		).toBe("codex");
 		expect(resolveChatLaunchPresetId("custom", "aider")).toBe("custom");
 		expect(resolveChatLaunchPresetId("claude", "codex")).toBe("claude");
+		expect(resolveChatLaunchPresetId("custom", "C:\\bin\\claude.cmd")).toBe(
+			"claude",
+		);
+		expect(resolveChatLaunchPresetId("custom", "codex.BAT --x")).toBe("codex");
+		expect(resolveChatLaunchPresetId("custom", "claude.sh")).toBe("custom");
 	});
 });
 

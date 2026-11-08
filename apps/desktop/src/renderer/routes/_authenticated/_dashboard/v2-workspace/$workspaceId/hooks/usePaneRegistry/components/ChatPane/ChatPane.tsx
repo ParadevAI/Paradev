@@ -62,10 +62,9 @@ export function ChatPane({
 		[onOpenDiff],
 	);
 	const agentId = data.agent?.id;
-	const agentConfigId = data.agent?.configId;
 	const store = ctx.store;
 	const onNewChat = useCallback(
-		(label: string | undefined) => {
+		(label: string | undefined, configId: string | undefined) => {
 			if (!agentId) return;
 			store.getState().addTab({
 				panes: [
@@ -77,14 +76,14 @@ export function ChatPane({
 							sessionId: null,
 							agent: {
 								id: agentId,
-								...(agentConfigId ? { configId: agentConfigId } : {}),
+								...(configId ? { configId } : {}),
 							},
 						} satisfies ChatPaneData,
 					},
 				],
 			});
 		},
-		[agentId, agentConfigId, store],
+		[agentId, store],
 	);
 	const { pendingPrompt, pendingAttachments, queuedPrompts } = data;
 	const pendingPrompts = useMemo(
