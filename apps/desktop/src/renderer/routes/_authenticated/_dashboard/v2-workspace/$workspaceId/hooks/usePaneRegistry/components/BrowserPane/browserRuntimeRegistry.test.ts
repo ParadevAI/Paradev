@@ -5,12 +5,36 @@ import { BrowserRuntimeRegistryImpl } from "./browserRuntimeRegistry";
 const register = mock(async (_input: unknown) => ({ success: true }));
 const unregister = mock(async () => ({ success: true }));
 
+const GB = 1024 * 1024;
+type UnloadInfoPane = {
+	memoryKb: number;
+	audible: boolean;
+	unsavedInput: boolean;
+};
+let paneInfo: Record<string, Partial<UnloadInfoPane>> = {};
+let beforeUnloadInfo = () => {};
+async function unloadInfo({ paneIds }: { paneIds: string[] }) {
+	beforeUnloadInfo();
+	return {
+		totalMemoryKb: 16 * GB,
+		panes: Object.fromEntries(
+			paneIds.map((id) => [
+				id,
+				{ memoryKb: GB, audible: false, unsavedInput: false, ...paneInfo[id] },
+			]),
+		),
+	};
+}
+
 const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
 	browser: {
 		register: { mutate: register },
 		unregister: { mutate: unregister },
 		onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
 		onAgentUse: { subscribe: () => ({ unsubscribe: () => {} }) },
+		getUnloadInfo: {
+			query: (input: { paneIds: string[] }) => unloadInfo(input),
+		},
 	},
 	browserHistory: {
 		upsert: { mutate: async () => ({ success: true }) },
@@ -64,67 +88,86 @@ describe("browserRuntimeRegistry detached persistence", () => {
 		}
 	});
 
-	test("hidden-webview eviction spares panes with a live CDP session", async () => {
-		const makeEntry = (lastUsedAt: number) => hiddenEntry(lastUsedAt, false);
-		const registryInternals = browserRuntimeRegistry as unknown as {
-			entries: Map<string, ReturnType<typeof makeEntry>>;
-			agentActivePaneIds: Set<string>;
-			evictExcessHiddenWebviews: () => void;
-		};
-		// Five hidden panes over the cap of three; the two oldest would go, but
-		// the oldest has an agent attached and must survive.
-		for (let i = 1; i <= 5; i++) {
-			registryInternals.entries.set(`evict-pane-${i}`, makeEntry(i));
-		}
-		registryInternals.agentActivePaneIds = new Set(["evict-pane-1"]);
-
-		try {
-			registryInternals.evictExcessHiddenWebviews();
-
-			const remaining = [...registryInternals.entries.keys()].filter((id) =>
-				id.startsWith("evict-pane-"),
+	const registryInternals = browserRuntimeRegistry as unknown as {
+		entries: Map<string, ReturnType<typeof hiddenEntry>>;
+		agentActivePaneIds: Set<string>;
+		evictExcessHiddenWebviews: () => Promise<void>;
+		touch: (paneId: string) => void;
+	};
+	// Hidden 1 GB pages, oldest first, on a 16 GB machine: each group's budget is under 1 GB.
+	async function sweep(
+		pages: { id: string; agent?: boolean }[],
+		setup: () => void = () => {},
+	): Promise<string[]> {
+		const now = Date.now();
+		for (const [i, page] of pages.entries()) {
+			registryInternals.entries.set(
+				page.id,
+				hiddenEntry(now - (pages.length - i), page.agent ?? false),
 			);
-			expect(remaining).toEqual([
-				"evict-pane-1",
-				"evict-pane-4",
-				"evict-pane-5",
-			]);
-		} finally {
-			registryInternals.agentActivePaneIds = new Set();
-			for (let i = 1; i <= 5; i++) {
-				registryInternals.entries.delete(`evict-pane-${i}`);
-			}
 		}
+		setup();
+		try {
+			await registryInternals.evictExcessHiddenWebviews();
+			return pages
+				.map((page) => page.id)
+				.filter((id) => !registryInternals.entries.has(id));
+		} finally {
+			for (const page of pages) registryInternals.entries.delete(page.id);
+			registryInternals.agentActivePaneIds = new Set();
+			paneInfo = {};
+			beforeUnloadInfo = () => {};
+		}
+	}
+
+	test("over budget, pages an agent drives, that play audio, or hold unsaved input stay loaded", async () => {
+		const unloaded = await sweep(
+			["driven", "audio", "form", "p4", "p5", "p6", "p7", "p8"].map((id) => ({
+				id,
+			})),
+			() => {
+				registryInternals.agentActivePaneIds = new Set(["driven"]);
+				paneInfo = { audio: { audible: true }, form: { unsavedInput: true } };
+			},
+		);
+		expect(unloaded).toEqual(["p4", "p5"]);
 	});
 
-	test("agents' hidden panes have their own cap, and agent use keeps a pane loaded", () => {
-		const registryInternals = browserRuntimeRegistry as unknown as {
-			entries: Map<string, ReturnType<typeof hiddenEntry>>;
-			useSeq: number;
-			evictExcessHiddenWebviews: () => void;
-			touch: (paneId: string) => void;
-		};
-		const ids: string[] = [];
-		const add = (id: string, agent: boolean) => {
-			ids.push(id);
-			registryInternals.entries.set(
-				id,
-				hiddenEntry(++registryInternals.useSeq, agent),
-			);
-		};
-		for (let i = 1; i <= 3; i++) add(`user-${i}`, false);
-		for (let i = 1; i <= 7; i++) add(`agent-${i}`, true);
-		registryInternals.touch("agent-1");
+	test("agent pages have their own budget, and agent use keeps a page loaded", async () => {
+		const unloaded = await sweep(
+			[
+				...[1, 2, 3].map((i) => ({ id: `user-${i}` })),
+				...[1, 2, 3, 4, 5, 6, 7].map((i) => ({
+					id: `agent-${i}`,
+					agent: true,
+				})),
+			],
+			() => registryInternals.touch("agent-1"),
+		);
+		expect(unloaded).toEqual(["agent-2", "agent-3", "agent-4", "agent-5"]);
+	});
 
-		try {
-			registryInternals.evictExcessHiddenWebviews();
+	test("a page an agent uses while the sweep waits on main stays loaded", async () => {
+		const unloaded = await sweep(
+			["p1", "p2", "p3", "p4", "p5"].map((id) => ({ id })),
+			() => {
+				beforeUnloadInfo = () => registryInternals.touch("p1");
+			},
+		);
+		expect(unloaded).toEqual(["p2", "p3"]);
+	});
 
-			expect(ids.filter((id) => !registryInternals.entries.has(id))).toEqual([
-				"agent-2",
-			]);
-		} finally {
-			for (const id of ids) registryInternals.entries.delete(id);
-		}
+	test("a page shown while the sweep waits on main stays loaded", async () => {
+		const unloaded = await sweep(
+			["p1", "p2", "p3", "p4", "p5"].map((id) => ({ id })),
+			() => {
+				beforeUnloadInfo = () => {
+					const entry = registryInternals.entries.get("p1");
+					if (entry) entry.visible = true;
+				};
+			},
+		);
+		expect(unloaded).toEqual(["p2"]);
 	});
 
 	test("surfaces BrowserManager unregister failures", async () => {

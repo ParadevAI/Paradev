@@ -1,10 +1,10 @@
 import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
-import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-eviction";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
+import { selectWebviewsToUnload } from "./utils/selectWebviewsToUnload";
 import {
 	clippingAncestorRects,
 	visibleClipPath,
@@ -59,14 +59,30 @@ interface RegistryEntry {
 	placeholder: HTMLElement | null;
 	resizeObserver: ResizeObserver | null;
 	visible: boolean;
-	/** Monotonic use counter for hidden-LRU eviction. */
+	/** Time of last use in ms, kept strictly increasing so ties never happen. */
 	lastUsedAt: number;
 	agent: boolean;
 }
 
 // Each hidden webview is a full guest Chromium process. (SUPER-1545)
-const MAX_HIDDEN_WEBVIEWS = 3;
-const MAX_HIDDEN_AGENT_WEBVIEWS = 6;
+const HIDDEN_POOLS = [
+	{
+		agent: false,
+		budgetShare: 0.06,
+		minLoaded: 3,
+		maxLoaded: 20,
+		idleMs: Number.POSITIVE_INFINITY,
+	},
+	{
+		agent: true,
+		budgetShare: 0.06,
+		minLoaded: 3,
+		maxLoaded: 20,
+		idleMs: 30 * 60_000,
+	},
+];
+const UNLOAD_SWEEP_INTERVAL_MS = 60_000;
+const UNLOAD_INFO_TIMEOUT_MS = 5_000;
 
 const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 	currentUrl: "about:blank",
@@ -108,8 +124,10 @@ export class BrowserRuntimeRegistryImpl {
 		string,
 		Set<(result: Electron.FoundInPageResult) => void>
 	>();
-	private useSeq = 0;
+	private lastStamp = 0;
 	private pendingEviction: ReturnType<typeof setTimeout> | null = null;
+	private sweeping = false;
+	private sweepAgain = false;
 	private rootContainer: HTMLDivElement | null = null;
 	private globalListenersInstalled = false;
 	// Panes an agent is driving (live CDP session or in-flight capture, fed
@@ -178,7 +196,7 @@ export class BrowserRuntimeRegistryImpl {
 				for (const [paneId, entry] of this.entries) {
 					if (!entry.visible) this.applyParkedStyle(paneId, entry);
 				}
-				// A session ending can leave more hidden webviews than the cap
+				// A session ending can leave more hidden webviews than the budget
 				// allows (they were exempt while attached) — sweep again.
 				this.scheduleHiddenEviction();
 			},
@@ -187,6 +205,14 @@ export class BrowserRuntimeRegistryImpl {
 		this.ipc.browser.onAgentUse.subscribe(undefined, {
 			onData: ({ paneId }: { paneId: string }) => this.touch(paneId),
 		});
+
+		// Pages grow and go idle while nothing else triggers a sweep.
+		setInterval(() => this.scheduleHiddenEviction(), UNLOAD_SWEEP_INTERVAL_MS);
+	}
+
+	private stamp(): number {
+		this.lastStamp = Math.max(Date.now(), this.lastStamp + 1);
+		return this.lastStamp;
 	}
 
 	/**
@@ -569,7 +595,7 @@ export class BrowserRuntimeRegistryImpl {
 		const root = this.ensureRootContainer();
 		const entry = this.createEntry(paneId, url, workspaceId, partition);
 		entry.onPersist = onPersist;
-		entry.lastUsedAt = ++this.useSeq;
+		entry.lastUsedAt = this.stamp();
 		// Give automation a usable viewport before this pane has ever been shown.
 		entry.webview.style.width = "1280px";
 		entry.webview.style.height = "720px";
@@ -619,7 +645,7 @@ export class BrowserRuntimeRegistryImpl {
 		entry.onClose = onClose;
 		entry.placeholder = placeholder;
 		entry.visible = true;
-		entry.lastUsedAt = ++this.useSeq;
+		entry.lastUsedAt = this.stamp();
 
 		entry.resizeObserver?.disconnect();
 		const observer = new ResizeObserver(() => {
@@ -644,7 +670,7 @@ export class BrowserRuntimeRegistryImpl {
 		entry.resizeObserver = null;
 		entry.visible = false;
 		this.applyParkedStyle(paneId, entry);
-		entry.lastUsedAt = ++this.useSeq;
+		entry.lastUsedAt = this.stamp();
 		this.scheduleHiddenEviction();
 	}
 
@@ -653,32 +679,76 @@ export class BrowserRuntimeRegistryImpl {
 		if (this.pendingEviction !== null) return;
 		this.pendingEviction = setTimeout(() => {
 			this.pendingEviction = null;
-			this.evictExcessHiddenWebviews();
+			void this.evictExcessHiddenWebviews();
 		}, 0);
 	}
 
-	private evictExcessHiddenWebviews() {
-		for (const agent of [false, true]) {
-			const candidates = Array.from(this.entries.entries())
-				.filter(([, entry]) => entry.agent === agent)
-				.map(([paneId, entry]) => ({
-					paneId,
-					runtime: { container: entry.visible ? entry : null },
-					lastUsedAt: entry.lastUsedAt,
-				}));
-			for (const victim of selectRuntimesToEvict(
-				candidates,
-				agent ? MAX_HIDDEN_AGENT_WEBVIEWS : MAX_HIDDEN_WEBVIEWS,
-				(candidate) => this.agentActivePaneIds.has(candidate.paneId),
-			)) {
-				this.destroy(victim.paneId);
+	private async evictExcessHiddenWebviews(): Promise<void> {
+		if (this.sweeping) {
+			this.sweepAgain = true;
+			return;
+		}
+		const hidden = [...this.entries].filter(([, entry]) => !entry.visible);
+		if (hidden.length === 0) return;
+		this.sweeping = true;
+		try {
+			const info = await Promise.race([
+				this.ipc.browser.getUnloadInfo.query({
+					paneIds: hidden.map(([paneId]) => paneId),
+				}),
+				new Promise<null>((resolve) =>
+					setTimeout(() => resolve(null), UNLOAD_INFO_TIMEOUT_MS),
+				),
+			]).catch((err) => {
+				console.warn("[browserRuntimeRegistry] unload info failed:", err);
+				return null;
+			});
+			const now = Date.now();
+			for (const pool of HIDDEN_POOLS) {
+				const candidates = hidden
+					.filter(([, entry]) => entry.agent === pool.agent)
+					.map(([paneId, entry]) => {
+						const pane = info?.panes[paneId];
+						return {
+							paneId,
+							lastUsedAt: entry.lastUsedAt,
+							memoryKb: pane?.memoryKb ?? 0,
+							keepLoaded:
+								this.agentActivePaneIds.has(paneId) ||
+								pane?.audible === true ||
+								pane?.unsavedInput === true,
+						};
+					});
+				const unload = selectWebviewsToUnload(candidates, {
+					now,
+					budgetKb: info
+						? info.totalMemoryKb * pool.budgetShare
+						: Number.POSITIVE_INFINITY,
+					minLoaded: pool.minLoaded,
+					maxLoaded: pool.maxLoaded,
+					idleMs: pool.idleMs,
+				});
+				for (const paneId of unload) {
+					const entry = this.entries.get(paneId);
+					const seen = candidates.find((c) => c.paneId === paneId);
+					// Shown or used while the info was on its way.
+					if (!entry || entry.visible || entry.lastUsedAt !== seen?.lastUsedAt)
+						continue;
+					this.destroy(paneId);
+				}
+			}
+		} finally {
+			this.sweeping = false;
+			if (this.sweepAgain) {
+				this.sweepAgain = false;
+				this.scheduleHiddenEviction();
 			}
 		}
 	}
 
 	private touch(paneId: string): void {
 		const entry = this.entries.get(paneId);
-		if (entry) entry.lastUsedAt = ++this.useSeq;
+		if (entry) entry.lastUsedAt = this.stamp();
 	}
 
 	destroy(paneId: string): void {

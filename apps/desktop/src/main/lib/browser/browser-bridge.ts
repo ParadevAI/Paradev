@@ -711,7 +711,7 @@ function handleCdpSocket(
 	let earlyBytes = 0;
 	const queue = (data: unknown) => {
 		const message = String(data);
-		earlyBytes += message.length;
+		earlyBytes += Buffer.byteLength(message, "utf8");
 		if (
 			early.length >= MAX_EARLY_CDP_FRAMES ||
 			earlyBytes > MAX_CDP_MESSAGE_BYTES

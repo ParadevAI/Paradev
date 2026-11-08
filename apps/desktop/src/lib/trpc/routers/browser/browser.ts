@@ -316,6 +316,10 @@ export const createBrowserRouter = () => {
 				return { success: true };
 			}),
 
+		getUnloadInfo: publicProcedure
+			.input(z.object({ paneIds: z.array(z.string()) }))
+			.query(({ input }) => browserManager.getUnloadInfo(input.paneIds)),
+
 		onAgentUse: publicProcedure.subscription(() => {
 			return observable<{ paneId: string }>((emit) => {
 				const handler = (event: { paneId: string }) => {
