@@ -32,7 +32,8 @@ export async function listForwards(
 			id: workspaceId,
 		}));
 	} catch (error) {
-		if ((error as { data?: { code?: string } }).data?.code === "NOT_FOUND") {
+		const code = (error as { data?: { code?: string } }).data?.code;
+		if (code === "NOT_FOUND" || code === "BAD_REQUEST") {
 			throw new CLIError(
 				`No cloud workspace ${workspaceId} that you can open`,
 				"Forwarded ports exist for cloud workspaces only; pass --workspace <cloud workspace id>",

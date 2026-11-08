@@ -35,6 +35,13 @@ export class RelayForwardTransport implements ForwardTransport {
 		return session.openStream(target.remotePort);
 	}
 
+	/** Evicts at once, so a forward made before the close lands cannot reuse a session. */
+	closeAll(): void {
+		const sessions = [...this.sessions.values()];
+		this.sessions.clear();
+		for (const session of sessions) session.close();
+	}
+
 	private session(target: ForwardTarget): MuxSession {
 		const key = `${target.hostUrl}|${target.workspaceId}`;
 		const existing = this.sessions.get(key);

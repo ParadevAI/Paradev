@@ -8,6 +8,7 @@ const DEFAULT_TIMING = {
 	retryMaxMs: 60_000,
 	/** How long a socket must stay up before a drop counts as fresh trouble. */
 	stableMs: 30_000,
+	handshakeMs: 10_000,
 };
 
 // Not 4403: access can be granted later, so "no access" only backs off.
@@ -113,6 +114,7 @@ export class ForwardReporter {
 		if (address.protocol === "http:") address.protocol = "ws:";
 		const socket = new WebSocket(address.toString(), {
 			headers: { authorization: `Bearer ${token}` },
+			handshakeTimeout: this.timing.handshakeMs,
 		});
 		channel.socket = socket;
 		channel.sent = null;

@@ -25,14 +25,16 @@ export function setHostToken(hostUrl: string, token: string | null): void {
 	else hostTokens.delete(hostUrl);
 }
 
+const transport = new RelayForwardTransport({
+	resolveLocalhostSubdomains: env.NODE_ENV === "development",
+	getToken: (target) =>
+		gateHosts.has(target.hostUrl)
+			? (hostTokens.get(target.hostUrl) ?? null)
+			: relayToken,
+});
+
 export const portForwardManager = new PortForwardManager({
-	transport: new RelayForwardTransport({
-		resolveLocalhostSubdomains: env.NODE_ENV === "development",
-		getToken: (target) =>
-			gateHosts.has(target.hostUrl)
-				? (hostTokens.get(target.hostUrl) ?? null)
-				: relayToken,
-	}),
+	transport,
 	getLocalPorts: () => portManager.getAllPorts(),
 	killLocalPort: ({ terminalId, workspaceId, port }) =>
 		portManager.killPort({ terminalId, workspaceId, port }),
@@ -48,6 +50,7 @@ portForwardManager.on("change", (forwards) => forwardReporter.sync(forwards));
 export function endForwardingSession(): void {
 	forwardReporter.stopAll();
 	void portForwardManager.stopExplicit();
+	transport.closeAll();
 	hostTokens.clear();
 	gateHosts.clear();
 }
