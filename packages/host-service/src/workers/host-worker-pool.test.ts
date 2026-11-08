@@ -340,11 +340,13 @@ describe("HostWorkerPool", () => {
 	});
 
 	test("a throwing onPause hook does not stop the pool from pausing", async () => {
+		let calls = 0;
 		const pool = makePool({
 			scriptPathResolver: () => CRASH_WORKER,
 			noInlineFallback: {
 				pauseAfterCrashMs: 60_000,
 				onPause: () => {
+					calls++;
 					throw new Error("reporter down");
 				},
 			},
@@ -356,6 +358,7 @@ describe("HostWorkerPool", () => {
 		await expect(pool.run(echo, { v: 1 })).rejects.toMatchObject({
 			name: WORKER_CRASH_ERROR_NAME,
 		});
+		expect(calls).toBe(1);
 		await expect(pool.run(echo, { v: 2 })).rejects.toMatchObject({
 			reason: "paused",
 		});
