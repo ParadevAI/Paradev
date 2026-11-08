@@ -341,6 +341,10 @@ describe("sessions router", () => {
 			workspaceId: WORKSPACE,
 			agent: "personal-config",
 		});
+		const second = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "personal-config",
+		});
 		const kept = await stopAndResume(created.sessionId);
 		expect(launches.at(-1)?.agentConfigId).toBe("personal-config");
 		expect("notice" in kept).toBe(false);
@@ -351,14 +355,20 @@ describe("sessions router", () => {
 			.run();
 		const moved = await stopAndResume(kept.sessionId);
 		expect("notice" in moved && moved.notice).toContain("no longer runs");
+		expect(launches.at(-1)?.agentConfigId).toBeUndefined();
+		expect(runtime.sessions.get(moved.sessionId)?.agentConfigId).toBeNull();
 		expect(launches.at(-1)?.resume?.harnessSessionId).toBe(
 			`native-${created.sessionId}`,
 		);
 
+		const again = await stopAndResume(moved.sessionId);
+		expect("notice" in again).toBe(false);
+
 		db.delete(schema.hostAgentConfigs)
 			.where(eq(schema.hostAgentConfigs.id, "personal-config"))
 			.run();
-		const deleted = await stopAndResume(moved.sessionId);
+		const deleted = await stopAndResume(second.sessionId);
 		expect("notice" in deleted && deleted.notice).toContain("was deleted");
+		expect(launches.at(-1)?.agentConfigId).toBeUndefined();
 	});
 });

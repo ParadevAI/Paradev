@@ -109,7 +109,7 @@ export async function createChatSessionInWorkspace(
 	});
 	const target =
 		resolved && launch.withoutAgentConfig
-			? { ...resolved, agentConfigId: undefined }
+			? { ...resolved, agentConfigId: null }
 			: resolved;
 	if (!target)
 		throw new TRPCError({
