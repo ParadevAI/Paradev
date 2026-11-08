@@ -1,0 +1,1 @@
+export { DashboardSidebarWorkspacePullRequestsMenu } from "./DashboardSidebarWorkspacePullRequestsMenu";

@@ -1986,6 +1986,7 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		]);
 		const current = await manager.getPullRequestsByWorkspaces(["ws"]);
 		expect(current[0]?.pullRequest?.number).toBe(102);
+		expect(current[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
 
 		// Remove PR Link: the sidebar loses the pointer; history keeps 102.
 		manager.unlinkWorkspacePullRequest("ws");
@@ -1996,6 +1997,203 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		expect(history[0]?.pullRequests.every((pr) => pr.isCurrent === false)).toBe(
 			true,
 		);
+	});
+
+	test("records every same-head PR once while preserving the current pointer and unlink", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		const nodes = [201, 202].map((number) =>
+			makePrNode({ number, headRef: "feature", headSha: "sha-feature" }),
+		);
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				if (args.includes("graphql")) return {};
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls")) return nodes;
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		const [current] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(current?.pullRequest?.number).toBe(201);
+		expect(current?.pullRequests.map((pr) => pr.number)).toEqual([201, 202]);
+		expect(
+			(await manager.getPullRequestHistoryByWorkspaces(["ws"]))[0]
+				?.pullRequests,
+		).toHaveLength(2);
+		manager.unlinkWorkspacePullRequest("ws");
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		const [unlinked] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(unlinked?.pullRequest).toBeNull();
+		expect(unlinked?.pullRequests.map((pr) => pr.number)).toEqual([202]);
+		expect(
+			(await manager.getPullRequestHistoryByWorkspaces(["ws"]))[0]
+				?.pullRequests,
+		).toHaveLength(2);
+	});
+
+	test.each([
+		{
+			initialState: "open",
+			responseState: "closed" as const,
+			mergedAt: "2026-10-26T12:00:00Z",
+			expected: "merged",
+		},
+		{
+			initialState: "closed",
+			responseState: "open" as const,
+			mergedAt: null,
+			expected: "open",
+		},
+	])("refreshes historical $initialState → $expected without moving the current pointer", async ({
+		initialState,
+		responseState,
+		mergedAt,
+		expected,
+	}) => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "old",
+			state: initialState,
+			prNumber: 101,
+			headBranch: "old-branch",
+			headSha: "old-sha",
+		});
+		seedPullRequest(db, {
+			id: "current",
+			prNumber: 102,
+			headBranch: "feature",
+			headSha: "sha-feature",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+			pullRequestId: "current",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values([
+				{ workspaceId: "ws", pullRequestId: "old", linkedAt: 1 },
+				{ workspaceId: "ws", pullRequestId: "current", linkedAt: 2 },
+			])
+			.run();
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				if (args.includes("graphql")) return {};
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls"))
+					return [
+						makePrNode({
+							number: 102,
+							headRef: "feature",
+							headSha: "sha-feature",
+						}),
+					];
+				if (path.endsWith("/pulls/101"))
+					return makePrNode({
+						number: 101,
+						headRef: "old-branch",
+						headSha: "old-sha",
+						state: responseState,
+						mergedAt,
+					});
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+		expect(getPrByNumber(db, 101)?.state).toBe(expected);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe("current");
+		const [snapshot] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(snapshot?.pullRequests.map((pr) => [pr.number, pr.state])).toEqual([
+			[102, "open"],
+			[101, expected],
+		]);
+	});
+
+	test.each([
+		"archive",
+		"unlink",
+	] as const)("respects %s while the head lookup is pending", async (action) => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "current",
+			prNumber: 101,
+			headBranch: "feature",
+			headSha: "sha",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+			pullRequestId: "current",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "current", linkedAt: 1 })
+			.run();
+		const started = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<unknown>();
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				if (args.includes("graphql")) return {};
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls")) {
+					started.resolve();
+					return pending.promise;
+				}
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		const refresh = withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		await started.promise;
+		if (action === "archive")
+			db.update(workspaces)
+				.set({ archivedAt: 10 })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+		else manager.unlinkWorkspacePullRequest("ws");
+		pending.resolve(
+			[101, 102].map((number) =>
+				makePrNode({ number, headRef: "feature", headSha: "sha" }),
+			),
+		);
+		await refresh;
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(
+			action === "archive" ? "current" : null,
+		);
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		if (action === "archive")
+			expect(history?.pullRequests.map((pr) => pr.number)).toEqual([101]);
+		else
+			expect(
+				(
+					await manager.getPullRequestsByWorkspaces(["ws"])
+				)[0]?.pullRequests.map((pr) => pr.number),
+			).toEqual([102]);
 	});
 
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
@@ -2132,6 +2330,387 @@ function ghAnsweringPr(
 }
 
 describe("PullRequestRuntimeManager GitHub traffic", () => {
+	test.each([
+		"closed",
+		"merged",
+	] as const)("refreshes pending checks on a %s PR until they finish", async (state) => {
+		const t0 = 1_700_000_000_000;
+		setSystemTime(new Date(t0));
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		let completed = false;
+		let checks = 0;
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls"))
+					return [
+						makePrNode({
+							number: 8,
+							headRef: "feature",
+							headSha: "history",
+							state: "closed",
+							mergedAt: state === "merged" ? "2026-10-26T12:00:00Z" : null,
+						}),
+					];
+				if (path.endsWith("/check-runs")) {
+					checks++;
+					return {
+						check_runs: [
+							{
+								name: "ci",
+								status: completed ? "completed" : "in_progress",
+								conclusion: completed ? "success" : null,
+							},
+							{ name: "lint", status: "completed", conclusion: "failure" },
+						],
+					};
+				}
+				return [];
+			},
+		});
+		try {
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(
+				JSON.parse(getPrByNumber(db, 8)?.checksJson ?? "[]"),
+			).toContainEqual(
+				expect.objectContaining({ name: "ci", status: "pending" }),
+			);
+			completed = true;
+			setSystemTime(new Date(t0 + 61_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(checks).toBe(2);
+			expect(
+				JSON.parse(getPrByNumber(db, 8)?.checksJson ?? "[]"),
+			).toContainEqual(
+				expect.objectContaining({ name: "ci", status: "success" }),
+			);
+			setSystemTime(new Date(t0 + 122_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(checks).toBe(2);
+		} finally {
+			setSystemTime();
+			manager.stop();
+			db.$client.close();
+		}
+	});
+
+	test.each([
+		"closed",
+		"merged",
+	] as const)("reuses successful %s details across TTLs while preserving explicit refresh", async (state) => {
+		const t0 = 1_700_000_000_000;
+		setSystemTime(new Date(t0));
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		let historicalState: "closed" | "open" = "closed";
+		const counts: Record<string, number> = {};
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls"))
+					return [
+						makePrNode({ number: 7, headRef: "feature", headSha: "current" }),
+						makePrNode({
+							number: 8,
+							headRef: "feature",
+							headSha: "history",
+							state: historicalState,
+							mergedAt:
+								state === "merged" && historicalState === "closed"
+									? "2026-10-26T12:00:00Z"
+									: null,
+						}),
+					];
+				if (path.endsWith("/check-runs")) {
+					counts[path] = (counts[path] ?? 0) + 1;
+					return { check_runs: [] };
+				}
+				return args.includes("graphql") ? {} : [];
+			},
+		});
+		const currentChecks = `repos/${REPO.owner}/${REPO.name}/commits/current/check-runs`;
+		const historicalChecks = `repos/${REPO.owner}/${REPO.name}/commits/history/check-runs`;
+		try {
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(counts[historicalChecks]).toBe(1);
+			setSystemTime(new Date(t0 + 61_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(counts[currentChecks]).toBe(2);
+			expect(counts[historicalChecks]).toBe(1);
+			expect(
+				(await manager.getPullRequestsByWorkspaces(["ws"]))[0]?.pullRequests,
+			).toHaveLength(2);
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			expect(counts[historicalChecks]).toBe(2);
+			if (state === "closed") {
+				historicalState = "open";
+				setSystemTime(new Date(t0 + 122_000));
+				await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+				expect(counts[historicalChecks]).toBe(3);
+				expect(getPrByNumber(db, 8)?.state).toBe("open");
+			}
+		} finally {
+			setSystemTime();
+			manager.stop();
+			db.$client.close();
+		}
+	});
+
+	test("retries failed terminal details even though discovery updated lastFetchedAt", async () => {
+		const t0 = 1_700_000_000_000;
+		setSystemTime(new Date(t0));
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		let attempts = 0;
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls"))
+					return [
+						makePrNode({
+							number: 8,
+							headRef: "feature",
+							headSha: "history",
+							state: "closed",
+						}),
+					];
+				if (path.endsWith("/check-runs")) {
+					if (++attempts === 1) throw new Error("details failed");
+					return { check_runs: [] };
+				}
+				return [];
+			},
+		});
+		try {
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(getPrByNumber(db, 8)?.lastFetchedAt).toBe(t0);
+			setSystemTime(new Date(t0 + 61_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(1);
+			setSystemTime(new Date(t0 + 121_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(2);
+			setSystemTime(new Date(t0 + 242_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(2);
+		} finally {
+			setSystemTime();
+			manager.stop();
+			db.$client.close();
+		}
+	});
+
+	test.each([
+		{ state: "closed", failFirst: false },
+		{ state: "merged", failFirst: false },
+		{ state: "closed", failFirst: true },
+		{ state: "merged", failFirst: true },
+	] as const)("refreshes historical $state details independently of state lookup (failure=$failFirst)", async ({
+		state,
+		failFirst,
+	}) => {
+		const t0 = 1_700_000_000_000;
+		setSystemTime(new Date(t0));
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "old",
+			prNumber: 8,
+			headBranch: "old",
+			headSha: "history",
+			state,
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "old", linkedAt: t0 })
+			.run();
+		let lookups = 0;
+		let attempts = 0;
+		let completed = false;
+		const execGh = async (args: string[]) => {
+			const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+			if (path.endsWith("/pulls"))
+				return [
+					makePrNode({ number: 7, headRef: "feature", headSha: "current" }),
+				];
+			if (path.endsWith("/pulls/8")) {
+				lookups++;
+				return makePrNode({
+					number: 8,
+					headRef: "old",
+					headSha: "history",
+					state: "closed",
+					mergedAt: state === "merged" ? "2026-10-26T12:00:00Z" : null,
+				});
+			}
+			if (path.endsWith("commits/history/check-runs")) {
+				attempts++;
+				if (failFirst && attempts === 1) throw new Error("details failed");
+				return {
+					check_runs: [
+						{
+							name: "ci",
+							status: completed ? "completed" : "in_progress",
+							conclusion: completed ? "success" : null,
+						},
+						{ name: "lint", status: "completed", conclusion: "failure" },
+					],
+				};
+			}
+			if (path.endsWith("/check-runs")) return { check_runs: [] };
+			return args.includes("graphql") ? {} : [];
+		};
+		let manager = createManager(db, { execGh });
+		try {
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			expect(attempts).toBe(1);
+			expect(lookups).toBe(1);
+			const currentId = getWorkspace(db, "ws")?.pullRequestId;
+			completed = true;
+			setSystemTime(new Date(t0 + 61_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(failFirst ? 1 : 2);
+			setSystemTime(new Date(t0 + 121_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(2);
+			expect(lookups).toBe(1);
+			expect(getPrByNumber(db, 8)?.lastFetchedAt).toBe(t0);
+			expect(
+				JSON.parse(getPrByNumber(db, 8)?.checksJson ?? "[]"),
+			).toContainEqual(
+				expect.objectContaining({ name: "ci", status: "success" }),
+			);
+			setSystemTime(new Date(t0 + 242_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(2);
+			expect(lookups).toBe(1);
+			expect(getWorkspace(db, "ws")?.pullRequestId).toBe(currentId);
+			manager.stop();
+			manager = createManager(db, { execGh });
+			setSystemTime(new Date(t0 + 303_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(3);
+			expect(lookups).toBe(1);
+			expect(getPrByNumber(db, 8)?.lastFetchedAt).toBe(t0);
+			setSystemTime(new Date(t0 + 364_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(3);
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			expect(attempts).toBe(4);
+			expect(lookups).toBe(2);
+		} finally {
+			setSystemTime();
+			manager.stop();
+			db.$client.close();
+		}
+	});
+
+	test("checks closed history daily, allows explicit refresh, and still detects reopening", async () => {
+		const t0 = 1_700_000_000_000;
+		setSystemTime(new Date(t0));
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "old",
+			prNumber: 8,
+			headBranch: "old",
+			headSha: "history",
+			state: "closed",
+		});
+		db.update(pullRequests)
+			.set({ lastFetchedAt: t0 })
+			.where(eq(pullRequests.id, "old"))
+			.run();
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "old", linkedAt: t0 })
+			.run();
+		let lookups = 0;
+		let historicalState: "closed" | "open" = "closed";
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls"))
+					return [
+						makePrNode({ number: 7, headRef: "feature", headSha: "current" }),
+					];
+				if (path.endsWith("/pulls/8")) {
+					lookups++;
+					return makePrNode({
+						number: 8,
+						headRef: "old",
+						headSha: "history",
+						state: historicalState,
+					});
+				}
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return args.includes("graphql") ? {} : [];
+			},
+		});
+		try {
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(lookups).toBe(0);
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			expect(lookups).toBe(1);
+			const currentId = getWorkspace(db, "ws")?.pullRequestId;
+			historicalState = "open";
+			setSystemTime(new Date(t0 + 24 * 60 * 60_000 - 1));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(lookups).toBe(1);
+			setSystemTime(new Date(t0 + 24 * 60 * 60_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(lookups).toBe(2);
+			expect(getPrByNumber(db, 8)?.state).toBe("open");
+			expect(getWorkspace(db, "ws")?.pullRequestId).toBe(currentId);
+		} finally {
+			setSystemTime();
+			manager.stop();
+			db.$client.close();
+		}
+	});
+
 	test("caches review/check/merge-queue lookups per PR head across refreshes", async () => {
 		const db = createRealDb();
 		seedProject(db);

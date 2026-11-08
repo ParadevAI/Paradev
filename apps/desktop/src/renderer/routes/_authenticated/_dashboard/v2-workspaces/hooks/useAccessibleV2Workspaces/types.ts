@@ -1,4 +1,5 @@
 import type { CheckItem } from "@superset/local-db";
+import type { WorkspacePullRequestSummary } from "renderer/lib/github/workspacePullRequests";
 import type { PaneStatus } from "shared/tabs-types";
 
 export type V2WorkspaceHostType = "local-device" | "remote-device" | "cloud";
@@ -70,6 +71,7 @@ export interface AccessibleV2Workspace {
 	hostType: V2WorkspaceHostType;
 	isInSidebar: boolean;
 	pr: V2WorkspacePrSummary | null;
+	pullRequests?: WorkspacePullRequestSummary[];
 	/**
 	 * Highest-priority live agent status across the workspace's terminals;
 	 * `review` means finished and not yet looked at.

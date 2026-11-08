@@ -187,6 +187,43 @@ describe("buildCloudSidebarWorkspaces", () => {
 		expect(rows[0]?.lastActivityAt).toBe(DATE.getTime());
 	});
 
+	it.each([
+		true,
+		false,
+	])("keeps all cloud PRs for existing project=%s", (knownProject) => {
+		const prs = [
+			makePullRequest({ isDraft: true }),
+			makePullRequest({
+				number: 8,
+				url: "https://github.com/acme/app/pull/8",
+				state: "closed",
+			}),
+			makePullRequest({
+				number: 7,
+				url: "https://github.com/acme/other/pull/7",
+				state: "merged",
+			}),
+		];
+		const layout = build({
+			cloudWorkspaces: [makeCloudWorkspace({ id: "ws-1" })],
+			projects: knownProject
+				? [{ id: "p1", githubOwner: "acme", githubRepoName: "app" }]
+				: [],
+			repoFullNameById: new Map([["ws-1", "acme/app"]]),
+			pullRequestsById: new Map([["ws-1", [...prs, ...prs]]]),
+		});
+		const row = knownProject
+			? layout.byProjectId.get("p1")?.[0]
+			: layout.repoProjects[0]?.cloudWorkspaces[0];
+		expect(row?.pullRequest?.number).toBe(7);
+		expect(row?.pullRequest?.state).toBe("draft");
+		expect(row?.pullRequests?.map((pr) => [pr.url, pr.state])).toEqual([
+			[prs[0]?.url, "draft"],
+			[prs[1]?.url, "closed"],
+			[prs[2]?.url, "merged"],
+		]);
+	});
+
 	it("badges the workspace's first pull request, on the live branch", () => {
 		const pullRequest = makePullRequest({ isDraft: true });
 		const layout = build({

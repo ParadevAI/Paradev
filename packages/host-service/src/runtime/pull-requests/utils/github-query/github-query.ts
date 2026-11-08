@@ -145,21 +145,19 @@ function headKey(
 function normalizePullRequestCandidates(
 	raw: unknown,
 	head: GitHubPullRequestHeadRef,
-): GitHubPullRequestNode | null {
+): GitHubPullRequestNode[] {
 	const requestedKey = headKey(head.owner, head.repo, head.branch);
-	return (
-		asArray(raw)
-			.map((item) => normalizePullRequest(item))
-			.find(
-				(node) =>
-					node &&
-					headKey(
-						node.headRepositoryOwner?.login,
-						node.headRepository?.name,
-						node.headRefName,
-					) === requestedKey,
-			) ?? null
-	);
+	return asArray(raw)
+		.map((item) => normalizePullRequest(item))
+		.filter(
+			(node): node is GitHubPullRequestNode =>
+				node !== null &&
+				headKey(
+					node.headRepositoryOwner?.login,
+					node.headRepository?.name,
+					node.headRefName,
+				) === requestedKey,
+		);
 }
 
 function mapReviewDecision(
@@ -226,53 +224,86 @@ function toStatusContextNode(
 	};
 }
 
-export async function fetchPullRequestByHeadFromGh(
+export async function fetchPullRequestsByHeadFromGh(
 	execGh: ExecGh,
-	repository: {
-		owner: string;
-		name: string;
-	},
+	repository: { owner: string; name: string },
 	head: GitHubPullRequestHeadRef,
-): Promise<GitHubPullRequestNode | null> {
-	const raw = await execGh([
-		"api",
-		"--method",
-		"GET",
-		`repos/${repository.owner}/${repository.name}/pulls`,
-		"-f",
-		"state=all",
-		"-f",
-		`head=${head.owner}:${head.branch}`,
-		"-f",
-		"sort=updated",
-		"-f",
-		"direction=desc",
-		"-f",
-		"per_page=10",
-	]);
-
-	return normalizePullRequestCandidates(raw, head);
+): Promise<GitHubPullRequestNode[]> {
+	const nodes: GitHubPullRequestNode[] = [];
+	for (let page = 1; ; page += 1) {
+		const raw = await execGh([
+			"api",
+			"--method",
+			"GET",
+			`repos/${repository.owner}/${repository.name}/pulls`,
+			"-f",
+			"state=all",
+			"-f",
+			`head=${head.owner}:${head.branch}`,
+			"-f",
+			"sort=updated",
+			"-f",
+			"direction=desc",
+			"-f",
+			"per_page=100",
+			"-f",
+			`page=${page}`,
+			"--jq",
+			OPEN_PULL_REQUESTS_JQ,
+		]);
+		nodes.push(...normalizePullRequestCandidates(raw, head));
+		if (asArray(raw).length < 100) return nodes;
+	}
 }
 
-export async function fetchPullRequestByHead(
+export async function fetchPullRequestsByHead(
 	octokit: Octokit,
-	repository: {
-		owner: string;
-		name: string;
-	},
+	repository: { owner: string; name: string },
 	head: GitHubPullRequestHeadRef,
+): Promise<GitHubPullRequestNode[]> {
+	const nodes: GitHubPullRequestNode[] = [];
+	for (let page = 1; ; page += 1) {
+		const response = await octokit.rest.pulls.list({
+			owner: repository.owner,
+			repo: repository.name,
+			state: "all",
+			head: `${head.owner}:${head.branch}`,
+			sort: "updated",
+			direction: "desc",
+			per_page: 100,
+			page,
+		});
+		nodes.push(...normalizePullRequestCandidates(response.data, head));
+		if (response.data.length < 100) return nodes;
+	}
+}
+
+export async function fetchPullRequestByNumberFromGh(
+	execGh: ExecGh,
+	repository: { owner: string; name: string },
+	number: number,
 ): Promise<GitHubPullRequestNode | null> {
-	const response = await octokit.rest.pulls.list({
+	return normalizePullRequest(
+		await execGh([
+			"api",
+			"--method",
+			"GET",
+			`repos/${repository.owner}/${repository.name}/pulls/${number}`,
+		]),
+	);
+}
+
+export async function fetchPullRequestByNumber(
+	octokit: Octokit,
+	repository: { owner: string; name: string },
+	number: number,
+): Promise<GitHubPullRequestNode | null> {
+	const response = await octokit.rest.pulls.get({
 		owner: repository.owner,
 		repo: repository.name,
-		state: "all",
-		head: `${head.owner}:${head.branch}`,
-		sort: "updated",
-		direction: "desc",
-		per_page: 10,
+		pull_number: number,
 	});
-
-	return normalizePullRequestCandidates(response.data, head);
+	return normalizePullRequest(response.data);
 }
 
 // 100 full PR objects (bodies included) routinely exceed exec's stdout

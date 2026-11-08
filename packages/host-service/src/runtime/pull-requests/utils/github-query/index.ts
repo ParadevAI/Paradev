@@ -1,14 +1,16 @@
 export {
 	fetchOpenPullRequests,
 	fetchOpenPullRequestsFromGh,
-	fetchPullRequestByHead,
-	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumber,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecks,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueState,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
+	fetchPullRequestsByHead,
+	fetchPullRequestsByHeadFromGh,
 	parseMergedAt,
 } from "./github-query";
 export type {
