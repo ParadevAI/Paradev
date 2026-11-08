@@ -1081,6 +1081,9 @@ msgstr "{label} снова станет ненастроенным. В рабо�
 msgid "{label} is set to manual"
 msgstr "Для {label} включён ручной вход"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} теперь запускает другой CLI, поэтому этот чат работает с аккаунтом по умолчанию."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -19533,6 +19536,9 @@ msgstr "Агент остановился при возобновлении ра
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Агента, на котором должна была запускаться эта автоматизация, больше нет на его хосте — возможно, агенты хоста были сброшены или удалены. Выберите агента заново в настройках автоматизации."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Агент, с которым начался этот чат, больше недоступен, поэтому чат работает с аккаунтом по умолчанию."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Агент использует свои навыки и инструменты. Задача появляется в Linear."

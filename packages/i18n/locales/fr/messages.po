@@ -1081,6 +1081,9 @@ msgstr "{label} redevient non configuré. Rien ne change dans vos espaces de tra
 msgid "{label} is set to manual"
 msgstr "{label} est en connexion manuelle"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} lance maintenant une autre CLI, ce chat utilise donc le compte par défaut."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -19533,6 +19536,9 @@ msgstr "L'agent s'est arrêté pendant la reprise de la conversation."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "L'agent que cette automatisation devait exécuter n'existe plus sur son hôte — les agents de l'hôte ont peut-être été réinitialisés ou supprimés. Sélectionnez à nouveau un agent dans les paramètres de l'automatisation."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "L’agent avec lequel ce chat a démarré n’est plus disponible, il utilise donc le compte par défaut."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "L'agent utilise ses compétences et ses outils. Le ticket arrive dans Linear."

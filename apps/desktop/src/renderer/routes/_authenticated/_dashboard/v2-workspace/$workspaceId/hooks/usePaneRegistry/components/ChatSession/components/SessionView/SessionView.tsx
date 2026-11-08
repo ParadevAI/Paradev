@@ -99,6 +99,7 @@ function contentText(content: UserContent[]): string {
 export function SessionView({
 	presetId,
 	agentLabel,
+	accountNotice,
 	agentSwitch,
 	canForkToWorktree,
 	chatKey,
@@ -167,6 +168,8 @@ export function SessionView({
 	onUserPrompt?: () => void;
 	/** Names the speaker in a handed-over transcript. */
 	agentLabel?: string;
+	/** Why the chat runs on another account than the one it started on. */
+	accountNotice?: string;
 	/** The transcript goes with the switch: the next agent cannot load this session. */
 	agentSwitch?: {
 		currentPresetId: string;
@@ -735,8 +738,7 @@ export function SessionView({
 				)}
 				<WorkDrawer
 					notice={
-						usageLimit &&
-						!held && (
+						usageLimit && !held ? (
 							<UsageLimitNotice
 								agent={usageLimit.agent}
 								hostUrl={usageLimit.hostUrl}
@@ -746,7 +748,11 @@ export function SessionView({
 								onSwitchAccount={usageLimit.onSwitchAccount}
 								sessionAccount={usageLimit.sessionAccount}
 							/>
-						)
+						) : accountNotice ? (
+							<p className="py-2 pr-2 pl-3 text-muted-foreground text-xs">
+								{accountNotice}
+							</p>
+						) : null
 					}
 					onExit={returnToComposer}
 					paneRef={paneRef}

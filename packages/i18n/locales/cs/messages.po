@@ -1081,6 +1081,9 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} teď spouští jiné CLI, takže tento chat běží na výchozím účtu."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -19533,6 +19536,9 @@ msgstr "Agent se zastavil při obnovování konverzace."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Agent, se kterým měla tato automatizace běžet, už na svém hostu neexistuje — agenti hosta mohli být resetováni nebo odebráni. Vyberte v nastavení automatizace jiného agenta."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Agent, se kterým tento chat začal, už není k dispozici, takže běží na výchozím účtu."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Agent použije své skills a nástroje. Issue skončí v Linearu."

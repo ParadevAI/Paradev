@@ -20,6 +20,7 @@ import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
+import { chatPresetIdForConfig } from "../../../../../../utils/chatPresetIdForConfig";
 import {
 	ignoreChatTerminal,
 	isChatSessionReopened,
@@ -176,6 +177,20 @@ export function AcpChatPane({
 		(config) => config.id === (agentConfigId ?? agent?.id),
 	);
 	const agentLabel = agentConfig?.label;
+	const label = agentLabel ?? "";
+	const accountNotice =
+		!agent?.id || !agentConfigs || !agentConfigId
+			? undefined
+			: !agentConfig
+				? t({
+						message:
+							"The agent this chat started with is no longer available, so it runs on the default account.",
+					})
+				: chatPresetIdForConfig(agentConfig) !== agent.id
+					? t({
+							message: `${label} now runs another CLI, so this chat runs on the default account.`,
+						})
+					: undefined;
 	const queryClient = useQueryClient();
 	useWorkspaceEvent(
 		"chat:sessions-changed",
@@ -812,6 +827,7 @@ export function AcpChatPane({
 				launchPrompt ? onLaunchPromptDelivered : undefined
 			}
 			agentLabel={agentLabel}
+			accountNotice={accountNotice}
 			agentSwitch={agentSwitch}
 			onModeChange={onModeChange}
 			canForkToWorktree={canForkToWorktree}
