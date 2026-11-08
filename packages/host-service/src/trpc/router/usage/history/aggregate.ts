@@ -1,6 +1,5 @@
 import { basename } from "node:path";
 import type { ModelProvider, UsageAgent } from "../types";
-import { collectUsageEntries } from "./entries";
 import { inferModelProvider } from "./model-provider";
 import type { UsageLogEntry } from "./parse";
 import {
@@ -9,6 +8,7 @@ import {
 	matchModelRate,
 	PRICING_TABLE_UPDATED,
 } from "./pricing";
+import type { CollectUsage } from "./usage-index";
 
 export interface UsageDailyBucket {
 	/** Local calendar day, `YYYY-MM-DD` in the host's timezone. */
@@ -155,7 +155,8 @@ function attributeCwd(
 
 export async function computeUsageHistory(
 	days: number,
-	cwdLabels: CwdLabel[] = [],
+	cwdLabels: CwdLabel[],
+	collect: CollectUsage,
 ): Promise<UsageHistory> {
 	const labelsByLength = [...cwdLabels].sort(
 		(a, b) => b.prefix.length - a.prefix.length,
@@ -169,11 +170,9 @@ export async function computeUsageHistory(
 		return start.getTime();
 	})();
 
-	const { entries, sessionLabels, scannedFiles } = await collectUsageEntries(
-		days,
-		cutoffMs,
-		{ cwdCandidates: cwdLabels.map((label) => label.prefix) },
-	);
+	const { entries, sessionLabels, scannedFiles } = await collect(cutoffMs, {
+		cwdCandidates: cwdLabels.map((label) => label.prefix),
+	});
 
 	const bucketsByDay = new Map<string, UsageDailyBucket>();
 	const modelsByKey = new Map<string, UsageModelBreakdown>();

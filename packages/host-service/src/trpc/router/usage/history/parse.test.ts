@@ -2,18 +2,18 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { forEachLine, MAX_LINE_LENGTH } from "./parse";
+import { MAX_LINE_LENGTH, readJsonFile, readLinesFrom } from "./parse";
 
 const root = mkdtempSync(join(tmpdir(), "usage-parse-"));
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 async function linesOf(path: string): Promise<string[]> {
 	const lines: string[] = [];
-	await forEachLine(path, (line) => lines.push(line));
+	await readLinesFrom(path, 0, (line) => lines.push(line));
 	return lines;
 }
 
-describe("forEachLine", () => {
+describe("readLinesFrom", () => {
 	test("splits on \\n, strips \\r, keeps blank lines, delivers an unterminated last line", async () => {
 		const path = join(root, "plain.jsonl");
 		writeFileSync(path, "a\r\nb\n\nc");
@@ -61,5 +61,15 @@ describe("forEachLine", () => {
 
 	test("skips an unreadable file without throwing", async () => {
 		expect(await linesOf(join(root, "missing.jsonl"))).toEqual([]);
+	});
+});
+
+describe("readJsonFile", () => {
+	test("parses a file within the cap and skips one past it", async () => {
+		const path = join(root, "summary.json");
+		writeFileSync(path, JSON.stringify({ title: "ok" }));
+		expect(await readJsonFile(path, 64)).toEqual({ title: "ok" });
+		expect(await readJsonFile(path, 4)).toBeNull();
+		expect(await readJsonFile(join(root, "missing.json"))).toBeNull();
 	});
 });

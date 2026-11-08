@@ -10,7 +10,12 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import { type DevinMessageRow, devinRowsToEntries } from "./devin-rows";
-import type { UsageLogEntry } from "./parse";
+import { MAX_SQL_TEXT_LENGTH, type UsageLogEntry } from "./parse";
+import {
+	readAppendOnly,
+	type SqliteStates,
+	setSessionLabels,
+} from "./sqlite-tail";
 
 export function devinDbPath(): string {
 	const dataHome =
@@ -24,21 +29,65 @@ export function collectDevinEntries(
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	dbPath: string = devinDbPath(),
+	states?: SqliteStates,
 ): number {
 	let db: InstanceType<typeof Database> | null = null;
 	try {
-		db = new Database(dbPath, { readonly: true, fileMustExist: true });
-		const rows = db
-			.prepare(
-				`SELECT m.session_id, m.chat_message, m.created_at,
-				        s.working_directory, s.model, s.title
-				 FROM message_nodes m
-				 LEFT JOIN sessions s ON s.id = m.session_id
-				 WHERE m.created_at >= ?
-				   AND json_extract(m.chat_message, '$.role') = 'assistant'`,
-			)
-			.all(Math.floor(cutoffMs / 1000)) as DevinMessageRow[];
-		devinRowsToEntries(rows, cutoffMs, out, sessionLabels);
+		const conn = new Database(dbPath, { readonly: true, fileMustExist: true });
+		db = conn;
+		// `chat_message` holds the full reply text and can total gigabytes, so
+		// only the usage fields leave SQLite, one row at a time.
+		const rows = conn.prepare(
+			`SELECT m.session_id, m.created_at,
+			        json_object(
+			          'message_id', json_extract(m.chat_message, '$.message_id'),
+			          'role', 'assistant',
+			          'metadata', json_object(
+			            'request_id', json_extract(m.chat_message, '$.metadata.request_id'),
+			            'generation_model', json_extract(m.chat_message, '$.metadata.generation_model'),
+			            'created_at', json_extract(m.chat_message, '$.metadata.created_at'),
+			            'metrics', json(json_extract(m.chat_message, '$.metadata.metrics'))
+			          )
+			        ) AS chat_message,
+			        s.working_directory, s.model, NULL AS title
+			 FROM message_nodes m
+			 LEFT JOIN sessions s ON s.id = m.session_id
+			 WHERE m.rowid > ? AND m.rowid <= ?
+			   AND m.created_at >= ?
+			   AND json_extract(m.chat_message, '$.role') = 'assistant'
+			   AND json_type(m.chat_message, '$.metadata.metrics') = 'object'`,
+		);
+		const entries = readAppendOnly({
+			db: conn,
+			dbPath,
+			table: "message_nodes",
+			stateKey: `devin:${dbPath}`,
+			cutoffMs,
+			states,
+			readRows: (afterRowId, upToRowId, into, seen) =>
+				devinRowsToEntries(
+					rows.iterate(
+						afterRowId,
+						upToRowId,
+						Math.floor(cutoffMs / 1000),
+					) as Iterable<DevinMessageRow>,
+					cutoffMs,
+					into,
+					undefined,
+					seen,
+				),
+		});
+		for (const entry of entries) out.push(entry);
+		setSessionLabels(
+			() =>
+				conn
+					.prepare(
+						`SELECT id, substr(title, 1, ${MAX_SQL_TEXT_LENGTH}) AS title FROM sessions`,
+					)
+					.all() as Array<{ id: string; title: string | null }>,
+			entries,
+			sessionLabels,
+		);
 		return 1;
 	} catch {
 		return 0;

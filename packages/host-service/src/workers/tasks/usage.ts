@@ -1,6 +1,5 @@
-// usage/* worker tasks. History computation walks and parses multi-GB
-// transcript trees (~/.claude/projects, $CODEX_HOME/sessions), so both the
-// I/O and the JSON.parse work must stay off the host-service event loop.
+// usage/* worker tasks. They run in the usage worker (usage-worker-pool.ts),
+// which keeps the usage index warm between requests.
 
 import type {
 	CwdLabel,
@@ -9,6 +8,7 @@ import type {
 import { computeUsageHistory } from "../../trpc/router/usage/history/aggregate.ts";
 import type { LeaderboardPayload } from "../../trpc/router/usage/history/leaderboard-days.ts";
 import { computeLeaderboardPayload } from "../../trpc/router/usage/history/leaderboard-days.ts";
+import { collectFromIndex } from "../../trpc/router/usage/history/usage-index.ts";
 import { defineWorkerTask } from "../define-worker-task.ts";
 
 export const usageHistoryTask = defineWorkerTask<
@@ -16,7 +16,8 @@ export const usageHistoryTask = defineWorkerTask<
 	UsageHistory
 >({
 	type: "usage/history",
-	handler: ({ days, cwdLabels }) => computeUsageHistory(days, cwdLabels),
+	handler: ({ days, cwdLabels }) =>
+		computeUsageHistory(days, cwdLabels, collectFromIndex),
 });
 
 export const leaderboardPayloadTask = defineWorkerTask<
@@ -25,7 +26,12 @@ export const leaderboardPayloadTask = defineWorkerTask<
 >({
 	type: "usage/leaderboard-payload",
 	handler: ({ days, nowMs, agentPrsByDay }) =>
-		computeLeaderboardPayload(days, agentPrsByDay, new Date(nowMs)),
+		computeLeaderboardPayload(
+			days,
+			agentPrsByDay,
+			new Date(nowMs),
+			collectFromIndex,
+		),
 });
 
 export const usageTasks = [usageHistoryTask, leaderboardPayloadTask];

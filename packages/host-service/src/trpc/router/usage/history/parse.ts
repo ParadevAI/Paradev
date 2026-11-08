@@ -15,8 +15,10 @@
  */
 
 import { createReadStream } from "node:fs";
+import { open } from "node:fs/promises";
 import { basename } from "node:path";
 import type { UsageAgent } from "../types";
+import type { LineParser } from "./line-cache";
 import type { LogFile } from "./logs";
 
 export interface UsageLogEntry {
@@ -73,52 +75,93 @@ export function toSessionLabel(text: unknown): string | null {
  * iteration, so it took the worker thread down and hung the inline retry. */
 export const MAX_LINE_LENGTH = 32 * 1024 * 1024;
 
-/** Calls `onLine` for every `\n`-terminated line of a UTF-8 file (a trailing
- * `\r` is stripped). A line longer than MAX_LINE_LENGTH is skipped and the
- * file continues at the next newline. */
-export async function forEachLine(
+interface LineReadResult {
+	/** Byte offset just past the last `\n` read. */
+	end: number;
+	/** An unterminated last line was handed to `onLine`; a later append may
+	 * extend it, so resuming from `end` would read it twice. */
+	partialTail: boolean;
+}
+
+/** Calls `onLine` for each line from byte `start` on, skipping lines past
+ * MAX_LINE_LENGTH bytes. Returns null when the file is unreadable. */
+export async function readLinesFrom(
 	path: string,
+	start: number,
 	onLine: (line: string) => void,
-): Promise<void> {
-	let pending = "";
+): Promise<LineReadResult | null> {
+	let pending: Buffer[] = [];
+	let pendingLength = 0;
 	let skipping = false;
-	const emit = (raw: string) => {
-		// Strip the CR before measuring so LF and CRLF files share one bound.
-		const line = raw.endsWith("\r") ? raw.slice(0, -1) : raw;
-		if (line.length <= MAX_LINE_LENGTH) onLine(line);
+	let chunkBase = start;
+	let end = start;
+	const emit = (raw: Buffer) => {
+		const line =
+			raw.length > 0 && raw[raw.length - 1] === 0x0d
+				? raw.subarray(0, -1)
+				: raw;
+		if (line.length <= MAX_LINE_LENGTH) onLine(line.toString("utf-8"));
 	};
 	try {
-		const chunks = createReadStream(path, {
-			encoding: "utf-8",
-		}) as AsyncIterable<string>;
+		const chunks = createReadStream(path, { start }) as AsyncIterable<Buffer>;
 		for await (const chunk of chunks) {
-			let start = 0;
+			let lineStart = 0;
 			for (
-				let end = chunk.indexOf("\n");
-				end !== -1;
-				end = chunk.indexOf("\n", start)
+				let newline = chunk.indexOf(0x0a);
+				newline !== -1;
+				newline = chunk.indexOf(0x0a, lineStart)
 			) {
 				if (skipping) {
 					skipping = false;
 				} else {
-					const line = pending + chunk.slice(start, end);
-					pending = "";
-					emit(line);
+					const piece = chunk.subarray(lineStart, newline);
+					emit(pendingLength > 0 ? Buffer.concat([...pending, piece]) : piece);
+					pending = [];
+					pendingLength = 0;
 				}
-				start = end + 1;
+				lineStart = newline + 1;
+				end = chunkBase + lineStart;
 			}
+			chunkBase += chunk.length;
 			if (skipping) continue;
-			pending += chunk.slice(start);
-			if (pending.length > MAX_LINE_LENGTH) {
-				pending = "";
+			const rest = chunk.subarray(lineStart);
+			pending.push(rest);
+			pendingLength += rest.length;
+			if (pendingLength > MAX_LINE_LENGTH) {
+				pending = [];
+				pendingLength = 0;
 				skipping = true;
 			}
 		}
-		if (!skipping && pending) emit(pending);
 	} catch {
-		// Unreadable or vanished mid-scan — skip the file.
+		return null;
+	}
+	const partialTail = !skipping && pendingLength > 0;
+	if (partialTail) emit(Buffer.concat(pending));
+	return { end, partialTail };
+}
+
+/** Parses a whole-file JSON document, or returns null when the file is
+ * missing, malformed, or larger than `maxBytes`. */
+export async function readJsonFile(
+	path: string,
+	maxBytes: number = MAX_LINE_LENGTH,
+): Promise<unknown> {
+	let file: Awaited<ReturnType<typeof open>> | null = null;
+	try {
+		file = await open(path, "r");
+		if ((await file.stat()).size > maxBytes) return null;
+		return JSON.parse(await file.readFile("utf-8"));
+	} catch {
+		return null;
+	} finally {
+		await file?.close();
 	}
 }
+
+/** Longest free-text column (title, summary) read out of an agent's SQLite
+ * store; labels are cut to SESSION_LABEL_MAX for display anyway. */
+export const MAX_SQL_TEXT_LENGTH = 1024;
 
 export function num(value: unknown): number {
 	// Clamp negatives — a corrupt count must not subtract from totals.
@@ -165,9 +208,17 @@ interface ClaudeLine {
 	};
 }
 
+export interface ClaudeFileResult {
+	/** Last entry per `message.id + requestId`, in first-seen order. */
+	byMessage: Record<string, UsageLogEntry>;
+	/** Entries without an id, which cannot be deduped. */
+	unkeyed: UsageLogEntry[];
+	label: string | null;
+}
+
 /**
- * Parses `~/.claude/projects/<encoded-cwd>/*.jsonl`. `entriesByMessage` is
- * shared across all files so resumed/forked sessions dedupe globally.
+ * Parses `~/.claude/projects/<encoded-cwd>/*.jsonl`. The caller merges each
+ * file's `byMessage` into one map so resumed/forked sessions dedupe globally.
  *
  * Dedupe keeps the LAST occurrence per `message.id + requestId`: Claude Code
  * writes one assistant line per content block with a usage snapshot that
@@ -175,16 +226,13 @@ interface ClaudeLine {
  * complete usage (verified token-exact against ccusage; first-wins
  * undercounts output ~10%).
  */
-export async function parseClaudeLogFile(
+export function claudeFileParser(
 	file: LogFile,
-	entriesByMessage: Map<string, UsageLogEntry>,
-	cutoffMs: number,
-	out: UsageLogEntry[],
-	sessionLabels?: Map<string, string>,
-): Promise<void> {
+	state: ClaudeFileResult = { byMessage: {}, unkeyed: [], label: null },
+): LineParser<ClaudeFileResult, ClaudeFileResult> {
 	const sessionId = sessionIdForFile(file.path);
-	await forEachLine(file.path, (line) => {
-		const wantLabel = sessionLabels ? !sessionLabels.has(sessionId) : false;
+	const onLine = (line: string) => {
+		const wantLabel = state.label === null;
 		if (
 			!line.includes('"assistant"') &&
 			!(wantLabel && line.includes('"user"'))
@@ -203,8 +251,7 @@ export async function parseClaudeLogFile(
 				typeof content === "string"
 					? content
 					: content?.find((block) => block.type === "text")?.text;
-			const label = toSessionLabel(text);
-			if (label) sessionLabels?.set(sessionId, label);
+			state.label = toSessionLabel(text);
 		}
 		if (parsed.type !== "assistant") return;
 		const usage = parsed.message?.usage;
@@ -212,7 +259,6 @@ export async function parseClaudeLogFile(
 		if (!usage || !model || model === "<synthetic>") return;
 
 		const timestampMs = entryTimestamp(parsed.timestamp, file.mtimeMs);
-		if (timestampMs < cutoffMs) return;
 
 		const cacheWriteTotal = num(usage.cache_creation_input_tokens);
 		const write5m = num(usage.cache_creation?.ephemeral_5m_input_tokens);
@@ -235,11 +281,12 @@ export async function parseClaudeLogFile(
 
 		const dedupeKey = `${parsed.message?.id ?? ""}|${parsed.requestId ?? ""}`;
 		if (dedupeKey === "|") {
-			out.push(entry);
+			state.unkeyed.push(entry);
 		} else {
-			entriesByMessage.set(dedupeKey, entry);
+			state.byMessage[dedupeKey] = entry;
 		}
-	});
+	};
+	return { state, onLine, result: () => state };
 }
 
 interface CodexLine {
@@ -262,23 +309,60 @@ interface CodexLine {
 	};
 }
 
-/** Parses `$CODEX_HOME/sessions/**\/*.jsonl` rollout files. */
-export async function parseCodexLogFile(
-	file: LogFile,
+export interface SessionFileResult {
+	entries: UsageLogEntry[];
+	label: string | null;
+}
+
+/** The first label found for a session wins. */
+export function rememberLabel(
+	sessionLabels: Map<string, string> | undefined,
+	sessionId: string,
+	label: string | null | undefined,
+): void {
+	if (label && sessionLabels && !sessionLabels.has(sessionId)) {
+		sessionLabels.set(sessionId, label);
+	}
+}
+
+/** Adds one session file's entries inside the window. */
+export function appendSessionFile(
+	{ entries, label }: SessionFileResult,
+	sessionId: string,
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
-): Promise<void> {
-	const sessionId = sessionIdForFile(file.path);
-	let currentModel: string | null = null;
-	let currentCwd: string | null = null;
+): void {
+	for (const entry of entries) {
+		if (entry.timestampMs >= cutoffMs) out.push(entry);
+	}
+	rememberLabel(sessionLabels, sessionId, label);
+}
+
+export interface CodexFileState extends SessionFileResult {
+	currentModel: string | null;
+	currentCwd: string | null;
 	// Codex occasionally re-emits the same token_count event back-to-back;
 	// skipping consecutive identical deltas brings summed deltas within ~1%
 	// of the session's own cumulative total_token_usage counter.
-	let previousDeltaSignature: string | null = null;
+	previousDeltaSignature: string | null;
+}
 
-	await forEachLine(file.path, (line) => {
-		const wantLabel = sessionLabels ? !sessionLabels.has(sessionId) : false;
+/** Parses `$CODEX_HOME/sessions/**\/*.jsonl` rollout files. */
+export function codexFileParser(
+	file: LogFile,
+	state: CodexFileState = {
+		entries: [],
+		label: null,
+		currentModel: null,
+		currentCwd: null,
+		previousDeltaSignature: null,
+	},
+): LineParser<SessionFileResult, CodexFileState> {
+	const sessionId = sessionIdForFile(file.path);
+
+	const onLine = (line: string) => {
+		const wantLabel = state.label === null;
 		const isContext =
 			line.includes('"turn_context"') || line.includes('"session_meta"');
 		if (
@@ -296,17 +380,16 @@ export async function parseCodexLogFile(
 		}
 
 		if (wantLabel && parsed.payload?.type === "user_message") {
-			const label = toSessionLabel(parsed.payload.message);
-			if (label) sessionLabels?.set(sessionId, label);
+			state.label = toSessionLabel(parsed.payload.message);
 			return;
 		}
 
 		if (parsed.type === "turn_context" || parsed.type === "session_meta") {
 			if (typeof parsed.payload?.model === "string") {
-				currentModel = parsed.payload.model;
+				state.currentModel = parsed.payload.model;
 			}
 			if (typeof parsed.payload?.cwd === "string") {
-				currentCwd = parsed.payload.cwd;
+				state.currentCwd = parsed.payload.cwd;
 			}
 			return;
 		}
@@ -316,19 +399,17 @@ export async function parseCodexLogFile(
 		if (!usage) return;
 
 		const signature = JSON.stringify(usage);
-		if (signature === previousDeltaSignature) return;
-		previousDeltaSignature = signature;
+		if (signature === state.previousDeltaSignature) return;
+		state.previousDeltaSignature = signature;
 
 		const timestampMs = entryTimestamp(parsed.timestamp, file.mtimeMs);
-		if (timestampMs < cutoffMs) return;
-
 		const input = num(usage.input_tokens);
 		const cached = num(usage.cached_input_tokens);
-		out.push({
+		state.entries.push({
 			agent: "codex",
-			model: currentModel ?? "unknown",
+			model: state.currentModel ?? "unknown",
 			timestampMs,
-			cwd: currentCwd,
+			cwd: state.currentCwd,
 			sessionId,
 			// OpenAI's input_tokens includes cached tokens; split them out.
 			uncachedInput: Math.max(0, input - cached),
@@ -338,5 +419,6 @@ export async function parseCodexLogFile(
 			output: num(usage.output_tokens),
 			reasoningOutput: num(usage.reasoning_output_tokens),
 		});
-	});
+	};
+	return { state, onLine, result: () => state };
 }

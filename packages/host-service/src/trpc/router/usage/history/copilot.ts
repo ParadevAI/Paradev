@@ -9,7 +9,12 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import { type CopilotUsageRow, copilotRowsToEntries } from "./copilot-rows";
-import type { UsageLogEntry } from "./parse";
+import { MAX_SQL_TEXT_LENGTH, type UsageLogEntry } from "./parse";
+import {
+	readAppendOnly,
+	type SqliteStates,
+	setSessionLabels,
+} from "./sqlite-tail";
 
 export { type CopilotUsageRow, copilotRowsToEntries } from "./copilot-rows";
 
@@ -23,21 +28,50 @@ export function collectCopilotEntries(
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	dbPath: string = copilotDbPath(),
+	states?: SqliteStates,
 ): number {
 	let db: InstanceType<typeof Database> | null = null;
 	try {
-		db = new Database(dbPath, { readonly: true, fileMustExist: true });
-		const rows = db
-			.prepare(
-				`SELECT e.session_id, e.model, e.input_tokens, e.output_tokens,
-				        e.cache_read_tokens, e.cache_write_tokens, e.reasoning_tokens,
-				        e.created_at, s.cwd, s.summary
-				 FROM assistant_usage_events e
-				 LEFT JOIN sessions s ON s.id = e.session_id
-				 WHERE e.created_at >= datetime(? / 1000, 'unixepoch')`,
-			)
-			.all(cutoffMs) as CopilotUsageRow[];
-		copilotRowsToEntries(rows, cutoffMs, out, sessionLabels);
+		const conn = new Database(dbPath, { readonly: true, fileMustExist: true });
+		db = conn;
+		const rows = conn.prepare(
+			`SELECT e.session_id, e.model, e.input_tokens, e.output_tokens,
+			        e.cache_read_tokens, e.cache_write_tokens, e.reasoning_tokens,
+			        e.created_at, s.cwd, NULL AS summary
+			 FROM assistant_usage_events e
+			 LEFT JOIN sessions s ON s.id = e.session_id
+			 WHERE e.rowid > ? AND e.rowid <= ?
+			   AND e.created_at >= datetime(? / 1000, 'unixepoch')`,
+		);
+		const entries = readAppendOnly({
+			db: conn,
+			dbPath,
+			table: "assistant_usage_events",
+			stateKey: `copilot:${dbPath}`,
+			cutoffMs,
+			states,
+			readRows: (afterRowId, upToRowId, into) =>
+				copilotRowsToEntries(
+					rows.iterate(
+						afterRowId,
+						upToRowId,
+						cutoffMs,
+					) as Iterable<CopilotUsageRow>,
+					cutoffMs,
+					into,
+				),
+		});
+		for (const entry of entries) out.push(entry);
+		setSessionLabels(
+			() =>
+				conn
+					.prepare(
+						`SELECT id, substr(summary, 1, ${MAX_SQL_TEXT_LENGTH}) AS title FROM sessions`,
+					)
+					.all() as Array<{ id: string; title: string | null }>,
+			entries,
+			sessionLabels,
+		);
 		return 1;
 	} catch {
 		return 0;

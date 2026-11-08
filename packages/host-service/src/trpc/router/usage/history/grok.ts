@@ -7,11 +7,12 @@
  * (`$GROK_HOME/sessions/<encoded-cwd>/<sid>/summary.json`), joined by sid.
  */
 
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { UsageLogEntry } from "./parse";
-import { entryTimestamp, forEachLine, num } from "./parse";
+import { entryTimestamp, num, readJsonFile } from "./parse";
 
 export function grokHomes(): string[] {
 	const homes = new Set<string>([join(homedir(), ".grok")]);
@@ -76,17 +77,15 @@ async function indexGrokSessions(
 		for (const sid of sids) {
 			if (++visited > MAX_SESSION_DIRS) return meta;
 			if (!wantedSids.has(sid) || meta.has(sid)) continue;
-			try {
-				const raw = await readFile(
-					join(sessionsDir, group, sid, "summary.json"),
-					"utf-8",
-				);
-				const summary = JSON.parse(raw) as {
-					info?: { cwd?: string };
-					current_model_id?: string;
-					session_summary?: string;
-					generated_title?: string;
-				};
+			const summary = (await readJsonFile(
+				join(sessionsDir, group, sid, "summary.json"),
+			)) as {
+				info?: { cwd?: string };
+				current_model_id?: string;
+				session_summary?: string;
+				generated_title?: string;
+			} | null;
+			if (summary) {
 				meta.set(sid, {
 					model:
 						typeof summary.current_model_id === "string"
@@ -95,38 +94,22 @@ async function indexGrokSessions(
 					cwd: typeof summary.info?.cwd === "string" ? summary.info.cwd : null,
 					label: summary.session_summary || summary.generated_title || null,
 				});
-			} catch {
-				// Missing/corrupt summary — the entries still count, unattributed.
 			}
 		}
 	}
 	return meta;
 }
 
-/**
- * Collects grok entries from one home. Returns the number of log files
- * scanned (0 or 1 per home).
- */
-export async function collectGrokEntries(
-	home: string,
-	cutoffMs: number,
-	out: UsageLogEntry[],
-	sessionLabels?: Map<string, string>,
-): Promise<number> {
-	const logPath = join(home, "logs", "unified.jsonl");
-	let mtimeMs: number;
-	try {
-		mtimeMs = (await stat(logPath)).mtimeMs;
-	} catch {
-		return 0;
-	}
+interface GrokPendingEntry {
+	sid: string;
+	entry: UsageLogEntry;
+}
 
-	interface PendingEntry {
-		sid: string;
-		entry: UsageLogEntry;
-	}
-	const pending: PendingEntry[] = [];
-	await forEachLine(logPath, (line) => {
+function grokLogParser(
+	mtimeMs: number,
+	pending: GrokPendingEntry[] = [],
+): LineParser<GrokPendingEntry[], GrokPendingEntry[]> {
+	const onLine = (line: string) => {
 		if (!line.includes('"shell.turn.inference_done"')) return;
 		let parsed: GrokUnifiedLine;
 		try {
@@ -139,7 +122,6 @@ export async function collectGrokEntries(
 		const sid = typeof parsed.sid === "string" ? parsed.sid : "";
 		if (!ctx || !sid) return;
 		const timestampMs = entryTimestamp(parsed.ts, mtimeMs);
-		if (timestampMs < cutoffMs) return;
 
 		// xAI's API is OpenAI-compatible: prompt_tokens INCLUDES cached tokens.
 		const prompt = num(ctx.prompt_tokens);
@@ -161,19 +143,46 @@ export async function collectGrokEntries(
 				reasoningOutput: num(ctx.reasoning_tokens),
 			},
 		});
-	});
+	};
+	return { state: pending, onLine, result: () => pending };
+}
+
+/**
+ * Collects grok entries from one home. Returns the number of log files
+ * scanned (0 or 1 per home).
+ */
+export async function collectGrokEntries(
+	home: string,
+	cutoffMs: number,
+	out: UsageLogEntry[],
+	sessionLabels?: Map<string, string>,
+	parseLines: ParseLines = parseWholeFile,
+): Promise<number> {
+	const logPath = join(home, "logs", "unified.jsonl");
+	let mtimeMs: number;
+	try {
+		mtimeMs = (await stat(logPath)).mtimeMs;
+	} catch {
+		return 0;
+	}
+
+	const pending = (
+		await parseLines("grok", logPath, (state?: GrokPendingEntry[]) =>
+			grokLogParser(mtimeMs, state),
+		)
+	).filter(({ entry }) => entry.timestampMs >= cutoffMs);
 	if (pending.length === 0) return 1;
 
 	const wanted = new Set(pending.map(({ sid }) => sid));
 	const sessions = await indexGrokSessions(home, wanted);
 	for (const { sid, entry } of pending) {
 		const meta = sessions.get(sid);
-		if (meta) {
-			if (meta.model) entry.model = meta.model;
-			entry.cwd = meta.cwd;
-			if (meta.label) sessionLabels?.set(sid, meta.label);
+		if (!meta) {
+			out.push(entry);
+			continue;
 		}
-		out.push(entry);
+		if (meta.label) sessionLabels?.set(sid, meta.label);
+		out.push({ ...entry, model: meta.model ?? entry.model, cwd: meta.cwd });
 	}
 	return 1;
 }
