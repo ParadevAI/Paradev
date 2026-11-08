@@ -10,8 +10,9 @@ import {
 	leaderboardPayloadTask,
 	usageHistoryTask,
 } from "../../../workers/tasks/usage";
+import { getUsageWorkerPool } from "../../../workers/usage-worker-pool";
 import { protectedProcedure, queryProcedure, router } from "../../index";
-import { offLoop } from "../../off-loop";
+import { createOffLoop } from "../../off-loop";
 import {
 	provisionClaudeAccount,
 	provisionCodexAccount,
@@ -79,6 +80,8 @@ function getQuota(forceRefresh: boolean): Promise<UsageAccount[]> {
 	});
 	return promise;
 }
+
+const usageOffLoop = createOffLoop(getUsageWorkerPool);
 
 export const leaderboardPayloadInput = z.object({
 	days: z.number().int().min(1).max(MAX_BACKFILL_DAYS),
@@ -319,15 +322,15 @@ export const usageRouter = router({
 
 	/**
 	 * Token/cost history estimated from the agents' own transcript logs,
-	 * priced at API list rates. Runs in the worker pool — the transcript
-	 * trees reach multiple GB. Coalesced per window so concurrent callers
-	 * (and the renderer's poll) share one scan.
+	 * priced at API list rates. Served by the usage worker's index, which
+	 * reads only what changed since its last scan. Coalesced per window so
+	 * concurrent callers (and the renderer's poll) share one read.
 	 */
 	history: queryProcedure
 		.meta({ timeoutMs: 120_000 })
 		.input(z.object({ days: z.number().int().min(1).max(90) }))
 		.query(
-			offLoop({
+			usageOffLoop({
 				task: usageHistoryTask,
 				// Workspace/project rows from host.db let the worker attribute
 				// transcript cwds to real workspaces instead of guessing from
@@ -389,7 +392,7 @@ export const usageRouter = router({
 		.meta({ timeoutMs: 120_000 })
 		.input(leaderboardPayloadInput)
 		.query(
-			offLoop({
+			usageOffLoop({
 				task: leaderboardPayloadTask,
 				prepare: ({ ctx, input }) => {
 					const nowMs = Date.now();
