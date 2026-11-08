@@ -3,7 +3,8 @@
 // host-service event loop. Credential env is resolved in-process (it needs
 // the credential provider) and crosses as plain data.
 
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { dirname } from "node:path";
 import {
 	detectExternalWorktrees,
@@ -353,8 +354,17 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		gitEnv: GitTaskEnv;
 		/** false lets git refuse a worktree with uncommitted changes. */
 		force?: boolean;
+		/**
+		 * Confirmed safe by the caller (the destroy saga) against
+		 * `isInsideProjectWorktreesRoot` before it is set. When true, the
+		 * handler deletes the directory with the native recursive rm *before*
+		 * asking git to unregister; when false it leaves removal to git and
+		 * the caller's own guarded fallback. Never set from inside the worker —
+		 * the worker has no project root knowledge.
+		 */
+		nativeRm?: boolean;
 	},
-	{ stillRegistered: boolean; removeError?: string }
+	{ stillRegistered: boolean; removeError?: string; wasRegistered: boolean }
 >({
 	type: "git/removeWorktree",
 	// This task outlives its caller's budget in the field (HOST-SERVICE-17,
@@ -362,7 +372,7 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 	// for unrelated reasons, so each announces itself before starting and the
 	// pool names the last one in the timeout error.
 	handler: async (
-		{ repoPath, worktreePath, gitEnv, force = true },
+		{ repoPath, worktreePath, gitEnv, force = true, nativeRm },
 		reportPhase,
 	) => {
 		// Labelled from the first statement so every moment of the handler
@@ -374,6 +384,61 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// (macOS `/var` → `/private/var`) still matches its registration.
 		// `realpathSync.native` is a blocking syscall, hence its own phase.
 		const target = normalizeWorktreePath(worktreePath);
+		// #6887: when the caller has confirmed the path sits inside the managed
+		// worktrees root (`nativeRm`), delete the directory with the native
+		// recursive rm *before* asking git to unregister. git's
+		// remove_dir_recursively is a single-threaded walk that cannot finish a
+		// node_modules-heavy worktree (161k+ entries, pnpm hardlinks) inside
+		// the 120 s task budget — the delete times out with the worktree still
+		// in PROCESSING. The node rm is several times faster, `force` makes a
+		// missing or concurrently-cleaned path a no-op, and once the tree is
+		// gone the `worktree remove` below is near-instant (it only drops the
+		// registry entry). This also shrinks the #6730 surface: git no longer
+		// owns a walk that can fail mid-way and unregister while leaving an
+		// orphaned folder.
+		// Why files can be left behind, whichever step failed. Declared before
+		// the native delete because that step can fail on its own.
+		let removeError: string | undefined;
+		// #6887 review: the native delete must never touch a directory git does
+		// not list as a worktree of this repo. The caller proves only that the
+		// stored path sits inside the managed root, so a stale row can point at
+		// any in-root folder — another workspace's worktree, a user directory —
+		// and deleting that before git has a say destroys work it never owned.
+		// The registry is asked first, on the same resolved `target` the delete
+		// and `worktree remove` then use: a symlink swapped in after the caller's
+		// containment check resolves outside the registration and is skipped.
+		reportPhase?.("worktree-list");
+		const registeredBefore = parseWorktreeList(
+			await git.raw(["worktree", "list", "--porcelain"]),
+		).some(
+			(w) =>
+				normalizeWorktreePath(w.path) === target &&
+				normalizeWorktreePath(w.path) !== normalizeWorktreePath(repoPath),
+		);
+		if (nativeRm && force && registeredBefore) {
+			// Only run the native delete when the caller asks for a forced
+			// removal: with `force: false` git's own `worktree remove` is
+			// supposed to refuse a dirty worktree, and deleting the tree here
+			// first would silently skip that documented safety check.
+			reportPhase?.("delete-files");
+			// The native delete must not take the whole task down with it: an
+			// EPERM/EBUSY (antivirus, a file still open, a synced folder) would
+			// otherwise reject the handler here, before git ever unregisters, and
+			// the caller would report a removal failure for a worktree git could
+			// still have dropped from its registry. Recorded into the same
+			// `removeError` the git step below uses, so the caller sees which
+			// step failed and its own guarded fallback still owns the disk
+			// recheck (#6887 review).
+			try {
+				await rm(target, { recursive: true, force: true, maxRetries: 3 });
+			} catch (err) {
+				removeError = (err instanceof Error ? err.message : String(err)).trim();
+				console.warn("[git/removeWorktree] native rm failed", {
+					target,
+					error: removeError,
+				});
+			}
+		}
 		// The registry read below decides "registered or not" (the command's
 		// exit text is locale- and version-dependent), but registration is
 		// not the whole story: git can unregister the worktree and still fail
@@ -383,7 +448,6 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 		// worktree whose directory is already gone, so no separate prune
 		// (which would clobber other stale worktrees' metadata) is needed.
 		reportPhase?.("worktree-remove");
-		let removeError: string | undefined;
 		await git
 			.raw(
 				force
@@ -391,7 +455,13 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 					: ["worktree", "remove", target],
 			)
 			.catch((err: unknown) => {
-				removeError = (err instanceof Error ? err.message : String(err)).trim();
+				const gitError = (
+					err instanceof Error ? err.message : String(err)
+				).trim();
+				// Both failures are worth keeping: the native rm's EPERM/EBUSY
+				// names the files that were left behind, git's message says
+				// whether the registration went away (#6887 review).
+				removeError = removeError ? `${removeError}; ${gitError}` : gitError;
 				console.warn("[git/removeWorktree] git worktree remove failed", {
 					target,
 					error: removeError,
@@ -406,6 +476,7 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 				(w) => normalizeWorktreePath(w.path) === target,
 			),
 			removeError,
+			wasRegistered: registeredBefore,
 		};
 	},
 });
