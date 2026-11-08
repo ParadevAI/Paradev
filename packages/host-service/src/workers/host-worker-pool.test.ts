@@ -312,19 +312,30 @@ describe("HostWorkerPool", () => {
 	});
 
 	test("without inline fallback a worker that crashes while idle still pauses the pool", async () => {
+		let pauses = 0;
 		const pool = makePool({
 			scriptPathResolver: () => CRASH_AFTER_RESULT_WORKER,
-			noInlineFallback: { pauseAfterCrashMs: 60_000 },
+			noInlineFallback: {
+				pauseAfterCrashMs: 60_000,
+				onPause: () => {
+					pauses++;
+				},
+			},
 		});
 		const echo = defineWorkerTask<{ v: number }, number>({
 			type: "test/echo",
 			handler: async ({ v }) => v,
 		});
 		expect(await pool.run(echo, { v: 1 })).toBe(1);
-		await new Promise((resolve) => setTimeout(resolve, 150));
+		// The pool pauses when the worker's exit arrives; wait for that, not a
+		// fixed delay.
+		for (let i = 0; i < 200 && pool.getRunner(); i++) {
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
 		await expect(pool.run(echo, { v: 2 })).rejects.toBeInstanceOf(
 			WorkerPoolUnavailableError,
 		);
+		expect(pauses).toBe(1);
 	});
 
 	test("without inline fallback a missing bundle fails the task", async () => {

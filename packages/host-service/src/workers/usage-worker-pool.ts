@@ -1,3 +1,4 @@
+import { reportUsageWorkerCrash } from "../sentry.ts";
 import { HostWorkerPool } from "./host-worker-pool.ts";
 
 let pool: HostWorkerPool | null = null;
@@ -11,7 +12,10 @@ export function getUsageWorkerPool(): HostWorkerPool {
 		concurrency: 1,
 		idleTimeoutMs: 30 * 60 * 1000,
 		resourceLimits: { maxOldGenerationSizeMb: 1536 },
-		noInlineFallback: { pauseAfterCrashMs: 10 * 60 * 1000 },
+		noInlineFallback: {
+			pauseAfterCrashMs: 10 * 60 * 1000,
+			onPause: reportUsageWorkerCrash,
+		},
 	});
 	return pool;
 }

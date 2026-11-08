@@ -97,6 +97,7 @@ export async function readLinesFrom(
 	let skipping = false;
 	let chunkBase = start;
 	let end = start;
+	let reportedReject = false;
 	const emit = (raw: Buffer) => {
 		const line =
 			raw.length > 0 && raw[raw.length - 1] === 0x0d
@@ -105,8 +106,12 @@ export async function readLinesFrom(
 		if (line.length > MAX_LINE_LENGTH) return;
 		try {
 			onLine(line.toString("utf-8"));
-		} catch {
-			// One line a parser cannot take must not end the file.
+		} catch (error) {
+			// Skip the line, not the file; say so once, so a parser bug shows.
+			if (!reportedReject) {
+				reportedReject = true;
+				console.warn(`[usage] skipped a line in ${path}`, error);
+			}
 		}
 	};
 	try {

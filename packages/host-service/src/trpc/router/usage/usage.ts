@@ -91,7 +91,8 @@ function getQuota(forceRefresh: boolean): Promise<UsageAccount[]> {
 const offUsageWorker = createOffLoop(getUsageWorkerPool);
 
 /** offLoop on the usage worker. A cold index, a crashed worker and a paused
- * pool reach the client as retryable errors, not internal ones. */
+ * pool reach the client as a retryable TIMEOUT. The pool reports crashes to
+ * Sentry itself, since a background scan can crash with no request. */
 function usageOffLoop<TInput, TTaskInput, TResult>(
 	spec: OffLoopSpec<TInput, TTaskInput, TResult>,
 ) {
@@ -113,7 +114,7 @@ function usageOffLoop<TInput, TTaskInput, TResult>(
 				error.name === WORKER_CRASH_ERROR_NAME
 			) {
 				throw new TRPCError({
-					code: "SERVICE_UNAVAILABLE",
+					code: "TIMEOUT",
 					message: "Usage history is paused after a failed scan.",
 					cause: error,
 				});

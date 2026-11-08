@@ -177,18 +177,31 @@ interface CursorUsage {
 	entries: UsageLogEntry[];
 	labels: Map<string, string>;
 	done: Promise<void>;
+	finishedAt?: number;
 }
 
-/** One collection per window and workspace set at a time. */
-const cursorInFlight = new Map<string, CursorUsage>();
+/** Same as the Cursor events cache, so reuse never serves older data. */
+const CURSOR_REUSE_MS = 5 * 60 * 1000;
+/** One collection per window and workspace set, reused while it runs and
+ * for a while after, so a lookup slower than CURSOR_WAIT_MS still lands. */
+const cursorRuns = new Map<string, CursorUsage>();
 
 function cursorUsage(
 	cutoffMs: number,
 	cwdCandidates: readonly string[],
 ): CursorUsage {
-	const key = `${cutoffMs}\u0000${cwdCandidates.join("\u0000")}`;
-	const running = cursorInFlight.get(key);
-	if (running) return running;
+	const now = Date.now();
+	for (const [runKey, run] of cursorRuns) {
+		if (
+			run.finishedAt !== undefined &&
+			now - run.finishedAt >= CURSOR_REUSE_MS
+		) {
+			cursorRuns.delete(runKey);
+		}
+	}
+	const key = `${cutoffMs}\u0000${[...cwdCandidates].sort().join("\u0000")}`;
+	const existing = cursorRuns.get(key);
+	if (existing) return existing;
 	const usage: CursorUsage = {
 		entries: [],
 		labels: new Map(),
@@ -204,8 +217,8 @@ function cursorUsage(
 			console.warn("[usage-index] Cursor usage unavailable", error);
 		})
 		.finally(() => {
-			cursorInFlight.delete(key);
+			usage.finishedAt = Date.now();
 		});
-	cursorInFlight.set(key, usage);
+	cursorRuns.set(key, usage);
 	return usage;
 }

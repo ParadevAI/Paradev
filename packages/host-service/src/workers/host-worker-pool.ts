@@ -155,7 +155,10 @@ export interface HostWorkerPoolOptions {
 	resourceLimits?: ResourceLimits;
 	/** Never run a task on the main thread: with no worker the task fails,
 	 * and a worker crash pauses the pool for `pauseAfterCrashMs`. */
-	noInlineFallback?: { pauseAfterCrashMs: number };
+	noInlineFallback?: {
+		pauseAfterCrashMs: number;
+		onPause?: (error: WorkerTaskError) => void;
+	};
 }
 
 export class HostWorkerPool {
@@ -177,6 +180,7 @@ export class HostWorkerPool {
 	private readonly name: string;
 	private readonly resourceLimits?: ResourceLimits;
 	private readonly pauseAfterCrashMs: number | null;
+	private readonly onPause?: (error: WorkerTaskError) => void;
 
 	constructor(options?: HostWorkerPoolOptions) {
 		this.scriptPathResolver =
@@ -188,6 +192,7 @@ export class HostWorkerPool {
 		this.resourceLimits = options?.resourceLimits;
 		this.pauseAfterCrashMs =
 			options?.noInlineFallback?.pauseAfterCrashMs ?? null;
+		this.onPause = options?.noInlineFallback?.onPause;
 	}
 
 	/** Exposed for tests. */
@@ -373,6 +378,7 @@ export class HostWorkerPool {
 				console.warn(
 					`[host-worker-pool] ${this.name} crashed — pausing for ${this.pauseAfterCrashMs / 1000}s`,
 				);
+				this.onPause?.(error);
 			}
 			// Do NOT dispose the old runner: dispose() would reject its
 			// outstanding tasks with abort errors that bypass the inline
