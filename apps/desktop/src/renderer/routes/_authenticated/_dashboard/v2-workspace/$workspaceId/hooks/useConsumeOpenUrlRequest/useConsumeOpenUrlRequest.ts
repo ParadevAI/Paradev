@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { ConsumeSearch, PaneTarget } from "../../types";
 import {
 	openUrlInV2Workspace,
@@ -35,12 +36,19 @@ export function useConsumeOpenUrlRequest({
 		if (consumedRef.current.has(key)) return;
 		consumedRef.current.add(key);
 		viewer.reveal();
-		openUrlInV2Workspace({
+		const paneId = openUrlInV2Workspace({
 			store: viewer.store,
 			target: resolvedTarget,
 			url,
 			agent,
 		});
+		if (agent && requestId && paneId) {
+			electronTrpcClient.browser.resolveOpenRequest
+				.mutate({ requestId, paneId })
+				.catch((err) => {
+					console.error("[useConsumeOpenUrlRequest] resolve open failed:", err);
+				});
+		}
 		consumeSearch([
 			"openUrl",
 			"openUrlTarget",

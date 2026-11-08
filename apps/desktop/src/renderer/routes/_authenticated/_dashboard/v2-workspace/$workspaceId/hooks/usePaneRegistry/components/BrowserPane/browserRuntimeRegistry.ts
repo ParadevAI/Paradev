@@ -2,7 +2,7 @@ import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-eviction";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { BROWSER_PARTITION } from "shared/constants";
+import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
 import {
@@ -59,16 +59,14 @@ interface RegistryEntry {
 	placeholder: HTMLElement | null;
 	resizeObserver: ResizeObserver | null;
 	visible: boolean;
-	/** Monotonic use counter; bumped on attach/detach, drives hidden-LRU eviction. */
+	/** Monotonic use counter for hidden-LRU eviction. */
 	lastUsedAt: number;
+	agent: boolean;
 }
 
-/**
- * Cap on hidden (detached) webviews kept alive. Each one is a full guest
- * Chromium process; past the cap the least-recently-visible are destroyed
- * and rebuilt from the pane's persisted URL on next attach. (SUPER-1545)
- */
+// Each hidden webview is a full guest Chromium process. (SUPER-1545)
 const MAX_HIDDEN_WEBVIEWS = 3;
+const MAX_HIDDEN_AGENT_WEBVIEWS = 6;
 
 const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 	currentUrl: "about:blank",
@@ -184,6 +182,10 @@ export class BrowserRuntimeRegistryImpl {
 				// allows (they were exempt while attached) — sweep again.
 				this.scheduleHiddenEviction();
 			},
+		});
+
+		this.ipc.browser.onAgentUse.subscribe(undefined, {
+			onData: ({ paneId }: { paneId: string }) => this.touch(paneId),
 		});
 	}
 
@@ -368,6 +370,7 @@ export class BrowserRuntimeRegistryImpl {
 			resizeObserver: null,
 			visible: false,
 			lastUsedAt: 0,
+			agent: partition === AGENT_BROWSER_PARTITION,
 		};
 
 		const firePersist = () => {
@@ -655,21 +658,27 @@ export class BrowserRuntimeRegistryImpl {
 	}
 
 	private evictExcessHiddenWebviews() {
-		const candidates = Array.from(
-			this.entries.entries(),
-			([paneId, entry]) => ({
-				paneId,
-				runtime: { container: entry.visible ? entry : null },
-				lastUsedAt: entry.lastUsedAt,
-			}),
-		);
-		for (const victim of selectRuntimesToEvict(
-			candidates,
-			MAX_HIDDEN_WEBVIEWS,
-			(candidate) => this.agentActivePaneIds.has(candidate.paneId),
-		)) {
-			this.destroy(victim.paneId);
+		for (const agent of [false, true]) {
+			const candidates = Array.from(this.entries.entries())
+				.filter(([, entry]) => entry.agent === agent)
+				.map(([paneId, entry]) => ({
+					paneId,
+					runtime: { container: entry.visible ? entry : null },
+					lastUsedAt: entry.lastUsedAt,
+				}));
+			for (const victim of selectRuntimesToEvict(
+				candidates,
+				agent ? MAX_HIDDEN_AGENT_WEBVIEWS : MAX_HIDDEN_WEBVIEWS,
+				(candidate) => this.agentActivePaneIds.has(candidate.paneId),
+			)) {
+				this.destroy(victim.paneId);
+			}
 		}
+	}
+
+	private touch(paneId: string): void {
+		const entry = this.entries.get(paneId);
+		if (entry) entry.lastUsedAt = ++this.useSeq;
 	}
 
 	destroy(paneId: string): void {

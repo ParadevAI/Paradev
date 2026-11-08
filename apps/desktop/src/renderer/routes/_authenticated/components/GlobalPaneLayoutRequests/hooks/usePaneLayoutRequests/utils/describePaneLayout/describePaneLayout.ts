@@ -59,6 +59,12 @@ export function describePaneLayout<TData>(
 						title: paneTitle(pane),
 						terminalId: readString(pane.data, "terminalId"),
 						active: id === tab.activePaneId,
+						...(pane.kind === "browser" && {
+							browser: {
+								url: readString(pane.data, "url") ?? "",
+								agent: (pane.data as { agent?: unknown })?.agent === true,
+							},
+						}),
 					},
 				];
 			}),
