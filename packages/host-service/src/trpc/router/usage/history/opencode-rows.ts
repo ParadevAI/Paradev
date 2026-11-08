@@ -61,7 +61,7 @@ export interface OpencodeMessageRow {
 }
 
 export function opencodeRowsToEntries(
-	rows: OpencodeMessageRow[],
+	rows: Iterable<OpencodeMessageRow>,
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
