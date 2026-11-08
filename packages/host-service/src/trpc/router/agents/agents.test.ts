@@ -1206,9 +1206,12 @@ describe("continuationTarget", () => {
 			agentConfigId: "00000000-0000-0000-0000-0000000000c1",
 			attachments: [],
 		});
-		expect(chat("00000000-0000-0000-0000-0000000000c2")?.agentConfigId).toBe(
-			"00000000-0000-0000-0000-0000000000c2",
-		);
+		expect(chat("00000000-0000-0000-0000-0000000000c2")).toEqual({
+			harness: "codex-acp",
+			label: "Codex",
+			agentConfigId: "00000000-0000-0000-0000-0000000000c2",
+			attachments: [],
+		});
 		expect(chat("00000000-0000-0000-0000-0000000000c3")).toBeNull();
 	});
 

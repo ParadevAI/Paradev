@@ -710,8 +710,10 @@ export function chatLaunchTarget(
 /**
  * A custom agent that runs the `claude` or `codex` CLI, typically with its own
  * account env, can chat as that agent. Terminal launches keep its preset.
+ * A chat takes only the config's env: its args and executable path apply to
+ * terminal launches, and the chat runs the CLI the ACP harness resolves.
  */
-function chatLaunchPresetId(
+export function chatLaunchPresetId(
 	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
 ): string {
 	const launchPresetId = resolveAgentLaunchPresetId(

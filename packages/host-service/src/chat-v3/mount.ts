@@ -89,6 +89,8 @@ function harnessRegistry(
 									cwd: options.cwd,
 									workspaceId: options.scopeId,
 									terminalId: options.terminalId,
+									agentConfigId: options.agentConfigId,
+									presetId: "claude",
 								}),
 						});
 						return {
@@ -114,6 +116,8 @@ function harnessRegistry(
 									cwd: options.cwd,
 									workspaceId: options.scopeId,
 									terminalId: options.terminalId,
+									agentConfigId: options.agentConfigId,
+									presetId: "codex",
 								}),
 						});
 						return { command: cli.command, env: cli.env };

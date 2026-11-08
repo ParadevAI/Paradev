@@ -8,6 +8,10 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../db";
 import * as schema from "../db/schema";
 import {
+	resetManagedEnvForTests,
+	setManagedEnv,
+} from "../runtime/sandbox-managed-env";
+import {
 	initTerminalBaseEnv,
 	resetTerminalBaseEnvForTests,
 } from "../terminal/env";
@@ -26,11 +30,14 @@ function createTestDb(): HostDb {
 describe("buildChatAgentEnv", () => {
 	// setDefaultAccountSelection publishes pointer files under SUPERSET_HOME_DIR.
 	let previousHome: string | undefined;
+	let previousRunMode: string | undefined;
 	let home = "";
 	const defaultDir = tmpdir();
 
 	beforeEach(() => {
 		previousHome = process.env.SUPERSET_HOME_DIR;
+		previousRunMode = process.env.SUPERSET_HOST_RUN_MODE;
+		process.env.SUPERSET_HOST_RUN_MODE = "local";
 		home = mkdtempSync(join(tmpdir(), "chat-agent-env-"));
 		process.env.SUPERSET_HOME_DIR = home;
 		initTerminalBaseEnv({ PATH: "/usr/bin", ANTHROPIC_API_KEY: "sk-ambient" });
@@ -39,6 +46,10 @@ describe("buildChatAgentEnv", () => {
 	afterEach(() => {
 		if (previousHome === undefined) delete process.env.SUPERSET_HOME_DIR;
 		else process.env.SUPERSET_HOME_DIR = previousHome;
+		if (previousRunMode === undefined)
+			delete process.env.SUPERSET_HOST_RUN_MODE;
+		else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
+		resetManagedEnvForTests();
 		rmSync(home, { recursive: true, force: true });
 		resetTerminalBaseEnvForTests();
 	});
@@ -63,11 +74,12 @@ describe("buildChatAgentEnv", () => {
 			.run();
 	}
 
-	const build = (db: HostDb, agentConfigId?: string) =>
+	const build = (db: HostDb, agentConfigId?: string, presetId = "claude") =>
 		buildChatAgentEnv({
 			db,
 			cwd: home,
 			workspaceId: "missing-workspace",
+			presetId,
 			...(agentConfigId ? { agentConfigId } : {}),
 		});
 
@@ -93,5 +105,28 @@ describe("buildChatAgentEnv", () => {
 		seed(db);
 		const env = await build(db, "00000000-0000-0000-0000-0000000000ff");
 		expect(env.CLAUDE_CONFIG_DIR).toBe(defaultDir);
+	});
+
+	it("ignores a config that now runs another CLI", async () => {
+		const db = createTestDb();
+		seed(db);
+		const env = await build(db, PERSONAL, "codex");
+		expect(env.CLAUDE_CONFIG_DIR).toBe(defaultDir);
+		expect(env.ANTHROPIC_API_KEY).toBeUndefined();
+	});
+
+	it("drops the sandbox sign-in when the config brings its own key", async () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		await setManagedEnv({});
+		initTerminalBaseEnv({
+			PATH: "/usr/bin",
+			ANTHROPIC_AUTH_TOKEN: "sandbox-token",
+		});
+		const db = createTestDb();
+		seed(db);
+		expect((await build(db)).ANTHROPIC_AUTH_TOKEN).toBe("sandbox-token");
+		const env = await build(db, PERSONAL);
+		expect(env.ANTHROPIC_AUTH_TOKEN).toBeUndefined();
+		expect(env.ANTHROPIC_API_KEY).toBe("sk-own");
 	});
 });

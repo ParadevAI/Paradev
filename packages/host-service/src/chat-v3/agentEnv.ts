@@ -9,6 +9,7 @@ import {
 	agentLaunchEnv,
 	resolveHostAgentConfig,
 } from "../terminal-agents/agent-config";
+import { chatLaunchPresetId } from "../trpc/router/agents/agents";
 import { resolveDefaultAccountTerminalEnv } from "../trpc/router/usage/default-account";
 
 function workspacePaths(
@@ -50,15 +51,32 @@ function withoutAmbientKeys(
 	return rest;
 }
 
-/** The launch env an agent config adds, account dir and keys included. */
+/**
+ * The launch env an agent config adds, account dir and keys included. A config
+ * edited to run another CLI since the chat started adds nothing: its env
+ * belongs to that CLI.
+ */
 function configEnv(
 	db: HostDb,
 	agentConfigId: string | undefined,
+	presetId: string | undefined,
 ): Record<string, string> {
 	const config = agentConfigId
 		? resolveHostAgentConfig(db, agentConfigId)
 		: null;
-	return config ? agentLaunchEnv(db, config) : {};
+	if (!config || !presetId || chatLaunchPresetId(config) !== presetId)
+		return {};
+	return agentLaunchEnv(db, config);
+}
+
+/** A key the config brings replaces both base keys, so a sandbox token cannot win over it. */
+function withoutReplacedKeys(
+	env: Record<string, string>,
+	overlay: Record<string, string>,
+): Record<string, string> {
+	if (!overlay.ANTHROPIC_API_KEY && !overlay.ANTHROPIC_AUTH_TOKEN) return env;
+	const { ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, ...rest } = env;
+	return rest;
 }
 
 /**
@@ -76,20 +94,30 @@ export async function buildChatAgentEnv(options: {
 	workspaceId: string;
 	terminalId?: string;
 	agentConfigId?: string;
+	/** The CLI the chat runs (`claude`, `codex`, …); a config applies only to its own. */
+	presetId?: string;
 }): Promise<Record<string, string>> {
 	await Promise.all([waitForTerminalBaseEnv(), waitForSandboxManagedEnv()]);
 	const paths = workspacePaths(options.db, options.workspaceId);
+	const overlay = configEnv(
+		options.db,
+		options.agentConfigId,
+		options.presetId,
+	);
 	return withSupersetBinFirst({
-		...withoutAmbientKeys({
-			...buildHostLaunchEnv({
-				cwd: options.cwd,
-				workspaceId: options.workspaceId,
-				terminalId: options.terminalId,
-				workspacePath: paths.workspacePath || options.cwd,
-				rootPath: paths.rootPath,
+		...withoutReplacedKeys(
+			withoutAmbientKeys({
+				...buildHostLaunchEnv({
+					cwd: options.cwd,
+					workspaceId: options.workspaceId,
+					terminalId: options.terminalId,
+					workspacePath: paths.workspacePath || options.cwd,
+					rootPath: paths.rootPath,
+				}),
+				...resolveDefaultAccountTerminalEnv(options.db),
 			}),
-			...resolveDefaultAccountTerminalEnv(options.db),
-		}),
-		...configEnv(options.db, options.agentConfigId),
+			overlay,
+		),
+		...overlay,
 	});
 }

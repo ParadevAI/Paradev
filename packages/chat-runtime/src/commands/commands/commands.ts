@@ -263,6 +263,8 @@ export type ResumeSessionInput = Omit<
 	cwd: string;
 	/** The cut-off session this one continues, whose ending it carries over. */
 	replacesSessionId?: string;
+	/** The chat this one continues; its agent config is launched again. */
+	sourceSessionId?: string;
 };
 
 type ResumedChat = {
@@ -433,6 +435,15 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		return { ok: true, snapshot };
 	};
 
+	const sourceAgentConfig = (
+		sourceSessionId: string | undefined,
+	): { agentConfigId?: string } => {
+		const agentConfigId = sourceSessionId
+			? options.sessions.get(sourceSessionId)?.agentConfigId
+			: null;
+		return agentConfigId ? { agentConfigId } : {};
+	};
+
 	const resumedByTerminal = new Map<string, ResumedChat>();
 	const resumedFor = (
 		input: z.output<typeof createSessionCommandSchema>,
@@ -448,10 +459,14 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		}
 		return resumed;
 	};
-	const handOff = (resumed: ResumedChat): CreateSessionResult | null => {
+	const handOff = (
+		resumed: ResumedChat,
+		agentConfigId: string | undefined,
+	): CreateSessionResult | null => {
 		const row = options.sessions.get(resumed.sessionId);
 		const live = options.live.get(resumed.sessionId);
 		if (!row || !live || live.state.status === "dead") return null;
+		if (agentConfigId && row.agentConfigId !== agentConfigId) return null;
 		if (!resumed.pending) resumedByTerminal.delete(resumed.terminalId);
 		return { sessionId: resumed.sessionId, epoch: row.epoch };
 	};
@@ -516,6 +531,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		if (
 			replacedRow?.scopeId === input.scopeId &&
 			replacedRow.harness === input.harness &&
+			replacedRow.harnessSessionId === input.resume.harnessSessionId &&
 			replacedRow.agentConfigId
 		)
 			return replacedRow.agentConfigId;
@@ -533,7 +549,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			const parsed = createSessionCommandSchema.parse(input);
 			return options.dedupe.run(`createSession:${parsed.commandId}`, () => {
 				const resumed = resumedFor(parsed);
-				const handedOff = resumed && handOff(resumed);
+				const handedOff = resumed && handOff(resumed, parsed.agentConfigId);
 				if (handedOff) return handedOff;
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
@@ -613,6 +629,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				scopeId: input.scopeId,
 				cwd: input.cwd,
 				harness: input.harness,
+				...sourceAgentConfig(input.sourceSessionId),
 				...explicitSelections(input),
 				terminalId: input.terminalId,
 				resume: {
@@ -993,6 +1010,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					harness: parsed.harness,
 					scopeId: parsed.scopeId,
 					cwd: parsed.cwd,
+					...(parsed.agentConfigId
+						? { agentConfigId: parsed.agentConfigId }
+						: {}),
 					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
 				}),
 				equivalentPaths(parsed.cwd),

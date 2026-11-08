@@ -59,6 +59,7 @@ export function openEpoch(db: ChatDb, init: ChatSessionInit): OpenedEpoch {
 		epoch,
 		init.status ?? "starting",
 		Date.now(),
+		init.agentConfigId ?? null,
 	);
 	return { epoch, minted: true };
 }

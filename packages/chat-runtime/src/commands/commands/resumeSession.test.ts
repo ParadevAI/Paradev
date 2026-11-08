@@ -340,4 +340,85 @@ describe("the agent config a chat launched with", () => {
 		expect(runtime.sessions.get(sessionId)?.agentConfigId).toBeNull();
 		await runtime.dispose();
 	});
+
+	const open = (
+		runtime: ReturnType<typeof runtimeWithStartedAgents>["runtime"],
+		extra: Partial<Parameters<typeof runtime.commands.createSession>[0]> = {},
+	) =>
+		runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			...extra,
+		});
+
+	test("follows the chat it continues when two chats share an agent session", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const ids: string[] = [];
+		for (const agentConfigId of ["config-a", "config-b"]) {
+			const { sessionId } = open(runtime, { agentConfigId });
+			ids.push(sessionId);
+			await waitFor(() => runtime.live.get(sessionId)?.state.status === "idle");
+			await runtime.commands.closeSession({ sessionId });
+		}
+		const first = ids[0];
+		runtime.commands.resumeSession({
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			harnessSessionId: "agent-1",
+			sourceSessionId: first,
+			cwd: "/tmp/workspace",
+			prompts: [],
+			pausedPrompts: [],
+		});
+		expect(started.at(-1)?.agentConfigId).toBe("config-a");
+		await runtime.dispose();
+	});
+
+	test("is not taken from a replaced chat of another agent session", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const replaced = open(runtime, { agentConfigId: "config-a" });
+		await waitFor(
+			() => runtime.live.get(replaced.sessionId)?.state.status === "idle",
+		);
+		await runtime.commands.closeSession({ sessionId: replaced.sessionId });
+		open(runtime, {
+			resume: {
+				harnessSessionId: "agent-other",
+				replacesSessionId: replaced.sessionId,
+			},
+		});
+		expect(started.at(-1)?.agentConfigId).toBeUndefined();
+		await runtime.dispose();
+	});
+
+	test("keeps a live resumed chat from a pane that asks for another config", async () => {
+		const { runtime } = runtimeWithStartedAgents();
+		const source = open(runtime, { agentConfigId: "config-a" });
+		await waitFor(
+			() => runtime.live.get(source.sessionId)?.state.status === "idle",
+		);
+		await runtime.commands.closeSession({ sessionId: source.sessionId });
+		const resumed = runtime.commands.resumeSession({
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			harnessSessionId: "agent-1",
+			sourceSessionId: source.sessionId,
+			terminalId: "terminal-1",
+			cwd: "/tmp/workspace",
+			prompts: [text("continue")],
+			pausedPrompts: [],
+		});
+		await waitFor(
+			() => runtime.live.get(resumed.sessionId)?.turn?.status === "running",
+		);
+		const other = open(runtime, {
+			terminalId: "terminal-1",
+			agentConfigId: "config-b",
+			resume: { harnessSessionId: "agent-1" },
+		});
+		expect(other.sessionId).not.toBe(resumed.sessionId);
+		await runtime.dispose();
+	});
 });

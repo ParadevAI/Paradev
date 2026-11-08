@@ -68,6 +68,7 @@ describe("resuming chats after an update", () => {
 		expect(resumed).toEqual([
 			{
 				scopeId: "workspace-1",
+				sourceSessionId: "chat-1",
 				harness: "claude-acp",
 				harnessSessionId: "agent-1",
 				terminalId: "terminal-1",
