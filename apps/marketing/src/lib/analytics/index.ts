@@ -36,12 +36,16 @@ export function track(
 ): void {
 	withPosthog((posthog) => posthog.capture(event, properties));
 
-	const googleAdsConversion = GOOGLE_ADS_EVENT_MAP[event];
+	const googleAdsConversion = Object.hasOwn(GOOGLE_ADS_EVENT_MAP, event)
+		? GOOGLE_ADS_EVENT_MAP[event]
+		: undefined;
 	if (googleAdsConversion) {
 		trackGoogleAdsConversion(googleAdsConversion);
 	}
 
-	const redditEvent = REDDIT_EVENT_MAP[event];
+	const redditEvent = Object.hasOwn(REDDIT_EVENT_MAP, event)
+		? REDDIT_EVENT_MAP[event]
+		: undefined;
 	if (redditEvent) {
 		trackReddit(redditEvent, properties);
 	}

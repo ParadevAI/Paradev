@@ -77,4 +77,39 @@ describe("track", () => {
 
 		expect(gtag).not.toHaveBeenCalled();
 	});
+	test("does not send ad pixels when the consent choice can't be read", () => {
+		const gtag = mock();
+		const rdt = mock();
+		const warn = console.warn;
+		console.warn = () => {};
+		globalWithWindow.window = {
+			gtag,
+			rdt,
+			localStorage: {
+				getItem: () => {
+					throw new Error("storage blocked");
+				},
+			},
+		};
+
+		try {
+			track("download_clicked", { source: "conductor" });
+		} finally {
+			console.warn = warn;
+		}
+
+		expect(gtag).not.toHaveBeenCalled();
+		expect(rdt).not.toHaveBeenCalled();
+	});
+
+	test("ignores events named after built-in object properties", () => {
+		const gtag = mock();
+		const rdt = mock();
+		globalWithWindow.window = { gtag, rdt };
+
+		track("toString");
+
+		expect(gtag).not.toHaveBeenCalled();
+		expect(rdt).not.toHaveBeenCalled();
+	});
 });

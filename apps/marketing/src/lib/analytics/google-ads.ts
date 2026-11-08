@@ -1,4 +1,4 @@
-import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
+import { hasDeclinedAnalytics } from "./consent";
 
 declare global {
 	interface Window {
@@ -9,14 +9,6 @@ declare global {
 /** Google Ads "Download click (paradev.com)" conversion action. */
 export const GOOGLE_ADS_DOWNLOAD_CONVERSION =
 	"AW-18209336001/XAEwCNPrxrQdEMHV8epD";
-
-function hasDeclinedAnalytics(): boolean {
-	try {
-		return window.localStorage?.getItem(ANALYTICS_CONSENT_KEY) === "declined";
-	} catch {
-		return false;
-	}
-}
 
 /**
  * Report a conversion to Google Ads through the gtag.js tag loaded in the
