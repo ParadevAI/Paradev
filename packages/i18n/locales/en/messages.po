@@ -1081,6 +1081,9 @@ msgstr "{label} goes back to not set up. Nothing changes inside your workspaces:
 msgid "{label} is set to manual"
 msgstr "{label} is set to manual"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} now runs another CLI, so this chat runs on the default account."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "A channel needs at least one admin"
 
 msgid "A channel with this name already exists"
 msgstr "A channel with this name already exists"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
@@ -19530,6 +19536,9 @@ msgstr "The agent stopped while resuming the conversation."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "The agent this chat started with is no longer available, so it runs on the default account."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "The agent uses its skills and tools. The issue lands in Linear."

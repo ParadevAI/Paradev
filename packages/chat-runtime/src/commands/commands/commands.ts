@@ -102,6 +102,8 @@ export const createSessionCommandSchema = createSessionInputSchema
 		cwd: z.string().min(1),
 		/** Opened by a person, who can answer an approval, so the remembered mode is safe to start in. */
 		interactive: z.boolean().optional(),
+		/** `null` launches on the default account and inherits no config from another chat. */
+		agentConfigId: z.string().min(1).nullable().optional(),
 		resume: z
 			.object({
 				harnessSessionId: z.string().min(1),
@@ -263,6 +265,8 @@ export type ResumeSessionInput = Omit<
 	cwd: string;
 	/** The cut-off session this one continues, whose ending it carries over. */
 	replacesSessionId?: string;
+	/** The chat this one continues; its agent config is launched again. */
+	sourceSessionId?: string;
 };
 
 type ResumedChat = {
@@ -433,6 +437,22 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		return { ok: true, snapshot };
 	};
 
+	/** A source chat on the default account passes `null`, so no other chat's config is inherited. */
+	const sourceAgentConfig = (
+		sourceSessionId: string | undefined,
+	): { agentConfigId?: string | null } => {
+		const source = sourceSessionId
+			? options.sessions.get(sourceSessionId)
+			: null;
+		return source ? { agentConfigId: source.agentConfigId ?? null } : {};
+	};
+	const runsConfig = (
+		sessionId: string,
+		agentConfigId: string | null | undefined,
+	): boolean =>
+		agentConfigId === undefined ||
+		(options.sessions.get(sessionId)?.agentConfigId ?? null) === agentConfigId;
+
 	const resumedByTerminal = new Map<string, ResumedChat>();
 	const resumedFor = (
 		input: z.output<typeof createSessionCommandSchema>,
@@ -503,11 +523,42 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 	};
 
+	/**
+	 * A resumed chat keeps the agent config it ran under, so it reopens on the
+	 * same account even when the caller only names the harness.
+	 */
+	const launchedAgentConfigId = (
+		input: z.output<typeof createSessionCommandSchema>,
+		replacedRow: ChatSessionRow | null,
+	): string | null => {
+		if (input.agentConfigId !== undefined) return input.agentConfigId;
+		if (!input.resume) return null;
+		if (
+			replacedRow?.scopeId === input.scopeId &&
+			replacedRow.harness === input.harness &&
+			replacedRow.harnessSessionId === input.resume.harnessSessionId &&
+			replacedRow.agentConfigId
+		)
+			return replacedRow.agentConfigId;
+		return (
+			options.sessions.findByHarnessSession(
+				input.scopeId,
+				input.harness,
+				input.resume.harnessSessionId,
+			)?.agentConfigId ?? null
+		);
+	};
+
 	return {
 		createSession(input) {
 			const parsed = createSessionCommandSchema.parse(input);
 			return options.dedupe.run(`createSession:${parsed.commandId}`, () => {
-				const resumed = resumedFor(parsed);
+				const pending = resumedFor(parsed);
+				// Recovery prompts stay with the account they were queued under.
+				const resumed =
+					pending && runsConfig(pending.sessionId, parsed.agentConfigId)
+						? pending
+						: null;
 				const handedOff = resumed && handOff(resumed);
 				if (handedOff) return handedOff;
 				if (!options.live.supports(parsed.harness)) {
@@ -536,17 +587,20 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				if (!selections.modeId && parsed.fallbackModeId) {
 					selections.modeId = parsed.fallbackModeId;
 				}
+				const agentConfigId = launchedAgentConfigId(parsed, replacedRow);
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
+					agentConfigId,
 				});
 				try {
 					options.live.create({
 						sessionId,
 						scopeId: parsed.scopeId,
 						harness: parsed.harness,
+						...(agentConfigId ? { agentConfigId } : {}),
 						cwd: parsed.cwd,
 						...selections,
 						resume: parsed.resume,
@@ -585,6 +639,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				scopeId: input.scopeId,
 				cwd: input.cwd,
 				harness: input.harness,
+				...sourceAgentConfig(input.sourceSessionId),
 				...explicitSelections(input),
 				terminalId: input.terminalId,
 				resume: {
@@ -771,6 +826,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				cwd: parsed.cwd,
 				harness,
 				...(harness === source.harness ? sessionSelections(live.state) : {}),
+				...(harness === source.harness && source.agentConfigId
+					? { agentConfigId: source.agentConfigId }
+					: {}),
 				resume: { harnessSessionId: forked },
 				terminalId: parsed.terminalId ?? live.terminalId,
 			});
@@ -824,6 +882,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						scopeId: source.scopeId,
 						cwd: parsed.cwd,
 						harness: source.harness,
+						...(source.agentConfigId
+							? { agentConfigId: source.agentConfigId }
+							: {}),
 						...sessionSelections(sourceLive?.state ?? replay.snapshot.session),
 						...explicitSelections(parsed),
 						terminalId: sourceLive?.terminalId,
@@ -959,6 +1020,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					harness: parsed.harness,
 					scopeId: parsed.scopeId,
 					cwd: parsed.cwd,
+					...(parsed.agentConfigId
+						? { agentConfigId: parsed.agentConfigId }
+						: {}),
 					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
 				}),
 				equivalentPaths(parsed.cwd),

@@ -1081,6 +1081,9 @@ msgstr "{label} wraca do stanu nieskonfigurowanego. W obszarach roboczych nic si
 msgid "{label} is set to manual"
 msgstr "{label} używa teraz logowania ręcznego"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} uruchamia teraz inne CLI, więc ten czat działa na koncie domyślnym."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "Kanał musi mieć co najmniej jednego administratora"
 
 msgid "A channel with this name already exists"
 msgstr "Kanał o tej nazwie już istnieje"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Czatu nie można przełączyć na inne konto w trakcie rozmowy. Rozpocznij nowy czat {label} albo rozgałęź tę rozmowę do nowego czatu. Ten czat {currentLabel} pozostanie otwarty."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Czatu nie można przełączyć na innego dostawcę w trakcie rozmowy. Rozpocznij nowy czat {label} albo rozgałęź tę rozmowę do nowego czatu. Ten czat {currentLabel} pozostanie otwarty."
@@ -19530,6 +19536,9 @@ msgstr "Agent zatrzymał się podczas wznawiania rozmowy."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Agent, na którym miała działać ta automatyzacja, już nie istnieje na swoim hoście — agenci hosta mogli zostać zresetowani lub usunięci. Wybierz ponownie agenta w ustawieniach automatyzacji."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Agent, od którego zaczął się ten czat, nie jest już dostępny, więc działa na koncie domyślnym."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Agent korzysta ze swoich umiejętności i narzędzi. Zgłoszenie trafia do Linear."

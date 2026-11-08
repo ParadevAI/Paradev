@@ -11,6 +11,7 @@ import { queuePendingChatHandoff } from "renderer/stores/workspace-creates/queue
 import { useWorkspace } from "../../../../../../../providers/WorkspaceProvider";
 
 export type ChatForkSource = {
+	/** A host agent config id, so the branch runs as the same account; or a preset id. */
 	agentId: string;
 	agentLabel: string;
 	/** The conversation as text, for the branch that cannot resume it. */

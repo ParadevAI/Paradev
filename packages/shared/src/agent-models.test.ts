@@ -13,6 +13,7 @@ import {
 	getAgentModeSupport,
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
+	resolveChatLaunchPresetId,
 	SUPERSET_CHAT_MODELS,
 } from "./agent-models";
 import { BUILTIN_TERMINAL_AGENT_TYPES } from "./builtin-terminal-agents";
@@ -331,6 +332,22 @@ describe("getAgentModeSupport", () => {
 
 	it("returns undefined for presets without launch modes", () => {
 		expect(getAgentModeSupport("claude")).toBeUndefined();
+	});
+});
+
+describe("resolveChatLaunchPresetId", () => {
+	it("chats a custom agent as the claude or codex CLI it runs", () => {
+		expect(resolveChatLaunchPresetId("custom", "claude")).toBe("claude");
+		expect(
+			resolveChatLaunchPresetId("custom:work", "/usr/local/bin/codex --x"),
+		).toBe("codex");
+		expect(resolveChatLaunchPresetId("custom", "aider")).toBe("custom");
+		expect(resolveChatLaunchPresetId("claude", "codex")).toBe("claude");
+		expect(resolveChatLaunchPresetId("custom", "C:\\bin\\claude.cmd")).toBe(
+			"claude",
+		);
+		expect(resolveChatLaunchPresetId("custom", "codex.BAT --x")).toBe("codex");
+		expect(resolveChatLaunchPresetId("custom", "claude.sh")).toBe("custom");
 	});
 });
 

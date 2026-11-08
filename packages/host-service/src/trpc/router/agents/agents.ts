@@ -13,6 +13,7 @@ import {
 	getAgentModeSupport,
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
+	resolveChatLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
 	buildArgvCommand,
@@ -669,6 +670,7 @@ export function chatLaunchTarget(
 ): {
 	harness: string;
 	label: string;
+	agentConfigId: string;
 	attachments: ChatLaunchAttachment[];
 } | null {
 	if (
@@ -693,7 +695,7 @@ export function chatLaunchTarget(
 	}
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) return null;
-	const launchPresetId = resolveAgentLaunchPresetId(
+	const launchPresetId = resolveChatLaunchPresetId(
 		config.presetId,
 		config.command,
 	);
@@ -701,7 +703,40 @@ export function chatLaunchTarget(
 	if (!harness) return null;
 	validateAgentModelSelection(launchPresetId, config.label, input.model);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
-	return { harness, label: config.label, attachments };
+	return {
+		harness,
+		label: config.label,
+		agentConfigId: config.id,
+		attachments,
+	};
+}
+
+/**
+ * A chat takes only the config's env: its args and executable path apply to
+ * terminal launches, and the chat runs the CLI the ACP harness resolves.
+ */
+export function chatLaunchPresetId(
+	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
+): string {
+	return resolveChatLaunchPresetId(config.presetId, config.command);
+}
+
+/**
+ * The agent config a stored chat ran under, and whether it still runs that
+ * chat's CLI. A deleted config, or one moved to another CLI, cannot carry the
+ * chat on, and the chat falls back to the default account.
+ */
+export function storedChatConfig(
+	db: HostDb,
+	session: { harness: string; agentConfigId: string | null },
+): { stored: ResolvedHostAgentConfig | null; keeps: boolean } {
+	const stored = session.agentConfigId
+		? resolveHostAgentConfig(db, session.agentConfigId)
+		: null;
+	const keeps =
+		stored !== null &&
+		acpHarnessForPreset(chatLaunchPresetId(stored)) === session.harness;
+	return { stored, keeps };
 }
 
 function continueChatAgent(

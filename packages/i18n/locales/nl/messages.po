@@ -1081,6 +1081,9 @@ msgstr "{label} is daarna weer niet ingesteld. In je werkruimtes verandert niets
 msgid "{label} is set to manual"
 msgstr "{label} gebruikt nu handmatig inloggen"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} start nu een andere CLI, dus deze chat draait op het standaardaccount."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "Een kanaal heeft minstens één beheerder nodig"
 
 msgid "A channel with this name already exists"
 msgstr "Er bestaat al een kanaal met deze naam"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Een chat kan niet halverwege naar een ander account overstappen. Start een nieuwe {label}-chat of splits dit gesprek af naar een nieuwe chat. Deze {currentLabel}-chat blijft open."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Een chat kan niet halverwege naar een andere provider overstappen. Start een nieuwe {label}-chat of splits dit gesprek af naar een nieuwe chat. Deze {currentLabel}-chat blijft open."
@@ -19530,6 +19536,9 @@ msgstr "De agent stopte tijdens het hervatten van het gesprek."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "De agent waarmee deze automatisering zou draaien bestaat niet meer op de host — de agents van die host zijn mogelijk gereset of verwijderd. Kies opnieuw een agent in de instellingen van de automatisering."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "De agent waarmee deze chat begon is niet meer beschikbaar, dus hij draait op het standaardaccount."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "De agent gebruikt zijn skills en tools. Het issue komt in Linear terecht."

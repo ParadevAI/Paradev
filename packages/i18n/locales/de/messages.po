@@ -1081,6 +1081,9 @@ msgstr "{label} ist danach wieder nicht eingerichtet. In deinen Arbeitsbereichen
 msgid "{label} is set to manual"
 msgstr "{label} nutzt jetzt die manuelle Anmeldung"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} startet jetzt eine andere CLI, daher läuft dieser Chat mit dem Standardkonto."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "Ein Kanal braucht mindestens einen Admin"
 
 msgid "A channel with this name already exists"
 msgstr "Ein Kanal mit diesem Namen existiert bereits"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Ein Chat kann nicht mittendrin zu einem anderen Konto wechseln. Starte einen neuen {label}-Chat oder verzweige diese Unterhaltung in einen. Dieser {currentLabel}-Chat bleibt geöffnet."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Ein Chat kann nicht mittendrin zu einem anderen Anbieter wechseln. Starte einen neuen {label}-Chat oder verzweige diese Unterhaltung in einen. Dieser {currentLabel}-Chat bleibt geöffnet."
@@ -19530,6 +19536,9 @@ msgstr "Der Agent wurde beim Fortsetzen der Unterhaltung beendet."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Den Agenten, mit dem diese Automatisierung laufen sollte, gibt es auf seinem Host nicht mehr — die Agenten des Hosts wurden möglicherweise zurückgesetzt oder entfernt. Wähle in den Einstellungen der Automatisierung erneut einen Agenten aus."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Der Agent, mit dem dieser Chat gestartet wurde, ist nicht mehr verfügbar, daher läuft er mit dem Standardkonto."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Der Agent nutzt seine Skills und Tools. Das Issue landet in Linear."

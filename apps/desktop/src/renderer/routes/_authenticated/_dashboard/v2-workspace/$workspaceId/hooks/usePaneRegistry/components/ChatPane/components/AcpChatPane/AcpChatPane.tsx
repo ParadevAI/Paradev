@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
 import { errorMessage } from "@superset/i18n/errors";
-import { getAgentModelSupport } from "@superset/shared/agent-models";
 import { hostRemembersChatSelections } from "@superset/shared/host-version";
 import {
 	buildChatRewindPrompt,
@@ -21,6 +20,7 @@ import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
+import { chatPresetIdForConfig } from "../../../../../../utils/chatPresetIdForConfig";
 import {
 	ignoreChatTerminal,
 	isChatSessionReopened,
@@ -48,6 +48,7 @@ import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
+import { chatAgentChoices } from "./utils/chatAgentChoices";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
 import {
@@ -70,6 +71,7 @@ const REPLACEMENT_TIMEOUT_MS = 30_000;
 
 export interface AgentSwitchTarget {
 	presetId: string;
+	configId?: string;
 	label: string;
 	model: { id: string; label: string } | null;
 	modeId: string | undefined;
@@ -111,7 +113,7 @@ export function AcpChatPane({
 	terminalId: string;
 	draftId?: string;
 	/** `sessionId` is absent until the agent has run a turn to report one. */
-	agent: { id: string; sessionId?: string } | undefined;
+	agent: { id: string; configId?: string; sessionId?: string } | undefined;
 	isActive: boolean;
 	sessionId: string | null;
 	pendingPrompts: UserContent[][];
@@ -132,7 +134,7 @@ export function AcpChatPane({
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
-	onNewChat?: (label: string | undefined) => void;
+	onNewChat?: (label: string | undefined, configId?: string) => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
@@ -148,9 +150,6 @@ export function AcpChatPane({
 	const { hostUrl } = useWorkspaceClient();
 	const hostInfo = useHostServiceInfo(hostUrl);
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
-	const agentLabel = agentConfigs?.find(
-		(config) => config.id === agent?.id,
-	)?.label;
 	const harness = acpHarnessForPreset(agent?.id);
 	const [failure, setFailure] = useState<string | null>(null);
 	const [switchingAccount, setSwitchingAccount] = useState(false);
@@ -170,6 +169,28 @@ export function AcpChatPane({
 		sessionId,
 		transport: wiring.transport,
 	});
+	// A pane opened before it saved its config, or adopted from the CLI, has
+	// only the host's record of which config the session runs as.
+	const agentConfigId =
+		agent?.configId ?? stored?.session?.agentConfigId ?? undefined;
+	const agentConfig = agentConfigs?.find(
+		(config) => config.id === (agentConfigId ?? agent?.id),
+	);
+	const agentLabel = agentConfig?.label;
+	const label = agentLabel ?? "";
+	const accountNotice =
+		!agent?.id || !agentConfigs || !agentConfigId
+			? undefined
+			: !agentConfig
+				? t({
+						message:
+							"The agent this chat started with is no longer available, so it runs on the default account.",
+					})
+				: chatPresetIdForConfig(agentConfig) !== agent.id
+					? t({
+							message: `${label} now runs another CLI, so this chat runs on the default account.`,
+						})
+					: undefined;
 	const queryClient = useQueryClient();
 	useWorkspaceEvent(
 		"chat:sessions-changed",
@@ -185,7 +206,7 @@ export function AcpChatPane({
 		sessionId !== null,
 	);
 
-	const createKey = `${terminalId}:${agent?.id ?? ""}`;
+	const createKey = `${terminalId}:${agent?.id ?? ""}:${agent?.configId ?? ""}`;
 	useEffect(() => watchChatCreate(createKey), [createKey]);
 	const attaching = useRef(false);
 	const recoveryInFlight = useRef(false);
@@ -223,6 +244,7 @@ export function AcpChatPane({
 										commandId,
 										workspaceId,
 										harness: resumeHarness,
+										...(agentConfigId ? { agentConfigId } : {}),
 										terminalId,
 										...(modelId ? { modelId } : {}),
 										...(effortId ? { effortId } : {}),
@@ -280,6 +302,7 @@ export function AcpChatPane({
 			effortId,
 			modeId,
 			agent,
+			agentConfigId,
 			sessionId,
 			hostInfo.data?.version,
 		],
@@ -343,20 +366,20 @@ export function AcpChatPane({
 			}
 			if (!agent) return;
 			void forkToWorktree({
-				agentId: agent.id,
+				agentId: agentConfigId ?? agent.id,
 				agentLabel: agentLabel ?? agent.id,
 				transcript,
 			});
 		},
-		[forkHere, forkToWorktree, agent, agentLabel],
+		[forkHere, forkToWorktree, agent, agentConfigId, agentLabel],
 	);
 
 	const presetLabel =
 		agentLabel ??
 		agentConfigs?.find((config) => config.presetId === agent?.id)?.label;
 	const newChat = useMemo(
-		() => (onNewChat ? () => onNewChat(presetLabel) : undefined),
-		[onNewChat, presetLabel],
+		() => (onNewChat ? () => onNewChat(presetLabel, agentConfigId) : undefined),
+		[onNewChat, presetLabel, agentConfigId],
 	);
 
 	const startFresh = useCallback(() => {
@@ -382,35 +405,31 @@ export function AcpChatPane({
 
 	const agentSwitch = useMemo(() => {
 		if (!agent || !onSwitchAgent) return undefined;
-		const presetIds = [
-			...new Set((agentConfigs ?? []).map((config) => config.presetId)),
-		].filter((presetId) => acpHarnessForPreset(presetId));
-		if (!presetIds.includes(agent.id)) return undefined;
+		const { agents, configsFor } = chatAgentChoices(agentConfigs ?? []);
+		if (!agents.some((choice) => choice.presetId === agent.id)) {
+			return undefined;
+		}
 		return {
 			currentPresetId: agent.id,
-			agents: presetIds.map((presetId) => ({
-				presetId,
-				label:
-					agentConfigs?.find((config) => config.presetId === presetId)?.label ??
-					presetId,
-				models: (getAgentModelSupport(presetId)?.models ?? []).map(
-					({ id, label }) => ({ id, label }),
-				),
-			})),
+			currentConfigId: agentConfig?.id,
+			agents,
 			onSwitch: async (
 				presetId: string,
 				nextModel: { id: string; label: string } | null,
 				transcript: string,
 				currentModeId: string | undefined,
+				configId?: string,
 			) => {
-				const label =
-					agentConfigs?.find((config) => config.presetId === presetId)?.label ??
-					presetId;
-				const currentLabel =
-					agentConfigs?.find((config) => config.presetId === agent.id)?.label ??
-					agent.id;
+				const nextConfig =
+					configsFor(presetId).find((config) => config.id === configId) ??
+					(presetId === agent.id ? agentConfig : undefined) ??
+					configsFor(presetId)[0];
+				const label = nextConfig?.label ?? presetId;
+				const currentLabel = agentLabel ?? agent.id;
+				const accountSwitch = presetId === agent.id;
 				const target: AgentSwitchTarget = {
 					presetId,
+					...(nextConfig ? { configId: nextConfig.id } : {}),
 					label,
 					model: nextModel,
 					// Never more access than the chat being left.
@@ -428,9 +447,13 @@ export function AcpChatPane({
 				if (handoffPrompt && onOpenAgentChat) {
 					alert({
 						title: t({ message: `Open a new ${label} chat?` }),
-						description: t({
-							message: `A chat can't switch to another provider partway through. Start a fresh ${label} chat, or fork this conversation into one. This ${currentLabel} chat stays open.`,
-						}),
+						description: accountSwitch
+							? t({
+									message: `A chat can't switch to another account partway through. Start a fresh ${label} chat, or fork this conversation into one. This ${currentLabel} chat stays open.`,
+								})
+							: t({
+									message: `A chat can't switch to another provider partway through. Start a fresh ${label} chat, or fork this conversation into one. This ${currentLabel} chat stays open.`,
+								}),
 						actions: [
 							{
 								label: t({ message: "Fork conversation" }),
@@ -463,7 +486,9 @@ export function AcpChatPane({
 		};
 	}, [
 		agent,
+		agentConfig,
 		agentConfigs,
+		agentLabel,
 		onSwitchAgent,
 		onOpenAgentChat,
 		sessionId,
@@ -802,6 +827,7 @@ export function AcpChatPane({
 				launchPrompt ? onLaunchPromptDelivered : undefined
 			}
 			agentLabel={agentLabel}
+			accountNotice={accountNotice}
 			agentSwitch={agentSwitch}
 			onModeChange={onModeChange}
 			canForkToWorktree={canForkToWorktree}
@@ -810,7 +836,9 @@ export function AcpChatPane({
 			onEditMessage={onRewound ? onEditMessage : undefined}
 			onRestartAndContinue={harness ? restartAndContinue : undefined}
 			onStartNewChat={harness ? startNewChat : undefined}
-			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
+			onUserPrompt={
+				agent ? () => saveLastChatAgent(agentConfigId ?? agent.id) : undefined
+			}
 			onSwitchAccount={switchAccount}
 			sessionAccount={sessionAccount}
 			openDiff={onOpenDiff}

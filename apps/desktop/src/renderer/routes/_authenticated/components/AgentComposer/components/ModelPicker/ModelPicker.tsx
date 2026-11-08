@@ -29,6 +29,7 @@ import { fastOption } from "../../utils/toggleOption";
 import { EffortSliderCard } from "./components/EffortSliderCard";
 import { ModelPanel } from "./components/ModelPanel";
 import type { AgentSwitcher } from "./types";
+import { canSwitchAgent } from "./utils/canSwitchAgent";
 
 export type ModelPickerProps = {
 	configOptions: SessionConfigOption[];
@@ -80,16 +81,21 @@ export function ModelPicker({
 	const currentAgent = agentSwitcher?.agents.find(
 		(agent) => agent.presetId === agentSwitcher.currentPresetId,
 	);
+	const currentAccount = currentAgent?.accounts?.find(
+		(account) => account.configId === agentSwitcher?.currentConfigId,
+	);
 	const agentIcon = agentSwitcher
 		? getPresetIcon(
-				currentAgent?.iconId ?? agentSwitcher.currentPresetId,
+				currentAccount?.iconId ??
+					currentAgent?.iconId ??
+					agentSwitcher.currentPresetId,
 				isDark,
 			)
 		: undefined;
 	const model = options.find(
 		(option) => option.category === "model" && option.options.length > 0,
 	);
-	const canSwitchAgent = (agentSwitcher?.agents.length ?? 0) > 1;
+	const canSwitch = canSwitchAgent(agentSwitcher);
 	const settings = options.filter(
 		(option) =>
 			option.category !== "model" &&
@@ -103,8 +109,8 @@ export function ModelPicker({
 	const rows = settings.filter(
 		(option) => option !== effort && (effort ? option !== fast : true),
 	);
-	if (!model && settings.length === 0 && !canSwitchAgent) return null;
-	const showsModels = Boolean(model) || canSwitchAgent;
+	if (!model && settings.length === 0 && !canSwitch) return null;
+	const showsModels = Boolean(model) || canSwitch;
 	const currentAgentLabel = currentAgent?.label;
 	const pillLabel =
 		currentLabel(model) ??
@@ -204,9 +210,9 @@ export function ModelPicker({
 						agentSwitcher={
 							agentSwitcher && {
 								...agentSwitcher,
-								onSwitch: (presetId, picked) => {
+								onSwitch: (presetId, picked, configId) => {
 									onOpenChange(false);
-									agentSwitcher.onSwitch(presetId, picked);
+									agentSwitcher.onSwitch(presetId, picked, configId);
 								},
 							}
 						}

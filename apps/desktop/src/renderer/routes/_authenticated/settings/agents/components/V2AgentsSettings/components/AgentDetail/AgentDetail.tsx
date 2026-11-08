@@ -56,7 +56,6 @@ export function AgentDetail({
 	const { t } = useLingui();
 	const hostService = useLocalHostService();
 	const { activeHostUrl } = hostService;
-	const isCustom = config.presetId === "custom";
 	const hasBundledDefault = getPresetById(config.presetId) !== undefined;
 	const isHooksSetupTarget = (AGENT_TYPES as readonly string[]).includes(
 		config.presetId,
@@ -292,19 +291,18 @@ export function AgentDetail({
 					/>
 				</Section>
 
-				{isCustom ? (
-					<Section
-						title={t({
-							message: "Icon",
-						})}
-					>
-						<AgentIconPicker
-							value={config.iconId}
-							onChange={(iconId) => updateMutation.mutate({ iconId })}
-							disabled={updateMutation.isPending}
-						/>
-					</Section>
-				) : null}
+				<Section
+					title={t({
+						message: "Icon",
+					})}
+				>
+					<AgentIconPicker
+						value={config.iconId}
+						presetId={config.presetId}
+						onChange={(iconId) => updateMutation.mutate({ iconId })}
+						disabled={updateMutation.isPending}
+					/>
+				</Section>
 
 				<AgentLaunchFields
 					idPrefix={config.id}

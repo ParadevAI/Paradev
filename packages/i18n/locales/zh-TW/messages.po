@@ -1081,6 +1081,9 @@ msgstr "{label} 將恢復為未設定。工作區內不會有任何變化：你�
 msgid "{label} is set to manual"
 msgstr "{label} 已設為手動登入"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} 現在執行另一個 CLI，因此此聊天改用預設帳號執行。"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "頻道至少需要一位管理員"
 
 msgid "A channel with this name already exists"
 msgstr "已有同名頻道"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "聊天進行中無法切換到其他帳號。請開始新的 {label} 聊天，或將此對話分岔到新聊天中。此 {currentLabel} 聊天會保持開啟。"
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "聊天進行中無法切換到其他提供者。請開始新的 {label} 聊天，或將此對話分岔到新聊天中。此 {currentLabel} 聊天會保持開啟。"
@@ -19530,6 +19536,9 @@ msgstr "恢復對話時代理已停止。"
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "這個自動化原本要執行的代理程式在它的主機上已不存在，該主機的代理程式可能被重置或刪除了。請在自動化的設定中重新選擇一個代理程式。"
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "此聊天開始時使用的代理已無法使用，因此改用預設帳號執行。"
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "代理程式使用其技能和工具，問題會出現在 Linear 中。"

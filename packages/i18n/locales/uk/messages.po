@@ -1075,6 +1075,9 @@ msgstr "{label} знову стане неналаштованим. У робо�
 msgid "{label} is set to manual"
 msgstr "Для {label} увімкнено ручний вхід"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} тепер запускає інший CLI, тому цей чат працює з обліковим записом за замовчуванням."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1694,6 +1697,9 @@ msgstr "Каналу потрібен принаймні один адмініс
 
 msgid "A channel with this name already exists"
 msgstr "Канал із такою назвою вже існує"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Чат не можна перемкнути на інший обліковий запис посеред розмови. Почніть новий чат {label} або створіть його як форк цієї розмови. Цей чат {currentLabel} залишиться відкритим."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Чат не можна перемкнути на іншого провайдера посеред розмови. Почніть новий чат {label} або створіть його як форк цієї розмови. Цей чат {currentLabel} залишиться відкритим."
@@ -19524,6 +19530,9 @@ msgstr "Агент зупинився під час відновлення ро�
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Агента, якого вибрано для цієї автоматизації, більше немає на його хості — можливо, агентів хоста скинули або видалили. Виберіть агента знову в налаштуваннях автоматизації."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Агент, з яким почався цей чат, більше недоступний, тому чат працює з обліковим записом за замовчуванням."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Агент використовує свої навички й інструменти. Issue з'являється в Linear."

@@ -40,6 +40,7 @@ import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
 	type AgentSwitcher,
+	canSwitchAgent,
 	ModelPicker,
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker";
 import {
@@ -473,7 +474,7 @@ export const Composer = memo(function Composer({
 		(configOptions?.some(
 			(option) => option.category === "model" && option.options.length > 0,
 		) === true ||
-			(agentSwitcher?.agents.length ?? 0) > 1);
+			canSwitchAgent(agentSwitcher));
 	const openModelPicker = useCallback(
 		() => changeModelPickerOpen(true),
 		[changeModelPickerOpen],

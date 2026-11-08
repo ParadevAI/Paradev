@@ -34,6 +34,7 @@ export type LiveSessionOptions = {
 	scopeId: string;
 	cwd?: string;
 	harness: string;
+	agentConfigId?: string;
 	terminalId?: string;
 	journal: ChatJournal;
 	publish: (envelope: Envelope) => void;
@@ -197,6 +198,10 @@ export class LiveSession {
 
 	get harness(): string {
 		return this.options.harness;
+	}
+
+	get agentConfigId(): string | undefined {
+		return this.options.agentConfigId;
 	}
 
 	supportsNativeDiscovery(): boolean {

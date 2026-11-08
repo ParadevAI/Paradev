@@ -1081,6 +1081,9 @@ msgstr "{label} kembali menjadi belum diatur. Tidak ada yang berubah di dalam wo
 msgid "{label} is set to manual"
 msgstr "{label} kini memakai login manual"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} sekarang menjalankan CLI lain, jadi chat ini berjalan dengan akun default."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "Kanal memerlukan setidaknya satu admin"
 
 msgid "A channel with this name already exists"
 msgstr "Kanal dengan nama ini sudah ada"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Chat tidak bisa beralih ke akun lain di tengah jalan. Mulai chat {label} baru, atau cabangkan percakapan ini ke chat baru. Chat {currentLabel} ini tetap terbuka."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Chat tidak bisa beralih ke penyedia lain di tengah jalan. Mulai chat {label} baru, atau cabangkan percakapan ini ke chat baru. Chat {currentLabel} ini tetap terbuka."
@@ -19530,6 +19536,9 @@ msgstr "Agen berhenti saat melanjutkan percakapan."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Agen yang disetel untuk menjalankan otomatisasi ini sudah tidak ada di host-nya — agen host itu mungkin telah direset atau dihapus. Pilih ulang agen di pengaturan otomatisasi."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Agen yang memulai chat ini tidak tersedia lagi, jadi chat berjalan dengan akun default."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Agen memakai skill dan tool-nya. Issue-nya masuk ke Linear."

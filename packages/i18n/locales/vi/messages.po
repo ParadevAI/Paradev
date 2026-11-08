@@ -1081,6 +1081,9 @@ msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có g
 msgid "{label} is set to manual"
 msgstr "{label} đã chuyển sang đăng nhập thủ công"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} giờ chạy một CLI khác, nên chat này chạy trên tài khoản mặc định."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "Kênh cần có ít nhất một quản trị viên"
 
 msgid "A channel with this name already exists"
 msgstr "Đã có kênh với tên này"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Không thể chuyển chat sang tài khoản khác giữa chừng. Hãy bắt đầu một chat {label} mới, hoặc tách cuộc trò chuyện này sang một chat mới. Chat {currentLabel} này vẫn mở."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Không thể chuyển chat sang nhà cung cấp khác giữa chừng. Hãy bắt đầu một chat {label} mới, hoặc tách cuộc trò chuyện này sang một chat mới. Chat {currentLabel} này vẫn mở."
@@ -19530,6 +19536,9 @@ msgstr "Tác tử đã dừng khi đang tiếp tục cuộc trò chuyện."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "Agent mà tự động hóa này được đặt để chạy không còn tồn tại trên host của nó — agent của host có thể đã bị đặt lại hoặc gỡ bỏ. Hãy chọn lại agent trong cài đặt của tự động hóa."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "Tác tử bắt đầu chat này không còn khả dụng, nên chat chạy trên tài khoản mặc định."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Agent dùng skill và công cụ của nó. Issue xuất hiện trong Linear."

@@ -1081,6 +1081,9 @@ msgstr "{label} torna a non essere configurato. Negli spazi di lavoro non cambia
 msgid "{label} is set to manual"
 msgstr "{label} ora usa l’accesso manuale"
 
+msgid "{label} now runs another CLI, so this chat runs on the default account."
+msgstr "{label} ora avvia un’altra CLI, quindi questa chat usa l’account predefinito."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1700,6 +1703,9 @@ msgstr "Un canale deve avere almeno un amministratore"
 
 msgid "A channel with this name already exists"
 msgstr "Esiste già un canale con questo nome"
+
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Una chat non può passare a un altro account a metà. Avvia una nuova chat {label} oppure dirama questa conversazione in una nuova chat. Questa chat {currentLabel} resta aperta."
 
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Una chat non può passare a un altro provider a metà. Avvia una nuova chat {label} oppure dirama questa conversazione in una nuova chat. Questa chat {currentLabel} resta aperta."
@@ -19530,6 +19536,9 @@ msgstr "L'agente si è fermato durante la ripresa della conversazione."
 
 msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "L'agente che questa automazione doveva eseguire non esiste più sul suo host — gli agenti dell'host potrebbero essere stati reimpostati o rimossi. Riseleziona un agente nelle impostazioni dell'automazione."
+
+msgid "The agent this chat started with is no longer available, so it runs on the default account."
+msgstr "L’agente con cui è iniziata questa chat non è più disponibile, quindi usa l’account predefinito."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "L'agente usa le sue skill e i suoi strumenti. L'issue arriva in Linear."

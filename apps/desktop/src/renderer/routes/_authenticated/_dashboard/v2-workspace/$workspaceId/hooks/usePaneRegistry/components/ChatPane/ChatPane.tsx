@@ -64,7 +64,7 @@ export function ChatPane({
 	const agentId = data.agent?.id;
 	const store = ctx.store;
 	const onNewChat = useCallback(
-		(label: string | undefined) => {
+		(label: string | undefined, configId: string | undefined) => {
 			if (!agentId) return;
 			store.getState().addTab({
 				panes: [
@@ -74,7 +74,10 @@ export function ChatPane({
 						data: {
 							terminalId: crypto.randomUUID(),
 							sessionId: null,
-							agent: { id: agentId },
+							agent: {
+								id: agentId,
+								...(configId ? { configId } : {}),
+							},
 						} satisfies ChatPaneData,
 					},
 				],
@@ -134,7 +137,7 @@ export function ChatPane({
 	return (
 		<>
 			<AcpChatPane
-				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}`}
+				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}:${data.agent?.configId ?? ""}`}
 				agent={data.agent}
 				draftId={data.draftId}
 				isActive={ctx.isActive}
@@ -162,18 +165,32 @@ export function ChatPane({
 					latest.current = next;
 					ctx.actions.updateData(next);
 				}}
-				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
+				onSwitchAgent={({
+					presetId,
+					configId,
+					label,
+					model,
+					modeId,
+					handoffPrompt,
+				}) => {
 					ctx.actions.setTitle(label);
 					ctx.actions.updateData(
 						restartedChatPaneData(data, {
-							agent: { id: presetId },
+							agent: { id: presetId, ...(configId ? { configId } : {}) },
 							...(model ? { chatModelId: model.id } : {}),
 							...(modeId ? { chatModeId: modeId } : {}),
 							...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
 						}),
 					);
 				}}
-				onOpenAgentChat={({ presetId, label, model, modeId, handoffPrompt }) =>
+				onOpenAgentChat={({
+					presetId,
+					configId,
+					label,
+					model,
+					modeId,
+					handoffPrompt,
+				}) =>
 					ctx.store.getState().addTab({
 						panes: [
 							{
@@ -182,7 +199,7 @@ export function ChatPane({
 								data: {
 									terminalId: crypto.randomUUID(),
 									sessionId: null,
-									agent: { id: presetId },
+									agent: { id: presetId, ...(configId ? { configId } : {}) },
 									...(model ? { chatModelId: model.id } : {}),
 									...(modeId ? { chatModeId: modeId } : {}),
 									...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),

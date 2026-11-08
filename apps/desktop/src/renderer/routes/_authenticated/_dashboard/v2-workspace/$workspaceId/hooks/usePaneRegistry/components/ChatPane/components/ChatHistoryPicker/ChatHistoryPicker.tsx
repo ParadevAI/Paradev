@@ -51,6 +51,7 @@ export function ChatHistoryPicker({
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const harness = acpHarnessForPreset(current.agent?.id);
+	const agentConfigId = current.agent?.configId;
 	const saved = useQuery({
 		queryKey: ["chat-v3", hostUrl, "history", workspaceId],
 		queryFn: () => transport.listSessions({ workspaceId, limit: 200 }),
@@ -58,12 +59,20 @@ export function ChatHistoryPicker({
 		refetchOnWindowFocus: false,
 	});
 	const native = useInfiniteQuery({
-		queryKey: ["chat-v3", hostUrl, "discoverSessions", workspaceId, harness],
+		queryKey: [
+			"chat-v3",
+			hostUrl,
+			"discoverSessions",
+			workspaceId,
+			harness,
+			agentConfigId,
+		],
 		queryFn: ({ pageParam }) =>
 			transport
 				.discoverSessions({
 					workspaceId,
 					harness: harness ?? "",
+					...(agentConfigId ? { agentConfigId } : {}),
 					...(pageParam ? { cursor: pageParam } : {}),
 				})
 				.catch((error: unknown): DiscoverSessionsResult => {
