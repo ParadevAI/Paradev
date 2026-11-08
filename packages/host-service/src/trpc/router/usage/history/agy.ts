@@ -2,8 +2,9 @@
 import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { UsageLogEntry } from "./parse";
-import { forEachLine, toSessionLabel } from "./parse";
+import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
+import type { SessionFileResult, UsageLogEntry } from "./parse";
+import { appendSessionFile, dropBefore, toSessionLabel } from "./parse";
 
 type JsonObject = Record<string, unknown>;
 
@@ -107,10 +108,47 @@ export function parseAgyTranscriptLine(
 	};
 }
 
+interface AgyFileState extends SessionFileResult {
+	cwd: string | null;
+}
+
+function agyFileParser(
+	sessionId: string,
+	state: AgyFileState = { entries: [], label: null, cwd: null },
+): LineParser<SessionFileResult, AgyFileState> {
+	const onLine = (line: string) => {
+		let envelope: JsonObject | null = null;
+		try {
+			envelope = object(JSON.parse(line));
+		} catch {
+			return;
+		}
+		if (!state.cwd) {
+			const workspace = object(envelope?.workspace);
+			const candidate =
+				envelope?.cwd ?? workspace?.current_dir ?? workspace?.project_dir;
+			if (typeof candidate === "string") state.cwd = candidate;
+		}
+		if (state.label === null && envelope?.type === "USER_INPUT") {
+			state.label = toSessionLabel(envelope.content);
+		}
+		const entry = parseAgyTranscriptLine(line, sessionId, state.cwd);
+		if (entry) state.entries.push(entry);
+	};
+	return {
+		state,
+		onLine,
+		result: () => state,
+		prune: (cutoffMs) =>
+			dropBefore(state.entries, cutoffMs, (entry) => entry.timestampMs),
+	};
+}
+
 export async function collectAgyEntries(
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels: Map<string, string>,
+	parseLines: ParseLines = parseWholeFile,
 ): Promise<number> {
 	const brain = join(homedir(), ".gemini", "antigravity-cli", "brain");
 	let sessions: string[];
@@ -134,27 +172,13 @@ export async function collectAgyEntries(
 			continue;
 		}
 		scanned += 1;
-		let cwd: string | null = null;
-		await forEachLine(path, (line) => {
-			let envelope: JsonObject | null = null;
-			try {
-				envelope = object(JSON.parse(line));
-			} catch {
-				return;
-			}
-			if (!cwd) {
-				const workspace = object(envelope?.workspace);
-				const candidate =
-					envelope?.cwd ?? workspace?.current_dir ?? workspace?.project_dir;
-				if (typeof candidate === "string") cwd = candidate;
-			}
-			if (!sessionLabels.has(sessionId) && envelope?.type === "USER_INPUT") {
-				const label = toSessionLabel(envelope.content);
-				if (label) sessionLabels.set(sessionId, label);
-			}
-			const entry = parseAgyTranscriptLine(line, sessionId, cwd);
-			if (entry && entry.timestampMs >= cutoffMs) out.push(entry);
-		});
+		const result = await parseLines(
+			"agy",
+			path,
+			(state?: AgyFileState) => agyFileParser(sessionId, state),
+			cutoffMs,
+		);
+		appendSessionFile(result, sessionId, cutoffMs, out, sessionLabels);
 	}
 	return scanned;
 }

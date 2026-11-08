@@ -36,6 +36,7 @@ import {
 } from "./default-account";
 import { fetchGrokAccounts } from "./grok-quota";
 import { countAgentPrsByDay } from "./history/agent-prs";
+import { USAGE_INDEXING_ERROR } from "./history/usage-index";
 import { fetchOpencodeAccounts } from "./opencode-quota";
 import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
 import {
@@ -89,8 +90,9 @@ function getQuota(forceRefresh: boolean): Promise<UsageAccount[]> {
 
 const offUsageWorker = createOffLoop(getUsageWorkerPool);
 
-/** offLoop on the usage worker. A crashed worker and a paused pool reach the
- * client as a retryable TIMEOUT; the pool reports crashes to Sentry itself. */
+/** offLoop on the usage worker. A cold index, a crashed worker and a paused
+ * pool reach the client as a retryable TIMEOUT. The pool reports crashes to
+ * Sentry itself, since a background scan can crash with no request. */
 function usageOffLoop<TInput, TTaskInput, TResult>(
 	spec: OffLoopSpec<TInput, TTaskInput, TResult>,
 ) {
@@ -100,6 +102,13 @@ function usageOffLoop<TInput, TTaskInput, TResult>(
 			return await resolve(args);
 		} catch (error) {
 			if (!(error instanceof Error)) throw error;
+			if (error.name === USAGE_INDEXING_ERROR) {
+				throw new TRPCError({
+					code: "TIMEOUT",
+					message: error.message,
+					cause: error,
+				});
+			}
 			// A missing bundle stays an internal error, so Sentry reports it.
 			if (
 				(error instanceof WorkerPoolUnavailableError &&
@@ -356,9 +365,9 @@ export const usageRouter = router({
 
 	/**
 	 * Token/cost history estimated from the agents' own transcript logs,
-	 * priced at API list rates. Runs in the usage worker — the transcript
-	 * trees reach multiple GB. Coalesced per window so concurrent callers
-	 * share one scan.
+	 * priced at API list rates. Served by the usage worker's index, which
+	 * reads only what changed since its last scan. Coalesced per window so
+	 * concurrent callers for one window share one read.
 	 */
 	history: queryProcedure
 		.meta({ timeoutMs: 120_000 })
