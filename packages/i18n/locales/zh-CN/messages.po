@@ -1168,9 +1168,6 @@ msgstr "{name}：每用户每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每用户每月 {monthly}，或按年计费 {yearly}"
 
-msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
-msgstr "{newPeople, plural, one {这将增加 # 个付费席位（{price}）。} other {这将增加 # 个付费席位（{price}）。}}"
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
 
@@ -1362,12 +1359,6 @@ msgstr "{toolName}已中断"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
-
-msgid "{total}/month"
-msgstr "{total}/月"
-
-msgid "{total}/year"
-msgstr "{total}/年"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub议题} other {GitHub议题}}"
@@ -7599,9 +7590,6 @@ msgstr "例如：我的云端评审"
 msgid "e.g. plan-budget"
 msgstr "例如 plan-budget"
 
-msgid "Each adds a paid seat."
-msgstr "每人将增加一个付费席位。"
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "每个附件最大为{0} MB。"
@@ -9338,9 +9326,6 @@ msgstr "获取 iPhone 和 iPad 应用"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "将收到加入 {organizationName} 的邀请"
-
-msgid "Gets an invite to join {organizationName} and a paid seat"
-msgstr "将收到加入 {organizationName} 的邀请，并占用一个付费席位"
 
 msgid "Getting Work Done"
 msgstr "工作常用"
@@ -12254,9 +12239,6 @@ msgstr "新消息"
 
 msgid "New page"
 msgstr "新建页面"
-
-msgid "New people get an email invite to {organizationName} and see this once they join."
-msgstr "新成员会收到加入 {organizationName} 的邮件邀请，加入后即可看到。"
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "新成员会收到加入 {organizationName} 的邮件邀请，加入后即可看到。"

@@ -9,8 +9,6 @@ interface InviteSuggestionProps {
 	item: SuggestionItem;
 	active: boolean;
 	organizationName: string;
-	/** Inviting someone new adds a billed seat. */
-	paidSeat: boolean;
 	inviteError: boolean;
 	/** No query yet, so people are suggestions rather than results. */
 	browsing: boolean;
@@ -24,7 +22,6 @@ export function InviteSuggestion({
 	item,
 	active,
 	organizationName,
-	paidSeat,
 	inviteError,
 	browsing,
 	onPick,
@@ -151,13 +148,7 @@ export function InviteSuggestion({
 						</p>
 						{invite ? (
 							<p className="truncate text-muted-foreground text-xs">
-								{paidSeat ? (
-									<Trans>
-										Gets an invite to join {organizationName} and a paid seat
-									</Trans>
-								) : (
-									<Trans>Gets an invite to join {organizationName}</Trans>
-								)}
+								<Trans>Gets an invite to join {organizationName}</Trans>
 							</p>
 						) : inviteError ? (
 							<p className="text-destructive text-xs">

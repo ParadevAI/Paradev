@@ -108,7 +108,6 @@ export function CloudWorkspaceShareButton({
 					organizationName={share.organizationName}
 					organizationLogo={share.organizationLogo}
 					inviteNew={share.inviteNew}
-					seatCost={share.seatCost}
 					onUpgrade={share.onUpgrade}
 					onCopyLink={() => copyToClipboard(linkUrl)}
 					onAdd={async ({ grantees: picked, emails }) => {

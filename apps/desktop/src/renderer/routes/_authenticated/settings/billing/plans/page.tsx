@@ -28,7 +28,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { PlanChangeDialog } from "../components/PlanChangeDialog";
 import { useBillingActions } from "../hooks/useBillingActions";
-import { usePlanCatalog } from "renderer/hooks/usePlanCatalog";
+import { usePlanCatalog } from "../hooks/usePlanCatalog";
 
 export const Route = createFileRoute("/_authenticated/settings/billing/plans/")(
 	{

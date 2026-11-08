@@ -1168,9 +1168,6 @@ msgstr "{name}: 1ユーザーあたり月額 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 1ユーザーあたり月額 {monthly}、または年払いで {yearly}"
 
-msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
-msgstr "{newPeople, plural, one {有料の席が # 席追加されます（{price}）。} other {有料の席が # 席追加されます（{price}）。}}"
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {人を1人以上指定するか、{choice}を選択してください。} sender {送信者を1人以上指定するか、{choice}を選択してください。} other {項目を1つ以上指定するか、{choice}を選択してください。}}"
 
@@ -1362,12 +1359,6 @@ msgstr "{toolName}が中断されました"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
-
-msgid "{total}/month"
-msgstr "{total}/月"
-
-msgid "{total}/year"
-msgstr "{total}/年"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issue}}"
@@ -7599,9 +7590,6 @@ msgstr "例: クラウドのレビュー"
 msgid "e.g. plan-budget"
 msgstr "例: plan-budget"
 
-msgid "Each adds a paid seat."
-msgstr "1人につき有料の席が1席追加されます。"
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "添付ファイルは1件あたり最大{0} MBです。"
@@ -9338,9 +9326,6 @@ msgstr "iPhone・iPad アプリを入手"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
-
-msgid "Gets an invite to join {organizationName} and a paid seat"
-msgstr "{organizationName}への招待が届き、有料の席が1席追加されます"
 
 msgid "Getting Work Done"
 msgstr "仕事に役立つ"
@@ -12254,9 +12239,6 @@ msgstr "新着メッセージ"
 
 msgid "New page"
 msgstr "新しいページ"
-
-msgid "New people get an email invite to {organizationName} and see this once they join."
-msgstr "新しいユーザーには{organizationName}への招待メールが届き、参加後に表示されます。"
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "新しいユーザーには{organizationName}への招待メールが届きます。参加後に表示されます。"
