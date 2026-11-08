@@ -296,16 +296,15 @@ export class TunnelClient {
 				},
 				{ signal: listeners.signal },
 			);
-			// close always follows error
-			ws.addEventListener(
-				"close",
-				() => {
-					clearTimeout(timer);
-					listeners.abort();
-					retry();
-				},
-				{ signal: listeners.signal },
-			);
+			// Node 22's WebSocket fires only error when the handshake fails.
+			const fail = () => {
+				clearTimeout(timer);
+				listeners.abort();
+				closeQuietly(ws, 1000, "Dial connect failed");
+				retry();
+			};
+			ws.addEventListener("error", fail, { signal: listeners.signal });
+			ws.addEventListener("close", fail, { signal: listeners.signal });
 		};
 		attempt(1);
 	}
@@ -462,7 +461,7 @@ function pipe(from: WebSocket, to: WebSocket): void {
 		closeQuietly(to, code, "Peer closed");
 	});
 	from.addEventListener("error", () => {
-		// close always follows error
+		closeQuietly(to, 1011, "Peer failed");
 	});
 }
 
