@@ -1168,6 +1168,12 @@ msgstr "{name}: 1ユーザーあたり月額 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 1ユーザーあたり月額 {monthly}、または年払いで {yearly}"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {{organizationName} に有料の席が # 席追加されます（{total}/月）。参加した時点で請求されます。} other {{organizationName} に有料の席が # 席追加されます（{total}/月）。参加した時点で請求されます。}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {{organizationName} に有料の席が # 席追加されます（{total}/年）。参加した時点で請求されます。} other {{organizationName} に有料の席が # 席追加されます（{total}/年）。参加した時点で請求されます。}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {人を1人以上指定するか、{choice}を選択してください。} sender {送信者を1人以上指定するか、{choice}を選択してください。} other {項目を1つ以上指定するか、{choice}を選択してください。}}"
 
@@ -7600,6 +7606,9 @@ msgstr "それぞれ新しいタブで"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "毎朝午前8時に、前日の失敗したCI実行を確認し、最も多い失敗原因を診断して修正PRを作成する。"
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "新しいメンバーを招待するたびに、{organizationName} に有料の席が1席追加されます。"
+
 msgid "Each run makes its own"
 msgstr "実行ごとに新しく作成します"
 
@@ -9326,6 +9335,9 @@ msgstr "iPhone・iPad アプリを入手"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "{organizationName}への招待が届き、有料の席が1席追加されます"
 
 msgid "Getting Work Done"
 msgstr "仕事に役立つ"

@@ -1168,6 +1168,12 @@ msgstr "{name}：每用户每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每用户每月 {monthly}，或按年计费 {yearly}"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {将为 {organizationName} 增加 # 个付费席位（{total}/月），在对方加入时计费。} other {将为 {organizationName} 增加 # 个付费席位（{total}/月），在对方加入时计费。}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {将为 {organizationName} 增加 # 个付费席位（{total}/年），在对方加入时计费。} other {将为 {organizationName} 增加 # 个付费席位（{total}/年），在对方加入时计费。}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
 
@@ -7600,6 +7606,9 @@ msgstr "每条各占一个新标签页"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "每天早上8点，查看昨天失败的CI运行，诊断最常见的失败原因，并提一个修复PR。"
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "每位新成员都会为 {organizationName} 增加一个付费席位。"
+
 msgid "Each run makes its own"
 msgstr "每次运行都新建一个"
 
@@ -9326,6 +9335,9 @@ msgstr "获取 iPhone 和 iPad 应用"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "将收到加入 {organizationName} 的邀请"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "将收到加入 {organizationName} 的邀请，并占用一个付费席位"
 
 msgid "Getting Work Done"
 msgstr "工作常用"

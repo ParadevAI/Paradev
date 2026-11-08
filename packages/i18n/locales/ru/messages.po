@@ -1168,6 +1168,12 @@ msgstr "{name}: {monthly} за пользователя в месяц"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за пользователя в месяц или {yearly} при оплате за год"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {Добавит # платное место в {organizationName} ({total}/мес.), оплата — когда человек присоединится.} few {Добавит # платных места в {organizationName} ({total}/мес.), оплата — когда люди присоединятся.} many {Добавит # платных мест в {organizationName} ({total}/мес.), оплата — когда люди присоединятся.} other {Добавит # платного места в {organizationName} ({total}/мес.), оплата — когда люди присоединятся.}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {Добавит # платное место в {organizationName} ({total}/год), оплата — когда человек присоединится.} few {Добавит # платных места в {organizationName} ({total}/год), оплата — когда люди присоединятся.} many {Добавит # платных мест в {organizationName} ({total}/год), оплата — когда люди присоединятся.} other {Добавит # платного места в {organizationName} ({total}/год), оплата — когда люди присоединятся.}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
 
@@ -7600,6 +7606,9 @@ msgstr "Каждая в своей новой вкладке"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Каждое утро в 8:00 смотри вчерашние упавшие запуски CI, определяй самую частую причину и открывай PR с исправлением."
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "Каждый новый человек добавляет платное место в {organizationName}."
+
 msgid "Each run makes its own"
 msgstr "Каждый запуск создаёт свою"
 
@@ -9326,6 +9335,9 @@ msgstr "Скачать приложение для iPhone и iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Получит приглашение в {organizationName}"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "Получит приглашение в {organizationName} и платное место"
 
 msgid "Getting Work Done"
 msgstr "Для работы"

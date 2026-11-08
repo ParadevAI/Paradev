@@ -1168,6 +1168,12 @@ msgstr "{name}: {monthly} za uživatele/měsíc"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za uživatele/měsíc, nebo {yearly} při roční fakturaci"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {Přidá # placené místo v {organizationName} ({total}/měs.), účtováno, až se člověk připojí.} few {Přidá # placená místa v {organizationName} ({total}/měs.), účtováno, až se lidé připojí.} many {Přidá # placeného místa v {organizationName} ({total}/měs.), účtováno, až se lidé připojí.} other {Přidá # placených míst v {organizationName} ({total}/měs.), účtováno, až se lidé připojí.}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {Přidá # placené místo v {organizationName} ({total}/rok), účtováno, až se člověk připojí.} few {Přidá # placená místa v {organizationName} ({total}/rok), účtováno, až se lidé připojí.} many {Přidá # placeného místa v {organizationName} ({total}/rok), účtováno, až se lidé připojí.} other {Přidá # placených míst v {organizationName} ({total}/rok), účtováno, až se lidé připojí.}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Zadejte alespoň jednu osobu, nebo zvolte {choice}.} sender {Zadejte alespoň jednoho odesílatele, nebo zvolte {choice}.} other {Zadejte alespoň jednu položku, nebo zvolte {choice}.}}"
 
@@ -7600,6 +7606,9 @@ msgstr "Každý ve vlastní nové kartě"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Každé ráno v 8:00 se podívej na včerejší neúspěšné běhy CI, urči nejčastější příčinu selhání a otevři PR s opravou."
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "Každý nový člověk přidá placené místo v {organizationName}."
+
 msgid "Each run makes its own"
 msgstr "Každé spuštění si vytvoří vlastní"
 
@@ -9326,6 +9335,9 @@ msgstr "Stáhnout aplikaci pro iPhone a iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "Dostane pozvánku do {organizationName} a placené místo"
 
 msgid "Getting Work Done"
 msgstr "Pracovní"

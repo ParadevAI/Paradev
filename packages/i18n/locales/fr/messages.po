@@ -1168,6 +1168,12 @@ msgstr "{name} : {monthly} par utilisateur/mois"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name} : {monthly} par utilisateur/mois, ou {yearly} en facturation annuelle"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {Ajoute un siège payant à {organizationName} ({total}/mois), facturé quand la personne rejoint.} other {Ajoute # sièges payants à {organizationName} ({total}/mois), facturés quand les personnes rejoignent.}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {Ajoute un siège payant à {organizationName} ({total}/an), facturé quand la personne rejoint.} other {Ajoute # sièges payants à {organizationName} ({total}/an), facturés quand les personnes rejoignent.}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Indiquez au moins une personne, ou choisissez {choice}.} sender {Indiquez au moins un expéditeur, ou choisissez {choice}.} other {Indiquez au moins un élément, ou choisissez {choice}.}}"
 
@@ -7600,6 +7606,9 @@ msgstr "Chacune dans son propre nouvel onglet"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Chaque matin à 8 h, examine les exécutions CI en échec de la veille, diagnostique l'échec le plus fréquent et ouvre une pull request de correction."
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "Chaque nouvelle personne ajoute un siège payant à {organizationName}."
+
 msgid "Each run makes its own"
 msgstr "Chaque exécution crée le sien"
 
@@ -9326,6 +9335,9 @@ msgstr "Obtenir l'app iPhone et iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Recevra une invitation à rejoindre {organizationName}"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "Recevra une invitation à rejoindre {organizationName} et un siège payant"
 
 msgid "Getting Work Done"
 msgstr "Pour le travail"

@@ -5,7 +5,7 @@ import {
 	getInvitableRoles,
 	type OrganizationRole,
 } from "@superset/shared/auth";
-import { resolveCurrentPlan } from "@superset/shared/billing";
+import { isPaidPlanTier, resolveCurrentPlan } from "@superset/shared/billing";
 import type { PageHeaderSharing } from "@superset/ui/page-comments";
 import {
 	type InviteNewMode,
@@ -97,6 +97,8 @@ export function usePageSharing(pageId: string): PageHeaderSharing {
 			organizations?.find((org) => org.id === activeOrganizationId)?.logo ??
 			null,
 		inviteNew,
+		seatCost:
+			inviteNew === "allowed" && isPaidPlanTier(plan) ? null : undefined,
 		onUpgrade: () => router.push("/settings/billing"),
 		onAdd: async ({ grantees: picked, emails, role: shareRole }) => {
 			const invitationIds = await inviteEmails(emails);

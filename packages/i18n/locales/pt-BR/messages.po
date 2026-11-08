@@ -1168,6 +1168,12 @@ msgstr "{name}: {monthly} por usuário/mês"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} por usuário/mês, ou {yearly} com cobrança anual"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {Adiciona um assento pago a {organizationName} ({total}/mês), cobrado quando a pessoa entrar.} other {Adiciona # assentos pagos a {organizationName} ({total}/mês), cobrados quando as pessoas entrarem.}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {Adiciona um assento pago a {organizationName} ({total}/ano), cobrado quando a pessoa entrar.} other {Adiciona # assentos pagos a {organizationName} ({total}/ano), cobrados quando as pessoas entrarem.}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Especifique pelo menos uma pessoa, ou escolha {choice}.} sender {Especifique pelo menos um remetente, ou escolha {choice}.} other {Especifique pelo menos um item, ou escolha {choice}.}}"
 
@@ -7600,6 +7606,9 @@ msgstr "Cada um em sua própria aba"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Toda manhã às 8h, veja as execuções de CI que falharam ontem, diagnostique a falha mais comum e abra um PR com a correção."
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "Cada pessoa nova adiciona um assento pago a {organizationName}."
+
 msgid "Each run makes its own"
 msgstr "Cada execução cria a sua"
 
@@ -9326,6 +9335,9 @@ msgstr "Baixe o app para iPhone e iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Receberá um convite para entrar em {organizationName}"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "Receberá um convite para entrar em {organizationName} e um assento pago"
 
 msgid "Getting Work Done"
 msgstr "Para trabalhar"

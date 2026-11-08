@@ -1168,6 +1168,12 @@ msgstr "{name}: kullanıcı başına aylık {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: kullanıcı başına aylık {monthly} veya yıllık faturalandırmayla {yearly}"
 
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
+msgstr "{newPeople, plural, one {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/ay), katıldıklarında faturalandırılır.} other {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/ay), katıldıklarında faturalandırılır.}}"
+
+msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
+msgstr "{newPeople, plural, one {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/yıl), katıldıklarında faturalandırılır.} other {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/yıl), katıldıklarında faturalandırılır.}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {En az bir kişi belirtin veya {choice} seçeneğini seçin.} sender {En az bir gönderen belirtin veya {choice} seçeneğini seçin.} other {En az bir öğe belirtin veya {choice} seçeneğini seçin.}}"
 
@@ -7600,6 +7606,9 @@ msgstr "Her biri kendi yeni sekmesinde"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Her sabah 08.00'de dünkü başarısız CI çalıştırmalarına bak, en sık görülen hatayı teşhis et ve düzeltme PR'ı aç."
 
+msgid "Each new person adds a paid seat to {organizationName}."
+msgstr "Her yeni kişi {organizationName} kuruluşuna bir ücretli koltuk ekler."
+
 msgid "Each run makes its own"
 msgstr "Her çalıştırma kendininkini oluşturur"
 
@@ -9326,6 +9335,9 @@ msgstr "iPhone ve iPad uygulamasını edinin"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "{organizationName} kuruluşuna katılma daveti ve ücretli bir koltuk alır"
 
 msgid "Getting Work Done"
 msgstr "İş Bitirme"

@@ -78,6 +78,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 		organizationName: share.organizationName,
 		organizationLogo: share.organizationLogo,
 		inviteNew: share.inviteNew,
+		seatCost: share.seatCost,
 		onUpgrade: share.onUpgrade,
 		onAdd: async ({ grantees: picked, emails, role }) => {
 			if (!pageId) return;
