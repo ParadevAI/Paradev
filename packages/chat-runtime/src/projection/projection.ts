@@ -1,5 +1,5 @@
 import type { SessionStatus } from "@superset/chat/protocol";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { ChatDb, ChatSessionRow } from "../db";
 import { chatSessionsLocal } from "../db";
 
@@ -125,6 +125,28 @@ export class ChatSessionStore {
 			.from(chatSessionsLocal)
 			.orderBy(desc(chatSessionsLocal.updatedAt))
 			.all();
+	}
+
+	/** The latest chat in a scope that ran this agent session. */
+	findByHarnessSession(
+		scopeId: string,
+		harness: string,
+		harnessSessionId: string,
+	): ChatSessionRow | null {
+		return (
+			this.db
+				.select()
+				.from(chatSessionsLocal)
+				.where(
+					and(
+						eq(chatSessionsLocal.scopeId, scopeId),
+						eq(chatSessionsLocal.harness, harness),
+						eq(chatSessionsLocal.harnessSessionId, harnessSessionId),
+					),
+				)
+				.orderBy(desc(chatSessionsLocal.updatedAt))
+				.get() ?? null
+		);
 	}
 
 	listByScope(scopeId: string): ChatSessionRow[] {

@@ -5,6 +5,10 @@ import type { HostDb } from "../db";
 import { projects, workspaces } from "../db/schema";
 import { waitForSandboxManagedEnv } from "../runtime/sandbox-managed-env";
 import { buildHostLaunchEnv, waitForTerminalBaseEnv } from "../terminal/env";
+import {
+	agentLaunchEnv,
+	resolveHostAgentConfig,
+} from "../terminal-agents/agent-config";
 import { resolveDefaultAccountTerminalEnv } from "../trpc/router/usage/default-account";
 
 function workspacePaths(
@@ -46,23 +50,37 @@ function withoutAmbientKeys(
 	return rest;
 }
 
+/** The launch env an agent config adds, account dir and keys included. */
+function configEnv(
+	db: HostDb,
+	agentConfigId: string | undefined,
+): Record<string, string> {
+	const config = agentConfigId
+		? resolveHostAgentConfig(db, agentConfigId)
+		: null;
+	return config ? agentLaunchEnv(db, config) : {};
+}
+
 /**
  * A chat agent is launched with the env a terminal would launch it with, so
  * the same CLI resolves the same tools and auth either way. `~/.paradev/bin`
  * leads PATH because a terminal picks that up from the shell bootstrap, which
  * a directly spawned agent never runs, and it is what puts the superset CLI
- * and the agent wrappers in reach.
+ * and the agent wrappers in reach. A chat opened with an agent config gets
+ * that config's env on top, as its terminal would, so a "Claude (work)" chat
+ * runs on the work account; a key set there is the user's own and stays.
  */
 export async function buildChatAgentEnv(options: {
 	db: HostDb;
 	cwd: string;
 	workspaceId: string;
 	terminalId?: string;
+	agentConfigId?: string;
 }): Promise<Record<string, string>> {
 	await Promise.all([waitForTerminalBaseEnv(), waitForSandboxManagedEnv()]);
 	const paths = workspacePaths(options.db, options.workspaceId);
-	return withoutAmbientKeys(
-		withSupersetBinFirst({
+	return withSupersetBinFirst({
+		...withoutAmbientKeys({
 			...buildHostLaunchEnv({
 				cwd: options.cwd,
 				workspaceId: options.workspaceId,
@@ -72,5 +90,6 @@ export async function buildChatAgentEnv(options: {
 			}),
 			...resolveDefaultAccountTerminalEnv(options.db),
 		}),
-	);
+		...configEnv(options.db, options.agentConfigId),
+	});
 }

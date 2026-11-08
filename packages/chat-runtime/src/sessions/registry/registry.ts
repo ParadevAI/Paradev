@@ -19,6 +19,8 @@ export type HarnessFactoryOptions = ChatSelections & {
 	sessionId: string;
 	scopeId: string;
 	harness: string;
+	/** The host agent config the harness launches with. */
+	agentConfigId?: string;
 	cwd: string;
 	resume?: { harnessSessionId: string; quiet?: boolean };
 	terminalId?: string;

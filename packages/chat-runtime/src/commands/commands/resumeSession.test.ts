@@ -291,3 +291,53 @@ describe("resuming chats after a restart", () => {
 		await runtime.dispose();
 	});
 });
+
+describe("the agent config a chat launched with", () => {
+	test("is stored and handed to every relaunch of that agent session", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			agentConfigId: "config-personal",
+			cwd: "/tmp/workspace",
+		});
+		await waitFor(() => runtime.live.get(sessionId)?.state.status === "idle");
+		expect(runtime.sessions.get(sessionId)?.agentConfigId).toBe(
+			"config-personal",
+		);
+		await runtime.commands.closeSession({ sessionId });
+
+		// Resumed by harness only, as the pane and the post-update resume do.
+		const resumed = runtime.commands.resumeSession({
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			harnessSessionId: "agent-1",
+			cwd: "/tmp/workspace",
+			prompts: [],
+			pausedPrompts: [],
+		});
+
+		expect(started.map((options) => options.agentConfigId)).toEqual([
+			"config-personal",
+			"config-personal",
+		]);
+		expect(runtime.sessions.get(resumed.sessionId)?.agentConfigId).toBe(
+			"config-personal",
+		);
+		await runtime.dispose();
+	});
+
+	test("is left unset for a chat opened without one", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		expect(started[0]?.agentConfigId).toBeUndefined();
+		expect(runtime.sessions.get(sessionId)?.agentConfigId).toBeNull();
+		await runtime.dispose();
+	});
+});

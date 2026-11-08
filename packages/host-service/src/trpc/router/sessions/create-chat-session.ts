@@ -8,6 +8,7 @@ import type {
 type ChatTarget = {
 	harness: string;
 	label: string;
+	agentConfigId?: string;
 	attachments: ChatLaunchAttachment[];
 };
 
@@ -24,6 +25,7 @@ export function createChatSession(
 		scopeId: input.workspaceId,
 		cwd,
 		harness: target.harness,
+		...(target.agentConfigId ? { agentConfigId: target.agentConfigId } : {}),
 		terminalId,
 		...(input.model ? { modelId: input.model } : {}),
 		...(input.mode ? { modeId: input.mode } : {}),

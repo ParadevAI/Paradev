@@ -2,6 +2,7 @@ import { presetForAcpHarness } from "@superset/chat/core";
 import { cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
@@ -154,9 +155,15 @@ export const sessionsRouter = router({
 					code: "PRECONDITION_FAILED",
 					message: "This chat has no saved provider session to resume.",
 				});
+			// Reopen on the agent config it ran under, so it keeps that account.
+			const agent =
+				session.agentConfigId &&
+				resolveHostAgentConfig(ctx.db, session.agentConfigId)
+					? session.agentConfigId
+					: presetId;
 			return createChatSessionInWorkspace(ctx, {
 				workspaceId: input.workspaceId,
-				agent: presetId,
+				agent,
 				resumeSessionId: session.harnessSessionId,
 				commandId: input.commandId,
 			});

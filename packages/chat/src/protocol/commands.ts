@@ -14,6 +14,8 @@ export const createSessionInputSchema = z.object({
 	commandId: z.uuid(),
 	workspaceId: z.string().min(1),
 	harness: z.string().min(1),
+	/** The host agent config to launch with, so its env (account, config dir) applies. */
+	agentConfigId: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
 	effortId: z.string().optional(),

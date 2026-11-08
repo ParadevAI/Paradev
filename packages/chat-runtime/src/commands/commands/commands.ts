@@ -503,6 +503,31 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 	};
 
+	/**
+	 * A resumed chat keeps the agent config it ran under, so it reopens on the
+	 * same account even when the caller only names the harness.
+	 */
+	const launchedAgentConfigId = (
+		input: z.output<typeof createSessionCommandSchema>,
+		replacedRow: ChatSessionRow | null,
+	): string | null => {
+		if (input.agentConfigId) return input.agentConfigId;
+		if (!input.resume) return null;
+		if (
+			replacedRow?.scopeId === input.scopeId &&
+			replacedRow.harness === input.harness &&
+			replacedRow.agentConfigId
+		)
+			return replacedRow.agentConfigId;
+		return (
+			options.sessions.findByHarnessSession(
+				input.scopeId,
+				input.harness,
+				input.resume.harnessSessionId,
+			)?.agentConfigId ?? null
+		);
+	};
+
 	return {
 		createSession(input) {
 			const parsed = createSessionCommandSchema.parse(input);
@@ -536,17 +561,20 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				if (!selections.modeId && parsed.fallbackModeId) {
 					selections.modeId = parsed.fallbackModeId;
 				}
+				const agentConfigId = launchedAgentConfigId(parsed, replacedRow);
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
+					agentConfigId,
 				});
 				try {
 					options.live.create({
 						sessionId,
 						scopeId: parsed.scopeId,
 						harness: parsed.harness,
+						...(agentConfigId ? { agentConfigId } : {}),
 						cwd: parsed.cwd,
 						...selections,
 						resume: parsed.resume,
@@ -771,6 +799,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				cwd: parsed.cwd,
 				harness,
 				...(harness === source.harness ? sessionSelections(live.state) : {}),
+				...(harness === source.harness && source.agentConfigId
+					? { agentConfigId: source.agentConfigId }
+					: {}),
 				resume: { harnessSessionId: forked },
 				terminalId: parsed.terminalId ?? live.terminalId,
 			});
@@ -824,6 +855,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						scopeId: source.scopeId,
 						cwd: parsed.cwd,
 						harness: source.harness,
+						...(source.agentConfigId
+							? { agentConfigId: source.agentConfigId }
+							: {}),
 						...sessionSelections(sourceLive?.state ?? replay.snapshot.session),
 						...explicitSelections(parsed),
 						terminalId: sourceLive?.terminalId,

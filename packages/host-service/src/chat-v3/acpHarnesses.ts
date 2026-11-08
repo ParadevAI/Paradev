@@ -58,6 +58,7 @@ export function acpHarnessFactory(
 							cwd: options.cwd,
 							workspaceId: options.scopeId,
 							terminalId: options.terminalId,
+							agentConfigId: options.agentConfigId,
 						}),
 				});
 				const env = cli.env;
