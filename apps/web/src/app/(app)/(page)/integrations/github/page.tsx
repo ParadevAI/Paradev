@@ -54,7 +54,7 @@ export default async function GitHubIntegrationPage() {
 		admin_required: i18n._(
 			msg({
 				message:
-					"Only organization admins can connect GitHub accounts. Ask an admin to connect it.",
+					"Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it.",
 			}),
 		),
 		unauthorized: i18n._(

@@ -13449,8 +13449,8 @@ msgstr "Nur sein Ersteller oder ein Organisations-Admin kann diesen Agent änder
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Nur auf diesem Rechner: von Git ignoriert und für jeden Worktree dieses Repositorys verwendet. Jeder hier gesetzte Schlüssel ersetzt den gemeinsamen."
 
-msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
-msgstr "Nur Organisationsadmins können GitHub-Konten verbinden. Bitte einen Admin, das Konto zu verbinden."
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "Nur Eigentümer und Admins der Organisation können GitHub-Konten verbinden. Bitte eine dieser Personen, das Konto zu verbinden."
 
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Nur Eigentümer und Admins der Organisation können Plugins verwalten."

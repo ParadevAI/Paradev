@@ -13449,8 +13449,8 @@ msgstr "이 에이전트는 만든 사람이나 조직 관리자만 변경할 �
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "이 컴퓨터에서만: git에서 무시되며 이 리포지토리의 모든 worktree에 적용됩니다. 여기에서 설정한 키는 공유된 값을 대체합니다."
 
-msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
-msgstr "조직 관리자만 GitHub 계정을 연결할 수 있습니다. 관리자에게 연결을 요청하세요."
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "조직 소유자와 관리자만 GitHub 계정을 연결할 수 있습니다. 이들 중 한 명에게 계정 연결을 요청하세요."
 
 msgid "Only organization owners and admins can manage plugins."
 msgstr "조직 소유자와 관리자만 플러그인을 관리할 수 있습니다."

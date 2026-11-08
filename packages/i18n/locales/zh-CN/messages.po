@@ -13449,8 +13449,8 @@ msgstr "只有创建者或组织管理员可以更改此智能体"
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "仅限本机：被 git 忽略，并应用于该仓库的每个 worktree。此处设置的任何键都会替换共享的值。"
 
-msgid "Only organization admins can connect GitHub accounts. Ask an admin to connect it."
-msgstr "只有组织管理员可以连接 GitHub 账号。请联系管理员进行连接。"
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "只有组织所有者和管理员可以连接 GitHub 账号。请让其中一位进行连接。"
 
 msgid "Only organization owners and admins can manage plugins."
 msgstr "只有组织所有者和管理员可以管理插件。"
