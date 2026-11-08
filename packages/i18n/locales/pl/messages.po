@@ -17651,6 +17651,9 @@ msgstr "Szczegóły sesji"
 msgid "Session ended"
 msgstr "Sesja zakończona"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sesja zakończona. Naciśnij Enter, aby uruchomić nową powłokę."
+
 msgid "Session name"
 msgstr "Nazwa sesji"
 

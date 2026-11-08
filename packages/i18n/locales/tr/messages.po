@@ -17651,6 +17651,9 @@ msgstr "Oturum ayrıntıları"
 msgid "Session ended"
 msgstr "Oturum sona erdi"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Oturum sona erdi. Yeni bir kabuk başlatmak için Enter tuşuna basın."
+
 msgid "Session name"
 msgstr "Oturum adı"
 

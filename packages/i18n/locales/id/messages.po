@@ -17651,6 +17651,9 @@ msgstr "Detail sesi"
 msgid "Session ended"
 msgstr "Sesi berakhir"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sesi berakhir. Tekan Enter untuk memulai shell baru."
+
 msgid "Session name"
 msgstr "Nama sesi"
 

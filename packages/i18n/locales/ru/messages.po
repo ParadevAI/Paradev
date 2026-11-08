@@ -17651,6 +17651,9 @@ msgstr "Детали сессии"
 msgid "Session ended"
 msgstr "Сеанс завершён"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Сеанс завершён. Нажмите Enter, чтобы запустить новую оболочку."
+
 msgid "Session name"
 msgstr "Имя сессии"
 

@@ -17651,6 +17651,9 @@ msgstr "Sitzungsdetails"
 msgid "Session ended"
 msgstr "Sitzung beendet"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sitzung beendet. Drücke die Eingabetaste, um eine neue Shell zu starten."
+
 msgid "Session name"
 msgstr "Sitzungsname"
 

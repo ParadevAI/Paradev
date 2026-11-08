@@ -17651,6 +17651,9 @@ msgstr "Podrobnosti relace"
 msgid "Session ended"
 msgstr "Relace skončila"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Relace skončila. Stiskněte Enter a spustí se nový shell."
+
 msgid "Session name"
 msgstr "Název relace"
 
