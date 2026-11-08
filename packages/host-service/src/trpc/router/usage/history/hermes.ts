@@ -6,7 +6,6 @@
  * Opened read-only — Hermes may hold the database concurrently. Kept apart
  * from the Bun unit suite because better-sqlite3 is a Node-only native binding.
  */
-import { statSync } from "node:fs";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import {
@@ -14,62 +13,21 @@ import {
 	type HermesSessionRow,
 	hermesRowsToEntries,
 } from "./hermes-rows";
-import {
-	MAX_SQL_TEXT_LENGTH,
-	rememberLabel,
-	type UsageLogEntry,
-} from "./parse";
-import type { SqliteStates } from "./sqlite-tail";
+import { MAX_SQL_TEXT_LENGTH, type UsageLogEntry } from "./parse";
 
 const ACTIVITY_AT =
 	"MAX(started_at, COALESCE(ended_at, 0), COALESCE(last_activity_at, 0))";
 
-interface HermesScan {
-	signature: string;
-	entries: UsageLogEntry[];
-	labels: Record<string, string>;
-}
-
-function fileSignature(path: string): string {
-	try {
-		const { ino, size, mtimeMs } = statSync(path);
-		return `${ino}:${size}:${mtimeMs}`;
-	} catch {
-		return "-";
-	}
-}
-
-function appendScan(
-	scan: HermesScan,
-	out: UsageLogEntry[],
-	sessionLabels?: Map<string, string>,
-): void {
-	for (const entry of scan.entries) out.push(entry);
-	for (const [id, label] of Object.entries(scan.labels)) {
-		rememberLabel(sessionLabels, id, label);
-	}
-}
-
-/** Returns 1 when the database was scanned, 0 when absent/unreadable. Totals
- * change in place, so a scan is reused until `state.db` or its WAL changes. */
+/** Returns 1 when the database was scanned, 0 when absent/unreadable. */
 export function collectHermesEntries(
 	hermesHome: string,
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
-	states?: SqliteStates,
 ): number {
-	const dbPath = join(hermesHome, "state.db");
-	const stateKey = `hermes:${dbPath}`;
-	const signature = `${cutoffMs}|${fileSignature(dbPath)}|${fileSignature(`${dbPath}-wal`)}`;
-	const cached = states?.get(stateKey) as HermesScan | undefined;
-	if (cached?.signature === signature) {
-		appendScan(cached, out, sessionLabels);
-		return 1;
-	}
 	let db: InstanceType<typeof Database> | null = null;
 	try {
-		const conn = new Database(dbPath, {
+		const conn = new Database(join(hermesHome, "state.db"), {
 			readonly: true,
 			fileMustExist: true,
 		});
@@ -109,16 +67,7 @@ export function collectHermesEntries(
 				: [],
 		}));
 		const { sessions, modelRows } = readSnapshot();
-		const entries: UsageLogEntry[] = [];
-		const labels = new Map<string, string>();
-		hermesRowsToEntries(sessions, modelRows, cutoffMs, entries, labels);
-		const scan: HermesScan = {
-			signature,
-			entries,
-			labels: Object.fromEntries(labels),
-		};
-		states?.set(stateKey, scan);
-		appendScan(scan, out, sessionLabels);
+		hermesRowsToEntries(sessions, modelRows, cutoffMs, out, sessionLabels);
 		return 1;
 	} catch {
 		return 0;

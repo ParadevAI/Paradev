@@ -8,6 +8,8 @@ export interface LineParser<R, S = unknown> {
 	readonly state: S;
 	onLine(line: string): void;
 	result(): R;
+	/** Drops entries before `cutoffMs` from the state; true if any were. */
+	prune?(cutoffMs: number): boolean;
 }
 
 type CreateLineParser<R, S> = (state?: S) => LineParser<R, S>;
@@ -18,6 +20,7 @@ export type ParseLines = <R, S>(
 	kind: string,
 	path: string,
 	create: CreateLineParser<R, S>,
+	cutoffMs: number,
 ) => Promise<R>;
 
 export const parseWholeFile: ParseLines = async (_kind, path, create) => {
@@ -53,6 +56,7 @@ export class LineFileCache {
 		kind: string,
 		path: string,
 		create: CreateLineParser<R, S>,
+		cutoffMs: number,
 	): Promise<R> => {
 		const key = `file\u0000${kind}\u0000${path}`;
 		let info: Awaited<ReturnType<typeof stat>>;
@@ -65,7 +69,14 @@ export class LineFileCache {
 		const cursor = this.store.get(key) as FileCursor | undefined;
 		if (cursor?.ino === info.ino) {
 			try {
-				const cached = await this.fromCursor(key, path, info, cursor, create);
+				const cached = await this.fromCursor(
+					key,
+					path,
+					info,
+					cursor,
+					create,
+					cutoffMs,
+				);
 				if (cached) return cached.value;
 			} catch {
 				// A saved state the parser cannot take; read the file again.
@@ -73,7 +84,8 @@ export class LineFileCache {
 		}
 		const parser = create();
 		const read = await readLinesFrom(path, 0, (line) => parser.onLine(line));
-		if (read) await this.save(key, path, read, parser);
+		parser.prune?.(cutoffMs);
+		if (read) await this.save(key, path, info.ino, read, parser);
 		else this.store.delete(key);
 		return parser.result();
 	};
@@ -83,12 +95,15 @@ export class LineFileCache {
 	private async fromCursor<R, S>(
 		key: string,
 		path: string,
-		info: { size: number; mtimeMs: number },
+		info: { ino: number; size: number; mtimeMs: number },
 		cursor: FileCursor,
 		create: CreateLineParser<R, S>,
+		cutoffMs: number,
 	): Promise<{ value: R } | null> {
 		if (info.size === cursor.size && info.mtimeMs === cursor.mtimeMs) {
-			return { value: create(cursor.state as S).result() };
+			const parser = create(cursor.state as S);
+			if (parser.prune?.(cutoffMs)) this.store.set(key, cursor);
+			return { value: parser.result() };
 		}
 		if (
 			cursor.partialTail ||
@@ -101,8 +116,9 @@ export class LineFileCache {
 		const read = await readLinesFrom(path, cursor.end, (line) =>
 			parser.onLine(line),
 		);
+		parser.prune?.(cutoffMs);
 		// A failed read leaves the state ahead of the saved offset.
-		if (read) await this.save(key, path, read, parser);
+		if (read) await this.save(key, path, info.ino, read, parser);
 		else this.store.delete(key);
 		return { value: parser.result() };
 	}
@@ -110,6 +126,7 @@ export class LineFileCache {
 	private async save(
 		key: string,
 		path: string,
+		readIno: number,
 		read: { end: number; partialTail: boolean; size: number },
 		parser: LineParser<unknown>,
 	): Promise<void> {
@@ -118,6 +135,11 @@ export class LineFileCache {
 				stat(path),
 				readHead(path, HEAD_BYTES),
 			]);
+			// Replaced during the read: the state belongs to the old file.
+			if (ino !== readIno) {
+				this.store.delete(key);
+				return;
+			}
 			const cursor: FileCursor = {
 				ino,
 				// Growth during the read leaves the file larger than what was

@@ -17,7 +17,7 @@ import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { LogFile } from "./logs";
 import { collectLogFiles } from "./logs";
 import type { UsageLogEntry } from "./parse";
-import { num, rememberLabel, toSessionLabel } from "./parse";
+import { dropBefore, num, rememberLabel, toSessionLabel } from "./parse";
 
 export function museSessionsRoot(): string {
 	const dataHome =
@@ -208,7 +208,13 @@ function museFileParser(
 			},
 		})),
 	});
-	return { state, onLine, result };
+	return {
+		state,
+		onLine,
+		result,
+		prune: (cutoffMs) =>
+			dropBefore(state.pending, cutoffMs, ({ entry }) => entry.timestampMs),
+	};
 }
 
 /** Returns the number of session logs scanned. */
@@ -236,6 +242,7 @@ export async function collectMuseEntries(
 			"muse",
 			file.path,
 			(state?: MuseFileState) => museFileParser(file, state),
+			cutoffMs,
 		);
 		for (const { recordId, entry } of entries) {
 			if (entry.timestampMs < cutoffMs) continue;

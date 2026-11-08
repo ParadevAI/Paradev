@@ -65,6 +65,9 @@ interface WorkerTaskRunnerOptions {
 	/** Heap caps per worker. A worker past them is terminated with
 	 * ERR_WORKER_OUT_OF_MEMORY instead of taking the process down. */
 	resourceLimits?: ResourceLimits;
+	/** Called when a worker dies unexpectedly, idle or not, before its queue
+	 * is handed to a replacement. */
+	onWorkerCrash?: (error: WorkerTaskError) => void;
 	/** How long a worker gets to honor a cooperative shutdown (kill + reap
 	 * its child processes) before it is hard-terminated. */
 	shutdownGraceMs?: number;
@@ -109,6 +112,7 @@ export class WorkerTaskRunner {
 	private readonly idleTimeoutMs?: number;
 	private readonly execArgv?: string[];
 	private readonly resourceLimits?: ResourceLimits;
+	private readonly onWorkerCrash?: (error: WorkerTaskError) => void;
 	private readonly shutdownGraceMs: number;
 	private readonly workerSlots = new Map<number, WorkerSlot>();
 	private readonly queue: string[] = [];
@@ -126,6 +130,7 @@ export class WorkerTaskRunner {
 		this.idleTimeoutMs = options.idleTimeoutMs;
 		this.execArgv = options.execArgv;
 		this.resourceLimits = options.resourceLimits;
+		this.onWorkerCrash = options.onWorkerCrash;
 		this.shutdownGraceMs = options.shutdownGraceMs ?? DEFAULT_SHUTDOWN_GRACE_MS;
 	}
 
@@ -554,6 +559,7 @@ export class WorkerTaskRunner {
 		const activeTaskId = slot.activeTaskId;
 		this.clearIdleTimer(slot);
 		this.workerSlots.delete(slot.id);
+		if (!slot.terminating && !this.disposed) this.onWorkerCrash?.(error);
 
 		if (activeTaskId) {
 			this.rejectTask(activeTaskId, error);

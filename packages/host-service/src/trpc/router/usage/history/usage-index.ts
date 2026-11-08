@@ -23,6 +23,7 @@ const FRESH_MS = 15_000;
 /** Well inside the usage task timeout: a timed-out task retires the worker
  * that holds the warm index. */
 const WAIT_MS = 60_000;
+const CURSOR_WAIT_MS = 20_000;
 /** Bump when a parser's saved state changes; each release also starts a new
  * cache through HOST_SERVICE_VERSION. */
 const USAGE_CACHE_FORMAT = 1;
@@ -115,15 +116,22 @@ function utcDayStart(ms: number): number {
 	return Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
 }
 
-async function waitAtMost(promise: Promise<void>, ms: number): Promise<void> {
+/** Resolves true if `promise` settles within `ms`, false otherwise. */
+async function waitAtMost(
+	promise: Promise<unknown>,
+	ms: number,
+): Promise<boolean> {
 	let timer: ReturnType<typeof setTimeout> | undefined;
-	await Promise.race([
-		promise,
-		new Promise<void>((resolve) => {
-			timer = setTimeout(resolve, ms);
-		}),
-	]);
-	clearTimeout(timer);
+	try {
+		return await Promise.race([
+			promise.then(() => true),
+			new Promise<boolean>((resolve) => {
+				timer = setTimeout(() => resolve(false), ms);
+			}),
+		]);
+	} finally {
+		clearTimeout(timer);
+	}
 }
 
 function openStore(): UsageStateStore {
@@ -151,15 +159,18 @@ export const collectFromIndex: CollectUsage = async (cutoffMs, options) => {
 	);
 	const collected = await workerIndex.read(cutoffMs, WAIT_MS);
 	const cursorEntries: UsageLogEntry[] = [];
-	try {
-		await collectCursorEntries(
-			cutoffMs,
-			cursorEntries,
-			collected.sessionLabels,
-			options.cwdCandidates ?? [],
-		);
-	} catch {
-		// A signed-out CLI or an offline host contributes nothing.
+	const cursor = collectCursorEntries(
+		cutoffMs,
+		cursorEntries,
+		collected.sessionLabels,
+		options.cwdCandidates ?? [],
+	).catch((error) => {
+		console.warn("[usage-index] Cursor usage unavailable", error);
+	});
+	// A hung keychain lookup must not time out the task: that would retire
+	// the worker that holds the warm index.
+	if (!(await waitAtMost(cursor, CURSOR_WAIT_MS))) {
+		console.warn("[usage-index] Cursor usage timed out");
 	}
 	for (const entry of cursorEntries) collected.entries.push(entry);
 	return collected;

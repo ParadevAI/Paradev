@@ -12,7 +12,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { UsageLogEntry } from "./parse";
-import { entryTimestamp, num, readJsonFile } from "./parse";
+import { dropBefore, entryTimestamp, num, readJsonFile } from "./parse";
 
 export function grokHomes(): string[] {
 	const homes = new Set<string>([join(homedir(), ".grok")]);
@@ -144,7 +144,13 @@ function grokLogParser(
 			},
 		});
 	};
-	return { state: pending, onLine, result: () => pending };
+	return {
+		state: pending,
+		onLine,
+		result: () => pending,
+		prune: (cutoffMs) =>
+			dropBefore(pending, cutoffMs, ({ entry }) => entry.timestampMs),
+	};
 }
 
 /**
@@ -167,8 +173,11 @@ export async function collectGrokEntries(
 	}
 
 	const pending = (
-		await parseLines("grok", logPath, (state?: GrokPendingEntry[]) =>
-			grokLogParser(mtimeMs, state),
+		await parseLines(
+			"grok",
+			logPath,
+			(state?: GrokPendingEntry[]) => grokLogParser(mtimeMs, state),
+			cutoffMs,
 		)
 	).filter(({ entry }) => entry.timestampMs >= cutoffMs);
 	if (pending.length === 0) return 1;

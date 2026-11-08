@@ -215,6 +215,12 @@ export class HostWorkerPool {
 			idleTimeoutMs: this.idleTimeoutMs,
 			execArgv: this.execArgv,
 			resourceLimits: this.resourceLimits,
+			// Work can outlive its task here (the usage index refreshes in the
+			// background), so a crash with no task running must pause too.
+			onWorkerCrash:
+				this.pauseAfterCrashMs === null
+					? undefined
+					: (error) => this.recordCrash(error),
 		});
 		return this.runner;
 	}

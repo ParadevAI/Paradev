@@ -17,6 +17,7 @@ import { collectLogFiles } from "./logs";
 import type { SessionFileResult, UsageLogEntry } from "./parse";
 import {
 	appendSessionFile,
+	dropBefore,
 	entryTimestamp,
 	num,
 	sessionIdForFile,
@@ -114,7 +115,13 @@ function piFileParser(
 			...(cost > 0 ? { costUsd: cost } : {}),
 		});
 	};
-	return { state, onLine, result: () => state };
+	return {
+		state,
+		onLine,
+		result: () => state,
+		prune: (cutoffMs) =>
+			dropBefore(state.entries, cutoffMs, (entry) => entry.timestampMs),
+	};
 }
 
 /** Returns the number of session files scanned. */
@@ -129,8 +136,11 @@ export async function collectPiEntries(
 ): Promise<number> {
 	const files = await collectLogFiles(root, days + 1);
 	for (const file of files) {
-		const result = await parseLines(agent, file.path, (state?: PiFileState) =>
-			piFileParser(agent, file, state),
+		const result = await parseLines(
+			agent,
+			file.path,
+			(state?: PiFileState) => piFileParser(agent, file, state),
+			cutoffMs,
 		);
 		appendSessionFile(
 			result,

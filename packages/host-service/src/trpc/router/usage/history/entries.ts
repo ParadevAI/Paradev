@@ -116,6 +116,7 @@ export async function collectUsageEntries(
 			"claude",
 			file.path,
 			(state?: ClaudeFileResult) => claudeFileParser(file, state),
+			cutoffMs,
 		);
 		appendSessionFile(
 			{ entries: unkeyed, label },
@@ -142,6 +143,7 @@ export async function collectUsageEntries(
 			"codex",
 			file.path,
 			(state?: CodexFileState) => codexFileParser(file, state),
+			cutoffMs,
 		);
 		appendSessionFile(
 			result,
@@ -218,38 +220,28 @@ export async function collectUsageEntries(
 		},
 		{
 			run: (out: UsageLogEntry[]) =>
-				Promise.resolve(
-					collectCopilotEntries(
-						cutoffMs,
-						out,
-						sessionLabels,
-						undefined,
-						sqliteStates,
-					),
+				collectCopilotEntries(
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					sqliteStates,
 				),
 		},
 		{
 			run: (out: UsageLogEntry[]) =>
-				Promise.resolve(
-					collectDevinEntries(
-						cutoffMs,
-						out,
-						sessionLabels,
-						undefined,
-						sqliteStates,
-					),
+				collectDevinEntries(
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					sqliteStates,
 				),
 		},
 		...hermesHomes().map((hermesHome) => ({
 			run: (out: UsageLogEntry[]) =>
 				Promise.resolve(
-					collectHermesEntries(
-						hermesHome,
-						cutoffMs,
-						out,
-						sessionLabels,
-						sqliteStates,
-					),
+					collectHermesEntries(hermesHome, cutoffMs, out, sessionLabels),
 				),
 		})),
 	];

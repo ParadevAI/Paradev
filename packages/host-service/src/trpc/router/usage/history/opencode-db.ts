@@ -14,6 +14,10 @@ import {
 import type { UsageLogEntry } from "./parse";
 import { type SqliteStates, setSessionLabels } from "./sqlite-tail";
 
+/** Rows updated this close below the watermark are read again, in case a
+ * clock step put a reply's last update behind it. */
+const REREAD_MS = 10 * 60 * 1000;
+
 interface OpencodeTail {
 	ino: number;
 	fromMs: number;
@@ -47,15 +51,17 @@ export function collectOpencodeDbEntries(
 		db = conn;
 		const changedRows = conn.prepare(
 			`SELECT m.id, m.session_id, m.time_created, m.time_updated,
-			        CASE WHEN json_extract(m.data, '$.role') = 'assistant' THEN
-			          json_object(
-			            'role', 'assistant',
-			            'modelID', json_extract(m.data, '$.modelID'),
-			            'time', json(json_extract(m.data, '$.time')),
-			            'path', json_object('cwd', json_extract(m.data, '$.path.cwd')),
-			            'cost', json_extract(m.data, '$.cost'),
-			            'tokens', json(json_extract(m.data, '$.tokens'))
-			          )
+			        CASE WHEN json_valid(m.data) THEN
+			          CASE WHEN json_extract(m.data, '$.role') = 'assistant' THEN
+			            json_object(
+			              'role', 'assistant',
+			              'modelID', json_extract(m.data, '$.modelID'),
+			              'time', json(json_extract(m.data, '$.time')),
+			              'path', json_object('cwd', json_extract(m.data, '$.path.cwd')),
+			              'cost', json_extract(m.data, '$.cost'),
+			              'tokens', json(json_extract(m.data, '$.tokens'))
+			            )
+			          END
 			        END AS data,
 			        s.directory, NULL AS title
 			 FROM message m
@@ -81,7 +87,7 @@ export function collectOpencodeDbEntries(
 			let watermark = since;
 			for (const row of changedRows.iterate(
 				tail.fromMs,
-				since,
+				Math.max(0, since - REREAD_MS),
 			) as Iterable<OpencodeTailRow>) {
 				read++;
 				tail.createdById[row.id] = row.time_created;

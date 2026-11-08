@@ -11,6 +11,7 @@ import Database from "better-sqlite3";
 import { type CopilotUsageRow, copilotRowsToEntries } from "./copilot-rows";
 import type { UsageLogEntry } from "./parse";
 import {
+	appendWithSessionCwd,
 	readAppendOnly,
 	type SqliteStates,
 	setSessionLabels,
@@ -23,13 +24,13 @@ export function copilotDbPath(): string {
 }
 
 /** Returns 1 when the database was scanned, 0 when absent/unreadable. */
-export function collectCopilotEntries(
+export async function collectCopilotEntries(
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	dbPath: string = copilotDbPath(),
 	states?: SqliteStates,
-): number {
+): Promise<number> {
 	let db: InstanceType<typeof Database> | null = null;
 	try {
 		const conn = new Database(dbPath, { readonly: true, fileMustExist: true });
@@ -43,7 +44,7 @@ export function collectCopilotEntries(
 			 WHERE e.rowid > ? AND e.rowid <= ?
 			   AND e.created_at >= datetime(? / 1000, 'unixepoch')`,
 		);
-		const entries = readAppendOnly({
+		const entries = await readAppendOnly({
 			db: conn,
 			dbPath,
 			table: "assistant_usage_events",
@@ -61,7 +62,7 @@ export function collectCopilotEntries(
 					into,
 				),
 		});
-		for (const entry of entries) out.push(entry);
+		appendWithSessionCwd(conn, "sessions", "cwd", entries, out);
 		setSessionLabels(conn, "sessions", "summary", entries, sessionLabels);
 		return 1;
 	} catch {

@@ -1,4 +1,4 @@
-import { mkdirSync, unlinkSync } from "node:fs";
+import { chmodSync, mkdirSync, unlinkSync } from "node:fs";
 import { dirname } from "node:path";
 import Database from "better-sqlite3";
 
@@ -69,7 +69,9 @@ export class SqliteStateStore extends MemoryStateStore {
 		version: string,
 		{ saveEveryMs = 5 * 60 * 1000, busyTimeoutMs = 2000 } = {},
 	): SqliteStateStore {
-		mkdirSync(dirname(path), { recursive: true });
+		// Titles in the cache come from prompts: keep it to the owner.
+		mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+		chmodSync(dirname(path), 0o700);
 		try {
 			return new SqliteStateStore(
 				openStateDb(path, version, busyTimeoutMs),
@@ -148,7 +150,7 @@ export class SqliteStateStore extends MemoryStateStore {
 					}
 				}
 				for (const key of saved as string[]) {
-					if (!this.used.has(key)) remove.run(key);
+					if (!this.used.has(key) || this.removed.has(key)) remove.run(key);
 				}
 			})();
 			this.unsaved.clear();

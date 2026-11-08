@@ -51,10 +51,10 @@ describe("LineFileCache", () => {
 		const cache = new LineFileCache();
 		const { fed, create } = recorder();
 
-		expect(await cache.parse("k", path, create)).toEqual(["a", "b"]);
-		expect(await cache.parse("k", path, create)).toEqual(["a", "b"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["a", "b"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["a", "b"]);
 		appendFileSync(path, "c\n");
-		expect(await cache.parse("k", path, create)).toEqual(["a", "b", "c"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["a", "b", "c"]);
 		expect(fed).toEqual(["a", "b", "c"]);
 	});
 
@@ -62,12 +62,16 @@ describe("LineFileCache", () => {
 		const path = join(root, "restart.jsonl");
 		writeFileSync(path, "a\nb\n");
 		const store = new MemoryStateStore();
-		await new LineFileCache(store).parse("k", path, recorder().create);
+		await new LineFileCache(store).parse("k", path, recorder().create, 0);
 
 		appendFileSync(path, "c\n");
 		const restarted = new LineFileCache(reloaded(store, [fileKey(path)]));
 		const { fed, create } = recorder();
-		expect(await restarted.parse("k", path, create)).toEqual(["a", "b", "c"]);
+		expect(await restarted.parse("k", path, create, 0)).toEqual([
+			"a",
+			"b",
+			"c",
+		]);
 		expect(fed).toEqual(["c"]);
 	});
 
@@ -76,13 +80,13 @@ describe("LineFileCache", () => {
 		writeFileSync(path, "a\nb\n");
 		const cache = new LineFileCache();
 		const { create, created } = recorder();
-		await cache.parse("k", path, create);
+		await cache.parse("k", path, create, 0);
 
 		writeFileSync(path, "x\n");
-		expect(await cache.parse("k", path, create)).toEqual(["x"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["x"]);
 		writeFileSync(`${path}.next`, "y\nz\n");
 		renameSync(`${path}.next`, path);
-		expect(await cache.parse("k", path, create)).toEqual(["y", "z"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["y", "z"]);
 		expect(created()).toBe(3);
 	});
 
@@ -91,10 +95,10 @@ describe("LineFileCache", () => {
 		writeFileSync(path, "a\n{par");
 		const cache = new LineFileCache();
 		const { create } = recorder();
-		expect(await cache.parse("k", path, create)).toEqual(["a", "{par"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["a", "{par"]);
 
 		appendFileSync(path, "tial}\n");
-		expect(await cache.parse("k", path, create)).toEqual(["a", "{partial}"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["a", "{partial}"]);
 	});
 
 	test("forgets files a scan no longer visits", async () => {
@@ -103,7 +107,7 @@ describe("LineFileCache", () => {
 		const store = new MemoryStateStore();
 		const cache = new LineFileCache(store);
 		store.beginScan();
-		await cache.parse("k", path, recorder().create);
+		await cache.parse("k", path, recorder().create, 0);
 		store.endScan();
 		expect(store.get(fileKey(path))).toBeDefined();
 		store.beginScan();
@@ -115,11 +119,11 @@ describe("LineFileCache", () => {
 		const path = join(root, "rewrite-in-place.jsonl");
 		writeFileSync(path, "a\nb\n");
 		const cache = new LineFileCache();
-		await cache.parse("k", path, recorder().create);
+		await cache.parse("k", path, recorder().create, 0);
 
 		writeFileSync(path, "x\ny\nz\n");
 		const { fed, create } = recorder();
-		expect(await cache.parse("k", path, create)).toEqual(["x", "y", "z"]);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["x", "y", "z"]);
 		expect(fed).toEqual(["x", "y", "z"]);
 	});
 
@@ -128,11 +132,11 @@ describe("LineFileCache", () => {
 		writeFileSync(path, "a\n");
 		const store = new MemoryStateStore();
 		const cache = new LineFileCache(store);
-		await cache.parse("k", path, recorder().create);
+		await cache.parse("k", path, recorder().create, 0);
 		const cursor = store.get(fileKey(path)) as { state: unknown };
 		store.set(fileKey(path), { ...cursor, state: "not an array" });
 
-		expect(await cache.parse("k", path, recorder().create)).toEqual(["a"]);
+		expect(await cache.parse("k", path, recorder().create, 0)).toEqual(["a"]);
 	});
 
 	test("does not read an unchanged file with an unterminated last line again", async () => {
@@ -140,8 +144,30 @@ describe("LineFileCache", () => {
 		writeFileSync(path, "a\n{par");
 		const cache = new LineFileCache();
 		const { fed, create } = recorder();
-		await cache.parse("k", path, create);
-		expect(await cache.parse("k", path, create)).toEqual(["a", "{par"]);
+		await cache.parse("k", path, create, 0);
+		expect(await cache.parse("k", path, create, 0)).toEqual(["a", "{par"]);
 		expect(fed).toEqual(["a", "{par"]);
+	});
+
+	test("drops entries before the cutoff from the saved state", async () => {
+		const path = join(root, "prune.jsonl");
+		writeFileSync(path, "1\n5\n9\n");
+		const store = new MemoryStateStore();
+		const cache = new LineFileCache(store);
+		const create = (state: number[] = []): LineParser<number[], number[]> => ({
+			state,
+			onLine: (line) => state.push(Number(line)),
+			result: () => [...state],
+			prune: (cutoffMs) => {
+				const before = state.length;
+				state.splice(0, state.length, ...state.filter((t) => t >= cutoffMs));
+				return state.length < before;
+			},
+		});
+		expect(await cache.parse("k", path, create, 0)).toEqual([1, 5, 9]);
+		expect(await cache.parse("k", path, create, 6)).toEqual([9]);
+		expect((store.get(fileKey(path)) as { state: number[] }).state).toEqual([
+			9,
+		]);
 	});
 });

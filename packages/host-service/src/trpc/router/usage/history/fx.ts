@@ -12,7 +12,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { SessionFileResult, UsageLogEntry } from "./parse";
-import { appendSessionFile, num } from "./parse";
+import { appendSessionFile, dropBefore, num } from "./parse";
 
 export function fxSessionsRoot(): string {
 	return join(homedir(), ".fx", "sessions");
@@ -114,6 +114,8 @@ function fxFileParser(
 		state,
 		onLine,
 		result: () => ({ entries: state.entries, label: null }),
+		prune: (cutoffMs) =>
+			dropBefore(state.entries, cutoffMs, (entry) => entry.timestampMs),
 	};
 }
 
@@ -144,8 +146,11 @@ export async function collectFxEntries(
 		}
 		scanned++;
 
-		const result = await parseLines("fx", eventsPath, (state?: FxFileState) =>
-			fxFileParser(sessionDir, state),
+		const result = await parseLines(
+			"fx",
+			eventsPath,
+			(state?: FxFileState) => fxFileParser(sessionDir, state),
+			cutoffMs,
 		);
 		appendSessionFile(result, sessionDir, cutoffMs, out);
 	}

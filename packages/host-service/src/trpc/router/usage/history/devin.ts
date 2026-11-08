@@ -12,6 +12,7 @@ import Database from "better-sqlite3";
 import { type DevinMessageRow, devinRowsToEntries } from "./devin-rows";
 import type { UsageLogEntry } from "./parse";
 import {
+	appendWithSessionCwd,
 	readAppendOnly,
 	type SqliteStates,
 	setSessionLabels,
@@ -24,13 +25,13 @@ export function devinDbPath(): string {
 }
 
 /** Returns 1 when the database was scanned, 0 when absent/unreadable. */
-export function collectDevinEntries(
+export async function collectDevinEntries(
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	dbPath: string = devinDbPath(),
 	states?: SqliteStates,
-): number {
+): Promise<number> {
 	let db: InstanceType<typeof Database> | null = null;
 	try {
 		const conn = new Database(dbPath, { readonly: true, fileMustExist: true });
@@ -54,10 +55,12 @@ export function collectDevinEntries(
 			 LEFT JOIN sessions s ON s.id = m.session_id
 			 WHERE m.rowid > ? AND m.rowid <= ?
 			   AND m.created_at >= ?
-			   AND json_extract(m.chat_message, '$.role') = 'assistant'
-			   AND json_type(m.chat_message, '$.metadata.metrics') = 'object'`,
+			   AND CASE WHEN json_valid(m.chat_message)
+			         THEN json_extract(m.chat_message, '$.role') = 'assistant'
+			              AND json_type(m.chat_message, '$.metadata.metrics') = 'object'
+			       END`,
 		);
-		const entries = readAppendOnly({
+		const entries = await readAppendOnly({
 			db: conn,
 			dbPath,
 			table: "message_nodes",
@@ -77,7 +80,7 @@ export function collectDevinEntries(
 					seen,
 				),
 		});
-		for (const entry of entries) out.push(entry);
+		appendWithSessionCwd(conn, "sessions", "working_directory", entries, out);
 		setSessionLabels(conn, "sessions", "title", entries, sessionLabels);
 		return 1;
 	} catch {

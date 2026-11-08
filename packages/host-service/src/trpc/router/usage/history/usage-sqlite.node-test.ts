@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import Database from "better-sqlite3";
-import { collectHermesEntries } from "./hermes.ts";
+import { collectDevinEntries } from "./devin.ts";
 import type { UsageLogEntry } from "./parse.ts";
 import { readAppendOnly } from "./sqlite-tail.ts";
 import { MemoryStateStore } from "./usage-store.ts";
@@ -28,40 +28,6 @@ function entry(timestampMs: number, sessionId: string): UsageLogEntry {
 	};
 }
 
-test("hermes reuses its scan until state.db changes", () => {
-	const home = join(root, "hermes");
-	mkdirSync(home, { recursive: true });
-	// WAL, as Hermes runs it: each write grows state.db-wal, which changes the
-	// signature even when it lands in the same timestamp tick.
-	const state = new Database(join(home, "state.db"));
-	state.pragma("journal_mode = WAL");
-	state.exec(`CREATE TABLE sessions (id TEXT, model TEXT, cwd TEXT, title TEXT,
-		started_at REAL, ended_at REAL, last_activity_at REAL, input_tokens INT,
-		output_tokens INT, cache_read_tokens INT, cache_write_tokens INT,
-		reasoning_tokens INT, estimated_cost_usd REAL, actual_cost_usd REAL)`);
-	state
-		.prepare(
-			"INSERT INTO sessions VALUES ('s', 'm', '/p', 'T', ?, NULL, NULL, 10, 5, 0, 0, 0, NULL, NULL)",
-		)
-		.run(Date.now() / 1000);
-	const store = new MemoryStateStore();
-	const scan = () => {
-		const out: UsageLogEntry[] = [];
-		collectHermesEntries(home, 0, out, new Map(), store);
-		return out.reduce((sum, e) => sum + e.uncachedInput, 0);
-	};
-	assert.equal(scan(), 10);
-
-	const key = `hermes:${join(home, "state.db")}`;
-	const saved = store.get(key) as { entries: UsageLogEntry[] };
-	store.set(key, { ...saved, entries: [] });
-	assert.equal(scan(), 0, "an unchanged database reuses the saved scan");
-
-	state.prepare("UPDATE sessions SET input_tokens = 25").run();
-	state.close();
-	assert.equal(scan(), 25, "a write to state.db scans again");
-});
-
 function appendOnlyDb(name: string, rows: number) {
 	const path = join(root, `${name}.db`);
 	const db = new Database(path);
@@ -72,7 +38,7 @@ function appendOnlyDb(name: string, rows: number) {
 	return { db, path };
 }
 
-test("a read that fails halfway leaves no rows behind to count twice", () => {
+test("a read that fails halfway leaves no rows behind to count twice", async () => {
 	const { db, path } = appendOnlyDb("fail-halfway", 1);
 	const store = new MemoryStateStore();
 	let failNext = true;
@@ -97,16 +63,16 @@ test("a read that fails halfway leaves no rows behind to count twice", () => {
 				}
 			},
 		});
-	assert.equal(read().length, 1);
+	assert.equal((await read()).length, 1);
 	for (let i = 0; i < 2; i++) {
 		db.prepare("INSERT INTO t (ts) VALUES (?)").run(Date.now());
 	}
-	assert.throws(read);
-	assert.equal(read().length, 3);
+	await assert.rejects(read);
+	assert.equal((await read()).length, 3);
 	db.close();
 });
 
-test("dedupe keys older than the window are dropped", () => {
+test("dedupe keys older than the window are dropped", async () => {
 	const { db, path } = appendOnlyDb("prune", 2);
 	const store = new MemoryStateStore();
 	const read = (cutoffMs: number) =>
@@ -126,11 +92,40 @@ test("dedupe keys older than the window are dropped", () => {
 				}
 			},
 		});
-	read(0);
+	await read(0);
 	const seenKeys = () =>
 		Object.keys((store.get("t") as { seen: Record<string, number> }).seen);
 	assert.equal(seenKeys().length, 2);
-	read(Date.now() + 60_000);
+	await read(Date.now() + 60_000);
 	assert.equal(seenKeys().length, 0);
 	db.close();
+});
+
+test("a malformed Devin message is skipped, not the whole read", async () => {
+	const path = join(root, "devin.db");
+	const db = new Database(path);
+	db.exec(`CREATE TABLE sessions (id TEXT PRIMARY KEY, working_directory TEXT, model TEXT, title TEXT);
+		CREATE TABLE message_nodes (row_id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, chat_message TEXT, created_at INTEGER)`);
+	db.prepare("INSERT INTO sessions VALUES ('s', '/p', 'm', 'T')").run();
+	const message = (id: string) =>
+		JSON.stringify({
+			message_id: id,
+			role: "assistant",
+			metadata: {
+				request_id: id,
+				metrics: { input_tokens: 1, output_tokens: 1 },
+			},
+		});
+	const insert = db.prepare(
+		"INSERT INTO message_nodes (session_id, chat_message, created_at) VALUES ('s', ?, ?)",
+	);
+	const nowSeconds = Math.floor(Date.now() / 1000);
+	insert.run(message("a"), nowSeconds);
+	insert.run('{"role": "assistant", ', nowSeconds);
+	insert.run(message("b"), nowSeconds);
+	db.close();
+
+	const out: UsageLogEntry[] = [];
+	assert.equal(await collectDevinEntries(0, out, new Map(), path), 1);
+	assert.equal(out.length, 2);
 });

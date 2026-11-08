@@ -131,3 +131,30 @@ test("a cache file another process has locked is left in place", () => {
 	assert.equal(reopened.get("a"), 1);
 	reopened.close();
 });
+
+test("a deleted key stays deleted before and after the next save", () => {
+	const path = join(root, "delete", "usage-cache.db");
+	const options = { saveEveryMs: 60_000, busyTimeoutMs: 50 };
+	const first = SqliteStateStore.open(path, "v1", options);
+	scan(first, () => first.set("a", 1));
+	scan(first, () => {
+		first.delete("a");
+		assert.equal(first.get("a"), undefined);
+	});
+	scan(first, () => assert.equal(first.get("a"), undefined));
+	first.close();
+
+	const saving = SqliteStateStore.open(path, "v1", {
+		...options,
+		saveEveryMs: 0,
+	});
+	scan(saving, () => {
+		saving.get("a");
+		saving.delete("a");
+		saving.get("a");
+	});
+	saving.close();
+	const reopened = SqliteStateStore.open(path, "v1", options);
+	assert.equal(reopened.get("a"), undefined);
+	reopened.close();
+});

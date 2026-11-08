@@ -6,11 +6,13 @@ import { MAX_BACKFILL_DAYS } from "@superset/trpc/leaderboard-periods";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { WorkerPoolUnavailableError } from "../../../workers/host-worker-pool";
 import {
 	leaderboardPayloadTask,
 	usageHistoryTask,
 } from "../../../workers/tasks/usage";
 import { getUsageWorkerPool } from "../../../workers/usage-worker-pool";
+import { WORKER_CRASH_ERROR_NAME } from "../../../workers/WorkerTaskRunner";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import {
 	createOffLoop,
@@ -88,8 +90,8 @@ function getQuota(forceRefresh: boolean): Promise<UsageAccount[]> {
 
 const offUsageWorker = createOffLoop(getUsageWorkerPool);
 
-/** offLoop on the usage worker. A request that outwaits a cold index reaches
- * the client as a retryable TIMEOUT, not an internal error. */
+/** offLoop on the usage worker. A cold index, a crashed worker and a paused
+ * pool reach the client as retryable errors, not internal ones. */
 function usageOffLoop<TInput, TTaskInput, TResult>(
 	spec: OffLoopSpec<TInput, TTaskInput, TResult>,
 ) {
@@ -98,10 +100,21 @@ function usageOffLoop<TInput, TTaskInput, TResult>(
 		try {
 			return await resolve(args);
 		} catch (error) {
-			if (error instanceof Error && error.name === USAGE_INDEXING_ERROR) {
+			if (!(error instanceof Error)) throw error;
+			if (error.name === USAGE_INDEXING_ERROR) {
 				throw new TRPCError({
 					code: "TIMEOUT",
 					message: error.message,
+					cause: error,
+				});
+			}
+			if (
+				error instanceof WorkerPoolUnavailableError ||
+				error.name === WORKER_CRASH_ERROR_NAME
+			) {
+				throw new TRPCError({
+					code: "SERVICE_UNAVAILABLE",
+					message: "Usage history is paused after a failed scan.",
 					cause: error,
 				});
 			}

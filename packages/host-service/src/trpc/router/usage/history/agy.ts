@@ -4,7 +4,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { SessionFileResult, UsageLogEntry } from "./parse";
-import { appendSessionFile, toSessionLabel } from "./parse";
+import { appendSessionFile, dropBefore, toSessionLabel } from "./parse";
 
 type JsonObject = Record<string, unknown>;
 
@@ -135,7 +135,13 @@ function agyFileParser(
 		const entry = parseAgyTranscriptLine(line, sessionId, state.cwd);
 		if (entry) state.entries.push(entry);
 	};
-	return { state, onLine, result: () => state };
+	return {
+		state,
+		onLine,
+		result: () => state,
+		prune: (cutoffMs) =>
+			dropBefore(state.entries, cutoffMs, (entry) => entry.timestampMs),
+	};
 }
 
 export async function collectAgyEntries(
@@ -166,8 +172,11 @@ export async function collectAgyEntries(
 			continue;
 		}
 		scanned += 1;
-		const result = await parseLines("agy", path, (state?: AgyFileState) =>
-			agyFileParser(sessionId, state),
+		const result = await parseLines(
+			"agy",
+			path,
+			(state?: AgyFileState) => agyFileParser(sessionId, state),
+			cutoffMs,
 		);
 		appendSessionFile(result, sessionId, cutoffMs, out, sessionLabels);
 	}

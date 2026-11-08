@@ -21,6 +21,11 @@ const CRASH_WORKER = path.resolve(
 	"test-fixtures",
 	"crashing-worker.ts",
 );
+const CRASH_AFTER_RESULT_WORKER = path.resolve(
+	import.meta.dirname,
+	"test-fixtures",
+	"crash-after-result-worker.ts",
+);
 
 const pools: HostWorkerPool[] = [];
 function makePool(options?: ConstructorParameters<typeof HostWorkerPool>[0]) {
@@ -304,6 +309,22 @@ describe("HostWorkerPool", () => {
 			WorkerPoolUnavailableError,
 		);
 		expect(inlineRuns).toBe(0);
+	});
+
+	test("without inline fallback a worker that crashes while idle still pauses the pool", async () => {
+		const pool = makePool({
+			scriptPathResolver: () => CRASH_AFTER_RESULT_WORKER,
+			noInlineFallback: { pauseAfterCrashMs: 60_000 },
+		});
+		const echo = defineWorkerTask<{ v: number }, number>({
+			type: "test/echo",
+			handler: async ({ v }) => v,
+		});
+		expect(await pool.run(echo, { v: 1 })).toBe(1);
+		await new Promise((resolve) => setTimeout(resolve, 150));
+		await expect(pool.run(echo, { v: 2 })).rejects.toBeInstanceOf(
+			WorkerPoolUnavailableError,
+		);
 	});
 
 	test("without inline fallback a missing bundle fails the task", async () => {

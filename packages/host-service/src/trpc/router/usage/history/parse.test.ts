@@ -62,6 +62,18 @@ describe("readLinesFrom", () => {
 	test("skips an unreadable file without throwing", async () => {
 		expect(await linesOf(join(root, "missing.jsonl"))).toEqual([]);
 	});
+
+	test("skips a line the parser throws on and keeps reading", async () => {
+		const path = join(root, "throws.jsonl");
+		writeFileSync(path, "a\nbad\nc\n");
+		const lines: string[] = [];
+		const read = await readLinesFrom(path, 0, (line) => {
+			if (line === "bad") throw new Error("unparseable");
+			lines.push(line);
+		});
+		expect(lines).toEqual(["a", "c"]);
+		expect(read?.end).toBe(8);
+	});
 });
 
 describe("readJsonFile", () => {

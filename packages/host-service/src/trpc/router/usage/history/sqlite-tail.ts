@@ -18,6 +18,8 @@ interface KeySet {
 
 interface AppendOnlyTail {
 	ino: number;
+	/** Database and WAL file signatures when last read. */
+	signature: string;
 	fromMs: number;
 	lastRowId: number;
 	/** Rows with rowid <= lastRowId; a drop means rows were deleted. */
@@ -44,9 +46,23 @@ export interface AppendOnlyRead {
 	) => void;
 }
 
+/** Rows per read transaction; the worker yields between batches so its
+ * timers keep running during a long first read. */
+const BATCH_ROWS = 2000;
+
+/** ino, size and mtime of a file, or "-" when it does not exist. */
+export function fileSignature(path: string): string {
+	try {
+		const { ino, size, mtimeMs } = statSync(path);
+		return `${ino}:${size}:${mtimeMs}`;
+	} catch {
+		return "-";
+	}
+}
+
 /** Entries from `cutoffMs` on, reading only rows added since the last call.
  * Starts over if the file was replaced, rows were deleted, or the window grew. */
-export function readAppendOnly({
+export async function readAppendOnly({
 	db,
 	dbPath,
 	table,
@@ -54,72 +70,110 @@ export function readAppendOnly({
 	cutoffMs,
 	states,
 	readRows,
-}: AppendOnlyRead): UsageLogEntry[] {
+}: AppendOnlyRead): Promise<UsageLogEntry[]> {
 	const { ino } = statSync(dbPath);
+	const signature = `${fileSignature(dbPath)}|${fileSignature(`${dbPath}-wal`)}`;
+	const top = (
+		db.prepare(`SELECT coalesce(max(rowid), 0) AS top FROM ${table}`).get() as {
+			top: number;
+		}
+	).top;
+	let tail = states?.get(stateKey) as AppendOnlyTail | undefined;
+	// Unchanged file and no new rowid: skip the full count below.
+	if (
+		tail?.signature === signature &&
+		tail.lastRowId === top &&
+		tail.fromMs === cutoffMs
+	) {
+		return tail.entries;
+	}
 	const countUpTo = db.prepare(
 		`SELECT count(*) AS n FROM ${table} WHERE rowid <= ?`,
 	);
-	const maxRowId = db.prepare(
-		`SELECT coalesce(max(rowid), 0) AS top FROM ${table}`,
-	);
-	// One read transaction, so the count, the max and the rows agree.
-	return db.transaction(() => {
-		const top = (maxRowId.get() as { top: number }).top;
-		let tail = states?.get(stateKey) as AppendOnlyTail | undefined;
-		if (
-			tail &&
-			(tail.ino !== ino ||
-				cutoffMs < tail.fromMs ||
-				top < tail.lastRowId ||
-				(countUpTo.get(tail.lastRowId) as { n: number }).n !== tail.rowCount)
-		) {
-			tail = undefined;
-		}
-		let changed = !tail;
-		tail ??= {
-			ino,
-			fromMs: cutoffMs,
-			lastRowId: 0,
-			rowCount: 0,
-			seen: {},
-			entries: [],
+	if (
+		tail &&
+		(tail.ino !== ino ||
+			cutoffMs < tail.fromMs ||
+			top < tail.lastRowId ||
+			(countUpTo.get(tail.lastRowId) as { n: number }).n !== tail.rowCount)
+	) {
+		tail = undefined;
+	}
+	tail ??= {
+		ino,
+		signature,
+		fromMs: cutoffMs,
+		lastRowId: 0,
+		rowCount: 0,
+		seen: {},
+		entries: [],
+	};
+	if (top > tail.lastRowId) {
+		// Applied only once every batch is read: a read that throws halfway
+		// must not leave rows in the state that the retry reads again.
+		const seen = tail.seen;
+		const added = new Map<string, number>();
+		const entries: UsageLogEntry[] = [];
+		const now = Date.now();
+		const keys: KeySet = {
+			has: (key) => added.has(key) || Object.hasOwn(seen, key),
+			add: (key) => {
+				added.set(key, now);
+			},
 		};
-		if (top > tail.lastRowId) {
-			// Applied only once the read succeeds: a read that throws halfway
-			// must not leave rows in the state that the retry reads again.
-			const seen = tail.seen;
-			const added = new Map<string, number>();
-			const entries: UsageLogEntry[] = [];
-			const now = Date.now();
-			readRows(tail.lastRowId, top, entries, {
-				has: (key) => added.has(key) || Object.hasOwn(seen, key),
-				add: (key) => {
-					added.set(key, now);
-				},
-			});
-			for (const entry of entries) tail.entries.push(entry);
-			for (const [key, at] of added) seen[key] = at;
-			tail.lastRowId = top;
-			tail.rowCount = (countUpTo.get(top) as { n: number }).n;
-			changed = true;
+		for (let after = tail.lastRowId; after < top; after += BATCH_ROWS) {
+			const upTo = Math.min(top, after + BATCH_ROWS);
+			db.transaction(() => readRows(after, upTo, entries, keys))();
+			await new Promise((resolve) => setImmediate(resolve));
 		}
-		if (cutoffMs > tail.fromMs) {
-			tail.entries = tail.entries.filter(
-				(entry) => entry.timestampMs >= cutoffMs,
-			);
-			for (const key in tail.seen) {
-				if ((tail.seen[key] ?? 0) < cutoffMs) delete tail.seen[key];
-			}
-			tail.fromMs = cutoffMs;
-			changed = true;
+		for (const entry of entries) {
+			if (entry.timestampMs >= cutoffMs) tail.entries.push(entry);
 		}
-		if (changed) states?.set(stateKey, tail);
-		return tail.entries;
-	})();
+		for (const [key, at] of added) seen[key] = at;
+		tail.lastRowId = top;
+		tail.rowCount = (countUpTo.get(top) as { n: number }).n;
+	}
+	if (cutoffMs > tail.fromMs) {
+		tail.entries = tail.entries.filter(
+			(entry) => entry.timestampMs >= cutoffMs,
+		);
+		for (const key in tail.seen) {
+			if ((tail.seen[key] ?? 0) < cutoffMs) delete tail.seen[key];
+		}
+		tail.fromMs = cutoffMs;
+	}
+	tail.signature = signature;
+	states?.set(stateKey, tail);
+	return tail.entries;
 }
 
-/** Titles change after the first message, so they are read on every scan,
- * and only for the sessions that have entries. */
+/** One column of the sessions that have entries, by session id. */
+function sessionColumn(
+	db: InstanceType<typeof Database>,
+	table: "session" | "sessions",
+	column: "summary" | "title" | "cwd" | "working_directory",
+	sessionIds: readonly string[],
+): Map<string, string> {
+	const values = new Map<string, string>();
+	if (sessionIds.length === 0) return values;
+	const rows = db
+		.prepare(
+			`SELECT id, substr(${column}, 1, ${MAX_SQL_TEXT_LENGTH}) AS value
+			 FROM ${table} WHERE id IN (SELECT value FROM json_each(?))`,
+		)
+		.all(JSON.stringify(sessionIds)) as Array<{
+		id: string;
+		value: string | null;
+	}>;
+	for (const { id, value } of rows) if (value) values.set(id, value);
+	return values;
+}
+
+function sessionIdsOf(entries: readonly UsageLogEntry[]): string[] {
+	return [...new Set(entries.map((entry) => entry.sessionId))];
+}
+
+/** Titles change after the first message, so they are read on every scan. */
 export function setSessionLabels(
 	db: InstanceType<typeof Database>,
 	table: "session" | "sessions",
@@ -128,15 +182,24 @@ export function setSessionLabels(
 	sessionLabels?: Map<string, string>,
 ): void {
 	if (!sessionLabels) return;
-	const ids = [...new Set(entries.map((entry) => entry.sessionId))].filter(
-		(id) => !sessionLabels.has(id),
-	);
-	if (ids.length === 0) return;
-	const rows = db
-		.prepare(
-			`SELECT id, substr(${titleColumn}, 1, ${MAX_SQL_TEXT_LENGTH}) AS title
-			 FROM ${table} WHERE id IN (SELECT value FROM json_each(?))`,
-		)
-		.all(JSON.stringify(ids)) as Array<{ id: string; title: string | null }>;
-	for (const { id, title } of rows) rememberLabel(sessionLabels, id, title);
+	const ids = sessionIdsOf(entries).filter((id) => !sessionLabels.has(id));
+	for (const [id, title] of sessionColumn(db, table, titleColumn, ids)) {
+		rememberLabel(sessionLabels, id, title);
+	}
+}
+
+/** Appends `entries` with each session's current cwd, which can change after
+ * the rows were read. */
+export function appendWithSessionCwd(
+	db: InstanceType<typeof Database>,
+	table: "session" | "sessions",
+	cwdColumn: "cwd" | "working_directory",
+	entries: readonly UsageLogEntry[],
+	out: UsageLogEntry[],
+): void {
+	const cwdById = sessionColumn(db, table, cwdColumn, sessionIdsOf(entries));
+	for (const entry of entries) {
+		const cwd = cwdById.get(entry.sessionId) ?? entry.cwd;
+		out.push(cwd === entry.cwd ? entry : { ...entry, cwd });
+	}
 }

@@ -102,7 +102,12 @@ export async function readLinesFrom(
 			raw.length > 0 && raw[raw.length - 1] === 0x0d
 				? raw.subarray(0, -1)
 				: raw;
-		if (line.length <= MAX_LINE_LENGTH) onLine(line.toString("utf-8"));
+		if (line.length > MAX_LINE_LENGTH) return;
+		try {
+			onLine(line.toString("utf-8"));
+		} catch {
+			// One line a parser cannot take must not end the file.
+		}
 	};
 	try {
 		const chunks = createReadStream(path, { start }) as AsyncIterable<Buffer>;
@@ -129,7 +134,8 @@ export async function readLinesFrom(
 			const rest = chunk.subarray(lineStart);
 			pending.push(rest);
 			pendingLength += rest.length;
-			if (pendingLength > MAX_LINE_LENGTH) {
+			// One byte of slack for a trailing \r, stripped once the line ends.
+			if (pendingLength > MAX_LINE_LENGTH + 1) {
 				pending = [];
 				pendingLength = 0;
 				skipping = true;
@@ -288,7 +294,18 @@ export function claudeFileParser(
 			state.byMessage[dedupeKey] = entry;
 		}
 	};
-	return { state, onLine, result: () => state };
+	const prune = (cutoffMs: number) => {
+		let dropped = dropBefore(state.unkeyed, cutoffMs, entryTime);
+		for (const key in state.byMessage) {
+			const entry = state.byMessage[key];
+			if (entry && entry.timestampMs < cutoffMs) {
+				delete state.byMessage[key];
+				dropped = true;
+			}
+		}
+		return dropped;
+	};
+	return { state, onLine, result: () => state, prune };
 }
 
 interface CodexLine {
@@ -315,6 +332,23 @@ export interface SessionFileResult {
 	entries: UsageLogEntry[];
 	label: string | null;
 }
+
+/** Removes items before `cutoffMs` in place; true if any were removed. */
+export function dropBefore<T>(
+	items: T[],
+	cutoffMs: number,
+	timestampOf: (item: T) => number,
+): boolean {
+	let kept = 0;
+	for (const item of items) {
+		if (timestampOf(item) >= cutoffMs) items[kept++] = item;
+	}
+	const dropped = kept < items.length;
+	items.length = kept;
+	return dropped;
+}
+
+const entryTime = (entry: UsageLogEntry) => entry.timestampMs;
 
 /** The first label found for a session wins. */
 export function rememberLabel(
@@ -422,5 +456,10 @@ export function codexFileParser(
 			reasoningOutput: num(usage.reasoning_output_tokens),
 		});
 	};
-	return { state, onLine, result: () => state };
+	return {
+		state,
+		onLine,
+		result: () => state,
+		prune: (cutoffMs) => dropBefore(state.entries, cutoffMs, entryTime),
+	};
 }
