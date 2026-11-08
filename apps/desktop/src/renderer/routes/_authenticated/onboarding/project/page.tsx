@@ -30,6 +30,10 @@ import { EmptyProjectModal } from "renderer/routes/_authenticated/components/Emp
 import { TemplateGalleryModal } from "renderer/routes/_authenticated/components/TemplateGalleryModal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useOnboardingRestartStore } from "renderer/routes/_authenticated/stores/onboardingRestartStore";
+import {
+	gitEnvironmentReasonOf,
+	type ProjectCreateError,
+} from "renderer/routes/_authenticated/utils/projectCreateError";
 import { GhAuthDialog } from "../components/GhAuthDialog";
 import { OnboardingTile } from "../components/OnboardingTile";
 import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
@@ -105,15 +109,46 @@ function OnboardingProjectPage() {
 	const [acquisitionSource, setAcquisitionSource] =
 		useState<AcquisitionSourceAnswer>(EMPTY_ACQUISITION_SOURCE_ANSWER);
 
-	const { data: gitStatus } = electronTrpc.system.detectGit.useQuery(
-		undefined,
-		{
-			refetchInterval: (query) =>
-				query.state.data?.installed === false ? GIT_POLL_MS : false,
-		},
+	// Set when a create or clone fails because git can't run, so the notice
+	// shows even before detection catches up.
+	const [gitToolsReportedAt, setGitToolsReportedAt] = useState<number | null>(
+		null,
 	);
-	const gitMissing = gitStatus?.installed === false;
+	const {
+		data: gitStatus,
+		dataUpdatedAt: gitCheckedAt,
+		refetch: refetchGit,
+	} = electronTrpc.system.detectGit.useQuery(undefined, {
+		refetchInterval: (query) =>
+			query.state.data?.installed === false ||
+			(gitToolsReportedAt !== null &&
+				query.state.dataUpdatedAt <= gitToolsReportedAt)
+				? GIT_POLL_MS
+				: false,
+	});
+	const gitDetectedMissing = gitStatus?.installed === false;
+	const gitToolsReported =
+		gitToolsReportedAt !== null && gitCheckedAt <= gitToolsReportedAt;
+	const gitMissing = gitDetectedMissing || gitToolsReported;
 	const gitMissingMessage = `${t`Paradev needs Git to add a project.`} ${t`On a Mac, Git comes with Apple's Command Line Tools.`}`;
+	const showGitToolsNotice = () => {
+		setEmptyProjectOpen(false);
+		setTemplateOpen(false);
+		setCloneError(null);
+		setGitToolsReportedAt(Date.now());
+		void refetchGit();
+	};
+	const isGitToolsFailure = (err: unknown) =>
+		gitEnvironmentReasonOf(err) === "COMMAND_LINE_TOOLS_MISSING" ||
+		isGitToolsMissingError(rawErrorMessage(err));
+	const handleProjectCreateError = (error: ProjectCreateError) => {
+		if (
+			error.gitEnvironmentReason === "COMMAND_LINE_TOOLS_MISSING" ||
+			isGitToolsMissingError(error.message)
+		) {
+			showGitToolsNotice();
+		}
+	};
 	const describeFailure = (message: string) =>
 		isGitToolsMissingError(message) ? gitMissingMessage : message;
 
@@ -227,6 +262,10 @@ function OnboardingProjectPage() {
 						mode: { kind: "clone", parentDir: cloneTargetDir, url: trimmed },
 					});
 				} catch (err) {
+					if (isGitToolsFailure(err)) {
+						showGitToolsNotice();
+						return;
+					}
 					setCloneError(toCloneError(err, gitMissingMessage));
 					return;
 				}
@@ -240,6 +279,10 @@ function OnboardingProjectPage() {
 						parentDir: cloneTargetDir,
 					});
 				} catch (err) {
+					if (isGitToolsFailure(err)) {
+						showGitToolsNotice();
+						return;
+					}
 					setCloneError(toCloneError(err, gitMissingMessage));
 					return;
 				}
@@ -266,11 +309,13 @@ function OnboardingProjectPage() {
 
 	return (
 		<div className="flex flex-col gap-3">
-			{gitStatus && gitMissing && (
+			{gitMissing && (
 				<GitMissingNotice
-					needsCommandLineTools={gitStatus.needsCommandLineTools}
-					installerRunning={gitStatus.installerRunning}
-					error={gitStatus.error}
+					needsCommandLineTools={
+						gitDetectedMissing ? gitStatus.needsCommandLineTools : true
+					}
+					installerRunning={gitStatus?.installerRunning ?? false}
+					error={gitDetectedMissing ? gitStatus.error : null}
 				/>
 			)}
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -367,15 +412,12 @@ function OnboardingProjectPage() {
 					setTemplateOpen(false);
 					finish(result.projectId);
 				}}
+				onError={handleProjectCreateError}
 			/>
 			<EmptyProjectModal
 				open={emptyProjectOpen}
 				onOpenChange={setEmptyProjectOpen}
-				onError={(message) =>
-					toast.error(t`Could not create project`, {
-						description: describeFailure(message),
-					})
-				}
+				onError={handleProjectCreateError}
 				onSuccess={(result) => {
 					setEmptyProjectOpen(false);
 					finish(result.projectId);
