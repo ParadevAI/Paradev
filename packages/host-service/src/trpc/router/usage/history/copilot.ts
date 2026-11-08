@@ -36,7 +36,7 @@ export function collectCopilotEntries(
 				 LEFT JOIN sessions s ON s.id = e.session_id
 				 WHERE e.created_at >= datetime(? / 1000, 'unixepoch')`,
 			)
-			.all(cutoffMs) as CopilotUsageRow[];
+			.iterate(cutoffMs) as Iterable<CopilotUsageRow>;
 		copilotRowsToEntries(rows, cutoffMs, out, sessionLabels);
 		return 1;
 	} catch {
