@@ -1701,6 +1701,9 @@ msgstr "Ein Kanal braucht mindestens einen Admin"
 msgid "A channel with this name already exists"
 msgstr "Ein Kanal mit diesem Namen existiert bereits"
 
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Ein Chat kann nicht mittendrin zu einem anderen Konto wechseln. Starte einen neuen {label}-Chat oder verzweige diese Unterhaltung in einen. Dieser {currentLabel}-Chat bleibt geöffnet."
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Ein Chat kann nicht mittendrin zu einem anderen Anbieter wechseln. Starte einen neuen {label}-Chat oder verzweige diese Unterhaltung in einen. Dieser {currentLabel}-Chat bleibt geöffnet."
 

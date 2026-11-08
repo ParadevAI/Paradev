@@ -13,6 +13,7 @@ import {
 	getAgentModeSupport,
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
+	resolveChatLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
 	buildArgvCommand,
@@ -694,7 +695,10 @@ export function chatLaunchTarget(
 	}
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) return null;
-	const launchPresetId = chatLaunchPresetId(config);
+	const launchPresetId = resolveChatLaunchPresetId(
+		config.presetId,
+		config.command,
+	);
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
 	validateAgentModelSelection(launchPresetId, config.label, input.model);
@@ -705,27 +709,6 @@ export function chatLaunchTarget(
 		agentConfigId: config.id,
 		attachments,
 	};
-}
-
-/**
- * A custom agent that runs the `claude` or `codex` CLI, typically with its own
- * account env, can chat as that agent. Terminal launches keep its preset.
- */
-function chatLaunchPresetId(
-	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
-): string {
-	const launchPresetId = resolveAgentLaunchPresetId(
-		config.presetId,
-		config.command,
-	);
-	if (!config.presetId.startsWith("custom")) return launchPresetId;
-	const [commandToken = ""] = config.command.trim().split(/\s+/);
-	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
-		.toLowerCase()
-		.replace(/\.exe$/, "");
-	return executable === "claude" || executable === "codex"
-		? executable
-		: launchPresetId;
 }
 
 function continueChatAgent(

@@ -1701,6 +1701,9 @@ msgstr "Een kanaal heeft minstens één beheerder nodig"
 msgid "A channel with this name already exists"
 msgstr "Er bestaat al een kanaal met deze naam"
 
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Een chat kan niet halverwege naar een ander account overstappen. Start een nieuwe {label}-chat of splits dit gesprek af naar een nieuwe chat. Deze {currentLabel}-chat blijft open."
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Een chat kan niet halverwege naar een andere provider overstappen. Start een nieuwe {label}-chat of splits dit gesprek af naar een nieuwe chat. Deze {currentLabel}-chat blijft open."
 

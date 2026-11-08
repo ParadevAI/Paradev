@@ -170,12 +170,14 @@ export function SessionView({
 	/** The transcript goes with the switch: the next agent cannot load this session. */
 	agentSwitch?: {
 		currentPresetId: string;
+		currentConfigId?: string;
 		agents: AgentChoice[];
 		onSwitch: (
 			presetId: string,
 			model: { id: string; label: string } | null,
 			transcript: string,
 			currentModeId: string | undefined,
+			configId?: string,
 		) => void;
 	};
 	openFile?: OpenFile;
@@ -357,8 +359,9 @@ export function SessionView({
 		() =>
 			agentSwitch && {
 				currentPresetId: agentSwitch.currentPresetId,
+				currentConfigId: agentSwitch.currentConfigId,
 				agents: agentSwitch.agents,
-				onSwitch: (presetId, model) =>
+				onSwitch: (presetId, model, configId) =>
 					agentSwitch.onSwitch(
 						presetId,
 						model,
@@ -368,6 +371,7 @@ export function SessionView({
 							agentLabel ?? "Agent",
 						),
 						snapshotRef.current.session?.modeId,
+						configId,
 					),
 			},
 		[agentSwitch, agentLabel],

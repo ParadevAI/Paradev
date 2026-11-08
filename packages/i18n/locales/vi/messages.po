@@ -1701,6 +1701,9 @@ msgstr "Kênh cần có ít nhất một quản trị viên"
 msgid "A channel with this name already exists"
 msgstr "Đã có kênh với tên này"
 
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Không thể chuyển chat sang tài khoản khác giữa chừng. Hãy bắt đầu một chat {label} mới, hoặc tách cuộc trò chuyện này sang một chat mới. Chat {currentLabel} này vẫn mở."
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Không thể chuyển chat sang nhà cung cấp khác giữa chừng. Hãy bắt đầu một chat {label} mới, hoặc tách cuộc trò chuyện này sang một chat mới. Chat {currentLabel} này vẫn mở."
 

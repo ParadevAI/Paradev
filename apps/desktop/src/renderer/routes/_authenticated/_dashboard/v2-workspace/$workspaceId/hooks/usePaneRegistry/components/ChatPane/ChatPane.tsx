@@ -62,6 +62,7 @@ export function ChatPane({
 		[onOpenDiff],
 	);
 	const agentId = data.agent?.id;
+	const agentConfigId = data.agent?.configId;
 	const store = ctx.store;
 	const onNewChat = useCallback(
 		(label: string | undefined) => {
@@ -74,13 +75,16 @@ export function ChatPane({
 						data: {
 							terminalId: crypto.randomUUID(),
 							sessionId: null,
-							agent: { id: agentId },
+							agent: {
+								id: agentId,
+								...(agentConfigId ? { configId: agentConfigId } : {}),
+							},
 						} satisfies ChatPaneData,
 					},
 				],
 			});
 		},
-		[agentId, store],
+		[agentId, agentConfigId, store],
 	);
 	const { pendingPrompt, pendingAttachments, queuedPrompts } = data;
 	const pendingPrompts = useMemo(
@@ -134,7 +138,7 @@ export function ChatPane({
 	return (
 		<>
 			<AcpChatPane
-				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}`}
+				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}:${data.agent?.configId ?? ""}`}
 				agent={data.agent}
 				draftId={data.draftId}
 				isActive={ctx.isActive}
@@ -162,18 +166,32 @@ export function ChatPane({
 					latest.current = next;
 					ctx.actions.updateData(next);
 				}}
-				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
+				onSwitchAgent={({
+					presetId,
+					configId,
+					label,
+					model,
+					modeId,
+					handoffPrompt,
+				}) => {
 					ctx.actions.setTitle(label);
 					ctx.actions.updateData(
 						restartedChatPaneData(data, {
-							agent: { id: presetId },
+							agent: { id: presetId, ...(configId ? { configId } : {}) },
 							...(model ? { chatModelId: model.id } : {}),
 							...(modeId ? { chatModeId: modeId } : {}),
 							...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
 						}),
 					);
 				}}
-				onOpenAgentChat={({ presetId, label, model, modeId, handoffPrompt }) =>
+				onOpenAgentChat={({
+					presetId,
+					configId,
+					label,
+					model,
+					modeId,
+					handoffPrompt,
+				}) =>
 					ctx.store.getState().addTab({
 						panes: [
 							{
@@ -182,7 +200,7 @@ export function ChatPane({
 								data: {
 									terminalId: crypto.randomUUID(),
 									sessionId: null,
-									agent: { id: presetId },
+									agent: { id: presetId, ...(configId ? { configId } : {}) },
 									...(model ? { chatModelId: model.id } : {}),
 									...(modeId ? { chatModeId: modeId } : {}),
 									...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),

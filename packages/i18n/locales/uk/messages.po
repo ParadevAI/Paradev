@@ -1695,6 +1695,9 @@ msgstr "Каналу потрібен принаймні один адмініс
 msgid "A channel with this name already exists"
 msgstr "Канал із такою назвою вже існує"
 
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "Чат не можна перемкнути на інший обліковий запис посеред розмови. Почніть новий чат {label} або створіть його як форк цієї розмови. Цей чат {currentLabel} залишиться відкритим."
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "Чат не можна перемкнути на іншого провайдера посеред розмови. Почніть новий чат {label} або створіть його як форк цієї розмови. Цей чат {currentLabel} залишиться відкритим."
 

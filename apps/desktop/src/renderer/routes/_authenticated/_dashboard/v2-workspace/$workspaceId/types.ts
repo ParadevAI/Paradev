@@ -109,7 +109,10 @@ export interface ChatPaneData {
 	draftId?: string;
 	sessionId: string | null;
 	agent?: {
+		/** The chat preset (`claude`, `codex`, …), also for a custom agent that runs one. */
 		id: string;
+		/** The host agent config whose env the chat runs with; absent on older panes. */
+		configId?: string;
 		sessionId?: string;
 	};
 	pendingPrompt?: string;

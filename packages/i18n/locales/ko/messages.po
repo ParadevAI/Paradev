@@ -1701,6 +1701,9 @@ msgstr "채널에는 관리자가 한 명 이상 있어야 합니다"
 msgid "A channel with this name already exists"
 msgstr "이 이름의 채널이 이미 있습니다"
 
+msgid "A chat can't switch to another account partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
+msgstr "채팅 도중에는 다른 계정으로 전환할 수 없습니다. 새 {label} 채팅을 시작하거나 이 대화를 새 채팅으로 분기하세요. 이 {currentLabel} 채팅은 계속 열려 있습니다."
+
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "채팅 도중에는 다른 제공자로 전환할 수 없습니다. 새 {label} 채팅을 시작하거나 이 대화를 새 채팅으로 분기하세요. 이 {currentLabel} 채팅은 계속 열려 있습니다."
 

@@ -51,6 +51,7 @@ export function ModelPanel({
 	const { t } = useLingui();
 	const isDark = useIsDarkTheme();
 	const currentPresetId = agentSwitcher?.currentPresetId ?? "";
+	const currentConfigId = agentSwitcher?.currentConfigId;
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState(currentPresetId);
 	const { favorites, toggle } = useFavoriteModels();
@@ -101,6 +102,17 @@ export function ModelPanel({
 	};
 
 	const needle = query.trim().toLowerCase();
+	const accounts =
+		onFavoritesTab || needle
+			? []
+			: (agentSwitcher?.agents.find((agent) => agent.presetId === tab)
+					?.accounts ?? []);
+	const isCurrentAccount = (configId: string) =>
+		tab === currentPresetId && configId === currentConfigId;
+	const pickAccount = (configId: string) => {
+		if (isCurrentAccount(configId)) return;
+		agentSwitcher?.onSwitch(tab, null, configId);
+	};
 	const matches = rows.filter((row) =>
 		`${row.label} ${row.agentLabel ?? ""}`.toLowerCase().includes(needle),
 	);
@@ -317,6 +329,31 @@ export function ModelPanel({
 				ref={listRef}
 				role="tabpanel"
 			>
+				{accounts.length > 0 ? (
+					<div className="flex flex-col gap-px">
+						<div className="px-2 pt-1.5 pb-1 text-[11px] text-muted-foreground/60">
+							{t({ message: "Account" })}
+						</div>
+						{accounts.map((account) => {
+							const selected = isCurrentAccount(account.configId);
+							return (
+								<DropdownMenuItem
+									aria-current={selected ? "true" : undefined}
+									className={cn(MENU_ROW_CLASS, "pr-1")}
+									key={account.configId}
+									onSelect={() => pickAccount(account.configId)}
+								>
+									<span className="min-w-0 flex-1 truncate">
+										{account.label}
+									</span>
+									<span className="grid size-5 shrink-0 place-items-center">
+										{selected ? <LuCheck className="size-3.5" /> : null}
+									</span>
+								</DropdownMenuItem>
+							);
+						})}
+					</div>
+				) : null}
 				{groups.length === 0 ? (
 					<div className="px-2 py-3 text-[13px] leading-relaxed text-muted-foreground">
 						{onFavoritesTab && !needle

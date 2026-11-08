@@ -1,0 +1,1 @@
+export { newChatConfig } from "./newChatConfig";

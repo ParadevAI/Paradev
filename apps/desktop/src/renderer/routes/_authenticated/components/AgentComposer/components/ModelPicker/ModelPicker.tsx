@@ -204,9 +204,9 @@ export function ModelPicker({
 						agentSwitcher={
 							agentSwitcher && {
 								...agentSwitcher,
-								onSwitch: (presetId, picked) => {
+								onSwitch: (presetId, picked, configId) => {
 									onOpenChange(false);
-									agentSwitcher.onSwitch(presetId, picked);
+									agentSwitcher.onSwitch(presetId, picked, configId);
 								},
 							}
 						}

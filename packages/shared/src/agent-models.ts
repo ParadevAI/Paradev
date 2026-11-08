@@ -734,6 +734,25 @@ export function resolveAgentLaunchPresetId(
 	return executable === "omp" || executable === "omp.exe" ? "omp" : presetId;
 }
 
+/**
+ * A custom agent that runs the `claude` or `codex` CLI, typically with its own
+ * account env, can chat as that agent. Terminal launches keep its preset.
+ */
+export function resolveChatLaunchPresetId(
+	presetId: string,
+	command: string,
+): string {
+	const launchPresetId = resolveAgentLaunchPresetId(presetId, command);
+	if (!presetId.startsWith("custom")) return launchPresetId;
+	const [commandToken = ""] = command.trim().split(/\s+/);
+	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
+		.toLowerCase()
+		.replace(/\.exe$/, "");
+	return executable === "claude" || executable === "codex"
+		? executable
+		: launchPresetId;
+}
+
 export function getAgentModelSupport(
 	presetId: string,
 ): AgentModelSupport | undefined {

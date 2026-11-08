@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
 import type { WorkspaceStore } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
@@ -19,8 +18,10 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
+import { chatPresetIdForConfig } from "../../utils/chatPresetIdForConfig";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 import { readLastChatAgent } from "../../utils/lastChatAgent";
+import { newChatConfig } from "./utils/newChatConfig";
 
 export interface CreateNewAgentSessionInput {
 	configId: string;
@@ -77,8 +78,8 @@ export function useAgentSessionLauncher({
 			const config =
 				configs.find((entry) => entry.id === input.configId) ??
 				configs.find((entry) => entry.presetId === input.presetId);
-			const presetId = config?.presetId;
-			if (!presetId || !acpHarnessForPreset(presetId)) return null;
+			const presetId = config ? chatPresetIdForConfig(config) : null;
+			if (!config || !presetId) return null;
 			const state = store.getState();
 			const terminalId = crypto.randomUUID();
 			const label = config?.label;
@@ -88,7 +89,7 @@ export function useAgentSessionLauncher({
 				data: {
 					terminalId,
 					sessionId: null,
-					agent: { id: presetId },
+					agent: { id: presetId, configId: config.id },
 					...(input.prompt ? { pendingPrompt: input.prompt } : {}),
 					...(input.attachments?.length
 						? { pendingAttachments: input.attachments }
@@ -111,17 +112,12 @@ export function useAgentSessionLauncher({
 		const configs = await queryClient
 			.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
 			.catch(() => agentConfigs ?? []);
-		const chatPresetIds = configs
-			.map((config) => config.presetId)
-			.filter((presetId) => acpHarnessForPreset(presetId));
-		const presetId = [readLastChatAgent(), "claude", ...chatPresetIds].find(
-			(candidate) => candidate && chatPresetIds.includes(candidate),
-		);
-		if (!presetId) {
+		const config = newChatConfig(configs, readLastChatAgent());
+		if (!config) {
 			toast.error(t({ message: "No installed agent can be opened as a chat" }));
 			return null;
 		}
-		return openAgentChat({ configId: "", presetId, placement: "new-tab" });
+		return openAgentChat({ configId: config.id, placement: "new-tab" });
 	}, [queryClient, hostUrl, agentConfigs, openAgentChat, t]);
 
 	const createNewAgentSession = useCallback<CreateNewAgentSession>(
