@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { CONTINUE_PROMPT, userStopOf } from "@superset/chat/core";
+import {
+	type ChatSelections,
+	CONTINUE_PROMPT,
+	sessionSelections,
+	userStopOf,
+} from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
@@ -86,14 +91,12 @@ export function replayKey(itemId: string): string {
 	return itemId.slice(itemId.lastIndexOf(":") + 1);
 }
 
-export type UnfinishedSession = {
+export type UnfinishedSession = ChatSelections & {
 	sessionId: string;
 	scopeId: string;
 	harness: string;
 	harnessSessionId: string;
 	terminalId?: string;
-	modeId?: string;
-	modelId?: string;
 	interrupted: boolean;
 	prompts: UserContent[][];
 	pausedPrompts: UserContent[][];
@@ -251,8 +254,7 @@ export class LiveSession {
 			harness: this.options.harness,
 			harnessSessionId,
 			terminalId: this.options.terminalId,
-			modeId: this.sessionState.modeId,
-			modelId: this.sessionState.modelId,
+			...sessionSelections(this.sessionState),
 			interrupted,
 			prompts,
 			pausedPrompts,
@@ -342,11 +344,8 @@ export class LiveSession {
 			(part) => !(part.type === "text" && part.hidden),
 		);
 		const sent = withHiddenWrapped(content);
-		const wantsSteer =
-			steerTurnId !== undefined ||
-			this.sessionState.awaitingBackground === true;
 		const running =
-			wantsSteer && this.queue.length === 0
+			steerTurnId !== undefined && this.queue.length === 0
 				? this.steerableTurn(steerTurnId)
 				: null;
 		if (running) {
@@ -640,8 +639,13 @@ export class LiveSession {
 		this.options.adapter.respondToApproval(approvalId, decision);
 	}
 
-	setMode(modeId: string): void {
-		this.options.adapter.setMode(modeId);
+	setMode(modeId: string): Promise<boolean> {
+		return this.options.adapter.setMode(modeId);
+	}
+
+	/** Null when the agent cannot say which start selections it took. */
+	startSelections(): Promise<ChatSelections | null> {
+		return this.options.adapter.startSelections?.() ?? Promise.resolve(null);
 	}
 
 	setConfigOption(configId: string, value: string): Promise<boolean> {
@@ -785,7 +789,6 @@ export class LiveSession {
 				}
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
-				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
 				return;
 			case "delta":
 				this.options.publish({
@@ -1045,16 +1048,6 @@ export class LiveSession {
 
 	private delivered(item: UserMessage): UserMessage {
 		return { ...withoutQueued(item), startedAtMs: this.now() };
-	}
-
-	private steerQueueIntoHeldTurn(): void {
-		if (this.queuePaused) return;
-		const turn = this.steerableTurn();
-		if (!turn) return;
-		for (const queued of this.queue.splice(0)) {
-			if (this.steerTarget === queued.item.id) this.steerTarget = null;
-			this.injectInto(turn, { ...queued, item: this.delivered(queued.item) });
-		}
 	}
 
 	private injectInto(

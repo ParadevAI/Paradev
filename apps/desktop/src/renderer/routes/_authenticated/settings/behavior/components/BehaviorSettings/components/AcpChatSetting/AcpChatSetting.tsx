@@ -26,13 +26,16 @@ export function AcpChatSetting() {
 		<div className="flex items-center justify-between gap-6">
 			<div className="min-w-0 flex-1 space-y-0.5">
 				<Label htmlFor="acp-chat" className="text-sm font-medium">
-					<HighlightText text={t({ message: "Chat" })} query={searchQuery} />
+					<HighlightText
+						text={t({ message: "Chat interface" })}
+						query={searchQuery}
+					/>
 				</Label>
 				<p className="text-xs text-muted-foreground">
 					<HighlightText
 						text={t({
 							message:
-								"Open Claude and Codex sessions in a chat pane instead of a terminal.",
+								"Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal.",
 						})}
 						query={searchQuery}
 					/>

@@ -369,16 +369,23 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (decision.type === "cancel") this.cancelTurn();
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
 		const previous = this.modeId;
 		const next = claudeMode(modeId);
 		this.modeId = next;
 		this.events.push({ kind: "session", session: { modeId: next } });
-		void this.session?.setPermissionMode?.(next).catch(() => {
-			if (this.modeId !== next) return;
-			this.modeId = previous;
-			this.events.push({ kind: "session", session: { modeId: previous } });
-		});
+		const applied = this.session?.setPermissionMode?.(next);
+		if (!applied) return Promise.resolve(true);
+		return applied.then(
+			() => true,
+			() => {
+				if (this.modeId === next) {
+					this.modeId = previous;
+					this.events.push({ kind: "session", session: { modeId: previous } });
+				}
+				return false;
+			},
+		);
 	}
 
 	async dispose(): Promise<void> {

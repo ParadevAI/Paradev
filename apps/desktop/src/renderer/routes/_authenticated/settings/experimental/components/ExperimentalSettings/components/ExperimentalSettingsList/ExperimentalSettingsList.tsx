@@ -18,7 +18,6 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
-import { AcpChatSetting } from "../AcpChatSetting";
 import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
 import { RestartOnboardingSetting } from "../RestartOnboardingSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
@@ -44,10 +43,6 @@ export function ExperimentalSettingsList({
 	);
 	const showWorkspaceAgents = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
-		visibleItems,
-	);
-	const showAcpChat = isItemVisible(
-		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
 		visibleItems,
 	);
 	const showChatTurnSnapshots = isItemVisible(
@@ -177,7 +172,6 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showAcpChat && <AcpChatSetting />}
 				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
 				{showRestartOnboarding && <RestartOnboardingSetting />}

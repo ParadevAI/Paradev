@@ -44,11 +44,11 @@ export function SidebarCardSlot({
 			{!isCollapsed && entry && (
 				<motion.div
 					key={entry.id}
-					initial={{ opacity: 0, y: 8 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: 8 }}
-					transition={{ duration: 0.2 }}
-					className="px-3 pb-2"
+					initial={{ opacity: 0, y: 8, scale: 0.98 }}
+					animate={{ opacity: 1, y: 0, scale: 1 }}
+					exit={{ opacity: 0, y: 8, scale: 0.98 }}
+					transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+					className="px-4 pb-2"
 				>
 					<SidebarCard
 						badge={entry.badge}

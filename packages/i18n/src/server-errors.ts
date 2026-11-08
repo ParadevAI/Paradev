@@ -574,6 +574,12 @@ export const serverErrorMessages: Record<
 				message: "Not a member of this organization",
 			}),
 		),
+	"serverError.host.onlyTheHostOwnerCanAllowCloudWorkspaces": () =>
+		i18n._(
+			msg({
+				message: "Only the host owner can let cloud workspaces reach it",
+			}),
+		),
 	"serverError.host.onlyTheHostOwnerCanSet": () =>
 		i18n._(
 			msg({
@@ -590,6 +596,13 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "GitHub installation not found",
+			}),
+		),
+	"serverError.integration.severalGithubAccountsConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
 			}),
 		),
 	"serverError.integration.githubSyncRequiresThePro": () =>

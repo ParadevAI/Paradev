@@ -27,7 +27,7 @@ function probedRuntime(page: DiscoverSessionsResult | Error | null) {
 			prompt() {},
 			cancelTurn() {},
 			respondToApproval() {},
-			setMode() {},
+			setMode: () => Promise.resolve(true),
 			...(page === null
 				? {}
 				: {

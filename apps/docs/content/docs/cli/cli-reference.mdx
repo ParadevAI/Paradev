@@ -3,10 +3,6 @@ title: Paradev CLI Reference
 description: Complete reference for Paradev command-line interface, including commands and flags.
 ---
 
-<Callout type="warn">
-The CLI is in Beta. Commands and flags can change. Update to the latest version if you run into issues.
-</Callout>
-
 ## Synopsis
 
 ```text
@@ -18,7 +14,7 @@ Run `superset --help` for the top-level command list, or
 
 ## Choosing a host
 
-Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. If the cloud check fails, they target this machine. Remote hosts go through the relay. `snapshot`, `panes`, `browser`, and `notifications` default to this machine.
+Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. If the cloud check fails, they target this machine. Remote hosts go through the relay. `snapshot`, `panes`, `browser`, and `notifications` default to this machine. Each cloud workspace runs its own host, so commands about one host, such as `projects list` and `agents list`, take a machineId rather than `cloud`; `snapshot --host cloud` needs `--workspace`.
 
 ## Global options
 
@@ -808,7 +804,7 @@ project id when the host does not know the project's name.
 		{ flag: "--model <id>", description: "Model for the spawned agent. Supported values depend on the agent; omit to use its default." },
 		{ flag: "--effort <level>", description: "Reasoning effort for the spawned agent. Omit to use the agent default." },
 		{ flag: "--command <cmd>", description: "Shell command to run in the new workspace after creation." },
-		{ flag: "--attachment <path>", description: "Local file to upload for the spawned agent. Repeatable." },
+		{ flag: "--attachment <path>", description: "Local file to upload for the spawned agent. Repeatable. Up to 25 MB a file on a host, 200 MB in the cloud." },
 		{ flag: "--tag <tag>", description: "Workspace tag. Repeatable. Each tag groups the workspace into a sidebar folder of the same name." },
 	]}
 	output={`{ workspace: Workspace; alreadyExists: boolean; url: string; webUrl: string }`}
@@ -836,8 +832,9 @@ Without `--host` or `--local`, the command creates a [cloud workspace](/cloud-wo
 if your account has cloud workspaces. A cloud workspace takes no project: it starts from an
 environment, and Paradev creates a new working branch from `--branch`. `--project`,
 `--session`, `--checkout`, `--pr`, `--task`, `--base-branch`, `--skip-branch-prefix`,
-`--tag`, `--attachment`, and `--command` are rejected for a cloud workspace. The command
-returns while the workspace is still provisioning.
+`--tag`, and `--command` are rejected for a cloud workspace. `--attachment` needs `--agent`:
+the files go to the agent through Paradev's storage, up to 200 MB each and 10 at a time.
+The command returns while the workspace is still provisioning.
 
 ```bash
 superset workspaces create \
@@ -1332,7 +1329,7 @@ superset agents list --host host_…
 		{ flag: "--model <id>", description: "Model for this launch. Supported values depend on the agent; omit to use its default." },
 		{ flag: "--effort <level>", description: "Reasoning effort for this launch. Omit to use the agent default." },
 		{ flag: "--attachment-id <uuid>", description: "Pre-uploaded attachment UUID; pass repeatedly for multiple attachments." },
-		{ flag: "--attachment <path>", description: "Local file path to upload as an attachment. Repeatable." },
+		{ flag: "--attachment <path>", description: "Local file path to upload as an attachment. Repeatable. Up to 25 MB a file for a workspace on a host, 200 MB for a cloud workspace." },
 	]}
 	output={`{
   kind: "terminal" | "chat";
@@ -1644,7 +1641,7 @@ Close (dispose) a terminal running in a workspace. This ends the session.
 <Command
 	name="superset snapshot"
 	options={[
-		{ flag: "--host <id>", description: "Host to read (default: this machine)." },
+		{ flag: "--host <id>", description: "Host to read (default: this machine), or `cloud` with `--workspace` for that cloud workspace's own host." },
 		{ flag: "--workspace <id>", description: "Only this workspace." },
 	]}
 >

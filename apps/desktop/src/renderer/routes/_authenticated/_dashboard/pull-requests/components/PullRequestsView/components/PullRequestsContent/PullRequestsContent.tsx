@@ -1,20 +1,27 @@
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
+import { cn } from "@superset/ui/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GoGitPullRequest } from "react-icons/go";
-import { LuRefreshCw } from "react-icons/lu";
-import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { LoadMoreSentinel } from "renderer/routes/_authenticated/_dashboard/components/LoadMoreSentinel";
 import { serializeProjectFilters } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
-import { useWorkItemsList } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkItemsList";
+import { pullRequestDetailQueryOptions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
 import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
+import {
+	type PullRequestsList,
+	pullRequestRowKey,
+} from "../../hooks/usePullRequestsList";
 import { PullRequestRow } from "../PullRequestRow";
+import { PullRequestRowSkeleton } from "./components/PullRequestRowSkeleton";
 
 interface PullRequestsContentProps {
+	list: PullRequestsList;
 	projectFilters: string[];
 	projectTargets: ProjectQueryTarget[];
 	areProjectsReady: boolean;
@@ -29,9 +36,20 @@ interface PullRequestsContentProps {
 	repoSlugByProjectId: Map<string, string>;
 }
 
-const PAGE_SIZE = 30;
+const NEIGHBOR_PREFETCH_DELAY_MS = 500;
+const SKELETON_TITLE_WIDTHS = [
+	"w-3/4",
+	"w-2/3",
+	"w-5/6",
+	"w-1/2",
+	"w-3/4",
+	"w-2/3",
+	"w-4/5",
+	"w-3/5",
+];
 
 export function PullRequestsContent({
+	list,
 	projectFilters,
 	projectTargets,
 	areProjectsReady,
@@ -45,11 +63,11 @@ export function PullRequestsContent({
 	selectedPrProjectId,
 	repoSlugByProjectId,
 }: PullRequestsContentProps) {
-	const { t } = useLingui();
-	const debouncedQuery = useDebouncedValue(searchQuery, 300);
 	const navigate = useNavigate();
 	const expandDetail = usePullRequestsSplitViewStore((s) => s.expandDetail);
-
+	const queryClient = useQueryClient();
+	const organizationId = useActiveOrganizationId();
+	const [isScrolled, setIsScrolled] = useState(false);
 	const {
 		rows: pullRequests,
 		totalCount,
@@ -61,64 +79,62 @@ export function PullRequestsContent({
 		refetch,
 		scrollRef,
 		sentinelRef,
-	} = useWorkItemsList({
-		projectTargets,
-		resetKey: `${debouncedQuery.trim()}\0${authorFilter ?? ""}\0${reviewFilter ?? ""}\0${includeClosed}\0${mergedOnly}`,
-		getQueryOptions: ({ target, page }) => ({
-			queryKey: [
-				"pullRequests",
-				"searchPullRequests",
-				target.key,
-				debouncedQuery.trim(),
-				authorFilter,
-				reviewFilter,
-				includeClosed,
-				mergedOnly,
-				page,
-			],
-			queryFn: async () => {
-				const firstProject = target.projects[0];
-				if (!target.hostUrl || !firstProject) return null;
-				const client = getHostServiceClientByUrl(target.hostUrl);
-				const result = await client.workspaceCreation.searchPullRequests.query({
-					projectId: firstProject.projectId,
-					projectIds: target.projects.map((project) => project.projectId),
-					query: debouncedQuery.trim() || undefined,
-					author: authorFilter ?? undefined,
-					review: reviewFilter ?? undefined,
-					limit: PAGE_SIZE,
-					includeClosed,
-					mergedOnly,
-					page,
-				});
-				// The router types come from this build, the rows come from
-				// whichever host-service the host actually runs — hosts update
-				// independently and the list is not version-gated. Rows only
-				// gained `checks` in host-service 1.20.0, so an older host
-				// answers without it. Absent checks read as "none reported".
-				return {
-					...result,
-					pullRequests: result.pullRequests.map((pullRequest) => ({
-						...pullRequest,
-						checks: pullRequest.checks ?? [],
-					})),
-				};
-			},
-			enabled: !!target.hostUrl,
-			staleTime: 30_000,
-			gcTime: 10 * 60_000,
-			meta: {
-				persist:
-					page === 1 &&
-					!debouncedQuery.trim() &&
-					!authorFilter &&
-					!reviewFilter,
-			},
-		}),
-		getRows: (data) => data.pullRequests,
-		getRowKey: (pullRequest) =>
-			`${pullRequest.projectId}:${pullRequest.prNumber}`,
+		isLoadingRowDetails,
+	} = list;
+
+	const prefetchDetail = useCallback(
+		async (url: string) => {
+			const ref = pullRequestRefFromUrl(url);
+			if (!ref) return;
+			await queryClient.prefetchQuery(
+				pullRequestDetailQueryOptions({
+					organizationId,
+					repoFullName: ref.repoFullName,
+					prNumber: ref.number,
+				}),
+			);
+		},
+		[queryClient, organizationId],
+	);
+	// One hover read at a time, and only the row the pointer settled on last
+	// waits its turn: sweeping across rows must not queue a GitHub read per row.
+	const hoverPrefetch = useRef<{ running: boolean; nextUrl: string | null }>({
+		running: false,
+		nextUrl: null,
 	});
+	const prefetchHovered = (url: string) => {
+		const state = hoverPrefetch.current;
+		if (state.running) {
+			state.nextUrl = url;
+			return;
+		}
+		state.running = true;
+		void prefetchDetail(url).finally(() => {
+			state.running = false;
+			const next = state.nextUrl;
+			state.nextUrl = null;
+			if (next) prefetchHovered(next);
+		});
+	};
+
+	const selectedIndex = pullRequests.findIndex(
+		(pr) =>
+			pr.prNumber === selectedPrNumber &&
+			(selectedPrProjectId == null || pr.projectId === selectedPrProjectId),
+	);
+	const neighborUrls =
+		selectedIndex < 0
+			? ""
+			: [pullRequests[selectedIndex + 1], pullRequests[selectedIndex - 1]]
+					.flatMap((pr) => (pr ? [pr.url] : []))
+					.join(" ");
+	useEffect(() => {
+		if (!neighborUrls) return;
+		const timer = setTimeout(() => {
+			for (const url of neighborUrls.split(" ")) void prefetchDetail(url);
+		}, NEIGHBOR_PREFETCH_DELAY_MS);
+		return () => clearTimeout(timer);
+	}, [neighborUrls, prefetchDetail]);
 
 	const handleOpenPreview = (pr: (typeof pullRequests)[number]) => {
 		expandDetail();
@@ -183,46 +199,14 @@ export function PullRequestsContent({
 			className="@container flex h-full flex-col overflow-hidden"
 			aria-busy={isFetching}
 		>
-			<div className="flex items-center gap-2 px-4 py-2 border-b bg-muted/30 shrink-0">
-				<GoGitPullRequest className="size-3.5 text-muted-foreground" />
-				<span className="text-xs text-muted-foreground" aria-live="polite">
-					<span className="tabular-nums">
-						{isInitialLoad ? (
-							<Trans>Loading…</Trans>
-						) : totalCount === 0 ? (
-							"0"
-						) : (
-							<Trans>
-								{pullRequests.length} of {totalCount}
-							</Trans>
-						)}
-					</span>{" "}
-					<Plural value={totalCount} one="pull request" other="pull requests" />
-				</span>
-				<Button
-					variant="ghost"
-					size="icon-xs"
-					className="ml-auto"
-					title={t({
-						message: "Refresh",
-					})}
-					aria-label={t({
-						message: "Refresh pull requests",
-					})}
-					disabled={isFetching}
-					onClick={() => refetch()}
-				>
-					<LuRefreshCw
-						className={
-							isFetching
-								? "size-3.5 animate-spin motion-reduce:animate-none"
-								: "size-3.5"
-						}
-					/>
-				</Button>
-			</div>
-
-			<div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
+			<div
+				ref={scrollRef}
+				onScroll={(event) => setIsScrolled(event.currentTarget.scrollTop > 0)}
+				className={cn(
+					"min-h-0 flex-1 overflow-y-auto border-t transition-colors",
+					isScrolled ? "border-border" : "border-transparent",
+				)}
+			>
 				{error instanceof Error && pullRequests.length === 0 ? (
 					<div className="flex flex-col items-start gap-3 px-4 py-4 text-sm text-destructive select-text cursor-text">
 						<span>{error.message}</span>
@@ -235,11 +219,17 @@ export function PullRequestsContent({
 						<Trans>PR URL must match {repoMismatch}.</Trans>
 					</div>
 				) : isInitialLoad ? (
-					<div className="flex h-full items-center justify-center gap-2 p-8 text-muted-foreground">
-						<LuRefreshCw className="size-4 animate-spin motion-reduce:animate-none" />
-						<span className="text-sm">
+					<div className="flex flex-col gap-1.5 p-2">
+						<span className="sr-only">
 							<Trans>Loading pull requests…</Trans>
 						</span>
+						{SKELETON_TITLE_WIDTHS.map((width, index) => (
+							<PullRequestRowSkeleton
+								// biome-ignore lint/suspicious/noArrayIndexKey: fixed placeholder list
+								key={index}
+								titleWidth={width}
+							/>
+						))}
 					</div>
 				) : totalCount === 0 && !isFetching ? (
 					<div className="flex h-full items-center justify-center p-8">
@@ -268,7 +258,7 @@ export function PullRequestsContent({
 							</div>
 						)}
 						{pullRequests.map((pr, index) => {
-							const rowKey = `${pr.projectId}:${pr.prNumber}`;
+							const rowKey = pullRequestRowKey(pr);
 							const isSelected =
 								selectedPrNumber === pr.prNumber &&
 								(selectedPrProjectId != null
@@ -281,7 +271,9 @@ export function PullRequestsContent({
 									pr={pr}
 									repoSlug={repoSlug}
 									isSelected={isSelected}
+									detailsLoading={isLoadingRowDetails}
 									onClick={() => handleOpenPreview(pr)}
+									onHoverIntent={() => prefetchHovered(pr.url)}
 								/>
 							);
 						})}

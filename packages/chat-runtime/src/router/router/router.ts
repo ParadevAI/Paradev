@@ -108,6 +108,7 @@ export function createChatRouter(
 						...rest,
 						scopeId: workspaceId,
 						cwd,
+						interactive: true,
 					}),
 				);
 			}),

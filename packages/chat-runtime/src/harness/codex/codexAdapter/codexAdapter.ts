@@ -217,9 +217,10 @@ export class CodexAdapter implements HarnessAdapter {
 		);
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
 		this.modeId = modeId;
 		this.emitSession({ modeId });
+		return Promise.resolve(true);
 	}
 
 	async dispose(): Promise<void> {

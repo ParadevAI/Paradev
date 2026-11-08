@@ -1,6 +1,7 @@
 import { string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import {
+	desktopTabNote,
 	resolveSessionWorkspace,
 	sessionWorkspaceOptions,
 } from "../../../lib/sessions";
@@ -38,7 +39,11 @@ export default command({
 		);
 
 		const uploadedIds = options.attachment
-			? await uploadAttachments(target.client, options.attachment)
+			? await uploadAttachments({
+					target,
+					api: ctx.api,
+					paths: options.attachment,
+				})
 			: [];
 		const attachmentIds = [...(options.attachmentId ?? []), ...uploadedIds];
 
@@ -53,8 +58,8 @@ export default command({
 
 		const opened = await openTab(result.sessionId);
 		return {
-			data: result,
-			message: `Started ${result.label} chat session ${result.sessionId} in workspace ${options.workspace}${opened ? ", opened in a desktop tab" : ""}`,
+			data: { ...result, openedInDesktop: opened },
+			message: `Started ${result.label} chat session ${result.sessionId} in workspace ${options.workspace}${desktopTabNote(opened)}`,
 		};
 	},
 });

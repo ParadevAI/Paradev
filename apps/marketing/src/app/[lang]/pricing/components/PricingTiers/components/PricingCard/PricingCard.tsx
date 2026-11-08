@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
 import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
 import { env } from "@/env";
-import { BETA, type PricingTier } from "../../../../constants";
+import type { PricingTier } from "../../../../constants";
 import { checkoutHref } from "../../../../utils/checkoutHref";
 import { seatPrice } from "../../../../utils/planDisplay";
 import {
@@ -148,11 +148,6 @@ export function PricingCard({
 							<div className="flex flex-col gap-1">
 								<span>
 									{i18n._({ ...feature.label, values: featureValues(set) })}
-									{feature.beta && (
-										<span className="ml-2 rounded-sm bg-accent/40 px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-											{t(BETA)}
-										</span>
-									)}
 								</span>
 								{feature.detail && (
 									<p className="text-xs text-muted-foreground">

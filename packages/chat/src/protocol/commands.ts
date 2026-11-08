@@ -16,6 +16,11 @@ export const createSessionInputSchema = z.object({
 	harness: z.string().min(1),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	effortId: z.string().optional(),
+	/** The model, effort and mode sent here are the user's own picks, so later chats start on them too. */
+	rememberSelections: z.boolean().optional(),
+	/** The mode to start in when neither the request nor the user's remembered picks name one. */
+	fallbackModeId: z.string().optional(),
 	resume: z
 		.object({
 			harnessSessionId: z.string().min(1),
@@ -162,6 +167,7 @@ export const rewindSessionInputSchema = z.object({
 	handoffPrompt: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	effortId: z.string().optional(),
 	snapshotWorktree: z.boolean().optional(),
 });
 export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
@@ -173,6 +179,8 @@ export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
  */
 export const closeSessionInputSchema = z.object({
 	sessionId: z.string().min(1),
+	/** A person closed the chat, not a restart or cleanup: other clients drop its tabs instead of restarting it. */
+	userClosed: z.boolean().optional(),
 });
 export type CloseSessionInput = z.infer<typeof closeSessionInputSchema>;
 

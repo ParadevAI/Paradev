@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { ChatSelections } from "@superset/chat/core";
 import type {
 	DiscoverSessionsResult,
 	Envelope,
@@ -14,13 +15,11 @@ import { HOST_STOPPED } from "../../journal";
 import type { UnfinishedSession } from "../liveSession";
 import { LiveSession } from "../liveSession";
 
-export type HarnessFactoryOptions = {
+export type HarnessFactoryOptions = ChatSelections & {
 	sessionId: string;
 	scopeId: string;
 	harness: string;
 	cwd: string;
-	modeId?: string;
-	modelId?: string;
 	resume?: { harnessSessionId: string; quiet?: boolean };
 	terminalId?: string;
 };
@@ -172,6 +171,7 @@ export class LiveSessionRegistry {
 				cwd: options.cwd,
 				modeId: options.modeId,
 				modelId: options.modelId,
+				effortId: options.effortId,
 				resume: options.resume,
 			});
 		} catch (error) {

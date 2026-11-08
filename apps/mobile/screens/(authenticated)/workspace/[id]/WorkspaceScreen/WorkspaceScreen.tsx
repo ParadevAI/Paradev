@@ -586,7 +586,10 @@ export function WorkspaceScreen() {
 			const row = rows.find((candidate) => candidate.terminalId === terminalId);
 			const closing =
 				row?.kind === "chat"
-					? getChatTransport(hostUrl).closeSession({ sessionId: terminalId })
+					? getChatTransport(hostUrl).closeSession({
+							sessionId: terminalId,
+							userClosed: true,
+						})
 					: getHostServiceClientByUrl(hostUrl).terminal.killSession.mutate({
 							terminalId,
 							workspaceId: id,

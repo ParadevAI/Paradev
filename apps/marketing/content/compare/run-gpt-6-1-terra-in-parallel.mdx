@@ -2,7 +2,7 @@
 title: "How to Run GPT-6.1 Terra in Parallel with Codex"
 description: "GPT-6.1 Terra shipped in Codex on October 26, 2026. How to pick it in the Codex CLI, run several Terra sessions at once in separate Git worktrees, and do the same in Paradev."
 date: 2026-11-03
-lastUpdated: 2026-11-03
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - codex
@@ -84,7 +84,7 @@ Worktrees share repository history and run as your user. They do not give each t
 
 ## Run GPT-6.1 Terra in Paradev
 
-Paradev is a desktop app that runs Codex and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: Codex runs on your own ChatGPT plan or API key.
+Paradev is a desktop app that runs Codex and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: Codex runs on your own ChatGPT plan or API key. Paradev is open source under the MIT License.
 
 From the app:
 
@@ -109,7 +109,7 @@ superset ws list --local --tag terra
 
 Tagged workspaces collect in a sidebar folder with the tag's name. `--effort` sets reasoning effort for the launch; omit it to use the Codex default. If you leave out `--model`, Codex starts on its own default model.
 
-To run the same task on Terra and Sol and compare the diffs, create two workspaces with the same prompt and different `--model` values. The [iPhone and iPad app](/mobile) lets you check on the sessions and review diffs while they keep running on your machine, a host you added, or a cloud workspace.
+To run the same task on Terra and Sol and compare the diffs, create two workspaces with the same prompt and different `--model` values. The [iPhone and iPad app](/mobile) lets you check on the sessions and review diffs while they keep running on your machine, a host you added, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud).
 
 ## Frequently Asked Questions
 

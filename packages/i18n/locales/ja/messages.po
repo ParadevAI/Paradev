@@ -483,11 +483,6 @@ msgstr "{0} GB 時間"
 msgid "{0} installed"
 msgstr "{0}をインストールしました"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} → {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -521,6 +516,10 @@ msgstr "{0}はオフラインです。"
 msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "{0}はFreeプランです。{appName} MobileはProプランの組織でご利用いただけます。"
 
+#. placeholder {0}: BRAND.NAME
+msgid "{0} is open source, so you're never locked in. Run parallel agents the way you're used to, with chat, cloud and mobile built in."
+msgstr "{0} はオープンソースなので、ロックインされることはありません。使い慣れた方法でエージェントを並列実行でき、チャット、クラウド、モバイルも組み込まれています。"
+
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
@@ -553,7 +552,6 @@ msgid "{0} of {1} checks running"
 msgstr "{1}件中{0}件のチェックが実行中です"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{totalCount}件中{0}件目"
 
@@ -815,6 +813,9 @@ msgstr "{closedCount}件未通過"
 
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {#件のコミット} other {#件のコミット}}"
+
+msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} が Conductor のワークツリーを見つけ、未コミットの変更ごとその場でインポートします。"
 
 msgid "{companyName} makes {productName}."
 msgstr "{productName} は {companyName} が開発しています。"
@@ -1358,9 +1359,6 @@ msgstr "{total, plural, one {#件のチェックにすべて成功しました} 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issue}}"
 
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {プルリクエスト} other {プルリクエスト}}"
-
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {カスタムテーマを#件インポートしました} other {カスタムテーマを#件インポートしました}}"
 
@@ -1702,6 +1700,9 @@ msgstr "この名前のチャンネルはすでに存在します"
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "チャットの途中で別のプロバイダーに切り替えることはできません。新しい {label} チャットを始めるか、この会話を新しいチャットに分岐してください。この {currentLabel} チャットは開いたままです。"
 
+msgid "A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions."
+msgstr "Claude Code、Codex、OpenCode、Pi のためのチャットインターフェース。Claude Code のセッションを引き継ぎます。"
+
 msgid "A chat takes its name from the agent."
 msgstr "チャットの名前はエージェントから付けられます。"
 
@@ -2023,9 +2024,6 @@ msgstr "クラウドワークスペースを作成する前に、設定で環境
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "別のアカウントを接続するか、使わなくなったものを解除します。"
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "どんなマシンでもホストとして追加できます。ノートPCがスリープしてもワークスペースは動き続け、どこからでも様子を確認できます。"
-
 msgid "Add Attachment"
 msgstr "添付ファイルを追加"
 
@@ -2061,6 +2059,9 @@ msgstr "ファイルやアプリなどを追加"
 
 msgid "Add files, apps, and more (@)"
 msgstr "ファイルやアプリなどを追加(@)"
+
+msgid "Add GitHub organization"
+msgstr "GitHub 組織を追加"
 
 msgid "Add instructions"
 msgstr "指示を追加"
@@ -2176,6 +2177,9 @@ msgstr "最初のプロジェクトを追加"
 
 msgid "Add your own terminal agent to this device."
 msgstr "このデバイスに独自のターミナルエージェントを追加します。"
+
+msgid "Add your repos"
+msgstr "リポジトリを追加"
 
 msgid "Added {added}"
 msgstr "{added} を追加しました"
@@ -2329,8 +2333,14 @@ msgstr "エージェントは {0} のツールにアクセスできません"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "エージェントが定型チケットを途中の介入なしに完了する。"
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "クラウドワークスペースのエージェントが <0>--host</0> を使って、このホストでコマンドを実行できるようになります。ホストにリレー経由で接続できる必要があります。"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "エージェントはクラウドで動き続けます。デスクトップ、iPhone、iPad からワークスペースをもう一度開けます。"
+
+msgid "Agents keep working when your laptop is closed."
+msgstr "ノートPCを閉じてもエージェントは動き続けます。"
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "エージェントが自らプレビューを開き、UIを操作し、レビュー待ちにする前にスクリーンショットの証拠を添付します。"
@@ -2352,6 +2362,9 @@ msgstr "エージェントに見えるのはプレースホルダーだけです
 
 msgid "Agents that run while you're away"
 msgstr "離席中も動き続けるエージェント"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "エージェントが issue の仕分け、changelog の下書き、依存関係の更新を自動で行います。あなたは PR をレビューするだけです。"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "エージェントは、Linearのツールを呼び出すときにこのアカウントを使います。"
@@ -2571,6 +2584,9 @@ msgstr "セッション中は許可"
 
 msgid "Allow microphone access to use dictation"
 msgstr "音声入力を使うにはマイクへのアクセスを許可してください"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "クラウドワークスペースからこのホストへのアクセスを許可"
 
 msgid "Allow remote access to this device via relay"
 msgstr "リレー経由でこのデバイスへのリモートアクセスを許可"
@@ -2831,6 +2847,9 @@ msgstr "何でも"
 msgid "Anything else? (optional)"
 msgstr "他にありますか？（任意）"
 
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "あなたが作成したクラウドワークスペースで動くものはすべて、このホストでワークスペースの作成、エージェントの起動、コマンドの実行ができるようになります。Web ページやリポジトリで見つけた指示に従うエージェントも含まれます。必要な場合にのみオンにしてください。"
+
 msgid "Anywhere"
 msgstr "すべての場所"
 
@@ -2922,9 +2941,6 @@ msgstr "適用"
 msgctxt "job application"
 msgid "Apply"
 msgstr "応募"
-
-msgid "Approve"
-msgstr "承認"
 
 msgid "Approve edits"
 msgstr "編集を承認"
@@ -3453,9 +3469,6 @@ msgstr "mainより?コミット遅れています。リベースが必要です"
 msgid "Being built right now."
 msgstr "いま作っています。"
 
-msgid "Beta"
-msgstr "ベータ"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "その先:F5は近い将来の主張ではない"
 
@@ -3851,6 +3864,9 @@ msgstr "自分のAPIキーを使えますか?"
 msgid "Can merge without conflicts"
 msgstr "コンフリクトなしでマージできます"
 
+msgid "Can my team share workspaces?"
+msgstr "チームでワークスペースを共有できますか？"
+
 msgid "Can only be viewed or joined by invitation"
 msgstr "招待された人のみ表示・参加できます"
 
@@ -4114,6 +4130,9 @@ msgstr "チャットを閉じました"
 msgid "Chat history"
 msgstr "チャット履歴"
 
+msgid "Chat interface"
+msgstr "チャット画面"
+
 msgid "Chat is being reworked"
 msgstr "チャットは再構築中です"
 
@@ -4146,6 +4165,9 @@ msgstr "アップデートを確認"
 
 msgid "Check for Updates..."
 msgstr "アップデートを確認..."
+
+msgid "Check on agents and review their work from iPhone or iPad."
+msgstr "iPhone や iPad からエージェントの様子を確認し、作業をレビューできます。"
 
 msgid "Check on running agents and read what they changed from your iPhone or iPad."
 msgstr "実行中のエージェントの状況を確認し、変更内容を iPhone や iPad から読めます。"
@@ -4316,8 +4338,17 @@ msgstr "CIが失敗しました"
 msgid "Clarify this"
 msgstr "これを明確にして"
 
+msgid "Claude Code sessions, with claude --resume"
+msgstr "Claude Code のセッション（claude --resume で再開）"
+
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code、Codex、OpenCodeはエージェントであり、Paradevはそれらを同時に何体も動かす場所です。タスクごとに専用のGitワークツリーとブランチが割り当てられるので、10体のエージェントが10本のブランチで同時に作業する間、1か所から監視・レビュー・マージができます。"
+
+msgid "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI"
+msgstr "Claude Code、Codex、Cursor Agent、OpenCode、Gemini、Amp、あらゆる CLI"
+
+msgid "Claude Code, Codex, Cursor, OpenCode"
+msgstr "Claude Code、Codex、Cursor、OpenCode"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code、Codex、Cursor、OpenCodeなど。エージェントごとの設定は不要です。"
@@ -4665,6 +4696,15 @@ msgstr "クラウド"
 msgid "Cloud · us-east"
 msgstr "クラウド · us-east"
 
+msgid "Cloud credentials"
+msgstr "クラウドの認証情報"
+
+msgid "Cloud data gets deleted. Push your branches first."
+msgstr "クラウドのデータは削除されます。先にブランチをプッシュしてください。"
+
+msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
+msgstr "Cloud は{shutdownDate}に終了。Mac アプリは 2027年前半に終了"
+
 msgid "Cloud environment setup"
 msgstr "クラウド環境のセットアップ"
 
@@ -4677,8 +4717,14 @@ msgstr "クラウド環境は GitHub からリポジトリをチェックアウ�
 msgid "Cloud GB-hours per seat each month"
 msgstr "1席あたりの毎月のクラウド GB 時間"
 
+msgid "Cloud goes read-only"
+msgstr "Cloud が読み取り専用に"
+
 msgid "Cloud sandboxes"
 msgstr "クラウドサンドボックス"
+
+msgid "Cloud shuts down"
+msgstr "Cloud が終了"
 
 msgid "Cloud usage"
 msgstr "クラウド使用量"
@@ -4690,6 +4736,9 @@ msgid "Cloud workspace — connecting"
 msgstr "クラウドワークスペース — 接続中"
 
 msgid "Cloud workspaces"
+msgstr "クラウドワークスペース"
+
+msgid "Cloud Workspaces"
 msgstr "クラウドワークスペース"
 
 #. js-lingui-explicit-id
@@ -4781,6 +4830,9 @@ msgstr "=> や !== などの並びを合字にします。"
 
 msgid "Come build it with us."
 msgstr "一緒に作りましょう。"
+
+msgid "Comes with you"
+msgstr "引き継げるもの"
 
 msgid "Coming Soon"
 msgstr "近日公開"
@@ -4940,6 +4992,39 @@ msgstr "component-showcase"
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "組み合わせ可能なフォームレイアウト — react-hook-form用の@superset/ui/formと合わせて使います"
 
+msgid "Conductor chat history. Export it in Conductor under Settings → Account"
+msgstr "Conductor のチャット履歴。Conductor の Settings → Account からエクスポートしてください"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
+msgstr "Conductor Cloud は{shutdownDate}に終了します。数分で {0} に移行できます。"
+
+msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
+msgstr "Conductor Cloud は{shutdownDate}に終了。{companyName} に乗り換えましょう"
+
+msgid "Conductor Cloud guide"
+msgstr "Conductor Cloud ガイド"
+
+msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Conductor Cloud は{shutdownDateLong}に終了します。ワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
+
+msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
+msgstr "Conductor は{shutdownDate}以降にデータを削除し、{companyName} からはアクセスできません。それまでにブランチをプッシュし、チャットをエクスポートしてください。"
+
+msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
+msgstr "Conductor の情報は公開ドキュメントに基づいています。<0>詳しい比較</0>をご覧ください。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
+msgstr "Conductor はその所有者の商標です。{0} は Conductor および Meta と提携しておらず、承認も受けていません。"
+
+msgid "Conductor joins Meta"
+msgstr "Conductor が Meta に参加"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
+msgstr "Conductor のワークスペースはただの Git ワークツリーです。{0} はそのままの場所で使います。"
+
 msgid "Config file contents"
 msgstr "設定ファイルの内容"
 
@@ -4994,6 +5079,9 @@ msgstr "変更を確定"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "{0} とコンフリクトしています"
+
+msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
+msgstr "Meta への参加、Conductor チームの皆さんおめでとうございます。日付は<0>同チームの発表</0>に基づいています。"
 
 msgid "Connect"
 msgstr "接続"
@@ -5376,6 +5464,9 @@ msgstr "CSVとしてコピー"
 msgid "Copy as Markdown"
 msgstr "Markdownとしてコピー"
 
+msgid "Copy branch name"
+msgstr "ブランチ名をコピー"
+
 msgid "Copy Branch Name"
 msgstr "ブランチ名をコピー"
 
@@ -5511,6 +5602,9 @@ msgstr "クリップボードにコピー"
 
 msgid "Copy URL"
 msgstr "URLをコピー"
+
+msgid "Copy username"
+msgstr "ユーザー名をコピー"
 
 msgid "Copy Workspace ID"
 msgstr "ワークスペースIDをコピー"
@@ -6287,6 +6381,9 @@ msgstr "AIで作成"
 
 msgid "Create workspace"
 msgstr "ワークスペースを作成"
+
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "CLI、SDK、または MCP からワークスペースを作成し、エージェントを起動できます。"
 
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "任意のターミナルやスクリプトから、ワークスペースを作成し、エージェントを起動し、その出力を読み取れます。macOS と Linux 対応。"
@@ -7139,6 +7236,9 @@ msgstr "破棄しました — 今後は確認しません"
 msgid "Disconnect"
 msgstr "切断"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "{accountLogin}の接続を解除しますか？"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential}の接続を解除しますか？"
 
@@ -7235,6 +7335,9 @@ msgstr "コーディングエージェントの契約は自分で用意する必
 msgid "Do nothing"
 msgstr "何もしない"
 
+msgid "Do you proxy my model calls?"
+msgstr "モデルの呼び出しはプロキシされますか？"
+
 msgid "Do you sponsor visas?"
 msgstr "ビザのスポンサーはしていますか?"
 
@@ -7254,6 +7357,9 @@ msgstr "ドキュメント"
 
 msgid "Documentation"
 msgstr "ドキュメント"
+
+msgid "Does it run on Windows?"
+msgstr "Windows で動きますか？"
 
 msgid "Don't allow"
 msgstr "許可しない"
@@ -7292,9 +7398,16 @@ msgstr "ダウングレード中..."
 msgid "Download"
 msgstr "ダウンロード"
 
+#. placeholder {0}: BRAND.NAME
+msgid "Download {0}"
+msgstr "{0} をダウンロード"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Download {appName} at <0>{0}/download</0>."
 msgstr "<0>{0}/download</0>から{appName}をダウンロードしてください。"
+
+msgid "Download {companyName}"
+msgstr "{companyName} をダウンロード"
 
 msgid "Download {name}"
 msgstr "{name}をダウンロード"
@@ -7463,9 +7576,6 @@ msgstr "例: クラウドのレビュー"
 msgid "e.g. plan-budget"
 msgstr "例: plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "各エージェントは専用のGitワークツリーとブランチで作業するので、互いのファイルを上書きしません。準備ができたらレビューしてマージするだけです。"
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "添付ファイルは1件あたり最大{0} MBです。"
@@ -7490,9 +7600,6 @@ msgstr "各セッションは中断したところから再開します。"
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "サーフェスごとに独自のタイポグラフィがあります。変更はライブプレビューに即座に反映されます。"
-
-msgid "Each task on its own branch"
-msgstr "タスクごとに専用のブランチ"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "ワークスペースごとに専用のクラウドマシンが割り当てられ、ノートパソコンを閉じても動き続けます。デスクトップ、iPhone、iPad から様子を確認できます。"
@@ -7866,9 +7973,6 @@ msgstr "Ultra のすべて"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra のすべてに加えて、カスタムのクラウド GB 時間、SSO と SAML、SCIM プロビジョニング、IP 制限、監査ログ、カスタム SLA、専任サポート、カスタム契約。価格は組織に合わせて設定します。お問い合わせいただければ、最適なプランをご提案します。"
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "すべてスクリプトから操作できます。CLIでワークスペースやエージェントを起動し、SDKでParadevをCIに組み込み、MCP経由でエージェント自身に操作させることもできます。"
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "プリミティブの上に作ったもの一式 — Paradev独自のコンポーネント、エージェントUI向けの"
@@ -8533,6 +8637,9 @@ msgstr "フォールト"
 msgid "Favorites"
 msgstr "お気に入り"
 
+msgid "Feature"
+msgstr "機能"
+
 msgid "Featured"
 msgstr "注目"
 
@@ -9016,6 +9123,24 @@ msgstr "Free"
 msgid "Free for everyone"
 msgstr "誰でも無料"
 
+msgid "Free for one user. macOS, with an experimental Linux build."
+msgstr "1ユーザーなら無料。macOS 対応、Linux 版は実験的に提供。"
+
+msgid "Free for one user. Open source under MIT."
+msgstr "1ユーザーなら無料。MIT ライセンスのオープンソース。"
+
+msgid "Free for one user. Paid plans per user"
+msgstr "1ユーザーなら無料。有料プランはユーザー単位"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
+msgstr "1ユーザーなら無料。Pro ではオートメーションとモバイルアプリが、Team ではクラウドワークスペースが追加されます。"
+
+msgid "Free for one user. Pro from {proPrice}/user/mo"
+msgstr "1ユーザーなら無料。Pro は {proPrice}/ユーザー/月から"
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
+msgstr "1ユーザーなら無料。Pro は1ユーザーあたり月額 {proPrice} で、オートメーションとモバイルアプリが追加されます。Team は {teamPrice} で、クラウドワークスペースが追加されます。"
+
 msgid "Frequently Used"
 msgstr "よく使う絵文字"
 
@@ -9078,9 +9203,6 @@ msgstr "フルスクリーン"
 
 msgid "Full self-driving"
 msgstr "完全自動運転"
-
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "全ソースがMITライセンスのもとGitHubで公開されています。コードを確認し、監査し、貢献できます。ブラックボックスも隠し機能もありません。"
 
 msgid "Funding"
 msgstr "資金調達"
@@ -9207,6 +9329,9 @@ msgstr "Gitとワークツリー"
 
 msgid "Git author name"
 msgstr "Gitの作成者名"
+
+msgid "Git-ignored files in Cloud, like .env. Copy them out"
+msgstr "Cloud 上の Git で無視されたファイル（.env など）。コピーして持ち出してください"
 
 msgid "GitHub"
 msgstr "GitHub"
@@ -9692,6 +9817,9 @@ msgstr "1つのオートメーションにトリガーはいくつ設定でき�
 msgid "How much agent work engineers are actually running — tokens, cost, models and sessions, published by people who opted in."
 msgstr "エンジニアが実際にどれだけエージェントを動かしているか — トークン、コスト、モデル、セッション。参加を選んだ人たちが公開しています。"
 
+msgid "How much does it cost?"
+msgstr "料金はいくらですか？"
+
 msgid "How should the agent's actions be approved?"
 msgstr "エージェントの操作をどう承認しますか？"
 
@@ -9947,6 +10075,9 @@ msgstr "このホストのターミナルで実行してください。"
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "ローカルワークスペースでは、コードとエージェントのセッションはあなたのマシンに留まります。クラウドワークスペースはサンドボックスで動きます。"
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "手動モードでは、Paradev はこのエージェントにサインインしません。スクリプトで再度サインインさせてから続行するか、エージェント設定で手動モードをオフにしてください。"
 
@@ -10117,8 +10248,8 @@ msgstr "プラグインをインストール"
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Paradev GitHub Appをインストールしてリポジトリを接続します。"
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "接続したいリポジトリがある GitHub の組織またはアカウントごとに、Paradev GitHub App をインストールしてください。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "すべてのワークスペースにまたがるMCPサーバーのインストール、認可、スコープ設定を1か所で。OAuthも一元管理します。"
@@ -10272,6 +10403,9 @@ msgstr "請求書と支払い方法"
 msgid "iOS app"
 msgstr "iOSアプリ"
 
+msgid "iOS app, ending {shutdownDate}"
+msgstr "iOS アプリ（{shutdownDate}に終了）"
+
 msgid "iOS Simulator"
 msgstr "iOSシミュレータ"
 
@@ -10280,6 +10414,12 @@ msgstr "iOSシミュレーターのペイン"
 
 msgid "IP restrictions"
 msgstr "IP制限"
+
+msgid "iPhone and iPad"
+msgstr "iPhone と iPad"
+
+msgid "Is {companyName} open source?"
+msgstr "{companyName} はオープンソースですか？"
 
 msgid "Is my data secure?"
 msgstr "データは安全ですか?"
@@ -10358,6 +10498,9 @@ msgstr "スリープ中かもしれません"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "削除されたか、別の組織に属している可能性があります。"
+
+msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
+msgstr "数分で完了します。Conductor Cloud をお使いの場合は、まず<0>クラウドガイド</0>をご覧ください。"
 
 msgid "It will open once the connection is back."
 msgstr "接続が戻ると開きます。"
@@ -10474,9 +10617,6 @@ msgstr "参加中…"
 msgid "Jump"
 msgstr "移動"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "ワンクリックでお気に入りのエディタに移動できます。VS Code、Cursor、Xcode、JetBrainsのIDE、あるいは任意のターミナル。ワークツリーを必要な場所でそのまま開けます。"
-
 msgid "Jump to a specific date"
 msgstr "特定の日付に移動"
 
@@ -10536,6 +10676,9 @@ msgstr "新しいファイルを保持しました — 作成後に変更され�
 
 msgid "Kept the new folder — it is no longer empty"
 msgstr "新しいフォルダを保持しました — 空ではなくなっています"
+
+msgid "Key dates"
+msgstr "主な日程"
 
 msgid "Key name"
 msgstr "キー名"
@@ -10712,9 +10855,6 @@ msgstr "最新ニュース"
 msgid "Launch"
 msgstr "起動"
 
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "機能開発、バグ修正、リファクタリングにまたがってエージェントを並列に起動できます。どのエージェントが作業中で、どれがブロックされ、どれがあなたの返事を待っているかが一目で分かります。"
-
 msgid "Launch mode"
 msgstr "起動モード"
 
@@ -10838,6 +10978,9 @@ msgstr "エージェントに {browserName} のログインを使わせますか
 
 msgid "Let the agent drive."
 msgstr "エージェントに操作させる。"
+
+msgid "Let your cloud workspaces reach this host?"
+msgstr "クラウドワークスペースからこのホストへのアクセスを許可しますか？"
 
 msgid "Lets your organization list and clone repositories"
 msgstr "組織がリポジトリを一覧表示してクローンできるようにします"
@@ -11162,11 +11305,20 @@ msgstr "ローカルファースト"
 msgid "Local Network"
 msgstr "ローカルネットワーク"
 
+msgid "Local work can move at your own pace."
+msgstr "ローカルの作業は自分のペースで移行できます。"
+
 msgid "Local workspace"
 msgstr "ローカルワークスペース"
 
 msgid "Local workspaces"
 msgstr "ローカルワークスペース"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "ローカルワークスペースはあなたのマシンで動きます。何をつなぐかはあなたが決めます。"
+
+msgid "Local, on a host, or in the cloud"
+msgstr "ローカル、ホスト上、またはクラウドで"
 
 msgid "Location"
 msgstr "場所"
@@ -11244,6 +11396,9 @@ msgstr "低"
 msgid "Low severity"
 msgstr "重要度: 低"
 
+msgid "Mac app winds down"
+msgstr "Mac アプリが終了へ"
+
 msgid "Machine resources"
 msgstr "マシンリソース"
 
@@ -11255,6 +11410,12 @@ msgstr "マシンサイズ: {label}"
 
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "マシンに縛られないクラウドワークスペース。数秒で立ち上がり、チームメイトと共有できます。"
+
+msgid "macOS"
+msgstr "macOS"
+
+msgid "macOS, Linux (experimental)"
+msgstr "macOS、Linux（実験的）"
 
 msgid "Magenta"
 msgstr "マゼンタ"
@@ -11627,6 +11788,9 @@ msgstr "2026年半ば"
 msgid "Mid 2027"
 msgstr "2027年半ば"
 
+msgid "Migration guide"
+msgstr "移行ガイド"
+
 msgid "Min iOS"
 msgstr "最小 iOS"
 
@@ -11694,6 +11858,9 @@ msgstr "モバイルアプリ"
 
 msgid "Mobile App"
 msgstr "モバイルアプリ"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "モバイル、クラウド、または自分のクラウド"
 
 msgid "Mode"
 msgstr "モード"
@@ -11815,6 +11982,9 @@ msgstr "{count}件をグループへ移動"
 msgid "Move {name} to background"
 msgstr "{name} をバックグラウンドに移動"
 
+msgid "Move cloud work"
+msgstr "クラウドの作業を移行"
+
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
 
@@ -11829,6 +11999,9 @@ msgstr "右側に移動"
 
 msgid "Move to Tab"
 msgstr "タブに移動"
+
+msgid "Move your agents before {shutdownDate}."
+msgstr "{shutdownDate}までにエージェントを移行しましょう。"
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "「{name}」を {group} へ移動しました"
@@ -12474,6 +12647,9 @@ msgstr "ライブセッションはありません"
 msgid "No local workspaces"
 msgstr "ローカルワークスペースはありません"
 
+msgid "No lock-in"
+msgstr "ロックインなし"
+
 msgid "No log lines yet"
 msgstr "ログ行はまだありません"
 
@@ -12482,6 +12658,9 @@ msgstr "ログイン情報なし"
 
 msgid "No longer in source"
 msgstr "ソースから削除済み"
+
+msgid "No longer on sale"
+msgstr "販売終了"
 
 msgid "No match"
 msgstr "一致なし"
@@ -12934,6 +13113,9 @@ msgstr "リーダーボードに参加していません。先に参加してく
 msgid "Not on this version"
 msgstr "このバージョンにはありません"
 
+msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
+msgstr "お使いのマシン上ではプロキシしません。エージェントは各プロバイダーを直接呼び出し、料金もそちらで請求されます。クラウドワークスペースでは、キーがサンドボックスに入ることはありません。{companyName} が送信リクエストにサインイン情報を付加します。"
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "まだイベントを受信していません: Microsoft Graphが通知サブスクリプションを拒否しました。アプリの管理者同意と保護されたAPIの承認を確認してから、再接続してください。"
 
@@ -12967,6 +13149,9 @@ msgstr "未同期"
 msgctxt "agent status"
 msgid "Not updating"
 msgstr "更新なし"
+
+msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgstr "まだです。macOS で動作し、Linux 版は実験的に提供しています。Windows をお使いの方は、ダウンロードボタンからウェイトリストに登録できます。"
 
 msgid "Note"
 msgstr "メモ"
@@ -13275,6 +13460,9 @@ msgstr "コメントを変更できるのは作成者だけです"
 msgid "Only the author can edit a comment"
 msgstr "コメントを編集できるのは投稿者のみです"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "クラウドワークスペースからのアクセスを許可できるのはホストのオーナーだけです"
+
 msgid "Only the host owner can set its wake command"
 msgstr "ウェイクコマンドを設定できるのはホストのオーナーのみです"
 
@@ -13390,9 +13578,6 @@ msgstr "それでも開く"
 msgid "Open Anyway"
 msgstr "それでも開く"
 
-msgid "Open Anywhere"
-msgstr "どこでも開く"
-
 msgid "Open App Store"
 msgstr "App Store を開く"
 
@@ -13432,11 +13617,11 @@ msgstr "ChatGPT の管理者設定を開く"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT の設定を開く"
 
-msgid "Open Claude and Codex sessions as chats"
-msgstr "Claude と Codex のセッションをチャットとして開く"
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
+msgstr "Claude Code、Codex、OpenCode、Pi のセッションをチャットとして開く"
 
-msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
-msgstr "Claude と Codex のセッションをターミナルではなくチャットペインで開きます。"
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
+msgstr "Claude Code、Codex、OpenCode、Pi のセッションをターミナルではなくチャットペインで開きます。"
 
 msgid "Open Command Palette"
 msgstr "コマンドパレットを開く"
@@ -13504,9 +13689,6 @@ msgstr "{0}で開く"
 
 msgid "Open in {app}"
 msgstr "{app}で開く"
-
-msgid "Open in any IDE"
-msgstr "どのIDEでも開ける"
 
 msgid "Open in Any IDE"
 msgstr "好きなIDEで開く"
@@ -13704,6 +13886,9 @@ msgstr "送信オプションを開く"
 
 msgid "Open Source"
 msgstr "オープンソース"
+
+msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
+msgstr "MIT ライセンスのオープンソース。お持ちのサブスクリプションとキーで、どのエージェントでも使えます。"
 
 msgid "Open System Settings"
 msgstr "システム設定を開く"
@@ -14175,6 +14360,9 @@ msgstr "ParadevはParadevで開発されています。私たち自身が一番�
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradevは既存のツールと併用できるように設計されています。CursorのようなIDEへのディープリンクをネイティブにサポートしているので、ワークスペースやファイルをそのままIDEで開けます。"
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev は MIT ライセンスなので、ロックインはありません。GitHub でコードを読んだり変更したりできます。"
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradevはオープンソースです。すべてのプルリクエスト、レビュー、バグがGitHubで公開されています。"
 
@@ -14434,11 +14622,17 @@ msgstr "人"
 msgid "Personal"
 msgstr "個人"
 
+msgid "Personal account"
+msgstr "個人アカウント"
+
 msgid "Personal plan"
 msgstr "個人プラン"
 
 msgid "Phantom Forklift"
 msgstr "幻のフォークリフト"
+
+msgid "Phone"
+msgstr "スマートフォン"
 
 msgid "Phone number"
 msgstr "電話番号"
@@ -14515,6 +14709,9 @@ msgstr "{hostName}のワークツリーフォルダを選択してください�
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "エージェントを選べば1行でインストールできます。設定を手でコピーしても構いません。OAuthやAPIキーの設定を含む各クライアントの手順は<0>MCPサーバーの完全なドキュメント</0>にあります。"
 
+msgid "Pick your agents"
+msgstr "エージェントを選ぶ"
+
 msgid "PID"
 msgstr "PID"
 
@@ -14569,6 +14766,9 @@ msgid "Plant Manager"
 msgstr "工場長"
 
 msgid "Platform"
+msgstr "プラットフォーム"
+
+msgid "Platforms"
 msgstr "プラットフォーム"
 
 #. placeholder {0}: ringtone.name
@@ -14815,6 +15015,9 @@ msgstr "前のタブ (2つ目のショートカット)"
 
 msgid "Previous Workspace"
 msgstr "前のワークスペース"
+
+msgid "Price"
+msgstr "料金"
 
 msgid "Pricing"
 msgstr "料金"
@@ -15077,9 +15280,15 @@ msgstr "自分のリポジトリから公開"
 msgid "Publish new versions, rename and share"
 msgstr "新しいバージョンの公開、名前の変更、共有"
 
+msgid "Publish Pages"
+msgstr "ページを公開"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "公開"
+
+msgid "Published version 1."
+msgstr "バージョン1を公開しました。"
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "トークン数とモデル名のみを公開し、リポジトリ名、ファイルパス、プロンプトは公開しません。いつでも退出でき、退出すると公開したものはすべて削除されます。"
@@ -15138,6 +15347,9 @@ msgstr "プッシュ"
 #. placeholder {0}: error.message
 msgid "Push failed: {0}"
 msgstr "プッシュに失敗しました: {0}"
+
+msgid "Push your branches, then keep going on your Mac or in a {companyName} cloud workspace."
+msgstr "ブランチをプッシュしたら、Mac 上または {companyName} のクラウドワークスペースで作業を続けられます。"
 
 msgid "Pushed"
 msgstr "プッシュ"
@@ -15363,6 +15575,9 @@ msgstr "ガイドを読む"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "並列コーディングエージェントのガイドを読む"
+
+msgid "Read the migration guide"
+msgstr "移行ガイドを読む"
 
 msgid "Read the MIT License"
 msgstr "MITライセンスを読む"
@@ -15941,14 +16156,17 @@ msgstr "報告機能が一時的に利用できません。しばらくしてか
 msgid "Repos"
 msgstr "リポジトリ"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "リポジトリ、ワークツリー、ターミナルの出力、エージェントのセッションは、お使いのマシンに留まります。クラウド同期の対象はアカウントと組織のメタデータのみです。"
+msgid "Repos, worktrees and branches"
+msgstr "リポジトリ、ワークツリー、ブランチ"
 
 msgid "Repositories"
 msgstr "リポジトリ"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "GitHub Appのインストールからアクセスできるリポジトリです。"
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "接続済みの GitHub アカウントからアクセスできるリポジトリ。"
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin} のリポジトリは同期されなくなります。接続済みのほかの GitHub アカウントには影響しません。GitHub App は {accountLogin} にインストールされたままで、いつでも再接続できます。"
 
 msgid "Repositories refreshed"
 msgstr "リポジトリを更新しました"
@@ -16476,6 +16694,9 @@ msgstr "途中の介入なしで完了する定型チケット"
 msgid "Routines"
 msgstr "ルーティン"
 
+msgid "Routines, ending with Cloud"
+msgstr "ルーティン（Cloud とともに終了）"
+
 msgid "Row actions"
 msgstr "行の操作"
 
@@ -16562,6 +16783,9 @@ msgstr "今すぐ実行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "スケジュールやイベントで実行、オンデマンド実行、一時停止、再開、ログの確認。"
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "機能開発、修正、リファクタリングに並列でコーディングエージェントを走らせます。各エージェントはローカルでもクラウドでも、専用のブランチで作業します。"
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Paradev で並列コーディングエージェントを実行"
 
@@ -16583,6 +16807,9 @@ msgstr "ターミナルコマンドの実行や他のアプリケーションと
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "2つ目のターミナルを並行して起動する代わりに、セットアップ完了後にワークスペースセットアップのターミナルでエージェントを実行します"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "夜間評価を実行してリグレッションを修正して"
+
 msgid "Run this command?"
 msgstr "このコマンドを実行しますか？"
 
@@ -16595,14 +16822,8 @@ msgstr "ワークスペースのコマンドを実行"
 msgid "Run Workspace Command"
 msgstr "ワークスペースのコマンドを実行"
 
-msgid "Run workspaces anywhere"
-msgstr "ワークスペースをどこでも動かす"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "デスクトップ、任意のターミナル、スマートフォンからエージェントを実行。"
-
-msgid "Run your agents from your phone."
-msgstr "スマートフォンからエージェントを実行。"
 
 msgid "Run your coding agents in the cloud."
 msgstr "コーディングエージェントをクラウドで実行。"
@@ -17074,11 +17295,17 @@ msgstr "エージェントの使用量を他の開発者と比較できます。
 msgid "See Less"
 msgstr "表示を減らす"
 
+msgid "See migration steps"
+msgstr "移行手順を見る"
+
 msgid "See More"
 msgstr "もっと見る"
 
 msgid "See open roles ↑"
 msgstr "募集中のポジションを見る ↑"
+
+msgid "See pricing"
+msgstr "料金を見る"
 
 msgid "See the <0>available tools reference</0> for every tool name and parameter."
 msgstr "すべてのツール名とパラメータは<0>利用可能なツールのリファレンス</0>をご覧ください。"
@@ -17498,8 +17725,14 @@ msgstr "セットアップ"
 msgid "Setup script"
 msgstr "セットアップスクリプト"
 
+msgid "Setup scripts, once you convert conductor.json"
+msgstr "セットアップスクリプト（conductor.json を変換した後）"
+
 msgid "Setup stopped. The reason is in the output below."
 msgstr "設定が停止しました。理由は下の出力に表示されています。"
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "複数の GitHub アカウントが接続されています。Web アプリで接続を解除するアカウントを選ぶか、CLI を更新してください。"
 
 msgid "Sexual content"
 msgstr "性的なコンテンツ"
@@ -17775,6 +18008,12 @@ msgstr "名前と一緒に公開されます。"
 msgid "Shut down {0}"
 msgstr "{0} をシャットダウン"
 
+msgid "Shuts down {shutdownDate}"
+msgstr "{shutdownDate}に終了"
+
+msgid "Side by side"
+msgstr "並べて比較"
+
 msgid "Side by Side"
 msgstr "並べて表示"
 
@@ -17891,6 +18130,12 @@ msgstr "サインインに失敗しました"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "サインインに失敗しました（{reason}）。もう一度お試しください。"
+
+msgid "Sign-up completion"
+msgstr "登録完了率"
+
+msgid "Sign-up steps"
+msgstr "登録ステップ数"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>としてサインイン中"
@@ -18491,6 +18736,9 @@ msgstr "ステータス: {0}"
 msgid "Stay connected (refresh tokens)"
 msgstr "接続の維持(リフレッシュトークン)"
 
+msgid "Stays behind"
+msgstr "引き継げないもの"
+
 msgid "Steer"
 msgstr "軌道修正"
 
@@ -18556,6 +18804,9 @@ msgstr "監視を停止"
 
 msgid "Stop workspace run command"
 msgstr "ワークスペースの実行コマンドを停止"
+
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "クラウドワークスペースからこのホストへのアクセスを停止しますか？"
 
 msgid "stopped"
 msgstr "停止"
@@ -18698,6 +18949,9 @@ msgstr "サポートのレート制限が設定されていません"
 msgid "Support the project with a GitHub star"
 msgstr "GitHubスターでプロジェクトを応援"
 
+msgid "Supported agents"
+msgstr "対応エージェント"
+
 msgid "Surprise me"
 msgstr "おまかせ"
 
@@ -18718,6 +18972,9 @@ msgstr "エージェントは替える。ワークフローはそのまま"
 
 msgid "Switch host"
 msgstr "ホストを切り替え"
+
+msgid "Switch in four steps"
+msgstr "4ステップで乗り換え"
 
 msgid "Switch organization"
 msgstr "組織を切り替え"
@@ -18994,6 +19251,9 @@ msgstr "チーム"
 
 msgid "Team activity feed"
 msgstr "チームのアクティビティフィード"
+
+msgid "Team and Ultra plans"
+msgstr "Team および Ultra プラン"
 
 msgid "Team collaboration"
 msgstr "チームでのコラボレーション"
@@ -19558,6 +19818,9 @@ msgstr "対象ホスト"
 msgid "The team"
 msgstr "チーム"
 
+msgid "The team announced the news."
+msgstr "チームがこのニュースを発表しました。"
+
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "チームの招待は期限切れか、存在しません。チームのオーナーに新しいリンクを依頼するか、URLが正しく入力されているか確認してください。"
 
@@ -19614,6 +19877,9 @@ msgstr "これらのフォルダにはファイルが残っていますが、新
 
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
+
+msgid "They run on the subscriptions and keys you already have."
+msgstr "お持ちのサブスクリプションとキーでそのまま動きます。"
 
 msgid "Thinking"
 msgstr "思考"
@@ -19992,9 +20258,6 @@ msgstr "組織の公開URLが変わります。ブックマークや共有リン
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "<0>{0}</0>を削除し、すべてのメンバーを外します。この操作は元に戻せません。"
 
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "組織からGitHubの接続を解除します。GitHub Appはインストールされたまま残りますが、データの同期は行われなくなります。いつでも再接続できます。"
-
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "実行中のすべてのセッションを終了し、ターミナルデーモンを再起動します。アプリは新しいデーモンでターミナルを再起動します。"
 
@@ -20087,6 +20350,9 @@ msgstr "ティア"
 
 msgid "Time"
 msgstr "時間"
+
+msgid "Time to first workspace"
+msgstr "最初のワークスペースまでの時間"
 
 msgid "Time zone"
 msgstr "タイムゾーン"
@@ -20406,11 +20672,11 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "トンネル確立"
 
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "定型作業を、スケジュールやイベントの発生で動くエージェントに任せましょう。Issueのトリアージ、Changelogの下書き、依存関係の更新など。エージェントは自律的に動き、レビュー用のPRを作成します。"
-
 msgid "Turn Fast mode on or off"
 msgstr "高速モードのオン/オフを切り替え"
+
+msgid "Turn off"
+msgstr "オフにする"
 
 msgid "Turn off manual mode"
 msgstr "手動モードをオフにする"
@@ -20689,6 +20955,9 @@ msgstr "非公開化"
 msgid "Unpushed"
 msgstr "未プッシュ"
 
+msgid "Unpushed Cloud work. Push before {shutdownDate}"
+msgstr "プッシュしていない Cloud の作業。{shutdownDate}までにプッシュしてください"
+
 msgid "Unranked"
 msgstr "ランク外"
 
@@ -20934,8 +21203,8 @@ msgstr "ワークスペースの実行に使用"
 msgid "Use cases"
 msgstr "ユースケース"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "タスクごとにClaude Code、Codex、OpenCode、その他どのコーディングエージェントでも使えます。ワークスペース、ブランチ、レビューの流れはそのままです。"
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Claude Code、Codex、OpenCode など、どの CLI エージェントでも使えます。ワークスペース、ブランチ、レビューの流れはそのままです。"
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Claude Code、Codex、その他どのコーディングエージェントでも使えます。タスクごとに選ぶことも、複数を並べて実行することもできます。"
@@ -20961,6 +21230,9 @@ msgstr "モバイルでParadevを使う"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro でスマートフォンから Paradev を使えます。"
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "お持ちのエージェントのプランと API キーをそのまま使えます。モデルの呼び出しはプロバイダーへ直接届きます。"
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "デスクトップアプリで並列コーディングエージェントの実行を始めましょう。"
 
@@ -20984,9 +21256,6 @@ msgstr "Paradev APIを呼び出すときに使用します。"
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "音声文字起こしとプッシュトゥトーク機能を使用します。"
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "既存のエージェントの契約とAPIキーをそのまま使えます。Paradevがモデルの呼び出しを中継したり、ワークフローを特定のプロバイダーに縛ったりすることはありません。"
 
 msgid "Used"
 msgstr "使用済み"
@@ -21400,6 +21669,9 @@ msgstr "Opus の週間上限に達しました"
 msgid "Weekly release notes"
 msgstr "週次リリースノート"
 
+msgid "Weekly sign-up completion"
+msgstr "週ごとの登録完了率"
+
 msgid "Weekly Sonnet limit reached"
 msgstr "Sonnet の週間上限に達しました"
 
@@ -21425,6 +21697,9 @@ msgstr "福利厚生は?"
 msgid "What builders say about Paradev"
 msgstr "ビルダーが語るParadev"
 
+msgid "What comes with you"
+msgstr "引き継げるもの"
+
 msgid "What did you see on the page?"
 msgstr "ページで何を見ましたか？"
 
@@ -21436,6 +21711,9 @@ msgstr "初期ユーザーの声"
 
 msgid "What general access allows"
 msgstr "一般的なアクセスで許可される操作"
+
+msgid "What happens to my Conductor Cloud data?"
+msgstr "Conductor Cloud のデータはどうなりますか？"
 
 msgid "What has to become true"
 msgstr "成立していなければならない条件"
@@ -21493,6 +21771,9 @@ msgstr "これまでのリリース"
 
 msgid "What would you like to know?"
 msgstr "何を知りたいですか?"
+
+msgid "What you get"
+msgstr "得られるもの"
 
 msgid "What your agent can do"
 msgstr "エージェントにできること"
@@ -21774,6 +22055,9 @@ msgstr "ワークツリーが見つかりません"
 msgid "Worktree out of sync"
 msgstr "ワークツリーが同期していません"
 
+msgid "Worktree per task"
+msgstr "タスクごとのワークツリー"
+
 msgid "Worktrees"
 msgstr "ワークツリー"
 
@@ -21854,6 +22138,15 @@ msgstr "はい"
 
 msgid "Yes, demote me"
 msgstr "はい、降格します"
+
+msgid "Yes, on paid plans."
+msgstr "はい、有料プランで可能です。"
+
+msgid "Yes, resumes Claude Code sessions"
+msgstr "対応（Claude Code のセッションを再開可能）"
+
+msgid "Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in."
+msgstr "はい、MIT ライセンスです。コードをフォークして自分でビルドできるので、ロックインされることはありません。"
 
 msgid "Yes. Apply to the role that fits best and tell us what you would build. Include a repo, PR or demo."
 msgstr "はい。最も合うポジションに応募し、何を作りたいか教えてください。リポジトリ、PR、デモを添えてください。"
@@ -21943,6 +22236,9 @@ msgstr "自分のメッセージのみ編集できます"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "共有できるのはこの組織内のユーザーとチームのみです"
+
+msgid "You can read and export, but not run agents."
+msgstr "閲覧とエクスポートはできますが、エージェントは実行できません。"
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30 日間は「設定 → プロジェクト」から復元できます。リポジトリのフォルダーが削除されることはありません。"
@@ -22075,6 +22371,9 @@ msgstr "エージェントがデザインやレポートを公開し、チーム
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "エージェントがデザインやレポートを公開します。チームがコメントすると、エージェントが作業を始めます。"
 
+msgid "Your agent subscriptions and keys"
+msgstr "エージェントのサブスクリプションとキー"
+
 msgid "Your Agents, Your Accounts"
 msgstr "エージェントもアカウントも、あなたのもの"
 
@@ -22084,8 +22383,8 @@ msgstr "編集中の内容"
 msgid "Your changes will be lost if you don't save them."
 msgstr "保存しないと変更は失われます。"
 
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "コードは既定でローカルに留まり、連携するサービスは明示的に制御できます。"
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "クラウドワークスペースからこのホストにアクセスできなくなります。"
 
 msgid "Your download starts automatically."
 msgstr "ダウンロードは自動的に始まります。"

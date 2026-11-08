@@ -67,6 +67,25 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("closeSession records whether a person closed the chat", async () => {
+		const { runtime } = newRuntime();
+		const byUser = createSession(runtime);
+		const internal = createSession(runtime);
+		await runtime.commands.closeSession({
+			sessionId: byUser.sessionId,
+			userClosed: true,
+		});
+		await runtime.commands.closeSession({ sessionId: internal.sessionId });
+		const listed = runtime.commands.listSessions({ scopeId: "workspace-1" });
+		expect(
+			listed.find((row) => row.sessionId === byUser.sessionId),
+		).toMatchObject({ live: false, closedByUser: true });
+		expect(
+			listed.find((row) => row.sessionId === internal.sessionId),
+		).toMatchObject({ live: false, closedByUser: false });
+		await runtime.dispose();
+	});
+
 	test("closing a session drops its cached subagent tree", async () => {
 		const forget = spyOn(SubagentItems.prototype, "forget");
 		try {
@@ -674,6 +693,51 @@ describe("chat commands", () => {
 		expect(runtime.live.require(source.sessionId).terminalId).toBe(
 			"terminal-source",
 		);
+		await runtime.dispose();
+	});
+
+	test("forkSession starts the branch in the source's mode", async () => {
+		const startModes: (string | undefined)[] = [];
+		class ForkingHarness extends FakeHarness {
+			override start(options: Parameters<FakeHarness["start"]>[0]) {
+				startModes.push(options.modeId);
+				return super.start(options);
+			}
+			async fork() {
+				return "agent-forked";
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new ForkingHarness({
+							...SCRIPT,
+							start: [
+								{
+									kind: "session",
+									session: { status: "idle", modeId: "bypassPermissions" },
+								},
+							],
+						}),
+				],
+			]),
+		});
+		const source = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+
+		await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: source.sessionId,
+			cwd: "/tmp/workspace",
+		});
+
+		expect(startModes).toEqual([undefined, "bypassPermissions"]);
 		await runtime.dispose();
 	});
 

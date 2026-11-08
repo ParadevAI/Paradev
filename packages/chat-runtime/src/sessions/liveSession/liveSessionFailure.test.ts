@@ -28,7 +28,7 @@ function failingStream(
 		prompt: () => undefined,
 		cancelTurn: () => undefined,
 		respondToApproval: () => undefined,
-		setMode: () => undefined,
+		setMode: () => Promise.resolve(true),
 		dispose: async () => undefined,
 	};
 }
@@ -48,7 +48,7 @@ function hangingStream(events: AdapterEvent[]): HarnessAdapter {
 		prompt: () => undefined,
 		cancelTurn: () => undefined,
 		respondToApproval: () => undefined,
-		setMode: () => undefined,
+		setMode: async () => true,
 		dispose: async () => release(),
 	};
 }
@@ -111,7 +111,7 @@ function stoppableStream(events: AdapterEvent[]): HarnessAdapter {
 		prompt: () => undefined,
 		cancelTurn: () => stop(),
 		respondToApproval: () => undefined,
-		setMode: () => undefined,
+		setMode: async () => true,
 		dispose: async () => release(),
 	};
 }
@@ -126,7 +126,7 @@ function endingStream(events: AdapterEvent[]): HarnessAdapter {
 		prompt: () => undefined,
 		cancelTurn: () => undefined,
 		respondToApproval: () => undefined,
-		setMode: () => undefined,
+		setMode: async () => true,
 		dispose: async () => undefined,
 	};
 }

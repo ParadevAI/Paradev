@@ -2,7 +2,7 @@
 title: "Git Worktrees for AI Coding Agents: The Parallel Workflow"
 description: "How Git worktrees let you run multiple AI coding agents in parallel in separate working directories. Learn the workflow, the tradeoffs, and the tools that automate it."
 date: 2026-07-13
-lastUpdated: 2026-10-21
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -100,7 +100,7 @@ That is the gap workspace tools fill. Instead of managing worktrees by hand, the
 
 ## Where Paradev Fits
 
-Paradev is built around this exact workflow. Each new local branch-based workspace gets a Git worktree, branch, and terminals. It runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor, or Gemini, adds a built-in diff editor, an in-app browser for docs and dev servers, port management, and MCP, and extends across remote and cloud hosts. It turns the manual worktree workflow into the default, so you can run many agents in parallel and review each one without the bookkeeping.
+Paradev is built around this exact workflow. Each new local branch-based workspace gets a Git worktree, branch, and terminals. It runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor, or Gemini, adds a built-in diff editor, an in-app browser for docs and dev servers, port management, and MCP, and extends to remote hosts, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), and [cloud workspaces](/cloud). Paradev is open source under the MIT License. It turns the manual worktree workflow into the default, so you can run many agents in parallel and review each one without the bookkeeping.
 
 Cleanup is part of the workflow too. Deleting a workspace runs the project's teardown commands, bulk delete flags dirty or unpushed work before you confirm, and a deleted workspace can be restored on its original branch while that branch still exists. Worktrees created outside Paradev can be imported as workspaces, and a sparse checkout setting limits new worktrees to the folders you list.
 

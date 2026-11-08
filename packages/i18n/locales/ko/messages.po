@@ -483,11 +483,6 @@ msgstr "{0} GB 시간"
 msgid "{0} installed"
 msgstr "{0} 설치됨"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} → {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -521,6 +516,10 @@ msgstr "{0}이(가) 오프라인입니다."
 msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "{0}은(는) Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
 
+#. placeholder {0}: BRAND.NAME
+msgid "{0} is open source, so you're never locked in. Run parallel agents the way you're used to, with chat, cloud and mobile built in."
+msgstr "{0}는 오픈 소스라서 종속될 일이 없습니다. 익숙한 방식대로 에이전트를 병렬로 실행하세요. 채팅, 클라우드, 모바일이 기본으로 포함됩니다."
+
 #. placeholder {0}: host?.name ?? t({ message: "This host" })
 #. placeholder {1}: hostCompatibility.hostVersion
 #. placeholder {2}: hostCompatibility.minVersion
@@ -553,7 +552,6 @@ msgid "{0} of {1} checks running"
 msgstr "검사 {1}개 중 {0}개 실행 중"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "총 {totalCount}개 중 {0}개"
 
@@ -815,6 +813,9 @@ msgstr "{closedCount}개 닫힘"
 
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {커밋 #개} other {커밋 #개}}"
+
+msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName}가 Conductor worktree를 찾아 커밋하지 않은 변경 사항과 함께 그 자리에서 가져옵니다."
 
 msgid "{companyName} makes {productName}."
 msgstr "{productName}은(는) {companyName}에서 만듭니다."
@@ -1358,9 +1359,6 @@ msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#�
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub 이슈} other {GitHub 이슈}}"
 
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {풀 리퀘스트} other {풀 리퀘스트}}"
-
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {사용자 지정 테마 #개를 가져왔습니다} other {사용자 지정 테마 #개를 가져왔습니다}}"
 
@@ -1702,6 +1700,9 @@ msgstr "이 이름의 채널이 이미 있습니다"
 msgid "A chat can't switch to another provider partway through. Start a fresh {label} chat, or fork this conversation into one. This {currentLabel} chat stays open."
 msgstr "채팅 도중에는 다른 제공자로 전환할 수 없습니다. 새 {label} 채팅을 시작하거나 이 대화를 새 채팅으로 분기하세요. 이 {currentLabel} 채팅은 계속 열려 있습니다."
 
+msgid "A chat interface for Claude Code, Codex, OpenCode, and Pi. Picks up your Claude Code sessions."
+msgstr "Claude Code, Codex, OpenCode, Pi를 위한 채팅 인터페이스입니다. Claude Code 세션을 이어받습니다."
+
 msgid "A chat takes its name from the agent."
 msgstr "채팅 이름은 에이전트 이름을 따릅니다."
 
@@ -2023,9 +2024,6 @@ msgstr "클라우드 워크스페이스를 만들기 전에 설정에서 환경�
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "다른 계정을 연결하거나 더 이상 쓰지 않는 계정을 해제하세요."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "어떤 머신이든 호스트로 추가하세요. 노트북이 잠자기에 들어가도 워크스페이스는 계속 돌고, 어디서든 확인할 수 있습니다."
-
 msgid "Add Attachment"
 msgstr "첨부 파일 추가"
 
@@ -2061,6 +2059,9 @@ msgstr "파일, 앱 등 추가"
 
 msgid "Add files, apps, and more (@)"
 msgstr "파일, 앱 등 추가 (@)"
+
+msgid "Add GitHub organization"
+msgstr "GitHub 조직 추가"
 
 msgid "Add instructions"
 msgstr "지침 추가"
@@ -2176,6 +2177,9 @@ msgstr "첫 프로젝트 추가"
 
 msgid "Add your own terminal agent to this device."
 msgstr "이 기기에 직접 만든 터미널 에이전트를 추가합니다."
+
+msgid "Add your repos"
+msgstr "저장소 추가"
 
 msgid "Added {added}"
 msgstr "{added} 추가됨"
@@ -2329,8 +2333,14 @@ msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완료합니다."
 
+msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
+msgstr "이후 클라우드 워크스페이스의 에이전트가 <0>--host</0>를 사용해 이 호스트에서 명령을 실행할 수 있습니다. 호스트는 릴레이를 통해 접근할 수 있어야 합니다."
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱, iPhone, iPad에서 워크스페이스를 다시 열 수 있습니다."
+
+msgid "Agents keep working when your laptop is closed."
+msgstr "노트북을 닫아도 에이전트는 계속 작업합니다."
 
 msgid "Agents load their own preview, drive the UI, and attach screenshot proof before marking work ready for review."
 msgstr "에이전트가 직접 미리 보기를 띄우고, UI를 조작하고, 리뷰 준비 표시를 하기 전에 스크린샷 증거를 첨부합니다."
@@ -2352,6 +2362,9 @@ msgstr "에이전트에는 자리 표시자만 보입니다. Paradev가 나가�
 
 msgid "Agents that run while you're away"
 msgstr "자리를 비운 동안에도 실행되는 에이전트"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "에이전트가 이슈 분류, changelog 초안 작성, 의존성 업데이트를 알아서 합니다. 당신은 PR만 리뷰하면 됩니다."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "에이전트는 Linear 도구를 호출할 때 이 계정을 사용합니다."
@@ -2571,6 +2584,9 @@ msgstr "세션 동안 허용"
 
 msgid "Allow microphone access to use dictation"
 msgstr "받아쓰기를 사용하려면 마이크 접근을 허용하세요"
+
+msgid "Allow my cloud workspaces to reach this host"
+msgstr "내 클라우드 워크스페이스가 이 호스트에 접근하도록 허용"
 
 msgid "Allow remote access to this device via relay"
 msgstr "릴레이를 통해 이 기기에 원격 액세스 허용"
@@ -2831,6 +2847,9 @@ msgstr "모든 내용"
 msgid "Anything else? (optional)"
 msgstr "그 밖에 알려줄 내용이 있나요? (선택)"
 
+msgid "Anything running in a cloud workspace you created can then create workspaces, start agents, and run commands on this host, including an agent following instructions it found in a web page or a repository. Turn this on only if you need it."
+msgstr "직접 만든 클라우드 워크스페이스에서 실행되는 모든 것이 이 호스트에서 워크스페이스를 만들고, 에이전트를 시작하고, 명령을 실행할 수 있게 됩니다. 웹 페이지나 저장소에서 찾은 지시를 따르는 에이전트도 포함됩니다. 필요할 때만 켜세요."
+
 msgid "Anywhere"
 msgstr "모든 위치"
 
@@ -2922,9 +2941,6 @@ msgstr "적용"
 msgctxt "job application"
 msgid "Apply"
 msgstr "지원"
-
-msgid "Approve"
-msgstr "승인"
 
 msgid "Approve edits"
 msgstr "편집 승인"
@@ -3453,9 +3469,6 @@ msgstr "main보다 커밋 ?개 뒤처짐, 리베이스 필요"
 msgid "Being built right now."
 msgstr "지금 만들고 있습니다."
 
-msgid "Beta"
-msgstr "베타"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "그 너머: F5는 단기 전망이 아닙니다"
 
@@ -3851,6 +3864,9 @@ msgstr "제 API 키를 사용할 수 있나요?"
 msgid "Can merge without conflicts"
 msgstr "충돌 없이 머지할 수 있습니다"
 
+msgid "Can my team share workspaces?"
+msgstr "팀원과 워크스페이스를 공유할 수 있나요?"
+
 msgid "Can only be viewed or joined by invitation"
 msgstr "초대를 통해서만 보거나 참여할 수 있습니다"
 
@@ -4114,6 +4130,9 @@ msgstr "채팅을 닫았습니다"
 msgid "Chat history"
 msgstr "채팅 기록"
 
+msgid "Chat interface"
+msgstr "채팅 인터페이스"
+
 msgid "Chat is being reworked"
 msgstr "채팅을 개편하는 중입니다"
 
@@ -4146,6 +4165,9 @@ msgstr "업데이트 확인"
 
 msgid "Check for Updates..."
 msgstr "업데이트 확인..."
+
+msgid "Check on agents and review their work from iPhone or iPad."
+msgstr "iPhone이나 iPad에서 에이전트를 확인하고 작업을 검토하세요."
 
 msgid "Check on running agents and read what they changed from your iPhone or iPad."
 msgstr "iPhone이나 iPad에서 실행 중인 에이전트를 확인하고 변경 내용을 읽어 보세요."
@@ -4316,8 +4338,17 @@ msgstr "CI 실패"
 msgid "Clarify this"
 msgstr "이것을 명확히 해 주세요"
 
+msgid "Claude Code sessions, with claude --resume"
+msgstr "Claude Code 세션 (claude --resume 사용)"
+
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code, Codex, OpenCode는 에이전트이고, Paradev는 그 에이전트들을 한 번에 여러 개 실행하는 곳입니다. 작업마다 자체 Git 워크트리와 브랜치가 생기므로, 에이전트 열 개가 브랜치 열 개에서 동시에 작업하는 동안 한곳에서 모니터링, 리뷰, 병합할 수 있습니다."
+
+msgid "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI"
+msgstr "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, 모든 CLI"
+
+msgid "Claude Code, Codex, Cursor, OpenCode"
+msgstr "Claude Code, Codex, Cursor, OpenCode"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode 등. 에이전트별 설정이 필요 없습니다."
@@ -4665,6 +4696,15 @@ msgstr "클라우드"
 msgid "Cloud · us-east"
 msgstr "클라우드 · us-east"
 
+msgid "Cloud credentials"
+msgstr "클라우드 자격 증명"
+
+msgid "Cloud data gets deleted. Push your branches first."
+msgstr "클라우드 데이터가 삭제됩니다. 먼저 브랜치를 푸시하세요."
+
+msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
+msgstr "Cloud는 {shutdownDate}에 종료. Mac 앱은 2027년 초에 종료"
+
 msgid "Cloud environment setup"
 msgstr "클라우드 환경 설정"
 
@@ -4677,8 +4717,14 @@ msgstr "클라우드 환경은 GitHub에서 리포지토리를 체크아웃합�
 msgid "Cloud GB-hours per seat each month"
 msgstr "좌석당 매월 클라우드 GB 시간"
 
+msgid "Cloud goes read-only"
+msgstr "Cloud가 읽기 전용으로 전환"
+
 msgid "Cloud sandboxes"
 msgstr "클라우드 샌드박스"
+
+msgid "Cloud shuts down"
+msgstr "Cloud 종료"
 
 msgid "Cloud usage"
 msgstr "클라우드 사용량"
@@ -4690,6 +4736,9 @@ msgid "Cloud workspace — connecting"
 msgstr "클라우드 워크스페이스 — 연결 중"
 
 msgid "Cloud workspaces"
+msgstr "클라우드 워크스페이스"
+
+msgid "Cloud Workspaces"
 msgstr "클라우드 워크스페이스"
 
 #. js-lingui-explicit-id
@@ -4781,6 +4830,9 @@ msgstr "=> 나 !== 같은 문자열을 하나로 합칩니다."
 
 msgid "Come build it with us."
 msgstr "우리와 함께 만들어요."
+
+msgid "Comes with you"
+msgstr "가져올 수 있는 것"
 
 msgid "Coming Soon"
 msgstr "출시 예정"
@@ -4940,6 +4992,39 @@ msgstr "component-showcase"
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "조합 가능한 폼 레이아웃 — react-hook-form을 쓰려면 @superset/ui/form과 함께 사용하세요"
 
+msgid "Conductor chat history. Export it in Conductor under Settings → Account"
+msgstr "Conductor 채팅 기록. Conductor의 Settings → Account에서 내보내세요"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
+msgstr "Conductor Cloud는 {shutdownDate}에 종료됩니다. 몇 분 만에 {0}(으)로 옮기세요."
+
+msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
+msgstr "Conductor Cloud는 {shutdownDate}에 종료됩니다. {companyName}(으)로 전환하세요"
+
+msgid "Conductor Cloud guide"
+msgstr "Conductor Cloud 가이드"
+
+msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Conductor Cloud는 {shutdownDateLong}에 종료됩니다. 몇 분 만에 worktree와 에이전트를 {companyName}(으)로 옮기세요. 무료 오픈 소스입니다."
+
+msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
+msgstr "Conductor는 {shutdownDate} 이후 데이터를 삭제하며, {companyName}에서는 접근할 수 없습니다. 그 전에 브랜치를 푸시하고 채팅을 내보내세요."
+
+msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
+msgstr "Conductor 관련 정보는 공개 문서를 기준으로 합니다. <0>전체 비교</0>를 확인하세요."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
+msgstr "Conductor는 해당 소유자의 상표입니다. {0}는 Conductor 또는 Meta와 제휴하거나 보증을 받지 않았습니다."
+
+msgid "Conductor joins Meta"
+msgstr "Conductor, Meta에 합류"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
+msgstr "Conductor 워크스페이스는 일반 Git worktree입니다. {0}는 그 자리 그대로 사용합니다."
+
 msgid "Config file contents"
 msgstr "설정 파일 내용"
 
@@ -4994,6 +5079,9 @@ msgstr "변경 확인"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "{0}과(와) 충돌"
+
+msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
+msgstr "Meta에 합류한 Conductor 팀에 축하를 전합니다. 날짜는 <0>해당 발표</0>를 기준으로 합니다."
 
 msgid "Connect"
 msgstr "연결"
@@ -5376,6 +5464,9 @@ msgstr "CSV로 복사"
 msgid "Copy as Markdown"
 msgstr "Markdown으로 복사"
 
+msgid "Copy branch name"
+msgstr "브랜치 이름 복사"
+
 msgid "Copy Branch Name"
 msgstr "브랜치 이름 복사"
 
@@ -5511,6 +5602,9 @@ msgstr "클립보드에 복사"
 
 msgid "Copy URL"
 msgstr "URL 복사"
+
+msgid "Copy username"
+msgstr "사용자 이름 복사"
 
 msgid "Copy Workspace ID"
 msgstr "워크스페이스 ID 복사"
@@ -6287,6 +6381,9 @@ msgstr "AI로 만들기"
 
 msgid "Create workspace"
 msgstr "워크스페이스 만들기"
+
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "CLI, SDK 또는 MCP로 워크스페이스를 만들고 에이전트를 시작하세요."
 
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "어떤 터미널이나 스크립트에서든 워크스페이스를 만들고, 에이전트를 실행하고, 출력을 확인하세요. macOS와 Linux를 지원합니다."
@@ -7139,6 +7236,9 @@ msgstr "버렸습니다 — 다시 묻지 않습니다"
 msgid "Disconnect"
 msgstr "연결 해제"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "{accountLogin} 연결을 해제할까요?"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential} 연결을 해제할까요?"
 
@@ -7235,6 +7335,9 @@ msgstr "코딩 에이전트 구독이 따로 필요한가요?"
 msgid "Do nothing"
 msgstr "아무 동작 안 함"
 
+msgid "Do you proxy my model calls?"
+msgstr "모델 호출을 프록시하나요?"
+
 msgid "Do you sponsor visas?"
 msgstr "비자 스폰서를 해 주나요?"
 
@@ -7254,6 +7357,9 @@ msgstr "문서"
 
 msgid "Documentation"
 msgstr "문서"
+
+msgid "Does it run on Windows?"
+msgstr "Windows에서 실행되나요?"
 
 msgid "Don't allow"
 msgstr "허용 안 함"
@@ -7292,9 +7398,16 @@ msgstr "다운그레이드하는 중..."
 msgid "Download"
 msgstr "다운로드"
 
+#. placeholder {0}: BRAND.NAME
+msgid "Download {0}"
+msgstr "{0} 다운로드"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Download {appName} at <0>{0}/download</0>."
 msgstr "<0>{0}/download</0>에서 {appName}을 다운로드하세요."
+
+msgid "Download {companyName}"
+msgstr "{companyName} 다운로드"
 
 msgid "Download {name}"
 msgstr "{name} 다운로드"
@@ -7463,9 +7576,6 @@ msgstr "예: 내 클라우드 리뷰"
 msgid "e.g. plan-budget"
 msgstr "예: plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "각 에이전트는 자체 Git 워크트리와 브랜치에서 작업하므로 서로의 파일을 덮어쓰지 않습니다. 준비되면 리뷰하고 병합하세요."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "첨부 파일은 각각 최대 {0} MB입니다."
@@ -7490,9 +7600,6 @@ msgstr "각 세션은 중단된 지점부터 이어집니다."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "각 화면마다 타이포그래피를 따로 설정합니다. 변경 사항은 실시간 미리보기에 바로 반영됩니다."
-
-msgid "Each task on its own branch"
-msgstr "작업마다 자체 브랜치"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "워크스페이스마다 전용 클라우드 머신이 있어 노트북을 덮어도 계속 작업합니다. 데스크톱, iPhone, iPad에서 확인하세요."
@@ -7866,9 +7973,6 @@ msgstr "Ultra의 모든 기능"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra의 모든 기능에 더해 맞춤 클라우드 GB 시간, SSO 및 SAML, SCIM 프로비저닝, IP 제한, 감사 로그, 맞춤 SLA, 전담 지원, 맞춤 계약을 제공합니다. 가격은 조직에 맞게 정해집니다. 문의해 주시면 알맞은 구성을 제안해 드립니다."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "모든 것이 스크립트로 가능합니다. CLI에서 워크스페이스와 에이전트를 띄우고, SDK로 Paradev를 CI에 연결하고, MCP로 에이전트가 직접 조작하게 하세요."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "프리미티브 위에 우리가 만든 모든 것 — Paradev 오리지널, 에이전트 UI용"
@@ -8533,6 +8637,9 @@ msgstr "결함"
 msgid "Favorites"
 msgstr "즐겨찾기"
 
+msgid "Feature"
+msgstr "기능"
+
 msgid "Featured"
 msgstr "추천"
 
@@ -9016,6 +9123,24 @@ msgstr "무료"
 msgid "Free for everyone"
 msgstr "누구나 무료"
 
+msgid "Free for one user. macOS, with an experimental Linux build."
+msgstr "1인 사용자는 무료. macOS 지원, Linux 빌드는 실험 단계입니다."
+
+msgid "Free for one user. Open source under MIT."
+msgstr "1인 사용자는 무료. MIT 라이선스 오픈 소스입니다."
+
+msgid "Free for one user. Paid plans per user"
+msgstr "1인 사용자는 무료. 유료 플랜은 사용자당 과금"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
+msgstr "1인 사용자는 무료. Pro는 자동화와 모바일 앱을, Team은 클라우드 워크스페이스를 추가합니다."
+
+msgid "Free for one user. Pro from {proPrice}/user/mo"
+msgstr "1인 사용자는 무료. Pro는 사용자당 월 {proPrice}부터"
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
+msgstr "1인 사용자는 무료. Pro는 사용자당 월 {proPrice}이며 자동화와 모바일 앱을 추가합니다. Team은 {teamPrice}이며 클라우드 워크스페이스를 추가합니다."
+
 msgid "Frequently Used"
 msgstr "자주 사용"
 
@@ -9078,9 +9203,6 @@ msgstr "전체 화면"
 
 msgid "Full self-driving"
 msgstr "완전 자율 주행"
-
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "전체 소스가 MIT 라이선스로 GitHub에 공개되어 있습니다. 코드를 확인하고, 감사하고, 기여하세요. 블랙박스도, 숨겨진 기능도 없습니다."
 
 msgid "Funding"
 msgstr "투자 유치"
@@ -9207,6 +9329,9 @@ msgstr "Git 및 worktree"
 
 msgid "Git author name"
 msgstr "Git 작성자 이름"
+
+msgid "Git-ignored files in Cloud, like .env. Copy them out"
+msgstr "Cloud에 있는 Git 무시 파일(.env 등). 직접 복사해 두세요"
 
 msgid "GitHub"
 msgstr "GitHub"
@@ -9692,6 +9817,9 @@ msgstr "자동화 하나에 트리거를 몇 개까지 둘 수 있나요?"
 msgid "How much agent work engineers are actually running — tokens, cost, models and sessions, published by people who opted in."
 msgstr "엔지니어들이 실제로 돌리는 에이전트 작업량 — 참여를 선택한 사용자들이 공개한 토큰, 비용, 모델, 세션 데이터입니다."
 
+msgid "How much does it cost?"
+msgstr "비용은 얼마인가요?"
+
 msgid "How should the agent's actions be approved?"
 msgstr "에이전트의 작업을 어떻게 승인할까요?"
 
@@ -9947,6 +10075,9 @@ msgstr "(이 호스트의 터미널에서)"
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "몇 달 만에 <0>수만 명의 엔지니어</0>가 Wix, DoorDash, Netflix 같은 회사에서 Paradev를 주력 IDE로 사용하고 있습니다."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "로컬 워크스페이스에서는 코드와 에이전트 세션이 당신의 기기에 남습니다. 클라우드 워크스페이스는 샌드박스에서 실행됩니다."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "수동 모드에서는 Paradev가 이 에이전트를 로그인시키지 않습니다. 스크립트로 다시 로그인시킨 뒤 계속하거나, 에이전트 설정에서 수동 모드를 끄세요."
 
@@ -10117,8 +10248,8 @@ msgstr "플러그인 설치"
 msgid "Install the desktop app"
 msgstr "데스크톱 앱 설치"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "리포지토리를 연결하려면 Paradev GitHub App을 설치하세요."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "연결할 저장소가 있는 GitHub 조직이나 계정마다 Paradev GitHub App을 설치하세요."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "모든 워크스페이스의 MCP 서버를 한곳에서 설치하고, 인증하고, 범위를 지정하세요. OAuth도 중앙에서 관리합니다."
@@ -10272,6 +10403,9 @@ msgstr "청구서 및 결제 수단"
 msgid "iOS app"
 msgstr "iOS 앱"
 
+msgid "iOS app, ending {shutdownDate}"
+msgstr "iOS 앱, {shutdownDate}에 종료"
+
 msgid "iOS Simulator"
 msgstr "iOS 시뮬레이터"
 
@@ -10280,6 +10414,12 @@ msgstr "iOS 시뮬레이터 패널"
 
 msgid "IP restrictions"
 msgstr "IP 제한"
+
+msgid "iPhone and iPad"
+msgstr "iPhone 및 iPad"
+
+msgid "Is {companyName} open source?"
+msgstr "{companyName}는 오픈 소스인가요?"
 
 msgid "Is my data secure?"
 msgstr "데이터는 안전한가요?"
@@ -10358,6 +10498,9 @@ msgstr "절전 모드일 수 있습니다"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "삭제되었거나 다른 조직에 속한 페이지일 수 있습니다."
+
+msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
+msgstr "몇 분이면 됩니다. Conductor Cloud를 사용 중이라면 <0>클라우드 가이드</0>부터 시작하세요."
 
 msgid "It will open once the connection is back."
 msgstr "연결이 복구되면 열립니다."
@@ -10474,9 +10617,6 @@ msgstr "참가하는 중…"
 msgid "Jump"
 msgstr "이동"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "클릭 한 번으로 즐겨 쓰는 에디터로 이동하세요. VS Code, Cursor, Xcode, JetBrains IDE, 또는 아무 터미널에서든 worktree를 원하는 곳에서 엽니다."
-
 msgid "Jump to a specific date"
 msgstr "특정 날짜로 이동"
 
@@ -10536,6 +10676,9 @@ msgstr "새 파일을 유지했습니다 — 생성 후 내용이 바뀌었습�
 
 msgid "Kept the new folder — it is no longer empty"
 msgstr "새 폴더를 유지했습니다 — 더 이상 비어 있지 않습니다"
+
+msgid "Key dates"
+msgstr "주요 일정"
 
 msgid "Key name"
 msgstr "키 이름"
@@ -10712,9 +10855,6 @@ msgstr "최신 소식"
 msgid "Launch"
 msgstr "실행"
 
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "기능 개발, 버그 수정, 리팩터링에 에이전트를 병렬로 띄우세요. 어떤 에이전트가 작업 중이고, 막혀 있고, 응답을 기다리는지 한눈에 보입니다."
-
 msgid "Launch mode"
 msgstr "실행 방식"
 
@@ -10838,6 +10978,9 @@ msgstr "에이전트가 {browserName} 로그인을 사용하도록 허용할까�
 
 msgid "Let the agent drive."
 msgstr "에이전트가 조작하게 하세요."
+
+msgid "Let your cloud workspaces reach this host?"
+msgstr "클라우드 워크스페이스가 이 호스트에 접근하도록 허용할까요?"
 
 msgid "Lets your organization list and clone repositories"
 msgstr "조직이 리포지토리를 나열하고 복제할 수 있게 합니다"
@@ -11162,11 +11305,20 @@ msgstr "로컬 우선"
 msgid "Local Network"
 msgstr "로컬 네트워크"
 
+msgid "Local work can move at your own pace."
+msgstr "로컬 작업은 원하는 속도로 옮기면 됩니다."
+
 msgid "Local workspace"
 msgstr "로컬 워크스페이스"
 
 msgid "Local workspaces"
 msgstr "로컬 워크스페이스"
+
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "로컬 워크스페이스는 당신의 기기에서 실행됩니다. 무엇을 연결할지는 당신이 정합니다."
+
+msgid "Local, on a host, or in the cloud"
+msgstr "로컬, 호스트 또는 클라우드에서"
 
 msgid "Location"
 msgstr "위치"
@@ -11244,6 +11396,9 @@ msgstr "낮음"
 msgid "Low severity"
 msgstr "심각도 낮음"
 
+msgid "Mac app winds down"
+msgstr "Mac 앱 단계적 종료"
+
 msgid "Machine resources"
 msgstr "머신 리소스"
 
@@ -11255,6 +11410,12 @@ msgstr "머신 크기: {label}"
 
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "머신에 묶이지 않는 클라우드 워크스페이스를 몇 초 만에 띄우고 팀원과 공유할 수 있습니다."
+
+msgid "macOS"
+msgstr "macOS"
+
+msgid "macOS, Linux (experimental)"
+msgstr "macOS, Linux (실험 단계)"
 
 msgid "Magenta"
 msgstr "자홍"
@@ -11627,6 +11788,9 @@ msgstr "2026년 중반"
 msgid "Mid 2027"
 msgstr "2027년 중반"
 
+msgid "Migration guide"
+msgstr "마이그레이션 가이드"
+
 msgid "Min iOS"
 msgstr "최소 iOS"
 
@@ -11694,6 +11858,9 @@ msgstr "모바일 앱"
 
 msgid "Mobile App"
 msgstr "모바일 앱"
+
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "모바일, 클라우드, 또는 자체 클라우드"
 
 msgid "Mode"
 msgstr "모드"
@@ -11815,6 +11982,9 @@ msgstr "{count}개를 그룹으로 이동"
 msgid "Move {name} to background"
 msgstr "{name}을(를) 백그라운드로 이동"
 
+msgid "Move cloud work"
+msgstr "클라우드 작업 옮기기"
+
 msgid "Move to background"
 msgstr "백그라운드로 이동"
 
@@ -11829,6 +11999,9 @@ msgstr "오른쪽으로 이동"
 
 msgid "Move to Tab"
 msgstr "탭으로 이동"
+
+msgid "Move your agents before {shutdownDate}."
+msgstr "{shutdownDate} 전에 에이전트를 옮기세요."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\"을(를) {group}(으)로 이동했습니다"
@@ -12474,6 +12647,9 @@ msgstr "활성 세션 없음"
 msgid "No local workspaces"
 msgstr "로컬 워크스페이스 없음"
 
+msgid "No lock-in"
+msgstr "종속 없음"
+
 msgid "No log lines yet"
 msgstr "아직 로그가 없습니다"
 
@@ -12482,6 +12658,9 @@ msgstr "로그인 없음"
 
 msgid "No longer in source"
 msgstr "소스에 더 이상 없음"
+
+msgid "No longer on sale"
+msgstr "판매 종료"
 
 msgid "No match"
 msgstr "일치 항목 없음"
@@ -12934,6 +13113,9 @@ msgstr "리더보드에 없습니다. 먼저 참여하세요."
 msgid "Not on this version"
 msgstr "이 버전에는 없음"
 
+msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
+msgstr "내 컴퓨터에서는 하지 않습니다. 에이전트가 각 제공업체를 직접 호출하고 요금도 그쪽에서 청구됩니다. 클라우드 워크스페이스에서는 키가 샌드박스에 들어가지 않으며, {companyName}가 나가는 요청에 로그인 정보를 추가합니다."
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "아직 이벤트를 받지 못하고 있습니다. Microsoft Graph가 알림 구독을 거부했습니다. 앱의 관리자 동의와 보호된 API 승인을 확인한 뒤 다시 연결하세요."
 
@@ -12967,6 +13149,9 @@ msgstr "아직 동기화되지 않음"
 msgctxt "agent status"
 msgid "Not updating"
 msgstr "업데이트 없음"
+
+msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgstr "아직은 아닙니다. macOS에서 실행되며 Linux 빌드는 실험 단계입니다. Windows 사용자는 다운로드 버튼에서 대기자 명단에 등록할 수 있습니다."
 
 msgid "Note"
 msgstr "참고"
@@ -13275,6 +13460,9 @@ msgstr "작성자만 댓글을 변경할 수 있습니다"
 msgid "Only the author can edit a comment"
 msgstr "작성자만 코멘트를 수정할 수 있습니다"
 
+msgid "Only the host owner can let cloud workspaces reach it"
+msgstr "호스트 소유자만 클라우드 워크스페이스의 접근을 허용할 수 있습니다"
+
 msgid "Only the host owner can set its wake command"
 msgstr "호스트 소유자만 wake 명령을 설정할 수 있습니다"
 
@@ -13390,9 +13578,6 @@ msgstr "그래도 열기"
 msgid "Open Anyway"
 msgstr "그래도 열기"
 
-msgid "Open Anywhere"
-msgstr "어디서나 열기"
-
 msgid "Open App Store"
 msgstr "App Store 열기"
 
@@ -13432,11 +13617,11 @@ msgstr "ChatGPT 관리자 설정 열기"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT 설정 열기"
 
-msgid "Open Claude and Codex sessions as chats"
-msgstr "Claude 및 Codex 세션을 채팅으로 열기"
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
+msgstr "Claude Code, Codex, OpenCode 및 Pi 세션을 채팅으로 열기"
 
-msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
-msgstr "Claude 및 Codex 세션을 터미널 대신 채팅 패널에서 엽니다."
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
+msgstr "Claude Code, Codex, OpenCode 및 Pi 세션을 터미널 대신 채팅 패널에서 엽니다."
 
 msgid "Open Command Palette"
 msgstr "명령 팔레트 열기"
@@ -13504,9 +13689,6 @@ msgstr "{0}에서 열기"
 
 msgid "Open in {app}"
 msgstr "{app}에서 열기"
-
-msgid "Open in any IDE"
-msgstr "어떤 IDE에서든 열기"
 
 msgid "Open in Any IDE"
 msgstr "어떤 IDE에서든 열기"
@@ -13704,6 +13886,9 @@ msgstr "배포 옵션 열기"
 
 msgid "Open Source"
 msgstr "오픈 소스"
+
+msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
+msgstr "MIT 라이선스 오픈 소스입니다. 내 구독과 키로 어떤 에이전트든 사용하세요."
 
 msgid "Open System Settings"
 msgstr "시스템 설정 열기"
@@ -14175,6 +14360,9 @@ msgstr "Paradev는 Paradev로 개발됩니다. 우리가 가장 열심히 쓰는
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev는 기존 도구와 함께 쓰도록 만들었습니다. Cursor 같은 IDE로의 딥링크를 기본 지원하므로 워크스페이스와 파일을 쓰던 IDE에서 열 수 있습니다."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev는 MIT 라이선스라 락인이 없습니다. GitHub에서 코드를 읽거나 바꿀 수 있습니다."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev는 오픈 소스입니다. 모든 풀 리퀘스트, 리뷰, 버그가 GitHub에 공개되어 있습니다."
 
@@ -14434,11 +14622,17 @@ msgstr "사람"
 msgid "Personal"
 msgstr "개인"
 
+msgid "Personal account"
+msgstr "개인 계정"
+
 msgid "Personal plan"
 msgstr "개인 플랜"
 
 msgid "Phantom Forklift"
 msgstr "유령 지게차"
+
+msgid "Phone"
+msgstr "휴대폰"
 
 msgid "Phone number"
 msgstr "전화번호"
@@ -14515,6 +14709,9 @@ msgstr "{hostName}에서 worktree 폴더를 선택하세요."
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "한 줄 설치를 위해 에이전트를 고르거나 설정을 직접 복사하세요. OAuth와 API 키 설정을 포함한 모든 클라이언트는 <0>전체 MCP 서버 문서</0>에서 다룹니다."
 
+msgid "Pick your agents"
+msgstr "에이전트 선택"
+
 msgid "PID"
 msgstr "PID"
 
@@ -14569,6 +14766,9 @@ msgid "Plant Manager"
 msgstr "공장장"
 
 msgid "Platform"
+msgstr "플랫폼"
+
+msgid "Platforms"
 msgstr "플랫폼"
 
 #. placeholder {0}: ringtone.name
@@ -14815,6 +15015,9 @@ msgstr "이전 탭(두 번째 단축키)"
 
 msgid "Previous Workspace"
 msgstr "이전 워크스페이스"
+
+msgid "Price"
+msgstr "가격"
 
 msgid "Pricing"
 msgstr "가격"
@@ -15077,9 +15280,15 @@ msgstr "내 저장소에서 게시"
 msgid "Publish new versions, rename and share"
 msgstr "새 버전 게시, 이름 변경 및 공유"
 
+msgid "Publish Pages"
+msgstr "페이지 게시"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "게시됨"
+
+msgid "Published version 1."
+msgstr "버전 1을 게시했습니다."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "토큰 수와 모델 이름만 공개하며, 리포지토리 이름이나 파일 경로, 프롬프트는 절대 공개하지 않습니다. 언제든 탈퇴할 수 있고, 탈퇴하면 공개한 내용이 모두 삭제됩니다."
@@ -15138,6 +15347,9 @@ msgstr "푸시"
 #. placeholder {0}: error.message
 msgid "Push failed: {0}"
 msgstr "푸시 실패: {0}"
+
+msgid "Push your branches, then keep going on your Mac or in a {companyName} cloud workspace."
+msgstr "브랜치를 푸시한 다음 Mac이나 {companyName} 클라우드 워크스페이스에서 이어서 작업하세요."
 
 msgid "Pushed"
 msgstr "푸시됨"
@@ -15363,6 +15575,9 @@ msgstr "가이드 읽기"
 
 msgid "Read the guide to parallel coding agents"
 msgstr "병렬 코딩 에이전트 가이드 읽기"
+
+msgid "Read the migration guide"
+msgstr "마이그레이션 가이드 읽기"
 
 msgid "Read the MIT License"
 msgstr "MIT 라이선스 읽기"
@@ -15941,14 +16156,17 @@ msgstr "신고 기능을 잠시 사용할 수 없습니다. 잠시 후 다시 �
 msgid "Repos"
 msgstr "리포"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "리포지토리, worktree, 터미널 출력, 에이전트 세션은 여러분의 머신에 머뭅니다. 클라우드 동기화는 계정과 조직 메타데이터만 다룹니다."
+msgid "Repos, worktrees and branches"
+msgstr "저장소, worktree, 브랜치"
 
 msgid "Repositories"
 msgstr "리포지토리"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "GitHub App 설치를 통해 접근할 수 있는 리포지토리입니다."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "연결된 GitHub 계정을 통해 접근할 수 있는 저장소입니다."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin}의 저장소는 더 이상 동기화되지 않습니다. 연결된 다른 GitHub 계정에는 영향이 없습니다. GitHub App은 {accountLogin}에 계속 설치되어 있으며 언제든지 다시 연결할 수 있습니다."
 
 msgid "Repositories refreshed"
 msgstr "리포지토리를 새로 고쳤습니다"
@@ -16476,6 +16694,9 @@ msgstr "작업 중간 개입 없는 일상적인 티켓"
 msgid "Routines"
 msgstr "루틴"
 
+msgid "Routines, ending with Cloud"
+msgstr "루틴, Cloud와 함께 종료"
+
 msgid "Row actions"
 msgstr "행 작업"
 
@@ -16562,6 +16783,9 @@ msgstr "지금 실행"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "일정이나 이벤트로 실행, 필요할 때 실행, 일시 중지, 재개, 로그 확인."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "기능, 수정, 리팩터링에 코딩 에이전트를 병렬로 실행하세요. 각 에이전트는 로컬이나 클라우드에서 자체 브랜치로 작업합니다."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Paradev로 병렬 코딩 에이전트 실행"
 
@@ -16583,6 +16807,9 @@ msgstr "터미널 명령을 실행하고 다른 애플리케이션과 상호작�
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "터미널을 하나 더 띄우는 대신, 설정이 끝난 뒤 워크스페이스 설정 터미널에서 에이전트를 실행합니다"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "야간 평가를 실행하고 회귀 문제를 수정해 줘"
+
 msgid "Run this command?"
 msgstr "이 명령을 실행할까요?"
 
@@ -16595,14 +16822,8 @@ msgstr "워크스페이스 명령 실행"
 msgid "Run Workspace Command"
 msgstr "워크스페이스 명령 실행"
 
-msgid "Run workspaces anywhere"
-msgstr "어디서나 워크스페이스 실행"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "데스크톱, 어떤 터미널, 또는 휴대폰에서 에이전트를 실행하세요."
-
-msgid "Run your agents from your phone."
-msgstr "휴대폰에서 에이전트를 실행하세요."
 
 msgid "Run your coding agents in the cloud."
 msgstr "코딩 에이전트를 클라우드에서 실행하세요."
@@ -17074,11 +17295,17 @@ msgstr "다른 개발자와 에이전트 사용량을 비교하세요. 각 프�
 msgid "See Less"
 msgstr "간단히 보기"
 
+msgid "See migration steps"
+msgstr "마이그레이션 단계 보기"
+
 msgid "See More"
 msgstr "더 보기"
 
 msgid "See open roles ↑"
 msgstr "채용 공고 보기 ↑"
+
+msgid "See pricing"
+msgstr "가격 보기"
 
 msgid "See the <0>available tools reference</0> for every tool name and parameter."
 msgstr "모든 도구 이름과 매개변수는 <0>사용 가능한 도구 레퍼런스</0>를 참고하세요."
@@ -17498,8 +17725,14 @@ msgstr "설정"
 msgid "Setup script"
 msgstr "설정 스크립트"
 
+msgid "Setup scripts, once you convert conductor.json"
+msgstr "설정 스크립트 (conductor.json 변환 후)"
+
 msgid "Setup stopped. The reason is in the output below."
 msgstr "설정이 중지되었습니다. 이유는 아래 출력에 있습니다."
+
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "여러 GitHub 계정이 연결되어 있습니다. 웹 앱에서 연결을 해제할 계정을 선택하거나 CLI를 업데이트하세요."
 
 msgid "Sexual content"
 msgstr "성적인 콘텐츠"
@@ -17775,6 +18008,12 @@ msgstr "이름과 함께 공개적으로 표시됩니다."
 msgid "Shut down {0}"
 msgstr "{0} 종료"
 
+msgid "Shuts down {shutdownDate}"
+msgstr "{shutdownDate}에 종료"
+
+msgid "Side by side"
+msgstr "나란히 비교"
+
 msgid "Side by Side"
 msgstr "나란히 보기"
 
@@ -17891,6 +18130,12 @@ msgstr "로그인 실패"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "로그인에 실패했습니다({reason}). 다시 시도해 주세요."
+
+msgid "Sign-up completion"
+msgstr "가입 완료율"
+
+msgid "Sign-up steps"
+msgstr "가입 단계"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>(으)로 로그인됨"
@@ -18491,6 +18736,9 @@ msgstr "상태: {0}"
 msgid "Stay connected (refresh tokens)"
 msgstr "연결 유지 (리프레시 토큰)"
 
+msgid "Stays behind"
+msgstr "가져올 수 없는 것"
+
 msgid "Steer"
 msgstr "방향 전환"
 
@@ -18556,6 +18804,9 @@ msgstr "감시 중지"
 
 msgid "Stop workspace run command"
 msgstr "워크스페이스 실행 명령 중지"
+
+msgid "Stop your cloud workspaces from reaching this host?"
+msgstr "클라우드 워크스페이스의 이 호스트 접근을 중지할까요?"
 
 msgid "stopped"
 msgstr "중지됨"
@@ -18698,6 +18949,9 @@ msgstr "지원 요청 한도가 구성되지 않았습니다"
 msgid "Support the project with a GitHub star"
 msgstr "GitHub 스타로 프로젝트를 응원해 주세요"
 
+msgid "Supported agents"
+msgstr "지원되는 에이전트"
+
 msgid "Surprise me"
 msgstr "랜덤으로"
 
@@ -18718,6 +18972,9 @@ msgstr "에이전트는 바꾸고, 워크플로는 그대로"
 
 msgid "Switch host"
 msgstr "호스트 전환"
+
+msgid "Switch in four steps"
+msgstr "네 단계로 전환"
 
 msgid "Switch organization"
 msgstr "조직 전환"
@@ -18994,6 +19251,9 @@ msgstr "팀"
 
 msgid "Team activity feed"
 msgstr "팀 활동 피드"
+
+msgid "Team and Ultra plans"
+msgstr "Team 및 Ultra 플랜"
 
 msgid "Team collaboration"
 msgstr "팀 협업"
@@ -19558,6 +19818,9 @@ msgstr "대상 호스트"
 msgid "The team"
 msgstr "팀"
 
+msgid "The team announced the news."
+msgstr "팀이 이 소식을 발표했습니다."
+
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "팀 초대가 만료되었거나 존재하지 않습니다. 팀 소유자에게 새 링크를 요청하거나 URL이 올바르게 입력되었는지 확인하세요."
 
@@ -19614,6 +19877,9 @@ msgstr "이 폴더들에는 아직 파일이 있지만 새 Paradev로 자동으�
 
 msgid "These ports are still in use"
 msgstr "이 포트들은 아직 사용 중입니다"
+
+msgid "They run on the subscriptions and keys you already have."
+msgstr "이미 가지고 있는 구독과 키로 실행됩니다."
 
 msgid "Thinking"
 msgstr "생각"
@@ -19992,9 +20258,6 @@ msgstr "조직의 공개 URL이 바뀝니다. 북마크나 공유한 링크도 �
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "<0>{0}</0>을(를) 삭제하고 모든 멤버를 제거합니다. 되돌릴 수 없습니다."
 
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "조직에서 GitHub 연결을 해제합니다. GitHub App은 설치된 상태로 남지만 더 이상 데이터를 동기화하지 않습니다. 언제든지 다시 연결할 수 있습니다."
-
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "실행 중인 모든 세션을 종료하고 터미널 데몬을 다시 시작합니다. 앱은 새 데몬으로 터미널을 다시 시작합니다."
 
@@ -20087,6 +20350,9 @@ msgstr "등급"
 
 msgid "Time"
 msgstr "시간"
+
+msgid "Time to first workspace"
+msgstr "첫 워크스페이스까지 걸린 시간"
 
 msgid "Time zone"
 msgstr "시간대"
@@ -20406,11 +20672,11 @@ msgstr "Tufte"
 msgid "Tunnel established"
 msgstr "터널 연결됨"
 
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "반복 작업을 일정에 따라 또는 이벤트가 발생할 때 실행되는 에이전트로 바꾸세요. 이슈 분류, 변경 로그 초안, 의존성 업데이트 등. 에이전트가 알아서 실행하고 검토할 PR을 엽니다."
-
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
+
+msgid "Turn off"
+msgstr "끄기"
 
 msgid "Turn off manual mode"
 msgstr "수동 모드 끄기"
@@ -20689,6 +20955,9 @@ msgstr "게시 취소됨"
 msgid "Unpushed"
 msgstr "푸시 안 됨"
 
+msgid "Unpushed Cloud work. Push before {shutdownDate}"
+msgstr "푸시하지 않은 Cloud 작업. {shutdownDate} 전에 푸시하세요"
+
 msgid "Unranked"
 msgstr "순위 없음"
 
@@ -20934,8 +21203,8 @@ msgstr "워크스페이스 실행으로 사용"
 msgid "Use cases"
 msgstr "사용 사례"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "작업마다 Claude Code, Codex, OpenCode 등 어떤 코딩 에이전트든 사용하세요. 워크스페이스, 브랜치, 리뷰 흐름은 그대로입니다."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Claude Code, Codex, OpenCode 등 어떤 CLI 에이전트든 사용하세요. 워크스페이스, 브랜치, 리뷰 방식은 그대로입니다."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Claude Code, Codex 등 어떤 코딩 에이전트든 사용하세요. 작업마다 고르거나 여러 개를 나란히 돌리세요."
@@ -20961,6 +21230,9 @@ msgstr "모바일에서 Paradev 사용하기"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro로 휴대폰에서 Paradev를 사용하세요."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "이미 가진 에이전트 플랜과 API 키를 사용하세요. 모델 호출은 제공업체로 바로 갑니다."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "데스크톱 앱에서 병렬 코딩 에이전트를 실행하세요."
 
@@ -20984,9 +21256,6 @@ msgstr "Paradev API를 호출할 때 사용하세요."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "음성 받아쓰기와 푸시 투 토크 기능을 사용합니다."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "기존 에이전트 구독과 API 키를 그대로 쓰세요. Paradev는 모델 호출을 중계하지 않고, 워크플로를 한 제공사에 묶어 두지 않습니다."
 
 msgid "Used"
 msgstr "사용됨"
@@ -21400,6 +21669,9 @@ msgstr "Opus 주간 한도에 도달했습니다"
 msgid "Weekly release notes"
 msgstr "주간 릴리스 노트"
 
+msgid "Weekly sign-up completion"
+msgstr "주간 가입 완료율"
+
 msgid "Weekly Sonnet limit reached"
 msgstr "Sonnet 주간 한도에 도달했습니다"
 
@@ -21425,6 +21697,9 @@ msgstr "복리후생은 어떤가요?"
 msgid "What builders say about Paradev"
 msgstr "빌더들이 말하는 Paradev"
 
+msgid "What comes with you"
+msgstr "가져올 수 있는 것"
+
 msgid "What did you see on the page?"
 msgstr "페이지에서 무엇을 보셨나요?"
 
@@ -21436,6 +21711,9 @@ msgstr "초기 사용자들의 이야기"
 
 msgid "What general access allows"
 msgstr "일반 접근 권한으로 허용되는 작업"
+
+msgid "What happens to my Conductor Cloud data?"
+msgstr "Conductor Cloud 데이터는 어떻게 되나요?"
 
 msgid "What has to become true"
 msgstr "무엇이 참이 되어야 하는가"
@@ -21493,6 +21771,9 @@ msgstr "지금까지 출시한 것"
 
 msgid "What would you like to know?"
 msgstr "무엇을 알고 싶으신가요?"
+
+msgid "What you get"
+msgstr "제공되는 기능"
 
 msgid "What your agent can do"
 msgstr "에이전트가 할 수 있는 일"
@@ -21774,6 +22055,9 @@ msgstr "worktree 없음"
 msgid "Worktree out of sync"
 msgstr "worktree가 동기화되지 않음"
 
+msgid "Worktree per task"
+msgstr "작업별 worktree"
+
 msgid "Worktrees"
 msgstr "worktree"
 
@@ -21854,6 +22138,15 @@ msgstr "예"
 
 msgid "Yes, demote me"
 msgstr "네, 강등하겠습니다"
+
+msgid "Yes, on paid plans."
+msgstr "네, 유료 플랜에서 가능합니다."
+
+msgid "Yes, resumes Claude Code sessions"
+msgstr "예, Claude Code 세션 재개 지원"
+
+msgid "Yes, under the MIT License. You can fork the code and build it yourself, so you're never locked in."
+msgstr "네, MIT 라이선스입니다. 코드를 포크해 직접 빌드할 수 있으므로 종속될 일이 없습니다."
 
 msgid "Yes. Apply to the role that fits best and tell us what you would build. Include a repo, PR or demo."
 msgstr "네. 가장 잘 맞는 포지션에 지원하고 무엇을 만들고 싶은지 알려 주세요. 리포지토리, PR 또는 데모를 함께 보내 주세요."
@@ -21943,6 +22236,9 @@ msgstr "자신의 메시지만 수정할 수 있습니다"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "이 조직의 사람과 팀하고만 공유할 수 있습니다"
+
+msgid "You can read and export, but not run agents."
+msgstr "읽기와 내보내기는 가능하지만 에이전트는 실행할 수 없습니다."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30일 동안 설정 → 프로젝트에서 복원할 수 있습니다. 저장소 폴더는 절대 삭제되지 않습니다."
@@ -22075,6 +22371,9 @@ msgstr "에이전트가 디자인과 보고서를 게시하면 팀이 검토합�
 msgid "Your agent publishes designs and reports. Your team comments, and it gets to work."
 msgstr "에이전트가 디자인과 보고서를 게시합니다. 팀이 댓글을 달면 에이전트가 작업을 시작합니다."
 
+msgid "Your agent subscriptions and keys"
+msgstr "에이전트 구독과 키"
+
 msgid "Your Agents, Your Accounts"
 msgstr "당신의 에이전트, 당신의 계정"
 
@@ -22084,8 +22383,8 @@ msgstr "내 변경 내용"
 msgid "Your changes will be lost if you don't save them."
 msgstr "저장하지 않으면 변경 사항이 사라집니다."
 
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "코드는 기본적으로 로컬에 머물고, 연결된 서비스는 명시적으로 통제합니다."
+msgid "Your cloud workspaces will no longer be able to reach this host."
+msgstr "클라우드 워크스페이스가 더 이상 이 호스트에 접근할 수 없습니다."
 
 msgid "Your download starts automatically."
 msgstr "다운로드가 자동으로 시작됩니다."
