@@ -282,24 +282,31 @@ export class TunnelClient {
 				if (n < DIAL_ATTEMPTS) attempt(n + 1);
 				else this.reportDialFailed(ticket);
 			};
-			const timer = setTimeout(() => {
+			// Node can keep a listener after its signal aborts, and Node 22's
+			// close() on a connecting socket fires error again, so settle once.
+			let settled = false;
+			const settle = () => {
+				if (settled) return false;
+				settled = true;
+				clearTimeout(timer);
 				listeners.abort();
+				return true;
+			};
+			const timer = setTimeout(() => {
+				if (!settle()) return;
 				closeQuietly(ws, 1000, "Dial connect timed out");
 				this.reportDialFailed(ticket);
 			}, remaining);
 			ws.addEventListener(
 				"open",
 				() => {
-					clearTimeout(timer);
-					listeners.abort();
-					attach(ws);
+					if (settle()) attach(ws);
 				},
 				{ signal: listeners.signal },
 			);
 			// Node 22's WebSocket fires only error when the handshake fails.
 			const fail = () => {
-				clearTimeout(timer);
-				listeners.abort();
+				if (!settle()) return;
 				closeQuietly(ws, 1000, "Dial connect failed");
 				retry();
 			};

@@ -11,6 +11,7 @@ import { TunnelClient } from "./tunnel-client";
 
 class FakeSocket extends EventTarget {
 	static instances: FakeSocket[] = [];
+	static node22AfterGc = false;
 	static OPEN = 1;
 	static CONNECTING = 0;
 	readyState = 0;
@@ -23,6 +24,7 @@ class FakeSocket extends EventTarget {
 	constructor(readonly url: string) {
 		super();
 		FakeSocket.instances.push(this);
+		if (FakeSocket.node22AfterGc) this.keepListenersAndRefireErrorOnClose();
 	}
 
 	static at(index: number) {
@@ -39,6 +41,17 @@ class FakeSocket extends EventTarget {
 	failWithoutClose() {
 		this.dispatchEvent(new Event("error"));
 	}
+
+	// Node 22 after a GC: aborted listeners can stay attached, and close() on a
+	// connecting socket fires error again before readyState changes.
+	keepListenersAndRefireErrorOnClose() {
+		const add = this.addEventListener.bind(this);
+		this.addEventListener = (type, listener) => add(type, listener);
+		this.close = mock(() => {
+			this.dispatchEvent(new Event("error"));
+			this.readyState = 2;
+		});
+	}
 }
 
 const originalWebSocket = globalThis.WebSocket;
@@ -49,6 +62,7 @@ beforeEach(() => {
 	elapsed = 0;
 	spyOn(performance, "now").mockImplementation(() => elapsed);
 	FakeSocket.instances = [];
+	FakeSocket.node22AfterGc = false;
 	globalThis.WebSocket = FakeSocket as unknown as typeof WebSocket;
 });
 
@@ -145,6 +159,15 @@ test("a local socket that fails with only error closes the relay stream", () => 
 	FakeSocket.at(0).open();
 	FakeSocket.at(1).failWithoutClose();
 	expect(FakeSocket.at(0).close).toHaveBeenCalledTimes(1);
+});
+
+test("a socket that refires error after its listeners abort settles once", () => {
+	FakeSocket.node22AfterGc = true;
+	const { attach, failed } = startDial();
+	advance(30_000);
+	expect(failed).toHaveBeenCalledTimes(1);
+	expect(FakeSocket.instances).toHaveLength(1);
+	expect(attach).not.toHaveBeenCalled();
 });
 
 test("an opened ticket is never retried when its stream closes", () => {
