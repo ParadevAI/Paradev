@@ -109,8 +109,10 @@ function usageOffLoop<TInput, TTaskInput, TResult>(
 					cause: error,
 				});
 			}
+			// A missing bundle stays an internal error, so Sentry reports it.
 			if (
-				error instanceof WorkerPoolUnavailableError ||
+				(error instanceof WorkerPoolUnavailableError &&
+					error.reason === "paused") ||
 				error.name === WORKER_CRASH_ERROR_NAME
 			) {
 				throw new TRPCError({

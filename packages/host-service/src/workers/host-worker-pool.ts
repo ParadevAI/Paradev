@@ -138,10 +138,15 @@ export function resolveHostWorkerScriptPath(): string | null {
 	return null;
 }
 
-/** Thrown by a pool without inline fallback when it has no worker to run on. */
+/** Thrown by a pool without inline fallback when it has no worker to run on:
+ * paused after a crash (clears on its own) or no worker bundle (it will not). */
 export class WorkerPoolUnavailableError extends Error {
-	constructor(name: string, taskType: string) {
-		super(`[${name}] no worker available for task "${taskType}"`);
+	constructor(
+		name: string,
+		taskType: string,
+		readonly reason: "paused" | "no-bundle",
+	) {
+		super(`[${name}] no worker available for task "${taskType}" (${reason})`);
 		this.name = "WorkerPoolUnavailableError";
 	}
 }
@@ -255,7 +260,11 @@ export class HostWorkerPool {
 		const runner = this.getRunner();
 		if (!runner) {
 			if (this.pauseAfterCrashMs !== null) {
-				throw new WorkerPoolUnavailableError(this.name, def.type);
+				throw new WorkerPoolUnavailableError(
+					this.name,
+					def.type,
+					Date.now() < this.pausedUntil ? "paused" : "no-bundle",
+				);
 			}
 			return this.runInline(def, input, options);
 		}
@@ -378,7 +387,15 @@ export class HostWorkerPool {
 				console.warn(
 					`[host-worker-pool] ${this.name} crashed — pausing for ${this.pauseAfterCrashMs / 1000}s`,
 				);
-				this.onPause?.(error);
+				try {
+					this.onPause?.(error);
+				} catch (hookError) {
+					// Reporting must not stop the cleanup below.
+					console.warn(
+						`[host-worker-pool] ${this.name} onPause failed`,
+						hookError,
+					);
+				}
 			}
 			// Do NOT dispose the old runner: dispose() would reject its
 			// outstanding tasks with abort errors that bypass the inline

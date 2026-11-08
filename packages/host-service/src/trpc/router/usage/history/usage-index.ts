@@ -212,13 +212,16 @@ function cursorUsage(
 		usage.entries,
 		usage.labels,
 		cwdCandidates,
-	)
-		.catch((error) => {
-			console.warn("[usage-index] Cursor usage unavailable", error);
-		})
-		.finally(() => {
+	).then(
+		() => {
 			usage.finishedAt = Date.now();
-		});
+		},
+		(error) => {
+			// Only a success is reused; the next request tries again.
+			cursorRuns.delete(key);
+			console.warn("[usage-index] Cursor usage unavailable", error);
+		},
+	);
 	cursorRuns.set(key, usage);
 	return usage;
 }

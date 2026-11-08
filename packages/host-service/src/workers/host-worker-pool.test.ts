@@ -332,10 +332,33 @@ describe("HostWorkerPool", () => {
 		for (let i = 0; i < 200 && pool.getRunner(); i++) {
 			await new Promise((resolve) => setTimeout(resolve, 10));
 		}
-		await expect(pool.run(echo, { v: 2 })).rejects.toBeInstanceOf(
-			WorkerPoolUnavailableError,
-		);
+		await expect(pool.run(echo, { v: 2 })).rejects.toMatchObject({
+			name: "WorkerPoolUnavailableError",
+			reason: "paused",
+		});
 		expect(pauses).toBe(1);
+	});
+
+	test("a throwing onPause hook does not stop the pool from pausing", async () => {
+		const pool = makePool({
+			scriptPathResolver: () => CRASH_WORKER,
+			noInlineFallback: {
+				pauseAfterCrashMs: 60_000,
+				onPause: () => {
+					throw new Error("reporter down");
+				},
+			},
+		});
+		const echo = defineWorkerTask<{ v: number }, number>({
+			type: "test/echo",
+			handler: async ({ v }) => v,
+		});
+		await expect(pool.run(echo, { v: 1 })).rejects.toMatchObject({
+			name: WORKER_CRASH_ERROR_NAME,
+		});
+		await expect(pool.run(echo, { v: 2 })).rejects.toMatchObject({
+			reason: "paused",
+		});
 	});
 
 	test("without inline fallback a missing bundle fails the task", async () => {
@@ -347,9 +370,9 @@ describe("HostWorkerPool", () => {
 			type: "test/echo",
 			handler: async ({ v }) => v,
 		});
-		await expect(pool.run(echo, { v: 1 })).rejects.toBeInstanceOf(
-			WorkerPoolUnavailableError,
-		);
+		await expect(pool.run(echo, { v: 1 })).rejects.toMatchObject({
+			reason: "no-bundle",
+		});
 	});
 
 	test("one crash with coalesced callers counts once toward the budget", async () => {
