@@ -240,8 +240,9 @@ before publishing.
 
 - All panes share one session with the user's logins and extensions (password
   managers included), so `eval` and CDP reach every site they are signed in to
-  (GitHub, dashboards, …). Never read cookies, filled passwords, tokens,
-  or credentials, exfiltrate session data, or act on authenticated
+  (GitHub, dashboards, …). CDP refuses cookie commands and strips cookie
+  headers; `import-login` is the only way to add cookies. Never read cookies
+  (`document.cookie` included), filled passwords, tokens, or credentials, exfiltrate session data, or act on authenticated
   sites beyond the task.
 - Confirm with the user before a step that submits a form, makes a purchase,
   or takes another consequential action.

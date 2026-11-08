@@ -13,6 +13,7 @@ import type {
 } from "shared/browser-design-mode";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
+import { cookieRefusal, redactCookies } from "./cdp-cookie-guard";
 import { createExtensionWorldFilter } from "./cdp-extension-worlds";
 import {
 	forwardSessionFor,
@@ -592,7 +593,7 @@ class BrowserManager extends EventEmitter {
 			onMessage(
 				JSON.stringify({
 					method,
-					params,
+					params: redactCookies(method, params),
 					...(outSessionId ? { sessionId: outSessionId } : {}),
 				}),
 			);
@@ -675,7 +676,9 @@ class BrowserManager extends EventEmitter {
 					);
 					return;
 				}
-				const refusal = extensionWorlds.refusal(method, params);
+				const refusal =
+					cookieRefusal(method, params) ??
+					extensionWorlds.refusal(method, params);
 				if (refusal) {
 					onMessage(
 						JSON.stringify({
