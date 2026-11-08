@@ -11,6 +11,7 @@ import {
 import type { createRelaySocket } from "@superset/workspace-client/relay-socket";
 import type { Terminal as XTerm } from "@xterm/xterm";
 import {
+	background,
 	connect,
 	createTransport as createRealTransport,
 	disconnect,
@@ -973,5 +974,75 @@ describe("input typed while attaching", () => {
 		expect(inputs(socket)).toEqual([]);
 		expect(inputs(resumed)).toEqual([]);
 		disconnect(transport);
+	});
+});
+
+describe("background", () => {
+	const RELAY_URL = "wss://relay.test/hosts/org-1:machine-1/terminal/t1";
+
+	test("keeps a live relay socket open, and the remount reuses it", () => {
+		const { transport, terminal, socket } = connectAttached(RELAY_URL);
+
+		background(transport);
+
+		expect(socket.closed).toBe(false);
+		expect(transport.connectionState).toBe("open");
+
+		connect(transport, terminal, RELAY_URL);
+
+		expect(FakeRelaySocket.instances).toHaveLength(1);
+		expect(socket.reconnectCount).toBe(0);
+		expect(transport._backgrounded).toBe(false);
+	});
+
+	test("parks a local terminal", () => {
+		const { transport, socket } = connectAttached("ws://host/terminal/t1");
+
+		background(transport);
+
+		expect(socket.closed).toBe(true);
+		expect(transport.connectionState).toBe("disconnected");
+	});
+
+	test("parks a relay socket that is not open yet", () => {
+		const transport = createTransport();
+		connect(transport, createMockTerminal(), RELAY_URL);
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+
+		background(transport);
+
+		expect(socket.closed).toBe(true);
+		expect(transport.connectionState).toBe("disconnected");
+	});
+
+	test("parks a backgrounded socket that drops instead of redialing it", () => {
+		const { transport, terminal, socket } = connectAttached(RELAY_URL);
+		background(transport);
+
+		socket.drop(1006, "host restarted");
+
+		expect(socket.closed).toBe(true);
+		expect(socket.reconnectCount).toBe(0);
+		expect(transport.connectionState).toBe("disconnected");
+		expect(transport.logs).toHaveLength(0);
+		expect(transport.lastDiagnosis).toBeNull();
+
+		connect(transport, terminal, RELAY_URL);
+		expect(FakeRelaySocket.instances).toHaveLength(2);
+	});
+
+	test("parks a backgrounded socket after a suspend instead of redialing it", () => {
+		jest.useFakeTimers();
+		setSystemTime(new Date("2026-01-01T00:00:00Z"));
+		const { transport, socket } = connectAttached(RELAY_URL);
+		background(transport);
+
+		setSystemTime(new Date("2026-01-01T00:02:00Z"));
+		jest.advanceTimersByTime(120_000);
+
+		expect(socket.closed).toBe(true);
+		expect(socket.reconnectCount).toBe(0);
+		expect(transport.connectionState).toBe("disconnected");
 	});
 });

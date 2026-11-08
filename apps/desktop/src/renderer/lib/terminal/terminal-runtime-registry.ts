@@ -29,13 +29,13 @@ import {
 	persistSeqAnchor,
 } from "./terminal-seq-anchor";
 import {
+	background,
 	type ConnectionState,
 	clearLogs,
 	connect,
 	createTransport,
 	disposeTransport,
 	getPersistableSeqAnchor,
-	park,
 	reconnect,
 	sendColors,
 	sendDispose,
@@ -366,10 +366,7 @@ class TerminalRuntimeRegistryImpl {
 		if (entry.transport.sessionEnded) {
 			clearPersistedRuntimeState(terminalId);
 		}
-		// Snapshot and anchor are on disk — close the socket. A parked pane no
-		// longer parses hidden output or joins reconnect storms; remount's
-		// connect() re-dials and the host replays from the anchor.
-		park(entry.transport);
+		background(entry.transport);
 		this.scheduleParkedEviction();
 	}
 
