@@ -27,7 +27,7 @@ export function InviteFooter({
 	return (
 		<div className="-mx-3 space-y-1 border-t px-3 py-2 text-muted-foreground text-xs">
 			{seatCost === undefined ? null : (
-				<p data-seat-cost="">
+				<p>
 					{seatCost === null ? (
 						<Trans>
 							Each new person adds a paid seat to {organizationName}.

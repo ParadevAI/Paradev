@@ -40,7 +40,7 @@ describe("InviteFooter", () => {
 
 	it("hides the seat line when seats are not billed or no one new is staged", () => {
 		const free = render({ organizationName: "Acme", newPeople: 1 });
-		expect(free).not.toContain("data-seat-cost");
+		expect(free).not.toContain("paid seat");
 		expect(free).toContain("New people get an email invite");
 		expect(
 			render({ organizationName: "Acme", newPeople: 0, seatCost: monthly }),
