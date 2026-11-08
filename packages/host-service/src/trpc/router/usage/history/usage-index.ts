@@ -1,3 +1,6 @@
+import { join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { HOST_SERVICE_VERSION } from "../../../../install-source";
 import { collectCursorEntries } from "./cursor";
 import {
 	type CollectedUsage,
@@ -6,7 +9,11 @@ import {
 	type UsageScanCaches,
 } from "./entries";
 import { rememberLabel, type UsageLogEntry } from "./parse";
-import { MemoryStateStore, type UsageStateStore } from "./usage-store";
+import {
+	MemoryStateStore,
+	SqliteStateStore,
+	type UsageStateStore,
+} from "./usage-store";
 
 /** The widest window a caller asks for (90 days), plus a day for the gap
  * between local and UTC midnight. */
@@ -17,6 +24,9 @@ const FRESH_MS = 15_000;
  * that holds the warm index. */
 const WAIT_MS = 60_000;
 const CURSOR_WAIT_MS = 20_000;
+/** Bump when a parser's saved state changes; each release also starts a new
+ * cache through HOST_SERVICE_VERSION. */
+const USAGE_CACHE_FORMAT = 1;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Kept as a string: the name crosses the worker boundary, and a minifier
@@ -124,6 +134,18 @@ async function waitAtMost(
 	}
 }
 
+function openStore(): UsageStateStore {
+	try {
+		return SqliteStateStore.open(
+			join(resolveAppHomeDir(), "usage", "usage-cache.db"),
+			`${USAGE_CACHE_FORMAT}:${HOST_SERVICE_VERSION}`,
+		);
+	} catch (error) {
+		console.warn("[usage-index] cache store unavailable; using memory", error);
+		return new MemoryStateStore();
+	}
+}
+
 let workerIndex: UsageIndex | null = null;
 
 /** Serves a request from this worker's index. Cursor is fetched per request:
@@ -133,7 +155,7 @@ export const collectFromIndex: CollectUsage = async (cutoffMs, options) => {
 		(scanCutoffMs, caches) =>
 			collectUsageEntries(INDEX_HORIZON_DAYS, scanCutoffMs, { caches }),
 		Date.now,
-		new MemoryStateStore(),
+		openStore(),
 	);
 	const collected = await workerIndex.read(cutoffMs, WAIT_MS);
 	const cursor = cursorUsage(cutoffMs, options.cwdCandidates ?? []);
