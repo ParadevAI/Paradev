@@ -17651,6 +17651,9 @@ msgstr "Sessiedetails"
 msgid "Session ended"
 msgstr "Sessie beëindigd"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sessie beëindigd. Druk op Enter om een nieuwe shell te starten."
+
 msgid "Session name"
 msgstr "Sessienaam"
 

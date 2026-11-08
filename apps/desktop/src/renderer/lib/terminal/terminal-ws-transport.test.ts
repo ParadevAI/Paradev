@@ -4,7 +4,6 @@ import {
 	describe,
 	expect,
 	jest,
-	mock,
 	setSystemTime,
 	test,
 } from "bun:test";
@@ -117,8 +116,8 @@ class FakeRelaySocket {
 const createSocket = ((options: Record<string, unknown>) =>
 	new FakeRelaySocket(options)) as unknown as typeof createRelaySocket;
 
-function createTransport(options: { onSessionEnded?: () => void } = {}) {
-	return createRealTransport({ ...options, createSocket });
+function createTransport() {
+	return createRealTransport({ createSocket });
 }
 
 // `window` is aliased to `globalThis` by the xterm-env-polyfill preload, and
@@ -582,9 +581,8 @@ describe("terminal-ws-transport", () => {
 		expect(transport.connectionState).toBe("disconnected");
 	});
 
-	test("PTY exit marks the session ended and fires the callback once", () => {
-		const onSessionEnded = mock(() => {});
-		const transport = createTransport({ onSessionEnded });
+	test("PTY exit marks the session ended and records the exit status", () => {
+		const transport = createTransport();
 		const terminal = createMockTerminal();
 		connect(transport, terminal, "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances.at(-1);
@@ -593,9 +591,9 @@ describe("terminal-ws-transport", () => {
 		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
 		expect(transport.sessionEnded).toBe(false);
 
-		socket.message(JSON.stringify({ type: "exit", exitCode: 0, signal: 0 }));
+		socket.message(JSON.stringify({ type: "exit", exitCode: 1, signal: 0 }));
 		expect(transport.sessionEnded).toBe(true);
-		expect(onSessionEnded).toHaveBeenCalledTimes(1);
+		expect(transport.exitStatus).toEqual({ exitCode: 1, signal: 0 });
 		// Permanent: no auto-retry after a PTY exit.
 		expect(socket.closed).toBe(true);
 		expect(
@@ -604,8 +602,7 @@ describe("terminal-ws-transport", () => {
 	});
 
 	test("a session-gone attach error marks the session ended", () => {
-		const onSessionEnded = mock(() => {});
-		const transport = createTransport({ onSessionEnded });
+		const transport = createTransport();
 		connect(transport, createMockTerminal(), "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances.at(-1);
 		if (!socket) throw new Error("expected relay socket instance");
@@ -620,7 +617,7 @@ describe("terminal-ws-transport", () => {
 		);
 
 		expect(transport.sessionEnded).toBe(true);
-		expect(onSessionEnded).toHaveBeenCalledTimes(1);
+		expect(transport.exitStatus).toBeNull();
 		// Permanent: the transport closes the socket so partysocket never
 		// re-dials, and the terminated close is not logged as retryable.
 		expect(socket.closed).toBe(true);
@@ -631,8 +628,7 @@ describe("terminal-ws-transport", () => {
 	});
 
 	test("a plain server error does not mark the session ended", () => {
-		const onSessionEnded = mock(() => {});
-		const transport = createTransport({ onSessionEnded });
+		const transport = createTransport();
 		connect(transport, createMockTerminal(), "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances.at(-1);
 		if (!socket) throw new Error("expected relay socket instance");
@@ -646,7 +642,6 @@ describe("terminal-ws-transport", () => {
 		);
 
 		expect(transport.sessionEnded).toBe(false);
-		expect(onSessionEnded).not.toHaveBeenCalled();
 	});
 
 	test("a successful re-attach resets the session-ended flag", () => {
@@ -660,6 +655,41 @@ describe("terminal-ws-transport", () => {
 		socket.open();
 		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
 		expect(transport.sessionEnded).toBe(false);
+		expect(transport.exitStatus).toBeNull();
+	});
+
+	test("re-attaching to an exited session does not repeat the exit line", () => {
+		const lines: string[] = [];
+		const terminal = Object.assign(createMockTerminal(), {
+			writeln: (text: string) => lines.push(...text.split("\r\n")),
+			buffer: {
+				active: {
+					get length() {
+						return lines.length;
+					},
+					getLine: (row: number) => ({
+						translateToString: () => lines[row] ?? "",
+					}),
+				},
+			},
+		}) as unknown as XTerm;
+		const transport = createTransport();
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		const attachAndExit = () => {
+			socket.open();
+			socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+			socket.message(JSON.stringify({ type: "exit", exitCode: 3, signal: 0 }));
+		};
+
+		attachAndExit();
+		reconnect(transport);
+		attachAndExit();
+
+		expect(
+			lines.filter((line) => line.includes("exited with code 3")),
+		).toHaveLength(1);
 	});
 
 	test("park closes the socket silently, keeping title and stream position", () => {

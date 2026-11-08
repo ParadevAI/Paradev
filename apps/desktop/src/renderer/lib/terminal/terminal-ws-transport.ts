@@ -91,11 +91,12 @@ export interface TerminalTransport {
 	 * True once the server has said the PTY is gone for good (live `exit`
 	 * message or a `session-gone` attach error). Distinct from `_terminated`,
 	 * which also covers access denials and unknown errors where the PTY may
-	 * still be alive. Persistence paths must clear — never write — the
-	 * persisted scrollback of a session-ended terminal. Reset on `attached`
-	 * (the session was re-created under the same id).
+	 * still be alive. Reset on `attached` (the session was re-created under the
+	 * same id).
 	 */
 	sessionEnded: boolean;
+	/** Set by a live `exit`; null when the session ended without one (`session-gone`). */
+	exitStatus: { exitCode: number; signal: number } | null;
 	/**
 	 * True while the PTY is narrower than this pane because a smaller client
 	 * (another device, or a narrower split) is showing the same terminal.
@@ -103,9 +104,6 @@ export interface TerminalTransport {
 	narrowedByOtherClient: boolean;
 	narrowedListeners: Set<() => void>;
 
-	/** Internal: invoked once each time the session-ended signal arrives, so
-	 * the owner can drop persisted scrollback immediately. */
-	_onSessionEnded: (() => void) | null;
 	/** Internal: the shared reconnecting relay socket (partysocket). Created
 	 * once on first connect; it re-signs the URL and runs the relay preflight
 	 * before every (re)dial and retries indefinitely. */
@@ -309,10 +307,23 @@ function setNarrowedByOtherClient(
 	}
 }
 
-function markSessionEnded(transport: TerminalTransport) {
-	if (transport.sessionEnded) return;
+// A re-attach to an exited session replays its `exit`; the line is already there.
+function lastNonEmptyLine(terminal: XTerm): string | null {
+	const buffer = terminal.buffer?.active;
+	if (!buffer) return null;
+	for (let row = buffer.length - 1; row >= 0; row--) {
+		const text = buffer.getLine(row)?.translateToString(true);
+		if (text) return text;
+	}
+	return null;
+}
+
+function markSessionEnded(
+	transport: TerminalTransport,
+	exitStatus: TerminalTransport["exitStatus"] = null,
+) {
+	transport.exitStatus ??= exitStatus;
 	transport.sessionEnded = true;
-	transport._onSessionEnded?.();
 }
 
 // Input typed before an attach completes is sent once it attaches. Input older
@@ -411,11 +422,7 @@ export function clearLogs(transport: TerminalTransport) {
 }
 
 export function createTransport(
-	options: {
-		onSessionEnded?: () => void;
-		createSocket?: typeof createRelaySocket;
-		now?: () => number;
-	} = {},
+	options: { createSocket?: typeof createRelaySocket; now?: () => number } = {},
 ): TerminalTransport {
 	return {
 		connectionState: "disconnected",
@@ -427,9 +434,9 @@ export function createTransport(
 		logListeners: new Set(),
 		lastDiagnosis: null,
 		sessionEnded: false,
+		exitStatus: null,
 		narrowedByOtherClient: false,
 		narrowedListeners: new Set(),
-		_onSessionEnded: options.onSessionEnded ?? null,
 		_socket: null,
 		_createSocket: options.createSocket ?? createRelaySocket,
 		_terminal: null,
@@ -830,6 +837,7 @@ function attachSocketListeners(
 			// A successful attach means the session exists again (re-created or
 			// respawned under the same id) — its scrollback is worth keeping.
 			transport.sessionEnded = false;
+			transport.exitStatus = null;
 			// Counting stays disarmed until this attach's `synced` arrives —
 			// bytes before it are host-synthesized (preamble/notice) or from a
 			// pre-seq host, and neither advances the stream position.
@@ -913,15 +921,19 @@ function attachSocketListeners(
 		if (message.type === "exit") {
 			transport._writeCoalescer?.flushSync();
 			transport._terminated = true;
-			markSessionEnded(transport);
+			markSessionEnded(transport, {
+				exitCode: message.exitCode,
+				signal: message.signal,
+			});
 			transport.lastDiagnosis = {
 				category: "unknown",
 				message: `The terminal session ended (exit code ${message.exitCode}).`,
 			};
 			socket.close();
-			terminal.writeln(
-				`\r\n[terminal] exited with code ${message.exitCode} (signal ${message.signal})`,
-			);
+			const exitLine = `[terminal] exited with code ${message.exitCode} (signal ${message.signal})`;
+			if (lastNonEmptyLine(terminal) !== exitLine) {
+				terminal.writeln(`\r\n${exitLine}`);
+			}
 		}
 	});
 
@@ -1228,7 +1240,7 @@ export function disposeTransport(transport: TerminalTransport) {
 	transport._diagnosisLogged = false;
 	transport._terminated = false;
 	transport.sessionEnded = false;
-	transport._onSessionEnded = null;
+	transport.exitStatus = null;
 	transport.lastDiagnosis = null;
 	resetAttachRetryState(transport._attachRetry);
 	setTerminalTitle(transport, undefined);

@@ -17651,6 +17651,9 @@ msgstr "세션 상세"
 msgid "Session ended"
 msgstr "세션 종료"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "세션이 종료되었습니다. Enter 키를 눌러 새 셸을 시작하세요."
+
 msgid "Session name"
 msgstr "세션 이름"
 

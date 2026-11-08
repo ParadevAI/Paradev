@@ -17645,6 +17645,9 @@ msgstr "Деталі сеансу"
 msgid "Session ended"
 msgstr "Сеанс завершено"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Сеанс завершено. Натисніть Enter, щоб запустити нову оболонку."
+
 msgid "Session name"
 msgstr "Назва сеансу"
 

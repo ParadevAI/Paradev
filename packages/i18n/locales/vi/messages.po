@@ -17651,6 +17651,9 @@ msgstr "Chi tiết phiên"
 msgid "Session ended"
 msgstr "Phiên đã kết thúc"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Phiên đã kết thúc. Nhấn Enter để mở shell mới."
+
 msgid "Session name"
 msgstr "Tên phiên"
 

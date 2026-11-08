@@ -381,7 +381,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
-	test("release disposes with clear and never persists an ended session", () => {
+	test("release keeps an ended session's scrollback for the pane to show", () => {
 		const terminalId = "release-session-ended";
 		const serialize = mock(() => "dead session scrollback");
 		const entry = {
@@ -392,6 +392,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 				serializeAddon: { serialize },
 				lastCols: 120,
 				lastRows: 32,
+				gate: { pending: 0 },
 			},
 			transport: { sessionEnded: true },
 			linkManager: null,
@@ -421,11 +422,10 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		try {
 			terminalRuntimeRegistry.release(terminalId);
 
-			expect(serialize).not.toHaveBeenCalled();
-			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
-				false,
+			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
+				"dead session scrollback",
 			);
-			expect(disposeCalls).toEqual([{ persistedState: "clear" }]);
+			expect(disposeCalls).toEqual([{ persistedState: "preserve" }]);
 		} finally {
 			delete (terminalRuntimeRegistry as unknown as { disposeEntry?: unknown })
 				.disposeEntry;
@@ -577,7 +577,7 @@ describe("terminal replacement history", () => {
 			});
 			expect(getOrCreate).toHaveBeenCalledWith("new", "pane");
 			expect(replacement.initialBuffer).toBe(
-				"previous output\r\n\x1b[0mNew shell\r\n",
+				"previous output\r\n\x1b[0mNew shell\r\n\x1b7",
 			);
 		} finally {
 			getEntry.mockRestore();

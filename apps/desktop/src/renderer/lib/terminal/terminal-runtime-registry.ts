@@ -101,11 +101,7 @@ class TerminalRuntimeRegistryImpl {
 			terminalId,
 			instanceId,
 			runtime: null,
-			// A destroyed PTY (exit / session-gone) has nothing left to restore —
-			// drop the persisted scrollback the moment the server says so.
-			transport: createTransport({
-				onSessionEnded: () => clearPersistedRuntimeState(terminalId),
-			}),
+			transport: createTransport(),
 			linkManager: null,
 			pendingLinkHandlers: null,
 			imagePasteOverride: null,
@@ -361,11 +357,6 @@ class TerminalRuntimeRegistryImpl {
 				? getPersistableSeqAnchor(entry.transport)
 				: null,
 		);
-		// detachFromContainer persists unconditionally; a dead session's snapshot
-		// must not outlive the PTY.
-		if (entry.transport.sessionEnded) {
-			clearPersistedRuntimeState(terminalId);
-		}
 		background(entry.transport);
 		this.scheduleParkedEviction();
 	}
@@ -413,10 +404,6 @@ class TerminalRuntimeRegistryImpl {
 			(entry) => entry.runtime?.terminal.buffer.active.type === "alternate",
 		);
 		for (const entry of victims) {
-			if (entry.transport.sessionEnded) {
-				this.disposeEntry(entry, { persistedState: "clear" });
-				continue;
-			}
 			if (!entry.runtime || !tryPersistRuntimeState(entry.runtime)) {
 				this.warnPersistFailureOnce(entry.terminalId);
 				continue;
@@ -501,10 +488,6 @@ class TerminalRuntimeRegistryImpl {
 				)
 			: this.getEntries(terminalId);
 		for (const entry of entries) {
-			if (entry.transport.sessionEnded) {
-				this.disposeEntry(entry, { persistedState: "clear" });
-				continue;
-			}
 			// Land frame-pending output first so snapshot and anchor agree.
 			entry.transport._writeCoalescer?.flushSync();
 			if (entry.runtime && !tryPersistRuntimeState(entry.runtime)) {
@@ -696,6 +679,13 @@ class TerminalRuntimeRegistryImpl {
 		);
 	}
 
+	/** Exited with code 0 and no signal, as after `exit` or Ctrl-D. */
+	endedCleanly(terminalId: string, instanceId?: string): boolean {
+		const exitStatus = this.getEntry(terminalId, instanceId)?.transport
+			.exitStatus;
+		return exitStatus?.exitCode === 0 && exitStatus.signal === 0;
+	}
+
 	prepareReplacement(
 		terminalId: string,
 		instanceId: string,
@@ -710,7 +700,9 @@ class TerminalRuntimeRegistryImpl {
 					excludeAltBuffer: true,
 					excludeModes: true,
 				});
-				initialBuffer = `${history}\r\n\x1b[0m${notice}\r\n`;
+				// DECSC: a prompt that restores the cursor (DECRC) and erases below
+				// would otherwise land at home and wipe the history.
+				initialBuffer = `${history}\r\n\x1b[0m${notice}\r\n\x1b7`;
 			} catch (error) {
 				console.warn(
 					"Failed to retain terminal history for replacement",

@@ -17651,6 +17651,9 @@ msgstr "会话详情"
 msgid "Session ended"
 msgstr "会话已结束"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "会话已结束。按 Enter 启动新的 Shell。"
+
 msgid "Session name"
 msgstr "会话名称"
 
