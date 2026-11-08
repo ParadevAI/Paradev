@@ -917,6 +917,12 @@ msgstr "{count, plural, one {odczytano # plik} few {odczytano # pliki} many {odc
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {Usunięto # automatyzację z grupy} few {Usunięto # automatyzacje z grup} many {Usunięto # automatyzacji z grup} other {Usunięto # automatyzacji z grup}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Wznowić # czat?} few {Wznowić # czaty?} many {Wznowić # czatów?} other {Wznowić # czatu?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Ten czat nie był ukończony, gdy zamknięto Paradev} few {Te czaty nie były ukończone, gdy zamknięto Paradev} many {Te czaty nie były ukończone, gdy zamknięto Paradev} other {Te czaty nie były ukończone, gdy zamknięto Paradev}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Użyto # źródła} few {Użyto # źródeł} many {Użyto # źródeł} other {Użyto # źródła}}"
 
@@ -10653,6 +10659,9 @@ msgstr "Utrzymuj dokumentację aktualną"
 msgid "Keep editing"
 msgstr "Kontynuuj edycję"
 
+msgid "Keep paused"
+msgstr "Pozostaw wstrzymane"
+
 msgid "Keep typing an email to invite"
 msgstr "Wpisuj dalej adres e-mail, aby zaprosić"
 
@@ -14534,6 +14543,9 @@ msgstr "Wstrzymany"
 msgid "Paused until {0}"
 msgstr "Wstrzymane do {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Wstrzymano przy zamknięciu Paradev"
+
 msgid "Pay {total}"
 msgstr "Zapłać {total}"
 
@@ -15377,6 +15389,9 @@ msgstr "Kolejka wstrzymana, bo przerwano agenta"
 
 msgid "Queue paused by the usage limit"
 msgstr "Kolejka wstrzymana przez limit użycia"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Kolejka wstrzymana, gdy zamknięto Paradev"
 
 msgid "Queue work for agents"
 msgstr "Kolejkuj pracę dla agentów"
@@ -22276,6 +22291,20 @@ msgstr "Aby łączyć konta, musisz należeć do organizacji."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Aby korzystać z integracji, trzeba należeć do organizacji."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Zatrzymano po {0} min {1} s"
+
+msgid "You stopped after {seconds}s"
+msgstr "Zatrzymano po {seconds} s"
+
+msgid "You stopped this response"
+msgstr "Zatrzymano tę odpowiedź"
+
+msgid "You stopped this response at a tool call"
+msgstr "Zatrzymano tę odpowiedź przy wywołaniu narzędzia"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

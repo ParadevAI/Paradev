@@ -917,6 +917,12 @@ msgstr "{count, plural, one {파일 #개 읽음} other {파일 #개 읽음}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {자동화 #개를 그룹에서 제거했습니다} other {자동화 #개를 그룹에서 제거했습니다}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, other {채팅 #개를 재개할까요?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, other {Paradev가 종료될 때 끝나지 않은 채팅입니다}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {출처 #개 사용} other {출처 #개 사용}}"
 
@@ -10653,6 +10659,9 @@ msgstr "문서 최신 상태 유지"
 msgid "Keep editing"
 msgstr "계속 편집"
 
+msgid "Keep paused"
+msgstr "일시 중지 상태로 두기"
+
 msgid "Keep typing an email to invite"
 msgstr "초대하려면 이메일을 계속 입력하세요"
 
@@ -14534,6 +14543,9 @@ msgstr "일시 중지됨"
 msgid "Paused until {0}"
 msgstr "{0}까지 일시 중지됨"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev가 종료되어 일시 중지됨"
+
 msgid "Pay {total}"
 msgstr "{total} 결제"
 
@@ -15377,6 +15389,9 @@ msgstr "중단했기 때문에 대기열이 일시 중지되었습니다"
 
 msgid "Queue paused by the usage limit"
 msgstr "사용량 한도로 대기열이 일시 중지되었습니다"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Paradev가 종료되어 대기열이 일시 중지되었습니다"
 
 msgid "Queue work for agents"
 msgstr "에이전트 작업 대기열에 추가"
@@ -22276,6 +22291,20 @@ msgstr "계정을 연결하려면 조직에 속해 있어야 합니다."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "연동을 사용하려면 조직에 속해 있어야 합니다."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "{0}분 {1}초 후 중지함"
+
+msgid "You stopped after {seconds}s"
+msgstr "{seconds}초 후 중지함"
+
+msgid "You stopped this response"
+msgstr "이 응답을 중지했습니다"
+
+msgid "You stopped this response at a tool call"
+msgstr "도구 호출 시점에 이 응답을 중지했습니다"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

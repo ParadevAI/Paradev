@@ -917,6 +917,12 @@ msgstr "{count, plural, one {leyó # archivo} other {leyó # archivos}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# automatización quitada de su grupo} other {# automatizaciones quitadas de sus grupos}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {¿Reanudar # chat?} other {¿Reanudar # chats?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Este chat no había terminado cuando se cerró Paradev} other {Estos chats no habían terminado cuando se cerró Paradev}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Se usó # fuente} other {Se usaron # fuentes}}"
 
@@ -10653,6 +10659,9 @@ msgstr "Mantener la documentación al día"
 msgid "Keep editing"
 msgstr "Seguir editando"
 
+msgid "Keep paused"
+msgstr "Mantener en pausa"
+
 msgid "Keep typing an email to invite"
 msgstr "Sigue escribiendo un correo para invitar"
 
@@ -14534,6 +14543,9 @@ msgstr "En pausa"
 msgid "Paused until {0}"
 msgstr "En pausa hasta las {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "En pausa al cerrarse Paradev"
+
 msgid "Pay {total}"
 msgstr "Pagar {total}"
 
@@ -15377,6 +15389,9 @@ msgstr "Cola en pausa porque interrumpiste"
 
 msgid "Queue paused by the usage limit"
 msgstr "Cola en pausa por el límite de uso"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Cola en pausa al cerrarse Paradev"
 
 msgid "Queue work for agents"
 msgstr "Pon trabajo en cola para los agentes"
@@ -22276,6 +22291,20 @@ msgstr "Necesitas formar parte de una organización para conectar cuentas."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Tienes que formar parte de una organización para usar integraciones."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Lo detuviste tras {0} min {1} s"
+
+msgid "You stopped after {seconds}s"
+msgstr "Lo detuviste tras {seconds} s"
+
+msgid "You stopped this response"
+msgstr "Detuviste esta respuesta"
+
+msgid "You stopped this response at a tool call"
+msgstr "Detuviste esta respuesta en una llamada a una herramienta"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

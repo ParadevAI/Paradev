@@ -2,7 +2,7 @@ import { presetForAcpHarness } from "@superset/chat/core";
 import { cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { protectedProcedure, router } from "../../index";
+import { protectedProcedure, queryProcedure, router } from "../../index";
 import { chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import {
@@ -19,6 +19,16 @@ const sessionInput = z.object({
 });
 
 export const sessionsRouter = router({
+	closedMidTurn: queryProcedure.query(
+		({ ctx }) => ctx.runtime.closedMidTurn?.list() ?? [],
+	),
+	resumeClosedMidTurn: protectedProcedure.mutation(async ({ ctx }) => ({
+		resumed: (await ctx.runtime.closedMidTurn?.resume()) ?? 0,
+	})),
+	keepClosedMidTurnPaused: protectedProcedure.mutation(({ ctx }) => {
+		ctx.runtime.closedMidTurn?.keepPaused();
+		return { ok: true };
+	}),
 	capabilities: protectedProcedure
 		.input(z.object({ agent: z.string().min(1) }))
 		.query(({ ctx, input }) => {

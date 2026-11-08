@@ -3,14 +3,17 @@ import {
 	type ChatSelections,
 	CONTINUE_PROMPT,
 	sessionSelections,
+	userStopOf,
 } from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
 	type Envelope,
+	type Item,
 	type SessionState,
 	sessionStateSchema,
 	type Turn,
+	type TurnError,
 	type UsageLimit,
 	type UsageLimitAction,
 	type UserContent,
@@ -24,7 +27,7 @@ import type {
 	HarnessAdapter,
 	HarnessStartOptions,
 } from "../../harness";
-import type { ChatJournal } from "../../journal";
+import type { ChatJournal, StoppedTurn } from "../../journal";
 
 export type LiveSessionOptions = {
 	sessionId: string;
@@ -70,6 +73,23 @@ export type QueueState = {
 		queuedAtMs: number;
 	}[];
 };
+
+export type CarriedSession = {
+	turn: Turn | null;
+	canceledToolIds: ReadonlySet<string>;
+	/** `replayKey`s of the stop notes the replaced session hid. */
+	hiddenStopKeys: ReadonlySet<string>;
+	/** Prompts still waiting in its queue, oldest first. */
+	queued: UserContent[][];
+};
+
+/**
+ * A replay mints new item ids for messages but keeps the agent's own id as the
+ * last segment, so the same message matches across replays.
+ */
+export function replayKey(itemId: string): string {
+	return itemId.slice(itemId.lastIndexOf(":") + 1);
+}
 
 export type UnfinishedSession = ChatSelections & {
 	sessionId: string;
@@ -129,6 +149,14 @@ export class LiveSession {
 	private heldPaused: UserContent[][] = [];
 	private onHeldReleased: (() => void) | null = null;
 	private carriedFailure: Turn | null = null;
+	private carriedCanceledToolIds: ReadonlySet<string> = new Set();
+	private hiddenStopKeys: ReadonlySet<string> = new Set();
+	/** Queued prompts taken from the replaced session, not yet claimed by a resume. */
+	private carriedQueue: UserContent[][] = [];
+	private carriedPrompts = 0;
+	/** The agent's "stopped by user" note the shutdown wrote, replayed after the last prompt. */
+	private replayedShutdownStop: { item: UserMessage; turnId: string } | null =
+		null;
 	private carriedAtMs: number | null = null;
 	private readonly turnStarts = new Map<string, number>();
 	/** Replays stamp items ahead of the clock to keep their order. */
@@ -191,6 +219,11 @@ export class LiveSession {
 		return this.currentTurn;
 	}
 
+	/** Prompts this session has taken, typed or resumed; replays of history do not count. */
+	get promptsSent(): number {
+		return this.sent - this.carriedPrompts;
+	}
+
 	get queuedCount(): number {
 		return this.queue.length;
 	}
@@ -233,10 +266,31 @@ export class LiveSession {
 		pausedPrompts: UserContent[][] = [],
 		onReleased?: () => void,
 	): void {
-		this.heldUntilStarted.push(...prompts);
-		this.heldPaused.push(...pausedPrompts);
+		const toRun = prompts.filter((content) => !this.claimCarried(content));
+		const resumesCarried = toRun.length < prompts.length;
+		this.heldUntilStarted.push(...toRun);
+		this.heldPaused.push(
+			...pausedPrompts.filter((content) => !this.claimCarried(content)),
+		);
+		if (resumesCarried) {
+			this.carriedPrompts = 0;
+			const waiting = this.heldPaused.splice(0);
+			this.heldUntilStarted.push(...waiting);
+		}
 		this.onHeldReleased = onReleased ?? null;
 		this.releaseHeldPrompts();
+		if (resumesCarried) this.resumeQueue();
+	}
+
+	/** A resumed prompt the replaced session's queue already brought over. */
+	private claimCarried(content: UserContent[]): boolean {
+		const key = JSON.stringify(content);
+		const index = this.carriedQueue.findIndex(
+			(carried) => JSON.stringify(carried) === key,
+		);
+		if (index === -1) return false;
+		this.carriedQueue.splice(index, 1);
+		return true;
 	}
 
 	/**
@@ -244,6 +298,22 @@ export class LiveSession {
 	 * agent has started: after any history it replays, so it reads as the
 	 * latest turn.
 	 */
+	/**
+	 * What the agent's replay of history cannot know, taken from the session
+	 * this one replaces. Its replay reports commands Paradev stopped as failed,
+	 * and replays the stop notes a shutdown made the agent write.
+	 */
+	carryFrom(replaced: CarriedSession): void {
+		this.carriedCanceledToolIds = replaced.canceledToolIds;
+		this.hiddenStopKeys = replaced.hiddenStopKeys;
+		if (replaced.turn) this.carryFailedTurn(replaced.turn);
+		if (replaced.queued.length === 0) return;
+		this.carriedQueue = [...replaced.queued];
+		this.carriedPrompts += replaced.queued.length;
+		this.heldPaused.push(...replaced.queued);
+		this.releaseHeldPrompts();
+	}
+
 	carryFailedTurn(turn: Turn): void {
 		this.carriedFailure = turn;
 		this.releaseCarriedFailure();
@@ -318,7 +388,11 @@ export class LiveSession {
 			this.appendDurable({ type: "item", item, turnId });
 			if (limited && !this.queuePaused) {
 				this.queuePaused = true;
-				this.emitSession({ queuePaused: true, queuePausedByLimit: true });
+				this.emitSession({
+					queuePaused: true,
+					queuePausedByLimit: true,
+					queuePausedByShutdown: false,
+				});
 			}
 			if (
 				steerTurnId &&
@@ -507,7 +581,9 @@ export class LiveSession {
 		this.emitSession({
 			queuePaused: this.queuePaused,
 			usageLimit: limit,
-			...(pausing ? { queuePausedByLimit: true } : {}),
+			...(pausing
+				? { queuePausedByLimit: true, queuePausedByShutdown: false }
+				: {}),
 		});
 	}
 
@@ -530,7 +606,11 @@ export class LiveSession {
 			this.discard(capturing);
 			if (pauseQueue && this.queue.length > 0 && !this.queuePaused) {
 				this.queuePaused = true;
-				this.emitSession({ queuePaused: true, queuePausedByLimit: false });
+				this.emitSession({
+					queuePaused: true,
+					queuePausedByLimit: false,
+					queuePausedByShutdown: false,
+				});
 				return;
 			}
 			this.emitSession({});
@@ -543,7 +623,11 @@ export class LiveSession {
 		const waiting = this.queue.length + this.pendingSteers.length;
 		if (pauseQueue && !steering && waiting > 0 && !this.queuePaused) {
 			this.queuePaused = true;
-			this.emitSession({ queuePaused: true, queuePausedByLimit: false });
+			this.emitSession({
+				queuePaused: true,
+				queuePausedByLimit: false,
+				queuePausedByShutdown: false,
+			});
 		}
 		this.options.adapter.cancelTurn();
 	}
@@ -600,16 +684,16 @@ export class LiveSession {
 		return this.options.adapter.fork(cut);
 	}
 
-	async dispose(): Promise<void> {
+	/** `error` says why the agent went away, when the user did not stop it. */
+	async dispose(error?: TurnError): Promise<void> {
 		this.settleStarted(false);
 		this.stopped = true;
 		this.clearResumeTimer();
-		if (this.currentTurn?.status === "running") {
-			this.settleCheckpoint(this.currentTurn.id);
-		}
+		this.interruptRunningTurn(this.now(), error);
 		this.discardPending();
 		await this.options.adapter.dispose();
 		await this.pump;
+		this.settleStranded();
 	}
 
 	private async run(stream: AsyncIterable<AdapterEvent>): Promise<void> {
@@ -618,6 +702,7 @@ export class LiveSession {
 				if (this.stopped) return;
 				this.handle(event);
 			}
+			if (!this.stopped) throw new Error("The agent exited");
 		} finally {
 			this.settleStarted(false);
 			this.stopped = true;
@@ -638,9 +723,10 @@ export class LiveSession {
 				) {
 					this.turnAnchors.set(event.turnId, event.item.id);
 				}
+				this.noteReplayedStop(event.item, event.turnId);
 				this.appendDurable({
 					type: "item",
-					item: event.item,
+					item: this.withCarriedCancel(event.item),
 					turnId: event.turnId,
 				});
 				return;
@@ -669,6 +755,16 @@ export class LiveSession {
 						this.options.adapter.cancelTurn();
 					}
 				} else {
+					if (event.turn.status === "interrupted") {
+						this.settleStranded({
+							turnId: event.turn.id,
+							background: new Set(
+								(this.sessionState.backgroundTasks ?? []).map(
+									(task) => task.id,
+								),
+							),
+						});
+					}
 					this.noteSilentTurn(event.turn);
 					this.settleCheckpoint(event.turn.id);
 					this.deliverNextQueued();
@@ -705,10 +801,42 @@ export class LiveSession {
 		}
 	}
 
+	private noteReplayedStop(item: Item, turnId: string): void {
+		if (this.carriedFailure?.error?.kind !== "host_stopped") return;
+		if (item.kind !== "user_message") return;
+		this.replayedShutdownStop = userStopOf(item, this.options.harness)
+			? { item: item as UserMessage, turnId }
+			: null;
+	}
+
+	private withCarriedCancel(item: Item): Item {
+		if (
+			item.kind === "tool_call" &&
+			item.status === "failed" &&
+			this.carriedCanceledToolIds.has(item.id)
+		)
+			return { ...item, status: "canceled" };
+		if (
+			item.kind === "user_message" &&
+			this.hiddenStopKeys.has(replayKey(item.id))
+		)
+			return { ...item, discarded: true };
+		return item;
+	}
+
 	private releaseCarriedFailure(): void {
 		const turn = this.carriedFailure;
 		if (!turn || this.sessionState.status === "starting") return;
 		this.carriedFailure = null;
+		const shutdownStop = this.replayedShutdownStop;
+		this.replayedShutdownStop = null;
+		if (shutdownStop) {
+			this.appendDurable({
+				type: "item",
+				item: { ...shutdownStop.item, discarded: true },
+				turnId: shutdownStop.turnId,
+			});
+		}
 		const at = Math.max(this.now(), this.latestStartMs + 1);
 		this.carriedAtMs = at;
 		this.appendDurable({
@@ -753,15 +881,21 @@ export class LiveSession {
 		this.onHeldReleased = null;
 		if (status === "dead") return;
 		onReleased?.();
-		this.queue.unshift(...held.map((content) => this.queuedPrompt(content)));
-		if (this.currentTurn?.status !== "running" && !this.inFlight()) {
-			this.deliverNextQueued();
-		}
+		const ready = held.map((content) => this.queuedPrompt(content));
+		const idle = this.currentTurn?.status !== "running" && !this.inFlight();
+		const first = idle && this.queuePaused ? ready.shift() : undefined;
+		this.queue.unshift(...ready);
+		if (first) this.deliver(first);
+		else if (idle) this.deliverNextQueued();
 		if (paused.length === 0) return;
 		this.queue.push(...paused.map((content) => this.queuedPrompt(content)));
 		if (!this.queuePaused) {
 			this.queuePaused = true;
-			this.emitSession({ queuePaused: true, queuePausedByLimit: false });
+			this.emitSession({
+				queuePaused: true,
+				queuePausedByLimit: false,
+				queuePausedByShutdown: true,
+			});
 		}
 	}
 
@@ -964,29 +1098,58 @@ export class LiveSession {
 		this.clearResumeTimer();
 		const failedAtMs = this.now();
 		const turn = this.currentTurn;
-		if (turn?.status === "running") {
-			this.currentTurn = {
-				...turn,
-				status: "interrupted",
-				completedAtMs: failedAtMs,
-			};
-			this.appendDurable({ type: "turn", turn: this.currentTurn });
-			this.settleCheckpoint(turn.id);
-		}
+		const message = error instanceof Error ? error.message : String(error);
+		this.failRunningTurn(message, failedAtMs);
 		this.discardPending();
+		this.settleStranded();
 		this.appendDurable({
 			type: "item",
 			item: {
 				id: this.mintId(),
 				kind: "notice",
 				noticeKind: "error",
-				text: error instanceof Error ? error.message : String(error),
+				text: message,
 				startedAtMs: failedAtMs,
 				completedAtMs: failedAtMs,
 			},
 			turnId: turn?.id ?? this.mintId(),
 		});
 		this.emitSession({ status: "dead" });
+	}
+
+	private interruptRunningTurn(atMs: number, error?: TurnError): void {
+		const turn = this.currentTurn;
+		if (turn?.status !== "running") return;
+		this.currentTurn = {
+			...turn,
+			status: "interrupted",
+			completedAtMs: atMs,
+			...(error ? { error } : {}),
+		};
+		this.appendDurable({ type: "turn", turn: this.currentTurn });
+		this.settleCheckpoint(turn.id);
+	}
+
+	private failRunningTurn(message: string, atMs: number): void {
+		const turn = this.currentTurn;
+		if (turn?.status !== "running") return;
+		this.currentTurn = {
+			...turn,
+			status: "failed",
+			error: { message, kind: "crashed" },
+			completedAtMs: atMs,
+		};
+		this.appendDurable({ type: "turn", turn: this.currentTurn });
+		this.settleCheckpoint(turn.id);
+	}
+
+	private settleStranded(stoppedTurn?: StoppedTurn): void {
+		for (const envelope of this.options.journal.settleStranded(
+			this.options.sessionId,
+			{ atMs: this.now(), ...(stoppedTurn ? { stoppedTurn } : {}) },
+		)) {
+			this.options.publish(envelope);
+		}
 	}
 
 	private discard(prompt: PendingPrompt): void {

@@ -917,6 +917,12 @@ msgstr "{count, plural, one {đã đọc # tệp} other {đã đọc # tệp}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {Đã xóa # tự động hóa khỏi nhóm} other {Đã xóa # tự động hóa khỏi nhóm}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Tiếp tục # cuộc trò chuyện?} other {Tiếp tục # cuộc trò chuyện?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Cuộc trò chuyện này chưa xong khi Paradev đóng} other {Các cuộc trò chuyện này chưa xong khi Paradev đóng}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Đã dùng # nguồn} other {Đã dùng # nguồn}}"
 
@@ -10653,6 +10659,9 @@ msgstr "Giữ tài liệu luôn mới"
 msgid "Keep editing"
 msgstr "Tiếp tục chỉnh sửa"
 
+msgid "Keep paused"
+msgstr "Giữ tạm dừng"
+
 msgid "Keep typing an email to invite"
 msgstr "Tiếp tục nhập email để mời"
 
@@ -14534,6 +14543,9 @@ msgstr "Tạm dừng"
 msgid "Paused until {0}"
 msgstr "Tạm dừng đến {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Đã tạm dừng khi Paradev đóng"
+
 msgid "Pay {total}"
 msgstr "Thanh toán {total}"
 
@@ -15377,6 +15389,9 @@ msgstr "Hàng đợi đã tạm dừng vì bạn đã ngắt"
 
 msgid "Queue paused by the usage limit"
 msgstr "Hàng đợi đã tạm dừng do giới hạn sử dụng"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Hàng đợi đã tạm dừng khi Paradev đóng"
 
 msgid "Queue work for agents"
 msgstr "Xếp việc cho agent"
@@ -22276,6 +22291,20 @@ msgstr "Bạn cần thuộc về một tổ chức để kết nối tài khoả
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Bạn cần thuộc một tổ chức để dùng tích hợp."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Bạn đã dừng sau {0} phút {1} giây"
+
+msgid "You stopped after {seconds}s"
+msgstr "Bạn đã dừng sau {seconds} giây"
+
+msgid "You stopped this response"
+msgstr "Bạn đã dừng phản hồi này"
+
+msgid "You stopped this response at a tool call"
+msgstr "Bạn đã dừng phản hồi này tại một lệnh gọi công cụ"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

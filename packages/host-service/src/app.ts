@@ -308,7 +308,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isTerminalAlive: (terminalId, workspaceId) => {
 			const chat = terminalAgentStore.getChat(terminalId);
-			if (chat) return chat.lastEventType !== "Failed";
+			if (chat?.chatSessionId) {
+				const live = chatV3.runtime().live.get(chat.chatSessionId);
+				return live !== null && live.state.status !== "dead";
+			}
 			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
 		},
 		isAgentBusy: (terminalId) =>
@@ -339,6 +342,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		pageWatch,
 		chat: () => chatV3.runtime(),
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
+		closedMidTurn: {
+			list: () => chatV3.closedMidTurn(),
+			resume: () => chatV3.resumeClosedMidTurn(),
+			keepPaused: () => chatV3.keepClosedMidTurnPaused(),
+		},
 	};
 
 	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:

@@ -6,3 +6,5 @@ export type {
 	OpenedSession,
 } from "./journal";
 export { ChatJournal } from "./journal";
+export type { StoppedTurn } from "./strandedEvents";
+export { HOST_STOPPED } from "./strandedEvents";

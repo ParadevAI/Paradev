@@ -3,6 +3,7 @@ import { realpath } from "node:fs/promises";
 import { resolve, win32 } from "node:path";
 import {
 	type ChatSelections,
+	deriveQueuedPrompts,
 	deriveTimeline,
 	emptySnapshot,
 	isSelectionCategory,
@@ -16,6 +17,7 @@ import {
 	type StoredItem,
 	selectionKey,
 	sessionSelections,
+	userStopOf,
 } from "@superset/chat/core";
 import type {
 	AgentMessage,
@@ -39,6 +41,7 @@ import type {
 	SteerSubagentInput,
 	StopBackgroundTaskInput,
 	Turn,
+	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	AGENT_DEFAULT_MODE,
@@ -83,11 +86,13 @@ import type { ChatResetReason, PageResult } from "../../replay";
 import { latestSeq, readPage, readSince } from "../../replay";
 import type { SelectionMemory } from "../../selections";
 import type {
+	CarriedSession,
 	LiveSessionRegistry,
 	PromptResult,
 	QueueState,
 	UnfinishedSession,
 } from "../../sessions";
+import { replayKey } from "../../sessions";
 import { SubagentItems } from "../../stream";
 
 export const createSessionCommandSchema = createSessionInputSchema
@@ -143,11 +148,12 @@ function lastAgentMessageId(events: DurableEvent[]): string | null {
 function transcriptBefore(
 	snapshot: SessionSnapshot,
 	itemId: string,
+	harness: string,
 ): { events: DurableEvent[]; midTurn: boolean } | null {
 	const events: DurableEvent[] = [];
-	for (const group of deriveTimeline(snapshot)) {
+	for (const group of deriveTimeline(snapshot, { harness })) {
 		const items = group.entries.flatMap((entry) =>
-			entry.kind === "item" ? [entry.item] : entry.items,
+			entry.kind === "tool_run" ? entry.items : [entry.item],
 		);
 		const index = items.findIndex((item) => item.id === itemId);
 		const kept = (index === -1 ? items : items.slice(0, index)).filter(
@@ -177,9 +183,42 @@ export function sessionsTitled<Row extends { title: string | null }>(
 		: rows;
 }
 
+function carriedFrom(
+	snapshot: SessionSnapshot,
+	harness: string,
+): CarriedSession {
+	const canceledToolIds = new Set<string>();
+	const hiddenStopKeys = new Set<string>();
+	for (const { item } of snapshot.items.values()) {
+		if (item.kind === "tool_call" && item.status === "canceled") {
+			canceledToolIds.add(item.id);
+			continue;
+		}
+		if (
+			item.kind === "user_message" &&
+			(item as UserMessage).discarded &&
+			userStopOf(item, harness)
+		)
+			hiddenStopKeys.add(replayKey(item.id));
+	}
+	const queued = deriveQueuedPrompts(snapshot)
+		.sort((a, b) => a.startedAtMs - b.startedAtMs)
+		.map((message) => message.content);
+	return {
+		turn: failedLastTurn(snapshot),
+		canceledToolIds,
+		hiddenStopKeys,
+		queued,
+	};
+}
+
+/** A turn that ended without the user asking stays visible in the session that replaces it. */
 function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
 	const last = deriveTimeline(snapshot).at(-1)?.turn;
-	return last?.status === "failed" ? last : null;
+	if (last?.status === "failed") return last;
+	return last?.status === "interrupted" && last.error?.kind === "host_stopped"
+		? last
+		: null;
 }
 
 export const listSessionsCommandSchema = listSessionsInputSchema
@@ -220,7 +259,11 @@ export type GetSessionResult = {
 export type ResumeSessionInput = Omit<
 	UnfinishedSession,
 	"sessionId" | "interrupted"
-> & { cwd: string };
+> & {
+	cwd: string;
+	/** The cut-off session this one continues, whose ending it carries over. */
+	replacesSessionId?: string;
+};
 
 type ResumedChat = {
 	terminalId: string;
@@ -476,7 +519,6 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					replaced && replacedRow?.scopeId === parsed.scopeId
 						? replaySession(replaced)
 						: null;
-				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
 				const continued =
 					replay?.ok && replacedRow?.harness === parsed.harness
 						? sessionSelections(replay.snapshot.session)
@@ -527,7 +569,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						}
 					});
 				}
-				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
+				if (replay?.ok) {
+					options.live
+						.require(sessionId)
+						.carryFrom(carriedFrom(replay.snapshot, parsed.harness));
+				}
 				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});
@@ -541,7 +587,12 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				harness: input.harness,
 				...explicitSelections(input),
 				terminalId: input.terminalId,
-				resume: { harnessSessionId: input.harnessSessionId },
+				resume: {
+					harnessSessionId: input.harnessSessionId,
+					...(input.replacesSessionId
+						? { replacesSessionId: input.replacesSessionId }
+						: {}),
+				},
 			});
 			const pending = {
 				prompts: input.prompts,
@@ -741,7 +792,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					if (!source || !replay.ok) {
 						throw new Error(`chat session ${parsed.sessionId} is not running`);
 					}
-					const before = transcriptBefore(replay.snapshot, parsed.itemId);
+					const before = transcriptBefore(
+						replay.snapshot,
+						parsed.itemId,
+						source.harness,
+					);
 					if (!before) {
 						throw new Error(
 							`message ${parsed.itemId} is not in chat session ${parsed.sessionId}`,

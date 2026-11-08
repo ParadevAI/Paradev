@@ -917,6 +917,12 @@ msgstr "{count, plural, one {read # file} other {read # files}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Used # source} other {Used # sources}}"
 
@@ -10653,6 +10659,9 @@ msgstr "Keep docs fresh"
 msgid "Keep editing"
 msgstr "Keep editing"
 
+msgid "Keep paused"
+msgstr "Keep paused"
+
 msgid "Keep typing an email to invite"
 msgstr "Keep typing an email to invite"
 
@@ -14534,6 +14543,9 @@ msgstr "Paused"
 msgid "Paused until {0}"
 msgstr "Paused until {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Paused when Paradev closed"
+
 msgid "Pay {total}"
 msgstr "Pay {total}"
 
@@ -15377,6 +15389,9 @@ msgstr "Queue paused because you interrupted"
 
 msgid "Queue paused by the usage limit"
 msgstr "Queue paused by the usage limit"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Queue paused when Paradev closed"
 
 msgid "Queue work for agents"
 msgstr "Queue work for agents"
@@ -22276,6 +22291,20 @@ msgstr "You need to be part of an organization to connect accounts."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "You need to be part of an organization to use integrations."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "You stopped after {0}m {1}s"
+
+msgid "You stopped after {seconds}s"
+msgstr "You stopped after {seconds}s"
+
+msgid "You stopped this response"
+msgstr "You stopped this response"
+
+msgid "You stopped this response at a tool call"
+msgstr "You stopped this response at a tool call"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

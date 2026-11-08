@@ -917,6 +917,12 @@ msgstr "{count, plural, one {# dosya okundu} other {# dosya okundu}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# otomasyon grubundan çıkarıldı} other {# otomasyon grubundan çıkarıldı}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {# sohbet sürdürülsün mü?} other {# sohbet sürdürülsün mü?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Bu sohbet, Paradev kapandığında bitmemişti} other {Bu sohbetler, Paradev kapandığında bitmemişti}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı}}"
 
@@ -10653,6 +10659,9 @@ msgstr "Belgeleri güncel tut"
 msgid "Keep editing"
 msgstr "Düzenlemeye devam et"
 
+msgid "Keep paused"
+msgstr "Duraklatılmış kalsın"
+
 msgid "Keep typing an email to invite"
 msgstr "Davet etmek için e-postayı yazmaya devam edin"
 
@@ -14534,6 +14543,9 @@ msgstr "Duraklatıldı"
 msgid "Paused until {0}"
 msgstr "{0} saatine kadar duraklatıldı"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev kapanınca duraklatıldı"
+
 msgid "Pay {total}"
 msgstr "{total} öde"
 
@@ -15377,6 +15389,9 @@ msgstr "Kesintiye uğrattığınız için kuyruk duraklatıldı"
 
 msgid "Queue paused by the usage limit"
 msgstr "Kuyruk kullanım sınırı nedeniyle duraklatıldı"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Paradev kapandığında kuyruk duraklatıldı"
 
 msgid "Queue work for agents"
 msgstr "Ajanlar için işi kuyruğa alın"
@@ -22276,6 +22291,20 @@ msgstr "Hesap bağlamak için bir organizasyona üye olmanız gerekir."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerekir."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "{0} dk {1} sn sonra durdurdunuz"
+
+msgid "You stopped after {seconds}s"
+msgstr "{seconds} sn sonra durdurdunuz"
+
+msgid "You stopped this response"
+msgstr "Bu yanıtı durdurdunuz"
+
+msgid "You stopped this response at a tool call"
+msgstr "Bu yanıtı bir araç çağrısında durdurdunuz"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

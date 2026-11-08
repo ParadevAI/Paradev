@@ -917,6 +917,12 @@ msgstr "{count, plural, one {# fichier lu} other {# fichiers lus}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# automatisation retirée de son groupe} other {# automatisations retirées de leurs groupes}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {Reprendre # chat ?} other {Reprendre # chats ?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Ce chat n’était pas terminé à la fermeture de Paradev} other {Ces chats n’étaient pas terminés à la fermeture de Paradev}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# source utilisée} other {# sources utilisées}}"
 
@@ -10653,6 +10659,9 @@ msgstr "Garder la documentation à jour"
 msgid "Keep editing"
 msgstr "Continuer à modifier"
 
+msgid "Keep paused"
+msgstr "Laisser en pause"
+
 msgid "Keep typing an email to invite"
 msgstr "Continuez à saisir un e-mail pour inviter"
 
@@ -14534,6 +14543,9 @@ msgstr "En pause"
 msgid "Paused until {0}"
 msgstr "En pause jusqu'à {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Mis en pause à la fermeture de Paradev"
+
 msgid "Pay {total}"
 msgstr "Payer {total}"
 
@@ -15377,6 +15389,9 @@ msgstr "File en pause car vous avez interrompu"
 
 msgid "Queue paused by the usage limit"
 msgstr "File en pause à cause de la limite d'utilisation"
+
+msgid "Queue paused when Paradev closed"
+msgstr "File en pause à la fermeture de Paradev"
 
 msgid "Queue work for agents"
 msgstr "Mettre du travail en file d'attente pour les agents"
@@ -22276,6 +22291,20 @@ msgstr "Vous devez faire partie d'une organisation pour connecter des comptes."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Vous devez faire partie d'une organisation pour utiliser les intégrations."
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "Vous l’avez arrêté après {0} min {1} s"
+
+msgid "You stopped after {seconds}s"
+msgstr "Vous l’avez arrêté après {seconds} s"
+
+msgid "You stopped this response"
+msgstr "Vous avez arrêté cette réponse"
+
+msgid "You stopped this response at a tool call"
+msgstr "Vous avez arrêté cette réponse lors d'un appel d'outil"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total

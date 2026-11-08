@@ -917,6 +917,12 @@ msgstr "{count, plural, one {讀取了 # 個檔案} other {讀取了 # 個檔案
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {已將 # 個自動化移出群組} other {已將 # 個自動化移出群組}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {要繼續 # 個聊天嗎？} other {要繼續 # 個聊天嗎？}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Paradev 關閉時這個聊天還沒完成} other {Paradev 關閉時這些聊天還沒完成}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#個來源} other {使用了#個來源}}"
 
@@ -10653,6 +10659,9 @@ msgstr "讓文件保持最新"
 msgid "Keep editing"
 msgstr "繼續編輯"
 
+msgid "Keep paused"
+msgstr "保持暫停"
+
 msgid "Keep typing an email to invite"
 msgstr "繼續輸入電子郵件以邀請"
 
@@ -14534,6 +14543,9 @@ msgstr "已暫停"
 msgid "Paused until {0}"
 msgstr "已暫停至 {0}"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev 關閉時已暫停"
+
 msgid "Pay {total}"
 msgstr "支付 {total}"
 
@@ -15377,6 +15389,9 @@ msgstr "由於你中斷了操作，佇列已暫停"
 
 msgid "Queue paused by the usage limit"
 msgstr "佇列因使用上限已暫停"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Paradev 關閉時佇列已暫停"
 
 msgid "Queue work for agents"
 msgstr "為代理程式排隊安排工作"
@@ -22276,6 +22291,20 @@ msgstr "您需要加入組織才能連接帳戶。"
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "你需要加入一個組織才能使用整合。"
+
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "你在 {0} 分 {1} 秒後停止了"
+
+msgid "You stopped after {seconds}s"
+msgstr "你在 {seconds} 秒後停止了"
+
+msgid "You stopped this response"
+msgstr "你停止了這則回覆"
+
+msgid "You stopped this response at a tool call"
+msgstr "你在工具呼叫時停止了這則回覆"
 
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
