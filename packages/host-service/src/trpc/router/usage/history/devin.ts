@@ -53,7 +53,10 @@ export function collectDevinEntries(
 				       END`,
 			)
 			.iterate(Math.floor(cutoffMs / 1000)) as Iterable<DevinMessageRow>;
-		devinRowsToEntries(rows, cutoffMs, out, sessionLabels);
+		// Added only once the read finishes: an error mid-stream adds nothing.
+		const entries: UsageLogEntry[] = [];
+		devinRowsToEntries(rows, cutoffMs, entries, sessionLabels);
+		for (const entry of entries) out.push(entry);
 		return 1;
 	} catch {
 		return 0;

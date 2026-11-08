@@ -37,7 +37,10 @@ export function collectCopilotEntries(
 				 WHERE e.created_at >= datetime(? / 1000, 'unixepoch')`,
 			)
 			.iterate(cutoffMs) as Iterable<CopilotUsageRow>;
-		copilotRowsToEntries(rows, cutoffMs, out, sessionLabels);
+		// Added only once the read finishes: an error mid-stream adds nothing.
+		const entries: UsageLogEntry[] = [];
+		copilotRowsToEntries(rows, cutoffMs, entries, sessionLabels);
+		for (const entry of entries) out.push(entry);
 		return 1;
 	} catch {
 		return 0;
