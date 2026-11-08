@@ -76,8 +76,14 @@ jobs:
               if [[ "$arch" =~ ^[0-9]+\.[0-9]+\.[0-9] ]]; then
                 arch="x64"
               fi
-              cp "$file" "Superset-${arch}.dmg"
-              echo "Created stable copy: Superset-${arch}.dmg"
+              # Published links still use Superset-<arch>.dmg; keep that alias.
+              name="${file%%-[0-9]*}"
+              for alias in "Superset-${arch}.dmg" "${name}-${arch}.dmg"; do
+                if [[ ! -f "$alias" ]]; then
+                  cp "$file" "$alias"
+                  echo "Created stable copy: $alias"
+                fi
+              done
             fi
           done
           for file in *-mac.zip; do

@@ -10,7 +10,10 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Configuration } from "electron-builder";
-import baseConfig, { displayName as baseDisplayName } from "./electron-builder";
+import baseConfig, {
+	displayName as baseDisplayName,
+	toInstallerFileName,
+} from "./electron-builder";
 import pkg from "./package.json";
 
 const productName = "Superset Canary";
@@ -29,6 +32,12 @@ const config: Configuration = {
 		owner: "superset-sh",
 		repo: "superset",
 		releaseType: "prerelease",
+	},
+
+	dmg: {
+		...baseConfig.dmg,
+		title: displayName,
+		artifactName: `${toInstallerFileName(displayName)}-\${version}-\${arch}.\${ext}`,
 	},
 
 	mac: {
