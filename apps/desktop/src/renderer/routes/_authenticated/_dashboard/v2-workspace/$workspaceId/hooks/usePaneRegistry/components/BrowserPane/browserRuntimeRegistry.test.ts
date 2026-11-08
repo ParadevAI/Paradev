@@ -147,6 +147,16 @@ describe("browserRuntimeRegistry detached persistence", () => {
 		expect(unloaded).toEqual(["agent-2", "agent-3", "agent-4", "agent-5"]);
 	});
 
+	test("a page an agent uses while the sweep waits on main stays loaded", async () => {
+		const unloaded = await sweep(
+			["p1", "p2", "p3", "p4", "p5"].map((id) => ({ id })),
+			() => {
+				beforeUnloadInfo = () => registryInternals.touch("p1");
+			},
+		);
+		expect(unloaded).toEqual(["p2", "p3"]);
+	});
+
 	test("a page shown while the sweep waits on main stays loaded", async () => {
 		const unloaded = await sweep(
 			["p1", "p2", "p3", "p4", "p5"].map((id) => ({ id })),

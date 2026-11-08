@@ -47,6 +47,23 @@ describe("selectWebviewsToUnload", () => {
 		expect(selectWebviewsToUnload(pages.slice(1), policy)).toEqual([]);
 	});
 
+	test("a protected page among the newest few counts toward the pages kept", () => {
+		const pages = [
+			page("p1", 1),
+			page("p2", 2),
+			page("p3", 3),
+			page("kept", 4, 150 * MB, true),
+		];
+		expect(
+			selectWebviewsToUnload(pages, { ...policy, budgetKb: 400 * MB }),
+		).toEqual(["p1"]);
+	});
+
+	test("unloads the oldest pages past the page limit, even under budget", () => {
+		const pages = Array.from({ length: 23 }, (_, i) => page(`p${i}`, i, MB));
+		expect(selectWebviewsToUnload(pages, policy)).toEqual(["p0", "p1", "p2"]);
+	});
+
 	test("unloads pages idle past the limit even under budget", () => {
 		const pages = [page("old", 1, MB), page("new", 9_500, MB)];
 		expect(selectWebviewsToUnload(pages, { ...policy, idleMs: 5_000 })).toEqual(

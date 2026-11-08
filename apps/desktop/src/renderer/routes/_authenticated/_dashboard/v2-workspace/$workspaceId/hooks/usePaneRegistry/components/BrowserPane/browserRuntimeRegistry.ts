@@ -82,6 +82,7 @@ const HIDDEN_POOLS = [
 	},
 ];
 const UNLOAD_SWEEP_INTERVAL_MS = 60_000;
+const UNLOAD_INFO_TIMEOUT_MS = 5_000;
 
 const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 	currentUrl: "about:blank",
@@ -691,9 +692,17 @@ export class BrowserRuntimeRegistryImpl {
 		if (hidden.length === 0) return;
 		this.sweeping = true;
 		try {
-			const info = await this.ipc.browser.getUnloadInfo
-				.query({ paneIds: hidden.map(([paneId]) => paneId) })
-				.catch(() => null);
+			const info = await Promise.race([
+				this.ipc.browser.getUnloadInfo.query({
+					paneIds: hidden.map(([paneId]) => paneId),
+				}),
+				new Promise<null>((resolve) =>
+					setTimeout(() => resolve(null), UNLOAD_INFO_TIMEOUT_MS),
+				),
+			]).catch((err) => {
+				console.warn("[browserRuntimeRegistry] unload info failed:", err);
+				return null;
+			});
 			const now = Date.now();
 			for (const pool of HIDDEN_POOLS) {
 				const candidates = hidden

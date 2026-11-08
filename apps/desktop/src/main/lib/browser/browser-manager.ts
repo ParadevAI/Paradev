@@ -53,15 +53,21 @@ export interface PaneUnloadInfo {
 	>;
 }
 
-const UNLOAD_CHECK_WORLD_ID = 1999;
+const FORM_EDITS_WORLD_ID = 1999;
 const UNLOAD_CHECK_TIMEOUT_MS = 500;
-// Form fields the user changed and did not submit; a reload would lose them.
-const HAS_UNSAVED_INPUT_SCRIPT = `[...document.querySelectorAll("input, textarea, select")].some((field) => {
-	if (field.type === "hidden" || field.disabled) return false;
-	if (field.tagName === "SELECT") return [...field.options].some((option) => option.selected !== option.defaultSelected);
-	if (field.type === "checkbox" || field.type === "radio") return field.checked !== field.defaultChecked;
-	return field.value !== field.defaultValue;
-})`;
+// Comparing values with their defaults flags untouched selects, range and
+// color inputs, so record real edits instead. Runs in an isolated world: the
+// page cannot see or change the flag. A submit clears it.
+const TRACK_FORM_EDITS_SCRIPT = `if (!globalThis.__formEdits) {
+	const state = (globalThis.__formEdits = { dirty: false });
+	const edited = (event) => {
+		if (event.isTrusted && event.target?.closest?.("input, textarea, select, [contenteditable]")) state.dirty = true;
+	};
+	document.addEventListener("input", edited, true);
+	document.addEventListener("change", edited, true);
+	document.addEventListener("submit", () => { state.dirty = false; }, true);
+}`;
+const HAS_UNSAVED_INPUT_SCRIPT = "globalThis.__formEdits?.dirty === true";
 
 export interface BrowserOpenRequest {
 	workspaceId: string;
@@ -278,6 +284,7 @@ class BrowserManager extends EventEmitter {
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
+	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
@@ -305,6 +312,7 @@ class BrowserManager extends EventEmitter {
 				this.navigationListeners,
 				this.popupListeners,
 				this.focusListeners,
+				this.formEditListeners,
 			]) {
 				const cleanup = map.get(paneId);
 				if (cleanup) {
@@ -331,6 +339,7 @@ class BrowserManager extends EventEmitter {
 			this.setupBeforeInput(paneId, wc);
 			this.setupNavigationGuard(paneId, wc);
 			this.setupFocusForward(paneId, wc);
+			this.setupFormEditTracking(paneId, wc);
 		}
 		this.emit("pane-registered", {
 			paneId,
@@ -346,6 +355,7 @@ class BrowserManager extends EventEmitter {
 			this.navigationListeners,
 			this.popupListeners,
 			this.focusListeners,
+			this.formEditListeners,
 		]) {
 			const cleanup = map.get(paneId);
 			if (cleanup) {
@@ -840,10 +850,6 @@ class BrowserManager extends EventEmitter {
 		};
 	}
 
-	/**
-	 * Panes with agent work in flight (live CDP session or capture). The
-	 * renderer parks these presentable and exempts them from LRU eviction.
-	 */
 	async getUnloadInfo(paneIds: string[]): Promise<PaneUnloadInfo> {
 		const memoryByPid = new Map(
 			app
@@ -866,7 +872,7 @@ class BrowserManager extends EventEmitter {
 					memoryKb: (memoryByPid.get(pid) ?? 0) / (panesByPid.get(pid) ?? 1),
 					audible: wc.isCurrentlyAudible(),
 					unsavedInput: await withTimeout(
-						wc.executeJavaScriptInIsolatedWorld(UNLOAD_CHECK_WORLD_ID, [
+						wc.executeJavaScriptInIsolatedWorld(FORM_EDITS_WORLD_ID, [
 							{ code: HAS_UNSAVED_INPUT_SCRIPT },
 						]),
 						UNLOAD_CHECK_TIMEOUT_MS,
@@ -881,6 +887,10 @@ class BrowserManager extends EventEmitter {
 		return { totalMemoryKb: Math.round(totalmem() / 1024), panes };
 	}
 
+	/**
+	 * Panes with agent work in flight (live CDP session or capture). The
+	 * renderer parks these presentable and exempts them from LRU eviction.
+	 */
 	getAgentActivePaneIds(): string[] {
 		return [...this.agentWakes.keys()];
 	}
@@ -1476,6 +1486,32 @@ class BrowserManager extends EventEmitter {
 			}
 		});
 		void loop(generation);
+	}
+
+	private setupFormEditTracking(
+		paneId: string,
+		wc: Electron.WebContents,
+	): void {
+		const install = (): void => {
+			Promise.resolve()
+				.then(() =>
+					wc.executeJavaScriptInIsolatedWorld(FORM_EDITS_WORLD_ID, [
+						{ code: TRACK_FORM_EDITS_SCRIPT },
+					]),
+				)
+				.catch(() => {
+					// Mid-navigation or a crashed page; the next dom-ready installs again.
+				});
+		};
+		wc.on("dom-ready", install);
+		this.formEditListeners.set(paneId, () => {
+			try {
+				wc.off("dom-ready", install);
+			} catch {
+				// webContents may be destroyed
+			}
+		});
+		install();
 	}
 
 	private setupConsoleCapture(paneId: string, wc: Electron.WebContents): void {
