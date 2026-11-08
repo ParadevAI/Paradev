@@ -44,7 +44,7 @@ export type TurnOutcome =
 	| { turnId: string; outcome: "queued" }
 	| { turnId: string; outcome: "duplicate"; running: boolean };
 
-interface Prompt {
+export interface Prompt {
 	agent: { id: string; organizationId: string };
 	sessionId: string;
 	/** The person this work is for; a task's report carries who asked for the task. */
