@@ -293,7 +293,19 @@ describe("Shell Environment", () => {
 
 		const shellPath = shellEnv.PATH || shellEnv.Path;
 		if (shellPath) {
-			expect(env.PATH).toBe(shellPath);
+			const expectedPath =
+				process.platform === "darwin"
+					? [
+							...[
+								"/opt/homebrew/bin",
+								"/opt/homebrew/sbin",
+								"/usr/local/bin",
+								"/usr/local/sbin",
+							].filter((entry) => !shellPath.split(":").includes(entry)),
+							shellPath,
+						].join(":")
+					: shellPath;
+			expect(env.PATH).toBe(expectedPath);
 			if (process.platform === "win32" || "Path" in shellEnv) {
 				expect(env.Path).toBe(shellPath);
 			}
