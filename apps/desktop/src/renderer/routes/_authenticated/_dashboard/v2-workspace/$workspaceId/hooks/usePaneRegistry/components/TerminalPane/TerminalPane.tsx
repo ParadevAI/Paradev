@@ -205,6 +205,19 @@ export function TerminalPane({
 	useEffect(() => {
 		if (sessionEnd.endedCleanly) closePaneRef.current();
 	}, [sessionEnd.endedCleanly]);
+	useEffect(() => {
+		if (sessionEnd.ended && !sessionEnd.endedCleanly) {
+			terminalRuntimeRegistry.persistEndedSession(
+				terminalId,
+				terminalInstanceId,
+			);
+		}
+	}, [
+		sessionEnd.ended,
+		sessionEnd.endedCleanly,
+		terminalId,
+		terminalInstanceId,
+	]);
 
 	// DOM-first lifecycle (VSCode/Tabby pattern):
 	//   1. mount() attaches xterm to the container synchronously — terminal

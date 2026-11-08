@@ -679,6 +679,23 @@ class TerminalRuntimeRegistryImpl {
 		);
 	}
 
+	/**
+	 * Save an ended session's scrollback now: a host-service restart forgets
+	 * the session, and a pane that was never parked has no other snapshot.
+	 */
+	persistEndedSession(terminalId: string, instanceId?: string): void {
+		const entry = this.getEntry(terminalId, instanceId);
+		const runtime = entry?.runtime;
+		if (!entry?.transport.sessionEnded || !runtime) return;
+		entry.transport._writeCoalescer?.flushSync();
+		runtime.terminal.write("", () => {
+			if (entry.runtime !== runtime) return;
+			if (!tryPersistRuntimeState(runtime)) {
+				this.warnPersistFailureOnce(terminalId);
+			}
+		});
+	}
+
 	/** Exited with code 0 and no signal, as after `exit` or Ctrl-D. */
 	endedCleanly(terminalId: string, instanceId?: string): boolean {
 		const exitStatus = this.getEntry(terminalId, instanceId)?.transport

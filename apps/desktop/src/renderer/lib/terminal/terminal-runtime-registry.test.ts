@@ -320,6 +320,53 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
+	test("persistEndedSession saves the scrollback once the parser is idle", () => {
+		const terminalId = "ended-on-screen";
+		let parsed: (() => void) | undefined;
+		const runtime = {
+			terminalId,
+			serializeAddon: { serialize: () => "output\r\n[terminal] exited" },
+			lastCols: 120,
+			lastRows: 32,
+			terminal: {
+				write: (_data: string, callback: () => void) => {
+					parsed = callback;
+				},
+			},
+		};
+		const entry = {
+			terminalId,
+			instanceId: terminalId,
+			runtime,
+			transport: { sessionEnded: true },
+		};
+		const registryInternals = terminalRuntimeRegistry as unknown as {
+			entries: Map<string, typeof entry>;
+			entryKeysByTerminalId: Map<string, Set<string>>;
+		};
+		const entryKey = `${terminalId}\u0000${terminalId}`;
+		registryInternals.entries.set(entryKey, entry);
+		registryInternals.entryKeysByTerminalId.set(
+			terminalId,
+			new Set([entryKey]),
+		);
+
+		try {
+			terminalRuntimeRegistry.persistEndedSession(terminalId);
+			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
+				false,
+			);
+			parsed?.();
+			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
+				"output\r\n[terminal] exited",
+			);
+		} finally {
+			registryInternals.entries.delete(entryKey);
+			registryInternals.entryKeysByTerminalId.delete(terminalId);
+			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
+		}
+	});
+
 	test("release persists once before disposing a runtime", () => {
 		const terminalId = "release-success";
 		const entry = {
