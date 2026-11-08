@@ -695,9 +695,15 @@ class TerminalRuntimeRegistryImpl {
 				this.warnPersistFailureOnce(terminalId);
 				return;
 			}
-			persistSeqAnchor(terminalId, getPersistableSeqAnchor(entry.transport));
+			persistSeqAnchor(
+				terminalId,
+				runtime.gate.pending === 0
+					? getPersistableSeqAnchor(entry.transport)
+					: null,
+			);
 		};
-		runtime.terminal.write("", () => runWhenParserIdle(runtime.gate, save));
+		// The gate releases this write right after its callback returns.
+		runtime.terminal.write("", () => queueMicrotask(save));
 	}
 
 	endedCleanly(terminalId: string, instanceId?: string): boolean {

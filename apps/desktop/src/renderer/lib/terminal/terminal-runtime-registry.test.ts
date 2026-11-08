@@ -7,7 +7,11 @@ import {
 	spyOn,
 	test,
 } from "bun:test";
-import { createParserIdleGate, wrapWrite } from "./parser-idle-gate";
+import {
+	createParserIdleGate,
+	runWhenParserIdle,
+	wrapWrite,
+} from "./parser-idle-gate";
 import {
 	terminalMeasurementsChanged,
 	tryPersistRuntimeState,
@@ -378,6 +382,57 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			registryInternals.entryKeysByTerminalId.delete(terminalId);
 			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
 			fakeStorage.values.delete(`terminal-seq:${terminalId}`);
+		}
+	});
+
+	test("persistEndedSession leaves other queued idle work in place", async () => {
+		const terminalId = "ended-with-queued-resize";
+		const gate = createParserIdleGate();
+		const callbacks: (() => void)[] = [];
+		const write = wrapWrite(gate, (_data, callback) => {
+			if (callback) callbacks.push(callback);
+		});
+		const entry = {
+			terminalId,
+			instanceId: terminalId,
+			runtime: {
+				terminalId,
+				serializeAddon: { serialize: () => "kept output" },
+				lastCols: 120,
+				lastRows: 32,
+				gate,
+				terminal: { write },
+			},
+			transport: { sessionEnded: true },
+		};
+		const registryInternals = terminalRuntimeRegistry as unknown as {
+			entries: Map<string, typeof entry>;
+			entryKeysByTerminalId: Map<string, Set<string>>;
+		};
+		const entryKey = `${terminalId}\u0000${terminalId}`;
+		registryInternals.entries.set(entryKey, entry);
+		registryInternals.entryKeysByTerminalId.set(
+			terminalId,
+			new Set([entryKey]),
+		);
+		const resize = mock(() => {});
+
+		try {
+			write("still parsing");
+			runWhenParserIdle(gate, resize);
+			terminalRuntimeRegistry.persistEndedSession(terminalId);
+			callbacks[1]?.();
+			await Promise.resolve();
+			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
+				"kept output",
+			);
+			callbacks[0]?.();
+			await Promise.resolve();
+			expect(resize).toHaveBeenCalledTimes(1);
+		} finally {
+			registryInternals.entries.delete(entryKey);
+			registryInternals.entryKeysByTerminalId.delete(terminalId);
+			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
 		}
 	});
 
