@@ -1,0 +1,100 @@
+name: Release Mobile
+
+# Sends a build that deploy.yml already uploaded to App Store Connect to App
+# Review, then opens the PR that bumps the marketing version (RELEASE.md,
+# "Versioning"). Approval comes from the mobile-release environment's required
+# reviewers. The App Store Connect API key is the one EAS Submit uses, read
+# from EAS credentials with EXPO_TOKEN.
+
+on:
+  workflow_dispatch:
+    inputs:
+      whats_new:
+        description: "What's New in this version (shown on the App Store)"
+        required: true
+        type: string
+      build:
+        description: "Build number to submit (default: the newest processed build)"
+        required: false
+        type: string
+      dry_run:
+        description: "Print the App Store Connect calls without making them"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-mobile
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    name: Submit for App Review
+    runs-on: ubuntu-latest
+    environment: mobile-release
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen --ignore-scripts
+
+      - name: Submit for App Review
+        id: submit
+        working-directory: apps/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_REVIEW_EMAIL: ${{ secrets.APP_REVIEW_EMAIL }}
+          APP_REVIEW_PASSWORD: ${{ secrets.APP_REVIEW_PASSWORD }}
+          APP_REVIEW_VIDEO_URL: ${{ vars.APP_REVIEW_VIDEO_URL }}
+          WHATS_NEW: ${{ inputs.whats_new }}
+          BUILD: ${{ inputs.build }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if [ -z "$APP_REVIEW_EMAIL" ] || [ -z "$APP_REVIEW_PASSWORD" ]; then
+            echo "::error::APP_REVIEW_EMAIL and APP_REVIEW_PASSWORD must be set on the mobile-release environment, or the metadata push blanks App Review's sign-in."
+            exit 1
+          fi
+          args=(--whats-new "$WHATS_NEW")
+          [ -n "$BUILD" ] && args+=(--build "$BUILD")
+          [ "$DRY_RUN" = "true" ] && args+=(--dry-run)
+          bun run scripts/submit-review.ts "${args[@]}"
+
+      - name: Bump the marketing version
+        id: bump
+        if: ${{ !inputs.dry_run }}
+        working-directory: apps/mobile
+        env:
+          VERSION: ${{ steps.submit.outputs.version }}
+        run: bun run scripts/submit-review.ts bump "$VERSION"
+
+      - name: Open the bump PR
+        if: ${{ steps.bump.outputs.bumped_to }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.submit.outputs.version }}
+          BUILD: ${{ steps.submit.outputs.build }}
+          NEXT: ${{ steps.bump.outputs.bumped_to }}
+        run: |
+          set -euo pipefail
+          branch="mobile/start-$NEXT"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add apps/mobile/app.config.ts apps/mobile/store.config.js
+          git commit -m "chore(mobile): start $NEXT; $VERSION ($BUILD) is in App Review"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "chore(mobile): start $NEXT; $VERSION ($BUILD) is in App Review" \
+            --body "Release Mobile submitted $VERSION ($BUILD) for App Review, so main moves to $NEXT (RELEASE.md, \"Versioning\"). Opened with GITHUB_TOKEN, which does not trigger CI: close and reopen this PR to run it."
