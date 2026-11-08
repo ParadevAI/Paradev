@@ -1903,6 +1903,9 @@ msgstr "Account wordt verwijderd."
 msgid "Account name"
 msgstr "Accountnaam"
 
+msgid "Account not found: {pinned}"
+msgstr "Account niet gevonden: {pinned}"
+
 msgid "Account pending deletion"
 msgstr "Account wordt verwijderd"
 
@@ -2254,6 +2257,9 @@ msgstr "Ten opzichte van main"
 
 msgid "Agent"
 msgstr "Agent"
+
+msgid "Agent accounts"
+msgstr "Agentaccounts"
 
 msgid "Agent commands"
 msgstr "Agentcommando's"
@@ -6731,6 +6737,10 @@ msgstr "Standaard"
 msgid "default · secondary · outline · ghost · link · destructive"
 msgstr "default · secondary · outline · ghost · link · destructive"
 
+#. placeholder {0}: label(hostDefault)
+msgid "Default ({0})"
+msgstr "Standaard ({0})"
+
 msgid "Default ({defaultWorktreePath})"
 msgstr "Standaard ({defaultWorktreePath})"
 
@@ -8563,6 +8573,9 @@ msgstr "Wisselen van organisatie mislukt. Probeer het opnieuw."
 
 msgid "Failed to trigger run"
 msgstr "Starten van run mislukt"
+
+msgid "Failed to update agent account"
+msgstr "Kan agentaccount niet bijwerken"
 
 msgid "Failed to update agent settings"
 msgstr "Bijwerken van agentinstellingen mislukt"
@@ -17005,6 +17018,9 @@ msgstr "\"{0}\" opgeslagen als omgeving"
 msgid "Saved to Downloads"
 msgstr "Opgeslagen in Downloads"
 
+msgid "Saved, but open terminals keep their current account until reopened."
+msgstr "Opgeslagen, maar open terminals houden hun huidige account tot ze opnieuw worden geopend."
+
 msgid "Saving as an environment..."
 msgstr "Opslaan als omgeving..."
 
@@ -19147,6 +19163,9 @@ msgstr "Systeem"
 
 msgid "System design"
 msgstr "Systeemontwerp"
+
+msgid "System login"
+msgstr "Systeemaanmelding"
 
 msgid "System memory"
 msgstr "Systeemgeheugen"
@@ -21884,6 +21903,9 @@ msgstr "Welke agents kunnen een automatisering draaien?"
 
 msgid "Which AI coding agents are supported?"
 msgstr "Welke AI-coding agents worden ondersteund?"
+
+msgid "Which login agents use in this project. Defaults to the account chosen in Usage."
+msgstr "Met welke login agents in dit project werken. Standaard het account dat in Gebruik is gekozen."
 
 msgid "Which plans include automations?"
 msgstr "Welke abonnementen bevatten automatiseringen?"

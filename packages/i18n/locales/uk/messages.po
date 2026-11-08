@@ -1897,6 +1897,9 @@ msgstr "Обліковий запис очікує на видалення."
 msgid "Account name"
 msgstr "Назва облікового запису"
 
+msgid "Account not found: {pinned}"
+msgstr "Обліковий запис не знайдено: {pinned}"
+
 msgid "Account pending deletion"
 msgstr "Обліковий запис очікує на видалення"
 
@@ -2248,6 +2251,9 @@ msgstr "Порівняно з main"
 
 msgid "Agent"
 msgstr "Агент"
+
+msgid "Agent accounts"
+msgstr "Облікові записи агентів"
 
 msgid "Agent commands"
 msgstr "Команди агентів"
@@ -6725,6 +6731,10 @@ msgstr "За замовчуванням"
 msgid "default · secondary · outline · ghost · link · destructive"
 msgstr "default · secondary · outline · ghost · link · destructive"
 
+#. placeholder {0}: label(hostDefault)
+msgid "Default ({0})"
+msgstr "За замовчуванням ({0})"
+
 msgid "Default ({defaultWorktreePath})"
 msgstr "За замовчуванням ({defaultWorktreePath})"
 
@@ -8557,6 +8567,9 @@ msgstr "Не вдалося змінити організацію. Спробу�
 
 msgid "Failed to trigger run"
 msgstr "Не вдалося запустити виконання"
+
+msgid "Failed to update agent account"
+msgstr "Не вдалося оновити обліковий запис агента"
 
 msgid "Failed to update agent settings"
 msgstr "Не вдалося оновити налаштування агента"
@@ -16999,6 +17012,9 @@ msgstr "«{0}» збережено як середовище"
 msgid "Saved to Downloads"
 msgstr "Збережено в «Завантаження»"
 
+msgid "Saved, but open terminals keep their current account until reopened."
+msgstr "Збережено, але відкриті термінали використовують поточний обліковий запис, доки їх не відкрити знову."
+
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
 
@@ -19141,6 +19157,9 @@ msgstr "Системна"
 
 msgid "System design"
 msgstr "Системний дизайн"
+
+msgid "System login"
+msgstr "Системний обліковий запис"
 
 msgid "System memory"
 msgstr "Системна пам'ять"
@@ -21878,6 +21897,9 @@ msgstr "Які агенти можуть запускати автоматиза
 
 msgid "Which AI coding agents are supported?"
 msgstr "Які кодинг-агенти підтримуються?"
+
+msgid "Which login agents use in this project. Defaults to the account chosen in Usage."
+msgstr "Який обліковий запис агенти використовують у цьому проєкті. За замовчуванням — той, що вибрано в розділі «Використання»."
 
 msgid "Which plans include automations?"
 msgstr "У яких тарифах є автоматизації?"

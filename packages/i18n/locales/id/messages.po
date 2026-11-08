@@ -1903,6 +1903,9 @@ msgstr "Akun sedang menunggu penghapusan."
 msgid "Account name"
 msgstr "Nama akun"
 
+msgid "Account not found: {pinned}"
+msgstr "Akun tidak ditemukan: {pinned}"
+
 msgid "Account pending deletion"
 msgstr "Akun menunggu penghapusan"
 
@@ -2254,6 +2257,9 @@ msgstr "Terhadap Main"
 
 msgid "Agent"
 msgstr "Agen"
+
+msgid "Agent accounts"
+msgstr "Akun agen"
 
 msgid "Agent commands"
 msgstr "Perintah agen"
@@ -6731,6 +6737,10 @@ msgstr "Bawaan"
 msgid "default · secondary · outline · ghost · link · destructive"
 msgstr "default · secondary · outline · ghost · link · destructive"
 
+#. placeholder {0}: label(hostDefault)
+msgid "Default ({0})"
+msgstr "Bawaan ({0})"
+
 msgid "Default ({defaultWorktreePath})"
 msgstr "Bawaan ({defaultWorktreePath})"
 
@@ -8563,6 +8573,9 @@ msgstr "Gagal mengganti organisasi. Silakan coba lagi."
 
 msgid "Failed to trigger run"
 msgstr "Gagal memicu run"
+
+msgid "Failed to update agent account"
+msgstr "Gagal memperbarui akun agen"
 
 msgid "Failed to update agent settings"
 msgstr "Gagal memperbarui pengaturan agen"
@@ -17005,6 +17018,9 @@ msgstr "\"{0}\" disimpan sebagai environment"
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
 
+msgid "Saved, but open terminals keep their current account until reopened."
+msgstr "Tersimpan, tetapi terminal yang terbuka tetap memakai akun saat ini sampai dibuka ulang."
+
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
 
@@ -19147,6 +19163,9 @@ msgstr "Sistem"
 
 msgid "System design"
 msgstr "Desain sistem"
+
+msgid "System login"
+msgstr "Login sistem"
 
 msgid "System memory"
 msgstr "Memori sistem"
@@ -21884,6 +21903,9 @@ msgstr "Agen apa yang bisa menjalankan otomatisasi?"
 
 msgid "Which AI coding agents are supported?"
 msgstr "Agen coding AI mana saja yang didukung?"
+
+msgid "Which login agents use in this project. Defaults to the account chosen in Usage."
+msgstr "Login yang dipakai agen di proyek ini. Bawaannya adalah akun yang dipilih di Penggunaan."
 
 msgid "Which plans include automations?"
 msgstr "Paket mana yang menyertakan otomatisasi?"
