@@ -25,34 +25,30 @@ export function InviteFooter({
 		: "";
 
 	return (
-		<div className="-mx-3 space-y-1 border-t px-3 py-2 text-muted-foreground text-xs">
-			{seatCost === undefined ? null : (
-				<p>
-					{seatCost === null ? (
-						<Trans>
-							Each new person adds a paid seat to {organizationName}.
-						</Trans>
-					) : seatCost.interval === "year" ? (
-						<Plural
-							value={newPeople}
-							one={`Adds a paid seat to ${organizationName} (${total}/year), billed when they join.`}
-							other={`Adds # paid seats to ${organizationName} (${total}/year), billed when they join.`}
-						/>
-					) : (
-						<Plural
-							value={newPeople}
-							one={`Adds a paid seat to ${organizationName} (${total}/month), billed when they join.`}
-							other={`Adds # paid seats to ${organizationName} (${total}/month), billed when they join.`}
-						/>
-					)}
-				</p>
-			)}
-			<p>
+		<p className="-mx-3 border-t px-3 py-2 text-muted-foreground text-xs">
+			{seatCost === undefined ? (
 				<Trans>
 					New people get an email invite to {organizationName}. They see this
 					once they join.
 				</Trans>
-			</p>
-		</div>
+			) : seatCost === null ? (
+				<Trans>
+					New people get an email invite to {organizationName} and see this once
+					they join, which adds a paid seat for each.
+				</Trans>
+			) : seatCost.interval === "year" ? (
+				<Plural
+					value={newPeople}
+					one={`The new person gets an email invite to ${organizationName} and sees this once they join, which adds a paid seat (${total}/year).`}
+					other={`New people get an email invite to ${organizationName} and see this once they join, which adds # paid seats (${total}/year).`}
+				/>
+			) : (
+				<Plural
+					value={newPeople}
+					one={`The new person gets an email invite to ${organizationName} and sees this once they join, which adds a paid seat (${total}/month).`}
+					other={`New people get an email invite to ${organizationName} and see this once they join, which adds # paid seats (${total}/month).`}
+				/>
+			)}
+		</p>
 	);
 }

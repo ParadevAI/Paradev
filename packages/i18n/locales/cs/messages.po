@@ -1168,11 +1168,11 @@ msgstr "{name}: {monthly} za uživatele/měsíc"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za uživatele/měsíc, nebo {yearly} při roční fakturaci"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
-msgstr "{newPeople, plural, one {Přidá # placené místo v {organizationName} ({total}/měs.), účtováno, až se člověk připojí.} few {Přidá # placená místa v {organizationName} ({total}/měs.), účtováno, až se lidé připojí.} many {Přidá # placeného místa v {organizationName} ({total}/měs.), účtováno, až se lidé připojí.} other {Přidá # placených míst v {organizationName} ({total}/měs.), účtováno, až se lidé připojí.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
+msgstr "{newPeople, plural, one {Nový člověk dostane e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibude # placené místo ({total}/měs.).} few {Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibudou # placená místa ({total}/měs.).} many {Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibude # placeného místa ({total}/měs.).} other {Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibude # placených míst ({total}/měs.).}}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
-msgstr "{newPeople, plural, one {Přidá # placené místo v {organizationName} ({total}/rok), účtováno, až se člověk připojí.} few {Přidá # placená místa v {organizationName} ({total}/rok), účtováno, až se lidé připojí.} many {Přidá # placeného místa v {organizationName} ({total}/rok), účtováno, až se lidé připojí.} other {Přidá # placených míst v {organizationName} ({total}/rok), účtováno, až se lidé připojí.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
+msgstr "{newPeople, plural, one {Nový člověk dostane e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibude # placené místo ({total}/rok).} few {Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibudou # placená místa ({total}/rok).} many {Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibude # placeného místa ({total}/rok).} other {Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Tím přibude # placených míst ({total}/rok).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Zadejte alespoň jednu osobu, nebo zvolte {choice}.} sender {Zadejte alespoň jednoho odesílatele, nebo zvolte {choice}.} other {Zadejte alespoň jednu položku, nebo zvolte {choice}.}}"
@@ -7606,9 +7606,6 @@ msgstr "Každý ve vlastní nové kartě"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Každé ráno v 8:00 se podívej na včerejší neúspěšné běhy CI, urči nejčastější příčinu selhání a otevři PR s opravou."
 
-msgid "Each new person adds a paid seat to {organizationName}."
-msgstr "Každý nový člověk přidá placené místo v {organizationName}."
-
 msgid "Each run makes its own"
 msgstr "Každé spuštění si vytvoří vlastní"
 
@@ -12251,6 +12248,9 @@ msgstr "Nové zprávy"
 
 msgid "New page"
 msgstr "Nová stránka"
+
+msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
+msgstr "Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí. Každý z nich přidá placené místo."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Noví lidé dostanou e-mailem pozvánku do {organizationName}. Uvidí to, jakmile se připojí."

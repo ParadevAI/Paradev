@@ -24,7 +24,7 @@ describe("InviteFooter", () => {
 			seatCost: monthly,
 		});
 		expect(html).toContain(
-			"Adds 2 paid seats to Acme ($40/month), billed when they join.",
+			"New people get an email invite to Acme and see this once they join, which adds 2 paid seats ($40/month).",
 		);
 	});
 
@@ -34,7 +34,7 @@ describe("InviteFooter", () => {
 			newPeople: 1,
 			seatCost: null,
 		});
-		expect(html).toContain("Each new person adds a paid seat to");
+		expect(html).toContain("which adds a paid seat for each.");
 		expect(html).not.toContain("$");
 	});
 

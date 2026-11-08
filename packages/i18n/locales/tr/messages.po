@@ -1168,11 +1168,11 @@ msgstr "{name}: kullanıcı başına aylık {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: kullanıcı başına aylık {monthly} veya yıllık faturalandırmayla {yearly}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
-msgstr "{newPeople, plural, one {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/ay), katıldıklarında faturalandırılır.} other {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/ay), katıldıklarında faturalandırılır.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
+msgstr "{newPeople, plural, one {Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta daveti alır ve katıldıklarında bunu görür; bu, # ücretli koltuk ekler ({total}/ay).} other {Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta daveti alır ve katıldıklarında bunu görür; bu, # ücretli koltuk ekler ({total}/ay).}}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
-msgstr "{newPeople, plural, one {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/yıl), katıldıklarında faturalandırılır.} other {{organizationName} kuruluşuna # ücretli koltuk ekler ({total}/yıl), katıldıklarında faturalandırılır.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
+msgstr "{newPeople, plural, one {Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta daveti alır ve katıldıklarında bunu görür; bu, # ücretli koltuk ekler ({total}/yıl).} other {Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta daveti alır ve katıldıklarında bunu görür; bu, # ücretli koltuk ekler ({total}/yıl).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {En az bir kişi belirtin veya {choice} seçeneğini seçin.} sender {En az bir gönderen belirtin veya {choice} seçeneğini seçin.} other {En az bir öğe belirtin veya {choice} seçeneğini seçin.}}"
@@ -7606,9 +7606,6 @@ msgstr "Her biri kendi yeni sekmesinde"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Her sabah 08.00'de dünkü başarısız CI çalıştırmalarına bak, en sık görülen hatayı teşhis et ve düzeltme PR'ı aç."
 
-msgid "Each new person adds a paid seat to {organizationName}."
-msgstr "Her yeni kişi {organizationName} kuruluşuna bir ücretli koltuk ekler."
-
 msgid "Each run makes its own"
 msgstr "Her çalıştırma kendininkini oluşturur"
 
@@ -12251,6 +12248,9 @@ msgstr "Yeni mesajlar"
 
 msgid "New page"
 msgstr "Yeni sayfa"
+
+msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
+msgstr "Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta daveti alır ve katıldıklarında bunu görür; her biri bir ücretli koltuk ekler."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta daveti alır. Katıldıklarında bunu görürler."

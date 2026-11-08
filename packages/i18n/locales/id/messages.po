@@ -1168,11 +1168,11 @@ msgstr "{name}: {monthly} per pengguna/bulan"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per pengguna/bulan, atau {yearly} ditagih tahunan"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
-msgstr "{newPeople, plural, one {Menambahkan # kursi berbayar ke {organizationName} ({total}/bulan), ditagih saat mereka bergabung.} other {Menambahkan # kursi berbayar ke {organizationName} ({total}/bulan), ditagih saat mereka bergabung.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
+msgstr "{newPeople, plural, one {Orang baru akan menerima undangan email untuk bergabung ke {organizationName} dan melihatnya setelah bergabung, yang menambahkan # kursi berbayar ({total}/bulan).} other {Orang baru akan menerima undangan email untuk bergabung ke {organizationName} dan melihatnya setelah bergabung, yang menambahkan # kursi berbayar ({total}/bulan).}}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
-msgstr "{newPeople, plural, one {Menambahkan # kursi berbayar ke {organizationName} ({total}/tahun), ditagih saat mereka bergabung.} other {Menambahkan # kursi berbayar ke {organizationName} ({total}/tahun), ditagih saat mereka bergabung.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
+msgstr "{newPeople, plural, one {Orang baru akan menerima undangan email untuk bergabung ke {organizationName} dan melihatnya setelah bergabung, yang menambahkan # kursi berbayar ({total}/tahun).} other {Orang baru akan menerima undangan email untuk bergabung ke {organizationName} dan melihatnya setelah bergabung, yang menambahkan # kursi berbayar ({total}/tahun).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Tentukan minimal satu orang, atau pilih {choice}.} sender {Tentukan minimal satu pengirim, atau pilih {choice}.} other {Tentukan minimal satu entri, atau pilih {choice}.}}"
@@ -7606,9 +7606,6 @@ msgstr "Masing-masing di tab barunya sendiri"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Tiap pagi jam 8, lihat run CI yang gagal kemarin, diagnosis kegagalan paling umum, dan buka PR perbaikan."
 
-msgid "Each new person adds a paid seat to {organizationName}."
-msgstr "Setiap orang baru menambahkan satu kursi berbayar ke {organizationName}."
-
 msgid "Each run makes its own"
 msgstr "Setiap run membuat miliknya sendiri"
 
@@ -12251,6 +12248,9 @@ msgstr "Pesan baru"
 
 msgid "New page"
 msgstr "Halaman baru"
+
+msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
+msgstr "Orang baru akan menerima undangan email untuk bergabung ke {organizationName} dan melihatnya setelah bergabung, yang menambahkan satu kursi berbayar untuk setiap orang."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Orang baru akan menerima undangan email untuk bergabung ke {organizationName}. Mereka akan melihatnya setelah bergabung."

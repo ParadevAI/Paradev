@@ -1168,11 +1168,11 @@ msgstr "{name}: {monthly} por usuário/mês"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} por usuário/mês, ou {yearly} com cobrança anual"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
-msgstr "{newPeople, plural, one {Adiciona um assento pago a {organizationName} ({total}/mês), cobrado quando a pessoa entrar.} other {Adiciona # assentos pagos a {organizationName} ({total}/mês), cobrados quando as pessoas entrarem.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
+msgstr "{newPeople, plural, one {A pessoa nova recebe um convite por e-mail para entrar em {organizationName} e verá isto quando entrar, o que adiciona um assento pago ({total}/mês).} other {Pessoas novas recebem um convite por e-mail para entrar em {organizationName} e verão isto quando entrarem, o que adiciona # assentos pagos ({total}/mês).}}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
-msgstr "{newPeople, plural, one {Adiciona um assento pago a {organizationName} ({total}/ano), cobrado quando a pessoa entrar.} other {Adiciona # assentos pagos a {organizationName} ({total}/ano), cobrados quando as pessoas entrarem.}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
+msgstr "{newPeople, plural, one {A pessoa nova recebe um convite por e-mail para entrar em {organizationName} e verá isto quando entrar, o que adiciona um assento pago ({total}/ano).} other {Pessoas novas recebem um convite por e-mail para entrar em {organizationName} e verão isto quando entrarem, o que adiciona # assentos pagos ({total}/ano).}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Especifique pelo menos uma pessoa, ou escolha {choice}.} sender {Especifique pelo menos um remetente, ou escolha {choice}.} other {Especifique pelo menos um item, ou escolha {choice}.}}"
@@ -7606,9 +7606,6 @@ msgstr "Cada um em sua própria aba"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Toda manhã às 8h, veja as execuções de CI que falharam ontem, diagnostique a falha mais comum e abra um PR com a correção."
 
-msgid "Each new person adds a paid seat to {organizationName}."
-msgstr "Cada pessoa nova adiciona um assento pago a {organizationName}."
-
 msgid "Each run makes its own"
 msgstr "Cada execução cria a sua"
 
@@ -12251,6 +12248,9 @@ msgstr "Novas mensagens"
 
 msgid "New page"
 msgstr "Nova página"
+
+msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
+msgstr "Pessoas novas recebem um convite por e-mail para entrar em {organizationName} e verão isto quando entrarem, o que adiciona um assento pago para cada uma."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Pessoas novas recebem um convite por e-mail para entrar em {organizationName}. Elas verão isto quando entrarem."

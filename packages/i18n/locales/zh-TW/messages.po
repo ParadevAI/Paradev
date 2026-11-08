@@ -1168,11 +1168,11 @@ msgstr "{name}：每位使用者每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每位使用者每月 {monthly}，或按年計費 {yearly}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/month), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/month), billed when they join.}}"
-msgstr "{newPeople, plural, one {將為 {organizationName} 增加 # 個付費席位（{total}/月），在對方加入時計費。} other {將為 {organizationName} 增加 # 個付費席位（{total}/月），在對方加入時計費。}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/month).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/month).}}"
+msgstr "{newPeople, plural, one {新成員會收到加入 {organizationName} 的電子郵件邀請，加入後即可看到，並將增加 # 個付費席位（{total}/月）。} other {新成員會收到加入 {organizationName} 的電子郵件邀請，加入後即可看到，並將增加 # 個付費席位（{total}/月）。}}"
 
-msgid "{newPeople, plural, one {Adds a paid seat to {organizationName} ({total}/year), billed when they join.} other {Adds # paid seats to {organizationName} ({total}/year), billed when they join.}}"
-msgstr "{newPeople, plural, one {將為 {organizationName} 增加 # 個付費席位（{total}/年），在對方加入時計費。} other {將為 {organizationName} 增加 # 個付費席位（{total}/年），在對方加入時計費。}}"
+msgid "{newPeople, plural, one {The new person gets an email invite to {organizationName} and sees this once they join, which adds a paid seat ({total}/year).} other {New people get an email invite to {organizationName} and see this once they join, which adds # paid seats ({total}/year).}}"
+msgstr "{newPeople, plural, one {新成員會收到加入 {organizationName} 的電子郵件邀請，加入後即可看到，並將增加 # 個付費席位（{total}/年）。} other {新成員會收到加入 {organizationName} 的電子郵件邀請，加入後即可看到，並將增加 # 個付費席位（{total}/年）。}}"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {請至少指定一個人員，或選擇{choice}。} sender {請至少指定一個寄件者，或選擇{choice}。} other {請至少指定一個項目，或選擇{choice}。}}"
@@ -7606,9 +7606,6 @@ msgstr "每條各佔一個新分頁"
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "每天早上8點，檢視昨天失敗的CI執行，診斷最常見的失敗原因，並提一個修復PR。"
 
-msgid "Each new person adds a paid seat to {organizationName}."
-msgstr "每位新成員都會為 {organizationName} 增加一個付費席位。"
-
 msgid "Each run makes its own"
 msgstr "每次執行都新建一個"
 
@@ -12251,6 +12248,9 @@ msgstr "新訊息"
 
 msgid "New page"
 msgstr "新增頁面"
+
+msgid "New people get an email invite to {organizationName} and see this once they join, which adds a paid seat for each."
+msgstr "新成員會收到加入 {organizationName} 的電子郵件邀請，加入後即可看到，每人將增加一個付費席位。"
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "新成員會收到加入 {organizationName} 的電子郵件邀請，加入後即可看到。"
