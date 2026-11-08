@@ -50,6 +50,12 @@ describe("computeChecksStatus", () => {
 		);
 	});
 
+	test("failure beats pending and cancelled", () => {
+		expect(computeChecksStatus(checks("failure", "pending", "cancelled"))).toBe(
+			"failure",
+		);
+	});
+
 	test("pending beats success and skipped", () => {
 		expect(computeChecksStatus(checks("success", "skipped", "pending"))).toBe(
 			"pending",
