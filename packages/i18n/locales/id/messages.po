@@ -1168,6 +1168,9 @@ msgstr "{name}: {monthly} per pengguna/bulan"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per pengguna/bulan, atau {yearly} ditagih tahunan"
 
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {Ini menambahkan # kursi berbayar ({price}).} other {Ini menambahkan # kursi berbayar ({price}).}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Tentukan minimal satu orang, atau pilih {choice}.} sender {Tentukan minimal satu pengirim, atau pilih {choice}.} other {Tentukan minimal satu entri, atau pilih {choice}.}}"
 
@@ -1359,6 +1362,12 @@ msgstr "{toolName} dihentikan"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
+
+msgid "{total}/month"
+msgstr "{total}/bulan"
+
+msgid "{total}/year"
+msgstr "{total}/tahun"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issue GitHub}}"
@@ -7590,6 +7599,9 @@ msgstr "mis. Review cloud saya"
 msgid "e.g. plan-budget"
 msgstr "mis. plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "Setiap orang menambahkan satu kursi berbayar."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Setiap lampiran maksimal {0} MB."
@@ -9326,6 +9338,9 @@ msgstr "Dapatkan aplikasi iPhone dan iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "Akan menerima undangan untuk bergabung ke {organizationName} dan satu kursi berbayar"
 
 msgid "Getting Work Done"
 msgstr "Menyelesaikan Pekerjaan"
@@ -12239,6 +12254,9 @@ msgstr "Pesan baru"
 
 msgid "New page"
 msgstr "Halaman baru"
+
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "Orang baru akan menerima undangan email untuk bergabung ke {organizationName} dan melihatnya setelah bergabung."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Orang baru akan menerima undangan email untuk bergabung ke {organizationName}. Mereka akan melihatnya setelah bergabung."

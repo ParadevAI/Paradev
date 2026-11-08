@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { HiArrowRight } from "react-icons/hi2";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
+import { usePlanCatalog } from "renderer/hooks/usePlanCatalog";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -22,7 +23,6 @@ import {
 	type SettingItemId,
 } from "../../../utils/settings-search";
 import { useBillingActions } from "../../hooks/useBillingActions";
-import { usePlanCatalog } from "../../hooks/usePlanCatalog";
 import { PlanChangeDialog } from "../PlanChangeDialog";
 import { BillingDetails } from "./components/BillingDetails";
 import { CloudUsageCard } from "./components/CloudUsageCard";

@@ -21,6 +21,7 @@ import type {
 	ShareGranteeRef,
 	SharePerson,
 	ShareRoleOption,
+	ShareSeatCost,
 } from "./types";
 
 const COPIED_MS = 1500;
@@ -41,6 +42,8 @@ export interface ShareAccessProps {
 	/** The organization's logo, shown for the organization's general access option. */
 	organizationLogo?: string | null;
 	inviteNew: InviteNewMode;
+	/** Set on paid plans, where each new person adds a billed seat. `null` when the price is unknown. */
+	seatCost?: ShareSeatCost | null;
 	onUpgrade: () => void;
 	general: ShareGeneralAccess;
 	onAdd: (request: ShareAddRequest) => Promise<void>;
@@ -81,6 +84,7 @@ export function ShareAccess({
 	organizationName,
 	organizationLogo = null,
 	inviteNew,
+	seatCost,
 	onUpgrade,
 	general,
 	onAdd,
@@ -150,6 +154,7 @@ export function ShareAccess({
 				ownerId={owner?.userId ?? null}
 				organizationName={organizationName}
 				inviteNew={inviteNew}
+				seatCost={seatCost}
 				roles={roles}
 				defaultRole={defaultRole}
 				roleNote={roleNote}

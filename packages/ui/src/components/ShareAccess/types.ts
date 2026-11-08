@@ -42,3 +42,10 @@ export interface ShareGeneralAccess {
 		onChange: (role: string) => Promise<void>;
 	};
 }
+
+/** What one added seat costs. */
+export interface ShareSeatCost {
+	amount: number;
+	currency: string;
+	interval: "month" | "year";
+}

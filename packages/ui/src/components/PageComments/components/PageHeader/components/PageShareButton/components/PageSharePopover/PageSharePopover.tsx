@@ -173,6 +173,7 @@ export function PageSharePopover({
 					organizationName={organizationName}
 					organizationLogo={sharing.organizationLogo ?? null}
 					inviteNew={sharing.inviteNew}
+					seatCost={sharing.seatCost}
 					onUpgrade={sharing.onUpgrade}
 					onCopyLink={copyLink}
 					onAdd={sharing.onAdd}

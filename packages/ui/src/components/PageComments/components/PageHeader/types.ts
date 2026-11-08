@@ -5,6 +5,7 @@ import type {
 	ShareDirectory,
 	ShareGrantee,
 	ShareGranteeRef,
+	ShareSeatCost,
 } from "../../../ShareAccess";
 
 export type { PageVisibility } from "@superset/shared/usercontent";
@@ -48,6 +49,8 @@ export interface PageHeaderSharing {
 	organizationName: string;
 	organizationLogo?: string | null;
 	inviteNew: InviteNewMode;
+	/** Set on paid plans, where each new person adds a billed seat. `null` when the price is unknown. */
+	seatCost?: ShareSeatCost | null;
 	onUpgrade: () => void;
 	onAdd: (request: ShareAddRequest) => Promise<void>;
 	onRemove: (grantee: ShareGranteeRef) => Promise<void>;

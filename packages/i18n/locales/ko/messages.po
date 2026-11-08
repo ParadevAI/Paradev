@@ -1168,6 +1168,9 @@ msgstr "{name}: 사용자당 월 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 사용자당 월 {monthly}, 또는 연간 결제 시 {yearly}"
 
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {유료 좌석 #개가 추가됩니다({price}).} other {유료 좌석 #개가 추가됩니다({price}).}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {사람을 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} sender {발신자를 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} other {항목을 하나 이상 지정하거나 {choice} 옵션을 선택하세요.}}"
 
@@ -1359,6 +1362,12 @@ msgstr "{toolName} 중단됨"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
+
+msgid "{total}/month"
+msgstr "{total}/월"
+
+msgid "{total}/year"
+msgstr "{total}/년"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub 이슈} other {GitHub 이슈}}"
@@ -7590,6 +7599,9 @@ msgstr "예: 내 클라우드 리뷰"
 msgid "e.g. plan-budget"
 msgstr "예: plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "한 명당 유료 좌석이 1개 추가됩니다."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "첨부 파일은 각각 최대 {0} MB입니다."
@@ -9326,6 +9338,9 @@ msgstr "iPhone 및 iPad 앱 받기"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} 가입 초대를 받습니다"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "{organizationName} 가입 초대를 받고 유료 좌석이 1개 추가됩니다"
 
 msgid "Getting Work Done"
 msgstr "업무용"
@@ -12239,6 +12254,9 @@ msgstr "새 메시지"
 
 msgid "New page"
 msgstr "새 페이지"
+
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "새로운 사람은 {organizationName} 가입 초대 이메일을 받고 가입하면 볼 수 있습니다."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "새로운 사람은 {organizationName} 가입 초대 이메일을 받습니다. 가입하면 볼 수 있습니다."

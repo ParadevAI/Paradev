@@ -1168,6 +1168,9 @@ msgstr "{name}: {monthly} per user/month"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per user/month, or {yearly} billed yearly"
 
+msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+msgstr "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 
@@ -1359,6 +1362,12 @@ msgstr "{toolName} interrupted"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {The check passed} other {All # checks passed}}"
+
+msgid "{total}/month"
+msgstr "{total}/month"
+
+msgid "{total}/year"
+msgstr "{total}/year"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
@@ -7590,6 +7599,9 @@ msgstr "e.g. My cloud reviews"
 msgid "e.g. plan-budget"
 msgstr "e.g. plan-budget"
 
+msgid "Each adds a paid seat."
+msgstr "Each adds a paid seat."
+
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Each attachment is at most {0} MB."
@@ -9326,6 +9338,9 @@ msgstr "Get the iPhone and iPad app"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Gets an invite to join {organizationName}"
+
+msgid "Gets an invite to join {organizationName} and a paid seat"
+msgstr "Gets an invite to join {organizationName} and a paid seat"
 
 msgid "Getting Work Done"
 msgstr "Getting Work Done"
@@ -12239,6 +12254,9 @@ msgstr "New messages"
 
 msgid "New page"
 msgstr "New page"
+
+msgid "New people get an email invite to {organizationName} and see this once they join."
+msgstr "New people get an email invite to {organizationName} and see this once they join."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "New people get an email invite to {organizationName}. They see this once they join."
