@@ -36,6 +36,7 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hooks/usePageFavorites";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
@@ -225,15 +226,16 @@ export function WorkspaceActivityMenu({
 			),
 	};
 	const organizationId = useActiveOrganizationId();
+	const currentPrTarget: PullRequestTarget | null = currentPr
+		? {
+				organizationId,
+				repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,
+				prNumber: currentPr.number,
+			}
+		: null;
 	const prActions = usePullRequestActions({
 		workspaceId,
-		target: currentPr
-			? {
-					organizationId,
-					repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,
-					prNumber: currentPr.number,
-				}
-			: null,
+		target: currentPrTarget,
 		onRefresh: refreshFlowState,
 	});
 
@@ -352,6 +354,7 @@ export function WorkspaceActivityMenu({
 						canCreatePr={false}
 						{...shipMenuProps}
 						pullRequest={{
+							target: currentPrTarget,
 							canMarkReady: currentPrState === "draft",
 							canMerge: currentPr.state === "open" && !currentPr.isDraft,
 							isMarkingReady: prActions.isMarkingReady,

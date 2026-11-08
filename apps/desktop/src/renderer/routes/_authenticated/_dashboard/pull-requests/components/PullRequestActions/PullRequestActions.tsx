@@ -382,7 +382,10 @@ export function PullRequestActions({
 									aria-busy={merge.isPending}
 									onClick={() => {
 										if (mergeBlocked) return;
-										setPendingAction({ kind: "merge", method: "squash" });
+										setPendingAction({
+											kind: "merge",
+											method: data.mergeMethods.primary,
+										});
 									}}
 								>
 									{merge.isPending ? (
@@ -472,7 +475,7 @@ export function PullRequestActions({
 									<PullRequestMenuLabel className="pt-1">
 										<Trans>Select method</Trans>
 									</PullRequestMenuLabel>
-									{(["squash", "merge", "rebase"] as const).map((method) => (
+									{data.mergeMethods.methods.map((method) => (
 										<PullRequestMenuItem
 											key={method}
 											className="flex-col items-start gap-0 py-1.5"
@@ -481,12 +484,18 @@ export function PullRequestActions({
 												setPendingAction({ kind: "merge", method })
 											}
 										>
-											<span className="flex items-center gap-2">
+											<span className="flex w-full items-center gap-2">
 												<GitMerge
 													strokeWidth={1.75}
 													className="size-3.5 opacity-80"
 												/>
 												{mergeMethodLabels[method]}
+												{method === data.mergeMethods.primary ? (
+													<Check
+														strokeWidth={1.75}
+														className="ml-auto size-3.5 text-muted-foreground"
+													/>
+												) : null}
 											</span>
 											<span className="pl-[1.375rem] text-[11px] text-muted-foreground">
 												{mergeMethodDescriptions[method]}
@@ -502,7 +511,7 @@ export function PullRequestActions({
 												onClick={() =>
 													setPendingAction({
 														kind: "merge",
-														method: "squash",
+														method: data.mergeMethods.primary,
 														force: true,
 													})
 												}

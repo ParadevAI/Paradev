@@ -61,6 +61,7 @@ function detail(overrides: {
 			requiresThreadResolution: false,
 			queue: null,
 			allowedMergeMethods: ["squash"],
+			defaultMergeMethod: "squash",
 			...overrides.mergeability,
 		},
 		capabilities: {

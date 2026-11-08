@@ -136,6 +136,8 @@ function toDetail(raw: PullRequestDetailRead): PullRequestDetail {
 				: null,
 			allowedMergeMethods: raw.mergeability
 				.allowedMergeMethods as MergeMethod[],
+			defaultMergeMethod: (raw.mergeability.defaultMergeMethod ??
+				null) as MergeMethod | null,
 		},
 		capabilities: raw.capabilities,
 	};

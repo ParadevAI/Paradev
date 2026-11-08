@@ -69,3 +69,28 @@ test("maps GitHub's vocabulary, keeping the latest run of each check", () => {
 		labels: [{ name: "desktop", color: "1d76db" }],
 	});
 });
+
+test("offers only the merge methods the repository allows, with its default as the main action", () => {
+	const base = cloudPullRequestRead();
+	const mergeCommitOnly = toPullRequestDetail(
+		{
+			...base,
+			mergeability: {
+				...base.mergeability,
+				allowedMergeMethods: ["merge"],
+				defaultMergeMethod: "merge",
+			},
+		},
+		"owner/repo",
+	);
+	expect(mergeCommitOnly.mergeMethods).toEqual({
+		methods: ["merge"],
+		primary: "merge",
+	});
+
+	const squashOnly = toPullRequestDetail(base, "owner/repo");
+	expect(squashOnly.mergeMethods).toEqual({
+		methods: ["squash"],
+		primary: "squash",
+	});
+});

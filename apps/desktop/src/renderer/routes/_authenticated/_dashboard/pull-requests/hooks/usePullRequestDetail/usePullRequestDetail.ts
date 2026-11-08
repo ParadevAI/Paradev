@@ -8,6 +8,7 @@ import type {
 	PullRequestMergeability,
 } from "@superset/shared/pull-request";
 import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail";
+import type { MergeMethodChoices } from "@superset/shared/pull-request-merge-methods";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
@@ -35,6 +36,8 @@ export type PullRequestDetail = PullRequestDetailBase &
 	PullRequestActivity & {
 		/** What GitHub lets the viewer do, so nothing is offered that would be refused. */
 		capabilities: PullRequestDetailRead["capabilities"];
+		/** The repository's allowed merge methods and the main button's choice. */
+		mergeMethods: MergeMethodChoices;
 	};
 
 export function pullRequestDetailQueryKey(
