@@ -31,7 +31,10 @@ function entry(timestampMs: number, sessionId: string): UsageLogEntry {
 test("hermes reuses its scan until state.db changes", () => {
 	const home = join(root, "hermes");
 	mkdirSync(home, { recursive: true });
+	// WAL, as Hermes runs it: each write grows state.db-wal, which changes the
+	// signature even when it lands in the same timestamp tick.
 	const state = new Database(join(home, "state.db"));
+	state.pragma("journal_mode = WAL");
 	state.exec(`CREATE TABLE sessions (id TEXT, model TEXT, cwd TEXT, title TEXT,
 		started_at REAL, ended_at REAL, last_activity_at REAL, input_tokens INT,
 		output_tokens INT, cache_read_tokens INT, cache_write_tokens INT,
