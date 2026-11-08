@@ -312,8 +312,13 @@ function lastNonEmptyLine(terminal: XTerm): string | null {
 	const buffer = terminal.buffer?.active;
 	if (!buffer) return null;
 	for (let row = buffer.length - 1; row >= 0; row--) {
-		const text = buffer.getLine(row)?.translateToString(true);
-		if (text) return text;
+		let text = buffer.getLine(row)?.translateToString(true);
+		if (!text) continue;
+		for (let start = row; start > 0 && buffer.getLine(start)?.isWrapped; ) {
+			start--;
+			text = `${buffer.getLine(start)?.translateToString(false) ?? ""}${text}`;
+		}
+		return text;
 	}
 	return null;
 }

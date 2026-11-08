@@ -328,6 +328,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			serializeAddon: { serialize: () => "output\r\n[terminal] exited" },
 			lastCols: 120,
 			lastRows: 32,
+			gate: { pending: 0 },
 			terminal: {
 				write: (_data: string, callback: () => void) => {
 					parsed = callback;
@@ -338,7 +339,12 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			terminalId,
 			instanceId: terminalId,
 			runtime,
-			transport: { sessionEnded: true },
+			transport: {
+				sessionEnded: true,
+				seqAnchor: { epoch: "e1", seq: 42 },
+				_seqCounting: true,
+				_bytesSinceAttach: false,
+			},
 		};
 		const registryInternals = terminalRuntimeRegistry as unknown as {
 			entries: Map<string, typeof entry>;
@@ -359,6 +365,55 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			parsed?.();
 			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
 				"output\r\n[terminal] exited",
+			);
+			expect(fakeStorage.values.get(`terminal-seq:${terminalId}`)).toContain(
+				"42",
+			);
+		} finally {
+			registryInternals.entries.delete(entryKey);
+			registryInternals.entryKeysByTerminalId.delete(terminalId);
+			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
+			fakeStorage.values.delete(`terminal-seq:${terminalId}`);
+		}
+	});
+
+	test("persistEndedSession skips the save when the pane is disposed first", () => {
+		const terminalId = "ended-then-closed";
+		let parsed: (() => void) | undefined;
+		const entry = {
+			terminalId,
+			instanceId: terminalId,
+			runtime: {
+				terminalId,
+				serializeAddon: { serialize: () => "late output" },
+				lastCols: 120,
+				lastRows: 32,
+				gate: { pending: 0 },
+				terminal: {
+					write: (_data: string, callback: () => void) => {
+						parsed = callback;
+					},
+				},
+			},
+			transport: { sessionEnded: true },
+		};
+		const registryInternals = terminalRuntimeRegistry as unknown as {
+			entries: Map<string, typeof entry>;
+			entryKeysByTerminalId: Map<string, Set<string>>;
+		};
+		const entryKey = `${terminalId}\u0000${terminalId}`;
+		registryInternals.entries.set(entryKey, entry);
+		registryInternals.entryKeysByTerminalId.set(
+			terminalId,
+			new Set([entryKey]),
+		);
+
+		try {
+			terminalRuntimeRegistry.persistEndedSession(terminalId);
+			registryInternals.entries.delete(entryKey);
+			parsed?.();
+			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
+				false,
 			);
 		} finally {
 			registryInternals.entries.delete(entryKey);

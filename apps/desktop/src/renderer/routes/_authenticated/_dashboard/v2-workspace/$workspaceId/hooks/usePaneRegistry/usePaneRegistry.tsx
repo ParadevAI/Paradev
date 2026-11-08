@@ -572,25 +572,7 @@ export function usePaneRegistry({
 								workspaceId={workspaceId}
 								terminalId={terminalId}
 								terminalInstanceId={ctx.pane.id}
-								onNewShell={() =>
-									replaceEndedTerminal({
-										store: ctx.store,
-										paneId: ctx.pane.id,
-										terminalId,
-										create: () => launcher.create(),
-										dispose: (id) =>
-											workspaceTrpcUtils.client.terminal.killSession.mutate({
-												terminalId: id,
-												workspaceId,
-											}),
-										prepare: () =>
-											terminalRuntimeRegistry.prepareReplacement(
-												terminalId,
-												ctx.pane.id,
-												t({ message: "New shell" }),
-											),
-									})
-								}
+								onNewShell={() => startNewShell(ctx)}
 								onCreateNewAgentSession={createNewAgentSession}
 								onForkIntoOtherSurface={(source, placement) =>
 									void forkIntoOtherSurface(ctx, source, placement)

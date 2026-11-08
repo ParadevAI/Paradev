@@ -688,11 +688,19 @@ class TerminalRuntimeRegistryImpl {
 		const runtime = entry?.runtime;
 		if (!entry?.transport.sessionEnded || !runtime) return;
 		entry.transport._writeCoalescer?.flushSync();
+		const key = this.getEntryKey(entry.terminalId, entry.instanceId);
 		runtime.terminal.write("", () => {
-			if (entry.runtime !== runtime) return;
+			if (this.entries.get(key) !== entry || entry.runtime !== runtime) return;
 			if (!tryPersistRuntimeState(runtime)) {
 				this.warnPersistFailureOnce(terminalId);
+				return;
 			}
+			persistSeqAnchor(
+				terminalId,
+				runtime.gate.pending === 0
+					? getPersistableSeqAnchor(entry.transport)
+					: null,
+			);
 		});
 	}
 

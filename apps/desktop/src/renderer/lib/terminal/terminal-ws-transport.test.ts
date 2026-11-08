@@ -658,18 +658,28 @@ describe("terminal-ws-transport", () => {
 		expect(transport.exitStatus).toBeNull();
 	});
 
-	test("re-attaching to an exited session does not repeat the exit line", () => {
-		const lines: string[] = [];
-		const terminal = Object.assign(createMockTerminal(), {
-			writeln: (text: string) => lines.push(...text.split("\r\n")),
+	test("re-attaching to an exited session does not repeat the exit line, even when it wraps", () => {
+		const cols = 12;
+		const rows: { text: string; isWrapped: boolean }[] = [];
+		const terminal = Object.assign(createMockTerminal(cols), {
+			writeln: (text: string) => {
+				for (const line of text.split("\r\n")) {
+					if (!line) rows.push({ text: "", isWrapped: false });
+					for (let i = 0; i < line.length; i += cols) {
+						rows.push({ text: line.slice(i, i + cols), isWrapped: i > 0 });
+					}
+				}
+			},
 			buffer: {
 				active: {
 					get length() {
-						return lines.length;
+						return rows.length;
 					},
-					getLine: (row: number) => ({
-						translateToString: () => lines[row] ?? "",
-					}),
+					getLine: (row: number) =>
+						rows[row] && {
+							isWrapped: rows[row].isWrapped,
+							translateToString: () => rows[row].text,
+						},
 				},
 			},
 		}) as unknown as XTerm;
@@ -688,7 +698,7 @@ describe("terminal-ws-transport", () => {
 		attachAndExit();
 
 		expect(
-			lines.filter((line) => line.includes("exited with code 3")),
+			rows.filter((row) => row.text.startsWith("[terminal] e")),
 		).toHaveLength(1);
 	});
 
