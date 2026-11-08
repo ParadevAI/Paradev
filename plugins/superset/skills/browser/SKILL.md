@@ -229,8 +229,9 @@ along at their relative paths, so nothing needs inlining.
 superset pages publish ./evidence/ --workspace <id> --title "Checkout flow: 3 blockers"
 ```
 
-Read every screenshot before it goes up. A pane holds every login the user has, so a capture can hold a session token, an email address, a customer
-name, or a dashboard that was never meant to leave the tab. New pages default
+Read every screenshot before it goes up. A pane is signed in to every site in
+the shared browser session, so a capture can hold a session token, an email
+address, a customer name, or a dashboard that was never meant to leave the tab. New pages default
 to org-wide visibility. Crop or redact what does not belong in the report, pass
 `--visibility just_me` when the org does not need it, and confirm with the user
 before publishing.
@@ -239,13 +240,17 @@ before publishing.
 
 - All panes share one session with the user's logins and extensions (password
   managers included), so `eval` and CDP reach every site they are signed in to
-  (GitHub, dashboards, …). Never read cookies, autofilled passwords,
-  tokens, or credentials, exfiltrate session data, or act on authenticated
+  (GitHub, dashboards, …). Never read cookies, filled passwords, tokens,
+  or credentials, exfiltrate session data, or act on authenticated
   sites beyond the task.
 - Confirm with the user before a step that submits a form, makes a purchase,
   or takes another consequential action.
-- Login walls stay with the user: never enter passwords or MFA yourself. At a
-  login wall you may offer `import-login` (above) rather than only stopping.
+- At a login wall, stop and ask unless the user already told you to sign in.
+  When they ask, sign in with their password manager: click its fill
+  suggestion on the field, or its inline menu, and submit. Never type a
+  password from anywhere else, never read the filled value back with `eval`,
+  and never put it in output or a screenshot. MFA codes stay with the user.
+  You may also offer `import-login` (above).
 - Never install Browser Use, enable Chrome remote debugging, attach to the
   user's signed-in profile, or start a billed cloud browser without explicit
   consent. If consent is refused, report what you couldn't do rather than

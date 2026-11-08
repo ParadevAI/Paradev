@@ -286,17 +286,14 @@ export async function startBrowserBridge({
 	});
 
 	app.get("/panes", (req, res) => {
-		const workspaceId =
-			typeof req.query.workspaceId === "string"
-				? req.query.workspaceId
-				: undefined;
-		if (workspaceId) {
-			listPanes(workspaceId)
-				.then((panes) => res.json({ panes }))
-				.catch((err) => res.status(500).json({ error: errorMessage(err) }));
+		const workspaceId = req.query.workspaceId;
+		if (typeof workspaceId !== "string" || workspaceId.length === 0) {
+			res.status(400).json({ error: "workspaceId is required" });
 			return;
 		}
-		res.json({ panes: browserManager.listPanes() });
+		listPanes(workspaceId)
+			.then((panes) => res.json({ panes }))
+			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 	});
 
 	app.post("/open", (req, res) => {

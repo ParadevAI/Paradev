@@ -129,6 +129,18 @@ test("agents reach every browser pane, the user's own included", async () => {
 		body: JSON.stringify({ workspaceId: "ws-bridge", code: "document.title" }),
 	});
 	expect(await userEval.json()).toEqual({ result: "page data" });
+
+	const cdpClose = await new Promise<number>((resolve) => {
+		const url = new URL("/panes/user-pane/cdp", bridge.endpoint);
+		url.protocol = "ws:";
+		url.searchParams.set("workspaceId", "ws-bridge");
+		url.searchParams.set("token", bridge.secret);
+		const socket = new WebSocket(url);
+		socket.onclose = (event) => resolve(event.code);
+	});
+	expect(cdpClose).not.toBe(1008);
+
+	expect((await call("/panes")).status).toBe(400);
 });
 
 test("an agent copies the user's Chrome logins only after the user allows it", async () => {
@@ -222,7 +234,10 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 	};
 	const renderer = (request: PaneLayoutRendererRequest) => {
 		if (request.op.type === "wakeBrowser") {
-			if (request.op.paneId !== "unloaded-user-pane") {
+			const woken = { "unloaded-agent-pane": 905, "unloaded-user-pane": 906 }[
+				request.op.paneId
+			];
+			if (!woken) {
 				paneLayoutRequests.respond(
 					{
 						requestId: request.requestId,
@@ -232,8 +247,8 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 				);
 				return;
 			}
-			fakePane(905, BROWSER_PARTITION);
-			browserManager.register("unloaded-user-pane", 905, "ws-bridge");
+			fakePane(woken, BROWSER_PARTITION);
+			browserManager.register(request.op.paneId, woken, "ws-bridge");
 		}
 		paneLayoutRequests.respond(
 			{
@@ -274,12 +289,15 @@ test("an agent lists and uses panes after hidden-pane eviction unloaded them", a
 			["unloaded-user-pane", false],
 			["user-pane", true],
 		]);
-		expect(await (await evaluate("unloaded-user-pane")).json()).toEqual({
-			result: "page data",
-		});
+		for (const paneId of ["unloaded-agent-pane", "unloaded-user-pane"]) {
+			expect(await (await evaluate(paneId)).json()).toEqual({
+				result: "page data",
+			});
+		}
 	} finally {
 		paneLayoutRequests.off("request", renderer);
 		paneLayoutRequests.removeSubscriber(RENDERER);
+		browserManager.unregister("unloaded-agent-pane");
 		browserManager.unregister("unloaded-user-pane");
 	}
 });
