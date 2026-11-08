@@ -689,19 +689,15 @@ class TerminalRuntimeRegistryImpl {
 		if (!entry?.transport.sessionEnded || !runtime) return;
 		entry.transport._writeCoalescer?.flushSync();
 		const key = this.getEntryKey(entry.terminalId, entry.instanceId);
-		runtime.terminal.write("", () => {
+		const save = () => {
 			if (this.entries.get(key) !== entry || entry.runtime !== runtime) return;
 			if (!tryPersistRuntimeState(runtime)) {
 				this.warnPersistFailureOnce(terminalId);
 				return;
 			}
-			persistSeqAnchor(
-				terminalId,
-				runtime.gate.pending === 0
-					? getPersistableSeqAnchor(entry.transport)
-					: null,
-			);
-		});
+			persistSeqAnchor(terminalId, getPersistableSeqAnchor(entry.transport));
+		};
+		runtime.terminal.write("", () => runWhenParserIdle(runtime.gate, save));
 	}
 
 	endedCleanly(terminalId: string, instanceId?: string): boolean {

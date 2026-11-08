@@ -7,7 +7,7 @@ import {
 	spyOn,
 	test,
 } from "bun:test";
-
+import { createParserIdleGate, wrapWrite } from "./parser-idle-gate";
 import {
 	terminalMeasurementsChanged,
 	tryPersistRuntimeState,
@@ -320,19 +320,20 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
-	test("persistEndedSession saves the scrollback once the parser is idle", () => {
+	test("persistEndedSession saves the scrollback and anchor once the parser is idle", async () => {
 		const terminalId = "ended-on-screen";
+		const gate = createParserIdleGate();
 		let parsed: (() => void) | undefined;
 		const runtime = {
 			terminalId,
 			serializeAddon: { serialize: () => "output\r\n[terminal] exited" },
 			lastCols: 120,
 			lastRows: 32,
-			gate: { pending: 0 },
+			gate,
 			terminal: {
-				write: (_data: string, callback: () => void) => {
+				write: wrapWrite(gate, (_data, callback) => {
 					parsed = callback;
-				},
+				}),
 			},
 		};
 		const entry = {
@@ -363,12 +364,15 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 				false,
 			);
 			parsed?.();
+			await Promise.resolve();
 			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
 				"output\r\n[terminal] exited",
 			);
-			expect(fakeStorage.values.get(`terminal-seq:${terminalId}`)).toContain(
-				"42",
-			);
+			expect(
+				JSON.parse(
+					fakeStorage.values.get(`terminal-seq:${terminalId}`) ?? "null",
+				),
+			).toEqual({ epoch: "e1", seq: 42 });
 		} finally {
 			registryInternals.entries.delete(entryKey);
 			registryInternals.entryKeysByTerminalId.delete(terminalId);
@@ -377,8 +381,9 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
-	test("persistEndedSession skips the save when the pane is disposed first", () => {
+	test("persistEndedSession skips the save when the pane is disposed first", async () => {
 		const terminalId = "ended-then-closed";
+		const gate = createParserIdleGate();
 		let parsed: (() => void) | undefined;
 		const entry = {
 			terminalId,
@@ -388,11 +393,11 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 				serializeAddon: { serialize: () => "late output" },
 				lastCols: 120,
 				lastRows: 32,
-				gate: { pending: 0 },
+				gate,
 				terminal: {
-					write: (_data: string, callback: () => void) => {
+					write: wrapWrite(gate, (_data, callback) => {
 						parsed = callback;
-					},
+					}),
 				},
 			},
 			transport: { sessionEnded: true },
@@ -412,6 +417,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			terminalRuntimeRegistry.persistEndedSession(terminalId);
 			registryInternals.entries.delete(entryKey);
 			parsed?.();
+			await Promise.resolve();
 			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
 				false,
 			);
