@@ -8,7 +8,7 @@ import {
 	createUsageScanCaches,
 	type UsageScanCaches,
 } from "./entries";
-import type { UsageLogEntry } from "./parse";
+import { rememberLabel, type UsageLogEntry } from "./parse";
 import {
 	MemoryStateStore,
 	SqliteStateStore,
@@ -158,20 +158,54 @@ export const collectFromIndex: CollectUsage = async (cutoffMs, options) => {
 		openStore(),
 	);
 	const collected = await workerIndex.read(cutoffMs, WAIT_MS);
-	const cursorEntries: UsageLogEntry[] = [];
-	const cursor = collectCursorEntries(
-		cutoffMs,
-		cursorEntries,
-		collected.sessionLabels,
-		options.cwdCandidates ?? [],
-	).catch((error) => {
-		console.warn("[usage-index] Cursor usage unavailable", error);
-	});
+	const cursor = cursorUsage(cutoffMs, options.cwdCandidates ?? []);
 	// A hung keychain lookup must not time out the task: that would retire
-	// the worker that holds the warm index.
-	if (!(await waitAtMost(cursor, CURSOR_WAIT_MS))) {
-		console.warn("[usage-index] Cursor usage timed out");
+	// the worker that holds the warm index. The collection keeps running and
+	// a later request picks it up.
+	if (!(await waitAtMost(cursor.done, CURSOR_WAIT_MS))) {
+		console.warn("[usage-index] Cursor usage is slow; returning without it");
+		return collected;
 	}
-	for (const entry of cursorEntries) collected.entries.push(entry);
+	for (const entry of cursor.entries) collected.entries.push(entry);
+	for (const [id, label] of cursor.labels) {
+		rememberLabel(collected.sessionLabels, id, label);
+	}
 	return collected;
 };
+
+interface CursorUsage {
+	entries: UsageLogEntry[];
+	labels: Map<string, string>;
+	done: Promise<void>;
+}
+
+/** One collection per window and workspace set at a time. */
+const cursorInFlight = new Map<string, CursorUsage>();
+
+function cursorUsage(
+	cutoffMs: number,
+	cwdCandidates: readonly string[],
+): CursorUsage {
+	const key = `${cutoffMs}\u0000${cwdCandidates.join("\u0000")}`;
+	const running = cursorInFlight.get(key);
+	if (running) return running;
+	const usage: CursorUsage = {
+		entries: [],
+		labels: new Map(),
+		done: Promise.resolve(),
+	};
+	usage.done = collectCursorEntries(
+		cutoffMs,
+		usage.entries,
+		usage.labels,
+		cwdCandidates,
+	)
+		.catch((error) => {
+			console.warn("[usage-index] Cursor usage unavailable", error);
+		})
+		.finally(() => {
+			cursorInFlight.delete(key);
+		});
+	cursorInFlight.set(key, usage);
+	return usage;
+}

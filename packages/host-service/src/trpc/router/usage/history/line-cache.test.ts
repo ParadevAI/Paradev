@@ -170,4 +170,22 @@ describe("LineFileCache", () => {
 			9,
 		]);
 	});
+
+	test("parses again when the cutoff moves earlier than the saved prune", async () => {
+		const path = join(root, "cutoff-earlier.jsonl");
+		writeFileSync(path, "1\n5\n9\n");
+		const cache = new LineFileCache();
+		const create = (state: number[] = []): LineParser<number[], number[]> => ({
+			state,
+			onLine: (line) => state.push(Number(line)),
+			result: () => [...state],
+			prune: (cutoffMs) => {
+				const before = state.length;
+				state.splice(0, state.length, ...state.filter((t) => t >= cutoffMs));
+				return state.length < before;
+			},
+		});
+		expect(await cache.parse("k", path, create, 6)).toEqual([9]);
+		expect(await cache.parse("k", path, create, 0)).toEqual([1, 5, 9]);
+	});
 });

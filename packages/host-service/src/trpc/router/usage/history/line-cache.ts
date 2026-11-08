@@ -31,6 +31,9 @@ export const parseWholeFile: ParseLines = async (_kind, path, create) => {
 
 /** Bytes compared to tell an append from a rewrite of the same file. */
 const HEAD_BYTES = 64;
+/** Lines between prunes while reading, so a cold read of a long log never
+ * holds all its expired entries at once. */
+const PRUNE_EVERY_LINES = 50_000;
 
 interface FileCursor {
 	ino: number;
@@ -42,6 +45,8 @@ interface FileCursor {
 	partialTail: boolean;
 	/** Hex of the first HEAD_BYTES bytes when the cursor was saved. */
 	head: string;
+	/** Entries before this were pruned; an earlier cutoff reads the file again. */
+	prunedBefore: number;
 	state: unknown;
 }
 
@@ -83,9 +88,9 @@ export class LineFileCache {
 			}
 		}
 		const parser = create();
-		const read = await readLinesFrom(path, 0, (line) => parser.onLine(line));
+		const read = await readLinesFrom(path, 0, feed(parser, cutoffMs));
 		parser.prune?.(cutoffMs);
-		if (read) await this.save(key, path, info.ino, read, parser);
+		if (read) await this.save(key, path, info.ino, read, parser, cutoffMs);
 		else this.store.delete(key);
 		return parser.result();
 	};
@@ -100,9 +105,12 @@ export class LineFileCache {
 		create: CreateLineParser<R, S>,
 		cutoffMs: number,
 	): Promise<{ value: R } | null> {
+		if (cutoffMs < (cursor.prunedBefore ?? 0)) return null;
 		if (info.size === cursor.size && info.mtimeMs === cursor.mtimeMs) {
 			const parser = create(cursor.state as S);
-			if (parser.prune?.(cutoffMs)) this.store.set(key, cursor);
+			if (parser.prune?.(cutoffMs)) {
+				this.store.set(key, { ...cursor, prunedBefore: cutoffMs });
+			}
 			return { value: parser.result() };
 		}
 		if (
@@ -113,12 +121,10 @@ export class LineFileCache {
 			return null;
 		}
 		const parser = create(cursor.state as S);
-		const read = await readLinesFrom(path, cursor.end, (line) =>
-			parser.onLine(line),
-		);
+		const read = await readLinesFrom(path, cursor.end, feed(parser, cutoffMs));
 		parser.prune?.(cutoffMs);
 		// A failed read leaves the state ahead of the saved offset.
-		if (read) await this.save(key, path, info.ino, read, parser);
+		if (read) await this.save(key, path, info.ino, read, parser, cutoffMs);
 		else this.store.delete(key);
 		return { value: parser.result() };
 	}
@@ -129,6 +135,7 @@ export class LineFileCache {
 		readIno: number,
 		read: { end: number; partialTail: boolean; size: number },
 		parser: LineParser<unknown>,
+		prunedBefore: number,
 	): Promise<void> {
 		try {
 			const [{ ino, mtimeMs, size }, head] = await Promise.all([
@@ -149,6 +156,7 @@ export class LineFileCache {
 				end: read.end,
 				partialTail: read.partialTail,
 				head,
+				prunedBefore,
 				state: parser.state,
 			};
 			this.store.set(key, cursor);
@@ -156,6 +164,17 @@ export class LineFileCache {
 			this.store.delete(key);
 		}
 	}
+}
+
+function feed(
+	parser: LineParser<unknown>,
+	cutoffMs: number,
+): (line: string) => void {
+	let lines = 0;
+	return (line) => {
+		parser.onLine(line);
+		if (++lines % PRUNE_EVERY_LINES === 0) parser.prune?.(cutoffMs);
+	};
 }
 
 async function readHead(path: string, bytes: number): Promise<string> {

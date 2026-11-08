@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { after, test } from "node:test";
 import Database from "better-sqlite3";
 import { collectDevinEntries } from "./devin.ts";
+import { collectOpencodeDbEntries } from "./opencode-db.ts";
 import type { UsageLogEntry } from "./parse.ts";
 import { readAppendOnly } from "./sqlite-tail.ts";
 import { MemoryStateStore } from "./usage-store.ts";
@@ -128,4 +129,84 @@ test("a malformed Devin message is skipped, not the whole read", async () => {
 	const out: UsageLogEntry[] = [];
 	assert.equal(await collectDevinEntries(0, out, new Map(), path), 1);
 	assert.equal(out.length, 2);
+});
+
+test("an OpenCode message with a malformed field is skipped, not the whole read", () => {
+	const path = join(root, "opencode.db");
+	const db = new Database(path);
+	db.exec(`CREATE TABLE session (id TEXT PRIMARY KEY, directory TEXT, title TEXT);
+		CREATE TABLE message (id TEXT PRIMARY KEY, session_id TEXT, time_created INTEGER, time_updated INTEGER, data TEXT)`);
+	db.prepare("INSERT INTO session VALUES ('s', '/p', 'T')").run();
+	const now = Date.now();
+	const data = (tokens: unknown) =>
+		JSON.stringify({
+			role: "assistant",
+			modelID: "m",
+			time: { created: now, completed: now },
+			tokens,
+		});
+	const insert = db.prepare("INSERT INTO message VALUES (?, 's', ?, ?, ?)");
+	insert.run("a", now, now, data({ input: 3, output: 1 }));
+	insert.run("b", now, now, data("invalid"));
+	db.close();
+
+	const out: UsageLogEntry[] = [];
+	collectOpencodeDbEntries(path, 0, out);
+	assert.deepEqual(
+		out.map((e) => e.uncachedInput),
+		[3],
+	);
+});
+
+test("a table with a large rowid gap is read in a few batches", async () => {
+	const { db, path } = appendOnlyDb("sparse", 0);
+	db.prepare("INSERT INTO t (id, ts) VALUES (1, ?)").run(Date.now());
+	db.prepare("INSERT INTO t (id, ts) VALUES (50000000, ?)").run(Date.now());
+	let batches = 0;
+	const entries = await readAppendOnly({
+		db,
+		dbPath: path,
+		table: "t",
+		stateKey: "t",
+		cutoffMs: 0,
+		readRows: (after, upTo, out) => {
+			batches++;
+			for (const row of db
+				.prepare("SELECT id, ts FROM t WHERE id > ? AND id <= ?")
+				.all(after, upTo) as Array<{ id: number; ts: number }>) {
+				out.push(entry(row.ts, String(row.id)));
+			}
+		},
+	});
+	assert.equal(entries.length, 2);
+	assert.equal(batches, 1);
+	db.close();
+});
+
+test("a session cwd cleared after its rows were read is applied on the next read", async () => {
+	const path = join(root, "devin-cwd.db");
+	const db = new Database(path);
+	db.exec(`CREATE TABLE sessions (id TEXT PRIMARY KEY, working_directory TEXT, model TEXT, title TEXT);
+		CREATE TABLE message_nodes (row_id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, chat_message TEXT, created_at INTEGER)`);
+	db.prepare("INSERT INTO sessions VALUES ('s', '/p', 'm', 'T')").run();
+	db.prepare(
+		"INSERT INTO message_nodes (session_id, chat_message, created_at) VALUES ('s', ?, ?)",
+	).run(
+		JSON.stringify({
+			message_id: "a",
+			role: "assistant",
+			metadata: { request_id: "a", metrics: { input_tokens: 1 } },
+		}),
+		Math.floor(Date.now() / 1000),
+	);
+	const store = new MemoryStateStore();
+	const read = async () => {
+		const out: UsageLogEntry[] = [];
+		await collectDevinEntries(0, out, new Map(), path, store);
+		return out.map((e) => e.cwd);
+	};
+	assert.deepEqual(await read(), ["/p"]);
+	db.prepare("UPDATE sessions SET working_directory = NULL").run();
+	assert.deepEqual(await read(), [null]);
+	db.close();
 });

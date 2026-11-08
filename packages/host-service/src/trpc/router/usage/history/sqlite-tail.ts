@@ -109,6 +109,13 @@ export async function readAppendOnly({
 		entries: [],
 	};
 	if (top > tail.lastRowId) {
+		// Counted before the batches, with the max: a row deleted mid-read
+		// then shows up as a count drop on the next scan.
+		const rowCount = (countUpTo.get(top) as { n: number }).n;
+		const batchEnd = db.prepare(
+			`SELECT max(rowid) AS upTo FROM (SELECT rowid FROM ${table}
+			 WHERE rowid > ? AND rowid <= ? ORDER BY rowid LIMIT ${BATCH_ROWS})`,
+		);
 		// Applied only once every batch is read: a read that throws halfway
 		// must not leave rows in the state that the retry reads again.
 		const seen = tail.seen;
@@ -121,9 +128,12 @@ export async function readAppendOnly({
 				added.set(key, now);
 			},
 		};
-		for (let after = tail.lastRowId; after < top; after += BATCH_ROWS) {
-			const upTo = Math.min(top, after + BATCH_ROWS);
+		for (let after = tail.lastRowId; after < top; ) {
+			// Batches end on existing rowids, so gaps cost nothing.
+			const upTo = (batchEnd.get(after, top) as { upTo: number | null }).upTo;
+			if (upTo === null) break;
 			db.transaction(() => readRows(after, upTo, entries, keys))();
+			after = upTo;
 			await new Promise((resolve) => setImmediate(resolve));
 		}
 		for (const entry of entries) {
@@ -131,7 +141,7 @@ export async function readAppendOnly({
 		}
 		for (const [key, at] of added) seen[key] = at;
 		tail.lastRowId = top;
-		tail.rowCount = (countUpTo.get(top) as { n: number }).n;
+		tail.rowCount = rowCount;
 	}
 	if (cutoffMs > tail.fromMs) {
 		tail.entries = tail.entries.filter(
@@ -153,19 +163,21 @@ function sessionColumn(
 	table: "session" | "sessions",
 	column: "summary" | "title" | "cwd" | "working_directory",
 	sessionIds: readonly string[],
-): Map<string, string> {
-	const values = new Map<string, string>();
+): Map<string, string | null> {
+	const values = new Map<string, string | null>();
 	if (sessionIds.length === 0) return values;
 	const rows = db
 		.prepare(
-			`SELECT id, substr(${column}, 1, ${MAX_SQL_TEXT_LENGTH}) AS value
+			// Titles are capped; a path is read whole, since a cut one would
+			// match no project.
+			`SELECT id, ${column === "summary" || column === "title" ? `substr(${column}, 1, ${MAX_SQL_TEXT_LENGTH})` : column} AS value
 			 FROM ${table} WHERE id IN (SELECT value FROM json_each(?))`,
 		)
 		.all(JSON.stringify(sessionIds)) as Array<{
 		id: string;
 		value: string | null;
 	}>;
-	for (const { id, value } of rows) if (value) values.set(id, value);
+	for (const { id, value } of rows) values.set(id, value || null);
 	return values;
 }
 
@@ -199,7 +211,10 @@ export function appendWithSessionCwd(
 ): void {
 	const cwdById = sessionColumn(db, table, cwdColumn, sessionIdsOf(entries));
 	for (const entry of entries) {
-		const cwd = cwdById.get(entry.sessionId) ?? entry.cwd;
+		// A session that still exists decides the cwd, cleared or not.
+		const cwd = cwdById.has(entry.sessionId)
+			? (cwdById.get(entry.sessionId) ?? null)
+			: entry.cwd;
 		out.push(cwd === entry.cwd ? entry : { ...entry, cwd });
 	}
 }

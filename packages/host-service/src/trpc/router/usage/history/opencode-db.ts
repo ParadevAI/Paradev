@@ -56,10 +56,10 @@ export function collectOpencodeDbEntries(
 			            json_object(
 			              'role', 'assistant',
 			              'modelID', json_extract(m.data, '$.modelID'),
-			              'time', json(json_extract(m.data, '$.time')),
+			              'time', m.data -> '$.time',
 			              'path', json_object('cwd', json_extract(m.data, '$.path.cwd')),
 			              'cost', json_extract(m.data, '$.cost'),
-			              'tokens', json(json_extract(m.data, '$.tokens'))
+			              'tokens', m.data -> '$.tokens'
 			            )
 			          END
 			        END AS data,
