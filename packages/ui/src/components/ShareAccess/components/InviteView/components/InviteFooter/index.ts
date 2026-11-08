@@ -1,1 +1,0 @@
-export { InviteFooter } from "./InviteFooter";

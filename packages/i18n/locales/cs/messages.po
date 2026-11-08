@@ -1168,9 +1168,6 @@ msgstr "{name}: {monthly} za uživatele/měsíc"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za uživatele/měsíc, nebo {yearly} při roční fakturaci"
 
-msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
-msgstr "{newPeople, plural, one {Tím přibude # placené místo ({price}).} few {Tím přibudou # placená místa ({price}).} many {Tím přibude # placeného místa ({price}).} other {Tím přibude # placených míst ({price}).}}"
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Zadejte alespoň jednu osobu, nebo zvolte {choice}.} sender {Zadejte alespoň jednoho odesílatele, nebo zvolte {choice}.} other {Zadejte alespoň jednu položku, nebo zvolte {choice}.}}"
 
@@ -1362,12 +1359,6 @@ msgstr "{toolName} přerušeno"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
-
-msgid "{total}/month"
-msgstr "{total}/měs."
-
-msgid "{total}/year"
-msgstr "{total}/rok"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} few {GitHub issues} many {GitHub issues} other {GitHub issues}}"
@@ -7599,9 +7590,6 @@ msgstr "např. Moje cloudové kontroly"
 msgid "e.g. plan-budget"
 msgstr "např. plan-budget"
 
-msgid "Each adds a paid seat."
-msgstr "Každý z nich přidá placené místo."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Každá příloha může mít nejvýše {0} MB."
@@ -9338,9 +9326,6 @@ msgstr "Stáhnout aplikaci pro iPhone a iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
-
-msgid "Gets an invite to join {organizationName} and a paid seat"
-msgstr "Dostane pozvánku do {organizationName} a placené místo"
 
 msgid "Getting Work Done"
 msgstr "Pracovní"
@@ -12254,9 +12239,6 @@ msgstr "Nové zprávy"
 
 msgid "New page"
 msgstr "Nová stránka"
-
-msgid "New people get an email invite to {organizationName} and see this once they join."
-msgstr "Noví lidé dostanou e-mailem pozvánku do {organizationName} a uvidí to, jakmile se připojí."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Noví lidé dostanou e-mailem pozvánku do {organizationName}. Uvidí to, jakmile se připojí."

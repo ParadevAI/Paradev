@@ -34,10 +34,8 @@ import type {
 	ShareGrantee,
 	ShareGranteeRef,
 	ShareRoleOption,
-	ShareSeatCost,
 	StagedPick,
 } from "../../types";
-import { InviteFooter } from "./components/InviteFooter";
 import { InviteSuggestion } from "./components/InviteSuggestion";
 import { StagedChip } from "./components/StagedChip";
 
@@ -47,8 +45,6 @@ interface InviteViewProps {
 	ownerId: string | null;
 	organizationName: string;
 	inviteNew: InviteNewMode;
-	/** Set on paid plans, where each new person adds a billed seat. `null` when the price is unknown. */
-	seatCost?: ShareSeatCost | null;
 	roles: ShareRoleOption[];
 	defaultRole: string;
 	/** What the people added get, when there is only one role. */
@@ -67,7 +63,6 @@ export function InviteView({
 	ownerId,
 	organizationName,
 	inviteNew,
-	seatCost,
 	roles,
 	defaultRole,
 	roleNote,
@@ -239,7 +234,7 @@ export function InviteView({
 		}
 	};
 
-	const newPeople = staged.filter((p) => p.kind === "email").length;
+	const newPeople = staged.some((p) => p.kind === "email");
 
 	return (
 		// biome-ignore lint/a11y/noStaticElementInteractions: Escape from any control in the view goes back
@@ -363,18 +358,20 @@ export function InviteView({
 							item={item}
 							active={index === highlighted}
 							organizationName={organizationName}
-							paidSeat={seatCost !== undefined}
 							inviteError={inviteError}
 							browsing={!query.trim()}
 							onPick={() => pick(item)}
 						/>
 					))}
 				</div>
-				<InviteFooter
-					organizationName={organizationName}
-					newPeople={newPeople}
-					seatCost={seatCost}
-				/>
+				{newPeople ? (
+					<p className="-mx-3 border-t px-3 py-2 text-muted-foreground text-xs">
+						<Trans>
+							New people get an email invite to {organizationName}. They see
+							this once they join.
+						</Trans>
+					</p>
+				) : null}
 			</div>
 		</div>
 	);

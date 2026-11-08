@@ -1168,9 +1168,6 @@ msgstr "{name}: {monthly} por usuário/mês"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} por usuário/mês, ou {yearly} com cobrança anual"
 
-msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
-msgstr "{newPeople, plural, one {Isso adiciona um assento pago ({price}).} other {Isso adiciona # assentos pagos ({price}).}}"
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Especifique pelo menos uma pessoa, ou escolha {choice}.} sender {Especifique pelo menos um remetente, ou escolha {choice}.} other {Especifique pelo menos um item, ou escolha {choice}.}}"
 
@@ -1362,12 +1359,6 @@ msgstr "{toolName} interrompida"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {A verificação passou} other {Todas as # verificações passaram}}"
-
-msgid "{total}/month"
-msgstr "{total}/mês"
-
-msgid "{total}/year"
-msgstr "{total}/ano"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue do GitHub} other {issues do GitHub}}"
@@ -7599,9 +7590,6 @@ msgstr "ex.: Minhas revisões na nuvem"
 msgid "e.g. plan-budget"
 msgstr "ex.: plan-budget"
 
-msgid "Each adds a paid seat."
-msgstr "Cada uma adiciona um assento pago."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Cada anexo tem no máximo {0} MB."
@@ -9338,9 +9326,6 @@ msgstr "Baixe o app para iPhone e iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Receberá um convite para entrar em {organizationName}"
-
-msgid "Gets an invite to join {organizationName} and a paid seat"
-msgstr "Receberá um convite para entrar em {organizationName} e um assento pago"
 
 msgid "Getting Work Done"
 msgstr "Para trabalhar"
@@ -12254,9 +12239,6 @@ msgstr "Novas mensagens"
 
 msgid "New page"
 msgstr "Nova página"
-
-msgid "New people get an email invite to {organizationName} and see this once they join."
-msgstr "Pessoas novas recebem um convite por e-mail para entrar em {organizationName} e verão isto quando entrarem."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Pessoas novas recebem um convite por e-mail para entrar em {organizationName}. Elas verão isto quando entrarem."

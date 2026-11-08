@@ -1168,9 +1168,6 @@ msgstr "{name}: {monthly} mỗi người dùng/tháng"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} mỗi người dùng/tháng, hoặc {yearly} khi thanh toán theo năm"
 
-msgid "{newPeople, plural, one {This adds a paid seat ({price}).} other {This adds # paid seats ({price}).}}"
-msgstr "{newPeople, plural, one {Việc này thêm # người dùng trả phí ({price}).} other {Việc này thêm # người dùng trả phí ({price}).}}"
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Hãy chỉ định ít nhất một người, hoặc chọn {choice}.} sender {Hãy chỉ định ít nhất một người gửi, hoặc chọn {choice}.} other {Hãy chỉ định ít nhất một mục, hoặc chọn {choice}.}}"
 
@@ -1362,12 +1359,6 @@ msgstr "{toolName} bị gián đoạn"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Cả # check đều đạt} other {Cả # check đều đạt}}"
-
-msgid "{total}/month"
-msgstr "{total}/tháng"
-
-msgid "{total}/year"
-msgstr "{total}/năm"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issue GitHub}}"
@@ -7599,9 +7590,6 @@ msgstr "vd: Đánh giá cloud của tôi"
 msgid "e.g. plan-budget"
 msgstr "vd: plan-budget"
 
-msgid "Each adds a paid seat."
-msgstr "Mỗi người là một người dùng trả phí."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Mỗi tệp đính kèm tối đa {0} MB."
@@ -9338,9 +9326,6 @@ msgstr "Tải ứng dụng cho iPhone và iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Sẽ nhận lời mời tham gia {organizationName}"
-
-msgid "Gets an invite to join {organizationName} and a paid seat"
-msgstr "Sẽ nhận lời mời tham gia {organizationName} và tính là một người dùng trả phí"
 
 msgid "Getting Work Done"
 msgstr "Làm việc"
@@ -12254,9 +12239,6 @@ msgstr "Tin nhắn mới"
 
 msgid "New page"
 msgstr "Trang mới"
-
-msgid "New people get an email invite to {organizationName} and see this once they join."
-msgstr "Người mới sẽ nhận email mời tham gia {organizationName} và thấy nội dung này sau khi tham gia."
 
 msgid "New people get an email invite to {organizationName}. They see this once they join."
 msgstr "Người mới sẽ nhận email mời tham gia {organizationName}. Họ sẽ thấy nội dung này sau khi tham gia."

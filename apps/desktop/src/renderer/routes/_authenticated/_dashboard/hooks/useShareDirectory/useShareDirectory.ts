@@ -1,15 +1,10 @@
 import { getInvitableRoles } from "@superset/shared/auth";
-import { isPaidPlanTier, PLAN_PRICE_CURRENCY } from "@superset/shared/billing";
-import {
-	type InviteNewMode,
-	type ShareSeatCost,
-	shareDirectory,
-} from "@superset/ui/share-access";
+import { isPaidPlanTier } from "@superset/shared/billing";
+import { type InviteNewMode, shareDirectory } from "@superset/ui/share-access";
 import { useCallback, useMemo } from "react";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
-import { usePlanCatalog } from "renderer/hooks/usePlanCatalog";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOrganizationRole } from "renderer/routes/_authenticated/hooks/useOrganizationRole";
@@ -28,8 +23,7 @@ export function useShareDirectory() {
 	});
 	const { data: teams } = cloudTrpc.organization.listTeams.useQuery();
 	const role = useOrganizationRole();
-	const { plan, isReady, activePlan } = useCurrentPlan();
-	const { data: catalog } = usePlanCatalog();
+	const { plan, isReady } = useCurrentPlan();
 	const { gateFeature } = usePaywall();
 	const utils = cloudTrpc.useUtils();
 
@@ -44,21 +38,6 @@ export function useShareDirectory() {
 			: role && getInvitableRoles(role).includes("member")
 				? "allowed"
 				: "admins-only";
-
-	const seatCost = useMemo((): ShareSeatCost | null | undefined => {
-		if (inviteNew !== "allowed" || !isPaidPlanTier(plan)) return undefined;
-		if (plan === "enterprise") return null;
-		const seatPlan = catalog
-			?.flatMap((family) => [family.monthly, family.yearly, ...family.legacy])
-			.find((candidate) => candidate?.id === activePlan?.autumnPlanId);
-		return seatPlan
-			? {
-					amount: seatPlan.seatPrice,
-					currency: PLAN_PRICE_CURRENCY,
-					interval: seatPlan.interval,
-				}
-			: null;
-	}, [inviteNew, plan, catalog, activePlan?.autumnPlanId]);
 
 	const onUpgrade = useCallback(() => {
 		gateFeature(GATED_FEATURES.INVITE_MEMBERS, () => {});
@@ -94,7 +73,6 @@ export function useShareDirectory() {
 		organizationLogo:
 			organizations?.find((org) => org.id === organizationId)?.logo ?? null,
 		inviteNew,
-		seatCost,
 		onUpgrade,
 		inviteEmails,
 	};
