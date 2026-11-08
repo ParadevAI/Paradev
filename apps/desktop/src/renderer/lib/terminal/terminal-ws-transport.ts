@@ -218,6 +218,9 @@ export interface TerminalTransport {
 	 * on every attach: a reconnecting socket starts out assumed visible.
 	 */
 	_visible: boolean;
+	/** Hidden with its relay socket still open. If that socket drops, it parks
+	 * instead of redialing, so hidden panes stay out of reconnect storms. */
+	_backgrounded: boolean;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -454,6 +457,7 @@ export function createTransport(
 		_resumeListener: null,
 		_disposeFocusListeners: null,
 		_visible: true,
+		_backgrounded: false,
 	};
 }
 
@@ -474,6 +478,10 @@ function forceReconnect(transport: TerminalTransport) {
 	if (transport._terminated) return;
 	const socket = transport._socket;
 	if (!socket) return;
+	if (transport._backgrounded) {
+		park(transport);
+		return;
+	}
 	transport._diagnosisLogged = false;
 	transport.lastDiagnosis = null;
 	resetAttachRetryState(transport._attachRetry);
@@ -609,6 +617,7 @@ export function connect(
 	wsUrl: string,
 ) {
 	const base = stripToken(wsUrl);
+	transport._backgrounded = false;
 
 	// Idempotent: a live socket already pointed at this endpoint just needs the
 	// latest token-bearing URL refreshed (the socket re-signs per dial anyway) —
@@ -924,6 +933,10 @@ function attachSocketListeners(
 		// Render whatever arrived before the close instead of holding it for a
 		// frame that may never come (e.g. hidden window).
 		transport._writeCoalescer?.flushSync();
+		if (transport._backgrounded) {
+			park(transport);
+			return;
+		}
 		// A connection that delivered bytes but never a `synced` was a pre-seq
 		// host (downgrade skew): those bytes advanced the xterm without
 		// advancing the anchor, so the anchor is poisoned — drop it rather
@@ -1039,6 +1052,7 @@ function attachSocketListeners(
  * bytes (or reanchors past the 2 MB ring), so parking loses nothing.
  */
 export function park(transport: TerminalTransport) {
+	transport._backgrounded = false;
 	// A pre-seq host (bytes delivered, `synced` never seen) cannot replay a
 	// parked gap: it ignores `?seq=` and `replay=0` suppresses its legacy
 	// FIFO replay, so closing this socket would silently drop everything
@@ -1080,6 +1094,19 @@ export function park(transport: TerminalTransport) {
 	if (transport.connectionState !== "disconnected") {
 		setConnectionState(transport, "disconnected");
 	}
+}
+
+/** Like park(), but an open relay socket stays open for the next connect(). */
+export function background(transport: TerminalTransport) {
+	if (
+		transport._terminated ||
+		transport.connectionState !== "open" ||
+		!isRelayHostUrl(transport.currentUrl)
+	) {
+		park(transport);
+		return;
+	}
+	transport._backgrounded = true;
 }
 
 /**
