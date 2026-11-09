@@ -14,6 +14,7 @@ import {
 	emitProjectChanged,
 	getLiveProjectAtPath,
 	getLocalProject,
+	getProjectIncludingDeleted,
 	toProjectSnapshot,
 	updateLocalProject,
 } from "../../../projects/local-project-store";
@@ -223,13 +224,7 @@ export const projectRouter = router({
 	get: protectedProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			const row = ctx.db
-				.select()
-				.from(projects)
-				.where(
-					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
-				)
-				.get();
+			const row = getLocalProject(ctx.db, input.projectId);
 			if (!row) return null;
 			return {
 				id: row.id,
@@ -325,26 +320,19 @@ export const projectRouter = router({
 		)
 		.mutation(({ ctx, input }) => {
 			const worktreeBaseDir = normalizeWorktreeBaseDir(input.path);
+			if (!getLocalProject(ctx.db, input.projectId)) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Project is not set up on this host",
+				});
+			}
 			ctx.db
 				.update(projects)
 				.set({ worktreeBaseDir })
 				.where(eq(projects.id, input.projectId))
 				.run();
 
-			const project = ctx.db.query.projects
-				.findFirst({ where: eq(projects.id, input.projectId) })
-				.sync();
-			if (!project) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Project is not set up on this host",
-				});
-			}
-
-			return {
-				id: project.id,
-				worktreeBaseDir: project.worktreeBaseDir ?? null,
-			};
+			return { id: input.projectId, worktreeBaseDir };
 		}),
 
 	/**
@@ -370,7 +358,9 @@ export const projectRouter = router({
 			const updated = ctx.db
 				.update(projects)
 				.set({ namingInstructions })
-				.where(eq(projects.id, input.projectId))
+				.where(
+					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
+				)
 				.returning({ id: projects.id })
 				.get();
 			if (!updated) {
@@ -402,7 +392,9 @@ export const projectRouter = router({
 			const updated = ctx.db
 				.update(projects)
 				.set({ sparseCheckoutPaths: serializeSparseCheckoutPaths(paths) })
-				.where(eq(projects.id, input.projectId))
+				.where(
+					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
+				)
 				.returning({ id: projects.id })
 				.get();
 			if (!updated) {
@@ -433,7 +425,9 @@ export const projectRouter = router({
 					branchPrefixMode: input.mode,
 					branchPrefixCustom: input.customPrefix ?? null,
 				})
-				.where(eq(projects.id, input.projectId))
+				.where(
+					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
+				)
 				.returning({ id: projects.id })
 				.get();
 			if (!updated) {
@@ -707,11 +701,7 @@ export const projectRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			restoreProject(ctx, input.projectId);
-			const existing = ctx.db
-				.select({ id: projects.id, repoPath: projects.repoPath })
-				.from(projects)
-				.where(eq(projects.id, input.projectId))
-				.get();
+			const existing = getProjectIncludingDeleted(ctx.db, input.projectId);
 
 			// Projects are host-owned, so a local row is this host's only
 			// self-contained source of repo coordinates. Without one the
