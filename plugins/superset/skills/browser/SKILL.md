@@ -65,12 +65,13 @@ Every pane has a stable `paneId`, scoped to its workspace: pass the same
 
 ```bash
 superset browser list --workspace <id> --json
-superset browser open --workspace <id> --url https://example.com --json
-superset browser open --workspace <id> --url http://localhost:3000 --target new-tab --json
+superset browser open --workspace <id> --url https://example.com --target new-tab --json
+superset browser open --workspace <id> --url http://localhost:3000 --json
 ```
 
 `--target new-tab` opens a fresh tab and focuses it; the default `current-tab`
-reuses the active browser pane. Opening needs the workspace visible in the
+can replace the active browser pane, which may be the page the user is on, so
+use `new-tab` unless the task is about that page. Opening needs the workspace visible in the
 desktop app (the renderer creates the pane), so if it times out, ask the user to
 open the workspace.
 
@@ -109,8 +110,8 @@ rejected with a clear error.
 
 `import-login` copies a system browser's cookies into the pane so it's signed in
 to the sites the user already uses. It imports every cookie that profile has on
-disk, not just the one site, into the browser every pane shares, so say that
-when offering and run it only with the user's go-ahead. The desktop app also
+disk, not just the one site, into the browser every pane shares, and it
+replaces the logins already there for the same sites, so say both when offering and run it only with the user's go-ahead. The desktop app also
 asks the user to allow each import. Offering it is how most
 users discover it, so reach for it in two cases:
 
@@ -246,8 +247,10 @@ before publishing.
 - Confirm with the user before a step that submits a form, makes a purchase,
   or takes another consequential action.
 - At a login wall, stop and ask unless the user already told you to sign in.
-  When they ask, sign in with their password manager: click its fill
-  suggestion on the field, or its inline menu, and submit. Never type a
+  When they ask, sign in with their password manager, and only after checking
+  that the page's origin is the site the user named (`location.origin`); a
+  look-alike or unexpected subdomain gets the user's call, not a fill. Click
+  its fill suggestion on the field, or its inline menu, and submit. Never type a
   password from anywhere else, never read the filled value back with `eval`,
   and never put it in output or a screenshot. MFA codes stay with the user.
   You may also offer `import-login` (above).

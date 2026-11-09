@@ -287,6 +287,7 @@ class BrowserManager extends EventEmitter {
 	private focusListeners = new Map<string, () => void>();
 	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	private requestedPanes = new Set<string>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
 	// un-throttled — see acquireAgentWake. The entry object's identity ties
@@ -349,6 +350,7 @@ class BrowserManager extends EventEmitter {
 	}
 
 	unregister(paneId: string): void {
+		this.requestedPanes.delete(paneId);
 		for (const map of [
 			this.consoleListeners,
 			this.contextMenuListeners,
@@ -496,7 +498,13 @@ class BrowserManager extends EventEmitter {
 	}
 
 	resolveOpenRequest(requestId: string, paneId: string): void {
+		this.requestedPanes.add(paneId);
 		this.emit(`open-resolved:${requestId}`, paneId);
+	}
+
+	/** Made for a `requestOpen`, so it is not the pane an extension's new tab is waiting for. */
+	isRequestedPane(paneId: string): boolean {
+		return this.requestedPanes.has(paneId);
 	}
 
 	markUse(paneId: string): void {
