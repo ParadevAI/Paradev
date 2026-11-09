@@ -36,6 +36,9 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hooks/usePageFavorites";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
+import { PullRequestMergeFlowDialog } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMergeFlowDialog";
+import { PullRequestStackPosition } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPosition";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
@@ -238,6 +241,21 @@ export function WorkspaceActivityMenu({
 		target: currentPrTarget,
 		onRefresh: refreshFlowState,
 	});
+	const refreshWorkspacePullRequest =
+		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
+	const mergeFlow = usePullRequestMergeFlow({
+		target: currentPrTarget,
+		onMerged: async () => {
+			try {
+				await refreshWorkspacePullRequest.mutateAsync({
+					workspaceIds: [workspaceId],
+				});
+			} catch (error) {
+				console.warn("Failed to refresh PR state after merge", error);
+			}
+			refreshFlowState();
+		},
+	});
 
 	const pagePolicy = usePagePolicy("4-tier");
 	const rightPane = useRightPaneLinkTarget();
@@ -355,8 +373,11 @@ export function WorkspaceActivityMenu({
 						{...shipMenuProps}
 						pullRequest={{
 							target: currentPrTarget,
+							flow: mergeFlow,
 							canMarkReady: currentPrState === "draft",
 							canMerge: currentPr.state === "open" && !currentPr.isDraft,
+							isQueued:
+								currentPr.state === "queued" || mergeFlow.queued !== null,
 							isMarkingReady: prActions.isMarkingReady,
 							isMerging: prActions.isMerging,
 							onMarkReady: prActions.markReady,
@@ -788,6 +809,12 @@ export function WorkspaceActivityMenu({
 								<span className="h-3.5 w-px shrink-0 bg-border" />
 								<PRIcon state={currentPrState} className="size-3.5 shrink-0" />
 								<span className="tabular-nums">#{currentPr.number}</span>
+								{mergeFlow.stack ? (
+									<PullRequestStackPosition
+										position={mergeFlow.stack.currentPosition}
+										size={mergeFlow.stack.layers.length}
+									/>
+								) : null}
 								{currentPrChecks && showsChecks(currentPrState) && (
 									<PRStatusIndicators checks={currentPrChecks} />
 								)}
@@ -847,6 +874,12 @@ export function WorkspaceActivityMenu({
 			{asideNode &&
 				dockedMounted &&
 				createPortal(renderPanel("docked"), asideNode)}
+			{currentPr ? (
+				<PullRequestMergeFlowDialog
+					flow={mergeFlow}
+					prNumber={currentPr.number}
+				/>
+			) : null}
 		</Popover>
 	);
 }

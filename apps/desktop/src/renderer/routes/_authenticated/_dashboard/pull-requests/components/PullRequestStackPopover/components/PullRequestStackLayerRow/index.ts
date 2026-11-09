@@ -1,1 +1,4 @@
-export { PullRequestStackLayerRow } from "./PullRequestStackLayerRow";
+export {
+	PullRequestStackLayerRow,
+	type StackLayerStatusTone,
+} from "./PullRequestStackLayerRow";

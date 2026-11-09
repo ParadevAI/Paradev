@@ -46,14 +46,19 @@ mock.module(
 	`${root}/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation`,
 	() => ({ useReviewCommentNavigation: () => mock() }),
 );
-mock.module(`${root}/pull-requests/hooks/usePullRequestStack`, () => ({
-	PULL_REQUEST_STACK_QUERY_KEY_PREFIX: ["pull-request-stack"],
-	usePullRequestStack: () => ({
+mock.module(`${root}/pull-requests/hooks/usePullRequestMergeFlow`, () => ({
+	usePullRequestMergeFlow: () => ({
 		stack: null,
-		isLoading: false,
-		isIncomplete: false,
-		refetch: mock(),
+		stackQuery: {
+			stack: null,
+			isLoading: false,
+			isIncomplete: false,
+			refetch: mock(),
+		},
 	}),
+}));
+mock.module(`${root}/pull-requests/hooks/useStackRestack`, () => ({
+	useStackRestack: () => null,
 }));
 mock.module(`${root}/pull-requests/hooks/useRefreshPullRequest`, () => ({
 	useRefreshPullRequest: () => ({ refresh: () => {}, isRefreshing: false }),

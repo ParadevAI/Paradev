@@ -4,15 +4,24 @@ import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useState } from "react";
+import type { PullRequestMergeFlow } from "../../hooks/usePullRequestMergeFlow";
 import type {
 	PullRequestStack,
 	PullRequestStackLayer,
 } from "../../hooks/usePullRequestStack";
 import { usePullRequestStackCopy } from "../../hooks/usePullRequestStackCopy";
-import { assessPullRequestStack } from "../../utils/assessPullRequestStack";
+import type { StackRestackAction } from "../../hooks/useStackRestack";
+import {
+	type StackLayerIssue,
+	stackLayerIssue,
+} from "../../utils/assessPullRequestStack";
+import { PullRequestStackPosition } from "../PullRequestStackPosition";
 import { PullRequestStackBaseRow } from "./components/PullRequestStackBaseRow";
-import { PullRequestStackLayerRow } from "./components/PullRequestStackLayerRow";
-import { PullRequestStackPosition } from "./components/PullRequestStackPosition";
+import { PullRequestStackCallout } from "./components/PullRequestStackCallout";
+import {
+	PullRequestStackLayerRow,
+	type StackLayerStatusTone,
+} from "./components/PullRequestStackLayerRow";
 import { PullRequestStackVerdict } from "./components/PullRequestStackVerdict";
 
 const TRIGGER_CLASS_NAME = {
@@ -24,20 +33,41 @@ const TRIGGER_CLASS_NAME = {
 		"flex h-full items-center gap-1 px-1.5 text-xs text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:text-foreground data-[state=open]:text-foreground",
 };
 
+const ISSUE_TONE: Record<StackLayerIssue, StackLayerStatusTone> = {
+	closed: "danger",
+	draft: "muted",
+	conflicts: "danger",
+	changes_requested: "danger",
+	review_required: "muted",
+	blocked: "muted",
+	checks_failing: "warning",
+	behind: "muted",
+	pending: "muted",
+};
+
+function layerStatusTone(layer: PullRequestStackLayer): StackLayerStatusTone {
+	if (layer.queue) return "warning";
+	const issue = stackLayerIssue(layer);
+	return issue ? ISSUE_TONE[issue] : "muted";
+}
+
 /**
  * The stack chip ("2/4") and the navigator it opens: one verdict for what a
- * merge here would land, then every layer top to bottom on a rail that ends
- * at the base branch.
+ * merge here would land and why it cannot yet, then every layer top to
+ * bottom on a rail that ends at the base branch.
  */
 export function PullRequestStackPopover({
 	stack,
+	flow,
 	appearance,
 	className,
 	workspaceNumber = null,
 	viewingNumber = null,
+	restack = null,
 	onSelectLayer,
 }: {
 	stack: PullRequestStack;
+	flow: PullRequestMergeFlow;
 	/** `badge` stands alone; `segment` is one part of a bordered split button. */
 	appearance: "badge" | "segment";
 	className?: string;
@@ -45,13 +75,21 @@ export function PullRequestStackPopover({
 	workspaceNumber?: number | null;
 	/** The PR open in the pane, when it is another layer than the workspace's. */
 	viewingNumber?: number | null;
+	restack?: StackRestackAction | null;
 	onSelectLayer: (layer: PullRequestStackLayer) => void;
 }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const copy = usePullRequestStackCopy();
-	const { verdict } = assessPullRequestStack(stack);
+	const verdict = flow.assessment?.verdict ?? "pending";
+	const canCreateStack = flow.chain.length >= 2;
+	const reason =
+		flow.blocker && !(flow.blocker.kind === "not-a-stack" && canCreateStack)
+			? copy.blocker(flow.blocker)
+			: null;
 	const layersTopDown = [...stack.layers].reverse();
+	const mergedNumber = restack?.mergedNumber;
+	const run = restack?.run ?? null;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -81,25 +119,63 @@ export function PullRequestStackPopover({
 					verdict={verdict}
 					label={copy.verdict(verdict)}
 					summary={copy.summary(stack)}
+					reason={reason}
 				/>
+				{restack ? (
+					<PullRequestStackCallout
+						text={t({
+							message: `#${mergedNumber} merged, and this branch still carries its commits.`,
+						})}
+						tone="warning"
+						action={
+							run
+								? {
+										label: t({ message: "Restack" }),
+										run: () => {
+											setOpen(false);
+											run();
+										},
+										isPending: restack.isPending,
+									}
+								: null
+						}
+					/>
+				) : null}
+				{canCreateStack ? (
+					<PullRequestStackCallout
+						text={t({
+							message:
+								"These are linked by base branch. A GitHub stack merges them in one step.",
+						})}
+						action={{
+							label: t({ message: "Create stack" }),
+							run: flow.createStack,
+							isPending: flow.isCreatingStack,
+						}}
+					/>
+				) : null}
 				<div className="max-h-[min(28rem,70vh)] overflow-y-auto py-1.5">
-					{layersTopDown.map((layer) => (
-						<PullRequestStackLayerRow
-							key={layer.number}
-							layer={layer}
-							tag={
-								layer.number === workspaceNumber
-									? t({ message: "This workspace" })
-									: layer.number === viewingNumber
-										? t({ message: "Viewing", context: "stack layer" })
-										: null
-							}
-							onSelect={(selected) => {
-								setOpen(false);
-								if (!selected.isCurrent) onSelectLayer(selected);
-							}}
-						/>
-					))}
+					{layersTopDown.map((layer) => {
+						const label = copy.layerStatus(layer);
+						return (
+							<PullRequestStackLayerRow
+								key={layer.number}
+								layer={layer}
+								tag={
+									layer.number === workspaceNumber
+										? t({ message: "This workspace" })
+										: layer.number === viewingNumber
+											? t({ message: "Viewing", context: "stack layer" })
+											: null
+								}
+								status={label ? { label, tone: layerStatusTone(layer) } : null}
+								onSelect={(selected) => {
+									setOpen(false);
+									if (!selected.isCurrent) onSelectLayer(selected);
+								}}
+							/>
+						);
+					})}
 					<PullRequestStackBaseRow baseRefName={stack.baseRefName} />
 				</div>
 			</PopoverContent>

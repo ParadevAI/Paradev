@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { cloudPullRequestRead } from "../toPullRequestDetail/fixtures";
 import {
+	mergeInBackground,
 	mergePullRequest,
 	type PullRequestGateways,
 	type PullRequestTarget,
@@ -22,6 +23,24 @@ function gateway() {
 		mergePullRequest: { mutate: mock(async () => ({})) },
 		setPullRequestState: { mutate: mock(async () => ({})) },
 		setPullRequestDraft: { mutate: mock(async () => ({})) },
+		getPullRequestStack: { query: mock(async () => null) },
+		requestPullRequestMerge: {
+			mutate: mock(
+				async (): Promise<{ status: string; uuid?: string }> => ({
+					status: "merged",
+				}),
+			),
+		},
+		getPullRequestMergeResult: {
+			query: mock(
+				async (): Promise<{ status: string; uuid?: string }> => ({
+					status: "merged",
+				}),
+			),
+		},
+		createPullRequestStack: { mutate: mock(async () => ({ stackNumber: 1 })) },
+		enqueuePullRequest: { mutate: mock(async () => ({})) },
+		dequeuePullRequest: { mutate: mock(async () => ({})) },
 	};
 }
 
@@ -87,5 +106,68 @@ describe("who acts on GitHub", () => {
 		await expect(
 			readPullRequestDetail({ ...target, repoFullName: null }, deps),
 		).rejects.toThrow("repository is unknown");
+	});
+});
+
+describe("mergeInBackground", () => {
+	test("polls one result id on the same gateway until GitHub settles", async () => {
+		local.status.query.mockResolvedValue({ available: true });
+		local.requestPullRequestMerge.mutate.mockResolvedValue({
+			status: "pending",
+			uuid: "u-1",
+		});
+		local.getPullRequestMergeResult.query
+			.mockResolvedValueOnce({ status: "pending", uuid: "u-1" })
+			.mockResolvedValueOnce({ status: "enqueued" });
+		const waits: number[] = [];
+
+		const outcome = await mergeInBackground(
+			target,
+			{ mergeAction: "merge_queue" },
+			deps,
+			{
+				sleep: async (ms) => {
+					waits.push(ms);
+				},
+				intervalMs: 5,
+			},
+		);
+
+		expect(outcome).toBe("enqueued");
+		expect(local.requestPullRequestMerge.mutate).toHaveBeenCalledWith({
+			repoFullName: "owner/repo",
+			number: 12,
+			mergeAction: "merge_queue",
+		});
+		expect(local.getPullRequestMergeResult.query).toHaveBeenCalledTimes(2);
+		expect(waits).toEqual([5, 5]);
+		expect(cloud.requestPullRequestMerge.mutate).not.toHaveBeenCalled();
+	});
+
+	test("stops asking after the poll limit and says the merge is still pending", async () => {
+		cloud.requestPullRequestMerge.mutate.mockResolvedValue({
+			status: "pending",
+			uuid: "u-2",
+		});
+		cloud.getPullRequestMergeResult.query.mockResolvedValue({
+			status: "pending",
+			uuid: "u-2",
+		});
+		expect(
+			await mergeInBackground(target, {}, deps, {
+				sleep: async () => {},
+				limit: 2,
+			}),
+		).toBe("pending");
+		expect(cloud.getPullRequestMergeResult.query).toHaveBeenCalledTimes(2);
+	});
+
+	test("an API that predates the background merge reads as unavailable", async () => {
+		cloud.requestPullRequestMerge.mutate.mockRejectedValue(
+			new Error(
+				'No procedure found on path "integration.github.requestPullRequestMerge"',
+			),
+		);
+		expect(await mergeInBackground(target, {}, deps)).toBe("unavailable");
 	});
 });

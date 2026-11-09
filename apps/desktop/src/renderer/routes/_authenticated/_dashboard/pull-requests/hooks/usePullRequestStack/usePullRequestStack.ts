@@ -1,13 +1,17 @@
-import type { AppRouter as HostServiceAppRouter } from "@superset/host-service";
-import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
+import type {
+	PullRequestStack,
+	PullRequestStackLayer,
+} from "@superset/shared/pull-request-stack";
 import { useQuery } from "@tanstack/react-query";
-import type { inferRouterOutputs } from "@trpc/server";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import {
+	canActOnPullRequest,
+	needsGithubConnection,
+	type PullRequestTarget,
+	pullRequestStackQueryKey,
+	readPullRequestStack,
+} from "../../utils/pullRequestClient";
 
-export type PullRequestStack = NonNullable<
-	inferRouterOutputs<HostServiceAppRouter>["pullRequests"]["getStack"]
->;
-export type PullRequestStackLayer = PullRequestStack["layers"][number];
+export type { PullRequestStack, PullRequestStackLayer };
 
 export interface PullRequestStackQuery {
 	stack: PullRequestStack | null;
@@ -15,42 +19,18 @@ export interface PullRequestStackQuery {
 	/** The stack read failed: the PR may be a layer of a stack nobody can see. */
 	isIncomplete: boolean;
 	refetch: () => void;
-	/** Where the stack was read; a stack merge must go to the same place. */
-	projectId: string | null;
-	hostUrl: string | null;
 }
 
 export const PULL_REQUEST_STACK_QUERY_KEY_PREFIX = ["pull-request-stack"];
 
-export function usePullRequestStack({
-	projectId,
-	hostUrl,
-	prNumber,
-}: {
-	projectId: string | null;
-	hostUrl: string | null;
-	prNumber: number | null;
-}): PullRequestStackQuery {
+/** The stack a pull request sits in, read as the viewer by repository and number. */
+export function usePullRequestStack(
+	target: PullRequestTarget | null,
+): PullRequestStackQuery {
 	const query = useQuery({
-		queryKey: [
-			...PULL_REQUEST_STACK_QUERY_KEY_PREFIX,
-			projectId,
-			hostUrl,
-			prNumber,
-		],
-		queryFn: async () => {
-			if (!projectId || !hostUrl || prNumber === null) return null;
-			try {
-				return await getHostServiceClientByUrl(
-					hostUrl,
-				).pullRequests.getStack.query({ projectId, prNumber });
-			} catch (error) {
-				// A host older than the stack read has no stacks to show.
-				if (isMissingProcedureError(error)) return null;
-				throw error;
-			}
-		},
-		enabled: !!projectId && !!hostUrl && prNumber !== null,
+		queryKey: pullRequestStackQueryKey(target),
+		queryFn: () => (target ? readPullRequestStack(target) : null),
+		enabled: target !== null && canActOnPullRequest(target),
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 		retry: 1,
@@ -58,9 +38,9 @@ export function usePullRequestStack({
 	return {
 		stack: query.data ?? null,
 		isLoading: query.isLoading,
-		isIncomplete: query.isError,
+		// Without a GitHub login there is nothing to merge with either, and the
+		// pane already asks to connect.
+		isIncomplete: query.isError && !needsGithubConnection(query.error),
 		refetch: () => void query.refetch(),
-		projectId,
-		hostUrl,
 	};
 }

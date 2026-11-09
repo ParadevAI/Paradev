@@ -3,9 +3,19 @@ import { cn } from "@superset/ui/utils";
 import { ArrowUpRight } from "lucide-react";
 import type { PullRequestStackLayer } from "../../../../hooks/usePullRequestStack";
 import {
+	PR_STATE_INK_CLASS_NAME,
 	type PullRequestGlyphState,
 	PullRequestStateGlyph,
 } from "../../../PullRequestStateGlyph";
+import { PR_RED_TEXT_CLASS_NAME } from "../../../pull-request-colors";
+
+export type StackLayerStatusTone = "danger" | "warning" | "muted";
+
+const STATUS_TONE_CLASS_NAME: Record<StackLayerStatusTone, string> = {
+	danger: PR_RED_TEXT_CLASS_NAME,
+	warning: PR_STATE_INK_CLASS_NAME.queued,
+	muted: "text-muted-foreground",
+};
 
 function layerGlyphState(layer: PullRequestStackLayer): PullRequestGlyphState {
 	if (layer.state === "merged") return "merged";
@@ -14,17 +24,20 @@ function layerGlyphState(layer: PullRequestStackLayer): PullRequestGlyphState {
 	if (layer.mergeable === "conflicting" || layer.mergeStateStatus === "DIRTY") {
 		return "conflicting";
 	}
-	return layer.isQueued ? "queued" : "open";
+	return layer.queue ? "queued" : "open";
 }
 
 export function PullRequestStackLayerRow({
 	layer,
 	tag,
+	status,
 	onSelect,
 }: {
 	layer: PullRequestStackLayer;
 	/** Where this layer stands for the reader ("This workspace", "Viewing"). */
 	tag: string | null;
+	/** What stands between this layer and a merge, in a word or two. */
+	status: { label: string; tone: StackLayerStatusTone } | null;
 	onSelect: (layer: PullRequestStackLayer) => void;
 }) {
 	const { t } = useLingui();
@@ -63,7 +76,15 @@ export function PullRequestStackLayerRow({
 					<PullRequestStateGlyph state={glyphState} className="size-4" />
 				</span>
 				<span className="min-w-0 flex-1">
-					<span className="block truncate text-sm leading-5 text-foreground">
+					<span
+						className={cn(
+							"block truncate text-sm leading-5",
+							!layer.isCurrent && "pr-5",
+							layer.state === "merged"
+								? "text-muted-foreground"
+								: "text-foreground",
+						)}
+					>
 						{layer.title}
 					</span>
 					<span className="flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground">
@@ -75,13 +96,23 @@ export function PullRequestStackLayerRow({
 								{tag}
 							</span>
 						) : null}
+						{status ? (
+							<span
+								className={cn(
+									"ml-auto shrink-0 pl-1",
+									STATUS_TONE_CLASS_NAME[status.tone],
+								)}
+							>
+								{status.label}
+							</span>
+						) : null}
 					</span>
 				</span>
 				{layer.isCurrent ? null : (
 					<ArrowUpRight
 						aria-hidden
 						strokeWidth={1.75}
-						className="mt-0.5 size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+						className="absolute right-2 top-2 size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
 					/>
 				)}
 			</button>

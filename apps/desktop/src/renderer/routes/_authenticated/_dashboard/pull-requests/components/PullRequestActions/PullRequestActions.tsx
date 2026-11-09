@@ -31,6 +31,8 @@ import {
 	GitPullRequestDraft,
 	Hammer,
 	Link2,
+	ListChecks,
+	ListX,
 	LoaderCircle,
 	RefreshCw,
 	SquareArrowOutUpRight,
@@ -48,19 +50,14 @@ import {
 	useNewWorkspaceDraftStore,
 } from "renderer/stores/new-workspace-draft";
 import { useMergeMethodLabels } from "../../hooks/useMergeMethodLabels";
-import { useMergePullRequestStack } from "../../hooks/useMergePullRequestStack";
 import { usePullRequestAgentHandoff } from "../../hooks/usePullRequestAgentHandoff";
 import {
 	type PullRequestDetail,
 	useInvalidatePullRequestDetail,
 } from "../../hooks/usePullRequestDetail";
 import { usePullRequestDraftMutation } from "../../hooks/usePullRequestDraftMutation";
-import type { PullRequestStackQuery } from "../../hooks/usePullRequestStack";
+import type { PullRequestMergeFlow } from "../../hooks/usePullRequestMergeFlow";
 import { usePullRequestStackCopy } from "../../hooks/usePullRequestStackCopy";
-import {
-	resolveStackMergeBlocker,
-	stackMergeTargets,
-} from "../../utils/assessPullRequestStack";
 import {
 	buildFixFindingsPrompt,
 	buildResolveConflictsPrompt,
@@ -79,8 +76,8 @@ import {
 	PullRequestMenuRadioItem,
 	PullRequestMenuSeparator,
 } from "../PullRequestMenu";
+import { PullRequestMergeFlowDialog } from "../PullRequestMergeFlowDialog";
 import { PullRequestSkeleton as Skeleton } from "../PullRequestSkeleton";
-import { PullRequestStackMergeDialog } from "../PullRequestStackMergeDialog";
 
 type MergeMethod = PullRequestMergeMethod;
 
@@ -97,8 +94,8 @@ interface PullRequestActionsProps {
 	hostUrl: string | null;
 	data: PullRequestDetail | null | undefined;
 	isLoading: boolean;
-	/** The PR's stack; a stacked PR merges as a stack. */
-	stack: PullRequestStackQuery;
+	/** How this pull request merges: alone, as a stack, or through a merge queue. */
+	flow: PullRequestMergeFlow;
 	/**
 	 * Offer "Start workspace". Off inside a workspace pane, where the PR is
 	 * already the workspace's own and a second one would be a duplicate.
@@ -146,7 +143,7 @@ export function PullRequestActions({
 	hostUrl,
 	data,
 	isLoading,
-	stack: stackQuery,
+	flow,
 	showStartWorkspace = true,
 	onRefresh,
 	isRefreshing = false,
@@ -170,10 +167,6 @@ export function PullRequestActions({
 		null,
 	);
 	const [mergeComment, setMergeComment] = useState("");
-	const [stackMerge, setStackMerge] = useState<{
-		open: boolean;
-		method: MergeMethod;
-	}>({ open: false, method: "squash" });
 	const { copyToClipboard: copyLink, copied: linkCopied } =
 		useCopyToClipboard();
 	const invalidatePullRequestQueries = useInvalidatePullRequestDetail(target);
@@ -227,15 +220,9 @@ export function PullRequestActions({
 		},
 	});
 
-	const mergeStack = useMergePullRequestStack({
-		projectId: stackQuery.projectId,
-		hostUrl: stackQuery.hostUrl,
-		prNumber,
-		onMerged: invalidatePullRequestQueries,
-	});
-
-	const isMerging = merge.isPending || mergeStack.isPending;
-	const isActionPending = setState.isPending || isMerging || setDraft.isPending;
+	const isMerging = merge.isPending || flow.isMerging;
+	const isActionPending =
+		setState.isPending || isMerging || setDraft.isPending || flow.isDequeuing;
 
 	const handleConfirmAction = () => {
 		if (!pendingAction) return;
@@ -309,20 +296,16 @@ export function PullRequestActions({
 		data.state === "open" && !data.isDraft && data.capabilities.merge;
 	const canToggleDraft = canAct && data.capabilities.update;
 	const isDraft = data.state === "open" && data.isDraft;
-	const stack = stackQuery.stack;
-	const stackBlocker = resolveStackMergeBlocker({
-		stack,
-		isIncomplete: stackQuery.isIncomplete,
-	});
-	const mergeBlockedReason = stackBlocker
-		? stackCopy.blocker(stackBlocker)
-		: !stack && data.mergeability === "conflicting"
+	const isQueued = flow.queued !== null;
+	const mergeBlockedReason = flow.blocker
+		? stackCopy.blocker(flow.blocker)
+		: !flow.isStack && data.mergeability === "conflicting"
 			? t({ message: `Resolve the conflicts with ${data.base.ref} first` })
 			: null;
 	const mergeBlocked = mergeBlockedReason !== null;
-	const stackMergeCount = stack ? stackMergeTargets(stack).length : null;
+	const mergeInert = mergeBlocked || isQueued;
 	const openMerge = (method: MergeMethod) => {
-		if (stack) setStackMerge({ open: true, method });
+		if (flow.handlesMerge) flow.request(method);
 		else setPendingAction({ kind: "merge", method });
 	};
 	const copyLinkLabel = linkCopied
@@ -407,36 +390,37 @@ export function PullRequestActions({
 							<TooltipTrigger asChild>
 								<Button
 									size="xs"
-									variant={mergeBlocked ? "secondary" : "default"}
+									variant={mergeInert ? "secondary" : "default"}
 									className={cn(
 										"h-7 gap-1.5 rounded-l-full rounded-r-none px-3",
-										mergeBlocked && "cursor-not-allowed text-muted-foreground",
+										mergeInert && "cursor-default text-muted-foreground",
+										mergeBlocked && "cursor-not-allowed",
 									)}
-									disabled={isActionPending || stackQuery.isLoading}
-									aria-disabled={mergeBlocked || undefined}
+									disabled={isActionPending || flow.stackQuery.isLoading}
+									aria-disabled={mergeInert || undefined}
 									aria-busy={isMerging}
 									onClick={() => {
-										if (mergeBlocked) return;
+										if (mergeInert) return;
 										openMerge(data.mergeMethods.primary);
 									}}
 								>
 									{isMerging ? (
 										<LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
+									) : isQueued || flow.usesQueue ? (
+										<ListChecks strokeWidth={1.75} className="size-3.5" />
 									) : (
 										<GitMerge strokeWidth={1.75} className="size-3.5" />
 									)}
 									<span className="@max-[23rem]/topbar:sr-only">
-										{mergeStack.isPending ? (
-											<Trans>Merging stack…</Trans>
-										) : merge.isPending ? (
-											<Trans>Merging…</Trans>
-										) : stack ? (
-											<Trans>Merge stack</Trans>
-										) : (
-											<Trans>Merge</Trans>
-										)}
+										{flow.isMerging
+											? stackCopy.busy(flow.kind)
+											: merge.isPending
+												? stackCopy.busy({ stack: false, queue: false })
+												: isQueued
+													? stackCopy.queued(flow.queued?.position ?? null)
+													: stackCopy.action(flow.kind)}
 									</span>
-									{stackMergeCount !== null && !mergeStack.isPending ? (
+									{flow.count !== null && !flow.isMerging && !isQueued ? (
 										<span
 											className={cn(
 												"rounded-full px-1.5 text-[11px] leading-4 tabular-nums",
@@ -445,14 +429,18 @@ export function PullRequestActions({
 													: "bg-primary-foreground/15",
 											)}
 										>
-											{stackMergeCount}
+											{flow.count}
 										</span>
 									) : null}
 								</Button>
 							</TooltipTrigger>
-							{mergeBlockedReason ? (
+							{mergeBlockedReason || isQueued ? (
 								<TooltipContent side="bottom" className="max-w-72">
-									{mergeBlockedReason}
+									{mergeBlockedReason ??
+										t({
+											message:
+												"In the merge queue. GitHub merges it when its turn comes.",
+										})}
 								</TooltipContent>
 							) : null}
 						</Tooltip>
@@ -461,10 +449,10 @@ export function PullRequestActions({
 						<DropdownMenuTrigger asChild>
 							<Button
 								size="xs"
-								variant={!isDraft && mergeBlocked ? "secondary" : "default"}
+								variant={!isDraft && mergeInert ? "secondary" : "default"}
 								className={cn(
 									"h-7 rounded-l-none rounded-r-full border-l px-1.5",
-									!isDraft && mergeBlocked
+									!isDraft && mergeInert
 										? "border-l-border"
 										: "border-l-primary-foreground/20",
 								)}
@@ -509,77 +497,107 @@ export function PullRequestActions({
 								</>
 							) : (
 								<>
-									{stack ? null : (
-										<div className="p-1.5 pb-1">
-											<Textarea
-												value={mergeComment}
-												onChange={(e) => setMergeComment(e.target.value)}
-												onKeyDown={(e) => e.stopPropagation()}
-												placeholder={t({
-													message: "Commit message (optional)",
-												})}
-												className="min-h-16 resize-none rounded-[0.625rem] border-border/60 bg-background/60 text-xs shadow-none"
-											/>
-										</div>
-									)}
-									<PullRequestMenuLabel className="pt-1">
-										<Trans>Select method</Trans>
-									</PullRequestMenuLabel>
-									{data.mergeMethods.methods.map((method) => (
+									{isQueued ? (
 										<PullRequestMenuItem
-											key={method}
-											className="flex-col items-start gap-0 py-1.5"
-											disabled={mergeBlocked}
-											onClick={() => openMerge(method)}
+											disabled={flow.isDequeuing}
+											onClick={flow.dequeue}
 										>
-											<span className="flex w-full items-center gap-2">
-												<GitMerge
-													strokeWidth={1.75}
-													className="size-3.5 opacity-80"
-												/>
-												{mergeMethodLabels[method]}
-												{method === data.mergeMethods.primary ? (
-													<>
-														<span className="sr-only">
-															{t({ message: "Default" })}
-														</span>
-														<Check
-															aria-hidden
-															strokeWidth={1.75}
-															className="ml-auto size-3.5 text-muted-foreground"
-														/>
-													</>
-												) : null}
-											</span>
-											<span className="pl-[1.375rem] text-[11px] text-muted-foreground">
-												{mergeMethodDescriptions[method]}
-											</span>
+											<ListX strokeWidth={1.75} className="size-4" />
+											<Trans>Remove from queue</Trans>
 										</PullRequestMenuItem>
-									))}
-									{data.checksStatus === "failure" && !stack && (
+									) : flow.usesQueue ? (
+										<PullRequestMenuItem
+											disabled={mergeBlocked}
+											onClick={() => openMerge(data.mergeMethods.primary)}
+										>
+											<ListChecks strokeWidth={1.75} className="size-4" />
+											{flow.kind.stack ? (
+												<Trans>Add stack to merge queue</Trans>
+											) : (
+												<Trans>Add to merge queue</Trans>
+											)}
+										</PullRequestMenuItem>
+									) : (
 										<>
-											<PullRequestMenuSeparator />
-											<PullRequestMenuItem
-												className="flex items-center justify-between gap-2 py-1.5"
-												disabled={mergeBlocked}
-												onClick={() =>
-													setPendingAction({
-														kind: "merge",
-														method: data.mergeMethods.primary,
-														force: true,
-													})
-												}
-											>
-												<div className="flex flex-col gap-0.5">
-													<span>
-														<Trans>Force merge</Trans>
-													</span>
-													<span className="text-[11px] text-muted-foreground">
-														<Trans>Attempt before checks pass</Trans>
-													</span>
+											{flow.handlesMerge ? null : (
+												<div className="p-1.5 pb-1">
+													<Textarea
+														value={mergeComment}
+														onChange={(e) => setMergeComment(e.target.value)}
+														onKeyDown={(e) => e.stopPropagation()}
+														placeholder={t({
+															message: "Commit message (optional)",
+														})}
+														className="min-h-16 resize-none rounded-[0.625rem] border-border/60 bg-background/60 text-xs shadow-none"
+													/>
 												</div>
-												<ChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
-											</PullRequestMenuItem>
+											)}
+											{mergeBlockedReason ? (
+												<p className="px-2.5 pb-1 pt-2 text-xs leading-4 text-foreground/85">
+													{mergeBlockedReason}
+												</p>
+											) : null}
+											<PullRequestMenuLabel className="pt-1">
+												<Trans>Select method</Trans>
+											</PullRequestMenuLabel>
+											{data.mergeMethods.methods.map((method) => (
+												<PullRequestMenuItem
+													key={method}
+													className="flex-col items-start gap-0 py-1.5"
+													disabled={mergeBlocked}
+													onClick={() => openMerge(method)}
+												>
+													<span className="flex w-full items-center gap-2">
+														<GitMerge
+															strokeWidth={1.75}
+															className="size-3.5 opacity-80"
+														/>
+														{mergeMethodLabels[method]}
+														{method === data.mergeMethods.primary ? (
+															<>
+																<span className="sr-only">
+																	{t({ message: "Default" })}
+																</span>
+																<Check
+																	aria-hidden
+																	strokeWidth={1.75}
+																	className="ml-auto size-3.5 text-muted-foreground"
+																/>
+															</>
+														) : null}
+													</span>
+													<span className="pl-[1.375rem] text-[11px] text-muted-foreground">
+														{mergeMethodDescriptions[method]}
+													</span>
+												</PullRequestMenuItem>
+											))}
+											{data.checksStatus === "failure" &&
+												!flow.handlesMerge && (
+													<>
+														<PullRequestMenuSeparator />
+														<PullRequestMenuItem
+															className="flex items-center justify-between gap-2 py-1.5"
+															disabled={mergeBlocked}
+															onClick={() =>
+																setPendingAction({
+																	kind: "merge",
+																	method: data.mergeMethods.primary,
+																	force: true,
+																})
+															}
+														>
+															<div className="flex flex-col gap-0.5">
+																<span>
+																	<Trans>Force merge</Trans>
+																</span>
+																<span className="text-[11px] text-muted-foreground">
+																	<Trans>Attempt before checks pass</Trans>
+																</span>
+															</div>
+															<ChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
+														</PullRequestMenuItem>
+													</>
+												)}
 										</>
 									)}
 									<PullRequestMenuSeparator />
@@ -623,20 +641,8 @@ export function PullRequestActions({
 				</Button>
 			) : null}
 
-			{stack && prNumber !== null ? (
-				<PullRequestStackMergeDialog
-					open={stackMerge.open}
-					onOpenChange={(open) =>
-						setStackMerge((current) => ({ ...current, open }))
-					}
-					stack={stack}
-					prNumber={prNumber}
-					method={stackMerge.method}
-					onConfirm={() => {
-						setStackMerge((current) => ({ ...current, open: false }));
-						mergeStack.mutate(stackMerge.method);
-					}}
-				/>
+			{prNumber !== null ? (
+				<PullRequestMergeFlowDialog flow={flow} prNumber={prNumber} />
 			) : null}
 			<AlertDialog
 				open={pendingAction !== null}

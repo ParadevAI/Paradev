@@ -42,7 +42,16 @@ export type PullRequestDetail = PullRequestDetailBase &
 		capabilities: PullRequestDetailRead["capabilities"];
 		/** The repository's allowed merge methods and the main button's choice. */
 		mergeMethods: MergeMethodChoices;
+		/** Absent from details cached by builds older than this field. */
+		mergeQueue?: PullRequestMergeQueue;
 	};
+
+export interface PullRequestMergeQueue {
+	/** The base branch merges through a merge queue. */
+	enabled: boolean;
+	/** This pull request's place in it; position 1 merges next. */
+	entry: { position: number | null; state: string } | null;
+}
 
 /**
  * A detail as the query cache holds it. Entries persisted by builds older

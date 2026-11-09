@@ -1,24 +1,50 @@
+import { stackMergeTargets } from "@superset/shared/pull-request-stack";
 import type {
 	PullRequestStack,
 	PullRequestStackLayer,
 } from "../../hooks/usePullRequestStack";
 
+export { stackMergeTargets };
+
 export type PullRequestStackVerdict =
 	| "merged"
+	| "queued"
 	| "attention"
 	| "unstable"
 	| "pending"
 	| "ready";
 
-export type PullRequestStackBlocker =
-	| { kind: "closed"; number: number }
-	| { kind: "draft"; number: number }
-	| { kind: "not-ready"; number: number };
+/** What stands between one open layer and a merge; the first that applies. */
+export type StackLayerIssue =
+	| "closed"
+	| "draft"
+	| "conflicts"
+	| "changes_requested"
+	| "review_required"
+	| "blocked"
+	| "checks_failing"
+	| "behind"
+	| "pending";
+
+const BLOCKING_ISSUES: ReadonlySet<StackLayerIssue> = new Set([
+	"closed",
+	"draft",
+	"conflicts",
+	"changes_requested",
+	"review_required",
+	"blocked",
+]);
+
+export interface PullRequestStackBlocker {
+	kind: StackLayerIssue;
+	number: number;
+}
 
 export type PullRequestStackMergeBlocker =
 	| PullRequestStackBlocker
 	| { kind: "incomplete" }
-	| { kind: "lower-layer"; number: number };
+	/** A chain of base branches: GitHub merges it one pull request at a time. */
+	| { kind: "not-a-stack"; lowest: number };
 
 export interface PullRequestStackAssessment {
 	verdict: PullRequestStackVerdict;
@@ -27,16 +53,40 @@ export interface PullRequestStackAssessment {
 	blocker: PullRequestStackBlocker | null;
 }
 
-const NOT_READY_STATES = new Set(["BLOCKED", "DIRTY", "DRAFT"]);
-const PENDING_STATES = new Set(["BEHIND", "UNKNOWN"]);
-
-export function stackMergeTargets(
-	stack: Pick<PullRequestStack, "layers" | "currentPosition">,
-): PullRequestStackLayer[] {
-	return stack.layers.filter(
-		(layer) =>
-			layer.position <= stack.currentPosition && layer.state !== "merged",
-	);
+export function stackLayerIssue(
+	layer: Pick<
+		PullRequestStackLayer,
+		| "state"
+		| "isDraft"
+		| "mergeable"
+		| "mergeStateStatus"
+		| "reviewDecision"
+		| "queue"
+	>,
+): StackLayerIssue | null {
+	if (layer.state === "merged" || layer.queue) return null;
+	if (layer.state === "closed") return "closed";
+	if (layer.isDraft || layer.mergeStateStatus === "DRAFT") return "draft";
+	if (layer.mergeable === "conflicting" || layer.mergeStateStatus === "DIRTY") {
+		return "conflicts";
+	}
+	if (layer.mergeStateStatus === "BLOCKED") {
+		if (layer.reviewDecision === "changes_requested") {
+			return "changes_requested";
+		}
+		if (layer.reviewDecision === "review_required") return "review_required";
+		return "blocked";
+	}
+	if (layer.mergeStateStatus === "UNSTABLE") return "checks_failing";
+	if (layer.mergeStateStatus === "BEHIND") return "behind";
+	if (
+		layer.mergeable === "unknown" ||
+		layer.mergeStateStatus === null ||
+		layer.mergeStateStatus === "UNKNOWN"
+	) {
+		return "pending";
+	}
+	return null;
 }
 
 /** One verdict over the layers a merge would land; the first rule that matches wins. */
@@ -47,49 +97,27 @@ export function assessPullRequestStack(
 	const assessment = (
 		verdict: PullRequestStackVerdict,
 		blocker: PullRequestStackBlocker | null = null,
-	) => ({ verdict, targets, blocker });
+	): PullRequestStackAssessment => ({ verdict, targets, blocker });
 
 	if (targets.length === 0) return assessment("merged");
+	if (targets.every((layer) => layer.queue)) return assessment("queued");
 
-	const closed = targets.find((layer) => layer.state === "closed");
-	if (closed) {
-		return assessment("attention", { kind: "closed", number: closed.number });
-	}
-	const draft = targets.find((layer) => layer.isDraft);
-	if (draft) {
-		return assessment("attention", { kind: "draft", number: draft.number });
-	}
-	const notReady = targets.find(
-		(layer) =>
-			layer.mergeable === "conflicting" ||
-			NOT_READY_STATES.has(layer.mergeStateStatus ?? ""),
-	);
-	if (notReady) {
-		return assessment("attention", {
-			kind: "not-ready",
-			number: notReady.number,
-		});
-	}
-
-	if (targets.some((layer) => layer.mergeStateStatus === "UNSTABLE")) {
+	const issues = targets.flatMap((layer) => {
+		const kind = stackLayerIssue(layer);
+		return kind ? [{ kind, number: layer.number }] : [];
+	});
+	const blocking = issues.find((issue) => BLOCKING_ISSUES.has(issue.kind));
+	if (blocking) return assessment("attention", blocking);
+	if (issues.some((issue) => issue.kind === "checks_failing")) {
 		return assessment("unstable");
 	}
-	if (
-		targets.some(
-			(layer) =>
-				layer.mergeable === "unknown" ||
-				layer.mergeStateStatus === null ||
-				PENDING_STATES.has(layer.mergeStateStatus),
-		)
-	) {
-		return assessment("pending");
-	}
+	if (issues.length > 0) return assessment("pending");
 	return assessment("ready");
 }
 
 /**
  * Why a stack merge cannot run now, or null when it can. A chain inferred
- * from base branches has no stack on GitHub, so only its lowest open layer
+ * from base branches is no stack on GitHub, so only its lowest open layer
  * can merge into the trunk.
  */
 export function resolveStackMergeBlocker({
@@ -105,7 +133,16 @@ export function resolveStackMergeBlocker({
 	if (blocker) return blocker;
 	const lowest = targets[0];
 	if (stack.source === "inferred" && lowest && targets.length > 1) {
-		return { kind: "lower-layer", number: lowest.number };
+		return { kind: "not-a-stack", lowest: lowest.number };
 	}
 	return null;
+}
+
+/** The open layers of a chain, bottom to top: what a new GitHub stack would hold. */
+export function stackableChain(
+	stack: Pick<PullRequestStack, "layers" | "source">,
+): number[] {
+	if (stack.source !== "inferred") return [];
+	const open = stack.layers.filter((layer) => layer.state === "open");
+	return open.length >= 2 ? open.map((layer) => layer.number) : [];
 }

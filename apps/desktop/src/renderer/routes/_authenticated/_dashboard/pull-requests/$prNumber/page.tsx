@@ -16,8 +16,10 @@ import { PullRequestStackNotice } from "renderer/routes/_authenticated/_dashboar
 import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
 import { usePullRequestDetail } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
 import { usePullRequestListPreview } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestListPreview";
-import { usePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
 import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
+import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useStackRestack";
+import { findPullRequestWorkspace } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/findPullRequestWorkspace";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
@@ -59,11 +61,6 @@ function PullRequestDetailPage() {
 		prNumber,
 	});
 	const data = detail.data ?? null;
-	const stack = usePullRequestStack({
-		projectId: detail.projectId,
-		hostUrl,
-		prNumber,
-	});
 	const navigate = useNavigate();
 	const openPullRequestInApp = useOpenPullRequestInApp();
 	const diffStat =
@@ -79,6 +76,13 @@ function PullRequestDetailPage() {
 					prNumber,
 				};
 	const commentTarget = target && canActOnPullRequest(target) ? target : null;
+	const flow = usePullRequestMergeFlow({ target });
+	const restack = useStackRestack(
+		detail.projectId && hostId && hostUrl && prNumber !== null
+			? { projectId: detail.projectId, hostId, hostUrl, prNumber }
+			: null,
+		flow.stack,
+	);
 	const { refresh, isRefreshing } = useRefreshPullRequest({
 		target,
 		url: detail.data?.url,
@@ -103,16 +107,24 @@ function PullRequestDetailPage() {
 						/>
 					</div>
 					<div className="drag h-full min-w-4 flex-1" />
-					{stack.stack ? (
+					{flow.stack ? (
 						<PullRequestStackPopover
-							stack={stack.stack}
+							stack={flow.stack}
+							flow={flow}
 							appearance="badge"
+							restack={restack}
 							onSelectLayer={(layer) => {
-								if (layer.workspaceId) {
-									void navigateToV2Workspace(layer.workspaceId, navigate);
-								} else {
-									openPullRequestInApp(layer.url);
-								}
+								void findPullRequestWorkspace({
+									hostUrl,
+									projectId: detail.projectId,
+									prNumber: layer.number,
+								}).then((workspaceId) => {
+									if (workspaceId) {
+										void navigateToV2Workspace(workspaceId, navigate);
+									} else {
+										openPullRequestInApp(layer.url);
+									}
+								});
 							}}
 						/>
 					) : null}
@@ -123,14 +135,14 @@ function PullRequestDetailPage() {
 						hostUrl={hostUrl}
 						data={detail.data}
 						isLoading={detail.isLoading}
-						stack={stack}
+						flow={flow}
 						onRefresh={refresh}
 						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</PageHeader>
-			{stack.isIncomplete && data?.state === "open" ? (
-				<PullRequestStackNotice onRefresh={stack.refetch} />
+			{flow.stackQuery.isIncomplete && data?.state === "open" ? (
+				<PullRequestStackNotice onRefresh={flow.stackQuery.refetch} />
 			) : null}
 			<PullRequestDetailContent
 				activeTab={activeTab}

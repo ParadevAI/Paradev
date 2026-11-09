@@ -1,22 +1,61 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
-import type {
-	PullRequestStackMergeBlocker,
-	PullRequestStackVerdict,
+import {
+	type PullRequestStackMergeBlocker,
+	type PullRequestStackVerdict,
+	type StackLayerIssue,
+	stackLayerIssue,
 } from "../../utils/assessPullRequestStack";
-import type { PullRequestStack } from "../usePullRequestStack";
+import type {
+	PullRequestStack,
+	PullRequestStackLayer,
+} from "../usePullRequestStack";
 
 type StackIdentity = Pick<
 	PullRequestStack,
 	"stackNumber" | "baseRefName" | "currentPosition" | "layers"
 >;
 
-/** Every sentence the stack surfaces say, from the structured verdict and blockers. */
+export interface MergeActionKind {
+	/** A stack lands several pull requests; otherwise the one. */
+	stack: boolean;
+	/** The base branch merges through a merge queue. */
+	queue: boolean;
+}
+
+/** Every sentence the stack and merge-queue surfaces say, from structured state. */
 export function usePullRequestStackCopy() {
 	const { t } = useLingui();
-	return useMemo(
-		() => ({
+	return useMemo(() => {
+		const issue = (kind: StackLayerIssue): string => {
+			switch (kind) {
+				case "closed":
+					return t({ message: "Closed" });
+				case "draft":
+					return t({ message: "Draft" });
+				case "conflicts":
+					return t({ message: "Conflicts", context: "pull request status" });
+				case "changes_requested":
+					return t({ message: "Changes requested" });
+				case "review_required":
+					return t({ message: "Review required" });
+				case "blocked":
+					return t({ message: "Blocked", context: "pull request status" });
+				case "checks_failing":
+					return t({ message: "Checks failing" });
+				case "behind":
+					return t({ message: "Behind base" });
+				case "pending":
+					return t({ message: "Checking", context: "pull request status" });
+			}
+		};
+		const queued = (position: number | null): string =>
+			position === null
+				? t({ message: "Queued" })
+				: t({ message: `Queued · ${position}` });
+
+		return {
 			verdict(verdict: PullRequestStackVerdict): string {
 				switch (verdict) {
 					case "ready":
@@ -27,36 +66,66 @@ export function usePullRequestStackCopy() {
 						return t({ message: "Mergeable with failing checks" });
 					case "pending":
 						return t({ message: "Merge status pending" });
+					case "queued":
+						return t({ message: "In the merge queue" });
 					case "merged":
 						return t({ message: "Stack merged", context: "stack verdict" });
 				}
 			},
 			blocker(blocker: PullRequestStackMergeBlocker): string {
-				switch (blocker.kind) {
-					case "incomplete":
-						return t({
-							message:
-								"Stack details could not be loaded. Refresh before merging.",
-						});
-					case "closed": {
-						const number = blocker.number;
-						return t({ message: `#${number} is closed without being merged.` });
-					}
-					case "draft": {
-						const number = blocker.number;
-						return t({ message: `#${number} is still a draft.` });
-					}
-					case "not-ready": {
-						const number = blocker.number;
-						return t({ message: `#${number} is not ready to merge.` });
-					}
-					case "lower-layer": {
-						const number = blocker.number;
-						return t({
-							message: `Merge #${number} first. A stack built from base branches merges one pull request at a time.`,
-						});
-					}
+				if (blocker.kind === "incomplete") {
+					return t({
+						message:
+							"Stack details could not be loaded. Refresh before merging.",
+					});
 				}
+				if (blocker.kind === "not-a-stack") {
+					const number = blocker.lowest;
+					return t({
+						message: `Merge #${number} first, or create a GitHub stack to merge these together.`,
+					});
+				}
+				const number = blocker.number;
+				switch (blocker.kind) {
+					case "closed":
+						return t({ message: `#${number} is closed without being merged.` });
+					case "draft":
+						return t({ message: `#${number} is still a draft.` });
+					case "conflicts":
+						return t({ message: `#${number} has conflicts.` });
+					case "changes_requested":
+						return t({ message: `#${number} has changes requested.` });
+					case "review_required":
+						return t({ message: `#${number} needs a review.` });
+					case "blocked":
+						return t({
+							message: `#${number} is waiting on a required check or rule.`,
+						});
+					default:
+						return t({ message: `#${number} is not ready to merge.` });
+				}
+			},
+			/** One layer's state in a word or two; null when there is nothing to say. */
+			layerStatus(layer: PullRequestStackLayer): string | null {
+				if (layer.state !== "open") return null;
+				if (layer.queue) return queued(layer.queue.position);
+				const kind = stackLayerIssue(layer);
+				return kind ? issue(kind) : null;
+			},
+			queued,
+			action({ stack, queue }: MergeActionKind): string {
+				if (stack) {
+					return queue
+						? t({ message: "Queue stack" })
+						: t({ message: "Merge stack" });
+				}
+				return queue ? t({ message: "Add to queue" }) : t({ message: "Merge" });
+			},
+			busy({ stack, queue }: MergeActionKind): string {
+				if (queue) return t({ message: "Adding to queue…" });
+				return stack
+					? t({ message: "Merging stack…" })
+					: t({ message: "Merging…" });
 			},
 			summary(stack: StackIdentity): string {
 				const base = stack.baseRefName;
@@ -97,7 +166,6 @@ export function usePullRequestStackCopy() {
 					message: `View stack, pull request ${position} of ${size}`,
 				});
 			},
-		}),
-		[t],
-	);
+		};
+	}, [t]);
 }

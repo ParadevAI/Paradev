@@ -3,7 +3,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
@@ -30,19 +29,10 @@ import {
 	type OpenPullRequestPane,
 	openPullRequestLink,
 } from "renderer/lib/github/openPullRequestLink";
-import {
-	PullRequestStackMergeDialog,
-	type StackMergeMethod,
-} from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackMergeDialog";
+import { PullRequestMergeFlowDialog } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMergeFlowDialog";
 import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
-import { useMergePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useMergePullRequestStack";
-import { useInvalidatePullRequestDetail } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
-import { usePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
-import { usePullRequestStackCopy } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStackCopy";
-import {
-	resolveStackMergeBlocker,
-	stackMergeTargets,
-} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/assessPullRequestStack";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
+import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useStackRestack";
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
@@ -52,8 +42,8 @@ import { usePullRequestActions } from "../../../../hooks/usePullRequestActions";
 import { useShipActions } from "../../../../hooks/useShipActions";
 import type { PRFlowState } from "../../../../utils/getPRFlowState";
 import { CommitForm } from "../../../CommitForm";
-import { MergeMethodMenuItems } from "../../../MergeMethodMenuItems";
 import { PRStatusIndicators } from "../../../PRStatusIndicators";
+import { PullRequestMergeMenuSection } from "../../../PullRequestMergeMenuSection";
 import { PRDetailCard } from "./components/PRDetailCard";
 
 interface PRStatusGroupProps {
@@ -97,7 +87,6 @@ export function PRStatusGroup({
 	viewingPullRequestNumber = null,
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
-	const stackCopy = usePullRequestStackCopy();
 	const { workspace, hostUrl } = useWorkspace();
 	const organizationId = useActiveOrganizationId();
 	const linkPolicy = usePullRequestLinkPolicy();
@@ -117,31 +106,33 @@ export function PRStatusGroup({
 			}
 		: null;
 	const prActions = usePullRequestActions({ workspaceId, target, onRefresh });
-	const prNumber = pr?.number ?? null;
-	const projectId = workspace.projectId ?? null;
-	const stackQuery = usePullRequestStack({ projectId, hostUrl, prNumber });
-	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
-	const [stackMerge, setStackMerge] = useState<{
-		open: boolean;
-		method: StackMergeMethod;
-	}>({ open: false, method: "squash" });
-	const invalidatePullRequest = useInvalidatePullRequestDetail(target);
-	const refreshPRMutation =
+	const refreshWorkspacePullRequest =
 		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
-	const mergeStackMutation = useMergePullRequestStack({
-		projectId,
-		hostUrl,
-		prNumber,
+	const flow = usePullRequestMergeFlow({
+		target,
 		onMerged: async () => {
 			try {
-				await refreshPRMutation.mutateAsync({ workspaceIds: [workspaceId] });
+				await refreshWorkspacePullRequest.mutateAsync({
+					workspaceIds: [workspaceId],
+				});
 			} catch (error) {
-				console.warn("Failed to refresh PR state after stack merge", error);
+				console.warn("Failed to refresh PR state after merge", error);
 			}
-			await invalidatePullRequest();
 			onRefresh?.();
 		},
 	});
+	const restack = useStackRestack(
+		pr && workspace.projectId
+			? {
+					projectId: workspace.projectId,
+					hostId: workspace.hostId,
+					hostUrl,
+					prNumber: pr.number,
+				}
+			: null,
+		flow.stack,
+	);
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
 
 	const sync = state.kind === "pr-exists" ? state.sync : null;
 	const canCommit = sync?.hasUncommitted === true;
@@ -183,22 +174,13 @@ export function PRStatusGroup({
 	// Queued PRs are still actively running checks, so keep CI/review indicators.
 	const showIndicators = pr.state === "open" || pr.state === "queued";
 
-	const stack = stackQuery.stack;
-	const stackBlocker = resolveStackMergeBlocker({
-		stack,
-		isIncomplete: stackQuery.isIncomplete,
-	});
-	const stackMergeCount = stack ? stackMergeTargets(stack).length : null;
-	const isMerging = prActions.isMerging || mergeStackMutation.isPending;
-	const mergeUnavailable =
-		isMerging || stackQuery.isLoading || stackBlocker !== null;
-	const handleMerge = (mergeMethod: StackMergeMethod) => {
-		if (stack) setStackMerge({ open: true, method: mergeMethod });
-		else prActions.merge(mergeMethod);
-	};
+	const stack = flow.stack;
+	const isQueued = pr.state === "queued" || flow.queued !== null;
+	const isMerging = prActions.isMerging || flow.isMerging;
 
 	const isBusy =
 		isMerging ||
+		flow.isDequeuing ||
 		prActions.isMarkingReady ||
 		shipActions.isCommitting ||
 		shipActions.isPushing;
@@ -268,6 +250,8 @@ export function PRStatusGroup({
 							<div className={cn("h-full w-px", tint.divider)} />
 							<PullRequestStackPopover
 								stack={stack}
+								flow={flow}
+								restack={restack}
 								appearance="segment"
 								className={tint.hover}
 								workspaceNumber={pr.number}
@@ -352,34 +336,14 @@ export function PRStatusGroup({
 									<DropdownMenuSeparator />
 								</>
 							)}
-							{canMerge && (
+							{(canMerge || isQueued) && (
 								<>
-									<DropdownMenuLabel
-										className={cn(
-											"font-normal text-muted-foreground",
-											"text-xs",
-										)}
-									>
-										{stack ? (
-											<span className="flex items-center gap-1.5">
-												<Trans>Merge stack</Trans>
-												<span className="rounded-full bg-foreground/10 px-1.5 text-[11px] leading-4 tabular-nums">
-													{stackMergeCount}
-												</span>
-											</span>
-										) : (
-											<Trans>Merge</Trans>
-										)}
-									</DropdownMenuLabel>
-									{stackBlocker ? (
-										<p className="px-2 pb-1.5 text-xs text-muted-foreground">
-											{stackCopy.blocker(stackBlocker)}
-										</p>
-									) : null}
-									<MergeMethodMenuItems
+									<PullRequestMergeMenuSection
 										target={target}
-										isMerging={mergeUnavailable}
-										onMerge={handleMerge}
+										flow={flow}
+										isQueued={isQueued}
+										isMergingAlone={prActions.isMerging}
+										onMergeAlone={prActions.merge}
 										className="text-xs"
 										iconClassName="size-3.5"
 									/>
@@ -409,21 +373,7 @@ export function PRStatusGroup({
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
-					{stack ? (
-						<PullRequestStackMergeDialog
-							open={stackMerge.open}
-							onOpenChange={(open) =>
-								setStackMerge((current) => ({ ...current, open }))
-							}
-							stack={stack}
-							prNumber={pr.number}
-							method={stackMerge.method}
-							onConfirm={() => {
-								setStackMerge((current) => ({ ...current, open: false }));
-								mergeStackMutation.mutate(stackMerge.method);
-							}}
-						/>
-					) : null}
+					<PullRequestMergeFlowDialog flow={flow} prNumber={pr.number} />
 				</div>
 			</PopoverAnchor>
 			<PopoverContent align="end" sideOffset={8} className="w-80 p-3">

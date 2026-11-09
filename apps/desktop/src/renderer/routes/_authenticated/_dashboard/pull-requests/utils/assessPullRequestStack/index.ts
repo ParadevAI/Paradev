@@ -5,5 +5,8 @@ export {
 	type PullRequestStackMergeBlocker,
 	type PullRequestStackVerdict,
 	resolveStackMergeBlocker,
+	type StackLayerIssue,
+	stackableChain,
+	stackLayerIssue,
 	stackMergeTargets,
 } from "./assessPullRequestStack";

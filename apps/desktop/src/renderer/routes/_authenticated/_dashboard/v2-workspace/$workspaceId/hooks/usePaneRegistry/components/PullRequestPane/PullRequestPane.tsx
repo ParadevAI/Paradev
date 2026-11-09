@@ -17,9 +17,10 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
 import { PullRequestStackNotice } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackNotice";
 import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
-import { usePullRequestStack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
 import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
 import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
+import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useStackRestack";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
@@ -118,13 +119,18 @@ export function PullRequestPane({
 		isLinkedPR,
 		onOpenInDiff,
 	]);
-	// The workspace's own PR is in the workspace's project, whatever repo name
-	// the PR's URL carries.
-	const stack = usePullRequestStack({
-		projectId: (isLinkedPR ? workspace.projectId : null) ?? detail.projectId,
-		hostUrl,
-		prNumber: data.number,
-	});
+	const flow = usePullRequestMergeFlow({ target });
+	const restack = useStackRestack(
+		detail.projectId
+			? {
+					projectId: detail.projectId,
+					hostId: workspace.hostId,
+					hostUrl,
+					prNumber: data.number,
+				}
+			: null,
+		flow.stack,
+	);
 	const diffStat =
 		detail.data?.additions !== undefined && detail.data.deletions !== undefined
 			? { additions: detail.data.additions, deletions: detail.data.deletions }
@@ -142,9 +148,11 @@ export function PullRequestPane({
 					/>
 				</div>
 				<div className="ml-auto flex shrink-0 items-center gap-1.5">
-					{stack.stack ? (
+					{flow.stack ? (
 						<PullRequestStackPopover
-							stack={stack.stack}
+							stack={flow.stack}
+							flow={flow}
+							restack={restack}
 							appearance="badge"
 							workspaceNumber={linkedPR.data?.number ?? null}
 							viewingNumber={data.number}
@@ -158,15 +166,15 @@ export function PullRequestPane({
 						hostUrl={hostUrl}
 						data={detail.data}
 						isLoading={detail.isLoading}
-						stack={stack}
+						flow={flow}
 						showStartWorkspace={false}
 						onRefresh={refresh}
 						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</div>
-			{stack.isIncomplete && detail.data?.state === "open" ? (
-				<PullRequestStackNotice onRefresh={stack.refetch} />
+			{flow.stackQuery.isIncomplete && detail.data?.state === "open" ? (
+				<PullRequestStackNotice onRefresh={flow.stackQuery.refetch} />
 			) : null}
 			<PullRequestDetailContent
 				activeTab={activeTab}

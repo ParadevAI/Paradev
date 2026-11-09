@@ -1,1 +1,4 @@
-export { usePullRequestStackCopy } from "./usePullRequestStackCopy";
+export {
+	type MergeActionKind,
+	usePullRequestStackCopy,
+} from "./usePullRequestStackCopy";
