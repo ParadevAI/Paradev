@@ -46,6 +46,8 @@ export function ChangedFileRow({
 			{...buttonProps}
 		>
 			<FileIcon fileName={name} className="size-3.5 shrink-0" />
+			{/* The name never shrinks before the folder text; it truncates only when
+			    it alone is wider than the row, keeping room for the rename hint. */}
 			<span className="flex min-w-0 flex-1 items-baseline overflow-hidden">
 				{dir && !hideDir && (
 					<span className="truncate text-muted-foreground">{dir}</span>
@@ -58,7 +60,12 @@ export function ChangedFileRow({
 						<span className="shrink-0 px-1 text-muted-foreground">→</span>
 					</>
 				)}
-				<span className="min-w-[120px] truncate font-medium text-foreground">
+				<span
+					className={cn(
+						"shrink-0 truncate font-medium text-foreground",
+						oldLabel ? "max-w-[calc(100%-3.25rem)]" : "max-w-full",
+					)}
+				>
 					{name}
 				</span>
 			</span>
