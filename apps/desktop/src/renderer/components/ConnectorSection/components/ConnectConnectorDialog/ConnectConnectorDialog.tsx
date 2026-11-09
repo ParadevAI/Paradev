@@ -132,6 +132,23 @@ function DialogBody({
 							</Trans>
 						}
 					/>
+					{connector?.scope === "user" ? (
+						<TrustItem
+							title={<Trans>Personal to you</Trans>}
+							body={t({
+								message: `Only you can use this connection. Teammates connect their own ${name} accounts.`,
+							})}
+						/>
+					) : connector ? (
+						<TrustItem
+							title={<Trans>Shared with your organization</Trans>}
+							body={
+								<Trans>
+									Everyone in this organization uses this connection.
+								</Trans>
+							}
+						/>
+					) : null}
 					<TrustItem
 						title={<Trans>Credentials stay on the server</Trans>}
 						body={

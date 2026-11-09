@@ -7958,6 +7958,12 @@ msgstr "Каждый будний день в 9:00 читай новые зад�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Все спорят, обобщается ли это. Сам спор — признак того, что уровень достигнут."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Все в этой организации используют этот аккаунт."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Все в этой организации используют это подключение."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Все видят новые версии по мере публикации"
 
@@ -13521,6 +13527,12 @@ msgstr "Только вы"
 msgid "Only you can see this page"
 msgstr "Эту страницу видите только вы"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Только вы можете использовать эти аккаунты. Коллеги подключают свои."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Только вы можете использовать это подключение. Коллеги подключают свои аккаунты {name}."
+
 msgid "Only you. Teammates forward their own."
 msgstr "Только для вас. Коллеги перенаправляют свои сами."
 
@@ -14652,6 +14664,9 @@ msgstr "Личный аккаунт"
 
 msgid "Personal plan"
 msgstr "Личный тариф"
+
+msgid "Personal to you"
+msgstr "Только для вас"
 
 msgid "Phantom Forklift"
 msgstr "Призрачный погрузчик"
@@ -17837,6 +17852,9 @@ msgstr "Доступна всем"
 
 msgid "Shared with me"
 msgstr "Доступные мне"
+
+msgid "Shared with your organization"
+msgstr "Доступно вашей организации"
 
 msgid "Sheet"
 msgstr "Панель"

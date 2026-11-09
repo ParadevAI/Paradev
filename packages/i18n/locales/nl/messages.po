@@ -7958,6 +7958,12 @@ msgstr "Elke werkdag om 9 uur: lees nieuwe GitHub-issues, plaats labels en stel 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Iedereen discussieert over de vraag of dit generaliseert. Die discussie is het teken dat het niveau is bereikt."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Iedereen in deze organisatie gebruikt dit account."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Iedereen in deze organisatie gebruikt deze verbinding."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Iedereen ziet nieuwe versies zodra ze worden gepubliceerd"
 
@@ -13521,6 +13527,12 @@ msgstr "Alleen jij"
 msgid "Only you can see this page"
 msgstr "Alleen jij kunt deze pagina zien"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Alleen jij kunt deze accounts gebruiken. Teamgenoten koppelen hun eigen accounts."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Alleen jij kunt deze verbinding gebruiken. Teamgenoten koppelen hun eigen {name}-accounts."
+
 msgid "Only you. Teammates forward their own."
 msgstr "Alleen jij. Teamgenoten sturen hun eigen poorten door."
 
@@ -14652,6 +14664,9 @@ msgstr "Persoonlijk account"
 
 msgid "Personal plan"
 msgstr "Persoonlijk abonnement"
+
+msgid "Personal to you"
+msgstr "Alleen voor jou"
 
 msgid "Phantom Forklift"
 msgstr "Fantoomheftruck"
@@ -17837,6 +17852,9 @@ msgstr "Gedeeld met iedereen"
 
 msgid "Shared with me"
 msgstr "Gedeeld met mij"
+
+msgid "Shared with your organization"
+msgstr "Gedeeld met je organisatie"
 
 msgid "Sheet"
 msgstr "Sheet"

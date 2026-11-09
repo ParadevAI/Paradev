@@ -7958,6 +7958,12 @@ msgstr "每個工作日上午9點，閱讀新的GitHub議題，打上標籤，�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在爭論這能否推廣。這場爭論本身就說明這一級別已經達到了。"
 
+msgid "Everyone in this organization uses this account."
+msgstr "此組織中的所有人都使用此帳號。"
+
+msgid "Everyone in this organization uses this connection."
+msgstr "此組織中的所有人都使用此連線。"
+
 msgid "Everyone sees new versions as they are published"
 msgstr "新版本一經發布，所有人都會看到"
 
@@ -13521,6 +13527,12 @@ msgstr "僅你自己"
 msgid "Only you can see this page"
 msgstr "僅你可見此頁面"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "只有你可以使用這些帳號。隊友會連結自己的帳號。"
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "只有你可以使用此連線。隊友會連結自己的 {name} 帳號。"
+
 msgid "Only you. Teammates forward their own."
 msgstr "僅限你自己。隊友各自轉送。"
 
@@ -14652,6 +14664,9 @@ msgstr "個人帳號"
 
 msgid "Personal plan"
 msgstr "個人方案"
+
+msgid "Personal to you"
+msgstr "僅限你使用"
 
 msgid "Phantom Forklift"
 msgstr "幽靈堆高機"
@@ -17837,6 +17852,9 @@ msgstr "已與所有人分享"
 
 msgid "Shared with me"
 msgstr "與我共用"
+
+msgid "Shared with your organization"
+msgstr "與你的組織共享"
 
 msgid "Sheet"
 msgstr "側邊面板"

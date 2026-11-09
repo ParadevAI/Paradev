@@ -7958,6 +7958,12 @@ msgstr "Tiap hari kerja jam 9 pagi, baca issue GitHub baru, terapkan label, dan 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Semua orang berdebat apakah ini bisa digeneralisasi. Perdebatan itu justru tanda bahwa levelnya sudah tercapai."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Semua orang di organisasi ini menggunakan akun ini."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Semua orang di organisasi ini menggunakan koneksi ini."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Semua orang melihat versi baru begitu dipublikasikan"
 
@@ -13521,6 +13527,12 @@ msgstr "Hanya Anda"
 msgid "Only you can see this page"
 msgstr "Hanya Anda yang dapat melihat halaman ini"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Hanya Anda yang dapat menggunakan akun ini. Rekan tim menghubungkan akun mereka sendiri."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Hanya Anda yang dapat menggunakan koneksi ini. Rekan tim menghubungkan akun {name} mereka sendiri."
+
 msgid "Only you. Teammates forward their own."
 msgstr "Hanya Anda. Rekan tim meneruskan port mereka sendiri."
 
@@ -14652,6 +14664,9 @@ msgstr "Akun pribadi"
 
 msgid "Personal plan"
 msgstr "Paket pribadi"
+
+msgid "Personal to you"
+msgstr "Khusus untuk Anda"
 
 msgid "Phantom Forklift"
 msgstr "Forklift Hantu"
@@ -17837,6 +17852,9 @@ msgstr "Dibagikan ke semua orang"
 
 msgid "Shared with me"
 msgstr "Dibagikan dengan saya"
+
+msgid "Shared with your organization"
+msgstr "Dibagikan dengan organisasi Anda"
 
 msgid "Sheet"
 msgstr "Sheet"
