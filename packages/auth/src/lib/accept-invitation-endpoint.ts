@@ -26,13 +26,6 @@ function verificationMatchesInvitation({
 	);
 }
 
-type AcceptFailureReason =
-	| "token_mismatch"
-	| "not_found"
-	| "not_pending"
-	| "free_plan_limit"
-	| "add_member_failed";
-
 function getInvitationAcceptError(error: unknown) {
 	if (!(error instanceof Error)) {
 		return {
@@ -113,15 +106,6 @@ export const acceptInvitationEndpoint = {
 					);
 				}
 
-				// On the inviter's timeline, next to the invitation they created.
-				const captureAcceptFailed = (reason: AcceptFailureReason) =>
-					captureOrgEvent({
-						event: "invitation_accept_failed",
-						distinctId: invitation.inviterId,
-						organizationId: invitation.organization.id,
-						properties: { invitation_id: invitation.id, reason },
-					});
-
 				if (
 					!verificationMatchesInvitation({
 						verificationIdentifier: verification.identifier,
@@ -132,7 +116,6 @@ export const acceptInvitationEndpoint = {
 					console.log(
 						"[invitation/accept] ERROR - Token does not match invitation",
 					);
-					await captureAcceptFailed("token_mismatch");
 					return ctx.json(
 						{ error: "This invitation link is invalid or has expired." },
 						{ status: 400 },
@@ -145,7 +128,6 @@ export const acceptInvitationEndpoint = {
 						"[invitation/accept] ERROR - Invitation already processed:",
 						invitation.status,
 					);
-					await captureAcceptFailed("not_pending");
 					return ctx.json({ error: processedError.error }, { status: 409 });
 				}
 
@@ -153,7 +135,6 @@ export const acceptInvitationEndpoint = {
 				let user = await db.query.users.findFirst({
 					where: eq(users.email, invitation.email),
 				});
-				const inviteeIsNewUser = !user;
 
 				if (!user) {
 					const userName = invitation.email;
@@ -186,7 +167,7 @@ export const acceptInvitationEndpoint = {
 							ok: false as const,
 							error: "This invitation link is invalid or has expired.",
 							status: 404,
-							reason: "not_found" as const,
+							reason: "not_pending" as const,
 						};
 					}
 
@@ -268,31 +249,23 @@ export const acceptInvitationEndpoint = {
 				});
 
 				if (!acceptanceResult.ok) {
-					await captureAcceptFailed(acceptanceResult.reason);
+					// On the inviter's timeline, next to the invitation they created.
+					await captureOrgEvent({
+						event: "invitation_accept_failed",
+						distinctId: invitation.inviterId,
+						organizationId: invitation.organization.id,
+						properties: {
+							invitation_id: invitation.id,
+							reason: acceptanceResult.reason,
+						},
+					});
 					return ctx.json(
 						{ error: acceptanceResult.error },
 						{ status: acceptanceResult.status },
 					);
 				}
 
-				// The inviter's timeline gets the acceptance, so invitation_created ->
-				// invitation_accepted is a per-inviter funnel; the invitee's gets
-				// member_joined. Whether a share created the invitation is joined on
-				// invitation_id from the client's share_invite_created.
-				await captureOrgEvent({
-					event: "invitation_accepted",
-					distinctId: invitation.inviterId,
-					organizationId: invitation.organization.id,
-					properties: {
-						invitation_id: invitation.id,
-						invitee_user_id: user.id,
-						invitee_is_new_user: inviteeIsNewUser,
-						member_added: acceptanceResult.memberAdded,
-						hours_to_accept:
-							(Date.now() - new Date(invitation.createdAt).getTime()) /
-							3_600_000,
-					},
-				});
+				// Only when they weren't already a member (e.g. by domain auto-join).
 				if (acceptanceResult.memberAdded) {
 					await captureOrgEvent({
 						event: "member_joined",

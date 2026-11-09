@@ -36,7 +36,7 @@ export function PageShareSheet() {
 		(page.data !== undefined &&
 			share.currentUserId !== undefined &&
 			page.data.createdByUserId === share.currentUserId);
-	useShareSession("page", canManage);
+	useShareSession("page");
 
 	return (
 		<ShareAccessSheet

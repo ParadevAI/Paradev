@@ -1,1 +1,1 @@
-export { useShareSession } from "./useShareSession";
+export { markShared, useShareSession } from "./useShareSession";

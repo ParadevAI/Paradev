@@ -10,9 +10,8 @@ import type { PageHeaderSharing } from "@superset/ui/page-comments";
 import {
 	type InviteNewMode,
 	type ShareGranteeRef,
-	type ShareUiEvent,
 	shareDirectory,
-	shareUiEventPayload,
+	shareUiEvent,
 } from "@superset/ui/share-access";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -71,11 +70,6 @@ export function usePageSharing(pageId: string): PageHeaderSharing {
 			trpc.page.sharing.get.queryFilter({ id: pageId }),
 		);
 
-	const captureShareEvent = (event: ShareUiEvent) => {
-		const { name, properties } = shareUiEventPayload(event, "page");
-		posthog.capture(name, properties);
-	};
-
 	/** Pass `sharing` from a share to record each invitation as created by it; a resend doesn't. */
 	const inviteEmails = async (emails: string[], sharing = false) => {
 		const ids: string[] = [];
@@ -91,7 +85,12 @@ export function usePageSharing(pageId: string): PageHeaderSharing {
 			}
 			ids.push(data.id);
 			if (sharing) {
-				captureShareEvent({ type: "invite_created", invitationId: data.id });
+				posthog.capture(
+					...shareUiEvent(
+						{ type: "invite_created", invitationId: data.id },
+						"page",
+					),
+				);
 			}
 		}
 		return ids;
@@ -110,7 +109,7 @@ export function usePageSharing(pageId: string): PageHeaderSharing {
 			null,
 		inviteNew,
 		onUpgrade: () => router.push("/settings/billing"),
-		onEvent: captureShareEvent,
+		onEvent: (event) => posthog.capture(...shareUiEvent(event, "page")),
 		onAdd: async ({ grantees: picked, emails, role: shareRole }) => {
 			const invitationIds = await inviteEmails(emails, true);
 			await add.mutateAsync({

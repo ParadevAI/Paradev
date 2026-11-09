@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
+import { errorMessage } from "@superset/i18n/errors";
 import {
 	getInvitableRoles,
 	type OrganizationRole,
@@ -12,6 +12,7 @@ import {
 	type ShareGranteeRef,
 	type ShareResourceKind,
 	shareDirectory,
+	shareUiEvent,
 } from "@superset/shared/sharing";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -19,11 +20,12 @@ import { useMemo } from "react";
 import { Alert } from "react-native";
 import { authClient, useSession } from "@/lib/auth/client";
 import { openUrl } from "@/lib/open-url";
+import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { billingSettingsUrl } from "@/lib/web-links";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { useOrgMembers } from "@/screens/(authenticated)/hooks/useOrgMembers";
-import { captureShareEvent, markShared } from "../../utils/shareSession";
+import { markShared } from "../useShareSession";
 
 /** Who the share sheet can find in the active organization, and whether new people can be invited. */
 export function useShareDirectory() {
@@ -69,10 +71,11 @@ export function useShareDirectory() {
 				throw new Error(error?.message ?? `Could not invite ${email}`);
 			}
 			ids.push(data.id);
-			// Recorded per invite, so it holds even if granting access fails after.
-			captureShareEvent(
-				{ type: "invite_created", invitationId: data.id },
-				resourceKind,
+			posthog.capture(
+				...shareUiEvent(
+					{ type: "invite_created", invitationId: data.id },
+					resourceKind,
+				),
 			);
 		}
 		return ids;
@@ -97,11 +100,10 @@ export function useShareDirectory() {
 
 	/** Invites any new emails, then grants everyone access through `add`. Resolves false after showing the error. */
 	const share = async (
-		request: ShareAddRequest,
+		{ grantees, emails, role }: ShareAddRequest,
 		add: (grantees: ShareGranteeRef[], role: string) => Promise<unknown>,
 		resourceKind: ShareResourceKind,
 	) => {
-		const { grantees, emails, role } = request;
 		try {
 			const invitationIds = await inviteEmails(emails, resourceKind);
 			await add(
@@ -120,10 +122,6 @@ export function useShareDirectory() {
 			void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 			return true;
 		} catch (error) {
-			captureShareEvent(
-				{ type: "failed", request, error: rawErrorMessage(error) },
-				resourceKind,
-			);
 			Alert.alert(errorMessage(error, t({ message: "Could not share" })));
 			return false;
 		}

@@ -856,19 +856,6 @@ export const auth = betterAuth({
 						);
 					}
 
-					if (seatsOwnedByAutumn || itemId) {
-						await captureOrgEvent({
-							event: "seat_added",
-							distinctId: member.userId,
-							organizationId: organization.id,
-							properties: {
-								plan: subscription.plan,
-								seats: quantity,
-								previous_seats: quantity - 1,
-							},
-						});
-					}
-
 					const recipients = await getOrganizationBillingRecipients(
 						organization.id,
 					);
@@ -998,19 +985,6 @@ export const auth = betterAuth({
 						);
 					}
 
-					if (seatsOwnedByAutumn || itemId) {
-						await captureOrgEvent({
-							event: "seat_removed",
-							distinctId: user.id,
-							organizationId: organization.id,
-							properties: {
-								plan: subscription.plan,
-								seats: quantity,
-								previous_seats: quantity + 1,
-							},
-						});
-					}
-
 					const recipients = await getOrganizationBillingRecipients(
 						organization.id,
 					);
@@ -1087,19 +1061,11 @@ export const auth = betterAuth({
 					inviter,
 					organization,
 				}) => {
-					const invitee = await db.query.users.findFirst({
-						where: eq(authSchema.users.email, invitation.email),
-						columns: { id: true },
-					});
 					await captureOrgEvent({
 						event: "invitation_created",
 						distinctId: inviter.id,
 						organizationId: organization.id,
-						properties: {
-							invitation_id: invitation.id,
-							role: invitation.role,
-							invitee_has_account: Boolean(invitee),
-						},
+						properties: { invitation_id: invitation.id },
 					});
 				},
 

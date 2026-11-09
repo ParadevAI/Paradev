@@ -1,12 +1,12 @@
 import { getInvitableRoles } from "@superset/shared/auth";
 import { isPaidPlanTier } from "@superset/shared/billing";
-import type { ShareResourceKind } from "@superset/shared/sharing";
+import { type ShareResourceKind, shareUiEvent } from "@superset/shared/sharing";
 import { type InviteNewMode, shareDirectory } from "@superset/ui/share-access";
 import { useCallback, useMemo } from "react";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
-import { trackShareEvent } from "renderer/lib/analytics";
+import { track } from "renderer/lib/analytics";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOrganizationRole } from "renderer/routes/_authenticated/hooks/useOrganizationRole";
@@ -68,10 +68,12 @@ export function useShareDirectory() {
 				}
 				ids.push(data.id);
 				if (sharing) {
-					trackShareEvent(sharing)({
-						type: "invite_created",
-						invitationId: data.id,
-					});
+					track(
+						...shareUiEvent(
+							{ type: "invite_created", invitationId: data.id },
+							sharing,
+						),
+					);
 				}
 			}
 			if (ids.length) void utils.organization.listInvitations.invalidate();

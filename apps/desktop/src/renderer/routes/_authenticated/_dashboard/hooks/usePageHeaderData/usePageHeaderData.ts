@@ -6,9 +6,9 @@ import type {
 	PageHeaderVersion,
 	PageVisibility,
 } from "@superset/ui/page-comments";
-import type { ShareGranteeRef } from "@superset/ui/share-access";
+import { type ShareGranteeRef, shareUiEvent } from "@superset/ui/share-access";
 import { useCallback } from "react";
-import { trackShareEvent } from "renderer/lib/analytics";
+import { track } from "renderer/lib/analytics";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { usePageFavorites } from "../usePageFavorites";
@@ -80,7 +80,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 		organizationLogo: share.organizationLogo,
 		inviteNew: share.inviteNew,
 		onUpgrade: share.onUpgrade,
-		onEvent: trackShareEvent("page"),
+		onEvent: (event) => track(...shareUiEvent(event, "page")),
 		onAdd: async ({ grantees: picked, emails, role }) => {
 			if (!pageId) return;
 			const invitationIds = await share.inviteEmails(emails, "page");

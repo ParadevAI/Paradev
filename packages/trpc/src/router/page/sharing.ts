@@ -5,7 +5,6 @@ import { and, eq } from "drizzle-orm";
 import {
 	addPageSharesSchema,
 	addShares,
-	captureResourceShared,
 	listGrantees,
 	removeShare,
 	removeShareSchema,
@@ -96,14 +95,6 @@ export const pageSharingRouter = {
 				grantees,
 				sharedByUserId: userId,
 				role: input.role,
-			});
-			captureResourceShared({
-				target: { kind: "page", id: page.id },
-				organizationId: page.organizationId,
-				sharedByUserId: userId,
-				added,
-				role: input.role,
-				client: ctx.client,
 			});
 			return { added };
 		}),
