@@ -5809,6 +5809,44 @@ describe("AcpAdapter config options", () => {
 		await adapter.dispose();
 	});
 
+	it("turns fast mode on once the agent has taken the start model", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [
+			MODEL_OPTION,
+			{
+				id: "fast",
+				name: "Fast mode",
+				type: "select",
+				currentValue: "off",
+				options: [
+					{ value: "off", name: "Off" },
+					{ value: "on", name: "On" },
+				],
+			},
+		];
+		const { adapter } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			fast: "on",
+		});
+		await flush(20);
+
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params),
+		).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "fast", value: "on" },
+		]);
+		expect(await adapter.startSelections()).toEqual({
+			modelId: "sonnet",
+			fast: "on",
+		});
+
+		await adapter.dispose();
+	});
+
 	it("skips the start effort when the agent refuses the start model, and reports what it took", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;

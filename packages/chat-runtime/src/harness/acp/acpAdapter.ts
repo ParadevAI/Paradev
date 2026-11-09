@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import type { ChatSelections } from "@superset/chat/core";
+import {
+	type ChatSelections,
+	type SelectionCategory,
+	selectionCategoryOf,
+} from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	AvailableCommand,
@@ -1997,15 +2001,15 @@ export class AcpAdapter implements HarnessAdapter {
 
 	/** Resolves to the value the agent took, or undefined when it took none. */
 	private applyStartSelection(
-		category: "model" | "thought_level" | "mode",
+		category: SelectionCategory,
 		wanted: string | undefined,
 	): Promise<string | undefined> {
 		const option = this.configOptions.find(
-			(entry) => entry.category === category,
+			(entry) => selectionCategoryOf(entry) === category,
 		);
 		if (!wanted || !option) return Promise.resolve(undefined);
 		const value =
-			category === "mode"
+			category === "mode" || category === "fast"
 				? option.options.some((entry) => entry.id === wanted)
 					? wanted
 					: undefined
@@ -2021,20 +2025,25 @@ export class AcpAdapter implements HarnessAdapter {
 		wanted: ChatSelections,
 	): Promise<ChatSelections> {
 		const model = this.applyStartSelection("model", wanted.modelId);
-		const { effortId } = wanted;
-		// The effort levels on offer belong to the model, so they are only known once it is set.
-		const effort = model.then((modelId) =>
-			effortId && (modelId || !wanted.modelId)
-				? this.applyStartSelection("thought_level", effortId)
-				: undefined,
-		);
-		this.trackSelection(effort);
+		// Effort levels and fast mode belong to the model, so they are only known once it is set.
+		const afterModel = (category: "thought_level" | "fast", value?: string) => {
+			const taken = model.then((modelId) =>
+				value && (modelId || !wanted.modelId)
+					? this.applyStartSelection(category, value)
+					: undefined,
+			);
+			this.trackSelection(taken);
+			return taken;
+		};
+		const effort = afterModel("thought_level", wanted.effortId);
+		const fast = afterModel("fast", wanted.fast);
 		const mode = this.applyStartSelection("mode", wanted.modeId);
-		return Promise.all([model, effort, mode]).then(
-			([modelId, effortId, modeId]) => ({
+		return Promise.all([model, effort, mode, fast]).then(
+			([modelId, effortId, modeId, fastTaken]) => ({
 				...(modelId ? { modelId } : {}),
 				...(effortId ? { effortId } : {}),
 				...(modeId ? { modeId } : {}),
+				...(fastTaken ? { fast: fastTaken } : {}),
 			}),
 		);
 	}
@@ -2067,6 +2076,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const wanted: ChatSelections = {
 			...(startOptions.modelId ? { modelId: startOptions.modelId } : {}),
 			...(startOptions.effortId ? { effortId: startOptions.effortId } : {}),
+			...(startOptions.fast ? { fast: startOptions.fast } : {}),
 			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
 		};
 		const configured =

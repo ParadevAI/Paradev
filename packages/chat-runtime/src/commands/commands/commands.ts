@@ -6,7 +6,6 @@ import {
 	deriveQueuedPrompts,
 	deriveTimeline,
 	emptySnapshot,
-	isSelectionCategory,
 	isStartingMode,
 	outlineSnapshot,
 	reduceMany,
@@ -15,6 +14,7 @@ import {
 	type SessionOutline,
 	type SessionSnapshot,
 	type StoredItem,
+	selectionCategoryOf,
 	selectionKey,
 	sessionSelections,
 	userStopOf,
@@ -787,11 +787,12 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				setConfigOptionInputSchema.parse(input);
 			return options.dedupe.run(`setConfigOption:${parsed.commandId}`, () => {
 				const live = options.live.require(parsed.sessionId);
-				const category = live.state.configOptions?.find(
-					(option) => option.id === parsed.configId,
-				)?.category;
+				const option = live.state.configOptions?.find(
+					(entry) => entry.id === parsed.configId,
+				);
+				const category = option ? selectionCategoryOf(option) : undefined;
 				const taken = live.setConfigOption(parsed.configId, parsed.value);
-				if (isSelectionCategory(category)) {
+				if (category) {
 					const order = pickOrder();
 					void taken.then((accepted) => {
 						if (accepted) rememberTaken(live, category, parsed.value, order);

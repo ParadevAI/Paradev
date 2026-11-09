@@ -34,6 +34,15 @@ const configOptions: SessionConfigOption[] = [
 			{ id: "high", label: "High" },
 		],
 	},
+	{
+		id: "fast",
+		label: "Fast mode",
+		currentValue: "off",
+		options: [
+			{ id: "off", label: "Off" },
+			{ id: "on", label: "On" },
+		],
+	},
 ];
 
 function selectionRuntime() {
@@ -49,11 +58,12 @@ function selectionRuntime() {
 		private started: ChatSelections = {};
 
 		override start(options: HarnessStartOptions) {
-			const { modelId, effortId, modeId } = options;
+			const { modelId, effortId, modeId, fast } = options;
 			this.started = {
 				...(modelId ? { modelId } : {}),
 				...(effortId ? { effortId } : {}),
 				...(modeId ? { modeId } : {}),
+				...(fast ? { fast } : {}),
 			};
 			starts.push(this.started);
 			return super.start(options);
@@ -201,6 +211,26 @@ describe("chat selections", () => {
 		await runtime.dispose();
 	});
 
+	test("fast mode is remembered by its option id, whether turned on or off", async () => {
+		const { runtime, starts, create, idle } = selectionRuntime();
+		const toggle = async (sessionId: string, value: string) => {
+			await idle(sessionId);
+			await runtime.commands.setConfigOption({
+				commandId: randomUUID(),
+				sessionId,
+				configId: "fast",
+				value,
+				confirm: true,
+			});
+		};
+		await toggle(create(FAKE_HARNESS).sessionId, "on");
+		await toggle(create(FAKE_HARNESS).sessionId, "off");
+		create(FAKE_HARNESS);
+
+		expect(starts.slice(1)).toEqual([{ fast: "on" }, { fast: "off" }]);
+		await runtime.dispose();
+	});
+
 	test("a chat nobody opened takes the remembered model and effort, but not the mode", async () => {
 		const { runtime, starts, create, pick } = selectionRuntime();
 		await pick(create(FAKE_HARNESS).sessionId);
@@ -239,7 +269,7 @@ describe("chat selections", () => {
 		await runtime.dispose();
 	});
 
-	test("a replacement resumes on the model, effort and mode of the chat it replaces", async () => {
+	test("a replacement resumes on the model, effort, mode and fast mode of the chat it replaces", async () => {
 		const { runtime, starts, create, idle, pick } = selectionRuntime();
 		const source = create(OTHER_HARNESS, { modelId: "default" });
 		await pick(source.sessionId);
@@ -257,6 +287,7 @@ describe("chat selections", () => {
 			modelId: "deepseek-v4.1-flash",
 			effortId: "high",
 			modeId: "plan",
+			fast: "off",
 		});
 		await runtime.dispose();
 	});
