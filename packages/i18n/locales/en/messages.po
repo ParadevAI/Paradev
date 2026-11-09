@@ -9271,6 +9271,9 @@ msgstr "Front matter hidden — switch to the Markdown view to edit it"
 msgid "Full access"
 msgstr "Full access"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Full access skips most approvals, but the agent still asks before some risky actions."
+
 msgid "Full changelog →"
 msgstr "Full changelog →"
 
@@ -12289,9 +12292,6 @@ msgstr "Network Changed"
 
 msgid "Never"
 msgstr "Never"
-
-msgid "Never asks before acting"
-msgstr "Never asks before acting"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Rank by"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 
+msgid "Rarely asks before acting"
+msgstr "Rarely asks before acting"
+
 msgid "Rate {appName}"
 msgstr "Rate {appName}"
 
@@ -18991,6 +18994,9 @@ msgstr "Step 2 of 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Steps 3 and 4 repeat until the page is right."
+
+msgid "Still asks in Full access mode"
+msgstr "Still asks in Full access mode"
 
 msgid "Still can't reach the host."
 msgstr "Still can't reach the host."

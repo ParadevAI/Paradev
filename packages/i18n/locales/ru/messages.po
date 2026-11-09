@@ -9271,6 +9271,9 @@ msgstr "Front matter скрыт — переключитесь в режим Mar
 msgid "Full access"
 msgstr "Полный доступ"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Полный доступ пропускает большинство подтверждений, но агент всё равно спрашивает перед некоторыми рискованными действиями."
+
 msgid "Full changelog →"
 msgstr "Полный changelog →"
 
@@ -12289,9 +12292,6 @@ msgstr "Сеть изменилась"
 
 msgid "Never"
 msgstr "Никогда"
-
-msgid "Never asks before acting"
-msgstr "Никогда не спрашивает"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Ранжировать по"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Сравните своё использование агентов с другими инженерами. Только количество токенов и названия моделей — без названий репозиториев, путей к файлам и промптов."
 
+msgid "Rarely asks before acting"
+msgstr "Редко спрашивает перед действием"
+
 msgid "Rate {appName}"
 msgstr "Оценить {appName}"
 
@@ -18991,6 +18994,9 @@ msgstr "Шаг 2 из 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Шаги 3 и 4 повторяются, пока страница не станет как надо."
+
+msgid "Still asks in Full access mode"
+msgstr "Спрашивает даже в режиме «Полный доступ»"
 
 msgid "Still can't reach the host."
 msgstr "Хост по-прежнему недоступен."

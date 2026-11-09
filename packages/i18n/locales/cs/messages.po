@@ -9271,6 +9271,9 @@ msgstr "Front matter je skrytý — pro úpravy přepněte na zobrazení Markdow
 msgid "Full access"
 msgstr "Plný přístup"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Plný přístup přeskočí většinu schválení, ale agent se u některých riskantních akcí stále zeptá."
+
 msgid "Full changelog →"
 msgstr "Celý changelog →"
 
@@ -12289,9 +12292,6 @@ msgstr "Síť se změnila"
 
 msgid "Never"
 msgstr "Nikdy"
-
-msgid "Never asks before acting"
-msgstr "Nikdy se neptá"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Řadit podle"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Porovnejte své využití agentů s ostatními inženýry. Jen počty tokenů a názvy modelů, žádné názvy repozitářů, cesty k souborům ani prompty."
 
+msgid "Rarely asks before acting"
+msgstr "Zřídka se ptá před akcí"
+
 msgid "Rate {appName}"
 msgstr "Ohodnotit {appName}"
 
@@ -18991,6 +18994,9 @@ msgstr "Krok 2 ze 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Kroky 3 a 4 se opakují, dokud stránka není správně."
+
+msgid "Still asks in Full access mode"
+msgstr "V režimu Plný přístup se stále ptá"
 
 msgid "Still can't reach the host."
 msgstr "Host je stále nedostupný."

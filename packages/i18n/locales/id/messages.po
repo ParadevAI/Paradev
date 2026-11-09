@@ -9271,6 +9271,9 @@ msgstr "Front matter disembunyikan — beralih ke tampilan Markdown untuk menged
 msgid "Full access"
 msgstr "Akses penuh"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Akses penuh melewati sebagian besar persetujuan, tetapi agen tetap bertanya sebelum beberapa tindakan berisiko."
+
 msgid "Full changelog →"
 msgstr "Changelog lengkap →"
 
@@ -12289,9 +12292,6 @@ msgstr "Jaringan Berubah"
 
 msgid "Never"
 msgstr "Tidak pernah"
-
-msgid "Never asks before acting"
-msgstr "Tidak pernah bertanya dulu"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Urutkan berdasarkan"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Peringkatkan penggunaan agen Anda terhadap engineer lain. Hanya jumlah token dan nama model, tanpa nama repo, path file, atau prompt."
 
+msgid "Rarely asks before acting"
+msgstr "Jarang bertanya sebelum bertindak"
+
 msgid "Rate {appName}"
 msgstr "Beri Nilai {appName}"
 
@@ -18991,6 +18994,9 @@ msgstr "Langkah 2 dari 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Langkah 3 dan 4 diulang sampai halamannya pas."
+
+msgid "Still asks in Full access mode"
+msgstr "Tetap bertanya dalam mode Akses penuh"
 
 msgid "Still can't reach the host."
 msgstr "Host masih tidak dapat dijangkau."

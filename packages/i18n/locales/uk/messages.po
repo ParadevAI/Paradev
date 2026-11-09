@@ -9265,6 +9265,9 @@ msgstr "Front matter приховано — перейдіть у режим Mar
 msgid "Full access"
 msgstr "Повний доступ"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Повний доступ пропускає більшість підтверджень, але агент усе одно запитує перед деякими ризикованими діями."
+
 msgid "Full changelog →"
 msgstr "Повний журнал змін →"
 
@@ -12283,9 +12286,6 @@ msgstr "Мережу змінено"
 
 msgid "Never"
 msgstr "Ніколи"
-
-msgid "Never asks before acting"
-msgstr "Ніколи не питає перед дією"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15682,6 +15682,9 @@ msgstr "Рейтинг за"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Порівнюйте використання агентів з іншими інженерами. Лише кількість токенів і назви моделей, без назв репозиторіїв, шляхів до файлів і промптів."
 
+msgid "Rarely asks before acting"
+msgstr "Рідко запитує перед дією"
+
 msgid "Rate {appName}"
 msgstr "Оцінити {appName}"
 
@@ -18985,6 +18988,9 @@ msgstr "Крок 2 з 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Кроки 3 і 4 повторюються, доки сторінка не стане такою, як треба."
+
+msgid "Still asks in Full access mode"
+msgstr "Запитує навіть у режимі «Повний доступ»"
 
 msgid "Still can't reach the host."
 msgstr "Хост досі недоступний."

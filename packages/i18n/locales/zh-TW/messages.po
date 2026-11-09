@@ -9271,6 +9271,9 @@ msgstr "已隱藏front matter — 切換到Markdown檢視進行編輯"
 msgid "Full access"
 msgstr "完整存取"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "完整存取會略過大多數核准，但代理程式在執行某些有風險的操作前仍會詢問。"
+
 msgid "Full changelog →"
 msgstr "完整更新日誌 →"
 
@@ -12289,9 +12292,6 @@ msgstr "網路已變更"
 
 msgid "Never"
 msgstr "從未"
-
-msgid "Never asks before acting"
-msgstr "執行前從不詢問"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "排序依據"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "把你的代理程式用量與其他工程師排名比較。僅包含token數量和模型名稱，不含儲存庫名、檔案路徑或提示詞。"
 
+msgid "Rarely asks before acting"
+msgstr "執行操作前很少詢問"
+
 msgid "Rate {appName}"
 msgstr "為{appName}評分"
 
@@ -18991,6 +18994,9 @@ msgstr "第 2 步，共 2 步"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "步驟 3 和 4 會重複，直到頁面滿意為止。"
+
+msgid "Still asks in Full access mode"
+msgstr "完整存取模式下仍會詢問"
 
 msgid "Still can't reach the host."
 msgstr "仍然無法連線到主機。"

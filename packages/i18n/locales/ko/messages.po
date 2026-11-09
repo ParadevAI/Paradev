@@ -9271,6 +9271,9 @@ msgstr "front matter 숨김 — 편집하려면 Markdown 보기로 전환하세�
 msgid "Full access"
 msgstr "전체 액세스"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "전체 액세스는 대부분의 승인을 건너뛰지만, 일부 위험한 작업 전에는 에이전트가 여전히 확인을 요청합니다."
+
 msgid "Full changelog →"
 msgstr "전체 변경 로그 →"
 
@@ -12289,9 +12292,6 @@ msgstr "네트워크 변경됨"
 
 msgid "Never"
 msgstr "없음"
-
-msgid "Never asks before acting"
-msgstr "묻지 않고 실행"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "정렬 기준"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "다른 엔지니어와 에이전트 사용량을 비교해 순위를 매깁니다. 토큰 수와 모델 이름만 게시되며 리포지토리 이름, 파일 경로, 프롬프트는 게시되지 않습니다."
 
+msgid "Rarely asks before acting"
+msgstr "작업 전에 거의 묻지 않습니다"
+
 msgid "Rate {appName}"
 msgstr "{appName} 평가하기"
 
@@ -18991,6 +18994,9 @@ msgstr "2단계 중 2단계"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "페이지가 완성될 때까지 3단계와 4단계를 반복합니다."
+
+msgid "Still asks in Full access mode"
+msgstr "전체 액세스 모드에서도 확인을 요청합니다"
 
 msgid "Still can't reach the host."
 msgstr "아직 호스트에 연결할 수 없습니다."

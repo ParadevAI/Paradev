@@ -9271,6 +9271,9 @@ msgstr "Đã ẩn front matter — hãy chuyển sang chế độ xem Markdown �
 msgid "Full access"
 msgstr "Toàn quyền truy cập"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Toàn quyền truy cập bỏ qua hầu hết các phê duyệt, nhưng agent vẫn hỏi trước một số hành động rủi ro."
+
 msgid "Full changelog →"
 msgstr "Changelog đầy đủ →"
 
@@ -12289,9 +12292,6 @@ msgstr "Mạng đã thay đổi"
 
 msgid "Never"
 msgstr "Chưa bao giờ"
-
-msgid "Never asks before acting"
-msgstr "Không bao giờ hỏi trước"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Xếp hạng theo"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Xếp hạng mức dùng agent của bạn so với các kỹ sư khác. Chỉ số token và tên mô hình, không có tên repo, đường dẫn tệp hay prompt."
 
+msgid "Rarely asks before acting"
+msgstr "Hiếm khi hỏi trước khi thực hiện"
+
 msgid "Rate {appName}"
 msgstr "Đánh giá {appName}"
 
@@ -18991,6 +18994,9 @@ msgstr "Bước 2/2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Bước 3 và 4 lặp lại cho đến khi trang ổn."
+
+msgid "Still asks in Full access mode"
+msgstr "Vẫn hỏi ở chế độ Toàn quyền truy cập"
 
 msgid "Still can't reach the host."
 msgstr "Vẫn không thể kết nối tới host."

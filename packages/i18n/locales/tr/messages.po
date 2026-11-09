@@ -9271,6 +9271,9 @@ msgstr "Front matter gizli — düzenlemek için Markdown görünümüne geçin"
 msgid "Full access"
 msgstr "Tam erişim"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Tam erişim çoğu onayı atlar, ancak ajan bazı riskli işlemlerden önce yine de sorar."
+
 msgid "Full changelog →"
 msgstr "Tüm değişiklik günlüğü →"
 
@@ -12289,9 +12292,6 @@ msgstr "Ağ değişti"
 
 msgid "Never"
 msgstr "Hiç"
-
-msgid "Never asks before acting"
-msgstr "Hiç sormadan çalışır"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Sıralama ölçütü"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Ajan kullanımınızı diğer mühendislerle karşılaştırın. Yalnızca token sayıları ve model adları; depo adı, dosya yolu veya istem yok."
 
+msgid "Rarely asks before acting"
+msgstr "Harekete geçmeden önce nadiren sorar"
+
 msgid "Rate {appName}"
 msgstr "{appName}'i puanla"
 
@@ -18991,6 +18994,9 @@ msgstr "Adım 2/2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Sayfa doğru olana kadar 3. ve 4. adımlar tekrarlanır."
+
+msgid "Still asks in Full access mode"
+msgstr "Tam erişim modunda bile sorar"
 
 msgid "Still can't reach the host."
 msgstr "Host'a hâlâ ulaşılamıyor."

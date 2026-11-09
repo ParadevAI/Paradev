@@ -9271,6 +9271,9 @@ msgstr "Front matter verborgen — schakel over naar de Markdown-weergave om die
 msgid "Full access"
 msgstr "Volledige toegang"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Volledige toegang slaat de meeste goedkeuringen over, maar de agent vraagt nog steeds om toestemming vóór sommige riskante acties."
+
 msgid "Full changelog →"
 msgstr "Volledige changelog →"
 
@@ -12289,9 +12292,6 @@ msgstr "Netwerk gewijzigd"
 
 msgid "Never"
 msgstr "Nooit"
-
-msgid "Never asks before acting"
-msgstr "Vraagt nooit vooraf"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Rangschikken op"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Vergelijk je agentgebruik met dat van andere engineers. Alleen tokenaantallen en modelnamen, geen repositorynamen, bestandspaden of prompts."
 
+msgid "Rarely asks before acting"
+msgstr "Vraagt zelden iets voordat het handelt"
+
 msgid "Rate {appName}"
 msgstr "{appName} beoordelen"
 
@@ -18991,6 +18994,9 @@ msgstr "Stap 2 van 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Stap 3 en 4 herhalen zich tot de pagina klopt."
+
+msgid "Still asks in Full access mode"
+msgstr "Vraagt nog steeds in de modus Volledige toegang"
 
 msgid "Still can't reach the host."
 msgstr "De host is nog steeds onbereikbaar."

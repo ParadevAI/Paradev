@@ -9271,6 +9271,9 @@ msgstr "Front matter nascosto — passa alla vista Markdown per modificarlo"
 msgid "Full access"
 msgstr "Accesso completo"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Accesso completo salta la maggior parte delle approvazioni, ma l’agente chiede comunque prima di alcune azioni rischiose."
+
 msgid "Full changelog →"
 msgstr "Changelog completo →"
 
@@ -12289,9 +12292,6 @@ msgstr "Rete cambiata"
 
 msgid "Never"
 msgstr "Mai"
-
-msgid "Never asks before acting"
-msgstr "Non chiede mai prima di agire"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15688,6 +15688,9 @@ msgstr "Ordina per"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Confronta il tuo utilizzo degli agenti con quello di altri ingegneri. Solo conteggi di token e nomi dei modelli, nessun nome di repository, percorso di file o prompt."
 
+msgid "Rarely asks before acting"
+msgstr "Chiede raramente prima di agire"
+
 msgid "Rate {appName}"
 msgstr "Valuta {appName}"
 
@@ -18991,6 +18994,9 @@ msgstr "Passo 2 di 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "I passaggi 3 e 4 si ripetono finché la pagina non è giusta."
+
+msgid "Still asks in Full access mode"
+msgstr "Chiede comunque in modalità Accesso completo"
 
 msgid "Still can't reach the host."
 msgstr "L'host resta irraggiungibile."
