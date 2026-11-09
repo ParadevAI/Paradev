@@ -659,7 +659,7 @@ msgstr "{0}, {outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0}: 기기 오프라인"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Paradev 트레이 메뉴 > Host Service > Restart를 사용해 보세요."
 

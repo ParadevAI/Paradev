@@ -5,7 +5,7 @@ import { track } from "renderer/lib/analytics";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { usePaymentFailedCardDismissalsStore } from "renderer/stores/payment-failed-card-dismissals";
+import { usePaymentFailedCardDismissalStore } from "renderer/stores/payment-failed-card-dismissal";
 import type { SidebarCardEntry } from "../../types";
 
 /**
@@ -55,8 +55,8 @@ export function usePaymentFailedCard({
 		});
 	const openUrl = electronTrpc.external.openUrl.useMutation();
 	const navigate = useNavigate();
-	const dismissedAt = usePaymentFailedCardDismissalsStore((s) => s.dismissedAt);
-	const dismiss = usePaymentFailedCardDismissalsStore((s) => s.dismiss);
+	const isDismissed = usePaymentFailedCardDismissalStore((s) => s.isDismissed);
+	const dismiss = usePaymentFailedCardDismissalStore((s) => s.dismiss);
 
 	const hasLapsed = mayHaveLapsed && Boolean(outstandingInvoice);
 
@@ -70,12 +70,12 @@ export function usePaymentFailedCard({
 		: null;
 	const hostedInvoiceUrl = outstandingInvoice?.hostedInvoiceUrl ?? null;
 	const state = hasLapsed ? "lapsed" : "past_due";
-	const dismissalKey = `${state}:${outstandingInvoice?.id ?? "unknown"}`;
-	if (dismissalKey in dismissedAt) return null;
+	const invoiceId = outstandingInvoice?.id ?? null;
+	if (isDismissed(state, invoiceId)) return null;
 
 	const onDismiss = () => {
 		track("payment_failed_banner_dismissed", { surface, isOwner, state });
-		dismiss(dismissalKey);
+		dismiss(state, invoiceId);
 	};
 
 	// Lapsed: the subscription is gone and paying the old invoice will not

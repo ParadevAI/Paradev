@@ -659,7 +659,7 @@ msgstr "{0}, {outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0}: устройство офлайн"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Попробуйте меню Paradev в трее > Host Service > Restart."
 
@@ -14380,7 +14380,7 @@ msgstr "Перезаписать файл"
 
 #. placeholder {0}: ownerName ?? t({ message: "a teammate", })
 msgid "Owned by {0}. Only they can edit this automation."
-msgstr "Владелец. {0}; изменять эту автоматизацию может только он."
+msgstr "Владелец: {0}. Изменять эту автоматизацию может только он."
 
 msgid "Owner"
 msgstr "Владелец"
@@ -15073,7 +15073,7 @@ msgid "Ports on this computer"
 msgstr "Порты на этом компьютере"
 
 msgid "Ports: {totalPortCount} live"
-msgstr "Порты: активных: {totalPortCount}"
+msgstr "Активных портов: {totalPortCount}"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "В хорошие дни возможно. Стоимость надзора пока растёт слишком быстро."

@@ -541,7 +541,7 @@ msgstr "{0} 已在本机设置，但未在你的账户中设置"
 
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
-msgstr "还有{0}个。。请细化搜索"
+msgstr "还有{0}个。请细化搜索"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: pages.length
@@ -659,7 +659,7 @@ msgstr "{0}，{outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0}，设备离线"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}。请尝试Paradev托盘菜单 > 主机服务 > 重启。"
 
@@ -861,7 +861,7 @@ msgid "{connectorName} account"
 msgstr "{connectorName} 账号"
 
 msgid "{cookieCount} cookies · Forget this site"
-msgstr "{cookieCount}个cookie ·  · 忘记此站点"
+msgstr "{cookieCount}个cookie · 忘记此站点"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# 个自动化} other {# 个自动化}}"
@@ -1622,7 +1622,7 @@ msgid "1"
 msgstr "1"
 
 msgid "1 cookie · Forget this site"
-msgstr "1个cookie ·  · 忘记此站点"
+msgstr "1个cookie · 忘记此站点"
 
 msgid "1 file is over {limit} and was not added"
 msgstr "1 个文件超过 {limit}，未添加"
@@ -2502,7 +2502,7 @@ msgstr "所有提交"
 
 #. placeholder {0}: members.length
 msgid "All data will be permanently deleted for all {0} members. This cannot be undone."
-msgstr "全部{0}名成员的所有数据都将被永久删除。。此操作无法撤销。"
+msgstr "全部{0}名成员的所有数据都将被永久删除。此操作无法撤销。"
 
 msgid "All downloads"
 msgstr "所有下载"
@@ -2538,7 +2538,7 @@ msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "所有目标均已达成。已在最高一级，没有更高可追。"
 
 msgid "All of the organization's data will be permanently deleted. This cannot be undone."
-msgstr "该组织的所有数据都将被永久删除。。此操作无法撤销。"
+msgstr "该组织的所有数据都将被永久删除。此操作无法撤销。"
 
 msgid "All of this project's worktrees are already tracked"
 msgstr "此项目的所有worktree均已跟踪"
@@ -4494,7 +4494,7 @@ msgid "Clear workspace selection"
 msgstr "清除工作区选择"
 
 msgid "Cleared {succeededLabels}. Could not clear {failedLabels}"
-msgstr "已清除{succeededLabels}。。无法清除{failedLabels}"
+msgstr "已清除{succeededLabels}。无法清除{failedLabels}"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "在 Run 01 期间达到 Operator"
@@ -5487,7 +5487,7 @@ msgid "cookies and site data"
 msgstr "Cookie和站点数据"
 
 msgid "Cookies and site data (signs you out of most sites)"
-msgstr "Cookie和站点数据（）（会让你退出大多数网站的登录）"
+msgstr "Cookie和站点数据（会让你退出大多数网站的登录）"
 
 msgid "Copied"
 msgstr "已复制"
@@ -6182,7 +6182,7 @@ msgid "Couldn't reach the model provider"
 msgstr "无法连接到模型提供商"
 
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
-msgstr "无法连接到此云工作区。它可能仍在唤醒中。。请重试。"
+msgstr "无法连接到此云工作区。它可能仍在唤醒中。请重试。"
 
 msgid "Couldn't reach workspace"
 msgstr "无法连接到工作区"
@@ -6231,10 +6231,10 @@ msgid "Couldn't save your choice. Try again."
 msgstr "无法保存你的选择。请重试。"
 
 msgid "Couldn't save. Edit or click away to retry"
-msgstr "保存失败。。编辑或点击别处以重试"
+msgstr "保存失败。编辑或点击别处以重试"
 
 msgid "Couldn't save. Retrying…"
-msgstr "保存失败。。正在重试…"
+msgstr "保存失败。正在重试…"
 
 msgid "Couldn't search your chats"
 msgstr "无法搜索你的聊天"
@@ -7139,10 +7139,10 @@ msgid "Design mode failed"
 msgstr "设计模式失败"
 
 msgid "Design mode: click any element in the page to send it to an agent"
-msgstr "设计模式：：点击页面中的任意元素即可发送给智能体"
+msgstr "设计模式：点击页面中的任意元素即可发送给智能体"
 
 msgid "Design mode: click any element in the page to send it to an agent."
-msgstr "设计模式：：点击页面中的任意元素即可发送给智能体。"
+msgstr "设计模式：点击页面中的任意元素即可发送给智能体。"
 
 msgid "Design review"
 msgstr "设计评审"
@@ -7823,7 +7823,7 @@ msgid "Electron/tRPC-coupled, so referenced rather than rendered. Badge = import
 msgstr "与Electron/tRPC耦合，因此只做引用而不实际渲染。徽章=当前的导入处数量；数量高的可以考虑提升到packages/ui"
 
 msgid "Element captured. Describe the change, or press esc to pick again."
-msgstr "已捕获元素。。描述要做的更改，或按esc重新选择。"
+msgstr "已捕获元素。描述要做的更改，或按esc重新选择。"
 
 msgid "Element captured. Describe the change."
 msgstr "已捕获元素。请描述改动。"
@@ -11563,7 +11563,7 @@ msgid "Make default"
 msgstr "设为默认"
 
 msgid "Make default: launch new terminals and agents on this account."
-msgstr "设为默认：：新终端和智能体将使用此账户启动。"
+msgstr "设为默认：新终端和智能体将使用此账户启动。"
 
 msgid "Make public"
 msgstr "公开"
@@ -12531,7 +12531,7 @@ msgstr "否"
 
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
-msgstr "此主机上没有{0}登录。。登录后用量会显示在这里。"
+msgstr "此主机上没有{0}登录。登录后用量会显示在这里。"
 
 msgid "No access to this host"
 msgstr "没有此主机的访问权限"
@@ -18377,7 +18377,7 @@ msgid "Sign-in expired"
 msgstr "登录已过期"
 
 msgid "Sign-in expired. Run"
-msgstr "登录已过期。。请运行"
+msgstr "登录已过期。请运行"
 
 msgid "Sign-in failed"
 msgstr "登录失败"
@@ -19684,7 +19684,7 @@ msgid "That account is no longer connected — choose another."
 msgstr "该账号已断开连接，请选择其他账号。"
 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
-msgstr "该智能体会话还没有可打开的对话。。它已启动但从未收到指令。"
+msgstr "该智能体会话还没有可打开的对话。它已启动但从未收到指令。"
 
 msgid "That computer can't be reached"
 msgstr "无法连接到那台电脑"

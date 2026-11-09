@@ -541,7 +541,7 @@ msgstr "{0} 已在本機設定，但未在你的帳戶中設定"
 
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
-msgstr "還有{0}個。。請細化搜尋"
+msgstr "還有{0}個。請細化搜尋"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: pages.length
@@ -659,7 +659,7 @@ msgstr "{0}，{outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0}，裝置離線"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}。請嘗試Paradev托盤選單 > 主機服務 > 重啟。"
 
@@ -861,7 +861,7 @@ msgid "{connectorName} account"
 msgstr "{connectorName} 帳號"
 
 msgid "{cookieCount} cookies · Forget this site"
-msgstr "{cookieCount}個cookie ·  · 忘記此站點"
+msgstr "{cookieCount}個cookie · 忘記此站點"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# 個自動化} other {# 個自動化}}"
@@ -1622,7 +1622,7 @@ msgid "1"
 msgstr "1"
 
 msgid "1 cookie · Forget this site"
-msgstr "1個cookie ·  · 忘記此站點"
+msgstr "1個cookie · 忘記此站點"
 
 msgid "1 file is over {limit} and was not added"
 msgstr "1 個檔案超過 {limit}，未新增"
@@ -2502,7 +2502,7 @@ msgstr "所有提交"
 
 #. placeholder {0}: members.length
 msgid "All data will be permanently deleted for all {0} members. This cannot be undone."
-msgstr "全部{0}名成員的所有資料都將被永久刪除。。此操作無法復原。"
+msgstr "全部{0}名成員的所有資料都將被永久刪除。此操作無法復原。"
 
 msgid "All downloads"
 msgstr "所有下載"
@@ -2538,7 +2538,7 @@ msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "所有目標均已達成。已在最高一級，沒有更高可追。"
 
 msgid "All of the organization's data will be permanently deleted. This cannot be undone."
-msgstr "該組織的所有資料都將被永久刪除。。此操作無法復原。"
+msgstr "該組織的所有資料都將被永久刪除。此操作無法復原。"
 
 msgid "All of this project's worktrees are already tracked"
 msgstr "此專案的所有worktree均已追蹤"
@@ -4494,7 +4494,7 @@ msgid "Clear workspace selection"
 msgstr "清除工作區選擇"
 
 msgid "Cleared {succeededLabels}. Could not clear {failedLabels}"
-msgstr "已清除{succeededLabels}。。無法清除{failedLabels}"
+msgstr "已清除{succeededLabels}。無法清除{failedLabels}"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "在 Run 01 期間達到 Operator"
@@ -5487,7 +5487,7 @@ msgid "cookies and site data"
 msgstr "Cookie和站點資料"
 
 msgid "Cookies and site data (signs you out of most sites)"
-msgstr "Cookie和站點資料（）（會讓你退出大多數網站的登入）"
+msgstr "Cookie和站點資料（會讓你退出大多數網站的登入）"
 
 msgid "Copied"
 msgstr "已複製"
@@ -6182,7 +6182,7 @@ msgid "Couldn't reach the model provider"
 msgstr "無法連線到模型供應商"
 
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
-msgstr "無法連線到此雲端工作區。它可能仍在喚醒中。。請重試。"
+msgstr "無法連線到此雲端工作區。它可能仍在喚醒中。請重試。"
 
 msgid "Couldn't reach workspace"
 msgstr "無法連線到工作區"
@@ -6231,10 +6231,10 @@ msgid "Couldn't save your choice. Try again."
 msgstr "無法儲存你的選擇。請再試一次。"
 
 msgid "Couldn't save. Edit or click away to retry"
-msgstr "儲存失敗。。編輯或點選別處以重試"
+msgstr "儲存失敗。編輯或點選別處以重試"
 
 msgid "Couldn't save. Retrying…"
-msgstr "儲存失敗。。正在重試…"
+msgstr "儲存失敗。正在重試…"
 
 msgid "Couldn't search your chats"
 msgstr "無法搜尋你的聊天"
@@ -7139,10 +7139,10 @@ msgid "Design mode failed"
 msgstr "設計模式失敗"
 
 msgid "Design mode: click any element in the page to send it to an agent"
-msgstr "設計模式：：點選頁面中的任意元素即可傳送給代理程式"
+msgstr "設計模式：點選頁面中的任意元素即可傳送給代理程式"
 
 msgid "Design mode: click any element in the page to send it to an agent."
-msgstr "設計模式：：點選頁面中的任意元素即可傳送給代理程式。"
+msgstr "設計模式：點選頁面中的任意元素即可傳送給代理程式。"
 
 msgid "Design review"
 msgstr "設計審查"
@@ -7823,7 +7823,7 @@ msgid "Electron/tRPC-coupled, so referenced rather than rendered. Badge = import
 msgstr "與Electron/tRPC耦合，因此只做引用而不實際渲染。徽章=目前的匯入處數量；數量高的可以考慮提升到packages/ui"
 
 msgid "Element captured. Describe the change, or press esc to pick again."
-msgstr "已捕獲元素。。描述要做的更改，或按esc重新選擇。"
+msgstr "已捕獲元素。描述要做的更改，或按esc重新選擇。"
 
 msgid "Element captured. Describe the change."
 msgstr "已擷取元素。請描述變更。"
@@ -11563,7 +11563,7 @@ msgid "Make default"
 msgstr "設為預設"
 
 msgid "Make default: launch new terminals and agents on this account."
-msgstr "設為預設：：新終端和代理程式將使用此帳戶啟動。"
+msgstr "設為預設：新終端和代理程式將使用此帳戶啟動。"
 
 msgid "Make public"
 msgstr "公開"
@@ -12531,7 +12531,7 @@ msgstr "否"
 
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
-msgstr "此主機上沒有{0}登入。。登入後用量會顯示在這裡。"
+msgstr "此主機上沒有{0}登入。登入後用量會顯示在這裡。"
 
 msgid "No access to this host"
 msgstr "沒有此主機的存取權限"
@@ -18377,7 +18377,7 @@ msgid "Sign-in expired"
 msgstr "登入已過期"
 
 msgid "Sign-in expired. Run"
-msgstr "登入已過期。。請執行"
+msgstr "登入已過期。請執行"
 
 msgid "Sign-in failed"
 msgstr "登入失敗"
@@ -19684,7 +19684,7 @@ msgid "That account is no longer connected — choose another."
 msgstr "該帳號已中斷連線，請選擇其他帳號。"
 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
-msgstr "該代理工作階段還沒有可開啟的對話。。它已啟動但從未收到指令。"
+msgstr "該代理工作階段還沒有可開啟的對話。它已啟動但從未收到指令。"
 
 msgid "That computer can't be reached"
 msgstr "無法連線到那台電腦"

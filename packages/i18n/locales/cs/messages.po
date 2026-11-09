@@ -659,7 +659,7 @@ msgstr "{0}, {outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0}: zařízení offline"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Zkuste nabídku Paradev v liště > Host Service > Restart."
 

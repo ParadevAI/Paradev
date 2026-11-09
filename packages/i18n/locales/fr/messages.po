@@ -659,7 +659,7 @@ msgstr "{0}, {outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0} : appareil hors ligne"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Essayez le menu de la barre d'état Paradev > Service hôte > Redémarrer."
 

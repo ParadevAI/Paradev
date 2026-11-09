@@ -653,7 +653,7 @@ msgstr "{0}, {outcome}{1}"
 msgid "{0}: device offline"
 msgstr "{0}: пристрій не в мережі"
 
-#. placeholder {0}: error.message
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Спробуйте меню Paradev у системному треї > Host Service > Restart."
 
@@ -15067,7 +15067,7 @@ msgid "Ports on this computer"
 msgstr "Порти на цьому комп’ютері"
 
 msgid "Ports: {totalPortCount} live"
-msgstr "Порти: активних: {totalPortCount}"
+msgstr "Активних портів: {totalPortCount}"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Можливо в хороші дні. Витрати на нагляд досі зростають надто швидко."
@@ -19678,7 +19678,7 @@ msgid "That account is no longer connected — choose another."
 msgstr "Цей обліковий запис більше не підключено — виберіть інший."
 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
-msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити,. Його запустили, але так і не надіслали промпт."
+msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити. Його запустили, але так і не надіслали промпт."
 
 msgid "That computer can't be reached"
 msgstr "Цей комп’ютер недоступний"

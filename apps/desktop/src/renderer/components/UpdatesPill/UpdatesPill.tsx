@@ -130,7 +130,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 		: isDownloading
 			? `Downloading${shortVersion || " update"}`
 			: isError
-				? `${event?.error ?? "Update failed"}. Click to retry`
+				? `${(event?.error ?? "Update failed").replace(/[.\s]+$/, "")}. Click to retry`
 				: isUpdated
 					? `Updated${shortVersion ? ` to${shortVersion}` : ""}`
 					: `Install${shortVersion || " update"}. Sessions keep running`;
