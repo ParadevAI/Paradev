@@ -1,14 +1,13 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
-type PaymentFailedState = "past_due" | "lapsed";
+export type PaymentFailedState = "past_due" | "lapsed";
 
 interface PaymentFailedCardDismissalState {
 	/** `<state>:<invoiceId>` of the last dismissed card. Only the latest matters. */
 	dismissedKey: string | null;
 	/** Not persisted: a card with no invoice id cannot be told apart from the next failure. */
 	sessionDismissedState: PaymentFailedState | null;
-	isDismissed: (state: PaymentFailedState, invoiceId: string | null) => boolean;
 	dismiss: (state: PaymentFailedState, invoiceId: string | null) => void;
 }
 
@@ -16,13 +15,9 @@ export const usePaymentFailedCardDismissalStore =
 	create<PaymentFailedCardDismissalState>()(
 		devtools(
 			persist(
-				(set, get) => ({
+				(set) => ({
 					dismissedKey: null,
 					sessionDismissedState: null,
-					isDismissed: (state, invoiceId) =>
-						invoiceId
-							? get().dismissedKey === `${state}:${invoiceId}`
-							: get().sessionDismissedState === state,
 					dismiss: (state, invoiceId) =>
 						set(
 							invoiceId

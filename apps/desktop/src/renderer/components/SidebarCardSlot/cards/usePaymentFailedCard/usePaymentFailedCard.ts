@@ -55,7 +55,12 @@ export function usePaymentFailedCard({
 		});
 	const openUrl = electronTrpc.external.openUrl.useMutation();
 	const navigate = useNavigate();
-	const isDismissed = usePaymentFailedCardDismissalStore((s) => s.isDismissed);
+	const dismissedKey = usePaymentFailedCardDismissalStore(
+		(s) => s.dismissedKey,
+	);
+	const sessionDismissedState = usePaymentFailedCardDismissalStore(
+		(s) => s.sessionDismissedState,
+	);
 	const dismiss = usePaymentFailedCardDismissalStore((s) => s.dismiss);
 
 	const hasLapsed = mayHaveLapsed && Boolean(outstandingInvoice);
@@ -71,7 +76,10 @@ export function usePaymentFailedCard({
 	const hostedInvoiceUrl = outstandingInvoice?.hostedInvoiceUrl ?? null;
 	const state = hasLapsed ? "lapsed" : "past_due";
 	const invoiceId = outstandingInvoice?.id ?? null;
-	if (isDismissed(state, invoiceId)) return null;
+	const isDismissed = invoiceId
+		? dismissedKey === `${state}:${invoiceId}`
+		: sessionDismissedState === state;
+	if (isDismissed) return null;
 
 	const onDismiss = () => {
 		track("payment_failed_banner_dismissed", { surface, isOwner, state });
