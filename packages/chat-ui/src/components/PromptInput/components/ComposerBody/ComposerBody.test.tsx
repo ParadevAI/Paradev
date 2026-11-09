@@ -52,7 +52,6 @@ async function pressFormatShortcut(key: string, selection: "word" | "caret") {
 
 	const reachedDocument: Event[] = [];
 	const onDocumentKeyDown = (event: Event) => reachedDocument.push(event);
-	document.addEventListener("keydown", onDocumentKeyDown);
 	const event = new KeyboardEvent("keydown", {
 		key,
 		code: `Key${key.toUpperCase()}`,
@@ -60,10 +59,14 @@ async function pressFormatShortcut(key: string, selection: "word" | "caret") {
 		bubbles: true,
 		cancelable: true,
 	});
-	await act(async () => {
-		editable.dispatchEvent(event);
-	});
-	document.removeEventListener("keydown", onDocumentKeyDown);
+	document.addEventListener("keydown", onDocumentKeyDown);
+	try {
+		await act(async () => {
+			editable.dispatchEvent(event);
+		});
+	} finally {
+		document.removeEventListener("keydown", onDocumentKeyDown);
+	}
 
 	const formatted = (format: TextFormatType) =>
 		editor.getEditorState().read(() => {
@@ -92,9 +95,9 @@ test.each(
 
 test.each(
 	SHORTCUTS,
-)("mod+%s with nothing selected formats nothing and reaches app hotkeys", async (key, format) => {
+)("Ctrl+%s with a caret formats the next text and keeps the key from app hotkeys", async (key, format) => {
+	expect(IS_APPLE).toBe(false);
 	const result = await pressFormatShortcut(key, "caret");
-	expect(result.formatted(format)).toBe(false);
-	expect(result.reachedDocument).toBe(true);
-	expect(result.event.defaultPrevented).toBe(true);
+	expect(result.formatted(format)).toBe(true);
+	expect(result.reachedDocument).toBe(false);
 });

@@ -38,7 +38,6 @@ import {
 	FORMAT_TEXT_COMMAND,
 	INDENT_CONTENT_COMMAND,
 	INSERT_PARAGRAPH_COMMAND,
-	isExactShortcutMatch,
 	KEY_ARROW_RIGHT_COMMAND,
 	KEY_BACKSPACE_COMMAND,
 	KEY_DELETE_COMMAND,
@@ -124,6 +123,7 @@ import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
 import { MentionSubmenu } from "../MentionSubmenu";
+import { getFormatShortcutTarget } from "./utils/getFormatShortcutTarget";
 
 function footerButtonClasses(base: string, ghost: string) {
 	return {
@@ -749,18 +749,15 @@ export function ComposerBody({
 				const key = event.key.toLowerCase();
 				const mod = event.metaKey || event.ctrlKey;
 				pasteAsTextRef.current = event.shiftKey && mod && key === "v";
-				const formatShortcut = { ctrlKey: !IS_APPLE, metaKey: IS_APPLE };
-				if (
-					!isExactShortcutMatch(event, "b", formatShortcut) &&
-					!isExactShortcutMatch(event, "i", formatShortcut)
-				)
-					return false;
-				// ⌘B and ⌘I format a selection; with none, they go to the app hotkeys.
 				const selection = $getSelection();
-				if ($isRangeSelection(selection) && !selection.isCollapsed()) {
-					event.stopPropagation();
-					return false;
-				}
+				const target = getFormatShortcutTarget(event, {
+					isApple: IS_APPLE,
+					hasSelection:
+						$isRangeSelection(selection) && !selection.isCollapsed(),
+				});
+				if (target === "editor") event.stopPropagation();
+				if (target !== "app") return false;
+				// true skips Lexical's bold shortcut; preventDefault stops the native formatBold.
 				event.preventDefault();
 				return true;
 			},
