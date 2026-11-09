@@ -102,6 +102,10 @@ msgstr "（你）"
 msgid "[prompt]"
 msgstr "[提示詞]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {已移動 {done}/# 個聊天} other {已移動 {done}/# 個聊天}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
 msgstr "{0, plural, one {#個活動埠：隱藏詳情} other {#個活動埠：隱藏詳情}}"
@@ -137,10 +141,6 @@ msgstr "{0, plural, other {已關閉 # 個聊天}}"
 #. placeholder {0}: chats?.failed ?? 0
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {# 個聊天無法移動。開啟後再試一次。}}"
-
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# 個聊天留在了原工作區} other {# 個聊天留在了原工作區}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -362,9 +362,9 @@ msgstr "{0, plural, one {Linear議題} other {Linear議題}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {把選中的#個工作區移動到群組} other {把選中的#個工作區移動到群組}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {正在將 # 個聊天移到這裡…} other {正在將 # 個聊天移到這裡…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {正在移動聊天…} other {正在移動聊天…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -395,6 +395,10 @@ msgstr "{0, plural, one {再顯示#行} other {再顯示#行}}"
 #. placeholder {0}: importableWorktrees.length
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {這會把#個已有worktree作為工作區匯入Paradev。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。} other {這會把#個已有worktree作為工作區匯入Paradev。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {此工作區已移動。它的 # 個聊天留在了這裡。} other {此工作區已移動。它的 # 個聊天留在了這裡。}}"
 
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
@@ -586,6 +590,10 @@ msgstr "已選取 {0} 個"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "已終止{0}個會話"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} 保持原樣。如果代理程式正在工作，它可能已被停止。"
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -858,6 +866,9 @@ msgstr "{cookieCount}個cookie ·  · 忘記此站點"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# 個自動化} other {# 個自動化}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# 個聊天留在了原工作區。} other {# 個聊天留在了原工作區。}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {#項檢查失敗} other {#項檢查失敗}}"
 
@@ -1002,9 +1013,6 @@ msgstr "{duration, plural, one {思考了#秒} other {思考了#秒}}"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "此工作區中的 {entryPath} 已在其他組織中發佈為頁面。請移動該檔案，或使用那個頁面的 id 發佈。"
-
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, other {# 個聊天無法移到電腦}}"
 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#項失敗} other {#項失敗}}"
@@ -1168,6 +1176,12 @@ msgstr "{name} 是內建的，無法取代"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未新增"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} 未變更。如果代理程式正在工作，它可能已被停止。"
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} 未變更。如果代理程式正在工作，它已被停止。"
+
 msgid "{name} plugin"
 msgstr "{name} 外掛程式"
 
@@ -1311,9 +1325,6 @@ msgstr "每 GB 小時 {rate}。在每月額度池之後使用，永不過期。"
 msgid "{readPercent}% read"
 msgstr "已讀{readPercent}%"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "已將 {total} 個聊天中的 {ready} 個移到這裡"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1357,9 +1368,6 @@ msgstr "{starCount}個星標，還在成長"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已啟動 # 個自動化} other {已啟動 # 個自動化}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {此工作區已移動。# 個聊天留在了這裡。} other {此工作區已移動。# 個聊天留在了這裡。}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 個子代理程式執行中}}"
 
@@ -1383,9 +1391,6 @@ msgstr "{threshold, plural, other {已合併 # 個智慧代理 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中斷"
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {已移動 {done}/# 個聊天}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#項檢查全部通過} other {#項檢查全部通過}}"
@@ -8070,6 +8075,9 @@ msgstr "Ultra 的全部功能"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra 的全部功能，再加上客製雲端 GB 小時、SSO 與 SAML、SCIM 佈建、IP 限制、稽核記錄、客製 SLA、專屬支援和客製合約。價格依您的組織量身訂定。與我們聯絡，我們會為您規劃合適的方案。"
 
+msgid "Everything moved."
+msgstr "已全部移動。"
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "我們在基礎元件之上構建的一切——Paradev原創元件、面向代理程式介面的"
 
@@ -8942,6 +8950,9 @@ msgstr "已完成 · 未讀"
 
 msgid "finished · worked for 7s"
 msgstr "已完成 · 用時7秒"
+
+msgid "Finishing the move…"
+msgstr "正在完成移動…"
 
 msgid "Fit"
 msgstr "符合視窗"
@@ -10632,6 +10643,9 @@ msgstr "條目"
 msgid "Iterate."
 msgstr "迭代。"
 
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "它的聊天沒有移動，仍在原工作區中。開啟新工作區查看原因，然後再試一次。"
+
 msgid "Its comments and history go with it."
 msgstr "其留言和歷史記錄也會一併刪除。"
 
@@ -12154,9 +12168,6 @@ msgstr "正在將 {name} 移至{destination}"
 
 msgid "Moving this chat here"
 msgstr "正在將此聊天移到這裡"
-
-msgid "Moving this workspace here…"
-msgstr "正在將此工作區移到這裡…"
 
 msgid "Moving this workspace…"
 msgstr "正在移動此工作區…"
@@ -14134,6 +14145,9 @@ msgstr "開啟全域性命令面板"
 
 msgid "Open the new workspace modal"
 msgstr "開啟新建工作區彈窗"
+
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "開啟新工作區即可查看每個聊天。未移動的聊天仍在原工作區中。"
 
 msgid "Open the original workspace"
 msgstr "開啟原工作區"
@@ -17183,6 +17197,9 @@ msgstr "已儲存到「下載」資料夾"
 msgid "Saving as an environment..."
 msgstr "正在儲存為環境..."
 
+msgid "Saving its work and its chats…"
+msgstr "正在儲存它的工作和聊天…"
+
 msgid "Saving..."
 msgstr "正在儲存..."
 
@@ -17923,6 +17940,9 @@ msgstr "設定已儲存"
 msgid "Setting up in the background..."
 msgstr "正在背景配置..."
 
+msgid "Setting up the new workspace…"
+msgstr "正在設定新工作區…"
+
 msgid "Settings"
 msgstr "設定"
 
@@ -18595,6 +18615,9 @@ msgstr "某人"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "其他人已發佈此工作區中的 {entryPath}。使用明確的頁面 id 發佈以為其頁面新增版本，或移動該檔案。"
 
+msgid "Someone is moving this workspace…"
+msgstr "有人正在移動此工作區…"
+
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev 團隊會審核此頁面。只有在需要你補充資訊時我們才會聯絡你。"
 
@@ -18928,6 +18951,9 @@ msgstr "正在啟動雲端工作區"
 
 msgid "Starting the agent…"
 msgstr "正在啟動代理…"
+
+msgid "Starting the cloud workspace…"
+msgstr "正在啟動雲端工作區…"
 
 msgid "Starting the simulator…"
 msgstr "正在啟動模擬器…"
@@ -19763,6 +19789,9 @@ msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保
 msgid "the cloud"
 msgstr "雲端"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "雲端工作區未執行。請先啟動它，然後再試一次。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "雲端工作區應該已經啟動，但沒有及時回應。下次執行時會重試。"
 
@@ -19941,14 +19970,14 @@ msgstr "多數已合併的代理程式PR只需審查，無需任何人工修改�
 msgid "The model declined to continue"
 msgstr "模型拒絕繼續"
 
-msgid "The move into this workspace failed."
-msgstr "移動到此工作區失敗。"
-
 msgid "The move service couldn't be reached."
 msgstr "無法連線到移動服務。"
 
 msgid "The move stopped responding, so it was ended."
 msgstr "移動已停止回應，因此已結束。"
+
+msgid "The move timed out."
+msgstr "移動逾時。"
 
 msgid "The move was cancelled."
 msgstr "移動已取消。"
@@ -19964,6 +19993,9 @@ msgstr "開源工作區，容納Claude Code、Codex和任何編碼代理程式�
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何程式碼代理。在不同分支上平行執行任務，並在同一處審查所有內容。"
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "移動的另一端執行的是舊版本。請重新啟動雲端工作區或更新電腦的主機，然後再試一次。"
 
 msgid "The overnight shift"
 msgstr "夜班"
@@ -20100,6 +20132,9 @@ msgstr "此更新還可以："
 msgid "The very beginning"
 msgstr "最開始"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "無法連線到工作區。請檢查它是否正在執行，然後再試一次。"
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "工作區尚未就緒。請重試。"
 
@@ -20141,9 +20176,6 @@ msgstr "這些資料夾中仍有你的檔案，但沒有自動移轉到新版 Pa
 
 msgid "These ports are still in use"
 msgstr "這些埠仍在使用中"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "它們仍在原工作區中。逐一開啟即可重試。"
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "它們使用你已有的訂閱和金鑰執行。"
@@ -20325,9 +20357,6 @@ msgstr "這個邀請已被接受。"
 
 msgid "This invitation link is invalid or has expired."
 msgstr "這個邀請連結無效或已過期。"
-
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "耗時比平常更久。下方的聊天是最後儲存的副本；工作區啟動後才會真正開啟。"
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "這比平時耗時更久。沙箱可能仍在拉取映象。無論此視窗是否開啟，它都會繼續。"
@@ -20590,9 +20619,6 @@ msgstr "這將取消暫存並還原所有已暫存的更改。已暫存的新檔
 
 msgid "This workspace"
 msgstr "此工作區"
-
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "無法移動此工作區。它沒有任何變化。"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
@@ -21815,9 +21841,6 @@ msgstr "正在等待子代理程式的第一則訊息…"
 
 msgid "Waiting for your input"
 msgstr "等待你的輸入"
-
-msgid "Waking the workspace…"
-msgstr "正在喚醒工作區…"
 
 msgid "Waking up workspace"
 msgstr "正在喚醒工作區"

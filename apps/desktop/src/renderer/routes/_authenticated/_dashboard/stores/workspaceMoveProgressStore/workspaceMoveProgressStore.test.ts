@@ -6,8 +6,12 @@ import {
 
 const move: WorkspaceMoveProgress = {
 	id: "m1",
+	workspaceMoveId: null,
 	name: "Workspace",
 	destination: "Cloud",
+	toCloud: true,
+	stayed: [],
+	open: null,
 	stage: "moving-chats",
 	chats: { total: 4, ready: 1, failed: 1 },
 	error: null,

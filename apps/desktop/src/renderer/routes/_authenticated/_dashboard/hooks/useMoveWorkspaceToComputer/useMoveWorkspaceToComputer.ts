@@ -1,10 +1,8 @@
-import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { toast } from "@superset/ui/sonner";
-import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import {
@@ -12,7 +10,6 @@ import {
 	type HostServiceClient,
 } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
@@ -37,11 +34,10 @@ export type MoveDestination = { hostId: string; name: string | null };
  */
 export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { t } = useLingui();
-	const navigate = useNavigate();
 	const { activeHostUrl, machineId, activeOrganizationId } =
 		useLocalHostService();
 	const relayUrl = useRelayUrl();
-	const { cache } = useHostWorkspaces();
+	const { workspaces: cloudWorkspaces = [] } = useCloudWorkspaces();
 	const { projects } = useHostProjects();
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
@@ -50,10 +46,12 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 		async ({
 			destination,
 			onStage,
+			onBegun,
 			signal,
 		}: {
 			destination: MoveDestination;
 			onStage: (stage: MoveToComputerStage) => void;
+			onBegun?: (workspaceMoveId: string) => void;
 			signal?: AbortSignal;
 		}) => {
 			const hostUrlOf = (hostId: string) => {
@@ -70,7 +68,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				return url;
 			};
 			const destinationUrl = hostUrlOf(destination.hostId);
-			const fromCloud = cache.isSandboxHost(workspace.hostId);
+			const fromCloud = cloudWorkspaces.some((row) => row.id === workspace.id);
 			const requireProject = (repositoryName: string) => {
 				const repository = repositoryName.toLowerCase();
 				const found = projects.find(
@@ -99,6 +97,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					...(fromCloud ? {} : { fromHostId: workspace.hostId }),
 					toHostId: destination.hostId,
 				});
+			onBegun?.(workspaceMoveId);
 			const target = getHostServiceClientByUrl(destinationUrl);
 			const leaving: { source: HostServiceClient | null; chats: string[] } = {
 				source: null,
@@ -169,7 +168,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						return { prepared, project, created, moves, skipped };
 					},
 				}).catch(async (error: unknown) => {
-					await abandonWorkspaceMove(workspaceMoveId, error);
+					await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 					if (leaving.source) {
 						await releaseSourceChats(leaving.source, leaving.chats);
 					}
@@ -196,49 +195,24 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					title: chat.title,
 				});
 			}
-			await navigate({
-				to: "/v2-workspace/$workspaceId",
-				params: { workspaceId: created.workspaceId },
-			}).catch((error: unknown) => {
-				console.warn(
-					"[workspace-move] could not open the new workspace",
-					error,
-				);
-			});
-			// Each chat's pane shows how far its move got, and a retry.
+			// Each chat's pane shows how far its move got, its failure and a retry.
 			void (async () => {
-				let failed = 0;
 				for (const { moveId } of moves) {
 					await runMoveOnComputer({ moveId, host: target }).catch(
-						(error: unknown) => {
-							failed += 1;
+						(error: unknown) =>
 							console.warn(
 								`[workspace-move] move ${moveId} to the computer failed`,
 								error,
-							);
-						},
-					);
-				}
-				if (failed > 0) {
-					toast.error(
-						t({
-							message: plural(failed, {
-								one: "# chat couldn't move to the computer",
-								other: "# chats couldn't move to the computer",
-							}),
-						}),
-						{
-							description: t`They are still in the original workspace. Open each one to try again.`,
-						},
+							),
 					);
 				}
 			})();
 			return {
 				toWorkspaceId: created.workspaceId,
-				skipped: [
-					...prepared.skipped,
+				stayed: [
+					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
-				],
+				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
 			};
 		},
 		[
@@ -248,10 +222,9 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			machineId,
 			activeOrganizationId,
 			relayUrl,
-			cache,
+			cloudWorkspaces,
 			projects,
 			submit,
-			navigate,
 			collections,
 		],
 	);

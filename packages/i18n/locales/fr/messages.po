@@ -102,6 +102,10 @@ msgstr "(vous)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {{done} discussion sur # déplacée} other {{done} discussions sur # déplacées}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
 msgstr "{0, plural, one {# port actif : masquer les détails} other {# ports actifs : masquer les détails}}"
@@ -137,10 +141,6 @@ msgstr "{0, plural, one {# chat fermé} other {# chats fermés}}"
 #. placeholder {0}: chats?.failed ?? 0
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# discussion n’a pas pu être déplacée. Ouvrez-la pour réessayer.} other {# discussions n’ont pas pu être déplacées. Ouvrez-les pour réessayer.}}"
-
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# discussion est restée dans l'ancien espace de travail} other {# discussions sont restées dans l'ancien espace de travail}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -362,9 +362,9 @@ msgstr "{0, plural, one {issue Linear} other {issues Linear}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Déplacer # espace de travail sélectionné vers un groupe} other {Déplacer # espaces de travail sélectionnés vers un groupe}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Déplacement de # discussion ici…} other {Déplacement de # discussions ici…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Déplacement de sa discussion…} other {Déplacement de ses discussions…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -395,6 +395,10 @@ msgstr "{0, plural, one {Afficher # ligne de plus} other {Afficher # lignes de p
 #. placeholder {0}: importableWorktrees.length
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {# worktree existant sera importé dans Paradev en tant qu'espace de travail. Chaque worktree présent sur le disque sera suivi et apparaîtra dans votre barre latérale. Aucun fichier ne sera modifié.} other {# worktrees existants seront importés dans Paradev en tant qu'espaces de travail. Chaque worktree présent sur le disque sera suivi et apparaîtra dans votre barre latérale. Aucun fichier ne sera modifié.}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Cet espace de travail a été déplacé. Sa # discussion est restée ici.} other {Cet espace de travail a été déplacé. Ses # discussions sont restées ici.}}"
 
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
@@ -586,6 +590,10 @@ msgstr "{0} sélectionnés"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "{0} sessions arrêtées"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} reste là où il était. Si un agent travaillait, il a peut-être été arrêté."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -858,6 +866,9 @@ msgstr "{cookieCount} cookies · oublier ce site"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automatisation} other {# automatisations}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# discussion est restée dans l'ancien espace de travail.} other {# discussions sont restées dans l'ancien espace de travail.}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# vérification en échec} other {# vérifications en échec}}"
 
@@ -1002,9 +1013,6 @@ msgstr "{duration, plural, one {A réfléchi pendant # seconde} other {A réflé
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} de cet espace de travail est déjà publié comme page dans une autre organisation. Déplacez le fichier ou publiez avec l'id de cette page."
-
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, one {# discussion n’a pas pu être déplacée vers l’ordinateur} other {# discussions n’ont pas pu être déplacées vers l’ordinateur}}"
 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# en échec} other {# en échec}}"
@@ -1168,6 +1176,12 @@ msgstr "{name} est intégré et ne peut pas être remplacé"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} n'est pas ajouté"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} n'a pas changé. Si un agent travaillait, il a peut-être été arrêté."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} n'a pas changé. Si un agent travaillait, il a été arrêté."
+
 msgid "{name} plugin"
 msgstr "Plugin {name}"
 
@@ -1311,9 +1325,6 @@ msgstr "{rate} par Go-heure. Utilisées après la réserve mensuelle, elles n'ex
 msgid "{readPercent}% read"
 msgstr "{readPercent} % lu"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "{ready} discussions sur {total} ont été déplacées ici"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1357,9 +1368,6 @@ msgstr "{starCount} étoiles, et ça continue"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisation lancée} other {# automatisations lancées}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Cet espace de travail a été déplacé. # discussion est restée ici.} other {Cet espace de travail a été déplacé. # discussions sont restées ici.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# sous-agent en cours} other {# sous-agents en cours}}"
 
@@ -1383,9 +1391,6 @@ msgstr "{threshold, plural, one {# PR d'agent fusionnée} other {# PR d'agent fu
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrompu"
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {{done} discussion sur # déplacée} other {{done} discussions sur # déplacées}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {La vérification a réussi} other {Les # vérifications ont toutes réussi}}"
@@ -8070,6 +8075,9 @@ msgstr "Tout Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Tout Ultra, plus des Go-heures cloud sur mesure, SSO et SAML, le provisionnement SCIM, les restrictions IP, les journaux d'audit, un SLA personnalisé, un support dédié et des contrats sur mesure. Le prix est adapté à votre organisation. Contactez-nous et nous définirons une offre adaptée."
 
+msgid "Everything moved."
+msgstr "Tout a été déplacé."
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Tout ce que nous avons construit par-dessus les primitives — les originaux Paradev, la"
 
@@ -8942,6 +8950,9 @@ msgstr "Terminé · non lu"
 
 msgid "finished · worked for 7s"
 msgstr "terminé · a travaillé 7 s"
+
+msgid "Finishing the move…"
+msgstr "Finalisation du déplacement…"
 
 msgid "Fit"
 msgstr "Ajuster"
@@ -10632,6 +10643,9 @@ msgstr "Élément"
 msgid "Iterate."
 msgstr "Itérez."
 
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Ses discussions n'ont pas été déplacées et se trouvent toujours dans l'espace de travail d'origine. Ouvrez le nouvel espace de travail pour en voir la raison, puis réessayez."
+
 msgid "Its comments and history go with it."
 msgstr "Ses commentaires et son historique seront aussi supprimés."
 
@@ -12154,9 +12168,6 @@ msgstr "Déplacement de {name} vers {destination}"
 
 msgid "Moving this chat here"
 msgstr "Déplacement de cette discussion ici"
-
-msgid "Moving this workspace here…"
-msgstr "Déplacement de cet espace de travail ici…"
 
 msgid "Moving this workspace…"
 msgstr "Déplacement de cet espace de travail…"
@@ -14134,6 +14145,9 @@ msgstr "Ouvrir la palette de commandes globale"
 
 msgid "Open the new workspace modal"
 msgstr "Ouvrir la fenêtre de création d'espace de travail"
+
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Ouvrez le nouvel espace de travail pour voir chaque discussion. Une discussion qui n'a pas été déplacée se trouve toujours dans l'espace de travail d'origine."
 
 msgid "Open the original workspace"
 msgstr "Ouvrir l’espace de travail d’origine"
@@ -17183,6 +17197,9 @@ msgstr "Enregistré dans Téléchargements"
 msgid "Saving as an environment..."
 msgstr "Enregistrement comme environnement..."
 
+msgid "Saving its work and its chats…"
+msgstr "Enregistrement de son travail et de ses discussions…"
+
 msgid "Saving..."
 msgstr "Enregistrement..."
 
@@ -17923,6 +17940,9 @@ msgstr "Paramètre enregistré"
 msgid "Setting up in the background..."
 msgstr "Configuration en arrière-plan..."
 
+msgid "Setting up the new workspace…"
+msgstr "Configuration du nouvel espace de travail…"
+
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -18595,6 +18615,9 @@ msgstr "Quelqu'un"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Quelqu'un d'autre a déjà publié {entryPath} depuis cet espace de travail. Publiez avec un id de page explicite pour ajouter une version à sa page, ou déplacez le fichier."
 
+msgid "Someone is moving this workspace…"
+msgstr "Quelqu'un déplace cet espace de travail…"
+
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Un membre de l'équipe Paradev examinera cette page. Nous ne vous recontacterons que si nous avons besoin de précisions."
 
@@ -18928,6 +18951,9 @@ msgstr "Démarrage de l'espace de travail cloud"
 
 msgid "Starting the agent…"
 msgstr "Démarrage de l'agent…"
+
+msgid "Starting the cloud workspace…"
+msgstr "Démarrage de l'espace de travail cloud…"
 
 msgid "Starting the simulator…"
 msgstr "Démarrage du simulateur…"
@@ -19763,6 +19789,9 @@ msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui q
 msgid "the cloud"
 msgstr "le cloud"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "L'espace de travail cloud n'est pas en cours d'exécution. Démarrez-le, puis réessayez."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "L'espace de travail cloud aurait dû démarrer, mais n'a pas répondu à temps. La prochaine exécution réessaiera."
 
@@ -19941,14 +19970,14 @@ msgstr "La majorité des PR d'agents fusionnées ne demandent qu'une revue, sans
 msgid "The model declined to continue"
 msgstr "Le modèle a refusé de continuer"
 
-msgid "The move into this workspace failed."
-msgstr "Le déplacement vers cet espace de travail a échoué."
-
 msgid "The move service couldn't be reached."
 msgstr "Le service de déplacement est injoignable."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Le déplacement ne répondait plus, il a donc été arrêté."
+
+msgid "The move timed out."
+msgstr "Le déplacement a expiré."
 
 msgid "The move was cancelled."
 msgstr "Le déplacement a été annulé."
@@ -19964,6 +19993,9 @@ msgstr "L'espace de travail open source pour Claude Code, Codex et n'importe que
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "L'espace de travail open source pour Claude Code, Codex, OpenCode et n'importe quel agent de code. Lancez des tâches en parallèle sur des branches séparées et relisez tout au même endroit."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "L'autre côté du déplacement utilise une version plus ancienne. Redémarrez un espace de travail cloud ou mettez à jour l'hôte de l'ordinateur, puis réessayez."
 
 msgid "The overnight shift"
 msgstr "L'équipe de nuit"
@@ -20100,6 +20132,9 @@ msgstr "La mise à jour peut aussi :"
 msgid "The very beginning"
 msgstr "Tout au début"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "Impossible de joindre l'espace de travail. Vérifiez qu'il est en cours d'exécution, puis réessayez."
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "L'espace de travail n'est pas encore prêt. Réessayez."
 
@@ -20141,9 +20176,6 @@ msgstr "Ces dossiers contiennent toujours vos fichiers, mais ils n’ont pas ét
 
 msgid "These ports are still in use"
 msgstr "Ces ports sont toujours utilisés"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Elles sont toujours dans l’espace de travail d’origine. Ouvrez-les une par une pour réessayer."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Ils fonctionnent avec les abonnements et clés que vous avez déjà."
@@ -20325,9 +20357,6 @@ msgstr "Cette invitation a déjà été acceptée."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Ce lien d'invitation est invalide ou a expiré."
-
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Cela prend plus de temps que d’habitude. La discussion ci-dessous est sa dernière copie enregistrée ; elle s’ouvre vraiment dès que l’espace de travail démarre."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "Cela prend plus de temps que d'habitude. Le bac à sable est peut-être encore en train de télécharger son image. Cela continue que cette fenêtre soit ouverte ou non."
@@ -20590,9 +20619,6 @@ msgstr "Cette action désindexera et annulera toutes les modifications indexées
 
 msgid "This workspace"
 msgstr "Cet espace de travail"
-
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Impossible de déplacer cet espace de travail. Il n’a pas changé."
 
 msgid "This workspace has no project to branch from"
 msgstr "Cet espace de travail n'a aucun projet depuis lequel dupliquer"
@@ -21815,9 +21841,6 @@ msgstr "En attente du premier message du sous-agent…"
 
 msgid "Waiting for your input"
 msgstr "En attente de votre réponse"
-
-msgid "Waking the workspace…"
-msgstr "Réveil de l’espace de travail…"
 
 msgid "Waking up workspace"
 msgstr "Réveil de l’espace de travail"

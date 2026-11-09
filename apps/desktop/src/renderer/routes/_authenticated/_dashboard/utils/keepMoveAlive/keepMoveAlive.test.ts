@@ -44,6 +44,16 @@ describe("keepMoveAlive", () => {
 		expect(seen.signal?.aborted).toBe(true);
 	});
 
+	test("ends the work with the reason the control plane gives", async () => {
+		const run = keepMoveAlive({
+			workspaceMoveId: "move-1",
+			intervalMs: 5,
+			heartbeat: async () => ({ alive: false, error: "Cancelled" }),
+			work: () => new Promise<never>(() => {}),
+		});
+		await expect(run).rejects.toThrow("Cancelled");
+	});
+
 	test("keeps going when a beat cannot reach the control plane", async () => {
 		const result = await keepMoveAlive({
 			workspaceMoveId: "move-1",

@@ -102,6 +102,10 @@ msgstr "(siz)"
 msgid "[prompt]"
 msgstr "[istem]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {# sohbetten {done} tanesi taşındı} other {# sohbetten {done} tanesi taşındı}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
 msgstr "{0, plural, one {# etkin port: ayrıntıları gizle} other {# etkin port: ayrıntıları gizle}}"
@@ -137,10 +141,6 @@ msgstr "{0, plural, other {# sohbet kapatıldı}}"
 #. placeholder {0}: chats?.failed ?? 0
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# sohbet taşınamadı. Yeniden denemek için açın.} other {# sohbet taşınamadı. Yeniden denemek için açın.}}"
-
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# sohbet eski çalışma alanında kaldı} other {# sohbet eski çalışma alanında kaldı}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -362,9 +362,9 @@ msgstr "{0, plural, one {Linear issue'su} other {Linear issue'su}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Seçili # çalışma alanını bir gruba taşı} other {Seçili # çalışma alanını bir gruba taşı}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {# sohbet buraya taşınıyor…} other {# sohbet buraya taşınıyor…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Sohbeti taşınıyor…} other {Sohbetleri taşınıyor…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -395,6 +395,10 @@ msgstr "{0, plural, one {# satır daha göster} other {# satır daha göster}}"
 #. placeholder {0}: importableWorktrees.length
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Bu işlem, mevcut # worktree'yi Paradev'e çalışma alanı olarak aktarır. Diskteki her worktree izlenir ve kenar çubuğunuzda görünür. Hiçbir dosya değiştirilmez.} other {Bu işlem, mevcut # worktree'yi Paradev'e çalışma alanı olarak aktarır. Diskteki her worktree izlenir ve kenar çubuğunuzda görünür. Hiçbir dosya değiştirilmez.}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Bu çalışma alanı taşındı. # sohbeti burada kaldı.} other {Bu çalışma alanı taşındı. # sohbeti burada kaldı.}}"
 
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
@@ -586,6 +590,10 @@ msgstr "{0} seçildi"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "{0} oturum sonlandırıldı"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} olduğu yerde kalıyor. Bir ajan çalışıyorduysa durdurulmuş olabilir."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -858,6 +866,9 @@ msgstr "{cookieCount} çerez · bu siteyi unut"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# otomasyon} other {# otomasyon}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# sohbet eski çalışma alanında kaldı.} other {# sohbet eski çalışma alanında kaldı.}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrol başarısız} other {# kontrol başarısız}}"
 
@@ -1002,9 +1013,6 @@ msgstr "{duration, plural, one {# saniye düşündü} other {# saniye düşünd�
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "Bu çalışma alanındaki {entryPath} başka bir organizasyonda zaten sayfa olarak yayımlanmış. Dosyayı taşı ya da o sayfanın kimliğiyle yayımla."
-
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, one {# sohbet bilgisayara taşınamadı} other {# sohbet bilgisayara taşınamadı}}"
 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# başarısız} other {# başarısız}}"
@@ -1168,6 +1176,12 @@ msgstr "{name} yerleşiktir ve değiştirilemez"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} eklenmedi"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durdurulmuş olabilir."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durduruldu."
+
 msgid "{name} plugin"
 msgstr "{name} eklentisi"
 
@@ -1311,9 +1325,6 @@ msgstr "GB-saat başına {rate}. Aylık havuzdan sonra kullanılır ve süresi d
 msgid "{readPercent}% read"
 msgstr "%{readPercent} okundu"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "{total} sohbetten {ready} tanesi buraya taşındı"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1357,9 +1368,6 @@ msgstr "{starCount} yıldız ve artıyor"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomasyon başlatıldı} other {# otomasyon başlatıldı}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Bu çalışma alanı taşındı. # sohbet burada kaldı.} other {Bu çalışma alanı taşındı. # sohbet burada kaldı.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# alt ajan çalışıyor} other {# alt ajan çalışıyor}}"
 
@@ -1383,9 +1391,6 @@ msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'�
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {# sohbetten {done} tanesi taşındı} other {# sohbetten {done} tanesi taşındı}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {# kontrolün tümü geçti} other {# kontrolün tümü geçti}}"
@@ -8070,6 +8075,9 @@ msgstr "Ultra'daki her şey"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra'daki her şeye ek olarak özel bulut GB-saatleri, SSO ve SAML, SCIM sağlama, IP kısıtlamaları, denetim günlükleri, özel SLA, özel destek ve özel sözleşmeler. Fiyat kuruluşunuza göre belirlenir. Bize ulaşın, size uygun bir paket hazırlayalım."
 
+msgid "Everything moved."
+msgstr "Her şey taşındı."
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "İlkellerin üzerine kurduğumuz her şey — Paradev özgünleri, ajan arayüzleri için"
 
@@ -8942,6 +8950,9 @@ msgstr "Tamamlandı · okunmadı"
 
 msgid "finished · worked for 7s"
 msgstr "bitti · 7 sn çalıştı"
+
+msgid "Finishing the move…"
+msgstr "Taşıma tamamlanıyor…"
 
 msgid "Fit"
 msgstr "Sığdır"
@@ -10632,6 +10643,9 @@ msgstr "Öğe"
 msgid "Iterate."
 msgstr "Yineleyin."
 
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Sohbetleri taşınmadı ve hâlâ orijinal çalışma alanında. Nedenini görmek için yeni çalışma alanını açın ve tekrar deneyin."
+
 msgid "Its comments and history go with it."
 msgstr "Yorumları ve geçmişi de silinir."
 
@@ -12154,9 +12168,6 @@ msgstr "{name}, {destination} hedefine taşınıyor"
 
 msgid "Moving this chat here"
 msgstr "Bu sohbet buraya taşınıyor"
-
-msgid "Moving this workspace here…"
-msgstr "Bu çalışma alanı buraya taşınıyor…"
 
 msgid "Moving this workspace…"
 msgstr "Bu çalışma alanı taşınıyor…"
@@ -14134,6 +14145,9 @@ msgstr "Genel komut paletini aç"
 
 msgid "Open the new workspace modal"
 msgstr "Yeni çalışma alanı penceresini aç"
+
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Her sohbeti görmek için yeni çalışma alanını açın. Taşınmayan bir sohbet hâlâ orijinal çalışma alanındadır."
 
 msgid "Open the original workspace"
 msgstr "Orijinal çalışma alanını aç"
@@ -17183,6 +17197,9 @@ msgstr "İndirilenler klasörüne kaydedildi"
 msgid "Saving as an environment..."
 msgstr "Ortam olarak kaydediliyor..."
 
+msgid "Saving its work and its chats…"
+msgstr "Çalışması ve sohbetleri kaydediliyor…"
+
 msgid "Saving..."
 msgstr "Kaydediliyor..."
 
@@ -17923,6 +17940,9 @@ msgstr "Ayar kaydedildi"
 msgid "Setting up in the background..."
 msgstr "Arka planda kuruluyor..."
 
+msgid "Setting up the new workspace…"
+msgstr "Yeni çalışma alanı hazırlanıyor…"
+
 msgid "Settings"
 msgstr "Ayarlar"
 
@@ -18595,6 +18615,9 @@ msgstr "Biri"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Bu çalışma alanından {entryPath} dosyasını başkası zaten yayımlamış. Onun sayfasına sürüm eklemek için açık bir sayfa kimliğiyle yayımla ya da dosyayı taşı."
 
+msgid "Someone is moving this workspace…"
+msgstr "Biri bu çalışma alanını taşıyor…"
+
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev ekibinden biri bu sayfayı inceleyecek. Yalnızca ek bilgiye ihtiyacımız olursa sizinle iletişime geçeriz."
 
@@ -18928,6 +18951,9 @@ msgstr "Bulut çalışma alanı başlatılıyor"
 
 msgid "Starting the agent…"
 msgstr "Aracı başlatılıyor…"
+
+msgid "Starting the cloud workspace…"
+msgstr "Bulut çalışma alanı başlatılıyor…"
 
 msgid "Starting the simulator…"
 msgstr "Simülatör başlatılıyor…"
@@ -19763,6 +19789,9 @@ msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından d�
 msgid "the cloud"
 msgstr "bulut"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "Bulut çalışma alanı çalışmıyor. Başlatın, ardından tekrar deneyin."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
@@ -19941,14 +19970,14 @@ msgstr "Birleştirilen ajan PR'larının çoğu yalnızca inceleme gerektirir, h
 msgid "The model declined to continue"
 msgstr "Model devam etmeyi reddetti"
 
-msgid "The move into this workspace failed."
-msgstr "Bu çalışma alanına taşıma başarısız oldu."
-
 msgid "The move service couldn't be reached."
 msgstr "Taşıma hizmetine ulaşılamadı."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Taşıma yanıt vermeyi bıraktı, bu yüzden sonlandırıldı."
+
+msgid "The move timed out."
+msgstr "Taşıma zaman aşımına uğradı."
 
 msgid "The move was cancelled."
 msgstr "Taşıma iptal edildi."
@@ -19964,6 +19993,9 @@ msgstr "Claude Code, Codex ve her kodlama ajanı için açık kaynak çalışma 
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode ve herhangi bir kodlama ajanı için açık kaynak çalışma alanı. Görevleri ayrı dallarda paralel çalıştırın ve her şeyi tek bir yerden inceleyin."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "Taşımanın diğer tarafı daha eski bir sürüm çalıştırıyor. Bir bulut çalışma alanını yeniden başlatın veya bilgisayarın host hizmetini güncelleyin, ardından tekrar deneyin."
 
 msgid "The overnight shift"
 msgstr "Gece vardiyası"
@@ -20100,6 +20132,9 @@ msgstr "Güncelleme ayrıca şunları yapabilir:"
 msgid "The very beginning"
 msgstr "En başı"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "Çalışma alanına ulaşılamadı. Çalıştığından emin olun, ardından tekrar deneyin."
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "Çalışma alanı henüz hazır değil. Yeniden deneyin."
 
@@ -20141,9 +20176,6 @@ msgstr "Bu klasörlerde hâlâ dosyalarınız var, ancak yeni Paradev'e kendili�
 
 msgid "These ports are still in use"
 msgstr "Bu portlar hâlâ kullanımda"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Hâlâ orijinal çalışma alanındalar. Yeniden denemek için her birini açın."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Zaten sahip olduğunuz abonelikler ve anahtarlarla çalışırlar."
@@ -20325,9 +20357,6 @@ msgstr "Bu davet zaten kabul edilmiş."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Bu davet bağlantısı geçersiz veya süresi dolmuş."
-
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Bu, normalden uzun sürüyor. Aşağıdaki sohbet son kaydedilen kopyası; çalışma alanı başlayınca gerçekten açılır."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "Bu normalden uzun sürüyor. Sandbox hâlâ imajını çekiyor olabilir. Bu pencere açık olsa da olmasa da devam eder."
@@ -20590,9 +20619,6 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 
 msgid "This workspace"
 msgstr "Bu çalışma alanı"
-
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Bu çalışma alanı taşınamadı. Değişmedi."
 
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
@@ -21815,9 +21841,6 @@ msgstr "Alt ajanın ilk mesajı bekleniyor…"
 
 msgid "Waiting for your input"
 msgstr "Girdinizi bekliyor"
-
-msgid "Waking the workspace…"
-msgstr "Çalışma alanı uyandırılıyor…"
 
 msgid "Waking up workspace"
 msgstr "Çalışma alanı uyandırılıyor"

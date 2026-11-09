@@ -1,4 +1,5 @@
-import { plural } from "@lingui/core/macro";
+import type { I18n } from "@lingui/core";
+import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Progress } from "@superset/ui/progress";
@@ -21,14 +22,19 @@ const ENDED = new Set([
 const CANCELLABLE = new Set(["saving"]);
 
 export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
-	const { t } = useLingui();
+	const { t, i18n } = useLingui();
 	const move = useWorkspaceMoveProgressStore((state) => state.moves[moveId]);
 	const remove = useWorkspaceMoveProgressStore((state) => state.remove);
 	if (!move) return null;
 	const ended = ENDED.has(move.stage);
 	const { name, destination } = move;
+	// Chats that did not arrive show their own reason in their pane.
 	const failure =
-		move.stage === "failed" ? describeMoveError(move.error) : null;
+		move.stage === "failed" && move.failedDuring !== "moving-chats"
+			? describeMoveError(move.error)
+			: null;
+	const retry = failure ? move.retry : null;
+	const openable = move.open !== null && !failure && ended;
 
 	const title =
 		move.stage === "failed"
@@ -62,11 +68,11 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 				</button>
 			</div>
 			<p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-				{failure ? failure.reason : describe(move, t)}
+				{failure ? failure.reason : describe(move, i18n)}
 			</p>
-			{move.stage === "failed" && (
+			{failure && (
 				<p className="mt-1 text-xs text-muted-foreground">
-					{describeOutcome(move, t)}
+					{describeOutcome(move, i18n)}
 				</p>
 			)}
 			{failure?.details && (
@@ -77,20 +83,31 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 					<p className="mt-1 font-mono break-words">{failure.details}</p>
 				</details>
 			)}
+			{ended && !failure && move.stayed.length > 0 && (
+				<p className="mt-1 truncate text-xs text-muted-foreground/70">
+					{move.stage === "ready"
+						? move.stayed.join(", ")
+						: `${stayedSentence(move.stayed.length, i18n)} ${move.stayed.join(", ")}`}
+				</p>
+			)}
 			{!ended && (
 				<Progress className="mt-3 h-1.5" value={progressPercent(move)} />
 			)}
-			{((move.cancel && CANCELLABLE.has(move.stage)) ||
-				(move.retry && move.stage === "failed")) && (
+			{((move.cancel && CANCELLABLE.has(move.stage)) || retry || openable) && (
 				<div className="mt-3 flex justify-end gap-2">
 					{move.cancel && CANCELLABLE.has(move.stage) && (
 						<Button size="sm" variant="outline" onClick={move.cancel}>
 							<Trans>Cancel move</Trans>
 						</Button>
 					)}
-					{move.retry && move.stage === "failed" && (
-						<Button size="sm" onClick={move.retry}>
+					{retry && (
+						<Button size="sm" onClick={retry}>
 							<Trans>Try again</Trans>
+						</Button>
+					)}
+					{openable && move.open && (
+						<Button size="sm" onClick={move.open}>
+							<Trans>Open</Trans>
 						</Button>
 					)}
 				</div>
@@ -99,71 +116,98 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 	);
 }
 
-function describeChatCount(
-	done: number,
-	total: number,
-	t: ReturnType<typeof useLingui>["t"],
-): string {
-	return t({
-		message: plural(total, {
-			one: `${done} of # chat moved`,
-			other: `${done} of # chats moved`,
-		}),
-	});
-}
-
-function describeOutcome(
-	move: WorkspaceMoveProgress,
-	t: ReturnType<typeof useLingui>["t"],
-): string {
+function describeOutcome(move: WorkspaceMoveProgress, i18n: I18n): string {
 	const { name } = move;
-	if (move.failedDuring === "moving-chats") {
-		return t({
-			message: "Chats that didn't move are still in the original workspace.",
-		});
-	}
 	if (move.failedDuring === "creating") {
-		return t({
-			message: `${name} is unchanged. If an agent was working, it was stopped.`,
-		});
+		return i18n._(
+			msg({
+				message: `${name} is unchanged. If an agent was working, it was stopped.`,
+			}),
+		);
 	}
-	return t({ message: `${name} is unchanged.` });
+	return i18n._(
+		msg({
+			message: `${name} is unchanged. If an agent was working, it may have been stopped.`,
+		}),
+	);
 }
 
-function describe(
-	move: WorkspaceMoveProgress,
-	t: ReturnType<typeof useLingui>["t"],
-): string {
+function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 	const chats = move.chats;
 	switch (move.stage) {
 		case "saving":
-			return t({ message: "Saving its work and its chats…" });
+			return i18n._(msg({ message: "Saving its work and its chats…" }));
 		case "creating":
-			return t({ message: "Setting up the new workspace…" });
-		case "moving-chats":
+			return i18n._(msg({ message: "Setting up the new workspace…" }));
+		case "moving-chats": {
 			if (!chats || chats.total === 0) {
-				return t({ message: "Finishing the move…" });
+				return i18n._(msg({ message: "Finishing the move…" }));
 			}
-			return describeChatCount(chats.ready + chats.failed, chats.total, t);
-		case "ready":
-			return t({ message: "Everything moved." });
-		case "partial":
-			return t({
-				message: plural(chats?.failed ?? 0, {
-					one: "# chat could not move. Open it to try again.",
-					other: "# chats could not move. Open them to try again.",
+			const done = chats.ready + chats.failed;
+			if (done === 0) {
+				return move.toCloud
+					? i18n._(msg({ message: "Starting the cloud workspace…" }))
+					: i18n._(
+							msg({
+								message: plural(chats.total, {
+									one: "Moving its chat…",
+									other: "Moving its chats…",
+								}),
+							}),
+						);
+			}
+			return i18n._(
+				msg({
+					message: plural(chats.total, {
+						one: `${done} of # chat moved`,
+						other: `${done} of # chats moved`,
+					}),
 				}),
-			});
+			);
+		}
+		case "ready":
+			return move.stayed.length === 0
+				? i18n._(msg({ message: "Everything moved." }))
+				: stayedSentence(move.stayed.length, i18n);
+		case "partial":
+			return i18n._(
+				msg({
+					message: plural(chats?.failed ?? 0, {
+						one: "# chat could not move. Open it to try again.",
+						other: "# chats could not move. Open them to try again.",
+					}),
+				}),
+			);
 		case "cancelled":
-			return t({
-				message: `${move.name} stays where it was. If an agent was working, it may have been stopped.`,
-			});
+			return i18n._(
+				msg({
+					message: `${move.name} stays where it was. If an agent was working, it may have been stopped.`,
+				}),
+			);
 		case "unverified":
-			return t({
-				message:
-					"Open the new workspace to see each chat. A chat that didn't move is still in the original workspace.",
-			});
+			return i18n._(
+				msg({
+					message:
+						"Open the new workspace to see each chat. A chat that didn't move is still in the original workspace.",
+				}),
+			);
 		case "failed":
-			return describeMoveError(move.error).reason;
+			return i18n._(
+				msg({
+					message:
+						"Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again.",
+				}),
+			);
 	}
+}
+
+function stayedSentence(count: number, i18n: I18n): string {
+	return i18n._(
+		msg({
+			message: plural(count, {
+				one: "# chat stayed in the old workspace.",
+				other: "# chats stayed in the old workspace.",
+			}),
+		}),
+	);
 }

@@ -10,6 +10,7 @@ import {
 	chatMoveEventsInputSchema,
 	chatMoveInputSchema,
 	chatMoveOfChatInputSchema,
+	chatMovesWaitingOnHostInputSchema,
 	failChatMoveInputSchema,
 	retryChatMoveInputSchema,
 } from "./schema";
@@ -83,11 +84,17 @@ export const chatMoveRouter = {
 		.input(chatMoveOfChatInputSchema)
 		.query(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			const { move } = await callMoves(mover.organizationId, {
-				op: "latestChatMove",
-				sessionId: input.chatSessionId,
-				createdBy: mover.userId,
-			});
+			const latestBy = async (createdBy: string | null) =>
+				(
+					await callMoves(mover.organizationId, {
+						op: "latestChatMove",
+						sessionId: input.chatSessionId,
+						createdBy,
+					})
+				).move;
+			const move =
+				(input.anyone ? await latestBy(null) : null) ??
+				(await latestBy(mover.userId));
 			if (!move) return null;
 			const [messages] = await db
 				.select({ value: count() })
@@ -98,16 +105,41 @@ export const chatMoveRouter = {
 						inArray(chatItems.kind, MESSAGE_KINDS),
 					),
 				);
+			// Someone else's chat history is private: their move shows only where it stands.
+			const isMine = move.createdBy === mover.userId;
 			return {
 				id: move.id,
+				isMine,
 				status: move.status,
-				error: move.error,
+				error: isMine ? move.error : null,
 				fromWorkspaceId: move.fromWorkspaceId,
 				toWorkspaceId: move.toWorkspaceId,
-				toHostId: move.toHostId,
-				messageCount: messages?.value ?? 0,
+				toHostId: isMine ? move.toHostId : null,
+				messageCount: isMine ? (messages?.value ?? 0) : 0,
 				updatedAt: move.updatedAt,
 			};
+		}),
+
+	/**
+	 * The caller's moves to this computer that no run has finished, oldest
+	 * first, for its desktop to take up after a restart.
+	 */
+	waitingOnHost: personProcedure
+		.input(chatMovesWaitingOnHostInputSchema)
+		.query(async ({ ctx, input }) => {
+			const mover = await moverOf(ctx);
+			const { ids } = await callMoves(mover.organizationId, {
+				op: "waitingOnHost",
+				toHostId: input.hostId,
+				createdBy: mover.userId,
+			}).catch((error: unknown) => {
+				// Realtime deploys apart from the API and may not know this op yet.
+				if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
+					return { ids: [] as string[] };
+				}
+				throw error;
+			});
+			return { moveIds: ids };
 		}),
 
 	/** Tries a failed move again, to the same workspace. */

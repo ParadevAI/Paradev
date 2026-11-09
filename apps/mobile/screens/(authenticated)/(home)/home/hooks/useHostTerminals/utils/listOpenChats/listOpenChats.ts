@@ -1,12 +1,15 @@
 import type { ChatTransport } from "@superset/chat/client";
 
-export interface LiveChat {
+export interface OpenChat {
 	sessionId: string;
 	workspaceId: string;
 	harness: string;
+	harnessSessionId: string | null;
 	title: string | null;
 	status: string;
 	updatedAt: number;
+	/** An agent is behind the chat now; a finished chat resumes when opened. */
+	live: boolean;
 }
 
 const LIST_LIMIT = 200;
@@ -15,28 +18,35 @@ const PROBE_BATCH = 10;
 const PROBE_MAX = 50;
 
 /**
- * The host's chats that still have an agent behind them. A host from before
- * `listSessions` reported `live` is asked per session instead, newest first,
- * since a closed chat keeps its last status forever.
+ * The host's open chats, as desktop shows them: every chat until a person or
+ * the host closes it, whether or not its agent is still running. A host from
+ * before `listSessions` reported `live` is asked per session instead, newest
+ * first, and only its running chats are shown.
  */
-export async function listLiveChats(
+export async function listOpenChats(
 	transport: Pick<ChatTransport, "listSessions" | "getSession">,
-): Promise<LiveChat[]> {
+): Promise<OpenChat[]> {
 	const rows = await transport.listSessions({ limit: LIST_LIMIT });
 	const reportsLive = rows.some((row) => typeof row.live === "boolean");
-	const live = reportsLive
-		? rows.filter((row) => row.live)
-		: await probeLive(
-				transport,
-				rows.filter((row) => row.status !== "dead").slice(0, PROBE_MAX),
-			);
-	return live.map((row) => ({
+	const open = reportsLive
+		? rows.filter(
+				(row) => row.live || (!row.closedAt && row.closedByUser !== true),
+			)
+		: (
+				await probeLive(
+					transport,
+					rows.filter((row) => row.status !== "dead").slice(0, PROBE_MAX),
+				)
+			).map((row) => ({ ...row, live: true }));
+	return open.map((row) => ({
 		sessionId: row.sessionId,
 		workspaceId: row.scopeId,
 		harness: row.harness,
+		harnessSessionId: row.harnessSessionId ?? null,
 		title: row.title,
 		status: row.status,
 		updatedAt: row.updatedAt,
+		live: row.live === true,
 	}));
 }
 

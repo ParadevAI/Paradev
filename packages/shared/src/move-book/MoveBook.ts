@@ -154,10 +154,11 @@ export class MoveBook {
 				return reply("latestWorkspaceMove", this.latestWorkspaceMove(request));
 			case "latestChatMove": {
 				const [row] = this.rows<ChatMoveRow>(
-					`SELECT * FROM chat_moves WHERE session_id = ? AND created_by = ?
+					`SELECT * FROM chat_moves WHERE session_id = ? AND (? IS NULL OR created_by = ?)
 					ORDER BY created_at DESC, rowid DESC LIMIT 1`,
 					request.sessionId,
-					request.createdBy,
+					request.createdBy ?? null,
+					request.createdBy ?? null,
 				);
 				return reply("latestChatMove", {
 					move: row ? this.toChatMove(row) : null,
@@ -245,6 +246,15 @@ export class MoveBook {
 						`SELECT id FROM chat_moves WHERE to_workspace_id = ? AND status = 'pending'
 						ORDER BY created_at, rowid`,
 						request.toWorkspaceId,
+					).map((row) => row.id),
+				});
+			case "waitingOnHost":
+				return reply("waitingOnHost", {
+					ids: this.rows<{ id: string }>(
+						`SELECT id FROM chat_moves WHERE to_host_id = ? AND created_by = ?
+						AND status IN ('pending', 'copying') ORDER BY created_at, rowid`,
+						request.toHostId,
+						request.createdBy,
 					).map((row) => row.id),
 				});
 			case "finishInto":
@@ -350,15 +360,16 @@ export class MoveBook {
 
 	private latestWorkspaceMove(request: {
 		workspaceId: string;
-		createdBy: string;
+		createdBy: string | null;
 	}): { move: WorkspaceMove | null; chats: MoveChatCounts } {
 		const [row] = this.rows<WorkspaceMoveRow>(
 			`SELECT * FROM workspace_moves
-			WHERE (from_workspace_id = ? OR to_workspace_id = ?) AND created_by = ?
+			WHERE (from_workspace_id = ? OR to_workspace_id = ?) AND (? IS NULL OR created_by = ?)
 			ORDER BY created_at DESC, rowid DESC LIMIT 1`,
 			request.workspaceId,
 			request.workspaceId,
-			request.createdBy,
+			request.createdBy ?? null,
+			request.createdBy ?? null,
 		);
 		if (!row) return { move: null, chats: { total: 0, ready: 0, failed: 0 } };
 		const statuses = this.newestAttempts(row.id).map((chat) => chat.status);
