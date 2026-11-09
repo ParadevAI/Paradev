@@ -71,7 +71,17 @@ function setup(
 			turnId: "t",
 			item: { id, kind: "agent_message", text: id, startedAtMs: 0 },
 		});
-	return { runtime, sync, pushes, say, open, timers, appended };
+	const turn = (status: "running" | "completed", usage = 0) =>
+		runtime.journal.append(CHAT, {
+			type: "turn",
+			turn: {
+				id: "t",
+				status,
+				startedAtMs: 0,
+				usage: { inputTokens: usage, cachedInputTokens: 0, outputTokens: 0 },
+			},
+		});
+	return { runtime, sync, pushes, say, turn, open, timers, appended };
 }
 
 describe("createChatSync", () => {
@@ -89,16 +99,26 @@ describe("createChatSync", () => {
 		expect(pushes[0]?.workspaceId).toBe(WORKSPACE);
 	});
 
-	test("a started sync pushes appends when its timer fires", async () => {
-		const { sync, pushes, say, timers, appended } = setup();
+	test("a started sync writes a chat only when a turn starts or ends", async () => {
+		const { sync, pushes, say, turn, timers, appended } = setup();
 		sync.start();
-		say("a");
-		for (const envelope of appended) sync.noteAppend(envelope);
-		expect(pushes).toHaveLength(0);
 		await timers.shift()?.();
-		await Promise.resolve();
-		expect(pushes.flatMap((push) => push.events.map((e) => e.seq))).toEqual([
-			1,
+		const flush = async () => {
+			for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+			await timers.shift()?.();
+			await Bun.sleep(0);
+		};
+		turn("running");
+		say("a");
+		await flush();
+		say("b");
+		turn("running", 10);
+		await flush();
+		turn("completed", 10);
+		await flush();
+		expect(pushes.map((push) => push.events.map((e) => e.seq))).toEqual([
+			[1, 2],
+			[3, 4, 5],
 		]);
 	});
 

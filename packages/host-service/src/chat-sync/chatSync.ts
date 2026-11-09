@@ -24,7 +24,11 @@ const REJECTED_CODES = new Set(["BAD_REQUEST", "PAYLOAD_TOO_LARGE"]);
 export type ChatSync = {
 	/** Pushes everything not yet pushed for one chat, and resolves once it is acked. */
 	syncSession(sessionId: string): Promise<void>;
-	/** Records an append; a running sync pushes it soon after. */
+	/**
+	 * Records an append. A chat is pushed when a turn starts or ends and when
+	 * its title changes, so a turn costs the database two writes; the rest
+	 * waits in the journal. A chat that is moving pushes every append.
+	 */
 	noteAppend(envelope: DurableEnvelope): void;
 	/** Keeps pushing every chat that changes, retrying with backoff. */
 	start(): () => void;
@@ -89,6 +93,8 @@ export function createChatSync(args: {
 	const moved = new Set<string>();
 	const followed = new Set<string>();
 	const inFlight = new Map<string, Promise<unknown>>();
+	const lastTurn = new Map<string, string>();
+	const lastTitle = new Map<string, string | null>();
 	let running = false;
 	let cancelTimer: (() => void) | null = null;
 	let retryMs = MIN_RETRY_MS;
@@ -266,23 +272,44 @@ export function createChatSync(args: {
 	};
 
 	const wake = (ms: number) => {
-		if (!syncing() || cancelTimer) return;
+		if (!syncing()) return;
+		if (cancelTimer) {
+			if (ms > 0) return;
+			cancelTimer();
+		}
 		cancelTimer = schedule(() => void drain(), ms);
+	};
+
+	/** A turn that started or ended, or a new title: what makes a chat worth a write. */
+	const isMilestone = (
+		sessionId: string,
+		event: DurableEnvelope["event"],
+	): boolean => {
+		if (event.type === "turn") {
+			const key = `${event.turn.id}:${event.turn.status}`;
+			if (lastTurn.get(sessionId) === key) return false;
+			lastTurn.set(sessionId, key);
+			return true;
+		}
+		if (event.type === "session" && "title" in event.session) {
+			const title = event.session.title ?? null;
+			if (lastTitle.get(sessionId) === title) return false;
+			lastTitle.set(sessionId, title);
+			return true;
+		}
+		return false;
 	};
 
 	return {
 		syncSession,
 		noteAppend(envelope) {
-			if (!syncs(envelope.sessionId)) return;
-			dirty.add(envelope.sessionId);
-			const turnEnded =
-				envelope.event.type === "turn" &&
-				envelope.event.turn.status !== "running";
-			if (turnEnded && cancelTimer) {
-				cancelTimer();
-				cancelTimer = null;
-			}
-			wake(turnEnded ? 0 : SETTLE_MS);
+			const { sessionId, event } = envelope;
+			if (!syncs(sessionId)) return;
+			const milestone = isMilestone(sessionId, event);
+			const moving = followed.has(sessionId);
+			if (!milestone && !moving) return;
+			dirty.add(sessionId);
+			wake(milestone ? 0 : SETTLE_MS);
 		},
 		follow(sessionId) {
 			moved.delete(sessionId);
@@ -291,6 +318,8 @@ export function createChatSync(args: {
 		forget(sessionId) {
 			moved.delete(sessionId);
 			followed.delete(sessionId);
+			lastTurn.delete(sessionId);
+			lastTitle.delete(sessionId);
 		},
 		start() {
 			started = true;
