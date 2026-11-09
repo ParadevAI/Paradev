@@ -9714,7 +9714,7 @@ msgid "Ignore @channel and @here"
 msgstr "Ignorovat @channel a @here"
 
 msgid "Ignore whitespace"
-msgstr "Ignorovat mezery"
+msgstr "Ignorovat bílé znaky"
 
 msgid "Illegal content"
 msgstr "Nelegální obsah"
@@ -13200,7 +13200,7 @@ msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affecte
 msgstr "Chcete ho jen odebrat z postranního panelu? Skryjte ho. Nikoho jiného se to nedotkne."
 
 msgid "Only whitespace changed"
-msgstr "Změnily se jen mezery"
+msgstr "Změnily se jen bílé znaky"
 
 msgid "Only you"
 msgstr "Jen vy"
