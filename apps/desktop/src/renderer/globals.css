@@ -337,6 +337,29 @@
 		background-color: var(--highlight-active);
 	}
 
+	/* UpdatesPill: marquee progress bar while installing */
+	@keyframes ascii-bar {
+		0% {
+			content: "[##····]";
+		}
+		16.667% {
+			content: "[·##···]";
+		}
+		33.333% {
+			content: "[··##··]";
+		}
+		50% {
+			content: "[···##·]";
+		}
+		66.667% {
+			content: "[····##]";
+		}
+		83.333%,
+		100% {
+			content: "[#····#]";
+		}
+	}
+
 	/* UpdatesPill: checkmark draw-in on download-confirmed */
 	@keyframes check-draw {
 		from {
