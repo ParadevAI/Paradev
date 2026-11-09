@@ -93,6 +93,11 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	onCancelRename: () => void;
 }
 
+/**
+ * One sidebar row, in all three places a workspace appears: inside a project,
+ * in the Pinned section, and as a top-level session. A row that needs
+ * attention carries it in the name's weight as well as the lead dot.
+ */
 export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 	HTMLDivElement,
 	DashboardSidebarExpandedWorkspaceRowProps

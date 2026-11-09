@@ -38,9 +38,10 @@ export interface SidebarWorkspaceStatusEntry {
 	/** Manual unread mark, or any terminal in review/failed. */
 	isUnread: boolean;
 	/**
-	 * Unread, or an agent waiting on an answer: the set the dock badge counts
-	 * (`useV2AttentionWorkspaceCount`). One value so the badge and the row
-	 * cannot drift apart.
+	 * Unread, or an agent waiting on an answer. A superset of the dock badge's
+	 * count (`useV2AttentionWorkspaceCount`), which reads cached bindings and
+	 * so cannot see a host-reported status; the row follows its own dot
+	 * instead of the badge where the two disagree.
 	 */
 	needsAttention: boolean;
 	/** `terminalId → host agent binding` (source rows for mark-seen). */
