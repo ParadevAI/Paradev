@@ -10,7 +10,7 @@ import {
 import { fileOriginalKey } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { callMoves } from "../../lib/moves";
@@ -19,6 +19,7 @@ import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	chatEventsInputSchema,
+	chatsOfWorkspaceInputSchema,
 	createTranscriptUploadInputSchema,
 	pushInputSchema,
 	searchInputSchema,
@@ -66,6 +67,9 @@ function stillMovingHere(): TRPCError {
  * turn, and the agent's own session files. A host pushes as it goes; when a
  * chat moves, `chatMove` hands both to the host it moves to.
  */
+/** As many chats as the preview of a sleeping cloud workspace lists. */
+const MAX_WORKSPACE_CHATS = 20;
+
 export const chatHistoryRouter = {
 	push: personProcedure
 		.input(pushInputSchema)
@@ -293,6 +297,32 @@ export const chatHistoryRouter = {
 				});
 			}
 			return { transcriptId: transcript.id };
+		}),
+
+	/** The caller's chats stored for a cloud workspace, newest first; none for a computer's. */
+	ofWorkspace: personProcedure
+		.input(chatsOfWorkspaceInputSchema)
+		.query(async ({ ctx, input }) => {
+			const caller = await callerOf(ctx);
+			if (!(await isCloudWorkspace(input.workspaceId))) return [];
+			return db
+				.select({
+					id: chatSessions.id,
+					title: chatSessions.title,
+					harness: chatSessions.harness,
+					lastActiveAt: chatSessions.lastActiveAt,
+				})
+				.from(chatSessions)
+				.where(
+					and(
+						eq(chatSessions.v2WorkspaceId, input.workspaceId),
+						eq(chatSessions.organizationId, caller.organizationId),
+						eq(chatSessions.createdBy, caller.userId),
+						isNotNull(chatSessions.epoch),
+					),
+				)
+				.orderBy(desc(chatSessions.lastActiveAt))
+				.limit(MAX_WORKSPACE_CHATS);
 		}),
 
 	/** A page of a stored chat, in the order it shows, as its host recorded it. */
