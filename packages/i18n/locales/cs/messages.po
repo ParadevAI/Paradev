@@ -19158,9 +19158,6 @@ msgstr "Přepnout účet"
 msgid "Switch agents. Keep your workflow"
 msgstr "Vyměňte agenta. Workflow zůstane"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Přepnout fokus na pravý postranní panel"
-
 msgid "Switch host"
 msgstr "Přepnout hosta"
 
@@ -20670,6 +20667,9 @@ msgstr "Přepnout pravý panel"
 
 msgid "Toggle Right Sidebar"
 msgstr "Přepnout pravý postranní panel"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Přepnout fokus pravého postranního panelu"
 
 msgid "Toggle Scripts Bar"
 msgstr "Přepnout lištu skriptů"

@@ -19158,9 +19158,6 @@ msgstr "Ganti akun"
 msgid "Switch agents. Keep your workflow"
 msgstr "Ganti agen. Pertahankan alur kerja Anda"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Pindahkan Fokus ke Sidebar Kanan"
-
 msgid "Switch host"
 msgstr "Ganti host"
 
@@ -20670,6 +20667,9 @@ msgstr "Alihkan sidebar kanan"
 
 msgid "Toggle Right Sidebar"
 msgstr "Alihkan Sidebar Kanan"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Alihkan Fokus Sidebar Kanan"
 
 msgid "Toggle Scripts Bar"
 msgstr "Alihkan Bilah Skrip"

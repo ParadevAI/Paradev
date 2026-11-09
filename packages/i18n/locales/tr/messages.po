@@ -19158,9 +19158,6 @@ msgstr "Hesap değiştir"
 msgid "Switch agents. Keep your workflow"
 msgstr "Ajan değiştirin. İş akışınızı koruyun"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Odağı sağ kenar çubuğuna geçir"
-
 msgid "Switch host"
 msgstr "Host değiştir"
 
@@ -20670,6 +20667,9 @@ msgstr "Sağ kenar çubuğunu aç/kapat"
 
 msgid "Toggle Right Sidebar"
 msgstr "Sağ kenar çubuğunu aç/kapat"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Sağ kenar çubuğu odağını değiştir"
 
 msgid "Toggle Scripts Bar"
 msgstr "Betikler çubuğunu aç/kapat"

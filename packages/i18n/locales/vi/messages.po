@@ -19158,9 +19158,6 @@ msgstr "Chuyển tài khoản"
 msgid "Switch agents. Keep your workflow"
 msgstr "Đổi agent. Giữ nguyên quy trình"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Chuyển tiêu điểm sang thanh bên phải"
-
 msgid "Switch host"
 msgstr "Đổi host"
 
@@ -20670,6 +20667,9 @@ msgstr "Bật/tắt thanh bên phải"
 
 msgid "Toggle Right Sidebar"
 msgstr "Bật/tắt thanh bên phải"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Bật/tắt tiêu điểm thanh bên phải"
 
 msgid "Toggle Scripts Bar"
 msgstr "Bật/tắt thanh script"

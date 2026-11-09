@@ -19158,9 +19158,6 @@ msgstr "切换账号"
 msgid "Switch agents. Keep your workflow"
 msgstr "换智能体，不换工作流"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "将焦点切换到右侧边栏"
-
 msgid "Switch host"
 msgstr "切换主机"
 
@@ -20670,6 +20667,9 @@ msgstr "切换右侧边栏"
 
 msgid "Toggle Right Sidebar"
 msgstr "切换右侧边栏"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "切换右侧边栏焦点"
 
 msgid "Toggle Scripts Bar"
 msgstr "切换脚本栏"

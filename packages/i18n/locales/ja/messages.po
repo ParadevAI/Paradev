@@ -19158,9 +19158,6 @@ msgstr "アカウントを切り替え"
 msgid "Switch agents. Keep your workflow"
 msgstr "エージェントは替える。ワークフローはそのまま"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "右サイドバーにフォーカスを切り替え"
-
 msgid "Switch host"
 msgstr "ホストを切り替え"
 
@@ -20670,6 +20667,9 @@ msgstr "右サイドバーを切り替え"
 
 msgid "Toggle Right Sidebar"
 msgstr "右サイドバーを切り替え"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "右サイドバーのフォーカスを切り替え"
 
 msgid "Toggle Scripts Bar"
 msgstr "スクリプトバーを切り替え"

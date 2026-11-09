@@ -19158,9 +19158,6 @@ msgstr "Zmień konto"
 msgid "Switch agents. Keep your workflow"
 msgstr "Zmieniaj agentów. Zachowaj swój workflow"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Przełącz fokus na prawy pasek boczny"
-
 msgid "Switch host"
 msgstr "Zmień host"
 
@@ -20670,6 +20667,9 @@ msgstr "Przełącz prawy pasek boczny"
 
 msgid "Toggle Right Sidebar"
 msgstr "Przełącz prawy pasek boczny"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Przełącz fokus prawego paska bocznego"
 
 msgid "Toggle Scripts Bar"
 msgstr "Przełącz pasek skryptów"

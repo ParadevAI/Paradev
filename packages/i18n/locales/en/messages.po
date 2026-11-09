@@ -19158,9 +19158,6 @@ msgstr "Switch account"
 msgid "Switch agents. Keep your workflow"
 msgstr "Switch agents. Keep your workflow"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Switch Focus to Right Sidebar"
-
 msgid "Switch host"
 msgstr "Switch host"
 
@@ -20670,6 +20667,9 @@ msgstr "Toggle right sidebar"
 
 msgid "Toggle Right Sidebar"
 msgstr "Toggle Right Sidebar"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Toggle Right Sidebar Focus"
 
 msgid "Toggle Scripts Bar"
 msgstr "Toggle Scripts Bar"

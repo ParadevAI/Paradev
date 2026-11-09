@@ -19158,9 +19158,6 @@ msgstr "계정 전환"
 msgid "Switch agents. Keep your workflow"
 msgstr "에이전트는 바꾸고, 워크플로는 그대로"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "오른쪽 사이드바로 포커스 전환"
-
 msgid "Switch host"
 msgstr "호스트 전환"
 
@@ -20670,6 +20667,9 @@ msgstr "오른쪽 사이드바 토글"
 
 msgid "Toggle Right Sidebar"
 msgstr "오른쪽 사이드바 전환"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "오른쪽 사이드바 포커스 전환"
 
 msgid "Toggle Scripts Bar"
 msgstr "스크립트 바 전환"

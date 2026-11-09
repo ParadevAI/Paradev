@@ -19158,9 +19158,6 @@ msgstr "Cambia account"
 msgid "Switch agents. Keep your workflow"
 msgstr "Cambia agente. Mantieni il tuo flusso di lavoro"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Sposta il focus sulla barra laterale destra"
-
 msgid "Switch host"
 msgstr "Cambia host"
 
@@ -20670,6 +20667,9 @@ msgstr "Mostra/nascondi barra laterale destra"
 
 msgid "Toggle Right Sidebar"
 msgstr "Mostra/nascondi barra laterale destra"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Attiva/disattiva il focus sulla barra laterale destra"
 
 msgid "Toggle Scripts Bar"
 msgstr "Mostra/nascondi la barra degli script"

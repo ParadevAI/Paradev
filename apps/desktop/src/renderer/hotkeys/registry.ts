@@ -697,7 +697,7 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+alt+e"),
 			linux: L("ctrl+shift+alt+e"),
 		},
-		label: msg({ message: "Switch Focus to Right Sidebar" }),
+		label: msg({ message: "Toggle Right Sidebar Focus" }),
 		category: "Layout",
 		description: msg({
 			message:

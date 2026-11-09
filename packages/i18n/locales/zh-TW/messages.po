@@ -19158,9 +19158,6 @@ msgstr "切換帳號"
 msgid "Switch agents. Keep your workflow"
 msgstr "換代理程式，不換工作流"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "將焦點切換到右側邊欄"
-
 msgid "Switch host"
 msgstr "切換主機"
 
@@ -20670,6 +20667,9 @@ msgstr "切換右側邊欄"
 
 msgid "Toggle Right Sidebar"
 msgstr "切換右側邊欄"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "切換右側邊欄焦點"
 
 msgid "Toggle Scripts Bar"
 msgstr "切換指令碼欄"

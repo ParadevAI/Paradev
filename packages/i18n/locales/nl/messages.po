@@ -12433,7 +12433,7 @@ msgid "Next match"
 msgstr "Volgende overeenkomst"
 
 msgid "Next Right Sidebar Tab"
-msgstr "Volgend tabblad in rechterzijbalk"
+msgstr "Volgend tabblad in de rechterzijbalk"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15162,7 +15162,7 @@ msgid "Previous prompts"
 msgstr "Eerdere prompts"
 
 msgid "Previous Right Sidebar Tab"
-msgstr "Vorig tabblad in rechterzijbalk"
+msgstr "Vorig tabblad in de rechterzijbalk"
 
 msgid "Previous slide"
 msgstr "Vorige slide"
@@ -19158,9 +19158,6 @@ msgstr "Van account wisselen"
 msgid "Switch agents. Keep your workflow"
 msgstr "Wissel van agent. Houd je workflow"
 
-msgid "Switch Focus to Right Sidebar"
-msgstr "Focus naar rechterzijbalk wisselen"
-
 msgid "Switch host"
 msgstr "Van host wisselen"
 
@@ -20670,6 +20667,9 @@ msgstr "Rechterzijbalk tonen/verbergen"
 
 msgid "Toggle Right Sidebar"
 msgstr "Rechterzijbalk tonen/verbergen"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Focus op de rechterzijbalk wisselen"
 
 msgid "Toggle Scripts Bar"
 msgstr "Scriptsbalk tonen/verbergen"
