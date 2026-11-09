@@ -21,6 +21,10 @@ import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import {
+	type PaneArea,
+	PaneAreaProvider,
+} from "renderer/routes/_authenticated/_dashboard/providers/PaneAreaProvider";
+import {
 	titleBarTabBarProps,
 	useTitleBarSideSlot,
 } from "renderer/routes/_authenticated/_dashboard/providers/TitleBarSlotsProvider";
@@ -55,6 +59,7 @@ interface RightPaneAreaProps {
 	toolbar: ReactNode;
 	isFullScreen: boolean;
 	onToggleFullScreen: () => void;
+	focusedArea: () => PaneArea;
 }
 
 export function RightPaneArea({
@@ -67,6 +72,7 @@ export function RightPaneArea({
 	toolbar,
 	isFullScreen,
 	onToggleFullScreen,
+	focusedArea,
 }: RightPaneAreaProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
@@ -99,54 +105,58 @@ export function RightPaneArea({
 			{pullRequests.map((pr) => (
 				<PullRequestCountsPrefetch key={pr.url} pullRequest={pr.ref} />
 			))}
-			<Workspace<PaneViewerData>
-				{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
-				appearance={isParadevShell ? "cards" : "default"}
-				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
-				registry={registry}
-				paneActions={rightPaneActions}
-				contextMenuActions={rightContextMenuActions}
-				onPaneError={reportRendererError}
-				renderTabIcon={renderBrowserTabIcon}
-				renameTabs={false}
-				isPreviewTab={isPreviewTab}
-				onTabClick={(tab) => {
-					if (!isPreviewTab(tab)) return;
-					for (const pane of Object.values(tab.panes)) {
-						store.getState().setPanePinned({ paneId: pane.id, pinned: true });
+			<PaneAreaProvider area="right" focusedArea={focusedArea}>
+				<Workspace<PaneViewerData>
+					{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
+					appearance={isParadevShell ? "cards" : "default"}
+					keepAliveTabs={RIGHT_PANE_KEPT_TABS}
+					registry={registry}
+					paneActions={rightPaneActions}
+					contextMenuActions={rightContextMenuActions}
+					onPaneError={reportRendererError}
+					renderTabIcon={renderBrowserTabIcon}
+					renameTabs={false}
+					isPreviewTab={isPreviewTab}
+					onTabClick={(tab) => {
+						if (!isPreviewTab(tab)) return;
+						for (const pane of Object.values(tab.panes)) {
+							store.getState().setPanePinned({ paneId: pane.id, pinned: true });
+						}
+					}}
+					renderTabAccessory={(tab) => (
+						<V2NotificationStatusIndicator
+							sources={getV2NotificationSourcesForTab(tab)}
+						/>
+					)}
+					renderTabBarLeading={
+						isFullScreen ? () => <WindowChrome /> : undefined
 					}
-				}}
-				renderTabAccessory={(tab) => (
-					<V2NotificationStatusIndicator
-						sources={getV2NotificationSourcesForTab(tab)}
-					/>
-				)}
-				renderTabBarLeading={isFullScreen ? () => <WindowChrome /> : undefined}
-				onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
-				renderTabBarTrailing={() => (
-					<div className="flex items-center gap-1 pr-1">
-						<RightPaneHeaderButton
-							label={
-								isFullScreen
-									? t({ message: "Restore width" })
-									: t({ message: "Expand" })
-							}
-							hotkeyId="TOGGLE_RIGHT_PANE_FULL_SCREEN"
-							onClick={onToggleFullScreen}
-						>
-							{isFullScreen ? (
-								<LuMinimize2 className="size-4" strokeWidth={1.5} />
-							) : (
-								<LuMaximize2 className="size-4" strokeWidth={1.5} />
-							)}
-						</RightPaneHeaderButton>
-						{toolbar}
-					</div>
-				)}
-				onBeforeCloseTab={onBeforeCloseTab}
-				onInteractionStateChange={onInteractionStateChange}
-				store={store}
-			/>
+					onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
+					renderTabBarTrailing={() => (
+						<div className="flex items-center gap-1 pr-1">
+							<RightPaneHeaderButton
+								label={
+									isFullScreen
+										? t({ message: "Restore width" })
+										: t({ message: "Expand" })
+								}
+								hotkeyId="TOGGLE_RIGHT_PANE_FULL_SCREEN"
+								onClick={onToggleFullScreen}
+							>
+								{isFullScreen ? (
+									<LuMinimize2 className="size-4" strokeWidth={1.5} />
+								) : (
+									<LuMaximize2 className="size-4" strokeWidth={1.5} />
+								)}
+							</RightPaneHeaderButton>
+							{toolbar}
+						</div>
+					)}
+					onBeforeCloseTab={onBeforeCloseTab}
+					onInteractionStateChange={onInteractionStateChange}
+					store={store}
+				/>
+			</PaneAreaProvider>
 		</div>
 	);
 }

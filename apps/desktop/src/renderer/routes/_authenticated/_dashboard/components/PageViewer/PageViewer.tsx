@@ -23,6 +23,7 @@ import { authClient, ensureFreshJwt, getJwt } from "renderer/lib/auth-client";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
+import { usePaneAreaHotkeyGuard } from "renderer/routes/_authenticated/_dashboard/providers/PaneAreaProvider";
 import { canonicalizeChord } from "shared/hotkey-chord";
 import { CommentDeepLink } from "./components/CommentDeepLink";
 import { MarkCommentsRead } from "./components/MarkCommentsRead";
@@ -74,8 +75,10 @@ export function PageViewer({
 }: PageViewerProps) {
 	const { t } = useLingui();
 	const [findRequest, setFindRequest] = useState(0);
+	const ignoreOtherPaneArea = usePaneAreaHotkeyGuard();
 	useHotkey("FIND_IN_PAGE", () => setFindRequest((count) => count + 1), {
 		enabled: findActive,
+		ignoreEventWhen: ignoreOtherPaneArea,
 	});
 	const findChord = useDispatchChord("FIND_IN_PAGE");
 	const find = useMemo(

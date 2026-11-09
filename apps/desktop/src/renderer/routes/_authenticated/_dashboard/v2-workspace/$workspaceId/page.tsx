@@ -17,6 +17,7 @@ import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/co
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
+import { PaneAreaProvider } from "renderer/routes/_authenticated/_dashboard/providers/PaneAreaProvider";
 import {
 	titleBarTabBarProps,
 	useTitleBarMainSlot,
@@ -100,6 +101,7 @@ import type {
 	PaneViewerData,
 	SubagentPaneData,
 } from "./types";
+import { focusedPaneArea } from "./utils/focusedPaneArea";
 import { isWorktreeMissing } from "./utils/isWorktreeMissing";
 import {
 	closeVisibleChangesPane,
@@ -539,19 +541,20 @@ function V2WorkspaceContent() {
 	const onBeforeCloseTab = useTabCloseGuard(store);
 	const onBeforeCloseRightTab = useTabCloseGuard(rightStore);
 	const activeAreaRef = useRef<PaneArea>("center");
+	const focusedArea = useCallback(
+		() =>
+			focusedPaneArea({
+				rightPaneAreaOpen: isRightPaneAreaEnabled && sidebarOpen,
+				lastArea: activeAreaRef.current,
+			}),
+		[isRightPaneAreaEnabled, sidebarOpen],
+	);
 	const getCloseTarget = useCallback(
 		() =>
-			isRightPaneAreaEnabled && sidebarOpen && activeAreaRef.current === "right"
+			focusedArea() === "right"
 				? { store: rightStore, onBeforeCloseTab: onBeforeCloseRightTab }
 				: { store, onBeforeCloseTab },
-		[
-			isRightPaneAreaEnabled,
-			sidebarOpen,
-			rightStore,
-			onBeforeCloseRightTab,
-			store,
-			onBeforeCloseTab,
-		],
+		[focusedArea, rightStore, onBeforeCloseRightTab, store, onBeforeCloseTab],
 	);
 	const centerContextMenuActions = usePaneAreaMoveActions({
 		defaults: defaultContextMenuActions,
@@ -638,6 +641,7 @@ function V2WorkspaceContent() {
 			toolbar={renderWorkspaceToolbar(true)}
 			isFullScreen={rightPaneMode === "expanded"}
 			onToggleFullScreen={toggleRightPaneAreaFullScreen}
+			focusedArea={focusedArea}
 		/>
 	);
 
@@ -695,7 +699,7 @@ function V2WorkspaceContent() {
 							data-pane-area="center"
 						>
 							{rightPaneMode !== "expanded" && <HostConnectionPill />}
-							{
+							<PaneAreaProvider area="center" focusedArea={focusedArea}>
 								<Workspace<PaneViewerData>
 									key={workspaceId}
 									{...titleBarTabBarProps(titleBarMainSlot, {
@@ -797,7 +801,7 @@ function V2WorkspaceContent() {
 									onInteractionStateChange={onWorkspaceInteractionStateChange}
 									store={store}
 								/>
-							}
+							</PaneAreaProvider>
 						</div>
 					</WorkspaceSplitLayout>
 				</WorkspaceGitStatusProvider>

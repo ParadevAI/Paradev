@@ -1,0 +1,1 @@
+export { focusedPaneArea } from "./focusedPaneArea";

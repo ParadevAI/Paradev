@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { useHotkey } from "renderer/hotkeys";
+import { usePaneAreaHotkeyGuard } from "renderer/routes/_authenticated/_dashboard/providers/PaneAreaProvider";
 import { rowElement } from "../../utils/rowElement";
 import { toolTitleText } from "../../utils/toolTitle";
 import {
@@ -234,10 +235,12 @@ export function useTranscriptFind({
 		inputRef.current?.select();
 	}, [isOpen]);
 
+	const ignoreOtherPaneArea = usePaneAreaHotkeyGuard();
 	useHotkey("FIND_IN_CHAT", show, {
 		enabled: isActive,
 		preventDefault: true,
-		ignoreEventWhen: insideForeignFindScope,
+		ignoreEventWhen: (event) =>
+			insideForeignFindScope(event) || ignoreOtherPaneArea(),
 	});
 
 	// Focus already belongs to the pane the reader moved to, so this close

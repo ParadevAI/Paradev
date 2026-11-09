@@ -11,10 +11,11 @@ import {
 	SidebarSlide,
 	type SidebarSlideMode,
 } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
+import type { PaneArea } from "renderer/routes/_authenticated/_dashboard/providers/PaneAreaProvider";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { clampSideWidth } from "./utils/clampSideWidth";
 
-export type PaneArea = "center" | "right";
+export type { PaneArea };
 
 function paneAreaOf(element: Element | null): PaneArea | null {
 	const area = element
