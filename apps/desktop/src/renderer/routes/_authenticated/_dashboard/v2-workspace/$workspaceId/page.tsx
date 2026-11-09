@@ -52,6 +52,7 @@ import {
 import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
+import { WorkspaceMoveBanner } from "./components/WorkspaceMoveBanner";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
 import {
 	type PaneArea,
@@ -678,6 +679,7 @@ function V2WorkspaceContent() {
 							data-pane-area="center"
 						>
 							{rightPaneMode !== "expanded" && <HostConnectionPill />}
+							<WorkspaceMoveBanner workspaceId={workspaceId} />
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}

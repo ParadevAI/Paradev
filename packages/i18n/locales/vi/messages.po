@@ -134,6 +134,14 @@ msgstr "{0, plural, one {# tệp thay đổi} other {# tệp thay đổi}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {Đã đóng # cuộc trò chuyện}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, other {Không thể chuyển # cuộc trò chuyện. Hãy mở để thử lại.}}"
+
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# cuộc trò chuyện vẫn ở không gian làm việc cũ} other {# cuộc trò chuyện vẫn ở không gian làm việc cũ}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {Đã đính kèm # bình luận} other {Đã đính kèm # bình luận}}"
@@ -353,6 +361,10 @@ msgstr "{0, plural, one {issue Linear} other {issue Linear}}"
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Chuyển # workspace đã chọn vào một nhóm} other {Chuyển # workspace đã chọn vào một nhóm}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {Đang chuyển # cuộc trò chuyện đến đây…} other {Đang chuyển # cuộc trò chuyện đến đây…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -831,6 +843,9 @@ msgstr "{completed} trong {0} check đã xong"
 msgid "{completed} of {total} completed"
 msgstr "Đã hoàn thành {completed}/{total}"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (ngoại tuyến)"
+
 msgid "{configTitle} font size"
 msgstr "Cỡ chữ {configTitle}"
 
@@ -988,6 +1003,9 @@ msgstr "{duration, plural, one {Đã suy nghĩ # giây} other {Đã suy nghĩ # 
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} trong workspace này đã được xuất bản thành một trang ở tổ chức khác. Hãy di chuyển tệp hoặc xuất bản kèm id của trang đó."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, other {# cuộc trò chuyện không thể chuyển sang máy tính}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# thất bại} other {# thất bại}}"
 
@@ -1097,6 +1115,9 @@ msgstr "{localHostName} (thiết bị này)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Đang sao chép cuộc trò chuyện (# tin nhắn)} other {Đang sao chép cuộc trò chuyện (# tin nhắn)}}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1290,6 +1311,9 @@ msgstr "{rate} cho mỗi GB-giờ. Được dùng sau quỹ hằng tháng và kh
 msgid "{readPercent}% read"
 msgstr "đã đọc {readPercent}%"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "Đã chuyển {ready}/{total} cuộc trò chuyện đến đây"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1333,6 +1357,9 @@ msgstr "{starCount} star và còn tăng"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Đã khởi chạy # tự động hóa} other {Đã khởi chạy # tự động hóa}}"
 
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Không gian làm việc này đã được chuyển. # cuộc trò chuyện vẫn ở đây.} other {Không gian làm việc này đã được chuyển. # cuộc trò chuyện vẫn ở đây.}}"
+
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# agent con đang chạy}}"
 
@@ -1356,6 +1383,9 @@ msgstr "{threshold, plural, other {đã hợp nhất # PR của tác nhân}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} bị gián đoạn"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {Đã chuyển {done}/# cuộc trò chuyện}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Cả # check đều đạt} other {Cả # check đều đạt}}"
@@ -1976,6 +2006,12 @@ msgstr "Thêm {0} vào workspace"
 
 msgid "Add {localizedName}?"
 msgstr "Thêm {localizedName}?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Hãy thêm {repositoryName} làm dự án trên {computer} trước"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Hãy thêm {repositoryName} làm dự án trên máy tính này trước"
 
 msgid "Add a comment…"
 msgstr "Thêm bình luận…"
@@ -3925,6 +3961,9 @@ msgstr "Hủy chỉnh sửa"
 msgid "Cancel invite"
 msgstr "Hủy lời mời"
 
+msgid "Cancel move"
+msgstr "Hủy chuyển"
+
 msgid "Cancel plan"
 msgstr "Hủy gói"
 
@@ -5620,6 +5659,9 @@ msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ trì
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Hãy sao chép khóa ngay — bạn sẽ không xem lại được nữa."
 
+msgid "Copying the conversation"
+msgstr "Đang sao chép cuộc trò chuyện"
+
 msgid "Copyright or trademark"
 msgstr "Bản quyền hoặc nhãn hiệu"
 
@@ -5958,11 +6000,17 @@ msgstr "Không thể tạo nhánh sang worktree mới"
 msgid "Couldn't branch the conversation"
 msgstr "Không thể tạo nhánh hội thoại"
 
+msgid "Couldn't cancel the move"
+msgstr "Không thể hủy việc chuyển"
+
 msgid "Couldn't change the routine"
 msgstr "Không thể thay đổi quy trình"
 
 msgid "Couldn't check"
 msgstr "Không thể kiểm tra"
+
+msgid "Couldn't check the move"
+msgstr "Không thể kiểm tra việc chuyển"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Không kiểm tra được việc gỡ thành viên này ảnh hưởng đến những gì"
@@ -6008,6 +6056,12 @@ msgstr "Không thể bỏ các thay đổi chưa stage"
 
 msgid "Couldn't edit the message"
 msgstr "Không thể chỉnh sửa tin nhắn"
+
+msgid "Couldn't end the move"
+msgstr "Không thể kết thúc việc chuyển"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Không rõ việc chuyển cuộc trò chuyện này đang thế nào. Nếu chưa được chuyển, nó vẫn ở không gian làm việc ban đầu."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Không xóa xong các workspace"
@@ -6064,6 +6118,9 @@ msgstr "Không thể đánh dấu sẵn sàng để review"
 
 msgid "Couldn't merge pull request"
 msgstr "Không thể merge pull request"
+
+msgid "Couldn't move {name}"
+msgstr "Không thể chuyển {name}"
 
 msgid "Couldn't move the subagent to the background"
 msgstr "Không thể chuyển agent con sang chạy nền"
@@ -6220,6 +6277,9 @@ msgstr "Không thể dừng trò chuyện"
 
 msgid "Couldn't take a screenshot"
 msgstr "Không chụp được màn hình"
+
+msgid "Couldn't try the move again"
+msgstr "Không thể thử chuyển lại"
 
 msgid "Couldn't undo the file changes."
 msgstr "Không thể hoàn tác thay đổi tệp."
@@ -9315,6 +9375,9 @@ msgstr "Tải ứng dụng cho iPhone và iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Sẽ nhận lời mời tham gia {organizationName}"
 
+msgid "Getting the computer ready"
+msgstr "Đang chuẩn bị máy tính"
+
 msgid "Getting Work Done"
 msgstr "Làm việc"
 
@@ -10540,6 +10603,9 @@ msgstr "Plugin của nó sẽ hiện khi đồng bộ xong."
 
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính bạn chọn bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại — dùng menu khay Paradev > Host Service > Restart."
@@ -11986,6 +12052,9 @@ msgstr "phần lớn lập trình viên"
 msgid "Most of software history"
 msgstr "Gần như suốt lịch sử phần mềm"
 
+msgid "Move"
+msgstr "Chuyển"
+
 msgid "Move {count} to Group"
 msgstr "Chuyển {count} vào nhóm"
 
@@ -11995,8 +12064,23 @@ msgstr "Chuyển {name} sang chạy nền"
 msgid "Move cloud work"
 msgstr "Chuyển công việc trên cloud"
 
+msgid "Move this workspace to a computer?"
+msgstr "Chuyển không gian làm việc này sang một máy tính?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Chuyển không gian làm việc này lên cloud?"
+
+msgid "Move to a computer"
+msgstr "Chuyển sang một máy tính"
+
+msgid "Move to another computer"
+msgstr "Chuyển sang máy tính khác"
+
 msgid "Move to background"
 msgstr "Chuyển sang chạy nền"
+
+msgid "Move to cloud"
+msgstr "Chuyển lên cloud"
 
 msgid "Move to group"
 msgstr "Chuyển vào nhóm"
@@ -12015,6 +12099,21 @@ msgstr "Hãy chuyển agent của bạn trước {shutdownDate}."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "Đã chuyển \"{name}\" vào {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "Đã chuyển {name} sang {destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "Đang chuyển {name} sang {destination}"
+
+msgid "Moving this chat here"
+msgstr "Đang chuyển cuộc trò chuyện này đến đây"
+
+msgid "Moving this workspace here…"
+msgstr "Đang chuyển không gian làm việc này đến đây…"
+
+msgid "Moving this workspace…"
+msgstr "Đang chuyển không gian làm việc này…"
 
 msgid "Multi-select"
 msgstr "Chọn nhiều"
@@ -12755,6 +12854,9 @@ msgstr "Chưa chọn tổ chức nào"
 
 msgid "No other chats here"
 msgstr "Không có cuộc trò chuyện nào khác ở đây"
+
+msgid "No other computer is set up for this account."
+msgstr "Tài khoản này chưa thiết lập máy tính nào khác."
 
 msgid "No pages match"
 msgstr "Không có trang nào khớp"
@@ -13980,6 +14082,9 @@ msgstr "Mở bảng lệnh toàn cục"
 
 msgid "Open the new workspace modal"
 msgstr "Mở hộp thoại tạo workspace mới"
+
+msgid "Open the original workspace"
+msgstr "Mở không gian làm việc ban đầu"
 
 msgid "Open the resource usage view in the command palette"
 msgstr "Mở khung tài nguyên trong bảng lệnh"
@@ -16513,6 +16618,9 @@ msgstr "Đã khôi phục \"{workspaceName}\""
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Đang khôi phục \"{workspaceName}\"…"
 
+msgid "Restoring Claude's session"
+msgstr "Đang khôi phục phiên của Claude"
+
 msgid "Restoring your session"
 msgstr "Đang khôi phục phiên của bạn"
 
@@ -18432,6 +18540,9 @@ msgstr "Còn gì khác? Nhập câu trả lời của bạn"
 msgid "Something went wrong"
 msgstr "Đã xảy ra lỗi"
 
+msgid "Something went wrong during the move."
+msgstr "Đã xảy ra lỗi trong khi chuyển."
+
 msgid "Something went wrong."
 msgstr "Đã xảy ra lỗi."
 
@@ -18751,6 +18862,9 @@ msgstr "Đang khởi động tác nhân…"
 msgid "Starting the simulator…"
 msgstr "Đang khởi động trình giả lập…"
 
+msgid "Starting the workspace"
+msgstr "Đang khởi động workspace"
+
 msgid "Starting up. This should only take a moment."
 msgstr "Đang khởi động. Sẽ chỉ mất một lát."
 
@@ -18872,6 +18986,9 @@ msgstr "Đã dừng"
 
 msgid "Stopped by the usage limit"
 msgstr "Đã dừng do giới hạn sử dụng"
+
+msgid "Stopped moving {name}"
+msgstr "Đã dừng chuyển {name}"
 
 msgid "Stopping the agent in {what}"
 msgstr "Đang dừng tác nhân trong {what}"
@@ -19473,6 +19590,9 @@ msgstr "Tài khoản đó không còn được kết nối — hãy chọn tài 
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở — nó đã khởi động nhưng chưa từng nhận yêu cầu."
 
+msgid "That computer can't be reached"
+msgstr "Không thể kết nối tới máy tính đó"
+
 msgid "That endpoint could not be resolved."
 msgstr "Không thể phân giải endpoint đó."
 
@@ -19570,6 +19690,9 @@ msgstr "Thay đổi có hiệu lực ngay. Bạn chỉ trả phần chênh lệc
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat vẫn giữ nguyên. Các tệp đã được bất kỳ ai sửa kể từ lượt này sẽ được giữ nguyên và liệt kê."
 
+msgid "the cloud"
+msgstr "cloud"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi kịp. Lần chạy tiếp theo sẽ thử lại."
 
@@ -19587,6 +19710,9 @@ msgstr "Kết nối đã quá thời gian"
 
 msgid "The connection was closed"
 msgstr "Kết nối đã bị đóng"
+
+msgid "The connection was lost."
+msgstr "Mất kết nối."
 
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Prompt hiện tại sẽ được thay bằng phiên bản đã chọn. Một mục \"Đã khôi phục\" sẽ được thêm vào lịch sử để bạn có thể hoàn tác."
@@ -19744,6 +19870,18 @@ msgstr "Phần lớn PR của agent được merge chỉ cần review, không c�
 
 msgid "The model declined to continue"
 msgstr "Mô hình đã từ chối tiếp tục"
+
+msgid "The move into this workspace failed."
+msgstr "Chuyển vào không gian làm việc này không thành công."
+
+msgid "The move service couldn't be reached."
+msgstr "Không thể kết nối với dịch vụ chuyển."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Việc chuyển ngừng phản hồi nên đã bị kết thúc."
+
+msgid "The move was cancelled."
+msgstr "Đã hủy việc chuyển."
 
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
@@ -19934,6 +20072,9 @@ msgstr "Các thư mục này vẫn còn tệp của bạn, nhưng chưa tự chu
 msgid "These ports are still in use"
 msgstr "Các cổng này vẫn đang được dùng"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Chúng vẫn ở không gian làm việc ban đầu. Mở từng cuộc trò chuyện để thử lại."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Chúng chạy bằng gói đăng ký và khóa bạn đã có."
 
@@ -20004,11 +20145,17 @@ msgstr "Không thể hoàn tác."
 msgid "This channel is archived"
 msgstr "Kênh này đã được lưu trữ"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Không thể chuyển cuộc trò chuyện này đến đây. Nó vẫn ở workspace ban đầu."
+
 msgid "This chat has ended."
 msgstr "Chat này đã kết thúc."
 
 msgid "This chat is empty."
 msgstr "Cuộc trò chuyện này trống."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Cuộc trò chuyện này dài nên chỉ hiển thị phần mới nhất. Toàn bộ sẽ mở khi không gian làm việc khởi động."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Cuộc trò chuyện này có thể đã bị xóa hoặc bạn không có quyền truy cập."
@@ -20036,6 +20183,15 @@ msgstr "Không thể khởi động workspace cloud này"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
+
+msgid "this computer"
+msgstr "máy tính này"
+
+msgid "This computer"
+msgstr "Máy tính này"
+
+msgid "This computer's host is not running"
+msgstr "Máy chủ của máy tính này không chạy"
 
 msgid "This conversation is too long for the model"
 msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
@@ -20067,6 +20223,9 @@ msgstr "Email này đã được đăng ký bằng phương thức đăng nhập
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment này không có repository nào. Hãy tạo một environment có repository trong Settings, rồi khởi động workspace từ environment đó"
 
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Môi trường này mở {environmentRepository}, không phải {repository}"
+
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Các repository của environment này đã cố định; hãy promote lại một workspace để thay đổi"
 
@@ -20096,6 +20255,9 @@ msgstr "Lời mời này đã được chấp nhận."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Liên kết mời này không hợp lệ hoặc đã hết hạn."
+
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Việc này lâu hơn bình thường. Cuộc trò chuyện bên dưới là bản lưu gần nhất; nó sẽ mở thật khi không gian làm việc khởi động."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Việc này lâu hơn bình thường. Sandbox có thể vẫn đang tải image — nó tiếp tục chạy dù cửa sổ này có mở hay không."
@@ -20147,6 +20309,9 @@ msgstr "Mô hình này không khả dụng"
 
 msgid "This month"
 msgstr "Tháng này"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Việc chuyển này đã dừng. Cuộc trò chuyện vẫn ở không gian làm việc cũ."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Việc này chỉ đổi tên hiển thị, không đổi nhánh."
@@ -20356,11 +20521,17 @@ msgstr "Thao tác này sẽ bỏ stage và hoàn nguyên toàn bộ thay đổi 
 msgid "This workspace"
 msgstr "Workspace này"
 
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Không thể chuyển không gian làm việc này. Không có gì thay đổi."
+
 msgid "This workspace has no project to branch from"
 msgstr "Workspace này không có dự án để tạo nhánh"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace này có thể đã bị gỡ, hoặc bạn không còn quyền truy cập."
+
+msgid "This workspace moved"
+msgstr "Không gian làm việc này đã được chuyển"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Bản ghi workspace này vẫn còn, nhưng thư mục worktree của nó không còn trên host này. Terminal và các thao tác với tệp không dùng được."
@@ -21131,6 +21302,12 @@ msgstr "Cần cập nhật"
 msgid "update the branch prefix"
 msgstr "cập nhật tiền tố nhánh"
 
+msgid "Update the host service on both computers and try again."
+msgstr "Hãy cập nhật dịch vụ host trên cả hai máy tính rồi thử lại."
+
+msgid "Update the host service on this device and try again."
+msgstr "Hãy cập nhật dịch vụ host trên thiết bị này rồi thử lại."
+
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
 
@@ -21562,6 +21739,9 @@ msgstr "Đang chờ tin nhắn đầu tiên của agent con…"
 
 msgid "Waiting for your input"
 msgstr "Đang chờ bạn phản hồi"
+
+msgid "Waking the workspace…"
+msgstr "Đang đánh thức không gian làm việc…"
 
 msgid "Waking up workspace"
 msgstr "Đang đánh thức workspace"
@@ -22561,8 +22741,14 @@ msgstr "Các dự án và workspace v1 của bạn đang được chuyển sang 
 msgid "Your version: {currentVersion}"
 msgstr "Phiên bản của bạn: {currentVersion}"
 
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Công việc của bạn, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới trên remote. Một không gian làm việc đám mây khởi động từ nhánh đó trong môi trường bạn chọn, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các tác tử đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở đây."
+
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Quản trị viên không gian làm việc của bạn bật đăng nhập bằng mã thiết bị cho Codex."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Không gian làm việc của bạn không thay đổi. Bạn có thể chuyển lại sau vài phút."
 
 msgid "Zap"
 msgstr "Tia chớp"

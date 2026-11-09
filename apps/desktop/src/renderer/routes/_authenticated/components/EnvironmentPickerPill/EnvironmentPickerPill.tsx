@@ -10,6 +10,7 @@ import {
 	defaultFilter,
 } from "@superset/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
+import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import {
 	HiCheck,
@@ -40,6 +41,7 @@ interface EnvironmentPickerPillProps {
 	onCreateEnvironment: () => void;
 	onManageEnvironments: () => void;
 	isLoading?: boolean;
+	triggerClassName?: string;
 }
 
 export function EnvironmentPickerPill({
@@ -51,6 +53,7 @@ export function EnvironmentPickerPill({
 	onCreateEnvironment,
 	onManageEnvironments,
 	isLoading = false,
+	triggerClassName,
 }: EnvironmentPickerPillProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
@@ -90,7 +93,7 @@ export function EnvironmentPickerPill({
 			}}
 		>
 			<PopoverTrigger asChild>
-				<FormPickerTrigger className="max-w-[160px]">
+				<FormPickerTrigger className={cn("max-w-[160px]", triggerClassName)}>
 					{needsSetup ? (
 						<HiMiniPlus className="size-4 shrink-0 text-muted-foreground" />
 					) : (

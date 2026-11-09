@@ -19,15 +19,29 @@ import { eventBytes, prepareEventForCloud } from "./prepareEvent";
 const SETTLE_MS = 1_000;
 const MIN_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 5 * 60 * 1000;
+const FOLLOW_MS = 60 * 60 * 1000;
 const REJECTED_CODES = new Set(["BAD_REQUEST", "PAYLOAD_TOO_LARGE"]);
+const NOT_THIS_HOSTS_CODES = new Set(["CONFLICT", "FORBIDDEN", "NOT_FOUND"]);
 
 export type ChatSync = {
 	/** Pushes everything not yet pushed for one chat, and resolves once it is acked. */
 	syncSession(sessionId: string): Promise<void>;
-	/** Records an append; a running sync pushes it soon after. */
+	/**
+	 * Records an append. A chat is pushed when a turn starts or ends and when
+	 * its title changes, so a turn costs the database two writes; the rest
+	 * waits in the journal. A chat that is moving pushes every append.
+	 */
 	noteAppend(envelope: DurableEnvelope): void;
 	/** Keeps pushing every chat that changes, retrying with backoff. */
 	start(): () => void;
+	/**
+	 * Keeps pushing one chat while it moves away, on a host that does not
+	 * sync otherwise, so the move can see a turn taken after it began.
+	 * Stops once the chat has moved, is forgotten, or an hour has passed.
+	 */
+	follow(sessionId: string): void;
+	/** The chat is on this host again, as when it moves back. */
+	forget(sessionId: string): void;
 };
 
 type Schedule = (run: () => void, ms: number) => () => void;
@@ -75,11 +89,24 @@ export function createChatSync(args: {
 	runtime: () => ChatRuntime | null;
 	api: ApiClient;
 	schedule?: Schedule;
+	now?: () => number;
 }): ChatSync {
 	const schedule = args.schedule ?? defaultSchedule;
+	const now = args.now ?? Date.now;
 	const dirty = new Set<string>();
 	const moved = new Set<string>();
+	/** Chats moving away, by when the move began; a move that never ends stops being followed. */
+	const followed = new Map<string, number>();
+	const isFollowed = (sessionId: string): boolean => {
+		const since = followed.get(sessionId);
+		if (since === undefined) return false;
+		if (now() - since <= FOLLOW_MS) return true;
+		followed.delete(sessionId);
+		return false;
+	};
 	const inFlight = new Map<string, Promise<unknown>>();
+	const lastTurn = new Map<string, string>();
+	const lastTitle = new Map<string, string | null>();
 	let running = false;
 	let cancelTimer: (() => void) | null = null;
 	let retryMs = MIN_RETRY_MS;
@@ -178,6 +205,8 @@ export function createChatSync(args: {
 
 	let started = false;
 	let catchUp = false;
+	const syncing = () => started || followed.size > 0;
+	const syncs = (sessionId: string) => started || isFollowed(sessionId);
 
 	/** Chats a previous run left unpushed; `pushBatch` skips the ones already pushed. */
 	const markAllDirty = () => {
@@ -211,19 +240,20 @@ export function createChatSync(args: {
 			}
 		}
 		let round = [...dirty];
-		while (started && round.length > 0) {
+		while (syncing() && round.length > 0) {
 			const next = new Set<string>();
 			for (const sessionId of round) {
-				if (!started) break;
+				if (!syncing()) break;
 				dirty.delete(sessionId);
-				if (moved.has(sessionId)) continue;
+				if (!syncs(sessionId) || moved.has(sessionId)) continue;
 				try {
 					if (await exclusive(sessionId, () => pushBatch(sessionId))) {
 						next.add(sessionId);
 					}
 				} catch (error) {
-					if (errorCode(error) === "CONFLICT") {
+					if (NOT_THIS_HOSTS_CODES.has(errorCode(error) ?? "")) {
 						moved.add(sessionId);
+						followed.delete(sessionId);
 						continue;
 					}
 					failed.add(sessionId);
@@ -234,11 +264,15 @@ export function createChatSync(args: {
 				}
 			}
 			for (const sessionId of dirty) {
-				if (!failed.has(sessionId)) next.add(sessionId);
+				if (!failed.has(sessionId) && syncs(sessionId)) next.add(sessionId);
 			}
 			round = [...next];
 		}
 		for (const sessionId of failed) dirty.add(sessionId);
+		// `start` marks every chat dirty again, so one this host does not sync can go.
+		for (const sessionId of dirty) {
+			if (!syncs(sessionId)) dirty.delete(sessionId);
+		}
 		running = false;
 		if (readFailed || failed.size > 0) {
 			wake(retryMs);
@@ -250,23 +284,54 @@ export function createChatSync(args: {
 	};
 
 	const wake = (ms: number) => {
-		if (!started || cancelTimer) return;
+		if (!syncing()) return;
+		if (cancelTimer) {
+			if (ms > 0) return;
+			cancelTimer();
+		}
 		cancelTimer = schedule(() => void drain(), ms);
+	};
+
+	/** A turn that started or ended, or a new title: what makes a chat worth a write. */
+	const isMilestone = (
+		sessionId: string,
+		event: DurableEnvelope["event"],
+	): boolean => {
+		if (event.type === "turn") {
+			const key = `${event.turn.id}:${event.turn.status}`;
+			if (lastTurn.get(sessionId) === key) return false;
+			lastTurn.set(sessionId, key);
+			return true;
+		}
+		if (event.type === "session" && "title" in event.session) {
+			const title = event.session.title ?? null;
+			if (lastTitle.get(sessionId) === title) return false;
+			lastTitle.set(sessionId, title);
+			return true;
+		}
+		return false;
 	};
 
 	return {
 		syncSession,
 		noteAppend(envelope) {
-			if (!started) return;
-			dirty.add(envelope.sessionId);
-			const turnEnded =
-				envelope.event.type === "turn" &&
-				envelope.event.turn.status !== "running";
-			if (turnEnded && cancelTimer) {
-				cancelTimer();
-				cancelTimer = null;
-			}
-			wake(turnEnded ? 0 : SETTLE_MS);
+			const { sessionId, event } = envelope;
+			if (!syncs(sessionId)) return;
+			const milestone = isMilestone(sessionId, event);
+			const moving = isFollowed(sessionId);
+			if (!milestone && !moving) return;
+			dirty.add(sessionId);
+			wake(milestone ? 0 : SETTLE_MS);
+		},
+		follow(sessionId) {
+			moved.delete(sessionId);
+			followed.set(sessionId, now());
+		},
+		forget(sessionId) {
+			moved.delete(sessionId);
+			followed.delete(sessionId);
+			lastTurn.delete(sessionId);
+			lastTitle.delete(sessionId);
 		},
 		start() {
 			started = true;
@@ -274,6 +339,7 @@ export function createChatSync(args: {
 			wake(0);
 			return () => {
 				started = false;
+				followed.clear();
 				cancelTimer?.();
 				cancelTimer = null;
 			};

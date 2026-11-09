@@ -1,5 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections } from "../../core/rankCommands";
@@ -17,6 +19,8 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 	const { i18n } = useLingui();
 	const context = useCommandContext();
 	const sections = useActiveCommands(context);
+	const chatSearchEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
 	const ranked = useMemo(
 		() => rankSections(sections, query),
 		[sections, query],
@@ -38,7 +42,7 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 					))}
 				</CommandGroup>
 			))}
-			<ChatSearchResults query={query} />
+			{chatSearchEnabled && <ChatSearchResults query={query} />}
 		</CommandList>
 	);
 }

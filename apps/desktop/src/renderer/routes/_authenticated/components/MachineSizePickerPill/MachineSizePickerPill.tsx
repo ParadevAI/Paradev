@@ -17,11 +17,13 @@ import {
 interface MachineSizePickerPillProps {
 	machineSize: MachineSize | null;
 	onSelectMachineSize: (machineSize: MachineSize) => void;
+	triggerClassName?: string;
 }
 
 export function MachineSizePickerPill({
 	machineSize,
 	onSelectMachineSize,
+	triggerClassName,
 }: MachineSizePickerPillProps) {
 	const { t } = useLingui();
 	const { options, defaultSize } = useMachineSizeOptions();
@@ -34,6 +36,7 @@ export function MachineSizePickerPill({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<FormPickerTrigger
+					className={triggerClassName}
 					aria-label={t({ message: `Machine size: ${label}` })}
 					title={selected?.spec ?? label}
 				>

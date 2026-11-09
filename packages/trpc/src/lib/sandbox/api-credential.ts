@@ -28,6 +28,8 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"automation.getPrompt",
 	"automation.list",
 	"automation.reportCloudLaunch",
+	"chatHistory.completeTranscriptUpload",
+	"chatHistory.createTranscriptUpload",
 	"chatHistory.push",
 	"cloudWorkspace.access",
 	"cloudWorkspace.available",
