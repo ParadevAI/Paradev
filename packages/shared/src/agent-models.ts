@@ -353,7 +353,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// provider/model selectors. Exact ids verified against
 			// `omp models --json` in OMP 18.0.1; `claude-fable-5-1` against the
 			// catalog bundled in OMP 18.1.2; the gpt-6 family against
-			// pi-catalog 18.2.11.
+			// pi-catalog 18.2.11; `claude-fable-5-2` against pi-catalog 18.18.5.
 			{ id: "@smol", label: "Configured fast model" },
 			{ id: "@slow", label: "Configured slow model" },
 			{ id: "@plan", label: "Configured plan model" },
@@ -361,6 +361,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-2", label: "Claude Fable 5.2" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{

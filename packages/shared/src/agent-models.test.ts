@@ -206,6 +206,13 @@ describe("buildAgentModelArgs", () => {
 		}
 	});
 
+	it("offers fable 5.2 in omp, whose catalog already lists it", () => {
+		expect(buildAgentModelArgs("omp", "anthropic/claude-fable-5-2")).toEqual([
+			"--model",
+			"anthropic/claude-fable-5-2",
+		]);
+	});
+
 	it("includes every GPT-5.6 Codex model", () => {
 		for (const model of ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"]) {
 			expect(buildAgentModelArgs("codex", model)).toEqual(["--model", model]);
