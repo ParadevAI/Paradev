@@ -20,6 +20,8 @@ interface ListedChatSession {
 	updatedAt: number;
 	live: boolean;
 	terminalId: string | null;
+	/** Every close sets it; a chat that only lost its process (host restart, cloud sleep) has none. */
+	closedAt?: number | null;
 }
 
 /**
@@ -28,16 +30,19 @@ interface ListedChatSession {
  * desktop is still creating (or a pending cloud launch) is never adopted twice.
  * A chat with no terminal uses its session id, as the host's `panes.newTab` does.
  * Only the most recently active live chats are candidates, so a workspace with
- * many idle chats does not open a tab for each of them.
+ * many idle chats does not open a tab for each of them. A workspace that opened
+ * with no tabs and has no live chat gets its newest stopped chat nobody closed.
  */
 export function chatSessionsToAdopt({
 	sessions,
 	tabs,
 	workspaceId,
+	openedEmpty = false,
 }: {
 	sessions: readonly ListedChatSession[];
 	tabs: readonly Tab<PaneViewerData>[];
 	workspaceId: string;
+	openedEmpty?: boolean;
 }): ChatSessionTarget[] {
 	const claimedSessionIds = new Set<string>(readPendingChatStops(workspaceId));
 	const claimedTerminalIds = new Set<string>(
@@ -52,18 +57,23 @@ export function chatSessionsToAdopt({
 				claimedSessionIds.add(data.sessionId);
 		}
 	}
-	const recent = sessions
+	const adoptable = sessions
 		.filter(
 			(session) =>
-				session.live &&
 				presetForAcpHarness(session.harness) &&
 				!isChatSessionClosed(session.sessionId) &&
 				!isChatTerminalIgnored(session.terminalId ?? session.sessionId),
 		)
-		.sort((a, b) => b.updatedAt - a.updatedAt)
+		.sort((a, b) => b.updatedAt - a.updatedAt);
+	const live = adoptable
+		.filter((session) => session.live)
 		.slice(0, CHAT_ADOPT_MAX_LIVE_CHATS);
+	const candidates =
+		live.length === 0 && openedEmpty
+			? adoptable.filter((session) => !session.closedAt).slice(0, 1)
+			: live;
 	const targets: Array<ChatSessionTarget & { updatedAt: number }> = [];
-	for (const session of recent) {
+	for (const session of candidates) {
 		const terminalId = session.terminalId ?? session.sessionId;
 		if (claimedSessionIds.has(session.sessionId)) continue;
 		if (claimedTerminalIds.has(terminalId)) continue;
