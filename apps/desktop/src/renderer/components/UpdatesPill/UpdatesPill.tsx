@@ -191,6 +191,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					type="button"
 					onClick={handleClick}
 					aria-disabled={isBusy}
+					aria-label={isInstalling ? tooltip : undefined}
 					className={cn(
 						"relative inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-1",
 						"font-mono text-[10px] tabular-nums leading-none",
@@ -217,8 +218,14 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					)}
 					{isInstalling ? (
 						<>
-							<span className="w-3 text-center text-xs leading-none before:animate-braille-spin" />
-							<span className="tracking-tighter before:animate-[ascii-bar_480ms_step-end_infinite]" />
+							<span
+								aria-hidden="true"
+								className="w-3 text-center text-xs leading-none before:animate-braille-spin"
+							/>
+							<span
+								aria-hidden="true"
+								className="tracking-tighter before:animate-[ascii-bar_480ms_step-end_infinite]"
+							/>
 						</>
 					) : isDownloading ? (
 						<>
