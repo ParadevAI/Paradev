@@ -4953,6 +4953,12 @@ msgstr "Có bình luận mới"
 msgid "Comment added in"
 msgstr "Bình luận được thêm trong"
 
+msgid "Comment edited"
+msgstr "Bình luận đã chỉnh sửa"
+
+msgid "Comment edited in"
+msgstr "Bình luận đã chỉnh sửa trong"
+
 msgid "Comment mentions user"
 msgstr "Bình luận nhắc đến người dùng"
 
@@ -5404,6 +5410,9 @@ msgstr "Liên hệ hỗ trợ"
 
 msgid "Contact Us"
 msgstr "Liên hệ"
+
+msgid "Contains \"{pattern}\""
+msgstr "Chứa \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Chứa văn bản này..."
@@ -11739,9 +11748,6 @@ msgstr "Bám theo mẫu hiện có"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Khớp phím tắt với ký tự in trên bàn phím của bạn (ví dụ ⌘Z luôn kích hoạt ở phím có nhãn \"Z\" — tức phím vật lý KeyY trên QWERTZ). Khi tắt, phím tắt gắn với vị trí phím vật lý và bỏ qua nguồn nhập hiện tại."
-
-msgid "Matching \"{pattern}\""
-msgstr "Khớp với \"{pattern}\""
 
 msgid "Max"
 msgstr "Tối đa"

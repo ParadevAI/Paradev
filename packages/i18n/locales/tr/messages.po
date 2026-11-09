@@ -4953,6 +4953,12 @@ msgstr "Yorum eklendi"
 msgid "Comment added in"
 msgstr "Yorum eklenen yer"
 
+msgid "Comment edited"
+msgstr "Yorum düzenlendi"
+
+msgid "Comment edited in"
+msgstr "Yorumun düzenlendiği yer"
+
 msgid "Comment mentions user"
 msgstr "Yorumda kullanıcıdan bahsedildi"
 
@@ -5404,6 +5410,9 @@ msgstr "Destekle iletişime geç"
 
 msgid "Contact Us"
 msgstr "Bize ulaşın"
+
+msgid "Contains \"{pattern}\""
+msgstr "\"{pattern}\" içerir"
 
 msgid "Contains this text..."
 msgstr "Şu metni içerir..."
@@ -11739,9 +11748,6 @@ msgstr "Mevcut desenlere uy"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Kısayolları klavyenizdeki etiketlerle eşleştirin (örn. ⌘Z her zaman \"Z\" etiketli tuşta çalışır — QWERTZ'de fiziksel KeyY). Kapalıyken kısayollar fiziksel tuş konumlarına sabitlenir ve geçerli giriş kaynağını yok sayar."
-
-msgid "Matching \"{pattern}\""
-msgstr "\"{pattern}\" ile eşleşen"
 
 msgid "Max"
 msgstr "En yüksek"

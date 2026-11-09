@@ -4953,6 +4953,12 @@ msgstr "Comentário adicionado"
 msgid "Comment added in"
 msgstr "Comentário adicionado em"
 
+msgid "Comment edited"
+msgstr "Comentário editado"
+
+msgid "Comment edited in"
+msgstr "Comentário editado em"
+
 msgid "Comment mentions user"
 msgstr "Comentário menciona usuário"
 
@@ -5404,6 +5410,9 @@ msgstr "Falar com o suporte"
 
 msgid "Contact Us"
 msgstr "Fale conosco"
+
+msgid "Contains \"{pattern}\""
+msgstr "Contém \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Contém este texto..."
@@ -11739,9 +11748,6 @@ msgstr "Siga os padrões existentes"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Faz os atalhos seguirem os rótulos do seu teclado (ex.: ⌘Z sempre dispara na tecla marcada \"Z\" — a KeyY física no QWERTZ). Quando desligado, os atalhos ficam presos às posições físicas e ignoram a fonte de entrada atual."
-
-msgid "Matching \"{pattern}\""
-msgstr "Corresponde a \"{pattern}\""
 
 msgid "Max"
 msgstr "Máx."

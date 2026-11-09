@@ -4953,6 +4953,12 @@ msgstr "Komentar ditambahkan"
 msgid "Comment added in"
 msgstr "Komentar ditambahkan di"
 
+msgid "Comment edited"
+msgstr "Komentar diedit"
+
+msgid "Comment edited in"
+msgstr "Komentar diedit di"
+
 msgid "Comment mentions user"
 msgstr "Komentar menyebut pengguna"
 
@@ -5404,6 +5410,9 @@ msgstr "Hubungi Dukungan"
 
 msgid "Contact Us"
 msgstr "Hubungi Kami"
+
+msgid "Contains \"{pattern}\""
+msgstr "Berisi \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Mengandung teks ini..."
@@ -11739,9 +11748,6 @@ msgstr "Ikuti pola yang ada"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Cocokkan pintasan dengan label pada keyboard Anda (mis. ⌘Z selalu aktif pada tombol berlabel \"Z\" — KeyY fisik di QWERTZ). Saat mati, pintasan terikat pada posisi tombol fisik dan mengabaikan sumber input saat ini."
-
-msgid "Matching \"{pattern}\""
-msgstr "Cocok dengan \"{pattern}\""
 
 msgid "Max"
 msgstr "Maks"

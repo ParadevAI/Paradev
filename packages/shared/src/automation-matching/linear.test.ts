@@ -31,7 +31,7 @@ const event: LinearMatchableEvent = {
 };
 
 describe("Linear comments", () => {
-	test("only new issue comments name a trigger", () => {
+	test("issue comment creation and body edits name separate triggers", () => {
 		const delivery = {
 			type: "Comment",
 			action: "create",
@@ -42,13 +42,51 @@ describe("Linear comments", () => {
 		};
 		expect(linearEventNames(delivery)).toEqual(["comment.created"]);
 		expect(linearEventNames({ ...delivery, action: "update" })).toEqual([]);
+		expect(
+			linearEventNames({
+				...delivery,
+				action: "update",
+				updatedFrom: { body: "previous text" },
+			}),
+		).toEqual(["comment.updated"]);
+		expect(
+			linearEventNames({
+				...delivery,
+				action: "update",
+				updatedFrom: { resolvedAt: null },
+			}),
+		).toEqual([]);
+		expect(
+			linearEventNames({
+				...delivery,
+				action: "update",
+				issueId: null,
+				updatedFrom: { body: "previous text" },
+			}),
+		).toEqual([]);
 		expect(linearEventNames({ ...delivery, action: "remove" })).toEqual([]);
 		expect(linearEventNames({ ...delivery, issueId: null })).toEqual([]);
 	});
 
-	test("matches text and author against the parent issue scopes", () => {
-		const resolved = resolveMeScopes(config, "author");
-		expect(linearTriggerMatches(resolved, event)).toEqual({ matches: true });
+	test.each([
+		"comment.created",
+		"comment.updated",
+	] as const)("%s matches text and author against the parent issue scopes", (eventName) => {
+		const resolved = resolveMeScopes({ ...config, event: eventName }, "author");
+		const commentEvent = { ...event, names: [eventName] };
+		expect(linearTriggerMatches(resolved, commentEvent)).toEqual({
+			matches: true,
+		});
+		expect(
+			linearTriggerMatches(resolved, {
+				...commentEvent,
+				names: [
+					eventName === "comment.created"
+						? "comment.updated"
+						: "comment.created",
+				],
+			}),
+		).toEqual({ matches: false, reason: "event" });
 		for (const [field, value, reason] of [
 			["body", "Thanks!", "commentFilter"],
 			["actorId", "someone-else", "actor"],
@@ -57,7 +95,7 @@ describe("Linear comments", () => {
 			["labelIds", [], "label"],
 		] as const) {
 			expect(
-				linearTriggerMatches(resolved, { ...event, [field]: value }),
+				linearTriggerMatches(resolved, { ...commentEvent, [field]: value }),
 			).toEqual({ matches: false, reason });
 		}
 	});

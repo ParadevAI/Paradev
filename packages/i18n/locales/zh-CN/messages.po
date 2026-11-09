@@ -4953,6 +4953,12 @@ msgstr "添加了评论"
 msgid "Comment added in"
 msgstr "评论添加于"
 
+msgid "Comment edited"
+msgstr "评论已编辑"
+
+msgid "Comment edited in"
+msgstr "评论编辑于"
+
 msgid "Comment mentions user"
 msgstr "评论提及用户"
 
@@ -5404,6 +5410,9 @@ msgstr "联系支持"
 
 msgid "Contact Us"
 msgstr "联系我们"
+
+msgid "Contains \"{pattern}\""
+msgstr "包含“{pattern}”"
 
 msgid "Contains this text..."
 msgstr "包含此文本..."
@@ -11739,9 +11748,6 @@ msgstr "沿用现有模式"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "让快捷键匹配键盘上的标签（例如⌘Z始终触发标有“Z”的按键——在QWERTZ上是物理KeyY）。关闭后，快捷键锚定在物理按键位置，忽略当前输入源。"
-
-msgid "Matching \"{pattern}\""
-msgstr "匹配“{pattern}”"
 
 msgid "Max"
 msgstr "最大"

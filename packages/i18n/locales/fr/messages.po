@@ -4953,6 +4953,12 @@ msgstr "Commentaire ajouté"
 msgid "Comment added in"
 msgstr "Commentaire ajouté dans"
 
+msgid "Comment edited"
+msgstr "Commentaire modifié"
+
+msgid "Comment edited in"
+msgstr "Commentaire modifié dans"
+
 msgid "Comment mentions user"
 msgstr "Un commentaire mentionne un utilisateur"
 
@@ -5404,6 +5410,9 @@ msgstr "Contacter le support"
 
 msgid "Contact Us"
 msgstr "Nous contacter"
+
+msgid "Contains \"{pattern}\""
+msgstr "Contient \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Contient ce texte..."
@@ -11739,9 +11748,6 @@ msgstr "Suivre les modèles existants"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Faire correspondre les raccourcis aux libellés de votre clavier (par ex. ⌘Z se déclenche toujours sur la touche marquée « Z » — physiquement KeyY sur un clavier QWERTZ). Lorsque cette option est désactivée, les raccourcis sont liés aux positions physiques des touches et ignorent la source de saisie actuelle."
-
-msgid "Matching \"{pattern}\""
-msgstr "Correspond à « {pattern} »"
 
 msgid "Max"
 msgstr "Max"

@@ -39,12 +39,9 @@ export function TextFilterChip({
 					{/* No `empty` styling: a null filter IS the value — "Any message"
 					    is a deliberate wide-open match, not a blank to fill in, and
 					    muting it made a configured chip read as disabled. */}
-					{/* "Matching" carries the verb the sentence around it does not:
-					    a bare quoted string beside "Comment added" reads as the
-					    comment, not as the filter applied to it. */}
 					<ChipButton
 						label={
-							pattern ? t({ message: `Matching "${pattern}"` }) : emptyLabel
+							pattern ? t({ message: `Contains "${pattern}"` }) : emptyLabel
 						}
 						disabled={disabled}
 						className="max-w-64"

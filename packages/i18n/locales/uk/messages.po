@@ -4947,6 +4947,12 @@ msgstr "Коментар додано"
 msgid "Comment added in"
 msgstr "Коментар додано в"
 
+msgid "Comment edited"
+msgstr "Коментар відредаговано"
+
+msgid "Comment edited in"
+msgstr "Коментар відредаговано в"
+
 msgid "Comment mentions user"
 msgstr "Коментар згадує користувача"
 
@@ -5398,6 +5404,9 @@ msgstr "Зв'язатися з підтримкою"
 
 msgid "Contact Us"
 msgstr "Зв'яжіться з нами"
+
+msgid "Contains \"{pattern}\""
+msgstr "Містить \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Містить цей текст..."
@@ -11733,9 +11742,6 @@ msgstr "Дотримуватися наявних патернів"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Зіставляти комбінації клавіш із позначками на клавіатурі (наприклад, ⌘Z завжди спрацьовує на клавіші з позначкою «Z» — фізична KeyY на QWERTZ). Якщо вимкнено, комбінації прив'язані до фізичного розташування клавіш і не враховують поточне джерело введення."
-
-msgid "Matching \"{pattern}\""
-msgstr "Відповідає «{pattern}»"
 
 msgid "Max"
 msgstr "Макс."

@@ -4953,6 +4953,12 @@ msgstr "Comment added"
 msgid "Comment added in"
 msgstr "Comment added in"
 
+msgid "Comment edited"
+msgstr "Comment edited"
+
+msgid "Comment edited in"
+msgstr "Comment edited in"
+
 msgid "Comment mentions user"
 msgstr "Comment mentions user"
 
@@ -5404,6 +5410,9 @@ msgstr "Contact Support"
 
 msgid "Contact Us"
 msgstr "Contact Us"
+
+msgid "Contains \"{pattern}\""
+msgstr "Contains \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Contains this text..."
@@ -11739,9 +11748,6 @@ msgstr "Match existing patterns"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
-
-msgid "Matching \"{pattern}\""
-msgstr "Matching \"{pattern}\""
 
 msgid "Max"
 msgstr "Max"

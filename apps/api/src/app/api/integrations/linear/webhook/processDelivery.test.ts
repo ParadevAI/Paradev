@@ -159,12 +159,17 @@ describe("one Linear delivery, two connections in the same organization", () => 
 		expect(ingestCalls.map((c) => c.ownerUserId)).toEqual(["user-a", "user-b"]);
 	});
 
-	test("hydrates comments with each connection's access and skips inaccessible issues", async () => {
+	test.each([
+		"create",
+		"update",
+	] as const)("hydrates comment %s with each connection's access and skips inaccessible issues", async (action) => {
 		await processDelivery({
 			payload: {
 				organizationId: WORKSPACE,
 				type: "Comment",
-				action: "create",
+				action,
+				updatedFrom:
+					action === "update" ? { body: "previous text" } : undefined,
 				webhookTimestamp: 123,
 				data: { id: "comment", issueId: "issue-1", body: "/superset fix this" },
 			} as never,
@@ -182,12 +187,13 @@ describe("one Linear delivery, two connections in the same organization", () => 
 		]);
 	});
 
-	test("comment edits never fetch an issue or dispatch another run", async () => {
+	test("comment updates without a body change never fetch an issue or dispatch", async () => {
 		await processDelivery({
 			payload: {
 				organizationId: WORKSPACE,
 				type: "Comment",
 				action: "update",
+				updatedFrom: { resolvedAt: null },
 				webhookTimestamp: 123,
 				data: { id: "comment", issueId: "issue-1", body: "/superset fix this" },
 			} as never,

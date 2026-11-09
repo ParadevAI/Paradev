@@ -58,7 +58,7 @@ An event trigger starts a run when the event arrives. Pick the provider, the eve
 
 Text filters are plain, case-insensitive "contains" matches against the first 4,096 characters, not regular expressions. Thread replies in Slack don't count as a message in channel.
 
-For a Linear comment command, add **Linear → Comment added**, select a team, and set the comment text filter to `/superset`. New issue comments containing that text start a run; edits and comments on projects or documents do not. The agent receives the comment and its parent issue context. This is a text command, not a native Linear agent @mention. The Linear OAuth application must have **Comment** webhook events enabled.
+For a Linear comment command, add **Linear → Issue → Comment added**, select a team, and set the comment text filter to `/superset`. New issue comments containing that text start a run. Add **Linear → Issue → Comment edited** to also run when an existing issue comment’s body is edited and its updated text contains the filter. Use both triggers for creation and edits. Text filters ignore capitalization. Updates that do not change the body, and comments on projects or documents, do not trigger either option. The agent receives the comment and its parent issue context. This is a text command, not a native Linear agent @mention. The Linear OAuth application must have **Comment** webhook events enabled.
 
 GitHub triggers skip pull request events from forks (opened, pushed, reviews, review comments, threads), and a run never checks out a fork's branch. A top-level comment on a fork's pull request can still fire **Comment added**, and checks and workflow runs from fork pull requests still fire.
 

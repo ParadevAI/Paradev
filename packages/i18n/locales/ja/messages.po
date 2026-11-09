@@ -4953,6 +4953,12 @@ msgstr "コメント追加"
 msgid "Comment added in"
 msgstr "コメント追加先"
 
+msgid "Comment edited"
+msgstr "コメントが編集された"
+
+msgid "Comment edited in"
+msgstr "コメントが編集された場所"
+
 msgid "Comment mentions user"
 msgstr "コメントでユーザーをメンション"
 
@@ -5404,6 +5410,9 @@ msgstr "サポートに問い合わせる"
 
 msgid "Contact Us"
 msgstr "お問い合わせ"
+
+msgid "Contains \"{pattern}\""
+msgstr "「{pattern}」を含む"
 
 msgid "Contains this text..."
 msgstr "このテキストを含む..."
@@ -11739,9 +11748,6 @@ msgstr "既存のパターンに合わせて"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "ショートカットをキーボードの刻印に合わせます(例: ⌘Zは常に「Z」と刻印されたキーで発火 — QWERTZでは物理KeyY)。オフの場合、ショートカットは物理キー位置に固定され、現在の入力ソースを無視します。"
-
-msgid "Matching \"{pattern}\""
-msgstr "「{pattern}」に一致"
 
 msgid "Max"
 msgstr "最大"

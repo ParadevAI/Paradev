@@ -4953,6 +4953,12 @@ msgstr "댓글 추가됨"
 msgid "Comment added in"
 msgstr "댓글이 추가된 위치"
 
+msgid "Comment edited"
+msgstr "댓글 수정됨"
+
+msgid "Comment edited in"
+msgstr "댓글이 수정된 위치"
+
 msgid "Comment mentions user"
 msgstr "댓글이 사용자를 멘션함"
 
@@ -5404,6 +5410,9 @@ msgstr "지원 문의"
 
 msgid "Contact Us"
 msgstr "문의하기"
+
+msgid "Contains \"{pattern}\""
+msgstr "\"{pattern}\" 포함"
 
 msgid "Contains this text..."
 msgstr "이 텍스트를 포함..."
@@ -11739,9 +11748,6 @@ msgstr "기존 패턴을 따라 주세요"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "키보드에 인쇄된 문자에 맞춰 단축키를 매핑합니다(예: ⌘Z는 항상 \"Z\"라고 적힌 키에서 동작하며, QWERTZ에서는 물리 키 KeyY입니다). 끄면 단축키가 물리적 키 위치에 고정되며 현재 입력 소스를 무시합니다."
-
-msgid "Matching \"{pattern}\""
-msgstr "\"{pattern}\" 일치"
 
 msgid "Max"
 msgstr "최대"

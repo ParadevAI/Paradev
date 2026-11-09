@@ -39,8 +39,12 @@ export function linearEventNames(delivery: {
 	issueId?: string | null;
 }): LinearTriggerEvent[] {
 	const { type, action, updatedFrom } = delivery;
-	if (type === "Comment" && action === "create" && delivery.issueId) {
-		return ["comment.created"];
+	if (type === "Comment" && delivery.issueId) {
+		if (action === "create") return ["comment.created"];
+		if (action === "update" && updatedFrom && "body" in updatedFrom) {
+			return ["comment.updated"];
+		}
+		return [];
 	}
 	if (type === "Issue") {
 		if (action === "create") {
@@ -105,7 +109,10 @@ export function linearTriggerMatches(
 	if (!scopeAllows(config.assignee, event.assigneeId)) {
 		return no("assignee");
 	}
-	if (config.event === "comment.created") {
+	if (
+		config.event === "comment.created" ||
+		config.event === "comment.updated"
+	) {
 		if (!scopeAllows(config.actor ?? { mode: "any" }, event.actorId)) {
 			return no("actor");
 		}

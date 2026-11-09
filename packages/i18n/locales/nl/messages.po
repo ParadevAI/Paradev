@@ -4953,6 +4953,12 @@ msgstr "Opmerking toegevoegd"
 msgid "Comment added in"
 msgstr "Opmerking toegevoegd in"
 
+msgid "Comment edited"
+msgstr "Reactie bewerkt"
+
+msgid "Comment edited in"
+msgstr "Reactie bewerkt in"
+
 msgid "Comment mentions user"
 msgstr "Opmerking vermeldt gebruiker"
 
@@ -5404,6 +5410,9 @@ msgstr "Contact met support"
 
 msgid "Contact Us"
 msgstr "Contact opnemen"
+
+msgid "Contains \"{pattern}\""
+msgstr "Bevat \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Bevat deze tekst..."
@@ -11739,9 +11748,6 @@ msgstr "Volg bestaande patronen"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Koppel sneltoetsen aan de opschriften op je toetsenbord (bijv. ⌘Z werkt altijd op de toets met \"Z\" — fysiek KeyY op QWERTZ). Staat dit uit, dan zijn sneltoetsen aan fysieke toetsposities gekoppeld en negeren ze de huidige invoerbron."
-
-msgid "Matching \"{pattern}\""
-msgstr "Komt overeen met \"{pattern}\""
 
 msgid "Max"
 msgstr "Max"

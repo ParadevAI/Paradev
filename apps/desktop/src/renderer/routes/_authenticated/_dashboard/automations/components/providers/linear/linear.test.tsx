@@ -11,7 +11,10 @@ const { createLinearConfig } = await import("./grammar");
 
 afterEach(cleanup);
 
-test("Linear comment rows edit a command filter and expose the author", async () => {
+test.each([
+	["comment.created", "Comment added in"],
+	["comment.updated", "Comment edited in"],
+] as const)("Linear %s rows edit a command filter and expose the author", async (event, sentence) => {
 	const onChange = mock(() => {});
 	let view!: ReturnType<typeof render>;
 	await act(async () => {
@@ -20,7 +23,7 @@ test("Linear comment rows edit a command filter and expose the author", async ()
 				trigger={{
 					id: "trigger",
 					config: {
-						...createLinearConfig("comment.created"),
+						...createLinearConfig(event),
 						teams: { mode: "list", ids: ["team"] },
 					},
 				}}
@@ -39,7 +42,7 @@ test("Linear comment rows edit a command filter and expose the author", async ()
 		);
 	});
 	const ui = within(view.baseElement as HTMLElement);
-	expect(ui.getByText("Comment added in")).toBeTruthy();
+	expect(ui.getByText(sentence)).toBeTruthy();
 	expect(ui.getByRole("button", { name: "Anyone" })).toBeTruthy();
 	await act(async () => {
 		ui.getByRole("button", { name: "Any comment" }).click();

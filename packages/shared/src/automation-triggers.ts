@@ -228,6 +228,7 @@ export const linearTriggerEventValues = [
 	"issue.status_changed",
 	"issue.assigned",
 	"comment.created",
+	"comment.updated",
 	"cycle.ended",
 ] as const;
 export type LinearTriggerEvent = (typeof linearTriggerEventValues)[number];
@@ -515,7 +516,9 @@ const REQUIREMENTS: Partial<
 		person(
 			"actor",
 			(config) =>
-				config.kind === "linear" && config.event === "comment.created",
+				config.kind === "linear" &&
+				(config.event === "comment.created" ||
+					config.event === "comment.updated"),
 		),
 		// Only the events whose sentence shows an assignee; a created or cycle
 		// trigger has no chip to clear such a problem with.
