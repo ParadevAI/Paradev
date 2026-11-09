@@ -29,6 +29,13 @@
       "when": 1793929979089,
       "tag": "0003_session_closed_by_user",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794151549057,
+      "tag": "0004_session_agent_config",
+      "breakpoints": true
     }
   ]
 }

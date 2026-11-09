@@ -26,6 +26,7 @@ import { HOST_CHAT_RESUME_MARKER_FILE } from "@superset/shared/host-version";
 import type { Hono, MiddlewareHandler } from "hono";
 import type { HostDb } from "../db";
 import { reportAttachmentResolveFailure } from "../sentry";
+import { storedChatConfig } from "../trpc/router/agents/agents";
 import { importCloudAttachments } from "../trpc/router/attachments/attachments";
 import type { ApiClient } from "../types";
 import { cliFloor } from "./acpCatalogue";
@@ -89,6 +90,8 @@ function harnessRegistry(
 									cwd: options.cwd,
 									workspaceId: options.scopeId,
 									terminalId: options.terminalId,
+									agentConfigId: options.agentConfigId,
+									presetId: "claude",
 								}),
 						});
 						return {
@@ -114,6 +117,8 @@ function harnessRegistry(
 									cwd: options.cwd,
 									workspaceId: options.scopeId,
 									terminalId: options.terminalId,
+									agentConfigId: options.agentConfigId,
+									presetId: "codex",
 								}),
 						});
 						return { command: cli.command, env: cli.env };
@@ -231,6 +236,10 @@ export function createChatV3Mount(options: {
 				markerPath,
 				runtime,
 				resolveCwd: createResolveCwd(options.db),
+				keepsAccount: (sessionId) => {
+					const row = runtime().sessions.get(sessionId);
+					return !row?.agentConfigId || storedChatConfig(options.db, row).keeps;
+				},
 			});
 			if (update.resumed > 0) {
 				console.log(
