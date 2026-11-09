@@ -85,7 +85,8 @@ export function readInstalledPluginIcons(): InstalledPluginIcon[] {
 	let installed: ReturnType<typeof readInstalledPlugins>;
 	try {
 		installed = readInstalledPlugins();
-	} catch {
+	} catch (error) {
+		console.warn("[agent-setup] plugin icons not read:", error);
 		return [];
 	}
 	return installed.flatMap((entry) => {

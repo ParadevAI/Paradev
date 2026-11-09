@@ -145,12 +145,9 @@ export function PluginIcon({
 	}
 
 	const key = builtInKey(pluginName, icon);
-	const imageIcon =
-		key !== undefined
-			? ownEntry(IMAGE_ICONS, key)
-			: iconUrl && iconUrl !== brokenUrl
-				? iconUrl
-				: undefined;
+	const candidate =
+		key !== undefined ? ownEntry(IMAGE_ICONS, key) : iconUrl || undefined;
+	const imageIcon = candidate !== brokenUrl ? candidate : undefined;
 	const entry = key !== undefined ? ownEntry(PLUGIN_ICONS, key) : undefined;
 	const Icon = entry?.icon ?? LuPuzzle;
 	return (
