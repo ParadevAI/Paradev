@@ -9,7 +9,6 @@ import {
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { toast } from "@superset/ui/sonner";
 import { createRelaySocket } from "@superset/workspace-client";
-import { useNavigate } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useRef } from "react";
 import { env } from "renderer/env.renderer";
@@ -53,7 +52,6 @@ export function ChannelsRealtime() {
 	const enabled = useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	const organizationId = useActiveOrganizationId();
 	const utils = cloudTrpc.useUtils();
-	const navigate = useNavigate();
 	const { data: session } = authClient.useSession();
 	const currentUserId = useRef<string | null>(null);
 	currentUserId.current = session?.user?.id ?? null;
@@ -61,9 +59,6 @@ export function ChannelsRealtime() {
 	electronTrpc.notifications.subscribe.useSubscription(undefined, {
 		enabled,
 		onData: (event) => {
-			if (event.type === NOTIFICATION_EVENTS.OPEN_ROUTE && event.data) {
-				void navigate({ href: event.data.path });
-			}
 			if (event.type === NOTIFICATION_EVENTS.NOTIFICATION_REPLY && event.data) {
 				const target = parseReplyTarget(event.data.target);
 				if (!target) return;

@@ -99,6 +99,17 @@ A closed box's dot is therefore at most a few seconds behind; the open box's
 own subscribers stay live as before. Reaches a box only through a
 host-service release.
 
+**A box's completion alerts don't come from the box either.** The chime and
+native notification for an agent that finished, failed, or asked for
+permission came only from the per-host `agent:lifecycle` socket, so a cloud
+workspace never alerted: the sidebar opens no socket to a sandbox, and the
+open one was addressed through the relay, where no sandbox is. Now
+`CloudWorkspaceNotifier` alerts when the reported status above changes to
+`review`, `failed`, or `permission` for a workspace in the user's cloud
+sidebar, and the host subscribers skip sandboxes. **Open:** the box reports at
+most once per five seconds and only on a change, so a turn that starts and
+ends inside that window raises no alert.
+
 **A closed box's pull requests are not on its creation branch.**
 `cloud_workspaces.branch` is the branch the box was cut on, and an agent
 moves on from it: new branches, one PR each. Looking PRs up by that branch

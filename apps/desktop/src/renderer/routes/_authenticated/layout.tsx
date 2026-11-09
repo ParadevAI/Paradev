@@ -158,6 +158,11 @@ function AuthenticatedLayout() {
 	// Update workspace-run pane state on terminal exit
 	electronTrpc.notifications.subscribe.useSubscription(undefined, {
 		onData: (event) => {
+			if (event.type === NOTIFICATION_EVENTS.OPEN_ROUTE && event.data) {
+				void navigate({ href: event.data.path });
+				return;
+			}
+
 			if (
 				event.type === NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE &&
 				event.data

@@ -226,3 +226,51 @@ function showNativeNotification({
 			);
 		});
 }
+
+/**
+ * A cloud workspace's alert comes from the status its box reports to the API,
+ * not from a host socket, so it has no terminal to target or mark as seen.
+ */
+export function handleCloudAgentAlert({
+	workspaceId,
+	workspaceName,
+	eventType,
+	volume,
+	muted,
+}: {
+	workspaceId: string;
+	workspaceName: string;
+	eventType: AgentLifecyclePayload["eventType"];
+	volume: number;
+	muted: boolean;
+}): void {
+	if (
+		!document.hidden &&
+		document.hasFocus() &&
+		getCurrentWorkspaceId() === workspaceId
+	) {
+		return;
+	}
+
+	const ringtoneId = useRingtoneStore.getState().selectedRingtoneId;
+	void playRingtone({ ringtoneId, volume, muted });
+
+	const { title, subtitle, body } = getV2NativeNotificationContent({
+		workspaceName,
+		payload: { eventType },
+	});
+	void electronTrpcClient.notifications.showNative
+		.mutate({
+			title,
+			subtitle,
+			body,
+			silent: true,
+			clickPath: `/v2-workspace/${encodeURIComponent(workspaceId)}`,
+		})
+		.catch((error) => {
+			console.warn(
+				"[notifications] failed to show native notification:",
+				error,
+			);
+		});
+}
