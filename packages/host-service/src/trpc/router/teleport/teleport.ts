@@ -36,7 +36,7 @@ const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
 const STOP_TIMEOUT_MS = 20_000;
 const STOP_POLL_MS = 200;
-/** As many chats as `workspaceMove.start` takes in one workspace move. */
+/** As many chats as `workspaceMove.attach` takes in one workspace move. */
 const MAX_MOVED_CHATS = 50;
 
 type MovableChat = {
@@ -56,7 +56,7 @@ type PreparedChat = {
 type SkippedChat = {
 	chatSessionId: string;
 	title: string | null;
-	reason: "unsupported_agent" | "not_started" | "moved_away";
+	reason: "unsupported_agent" | "not_started" | "moved_away" | "failed";
 };
 
 function errorCode(error: unknown): string | undefined {
@@ -226,7 +226,7 @@ export const teleportRouter = router({
 					}
 					chatSync.follow(session.sessionId);
 					followed.push(session.sessionId);
-					await withStage(async (stageDir) => {
+					const outcome = await withStage(async (stageDir) => {
 						const manifest = await session.provider.collect({
 							harnessSessionId: session.harnessSessionId,
 							worktreePath,
@@ -242,6 +242,7 @@ export const teleportRouter = router({
 									},
 								}),
 						});
+						if (!manifest) return "not_started" as const;
 						await uploadBundle({
 							api: ctx.api,
 							chatSessionId: session.sessionId,
@@ -249,7 +250,24 @@ export const teleportRouter = router({
 							manifest,
 							stageDir,
 						});
+						return "uploaded" as const;
+					}).catch((error: unknown) => {
+						console.warn(
+							`[teleport] could not pack chat ${session.sessionId}; it stays here`,
+							error,
+						);
+						return "failed" as const;
 					});
+					if (outcome !== "uploaded") {
+						chatSync.forget(session.sessionId);
+						followed.pop();
+						skipped.push({
+							chatSessionId: session.sessionId,
+							title: session.title,
+							reason: outcome,
+						});
+						continue;
+					}
 					prepared.push({
 						chatSessionId: session.sessionId,
 						harnessSessionId: session.harnessSessionId,
