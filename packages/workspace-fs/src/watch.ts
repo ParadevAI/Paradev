@@ -192,6 +192,8 @@ interface WatcherState {
 	listeners: Set<WatchListener>;
 	/** Disposes the watcher once it has sat without listeners for the keep-alive. */
 	idleTimer: ReturnType<typeof setTimeout> | null;
+	/** A directory under the root was removed while no listener was attached. */
+	removedDirWhileIdle: boolean;
 	/**
 	 * Root-relative directories pruned from the native subscription beyond the
 	 * static defaults (nested repos + gitignored dirs), kept queryable so
@@ -371,7 +373,10 @@ export class FsWatcherManager {
 		const absolutePath = normalizeAbsolutePath(options.absolutePath);
 		options.signal?.throwIfAborted();
 		const idle = this.watchers.get(absolutePath);
-		if (idle?.listeners.size === 0 && !(await this.isStillAttached(idle))) {
+		if (
+			idle?.listeners.size === 0 &&
+			(idle.removedDirWhileIdle || !(await this.isStillAttached(idle)))
+		) {
 			// A concurrent subscribe may have claimed it during the stat.
 			if (idle.listeners.size === 0) {
 				await this.releaseWatcher(idle);
@@ -689,6 +694,7 @@ export class FsWatcherManager {
 			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
 			idleTimer: null,
+			removedDirWhileIdle: false,
 			prunedRelPrefixes: [],
 			filePaths: new Map<string, true>(),
 			directoryPaths: new Set<string>(),
@@ -791,6 +797,17 @@ export class FsWatcherManager {
 
 		if (visibleEvents.length === 0) {
 			return;
+		}
+
+		// chokidar doesn't re-watch a directory recreated at the same path, so a
+		// warm watcher reused after this would miss events under it.
+		if (
+			state.listeners.size === 0 &&
+			visibleEvents.some(
+				(event) => event.type === "delete" && event.isDirectory,
+			)
+		) {
+			state.removedDirWhileIdle = true;
 		}
 
 		if (process.env.SUPERSET_FS_EVENTS_DEBUG === "1") {

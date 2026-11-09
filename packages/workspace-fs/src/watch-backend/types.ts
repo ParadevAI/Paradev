@@ -1,6 +1,8 @@
 export interface NativeWatchEvent {
 	type: "create" | "update" | "delete";
 	path: string;
+	/** Set only by backends that know; absent means unknown. */
+	isDirectory?: boolean;
 }
 
 export interface NativeWatchSubscription {
