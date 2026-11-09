@@ -76,7 +76,6 @@ import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/Browser
 import { browserRuntimeRegistry } from "./hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
 import { useRestoreExpandedPaneArea } from "./hooks/useRestoreExpandedPaneArea";
-import { useRightPaneAreaLifecycle } from "./hooks/useRightPaneAreaLifecycle";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
@@ -225,9 +224,8 @@ function V2WorkspaceContent() {
 		setShowPresetsBar,
 	} = useV2UserPreferences();
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
-	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
-	const rightPaneAreaFlag = useRightPaneAreaEnabled();
-	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
+	const { store, isLayoutReady } = useV2WorkspacePaneLayout();
+	const isRightPaneAreaEnabled = useRightPaneAreaEnabled();
 	const {
 		isOpen: sidebarOpen,
 		setOpen: setRightSidebarOpen,
@@ -247,14 +245,6 @@ function V2WorkspaceContent() {
 		centerStore: store,
 		rightStore,
 		isReady: isLayoutReady && isRightLayoutReady,
-	});
-	useRightPaneAreaLifecycle({
-		workspaceId,
-		flag: rightPaneAreaFlag,
-		centerStore: store,
-		rightStore,
-		isReady: isLayoutReady && isRightLayoutReady,
-		hasRow,
 	});
 	const openRightSidebar = useCallback(
 		() => setRightSidebarOpen(true),

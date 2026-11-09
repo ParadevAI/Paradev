@@ -149,8 +149,6 @@ function runPaneLayoutOp(
 	forgetClosedChat(previous, workspaceId, op);
 
 	if (op.type !== "list") {
-		// Sidebar first: a non-terminal pane landing in the main area is moved to
-		// the sidebar by useRightPaneAreaLifecycle, and a later sidebar write would drop it.
 		for (const area of ["sidebar", "main"] as const) {
 			const next = outcome.areas[area];
 			if (next === previous[area]) continue;
