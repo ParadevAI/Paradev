@@ -1,10 +1,12 @@
 import { getInvitableRoles } from "@superset/shared/auth";
 import { isPaidPlanTier } from "@superset/shared/billing";
+import type { ShareResourceKind } from "@superset/shared/sharing";
 import { type InviteNewMode, shareDirectory } from "@superset/ui/share-access";
 import { useCallback, useMemo } from "react";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
+import { trackShareEvent } from "renderer/lib/analytics";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOrganizationRole } from "renderer/routes/_authenticated/hooks/useOrganizationRole";
@@ -43,9 +45,16 @@ export function useShareDirectory() {
 		gateFeature(GATED_FEATURES.INVITE_MEMBERS, () => {});
 	}, [gateFeature]);
 
-	/** Invites each email to the organization, reusing a pending invite, and returns the invitation ids. */
+	/**
+	 * Invites each email to the organization, reusing a pending invite, and
+	 * returns the invitation ids. Pass the resource being shared to record each
+	 * invitation as created by a share; a resend passes nothing.
+	 */
 	const inviteEmails = useCallback(
-		async (emails: string[]): Promise<string[]> => {
+		async (
+			emails: string[],
+			sharing?: ShareResourceKind,
+		): Promise<string[]> => {
 			const ids: string[] = [];
 			for (const email of emails) {
 				const { data, error } = await authClient.organization.inviteMember({
@@ -58,6 +67,12 @@ export function useShareDirectory() {
 					throw new Error(error?.message ?? `Could not invite ${email}`);
 				}
 				ids.push(data.id);
+				if (sharing) {
+					trackShareEvent(sharing)({
+						type: "invite_created",
+						invitationId: data.id,
+					});
+				}
 			}
 			if (ids.length) void utils.organization.listInvitations.invalidate();
 			return ids;

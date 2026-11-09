@@ -1,5 +1,4 @@
 import { db, dbWs } from "@superset/db/client";
-import { cloudWorkspaceShares, pageShares } from "@superset/db/schema";
 import {
 	invitations,
 	members,
@@ -10,7 +9,7 @@ import type { BetterAuthPlugin } from "better-auth";
 import { createAuthEndpoint } from "better-auth/api";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { captureInvitationEvent } from "./invitation-analytics";
+import { captureOrgEvent } from "./org-analytics";
 
 function verificationMatchesInvitation({
 	verificationIdentifier,
@@ -27,22 +26,12 @@ function verificationMatchesInvitation({
 	);
 }
 
-/** Whether a page or cloud workspace was shared through this invitation. */
-async function invitationHasShares(invitationId: string): Promise<boolean> {
-	const [pageShare, workspaceShare] = await Promise.all([
-		db
-			.select({ id: pageShares.id })
-			.from(pageShares)
-			.where(eq(pageShares.invitationId, invitationId))
-			.limit(1),
-		db
-			.select({ id: cloudWorkspaceShares.id })
-			.from(cloudWorkspaceShares)
-			.where(eq(cloudWorkspaceShares.invitationId, invitationId))
-			.limit(1),
-	]);
-	return pageShare.length > 0 || workspaceShare.length > 0;
-}
+type AcceptFailureReason =
+	| "token_mismatch"
+	| "not_found"
+	| "not_pending"
+	| "free_plan_limit"
+	| "add_member_failed";
 
 function getInvitationAcceptError(error: unknown) {
 	if (!(error instanceof Error)) {
@@ -124,6 +113,15 @@ export const acceptInvitationEndpoint = {
 					);
 				}
 
+				// On the inviter's timeline, next to the invitation they created.
+				const captureAcceptFailed = (reason: AcceptFailureReason) =>
+					captureOrgEvent({
+						event: "invitation_accept_failed",
+						distinctId: invitation.inviterId,
+						organizationId: invitation.organization.id,
+						properties: { invitation_id: invitation.id, reason },
+					});
+
 				if (
 					!verificationMatchesInvitation({
 						verificationIdentifier: verification.identifier,
@@ -134,6 +132,7 @@ export const acceptInvitationEndpoint = {
 					console.log(
 						"[invitation/accept] ERROR - Token does not match invitation",
 					);
+					await captureAcceptFailed("token_mismatch");
 					return ctx.json(
 						{ error: "This invitation link is invalid or has expired." },
 						{ status: 400 },
@@ -146,12 +145,9 @@ export const acceptInvitationEndpoint = {
 						"[invitation/accept] ERROR - Invitation already processed:",
 						invitation.status,
 					);
+					await captureAcceptFailed("not_pending");
 					return ctx.json({ error: processedError.error }, { status: 409 });
 				}
-
-				// Read before membership is created: adding the member converts these
-				// shares into shares to the user and clears the invitation id.
-				const viaShare = await invitationHasShares(invitationId);
 
 				// 3. Create or get user
 				let user = await db.query.users.findFirst({
@@ -190,6 +186,7 @@ export const acceptInvitationEndpoint = {
 							ok: false as const,
 							error: "This invitation link is invalid or has expired.",
 							status: 404,
+							reason: "not_found" as const,
 						};
 					}
 
@@ -201,6 +198,7 @@ export const acceptInvitationEndpoint = {
 							ok: false as const,
 							error: processedError.error,
 							status: processedError.status,
+							reason: "not_pending" as const,
 						};
 					}
 
@@ -245,6 +243,11 @@ export const acceptInvitationEndpoint = {
 									ok: false as const,
 									error: acceptError.error,
 									status: acceptError.status,
+									// 409 is the free plan's one-member limit.
+									reason:
+										acceptError.status === 409
+											? ("free_plan_limit" as const)
+											: ("add_member_failed" as const),
 								};
 							}
 
@@ -260,30 +263,48 @@ export const acceptInvitationEndpoint = {
 						.set({ status: "accepted" })
 						.where(eq(invitations.id, invitationId));
 
-					return { ok: true as const };
+					// False when they were already a member, e.g. by domain auto-join.
+					return { ok: true as const, memberAdded: !existingMember };
 				});
 
 				if (!acceptanceResult.ok) {
+					await captureAcceptFailed(acceptanceResult.reason);
 					return ctx.json(
 						{ error: acceptanceResult.error },
 						{ status: acceptanceResult.status },
 					);
 				}
 
-				await captureInvitationEvent({
+				// The inviter's timeline gets the acceptance, so invitation_created ->
+				// invitation_accepted is a per-inviter funnel; the invitee's gets
+				// member_joined. Whether a share created the invitation is joined on
+				// invitation_id from the client's share_invite_created.
+				await captureOrgEvent({
 					event: "invitation_accepted",
-					inviterId: invitation.inviterId,
+					distinctId: invitation.inviterId,
 					organizationId: invitation.organization.id,
-					invitationId: invitation.id,
 					properties: {
+						invitation_id: invitation.id,
 						invitee_user_id: user.id,
 						invitee_is_new_user: inviteeIsNewUser,
-						source: viaShare ? "share" : "invite",
+						member_added: acceptanceResult.memberAdded,
 						hours_to_accept:
 							(Date.now() - new Date(invitation.createdAt).getTime()) /
 							3_600_000,
 					},
 				});
+				if (acceptanceResult.memberAdded) {
+					await captureOrgEvent({
+						event: "member_joined",
+						distinctId: user.id,
+						organizationId: invitation.organization.id,
+						properties: {
+							join_method: "invite",
+							invited_by: invitation.inviterId,
+							invitation_id: invitation.id,
+						},
+					});
+				}
 
 				// 5. Create session using Better Auth's proper API
 				const session = await ctx.context.internalAdapter.createSession(

@@ -53,8 +53,8 @@ import {
 } from "./lib/billing/subscription-events";
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
-import { captureInvitationEvent } from "./lib/invitation-analytics";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
+import { captureOrgEvent } from "./lib/org-analytics";
 import {
 	convertPendingShares,
 	removeInvitationShares,
@@ -273,6 +273,12 @@ export const auth = betterAuth({
 										userId: user.id,
 										role: "member",
 									},
+								});
+								await captureOrgEvent({
+									event: "member_joined",
+									distinctId: user.id,
+									organizationId: org.id,
+									properties: { join_method: "domain" },
 								});
 								if (!enrolledOrgId) {
 									enrolledOrgId = org.id;
@@ -508,17 +514,6 @@ export const auth = betterAuth({
 						expiresAt: data.invitation.expiresAt,
 					}),
 				});
-
-				await captureInvitationEvent({
-					event: "invitation_sent",
-					inviterId: data.inviter.user.id,
-					organizationId: data.organization.id,
-					invitationId: data.id,
-					properties: {
-						role: data.role,
-						invitee_has_account: Boolean(existingUser),
-					},
-				});
 			},
 			organizationHooks: {
 				beforeCreateInvitation: async (data) => {
@@ -566,6 +561,13 @@ export const auth = betterAuth({
 				},
 
 				afterCreateOrganization: async ({ organization, user }) => {
+					await captureOrgEvent({
+						event: "member_joined",
+						distinctId: user.id,
+						organizationId: organization.id,
+						properties: { join_method: "created_org" },
+					});
+
 					if (process.env.NODE_ENV !== "development") {
 						const customer = await stripeClient.customers.create({
 							name: organization.name,
@@ -854,6 +856,19 @@ export const auth = betterAuth({
 						);
 					}
 
+					if (seatsOwnedByAutumn || itemId) {
+						await captureOrgEvent({
+							event: "seat_added",
+							distinctId: member.userId,
+							organizationId: organization.id,
+							properties: {
+								plan: subscription.plan,
+								seats: quantity,
+								previous_seats: quantity - 1,
+							},
+						});
+					}
+
 					const recipients = await getOrganizationBillingRecipients(
 						organization.id,
 					);
@@ -983,6 +998,19 @@ export const auth = betterAuth({
 						);
 					}
 
+					if (seatsOwnedByAutumn || itemId) {
+						await captureOrgEvent({
+							event: "seat_removed",
+							distinctId: user.id,
+							organizationId: organization.id,
+							properties: {
+								plan: subscription.plan,
+								seats: quantity,
+								previous_seats: quantity + 1,
+							},
+						});
+					}
+
 					const recipients = await getOrganizationBillingRecipients(
 						organization.id,
 					);
@@ -1050,6 +1078,29 @@ export const auth = betterAuth({
 							error,
 						);
 					}
+				},
+
+				// Not called on a resend, which only re-sends the email: this counts
+				// each invitation once, under the person who created it.
+				afterCreateInvitation: async ({
+					invitation,
+					inviter,
+					organization,
+				}) => {
+					const invitee = await db.query.users.findFirst({
+						where: eq(authSchema.users.email, invitation.email),
+						columns: { id: true },
+					});
+					await captureOrgEvent({
+						event: "invitation_created",
+						distinctId: inviter.id,
+						organizationId: organization.id,
+						properties: {
+							invitation_id: invitation.id,
+							role: invitation.role,
+							invitee_has_account: Boolean(invitee),
+						},
+					});
 				},
 
 				afterCancelInvitation: async ({ invitation }) => {

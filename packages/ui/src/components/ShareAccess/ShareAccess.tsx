@@ -98,7 +98,7 @@ export function ShareAccess({
 	onEvent,
 }: ShareAccessProps) {
 	const { t } = useLingui();
-	const trackedAdd = useShareEvents(onAdd, onEvent);
+	const trackedAdd = useShareEvents(onAdd, onEvent, canManage);
 	const [copied, setCopied] = useState(false);
 	const [view, setView] = useState<{ query: string } | null>(null);
 	const highlighted = useNewKeys(grantees.map(keyOf));
@@ -317,15 +317,23 @@ export function ShareAccess({
 function useShareEvents(
 	onAdd: ShareAccessProps["onAdd"],
 	onEvent: ShareAccessProps["onEvent"],
+	canManage: boolean,
 ): ShareAccessProps["onAdd"] {
 	const onEventRef = useRef(onEvent);
 	onEventRef.current = onEvent;
+	// Read at close: it can still be loading when the dialog opens.
+	const canManageRef = useRef(canManage);
+	canManageRef.current = canManage;
 	const shared = useRef(false);
 
 	useEffect(() => {
 		onEventRef.current?.({ type: "opened" });
 		return () => {
-			onEventRef.current?.({ type: "closed", shared: shared.current });
+			onEventRef.current?.({
+				type: "closed",
+				shared: shared.current,
+				canManage: canManageRef.current,
+			});
 		};
 	}, []);
 
@@ -334,6 +342,7 @@ function useShareEvents(
 			await onAdd(request);
 			shared.current = true;
 		} catch (error) {
+			// The raw message is bucketed before it reaches analytics.
 			onEventRef.current?.({
 				type: "failed",
 				request,

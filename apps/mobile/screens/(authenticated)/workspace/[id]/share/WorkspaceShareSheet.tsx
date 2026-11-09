@@ -19,7 +19,7 @@ export function WorkspaceShareSheet() {
 	const share = useShareDirectory();
 	const roles = useWorkspaceShareRoles();
 	const general = useWorkspaceGeneralAccess(id);
-	useShareSession("cloud_workspace");
+	useShareSession("cloud_workspace", sharing.data?.canManage ?? false);
 
 	return (
 		<ShareAccessSheet

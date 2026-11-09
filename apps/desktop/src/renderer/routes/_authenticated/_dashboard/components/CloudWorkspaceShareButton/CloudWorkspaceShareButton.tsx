@@ -113,7 +113,10 @@ export function CloudWorkspaceShareButton({
 					onCopyLink={() => copyToClipboard(linkUrl)}
 					onEvent={trackShareEvent("cloud_workspace")}
 					onAdd={async ({ grantees: picked, emails }) => {
-						const invitationIds = await share.inviteEmails(emails);
+						const invitationIds = await share.inviteEmails(
+							emails,
+							"cloud_workspace",
+						);
 						await add.mutateAsync({
 							id: workspaceId,
 							grantees: [

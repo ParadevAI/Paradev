@@ -83,7 +83,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 		onEvent: trackShareEvent("page"),
 		onAdd: async ({ grantees: picked, emails, role }) => {
 			if (!pageId) return;
-			const invitationIds = await share.inviteEmails(emails);
+			const invitationIds = await share.inviteEmails(emails, "page");
 			await addShares.mutateAsync({
 				id: pageId,
 				role: role === "view" ? "view" : "comment",

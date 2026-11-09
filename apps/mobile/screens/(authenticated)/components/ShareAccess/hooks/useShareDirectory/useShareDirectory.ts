@@ -53,7 +53,10 @@ export function useShareDirectory() {
 			: "admins-only";
 
 	/** Invites each email to the organization, reusing a pending invite, and returns the invitation ids. */
-	const inviteEmails = async (emails: string[]): Promise<string[]> => {
+	const inviteEmails = async (
+		emails: string[],
+		resourceKind: ShareResourceKind,
+	): Promise<string[]> => {
 		const ids: string[] = [];
 		for (const email of emails) {
 			const { data, error } = await authClient.organization.inviteMember({
@@ -66,6 +69,11 @@ export function useShareDirectory() {
 				throw new Error(error?.message ?? `Could not invite ${email}`);
 			}
 			ids.push(data.id);
+			// Recorded per invite, so it holds even if granting access fails after.
+			captureShareEvent(
+				{ type: "invite_created", invitationId: data.id },
+				resourceKind,
+			);
 		}
 		return ids;
 	};
@@ -95,7 +103,7 @@ export function useShareDirectory() {
 	) => {
 		const { grantees, emails, role } = request;
 		try {
-			const invitationIds = await inviteEmails(emails);
+			const invitationIds = await inviteEmails(emails, resourceKind);
 			await add(
 				[
 					...grantees,

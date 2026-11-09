@@ -24,6 +24,7 @@ import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+import { posthog } from "../../lib/analytics";
 import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
 import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
@@ -564,6 +565,18 @@ export const organizationRouter = {
 					role: "member",
 				},
 				headers: ctx.headers,
+			});
+			// Same shape as packages/auth's member_joined, for an admin adding an
+			// existing user directly, with no invitation.
+			posthog.capture({
+				distinctId: input.userId,
+				event: "member_joined",
+				properties: {
+					join_method: "admin_add",
+					invited_by: ctx.session.user.id,
+					organization_id: input.organizationId,
+				},
+				groups: { organization: input.organizationId },
 			});
 			return member;
 		}),

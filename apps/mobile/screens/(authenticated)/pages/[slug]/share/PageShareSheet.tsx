@@ -29,7 +29,6 @@ export function PageShareSheet() {
 	const share = useShareDirectory();
 	const roles = usePageShareRoles();
 	const general = usePageGeneralAccess(slug);
-	useShareSession("page");
 
 	const owner = access.data?.owner;
 	const canManage =
@@ -37,6 +36,7 @@ export function PageShareSheet() {
 		(page.data !== undefined &&
 			share.currentUserId !== undefined &&
 			page.data.createdByUserId === share.currentUserId);
+	useShareSession("page", canManage);
 
 	return (
 		<ShareAccessSheet
