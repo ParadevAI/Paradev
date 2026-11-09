@@ -12064,6 +12064,9 @@ msgstr "Pindahkan {name} ke latar belakang"
 msgid "Move cloud work"
 msgstr "Pindahkan pekerjaan cloud"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
+
 msgid "Move this workspace to a computer?"
 msgstr "Pindahkan workspace ini ke komputer?"
 
@@ -12428,6 +12431,9 @@ msgstr "Gambar berikutnya"
 
 msgid "Next match"
 msgstr "Kecocokan berikutnya"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Tab Sidebar Kanan Berikutnya"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Kecocokan sebelumnya"
 
 msgid "Previous prompts"
 msgstr "Prompt sebelumnya"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Tab Sidebar Kanan Sebelumnya"
 
 msgid "Previous slide"
 msgstr "Slide sebelumnya"
@@ -18144,6 +18153,12 @@ msgstr "Tampilkan status dan kirim notifikasi untuk agen ini."
 msgid "Show text"
 msgstr "Tampilkan teks"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Tampilkan tab berikutnya di sidebar kanan tanpa memindahkan fokus"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Tampilkan tab sebelumnya di sidebar kanan tanpa memindahkan fokus"
+
 msgid "Show the triggering payload"
 msgstr "Tampilkan payload pemicu"
 
@@ -20652,6 +20667,9 @@ msgstr "Alihkan sidebar kanan"
 
 msgid "Toggle Right Sidebar"
 msgstr "Alihkan Sidebar Kanan"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Alihkan Fokus Sidebar Kanan"
 
 msgid "Toggle Scripts Bar"
 msgstr "Alihkan Bilah Skrip"

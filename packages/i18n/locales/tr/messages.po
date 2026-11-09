@@ -12064,6 +12064,9 @@ msgstr "{name} öğesini arka plana taşı"
 msgid "Move cloud work"
 msgstr "Bulut işinizi taşıyın"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Odağı ana sekmeler ile sağ kenar çubuğu arasında taşı ve kapalıysa kenar çubuğunu aç"
+
 msgid "Move this workspace to a computer?"
 msgstr "Bu çalışma alanı bir bilgisayara taşınsın mı?"
 
@@ -12428,6 +12431,9 @@ msgstr "Sonraki görsel"
 
 msgid "Next match"
 msgstr "Sonraki eşleşme"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Sağ kenar çubuğunda sonraki sekme"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Önceki eşleşme"
 
 msgid "Previous prompts"
 msgstr "Önceki istemler"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Sağ kenar çubuğunda önceki sekme"
 
 msgid "Previous slide"
 msgstr "Önceki slayt"
@@ -18144,6 +18153,12 @@ msgstr "Bu ajan için durum göster ve bildirim gönder."
 msgid "Show text"
 msgstr "Metni göster"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Odağı taşımadan sağ kenar çubuğunda sonraki sekmeyi göster"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Odağı taşımadan sağ kenar çubuğunda önceki sekmeyi göster"
+
 msgid "Show the triggering payload"
 msgstr "Tetikleyen yükü göster"
 
@@ -20652,6 +20667,9 @@ msgstr "Sağ kenar çubuğunu aç/kapat"
 
 msgid "Toggle Right Sidebar"
 msgstr "Sağ kenar çubuğunu aç/kapat"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Sağ kenar çubuğu odağını değiştir"
 
 msgid "Toggle Scripts Bar"
 msgstr "Betikler çubuğunu aç/kapat"

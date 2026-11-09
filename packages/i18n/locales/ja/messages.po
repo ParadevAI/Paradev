@@ -12064,6 +12064,9 @@ msgstr "{name} をバックグラウンドに移動"
 msgid "Move cloud work"
 msgstr "クラウドの作業を移行"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
+
 msgid "Move this workspace to a computer?"
 msgstr "このワークスペースをコンピューターに移動しますか？"
 
@@ -12428,6 +12431,9 @@ msgstr "次の画像"
 
 msgid "Next match"
 msgstr "次の一致"
+
+msgid "Next Right Sidebar Tab"
+msgstr "右サイドバーの次のタブ"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "前の一致"
 
 msgid "Previous prompts"
 msgstr "以前のプロンプト"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "右サイドバーの前のタブ"
 
 msgid "Previous slide"
 msgstr "前のスライド"
@@ -18144,6 +18153,12 @@ msgstr "このエージェントのステータス表示と通知を有効にし
 msgid "Show text"
 msgstr "テキストを表示"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "フォーカスを移動せずに右サイドバーの次のタブを表示"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "フォーカスを移動せずに右サイドバーの前のタブを表示"
+
 msgid "Show the triggering payload"
 msgstr "トリガーのペイロードを表示"
 
@@ -20652,6 +20667,9 @@ msgstr "右サイドバーを切り替え"
 
 msgid "Toggle Right Sidebar"
 msgstr "右サイドバーを切り替え"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "右サイドバーのフォーカスを切り替え"
 
 msgid "Toggle Scripts Bar"
 msgstr "スクリプトバーを切り替え"

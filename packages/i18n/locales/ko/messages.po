@@ -12064,6 +12064,9 @@ msgstr "{name}을(를) 백그라운드로 이동"
 msgid "Move cloud work"
 msgstr "클라우드 작업 옮기기"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "메인 탭과 오른쪽 사이드바 사이에서 포커스를 옮기고, 사이드바가 닫혀 있으면 엽니다"
+
 msgid "Move this workspace to a computer?"
 msgstr "이 워크스페이스를 컴퓨터로 옮길까요?"
 
@@ -12428,6 +12431,9 @@ msgstr "다음 이미지"
 
 msgid "Next match"
 msgstr "다음 일치 항목"
+
+msgid "Next Right Sidebar Tab"
+msgstr "오른쪽 사이드바 다음 탭"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "이전 일치 항목"
 
 msgid "Previous prompts"
 msgstr "이전 프롬프트"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "오른쪽 사이드바 이전 탭"
 
 msgid "Previous slide"
 msgstr "이전 슬라이드"
@@ -18144,6 +18153,12 @@ msgstr "이 에이전트의 상태를 표시하고 알림을 보냅니다."
 msgid "Show text"
 msgstr "텍스트 보기"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 다음 탭 표시"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 이전 탭 표시"
+
 msgid "Show the triggering payload"
 msgstr "트리거 페이로드 표시"
 
@@ -20652,6 +20667,9 @@ msgstr "오른쪽 사이드바 토글"
 
 msgid "Toggle Right Sidebar"
 msgstr "오른쪽 사이드바 전환"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "오른쪽 사이드바 포커스 전환"
 
 msgid "Toggle Scripts Bar"
 msgstr "스크립트 바 전환"

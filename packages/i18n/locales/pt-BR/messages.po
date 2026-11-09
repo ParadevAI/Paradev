@@ -12064,6 +12064,9 @@ msgstr "Mover {name} para segundo plano"
 msgid "Move cloud work"
 msgstr "Mova o trabalho na nuvem"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Mover o foco entre as abas principais e a barra lateral direita, e abrir a barra lateral se estiver fechada"
+
 msgid "Move this workspace to a computer?"
 msgstr "Mover esta área de trabalho para um computador?"
 
@@ -12428,6 +12431,9 @@ msgstr "Próxima imagem"
 
 msgid "Next match"
 msgstr "Próxima ocorrência"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Próxima aba da barra lateral direita"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Ocorrência anterior"
 
 msgid "Previous prompts"
 msgstr "Prompts anteriores"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Aba anterior da barra lateral direita"
 
 msgid "Previous slide"
 msgstr "Slide anterior"
@@ -18144,6 +18153,12 @@ msgstr "Mostra o status e envia notificações para este agente."
 msgid "Show text"
 msgstr "Mostrar texto"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Mostrar a próxima aba da barra lateral direita sem mover o foco"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Mostrar a aba anterior da barra lateral direita sem mover o foco"
+
 msgid "Show the triggering payload"
 msgstr "Mostrar a carga útil que disparou"
 
@@ -20652,6 +20667,9 @@ msgstr "Alternar barra lateral direita"
 
 msgid "Toggle Right Sidebar"
 msgstr "Alternar barra lateral direita"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Alternar foco da barra lateral direita"
 
 msgid "Toggle Scripts Bar"
 msgstr "Alternar a barra de scripts"

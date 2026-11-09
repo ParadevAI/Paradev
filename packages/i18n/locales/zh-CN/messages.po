@@ -12064,6 +12064,9 @@ msgstr "将 {name} 移到后台"
 msgid "Move cloud work"
 msgstr "迁移云端工作"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关闭则将其打开"
+
 msgid "Move this workspace to a computer?"
 msgstr "将此工作区移至一台电脑？"
 
@@ -12428,6 +12431,9 @@ msgstr "下一张图片"
 
 msgid "Next match"
 msgstr "下一个匹配"
+
+msgid "Next Right Sidebar Tab"
+msgstr "右侧边栏下一个标签页"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "上一个匹配"
 
 msgid "Previous prompts"
 msgstr "历史提示词"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "右侧边栏上一个标签页"
 
 msgid "Previous slide"
 msgstr "上一张"
@@ -18144,6 +18153,12 @@ msgstr "为此智能体显示状态并发送通知。"
 msgid "Show text"
 msgstr "显示文本"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "显示右侧边栏中的下一个标签页，不移动焦点"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "显示右侧边栏中的上一个标签页，不移动焦点"
+
 msgid "Show the triggering payload"
 msgstr "显示触发负载"
 
@@ -20652,6 +20667,9 @@ msgstr "切换右侧边栏"
 
 msgid "Toggle Right Sidebar"
 msgstr "切换右侧边栏"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "切换右侧边栏焦点"
 
 msgid "Toggle Scripts Bar"
 msgstr "切换脚本栏"

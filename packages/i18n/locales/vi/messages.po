@@ -12064,6 +12064,9 @@ msgstr "Chuyển {name} sang chạy nền"
 msgid "Move cloud work"
 msgstr "Chuyển công việc trên cloud"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Di chuyển tiêu điểm giữa các tab chính và thanh bên phải, và mở thanh bên nếu đang đóng"
+
 msgid "Move this workspace to a computer?"
 msgstr "Chuyển không gian làm việc này sang một máy tính?"
 
@@ -12428,6 +12431,9 @@ msgstr "Ảnh tiếp theo"
 
 msgid "Next match"
 msgstr "Kết quả kế tiếp"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Tab kế tiếp của thanh bên phải"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Kết quả trước"
 
 msgid "Previous prompts"
 msgstr "Prompt trước đó"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Tab trước của thanh bên phải"
 
 msgid "Previous slide"
 msgstr "Slide trước"
@@ -18144,6 +18153,12 @@ msgstr "Hiển thị trạng thái và gửi thông báo cho agent này."
 msgid "Show text"
 msgstr "Hiện văn bản"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Hiển thị tab kế tiếp trong thanh bên phải mà không di chuyển tiêu điểm"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Hiển thị tab trước trong thanh bên phải mà không di chuyển tiêu điểm"
+
 msgid "Show the triggering payload"
 msgstr "Hiển thị payload kích hoạt"
 
@@ -20652,6 +20667,9 @@ msgstr "Bật/tắt thanh bên phải"
 
 msgid "Toggle Right Sidebar"
 msgstr "Bật/tắt thanh bên phải"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Bật/tắt tiêu điểm thanh bên phải"
 
 msgid "Toggle Scripts Bar"
 msgstr "Bật/tắt thanh script"

@@ -12064,6 +12064,9 @@ msgstr "Passer {name} en arrière-plan"
 msgid "Move cloud work"
 msgstr "Transférer le travail cloud"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Déplacer le focus entre les onglets principaux et la barre latérale droite, et ouvrir la barre latérale si elle est fermée"
+
 msgid "Move this workspace to a computer?"
 msgstr "Déplacer cet espace de travail vers un ordinateur ?"
 
@@ -12428,6 +12431,9 @@ msgstr "Image suivante"
 
 msgid "Next match"
 msgstr "Résultat suivant"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Onglet suivant de la barre latérale droite"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Résultat précédent"
 
 msgid "Previous prompts"
 msgstr "Prompts précédents"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Onglet précédent de la barre latérale droite"
 
 msgid "Previous slide"
 msgstr "Diapositive précédente"
@@ -18144,6 +18153,12 @@ msgstr "Afficher le statut et envoyer des notifications pour cet agent."
 msgid "Show text"
 msgstr "Afficher le texte"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Afficher l’onglet suivant de la barre latérale droite sans déplacer le focus"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Afficher l’onglet précédent de la barre latérale droite sans déplacer le focus"
+
 msgid "Show the triggering payload"
 msgstr "Afficher la charge utile déclenchante"
 
@@ -20652,6 +20667,9 @@ msgstr "Afficher/masquer la barre latérale droite"
 
 msgid "Toggle Right Sidebar"
 msgstr "Afficher/masquer la barre latérale droite"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Basculer le focus de la barre latérale droite"
 
 msgid "Toggle Scripts Bar"
 msgstr "Afficher/masquer la barre de scripts"

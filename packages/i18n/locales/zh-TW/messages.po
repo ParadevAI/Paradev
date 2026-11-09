@@ -12064,6 +12064,9 @@ msgstr "將 {name} 移到背景"
 msgid "Move cloud work"
 msgstr "遷移雲端工作"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "在主要分頁與右側邊欄之間移動焦點，若側邊欄已關閉則將其開啟"
+
 msgid "Move this workspace to a computer?"
 msgstr "要將此工作區移至一台電腦嗎？"
 
@@ -12428,6 +12431,9 @@ msgstr "下一張圖片"
 
 msgid "Next match"
 msgstr "下一個匹配"
+
+msgid "Next Right Sidebar Tab"
+msgstr "右側邊欄下一個分頁"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "上一個匹配"
 
 msgid "Previous prompts"
 msgstr "歷史提示詞"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "右側邊欄上一個分頁"
 
 msgid "Previous slide"
 msgstr "上一張"
@@ -18144,6 +18153,12 @@ msgstr "為此代理程式顯示狀態併發送通知。"
 msgid "Show text"
 msgstr "顯示文字"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "顯示右側邊欄中的下一個分頁，不移動焦點"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "顯示右側邊欄中的上一個分頁，不移動焦點"
+
 msgid "Show the triggering payload"
 msgstr "顯示觸發酬載"
 
@@ -20652,6 +20667,9 @@ msgstr "切換右側邊欄"
 
 msgid "Toggle Right Sidebar"
 msgstr "切換右側邊欄"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "切換右側邊欄焦點"
 
 msgid "Toggle Scripts Bar"
 msgstr "切換指令碼欄"

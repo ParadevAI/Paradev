@@ -12064,6 +12064,9 @@ msgstr "Перевести {name} в фон"
 msgid "Move cloud work"
 msgstr "Перенесите работу из облака"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Перемещать фокус между основными вкладками и правой боковой панелью и открывать панель, если она закрыта"
+
 msgid "Move this workspace to a computer?"
 msgstr "Перенести эту рабочую область на компьютер?"
 
@@ -12428,6 +12431,9 @@ msgstr "Следующее изображение"
 
 msgid "Next match"
 msgstr "Следующее совпадение"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Следующая вкладка правой боковой панели"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Предыдущее совпадение"
 
 msgid "Previous prompts"
 msgstr "Предыдущие промпты"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Предыдущая вкладка правой боковой панели"
 
 msgid "Previous slide"
 msgstr "Предыдущий слайд"
@@ -18144,6 +18153,12 @@ msgstr "Показывать статус и отправлять уведомл
 msgid "Show text"
 msgstr "Показать текст"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Показать следующую вкладку правой боковой панели, не перемещая фокус"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Показать предыдущую вкладку правой боковой панели, не перемещая фокус"
+
 msgid "Show the triggering payload"
 msgstr "Показать полезную нагрузку триггера"
 
@@ -20652,6 +20667,9 @@ msgstr "Переключить правую панель"
 
 msgid "Toggle Right Sidebar"
 msgstr "Переключить правую боковую панель"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Переключить фокус правой боковой панели"
 
 msgid "Toggle Scripts Bar"
 msgstr "Переключить панель скриптов"

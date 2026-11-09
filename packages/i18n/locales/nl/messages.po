@@ -12064,6 +12064,9 @@ msgstr "{name} naar de achtergrond verplaatsen"
 msgid "Move cloud work"
 msgstr "Cloudwerk verhuizen"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "De focus verplaatsen tussen de hoofdtabbladen en de rechterzijbalk, en de zijbalk openen als die gesloten is"
+
 msgid "Move this workspace to a computer?"
 msgstr "Deze werkruimte naar een computer verplaatsen?"
 
@@ -12428,6 +12431,9 @@ msgstr "Volgende afbeelding"
 
 msgid "Next match"
 msgstr "Volgende overeenkomst"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Volgend tabblad in de rechterzijbalk"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Vorige overeenkomst"
 
 msgid "Previous prompts"
 msgstr "Eerdere prompts"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Vorig tabblad in de rechterzijbalk"
 
 msgid "Previous slide"
 msgstr "Vorige slide"
@@ -18144,6 +18153,12 @@ msgstr "Status tonen en meldingen sturen voor deze agent."
 msgid "Show text"
 msgstr "Tekst tonen"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Het volgende tabblad in de rechterzijbalk tonen zonder de focus te verplaatsen"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Het vorige tabblad in de rechterzijbalk tonen zonder de focus te verplaatsen"
+
 msgid "Show the triggering payload"
 msgstr "Activerende payload tonen"
 
@@ -20652,6 +20667,9 @@ msgstr "Rechterzijbalk tonen/verbergen"
 
 msgid "Toggle Right Sidebar"
 msgstr "Rechterzijbalk tonen/verbergen"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Focus op de rechterzijbalk wisselen"
 
 msgid "Toggle Scripts Bar"
 msgstr "Scriptsbalk tonen/verbergen"

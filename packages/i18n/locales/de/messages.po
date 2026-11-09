@@ -12064,6 +12064,9 @@ msgstr "{name} in den Hintergrund verschieben"
 msgid "Move cloud work"
 msgstr "Cloud-Arbeit umziehen"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Fokus zwischen den Haupt-Tabs und der rechten Seitenleiste wechseln und die Seitenleiste öffnen, falls sie geschlossen ist"
+
 msgid "Move this workspace to a computer?"
 msgstr "Diesen Arbeitsbereich auf einen Computer verschieben?"
 
@@ -12428,6 +12431,9 @@ msgstr "Nächstes Bild"
 
 msgid "Next match"
 msgstr "Nächster Treffer"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Nächster Tab der rechten Seitenleiste"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Vorheriger Treffer"
 
 msgid "Previous prompts"
 msgstr "Frühere Prompts"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Vorheriger Tab der rechten Seitenleiste"
 
 msgid "Previous slide"
 msgstr "Vorherige Folie"
@@ -18144,6 +18153,12 @@ msgstr "Status anzeigen und Benachrichtigungen für diesen Agenten senden."
 msgid "Show text"
 msgstr "Text anzeigen"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Nächsten Tab in der rechten Seitenleiste anzeigen, ohne den Fokus zu verschieben"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Vorherigen Tab in der rechten Seitenleiste anzeigen, ohne den Fokus zu verschieben"
+
 msgid "Show the triggering payload"
 msgstr "Auslösende Nutzlast anzeigen"
 
@@ -20652,6 +20667,9 @@ msgstr "Rechte Seitenleiste umschalten"
 
 msgid "Toggle Right Sidebar"
 msgstr "Rechte Seitenleiste umschalten"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Fokus der rechten Seitenleiste umschalten"
 
 msgid "Toggle Scripts Bar"
 msgstr "Skriptleiste umschalten"

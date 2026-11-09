@@ -12064,6 +12064,9 @@ msgstr "Sposta {name} in background"
 msgid "Move cloud work"
 msgstr "Sposta il lavoro nel cloud"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Sposta il focus tra le schede principali e la barra laterale destra, e apri la barra laterale se è chiusa"
+
 msgid "Move this workspace to a computer?"
 msgstr "Spostare questo workspace su un computer?"
 
@@ -12428,6 +12431,9 @@ msgstr "Immagine successiva"
 
 msgid "Next match"
 msgstr "Corrispondenza successiva"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Scheda successiva della barra laterale destra"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Corrispondenza precedente"
 
 msgid "Previous prompts"
 msgstr "Prompt precedenti"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Scheda precedente della barra laterale destra"
 
 msgid "Previous slide"
 msgstr "Diapositiva precedente"
@@ -18144,6 +18153,12 @@ msgstr "Mostra lo stato e invia notifiche per questo agente."
 msgid "Show text"
 msgstr "Mostra testo"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Mostra la scheda successiva nella barra laterale destra senza spostare il focus"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Mostra la scheda precedente nella barra laterale destra senza spostare il focus"
+
 msgid "Show the triggering payload"
 msgstr "Mostra il payload che ha attivato questa esecuzione"
 
@@ -20652,6 +20667,9 @@ msgstr "Mostra/nascondi barra laterale destra"
 
 msgid "Toggle Right Sidebar"
 msgstr "Mostra/nascondi barra laterale destra"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Attiva/disattiva il focus sulla barra laterale destra"
 
 msgid "Toggle Scripts Bar"
 msgstr "Mostra/nascondi la barra degli script"

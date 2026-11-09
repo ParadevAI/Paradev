@@ -12064,6 +12064,9 @@ msgstr "Przenieś {name} w tło"
 msgid "Move cloud work"
 msgstr "Przenieś pracę z chmury"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Przenieś fokus między głównymi kartami a prawym paskiem bocznym i otwórz pasek, jeśli jest zamknięty"
+
 msgid "Move this workspace to a computer?"
 msgstr "Przenieść ten obszar roboczy na komputer?"
 
@@ -12428,6 +12431,9 @@ msgstr "Następny obraz"
 
 msgid "Next match"
 msgstr "Następne dopasowanie"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Następna karta prawego paska bocznego"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Poprzednie dopasowanie"
 
 msgid "Previous prompts"
 msgstr "Poprzednie prompty"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Poprzednia karta prawego paska bocznego"
 
 msgid "Previous slide"
 msgstr "Poprzedni slajd"
@@ -18144,6 +18153,12 @@ msgstr "Pokazuj status i wysyłaj powiadomienia dla tego agenta."
 msgid "Show text"
 msgstr "Pokaż tekst"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Pokaż następną kartę w prawym pasku bocznym bez przenoszenia fokusu"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Pokaż poprzednią kartę w prawym pasku bocznym bez przenoszenia fokusu"
+
 msgid "Show the triggering payload"
 msgstr "Pokaż ładunek wyzwalający"
 
@@ -20652,6 +20667,9 @@ msgstr "Przełącz prawy pasek boczny"
 
 msgid "Toggle Right Sidebar"
 msgstr "Przełącz prawy pasek boczny"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Przełącz fokus prawego paska bocznego"
 
 msgid "Toggle Scripts Bar"
 msgstr "Przełącz pasek skryptów"

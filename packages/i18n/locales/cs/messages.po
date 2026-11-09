@@ -12064,6 +12064,9 @@ msgstr "Přesunout {name} na pozadí"
 msgid "Move cloud work"
 msgstr "Přesuňte práci z cloudu"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a otevřít panel, pokud je zavřený"
+
 msgid "Move this workspace to a computer?"
 msgstr "Přesunout tento pracovní prostor na počítač?"
 
@@ -12428,6 +12431,9 @@ msgstr "Další obrázek"
 
 msgid "Next match"
 msgstr "Další shoda"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Další karta pravého postranního panelu"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -15154,6 +15160,9 @@ msgstr "Předchozí shoda"
 
 msgid "Previous prompts"
 msgstr "Předchozí prompty"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Předchozí karta pravého postranního panelu"
 
 msgid "Previous slide"
 msgstr "Předchozí snímek"
@@ -18144,6 +18153,12 @@ msgstr "Zobrazovat stav a posílat oznámení pro tohoto agenta."
 msgid "Show text"
 msgstr "Zobrazit text"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Zobrazit další kartu v pravém postranním panelu bez přesunu fokusu"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Zobrazit předchozí kartu v pravém postranním panelu bez přesunu fokusu"
+
 msgid "Show the triggering payload"
 msgstr "Zobrazit spouštěcí data"
 
@@ -20652,6 +20667,9 @@ msgstr "Přepnout pravý panel"
 
 msgid "Toggle Right Sidebar"
 msgstr "Přepnout pravý postranní panel"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Přepnout fokus pravého postranního panelu"
 
 msgid "Toggle Scripts Bar"
 msgstr "Přepnout lištu skriptů"
