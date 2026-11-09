@@ -68,9 +68,8 @@ export function useAgentSessionLauncher({
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const queryClient = useQueryClient();
 
-	const openAgentChat = useCallback<OpenAgentChat>(
+	const openChatPane = useCallback<OpenAgentChat>(
 		async (input) => {
-			if (!(await resolveAcpChatEnabled())) return null;
 			const configs = await queryClient
 				.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
 				.catch(() => agentConfigs ?? []);
@@ -104,7 +103,13 @@ export function useAgentSessionLauncher({
 			}
 			return { terminalId };
 		},
-		[resolveAcpChatEnabled, queryClient, hostUrl, agentConfigs, store],
+		[queryClient, hostUrl, agentConfigs, store],
+	);
+
+	const openAgentChat = useCallback<OpenAgentChat>(
+		async (input) =>
+			(await resolveAcpChatEnabled()) ? openChatPane(input) : null,
+		[resolveAcpChatEnabled, openChatPane],
 	);
 
 	const openNewChat = useCallback<OpenNewChat>(async () => {
@@ -121,8 +126,8 @@ export function useAgentSessionLauncher({
 			toast.error(t({ message: "No installed agent can be opened as a chat" }));
 			return null;
 		}
-		return openAgentChat({ configId: "", presetId, placement: "new-tab" });
-	}, [queryClient, hostUrl, agentConfigs, openAgentChat, t]);
+		return openChatPane({ configId: "", presetId, placement: "new-tab" });
+	}, [queryClient, hostUrl, agentConfigs, openChatPane, t]);
 
 	const createNewAgentSession = useCallback<CreateNewAgentSession>(
 		async (input) => {

@@ -7,7 +7,6 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useMemo, useRef } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
@@ -306,11 +305,9 @@ function V2WorkspaceContent() {
 		openNewChat,
 		focusAgentTerminal,
 	} = useAgentSessionLauncher({ workspaceId, store });
-	const acpChat = useAcpChatEnabled();
 	const addChatTab = useCallback(() => {
 		void openNewChat();
 	}, [openNewChat]);
-	const onAddChat = acpChat ? addChatTab : undefined;
 	const {
 		matchedPresets,
 		newTabPresets,
@@ -578,7 +575,7 @@ function V2WorkspaceContent() {
 		isMobilePaneEnabled,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
-	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat });
+	useHotkey("NEW_CHAT", addChatTab);
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();
 	});
@@ -727,7 +724,7 @@ function V2WorkspaceContent() {
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
 											runAfterClose={runAfterClose}
-											onAddChat={onAddChat}
+											onAddChat={addChatTab}
 											onAddBrowser={
 												isRightPaneAreaEnabled ? undefined : addBrowserTab
 											}
@@ -788,7 +785,7 @@ function V2WorkspaceContent() {
 										<WorkspaceEmptyState
 											onOpenBrowser={addBrowserTab}
 											onOpenChanges={openChanges}
-											onOpenChat={onAddChat}
+											onOpenChat={addChatTab}
 											onOpenQuickOpen={handleQuickOpen}
 											onOpenTerminal={addTerminalTab}
 										/>

@@ -5361,9 +5361,6 @@ msgstr "Продовжити"
 msgid "Continue in your browser"
 msgstr "Продовжте в браузері"
 
-msgid "Continue or fork session"
-msgstr "Продовжити сеанс або створити його форк"
-
 msgid "Continue this chat on another login"
 msgstr "Продовжити цей чат під іншим логіном"
 
@@ -6009,9 +6006,6 @@ msgstr "Не вдалося змінити повідомлення"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Не вдалося завершити видалення робочих просторів"
 
-msgid "Couldn't fork into a chat"
-msgstr "Не вдалося створити форк у чаті"
-
 msgid "Couldn't forward port {portNumber}"
 msgstr "Не вдалося переадресувати порт {portNumber}"
 
@@ -6070,6 +6064,9 @@ msgstr "Не вдалося перевести субагента у фонов�
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "Не вдалося відкрити в інтерфейсі чату"
 
 msgid "Couldn't open the screenshot"
 msgstr "Не вдалося відкрити знімок екрана"
@@ -9086,26 +9083,11 @@ msgstr "Аргументи форка"
 msgid "Fork conversation"
 msgstr "Форкнути розмову"
 
-msgid "Fork into chat"
-msgstr "Форкнути в чат"
-
-msgid "Fork into chat in a new tab"
-msgstr "Форкнути в чат у новій вкладці"
-
-msgid "Fork into CLI"
-msgstr "Форкнути в CLI"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Форкнути в CLI у новій вкладці"
-
 msgid "Fork session"
 msgstr "Створити форк сеансу"
 
 msgid "Fork session…"
 msgstr "Створити форк сеансу…"
-
-msgid "Forking into a chat…"
-msgstr "Форкаємо в чат…"
 
 msgid "Form controls and field composition"
 msgstr "Елементи форм і компонування полів"
@@ -12183,6 +12165,9 @@ msgstr "Новий сеанс агента"
 msgid "New agent sessions"
 msgstr "Нові сеанси агентів"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Нові сесії агентів запускаються в чаті замість термінала. Будь-яку сесію можна перемкнути з її меню."
+
 msgid "New automation"
 msgstr "Нова автоматизація"
 
@@ -13202,8 +13187,8 @@ msgstr "Нічого не потребує повторної спроби"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "За останні 30 днів ще нічого не опубліковано. Ваше місце з'явиться, щойно синхронізується використання з цього комп'ютера; публікація від імені <0>{handle}</0>."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Поки що немає чого форкнути. Спершу надішліть повідомлення."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Поки що нічого відкривати. Спершу надішліть повідомлення."
 
 msgid "Nothing was missed"
 msgstr "Нічого не пропущено"
@@ -13600,6 +13585,9 @@ msgstr "Відкрийте пул-реквест, щоб побачити ста
 msgid "Open actions menu"
 msgstr "Відкрити меню дій"
 
+msgid "Open agents in chat"
+msgstr "Відкривати агентів у чаті"
+
 msgid "Open anyway"
 msgstr "Усе одно відкрити"
 
@@ -13647,9 +13635,6 @@ msgstr "Відкрити налаштування ChatGPT"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Відкривати сеанси Claude Code, Codex, OpenCode і Pi як чати"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Відкривати сеанси Claude Code, Codex, OpenCode і Pi на панелі чату замість термінала."
 
 msgid "Open Command Palette"
 msgstr "Відкрити палітру команд"
@@ -13733,6 +13718,9 @@ msgstr "Відкрити в браузері"
 msgid "Open in Changes pane"
 msgstr "Відкрити на панелі «Зміни»"
 
+msgid "Open in Chat Interface"
+msgstr "Відкрити в інтерфейсі чату"
+
 msgid "Open in ChatGPT"
 msgstr "Відкрити в ChatGPT"
 
@@ -13807,6 +13795,9 @@ msgstr "Відкрити у вкладці"
 
 msgid "Open in Tasks"
 msgstr "Відкрити в розділі «Завдання»"
+
+msgid "Open in Terminal Chat"
+msgstr "Відкрити в чаті терміналу"
 
 msgid "Open in…"
 msgstr "Відкрити в…"
@@ -14017,11 +14008,11 @@ msgstr "Відкриття файлів"
 msgid "Opening folders"
 msgstr "Відкриття папок"
 
+msgid "Opening in Chat Interface…"
+msgstr "Відкриття в інтерфейсі чату…"
+
 msgid "Opening pages"
 msgstr "Відкриття сторінок"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Відкриється поруч із цією панеллю. Ця продовжить працювати."
 
 msgid "Operator"
 msgstr "Оператор"

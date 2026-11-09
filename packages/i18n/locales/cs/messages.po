@@ -5367,9 +5367,6 @@ msgstr "Pokračovat"
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
-msgid "Continue or fork session"
-msgstr "Pokračovat nebo forkovat relaci"
-
 msgid "Continue this chat on another login"
 msgstr "Pokračovat v tomto chatu pod jiným přihlášením"
 
@@ -6015,9 +6012,6 @@ msgstr "Zprávu se nepodařilo upravit"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Mazání pracovních prostorů se nepodařilo dokončit"
 
-msgid "Couldn't fork into a chat"
-msgstr "Do chatu se nepodařilo forkovat"
-
 msgid "Couldn't forward port {portNumber}"
 msgstr "Port {portNumber} se nepodařilo přesměrovat"
 
@@ -6076,6 +6070,9 @@ msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "Nepodařilo se otevřít v rozhraní chatu"
 
 msgid "Couldn't open the screenshot"
 msgstr "Snímek obrazovky se nepodařilo otevřít"
@@ -9092,26 +9089,11 @@ msgstr "Argumenty pro fork"
 msgid "Fork conversation"
 msgstr "Rozvětvit konverzaci"
 
-msgid "Fork into chat"
-msgstr "Forkovat do chatu"
-
-msgid "Fork into chat in a new tab"
-msgstr "Forkovat do chatu v nové kartě"
-
-msgid "Fork into CLI"
-msgstr "Forkovat do CLI"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Forkovat do CLI v nové kartě"
-
 msgid "Fork session"
 msgstr "Forkovat relaci"
 
 msgid "Fork session…"
 msgstr "Forkovat relaci…"
-
-msgid "Forking into a chat…"
-msgstr "Forkuji do chatu…"
 
 msgid "Form controls and field composition"
 msgstr "Prvky formuláře a skládání polí"
@@ -12189,6 +12171,9 @@ msgstr "Nová relace agenta"
 msgid "New agent sessions"
 msgstr "Nové relace agentů"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Nové relace agentů se spustí v chatu místo v terminálu. Každou relaci můžete přepnout v jejím menu."
+
 msgid "New automation"
 msgstr "Nová automatizace"
 
@@ -13208,8 +13193,8 @@ msgstr "Není co opakovat"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Za posledních 30 dní zatím nebylo nic publikováno. Vaše pozice se objeví, jakmile se synchronizuje využití z tohoto počítače; publikujete jako <0>{handle}</0>."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Zatím není co forkovat. Nejprve pošlete zprávu."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Zatím není co otevřít. Nejdřív pošlete zprávu."
 
 msgid "Nothing was missed"
 msgstr "Nic nebylo zmeškáno"
@@ -13606,6 +13591,9 @@ msgstr "Otevřete pull request a uvidíte stav revize, kontroly a komentáře."
 msgid "Open actions menu"
 msgstr "Otevřít nabídku akcí"
 
+msgid "Open agents in chat"
+msgstr "Otevírat agenty v chatu"
+
 msgid "Open anyway"
 msgstr "Přesto otevřít"
 
@@ -13653,9 +13641,6 @@ msgstr "Otevřít nastavení ChatGPT"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Otevírat relace Claude Code, Codex, OpenCode a Pi jako chaty"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Otevírejte relace Claude Code, Codex, OpenCode a Pi v panelu chatu místo terminálu."
 
 msgid "Open Command Palette"
 msgstr "Otevřít paletu příkazů"
@@ -13739,6 +13724,9 @@ msgstr "Otevřít v prohlížeči"
 msgid "Open in Changes pane"
 msgstr "Otevřít v panelu Změny"
 
+msgid "Open in Chat Interface"
+msgstr "Otevřít v rozhraní chatu"
+
 msgid "Open in ChatGPT"
 msgstr "Otevřít v ChatGPT"
 
@@ -13813,6 +13801,9 @@ msgstr "Otevřít na kartě"
 
 msgid "Open in Tasks"
 msgstr "Otevřít v Úkolech"
+
+msgid "Open in Terminal Chat"
+msgstr "Otevřít v terminálovém chatu"
 
 msgid "Open in…"
 msgstr "Otevřít v…"
@@ -14023,11 +14014,11 @@ msgstr "Otevírání souborů"
 msgid "Opening folders"
 msgstr "Otevírání složek"
 
+msgid "Opening in Chat Interface…"
+msgstr "Otevírání v rozhraní chatu…"
+
 msgid "Opening pages"
 msgstr "Otevírání stránek"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Otevře se vedle tohoto panelu. Tento dál běží."
 
 msgid "Operator"
 msgstr "Operátor"

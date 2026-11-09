@@ -5367,9 +5367,6 @@ msgstr "続ける"
 msgid "Continue in your browser"
 msgstr "ブラウザで続行してください"
 
-msgid "Continue or fork session"
-msgstr "セッションを続行またはフォーク"
-
 msgid "Continue this chat on another login"
 msgstr "別のログインでこのチャットを続ける"
 
@@ -6015,9 +6012,6 @@ msgstr "メッセージを編集できませんでした"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
 
-msgid "Couldn't fork into a chat"
-msgstr "チャットにフォークできませんでした"
-
 msgid "Couldn't forward port {portNumber}"
 msgstr "ポート {portNumber} を転送できませんでした"
 
@@ -6076,6 +6070,9 @@ msgstr "サブエージェントをバックグラウンドに移動できませ
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "チャット画面で開けませんでした"
 
 msgid "Couldn't open the screenshot"
 msgstr "スクリーンショットを開けませんでした"
@@ -9092,26 +9089,11 @@ msgstr "フォーク引数"
 msgid "Fork conversation"
 msgstr "会話を分岐"
 
-msgid "Fork into chat"
-msgstr "チャットにフォーク"
-
-msgid "Fork into chat in a new tab"
-msgstr "新しいタブでチャットにフォーク"
-
-msgid "Fork into CLI"
-msgstr "CLIにフォーク"
-
-msgid "Fork into CLI in a new tab"
-msgstr "新しいタブでCLIにフォーク"
-
 msgid "Fork session"
 msgstr "セッションをフォーク"
 
 msgid "Fork session…"
 msgstr "セッションをフォーク…"
-
-msgid "Forking into a chat…"
-msgstr "チャットにフォーク中…"
 
 msgid "Form controls and field composition"
 msgstr "フォームコントロールとフィールドの組み立て"
@@ -12189,6 +12171,9 @@ msgstr "新規エージェントセッション"
 msgid "New agent sessions"
 msgstr "新しいエージェントセッション"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "新しいエージェントセッションはターミナルではなくチャットで開始します。各セッションはメニューから切り替えられます。"
+
 msgid "New automation"
 msgstr "新規オートメーション"
 
@@ -13208,8 +13193,8 @@ msgstr "再実行が必要なものはありません"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "直近30日に公開された実績はまだありません。このマシンの利用状況が同期されるとランクが表示されます(<0>{handle}</0>として公開)。"
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "まだフォークできる内容がありません。先にメッセージを送信してください。"
+msgid "Nothing to open yet. Send a message first."
+msgstr "まだ開く内容がありません。先にメッセージを送信してください。"
 
 msgid "Nothing was missed"
 msgstr "未実行はありません"
@@ -13606,6 +13591,9 @@ msgstr "プルリクエストを開くと、レビュー状態、チェック、
 msgid "Open actions menu"
 msgstr "アクションメニューを開く"
 
+msgid "Open agents in chat"
+msgstr "エージェントをチャットで開く"
+
 msgid "Open anyway"
 msgstr "それでも開く"
 
@@ -13653,9 +13641,6 @@ msgstr "ChatGPT の設定を開く"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code、Codex、OpenCode、Pi のセッションをチャットとして開く"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Claude Code、Codex、OpenCode、Pi のセッションをターミナルではなくチャットペインで開きます。"
 
 msgid "Open Command Palette"
 msgstr "コマンドパレットを開く"
@@ -13739,6 +13724,9 @@ msgstr "ブラウザで開く"
 msgid "Open in Changes pane"
 msgstr "変更ペインで開く"
 
+msgid "Open in Chat Interface"
+msgstr "チャット画面で開く"
+
 msgid "Open in ChatGPT"
 msgstr "ChatGPTで開く"
 
@@ -13813,6 +13801,9 @@ msgstr "タブで開く"
 
 msgid "Open in Tasks"
 msgstr "タスクで開く"
+
+msgid "Open in Terminal Chat"
+msgstr "ターミナルチャットで開く"
 
 msgid "Open in…"
 msgstr "アプリで開く…"
@@ -14023,11 +14014,11 @@ msgstr "ファイルを開く"
 msgid "Opening folders"
 msgstr "フォルダーを開く"
 
+msgid "Opening in Chat Interface…"
+msgstr "チャット画面で開いています…"
+
 msgid "Opening pages"
 msgstr "ページを開く"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "このペインの横に開きます。元のペインは動作し続けます。"
 
 msgid "Operator"
 msgstr "オペレーター"

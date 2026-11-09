@@ -564,8 +564,8 @@ export function usePaneRegistry({
 									})
 								}
 								onCreateNewAgentSession={createNewAgentSession}
-								onForkIntoOtherSurface={(source, placement) =>
-									void forkIntoOtherSurface(ctx, source, placement)
+								onForkIntoOtherSurface={(source) =>
+									void forkIntoOtherSurface(ctx, source)
 								}
 								onOpenSubagent={onOpenSubagent}
 							/>
@@ -952,9 +952,7 @@ export function usePaneRegistry({
 							/>
 							<ChatModeMenu
 								data={data}
-								onFork={(source, placement) =>
-									void forkIntoOtherSurface(ctx, source, placement)
-								}
+								onFork={(source) => void forkIntoOtherSurface(ctx, source)}
 								workspaceId={workspaceId}
 							/>
 						</div>

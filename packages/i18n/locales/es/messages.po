@@ -5367,9 +5367,6 @@ msgstr "Continuar"
 msgid "Continue in your browser"
 msgstr "Continúa en tu navegador"
 
-msgid "Continue or fork session"
-msgstr "Continuar o bifurcar la sesión"
-
 msgid "Continue this chat on another login"
 msgstr "Continuar este chat con otra cuenta"
 
@@ -6015,9 +6012,6 @@ msgstr "No se pudo editar el mensaje"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "No se pudo terminar de eliminar los espacios de trabajo"
 
-msgid "Couldn't fork into a chat"
-msgstr "No se pudo bifurcar en un chat"
-
 msgid "Couldn't forward port {portNumber}"
 msgstr "No se pudo reenviar el puerto {portNumber}"
 
@@ -6076,6 +6070,9 @@ msgstr "No se pudo mover el subagente a segundo plano"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "No se pudo nombrar «{name}» automáticamente"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "No se pudo abrir en la interfaz de chat"
 
 msgid "Couldn't open the screenshot"
 msgstr "No se pudo abrir la captura de pantalla"
@@ -9092,26 +9089,11 @@ msgstr "Argumentos de fork"
 msgid "Fork conversation"
 msgstr "Bifurcar conversación"
 
-msgid "Fork into chat"
-msgstr "Bifurcar en un chat"
-
-msgid "Fork into chat in a new tab"
-msgstr "Bifurcar en un chat en una nueva pestaña"
-
-msgid "Fork into CLI"
-msgstr "Bifurcar en la CLI"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Bifurcar en la CLI en una nueva pestaña"
-
 msgid "Fork session"
 msgstr "Bifurcar sesión"
 
 msgid "Fork session…"
 msgstr "Bifurcar sesión…"
-
-msgid "Forking into a chat…"
-msgstr "Bifurcando en un chat…"
 
 msgid "Form controls and field composition"
 msgstr "Controles de formulario y composición de campos"
@@ -12189,6 +12171,9 @@ msgstr "Nueva sesión de agente"
 msgid "New agent sessions"
 msgstr "Nuevas sesiones de agentes"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Las nuevas sesiones de agente empiezan en el chat en lugar de en la terminal. Puedes cambiar cualquier sesión desde su menú."
+
 msgid "New automation"
 msgstr "Nueva automatización"
 
@@ -13208,8 +13193,8 @@ msgstr "Nada necesita reintento"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Aún no has publicado nada en los últimos 30 días. Tu puesto aparecerá cuando se sincronice el uso de esta máquina, publicando como <0>{handle}</0>."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Todavía no hay nada que bifurcar. Envía un mensaje primero."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Aún no hay nada que abrir. Envía un mensaje primero."
 
 msgid "Nothing was missed"
 msgstr "No se perdió nada"
@@ -13606,6 +13591,9 @@ msgstr "Abre una pull request para ver el estado de la revisión, las comprobaci
 msgid "Open actions menu"
 msgstr "Abrir el menú de acciones"
 
+msgid "Open agents in chat"
+msgstr "Abrir agentes en el chat"
+
 msgid "Open anyway"
 msgstr "Abrir igualmente"
 
@@ -13653,9 +13641,6 @@ msgstr "Abrir ajustes de ChatGPT"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Abrir las sesiones de Claude Code, Codex, OpenCode y Pi como chats"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Abre las sesiones de Claude Code, Codex, OpenCode y Pi en un panel de chat en lugar de en una terminal."
 
 msgid "Open Command Palette"
 msgstr "Abrir la paleta de comandos"
@@ -13739,6 +13724,9 @@ msgstr "Abrir en el navegador"
 msgid "Open in Changes pane"
 msgstr "Abrir en el panel de cambios"
 
+msgid "Open in Chat Interface"
+msgstr "Abrir en la interfaz de chat"
+
 msgid "Open in ChatGPT"
 msgstr "Abrir en ChatGPT"
 
@@ -13813,6 +13801,9 @@ msgstr "Abrir en una pestaña"
 
 msgid "Open in Tasks"
 msgstr "Abrir en Tareas"
+
+msgid "Open in Terminal Chat"
+msgstr "Abrir en el chat de terminal"
 
 msgid "Open in…"
 msgstr "Abrir en…"
@@ -14023,11 +14014,11 @@ msgstr "Abrir archivos"
 msgid "Opening folders"
 msgstr "Abrir carpetas"
 
+msgid "Opening in Chat Interface…"
+msgstr "Abriendo en la interfaz de chat…"
+
 msgid "Opening pages"
 msgstr "Abrir páginas"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Se abre junto a este panel. Este sigue en ejecución."
 
 msgid "Operator"
 msgstr "Operario"
