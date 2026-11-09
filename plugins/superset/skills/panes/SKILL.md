@@ -148,8 +148,8 @@ superset panes open changes --workspace $WS --json >/dev/null
 W=$(superset panes open browser --workspace $WS --url http://localhost:3000 --json | jq -r .paneId)
 ```
 
-That browser pane is the user's own, so agents cannot drive it. To screenshot,
-click or read the console, open an agent pane with superset:browser.
+To screenshot, click or read the console in that pane, use superset:browser
+with its `paneId`.
 
 A grid of N panes in a new tab: open the tab, split the first pane right for
 each column, split each column down for each row, then `equalize --tab`.

@@ -10484,8 +10484,8 @@ msgstr "Berechtigungen:"
 msgid "It can't be brought back."
 msgstr "Er lässt sich nicht wiederherstellen."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Die Cookies aus deinem Profil „{profileName}“ werden in einen Browserbereich kopiert, den der Agent geöffnet hat. Der Agent kann dann auf den Websites handeln, auf denen du angemeldet bist."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Die Cookies aus deinem Profil „{profileName}“ werden in den Browser der App kopiert. Agenten können dann auf den Websites handeln, auf denen du angemeldet bist."
 
 msgid "It keeps the title from your prompt."
 msgstr "Der Titel aus deinem Prompt bleibt erhalten."
@@ -17641,6 +17641,9 @@ msgstr "Sitzungsdetails"
 
 msgid "Session ended"
 msgstr "Sitzung beendet"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sitzung beendet. Drücke die Eingabetaste, um eine neue Shell zu starten."
 
 msgid "Session name"
 msgstr "Sitzungsname"

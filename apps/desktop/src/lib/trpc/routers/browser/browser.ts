@@ -6,7 +6,7 @@ import {
 } from "main/lib/browser/browser-manager";
 import { clearPaneData } from "main/lib/browser/clear-pane-data";
 import { screenshotManager } from "main/lib/screenshot-manager";
-import { BROWSER_PARTITION, PANE_PARTITIONS } from "shared/constants";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -379,9 +379,10 @@ export const createBrowserRouter = () => {
 				}),
 			)
 			.mutation(async ({ input }) => {
-				for (const partition of PANE_PARTITIONS) {
-					await clearPaneData(session.fromPartition(partition), input.type);
-				}
+				await clearPaneData(
+					session.fromPartition(BROWSER_PARTITION),
+					input.type,
+				);
 				return { success: true };
 			}),
 

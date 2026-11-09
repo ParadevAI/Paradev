@@ -10484,8 +10484,8 @@ msgstr "Może:"
 msgid "It can't be brought back."
 msgstr "Nie będzie można go przywrócić."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Kopiuje pliki cookie z Twojego profilu „{profileName}” do panelu przeglądarki otwartego przez agenta. Agent może wtedy działać na stronach, na których jesteś zalogowany."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Kopiuje pliki cookie z Twojego profilu „{profileName}” do przeglądarki w aplikacji. Agenci mogą wtedy działać na stronach, na których jesteś zalogowany."
 
 msgid "It keeps the title from your prompt."
 msgstr "Zachowa tytuł z Twojego polecenia."
@@ -17641,6 +17641,9 @@ msgstr "Szczegóły sesji"
 
 msgid "Session ended"
 msgstr "Sesja zakończona"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sesja zakończona. Naciśnij Enter, aby uruchomić nową powłokę."
 
 msgid "Session name"
 msgstr "Nazwa sesji"

@@ -10484,8 +10484,8 @@ msgstr "가능한 작업:"
 msgid "It can't be brought back."
 msgstr "되돌릴 수 없습니다."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "\"{profileName}\" 프로필의 쿠키를 에이전트가 연 브라우저 창으로 복사합니다. 그러면 에이전트가 로그인된 사이트에서 작업할 수 있습니다."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "\"{profileName}\" 프로필의 쿠키를 앱 내 브라우저로 복사합니다. 그러면 에이전트가 로그인된 사이트에서 작업할 수 있습니다."
 
 msgid "It keeps the title from your prompt."
 msgstr "프롬프트에서 가져온 제목이 유지됩니다."
@@ -17641,6 +17641,9 @@ msgstr "세션 상세"
 
 msgid "Session ended"
 msgstr "세션 종료"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "세션이 종료되었습니다. Enter 키를 눌러 새 셸을 시작하세요."
 
 msgid "Session name"
 msgstr "세션 이름"

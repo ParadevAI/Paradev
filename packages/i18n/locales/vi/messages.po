@@ -10484,8 +10484,8 @@ msgstr "Tiện ích có thể:"
 msgid "It can't be brought back."
 msgstr "Không thể khôi phục."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Sao chép cookie từ hồ sơ \"{profileName}\" của bạn vào một khung trình duyệt mà agent đã mở. Sau đó agent có thể thao tác trên các trang bạn đã đăng nhập."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Sao chép cookie từ hồ sơ \"{profileName}\" của bạn vào trình duyệt trong ứng dụng. Sau đó các agent có thể thao tác trên các trang bạn đã đăng nhập."
 
 msgid "It keeps the title from your prompt."
 msgstr "Tiêu đề từ lời nhắc của bạn sẽ được giữ nguyên."
@@ -17641,6 +17641,9 @@ msgstr "Chi tiết phiên"
 
 msgid "Session ended"
 msgstr "Phiên đã kết thúc"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Phiên đã kết thúc. Nhấn Enter để mở shell mới."
 
 msgid "Session name"
 msgstr "Tên phiên"

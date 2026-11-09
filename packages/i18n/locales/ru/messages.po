@@ -10484,8 +10484,8 @@ msgstr "Расширение сможет:"
 msgid "It can't be brought back."
 msgstr "Его нельзя будет вернуть."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Cookie из вашего профиля «{profileName}» копируются в панель браузера, которую открыл агент. Тогда агент сможет действовать на сайтах, где вы вошли в аккаунт."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Cookie из вашего профиля «{profileName}» копируются во встроенный браузер приложения. Тогда агенты смогут действовать на сайтах, где вы вошли в аккаунт."
 
 msgid "It keeps the title from your prompt."
 msgstr "Останется название из вашего запроса."
@@ -17641,6 +17641,9 @@ msgstr "Детали сессии"
 
 msgid "Session ended"
 msgstr "Сеанс завершён"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Сеанс завершён. Нажмите Enter, чтобы запустить новую оболочку."
 
 msgid "Session name"
 msgstr "Имя сессии"

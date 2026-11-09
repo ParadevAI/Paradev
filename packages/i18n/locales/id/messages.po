@@ -10484,8 +10484,8 @@ msgstr "Ekstensi ini dapat:"
 msgid "It can't be brought back."
 msgstr "Komentar ini tidak bisa dikembalikan."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Menyalin cookie dari profil \"{profileName}\" Anda ke panel browser yang dibuka agen. Agen lalu dapat bertindak di situs tempat Anda masuk."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Menyalin cookie dari profil \"{profileName}\" Anda ke browser di dalam aplikasi. Agen lalu dapat bertindak di situs tempat Anda masuk."
 
 msgid "It keeps the title from your prompt."
 msgstr "Judul dari prompt Anda tetap dipakai."
@@ -17641,6 +17641,9 @@ msgstr "Detail sesi"
 
 msgid "Session ended"
 msgstr "Sesi berakhir"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sesi berakhir. Tekan Enter untuk memulai shell baru."
 
 msgid "Session name"
 msgstr "Nama sesi"

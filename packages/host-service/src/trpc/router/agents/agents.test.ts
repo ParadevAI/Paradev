@@ -1168,12 +1168,51 @@ describe("continuationTarget", () => {
 		).toEqual({
 			harness: "claude-acp",
 			label: "Claude",
+			agentConfigId: "00000000-0000-0000-0000-00000000000a",
 			attachments: [],
 		});
 		expect(chatLaunchTarget(db, launch)).toBeNull();
 		expect(
 			chatLaunchTarget(db, { ...launch, surface: "chat", effort: "high" }),
 		).toBeNull();
+	});
+
+	it("chats as a custom agent that runs the claude or codex CLI", () => {
+		const db = createTestDb();
+		const seedCustom = (id: string, label: string, command: string) =>
+			db
+				.insert(schema.hostAgentConfigs)
+				.values({
+					id,
+					presetId: "custom",
+					label,
+					command,
+					argsJson: '["--permission-mode","auto"]',
+					promptTransport: "argv",
+					promptArgsJson: "[]",
+					envJson: JSON.stringify({ CLAUDE_CONFIG_DIR: "/tmp/personal" }),
+					displayOrder: 1,
+				})
+				.run();
+		seedCustom("00000000-0000-0000-0000-0000000000c1", "Personal", "claude");
+		seedCustom("00000000-0000-0000-0000-0000000000c2", "Codex", "/bin/codex");
+		seedCustom("00000000-0000-0000-0000-0000000000c3", "Other", "aider");
+		const chat = (agent: string) =>
+			chatLaunchTarget(db, { workspaceId, agent, prompt: "", surface: "chat" });
+
+		expect(chat("00000000-0000-0000-0000-0000000000c1")).toEqual({
+			harness: "claude-acp",
+			label: "Personal",
+			agentConfigId: "00000000-0000-0000-0000-0000000000c1",
+			attachments: [],
+		});
+		expect(chat("00000000-0000-0000-0000-0000000000c2")).toEqual({
+			harness: "codex-acp",
+			label: "Codex",
+			agentConfigId: "00000000-0000-0000-0000-0000000000c2",
+			attachments: [],
+		});
+		expect(chat("00000000-0000-0000-0000-0000000000c3")).toBeNull();
 	});
 
 	// A hook-recorded binding carries only the binary's builtin id, while a

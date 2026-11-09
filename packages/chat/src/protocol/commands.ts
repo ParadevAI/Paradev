@@ -14,6 +14,8 @@ export const createSessionInputSchema = z.object({
 	commandId: z.uuid(),
 	workspaceId: z.string().min(1),
 	harness: z.string().min(1),
+	/** The host agent config to launch with, so its env (account, config dir) applies. */
+	agentConfigId: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
 	effortId: z.string().optional(),
@@ -221,6 +223,8 @@ export type ListSessionsInput = z.infer<typeof listSessionsInputSchema>;
 export const discoverSessionsInputSchema = z.object({
 	workspaceId: z.string().min(1),
 	harness: z.string().min(1),
+	/** The host agent config whose account the native history belongs to. */
+	agentConfigId: z.string().min(1).optional(),
 	/** Opaque page token from a previous `nextCursor`. Not a journal cursor. */
 	cursor: z.string().min(1).optional(),
 });

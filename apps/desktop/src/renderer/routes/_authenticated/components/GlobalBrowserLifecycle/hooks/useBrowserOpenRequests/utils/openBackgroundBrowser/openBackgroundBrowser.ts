@@ -29,7 +29,7 @@ export function openBackgroundBrowser({
 	const store = createWorkspaceStore<PaneViewerData>({
 		initialState: previous,
 	});
-	const paneId = openUrlInV2Workspace({ store, url, target, agent: true });
+	const paneId = openUrlInV2Workspace({ store, url, target });
 	if (!paneId) throw new Error("Browser open did not create a pane");
 	const next = store.getState();
 	const paneLayout = preserveLocalPaneSelection(previous, {

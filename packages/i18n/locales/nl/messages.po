@@ -10484,8 +10484,8 @@ msgstr "De extensie kan:"
 msgid "It can't be brought back."
 msgstr "Dit kan niet ongedaan worden gemaakt."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar een browservenster dat de agent heeft geopend. De agent kan dan handelen op de sites waar je bent ingelogd."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar de browser in de app. Agents kunnen dan handelen op de sites waar je bent ingelogd."
 
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
@@ -17641,6 +17641,9 @@ msgstr "Sessiedetails"
 
 msgid "Session ended"
 msgstr "Sessie beëindigd"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Sessie beëindigd. Druk op Enter om een nieuwe shell te starten."
 
 msgid "Session name"
 msgstr "Sessienaam"

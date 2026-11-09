@@ -10484,8 +10484,8 @@ msgstr "It can:"
 msgid "It can't be brought back."
 msgstr "It can't be brought back."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 
 msgid "It keeps the title from your prompt."
 msgstr "It keeps the title from your prompt."
@@ -17641,6 +17641,9 @@ msgstr "Session details"
 
 msgid "Session ended"
 msgstr "Session ended"
+
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Session ended. Press Enter to start a new shell."
 
 msgid "Session name"
 msgstr "Session name"
