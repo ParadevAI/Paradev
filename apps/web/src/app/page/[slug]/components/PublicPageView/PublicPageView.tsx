@@ -7,13 +7,14 @@ import {
 	PageFrame,
 	PageUpdateBanner,
 	usePageToolsUnavailable,
+	usePageUpdateOffer,
 } from "@superset/ui/page-comments";
 import { PagePresenceStack, useJoinPresence } from "@superset/ui/presence";
 import { useQueryClient } from "@tanstack/react-query";
 import { Globe } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { env } from "@/env";
 import { useTRPC } from "@/trpc/react";
 import { OpenInSupersetButton } from "../OpenInSupersetButton";
@@ -41,7 +42,18 @@ export function PublicPageView({
 	const router = useRouter();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const [offered, setOffered] = useState<number | null>(null);
+	const { onPublished, offered, viewOffered } = usePageUpdateOffer({
+		check: async () => {
+			const shared = await queryClient.fetchQuery({
+				...trpc.page.publicView.queryOptions({ slug }),
+				staleTime: 0,
+			});
+			return { version: shared?.version ?? version, publishedBy: null };
+		},
+		apply: () => router.refresh(),
+		shownVersion: version,
+		viewerId: null,
+	});
 	const frameRef = useRef<HTMLIFrameElement>(null);
 	const frameOrigin = useMemo(() => new URL(viewUrl).origin, [viewUrl]);
 	usePageToolsUnavailable({ frameRef, frameOrigin, signedIn });
@@ -53,15 +65,7 @@ export function PublicPageView({
 				pageId,
 				guestId: guestId(),
 			}),
-		onPublished: async () => {
-			const next = await queryClient
-				.fetchQuery({
-					...trpc.page.publicView.queryOptions({ slug }),
-					staleTime: 0,
-				})
-				.catch(() => null);
-			if (next && next.version !== version) setOffered(next.version);
-		},
+		onPublished,
 	});
 
 	return (
@@ -93,14 +97,8 @@ export function PublicPageView({
 			</div>
 
 			<main className="relative min-h-0 flex-1">
-				{offered !== null && offered !== version ? (
-					<PageUpdateBanner
-						version={offered}
-						onView={() => {
-							setOffered(null);
-							router.refresh();
-						}}
-					/>
+				{offered ? (
+					<PageUpdateBanner version={offered.version} onView={viewOffered} />
 				) : null}
 				<PageFrame ref={frameRef} src={viewUrl} title={title} />
 			</main>

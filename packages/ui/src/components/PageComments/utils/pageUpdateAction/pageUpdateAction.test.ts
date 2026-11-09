@@ -35,6 +35,17 @@ describe("pageUpdateAction", () => {
 		).toBe("offer");
 	});
 
+	test("never swaps for a viewer with no id, even when the publisher is unknown too", () => {
+		expect(
+			pageUpdateAction({
+				shownVersion: 1,
+				nextVersion: 2,
+				publishedBy: undefined,
+				viewerId: undefined,
+			}),
+		).toBe("offer");
+	});
+
 	test("does nothing when the served version did not change", () => {
 		expect(
 			pageUpdateAction({
