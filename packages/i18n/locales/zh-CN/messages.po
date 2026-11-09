@@ -889,6 +889,9 @@ msgstr "{count, plural, other {# 个步骤}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {此仓库中有#个worktree没有对应的工作区，将被导入为工作区。} other {此仓库中有#个worktree没有对应的工作区，将被导入为工作区。}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, other {将 # 个拉取请求加入合并队列?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {添加了#个提交} other {添加了#个提交}}"
 
@@ -1504,6 +1507,15 @@ msgstr "#{0} {1}\n"
 "\n"
 "这将合并到 {2}，且无法在此撤销。"
 
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} 已合并，但此分支仍带有它的提交。"
+
+msgid "#{number} has changes requested."
+msgstr "#{number} 被要求修改。"
+
+msgid "#{number} has conflicts."
+msgstr "#{number} 存在冲突。"
+
 msgid "#{number} is closed without being merged."
 msgstr "#{number} 已关闭且未合并。"
 
@@ -1512,6 +1524,12 @@ msgstr "#{number} 尚未准备好合并。"
 
 msgid "#{number} is still a draft."
 msgstr "#{number} 仍是草稿。"
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} 正在等待必需的检查或规则。"
+
+msgid "#{number} needs a review."
+msgstr "#{number} 需要审查。"
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -2032,6 +2050,9 @@ msgstr "请先在 {computer} 上将 {repositoryName} 添加为项目"
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "请先将 {repositoryName} 添加为此电脑上的项目"
 
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "将 #{prNumber} 加入合并队列?"
+
 msgid "Add a comment…"
 msgstr "添加评论…"
 
@@ -2183,6 +2204,9 @@ msgstr "添加脚本"
 msgid "Add setup commands, one per line..."
 msgstr "添加设置命令，每行一条..."
 
+msgid "Add stack to merge queue"
+msgstr "将堆栈加入合并队列"
+
 msgid "Add tag…"
 msgstr "添加标签…"
 
@@ -2219,8 +2243,14 @@ msgstr "添加到词典"
 msgid "Add to favorites"
 msgstr "添加到收藏"
 
+msgid "Add to merge queue"
+msgstr "加入合并队列"
+
 msgid "Add to project"
 msgstr "添加到项目"
+
+msgid "Add to queue"
+msgstr "加入队列"
 
 msgid "Add to sidebar"
 msgstr "添加到侧边栏"
@@ -2258,9 +2288,15 @@ msgstr "仅在带提示词启动时添加，例如<0>--</0>、<1>--prompt</1>、
 msgid "Added to agent input"
 msgstr "已添加到智能体输入框"
 
+msgid "Added to merge queue"
+msgstr "已加入合并队列"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "向 {organizationName} 添加成员需要付费套餐。你所在组织的套餐由其所有者在 {0} 管理。"
+
+msgid "Adding to queue…"
+msgstr "正在加入队列…"
 
 msgid "Adding..."
 msgstr "正在添加..."
@@ -3522,6 +3558,9 @@ msgstr "变更前"
 msgid "Behavior"
 msgstr "行为"
 
+msgid "Behind base"
+msgstr "落后于基础分支"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "落后main ?个提交，需要变基"
 
@@ -3571,6 +3610,10 @@ msgid "Block content on any page"
 msgstr "屏蔽任何网页上的内容"
 
 msgid "blocked"
+msgstr "已阻止"
+
+msgctxt "pull request status"
+msgid "Blocked"
 msgstr "已阻止"
 
 msgid "Blocked by Branch Rules"
@@ -4261,6 +4304,10 @@ msgstr "查收你的邮箱"
 msgid "Checkbox · Radio · Switch"
 msgstr "复选框 · 单选框 · 开关"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "正在检查"
+
 msgid "Checking agents…"
 msgstr "正在检查智能体…"
 
@@ -4311,6 +4358,9 @@ msgid "Checks completed"
 msgstr "检查完成"
 
 msgid "Checks failed"
+msgstr "检查失败"
+
+msgid "Checks failing"
 msgstr "检查失败"
 
 msgid "Checks passed"
@@ -5141,6 +5191,10 @@ msgstr "退出前确认"
 
 msgid "Confirm switch"
 msgstr "确认切换"
+
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "冲突"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -6058,6 +6112,9 @@ msgstr "无法复制图片"
 msgid "Couldn't copy the screenshot"
 msgstr "无法复制截图"
 
+msgid "Couldn't create stack"
+msgstr "无法创建堆栈"
+
 msgid "Couldn't create the channel"
 msgstr "无法创建频道"
 
@@ -6190,6 +6247,9 @@ msgstr "无法读取该终端的上下文。"
 
 msgid "Couldn't read usage history from this host."
 msgstr "无法从此主机读取用量历史。"
+
+msgid "Couldn't remove from the merge queue"
+msgstr "无法移出合并队列"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "无法移除本地登录"
@@ -6453,6 +6513,9 @@ msgstr "创建项目…"
 
 msgid "Create pull request"
 msgstr "创建拉取请求"
+
+msgid "Create stack"
+msgstr "创建堆栈"
 
 msgid "Create task"
 msgstr "创建任务"
@@ -8019,6 +8082,9 @@ msgstr "每分钟"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "所有目标都在为下一档位发力。按最近 30 天计算。"
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "直到 #{prNumber} 的所有打开的拉取请求会按顺序加入 {base} 的合并队列。轮到它们且检查通过时，GitHub 会合并它们。"
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "每个付费套餐都包含 Paradev Mobile、自动化和优先支持。带云端工作区的套餐为团队提供一个共享的 GB 小时额度池。"
 
@@ -9433,6 +9499,9 @@ msgstr "GitHub App安装已取消。"
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App安装成功！"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub 无法在这里一步合并此堆栈。"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub已连接，但初始同步未能启动。请尝试重新连接。"
 
@@ -9445,8 +9514,14 @@ msgstr "未找到GitHub安装"
 msgid "GitHub integration"
 msgstr "GitHub集成"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub 仍在合并。完成后此处会更新。"
+
 msgid "GitHub issues"
 msgstr "GitHub议题"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "轮到它且检查通过时，GitHub 会合并它。"
 
 msgid "GitHub rate limit reached"
 msgstr "已达到 GitHub 速率限制"
@@ -9459,6 +9534,12 @@ msgstr "包含插件市场文件的 GitHub 仓库。Superset 会将其中的插�
 
 msgid "GitHub sign-in needed"
 msgstr "需要登录 GitHub"
+
+msgid "GitHub stack created"
+msgstr "已创建 GitHub 堆栈"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "此仓库未开启 GitHub 堆栈。"
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "GitHub同步需要Pro套餐。"
@@ -10190,6 +10271,12 @@ msgstr "审查中"
 
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "在{appName}桌面应用中打开“设置 → 远程访问”，开启“允许通过中继远程访问本设备”。"
+
+msgid "In the merge queue"
+msgstr "在合并队列中"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "在合并队列中。轮到它时 GitHub 会合并它。"
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "在Paradev桌面应用中打开<0>设置 → 外观 → 主题</0>。"
@@ -11798,8 +11885,11 @@ msgstr "合并"
 msgid "Merge #{0}?"
 msgstr "合并#{0}？"
 
-msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
-msgstr "请先合并 #{number}。基于基础分支的堆栈一次只能合并一个拉取请求。"
+msgid "Merge #{number} first, or create a GitHub stack to merge these together."
+msgstr "请先合并 #{number}，或创建 GitHub 堆栈将它们一起合并。"
+
+msgid "Merge #{prNumber}?"
+msgstr "合并 #{prNumber}？"
 
 msgid "Merge commit"
 msgstr "合并提交"
@@ -15516,6 +15606,9 @@ msgstr "拉取请求操作"
 msgid "Pull request detail tabs"
 msgstr "拉取请求详情标签页"
 
+msgid "Pull request merged"
+msgstr "拉取请求已合并"
+
 msgid "Pull request not found"
 msgstr "未找到拉取请求"
 
@@ -15596,6 +15689,9 @@ msgstr "队列因使用上限已暂停"
 msgid "Queue paused when Paradev closed"
 msgstr "Paradev 关闭时队列已暂停"
 
+msgid "Queue stack"
+msgstr "将堆栈加入队列"
+
 msgid "Queue work for agents"
 msgstr "为智能体排队安排工作"
 
@@ -15604,6 +15700,9 @@ msgstr "加入队列；按⌘↩引导当前轮次"
 
 msgid "Queued"
 msgstr "排队中"
+
+msgid "Queued · {position}"
+msgstr "排队中 · {position}"
 
 msgid "Queued messages"
 msgstr "排队中的消息"
@@ -16121,6 +16220,9 @@ msgstr "从收藏中移除"
 msgid "Remove from group"
 msgstr "移出分组"
 
+msgid "Remove from queue"
+msgstr "移出队列"
+
 msgid "Remove from Queue"
 msgstr "移出队列"
 
@@ -16201,6 +16303,9 @@ msgstr "已移除 {name}"
 
 msgid "Removed {removedLabel}."
 msgstr "已移除{removedLabel}。"
+
+msgid "Removed from the merge queue"
+msgstr "已移出合并队列"
 
 msgid "Removes this agent from this device only."
 msgstr "仅从此设备上移除该智能体。"
@@ -16547,6 +16652,9 @@ msgstr "资源"
 
 msgid "Response"
 msgstr "响应"
+
+msgid "Restack"
+msgstr "重建堆栈"
 
 msgid "Restart"
 msgstr "重启"
@@ -20087,6 +20195,9 @@ msgstr "该站点的证书已过期"
 msgid "The site's certificate is invalid"
 msgstr "该站点的证书无效"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "打开期间堆栈已变化。请检查后重试。"
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "云端工作区启动的起点 — 一个基础镜像，或你已配置好、想要 fork 的沙箱。"
 
@@ -20146,6 +20257,9 @@ msgstr "主题预览卡片"
 
 msgid "Themes"
 msgstr "主题"
+
+msgid "These are linked by base branch. A GitHub stack merges them in one step."
+msgstr "它们通过基础分支相连。GitHub 堆栈可一步合并它们。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"
@@ -20457,9 +20571,6 @@ msgstr "此个人主页当前繁忙"
 msgid "This project is no longer available on your devices."
 msgstr "这个项目在你的设备上已不可用。"
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "此项目未关联 GitHub 仓库。"
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "此项目仍在使用旧的 config.json。它仍可正常工作；转换为 config.toml 即可使用新的配置节。"
 
@@ -20577,6 +20688,15 @@ msgstr "这将删除<0>{0}</0>并移除其所有成员。此操作无法撤销�
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "这将终止所有运行中的会话并重启终端守护进程。应用会用全新的守护进程重启终端。"
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "这将使用合并提交把 #{prNumber} 合并到 {base}。"
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "这将使用变基把 #{prNumber} 合并到 {base}。"
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "这将使用压缩把 #{prNumber} 合并到 {base}。"
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "这将永久删除该例行任务，并停止之后的运行。"

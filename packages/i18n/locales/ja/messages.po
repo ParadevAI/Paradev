@@ -889,6 +889,9 @@ msgstr "{count, plural, other {#ステップ}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {このリポジトリの#件のワークツリーにワークスペースがありません。ワークスペースとしてインポートされます。} other {このリポジトリの#件のワークツリーにワークスペースがありません。ワークスペースとしてインポートされます。}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, other {# 件のプルリクエストをマージキューに追加しますか?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {が#件のコミットを追加しました} other {が#件のコミットを追加しました}}"
 
@@ -1504,6 +1507,15 @@ msgstr "#{0} {1}\n"
 "\n"
 "これは {2} にマージされ、ここでは取り消せません。"
 
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} はマージ済みですが、このブランチにはまだそのコミットが残っています。"
+
+msgid "#{number} has changes requested."
+msgstr "#{number} に変更リクエストがあります。"
+
+msgid "#{number} has conflicts."
+msgstr "#{number} にコンフリクトがあります。"
+
 msgid "#{number} is closed without being merged."
 msgstr "#{number} はマージされずにクローズされています。"
 
@@ -1512,6 +1524,12 @@ msgstr "#{number} はまだマージできる状態ではありません。"
 
 msgid "#{number} is still a draft."
 msgstr "#{number} はまだドラフトです。"
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} は必須のチェックまたはルールを待っています。"
+
+msgid "#{number} needs a review."
+msgstr "#{number} にはレビューが必要です。"
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -2032,6 +2050,9 @@ msgstr "先に {computer} で {repositoryName} をプロジェクトとして追
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "まず {repositoryName} をこのコンピューターのプロジェクトとして追加してください"
 
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "#{prNumber} をマージキューに追加しますか?"
+
 msgid "Add a comment…"
 msgstr "コメントを追加…"
 
@@ -2183,6 +2204,9 @@ msgstr "スクリプトを追加"
 msgid "Add setup commands, one per line..."
 msgstr "セットアップコマンドを1行に1つずつ追加..."
 
+msgid "Add stack to merge queue"
+msgstr "スタックをマージキューに追加"
+
 msgid "Add tag…"
 msgstr "タグを追加…"
 
@@ -2219,8 +2243,14 @@ msgstr "辞書に追加"
 msgid "Add to favorites"
 msgstr "お気に入りに追加"
 
+msgid "Add to merge queue"
+msgstr "マージキューに追加"
+
 msgid "Add to project"
 msgstr "プロジェクトに追加"
+
+msgid "Add to queue"
+msgstr "キューに追加"
 
 msgid "Add to sidebar"
 msgstr "サイドバーに追加"
@@ -2258,9 +2288,15 @@ msgstr "プロンプト付きで起動するときのみ追加されます — �
 msgid "Added to agent input"
 msgstr "エージェントの入力欄に追加しました"
 
+msgid "Added to merge queue"
+msgstr "マージキューに追加しました"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName} にメンバーを追加するには有料プランが必要です。組織のプランはオーナーが {0} で管理しています。"
+
+msgid "Adding to queue…"
+msgstr "キューに追加中…"
 
 msgid "Adding..."
 msgstr "追加中..."
@@ -3522,6 +3558,9 @@ msgstr "変更前"
 msgid "Behavior"
 msgstr "全般"
 
+msgid "Behind base"
+msgstr "ベースより遅れています"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "mainより?コミット遅れています。リベースが必要です"
 
@@ -3572,6 +3611,10 @@ msgstr "すべてのページでコンテンツをブロックする"
 
 msgid "blocked"
 msgstr "ブロック"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "ブロック中"
 
 msgid "Blocked by Branch Rules"
 msgstr "ブランチルールによりブロック"
@@ -4261,6 +4304,10 @@ msgstr "受信トレイを確認してください"
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "確認中"
+
 msgid "Checking agents…"
 msgstr "エージェントを確認中…"
 
@@ -4312,6 +4359,9 @@ msgstr "チェック完了"
 
 msgid "Checks failed"
 msgstr "チェックが失敗しました"
+
+msgid "Checks failing"
+msgstr "チェック失敗"
 
 msgid "Checks passed"
 msgstr "チェックが成功しました"
@@ -5141,6 +5191,10 @@ msgstr "終了前に確認"
 
 msgid "Confirm switch"
 msgstr "変更を確定"
+
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "コンフリクト"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -6058,6 +6112,9 @@ msgstr "画像をコピーできませんでした"
 msgid "Couldn't copy the screenshot"
 msgstr "スクリーンショットをコピーできませんでした"
 
+msgid "Couldn't create stack"
+msgstr "スタックを作成できませんでした"
+
 msgid "Couldn't create the channel"
 msgstr "チャンネルを作成できませんでした"
 
@@ -6190,6 +6247,9 @@ msgstr "このターミナルのコンテキストを読み取れませんでし
 
 msgid "Couldn't read usage history from this host."
 msgstr "このホストから使用履歴を読み取れませんでした。"
+
+msgid "Couldn't remove from the merge queue"
+msgstr "マージキューから外せませんでした"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "ローカルのサインインを削除できませんでした"
@@ -6453,6 +6513,9 @@ msgstr "プロジェクトを作成…"
 
 msgid "Create pull request"
 msgstr "プルリクエストを作成"
+
+msgid "Create stack"
+msgstr "スタックを作成"
 
 msgid "Create task"
 msgstr "タスクを作成"
@@ -8019,6 +8082,9 @@ msgstr "毎分"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "すべての目標が次の段に向けて力を発揮しています。直近30日間で計測。"
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "#{prNumber} までのすべてのオープンなプルリクエストが、順番に {base} のマージキューに入ります。順番が来てチェックが通ると GitHub がマージします。"
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "すべての有料プランに Paradev Mobile、オートメーション、優先サポートが含まれます。クラウドワークスペース付きのプランでは、チームで共有する GB 時間のプールが付きます。"
 
@@ -9433,6 +9499,9 @@ msgstr "GitHub Appのインストールがキャンセルされました。"
 msgid "GitHub App installed successfully!"
 msgstr "GitHub Appをインストールしました!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub はここではこのスタックを 1 回でマージできません。"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHubは接続しましたが、初回同期を開始できませんでした。再接続をお試しください。"
 
@@ -9445,8 +9514,14 @@ msgstr "GitHubのインストールが見つかりません"
 msgid "GitHub integration"
 msgstr "GitHub連携"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub がまだマージしています。完了すると更新されます。"
+
 msgid "GitHub issues"
 msgstr "GitHub issue"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "順番が来てチェックが通ると GitHub がマージします。"
 
 msgid "GitHub rate limit reached"
 msgstr "GitHub のレート制限に達しました"
@@ -9459,6 +9534,12 @@ msgstr "プラグインのマーケットプレイスファイルを含む GitHu
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub へのサインインが必要です"
+
+msgid "GitHub stack created"
+msgstr "GitHub スタックを作成しました"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "このリポジトリでは GitHub スタックが有効になっていません。"
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "GitHubの同期にはProプランが必要です。"
@@ -10190,6 +10271,12 @@ msgstr "レビュー中"
 
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "{appName}デスクトップアプリで設定 → リモートアクセスを開き、「リレー経由でこのデバイスへのリモートアクセスを許可」をオンにしてください。"
+
+msgid "In the merge queue"
+msgstr "マージキュー内"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "マージキュー内です。順番が来ると GitHub がマージします。"
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Paradevデスクトップアプリで<0>設定 → 外観 → テーマ</0>を開きます。"
@@ -11798,8 +11885,11 @@ msgstr "マージ"
 msgid "Merge #{0}?"
 msgstr "#{0}をマージしますか?"
 
-msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
-msgstr "先に #{number} をマージしてください。ベースブランチで組んだスタックは 1 件ずつマージされます。"
+msgid "Merge #{number} first, or create a GitHub stack to merge these together."
+msgstr "先に #{number} をマージするか、GitHub スタックを作成してまとめてマージしてください。"
+
+msgid "Merge #{prNumber}?"
+msgstr "#{prNumber} をマージしますか?"
 
 msgid "Merge commit"
 msgstr "マージコミット"
@@ -15516,6 +15606,9 @@ msgstr "プルリクエストの操作"
 msgid "Pull request detail tabs"
 msgstr "プルリクエスト詳細のタブ"
 
+msgid "Pull request merged"
+msgstr "プルリクエストをマージしました"
+
 msgid "Pull request not found"
 msgstr "プルリクエストが見つかりません"
 
@@ -15596,6 +15689,9 @@ msgstr "使用量の上限によりキューを一時停止しました"
 msgid "Queue paused when Paradev closed"
 msgstr "Paradev の終了によりキューを一時停止しました"
 
+msgid "Queue stack"
+msgstr "スタックをキューに追加"
+
 msgid "Queue work for agents"
 msgstr "エージェントの作業をキューに入れる"
 
@@ -15604,6 +15700,9 @@ msgstr "キューに追加。⌘↩で実行中のターンを軌道修正"
 
 msgid "Queued"
 msgstr "待機中"
+
+msgid "Queued · {position}"
+msgstr "待機中 · {position}"
 
 msgid "Queued messages"
 msgstr "キュー内のメッセージ"
@@ -16121,6 +16220,9 @@ msgstr "お気に入りから削除"
 msgid "Remove from group"
 msgstr "グループから外す"
 
+msgid "Remove from queue"
+msgstr "キューから外す"
+
 msgid "Remove from Queue"
 msgstr "キューから削除"
 
@@ -16201,6 +16303,9 @@ msgstr "{name}を削除しました"
 
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel}を削除しました。"
+
+msgid "Removed from the merge queue"
+msgstr "マージキューから外しました"
 
 msgid "Removes this agent from this device only."
 msgstr "このデバイスからのみエージェントを削除します。"
@@ -16547,6 +16652,9 @@ msgstr "リソース"
 
 msgid "Response"
 msgstr "レスポンス"
+
+msgid "Restack"
+msgstr "リスタック"
 
 msgid "Restart"
 msgstr "再起動"
@@ -20087,6 +20195,9 @@ msgstr "サイトの証明書の有効期限が切れています"
 msgid "The site's certificate is invalid"
 msgstr "サイトの証明書が無効です"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "開いている間にスタックが変わりました。確認してからもう一度お試しください。"
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "クラウドワークスペースの起動元となる出発点 — ベースイメージ、または設定済みでフォークしたいサンドボックス。"
 
@@ -20146,6 +20257,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "テーマ"
+
+msgid "These are linked by base branch. A GitHub stack merges them in one step."
+msgstr "ベースブランチでつながっています。GitHub スタックにすると 1 回でマージできます。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "これらのコマンドはワークスペース作成時に自動的に実行されます。<0>ドキュメントを読む<1/></0>"
@@ -20457,9 +20571,6 @@ msgstr "このプロフィールは現在混み合っています"
 msgid "This project is no longer available on your devices."
 msgstr "このプロジェクトはお使いのデバイスでは利用できなくなりました。"
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "このプロジェクトは GitHub リポジトリにリンクされていません。"
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "このプロジェクトはまだ以前の config.json を使っています。引き続き動作しますが、新しいセクションを使うには config.toml に変換してください。"
 
@@ -20577,6 +20688,15 @@ msgstr "<0>{0}</0>を削除し、すべてのメンバーを外します。こ�
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "実行中のすべてのセッションを終了し、ターミナルデーモンを再起動します。アプリは新しいデーモンでターミナルを再起動します。"
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber} をマージコミットで {base} にマージします。"
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "#{prNumber} をリベースで {base} にマージします。"
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "#{prNumber} をスカッシュで {base} にマージします。"
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "ルーティンは完全に削除され、今後の実行は停止します。"

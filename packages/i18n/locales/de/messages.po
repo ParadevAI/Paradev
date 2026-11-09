@@ -889,6 +889,9 @@ msgstr "{count, plural, one {# Schritt} other {# Schritte}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# Worktree in diesem Repository hat keinen Arbeitsbereich. Er wird als Arbeitsbereich importiert.} other {# Worktrees in diesem Repository haben keinen Arbeitsbereich. Sie werden als Arbeitsbereiche importiert.}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, one {# Pull Request zur Merge-Warteschlange hinzufügen?} other {# Pull Requests zur Merge-Warteschlange hinzufügen?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {hat einen Commit hinzugefügt} other {hat # Commits hinzugefügt}}"
 
@@ -1504,6 +1507,15 @@ msgstr "#{0} {1}\n"
 "\n"
 "Dies wird in {2} gemergt und kann hier nicht rückgängig gemacht werden."
 
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} wurde zusammengeführt, und dieser Branch enthält noch seine Commits."
+
+msgid "#{number} has changes requested."
+msgstr "Bei #{number} wurden Änderungen angefordert."
+
+msgid "#{number} has conflicts."
+msgstr "#{number} hat Konflikte."
+
 msgid "#{number} is closed without being merged."
 msgstr "#{number} wurde geschlossen, ohne zusammengeführt zu werden."
 
@@ -1512,6 +1524,12 @@ msgstr "#{number} ist nicht bereit zum Zusammenführen."
 
 msgid "#{number} is still a draft."
 msgstr "#{number} ist noch ein Entwurf."
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} wartet auf einen erforderlichen Check oder eine Regel."
+
+msgid "#{number} needs a review."
+msgstr "#{number} braucht ein Review."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -2032,6 +2050,9 @@ msgstr "Füge {repositoryName} zuerst als Projekt auf {computer} hinzu"
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Füge {repositoryName} zuerst als Projekt auf diesem Computer hinzu"
 
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "#{prNumber} zur Merge-Warteschlange hinzufügen?"
+
 msgid "Add a comment…"
 msgstr "Kommentar hinzufügen…"
 
@@ -2183,6 +2204,9 @@ msgstr "Skript hinzufügen"
 msgid "Add setup commands, one per line..."
 msgstr "Setup-Befehle hinzufügen, einer pro Zeile..."
 
+msgid "Add stack to merge queue"
+msgstr "Stack zur Merge-Warteschlange hinzufügen"
+
 msgid "Add tag…"
 msgstr "Tag hinzufügen…"
 
@@ -2219,8 +2243,14 @@ msgstr "Zum Wörterbuch hinzufügen"
 msgid "Add to favorites"
 msgstr "Zu Favoriten hinzufügen"
 
+msgid "Add to merge queue"
+msgstr "Zur Merge-Warteschlange hinzufügen"
+
 msgid "Add to project"
 msgstr "Zu Projekt hinzufügen"
+
+msgid "Add to queue"
+msgstr "Zur Warteschlange"
 
 msgid "Add to sidebar"
 msgstr "Zur Seitenleiste hinzufügen"
@@ -2258,9 +2288,15 @@ msgstr "Nur beim Start mit Prompt ergänzt — z. B. <0>--</0>, <1>--prompt</1>,
 msgid "Added to agent input"
 msgstr "Zur Agenten-Eingabe hinzugefügt"
 
+msgid "Added to merge queue"
+msgstr "Zur Merge-Warteschlange hinzugefügt"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Um Personen zu {organizationName} hinzuzufügen, ist ein kostenpflichtiger Tarif nötig. Den Tarif deiner Organisation verwaltet ihr Inhaber auf {0}."
+
+msgid "Adding to queue…"
+msgstr "Wird zur Warteschlange hinzugefügt…"
 
 msgid "Adding..."
 msgstr "Wird hinzugefügt..."
@@ -3522,6 +3558,9 @@ msgstr "Vorher"
 msgid "Behavior"
 msgstr "Verhalten"
 
+msgid "Behind base"
+msgstr "Hinter der Basis"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "? Commits hinter main, Rebase nötig"
 
@@ -3572,6 +3611,10 @@ msgstr "Inhalte auf jeder Seite blockieren"
 
 msgid "blocked"
 msgstr "blockiert"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "Blockiert"
 
 msgid "Blocked by Branch Rules"
 msgstr "Durch Branch-Regeln blockiert"
@@ -4261,6 +4304,10 @@ msgstr "Sieh in dein Postfach"
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "Wird geprüft"
+
 msgid "Checking agents…"
 msgstr "Agenten werden geprüft…"
 
@@ -4312,6 +4359,9 @@ msgstr "Prüfungen abgeschlossen"
 
 msgid "Checks failed"
 msgstr "Prüfungen fehlgeschlagen"
+
+msgid "Checks failing"
+msgstr "Checks schlagen fehl"
 
 msgid "Checks passed"
 msgstr "Prüfungen bestanden"
@@ -5141,6 +5191,10 @@ msgstr "Vor dem Beenden bestätigen"
 
 msgid "Confirm switch"
 msgstr "Wechsel bestätigen"
+
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "Konflikte"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -6058,6 +6112,9 @@ msgstr "Bild konnte nicht kopiert werden"
 msgid "Couldn't copy the screenshot"
 msgstr "Screenshot konnte nicht kopiert werden"
 
+msgid "Couldn't create stack"
+msgstr "Stack konnte nicht erstellt werden"
+
 msgid "Couldn't create the channel"
 msgstr "Kanal konnte nicht erstellt werden"
 
@@ -6190,6 +6247,9 @@ msgstr "Der Kontext dieses Terminals konnte nicht gelesen werden."
 
 msgid "Couldn't read usage history from this host."
 msgstr "Der Nutzungsverlauf konnte von diesem Host nicht gelesen werden."
+
+msgid "Couldn't remove from the merge queue"
+msgstr "Konnte nicht aus der Merge-Warteschlange entfernt werden"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Die lokale Anmeldung konnte nicht entfernt werden"
@@ -6453,6 +6513,9 @@ msgstr "Projekt erstellen…"
 
 msgid "Create pull request"
 msgstr "Pull Request erstellen"
+
+msgid "Create stack"
+msgstr "Stack erstellen"
 
 msgid "Create task"
 msgstr "Aufgabe erstellen"
@@ -8019,6 +8082,9 @@ msgstr "Jede Minute"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Alle Ziele tragen zur nächsten Stufe bei. Gemessen über die letzten 30 Tage."
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "Jeder offene Pull Request bis #{prNumber} kommt der Reihe nach in die Merge-Warteschlange für {base}. GitHub führt sie zusammen, wenn sie an der Reihe sind und ihre Checks bestehen."
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "Jeder kostenpflichtige Plan enthält Paradev Mobile, Automatisierungen und bevorzugten Support. Pläne mit Cloud-Workspaces geben deinem Team einen gemeinsamen Pool an GB-Stunden."
 
@@ -9433,6 +9499,9 @@ msgstr "Die Installation der GitHub-App wurde abgebrochen."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub-App erfolgreich installiert!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub kann diesen Stack hier nicht in einem Schritt zusammenführen."
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub verbunden, aber die erste Synchronisierung konnte nicht starten. Bitte verbinde es erneut."
 
@@ -9445,8 +9514,14 @@ msgstr "GitHub-Installation nicht gefunden"
 msgid "GitHub integration"
 msgstr "GitHub-Integration"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub führt noch zusammen. Das aktualisiert sich, sobald es fertig ist."
+
 msgid "GitHub issues"
 msgstr "GitHub-Issues"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "GitHub führt ihn zusammen, wenn er an der Reihe ist und seine Checks bestehen."
 
 msgid "GitHub rate limit reached"
 msgstr "GitHub-Ratenlimit erreicht"
@@ -9459,6 +9534,12 @@ msgstr "GitHub-Repositories mit einer Plugin-Marketplace-Datei. Superset synchro
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub-Anmeldung erforderlich"
+
+msgid "GitHub stack created"
+msgstr "GitHub-Stack erstellt"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "GitHub-Stacks sind für dieses Repository nicht aktiviert."
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "Die GitHub-Synchronisierung erfordert den Pro-Plan."
@@ -10190,6 +10271,12 @@ msgstr "In Review"
 
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "Öffne in der {appName}-Desktop-App Einstellungen → Fernzugriff und aktiviere „Fernzugriff auf dieses Gerät über den Relay erlauben“."
+
+msgid "In the merge queue"
+msgstr "In der Merge-Warteschlange"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "In der Merge-Warteschlange. GitHub führt ihn zusammen, wenn er an der Reihe ist."
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Öffne in der Paradev-Desktop-App <0>Einstellungen → Darstellung → Theme</0>."
@@ -11798,8 +11885,11 @@ msgstr "Zusammenführen"
 msgid "Merge #{0}?"
 msgstr "#{0} zusammenführen?"
 
-msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
-msgstr "Führe zuerst #{number} zusammen. Ein Stack aus Basis-Branches wird ein Pull Request nach dem anderen zusammengeführt."
+msgid "Merge #{number} first, or create a GitHub stack to merge these together."
+msgstr "Führe zuerst #{number} zusammen oder erstelle einen GitHub-Stack, um sie gemeinsam zusammenzuführen."
+
+msgid "Merge #{prNumber}?"
+msgstr "#{prNumber} zusammenführen?"
 
 msgid "Merge commit"
 msgstr "Merge-Commit"
@@ -15516,6 +15606,9 @@ msgstr "Pull-Request-Aktionen"
 msgid "Pull request detail tabs"
 msgstr "Tabs der Pull-Request-Details"
 
+msgid "Pull request merged"
+msgstr "Pull Request zusammengeführt"
+
 msgid "Pull request not found"
 msgstr "Pull Request nicht gefunden"
 
@@ -15596,6 +15689,9 @@ msgstr "Warteschlange durch das Nutzungslimit pausiert"
 msgid "Queue paused when Paradev closed"
 msgstr "Warteschlange pausiert, als Paradev geschlossen wurde"
 
+msgid "Queue stack"
+msgstr "Stack einreihen"
+
 msgid "Queue work for agents"
 msgstr "Arbeit für Agenten einreihen"
 
@@ -15604,6 +15700,9 @@ msgstr "In die Warteschlange; ⌘↩ steuert den laufenden Zug"
 
 msgid "Queued"
 msgstr "In Warteschlange"
+
+msgid "Queued · {position}"
+msgstr "In Warteschlange · {position}"
 
 msgid "Queued messages"
 msgstr "Nachrichten in Warteschlange"
@@ -16121,6 +16220,9 @@ msgstr "Aus Favoriten entfernen"
 msgid "Remove from group"
 msgstr "Aus Gruppe entfernen"
 
+msgid "Remove from queue"
+msgstr "Aus der Warteschlange entfernen"
+
 msgid "Remove from Queue"
 msgstr "Aus Warteschlange entfernen"
 
@@ -16201,6 +16303,9 @@ msgstr "{name} entfernt"
 
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel} entfernt."
+
+msgid "Removed from the merge queue"
+msgstr "Aus der Merge-Warteschlange entfernt"
 
 msgid "Removes this agent from this device only."
 msgstr "Entfernt diesen Agenten nur von diesem Gerät."
@@ -16547,6 +16652,9 @@ msgstr "Ressourcen"
 
 msgid "Response"
 msgstr "Response"
+
+msgid "Restack"
+msgstr "Restack"
 
 msgid "Restart"
 msgstr "Neu starten"
@@ -20087,6 +20195,9 @@ msgstr "Das Zertifikat der Website ist abgelaufen"
 msgid "The site's certificate is invalid"
 msgstr "Das Zertifikat der Website ist ungültig"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "Der Stack hat sich inzwischen geändert. Prüfe ihn und versuche es erneut."
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Der Ausgangspunkt, von dem ein Cloud-Arbeitsbereich startet — ein Basis-Image oder eine Sandbox, die du konfiguriert hast und forken möchtest."
 
@@ -20146,6 +20257,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Themes"
+
+msgid "These are linked by base branch. A GitHub stack merges them in one step."
+msgstr "Diese sind über ihre Basis-Branches verknüpft. Ein GitHub-Stack führt sie in einem Schritt zusammen."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Diese Befehle laufen automatisch, wenn ein Arbeitsbereich erstellt wird. <0>Zur Doku<1/></0>"
@@ -20457,9 +20571,6 @@ msgstr "Dieses Profil ist gerade stark ausgelastet"
 msgid "This project is no longer available on your devices."
 msgstr "Dieses Projekt ist auf deinen Geräten nicht mehr verfügbar."
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "Dieses Projekt ist mit keinem GitHub-Repository verknüpft."
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "Dieses Projekt verwendet noch die ältere config.json. Sie funktioniert weiterhin; wandle sie in config.toml um, um die neuen Abschnitte zu nutzen."
 
@@ -20577,6 +20688,15 @@ msgstr "Damit werden <0>{0}</0> gelöscht und alle Mitglieder entfernt. Das läs
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Damit werden alle laufenden Sitzungen beendet und der Terminal-Daemon neu gestartet. Die App startet Terminals mit einem frischen Daemon neu."
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "Damit wird #{prNumber} per Merge-Commit in {base} zusammengeführt."
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "Damit wird #{prNumber} per Rebase in {base} zusammengeführt."
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "Damit wird #{prNumber} per Squash in {base} zusammengeführt."
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "Die Routine wird endgültig gelöscht und künftige Durchläufe werden gestoppt."

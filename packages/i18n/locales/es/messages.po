@@ -889,6 +889,9 @@ msgstr "{count, plural, one {# paso} other {# pasos}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree de este repositorio no tiene espacio de trabajo. Se importará como espacio de trabajo.} other {# worktrees de este repositorio no tienen espacio de trabajo. Se importarán como espacios de trabajo.}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, one {¿Añadir # pull request a la cola de fusión?} other {¿Añadir # pull requests a la cola de fusión?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {añadió un commit} other {añadió # commits}}"
 
@@ -1504,6 +1507,15 @@ msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
 
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} se fusionó y esta rama todavía lleva sus commits."
+
+msgid "#{number} has changes requested."
+msgstr "#{number} tiene cambios solicitados."
+
+msgid "#{number} has conflicts."
+msgstr "#{number} tiene conflictos."
+
 msgid "#{number} is closed without being merged."
 msgstr "#{number} está cerrada sin haberse fusionado."
 
@@ -1512,6 +1524,12 @@ msgstr "#{number} no está lista para fusionarse."
 
 msgid "#{number} is still a draft."
 msgstr "#{number} sigue siendo un borrador."
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} está esperando una comprobación o regla obligatoria."
+
+msgid "#{number} needs a review."
+msgstr "#{number} necesita una revisión."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -2032,6 +2050,9 @@ msgstr "Primero añade {repositoryName} como proyecto en {computer}"
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Primero añade {repositoryName} como proyecto en este equipo"
 
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "¿Añadir #{prNumber} a la cola de fusión?"
+
 msgid "Add a comment…"
 msgstr "Añade un comentario…"
 
@@ -2183,6 +2204,9 @@ msgstr "Añadir script"
 msgid "Add setup commands, one per line..."
 msgstr "Añade comandos de setup, uno por línea..."
 
+msgid "Add stack to merge queue"
+msgstr "Añadir pila a la cola de fusión"
+
 msgid "Add tag…"
 msgstr "Añadir etiqueta…"
 
@@ -2219,8 +2243,14 @@ msgstr "Añadir al diccionario"
 msgid "Add to favorites"
 msgstr "Añadir a favoritos"
 
+msgid "Add to merge queue"
+msgstr "Añadir a la cola de fusión"
+
 msgid "Add to project"
 msgstr "Añadir a un proyecto"
+
+msgid "Add to queue"
+msgstr "Añadir a la cola"
 
 msgid "Add to sidebar"
 msgstr "Añadir a la barra lateral"
@@ -2258,9 +2288,15 @@ msgstr "Se añaden solo al lanzar con un prompt, p. ej. <0>--</0>, <1>--prompt</
 msgid "Added to agent input"
 msgstr "Añadido a la entrada del agente"
 
+msgid "Added to merge queue"
+msgstr "Añadida a la cola de fusión"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Añadir personas a {organizationName} requiere un plan de pago. El propietario de tu organización gestiona su plan en {0}."
+
+msgid "Adding to queue…"
+msgstr "Añadiendo a la cola…"
 
 msgid "Adding..."
 msgstr "Añadiendo..."
@@ -3522,6 +3558,9 @@ msgstr "Antes"
 msgid "Behavior"
 msgstr "Comportamiento"
 
+msgid "Behind base"
+msgstr "Por detrás de la base"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "? commits por detrás de main, necesita rebase"
 
@@ -3572,6 +3611,10 @@ msgstr "Bloquear contenido en cualquier página"
 
 msgid "blocked"
 msgstr "bloqueada"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "Bloqueada"
 
 msgid "Blocked by Branch Rules"
 msgstr "Bloqueada por reglas de rama"
@@ -4261,6 +4304,10 @@ msgstr "Revisa tu bandeja de entrada"
 msgid "Checkbox · Radio · Switch"
 msgstr "Casilla · Radio · Interruptor"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "Comprobando"
+
 msgid "Checking agents…"
 msgstr "Comprobando agentes…"
 
@@ -4311,6 +4358,9 @@ msgid "Checks completed"
 msgstr "Comprobaciones completadas"
 
 msgid "Checks failed"
+msgstr "Comprobaciones fallidas"
+
+msgid "Checks failing"
 msgstr "Comprobaciones fallidas"
 
 msgid "Checks passed"
@@ -5141,6 +5191,10 @@ msgstr "Confirmar antes de salir"
 
 msgid "Confirm switch"
 msgstr "Confirmar cambio"
+
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "Conflictos"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -6058,6 +6112,9 @@ msgstr "No se pudo copiar la imagen"
 msgid "Couldn't copy the screenshot"
 msgstr "No se pudo copiar la captura de pantalla"
 
+msgid "Couldn't create stack"
+msgstr "No se pudo crear la pila"
+
 msgid "Couldn't create the channel"
 msgstr "No se pudo crear el canal"
 
@@ -6190,6 +6247,9 @@ msgstr "No se pudo leer el contexto de este terminal."
 
 msgid "Couldn't read usage history from this host."
 msgstr "No se pudo leer el historial de uso de este host."
+
+msgid "Couldn't remove from the merge queue"
+msgstr "No se pudo quitar de la cola de fusión"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "No se pudo eliminar el inicio de sesión local"
@@ -6453,6 +6513,9 @@ msgstr "Crear proyecto…"
 
 msgid "Create pull request"
 msgstr "Crear pull request"
+
+msgid "Create stack"
+msgstr "Crear pila"
 
 msgid "Create task"
 msgstr "Crear tarea"
@@ -8019,6 +8082,9 @@ msgstr "Cada minuto"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Todos los objetivos aportan lo suyo para el siguiente escalón. Medido en los últimos 30 días."
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "Cada pull request abierta hasta #{prNumber} entra en orden en la cola de fusión de {base}. GitHub las fusiona cuando llega su turno y pasan sus comprobaciones."
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "Todos los planes de pago incluyen Paradev Mobile, automatizaciones y soporte prioritario. Los planes con espacios de trabajo en la nube dan a tu equipo un fondo compartido de GB-horas."
 
@@ -9433,6 +9499,9 @@ msgstr "Se canceló la instalación de la GitHub App."
 msgid "GitHub App installed successfully!"
 msgstr "¡GitHub App instalada correctamente!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub no puede fusionar esta pila en un solo paso aquí."
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub está conectado, pero la sincronización inicial no pudo empezar. Prueba a volver a conectarlo."
 
@@ -9445,8 +9514,14 @@ msgstr "No se encontró la instalación de GitHub"
 msgid "GitHub integration"
 msgstr "Integración con GitHub"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub sigue fusionando. Esto se actualizará cuando termine."
+
 msgid "GitHub issues"
 msgstr "Issues de GitHub"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "GitHub la fusiona cuando llega su turno y pasan sus comprobaciones."
 
 msgid "GitHub rate limit reached"
 msgstr "Límite de peticiones de GitHub alcanzado"
@@ -9459,6 +9534,12 @@ msgstr "Repositorios de GitHub con un archivo de marketplace de plugins. Superse
 
 msgid "GitHub sign-in needed"
 msgstr "Se requiere iniciar sesión en GitHub"
+
+msgid "GitHub stack created"
+msgstr "Pila de GitHub creada"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "Las pilas de GitHub no están activadas en este repositorio."
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "La sincronización de GitHub requiere el plan Pro."
@@ -10190,6 +10271,12 @@ msgstr "En revisión"
 
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "En la app de escritorio de {appName}, abre Configuración → Acceso remoto y activa “Permitir el acceso remoto a este dispositivo a través del relay”."
+
+msgid "In the merge queue"
+msgstr "En la cola de fusión"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "En la cola de fusión. GitHub la fusiona cuando llega su turno."
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "En la app de escritorio de Paradev, abre <0>Configuración → Apariencia → Tema</0>."
@@ -11798,8 +11885,11 @@ msgstr "Fusionar"
 msgid "Merge #{0}?"
 msgstr "¿Fusionar #{0}?"
 
-msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
-msgstr "Fusiona #{number} primero. Una pila basada en ramas base se fusiona una pull request a la vez."
+msgid "Merge #{number} first, or create a GitHub stack to merge these together."
+msgstr "Fusiona primero #{number}, o crea una pila de GitHub para fusionarlas juntas."
+
+msgid "Merge #{prNumber}?"
+msgstr "¿Fusionar #{prNumber}?"
 
 msgid "Merge commit"
 msgstr "Commit de fusión"
@@ -15516,6 +15606,9 @@ msgstr "Acciones de la pull request"
 msgid "Pull request detail tabs"
 msgstr "Pestañas del detalle de la pull request"
 
+msgid "Pull request merged"
+msgstr "Pull request fusionada"
+
 msgid "Pull request not found"
 msgstr "Pull request no encontrada"
 
@@ -15596,6 +15689,9 @@ msgstr "Cola en pausa por el límite de uso"
 msgid "Queue paused when Paradev closed"
 msgstr "Cola en pausa al cerrarse Paradev"
 
+msgid "Queue stack"
+msgstr "Encolar pila"
+
 msgid "Queue work for agents"
 msgstr "Pon trabajo en cola para los agentes"
 
@@ -15604,6 +15700,9 @@ msgstr "En cola; ⌘↩ para redirigir el turno en curso"
 
 msgid "Queued"
 msgstr "En cola"
+
+msgid "Queued · {position}"
+msgstr "En cola · {position}"
 
 msgid "Queued messages"
 msgstr "Mensajes en cola"
@@ -16121,6 +16220,9 @@ msgstr "Quitar de favoritos"
 msgid "Remove from group"
 msgstr "Quitar del grupo"
 
+msgid "Remove from queue"
+msgstr "Quitar de la cola"
+
 msgid "Remove from Queue"
 msgstr "Quitar de la cola"
 
@@ -16201,6 +16303,9 @@ msgstr "Se quitó a {name}"
 
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel} eliminada."
+
+msgid "Removed from the merge queue"
+msgstr "Quitada de la cola de fusión"
 
 msgid "Removes this agent from this device only."
 msgstr "Quita este agente solo de este dispositivo."
@@ -16547,6 +16652,9 @@ msgstr "Recursos"
 
 msgid "Response"
 msgstr "Respuesta"
+
+msgid "Restack"
+msgstr "Reapilar"
 
 msgid "Restart"
 msgstr "Reiniciar"
@@ -20087,6 +20195,9 @@ msgstr "El certificado del sitio ha caducado"
 msgid "The site's certificate is invalid"
 msgstr "El certificado del sitio no es válido"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "La pila cambió mientras esto estaba abierto. Revísala e inténtalo de nuevo."
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "El punto de partida desde el que arranca un espacio de trabajo en la nube: una imagen base o un sandbox que ya has configurado y quieres forkear."
 
@@ -20146,6 +20257,9 @@ msgstr "Tarjeta de vista previa del tema"
 
 msgid "Themes"
 msgstr "Temas"
+
+msgid "These are linked by base branch. A GitHub stack merges them in one step."
+msgstr "Están enlazadas por su rama base. Una pila de GitHub las fusiona en un solo paso."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Estos comandos se ejecutan automáticamente al crear un espacio de trabajo. <0>Consulta la documentación<1/></0>"
@@ -20457,9 +20571,6 @@ msgstr "Este perfil está saturado ahora mismo"
 msgid "This project is no longer available on your devices."
 msgstr "Este proyecto ya no está disponible en tus dispositivos."
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "Este proyecto no está vinculado a un repositorio de GitHub."
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "Este proyecto aún usa el antiguo config.json. Sigue funcionando; conviértelo a config.toml para usar las nuevas secciones."
 
@@ -20577,6 +20688,15 @@ msgstr "Esto eliminará <0>{0}</0> y quitará a todos sus miembros. No se puede 
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Esto terminará todas las sesiones en marcha y reiniciará el daemon de terminal. La app reiniciará las terminales con un daemon nuevo."
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "Esto fusionará #{prNumber} en {base} usando un commit de fusión."
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "Esto fusionará #{prNumber} en {base} usando rebase."
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "Esto fusionará #{prNumber} en {base} usando squash."
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "Esto eliminará la rutina de forma permanente y detendrá las ejecuciones futuras."

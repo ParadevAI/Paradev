@@ -883,6 +883,9 @@ msgstr "{count, plural, one {# крок} few {# кроки} many {# кроків
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree у цьому репозиторії не має робочого простору. Його буде імпортовано як робочий простір.} few {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} many {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} other {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, one {Додати # пул-реквест до черги злиття?} few {Додати # пул-реквести до черги злиття?} many {Додати # пул-реквестів до черги злиття?} other {Додати # пул-реквесту до черги злиття?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, =1 {додав(-ла) коміт} one {додав(-ла) # коміт} few {додав(-ла) # коміти} many {додав(-ла) # комітів} other {додав(-ла) # коміту}}"
 
@@ -1498,6 +1501,15 @@ msgstr "#{0} {1}\n"
 "\n"
 "PR буде злито в {2}, і тут це не можна скасувати."
 
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} злито, але ця гілка досі містить його коміти."
+
+msgid "#{number} has changes requested."
+msgstr "У #{number} запитано зміни."
+
+msgid "#{number} has conflicts."
+msgstr "У #{number} є конфлікти."
+
 msgid "#{number} is closed without being merged."
 msgstr "#{number} закрито без злиття."
 
@@ -1506,6 +1518,12 @@ msgstr "#{number} ще не готовий до злиття."
 
 msgid "#{number} is still a draft."
 msgstr "#{number} досі чернетка."
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} чекає на обов'язкову перевірку або правило."
+
+msgid "#{number} needs a review."
+msgstr "#{number} потребує рев'ю."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -2026,6 +2044,9 @@ msgstr "Спершу додайте {repositoryName} як проєкт на ко
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Спочатку додайте {repositoryName} як проєкт на цьому комп'ютері"
 
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "Додати #{prNumber} до черги злиття?"
+
 msgid "Add a comment…"
 msgstr "Додайте коментар…"
 
@@ -2177,6 +2198,9 @@ msgstr "Додати скрипт"
 msgid "Add setup commands, one per line..."
 msgstr "Додайте команди налаштування, по одній у рядку..."
 
+msgid "Add stack to merge queue"
+msgstr "Додати стек до черги злиття"
+
 msgid "Add tag…"
 msgstr "Додати тег…"
 
@@ -2213,8 +2237,14 @@ msgstr "Додати до словника"
 msgid "Add to favorites"
 msgstr "Додати до вибраного"
 
+msgid "Add to merge queue"
+msgstr "Додати до черги злиття"
+
 msgid "Add to project"
 msgstr "Додати до проєкту"
+
+msgid "Add to queue"
+msgstr "У чергу"
 
 msgid "Add to sidebar"
 msgstr "Додати на бічну панель"
@@ -2252,9 +2282,15 @@ msgstr "Додаються лише під час запуску з промпт
 msgid "Added to agent input"
 msgstr "Додано в поле введення агента"
 
+msgid "Added to merge queue"
+msgstr "Додано до черги злиття"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Щоб додавати людей до {organizationName}, потрібен платний тариф. Тарифом вашої організації керує її власник на {0}."
+
+msgid "Adding to queue…"
+msgstr "Додавання до черги…"
 
 msgid "Adding..."
 msgstr "Додавання..."
@@ -3516,6 +3552,9 @@ msgstr "До"
 msgid "Behavior"
 msgstr "Поведінка"
 
+msgid "Behind base"
+msgstr "Відстає від бази"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Відстає від main на ? комітів, потрібен ребейз"
 
@@ -3566,6 +3605,10 @@ msgstr "Блокувати вміст на будь-якій сторінці"
 
 msgid "blocked"
 msgstr "заблоковано"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "Заблоковано"
 
 msgid "Blocked by Branch Rules"
 msgstr "Заблоковано правилами гілки"
@@ -4255,6 +4298,10 @@ msgstr "Перевірте поштову скриньку"
 msgid "Checkbox · Radio · Switch"
 msgstr "Прапорець · Радіокнопка · Перемикач"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "Перевіряється"
+
 msgid "Checking agents…"
 msgstr "Перевірка агентів…"
 
@@ -4306,6 +4353,9 @@ msgstr "Перевірки завершено"
 
 msgid "Checks failed"
 msgstr "Перевірки не пройдено"
+
+msgid "Checks failing"
+msgstr "Перевірки не проходять"
 
 msgid "Checks passed"
 msgstr "Перевірки пройдено"
@@ -5135,6 +5185,10 @@ msgstr "Підтверджувати перед виходом"
 
 msgid "Confirm switch"
 msgstr "Підтвердити перемикання"
+
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "Конфлікти"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -6052,6 +6106,9 @@ msgstr "Не вдалося скопіювати зображення"
 msgid "Couldn't copy the screenshot"
 msgstr "Не вдалося скопіювати знімок екрана"
 
+msgid "Couldn't create stack"
+msgstr "Не вдалося створити стек"
+
 msgid "Couldn't create the channel"
 msgstr "Не вдалося створити канал"
 
@@ -6184,6 +6241,9 @@ msgstr "Не вдалося прочитати контекст цього те�
 
 msgid "Couldn't read usage history from this host."
 msgstr "Не вдалося прочитати історію використання з цього хоста."
+
+msgid "Couldn't remove from the merge queue"
+msgstr "Не вдалося прибрати з черги злиття"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не вдалося видалити локальні дані входу"
@@ -6447,6 +6507,9 @@ msgstr "Створити проєкт…"
 
 msgid "Create pull request"
 msgstr "Створити пул-реквест"
+
+msgid "Create stack"
+msgstr "Створити стек"
 
 msgid "Create task"
 msgstr "Створити завдання"
@@ -8013,6 +8076,9 @@ msgstr "Щохвилини"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Кожна мета робить свій внесок у наступну сходинку. Виміряно за останні 30 днів."
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "Усі відкриті пул-реквести до #{prNumber} по черзі потраплять до черги злиття для {base}. GitHub зіллє їх, коли настане їхня черга і пройдуть перевірки."
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "Кожен платний тариф містить Paradev Mobile, автоматизації та пріоритетну підтримку. Тарифи з хмарними робочими просторами дають вашій команді спільний пул ГБ-годин."
 
@@ -9427,6 +9493,9 @@ msgstr "Встановлення GitHub App скасовано."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App успішно встановлено!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub не може злити цей стек тут за один крок."
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub підключено, але не вдалося запустити початкову синхронізацію. Спробуйте підключитися повторно."
 
@@ -9439,8 +9508,14 @@ msgstr "Встановлення GitHub не знайдено"
 msgid "GitHub integration"
 msgstr "Інтеграція з GitHub"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub ще зливає. Це оновиться, коли він закінчить."
+
 msgid "GitHub issues"
 msgstr "GitHub issues"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "GitHub зіллє його, коли настане його черга і пройдуть перевірки."
 
 msgid "GitHub rate limit reached"
 msgstr "Досягнуто ліміту запитів GitHub"
@@ -9453,6 +9528,12 @@ msgstr "Репозиторії GitHub із файлом маркетплейсу
 
 msgid "GitHub sign-in needed"
 msgstr "Потрібно увійти в GitHub"
+
+msgid "GitHub stack created"
+msgstr "Стек GitHub створено"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "Стеки GitHub не ввімкнені для цього репозиторію."
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "Для синхронізації з GitHub потрібен тариф Pro."
@@ -10184,6 +10265,12 @@ msgstr "На рев'ю"
 
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "У десктопному застосунку {appName} відкрийте «Налаштування → Віддалений доступ» і ввімкніть «Дозволити віддалений доступ до цього пристрою через релей»."
+
+msgid "In the merge queue"
+msgstr "У черзі злиття"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "У черзі злиття. GitHub зіллє його, коли настане його черга."
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "У десктопному застосунку Paradev відкрийте <0>Налаштування → Вигляд → Тема</0>."
@@ -11792,8 +11879,11 @@ msgstr "Злити"
 msgid "Merge #{0}?"
 msgstr "Злити #{0}?"
 
-msgid "Merge #{number} first. A stack built from base branches merges one pull request at a time."
-msgstr "Спершу злийте #{number}. Стек із базових гілок зливається по одному пул-реквесту."
+msgid "Merge #{number} first, or create a GitHub stack to merge these together."
+msgstr "Спершу злийте #{number} або створіть стек GitHub, щоб злити їх разом."
+
+msgid "Merge #{prNumber}?"
+msgstr "Злити #{prNumber}?"
 
 msgid "Merge commit"
 msgstr "Коміт злиття"
@@ -15510,6 +15600,9 @@ msgstr "Дії з пул-реквестом"
 msgid "Pull request detail tabs"
 msgstr "Вкладки відомостей про пул-реквест"
 
+msgid "Pull request merged"
+msgstr "Пул-реквест злито"
+
 msgid "Pull request not found"
 msgstr "Пул-реквест не знайдено"
 
@@ -15590,6 +15683,9 @@ msgstr "Чергу призупинено через ліміт використ
 msgid "Queue paused when Paradev closed"
 msgstr "Чергу призупинено, коли Paradev закрився"
 
+msgid "Queue stack"
+msgstr "Стек у чергу"
+
 msgid "Queue work for agents"
 msgstr "Ставте роботу для агентів у чергу"
 
@@ -15598,6 +15694,9 @@ msgstr "У чергу; ⌘↩, щоб скерувати поточний хід
 
 msgid "Queued"
 msgstr "У черзі"
+
+msgid "Queued · {position}"
+msgstr "У черзі · {position}"
 
 msgid "Queued messages"
 msgstr "Повідомлення в черзі"
@@ -16115,6 +16214,9 @@ msgstr "Прибрати з вибраного"
 msgid "Remove from group"
 msgstr "Прибрати з групи"
 
+msgid "Remove from queue"
+msgstr "Прибрати з черги"
+
 msgid "Remove from Queue"
 msgstr "Прибрати з черги"
 
@@ -16195,6 +16297,9 @@ msgstr "{name} видалено"
 
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel} видалено."
+
+msgid "Removed from the merge queue"
+msgstr "Прибрано з черги злиття"
 
 msgid "Removes this agent from this device only."
 msgstr "Видаляє цього агента лише з цього пристрою."
@@ -16541,6 +16646,9 @@ msgstr "Ресурси"
 
 msgid "Response"
 msgstr "Відповідь"
+
+msgid "Restack"
+msgstr "Ребейз стека"
 
 msgid "Restart"
 msgstr "Перезапустити"
@@ -20081,6 +20189,9 @@ msgstr "Термін дії сертифіката сайту минув"
 msgid "The site's certificate is invalid"
 msgstr "Сертифікат сайту недійсний"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "Стек змінився, поки це було відкрито. Перевірте його і спробуйте ще раз."
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Початкова точка, з якої завантажується хмарний робочий простір. Змінні, задані тут, потрапляють у кожну пісочницю, запущену з неї."
 
@@ -20140,6 +20251,9 @@ msgstr "Картка попереднього перегляду теми"
 
 msgid "Themes"
 msgstr "Теми"
+
+msgid "These are linked by base branch. A GitHub stack merges them in one step."
+msgstr "Вони пов'язані базовими гілками. Стек GitHub зливає їх за один крок."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Ці команди виконуються автоматично під час створення робочого простору. <0>Читати документацію<1/></0>"
@@ -20451,9 +20565,6 @@ msgstr "Цей профіль зараз зайнятий"
 msgid "This project is no longer available on your devices."
 msgstr "Цей проєкт більше недоступний на ваших пристроях."
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "Цей проєкт не пов’язано з репозиторієм GitHub."
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "Цей проєкт досі використовує старіший config.json. Він і далі працює; перетворіть його на config.toml, щоб користуватися новими розділами."
 
@@ -20571,6 +20682,15 @@ msgstr "Це видалить команду <0>{0}</0> і прибере всі
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Це примусово завершить усі активні сеанси й перезапустить демон терміналів. Застосунок перезапустить термінали з новим демоном."
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber} буде злито в {base} за допомогою коміту злиття."
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "#{prNumber} буде злито в {base} за допомогою ребейзу."
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "#{prNumber} буде злито в {base} за допомогою squash."
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "Це назавжди видалить рутину й зупинить майбутні запуски."
