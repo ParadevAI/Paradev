@@ -49,7 +49,10 @@ export function useStoredChatSnapshot(
 	const shownId = query.data && !query.isPlaceholderData ? sessionId : null;
 	useEffect(() => {
 		if (shownId) {
-			electronQueryClient.setQueryData(shownStoredChatKey(workspace.id), shownId);
+			electronQueryClient.setQueryData(
+				shownStoredChatKey(workspace.id),
+				shownId,
+			);
 		}
 	}, [shownId, workspace.id]);
 	return query.data ?? null;

@@ -1,3 +1,1 @@
-export {
-	StoredChatTranscript,
-} from "./StoredChatTranscript";
+export { StoredChatTranscript } from "./StoredChatTranscript";
