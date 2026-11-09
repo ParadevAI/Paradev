@@ -66,7 +66,10 @@ that must not change under them.
 `license` — with everything Paradev-specific under `extensions.superset`:
 
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
-  `packages/shared/src/plugins/index.ts`), and `icon`.
+  `packages/shared/src/plugins/index.ts`), and `icon`. `icon` names a built-in icon key or an
+  image inside the plugin (`./assets/icon.svg`: svg, png, webp or jpeg, ≤ 256 KB, no URLs,
+  absolute paths or traversal). The desktop reads the image from the installed tree
+  (`packages/agent-setup/src/plugin-icon.ts`), so it shows only once the plugin is installed.
 - `connector` — the one connection this plugin needs, as `{ "slug" }`. A slug names a connector in
   `packages/shared/src/connectors/connectors.json`; the manifest carries no OAuth configuration of
   its own — no scopes, no client mode, no `requires_env`. A connection is account state, and the
