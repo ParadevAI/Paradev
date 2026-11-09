@@ -6,6 +6,7 @@ import {
 	useWorkspaceMoveProgressStore,
 	type WorkspaceMoveProgressStage,
 } from "../../stores/workspaceMoveProgressStore";
+import { MOVE_CANCELLED } from "../describeMoveError";
 
 const POLL_MS = 2_000;
 /** Longer than a stuck move takes to fail on its own. */
@@ -17,6 +18,8 @@ export interface WorkspaceMoveProgressHandle {
 	/** Aborts when the person cancels the move from the toast. */
 	signal: AbortSignal;
 	setStage: (stage: "saving" | "creating") => void;
+	/** Links the toast to the control plane's move, so a cancel elsewhere ends it. */
+	begun: (workspaceMoveId: string) => void;
 	/** Follows the move's chats into this workspace until the move ends. */
 	follow: (toWorkspaceId: string) => void;
 	fail: (message: string) => void;
@@ -39,6 +42,7 @@ export function startWorkspaceMoveProgress(args: {
 	const { retry } = args;
 	useWorkspaceMoveProgressStore.getState().start({
 		id,
+		workspaceMoveId: null,
 		name: args.name,
 		destination: args.destination,
 		stage: "saving",
@@ -72,9 +76,14 @@ export function startWorkspaceMoveProgress(args: {
 			if (current()?.stage === "cancelled") return;
 			update(id, { stage });
 		},
+		begun: (workspaceMoveId) => update(id, { workspaceMoveId }),
 		fail: (message) => {
 			const move = current();
 			if (!move || move.stage === "cancelled") return;
+			if (message === MOVE_CANCELLED) {
+				update(id, { stage: "cancelled", cancel: null });
+				return;
+			}
 			update(id, {
 				stage: "failed",
 				error: message,

@@ -2,6 +2,12 @@ import { z } from "zod";
 
 export const chatMoveOfChatInputSchema = z.object({
 	chatSessionId: z.string().uuid(),
+	/** The newest move by anyone in the organization, not only the caller's. */
+	anyone: z.boolean().optional(),
+});
+
+export const chatMovesWaitingOnHostInputSchema = z.object({
+	hostId: z.string().min(1).max(200),
 });
 
 /** As many chats as one workspace move takes. */

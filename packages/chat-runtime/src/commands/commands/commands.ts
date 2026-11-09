@@ -462,6 +462,57 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 	): boolean =>
 		agentConfigId === undefined ||
 		(options.sessions.get(sessionId)?.agentConfigId ?? null) === agentConfigId;
+	const running = (sessionId: string): boolean => {
+		const live = options.live.get(sessionId);
+		return live !== null && live.state.status !== "dead";
+	};
+	const openOnAgentSession = (
+		input: z.output<typeof createSessionCommandSchema>,
+	): ChatSessionRow[] => {
+		const harnessSessionId = input.resume?.harnessSessionId;
+		if (!harnessSessionId) return [];
+		return options.sessions
+			.listByScope(input.scopeId)
+			.filter(
+				(row) =>
+					!row.closedAt &&
+					row.harness === input.harness &&
+					row.harnessSessionId === harnessSessionId,
+			);
+	};
+
+	const closeChat = async (
+		sessionId: string,
+		{ userClosed = false } = {},
+	): Promise<void> => {
+		const wasLive = options.live.get(sessionId) !== null;
+		options.sessions.markClosed(sessionId, { byUser: userClosed });
+		replays.delete(sessionId);
+		subagentItems.forget(sessionId);
+		for (const category of SELECTION_CATEGORIES) {
+			savedPicks.delete(`${sessionId}:${category}`);
+		}
+		try {
+			await options.live.dispose(sessionId);
+		} finally {
+			if (wasLive) options.journal.announce(sessionId);
+		}
+	};
+
+	const retireStopped = (
+		sharing: readonly ChatSessionRow[],
+		keptSessionId: string,
+	): void => {
+		for (const row of sharing) {
+			if (row.sessionId === keptSessionId || running(row.sessionId)) continue;
+			void closeChat(row.sessionId).catch((error: unknown) =>
+				console.warn(
+					`[chat-runtime] could not close ${row.sessionId}, which ${keptSessionId} now resumes`,
+					error,
+				),
+			);
+		}
+	};
 
 	const resumedByTerminal = new Map<string, ResumedChat>();
 	const resumedFor = (
@@ -570,6 +621,20 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						: null;
 				const handedOff = resumed && handOff(resumed);
 				if (handedOff) return handedOff;
+				const sharing = openOnAgentSession(parsed);
+				const alreadyRunning = sharing.find(
+					(row) =>
+						running(row.sessionId) &&
+						runsConfig(row.sessionId, parsed.agentConfigId),
+				);
+				if (alreadyRunning) {
+					if (resumed) sendPending(resumed, alreadyRunning.sessionId);
+					retireStopped(sharing, alreadyRunning.sessionId);
+					return {
+						sessionId: alreadyRunning.sessionId,
+						epoch: alreadyRunning.epoch,
+					};
+				}
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
@@ -638,6 +703,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						.carryFrom(carriedFrom(replay.snapshot, parsed.harness));
 				}
 				if (resumed) sendPending(resumed, sessionId);
+				retireStopped(sharing, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});
 		},
@@ -974,20 +1040,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
-			const wasLive = options.live.get(parsed.sessionId) !== null;
-			options.sessions.markClosed(parsed.sessionId, {
-				byUser: parsed.userClosed === true,
+			await closeChat(parsed.sessionId, {
+				userClosed: parsed.userClosed === true,
 			});
-			replays.delete(parsed.sessionId);
-			subagentItems.forget(parsed.sessionId);
-			for (const category of SELECTION_CATEGORIES) {
-				savedPicks.delete(`${parsed.sessionId}:${category}`);
-			}
-			try {
-				await options.live.dispose(parsed.sessionId);
-			} finally {
-				if (wasLive) options.journal.announce(parsed.sessionId);
-			}
 		},
 
 		async closeScope(scopeId) {

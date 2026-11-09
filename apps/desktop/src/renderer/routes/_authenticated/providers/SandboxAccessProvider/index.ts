@@ -5,5 +5,6 @@ export type {
 export {
 	SandboxAccessContext,
 	SandboxAccessProvider,
+	sandboxWakeQueryKey,
 	useSandboxAccess,
 } from "./SandboxAccessProvider";

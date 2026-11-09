@@ -6,7 +6,7 @@ export const MOVE_HEARTBEAT_MS = 60_000;
  * Runs a begun workspace move's own work while telling the control plane it
  * is still going, so the stale sweep never ends a move that is only slow.
  * When the control plane says the move already ended, the work stops with
- * that reason.
+ * the reason it gives, such as a cancel from another view.
  */
 export async function keepMoveAlive<T>({
 	workspaceMoveId,
@@ -16,7 +16,9 @@ export async function keepMoveAlive<T>({
 	work,
 }: {
 	workspaceMoveId: string;
-	heartbeat: (workspaceMoveId: string) => Promise<{ alive: boolean }>;
+	heartbeat: (
+		workspaceMoveId: string,
+	) => Promise<{ alive: boolean; error?: string | null }>;
 	signal?: AbortSignal;
 	intervalMs?: number;
 	work: (signal: AbortSignal) => Promise<T>;
@@ -34,9 +36,9 @@ export async function keepMoveAlive<T>({
 
 	const timer = setInterval(() => {
 		heartbeat(workspaceMoveId).then(
-			({ alive }) => {
+			({ alive, error: reason }) => {
 				if (alive || controller.signal.aborted) return;
-				const error = new Error(MOVE_STOPPED_ANSWERING);
+				const error = new Error(reason || MOVE_STOPPED_ANSWERING);
 				controller.abort(error);
 				rejectEnded(error);
 			},

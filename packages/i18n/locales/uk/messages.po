@@ -96,6 +96,10 @@ msgstr "(ви)"
 msgid "[prompt]"
 msgstr "[промпт]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {Переміщено {done} з # чату} few {Переміщено {done} з # чатів} many {Переміщено {done} з # чатів} other {Переміщено {done} з # чату}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# активний порт — сховати деталі} few {# активні порти — сховати деталі} many {# активних портів — сховати деталі} other {# активного порту — сховати деталі}}"
@@ -390,6 +394,10 @@ msgstr "{0, plural, one {Показати ще # рядок} few {Показат
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {# наявний worktree буде імпортовано в Paradev як робочий простір. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} few {# наявні worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} many {# наявних worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} other {# наявного worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Цей робочий простір переміщено. Його # чат залишився тут.} few {Цей робочий простір переміщено. Його # чати залишилися тут.} many {Цей робочий простір переміщено. Його # чатів залишилися тут.} other {Цей робочий простір переміщено. Його # чату залишилося тут.}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, one {Показати # вирішений коментар} few {Показати # вирішені коментарі} many {Показати # вирішених коментарів} other {Показати # вирішеного коментаря}}"
@@ -588,6 +596,10 @@ msgstr "Вибрано: {0}"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "Завершено сеансів: {0}"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} залишається там, де був. Якщо агент працював, його могло бути зупинено."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -997,9 +1009,6 @@ msgstr "{duration, plural, one {Думав # секунду} few {Думав # �
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} у цьому робочому просторі вже опубліковано як сторінку в іншій організації. Перемістіть файл або опублікуйте його з ідентифікатором тієї сторінки."
 
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, one {# чат не вдалося перенести на комп’ютер} few {# чати не вдалося перенести на комп’ютер} many {# чатів не вдалося перенести на комп’ютер} other {# чату не вдалося перенести на комп’ютер}}"
-
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# не пройдено} few {# не пройдено} many {# не пройдено} other {# не пройдено}}"
 
@@ -1162,6 +1171,12 @@ msgstr "{name} вбудовано, тому його не можна замін�
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} не додано"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} без змін. Якщо агент працював, його могло бути зупинено."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} без змін. Якщо агент працював, його зупинено."
+
 msgid "{name} plugin"
 msgstr "Плагін {name}"
 
@@ -1305,9 +1320,6 @@ msgstr "{rate} за ГБ-год. Використовуються після м�
 msgid "{readPercent}% read"
 msgstr "прочитано {readPercent}%"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "Сюди переміщено {ready} з {total} чатів"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1378,8 +1390,8 @@ msgstr "{threshold, plural, one {Злито # агентський PR} few {Зл
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
 
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {Переміщено {done} з # чату} few {Переміщено {done} з # чатів} many {Переміщено {done} з # чатів} other {Переміщено {done} з # чату}}"
+msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
+msgstr "{total, plural, one {Сюди переміщено {ready} з # чату} few {Сюди переміщено {ready} з # чатів} many {Сюди переміщено {ready} з # чатів} other {Сюди переміщено {ready} з # чату}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, =1 {Перевірку пройдено} one {Пройдено всі перевірки: #} few {Пройдено всі перевірки: #} many {Пройдено всі перевірки: #} other {Пройдено всі перевірки: #}}"
@@ -8061,6 +8073,9 @@ msgstr "Усе з Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Усе з Ultra, а також індивідуальні хмарні ГБ-години, SSO і SAML, надання доступу через SCIM, обмеження за IP, журнали аудиту, індивідуальний SLA, виділена підтримка та індивідуальні договори. Ціну підбираємо під вашу організацію. Зв'яжіться з нами, і ми підберемо відповідний варіант."
 
+msgid "Everything moved."
+msgstr "Усе переміщено."
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Усе, що ми збудували поверх примітивів — власні компоненти Paradev, а також"
 
@@ -8933,6 +8948,9 @@ msgstr "Завершено · не прочитано"
 
 msgid "finished · worked for 7s"
 msgstr "завершив · працював 7 с"
+
+msgid "Finishing the move…"
+msgstr "Завершення переміщення…"
 
 msgid "Fit"
 msgstr "За розміром"
@@ -10622,6 +10640,9 @@ msgstr "Елемент"
 
 msgid "Iterate."
 msgstr "Доопрацьовуйте."
+
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Його чати не переміщено, вони залишилися в початковому робочому просторі. Відкрийте новий робочий простір, щоб дізнатися причину, і спробуйте ще раз."
 
 msgid "Its comments and history go with it."
 msgstr "Його коментарі та історію буде видалено разом із ним."
@@ -14126,6 +14147,9 @@ msgstr "Відкрити глобальну палітру команд"
 msgid "Open the new workspace modal"
 msgstr "Відкрити вікно нового робочого простору"
 
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Відкрийте новий робочий простір, щоб побачити кожен чат. Чат, який не переміщено, залишився в початковому робочому просторі."
+
 msgid "Open the original workspace"
 msgstr "Відкрити початковий робочий простір"
 
@@ -17174,6 +17198,9 @@ msgstr "Збережено в «Завантаження»"
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
 
+msgid "Saving its work and its chats…"
+msgstr "Збереження його роботи й чатів…"
+
 msgid "Saving..."
 msgstr "Збереження..."
 
@@ -17914,6 +17941,9 @@ msgstr "Налаштування збережено"
 msgid "Setting up in the background..."
 msgstr "Налаштування у фоні..."
 
+msgid "Setting up the new workspace…"
+msgstr "Налаштування нового робочого простору…"
+
 msgid "Settings"
 msgstr "Налаштування"
 
@@ -18585,6 +18615,9 @@ msgstr "Хтось"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Хтось інший уже опублікував {entryPath} з цього робочого простору. Опублікуйте з явним ідентифікатором сторінки, щоб додати версію до його сторінки, або перемістіть файл."
+
+msgid "Someone is moving this workspace…"
+msgstr "Хтось переміщує цей робочий простір…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Команда Paradev перевірить цю сторінку. Ми зв'яжемося з вами, лише якщо нам знадобиться щось іще."
@@ -19754,6 +19787,9 @@ msgstr "Чат залишиться без змін. Файли, які будь
 msgid "the cloud"
 msgstr "хмара"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "Хмарний робочий простір не запущено. Запустіть його й спробуйте ще раз."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Хмарний робочий простір мав запуститися, але не відповів вчасно. Наступний запуск спробує знову."
 
@@ -19932,17 +19968,20 @@ msgstr "Більшість злитих PR від агентів потребу�
 msgid "The model declined to continue"
 msgstr "Модель відмовилася продовжувати"
 
-msgid "The move into this workspace failed."
-msgstr "Перенесення в цей робочий простір не вдалося."
-
 msgid "The move service couldn't be reached."
 msgstr "Сервіс перенесення недоступний."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Перенесення перестало відповідати, тому його завершено."
 
+msgid "The move timed out."
+msgstr "Час очікування переміщення минув."
+
 msgid "The move was cancelled."
 msgstr "Перенесення скасовано."
+
+msgid "The move was stopped. This workspace stayed here."
+msgstr "Переміщення зупинено. Цей робочий простір залишився тут."
 
 msgid "The name of your organization or team"
 msgstr "Назва вашої організації чи команди"
@@ -19955,6 +19994,9 @@ msgstr "Робочий простір з відкритим кодом для Cl
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Робочий простір з відкритим кодом для Claude Code, Codex, OpenCode і будь-якого кодинг-агента. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "Інша сторона переміщення використовує старішу версію. Перезапустіть хмарний робочий простір або оновіть хост комп'ютера, а потім спробуйте ще раз."
 
 msgid "The overnight shift"
 msgstr "Нічна зміна"
@@ -20091,6 +20133,9 @@ msgstr "Оновлення також зможе:"
 msgid "The very beginning"
 msgstr "Самісінький початок"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "Не вдалося підключитися до робочого простору. Перевірте, що він запущений, і спробуйте ще раз."
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "Робочий простір ще не готовий. Спробуйте ще раз."
 
@@ -20132,9 +20177,6 @@ msgstr "У цих папках досі є ваші файли, але вони 
 
 msgid "These ports are still in use"
 msgstr "Ці порти досі використовуються"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Вони досі в початковому робочому просторі. Відкрийте кожен, щоб спробувати знову."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Вони працюють на підписках і ключах, які у вас уже є."
@@ -20316,9 +20358,6 @@ msgstr "Це запрошення вже прийнято."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Це посилання-запрошення недійсне, або термін його дії минув."
-
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Це триває довше, ніж зазвичай. Нижче — остання збережена копія чату; по-справжньому він відкриється, коли робочий простір запуститься."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Це триває довше, ніж зазвичай. Можливо, пісочниця ще завантажує свій образ — процес триває незалежно від того, чи відкрите це вікно."
@@ -20582,8 +20621,8 @@ msgstr "Це зніме з індексу та відкотить усі про�
 msgid "This workspace"
 msgstr "Цей робочий простір"
 
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Не вдалося перенести цей робочий простір. Він не змінився."
+msgid "This workspace couldn't move."
+msgstr "Не вдалося перемістити цей робочий простір."
 
 msgid "This workspace has no project to branch from"
 msgstr "У цього робочого простору немає проєкту, від якого можна створити гілку"
@@ -21806,9 +21845,6 @@ msgstr "Очікування першого повідомлення субаг�
 
 msgid "Waiting for your input"
 msgstr "Чекає на вашу відповідь"
-
-msgid "Waking the workspace…"
-msgstr "Пробудження робочого простору…"
 
 msgid "Waking up workspace"
 msgstr "Пробудження робочого простору"

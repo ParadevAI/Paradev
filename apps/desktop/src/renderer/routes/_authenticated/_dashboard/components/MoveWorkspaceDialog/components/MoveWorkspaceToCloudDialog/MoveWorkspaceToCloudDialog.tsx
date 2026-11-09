@@ -106,6 +106,7 @@ export function MoveWorkspaceToCloudDialog({
 			machineSize: selection.machineSize,
 			onStage: (stage) =>
 				progress.setStage(stage === "saving" ? "saving" : "creating"),
+			onBegun: progress.begun,
 			signal: progress.signal,
 		})
 			.then(({ toWorkspaceId, skipped }) => {

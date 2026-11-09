@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
@@ -7,6 +8,7 @@ import { X } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useWorkspaceMoveProgressStore } from "renderer/routes/_authenticated/_dashboard/stores/workspaceMoveProgressStore";
 import {
 	describeMoveError,
 	MOVE_CANCELLED,
@@ -19,7 +21,7 @@ const IN_FLIGHT = new Set(["pending", "moving"]);
 /**
  * Where this workspace's newest move stands: on the workspace it left, that it
  * moved and where to; on the one it moved to, how many chats are still on
- * their way. Each moved chat's own pane shows its progress and retry.
+ * their way. Each moved chat's own pane shows its progress, failure and retry.
  */
 export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 	const { t } = useLingui();
@@ -29,7 +31,7 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 		useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
 	const utils = cloudTrpc.useUtils();
 	const { data: move } = cloudTrpc.workspaceMove.latest.useQuery(
-		{ workspaceId },
+		{ workspaceId, anyone: true },
 		{
 			enabled: movesEnabled,
 			refetchInterval: (query) =>
@@ -52,20 +54,41 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 	const destination = move.toWorkspaceId;
 	const isSource = move.fromWorkspaceId === workspaceId;
 	const stayed = move.chats.total - move.chats.ready;
+	const isMine = move.isMine !== false;
 	const cancellable =
-		isSource && move.status === "pending" && !move.toWorkspaceId;
+		isMine && isSource && move.status === "pending" && !move.toWorkspaceId;
+	const cancelled = move.status === "failed" && move.error === MOVE_CANCELLED;
 	const failure =
-		move.status === "failed" ? describeMoveError(move.error) : null;
+		move.status === "failed" && !cancelled
+			? describeMoveError(move.error)
+			: null;
+	const cancel = () => {
+		stopLocalProgress(move.id);
+		abandon.mutate({ workspaceMoveId: move.id, error: MOVE_CANCELLED });
+	};
 	let label: ReactNode = null;
-	if (failure) {
-		label = isSource ? (
-			<Trans>This workspace couldn't move. It is unchanged.</Trans>
-		) : (
-			<Trans>The move into this workspace failed.</Trans>
-		);
+	if (cancelled) {
+		if (!isSource) return null;
+		label = <Trans>The move was stopped. This workspace stayed here.</Trans>;
+	} else if (failure) {
+		if (!isSource) return null;
+		label =
+			destination && move.chats.ready > 0 ? (
+				<Plural
+					value={move.chats.total - move.chats.ready}
+					one="This workspace moved. Its # chat stayed here."
+					other="This workspace moved. Its # chats stayed here."
+				/>
+			) : (
+				<Trans>This workspace couldn't move.</Trans>
+			);
 	} else if (isSource) {
 		if (inFlight) {
-			label = <Trans>Moving this workspace…</Trans>;
+			label = isMine ? (
+				<Trans>Moving this workspace…</Trans>
+			) : (
+				<Trans>Someone is moving this workspace…</Trans>
+			);
 		} else if (move.status === "ready") {
 			label = <Trans>This workspace moved</Trans>;
 		} else if (move.status === "partial") {
@@ -90,7 +113,12 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 			);
 	} else if (move.status === "partial") {
 		const { ready, total } = move.chats;
-		label = t({ message: `${ready} of ${total} chats moved here` });
+		label = t({
+			message: plural(total, {
+				one: `${ready} of # chat moved here`,
+				other: `${ready} of # chats moved here`,
+			}),
+		});
 	}
 	if (!label) return null;
 
@@ -105,22 +133,12 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 					title={failure ? (failure.details ?? failure.reason) : undefined}
 				>
 					{label}
-					{failure ? (
-						<span className="ml-1.5 font-normal text-muted-foreground">
-							{failure.reason}
-						</span>
-					) : null}
 				</span>
 				{cancellable ? (
 					<button
 						type="button"
 						disabled={abandon.isPending}
-						onClick={() =>
-							abandon.mutate({
-								workspaceMoveId: move.id,
-								error: MOVE_CANCELLED,
-							})
-						}
+						onClick={cancel}
 						className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 font-medium hover:bg-accent/70 disabled:opacity-50"
 					>
 						<Trans>Cancel move</Trans>
@@ -148,4 +166,12 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 			</div>
 		</div>
 	);
+}
+
+/** The toast of a move this app is running stops at once, not at the next heartbeat. */
+function stopLocalProgress(workspaceMoveId: string): void {
+	const { moves } = useWorkspaceMoveProgressStore.getState();
+	for (const progress of Object.values(moves)) {
+		if (progress.workspaceMoveId === workspaceMoveId) progress.cancel?.();
+	}
 }

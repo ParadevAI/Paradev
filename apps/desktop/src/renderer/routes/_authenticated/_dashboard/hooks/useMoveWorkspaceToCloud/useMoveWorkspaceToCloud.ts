@@ -43,11 +43,13 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			environment,
 			machineSize,
 			onStage,
+			onBegun,
 			signal,
 		}: {
 			environment: { id: string; repositoryFullName: string | null };
 			machineSize: MachineSize;
 			onStage: (stage: MoveToCloudStage) => void;
+			onBegun?: (workspaceMoveId: string) => void;
 			signal?: AbortSignal;
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
@@ -72,6 +74,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					fromWorkspaceId: workspace.id,
 					fromHostId: workspace.hostId,
 				});
+			onBegun?.(workspaceMoveId);
 			const source = getHostServiceClientByUrl(activeHostUrl);
 			const leaving: { chats: string[] } = { chats: [] };
 			const { prepared, created } = await keepMoveAlive({
@@ -105,7 +108,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					return { prepared, created };
 				},
 			}).catch(async (error: unknown) => {
-				await abandonWorkspaceMove(workspaceMoveId, error);
+				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 				await releaseSourceChats(source, leaving.chats);
 				throw error;
 			});

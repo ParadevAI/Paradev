@@ -102,6 +102,10 @@ msgstr "(Ty)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {Przeniesiono {done} z # czatu} few {Przeniesiono {done} z # czatów} many {Przeniesiono {done} z # czatów} other {Przeniesiono {done} z # czatu}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktywny port — ukryj szczegóły} few {# aktywne porty — ukryj szczegóły} many {# aktywnych portów — ukryj szczegóły} other {# aktywnego portu — ukryj szczegóły}}"
@@ -396,6 +400,10 @@ msgstr "{0, plural, one {Pokaż jeszcze # wiersz} few {Pokaż jeszcze # wiersze}
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Spowoduje to zaimportowanie # istniejącego worktree do Paradev jako obszaru roboczego. Każdy worktree na dysku będzie śledzony i pojawi się na pasku bocznym. Żadne pliki nie zostaną zmienione.} few {Spowoduje to zaimportowanie # istniejących worktree do Paradev jako obszarów roboczych. Każdy worktree na dysku będzie śledzony i pojawi się na pasku bocznym. Żadne pliki nie zostaną zmienione.} many {Spowoduje to zaimportowanie # istniejących worktree do Paradev jako obszarów roboczych. Każdy worktree na dysku będzie śledzony i pojawi się na pasku bocznym. Żadne pliki nie zostaną zmienione.} other {Spowoduje to zaimportowanie # istniejących worktree do Paradev jako obszarów roboczych. Każdy worktree na dysku będzie śledzony i pojawi się na pasku bocznym. Żadne pliki nie zostaną zmienione.}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Ten obszar roboczy został przeniesiony. Jego # czat pozostał tutaj.} few {Ten obszar roboczy został przeniesiony. Jego # czaty pozostały tutaj.} many {Ten obszar roboczy został przeniesiony. Jego # czatów pozostało tutaj.} other {Ten obszar roboczy został przeniesiony. Jego # czatu pozostało tutaj.}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, one {Pokaż # rozwiązany komentarz} few {Pokaż # rozwiązane komentarze} many {Pokaż # rozwiązanych komentarzy} other {Pokaż # rozwiązanych komentarzy}}"
@@ -594,6 +602,10 @@ msgstr "Wybrano: {0}"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "Zakończono sesje: {0}"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} pozostaje tam, gdzie był. Jeśli agent pracował, mógł zostać zatrzymany."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -1003,9 +1015,6 @@ msgstr "{duration, plural, one {Myślał # sekundę} few {Myślał # sekundy} ma
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} w tym workspace jest już opublikowany jako strona w innej organizacji. Przenieś plik albo opublikuj z identyfikatorem tamtej strony."
 
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, one {# czatu nie udało się przenieść na komputer} few {# czatów nie udało się przenieść na komputer} many {# czatów nie udało się przenieść na komputer} other {# czatu nie udało się przenieść na komputer}}"
-
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# nieudany} few {# nieudane} many {# nieudanych} other {# nieudanego}}"
 
@@ -1168,6 +1177,12 @@ msgstr "{name} jest wbudowany i nie można go zastąpić"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} nie został dodany"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} pozostaje bez zmian. Jeśli agent pracował, mógł zostać zatrzymany."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} pozostaje bez zmian. Jeśli agent pracował, został zatrzymany."
+
 msgid "{name} plugin"
 msgstr "Wtyczka {name}"
 
@@ -1311,9 +1326,6 @@ msgstr "{rate} za GB-godzinę. Używane po miesięcznej puli, nigdy nie wygasaj�
 msgid "{readPercent}% read"
 msgstr "{readPercent}% przeczytane"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "Przeniesiono tutaj {ready} z {total} czatów"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1384,8 +1396,8 @@ msgstr "{threshold, plural, one {scalono # PR agenta} few {scalono # PR agenta} 
 msgid "{toolName} interrupted"
 msgstr "{toolName} przerwane"
 
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {Przeniesiono {done} z # czatu} few {Przeniesiono {done} z # czatów} many {Przeniesiono {done} z # czatów} other {Przeniesiono {done} z # czatu}}"
+msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
+msgstr "{total, plural, one {Przeniesiono tutaj {ready} z # czatu} few {Przeniesiono tutaj {ready} z # czatów} many {Przeniesiono tutaj {ready} z # czatów} other {Przeniesiono tutaj {ready} z # czatu}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola przeszła} few {Wszystkie # kontrole przeszły} many {Wszystkie # kontroli przeszło} other {Wszystkie # kontroli przeszło}}"
@@ -8067,6 +8079,9 @@ msgstr "Wszystko z Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Wszystko z Ultra plus indywidualna liczba chmurowych GB-godzin, SSO i SAML, provisioning SCIM, ograniczenia IP, logi audytu, indywidualne SLA, dedykowane wsparcie i indywidualne umowy. Cena jest dopasowana do Twojej organizacji. Skontaktuj się z nami, a dobierzemy odpowiednią ofertę."
 
+msgid "Everything moved."
+msgstr "Wszystko zostało przeniesione."
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Wszystko, co zbudowaliśmy na prymitywach — oryginały Paradev, zestaw"
 
@@ -8939,6 +8954,9 @@ msgstr "Zakończone · nieprzeczytane"
 
 msgid "finished · worked for 7s"
 msgstr "zakończono · pracował 7 s"
+
+msgid "Finishing the move…"
+msgstr "Kończenie przenoszenia…"
 
 msgid "Fit"
 msgstr "Dopasuj"
@@ -10628,6 +10646,9 @@ msgstr "Element"
 
 msgid "Iterate."
 msgstr "Ulepszaj."
+
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Jego czaty nie zostały przeniesione i nadal są w pierwotnym obszarze roboczym. Otwórz nowy obszar roboczy, aby sprawdzić przyczynę, i spróbuj ponownie."
 
 msgid "Its comments and history go with it."
 msgstr "Komentarze i historia też zostaną usunięte."
@@ -14132,6 +14153,9 @@ msgstr "Otwórz globalną paletę poleceń"
 msgid "Open the new workspace modal"
 msgstr "Otwórz okno nowego obszaru roboczego"
 
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Otwórz nowy obszar roboczy, aby zobaczyć każdy czat. Czat, który nie został przeniesiony, nadal jest w pierwotnym obszarze roboczym."
+
 msgid "Open the original workspace"
 msgstr "Otwórz pierwotny obszar roboczy"
 
@@ -17180,6 +17204,9 @@ msgstr "Zapisano w Pobranych"
 msgid "Saving as an environment..."
 msgstr "Zapisywanie jako środowisko..."
 
+msgid "Saving its work and its chats…"
+msgstr "Zapisywanie jego pracy i czatów…"
+
 msgid "Saving..."
 msgstr "Zapisywanie..."
 
@@ -17920,6 +17947,9 @@ msgstr "Ustawienie zapisane"
 msgid "Setting up in the background..."
 msgstr "Konfigurowanie w tle..."
 
+msgid "Setting up the new workspace…"
+msgstr "Konfigurowanie nowego obszaru roboczego…"
+
 msgid "Settings"
 msgstr "Ustawienia"
 
@@ -18591,6 +18621,9 @@ msgstr "Ktoś"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Ktoś inny opublikował już {entryPath} z tego workspace. Opublikuj z jawnym identyfikatorem strony, aby dodać wersję do jego strony, albo przenieś plik."
+
+msgid "Someone is moving this workspace…"
+msgstr "Ktoś przenosi ten obszar roboczy…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Ktoś z zespołu Paradev sprawdzi tę stronę. Odezwiemy się tylko wtedy, gdy będziemy potrzebować więcej informacji."
@@ -19760,6 +19793,9 @@ msgstr "Czat zostaje bez zmian. Pliki edytowane od tej tury przez kogokolwiek po
 msgid "the cloud"
 msgstr "chmura"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "Obszar roboczy w chmurze nie działa. Uruchom go i spróbuj ponownie."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Obszar roboczy w chmurze powinien był się uruchomić, ale nie odpowiedział na czas. Następne uruchomienie spróbuje ponownie."
 
@@ -19938,17 +19974,20 @@ msgstr "Większość scalonych PR-ów od agentów wymaga tylko przeglądu, bez �
 msgid "The model declined to continue"
 msgstr "Model odmówił kontynuowania"
 
-msgid "The move into this workspace failed."
-msgstr "Przenoszenie do tego obszaru roboczego nie powiodło się."
-
 msgid "The move service couldn't be reached."
 msgstr "Nie udało się połączyć z usługą przenoszenia."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Przenoszenie przestało odpowiadać, więc zostało zakończone."
 
+msgid "The move timed out."
+msgstr "Przekroczono limit czasu przenoszenia."
+
 msgid "The move was cancelled."
 msgstr "Przenoszenie zostało anulowane."
+
+msgid "The move was stopped. This workspace stayed here."
+msgstr "Przenoszenie zostało zatrzymane. Ten obszar roboczy pozostał tutaj."
 
 msgid "The name of your organization or team"
 msgstr "Nazwa organizacji lub zespołu"
@@ -19961,6 +20000,9 @@ msgstr "Otwartoźródłowy obszar roboczy dla Claude Code, Codex i dowolnego age
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Otwartoźródłowy workspace dla Claude Code, Codex, OpenCode i dowolnego agenta kodującego. Uruchamiaj zadania równolegle na osobnych gałęziach i przeglądaj wszystko w jednym miejscu."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "Druga strona przenoszenia używa starszej wersji. Uruchom ponownie obszar roboczy w chmurze lub zaktualizuj host komputera, a następnie spróbuj ponownie."
 
 msgid "The overnight shift"
 msgstr "Nocna zmiana"
@@ -20097,6 +20139,9 @@ msgstr "Aktualizacja może też:"
 msgid "The very beginning"
 msgstr "Sam początek"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "Nie udało się połączyć z obszarem roboczym. Sprawdź, czy działa, i spróbuj ponownie."
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "Obszar roboczy nie jest jeszcze gotowy. Spróbuj ponownie."
 
@@ -20138,9 +20183,6 @@ msgstr "Te foldery nadal zawierają Twoje pliki, ale nie zostały same przeniesi
 
 msgid "These ports are still in use"
 msgstr "Te porty są nadal używane"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Nadal są w pierwotnym obszarze roboczym. Otwórz każdy, aby spróbować ponownie."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Działają na subskrypcjach i kluczach, które już masz."
@@ -20322,9 +20364,6 @@ msgstr "To zaproszenie zostało już przyjęte."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Ten link z zaproszeniem jest nieprawidłowy lub wygasł."
-
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Trwa to dłużej niż zwykle. Poniżej jest ostatnia zapisana kopia czatu; otworzy się naprawdę po uruchomieniu obszaru roboczego."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Trwa to dłużej niż zwykle. Piaskownica może wciąż pobierać obraz — działa dalej niezależnie od tego, czy to okno jest otwarte."
@@ -20588,8 +20627,8 @@ msgstr "Usunie to z indeksu i cofnie wszystkie zaindeksowane zmiany. Zaindeksowa
 msgid "This workspace"
 msgstr "Ten obszar roboczy"
 
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Nie udało się przenieść tego obszaru roboczego. Nic się nie zmieniło."
+msgid "This workspace couldn't move."
+msgstr "Nie udało się przenieść tego obszaru roboczego."
 
 msgid "This workspace has no project to branch from"
 msgstr "Ten obszar roboczy nie ma projektu, z którego można się rozgałęzić"
@@ -21812,9 +21851,6 @@ msgstr "Oczekiwanie na pierwszą wiadomość subagenta…"
 
 msgid "Waiting for your input"
 msgstr "Czeka na Twoją odpowiedź"
-
-msgid "Waking the workspace…"
-msgstr "Wybudzanie obszaru roboczego…"
 
 msgid "Waking up workspace"
 msgstr "Wybudzanie obszaru roboczego"
